@@ -502,8 +502,7 @@ class DirectNeed:
     """One formula line scaled to a plan: what the run asks of an ingredient.
 
     ``has_recipe`` says the ingredient is itself made by a recipe — a
-    sub-assembly the run takes from its stock or makes — and ``make_fresh``
-    that the line never takes it from the shelf.
+    sub-assembly the run takes from the shelf, or from a run of its own.
     """
 
     child_template_id: UUID
@@ -511,82 +510,79 @@ class DirectNeed:
     uom_id: UUID | None
     unit: str
     has_recipe: bool
-    make_fresh: bool
 
 
-async def direct_needs(
+async def plan_needs(
     db: AsyncSession,
     organization_id: UUID,
-    recipe_id: UUID,
-    qty: Decimal,
-) -> list[DirectNeed]:
-    """The lines of one recipe at *qty* of its output, one level deep.
+    plans: list[tuple[UUID, Decimal]],
+) -> list[list[DirectNeed] | None]:
+    """What each ``(recipe, output quantity)`` plan asks for, as a planner reads it.
 
     Where an explosion walks a sub-assembly down to its raw materials, this
     stops at it: a planner asking what a week of runs needs wants "dough",
-    and the question of the dough's flour is the dough run's own. The scaling
-    is the explosion's (yield loss and batch yield included).
-    """
-    recipe = await resolve_recipe(db, organization_id, recipe_id)
-    children = await _find_default_recipes_batch(
-        db, organization_id, (line.child_template_id for line in recipe.lines)
-    )
-    return [
-        DirectNeed(
-            child_template_id=line.child_template_id,
-            qty=(
-                Decimal(str(qty))
-                * line.qty_per_batch
-                * (Decimal('1') + line.yield_loss_pct / Decimal('100'))
-                / recipe.batch_yield_qty
-            ),
-            uom_id=line.uom_id,
-            unit=line.unit,
-            has_recipe=line.child_template_id in children,
-            make_fresh=line.make_fresh,
-        )
-        for line in recipe.lines
-    ]
-
-
-async def explode_in_sequence(
-    db: AsyncSession,
-    organization_id: UUID,
-    plans: list[tuple[UUID, Decimal, StockPool | None]],
-) -> list[list[tuple[UUID, Decimal, str, UUID | None]] | None]:
-    """Explode ``(recipe, output quantity, pool)`` plans one after another.
-
-    Where :func:`explode_by_recipes_with_uom` answers independent questions
-    (each plan spends a fork of its pool), these plans are one queue: a plan
-    spends the very pool it is handed, so the intermediate a plan takes from
-    the shelf is no longer there for the next plan that shares that pool.
-    The recipes and the children's default recipes are read once for the
-    whole queue. A plan whose recipe the organization does not have answers
-    ``None`` in its place.
+    and the dough's flour is the question of the run that makes the dough,
+    planned or still to plan. A line marked make-fresh is the exception: the
+    run makes that sub-assembly itself and never takes it from the shelf (as
+    the explosion does), so its own ingredients stand in its place, by the
+    same rule one level down. The scaling is the explosion's (yield loss and
+    batch yield included). The recipes and the children's default recipes are
+    read once for the whole list; a plan whose recipe the organization does
+    not have answers ``None`` in its place.
     """
     if not plans:
         return []
     stmt = select(MakerRecipe).where(
-        MakerRecipe.id.in_({recipe_id for recipe_id, _qty, _pool in plans}),
+        MakerRecipe.id.in_({recipe_id for recipe_id, _qty in plans}),
         MakerRecipe.organization_id == organization_id,
     )
     tops = {recipe.id: recipe for recipe in (await db.scalars(stmt)).all()}
     child_cache = await _warm_child_cache(db, organization_id, tops.values())
     return [
-        await _explode_recipe(
-            db,
-            organization_id,
-            tops[recipe_id],
-            qty,
-            depth=0,
-            _seen=None,
-            _child_cache=child_cache,
-            pool=pool,
-        )
+        _plan_lines(tops[recipe_id], Decimal(str(qty)), child_cache, frozenset())
         if recipe_id in tops
         else None
-        for recipe_id, qty, pool in plans
+        for recipe_id, qty in plans
     ]
+
+
+def _plan_lines(
+    recipe: MakerRecipe,
+    qty: Decimal,
+    child_cache: dict[UUID, MakerRecipe | None],
+    seen: frozenset[UUID],
+) -> list[DirectNeed]:
+    """One recipe's lines at *qty*, a make-fresh sub-assembly replaced by its own."""
+    if len(seen) > _MAX_DEPTH:
+        raise ServiceRejectionError('bom_depth_exceeded', max_depth=_MAX_DEPTH)
+    if recipe.output_template_id in seen:
+        raise ServiceRejectionError(
+            'bom_cycle_detected', template_id=recipe.output_template_id
+        )
+    needs: list[DirectNeed] = []
+    for line in recipe.lines:
+        effective_qty = (
+            qty
+            * line.qty_per_batch
+            * (Decimal('1') + line.yield_loss_pct / Decimal('100'))
+            / recipe.batch_yield_qty
+        )
+        child = child_cache.get(line.child_template_id)
+        if child is not None and line.make_fresh and child.lines:
+            needs += _plan_lines(
+                child, effective_qty, child_cache, seen | {recipe.output_template_id}
+            )
+        else:
+            needs.append(
+                DirectNeed(
+                    child_template_id=line.child_template_id,
+                    qty=effective_qty,
+                    uom_id=line.uom_id,
+                    unit=line.unit,
+                    has_recipe=child is not None,
+                )
+            )
+    return needs
 
 
 async def _explode_recipe(

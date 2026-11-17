@@ -455,6 +455,130 @@ class TestTheCombinedList:
             assert Decimal(row['planned']) == Decimal('5')
             assert Decimal(row['missing']) == Decimal('0')
 
+    def test_a_consumer_whose_sub_assembly_comes_later_is_not_covered_by_raw_stock(
+        self,
+        client: TestClient,
+        headers: dict[str, str],
+        org: Organization,
+        shelf: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        # Flour enough for the dough is on the shelf, but the dough itself is
+        # made three days after the bread needs it. The plan and the list
+        # under it say the same thing: the bread waits for dough nobody makes
+        # in time, and the flour belongs to the dough run.
+        kg, _bag = _kg_and_bag(db_session, org)
+        flour = _template(db_session, org, 'Flour', uom=kg)
+        dough = _template(db_session, org, 'Dough', uom=kg)
+        bread = _template(db_session, org, 'Bread')
+        _recipe(db_session, org, dough, flour)
+        _recipe(db_session, org, bread, dough)
+        post_on_shelf(client, headers, flour, shelf.id, '10')
+        bread_run = _run(client, headers, bread, shelf, '5', _MONDAY)
+        dough_run = _run(
+            client, headers, dough, shelf, '5', _MONDAY + timedelta(days=3)
+        )
+
+        listed = {
+            row['id']: row
+            for row in client.get(f'{_API}/orders', headers=headers).json()['items']
+        }
+        rows = {r['name']: r for r in _week(client, headers)['rows']}
+
+        assert listed[bread_run['id']]['coverage'] == 'short'
+        assert [
+            i['child_template_name'] for i in listed[bread_run['id']]['coverage_items']
+        ] == ['Dough']
+        assert listed[dough_run['id']]['coverage'] == 'covered'
+        assert Decimal(rows['Dough']['missing']) == Decimal('5')
+        assert Decimal(rows['Flour']['needed']) == Decimal('5')
+        assert Decimal(rows['Flour']['missing']) == Decimal('0')
+
+    def test_what_a_planned_run_makes_is_spent_once_across_periods(
+        self,
+        client: TestClient,
+        headers: dict[str, str],
+        org: Organization,
+        shelf: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        # The week before: a dough run and the bread that uses its dough, the
+        # same day. This week: another bread. The earlier bread is served by
+        # its own dough run, not by this week's, so planning the dough this
+        # week is missing plans it once and then the line is clear.
+        kg, _bag = _kg_and_bag(db_session, org)
+        flour = _template(db_session, org, 'Flour', uom=kg)
+        dough = _template(db_session, org, 'Dough', uom=kg)
+        bread = _template(db_session, org, 'Bread')
+        _recipe(db_session, org, dough, flour)
+        _recipe(db_session, org, bread, dough)
+        post_on_shelf(client, headers, flour, shelf.id, '20')
+        week_before = _MONDAY - timedelta(days=7)
+        _run(client, headers, dough, shelf, '5', week_before)
+        _run(client, headers, bread, shelf, '5', week_before)
+        _run(client, headers, bread, shelf, '5', _MONDAY)
+        scope = {
+            'date_from': _MONDAY.isoformat(),
+            'date_to': (_MONDAY + timedelta(days=6)).isoformat(),
+        }
+
+        before = {r['name']: r for r in _week(client, headers)['rows']}
+        planned = client.post(
+            f'{_API}/needs/plan-intermediates', headers=headers, json=scope
+        )
+        again = client.post(
+            f'{_API}/needs/plan-intermediates', headers=headers, json=scope
+        )
+        after = {r['name']: r for r in _week(client, headers)['rows']}
+
+        assert Decimal(before['Dough']['planned']) == Decimal('0')
+        assert Decimal(before['Dough']['missing']) == Decimal('5')
+        assert len(planned.json()['runs']) == 1
+        assert again.json()['runs'] == []
+        assert Decimal(after['Dough']['planned']) == Decimal('5')
+        assert Decimal(after['Dough']['missing']) == Decimal('0')
+        # Twenty flour, five for the dough of the week before: fifteen left
+        # for this week's dough run, which needs five.
+        assert Decimal(after['Flour']['needed']) == Decimal('5')
+        assert Decimal(after['Flour']['in_stock']) == Decimal('15')
+
+    def test_a_sub_assembly_made_fresh_in_the_run_is_needed_as_its_ingredients(
+        self,
+        client: TestClient,
+        headers: dict[str, str],
+        org: Organization,
+        shelf: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        # A make-fresh line never takes the dough from the shelf: the bread run
+        # makes it itself, from flour. The list names the flour, and proposes
+        # no dough run — one the line would never take dough from.
+        kg, _bag = _kg_and_bag(db_session, org)
+        flour = _template(db_session, org, 'Flour', uom=kg)
+        dough = _template(db_session, org, 'Dough', uom=kg)
+        bread = _template(db_session, org, 'Bread')
+        _recipe(db_session, org, dough, flour)
+        _recipe(db_session, org, bread, dough)
+        line = db_session.execute(
+            select(BoMLine).where(BoMLine.child_template_id == dough.id)
+        ).scalar_one()
+        line.make_fresh = True
+        db_session.commit()
+        post_on_shelf(client, headers, flour, shelf.id, '10')
+        post_on_shelf(client, headers, dough, shelf.id, '5')
+        bread_run = _run(client, headers, bread, shelf, '5', _MONDAY)
+
+        listed = {
+            row['id']: row
+            for row in client.get(f'{_API}/orders', headers=headers).json()['items']
+        }
+        rows = {r['name']: r for r in _week(client, headers)['rows']}
+
+        assert listed[bread_run['id']]['coverage'] == 'covered'
+        assert list(rows) == ['Flour']
+        assert Decimal(rows['Flour']['needed']) == Decimal('5')
+        assert Decimal(rows['Flour']['missing']) == Decimal('0')
+
 
 class TestOrderingWhatIsMissing:
     def _scope(self) -> dict[str, str]:

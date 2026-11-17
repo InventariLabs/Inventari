@@ -26,12 +26,14 @@ says what the release does rather than what changed since them.
   **Order what is missing** raises one draft purchase order per supplier from
   each ingredient's best price in the supplier's own unit, sends ingredients
   with no supplier to the shopping list, and proposes an ingredient that has a
-  recipe of its own as a planned run instead of a purchase, and once that run
-  is planned it counts as what the need is waiting for. What is on order is
-  spent once: a delivery ordered for one week is not counted again by a later
-  one. A product you make
-  that falls below its reorder minimum is now proposed as a production run, in
-  To do and in the reorder alerts, and no longer as a purchase.
+  recipe of its own as a planned run instead of a purchase. A run that uses
+  such an ingredient counts on what the shelf holds of it and on runs of it
+  planned for its day or earlier — never on a run planned after it — and the
+  run list and the needs list say the same about it. What is on order or
+  planned is spent once: a delivery ordered for one week, or a run planned for
+  it, is not counted again by a later one. A product you make that falls below
+  its reorder minimum is now proposed as a production run, in To do and in the
+  reorder alerts, and no longer as a purchase.
 
 - A production run can be started, filled in portions and finished on
   different days, for wine, cheese, beer, ferments and anything else that

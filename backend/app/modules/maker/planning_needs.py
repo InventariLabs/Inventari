@@ -7,10 +7,12 @@ what is needed, what the shelf holds once the runs planned before the period
 have taken their share, what open purchase orders still expect (with their
 dates) and what is still missing.
 
-The list stops at the first level of each formula. An ingredient that has a
-recipe of its own is something to *make*: its missing part is proposed as a
-planned run of that product, never as a purchase, and its raw materials belong
-to that run once it is planned.
+The list reads the one walk of the queue that the plan's coverage reads
+(``planning_service.walk_plan``), so the two cannot disagree about a run. It
+stops at the first level of each formula. An ingredient that has a recipe of
+its own is something to *make*: what neither the shelf nor a run of it planned
+in time covers is proposed as a planned run of that product, never as a
+purchase, and its raw materials belong to that run once it is planned.
 
 Purchasing is another module. With it off the answer carries no on-order
 figure at all (``on_order`` is ``None``, not zero), and ordering is refused —
@@ -41,8 +43,7 @@ from app.core.exceptions import ServiceRejectionError
 from app.core.public_api import core_api
 from app.i18n import Language
 
-from . import bom_service, planning_service, recipe_service
-from .availability_service import _get_available_stock_batch, _resolve_scope
+from . import planning_service
 from .models import ProductionOrder
 
 NeedAction = Literal['buy', 'make']
@@ -71,9 +72,9 @@ class NeedRow:
     on_order: Decimal | None
     expected: list[ExpectedDelivery]
     missing: Decimal
-    #: What draft runs of the ingredient itself already bring, once the runs
-    #: before the period have taken their share: a sub-assembly that is
-    #: planned is not missing.
+    #: What draft runs of the ingredient itself make in time for the runs
+    #: that ask for it (on their planned day or before it), beyond what the
+    #: shelf gave them: a sub-assembly that is planned is not missing.
     planned: Decimal
     #: ``make`` for an ingredient that has a recipe of its own.
     action: NeedAction
@@ -108,171 +109,56 @@ async def _open_orders(
     )
 
 
-def _to_stock_unit(
-    qty: Decimal,
-    line_uom_id: UUID | None,
-    stock_uom_id: UUID | None,
-    uoms: dict[UUID, UomDTO],
-) -> Decimal | None:
-    """*qty* in the ingredient's stock unit; ``None`` when no bridge exists."""
-    if line_uom_id is None or stock_uom_id is None or line_uom_id == stock_uom_id:
-        return qty
-    source, target = uoms.get(line_uom_id), uoms.get(stock_uom_id)
-    if source is None or target is None:
-        return qty
-    converted, ok = core_api.uoms.convert_quantity(qty, source, target)
-    return converted if ok else None
+@dataclass
+class _Tally:
+    """What the runs of the request ask of one ingredient, and where it came from."""
+
+    first_run: ProductionOrder
+    has_recipe: bool
+    needed: Decimal = Decimal('0')
+    in_stock: Decimal = Decimal('0')
+    planned: Decimal = Decimal('0')
+    unmet: Decimal = Decimal('0')
+    scopes: set[UUID | None] = field(default_factory=set)
 
 
 def _need_row(
     tid: UUID,
     template: ProductTemplateDTO | None,
     uoms: dict[UUID, UomDTO],
-    *,
-    needed: Decimal,
-    in_stock: Decimal,
+    tally: _Tally,
     deliveries: list[ExpectedDelivery],
     purchasing: bool,
-    freshly_made: Decimal,
-    planned: Decimal,
-    makes: bool,
-    first_run: ProductionOrder,
 ) -> NeedRow:
-    """One ingredient's row: what is covered by the shelf and by what is on its way.
-
-    A line that never takes the sub-assembly from the shelf needs it made
-    whatever is in stock (*freshly_made*); the rest of the need is covered by
-    the stock first and by the open orders after it. Runs already planned of
-    the ingredient itself (*planned*) cover what is still missing after that.
-    """
+    """One ingredient's row: what the shelf and planned runs left, less what is on its way."""
     on_order = (
         sum((d.quantity for d in deliveries), Decimal('0')) if purchasing else None
-    )
-    covered_by = in_stock + (on_order or Decimal('0'))
-    missing = max(
-        Decimal('0'),
-        max(Decimal('0'), needed - freshly_made - covered_by) + freshly_made - planned,
     )
     uom = uoms.get(template.uom_id) if template and template.uom_id else None
     return NeedRow(
         template_id=tid,
         name=template.name if template else None,
         uom_symbol=uom.symbol if uom else None,
-        needed=needed,
-        in_stock=in_stock,
+        needed=tally.needed,
+        in_stock=tally.in_stock,
         on_order=on_order,
         expected=deliveries,
-        missing=missing,
-        planned=planned,
-        action='make' if makes else 'buy',
-        needed_by=first_run.production_date,
-        output_location_id=first_run.output_storage_location_id,
+        missing=max(Decimal('0'), tally.unmet - (on_order or Decimal('0'))),
+        planned=tally.planned,
+        action='make' if tally.has_recipe else 'buy',
+        needed_by=tally.first_run.production_date,
+        output_location_id=tally.first_run.output_storage_location_id,
     )
-
-
-@dataclass
-class _Tally:
-    """What the queue asks of each ingredient, and the shelf the period opens on."""
-
-    needed: dict[UUID, Decimal] = field(default_factory=dict)
-    fresh: dict[UUID, Decimal] = field(default_factory=dict)
-    has_recipe: set[UUID] = field(default_factory=set)
-    scopes_used: dict[UUID, set[UUID | None]] = field(default_factory=dict)
-    first_run: dict[UUID, ProductionOrder] = field(default_factory=dict)
-    unmeasured: set[UUID] = field(default_factory=set)
-    #: What the runs before the period asked for beyond the shelf: it was
-    #: spoken for by whatever is on its way, so the period cannot count it.
-    overflow: dict[UUID, Decimal] = field(default_factory=dict)
-    #: Per ingredient, what each run of the period asks for and on which day.
-    asked: dict[UUID, list[tuple[tuple[bool, date], Decimal]]] = field(
-        default_factory=dict
-    )
-    start_left: dict[UUID | None, dict[UUID, Decimal]] | None = None
-
-
-def _claim_in_queue(
-    queue: list[ProductionOrder],
-    scopes: list[UUID | None],
-    run_needs: list[list[bom_service.DirectNeed]],
-    left: dict[UUID | None, dict[UUID, Decimal]],
-    templates: dict[UUID, ProductTemplateDTO],
-    uoms: dict[UUID, UomDTO],
-    selected: Callable[[ProductionOrder], bool],
-) -> _Tally:
-    """Walk the queue: every run claims its needs off the shelf, in order.
-
-    The runs of the period add to the tally; the runs before it only spend
-    the shelf, and the shelf is copied the moment the first run of the period
-    is reached — that copy is what the period starts with.
-    """
-    tally = _Tally()
-    for order, scope, needs in zip(queue, scopes, run_needs, strict=True):
-        in_period = selected(order)
-        if in_period and tally.start_left is None:
-            tally.start_left = {sc: dict(stock) for sc, stock in left.items()}
-        for need in needs:
-            tid = need.child_template_id
-            template = templates.get(tid)
-            claimed = _to_stock_unit(
-                need.qty, need.uom_id, template.uom_id if template else None, uoms
-            )
-            if claimed is None:
-                if in_period:
-                    tally.unmeasured.add(tid)
-                continue
-            if in_period:
-                tally.needed[tid] = tally.needed.get(tid, Decimal('0')) + claimed
-                tally.scopes_used.setdefault(tid, set()).add(scope)
-                tally.asked.setdefault(tid, []).append(
-                    (planning_service.planned_day(order), claimed)
-                )
-                tally.first_run.setdefault(tid, order)
-                if need.has_recipe:
-                    tally.has_recipe.add(tid)
-                    if need.make_fresh:
-                        tally.fresh[tid] = tally.fresh.get(tid, Decimal('0')) + claimed
-            stock = left[scope]
-            on_hand = stock.get(tid, Decimal('0'))
-            if not in_period and claimed > on_hand:
-                tally.overflow[tid] = tally.overflow.get(tid, Decimal('0')) + (
-                    claimed - on_hand
-                )
-            stock[tid] = max(Decimal('0'), on_hand - claimed)
-    return tally
-
-
-def _planned_supply(
-    made: list[tuple[tuple[bool, date], Decimal]],
-    asked: list[tuple[tuple[bool, date], Decimal]],
-) -> Decimal:
-    """How much of what the period asks a planned run makes in time for it.
-
-    A run's output is there for the runs planned on its day or after it, the
-    same day included whatever the creation order; a run planned later makes
-    nothing for the ones before it.
-    """
-    events = [(day, 0, qty) for day, qty in made] + [
-        (day, 1, qty) for day, qty in asked
-    ]
-    supply = Decimal('0')
-    taken = Decimal('0')
-    for _day, kind, qty in sorted(events, key=lambda e: (e[0], e[1])):
-        if kind == 0:
-            supply += qty
-        else:
-            used = min(qty, supply)
-            supply -= used
-            taken += used
-    return taken
 
 
 def _after_earlier_claims(
     deliveries: list[ExpectedDelivery], claimed: Decimal
-) -> tuple[list[ExpectedDelivery], Decimal]:
-    """What the earlier runs left of the deliveries, and what they claimed beyond them.
+) -> list[ExpectedDelivery]:
+    """What the earlier runs left of the deliveries.
 
-    The runs before the period ask for more than the shelf had; what is on
-    its way goes to them first, the earliest delivery first, as the shelf does.
+    The runs before the period ask for more than the shelf and the planned
+    runs gave them; what is on its way goes to them first, the earliest
+    delivery first, as the shelf does.
     """
     left: list[ExpectedDelivery] = []
     for delivery in sorted(
@@ -289,7 +175,7 @@ def _after_earlier_claims(
                     delivery.quantity - taken,
                 )
             )
-    return left, claimed
+    return left
 
 
 def ensure_scope(
@@ -339,96 +225,58 @@ async def needs_for(
 
     A run is in the period when its planned day lies in
     ``date_from..date_to``; runs with no planned day are in no period. The
-    runs queued before the first of them take their share of the shelf first
-    (the order ``planning_service`` queues them in), so ``in_stock`` is what
-    is left for the period, not what the shelf holds today.
+    runs queued before the first of them take their share first — of the
+    shelf, of what planned runs make, and what they still lack of the open
+    purchase orders — so ``in_stock`` is what is left for the period, not
+    what the shelf holds today, and nothing that is on its way is counted
+    by two periods.
     """
     ensure_scope(date_from, date_to, order_id)
-    queue = await planning_service.queued_drafts(db, organization_id)
-
-    selected = _selector(date_from, date_to, order_id)
-    last = max((i for i, o in enumerate(queue) if selected(o)), default=None)
+    walk = await planning_service.walk_plan(db, organization_id)
     view = NeedsView(purchasing=await purchasing_enabled(db, organization_id))
-    if last is None:
+    selected = _selector(date_from, date_to, order_id)
+    first = next((i for i, run in enumerate(walk.runs) if selected(run.order)), None)
+    if first is None:
         return view
-    # Runs planned on the day of the last one count as supply for it, though
-    # they were created after it and so stand behind it in the queue.
-    last_day = planning_service.planned_day(queue[last])
-    makers = [o for o in queue if planning_service.planned_day(o) <= last_day]
-    queue = queue[: last + 1]
-    view.run_count = sum(1 for o in queue if selected(o))
 
-    settings = await recipe_service.get_settings(db, organization_id, for_update=False)
-
-    def scope_of(order_location: UUID | None) -> UUID | None:
-        return _resolve_scope(settings.availability_check_scope, None, order_location)
-
-    run_needs = [
-        await bom_service.direct_needs(
-            db, organization_id, order.recipe_id, order.planned_qty
-        )
-        for order in queue
-        if order.recipe_id is not None
-    ]
-    scopes = [scope_of(o.output_storage_location_id) for o in queue]
-
-    children_by_scope: dict[UUID | None, set[UUID]] = {}
-    for scope, needs in zip(scopes, run_needs, strict=True):
-        children_by_scope.setdefault(scope, set()).update(
-            n.child_template_id for n in needs
-        )
-    left: dict[UUID | None, dict[UUID, Decimal]] = {
-        scope: await _get_available_stock_batch(
-            db, organization_id, sorted(children), location_id=scope
-        )
-        for scope, children in children_by_scope.items()
-    }
-    all_children = sorted(set().union(*children_by_scope.values()))
-    templates: dict[UUID, ProductTemplateDTO] = (
-        await core_api.product_templates.get_many_async(
-            db, organization_id, all_children
-        )
-        if all_children
-        else {}
-    )
-    uoms = {
-        u.id: u for u in await core_api.uoms.list_for_org_async(db, organization_id)
-    }
-
-    tally = _claim_in_queue(queue, scopes, run_needs, left, templates, uoms, selected)
-    needed, fresh = tally.needed, tally.fresh
-    has_recipe, scopes_used, first_run = (
-        tally.has_recipe,
-        tally.scopes_used,
-        tally.first_run,
-    )
-    unmeasured = tally.unmeasured
-    start_left = tally.start_left
-
-    opening = start_left or {}
-    made: dict[UUID, list[tuple[tuple[bool, date], Decimal]]] = {}
-    for order in makers:
-        if order.output_template_id in needed:
-            made.setdefault(order.output_template_id, []).append(
-                (planning_service.planned_day(order), order.planned_qty)
+    overflow: dict[UUID, Decimal] = {}
+    for run in walk.runs[:first]:
+        for claim in run.claims:
+            overflow[claim.template_id] = (
+                overflow.get(claim.template_id, Decimal('0')) + claim.unmet
             )
+    tallies: dict[UUID, _Tally] = {}
+    unmeasured: set[UUID] = set()
+    for run in walk.runs[first:]:
+        if not selected(run.order):
+            continue
+        view.run_count += 1
+        for claim in run.claims:
+            if claim.needed is None:
+                unmeasured.add(claim.template_id)
+                continue
+            tally = tallies.setdefault(
+                claim.template_id, _Tally(run.order, claim.has_recipe)
+            )
+            tally.needed += claim.needed
+            tally.planned += claim.from_planned
+            tally.unmet += claim.unmet
+            if run.scope not in tally.scopes:
+                # The first run of the period to ask for it in this scope
+                # sees the shelf the period opens on.
+                tally.scopes.add(run.scope)
+                tally.in_stock += claim.on_shelf
+
     open_lines: list[OpenOrderLineDTO] = (
-        await _open_orders(db, organization_id, sorted(needed))
-        if view.purchasing and needed
+        await _open_orders(db, organization_id, sorted(tallies))
+        if view.purchasing and tallies
         else []
     )
+    templates = walk.templates
     for tid in sorted(
-        needed, key=lambda t: templates[t].name if t in templates else ''
+        tallies, key=lambda t: templates[t].name if t in templates else ''
     ):
-        template = templates.get(tid)
-        in_stock = sum(
-            (
-                opening.get(scope, {}).get(tid, Decimal('0'))
-                for scope in scopes_used[tid]
-            ),
-            Decimal('0'),
-        )
-        deliveries, unmet = _after_earlier_claims(
+        deliveries = _after_earlier_claims(
             [
                 ExpectedDelivery(
                     purchase_order_id=line.purchase_order_id,
@@ -439,25 +287,16 @@ async def needs_for(
                 for line in open_lines
                 if line.product_template_id == tid
             ],
-            tally.overflow.get(tid, Decimal('0')),
+            overflow.get(tid, Decimal('0')),
         )
         view.rows.append(
             _need_row(
                 tid,
-                template,
-                uoms,
-                needed=needed[tid],
-                in_stock=in_stock,
-                deliveries=deliveries,
-                purchasing=view.purchasing,
-                freshly_made=fresh.get(tid, Decimal('0')),
-                planned=max(
-                    Decimal('0'),
-                    _planned_supply(made.get(tid, []), tally.asked.get(tid, []))
-                    - unmet,
-                ),
-                makes=tid in has_recipe,
-                first_run=first_run[tid],
+                templates.get(tid),
+                walk.uoms,
+                tallies[tid],
+                deliveries,
+                view.purchasing,
             )
         )
     view.unmeasured = sorted(templates[t].name for t in unmeasured if t in templates)
