@@ -1383,6 +1383,7 @@ async def start_production(
     user: UserContextDTO,
     *,
     started_on: date | None = None,
+    ingredient_lots: list[IngredientLotChoice] | None = None,
 ) -> ProductionOrder:
     """Begin a run that will be finished later: take the ingredients now.
 
@@ -1394,6 +1395,9 @@ async def start_production(
     process steps of the formula are copied onto the run to be ticked off with
     the day each was done. The output comes later, in portions or all at once
     (:func:`record_portion`, :func:`finish_production`).
+
+    ``ingredient_lots`` are the batches the person chose for ingredients, as
+    when a run is completed in one step: the run takes exactly those.
     """
     order = await _lock_order(
         db,
@@ -1409,6 +1413,7 @@ async def start_production(
         user,
         estimate_qty=order.planned_qty,
         record_shortfall=False,
+        ingredient_lots=ingredient_lots,
     )
     recipe = await _recipe_for_order(db, organization_id, order)
     order.status = 'IN_PROGRESS'
@@ -1473,6 +1478,7 @@ async def record_portion(
     qty: Decimal,
     made_on: date | None = None,
     lot_name: str | None = None,
+    best_before: date | None = None,
 ) -> ProductionPortion:
     """Put one portion of an in-progress run's output on the shelf.
 
@@ -1523,7 +1529,7 @@ async def record_portion(
         user,
         run_day=day,
         best_before=await output_batch.best_before_for_run(
-            db, organization_id, order.output_template_id, day, None
+            db, organization_id, order.output_template_id, day, best_before
         ),
         lot_name=lot_name,
         cost_comes_at_the_finish=True,
@@ -1587,6 +1593,7 @@ async def finish_production(
     actual_qty: Decimal | None = None,
     finished_on: date | None = None,
     lot_name: str | None = None,
+    best_before: date | None = None,
 ) -> ProductionOrder:
     """Close an in-progress run: the output and the cost it ended up with.
 
@@ -1596,6 +1603,8 @@ async def finish_production(
     The run's cost is what the start took plus its fixed costs and labour,
     and its unit cost divides that by everything that came out. The closing
     quantity carries the part of the cost the portions did not.
+    ``best_before`` dates that closing quantity (the shelf life answers when
+    it is left out), as it dates a portion.
     """
     order = await _lock_order(
         db,
@@ -1680,7 +1689,7 @@ async def finish_production(
             user,
             run_day=day,
             best_before=await output_batch.best_before_for_run(
-                db, organization_id, order.output_template_id, day, None
+                db, organization_id, order.output_template_id, day, best_before
             ),
             lot_name=lot_name,
             a_zero_cost_is_stated=total_cost > 0,

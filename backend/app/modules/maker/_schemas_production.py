@@ -291,6 +291,11 @@ class ProductionOrderStart(BaseModel):
     """
 
     started_on: date | None = None
+    #: The batches the person chose for ingredients; an ingredient left out
+    #: is taken in the product's removal order.
+    ingredient_lots: list[IngredientLotChoice] = Field(
+        default_factory=list, max_length=500
+    )
 
 
 class ProductionOrderFinish(BaseModel):
@@ -305,6 +310,9 @@ class ProductionOrderFinish(BaseModel):
     actual_qty: Decimal | None = Field(None, ge=0, max_digits=12, decimal_places=3)
     finished_on: date | None = None
     output_lot_name: str | None = Field(None, max_length=100)
+    #: The best-before of the closing quantity; left out, the finish day
+    #: plus the product's shelf life.
+    best_before: date | None = None
 
     @field_validator('output_lot_name')
     @classmethod
@@ -321,6 +329,9 @@ class ProductionPortionCreate(BaseModel):
     qty: Decimal = Field(gt=0, max_digits=12, decimal_places=3)
     made_on: date | None = None
     output_lot_name: str | None = Field(None, max_length=100)
+    #: The best-before of this portion's batch; left out, the day it is made
+    #: plus the product's shelf life.
+    best_before: date | None = None
 
     @field_validator('output_lot_name')
     @classmethod

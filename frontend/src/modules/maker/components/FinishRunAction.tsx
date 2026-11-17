@@ -10,6 +10,8 @@ import { extractApiError } from "@/lib/errors";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import { QUANTITY_STEP } from "@/module-sdk";
 import { todayIso } from "@/utils/formatters";
+import { BestBeforeField } from "@/modules/maker/components/BestBeforeField";
+import { useProposedBestBefore } from "@/modules/maker/hooks/useProposedBestBefore";
 import { useFinishProduction } from "@/modules/maker/hooks/useProduction";
 import type { ProductionOrder } from "@/modules/maker/types/maker";
 
@@ -26,6 +28,7 @@ export function FinishRunAction({ order }: { order: ProductionOrder }) {
   const [qty, setQty] = useState("");
   const [day, setDay] = useState(todayIso());
   const [lot, setLot] = useState("");
+  const bestBefore = useProposedBestBefore(day, order.shelf_life_days);
 
   function confirm() {
     setAsking(false);
@@ -36,6 +39,7 @@ export function FinishRunAction({ order }: { order: ProductionOrder }) {
           actual_qty: qty.trim() || undefined,
           finished_on: day || undefined,
           output_lot_name: lot.trim() || undefined,
+          best_before: bestBefore.value || undefined,
         },
       },
       {
@@ -43,6 +47,7 @@ export function FinishRunAction({ order }: { order: ProductionOrder }) {
           toast.success(t("progress.finishSuccess"));
           setQty("");
           setLot("");
+          bestBefore.reset();
         },
         onError: (err) =>
           toast.error(extractApiError(err, t("progress.finishFailed"))),
@@ -97,6 +102,13 @@ export function FinishRunAction({ order }: { order: ProductionOrder }) {
             value={lot}
             maxLength={100}
             onChange={(e) => setLot(e.target.value)}
+          />
+          <BestBeforeField
+            id="maker-finish-best-before"
+            value={bestBefore.value}
+            onChange={bestBefore.set}
+            min={day || undefined}
+            shelfLifeDays={order.shelf_life_days}
           />
         </div>
       </ConfirmDialog>

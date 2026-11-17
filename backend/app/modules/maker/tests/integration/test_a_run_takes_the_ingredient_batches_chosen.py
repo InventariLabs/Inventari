@@ -397,3 +397,69 @@ def test_holding_a_run_that_made_no_batch_is_refused(
     )
 
     assert held.status_code == 400, held.text
+
+
+def test_a_run_that_is_started_takes_exactly_the_batches_chosen(
+    client: TestClient,
+    mk_auth_headers: dict[str, str],
+    mk_output_loc: StorageLocation,
+    kitchen: _Kitchen,
+) -> None:
+    draft = client.post(
+        ORDERS, headers=mk_auth_headers, json=_run(kitchen, mk_output_loc)
+    )
+    assert draft.status_code == 201, draft.text
+
+    started = client.post(
+        f'{ORDERS}/{draft.json()["id"]}/start',
+        headers=mk_auth_headers,
+        json={
+            'ingredient_lots': [
+                {
+                    'template_id': str(kitchen.honey.id),
+                    'lot_id': str(kitchen.late.id),
+                    'quantity': '6',
+                }
+            ]
+        },
+    )
+
+    # Fails without the change: the choice was ignored and FEFO took H-EARLY.
+    assert started.status_code == 200, started.text
+    assert started.json()['status'] == 'IN_PROGRESS'
+    assert _taken(client, mk_auth_headers, draft.json()['id'], kitchen.honey.id) == {
+        'H-LATE': Decimal('6')
+    }
+
+
+def test_starting_a_run_with_a_choice_that_does_not_add_up_is_refused(
+    client: TestClient,
+    mk_auth_headers: dict[str, str],
+    mk_output_loc: StorageLocation,
+    kitchen: _Kitchen,
+) -> None:
+    draft = client.post(
+        ORDERS, headers=mk_auth_headers, json=_run(kitchen, mk_output_loc)
+    )
+
+    started = client.post(
+        f'{ORDERS}/{draft.json()["id"]}/start',
+        headers=mk_auth_headers,
+        json={
+            'ingredient_lots': [
+                {
+                    'template_id': str(kitchen.honey.id),
+                    'lot_id': str(kitchen.late.id),
+                    'quantity': '5',
+                }
+            ]
+        },
+    )
+
+    assert started.status_code == 400, started.text
+    assert (
+        client.get(f'{ORDERS}/{draft.json()["id"]}', headers=mk_auth_headers).json()[
+            'status'
+        ]
+        == 'DRAFT'
+    )
