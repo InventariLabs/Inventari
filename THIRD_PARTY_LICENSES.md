@@ -410,8 +410,8 @@ and the static assets the frontend serves.
 | `react-redux` | 9.3.0 | MIT |  |
 | `react-remove-scroll` | 2.7.2 | MIT |  |
 | `react-remove-scroll-bar` | 2.3.8 | MIT |  |
-| `react-router` | 7.18.4 | MIT |  |
-| `react-router-dom` | 7.18.4 | MIT |  |
+| `react-router` | 7.18.5 | MIT |  |
+| `react-router-dom` | 7.18.5 | MIT |  |
 | `react-style-singleton` | 2.2.3 | MIT |  |
 | `read-cache` | 1.0.2 | MIT |  |
 | `readdirp` | 3.6.0 | MIT |  |
@@ -426,7 +426,7 @@ and the static assets the frontend serves.
 | `reusify` | 1.1.0 | MIT |  |
 | `run-parallel` | 1.2.0 | MIT |  |
 | `scheduler` | 0.23.2 | MIT |  |
-| `set-cookie-parser` | 2.7.2 | MIT |  |
+| `set-cookie-parser` | 2.7.3 | MIT |  |
 | `sonner` | 2.0.8 | MIT |  |
 | `source-map-js` | 1.2.2 | BSD-3-Clause |  |
 | `space-separated-tokens` | 2.0.2 | MIT |  |
