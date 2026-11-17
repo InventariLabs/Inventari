@@ -704,6 +704,7 @@
         "stock_take_adjustment": "Stock take correction",
         "production_run": "Production run",
         "production_run_reversed": "Production run taken back",
+        "package_opened": "Package opened",
         "circuit_breaker": "Disabled by the circuit breaker after repeated delivery failures"
       },
       "targetTypes": {
