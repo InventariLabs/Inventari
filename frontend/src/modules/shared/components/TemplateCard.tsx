@@ -54,8 +54,10 @@ export function TemplateCard({
       <div className="flex items-center gap-3">
         <FileText size={18} className="text-primary-500 flex-shrink-0" />
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 ml-auto">
-            <span className="font-medium text-sm text-on truncate">
+          {/* Wraps: on a phone the name and two badges do not fit one line,
+              and a truncating name beside non-shrinking badges shrank to 0. */}
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="font-medium text-sm text-on break-words min-w-0">
               {tpl.name}
             </span>
             {tpl.is_default && (

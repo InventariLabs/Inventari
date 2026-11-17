@@ -371,6 +371,71 @@ describe("DocumentsTemplatesPage — putting a copy back as the built-in", () =>
     ).not.toBeInTheDocument();
   });
 
+  it("previews the layout without an error once the copy is reset", async () => {
+    let reset = false;
+    const rendered = vi.fn();
+    server.use(
+      http.get("*/api/v1/warehouse/templates", () =>
+        HttpResponse.json(
+          onePage([
+            {
+              ...copy,
+              body_html: reset ? builtIn.body_html : "<p>{{ broken</p>",
+              source_modified: !reset,
+            },
+          ]),
+        ),
+      ),
+      http.get("*/api/v1/warehouse/templates/built-in", () =>
+        HttpResponse.json([builtIn]),
+      ),
+      http.post("*/api/v1/warehouse/templates/t1/reset", () => {
+        reset = true;
+        return HttpResponse.json({ ...copy, source_modified: false });
+      }),
+      // The renderer's verdict follows the body it is sent: the broken
+      // source is refused, the built-in body renders.
+      http.post("*/api/v1/warehouse/templates/preview", async ({ request }) => {
+        const { body_html } = (await request.json()) as { body_html: string };
+        if (body_html.includes("{{ broken")) {
+          return HttpResponse.json({ detail: "bad layout" }, { status: 400 });
+        }
+        rendered(body_html);
+        return HttpResponse.json({ html: renderedBuiltIn });
+      }),
+    );
+    render(<DocumentsTemplatesPage />);
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: /reset to built-in/i }),
+    );
+    await userEvent.click(
+      within(await screen.findByRole("alertdialog")).getByRole("button", {
+        name: "Reset",
+      }),
+    );
+    await waitFor(() =>
+      expect(
+        screen.queryByTestId("template-modified-badge"),
+      ).not.toBeInTheDocument(),
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /edit standard template/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("button", { name: /show preview/i }),
+    );
+
+    const frame = await screen.findByTitle(/template preview/i);
+    await waitFor(() =>
+      expect(frame).toHaveAttribute("srcdoc", renderedBuiltIn),
+    );
+    expect(rendered).toHaveBeenCalledWith(builtIn.body_html);
+    expect(screen.queryByText(/does not render/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/bad layout/i)).not.toBeInTheDocument();
+  });
+
   it("offers nothing on a copy that matches, or on a template of the organization's own", async () => {
     server.use(
       http.get("*/api/v1/warehouse/templates", () =>
