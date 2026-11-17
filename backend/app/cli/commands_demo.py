@@ -64,8 +64,19 @@ DEMO_PROFILE_ID = 'equipment_wms'
 #: The warehouse profile leaves the kitchen half switched off, which on a demo
 #: means Production and Recipes greet the visitor with "Module Not Enabled"
 #: over rows the seed had already written. The demo shows everything it seeds,
-#: so the profile's list is widened by the four the seeder also fills.
-DEMO_EXTRA_MODULES = ['maker', 'recipes', 'shopping_lists', 'nutrition']
+#: so the profile's list is widened by the four the seeder also fills — and by
+#: API Keys and MCP Server, which seed nothing: a visitor connects an AI agent
+#: with a key issued in their own sandbox (docs/DEMO.md), never with one the
+#: demo publishes, so the screen that issues it has to be there on the first
+#: click.
+DEMO_EXTRA_MODULES = [
+    'maker',
+    'recipes',
+    'shopping_lists',
+    'nutrition',
+    'api_keys',
+    'mcp_server',
+]
 
 #: Modules that seed no rows but that the demo switches on because the server
 #: can serve them: module name -> the AI purpose it depends on. The photo tab
@@ -230,6 +241,7 @@ async def apply_demo_onboarding(db, admin_email: str) -> None:
     )
     await apply_onboarding_profile_async(db, org, DEMO_PROFILE_ID, user=context)
     await _enable_extra_modules(db, org, context)
+    await allow_the_demo_address_async(db, org.id)
     await db.commit()
     # The CLI never ran the app lifespan, so only a standalone delete reaches
     # the cache the running app reads from.
@@ -269,6 +281,34 @@ async def _enable_extra_modules(db, org, user) -> None:
 
     await enable_modules_async(modules, org.id, db=db, user=user)
     org.enabled_modules = list(enabled | {m.metadata.name for m in modules})
+
+
+async def allow_the_demo_address_async(db, organization_id) -> None:
+    """Let the MCP endpoint answer on the address the demo is published at.
+
+    The endpoint refuses a ``Host`` it was not told about — the protection
+    against DNS rebinding — and admits the loopback names plus the hosts the
+    organization saved under MCP Server's ``allowed_hosts``. A visitor's
+    sandbox is seeded before anyone arrives, so nobody could have saved the
+    demo's own host in it, and an agent pointed at the demo would be answered
+    421. The seed saves it: the host of ``FRONTEND_URL``, which the demo
+    compose file sets to ``https://${DOMAIN}`` for the service that seeds.
+    Only that host — any other is refused as on every install — and nothing
+    for a ``FRONTEND_URL`` on the local machine, which a local ``make
+    demo-reset`` has and loopback already covers. The visitor sees it in the
+    module's settings, like any host an administrator adds.
+    """
+    from urllib.parse import urlsplit
+
+    from app.config import frontend_url_is_deployable, settings
+    from app.services.module_settings_service import write_module_settings_async
+
+    if not frontend_url_is_deployable(settings.FRONTEND_URL):
+        return
+    host = urlsplit(settings.FRONTEND_URL).netloc.lower()
+    await write_module_settings_async(
+        db, organization_id, 'mcp_server', {'allowed_hosts': [host]}
+    )
 
 
 def empty_demo_inbox(api_url: str) -> None:
