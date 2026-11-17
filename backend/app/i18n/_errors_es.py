@@ -90,7 +90,7 @@ ERRORS_ES: ErrorMessages = {
     'storage_create_failed': 'Error al crear la ubicación de almacenamiento',
     'storage_update_failed': 'Error al actualizar la ubicación de almacenamiento',
     'storage_delete_failed': 'Error al eliminar la ubicación de almacenamiento',
-    'storage_delete_failed_items': 'No se puede eliminar una ubicación que contiene artículos. Muévalos o elimínelos primero.',
+    'storage_delete_failed_items': 'No se puede eliminar una ubicación que contiene artículos o a la que hay artículos entregados. Muévalos, devuélvalos o elimínelos primero.',
     'storage_delete_blocked_by_production_orders': 'No se puede eliminar la ubicación: la utilizan órdenes de producción.',
     'storage_type_not_found': 'Tipo de ubicación de almacenamiento no encontrado',
     'storage_type_create_failed': 'Error al crear el tipo de ubicación',
