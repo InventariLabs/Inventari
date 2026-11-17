@@ -39,74 +39,53 @@
     },
     "/api/v1/warehouse/settings/type-configs": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
+      "expires": "2027-02-28",
       "verdict": "to-wire",
-      "reason": "Per-document-type configuration (numbering, defaults) with GET, PUT and DELETE. No settings screen calls it; it is configured through the API."
+      "reason": "Per-document-type configuration (numbering, defaults) with GET, PUT and DELETE. No settings screen calls it; it is configured through the API. Deferred on 2026-11-17: the screen is a board task, and the date is when this entry is read again."
     },
     "/api/v1/warehouse/settings/type-configs/{document_type}": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
+      "expires": "2027-02-28",
       "verdict": "to-wire",
-      "reason": "Read, update and delete of one document type's configuration. No settings screen calls it."
+      "reason": "Read, update and delete of one document type's configuration. No settings screen calls it. Deferred on 2026-11-17: the screen is a board task, and the date is when this entry is read again."
     },
     "/api/v1/warehouse/tax-summary": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
+      "expires": "2027-02-28",
       "verdict": "to-wire",
-      "reason": "Tax totals per rate over a period. No report screen calls it."
+      "reason": "Tax totals per rate over a period. No report screen calls it. Deferred on 2026-11-17: the screen is a board task, and the date is when this entry is read again."
     },
     "/api/v1/warehouse/documents/{document_id}/picking/{session_id}": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-delete",
-      "reason": "Reads one picking session. The UI lists the sessions of a document and acts on one by id from that list, so it never fetches a single session."
-    },
-    "/api/v1/equipment/protocol/placeholders": {
-      "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-wire",
-      "reason": "Placeholder list for handover protocol templates. The template editor reads /equipment/templates/placeholders only, so these placeholders are not offered in the UI."
+      "verdict": "integration-only",
+      "reason": "Reads one picking session, the way a handheld scanner or an external client polls the state of the session it holds. The app lists a document's sessions and acts on one by id from that list, so its own screens never fetch a single one; the tests of the picking flow read the session through this route."
     },
     "/api/v1/items/cursor-page": {
       "owner": "maintainers",
       "verdict": "integration-only",
       "reason": "Cursor pagination over items for external consumers and large exports. The UI pages by offset because it shows page numbers, which a cursor cannot provide. Both are canonical envelopes per AGENTS.md."
     },
-    "/api/v1/items/expiring": {
-      "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-delete",
-      "reason": "Superseded by GET /items?expiring_days=N, which the item list and its expiry chip call."
-    },
     "/api/v1/items/product-templates/sku-schema": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
+      "expires": "2027-02-28",
       "verdict": "to-wire",
-      "reason": "GET and PUT for the organization's SKU numbering scheme. No screen calls it, so SKUs are entered free-form."
+      "reason": "GET and PUT for the organization's SKU numbering scheme. No screen calls it, so SKUs are entered free-form. Deferred on 2026-11-17: the screen is a board task, and the date is when this entry is read again."
     },
     "/api/v1/items/product-templates/{template_id}/clone": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
+      "expires": "2027-02-28",
       "verdict": "to-wire",
-      "reason": "Duplicates a product template. The products UI has no clone action (equipment models have one, through their own route)."
-    },
-    "/api/v1/maker/bom/parents": {
-      "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-delete",
-      "reason": "Lists templates that have BoM lines. The UI gets the same answer from /maker/bom/summary and /maker/bom/template-ids."
+      "reason": "Duplicates a product template. The products UI has no clone action (equipment models have one, through their own route). Deferred on 2026-11-17: the screen is a board task, and the date is when this entry is read again."
     },
     "/api/v1/maker/bom/{line_id}": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-delete",
-      "reason": "DELETE of a BoM line. The editor deletes through the recipe-scoped /maker/recipes/{id}/bom-lines/{lineId} instead."
+      "verdict": "integration-only",
+      "reason": "Deletes one formula line by its id, for scripts and imports that do not know the recipe the line belongs to. The editor deletes through the recipe-scoped /maker/recipes/{id}/bom-lines/{lineId}, which also records the change against that recipe."
     },
     "/api/v1/maker/bom/{template_id}": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-delete",
-      "reason": "Flat BoM lines for a template. The editor reads /maker/bom/tree/{id}, which returns the same lines with their structure."
+      "verdict": "integration-only",
+      "reason": "Flat lines of one template's formula, with `recipe_id=` for a variant. A documented read for scripts and exports; the editor reads /maker/bom/tree/{id}, which returns the same lines with their structure."
     },
     "/api/v1/organizations/current/defaults": {
       "owner": "maintainers",
@@ -115,9 +94,9 @@
     },
     "/api/v1/partners/{partner_id}/items": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
+      "expires": "2027-02-28",
       "verdict": "to-wire",
-      "reason": "Items a partner supplies or has bought. The partner detail page shows documents and contact data and does not call it."
+      "reason": "Items a partner supplies or has bought. The partner detail page shows documents and contact data and does not call it. Deferred on 2026-11-17: the screen is a board task, and the date is when this entry is read again."
     },
     "/api/v1/printing/agent/jobs/{job_id}/image": {
       "owner": "printing",
@@ -146,32 +125,20 @@
     },
     "/api/v1/purchase-orders/import/analyze": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
+      "expires": "2027-02-28",
       "verdict": "to-wire",
-      "reason": "Reads a supplier file and proposes purchase order lines. Purchase orders have no import screen, so no UI calls it."
-    },
-    "/api/v1/purchase-orders/{po_id}/approval": {
-      "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-delete",
-      "reason": "Proxy that reads the approval request for an order. The detail page reads it from the approvals module directly, through useApprovalRequests."
+      "reason": "Reads a supplier file and proposes purchase order lines. Purchase orders have no import screen, so no UI calls it. Deferred on 2026-11-17: the screen is a board task, and the date is when this entry is read again."
     },
     "/api/v1/purchase-orders/{po_id}/create-receipt": {
       "owner": "maintainers",
       "verdict": "integration-only",
       "reason": "Builds a confirmed receipt for an order in one call, for scripts and integrations that hand the floor a receipt to scan. The order screen receives through the one-screen receive, which posts with POST /warehouse/documents/post."
     },
-    "/api/v1/purchase-orders/{po_id}/html": {
-      "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-wire",
-      "reason": "Renders an order as HTML for preview and printing. The purchase order screens do not call it."
-    },
     "/api/v1/purchase-orders/{po_id}/import-lines": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
+      "expires": "2027-02-28",
       "verdict": "to-wire",
-      "reason": "Commits the lines proposed by /purchase-orders/import/analyze. No import screen calls it."
+      "reason": "Commits the lines proposed by /purchase-orders/import/analyze. No import screen calls it. Deferred on 2026-11-17: the screen is a board task, and the date is when this entry is read again."
     },
     "/api/v1/recipes/import": {
       "owner": "maintainers",
@@ -180,33 +147,26 @@
     },
     "/api/v1/recipes/meal-plans/{plan_id}/entries/bulk": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-wire",
-      "reason": "Adds several meal plan entries in one call. The planner adds entries one request at a time."
-    },
-    "/api/v1/roles/users/{user_id}/{role_id}": {
-      "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-delete",
-      "reason": "Assigns a custom role by a path pair. The members list changes roles through the organization members endpoint, which also refuses an admin demoting themselves."
+      "verdict": "integration-only",
+      "reason": "Adds several meal plan entries in one call, for an import or a script that fills a week. The planner adds an entry per action, so the screen never needs the batch."
     },
     "/api/v1/shopping-lists/{list_id}/suggestions/add-all": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
+      "expires": "2027-02-28",
       "verdict": "to-wire",
-      "reason": "Accepts every shopping list suggestion in one call. The UI adds suggestions one by one."
+      "reason": "Accepts every shopping list suggestion in one call. The UI adds suggestions one by one. Deferred on 2026-11-17: the screen is a board task, and the date is when this entry is read again."
     },
     "/api/v1/stats/activity": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
+      "expires": "2027-02-28",
       "verdict": "to-wire",
-      "reason": "Recent activity feed. No dashboard screen calls it."
+      "reason": "Recent activity feed. No dashboard screen calls it. Deferred on 2026-11-17: the screen is a board task, and the date is when this entry is read again."
     },
     "/api/v1/stats/consumption": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
+      "expires": "2027-02-28",
       "verdict": "to-wire",
-      "reason": "Consumption over time. No dashboard screen calls it."
+      "reason": "Consumption over time. No dashboard screen calls it. Deferred on 2026-11-17: the screen is a board task, and the date is when this entry is read again."
     },
     "/api/v1/stats/overview/stream": {
       "owner": "maintainers",
@@ -215,27 +175,26 @@
     },
     "/api/v1/stock-takes/cycle-count-schedules": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
+      "expires": "2027-01-31",
       "verdict": "to-decide",
-      "reason": "Cycle count schedules, list and create. The backend is complete and no screen calls it; schedules are created through the API only."
+      "reason": "Cycle count schedules, list and create. The backend is complete and no screen calls it; schedules are created through the API only. Deferred on 2026-11-17: whether to build a screen is the owner's open decision."
     },
     "/api/v1/stock-takes/cycle-count-schedules/{schedule_id}": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
+      "expires": "2027-01-31",
       "verdict": "to-decide",
-      "reason": "Cycle count schedules, read, update and delete. The backend is complete and no screen calls it; schedules are managed through the API only."
+      "reason": "Cycle count schedules, read, update and delete. The backend is complete and no screen calls it; schedules are managed through the API only. Deferred on 2026-11-17: whether to build a screen is the owner's open decision."
     },
     "/api/v1/stock-takes/{stock_take_id}/items/bulk-count": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
-      "verdict": "to-wire",
-      "reason": "Submits many counted lines in one call. The counting screen posts one line per item."
+      "verdict": "integration-only",
+      "reason": "Submits many counted lines in one call, for a scanner or a script that counts offline and uploads the result. The counting screen posts one line per item as it is counted."
     },
     "/api/v1/location-types/{location_type_id}": {
       "owner": "maintainers",
-      "expires": "2026-11-30",
+      "expires": "2027-02-28",
       "verdict": "to-wire",
-      "reason": "Read, update and delete one storage type. The UI lists storage types to pick one for a location, and has no screen that creates, corrects or deletes a type."
+      "reason": "Read, update and delete one storage type. The UI lists storage types to pick one for a location, and has no screen that creates, corrects or deletes a type. Deferred on 2026-11-17: the screen is a board task, and the date is when this entry is read again."
     }
   }
 }

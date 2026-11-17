@@ -31,10 +31,6 @@ from app.schemas.item import (
     AttentionCounts,
     ItemAggregates,
 )
-from app.schemas.item import (
-    Item as ItemSchema,
-)
-from app.schemas.pagination import PaginatedResponse
 from app.services.analytics._common import (
     get_org_currency_async,
     org_today_async,
@@ -48,7 +44,6 @@ from app.services.items._query_get import count_needing_attention_async
 from app.services.items._query_special import (
     get_archived_items_async,
     get_deletion_notes_async,
-    get_expiring_items_async,
 )
 from app.services.items.low_stock import claimed_tags_for
 
@@ -222,28 +217,6 @@ async def get_attention_counts_endpoint(
             today=await org_today_async(db, org_id),
         ),
     )
-
-
-@router.get('/expiring', response_model=PaginatedResponse[ItemSchema])
-async def get_expiring_items(
-    days: int = Query(7, description='Number of days until expiration'),
-    limit: int = Query(50, ge=1, le=200),
-    offset: int = Query(0, ge=0),
-    user_storage_ids: list[UUID] = Depends(get_user_storage_ids),
-    current_user: UserContextDTO = Depends(get_current_user_context),
-    db: AsyncSession = Depends(get_async_db, scope='function'),
-    _: object = require_permission(SystemPermission.ITEMS_READ),
-):
-    """Products approaching expiration (all locations)."""
-    items, total = await get_expiring_items_async(
-        db,
-        user_storage_ids,
-        organization_id=current_user.organization_id,
-        days=days,
-        offset=offset,
-        limit=limit,
-    )
-    return PaginatedResponse.from_slice(items, offset, limit, total)
 
 
 @router.get('/archived', response_model=ArchivedItemListResponse)

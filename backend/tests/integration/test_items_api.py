@@ -583,32 +583,6 @@ class TestItemsCreate:
 
 
 @pytest.mark.integration
-class TestItemsExpiring:
-    """Tests for expiring items endpoint."""
-
-    def test_get_expiring_items(self, client, auth_headers, test_item):
-        """Tests fetching expiring items."""
-        response = client.get('/api/v1/items/expiring?days=30', headers=auth_headers)
-
-        assert response.status_code == status.HTTP_200_OK
-        items = response.json()['items']
-        # Check that all items have expiry date
-        for item in items:
-            assert item['expiry_date'] is not None
-
-    def test_get_expiring_items_custom_days(self, client, auth_headers):
-        """Tests fetching expiring items with custom period."""
-        response = client.get('/api/v1/items/expiring?days=60', headers=auth_headers)
-
-        assert response.status_code == status.HTTP_200_OK
-        items = response.json()['items']
-        for item in items:
-            if item['expiry_date']:
-                expiry_date = date.fromisoformat(item['expiry_date'])
-                assert expiry_date <= date.today() + timedelta(days=60)
-
-
-@pytest.mark.integration
 class TestItemDetails:
     """Tests for item details endpoint."""
 

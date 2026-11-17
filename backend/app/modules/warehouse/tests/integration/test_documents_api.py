@@ -4146,7 +4146,7 @@ class TestDoc12ValueTracking:
         from app.modules.warehouse import _documents_query_router
 
         class _BrokenOrders:
-            async def list_pricelist_for_partner_async(
+            async def get_best_offer_for_partner_async(
                 self, *_args: object, **_kwargs: object
             ) -> list[object]:
                 raise RuntimeError('simulated defect in the pricelist lookup')

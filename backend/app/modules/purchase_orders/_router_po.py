@@ -19,11 +19,9 @@ from app.core.exceptions import (
 )
 from app.core.logging import get_logger
 from app.core.module_sdk import PaginatedResponse
-from app.core.public_api import core_api
 from app.i18n.service import get_current_lang, get_error_message
 
 from ._journal import journal_order_act
-from ._po_render_context import build_po_context
 from ._service_crud import (
     create_purchase_order as _create_po,
 )
@@ -357,43 +355,3 @@ def register_po_routes(router: APIRouter) -> None:  # noqa: C901, PLR0915 - rout
                 },
             )
         return {'status': 'ok', 'message': 'Email sent successfully'}
-
-    @router.get('/{po_id}/html')
-    async def get_po_html(
-        po_id: UUID,
-        template_id: UUID | None = None,
-        lang: str = Query(default='en', pattern='^[a-z]{2}(-[A-Z]{2})?$'),
-        current_user: UserContextDTO = Depends(get_current_user_context),
-        db: AsyncSession = Depends(get_async_db, scope='function'),
-        org_id: UUID = Depends(require_org),
-    ) -> Response:
-        po = await _get_po(db, org_id, po_id)
-        if not po:
-            raise NotFoundException('purchase_order', get_current_lang())
-
-        from pathlib import Path
-
-        templates_dir = Path(__file__).parent / 'templates'
-
-        template_html: str | None = None
-        if template_id:
-            tpl = await core_api.templates.get_async(
-                db, org_id, template_id, module='purchase_orders'
-            )
-            if tpl:
-                template_html = tpl.body_html
-        if not template_html:
-            logger.warning(
-                'No template found for PO %s — using filesystem fallback', po_id
-            )
-            fs_path = templates_dir / 'po_standard.html'
-            if fs_path.exists():
-                template_html = fs_path.read_text(encoding='utf-8')
-
-        context = build_po_context(po, lang)
-        return Response(
-            content=core_api.pdf.render_html(
-                template_html, context, templates_dir=templates_dir
-            ),
-            media_type='text/html',
-        )

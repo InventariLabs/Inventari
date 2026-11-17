@@ -224,7 +224,6 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | Method | Signature | R/W | Description |
 |---|---|---|---|
 | `administrators_async` | `(db: AsyncSession, *, organization_id: UUID) -> set[UUID]` | READ | Everybody who administers this organisation, by authority. |
-| `assign_async` | `(db: AsyncSession, organization_id: UUID, user_id: UUID, role_id: UUID, actor_user_id: UUID) -> bool` | WRITE | Link a user to a role. Idempotent. |
 | `check_user_permission_async` | `(db: AsyncSession, *, user_id: UUID, organization_id: UUID, permission: str) -> bool` | READ | Fresh DB lookup: does *user_id* hold *permission* in this org? |
 | `create_async` | `(db: AsyncSession, *, organization_id: UUID, name: str, permissions: list[str]) -> RoleDTO` | WRITE | Create a new org-scoped role. |
 | `delete_async` | `(db: AsyncSession, *, organization_id: UUID, role_id: UUID) -> None` | WRITE | Delete an org role, refusing while somebody still holds it. |
@@ -596,9 +595,9 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 
 ## Statistics
 
-- **Total methods:** 313
+- **Total methods:** 312
 - **Namespaces:** 33
-- **Documented methods:** 313 (100%)
+- **Documented methods:** 312 (100%)
 - **READ methods:** 218 (70%)
-- **WRITE methods:** 95 (30%)
+- **WRITE methods:** 94 (30%)
 

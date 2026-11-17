@@ -362,9 +362,13 @@ class TestAParkedOrderWithNothingPendingIsAskedToo:
     ) -> None:
         """Fails without the fix: only a DRAFT was answered."""
         po = self._parked(client, po_auth_headers, po_partner, po_template)
-        request = client.get(f'{URL}/{po["id"]}/approval', headers=po_auth_headers)
+        listed = client.get(
+            '/api/v1/approvals/requests?target_type=purchase_order',
+            headers=po_auth_headers,
+        )
+        request = next(r for r in listed.json()['items'] if r['target_id'] == po['id'])
         withdrawn = client.post(
-            f'/api/v1/approvals/requests/{request.json()["id"]}/cancel',
+            f'/api/v1/approvals/requests/{request["id"]}/cancel',
             headers=po_auth_headers,
         )
         assert withdrawn.status_code == status.HTTP_200_OK, withdrawn.text

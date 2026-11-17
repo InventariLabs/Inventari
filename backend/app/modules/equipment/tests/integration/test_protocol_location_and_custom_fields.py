@@ -168,7 +168,7 @@ class TestALocationCheckout:
         self, client: TestClient, eq_auth_headers: dict[str, str]
     ) -> None:
         keys = _placeholders(
-            client, eq_auth_headers, '/api/v1/equipment/protocol/placeholders'
+            client, eq_auth_headers, '/api/v1/equipment/templates/placeholders'
         )
         assert '{{checkout_location_name}}' in keys
 
@@ -276,10 +276,7 @@ class TestCategoryCustomFields:
         eq_auth_headers: dict[str, str],
         machine_category: Category,
     ) -> None:
-        for path in (
-            '/api/v1/equipment/protocol/placeholders',
-            '/api/v1/equipment/templates/placeholders',
-        ):
+        for path in ('/api/v1/equipment/templates/placeholders',):
             keys = _placeholders(client, eq_auth_headers, path)
             assert '{{custom.operating_hours}}' in keys, path
             assert 'Operating hours' in keys['{{custom.operating_hours}}'], path
@@ -293,10 +290,7 @@ class TestCategoryCustomFields:
     ) -> None:
         """The description is one English sentence; a Polish editor cannot
         translate the connective inside it, so the parts travel separately."""
-        for path in (
-            '/api/v1/equipment/protocol/placeholders',
-            '/api/v1/equipment/templates/placeholders',
-        ):
+        for path in ('/api/v1/equipment/templates/placeholders',):
             resp = client.get(path, headers=eq_auth_headers)
             entry = next(
                 e for e in resp.json() if e['key'] == '{{custom.operating_hours}}'
@@ -327,7 +321,7 @@ class TestCategoryCustomFields:
         )
         db_session.commit()
         keys = _placeholders(
-            client, eq_auth_headers, '/api/v1/equipment/protocol/placeholders'
+            client, eq_auth_headers, '/api/v1/equipment/templates/placeholders'
         )
         assert '{{custom.operating_hours}}' in keys
         assert '{{custom.food_only}}' not in keys

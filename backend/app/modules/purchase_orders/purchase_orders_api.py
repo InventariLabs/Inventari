@@ -110,6 +110,32 @@ class PurchaseOrdersAPI:
         )
         return [PartnerPricelistDTO.model_validate(e) for e in entries]
 
+    async def get_best_offer_for_partner_async(
+        self,
+        db: AsyncSession,
+        organization_id: UUID,
+        partner_id: UUID,
+        product_template_id: UUID,
+        *,
+        quantity: Decimal | None = None,
+    ) -> PartnerPricelistDTO | None:
+        """The supplier's offer that prices an order of *quantity* today.
+
+        Valid today on the organization's clock, a minimum the quantity has
+        met, the organization's own currency before any other; ``None`` when
+        the supplier quotes nothing the order can get.
+        """
+        from app.modules.purchase_orders.pricelist_service import get_best_price_async
+
+        entry = await get_best_price_async(
+            db,
+            organization_id,
+            product_template_id,
+            quantity=quantity,
+            partner_id=partner_id,
+        )
+        return None if entry is None else PartnerPricelistDTO.model_validate(entry)
+
     async def list_supplier_prices_for_template_async(
         self,
         db: AsyncSession,
@@ -120,7 +146,9 @@ class PurchaseOrdersAPI:
     ) -> list[PartnerPricelistDTO]:
         """Return all supplier offers for one product (price comparison).
 
-        Ordered by ``unit_price`` ascending (cheapest first).
+        Ordered the way ``pick_offer`` chooses: the organization's own
+        currency first, then each other currency whole, cheapest first
+        within a currency — never one list sorted across currencies.
         """
         from app.modules.purchase_orders.pricelist_service import (
             list_for_template_async,

@@ -6131,39 +6131,6 @@
         }
       }
     },
-    "/api/v1/equipment/protocol/placeholders": {
-      "get": {
-        "tags": [
-          "Equipment"
-        ],
-        "summary": "Get Placeholders",
-        "operationId": "get_placeholders_api_v1_equipment_protocol_placeholders_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/PlaceholderInfo"
-                  },
-                  "type": "array",
-                  "title": "Response Get Placeholders Api V1 Equipment Protocol Placeholders Get"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
     "/api/v1/equipment/templates": {
       "get": {
         "tags": [
@@ -8223,83 +8190,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CursorPaginatedResponse_Item_"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/items/expiring": {
-      "get": {
-        "tags": [
-          "Items"
-        ],
-        "summary": "Get Expiring Items",
-        "description": "Products approaching expiration (all locations).",
-        "operationId": "get_expiring_items_api_v1_items_expiring_get",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "days",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "description": "Number of days until expiration",
-              "default": 7,
-              "title": "Days"
-            },
-            "description": "Number of days until expiration"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "maximum": 200,
-              "minimum": 1,
-              "default": 50,
-              "title": "Limit"
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 0,
-              "title": "Offset"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaginatedResponse_Item_"
                 }
               }
             }
@@ -13028,72 +12918,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StorageLocation"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/maker/bom/parents": {
-      "get": {
-        "tags": [
-          "Production",
-          "maker"
-        ],
-        "summary": "Get Bom Parents",
-        "description": "List all recipes in the organization (parents that have >=1 BOM line).",
-        "operationId": "get_bom_parents_api_v1_maker_bom_parents_get",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "maximum": 1000,
-              "minimum": 1,
-              "default": 200,
-              "title": "Limit"
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 0,
-              "title": "Offset"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaginatedResponse_BoMParentItem_"
                 }
               }
             }
@@ -21919,65 +21743,6 @@
         }
       }
     },
-    "/api/v1/purchase-orders/{po_id}/approval": {
-      "get": {
-        "tags": [
-          "Purchase Orders"
-        ],
-        "summary": "Get Approval Endpoint",
-        "operationId": "get_approval_endpoint_api_v1_purchase_orders__po_id__approval_get",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "po_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Po Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/ApprovalRequestSchema"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Response Get Approval Endpoint Api V1 Purchase Orders  Po Id  Approval Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/purchase-orders/{po_id}/approval-requirement": {
       "get": {
         "tags": [
@@ -22237,83 +22002,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/ReceiptFromPOSchema"
                 }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/purchase-orders/{po_id}/html": {
-      "get": {
-        "tags": [
-          "Purchase Orders"
-        ],
-        "summary": "Get Po Html",
-        "operationId": "get_po_html_api_v1_purchase_orders__po_id__html_get",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "po_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Po Id"
-            }
-          },
-          {
-            "name": "template_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "uuid"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Template Id"
-            }
-          },
-          {
-            "name": "lang",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
-              "default": "en",
-              "title": "Lang"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
               }
             }
           },
@@ -27065,65 +26753,6 @@
                   "additionalProperties": true,
                   "title": "Response Permission Catalog Api V1 Roles Permission Catalog Get"
                 }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/roles/users/{user_id}/{role_id}": {
-      "post": {
-        "tags": [
-          "Roles & Permissions"
-        ],
-        "summary": "Assign Role To User",
-        "operationId": "assign_role_to_user_api_v1_roles_users__user_id___role_id__post",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "User Id"
-            }
-          },
-          {
-            "name": "role_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Role Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
               }
             }
           },
@@ -37122,6 +36751,28 @@
               "title": "Partner Id"
             },
             "description": "Partner id for supplier pricelist lookup"
+          },
+          {
+            "name": "quantity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "exclusiveMinimum": 0.0
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Line quantity; a volume price it does not reach is not offered",
+              "title": "Quantity"
+            },
+            "description": "Line quantity; a volume price it does not reach is not offered"
           }
         ],
         "responses": {
@@ -45872,31 +45523,6 @@
         "type": "object",
         "title": "BoMLineUpdate",
         "description": "Input for PATCH /recipes/{id}/bom-lines/{line_id} \u2014 in-place edit."
-      },
-      "BoMParentItem": {
-        "properties": {
-          "template_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Template Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "line_count": {
-            "type": "integer",
-            "title": "Line Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "template_id",
-          "name",
-          "line_count"
-        ],
-        "title": "BoMParentItem",
-        "description": "One recipe in the parents list \u2014 a template that has a BOM."
       },
       "BoMSummaryItem": {
         "properties": {
@@ -65391,47 +65017,6 @@
           "has_more"
         ],
         "title": "PaginatedResponse[BoMLineRead]"
-      },
-      "PaginatedResponse_BoMParentItem_": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/BoMParentItem"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "limit": {
-            "type": "integer",
-            "title": "Limit"
-          },
-          "offset": {
-            "type": "integer",
-            "title": "Offset"
-          },
-          "has_more": {
-            "type": "boolean",
-            "title": "Has More"
-          },
-          "total_capped": {
-            "type": "boolean",
-            "title": "Total Capped",
-            "default": false
-          }
-        },
-        "type": "object",
-        "required": [
-          "items",
-          "total",
-          "limit",
-          "offset",
-          "has_more"
-        ],
-        "title": "PaginatedResponse[BoMParentItem]"
       },
       "PaginatedResponse_CampaignSchema_": {
         "properties": {

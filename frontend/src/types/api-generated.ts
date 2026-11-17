@@ -1907,23 +1907,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/equipment/protocol/placeholders": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Placeholders */
-        get: operations["get_placeholders_api_v1_equipment_protocol_placeholders_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/equipment/templates": {
         parameters: {
             query?: never;
@@ -2331,26 +2314,6 @@ export interface paths {
          * @description Cursor-paginated items list. Suitable for infinite-scroll UIs.
          */
         get: operations["get_items_cursor_page_api_v1_items_cursor_page_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/items/expiring": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Expiring Items
-         * @description Products approaching expiration (all locations).
-         */
-        get: operations["get_expiring_items_api_v1_items_expiring_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3606,26 +3569,6 @@ export interface paths {
          * @description Restore an archived storage location.
          */
         post: operations["unarchive_storage_api_v1_locations__location_id__unarchive_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/maker/bom/parents": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Bom Parents
-         * @description List all recipes in the organization (parents that have >=1 BOM line).
-         */
-        get: operations["get_bom_parents_api_v1_maker_bom_parents_get"];
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -6148,23 +6091,6 @@ export interface paths {
         patch: operations["update_purchase_order_api_v1_purchase_orders__po_id__patch"];
         trace?: never;
     };
-    "/api/v1/purchase-orders/{po_id}/approval": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Approval Endpoint */
-        get: operations["get_approval_endpoint_api_v1_purchase_orders__po_id__approval_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/purchase-orders/{po_id}/approval-requirement": {
         parameters: {
             query?: never;
@@ -6244,23 +6170,6 @@ export interface paths {
         put?: never;
         /** Create Receipt From Po */
         post: operations["create_receipt_from_po_api_v1_purchase_orders__po_id__create_receipt_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/purchase-orders/{po_id}/html": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Po Html */
-        get: operations["get_po_html_api_v1_purchase_orders__po_id__html_get"];
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -7366,23 +7275,6 @@ export interface paths {
         get: operations["permission_catalog_api_v1_roles_permission_catalog_get"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/roles/users/{user_id}/{role_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Assign Role To User */
-        post: operations["assign_role_to_user_api_v1_roles_users__user_id___role_id__post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -12775,21 +12667,6 @@ export interface components {
             make_fresh?: boolean | null;
             /** Notes */
             notes?: string | null;
-        };
-        /**
-         * BoMParentItem
-         * @description One recipe in the parents list — a template that has a BOM.
-         */
-        BoMParentItem: {
-            /**
-             * Template Id
-             * Format: uuid
-             */
-            template_id: string;
-            /** Name */
-            name: string;
-            /** Line Count */
-            line_count: number;
         };
         /**
          * BoMSummaryItem
@@ -19608,24 +19485,6 @@ export interface components {
         PaginatedResponse_BoMLineRead_: {
             /** Items */
             items: components["schemas"]["BoMLineRead"][];
-            /** Total */
-            total: number;
-            /** Limit */
-            limit: number;
-            /** Offset */
-            offset: number;
-            /** Has More */
-            has_more: boolean;
-            /**
-             * Total Capped
-             * @default false
-             */
-            total_capped: boolean;
-        };
-        /** PaginatedResponse[BoMParentItem] */
-        PaginatedResponse_BoMParentItem_: {
-            /** Items */
-            items: components["schemas"]["BoMParentItem"][];
             /** Total */
             total: number;
             /** Limit */
@@ -33387,26 +33246,6 @@ export interface operations {
             };
         };
     };
-    get_placeholders_api_v1_equipment_protocol_placeholders_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PlaceholderInfo"][];
-                };
-            };
-        };
-    };
     list_document_templates_api_v1_equipment_templates_get: {
         parameters: {
             query?: {
@@ -34330,40 +34169,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CursorPaginatedResponse_Item_"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_expiring_items_api_v1_items_expiring_get: {
-        parameters: {
-            query?: {
-                /** @description Number of days until expiration */
-                days?: number;
-                limit?: number;
-                offset?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedResponse_Item_"];
                 };
             };
             /** @description Validation Error */
@@ -36639,38 +36444,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StorageLocation"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_bom_parents_api_v1_maker_bom_parents_get: {
-        parameters: {
-            query?: {
-                limit?: number;
-                offset?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedResponse_BoMParentItem_"];
                 };
             };
             /** @description Validation Error */
@@ -41477,37 +41250,6 @@ export interface operations {
             };
         };
     };
-    get_approval_endpoint_api_v1_purchase_orders__po_id__approval_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                po_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApprovalRequestSchema"] | null;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
     get_approval_requirement_endpoint_api_v1_purchase_orders__po_id__approval_requirement_get: {
         parameters: {
             query?: never;
@@ -41658,40 +41400,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReceiptFromPOSchema"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_po_html_api_v1_purchase_orders__po_id__html_get: {
-        parameters: {
-            query?: {
-                template_id?: string | null;
-                lang?: string;
-            };
-            header?: never;
-            path: {
-                po_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
@@ -44246,38 +43954,6 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    assign_role_to_user_api_v1_roles_users__user_id___role_id__post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                user_id: string;
-                role_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
@@ -49254,6 +48930,8 @@ export interface operations {
                 template_id: string;
                 /** @description Partner id for supplier pricelist lookup */
                 partner_id?: string | null;
+                /** @description Line quantity; a volume price it does not reach is not offered */
+                quantity?: number | string | null;
             };
             header?: never;
             path?: never;

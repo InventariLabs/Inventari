@@ -1,8 +1,8 @@
 """Acts on the role catalogue are journalled, with the actor.
 
 `docs/subsystems/ROLES.md` decides not to cap role creation at the creator's
-own permissions, and rests that decision on one sentence: a self-promotion
-leaves a record even though nothing refuses it. The record was a `logger.info`
+own permissions, and rests that decision on one sentence: a permission
+added to a role leaves a record even though nothing refuses it. The record was a `logger.info`
 on stdout — the organization's journal had `CREATE invitation`, `UPDATE
 organization` and `UPDATE module` from the same minute, and nothing about a
 role. These tests are what makes that sentence true.
@@ -122,49 +122,6 @@ class TestTheRoleCatalogueIsJournalled:
         assert entry['target_id'] == role['id']
         assert entry['snapshot']['name'] == 'Temporary'
         assert entry['snapshot']['permissions'] == ['items:read']
-
-
-@pytest.mark.asyncio
-class TestASelfPromotionLeavesARecord:
-    async def test_assigning_a_role_says_who_got_it_and_who_gave_it(
-        self, real_async_client, admin
-    ):
-        role = await _create_role(
-            real_async_client,
-            admin,
-            name='Administrators',
-            permissions=['admin:access'],
-        )
-
-        assigned = await real_async_client.post(
-            f'/api/v1/roles/users/{admin.id}/{role["id"]}',
-            headers=_auth(admin),
-        )
-        assert assigned.status_code == 200, assigned.text
-        assert assigned.json()['created'] is True
-
-        entries = await _entries(real_async_client, admin, target_type='org_member')
-        entry = next(e for e in entries if e['target_id'] == str(admin.id))
-        assert entry['snapshot']['name'] == admin.email
-        assert entry['snapshot']['role_name'] == 'Administrators'
-        assert entry['snapshot']['permissions'] == ['admin:access']
-        assert entry['user_email'] == admin.email
-
-    async def test_an_assignment_that_changes_nothing_writes_nothing(
-        self, real_async_client, admin
-    ):
-        role = await _create_role(
-            real_async_client, admin, name='Again', permissions=['items:read']
-        )
-        for _ in range(2):
-            response = await real_async_client.post(
-                f'/api/v1/roles/users/{admin.id}/{role["id"]}',
-                headers=_auth(admin),
-            )
-            assert response.status_code == 200, response.text
-
-        entries = await _entries(real_async_client, admin, target_type='org_member')
-        assert len([e for e in entries if e['target_id'] == str(admin.id)]) == 1
 
 
 @pytest.mark.asyncio

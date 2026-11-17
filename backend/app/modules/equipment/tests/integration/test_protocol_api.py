@@ -4,7 +4,6 @@ Integration tests for equipment protocol generation and document templates.
 Covers:
 - GET  /equipment/assignments/{id}/protocol/html — render HTML
 - GET  /equipment/assignments/{id}/protocol/pdf  — render PDF
-- GET  /equipment/protocol/placeholders           — list placeholders
 - CRUD /equipment/templates                        — template management
 """
 
@@ -398,7 +397,7 @@ class TestPlaceholders:
         self, client: TestClient, eq_auth_headers: dict[str, str]
     ) -> None:
         resp = client.get(
-            '/api/v1/equipment/protocol/placeholders',
+            '/api/v1/equipment/templates/placeholders',
             headers=eq_auth_headers,
         )
         assert resp.status_code == status.HTTP_200_OK

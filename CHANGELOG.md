@@ -218,6 +218,16 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The price a document suggests for a supplier's product is the price that
+  line can get: valid today, from a quantity tier the line's quantity
+  reaches, and in the organization's own currency before any other. It used
+  to be the lowest number on the whole price list, so a 1000-piece price or
+  an expired promotion was suggested for a line of five. A quote in another
+  currency no longer fills the line's price, which the document would have
+  kept under its own currency. The supplier price comparison lists the
+  organization's currency first instead of sorting different currencies by
+  their digits.
+
 - The first `make dev-up` on a machine that has no images yet no longer
   fails with a duplicate-type error from a module's migration. The backend's
   first start and the bootstrap's own `db upgrade` migrated the same empty
@@ -345,6 +355,24 @@ says what the release does rather than what changed since them.
   installation, and any member of one organization could call it. A script
   that called it needs to do nothing: the recipes module does the same work
   once at start-up.
+
+- **Breaking:** six API routes no screen or client of the app called, each
+  superseded by one that stays. A script that used one switches to its
+  replacement:
+  - `GET /api/v1/items/expiring` — use `GET /api/v1/items?expiring_days=N`.
+  - `GET /api/v1/maker/bom/parents` — use `GET /api/v1/maker/bom/summary` or
+    `GET /api/v1/maker/bom/template-ids`.
+  - `GET /api/v1/purchase-orders/{po_id}/approval` — list the order's request
+    with `GET /api/v1/approvals/requests?target_type=purchase_order` and take
+    the one whose `target_id` is the order.
+  - `GET /api/v1/purchase-orders/{po_id}/html` — use
+    `GET /api/v1/purchase-orders/{po_id}/pdf`.
+  - `GET /api/v1/equipment/protocol/placeholders` — use
+    `GET /api/v1/equipment/templates/placeholders`, which answers the same list.
+  - `POST /api/v1/roles/users/{user_id}/{role_id}` — use
+    `PATCH /api/v1/organizations/my/members/{user_id}/role` with a `role_id`.
+    That route also refuses a member changing their own role, which the removed
+    one did not.
 
 ## v0.12.0 - 2026-11-09
 

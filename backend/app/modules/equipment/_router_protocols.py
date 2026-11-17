@@ -1,4 +1,3 @@
-from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
@@ -9,8 +8,6 @@ from app.core.contracts import UserContextDTO
 from app.core.deps import get_async_db, get_current_user_context, require_org
 from app.core.exceptions import map_service_errors
 from app.i18n.service import Language, get_lang_from_header
-
-from .schemas import PlaceholderInfo
 
 router = APIRouter()
 
@@ -53,21 +50,3 @@ async def get_protocol_pdf(
         media_type='application/pdf',
         headers={'Content-Disposition': f'attachment; filename="{filename}"'},
     )
-
-
-@router.get(
-    '/protocol/placeholders',
-    # list-envelope-exception: the placeholder catalogue, a vocabulary in the code
-    response_model=list[PlaceholderInfo],
-    dependencies=[Depends(require_org)],
-)
-async def get_placeholders(
-    current_user: UserContextDTO = Depends(get_current_user_context),
-    db: AsyncSession = Depends(get_async_db, scope='function'),
-    org_id: UUID = Depends(require_org),
-) -> Any:
-    # The custom-field half is a value, not a gate: what it lists is what
-    # this organization's categories define.
-    from .protocol_service import protocol_placeholders_async
-
-    return await protocol_placeholders_async(db, org_id)
