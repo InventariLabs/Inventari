@@ -605,6 +605,7 @@
     "updateFailed": "Nie udało się zaktualizować miejsca",
     "deleted": "Miejsce usunięte",
     "deleteFailed": "Nie udało się usunąć miejsca",
+    "archiveConfirm": "Miejsce zniknie z list i selektorów.",
     "deleteTitle": "Usuń miejsce",
     "confirmDelete": "Usunąć miejsce „{{name}}”?",
     "parent": "Miejsce nadrzędne",

@@ -166,14 +166,7 @@ function LocationActions({
   const refusal = t("locations.cannotDeleteHolding", { count: blocking });
   return (
     <div className="flex items-center gap-1">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onEdit}
-        aria-label={t("common:a11y.editNamed", { name })}
-      >
-        <Pencil size={16} />
-      </Button>
+      {/* First, so Edit and Delete keep their place on rows without it. */}
       {archivable && (
         <Button
           variant="ghost"
@@ -186,6 +179,14 @@ function LocationActions({
         </Button>
       )}
       <Button
+        variant="ghost"
+        size="icon"
+        onClick={onEdit}
+        aria-label={t("common:a11y.editNamed", { name })}
+      >
+        <Pencil size={16} />
+      </Button>
+      <Button
         variant="ghostDanger"
         size="icon"
         onClick={onDelete}
@@ -197,6 +198,26 @@ function LocationActions({
       >
         <Trash2 size={16} />
       </Button>
+    </div>
+  );
+}
+
+/**
+ * The way back from Archive. Places made on this screen are tagged for the
+ * module, which the inventory list of archived places hides unless the
+ * organization shows module data; the link carries the module so they are
+ * listed there either way.
+ */
+function ArchivedLocationsLink() {
+  const { t } = useTranslation("locations");
+  return (
+    <div className="flex justify-center">
+      <Link
+        to="/inventory/locations/archived?module=equipment"
+        className="text-sm text-primary-600 hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
+      >
+        {t("archived.title")}
+      </Link>
     </div>
   );
 }
@@ -342,7 +363,19 @@ export default function EquipmentLocationsPage() {
   const handleArchive = async (loc: StorageLocationSummary) => {
     const ok = await confirm({
       title: t("locations:edit.archiveTitle"),
-      message: `${t("locations:edit.archiveConfirmEmpty")} ${t("locations:edit.archiveReversible")}`,
+      // Not the core "Products are not deleted": nothing stands here to be
+      // asked about. The places inside stay, as the spaces dialog says.
+      message: [
+        t("locations.archiveConfirm"),
+        t("locations:edit.archiveReversible"),
+        loc.direct_children_count
+          ? t("locations:edit.archiveSubLocations", {
+              count: loc.direct_children_count,
+            })
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" "),
       variant: "danger",
       confirmLabel: t("locations:edit.archive"),
     });
@@ -557,6 +590,7 @@ export default function EquipmentLocationsPage() {
           )}
         </div>
       )}
+      <ArchivedLocationsLink />
       <ConfirmDialog {...confirmDialogProps} />
     </div>
   );

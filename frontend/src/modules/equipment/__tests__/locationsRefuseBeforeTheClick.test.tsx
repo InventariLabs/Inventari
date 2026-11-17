@@ -355,6 +355,7 @@ describe("archiving the place the delete will refuse", () => {
       context_tag: "equipment",
       items_count: 0,
       total_items_count: 0,
+      direct_children_count: 2,
     },
     {
       ...base,
@@ -433,5 +434,37 @@ describe("archiving the place the delete will refuse", () => {
     expect(
       screen.queryByRole("button", { name: "Archive Desk 14" }),
     ).toBeNull();
+  });
+
+  it("asks without the stock wording, and says what happens to the places inside", async () => {
+    // "Products are not deleted" is the core sentence for a place that holds
+    // some; nothing stands here. The places inside it are left where they are.
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText("Review Room")).toBeInTheDocument();
+    });
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Archive Review Room" }),
+    );
+
+    expect(
+      await screen.findByText(/The 2 locations inside it are not archived/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Products are not deleted/)).toBeNull();
+  });
+
+  it("leads to the archived places, carrying the module", async () => {
+    // Places made here are tagged for the module, which the inventory list of
+    // archived places hides unless the organization shows module data: the
+    // dialog promises a way back, so the screen has to carry the door.
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText("Review Room")).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByRole("link", { name: "Archived locations" }),
+    ).toHaveAttribute("href", "/inventory/locations/archived?module=equipment");
   });
 });
