@@ -257,5 +257,32 @@
     },
     "unpriced_one": "{{count}} produit n'a pas d'historique des coûts et reste hors du total.",
     "unpriced_other": "{{count}} produits n'ont pas d'historique des coûts et restent hors du total."
+  },
+  "valueMovement": {
+    "title": "Mouvement de valeur",
+    "subtitle": "Ce que valait le stock à l'ouverture d'une période, ce qui l'a fait bouger, et ce qu'il valait à la clôture",
+    "from": "Du",
+    "to": "Au",
+    "opening": "Valeur au {{date}}, en début de journée",
+    "closing": "Valeur au {{date}}, en fin de journée",
+    "caption": "Valeur du stock de {{organization}} du {{from}} au {{to}}",
+    "completeFrom": "Le journal des mouvements commence le {{date}}. Rien avant n'est connu — et ce n'est pas zéro.",
+    "noValueSource": "Aucun historique des coûts n'est tenu, donc il n'y a pas de valeur à indiquer. L'état est construit à partir de l'historique des coûts des entrées et des sorties.",
+    "cannotAnswer": "Impossible de répondre pour cette période.",
+    "excludedCurrency_one": "{{count}} réception écartée : sa devise n'est pas celle de l'organisation.",
+    "excludedCurrency_other": "{{count}} réceptions écartées : leur devise n'est pas celle de l'organisation.",
+    "columns": {
+      "line": "Ligne",
+      "value": "Valeur"
+    },
+    "lines": {
+      "receipts": "Réceptions",
+      "internal_receipts": "Produit et remis en stock",
+      "used": "Consommation",
+      "disposed": "Mise au rebut",
+      "other_issues": "Autres sorties (expéditions, manquants d'inventaire, corrections)",
+      "work_in_progress_change": "Variation de la production en cours",
+      "other_changes": "Autres variations (coûts ajoutés après réception, arrondis)"
+    }
   }
 }

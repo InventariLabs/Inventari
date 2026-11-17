@@ -273,5 +273,34 @@
     "unpriced_few": "{{count}} produkty nie mają historii kosztów i nie wchodzą do sumy.",
     "unpriced_many": "{{count}} produktów nie ma historii kosztów i nie wchodzi do sumy.",
     "unpriced_other": "{{count}} produktu nie ma historii kosztów i nie wchodzi do sumy."
+  },
+  "valueMovement": {
+    "title": "Ruch wartości",
+    "subtitle": "Ile zapas był wart na początku okresu, co się z nim działo i ile był wart na koniec",
+    "from": "Od",
+    "to": "Do",
+    "opening": "Wartość na {{date}}, na początek dnia",
+    "closing": "Wartość na {{date}}, na koniec dnia",
+    "caption": "Wartość zapasu {{organization}} od {{from}} do {{to}}",
+    "completeFrom": "Rejestr ruchów zaczyna się {{date}}. Nic wcześniejszego nie jest znane — i nie jest zerem.",
+    "noValueSource": "Nie ma historii kosztów, więc nie ma wartości do podania. Zestawienie powstaje z historii kosztów tego, co przyszło i wyszło.",
+    "cannotAnswer": "Na ten okres nie da się odpowiedzieć.",
+    "excludedCurrency_one": "Pominięto {{count}} przyjęcie: jego waluta nie jest walutą organizacji.",
+    "excludedCurrency_few": "Pominięto {{count}} przyjęcia: ich waluta nie jest walutą organizacji.",
+    "excludedCurrency_many": "Pominięto {{count}} przyjęć: ich waluta nie jest walutą organizacji.",
+    "excludedCurrency_other": "Pominięto {{count}} przyjęcia: ich waluta nie jest walutą organizacji.",
+    "columns": {
+      "line": "Pozycja",
+      "value": "Wartość"
+    },
+    "lines": {
+      "receipts": "Przyjęcia",
+      "internal_receipts": "Wyprodukowane i zwrócone na stan",
+      "used": "Zużycie",
+      "disposed": "Utylizacja",
+      "other_issues": "Inne rozchody (wydania, braki z inwentaryzacji, korekty)",
+      "work_in_progress_change": "Zmiana produkcji w toku",
+      "other_changes": "Inne zmiany (koszty dopisane po przyjęciu, zaokrąglenia)"
+    }
   }
 }
