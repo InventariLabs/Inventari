@@ -660,7 +660,23 @@
         "step": "Paso",
         "label_name": "Nombre en una lista de ingredientes",
         "allergens": "Alérgenos",
-        "may_contain": "Puede contener"
+        "may_contain": "Puede contener",
+        "answer": "Respuesta",
+        "api_base_url": "URL base",
+        "approved_by_id": "Aprobado por",
+        "assets": "Equipos",
+        "campaign": "Campaña",
+        "capabilities": "Capacidades",
+        "closed_by": "Cerrado por",
+        "connection_id": "Conexión",
+        "holder": "Titular",
+        "holder_email": "Correo del titular",
+        "model_name": "Modelo",
+        "provider": "Proveedor",
+        "purpose": "Finalidad",
+        "registration": "Registro",
+        "response_id": "ID de la respuesta",
+        "sku_schema": "Esquema de SKU"
       },
       "showWholeChange": "Mostrar el cambio completo",
       "showLess": "Mostrar menos",
@@ -722,7 +738,8 @@
         "cycle_count_schedule": "Plan de recuentos cíclicos",
         "work_item": "Tarea",
         "partner": "Socio",
-        "label": "Etiqueta"
+        "label": "Etiqueta",
+        "ai_connection": "Conexión de IA"
       },
       "columns": {
         "timestamp": "Cuándo",

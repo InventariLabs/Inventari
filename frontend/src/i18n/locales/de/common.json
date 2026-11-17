@@ -660,7 +660,23 @@
         "step": "Schritt",
         "label_name": "Name im Zutatenverzeichnis",
         "allergens": "Allergene",
-        "may_contain": "Kann enthalten"
+        "may_contain": "Kann enthalten",
+        "answer": "Antwort",
+        "api_base_url": "Basis-URL",
+        "approved_by_id": "Genehmigt von",
+        "assets": "Geräte",
+        "campaign": "Kampagne",
+        "capabilities": "Fähigkeiten",
+        "closed_by": "Geschlossen durch",
+        "connection_id": "Verbindung",
+        "holder": "Inhaber",
+        "holder_email": "E-Mail des Inhabers",
+        "model_name": "Modell",
+        "provider": "Anbieter",
+        "purpose": "Verwendungszweck",
+        "registration": "Registrierung",
+        "response_id": "Antwort-ID",
+        "sku_schema": "SKU-Schema"
       },
       "showWholeChange": "Ganze Änderung anzeigen",
       "showLess": "Weniger anzeigen",
@@ -722,7 +738,8 @@
         "cycle_count_schedule": "Zykluszählplan",
         "work_item": "Aufgabe",
         "partner": "Partner",
-        "label": "Etikett"
+        "label": "Etikett",
+        "ai_connection": "KI-Verbindung"
       },
       "columns": {
         "timestamp": "Wann",

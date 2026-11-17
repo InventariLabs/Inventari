@@ -662,7 +662,23 @@
         "step": "Krok",
         "label_name": "Nazwa na liście składników",
         "allergens": "Alergeny",
-        "may_contain": "Może zawierać"
+        "may_contain": "Może zawierać",
+        "answer": "Odpowiedź",
+        "api_base_url": "Adres bazowy",
+        "approved_by_id": "Zatwierdził",
+        "assets": "Zasoby",
+        "campaign": "Kampania",
+        "capabilities": "Możliwości",
+        "closed_by": "Zamknięte przez",
+        "connection_id": "Połączenie",
+        "holder": "Posiadacz",
+        "holder_email": "E-mail posiadacza",
+        "model_name": "Model",
+        "provider": "Dostawca",
+        "purpose": "Przeznaczenie",
+        "registration": "Rejestracja",
+        "response_id": "Odpowiedź (identyfikator)",
+        "sku_schema": "Schemat SKU"
       },
       "showWholeChange": "Pokaż całą zmianę",
       "showLess": "Pokaż mniej",
@@ -724,7 +740,8 @@
         "cycle_count_schedule": "Harmonogram zliczeń okresowych",
         "work_item": "Zadanie",
         "partner": "Partner",
-        "label": "Etykieta"
+        "label": "Etykieta",
+        "ai_connection": "Połączenie AI"
       },
       "columns": {
         "timestamp": "Kiedy",
