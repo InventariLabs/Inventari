@@ -209,14 +209,14 @@ function LocationActions({
  * listed there either way.
  */
 function ArchivedLocationsLink() {
-  const { t } = useTranslation("locations");
+  const { t } = useTranslation(["equipment", "locations"]);
   return (
     <div className="flex justify-center">
       <Link
         to="/inventory/locations/archived?module=equipment"
-        className="text-sm text-primary-600 hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
+        className="text-sm text-on-primary hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
       >
-        {t("archived.title")}
+        {t("locations:archived.title")}
       </Link>
     </div>
   );
