@@ -629,8 +629,10 @@ class TestMemberCustomRole:
         self, client, auth_headers, test_user2
     ):
         role = self._create_role(client, auth_headers)
-        assign = client.post(
-            f'/api/v1/roles/users/{test_user2.id}/{role["id"]}', headers=auth_headers
+        assign = client.patch(
+            f'/api/v1/organizations/my/members/{test_user2.id}/role',
+            headers=auth_headers,
+            json={'role_id': role['id']},
         )
         assert assign.status_code == status.HTTP_200_OK
 

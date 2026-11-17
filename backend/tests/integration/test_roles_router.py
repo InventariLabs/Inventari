@@ -4,7 +4,6 @@ Roles router exposes org-scoped role listing + mutation:
 - GET    /roles                  -- list org roles (admin only)
 - POST   /roles                  -- create role        (admin only)
 - PUT    /roles/{id}/permissions -- replace permission set on a role
-- POST   /roles/users/{uid}/{rid} -- link a user to a role
 
 Reads funnel through CoreAPI (core_api.roles), writes go through
 the service helpers. Admin-only access is enforced by
@@ -283,9 +282,10 @@ class TestRolesRouter:
         db_session.add(target_user)
         db_session.commit()
 
-        response = await real_async_client.post(
-            f'/api/v1/roles/users/{target_user_id}/{role.id}',
+        response = await real_async_client.patch(
+            f'/api/v1/organizations/my/members/{target_user_id}/role',
             headers=_auth(async_test_user),
+            json={'role_id': str(role.id)},
         )
         assert response.status_code == 200
 

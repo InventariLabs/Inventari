@@ -37,8 +37,10 @@ Three consequences worth stating plainly:
   to the organization's audit log, naming the actor and what the role carried
   at that moment — `role` entries for the catalogue, an `org_member` entry for
   the assignment, since who holds what is a fact about a person. A
-  self-promotion is therefore two rows an administrator can read on
-  Settings → Audit Log, even though nothing refuses it.
+  permission added to a role its editor already holds is therefore a row an
+  administrator can read on Settings → Audit Log, even though nothing refuses
+  it. Handing oneself a role is refused: the members endpoint does not let a
+  member change their own role.
 - **The scope is the permission catalogue, not the built-in bypass.** A
   custom role carrying `admin:access` grants the permission; it does not turn
   its holder into a built-in administrator, and `require_permission` keeps its

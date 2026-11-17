@@ -23,6 +23,15 @@ from app.models.user import User
 PO_URL = '/api/v1/purchase-orders'
 
 
+def _approval_of(client: TestClient, headers: dict[str, str], po_id: str) -> Any:
+    """The approval request filed for an order, or None: the approvals list's answer."""
+    listed = client.get(
+        '/api/v1/approvals/requests?target_type=purchase_order', headers=headers
+    )
+    assert listed.status_code == 200, listed.text
+    return next((r for r in listed.json()['items'] if r['target_id'] == po_id), None)
+
+
 def _create_po(
     client: TestClient,
     headers: dict[str, str],
@@ -544,9 +553,7 @@ class TestPOApprovalFlow:
         confirm = client.post(f'{PO_URL}/{po["id"]}/confirm', headers=approval_headers)
         assert confirm.json()['status'] == 'PENDING_APPROVAL'
 
-        approval = client.get(f'{PO_URL}/{po["id"]}/approval', headers=approval_headers)
-        assert approval.status_code == 200
-        assert approval.json() is not None
+        assert _approval_of(client, approval_headers, po['id']) is not None
 
         approve = client.post(f'{PO_URL}/{po["id"]}/approve', headers=approval_headers)
         assert approve.status_code == 200, approve.text
@@ -656,9 +663,8 @@ class TestPOApprovalFlow:
         assert cancel.status_code == 200, cancel.text
         assert cancel.json()['status'] == 'CANCELLED'
 
-        approval = client.get(f'{PO_URL}/{po["id"]}/approval', headers=approval_headers)
-        assert approval.status_code == 200
-        assert approval.json()['status'] == 'CANCELLED'
+        approval = _approval_of(client, approval_headers, po['id'])
+        assert approval['status'] == 'CANCELLED'
 
     def test_withdrawn_request_leaves_the_po_a_way_out(
         self,
@@ -886,8 +892,8 @@ class TestSwitchingTheWorkflowOff:
 
         after = client.get(f'{PO_URL}/{po["id"]}', headers=approval_headers).json()
         assert after['status'] == 'CONFIRMED'
-        approval = client.get(f'{PO_URL}/{po["id"]}/approval', headers=approval_headers)
-        assert approval.json()['status'] == 'CANCELLED'
+        approval = _approval_of(client, approval_headers, po['id'])
+        assert approval['status'] == 'CANCELLED'
 
     def test_the_released_order_requester_is_told_the_order_goes_on(
         self,
@@ -944,10 +950,10 @@ class TestSwitchingTheWorkflowOff:
         _set_settings(client, approval_headers, approval_required=True)
         po = _create_po(client, approval_headers, approval_partner, approval_template)
         client.post(f'{PO_URL}/{po["id"]}/confirm', headers=approval_headers)
-        request = client.get(f'{PO_URL}/{po["id"]}/approval', headers=approval_headers)
+        request = _approval_of(client, approval_headers, po['id'])
 
         withdrawn = client.post(
-            f'/api/v1/approvals/requests/{request.json()["id"]}/cancel',
+            f'/api/v1/approvals/requests/{request["id"]}/cancel',
             headers=approval_headers,
         )
         assert withdrawn.status_code == 200, withdrawn.text

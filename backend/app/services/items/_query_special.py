@@ -1,6 +1,6 @@
 """Specialized view-specific queries.
 
-Groups the ``get_*_or_404``, ``get_expiring_items``,
+Groups the ``get_*_or_404``,
 ``get_archived_items`` and ``get_product_template_or_404`` families. These
 are the queries backing dashboard widgets, alerts, archive views and
 PO/template lookups. Single-item lookups live in ``_query_get.py``,
@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session, joinedload, noload, selectinload
 from sqlalchemy.sql.elements import ColumnElement
 
-from app.core.db_utils import in_ids, paginate_async
+from app.core.db_utils import in_ids
 from app.core.exceptions import AppException, NotFoundException
 from app.core.keyset import read_page_after
 from app.i18n.service import get_current_lang, get_error_message
@@ -80,40 +80,6 @@ async def get_item_or_404_async(
             message=get_error_message('item_archived', get_current_lang()),
         )
     return item
-
-
-async def get_expiring_items_async(
-    db: AsyncSession,
-    user_storage_ids: list[UUID],
-    organization_id: UUID | None = None,
-    days: int = 7,
-    offset: int = 0,
-    limit: int = 50,
-) -> tuple[list[Item], int]:
-    """Products approaching expiry, soonest first, and how many there are.
-
-    The same window as the counters: ``is_expiring_soon``, which starts at
-    the organization's own today. Items already past their date belong to
-    the expired bucket and used to appear in both.
-    """
-    from app.services.items.expiry import expiry_today_async, is_expiring_soon
-
-    # A reader with no organization has no shelves either (its storage scope
-    # is empty) and no day to count the window from.
-    if organization_id is None:
-        return [], 0
-    today = await expiry_today_async(db, organization_id)
-    query = (
-        select(Item)
-        .options(joinedload(Item.category), joinedload(Item.uom))
-        .where(
-            in_ids(Item.storage_location_id, user_storage_ids),
-            Item.is_deleted.is_(False),
-            is_expiring_soon(today, days),
-        )
-        .order_by(Item.effective_expiry_date.asc(), Item.id)
-    )
-    return await paginate_async(db, query, limit=limit, offset=offset)
 
 
 def _archived_at() -> ColumnElement[Any]:

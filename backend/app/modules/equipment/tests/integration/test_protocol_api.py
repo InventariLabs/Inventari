@@ -4,7 +4,6 @@ Integration tests for equipment protocol generation and document templates.
 Covers:
 - GET  /equipment/assignments/{id}/protocol/html — render HTML
 - GET  /equipment/assignments/{id}/protocol/pdf  — render PDF
-- GET  /equipment/protocol/placeholders           — list placeholders
 - CRUD /equipment/templates                        — template management
 """
 
