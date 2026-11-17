@@ -88,31 +88,28 @@ export function PricelistComparisonCard({
                 </tr>
               </thead>
               <tbody>
-                {entries
-                  .slice()
-                  .sort((a, b) => Number(a.unit_price) - Number(b.unit_price))
-                  .map((entry) => {
-                    return (
-                      <tr
-                        key={entry.id}
-                        className="border-b border-surface-inset/60 last:border-0"
-                      >
-                        <td className="px-4 py-2">
-                          {supplierNames.get(entry.partner_id) ??
-                            entry.partner_id}
-                        </td>
-                        <td className="px-4 py-2 font-medium">
-                          {money(entry.unit_price, entry.currency)}
-                        </td>
-                        <td className="px-4 py-2 text-on-secondary">
-                          {formatDate(entry.valid_from)}
-                          {entry.valid_to
-                            ? ` → ${formatDate(entry.valid_to)}`
-                            : ` → ${t("common:datePicker.empty")}`}
-                        </td>
-                      </tr>
-                    );
-                  })}
+                {entries.map((entry) => {
+                  return (
+                    <tr
+                      key={entry.id}
+                      className="border-b border-surface-inset/60 last:border-0"
+                    >
+                      <td className="px-4 py-2">
+                        {supplierNames.get(entry.partner_id) ??
+                          entry.partner_id}
+                      </td>
+                      <td className="px-4 py-2 font-medium">
+                        {money(entry.unit_price, entry.currency)}
+                      </td>
+                      <td className="px-4 py-2 text-on-secondary">
+                        {formatDate(entry.valid_from)}
+                        {entry.valid_to
+                          ? ` → ${formatDate(entry.valid_to)}`
+                          : ` → ${t("common:datePicker.empty")}`}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

@@ -15,7 +15,10 @@ import {
   type ReceiptDraftLine,
 } from "@/modules/warehouse/components/documentFormShared";
 import { useProductSearch } from "@/modules/warehouse/hooks/useProductSearch";
-import { documentsApi } from "@/modules/warehouse/api/documents";
+import {
+  documentsApi,
+  type PriceHint,
+} from "@/modules/warehouse/api/documents";
 import { formatMoney } from "@/utils/formatters";
 import { totalAmounts } from "@/utils/money";
 
@@ -121,6 +124,27 @@ function toReceiptLineUpdates(
     }
   }
   return result as Partial<ReceiptDraftLine>;
+}
+
+/**
+ * Two answers, kept apart. A product nobody has bought yet has no price to
+ * suggest, and the rate that came with it — the partner's, the most specific
+ * one there is — used to be discarded along with it. A quote in another
+ * currency is a number the document cannot hold: it would be stored under the
+ * document's own currency, so the rate comes through and the price is left
+ * for the user.
+ */
+function suggestionFromHint(
+  hint: PriceHint,
+  documentCurrency?: string | null,
+): { suggestion: Partial<ReceiptDraftLine>; priceFitsDocument: boolean } {
+  const suggestion: Partial<ReceiptDraftLine> = {};
+  const priceFitsDocument =
+    hint.unit_price != null &&
+    (!hint.currency || !documentCurrency || hint.currency === documentCurrency);
+  if (priceFitsDocument) suggestion.unit_price = String(hint.unit_price);
+  if (hint.tax_rate != null) suggestion.tax_rate = String(hint.tax_rate);
+  return { suggestion, priceFitsDocument };
 }
 
 function computeLineValue(
@@ -333,22 +357,18 @@ export function DocumentLinesEditor({
       const hint = await documentsApi.priceHint({
         template_id: product.product_template_id,
         partner_id: partnerId ?? null,
+        // The tier the line reaches: a volume price is not the price of five.
+        quantity: existing.quantity > 0 ? existing.quantity : null,
       });
-      // Two answers, kept apart. A product nobody has bought yet has no
-      // price to suggest, and the rate that came with it — the partner's,
-      // the most specific one there is — used to be discarded along with it.
-      const suggestion: Partial<ReceiptDraftLine> = {};
-      if (hint.unit_price != null) {
-        suggestion.unit_price = String(hint.unit_price);
-      }
-      if (hint.tax_rate != null) {
-        suggestion.tax_rate = String(hint.tax_rate);
-      }
+      const { suggestion, priceFitsDocument } = suggestionFromHint(
+        hint,
+        currency,
+      );
       if (Object.keys(suggestion).length === 0) {
         onPriceHintResult?.(key, false);
         return;
       }
-      onPriceHintResult?.(key, hint.unit_price != null);
+      onPriceHintResult?.(key, priceFitsDocument);
       onUpdateLine(index, suggestion);
     } catch {
       // The ask failed, but it was made: the form may not keep promising

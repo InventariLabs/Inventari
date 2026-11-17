@@ -37122,6 +37122,28 @@
               "title": "Partner Id"
             },
             "description": "Partner id for supplier pricelist lookup"
+          },
+          {
+            "name": "quantity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "exclusiveMinimum": 0.0
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Line quantity; a volume price it does not reach is not offered",
+              "title": "Quantity"
+            },
+            "description": "Line quantity; a volume price it does not reach is not offered"
           }
         ],
         "responses": {

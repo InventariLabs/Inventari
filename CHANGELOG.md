@@ -218,6 +218,16 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The price a document suggests for a supplier's product is the price that
+  line can get: valid today, from a quantity tier the line's quantity
+  reaches, and in the organization's own currency before any other. It used
+  to be the lowest number on the whole price list, so a 1000-piece price or
+  an expired promotion was suggested for a line of five. A quote in another
+  currency no longer fills the line's price, which the document would have
+  kept under its own currency. The supplier price comparison lists the
+  organization's currency first instead of sorting different currencies by
+  their digits.
+
 - The first `make dev-up` on a machine that has no images yet no longer
   fails with a duplicate-type error from a module's migration. The backend's
   first start and the bootstrap's own `db upgrade` migrated the same empty

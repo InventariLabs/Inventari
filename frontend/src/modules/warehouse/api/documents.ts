@@ -260,11 +260,13 @@ export const documentsApi = {
   priceHint: async (params: {
     template_id: string;
     partner_id?: string | null;
+    quantity?: number | null;
   }): Promise<PriceHint> => {
     const response = await api.get<PriceHint>("/warehouse/price-hint", {
       params: {
         template_id: params.template_id,
         ...(params.partner_id ? { partner_id: params.partner_id } : {}),
+        ...(params.quantity ? { quantity: params.quantity } : {}),
       },
     });
     return response.data;
