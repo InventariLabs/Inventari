@@ -665,6 +665,7 @@ apart.
 | `STOCK_TAKE_STATUS_UNCHANGEABLE` | Cannot change status from {current} to {new}. |
 | `STOCK_TAKE_TOLERANCE_NOT_ALLOWED` | Accepting a difference beyond the tolerance needs the stock take approval permission. |
 | `STOCK_TAKE_UNCOUNTED_ITEMS` | {count} uncounted items remaining |
+| `STOCK_VALUE_PERIOD_REVERSED` | The period ends before it starts. Pick an end date on or after the start date. |
 | `STORAGE_ARCHIVED` | This location is archived. Restore it before storing products here. |
 | `STORAGE_ARCHIVE_BLOCKED_BY_ITEMS` | Cannot archive: {count} item(s) are still stored here. Move them first or archive with a target location. |
 | `STORAGE_ARCHIVE_TARGET_ARCHIVED` | Cannot move items into an archived location. |
