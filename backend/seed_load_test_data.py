@@ -442,7 +442,7 @@ def main():
         )
         print('\n   Expiry date distribution:')
         print('   - ~15% already expired')
-        print('   - ~30% expiring within 90 days (endpoint /expiring)')
+        print('   - ~30% expiring within 90 days (items list, expiring_days filter)')
         print('   - ~25% OK (91–365 days)')
         print('   - ~30% no expiry date')
 

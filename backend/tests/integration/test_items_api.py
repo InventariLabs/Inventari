@@ -4,7 +4,6 @@ Integration tests for items API endpoints.
 Tests verify correctness of endpoints:
 - GET /api/v1/items - list of items with filters
 - POST /api/v1/items - create item
-- GET /api/v1/items/expiring - expiring items
 - GET /api/v1/items/{item_id} - item details
 - PUT /api/v1/items/{item_id} - update item
 - DELETE /api/v1/items/{item_id} - delete item

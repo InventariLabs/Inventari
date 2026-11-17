@@ -87,7 +87,8 @@ says what the release does rather than what changed since them.
   journal, and `effective_expiry`, the day a package really stops being fit to
   use — the batch's date or the use-by an opening wrote, whichever is earlier —
   so a module reading an expiry window can judge a package by the date the
-  screens, the forecast and the items list's `expiring_days` filter report.
+  screens and the forecast report, which is also the date the items list's
+  `expiring_days` filter selects on.
   `core_api.items.list_by_expiry_async` takes `expiry_after` and
   `expiry_before`, so a caller reading one expiry window filters the query
   instead of reading a capped list and discarding rows after it. The app-level
