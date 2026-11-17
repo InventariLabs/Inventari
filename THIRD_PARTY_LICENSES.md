@@ -247,7 +247,7 @@ and the static assets the frontend serves.
 | `arg` | 5.0.2 | MIT |  |
 | `aria-hidden` | 1.2.6 | MIT |  |
 | `asynckit` | 0.4.0 | MIT |  |
-| `axios` | 1.20.0 | MIT |  |
+| `axios` | 1.21.1 | MIT |  |
 | `bail` | 2.0.2 | MIT |  |
 | `binary-extensions` | 2.3.0 | MIT |  |
 | `braces` | 3.0.3 | MIT |  |
