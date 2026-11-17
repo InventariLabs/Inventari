@@ -1,5 +1,6 @@
 {
   "campaign_cannot_delete_launched": "Eine gestartete Kampagne kann nicht gelöscht werden — brechen Sie sie stattdessen ab.",
   "campaign_already_completed": "Die Kampagne ist bereits abgeschlossen.",
-  "campaign_already_cancelled": "Die Kampagne ist bereits abgebrochen."
+  "campaign_already_cancelled": "Die Kampagne ist bereits abgebrochen.",
+  "storage_delete_blocked_by_checkouts": "Dieser Ort kann nicht gelöscht werden: Es wurde Ausrüstung dorthin ausgegeben, und die Historie des Objekts nennt ihn. Archivieren Sie ihn stattdessen."
 }

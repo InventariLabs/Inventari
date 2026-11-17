@@ -1,5 +1,6 @@
 {
   "campaign_cannot_delete_launched": "No se puede eliminar una campaña iniciada; cancélala en su lugar.",
   "campaign_already_completed": "La campaña ya está completada.",
-  "campaign_already_cancelled": "La campaña ya está cancelada."
+  "campaign_already_cancelled": "La campaña ya está cancelada.",
+  "storage_delete_blocked_by_checkouts": "No se puede eliminar este lugar: se entregó equipo allí y el historial del activo lo nombra. Archívalo en su lugar."
 }
