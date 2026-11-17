@@ -22153,6 +22153,8 @@ export interface components {
             finished_on?: string | null;
             /** Output Lot Name */
             output_lot_name?: string | null;
+            /** Best Before */
+            best_before?: string | null;
         };
         /**
          * ProductionOrderLineRead
@@ -22336,6 +22338,8 @@ export interface components {
         ProductionOrderStart: {
             /** Started On */
             started_on?: string | null;
+            /** Ingredient Lots */
+            ingredient_lots?: components["schemas"]["IngredientLotChoice"][];
         };
         /**
          * ProductionOrderUpdate
@@ -22363,6 +22367,8 @@ export interface components {
             made_on?: string | null;
             /** Output Lot Name */
             output_lot_name?: string | null;
+            /** Best Before */
+            best_before?: string | null;
         };
         /**
          * ProductionPortionRead

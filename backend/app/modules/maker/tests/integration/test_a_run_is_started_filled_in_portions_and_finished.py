@@ -869,3 +869,73 @@ def test_a_run_whose_portion_has_left_the_shelf_is_not_taken_back(
 
     assert refused.status_code == 400, refused.text
     assert winery.on_shelf(winery.wine) == Decimal('1')
+
+
+def _expiry(winery: _Winery, portion: dict[str, object]) -> date | None:
+    winery.db.expire_all()
+    item = winery.db.get(Item, uuid.UUID(str(portion['item_id'])))
+    assert item is not None
+    return item.expiry_date
+
+
+def test_a_portion_and_the_finish_take_the_best_before_they_are_given(
+    winery: _Winery,
+) -> None:
+    order_id = winery.draft('3')
+    winery.post(order_id, 'start')
+    portion_until = date.today() + timedelta(days=30)
+    finish_until = date.today() + timedelta(days=90)
+
+    portion = winery.post(
+        order_id, 'portions', {'qty': '1', 'best_before': portion_until.isoformat()}
+    )
+    finished = winery.post(
+        order_id,
+        'finish',
+        {'actual_qty': '3', 'best_before': finish_until.isoformat()},
+    )
+
+    # Fails without the change: neither date is read and both batches stay
+    # undated, the product having no shelf life.
+    assert portion.status_code == 201, portion.text
+    assert finished.status_code == 200, finished.text
+    first, closing = finished.json()['portions']
+    assert _expiry(winery, first) == portion_until
+    assert _expiry(winery, closing) == finish_until
+
+
+def test_a_portion_left_without_a_best_before_takes_the_shelf_life(
+    winery: _Winery,
+) -> None:
+    shelf_life = winery.client.put(
+        f'{API}/shelf-lives/{winery.wine.id}',
+        headers=winery.headers,
+        json={'shelf_life_days': 100},
+    )
+    assert shelf_life.status_code == 200, shelf_life.text
+    order_id = winery.draft('2')
+    winery.post(order_id, 'start')
+
+    portion = winery.post(order_id, 'portions', {'qty': '1'})
+    finished = winery.post(order_id, 'finish', {'actual_qty': '2'})
+
+    assert portion.status_code == 201, portion.text
+    expected = date.today() + timedelta(days=100)
+    first, closing = finished.json()['portions']
+    assert _expiry(winery, first) == expected
+    assert _expiry(winery, closing) == expected
+
+
+def test_a_portion_with_a_best_before_before_its_day_is_refused(
+    winery: _Winery,
+) -> None:
+    order_id = winery.draft('2')
+    winery.post(order_id, 'start')
+
+    refused = winery.post(
+        order_id,
+        'portions',
+        {'qty': '1', 'best_before': (date.today() - timedelta(days=1)).isoformat()},
+    )
+
+    assert refused.status_code == 400, refused.text

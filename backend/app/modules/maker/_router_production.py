@@ -534,7 +534,12 @@ async def start_production_order(
     """
     try:
         order = await production_service.start_production(
-            db, org_id, order_id, current_user, started_on=data.started_on
+            db,
+            org_id,
+            order_id,
+            current_user,
+            started_on=data.started_on,
+            ingredient_lots=data.ingredient_lots,
         )
     except InsufficientStockError as exc:
         raise _shortage_refusal(
@@ -568,6 +573,7 @@ async def record_production_portion(
         qty=data.qty,
         made_on=data.made_on,
         lot_name=data.output_lot_name,
+        best_before=data.best_before,
     )
     order = await production_service.get_order(db, org_id, order_id)
     if order is None:
@@ -600,6 +606,7 @@ async def finish_production_order(
         actual_qty=data.actual_qty,
         finished_on=data.finished_on,
         lot_name=data.output_lot_name,
+        best_before=data.best_before,
     )
     return await _read_after(db, org_id, order)
 

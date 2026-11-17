@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { addDays, format } from "date-fns";
 import { RunPortions } from "./RunPortions";
 import { RunSteps } from "./RunSteps";
 import { ProductionStatusBadge } from "./ProductionStatusBadge";
@@ -14,6 +15,10 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@/modules/maker/hooks/useProduction", () => ({
   useAddPortion: () => ({ mutate: mocks.addPortion, isPending: false }),
   useTickStep: () => ({ mutate: mocks.tickStep, isPending: false }),
+}));
+
+vi.mock("@/hooks/useActiveProfile", () => ({
+  useActiveProfile: () => null,
 }));
 
 vi.mock("sonner", () => ({
@@ -75,8 +80,25 @@ describe("RunPortions", () => {
     expect(mocks.addPortion).toHaveBeenCalledTimes(1);
     expect(mocks.addPortion.mock.calls[0][0]).toEqual({
       orderId: "ord-1",
-      data: { qty: "2.5", made_on: todayIso(), output_lot_name: "B2" },
+      data: {
+        qty: "2.5",
+        made_on: todayIso(),
+        output_lot_name: "B2",
+        best_before: undefined,
+      },
     });
+  });
+
+  it("dates the portion from the product's shelf life when no date is typed", () => {
+    render(<RunPortions order={order({ shelf_life_days: 30 })} canWrite />);
+    fireEvent.change(screen.getByTestId("maker-portion-qty-input"), {
+      target: { value: "2" },
+    });
+    fireEvent.click(screen.getByTestId("maker-portion-add-button"));
+
+    expect(mocks.addPortion.mock.calls[0][0].data.best_before).toBe(
+      format(addDays(new Date(), 30), "yyyy-MM-dd"),
+    );
   });
 
   it("offers no form to someone who cannot write", () => {
