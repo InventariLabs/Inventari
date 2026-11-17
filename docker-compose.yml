@@ -100,7 +100,7 @@ services:
   # protocol, so REDIS_URL and every client stay as they are. The tag is
   # pinned — a moving tag means the deployed version is not recorded here.
   redis:
-    image: valkey/valkey:9.1.2-alpine
+    image: valkey/valkey:9.1.3-alpine
     restart: always
     command: >
       valkey-server
