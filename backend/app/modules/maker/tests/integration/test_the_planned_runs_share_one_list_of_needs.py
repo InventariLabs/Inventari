@@ -595,6 +595,7 @@ class TestOrderingWhatIsMissing:
         template: ProductTemplate,
         price: str,
         uom: Uom | None = None,
+        currency: str = 'PLN',
     ) -> None:
         db.add(
             PartnerPricelist(
@@ -602,7 +603,7 @@ class TestOrderingWhatIsMissing:
                 partner_id=partner.id,
                 product_template_id=template.id,
                 unit_price=Decimal(price),
-                currency='PLN',
+                currency=currency,
                 uom_id=uom.id if uom else None,
                 valid_from=date.today() - timedelta(days=1),
             )
@@ -668,6 +669,80 @@ class TestOrderingWhatIsMissing:
             )
         ).scalars()
         assert {po.status for po in stored} == {'DRAFT'}
+
+    def test_a_quote_in_another_currency_does_not_win_on_its_number(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        headers: dict[str, str],
+        org: Organization,
+        user: User,
+        shelf: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """EUR 4.00 is not cheaper than PLN 5.00 just because 4 < 5.
+
+        No rate is held, so the organization's own currency is preferred
+        and the draft order is raised in the currency of the offer chosen.
+        """
+        org.currency = 'PLN'
+        db_session.commit()
+        kg, _bag = _kg_and_bag(db_session, org)
+        flour = _template(db_session, org, 'Flour', uom=kg)
+        bread = _template(db_session, org, 'Bread')
+        _recipe(db_session, org, bread, flour)
+        abroad = h.create_partner(org, user, name='Abroad')
+        local = h.create_partner(org, user, name='Local')
+        self._offer(db_session, org, abroad, flour, '4.00', currency='EUR')
+        self._offer(db_session, org, local, flour, '5.00')
+        _run(client, headers, bread, shelf, '5', _MONDAY)
+
+        response = client.post(
+            f'{_API}/needs/order', headers=headers, json=self._scope()
+        )
+
+        assert response.status_code == 200, response.text
+        (placed,) = response.json()['purchase_orders']
+        assert placed['partner_id'] == str(local.id)
+        order = db_session.execute(
+            select(PurchaseOrder).where(PurchaseOrder.id == placed['purchase_order_id'])
+        ).scalar_one()
+        assert order.currency == 'PLN'
+        assert order.lines[0].unit_price == Decimal('5.00')
+
+    def test_with_no_offer_in_the_own_currency_one_foreign_currency_is_kept_whole(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        headers: dict[str, str],
+        org: Organization,
+        user: User,
+        shelf: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        org.currency = 'PLN'
+        db_session.commit()
+        kg, _bag = _kg_and_bag(db_session, org)
+        flour = _template(db_session, org, 'Flour', uom=kg)
+        bread = _template(db_session, org, 'Bread')
+        _recipe(db_session, org, bread, flour)
+        dollars = h.create_partner(org, user, name='Dollars')
+        euros = h.create_partner(org, user, name='Euros')
+        self._offer(db_session, org, dollars, flour, '1.00', currency='USD')
+        self._offer(db_session, org, euros, flour, '9.00', currency='EUR')
+        _run(client, headers, bread, shelf, '5', _MONDAY)
+
+        response = client.post(
+            f'{_API}/needs/order', headers=headers, json=self._scope()
+        )
+
+        (placed,) = response.json()['purchase_orders']
+        # EUR sorts before USD: one currency is chosen whole, not the lower number.
+        assert placed['partner_id'] == str(euros.id)
+        order = db_session.execute(
+            select(PurchaseOrder).where(PurchaseOrder.id == placed['purchase_order_id'])
+        ).scalar_one()
+        assert order.currency == 'EUR'
 
     def test_ordering_twice_does_not_order_what_is_already_on_order(
         self,

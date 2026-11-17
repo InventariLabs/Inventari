@@ -323,8 +323,14 @@ def _best_offer(
     template: ProductTemplateDTO,
     prices: list[PartnerPricelistDTO],
     uoms: dict[UUID, UomDTO],
+    house_currency: str,
 ) -> _Offer | None:
     """The cheapest supplier price, compared per stock unit, stated in its own unit.
+
+    Prices are only comparable within one currency, and no rate is held: an
+    offer in the organization's own currency comes first, and when nothing is
+    quoted in it one other currency is chosen whole (alphabetically), so a
+    4.00 in euros never beats 5.00 in zloty on the strength of the number.
 
     A supplier sells in its own unit (a 25 kg sack), and the quantity to order
     is the missing quantity expressed in it, put up to a whole step of that
@@ -363,9 +369,16 @@ def _best_offer(
             quantity,
             per_stock,
         )
-        if best is None or offer.per_stock_unit < best.per_stock_unit:
+        if best is None or _offer_rank(offer, house_currency) < _offer_rank(
+            best, house_currency
+        ):
             best = offer
     return best
+
+
+def _offer_rank(offer: _Offer, house_currency: str) -> tuple[bool, str, Decimal]:
+    """House currency, then currency, then the price per stock unit."""
+    return (offer.currency != house_currency, offer.currency, offer.per_stock_unit)
 
 
 @dataclass
@@ -433,9 +446,12 @@ async def order_missing(
     uoms = {
         u.id: u for u in await core_api.uoms.list_for_org_async(db, organization_id)
     }
-    by_partner: dict[UUID, list[tuple[NeedRow, _Offer]]] = {}
+    # An order carries one currency, so a supplier quoting in two gets two.
+    by_partner: dict[tuple[UUID, str], list[tuple[NeedRow, _Offer]]] = {}
     unsupplied: list[NeedRow] = []
     today = date.today()
+    org = await core_api.organizations.get_async(db, organization_id)
+    house_currency = (org.currency if org else None) or 'USD'
     for row in to_buy:
         template = templates.get(row.template_id)
         if template is None:
@@ -443,18 +459,21 @@ async def order_missing(
         prices = await purchase_orders_api.list_supplier_prices_for_template_async(
             db, organization_id, row.template_id, active_on=today
         )
-        offer = _best_offer(row.missing, template, prices, uoms)
+        offer = _best_offer(row.missing, template, prices, uoms, house_currency)
         if offer is None:
             unsupplied.append(row)
         else:
-            by_partner.setdefault(offer.partner_id, []).append((row, offer))
+            by_partner.setdefault((offer.partner_id, offer.currency), []).append(
+                (row, offer)
+            )
 
-    for partner_id, chosen in by_partner.items():
+    for (partner_id, currency), chosen in by_partner.items():
         order = await purchase_orders_api.create_purchase_order_async(
             db,
             organization_id,
             PurchaseOrderCreateInput(
                 partner_id=partner_id,
+                currency=currency,
                 lines=[
                     PurchaseOrderLineInput(
                         product_template_id=row.template_id,
