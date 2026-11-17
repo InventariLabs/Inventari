@@ -124,7 +124,7 @@ and the static assets the frontend serves.
 | `python-barcode` | 0.16.1 | MIT |  |
 | `python-dateutil` | 2.9.0.post0 | BSD OR Apache-2.0 |  |
 | `python-dotenv` | 1.2.4 | BSD-3-Clause |  |
-| `python-multipart` | 0.0.32 | Apache-2.0 |  |
+| `python-multipart` | 0.0.33 | Apache-2.0 |  |
 | `PyYAML` | 6.0.3 | MIT |  |
 | `qrcode` | 8.2 | BSD-3-Clause | exception: ships a bogus "License :: Other/Proprietary License" classifier next to "BSD License"; upstream LICENSE is BSD-3-Clause |
 | `redis` | 8.1.0 | MIT |  |
@@ -479,11 +479,11 @@ and the static assets the frontend serves.
 | Package | Version | Licence | Note |
 |---|---|---|---|
 | `postgres:17-alpine` | 17 | PostgreSQL | PostgreSQL Licence — permissive, BSD-style |
-| `valkey/valkey:9.1.2-alpine` | 9.1.2 | BSD-3-Clause | the fork that stayed open source after Redis moved to RSALv2/SSPL |
+| `valkey/valkey:9.1.3-alpine` | 9.1.3 | BSD-3-Clause | the fork that stayed open source after Redis moved to RSALv2/SSPL |
 | `caddy:2-alpine` | 2 | Apache-2.0 |  |
-| `edoburu/pgbouncer:v1.25.2-p0` | 1.25.2 | ISC | PgBouncer is ISC; the image wrapper is MIT |
-| `rclone/rclone` | 1.75.1 | MIT | offsite copy of the encrypted backups, opt-in `offsite` profile |
-| `axllent/mailpit:v1.31.4` | 1.31.4 | MIT | the demo stack's catch-all mail server, so a demo visitor can read what would have gone out; opt-in `demo` profile, never part of a production deployment |
+| `edoburu/pgbouncer:v1.26.1-p0` | 1.26.1 | ISC | PgBouncer is ISC; the image wrapper is MIT |
+| `rclone/rclone` | 1.76.0 | MIT | offsite copy of the encrypted backups, opt-in `offsite` profile |
+| `axllent/mailpit:v1.33.1` | 1.33.1 | MIT | the demo stack's catch-all mail server, so a demo visitor can read what would have gone out; opt-in `demo` profile, never part of a production deployment |
 | `mailhog/mailhog:latest` | latest | MIT | development only — never part of a production deployment |
 | `grafana/k6:latest` | latest | AGPL-3.0 | load-testing tool run on its own; not distributed with the product and nothing links against it |
 | `grafana/grafana:latest` | latest | AGPL-3.0 | load-test dashboards only; same reasoning as k6 |
