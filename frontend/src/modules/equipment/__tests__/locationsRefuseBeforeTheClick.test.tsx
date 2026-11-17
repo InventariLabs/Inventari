@@ -358,6 +358,15 @@ describe("archiving the place the delete will refuse", () => {
     },
     {
       ...base,
+      id: "loc-parent",
+      name: "Floor Two",
+      context_tag: "equipment",
+      items_count: 0,
+      total_items_count: 0,
+      total_subtree_items_count: 3,
+    },
+    {
+      ...base,
       id: "loc-busy",
       name: "Desk 14",
       context_tag: "equipment",
@@ -395,6 +404,22 @@ describe("archiving the place the delete will refuse", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Archive" }));
 
     await waitFor(() => expect(archived).toEqual(["loc-history"]));
+  });
+
+  it("offers no archive over a place with records below it", async () => {
+    // Archiving relocates the whole subtree's records and the server refuses
+    // without a target, so the verb is not offered where it would be refused.
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText("Floor Two")).toBeInTheDocument();
+    });
+
+    expect(
+      screen.queryByRole("button", { name: "Archive Floor Two" }),
+    ).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Archive Review Room" }),
+    ).toBeEnabled();
   });
 
   it("offers no archive over a place that still holds a record", async () => {

@@ -137,15 +137,16 @@ function LocationForm({
 }
 
 /**
- * The row's verbs. Archive sits beside Delete only where the place holds
- * nothing: the server refuses to delete a place an asset was ever checked out
+ * The row's verbs. Archive sits beside Delete only where the place and
+ * everything below it hold nothing: the server refuses to delete a place an asset was ever checked out
  * to — a history no count shows — and names archiving as the way out, so the
- * screen carries that verb. A place with records in it keeps the disabled
- * Delete and its reason; archiving it would ask where they go.
+ * screen carries that verb. A place with records in or below it keeps the
+ * disabled Delete and its reason; archiving it would ask where they go.
  */
 function LocationActions({
   name,
   blocking,
+  archivable,
   deleting,
   archiving,
   onEdit,
@@ -154,6 +155,7 @@ function LocationActions({
 }: {
   name: string;
   blocking: number;
+  archivable: boolean;
   deleting: boolean;
   archiving: boolean;
   onEdit: () => void;
@@ -172,7 +174,7 @@ function LocationActions({
       >
         <Pencil size={16} />
       </Button>
-      {blocking === 0 && (
+      {archivable && (
         <Button
           variant="ghost"
           size="icon"
@@ -292,6 +294,11 @@ export default function EquipmentLocationsPage() {
     loc.subtree_items_count ?? loc.items_count ?? 0;
   const recordsBlockingDelete = (loc: StorageLocationSummary) =>
     loc.total_items_count ?? loc.subtree_items_count ?? loc.items_count ?? 0;
+  // Archiving takes the whole subtree with it and refuses while any record
+  // stands anywhere inside, so its gate is the all-modules subtree total, not
+  // the direct one the delete reads.
+  const recordsInSubtree = (loc: StorageLocationSummary) =>
+    Math.max(recordsBlockingDelete(loc), loc.total_subtree_items_count ?? 0);
   // Decision, vs the spaces module answering the same rows: spaces serves
   // the SAME core delete — reachable from its edit sheet — and adds an
   // archive beside it, its dialog naming the moved products, the children
@@ -524,6 +531,7 @@ export default function EquipmentLocationsPage() {
                       <LocationActions
                         name={loc.name}
                         blocking={recordsBlockingDelete(loc)}
+                        archivable={recordsInSubtree(loc) === 0}
                         deleting={deleteMutation.isPending}
                         archiving={archiveMutation.isPending}
                         onEdit={() => setEditingId(loc.id)}
