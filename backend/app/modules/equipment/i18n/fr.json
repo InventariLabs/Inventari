@@ -1,5 +1,6 @@
 {
   "campaign_cannot_delete_launched": "Une campagne lancée ne peut pas être supprimée — annulez-la plutôt.",
   "campaign_already_completed": "La campagne est déjà terminée.",
-  "campaign_already_cancelled": "La campagne est déjà annulée."
+  "campaign_already_cancelled": "La campagne est déjà annulée.",
+  "storage_delete_blocked_by_checkouts": "Ce lieu ne peut pas être supprimé : du matériel y a été remis et l'historique de l'actif le mentionne. Archivez-le plutôt."
 }

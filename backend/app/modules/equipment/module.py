@@ -196,11 +196,14 @@ class EquipmentModule(BaseModule):
 
         from app.core.contributions import BaseContribution, contribution_registry
 
-        from .interceptors import EquipmentItemInterceptor
+        from .interceptors import CheckoutPlaceStorageGuard, EquipmentItemInterceptor
         from .resolvers import EquipmentAttachmentResolver
 
         contribution_registry.register(
             'item_interceptors', cast(BaseContribution, EquipmentItemInterceptor())
+        )
+        contribution_registry.register(
+            'storage_interceptors', cast(BaseContribution, CheckoutPlaceStorageGuard())
         )
         contribution_registry.register(
             'upload_path_resolvers',
