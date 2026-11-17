@@ -331,3 +331,25 @@ class TestUsePartially:
         # It can still be opened and finished.
         opened = _use_partially(client, auth_headers, item, {})
         assert opened.status_code == 200, opened.text
+
+
+def test_the_opened_unit_is_not_a_purchase_in_its_history(
+    client: TestClient,
+    auth_headers: dict[str, str],
+    db_session: Session,
+    test_user: User,
+    test_storage_location: StorageLocation,
+) -> None:
+    """Its birth says the unit was already here, so no report reads it as bought."""
+    item = _bags(db_session, test_user, test_storage_location, count=3)
+
+    response = _use_partially(client, auth_headers, item, {})
+    assert response.status_code == 200, response.text
+
+    opened = next(r for r in _records(db_session, item) if r.id != item.id)
+    born = db_session.scalars(
+        select(ItemHistory).where(
+            ItemHistory.item_id == opened.id, ItemHistory.action == 'CREATED'
+        )
+    ).one()
+    assert (born.changes or {}).get('reason') == 'package_opened'

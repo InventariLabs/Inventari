@@ -12,7 +12,7 @@ import statistics
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import ColumnElement, and_, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.module_sdk import general_rows, hidden_module_tags_async
@@ -34,17 +34,47 @@ from ._purchase_analysis import (
 from .constants import MAX_ANALYTICS_ROWS
 
 
+def _born_as_a_purchase(organization_id: UUID) -> ColumnElement[bool]:
+    """True for a record whose birth was a purchase, not a move of goods.
+
+    A purchase is positively recognisable: it is entered by hand, imported,
+    scanned, or received on a receipt, and none of those says why in the
+    birth's history except the receipt. Every other way a record comes to
+    exist (a production run's output, the remainder of a split transfer, a
+    stock count's surplus, an opened package, a reversed run's ingredient)
+    carries a reason, so a reason that is not a receipt leaves the record out
+    and a new kind of birth stays out without being listed here.
+    """
+    reason = ItemHistory.changes['reason'].as_string()
+    return (
+        ~select(ItemHistory.id)
+        .where(
+            ItemHistory.organization_id == organization_id,
+            ItemHistory.item_id == Item.id,
+            ItemHistory.action == ItemAction.CREATED.value,
+            reason.isnot(None),
+            ~and_(
+                reason == 'document_execution',
+                ItemHistory.changes['document_type'].as_string() == 'receipt',
+            ),
+        )
+        .exists()
+    )
+
+
 async def _batch_assess_volatility(
-    db: AsyncSession, organization_id: UUID, product_names: list[str]
+    db: AsyncSession,
+    organization_id: UUID,
+    product_names: list[str],
+    purchase_filters: list[ColumnElement[bool]],
 ) -> dict[str, str]:
-    """Batch-load prices for all products and compute volatility in one query."""
+    """Batch-load prices for all products and compute volatility in one query.
+
+    *purchase_filters* are the conditions the purchase count reads its records
+    by, so the price spread is measured over the purchases that were counted.
+    """
     if not product_names:
         return {}
-
-    org_row = await db.scalar(
-        select(Organization).where(Organization.id == organization_id)
-    )
-    org_currency = org_row.currency if org_row else 'USD'
 
     rows = (
         await db.execute(
@@ -53,11 +83,7 @@ async def _batch_assess_volatility(
                 Item.organization_id == organization_id,
                 Item.name.in_(product_names),
                 Item.purchase_price.isnot(None),
-                Item.is_deleted.is_(False),
-                or_(
-                    Item.currency == org_currency,
-                    Item.currency.is_(None),
-                ),
+                *purchase_filters,
             )
             .limit(MAX_ANALYTICS_ROWS * 2)
         )
@@ -102,6 +128,19 @@ async def get_purchase_patterns_async(
         select(Organization.currency).where(Organization.id == organization_id)
     )
 
+    purchase_filters: list[ColumnElement[bool]] = [
+        Item.organization_id == organization_id,
+        Item.storage_location_id.in_(storage_ids),
+        Item.is_deleted.is_(False),
+        Item.created_at >= date_from,
+        _born_as_a_purchase(organization_id),
+        general_rows(hidden),
+        or_(
+            Item.currency == org_currency,
+            Item.currency.is_(None),
+        ),
+    ]
+
     product_rows = (
         await db.execute(
             select(
@@ -119,26 +158,7 @@ async def get_purchase_patterns_async(
                 func.array_agg(Item.created_at).label('purchase_dates'),
             )
             .outerjoin(Category, Item.category_id == Category.id)
-            .where(
-                Item.storage_location_id.in_(storage_ids),
-                Item.is_deleted.is_(False),
-                Item.created_at >= date_from,
-                # A production run's output is made, not bought: its record
-                # says so at birth, and the run is not a purchase of it.
-                ~select(ItemHistory.id)
-                .where(
-                    ItemHistory.organization_id == organization_id,
-                    ItemHistory.item_id == Item.id,
-                    ItemHistory.action == ItemAction.CREATED.value,
-                    ItemHistory.changes['reason'].as_string() == 'production_run',
-                )
-                .exists(),
-                general_rows(hidden),
-                or_(
-                    Item.currency == org_currency,
-                    Item.currency.is_(None),
-                ),
-            )
+            .where(*purchase_filters)
             .group_by(
                 Item.name,
                 Item.brand,
@@ -158,7 +178,7 @@ async def get_purchase_patterns_async(
         name for name, data in product_purchases.items() if len(data['purchases']) >= 2
     ]
     volatility_map = await _batch_assess_volatility(
-        db, organization_id, candidate_names
+        db, organization_id, candidate_names, purchase_filters
     )
 
     for product_name in candidate_names:
