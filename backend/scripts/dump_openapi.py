@@ -37,14 +37,34 @@ from __future__ import annotations
 import json
 from typing import Any
 
+# What pydantic 2.13 writes as the `pattern` of a `Decimal` string (and 2.14
+# no longer does). Every variant begins the same way, whatever the digit
+# limits behind it.
+_DECIMAL_PATTERN_PREFIX = '^(?!^[-+.]*$)[+-]?0*'
+
+
+def _drop_decimal_patterns(node: Any) -> None:
+    if isinstance(node, dict):
+        pattern = node.get('pattern')
+        if isinstance(pattern, str) and pattern.startswith(_DECIMAL_PATTERN_PREFIX):
+            del node['pattern']
+        for value in node.values():
+            _drop_decimal_patterns(value)
+    elif isinstance(node, list):
+        for value in node:
+            _drop_decimal_patterns(value)
+
 
 def canonical(schema: dict[str, Any]) -> dict[str, Any]:
     """Sort the path and schema maps so the dump depends on the API alone.
 
     Only the two maps whose key order follows router/model registration
-    order are touched; every other key keeps the order the code declared
-    it in, and any content is left byte-identical.
+    order are touched, and the library's `Decimal` regular expression is
+    left out (see `_DECIMAL_PATTERN_PREFIX`: the container's pydantic
+    version must not decide the artifact); every other key keeps the order
+    the code declared it in, and any content is left byte-identical.
     """
+    _drop_decimal_patterns(schema)
     if 'paths' in schema:
         schema['paths'] = dict(sorted(schema['paths'].items()))
     components = schema.get('components')
