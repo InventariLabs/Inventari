@@ -21,6 +21,12 @@
   },
   "completed": "Gotowe",
   "detail": {
+    "completedTitle": "Ta lista jest zakończona",
+    "archivedTitle": "Ta lista jest zarchiwizowana",
+    "frozenHint": "Dopóki tak zostaje, nie można dodawać, odhaczać ani usuwać pozycji.",
+    "reactivate": "Reaktywuj",
+    "reactivated": "Lista reaktywowana",
+    "errorReactivate": "Nie udało się reaktywować listy",
     "purchased": "kupionych",
     "addItem": "Dodaj pozycję",
     "clearPurchased": "Wyczyść kupione ({{count}})",

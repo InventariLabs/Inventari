@@ -56,7 +56,7 @@ ERRORS_PT: dict[str, str] = {
     'shopping_list_not_found': 'Lista de compras não encontrada',
     'shopping_list_create_failed': 'Falha ao criar a lista de compras',
     'shopping_list_update_failed': 'Falha ao atualizar a lista de compras',
-    'shopping_list_not_writable': 'Esta lista de compras está {status} e não pode ser modificada. Reative-a primeiro.',
+    'shopping_list_not_writable': 'Esta lista de compras já não está aberta e não pode ser modificada. Reative-a primeiro.',
     'shopping_list_delete_failed': 'Falha ao excluir a lista de compras',
     'shopping_list_item_not_found': 'Item da lista de compras não encontrado',
     'shopping_list_item_quantity_rounds_to_zero': 'A quantidade {quantity} é arredondada para zero na precisão da loja — a menor quantidade contável é {smallest}',

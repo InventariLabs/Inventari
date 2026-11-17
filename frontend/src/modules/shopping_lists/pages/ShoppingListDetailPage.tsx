@@ -15,6 +15,7 @@ import Button from "@/components/ui/Button";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
+import { FrozenListNotice } from "../components/FrozenListNotice";
 import { ShoppingListItemCard } from "../components/ShoppingListItemCard";
 import { useModules } from "@/contexts/ModulesContext";
 import AddFromRecipesModal from "../components/AddFromRecipesModal";
@@ -25,7 +26,11 @@ import {
   useClearPurchasedItems,
   useDeleteShoppingItem,
   useConvertToPO,
+  useUpdateShoppingList,
 } from "../hooks/useShoppingLists";
+
+const isFrozen = (status: string | undefined) =>
+  status !== undefined && status !== "active";
 
 export default function ShoppingListDetailPage() {
   const { t } = useTranslation("shopping_lists");
@@ -35,7 +40,7 @@ export default function ShoppingListDetailPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showRecipesModal, setShowRecipesModal] = useState(false);
   const { setHeader } = useModulePageHeader();
-  const canWrite = useCanWrite("shopping_lists");
+  const mayWrite = useCanWrite("shopping_lists");
   const { isModuleEnabled } = useModules();
   const recipesEnabled = isModuleEnabled("recipes");
   const poEnabled = isModuleEnabled("purchase_orders");
@@ -46,6 +51,11 @@ export default function ShoppingListDetailPage() {
   const clearMutation = useClearPurchasedItems(id!);
   const deleteItemMutation = useDeleteShoppingItem(id!);
   const convertMutation = useConvertToPO(id!);
+  const updateListMutation = useUpdateShoppingList();
+  // A completed or archived list is frozen: the server refuses every change
+  // to its lines until it is reactivated, so the screen offers none.
+  const frozen = isFrozen(list?.status);
+  const canWrite = mayWrite && !frozen;
 
   useEffect(() => {
     if (!list) return;
@@ -76,6 +86,16 @@ export default function ShoppingListDetailPage() {
       ) : undefined,
     });
   }, [list, setHeader, t, recipesEnabled, canWrite]);
+
+  const handleReactivate = async () => {
+    if (!id) return;
+    try {
+      await updateListMutation.mutateAsync({ id, status: "active" });
+      toast.success(t("detail.reactivated"));
+    } catch (error) {
+      toast.error(extractApiError(error, t("detail.errorReactivate")));
+    }
+  };
 
   const handleTogglePurchased = async (
     itemId: string,
@@ -202,6 +222,14 @@ export default function ShoppingListDetailPage() {
   return (
     <div className="space-y-6">
       <ReadOnlyNotice module="shopping_lists" />
+      {frozen && (
+        <FrozenListNotice
+          status={list.status}
+          canReactivate={mayWrite}
+          onReactivate={handleReactivate}
+          busy={updateListMutation.isPending}
+        />
+      )}
       {poEnabled && convertibleCount > 0 && canWrite && (
         <div className="flex justify-end">
           <Button

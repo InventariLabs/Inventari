@@ -185,8 +185,8 @@ export function useDeleteShoppingList() {
 
 export function useUpdateShoppingList() {
   return useAppMutation(
-    ({ id, name }: { id: string; name: string }) =>
-      shoppingListsApi.update(id, { name }),
+    ({ id, ...changes }: { id: string; name?: string; status?: string }) =>
+      shoppingListsApi.update(id, changes),
     (qc) => {
       invalidation.shoppingLists(qc);
     },

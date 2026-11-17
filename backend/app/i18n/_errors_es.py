@@ -115,7 +115,7 @@ ERRORS_ES: ErrorMessages = {
     'shopping_list_not_found': 'Lista de compras no encontrada',
     'shopping_list_create_failed': 'Error al crear la lista de compras',
     'shopping_list_update_failed': 'Error al actualizar la lista de compras',
-    'shopping_list_not_writable': 'Esta lista de la compra está {status} y no se puede modificar. Reactívala primero.',
+    'shopping_list_not_writable': 'Esta lista de la compra ya no está abierta y no se puede modificar. Reactívala primero.',
     'shopping_list_delete_failed': 'Error al eliminar la lista de compras',
     'shopping_list_item_not_found': 'Artículo de la lista de compras no encontrado',
     'shopping_list_item_quantity_rounds_to_zero': 'La cantidad {quantity} se redondea a cero con la precisión del almacenamiento — el valor más pequeño guardable es {smallest}',

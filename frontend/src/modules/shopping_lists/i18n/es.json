@@ -21,6 +21,12 @@
   },
   "completed": "Hecho",
   "detail": {
+    "completedTitle": "Esta lista está terminada",
+    "archivedTitle": "Esta lista está archivada",
+    "frozenHint": "Mientras siga así, no se pueden añadir, marcar ni quitar artículos.",
+    "reactivate": "Reactivar",
+    "reactivated": "Lista reactivada",
+    "errorReactivate": "No se pudo reactivar la lista",
     "purchased": "comprados",
     "addItem": "Añadir artículo",
     "clearPurchased": "Limpiar comprados ({{count}})",
