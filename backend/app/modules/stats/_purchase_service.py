@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.module_sdk import general_rows, hidden_module_tags_async
 from app.models.category import Category
 from app.models.item import Item
+from app.models.item_history import ItemAction, ItemHistory
 from app.models.organization import Organization
 from app.services.analytics._common import (
     get_internal_storage_ids_async,
@@ -122,6 +123,16 @@ async def get_purchase_patterns_async(
                 Item.storage_location_id.in_(storage_ids),
                 Item.is_deleted.is_(False),
                 Item.created_at >= date_from,
+                # A production run's output is made, not bought: its record
+                # says so at birth, and the run is not a purchase of it.
+                ~select(ItemHistory.id)
+                .where(
+                    ItemHistory.organization_id == organization_id,
+                    ItemHistory.item_id == Item.id,
+                    ItemHistory.action == ItemAction.CREATED.value,
+                    ItemHistory.changes['reason'].as_string() == 'production_run',
+                )
+                .exists(),
                 general_rows(hidden),
                 or_(
                     Item.currency == org_currency,

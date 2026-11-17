@@ -232,6 +232,10 @@ says what the release does rather than what changed since them.
   inflated total. Total spent, the monthly trend and the weekly spending
   behind the forecast now add up only what came in from outside. Receipts
   posted before this release cannot be told apart and keep counting.
+- Purchase patterns no longer read a production run's product as a purchase
+  of it. Two runs of a wine used to list the wine as bought twice, at the
+  run's cost; the report now leaves out records a run made. Records made
+  before this release cannot be told apart and keep counting.
 
 - The public attestation page declares the language it is written in
   (`<html lang>`), as the rest of the application does, so a screen reader
