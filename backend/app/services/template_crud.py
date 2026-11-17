@@ -337,6 +337,76 @@ def builtin_has_moved_on(
     return False
 
 
+def builtin_body_for(
+    template: DocumentTemplate,
+    built_ins: list[tuple[str, str, str]],
+) -> str | None:
+    """The HTML of the built-in this copy was made from, or None when it has none."""
+    if not template.source_builtin:
+        return None
+    return next(
+        (html for name, _t, html in built_ins if name == template.source_builtin), None
+    )
+
+
+def differs_from_builtin(
+    template: DocumentTemplate,
+    built_ins: list[tuple[str, str, str]],
+) -> bool:
+    """Whether the copy's body is no longer the built-in's, byte for byte.
+
+    A comparison of content, not of versions: a copy nobody touched while the
+    built-in moved on differs too, and resetting it is exactly what brings it
+    up to date.
+    """
+    built_in = builtin_body_for(template, built_ins)
+    return built_in is not None and built_in != template.body_html
+
+
+async def reset_to_builtin_async(
+    db: AsyncSession,
+    org_id: uuid.UUID,
+    module: str,
+    user_id: uuid.UUID | None,
+    template_id: uuid.UUID,
+    built_ins: list[tuple[str, str, str]],
+) -> DocumentTemplate:
+    """Overwrite a copy's body with the built-in it came from, in place.
+
+    The deliberate counterpart of :func:`copy_builtin_alongside_async`: the
+    copy keeps its id, name and default flag, and only what was written into
+    it is replaced. A template that was not copied from a built-in has
+    nothing to go back to and is reported as not found.
+    """
+    tpl = await get_template_async(db, org_id, template_id, module)
+    if tpl is None:
+        raise NotFoundException('template', get_current_lang())
+    body_html = builtin_body_for(tpl, built_ins)
+    if body_html is None:
+        raise NotFoundException('template', get_current_lang())
+
+    changed = body_html != tpl.body_html
+    tpl.body_html = body_html
+    tpl.source_checksum = builtin_checksum(body_html)
+    await db.flush()
+    if changed:
+        await _log_template_async(
+            db,
+            tpl,
+            user_id=user_id,
+            action=AuditAction.UPDATE,
+            snapshot={
+                'name': tpl.name,
+                'module': tpl.module,
+                'reset_to_builtin': tpl.source_builtin,
+                'after': {'body_html': 'changed'},
+            },
+        )
+    await db.flush()
+    await db.refresh(tpl)
+    return tpl
+
+
 async def copy_builtin_alongside_async(
     db: AsyncSession,
     org_id: uuid.UUID,

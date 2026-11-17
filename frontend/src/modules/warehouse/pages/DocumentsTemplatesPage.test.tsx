@@ -310,6 +310,99 @@ describe("DocumentsTemplatesPage — a copy of an older built-in", () => {
   });
 });
 
+describe("DocumentsTemplatesPage — putting a copy back as the built-in", () => {
+  const copy = {
+    id: "t1",
+    module: "warehouse",
+    name: "Standard Template",
+    document_type: "STANDARD",
+    body_html: "<p>ours</p>",
+    version: 1,
+    is_default: true,
+    created_by: null,
+    created_at: "2026-01-02T00:00:00Z",
+    updated_at: null,
+    source_builtin: "Standard Template",
+    source_outdated: false,
+  };
+
+  it("marks a changed copy, asks before resetting it, and clears the mark", async () => {
+    let reset = false;
+    const resets = vi.fn();
+    server.use(
+      http.get("*/api/v1/warehouse/templates", () =>
+        HttpResponse.json(onePage([{ ...copy, source_modified: !reset }])),
+      ),
+      http.get("*/api/v1/warehouse/templates/built-in", () =>
+        HttpResponse.json([builtIn]),
+      ),
+      http.post("*/api/v1/warehouse/templates/t1/reset", () => {
+        reset = true;
+        resets();
+        return HttpResponse.json({ ...copy, source_modified: false });
+      }),
+    );
+    render(<DocumentsTemplatesPage />);
+
+    expect(
+      await screen.findByTestId("template-modified-badge"),
+    ).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole("button", { name: /reset to built-in/i }),
+    );
+
+    const dialog = await screen.findByRole("alertdialog");
+    expect(dialog).toHaveTextContent("Standard Template");
+    expect(dialog).toHaveTextContent(/lost/i);
+    expect(resets).not.toHaveBeenCalled();
+
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Reset" }),
+    );
+
+    await waitFor(() => expect(resets).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(
+        screen.queryByTestId("template-modified-badge"),
+      ).not.toBeInTheDocument(),
+    );
+    expect(
+      screen.queryByRole("button", { name: /reset to built-in/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("offers nothing on a copy that matches, or on a template of the organization's own", async () => {
+    server.use(
+      http.get("*/api/v1/warehouse/templates", () =>
+        HttpResponse.json(
+          onePage([
+            { ...copy, source_modified: false },
+            {
+              ...copy,
+              id: "t2",
+              name: "Delivery Note EU",
+              source_builtin: null,
+              source_modified: false,
+            },
+          ]),
+        ),
+      ),
+      http.get("*/api/v1/warehouse/templates/built-in", () =>
+        HttpResponse.json([builtIn]),
+      ),
+    );
+    render(<DocumentsTemplatesPage />);
+
+    await screen.findByText("Delivery Note EU");
+    expect(
+      screen.queryByTestId("template-modified-badge"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /reset to built-in/i }),
+    ).not.toBeInTheDocument();
+  });
+});
+
 describe("DocumentsTemplatesPage — an account that may only read", () => {
   afterEach(() => {
     rights.write = true;

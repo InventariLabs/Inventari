@@ -3,6 +3,7 @@ import {
   FileText,
   History,
   Pencil,
+  RotateCcw,
   Trash2,
   Star,
 } from "lucide-react";
@@ -22,6 +23,12 @@ interface TemplateCardProps {
   /** Offered only for a copy whose built-in has moved on. */
   onRefreshCopy?: (tpl: DocumentTemplate) => void;
   isRefreshPending?: boolean;
+  /**
+   * Offered for a copy whose body differs from its built-in: the badge and
+   * the action to put it back, which the caller confirms.
+   */
+  onReset?: (tpl: DocumentTemplate) => void;
+  isResetPending?: boolean;
   /** Offered when the template can leave as a file. */
   onExport?: (tpl: DocumentTemplate) => void;
   /** True drops every action — the card stays, as a record to read. */
@@ -36,6 +43,8 @@ export function TemplateCard({
   defaultLabel = "Default",
   onRefreshCopy,
   isRefreshPending = false,
+  onReset,
+  isResetPending = false,
   onExport,
   readOnly = false,
 }: TemplateCardProps) {
@@ -53,6 +62,11 @@ export function TemplateCard({
               <Badge variant="info" className="flex items-center gap-1">
                 <Star size={10} />
                 {defaultLabel}
+              </Badge>
+            )}
+            {onReset && tpl.source_modified && (
+              <Badge variant="warning" data-testid="template-modified-badge">
+                {t("templates.modifiedNote")}
               </Badge>
             )}
           </div>
@@ -103,6 +117,19 @@ export function TemplateCard({
               onClick={() => onRefreshCopy(tpl)}
             >
               <History size={14} />
+            </Button>
+          )}
+          {!readOnly && tpl.source_modified && onReset && (
+            <Button
+              variant="ghost"
+              size="iconSm"
+              className="text-on-muted hover:text-on"
+              title={t("templates.reset")}
+              aria-label={`${t("templates.reset")} ${tpl.name}`}
+              disabled={isResetPending}
+              onClick={() => onReset(tpl)}
+            >
+              <RotateCcw size={14} />
             </Button>
           )}
           {!readOnly && (

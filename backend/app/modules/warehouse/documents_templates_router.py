@@ -785,6 +785,29 @@ async def refresh_builtin_copy(
     )
 
 
+@router.post('/{template_id}/reset', response_model=DocumentTemplateSchema)
+async def reset_template_to_built_in(
+    template_id: UUID,
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
+    """Put a copy back as the built-in it came from, in place.
+
+    Whatever was written into the copy is gone; its name, its place among
+    the defaults and everything that points at it stay. A template that was
+    not copied from a built-in has nothing to go back to: 404.
+    """
+    org_id = require_org(current_user)
+    return await core_api.templates.reset_to_builtin_async(
+        db=db,
+        organization_id=org_id,
+        module='warehouse',
+        user=current_user,
+        template_id=template_id,
+        built_ins=_read_built_ins(),
+    )
+
+
 @router.get('/{template_id}', response_model=DocumentTemplateSchema)
 async def get_template(
     template_id: UUID,
