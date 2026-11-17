@@ -178,15 +178,20 @@ def upgrade(
     (``alembic_version_<module>`` tables) are applied too — otherwise module
     columns added after the core baseline (e.g. the maker settings) stay
     missing and the API 500s on fresh deploys.
+
+    Runs under the migration advisory lock the backend's entrypoint holds while
+    it migrates, so a bootstrap that calls this beside a container's first
+    start queues behind it instead of racing it on the same empty database.
     """
     from alembic import command
     from alembic.config import Config
 
     alembic_cfg = Config('alembic.ini')
-    command.upgrade(alembic_cfg, revision)
-    console.print(f'[green]✔ Migrated to {revision}.[/]')
-    if revision == 'head':
-        _upgrade_all_modules()
+    with hold_migration_lock():
+        command.upgrade(alembic_cfg, revision)
+        console.print(f'[green]✔ Migrated to {revision}.[/]')
+        if revision == 'head':
+            _upgrade_all_modules()
 
 
 @db_app.command()

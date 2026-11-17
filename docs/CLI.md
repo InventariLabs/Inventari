@@ -17,7 +17,7 @@ as `DEPLOYMENT.md` writes it. Every command below is given without that prefix.
 
 | Command | Description |
 |---------|-------------|
-| `manage.py db upgrade [revision]` | Apply core Alembic migrations (default: `head`); upgrading to `head` also applies the per-module migrations, as `upgrade-modules` does |
+| `manage.py db upgrade [revision]` | Apply core Alembic migrations (default: `head`); upgrading to `head` also applies the per-module migrations, as `upgrade-modules` does; waits for the migration lock the backend's entrypoint holds, so it is safe beside a container's first start |
 | `manage.py db upgrade-modules` | Apply per-module Alembic migrations (`alembic_version_<module>` chains) |
 | `manage.py db doctor` | Check every module's version table against its migration chain (exit 1 on drift) |
 | `manage.py db stamp-module <module> <revision> [--yes] [--force]` | Record a revision in a module's version table without running its migrations. It asks first (`--yes`/`-y` skips the question) and refuses when the revision's tables are missing (`--force` stamps anyway) |
