@@ -3,8 +3,8 @@
 Two bread runs in one week each need flour. The list adds them up, subtracts
 what the shelf holds and what open purchase orders still expect (with their
 dates), and says what is still missing. Ordering that creates a draft
-purchase order per supplier from the cheapest price in the supplier's own
-unit; an ingredient with a recipe of its own is proposed as a run, not
+purchase order per supplier and currency (the organization's own currency
+first) from the cheapest price in the supplier's own unit; an ingredient with a recipe of its own is proposed as a run, not
 bought. With purchasing off the on-order column does not exist.
 """
 
@@ -596,6 +596,7 @@ class TestOrderingWhatIsMissing:
         price: str,
         uom: Uom | None = None,
         currency: str = 'PLN',
+        min_quantity: str | None = None,
     ) -> None:
         db.add(
             PartnerPricelist(
@@ -604,6 +605,7 @@ class TestOrderingWhatIsMissing:
                 product_template_id=template.id,
                 unit_price=Decimal(price),
                 currency=currency,
+                min_quantity=Decimal(min_quantity) if min_quantity else None,
                 uom_id=uom.id if uom else None,
                 valid_from=date.today() - timedelta(days=1),
             )
@@ -669,6 +671,115 @@ class TestOrderingWhatIsMissing:
             )
         ).scalars()
         assert {po.status for po in stored} == {'DRAFT'}
+
+    def test_a_volume_price_the_shortage_does_not_reach_is_not_bought(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        headers: dict[str, str],
+        org: Organization,
+        user: User,
+        shelf: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """5 kg short is 5 kg at 3.00, not 1000 kg at the 2.00 tier."""
+        kg, _bag = _kg_and_bag(db_session, org)
+        oats = _template(db_session, org, 'Oats', uom=kg)
+        porridge = _template(db_session, org, 'Porridge')
+        _recipe(db_session, org, porridge, oats)
+        mill = h.create_partner(org, user, name='Mill')
+        self._offer(db_session, org, mill, oats, '3.00')
+        self._offer(db_session, org, mill, oats, '2.00', min_quantity='1000')
+        _run(client, headers, porridge, shelf, '5', _MONDAY)
+
+        response = client.post(
+            f'{_API}/needs/order', headers=headers, json=self._scope()
+        )
+
+        assert response.status_code == 200, response.text
+        (placed,) = response.json()['purchase_orders']
+        assert Decimal(placed['lines'][0]['quantity']) == Decimal('5')
+        order = db_session.execute(
+            select(PurchaseOrder).where(PurchaseOrder.id == placed['purchase_order_id'])
+        ).scalar_one()
+        assert order.lines[0].unit_price == Decimal('3.00')
+
+    def test_a_volume_price_is_taken_when_the_whole_order_costs_less(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        headers: dict[str, str],
+        org: Organization,
+        user: User,
+        shelf: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """9 kg at 3.00 is 27.00; the 10 kg tier at 2.00 is 20.00 and wins."""
+        kg, _bag = _kg_and_bag(db_session, org)
+        oats = _template(db_session, org, 'Oats', uom=kg)
+        porridge = _template(db_session, org, 'Porridge')
+        _recipe(db_session, org, porridge, oats)
+        mill = h.create_partner(org, user, name='Mill')
+        self._offer(db_session, org, mill, oats, '3.00')
+        self._offer(db_session, org, mill, oats, '2.00', min_quantity='10')
+        _run(client, headers, porridge, shelf, '9', _MONDAY)
+
+        response = client.post(
+            f'{_API}/needs/order', headers=headers, json=self._scope()
+        )
+
+        (placed,) = response.json()['purchase_orders']
+        assert Decimal(placed['lines'][0]['quantity']) == Decimal('10')
+
+    def test_one_supplier_quoting_in_two_currencies_gets_an_order_for_each(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        headers: dict[str, str],
+        org: Organization,
+        user: User,
+        shelf: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        org.currency = 'PLN'
+        db_session.commit()
+        kg, _bag = _kg_and_bag(db_session, org)
+        flour = _template(db_session, org, 'Flour', uom=kg)
+        seeds = _template(db_session, org, 'Seeds', uom=kg)
+        bread = _template(db_session, org, 'Bread')
+        recipe = _recipe(db_session, org, bread, flour)
+        db_session.add(
+            BoMLine(
+                organization_id=org.id,
+                recipe_id=recipe.id,
+                parent_template_id=bread.id,
+                child_template_id=seeds.id,
+                qty_per_batch=Decimal('1'),
+                unit='kg',
+            )
+        )
+        db_session.commit()
+        trader = h.create_partner(org, user, name='Trader')
+        self._offer(db_session, org, trader, flour, '2.00')
+        self._offer(db_session, org, trader, seeds, '7.00', currency='EUR')
+        _run(client, headers, bread, shelf, '5', _MONDAY)
+
+        response = client.post(
+            f'{_API}/needs/order', headers=headers, json=self._scope()
+        )
+
+        assert response.status_code == 200, response.text
+        placed = response.json()['purchase_orders']
+        assert len(placed) == 2
+        # The organization's own currency first.
+        orders = [
+            db_session.execute(
+                select(PurchaseOrder).where(PurchaseOrder.id == po['purchase_order_id'])
+            ).scalar_one()
+            for po in placed
+        ]
+        assert [o.currency for o in orders] == ['PLN', 'EUR']
+        assert [po['lines'][0]['name'] for po in placed] == ['Flour', 'Seeds']
 
     def test_a_quote_in_another_currency_does_not_win_on_its_number(
         self,

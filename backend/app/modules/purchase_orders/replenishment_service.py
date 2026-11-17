@@ -11,7 +11,7 @@ by every alert competing for it, so a unit is counted — and promised — once.
 Lives in the ``purchase_orders`` module because replenishment is a
 procurement decision — and its last mile lives here too:
 ``create_draft_pos_from_alerts_async`` turns the current alerts into
-draft purchase orders, grouped by supplier.  Previously this
+draft purchase orders, grouped by supplier and currency.  Previously this
 service lived in ``warehouse`` and used ``ProductTemplate.min_quantity``
 (org-global).  The per-location rules replace that flat field.
 
@@ -699,7 +699,7 @@ async def create_draft_pos_from_alerts_async(
     """Turn the current alerts of *rule_ids* into draft purchase orders.
 
     The alerts are re-derived from live stock — the quantities a client
-    rendered minutes ago are not trusted. Each supplier group becomes one
+    rendered minutes ago are not trusted. Each supplier and currency becomes one
     DRAFT PO (normal editable order: number, audit, PATCH-able lines)
     whose lines carry ``source_reorder_rule_id`` back to the rule. A line is
     for what reserve cannot cover; a rule a reserve move covers in full is
@@ -785,8 +785,11 @@ async def create_draft_pos_from_alerts_async(
         for entry in offers:
             offers_by_template.setdefault(entry.product_template_id, []).append(entry)
 
-        lines: list[PurchaseOrderLineCreate] = []
-        currencies: set[str] = set()
+        # An order carries one currency: a supplier whose chosen prices are
+        # quoted in two gets one order for each, the house currency first.
+        # A line with no price has no currency and rides on the first order.
+        by_currency: dict[str | None, list[PurchaseOrderLineCreate]] = {}
+        unpriced: list[PurchaseOrderLineCreate] = []
         for rule, alert in members:
             remainder = alert.remaining_to_buy
             quantity = Decimal(
@@ -808,31 +811,34 @@ async def create_draft_pos_from_alerts_async(
                 unit_price = offer.unit_price.quantize(
                     Decimal('0.01'), rounding=ROUND_HALF_UP
                 )
-                currencies.add(offer.currency)
                 uom_id = offer.uom_id or uom_id
-            lines.append(
-                PurchaseOrderLineCreate(
-                    product_template_id=rule.product_template_id,
-                    name=rule.product_name,
-                    quantity_ordered=quantity,
-                    unit_price=unit_price,
-                    uom_id=uom_id,
-                    source_reorder_rule_id=rule.id,
-                )
+            line = PurchaseOrderLineCreate(
+                product_template_id=rule.product_template_id,
+                name=rule.product_name,
+                quantity_ordered=quantity,
+                unit_price=unit_price,
+                uom_id=uom_id,
+                source_reorder_rule_id=rule.id,
             )
+            if offer is None:
+                unpriced.append(line)
+            else:
+                by_currency.setdefault(offer.currency, []).append(line)
 
-        po = await create_purchase_order(
-            db,
-            org_id,
-            PurchaseOrderCreate(
-                partner_id=partner_id,
-                lines=lines,
-                # A line carries no currency — one shared by every priced
-                # line becomes the order's; a mix falls back to the org's.
-                currency=currencies.pop() if len(currencies) == 1 else None,
-            ),
-            user_id,
-        )
-        created.append(po)
+        orders: list[tuple[str | None, list[PurchaseOrderLineCreate]]] = [
+            (currency, by_currency[currency])
+            for currency in sorted(by_currency, key=lambda c: (c != house_currency, c))
+        ] or [(None, [])]
+        orders[0] = (orders[0][0], unpriced + orders[0][1])
+        for currency, lines in orders:
+            po = await create_purchase_order(
+                db,
+                org_id,
+                PurchaseOrderCreate(
+                    partner_id=partner_id, lines=lines, currency=currency
+                ),
+                user_id,
+            )
+            created.append(po)
 
     return created, skipped
