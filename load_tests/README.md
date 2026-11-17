@@ -62,7 +62,7 @@ this step. The two seeders can still be run on their own (`backend/seed_load_tes
 Expiry date distribution: on the cold-storage and shelf locations (80% of the items) ~15% expired,
 ~30% expiring in ≤90 days, ~25% OK, ~30% no date; on the freezer (20%) ~10% no date and the rest
 1–18 months out. Over everything: ~12% expired, ~26% expiring in ≤90 days, ~36% later, ~26% no date.
-Exercises: `GET /api/v1/items`, `?search=`, `/api/v1/items/expiring`, `/api/v1/stats/overview`,
+Exercises: `GET /api/v1/items`, `?search=`, `/api/v1/items?expiring_days=7`, `/api/v1/stats/overview`,
 `/api/v1/stats/by-location`, `/api/v1/stats/expiry-forecast`, `/api/v1/stats/rotation-analysis`.
 
 ---

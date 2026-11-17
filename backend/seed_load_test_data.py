@@ -23,7 +23,7 @@ Realistic data distribution per organization:
       storage_type, so the seeder is vertical-agnostic and works on any deployment
       (food, IT equipment, warehouse, …) without depending on pre-seeded StorageType rows
     - 300 items by default: ~35% Cold Storage, ~20% Freezer, ~30% Shelf A, ~15% Shelf B
-    - 30% of items expire within 90 days (endpoint /api/items/expiring)
+    - 30% of items expire within 90 days (items list, expiring_days filter)
     - 15% of items are already expired (expired filtering tests)
     - Diverse names, brands, and barcodes to exercise SELECT with WHERE LIKE
 """

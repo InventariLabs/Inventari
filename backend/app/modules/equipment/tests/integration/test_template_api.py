@@ -7,7 +7,7 @@ Covers:
 - GET /equipment/templates/{id} — get
 - PUT /equipment/templates/{id} — update
 - DELETE /equipment/templates/{id} — delete
-- GET /equipment/protocol/placeholders
+- GET /equipment/templates/placeholders
 - POST /equipment/templates/seed-defaults
 """
 

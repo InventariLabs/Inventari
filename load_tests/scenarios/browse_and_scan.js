@@ -139,10 +139,10 @@ export default function () {
 
   sleep(Math.random() * 1.5 + 0.5);
 
-  // Every 3rd iteration — check expiring items (heavier query: ORDER BY expiry_date)
+  // Every 3rd iteration — items expiring within a week (heavier query: filters on the effective expiry)
   if (__ITER % 3 === 0) {
     group('Expiring items', () => {
-      const r = http.get(`${BASE_URL}/api/v1/items/expiring`, {
+      const r = http.get(`${BASE_URL}/api/v1/items?expiring_days=7`, {
         headers,
         tags: { name: 'items/expiring' },
       });
