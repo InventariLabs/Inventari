@@ -360,6 +360,11 @@ says what the release does rather than what changed since them.
   bulk location move is marked as one of a batch like the other batch edits.
 - Clearing the purchased lines of a shopping list keeps what was bought in the
   list's purchase history, as archiving the list already did.
+- A place that equipment was ever checked out to can no longer be deleted.
+  Deleting it blanked the holder line of that past checkout in the asset's
+  history: the dates stayed, the place the card named was gone. The delete is
+  now refused with a message that points to archiving the place instead, as a
+  place with stock movements already was.
 
 ### Removed
 
