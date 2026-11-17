@@ -367,8 +367,7 @@ says what the release does rather than what changed since them.
   Locations row offered Delete over a place it counted an asset in. The row
   and the server now count every record that names the location — the home it
   belongs to, or the place it is checked out to — and both doors into a delete
-  (the single delete and the reorganization) refuse it. Once the asset is
-  returned the place can be deleted as before.
+  (the single delete and the reorganization) refuse it.
 
 ### Removed
 

@@ -5,7 +5,13 @@ delete after the return silently rewrote the asset's timeline: the past
 checkout kept its dates and its holder line went blank, the place its card
 named gone. A stock move is protected from exactly this by the movement guard;
 the assignment is the asset's own history, and the place is refused the same
-way, whether the checkout is still open or already closed.
+way.
+
+The refusal is split between two layers, and each answers for what it can see.
+An open checkout is a record standing in the place, which the core delete
+guard refuses like any other record there ("contains items, move it first");
+a closed one leaves only the history, which the equipment module's storage
+guard refuses and points at archiving.
 """
 
 from __future__ import annotations
@@ -95,8 +101,17 @@ class TestAPlaceInAnAssetsHistoryIsNotDeleted:
 
         resp = client.delete(f'/api/v1/locations/{place.id}', headers=eq_auth_headers)
 
-        assert resp.status_code == 409, resp.text
-        assert resp.json()['detail']['code'] == 'STORAGE_HAS_EQUIPMENT_CHECKOUTS'
+        # The core guard answers first while the checkout is open: the place
+        # holds a record, and that is the number its row shows. The module's
+        # history guard is what asks after the return (the test above).
+        assert resp.status_code == 400, resp.text
+        assert resp.json()['detail']['code'] == 'STORAGE_DELETE_FAILED_ITEMS'
+        assert (
+            client.get(
+                f'/api/v1/locations/{place.id}', headers=eq_auth_headers
+            ).status_code
+            == 200
+        )
 
     def test_a_place_no_asset_was_checked_out_to_is_deleted(
         self,

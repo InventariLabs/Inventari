@@ -7,7 +7,11 @@ offered with an enabled delete button and answered 204 — the open assignment
 was left naming a row that no longer existed, and the asset fell back to its
 home. The guard now counts every record that names the place, the home a
 record belongs to or the place it is checked out to, and both doors into a
-delete refuse it until the asset comes back.
+delete refuse it while the asset stands there.
+
+The place is not deleted after the return either, but that is the equipment
+module answering for the asset's history, not a count (see
+``test_a_place_in_an_assets_history_is_not_deleted``).
 """
 
 from __future__ import annotations
@@ -141,24 +145,3 @@ def test_the_row_that_carries_the_count_refuses_the_delete(
     assert rows['Workstations']['total_items_count'] == 1
     # The home still holds the record it owns, so it stays refused as well.
     assert rows[eq_storage_location.name]['total_items_count'] == 1
-
-
-def test_the_place_can_be_deleted_once_the_asset_comes_back(
-    client: TestClient,
-    eq_auth_headers: dict[str, str],
-    eq_item: Item,
-    workstations: StorageLocation,
-    db_session: Session,
-) -> None:
-    assignment_id = _place(client, eq_auth_headers, eq_item, workstations)
-    place_id = workstations.id
-    client.post(
-        f'/api/v1/equipment/assignments/{assignment_id}/checkin',
-        headers=eq_auth_headers,
-        json={},
-    ).raise_for_status()
-
-    response = client.delete(f'/api/v1/locations/{place_id}', headers=eq_auth_headers)
-
-    assert response.status_code == 204, response.text
-    assert not _still_there(db_session, place_id)
