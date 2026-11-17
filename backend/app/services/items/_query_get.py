@@ -22,6 +22,7 @@ from app.core.exceptions import ContractViolationError, NotFoundException
 from app.core.read_scope import keep_loaded
 from app.core.txn_memo import records_locked
 from app.models.item import Item
+from app.models.item_history import ItemHistory
 from app.models.product_template import ProductTemplate
 from app.models.stock_valuation_layer import StockValuationLayer
 from app.models.storage_location import StorageLocation
@@ -216,7 +217,16 @@ def _apply_item_filters(  # noqa: C901 - the filter list is the list's contract
         )
 
     if source_document_id:
-        query = query.where(Item.source_document_id == source_document_id)
+        # Provenance lives in the item's history, one row per event — the
+        # column on the item itself is never written.
+        query = query.where(
+            select(ItemHistory.id)
+            .where(
+                ItemHistory.item_id == Item.id,
+                ItemHistory.source_document_id == source_document_id,
+            )
+            .exists()
+        )
     # Neutral on purpose: Core narrows to a set of templates, and whoever asks
     # decides what the set means. "Products with a formula" is maker's
     # question, and Core does not need to learn it.
