@@ -249,7 +249,7 @@ def _draw(
             _draw_fitted(draw, line, left, bottom, width, text_size)
     if label.name != label.code:
         bottom -= text_line
-        _draw_centred(draw, label.code, left, bottom, width, text_size)
+        _draw_fitted(draw, label.code, left, bottom, width, text_size)
     bottom -= gap
 
     kind = symbology(label.code)
@@ -393,8 +393,8 @@ def _draw_fitted(
     """A centred line at the largest size up to *ceiling* that holds it whole.
 
     The text size follows the label's height, so on a tall, narrow-ish label
-    it is large enough that a lot and best-before line runs past the width
-    and its date would be cut. It shrinks to fit instead, and is cut with an
+    it is large enough that a lot and best-before line, or a long code, runs
+    past the width and would be cut. It shrinks to fit instead, and is cut with an
     ellipsis only when even the smallest size cannot hold it.
     """
     size = _largest_fitting(

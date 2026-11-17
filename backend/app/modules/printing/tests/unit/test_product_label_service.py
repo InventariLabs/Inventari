@@ -169,6 +169,30 @@ class TestALargerLabelKeepsItsDetailsWhole:
 
         assert details in drawn
 
+    @pytest.mark.parametrize('size_mm', [(80.0, 60.0), (100.0, 100.0)])
+    def test_the_code_line_under_the_bars_is_not_cut_with_an_ellipsis(
+        self, monkeypatch: pytest.MonkeyPatch, size_mm: tuple[float, float]
+    ) -> None:
+        from app.modules.printing.services import product_label_service as svc
+
+        code = 'SKU-2026-11-16-LONG-BATCH-CODE'
+        original = svc._clipped_to_width
+        drawn: list[str] = []
+
+        def spy(draw, text, font, max_width):  # type: ignore[no-untyped-def]
+            result = original(draw, text, font, max_width)
+            drawn.append(result)
+            return result
+
+        monkeypatch.setattr(svc, '_clipped_to_width', spy)
+
+        png = generate_product_label_png(
+            ProductLabel('Crate', code, 'Lot L-1'), *size_mm
+        )
+
+        assert code in drawn
+        assert read_bars(png) == barcode_modules(code)
+
     def test_a_line_no_size_holds_is_still_cut_not_drawn_off_the_label(self) -> None:
         png = generate_product_label_png(
             ProductLabel('Crate', '2000000000022', 'Lot ' + 'X' * 200), 80.0, 60.0
