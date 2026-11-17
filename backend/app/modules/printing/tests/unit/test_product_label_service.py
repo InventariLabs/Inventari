@@ -143,6 +143,40 @@ class TestABarcodeThatHasNoRoomToStand:
             require_fits(ProductLabel('Crate', '2000000000022'), 50.0, 5.0)
 
 
+class TestALargerLabelKeepsItsDetailsWhole:
+    """The text size follows the label's height; the line must still fit."""
+
+    @pytest.mark.parametrize('size_mm', [(80.0, 60.0), (100.0, 100.0)])
+    def test_the_lot_and_expiry_line_is_not_cut_with_an_ellipsis(
+        self, monkeypatch: pytest.MonkeyPatch, size_mm: tuple[float, float]
+    ) -> None:
+        from app.modules.printing.services import product_label_service as svc
+
+        details = 'Lot PLB-20261116-B · Exp. 15 May 2027'
+        original = svc._clipped_to_width
+        drawn: list[str] = []
+
+        def spy(draw, text, font, max_width):  # type: ignore[no-untyped-def]
+            result = original(draw, text, font, max_width)
+            drawn.append(result)
+            return result
+
+        monkeypatch.setattr(svc, '_clipped_to_width', spy)
+
+        generate_product_label_png(
+            ProductLabel('Plum jam', '2000000000022', details), *size_mm
+        )
+
+        assert details in drawn
+
+    def test_a_line_no_size_holds_is_still_cut_not_drawn_off_the_label(self) -> None:
+        png = generate_product_label_png(
+            ProductLabel('Crate', '2000000000022', 'Lot ' + 'X' * 200), 80.0, 60.0
+        )
+
+        assert Image.open(io.BytesIO(png)).size[0] > 0
+
+
 class TestDetailsLine:
     def test_the_lot_and_expiry_read_in_the_reader_language(self) -> None:
         assert (

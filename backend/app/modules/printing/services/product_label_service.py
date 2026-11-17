@@ -246,7 +246,7 @@ def _draw(
         # date a reader needs most.
         for line in reversed(label.details.split('\n')):
             bottom -= text_line
-            _draw_centred(draw, line, left, bottom, width, text_size)
+            _draw_fitted(draw, line, left, bottom, width, text_size)
     if label.name != label.code:
         bottom -= text_line
         _draw_centred(draw, label.code, left, bottom, width, text_size)
@@ -385,6 +385,22 @@ def _draw_centred(
     text = _clipped_to_width(draw, text, font, width)
     bbox = draw.textbbox((0, 0), text, font=font)
     draw.text((left + (width - (bbox[2] - bbox[0])) // 2, top), text, fill=0, font=font)
+
+
+def _draw_fitted(
+    draw: ImageDraw.ImageDraw, text: str, left: int, top: int, width: int, ceiling: int
+) -> None:
+    """A centred line at the largest size up to *ceiling* that holds it whole.
+
+    The text size follows the label's height, so on a tall, narrow-ish label
+    it is large enough that a lot and best-before line runs past the width
+    and its date would be cut. It shrinks to fit instead, and is cut with an
+    ellipsis only when even the smallest size cannot hold it.
+    """
+    size = _largest_fitting(
+        lambda s: not _overflows(draw, [text], _font(s), width), ceiling
+    )
+    _draw_centred(draw, text, left, top, width, size or MIN_FONT_PX)
 
 
 def _draw_bars(
