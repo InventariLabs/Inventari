@@ -263,6 +263,7 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | `get_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> StorageDTO \| None` | READ | — |
 | `get_with_type_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> StorageDTO \| None` | READ | Return a storage location with eager-loaded storage_type, or ``None``. |
 | `item_counts_by_location_async` | `(db: AsyncSession, organization_id: UUID, storage_ids: list[UUID]) -> dict[UUID, int]` | READ | Return {storage_id: count} for non-deleted items in those storages. |
+| `item_counts_naming_locations_async` | `(db: AsyncSession, organization_id: UUID, storage_ids: list[UUID]) -> dict[UUID, int]` | READ | Return {storage_id: count} for the records that name that location. |
 | `label_caption` | `(storage: StorageDTO) -> str \| None` | READ | The text under the QR code of this location's label. |
 | `list_async` | `(db: AsyncSession, organization_id: UUID, *, context_tag: str \| None=None, usage: str \| None=None, limit: int=200, offset: int=0) -> list[StorageDTO]` | READ | — |
 | `list_by_ids_async` | `(db: AsyncSession, organization_id: UUID, storage_ids: Iterable[UUID]) -> list[StorageDTO]` | READ | The named locations that exist and are not archived, ordered by name. |
@@ -595,9 +596,9 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 
 ## Statistics
 
-- **Total methods:** 312
+- **Total methods:** 313
 - **Namespaces:** 33
-- **Documented methods:** 312 (100%)
-- **READ methods:** 218 (70%)
+- **Documented methods:** 313 (100%)
+- **READ methods:** 219 (70%)
 - **WRITE methods:** 94 (30%)
 

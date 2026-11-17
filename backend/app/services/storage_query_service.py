@@ -27,6 +27,7 @@ from app.schemas.storage_location import (
 from app.services.storage._queries import (
     expiring_counts_by_location_async,
     item_counts_by_location_async,
+    item_counts_naming_locations_async,
     list_archived_async,
     not_archived_condition,
     subtree_item_counts,
@@ -367,11 +368,13 @@ async def _page_counts_async(
         all_direct = await item_counts_by_location_async(db, organization_id, below_all)
         # When the counts were narrowed to a module, the all-modules total
         # travels alongside: deleting a location is refused while any
-        # module's record stands DIRECTLY in it, so a screen showing narrowed
-        # numbers would enable a delete the server refuses, justified by a
-        # number it never showed. Direct on purpose: children are reparented
-        # on delete, not asked first.
-        counts.total_direct = {i: all_direct.get(i, 0) for i in page_ids}
+        # module's record names it DIRECTLY — its home, or the place it is
+        # checked out to — so a screen showing narrowed numbers would enable
+        # a delete the server refuses, justified by a number it never showed.
+        # Direct on purpose: children are reparented on delete, not asked
+        # first.
+        named = await item_counts_naming_locations_async(db, organization_id, page_ids)
+        counts.total_direct = {i: named.get(i, 0) for i in page_ids}
     else:
         # Nothing narrows the count: one read answers both folds.
         all_direct = await item_counts_by_location_async(

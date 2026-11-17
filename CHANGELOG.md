@@ -358,6 +358,15 @@ says what the release does rather than what changed since them.
   bulk location move is marked as one of a batch like the other batch edits.
 - Clearing the purchased lines of a shopping list keeps what was bought in the
   list's purchase history, as archiving the list already did.
+- A location an asset is checked out to can no longer be deleted out from
+  under the checkout. The delete guard counted only the records whose home the
+  location is, so a place an asset stood in answered 204 and left the open
+  checkout naming a location that no longer existed, while the Equipment
+  Locations row offered Delete over a place it counted an asset in. The row
+  and the server now count every record that names the location — the home it
+  belongs to, or the place it is checked out to — and both doors into a delete
+  (the single delete and the reorganization) refuse it. Once the asset is
+  returned the place can be deleted as before.
 
 ### Removed
 

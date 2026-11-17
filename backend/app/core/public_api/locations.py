@@ -178,6 +178,24 @@ class CoreStoragesAPI:
         return await item_counts_by_location_async(db, organization_id, storage_ids)
 
     @reads
+    async def item_counts_naming_locations_async(
+        self, db: AsyncSession, organization_id: UUID, storage_ids: list[UUID]
+    ) -> dict[UUID, int]:
+        """Return {storage_id: count} for the records that name that location.
+
+        A record names its home, and one a module has placed while it is
+        there names that place too — the number a delete is refused on, since
+        deleting either strands the record or the placement.
+        """
+        from app.services.storage._queries import (
+            item_counts_naming_locations_async,
+        )
+
+        return await item_counts_naming_locations_async(
+            db, organization_id, storage_ids
+        )
+
+    @reads
     async def list_items_in_location_async(
         self,
         db: AsyncSession,

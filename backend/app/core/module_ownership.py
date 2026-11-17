@@ -281,18 +281,46 @@ def register_record_placement(module_name: str, fn: PlacementFn) -> None:
     _placements[module_name] = fn
 
 
+def _placement_column(
+    module_name: str, organization_id: UUID
+) -> ColumnElement[UUID] | None:
+    """The place *module_name* put a record, correlated by record id.
+
+    ``None`` when the module registered no placement at all — its records
+    stand in their home column, and there is no subquery to ask.
+    """
+    fn = _placements.get(module_name)
+    if fn is None:
+        return None
+    placed = fn(organization_id).subquery()
+    item_id, location_id = placed.c
+    return select(location_id).where(item_id == Item.id).limit(1).scalar_subquery()
+
+
 def standing_location(module_name: str, organization_id: UUID) -> ColumnElement[UUID]:
     """Where one of *module_name*'s records stands now — the place a module
     put it while it lasts, its own location otherwise.
 
     For a module that registered no placement this is the home column itself.
     """
-    fn = _placements.get(module_name)
-    if fn is None:
+    placed = _placement_column(module_name, organization_id)
+    if placed is None:
         return Item.storage_location_id.expression
-    placed = fn(organization_id).subquery()
-    item_id, location_id = placed.c
-    return func.coalesce(
-        select(location_id).where(item_id == Item.id).limit(1).scalar_subquery(),
-        Item.storage_location_id,
-    )
+    return func.coalesce(placed, Item.storage_location_id)
+
+
+def placement_location_columns(organization_id: UUID) -> list[ColumnElement[UUID]]:
+    """One column per module that places records: the place, or NULL.
+
+    Each column answers "where did this module put this record" for the
+    record on the row, and NULL where it put it nowhere. A reader that is not
+    narrowed to one module — the delete guard, which must refuse every place
+    any module's record names — asks them all instead of one.
+    """
+    return [
+        placed
+        for placed in (
+            _placement_column(name, organization_id) for name in sorted(_placements)
+        )
+        if placed is not None
+    ]

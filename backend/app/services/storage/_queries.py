@@ -208,6 +208,44 @@ async def item_counts_by_location_async(
     return {row[0]: row[1] for row in result.all()}
 
 
+async def item_counts_naming_locations_async(
+    db: AsyncSession,
+    organization_id: UUID,
+    storage_ids: list[UUID],
+) -> dict[UUID, int]:
+    """Count the organization's records that name each of *storage_ids*.
+
+    A record names its home, and one a module has placed for a while names
+    that place as well: an asset checked out to a place names both the place
+    it stands in and the home it belongs to. The delete guard refuses either,
+    so the count adds a record to every location it names — deleting the home
+    would strand the record, deleting the place would strand the placement —
+    and the home of a record placed elsewhere is one of the numbers.
+    """
+    if not storage_ids:
+        return {}
+    counts = dict(await item_counts_by_location_async(db, organization_id, storage_ids))
+    from app.core.module_ownership import placement_location_columns
+
+    for placed in placement_location_columns(organization_id):
+        rows = await db.execute(
+            select(placed, func.count(Item.id))
+            .where(
+                Item.organization_id == organization_id,
+                Item.is_deleted.is_(False),
+                placed.is_not(None),
+                in_ids(placed, storage_ids),
+                # A record checked out to its own home names that place once,
+                # and the home count above already has it.
+                Item.storage_location_id.is_distinct_from(placed),
+            )
+            .group_by(placed)
+        )
+        for location_id, count in rows.all():
+            counts[location_id] = counts.get(location_id, 0) + count
+    return counts
+
+
 def subtree_item_counts(
     direct_counts: dict[UUID, int],
     parents: dict[UUID, UUID | None],
