@@ -114,7 +114,7 @@ ERRORS_FR: ErrorMessages = {
     'shopping_list_not_found': 'Liste de courses introuvable',
     'shopping_list_create_failed': 'Échec de la création de la liste de courses',
     'shopping_list_update_failed': 'Échec de la mise à jour de la liste de courses',
-    'shopping_list_not_writable': 'Cette liste de courses est {status} et ne peut pas être modifiée. Réactivez-la d’abord.',
+    'shopping_list_not_writable': 'Cette liste de courses n’est plus ouverte et ne peut pas être modifiée. Réactivez-la d’abord.',
     'shopping_list_delete_failed': 'Échec de la suppression de la liste de courses',
     'shopping_list_item_not_found': 'Article de la liste de courses introuvable',
     'shopping_list_item_quantity_rounds_to_zero': "La quantité {quantity} s'arrondit à zéro à la précision du stockage — la plus petite valeur enregistrable est {smallest}",

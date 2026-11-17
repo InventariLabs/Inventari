@@ -117,7 +117,7 @@ ERRORS_DE: ErrorMessages = {
     'shopping_list_not_found': 'Einkaufsliste nicht gefunden',
     'shopping_list_create_failed': 'Einkaufsliste konnte nicht erstellt werden',
     'shopping_list_update_failed': 'Einkaufsliste konnte nicht aktualisiert werden',
-    'shopping_list_not_writable': 'Diese Einkaufsliste ist {status} und kann nicht geändert werden. Aktivieren Sie sie zuerst wieder.',
+    'shopping_list_not_writable': 'Diese Einkaufsliste ist nicht mehr offen und kann nicht geändert werden. Aktivieren Sie sie zuerst wieder.',
     'shopping_list_delete_failed': 'Einkaufsliste konnte nicht gelöscht werden',
     'shopping_list_item_not_found': 'Einkaufslisten-Element nicht gefunden',
     'shopping_list_item_quantity_rounds_to_zero': 'Die Menge {quantity} rundet auf der Speichergenauigkeit zu null — der kleinste speicherbare Wert ist {smallest}',

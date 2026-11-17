@@ -13,6 +13,7 @@ import { ModulesProvider } from "@/contexts/ModulesContext";
 import {
   useShoppingListDetail,
   useToggleShoppingItem,
+  useUpdateShoppingList,
 } from "../hooks/useShoppingLists";
 
 function ShellWrapper({ children }: { children: ReactNode }) {
@@ -32,6 +33,10 @@ function ShellWrapper({ children }: { children: ReactNode }) {
 vi.mock("../hooks/useShoppingLists", () => ({
   useShoppingListDetail: vi.fn(),
   useToggleShoppingItem: vi.fn(() => ({
+    mutateAsync: vi.fn().mockResolvedValue(undefined),
+    isPending: false,
+  })),
+  useUpdateShoppingList: vi.fn(() => ({
     mutateAsync: vi.fn().mockResolvedValue(undefined),
     isPending: false,
   })),
@@ -174,6 +179,42 @@ describe("ShoppingListDetailPage", () => {
 
     expect(screen.getByText(/1 (do kupna|to buy)/i)).toBeInTheDocument();
     expect(screen.getByText(/1 (kupione|purchased)/i)).toBeInTheDocument();
+  });
+
+  it("says a completed list is done and offers Reactivate instead of Add", async () => {
+    const reactivate = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(useUpdateShoppingList).mockReturnValue({
+      mutateAsync: reactivate,
+      isPending: false,
+    } as unknown as ReturnType<typeof useUpdateShoppingList>);
+    vi.mocked(useShoppingListDetail).mockReturnValue(
+      makeQueryResult({
+        id: "list-1",
+        name: "Last week",
+        status: "completed",
+        items: [
+          {
+            id: "item-1",
+            name: "Milk",
+            quantity: 2,
+            unit: "pcs",
+            is_purchased: false,
+            priority: 0,
+            source: "manual",
+          },
+        ],
+      }),
+    );
+
+    renderWithRouter("list-1");
+
+    expect(await screen.findByText(/This list is done/i)).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /^Product$|^Add$/i }),
+    ).toBeNull();
+    expect(screen.queryByRole("button", { name: /From recipes/i })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /Reactivate/i }));
+    expect(reactivate).toHaveBeenCalledWith({ id: "list-1", status: "active" });
   });
 
   it("should show empty state message", async () => {

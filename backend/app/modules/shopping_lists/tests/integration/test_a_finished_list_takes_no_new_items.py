@@ -11,11 +11,13 @@ one came back first whenever it was the newest.
 
 from __future__ import annotations
 
+from decimal import Decimal
 from uuid import UUID
 
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
@@ -69,6 +71,37 @@ class TestTheFacadeRefusesAFrozenList:
             )
         )
         assert list(rows) == []
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize('state', ['completed', 'archived'])
+    async def test_a_frozen_lists_line_is_not_raised_by_a_top_up(
+        self, real_async_db_session: AsyncSession, async_test_user: User, state: str
+    ) -> None:
+        shopping_list = await a_list(real_async_db_session, async_test_user, 'active')
+        org = _org_of(async_test_user)
+        need = ShoppingListItemCreateDTO(
+            name='Coconut Milk', quantity=Decimal('100'), source='meal_plan'
+        )
+        [line] = await shopping_lists_api.add_items_async(
+            real_async_db_session, shopping_list.id, [need], org
+        )
+        shopping_list.status = state
+        await real_async_db_session.flush()
+
+        with pytest.raises(ServiceRejectionError) as refused:
+            await shopping_lists_api.top_up_async(
+                real_async_db_session,
+                shopping_list.id,
+                need.model_copy(update={'quantity': Decimal('400')}),
+                [line],
+                org,
+            )
+
+        assert refused.value.key == 'shopping_list_not_writable'
+        stored = await real_async_db_session.scalar(
+            select(ShoppingListItem.quantity).where(ShoppingListItem.id == line.id)
+        )
+        assert stored == Decimal('100')
 
     @pytest.mark.asyncio
     async def test_an_active_list_still_takes_items(
