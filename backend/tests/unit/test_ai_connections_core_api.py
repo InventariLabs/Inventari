@@ -74,6 +74,17 @@ def _make_existing_conn(
     )
 
 
+def _user(org_id: uuid.UUID):
+    from app.core.contracts import UserContextDTO
+
+    return UserContextDTO(
+        id=uuid.uuid4(),
+        email='admin@example.test',
+        organization_id=org_id,
+        role='admin',
+    )
+
+
 # --------------------------- list_async --------------------------------------
 
 
@@ -433,6 +444,7 @@ class TestSetBindingAsync:
                 'app.core.public_api.ai_connections._persist_org_settings',
                 AsyncMock(side_effect=fake_persist),
             ),
+            patch('app.services.audit_service.log_action_async', AsyncMock()),
         ):
             db = AsyncMock()
             await api.set_binding_async(
@@ -440,6 +452,7 @@ class TestSetBindingAsync:
                 org_id=org_id,
                 purpose_key='vision.extract',
                 connection_id=conn_uuid,
+                user=_user(org_id),
             )
 
         new_settings = captured['settings']
@@ -470,6 +483,7 @@ class TestSetBindingAsync:
                 'app.core.public_api.ai_connections._persist_org_settings',
                 AsyncMock(side_effect=fake_persist),
             ),
+            patch('app.services.audit_service.log_action_async', AsyncMock()),
         ):
             db = AsyncMock()
             await api.set_binding_async(
@@ -477,6 +491,7 @@ class TestSetBindingAsync:
                 org_id=org_id,
                 purpose_key='recipes.text_parse',
                 connection_id=conn_uuid,
+                user=_user(org_id),
             )
 
         new_settings = captured['settings']

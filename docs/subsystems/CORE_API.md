@@ -59,7 +59,7 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | `get_async` | `(db: AsyncSession, org_id: uuid.UUID, conn_id: uuid.UUID) -> AiConnectionDTO \| None` | READ | — |
 | `list_async` | `(db: AsyncSession, org_id: uuid.UUID) -> list[AiConnectionDTO]` | READ | — |
 | `list_purposes_async` | `(db: AsyncSession, org_id: uuid.UUID) -> list[AiPurposeDTO]` | READ | All registered purposes, with the choice and the verdict apart. |
-| `set_binding_async` | `(db: AsyncSession, org_id: uuid.UUID, purpose_key: str, connection_id: uuid.UUID \| None) -> None` | WRITE | Set *purpose_key* -> *connection_id* for *org_id*. |
+| `set_binding_async` | `(db: AsyncSession, org_id: uuid.UUID, purpose_key: str, connection_id: uuid.UUID \| None, user: UserContextDTO \| None=None) -> None` | WRITE | Set *purpose_key* -> *connection_id* for *org_id*. |
 | `test_connection_async` | `(db: AsyncSession, org_id: uuid.UUID, *, connection_id: uuid.UUID \| None=None, provider: str \| None=None, api_key: str \| None=None, api_base_url: str \| None=None, model_name: str \| None=None, capabilities: list[str] \| None=None) -> dict[str, Any]` | WRITE | Validate credentials, then check the model against the contract. |
 | `update_async` | `(db: AsyncSession, org_id: uuid.UUID, conn_id: uuid.UUID, data: AiConnectionUpdateDTO) -> AiConnectionDTO \| None` | WRITE | — |
 
@@ -142,7 +142,7 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | `search_stock_summary_async` | `(db: AsyncSession, organization_id: UUID, *, storage_ids: list[UUID] \| None=None, search: str \| None=None, quantity_above: Decimal \| None=None, limit: int=50) -> list[tuple[ItemDTO, Decimal, bool]]` | READ | Stock rows for a picker: distinguishable ones individually, interchangeable ones summed per (product, shelf). |
 | `soft_delete_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, user: UserContextDTO, reason: str \| None=None, notes: str \| None=None) -> bool` | WRITE | — |
 | `transfer_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, to_storage_location_id: UUID, *, user_id: UUID, source_document_id: UUID \| None=None, notes: str \| None=None, history_changes: dict[str, Any] \| None=None, history_action: ItemAction=ItemAction.MOVED, post_the_change: bool=True) -> ItemDTO \| None` | WRITE | — |
-| `update_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, data: ItemUpdateDTO, user: UserContextDTO) -> ItemDTO \| None` | WRITE | — |
+| `update_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, data: ItemUpdateDTO, user: UserContextDTO, *, bulk: bool=False) -> ItemDTO \| None` | WRITE | Update one item. ``bulk=True`` marks the edit as one of a batch, so its journal entry carries ``meta_data.bulk`` like the core's own batch edits. |
 | `update_meta_data_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, namespace: str, data: dict[str, Any]) -> ItemDTO \| None` | WRITE | Update item meta_data in a namespaced way. |
 | `update_quantity_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, quantity: Decimal, *, user_id: UUID, source_document_id: UUID \| None=None, history_changes: dict[str, Any] \| None=None, sync_valuation: bool=True, post_the_change: bool=True, lot_id: UUID \| None=None, move_reference_type: str='item', move_reference_id: UUID \| None=None) -> ItemDTO \| None` | WRITE | Set an item's quantity and post the change to the ledger. |
 

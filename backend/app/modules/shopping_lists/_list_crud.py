@@ -21,10 +21,9 @@ from app.i18n.service import (
     get_shopping_label,
 )
 
-from ._helpers import get_shopping_list_or_404
+from ._helpers import get_shopping_list_or_404, record_purchases
 from .models import (
     ShoppingList,
-    ShoppingListHistory,
     ShoppingListItem,
     ShoppingListStatus,
 )
@@ -182,20 +181,7 @@ async def delete_shopping_list_by_id(
         return
     org_uuid = org_id if isinstance(org_id, UUID) else UUID(str(org_id))
 
-    for item in shopping_list.items:
-        if item.is_purchased:
-            db.add(
-                ShoppingListHistory(
-                    organization_id=org_uuid,
-                    original_list_id=shopping_list.id,
-                    original_list_name=shopping_list.name,
-                    item_name=item.name,
-                    quantity=item.quantity,
-                    estimated_price=item.estimated_price,
-                    purchased_at=item.purchased_at,
-                    purchased_by=item.purchased_by,
-                )
-            )
+    record_purchases(db, shopping_list)
 
     shopping_list.status = 'archived'
     shopping_list.archived_at = datetime.now(UTC)

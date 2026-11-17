@@ -183,6 +183,10 @@ says what the release does rather than what changed since them.
   New endpoints: `GET/PUT /maker/labelling/products/{template_id}` and
   `GET /maker/labelling/recipes/{recipe_id}`; the module SDK exports
   `pick_by_lang`.
+- For module authors: `core_api.items.update_async` takes an optional `bulk`
+  flag that marks the edit's journal entry as one of a batch, and
+  `core_api.ai_connections.set_binding_async` an optional `user` it names in
+  the entry it writes. Callers that pass neither are unchanged.
 
 ### Changed
 
@@ -321,6 +325,26 @@ says what the release does rather than what changed since them.
   so the limit is met by API clients and by recipe covers fetched from other
   sites. A photograph Vision AI cannot read at all is refused with "This file
   could not be read as an image" instead of an internal error.
+- The audit journal now records acts it used to miss. Saving the SKU naming
+  schema, binding an AI purpose to a connection, and adding, editing or
+  removing an AI connection each leave an entry (the key itself is never
+  written down); a module that writes its own settings through
+  `core_api.settings.set_bulk_async` leaves the same entry as the settings
+  screen does. A holder who confirms or reports an asset from the attestation
+  link leaves an entry naming the holder. An organization founded by a
+  self-registration starts its journal with the entry that created it. A bulk
+  retire that closes an asset's open checkout records the handover back, and a
+  bulk location move is marked as one of a batch like the other batch edits.
+- Clearing the purchased lines of a shopping list keeps what was bought in the
+  list's purchase history, as archiving the list already did.
+
+### Removed
+
+- **Breaking:** `POST /api/v1/recipes/ingredient-defaults/seed`. It
+  deduplicated and seeded the ingredient defaults of every organization on the
+  installation, and any member of one organization could call it. A script
+  that called it needs to do nothing: the recipes module does the same work
+  once at start-up.
 
 ## v0.12.0 - 2026-11-09
 

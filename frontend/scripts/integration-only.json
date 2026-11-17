@@ -178,11 +178,6 @@
       "verdict": "integration-only",
       "reason": "Imports a recipe from JSON or a URL in one call, with no review step, for scripts. The import screen previews through /recipes/import/preview, lets the user correct the draft, and saves it through POST /recipes."
     },
-    "/api/v1/recipes/ingredient-defaults/seed": {
-      "owner": "maintainers",
-      "verdict": "integration-only",
-      "reason": "Seeds the starter ingredient-to-product mapping for an organization. An operator lever, like the seed-defaults routes in purchase orders and equipment."
-    },
     "/api/v1/recipes/meal-plans/{plan_id}/entries/bulk": {
       "owner": "maintainers",
       "expires": "2026-11-30",

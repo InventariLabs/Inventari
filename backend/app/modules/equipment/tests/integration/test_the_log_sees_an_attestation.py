@@ -142,3 +142,92 @@ class TestTheLogSeesAnAttestation:
         assert removed.snapshot is not None
         assert removed.snapshot['name'] == 'Q3 attestation'
         assert removed.snapshot['deadline'] is not None
+
+
+def _holders_token(
+    client: TestClient,
+    headers: dict[str, str],
+    item_id: Any,
+    db_session: Session,
+) -> str:
+    """Launch an attestation for one assignee and return their link's token."""
+    from app.modules.equipment.models import AuditResponse
+
+    _checkout(client, headers, item_id)
+    campaign_id = _campaign(client, headers)
+    client.post(f'{CAMPAIGNS_URL}/{campaign_id}/launch', headers=headers)
+    db_session.expire_all()
+    return str(db_session.scalars(select(AuditResponse.token)).one())
+
+
+@pytest.mark.integration
+class TestTheLogSeesAHoldersAnswer:
+    """The holder's page has no session; the entry names the holder instead."""
+
+    def test_confirming_names_the_holder_and_the_asset(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        eq_org: Organization,
+        eq_item: Item,
+        db_session: Session,
+    ) -> None:
+        token = _holders_token(client, eq_auth_headers, eq_item.id, db_session)
+
+        answered = client.post(f'/public/attestation/{token}/confirm')
+        assert answered.status_code == 200, answered.text
+
+        db_session.expire_all()
+        entry = _entries(db_session, eq_org.id)[-1]
+        assert entry.user_id is None
+        assert entry.action == 'UPDATE'
+        assert entry.snapshot is not None
+        assert entry.snapshot['answer'] == 'CONFIRMED'
+        assert entry.snapshot['holder'] == 'Alice'
+        assert entry.snapshot['holder_email'] == 'alice@example.com'
+        # The row is about the campaign, by name, and says who answered so
+        # the screen does not read it as an unknown user.
+        assert entry.snapshot['name'] == 'Q3 attestation'
+        assert entry.meta_data is not None
+        assert entry.meta_data['actor'] == {
+            'type': 'holder',
+            'name': 'Alice',
+            'email': 'alice@example.com',
+        }
+        # Names the asset the way every equipment entry does: a holder of two
+        # laptops that share a name must be able to say which one.
+        assert len(entry.snapshot['assets']) == 1
+        assert entry.snapshot['assets'][0].startswith(eq_item.name)
+
+        # The same link opened again answers nothing new.
+        before = len(_entries(db_session, eq_org.id))
+        client.post(f'/public/attestation/{token}/confirm')
+        db_session.expire_all()
+        assert len(_entries(db_session, eq_org.id)) == before
+
+    def test_reporting_a_problem_says_what_and_why(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        eq_org: Organization,
+        eq_item: Item,
+        db_session: Session,
+    ) -> None:
+        token = _holders_token(client, eq_auth_headers, eq_item.id, db_session)
+
+        answered = client.post(
+            f'/public/attestation/{token}/dispute',
+            json={'dispute_type': 'MISSING', 'reason': 'Left in the van'},
+        )
+        assert answered.status_code == 200, answered.text
+
+        db_session.expire_all()
+        entry = _entries(db_session, eq_org.id)[-1]
+        assert entry.user_id is None
+        assert entry.snapshot is not None
+        assert entry.snapshot['answer'] == 'DISPUTED'
+        assert entry.snapshot['dispute_type'] == 'MISSING'
+        assert entry.snapshot['reason'] == 'Left in the van'
+        assert entry.snapshot['holder'] == 'Alice'
+        assert len(entry.snapshot['assets']) == 1
+        assert entry.snapshot['assets'][0].startswith(eq_item.name)

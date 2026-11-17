@@ -306,9 +306,29 @@ async def update_sku_schema(
     org_id = require_org(current_user)
 
     validated = SkuSchemaConfig(**data)
+    before = await db.run_sync(lambda s: SkuService.get_schema(s, org_id))
     await db.run_sync(
         lambda s: SkuService.set_schema(s, org_id, validated.model_dump())
     )
+    if before != validated.model_dump():
+        from app.services._org_reads import get_by_id_async
+
+        organization = await get_by_id_async(db, org_id)
+        # Same shape as the organization PUT: the setting that moved, with
+        # both sides, on the organization's own row.
+        await core_api.audit_log.log_action_async(
+            db,
+            organization_id=org_id,
+            user_id=current_user.id,
+            action=AuditAction.UPDATE,
+            target_type=AuditTargetType.ORGANIZATION,
+            target_id=org_id,
+            snapshot={
+                'name': organization.name if organization else None,
+                'before': {'sku_schema': before},
+                'after': {'sku_schema': validated.model_dump()},
+            },
+        )
     return {'sku_schema': validated.model_dump()}
 
 

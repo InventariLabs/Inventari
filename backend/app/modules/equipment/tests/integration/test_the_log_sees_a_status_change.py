@@ -219,6 +219,7 @@ class TestTheLogSeesAStatusChange:
         eq_auth_headers: dict[str, str],
         eq_org: Organization,
         eq_item: Item,
+        eq_second_item: Item,
         eq_second_location: StorageLocation,
         db_session: Session,
     ) -> None:
@@ -226,13 +227,13 @@ class TestTheLogSeesAStatusChange:
             f'{EQUIPMENT_URL}/assets/bulk',
             headers=eq_auth_headers,
             json={
-                'item_ids': [str(eq_item.id)],
+                'item_ids': [str(eq_item.id), str(eq_second_item.id)],
                 'action': 'change_location',
                 'data': {'location_id': str(eq_second_location.id)},
             },
         )
         assert response.status_code == 200, response.text
-        assert response.json()['updated'] == 1
+        assert response.json()['updated'] == 2
 
         db_session.expire_all()
         moved = db_session.scalars(
@@ -247,3 +248,53 @@ class TestTheLogSeesAStatusChange:
             or eq_second_location.name in json.dumps(m.snapshot, default=str)
             for m in moved
         ), [m.snapshot for m in moved]
+        # One of a batch says so, like every other batch edit in the log.
+        assert any((m.meta_data or {}).get('bulk') is True for m in moved), [
+            m.meta_data for m in moved
+        ]
+
+    def test_retiring_a_held_asset_in_a_batch_journals_the_return(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        eq_org: Organization,
+        eq_item: Item,
+        eq_second_item: Item,
+        db_session: Session,
+    ) -> None:
+        """The batch closes the open checkout (the single retire refuses an
+        asset somebody holds), so the handover back is a custody entry of its
+        own, flagged as one of a batch."""
+        held = client.post(
+            f'{EQUIPMENT_URL}/assignments',
+            headers=eq_auth_headers,
+            json={'item_id': str(eq_item.id), 'assigned_to_name': 'Ewa Nowak'},
+        )
+        assert held.status_code in (200, 201), held.text
+
+        response = client.patch(
+            f'{EQUIPMENT_URL}/assets/bulk',
+            headers=eq_auth_headers,
+            json={
+                'item_ids': [str(eq_item.id), str(eq_second_item.id)],
+                'action': 'change_status',
+                'data': {'status': 'RETIRED'},
+            },
+        )
+        assert response.status_code == 200, response.text
+        assert response.json()['updated'] == 2
+
+        db_session.expire_all()
+        handovers = db_session.scalars(
+            select(AuditLog)
+            .where(
+                AuditLog.organization_id == eq_org.id,
+                AuditLog.target_type == 'equipment_assignment',
+            )
+            .order_by(AuditLog.created_at)
+        ).all()
+        _checkout, closed = handovers
+        assert closed.snapshot is not None
+        assert closed.snapshot['before'] == {'assigned_to': 'Ewa Nowak'}
+        assert closed.snapshot['after']['assigned_to'] is None
+        assert closed.meta_data == {'bulk': True}

@@ -7,6 +7,7 @@ from sqlalchemy import ColumnElement, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.contracts import AuditAction, AuditTargetType
 from app.core.public_api import core_api
 from app.modules.equipment.models import (
     AuditCampaign,
@@ -102,6 +103,55 @@ async def _guard_response(db: AsyncSession, response: AuditResponse) -> None:
         raise ValueError(reason)
 
 
+async def _journal_the_answer(
+    db: AsyncSession,
+    response: AuditResponse,
+    *,
+    answer: str,
+    assets: list[AuditResponseItem],
+    dispute_type: str | None = None,
+    reason: str | None = None,
+) -> None:
+    """Write down that a holder answered for the assets they hold.
+
+    Confirming that an asset is still where the register says, or reporting
+    it missing, damaged or the wrong one, is custody: it changes what the
+    organization knows about an object in the world. Before this it lived
+    on the response row and the asset's timeline only. The page has no
+    session, so the entry has no user; the holder the response was sent to
+    is its actor (``meta_data.actor``), and the campaign it answers is the
+    entry's name.
+    """
+    snapshot = {
+        'name': response.campaign.name if response.campaign else None,
+        'answer': answer,
+        'response_id': str(response.id),
+        'holder': response.assignee_name,
+        'holder_email': response.assignee_email,
+        # Name and serial, as every other equipment entry names an asset:
+        # a holder of two laptops that share a name must say which.
+        'assets': [_asset_label(a) for a in assets],
+        'dispute_type': dispute_type,
+        'reason': reason,
+    }
+    await core_api.audit_log.log_action_async(
+        db,
+        organization_id=response.organization_id,
+        user_id=None,
+        action=AuditAction.UPDATE,
+        target_type=AuditTargetType.EQUIPMENT_ATTESTATION,
+        target_id=response.campaign_id,
+        snapshot={k: v for k, v in snapshot.items() if v is not None},
+        meta_data={
+            'actor': {
+                'type': 'holder',
+                'name': response.assignee_name,
+                'email': response.assignee_email,
+            }
+        },
+    )
+
+
 async def confirm_response(
     db: AsyncSession,
     token: str,
@@ -123,12 +173,15 @@ async def confirm_response(
     # once; one already returned is not the holder's to confirm, and one
     # already reported keeps its report.
     now = datetime.now(UTC)
+    confirmed = []
     for item in response.items:
         if item.status == 'PENDING' and not item.returned:
             item.status = 'CONFIRMED'
             item.responded_at = now
+            confirmed.append(item)
     _settle(response, answered_without_items='CONFIRMED')
     await db.flush()
+    await _journal_the_answer(db, response, answer='CONFIRMED', assets=confirmed)
     await db.refresh(response)
     return response
 
@@ -209,6 +262,14 @@ async def dispute_response(
     _settle(response, answered_without_items='DISPUTED')
 
     await db.flush()
+    await _journal_the_answer(
+        db,
+        response,
+        answer='DISPUTED',
+        assets=[target] if target is not None else [],
+        dispute_type=dispute_type,
+        reason=reason,
+    )
     await _tell_the_admins(db, response, target, reason)
     await db.refresh(response)
     return response

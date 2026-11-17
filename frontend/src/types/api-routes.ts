@@ -317,7 +317,6 @@ export const API_ROUTES = [
   "/api/v1/recipes/ingredient-defaults/export",
   "/api/v1/recipes/ingredient-defaults/import",
   "/api/v1/recipes/ingredient-defaults/lookup",
-  "/api/v1/recipes/ingredient-defaults/seed",
   "/api/v1/recipes/ingredient-defaults/{default_id}",
   "/api/v1/recipes/ingredients/link-templates",
   "/api/v1/recipes/ingredients/match-proposals",

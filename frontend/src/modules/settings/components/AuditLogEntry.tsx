@@ -272,10 +272,12 @@ export function AuditTarget({
 export function AuditActor({ row, t }: { row: AuditLogEntry; t: TFunction }) {
   const prefix = apiKeyActor(row);
   const system = systemActor(row);
+  const holder = holderActor(row);
   return (
     <div className="text-xs">
-      <div className="truncate" title={row.user_id ?? undefined}>
+      <div className="truncate" title={row.user_id ?? holder ?? undefined}>
         {row.user_email ??
+          holder ??
           (system
             ? t("common:settings.audit.actor.system")
             : t("common:settings.audit.unknownUser"))}
@@ -289,6 +291,21 @@ export function AuditActor({ row, t }: { row: AuditLogEntry; t: TFunction }) {
       )}
     </div>
   );
+}
+
+/**
+ * The person without an account who answered, when one did — an equipment
+ * holder confirming or reporting an asset from the public link. The entry has
+ * no user; `meta_data.actor` carries who they are, so the row does not read
+ * as an unknown user.
+ */
+function holderActor(row: AuditLogEntry): string | null {
+  const actor = row.meta_data?.actor;
+  if (typeof actor !== "object" || actor === null) return null;
+  const { type, name, email } = actor as Record<string, unknown>;
+  if (type !== "holder") return null;
+  const text = [name, email].find((v) => typeof v === "string" && v !== "");
+  return typeof text === "string" ? text : null;
 }
 
 /**

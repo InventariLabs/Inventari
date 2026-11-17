@@ -493,6 +493,44 @@ class AuthService:
             user.organization_id = organization.id
             user.role = 'admin'
             await seed_new_organization_async(db, organization.id)
+            # Founding a tenant is an access act, whether it opens the
+            # installation or an operator approved a request: the
+            # organization's journal starts with it, the way the create
+            # route's does. An approved request carries the operator who
+            # said yes, which is the part that was nowhere.
+            from app.core.contracts import AuditAction, AuditTargetType
+            from app.services.audit_service import log_action_async
+
+            operator = (
+                await db.get(User, registration_request.approved_by_id)
+                if registration_request is not None
+                and registration_request.approved_by_id
+                else None
+            )
+            # The operator is an account outside the new organization, so its
+            # admin cannot resolve an id: the entry carries the name and the
+            # address the operator had at the time (AUDIT.md, "A reference is
+            # written with its name").
+            await log_action_async(
+                db,
+                organization_id=organization.id,
+                user_id=user.id,
+                action=AuditAction.CREATE,
+                target_type=AuditTargetType.ORGANIZATION,
+                target_id=organization.id,
+                snapshot={
+                    'name': organization.name,
+                    'short_id': organization.short_id,
+                    'registration': (
+                        'APPROVED'
+                        if registration_request is not None
+                        else 'FIRST_ACCOUNT'
+                    ),
+                    'approved_by_id': str(operator.id) if operator else None,
+                    'approved_by_name': operator.full_name if operator else None,
+                    'approved_by_email': operator.email if operator else None,
+                },
+            )
 
         if registration_request:
             registration_request.token = None

@@ -23,6 +23,13 @@ from app.core.public_api.settings import CoreSettingsAPI
 # ---------------------------------------------------------------------------
 
 
+@pytest.fixture(autouse=True)
+def _no_journal(monkeypatch):
+    """These tests are about what the settings store holds; the entry a write
+    leaves needs a real session and is pinned where there is one."""
+    monkeypatch.setattr('app.services.audit_service.log_action_async', AsyncMock())
+
+
 def _make_org(settings: dict | None = None):
     org = MagicMock()
     org.settings = settings

@@ -79,9 +79,41 @@ class CoreSettingsAPI:
         organization actually saved.
         """
         refuse_foreign_module(module_name, api='core_api.settings.set_bulk_async')
+        from app.core.contracts import AuditAction, AuditTargetType
+        from app.core.settings_diff import changed_settings_snapshot
+        from app.services._org_reads import get_by_id_async
+        from app.services.audit_service import log_action_async
         from app.services.module_settings_service import write_module_settings_async
 
+        ns = self._namespace(module_name)
+        org = await get_by_id_async(db, organization_id)
+        before = self._without_stamp(
+            ((org.settings if org else None) or {}).get(ns, {})
+        )
         await write_module_settings_async(db, organization_id, module_name, values)
+        # ``write_module_settings_async`` has refused an unknown organization.
+        after = self._without_stamp(((org.settings if org else None) or {}).get(ns, {}))
+        # What a module may do is the organization's to set, and the PUT
+        # route journals it; a module writing the same namespace through
+        # this door leaves the same entry. No user travels with the call —
+        # a module writes from an event or a job as often as from a request
+        # — so the entry names the module and, for an API-key request, the
+        # key (``log_action_async`` adds it); with neither it says the system
+        # acted, not that the actor is unknown.
+        change = changed_settings_snapshot(
+            before, after, set(self._secret_paths_for(module_name))
+        )
+        if change is not None:
+            await log_action_async(
+                db,
+                organization_id=organization_id,
+                user_id=None,
+                action=AuditAction.UPDATE,
+                target_type=AuditTargetType.MODULE,
+                target_id=organization_id,
+                snapshot={'name': module_name, **change},
+                meta_data={'actor': {'type': 'system'}},
+            )
 
     @staticmethod
     @reads

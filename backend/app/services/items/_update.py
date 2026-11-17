@@ -52,9 +52,18 @@ logger = get_logger(__name__)
 
 
 async def update_item(
-    db: AsyncSession, item: Item, item_in: ItemUpdate, user: UserContextDTO
+    db: AsyncSession,
+    item: Item,
+    item_in: ItemUpdate,
+    user: UserContextDTO,
+    *,
+    bulk: bool = False,
 ) -> Item:
-    """Update item dynamically."""
+    """Update item dynamically.
+
+    ``bulk`` says the edit is one of a batch: its journal entry carries
+    ``meta_data.bulk``, the way every other batch edit's does.
+    """
     update_data = keyed_by_column(item_in.model_dump(exclude_unset=True))
 
     await _validate_uniqueness(db, item, update_data, user)
@@ -160,7 +169,7 @@ async def update_item(
         db, item, update_data, user
     )
     await _log_and_emit(
-        db, item, update_data, old_values, template_changes, user, context
+        db, item, update_data, old_values, template_changes, user, context, bulk=bulk
     )
     return item
 
@@ -647,6 +656,8 @@ async def _log_and_emit(
     template_changes: dict[str, tuple[Any, Any]],
     user: UserContextDTO,
     context: ModuleContext,
+    *,
+    bulk: bool = False,
 ) -> None:
     """Persist, record history/audit, emit the update event, run after hooks."""
     await db.flush()
@@ -701,6 +712,7 @@ async def _log_and_emit(
                 'after': after,
                 'fields': list(changed),
             },
+            meta_data={'bulk': True} if bulk else None,
         )
     await event_bus.emit_transactional(
         db,

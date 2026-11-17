@@ -142,6 +142,11 @@
               "kind": "POSITIONAL_OR_KEYWORD",
               "name": "connection_id",
               "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "user",
+              "required": false
             }
           ]
         },
@@ -2144,6 +2149,11 @@
               "kind": "POSITIONAL_OR_KEYWORD",
               "name": "user",
               "required": true
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "bulk",
+              "required": false
             }
           ]
         },

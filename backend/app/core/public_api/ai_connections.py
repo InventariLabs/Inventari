@@ -29,6 +29,7 @@ from app.core.contracts import (
     AiConnectionDTO,
     AiConnectionUpdateDTO,
     AiPurposeDTO,
+    UserContextDTO,
 )
 from app.core.exceptions import ServiceRejectionError
 from app.core.llm.purpose_registry import all_purposes
@@ -244,10 +245,15 @@ class CoreAIConnectionsAPI:
         org_id: uuid.UUID,
         purpose_key: str,
         connection_id: uuid.UUID | None,
+        user: UserContextDTO | None = None,
     ) -> None:
         """Set *purpose_key* -> *connection_id* for *org_id*.
 
-        ``connection_id=None`` clears the binding.
+        ``connection_id=None`` clears the binding. A binding that changes
+        which connection answers the purpose writes an organization-settings
+        entry in the journal — the binding decides which provider, and so
+        which key, receives that purpose's data — naming *user*, or, for a
+        caller with no user (a migration), the system as the actor.
 
         The settings dict is deep-copied before any mutation: the read path
         (``decrypt_settings``) returns a SHALLOW copy that shares nested
@@ -264,6 +270,11 @@ class CoreAIConnectionsAPI:
             raise ServiceRejectionError('ai_purpose_unknown', purpose=purpose_key)
 
         settings = copy.deepcopy(await _get_settings_async(db, org_id) or {})
+        from app.core.llm import registry
+
+        bound_before = registry.binding_from_settings(
+            settings, purpose_key, spec.owner_module
+        )
 
         # Per purpose key, whatever the owner module. The module-owned slot
         # (``settings.modules.<owner>.ai_default_connection_id``) was one id
@@ -298,6 +309,48 @@ class CoreAIConnectionsAPI:
             defaults[purpose_key] = str(connection_id)
 
         await _persist_org_settings(db, org_id, settings)
+
+        if bound_before != connection_id:
+            from app.core.contracts import AuditAction, AuditTargetType
+            from app.services._org_reads import get_by_id_async
+            from app.services.audit_service import log_action_async
+
+            org = await get_by_id_async(db, org_id)
+            # Each side names its connection beside the id: the journal
+            # keeps what it was called when the binding moved.
+            before_name = await self._connection_name(db, org_id, bound_before)
+            after_name = await self._connection_name(db, org_id, connection_id)
+            await log_action_async(
+                db,
+                organization_id=org_id,
+                user_id=user.id if user else None,
+                action=AuditAction.UPDATE,
+                target_type=AuditTargetType.ORGANIZATION,
+                target_id=org_id,
+                snapshot={
+                    'name': org.name if org else None,
+                    'purpose': purpose_key,
+                    'before': {
+                        'connection_id': str(bound_before) if bound_before else None,
+                        'connection_name': before_name,
+                    },
+                    'after': {
+                        'connection_id': str(connection_id) if connection_id else None,
+                        'connection_name': after_name,
+                    },
+                },
+                # No account travels with a migration or a job: say so, the
+                # way every other act of the system does.
+                meta_data=None if user else {'actor': {'type': 'system'}},
+            )
+
+    async def _connection_name(
+        self, db: AsyncSession, org_id: uuid.UUID, conn_id: uuid.UUID | None
+    ) -> str | None:
+        if conn_id is None:
+            return None
+        schema = await self._service.get_for_org(db, org_id, conn_id)
+        return schema.name if schema else None
 
 
 # ----------------------------------------------------------------------
