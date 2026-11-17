@@ -6944,6 +6944,40 @@
             }
           ]
         },
+        "reset_to_builtin_async": {
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "module",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "user",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "template_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "built_ins",
+              "required": true
+            }
+          ]
+        },
         "seed_defaults_async": {
           "params": [
             {
