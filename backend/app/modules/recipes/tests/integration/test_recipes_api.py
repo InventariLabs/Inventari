@@ -601,6 +601,19 @@ class TestIngredientDefaultsRouter:
         assert data['total'] >= 1
         assert any(item['id'] == created['id'] for item in data['items'])
 
+    def test_no_member_can_rewrite_every_organizations_dictionary(
+        self, client: TestClient, auth_headers: dict[str, str]
+    ) -> None:
+        """There is no door for a member to deduplicate and seed the whole
+        installation's ingredient defaults — it read and rewrote every
+        organization's overrides with no organization filter. The module's
+        own start-up pass does that work, once, for the installation."""
+        r = client.post(f'{RECIPE_URL}/ingredient-defaults/seed', headers=auth_headers)
+        assert r.status_code in (
+            status.HTTP_404_NOT_FOUND,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
+
     def test_the_dictionary_pages_like_every_other_list(
         self, client: TestClient, auth_headers: dict[str, str]
     ) -> None:

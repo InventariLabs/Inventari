@@ -14,7 +14,7 @@ from app.core.exceptions import ConflictException, NotFoundException
 from app.i18n import Language
 from app.i18n.service import get_current_lang, get_error_message
 
-from ._helpers import get_shopping_list_or_404
+from ._helpers import get_shopping_list_or_404, record_purchases
 from .models import ShoppingList, ShoppingListItem
 
 
@@ -133,6 +133,16 @@ async def clear_purchased_from_list(
     db: AsyncSession, list_id: UUID, organization_id: UUID, lang: Language | None
 ) -> None:
     await get_shopping_list_or_404(db, list_id, organization_id, lang)
+    # Clearing deletes the lines, and with them the only copy of what was
+    # bought, when and by whom: the history keeps it, as archiving does.
+    shopping_list = (
+        await db.execute(
+            select(ShoppingList)
+            .options(selectinload(ShoppingList.items))
+            .where(ShoppingList.id == list_id)
+        )
+    ).scalar_one()
+    record_purchases(db, shopping_list)
     await db.execute(
         delete(ShoppingListItem).where(
             ShoppingListItem.shopping_list_id == list_id,

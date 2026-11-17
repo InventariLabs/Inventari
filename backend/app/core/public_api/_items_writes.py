@@ -87,13 +87,20 @@ class CoreItemsWritesMixin:
         item_id: UUID,
         data: ItemUpdateDTO,
         user: UserContextDTO,
+        *,
+        bulk: bool = False,
     ) -> ItemDTO | None:
+        """Update one item. ``bulk=True`` marks the edit as one of a batch, so
+        its journal entry carries ``meta_data.bulk`` like the core's own
+        batch edits."""
         item = await get_by_id_async(db, organization_id, item_id)
         if not item:
             return None
 
         item_update = ItemUpdate(**data.model_dump(exclude_unset=True))
-        updated = await update_item(db=db, item=item, item_in=item_update, user=user)
+        updated = await update_item(
+            db=db, item=item, item_in=item_update, user=user, bulk=bulk
+        )
         return ItemDTO.model_validate(updated)
 
     @writes

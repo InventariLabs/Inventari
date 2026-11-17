@@ -300,6 +300,29 @@ says what the release does rather than what changed since them.
   words in its name; about two dozen methods were labelled the wrong way
   round. Summaries no longer stop mid-sentence, and types and enum defaults
   print as a caller writes them.
+- The audit journal now records acts it used to miss. Saving the SKU naming
+  schema, binding an AI purpose to a connection, and adding, editing or
+  removing an AI connection each leave an entry (the key itself is never
+  written down); a module that writes its own settings through
+  `core_api.settings.set_bulk_async` leaves the same entry as the settings
+  screen does. A holder who confirms or reports an asset from the attestation
+  link leaves an entry naming the holder. An organization founded by a
+  self-registration starts its journal with the entry that created it. A bulk
+  retire that closes an asset's open checkout records the handover back, and a
+  bulk location move is marked as one of a batch like the other batch edits.
+- Clearing the purchased lines of a shopping list keeps what was bought in the
+  list's purchase history, as archiving the list already did.
+- For module authors: `core_api.items.update_async` takes an optional `bulk`
+  flag that marks the edit's journal entry as one of a batch, and
+  `core_api.ai_connections.set_binding_async` an optional `user` it names in
+  the entry it writes. Callers that pass neither are unchanged.
+
+### Removed
+
+- `POST /api/v1/recipes/ingredient-defaults/seed`. It deduplicated and seeded
+  the ingredient defaults of every organization on the installation, and any
+  member of one organization could call it; the module already does that work
+  once at start-up.
 
 ## v0.12.0 - 2026-11-09
 

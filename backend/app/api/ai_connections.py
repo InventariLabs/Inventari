@@ -49,9 +49,17 @@ from app.core.contracts import (
     AiConnectionDTO,
     AiConnectionUpdateDTO,
     AiPurposeDTO,
+    AuditAction,
+    AuditTargetType,
     SystemPermission,
+    UserContextDTO,
 )
-from app.core.deps import get_async_db, require_org, require_permission
+from app.core.deps import (
+    get_async_db,
+    get_current_user_context,
+    require_org,
+    require_permission,
+)
 from app.core.exceptions import (
     ConflictException,
     NotFoundException,
@@ -78,9 +86,51 @@ from app.schemas.ai_connection import (
     TestConnectionRequest,
 )
 from app.schemas.pagination import PaginatedResponse
+from app.services.crypto_service import MASKED_VALUE
 
 router = APIRouter()
 logger = get_logger(__name__)
+
+#: The connection fields an edit can move that are worth naming in the
+#: journal. The key is left out on purpose: whether it was replaced is told
+#: by ``_changes`` without ever carrying either value.
+_JOURNALLED_FIELDS = (
+    'name',
+    'api_base_url',
+    'model_name',
+    'temperature',
+    'max_tokens',
+    'top_p',
+    'capabilities',
+)
+
+
+def _connection_snapshot(conn: AiConnectionDTO) -> dict[str, object]:
+    """What the journal keeps of a connection — never the key, masked or not."""
+    return {
+        'name': conn.name,
+        'provider': conn.provider,
+        'api_base_url': conn.api_base_url,
+        'model_name': conn.model_name,
+        'capabilities': conn.capabilities,
+    }
+
+
+def _connection_changes(
+    before: AiConnectionDTO, after: AiConnectionDTO, key_replaced: bool
+) -> dict[str, object] | None:
+    """Before/after of the fields an edit moved, ``None`` when it moved none."""
+    moved = [f for f in _JOURNALLED_FIELDS if getattr(before, f) != getattr(after, f)]
+    if not moved and not key_replaced:
+        return None
+    return {
+        'name': after.name,
+        'before': {f: getattr(before, f) for f in moved},
+        'after': {
+            **{f: getattr(after, f) for f in moved},
+            **({'api_key': 'replaced'} if key_replaced else {}),
+        },
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -104,6 +154,7 @@ async def list_connections(
 async def create_connection(
     data: AiConnectionCreateDTO,
     org_id: UUID = Depends(require_org),
+    current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ORG_SETTINGS_WRITE),
 ):
@@ -115,7 +166,7 @@ async def create_connection(
     see a domain-shape error, not a raw SQLAlchemy message.
     """
     try:
-        return await core_api.ai_connections.create_async(db, org_id, data)
+        created = await core_api.ai_connections.create_async(db, org_id, data)
     except IntegrityError as exc:
         # Service has already rolled the transaction back.
         raise ConflictException(
@@ -126,6 +177,19 @@ async def create_connection(
                 name=data.name,
             ),
         ) from exc
+    # A connection is the provider and the key an organization's data is
+    # sent to, so adding one is an access act. The key never enters the
+    # entry.
+    await core_api.audit_log.log_action_async(
+        db,
+        organization_id=org_id,
+        user_id=current_user.id,
+        action=AuditAction.CREATE,
+        target_type=AuditTargetType.AI_CONNECTION,
+        target_id=created.id,
+        snapshot=_connection_snapshot(created),
+    )
+    return created
 
 
 @router.get('/purposes', response_model=PaginatedResponse[AiPurposeDTO])
@@ -145,6 +209,7 @@ async def list_purposes(
 async def set_binding(
     data: SetBindingRequest,
     org_id: UUID = Depends(require_org),
+    current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ORG_SETTINGS_WRITE),
 ):
@@ -153,7 +218,7 @@ async def set_binding(
     400 when the purpose key is not registered.
     """
     await core_api.ai_connections.set_binding_async(
-        db, org_id, data.purpose_key, data.connection_id
+        db, org_id, data.purpose_key, data.connection_id, current_user
     )
     return {'bound': True}
 
@@ -293,6 +358,7 @@ async def update_connection(
     conn_id: UUID,
     data: AiConnectionUpdateDTO,
     org_id: UUID = Depends(require_org),
+    current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ORG_SETTINGS_WRITE),
 ):
@@ -302,6 +368,7 @@ async def update_connection(
     Returns 409 when the rename collides with another connection in
     the same org (uq_ai_connections_org_name) — same contract as
     create, so the UI gets a domain error instead of a 500."""
+    before = await core_api.ai_connections.get_async(db, org_id, conn_id)
     try:
         result = await core_api.ai_connections.update_async(db, org_id, conn_id, data)
     except IntegrityError as exc:
@@ -313,8 +380,24 @@ async def update_connection(
                 name=data.name,
             ),
         ) from exc
-    if result is None:
+    if result is None or before is None:
         raise NotFoundException(resource='ai_connection')
+    changes = _connection_changes(
+        before,
+        result,
+        key_replaced='api_key' in data.model_fields_set
+        and data.api_key != MASKED_VALUE,
+    )
+    if changes is not None:
+        await core_api.audit_log.log_action_async(
+            db,
+            organization_id=org_id,
+            user_id=current_user.id,
+            action=AuditAction.UPDATE,
+            target_type=AuditTargetType.AI_CONNECTION,
+            target_id=conn_id,
+            snapshot=changes,
+        )
     return result
 
 
@@ -322,17 +405,29 @@ async def update_connection(
 async def delete_connection(
     conn_id: UUID,
     org_id: UUID = Depends(require_org),
+    current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ORG_SETTINGS_WRITE),
 ):
     """Delete a connection. 409 when the row is still bound to any
     declared purpose (caller must detach the binding first)."""
+    before = await core_api.ai_connections.get_async(db, org_id, conn_id)
     try:
         deleted = await core_api.ai_connections.delete_async(db, org_id, conn_id)
     except ConnectionStillBoundError as exc:
         # The core API translated the refusal; the router gives it the
         # stable code a client can branch on.
         raise ConflictException('CONNECTION_STILL_BOUND', str(exc)) from exc
-    if not deleted:
+    if not deleted or before is None:
         raise NotFoundException(resource='ai_connection')
+    # The row is gone, so the entry carries what it was.
+    await core_api.audit_log.log_action_async(
+        db,
+        organization_id=org_id,
+        user_id=current_user.id,
+        action=AuditAction.HARD_DELETE,
+        target_type=AuditTargetType.AI_CONNECTION,
+        target_id=conn_id,
+        snapshot=_connection_snapshot(before),
+    )
     return {'deleted': True}

@@ -29,6 +29,7 @@ from app.core.contracts import (
     AiConnectionDTO,
     AiConnectionUpdateDTO,
     AiPurposeDTO,
+    UserContextDTO,
 )
 from app.core.exceptions import ServiceRejectionError
 from app.core.llm.purpose_registry import all_purposes
@@ -244,10 +245,15 @@ class CoreAIConnectionsAPI:
         org_id: uuid.UUID,
         purpose_key: str,
         connection_id: uuid.UUID | None,
+        user: UserContextDTO | None = None,
     ) -> None:
         """Set *purpose_key* -> *connection_id* for *org_id*.
 
-        ``connection_id=None`` clears the binding.
+        ``connection_id=None`` clears the binding. A binding that changes
+        which connection answers the purpose writes an organization-settings
+        entry in the journal — the binding decides which provider, and so
+        which key, receives that purpose's data — naming *user* — or no one, for a caller with no
+        user (a migration), which the entry then shows as the system's.
 
         The settings dict is deep-copied before any mutation: the read path
         (``decrypt_settings``) returns a SHALLOW copy that shares nested
@@ -264,6 +270,11 @@ class CoreAIConnectionsAPI:
             raise ServiceRejectionError('ai_purpose_unknown', purpose=purpose_key)
 
         settings = copy.deepcopy(await _get_settings_async(db, org_id) or {})
+        from app.core.llm import registry
+
+        bound_before = registry.binding_from_settings(
+            settings, purpose_key, spec.owner_module
+        )
 
         # Per purpose key, whatever the owner module. The module-owned slot
         # (``settings.modules.<owner>.ai_default_connection_id``) was one id
@@ -298,6 +309,29 @@ class CoreAIConnectionsAPI:
             defaults[purpose_key] = str(connection_id)
 
         await _persist_org_settings(db, org_id, settings)
+
+        if bound_before != connection_id:
+            from app.core.contracts import AuditAction, AuditTargetType
+            from app.services.audit_service import log_action_async
+
+            await log_action_async(
+                db,
+                organization_id=org_id,
+                user_id=user.id if user else None,
+                action=AuditAction.UPDATE,
+                target_type=AuditTargetType.ORGANIZATION,
+                target_id=org_id,
+                snapshot={
+                    'name': 'ai_binding',
+                    'purpose': purpose_key,
+                    'before': {
+                        'connection_id': str(bound_before) if bound_before else None
+                    },
+                    'after': {
+                        'connection_id': str(connection_id) if connection_id else None
+                    },
+                },
+            )
 
 
 # ----------------------------------------------------------------------

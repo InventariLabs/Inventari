@@ -4,7 +4,6 @@ core/public_api/_items_stock_ops.py::CoreItemsStockOpsMixin.transfer_async
 core/public_api/_items_stock_ops.py::CoreItemsStockOpsMixin.update_meta_data_async
 core/public_api/_items_stock_ops.py::CoreItemsStockOpsMixin.update_quantity_async
 core/public_api/_items_writes.py::CoreItemsWritesMixin.bind_template_async
-core/public_api/ai_connections.py::CoreAIConnectionsAPI.set_binding_async
 core/public_api/ai_usage.py::CoreAIUsageAPI.log_usage_async
 core/public_api/announcements.py::CoreAnnouncementsAPI.delete_async
 core/public_api/email.py::CoreEmailAPI.send_async

@@ -23930,40 +23930,6 @@
         }
       }
     },
-    "/api/v1/recipes/ingredient-defaults/seed": {
-      "post": {
-        "tags": [
-          "Recipes"
-        ],
-        "summary": "Seed Ingredient Defaults",
-        "description": "Trigger idempotent seeding and deduplication of system defaults (admin utility).",
-        "operationId": "seed_ingredient_defaults_api_v1_recipes_ingredient_defaults_seed_post",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": {
-                    "type": "integer"
-                  },
-                  "type": "object",
-                  "title": "Response Seed Ingredient Defaults Api V1 Recipes Ingredient Defaults Seed Post"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          },
-          {
-            "ApiKey": []
-          }
-        ]
-      }
-    },
     "/api/v1/recipes/ingredient-defaults/{default_id}": {
       "delete": {
         "tags": [

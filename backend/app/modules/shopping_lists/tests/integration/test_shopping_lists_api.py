@@ -22,6 +22,7 @@ from uuid import uuid4
 
 import pytest
 from fastapi import status
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
@@ -603,13 +604,17 @@ class TestShoppingListItemDelete:
         test_shopping_list: ShoppingList,
     ) -> None:
         """Tests clearing all purchased items from list."""
-        from app.modules.shopping_lists.models import ShoppingListItem
+        from app.modules.shopping_lists.models import (
+            ShoppingListHistory,
+            ShoppingListItem,
+        )
 
         # Create purchased item
         purchased_item = ShoppingListItem(
             shopping_list_id=test_shopping_list.id,
             name='Purchased item',
             quantity=1,
+            estimated_price=4,
             is_purchased=True,
         )
         db_session.add(purchased_item)
@@ -621,6 +626,16 @@ class TestShoppingListItemDelete:
         )
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
+        # The lines are gone, and what was bought is kept the way archiving
+        # keeps it.
+        db_session.expire_all()
+        (kept,) = db_session.scalars(
+            select(ShoppingListHistory).where(
+                ShoppingListHistory.original_list_id == test_shopping_list.id
+            )
+        ).all()
+        assert kept.item_name == 'Purchased item'
+        assert kept.estimated_price == 4
 
 
 # Fixtures for shopping list tests

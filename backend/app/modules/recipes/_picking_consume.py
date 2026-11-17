@@ -103,10 +103,11 @@ async def consume_for_picking(
     """Decrement the item's quantity and record consumption.
 
     ``history_changes`` says why the stock left, in the same place a stock take
-    says it (``reason`` plus the id of what caused it). In a household profile
-    there is no warehouse module and no organization journal to ask, so the item
-    history is the only account of the ubytek there will ever be, and
-    ``{'old': 500.0, 'new': 499.0}`` is not an account of anything.
+    says it (``reason`` plus the id of what caused it). The organization journal
+    does get a ``QUANTITY_CHANGE`` entry — ``update_quantity`` writes it — but
+    that entry says how much moved, not why; the item history is where the
+    reason lives, and ``{'old': 500.0, 'new': 499.0}`` is not an account of
+    anything.
 
     Returns (consume_qty, remaining_qty, consumed_valuation_rate).
     """

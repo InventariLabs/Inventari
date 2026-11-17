@@ -6652,26 +6652,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/recipes/ingredient-defaults/seed": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Seed Ingredient Defaults
-         * @description Trigger idempotent seeding and deduplication of system defaults (admin utility).
-         */
-        post: operations["seed_ingredient_defaults_api_v1_recipes_ingredient_defaults_seed_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/recipes/ingredient-defaults/{default_id}": {
         parameters: {
             query?: never;
@@ -42566,28 +42546,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    seed_ingredient_defaults_api_v1_recipes_ingredient_defaults_seed_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        [key: string]: number;
-                    };
                 };
             };
         };

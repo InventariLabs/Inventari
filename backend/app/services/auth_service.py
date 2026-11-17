@@ -493,6 +493,37 @@ class AuthService:
             user.organization_id = organization.id
             user.role = 'admin'
             await seed_new_organization_async(db, organization.id)
+            # Founding a tenant is an access act, whether it opens the
+            # installation or an operator approved a request: the
+            # organization's journal starts with it, the way the create
+            # route's does. An approved request carries the operator who
+            # said yes, which is the part that was nowhere.
+            from app.core.contracts import AuditAction, AuditTargetType
+            from app.services.audit_service import log_action_async
+
+            await log_action_async(
+                db,
+                organization_id=organization.id,
+                user_id=user.id,
+                action=AuditAction.CREATE,
+                target_type=AuditTargetType.ORGANIZATION,
+                target_id=organization.id,
+                snapshot={
+                    'name': organization.name,
+                    'short_id': organization.short_id,
+                    'registration': (
+                        'approved'
+                        if registration_request is not None
+                        else 'first_account'
+                    ),
+                    'approved_by_id': (
+                        str(registration_request.approved_by_id)
+                        if registration_request is not None
+                        and registration_request.approved_by_id
+                        else None
+                    ),
+                },
+            )
 
         if registration_request:
             registration_request.token = None

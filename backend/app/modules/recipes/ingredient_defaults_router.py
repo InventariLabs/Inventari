@@ -24,7 +24,6 @@ from app.core.module_sdk import PaginatedResponse
 from app.core.upload_validation import MAX_IMPORT_ROWS, read_capped_upload
 
 from ._allergens import infer_allergens
-from ._defaults_seeding import deduplicate_defaults, seed_system_defaults
 from .defaults_service import (
     delete_org_default,
     export_defaults,
@@ -199,15 +198,3 @@ async def import_ingredient_defaults(
         # tick a green box over a row of zeros.
         raise catalogue_refusal('ingredient_defaults_unreadable_file')
     return ImportDefaultsResult(**result)
-
-
-@router.post('/seed', status_code=status.HTTP_200_OK)
-async def seed_ingredient_defaults(
-    current_user: UserContextDTO = Depends(get_current_user_context),
-    db: AsyncSession = Depends(get_async_db, scope='function'),
-) -> dict[str, int]:
-    """Trigger idempotent seeding and deduplication of system defaults (admin utility)."""
-    require_org(current_user)
-    deduped = await deduplicate_defaults(db)
-    inserted = await seed_system_defaults(db)
-    return {'inserted': inserted, 'deduped': deduped}

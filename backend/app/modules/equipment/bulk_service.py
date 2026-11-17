@@ -206,6 +206,25 @@ async def _change_status(
 
         active.checked_in_at = datetime.now(UTC)
         active.checked_in_by = user_id
+        # The single check-in journals the handover back; so does this one.
+        # It is a custody fact and the retire below only says the asset left
+        # service, not that its holder let go of it.
+        await _log_asset_async(
+            db,
+            org_id,
+            user_id,
+            item,
+            target_type=AuditTargetType.EQUIPMENT_ASSIGNMENT,
+            target_id=active.id,
+            snapshot={
+                'before': {'assigned_to': active.assigned_to_name},
+                'after': {
+                    'assigned_to': None,
+                    'closed_by': 'retired_status',
+                },
+            },
+            bulk=bulk,
+        )
         await core_api.item_history.log_async(
             db,
             item_id=item_id,
@@ -301,6 +320,7 @@ async def _change_location(
         item.id,
         ItemUpdateDTO(location_id=_parse_uuid(location_id) if location_id else None),
         user=UserContextDTO(id=user_id, organization_id=org_id),
+        bulk=bulk,
     )
 
 

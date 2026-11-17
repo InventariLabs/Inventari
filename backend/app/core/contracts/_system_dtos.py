@@ -351,6 +351,10 @@ class AuditTargetType(StrEnum):
     INVITATION = 'invitation'
     MODULE = 'module'
     ORGANIZATION = 'organization'
+    #: Where organization data is sent and with whose key. Adding, editing
+    #: and removing one is an access act; which purpose uses which is an
+    #: ``ORGANIZATION`` update.
+    AI_CONNECTION = 'ai_connection'
     PRODUCT_PROFILE = 'product_profile'
 
 

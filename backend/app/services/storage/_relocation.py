@@ -7,8 +7,8 @@ happened. A physical move therefore writes a relocation document
 reached) and one movement per product, batch and owner standing in the
 location or below it, both ends on its own shelf and the quantity unchanged
 — the records do not change, so there is nothing for a posting to post and
-the movement goes straight through ``stock_moves.create_async``. A move that
-only corrects the layout writes none of it.
+the movement goes straight through ``stock_moves_service.create_async``. A
+move that only corrects the layout writes none of it.
 
 The stock on a past date reads the documents back
 (:func:`parents_as_of_async`): a subtree counts in the warehouse it stood in
