@@ -23,9 +23,11 @@ says what the release does rather than what changed since them.
   on a phone), moves a run to another day, and lists everything those runs need
   in one place: in stock, on order in open purchase orders with their expected
   dates (the column is absent while purchasing is off), and still missing.
-  **Order what is missing** raises one draft purchase order per supplier from
-  each ingredient's best price in the supplier's own unit (offers in your own
-  currency first, never compared with another currency by their numbers), sends ingredients
+  **Order what is missing** raises one draft purchase order per supplier and
+  currency from each ingredient's best price in the supplier's own unit (offers
+  in your own currency first, never compared with another currency by their
+  numbers, and a volume price the shortage does not reach is not bought unless
+  the whole order costs less), sends ingredients
   with no supplier to the shopping list, and proposes an ingredient that has a
   recipe of its own as a planned run instead of a purchase. A run that uses
   such an ingredient counts on what the shelf holds of it and on runs of it

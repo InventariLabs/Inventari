@@ -491,6 +491,51 @@ class TestReplenishmentDraftPos:
         assert resp.status_code == status.HTTP_201_CREATED
         assert resp.json()['created'][0]['partner_id'] == str(po_partner.id)
 
+    def test_a_supplier_quoting_in_two_currencies_gets_an_order_for_each(
+        self,
+        client: TestClient,
+        db_session: Session,
+        po_auth_headers: dict[str, str],
+        po_org: Any,
+        po_location: Any,
+        po_partner: Any,
+        po_template: Any,
+        h: Any,
+    ) -> None:
+        other = 'EUR' if po_org.currency != 'EUR' else 'PLN'
+        second = h.create_template(po_org, name='Second Product', sku='PO-DRAFT-004')
+        rule_a = _rule(
+            db_session, po_org, po_template, po_location, partner_id=po_partner.id
+        )
+        rule_b = _rule(
+            db_session, po_org, second, po_location, partner_id=po_partner.id
+        )
+        _price(db_session, po_org, po_partner, po_template, '5.00', currency=other)
+        _price(
+            db_session,
+            po_org,
+            po_partner,
+            second,
+            '7.00',
+            currency=po_org.currency,
+        )
+        _stock(client, po_auth_headers, po_template, po_location, '0')
+        _stock(client, po_auth_headers, second, po_location, '0')
+
+        resp = client.post(
+            URL,
+            headers=po_auth_headers,
+            json={'reorder_rule_ids': [str(rule_a.id), str(rule_b.id)]},
+        )
+
+        assert resp.status_code == status.HTTP_201_CREATED
+        created = resp.json()['created']
+        # The house currency first; each foreign number stays under its own.
+        assert [
+            (po['currency'], Decimal(po['lines'][0]['unit_price'])) for po in created
+        ] == [(po_org.currency, Decimal('7.00')), (other, Decimal('5.00'))]
+        assert all(len(po['lines']) == 1 for po in created)
+
     def test_missing_pricelist_leaves_unit_price_null(
         self,
         client: TestClient,
