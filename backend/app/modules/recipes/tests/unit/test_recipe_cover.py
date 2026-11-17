@@ -12,8 +12,10 @@ import httpx
 import pytest
 from PIL import Image
 
+from app.core import upload_validation
 from app.modules.recipes._recipe_cover import (
     MAX_COVER_BYTES,
+    CoverUnreadableError,
     _reencode,
     fetch_remote_cover,
 )
@@ -219,3 +221,14 @@ def test_a_phone_photo_stored_sideways_is_turned_upright(
     data, _ = _reencode(buffer.getvalue(), 'image/jpeg')
 
     assert Image.open(io.BytesIO(data)).size == expected
+
+
+def test_a_picture_with_more_pixels_than_an_upload_may_decode_is_refused(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # The bound is Core's, shared with every picture upload; set low here so a
+    # small file stands in for the few-kilobyte PNG with a huge canvas.
+    monkeypatch.setattr(upload_validation, 'MAX_UPLOAD_IMAGE_PIXELS', 40 * 30 - 1)
+
+    with pytest.raises(CoverUnreadableError):
+        _reencode(_png(40, 30), 'image/jpeg')

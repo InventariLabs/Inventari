@@ -311,6 +311,16 @@ says what the release does rather than what changed since them.
   words in its name; about two dozen methods were labelled the wrong way
   round. Summaries no longer stop mid-sentence, and types and enum defaults
   print as a caller writes them.
+- An uploaded picture is measured before it is decoded. The ten-megabyte
+  limit bounded the file, not what it decodes to: a PNG of a few hundred
+  kilobytes can describe a 12000 × 12000 canvas, which took close to 570 MB
+  of server memory as an item's or a recipe's cover, or as a photograph for
+  Vision AI to read. A picture of more than 60 million pixels — more than a
+  50-megapixel phone photograph — is now refused as unreadable on all three
+  before any of it is decoded. The browser already shrinks what it uploads,
+  so the limit is met by API clients and by recipe covers fetched from other
+  sites. A photograph Vision AI cannot read at all is refused with "This file
+  could not be read as an image" instead of an internal error.
 
 ## v0.12.0 - 2026-11-09
 

@@ -38,7 +38,11 @@ from app.core.public_api.llm import (
     LlmTransportError,
     classify_provider_refusal,
 )
-from app.core.upload_validation import format_size_limit, read_capped_upload
+from app.core.upload_validation import (
+    ImageUnreadableError,
+    format_size_limit,
+    read_capped_upload,
+)
 from app.i18n import Language
 from app.i18n.service import get_current_lang, get_error_message
 
@@ -148,6 +152,11 @@ def _reraise_llm_failure(
     exc: Exception, lang: Language, unusable_key: str
 ) -> AppException:
     """Turn a failed extraction into an answer the photographer can act on."""
+    if isinstance(exc, ImageUnreadableError):
+        # The photograph is the problem, and the model never saw it: not a
+        # picture, a broken one, or a canvas too large to decode. Answered as
+        # every other picture upload answers it.
+        return catalogue_refusal('image_unreadable', lang=lang)
     if isinstance(exc, LlmPurposeUnboundError):
         # Nobody has picked a connection for this yet. An administrator fixes
         # that in a minute; reporting it as a server error sends them to the
@@ -202,7 +211,7 @@ def _reraise_llm_failure(
         return _with_connection(
             status.HTTP_422_UNPROCESSABLE_CONTENT, exc, unusable_key, lang
         )
-    # No answer at all: transport, configuration, a broken image.
+    # No answer at all: transport, configuration.
     logger.exception('[Vision] Extraction failed before an answer arrived')
     return catalogue_status_refusal(
         'internal_error', status.HTTP_500_INTERNAL_SERVER_ERROR, lang=lang
