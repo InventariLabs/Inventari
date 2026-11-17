@@ -145,7 +145,8 @@ class StorageLocationSummary(BaseModel):
     subtree_items_count: int = 0  # items here + in all descendants
     # Only populated when the other counts were narrowed — to one module by
     # module_scope, or to the general records by exclude_module_contexts:
-    # records of EVERY module standing directly in this location — the number
+    # records of EVERY module standing directly in this location — the home a
+    # record keeps or the place a module put it while it is there — the number
     # the deletion guard answers to, since the server refuses while any of
     # them stands here (children are reparented on delete, not asked first).
     # Zero on a listing nothing narrowed, where items_count already is the

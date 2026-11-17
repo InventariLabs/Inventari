@@ -179,13 +179,20 @@ class EquipmentItemInterceptor(ItemInterceptor):
 
 
 class CheckoutPlaceStorageGuard(StorageInterceptor):
-    """Veto deleting a place any assignment was ever checked out to.
+    """Veto deleting a place a returned asset was checked out to.
 
     ``EquipmentAssignment.checkout_location_id`` is ``ON DELETE SET NULL``, so
     a delete after the return would blank the holder line of that past
     checkout in the asset's timeline. The assignment is the asset's own
     history, like a stock move is the register's: the place is archived, not
-    deleted, once it appears in it — open or closed.
+    deleted, once it appears in it.
+
+    Only a closed assignment is asked here. An open one is a record standing
+    in the place — the core delete guard counts the placements its counts
+    read, so it refuses that place as one holding a record, with the same
+    answer the row's own number gives, before any module guard runs. This
+    guard answers for what no count shows: the history left when the asset is
+    back home.
     """
 
     priority = 40
@@ -203,6 +210,7 @@ class CheckoutPlaceStorageGuard(StorageInterceptor):
             .where(
                 EquipmentAssignment.organization_id == context.organization_id,
                 EquipmentAssignment.checkout_location_id == storage_id,
+                EquipmentAssignment.checked_in_at.is_not(None),
             )
         )
         if not count:

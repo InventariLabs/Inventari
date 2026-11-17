@@ -163,10 +163,10 @@ async def delete_storage(
     if storage_model is None:
         raise NotFoundException('storage', lang)
 
-    items_count = await core_api.locations.count_items_in_location_async(
-        db, org_id, location_id
+    items_count = await core_api.locations.item_counts_naming_locations_async(
+        db, org_id, [location_id]
     )
-    if items_count > 0:
+    if items_count.get(location_id, 0) > 0:
         raise catalogue_refusal('storage_delete_failed_items')
 
     try:

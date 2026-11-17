@@ -30,7 +30,6 @@ from app.core.exceptions import ServiceRejectionError
 from app.core.interceptors import interceptor_pipeline
 from app.i18n.service import get_current_lang, get_error_message
 from app.models.audit_log import AuditAction, AuditTargetType
-from app.models.item import Item
 from app.models.stock_move import StockMove
 from app.models.storage_location import LocationUsage, StorageLocation
 from app.schemas.storage_location import (
@@ -42,7 +41,10 @@ from app.schemas.storage_location import (
 )
 from app.services.audit_service import audit_value, log_action_async
 from app.services.storage._codes import code_for_new_location_async
-from app.services.storage._queries import locations_holding_stock_async
+from app.services.storage._queries import (
+    item_counts_naming_locations_async,
+    locations_holding_stock_async,
+)
 from app.services.storage._relocation import (
     path_to,
     products_in_async,
@@ -339,21 +341,16 @@ def _max_touching_index(
 async def _check_delete_guards(
     db: AsyncSession, org_id: UUID, plan: _Plan, data: StorageReorgRequest
 ) -> None:
-    """Reject deletes of locations that hold items or ledger references."""
+    """Reject deletes of locations that hold records or ledger references."""
     if not plan.deleted_ids:
         return
-    item_rows = (
-        await db.execute(
-            select(Item.storage_location_id, func.count())
-            .where(
-                Item.organization_id == org_id,
-                Item.storage_location_id.in_(plan.deleted_ids),
-                Item.is_deleted.is_(False),
-            )
-            .group_by(Item.storage_location_id)
-        )
-    ).all()
-    item_counts: dict[UUID, int] = {row[0]: row[1] for row in item_rows}
+    # Every record that names the location, not only the ones it is home to:
+    # a place an asset is checked out to is named by the open assignment, and
+    # a delete here would leave that assignment pointing at a row that is
+    # gone — the same refusal the single delete answers.
+    item_counts = await item_counts_naming_locations_async(
+        db, org_id, list(plan.deleted_ids)
+    )
     from_rows = (
         await db.execute(
             select(StockMove.from_location_id, func.count())

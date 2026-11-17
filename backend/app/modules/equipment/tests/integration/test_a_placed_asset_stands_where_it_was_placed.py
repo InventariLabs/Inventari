@@ -240,6 +240,8 @@ class TestAPlacedAssetStandsWhereItWasPlaced:
         assert rows['Workstations']['items_count'] == 1
         assert rows['Workstations']['subtree_items_count'] == 1
         assert rows['Server Room A']['items_count'] == 0
-        # The home keeps the record, and the delete guard answers for it.
+        # The home keeps the record, and the delete guard answers for both
+        # places the record names: the home it belongs to and the place it
+        # stands in, so neither can be deleted out from under the checkout.
         assert rows['Server Room A']['total_items_count'] == 1
-        assert rows['Workstations']['total_items_count'] == 0
+        assert rows['Workstations']['total_items_count'] == 1

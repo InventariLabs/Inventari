@@ -38,6 +38,7 @@ from app.services.audit_service import audit_key, audit_value, log_action_async
 from app.services.storage._codes import code_for_new_location_async
 from app.services.storage._queries import (
     is_descendant_async,
+    item_counts_naming_locations_async,
     locations_holding_stock_async,
 )
 from app.services.storage._relocation import record_moved_location_async
@@ -692,10 +693,12 @@ async def delete_storage(
     db: AsyncSession, storage: StorageLocation, user: UserContextDTO
 ) -> None:
     """Delete storage location after running interceptors."""
-    # Server-side guard: prevent deleting storage with items
+    # Server-side guard: prevent deleting storage with records standing in it
+    # — at home, or checked out to it: a placement names the location the same
+    # way a home does, and a delete would leave the open assignment naming a
+    # row that is gone.
     from sqlalchemy import func
 
-    from app.models.item import Item
     from app.models.stock_move import StockMove
 
     # Serialize DELETE with any concurrent stock_move INSERT for the same
@@ -705,12 +708,8 @@ async def delete_storage(
     # violation via the FK ON DELETE SET NULL cascade.
     await acquire_advisory_lock(db, f'storage_delete:{storage.id}')
 
-    item_count = await db.scalar(
-        select(func.count())
-        .select_from(Item)
-        .where(Item.storage_location_id == storage.id, Item.is_deleted.is_(False))
-    )
-    if item_count and item_count > 0:
+    named = await item_counts_naming_locations_async(db, _org_id(user), [storage.id])
+    if named.get(storage.id, 0) > 0:
         raise ServiceRejectionError('storage_delete_failed_items')
 
     # Server-side guard: prevent deleting storage referenced by StockMove ledger.
