@@ -368,6 +368,11 @@ says what the release does rather than what changed since them.
   and the server now count every record that names the location — the home it
   belongs to, or the place it is checked out to — and both doors into a delete
   (the single delete and the reorganization) refuse it.
+- A place that equipment was ever checked out to can no longer be deleted.
+  Deleting it blanked the holder line of that past checkout in the asset's
+  history: the dates stayed, the place the card named was gone. The delete is
+  now refused with a message that points to archiving the place instead, as a
+  place with stock movements already was.
 
 ### Removed
 
