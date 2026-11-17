@@ -238,18 +238,27 @@ def seeded_organization(
     return build
 
 
+#: Where the demo these sandboxes belong to is published. The demo compose
+#: file gives the seeding service ``FRONTEND_URL=https://${DOMAIN}``.
+DEMO_ADDRESS = 'https://demo.example.org'
+
+
 def pooled_sandboxes(async_engine: Any) -> Callable[[Session], list[list[str]]]:
     """A build for two sandboxes made the way ``demo fill-pool`` makes one.
 
     The order is the pool's own -- open, onboard (profile, modules), seed,
     dress, offer -- because the sandbox a visitor receives is the product of
-    that order. Each pair is an organization and its administrator, who waits
-    inactive on the pool until a visitor takes the sandbox.
+    that order, on an instance that declares itself a demo published at
+    ``DEMO_ADDRESS``. Each pair is an organization and its administrator, who
+    waits inactive on the pool until a visitor takes the sandbox.
     """
 
     def build(db: Session) -> list[list[str]]:
         opened = []
-        with patch.object(settings, 'INVENTARI_DEMO', True):
+        with (
+            patch.object(settings, 'INVENTARI_DEMO', True),
+            patch.object(settings, 'FRONTEND_URL', DEMO_ADDRESS),
+        ):
             for _ in range(2):
                 org_id, user_id, email = open_sandbox_account(db)
                 run_in_async_session(

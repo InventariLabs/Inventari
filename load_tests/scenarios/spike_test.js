@@ -56,7 +56,7 @@ export default function () {
   http.batch([
     ['GET', `${BASE_URL}/api/v1/items`, null, { headers, tags: { name: 'items/list' } }],
     ['GET', `${BASE_URL}/api/v1/locations`, null, { headers, tags: { name: 'storages/list' } }],
-    ['GET', `${BASE_URL}/api/v1/items/expiring`, null, { headers, tags: { name: 'items/expiring' } }],
+    ['GET', `${BASE_URL}/api/v1/items?expiring_days=7`, null, { headers, tags: { name: 'items/expiring' } }],
     ['GET', `${BASE_URL}/api/v1/stats/overview`, null, { headers, tags: { name: 'stats/overview' } }],
   ]);
 

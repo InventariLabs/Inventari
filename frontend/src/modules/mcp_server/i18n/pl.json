@@ -1,7 +1,7 @@
 {
   "title": "Serwer MCP",
   "description": "Połącz agenta AI z tą przestrzenią kluczem API, przez Model Context Protocol.",
-  "subtitle": "Adres, klucz i hosty, na których odpowiada ta przestrzeń.",
+  "subtitle": "Gdzie agent AI łączy się z tą przestrzenią, jaki klucz API wysyła i na jakich hostach odpowiada endpoint.",
   "endpoint": {
     "label": "Endpoint",
     "hint": "Wskaż ten adres w kliencie MCP."

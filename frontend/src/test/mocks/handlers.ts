@@ -1504,9 +1504,6 @@ export const handlers = [
   http.post("/api/v1/equipment/templates/seed-defaults", () => {
     return HttpResponse.json({ seeded: true });
   }),
-  http.get("/api/v1/equipment/protocol/placeholders", () => {
-    return HttpResponse.json([]);
-  }),
   http.get("/api/v1/equipment/assignments/:id/protocol/html", () => {
     return HttpResponse.text("<html><body>Protocol</body></html>");
   }),

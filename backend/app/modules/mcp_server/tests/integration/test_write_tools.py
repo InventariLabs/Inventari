@@ -491,3 +491,95 @@ class TestCorrectStock:
         assert call.snapshot is not None
         assert Decimal(call.snapshot['before']['quantity']) == Decimal('7')
         assert Decimal(str(_record(db_session, item.id).quantity)) == Decimal('3')
+
+    def test_a_record_moved_while_the_call_waited_locks_its_new_group_too(
+        self,
+        mcp_tool,
+        db_session: Session,
+        mcp_org: Organization,
+        mcp_user: User,
+        mcp_write_key: str,
+        item: Item,
+        monkeypatch,
+    ) -> None:
+        """The group the record stands in once the call holds it is locked as well.
+
+        Another operator moves the record to a second shelf and commits between
+        this call's first read and its lock. The call locked the group it read,
+        (product, first shelf); the record it then holds writes (product,
+        second shelf), so that group is locked too before the first write, and
+        the correction is posted where the record stands.
+
+        That second lock is taken while the first one is held, after it, and
+        so outside the one sorted order the Stock Posting Rules ask for. A
+        single move during the wait, as here, cannot deadlock on it — nothing
+        holds the new group in the other order. Two corrections that each find
+        their record moved into the group the other locked first would wait on
+        each other; PostgreSQL detects that deadlock and aborts one of the two
+        transactions, whose tool call fails and posts nothing, and the agent
+        can call it again.
+        """
+        second_shelf = StorageLocation(
+            organization_id=mcp_org.id,
+            created_by=mcp_user.id,
+            name='Cold Storage B',
+        )
+        db_session.add(second_shelf)
+        db_session.commit()
+        first_shelf_id = item.storage_location_id
+        second_shelf_id = second_shelf.id
+        template_id = item.template_id
+
+        first_read = core_api.items.get_async
+        moved = False
+
+        async def read_then_another_move(db, organization_id, item_id):
+            nonlocal moved
+            found = await first_read(db, organization_id, item_id)
+            if not moved:
+                moved = True
+                # A connection of its own, so the move commits for real while
+                # this request's transaction is open and has read.
+                async with AsyncSession(bind=db.bind, expire_on_commit=False) as other:
+                    await core_api.items.transfer_async(
+                        other,
+                        organization_id,
+                        item_id,
+                        second_shelf_id,
+                        user_id=mcp_user.id,
+                    )
+                    await other.commit()
+            return found
+
+        locked: list[list[tuple[UUID, UUID | None]]] = []
+        lock = core_api.stock.lock_async
+
+        async def recording_lock(db, organization_id, *, keys=(), **kwargs):
+            locked.append(list(keys))
+            await lock(db, organization_id, keys=keys, **kwargs)
+
+        monkeypatch.setattr(core_api.items, 'get_async', read_then_another_move)
+        monkeypatch.setattr(core_api.stock, 'lock_async', recording_lock)
+
+        result = mcp_tool(
+            mcp_write_key,
+            'correct_stock',
+            {'item_id': str(item.id), 'quantity': 3, 'reason': 'Counted three'},
+        )
+
+        payload = _structured(result)
+        assert locked == [
+            [(template_id, first_shelf_id)],
+            [(template_id, second_shelf_id)],
+        ]
+        db_session.expire_all()
+        record = _record(db_session, item.id)
+        assert record.storage_location_id == second_shelf_id
+        assert Decimal(str(record.quantity)) == Decimal('3')
+        moves = db_session.scalars(
+            select(StockMove).where(
+                StockMove.reference_id == UUID(payload['reference'])
+            )
+        ).all()
+        assert len(moves) == 1
+        assert moves[0].from_location_id == second_shelf_id

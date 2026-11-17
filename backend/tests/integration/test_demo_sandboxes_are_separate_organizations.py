@@ -32,7 +32,6 @@ from app.models.storage_type import StorageType
 from app.models.user import User
 from app.modules.warehouse.models import Document
 from app.services.token_service import create_access_token
-from tests.integration._demo_world import ids, pooled_sandboxes
 
 pytestmark = pytest.mark.integration
 
@@ -51,21 +50,6 @@ def _remove(db: Session, org_id: uuid.UUID) -> None:
         synchronize_session=False
     )
     db.commit()
-
-
-@pytest.fixture
-def two_sandboxes(
-    demo_world, async_engine_fixture, db_session: Session
-) -> list[tuple[uuid.UUID, uuid.UUID]]:
-    """Two visitors' organizations, each with its administrator, seeded and dressed."""
-    payload = demo_world('pooled-sandboxes', pooled_sandboxes(async_engine_fixture))
-    opened = [ids(pair) for pair in payload]
-    for _org_id, user_id in opened:
-        admin = db_session.get(User, user_id)
-        assert admin is not None
-        admin.is_active = True  # what handing it to a visitor does
-    db_session.commit()
-    return opened
 
 
 def _as(user_id: uuid.UUID) -> dict[str, str]:

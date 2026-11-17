@@ -81,6 +81,15 @@ says what the release does rather than what changed since them.
   `X-API-Key`, which the endpoint and the rest of the API both accept; an
   organization lists the hosts and origins its deployment answers on in the
   module's settings card, and every other `Host`/`Origin` is refused.
+- On the public demo a visitor can connect an AI agent to their own sandbox.
+  Every sandbox the demo hands out has API Keys and MCP Server switched on and
+  the demo's address allowed, so a visitor issues a key there — read-only, or
+  with **Add products and change stock levels** — and the agent searches a
+  product, reads its stock and posts a correction in that sandbox alone. The
+  demo publishes no key; the nightly rebuild deletes every key with its
+  sandbox. `docs/DEMO.md`, *Connect an AI agent*, walks it in about ten
+  minutes and says what an agent may do there, the limits it meets and that
+  what it reads goes to the model provider the visitor chose.
 - A module can close what it opened: `BaseModule.on_shutdown_async` runs at
   application shutdown in the reverse of the startup order, so a task group,
   connection or exit stack started by the module is closed with the app, and
@@ -90,7 +99,8 @@ says what the release does rather than what changed since them.
   journal, and `effective_expiry`, the day a package really stops being fit to
   use — the batch's date or the use-by an opening wrote, whichever is earlier —
   so a module reading an expiry window can judge a package by the date the
-  screens, the forecast and `GET /items/expiring` report.
+  screens and the forecast report, which is also the date the items list's
+  `expiring_days` filter selects on.
   `core_api.items.list_by_expiry_async` takes `expiry_after` and
   `expiry_before`, so a caller reading one expiry window filters the query
   instead of reading a capped list and discarding rows after it. The app-level

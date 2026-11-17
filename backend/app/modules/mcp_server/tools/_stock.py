@@ -200,7 +200,7 @@ def register_stock_tools(server: MCPServer) -> None:
             # The window is the effective expiry — the batch date or the
             # opened package's use-by, whichever is earlier — because that is
             # what the query filtered on and what the provider's screens,
-            # forecast and GET /items/expiring report. Judging by the raw
+            # forecast and the items list's expiring_days filter report. Judging by the raw
             # batch date here dropped an opened jar whose use-by was inside
             # the window while the same answer's forecast counted it.
             window_end = today + timedelta(days=days)

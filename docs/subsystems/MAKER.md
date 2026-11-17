@@ -102,7 +102,6 @@ read, not how it is stored. See TECHNICAL_DECISIONS.md §19.
 
 | Endpoint | Description |
 |---|---|
-| `GET /bom/parents` | Every template that has BoM lines (parent + line_count). |
 | `GET /bom/summary?template_ids=` | Batched: has-BoM + line_count + `default_recipe_id` (badges on product lists). |
 | `GET /bom/template-ids` | Every template in the organization that has at least one BoM line — feeds the "BOM" filter on the virtualised product list, which cannot decide row by row from data it has not fetched. |
 | `GET /bom/where-used?template_id=` | The reverse edge — recipes that use a template (JOIN lines→recipes, direct use only, org-scoped, cycles have no effect). |
