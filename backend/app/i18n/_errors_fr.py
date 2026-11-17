@@ -89,7 +89,7 @@ ERRORS_FR: ErrorMessages = {
     'storage_create_failed': "Échec de la création de l'emplacement de stockage",
     'storage_update_failed': "Échec de la mise à jour de l'emplacement de stockage",
     'storage_delete_failed': "Échec de la suppression de l'emplacement de stockage",
-    'storage_delete_failed_items': "Impossible de supprimer un emplacement contenant des articles. Déplacez-les ou supprimez-les d'abord.",
+    'storage_delete_failed_items': "Impossible de supprimer un emplacement contenant des articles ou vers lequel des articles sont sortis. Déplacez-les, retournez-les ou supprimez-les d'abord.",
     'storage_delete_blocked_by_production_orders': "Impossible de supprimer l'emplacement : il est utilisé par des ordres de production.",
     'storage_type_not_found': "Type d'emplacement de stockage introuvable",
     'storage_type_create_failed': "Échec de la création du type d'emplacement",

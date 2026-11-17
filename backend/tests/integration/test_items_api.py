@@ -240,6 +240,72 @@ class TestItemsList:
         names = {item['name'] for item in response.json()['items']}
         assert names == {'Wanted product'}
 
+    def test_get_items_filter_by_source_document_reads_the_history(
+        self, client, auth_headers, db_session, test_user, test_storage_location
+    ):
+        """A product the document moved stock into answers to that document.
+
+        Provenance is written to the item's history, one row per event; the
+        filter reads it from there. A product the document never touched, and
+        one a different document touched, stay out of the answer.
+        """
+        from app.models.item import Item
+        from app.models.item_history import ItemAction, ItemHistory
+        from app.modules.warehouse.models import Document
+
+        documents = []
+        for number in ('PZ/1', 'PZ/2'):
+            document = Document(
+                organization_id=test_user.organization_id,
+                type='IN',
+                number=number,
+                created_by=test_user.id,
+            )
+            db_session.add(document)
+            documents.append(document)
+        anchor_pending_records(db_session)
+        db_session.flush()
+
+        for name, document in (('Received', documents[0]), ('Elsewhere', documents[1])):
+            item = Item(
+                name=name,
+                quantity=1,
+                organization_id=test_user.organization_id,
+                storage_location_id=test_storage_location.id,
+            )
+            db_session.add(item)
+            anchor_pending_records(db_session)
+            db_session.flush()
+            db_session.add(
+                ItemHistory(
+                    item_id=item.id,
+                    organization_id=test_user.organization_id,
+                    user_id=test_user.id,
+                    action=ItemAction.CREATED.value,
+                    changes={},
+                    source_document_id=document.id,
+                )
+            )
+        db_session.add(
+            Item(
+                name='Untouched',
+                quantity=1,
+                organization_id=test_user.organization_id,
+                storage_location_id=test_storage_location.id,
+            )
+        )
+        anchor_pending_records(db_session)
+        db_session.commit()
+
+        response = client.get(
+            f'/api/v1/items?source_document_id={documents[0].id}',
+            headers=auth_headers,
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        names = {item['name'] for item in response.json()['items']}
+        assert names == {'Received'}
+
     def test_get_items_template_ids_accepts_several(
         self, client, auth_headers, db_session, test_user, test_storage_location
     ):

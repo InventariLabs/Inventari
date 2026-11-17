@@ -116,6 +116,9 @@ async def _split_one_unit_async(
             added_date=item.added_date,
         ),
         user,
+        # The unit was already here: the record's birth says so, and a report
+        # of what was bought leaves it out.
+        history_changes={'reason': 'package_opened'},
         post_the_change=False,
         lot_id=item.lot_id,
         owner_id=item.owner_id,

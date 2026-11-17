@@ -706,6 +706,7 @@
         "stock_take_adjustment": "Korekta z inwentaryzacji",
         "production_run": "Zlecenie produkcyjne",
         "production_run_reversed": "Zlecenie produkcyjne cofnięte",
+        "package_opened": "Otwarcie opakowania",
         "circuit_breaker": "Odłączone przez bezpiecznik po powtarzających się niepowodzeniach dostawy"
       },
       "targetTypes": {

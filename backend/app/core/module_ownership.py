@@ -309,18 +309,16 @@ def standing_location(module_name: str, organization_id: UUID) -> ColumnElement[
     return func.coalesce(placed, Item.storage_location_id)
 
 
-def placement_location_columns(organization_id: UUID) -> list[ColumnElement[UUID]]:
-    """One column per module that places records: the place, or NULL.
+def record_placements(
+    organization_id: UUID,
+) -> list[Select[tuple[UUID, UUID | None]]]:
+    """Every module's placements of the organization, one select per module.
 
-    Each column answers "where did this module put this record" for the
-    record on the row, and NULL where it put it nowhere. A reader that is not
-    narrowed to one module — the delete guard, which must refuse every place
-    any module's record names — asks them all instead of one.
+    Each is ``select(<item id>, <location id>)``, as registered. A reader that
+    is not narrowed to one module — the delete guard, which must refuse every
+    place any module's record names — asks them all, and joins them to the
+    records they name: the work then follows the number of placements, not
+    the number of records (a correlated column per record is evaluated for
+    every record of the organization, checkouts or none).
     """
-    return [
-        placed
-        for placed in (
-            _placement_column(name, organization_id) for name in sorted(_placements)
-        )
-        if placed is not None
-    ]
+    return [fn(organization_id) for _, fn in sorted(_placements.items())]
