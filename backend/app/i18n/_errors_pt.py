@@ -31,7 +31,7 @@ ERRORS_PT: dict[str, str] = {
     'storage_create_failed': 'Falha ao criar o local de armazenamento',
     'storage_update_failed': 'Falha ao atualizar o local de armazenamento',
     'storage_delete_failed': 'Falha ao excluir o local de armazenamento',
-    'storage_delete_failed_items': 'Não é possível excluir um local de armazenamento que contém itens. Mova ou exclua os itens primeiro.',
+    'storage_delete_failed_items': 'Não é possível excluir um local de armazenamento que contém itens ou para o qual há itens emprestados. Mova, devolva ou exclua os itens primeiro.',
     'storage_delete_blocked_by_production_orders': 'Não é possível excluir o local de armazenamento: ele é usado por ordens de produção.',
     'storage_type_not_found': 'Tipo de local de armazenamento não encontrado',
     'storage_type_create_failed': 'Falha ao criar o tipo de local de armazenamento',

@@ -92,7 +92,7 @@ ERRORS_DE: ErrorMessages = {
     'storage_create_failed': 'Lagerort konnte nicht erstellt werden',
     'storage_update_failed': 'Lagerort konnte nicht aktualisiert werden',
     'storage_delete_failed': 'Lagerort konnte nicht gelöscht werden',
-    'storage_delete_failed_items': 'Ein Lagerort mit Artikeln kann nicht gelöscht werden. Verschieben oder löschen Sie die Artikel zuerst.',
+    'storage_delete_failed_items': 'Ein Lagerort, in dem Artikel liegen oder an den Artikel ausgegeben sind, kann nicht gelöscht werden. Verschieben, zurückgeben oder löschen Sie die Artikel zuerst.',
     'storage_delete_blocked_by_production_orders': 'Lagerort kann nicht gelöscht werden: Er wird von Produktionsaufträgen verwendet.',
     'storage_type_not_found': 'Lagerorttyp nicht gefunden',
     'storage_type_create_failed': 'Lagerorttyp konnte nicht erstellt werden',

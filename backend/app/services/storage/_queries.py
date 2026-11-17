@@ -225,24 +225,28 @@ async def item_counts_naming_locations_async(
     if not storage_ids:
         return {}
     counts = dict(await item_counts_by_location_async(db, organization_id, storage_ids))
-    from app.core.module_ownership import placement_location_columns
+    from app.core.module_ownership import record_placements
 
-    for placed in placement_location_columns(organization_id):
+    # Driven from the placements, joined to the records they name, so the work
+    # follows the number of checkouts and not the number of records.
+    for select_placed in record_placements(organization_id):
+        placed = select_placed.subquery()
+        item_id, location_id = placed.c
         rows = await db.execute(
-            select(placed, func.count(Item.id))
+            select(location_id, func.count(Item.id))
+            .join(Item, Item.id == item_id)
             .where(
                 Item.organization_id == organization_id,
                 Item.is_deleted.is_(False),
-                placed.is_not(None),
-                in_ids(placed, storage_ids),
+                in_ids(location_id, storage_ids),
                 # A record checked out to its own home names that place once,
                 # and the home count above already has it.
-                Item.storage_location_id.is_distinct_from(placed),
+                Item.storage_location_id.is_distinct_from(location_id),
             )
-            .group_by(placed)
+            .group_by(location_id)
         )
-        for location_id, count in rows.all():
-            counts[location_id] = counts.get(location_id, 0) + count
+        for placed_id, count in rows.all():
+            counts[placed_id] = counts.get(placed_id, 0) + count
     return counts
 
 

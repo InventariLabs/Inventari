@@ -680,7 +680,7 @@ apart.
 | `STORAGE_DELETE_BLOCKED_BY_REFERENCES` | Cannot delete storage location: it is still referenced by other records (constraint "{constraint}"). Archive it instead. |
 | `STORAGE_DELETE_BLOCKED_BY_STOCK` | Cannot delete storage location: the stock register still holds stock here with no record standing on it. Archive this location instead, or bring its stock back to a record first. |
 | `STORAGE_DELETE_CONCURRENT_MOVEMENTS` | Cannot delete storage: a concurrent transaction created stock movements referencing it. Retry to refresh the count. Original error: {error} |
-| `STORAGE_DELETE_FAILED_ITEMS` | Cannot delete a storage location that contains items. Move or delete them first. |
+| `STORAGE_DELETE_FAILED_ITEMS` | Cannot delete a storage location that contains items or that items are checked out to. Move, return or delete them first. |
 | `STORAGE_LOCATION_AMBIGUOUS` | "{text}" matches {count} storage locations ({shown}). Name the path instead, for example "{example}". |
 | `STORAGE_NOT_FOUND` | Storage location not found |
 | `STORAGE_NO_SHORT_CODE` | Storage has no short code. Generate one first. |
