@@ -1010,6 +1010,12 @@ async def _receive_output(
             expiry_date=best_before,
         ),
         user=user,
+        # The record's birth says a run made it: a report of what was bought
+        # reads the records created in a window and leaves these out.
+        history_changes={
+            'reason': 'production_run',
+            'production_order_id': str(order.id),
+        },
         post_the_change=False,
     )
     if order.produced_item_id is None:
