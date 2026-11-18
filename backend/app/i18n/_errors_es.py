@@ -420,6 +420,7 @@ ERRORS_ES: ErrorMessages = {
     'meal_plan_entry_date_out_of_range': 'La fecha de la entrada está fuera del rango de fechas del plan.',
     'meal_plan_slot_not_enabled': 'Esa comida no está habilitada para este plan.',
     'shopping_exclusion_exists': 'Esta exclusión ya existe.',
+    'shopping_exclusion_name_has_no_key': 'Una exclusión necesita un nombre; solo espacios o caracteres invisibles no bastan.',
     'shopping_item_already_purchased': 'Este artículo ya está marcado como comprado.',
     'shopping_item_already_purchased_reset': 'Este artículo ya está marcado como comprado. Márcalo primero como no comprado para cambiarlo.',
     'shopping_list_not_editable': 'No se puede editar una lista de compras completada o archivada.',

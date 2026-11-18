@@ -106,6 +106,7 @@ from app.core.file_reference import (
     served_url,
     stored_reference,
 )
+from app.core.import_sheet import cell_text, read_sheet
 from app.core.interceptors import InterceptorPipeline, interceptor_pipeline
 from app.core.location_path import join_location_path
 from app.core.logging import get_logger
@@ -201,6 +202,7 @@ __all__ = [
     'UploadPolicy',
     'ValidationException',
     'audit_actor_scope',
+    'cell_text',
     'current_actor',
     'contribution_registry',
     'convert_naive_timestamps_to_utc',
@@ -229,6 +231,7 @@ __all__ = [
     'record_settings',
     'register_api_key_scope',
     'register_lot_trace_source',
+    'read_sheet',
     'register_work_in_progress_provider',
     'relation_exists',
     'require_module',

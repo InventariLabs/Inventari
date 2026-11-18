@@ -2535,6 +2535,16 @@
       "kind": "function",
       "params": []
     },
+    "cell_text": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "raw",
+          "required": true
+        }
+      ]
+    },
     "contribution_registry": {
       "kind": "value",
       "members": {
@@ -3531,6 +3541,26 @@
         {
           "kind": "POSITIONAL_OR_KEYWORD",
           "name": "es",
+          "required": false
+        }
+      ]
+    },
+    "read_sheet": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "content",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "filename",
+          "required": true
+        },
+        {
+          "kind": "VAR_KEYWORD",
+          "name": "kwargs",
           "required": false
         }
       ]

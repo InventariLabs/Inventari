@@ -309,6 +309,7 @@ class ErrorMessages(TypedDict):
     meal_plan_entry_date_out_of_range: str
     meal_plan_slot_not_enabled: str
     shopping_exclusion_exists: str
+    shopping_exclusion_name_has_no_key: str
     shopping_item_already_purchased: str
     shopping_item_already_purchased_reset: str
     shopping_list_not_editable: str

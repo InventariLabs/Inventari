@@ -231,6 +231,10 @@ says what the release does rather than what changed since them.
   flag that marks the edit's journal entry as one of a batch, and
   `core_api.ai_connections.set_binding_async` an optional `user` it names in
   the entry it writes. Callers that pass neither are unchanged.
+- For module authors: the module SDK exports `read_sheet` and `cell_text` —
+  the shared reader that turns an uploaded CSV or workbook into a frame of
+  text cells (tolerant of a BOM, of the locale's codepage and of semicolon or
+  tab separators) and the accessor that reads one cell as the text it is.
 
 ### Changed
 
@@ -424,6 +428,16 @@ says what the release does rather than what changed since them.
   history: the dates stayed, the place the card named was gone. The delete is
   now refused with a message that points to archiving the place instead, as a
   place with stock movements already was.
+- The ingredient dictionary reads the CSV a spreadsheet actually saves. A
+  file separated by semicolons — the separator in Polish, German, French and
+  Spanish locales — imports its rows instead of being refused as unreadable,
+  a file saved in the local codepage (cp1250) keeps its Polish letters
+  instead of storing a replacement character for each one, and a decimal
+  comma such as `368,5` reads as the decimal it names.
+- A shopping exclusion made only of spaces, zero-width spaces or a byte order
+  mark is refused instead of being saved as an empty name that excludes
+  nothing, and the next such name no longer answers that the exclusion
+  already exists.
 - The ingredient dictionary refuses a name made only of invisible characters
   (a zero-width space, a byte order mark) instead of filing it under the empty
   key every blank row shares, and counts such a row as an error on import. A

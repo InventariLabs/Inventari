@@ -30,6 +30,7 @@ from .defaults_service import (
     import_defaults,
     list_defaults,
     lookup_default,
+    read_defaults_csv,
     upsert_org_default,
 )
 from .schemas import (
@@ -168,7 +169,6 @@ async def import_ingredient_defaults(
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> ImportDefaultsResult:
     """Import nutrition defaults from a JSON or CSV file upload."""
-    import csv as csv_module
     import json as json_module
 
     org_id = require_org(current_user)
@@ -180,15 +180,15 @@ async def import_ingredient_defaults(
             code=refusal_code(exc, 'FILE_TOO_LARGE'),
             message=refusal_text(exc),
         ) from exc
-    # 'utf-8-sig' drops the BOM an Excel "CSV UTF-8" file opens with; plain
-    # 'utf-8' keeps it in the first header and every row then lacks 'name'.
+    # 'utf-8-sig' drops the byte order mark a file saved with one opens with.
+    # It is the JSON branch's decode: a CSV goes through the shared reader,
+    # which names the encoding itself (BOM, codepage and all).
     content = raw.decode('utf-8-sig', errors='replace')
     filename = (file.filename or '').lower()
 
     try:
         if filename.endswith('.csv'):
-            reader = csv_module.DictReader(content.splitlines())
-            items = list(reader)
+            items = read_defaults_csv(raw, file.filename or '')
         else:
             items = json_module.loads(content)
     except Exception as exc:  # an uploaded file's every parse failure is a refusal
