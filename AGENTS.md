@@ -56,21 +56,14 @@ is the only record of the change there is.
 
 ### Comments and docstrings
 
-A comment or docstring says what the code does and the constraint that makes it
-so, in the present tense. How the code got here (the defect, its cause, the fix)
-belongs in the commit message, where `git blame` leads. A regression test's
-docstring names what must hold, not how it once failed.
-
-- Not: "A group used to be locked by whoever wrote it, so two of them
-  deadlocked." Instead: "Every group is locked here, before the first write
-  and in id order, so a second operation waits instead of deadlocking."
-- Not: "Regression: a dead invitation link rendered the sign-in form."
-  Instead: "A dead invitation link answers 404, not the sign-in form."
-- `make lint` and `make check-frontend` run `backend/scripts/check_history_comments.py`:
-  per file, lines that narrate the past (`used to`, `previously`, `formerly`,
-  `until now`, "the old code", …) may not exceed the recorded baseline, and a
-  new file starts at 0. A phrase that truly describes the present is rare;
-  rewrite the line first.
+A comment or docstring says what the code does and the constraint behind it, in
+the present tense; how the code got here belongs in the commit message. A
+regression test's docstring names what must hold, not how it once failed. Not
+"A group used to be locked by whoever wrote it, so two deadlocked"; instead
+"Every group is locked here, in id order, so a second operation waits."
+`make lint` and `make check-frontend` run `backend/scripts/check_history_comments.py`:
+per file, lines with `used to`, `previously`, `formerly`, `until now` or "the old
+code" may not exceed the recorded baseline, and a new file starts at 0.
 
 ### Changelog
 
