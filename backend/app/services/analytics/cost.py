@@ -308,7 +308,8 @@ def _build_savings_opportunities(
             suggestion=f'Consider smaller packaging or better shopping planning for {name}',
         )
         for name, data in sorted(
-            wasted_by_product.items(), key=lambda x: x[1]['wasted_amount'], reverse=True
+            wasted_by_product.items(),
+            key=lambda x: (-x[1]['wasted_amount'], x[0].casefold(), x[0]),
         )[:5]
         if data['wasted_amount'] > 0
     ]
@@ -445,7 +446,12 @@ async def get_cost_summary_async(
             }
         )
         for data in sorted(
-            category_costs.values(), key=lambda x: x['total_spent'], reverse=True
+            category_costs.values(),
+            key=lambda x: (
+                -x['total_spent'],
+                x['category_name'].casefold(),
+                x['category_name'],
+            ),
         )[:5]
     ]
 
