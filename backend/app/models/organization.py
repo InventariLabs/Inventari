@@ -1,6 +1,6 @@
 import uuid
 from datetime import UTC, datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, deferred, mapped_column, relationship
@@ -9,6 +9,12 @@ from sqlalchemy.orm import Mapped, deferred, mapped_column, relationship
 # re-exports the same set but pulls in the loader, and this is a model.
 from app.core.module_safety import ALWAYS_ON_MODULES, is_always_on
 from app.database import Base
+
+if TYPE_CHECKING:
+    from app.models.item import Item
+    from app.models.storage_location import StorageLocation
+    from app.models.storage_type import StorageType
+    from app.models.user import User
 
 
 class Organization(Base):
@@ -126,28 +132,30 @@ class Organization(Base):
     logo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     # Relationships
-    members: Mapped[list['User']] = relationship(  # type: ignore[name-defined]
+    members: Mapped[list['User']] = relationship(
         back_populates='organization', foreign_keys='User.organization_id'
     )
-    storage_locations: Mapped[list['StorageLocation']] = relationship(  # type: ignore[name-defined]
+    storage_locations: Mapped[list['StorageLocation']] = relationship(
         back_populates='organization', cascade='all, delete-orphan'
     )
-    storage_types: Mapped[list['StorageType']] = relationship(  # type: ignore[name-defined]
+    storage_types: Mapped[list['StorageType']] = relationship(
         back_populates='organization', cascade='all, delete-orphan'
     )
-    creator: Mapped['User | None'] = relationship(  # type: ignore[name-defined]
+    creator: Mapped['User | None'] = relationship(
         foreign_keys=[created_by], back_populates='created_organizations'
     )
     invitations: Mapped[list['OrganizationInvitation']] = relationship(
         back_populates='organization',
         cascade='all, delete-orphan',
     )
-    items: Mapped[list['Item']] = relationship(  # type: ignore[name-defined]
+    items: Mapped[list['Item']] = relationship(
         back_populates='organization', cascade='all, delete-orphan'
     )
 
     @staticmethod
-    def is_module_enabled_value(enabled_modules: list | None, module_name: str) -> bool:
+    def is_module_enabled_value(
+        enabled_modules: list[Any] | None, module_name: str
+    ) -> bool:
         """Module-enablement check against a raw ``enabled_modules`` value.
 
         Shared by the ORM method and the CoreAPI column getter so the
@@ -222,4 +230,4 @@ class OrganizationInvitation(Base):
 
     # Relationships
     organization: Mapped['Organization'] = relationship(back_populates='invitations')
-    creator: Mapped['User'] = relationship(foreign_keys=[created_by])  # type: ignore[name-defined]
+    creator: Mapped['User'] = relationship(foreign_keys=[created_by])

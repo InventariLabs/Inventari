@@ -9,10 +9,12 @@ POST /onboarding/switch-profile — admin-only endpoint that switches an
 already-onboarded organisation to a different product profile.
 """
 
+from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field, field_validator
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_current_admin_user
 from app.core._require_module import invalidate_enabled_modules
@@ -47,6 +49,9 @@ from app.services.profile_switch_service import (
 )
 
 logger = get_logger(__name__)
+
+if TYPE_CHECKING:
+    from app.models.organization import Organization
 
 router = APIRouter()
 
@@ -164,7 +169,7 @@ async def onboarding_country_preset(
 async def onboarding_setup(
     body: OnboardingSetupRequest,
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> OrganizationDTO:
     """
     Apply a product profile to the current organisation.
@@ -282,7 +287,10 @@ async def onboarding_setup(
 
 
 async def _enter_chosen_module(
-    db, organization, focus_module: str, current_user: UserContextDTO
+    db: AsyncSession,
+    organization: 'Organization',
+    focus_module: str,
+    current_user: UserContextDTO,
 ) -> OrganizationDTO:
     """Enter focus mode on top of the profile applied in this transaction.
 
@@ -333,7 +341,7 @@ async def _enter_chosen_module(
 async def switch_profile(
     body: ProfileSwitchRequest,
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> ProfileSwitchResponse:
     """Switch the current organisation to a new product profile.
 

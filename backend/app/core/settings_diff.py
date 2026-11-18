@@ -9,7 +9,7 @@ nothing moved — a journal records changes, not keystrokes.
 """
 
 from decimal import Decimal
-from typing import Any
+from typing import Any, cast
 
 from sqlalchemy import inspect
 
@@ -87,7 +87,7 @@ async def journal_config_change(
         snapshot={
             'name': module,
             'subject': subject,
-            **audit_value(context or {}),
+            **cast('dict[str, Any]', audit_value(context or {})),
             **snapshot,
         },
     )

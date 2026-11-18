@@ -1,6 +1,8 @@
+from typing import Any
 from uuid import UUID
 
 from fastapi import Depends, Response, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import UserContextDTO
 from app.core.deps import get_async_db, get_current_user_context, require_org
@@ -49,8 +51,8 @@ logger = get_logger(__name__)
 async def create_storage_hierarchy(
     data: StorageHierarchyCreate,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Atomically create a full location chain: [Site →] [Zone →] Storage."""
     # A router docstring is the endpoint's public description in the schema, so
     # the reason lives here instead: a ``ValueError`` is bad input, not a missing
@@ -65,8 +67,8 @@ async def create_storage_hierarchy(
 async def create_storage(
     storage_in: StorageLocationCreate,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Create new storage location."""
     try:
         return await svc_create_storage(db, storage_in, current_user)
@@ -78,8 +80,8 @@ async def update_storage(
     location_id: UUID,
     storage_in: StorageLocationUpdate,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Update storage location."""
     org_id = require_org(current_user)
     storage_model = await svc_get_storage(db, org_id, location_id)
@@ -98,8 +100,8 @@ async def reorg_storages(
     data: StorageReorgRequest,
     response: Response,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Apply a batch of storage tree operations in one transaction.
 
     Structural or business violations reject the whole batch (applied=False)
@@ -119,8 +121,8 @@ async def archive_storage(
     location_id: UUID,
     data: StorageArchiveRequest,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Archive a storage location, optionally moving its items out first."""
     lang = get_current_lang()
     org_id = require_org(current_user)
@@ -136,8 +138,8 @@ async def archive_storage(
 async def unarchive_storage(
     location_id: UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Restore an archived storage location."""
     lang = get_current_lang()
     org_id = require_org(current_user)
@@ -153,8 +155,8 @@ async def unarchive_storage(
 async def delete_storage(
     location_id: UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> None:
     """Delete storage location."""
     lang = get_current_lang()
     org_id = require_org(current_user)
@@ -198,8 +200,8 @@ async def delete_storage(
 async def generate_storage_code(
     location_id: UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Assigns a short_code (LOC-XXXX) to a storage location that doesn't have one yet."""
     org_id = require_org(current_user)
     storage_model = await svc_get_storage(db, org_id, location_id)
@@ -208,7 +210,9 @@ async def generate_storage_code(
     return await ensure_short_code_async(db, storage_model, user_id=current_user.id)
 
 
-async def _codes_of(db, org_id: UUID, location_id: UUID) -> dict:
+async def _codes_of(
+    db: AsyncSession, org_id: UUID, location_id: UUID
+) -> dict[str, Any]:
     from app.services.storage._codes import warehouse_codes_async
 
     codes = await warehouse_codes_async(db, org_id, location_id)
@@ -221,8 +225,8 @@ async def set_storage_code_template(
     location_id: UUID,
     data: StorageCodeTemplateUpdate,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Set the code template of a warehouse (a top-level location).
 
     Rewrites no code: renumbering is a separate step.
@@ -241,8 +245,8 @@ async def number_storage_branch(
     location_id: UUID,
     data: StorageNumberRequest,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Give a warehouse, or a branch of one, the codes its template makes.
 
     Every code that changes stays behind as a pool label aimed at its
@@ -272,7 +276,7 @@ async def number_storage_branch(
 async def mark_storages_reprinted(
     data: StorageReprintedRequest,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> Response:
     """The new stickers of these locations are on the shelves.
 

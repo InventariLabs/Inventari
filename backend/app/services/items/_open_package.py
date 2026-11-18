@@ -22,7 +22,7 @@ from __future__ import annotations
 
 from datetime import UTC, date, datetime
 from decimal import Decimal
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from sqlalchemy import select
@@ -70,8 +70,9 @@ def _with_opening(meta_data: dict[str, Any] | None, when: datetime) -> dict[str,
 
 
 async def _category_name_async(db: AsyncSession, category_id: UUID) -> str | None:
-    return await db.scalar(
-        select(UomCategory.name).where(UomCategory.id == category_id)
+    return cast(
+        str | None,
+        await db.scalar(select(UomCategory.name).where(UomCategory.id == category_id)),
     )
 
 

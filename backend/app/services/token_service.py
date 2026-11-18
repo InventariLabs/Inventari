@@ -1,4 +1,5 @@
 from datetime import UTC, datetime, timedelta
+from typing import Any
 from uuid import UUID, uuid4
 
 import bcrypt
@@ -58,7 +59,9 @@ ACCESS_TOKEN_TYPE = 'access'  # noqa: S105
 REFRESH_TOKEN_TYPE = 'refresh'  # noqa: S105
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+def create_access_token(
+    data: dict[str, Any], expires_delta: timedelta | None = None
+) -> str:
     """Create a new JWT token."""
     to_encode = data.copy()
     if expires_delta:
@@ -80,7 +83,9 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     return encoded_jwt
 
 
-def create_refresh_token(data: dict, expires_delta: timedelta | None = None) -> str:
+def create_refresh_token(
+    data: dict[str, Any], expires_delta: timedelta | None = None
+) -> str:
     """Create a new Refresh Token."""
     to_encode = data.copy()
     if expires_delta:

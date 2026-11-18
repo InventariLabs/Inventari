@@ -79,7 +79,7 @@ class CoreNotificationsAPI:
         )
         if notification is None:
             return None
-        return NotificationService.to_dto(notification)  # type: ignore[no-any-return]
+        return NotificationService.to_dto(notification)
 
     @writes
     async def publish_async(

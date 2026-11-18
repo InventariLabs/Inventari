@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, Any, Final
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,6 +34,7 @@ from app.schemas.ai_connection import (
 )
 
 if TYPE_CHECKING:
+    from app.core.llm.purpose_registry import AiPurposeSpec
     from app.models.ai_connection import AiConnection
 
 logger = get_logger(__name__)
@@ -138,7 +139,7 @@ class AiConnectionService:
         api_base_url: str | None = None,
         model_name: str | None = None,
         capabilities: list[str] | None = None,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Check a connection in two stages, and say which one failed.
 
         ``list_models()`` proves the credentials work and the provider is
@@ -237,7 +238,7 @@ class AiConnectionService:
 
     async def _probe_reader_connection(
         self, conn: AiConnection, *, persist: bool
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Test a reader connection by reading one page with its key.
 
         Without a key the connection is the free tier — a legal state with
@@ -300,7 +301,7 @@ class AiConnectionService:
         }
 
     @staticmethod
-    def _record_capability_check(conn: AiConnection, contract: dict) -> None:
+    def _record_capability_check(conn: AiConnection, contract: dict[str, Any]) -> None:
         """Write the probe's verdict onto the connection, under its capability.
 
         Keyed by capability rather than by purpose: the reader's question is
@@ -326,7 +327,7 @@ class AiConnectionService:
         org_id: uuid.UUID,
         client: object,
         declared_capabilities: list[str],
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Stage two: ask the model to do the job once, and judge the answer.
 
         The call is billed like any other. A test that is free to run is a
@@ -603,7 +604,7 @@ def _preview(answer: str) -> str:
     return stripped[:_ANSWER_PREVIEW] + '…'
 
 
-def _probe_for(declared_capabilities: list[str]):
+def _probe_for(declared_capabilities: list[str]) -> AiPurposeSpec | None:
     """Pick the most demanding purpose this connection claims it can serve.
 
     Vision before text: a connection that says it reads images gets asked to,
@@ -663,7 +664,7 @@ def _to_schema(conn: AiConnection) -> AiConnectionSchema:
     return AiConnectionSchema(
         id=conn.id,
         name=conn.name,
-        provider=conn.provider,  # type: ignore[arg-type]
+        provider=conn.provider,
         api_key=masked,
         api_base_url=conn.api_base_url,
         model_name=conn.model_name,

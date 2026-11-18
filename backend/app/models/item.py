@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import (
     CheckConstraint,
+    ColumnElement,
     Date,
     DateTime,
     ForeignKey,
@@ -19,7 +20,13 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import Mapped, mapped_column, relationship, synonym
+from sqlalchemy.orm import (
+    InstrumentedAttribute,
+    Mapped,
+    mapped_column,
+    relationship,
+    synonym,
+)
 from sqlalchemy.types import TypeDecorator
 
 from app.core.file_reference import served_url, stored_reference
@@ -27,10 +34,19 @@ from app.core.open_package import OPENED_KEY, USE_BY_KEY, effective_expiry
 from app.database import Base
 
 if TYPE_CHECKING:
+    from app.models.category import Category
+    from app.models.item_attachment import ItemAttachment
+    from app.models.item_history import ItemHistory
+    from app.models.organization import Organization
+    from app.models.partner import Partner
+    from app.models.product_template import ProductTemplate
     from app.models.storage_location import StorageLocation
+    from app.models.uom import Uom
+    from app.modules.stock_takes.models import StockTakeItem
+    from app.modules.warehouse.models.document import Document
 
 
-class FiniteNumeric(TypeDecorator):
+class FiniteNumeric(TypeDecorator[Any]):
     """Numeric column that refuses non-finite values and heals them on read.
 
     PostgreSQL's numeric happily stores ``Decimal('NaN')`` — and its own
@@ -283,24 +299,24 @@ class Item(Base):
     )
 
     # Relationships
-    organization: Mapped['Organization'] = relationship(back_populates='items')  # type: ignore[name-defined]
+    organization: Mapped['Organization'] = relationship(back_populates='items')
     storage_location: Mapped['StorageLocation'] = relationship(
         back_populates='items', lazy='selectin'
-    )  # type: ignore[name-defined]
-    category: Mapped['Category | None'] = relationship(  # type: ignore[name-defined]
+    )
+    category: Mapped['Category | None'] = relationship(
         back_populates='items', lazy='selectin'
     )
-    uom: Mapped['Uom | None'] = relationship(lazy='selectin')  # type: ignore[name-defined]
-    template: Mapped['ProductTemplate | None'] = relationship(  # type: ignore[name-defined]
+    uom: Mapped['Uom | None'] = relationship(lazy='selectin')
+    template: Mapped['ProductTemplate | None'] = relationship(
         back_populates='items', lazy='selectin'
     )
-    history: Mapped[list['ItemHistory']] = relationship(  # type: ignore[name-defined]
+    history: Mapped[list['ItemHistory']] = relationship(
         back_populates='item', cascade='all, delete-orphan'
     )
-    stock_take_items: Mapped[list['StockTakeItem']] = relationship(  # type: ignore[name-defined]
+    stock_take_items: Mapped[list['StockTakeItem']] = relationship(
         back_populates='item'
     )
-    attachments: Mapped[list['ItemAttachment']] = relationship(  # type: ignore[name-defined]
+    attachments: Mapped[list['ItemAttachment']] = relationship(
         back_populates='item', cascade='all, delete-orphan'
     )
     # label_code references label_pool.short_code but has NO database FK: the
@@ -315,7 +331,7 @@ class Item(Base):
         nullable=True,
         index=True,
     )
-    partner: Mapped['Partner | None'] = relationship(  # type: ignore[name-defined]
+    partner: Mapped['Partner | None'] = relationship(
         'Partner',
         back_populates='items',
         lazy='select',
@@ -350,12 +366,12 @@ class Item(Base):
         nullable=True,
         index=True,
     )
-    source_document: Mapped['Document | None'] = relationship(  # type: ignore[name-defined]
+    source_document: Mapped['Document | None'] = relationship(
         'Document',
         lazy='select',
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<Item(name="{self.name}", brand="{self.brand}", quantity={self.quantity})>'
 
     @hybrid_property
@@ -365,7 +381,7 @@ class Item(Base):
 
     @effective_expiry_date.inplace.expression
     @classmethod
-    def _effective_expiry_date_expression(cls):
+    def _effective_expiry_date_expression(cls) -> ColumnElement[Any]:
         """The same rule in SQL; ``least`` skips the side that has no date."""
         use_by = cast(cls.meta_data[OPENED_KEY][USE_BY_KEY].astext, Date)
         return func.least(cls.expiry_date, use_by)
@@ -386,7 +402,7 @@ class Item(Base):
 
     @image_url.inplace.expression
     @classmethod
-    def _image_url_expression(cls):
+    def _image_url_expression(cls) -> InstrumentedAttribute[str | None]:
         """Filters on the column: ``Item.image_url.is_(None)`` keeps working."""
         return cls.image_key
 

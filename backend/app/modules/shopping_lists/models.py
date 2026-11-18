@@ -2,7 +2,7 @@ import uuid
 from datetime import UTC, datetime
 from decimal import Decimal
 from enum import StrEnum
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import JSONB
@@ -13,6 +13,11 @@ from app.database import Base
 # The quantity columns' shape lives with the validators that police it —
 # the schemas refuse the same ceiling this column holds.
 from app.schemas.validators import QUANTITY_MAX_DIGITS, QUANTITY_SCALE
+
+# Core tables this module may not import, even for typing, stay ``Any`` here:
+# the relationship names its class to SQLAlchemy as a string.
+if TYPE_CHECKING:
+    from app.models.item import Item
 
 
 class ShoppingListStatus(StrEnum):
@@ -64,8 +69,8 @@ class ShoppingList(Base):
     )
 
     # Relationships
-    organization: Mapped['Organization'] = relationship()  # type: ignore[name-defined]
-    creator: Mapped['User'] = relationship(foreign_keys=[created_by])  # type: ignore[name-defined]
+    organization: Mapped[Any] = relationship('Organization')
+    creator: Mapped[Any] = relationship('User', foreign_keys=[created_by])
     items: Mapped[list['ShoppingListItem']] = relationship(
         'app.modules.shopping_lists.models.ShoppingListItem',
         back_populates='shopping_list',
@@ -150,9 +155,9 @@ class ShoppingListItem(Base):
     shopping_list: Mapped['ShoppingList'] = relationship(
         'app.modules.shopping_lists.models.ShoppingList', back_populates='items'
     )
-    item: Mapped['Item'] = relationship()  # type: ignore[name-defined]
-    category: Mapped['Category'] = relationship(lazy='selectin')  # type: ignore[name-defined]
-    purchaser: Mapped['User | None'] = relationship(foreign_keys=[purchased_by])  # type: ignore[name-defined]
+    item: Mapped['Item'] = relationship()
+    category: Mapped[Any] = relationship('Category', lazy='selectin')
+    purchaser: Mapped[Any] = relationship('User', foreign_keys=[purchased_by])
     uom = relationship('Uom', lazy='joined', foreign_keys=[uom_id])
 
 

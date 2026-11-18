@@ -1,6 +1,8 @@
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, Query, UploadFile, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import SystemPermission, UserContextDTO
 from app.core.deps import (
@@ -41,8 +43,8 @@ async def upload_attachment(
     # a product is a write to the product register (``items:write``), and
     # the service below only ever sees an already-authorized request.
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """
     Upload a file as an attachment to an item.
     """
@@ -84,9 +86,9 @@ async def list_item_attachments(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
-):
+) -> Any:
     """
     List all attachments for an item.
     """
@@ -109,8 +111,8 @@ async def delete_attachment(
     attachment_id: UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """
     Delete an attachment.
     """

@@ -1,3 +1,4 @@
+from typing import Any
 from uuid import UUID
 
 from fastapi import Depends
@@ -43,7 +44,7 @@ async def get_current_admin_user(
 
 
 async def get_superuser(
-    current_user=Depends(get_current_user),
+    current_user: Any = Depends(get_current_user),
 ) -> object:
     """Ensures the current user is a system-wide superuser."""
     if not current_user.is_superuser:

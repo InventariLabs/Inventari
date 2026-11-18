@@ -1,6 +1,7 @@
 from typing import Any
 
 from fastapi import APIRouter, Body, Depends, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_current_admin_user
 from app.core.contracts import AuditAction, AuditTargetType, UserContextDTO
@@ -63,7 +64,7 @@ _ALWAYS_ON_FRONTEND_ONLY = [
 ]
 
 
-def _frontend_state_of(name: str, tracked: dict) -> str:
+def _frontend_state_of(name: str, tracked: dict[str, Any]) -> str:
     """Say whether this installation has screens for *name*.
 
     Every module in the tree does, by construction — the check that guarantees
@@ -81,7 +82,7 @@ def _frontend_state_of(name: str, tracked: dict) -> str:
     return 'incomplete' if entry.get('declares_frontend', False) else 'headless'
 
 
-def _signature_of(name: str, tracked: dict) -> dict:
+def _signature_of(name: str, tracked: dict[str, Any]) -> dict[str, Any]:
     """What the install verified about this package, for the store card.
 
     The author and the licence the card shows come off the package's own
@@ -118,7 +119,7 @@ def _effective_always_on() -> list[str]:
     return [name for name in ALWAYS_ON_MODULES if is_always_on(name)]
 
 
-def get_available_modules_list():
+def get_available_modules_list() -> list[ModuleInfo]:
     # Imported inside the function on purpose: the tracking file is read at
     # call time, and the tests that describe what the store shows replace
     # this function at its source.
@@ -212,8 +213,8 @@ async def get_available_modules(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """List modules available for the current organization based on entitlements.
 
     Transaction note: this is the one API function that rolls back by hand.
@@ -260,8 +261,8 @@ async def get_available_modules(
 )
 async def get_my_modules(
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Get list of modules enabled for current organization."""
     from app.core.cache import cache_delete, cache_get_or_set
 
@@ -396,8 +397,8 @@ def _check_module_dependencies(
 async def get_enable_preview(
     module_name: str,
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """What switching *module_name* on would resume — the question before the click.
 
     Admin only, like the switch itself. The module answers; a module that holds
@@ -427,8 +428,8 @@ async def get_enable_preview(
 async def toggle_module(
     module_toggle: ModuleToggle,
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Enable or disable a module for the organization. Admin only."""
     lang = get_current_lang()
 
@@ -553,8 +554,8 @@ async def _load_org_for_focus(db: Any, current_user: UserContextDTO) -> Any:
 @router.get('/focus', response_model=FocusModeResponse)
 async def get_focus_mode_endpoint(
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """The current single-module focus state, or that there is none.
 
     Any member may read it — the shell needs it to draw navigation, and it
@@ -573,8 +574,8 @@ async def get_focus_mode_endpoint(
 async def preview_focus_mode_endpoint(
     body: FocusModeRequest,
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Dry-run single-module focus mode: the diff without any writes. Admin only."""
     organization = await _load_org_for_focus(db, current_user)
     try:
@@ -595,8 +596,8 @@ async def preview_focus_mode_endpoint(
 async def enter_focus_mode_endpoint(
     body: FocusModeRequest,
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Enter single-module focus mode on the given module. Admin only."""
     organization = await _load_org_for_focus(db, current_user)
     try:
@@ -641,8 +642,8 @@ async def enter_focus_mode_endpoint(
 @router.delete('/focus', response_model=FocusModeResponse)
 async def exit_focus_mode_endpoint(
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Leave single-module focus mode, restoring the state before it. Admin only."""
     organization = await _load_org_for_focus(db, current_user)
     previous_focus = organization.focus_module
@@ -683,8 +684,8 @@ async def exit_focus_mode_endpoint(
 async def get_module_settings(
     module_name: str,
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Get module settings and its schema for the current organization. Admin only."""
 
     require_org(current_user)
@@ -715,10 +716,10 @@ async def get_module_settings(
 @router.put('/{module_name}/settings', response_model=ModuleSettingsUpdateResponse)
 async def update_module_settings(
     module_name: str,
-    body: dict = Body(...),
+    body: dict[str, Any] = Body(...),
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Update module settings for the current organization. Admin only.
 
     Partial update: the body merges over the saved settings at the top

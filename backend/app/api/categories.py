@@ -1,6 +1,8 @@
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import (
     CategoryCreateDTO,
@@ -61,9 +63,9 @@ async def get_categories(
         False, description='Include how many live items each category holds'
     ),
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = _READS_CATEGORIES,
-):
+) -> Any:
     """List of categories with optional module-context filters."""
     claimed_tags: set[str] = set()
     if exclude_module_contexts:
@@ -88,8 +90,8 @@ async def create_category(
     category_in: CategoryCreateDTO,
     _: object = require_permission(SystemPermission.CATEGORIES_WRITE),
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Add custom category."""
     try:
         return await core_api.categories.create_async(db, category_in, current_user)
@@ -102,8 +104,8 @@ async def rename_category_group_endpoint(
     payload: CategoryGroupRename,
     _: object = require_permission(SystemPermission.CATEGORIES_WRITE),
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Rename a category group in one go, or take it off its categories.
 
     Declared before ``/{category_id}`` so "groups" is read as this route and
@@ -128,9 +130,9 @@ async def rename_category_group_endpoint(
 async def get_category(
     category_id: UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.CATEGORIES_READ),
-):
+) -> Any:
     """Category details."""
     org_id = require_org(current_user)
     category = await core_api.categories.get_by_id_async(db, org_id, category_id)
@@ -145,8 +147,8 @@ async def update_category(
     category_in: CategoryUpdateDTO,
     _: object = require_permission(SystemPermission.CATEGORIES_WRITE),
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Update category."""
     org_id = require_org(current_user)
     # A refusal of the payload (a system field's label renamed, a dropdown
@@ -167,8 +169,8 @@ async def delete_category(
     category_id: UUID,
     _: object = require_permission(SystemPermission.CATEGORIES_WRITE),
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> None:
     """Delete category."""
     org_id = require_org(current_user)
     try:

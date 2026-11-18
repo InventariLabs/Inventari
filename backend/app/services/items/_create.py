@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import Any, NoReturn
+from typing import Any, NoReturn, cast
 from uuid import UUID
 
 from sqlalchemy import select
@@ -391,8 +391,9 @@ async def _resolve_org_currency_async(
     db: AsyncSession,
     org_id: UUID,
 ) -> str | None:
-    return await db.scalar(
-        select(Organization.currency).where(Organization.id == org_id)
+    return cast(
+        str | None,
+        await db.scalar(select(Organization.currency).where(Organization.id == org_id)),
     )
 
 

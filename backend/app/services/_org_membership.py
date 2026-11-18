@@ -1,6 +1,6 @@
 import secrets
 from datetime import UTC, datetime, timedelta
-from typing import NamedTuple
+from typing import Any, NamedTuple, cast
 from uuid import UUID
 
 from sqlalchemy import delete, func, select
@@ -82,13 +82,16 @@ async def open_invitation(db: AsyncSession, code: str) -> OrganizationInvitation
     silent redirect to /login. The same three conditions joining enforces,
     minus the address binding, which stays a registration-time check.
     """
-    return await db.scalar(
-        select(OrganizationInvitation).where(
-            OrganizationInvitation.code == code,
-            OrganizationInvitation.expires_at > datetime.now(UTC),
-            OrganizationInvitation.is_used == False,
-            OrganizationInvitation.revoked_at.is_(None),
-        )
+    return cast(
+        OrganizationInvitation | None,
+        await db.scalar(
+            select(OrganizationInvitation).where(
+                OrganizationInvitation.code == code,
+                OrganizationInvitation.expires_at > datetime.now(UTC),
+                OrganizationInvitation.is_used == False,
+                OrganizationInvitation.revoked_at.is_(None),
+            )
+        ),
     )
 
 
@@ -142,7 +145,7 @@ async def create_invitation_code(
     role: str = 'user',
     role_id: UUID | None = None,
     invited_email: str | None = None,
-) -> dict:
+) -> dict[str, Any]:
     """Mint one invitation, for one address.
 
     Every call issues a new code. A code names a recipient, so handing back a
@@ -258,7 +261,7 @@ def _delivery_of(
 
 async def list_invitations(
     db: AsyncSession, organization_id: UUID, limit: int = 20
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     """Invitations issued for this organization, newest first.
 
     The screen had none of this: the only way to learn whether anyone had used
@@ -318,7 +321,7 @@ async def resend_invitation(
     invitation_id: UUID,
     *,
     actor_user_id: UUID | None = None,
-) -> dict:
+) -> dict[str, Any]:
     """Give a pending invitation another seven days, unchanged otherwise.
 
     The code stays the same, so a recipient who still has the first mail is
@@ -624,7 +627,7 @@ async def join_organization(db: AsyncSession, code: str, user_id: UUID) -> Organ
     if organization is None:
         raise ServiceRejectionError('organization_not_found')
 
-    return organization
+    return cast(Organization, organization)
 
 
 async def leave_organization(

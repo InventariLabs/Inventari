@@ -1,4 +1,5 @@
 from dataclasses import asdict
+from typing import Any
 from uuid import UUID
 
 from fastapi import (
@@ -108,7 +109,7 @@ async def get_items_aggregates_endpoint(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
-):
+) -> Any:
     """Totals over the whole filtered set, for the list footer.
 
     Takes the same filters as ``GET /items`` minus pagination and sorting, and
@@ -193,7 +194,7 @@ async def get_attention_counts_endpoint(
     org_id: UUID = Depends(require_org),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
-):
+) -> Any:
     """What needs attention, from one rule shared with the statistics screen.
 
     Expired and expiring-soon records plus short products — the numbers
@@ -260,7 +261,7 @@ async def get_archived_items(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = _READS_ARCHIVED,
-):
+) -> Any:
     """Archived (soft-deleted) products, newest archived first, scoped by module context."""
     org_id = require_org(current_user)
     if not current_user.has_permission(SystemPermission.ITEMS_READ) and (

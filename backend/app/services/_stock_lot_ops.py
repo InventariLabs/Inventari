@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from datetime import UTC, date, datetime
 from decimal import Decimal
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from sqlalchemy import func, select
@@ -91,11 +91,14 @@ async def _locked_lot_async(
     otherwise hands back the instance already in the session without its
     columns read again.
     """
-    return await db.scalar(
-        select(StockLot)
-        .where(StockLot.id == lot_id, StockLot.organization_id == organization_id)
-        .with_for_update()
-        .execution_options(populate_existing=True)
+    return cast(
+        StockLot | None,
+        await db.scalar(
+            select(StockLot)
+            .where(StockLot.id == lot_id, StockLot.organization_id == organization_id)
+            .with_for_update()
+            .execution_options(populate_existing=True)
+        ),
     )
 
 

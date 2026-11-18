@@ -19,6 +19,7 @@ from typing import Any
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import PreviousMeasurementDTO
 from app.core.logging import get_logger
@@ -196,7 +197,7 @@ def decode_previous_measurement(raw: object) -> PreviousMeasurementDTO | None:
 
 
 async def read_previous_measurement_async(
-    db, organization_id: UUID
+    db: AsyncSession, organization_id: UUID
 ) -> PreviousMeasurementDTO | None:
     """What the previous scheduled pass measured, for the screen to show."""
     from app.services.module_settings_service import read_module_setting_async
@@ -207,7 +208,9 @@ async def read_previous_measurement_async(
     return decode_previous_measurement(stored)
 
 
-async def reconcile_organization_async(db, organization_id: UUID) -> dict:
+async def reconcile_organization_async(
+    db: AsyncSession, organization_id: UUID
+) -> dict[str, Any]:
     """Run both pair comparisons for one organization.
 
     Returns the reconciliation DTO's figures as a plain dict. Alerting,
@@ -237,7 +240,10 @@ async def reconcile_organization_async(db, organization_id: UUID) -> dict:
 
 
 async def _record_pass_and_alert_admins_async(
-    db, organization_id: UUID, figures: dict, measured_at: datetime
+    db: AsyncSession,
+    organization_id: UUID,
+    figures: dict[str, Any],
+    measured_at: datetime,
 ) -> None:
     """Store this pass; warn the admins when a drift appears, changes or stands.
 
@@ -299,7 +305,7 @@ async def _record_pass_and_alert_admins_async(
 
 
 async def _warn_admins_async(
-    db, organization_id: UUID, figures: dict, *, standing: bool
+    db: AsyncSession, organization_id: UUID, figures: dict[str, Any], *, standing: bool
 ) -> None:
     """One warning to every admin, in their language: found, or still there."""
     from app.services.notification_service import NotificationService
@@ -317,7 +323,7 @@ async def _warn_admins_async(
     )
 
 
-async def _is_due_async(db, organization_id: UUID, now: datetime) -> bool:
+async def _is_due_async(db: AsyncSession, organization_id: UUID, now: datetime) -> bool:
     """Whether the organization's last stored pass is old enough to repeat.
 
     No stored pass, or one from before the record carried its timestamp, is

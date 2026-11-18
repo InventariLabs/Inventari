@@ -1,3 +1,5 @@
+from datetime import datetime
+from typing import cast
 from uuid import UUID
 
 from sqlalchemy import func, or_, select
@@ -75,7 +77,7 @@ class UserService:
         user: User,
         is_active: bool | None = None,
         is_blocked: bool | None = None,
-        blocked_at=None,
+        blocked_at: datetime | None = None,
         blocking_reason: str | None = None,
     ) -> User:
         if is_active is not None:
@@ -93,7 +95,9 @@ class UserService:
 
     @staticmethod
     async def get_user_by_email_async(db: AsyncSession, email: str) -> User | None:
-        return await db.scalar(select(User).where(User.email == email))
+        return cast(
+            User | None, await db.scalar(select(User).where(User.email == email))
+        )
 
     @staticmethod
     async def get_first_by_created_at_async(

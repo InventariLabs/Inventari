@@ -1,7 +1,9 @@
+from datetime import datetime
 from decimal import Decimal
+from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import Select, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db_utils import escape_ilike, in_ids, paginate_async
@@ -73,7 +75,7 @@ async def search_cursor_paginated_async(
     storage_id: UUID | None = None,
     search: str | None = None,
     quantity_above: Decimal | None = None,
-    cursor_ts=None,
+    cursor_ts: datetime | None = None,
     cursor_id: UUID | None = None,
     limit: int = 50,
 ) -> list[Item]:
@@ -168,7 +170,7 @@ async def search_stock_summary_async(
     from sqlalchemy.dialects.postgresql import aggregate_order_by
     from sqlalchemy.orm import joinedload
 
-    def _base_filters(q):
+    def _base_filters(q: Select[Any]) -> Select[Any]:
         q = q.where(
             Item.is_deleted.is_(False),
             Item.storage_location_id.isnot(None),
@@ -222,18 +224,18 @@ async def search_stock_summary_async(
         .order_by(func.max(Item.created_at).desc())
         .limit(limit)
     )
-    grouped_q = grouped_q.where(
+    grouped = grouped_q.where(
         Item.expiry_date.is_(None), Item.serial_number.is_(None)
     ).subquery()
     summed = await db.execute(
-        select(Item, grouped_q.c.total)
+        select(Item, grouped.c.total)
         .join(
-            grouped_q,
+            grouped,
             and_(
-                Item.storage_location_id == grouped_q.c.shelf_id,
+                Item.storage_location_id == grouped.c.shelf_id,
                 func.coalesce(func.cast(Item.template_id, String), 'name:' + Item.name)
-                == grouped_q.c.group_key,
-                Item.id == grouped_q.c.seed_id,
+                == grouped.c.group_key,
+                Item.id == grouped.c.seed_id,
             ),
         )
         .where(

@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -36,7 +37,7 @@ class LabelPoolCreate(BaseModel):
 
     @field_validator('target_location_id', mode='before')
     @classmethod
-    def empty_string_to_none(cls, v):
+    def empty_string_to_none(cls, v: Any) -> Any:
         return empty_string_to_none(v)
 
 
@@ -110,7 +111,7 @@ class LabelAssignRequest(BaseModel):
     expiry_date: str | None = None
     freeze_date: str | None = None
     image_url: str | None = None
-    metadata: dict | None = None
+    metadata: dict[str, Any] | None = None
     # The form after a scan is the product form, so it renders these four
     # as well — and a request that cannot carry them made the reader type
     # into fields whose content was dropped on the way, under a 200. Every

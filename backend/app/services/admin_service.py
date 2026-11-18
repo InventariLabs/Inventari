@@ -6,6 +6,7 @@ All read-only — backed by CoreAPI for safe data access.
 """
 
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,7 +19,7 @@ logger = get_logger(__name__)
 class AdminService:
     """Aggregator for system-wide admin stats."""
 
-    async def get_system_summary(self, db: AsyncSession) -> dict:
+    async def get_system_summary(self, db: AsyncSession) -> dict[str, Any]:
         """Return top-level system metrics: user count, org count, 24h actions, AI usage."""
         from app.models.ai_usage_log import AIUsageLog
         from app.models.item_history import ItemHistory
@@ -57,7 +58,9 @@ class AdminService:
             },
         }
 
-    async def get_ai_usage_stats(self, db: AsyncSession, days: int = 7) -> dict:
+    async def get_ai_usage_stats(
+        self, db: AsyncSession, days: int = 7
+    ) -> dict[str, Any]:
         """Return AI usage broken down by organization, user, and model."""
         from app.models.ai_usage_log import AIUsageLog
         from app.models.organization import Organization
@@ -138,7 +141,9 @@ class AdminService:
             ],
         }
 
-    async def get_activity_stats(self, db: AsyncSession, days: int = 7) -> dict:
+    async def get_activity_stats(
+        self, db: AsyncSession, days: int = 7
+    ) -> dict[str, Any]:
         """Return activity timeline (daily action counts)."""
         from app.models.item_history import ItemHistory
 

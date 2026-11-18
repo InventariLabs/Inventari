@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Query
 
+from app.core.contracts import UserContextDTO
 from app.core.deps import get_current_user_context
 from app.core.exceptions import NotFoundException
 from app.core.product_profiles import ProductProfile, get_all_profiles, get_profile
@@ -12,7 +13,7 @@ router = APIRouter()
 async def list_profiles(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
-    _current_user=Depends(get_current_user_context),
+    _current_user: UserContextDTO = Depends(get_current_user_context),
 ) -> PaginatedResponse[ProductProfile]:
     """Return all available product profiles for onboarding selection."""
     return PaginatedResponse[ProductProfile].from_full_list(
@@ -23,7 +24,7 @@ async def list_profiles(
 @router.get('/{profile_id}', response_model=ProductProfile)
 async def get_profile_by_id(
     profile_id: str,
-    _current_user=Depends(get_current_user_context),
+    _current_user: UserContextDTO = Depends(get_current_user_context),
 ) -> ProductProfile:
     """Return a single product profile by ID."""
     profile = get_profile(profile_id)

@@ -1,5 +1,6 @@
 import asyncio
 import json
+from typing import Any, cast
 
 import jwt
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
@@ -61,7 +62,7 @@ class NotificationHub:
             if not self._connections[user_id]:
                 del self._connections[user_id]
 
-    async def broadcast(self, user_id: str, data: dict) -> None:
+    async def broadcast(self, user_id: str, data: dict[str, Any]) -> None:
         """Push a message to all WebSocket connections for a user."""
         if user_id not in self._connections:
             return
@@ -110,7 +111,7 @@ class NotificationHub:
 hub = NotificationHub()
 
 
-async def _credential_is_live(token: str, payload: dict) -> bool:
+async def _credential_is_live(token: str, payload: dict[str, Any]) -> bool:
     """Everything the HTTP paths ask of an access token, asked here too.
 
     The socket checked the per-token blacklist and nothing else, so it missed
@@ -136,7 +137,7 @@ async def _credential_is_live(token: str, payload: dict) -> bool:
 
 
 async def _close_when_credential_dies(
-    websocket: WebSocket, token: str, payload: dict
+    websocket: WebSocket, token: str, payload: dict[str, Any]
 ) -> None:
     """Close the socket once its credential stops being good.
 
@@ -161,7 +162,7 @@ def _offered_token(websocket: WebSocket) -> str:
     """The access token offered as the subprotocol that follows ``bearer``."""
     offered = list(websocket.scope.get('subprotocols') or [])
     if len(offered) == 2 and offered[0] == BEARER_SUBPROTOCOL:
-        return offered[1]
+        return cast(str, offered[1])
     return ''
 
 

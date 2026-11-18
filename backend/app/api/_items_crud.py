@@ -1,3 +1,4 @@
+from typing import Any
 from uuid import UUID
 
 from fastapi import (
@@ -75,7 +76,7 @@ async def get_item(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = _READS_ONE_ITEM,
-):
+) -> Any:
     """Product details."""
     item = await get_item_or_404_async(
         db, item_id, user_storage_ids, include_archived=include_archived
@@ -96,7 +97,7 @@ async def update_item(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-):
+) -> Any:
     """Update product."""
     # A request carrying a quantity is a read-modify-write: the service
     # computes ``delta = new - old`` from what is read here, so two edits in
@@ -127,7 +128,7 @@ async def delete_item(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_DELETE),
-):
+) -> None:
     """Soft-delete product (archive). Item is hidden but recoverable."""
     item = await get_any_item_in_locations_or_404_async(db, item_id, user_storage_ids)
     reason = delete_data.reason if delete_data else None
@@ -155,7 +156,7 @@ async def restore_item(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-):
+) -> Any:
     """Restore a soft-deleted product back to active state."""
     item = await get_any_item_in_locations_or_404_async(db, item_id, user_storage_ids)
     try:
@@ -172,7 +173,7 @@ async def purge_item(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_PURGE),
-):
+) -> None:
     """Permanently delete an archived product. Cannot be undone."""
     item = await get_any_item_in_locations_or_404_async(db, item_id, user_storage_ids)
     try:

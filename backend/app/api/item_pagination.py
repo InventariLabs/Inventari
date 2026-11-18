@@ -4,9 +4,11 @@ Mounted at the same ``/items`` prefix as the main ``items`` router in ``main.py`
 Kept in a separate module to keep ``api/items.py`` under the 500-LOC threshold.
 """
 
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_user_storage_ids
 from app.core.contracts import SystemPermission
@@ -36,8 +38,8 @@ async def get_items_history(
         False, description='Hide entries for items owned by a vertical module'
     ),
     user_storage_ids: list[UUID] = Depends(get_user_storage_ids),
-    current_user=Depends(get_current_user),
-    db=Depends(get_async_db, scope='function'),
+    current_user: Any = Depends(get_current_user),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
 ) -> CursorPaginatedResponse[ItemHistorySchema]:
     """Get recent activity history for user's items (cursor-paginated, newest first)."""
@@ -100,8 +102,8 @@ async def get_item_history(
     cursor: str | None = Query(
         None, description='Opaque cursor from previous response'
     ),
-    current_user=Depends(get_current_user),
-    db=Depends(get_async_db, scope='function'),
+    current_user: Any = Depends(get_current_user),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
 ) -> CursorPaginatedResponse[ItemHistorySchema]:
     """Get movement/action history for a single item."""
@@ -155,8 +157,8 @@ async def get_items_cursor_page(
     location_id: UUID | None = Query(None),
     search: str | None = Query(None),
     user_storage_ids: list[UUID] = Depends(get_user_storage_ids),
-    current_user=Depends(get_current_user),
-    db=Depends(get_async_db, scope='function'),
+    current_user: Any = Depends(get_current_user),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
 ) -> CursorPaginatedResponse[ItemSchema]:
     """Cursor-paginated items list. Suitable for infinite-scroll UIs."""

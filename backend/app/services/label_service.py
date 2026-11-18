@@ -1,7 +1,7 @@
 import secrets
 import string
 from datetime import UTC, datetime
-from typing import Protocol
+from typing import Any, Protocol, cast
 from uuid import UUID
 
 from sqlalchemy import Select, or_, select
@@ -125,7 +125,9 @@ async def _draw_unused_short_codes_async(
     return drawn
 
 
-def _claimed_by_a_module(query: Select, module_scopes: frozenset[str] | None) -> Select:
+def _claimed_by_a_module(
+    query: Select[Any], module_scopes: frozenset[str] | None
+) -> Select[Any]:
     """Keep the labels whose product one of *module_scopes* claims.
 
     A module's read reaches the labels assigned to the module's records and
@@ -204,7 +206,7 @@ def label_caption(label: _CaptionSource) -> str | None:
     return f'{name} {expiry.month}.{expiry.year}'
 
 
-def _locked(stmt: Select, for_update: bool) -> Select:
+def _locked(stmt: Select[Any], for_update: bool) -> Select[Any]:
     """*stmt* taking the row lock, read again past the session's copy.
 
     ``populate_existing`` because a locking select otherwise hands back the
@@ -496,16 +498,19 @@ class LabelService:
         organization_id: UUID,
         *,
         for_update: bool = False,
-    ):
+    ) -> LabelPool | None:
         """The label, or ``None``; ``for_update`` as in ``get_by_short_code_async``."""
-        return await db.scalar(
-            _locked(
-                select(LabelPool).where(
-                    LabelPool.id == label_id,
-                    LabelPool.organization_id == organization_id,
-                ),
-                for_update,
-            )
+        return cast(
+            LabelPool | None,
+            await db.scalar(
+                _locked(
+                    select(LabelPool).where(
+                        LabelPool.id == label_id,
+                        LabelPool.organization_id == organization_id,
+                    ),
+                    for_update,
+                )
+            ),
         )
 
     @staticmethod
@@ -515,21 +520,24 @@ class LabelService:
         organization_id: UUID,
         *,
         for_update: bool = False,
-    ):
+    ) -> LabelPool | None:
         """The label, or ``None``; ``for_update`` locks the row first.
 
         A binding change locks the label before it reads the product it
         journals as ``before``, so a concurrent change is waited for and read
         rather than written over in the journal.
         """
-        return await db.scalar(
-            _locked(
-                select(LabelPool).where(
-                    LabelPool.short_code == short_code,
-                    LabelPool.organization_id == organization_id,
-                ),
-                for_update,
-            )
+        return cast(
+            LabelPool | None,
+            await db.scalar(
+                _locked(
+                    select(LabelPool).where(
+                        LabelPool.short_code == short_code,
+                        LabelPool.organization_id == organization_id,
+                    ),
+                    for_update,
+                )
+            ),
         )
 
     @staticmethod
@@ -685,7 +693,9 @@ class LabelService:
         return list(result.unique().all())
 
     @staticmethod
-    async def get_pool_stats_async(db: AsyncSession, organization_id: UUID) -> dict:
+    async def get_pool_stats_async(
+        db: AsyncSession, organization_id: UUID
+    ) -> dict[str, Any]:
         from sqlalchemy import case, func
 
         counts = (

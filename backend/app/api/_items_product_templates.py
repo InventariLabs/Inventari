@@ -1,3 +1,4 @@
+from typing import Any
 from uuid import UUID
 
 from fastapi import (
@@ -7,6 +8,7 @@ from fastapi import (
     status,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from app.core import db_facade
 from app.core.contracts import (
@@ -65,7 +67,7 @@ async def update_template_nutrition(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-):
+) -> Any:
     """Update nutrition_info on a product template owned by the current organization."""
     org_id = require_org(current_user)
     before = await core_api.product_templates.get_async(db, org_id, template_id)
@@ -103,16 +105,16 @@ async def update_template_nutrition(
 
 def _local_lookup_result(
     *,
-    template_id,
-    name,
-    brand,
-    barcode,
-    sku,
-    uom_id,
-    uom_symbol,
-    uom_name,
-    image_url,
-    description,
+    template_id: UUID | None,
+    name: str,
+    brand: str | None,
+    barcode: str | None,
+    sku: str | None,
+    uom_id: UUID | None,
+    uom_symbol: str | None,
+    uom_name: str | None,
+    image_url: str | None,
+    description: str | None,
 ) -> ProductTemplateLookupResult:
     """One local template as the lookup answer, unit symbols included."""
     return ProductTemplateLookupResult(
@@ -163,7 +165,7 @@ async def lookup_product_template(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
-):
+) -> Any:
     """
     Look up a product template by barcode, SKU, or the name a form is typing.
 
@@ -229,7 +231,7 @@ async def lookup_product_template(
         if module_enabled:
             from app.modules.nutrition.services import off_service
 
-            off_data: dict | None = None
+            off_data: dict[str, Any] | None = None
             if db_facade.ProductsSessionLocal is not None:
                 import asyncio
 
@@ -286,7 +288,7 @@ async def get_sku_schema(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
-):
+) -> Any:
     """Get SKU naming schema for current organization."""
     org_id = require_org(current_user)
     return await db.run_sync(lambda s: SkuService.get_schema(s, org_id))
@@ -294,11 +296,11 @@ async def get_sku_schema(
 
 @router.put('/product-templates/sku-schema', response_model=SkuSchemaResponse)
 async def update_sku_schema(
-    data: dict,
+    data: dict[str, Any],
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ORG_SETTINGS_WRITE),
-):
+) -> Any:
     """Configure SKU naming schema. Requires org:settings:write."""
     # How every SKU in the organization is spelled is a setting, not a record:
     # a member who may add a product may not redefine the naming of the ones
@@ -337,7 +339,7 @@ async def generate_product_barcode(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-):
+) -> Any:
     """A fresh internal code for the product form's barcode field.
 
     Nothing is assigned here: the form fills the field and the product's save
@@ -360,7 +362,7 @@ async def clone_product_template(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-):
+) -> Any:
     """Clone a product template.
 
     Creates a new template with:
@@ -396,7 +398,7 @@ async def search_product_templates(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
-):
+) -> Any:
     """Search product templates by name (fuzzy ILIKE, org + global).
 
     Used by the recipe ingredient autocomplete — returns templates
@@ -416,7 +418,7 @@ async def count_product_templates(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
-):
+) -> Any:
     """Count templates the org can pick from (org-scoped + global).
 
        Lets the frontend answer "is the catalog empty" before a form opens —
@@ -437,7 +439,7 @@ async def get_product_template_stock(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
-):
+) -> Any:
     """How much of this product the organization holds on its shelves.
 
     The threshold on a product is one value for the product, so the screen
@@ -451,7 +453,7 @@ async def get_product_template_stock(
     """
     org_id = require_org(current_user)
 
-    def _symbol_of_an_existing_template(session) -> str | None:
+    def _symbol_of_an_existing_template(session: Session) -> str | None:
         # The unit is read where the object still has a session: reaching
         # for the lazy relationship after `run_sync` returns raises
         # MissingGreenlet, and the 404 guard has to run either way.
@@ -476,7 +478,7 @@ async def get_product_template(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
-):
+) -> Any:
     """Get a product template by ID including this organization's layer-average rate.
 
     Stock value is FIFO; the rate is the average cost of the cost layers
@@ -510,7 +512,7 @@ async def create_product_template(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-):
+) -> Any:
     """Create a new ProductTemplate.
 
     Used by seed/test paths that need a template row before items can be

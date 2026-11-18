@@ -142,7 +142,10 @@ class ModuleService:
 
     @staticmethod
     async def update_module_settings_async(
-        db: AsyncSession, organization_id: UUID, module_name: str, settings: dict
+        db: AsyncSession,
+        organization_id: UUID,
+        module_name: str,
+        settings: dict[str, Any],
     ) -> dict[str, dict[str, Any]] | None:
         """Validate and store one module's settings, reporting what moved.
 

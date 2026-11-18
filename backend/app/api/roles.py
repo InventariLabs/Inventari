@@ -15,6 +15,7 @@ pattern as ``_items_crud.py``).
 
 from __future__ import annotations
 
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, status
@@ -63,7 +64,9 @@ class RoleRename(BaseModel):
     name: str = Field(min_length=1, max_length=100)
 
 
-async def _role_snapshot(db: AsyncSession, org_id: UUID, role_id: UUID) -> dict:
+async def _role_snapshot(
+    db: AsyncSession, org_id: UUID, role_id: UUID
+) -> dict[str, Any]:
     """What a journal entry says a role was: its name and what it carried.
 
     Falls back to the id alone if the role is not this organization's — the
@@ -83,7 +86,7 @@ async def _journal(
     *,
     action: AuditAction,
     target_id: UUID,
-    snapshot: dict,
+    snapshot: dict[str, Any],
     target_type: AuditTargetType = AuditTargetType.ROLE,
 ) -> None:
     """Record an act on the role catalogue in the organization's journal.
@@ -112,7 +115,7 @@ async def list_roles(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.SYSTEM_CONFIG_WRITE),
-):
+) -> Any:
     org_id = require_org(current_user)
     roles = await core_api.roles.list_for_org_async(db, org_id)
     return PaginatedResponse.from_full_list(roles, offset=offset, limit=limit)
@@ -164,7 +167,7 @@ async def create_role(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.SYSTEM_CONFIG_WRITE),
-):
+) -> Any:
     org_id = require_org(current_user)
     role = await core_api.roles.create_async(
         db,
@@ -190,7 +193,7 @@ async def update_role_permissions(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.SYSTEM_CONFIG_WRITE),
-):
+) -> Any:
     org_id = require_org(current_user)
     before = await _role_snapshot(db, org_id, role_id)
     role = await core_api.roles.update_permissions_async(
@@ -221,7 +224,7 @@ async def rename_role(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.SYSTEM_CONFIG_WRITE),
-):
+) -> Any:
     org_id = require_org(current_user)
     before = await _role_snapshot(db, org_id, role_id)
     role = await core_api.roles.rename_async(
@@ -250,7 +253,7 @@ async def list_role_members(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.SYSTEM_CONFIG_WRITE),
-):
+) -> Any:
     """Who holds this role — what the delete refusal is about."""
     org_id = require_org(current_user)
     holders = await core_api.roles.holders_async(

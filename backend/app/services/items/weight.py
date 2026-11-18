@@ -37,7 +37,7 @@ CONTINUOUS_UOM_CATEGORIES = frozenset({'Weight', VOLUME_UOM_CATEGORY})
 
 def quantity_as_weight(
     quantity: Decimal | float | None,
-    uom_factor: float | None = None,
+    uom_factor: Decimal | float | None = None,
 ) -> Decimal | None:
     """Weight of a line counted in a weight or volume unit.
 
@@ -56,7 +56,7 @@ def quantity_as_weight(
 def total_weight(
     quantity: Decimal | float | None,
     weight_value: Decimal | float | None,
-    weight_uom_factor: float | None = None,
+    weight_uom_factor: Decimal | float | None = None,
 ) -> Decimal | None:
     """Weight of a whole line, in kilograms (or litres for volume units).
 

@@ -1,3 +1,4 @@
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, status
@@ -105,10 +106,10 @@ async def _codes_declared_by_disabled_modules(
 async def get_storage_types(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     current_user: UserContextDTO = Depends(get_current_user_context),
     _: object = require_permission(SystemPermission.STORAGES_READ),
-):
+) -> Any:
     """
     List of available storage location types, owned by the caller's
     organization (types have had an owner since — the global, shared
@@ -128,9 +129,9 @@ async def get_storage_types(
 async def create_storage_type(
     storage_type_in: StorageTypeCreateDTO,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.STORAGES_WRITE),
-):
+) -> Any:
     """Create a storage location type owned by the caller's organization."""
     require_org(current_user)
     try:
@@ -144,10 +145,10 @@ async def create_storage_type(
 @router.get('/{location_type_id}', response_model=StorageTypeDTO)
 async def get_storage_type(
     location_type_id: UUID,
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     current_user: UserContextDTO = Depends(get_current_user_context),
     _: object = require_permission(SystemPermission.STORAGES_READ),
-):
+) -> Any:
     """Storage location type details."""
     lang = get_current_lang()
     org_id = require_org(current_user)
@@ -168,9 +169,9 @@ async def update_storage_type(
     location_type_id: UUID,
     storage_type_in: StorageTypeUpdateDTO,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.STORAGES_WRITE),
-):
+) -> Any:
     """
     Update a storage location type.
     If it's a global system type, fork it for the organization first.
@@ -189,9 +190,9 @@ async def update_storage_type(
 async def delete_storage_type(
     location_type_id: UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.STORAGES_WRITE),
-):
+) -> None:
     """Delete a storage location type (only non-system types that are not in use)."""
     lang = get_current_lang()
     deleted = await core_api.location_types.delete_async(

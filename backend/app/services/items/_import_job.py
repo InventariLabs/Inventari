@@ -106,7 +106,7 @@ async def run_job_async(
     *,
     file_content: bytes,
     filename: str,
-    mapping: dict,
+    mapping: dict[str, Any],
     user: UserContextDTO,
     create_missing_locations: bool,
     create_missing_categories: bool,

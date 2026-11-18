@@ -1,5 +1,5 @@
 from datetime import UTC, datetime, timedelta
-from typing import Annotated
+from typing import Annotated, Any
 from uuid import uuid4
 
 import jwt
@@ -62,7 +62,7 @@ async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     lang: Language = Depends(get_lang_from_header),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """User login (returns JWT token and sets refresh cookie)."""
     user = await authenticate_user_async(
         db,
@@ -240,7 +240,7 @@ async def refresh_token(
     return Token(access_token=access_token, token_type='bearer')
 
 
-def _family_from(payload: dict) -> tuple[str, str] | None:
+def _family_from(payload: dict[str, Any]) -> tuple[str, str] | None:
     """The (user, session) pair a token names, or ``None`` if it names neither.
 
     ``sid`` falls back to the user id for tokens minted before the claim

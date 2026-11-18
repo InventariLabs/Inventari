@@ -94,13 +94,13 @@ async def check_password_reset_token(
         raise catalogue_refusal('invalid_reset_token') from exc
 
 
-@router.post('/password-reset/confirm')
+@router.post('/password-reset/confirm', response_model=None)
 @limiter.limit('5/hour')
 async def confirm_password_reset(
     request: Request,
     data: PasswordResetConfirmIn,
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> dict[str, str]:
     """Verify a reset token and replace the user's password."""
     try:
         await AuthService.confirm_password_reset_async(
@@ -121,11 +121,13 @@ if settings.TESTING:
     class DevTokenIn(BaseModel):
         email: EmailStr
 
-    @router.post('/password-reset/_dev_token', include_in_schema=False)
+    @router.post(
+        '/password-reset/_dev_token', include_in_schema=False, response_model=None
+    )
     async def dev_issue_token(
         data: DevTokenIn,
         db: AsyncSession = Depends(get_async_db, scope='function'),
-    ):
+    ) -> dict[str, str]:
         result = await AuthService.request_password_reset_async(db, data.email)
         if result is None:
             raise NotFoundException('user', get_current_lang())

@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,11 +18,14 @@ logger = get_logger(__name__)
 async def get_virtual_location_async(
     db: AsyncSession, organization_id: str, usage: LocationUsage
 ) -> StorageLocation | None:
-    return await db.scalar(
-        select(StorageLocation).where(
-            StorageLocation.organization_id == organization_id,
-            StorageLocation.usage == usage,
-        )
+    return cast(
+        StorageLocation | None,
+        await db.scalar(
+            select(StorageLocation).where(
+                StorageLocation.organization_id == organization_id,
+                StorageLocation.usage == usage,
+            )
+        ),
     )
 
 
@@ -96,8 +99,8 @@ async def ensure_virtual_locations_async(
     lang = get_current_lang()
 
     for v in virtuals:
-        v_usage: LocationUsage = v['usage']  # type: ignore[assignment]
-        v_code: str = v['code']  # type: ignore[assignment]
+        v_usage: LocationUsage = v['usage']
+        v_code: str = v['code']
         localized = v['translations'].get(lang)
         target = localized.name if localized else v['name']
         existing = await get_virtual_location_async(db, organization_id, v_usage)

@@ -9,7 +9,7 @@ from sse_starlette.sse import EventSourceResponse
 from starlette.background import BackgroundTask
 
 from app.core import db_facade
-from app.core.contracts import UserContextDTO
+from app.core.contracts import CategoryStatsDTO, StorageStatsDTO, UserContextDTO
 from app.core.deps import (
     get_async_db,
     get_current_user_context,
@@ -151,7 +151,7 @@ async def get_stats_by_storage_endpoint(
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-) -> PaginatedResponse[StorageStats]:
+) -> PaginatedResponse[StorageStatsDTO]:
     rows = await get_stats_by_storage(db, require_org(current_user))
     return PaginatedResponse.from_full_list(rows, offset=offset, limit=limit)
 
@@ -162,7 +162,7 @@ async def get_stats_by_category_endpoint(
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-) -> PaginatedResponse[CategoryStats]:
+) -> PaginatedResponse[CategoryStatsDTO]:
     rows = await get_stats_by_category(db, require_org(current_user))
     return PaginatedResponse.from_full_list(rows, offset=offset, limit=limit)
 

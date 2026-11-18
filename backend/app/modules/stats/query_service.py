@@ -12,6 +12,17 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.contracts import (
+    ActivityDTO,
+    CategoryStatsDTO,
+    ConsumptionStatsDTO,
+    CostSummaryDTO,
+    ExpenseForecastDTO,
+    ExpiryBucketDTO,
+    OverviewDTO,
+    RotationAnalysisDTO,
+    StorageStatsDTO,
+)
 from app.core.public_api import core_api
 
 from .schemas import PreviousMeasurement, ReconciliationResponse
@@ -19,7 +30,7 @@ from .schemas import PreviousMeasurement, ReconciliationResponse
 
 async def get_consumption_stats(
     db: AsyncSession, organization_id: UUID, days: int = 30
-) -> Any:
+) -> ConsumptionStatsDTO:
     """Usage and disposal aggregates (delegates to core_api.queries)."""
     return await core_api.queries.get_consumption_stats_async(
         db, organization_id, days=days
@@ -28,19 +39,21 @@ async def get_consumption_stats(
 
 async def get_cost_analysis(
     db: AsyncSession, organization_id: UUID, period: str = 'month'
-) -> Any:
+) -> CostSummaryDTO:
     """Cost analysis: spent, wasted, trends (delegates to core_api.queries)."""
     return await core_api.queries.get_cost_summary_async(
         db, organization_id, period=period
     )
 
 
-async def get_rotation_analysis_async(db: AsyncSession, organization_id: UUID) -> Any:
+async def get_rotation_analysis_async(
+    db: AsyncSession, organization_id: UUID
+) -> RotationAnalysisDTO:
     """Inventory rotation metrics (delegates to core_api.queries)."""
     return await core_api.queries.get_rotation_analysis_async(db, organization_id)
 
 
-async def get_overview_stats(db: AsyncSession, organization_id: UUID) -> Any:
+async def get_overview_stats(db: AsyncSession, organization_id: UUID) -> OverviewDTO:
     """High-level inventory health snapshot (delegates to core_api.queries)."""
     return await core_api.queries.get_overview_async(db, organization_id)
 
@@ -70,31 +83,39 @@ async def get_low_stock_products(
     return rows, total
 
 
-async def get_stats_by_storage(db: AsyncSession, organization_id: UUID) -> Any:
+async def get_stats_by_storage(
+    db: AsyncSession, organization_id: UUID
+) -> list[StorageStatsDTO]:
     """Per-storage item counts and expiry aggregates."""
     return await core_api.queries.get_stats_by_storage_async(db, organization_id)
 
 
-async def get_stats_by_category(db: AsyncSession, organization_id: UUID) -> Any:
+async def get_stats_by_category(
+    db: AsyncSession, organization_id: UUID
+) -> list[CategoryStatsDTO]:
     """Per-category item counts and stock value."""
     return await core_api.queries.get_stats_by_category_async(db, organization_id)
 
 
-async def get_expiry_forecast(db: AsyncSession, organization_id: UUID) -> Any:
+async def get_expiry_forecast(
+    db: AsyncSession, organization_id: UUID
+) -> list[ExpiryBucketDTO]:
     """Six time-bucketed expiry counts."""
     return await core_api.queries.get_expiry_forecast_async(db, organization_id)
 
 
 async def get_recent_activity(
     db: AsyncSession, organization_id: UUID, limit: int = 10
-) -> Any:
+) -> list[ActivityDTO]:
     """Recent ItemHistory entries."""
     return await core_api.queries.get_recent_activity_async(
         db, organization_id, limit=limit
     )
 
 
-async def get_reconciliation(db: AsyncSession, organization_id: UUID) -> Any:
+async def get_reconciliation(
+    db: AsyncSession, organization_id: UUID
+) -> ReconciliationResponse:
     """The stock reconciliation pairs (delegates to core_api.queries).
 
     The screen reads the previous scheduled pass beside the fresh one — the
@@ -116,7 +137,7 @@ async def get_reconciliation(db: AsyncSession, organization_id: UUID) -> Any:
 
 async def get_expense_forecast(
     db: AsyncSession, organization_id: UUID, period: str = 'month'
-) -> Any:
+) -> ExpenseForecastDTO:
     """Predicted spending from historical trends (delegates to core_api.queries)."""
     return await core_api.queries.get_expense_forecast_async(
         db, organization_id, period=period

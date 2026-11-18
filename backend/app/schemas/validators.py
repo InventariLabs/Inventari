@@ -6,7 +6,7 @@ to avoid copy-pasting the same field_validator / field_serializer bodies.
 
 import re
 from decimal import ROUND_HALF_UP, Decimal
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import AfterValidator
 
@@ -15,7 +15,7 @@ from app.core.scan_links import scanned_code
 _SKU_RE = re.compile(r'^[A-Z0-9][A-Z0-9\-_/]{0,49}$')
 
 
-def decimal_from_int_float(v):
+def decimal_from_int_float(v: Any) -> Any:
     """Convert int/float to Decimal; pass None and str through unchanged.
 
     Suitable as a Pydantic ``BeforeValidator`` or inline in a
@@ -48,7 +48,7 @@ QUANTITY_MAX = Decimal(
 RemovalStrategy = Literal['FIFO', 'FEFO']
 
 
-def quantize_quantity(v):
+def quantize_quantity(v: Any) -> Any:
     """Quantize an incoming quantity to the store's precision (3 dp, HALF_UP).
 
     Pydantic passes 1.0005 through and Postgres rounds it silently; an
@@ -60,21 +60,21 @@ def quantize_quantity(v):
     return Decimal(v).quantize(QUANTITY_STEP, rounding=ROUND_HALF_UP)
 
 
-def empty_string_to_none(v):
+def empty_string_to_none(v: Any) -> Any:
     """Convert ``''`` to ``None``, pass everything else through."""
     if v == '':
         return None
     return v
 
 
-def normalize_barcode(v):
+def normalize_barcode(v: Any) -> Any:
     """Normalize barcode value using the core barcode utility."""
     from app.core.barcode import normalize_barcode as _normalize
 
     return _normalize(v)
 
 
-def normalize_sku(v):
+def normalize_sku(v: Any) -> Any:
     """A SKU as the catalogue keeps it: trimmed, upper-case, blank as ``None``.
 
     Raises the translated ``sku_format_invalid`` refusal for a value outside

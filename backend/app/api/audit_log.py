@@ -15,10 +15,11 @@ happen via dedicated ``audit_service.log_action_async`` callers
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_current_admin_user
 from app.core.contracts import AuditLogDTO, UserContextDTO
@@ -64,8 +65,8 @@ async def list_audit_log(
         ),
     ),
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     org_id = require_org(current_user)
     position = decode_keyset_cursor(cursor) if cursor else None
     served_before = position.offset if position else offset
@@ -120,7 +121,7 @@ async def list_audit_log(
 )
 async def list_audit_target_types(
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> list[str]:
     """The kinds of thing this organization's log actually records.
 

@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import logging
 from typing import TYPE_CHECKING
+from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.orm import undefer
@@ -63,7 +64,7 @@ logger = logging.getLogger(__name__)
 
 
 async def load_org_for_focus_async(
-    db: AsyncSession, organization_id
+    db: AsyncSession, organization_id: UUID
 ) -> Organization | None:
     """The organization row with the deferred focus columns eager-loaded.
 

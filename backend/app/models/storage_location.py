@@ -23,6 +23,8 @@ if TYPE_CHECKING:
     from app.models.item import Item
     from app.models.organization import Organization
     from app.models.storage_type import StorageType
+    from app.models.user import User
+    from app.modules.stock_takes.models import StockTake
 
 
 class LocationUsage(StrEnum):
@@ -113,7 +115,7 @@ class StorageLocation(Base):
     #: The names the API and the contract DTOs give the type: a client meets
     #: a location type, the table keeps its storage_type spelling.
     location_type_id: Mapped[uuid.UUID | None] = synonym('storage_type_id')
-    location_type: Mapped['StorageType'] = synonym('storage_type')  # type: ignore[name-defined]
+    location_type: Mapped['StorageType'] = synonym('storage_type')
     context_schema: Mapped[list[str]] = mapped_column(
         JSON, server_default='[]'
     )  # e.g. ["expiry_date", "quantity", "unit"]
@@ -160,7 +162,7 @@ class StorageLocation(Base):
     # Relationships
     organization: Mapped['Organization'] = relationship(
         back_populates='storage_locations'
-    )  # type: ignore[name-defined]
+    )
     parent: Mapped['StorageLocation | None'] = relationship(
         remote_side='StorageLocation.id',
         back_populates='children',
@@ -170,21 +172,21 @@ class StorageLocation(Base):
         back_populates='parent',
         foreign_keys='StorageLocation.parent_id',
     )
-    user: Mapped['User'] = relationship(  # type: ignore[name-defined]
+    user: Mapped['User'] = relationship(
         back_populates='storage_locations', foreign_keys=[created_by]
     )
-    creator: Mapped['User'] = relationship(  # type: ignore[name-defined]
+    creator: Mapped['User'] = relationship(
         foreign_keys=[created_by], overlaps='storage_locations,user'
     )
     storage_type: Mapped['StorageType'] = relationship(
         back_populates='storage_locations', lazy='selectin'
-    )  # type: ignore[name-defined]
-    items: Mapped[list['Item']] = relationship(  # type: ignore[name-defined]
+    )
+    items: Mapped[list['Item']] = relationship(
         back_populates='storage_location', cascade='all, delete-orphan'
     )
-    stock_takes: Mapped[list['StockTake']] = relationship(  # type: ignore[name-defined]
+    stock_takes: Mapped[list['StockTake']] = relationship(
         back_populates='storage_location', cascade='all, delete-orphan'
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<StorageLocation(name="{self.name}", parent_id={self.parent_id})>'

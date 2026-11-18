@@ -2,6 +2,7 @@ import re
 import uuid
 from datetime import datetime
 from decimal import Decimal
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -177,4 +178,4 @@ class PartnerImportResponse(BaseModel):
     total: int
     imported: int
     failed: int
-    errors: list[dict] = []
+    errors: list[dict[str, Any]] = []
