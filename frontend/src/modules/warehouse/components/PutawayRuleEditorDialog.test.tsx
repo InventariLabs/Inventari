@@ -848,7 +848,12 @@ describe("PutawayRuleEditorDialog on the rule's targets", () => {
     });
     renderDialog({ rule: ruleFixture() });
 
-    await screen.findByRole("list");
+    const items = within(await screen.findByRole("list")).getAllByRole(
+      "listitem",
+    );
+    // The list stands before the capacity reads answer; absence only means
+    // something once the first target's row is filled.
+    await waitFor(() => expect(items[0]).toHaveTextContent("12 / 50 kg"));
     expect(
       screen.queryByText(/a delivery larger than what still fits/i),
     ).toBeNull();
