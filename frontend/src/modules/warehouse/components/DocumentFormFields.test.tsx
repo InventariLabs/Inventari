@@ -1,4 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import userEvent from "@testing-library/user-event";
 import { render, screen, within } from "@/test/utils";
 import { DocumentFormFields } from "./DocumentFormFields";
 import { serveLocations } from "@/test/serveLocations";
@@ -18,6 +19,7 @@ vi.mock("@/components/ui/SearchableCombobox", () => ({
     label,
     required,
     loading,
+    clearable,
   }: {
     options: { id: string; name: string; path?: string }[];
     value: string;
@@ -29,6 +31,7 @@ vi.mock("@/components/ui/SearchableCombobox", () => ({
     label?: string;
     required?: boolean;
     loading?: boolean;
+    clearable?: boolean;
   }) => (
     <div>
       {label && (
@@ -53,6 +56,11 @@ vi.mock("@/components/ui/SearchableCombobox", () => ({
           </option>
         ))}
       </select>
+      {clearable && value && (
+        <button type="button" onClick={() => onChange("")}>
+          Clear
+        </button>
+      )}
       {onCreateNew && createLabel && (
         <button type="button" onClick={() => onCreateNew("")}>
           {createLabel}
@@ -229,6 +237,33 @@ describe("DocumentFormFields", () => {
     );
     expect(options).not.toContain("Receiving");
     expect(options).toContain("Shelf A");
+  });
+
+  it("offers a clear choice on an optional partner that is set, and clears it", async () => {
+    const onPartnerIdChange = vi.fn();
+    render(
+      <DocumentFormFields
+        {...baseProps}
+        requiresPartner={false}
+        partnerId="p1"
+        onPartnerIdChange={onPartnerIdChange}
+      />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Clear" }));
+    expect(onPartnerIdChange).toHaveBeenCalledWith("");
+  });
+
+  it("offers no clear choice when the partner is required", () => {
+    render(
+      <DocumentFormFields
+        {...baseProps}
+        requiresPartner={true}
+        partnerId="p1"
+      />,
+    );
+    expect(
+      screen.queryByRole("button", { name: "Clear" }),
+    ).not.toBeInTheDocument();
   });
 
   it("renders create new partner button when onPartnerCreate is provided", () => {

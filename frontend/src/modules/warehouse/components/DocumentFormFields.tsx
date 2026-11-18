@@ -143,6 +143,7 @@ export function DocumentFormFields({
               id={FIELD_IDS.partner}
               label={t("fields.partner")}
               required={requiresPartner}
+              clearable={!requiresPartner}
               error={errors.partner_id ? t(errors.partner_id) : undefined}
               options={partners}
               onSearchChange={onPartnerSearch}
