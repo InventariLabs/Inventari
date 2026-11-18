@@ -30,6 +30,7 @@ from .defaults_service import (
     import_defaults,
     list_defaults,
     lookup_default,
+    read_defaults_csv,
     upsert_org_default,
 )
 from .schemas import (
@@ -160,7 +161,6 @@ async def import_ingredient_defaults(
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> ImportDefaultsResult:
     """Import nutrition defaults from a JSON or CSV file upload."""
-    import csv as csv_module
     import json as json_module
 
     org_id = require_org(current_user)
@@ -177,8 +177,7 @@ async def import_ingredient_defaults(
 
     try:
         if filename.endswith('.csv'):
-            reader = csv_module.DictReader(content.splitlines())
-            items = list(reader)
+            items = read_defaults_csv(raw, file.filename or '')
         else:
             items = json_module.loads(content)
     except Exception as exc:  # an uploaded file's every parse failure is a refusal

@@ -4,10 +4,11 @@ import datetime
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.modules.recipes.models import MealSlot
 
+from ._name_matching import match_key
 from ._schemas_io import ListedElsewhere
 
 # === MealPlanner ===
@@ -212,6 +213,23 @@ class ShoppingListGenerationResult(BaseModel):
 class ShoppingExclusionCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     template_id: UUID | None = None
+
+    @field_validator('name')
+    @classmethod
+    def name_needs_a_key(cls, value: str) -> str:
+        """A name the matching folds to nothing names no ingredient.
+
+        The minimum length counts characters, and whitespace, a zero-width
+        space or a BOM are characters that fold to '': the exclusion would be
+        stored under the matching key every nameless exclusion shares, and
+        the next invisible name — whichever of them it is — would be answered
+        with 409. Refused here, the write never reaches the column, and the
+        name stored is the stripped one the matching was taken from.
+        """
+        name = value.strip()
+        if not match_key(name):
+            raise ValueError('name must not be blank')
+        return name
 
 
 class ShoppingExclusionSchema(BaseModel):

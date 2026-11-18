@@ -22,7 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db_utils import acquire_advisory_lock, escape_ilike, paginate_async
 from app.core.exceptions import AppException
 from app.core.logging import get_logger
-from app.core.module_sdk import rows_to_csv
+from app.core.module_sdk import cell_text, read_sheet, rows_to_csv
 from app.i18n.service import get_current_lang, get_error_message
 
 from ._name_matching import normalize_name
@@ -228,6 +228,34 @@ def _same_numbers(row: IngredientNutritionDefault, item: dict[str, Any]) -> bool
         _opt_decimal(item.get(field)) == getattr(row, field)
         for field in _NUTRIENT_FIELDS
     )
+
+
+def read_defaults_csv(content: bytes, filename: str) -> list[dict[str, Any]]:
+    """A CSV sheet as the row dicts :func:`import_defaults` validates.
+
+    Read through the shared reader, the one place that knows how the file a
+    user actually has writes itself — a BOM, the local codepage, and the
+    semicolon most European locales put between columns. A door with a
+    reader of its own took a semicolon sheet for one unreadable column, and
+    decoded cp1250 with ``errors='replace'``: the Polish letters reached the
+    column as '�' under a 200.
+
+    A decimal comma is the same sheet's arithmetic. With the semicolon
+    separating columns, a comma inside a cell is never a boundary, and
+    Excel writes 368,5 where a comma-separated sheet writes 368.5 — read as
+    text it fails the numeric validation and every fractional row counts as
+    an error. A nutrient cell named that way reads as the number it names;
+    the rest of the row stays the text it was.
+    """
+    items: list[dict[str, Any]] = []
+    for record in read_sheet(content, filename).to_dict(orient='records'):
+        row = {str(column): cell_text(value) for column, value in record.items()}
+        for field in _NUTRIENT_FIELDS:
+            value = row.get(field)
+            if isinstance(value, str):
+                row[field] = value.replace(',', '.')
+        items.append(row)
+    return items
 
 
 async def import_defaults(
