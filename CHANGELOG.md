@@ -282,6 +282,13 @@ says what the release does rather than what changed since them.
   also creates products, keep the longer warning, because signing in again
   loses that work.
 
+- When the session ends on a request that only reads (picking an import file,
+  looking up a product) while a document form holds unsaved work, the reader
+  is now told that what was entered was not kept, instead of landing on the
+  sign-in page with nothing said. The document form also asks before the page
+  is reloaded or left once something in it has been changed, and says nothing
+  while an opened draft is untouched.
+
 - The price a document suggests for a supplier's product is the price that
   line can get: valid today, from a quantity tier the line's quantity
   reaches, and in the organization's own currency before any other. It used

@@ -172,7 +172,7 @@ describe("AppShell — a session that ends under a form holding work says so", (
     vi.restoreAllMocks();
   });
 
-  it("says the work was not kept when no caller's toast did", () => {
+  it("says the work was not kept when no toast carried the news", () => {
     vi.useFakeTimers();
     const error = vi.spyOn(toast, "error").mockReturnValue("id");
     useFormGuardStore.getState().setDirtyForm("The document form");
@@ -180,6 +180,9 @@ describe("AppShell — a session that ends under a form holding work says so", (
 
     act(() => {
       window.dispatchEvent(new CustomEvent("auth:logout"));
+      // A caller that puts the sentence into its own state (a picker's inline
+      // error) reads it, but nothing on screen shows it once /login mounts.
+      extractApiError(new SessionEndedError("Your session has ended."), "x");
       vi.advanceTimersByTime(1000);
     });
 
@@ -190,16 +193,21 @@ describe("AppShell — a session that ends under a form holding work says so", (
     );
   });
 
-  it("leaves the news to a caller's toast that already carried it", () => {
+  it("leaves the news to a toast that already carries it", () => {
     vi.useFakeTimers();
     const error = vi.spyOn(toast, "error").mockReturnValue("id");
+    vi.spyOn(toast, "getToasts").mockReturnValue([
+      {
+        id: 1,
+        title:
+          "Your session has ended, so this was not saved. Sign in again and start over.",
+      },
+    ]);
     useFormGuardStore.getState().setDirtyForm("The document form");
     renderShell();
 
     act(() => {
       window.dispatchEvent(new CustomEvent("auth:logout"));
-      // The caller's catch block runs right after the event.
-      extractApiError(new SessionEndedError("Your session has ended."), "x");
       vi.advanceTimersByTime(1000);
     });
 
