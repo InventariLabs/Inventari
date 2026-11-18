@@ -155,6 +155,41 @@ function hasUserFilledLine(
   });
 }
 
+/**
+ * Reports whether the form holds work to the form guard. A new form holds
+ * work once the user has filled something in; an existing document opens
+ * with its own partner, locations and lines, so there work is any difference
+ * from what it opened with.
+ */
+function useDocumentFormGuard(
+  workspace: ReturnType<typeof useDocumentWorkspaceState>,
+  hasUnsavedInput: boolean,
+  label: string,
+): void {
+  const snapshot = JSON.stringify([
+    workspace.partnerId,
+    workspace.sourceLocationId,
+    workspace.targetLocationId,
+    workspace.scheduledDate,
+    workspace.notes,
+    workspace.externalReference,
+    workspace.lines.map((l) => [
+      lineSignature(l),
+      l.name,
+      l.unit_price,
+      l.tax_rate,
+      l.batch_number,
+      l.expiry_date,
+      l.notes,
+    ]),
+  ]);
+  const opened = useRef(snapshot);
+  useFormGuard(
+    workspace.isEdit ? snapshot !== opened.current : hasUnsavedInput,
+    label,
+  );
+}
+
 /** A location the user picked, as opposed to none or the one handed in. */
 function changedFrom(picked: string, prefilled?: string): boolean {
   return !!picked && picked !== prefilled;
@@ -509,34 +544,10 @@ export default function DocumentFormModal({
     !!notes.trim() ||
     !!externalReference.trim();
 
-  // An existing document opens with its own partner, locations and lines, so
-  // there "work" is any difference from what it opened with.
-  const formSnapshot = JSON.stringify([
-    partnerId,
-    sourceLocationId,
-    targetLocationId,
-    scheduledDate,
-    notes,
-    externalReference,
-    lines.map((l) => [
-      lineSignature(l),
-      l.name,
-      l.unit_price,
-      l.tax_rate,
-      l.batch_number,
-      l.expiry_date,
-      l.notes,
-    ]),
-  ]);
-  const openedSnapshot = useRef(formSnapshot);
-
   // The shell-wide navigation gate (the command palette, the header) and the
   // reader's own words after a session ended under the form both ask whether
   // the form holds work.
-  useFormGuard(
-    isEdit ? formSnapshot !== openedSnapshot.current : hasUnsavedInput,
-    t("form.guardName"),
-  );
+  useDocumentFormGuard(workspace, hasUnsavedInput, t("form.guardName"));
 
   // when the inline partner-create popover is open, Esc/backdrop must
   // close the popover first — not discard the whole document form.
