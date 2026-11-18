@@ -235,3 +235,74 @@ def test_our_own_validator_messages_lose_the_pydantic_wrapper(client):
     messages = _detail_messages(response)
     assert 'Nieprawidłowy format email' in messages
     assert not any(msg.startswith('Value error, ') for msg in messages)
+
+
+def test_a_reserved_domain_email_answers_in_polish(client):
+    """email-validator's own English sentence never reaches a Polish reader."""
+    response = client.post(
+        '/api/v1/auth/password-reset/request',
+        json={'email': 'jan@foo.invalid'},
+        headers={'Accept-Language': 'pl'},
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+    messages = _detail_messages(response)
+    assert 'Ta domena jest zarezerwowana i nie przyjmuje poczty' in messages
+    assert not any('email address' in msg for msg in messages)
+
+
+@pytest.mark.parametrize(
+    ('lang', 'sentence'),
+    [
+        ('en', 'This e-mail domain is reserved and cannot receive mail'),
+        ('pl', 'Ta domena jest zarezerwowana i nie przyjmuje poczty'),
+        ('de', 'Diese E-Mail-Domain ist reserviert und kann keine Post empfangen'),
+        (
+            'fr',
+            'Ce domaine e-mail est réservé et ne peut pas recevoir de courrier',
+        ),
+        ('es', 'Este dominio de correo está reservado y no puede recibir mensajes'),
+    ],
+)
+def test_a_reserved_domain_email_is_named_in_every_maintained_language(
+    lang: str, sentence: str
+) -> None:
+    from app.i18n._validation import translate_validation_error
+
+    message = translate_validation_error(
+        {
+            'type': 'value_error',
+            'msg': 'value is not a valid email address: The part after the '
+            '@-sign is a special-use or reserved name that cannot be used '
+            'with email.',
+            'ctx': {'reason': 'reserved'},
+        },
+        lang=lang,
+    )
+
+    assert message == sentence
+
+
+@pytest.mark.parametrize(
+    ('email', 'expected'),
+    [
+        ('jan', 'Adres e-mail potrzebuje znaku @ z czymś przed i po nim'),
+        ('x@y', 'Część po znaku @ wymaga kropki, jak w imie@example.com'),
+        ('a b@x.com', 'Adres e-mail zawiera niedozwolone znaki'),
+        ('jan@x..com', 'To nie jest poprawny adres e-mail'),
+    ],
+)
+def test_each_email_refusal_keeps_its_reason_in_polish(email: str, expected: str):
+    """The reasons email-validator gives map to catalogue sentences; one it
+    does not name answers with the general Polish sentence, not English."""
+    from pydantic import BaseModel, EmailStr, ValidationError
+
+    from app.i18n._validation import translate_validation_error
+
+    class Probe(BaseModel):
+        address: EmailStr
+
+    with pytest.raises(ValidationError) as refused:
+        Probe(address=email)
+
+    assert translate_validation_error(refused.value.errors()[0], lang='pl') == expected
