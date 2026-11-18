@@ -1,7 +1,8 @@
 import uuid
 from datetime import UTC, datetime
+from decimal import Decimal
 
-from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -32,7 +33,9 @@ class AIUsageLog(Base):
     completion_tokens: Mapped[int] = mapped_column(Integer, default=0)
     total_tokens: Mapped[int] = mapped_column(Integer, default=0)
 
-    estimated_cost_usd: Mapped[float | None] = mapped_column(Float)
+    # Ten decimal places: a short call to a cheap model costs well under a
+    # millionth of a dollar, and rounding those to zero would lose them all.
+    estimated_cost_usd: Mapped[Decimal | None] = mapped_column(Numeric(16, 10))
     cost_is_estimated: Mapped[bool] = mapped_column(
         default=False, server_default='false'
     )

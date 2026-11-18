@@ -235,6 +235,10 @@ async def _send_job(db: AsyncSession, job_id: uuid.UUID, now: datetime) -> None:
     if result.ok:
         job.status = _STATUS_SENT
         job.sent_at = now
+        # The file left with the message and nothing reads it again. Mail that
+        # has not gone out keeps its own: a retry needs it, and so does an
+        # operator who puts failed mail back in the queue.
+        job.attachment_bytes = None
         job.last_error = None
     else:
         # What stopped the mail, not what the queue did about it. The row

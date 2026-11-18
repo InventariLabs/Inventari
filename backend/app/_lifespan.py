@@ -217,6 +217,7 @@ def _register_background_jobs(task_scheduler, event_bus) -> None:
         RECONCILIATION_INTERVAL,
         run_reconciliation_once,
     )
+    from app.services.table_retention import run_table_retention_once
 
     task_scheduler.register(
         name='email_jobs',
@@ -229,6 +230,13 @@ def _register_background_jobs(task_scheduler, event_bus) -> None:
         name='archive_retention',
         interval=timedelta(hours=24),
         handler=run_archive_retention_once,
+        module_name='core',
+    )
+    # finished rows of the tables that would otherwise only grow.
+    task_scheduler.register(
+        name='table_retention',
+        interval=timedelta(hours=24),
+        handler=run_table_retention_once,
         module_name='core',
     )
     # stock reconciliation — the two-pair drift check, measured on a
