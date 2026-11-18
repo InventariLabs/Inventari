@@ -352,7 +352,7 @@ class TestGetOrgOwnedRefusesMissingOrg:
     """``org_id=None`` is a refusal, not a query for org-less rows.
 
     ``organization_id == None`` compiles to ``IS NULL``, so a caller that
-    lost its tenant on the way here used to read system/global rows instead
+    lost its tenant on the way here would read system/global rows instead
     of being turned away. Both tests pass ``db=None``: reaching the session
     at all would raise ``AttributeError``, so a passing test also proves the
     refusal happens *before* the query is built.

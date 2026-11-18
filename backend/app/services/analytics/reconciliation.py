@@ -41,12 +41,10 @@ _ZERO = Decimal('0')
 #: ``work_mem`` for the report's aggregates (see :func:`get_reconciliation_async`).
 _WORK_MEM = '64MB'
 
-# Any difference at all. There used to be a threshold of a thousandth here,
-# and the comment beside it said why: both sides were being converted to
-# float, so a shelf holding a third of a kilogram three times over showed a
-# drift that was not there. Both sides are exact now, and a thousandth is
-# the smallest difference these columns can hold — so the threshold that
-# hid the noise was also hiding the smallest real drift there is.
+# Any difference at all. Both sides are exact decimals, so a shelf holding a
+# third of a kilogram three times over shows no drift, and a thousandth is
+# the smallest difference these columns can hold: a threshold would hide
+# the smallest real drift there is.
 _DRIFT_EPSILON = Decimal('0')
 
 

@@ -55,7 +55,7 @@ def _blank_png(width: int, height: int) -> bytes:
         # The reported file: inside the band where Pillow only warns.
         (12_000, 12_000),
         # Over twice Pillow's limit: Pillow refuses it itself, with an error
-        # class no caller here used to catch.
+        # class no caller here catches.
         (20_000, 10_000),
     ],
 )

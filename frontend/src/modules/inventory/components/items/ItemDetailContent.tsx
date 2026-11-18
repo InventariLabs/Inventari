@@ -30,13 +30,12 @@ type Tab = "overview" | "history" | "moves";
  * Split off the page so the quick actions can be a hook: they need an item,
  * and a hook cannot wait for one to load.
  *
- * Three tabs where there used to be two. The third was refused on the
- * grounds that "stock movements have no source of their own" — true when
- * the only history in the application was this record's own audit trail,
- * and false now that the movement ledger is readable: a run that consumed
- * this product picked whichever rows covered the amount, a receipt lands on
- * the row it decided to top up, and neither writes the story of the *place*
- * into the row you happen to be looking at. The two tabs answer different
+ * Three tabs, the third being the movement ledger. "Stock movements have no
+ * source of their own" would hold only if the sole history were this
+ * record's own audit trail; the ledger is readable, and a run that consumed
+ * this product picks whichever rows cover the amount, a receipt lands on
+ * the row it decides to top up, and neither writes the story of the *place*
+ * into the row you happen to be looking at. The two history tabs answer different
  * questions — "what was done to this record" and "what moved here" — and
  * the second one is the one an audit asks.
  */

@@ -17,9 +17,9 @@ changes daily, so freezing the resolution at save time would hide every
 product added afterwards until somebody re-saved the recipe by hand.
 
 The reads are batched into a :class:`StockContext` — five queries, whether
-the caller asks about one recipe or two hundred. There used to be two
-nearly identical code paths, one with a cache and one without; a context
-that a lone recipe also builds removes that fork.
+the caller asks about one recipe or two hundred. One code path serves
+both: a lone recipe builds the same context, so there is no second path
+with a cache of its own to keep in step.
 """
 
 from __future__ import annotations

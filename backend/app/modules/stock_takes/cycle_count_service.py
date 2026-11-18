@@ -93,7 +93,7 @@ async def update_schedule(
 
     # The router has already refused nulls on NOT NULL columns; a named null
     # that reaches this loop is a real clearing instruction for a nullable
-    # column, and the blanket `is not None` filter here used to erase it.
+    # column, so no blanket `is not None` filter belongs here: it would erase it.
     changed = sorted(kwargs)
     for key, value in kwargs.items():
         if hasattr(schedule, key):

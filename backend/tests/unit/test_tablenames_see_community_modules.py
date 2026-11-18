@@ -379,7 +379,7 @@ class TestExternalModuleRoots:
         self, tmp_path: Path, monkeypatch
     ):
         """In the container ``/modules-workspace`` and the repo-root twin are
-        one directory; a module there used to be reported twice."""
+        one directory; a module there is reported once, not twice."""
         from app.core.architecture_lint import _main
 
         real = tmp_path / 'workspace'

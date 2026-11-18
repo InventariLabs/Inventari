@@ -104,8 +104,8 @@ export function PrintLayoutSelector() {
         )}
         {/* What the change reaches: this is the org-wide fallback, and a
             template written for a document's type (Templates screen) still
-            wins for that type. Saving here used to re-dress every printout
-            in the organization with nothing on screen saying so. */}
+            wins for that type. Saving here re-dresses every printout
+            in the organization, so the screen has to say so. */}
         <p className="text-xs text-on-muted">{t("profile.printLayoutScope")}</p>
         {selected === "auto" && (
           <p className="text-xs text-on-muted">{t("profile.layoutAutoRule")}</p>

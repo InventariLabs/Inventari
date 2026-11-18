@@ -5,7 +5,6 @@
   "backend/app/core/_registry_class.py": 1,
   "backend/app/core/file_storage/providers/s3.py": 1,
   "backend/app/core/llm/google_client.py": 1,
-  "backend/app/modules/api_keys/tests/integration/test_a_key_keeps_working_on_a_short_prefix.py": 1,
   "backend/app/modules/maker/tests/integration/test_the_planned_runs_share_one_list_of_needs.py": 1,
   "backend/app/modules/recipes/_meal_plan_shopping.py": 1,
   "backend/app/modules/recipes/tests/integration/test_picking_trace_survives_edit.py": 1,

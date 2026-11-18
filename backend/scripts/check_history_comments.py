@@ -9,7 +9,7 @@ there. AGENTS.md, "Comments and docstrings", states the rule; this is the part
 that keeps it from eroding.
 
 What is counted: lines of *comments and docstrings* that match a phrase from
-``PHRASES`` -- ``used to``, ``previously``, ``formerly``, ``until now``, "the old
+``narrates`` -- ``used to``, ``previously``, ``formerly``, ``until now``, "the old
 code" and their kin. Python is read with ``tokenize`` (comments) and ``ast``
 (docstrings); TypeScript with a small scanner that skips string, template and
 regular-expression literals. A string literal or an identifier that happens to
@@ -61,19 +61,23 @@ _EXTENSIONS = {
 _GENERATED = ('frontend/src/types/api-generated.ts', 'frontend/src/types/api-routes.ts')
 
 # "used to" is a narration only as the verb of a subject ("the rule used to
-# turn ..."); after a form of "be", a modal or an adverb it is the participle
-# ("is used to build the key") and describes the present.
-_NOT_BEFORE_USED_TO = (
-    'is are be was were been being get gets got not also only then can could may '
-    'might will would should must always just here there simply solely merely '
-    'again often mostly mainly typically usually'
-).split()
-_USED_TO = ''.join(rf'(?<!\b{word} )' for word in _NOT_BEFORE_USED_TO) + r'\bused to\b'
+# turn ..."). After a form of "be" or "get" it is the participle ("is used to
+# build the key", "gets used to read it") and describes the present; the
+# adverbs of "is also used to" may sit between the two. Anything else -- "there
+# used to be", "it also used to close" -- narrates.
+_PARTICIPLE_AFTER = {
+    'is', 'are', 'am', 'be', 'was', 'were', 'been', 'being', 'get', 'gets', 'got',
+    'getting', "isn't", "aren't", "wasn't", "weren't",
+}  # fmt: skip
+_ADVERBS_BETWEEN = {
+    'not', 'also', 'only', 'just', 'then', 'always', 'simply', 'solely', 'merely',
+    'often', 'mostly', 'mainly', 'typically', 'usually', 'again', 'still',
+}  # fmt: skip
+_USED_TO = re.compile(r'\bused to\b', re.IGNORECASE)
 
-PHRASES = re.compile(
+_OTHER_PHRASES = re.compile(
     '|'.join(
         (
-            _USED_TO,
             r'\bpreviously\b',
             r'\bwas once\b',
             r'\bformerly\b',
@@ -87,6 +91,19 @@ PHRASES = re.compile(
     ),
     re.IGNORECASE,
 )
+
+
+def narrates(text: str) -> bool:
+    """Whether one comment line tells how the code used to be."""
+    if _OTHER_PHRASES.search(text):
+        return True
+    for match in _USED_TO.finditer(text):
+        before = re.findall(r"[a-z']+", text[: match.start()].lower())
+        while before and before[-1] in _ADVERBS_BETWEEN:
+            before.pop()
+        if not before or before[-1] not in _PARTICIPLE_AFTER:
+            return True
+    return False
 
 
 def python_comment_lines(source: str) -> dict[int, str]:
@@ -271,7 +288,7 @@ def count_history_lines(path: str, source: str) -> int:
         lines = python_comment_lines(source)
     else:
         lines = typescript_comment_lines(source)
-    return sum(1 for text in lines.values() if PHRASES.search(text))
+    return sum(1 for text in lines.values() if narrates(text))
 
 
 def tracked_files(trees: list[str]) -> list[str]:

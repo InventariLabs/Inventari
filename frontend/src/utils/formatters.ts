@@ -461,8 +461,9 @@ export function stepText(
  * `numeric(12,6)` serializes a thousandth as "0.001000", and a rule read off
  * that column would be a rule nobody has. This is the number of places an
  * input accepts (the counting box refuses a fourth decimal on a gram). It is
- * not how many places a stored quantity displays: `formatQuantityValue` never
- * shows fewer than the three places the quantity columns keep.
+ * not how many places a stored quantity displays: given a unit step,
+ * `formatQuantityValue` never shows fewer than the three places the quantity
+ * columns keep; without one it strips the padding ("1.000" shows as "1").
  */
 export function decimalsAllowedBy(
   rounding: string | number | null | undefined,

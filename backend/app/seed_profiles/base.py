@@ -190,10 +190,10 @@ def upsert_storage_types(
             # A row still bearing the literal is one nobody has renamed —
             # in either mode. insert_only exists to preserve the
             # organization's customisations, and the install-day literal is
-            # not one of them: freezing it here used to leave an
+            # not one of them: freezing it here would leave an
             # already-seeded organization with no route to its reader's
-            # language, because the switch path was the only seeding it ever
-            # ran again.
+            # language, because the switch path is the only seeding it ever
+            # runs again.
             if existing.name == seeded_name and name != seeded_name:
                 existing.name = name
 
