@@ -146,7 +146,7 @@ ERRORS_PT: dict[str, str] = {
     'picking_picked': '{name} ✓ — retirando {quantity}',
     'invalid_mapping_json': 'JSON de mapeamento inválido',
     'extra_cost_not_a_receipt': 'Custos extras pertencem a um recebimento: somente as mercadorias que entram podem carregar o custo de trazê-las até aqui.',
-    'extra_cost_document_posted': 'Este recebimento já foi lançado, então não é possível adicionar um custo extra: as mercadorias podem já ter saído da prateleira e não há mais o que cobrar. Emita uma correção do recebimento enquanto o período estiver aberto.',
+    'extra_cost_document_posted': 'Este recebimento já foi lançado, então não é possível adicionar um custo extra: as mercadorias podem já ter saído da prateleira e não há mais o que cobrar. Emita uma correção do recebimento enquanto o período estiver aberto ou registre o valor como desvio de custo: ele é listado com o motivo e não entra no valor do estoque.',
     'extra_cost_currency_mismatch': 'O custo extra está em uma moeda diferente da do documento. Informe-o na moeda do documento — converter por uma taxa que ninguém registrou colocaria no valor do estoque um número sem histórico por trás.',
     'document_shipment_dispatch_only': 'Somente uma expedição registra um envio: uma transportadora leva mercadorias que saem do armazém.',
     'document_tracking_template_invalid': 'O link de rastreamento de "{carrier}" deve ser um endereço web que comece com https:// ou http:// e contenha {{tracking_number}} no lugar do número.',

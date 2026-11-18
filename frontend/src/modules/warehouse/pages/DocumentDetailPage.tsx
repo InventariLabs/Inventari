@@ -19,7 +19,7 @@ import { DocumentApprovalCard } from "@/modules/warehouse/components/DocumentApp
 import { DocumentDetailLinesCard } from "@/modules/warehouse/components/DocumentDetailLinesCard";
 import { DocumentValueTotals } from "@/modules/warehouse/components/DocumentValueTotals";
 import { DocumentCorrectionsSection } from "@/modules/warehouse/components/DocumentCorrectionsSection";
-import { DocumentExtraCostsSection } from "@/modules/warehouse/components/DocumentExtraCostsSection";
+import { DocumentDeliveryCosts } from "@/modules/warehouse/components/DocumentDeliveryCosts";
 import { DocumentMetadataGrid } from "@/modules/warehouse/components/DocumentMetadataGrid";
 import { DocumentExecutionPanel } from "@/modules/warehouse/components/DocumentExecutionPanel";
 import { DocumentPackingStep } from "@/modules/warehouse/components/packing/DocumentPackingStep";
@@ -731,7 +731,7 @@ export default function DocumentDetailPage() {
 
       {/* Freight, duty and insurance belong in the value of the goods they
           arrived with, and only a receipt can carry them. */}
-      {doc.type === "IN" && <DocumentExtraCostsSection documentId={doc.id} />}
+      {doc.type === "IN" && <DocumentDeliveryCosts documentId={doc.id} />}
 
       {/* What the document actually did to stock, if anything can have
           happened yet. The lines above say how much was expected and how

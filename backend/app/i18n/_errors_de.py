@@ -236,7 +236,7 @@ ERRORS_DE: ErrorMessages = {
     'invalid_mapping_json': 'Ungültiges Mapping-JSON',
     'extra_cost_not_a_receipt': 'Nebenkosten gehören zu einem Wareneingang: nur eingehende Ware kann die Kosten ihrer Anlieferung tragen.',
     'extra_cost_document_posted': (
-        'Dieser Wareneingang ist bereits gebucht, daher können keine Nebenkosten mehr hinzugefügt werden: die Ware kann das Lager verlassen haben und es gibt nichts mehr zu belasten. Erstellen Sie stattdessen eine Korrektur im offenen Zeitraum.'
+        'Dieser Wareneingang ist bereits gebucht, daher können keine Nebenkosten mehr hinzugefügt werden: die Ware kann das Lager verlassen haben und es gibt nichts mehr zu belasten. Erstellen Sie stattdessen eine Korrektur im offenen Zeitraum oder erfassen Sie den Betrag als Kostenabweichung: Er wird mit Grund aufgeführt und zählt nicht zum Lagerwert.'
     ),
     'extra_cost_currency_mismatch': (
         'Die Nebenkosten lauten auf eine andere Währung als das Dokument. Geben Sie sie in der Dokumentwährung an — eine Umrechnung zu einem nicht erfassten Kurs setzt eine Zahl ohne Historie in den Lagerwert.'

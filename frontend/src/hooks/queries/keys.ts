@@ -266,6 +266,11 @@ export const queryKeys = {
       ["documents", "source-numbers", ids] as const,
     corrections: (documentId: string) =>
       ["documents", documentId, "corrections"] as const,
+    /** Freight, duty and insurance on a receipt, and what they do to its lines. */
+    extraCosts: (documentId: string) =>
+      ["documents", documentId, "extra-costs"] as const,
+    /** Every cost that reached no product, across the organization. */
+    costVariances: ["documents", "cost-variances"] as const,
     /** The scanning session still open over the document, if any. */
     scanSession: (documentId: string) =>
       ["documents", documentId, "scan-session"] as const,

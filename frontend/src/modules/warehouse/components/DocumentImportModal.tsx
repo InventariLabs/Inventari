@@ -52,6 +52,9 @@ type ImportTarget =
       documentType: string;
       /** The shelf those records stand on. */
       sourceLocationId?: string;
+      /** The form already holds what the reader typed. A session that ends
+       *  during the import loses it too, so the refusal says so. */
+      holdsUnsavedWork?: boolean;
     };
 
 type DocumentImportModalProps = ImportTarget & {
@@ -231,6 +234,16 @@ function newDocumentFields(target: ImportTarget): Record<string, string> {
   };
 }
 
+/**
+ * Into an unsaved document the rows are only read, unless unmatched rows found
+ * products. A session that ended during such a read loses nothing the import
+ * held, but a form already filled in goes with it: that refusal keeps saying
+ * the work was not saved.
+ */
+function importReadsOnly(target: ImportTarget, stubs: boolean): boolean {
+  return !stubs && !("holdsUnsavedWork" in target && target.holdsUnsavedWork);
+}
+
 export function DocumentImportModal(props: DocumentImportModalProps) {
   const { onClose, onImported } = props;
   const documentId = "documentId" in props ? props.documentId : undefined;
@@ -353,6 +366,9 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
       return;
     }
 
+    const stubs = createStubsForUnmatched && canCreateStubs;
+    const readOnly = importReadsOnly(props, stubs);
+
     setIsImporting(true);
     try {
       let response;
@@ -361,7 +377,7 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("mapping_json", JSON.stringify(mapping));
-        if (createStubsForUnmatched && canCreateStubs) {
+        if (stubs) {
           formData.append("create_stubs_for_unmatched", "true");
         }
         for (const [key, value] of Object.entries(newDocumentFields(props))) {
@@ -372,12 +388,14 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
               `/warehouse/documents/${documentId}/import-lines`,
               formData,
             )
-          : await api.post<ImportResult>(`/warehouse/import/lines`, formData);
+          : await api.post<ImportResult>(`/warehouse/import/lines`, formData, {
+              readOnly,
+            });
       } else if (sourceMode === "paste" && pasteText) {
         const body = {
           text: pasteText,
           mapping_json: mapping,
-          create_stubs_for_unmatched: createStubsForUnmatched && canCreateStubs,
+          create_stubs_for_unmatched: stubs,
           ...newDocumentFields(props),
         };
         response = documentId
@@ -385,7 +403,11 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
               `/warehouse/documents/${documentId}/import-paste`,
               body,
             )
-          : await api.post<ImportResult>(`/warehouse/import/lines/paste`, body);
+          : await api.post<ImportResult>(
+              `/warehouse/import/lines/paste`,
+              body,
+              { readOnly },
+            );
       } else {
         return;
       }

@@ -257,7 +257,7 @@ function sheetHasWork(args: {
   );
 }
 
-/** Typed work is unsaved: leaving the sheet asks before it is lost. */
+/** Typed work is unsaved: leaving the sheet asks before it is lost. Says whether any is. */
 function useSheetGuard(args: {
   lines: ReceiveDraftLine[];
   externalReference: string;
@@ -271,14 +271,14 @@ function useSheetGuard(args: {
 }) {
   const { t } = useTranslation("warehouse");
   const { delivery, result, ...sheet } = args;
-  useFormGuard(
+  const holdsWork =
     sheetHasWork({
       ...sheet,
       linkedPartnerId: delivery.linkedPartnerId,
       orderLines: delivery.chosenOrder?.lines ?? [],
-    }) && !result,
-    t("receive.guardName"),
-  );
+    }) && !result;
+  useFormGuard(holdsWork, t("receive.guardName"));
+  return holdsWork;
 }
 
 /**
@@ -613,6 +613,33 @@ function importOutcome(lines: ReceiveDraftLine[], result: ImportResult) {
       ? { unmatched: applied.unmatched, errors: result.errors }
       : null;
   return { lines: applied.lines, refused };
+}
+
+/** Rows read from a file or the clipboard, put on the sheet when it closes. */
+function ImportSheet(props: {
+  open: boolean;
+  target: { documentType: string; holdsUnsavedWork: boolean };
+  lines: ReceiveDraftLine[];
+  setLines: (lines: ReceiveDraftLine[]) => void;
+  setRefused: (refused: RefusedPaste | null) => void;
+  onClose: () => void;
+}) {
+  const { open, target, lines, setLines, setRefused, onClose } = props;
+  if (!open) return null;
+  return (
+    <Suspense fallback={null}>
+      <DocumentImportModal
+        {...target}
+        onClose={onClose}
+        onImported={(result) => {
+          const applied = importOutcome(lines, result);
+          setLines(applied.lines);
+          setRefused(applied.refused);
+          onClose();
+        }}
+      />
+    </Suspense>
+  );
 }
 
 /**
@@ -1093,7 +1120,13 @@ export default function ReceiveGoodsPage() {
     source === "supplier",
   );
   const { orders, chosenOrder, setChosenOrderId, forgetOrder } = delivery;
-  useSheetGuard({ lines, externalReference, partnerId, delivery, result });
+  const holdsWork = useSheetGuard({
+    lines,
+    externalReference,
+    partnerId,
+    delivery,
+    result,
+  });
 
   useOnlyWarehouse(
     locationCount,
@@ -1375,20 +1408,14 @@ export default function ReceiveGoodsPage() {
 
       {surplusDialog}
 
-      {importOpen && (
-        <Suspense fallback={null}>
-          <DocumentImportModal
-            documentType={docType}
-            onClose={() => setImportOpen(false)}
-            onImported={(result) => {
-              const applied = importOutcome(lines, result);
-              setLines(applied.lines);
-              setRefused(applied.refused);
-              setImportOpen(false);
-            }}
-          />
-        </Suspense>
-      )}
+      <ImportSheet
+        open={importOpen}
+        target={{ documentType: docType, holdsUnsavedWork: holdsWork }}
+        lines={lines}
+        setLines={setLines}
+        setRefused={setRefused}
+        onClose={() => setImportOpen(false)}
+      />
     </div>
   );
 }

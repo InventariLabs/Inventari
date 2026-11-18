@@ -233,7 +233,7 @@ ERRORS_FR: ErrorMessages = {
     'invalid_mapping_json': 'JSON de mappage invalide',
     'extra_cost_not_a_receipt': 'Les frais annexes appartiennent à une réception : seule la marchandise qui arrive peut porter le coût de son acheminement.',
     'extra_cost_document_posted': (
-        "Cette réception est déjà comptabilisée, un frais ne peut donc plus y être ajouté : la marchandise a pu quitter le stock et il n'y a plus rien à charger. Émettez plutôt une correction pendant que la période est ouverte."
+        "Cette réception est déjà comptabilisée, un frais ne peut donc plus y être ajouté : la marchandise a pu quitter le stock et il n'y a plus rien à charger. Émettez plutôt une correction pendant que la période est ouverte, ou enregistrez le montant comme écart de coût : il est listé avec son motif et n'entre pas dans la valeur du stock."
     ),
     'extra_cost_currency_mismatch': (
         "Le frais est dans une devise différente de celle du document. Saisissez-le dans la devise du document : convertir à un taux que personne n'a enregistré mettrait dans la valeur du stock un chiffre sans historique."

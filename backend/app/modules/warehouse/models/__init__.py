@@ -18,6 +18,7 @@ from .document import (
     ScrapReasonCode,
 )
 from .misc import (
+    DocumentCostVariance,
     DocumentExtraCost,
     DocumentNumberSequence,
     DocumentRelation,
@@ -59,6 +60,7 @@ __all__ = [
     'DocumentLine',
     'DocumentLineStatus',
     'DocumentProfile',
+    'DocumentCostVariance',
     'DocumentExtraCost',
     'DocumentNumberSequence',
     'DocumentPackage',

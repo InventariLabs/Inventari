@@ -95,8 +95,8 @@ describe("receipt extra costs — read, added and removed per document", () => {
       "DELETE cost-1",
     ]);
     expect(invalidated).toEqual([
-      ["document-extra-costs", "doc-1"],
-      ["document-extra-costs", "doc-1"],
+      ["documents", "doc-1", "extra-costs"],
+      ["documents", "doc-1", "extra-costs"],
     ]);
   });
 });

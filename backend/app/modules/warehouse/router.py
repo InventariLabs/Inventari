@@ -49,6 +49,7 @@ from ._router_home_shelf import router as home_shelf_router
 from ._router_occupancy import router as occupancy_router
 from ._router_putaway import router as putaway_router
 from ._work_items_router import router as work_items_router
+from .cost_variance_router import router as cost_variance_router
 from .document_filters import (
     UnknownDocumentFilterError,
     resolve_document_filters_async,
@@ -101,6 +102,7 @@ router.include_router(work_items_router)
 router.include_router(templates_router, prefix='/templates')
 router.include_router(type_config_router)
 router.include_router(extra_costs_router, prefix='/documents')
+router.include_router(cost_variance_router, prefix='/cost-variances')
 router.include_router(packing_router, prefix='/documents')
 router.include_router(shipment_router)
 router.include_router(tax_rate_router)

@@ -253,3 +253,21 @@ The scheduled reconciliation (`app.services.reconciliation_job`, every
 means the quantities in the layers and on the shelf differ. An unpriced
 arrival still has an `unknown` layer, so this comparison does not measure
 how much stock has a known price. See [STOCK.md](STOCK.md).
+
+## A cost that reached no product
+
+A delivery cost can only be spread over the goods while the receipt is
+unposted (`extra_costs_service`). Afterwards the layers are written and some
+of the goods may be gone, so the cost is refused — and the refusal names the
+alternative: a **cost variance** (`DocumentCostVariance`, owned by the
+`warehouse` module; `cost_variance_service`).
+
+A variance is a figure with a reason: amount, currency (the document's, or
+refused — never converted), kind, reason and the day it belongs to. It is
+**not part of any stock value**. No valuation report, layer or total reads the
+`document_cost_variances` table, and there is no counter-account, double entry
+or chart of accounts behind it; a system with a general ledger books the same
+figure to a price-variance account, this one keeps the figure. It is listed
+and summed per currency at `GET /warehouse/cost-variances`, and per document
+in the extra-costs view. The test that pins the promise adds a variance and
+asserts the stock-on-a-date report is identical before and after.
