@@ -491,7 +491,7 @@ describe("closing the shelf the count stands at", () => {
     );
 
     expect(toast.error).toHaveBeenCalledWith(
-      "One number at this location has not been saved. Save it before closing the location.",
+      "One line at this location has changes that are not saved. Save it before closing the location.",
     );
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
     expect(closes).toHaveLength(0);

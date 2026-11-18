@@ -11,8 +11,8 @@
     "countedOf": "{{counted}} / {{total}} articles",
     "discrepanciesDetected_one": "1 écart détecté",
     "discrepanciesDetected_other": "{{count}} écarts détectés",
-    "unsaved_one": "1 quantité saisie mais non enregistrée",
-    "unsaved_other": "{{count}} quantités saisies mais non enregistrées"
+    "unsaved_one": "1 ligne avec des modifications non enregistrées",
+    "unsaved_other": "{{count}} lignes avec des modifications non enregistrées"
   },
   "differencesBadge_one": "{{count}} écart",
   "differencesBadge_other": "{{count}} écarts",
@@ -102,6 +102,7 @@
     "countFor": "Quantité comptée : {{name}}",
     "countMalformed": "Ce n'est pas un nombre. Saisissez des chiffres avec un seul séparateur décimal, par exemple 12 ou 1,5.",
     "unsaved": "Non enregistré",
+    "unsavedNeedsCount": "Non enregistré — saisissez une quantité pour enregistrer",
     "awaitingRecount": "À recompter",
     "countAgain": "Recompter {{name}}",
     "countedPass": "Comptage {{sequence}} : {{quantity}} ({{name}})",
@@ -122,10 +123,10 @@
     "complete": {
       "title": "Terminer l'inventaire",
       "confirmLabel": "Terminer",
-      "unsaved_one": "Une quantité comptée n'a pas été enregistrée et sera perdue.",
-      "unsaved_other": "{{count}} quantités comptées n'ont pas été enregistrées et seront perdues.",
       "message_one": "Terminer cet inventaire remplace le stock d'un produit par le nombre compté. Les lignes comptées ne pourront plus être modifiées.",
-      "message_other": "Terminer cet inventaire remplace le stock de {{count}} produits par les nombres comptés. Les lignes comptées ne pourront plus être modifiées."
+      "message_other": "Terminer cet inventaire remplace le stock de {{count}} produits par les nombres comptés. Les lignes comptées ne pourront plus être modifiées.",
+      "unsaved_one": "Une ligne a une quantité, un motif ou une note non enregistrés ; ils seront perdus.",
+      "unsaved_other": "{{count}} lignes ont une quantité, un motif ou une note non enregistrés ; ils seront perdus."
     },
     "cancel": {
       "title": "Annuler l'inventaire",
@@ -245,14 +246,14 @@
     "closeEmpty": "Rien n'a été trouvé à {{location}}. Le confirmer comme compté et vide ?",
     "closeCounted": "Toutes les lignes de {{location}} sont comptées. Clôturer l'emplacement ?",
     "closeConfirm": "Clôturer l'emplacement",
-    "closeUnsaved_one": "Un nombre de cet emplacement n'est pas enregistré. Enregistrez-le avant de clôturer l'emplacement.",
-    "closeUnsaved_other": "{{count}} nombres de cet emplacement ne sont pas enregistrés. Enregistrez-les avant de clôturer l'emplacement.",
     "closedDone_one": "{{location}} clôturé : une ligne comptée à 0.",
     "closedDone_other": "{{location}} clôturé : {{count}} lignes comptées à 0.",
     "closedEmptyDone": "{{location}} confirmé comme vide.",
     "closedCountedDone": "{{location}} clôturé.",
     "closedBy": "Clôturé par {{name}}",
-    "closedEmptyBy": "Confirmé vide par {{name}}"
+    "closedEmptyBy": "Confirmé vide par {{name}}",
+    "closeUnsaved_one": "Une ligne de cet emplacement a des modifications non enregistrées. Enregistrez-la avant de clôturer l'emplacement.",
+    "closeUnsaved_other": "{{count}} lignes de cet emplacement ont des modifications non enregistrées. Enregistrez-les avant de clôturer l'emplacement."
   },
   "count": {
     "action": "Compter un emplacement",

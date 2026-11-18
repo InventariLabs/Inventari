@@ -13,10 +13,10 @@
     "discrepanciesDetected_few": "wykryto {{count}} rozbieżności",
     "discrepanciesDetected_many": "wykryto {{count}} rozbieżności",
     "discrepanciesDetected_other": "wykryto {{count}} rozbieżności",
-    "unsaved_one": "1 liczba wpisana, ale niezapisana",
-    "unsaved_few": "{{count}} liczby wpisane, ale niezapisane",
-    "unsaved_many": "{{count}} liczb wpisanych, ale niezapisanych",
-    "unsaved_other": "{{count}} liczb wpisanych, ale niezapisanych"
+    "unsaved_one": "1 pozycja ma niezapisane zmiany",
+    "unsaved_few": "{{count}} pozycje mają niezapisane zmiany",
+    "unsaved_many": "{{count}} pozycji ma niezapisane zmiany",
+    "unsaved_other": "{{count}} pozycji ma niezapisane zmiany"
   },
   "differencesBadge_one": "{{count}} różnica",
   "differencesBadge_few": "{{count}} różnice",
@@ -108,6 +108,7 @@
     "countFor": "Policzona ilość: {{name}}",
     "countMalformed": "To nie jest liczba. Wpisz cyfry z jednym separatorem dziesiętnym, na przykład 12 lub 1,5.",
     "unsaved": "Niezapisane",
+    "unsavedNeedsCount": "Niezapisane — wpisz liczbę, aby zapisać",
     "awaitingRecount": "Do przeliczenia",
     "countAgain": "Policz {{name}} jeszcze raz",
     "countedPass": "Liczenie {{sequence}}: {{quantity}} ({{name}})",
@@ -128,14 +129,14 @@
     "complete": {
       "title": "Zakończ inwentaryzację",
       "confirmLabel": "Zakończ",
-      "unsaved_one": "Jedna policzona liczba nie została zapisana i przepadnie.",
-      "unsaved_few": "{{count}} policzone liczby nie zostały zapisane i przepadną.",
-      "unsaved_many": "{{count}} policzonych liczb nie zostało zapisanych i przepadnie.",
-      "unsaved_other": "{{count}} policzonych liczb nie zostało zapisanych i przepadnie.",
       "message_one": "Zamknięcie spisu nadpisze stan jednego produktu policzoną liczbą. Policzonych pozycji nie będzie się już dało zmienić.",
       "message_few": "Zamknięcie spisu nadpisze stan {{count}} produktów policzonymi liczbami. Policzonych pozycji nie będzie się już dało zmienić.",
       "message_many": "Zamknięcie spisu nadpisze stan {{count}} produktów policzonymi liczbami. Policzonych pozycji nie będzie się już dało zmienić.",
-      "message_other": "Zamknięcie spisu nadpisze stan {{count}} produktu policzonymi liczbami. Policzonych pozycji nie będzie się już dało zmienić."
+      "message_other": "Zamknięcie spisu nadpisze stan {{count}} produktu policzonymi liczbami. Policzonych pozycji nie będzie się już dało zmienić.",
+      "unsaved_one": "Jedna pozycja ma liczbę, powód lub notatkę, które nie zostały zapisane i przepadną.",
+      "unsaved_few": "{{count}} pozycje mają liczbę, powód lub notatkę, które nie zostały zapisane i przepadną.",
+      "unsaved_many": "{{count}} pozycji ma liczbę, powód lub notatkę, które nie zostały zapisane i przepadną.",
+      "unsaved_other": "{{count}} pozycji ma liczbę, powód lub notatkę, które nie zostały zapisane i przepadną."
     },
     "cancel": {
       "title": "Anuluj inwentaryzację",
@@ -271,10 +272,6 @@
     "closeEmpty": "W {{location}} nic nie znaleziono. Potwierdzić je jako policzone i puste?",
     "closeCounted": "Wszystkie wiersze w {{location}} są policzone. Zamknąć miejsce?",
     "closeConfirm": "Zamknij miejsce",
-    "closeUnsaved_one": "Jedna liczba w tym miejscu nie została zapisana. Zapisz ją przed zamknięciem miejsca.",
-    "closeUnsaved_few": "{{count}} liczby w tym miejscu nie zostały zapisane. Zapisz je przed zamknięciem miejsca.",
-    "closeUnsaved_many": "{{count}} liczb w tym miejscu nie zostało zapisanych. Zapisz je przed zamknięciem miejsca.",
-    "closeUnsaved_other": "{{count}} liczby w tym miejscu nie zostało zapisane. Zapisz je przed zamknięciem miejsca.",
     "closedDone_one": "Zamknięto {{location}}: jeden wiersz policzony jako 0.",
     "closedDone_few": "Zamknięto {{location}}: {{count}} wiersze policzone jako 0.",
     "closedDone_many": "Zamknięto {{location}}: {{count}} wierszy policzonych jako 0.",
@@ -282,7 +279,11 @@
     "closedEmptyDone": "Potwierdzono, że {{location}} jest puste.",
     "closedCountedDone": "Zamknięto {{location}}.",
     "closedBy": "Zamknięte przez: {{name}}",
-    "closedEmptyBy": "Potwierdzone jako puste przez: {{name}}"
+    "closedEmptyBy": "Potwierdzone jako puste przez: {{name}}",
+    "closeUnsaved_one": "Jedna pozycja w tym miejscu ma niezapisane zmiany. Zapisz ją przed zamknięciem miejsca.",
+    "closeUnsaved_few": "{{count}} pozycje w tym miejscu mają niezapisane zmiany. Zapisz je przed zamknięciem miejsca.",
+    "closeUnsaved_many": "{{count}} pozycji w tym miejscu ma niezapisane zmiany. Zapisz je przed zamknięciem miejsca.",
+    "closeUnsaved_other": "{{count}} pozycji w tym miejscu ma niezapisane zmiany. Zapisz je przed zamknięciem miejsca."
   },
   "count": {
     "action": "Policz miejsce",
