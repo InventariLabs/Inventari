@@ -65,7 +65,7 @@ describe("DocumentCostVariancesSection", () => {
     removeMutate.mockClear();
     rights.manage = true;
     view = { ...posted };
-    vi.useFakeTimers({ toFake: ["Date"], now: new Date(2026, 10, 18, 12) });
+    vi.useFakeTimers({ toFake: ["Date"], now: new Date(2026, 10, 12, 12) });
   });
 
   it("lists what was recorded, with its reason, and adds it up", () => {
@@ -94,7 +94,7 @@ describe("DocumentCostVariancesSection", () => {
         kind: "freight",
         amount: "50",
         reason: "Late invoice",
-        occurred_on: "2026-11-18",
+        occurred_on: "2026-11-12",
       },
       expect.anything(),
     );
