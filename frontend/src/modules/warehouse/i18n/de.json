@@ -1509,6 +1509,28 @@
       "unitCostAfter": "Stückkosten"
     }
   },
+  "costVariances": {
+    "title": "Kosten, die kein Produkt erreicht haben",
+    "subtitle": "Als Abweichungen erfasste Beträge mit Grund und dem Tag, zu dem sie gehören",
+    "navLabel": "Kostenabweichungen",
+    "sectionTitle": "Kosten, die kein Produkt erreicht haben",
+    "sectionSubtitle": "Ein Kostenbetrag, der nach der Buchung des Wareneingangs eintrifft, lässt sich nicht mehr auf die Ware verteilen — ein Teil kann bereits weg sein. Erfassen Sie ihn stattdessen hier: Er wird mit Grund aufgeführt und wird nie Teil des Lagerwerts.",
+    "reasonLabel": "Grund",
+    "record": "Als Abweichung erfassen",
+    "addFailed": "Die Abweichung konnte nicht erfasst werden.",
+    "removeLabel": "Diese Abweichung entfernen",
+    "total": "Summe",
+    "loadFailed": "Die Kostenabweichungen konnten nicht geladen werden.",
+    "empty": "Es wurde noch keine Kostenabweichung erfasst.",
+    "notValued": "Diese Beträge gehören zu keinem Lagerwert: Kein Bericht rechnet sie zum Wert der Regale hinzu. Jeder ist die Zahl und der Grund, warum er nicht auf die Ware verteilt wurde.",
+    "columns": {
+      "date": "Datum",
+      "document": "Wareneingang",
+      "kind": "Kosten",
+      "reason": "Grund",
+      "amount": "Betrag"
+    }
+  },
   "openingStock": {
     "button": "Anfangsbestand",
     "title": "Anfangsbestand aus einer Tabelle",
@@ -1791,6 +1813,10 @@
       },
       "documents": {
         "hint": "Alle Belege mit Filtern nach Typ, Status und Datum"
+      },
+      "costVariances": {
+        "title": "Kostenabweichungen",
+        "hint": "Lieferkosten, die kein Produkt erreicht haben, aufgelistet und summiert"
       }
     },
     "mistake": {

@@ -1509,6 +1509,28 @@
       "unitCostAfter": "Coût unitaire"
     }
   },
+  "costVariances": {
+    "title": "Coûts qui n'ont atteint aucun produit",
+    "subtitle": "Montants enregistrés comme écarts, avec le motif et le jour auquel ils se rapportent",
+    "navLabel": "Écarts de coût",
+    "sectionTitle": "Coûts qui n'ont atteint aucun produit",
+    "sectionSubtitle": "Un coût qui arrive après la comptabilisation de la réception ne peut plus être réparti sur la marchandise : une partie peut déjà être partie. Enregistrez-le ici : il est conservé avec son motif, listé, et n'entre jamais dans la valeur du stock.",
+    "reasonLabel": "Motif",
+    "record": "Enregistrer comme écart",
+    "addFailed": "L'écart n'a pas pu être enregistré.",
+    "removeLabel": "Supprimer cet écart",
+    "total": "Total",
+    "loadFailed": "Les écarts de coût n'ont pas pu être chargés.",
+    "empty": "Aucun coût n'a été enregistré comme écart.",
+    "notValued": "Ces montants n'entrent dans aucune valeur de stock : aucun rapport ne les ajoute à ce que valent les étagères. Chacun est le chiffre et le motif pour lequel il n'a pas été réparti sur la marchandise.",
+    "columns": {
+      "date": "Date",
+      "document": "Réception",
+      "kind": "Coût",
+      "reason": "Motif",
+      "amount": "Montant"
+    }
+  },
   "openingStock": {
     "button": "Stock initial",
     "title": "Stock initial depuis une feuille",
@@ -1791,6 +1813,10 @@
       },
       "documents": {
         "hint": "Tous les documents, filtrés par type, statut et date"
+      },
+      "costVariances": {
+        "title": "Écarts de coût",
+        "hint": "Coûts de livraison qui n'ont atteint aucun produit, listés et additionnés"
       }
     },
     "mistake": {

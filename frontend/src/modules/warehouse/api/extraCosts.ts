@@ -12,6 +12,15 @@ export type ExtraCostsView = components["schemas"]["ExtraCostsView"];
 export type ExtraCostKind = components["schemas"]["ExtraCostKind"];
 export type ExtraCostAllocation = components["schemas"]["ExtraCostAllocation"];
 
+export type CostVarianceList = components["schemas"]["CostVariancesList"];
+
+export interface CostVarianceInput {
+  kind: ExtraCostKind;
+  amount: string;
+  reason: string;
+  occurred_on?: string;
+}
+
 export interface ExtraCostInput {
   kind: ExtraCostKind;
   amount: string;
@@ -44,6 +53,42 @@ export const extraCostsApi = {
   ): Promise<ExtraCostsView> => {
     const response = await api.delete<ExtraCostsView>(
       `/warehouse/documents/${documentId}/extra-costs/${costId}`,
+    );
+    return response.data;
+  },
+
+  /**
+   * A cost that reached no product: kept with its reason and reported, and
+   * never part of any stock value.
+   */
+  addVariance: async (
+    documentId: string,
+    input: CostVarianceInput,
+  ): Promise<ExtraCostsView> => {
+    const response = await api.post<ExtraCostsView>(
+      `/warehouse/documents/${documentId}/cost-variances`,
+      input,
+    );
+    return response.data;
+  },
+
+  removeVariance: async (
+    documentId: string,
+    varianceId: string,
+  ): Promise<ExtraCostsView> => {
+    const response = await api.delete<ExtraCostsView>(
+      `/warehouse/documents/${documentId}/cost-variances/${varianceId}`,
+    );
+    return response.data;
+  },
+
+  listVariances: async (page: {
+    limit: number;
+    offset: number;
+  }): Promise<CostVarianceList> => {
+    const response = await api.get<CostVarianceList>(
+      "/warehouse/cost-variances",
+      { params: page },
     );
     return response.data;
   },

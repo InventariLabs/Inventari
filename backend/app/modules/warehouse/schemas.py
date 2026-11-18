@@ -828,6 +828,43 @@ class ExtraCostLinePreview(BaseModel):
     unit_cost_after: Decimal | None = None
 
 
+class CostVarianceCreate(BaseModel):
+    kind: ExtraCostKind = ExtraCostKind.FREIGHT
+    amount: Decimal = Field(gt=0, max_digits=12, decimal_places=2)
+    currency: str | None = Field(default=None, max_length=3)
+    reason: Annotated[
+        str, StringConstraints(strip_whitespace=True, min_length=1, max_length=255)
+    ]
+    #: Defaults to today.
+    occurred_on: date | None = None
+
+
+class CostVarianceOut(BaseModel):
+    id: UUID
+    document_id: UUID
+    kind: str
+    amount: Decimal
+    currency: str | None = None
+    reason: str
+    occurred_on: date
+
+
+class CostVarianceRow(CostVarianceOut):
+    """One variance in the organization-wide list, with its document's number."""
+
+    document_number: str | None = None
+
+
+class CostVariancesList(PaginatedResponse[CostVarianceRow]):
+    """A page of the costs that reached no product, with the sums of all.
+
+    ``totals`` is per currency and covers the whole period, not the page: a
+    variance is never converted, so two currencies are two sums.
+    """
+
+    totals: dict[str, Decimal] = {}
+
+
 class ExtraCostsView(BaseModel):
     costs: list[ExtraCostOut] = []
     total: Decimal = Decimal('0')
@@ -838,3 +875,6 @@ class ExtraCostsView(BaseModel):
     #: allocation needs values, and weight allocation needs weights.
     fell_back: list[str] = []
     lines: list[ExtraCostLinePreview] = []
+    #: Costs recorded as variances: part of no stock value.
+    variances: list[CostVarianceOut] = []
+    variance_total: Decimal = Decimal('0')

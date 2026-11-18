@@ -142,8 +142,8 @@ vi.mock("@/modules/warehouse/components/shipping/DocumentShipmentCard", () => ({
 vi.mock("@/modules/warehouse/components/DocumentValueTotals", () => ({
   DocumentValueTotals: () => null,
 }));
-vi.mock("@/modules/warehouse/components/DocumentExtraCostsSection", () => ({
-  DocumentExtraCostsSection: () => null,
+vi.mock("@/modules/warehouse/components/DocumentDeliveryCosts", () => ({
+  DocumentDeliveryCosts: () => null,
 }));
 vi.mock("@/modules/warehouse/components/DocumentLineExtra", () => ({
   DocumentDetailExtra: () => null,

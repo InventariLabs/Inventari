@@ -234,7 +234,7 @@ ERRORS_ES: ErrorMessages = {
     'invalid_mapping_json': 'JSON de mapeo inválido',
     'extra_cost_not_a_receipt': 'Los costes adicionales pertenecen a una entrada: solo la mercancía que llega puede llevar el coste de traerla.',
     'extra_cost_document_posted': (
-        'Esta entrada ya está contabilizada, así que no se le puede añadir un coste: la mercancía puede haber salido y no queda nada a lo que cargarlo. Emita una corrección de la entrada con el periodo abierto.'
+        'Esta entrada ya está contabilizada, así que no se le puede añadir un coste: la mercancía puede haber salido y no queda nada a lo que cargarlo. Emita una corrección de la entrada con el periodo abierto o registre el importe como desviación de coste: se lista con su motivo y no entra en el valor del stock.'
     ),
     'extra_cost_currency_mismatch': (
         'El coste adicional está en una moneda distinta a la del documento. Introdúzcalo en la moneda del documento: convertir a un tipo que nadie registró pondría en el valor del stock un número sin historial.'

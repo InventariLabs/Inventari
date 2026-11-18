@@ -686,7 +686,8 @@
         "response_id": "Identifiant de la réponse",
         "sku_schema": "Schéma de SKU",
         "body_html": "Contenu du modèle",
-        "reset_to_builtin": "Rétabli au modèle intégré"
+        "reset_to_builtin": "Rétabli au modèle intégré",
+        "occurred_on": "Jour concerné"
       },
       "showWholeChange": "Afficher toute la modification",
       "showLess": "Afficher moins",

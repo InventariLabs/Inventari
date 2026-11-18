@@ -646,7 +646,8 @@
         "skipped": "Linhas ignoradas",
         "approval": "Aprovação",
         "body_html": "Conteúdo do modelo",
-        "reset_to_builtin": "Reposto no modelo integrado"
+        "reset_to_builtin": "Reposto no modelo integrado",
+        "occurred_on": "Dia a que pertence"
       },
       "showWholeChange": "Mostrar a alteração completa",
       "showLess": "Mostrar menos",

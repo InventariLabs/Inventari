@@ -234,10 +234,16 @@ vi.mock("@/components/ui/SearchableCombobox", () => ({
 vi.mock("@/modules/warehouse/components/DocumentImportModal", () => ({
   DocumentImportModal: ({
     onImported,
+    holdsUnsavedWork,
   }: {
     onImported: (result: Record<string, unknown>) => void;
+    holdsUnsavedWork?: boolean;
   }) => (
-    <button type="button" onClick={() => onImported(state.importResult)}>
+    <button
+      type="button"
+      data-holds-work={String(holdsUnsavedWork)}
+      onClick={() => onImported(state.importResult)}
+    >
       import-stub
     </button>
   ),
@@ -864,6 +870,30 @@ describe("ReceiveGoodsPage", () => {
 
       expect(screen.queryByRole("status")).not.toBeInTheDocument();
     });
+  });
+
+  it("tells the import sheet whether the delivery holds what was typed", async () => {
+    // A session that ends during the import loses the sheet with it, and
+    // the refusal says so only when there is something on it.
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(screen.getByRole("button", { name: "Paste rows" }));
+    expect(
+      await screen.findByRole("button", { name: "import-stub" }),
+    ).toHaveAttribute("data-holds-work", "false");
+  });
+
+  it("tells the import sheet the delivery holds work once a reference is typed", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await user.type(
+      screen.getByLabelText("Supplier's document number"),
+      "WZ 12/11",
+    );
+    await user.click(screen.getByRole("button", { name: "Paste rows" }));
+    expect(
+      await screen.findByRole("button", { name: "import-stub" }),
+    ).toHaveAttribute("data-holds-work", "true");
   });
 
   it("fills the sheet from pasted rows", async () => {

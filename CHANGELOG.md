@@ -14,6 +14,16 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- A place for a delivery cost that reached no product. Freight that arrives
+  after a receipt is posted can no longer be added to the goods, and the
+  refusal now offers a way forward: on a posted receipt the **Costs that
+  reached no product** section records the amount with a reason, the cost kind
+  and the day it belongs to. The amounts are listed and added up per currency
+  on a screen of their own, reached from the office panel in History, and each
+  one can be removed again. They are never part of a stock value: *Stock on a
+  date* and *Value movement* do not move when one is recorded, and there is no
+  counter-account or double entry behind them. A currency other than the
+  document's is refused, as it is for a cost added before posting.
 - A statement of what the stock was worth over a period. **Value movement**,
   reached from *Stock on a date*, takes a first and a last day and gives the
   value when the period opened, what came in (bought, and produced or returned
@@ -264,6 +274,13 @@ says what the release does rather than what changed since them.
   with an `expiry`.
 
 ### Fixed
+
+- Importing rows into a document that is not saved yet, when the session has
+  ended, no longer says "this was not saved" over an empty form: the import
+  only reads the rows, so the message is the plain "your session has ended".
+  A form that already holds something the reader typed, and an import that
+  also creates products, keep the longer warning, because signing in again
+  loses that work.
 
 - The price a document suggests for a supplier's product is the price that
   line can get: valid today, from a quantity tier the line's quantity

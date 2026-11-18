@@ -106,12 +106,14 @@ vi.mock("@/modules/warehouse/components/DocumentImportModal", () => ({
   DocumentImportModal: (props: {
     documentType?: string;
     sourceLocationId?: string;
+    holdsUnsavedWork?: boolean;
     onImported?: (result: { lines: unknown[] }) => void;
   }) =>
     createElement(
       "button",
       {
         type: "button",
+        "data-holds-work": String(props.holdsUnsavedWork),
         onClick: () => props.onImported?.({ lines: importStub.lines }),
       },
       `finish import of ${props.documentType} from ${props.sourceLocationId}`,
@@ -988,6 +990,37 @@ describe("DocumentFormModal", () => {
         expect.any(Object),
       );
     });
+  });
+
+  it("tells the import whether the form holds what the reader typed", async () => {
+    // A session that ends during an import loses the form with it: the
+    // refusal says so only when there is something in the form to lose.
+    const user = userEvent.setup();
+    await act(async () => {
+      render(<DocumentFormModal initialType="IN" onClose={vi.fn()} />);
+    });
+    await act(async () => {
+      await user.click(screen.getByRole("button", { name: "Import lines" }));
+    });
+    expect(
+      screen.getByRole("button", { name: /finish import/ }),
+    ).toHaveAttribute("data-holds-work", "false");
+  });
+
+  it("tells the import the form holds work once a partner is chosen", async () => {
+    const user = userEvent.setup();
+    await act(async () => {
+      render(<DocumentFormModal initialType="IN" onClose={vi.fn()} />);
+    });
+    await placesLoaded();
+    const [partnerSelect] = screen.getAllByRole("combobox");
+    await act(async () => {
+      await user.selectOptions(partnerSelect, "partner-1");
+      await user.click(screen.getByRole("button", { name: "Import lines" }));
+    });
+    expect(
+      screen.getByRole("button", { name: /finish import/ }),
+    ).toHaveAttribute("data-holds-work", "true");
   });
 
   it("offers the line import while a dispatch is still being written", async () => {

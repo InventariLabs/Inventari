@@ -1623,6 +1623,28 @@
       "unitCostAfter": "Koszt jedn."
     }
   },
+  "costVariances": {
+    "title": "Koszty, które nie trafiły na żaden produkt",
+    "subtitle": "Kwoty zapisane jako odchylenia, z powodem i dniem, do którego należą",
+    "navLabel": "Odchylenia kosztów",
+    "sectionTitle": "Koszty, które nie trafiły na żaden produkt",
+    "sectionSubtitle": "Koszt, który przychodzi po zaksięgowaniu przyjęcia, nie da się rozdzielić na towar — część mogła już zejść. Zapisz go tutaj: zostanie z powodem na liście i nigdy nie wejdzie do wartości zapasu.",
+    "reasonLabel": "Powód",
+    "record": "Zapisz jako odchylenie",
+    "addFailed": "Nie udało się zapisać odchylenia.",
+    "removeLabel": "Usuń to odchylenie",
+    "total": "Razem",
+    "loadFailed": "Nie udało się wczytać odchyleń kosztów.",
+    "empty": "Żaden koszt nie został zapisany jako odchylenie.",
+    "notValued": "Te kwoty nie wchodzą do żadnej wartości zapasu: żaden raport nie dolicza ich do tego, ile warte są półki. Każda to sama liczba i powód, dla którego nie rozdzielono jej na towar.",
+    "columns": {
+      "date": "Data",
+      "document": "Przyjęcie",
+      "kind": "Koszt",
+      "reason": "Powód",
+      "amount": "Kwota"
+    }
+  },
   "openingStock": {
     "button": "Stan początkowy",
     "title": "Stan początkowy z arkusza",
@@ -1917,6 +1939,10 @@
       },
       "documents": {
         "hint": "Wszystkie dokumenty z filtrami typu, statusu i daty"
+      },
+      "costVariances": {
+        "title": "Odchylenia kosztów",
+        "hint": "Koszty dostawy, które nie trafiły na żaden produkt — wypisane i zsumowane"
       }
     },
     "mistake": {

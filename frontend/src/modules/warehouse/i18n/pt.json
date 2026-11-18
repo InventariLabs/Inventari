@@ -1473,6 +1473,28 @@
       "unitCostAfter": "Custo unitário"
     }
   },
+  "costVariances": {
+    "title": "Custos que não chegaram a nenhum produto",
+    "subtitle": "Valores registrados como desvios, com o motivo e o dia a que pertencem",
+    "navLabel": "Desvios de custo",
+    "sectionTitle": "Custos que não chegaram a nenhum produto",
+    "sectionSubtitle": "Um custo que chega depois do lançamento do recebimento não pode ser rateado entre as mercadorias — parte delas pode já ter saído. Registre-o aqui: ele fica guardado com o motivo, aparece na lista e nunca entra no valor do estoque.",
+    "reasonLabel": "Motivo",
+    "record": "Registrar como desvio",
+    "addFailed": "Não foi possível registrar o desvio.",
+    "removeLabel": "Remover este desvio",
+    "total": "Total",
+    "loadFailed": "Não foi possível carregar os desvios de custo.",
+    "empty": "Nenhum custo foi registrado como desvio.",
+    "notValued": "Estes valores não fazem parte de nenhum valor de estoque: nenhum relatório os soma ao que valem as prateleiras. Cada um é o número e o motivo pelo qual não foi rateado entre as mercadorias.",
+    "columns": {
+      "date": "Data",
+      "document": "Recebimento",
+      "kind": "Custo",
+      "reason": "Motivo",
+      "amount": "Valor"
+    }
+  },
   "openingStock": {
     "button": "Estoque inicial",
     "title": "Estoque inicial a partir de uma planilha",
@@ -1735,6 +1757,10 @@
       },
       "documents": {
         "hint": "Todos os documentos, com filtros por tipo, status e data"
+      },
+      "costVariances": {
+        "title": "Desvios de custo",
+        "hint": "Custos de entrega que não chegaram a nenhum produto, listados e somados"
       }
     },
     "mistake": {

@@ -1509,6 +1509,28 @@
       "unitCostAfter": "Coste unit."
     }
   },
+  "costVariances": {
+    "title": "Costes que no llegaron a ningún producto",
+    "subtitle": "Importes registrados como desviaciones, con el motivo y el día al que pertenecen",
+    "navLabel": "Desviaciones de coste",
+    "sectionTitle": "Costes que no llegaron a ningún producto",
+    "sectionSubtitle": "Un coste que llega después de contabilizar la entrada no se puede repartir entre la mercancía: parte puede haber salido ya. Regístralo aquí: se guarda con su motivo, aparece en la lista y nunca pasa a formar parte del valor del stock.",
+    "reasonLabel": "Motivo",
+    "record": "Registrar como desviación",
+    "addFailed": "No se pudo registrar la desviación.",
+    "removeLabel": "Quitar esta desviación",
+    "total": "Total",
+    "loadFailed": "No se pudieron cargar las desviaciones de coste.",
+    "empty": "Ningún coste se ha registrado como desviación.",
+    "notValued": "Estos importes no forman parte de ningún valor del stock: ningún informe los suma a lo que valen las estanterías. Cada uno es la cifra y el motivo por el que no se repartió entre la mercancía.",
+    "columns": {
+      "date": "Fecha",
+      "document": "Entrada",
+      "kind": "Coste",
+      "reason": "Motivo",
+      "amount": "Importe"
+    }
+  },
   "openingStock": {
     "button": "Stock inicial",
     "title": "Stock inicial desde una hoja",
@@ -1791,6 +1813,10 @@
       },
       "documents": {
         "hint": "Todos los documentos, con filtros por tipo, estado y fecha"
+      },
+      "costVariances": {
+        "title": "Desviaciones de coste",
+        "hint": "Costes de entrega que no llegaron a ningún producto, listados y sumados"
       }
     },
     "mistake": {
