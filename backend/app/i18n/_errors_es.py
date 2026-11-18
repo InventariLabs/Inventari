@@ -575,7 +575,7 @@ ERRORS_ES: ErrorMessages = {
     'equipment_cannot_checkout_in_maintenance': 'No se puede prestar un recurso en mantenimiento; márquelo primero como Disponible',
     'equipment_assignment_needs_person_or_location': 'Indique la persona o la ubicación, pero no ambas',
     'equipment_bulk_scope_too_large': '{matched} recursos coinciden con los filtros; una acción abarca como máximo {limit}. Acote los filtros.',
-    'equipment_assignment_already_active': 'El artículo ya tiene una asignación activa',
+    'equipment_assignment_already_active': 'El activo ya tiene una asignación activa',
     'equipment_assignment_already_checked_in': 'La asignación ya fue devuelta',
     'api_key_cannot_manage': 'Las claves API no pueden administrar otras claves API',
     'api_key_cannot_create': 'Las claves API no pueden crear otras claves API',

@@ -442,7 +442,7 @@ ERRORS_PT: dict[str, str] = {
     'equipment_cannot_checkout_in_maintenance': 'Não é possível entregar um ativo em manutenção; marque-o primeiro como Disponível',
     'equipment_assignment_needs_person_or_location': 'Informe a pessoa ou o local, não ambos',
     'equipment_bulk_scope_too_large': '{matched} ativos correspondem aos filtros; uma ação pode abranger no máximo {limit}. Restrinja os filtros.',
-    'equipment_assignment_already_active': 'O item já tem uma atribuição ativa',
+    'equipment_assignment_already_active': 'O ativo já tem uma atribuição ativa',
     'equipment_assignment_already_checked_in': 'A atribuição já foi devolvida',
     'api_key_cannot_manage': 'Chaves de API não podem gerenciar outras chaves de API',
     'api_key_cannot_create': 'Chaves de API não podem criar outras chaves de API',
