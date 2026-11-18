@@ -38,9 +38,9 @@ export default function LabelScanPage() {
   // the server cannot know which language the reader holds in their hand.
   const tDynamic = makeTDynamic(t);
   // Assigning a label is creating the product it will name; the label pool
-  // rides on `items:write` (a sticker is inventory data). The button used to
-  // send a reader to the scan screen, which refuses before the form opens —
-  // an offer whose only end is "you can view this, not change it".
+  // rides on `items:write` (a sticker is inventory data). The button is offered
+  // only to readers who can assign, because the scan screen refuses before the
+  // form opens: an offer whose only end is "you can view this, not change it".
   const canWrite = useCanWrite("items");
 
   const { data, isLoading, error, refetch } = useLabelScan(code!);

@@ -471,8 +471,8 @@ describe("the equipment overview", () => {
   it("shows the fleet totals on the equipment overview, not on stock", async () => {
     serve({ totals: { total_assets: 12, retired: 2, active: 4 } });
     renderPage();
-    // These four numbers used to sit on the inventory overview, where a
-    // stock reader met warranties and check-outs beside the stock.
+    // These four numbers belong to the equipment overview, not the inventory
+    // overview, where a stock reader would meet warranties and check-outs.
     expect(await screen.findByText("In the fleet")).toBeInTheDocument();
     expect(screen.getByText("Retired")).toBeInTheDocument();
     await settle();

@@ -179,7 +179,7 @@ export default function ArchivedItemsPage() {
   const restoreMutation = useRestoreItem();
   const purgeMutation = usePurgeItem();
   const { data: org } = useOrganization();
-  // Two different questions, and until now the screen asked only the first.
+  // Two different questions, and the screen asks both.
   // `allow_permanent_delete` is the organization's policy; `items:purge` and
   // `items:write` are this account's rights, which the API checks on the other
   // end. Offered without them, both buttons ended in a 403 after the click.

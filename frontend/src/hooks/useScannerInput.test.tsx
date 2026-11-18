@@ -246,7 +246,7 @@ describe("useScannerInput", () => {
 
   it("hands over what a field holds when only the end of it came fast", () => {
     // A person typing a long code in the field pauses once; the keys after the
-    // pause are a burst by the clock, and used to be emitted alone with the
+    // pause are a burst by the clock, and must not be emitted alone with the
     // start of the code left behind in the field.
     const onScan = vi.fn();
     const { getByRole } = render(

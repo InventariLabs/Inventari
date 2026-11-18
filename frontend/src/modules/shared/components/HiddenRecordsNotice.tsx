@@ -15,8 +15,8 @@ interface HiddenRecordsNoticeProps {
  * One muted line above a list that is showing rows while the module-data
  * policy keeps others off it.
  *
- * The hidden counter used to belong to the empty state alone, so the first
- * visible row silenced it — one hidden record behind three visible ones is
+ * The hidden counter belongs to the list, not to the empty state alone, so a
+ * visible row does not silence it — one hidden record behind three visible ones is
  * exactly the case a reader cannot spot on their own. The same component
  * serves the three lists of that navigation section — `/inventory/items`,
  * `/inventory/categories` and `/inventory/locations` — so it lives in

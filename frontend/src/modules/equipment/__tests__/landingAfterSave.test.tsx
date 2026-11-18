@@ -7,9 +7,8 @@ import { describe, it, expect, vi } from "vitest";
 import { useEquipmentForm } from "../hooks/useEquipmentForm";
 
 /**
- * Adding an asset used to end on the equipment overview with a toast and
- * nothing else: the asset just added was a search away. Now a single asset
- * opens on its own page and a batch on the list that holds it.
+ * Adding an asset ends on its own page, or on the list that holds it for a
+ * batch, so the asset just added is never only a search away.
  */
 vi.mock("@/lib/api/items", () => ({
   itemsApi: {

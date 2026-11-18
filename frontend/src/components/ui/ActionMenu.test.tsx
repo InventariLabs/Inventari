@@ -68,7 +68,7 @@ describe("ActionMenu", () => {
     /**
      * `Sheet` and `ItemEditModal` close themselves from a `document` keydown
      * listener registered when they mounted — before the menu's. One press
-     * used to take the whole editor down with the menu.
+     * must not take the whole editor down with the menu.
      */
     it("closes the menu without reaching the surface that holds it", () => {
       document.addEventListener("keydown", surfaceListener);

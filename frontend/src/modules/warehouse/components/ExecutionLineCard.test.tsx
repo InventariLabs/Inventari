@@ -55,9 +55,8 @@ function doneField() {
 
 describe("ExecutionLineCard — done quantity field", () => {
   // While "12.5" is typed, the number field reports the dot step
-  // as "". The card used to answer that with Number("") === 0 — the round
-  // trip through the numeric store rewrote the field to "0" and ate the
-  // dot, so receiving twelve and a half kilos landed as five.
+  // as "". The card keeps that empty report rather than reading it as 0: a round
+  // trip through the numeric store would rewrite the field to "0" and eat the dot.
   it("does not report zero for the dot step's empty report", () => {
     const props = makeProps();
     render(<ExecutionLineCard {...props} />);

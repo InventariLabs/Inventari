@@ -264,11 +264,11 @@ describe("Equipment protocol — a failed download says so", () => {
 describe("Equipment protocol — the returned assignment has a door too", () => {
   /**
    * The backend picks the CHECKIN template by `checked_in_at`
-   * (`protocol_service.render_protocol_html`), and the row used to hide its
+   * (`protocol_service.render_protocol_html`), and the row must not hide its
    * protocol controls on exactly that condition — so the return protocol, a
    * document an admin can edit under Templates, had no way in from the
-   * interface. Reverting the row to the old `checked_in_at ? badges :
-   * buttons` shape fails this one.
+   * interface. A row that hides its controls on `checked_in_at ? badges :
+   * buttons` fails this one.
    */
   it("offers the protocol on a row that was already checked in", async () => {
     server.use(

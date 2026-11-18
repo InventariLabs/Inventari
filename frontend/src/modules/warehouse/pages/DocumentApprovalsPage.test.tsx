@@ -151,8 +151,8 @@ describe("DocumentApprovalsPage", () => {
 
   it("asks the approvals module to name the requests parked beside the queue", () => {
     // A request parked at a stage nobody can decide never reaches this queue,
-    // so it used to read as an empty one. The module that owns requests names
-    // them; the queue says where a document of its own is shown.
+    // so without a parked section it would read as an empty one. The module
+    // that owns requests names them; the queue says where a document of its own is shown.
     queueItems = [];
     renderPage();
 

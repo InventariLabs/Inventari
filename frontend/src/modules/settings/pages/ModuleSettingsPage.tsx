@@ -45,10 +45,8 @@ export default function ModuleSettingsPage({
         : name;
   const description = labels?.description === name ? "" : labels?.description;
 
-  // The shell's header is the only one on this screen. It used to say "Module
-  // settings: X" above a card that said "X" above the sentence "Module-level
-  // configuration" — the same title twice, and the space meant for describing
-  // this module spent on describing the page.
+  // The shell's header is the only title on this screen, and the space goes to
+  // describing this module rather than repeating the page's name.
   useEffect(() => {
     if (!name) return;
     setHeader({
@@ -73,9 +71,8 @@ export default function ModuleSettingsPage({
   }
 
   if (isError || !data) {
-    // One sentence used to cover three different situations: no permission,
-    // no such module, and a request that genuinely failed. They call for
-    // three different next steps.
+    // No permission, no such module and a failed request each call for a
+    // different next step, so the status decides which sentence is shown.
     const status = apiErrorStatus(error);
     const storeLink = (
       <Link

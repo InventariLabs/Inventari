@@ -93,7 +93,7 @@ export default function AddItemPage() {
   };
 
   // The storage field's own way out when the picker has nothing to offer —
-  // an empty list used to cost the whole form. Built here rather than in the
+  // an empty list must not cost the whole form. Built here rather than in the
   // form body: StorageRequired belongs to the spaces module, and this page
   // is the composition root the boundary baseline already knows.
   const storageGate =
@@ -107,8 +107,7 @@ export default function AddItemPage() {
 
   // The list that leads here asks first, so an account without the right
   // never sees the button. Typing the address, or following an old link,
-  // used to open the whole form anyway — filled in, submitted, and refused
-  // by a 403 at the end of the work.
+  // is refused here, before the form opens, so no work ends in a 403.
   if (!canWrite) {
     return (
       <div className="p-6 sm:max-w-6xl sm:mx-auto">
@@ -193,8 +192,8 @@ export default function AddItemPage() {
             <SheetActions>
               {/* Cancel ends this task, so it names the list it belongs to
                   rather than popping the history stack: entered by address
-                  or from another module, `navigate(-1)` used to leave the
-                  reader wherever they happened to come from. */}
+                  or from another module, `navigate(-1)` leaves the reader
+                  wherever they came from. */}
               <Button
                 variant="outline"
                 onClick={() => navigate("/inventory/items", { replace: true })}

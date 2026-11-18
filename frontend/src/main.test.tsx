@@ -50,9 +50,9 @@ describe("the entry point", () => {
  *
  * `@vitejs/plugin-react` makes a module accept its own hot updates as soon as
  * React Refresh registers a component in it, and a lazy component counts.
- * `main.tsx` used to declare the two lazy trees itself, so every hot update
+ * `main.tsx` must not declare the two lazy trees itself, or every hot update
  * that climbed to it — a module's files landing under `src/modules` during an
- * install or an upgrade, an edit to `App.tsx` — ran it again: a second
+ * install or an upgrade, an edit to `App.tsx` — would run it again: a second
  * `createRoot()` on the same container, two React trees writing one DOM, and
  * the error boundary catching what fell out of them until the page reloaded.
  *

@@ -32,8 +32,8 @@ interface EmployeeAutocompleteProps {
   onClear: () => void;
   /**
    * Names the field. Passed down to the search box so the label points at the
-   * control; callers used to hand-roll a `<label>` above this component, which
-   * left the input unnamed in the accessibility tree.
+   * control; callers do not hand-roll a `<label>` above this component, which
+   * would leave the input unnamed in the accessibility tree.
    */
   label?: string;
   /**
@@ -159,7 +159,7 @@ export function EmployeeAutocomplete({
           className="pr-8"
         />
         {/* Anchored to the field's own box rather than to the wrapper:
-            with a label above, half of the wrapper is no longer half of
+            with a label above, half of the wrapper is not half of
             the input. */}
         <span className="pointer-events-none absolute inset-x-0 bottom-0 flex h-11 items-center justify-end pr-3 md:h-10">
           <ChevronDown size={14} className="text-on-muted" />

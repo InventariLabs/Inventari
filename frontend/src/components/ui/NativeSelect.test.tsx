@@ -22,8 +22,8 @@ describe("NativeSelect", () => {
   });
 
   /**
-   * The box used to appear only alongside a label, so `wrapperClassName` was
-   * accepted, type-checked and thrown away on every unlabelled call site.
+   * The box appears with or without a label, so `wrapperClassName` is never
+   * accepted, type-checked and thrown away on an unlabelled call site.
    */
   it("renders its box with no label, so wrapperClassName lands somewhere", () => {
     render(
@@ -57,9 +57,8 @@ describe("NativeSelect", () => {
   });
 
   /**
-   * A field's explanation used to be dropped on the floor by every caller that
-   * passed `description` to a select — the prop did not exist. It must reach
-   * the DOM and name the select's description, the contract `Input` has.
+   * A field's explanation reaches the DOM when a caller passes `description` to
+   * a select, and names the select's description, the contract `Input` has.
    */
   it("shows its description and points the select's aria-describedby at it", () => {
     render(

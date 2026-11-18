@@ -533,10 +533,9 @@ describe("ApprovalActions with no active workflow", () => {
       { wrapper: createWrapper() },
     );
 
-    // The button used to stand there until clicked; the refusal — "No active
-    // approval workflow is configured for this action" — arrived after. This
-    // account cannot read the workflow list, so the answer has to come from
-    // the endpoint that needs no such grant.
+    // The refusal — "No active approval workflow is configured for this action" —
+    // shows before the click. This account cannot read the workflow list, so the
+    // answer comes from the endpoint that needs no such grant.
     await waitFor(() =>
       expect(screen.queryByText("Request Approval")).not.toBeInTheDocument(),
     );
@@ -567,10 +566,9 @@ describe("ApprovalActions with no active workflow", () => {
   });
 
   it("needs no read grant over approvals to answer the door", async () => {
-    // The measured regression: write on the target module, no read over
-    // approvals. The list is empty for this account — not unconfigured —
-    // and the door used to read that emptiness as permission to offer a
-    // request the engine then refused.
+    // Write on the target module, no read over approvals. The list is empty for
+    // this account, not unconfigured, and the door must not read that emptiness
+    // as permission to offer a request the engine would refuse.
     signInWith(["approvals:approve", "approvals:write"]);
     workflowConfigured(false);
 
@@ -913,8 +911,8 @@ describe("ApprovalActions without approvals:approve", () => {
 
   it("hides Request Approval from an account that may not write", () => {
     // The generic POST /approvals/requests is refused to any account without
-    // approvals:write; the button used to render anyway and the refusal
-    // arrived only after the click.
+    // approvals:write, so the button stays hidden for it instead of offering
+    // a click the server would refuse.
     signInWith(["approvals:read"]);
 
     render(

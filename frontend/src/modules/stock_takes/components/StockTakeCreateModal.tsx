@@ -228,9 +228,7 @@ export default function StockTakeCreateModal({
         </form>
       </div>
 
-      {/* actions live outside the scroll area so they are always
-          reachable — at 1280×577 they used to sit below the fold inside
-          the scrolling form and clicks never fired. */}
+      {/* actions live outside the scroll area, so they stay in reach at any window height. */}
       <div className="flex items-center justify-end gap-2 p-4 border-t border-border shrink-0">
         <Button variant="outline" onClick={onClose}>
           {t("modal.cancel")}

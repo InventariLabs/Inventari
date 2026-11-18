@@ -48,8 +48,8 @@ const RETURN_TYPE_OF: Record<string, string> = {
 
 export function ReturnFormModal({ document, onClose }: ReturnFormModalProps) {
   const { t } = useTranslation(["warehouse", "common"]);
-  // The warning used to name a receipt (IN) whatever the source was, so a
-  // return of an internal transfer promised a document type it never created.
+  // The warning names the return type for this document's type, so a return of
+  // an internal transfer never promises a receipt it does not create.
   const returnType = RETURN_TYPE_OF[document.type] ?? document.type;
   const navigate = useNavigate();
   const createReturn = useCreateReturn();

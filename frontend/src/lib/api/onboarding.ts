@@ -30,8 +30,8 @@ export const onboardingApi = {
       use_country_preset: useCountryPreset,
       // The organization's clock — when a day starts for expiry dates,
       // inventory periods and reports. Onboarding asks the currency and
-      // used to leave the zone at UTC whatever this browser said; the same
-      // answer the stock-move export sends (see `stockMoves.exportXlsx`).
+      // sends this browser's zone, not UTC: the same answer the stock-move
+      // export sends (see `stockMoves.exportXlsx`).
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
     return response.data;

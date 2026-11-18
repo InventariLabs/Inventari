@@ -426,9 +426,8 @@ export default function DocumentsTemplatesPage() {
 
   return (
     <div className="space-y-6">
-      {/* A screen that used to carry three buttons and now carries none reads
-          as broken rather than as a boundary. The documents list and the
-          putaway rules have said this for a while; this one said nothing. */}
+      {/* A screen that carries no buttons reads as a boundary, not as broken, and
+          this notice says so, as the documents list and the putaway rules do. */}
       <ReadOnlyNotice module="warehouse" />
       {/* The built-in layouts feed the preview; without them its entry point
           silently disappears. */}

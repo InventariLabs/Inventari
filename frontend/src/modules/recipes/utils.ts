@@ -83,12 +83,11 @@ const SPICE_THRESHOLD = 10;
 /**
  * Whether an amount is small enough to fold away as seasoning.
  *
- * Pieces are never spices by amount: the card used to send every countable
- * ingredient at one or less into the collapsed section — one egg, one onion,
- * half a carton of milk — so a main ingredient disappeared under the heading
- * that says "seasonings". A piece the cook means as a spice is marked as one
- * in the import review, and the mark travels with the recipe: the card folds
- * a row in when the mark is set or the amount reads as seasoning.
+ * Pieces are never spices by amount: a countable ingredient at one or less
+ * stays out of the collapsed section, so one egg, one onion or half a carton of
+ * milk stays under its own heading. A piece the cook means as a spice is marked
+ * as one in the import review, and the mark travels with the recipe: the card
+ * folds a row in when the mark is set or the amount reads as seasoning.
  */
 export const isSpiceQuantity = (
   quantity: number,

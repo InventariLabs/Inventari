@@ -117,8 +117,8 @@ describe("DocumentApprovalsPage", () => {
 
   it("names a parked request whose stage nobody can decide, beside an empty queue", async () => {
     // A request waiting where nobody can act never enters the queue itself —
-    // the queue shows what the reader can act on — so it used to read
-    // exactly like an empty queue. The parked section names it instead.
+    // the queue shows what the reader can act on — so without the parked
+    // section it would read exactly like an empty queue.
     // The server CAN produce this state, which is what makes the assertion
     // honest: the reader's own request parked on a stage naming approvers
     // who cannot see approvals.
@@ -366,9 +366,9 @@ describe("DocumentApprovalsPage", () => {
   });
 
   it("offers no way into a module this workspace does not have", async () => {
-    // The hint used to name the Approvals module in prose — in a workspace
-    // mode where the module is absent from the launcher, and as text nobody
-    // could click. There is no ModulesProvider here, so nothing is enabled.
+    // The hint names no module in prose: in a workspace mode where the module
+    // is absent from the launcher, prose would be text nobody could click.
+    // There is no ModulesProvider here, so nothing is enabled.
     server.use(
       http.get("/api/v1/warehouse/awaiting-my-approval", () =>
         HttpResponse.json({
@@ -518,9 +518,9 @@ describe("DocumentApprovalsPage", () => {
   });
 
   it("says the queue could not be loaded, rather than that it is empty", async () => {
-    // this page used to answer a failed request with "nothing awaiting
-    // your approval" — the one sentence guaranteed to make an approver stop
-    // looking. The failure is now named, with a way to try again.
+    // A failed request is answered with the failure named and a way to try
+    // again, never with "nothing awaiting your approval": that sentence would
+    // make an approver stop looking.
     server.use(
       http.get("/api/v1/warehouse/awaiting-my-approval", () =>
         HttpResponse.json({ detail: "approvals disabled" }, { status: 500 }),

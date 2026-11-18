@@ -180,9 +180,9 @@ export function PrintQueuePanel() {
 /**
  * A printer by name, and whether its agent is asking for work.
  *
- * It used to show a media profile and a label size, with a dialog to change
- * them. A printer has neither now: every label is one file at the size the
- * person chose, and the agent next to the printer fits it there.
+ * A printer has no media profile or label size of its own: every label is one
+ * file at the size the person chose, and the agent next to the printer fits it
+ * there.
  */
 function AgentRow({ agent }: { agent: PrintAgent }) {
   const { t } = useTranslation("labels");

@@ -184,8 +184,7 @@ describe("RecipeCard — image rendering", () => {
         <RecipeCard {...baseProps} recipe={makeRecipe({ tags: ["Italian"] })} />
       </MemoryRouter>,
     );
-    // `normal-case` used to be here to cancel Badge's uppercase default. The
-    // tag is a Button now, which has no case transform to undo.
+    // The tag is a Button, which has no uppercase default to cancel.
     const tag = screen.getByRole("button", { name: "Italian" });
     expect(tag).toHaveClass("rounded-full");
     expect(tag).not.toHaveClass("uppercase");

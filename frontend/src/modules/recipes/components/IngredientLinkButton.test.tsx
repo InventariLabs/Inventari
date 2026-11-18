@@ -156,7 +156,7 @@ describe("IngredientLinkButton — the create is refused", () => {
 
     await waitFor(() => expect(createProduct).toHaveBeenCalled());
     // What a browser does next with a name wider than the box: it scrolls
-    // the text inside the input, and that scroll used to clear the box.
+    // the text inside the input, and that scroll must not clear the box.
     fireEvent.scroll(input);
     expect(
       await screen.findByTestId("ingredient-link-search-input"),

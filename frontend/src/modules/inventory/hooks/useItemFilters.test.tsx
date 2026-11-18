@@ -158,8 +158,8 @@ describe("useItemFilters", () => {
   });
 
   // A chip and a sort pressed before the first address has rendered each
-  // start from the address on screen; the sort used to write past the list's
-  // own queue of writes, so the chip stayed on while Back lost it.
+  // start from the address on screen, and every write goes through the list's
+  // own queue, so Back restores both.
   it.each([
     ["chip first", ["chip", "sort"]],
     ["sort first", ["sort", "chip"]],

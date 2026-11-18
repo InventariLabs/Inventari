@@ -105,7 +105,7 @@ export const WebhookCard = memo(function WebhookCard({
             )}
             {/* The other half of the same silence: a name the catalogue no
                 longer offers can never match an emission, and the list it
-                disappeared from is the only place that used to say so. */}
+                disappeared from is the only place that says so. */}
             {webhook.events_unknown && (
               <Badge variant="warning">
                 <AlertTriangle className="w-3 h-3 mr-1 inline" />

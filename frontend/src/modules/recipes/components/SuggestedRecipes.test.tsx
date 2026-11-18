@@ -22,9 +22,8 @@ const suggestion = (
 
 describe("SuggestedRecipes coverage badge", () => {
   it("writes the ratio the recipe cards write, not a bare percentage", () => {
-    // This used to render a percent icon and the number alone — "⁒ 100" —
-    // with no title and no accessible name, so a screen reader announced
-    // "100" and nothing said what of.
+    // The badge is the ratio the cards write, with a title and an accessible name,
+    // so a screen reader says what the number counts.
     render(
       <SuggestedRecipes
         suggestions={[suggestion()]}

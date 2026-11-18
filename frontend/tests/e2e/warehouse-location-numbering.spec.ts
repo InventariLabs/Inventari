@@ -296,7 +296,7 @@ test.describe("Warehouse — business location numbering", () => {
     await expect(page.getByText("1 code changed")).toBeVisible();
 
     // The rack now reads like its new zone, the one that stayed is untouched,
-    // and the card lists exactly the sticker to replace, old code first.
+    // and the card lists exactly the sticker to replace, its code first.
     // (A number an old sticker of the organization carried is never reused,
     // so which number it is depends on the database; that it reads off the
     // new zone does not.)
@@ -315,8 +315,8 @@ test.describe("Warehouse — business location numbering", () => {
     expect(await scanned(s, oldCode)).toBe(moves.name);
     expect(await scanned(s, newCode)).toBe(moves.name);
 
-    // Stick the new label on: the list empties, and the old code still names
-    // the shelf for as long as the old sticker lies around.
+    // Stick the new label on: the list empties, and the code on the old sticker still names
+    // the shelf for as long as that sticker lies around.
     await list.getByRole("button", { name: "Mark as replaced" }).click();
     await expect(page.getByText(/stickers? to replace/)).toHaveCount(0);
     expect(await scanned(s, oldCode)).toBe(moves.name);

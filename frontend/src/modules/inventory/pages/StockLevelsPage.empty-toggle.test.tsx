@@ -6,13 +6,12 @@ import { PageHeaderContext } from "@/hooks/useModulePageHeader";
 import StockLevelsPage from "./StockLevelsPage";
 
 /**
- * The empty state used to send a reader who asked "which storages are
- * empty" to the include-empty toggle — and the toggle could not answer:
- * `include_empty` only un-hides rows whose quantity was drained to zero,
- * while a storage that never held the product has no row at all. So the
- * label names what the flag really shows (storages at zero for the current
- * filters) and a hint underneath says both halves: what appears, and what
- * cannot.
+ * A reader who asks "which storages are empty" is not sent to the include-empty
+ * toggle, which cannot answer: `include_empty` only un-hides rows whose quantity
+ * was drained to zero, while a storage that never held the product has no row
+ * at all. So the label names what the flag really shows (storages at zero for
+ * the current filters) and a hint underneath says both halves: what appears,
+ * and what cannot.
  */
 
 const listSpy = vi.fn();

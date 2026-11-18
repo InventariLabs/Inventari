@@ -64,8 +64,8 @@ export function LineItemOptionalPanel({
 
         {/* The expiry column is a field like the ones beside it: label on the
             same line as SKU / Notes, control on the same line as theirs. The
-            bordered card it used to be started and ended between those lines,
-            so nothing in the row lined up. */}
+            no bordered card starts or ends between those lines, so the row
+            lines up. */}
         <div className="space-y-1.5">
           {expiryFieldOpen ? (
             <>

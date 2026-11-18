@@ -295,8 +295,8 @@ export function FinishedScreen({
               },
             });
           } catch {
-            // The note stays on screen; closing here is how a written note
-            // used to disappear without a word.
+            // The note stays on screen; closing here would make a written note
+            // disappear without a word.
             setSaveFailed(true);
             return;
           }

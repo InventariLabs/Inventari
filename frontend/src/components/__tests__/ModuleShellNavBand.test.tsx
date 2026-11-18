@@ -6,8 +6,8 @@ import ModuleShell from "@/components/ModuleShell";
 
 /**
  * The nav bar appears from two items up — a tab that selects the module's only
- * page is noise. But a single-screen module's content used to start ~44px
- * higher than every other module's, which read as an unfinished shell, so the
+ * page is noise. But a single-screen module's content must start at the same
+ * height as every other module's, or it reads as an unfinished shell, so the
  * band's height is reserved either way (UI_GUIDELINES §2.14).
  */
 

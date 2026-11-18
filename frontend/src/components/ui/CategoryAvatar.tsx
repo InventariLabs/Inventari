@@ -135,11 +135,11 @@ export function CategoryAvatar({
     //   1. user-set category.color (curated key or still-supported legacy key)
     //   2. hash(category.name) → curated FALLBACK_COLORS
     //
-    // A third step used to sit between them: a map from the deprecated
+    // No third step sits between them: no map from the deprecated
     // `category_type` to a fixed tint, which is domain knowledge — three food
-    // storage codes — inside a generic Design System component. It also
-    // painted every category of one type the same colour, which is the
-    // opposite of what an identity avatar is for. The property and the hash
+    // storage codes — inside a generic Design System component. Such a tint
+    // would paint every category of one type the same colour, the opposite of
+    // what an identity avatar is for. The property and the hash
     // decide now.
     let key: CategoryColorKey | LegacyColorKey;
     const userKey = category.color;

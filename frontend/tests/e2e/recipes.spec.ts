@@ -78,8 +78,8 @@ test.describe("Recipes — CRUD flow", () => {
     try {
       const uniqueName = `E2E-Recipe-UI-${Date.now()}`;
       // Name the button, not a loose /add|new|create/ race: "New collection"
-      // sits next to "New recipe" in the header and used to win — the name
-      // went into a collection and the recipe never existed. The grid's empty
+      // sits next to "New recipe" in the header and must not win: the name
+      // would go into a collection and the recipe would never exist. The grid's empty
       // state renders a second "New recipe", so take the header's own.
       const addButton = page
         .getByRole("button", { name: /^new recipe$/i })
@@ -693,7 +693,7 @@ test.describe("Recipes — detail layout at intermediate widths", () => {
 
     // No template_id / ingredient_group_name → availability status "unknown",
     // which renders the "link to product" action next to every ingredient name.
-    // That action is what used to clip ingredient names on a half-width window.
+    // That action must not clip ingredient names on a half-width window.
     const recipe = await api.createRecipe(token, {
       name: recipeName,
       servings: 2,

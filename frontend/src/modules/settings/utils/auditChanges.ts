@@ -236,8 +236,8 @@ function absentAsEmpty(value: unknown): Record<string, unknown> | null {
  * export, which writes the snapshot itself — is untouched.
  *
  * A timestamp is formatted, not printed. The backend writes dates as ISO
- * (`deadline: 2026-09-25T23:59:59.999999+00:00`), and that string used to
- * reach the reader exactly as written — microseconds, offset and all — in a
+ * (`deadline: 2026-09-25T23:59:59.999999+00:00`), and that string is never
+ * shown as written — microseconds, offset and all — in a
  * column whose every other row says `18.09.2026, 14:41`. The same formatter
  * the column beside it uses, so one date has one spelling on one screen.
  *
@@ -580,7 +580,7 @@ function fieldDefinitionText(d: Definition, t: TranslateFn): string {
 
 /**
  * A category's field definitions as the fields added, removed or changed,
- * matched by key — the list used to print each definition as JSON. Null when
+ * matched by key, each definition on its own line rather than as JSON. Null when
  * a side is not a list of definitions, so the generic walk still applies.
  */
 function fieldDefinitionChange(
@@ -703,9 +703,9 @@ function walk(
 /**
  * What an entry records, one line per leaf that moved.
  *
- * A dictionary-valued field used to be printed whole on both sides of the
- * arrow: a product's nutrition document from a food database, twice, in one
- * table cell. Only the paths that differ are named now, so the size of the
+ * A dictionary-valued field is not printed whole on both sides of the arrow:
+ * a product's nutrition document from a food database would appear twice in
+ * one table cell. Only the paths that differ are named, so the size of the
  * document stops deciding the size of the row.
  *
  * *t* is the reader's translator, when there is one: a reference the app
@@ -744,8 +744,8 @@ export function auditChanges(
   // what the count produced (counted, adjusted, how many differences were
   // accepted beyond the tolerance); a document confirmed names its new
   // status; an approval stage names why it skipped itself. All of that is
-  // the record of what happened, and an UPDATE row showing it used to print
-  // "—" instead. Same reading as a CREATE: what the entry came with, minus
+  // the record of what happened, and an UPDATE row shows it rather than a dash.
+  // Same reading as a CREATE: what the entry came with, minus
   // the identity (the Target column already shows it) and minus the empties.
   return flatFields(snapshot, resolveId, t);
 }
@@ -831,10 +831,9 @@ function flatFields(
  *    whichever one the reader uses.
  * 2. The catalogue (`settings.audit.fields.<segment>`), when it has the word.
  * 3. The segment as the record wrote it — `min_quantity` — and not tidied into
- *    "Min quantity". The tidying is what this function used to do, and it is
- *    why forty fields went out in English without anyone noticing:
- *    `storage_location_id` became "Storage location", a shape no reader can
- *    tell from a translated label, in a journal whose reader is Polish. A raw
+ *    "Min quantity". Tidying it would give `storage_location_id` the shape
+ *    "Storage location", which no reader can tell from a translated label, in
+ *    a journal whose reader is Polish. A raw
  *    key says the one true thing — nobody has named this field in your
  *    language yet — and the gate beside this file
  *    (`scripts/check-audit-fields.mjs`) fails when the backend declares a key

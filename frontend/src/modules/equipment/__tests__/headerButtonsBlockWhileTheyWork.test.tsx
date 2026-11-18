@@ -1,6 +1,5 @@
 /**
- * regression: header action buttons used to stay live while their own
- * request was in flight.
+ * Header action buttons are disabled while their own request is in flight.
  *
  * The page builds the header JSX inside a `useEffect`. The values that JSX
  * reads are captured when the effect last ran, and the effect's dependency

@@ -16,16 +16,15 @@ vi.mock("@/modules/warehouse/hooks/useDocumentProfile", () => ({
 /**
  * The menu is where a document type is chosen, so it says what the type IS.
  *
- * It used to render `typesShort.<CODE>`, which in Polish is the paperwork
- * code alone — the menu offered "PZ", "WZ", "MM", "PW", "RW", "Złom" with no
- * expansion anywhere, while the same file held "Przyjęcie (PZ)" and
- * "Złomowanie" one key over. English readers got full names out of the same
- * component, so only Polish was encrypted — and a reader whose organization
+ * It renders `types.<CODE>`, the full name, and not `typesShort.<CODE>`: in
+ * Polish the short form is the paperwork code alone ("PZ", "WZ", "MM", "PW",
+ * "RW", "Złom") with no expansion anywhere, while the same file holds
+ * "Przyjęcie (PZ)" and "Złomowanie" one key over. A reader whose organization
  * runs the "home" profile is never assumed to have warehouse training.
  *
- * The approval-thresholds screen showed the same abbreviations while an
- * administrator decided which types need a workflow; it reads `types` too
- * now. The dense register rows keep `typesShort` deliberately.
+ * The approval-thresholds screen reads `types` too, so an administrator deciding
+ * which types need a workflow sees the same full names. The dense register rows
+ * keep `typesShort` deliberately.
  */
 async function openMenu(triggerName: string) {
   const user = userEvent.setup();

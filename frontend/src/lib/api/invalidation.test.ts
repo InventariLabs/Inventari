@@ -155,7 +155,7 @@ describe("invalidation helpers", () => {
       );
       // New tags (e.g. from a freshly created recipe) must appear in the
       // filter bar without a page reload — the tags key lives outside the
-      // ["recipes"] prefix, so every recipe mutation used to skip it.
+      // ["recipes"] prefix, so every recipe mutation must not skip it.
       expect(keys).toContainEqual(queryKeys.recipes.tags);
     });
   });

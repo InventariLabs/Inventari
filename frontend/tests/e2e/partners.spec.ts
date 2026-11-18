@@ -15,10 +15,9 @@ test.describe("Partners — CRUD flow", () => {
     await api.enableAllModules(token);
 
     // Every partner this file creates carries a UUID, so no earlier run's
-    // can block it. It used to delete every "E2E-" partner here first, and
-    // with the file running in two workers at once that took the other
-    // worker's seed out from under its list — and the suppliers other
-    // specs had just made for their own documents.
+    // can block it. It does not delete every "E2E-" partner here first: with the file running in
+    // two workers at once, that would take the other worker's seed out from under
+    // its list, and the suppliers other specs had just made.
     const partner = await api.createPartner(token, {
       name: `E2E-Partner-Seed-${crypto.randomUUID()}`,
       type: "supplier",

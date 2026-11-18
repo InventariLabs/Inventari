@@ -10,8 +10,7 @@ type Props = { data?: Partial<SlotDataMap["stock_action_extra"]> };
  * Compact nutrition summary for Quick Action sheets.
  *
  * The values arrive on the scanned product, which is the only thing this slot
- * is handed. It used to look for an `item` first — a field the slot has never
- * carried — so the read that mattered was the second half of a fallback.
+ * is handed. Nothing looks for an `item` first: the slot never carries one.
  */
 const NutritionSummary: React.FC<Props> = ({ data }) => {
   const { t } = useTranslation("nutrition");

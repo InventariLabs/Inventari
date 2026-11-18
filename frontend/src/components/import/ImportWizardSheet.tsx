@@ -124,9 +124,8 @@ export function ImportWizardSheet<R extends ImportOutcome>({
       setImportResult(await run(file, mapping, setProgress));
       setStep("result");
     } catch (error) {
-      // A gate refusal carries its reason and its remedy, written to be
-      // read; this bare catch used to bury it under a generic toast and
-      // every failure read the same.
+      // A gate refusal carries its reason and its remedy, written to be read;
+      // this catch shows that message, not a generic toast.
       toast.error(extractApiError(error, texts.importFailed));
       setStep("mapping");
     }

@@ -112,8 +112,8 @@ describe("StorageWizard", () => {
   });
 
   it("finishes on the zone alone, without inventing a shelf", async () => {
-    // Done used to stay disabled until a location name appeared — a place
-    // wanting one place had to invent a second one inside it.
+    // Done is enabled without a location name — a place wanting one place
+    // does not have to invent a second one inside it.
     render(<StorageWizard isOpen={true} onClose={vi.fn()} />, {
       wrapper: createWrapper(),
     });
@@ -134,7 +134,7 @@ describe("StorageWizard", () => {
     );
   });
 
-  // ADR-018: step 1 used to offer a chip per child-of-a-root, so a shelf
+  // ADR-018: step 1 offers no chip per child-of-a-root, so a shelf
   // three levels down could not be built on — the wizard could only ever add
   // to the second level.
   it("offers a location three levels down as the parent", async () => {
@@ -393,9 +393,9 @@ describe("StorageWizard - leaving a step", () => {
 
     it("closes only the location list on Escape, keeping the step and the name", async () => {
       // The wizard's first control opens a list that is itself a sheet on a
-      // phone. One press used to close the list *and* raise the discard
-      // question over it — three layers, and a destructive "Discard" a click
-      // away. Escape belongs to the highest layer only.
+      // phone. One press closes the list, not the list *and* the discard
+      // question over it: that would be three layers, and a destructive
+      // "Discard" a click away. Escape belongs to the highest layer only.
       const onClose = vi.fn();
       renderWizard(onClose);
       await typeIntoFirstStep("Workshop");

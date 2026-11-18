@@ -191,8 +191,7 @@ describe("DocumentProfileSettingsPage — a profile that failed", () => {
 });
 
 describe("DocumentProfileSettingsPage — one Settings screen", () => {
-  // The module's own options used to be a second tab, "Module settings",
-  // whose only other content was a link back to this screen.
+  // The module's own options sit on this screen, not in a second tab.
   it("opens on receiving, which holds the module's own options", async () => {
     renderPage();
 

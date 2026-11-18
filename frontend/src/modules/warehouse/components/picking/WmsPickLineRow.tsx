@@ -53,16 +53,13 @@ const WmsPickLineRow = memo(function WmsPickLineRow({
   const variant = statusVariant[line.status] ?? "secondary";
 
   return (
-    // A plain row, not a button: tapping it used to open the shortfall
-    // sheet at 0, so recording an ordinary pick meant typing the number
-    // the row already carried — one sheet and one keyboard per line. Every
-    // action a pending line offers is a named button now, the way the
-    // receiving row has them, and a thumb that lands here while scrolling
-    // records nothing.
+    // A plain row, not a button: tapping it records nothing, so a thumb that
+    // lands here while scrolling does nothing. Every action a pending line
+    // offers is a named button, the way the receiving row has them.
     //
-    // Wraps: on a 320px sheet the name shared one row with the quantity,
-    // the status badge and three icons and was left a few pixels, so the
-    // figures drop under it instead.
+    // Wraps: on a 320px sheet the name would be left a few pixels beside the
+    // quantity, the status badge and three icons, so the figures drop under it
+    // instead.
     <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 px-4 py-3 border-b border-border last:border-0">
       <div className="flex min-w-0 flex-1 basis-40 gap-2">
         {line.status === "picked" || line.status === "short" ? (
@@ -119,9 +116,8 @@ const WmsPickLineRow = memo(function WmsPickLineRow({
         <span className="text-xs text-on-secondary">
           {/* Once part of the line is in the session, the count is two
               numbers — what was scanned and what the document expects — the
-              same pair the receiving row and the scan field above show. The
-              row used to keep only the scanned count, while "Pick full
-              amount" beside it booked the whole expectation. */}
+              same pair the receiving row and the scan field above show. Both halves
+              are shown here, as on the receiving row. */}
           {line.picked_quantity > 0
             ? `${formatQuantityValue(line.picked_quantity)}/${formatQuantityValue(line.expected_quantity)}`
             : formatQuantityValue(line.expected_quantity)}{" "}

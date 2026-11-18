@@ -17,7 +17,7 @@ export interface StockQuantFilters {
   /** Answers for this location and everything below it. */
   location_id?: string;
   lot_id?: string;
-  /** Shelves drained to zero — the only record of where a product used to be. */
+  /** Shelves drained to zero — the only record of where a product has been. */
   include_empty?: boolean;
   /**
    * What the reader typed: matched against the product (name, brand, barcode,

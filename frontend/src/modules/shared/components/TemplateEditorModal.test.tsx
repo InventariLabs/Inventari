@@ -253,8 +253,8 @@ describe("TemplateEditorModal", () => {
   });
 
   it("offers the preview toggle only where the module can serve it", async () => {
-    // Equipment has no preview endpoint: the toggle used to render there and
-    // the frame asked an address the backend does not expose, so the panel
+    // Equipment has no preview endpoint, so the toggle is not offered there:
+    // the frame would ask an address the backend does not expose, so the panel
     // answered with the render-failure sentence for a completely different
     // reason. Without support the editor offers no control at all.
     server.use(

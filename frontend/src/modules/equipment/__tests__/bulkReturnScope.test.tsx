@@ -97,9 +97,8 @@ async function selectEverything() {
 }
 
 /**
- * A bulk return closes open assignments. It used to send everything ticked,
- * so the dialog promised to return assets that were sitting on a shelf and
- * the backend answered with failures nobody had asked for.
+ * A bulk return closes open assignments and sends only what can be returned,
+ * so the dialog never promises a return the backend will refuse.
  */
 describe("a bulk return covers what is actually out", () => {
   beforeEach(() => {

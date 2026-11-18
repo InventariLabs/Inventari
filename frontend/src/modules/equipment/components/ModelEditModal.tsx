@@ -18,8 +18,8 @@ import type { EquipmentModel } from "@/modules/equipment/api/equipment";
 import type { CategoryDTO } from "@/types";
 import { getCategoryLabel } from "@/modules/equipment/components/assetUtils";
 
-// The model dialog used to show raw enum values while the asset
-// form next to it showed translated ones. Static keys keep the unused-key
+// The model dialog shows translated enum values, as the asset form next to it
+// does. Static keys keep the unused-key
 // gate able to see them.
 /**
  * A model is a reusable template, so it carries what every unit built from it
@@ -38,8 +38,8 @@ const EMPTY_META: Record<string, string> = {
 };
 
 /**
- * Keys a model used to store that describe one unit. Dropped on save so an
- * edited model stops handing them down; reads elsewhere still tolerate them.
+ * Keys that describe one unit, which a model may still store. Dropped on save
+ * so an edited model does not hand them down; reads elsewhere still tolerate them.
  */
 const PER_UNIT_KEYS = [
   "purchase_date",
@@ -178,8 +178,8 @@ export default function ModelEditModal({
               onChange={(e) => setName(e.target.value)}
               autoFocus
             />
-            {/* Nothing here used to say where the brand goes, so the natural
-                thing — typing the full commercial name — put it in twice. */}
+            {/* Nothing here says where the brand goes, so the natural
+                thing — typing the full commercial name — puts it in twice. */}
             <p className="mt-1 text-xs text-on-muted">{t("models.nameHint")}</p>
           </div>
 

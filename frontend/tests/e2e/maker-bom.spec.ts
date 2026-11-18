@@ -226,10 +226,9 @@ test.describe("Maker — recipe catalog & formula detail", () => {
 });
 
 test.describe("Maker — composing a formula (Composition tab)", () => {
-  // What the removed /maker/bom editor used to cover, on the screen that
-  // replaced it: add an ingredient, refuse a non-positive qty, delete the
-  // formula. The old editor addressed a *product* and always wrote to its
-  // default formula; these address the formula on screen.
+  // What the screen that replaces /maker/bom covers: add an ingredient, refuse a non-positive qty, delete the
+  // formula. These address the formula on screen, not a *product* and its
+  // default formula.
   let api: ApiHelper;
   let ctx: APIRequestContext;
   let token: string;

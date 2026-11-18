@@ -25,10 +25,9 @@ import { DND_LABEL } from "@/lib/dndA11y";
 /**
  * Shared collection CRUD state.
  *
- * The mobile chips row and the desktop sidebar used to be rendered as two
- * fragment siblings inside the page's flex row — with a collection present
- * the chips consumed the whole row on phones and the recipe grid collapsed
- * to ~6px. The two surfaces are now separate components; this hook owns the
+ * The mobile chips row and the desktop sidebar are separate components, so a
+ * collection present never lets the chips take the whole flex row on a phone
+ * and collapse the recipe grid. This hook owns the
  * create/rename/delete state they both drive, so the logic is not duplicated.
  */
 export interface CollectionManager {

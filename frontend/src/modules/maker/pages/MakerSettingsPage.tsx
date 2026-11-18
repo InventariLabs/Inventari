@@ -6,9 +6,9 @@ import { MakerSettingsPanel } from "@/modules/maker/components/MakerSettingsPane
 /**
  * Maker settings, inside the module they configure.
  *
- * They used to live only under the global /settings shell, in its
- * "Integrations" group between API keys and webhooks — neither an
- * integration nor anywhere near the screens the options change.
+ * The options sit beside the screens they change. They are not integrations,
+ * so they do not belong in the "Integrations" group of the global /settings
+ * shell.
  */
 export default function MakerSettingsPage() {
   const { t } = useTranslation("maker");

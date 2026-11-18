@@ -16,9 +16,9 @@ import { moduleRegistry } from "./moduleRegistry";
  * scripts/check-module-settings.mjs carries it into the snapshot read below —
  * the frontend container mounts ./frontend and cannot see the backend at all.
  *
- * The previous version globbed the backend's module.py files as raw text and
- * matched a regex against them. Wherever that tree was absent the glob
- * returned nothing and every assertion here passed by describing an empty
+ * Globbing the backend's module.py files as raw text and matching a regex
+ * against them would let every assertion pass wherever that tree is absent: the
+ * glob returns nothing and the assertions describe an empty
  * world; and the regex was only accidentally right, since `approvals` attaches
  * its schema by assignment rather than by defining a method.
  *

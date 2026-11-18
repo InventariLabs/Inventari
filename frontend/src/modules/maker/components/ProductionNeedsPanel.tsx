@@ -40,8 +40,8 @@ function isShort(ingredient: Ingredient): boolean {
 /**
  * What the run takes off stock (or will need), before anything is saved.
  *
- * The shortage used to surface only at "Create draft", and a run already made
- * was then refused at completion. Each ingredient says what it needs against
+ * The shortage surfaces here, before "Create draft", and not only at completion,
+ * where a run already made would be refused. Each ingredient says what it needs against
  * what the records hold where the run draws; under the list, the cost per
  * unit and what is left of the reference price, and what saving will do
  * about a shortfall — count it when the goods were already used, buy it when

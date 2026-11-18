@@ -160,17 +160,16 @@ export default function RecipeCatalogPage() {
         />
       )}
 
-      {/* The month's production result, the figure that used to sit on the
-          inventory overview beside stock. Production's start is its home.
-          On a phone it sits after the recipes: above them it filled the
-          first screen and the first recipe started below the fold. */}
+      {/* The month's production result, on production's start. On a phone it
+          sits after the recipes: above them it would fill the first screen and
+          push the first recipe below the fold. */}
       <div className="order-last sm:order-none">
         <MakerResultWidget />
       </div>
 
       {/* Loading, error-with-retry and empty are the shared components now:
-          the page used to hand-roll all three, and its error state was a
-          single line of text with no way to try again. */}
+          the page renders all three through them, so the error state has a way
+          to try again. */}
       <QueryResult<RecipeCatalogResponse> query={query}>
         {(data) =>
           data.items.length === 0 ? (

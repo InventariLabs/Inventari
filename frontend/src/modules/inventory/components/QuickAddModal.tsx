@@ -20,11 +20,10 @@ interface Props {
   /**
    * What the scan said about the code, as the catalogue key the server sends.
    * The difference between a brand-new product, one matched from history and
-   * a free pool label used to be read out of the English sentence
-   * (`message.includes("history")`), which made the sentence load-bearing:
-   * translating it would have switched the "matched from your previous
-   * products" answer off in silence. The key is the contract; the sentence is
-   * free to be a sentence.
+   * a free pool label is read from the catalogue key, never from the English
+   * sentence, so translating the sentence cannot switch the "matched from your
+   * previous products" answer off in silence. The key is the contract; the
+   * sentence is free to be a sentence.
    */
   messageKey?: string | null;
   onClose: () => void;

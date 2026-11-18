@@ -263,10 +263,9 @@ describe("ProductionCreateSheet — shortage strategy flows", () => {
 
 describe("ProductionCreateSheet — nowhere to put the batch", () => {
   it("keeps the picker on the form and offers to create the first location", () => {
-    // The picker used to leave the form for a banner, which blocked the
-    // module's only save path and left the footer hint asking for a control
-    // that was not on the screen. The control stays; the way forward —
-    // creating the first location without leaving the sheet — sits under it.
+    // The picker stays on the form: the way forward, creating the first location
+    // without leaving the sheet, sits under the control, so the footer hint asks
+    // for a control that is on the screen.
     offer([]);
     render(
       <QueryWrapper>
@@ -729,8 +728,8 @@ describe("ProductionCreateSheet — already made, in one step", () => {
 
   it("offers the shortfall at the quantity the list will receive", () => {
     // The list is shopped in the ingredient's unit and asks for a whole piece
-    // when the run is half a piece short. The button used to promise the raw
-    // 1.5 while the line it wrote held 2.
+    // when the run is half a piece short. The button promises the amount the
+    // line holds: a raw 1.5 would not match the 2 written.
     mocks.preview.data = {
       ...PLUM_PREVIEW,
       ingredients: [

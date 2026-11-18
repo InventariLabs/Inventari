@@ -1,8 +1,8 @@
 import type { TFunction } from "i18next";
 
 /**
- * Campaign and response statuses arrive as codes and used to render as codes
- * — DRAFT, ACTIVE, PENDING — in an interface whose asset statuses are
+ * Campaign and response statuses arrive as codes and render as translated labels,
+ * never as DRAFT, ACTIVE, PENDING, in an interface whose asset statuses are
  * translated. Static keys keep the i18n unused-key gate honest: a template
  * literal would report all nine as orphans.
  */

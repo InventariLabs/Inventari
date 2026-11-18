@@ -15,11 +15,10 @@ const modeIcons = {
 /**
  * The theme control — a picker, not a carousel.
  *
- * It used to cycle light → dark → system on click, which asks the reader to
- * know the order and hides which of the three is chosen. Worse, two of the
- * three look identical while the system is light: the click that moves from
- * "Light" to "Follow system" changes nothing on screen and reads as a broken
- * button.
+ * A click on a cycle would ask the reader to know the order and hide which of
+ * the three is chosen. Worse, two of the three look identical while the system
+ * is light, so a click from "Light" to "Follow system" would change nothing on
+ * screen and read as a broken button.
  *
  * So it is built like the `LanguageSelector` standing next to it in the user
  * menu: a trigger showing the current state and a list with the active option
@@ -36,8 +35,8 @@ export function ThemeToggle() {
     ? mode
     : "system";
   const Icon = modeIcons[current];
-  // The accessible name used to be a bare "Theme", which said nothing about
-  // which of the three states the button was in.
+  // The accessible name carries the state, not a bare "Theme", so it says which
+  // of the three the button is in.
   const stateLabel = t(`settings.theme_${current}` as const);
 
   useEffect(() => {

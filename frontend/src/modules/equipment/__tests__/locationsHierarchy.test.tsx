@@ -155,16 +155,15 @@ describe("equipment locations and the hierarchy they live in", () => {
     );
 
     // ADR-018: a room inside an office holds a shelf like anything else. The
-    // list used to be filtered down to locations with no parent.
+    // list is not filtered down to locations with no parent.
     const panel = await screen.findByRole("dialog");
     expect(within(panel).getByText("Server room")).toBeInTheDocument();
     expect(within(panel).getByText("Warsaw office")).toBeInTheDocument();
   });
 
   it("refuses to delete a location that holds records, before the click", async () => {
-    // It used to ask, then report a bare "Failed to delete" — the API has
-    // always refused this, so the question had one possible answer and was
-    // phrased as a mishap.
+    // The refusal comes before the click: the API has always refused this, so
+    // the screen says so instead of asking a question with one possible answer.
     render(<EquipmentLocationsPage />, { wrapper: createWrapper() });
     await screen.findByText("Server room");
 

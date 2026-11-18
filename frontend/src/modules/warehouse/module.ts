@@ -84,8 +84,8 @@ moduleRegistry.register({
   useStatusBadge: useDocumentsStatusBadge,
   statusBadgePermission: "warehouse:read",
   routes: [
-    // The list this module used to open on now lives in History; the old
-    // address keeps working for bookmarks, query string included.
+    // The list this module opens on lives in History; the address of the former
+    // list keeps working for bookmarks, query string included.
     { path: "/warehouse", component: DocumentsLegacyRedirect },
     // The former document list stays reachable from the office panel in History:
     // it is where the type, status and date filters and the opening-stock

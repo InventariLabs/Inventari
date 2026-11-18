@@ -221,8 +221,8 @@ export default function EquipmentCategoriesPage() {
             </table>
           </div>
           {/* The same records below `md`, one card each: the table stays the
-           desktop list, and the actions the scroller used to push off the
-           right edge sit in the row a thumb reaches. */}
+           desktop list, and the actions stay in the row a thumb reaches,
+           clear of the scroller's right edge. */}
           <ul className="md:hidden divide-y divide-border">
             {equipmentCategories.map((cat: CategoryDTO) => {
               const fieldCount = (cat.field_definitions ?? []).filter(

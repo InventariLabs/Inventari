@@ -151,9 +151,8 @@ describe("RecipeIngredientsSection — simple by default, advanced on demand", (
 
 describe("RecipeIngredientsSection — linking names the ingredient", () => {
   it("takes the product's name when a suggestion is picked", () => {
-    // The typed fragment used to survive the link and reach the database,
-    // so nutrition lookups, the shopping list and the shortage modal each
-    // read a different name for the same thing.
+    // The typed fragment does not survive the link: nutrition lookups, the
+    // shopping list and the shortage modal all read the one name the product has.
     const onUpdate = vi.fn();
     renderSection([draft({ name: "Wheat fl" })], onUpdate);
 

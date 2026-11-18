@@ -6,12 +6,9 @@ import { vi } from "vitest";
 /**
  * The unit suite runs the real i18next, not a stand-in.
  *
- * What used to live here was a ~120-line reimplementation of i18next —
- * its own key resolver, its own interpolation, and a hand-rolled Polish
- * plural rule (count 2–4 → _few) that could never fire because only the
- * English bundles were loaded. Every translation defect was therefore
- * invisible to 2335 tests: plural forms, interpolation and namespace
- * fallback were exercised by mock code, not by the code that ships.
+ * The key resolver, the interpolation and the Polish plural rule (count 2–4 →
+ * _few) are i18next's own, so plural forms, interpolation and namespace fallback
+ * are exercised by the code that ships, not by mock code.
  *
  * English stays the default language so existing text selectors keep
  * working. Tests that care about translation switch with

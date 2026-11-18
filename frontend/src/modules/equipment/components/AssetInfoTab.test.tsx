@@ -155,8 +155,7 @@ describe("InfoTab — who has it", () => {
   });
 
   // Checked out to a place, the asset stands there — the Location row says
-  // so, with the home the return will bring it back to beneath it. It used to
-  // name the home alone while the list's holder column named the place.
+  // so, with the home the return will bring it back to beneath it.
   it("gives a placed asset one location: the place, with its home beneath", () => {
     render(
       <InfoTab
@@ -189,7 +188,7 @@ describe("InfoTab — who has it", () => {
 /**
  * The tab's two writes: deleting the asset's own picture and downloading
  * its QR label. The failures caught: a delete that leaves the detail page
- * showing the old picture (the caller is never told), a download saved
+ * showing a deleted picture (the caller is never told), a download saved
  * under the wrong name, and either failing with nothing said.
  */
 describe("InfoTab — the picture and the label", () => {

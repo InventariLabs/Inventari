@@ -222,9 +222,8 @@ export default function CategoriesPage() {
   // Counts come from the list endpoint: a card that cannot say how much the
   // category holds is a coloured label and nothing more.
   //
-  // The module filter used to be hard-coded on here — the one list where the
-  // organization policy ("Module data in general lists") had no effect, so
-  // eight equipment categories were unreachable at every setting.
+  // The module filter follows the organization policy ("Module data in general
+  // lists"), so the module's categories are reachable at every setting.
   const excludeModuleContexts = !useShowModuleData();
   const {
     data: categories,

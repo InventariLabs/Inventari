@@ -202,12 +202,12 @@ moduleRegistry.register({
     keepCoreNav: [],
   },
   // No i18nOverrides, and that is the decision, not an omission.
-  // The module used to rename two core navigation labels — "Assets" for
-  // `inventory:nav.items` and "Locations" for `inventory:nav.storages` — and
-  // stopped at the tab strip: the pages under those tabs stayed headed
-  // "Products" and "Storages", and "Assets" already meant this module's own
-  // fixed-asset list. A reader following the tab met a different word at the
-  // destination, and one word carried two meanings in one application. The
+  // Renaming the two core navigation labels — "Assets" for `inventory:nav.items`
+  // and "Locations" for `inventory:nav.storages` — would stop at the tab strip:
+  // the pages under those tabs stay headed "Products" and "Storages", and
+  // "Assets" already means this module's own fixed-asset list. A reader
+  // following the tab would meet a different word at the destination, and one
+  // word would carry two meanings in one application. The
   // module's own screens name their own things (`equipment:nav.*`); the core
   // list keeps the core word, which is also the word on its page.
   //

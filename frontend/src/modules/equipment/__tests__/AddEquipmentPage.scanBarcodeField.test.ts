@@ -71,9 +71,9 @@ const archivedLabel = {
 
 describe("barcodeScanTarget", () => {
   it("keeps a taken label's address out of the field and leaves it to be named", () => {
-    // Scanning the QR of a label stuck to another product used to write
+    // Scanning the QR of a label stuck to another product must not write
     // 'http://localhost:5773/s/STM-EHBH' into Barcode / EAN. Nothing is
-    // written now; the resolver names the product and offers a way through.
+    // written; the resolver names the product and offers a way through.
     expect(barcodeScanTarget(assignedLabel)).toEqual({ place: "elsewhere" });
   });
 

@@ -37,10 +37,10 @@ import { LocationMoveQuestion } from "@/modules/spaces/components/LocationMoveQu
  * Storages as one screen: the location tree on the left, the selected
  * location on the right.
  *
- * The old screen was three screens stacked — a list of zone cards, a zone of
- * location cards, and a location's own page — each with its own Edit dialog
- * and no place showing the whole path. Restructuring was a fourth screen
- * behind Reorganize, saved separately from the changes it made.
+ * One screen holds the whole tree, so a list of zone cards, a zone of location
+ * cards and a location's own page do not each need an Edit dialog, and one
+ * place shows the whole path. Restructuring is part of the same screen, saved
+ * with the changes it makes.
  *
  * `/inventory/locations` is "nothing selected"; `/inventory/locations/:id` and
  * the old `/inventory/locations/zone/:zoneId` open this screen with that

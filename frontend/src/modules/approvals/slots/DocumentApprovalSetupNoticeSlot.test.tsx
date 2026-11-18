@@ -57,8 +57,7 @@ describe("DocumentApprovalSetupNoticeSlot", () => {
   });
 
   it("says the approval setting has nothing behind it, and where to fix that", async () => {
-    // The setting used to be an ornament: with no workflow the document
-    // confirmed anyway. Confirmation is refused now, so the screen that
+    // Without a workflow behind it, confirmation is refused, so the screen that
     // switched the requirement on has to name the missing piece.
     withWorkflows([]);
     renderNotice(true);

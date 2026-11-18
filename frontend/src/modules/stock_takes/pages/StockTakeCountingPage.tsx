@@ -257,7 +257,7 @@ export default function StockTakeCountingPage() {
 
   // Counting is writing. The list this page is opened from asks first, so an
   // account without the right never sees the way in — but the address is one
-  // anybody can type, and the whole counting screen used to open on it.
+  // anybody can type, so the counting screen itself refuses such an account.
   if (!canWrite) {
     return (
       <div className="space-y-4">

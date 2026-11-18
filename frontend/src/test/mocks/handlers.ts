@@ -1575,8 +1575,8 @@ export const handlers = [
 ];
 
 // Ambient endpoints — shared hooks fire these on mount while tests assert
-// something unrelated, so the catch-all below used to 500 them ~90 times per
-// run and every run spammed "unmocked request" errors. A valid empty response
+// something unrelated, so the catch-all below must not 500 them: each run would
+// otherwise spam "unmocked request" errors. A valid empty response
 // keeps those components on their normal path (the shapes mirror the API
 // contracts); tests that assert on these endpoints mock their own handlers
 // via server.use().

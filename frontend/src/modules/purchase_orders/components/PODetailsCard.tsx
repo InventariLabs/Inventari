@@ -47,10 +47,9 @@ function Field({
 /**
  * The order's metadata, and where it stands.
  *
- * It used to hold two fields next to a document detail that shows a metadata
- * grid, a status axis and dated steps — the same kind of record, told two
- * different ways. Dates, currency and value join the grid, and the
- * axis comes from the same component the document uses.
+ * It shows the same kind of record as the document detail, with a metadata
+ * grid, a status axis and dated steps. Dates, currency and value join the grid,
+ * and the axis comes from the same component the document uses.
  *
  * The fields were a label at the left edge and its value at the right one —
  * 1300 px apart on a desktop screen. They take the document's grid now: the

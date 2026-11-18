@@ -419,8 +419,8 @@ describe("auditChanges scan session journal", () => {
 
 describe("auditChanges", () => {
   it("names only the paths that moved inside a dictionary", () => {
-    // The whole document used to be printed on both sides of the arrow: a
-    // product's nutrition data from a food database, twice, in one cell.
+    // The whole document is not printed on both sides of the arrow: a
+    // product's nutrition data from a food database would appear twice, in one cell.
     const changes = auditChanges(
       {
         before: {
@@ -712,8 +712,8 @@ describe("auditChanges", () => {
   });
 
   it("does not print a change dictionary as JSON", () => {
-    // What the maker's own `{changed: {field: {from, to}}}` shape used to
-    // get: `Changed: {"qty_per_batch":{"from":2,"to":5}}`, one cell, one
+    // The maker's own `{changed: {field: {from, to}}}` shape is not printed as
+    // `Changed: {"qty_per_batch":{"from":2,"to":5}}` in one cell, one
     // reader, no meaning. The shape is gone from the writer; this pins the
     // reading side against it coming back.
     const changes = auditChanges(
@@ -791,9 +791,9 @@ describe("auditChanges", () => {
   });
 
   it("skips the envelope's own before/after when they sit inside a field", () => {
-    // A nested snapshot that wrapped its own two sides — `meta: {before,
-    // after, x}` — used to be read as the record's fields, `Meta › before
-    // › …` in place of what moved. The names are the envelope's at every
+    // A nested snapshot that wraps its own two sides — `meta: {before,
+    // after, x}` — is not read as the record's fields, so the row never names
+    // `Meta › before › …` in place of what moved. The names are the envelope's at every
     // depth, never a field of the record; `meta.x` is one, and it is the
     // same on both sides here, so the entry moved nothing.
     const changes = auditChanges(
@@ -836,7 +836,7 @@ describe("the changed-fields list on a journal line", () => {
 
   it("does not repeat a field the diff already speaks as flat context", () => {
     // Moving a webhook's address: the snapshot carries the url flat beside
-    // the two sides, and the line used to appear twice under one key.
+    // the two sides, and the line appears once under its key.
     const changes = auditChanges(
       {
         name: "Orders hook",
@@ -931,10 +931,10 @@ describe("formatAuditValue", () => {
   });
 
   it("prints a timestamp the way the column beside it does", () => {
-    // `deadline: 2026-09-25T23:59:59.999999+00:00` used to reach the reader
-    // exactly as written — microseconds, offset and all — in a column whose
-    // every other row says "18.09.2026, 14:41". The exact rendering is the
-    // formatter's business; what this pins is that it is no longer ISO.
+    // `deadline: 2026-09-25T23:59:59.999999+00:00` is shown the way the other
+    // rows of its column are, not as written — microseconds, offset and all:
+    // those rows say "18.09.2026, 14:41". The exact rendering is the
+    // formatter's business; what this pins is that the value is not ISO.
     const printed = formatAuditValue("2026-09-25T23:59:59.999999+00:00");
 
     expect(printed).not.toContain("T23:59:59");
@@ -979,8 +979,8 @@ describe("auditFieldLabel", () => {
   });
 
   it("prints an unnamed field as the record wrote it", () => {
-    // The fallback used to tidy `storage_location_id` into "Storage
-    // location" — a shape no reader can tell from a translated label, which
+    // The fallback leaves `storage_location_id` as written, not tidied into
+    // "Storage location" — a shape no reader can tell from a translated label, which
     // is how forty fields went out in English in a Polish journal.
     expect(auditFieldLabel("min_quantity", t)).toBe("min_quantity");
     expect(auditFieldLabel("storage_location_id", t)).toBe(

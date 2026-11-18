@@ -11,10 +11,11 @@ import {
 /**
  * A list opened on a phone must show a record, not only its controls.
  *
- * A needs-attention link from the Inventory overview used to land on a full
+ * A needs-attention link from the Inventory overview must land on the records,
+ * not on a full
  * screen of search, tabs, sort, seven wrapped chips and an open Place/Category
- * panel, with the first product below the fold: a reader who followed a link
- * promising the products that need attention saw none of them. JSDOM has no
+ * panel, with the first product below the fold: a reader who follows a link
+ * promising the products that need attention sees them. JSDOM has no
  * layout, so only a real browser at a real viewport can say where the first
  * record starts.
  *

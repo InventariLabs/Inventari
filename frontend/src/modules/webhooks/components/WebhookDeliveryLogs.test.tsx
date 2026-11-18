@@ -55,7 +55,7 @@ function renderLogs(isActive = true) {
 
 describe("WebhookDeliveryLogs", () => {
   it("calls the target's own reply a reply, not our error", async () => {
-    // A 405 with an HTML page used to render under "Error" in full — sending
+    // A 405 with an HTML page is not rendered in full under "Error", which would send
     // whoever looked for the cause into someone else's page template.
     mockDelivery({ status_code: 405, error_message: HTML_PAGE });
     renderLogs();
@@ -116,8 +116,8 @@ describe("WebhookDeliveryLogs", () => {
   });
 
   it("dates the row with the attempt that answered, not the enqueue", async () => {
-    // A retry answering 54 seconds after the enqueue used to wear the
-    // enqueue time — a success stamped before the event it describes.
+    // A retry answering 54 seconds after the enqueue wears the time of its own
+    // attempt, not the enqueue time, so no success is stamped before the event it describes.
     mockDelivery({
       status_code: 200,
       error_message: null,
@@ -151,9 +151,8 @@ describe("WebhookDeliveryLogs", () => {
   });
 
   it("signs an abandonment as ours, with the reason and no borrowed status", async () => {
-    // The breaker cut the endpoint after a 500; the row used to keep that
-    // 500 and read "Response from the target: Webhook disabled or deleted"
-    // — sending the reader to fix the receiver when the breaker lives here.
+    // The breaker cut the endpoint after a 500; the row reads "Response from the target:
+    // Webhook disabled or deleted", since the breaker lives here, not at the receiver.
     mockDelivery({
       status_code: null,
       response_body: null,

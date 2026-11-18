@@ -699,7 +699,7 @@ describe("AuditLogPage", () => {
       ),
     );
     // Choosing a workspace mode writes the profile's warning windows under
-    // the person who chose it; the row used to read as their own "Update".
+    // the person who chose it, so the row does not read as their own "Update".
     server.use(
       http.get("/api/v1/audit-log", () =>
         HttpResponse.json({
@@ -1318,8 +1318,8 @@ describe("AuditLogPage", () => {
   });
 
   it("names the stock reasons the dialogs write, USED included", async () => {
-    // The reason column used to map CONSUMED while the quick-use flow
-    // writes USED — so the row about eating the product carried the raw
+    // The reason column names each stock reason the dialogs write, USED
+    // included: the row about eating the product carries a word, not the raw
     // code in the middle of the column the organization accounts on.
     // Every reason a dialog offers has a word here.
     server.use(
@@ -1772,7 +1772,7 @@ describe("AuditLogPage — on a phone", () => {
 /**
  * A name on a journal row belongs to the row it was written for.
  *
- * The page used to build one map from every row it was showing — id to the
+ * The page must not build one map from every row it is showing — id to the
  * row's own identity — and hand it to every other row. A module switched on
  * puts the *organization's* id in its target column and the *module's* name
  * in its snapshot, so on a page holding both, a product's row read

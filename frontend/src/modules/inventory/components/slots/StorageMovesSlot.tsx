@@ -3,8 +3,7 @@
  *
  * A slot, not an import: the ledger belongs to Inventory and the storage
  * page belongs to Spaces, and modules do not reach into each other
- * (backend/AGENTS.md §4). `storage_detail_extra` was declared for exactly this and
- * had no contributor until now.
+ * (backend/AGENTS.md §4). `storage_detail_extra` is declared for exactly this, and this slot is its contributor.
  */
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";

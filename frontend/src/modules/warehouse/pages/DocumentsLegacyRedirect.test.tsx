@@ -83,9 +83,9 @@ describe("DocumentsLegacyRedirect", () => {
 });
 
 /**
- * An old bookmark or emailed link to one partner's documents used to land on
- * History with the partner carried in the address — and History reads no
- * filter, so it opened every movement of the warehouse. The screens here are
+ * An old bookmark or emailed link to one partner's documents has to reach the
+ * document list, since History reads no filter and would open every movement of
+ * the warehouse. The screens here are
  * the real ones the module routes to: whichever the redirect picks, the
  * documents it asks the server for have to be that partner's.
  */

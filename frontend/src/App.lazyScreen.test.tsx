@@ -1,8 +1,8 @@
 /**
  * The first visit to a screen downloads it. For that moment the reader has
  * tapped and needs to see that the tap landed: the address had changed, but a
- * router update inside a React transition kept the old screen up, untouched,
- * for as long as the download took.
+ * router update inside a React transition keeps the screen on display up,
+ * untouched, for as long as the download takes.
  *
  * The two sections below never finish loading, so what they pin is the state
  * in between: a loading sign in place of the old content, with the navigation

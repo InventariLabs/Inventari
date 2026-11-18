@@ -16,9 +16,8 @@ interface CardLinkProps {
  * in an empty state.
  *
  * The colour is the brand-text token the wordmark takes (`text-on-primary`;
- * `statusTokenContrast.test.ts` measures it): `primary-600`, the colour these
- * links used to take, reads 3.6:1 on the amber attention card and under 4:1
- * in dark mode, and the raw dark step is the profile's own 500 — 4.05:1 under
+ * `statusTokenContrast.test.ts` measures it): `primary-600` reads 3.6:1 on
+ * the amber attention card and under 4:1 in dark mode, and the raw dark step is the profile's own 500 — 4.05:1 under
  * the blue palette. The token is short of neither.
  */
 export function CardLink({

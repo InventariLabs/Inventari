@@ -82,7 +82,7 @@ test.describe("Webhooks — recovery from an endpoint that is off", () => {
       await expect(page.getByText(name)).toBeVisible({ timeout: 15000 });
 
       // One door, named after its webhook: the action row below the banner
-      // used to offer a second one, spelled out on a phone. The page lists
+      // does not offer a second one, even spelled out on a phone. The page lists
       // other endpoints too, so the count is of this card's buttons.
       const reactivate = page.getByRole("button", {
         name: new RegExp(`^Reactivate ${name}$`),

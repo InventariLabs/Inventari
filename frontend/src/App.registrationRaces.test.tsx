@@ -99,8 +99,8 @@ describe("the module set changing before its chunks land", () => {
     await screen.findByText("Module Not Enabled");
 
     // The set gains inventory, and the chunks it needs are held mid-flight:
-    // this is the window the routes used to be rebuilt in, too early, with
-    // nothing left to rebuild them when the import finished.
+    // this is the window the routes are rebuilt in. A rebuild that runs too
+    // early has nothing left to pick it up when the import finishes.
     gate.hold = true;
     modules = ["core", "inventory"];
     await act(async () => {

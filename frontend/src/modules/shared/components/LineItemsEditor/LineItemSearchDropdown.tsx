@@ -33,7 +33,7 @@ interface LineItemSearchDropdownProps {
   onSelect: (product: LineItemProduct) => void;
   /** DOM id of the input this dropdown anchors to. When provided, the list
    * renders in a portal positioned against the input — inside a
-   * modal the old inline `absolute` list was clipped by the scrolling form
+   * modal, where an inline `absolute` list would be clipped by the scrolling form
    * container. Without an anchor the legacy inline behaviour is kept. */
   anchorId?: string;
   /** Called when a scroll moves the input while the dropdown is open in
@@ -178,7 +178,7 @@ export function LineItemSearchDropdown({
   }
 
   // The panel exists only when it has something to say: results, or a
-  // finished search that found none. Focusing an untouched field used to
+  // finished search that found none. Focusing an untouched field must not
   // open it with "no results" printed before anything was searched — and
   // every open panel is what the sheet's Escape handling watches for.
   if (!showDropdown) return null;

@@ -97,9 +97,9 @@ export function useRefreshTemplateCopy(module: TemplateUrlSegment) {
  * The operation is idempotent: pressed a second time the server copies
  * nothing and answers `201` with an empty list. The message therefore comes
  * from the answer rather than from the request having gone through --
- * somebody who deleted their own copy and wants it back used to be told the
- * layouts had been copied, and then went looking for a row that was never
- * created. It lives here so all three template screens say the same thing;
+ * somebody who deleted their own copy and wants it back is told what the
+ * server did, so a message never names a row that was not created. It lives
+ * here so all three template screens say the same thing;
  * two of them said nothing at all.
  */
 export function useSeedDefaultTemplates(module: TemplateUrlSegment) {

@@ -5,10 +5,9 @@ import { useAuthStore } from "@/store/authStore";
 
 /**
  * The public forms (forgot password, reset, request access) are for people
- * who are not signed in. Opened on a device with a live session they used to
- * look exactly as they do for a stranger, as though nothing were signed in.
- * Say whose session this is and offer both ways on: back into the app, or
- * out of the session when the form really is meant for someone else.
+ * who are not signed in. Opened on a device with a live session, they say whose
+ * session it is and offer both ways on: back into the app, or out of the
+ * session when the form really is meant for someone else.
  */
 export function SignedInNotice() {
   const { t } = useTranslation("auth");

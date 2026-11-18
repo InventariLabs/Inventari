@@ -4,9 +4,9 @@ import { moduleRegistry } from "./registry";
 /**
  * The import that runs one module's registration.
  *
- * `App` used to glob every `module.ts` with `eager: true`, which put all of
- * them — their registration code and the API layer each drags in — into the
- * entry chunk for every reader, including organizations that had switched
+ * `App` does not glob every `module.ts` with `eager: true`: that would put all
+ * of them — their registration code and the API layer each drags in — into the
+ * entry chunk for every reader, including organizations that have switched
  * most modules off. The glob without `eager` turns each file into a chunk of
  * its own, and these functions import only what an organization actually
  * uses. A module's `module.ts` registers itself as a side effect of import —

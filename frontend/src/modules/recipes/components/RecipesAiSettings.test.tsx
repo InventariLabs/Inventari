@@ -1,12 +1,10 @@
 /**
  * The recipes AI card offers both purposes the module owns.
  *
- * The reader key used to be a secret field on this screen's schema — the
- * one place in the app where an external credential hid from the
- * administrator. It is a connection now, bound per purpose like every
- * other credential, so the card has to offer both slots: the parser and
- * the page reader. A card that offered only the parser would send the
- * reader key back to whatever screen happened to be nearest.
+ * The reader key is a connection, bound per purpose like every other
+ * credential, so the card offers both slots: the parser and the page reader. A
+ * card that offered only the parser would send the reader key back to whatever
+ * screen happened to be nearest.
  */
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";

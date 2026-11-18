@@ -34,8 +34,8 @@ interface NewLocationSheetProps {
 /**
  * A new location, made from inside the form that needs one.
  *
- * The product form's location picker used to have one way out when the place
- * was not on the list: a link to the Storages screen in another tab, and a
+ * The product form's location picker offers this sheet when the place is not
+ * on the list, instead of a link to the Storages screen in another tab and a
  * reload of the form on return. A location is a name and, optionally, the
  * place it stands in — both fit here, with the storage wizard's name chips
  * for the reader who has not decided what to call it. Anything more (codes,

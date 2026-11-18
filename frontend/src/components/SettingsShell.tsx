@@ -322,7 +322,7 @@ export default function SettingsShell() {
 
             {/* Mobile nav bottom sheet — the shared primitive, so the sheet
                 inherits the role, the focus trap, the scroll lock and Escape
-                (whose press used to land on nothing at all). */}
+                (which closes the sheet). */}
             <Sheet
               open={mobileNavOpen}
               onClose={() => setMobileNavOpen(false)}

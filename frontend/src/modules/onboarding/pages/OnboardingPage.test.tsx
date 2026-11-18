@@ -63,9 +63,9 @@ function renderAt(path: string) {
 }
 
 /**
- * Picking a mode no longer applies it: the reader passes through a second
- * step that says what the mode starts with. Every test that used to click
- * "Get started" straight after a card now walks both.
+ * Picking a mode does not apply it: the reader passes through a second step
+ * that says what the mode starts with. Every test that clicks "Get started"
+ * straight after a card walks both.
  */
 async function finishSetup() {
   const next = screen.queryByRole("button", { name: /continue/i });
@@ -110,9 +110,8 @@ describe("OnboardingPage — navigate past guard", () => {
 });
 
 /**
- * The wizard translates its own headings but used to render the three profile
- * cards — the only content the choice rests on — straight from the English
- * registry. This is the first screen a new user sees.
+ * The wizard translates its own headings and also the three profile cards, the
+ * only content the choice rests on. This is the first screen a new user sees.
  */
 describe("OnboardingPage — profile cards speak the user's language", () => {
   it("names all three workspace modes in Polish, with no English left over", async () => {
@@ -151,8 +150,8 @@ describe("OnboardingPage — profile cards speak the user's language", () => {
 
 /**
  * A 403 on setup means this account will never be allowed to apply a profile.
- * The screen used to answer it with "please try again" — advice that cannot
- * work — and no way off the page.
+ * The screen answers it with an explanation rather than "please try again",
+ * advice that cannot work, and leaves a way off the page.
  */
 describe("OnboardingPage — a refusal that will not change", () => {
   it("explains a 403 and offers the way out", async () => {
@@ -494,9 +493,9 @@ describe("OnboardingPage — the organization's name", () => {
 
 /**
  * The zone decides when a day starts — expiry dates, inventory periods,
- * reports — and a new organization used to be put on UTC whatever its
- * browser said, with nothing on the path saying so. There is no picker here
- * to prove, only that the browser's own answer travels with the setup.
+ * reports — and a new organization takes the zone its browser reports. There
+ * is no picker here to prove, only that the browser's own answer travels with
+ * the setup.
  */
 describe("OnboardingPage — the browser's time zone reaches the request", () => {
   it("sends the zone the setup screen runs in", async () => {
@@ -552,9 +551,9 @@ describe("OnboardingPage — a way off the first screen", () => {
 });
 
 /**
- * Production, API keys and webhooks belong to no profile, so the
- * first move of the people who need them used to be "go into Settings and
- * turn it on yourself". The second step is where a mode stops being a
+ * Production, API keys and webhooks belong to no profile, so the people who
+ * need them go into Settings and turn them on. The second step is where a mode
+ * stops being a
  * verdict and becomes a starting point.
  */
 describe("OnboardingPage — the second step decides what the mode starts with", () => {
@@ -876,9 +875,9 @@ describe("OnboardingPage — a mode that offers nothing asks nothing", () => {
 
 /**
  * The wizard is the first run of an organization, not a setting. A completed
- * organization used to be shown it anyway (a submit answered 409), a reader
- * who may not set anything up was offered it, and a failed profile list left
- * the one card that needs no profile as the only choice, with no message.
+ * organization is not shown it (a submit would answer 409), a reader who may
+ * not set anything up is not offered it, and a failed profile list is reported
+ * rather than left as the only choice without a message.
  */
 describe("OnboardingPage — only while there is something to set up", () => {
   const asUser = (role: string) =>

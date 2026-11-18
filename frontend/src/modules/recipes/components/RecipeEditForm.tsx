@@ -37,8 +37,7 @@ export default function RecipeEditForm({
 
   // A failed read has already toasted and closed the form; it renders nothing.
   // A pending one shows the sheet at once, so the click is answered while the
-  // detail travels — on a cold cache the form used to appear only when it
-  // landed, and the click looked dead. The same sheet then holds the form.
+  // detail travels, and the same sheet then holds the form.
   if (detail.isError) return null;
   return (
     <RecipeForm

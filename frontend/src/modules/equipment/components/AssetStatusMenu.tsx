@@ -30,8 +30,8 @@ interface AssetStatusMenuProps {
  *
  * MAINTENANCE on a checked-out asset is the third such case: the
  * holder still has the thing and the overview deliberately keeps counting it
- * as deployed (dashboard_service rewrites the count), so the menu used to
- * hand out a status two screens believed and the planner screen ignored.
+ * as deployed (dashboard_service rewrites the count), so the menu must not
+ * hand out a status that two screens believe and the planner screen ignores.
  * The way into maintenance is checkin → AVAILABLE → MAINTENANCE.
  */
 

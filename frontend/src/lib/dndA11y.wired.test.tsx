@@ -131,9 +131,9 @@ describe("every drag context in the tree takes its words and its keyboard from t
   // object on it. Both `accessibility={dndA11y}` and a legal extension of
   // the object — `accessibility={{ ...dndA11y, restoreFocus: false }}` —
   // count as spreading; a line commented out counts as neither a context
-  // nor a spread. The literal map this test once compared against is gone
-  // on purpose: a second, unwired context in a file the test already knew
-  // used to slip through green.
+  // nor a spread. The test keeps no literal map of contexts on purpose: a
+  // second, unwired context in a file the test already knows would slip through
+  // green.
   const CONTEXT = /<DndContext\b/g;
   const WIRED = /accessibility=\{\s*(?:\{\s*)?(?:\.\.\.\s*)?dndA11y\b/g;
 

@@ -8,10 +8,10 @@ import { useScanStore } from "./scanStore";
  * on the same shelf and usually under the same category, and retyping both
  * every time is the difference between the batch being done and abandoned.
  *
- * Everything else that used to be remembered — the name, the brand, the unit,
- * the weight, the quantity, the expiry date, the custom fields — described one
- * product, not the batch. Carried onto the next record it produced data nobody
- * typed: a tin of peas filed as cold cuts and given the expiry date of the
+ * Everything else — the name, the brand, the unit,
+ * the weight, the quantity, the expiry date, the custom fields — describes one
+ * product, not the batch. Carried onto the next record it would produce data
+ * nobody typed: a tin of peas filed as cold cuts and given the expiry date of the
  * carton before it. A default that is wrong more often than right is not a
  * shortcut, so those are gone rather than made optional.
  */

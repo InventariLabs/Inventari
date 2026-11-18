@@ -243,9 +243,9 @@ describe("FinishedScreen — the rating lands on its own cooking", () => {
   });
 
   /**
-   * The entry used to be asked the moment "Done" was pressed, before the
-   * finished screen had its say — but only that screen knows whether the
-   * reader confirmed the deduction, and the answer decides which run the
+   * The entry is asked only once the finished screen has had its say. Only that
+   * screen knows whether the reader confirmed the deduction, and the answer
+   * decides which run the
    * entry names. So every way out records the dinner first: with nothing
    * written, the record is still asked for, and the screen still closes.
    */
@@ -330,13 +330,12 @@ describe("FinishedScreen — the shelf learns about the dinner", () => {
   });
 
   /**
-   * The exit guard used to be mirrored from the hook's `running` in an effect,
-   * which reports one render late on both ends. On the way in, a fast click
-   * slipped past a guard that had not been raised yet; on the way out, a click
-   * in the frame the result landed met a flag the next effect pass had not
-   * cleared — the screen ignored it and the dinner was never recorded. The
-   * frame is milliseconds wide, too narrow for a hand but not for the suite's
-   * own timing: this is the click that turned a 773-file full run red.
+   * The exit guard is read from the hook's `running` directly, not mirrored in an
+   * effect, which would report one render late on both ends. On the way in, a
+   * fast click must not slip past a guard that is not raised yet; on the way out,
+   * a click in the frame the result lands must not meet a flag the next effect
+   * pass has not cleared. The frame is milliseconds wide, too narrow for a hand
+   * but not for the suite's own timing, so this click is tested on its own.
    */
   it("records the dinner when the reader leaves the frame the result lands", async () => {
     mocks.startPicking.mockResolvedValue({

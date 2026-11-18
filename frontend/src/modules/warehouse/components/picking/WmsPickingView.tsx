@@ -271,8 +271,8 @@ function WmsPickingView({
   const handleUndoLine = async (line: WmsPickLine) => {
     const undone = await undoLine(line.id);
     // Only when the server undid it. A refused undo answers with its own
-    // sentence — a package already holds the goods — and the white toast
-    // used to fire beside the red refusal.
+    // sentence — a package already holds the goods — and no white toast fires
+    // beside that red refusal.
     if (undone)
       toast(t("picking.toast.undo", { product: line.product_name ?? "" }));
   };
@@ -292,9 +292,8 @@ function WmsPickingView({
       replaceScans,
     );
     // Nothing to announce when the server refused the quantity — the
-    // success toast used to fire beside the error. And a full pick made
-    // through this dialog reports what a scan would report, not a
-    // shortage nobody had.
+    // success toast beside the error. And a full pick made through this dialog
+    // reports what a scan would report, not a shortage nobody had.
     if (!result) return;
     if (result.status === "shelf_required") {
       toast.error(
@@ -332,9 +331,8 @@ function WmsPickingView({
     const closed = await completeSession();
     invalidateDocument();
     // Only when the server closed it. The refusal it answers with — "Cannot
-    // complete: 1 lines still pending" — used to arrive under a green
-    // "completed", and the reader had two contradictory sentences and no way
-    // to tell which one was true.
+    // complete: 1 lines still pending" — never appears under a green
+    // "completed" toast, so the reader sees one true sentence.
     if (closed) toast.success(t("picking.toast.completed"));
   };
 

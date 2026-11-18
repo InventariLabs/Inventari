@@ -87,8 +87,8 @@ describe("a phone photo above the cap", () => {
 });
 
 /**
- * The gate used to toast its sentence and then throw a bare "File too large",
- * which every caller's catch turned into its own generic toast on top: two
+ * The gate toasts its sentence and does not throw a bare "File too large",
+ * which every caller's catch would turn into its own generic toast on top: two
  * toasts, and the one with the limit hidden under the one without. The
  * refusal now travels as the error itself, so the caller's single toast —
  * `extractApiError(error, fallback)`, the way each of them reads a failure —

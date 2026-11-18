@@ -35,11 +35,11 @@ interface StorageRequiredProps {
 /**
  * One answer to "you have nowhere to put this yet".
  *
- * Four screens used to enforce the same precondition four ways: a hard gate
+ * The precondition is enforced in one place, not four ways: a hard gate
  * sending the reader to the storage list, a warning banner, a modal with a
- * required field holding no options, and a call to action pointing at a form
- * with nothing to aim at. Each one interrupted the task and made the reader
- * find the create action a second time.
+ * required field holding no options, or a call to action pointing at a form
+ * with nothing to aim at. Each of those interrupts the task and makes the
+ * reader find the create action a second time.
  *
  * Here the missing thing is named and created in place, so the task the reader
  * started survives.

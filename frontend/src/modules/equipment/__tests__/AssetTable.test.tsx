@@ -92,8 +92,8 @@ describe("AssetTable", () => {
     expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(2);
   });
 
-  // A place used to sit in the Assigned-to column while the Location column
-  // still named where the asset had stood before: two answers to "where".
+  // One answer to "where": a place in the Assigned-to column and an older place
+  // in the Location column would give two.
   // The asset is moved into the place now, so the place is its location and
   // the holder column names people only — the phone card's words.
   it("names a placed asset's place once, as its location", () => {
@@ -109,7 +109,7 @@ describe("AssetTable", () => {
   });
 
   // An asset created through the generic item API carries no equipment
-  // namespace, so no status was ever recorded for it — the reader used to
+  // namespace, so no status was ever recorded for it, and the reader must not
   // see it wearing AVAILABLE, a fact nobody wrote down.
   it("calls an asset whose status was never set unknown, not available", () => {
     renderTable([makeItem({ metadata: null, name: "No Status" })]);

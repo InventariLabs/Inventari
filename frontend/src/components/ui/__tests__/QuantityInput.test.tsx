@@ -155,7 +155,7 @@ describe("QuantityInput (min/step per UoM)", () => {
   it("drops the sentence about a typed value once the field no longer holds it", () => {
     // A panel may clamp what was typed — a line that can still receive two
     // takes 2, not the 2.5 somebody entered. The sentence belonged to the
-    // 2.5, and it used to stay hanging over the 2.
+    // 2.5, and it must not stay hanging over the 2.
     mockPrecision.current = {
       stepString: "1",
       step: 1,
@@ -187,8 +187,8 @@ describe("QuantityInput (min/step per UoM)", () => {
     // The execution panel changes the field from outside: Clear writes 0,
     // +1 steps, "Fill to plan" jumps to the planned quantity. None of them
     // goes through the field's own `onChange`, so the sentence about the
-    // last typed text used to sit over a value nobody typed — "Clear" gave
-    // zero and the field went on calling zero a non-integer.
+    // last typed text must not sit over a value nobody typed — "Clear" gives
+    // zero, and the field does not go on calling zero a non-integer.
     mockPrecision.current = {
       stepString: "1",
       step: 1,

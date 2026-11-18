@@ -106,8 +106,8 @@ describe("Sheet", () => {
 
   it("leaves Escape to a list opened inside it", () => {
     // A unit list, an ingredient suggestion, a date picker: Radix closes its
-    // own layer from a document listener, and the sheet used to close itself
-    // in the same keystroke — so Escape aimed at the list threw away the form
+    // own layer from a document listener, and the sheet does not close itself
+    // in the same keystroke — so Escape aimed at the list leaves the form
     // underneath it.
     const onClose = vi.fn();
     render(
@@ -130,7 +130,7 @@ describe("Sheet", () => {
   it("leaves Escape to a suggestion list that holds results", () => {
     // The product picker of a line editor is not a Radix layer; its input
     // closes it from a key handler that runs after this sheet's listener, so
-    // Escape aimed at the list used to close the sheet around it.
+    // Escape aimed at the list must not close the sheet around it.
     const onClose = vi.fn();
     render(
       <Sheet open={true} onClose={onClose}>

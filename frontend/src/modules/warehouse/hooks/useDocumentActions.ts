@@ -559,9 +559,8 @@ export function useDocumentActions({
    * page heard about it, so no execution payload travels here — a payload
    * names the lines it answers for and books every other line as delivered
    * in full, which would erase the shortfall the backorder exists for. The
-   * payload-free door used to be silent: the numbers and the backorder the
-   * server answered with were dropped, and the worker who just closed the
-   * session was the last to know a shortage had been posted.
+   * payload-free door answers with the numbers and the backorder the server
+   * returns, so the worker who just closed the session learns of any shortage.
    *
    * A dispatch's shipment may ride along: a body that names no line books
    * the lines the way no body does.

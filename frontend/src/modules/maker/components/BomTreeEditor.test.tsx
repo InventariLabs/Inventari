@@ -83,8 +83,7 @@ describe("BomTreeEditor", () => {
 
   /**
    * The panel has no "below" of its own — ingredients are added in the
-   * section above it, and the message used to send the reader looking for a
-   * form that is not in this card.
+   * section above it, so the message points the reader at that section.
    */
   it("points at the section that actually adds ingredients", () => {
     renderTree(tree());

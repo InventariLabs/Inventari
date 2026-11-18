@@ -184,8 +184,8 @@ describe("RecipeCatalogPage produce + create wiring", () => {
 
   it("shows the monthly production result on the module's start screen", async () => {
     renderPage();
-    // The result card used to sit on the inventory overview, where it mixed
-    // the month's margin into stock. Production's own start is its home.
+    // The result card sits on production's own start screen, not on the
+    // inventory overview, where it would mix the month's margin into stock.
     expect(
       await screen.findByText("Savings vs shop price by month"),
     ).toBeInTheDocument();

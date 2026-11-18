@@ -107,8 +107,8 @@ export default function StatsPage() {
   } = useStatsHeadline(excludeModuleContexts);
 
   // The overview's four supporting queries. Each one reports its own
-  // failure: the tab used to render only when *every* one of them had
-  // arrived, so one 500 blanked the page (see StatsSectionFailure).
+  // failure: a tab renders only when *every* one of them has arrived, so one
+  // 500 does not blank the page (see StatsSectionFailure).
   const {
     data: storageStats,
     isLoading: isLoadingStorage,
@@ -335,8 +335,7 @@ export default function StatsPage() {
           )}
 
           {/* What failed, and the one action that can change it. These blocks
-              used to name the failure and then leave the reader with nothing
-              to press. */}
+              name the failure and give the reader something to press. */}
           {rotationError && (
             <QueryError
               message={t("errors.failedToLoadRotationAnalysis")}

@@ -6,11 +6,9 @@ import { SUCCESS_TOAST_DURATION_MS } from "@/lib/toastDefaults";
  * The notification surface — the one place toasts are configured, and the one
  * place a test can read that configuration back.
  *
- * It used to be props written inline in `main.tsx`, beside a comment about
- * `closeButton` that nothing could assert on. Deleting either the button or
- * the `installToastDefaults()` call next to it broke no test at all, which is
- * how a 20px close button reached a touch screen under a task whose whole
- * premise was touch.
+ * The props live here, where a test can read them back, rather than inline in
+ * `main.tsx`. Deleting either the button or the `installToastDefaults()` call
+ * breaks a test, so a 20px close button cannot reach a touch screen unnoticed.
  *
  * `closeButton`: sonner pauses its countdown on hover and on focus, and a
  * phone has neither — without an explicit close there is no way to hold a

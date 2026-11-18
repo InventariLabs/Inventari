@@ -489,10 +489,9 @@ describe("authStore", () => {
 describe("the retry keeps the outage's promise", () => {
   it("holds the gate closed while the retry is asking", async () => {
     // After a failed boot check there is no token and the shell shows the
-    // outage. Clicking retry used to wipe authUnavailable before it asked
-    // again — and for the whole length of the ask the state read "signed
-    // out, no outage, nothing loading", which is exactly the state that
-    // sends the reader to the sign-in form.
+    // outage. Clicking retry keeps authUnavailable until the
+    // ask answers, so the state never reads "signed out, no outage, nothing
+    // loading" — the state that sends the reader to the sign-in form.
     act(() => {
       useAuthStore.setState({
         isAuthenticated: false,

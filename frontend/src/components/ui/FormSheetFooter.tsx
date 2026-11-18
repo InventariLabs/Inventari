@@ -12,8 +12,8 @@ import { SheetActions, SheetFooter } from "@/components/ui/Sheet";
  * Labels arrive via props so the component stays generic — consumers
  * translate them at the call site. Layout is owned by SheetFooter /
  * SheetActions per UI_GUIDELINES §4.3; this component only adds the
- * line-count hint (: previously two byte-level copies lived in the
- * purchase_orders and warehouse modules).
+ * line-count hint (one copy, shared by the purchase_orders and warehouse
+ * modules).
  *
  * While pending, the submit Button renders its spinner in place of the
  * label — that is the Button's isLoading contract, so no pending-label

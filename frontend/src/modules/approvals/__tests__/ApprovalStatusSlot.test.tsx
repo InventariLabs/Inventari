@@ -202,9 +202,9 @@ describe("ApprovalStatusSlot", () => {
   });
 
   it("offers no request button to an account the endpoint would refuse", async () => {
-    // The request button used to render for every reader; the backend
-    // refused the click with 403. Without the write right the button says
-    // nothing instead of promising an action.
+    // The backend refuses the request click with 403 without the write right,
+    // so the button stays off the page for that reader instead of promising
+    // an action.
     signInWith(["approvals:read"]);
     server.use(
       http.get("/api/v1/approvals/requests", () =>

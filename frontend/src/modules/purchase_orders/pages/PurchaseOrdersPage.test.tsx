@@ -222,8 +222,8 @@ describe("PurchaseOrdersPage", () => {
   });
 
   it("says so when the order to edit could not be read", async () => {
-    // The row carries no lines, so Edit reads the whole order first; a
-    // read that failed used to leave the press doing nothing at all.
+    // The row carries no lines, so Edit reads the whole order first; a read
+    // that fails is reported, not left as a press that does nothing.
     server.use(
       http.get("/api/v1/purchase-orders/po-1", () =>
         HttpResponse.json({ detail: "boom" }, { status: 500 }),
@@ -276,10 +276,10 @@ describe("PurchaseOrdersPage", () => {
     expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument();
   });
 
-  // The list page's confirm dialog is the second address of the same
-  // class: it used to pick between two sentences on `approval_required`
-  // alone, so the "off" branch handed the reader a condition about their
-  // own organization that the branch had already settled.
+  // The list page's confirm dialog is the second address of the same class:
+  // it picks its sentence on `approval_required` alone, so the "off" branch
+  // names no condition about the reader's organization that the branch has
+  // already settled.
   it("confirming with no approval and no threshold names no queue", async () => {
     server.use(
       http.get("/api/v1/purchase-orders/settings", () =>

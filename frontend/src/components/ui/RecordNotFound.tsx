@@ -9,10 +9,10 @@ import { useDocumentTitle } from "@/hooks/useDocumentTitle";
  *
  * A 404 is an answer, not a hiccup: the server understood the request and said
  * the record is gone. The reader needs two things from that answer — a sentence
- * naming what was not found, and one way onwards — and used to get neither in
- * the same shape twice. Eleven detail screens had six different replies to the
- * same condition, from a bare sentence with no exit to a spinner that never
- * stopped, because each one wrote its own.
+ * naming what was not found, and one way onwards — and gets both in
+ * one shape. Detail screens must not each answer the same condition in their
+ * own words: that is how a bare sentence with no exit, or a spinner that never
+ * stops, reaches the reader.
  *
  * Pair it with `isNotFoundError` so a failed request keeps its own branch:
  *

@@ -5,8 +5,7 @@ import { isDisposalReason } from "./stockReasons";
  * Which "where did it go" answers mean the goods were thrown out. The
  * remove-from-stock window routes these to the discard endpoint — the one
  * whose action the ledger, the journal and the waste report can tell apart
- * from a use (every exit used to be filed as USED, so the
- * waste report read 0.00 over a full bin).
+ * from a use, so the waste report counts what was thrown out.
  */
 describe("isDisposalReason", () => {
   it("routes the thrown-out reasons to disposal", () => {

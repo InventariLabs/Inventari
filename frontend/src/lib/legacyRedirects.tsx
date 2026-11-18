@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 
 /**
- * An address the app used to answer and now forwards, kept so a bookmark, a
+ * An address the app answers by forwarding, kept so a bookmark, a
  * printed label or a mail link still lands.
  *
  * It is a row of data, not a `<Route>` per address: retiring one is deleting a
@@ -69,7 +69,7 @@ export const LEGACY_REDIRECTS: LegacyRedirect[] = [
 /** Settings addresses that were renamed or folded into another screen. */
 export const LEGACY_SETTINGS_REDIRECTS: LegacyRedirect[] = [
   // "My modules" is one screen for the module set and the single-module
-  // toggles; the two addresses that used to hold one half each survive so a
+  // toggles; the two addresses that each hold one half survive so a
   // bookmark still lands on the whole.
   { from: "workspace", to: "/settings/my-modules" },
   { from: "focus", to: "/settings/my-modules" },

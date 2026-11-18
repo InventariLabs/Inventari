@@ -184,8 +184,8 @@ describe("WmsReceivingView", () => {
 
   it("leaves nothing where the unit would stand on a line that has none", async () => {
     // A hand-written line carries no unit, and the sentence above the scan
-    // field has a slot for one: it used to fill it with a dash, so the
-    // number read as a quantity measured in "—".
+    // field has a slot for one: the slot stays empty, so the number does not
+    // read as a quantity measured in "—".
     const session = buildSession();
     session.lines = [{ ...session.lines[0], uom_symbol: null }];
     server.use(http.post(START_PATH, () => HttpResponse.json(session)));
@@ -248,9 +248,8 @@ describe("WmsReceivingView", () => {
     // the reader. A 4xx reason — "a receiving session is already open" — still
     // does, and that is the one this screen was built to surface.
     //
-    // And not an English literal either. It used to be one, sitting in the
-    // hook as the fallback argument, so a Polish reader met "Failed to start
-    // receiving" over Polish buttons. The words come from the namespace now.
+    // And not an English literal either: the words come from the namespace, so
+    // a Polish reader sees Polish text over Polish buttons.
     expect(
       await screen.findByText("Failed to start the receiving session."),
     ).toBeInTheDocument();
@@ -550,7 +549,7 @@ describe("WmsReceivingView", () => {
     const field = screen.getByPlaceholderText("Scan product barcode…");
     // A one-letter code is a scan only at a scanner's own pace, every key
     // under 30 ms: typed by the test at whatever speed the host allows, it
-    // used to arrive as two separate keys and confirm nothing.
+    // would arrive as two separate keys and confirm nothing.
     scanIntoField("A", field as HTMLInputElement, "Tab");
     await waitFor(() => expect(bodies).toHaveLength(1));
     await act(async () => {
@@ -721,9 +720,8 @@ describe("WmsReceivingView", () => {
   });
 
   it("books nothing at the last scan: the summary comes first and its closing completes the document", async () => {
-    // Stock is booked by the document's completion. It used to fire the
-    // moment the last scan resolved the session, with no screen to look at
-    // in between; picking has always shown its summary first.
+    // Stock is booked by the document's completion, not by the last scan: the
+    // summary comes first, as it does in picking.
     server.use(
       http.post(START_PATH, () => HttpResponse.json(buildSession())),
       http.post(
@@ -1297,8 +1295,8 @@ describe("WmsReceivingView", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Undo" }));
 
-    // The refusal and the white toast used to arrive together; the sheet
-    // shows the server's sentence and the line stays counted.
+    // The refusal arrives without a white toast: the sheet shows the server's
+    // sentence, and the line stays counted.
     expect(await screen.findByText("Session is closed")).toBeInTheDocument();
     expect(toast).not.toHaveBeenCalledWith("Reverted Widget");
     expect(screen.getByText("3/5 pcs.")).toBeInTheDocument();

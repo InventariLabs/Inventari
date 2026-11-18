@@ -120,10 +120,10 @@ function readQuantityChanged(
   if (oldQty !== undefined && newQty !== undefined) {
     parts.push(`${amountText(oldQty, ctx)} → ${amountText(newQty, ctx)}`);
   }
-  // The journal shows the same event with its reason; this row used to
-  // keep only the numbers, though the write carried the why — a stock
-  // take correction names itself and, when the counter picked one, the
-  // code for what the count found. One event, one story, both screens.
+  // The journal shows the same event with its reason, and so does this row: the
+  // write carries the why — a stock take correction names itself and, when the
+  // counter picked one, the code for what the count found. One event, one
+  // story, both screens.
   const reason = changes.reason as string | undefined;
   if (reason) {
     // A production run's reason is a code, and the code carries no number:

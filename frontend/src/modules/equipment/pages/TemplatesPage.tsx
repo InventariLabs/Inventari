@@ -403,8 +403,8 @@ export default function TemplatesPage() {
           module="equipment"
           template={editingTemplate}
           // One label per value, and the same one the card shows. The
-          // editor used to carry its own untranslated set, so a template
-          // saved as "Checkout (Handover)" was listed as "Checkout".
+          // editor takes its labels from the same set, so a template saved as
+          // "Checkout (Handover)" is listed under that same label.
           documentTypes={Object.entries(TYPE_LABELS).map(([value, label]) => ({
             value,
             label,

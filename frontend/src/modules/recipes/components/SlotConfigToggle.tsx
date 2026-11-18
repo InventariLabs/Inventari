@@ -13,9 +13,8 @@ interface SlotConfigToggleProps {
   disabled?: boolean;
   /**
    * Names the whole group, the way `ChoiceGroup` does for a single choice.
-   * Both call sites used to place a `<label>` above these chips — a label can
-   * only name one form control, so it named nothing and a reader heard four
-   * meal slots with no idea what question they answered.
+   * A label can only name one form control, so the group is named as a whole and
+   * a reader hears the question before the four meal slots.
    */
   label?: string;
 }

@@ -102,7 +102,7 @@ describe("StorageTrackingFields", () => {
 
   it("gives every row the touch floor and a left-aligned label", () => {
     // `size="content"` leaves the height to the content, so a row holding one
-    // line of text used to be 21px tall — the padding and the floor have to
+    // line of text takes its height from the padding and the 21px floor. Both have to
     // come from the row itself, in both variants.
     for (const variant of ["bordered", "solid"] as const) {
       const { unmount } = render(

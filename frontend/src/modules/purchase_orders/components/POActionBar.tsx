@@ -164,10 +164,8 @@ function pendingApprovalItems({
 /**
  * The order's actions, for the page header.
  *
- * They used to fill a row of their own under the title, with "Scheduled: …"
- * at its other end; the document detail keeps its actions in the header, on
- * the line of the number, and the scheduled date is a field of the details
- * grid.
+ * The actions sit in the page header, on the line of the number as on the
+ * document detail, and the scheduled date is a field of the details grid.
  */
 export function POActionBar({
   po,

@@ -63,10 +63,9 @@ export default function DocumentScanPage() {
   }, []);
 
   // The read goes through the same registry as every other scanning
-  // screen. This screen used to look documents up by number on its own, so a
-  // label, a location or a product code landed on "document not found" —
-  // and its own printed QR, which wraps the number in a `?code=` URL, would
-  // not have resolved at all, because the unwrapping lives in the registry.
+  // screen. The registry resolves a label, a location or a product code like
+  // any other scan, and this screen's printed QR, which wraps the number in a
+  // `?code=` URL, resolves too, because the unwrapping lives in the registry.
   const { resolve, isResolving } = useScanResolver({
     handle: (result) => {
       // A location label answers what is on the place, not "not a document".

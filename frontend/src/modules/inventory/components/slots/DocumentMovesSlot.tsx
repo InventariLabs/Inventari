@@ -1,10 +1,9 @@
 /**
  * What this document did to stock — contributed to the Document detail page.
  *
- * A document that declares ten and takes eight off the shelf used to be a
- * riddle: the lines said what was expected and what was done, and nothing
- * said where the goods went or which batch they came out of. Both facts are
- * in the ledger, keyed by the document, and were readable nowhere.
+ * The lines say what was expected and what was done, and this slot adds where
+ * the goods went and which batch they came out of. Both facts are in the
+ * ledger, keyed by the document.
  */
 import { useTranslation } from "react-i18next";
 import type { SlotDataMap } from "@/lib/moduleRegistry";

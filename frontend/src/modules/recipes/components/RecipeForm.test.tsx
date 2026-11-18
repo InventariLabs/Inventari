@@ -210,9 +210,8 @@ describe("RecipeForm — photo", () => {
 describe("RecipeForm — label consistency", () => {
   it("writes every field label the one way the field components do", () => {
     renderForm({ onSubmit: vi.fn(), onCancel: vi.fn() });
-    // Description used to opt out of the shared variant with a
-    // `labelClassName` that undid the uppercase, so this form carried two
-    // label styles in one column.
+    // Description takes the shared variant like every other field, so this form
+    // carries one label style in one column.
     for (const text of [
       "Recipe name",
       "Description",
@@ -422,9 +421,8 @@ describe("RecipeForm — an amount needs a unit", () => {
 });
 
 describe("RecipeForm — clearing a field saves it as empty", () => {
-  // The four clearable fields used to go out as `undefined` when emptied,
-  // the server's exclude_unset kept the old values, and a recipe carried
-  // an unwanted description forever.
+  // The four clearable fields go out as `null` when emptied, so the server's
+  // exclude_unset does not keep the old values and a recipe drops them.
   const initial = {
     id: "r1",
     organization_id: "o1",
@@ -477,11 +475,10 @@ describe("RecipeForm — clearing a field saves it as empty", () => {
 });
 
 describe("RecipeForm — ingredient defaults are looked up once", () => {
-  // Autofill used to re-arm itself. A lookup that answers with allergens but no
-  // kcal leaves the ingredient in `missing`; the effect wrote state on every
-  // answer and carried `ingredients` in its deps, so the fresh array identity
-  // started the whole thing again — one ingredient, a steady stream of GETs for
-  // as long as the dialog stayed open.
+  // Autofill looks each ingredient up once. A lookup that answers with allergens
+  // but no kcal leaves the ingredient in `missing`, and the effect does not depend
+  // on the `ingredients` array identity, so a fresh array does not start the
+  // lookups again.
   const ingredient = (id: string, name: string, sortOrder: number) => ({
     id,
     recipe_id: "r1",

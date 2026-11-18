@@ -442,7 +442,7 @@ describe("LineItemsEditor (a chosen product still shows its line's error)", () =
   });
 
   it("says when a stock hit landed, so twins differ by more than quantity", async () => {
-    // A shelf holding two unmarked records of one product used to offer
+    // A shelf holding two unmarked records of one product must not offer
     // two rows differing by nothing but their quantity. The landing date
     // is the row's third word — and a row without a date carries none.
     const user = userEvent.setup();

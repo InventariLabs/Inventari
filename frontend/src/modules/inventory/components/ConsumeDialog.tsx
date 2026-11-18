@@ -56,8 +56,8 @@ export function ConsumeDialog({
   const maxQuantity = Math.max(available, precision.min);
   // What the reader typed, never a number quietly put in its place. A value
   // the shelf cannot honour is said out loud and the button stops offering
-  // to send it; the old code took min(max(requested, 1), max) and sent the
-  // result, so "0,5" left the screen as 1.
+  // to send it; it never clamps the request to min(max(requested, 1), max),
+  // which would send "0,5" as 1.
   const requested = typeof quantity === "number" ? quantity : NaN;
   // Below the step and off the step are the unit's own verdicts, and the
   // field says them itself; what is left for this dialog is its own bound —

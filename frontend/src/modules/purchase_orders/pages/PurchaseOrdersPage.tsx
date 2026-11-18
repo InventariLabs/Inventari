@@ -202,7 +202,7 @@ export default function PurchaseOrdersPage() {
       {isLoading && !data ? (
         <LoadingSpinner />
       ) : isError ? (
-        /* A failed request used to render the "no orders yet" card, which
+        /* A failed request shows its error, not the "no orders yet" card, which
            invites the reader to create an order they may already have
 . */
         <QueryError onRetry={() => void refetch()} />

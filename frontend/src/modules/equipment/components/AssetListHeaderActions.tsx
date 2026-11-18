@@ -14,10 +14,10 @@ interface AssetListHeaderActionsProps {
  * The asset list's header: Export, Import and "Add asset" in one row on every
  * width. Below `sm:` Export and Import shrink to their icons (each keeps its
  * name for assistive technology) beside "Add asset", so three labelled buttons
- * no longer stack above the search.
+ * never stack above the search.
  *
  * Export stays for a reader: it downloads what this account is already
- * reading. Import and Add do not — a reader used to fill either one to the end
+ * reading. Import and Add do not: a reader must not fill either one to the end
  * and meet the refusal on submit.
  */
 export function AssetListHeaderActions({

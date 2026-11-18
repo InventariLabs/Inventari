@@ -30,8 +30,8 @@ describe("ImportUploadStep", () => {
     ).toBeInTheDocument();
   });
 
-  /** The step used to render its copy as literals, which an English test
-   *  cannot tell apart from a translated string. */
+  /** The step's copy comes from the translations, so a test in English can tell
+   *  a translated string from a literal. */
   it("speaks the interface language, not the language it was written in", async () => {
     await withLanguage("pl", async () => {
       const { unmount } = render(<ImportUploadStep onFileSelect={vi.fn()} />);

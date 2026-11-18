@@ -79,8 +79,8 @@ export default function DashboardStorages({
       {loadFailed ? (
         <QueryError onRetry={onRetry} />
       ) : rows.length === 0 ? (
-        // The call to action used to land on the storage list, where the
-        // reader had to find "add" a second time.
+        // The call to action must not land on the storage list, where the
+        // reader would have to find "add" a second time.
         <StorageRequired />
       ) : (
         <>
@@ -135,9 +135,8 @@ export default function DashboardStorages({
 // Every count through t() with `count`: one language's plural rule written
 // into a component is wrong in every language with more than two forms.
 function zoneMeta(t: TFunction, zone: StorageLocationNode, s: Segments) {
-  // The expired come first: the line used to name only what was expiring,
-  // so "2 expiring" sat beside a red bar for the cheese already past its
-  // date — the worst thing in the place was the one the words left out.
+  // The expired come first: the line names what has expired as well as what is
+  // expiring, so the worst thing in the place is never the one the words leave out.
   return [
     zone.children_count > 0 &&
       t("common:dashboard.locationCount", { count: zone.children_count }),

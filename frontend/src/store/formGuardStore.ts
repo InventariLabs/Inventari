@@ -5,8 +5,8 @@ import { create } from "zustand";
  *
  * One slot, not a registry: the app shows one page at a time, so at most one
  * form can be holding work. The navigation gate reads this before it lets a
- * link through: the equipment form used to lose eight filled fields to a
- * click on the module tab, with no question asked and no way back.
+ * link through: a click on a module tab asks before it discards the filled
+ * fields of a long form.
  *
  * The label travels already localized — the store is not a translator.
  *

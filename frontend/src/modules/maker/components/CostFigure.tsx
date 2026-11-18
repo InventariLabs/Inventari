@@ -27,8 +27,8 @@ interface CostFigureProps extends CostGapProps {
    * The id of the element that prints the gap sentence visibly, when one
    * does — the caller's CostGapNote or amber card.
    *
-   * This is the association a `title` used to carry, and the reason the
-   * title stays gone: a title is the one channel a touch screen never
+   * This is the association a `title` could carry, and the reason no `title` is
+   * set: a title is the one channel a touch screen never
    * opens and a screen reader announces inconsistently, while an
    * aria-describedby pointing at visible text is announced as the figure's
    * own description — the figure and its explanation travel together for

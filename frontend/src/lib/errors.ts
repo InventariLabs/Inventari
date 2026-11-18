@@ -140,8 +140,8 @@ export function isUnreachableError(error: unknown): boolean {
  * One definition, shared by the two layers that have to tell the cases apart:
  * the auth store, deciding whether a failed session check ends the session,
  * and the API client, deciding whether a failed silent refresh tears the
- * token down. They used to hold a copy each, and a drift between the two
- * would read one refusal as a session's end and the same refusal as an
+ * token down. They share one definition, so a drift between the two cannot
+ * read one refusal as a session's end and the same refusal as an
  * outage in the other.
  */
 export function isServerRefusal(error: unknown): boolean {
@@ -264,8 +264,8 @@ function isPathParameterRejection(
  * Whether a failed request means "this does not exist" rather than "we could
  * not ask".
  *
- * Detail screens used to render their not-found state for every failure, so a
- * dropped connection told the reader their document had been deleted. Only a
+ * Detail screens must not render their not-found state for every failure, so a
+ * dropped connection does not tell the reader their document had been deleted. Only a
  * 404 says that; everything else deserves a retry.
  *
  * Everything except an id the server would not even read. These addresses are

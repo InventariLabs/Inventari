@@ -1,10 +1,8 @@
 /**
- * After answering, the public attestation page used to count down "This tab
- * will close automatically in 5s" and offer "Close now" — both calling
- * `window.close()`, which a browser refuses for a tab the script did not
- * open. An e-mail link is exactly that tab, so the countdown stopped at 0s
- * and the button did nothing. The page now says the answer is recorded and
- * that the reader may close the tab, and promises nothing it cannot keep.
+ * After answering, the public attestation page says the answer is recorded and
+ * that the reader may close the tab. It promises nothing it cannot keep: a
+ * browser refuses `window.close()` for a tab the script did not open, and an
+ * e-mail link is exactly that tab.
  */
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test/utils";

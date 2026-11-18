@@ -149,8 +149,9 @@ export default function EquipmentDashboardPage() {
         />
       )}
 
-      {/* The fleet's totals, one strip of four numbers: they used to sit on
-          the inventory overview, where a stock reader met warranties. */}
+      {/* The fleet's totals, one strip of four numbers: they belong on the
+          equipment overview, not the inventory one, where a stock reader
+          meets warranties. */}
       <EquipmentDashboardWidget />
 
       <FleetCompositionCard

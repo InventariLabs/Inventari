@@ -128,11 +128,10 @@ function toReceiptLineUpdates(
 
 /**
  * Two answers, kept apart. A product nobody has bought yet has no price to
- * suggest, and the rate that came with it — the partner's, the most specific
- * one there is — used to be discarded along with it. A quote in another
- * currency is a number the document cannot hold: it would be stored under the
- * document's own currency, so the rate comes through and the price is left
- * for the user.
+ * suggest, but the rate that came with it — the partner's, the most specific
+ * one there is — is kept. A quote in another currency is a number the document
+ * cannot hold: it would be stored under the document's own currency, so the
+ * rate comes through and the price is left for the user.
  */
 function suggestionFromHint(
   hint: PriceHint,

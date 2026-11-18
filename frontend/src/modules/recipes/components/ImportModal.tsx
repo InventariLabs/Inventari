@@ -108,8 +108,8 @@ export function ImportModal({
           </TabsList>
 
           {/* Both panels share one cell, so the sheet keeps the height of the
-              taller one: the JSON tab used to be 48px taller than the URL
-              tab and the sheet jumped, centred, on every switch. */}
+              taller one: the JSON tab is 48px taller than the URL tab, and the
+              sheet would otherwise jump, centred, on every switch. */}
           <TabsPanels className="mt-4">
             <TabsContent value="url" stacked className="mt-0">
               <Input

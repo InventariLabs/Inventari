@@ -18,13 +18,12 @@ import {
  * The core translation gate: the locales directory is the set of shipped
  * languages, and every language is held to a coverage number it declared.
  *
- * It used to import twenty locale files by hand and hold a five-language
- * constant. A directory added per the new-language recipe was invisible to
- * it — the gate stayed green while measuring nothing for that language,
- * which is worse than red: it looked like a measurement and was not. The
- * directory is now read as data, and the gate holds it to the application's
- * own list in both directions: an orphan directory fails, a listed language
- * without a directory fails.
+ * The locales directory is read as data, and the gate holds it to the
+ * application's own list in both directions: an orphan directory fails, and a
+ * listed language without a directory fails. A directory added per the
+ * new-language recipe is therefore measured, never skipped: a gate that stayed
+ * green while measuring nothing for a language would look like a measurement
+ * and not be one.
  *
  * Two classes of language, declared in `languages.ts`. A maintained language
  * (pl, de, fr, es) is complete by rule: every English key, always, and its

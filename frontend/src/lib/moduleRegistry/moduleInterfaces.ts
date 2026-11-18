@@ -490,7 +490,7 @@ export interface FrontendModule {
    * {@link ValidationRule} for what a rule may and may not do.
    */
   validationRules?: ValidationRule[];
-  // `permissions` used to be declared here too, and nothing read it. Modules
+  // `permissions` is not declared here, since nothing reads it. Modules
   // declare permissions in their backend manifest.json; the roles UI renders
   // them from GET /roles/permission-catalog. See MODULES_GUIDE.
   /**
@@ -530,8 +530,8 @@ export interface FrontendModule {
   /**
    * Label purpose contributed by this module.
    *
-   * Blank labels used to be untyped: whatever was scanned opened the product
-   * form, because nothing ever stamped a ``context_tag`` on a generated
+   * Blank labels are typed: an untyped one would open the product form for
+   * whatever was scanned, since nothing stamps a ``context_tag`` on a generated
    * label. A module that owns a different kind of record declares its purpose
    * here, the generate form offers it, and the sticker itself carries the
    * answer — so the scan needs no mode switch to guess from.

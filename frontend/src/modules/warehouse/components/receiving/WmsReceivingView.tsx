@@ -42,8 +42,8 @@ interface Props {
 /**
  * What the short-receive dialog's answer deserves as a toast.
  *
- * Success is claimed only for a quantity the server accepted: the success
- * toast used to fire beside the over-quantity error. A full receive through
+ * Success is claimed only for a quantity the server accepted, never beside
+ * the over-quantity error. A full receive through
  * this dialog gets the scan's own "received" toast, not "short receive
  * confirmed".
  */
@@ -430,7 +430,7 @@ export default function WmsReceivingView({
   const handleUndoLine = async (line: WmsReceiveLine) => {
     const undone = await undoLine(line.id);
     // Only when the server undid it: a refused undo answers with its own
-    // sentence, and the white toast used to fire beside the red refusal.
+    // sentence, and no white toast fires beside the red refusal.
     if (undone)
       toast(t("receiving.toast.undo", { product: line.product_name ?? "" }));
   };
@@ -490,9 +490,8 @@ export default function WmsReceivingView({
     const closed = await completeSession();
     invalidateDocument();
     // Only when the server closed it. The refusal it answers with — "Cannot
-    // complete: 1 lines still pending" — used to arrive under a green
-    // "completed", and the reader had two contradictory sentences and no way
-    // to tell which one was true.
+    // complete: 1 lines still pending" — never appears under a green
+    // "completed" toast, so the reader sees one true sentence.
     if (closed) toast.success(t("receiving.toast.completed"));
   };
 
@@ -573,8 +572,8 @@ export default function WmsReceivingView({
         error={sessionError}
         onClose={() => {
           // Closing the summary is what completes the document and books
-          // the stock, as it is in picking. The last scan used to book on
-          // its own, with nothing to look at first.
+          // the stock, as it is in picking. The last scan does not book on
+          // its own; there is a summary to look at first.
           reset();
           onClose(true);
         }}

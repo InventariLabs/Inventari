@@ -4,12 +4,12 @@
  *
  * `StorageEditSheet` renders the list as `solid` Button pairs; the `bordered`
  * variant (outlined chips) remains for callers that want the lighter chrome.
- * What the editors used to duplicate was this list: the same
- * `getNeutralBaseFields` → toggle → `context_schema` logic, written twice with
+ * The list is what the two editors share: the same
+ * `getNeutralBaseFields` → toggle → `context_schema` logic, kept in one place with
  * different chrome.
  *
  * `variant` keeps each site's chrome; the row geometry is shared — the
- * `solid` rows used to be 21px tall with a centred label.
+ * `solid` rows keep a 21px floor with a centred label.
  */
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -58,7 +58,7 @@ export function StorageTrackingFields({
 }: StorageTrackingFieldsProps) {
   // `getNeutralBaseFields` documents that its argument is a deliberate no-op
   // ("storage is now vertical-agnostic. Pass `undefined` to make the no-op
-  // intent explicit"), so this component no longer threads a context tag it
+  // intent explicit"), so this component threads no context tag it
   // cannot act on.
   const fields = getNeutralBaseFields(undefined);
 

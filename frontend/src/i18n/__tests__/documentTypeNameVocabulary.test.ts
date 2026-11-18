@@ -1,11 +1,10 @@
 /**
  * Helps speak in type names; paperwork codes are the user's data, not ours.
  *
- * The document settings and scan helps used to illustrate numbers with
- * paperwork codes — "PZ/2026/001" in four languages that never adopted them,
- * plus a private dialect per language (GRN, WE/WA/UML, ALB, RE/LI/TR). An
- * administrator reading English was asked to recognize Polish warehouse
- * shorthand, and every language carried a different invention.
+ * The document settings and scan helps illustrate numbers with type names, not
+ * paperwork codes: "PZ/2026/001" is the user's data, and no language carries a
+ * private dialect of them (GRN, WE/WA/UML, ALB, RE/LI/TR). An administrator
+ * reading English is not asked to recognize Polish warehouse shorthand.
  *
  * Neither a paperwork code nor a translated type name may stand in a number:
  * what a number looks like is the organization's numbering format, so the

@@ -286,8 +286,7 @@ test.describe("Maker — create production order (UI sheet)", () => {
     await page.clock.install();
     await search.fill("a");
     await page.clock.runFor(1000);
-    // Two characters do search; the request for the single character, had the
-    // threshold regressed, would have gone out before this one.
+    // Two characters do search; the request for a single character must not go out before this one.
     const answered = page.waitForResponse(
       (r) =>
         r.url().includes("/items/product-templates") &&

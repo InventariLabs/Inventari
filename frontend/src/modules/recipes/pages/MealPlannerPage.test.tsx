@@ -156,9 +156,8 @@ describe("MealPlannerPage grid", () => {
 });
 
 /**
- * One click on the bin used to hard-delete the plan and every meal on it,
- * with no way back. The delete now waits for an answer that says how many
- * meals go with it.
+ * A click on the bin does not hard-delete the plan and every meal on it, with no
+ * way back: the delete waits for an answer that says how many meals go with it.
  */
 describe("MealPlannerPage — deleting a plan asks first", () => {
   beforeEach(() => {

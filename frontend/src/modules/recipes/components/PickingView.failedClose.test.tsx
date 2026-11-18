@@ -9,9 +9,9 @@ import { server } from "@/test/mocks/server";
 
 /**
  * The real hook against a server that refuses to close the session. The view
- * used to toast "complete" or "cancelled", clear the error and close on top of
- * a session that was still open — and the meal plan opened its rating prompt
- * for it.
+ * does not toast "complete" or "cancelled", clear the error or close on top of
+ * a session that is still open, and the meal plan does not open its rating
+ * prompt for it.
  */
 
 vi.mock("sonner", () => ({

@@ -12,9 +12,10 @@ import { FALLBACK_COLORS } from "./CategoryAvatar";
 import { ColorSwatchPicker, PALETTE_KEYS } from "./ColorSwatchPicker";
 
 /**
- * A swatch used to answer to the palette key it stores — "sky", "violet",
- * "slate", and "accent", which is not even a colour but the role a token
- * plays. A screen reader announced those tokens in a Polish dialog.
+ * A swatch answers to its name in the catalogue, never to the palette key it
+ * stores — "sky", "violet", "slate", and "accent", which is not even a colour
+ * but the role a token plays. A screen reader must not announce those tokens in
+ * a Polish dialog.
  */
 const CATALOGUES: Record<string, Record<string, string>> = {
   en: enCategories.modal.colors,

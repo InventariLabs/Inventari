@@ -118,9 +118,9 @@ describe("launching a campaign that has nothing to survey", () => {
 });
 
 /**
- * The other half of the same walkthrough: the reader used to learn that there
- * was nobody in scope only from the refusal behind the irreversible gate. The
- * count is fetched before the dialog now, and a scope covering nobody is
+ * The other half of the same walkthrough: the reader learns that nobody is in
+ * scope before the irreversible gate, not from the refusal behind it. The
+ * count is fetched before the dialog opens, and a scope covering nobody is
  * answered with where to fill it in.
  */
 describe("launching a campaign whose scope covers nobody", () => {

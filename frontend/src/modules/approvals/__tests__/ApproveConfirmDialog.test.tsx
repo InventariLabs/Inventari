@@ -36,8 +36,6 @@ describe("ApproveConfirmDialog", () => {
     // Approving the last stage runs confirm_after_approval: the document
     // goes from PENDING_APPROVAL to CONFIRMED and nothing else — the stock
     // moves only when someone later runs the receipt from the document page.
-    // The dialog used to promise "which moves its stock", so whoever believed
-    // it never came back for the receipt and the book said nothing arrived.
     // The text must keep saying what the backend does.
     renderDialog(baseRequest);
 

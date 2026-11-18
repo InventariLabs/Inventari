@@ -46,10 +46,10 @@ describe("ApprovalWorkflowSettings", () => {
   });
 
   it("names the workflow half of the approval rule, not only the profile half", () => {
-    // The sentence used to describe only the threshold and the type list,
-    // while an active document workflow already parked every confirmed
-    // document on its own — measured: empty profile, workflow active, and
-    // each confirm landed on PENDING_APPROVAL.
+    // The sentence names the workflow as well as the threshold and the type
+    // list: an active document workflow parks every confirmed document on its
+    // own. With an empty profile and the workflow active, each confirm lands on
+    // PENDING_APPROVAL.
     render(<ApprovalWorkflowSettings {...baseProps} />);
 
     expect(

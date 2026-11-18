@@ -99,7 +99,7 @@ describe("WebhookForm — every control says what it is", () => {
     renderForm();
 
     // With forty-two events on offer the form is taller than a 900px window;
-    // Save used to scroll below the bottom edge of the dialog.
+    // Save stays within the bottom edge of the dialog.
     const save = await screen.findByRole("button", { name: /save/i });
     const scroller = save.closest(".overflow-y-auto");
     expect(scroller).toBeNull();

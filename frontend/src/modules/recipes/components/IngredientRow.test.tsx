@@ -393,8 +393,9 @@ describe("IngredientRow — link to product", () => {
   });
 
   it("does not offer linking when the ingredient already points at a product", () => {
-    // It used to follow the stock answer, so the control sat on a linked row
-    // that was merely short of stock — where it could change nothing — and
+    // The control is offered only on an ingredient that points at no product, so a
+    // linked row that is merely short of stock does not carry it, where it could
+    // change nothing, and
     // was absent from a row matched only by name, where it is the fix.
     render(
       <IngredientRow
@@ -438,8 +439,9 @@ describe("IngredientRow — link to product", () => {
 });
 
 describe("IngredientRow — not enough is not none", () => {
-  // 492 ml of the 500 ml a recipe wants used to read exactly like an empty
-  // fridge: the same red dot, the same word, and no number anywhere. People
+  // 492 ml of the 500 ml a recipe wants reads as short, with the shortfall in
+  // words, not as an empty fridge with the same red dot, the same word and no
+  // number anywhere. People
   // went shopping for milk they had, or gave up on cooking five portions of
   // six.
   const short = {
@@ -495,8 +497,8 @@ describe("IngredientRow — measures that cannot be compared", () => {
   });
 
   it("says why in words, not in a hover", () => {
-    // The explanation used to live in a `title` attribute, which on a phone
-    // in a kitchen is nowhere.
+    // The explanation is in words on the row, not in a `title` attribute, which
+    // on a phone in a kitchen is nowhere.
     render(<IngredientRow ingredient={incomparable} />);
     const note = screen.getByTestId("not-comparable");
     expect(note.textContent).toContain("Cannot compare");

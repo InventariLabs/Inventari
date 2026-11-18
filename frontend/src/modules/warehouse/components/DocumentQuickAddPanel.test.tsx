@@ -27,11 +27,9 @@ function quantityField() {
 }
 
 describe("DocumentQuickAddPanel — quantity field", () => {
-  // The panel used to answer every change with
-  // `Number(event.target.value) || 1`, so the empty report of the dot step
-  // ("12." while the reader types) turned the quantity into 1 — twice over:
-  // once destroying the fraction being typed, once making an emptied field
-  // save a silent single piece.
+  // Every change is read as it is: the empty report of the dot step ("12."
+  // while the reader types) keeps the quantity empty, so the fraction being
+  // typed survives and an emptied field is not saved as a single piece.
   it("reports each complete number and null when the field is emptied", () => {
     const props = makeProps();
     render(<DocumentQuickAddPanel {...props} />);

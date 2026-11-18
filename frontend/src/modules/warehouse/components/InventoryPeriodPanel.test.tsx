@@ -127,8 +127,8 @@ describe("InventoryPeriodPanel", () => {
   });
 
   it("tells a month that was unlocked apart from one nobody touched", () => {
-    // Both used to be an empty cell, while the API had been sending
-    // `reopened_at`, `reopened_by` and the note all along.
+    // Both would look like an empty cell, although the API sends
+    // `reopened_at`, `reopened_by` and the note.
     const month = new Date().getMonth() + 1 === 1 ? 2 : 1;
     periods.current = [
       {
@@ -136,8 +136,7 @@ describe("InventoryPeriodPanel", () => {
         year: new Date().getFullYear(),
         month,
         // Reopening keeps `closed_at` — the evidence of the closure — so the
-        // state is its own field. The screen used to read that column and
-        // nothing else, which is why the row went blank.
+        // state is its own field, and the screen reads that field, not the column.
         is_closed: false,
         closed_at: "2026-04-01T09:00:00Z",
         closed_by: "QA Many Admin",

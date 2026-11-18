@@ -12,7 +12,7 @@
  * — the strings that name a thing. Explanatory sentences are left to a
  * reader's judgement, because a language's ordinary word for "somewhere" is
  * not always a claim about the hierarchy ("move them there", in Polish, uses
- * the same noun the level used to be called by).
+ * the same noun that names the level).
  *
  * Each language bans the synonyms of its own canonical pair. German's word
  * for a Location *is* "Ort", so German bans "Zone" and "Raum" instead —
@@ -21,7 +21,7 @@
  *
  * ADR-018 removed the declared levels, and with them the last reason to have
  * a word for one: "site", "zone" and "building" named a rung on a ladder that
- * no longer exists, so they join the list.
+ * does not exist, so these words join the list.
  *
  * Internal identifiers may lag behind (the wizard's suggestion catalogue is
  * still keyed `zones`); user-visible strings may not.

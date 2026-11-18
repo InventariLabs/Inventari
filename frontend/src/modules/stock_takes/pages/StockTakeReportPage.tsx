@@ -75,8 +75,8 @@ export default function StockTakeReportPage() {
       sortByAbsDifference([
         // Both kinds of difference belong in the default view: the rows that
         // must be explained, and the rows the tolerance accepted without an
-        // explanation. The second kind used to vanish here — reported as a
-        // perfect match while its correction sat in the ledger.
+        // explanation. Both stay visible here: a row the tolerance accepted is
+        // not a perfect match while its correction sits in the ledger.
         ...(report?.discrepancy_items ?? []),
         ...(report?.tolerated_items ?? []),
         // And the rows nobody counted. They match nothing — they were never

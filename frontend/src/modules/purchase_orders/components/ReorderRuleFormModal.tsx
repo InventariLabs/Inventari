@@ -71,9 +71,9 @@ export function ReorderRuleFormModal({
 
   // Both thresholds have to be above 0, and MIN is the one that matters:
   // it is what makes the rule fire, while MAX is only the level to reach.
-  // The star used to sit on MAX alone, so a rule saved with the required
-  // fields got MIN 0 and the engine skipped it — a row on the list that
-  // looked like every other one and could never produce an alert.
+  // The star sits on both fields, so a rule is never saved with MIN 0: the
+  // engine would skip it, and the row would look like every other one and never
+  // produce an alert.
   const [submitted, setSubmitted] = useState(false);
   useEffect(() => {
     if (open) setSubmitted(false);
@@ -231,8 +231,8 @@ export function ReorderRuleFormModal({
         />
       </SheetBody>
 
-      {/* One footer row, owned by the component (§4.3) — it used to scroll
-          away with the form as two `size="sm"` buttons. */}
+      {/* One footer row, owned by the component (§4.3), so it stays in view
+          while the form scrolls. */}
       <FormSheetFooter
         isPending={isSaving}
         lineCount={0}

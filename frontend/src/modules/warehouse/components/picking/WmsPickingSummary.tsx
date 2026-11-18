@@ -254,8 +254,8 @@ export default function WmsPickingSummary({
   };
 
   // Only the button that says it completes the document may book the
-  // stock. Escape and a tap outside used to finish too, so a picker closing
-  // the sheet to look at the order had shipped it unpacked, with no carrier.
+  // stock. Escape and a tap outside do not finish it either, so a picker who
+  // closes the sheet to look at the order does not ship it unpacked.
   const completeLabel = completesDocument
     ? t("picking.completeAndBook")
     : t("picking.close");

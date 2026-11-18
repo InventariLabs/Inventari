@@ -137,8 +137,8 @@ describe("ProductionIngredientsTable — one header, one meaning", () => {
   });
 
   it("keeps column meanings consistent between DRAFT and COMPLETED", () => {
-    // Same numbers, two states: the draft used to print the line amount
-    // under "UNIT COST", so closing the run read as a hundredfold saving.
+    // Same numbers, two states: the draft prints the rate under "UNIT COST", as
+    // the closed run does, so closing the run changes no unit price on screen.
     const draft = render(
       <ProductionIngredientsTable
         lines={[]}

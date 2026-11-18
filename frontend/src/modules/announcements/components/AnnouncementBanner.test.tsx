@@ -18,9 +18,9 @@ const ANNOUNCEMENT = {
 
 /**
  * The close button is an icon 14×14 with no visible text, so its accessible
- * name is the whole of what a screen reader gets. It used to be "Odrzuć" —
- * the word the approvals queue uses to reject a request, and both controls
- * stood on one screen. German and French chose the "close" sense; Polish now
+ * name is the whole of what a screen reader gets. It must not be "Odrzuć" —
+ * the word the approvals queue uses to reject a request, since both controls
+ * stand on one screen. German and French chose the "close" sense; Polish now
  * uses the word the rest of the app closes windows with.
  */
 describe("AnnouncementBanner — the close button is named for closing", () => {

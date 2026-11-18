@@ -67,9 +67,8 @@ export function useQuickAddToShoppingList() {
 /**
  * What the app would propose buying, asked without a list.
  *
- * The dashboard's button used to reach this answer through a list it had
- * just created — the only route to it was addressed by `list_id` — so
- * opening a preview left an empty active list nobody had asked for, and
+ * The dashboard's button reaches this answer without creating a list first, so
+ * opening a preview leaves no empty active list that nobody asked for, and
  * Cancel did not take it back.
  *
  * `sources` is here because the button hangs on the tile counting
@@ -156,7 +155,7 @@ export function useShoppingListStats(lists: ShoppingList[]) {
     })),
   });
 
-  // The names come from the same answer the counts do. The card used to draw
+  // The names come from the same answer the counts do; the card must not draw
   // four identical box glyphs from `total` alone, so six lists of six things
   // each looked like the same six things.
   const stats: Record<string, ShoppingListPreview> = {};

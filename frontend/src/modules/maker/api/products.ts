@@ -4,11 +4,10 @@ import { clampProductSearch } from "@/module-sdk";
 /**
  * A product the maker module can point at — as an output or an ingredient.
  *
- * Same shape the documents picker returns, deliberately: the module used to
- * import that type and call `/warehouse/product-search`, which 403s for an
- * organization that has the warehouse module switched off. Maker declares
- * `requires: ["items", "locations"]` and nothing more, so it now reads and
- * writes product templates through core.
+ * Same shape the documents picker returns, deliberately. Maker declares
+ * `requires: ["items", "locations"]` and nothing more, so it reads and writes
+ * product templates through core, not through `/warehouse/product-search`,
+ * which 403s for an organization that has the warehouse module switched off.
  */
 export interface ProductOption {
   product_template_id: string;

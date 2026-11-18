@@ -300,9 +300,9 @@ export interface SlotDataMap {
      * Pass it and the card reads nothing else. The type-wide request list
      * cannot stand in for it: the server scopes that list by ``approvals:read``
      * (one sees one's own requests and the open ones one may decide), so a
-     * request raised by somebody else is invisible there and the card used to
+     * request raised by somebody else is invisible there and the card must not
      * conclude "no request" and offer "Request Approval" on a document that
-     * already had one — on an approved document, one click took it back to
+     * already has one — on an approved document, one click takes it back to
      * the approval queue. It is also paginated, so the guess went wrong for
      * everybody past the first page.
      *

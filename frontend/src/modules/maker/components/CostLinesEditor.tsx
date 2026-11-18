@@ -75,9 +75,9 @@ export function CostLinesEditor({
     null,
   );
 
-  // The sum lives beside the lines it sums: the tab above used to repeat
-  // this section's heading on a summary card of its own, so the reader met
-  // the same label and the same figure twice on one screen. The heading
+  // The sum lives beside the lines it sums: the tab above does not repeat
+  // this section's heading on a summary card of its own, since the reader
+  // would meet the same label and the same figure twice on one screen. The heading
   // already says "/ batch", so the sum does not repeat the unit; and one
   // line is its own sum, so the figure is not printed a second time.
   const totalFixed = lines.reduce((sum, line) => sum + Number(line.amount), 0);
@@ -193,7 +193,7 @@ export function CostLinesEditor({
         )}
 
       {/* Timed steps but no labour line: the rate is zero or unset, and the
-          line's absence used to read as "this formula has no labour". Say
+          line's absence must not read as "this formula has no labour". Say
           where the rate lives instead of leaving the reader to guess. */}
       {(labourMinutes ?? 0) > 0 && !(Number(labourCost) > 0) && (
         <p

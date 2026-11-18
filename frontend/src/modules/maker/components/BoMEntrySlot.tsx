@@ -38,10 +38,9 @@ function toProductOption(item: Item, templateId: string): ProductOption {
  * (`/maker/recipes/{default_recipe_id}`).
  *
  * When the product has no formula yet it sends the operator to the catalog
- * with the create sheet already pointed at this product — the button used to
- * link to `/maker/bom?parent=`, a screen that no longer exists, so the most
- * common case (a product without a formula, which is exactly when someone
- * reaches for this button) landed on a dead route.
+ * with the create sheet already pointed at this product. The button never links
+ * to `/maker/bom?parent=`, a screen that does not exist, because the most common
+ * case, a product without a formula, is exactly when someone reaches for it.
  */
 export function BoMEntrySlot({ data }: BoMEntrySlotProps) {
   const { t } = useTranslation("maker");

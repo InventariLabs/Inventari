@@ -95,8 +95,8 @@ export default function AppShell() {
   // The header's own exits — the logo home link, the settings link, the links
   // inside the user menu and the module switcher — ask a dirty form before
   // they navigate. The module tabs and the mobile bar already route through
-  // this gate; the header used to be the hole where the same address gave a
-  // different answer depending on which control carried it.
+  // this gate, so the header gives the same address the same answer whichever
+  // control carries it.
   const { guardNavigate, guardClick, confirmDialogProps } = useNavLeaveGuard();
 
   const visibleModules = moduleRegistry.getVisibleModules(
@@ -122,8 +122,8 @@ export default function AppShell() {
     // path); every other module keeps exactly its own items.
     const items = moduleRegistry.getShellNavItems(activeModule, focusModule);
     // The same two gates the module's desktop tabs pass (ModuleShell): the
-    // bar used to skip the module one, so a tab whose screen needs another
-    // module stayed on the phone with that module off.
+    // bar checks the module one too, so a tab whose screen needs another module
+    // stays off the phone while that module is off.
     return applyNavOverrides(items, navOverrides)
       .filter((item) => canSee(item.roles))
       .filter(

@@ -185,9 +185,8 @@ describe("AiConnectionsTab", () => {
   });
 
   it("leaves the page's name to the shell heading and keeps one level per section", async () => {
-    // The card title used to repeat the shell h1's exact words as an h2, and
-    // the bindings section sat an h3 below it — the same name twice in the
-    // heading tree, one level skipped.
+    // The card title does not repeat the shell h1's words as an h2, and the
+    // bindings section sits one level below it, with no level skipped.
     renderTab();
     await screen.findAllByText(/Vision pool/i);
 
@@ -296,9 +295,9 @@ describe("AiConnectionsTab — the modal opens ready to work", () => {
 describe("AiConnectionsTab — the save refusal lands on the field", () => {
   /**
    * The backend refuses a draft without a base URL with a 422 whose loc
-   * names the field. That refusal used to surface only as a vanishing
+   * names the field. That refusal lands on the field, not in a vanishing
    * toast with the raw wire string; the name-required rule next to it
-   * rendered red under its input. A server refusal with a field in its
+   * renders red under its input. A server refusal with a field in its
    * loc now gets the same treatment — the sentence stands under the
    * field it is about.
    */

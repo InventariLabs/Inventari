@@ -35,10 +35,9 @@ moduleRegistry.register({
   // this one whenever example_widgets is enabled.
   //
   // The handler is given identifiers and nothing else, so the action is named
-  // after what it can actually deliver. It used to be "Export selected to CSV",
-  // under the Download icon, two rows below the screen's own Export button —
-  // one name and one icon for two different results, and the one contributed
-  // here handed over a column of UUIDs.
+  // after what it can actually deliver. It copies the ids, so its name says
+  // that, and it does not share a name or icon with the screen's own Export
+  // button, which delivers a different result.
   bulkActions: [
     {
       id: "copy-selected-ids",
@@ -60,9 +59,9 @@ moduleRegistry.register({
   // save — an item named only with digits is almost always a mis-scan landing
   // in the name field.
   //
-  // The message names a place that exists. It used to say "scan it into the
-  // barcode field", and the form it appears on has no barcode field: advice a
-  // reader cannot follow is worse than no advice, because they go looking.
+  // The message names a place that exists, not the form's missing barcode
+  // field: advice a reader cannot act on is worse than no advice, because they
+  // go looking.
   validationRules: [
     {
       form: "item_create",

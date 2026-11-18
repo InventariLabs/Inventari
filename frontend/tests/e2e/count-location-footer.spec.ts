@@ -36,7 +36,7 @@ test.describe("Count a location — the pinned footer leaves the list clickable"
     await page.getByRole("textbox", { name: "Find a location" }).fill(name);
 
     // The list answers the typed text after a debounce: wait until it holds
-    // that one place, not the rows of the previous query.
+    // that one place, not the rows still on screen for what was typed before.
     const row = page.locator("ul button");
     await expect(row).toHaveCount(1, { timeout: 15000 });
     await expect(row).toContainText(name);

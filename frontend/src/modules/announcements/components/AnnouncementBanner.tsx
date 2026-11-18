@@ -95,8 +95,8 @@ const AnnouncementBanner: React.FC = () => {
               <span
                 className={`text-[10px] font-medium uppercase tracking-[0.15em] ${theme.color} hidden sm:inline`}
               >
-                {/* The type used to render raw — `warning`, `critical`,
-                    `downtime` — in English, on a screen with five catalogs. */}
+                {/* The type is translated: a raw code such as `warning` or `downtime`
+                    would show in English on a screen with five catalogs. */}
                 {t(`types.${a.type}` as "types.info", {
                   defaultValue: a.type,
                 })}

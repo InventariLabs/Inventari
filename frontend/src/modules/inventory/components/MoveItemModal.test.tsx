@@ -148,7 +148,7 @@ describe("MoveItemModal — one question, one answer", () => {
 
     await user.click(trigger);
 
-    // "Leaf" used to decide this. It cannot: a shelf stops being one the
+    // "Leaf" does not decide this. It cannot: a shelf stops being one the
     // moment somebody puts a box under it, and the thing already on it would
     // vanish from the picker that moves it.
     expect(await screen.findByText("Garage")).toBeInTheDocument();
@@ -213,7 +213,7 @@ describe("MoveItemModal — one question, one answer", () => {
 
   it("does not claim a module owns a location whose tag is not a module", async () => {
     // "food" is stamped on EXPIRY/FREEZING locations by the backend; no
-    // module has that name, and the badge used to print the raw tag.
+    // module has that name, and the badge must not print the raw tag.
     const user = userEvent.setup();
     renderModal();
     const trigger = (await screen.findByText("Home Shelf")).closest(

@@ -8,9 +8,8 @@ import type { WarehouseDocument } from "../types";
  * The update payload spells "clear" as null, not as a key left out.
  *
  * The form turns an emptied input into an empty string, and the payload
- * builder used to turn that into `undefined` — JSON drops the key, the
- * server reads an absent key as "leave it alone", and the save answered
- * "updated" over a note that never changed (backend/AGENTS.md §2b).
+ * builder turns that into null, since `undefined` would drop the key, and the
+ * server reads an absent key as "leave it alone" (backend/AGENTS.md §2b).
  * Both halves are pinned: emptied means null, still-held means itself.
  */
 const draft = (patch: Partial<WarehouseDocument>): WarehouseDocument =>

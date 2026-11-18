@@ -146,8 +146,7 @@ describe("DocumentsTemplatesPage — nothing written yet", () => {
 
   it("does not put a second filled create next to the header's", async () => {
     // The header owns the view's one primary call to action. The empty
-    // state used to repeat the create as its own filled button, so the
-    // empty screen carried two of them.
+    // state does not repeat the create as its own filled button.
     noTemplates();
     render(<DocumentsTemplatesPage />);
 
@@ -316,11 +315,10 @@ describe("DocumentsTemplatesPage — an account that may only read", () => {
   });
 
   it("offers no way to write a template, and says why", async () => {
-    // The editor used to open in full for an account holding `warehouse:read`
-    // alone — Add Template, Edit and Delete on all eight templates — and the
-    // refusal arrived after the HTML was written. This screen was also the one
-    // module page with no notice at all, so with the buttons gone it would
-    // have read as broken rather than as a boundary.
+    // The editor does not open in full for an account holding `warehouse:read`
+    // alone: Add Template, Edit and Delete are not offered, so no refusal arrives
+    // after the HTML was written. With the buttons gone, this screen's notice
+    // reads as a boundary rather than as broken.
     rights.write = false;
     server.use(
       http.get("*/api/v1/warehouse/templates", () =>
@@ -417,9 +415,7 @@ describe("DocumentsTemplatesPage — confirming a deletion", () => {
 });
 
 describe("DocumentsTemplatesPage — the dialog and the badge speak the documents' language", () => {
-  /** The template's type used to be a layout family ("Standard", "PL PZ")
-   *  that the print endpoint never read; now it is one of the seven
-   *  document types, under the same labels the documents list prints. */
+  /** The template's type is one of the seven document types, under the same labels the documents list prints. */
   const scrapTemplate = {
     id: "tpl-scrap",
     name: "Scrap layout",

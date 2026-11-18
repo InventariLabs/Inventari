@@ -130,8 +130,8 @@ describe("ConsumeDialog", () => {
   });
 
   // A cleared field is no amount, and inventing one for it is the same
-  // substitution this dialog used to make everywhere: it answered every
-  // out-of-range request with 1, so "0,5" left the screen as a whole unit.
+  // substitution this dialog must never make: an out-of-range request is not
+  // answered with 1, so "0,5" must not leave the screen as a whole unit.
   // Nothing is sent until an amount is named.
   it("names no amount while the field is empty, and sends nothing", async () => {
     const user = userEvent.setup();
@@ -146,8 +146,8 @@ describe("ConsumeDialog", () => {
     expect(onConfirm).not.toHaveBeenCalled();
   });
 
-  // The shelf holds 5. The request used to be trimmed to it at the commit,
-  // in silence; now the screen says so and the button stops offering to
+  // The shelf holds 5. The request is never trimmed to it at the commit
+  // in silence: the screen says so and the button stops offering to
   // send it — the reader finds out before the press, not after.
   it("refuses more than the shelf holds, and says so before the press", async () => {
     const user = userEvent.setup();
@@ -181,7 +181,7 @@ describe("ConsumeDialog", () => {
 
   // The unit's word comes from the catalogue like every other word on this
   // screen: the wire writes "pcs", the catalogue writes "pcs.", and the
-  // button used to print the wire's spelling.
+  // button prints the catalogue's spelling, not the wire's.
   it("names the unit the way the catalogue does, not the way the wire writes it", () => {
     render(
       <ConsumeDialog

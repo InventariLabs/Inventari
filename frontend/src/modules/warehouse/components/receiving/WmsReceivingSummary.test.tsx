@@ -6,9 +6,8 @@ import { render } from "@/test/utils";
 
 /**
  * The summary is the screen a stockkeeper reads to decide whether to file
- * a claim. It used to list only received and short lines while counting
- * every line into its denominator, so a skipped line's ten units went
- * missing from exactly the list that had to account for them.
+ * a claim. It lists every line, received, short and skipped, since the
+ * denominator counts them all, so a skipped line's ten units are listed too.
  */
 
 const lines: WmsReceiveLine[] = [
@@ -116,9 +115,8 @@ describe("WmsReceivingSummary — the list accounts for every expected unit", ()
 });
 
 describe("WmsReceivingSummary — one exit, and it says what it does", () => {
-  // Closing the summary completes the document and books the stock, so no
-  // unlabelled control may reach that handler: the corner X, Escape and the
-  // backdrop used to book stock without a word about it.
+  // Closing the summary completes the document and books the stock, so the
+  // only control that reaches that handler is the one that says it posts stock.
   it("has no close control but the one that says it posts stock", () => {
     const onClose = vi.fn();
     render(<WmsReceivingSummary lines={lines} onClose={onClose} />);

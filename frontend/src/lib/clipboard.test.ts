@@ -5,9 +5,9 @@ import { copyText, copyTextOrExplain } from "./clipboard";
 
 /**
  * The clipboard answers three ways and only one of them is a copy. The other
- * two used to be an unhandled rejection behind a button that never changed
+ * two must not be an unhandled rejection behind a button that never changes
  * state — which is how an API key shown once, or an invitation link in an
- * organization that sends no mail, went nowhere with nothing said.
+ * organization that sends no mail, would go nowhere with nothing said.
  */
 
 const stubClipboard = (clipboard: unknown) => {

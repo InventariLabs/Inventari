@@ -69,7 +69,7 @@ const MOVES: StockMoveRow[] = [
     quantity: "5.000",
     lot_id: null,
     state: "done",
-    // What production writes. The column used to print it verbatim.
+    // What production writes. The column translates it rather than printing it verbatim.
     reference_type: "maker_production",
     reference_id: "o1",
     created_by: "u1",
@@ -460,8 +460,8 @@ describe("StockMovesPage", () => {
     );
   });
 
-  // A refresh, or a link copied to a colleague, used to drop every filter
-  // the reader had set: the screen read the address once and never wrote it.
+  // A refresh, or a link copied to a colleague, keeps every filter the reader
+  // set: the screen writes each change to the address.
   it("writes the direction to the address, replacing the entry", async () => {
     const user = userEvent.setup();
     renderPage();
@@ -604,10 +604,8 @@ describe("StockMovesPage", () => {
   });
 
   it("names an archived storage the ledger is still narrowed to", async () => {
-    // The storage card links here, and archiving the storage afterwards
-    // used to turn the hint into "filters you set ()" — a filter named by
-    // nothing, on the one path a reader can actually reach. The picker
-    // reads archived storages as well.
+    // The storage card links here, and archiving the storage afterwards keeps
+    // the hint naming the storage: the picker reads archived storages as well.
     searchParams = new URLSearchParams("location=l-archived");
     listState = { items: [], total: 0 };
 

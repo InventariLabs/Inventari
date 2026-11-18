@@ -3,8 +3,8 @@ import { moduleRegistry } from "@/lib/moduleRegistry";
 import { CORE_SECTION_NAV } from "@/lib/moduleRegistry/coreSections";
 import "../module";
 
-// A USB scanner sits at a desktop; the Scan screen it types into used to be
-// reachable there only through the command palette.
+// A USB scanner sits at a desktop, and the Scan screen it types into is
+// reachable there from the menu, not only through the command palette.
 describe("the Scan entry in the module menu", () => {
   it("is shown on desktop in the inventory menu", () => {
     const item = moduleRegistry

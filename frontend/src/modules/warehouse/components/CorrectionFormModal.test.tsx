@@ -79,8 +79,8 @@ describe("CorrectionFormModal", () => {
     fireEvent.change(deltaInput, { target: { value: "-15" } });
 
     // The reader's text stays until they leave the field — a rewrite
-    // mid-typing is what used to eat the dot of a fraction. The
-    // bound is said meanwhile, and lands on blur.
+    // mid-typing would eat the dot of a fraction. The bound is said
+    // meanwhile, and lands on blur.
     expect((deltaInput as HTMLInputElement).value).toBe("-15");
     // the label describes the lower bound, not a maximum.
     expect(screen.getByText("You can remove up to 3")).toBeInTheDocument();

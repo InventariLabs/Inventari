@@ -38,8 +38,7 @@ export function PricelistComparisonCard({
     <Card>
       <CardContent className="p-5">
         {/* Title, the control it belongs to, and what the card will show once
-            it has an answer — the field used to sit under a bare heading with
-            the rest of the card empty around it. */}
+            it has an answer, in one block. */}
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">
             <h2 className="text-sm font-medium text-on">

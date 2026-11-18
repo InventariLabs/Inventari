@@ -26,8 +26,8 @@ interface Props<T extends string> {
 /**
  * Why something happened: a code from a closed list, plus a note.
  *
- * The reason used to be one free-text box. It answered "what happened here"
- * and nothing else — no report could tell how often a correction is a
+ * The reason is a closed list rather than one free-text box. A box answers
+ * "what happened here" and nothing else: no report can tell how often a correction is a
  * mistyped quantity rather than a wrong product, or how much of a shortage
  * is breakage rather than theft. The code answers that; the note stays for
  * what the list cannot say, and becomes the reason itself when the code is

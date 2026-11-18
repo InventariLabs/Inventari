@@ -140,8 +140,8 @@ describe("useThemeStore", () => {
 
   it("surfaces a failed rehydration in the console instead of swallowing it", () => {
     // persist reports a failed hydration to the callback's `error` argument;
-    // the old code read only `state`, so a broken storage value vanished
-    // without a trace.
+    // the callback reads it as well as `state`, so a broken storage value
+    // is reported.
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     localStorage.setItem("inventari-theme", "{ not json");
     try {

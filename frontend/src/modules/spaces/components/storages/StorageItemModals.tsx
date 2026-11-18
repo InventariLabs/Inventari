@@ -16,8 +16,8 @@ interface StorageItemModalsProps {
  * live on the page beside the tree.
  *
  * "Move" over a product opens the move dialog, the same one the items list
- * opens for the same action; it used to open the product form here, so the
- * reader was handed product details instead of a move.
+ * opens for the same action; this dialog does not open the product form, so the
+ * reader is handed the move instead of product details.
  */
 export default function StorageItemModals({
   editingItemId,

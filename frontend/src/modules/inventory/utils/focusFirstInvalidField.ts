@@ -5,8 +5,8 @@ const FOCUSABLE =
  * Moves focus to the first field of the form that has an error, scrolling it
  * into view.
  *
- * A refused submit used to do nothing the reader could see when the field
- * sat below the fold: no request, no toast, focus left on the button. Fields
+ * A refused submit is shown where the field sits, even below the fold: focus
+ * moves to it rather than staying on the button. Fields
  * mark their wrapper with `data-field-key`; the first one in the page, in
  * reading order, whose key is among *keys* gets the focus.
  */

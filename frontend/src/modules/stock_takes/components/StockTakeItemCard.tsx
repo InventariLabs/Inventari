@@ -133,7 +133,7 @@ const StockTakeItemCard = memo(function StockTakeItemCard({
   ].join(", ");
   // The two step buttons say what a step is: "one more" is one kilogram on a
   // weighed row, not one banana — and in the reader's word for it ("szt."),
-  // not the record's ("pcs"), which is what a screen reader used to announce.
+  // not the record's ("pcs"), which is what a screen reader would announce.
   // `unitLabel` is the one place that decides the word, as
   // `StockTakeItemFigures` beside it does for the figures.
   const unit = unitLabel(t, stockTakeItem?.uom_symbol);

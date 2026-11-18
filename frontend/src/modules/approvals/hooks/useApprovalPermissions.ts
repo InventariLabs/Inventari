@@ -4,9 +4,9 @@
  *
  * The API enforces `approvals:approve` on /approve and /reject,
  * `approvals:configure` on workflow writes, and filters the workflow list
- * by `approvals:read`. The UI used to offer all of it to everyone: a user
- * without the grant saw Approve, clicked it, and learned about the rule
- * from a 403 toast. These hooks put the same rule in front of the button.
+ * by `approvals:read`. These hooks put the same rule in front of the button, so
+ * a user without the grant does not see Approve and does not learn the rule
+ * from a 403 toast.
  *
  * The permission keys match `backend/app/modules/approvals/manifest.json` —
  * the one place they are declared — and reach the browser through the set
@@ -26,8 +26,8 @@ export function useCanDecideApprovals(): boolean {
  * only the server knows: that nobody approves their own request unless the
  * organization allows it, and that a named stage is exclusive.
  *
- * The queue used to ask the grant alone, so a requester saw a live Approve
- * on their own document and learned the rule from a 409.
+ * The grant alone is not enough: a requester would see a live Approve on their
+ * own document and learn the rule from a 409.
  */
 export function useCanDecideOnApproval(
   approval: ApprovalRequest | null | undefined,

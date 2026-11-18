@@ -47,8 +47,6 @@ export interface AuditLogListResponse {
 /**
  * What a custom field may be. Mirrors the `FieldType` literal in
  * `app/schemas/category.py`; a value not in that list is refused on save.
- * `uom_select` used to be here and was in neither the backend nor any
- * screen — a type nothing could produce and nothing would accept.
  */
 export type FieldType =
   | "text"
@@ -141,8 +139,8 @@ export type Organization = components["schemas"]["Organization"];
 
 /**
  * Where a module sits in the store's taxonomy. Declared by the module and
- * carried by `GET /modules/available` — the store used to read it off the
- * frontend launcher tile instead, which only tiled modules have.
+ * carried by `GET /modules/available` — rather than from the frontend launcher
+ * tile, which only tiled modules have.
  */
 export type ModuleCategory =
   "core" | "business" | "analytics" | "integrations" | "system" | "other";

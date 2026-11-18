@@ -106,8 +106,8 @@ describe("My Assets, for a holder who can check in", () => {
     // and the holder's list describes it under a different shape.
     expect(screen.getAllByText("ThinkPad T14").length).toBeGreaterThan(1);
     // The holder is the one handing it back: the dialog does not tell them
-    // who holds it (it used to read "Assigned to: undefined", then their own
-    // name in the third person).
+    // who holds it, and never reads "Assigned to: undefined" or their own name
+    // in the third person.
     expect(screen.queryByText(/Held by/)).not.toBeInTheDocument();
   });
 

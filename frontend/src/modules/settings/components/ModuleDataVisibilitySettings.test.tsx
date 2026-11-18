@@ -143,8 +143,8 @@ describe("ModuleDataVisibilitySettings", () => {
   });
 
   it("shows a member the policy without a switch they cannot save", async () => {
-    // `PUT /organizations` is admin-only. The switch used to be live for a
-    // manager, whose click produced a request the API refused.
+    // `PUT /organizations` is admin-only, so the switch stays disabled for a
+    // manager, whose click would be a request the API refuses.
     authState.user = { role: "manager", is_superuser: false, permissions: [] };
     mockOrg({ show_module_data: true });
     renderSettings();

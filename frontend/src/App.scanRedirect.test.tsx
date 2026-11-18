@@ -56,10 +56,10 @@ vi.mock("@/lib/api/labels", () => ({
 const ROUTE_LOADED_WITHIN = 12000;
 
 // A printed QR label carries {base_url}/scan?code=<short_code> (the backend
-// builds this URL in label_print_service). The legacy alias used to drop the
-// query string in the redirect, so a scanned sticker opened an empty scanner
-// — the code the app itself printed was unreachable from the one address the
-// app printed it under.
+// builds this URL in label_print_service). The legacy alias keeps the
+// query string in the redirect, so a scanned sticker opens the scanner with
+// its code: the code the app itself printed stays reachable from the one
+// address the app printed it under.
 describe("legacy /scan alias", () => {
   let queryClient: QueryClient;
 

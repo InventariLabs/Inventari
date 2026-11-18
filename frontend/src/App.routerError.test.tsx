@@ -2,13 +2,11 @@
  * The wiring behind the error screen: a route that throws must land on
  * `ErrorPage`, not on the boundary above the router.
  *
- * This is the defect in its user-visible form. `errorElement` is armed only
- * by a *data* router, and this application mounted a declarative
- * `<BrowserRouter>`, so the attribute sat on the route tree doing nothing —
- * and the boundary in `main.tsx` (or the one that used to wrap `AppShell`)
- * caught the throw instead and named the failure with its own words, a
- * refresh button among them. The screen the reader got was the one the
- * application never chose.
+ * `errorElement` is armed only by a *data* router. Under a declarative
+ * `<BrowserRouter>` the attribute sits on the route tree doing nothing, and
+ * the boundary in `main.tsx` (or the one that wraps `AppShell`) catches the
+ * throw instead and names the failure with its own words, a refresh button
+ * among them. The reader must get the screen the application chose.
  *
  * What pins the behaviour is the way out of the screen: `ErrorPage` offers a
  * link home, the boundaries offer only buttons. The link is therefore the mark of

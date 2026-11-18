@@ -108,7 +108,7 @@ describe("ShoppingListCard", () => {
   });
 
   /**
-   * The preview used to be four identical box glyphs in a stack of
+   * The preview is not four identical box glyphs in a stack of
    * overlapping circles: nothing that told one list from another, and the
    * shape of an avatar stack, which says the circles are people. The names
    * were in the same answer the counts came from.
@@ -127,7 +127,7 @@ describe("ShoppingListCard", () => {
   });
 
   /**
-   * The card used to navigate from a `<div onClick>` covering its top half:
+   * The card must not navigate from a `<div onClick>` covering its top half:
    * no role, no focus, nothing for a screen reader, and hover feedback on a
    * surface that answered a click on only part of itself. The title is the
    * link now, stretched over the card.
@@ -159,7 +159,7 @@ describe("ShoppingListCard", () => {
   /**
    * Renaming and deleting act on the record, not on what the reader is doing
    * right now, so they live behind the "⋯" — the same place the recipe detail
-   * keeps deleting. The bin used to sit bare on the card, one pixel from the
+   * keeps deleting. The bin does not sit bare on the card, one pixel from the
    * rename pencil.
    */
   it("keeps the record's actions behind the overflow menu", async () => {

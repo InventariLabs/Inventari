@@ -36,11 +36,11 @@ interface RecipeCreateSheetProps {
  * and optionally says how much one batch makes, with the unit beside the
  * quantity. Navigates to the new formula's detail page on success.
  *
- * The unit used to be asked only inside the product search's "add as new"
- * panel, so a reader typing a new product met it hidden in a dropdown, and a
- * reader picking an existing one never saw what unit the yield was counted
- * in. It now stands next to the quantity: an existing product's own unit,
- * fixed, or the unit a product created here is made in.
+ * The unit is asked next to the quantity, not only inside the product search's
+ * "add as new" panel, so a reader typing a new product meets it in plain view,
+ * and a reader picking an existing one sees the unit the yield is counted in.
+ * It stands beside the quantity: an existing product's own unit, fixed, or the
+ * unit a product created here is made in.
  */
 export function RecipeCreateSheet({
   open,

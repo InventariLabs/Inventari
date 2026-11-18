@@ -8,11 +8,11 @@ import { moduleRegistry } from "./registry";
  * The label a sidebar renders must not depend on the order in which the
  * language chunks happen to land: one module renames core vocabulary for the
  * whole organization, the catalog carries the base names, and both write into
- * the same namespace with overwrite on. Whoever writes last used to win, so
- * the same screen flipped between "Products" and "Assets" across reloads.
+ * the same namespace with overwrite on. Whoever writes last must not win: the
+ * same screen would flip between "Products" and "Assets" across reloads.
  *
- * The catalogs used to arrive with `moduleRegistry.register`. They arrive
- * through the dynamic i18n backend now (`src/i18n/config.ts`), which
+ * The catalogs do not arrive with `moduleRegistry.register`. They arrive
+ * through the dynamic i18n backend (`src/i18n/config.ts`), which
  * announces each one after i18next has merged it; the registry subscribes
  * (`onCatalogLoaded`) and calls `catalogLoaded`. The tests drive that call
  * directly — the subscription wiring itself is what the app runs.

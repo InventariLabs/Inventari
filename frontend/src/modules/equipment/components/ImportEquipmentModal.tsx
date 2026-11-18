@@ -162,7 +162,7 @@ export default function ImportEquipmentModal({
     const selected = e.target.files?.[0];
     if (!selected) return;
     setFile(selected);
-    // A new file is a new question; the old answer stops applying.
+    // A new file is a new question; the answer given for the last file stops applying.
     setAnalyzeError(null);
   };
 
@@ -174,7 +174,7 @@ export default function ImportEquipmentModal({
       const result = await equipmentApi.analyzeImport(file);
       setAnalyzeResult(result);
       // the backend suggests mappings via aliases in all five
-      // module languages — the frontend heuristics are no longer needed.
+      // module languages — the frontend heuristics are not needed.
       setMapping(result.suggested_mapping ?? {});
       setStep("mapping");
     } catch (err) {
@@ -258,7 +258,7 @@ export default function ImportEquipmentModal({
               </label>
 
               {/* What the import can read, before anything is uploaded — the
-                  screen used to answer that only after a file had been sent. */}
+                  screen answers that before a file is sent. */}
               <div className="rounded-lg border border-border p-3 space-y-2">
                 <p className="text-sm font-medium text-on">
                   {t("import.supported_title")}
@@ -370,8 +370,8 @@ export default function ImportEquipmentModal({
               </div>
 
               {/* What the mapping actually reads, on rows the reader can
-                  see. The step used to show twelve dropdowns and not one
-                  value, so a shifted header row looked correctly mapped. */}
+                  see. The step shows the values, not only twelve dropdowns, so a
+                  shifted header row does not look correctly mapped. */}
               <ImportPreviewTable
                 rows={analyzeResult.preview_rows}
                 fields={EQUIPMENT_FIELDS.map((field) => ({

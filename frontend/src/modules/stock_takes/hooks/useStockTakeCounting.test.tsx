@@ -50,11 +50,9 @@ const createWrapper = () => {
 /**
  * Render the hook and wait for the count it works on to arrive.
  *
- * The cases used to sleep 50 ms and trust the stock take had loaded by then.
- * On a loaded host it had not: `handleAddNewItem` found no location, returned
- * without sending anything, and the test then waited out a second for a POST
- * that was never going to come — red for the speed of the machine, not the
- * state of the hook.
+ * The cases wait for the count to load instead of sleeping for a fixed time and
+ * trusting it has loaded by then. A test that fires too early finds no
+ * location, so `handleAddNewItem` returns without sending a POST.
  */
 const renderLoaded = async () => {
   const rendered = renderHook(() => useStockTakeCounting("st-1"), {

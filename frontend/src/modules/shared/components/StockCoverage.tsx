@@ -34,13 +34,13 @@ export function toneForCoverage(
 /**
  * How much of a recipe is on the shelf, written the one way.
  *
- * The same computed number used to reach the reader in three notations: the
- * recipe card wrote "5/5" and explained it in a `title` nobody on a phone can
- * open; the same card on the "I can cook" tab wrote "100%"; the planner's
- * suggestions wrote a percent icon followed by a bare "100", which a screen
- * reader announced as the number alone. The percentage was always a rounding
- * of the ratio — 80% of five ingredients cannot be turned back into "4 of 5",
- * and it is the missing one the reader is after.
+ * The same computed number must reach the reader in one notation, not three.
+ * A recipe card that writes "5/5" explains it in a `title` nobody on a phone
+ * can open, the same card on the "I can cook" tab writes "100%", and a
+ * planner's suggestion pairs a percent icon with a bare "100", which a screen
+ * reader announces as the number alone. The percentage is a rounding of the
+ * ratio — 80% of five ingredients cannot be turned back into "4 of 5", and it
+ * is the missing one the reader is after.
  *
  * Inline content only, no chrome: the card wraps this in a Badge, the maker
  * screens in a line of muted text with the batch count after it. One notation

@@ -130,9 +130,9 @@ describe("PurposeBindingSelect", () => {
   });
 
   /**
-   * The purpose used to be labelled `RECIPES.TEXT_PARSE` — its own identifier,
-   * shouted by an `uppercase` class, because `recipes:ai.purposeLabel` existed
-   * in no catalog and the fallback is the key.
+   * The purpose is labelled from its catalog entry, not by its identifier
+   * `RECIPES.TEXT_PARSE` shouted by an `uppercase` class, which is what a
+   * missing catalog key falls back to.
    */
   it("names the purpose rather than printing its key", () => {
     const purpose: AiPurpose = {
@@ -266,8 +266,8 @@ describe("PurposeBindingSelect", () => {
 describe("whose purpose this is", () => {
   it("names the module that asked for it", () => {
     // The purposes read as one flat list. Two phrased alike gave no way to
-    // tell whose setting was whose, and the recipes module used to render a
-    // second copy of its own on the same screen under another heading.
+    // tell whose setting was whose, and the recipes module renders its own
+    // purpose once, not a second copy under another heading.
     const purpose: AiPurpose = {
       key: "recipes.text_parse",
       label_key: "recipes:ai.purposeLabel",

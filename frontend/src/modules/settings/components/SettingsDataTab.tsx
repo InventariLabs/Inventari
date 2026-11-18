@@ -32,7 +32,6 @@ export default function SettingsDataTab() {
 
   const handleImport = () => {
     // The import wizard exists — XLSX / CSV / Grocy, on the products list.
-    // This card used to say "coming soon" about a feature two clicks away.
     navigate("/inventory/items?import=1");
   };
 

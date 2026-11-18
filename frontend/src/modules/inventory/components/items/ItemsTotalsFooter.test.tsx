@@ -35,9 +35,9 @@ function aggregates(over: Partial<ItemAggregates> = {}): ItemAggregates {
 
 /**
  * The ledger knows products, not shelves, so a filtered slice has
- * no ledger value. The footer used to print a number there anyway — the
- * shelf's stock priced at rates the organization's other receipts earned.
- * When the API withholds the figure, the footer says why instead.
+ * no ledger value, so the footer prints no number there: a shelf's stock priced
+ * at rates the organization's other receipts earned would mislead. When the
+ * API withholds the figure, the footer says why instead.
  */
 describe("ItemsTotalsFooter — the value it holds is the value the ledger holds", () => {
   it("renders the figure the API sends", () => {
@@ -161,10 +161,9 @@ describe("ItemsTotalsFooter — every reason the sum is smaller", () => {
 });
 
 /**
- * A litre is not a kilogram. The aggregates used to return one number that
- * summed both, and the footer labelled it kg: 2 l of milk read "2,0 kg".
- * The API now sends the volume apart from the weight, and each figure
- * stands under its own unit — a litre-only list shows no kilogram total.
+ * A litre is not a kilogram. The API sends the volume apart from the weight,
+ * and each figure stands under its own unit — a litre-only list shows no
+ * kilogram total.
  */
 describe("ItemsTotalsFooter — litres are not kilograms", () => {
   it("shows a litre-only set in litres, with no kilogram total", () => {

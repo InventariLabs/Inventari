@@ -11,7 +11,7 @@ import { PageHeaderContext } from "@/hooks/useModulePageHeader";
 import { onePage } from "@/test/mocks/page";
 
 /**
- * One failing request used to take the whole overview with it.
+ * One failing request must not take the whole overview with it.
  *
  * The tab rendered only when both the overview *and* the cost analysis had
  * arrived, so a 500 on `/stats/cost-analysis` left a header, two tabs and

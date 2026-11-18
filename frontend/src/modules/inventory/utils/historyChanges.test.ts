@@ -17,9 +17,8 @@ const t = ((key: string, opts?: { defaultValue?: string }) => {
 
 describe("historyChanges STATUS_CHANGED", () => {
   it("reads the absence of a status as the dash, never as the sentinel", () => {
-    // The register used to carry UNKNOWN as the old status, and the row
-    // fell through to the raw dump: old_status: "UNKNOWN" — the model's
-    // word for nothing, printed like a state nobody declared.
+    // The absence of a status reads as the dash. UNKNOWN is the model's word for
+    // nothing, and the row never prints it like a state nobody declared.
     const line = parseChanges(
       "STATUS_CHANGED",
       { old_status: "UNKNOWN", new_status: "RETIRED" },
