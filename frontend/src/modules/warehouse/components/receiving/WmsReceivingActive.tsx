@@ -195,7 +195,7 @@ export default function WmsReceivingActive({
           {/* A line part of which has already arrived stays the next one to
               scan, so naming only what was ordered would put "12.5 kg" above a
               field whose job is now to take the remaining 7.5. */}
-          <p className="mt-1 text-sm text-on-secondary">
+          <p className="mt-1 text-sm text-on-secondary [overflow-wrap:anywhere]">
             {nextLine.product_name} —{" "}
             {nextLine.received_quantity > 0
               ? `${formatQuantityValue(nextLine.received_quantity)}/${formatQuantityValue(
