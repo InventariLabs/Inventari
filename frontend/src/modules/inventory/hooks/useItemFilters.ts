@@ -183,6 +183,8 @@ export function useItemFilters() {
         }
       });
     },
+    /** The list's address write queue, for a param of the screen's own. */
+    writeParams: f.writeParams,
     // UI state
     showFilters,
     setShowFilters,

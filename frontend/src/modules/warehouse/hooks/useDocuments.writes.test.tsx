@@ -135,6 +135,36 @@ describe("useDocuments writes — the right call, then the right caches dropped"
     expect(invalidated).toContainEqual(queryKeys.documents.approval("doc-4"));
   });
 
+  it("saves a draft pressed again after a lost answer under the same key", async () => {
+    const keys: (string | null)[] = [];
+    let answers = 0;
+    server.use(
+      http.post("*/api/v1/warehouse/documents", ({ request }) => {
+        keys.push(request.headers.get("Idempotency-Key"));
+        return answers++ === 0
+          ? HttpResponse.error()
+          : HttpResponse.json({ id: "doc-1" });
+      }),
+    );
+    const { wrapper } = setup();
+    const { result } = renderHook(() => useCreateDocument(), { wrapper });
+    const data = { type: "OUT" } as never;
+
+    await act(() => result.current.mutateAsync({ data }).catch(() => null));
+    await act(() => result.current.mutateAsync({ data }));
+    // Answered: the same form saved again is a new draft, not a retry.
+    await act(() => result.current.mutateAsync({ data }));
+    // A changed form is a new draft whatever came before.
+    await act(() =>
+      result.current.mutateAsync({ data: { type: "IN" } as never }),
+    );
+
+    expect(keys[0]).toEqual(expect.any(String));
+    expect(keys[1]).toBe(keys[0]);
+    expect(keys[2]).not.toBe(keys[0]);
+    expect(keys[3]).not.toBe(keys[2]);
+  });
+
   it("imports opening stock and refreshes the documents list", async () => {
     const seen = record({ document_id: "doc-9" });
     const { invalidated, wrapper } = setup();
