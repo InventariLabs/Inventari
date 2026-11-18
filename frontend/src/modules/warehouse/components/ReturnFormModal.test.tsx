@@ -154,6 +154,55 @@ describe("ReturnFormModal", () => {
     expect(screen.queryByText("Flour")).not.toBeInTheDocument();
   });
 
+  it("limits a line to what earlier returns left of it", () => {
+    const document = buildDocument("OUT");
+    document.lines.push(
+      ...([
+        {
+          id: "line-2",
+          line_number: 2,
+          name: "Bolt",
+          quantity: 2,
+          done_quantity: 2,
+          returnable_quantity: 0,
+        },
+        {
+          id: "line-3",
+          line_number: 3,
+          name: "Nail",
+          quantity: 3,
+          done_quantity: 3,
+          returnable_quantity: 1,
+        },
+      ] as unknown as WarehouseDocument["lines"]),
+    );
+    render(<ReturnFormModal document={document} onClose={vi.fn()} />);
+
+    expect(screen.queryByText("Bolt")).not.toBeInTheDocument();
+    expect(screen.getByText("Max: 1")).toBeInTheDocument();
+    fireEvent.change(screen.getAllByRole("spinbutton")[1], {
+      target: { value: "3" },
+    });
+    expect(screen.getByText("Can't return more than 1")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /create return/i }),
+    ).toBeDisabled();
+  });
+
+  it("reads a digit typed left of the zero as that digit", () => {
+    render(
+      <ReturnFormModal document={buildDocument("OUT")} onClose={vi.fn()} />,
+    );
+
+    fireEvent.change(screen.getByRole("spinbutton"), {
+      target: { value: "90" },
+    });
+
+    expect((screen.getByRole("spinbutton") as HTMLInputElement).value).toBe(
+      "9",
+    );
+  });
+
   it("does not keep the zero in front of a typed digit", () => {
     render(
       <ReturnFormModal document={buildDocument("OUT")} onClose={vi.fn()} />,

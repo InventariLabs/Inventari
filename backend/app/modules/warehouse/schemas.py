@@ -324,6 +324,11 @@ class DocumentLineSchema(BaseModel):
     #: The part of ``done_quantity`` that is booked but held back — see
     #: ``DocumentLine.held_quantity``.
     held_quantity: Decimal
+    #: What a return of this line can still take back: ``done_quantity`` less
+    #: what corrections and returns, drafts included, already took. Set only
+    #: when one document is read, and only once it is completed — ``None``
+    #: elsewhere, where nothing can be returned yet.
+    returnable_quantity: Decimal | None = None
     uom_id: UUID | None
     uom: UomInfoDTO | None
     batch_number: str | None

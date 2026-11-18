@@ -51445,6 +51445,17 @@
             "type": "string",
             "title": "Held Quantity"
           },
+          "returnable_quantity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Returnable Quantity"
+          },
           "uom_id": {
             "anyOf": [
               {
