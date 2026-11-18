@@ -66,7 +66,7 @@ async def _tick_overview(db: AsyncSession, organization_id: UUID) -> OverviewDTO
 # would read the very no-op the capture exists to avoid — an await that
 # never suspends, so the settle loop busy-spins the CPU and the events the
 # predicate waits for (pool checkins, the generator's own progress) never
-# get scheduled. Under xdist load that spin is exactly what used to tip the
+# get scheduled. Under xdist load that spin is exactly what tips the
 # two-second deadline into a flake.
 _REAL_SLEEP = asyncio.sleep
 
@@ -100,7 +100,7 @@ async def test_each_tick_opens_its_own_session_and_holds_nothing_at_yield(
 ) -> None:
     """Two ticks: two short sessions, zero checked-out connections at yield.
 
-    The suspension point after an event is where the stream used to hold the
+    The suspension point after an event is where the stream must not hold the
     request session — there the pool checkout count must be back to zero, and
     the next tick must check out a session of its own rather than reuse one.
 

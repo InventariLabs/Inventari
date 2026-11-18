@@ -12,8 +12,8 @@ import App from "./App";
 // Applying a workspace profile changes the organization's module list while
 // the reader is on /settings/my-modules. The route tree is rebuilt for the new
 // list, and the reader must stay on the page that just confirmed the switch.
-// With a module leaving the list, a legacy redirect used to render in the
-// settings page's place and send the reader to the start screen.
+// With a module leaving the list, no legacy redirect may render in the
+// settings page's place or send the reader to the start screen.
 describe("a module list that changes under the reader", () => {
   let queryClient: QueryClient;
   let modules: string[];
@@ -82,8 +82,8 @@ describe("a module list that changes under the reader", () => {
   });
 });
 
-// A nav entry that hides is not a gate: the stock-take screens used to render
-// by address while their module was off, in work mode or not.
+// A nav entry that hides is not a gate: the stock-take screens must not render
+// by address while their module is off, in work mode or not.
 describe("routes that need a module", () => {
   beforeEach(() => {
     tokenStore.set("test-token");

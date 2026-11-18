@@ -257,5 +257,34 @@
     },
     "unpriced_one": "{{count}} Produkt hat keine Kostenhistorie und bleibt aus der Summe.",
     "unpriced_other": "{{count}} Produkte haben keine Kostenhistorie und bleiben aus der Summe."
+  },
+  "valueMovement": {
+    "title": "Wertbewegung",
+    "subtitle": "Was der Bestand beim Start eines Zeitraums wert war, was ihn bewegt hat und was er am Ende wert war",
+    "from": "Von",
+    "to": "Bis",
+    "opening": "Wert am {{date}}, zu Tagesbeginn",
+    "closing": "Wert am {{date}}, zu Tagesende",
+    "caption": "Bestandswert von {{organization}} vom {{from}} bis {{to}}",
+    "completeFrom": "Das Bewegungsjournal beginnt am {{date}}. Davor ist nichts bekannt — und nicht null.",
+    "noValueSource": "Es wird keine Kostenhistorie geführt, daher gibt es keinen Wert, den man nennen könnte. Die Aufstellung entsteht aus der Kostenhistorie der Zu- und Abgänge.",
+    "valueHidden": "Der Arbeitsbereich zeigt den Bestandswert nicht an, daher gibt es hier keine Aufstellung.",
+    "cannotAnswer": "Für diesen Zeitraum gibt es keine Antwort.",
+    "excludedCurrency_one": "{{count}} Zugang ausgelassen: Seine Währung ist nicht die der Organisation.",
+    "excludedCurrency_other": "{{count}} Zugänge ausgelassen: Ihre Währung ist nicht die der Organisation.",
+    "columns": {
+      "line": "Position",
+      "value": "Wert"
+    },
+    "lines": {
+      "receipts": "Zugänge",
+      "internal_receipts": "Produziert und zurück auf Lager",
+      "used": "Verbrauch",
+      "disposed": "Entsorgung",
+      "dispatched": "Lieferungen",
+      "other_issues": "Sonstige Abgänge (Zählfehlbestände, Korrekturen)",
+      "work_in_progress_change": "Veränderung laufender Produktion",
+      "other_changes": "Sonstige Änderungen (nachträgliche Kosten, Rundung)"
+    }
   }
 }

@@ -275,7 +275,7 @@ class TestMakerRoleGuards:
         """Completing opens a core Item for the output — items work.
 
         A caller carrying maker:write but no items:write (the shape a custom
-        role can produce) used to open that record through this door.
+        role can produce) must not open that record through this door.
         """
         order_id = _recipe_with_stock(
             db_session,

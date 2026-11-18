@@ -321,9 +321,9 @@ class TestTheTodoQueueAsksForDecisions:
     ) -> None:
         """An empty module list reads as every default module, here as well.
 
-        The To do used to test the list itself, so an organization that kept
-        the defaults had its approvals module on for every other screen and
-        off for the decisions block.
+        The To do tests the module list the way every other screen does, so an
+        organization that keeps the defaults has its approvals module on for the
+        decisions block too.
         """
         _set_threshold(client, doc_auth_headers, '100.00')
         document = _create_document(

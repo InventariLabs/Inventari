@@ -2,9 +2,8 @@
 
 The weight of one piece is the product's (ADR-015), and a product from the
 shared catalogue is every organization's, so one of them cannot change it for
-all. Both doors used to drop the weight and answer success: the form said
-"Updated", and the card — with every line weight read from it — kept the old
-one. The removal strategy beside it is already refused this way. The weight
+all. Both doors refuse it: a success answer would leave the card, and every line
+weight read from it, on the old value. The removal strategy beside it is already refused this way. The weight
 the card already records is not a change, because the form posts its whole
 state.
 """

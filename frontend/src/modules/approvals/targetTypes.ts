@@ -11,10 +11,9 @@ import { useModules } from "@/contexts/ModulesContext";
  * purchase_orders (`_service_workflow.py`, `_router_approval.py`) and
  * equipment (`_router_approvals.py`, checkout requests).
  *
- * The list used to hold "document" alone, justified by a comment claiming the
- * other two never call approvals_api. They did, in ten places, so the workflow
- * a purchase order needed could not be created from this screen at all. The
- * companion test reads those call sites out of the backend rather than
+ * The list holds every target type a module requests approval for: the
+ * workflow a purchase order needs can only be created from this screen if it
+ * is listed. The companion test reads those call sites out of the backend rather than
  * repeating this list, so the next integration fails the gate instead of
  * silently sitting outside the editor.
  */

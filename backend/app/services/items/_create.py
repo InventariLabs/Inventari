@@ -53,7 +53,7 @@ async def _ensure_storage_async(
     storage = await _fetch_own_storage_or_404_async(db, item_in.location_id, org_id)
     # An archived location is off every picker, so a product stored there
     # shows its location as "Unknown" and cannot be moved back. The screen
-    # used to offer "Add product" and the server answered 201.
+    # does not offer "Add product" there, and the server refuses it too.
     if (storage.settings or {}).get('archived') is True:
         raise catalogue_refusal('storage_archived')
     return storage
@@ -195,8 +195,8 @@ async def _ensure_serial_unique_async(
 ) -> None:
     """Raise ValueError when another item in the org holds *serial*.
 
-    Shared by create and update; the update path previously stripped
-    twice and reported the unstripped value in the error message.
+    Shared by create and update: the serial is stripped once, before the
+    check, and the error message reports that stripped value.
     """
     sn = serial.strip()
     if not sn:

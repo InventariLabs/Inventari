@@ -46,9 +46,8 @@ class TestComputeBookValue:
     def test_zero_useful_life_returns_not_depreciable(self) -> None:
         """Zero years is not a configuration, it is the absence of one.
 
-        A purchase date with a zero life used to make the asset "fully
-        depreciated" on day one — a book value of 0.00 and 100% depreciation
-        inferred from a missing number.
+        A purchase date with a zero life reads as not depreciable, never as fully
+        depreciated on day one.
         """
         result = compute_book_value(
             Decimal('5400'),

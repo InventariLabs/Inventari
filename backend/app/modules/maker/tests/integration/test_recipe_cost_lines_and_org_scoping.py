@@ -111,7 +111,7 @@ class TestCostLinesCrud:
         assert body['sort_order'] == 2
         assert body['recipe_id'] == recipe['id']
 
-        # Detail must expose the cost line (was previously always []).
+        # Detail exposes the cost line.
         detail = client.get(
             f'/api/v1/maker/recipes/{recipe["id"]}', headers=mk_auth_headers
         ).json()
@@ -549,11 +549,9 @@ class TestCatalogCostAndResult:
             child_id=ingredient.id,
             qty='1.0',
         )
-        # Exactly what order 1 consumes, so this layer is drained by it — and
-        # it now really is: a run posts an outgoing layer for what it ate,
-        # which it never used to, so this layer stayed on the books with its
-        # full quantity and kept dragging the rate down long after the flour
-        # had been baked.
+        # Exactly what order 1 consumes, so this layer is drained by it: a run posts
+        # an outgoing layer for what it ate, so the flour leaves the books when it
+        # is baked.
         _quant(
             client,
             mk_auth_headers,
@@ -576,8 +574,8 @@ class TestCatalogCostAndResult:
         )
         # A dearer delivery, and nothing older left to consume: order 1 took
         # the last of the 2.00 flour, so the second run eats the 4.00 flour
-        # and costs what that flour cost. This used to read 3.67 — the average
-        # of ten units at 4.00 and two at 2.00 that had already been baked.
+        # and costs what that flour cost, not the average of ten units at 4.00 and two
+        # at 2.00 that had already been baked.
         _quant(
             client,
             mk_auth_headers,

@@ -73,8 +73,8 @@ describe("the attestation has one name in every language", () => {
   it.each(Object.keys(CATALOGS))(
     "%s names the campaign status the way the API does",
     (lang) => {
-      // The badge used to read "Running" while the API said ACTIVE — an
-      // export and the screen disagreed about the same row.
+      // The badge names the status as the API does, so an export and the screen
+      // agree about the same row.
       const active = ACTIVE[lang as keyof typeof ACTIVE];
       const status = (
         CATALOGS[lang] as {

@@ -112,7 +112,7 @@ class InterceptorPipeline:
         self._register(self._category_interceptors, interceptor)
 
     def unregister_item_interceptor(self, interceptor: ItemInterceptor) -> None:
-        """Remove a previously registered item interceptor; a no-op if absent.
+        """Remove a registered item interceptor; a no-op if absent.
 
         Registration is a public operation, so undoing it is one too. Tests that
         register a blocker for the duration of one case were reaching into

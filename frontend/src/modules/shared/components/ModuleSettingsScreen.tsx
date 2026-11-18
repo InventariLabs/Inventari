@@ -27,7 +27,7 @@ interface ModuleSettingsScreenProps {
  *
  * Reading them is an administrator's right, so this screen has to answer three
  * different questions — "you may not", "it did not load" and "there is nothing
- * to configure" — which it used to answer with one sentence about a failure.
+ * to configure" — each gets its own sentence, not one about a failure.
  */
 export function ModuleSettingsScreen({
   moduleName,

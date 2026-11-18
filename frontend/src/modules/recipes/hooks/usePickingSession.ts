@@ -12,8 +12,8 @@ import type {
 
 /**
  * What a failed call says when the server sends no sentence of its own — a
- * 5xx, whose detail is for the logs. In the reader's language: the hook's
- * English literals used to reach a Polish reader's banner as they were.
+ * 5xx, whose detail is for the logs. It is in the reader's language, so the
+ * hook's English literals never reach a Polish reader's banner.
  */
 const fallback = {
   start: () => i18n.t("recipes:picking.errors.start"),
@@ -181,11 +181,11 @@ export function usePickingSession(recipeId: string, mealPlanEntryId?: string) {
     [recipeId, mealPlanEntryId],
   );
 
-  // Ending a session is the backend's business, and the sheet used to do it in
-  // its own state alone: on the last ingredient it went straight to "complete"
-  // and the card said "Completed ✓", while the session stayed `active` in the
-  // database. Nothing could close it afterwards, and the next "Get
-  // ingredients" put every ingredient back on the shelf. Whatever resolves the
+  // Ending a session is the backend's business, not the sheet's own state alone.
+  // On the last ingredient the session is closed here first, so the card says
+  // "Completed ✓" only once the session is closed in the database, and the next
+  // "Get ingredients" does not put every ingredient back on the shelf. Whatever
+  // resolves the
   // last ingredient calls this first, and reports the session done only when
   // the database took it: a refusal leaves the session open on the sheet, with
   // the error above the checklist, so the reader can finish it again.
@@ -269,10 +269,9 @@ export function usePickingSession(recipeId: string, mealPlanEntryId?: string) {
             items: pickedIn(items, result.ingredient_id),
           });
         } else {
-          // The request succeeded and the pick did not. The row used to be
-          // ticked off here regardless of what the answer said, so a refused
-          // scan read as done and the count went up for stock still on the
-          // shelf.
+          // The request succeeded and the pick did not. The row is ticked off only
+          // for a pick the answer confirms, so a refused scan never reads as done
+          // and the count does not go up for stock still on the shelf.
           noteRefusal(result.ingredient_id, result.status);
           setState({ phase: "active", session, items });
         }

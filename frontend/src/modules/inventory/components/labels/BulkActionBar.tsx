@@ -18,10 +18,8 @@ interface BulkActionBarProps {
 /**
  * What to do with the labels that are ticked.
  *
- * It used to be a row in the page flow with both buttons on `flex-1`, so a
- * desktop showed two actions each half the screen wide, wedged between the
- * page title and the filter row. The selection is a passing state, so its
- * actions live in the floating toolbar every list in this app uses.
+ * The selection is a passing state, so its actions live in the floating toolbar
+ * every list in this app uses, not in the page flow.
  */
 export function BulkActionBar({
   selectedIds,

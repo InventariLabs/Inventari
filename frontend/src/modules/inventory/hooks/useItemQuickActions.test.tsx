@@ -80,10 +80,10 @@ describe("useItemQuickActions", () => {
   });
 
   /**
-   * The button says "Remove 1 unit" and the record holds 2 kg. It used to
-   * consume the whole record for units measured by weight or volume: a reader
-   * who asked for one kilogram lost two, and the "Add 1 unit" beside it adds
-   * exactly one. Reverting the fix makes this test expect 2 and fail.
+   * The button says "Remove 1 unit" and the record holds 2 kg. The action takes
+   * one unit, not the whole record, for units measured by weight or volume: a
+   * reader who asked for one kilogram keeps the other, and the "Add 1 unit" beside
+   * it adds exactly one.
    */
   it("takes one unit — not the whole record — when the label promises one unit", async () => {
     const onDone = vi.fn();

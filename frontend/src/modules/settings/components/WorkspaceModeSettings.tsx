@@ -59,10 +59,10 @@ export function WorkspaceModeSettings() {
    * Name a module the way the rest of the app names it, and say nothing about
    * the ones this screen has no business naming.
    *
-   * The diff used to render `display_name` straight from the manifest — English
-   * in a Polish interface (`Approvals`, `Purchase Orders`) — and, for shell
-   * modules with no manifest at all, the bare identifier (`categories`,
-   * `core`). Those four are always on, so listing them as part of a profile
+   * The diff names each module by its translated label, not by the
+   * `display_name` in its manifest, which is English in a Polish interface
+   * (`Approvals`, `Purchase Orders`); shell modules with no manifest at all
+   * would show the bare identifier (`categories`, `core`). Those four are always on, so listing them as part of a profile
    * switch was noise on top of being unreadable: they are dropped, and the
    * rest goes through `modules.<name>.name` (docs/MODULE_NAMES.md).
    */

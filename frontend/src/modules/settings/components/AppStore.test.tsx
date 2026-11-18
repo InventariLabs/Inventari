@@ -72,8 +72,8 @@ describe("AppStore search", () => {
   it("makes every module tile a second-level heading", async () => {
     render(<AppStore />, { wrapper: Wrapper });
 
-    // The tiles used to be h3 under the shell's h1 — a heading level skipped
-    // in between, so the tree read as if a section were missing.
+    // The tiles are h2 under the shell's h1, so no heading level is skipped and
+    // the tree reads as complete.
     expect(
       (await screen.findAllByRole("heading", { level: 2 })).length,
     ).toBeGreaterThan(0);
@@ -141,8 +141,7 @@ describe("AppStore card status", () => {
       render(<AppStore />, { wrapper: Wrapper });
 
       expect(await screen.findByText("Webhooks")).toBeInTheDocument();
-      // Switching off used to take the "Enabled" badge away and put nothing
-      // in its place: the card's state lived only in the button label, which
+      // Switching off puts a state of its own on the card, and the button label
       // reads the same on every card.
       expect(screen.getAllByText("Disabled").length).toBeGreaterThan(0);
     });
@@ -393,7 +392,7 @@ describe("AppStore taxonomy", () => {
   });
 
   it("says which filter is the chosen one", async () => {
-    // The state used to be carried by the background colour alone.
+    // The chosen filter is named by more than its background colour.
     withCatalog([statsModule, visionModule]);
     render(<AppStore />, { wrapper: Wrapper });
 
@@ -780,8 +779,8 @@ describe("AppStore — arriving from somewhere that named a module", () => {
   });
 
   it("opens on the module the link named instead of on all sixteen", async () => {
-    // "Enable the Partners module" used to land on a page that did not mention
-    // Partners, leaving the reader to find it among the tiles.
+    // "Enable the Partners module" lands on a page that names Partners, so the
+    // reader does not have to find it among the tiles.
     render(
       <MemoryRouter initialEntries={["/apps?module=partners"]}>
         <AppStore />

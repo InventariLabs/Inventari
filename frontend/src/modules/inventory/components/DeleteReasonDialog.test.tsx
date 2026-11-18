@@ -1,7 +1,6 @@
 /**
- * The delete confirmation used to say the same thing twice — title and body
- * were one sentence — and the two of them disagreed about what was being
- * deleted: the title said "product", the toast that followed said "item".
+ * The delete confirmation says each thing once, and the title and the toast
+ * name what is deleted the same way.
  */
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
@@ -25,8 +24,8 @@ describe("DeleteReasonDialog", () => {
   });
 
   it("does not call a reversible operation irreversible", () => {
-    // The old body opened with "This cannot be undone" and kept
-    // talking in the next breath about the archive it lands in, where a
+    // The body does not open with "This cannot be undone", and it names the
+    // archive it lands in, where a
     // Restore button gives the product back with everything.
     render(
       <DeleteReasonDialog

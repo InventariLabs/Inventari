@@ -132,7 +132,7 @@ describe("usePartnerPicker", () => {
 
   it("keeps naming a partner picked from a search while its own read is on the way", async () => {
     serveRegister();
-    // The by-id read is slow: the window the field used to read its placeholder in.
+    // The by-id read is slow: the window the field reads its placeholder in.
     server.use(
       http.get("/api/v1/partners/:id", async ({ params }) => {
         await new Promise((resolve) => setTimeout(resolve, 150));

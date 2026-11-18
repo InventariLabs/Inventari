@@ -53,9 +53,8 @@ class AppException(HTTPException):
 class NotFoundException(AppException):
     """404 — resource not found.
 
-    Without *lang* the sentence is in the request's language: the default
-    used to be English, and every call site that did not pass the language
-    answered a Polish reader in English.
+    Without *lang* the sentence is in the request's language. A call site that
+    does not pass the language would otherwise answer a Polish reader in English.
     """
 
     def __init__(self, resource: str, lang: Language | None = None) -> None:
@@ -422,8 +421,8 @@ def refusal_text(exc: ValueError) -> str:
     """The sentence a router may hand on from a ``ValueError`` it caught.
 
     A router that maps a service's refusal to a status of its own — a 409, a
-    404, a 413 — speaks the refusal's text. It used to speak ``str(exc)``,
-    and a router-local catch then decided provenance by not deciding it:
+    404, a 413 — speaks the refusal's text. It never speaks ``str(exc)``, because a
+    router-local catch that did would decide provenance by not deciding it:
     pydantic's ``ValidationError``, raised when a service builds a DTO from
     the request, reached a Polish reader as the DTO's name, the echoed input
     and a link to pydantic's docs, in English.
@@ -515,11 +514,9 @@ def catalogue_status_refusal(
 ) -> AppException:
     """:func:`catalogue_refusal` for a refusal answered at a status of its own.
 
-    A 401, 403 or 404 whose sentence is in the catalogue used to be raised as
-    ``HTTPException(detail=get_error_message(key, lang))``: the reader got the
-    sentence in the right language and a client got a bare string with no
-    code, so telling "this key may not create keys" from "the module is off"
-    meant reading prose. The key becomes the ``code``, as for the 400s.
+    A 401, 403 or 404 whose sentence is in the catalogue is raised with the key
+    as its ``code``, as for the 400s, so a client tells "this key may not create
+    keys" from "the module is off" by the code and never by reading prose.
     *headers* stays beside the envelope — a 401's ``WWW-Authenticate``.
     """
     lang = lang or get_current_lang()
@@ -576,9 +573,8 @@ def _map_exception(exc: Exception) -> HTTPException | None:
     Order matters: ``PeriodClosedError`` subclasses ``ValueError`` and must be
     matched first, or a closed period would surface as 400 instead of 409.
 
-    Shared by both wrappers below — they previously carried identical
-    six-branch ``except`` ladders, which is also what pushed the decorator past
-    the C901 complexity guard when the ``EntityNotFoundError`` branch was added.
+    Shared by both wrappers below, so the ``except`` ladder exists once: two
+    copies would push each decorator past the C901 complexity guard.
     """
     if isinstance(exc, HTTPException):
         return None  # AppException and friends are already correct

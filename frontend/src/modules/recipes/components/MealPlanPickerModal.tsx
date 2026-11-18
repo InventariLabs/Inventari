@@ -222,8 +222,8 @@ export function MealPlanPickerModal({
               {/* Name and dates, because a plan's name is free text and
                   nothing makes it say anything about time. "Week 2" and
                   "Week 3" only tell them apart for whoever wrote them; the
-                  range the plan actually runs over came down with the list
-                  and this screen used to drop it. */}
+                  range the plan actually runs over comes down with the list
+                  and this screen keeps it. */}
               {plans.map((p) => (
                 <option key={p.id} value={p.id}>
                   {`${p.name ?? t("meal_planner.unnamed_plan")} · ${formatDateRange(

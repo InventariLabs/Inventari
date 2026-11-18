@@ -19,8 +19,8 @@ vi.mock("@/hooks/useModulePageHeader", () => ({
 
 /**
  * The filter row reads two lists, locations and categories. A list that
- * failed to arrive used to leave a filter with only "All Locations" in it —
- * which reads as an organization that has no locations at all.
+ * failed to arrive must not leave a filter with only "All Locations" in it,
+ * which would read as an organization that has no locations at all.
  */
 function renderList(entry: string) {
   const queryClient = new QueryClient({

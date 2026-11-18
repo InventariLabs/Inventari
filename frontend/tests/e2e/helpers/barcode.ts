@@ -80,9 +80,9 @@ export function ean13Modules(code: string): string {
 
 // --- QR: version 2, error correction L, byte mode (up to 32 bytes).
 // The mask is chosen by the standard's penalty score, as a real encoder does.
-// Mask 0 alone used to be drawn for every payload, and for some (LOC-Y9MJ, a
-// storage code a stack happened to generate) it left patterns the scanner's
-// detector could not lock onto, so a spec passed or failed with the data.
+// Mask 0 alone is never drawn for every payload, since for some (LOC-Y9MJ, a
+// storage code a stack happened to generate) it leaves patterns the scanner's
+// detector cannot lock onto, so a spec would pass or fail with the data.
 
 const GF_EXP: number[] = [];
 const GF_LOG: number[] = new Array(256).fill(0);

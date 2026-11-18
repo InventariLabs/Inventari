@@ -163,9 +163,9 @@ export default function ReorderRulesPage() {
       id: rule.id,
       product: {
         product_template_id: rule.product_template_id,
-        // the API returns the product name; the form used to receive
-        // the template id in the field named `name`, and the first caller
-        // that displayed `form.product.name` in edit mode showed a UUID.
+        // the API returns the product name, and the form carries it in `name`,
+        // so the first caller that displays `form.product.name` in edit mode
+        // shows the product, not a UUID.
         name: rule.product_name,
         sku: null,
         barcode: null,

@@ -109,10 +109,9 @@ async def _get_correction_item_or_raise(
 ) -> Any:
     """Fetch the item a correction line targets, with a structured failure.
 
-    corrections used to fail with a raw ``Item <uuid> not
-       found`` sentence that reached the user verbatim. Raise a structured
-       ``CORRECTION_ITEM_MISSING`` error carrying the product name instead, so
-       the client can render a translated message and the user knows the way out.
+    A missing item raises a structured ``CORRECTION_ITEM_MISSING`` error that
+    carries the product name, so the client can render a translated message and
+    the user knows the way out.
     """
     assert line.item_id is not None
     # Under its row lock from the first read: the correction writes this
@@ -222,12 +221,10 @@ async def _require_stock_at(
     """Refuse the line unless the shelf holds what it takes off it.
 
     Confirmation reserves against the group the records' view sums per
-    (template, location); execution used to check ``Item.quantity``, which is
-    one record's share of that same figure, split across however many
-    records stand there. One product on one shelf in two records — two batches,
-    or two deliveries that arrived apart — made the two numbers differ every
-    time, so a document could pass confirmation and then break on its last
-    step quoting a figure matching neither the shelf nor the reservation.
+    (template, location), and the check at execution sums that same group.
+    ``Item.quantity`` is one record's share of it, so checking one record would
+    disagree with the reservation whenever a product sits in two records on one
+    shelf: two batches, or two deliveries that arrived apart.
     """
     if template_id is not None and location_id is not None:
         on_hand = await _ledger_quantity_at(
@@ -456,7 +453,7 @@ async def _adopt_card_async(
     (*unit_confirmed_over_template*, riding the completion payload). The
     refusal reaches that screen as a structured ``RECORD_UNIT_MISMATCH``
     naming the record and both units — the shape a client needs to ask the
-    operator the question the bind used to have nobody to ask.
+    operator the question the bind cannot answer on its own.
 
     Returns the adopted card's id, or None when *item* is None. Binding the
     card is all this helper does: the stock such a record holds never reached
@@ -505,21 +502,17 @@ async def _post_opening_balance_async(
     """Put the stock a record already holds into the ledger it just joined.
 
     A record that predates its card keeps its stock nowhere but on itself —
-    no movement, no cost layer — and adoption used to leave it there while
-    the door went on moving it as if the register knew: the goods left the
-    record, the shelf read empty, and from that moment the pair *(card,
-    location)* said two different numbers about the same tray. The next
-    dispatch of the same record came back refused by a shelf whose card was,
-    at that moment, showing the remaining quantity, and the reconciliation
-    report named a drift nobody had caused.
+    no movement, no cost layer. Adoption puts that stock into the ledger, so the
+    door moves it the way the register knows it: the goods leave the record,
+    and the pair *(card, location)* states one number for the same tray.
 
     Joining the ledger means saying what the record holds: a movement
     marked ``opening_balance`` at its own location, which the second pair of
     that report traces the shelf back to, and the cost layer its third pair
     measures the shelf against. What an opening writes is the Core's
     rule, the one its own edit and quantity paths take
-    (``core_api.items.post_opening_balance_async``); this door used to keep
-    a copy of it, and every change to the rule had to find both. What is
+    (``core_api.items.post_opening_balance_async``); this door calls it and keeps
+    no copy of its own. What is
     left here is the door's own part: which shelf, and how much. The door's
     own movement is what says the goods left; the opening only says what
     stood there before it.

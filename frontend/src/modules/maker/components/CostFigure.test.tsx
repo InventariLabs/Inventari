@@ -119,8 +119,8 @@ describe("CostFigure", () => {
   it("names no description when nothing is missing and the note renders null", () => {
     // A recipe without ingredients: no value and nothing unpriced. The
     // caller's note renders null, so a describedby here would point at an
-    // element that is not in the page — the dangling reference the title
-    // used to be, one level down.
+    // element that is not in the page — the dangling reference that a title
+    // would be, one level down.
     render(
       <CostFigure
         value={null}

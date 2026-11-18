@@ -117,7 +117,7 @@ class TestTheExpiringWindowIsOneWindow:
         async_test_storage_location,
         async_test_category,
     ) -> None:
-        """The case the storage summary used to answer differently."""
+        """The storage summary answers this case the same way as the expiring window."""
         db = real_async_db_session
         today = await expiry_today_async(db, async_test_household.id)
         db.add(

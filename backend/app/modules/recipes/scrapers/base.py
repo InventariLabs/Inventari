@@ -27,5 +27,5 @@ class ScrapedRecipe:
     # (e.g. Jina+LLM path) so we skip the post-scraping translation step.
     translated: bool = False
     # BCP-47 language code detected from the source page (e.g. 'fr', 'de').
-    # None means unknown. Used to skip translation when already in target lang.
+    # None means unknown. Translation is skipped when already in target lang.
     source_language: str | None = None

@@ -3,9 +3,9 @@ import { apiErrorStatus } from "@/lib/errors";
 /**
  * Which sentence a failed sign-in deserves.
  *
- * The login form used to answer every failure with "invalid email or
- * password": a rate-limited reader changed a password that was correct, and
- * a reader with no connection did the same. The status separates the four
+ * The login form does not answer every failure with "invalid email or
+ * password": a rate-limited reader would change a password that is correct,
+ * and a reader with no connection would do the same. The status separates the four
  * cases the reader can act on differently.
  */
 export function loginFailureKey(error: unknown): string {

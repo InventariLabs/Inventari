@@ -3,8 +3,8 @@ import { persist } from "zustand/middleware";
 
 /**
  * What the user chose. "system" defers to `prefers-color-scheme`, which is the
- * default: a visitor whose desktop is dark used to be handed a light interface
- * on the first visit, with no way to say "follow my system" afterwards.
+ * default: a visitor whose desktop is dark gets a dark interface on the first
+ * visit, and can always say "follow my system" afterwards.
  */
 export type ThemeMode = "light" | "dark" | "system";
 
@@ -74,8 +74,8 @@ export const useThemeStore = create<ThemeState>()(
       },
       onRehydrateStorage: () => (_state, error) => {
         // persist hands a failed hydration to this callback's `error`
-        // argument — the old code read only `state`, so a broken storage or a
-        // thrown rehydration vanished without a trace. Say it out loud.
+        // argument, which is reported: a broken storage or a
+        // thrown rehydration is not left to vanish without a trace.
         if (error) {
           console.error("[themeStore] theme rehydration failed:", error);
         }

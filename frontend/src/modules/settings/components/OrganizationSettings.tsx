@@ -216,9 +216,9 @@ function OrganizationCard({
           </div>
 
           <div className="space-y-1.5">
-            {/* One currency list for the whole application — this screen
-                used to offer ten while the first-run screen offered four
-                and the purchase-order forms offered twenty-nine. */}
+            {/* One currency list for the whole application, so this screen,
+                the first-run screen and the purchase-order forms offer the
+                same choices. */}
             <NativeSelect
               label={t("settings.organization.currency", {
                 defaultValue: "Currency",

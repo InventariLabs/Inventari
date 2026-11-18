@@ -186,9 +186,9 @@ def _sheet_status(row: Any, column: str | None) -> str | None:
     for the status gate to refuse by name.
 
     A blank cell, or no status column, is ``None``: the sheet says nothing
-    about the status. It used to read as Available, so an update-mode import
-    without the column took every matched asset out of maintenance; a new
-    asset still arrives Available, seeded by the item interceptor.
+    about the status, so an update-mode import without the column leaves every
+    matched asset where it is. A new asset still arrives Available, seeded by
+    the item interceptor.
     """
     text = row_text(row, column)
     if not text:
@@ -199,11 +199,11 @@ def _sheet_status(row: Any, column: str | None) -> str | None:
 def _sheet_date(row: Any, column: str | None) -> str | None:
     """A date column as a date, or a refusal naming the cell.
 
-    The two date columns used to travel into ``meta_data`` as whatever text
-    the sheet held, so "kiedys w maju" ended up in a field the rest of the
-    module reads as a date — and the warranty column then printed "—", which
-    is also what an asset with no warranty prints. A row the importer cannot
-    read is a failed row, not a silent one.
+    A date column is stored as a date or refused. Text such as "kiedys w maju"
+    would otherwise land in a field the rest of the module reads as a date, and
+    the warranty column would print "—", which is also what an asset with no
+    warranty prints. A row the importer cannot read is a failed row, not a
+    silent one.
     """
     text = row_text(row, column)
     if not text:
@@ -219,9 +219,9 @@ def _sheet_date(row: Any, column: str | None) -> str | None:
 def _sheet_price(row: Any, column: str | None) -> Decimal | None:
     """A price column as a number, or a refusal naming the cell.
 
-    "ABC" used to be swallowed by an ``except InvalidOperation: pass`` and
-    the row counted as imported, so the asset arrived with no price and
-    nobody was told which cell was dropped.
+    A value that does not parse is refused with its cell named. It must not be
+    swallowed, or the row would count as imported with no price and nobody
+    would be told which cell was dropped.
     """
     text = row_text(row, column)
     if not text:

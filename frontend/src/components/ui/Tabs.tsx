@@ -83,10 +83,10 @@ const TabsList = React.forwardRef<
     ref={ref}
     className={cn(
       // The bar is as tall as the tabs it holds, plus its own padding, at
-      // every width. It used to be pinned to 40px above `md:`, which leaves
-      // 28px between the paddings — the height of a `size="sm"` tab exactly,
-      // and 12px short of a default one. The oversized tab filled the padding
-      // it was supposed to sit inside, and the ring that marks it active is
+      // every width. Pinning it to 40px above `md:` would leave 28px between
+      // the paddings — the height of a `size="sm"` tab exactly, and 12px short of
+      // a default one. An oversized tab overfills the padding it sits inside, and
+      // the ring that marks it active is
       // drawn just outside its box, so the top and bottom of that ring fell
       // outside the scrollport and were clipped away. Sides survived, because
       // sideways there was room.

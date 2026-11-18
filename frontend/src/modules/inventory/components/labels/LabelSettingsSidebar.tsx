@@ -8,8 +8,8 @@ import type { PrintSettings } from "./LabelPreviewModal";
 /**
  * Sizes worth offering, by what the label is going to carry.
  *
- * Every preset used to be wider than it was tall — right for a label that
- * carries a sentence, wrong for one that carries a square. A QR alone on a
+ * The wide presets suit a label that carries a sentence; they are wrong for one
+ * that carries a square. A QR alone on a
  * 50 x 24 die-cut label leaves three fifths of it blank, and on a sheet
  * there is nothing to trim: the label is the size of the die, so the only
  * lever is which die.
@@ -19,10 +19,9 @@ import type { PrintSettings } from "./LabelPreviewModal";
  * decides the shape is the description, not the code.
  *
  * A preset carries the word and the two numbers separately, and the button
- * joins them. The seven names used to be English sentences with the size
- * baked in ("Narrow (50x12)"), read aloud in every language by a reader who
- * could see the numbers but not the word; the word is a catalogue key now
- * and the numbers are the same ones the fields below accept.
+ * joins them. The names are catalogue keys, so each language translates the word
+ * on its own and the size is never baked into a translation. The numbers are
+ * the same ones the fields below accept.
  */
 const WIDE_PRESETS = [
   { word: "previewModal.preset.standard", width: 50, height: 24 },
@@ -54,18 +53,13 @@ const labelPresetName = (
 /**
  * What goes on the label besides the QR — one question, four answers.
  *
- * It used to be two independent switches, "QR code only (no text)" and
- * "Also print the code", and between them the word "code" meant two
- * different things: the square in the first, the string STM-K9XP in the
- * second. They also described one choice badly. Three of the four
- * arrangements were reachable and the fourth — the short code with no
- * caption — was not expressible at all, because "QR only" was read as
- * "no text" rather than "no caption".
+ * One radio group, because the word "code" has to mean one thing: the square,
+ * or the string STM-K9XP beside it. Each arrangement is named as a whole,
+ * including the short code with no caption.
  *
- * As a radio group the whole choice is visible whichever answer is
- * current, and nothing appears or disappears under the pointer: the
- * conditional row used to collapse the panel and move every control below
- * it while somebody was reaching for one.
+ * The whole choice is visible whichever answer is current, and nothing appears
+ * or disappears under the pointer: a conditional row would collapse the panel
+ * and move every control below it while somebody reaches for one.
  */
 type LabelContent =
   "description" | "descriptionAndCode" | "codeOnly" | "qrOnly";
@@ -161,10 +155,9 @@ export function LabelSettingsSidebar({
           <p className="block text-[10px] font-medium text-on-muted uppercase tracking-widest">
             {t("previewModal.globalSettings", { ns: "labels" })}
           </p>
-          {/* Plain fields. These used to carry a filled inset background and
-              no visible border of their own, which is what a disabled field
-              looks like everywhere else in the app — and the label sat in a
-              loose <span>, so nothing named the input for a reader. */}
+          {/* Plain fields: a filled inset background reads as a disabled field
+              everywhere else in the app, so these carry none, and each label
+              names its input for a reader. */}
           <Input
             label={t("previewModal.labelDescription", { ns: "labels" })}
             type="text"

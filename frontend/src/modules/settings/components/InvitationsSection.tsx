@@ -31,11 +31,9 @@ const inviteLink = (code: string) =>
 /**
  * Invitations: who is being asked in, as what, and whether they arrived.
  *
- * The screen used to ask for a role and nothing else, hand back a link, and
- * show it in a panel that a page refresh took away. The list it kept was a
- * column of the word "User" with a status pushed to the far side of the
- * viewport — it could not name the invitee because the invitation had no
- * recipient to name.
+ * The invitation records who is asked in and as what, so the list names the
+ * invitee and shows whether they arrived, rather than a column of the word
+ * "User" with a status at the far side of the viewport.
  */
 export default function InvitationsSection() {
   const { t } = useTranslation("common");

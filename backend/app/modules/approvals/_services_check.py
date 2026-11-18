@@ -56,9 +56,9 @@ async def check_and_block(
     Switched off means stood down (``docs/purpose/approvals.md``): when the
     module is not enabled for the organization, this is a no-op and the
     operation that would have waited simply proceeds. A document parked in
-    PENDING_APPROVAL used to stay un-postable, unreadable and un-withdrawable
-    with the module off — the refusal even told the reader to request an
-    approval, which a disabled module makes impossible.
+    PENDING_APPROVAL is not held back by a disabled module: it stays postable,
+    readable and withdrawable, and no refusal tells the reader to request an
+    approval that a disabled module cannot raise.
     """
     if not await core_api.organizations.is_module_enabled_async(
         db, org_id, 'approvals'

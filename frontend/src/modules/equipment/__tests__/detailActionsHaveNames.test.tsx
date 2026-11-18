@@ -64,7 +64,7 @@ describe("icon controls on the asset detail header", () => {
       name: "Cannot retire — return the asset first",
     });
     expect(blocked).toBeDisabled();
-    // The reason used to live in `title` alone, which a finger never sees.
+    // The reason is visible text, not `title` alone, which a finger never sees.
     expect(
       screen.getByText("Cannot retire — return the asset first"),
     ).toBeInTheDocument();

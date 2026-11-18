@@ -87,9 +87,8 @@ export function MaintenanceLogModal({
     }
   }, [timezone]);
 
-  // Save used to be disabled until all three required answers were in, and
-  // said nothing about which one was missing — no toast, no text at the field,
-  // no `aria-invalid`. The button is live now and answers on press.
+  // The button stays live and answers on press: a missing answer is named by a
+  // toast, text at the field and `aria-invalid`.
   // A repair filed today on an asset that is still available leaves it
   // offered for hand-out; the status change was a separate step nobody was
   // told to take. Offer it here, on by default, and only when the repair is

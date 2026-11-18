@@ -177,8 +177,8 @@ describe("RecipeAvailabilityChecker — shopping list toast", () => {
         onServingsChange={vi.fn()}
       />,
     );
-    // One egg is not seasoning: the card used to fold every countable
-    // ingredient at one or less into the collapsed spices section.
+    // One egg is not seasoning: the card folds only the amounts that read as
+    // seasoning into the collapsed spices section, never a countable ingredient.
     expect(screen.getByText("Egg")).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /seasonings/i }),
@@ -695,8 +695,8 @@ describe("RecipeAvailabilityChecker — shopping list toast", () => {
   });
 
   it("hides the shopping-list action from a reader", () => {
-    // The button writes through `recipes:write`; it used to be offered to
-    // every reader on an installation that has the module.
+    // The button writes through `recipes:write`, so it is offered only to a
+    // reader who holds it, on an installation that has the module.
     signOut();
     render(
       <RecipeAvailabilityChecker

@@ -29,9 +29,8 @@ function renderDialog() {
 
 describe("CopyKeyDialog", () => {
   it("does not close on Escape", () => {
-    // The key is shown once and cannot be recovered. A reflex Escape — the one
-    // that closed the previous modal — used to destroy the credential with no
-    // warning and no undo.
+    // The key is shown once and cannot be recovered. A reflex Escape must not
+    // destroy the credential with no warning and no undo.
     const onClose = renderDialog();
 
     fireEvent.keyDown(document, { key: "Escape" });

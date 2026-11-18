@@ -10,11 +10,10 @@ import * as modulesCtx from "@/contexts/ModulesContext";
 import { onePage } from "@/test/mocks/page";
 
 /**
- * A community module whose frontend never installed used to draw an ordinary
- * card: activate it and it reported ✓ ENABLED while existing in no launcher,
- * no navigation and under no route. The registry knew — it records whether the
- * screens landed — and the store had three badge patterns already built for
- * telling somebody what a module is missing.
+ * A community module whose frontend never installed must not read as an
+ * ordinary card. It exists in no launcher, no navigation and under no route,
+ * and the registry records whether the screens landed; the store has three
+ * badge patterns for telling somebody what a module is missing.
  */
 
 const mockAuthState = {

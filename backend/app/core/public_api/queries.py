@@ -266,7 +266,7 @@ class CoreQueriesAPI:
     ) -> dict[UUID, str]:
         """The display name of each partner these ids name, asked in one read.
 
-        A list that prints a name beside a stored partner id used to have
+        A list that prints a name beside a stored partner id has
         two bad answers: fetch each partner on its own, an N+1 over the
         page, or take the whole partner list and filter it. This reads
         only the ids the reader shows, deactivated partners included —

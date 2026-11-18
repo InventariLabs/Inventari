@@ -120,9 +120,8 @@ class TestPlaceholdersEndpoint:
         """A template author copies a built-in layout and looks its parts up.
 
         Every shipped layout is written in terms of `document` — the number,
-        the dates, the loop over the lines — and `document` used to be
-        excluded from the catalogue as internal. So the list described one
-        dialect and the file being copied was written in another.
+        the dates, the loop over the lines — and `document` is listed in the catalogue,
+        so the list speaks the same dialect as the file being copied.
         """
         resp = client.get(
             '/api/v1/warehouse/templates/placeholders',
@@ -136,9 +135,9 @@ class TestPlaceholdersEndpoint:
 
     def test_no_example_is_the_repr_of_a_python_object(self) -> None:
         """The help is for a template author, not for someone debugging the
-        service: ``{{document.lines}}`` used to show
-        ``[<...DocumentLine object at 0x7be5...>]`` — a module path and a
-        memory address where the other placeholders show a readable value.
+        service: ``{{document.lines}}`` shows a readable value, never a repr such as
+        ``[<...DocumentLine object at 0x7be5...>]`` — a module path and a memory
+        address.
         Fails without the fix on every list-valued entry."""
         catalog = {entry.key: entry.example for entry in _build_placeholders_catalog()}
 
@@ -216,7 +215,7 @@ class TestTemplatePreviewEndpoint:
     ) -> None:
         """PL PZ is a Polish form: its own wording is Polish whatever the
         editor's language, so the header it includes must be Polish too —
-        the preview used to put "Goods Receipt Note" above "DOSTAWCA"."""
+        the preview must not put "Goods Receipt Note" above "DOSTAWCA"."""
         from pathlib import Path
 
         templates_dir = Path(__file__).resolve().parents[2] / 'templates'

@@ -1,9 +1,9 @@
 """The export covers what the list shows, and says what comes back.
 
-The Export button stands under "Showing 1–50 of 102" and used to produce a
-sheet of the whole organization — module records the list hides on
-purpose, consumed stock in a virtual location. It also left the serial
-number out and said nothing about which of its columns the import reads.
+The Export button stands under "Showing 1–50 of 102" and produces a sheet of
+what the list shows: module records the list hides on purpose and consumed
+stock in a virtual location stay out of it. The sheet carries the serial
+number, and its Read me says which of its columns the import reads.
 """
 
 import io
@@ -78,7 +78,7 @@ class TestTheExportSaysWhatComesBack:
     async def test_the_read_me_promises_only_what_the_import_does(
         self, real_async_db_session: AsyncSession, async_test_user, async_test_item
     ):
-        # The note used to promise that nothing is refused — measured in the
+        # The note must not promise that nothing is refused. Measured in the
         # app, a row whose serial number matches is refused (the serial is
         # not a matching key; uniqueness refuses it), and so is a barcode
         # worn by a live record of a different product. A Read me that

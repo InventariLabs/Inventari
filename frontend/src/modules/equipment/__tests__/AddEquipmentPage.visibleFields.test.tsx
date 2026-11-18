@@ -5,8 +5,8 @@ import type { FieldDefinition } from "@/types";
 describe("filterVisibleFields", () => {
   it("drops definitions without a type (category_id leak)", () => {
     // The persisted `category_id` visibility flag has no `type` and no
-    // `label`; it used to render as an unlabelled text input in the top
-    // left of the category card.
+    // `label`; without this filter it would render as an unlabelled text
+    // input in the top left of the category card.
     const fields = [
       { key: "category_id", visible: true },
       {

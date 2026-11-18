@@ -27,7 +27,7 @@ import es from "../i18n/es.json";
  *
  * Branches carrying a single code are out of scope on purpose: "OTHER" is an
  * escape hatch several different enums share (correction reasons, return
- * reasons), and naming it once per enum is not a duplicate of this set.
+ * reasons), and naming it in each enum is not a duplicate of this set.
  */
 const DISCREPANCY_CODES = [
   "SHORTAGE",

@@ -1,15 +1,11 @@
 """A second delivery of a catalogued product tops up the record it already has.
 
-Completing a receipt used to call ``items.create`` for every line whose
-product was named by template or barcode, without ever asking whether that
-product was already on the shelf. The two halves of the consequence:
-
-- **template with a barcode** — the second receipt broke
-  ``uq_items_org_barcode_active`` and the endpoint answered 500.
-- **template without one** — nothing stopped it, so the catalogue grew a
-  second row and the stock of one product was split across two records.
-
-Either way a catalogued product could be received exactly once. These tests
+Completing a receipt for a line named by template or barcode first asks whether
+that product is already on the shelf, and tops up its record if it is. Otherwise
+a template with a barcode breaks ``uq_items_org_barcode_active`` on the second
+receipt and answers 500, and a template without one splits the stock of one
+product across two catalogue rows. A catalogued product is received on every
+delivery. These tests
 pin the fix: the line resolves to the existing record first, and the receipt
 follows the same path as a line that named an item outright.
 """
@@ -232,10 +228,9 @@ class TestReceiptTopsUpExistingStock:
     ) -> None:
         """A putaway rule moves the goods, and the record goes with them.
 
-        The rule used to steer the stock alone: the delivery raised a quant on
-        the shelf the rule named while the record it topped up went on
-        standing where it had been, and the document named a third place. The
-        record and the ledger's movement now answer with one shelf, and the
+        The rule steers the record and the stock together: the delivery raises a quant
+        on the shelf the rule names, and the record it tops up goes there too.
+        The record and the ledger's movement answer with one shelf, and the
         line says which one it was.
         """
         from app.models.stock_move import StockMove

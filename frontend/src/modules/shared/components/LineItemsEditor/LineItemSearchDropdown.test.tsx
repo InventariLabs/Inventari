@@ -262,7 +262,7 @@ describe("LineItemSearchDropdown — the overlay stack can see the panel", () =>
   });
 
   it("stays closed until there is a result or a search worth reporting", () => {
-    // Focusing an empty product field used to open the panel with "no
+    // Focusing an empty product field must not open the panel with "no
     // results" printed before anything had been searched.
     render(
       <LineItemSearchDropdown
@@ -376,8 +376,8 @@ describe("LineItemSearchDropdown — merged rows", () => {
 
 describe("LineItemSearchDropdown — same-named catalogue products", () => {
   it("tells them apart once their generated SKUs are hidden", () => {
-    // Catalogue hits carry no record id. Two products named alike used to
-    // differ by the STM- code the server minted; with that code hidden the
+    // Catalogue hits carry no record id. Two products named alike differ by
+    // the STM- code the server mints; with that code hidden the
     // two options read the same and a line could land on the wrong one.
     renderList([
       stockHit({

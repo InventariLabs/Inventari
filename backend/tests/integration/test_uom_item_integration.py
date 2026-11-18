@@ -67,8 +67,8 @@ class TestUomItemIntegration:
     ):
         """An empty record keeps its card's unit; one holding stock may not move.
 
-        This used to assert only the first half, on a record holding a
-        kilogram — so it asserted that "1 kg" could silently become "1 g".
+        This asserts both halves: on a record holding a kilogram, "1 kg" must not
+        silently become "1 g".
         """
         kg = (
             await real_async_db_session.scalars(select(Uom).where(Uom.symbol == 'kg'))

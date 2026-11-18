@@ -178,7 +178,7 @@ describe("StorageDetailPane — a virtual location", () => {
       usage: "customer",
     } as StorageLocation);
 
-    // The badge beside "Consumed (Virtual)" used to read "Customer".
+    // The badge beside "Consumed (Virtual)" never reads "Customer".
     expect(screen.queryByText("Customer")).not.toBeInTheDocument();
     expect(screen.getAllByText("Consumed").length).toBeGreaterThan(0);
   });

@@ -432,7 +432,7 @@ describe("DocumentDetailPage", () => {
 
   it("shows no card around an approvals slot that has nothing to say", async () => {
     // A confirmed document with no request: the approvals module renders
-    // nothing, and the frame used to stand there empty.
+    // nothing, and the frame must not stand there empty.
     vi.mocked(documentHooks.useDocument).mockReturnValue({
       data: buildDocument({ status: "CONFIRMED" }),
       isLoading: false,
@@ -528,9 +528,9 @@ describe("DocumentDetailPage", () => {
     // The rejection left a draft; the reader edited it, brought the value
     // under the threshold and confirmed again — no approval was needed, so
     // the header now says CONFIRMED while the only request on the document
-    // is still the rejected one. The banner and the panel used to restate
-    // it anyway: two statuses at once, and an "edit and re-submit" offered
-    // on a document that is already confirmed.
+    // is still the rejected one. The banner and the panel do not restate it, so
+    // one status shows at a time and no "edit and re-submit" is offered on a
+    // document that is already confirmed.
     vi.mocked(documentApprovalHooks.useDocumentApproval).mockReturnValue({
       data: rejectedRequest(),
     } as unknown as ReturnType<
@@ -633,9 +633,8 @@ describe("DocumentDetailPage", () => {
   });
 
   it("says on the page how far an open scanning session got, and offers to continue or discard it", async () => {
-    // The session a closed sheet left behind used to be named only in the
-    // refusal at the last click — by then the reader had already filled in
-    // a form over it.
+    // The session a closed sheet left behind is named up front, not only in the
+    // refusal at the last click, by which time the reader has filled in a form over it.
     vi.mocked(scanSessionHooks.useDocumentScanSession).mockReturnValue({
       data: {
         kind: "receiving",
@@ -674,9 +673,8 @@ describe("DocumentDetailPage", () => {
   ] as const)(
     "names a finished %s scan that booked nothing, and completes the document in one step",
     async (kind, type) => {
-      // Leaving the summary by the back arrow or a closed tab used to leave
-      // every line done and nothing booked, with nothing on the page to say
-      // so or to finish it from.
+      // Leaving the summary by the back arrow or a closed tab leaves every line done
+      // and nothing booked, so the page says so and offers a way to finish it.
       vi.mocked(scanSessionHooks.useDocumentScanSession).mockReturnValue({
         data: {
           kind,

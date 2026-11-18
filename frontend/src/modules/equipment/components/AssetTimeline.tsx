@@ -69,7 +69,7 @@ function statusLabel(t: TimelineT, value: string | null | undefined): string {
 
 /**
  * What the holder answered an attestation with, on the asset itself: the
- * report used to stay on the campaign's response alone.
+ * report also reaches the asset, not only the campaign's response.
  */
 function disputedEntry(event: AssetTimelineEvent, t: TimelineT) {
   const typeKey = event.condition ? DISPUTE_TYPE_KEYS[event.condition] : null;
@@ -86,7 +86,7 @@ function disputedEntry(event: AssetTimelineEvent, t: TimelineT) {
 
 /** The return card's title: a person's return names the holder, a
  * deployment's names the place it left. A return read as "who the asset
- * was with" used to claim the holder carried it back even when an
+ * was with" never claims the holder carried it back when an
  * administrator checked it off for them — the entry says which of the two
  * happened. */
 function checkinTitle(event: AssetTimelineEvent, t: TimelineT): string {

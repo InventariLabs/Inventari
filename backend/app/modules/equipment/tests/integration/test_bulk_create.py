@@ -178,11 +178,10 @@ class TestBulkEquipmentCreate:
     ) -> None:
         """Storage from another org → no items created (per-row errors).
 
-        The storage pre-validation (moved from the dead bulk_service
-        copy into _bulk_service) rejects a location that does not belong to
-        the caller's org up front. Previously the request aborted with
-        NotFoundException from core_api.items.create_async; now it returns a
-        structured response with failed rows and created=0.
+        The storage pre-validation in _bulk_service rejects a location that does
+        not belong to the caller's org up front, and returns a structured
+        response with failed rows and created=0, rather than aborting with
+        NotFoundException from core_api.items.create_async.
         """
         payload = {
             'name': 'Asset',

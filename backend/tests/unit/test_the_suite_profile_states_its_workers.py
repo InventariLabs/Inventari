@@ -1,10 +1,9 @@
 """The suite profiler, held to the worker count its report states.
 
 ``scripts/profile_suite.py`` exists so that a timing claim carries the
-conditions it was measured under. It used to run pytest with ``-n auto`` —
-every core of the host, which the suite's own rule forbids on a shared
-machine — and then wrote the CPU count into the report as the worker count,
-and worker-time as wall x CPUs. Once the worker count is a choice, those two
+conditions it was measured under. It runs pytest with the worker count it is
+given, never ``-n auto``, and the report states that count as the worker count,
+and computes worker-time from it. Once the worker count is a choice, those two
 numbers have to follow the choice, or the report states a machine it did not
 run on.
 """

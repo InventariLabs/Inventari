@@ -393,8 +393,8 @@ describe("UnifiedFieldRenderer — Configure category fields link", () => {
   });
 
   it("names the category combobox with its visible label", () => {
-    // The renderer used to leave `htmlFor` off this one because the trigger
-    // named itself with `aria-label`. That `aria-label` is gone, so the id has
+    // The renderer sets `htmlFor` on this one, so the trigger takes its name from
+    // the visible label, not from an `aria-label`. The id has
     // to reach the trigger — a `<button>` is labelable, so `htmlFor` works.
     render(
       <UnifiedFieldRenderer
@@ -512,24 +512,20 @@ describe("a system field's label speaks the reader's language", () => {
 });
 
 /**
- * Measured against the code before `SelectField` existed, when `select` fell
- * through to the default text input: **2 of these failed, 21 other tests in
- * this file passed.**
- *
- * Red on the old code — these discriminate:
+ * A `select` field renders a picker, not the default text input. These tests
+ * discriminate against that fallback:
  *   - "renders the declared choices as a picker, not as free text" (the
  *     control was an INPUT)
  *   - "keeps a stored value the option list does not contain"
  *
- * Green on BOTH sides — recorded as such rather than left to read as proof:
+ * Green on both sides, by design — this one pins the onChange contract, not
+ * the fix:
  *   - "emits the option the reader picked"
- * `fireEvent.change` on a text input emits the same value a `<select>` does,
- * so that one pins the onChange contract, not the fix.
+ * `fireEvent.change` on a text input emits the same value a `<select>` does.
  *
- * "emits the unset shape when the reader clears an optional field" started as
- * this block's empty-choice test and expected `""` back then, which made it
- * green on both sides too. It expects `null` now — the shape the backend
- * accepts as a clear — and is red on the old control for that reason.
+ * "emits the unset shape when the reader clears an optional field" expects
+ * `null`, the shape the backend accepts as a clear, so it fails on a text
+ * control for that reason.
  */
 describe("a select field offers the choices it was given", () => {
   const originalLanguage = i18n.language;

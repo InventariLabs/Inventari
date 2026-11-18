@@ -209,9 +209,8 @@ describe("SearchableCombobox", () => {
 
   it("an empty list carries the create door even before anything is typed", () => {
     // An organization with zero partners opens the panel, reads "no
-    // partners found" — and used to find nothing but the header close:
-    // the create door asked for a typed query first, and nobody types
-    // into an empty register. The empty list is itself the reason to
+    // partners found" — and finds more than the header close: the create door
+    // needs no typed query, because nobody types into an empty register. The empty list is itself the reason to
     // offer the way out.
     const onCreateNew = vi.fn();
     render(

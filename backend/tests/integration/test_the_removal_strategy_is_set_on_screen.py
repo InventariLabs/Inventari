@@ -197,8 +197,8 @@ def test_a_shared_products_strategy_is_refused_rather_than_dropped(
     client, auth_headers, db_session: Session, test_storage_location
 ) -> None:
     # The product is every organization's, so this one cannot reorder its
-    # stock for all of them. The edit used to answer 200 and leave FIFO in
-    # place: the form said "Updated" and the dispatch kept drawing FIFO.
+    # stock for all of them. A refused edit leaves the strategy as it
+    # was, so no form says "Updated" while dispatch keeps drawing FIFO.
     shared = _shared_product(db_session, 'Shared yoghurt')
     item = _create_item(
         client,

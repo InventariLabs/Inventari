@@ -2,10 +2,10 @@
  * The batch "Assign to Person" dialog, against both registers a holder can
  * live in.
  *
- * It used to search the Partners register only — a colleague with an
- * account was answered with "add records in the Partners module" — and it
- * sent only a partner_id, so a batch-issued asset never carried the email
- * "My assets" matches on, and the person holding it could not see it.
+ * It searches the Partners register and the colleagues with an account, so a
+ * colleague is never answered with "add records in the Partners module". It
+ * carries the e-mail as well as the partner_id, so a batch-issued asset holds
+ * the email "My assets" matches on, and the person holding it can see it.
  */
 import { describe, expect, it, vi } from "vitest";
 import { http, HttpResponse } from "msw";
@@ -135,8 +135,8 @@ describe("BulkEditDialogs — assign to person", () => {
     const search = await screen.findByPlaceholderText(/search people/i);
     await user.type(search, "nobody");
 
-    // Nothing picked → nothing applied. The old dialog enabled its Apply
-    // only for partner picks and sent "" for everyone else.
+    // Nothing picked → nothing applied: an unpicked choice never sends ""
+    // to everyone.
     expect(onConfirm).not.toHaveBeenCalled();
     expect(screen.getByRole("button", { name: /apply/i })).toBeDisabled();
   });

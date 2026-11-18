@@ -219,7 +219,7 @@ def read_back(parsed: Any) -> dict[str, Any]:
     This does not decide the verdict. A model that answers in the agreed shape
     has satisfied the contract, which is what the verdict is about; whether it
     also read the picture is a second question the person choosing a model
-    needs answered, and until now the test gave the same green for both.
+    needs answered, and the test keeps the two answers apart.
     """
     fields = {}
     for field, expected in _EXPECTED.items():

@@ -264,9 +264,9 @@ def _apply_dated_filters(
     if needs_attention:
         # What the "needs attention" number counts, as one list: expired,
         # expiring inside the horizon, or a record of a product that reached
-        # its threshold. The tiles that show the number used to open the
-        # whole list, where the few it counted were nowhere marked; the
-        # three chips combine with AND, so none of them could answer an OR.
+        # its threshold. The tiles that show the number open the list
+        # filtered to what it counts; the
+        # three chips combine with AND, so none of them answers an OR.
         # The low-stock half is the count's own rule, module scoping and all.
         from app.services.items.expiry import (
             DEFAULT_EXPIRING_SOON_DAYS,
@@ -502,9 +502,8 @@ class ItemTotals:
     #: True when the ledger holds open cost layers for products this list
     #: has no record of. The footer clamps each product to what the list
     #: can see, so such a layer reaches the statistics tile and not this
-    #: sum — the second reason the two numbers differ, and the one that
-    #: used to be left unexplained while the module sentence implied it
-    #: accounted for the whole gap.
+    #: sum — the second reason the two numbers differ. The module sentence
+    #: would otherwise suggest it accounts for the whole gap.
     excludes_unlisted_layers: bool = False
 
 
@@ -556,7 +555,7 @@ def get_items_aggregates(
     product in the wider set is still priced at its own organization's
     rate. A receipt posted by document then moves the
     unfiltered footer by what the goods cost, freight included, and a
-    price corrected on a card does not; it used to be the other way round.
+    price corrected on a card does not.
     An organization without a ledger is valued from the price on each
     record — a figure that can follow a filter, because the price sits on
     the very rows the filter keeps — and ``value_source`` says which of

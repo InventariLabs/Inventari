@@ -1,11 +1,9 @@
 // Analytics / reporting types.
 //
 // These are aliases of the generated OpenAPI schemas, not copies of them.
-// The hand-written mirror that used to live here declared `total_spent` as a
-// required field of a response the backend never sent, and narrowed `trend`
-// to a union that omitted the value the backend actually returns — drift no
-// gate could see, because `make check-api-types` guards `api-generated.ts`
-// and nothing guarded this file. Aliasing puts it back under that gate.
+// A hand-written copy would drift from the backend unseen, because
+// `make check-api-types` guards `api-generated.ts` and nothing guards a
+// hand-written file. Aliasing keeps these types under that gate.
 
 import type { components } from "@/types/api-generated";
 

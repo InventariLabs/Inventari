@@ -3,10 +3,10 @@
 The lock discipline (ADR-020 and its siblings) keeps concurrent writes
 from colliding, but two paths that lock the same rows in opposite orders
 can still meet in the middle: Postgres kills one transaction with SQLSTATE
-40P01 and, before the retry guard existed, that answer went straight to
-the user. The tests below produce a real deadlock with two live sessions
-on the real database — advisory locks, taken in opposite orders, one on
-each side — and read what the request actually got.
+40P01, which without the retry guard goes straight to the user. The tests
+below produce a real deadlock with two live sessions on the real database —
+advisory locks, taken in opposite orders, one on each side — and read what
+the request actually got.
 
 The steps are coordinated on events, not sleeps: the endpoint says it
 holds the first lock, the antagonist says it holds the second, and only
@@ -21,8 +21,7 @@ probe walks into its second lock only after the database shows the
 antagonist already waiting for the first: were the probe first, a machine
 slow enough to keep the antagonist's request away for those milliseconds
 would find no cycle yet, and the deadlock would wait for the antagonist's
-minute instead — past the request's timeout, which is how a two-CPU CI
-runner failed this file.
+minute instead — past the request's timeout.
 
 The third test is the safety rule the whole mechanism stands on: a
 request that has already published an event (a bare ``emit``, before the
@@ -80,8 +79,9 @@ class _Choreography:
         both locks free.
         """
         async with factory() as session:
-            # Far above the probe's 20ms, so the probe stays the victim even
-            # when a loaded machine delays it by more than the server default.
+            # Far above the probe's 20ms and the server's one-second default,
+            # so the probe stays the victim however long a loaded machine
+            # delays it.
             await session.execute(text("SET LOCAL deadlock_timeout = '60s'"))
             await session.execute(text(f'SELECT pg_advisory_xact_lock({_LOCK_B})'))
             self.antagonist_holds_second.set()

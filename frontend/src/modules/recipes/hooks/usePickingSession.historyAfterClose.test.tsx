@@ -13,9 +13,9 @@ vi.mock("sonner", () => ({
 
 /**
  * The close is what writes a finished session into the recipe's cooking
- * history. The history used to be refreshed on the scan before it, so a panel
- * opened beforehand refetched while the session was still open and kept
- * reading "No completed cooking sessions yet" after the card said Completed.
+ * history. The history is refreshed on the close, not on the scan, so a panel
+ * opened beforehand does not refetch while the session is still open and keep
+ * reading "No completed cooking sessions yet" after the card says Completed.
  */
 
 const start = {

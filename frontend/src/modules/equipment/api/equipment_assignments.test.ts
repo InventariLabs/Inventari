@@ -8,7 +8,7 @@ describe("fetchProtocolHtml — a refusal through the text transport", () => {
   it("hands the backend's sentence to extractApiError", async () => {
     // With responseType "text" the refusal body arrives as an unparsed JSON
     // string, and extractApiError reads no detail out of a string — the
-    // sentence used to stop at this seam and the caller printed its canned
+    // sentence must not stop at this seam, or the caller prints its canned
     // line. The API parses the body once, where the transport is known.
     server.use(
       http.get("*/equipment/assignments/:assignmentId/protocol/html", () =>

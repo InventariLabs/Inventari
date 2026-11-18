@@ -611,7 +611,7 @@ describe("ItemEditModal — the order the product's stock leaves in", () => {
 
   it("shows a shared product's order without offering to change it", async () => {
     // The server keeps a catalogue product's order for every organization;
-    // the choice used to be offered, answered "Updated" and saved nothing.
+    // the choice is not offered: it would be answered "Updated" and save nothing.
     server.use(
       http.get("/api/v1/items/:id", () =>
         HttpResponse.json({
@@ -666,8 +666,8 @@ describe("ItemEditModal — the order the product's stock leaves in", () => {
 });
 
 /**
- * A viewer opens the product to read it. The sheet used to open as "Edit
- * product" with every field live and a Save that answered 403 after the work.
+ * A viewer opens the product to read it. The sheet must not open as "Edit
+ * product" with every field live and a Save that answers 403 after the work.
  */
 describe("ItemEditModal — a reader without items:write", () => {
   beforeEach(() => signInWith(["items:read"]));

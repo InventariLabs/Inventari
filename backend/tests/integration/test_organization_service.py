@@ -378,8 +378,8 @@ class TestJoinOrganization:
     ):
         """A successful join must mark the invitation is_used=True.
 
-        Previously is_used was never set, so a single 6-digit code could admit
-        unlimited users until its 15-minute expiry.
+        A join sets is_used, so a single 6-digit code cannot admit unlimited users
+        before its 15-minute expiry.
         """
         db = real_async_db_session
         code_result = await create_invitation_code(
@@ -442,9 +442,9 @@ class TestJoinOrganization:
         """The invitation names the role of an arrival — nobody arrives here.
 
         An administrator minting a `role=user` code for their own organization
-        and opening it used to be demoted by their own link: the role was
-        written unconditionally, and the sole-administrator guard only runs
-        when the organization changes.
+        and opening it leaves their role as it is: the role is written only for an
+        arrival, and the sole-administrator guard runs only when the organization
+        changes.
         """
         db = real_async_db_session
         assert async_test_user.role == 'admin'

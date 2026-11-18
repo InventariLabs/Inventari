@@ -159,10 +159,9 @@ class TestExpiryPredicate:
     ):
         """Which day it is belongs to the organization, and nobody else knows it.
 
-        The expiry predicates used to fall back to the server's ``date.today()``
-        when a caller passed no day, so a caller that forgot the
-        organization's clock cut the list on the server's and passed every
-        test run in UTC. Now there is nothing to fall back on.
+        The expiry predicates never fall back to the server's ``date.today()``: a
+        caller that passes no day has nothing to fall back on, so it cannot cut
+        the list on the server's date and pass every test run in UTC.
         """
         org_id = async_test_storage_location.organization_id
 

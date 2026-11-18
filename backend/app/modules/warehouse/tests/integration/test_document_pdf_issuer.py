@@ -251,8 +251,8 @@ class TestUserTemplatePrinting:
     """The organization's own template replaces the built-in family.
 
     The templates screen promises "copy a built-in to change the printout";
-    the promise used to be hollow — generate_pdf rendered only the
-    filesystem file and ``default_template_id`` was never read.
+    generate_pdf renders the organization's own template when
+    ``default_template_id`` names one, not only the filesystem file.
     """
 
     @staticmethod

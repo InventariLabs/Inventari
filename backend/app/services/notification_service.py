@@ -160,9 +160,9 @@ class NotificationService:
         The readers of a request for access, which belongs to no
         organization: its list, approval and refusal sit behind
         ``get_superuser``, so the superusers are who can act on it. This
-        used to ring for every ``role == 'admin'`` in every organization —
-        administrators told about a request they could neither open nor
-        decide, and about a person who had not asked them. An inactive
+        rings for superusers only, not for every ``role == 'admin'`` in every
+        organization: administrators would be told about a request they could
+        neither open nor decide, and about a person who had not asked them. An inactive
         account cannot sign in to decide anything, so it is not told
         either. ``exclude_user_id`` leaves out whoever made the act the notice
         reports: a decision is news to the other superusers, not to the one

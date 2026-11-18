@@ -38,8 +38,8 @@ export function MakerResultWidget() {
   const latest = months[0];
   // The service builds six buckets whether or not anything happened in them,
   // "including zero months for chart continuity" — so `months.length` is
-  // always six and the empty state it used to guard was unreachable. What
-  // makes a month empty is that no run closed in it.
+  // always six, so the length never decides the empty state. What makes a
+  // month empty is that no run closed in it.
   const hasResults = months.some((month) => month.orders > 0);
 
   const monthLabel = (month: string) => {

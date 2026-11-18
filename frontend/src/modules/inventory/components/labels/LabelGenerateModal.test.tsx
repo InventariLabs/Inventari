@@ -130,8 +130,8 @@ describe("LabelGenerateModal — label purpose", () => {
   });
 
   it("holds the number of labels at the 500 the server accepts", async () => {
-    // The input's max attribute is only a hint to the spinner arrows; typing
-    // 600 used to leave as a request and come back a 422.
+    // The input's max attribute is only a hint to the spinner arrows, so typing
+    // 600 is held here, before a request carries it to a 422.
     renderModal();
 
     const count = screen.getByLabelText("Number of labels (1–500)");

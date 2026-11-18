@@ -447,9 +447,9 @@ describe("CheckoutModal — to a location, and the return date", () => {
 
 /**
  * Under an approval workflow a checkout can be refused for want of an
- * approval. The dialog used to answer with a toast and nothing else: the
- * reader closed it, asked on the page, waited, and typed the holder again.
- * And the request carried no holder, so the approver decided blind.
+ * approval. The dialog asks for that approval itself, so the reader does not
+ * close it, ask on the page, wait, and type the holder again. The request
+ * carries the holder, so the approver decides with the holder in view.
  */
 describe("CheckoutModal — asking for the approval of this checkout", () => {
   let posted: Record<string, unknown> | null;
@@ -550,10 +550,9 @@ describe("CheckoutModal — asking for the approval of this checkout", () => {
 
 /**
  * A checkout the server refuses for a reason of its own (an address on a
- * reserved domain, say) used to be answered by a toast alone: it rises at the
- * edge of the screen, outside the dialog the reader is looking at, and is gone
- * in seconds — the fields stay filled, the button stays active, and the dialog
- * itself says nothing. The refusal belongs where the click was.
+ * reserved domain, say) is answered inside the dialog, where the click was. A
+ * toast alone rises at the edge of the screen, outside the dialog, and is gone
+ * in seconds, while the fields stay filled and the button stays active.
  */
 describe("CheckoutModal — a refusal is read in the dialog", () => {
   const refuse = () =>

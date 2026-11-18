@@ -45,8 +45,8 @@ describe("MobileModuleNav", () => {
   });
 
   /**
-   * The active item used to paint its label `text-primary-600`: on
-   * surface-card that measured 3.77:1 light / 3.95:1 dark — below AA at the
+   * The active item does not paint its label `text-primary-600`: on
+   * surface-card that color measures 3.77:1 light / 3.95:1 dark — below AA at the
    * bar's 10px, and unfixable centrally, because product profiles repaint
    * the whole primary ramp (UI_GUIDELINES §1.1). The desktop band already
    * carries "active" on weight alone for the same reason.

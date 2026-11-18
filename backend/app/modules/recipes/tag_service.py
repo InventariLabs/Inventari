@@ -50,8 +50,8 @@ async def list_tags(
 
     The filters mirror ``list_recipes``: a chip's count answers "how many
     recipes would this chip leave on the screen", not "how many this
-    organization owns". A collection showing zero recipes used to keep
-    counting the whole organization on its chips, so every click led to
+    organization owns". A collection showing zero recipes shows zero on its chips,
+    not the count for the whole organization, which would lead every click to
     the same empty list.
     """
     # One row per tag per recipe, so counting the rows counts the recipes
@@ -253,9 +253,9 @@ async def delete_tag(
 ) -> dict[str, Any]:
     """Remove *tag_name* from every recipe in the org, and drop its colour.
 
-    Tags are free text typed into a comma-separated field, so a typo used to
-    be permanent: the panel could merge one tag into another and colour it,
-    but never take one away.
+    Tags are free text typed into a comma-separated field, so a typo has to be
+    removable: the panel can merge one tag into another and colour it, and this
+    function takes one away.
 
     Returns { name, updated_recipes }.
     """

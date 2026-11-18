@@ -1,12 +1,9 @@
 """PO numbering respects the organization's ``number_padding``.
 
-The width used to be hardcoded ``:04d``, then read through an accessor of
-its own beside the document numbering engine. Orders now go through that
-engine, so the width is simply the one the profile states — and
-``DEFAULT_NUMBER_PADDING`` when there is no profile to state one. That
-default used to be a second opinion (four here, three in the preset every
-organization actually gets), which is how the first document of an
-organization came out shaped differently from every one after it.
+Orders go through the document numbering engine, so the width is the one the
+profile states, and ``DEFAULT_NUMBER_PADDING`` when there is no profile to
+state one. That default is the single source of the width, so the first
+document of an organization is shaped like every one after it.
 """
 
 from __future__ import annotations

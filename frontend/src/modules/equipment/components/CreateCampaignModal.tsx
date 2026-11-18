@@ -116,8 +116,8 @@ export function CreateCampaignModal({ onClose }: { onClose: () => void }) {
               {t("attestation.createTitle", "New attestation")}
             </DialogTitle>
             {/* What happens, not how it travels: true with mail and without.
-                It used to promise "Send an attestation request" above the
-                warning that nothing would be sent; the warning below says
+                It does not promise "Send an attestation request" above the
+                warning that nothing is sent; the warning below says
                 how the links reach people when there is no mail. */}
             <DialogDescription>
               {t(
@@ -127,10 +127,9 @@ export function CreateCampaignModal({ onClose }: { onClose: () => void }) {
             </DialogDescription>
           </DialogHeader>
 
-          {/* Every field is labelled by its own control (§2.10). Half of this
-              dialog used to hand-roll `<label>` beside the field in sentence
-              case while the other half let the control render its own in
-              caps — one form, two label styles, two label-to-field gaps. */}
+          {/* Every field is labelled by its own control (§2.10), never by a
+              `<label>` hand-rolled beside it: one form keeps one label style
+              and one label-to-field gap. */}
           <div className="space-y-3">
             <Input
               label={t("attestation.name", "Attestation name")}
@@ -223,7 +222,7 @@ export function CreateCampaignModal({ onClose }: { onClose: () => void }) {
 
             {/* A day, not a timestamp: the reminder scheduler counts whole
                 days and the e-mail prints the date alone, so the clock half of
-                the old `datetime-local` was never shown to anyone — while a
+                a `datetime-local` picker's clock is never shown to anyone — while a
                 picker left at 00:00 quietly expired the token as the deadline
                 day began. */}
             {/* The floor is the organization's today: a reader west of the

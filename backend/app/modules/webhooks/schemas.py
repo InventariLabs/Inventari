@@ -133,7 +133,7 @@ class WebhookEndpointResponse(BaseModel):
     #: refuse it today, so nothing it names can match an emission. The rows
     #: are not migrated (the stores carrying them are disposable), so the
     #: fact is reported instead — a subscription that died with its catalogue
-    #: entry used to be visible nowhere and the card looked healthy.
+    #: entry must not be invisible while the card looks healthy.
     events_unknown: bool = False
     created_at: datetime
     updated_at: datetime

@@ -59,9 +59,9 @@ export function MealPlanCell({
   // Drop zone highlight — only for valid targets (future/present cells).
   const highlightDrop = isOver && !locked;
 
-  // Twenty-one buttons in this grid, and they used to share one name: "Add a
-  // meal to this slot". Which slot is exactly what a reader who cannot see the
-  // grid needs to be told.
+  // Twenty-one buttons in this grid, each naming its own slot: "Add a meal to
+  // this slot" would be one name for all of them. Which slot is exactly what a
+  // reader who cannot see the grid needs to be told.
   const addLabel = t("recipes:meal_planner.add_to_slot_named", {
     slot: slotLabel,
     day: format(parseISO(date), "EEEE d MMM", { locale: dateFnsLocale() }),

@@ -895,12 +895,11 @@ def reservation_disagreements(session) -> list:
     records hold there, ``reserved_quantity`` is what the reservation rows
     of that group promise, summed per the grain they name. Both numbers sit
     in the view, so this reads the records and the rows; the quant table,
-    whose running total was the other opinion this command used to compare,
+    whose running total was the other opinion this command compares against,
     is gone.
 
-    Nothing here can report the old ``over`` any more: there is no cached
-    total left to stand higher than the rows. What is left is what the old
-    command called ``short`` — a shelf holding less than documents already
+    Nothing here reports ``over``: there is no cached total left to stand
+    higher than the rows. What is reported is ``short`` — a shelf holding less than documents already
     claim on it, including a promise with no record under it at all, which
     the view reports as quantity 0.
     """

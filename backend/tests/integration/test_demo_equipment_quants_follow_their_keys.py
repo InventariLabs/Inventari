@@ -1,17 +1,14 @@
 """The demo seeder puts each equipment record's stock where the record stands.
 
-``_create_equipment_items`` used to aggregate quantities into a dict keyed by
-(template, location) and write one StockQuant per key. The write named
-``loc`` — the loop variable leaked out of the item loop, the last location
-any item happened to land on — so every equipment quant landed in one place
-no matter what its key said, and the quant-uniqueness constraint turned that
-silent corruption into a loud UniqueViolation mid-seed.
+``_create_equipment_items`` aggregates quantities into a dict keyed by
+(template, location) and writes one StockQuant per key, at the location the key
+names, never at a loop variable left over from the item loop.
 
-The seed no longer writes quants itself, and the quant table is gone:
+The seed does not write quants itself, and the quant table does not exist:
 ``_open_the_shelves`` opens each record's stock through the core movement
 call, on the record's own shelf, and the shelf is what the records hold.
 The property this file guards is the same one — the stock sits where the
-records do — measured on the path that now writes it: the opening
+records do — measured on the path that writes it: the opening
 movements, and the records' view.
 """
 

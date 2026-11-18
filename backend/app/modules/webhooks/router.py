@@ -201,9 +201,8 @@ def _validate_url_or_422(url: str) -> None:
     """Refuse an unsafe target in the reader's language, with the reason.
 
     The guard knows *why* it said no (loopback, private range, a name that does
-    not resolve, a name that resolves into a private range). That reason used to
-    reach the screen as an English sentence — and, before that, did not reach it
-    at all, because the form swallowed the rejection.
+    not resolve, a name that resolves into a private range). That reason reaches the
+    screen as a translated sentence, and the form does not swallow the rejection.
 
     The operator's switch is read here, not only at delivery time. Saving used
     to refuse a private address whatever the setting said, so the switch turned

@@ -1,12 +1,10 @@
 """An upgrade whose migrations failed must not read as a completed one.
 
-The tracking entry used to be written before the module's migrations ran,
-so a failure — or a kill mid-flight — left the tracking saying v0.2.0 while
-the schema sat wherever the failure left it, on every surface an operator
-reads. The entry is now written only after the migrations succeed: until
-then it keeps naming the old version, the one the schema can actually
-answer for, and a retry of the same package walks the forward path — no
-flag to read, no force to pass, no hand-edited database to recover.
+The tracking entry is written only after the module's migrations succeed, so a
+failure — or a kill mid-flight — leaves the tracking on the old version, the one
+the schema can actually answer for, on every surface an operator reads. A retry
+of the same package walks the forward path — no flag to read, no force to pass,
+no hand-edited database to recover.
 """
 
 from __future__ import annotations

@@ -7,7 +7,7 @@ door disagreed with all of them — ``POST /items`` took a unit of its own and
 wrote it down without a word, so a record could contradict its own catalogue
 row and nothing anywhere said who decided that or why.
 
-The rule now: a unit that differs from the matched template's is a
+The rule: a unit that differs from the matched template's is a
 *deliberate* choice. It travels with an explicit confirmation
 (``unit_confirmed_over_template``), it is refused by name — both units, in the
 reader's language — when the confirmation is missing, and when it is given
@@ -101,10 +101,10 @@ class TestTheCreateDoorRefusesADifferenceNobodyConfirmed:
         auth_headers: dict[str, str],
         test_storage_location: StorageLocation,
     ) -> None:
-        """The silent case, on the door that used to accept it.
+        """The silent case, on the create door.
 
-        ``Rye flour`` is kept in kilograms. Asking for pieces used to answer
-        201 and write the record — no warning, no history, no trace of the
+        ``Rye flour`` is kept in kilograms. Asking for pieces must not answer
+        201 and write the record: no warning, no history, no trace of the
         decision anywhere but the row itself.
         """
         kg = _uom(db_session, 'kg')
@@ -416,13 +416,11 @@ SCAN_ASSIGN_URL = '/api/v1/labels/scan/{short_code}/assign'
 
 
 class TestTheScanDoorAnswersTheSameWay:
-    """The third door, and the one that used to keep its own opinion.
+    """The third door answers as the other two do.
 
-    The form refused a difference nobody confirmed; the scan built the row
-    straight from the request and let any unit land beside the template's.
-    The product form after a scan is the same form, so it asks the same
-    question — and the answer used to fall on the floor, because the scan's
-    own request model had no field to carry it.
+    The form refuses a difference nobody confirmed. The scan goes through the
+    same check, and its request model carries the answer to the question the
+    product form asks after a scan.
     """
 
     def _label(self, db: Session, org_id, user_id, short_code: str) -> LabelPool:
@@ -468,10 +466,10 @@ class TestTheScanDoorAnswersTheSameWay:
         test_user,
         test_storage_location: StorageLocation,
     ) -> None:
-        """The silent case, on the door that used to accept it.
+        """The silent case, on the scan door.
 
-        ``Rye flour`` is kept in kilograms. A scan naming pieces answered 200
-        and wrote the record — no warning, no history, no trace of the
+        ``Rye flour`` is kept in kilograms. A scan naming pieces must not answer
+        200 and write the record: no warning, no history, no trace of the
         decision anywhere but the row itself.
         """
         kg = _uom(db_session, 'kg')

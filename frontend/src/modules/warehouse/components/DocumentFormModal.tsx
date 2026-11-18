@@ -511,8 +511,8 @@ export default function DocumentFormModal({
   // when the inline partner-create popover is open, Esc/backdrop must
   // close the popover first — not discard the whole document form.
   //
-  // And Escape on a filled-in form used to throw away the partner, the
-  // locations and every line without a word, with no way back.
+  // Escape on a filled-in form asks before it throws away the partner, the
+  // locations and every line, since there is no way back.
   const handleSheetClose = useCallback(() => {
     if (partnerCreateOpen) {
       handlePartnerCreateCancel();

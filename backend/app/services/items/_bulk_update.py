@@ -183,9 +183,9 @@ async def bulk_update_items(
     if 'metadata' in update_dict:
         update_dict['meta_data'] = update_dict.pop('metadata')
     # The confirmation has no column to land in. It is spent on the unit
-    # guard below, as the single edit spends it; the batch used to set it on
-    # the record, where ``hasattr`` dropped it, so a unit the single edit
-    # takes on confirmation the batch refused whatever the caller said.
+    # guard below, as the single edit spends it; the batch does not set it on
+    # the record, where ``hasattr`` would drop it, so the batch takes a unit on
+    # the same confirmation as the single edit.
     confirmed_unit = _take_unit_confirmation(update_dict)
 
     if not update_dict:
@@ -274,11 +274,10 @@ async def _update_one_async(
 ) -> None:
     """One record of the batch, taken through the single edit's own steps.
 
-    The batch used to ``setattr`` every field ``hasattr`` let through, and
-    four fields of the schema are not the record's columns: the low-stock
-    threshold (a read-only property, so the request ended in a 500), the
-    unit weight, and a freeze date, which was dropped at 200. The single
-    edit routes each of them by name, and the batch now calls the same
+    The batch does not ``setattr`` every field ``hasattr`` lets through: four
+    fields of the schema are not the record's columns: the low-stock
+    threshold (a read-only property), the unit weight, and a freeze date. The
+    single edit routes each of them by name, and the batch calls the same
     helpers. They take the fields they route off *data*, which is this
     record's own copy of the payload.
     """
@@ -296,9 +295,9 @@ async def _update_one_async(
     _apply_field_updates(item, data)
     # The stock follows the record to its new shelf — the same call the
     # single move and the single edit make, so fifty records moved at once
-    # are the same operation as fifty moved one by one. It used to sit in the
-    # ``elif`` of the quantity change below, so a batch that changed both put
-    # the difference on the new shelf and never took anything off the old one.
+    # are the same operation as fifty moved one by one. It sits outside the
+    # ``elif`` of the quantity change below, so a batch that changes both takes
+    # the stock off the old shelf as well.
     if 'storage_location_id' in data:
         await carry_record_stock_async(
             db,
@@ -346,11 +345,11 @@ async def _trace_async(
 ) -> None:
     """The record's history and the organization journal, naming what moved.
 
-    Both used to be built from the payload, so a batch that posted a name
-    the record already had wrote two rows whose sides agreed, and a field
-    the record could not take was named as taken. They are built from what
-    the record, its card and its dates took, and not written at all when
-    that is nothing — the single edit skips its journal row the same way.
+    Both are built from what the record, its card and its dates took, not from
+    the payload: a batch that posts a name the record already has writes no
+    row for it, and a field the record cannot take is not named as taken.
+    Nothing is written when that is nothing — the single edit skips its
+    journal row the same way.
     """
     # The history keeps a record column in its own value, as the single
     # edit's does; what the record keeps elsewhere — the card's threshold, a
@@ -379,11 +378,9 @@ async def _trace_async(
         },
         user_id=user.id,
     )
-    # And the organization journal, which used to be skipped here with a
-    # comment saying so. Fifty items recategorised at once left the same
-    # trace as nothing having happened, while the same edit made one at a
-    # time was fully recorded — the journal is not supposed to depend on
-    # which button was pressed. The `bulk` flag is what tells the reader it
+    # And the organization journal. A batch leaves the same trace as fifty
+    # single edits: the journal is not supposed to depend on which button was
+    # pressed. The `bulk` flag is what tells the reader it
     # was one batch.
     if user.organization_id is None:
         return

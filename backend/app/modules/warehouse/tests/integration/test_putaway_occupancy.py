@@ -195,11 +195,9 @@ class TestPutawayOccupancy:
         """The numbers cross the wire as strings, the way every other
         decimal in this module does.
 
-        This endpoint used to be declared without a ``response_model``, so
-        it had no schema in OpenAPI at all: ``make check-api-types`` had
-        nothing to compare, and the frontend carried a hand-written
-        interface in place of a generated one. Adding the model closes that,
-        and this pins the one thing a generated type would otherwise be
+        This endpoint declares a ``response_model``, so OpenAPI carries its schema
+        and ``make check-api-types`` has a generated type to compare against.
+        This pins the one thing a generated type would otherwise be
         trusted for blindly.
 
         What it fails on: a model that types these fields ``float``, or a
@@ -340,8 +338,8 @@ class TestPutawayOccupancy:
         the shelf full. A third product stands there with no limit: it adds
         no share, and the cell says part of the shelf is unmeasured.
 
-        What it fails on: the cell used to speak for the fullest product
-        alone and read 50 where the planner — and the shelf — say 100.
+        What it fails on: a cell that speaks for the fullest product
+        alone reads 50 where the planner — and the shelf — say 100.
         """
         from app.core.testing import ModuleTestHelper
 

@@ -1,15 +1,13 @@
 """The putaway decision, spoken before the goods are booked.
 
-Where a receipt line will land used to be answerable only after execution —
-the executor picked the shelf while booking, and the reader found out through
-"landed elsewhere". Both the read-side preview and the executor now go through
-one planner (``ReceiptLocationPlanner``): the ranking lives once, rules load
-once per document (they used to reload per line), and a preview can never
+Where a receipt line will land is answerable before execution: the read-side
+preview and the executor both go through one planner (``ReceiptLocationPlanner``),
+so the ranking lives once, rules load once per document, and a preview cannot
 quietly diverge from what execution does, because there is no second copy.
 
 The plan is computed at read time, never stored: rules may change between
-opening a document and executing it, and a stored preview would lie exactly
-the way the old "landed elsewhere" did.
+opening a document and executing it, and a stored preview would go stale the
+moment a rule changed.
 """
 
 from __future__ import annotations

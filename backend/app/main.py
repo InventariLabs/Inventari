@@ -432,7 +432,7 @@ async def llm_provider_refusal_handler(request: Request, exc: LlmProviderRefusal
 
     A key the provider will not accept, a spent plan or balance, a model
     name it does not know — each is a setting an administrator can fix,
-    and each used to arrive as HTTP 500 "An internal error occurred"
+    and each would arrive as HTTP 500 "An internal error occurred"
     while the log knew it was 401. Here, rather than at every call site,
     for the same reason as the handler above: the same refusal can leave
     image recognition, the nutrition scanner, and recipe import, and the

@@ -11,18 +11,18 @@ import { cn } from "@/lib/utils";
 /**
  * The screen named by the route tree's `errorElement`.
  *
- * Every string here used to be an English literal — an h1, a sentence and a
- * way back — so the one moment the application owed the reader an explanation
- * was the one moment it stopped speaking their language. The three keys are
+ * Every string here comes from the catalogue — an h1, a sentence and a way
+ * back — so the one moment the application owes the reader an explanation is in
+ * their language. The three keys are
  * the ones the error boundary already uses for the same three jobs; a second
  * set of words for one situation is how two screens end up describing one
  * failure differently.
  *
  * The wiring is worth knowing while reading this: `errorElement` is armed
  * only by a *data* router, and the route tree in `App.tsx` mounts one — every
- * top-level route is handed this screen by `createAppRoutes`. It used to sit
- * on a declarative `<BrowserRouter>`, where the attribute was never armed and
- * a render error in a route went to the boundary in `main.tsx` instead.
+ * top-level route is handed this screen by `createAppRoutes`. Under a
+ * declarative `<BrowserRouter>` the attribute would never be armed, and a render
+ * error in a route would go to the boundary in `main.tsx` instead.
  */
 export default function ErrorPage() {
   const { t } = useTranslation("common");

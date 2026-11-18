@@ -58,9 +58,8 @@ def _fefo_sort_key(
     item: StockedItem, today: date
 ) -> tuple[bool, bool, date, bool, Decimal | int]:
     # First expiring, first out — among the goods still fit to use. Stock
-    # past its date used to lead the order, having the earliest date of all,
-    # so the chicken that went off on Monday was the pick while a fresh pack
-    # sat beside it. It goes last now: still listed, never first.
+    # past its date goes last: still listed, never first, so a chicken that
+    # went off on Monday is never the pick while a fresh pack sits beside it.
     #
     # On the same date an opened pack goes first: it keeps worse than a
     # sealed one, and the sealed bag beside it stays sealed. Then the larger
@@ -171,7 +170,7 @@ def _should_auto_skip(ingredient: RecipeIngredient, scaled_qty: float) -> bool:
     3. Heuristic: UOM is g/ml/mg and scaled qty <= 10
 
     Pieces are never folded away by their amount: one egg or one onion is a
-    main ingredient, not a seasoning, and the fold-out it used to land in
+    main ingredient, not a seasoning, and it never lands in the fold-out that
     says "Spices & small quantities". The recipe card draws the same line —
     only weight and volume amounts read as seasoning — so a piece the cook
     means as a spice is skipped through ``picking_skip``.

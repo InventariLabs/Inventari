@@ -1,9 +1,9 @@
 """A batch on hold is on hold whichever way you reach for it.
 
-The status filter used to live in one query — the removal-strategy pick.
-Reach for the same stock by naming the batch, or let a document reserve it
-at confirm, and nothing looked at the status at all. A rule enforced on one
-of two paths is not a rule: a quarantined batch could be dispatched by
+The status filter applies on every path to a batch: the removal-strategy pick,
+naming the batch, and the reservation a document takes at confirmation. A rule
+enforced on only one of those paths is not a rule: a quarantined batch could be
+dispatched by
 typing its number, and a confirmed document could hold stock that no
 dispatch is ever allowed to release.
 
@@ -320,12 +320,10 @@ def _create_release(
 class TestADeliberateDoorTakesAHeldBatchByName:
     """A write-off or a move of a held batch is confirmed, not refused.
 
-    Confirmation reserves, and the reservation used to plan over dispatchable
-    stock only, so a scrap naming a quarantined batch was refused as
-    "insufficient stock" while the whole batch stood on the shelf. The one
-    way to write it off was to release the batch for picking first. The
-    batch the door names is what it reserves, held or not, and it stays
-    held for that document until it leaves. A transfer carries its record
+    Confirmation reserves the batch the door names, held or not, and that batch
+    stays held for the document until it leaves. A scrap naming a quarantined batch
+    is confirmed while the whole batch stands on the shelf, with no release for
+    picking first. A transfer carries its record
     as itself, so the record's own batch is the one it names when the line
     names none.
     """

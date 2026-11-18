@@ -357,11 +357,8 @@ class TestReturnDocument:
     ) -> None:
         """A return stores no sentence for another language's reader to miss.
 
-        The server used to write one into the return's notes — first English
-        for every reader, then the creator's request language, so a return
-        created from an English session still read "Return for IN/…" under
-        Uwagi on a Polish screen and on the printout. The reference is
-        structured now: the response and the printout carry the id and
+        The reference is structured, not a sentence in the return's notes: the
+        response and the printout carry the id and
         number of the document the return reverses, in every language.
         """
         doc = self._create_and_complete_out(

@@ -91,8 +91,8 @@ class PutawayRule(CoreModelBase):
     location_type_code: Mapped[str | None] = synonym('storage_type_code')
 
     # The rule's shelves, in the order the resolver walks them. Lives on
-    # ``PutawayRuleLocation`` rows — an ordered list replaced the single
-    # target column, because the first shelf filling up used to be the end
+    # ``PutawayRuleLocation`` rows — an ordered list rather than one target
+    # column, because a first shelf filling up is not the end
     # of the conversation.
 
     # Tie-breaker within the same specificity tier

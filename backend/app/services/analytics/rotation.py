@@ -236,8 +236,8 @@ def _value_stmt(
     """Value of the records in an age window: price times quantity.
 
     Off the records, because age belongs to a record on a shelf and the cost
-    ledger does not know shelves. It used to sum the unit prices alone, so
-    a pallet of a thousand at 1.00 was worth as much dead stock as one unit.
+    ledger does not know shelves. It is price times quantity, not the unit
+    prices alone, so a pallet of a thousand at 1.00 is worth more than one unit.
     """
     stmt = select(
         func.sum(func.coalesce(Item.purchase_price, 0) * Item.quantity)

@@ -254,10 +254,10 @@ class TestTheBatchSaysWhereItIs:
     ) -> None:
         """A shelf the batch fully left stops naming itself as where it is.
 
-        A quant drained to zero stays in the table forever, and the one place
-        the batch used to sit kept the answer to "where is it" pointed at a
-        shelf holding none of it — while the page's own nothingLeft message,
-        written for exactly this end of a batch's life, stayed unreachable.
+        A quant drained to zero stays in the table forever, and the answer
+        to "where is it" must not point at a shelf holding none of it, and the
+        page's own nothingLeft message, written for exactly this end of a batch's
+        life, must stay reachable.
         """
         emptied_shelf = StorageLocation(
             organization_id=batch.org.id,
@@ -267,8 +267,8 @@ class TestTheBatchSaysWhereItIs:
         )
         real_async_db_session.add(emptied_shelf)
         await real_async_db_session.flush()
-        # The batch used to sit here too; the shelf drained to zero and the
-        # quant row stayed, as drained quants do.
+        # The batch is put here too; the shelf drains to zero and the
+        # quant row stays, as drained quants do.
         drained = await put_on_shelf(
             real_async_db_session,
             batch.user,

@@ -143,8 +143,8 @@ describe("ResetPasswordPage", () => {
   });
 
   it("replaces the form with a refusal when the link is spent", async () => {
-    // The refusal used to be a toast while the form stayed up, asking for a
-    // password the dead link can never save.
+    // A dead link is refused on the page, not as a toast while the form stays up
+    // asking for a password the link can never save.
     vi.mocked(authApi.confirmPasswordReset).mockRejectedValue(refusal(400));
     fill("GoodPass1");
 

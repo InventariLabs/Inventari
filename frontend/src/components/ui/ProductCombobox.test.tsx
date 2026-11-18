@@ -155,8 +155,9 @@ describe("ProductCombobox", () => {
     // the document to the input and takes that back frame by frame as the
     // sheet stops overflowing it. Real scroll events and a real move, with
     // nobody scrolling; a box filled at machine speed has its list open by
-    // then. This used to wipe the typed text, and so did the next scroll event
-    // on the form at rest, against the place the list had opened at.
+    // then. A scroll of the sheet must not wipe the typed text, and neither may
+    // the next scroll event on the form at rest, against the place the list had
+    // opened at.
     const user = userEvent.setup();
     search.mockResolvedValue([stub("Latte cups")]);
     render(<ProductCombobox {...baseProps} />);
@@ -232,7 +233,7 @@ describe("ProductCombobox", () => {
   it("keeps the typed text when the box scrolls its own long text sideways", async () => {
     // A name too long for the box scrolls inside it when the focus comes
     // back — after a refused "add as new", say. That is not the page moving
-    // under the list, and it used to wipe the name the reader had to fix.
+    // under the list, and it must not wipe the name the reader has to fix.
     const user = userEvent.setup();
     search.mockResolvedValue([stub("Latte cups")]);
     render(<ProductCombobox {...baseProps} />);
@@ -494,7 +495,7 @@ describe("ProductCombobox", () => {
 
   it("closes the empty panel on the first Escape and the sheet on the next", async () => {
     // The sheet's capture-phase handler runs before the picker's own, so an
-    // Escape aimed at the empty panel used to close the sheet, or raise its
+    // Escape aimed at the empty panel must not close the sheet, or raise its
     // discard question, while the panel stayed open.
     const user = userEvent.setup();
     const onClose = vi.fn();
@@ -517,8 +518,8 @@ describe("ProductCombobox", () => {
   });
 
   it("closes its panel when focus leaves, so Escape reaches the sheet", async () => {
-    // The panel used to outlive the focus: Escape from another field was
-    // yielded to a list nobody was typing in, and nothing happened.
+    // The panel must not outlive the focus: Escape from another field has to
+    // reach the sheet, not a list nobody is typing in.
     const user = userEvent.setup();
     const onClose = vi.fn();
     search.mockResolvedValue([stub("Widget")]);

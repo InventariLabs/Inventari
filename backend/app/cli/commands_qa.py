@@ -327,9 +327,9 @@ def _import_module_tables() -> None:
 
     A table joins the metadata when the module that declares it is imported,
     and a CLI process has imported none of them. The wipe below walks the
-    metadata, so what it has not imported it does not delete: it used to leave
+    metadata, so what it has not imported it does not delete: it would leave
     an organization's documents and orders standing, and the next statement —
-    the accounts — then walked into the foreign key an order holds on its
+    the accounts — would walk into the foreign key an order holds on its
     author.
 
     Importing each module's ``models`` rather than its package: whether a

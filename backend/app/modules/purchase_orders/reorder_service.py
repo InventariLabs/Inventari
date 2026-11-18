@@ -104,9 +104,8 @@ async def _load_rule_with_uom(
 ) -> ReorderRule | None:
     """Re-read a rule with its unit eagerly loaded, scoped to its owner.
 
-    The organization is required. It used to default to None, which read the
-    rule by bare id -- fine for the two internal callers that had just
-    written the row, and a cross-org read for anyone who copied the shape.
+    The organization is required, and the rule is read only within it, so a
+    read by bare id cannot reach another organization's rule.
     """
     stmt = (
         select(ReorderRule)

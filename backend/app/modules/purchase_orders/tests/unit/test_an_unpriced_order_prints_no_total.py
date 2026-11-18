@@ -84,7 +84,7 @@ class TestTheBuiltInLayout:
         html = await _printed(_order('2.50', None), 'en')
 
         # The priced line keeps its own amounts, and its gross appears only on
-        # that line: the footer used to repeat it as the order's total.
+        # that line: the footer does not repeat it as the order's total.
         assert '25.00' in html
         assert html.count('30.75') == 1
         assert html.count('No price yet') == 3

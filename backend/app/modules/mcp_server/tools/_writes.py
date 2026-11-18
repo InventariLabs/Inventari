@@ -265,10 +265,8 @@ def register_write_tools(server: MCPServer) -> None:
             # What the answer and the register measure their difference
             # against is the quantity that stands once this call holds the
             # record, not the one it read before waiting for the lock. Two
-            # corrections racing for one record used to be measured on the
-            # pre-lock read: the ledger posted the real change while the
-            # register carried a line for a difference nobody made, with the
-            # wrong sign.
+            # corrections racing for one record are both measured on this value, so
+            # the ledger and the register carry the same difference.
             item = await core_api.items.get_for_update_async(
                 db, identity.organization_id, item_id
             )

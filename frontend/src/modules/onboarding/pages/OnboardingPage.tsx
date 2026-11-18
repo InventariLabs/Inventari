@@ -48,11 +48,12 @@ const BASE_PROFILE = "clean_core";
 /**
  * The currency and country this interface language is most likely to belong
  * to — one table, so the two answers cannot disagree: a Polish interface on
- * an en-US browser used to offer PLN with the United States selected.
+ * an en-US browser keeps the pair together: PLN comes with Poland, not with the
+ * United States.
  *
- * The screen used to open on USD whatever the language, and the currency is
- * permanent for the organization — a Polish first-run picked dollars unless
- * the reader noticed a select at the bottom of the page.
+ * The screen opens on the currency this language points to. The currency is
+ * permanent for the organization, so a Polish first run keeps złoty unless the
+ * reader changes the select.
  *
  * Guessing from the language is only fair while the language is a choice the
  * reader can make here, which is why this screen now carries the language

@@ -35,7 +35,7 @@ export function MealPlanEntryCard({
 }: MealPlanEntryCardProps) {
   // Cooking checks `recipes:consume`, not the plan's `recipes:write`: the
   // person at the stove and the person planning the week are different
-  // grants, and the card used to spell both with one prop.
+  // grants, so the card asks for each one on its own.
   const canConsume = useHasPermission("recipes:consume");
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({

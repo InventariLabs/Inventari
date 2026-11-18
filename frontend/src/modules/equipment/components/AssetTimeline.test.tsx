@@ -324,7 +324,7 @@ describe("AssetTimeline", () => {
 
   it("reads the expected return day on the organization's clock", async () => {
     // The checkout stored "2026-09-30T00:00:00Z" — UTC midnight. A reader
-    // in Los Angeles used to see 09/29 off it; the timeline owes the
+    // in Los Angeles must not see 09/29 off it; the timeline reads the
     // organization's clock, like every other read of this day.
     useAssetTimelineMock.mockReturnValue(
       read({

@@ -59,17 +59,16 @@ interface ProviderDescriptor {
 /**
  * The catalog key describing what a provider is good for.
  *
- * The descriptions used to live in this file as English literals — sixteen of
- * them, on a screen translated into five languages.
+ * The descriptions are catalog keys, not English literals in this file: sixteen
+ * of them, on a screen translated into five languages.
  */
 export const providerDescriptionKey = (id: LlmProvider): string =>
   `config.providerDescription.${id}`;
 
 /**
  * The group headings. The icon is a component, not a character in the
- * translation: the labels used to carry an emoji inside the translated string
- * ("☁️ Cloud"), which no translator can be expected to keep and which is the
- * one place in the application that draws its icons that way.
+ * translation: the label is plain text ("Cloud"), since no translator can be
+ * expected to keep an emoji inside a translated string.
  */
 export const PROVIDER_GROUPS: ReadonlyArray<{
   id: ProviderGroup;
@@ -307,13 +306,11 @@ export const getProviderDescriptor = (
  * What to tick for a provider before anybody says otherwise — a starting
  * point, never a verdict.
  *
- * This used to be called `providerDefaultCapabilities`, and the form treated
- * it as the name promised: a capability on this list was drawn as a fixed
- * badge with a tick, with no way to remove it. But a protocol is not a model.
- * A connection to `deepseek-v4-flash` through an OpenAI-compatible endpoint
- * inherited VISION from the shape of the API, showed it as a fact, and could
- * not be told that the model does not read images — so it stayed on the list
- * of candidates for reading photographs.
+ * The list is a suggestion, and the form draws each capability as a checkbox
+ * the reader can clear: a protocol is not a model. A connection to
+ * `deepseek-v4-flash` through an OpenAI-compatible endpoint gets VISION from
+ * the shape of the API, and the reader can tell that the model does not read
+ * images.
  *
  * Whether a model can actually do the job is a question with an answer: the
  * connection test asks it. See `capability_checks` on the connection.
@@ -354,12 +351,11 @@ export const CAPABILITIES: ReadonlyArray<{
 /**
  * What choosing a provider fills in — the whole of it, in one place.
  *
- * The dialog used to apply these from the provider-change handler and from
- * nowhere else, so a dialog that *opened* on a provider opened with its two
- * required fields empty. The shortest path through the form — accept the
- * provider already selected, type the key, save — was the one path that
- * could not work, and the reader learned it from the backend: "AI connection
- * base URL must use http or https".
+ * The dialog applies these from the provider-change handler and also when it
+ * opens on a provider, so the two required fields are filled. The shortest
+ * path through the form — accept the provider already selected, type the key,
+ * save — works without a detour, and a base URL with the wrong scheme is named
+ * by the form: "AI connection base URL must use http or https".
  */
 export const providerDefaults = (
   provider: LlmProvider,

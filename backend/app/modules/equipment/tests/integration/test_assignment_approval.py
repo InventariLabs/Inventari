@@ -228,8 +228,8 @@ class TestCheckoutApprovalsGate:
         approval_org: dict[str, Any],
         db_session: Session,
     ) -> None:
-        """The approvals queue used to show an equipment checkout as a truncated
-        UUID, with no asset name and no link."""
+        """The approvals queue shows an equipment checkout with its asset name and
+        a link."""
         from app.models.category import Category
         from app.models.item import Item as ItemModel
 

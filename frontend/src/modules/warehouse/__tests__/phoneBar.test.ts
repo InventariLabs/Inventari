@@ -71,8 +71,8 @@ describe("the warehouse module's navigation", () => {
   });
 });
 
-// The bar used to carry nine tabs; five of them became links inside Start,
-// History and Configuration. A bookmark to any of them still opens a screen.
+// Five of the bar's tabs are links inside Start, History and Configuration.
+// A bookmark to any of the nine addresses the bar linked to still opens a screen.
 describe("the addresses the nine-tab bar linked to", () => {
   const routes = new Set(
     (moduleRegistry.getModule("warehouse")?.routes ?? []).map((r) => r.path),

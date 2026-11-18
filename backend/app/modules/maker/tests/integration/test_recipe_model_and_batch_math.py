@@ -249,10 +249,8 @@ class TestRecipeDefaultReassignment:
 #
 # These cases drive the production entry points (``explode_with_uom`` behind
 # ``explode``) against real default recipes in the database — the same path
-# availability, consumption and the cost rollup read. They used to exercise a
-# pure-function copy of the algorithm that no production code called; the copy
-# ignored recipe identity and line UoM, so a drift there was invisible to this
-# suite. A test that passes on a copy says nothing about the code that ships.
+# availability, consumption and the cost rollup read. A test that passes on a copy
+# of the algorithm says nothing about the code that ships, so these run the real one.
 # ---------------------------------------------------------------------------
 
 

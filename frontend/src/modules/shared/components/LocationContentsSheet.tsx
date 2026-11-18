@@ -2,8 +2,8 @@
  * What is on a scanned location label — the answer to "what is on this
  * shelf, and how much".
  *
- * A location label used to do one thing: set the scan context. A rack whose
- * stock stands on its shelves told the reader nothing, because the location
+ * A location label does one thing: it sets the scan context. A rack whose
+ * stock stands on its shelves says nothing, because the location
  * page lists only what lies on the location itself. This sheet asks the
  * shelves instead (`/stock-quants` answers for the whole subtree) and offers
  * what a person standing at the rack does next.

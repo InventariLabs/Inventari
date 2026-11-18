@@ -415,8 +415,7 @@ class TestLabelsAPI:
     ):
         """A blank label is not a product code, so after scanning one the form
         offers the code field — and what is typed or generated there is the
-        product's code. The request used to have no such field: the code was
-        dropped under a 200, and a scan of it found nothing."""
+        product's code, and the request carries it, so a scan of it finds the product."""
         real_async_db_session.add(
             LabelPool(
                 short_code='STM-CODE1',
@@ -646,9 +645,8 @@ class TestLabelsAPI:
     ):
         """The row says what the label points at, not only what it printed for.
 
-        A generic label assigned to an asset used to describe itself as a
-        product everywhere — the assignment line carried what the item is,
-        which the label's own purpose never knew.
+        A generic label assigned to an asset describes itself as that asset everywhere,
+        not as a product: the assignment line carries what the label points at.
         """
         from app.models.category import Category
         from app.models.item import Item
@@ -839,8 +837,7 @@ class TestTheScanAnswersForWhatItCreates:
         assert first.status_code == status.HTTP_200_OK, first.text
 
         # The second delivery has no new label — the delivery is scanned by
-        # the product's own barcode, which is exactly the route that used to
-        # hit the uniqueness index.
+        # the product's own barcode, the route that must not hit the uniqueness index.
         second = await real_async_client.post(
             '/api/v1/labels/scan/5901234123457/assign',
             headers=_auth(lbl_user),

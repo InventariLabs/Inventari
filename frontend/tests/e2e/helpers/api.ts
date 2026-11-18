@@ -2610,9 +2610,9 @@ export class ApiHelper {
    * The formula a product's BoM lines belong to: its default one, created
    * on the spot when the product has none yet.
    *
-   * `POST /maker/bom` used to do this resolution server-side, which is why
-   * it was removed — it always wrote to the *default* formula, so a product
-   * with two formulas silently got its lines in the wrong one. Setups that
+   * The resolution happens here, not in a server route: that route always wrote
+   * to the *default* formula, so a product with two formulas would get its lines
+   * in the wrong one. Setups that
    * only care about "this product has these ingredients" resolve here
    * instead; a test that means a *specific* formula passes `recipe_id` to
    * `createBomLine` and skips this entirely.

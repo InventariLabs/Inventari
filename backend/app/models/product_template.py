@@ -77,7 +77,7 @@ class ProductTemplate(Base):
         postgresql.DOUBLE_PRECISION, default=0.0
     )
 
-    # AVCO valuation used to be cached here, in `current_valuation_rate`. It
+    # A valuation rate is never cached on this row, not even as `current_valuation_rate`. It
     # cannot live on this row: valuation layers belong to an organization, and
     # a global template — the whole default catalogue — is one row shared by
     # every organization, so the cached number belonged to whichever one had

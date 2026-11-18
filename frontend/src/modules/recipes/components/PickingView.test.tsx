@@ -200,8 +200,8 @@ describe("PickingView — the resumed session stays on the sheet", () => {
       </QueryWrapper>,
     );
 
-    // The dialog used to say "Servings to cook: 4" in the form and then open
-    // an eight-serving checklist with only a few-seconds toast in between.
+    // The resumed session keeps its own servings, not the ones asked for in the
+    // dialog.
     expect(screen.getByText("Resumed")).toBeInTheDocument();
     expect(screen.getByText(/8 servings/)).toBeInTheDocument();
   });

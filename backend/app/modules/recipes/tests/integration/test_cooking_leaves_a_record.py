@@ -186,8 +186,8 @@ class TestCookingLeavesARecord:
     ) -> None:
         """Undo writes the same shape of entry, so the two legs are legible.
 
-        Both directions used to be a bare pair of numbers, and a take followed
-        by a return read exactly like a take followed by a take.
+        Both directions are recorded with their own leg, so a take followed by a
+        return does not read like a take followed by a take.
         """
         recipe_id, item_id = _recipe_with_one_ingredient(
             client, auth_headers, db_session, test_user, test_storage_location
@@ -228,9 +228,9 @@ class TestCookingLeavesARecord:
     ) -> None:
         """The household path: no warehouse module, and the flour stays gone.
 
-        Cooking used to end with the session still ``active``, so the next
-        "Get ingredients" cancelled it and put the flour back — a meal that had
-        been eaten reappearing in the cupboard.
+        Cooking ends with the session closed, so the next "Get ingredients" does
+        not cancel it and put the flour back: a meal that has been eaten does not
+        reappear in the cupboard.
         """
         recipe_id, item_id = _recipe_with_one_ingredient(
             client, auth_headers, db_session, test_user, test_storage_location
@@ -301,9 +301,9 @@ class TestCookingInTheMovesRegister:
     """The moves register names cooking as its source, in both directions.
 
     The register is the one screen a household has for "where did the flour
-    go", and every leg of a pick used to be filed under the record it changed:
-    the source column said "Record", and a put-back read as a delivery from
-    outside. The session is what caused the movement, so it is what the row
+    go". Every leg of a pick is filed under the session that caused it, not
+    under the record it changed: the source column does not say "Record", and a
+    put-back does not read as a delivery from outside. The session is what caused the movement, so it is what the row
     points at.
     """
 

@@ -63,8 +63,8 @@ describe("a refused sign-in is not a session to refresh", () => {
       (e: unknown) => apiErrorStatus(e),
     );
 
-    // The form's own 401 reaches the form; the probe it used to trigger
-    // both doubled the failed requests and replaced the sentence.
+    // The form's own 401 reaches the form, and no probe is triggered: it would
+    // double the failed requests and replace the sentence.
     expect(status).toBe(401);
     expect(refreshes).toBe(0);
   });

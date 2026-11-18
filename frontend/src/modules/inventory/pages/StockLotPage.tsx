@@ -95,8 +95,8 @@ export default function StockLotPage() {
       subtitle: lot.product_name ?? undefined,
       backTo: "/inventory/lots",
       // The decision belongs on the card: the reader has just seen where the
-      // batch still lies and what happened to it. It used to live only in the
-      // list row, so acting on a recall meant going back and finding the row.
+      // batch still lies and what happened to it, so the action is here, not
+      // only in the list row, and a recall needs no trip back to find it.
       actions: canWrite ? (
         <ActionMenu
           label={t("inventory:lots.actionsFor", { name: lot.name })}

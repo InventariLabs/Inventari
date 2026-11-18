@@ -1,9 +1,8 @@
 """The toggle → onboarding walk.
 
 A module switched on through POST /modules/toggle before onboarding was
-finished, and not offered by the profile the admin then chooses, used to be
-dropped when 'Get started' was pressed: the setup overwrote
-``enabled_modules`` with the profile's chosen set and only logged the loss.
+finished, and not offered by the profile the admin then chooses, stays enabled
+when 'Get started' is pressed: the profile's chosen set does not overwrite it.
 The admin's explicit choice is kept, and GET /modules/my still serves it.
 """
 

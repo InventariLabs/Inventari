@@ -422,7 +422,7 @@ class LabelService:
         *,
         user_id: UUID | None = None,
     ) -> LabelPool:
-        # Free any label previously assigned to this item before binding the
+        # Free any label assigned to this item before binding the
         # new one, so the previous label does not become a permanent zombie
         # (is_assigned stays True, item_id points nowhere).
         from app.models.item import Item

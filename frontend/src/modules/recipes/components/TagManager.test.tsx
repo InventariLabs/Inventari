@@ -105,8 +105,8 @@ describe("TagManager when the tags did not load", () => {
 
 describe("TagManager colour", () => {
   it("says why when the colour is refused", async () => {
-    // Nothing above the picker reports it: the catch here used to say
-    // "handled globally" and nothing was.
+    // Nothing above the picker reports it, so a catch that deferred to a
+    // global handler would leave the refusal unexplained.
     tags = [tag("dinner")];
     setColor.mockRejectedValueOnce(new Error("refused"));
     render(<TagManager />);

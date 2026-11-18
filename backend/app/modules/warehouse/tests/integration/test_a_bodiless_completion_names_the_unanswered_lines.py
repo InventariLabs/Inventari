@@ -1,10 +1,10 @@
 """Completing a document without saying what arrived is not a delivery.
 
-A completion that carries no per-line answers used to book every line nobody
-answered for as delivered in full. The execution panel names every line and a
-scanning session resolves each one before it closes, so only an integration, a
-script or a webhook consumer ever sent such a request — and its documents
-posted stock that never arrived. The request now has to say so
+A completion that carries no per-line answers is not a delivery: the lines nobody
+answered for are named, not booked as delivered in full. The execution panel names
+every line and a scanning session resolves each one before it closes, so only an
+integration, a script or a webhook consumer sends such a request, and its documents
+would otherwise post stock that never arrived. The request has to say so
 (``complete_as_planned``); without it the answer names the lines.
 
 A body that answers only some of the lines is the same request through a

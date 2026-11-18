@@ -1,10 +1,10 @@
 /**
  * One concept, one word (UI_GUIDELINES §14.3).
  *
- * The thing on a shelf is a **Product**. It used to be called two things at
- * once: the sidebar and the page title said "Items" while the subtitle
- * directly beneath them said "Browse and manage your products", and one
- * sentence in the bulk-edit window managed both nouns in a single breath —
+ * The thing on a shelf is a **Product**, never two things at once: the sidebar
+ * and the page title do not say "Items" while the subtitle
+ * directly beneath them says "Browse and manage your products", and one
+ * sentence in the bulk-edit window must not manage both nouns in a single breath —
  * "applied to all 3 selected products … unchanged for each item".
  *
  * Scope is the core catalogues: the ones where the noun can only mean the

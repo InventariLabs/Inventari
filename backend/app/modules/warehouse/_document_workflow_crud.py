@@ -585,10 +585,9 @@ async def create_document(
             return made
 
     # The closure dialog says documents dated in the month "can no longer be
-    # created or edited", and until now only the second half was true: the
-    # guard read the date off a document, so it could not run before one
-    # existed. A document born into a closed month is unusable — it cannot be
-    # confirmed, completed, updated or cancelled — so it is refused at the
+    # created or edited", so the guard checks the date before a document exists.
+    # A document born into a closed month is unusable — it cannot be confirmed,
+    # completed, updated or cancelled — so it is refused at the
     # door, where the message can still be acted on by changing the date.
     await check_period_not_closed_async(
         db, org_id, data.scheduled_date or datetime.now(UTC).date()

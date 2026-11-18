@@ -1,12 +1,8 @@
 """The single AST safety scanner shared by the runtime loader and the CLI.
 
-Two copies of this scan used to exist — ``app.core.module_validator`` for module
-discovery and ``app.cli.module_validator`` for ``manage.py module validate`` and
-the packaging pipeline. They were written from the same design but drifted, and
-the drift was not cosmetic: the fix that made symbol-level bans actually fire
-landed only in the runtime copy, so ``from app.core.events import event_bus``
-was rejected when a module loaded yet passed the CLI gate that runs *before*
-installation. The stricter check sat behind the weaker one.
+This one scan serves the runtime loader (module discovery) and the CLI
+(``manage.py module validate`` and the packaging pipeline), so a rule that fires
+in one place fires in both.
 
 Rather than patch the copy, both callers now share this scanner. What stayed
 per-caller is only the wording: the registry reports violations relative to the
@@ -31,9 +27,8 @@ reflection through non-module objects (a function's ``__globals__``,
 and per ADR-019 there is no runtime guard — certification is the protection.
 
 Note on the failure mode: parsing an unexpected file raises broadly here and is
-reported as a finding rather than propagated. The CLI copy previously caught
-only ``OSError``/``SyntaxError``, so an oddity like a bad encoding aborted the
-whole validation run instead of failing that one module. A safety gate that
+reported as a finding rather than propagated. Both entry points catch the same wide set, so an oddity like a bad encoding
+fails that one module, not the whole validation run. A safety gate that
 crashes is a gate that gets skipped.
 """
 

@@ -34,9 +34,8 @@ afterEach(() => {
 
 /**
  * Location is a required field of every record standing in one, so the API
- * refuses to delete a location that holds anything. The screen used to ask
- * for confirmation anyway and report a bare "Failed to delete" afterwards —
- * a question whose only possible answer was a refusal, phrased as a mishap.
+ * refuses to delete a location that holds anything, and the screen shows that
+ * before the click, not as a confirmation followed by a bare "Failed to delete".
  */
 
 const base = {

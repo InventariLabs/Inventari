@@ -105,9 +105,8 @@ export default function AppStore() {
 
   const isAdmin = useHasPermission("admin:access");
 
-  // A refusal is an answer, not a bounce. The store used to
-  // `navigate("/")`, so a manager who followed a link to it landed on the
-  // launcher with nothing said and no idea why.
+  // A refusal is an answer, not a bounce. The store does not `navigate("/")`,
+  // so a manager who follows a link to it sees what was refused and why.
 
   const [filter, setFilter] = useState<FilterCategory>("all");
   const [search, setSearch] = useState("");
@@ -408,9 +407,7 @@ export default function AppStore() {
             </div>
           )}
 
-          {/* Cards contributed through `settings_module_card`. The slot used to
-              hang on /settings/modules, a page whose whole content was a
-              button pointing here. */}
+          {/* Cards contributed through `settings_module_card` hang on this page. */}
           <TypedSlot name="settings_module_card" data={EMPTY_SLOT_DATA} />
         </div>
       </div>

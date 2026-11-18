@@ -311,7 +311,7 @@ function useShelfScan({
 
 /**
  * The shelf-settings tab: the locations of one warehouse, with the walk
- * order, product mixing and per-product limits that used to be spread over
+ * order, product mixing and per-product limits that this tab gathers from
  * three screens — the location's Edit dialog and two cards at the very
  * bottom of its detail page, thousands of pixels under the contents.
  *

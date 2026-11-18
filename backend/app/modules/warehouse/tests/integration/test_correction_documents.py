@@ -230,8 +230,7 @@ class TestCorrectionDocumentCreation:
         doc_item: Any,
     ) -> None:
         """An adjustment's lines are already differences; a correction of one
-        has no direction. The correction used to be saved anyway and failed
-        only at completion — the refusal belongs where it is written."""
+        has no direction, so it is refused where it is written, not at completion."""
         adjustment = client.post(
             '/api/v1/warehouse/documents',
             headers=doc_auth_headers,
@@ -724,9 +723,10 @@ class TestCorrectionStockExecution:
     ) -> None:
         """an API client must not flip a correction by completing it.
 
-        ``done_quantity`` used to be constrained to ``>= 0``, so the only value
-        a client could send for a -3 correction was +3 — and the executor took
-        it at face value, adding stock where the document said remove.
+        ``done_quantity`` is constrained to ``>= 0``, so the only value a client
+        can send for a -3 correction is +3. The executor reads the direction from
+        the document, not from the figure, or it adds stock where the document
+        says remove.
         """
         original = _create_and_complete_in(
             client,
@@ -1171,10 +1171,10 @@ def _pdf_text(pdf_bytes: bytes) -> str:
 class TestCorrectionPrintout:
     """The correction's printout names the document it corrects.
 
-    Downloading it used to answer 500: the PDF renderer read the
+    Downloading it answers 200 with the reference line: the PDF renderer reads the
     ``corrected_document`` relationship inside its worker thread, where a
-    lazy load is a ``MissingGreenlet`` rather than a query — so the
-    reference line the template prints for corrections never got to appear.
+    lazy load is a ``MissingGreenlet`` rather than a query, so the reference
+    line the template prints for corrections needs the relationship loaded.
     """
 
     def test_pdf_points_at_the_corrected_document(

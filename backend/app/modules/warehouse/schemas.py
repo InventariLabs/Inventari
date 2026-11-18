@@ -336,7 +336,7 @@ class DocumentLineSchema(BaseModel):
     source_po_line_id: UUID | None = None
     # Where this line's goods actually landed. A putaway rule can send a
     # delivery somewhere other than the document's target location, and the
-    # document used to say nothing about it.
+    # document records where they landed.
     executed_location_id: UUID | None = None
     executed_location_name: str | None = None
     # Where the goods WILL land, computed at read time by the same planner

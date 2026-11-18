@@ -185,10 +185,9 @@ const FoodAndHealthExtra: React.FC<Props> = ({ data }) => {
     }
   };
 
-  // The same form in both branches. It used to live only in the "there is
-  // data" half, which made the empty state a closed loop: to type values in by
-  // hand you first had to have values, so the one route out was a camera, a
-  // legible label and an AI provider an admin had configured.
+  // The same form in both branches, so the empty state is not a closed loop:
+  // typing values in by hand does not first require values, and a camera, a
+  // legible label and an AI provider an admin configured are not the only way out.
   const editForm = item.template_id ? (
     <NutritionEditForm
       nutritionFields={nutritionFields}

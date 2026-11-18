@@ -98,8 +98,7 @@ describe("BoMEntrySlot", () => {
     renderSlot(makeItem());
     fireEvent.click(screen.getByTestId("maker-bom-entry-link"));
 
-    // The regression this guards: the fallback used to point at
-    // `/maker/bom?parent=`, a route that no longer exists.
+    // The fallback never points at `/maker/bom?parent=`, a route that does not exist.
     expect(await screen.findByTestId("probe-state")).toBeInTheDocument();
   });
 

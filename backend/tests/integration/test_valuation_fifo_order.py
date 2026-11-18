@@ -1,9 +1,9 @@
 """FIFO consumes in business-date order — the date the receipt is about.
 
-Layers used to be consumed in ``created_at`` order: the order the rows
-happened to be written. A booking typed late pushed the goods it
-describes to the back of the queue, so the cost of a dispatch could
-come from a receipt the business would call the newer one. The layer
+Layers are consumed in business-date order, not ``created_at`` order: the
+order the rows happened to be written. A booking typed late does not push the
+goods it describes to the back of the queue, and the cost of a dispatch never
+comes from a receipt the business would call the newer one. The layer
 now carries the receipt's business date (a document's scheduled date),
 and consumption follows it; layers with no document behind them fall
 back to their write time, and ``id`` breaks the ties a same-day batch

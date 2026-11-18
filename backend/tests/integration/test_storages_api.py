@@ -562,10 +562,9 @@ class TestStorageItems:
         """Regression: items with a UoM must serialize without a 500.
 
         The endpoint returns ItemDTO (CoreAPI) but validates against
-        ItemSchema, whose uom mapping used to call
-        from_orm_with_category on a UomDTO — which has no `category`
-        relation — raising AttributeError for every location whose items
-        have a unit of measure.
+        ItemSchema. Its uom mapping works on a UomDTO, which has no `category`
+        relation, so every location whose items have a unit of measure
+        serializes without an AttributeError.
         """
         from app.models.item import Item
         from app.models.uom import Uom, UomCategory

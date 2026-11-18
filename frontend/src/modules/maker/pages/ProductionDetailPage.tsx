@@ -94,9 +94,8 @@ export default function ProductionDetailPage() {
 
   useEffect(() => {
     setHeader({
-      // Name the run by what is being produced. The header used to read
-      // "Planned qty: 7.000" — a number where the record's name belongs,
-      // leaving three screens of a module all titled by their quantity.
+      // Name the run by what is being produced, not by a quantity: three screens
+      // of the module would otherwise all be titled by their amount.
       title: order?.output_template_name ?? t("detail.title"),
       subtitle: order
         ? t("detail.plannedSummary", {

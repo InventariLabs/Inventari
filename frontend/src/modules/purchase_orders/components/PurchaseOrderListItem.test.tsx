@@ -436,9 +436,9 @@ describe("PurchaseOrderListItem — receipt progress", () => {
   });
 
   it("leaves an order waiting for approval a way out", async () => {
-    // The row used to render no action at all for PENDING_APPROVAL, and the
-    // detail page bar hid Cancel the same way — so an order whose request had
-    // been withdrawn could not be moved anywhere from the interface.
+    // The row renders an action for PENDING_APPROVAL, and the detail page bar
+    // shows Cancel the same way, so an order whose request has been withdrawn
+    // can be moved from the interface.
     const user = userEvent.setup();
     render(
       <PurchaseOrderListItem

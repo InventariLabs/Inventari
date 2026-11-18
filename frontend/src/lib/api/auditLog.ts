@@ -46,10 +46,10 @@ export const auditLogApi = {
   /**
    * The kinds of thing this organization's log actually records.
    *
-   * The filter used to offer three values written into the page, two of them
-   * belonging to modules the profile does not install — so two choices could
-   * only ever answer "no entries", and the things that really changed
-   * (storages, members, modules) had no choice at all.
+   * The filter offers only the kinds the profile can record: a value for a
+   * module the profile does not install would answer "no entries" every time,
+   * and the things that really changed (storages, members, modules) need a
+   * choice of their own.
    */
   targetTypes: async (): Promise<string[]> => {
     const response = await api.get<string[]>("/audit-log/target-types");

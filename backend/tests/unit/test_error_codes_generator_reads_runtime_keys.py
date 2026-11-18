@@ -129,7 +129,7 @@ def test_a_key_the_generator_cannot_follow_fails_it(tmp_path: Path) -> None:
 
 def test_a_key_parameter_nobody_fills_fails_it(tmp_path: Path) -> None:
     # No default and no call that passes it: the page could not list the key,
-    # and the check used to say it was in sync all the same.
+    # and the check must not say it is in sync all the same.
     app = _app(
         tmp_path,
         'def refuse(key):\n    raise ServiceRejectionError(key)\n',

@@ -156,9 +156,8 @@ export default function WmsReceivingActive({
               autoFocus
             />
             <div className="flex items-center gap-2">
-              {/* The unit decides the step, not this screen. It used to be
-                  hardcoded, and the four quantity fields of this module
-                  between them carried four different answers. */}
+              {/* The unit decides the step, not this screen, so every quantity field
+                  of this module steps alike. */}
               <QuantityInput
                 wrapperClassName="w-24"
                 uomSymbol={unitSymbol}

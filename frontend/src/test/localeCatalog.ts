@@ -4,10 +4,9 @@ import { join } from "node:path";
 /**
  * Reading the locale directory as data.
  *
- * The parity gate used to import twenty locale files by hand and hold a
- * five-language list in a constant: a directory added per the recipe was
- * invisible to it — green while measuring nothing. Every question the gates
- * ask now starts here: which languages exist (directories under locales/),
+ * The parity gate reads the locale directory, not a list of files or a constant,
+ * so a language added per the recipe is seen by it. Every question the gates
+ * ask starts here: which languages exist (directories under locales/),
  * which namespaces a language carries, and how much of the English catalog
  * a language actually holds. Pure path-in, data-out, so the unit tests can
  * exercise them on fixture directories instead of the real tree.

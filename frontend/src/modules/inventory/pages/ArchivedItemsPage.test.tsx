@@ -198,8 +198,8 @@ describe("ArchivedItemsPage", () => {
   });
 
   it("reads a reason the catalogue does not know as the value that was written", () => {
-    // A stored value without a word of its own used to print the composed
-    // key ("items:deletionReasons.SOMETHING_NEW") in the badge.
+    // A stored value without a word of its own prints the value itself in the
+    // badge, not the composed key ("items:deletionReasons.SOMETHING_NEW").
     mockUseArchivedItems.mockReturnValue(
       archiveOf({ ...archivedRows[1], deletion_reason: "SOMETHING_NEW" }),
     );
@@ -409,8 +409,7 @@ describe("ArchivedItemsPage", () => {
 
   it("offers neither action to an account that may not change products", async () => {
     // The API refuses restore without `items:write` and purge without
-    // `items:purge`; the screen used to ask neither question and let the
-    // refusal arrive after the click.
+    // `items:purge`, so the screen offers neither action without them.
     signIn([]);
     const { useOrganization } =
       await import("@/modules/settings/hooks/useOrganization");

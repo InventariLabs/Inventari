@@ -21,8 +21,8 @@ interface CollectionAddRecipesModalProps {
 /**
  * Adds recipes that already exist to an empty collection.
  *
- * A fresh collection's empty state used to offer only "New recipe", which
- * answered a different question than the one the reader had. This picker
+ * A fresh collection's empty state offers this picker for recipes that already
+ * exist, not only "New recipe", which answers a different question. This picker
  * lists what is already there; clicking a row adds it, and the row says so,
  * so filling a collection is one visit rather than a sequence of them.
  */

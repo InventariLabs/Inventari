@@ -861,7 +861,7 @@ describe("WmsPickingView", () => {
 
     // The characters land in the field, as a scanner's do; the Enter that
     // closes the burst must not submit them a second time. Typed by hand the
-    // burst is as fast as the machine, and on a loaded one it used to split.
+    // burst is as fast as the machine, and on a loaded one it can split.
     scanIntoField("1234567890123", field as HTMLInputElement);
 
     await waitFor(() => expect(bodies).toHaveLength(1));
@@ -972,7 +972,7 @@ describe("WmsPickingView", () => {
     await waitFor(() => expect(bodies).toHaveLength(1));
     expect(bodies[0]).toMatchObject({ lot_name: "LOT-FIRST" });
     // The scan is recorded, and the picker is told the plan said otherwise
-    // -- the warning the server's note used to be, which no screen showed.
+    // -- the warning that carries the server's note, shown on screen.
     await waitFor(() =>
       expect(toast.warning).toHaveBeenCalledWith(
         "Lot LOT-FIRST was picked, but the plan said LOT-SECOND — the books follow LOT-FIRST",
@@ -1163,8 +1163,7 @@ describe("WmsPickingView", () => {
 
     await userEvent.click(screen.getByText("Widget"));
 
-    // Tapping the line used to be the only way to record it, and it opened
-    // the shortage window at 0.
+    // Tapping the line does not open the shortage window; a short pick has its own action.
     expect(
       screen.queryByRole("heading", { name: "Short pick" }),
     ).not.toBeInTheDocument();
@@ -1835,8 +1834,8 @@ describe("WmsPickingView", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Undo" }));
 
-    // The refusal and the white toast used to arrive together; the sheet
-    // shows the server's sentence and the line stays counted.
+    // The refusal arrives without a white toast: the sheet shows the server's
+    // sentence, and the line stays counted.
     expect(
       await screen.findByText(/a package already holds 3 of what was picked/),
     ).toBeInTheDocument();

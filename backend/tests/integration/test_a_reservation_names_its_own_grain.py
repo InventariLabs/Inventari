@@ -1,11 +1,9 @@
 """A reservation row names its own grain: the group's anchor, the batch, the owner.
 
-A row used to name only the quant it held stock on; the product, the shelf,
-the batch and the owner were read off that quant, by the records' view and
-by every lock that looked for a document's holds. The quants are gone and
-the records are the only count, so the row carries its grain itself — the
-grain of the records the stock was reserved from — and the view counts the
-hold by it.
+A row names the product, the shelf, the batch and the owner of the stock it
+holds, so the records' view and every lock that looks for a document's holds
+read them off the row. The row carries the grain of the records the stock was
+reserved from, and the view counts the hold by it.
 """
 
 from __future__ import annotations

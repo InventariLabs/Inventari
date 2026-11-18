@@ -253,9 +253,7 @@ class TestTemplateEngine:
     def test_render_with_filesystem_loader(self):
         """An include resolves against the family's directory on disk.
 
-        The path used to point at backend/modules/, which has never existed,
-        and the test skipped on it; the template it then rendered touched no
-        file anyway. The include below lives only in the documents family, so
+        The include below lives only in the documents family, so
         an engine that does not read that directory raises TemplateNotFound.
         """
         from pathlib import Path

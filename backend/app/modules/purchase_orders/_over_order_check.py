@@ -1,10 +1,11 @@
 """A receipt naming an order line cannot take it past what was ordered.
 
-The guard used to live in the endpoint that builds a receipt out of an
-order, and ``source_po_line_id`` is a field the client fills in: a receipt
-posted straight to the documents endpoint, naming any order line and any
-quantity, went round it. The order then held ``quantity_received`` above
-``quantity_ordered`` and completed itself on that figure.
+The guard runs for every receipt, whichever endpoint posts it.
+``source_po_line_id`` is a field the client fills in, so a receipt posted
+straight to the documents endpoint, naming any order line and any quantity,
+must not go round it. Without the guard the order would hold
+``quantity_received`` above ``quantity_ordered`` and complete itself on that
+figure.
 
 So the rule is asked of the document, at the two moments its numbers become
 real — when it is confirmed and when it is completed — whichever door it

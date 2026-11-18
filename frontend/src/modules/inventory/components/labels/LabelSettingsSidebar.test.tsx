@@ -66,8 +66,7 @@ describe("LabelSettingsSidebar", () => {
   it("names each field for a reader, not just for the eye", () => {
     renderSidebar();
 
-    // The labels used to be loose <span>s above the inputs, associated with
-    // nothing.
+    // Each input is named by its label, so a reader hears what the field is.
     expect(
       screen.getByLabelText(enLabels.previewModal.labelDescription),
     ).toBeInTheDocument();
@@ -81,11 +80,9 @@ describe("LabelSettingsSidebar", () => {
 });
 
 /**
- * What goes on the label used to be two independent switches, and between
- * them the word "code" meant two things: the QR square in one, the string
- * STM-K9XP in the other. They also described the choice badly — the fourth
- * arrangement, a short code with no caption, could not be asked for at all,
- * because "QR code only" was read as "no text" rather than "no caption".
+ * What goes on the label is one choice of four arrangements, so the word "code"
+ * means one thing: the QR square, or the string STM-K9XP beside it. Each
+ * arrangement is named as a whole, including a short code with no caption.
  */
 describe("what goes on the label", () => {
   const renderWith = (
@@ -110,8 +107,7 @@ describe("what goes on the label", () => {
   it("offers every arrangement, whichever one is current", () => {
     renderWith({ ...settings, qrOnly: true, showCode: true });
 
-    // Nothing is conditional: the row that used to vanish took the panel's
-    // height with it and moved every control under it.
+    // Nothing is conditional: every arrangement stays on screen, so no control moves.
     expect(screen.getAllByRole("radio")).toHaveLength(4);
     expect(option(enLabels.previewModal.content.codeOnly)).toBeChecked();
   });

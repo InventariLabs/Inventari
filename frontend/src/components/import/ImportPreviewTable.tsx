@@ -12,10 +12,10 @@ interface ImportPreviewTableProps {
 
 /** What the mapping actually reads, on the rows the reader can see.
  *
- * Every importer here used to ask for a mapping and show no data at all: a
- * sheet with a shifted header row, or one pandas split on the wrong
- * delimiter, looked correctly mapped and the mismatch only turned up after
- * the rows had been written. The columns are the mapped fields rather than
+ * An importer that asks for a mapping and shows no data leaves a sheet with
+ * a shifted header row, or one pandas split on the wrong delimiter, looking
+ * correctly mapped; the mismatch would only turn up after the rows had been
+ * written. The columns are the mapped fields rather than
  * the file's own, because the question this answers is not "what is in the
  * file" but "is *this* the column I just called Quantity".
  *

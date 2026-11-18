@@ -112,10 +112,8 @@ async def preview_suggestions(
 ) -> ShoppingSuggestionPreview:
     """What the app would propose buying. It creates nothing.
 
-    The dashboard used to reach this answer through a list it had just
-    created, because the only route to it was addressed by ``list_id`` —
-    so opening a preview left an empty active list the reader had never
-    asked for, and Cancel did not take it back.
+    The dashboard reads this answer without creating a list it does not need,
+    so opening a preview leaves no empty active list the reader never asked for.
 
     The three switches are here because the button that opens this hangs
     on the tile counting shortages, and the engine returns every source it

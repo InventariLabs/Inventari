@@ -72,8 +72,7 @@ def _line_shape(line: BoMLine, uom_symbol: str | None = None) -> dict[str, Any]:
 
     The unit travels as its symbol, not as its id: a journal entry saying
     ``uom_id: null → 38690ddd-…`` records a change nobody can read, and the
-    row is opened months later precisely to find out what the line used to
-    say. The id is resolved at write time because the row is immutable
+    row is opened months later to find out what the line said. The id is resolved at write time because the row is immutable
     afterwards — resolving it on the way out would mean a rename rewrote
     history.
     """
@@ -114,8 +113,8 @@ def _changed_fields(
     touched, and the journal is read to answer exactly that. The two sides
     are named the way every other service names them, because the audit
     screen renders that shape as "Field: old → new" and renders anything
-    else by printing the JSON — which is what this service's own
-    ``{'changed': {...}}`` used to get.
+    else by printing the JSON, which is what this service's own
+    ``{'changed': {...}}`` gets.
 
     Returns an empty dict when nothing moved, so the caller can keep asking
     ``if changed:``.
@@ -1080,9 +1079,8 @@ async def get_settings(
     """Return settings for the org; a missing row reads as all defaults.
 
     A read takes no lock and never writes: the catalogue and the settings
-    screen used to take the row lock by default, so two people opening the
-    catalogue waited on each other and the first visit of an organization
-    wrote a row from a GET. A caller about to act on a setting, or change
+    screen take no row lock, so two people opening the catalogue do not wait on
+    each other, and the first visit of an organization writes no row from a GET. A caller about to act on a setting, or change
     one, asks for ``for_update=True``: that holds the row until its
     transaction ends and creates it with the defaults when absent (upsert).
 

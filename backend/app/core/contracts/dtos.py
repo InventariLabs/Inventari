@@ -114,6 +114,7 @@ from ._stock_dtos import (
     StockMoveState,
     StockQuantDTO,
     StockQuantRowDTO,
+    StockValueMovementDTO,
 )
 from ._system_dtos import (
     API_KEY_DEFAULT_PERMISSIONS,
@@ -251,6 +252,7 @@ __all__ = [
     'StockMoveState',
     'StockQuantDTO',
     'StockQuantRowDTO',
+    'StockValueMovementDTO',
     'StorageDTO',
     'StorageStatsDTO',
     'StorageTypeCreateDTO',

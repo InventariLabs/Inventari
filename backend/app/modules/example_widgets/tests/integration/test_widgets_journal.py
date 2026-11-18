@@ -2,10 +2,9 @@
 
 A module made by ``make new-module`` is a copy of this one, and the
 architecture gate refuses a module whose writes leave no journal entry. The
-reference module used to pass that gate on baseline entries of its own, which
-a copy does not inherit — so every new module failed its first commit. What
-this module does is what every copy will do; so it journals, and this test
-says what the journal holds afterwards.
+copy does not inherit baseline entries, so the reference module passes that gate
+by journaling its own writes, and every copy does the same. This test says what
+the journal holds afterwards.
 """
 
 from typing import Any

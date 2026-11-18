@@ -9,8 +9,8 @@
 - ``post_movement_async`` — goods arriving, leaving or changing shelves:
   the records handed over stated and the movement written, one pass.
 
-The quant table these used to keep beside the records is gone (the
-one-number stock model, ADR-022). The records are the stock, and a group's
+There is no quant table beside the records (the one-number stock model,
+ADR-022). The records are the stock, and a group's
 reservation rows are what is promised out of it: what a grain can give is
 what its records hold less what its rows hold.
 
@@ -73,8 +73,8 @@ async def _refuse(
     """The refusal, named the way the person looking at it knows the two things.
 
     These sentences reach the screen unchanged — a toast on a bulk edit, a
-    toast on a single move — and they used to carry two UUIDs and no
-    translation. The names cost two selects on a path that is already
+    toast on a single move — and they carry the names, not two UUIDs with
+    no translation. The names cost two selects on a path that is already
     refusing, and they are what makes the message actionable: on a bulk edit
     the product name is which of the selected rows blocked the batch.
     """
@@ -291,14 +291,11 @@ async def lock_stock_async(
 ) -> set[tuple[UUID, UUID]]:
     """Lock every group of stock an operation is about to write, at once, in one order.
 
-    A group used to be locked by whoever wrote it, when they got to it. An
-    operation that writes more than one — a document's lines, the two ends
-    of a move, a reservation that may draw on any shelf — took them one at a
-    time, so two of them taking the same groups in opposite orders each held
-    one the other was waiting for, and the database aborted one of them: a
-    person got an error for a document or a move nothing was wrong with.
-    Taken here, before the first write and in ``id`` order, the second
-    operation waits for the first instead of meeting it halfway.
+    Every group is locked here, before the first write and in ``id`` order, so
+    an operation that writes more than one — a document's lines, the two ends
+    of a move, a reservation that may draw on any shelf — waits for the first
+    instead of deadlocking with it. Two operations taking the same groups in
+    opposite orders would each hold the one the other is waiting for.
 
     *keys* are ``(product_template_id, storage_location_id)`` pairs; a
     location of ``None`` means every shelf of the product — the grain the
@@ -750,11 +747,10 @@ async def ask_what_each_grain_has_free_once(
 ) -> AsyncIterator[None]:
     """Ask the shortage question of a pass's movements once, when its lines are done.
 
-    A correction or an adjustment moves stock line by line, and each movement
-    used to be followed by its own read of what the grain has free. The
-    movements are the same; the question is put when the last of them is
-    written, in one statement, and a grain a later line brought back above
-    zero is no longer refused for having dipped. The refusal is the same
+    A correction or an adjustment moves stock line by line, and the question
+    of what the grain has free is put once, when the last of the movements is
+    written, in one statement. A grain a later line brought back above zero
+    is not refused for having dipped. The refusal is the same
     error, raised from the end of this block. Nesting joins the outer block.
     """
     info = db.sync_session.info
@@ -827,8 +823,8 @@ async def post_movement_async(
     how the state got there; a caller that writes one without the other is
     what the reconciliation's shelf-versus-ledger pair measures. This writes
     both, under the anchor locks it takes up front, and states the records
-    the caller hands over (``records``) in the same pass — the doors used to
-    change them on their own before the locks were taken.
+    the caller hands over (``records``) in the same pass, so the doors never
+    change them before the locks are taken.
 
     - *to* only — goods arrive: one movement in;
     - *from* only — goods leave: one movement out;

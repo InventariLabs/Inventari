@@ -124,8 +124,7 @@ class TestInventoryPeriodClosure:
     ) -> None:
         """DB enforces one inventory period per (org, year, month).
 
-        Previously uniqueness relied only on an advisory lock; a hard UNIQUE
-        constraint now backstops it.
+        A UNIQUE constraint backstops the advisory lock.
         """
         from app.modules.warehouse.models import InventoryPeriod
 
@@ -166,8 +165,8 @@ class TestInventoryPeriodClosure:
         )
         assert resp.status_code == status.HTTP_200_OK, resp.text
         data = resp.json()
-        # `closed_at` used to be NULLed here, which erased the evidence that
-        # the month had ever been closed. The state is its own field now.
+        # `closed_at` stays set here, so the evidence that the month was closed
+        # is kept; the reopen is its own field.
         assert data['is_closed'] is False
         assert data['closed_at'] is not None
         assert data['reopened_at'] is not None
@@ -220,8 +219,8 @@ class TestInventoryPeriodClosure:
         self, client: TestClient, doc_auth_headers: dict[str, str]
     ) -> None:
         """The reader's language, on both period refusals, measured on the
-        envelope the screen's toast prints. The server sentences used to be
-        bare ``ValueError`` prose — English no matter the interface."""
+        envelope the screen's toast prints. The server sentences follow the
+        interface language, not a fixed English string."""
         pl = {'Accept-Language': 'pl', **doc_auth_headers}
 
         client.post('/api/v1/warehouse/periods/2026/9/close', headers=doc_auth_headers)

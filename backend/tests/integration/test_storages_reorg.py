@@ -1,8 +1,7 @@
 """Integration tests for the transactional storage reorg batch endpoint.
 
-The reorg modal used to save the new hierarchy as a sequence of individual
-create/update/delete requests — a failure in the middle left the tree
-half-applied with no rollback. The batch endpoint executes the whole
+The reorg modal saves the new hierarchy in one request. The batch endpoint
+executes the whole
 operation list in one transaction and validates the FINAL tree state, so:
 
 - a batch with one illegal operation changes nothing and returns the reason,

@@ -214,11 +214,12 @@ def _write_package(
 def fixture_module(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, setup_test_db):
     """A community module installed at v0.1, into a tree of this test's own.
 
-    The install used to land in the real ``app/modules`` tree, because that is
-    where the migration runner and the import in ``env.py`` look. That tree is
-    also what every other xdist worker reads, so the fixture was a module the
-    migration doctor enumerated mid-run: ``test_migration_doctor_drift`` went
-    red in both directions of the window, depending on which worker won.
+    The install lands in a tree of this test's own, not in the real ``app/modules``
+    tree that the migration runner and the import in ``env.py`` read. That tree
+    is also what every other xdist worker reads, so a module installed there
+    would be enumerated by the migration doctor mid-run, and
+    ``test_migration_doctor_drift`` would go red in both directions of the
+    window, depending on which worker won.
 
     For the duration of the test every writer and reader of the tree is
     pointed at ``tmp_path/modules``: the install and upgrade destinations, the

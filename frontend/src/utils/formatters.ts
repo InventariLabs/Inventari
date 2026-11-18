@@ -459,9 +459,11 @@ export function stepText(
  *
  * Counted off the step as it is written, not off the column it is stored in:
  * `numeric(12,6)` serializes a thousandth as "0.001000", and a rule read off
- * that column would be a rule nobody has. One function for both directions —
- * the counting box refuses a fourth decimal on a gram because of it, and the
- * screens below print the same number of places for the same reason.
+ * that column would be a rule nobody has. This is the number of places an
+ * input accepts (the counting box refuses a fourth decimal on a gram). It is
+ * not how many places a stored quantity displays: given a unit step,
+ * `formatQuantityValue` never shows fewer than the three places the quantity
+ * columns keep; without one it strips the padding ("1.000" shows as "1").
  */
 export function decimalsAllowedBy(
   rounding: string | number | null | undefined,
@@ -523,8 +525,8 @@ export function formatQuantityValue(
 /**
  * A quantity with its unit — or bare, when the product has no unit recorded.
  *
- * The UI used to append "pcs" wherever a unit was missing, which showed the
- * user a unit that is not in the data. 500 g of something then read as 500
+ * The UI does not append "pcs" wherever a unit is missing: that would show the
+ * user a unit that is not in the data, and 500 g of something would read as 500
  * pieces.
  */
 export function formatQuantity(

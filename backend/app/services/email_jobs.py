@@ -238,10 +238,9 @@ async def _send_job(db: AsyncSession, job_id: uuid.UUID, now: datetime) -> None:
         job.last_error = None
     else:
         # What stopped the mail, not what the queue did about it. The row
-        # used to record 'max attempts reached' and 'smtp send returned
-        # False' — both true, neither actionable: a wrong relay password, a
-        # closed port and a host that never answered all read the same, and
-        # the row is the only place an administrator meets any of them.
+        # carries the cause the transport reported: a wrong relay password, a
+        # closed port and a host that never answered are not the same failure,
+        # and the row is the only place an administrator meets any of them.
         job.last_error = result.error or _UNREPORTED_FAILURE
         if job.attempts >= job.max_attempts:
             job.status = _STATUS_FAILED

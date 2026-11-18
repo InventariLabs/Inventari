@@ -151,8 +151,8 @@ export const shoppingListsApi = {
   },
 
   /** What the app would propose buying, with no list to propose it onto.
-   *  The dashboard used to create an empty list simply to have an id for
-   *  this read, and Cancel did not take it back. */
+   *  The dashboard creates no empty list simply to have an id for
+   *  this read, so Cancel has no list to take back. */
   previewSuggestions: async (params?: {
     include_low_stock?: boolean;
     include_frequent?: boolean;

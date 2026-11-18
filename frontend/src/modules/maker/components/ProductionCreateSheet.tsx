@@ -33,12 +33,9 @@ interface ProductionCreateSheetProps {
 /**
  * "I made it" and "I plan to make it" on one sheet.
  *
- * Recording 20 kg made used to be five steps — a draft, its page, a
- * completion — with the quantity defaulting to one of nothing in particular,
- * and the shortage first heard of at "Create draft". The quantity is now in
- * the product's own unit; what the run takes, what is short and what it
- * costs stand beside the form while it is filled; and "Already made" saves
- * the finished run in one step.
+ * Recording 20 kg made is one step: the quantity is in the product's own unit,
+ * what the run takes, what is short and what it costs stand beside the form
+ * while it is filled, and "Already made" saves the finished run in one step.
  */
 export function ProductionCreateSheet({
   open,

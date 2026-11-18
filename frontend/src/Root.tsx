@@ -8,10 +8,9 @@ import { queryClient } from "./lib/queryClient";
 import { isPublicPath } from "./publicRoutes";
 
 // Two trees, and the choice is made here rather than by the router, because it
-// decides what gets downloaded. The public attestation page used to live inside
-// `App`, which opened by loading every module.ts up front back then, so a
-// visitor with no account was handed the whole application. Both are lazy so
-// the bundler can keep them apart.
+// decides what gets downloaded. The public attestation page stays out of
+// `App`, so a visitor with no account is not handed the whole application.
+// Both are lazy so the bundler can keep them apart.
 const App = lazy(() => import("./App"));
 const PublicApp = lazy(() => import("./PublicApp"));
 

@@ -1,8 +1,6 @@
 """The movement ledger pages by the last row the reader saw.
 
-``GET /api/v1/stock-moves`` used to page with ``OFFSET`` and a ``COUNT(*)`` on
-every request, so the hundredth page cost a hundred pages and the count was
-taken again each time the reader turned one. It now hands back a
+``GET /api/v1/stock-moves`` pages by cursor, not ``OFFSET``: it hands back a
 ``next_cursor`` that names the last row, the next request starts below that
 row, and the count is taken on the first page and carried in the cursor.
 

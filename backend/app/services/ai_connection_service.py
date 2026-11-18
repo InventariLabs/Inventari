@@ -221,10 +221,9 @@ class AiConnectionService:
             verdict = 'contract_failed'
 
         # The probe's verdict belongs on the row, not only in the toast that
-        # showed it once. A connection whose vision test failed used to keep
-        # its VISION badge and stay on the list of candidates for reading
-        # photographs, with nothing anywhere to say the model had been asked
-        # and had not managed. A draft has no row to write to.
+        # shows it once. A connection whose vision test failed keeps no VISION
+        # badge and is not a candidate for reading photographs, and the row says
+        # the model was asked and did not manage. A draft has no row to write to.
         if connection_id is not None and contract['checked']:
             self._record_capability_check(conn, contract)
         # ``ok`` keeps its original meaning — the provider answered us. The

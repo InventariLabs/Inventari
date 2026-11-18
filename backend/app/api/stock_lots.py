@@ -119,8 +119,8 @@ async def set_stock_lot_status(
 ) -> Any:
     """Hold a batch back, or let it go again.
 
-    Every picking path already obeys the status; until now nobody could set
-    it. The reason is kept with the batch, because "quarantined" without
+    Every picking path obeys the status, and this endpoint is the only place
+    it is set. The reason is kept with the batch, because "quarantined" without
     "supplier notice 41/26" is a decision nobody can review.
     """
     org_id = require_org(current_user)

@@ -102,8 +102,7 @@ function HolderCard({ assignment }: { assignment: EquipmentAssignment }) {
 /**
  * Where the asset is. Checked out to a place, it stands there until it comes
  * back: that is its location, with its own location — the home the return
- * goes to — beneath it. The row used to name the home alone while the list's
- * holder column named the place.
+ * goes to — beneath it.
  */
 function LocationRow({
   item,

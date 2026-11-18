@@ -33,13 +33,12 @@ class TaxHandling(StrEnum):
 
 #: How a document number is shaped when nobody has said otherwise.
 #:
-#: One constant, because there used to be three: this column's default, the
-#: "Simple" preset, and a literal in the numbering code — and which of them
-#: applied depended on call order. The first document of an organization was
-#: numbered before its profile existed, so it got the numbering code's width
-#: and every document after it got the preset's: IN/2026/0001, then
-#: IN/2026/002. Two defaults for one question is a bug waiting for its next
-#: field; this is the one place the answer lives.
+#: One constant serves the column's default, the "Simple" preset and the
+#: numbering code. Three separate defaults would apply by call order: the
+#: first document of an organization is numbered before its profile exists,
+#: so it would get the numbering code's width and every later document the
+#: preset's (IN/2026/0001, then IN/2026/002). Two defaults for one question
+#: is a bug waiting for its next field; this is the one place the answer lives.
 DEFAULT_NUMBERING_FORMAT = '{TYPE}/{YEAR}/{SEQ:03d}'
 DEFAULT_NUMBER_PADDING = 3
 

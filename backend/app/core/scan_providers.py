@@ -28,8 +28,8 @@ _DIGITS_BARCODE = re.compile(r'^\d{8,14}$')
 
 # Recognises a label short_code (e.g. STM-2BWO, B12-6UPR, DELL-LAT5540).
 # The shape is defined once, beside the constraint the creation schema
-# reads, because the two used to disagree about digits and the
-# disagreement printed stickers the scanner refused: see
+# reads, because the two must agree about digits, or a sticker printed
+# by one is refused by the other: see
 # `app.core.label_codes`. Re-exported here so the provider chain and the
 # legacy scan service keep their existing import.
 
@@ -86,9 +86,9 @@ class StorageScanProvider:
     async def _renumbered_async(
         code: str, user: UserContextDTO, db: AsyncSession
     ) -> LabelScanResponse | None:
-        """The location an old code of a renumbered location names.
+        """The location named by a code that a renumbering retired.
 
-        The old code stays behind as a storage pool label aimed at the
+        The retired code stays behind as a storage pool label aimed at the
         location, and it need not have a label's shape (``SHELF1``,
         ``A-02-01``) — the pool provider only looks at codes that do. The
         scan is counted on the label like any pool label's.

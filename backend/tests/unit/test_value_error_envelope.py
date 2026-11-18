@@ -1,11 +1,10 @@
 """The 400 envelope stamps ``lang`` only on text i18n actually produced.
 
 Every service ``ValueError`` reaches the client through the global handler
-in ``app.main``. The handler used to copy ``str(exc)`` and stamp the request
-language on it — a claim it could not keep: a Polish reader asking for a
-production order without a recipe got an English sentence wearing a
-``lang: pl`` label (measured on /maker/production at 390x844). Provenance
-now rides on the type: ``ServiceRejectionError`` carries the i18n key it
+in ``app.main``. The handler does not copy ``str(exc)`` and stamp the request
+language on it, a claim it could not keep: a Polish reader asking for a
+production order without a recipe would get an English sentence wearing a
+``lang: pl`` label. Provenance rides on the type: ``ServiceRejectionError`` carries the i18n key it
 was built from and earns the language field; a plain ``ValueError`` speaks
 its own internal text and the envelope stops claiming otherwise.
 

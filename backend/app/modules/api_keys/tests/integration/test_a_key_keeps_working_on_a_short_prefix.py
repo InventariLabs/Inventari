@@ -54,7 +54,7 @@ def before_the_cut() -> Iterator[str]:
 
 
 def _seed(url: str) -> dict[str, tuple[uuid.UUID, str]]:
-    """An active key and a revoked one, stored the way they used to be issued."""
+    """An active key and a revoked one, stored in the short-prefix form that older installs issued."""
     org, user = uuid.uuid4(), uuid.uuid4()
     keys = {
         name: (uuid.uuid4(), f'inv_live_{uuid.uuid4().hex}')

@@ -6,7 +6,7 @@ pandas. The second is its counterpart for pictures, ``decode_image``: the
 decoded size of an uploaded image, for every path that decodes one. The
 third is the attachment policy below.
 
-Two attachment services used to answer the same question apart: item
+Two attachment services answer the same question in one place: item
 attachments (10 MB, their own MIME list, the extension read off the
 uploaded filename) and equipment's (20 MB, a list of its own, the
 extension read off the validated type). The limits differ on purpose — a

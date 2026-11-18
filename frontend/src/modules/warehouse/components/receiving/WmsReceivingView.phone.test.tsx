@@ -837,8 +837,8 @@ describe("WmsReceivingView on a phone", () => {
 
   /**
    * A delivery whose only line was skipped on the desktop: the phone opens the
-   * finished session and used to post the completion at once, got the refusal
-   * and offered only Retry — no way to undo the skip or say what became of it.
+   * finished session, posts the completion at once, and a refusal of it still
+   * offers a way to undo the skip or say what became of it.
    */
   async function answerSkippedLines(
     skipped: Array<{
@@ -1009,9 +1009,8 @@ describe("WmsReceivingView on a phone", () => {
 /**
  * A scanner reads faster than the server answers: a warehouse's wifi takes a
  * few hundred milliseconds a round trip, and the scanner fires every few
- * tens. The field used to go dead for each round trip, so a code read in
- * between fell on whatever had the focus — Enter on the Back button paused
- * the session — and the ones that did arrive were dropped by a guard.
+ * tens. The field stays live during each round trip, so a code read in between
+ * goes to the field and is not lost to whatever holds the focus.
  */
 describe("a burst of scans on a phone", () => {
   const PRODUCTS = [

@@ -1,10 +1,9 @@
 """What an intermediate product already has on the shelf, before it is made.
 
-A formula line whose ingredient has a recipe of its own — dough in the
-bread, a sauce in the dish — used to be exploded all the way down to its
-leaves, so the dough made yesterday stayed on the shelf while today's run
-took flour again. Every multi-level tool in the field takes the intermediate
-from its own stock first and makes only the part the stock does not cover.
+A formula line whose ingredient has a recipe of its own — dough in the bread, a
+sauce in the dish — is taken from its own stock first, and only the part the
+stock does not cover is made. The dough made yesterday is used before today's
+run takes flour again.
 
 ``StockPool`` is the one answer to "how much of this intermediate can a run
 take from the shelf". The explosion asks it line by line, and every reader of

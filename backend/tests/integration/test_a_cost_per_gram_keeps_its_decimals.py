@@ -94,7 +94,7 @@ async def test_the_batch_rate_agrees_with_the_single_one(
 async def test_an_unpriced_receipt_inherits_the_full_rate(
     real_async_db_session: AsyncSession, async_test_household
 ):
-    """The truncation used to be written into the next layer, not just returned."""
+    """The truncation is written into the next layer, not just returned."""
     db = real_async_db_session
     template = await _template_with_receipt(
         db, async_test_household.id, Decimal('1000'), Decimal('0.0234')

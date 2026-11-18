@@ -219,8 +219,8 @@ class TestTheCountrySuppliesTheTaxIdRequirement:
         doc_template: ProductTemplate,
         db_session: Session,
     ) -> None:
-        """``Full Value`` used to pin this requirement to False, so a Polish
-        company confirmed documents with partners it could not invoice.
+        """``Full Value`` does not pin this requirement to False, so a Polish company
+        cannot confirm documents with partners it could not invoice.
         Fails without the fix at the first confirm: 200 where 400 is the law."""
         _set_country(db_session, doc_org, 'PL')
         _apply_preset(client, doc_auth_headers, 'Full Value')

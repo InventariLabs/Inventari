@@ -1,7 +1,7 @@
 """Module context-tag scoping.
 
 Derives the set of context_tags "claimed" by vertical modules from their
-CategoryDeclaration.context_tag. Used to isolate the default Inventory view
+CategoryDeclaration.context_tag. It isolates the default Inventory view
 from vertical-module data (equipment, library, ...).
 
 Pure-Python (no DB session, no organization) so it can be called from both

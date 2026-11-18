@@ -256,7 +256,7 @@ class TestParseIngredientsLLMAsync:
     async def test_llm_response_cut_off_keeps_the_complete_entries(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """A truncated list used to fall back to the basic parser wholesale."""
+        """A truncated list is not handed to the basic parser wholesale."""
         mock_json = (
             '[{"name": "flour", "group_name": "flour", "quantity": 500, '
             '"unit": "g", "original": "500 g flour"}, {"name": "eg'

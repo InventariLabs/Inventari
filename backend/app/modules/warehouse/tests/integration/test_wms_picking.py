@@ -303,10 +303,9 @@ class TestWmsPickStart:
         )
         assert resp1.status_code == status.HTTP_201_CREATED
 
-        # A second tap on the same button used to refuse, and nothing in the
-        # interface could reach the session that was already open — the
-        # document could then be neither completed nor cancelled. The picker
-        # gets their own session back instead, on the lines already picked.
+        # A second tap on the same button returns the picker's own open session,
+        # so the document can always be completed or cancelled. The picker
+        # gets their own session back, on the lines already picked.
         resp2 = client.post(
             f'/api/v1/warehouse/documents/{doc_id}/picking/start',
             headers=doc_auth_headers,
@@ -513,9 +512,8 @@ class TestWmsPickScan:
     ) -> None:
         """One scan of one unit closes one unit, not the whole line.
 
-        Scanning a single piece out of four used to answer
-        ``picked_quantity: 4`` and close the line -- the picker had no way
-        to report what was actually in their hand.
+        Scanning a single piece out of four answers ``picked_quantity: 1`` and
+        leaves the line open -- the picker reports what is in their hand.
         """
         template_id = doc_item.template_id or doc_template.id
         _sow(
@@ -1626,7 +1624,7 @@ class TestWmsPickLineCoverage:
         )
         session_id = start.json()['id']
 
-        # Strip the session down to what an unbuildable document used to produce.
+        # Strip the session down to what an unbuildable document produces.
         for line in db_session.scalars(
             select(WmsPickLine).where(WmsPickLine.session_id == uuid.UUID(session_id))
         ).all():

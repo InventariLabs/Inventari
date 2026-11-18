@@ -287,9 +287,8 @@ class TestTopUp:
 class TestTopUpAcrossUnits:
     """A line for the same goods in another unit is cover in the need's unit.
 
-    The sum used to add the lines' numbers whatever their unit: 500 g of
-    plums on the list was 500 kg of cover, and a run short of 4 kg put
-    nothing on the list.
+    The sum adds only lines in the need's unit: 500 g of plums on the list is
+    not 500 kg of cover, and a run short of 4 kg is put on the list.
     """
 
     async def _top_up(

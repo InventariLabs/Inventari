@@ -710,8 +710,8 @@ class TestScenario7ReceiptThenCorrection:
 class TestScenario3bDispatchItemOnly:
     """
     Dispatch referencing only item_id (no product_template_id on the line).
-    The stock must leave once: the dispatch used to risk a second, manual
-    decrement beside the one the record's own card drives.
+    The stock must leave once: no second, manual decrement sits beside the one
+    the record's own card drives.
 
     In practice, the document_line_resolver populates product_template_id from
     the item, so this path is exercised but the executor still sees the field.
@@ -770,8 +770,8 @@ class TestScenario3bDispatchItemOnly:
 class TestScenario8ReceiptOnExistingItem:
     """
     Receipt that adds stock to an item already at the target location.
-    Exercises the update_quantity_sync path in _receive_item — previously
-    caused a double increment of the shelf.
+    Exercises the update_quantity_sync path in _receive_item, which increments the
+    shelf once.
     """
 
     def test_receipt_adds_to_existing_item(
@@ -983,7 +983,7 @@ class TestScenario9CorrectionOnDispatch:
 class TestScenario10ScrapDocument:
     """
     SCRAP document: remove 15 units from stock.
-    Exercises _scrap_item which previously had double decrement.
+    Exercises _scrap_item, which decrements the stock once.
     """
 
     def test_scrap_removes_stock(

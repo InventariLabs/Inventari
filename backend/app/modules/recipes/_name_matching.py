@@ -11,10 +11,10 @@ shopping lists and meal plans are merged, so token order must not matter —
 "mąka pszenna" and "pszenna mąka" have to collapse onto one entry.
 
 Both go through the same transliteration, which is the point of this module:
-the two shapes used to be three separate implementations, and one of them fell
-back to a diacritics-preserving path whenever its optional dependency was
-missing — enough to write ``bakłażan`` next to ``baklazan`` and hand the
-cleanup to ``deduplicate_defaults``.
+the two shapes share one implementation, which must not fall back to a
+diacritics-preserving path when an optional dependency is missing: that would
+write ``bakłażan`` next to ``baklazan`` and hand the cleanup to
+``deduplicate_defaults``.
 """
 
 from __future__ import annotations

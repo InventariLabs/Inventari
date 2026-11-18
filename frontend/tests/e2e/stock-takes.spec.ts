@@ -306,9 +306,9 @@ test.describe("Stock Takes — counting lifecycle (API)", () => {
   });
 
   // the redirect after completing a stock take targets
-  // /inventory/stock-takes/{id}/report — that route used to be
-  // unregistered ("Page Not Found" after the most labor-intensive
-  // operation in the system).
+  // /inventory/stock-takes/{id}/report — that route must be registered: an
+  // unregistered one shows "Page Not Found" after the most labor-intensive
+  // operation in the system.
   test("report route renders after completion", async ({
     page,
     authenticatedPage,
@@ -335,7 +335,7 @@ test.describe("Stock Takes — counting lifecycle (API)", () => {
       .waitForLoadState("networkidle", { timeout: 15000 })
       .catch(() => {});
 
-    // Old behaviour: "Page Not Found". The summary must render instead.
+    // Not "Page Not Found": the summary must render instead.
     await expect(page.getByText(/perfect matches/i).first()).toBeVisible({
       timeout: 15000,
     });
@@ -345,9 +345,9 @@ test.describe("Stock Takes — counting lifecycle (API)", () => {
   });
 
   // at 390 px the counting controls (minus / quantity / plus /
-  // save) must sit inside the viewport — previously "+" (404 px) and the
-  // save button (446 px) fell past the right edge of a 384 px card with
-  // no horizontal scrolling.
+  // save) must sit inside the viewport — the "+" at 404 px and the
+  // save button at 446 px must not fall past the right edge of a 384 px card,
+  // with no horizontal scrolling.
   test.describe("mobile counting card at 390px", () => {
     test.use({ viewport: { width: 390, height: 844 } });
 

@@ -37,8 +37,8 @@ import { StockQuantCards } from "../components/stock/StockQuantCards";
 const PAGE_SIZE = 50;
 
 /** The filters the empty state names, and only those: with a search alone it
- *  used to send the reader to clear a storage nobody had picked — the same
- *  rule the movements ledger learned. The include-empty toggle widens rather
+ *  does not send the reader to clear a storage nobody had picked — the same
+ *  rule the movements ledger follows. The include-empty toggle widens rather
  *  than narrows, so it takes no part in the sentence. */
 function appliedStockFilters(
   t: TFunction,

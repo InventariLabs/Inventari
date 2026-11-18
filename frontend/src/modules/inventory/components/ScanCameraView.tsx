@@ -47,7 +47,7 @@ export interface LookupFailure {
 /**
  * Typing a barcode instead of scanning it. Reachable from every state where
  * the camera is not delivering codes — including the error overlay, which
- * used to cover the only copy of this field and leave a phone user stuck.
+ * must not cover the only copy of this field and leave a phone user stuck.
  */
 function ManualCodeEntry({ onSubmit }: { onSubmit: (code: string) => void }) {
   const { t: tScan } = useTranslation(["scan", "common"]);

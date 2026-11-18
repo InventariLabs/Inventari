@@ -3,9 +3,9 @@
 Initial migration for the approvals module, extracted from core baseline_001
 as part of the module migration isolation effort.
 
-These tables were previously created by the consolidated
-``baseline_001_full_schema.py`` with cancelled_by/cancelled_at added by
-core migration ``c0a1b2c3d4e5``. They now belong to the approvals module
+These tables come from the consolidated
+``baseline_001_full_schema.py``, with cancelled_by/cancelled_at added by
+core migration ``c0a1b2c3d4e5``, and belong to the approvals module
 so ``module enable approvals`` / ``module disable approvals`` can manage
 them independently via ``alembic_version_approvals``.
 

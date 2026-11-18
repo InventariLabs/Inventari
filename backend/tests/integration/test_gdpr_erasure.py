@@ -86,7 +86,7 @@ class TestAnonymizeUser:
         assert anonymized.hashed_password != old_password_hash
         assert anonymized.is_active is False
 
-        # RegistrationRequest no longer leaks the old email/name.
+        # RegistrationRequest keeps neither the email nor the name.
         await db.refresh(request)
         assert request.email != old_email
         assert request.full_name is None
@@ -249,7 +249,7 @@ class TestErasureOfTheRecordsThatKeepAnAddress:
         anonymized = await anonymize_user_async(db, invitee.id)
         await db.commit()
 
-        # The invitation no longer names anybody.
+        # The invitation names nobody.
         await db.refresh(invitation)
         assert invitation.invited_email == anonymized.email
         assert invitation.invited_email != old_email
@@ -369,11 +369,9 @@ class _Redis:
 class TestTheEraseCommand:
     """``manage.py user erase`` is the procedure's erasure, run as an operator runs it.
 
-    The procedure used to paste a script that failed as written: it asked for
-    a session before any async engine existed, and in production the token
-    revocation refused to run with no Redis behind it. So every test here
-    meets the command the way a fresh process on a deployed install does — no
-    async engine, a shared blacklist with no connection, DEBUG and TESTING
+    The procedure runs the command the way a fresh process on a deployed install
+    does, so every test here meets it that way — no async engine yet, a shared
+    blacklist with no connection, DEBUG and TESTING
     off — against the worker database, and reads the outcome back through a
     connection of its own, which only sees what was committed.
     """

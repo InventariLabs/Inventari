@@ -1,8 +1,8 @@
 """A write-off says why, and what it cost.
 
-A scrapped pair of boxes used to leave the register as a row with a count and
-no amount: the loss was in no total, and nothing on the document said whether
-the goods were damaged or simply out of date.
+A scrapped pair of boxes leaves the register as a row with a count and an
+amount: the loss is in the totals, and the document says whether the goods were
+damaged or simply out of date.
 """
 
 from datetime import date

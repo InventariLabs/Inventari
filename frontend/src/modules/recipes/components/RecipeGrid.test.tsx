@@ -205,8 +205,8 @@ describe("RecipeGrid — 'No recipes yet' CTA", () => {
     expect(
       screen.queryByRole("button", { name: "New recipe" }),
     ).not.toBeInTheDocument();
-    // The description used to fall through to "Create your first recipe to
-    // get started" under a title that said the search matched nothing.
+    // The description says the search matched nothing, and does not fall through
+    // to "Create your first recipe to get started".
     expect(
       screen.getByText("Try a different search term, or clear the search."),
     ).toBeInTheDocument();

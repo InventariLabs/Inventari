@@ -185,8 +185,7 @@ def changed_fields(before: dict, after: dict) -> dict[str, dict]:
 
     Both sides arrive masked, so a changed SMTP password records that it
     changed without recording what to. The audit entry names the settings an
-    administrator touched — "Permanent deletion" among them, which used to
-    save silently and leave no trace anywhere.
+    administrator touched — "Permanent deletion" among them, so no change saves without a trace.
     """
     keys = set(before) | set(after)
     changed = {k for k in keys if before.get(k) != after.get(k)}

@@ -101,9 +101,8 @@ describe("useBulkSelect", () => {
   });
 
   it("drops a tick whose row the next page no longer carries", () => {
-    // The bar counts what it can act on, and one page's ticks used to stay
-    // in the set while the actions were built from the page in view: the
-    // session covered one document and the other stayed ticked out of sight.
+    // The bar counts what it can act on, and the actions are built from every
+    // tick in the set, not only the page in view.
     const page1 = [makeDoc("1", "CONFIRMED"), makeDoc("2", "CONFIRMED")];
     const page2 = [makeDoc("3", "CONFIRMED")];
     const { result, rerender } = renderHook(

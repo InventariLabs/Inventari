@@ -311,7 +311,7 @@ describe("ShoppingListsPage", () => {
 
   it("asks for one new list everywhere — the empty state uses the header's word", async () => {
     // Both controls open the same modal, so they carry the same accessible
-    // name (§14.4): the empty state used to say "Create" where the header
+    // name (§14.4): the empty state must not say "Create" where the header
     // said "New list".
     vi.mocked(useShoppingLists).mockReturnValue({
       data: [],

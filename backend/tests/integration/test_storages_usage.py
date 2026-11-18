@@ -1,11 +1,9 @@
 """What a location is for is the system's business, not the caller's.
 
-``usage`` decides whether a location counts towards stock. The API used to
-take it on create, on update and through the hierarchy builder, and the edit
-sheet offered the seven Odoo-style values as a picker — so flipping a shelf
-of twelve products to "Scrap" removed them from stock, reports, purchase
-suggestions and scan lookup, removed the shelf from the tree it was reached
-from, and wrote nothing anywhere. These tests pin the door shut on both
+``usage`` decides whether a location counts towards stock, so it is not the
+caller's to set. A shelf of twelve products flipped to "Scrap" would drop them
+from stock, reports, purchase suggestions and scan lookup, and take the shelf
+out of the tree it is reached from, while writing nothing anywhere. These tests pin the door shut on both
 sides: the picker is gone from the app, and the API refuses the change.
 """
 

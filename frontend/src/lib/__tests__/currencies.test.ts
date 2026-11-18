@@ -6,9 +6,9 @@ import { CURRENCY_CODES, currencyLabel } from "@/lib/currencies";
 
 /**
  * The order form's currency select and the backend's currency validation
- * each carry their own curated ISO 4217 list. They used to drift:
- * the backend is a closed frozenset, the frontend a typed array, and nothing
- * compared the two — a code added on one side silently changed what the
+ * each carry their own curated ISO 4217 list, which must not drift:
+ * the backend is a closed frozenset, the frontend a typed array, and the test
+ * compares the two: a code added on one side must not silently change what the
  * other side accepts or offers.
  *
  * So the rule is read from the backend instead of restated here: the

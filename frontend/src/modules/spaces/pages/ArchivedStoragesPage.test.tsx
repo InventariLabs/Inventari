@@ -143,7 +143,7 @@ describe("ArchivedStoragesPage", () => {
 
   it("shows when each location left the lists", async () => {
     // The moment lives in the organization journal (SOFT_DELETE storage), and
-    // the row used to show the name alone — nothing said which of two same-
+    // the row shows the moment beside the name, so it is clear which of two same-
     // named rows was archived when.
     server.use(
       http.get("/api/v1/locations/archived", () =>

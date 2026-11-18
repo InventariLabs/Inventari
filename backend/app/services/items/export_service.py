@@ -51,9 +51,9 @@ def _iter_items(
     Same builder as ``GET /items`` — the sheet a reader downloads from under
     "Showing 1–50 of 102" holds those 102 rows, not the whole organization.
     The records are read a page at a time, keyed on the id, and handed on
-    one by one: the export used to hold every record with its category,
-    template, shelf and unit in one list, which at 100 000 products grew the
-    worker until the container killed it.
+    one by one: the export does not hold every record with its category,
+    template, shelf and unit in one list, which at 100 000 products would grow
+    the worker until the container killed it.
     """
     from app.services.items._query_get import _apply_item_filters
 
@@ -114,8 +114,8 @@ def _active_field_keys(
     # The same rule the form reads a schema by: an empty context_schema is
     # "no restriction", not "no fields". A location without one allows every
     # field, so a key any exported item carries travels — a home with expiry
-    # dates on the list used to get a sheet without the column, and the
-    # round trip through that sheet forgot the dates.
+    # dates on the list get a sheet with the column, so the round trip through
+    # that sheet keeps them.
     unrestricted = False
     for context_schema, field_definitions in schema_rows:
         if context_schema:

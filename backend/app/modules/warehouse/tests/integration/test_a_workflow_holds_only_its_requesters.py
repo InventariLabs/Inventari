@@ -2,10 +2,10 @@
 
 Approval is for the people who need it, not for everyone who files a
 document: warehouse staff's receipts wait, the administrator's do not. A
-workflow used to say only who decides, so whether a document waited depended
-on the document alone, and the administrator who confirmed a receipt was held
-like anyone else. The workflow now names whose documents it holds — everyone,
-or chosen people and roles — and the one rule asks that first.
+workflow names the people whose documents it holds, so whether a document
+waits depends on who filed it: the administrator who confirms a receipt is not
+held like anyone else. The workflow names everyone, or chosen people and roles,
+and the one rule asks that first.
 """
 
 import uuid

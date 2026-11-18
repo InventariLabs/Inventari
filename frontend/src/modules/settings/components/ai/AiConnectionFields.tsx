@@ -25,7 +25,7 @@ interface AiConnectionFieldsProps {
 }
 
 // Local providers usually don't need a key (Ollama, LM Studio, vLLM run
-// unauthenticated on localhost). Used to decide whether the draft carries
+// unauthenticated on localhost). Decides whether the draft carries
 // enough for the test to be worth sending.
 const LOCAL_PROVIDERS: ReadonlySet<LlmProvider> = new Set([
   "ollama",
@@ -86,9 +86,9 @@ export function AiConnectionFields({
 
   const onTest = async () => {
     // A draft the test cannot work with is refused here, in the reader's own
-    // language, instead of on the wire. Both gaps used to be silent: with no
-    // key the button was not rendered at all, and a missing base URL only
-    // came back as the provider's transport error.
+    // language, instead of on the wire. Both gaps are named here: a missing
+    // key and a missing base URL each say what is absent, rather than coming
+    // back as the provider's transport error.
     if (!canTest) {
       setRefusal(t("config.testNeedsApiKey"));
       return;
@@ -267,8 +267,8 @@ export function AiConnectionFields({
               onChange({ ...value, api_base_url: e.target.value || null })
             }
             onBlur={() => {
-              // An emptied field used to strand the connection: the save
-              // went through and the first call died on a relative URL.
+              // An emptied field is never saved as empty: the first call
+              // would die on a relative URL.
               // The descriptor's default comes back on blur. Every
               // provider that shows this field carries one except
               // "custom" — an address no descriptor can know — which
@@ -309,10 +309,9 @@ export function AiConnectionFields({
         </div>
       )}
 
-      {/* Always offered. The button used to be rendered only once the draft
-          carried a key, so the reader whose form was missing something had
-          nothing to press and nothing to read. Pressing it on an incomplete
-          draft now answers with the field that is missing. */}
+      {/* Always offered, so a reader whose form is missing something has a
+          button to press and a message to read. Pressing it on an incomplete
+          draft answers with the field that is missing. */}
       <div className="flex flex-col gap-2">
         <div>
           <Button
@@ -351,10 +350,9 @@ export function AiConnectionFields({
         <div className="flex flex-wrap items-center gap-3">
           {/* Every capability is a checkbox, including the ones the provider
               suggested. The suggestion comes from the protocol, and the
-              protocol says nothing about the model behind it: a connection to
-              a text-only model through an OpenAI-compatible endpoint used to
-              wear an unremovable VISION badge and stay on the list of things
-              to read photographs with. */}
+              protocol says nothing about the model behind it, so the reader can
+              untick VISION for a text-only model behind an OpenAI-compatible
+              endpoint. */}
           {CAPABILITIES.map((cap) => {
             const isChecked = value.capabilities.includes(cap.value);
             return (

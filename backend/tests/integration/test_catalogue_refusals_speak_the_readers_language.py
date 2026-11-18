@@ -1,9 +1,8 @@
-"""Refusals of the catalogue that used to carry an English literal.
+"""Refusals of the catalogue are answered in the reader's language.
 
-A request with no organization, a failure while storing an attachment, and a
-core-API write whose organization contradicts its user's were each answered
-with a hard-coded English sentence. The first two now come from the error
-catalogue in the request language; the third is a caller's mistake, so it is a
+A request with no organization and a failure while storing an attachment come
+from the error catalogue in the request language. A core-API write whose
+organization contradicts its user's is a caller's mistake, so it is a
 ``ContractViolationError`` (a logged 500), never a sentence for a reader.
 """
 

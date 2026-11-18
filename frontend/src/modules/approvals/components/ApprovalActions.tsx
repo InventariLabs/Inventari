@@ -405,9 +405,9 @@ export function ApprovalActions({
 
   if (approval === undefined) {
     // The read that says which request this target has has not landed. "No
-    // request" is a claim about the target, and this card used to make it on
-    // an empty guess — the button then took an approved document back to the
-    // approval queue. Nothing to say until the answer arrives.
+    // request" is a claim about the target, so the card makes it only on an
+    // answer. Nothing is said until the answer arrives: an empty guess would
+    // offer to take an approved document back to the approval queue.
     return null;
   }
 
@@ -451,9 +451,9 @@ export function ApprovalActions({
   }
 
   if (approval.status === "CANCELLED") {
-    // a withdrawn request used to fall through to the default
-    // branch, which offered Approve and Reject on a request the API
-    // answers with a conflict. The document stays in PENDING_APPROVAL —
+    // A withdrawn request gets its own card: the default branch would offer
+    // Approve and Reject on a request the API answers with a conflict. The
+    // document stays in PENDING_APPROVAL —
     // withdrawing takes back the request, not the document — so the one
     // thing left to do is send it again.
     return (

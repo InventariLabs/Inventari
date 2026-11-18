@@ -69,7 +69,8 @@ describe("PickingItemRow", () => {
 
   it("keeps saying the scan took nothing", () => {
     // The toast carrying this news is gone in seconds, and the checklist is
-    // read for as long as the cooking takes. The row used to say "Picked".
+    // read for as long as the cooking takes, so the row keeps saying the scan
+    // took nothing.
     renderRow(baseItem);
     expect(screen.queryByText(/Not taken/)).not.toBeInTheDocument();
 

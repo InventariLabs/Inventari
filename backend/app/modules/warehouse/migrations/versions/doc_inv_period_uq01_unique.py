@@ -4,9 +4,10 @@ Revision ID: doc_inv_period_uq01
 Revises: doc_putaway_rules01
 Create Date: 2026-07-24
 
-Previously uniqueness of an inventory period relied solely on an application-
-level advisory lock. A race, a bypassed code path, or manual DB edits could
-create duplicate closure rows for the same (organization, year, month). This
+Uniqueness of an inventory period is a hard constraint, not only an application-
+level advisory lock: a race, a bypassed code path, or manual DB edits could
+otherwise create duplicate closure rows for the same (organization, year, month).
+This
 adds a hard UNIQUE constraint.
 
 The constraint is added defensively: any pre-existing duplicates are collapsed

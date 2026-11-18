@@ -570,9 +570,9 @@ describe("RecipeDetailPage", () => {
     expect(screen.getByText("Copy Schema.org")).toBeInTheDocument();
   });
   it("answers a deleted recipe with a way back, not with a retry", async () => {
-    // A 404 used to reach the isError branch first, so a recipe that was gone
-    // came with "Try again" — a button that repeats a request the server has
-    // already answered.
+    // A 404 is not an error to retry: a recipe that is gone comes with a way back,
+    // not with "Try again", a button that repeats a request the server has already
+    // answered.
     server.use(
       http.get("*/api/v1/recipes/:id", () =>
         HttpResponse.json({ detail: "Not found" }, { status: 404 }),

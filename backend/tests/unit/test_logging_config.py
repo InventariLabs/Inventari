@@ -1,9 +1,7 @@
 """Every line on stdout carries a timestamp, and one format serves them all.
 
-The console handler used to run ``%(levelname)s - %(name)s - %(message)s``,
-so ``docker compose logs backend`` — the stream people actually read — had no
-clock on it.  ``app.log`` had one, in a different format, and uvicorn printed
-in a third.  These tests pin the three halves of the fix: the format itself,
+Every console line carries the clock in one format: ``docker compose logs backend``,
+the stream people actually read, matches ``app.log`` and uvicorn's output.  These tests pin the three halves of the fix: the format itself,
 the servers adopting it, and the launch commands still passing the config.
 """
 

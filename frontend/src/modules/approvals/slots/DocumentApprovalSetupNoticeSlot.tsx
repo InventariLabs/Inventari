@@ -20,8 +20,8 @@ type ConsequenceId =
  * it: the profile says what needs approval, the workflow says who approves,
  * and only a silent profile lets the workflow stand in for it. Each state
  * gets the sentence that matches it — none is left to inference, and the
- * two that used to be conflated (a profile outside a workflow, and a
- * workflow overriding a profile) now read differently.
+ * two easily conflated states (a profile outside a workflow, and a
+ * workflow overriding a profile) read differently.
  *
  * ``null`` only when the workflow cannot be told and nothing asks for it —
  * there is no honest sentence then.
@@ -65,18 +65,18 @@ function ConsequenceSentence({ id }: { id: ConsequenceId }) {
 /**
  * Says what the approval settings do — with a workflow and without one.
  *
- * "Require approval" used to confirm the document anyway when no workflow
- * existed, so the manager who switched it on believed documents were
- * controlled while every one sailed through. Confirmation is now refused
- * instead — which is only fair if the screen that switched the requirement
- * on also says what is missing and leads to where it is fixed.
+ * "Require approval" with no workflow behind it refuses confirmation rather
+ * than confirming the document anyway: a manager who switched it on must not
+ * believe documents are controlled while every one passes. So the screen that
+ * switched the requirement on also says what is missing and leads to where it
+ * is fixed.
  *
  * The other half is the rule itself: once a workflow exists, the profile
  * settings decide which documents wait, and only a profile that names
  * nothing lets the workflow demand approval for every document. The two
- * used to be one sentence ("the workflow demands every document"), which
- * the server then applied whatever the threshold said — so the consequence
- * is stated per combination, from the same state the warning reads.
+ * are stated as different sentences: the server applies a configured
+ * threshold whatever the workflow says, so the consequence is stated per
+ * combination, from the same state the warning reads.
  */
 export function DocumentApprovalSetupNoticeSlot({
   data: { approvalRequested },

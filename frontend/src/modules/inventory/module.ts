@@ -40,6 +40,9 @@ const StockLotPage = lazy(() => import("./pages/StockLotPage"));
 const StockLevelsPage = lazy(() => import("./pages/StockLevelsPage"));
 const StockLotsPage = lazy(() => import("./pages/StockLotsPage"));
 const StockAsOfPage = lazy(() => import("./pages/StockAsOfPage"));
+const StockValueMovementPage = lazy(
+  () => import("./pages/StockValueMovementPage"),
+);
 
 moduleRegistry.register({
   name: "inventory",
@@ -160,6 +163,10 @@ moduleRegistry.register({
     { path: "/inventory/stock", component: StockLevelsPage },
     { path: "/inventory/lots", component: StockLotsPage },
     { path: "/inventory/stock/as-of", component: StockAsOfPage },
+    {
+      path: "/inventory/stock/value-movement",
+      component: StockValueMovementPage,
+    },
     { path: "/inventory/lots/:id", component: StockLotPage },
     { path: "/inventory/moves", component: StockMovesPage },
     { path: "/inventory/labels", component: LabelPoolPage },

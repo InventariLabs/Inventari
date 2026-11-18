@@ -16,9 +16,9 @@ import { describe, expect, it } from "vitest";
  * - building the translation key by hand instead of calling the resolver;
  * - rendering a raw category name.
  *
- * The raw scan used to have an opinion only about files that named a
- * category type, so a file rendering `item.category_name` without ever
- * writing `Category` was waved through whole. What can only be a category's
+ * The raw scan has an opinion about files that never name a category type,
+ * so a file rendering `item.category_name` without ever writing `Category` must
+ * not be waved through whole. What can only be a category's
  * name — the wire field `category_name`, `category.name`, `{row.category}`
  * — is now a finding wherever it stands. Only the ambiguous shorthands
  * (`c.name`, `cat.name`) still need the file to be about categories.
@@ -234,7 +234,7 @@ describe("a category is named in one place", () => {
   });
 
   it("fires on the bulk-edit regression it exists for", () => {
-    // The bulk-edit select used to render exactly this line.
+    // The bulk-edit select renders exactly this line.
     const findings = rawNameFindings(
       "modules/inventory/components/items/BulkEditModal.tsx",
       [

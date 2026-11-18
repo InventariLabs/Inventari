@@ -157,10 +157,9 @@ describe("LineItemRow — collapsed", () => {
   it("keeps a fraction typed character by character — the dot step reports empty, not zero", () => {
     // While "12.5" is typed into a number field, the browser
     // reports "1", "12", "" (the incomplete "12."), "12.5" — one change
-    // event per keystroke. The row used to answer the "" with
-    // Number("") === 0, the controlled field rewrote itself to "0", and the
-    // dot the reader was still holding died with it: the line ended with
-    // quantity 5 and a field reading "05".
+    // event per keystroke. The row must not answer the "" with Number("") === 0,
+    // which would rewrite the field to "0" and drop the dot the reader is still
+    // holding: the line keeps the quantity 12.5 as typed.
     const props = makeProps();
     render(<LineItemRow {...props} line={makeLine({ quantity: 12 })} />);
     const field = screen.getByRole("spinbutton", { name: "Quantity" });
@@ -291,7 +290,7 @@ describe("LineItemRow — product search", () => {
   });
 
   it("closes the results panel rather than swapping in the empty one", async () => {
-    // Escape used to clear the results, and the panel — still open — redrew
+    // Escape must not clear the results, or the panel — still open — redraw
     // as "No results found". The first press belongs to the panel, and the
     // panel is what it closes.
     const props = makeProps();
@@ -528,7 +527,7 @@ describe("LineItemRow — the blur grace timer", () => {
 describe("LineItemRow — focus returning inside the blur grace window", () => {
   // Picking an option blurs the input; the row is then cleared and typed into
   // again. On a slow machine the first blur's timer is still pending when the
-  // focus comes back, and used to fire after it: the panel closed under the
+  // focus comes back. It must not fire after it and close the panel under the
   // user's hands, with the input still focused.
   it("keeps the panel open when an earlier blur's timer fires after the focus came back", () => {
     vi.useFakeTimers();
@@ -561,7 +560,7 @@ describe("LineItemRow — focus returning inside the blur grace window", () => {
 
 describe("LineItemRow — a line that opens with a typed name", () => {
   // A saved draft or a pasted list opens with names nobody has searched for
-  // yet. The panel used to answer "No results found" on focus, and on a
+  // yet. The panel must not answer "No results found" on focus, and on a
   // receipt offer to make a product of a name the list may already hold.
   it("searches for its name when it gets the focus", async () => {
     const props = makeProps();

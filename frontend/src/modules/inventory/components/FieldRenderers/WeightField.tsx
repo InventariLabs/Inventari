@@ -35,19 +35,16 @@ interface WeightFieldProps {
  * the same way, in thousandths of the reference unit — see
  * ``app.services.items.weight``.
  *
- * Precision is the unit's own knowledge, not this field's: the total keeps
- * the unit's rounding step, so an input finer than two places reads finer
- * instead of being silently clipped to what the old two-decimal cap
- * allowed. Every unit this picker offers — the Weight and Volume
- * categories, g through gal — keeps three places, so three is what a total
- * here shows; the sentence used to illustrate itself with a centimetre,
- * which is in Length and unreachable from this field.
+ * Precision: the total is shown with the unit's rounding step, but never with
+ * fewer places than the quantity columns store (three), because the step says
+ * how finely an amount is typed, not what a record holds. Every unit this
+ * picker offers — the Weight and Volume categories, g through gal — has a step
+ * of three places or fewer, so a total here shows three; a Length unit such as
+ * a centimetre is unreachable from this field.
  *
- * Until a unit is picked there is no unit to ask, and the screen must not
- * invent an answer either: it fell back to printing whatever decimals the
- * input carried, so 2 × 1.23456 read "2,4691" — four places, finer than any
- * unit in the picker allows. Without a unit the total keeps the quantity
- * columns' own scale, the floor every other consumer of a step already uses.
+ * Until a unit is picked there is no unit to ask, and the total keeps the
+ * quantity columns' own scale, the floor every other consumer of a step uses,
+ * instead of printing whatever number of decimals the input carried.
  *
  * One ceiling stands above all of this and is not the unit's: the formatter
  * trims to four decimal places before a step is applied at all. No unit in
@@ -126,10 +123,9 @@ export function WeightField({
 
       {showTotal && (
         <p id={totalId} className="text-xs text-on-muted mt-0.5 font-medium">
-          {/* The product is a number the formatter reads directly; the unit's
-              own step decides how many decimals it keeps — and with no unit
-              picked, the quantity columns' scale does, rather than the
-              accident of how many decimals were typed. */}
+          {/* The product is a number the formatter reads directly; it shows at
+              least the quantity columns' three places, and more only when the
+              unit's own step is finer. */}
           {t("items:weightTotalHint", {
             total: formatQuantity(
               perUnit * qty,

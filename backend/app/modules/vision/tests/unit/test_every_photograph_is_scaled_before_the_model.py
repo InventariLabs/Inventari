@@ -1,10 +1,10 @@
 """Every photograph is scaled into 1200 px before a model sees it.
 
 The ten-megabyte limit on an uploaded photograph rests on this: nothing past
-the box survives to the model anyway. Only the nutrition-table path used to do
-it; the label path handed the model the bytes as they came, so an API client
-that did not shrink its photograph sent all of it — billed by size, and
-refused by some providers past a few megabytes.
+the box survives to the model anyway. Every path does it, the label path
+included, so the model never receives the bytes of a photograph an API client
+did not shrink: those are billed by size, and some providers refuse them past
+a few megabytes.
 
 What is checked is what reaches Core's extraction call, on both paths.
 """

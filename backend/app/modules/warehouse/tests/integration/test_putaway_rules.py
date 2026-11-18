@@ -317,8 +317,8 @@ class TestPutawayRulesResolution:
     ) -> None:
         """a context_tag rule matches via the item's Category.context_tag.
 
-        The receipt executor used to pass category_context_tag=None, so such
-        a rule could never fire.
+        The receipt executor passes the item's category_context_tag, so such
+        a rule can fire.
         """
         from app.core.testing import ModuleTestHelper
 
@@ -419,8 +419,8 @@ class TestPutawayRulesResolution:
     ) -> None:
         """a storage_type_code rule matches via the doc target's type.
 
-        The receipt executor used to pass storage_type_code=None, so such a
-        rule could never fire.
+        The receipt executor passes the target's storage_type_code, so such a
+        rule can fire.
         """
         from app.core.testing import ModuleTestHelper
 

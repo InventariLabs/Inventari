@@ -33,9 +33,9 @@ def _get_effective_servings(
     """How many servings this entry stands for.
 
     The entry decides; failing that the plan; failing that the recipe itself.
-    The constant is the last resort and it used to be the second one, so a
-    recipe written for one serving landed in a plan as two, and the shopping
-    list asked for twice the ingredients nobody had agreed to.
+    The constant is the last resort, so a recipe written for one serving lands
+    in a plan as one, and the shopping list does not ask for twice the
+    ingredients nobody agreed to.
     """
     if entry.servings:
         return entry.servings

@@ -175,8 +175,8 @@ describe("usePickingSession — a refused scan is not a pick", () => {
   });
 
   it("does not close the session on a refusal that claims completion", async () => {
-    // `session_complete` used to be read before the status, so a refusal
-    // carrying it would have ended the session with nothing taken.
+    // `session_complete` is read after the status, so a refusal carrying it does
+    // not end the session with nothing taken.
     let completeCalls = 0;
     scanAnswers({ ...unitMismatch, session_complete: true });
     server.use(

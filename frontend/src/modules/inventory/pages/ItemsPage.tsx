@@ -188,9 +188,8 @@ export default function ItemsPage() {
   // other way to reach the bulk bar.
   const [selectionMode, setSelectionMode] = useState(false);
   const [showBulkEdit, setShowBulkEdit] = useState(false);
-  // `?import=1` opens the wizard straight away: the data card in settings used
-  // to answer "coming soon" while this very wizard sat two clicks away, and it
-  // now links here. Only for a role the wizard would actually serve — the
+  // `?import=1` opens the wizard straight away, as the data card in settings
+  // links here. Only for a role the wizard would actually serve — the
   // card hides itself behind `items:write`, so a deep link must not reopen
   // the door the card just closed.
   const [showImportModal, setShowImportModal] = useState(
@@ -211,8 +210,8 @@ export default function ItemsPage() {
   );
 
   // A product's name opens the product dialog, the pencil's own — on the
-  // desktop table and on a phone card alike. It used to open a quick-action
-  // sheet first, a step no visitor expects from a name.
+  // desktop table and on a phone card alike, without a quick-action sheet in
+  // between: no visitor expects that step from a name.
   const openProduct = useCallback(
     (item: Item) => setEditingItemId(item.id),
     [setEditingItemId],

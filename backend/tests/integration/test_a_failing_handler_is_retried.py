@@ -1,9 +1,9 @@
 """A handler that fails on a stream delivery is retried, then parked — never lost.
 
-The consumer used to log the exception and acknowledge the message on the
+The consumer does not log the exception and acknowledge the message on the
 next line: a handler that raised, deterministically or on a database blip,
-had its event dropped with no retry, no dead-letter queue and nothing for an
-administrator to see. The bus now writes the failed handler to the delivery
+would have its event dropped with no retry, no dead-letter queue and nothing
+for an administrator to see. The bus writes the failed handler to the delivery
 log (``event_deliveries``) and the retry worker runs it again, alone, with
 backoff; after ``MAX_HANDLER_ATTEMPTS`` it is parked as dead and the
 organization's admins are told.

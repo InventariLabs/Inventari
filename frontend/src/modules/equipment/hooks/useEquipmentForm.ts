@@ -30,10 +30,9 @@ export const DEDICATED_KEYS: ReadonlySet<string> = new Set([
  * equipment namespace.
  *
  * The serial number identifies the asset, so it belongs where the core
- * search can reach it — a number typed into the command palette used to
- * find nothing while the module's own list found it at once. The field
- * still renders from the category declaration; only its destination
- * changed.
+ * search can reach it — a number typed into the command palette finds it,
+ * as the module's own list does. The field still renders from the category
+ * declaration; only its destination is the core column.
  */
 const SERIAL_KEY = "serial_number";
 const MODEL_KEY = "model_id";
@@ -87,9 +86,9 @@ export function useEquipmentForm(
     Partial<Record<"name" | "location_id" | "category_id", string>>
   >({});
   const [isFetchingItem, setIsFetchingItem] = useState(Boolean(editItemId));
-  // A failed read used to leave the form standing and empty, with a live
-  // Save button — so the first save wrote that emptiness over the record.
-  // The failure is state now, and the page renders it instead of the form.
+  // A failed read must not leave the form standing and empty, with a live
+  // Save button, or the first save would write that emptiness over the record.
+  // The failure is state, and the page renders it instead of the form.
   const [loadError, setLoadError] = useState<unknown>(null);
   const [reloadToken, setReloadToken] = useState(0);
   const [selectedModelId, setSelectedModelId] = useState("");
@@ -274,7 +273,7 @@ export function useEquipmentForm(
   const handleModelSelect = (models: EquipmentModel[], modelId: string) => {
     setSelectedModelId(modelId);
     if (!modelId) {
-      // Back to "create from scratch": the unit no longer belongs to a model,
+      // Back to "create from scratch": the unit does not belong to a model,
       // so it must stop borrowing its picture.
       setForm((prev) => {
         const { [MODEL_KEY]: _released, ...rest } = prev.dynamic;
@@ -330,15 +329,15 @@ export function useEquipmentForm(
           serial_number: serialNumber || null,
           metadata: { equipment: equipmentMeta },
           // The form never changes the unit against the template, which is
-          // the flag's "no" — the answer the server used to default to.
+          // the flag's "no", sent explicitly rather than left to a server default.
           unit_confirmed_over_template: false,
         };
         await itemsApi.update(editItemId, updatePayload);
         await applyImageAfterSave(editItemId);
         // Reconcile label_code through the label-pool API rather than the
         // generic item PATCH: the LabelPool binding (is_assigned / item_id)
-        // must stay consistent with Item.label_code. assign also frees the
-        // previously bound label; unassign releases it when cleared.
+        // must stay consistent with Item.label_code. assign also frees the label
+        // the item held; unassign releases it when cleared.
         const newLabelCode = form.label_code.trim();
         if (newLabelCode !== originalLabelCode.current) {
           if (newLabelCode) {
@@ -385,7 +384,7 @@ export function useEquipmentForm(
           // none — invisible under every status chip on the list.
           metadata: { equipment: equipmentMeta },
           // Quantity 1 with no template match to contradict — the flag's
-          // "no", which the server used to default to.
+          // "no", sent explicitly rather than left to the server's default.
           unit_confirmed_over_template: false,
         };
 
@@ -412,8 +411,8 @@ export function useEquipmentForm(
         navigate(`/equipment/${created.id}`, { replace: true });
       }
     } catch (err) {
-      // The `{{msg}}` this used to interpolate is in none of the five
-      // translations, so the reason was computed and dropped. The server's
+      // The `{{msg}}` placeholder is in none of the five translations, so a
+      // reason interpolated there would be dropped. The server's
       // sentence replaces the generic one instead of decorating it.
       toast.error(extractApiError(err, t("form.errors.saveFailed")));
     } finally {

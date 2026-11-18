@@ -119,11 +119,10 @@ class TestPutawayCapacity:
         the same answer a missing one gets.
 
         The product half needs a template that really belongs to another
-        organization. It used to pass a random UUID, which only proves the
-        endpoint checks existence: a lookup without an ``organization_id``
-        filter would have stayed green while happily capping another
-        tenant's product on our shelf. That is the cross-tenant lookup
-        class.
+        organization: a random UUID would only prove the endpoint checks
+        existence, and a lookup without an ``organization_id`` filter would
+        stay green while capping another tenant's product on our shelf. That
+        is the cross-tenant lookup class.
         """
         from app.core.testing import ModuleTestHelper
 

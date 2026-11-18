@@ -139,7 +139,7 @@ function useLineItemPicker({
 
   // The blur grace timer is delayed work on the global timer queue: a row
   // that goes away inside the 200 ms window — a removed line, a closed
-  // editor, a test environment torn down — used to fire its state set on a
+  // editor, a test environment torn down — must not fire its state set on a
   // dead component. The id is kept so unmount can take the timer back.
   const blurTimerRef = useRef<number | null>(null);
 

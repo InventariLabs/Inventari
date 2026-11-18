@@ -4,9 +4,9 @@ import { moduleRegistry } from "./registry";
 import { registerModules } from "./moduleLoaders";
 
 /**
- * Registering used to be an all-or-nothing side effect of the entry chunk:
- * `App` globbed every `module.ts` with `eager: true`, so every reader
- * downloaded all of them — including the ones their organization had
+ * Registering is a per-module import, not an all-or-nothing side effect of the
+ * entry chunk: every reader would otherwise download every `module.ts`,
+ * including the ones their organization had
  * switched off. The loaders make it a per-module act, and these tests pin
  * the act itself.
  *

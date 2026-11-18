@@ -56,11 +56,8 @@ describe("WmsPickLineRow's action icons", () => {
 });
 
 /**
- * The row itself used to be the way to record a line: it opened the shortfall
- * sheet prefilled with 0, so an ordinary pick was a sheet and a number typed
- * by hand. The receiving row never was a button, and its actions say what
- * they do — so this one is a plain row too, and the full pick is a named
- * action on it.
+ * The row is a plain row, not a button: its actions are named buttons, as on
+ * the receiving row, and the full pick is a named action on it.
  */
 describe("WmsPickLineRow's row itself", () => {
   it("renders a pending line as a plain row, not a button", () => {

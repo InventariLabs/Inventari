@@ -2,7 +2,7 @@
 
 A customer's return and a dispatch corrected downwards both put goods back
 on the shelf. The line they come back on carries the sales price -- it is
-copied from the dispatch -- and the receipt layer used to be posted at it.
+copied from the dispatch -- and the receipt layer must not be posted at it.
 Every return then put the margin on the shelf: sold at 5.00 what cost 1.00,
 taken back, and the books held 5.00 of stock where 1.00 had left.
 

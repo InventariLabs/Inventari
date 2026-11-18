@@ -110,7 +110,7 @@ def uninstall(
         help="DROP the module's tables with every organization's data in them.",
     ),
 ):
-    """Uninstall a previously installed community module.
+    """Uninstall an installed community module.
 
     Removes the module files from backend/app/modules/ and frontend/src/modules/,
     updates the community_modules.json tracking file, and clears the module's
@@ -166,7 +166,7 @@ def upgrade(
     data with it.
 
     The on_upgrade hook runs on the next backend restart, from the new
-    version's own code, with the previously installed version as
+    version's own code, with the installed version as
     old_version.
 
     Example:
@@ -782,8 +782,8 @@ def smoke(  # noqa: PLR0915 - existing complexity/size
     check('AST safety', not safety_errors, '; '.join(safety_errors[:3]))
 
     # One source of truth for i18n completeness (module_validator.validate_i18n):
-    # the flat five-language list this used to carry failed community modules for
-    # missing pl/de/fr/es, which is only an error for core and official ones.
+    # a flat five-language list would fail community modules for
+    # missing pl/de/fr/es, which is an error only for core and official ones.
     i18n_findings = validate_i18n(module_dir)
     if not i18n_findings:
         check('i18n complete', True)

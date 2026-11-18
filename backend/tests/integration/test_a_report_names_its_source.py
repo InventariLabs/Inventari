@@ -6,8 +6,8 @@ report that breaks value down by location or category cannot read the
 ledger, and one that does not can. Both kinds are honest about it here:
 the figure carries ``value_source``, a per-category row counts the records
 it could not price, and the overview says whom its figure is about — the
-ledger branch used to take the storage filter and drop it, counting one
-population and valuing another on the same card.
+ledger branch takes the storage filter too, so the count and the value on the
+same card cover one population.
 
 The differencing test: a price corrected on the card, with no movement
 behind it, does not move a figure that reads the ledger.

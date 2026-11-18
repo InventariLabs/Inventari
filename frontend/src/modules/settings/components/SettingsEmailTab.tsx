@@ -32,9 +32,10 @@ interface SMTPSettings {
   host: string;
   port: number;
   /**
-   * Explicit, because the port used to decide it: the backend called
-   * STARTTLS only on 587, so a server on 465 — the standard TLS port — sent
-   * the login and the message in the clear with nothing on screen saying so.
+   * Explicit rather than derived from the port: the port alone does not say
+   * whether the server speaks TLS from the first byte (465) or upgrades with
+   * STARTTLS (587), and a wrong guess would send the login and the message in
+   * the clear.
    */
   encryption: SmtpEncryption;
   user: string;
@@ -248,10 +249,9 @@ export default function SettingsEmailTab() {
         </div>
         <div className="flex items-center gap-3 shrink-0">
           {/* Whether this installation can send mail at all is the first
-              thing the page is opened to find out. It used to require
-              expanding the accordion and reading the fields — and the fields
-              are the organization's own, so an installation-wide server left
-              them empty while mail went out fine. */}
+              thing the page is opened to find out. The fields shown in the
+              accordion are the organization's own, so an installation-wide
+              server leaves them empty while mail goes out fine. */}
           <Badge variant={canSendEmail ? "success" : "secondary"}>
             {canSendEmail
               ? t("settings.smtp.statusConfigured")

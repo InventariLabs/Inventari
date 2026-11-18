@@ -50,11 +50,8 @@ async def checkout(
 
     # An assignment hands the asset to a person or deploys it to a place, and
     # it has to be one of the two: an assignment naming neither answers
-    # nobody's question about where the asset went. The rule used to be split
-    # in half and written down in neither half -- the form validated one
-    # field or the other by mode, the schema demanded the name
-    # unconditionally -- so the location mode posted a body its own schema
-    # refused, and no deployment to a location ever became a record.
+    # nobody's question about where the asset went. Both are read from the body
+    # together, so the person and the location mode take the same rule.
     person = bool(data.assigned_to_name.strip() or data.assignee_partner_id)
     place = data.checkout_location_id is not None
     if person == place or (place and data.assigned_to_email):
@@ -455,9 +452,9 @@ async def _operator_names(
 ) -> dict[UUID, str]:
     """Batch-resolve the accounts behind ``checked_out_by`` / ``checked_in_by``.
 
-    A timeline entry used to name only the person the asset was with, so a
-    return an administrator checked off read as if the holder had carried
-    the asset back. One IN-query for every operator id on the page; a user
+    A timeline entry names the operator of each handover and return as well as
+    the person the asset was with, so a return an administrator checked off
+    reads as the administrator's act. One IN-query for every operator id on the page; a user
     the org no longer knows (deleted, moved) simply stays unnamed.
     """
     from app.core.public_api import core_api

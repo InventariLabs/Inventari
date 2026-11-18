@@ -1,9 +1,9 @@
 /**
- * The protocol preview used to open as a blob URL in a new tab, and a blob
- * inherits the origin of the page that made it — so a Jinja layout an
- * organization admin can edit ran as the application, with the reader's
- * session. The sandbox attribute is the whole fix, which makes it worth a
- * test that fails if someone loosens it.
+ * The protocol preview renders in a sandbox rather than as a blob URL in a new
+ * tab: a blob inherits the origin of the page that made it, so a Jinja layout
+ * an organization admin can edit would run as the application, with the
+ * reader's session. The sandbox attribute is the whole fix, which makes it
+ * worth a test that fails if someone loosens it.
  *
  * The footer is the other half of the same rationale: the sandbox is why
  * there is no Print button, and the download is therefore the route to

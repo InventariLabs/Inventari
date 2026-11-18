@@ -1,7 +1,7 @@
 """One completed order, one notice per person.
 
 The administrators are told that the order is complete, and the person who
-raised it is told that theirs is. Someone who is both used to get both.
+raised it is told that theirs is. Someone who is both gets one notice, not one per role.
 """
 
 from __future__ import annotations

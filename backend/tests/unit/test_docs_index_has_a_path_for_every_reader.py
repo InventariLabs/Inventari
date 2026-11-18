@@ -1,11 +1,10 @@
 """The docs index opens with four reader paths, and every guide has one.
 
-``docs/README.md`` used to split its external guides into "External guides"
-and "Technical reference", which put the user guide, the CLI, the demo, nine
-module-author documents and the operator runbooks in one table — and the
-operator documents were not in it at all: DEPLOYMENT.md and QUICK_DEPLOY.md
-live at the repository root and the index never named them. The fix agreed in
-the docs review is structural: reader paths (using, running, building on
+``docs/README.md`` opens with reader paths: the user guide, the CLI, the demo,
+the module-author documents and the operator runbooks each sit under the path
+that reader takes, and the operator documents, DEPLOYMENT.md and QUICK_DEPLOY.md
+at the repository root, are named there too. The structure is: reader paths
+(using, running, building on
 Inventari, contributing to it), each external guide in exactly one of them, the operator documents reachable
 with their update/backup/restore/troubleshooting sections linked by anchor, and
 the technical reference (ERD, ADRs, subsystems, purpose cards) below as its own

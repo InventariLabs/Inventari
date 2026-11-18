@@ -109,10 +109,9 @@ export function ActionItemsFeed() {
     />
   ));
 
-  // Nothing to do is not news. The card used to hold its place with "All
-  // caught up" inside it, which on first paint was a claim made before a
-  // single provider had answered — no rows is the loading state as much as the
-  // empty one, and the two are indistinguishable from here.
+  // Nothing to do is not news. The card shows no "All caught up" before a
+  // provider has answered: no rows is the loading state as much as the empty
+  // one, and the two are indistinguishable from here.
   //
   // The collectors sit beside the card, never inside the branch that decides
   // whether it shows: a parent that changed with the card remounted them, and

@@ -1,5 +1,5 @@
 """Templates are catalogue: the definitions everything printed is written
-against, and until now nothing recorded a change to one.
+against, and every change to one reaches the organization log.
 
 The rule in ``AuditTargetType`` names templates among the definitions the
 organization log holds, and a handover protocol is exactly that -- change

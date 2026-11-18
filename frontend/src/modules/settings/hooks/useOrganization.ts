@@ -195,7 +195,7 @@ export function useJoinOrganization() {
  * The /join page runs this before it forwards a signed-out visitor anywhere:
  * a dead link answers here, as "invalid or expired" on the screen, instead of
  * coming back later as a registration form that refuses at submit — or as the
- * silent drop on /login an old link used to end with.
+ * silent drop on /login.
  */
 export function useInvitationCheck(code: string | null, enabled: boolean) {
   return useQuery({

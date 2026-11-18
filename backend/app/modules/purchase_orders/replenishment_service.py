@@ -11,9 +11,8 @@ by every alert competing for it, so a unit is counted — and promised — once.
 Lives in the ``purchase_orders`` module because replenishment is a
 procurement decision — and its last mile lives here too:
 ``create_draft_pos_from_alerts_async`` turns the current alerts into
-draft purchase orders, grouped by supplier and currency.  Previously this
-service lived in ``warehouse`` and used ``ProductTemplate.min_quantity``
-(org-global).  The per-location rules replace that flat field.
+draft purchase orders, grouped by supplier and currency.  It reads the
+per-location rules, not the flat ``ProductTemplate.min_quantity`` field.
 
 The move itself is a warehouse document, so it is created on the other side
 of the boundary: ``warehouse.stock_router`` reads the proposal through

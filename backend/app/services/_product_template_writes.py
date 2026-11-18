@@ -77,8 +77,8 @@ async def _journal_record_async(db: AsyncSession, tpl: ProductTemplate) -> dict:
     template names its unit, and equipment's maintenance rows name the
     asset beside the reference id (`item_name`). What stays unnamed is the
     id whose referent the writer does not hold (a profile is written by its
-    key, which is its name) and every entry written before this change: the
-    journal is immutable, so old rows keep the ids they were written with.
+    key, which is its name) and the rows already in the journal: it is
+    immutable, so old rows keep the ids they were written with.
     """
     snapshot = _template_snapshot(tpl)
     word = await _uom_word_async(db, tpl.uom_id)
@@ -126,8 +126,8 @@ async def _generate_sku_async(
 ) -> str:
     """Generate the org's next SKU, falling back to a random code.
 
-    Single fallback path — the three call sites previously used two
-    different prefixes (STB-/STM-) depending on which copy they hit.
+    Single fallback path, so every caller gets the same STM- prefix unless it
+    passes another one.
     """
     sku = await SkuService.generate_next_async(db, org_id)
     if sku:
@@ -229,9 +229,8 @@ async def clone_template(
 
     cloned = ProductTemplate(
         # Assign the cloned template to the caller's org, not the
-        # original's. Cloning a system/global template previously copied the
-        # original (None) org_id, flooding the global catalog with org-specific
-        # clones instead of scoping them to the requesting organization.
+        # original's. Copying the original (None) org_id of a system/global
+        # template would flood the global catalog with org-specific clones.
         organization_id=organization_id,
         name=new_name,
         brand=original.brand,

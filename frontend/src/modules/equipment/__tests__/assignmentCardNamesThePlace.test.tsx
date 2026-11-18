@@ -8,8 +8,8 @@ import { onePage } from "@/test/mocks/page";
 
 /**
  * A check-out that names a person and a place at once (the demo data has four
- * of them) used to print the bare word "Location" under the person, with the
- * place itself nowhere, and hid the person's e-mail because a place was set.
+ * of them) names the place under the person, and the person's e-mail stays
+ * visible even though a place is set.
  */
 
 const item = {

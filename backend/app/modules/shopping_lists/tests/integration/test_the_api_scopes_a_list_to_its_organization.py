@@ -102,7 +102,7 @@ class TestAddItems:
     async def test_a_list_that_does_not_exist_is_refused(
         self, real_async_db_session: AsyncSession, async_test_user: User
     ) -> None:
-        """It used to insert the rows anyway, pointing at nothing."""
+        """A list that does not exist is refused, and no row is written that points at nothing."""
         with pytest.raises(NotFoundException):
             await shopping_lists_api.add_items_async(
                 real_async_db_session,

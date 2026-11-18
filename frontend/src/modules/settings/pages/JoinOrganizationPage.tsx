@@ -129,7 +129,7 @@ function ErrorCard({
  * (`/join?code=…`); older links in the wild carry it in the path
  * (`/join/QACFAKETOKEN123`) — both arrive here. Whatever the shape, a dead
  * link ends on this page as a message naming the problem and who can issue
- * a fresh link, never as the silent redirect to /login it used to be: a
+ * a fresh link, never as a silent redirect to /login: a
  * visitor dropped there signs up through /register and mints an organization
  * of their own instead of joining the one that invited them. A link without
  * any code at all keeps the written refusal this screen already answered it
@@ -188,8 +188,8 @@ export default function JoinOrganizationPage() {
 
   useEffect(() => {
     // A link without its code is answered by the render below, before any
-    // effect could matter — the redirect this page used to fall through to
-    // was the reason an invited person landed on the login form.
+    // effect could matter: a redirect to /login would put an invited person on
+    // the login form.
     if (!code) {
       return;
     }
@@ -262,9 +262,9 @@ export default function JoinOrganizationPage() {
     setAttempt((n) => n + 1);
   };
 
-  // No code at all is a malformed link — the written message this screen
-  // answers it with, not the silent redirect home that used to strand a
-  // signed-out reader on /login.
+  // No code at all is a malformed link: the screen answers it with a written
+  // message, not a silent redirect home, which would strand a signed-out
+  // reader on /login.
   if (!code) {
     return <ErrorCard message={t("settings.organization.invalidLink")} />;
   }

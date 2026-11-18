@@ -1,6 +1,6 @@
 """One source of work for the floor: what needs doing, not what is confirmed.
 
-To do used to be the list of confirmed documents. The work a small warehouse
+To do is the work the floor has, not the list of confirmed documents. The work a small warehouse
 has is wider than its documents: a delivery that has been ordered but has no
 receipt yet, a production run planned for today, a document that waits for
 this person's approval, a count that has fallen due, goods waiting in a

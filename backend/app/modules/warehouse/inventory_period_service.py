@@ -43,10 +43,10 @@ async def _get_user_name(
 def period_is_closed(period: InventoryPeriod) -> bool:
     """Whether the month is locked right now, from which act came last.
 
-    Both stamps are kept, so neither can be read alone. Reopening used to
-    NULL ``closed_at`` and ``closed_by``, which meant undoing a closure also
-    erased the evidence that it had happened and who was responsible — the
-    one act in the whole system where that evidence matters most. Now the
+    Both stamps are kept, so neither can be read alone. Reopening clears the
+    closure without erasing ``closed_at`` and ``closed_by``, so the evidence that
+    it happened and who was responsible survives — the one act in the whole
+    system where that evidence matters most. Now the
     row holds both dates and the later one wins.
     """
     if period.closed_at is None:
@@ -108,8 +108,8 @@ async def _period_to_dict(db: AsyncSession, period: InventoryPeriod) -> dict[str
         'id': period.id,
         'year': period.year,
         'month': period.month,
-        # Stated rather than inferred. Readers used to take a non-NULL
-        # ``closed_at`` for "closed", which is why reopening had to erase it.
+        # Stated rather than inferred: a non-NULL ``closed_at`` alone does not mean
+        # "closed", since reopening keeps the stamp.
         'is_closed': period_is_closed(period),
         'closed_at': period.closed_at,
         'closed_by': await _get_user_name(db, period.organization_id, period.closed_by),

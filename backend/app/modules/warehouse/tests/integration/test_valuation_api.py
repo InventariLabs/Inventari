@@ -27,10 +27,9 @@ def _rate(
 ) -> Decimal | None:
     """This organization's AVCO rate, read the way a reader gets it.
 
-    It used to be a cached column on `product_templates`, and a global template
-    is one row every organization shares — so the number there belonged to
-    whichever one had last taken a delivery. It is computed per organization
-    now, from that organization's own layers.
+    It is computed per organization, from that organization's own layers: a
+    global template is one row every organization shares, so no cached column
+    on `product_templates` could hold one organization's number.
     """
     response = client.get(
         f'/api/v1/items/product-templates/{template_id}', headers=headers

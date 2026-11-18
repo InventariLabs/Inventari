@@ -1,9 +1,10 @@
 """The probe drew the label, so it can say whether the model read it.
 
-The connection test used to answer one question — does the answer parse into
-``VisionExtractResult`` — and report it as "the connection works". A model
-returning a well-formed ``{"name": "Milk"}`` for a carton labelled OAT DRINK
-passed exactly like one that read the picture, and the difference surfaced on
+The connection test answers two questions: does the answer parse into
+``VisionExtractResult``, and did the model read the picture. A model returning
+a well-formed ``{"name": "Milk"}`` for a carton labelled OAT DRINK parses, but
+it has not read the picture, and the probe says so. The difference would
+otherwise surface on
 the user's first product.
 
 The verdict deliberately does not change: a well-formed answer is still a
@@ -160,8 +161,8 @@ class TestTheNameIsWholeAndAFullerReadingStillCounts:
 
     @pytest.mark.parametrize('read', ['OAT', 'oa', 'k'])
     def test_a_fragment_of_the_name_is_not_a_reading(self, read: str) -> None:
-        """The header word, two letters, one letter — the screen used to
-        report a model that answered like this as having read everything."""
+        """The header word, two letters, one letter — the screen never reports
+        a model that answered like this as having read everything."""
         report = read_back(_answer(name=read))
 
         assert report['fields']['name']['matches'] is False

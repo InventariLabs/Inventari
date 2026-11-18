@@ -39,8 +39,8 @@ class CostBreakdownEntry(BaseModel):
     unit: str
     # The layer-average rate per unit and the line's share of it. Both travel
     # so the draft's table can carry the same two named columns as the closed
-    # run's — a draft used to show the line amount under a header that the
-    # closed run filled with the rate. (Stock value is FIFO; the rate is the
+    # run's, with the line amount and the rate each under its own header.
+    # (Stock value is FIFO; the rate is the
     # average of the layers still on hand — 'avco' is the historical label.)
     unit_cost: Decimal | None = None
     cost: Decimal | None

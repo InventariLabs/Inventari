@@ -930,10 +930,9 @@ class TestCreatePZFromPO:
         assert response.status_code == status.HTTP_201_CREATED
         data = response.json()
         assert data['external_reference'] == po_number
-        # The notes are the order's own, verbatim: the "PO ref: …" prefix
-        # the receipt used to prepend was English stored on the document,
-        # shown raw in every language and printed, and the number prints in
-        # the reference row instead (asserted above). Exact equality, so a
+        # The notes are the order's own, verbatim: no "PO ref: …" prefix is
+        # prepended to them, and the number prints in the reference row
+        # instead (asserted above). Exact equality, so a
         # receipt that silently dropped the notes fails here too.
         assert data['notes'] == 'Proszę o dostawę do godziny 10'
 
@@ -1731,8 +1730,8 @@ class TestOverReceiptAndCancelGuard:
     """Over-receipt guard, po_line_id dedup, cancel PO block.
 
     Background: ``quantity_received`` is recalculated only when a receipt is
-    COMPLETED. Previously two receipts created before completion both validated
-    against the same (stale) ``remaining`` → over-receipt. The guard now counts
+    COMPLETED, so two receipts created before completion would both validate
+    against the same stale ``remaining`` and over-receive. The guard counts
     pending quantities on active (DRAFT/CONFIRMED) receipts.
     """
 

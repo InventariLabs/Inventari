@@ -49,14 +49,14 @@ def _extract_decimal(
     """Read a decimal column value, or ``default`` when the cell is blank.
 
     A cell that holds something other than a number refuses the row and
-    names the column and the cell. It used to fall back to the default in
-    silence, so "abc" in the quantity column imported as 1 and "tanio" in the
-    price column as no price — and an opening balance built on that is wrong
-    in a way nobody is told about.
+    names the column and the cell. The default fills in only a blank cell, never
+    a value that is not a number: "abc" in the quantity column does not import as
+    1, and "tanio" in the price column does not import as no price. An opening
+    balance built on such a guess would be wrong in a way nobody is told about.
 
     The refusal is a translated one: the screen showing it writes the row
-    number in the reader's language and used to hand the rest of the line
-    back in English.
+    number in the reader's language, and the rest of the line stays in that
+    language too.
     """
     if not col_name or row.get(col_name) is None:
         return default

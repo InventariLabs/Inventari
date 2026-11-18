@@ -81,11 +81,10 @@ _INTERNAL_CONTEXT_KEYS = frozenset(
 # its list stays manual — the coverage test below still demands an
 # annotation for every entry.
 _NESTED_PLACEHOLDERS: dict[str, list[str]] = {
-    # The document itself. It used to be hidden as "internal", while every
-    # built-in layout is written in terms of it — `{{ document.number }}`,
-    # `{% for line in document.lines %}`. So the catalogue described one
-    # dialect and the layout a template author copies was written in
-    # another, with no way to look up the half that mattered most.
+    # The document itself. Every built-in layout is written in terms of it —
+    # `{{ document.number }}`, `{% for line in document.lines %}` — so the
+    # catalogue lists it with the other entries, and a template author can look
+    # up the half that matters most.
     'document': [
         'number',
         'type',
@@ -585,8 +584,8 @@ async def preview_template(
 ) -> TemplatePreviewResponse:
     """What this layout prints, on a document made up for the purpose.
 
-    The preview used to show the source — `{% for line in lines %}` and all —
-    which answers "what does this template say" and not "what will the paper
+    The preview shows the rendered page, not the template source, because what
+    matters is "what will the paper
     look like". The rendering is the same one the PDF goes through, on the
     same example context the placeholder catalog is derived from, so a
     preview cannot describe a document the printer would not produce.

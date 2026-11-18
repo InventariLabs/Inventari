@@ -307,8 +307,8 @@ describe("DocumentImportModal", () => {
 
   it("keeps the file and paste panels in one grid cell, so the sheet does not jump between them", () => {
     renderModal();
-    // The paste tab was 120px taller than the file tab; each in turn used to
-    // size the sheet, which moved on every switch.
+    // The paste tab is 120px taller than the file tab, but both sit in one grid cell, so the
+    // sheet keeps its size on every switch.
     const panels = screen.getAllByRole("tabpanel", { hidden: true });
     expect(panels).toHaveLength(2);
     for (const panel of panels) {

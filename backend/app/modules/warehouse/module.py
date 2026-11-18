@@ -53,9 +53,9 @@ def _approvals_installed() -> bool:
 def _register_approval_target_summaries() -> None:
     """Describe a document to the approvals queue.
 
-    The engine used to import this module and ask for the summaries itself;
-    now every consumer claims its own target type, and a type nobody claims
-    degrades to the bare identifier. Registered at import, like the period
+    The engine does not import this module to ask for the summaries; every
+    consumer claims its own target type, and a type nobody claims degrades to the
+    bare identifier. Registered at import, like the period
     guard above: the queue is enriched by whoever the installation ships, not
     by which organisation happens to have the module switched on.
     """

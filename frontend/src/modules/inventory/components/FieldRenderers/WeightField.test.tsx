@@ -252,8 +252,8 @@ describe("WeightField", () => {
   });
 
   /**
-   * The hint under the field used to say "weight of one piece" while the
-   * label above it offered volume — and it said so in five languages, which
+   * The hint under the field must name the unit the label above it offers, and it
+   * says so in five languages, which
    * is five places for the promise to come apart again.
    */
   it.each([

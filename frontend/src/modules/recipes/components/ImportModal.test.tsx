@@ -97,9 +97,9 @@ describe("ImportIngredientRow — the spice chip announces its state", () => {
   }
 
   /**
-   * The state used to travel in the background colour alone: a screen reader
-   * heard "Spice, button" whether the ingredient was one or not, and so did
-   * anyone who does not separate amber from grey.
+   * The state is carried by `aria-pressed`, not by the background colour alone:
+   * a screen reader hears whether the ingredient is a spice, and so does anyone
+   * who does not separate amber from grey.
    */
   it("is pressed when the ingredient counts as a spice", () => {
     // 5 g is under the 10 g/ml threshold the import derives from.
@@ -451,8 +451,8 @@ describe("ImportModal — one height for both modes", () => {
         parsingText="Parsing…"
       />,
     );
-    // The JSON mode is taller than the URL mode; each in turn used to size
-    // the sheet, which moved on every switch. Both stay in the layout now.
+    // The JSON mode is taller than the URL mode; both stay in the layout, so
+    // the sheet keeps still on every switch.
     const panels = screen.getAllByRole("tabpanel", { hidden: true });
     expect(panels).toHaveLength(2);
     for (const panel of panels) {

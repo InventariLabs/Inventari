@@ -145,8 +145,8 @@ describe("StockLevelsPage", () => {
   it("says on the shelf that the batch must not be picked", () => {
     renderPage();
 
-    // A recalled batch cannot be picked; until now nothing showed why, and
-    // the refusal arrived only at picking time.
+    // A recalled batch cannot be picked, and the shelf says why, so the refusal
+    // does not wait for picking time.
     const table = screen.getByRole("table");
     expect(within(table).getByText("Recalled")).toBeInTheDocument();
   });

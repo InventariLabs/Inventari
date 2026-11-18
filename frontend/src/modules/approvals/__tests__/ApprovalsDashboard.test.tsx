@@ -175,9 +175,9 @@ describe("ApprovalsDashboard", () => {
   });
 
   it("opens on the states that still need a decision", async () => {
-    // Deleting a document cancels its request, and the queue used to
-    // open on every status — so the first thing an approver saw was a row
-    // of requests with nothing left to decide.
+    // Deleting a document cancels its request. The queue opens on the states
+    // that still need a decision, so an approver never starts on a row of
+    // requests with nothing left to decide.
     let requestedStatus: string | null = "not-called";
     server.use(
       http.get("/api/v1/approvals/requests", ({ request }) => {
@@ -192,8 +192,8 @@ describe("ApprovalsDashboard", () => {
   });
 
   it("names the tab it is empty on, not the waiting queue", async () => {
-    // One string used to serve every tab, so the Approved tab answered
-    // "No requests are waiting for approval" — true of a different list.
+    // Each tab has its own empty message, so the Approved tab does not answer
+    // "No requests are waiting for approval", which is true of a different list.
     server.use(
       http.get("/api/v1/approvals/requests", () =>
         HttpResponse.json(envelope([])),

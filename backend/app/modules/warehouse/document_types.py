@@ -67,10 +67,9 @@ def normalize(doc_type: str) -> str:
 
 #: The short, country-neutral code each canonical type wears in a number.
 #:
-#: ``{TYPE}`` used to write the stored value: a fresh organization's number
-#: read ``INTERNAL_OUT/2026/001`` while every label on the screen said ``RW``,
-#: and a search for ``OUT/2026/001`` found that document because the one
-#: number contained the other. These codes are the module's own, not a
+#: ``{TYPE}`` writes these short codes, so a number reads the same as the label
+#: on the screen, and a search for ``OUT/2026/001`` does not find a document
+#: numbered ``INTERNAL_OUT/2026/001``. These codes are the module's own, not a
 #: country's, so they read the same in every language: the Polish paperwork
 #: codes stay where they belong — the ``PL Magazyn`` type labels, which
 #: ``{TYPE_LABEL}`` writes into the number.

@@ -7,7 +7,7 @@ import { COUNTRY_CODES, countryLabel, isCountryCode } from "@/lib/countries";
 /**
  * The address form offers a curated country list, the backend validates
  * against the full ISO 3166-1 set, and PDFs print names through Babel's
- * CLDR tables ( follow-up). The three used to be three hand-kept
+ * CLDR tables ( follow-up). The three must not be three hand-kept
  * copies; the gate that matters is: the form must never offer a code the
  * API would reject, and every offered code must resolve to a real name.
  */

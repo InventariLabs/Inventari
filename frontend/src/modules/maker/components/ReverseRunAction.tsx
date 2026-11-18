@@ -16,8 +16,8 @@ import type { ProductionOrder } from "@/modules/maker/types/maker";
  * A completed run stays on record; undoing it writes the way back beside it —
  * the ingredients return to where they were taken from, the output leaves
  * its location — the way a receipt or an issue is undone in the warehouse.
- * A typo of 20 for 2 used to need one hand correction per ingredient and
- * shelf. Like cancelling a draft it is the manager's call, and a writer who
+ * Undoing a run is one step, not a hand correction per ingredient and shelf,
+ * even for a typo of 20 for 2. Like cancelling a draft it is the manager's call, and a writer who
  * cannot do it is told why rather than shown nothing.
  */
 export function ReverseRunAction({ order }: { order: ProductionOrder }) {

@@ -245,10 +245,10 @@ class TestSuggestionsExpiryUrgency:
         test_storage_location: StorageLocation,
         db_session: Session,
     ) -> None:
-        """The planner used to answer this in percent, which is the pair rounded.
+        """The planner answers this as the pair, not as a percent that rounds it.
 
         80% of five ingredients cannot be read back as "4 of 5", and it is the
-        fifth one the reader is after. Both surfaces now count through
+        fifth one the reader is after. Both surfaces count through
         ``stock_coverage``, so neither can quietly answer with another total.
         """
         today = date.today()

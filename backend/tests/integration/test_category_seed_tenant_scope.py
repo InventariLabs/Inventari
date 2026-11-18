@@ -2,9 +2,8 @@
 
 Onboarding applies the seed bundle of whichever workspace mode a tenant
 picks. Category reads surface owner-less rows (``organization_id IS NULL``)
-to *every* organization, so seeding without an owner used to fill the
-category list of the whole installation — a tenant in the neutral mode found
-33 groceries it never asked for.
+to *every* organization, so a seed names its owner, and nothing else fills the
+category list of an organization it was not made for.
 """
 
 from __future__ import annotations

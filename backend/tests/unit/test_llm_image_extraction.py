@@ -194,8 +194,8 @@ class TestPromptShape:
     async def test_the_schema_is_what_the_model_is_asked_for(self) -> None:
         """Field names and descriptions reach the prompt from the model itself.
 
-        The two used to be separate lists — a hand-written JSON block in the
-        prompt and a Pydantic class — and drifted apart field by field.
+        The prompt is built from the Pydantic class, so the two cannot drift apart
+        field by field.
         """
         log = AsyncMock(return_value=None)
         client = _answering(('{"name": "Tej"}', {}))

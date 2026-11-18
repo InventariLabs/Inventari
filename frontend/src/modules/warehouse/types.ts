@@ -134,8 +134,8 @@ export function isPickedBeforePosting(type: string): boolean {
 /**
  * Whether a draft may be planned rather than posted now: a future date is a
  * plan by itself, and an issue needs one today too, since a picking session
- * starts on a planned document. Today's issue used to reach picking only after
- * the office dated it tomorrow.
+ * starts on a planned document. Today's issue is planned too, so picking can
+ * start on it.
  */
 export function mayBePlanned(
   type: string,

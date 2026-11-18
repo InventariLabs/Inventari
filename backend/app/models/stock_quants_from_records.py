@@ -12,7 +12,7 @@ catalog's stock totals, the stock on a date, the reconciliation's shelf
 pairs, a batch's numbers (its own screen and the batch list), the shelf
 occupancy behind a location delete, the reservation guard inside deleting a
 record and the CLI's reservation check; ``docs/subsystems/STOCK.md`` names
-where each lives. The quant table it was once read beside is gone
+where each lives. No quant table sits beside it
 (archived ``quantdrop01``): what the view says is the stock.
 
 It is a ``Table`` on its own ``MetaData``, not a model on ``Base``:

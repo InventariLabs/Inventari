@@ -66,8 +66,8 @@ export default function ThresholdQuickSetSheet({ item, onClose }: Props) {
   // the template and read as a sum (`app.services.items.low_stock`). So the
   // quantity this sheet shows, compares and offers to copy is the product's
   // total, not the row the reader opened: on a product kept in six places,
-  // "set the alert to what is here now" used to set it to a sixth of what
-  // was there, and the alert then never fired.
+  // "set the alert to what is here now" must not set it to a sixth of what
+  // was there, or the alert never fires.
   const { data: productStock } = useProductTemplateStock(item.template_id);
   const coversWholeProduct = !!item.template_id;
   // Both quantities cross the wire as Decimal strings; the comparison runs

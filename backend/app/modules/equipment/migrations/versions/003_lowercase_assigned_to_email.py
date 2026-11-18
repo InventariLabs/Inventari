@@ -1,10 +1,9 @@
 """equipment: lowercase assigned_to_email in equipment_assignments.
 
-The checkout used to store ``assigned_to_email`` verbatim, so
-"Anna.Kowalska@Example.org" stayed mixed-case in the database while "My
-assets" compared it with a bare ``==`` against the lowercase account
-email. Emails are case-insensitive (RFC 5321): this migration normalizes
-existing rows, and the write path now lowercases on insert.
+Emails are case-insensitive (RFC 5321). The checkout stores
+``assigned_to_email`` lowercased, so "My assets" can compare it with the
+lowercase account email using a plain ``==``. This migration normalizes
+existing rows to match.
 
 * Upgrade — rewrites every non-null ``assigned_to_email`` to lowercase.
   Idempotent: re-running only touches rows that still differ.

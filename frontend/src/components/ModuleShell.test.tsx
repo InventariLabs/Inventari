@@ -30,9 +30,9 @@ vi.mock("@/hooks/useHasRole", () => ({
  * there is one: they take the strip's height from the shell, which is zero
  * when the strip is empty, and a layer from the z-index system.
  *
- * Both bars used to stick at the same offset, so once the page scrolled one
- * covered the other — the demo notice hid the tabs, then the tabs hid the
- * notice and its "Start over" button.
+ * The two bars stick at different offsets, so scrolling never has one covering
+ * the other — the demo notice must not hide the tabs, nor the tabs the notice
+ * and its "Start over" button.
  */
 describe("ModuleShell — the module tabs", () => {
   it("stack under the notice strip and take their layer from the z-index system", () => {

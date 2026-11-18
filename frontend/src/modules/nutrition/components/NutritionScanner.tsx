@@ -212,9 +212,8 @@ const NutritionScanner: React.FC<Props> = ({
                 accept="image/*"
                 capture="environment"
                 className="hidden"
-                // CSS alone used to block the capture: a disabled state no
-                // assistive technology could see. The attribute makes the
-                // refusal real for the control itself.
+                // The attribute makes the refusal real for the control itself:
+                // CSS alone would hide a disabled state from assistive technology.
                 disabled={registryAnswered && !visionConfigured}
                 onChange={handleCapture}
               />

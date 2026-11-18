@@ -1,13 +1,13 @@
 """A document's transitions write inside the caller's transaction and never commit.
 
 Confirming reserves the stock, completing posts it, cancelling gives the
-reservation back. Each used to commit as it finished, so a request that failed
-after the service returned (the response could not be built, a later step of
-the same request was refused) found the document already moved and the stock
-already posted, with nothing left to roll back.
+reservation back. Each leaves the commit to the request, so a request that fails
+after the service returns (the response cannot be built, or a later step of the
+same request is refused) finds the document, the stock and the reservation taken
+back with it.
 
-The transitions flush instead and the request-scoped session commits once. A
-failure after the point where the commit used to be therefore takes the
+The transitions flush, and the request-scoped session commits once. A failure
+after that commit point therefore takes the
 document, the movement and the reservation back together.
 """
 

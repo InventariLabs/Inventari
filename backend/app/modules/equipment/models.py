@@ -341,10 +341,9 @@ class AuditResponse(Base):
 class AuditResponseItem(Base):
     """One asset within a per-person attestation response.
 
-    A campaign used to create one ``AuditResponse`` per assignment; now one
-    response is created per person (grouped by email) and each asset is an
-    item row here, so the public page confirms everything at once and can
-    dispute a specific asset.
+    A campaign creates one ``AuditResponse`` per person (grouped by email), and
+    each asset is an item row here, so the public page confirms everything at
+    once and can dispute a specific asset.
     """
 
     __tablename__ = 'audit_response_items'

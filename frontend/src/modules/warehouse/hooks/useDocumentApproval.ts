@@ -64,9 +64,9 @@ export function useDocumentApproval(
  *
  * Asked of the backend because the rule is the backend's: the profile's
  * listed types and threshold — and, when the profile names neither, an
- * active approval workflow for documents. The page used to recompute part
- * of it from the workflow list and the profile — a second definition that
- * could name a consequence the server would not carry out.
+ * active approval workflow for documents. The page asks the server rather than
+ * recomputing part of it from the workflow list and the profile: a second
+ * definition could name a consequence the server would not carry out.
  *
  * Pass ``enabled: false`` when the approvals module is disabled for the org,
  * as the approval fetch beside it does: nothing can be queued then, and the

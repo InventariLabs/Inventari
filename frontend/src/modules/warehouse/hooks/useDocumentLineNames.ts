@@ -9,9 +9,8 @@ const NAME_STALE_MS = 5 * 60_000;
 /**
  * The document with a name on every line that has an item to name it by.
  *
- * A line created through the API may carry only `item_id`; the page used to
- * print a dash for it, so a worker executing a transfer could not tell which
- * record the line moves. The name is read from the item itself, once per
+ * A line created through the API may carry only `item_id`, and the page fills in
+ * its name, so a worker executing a transfer can tell which record the line moves. The name is read from the item itself, once per
  * distinct item, and only for lines that lack one — a document whose lines
  * all carry names asks for nothing. An account that may not read items keeps
  * the dash: the refusal is not worth a toast on a screen that works.

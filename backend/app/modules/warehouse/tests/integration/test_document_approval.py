@@ -430,8 +430,8 @@ class TestDocumentApprovalWorkflow:
         """the grant decides, not the role name.
 
         A dedicated approver is exactly who an organization creates the
-        ``approvals:approve`` grant for; the proxy used to turn them away
-        because their role string was not ``manager``.
+        ``approvals:approve`` grant for; the proxy must not turn them away
+        for a role string other than ``manager``.
         """
         self._set_profile_threshold(client, doc_auth_headers, 100.00)
         doc_id = self._create_doc(
@@ -779,12 +779,9 @@ class TestDocumentApprovalWorkflow:
         """A document parked in PENDING_APPROVAL keeps its way forward when
         the approvals module is switched off.
 
-        The gate used to refuse with APPROVAL_REQUIRED —
-        telling the reader to request an approval, which a disabled module
-        makes impossible — while the requests themselves were unreadable and
-        un-withdrawable behind the module's own 403s. Receipt of goods that
-        physically arrived was postable only by cancelling the document or
-        switching the module back on, and nothing on the document said so.
+        The gate does not refuse with APPROVAL_REQUIRED, which would tell the
+        reader to request an approval that a disabled module makes impossible.
+        Goods that physically arrived can still be received.
         ``docs/purpose/approvals.md``: when the module is off,
         ``check_and_block`` is a no-op and what would have waited proceeds.
         """
@@ -1506,8 +1503,8 @@ class TestDocumentApprovalWorkflow:
     ) -> None:
         """GET /approvals/documents/{id}/approval carries workflow_stages.
 
-        The earlier path returned the bare request (workflow_stages=null),
-               so a two-stage workflow rendered as "Single approval" in the queue.
+        The response carries workflow_stages, so a two-stage workflow is shown as
+        two stages in the queue, not as "Single approval".
         """
         workflow_resp = client.post(
             '/api/v1/approvals/workflows',
@@ -1577,9 +1574,8 @@ class TestDocumentApprovalWorkflow:
     ) -> None:
         """Approval required with no workflow → confirm refuses and names the gap.
 
-               This used to confirm the document and call it graceful degradation,
-               so the setting a manager switched on to control spending did nothing
-        and said nothing. Refusing names the missing piece instead.
+               Confirmation refuses and names the missing piece: a setting that controls
+        spending must not be silently ignored.
         """
         # No doc_approval_workflow fixture — no workflow in DB.
         self._set_profile_threshold(client, doc_auth_headers, 100.00)
@@ -1655,16 +1651,15 @@ class TestDocumentApprovalWorkflow:
         doc_target_location: StorageLocation,
         doc_item: Item,
     ) -> None:
-        """Regression: active request blocks completion regardless of status.
+        """Active request blocks completion regardless of status.
 
         A CONFIRMED document that someone manually sent to /request-approval
         (e.g., manager wants sign-off even though below threshold) must NOT
         be completable until the request is approved/rejected.
 
-        The old code only called check_and_block when status was
-        PENDING_APPROVAL or is_approval_required was True — so a
-        manually-created request on a CONFIRMED doc could be bypassed by
-        lowering the threshold after the fact.
+        A request blocks completion whatever the status, so a manually-created
+        request on a CONFIRMED doc cannot be bypassed by lowering the threshold
+        after the fact.
 
         The document here is confirmed before the workflow exists, which is
         the only way to reach CONFIRMED with the manual door still open: a

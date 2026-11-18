@@ -233,7 +233,7 @@ class RequestIDMiddleware:
     otherwise, or when there is none, a new UUID4 is generated. The id is
     written verbatim into every log line of the request, so a space, a quote
     or a byte outside ASCII would let a client shape those lines, and a byte
-    outside UTF-8 used to stop the request with a 500. The ID is:
+    outside UTF-8 would stop the request with a 500. The ID is:
     - stored in a contextvar (``request_id_var``) for log correlation
     - returned in the ``X-Request-ID`` response header
     """

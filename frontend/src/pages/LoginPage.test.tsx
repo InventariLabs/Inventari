@@ -196,7 +196,7 @@ describe("LoginPage", () => {
   });
 
   it("does not call a rate-limited attempt a wrong password", async () => {
-    // The catch-all used to send a reader blocked by the limiter off to
+    // The catch-all does not send a reader blocked by the limiter off to
     // change a password that was correct all along.
     rejectWith(429);
     const { toast } = await import("sonner");

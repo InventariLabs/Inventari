@@ -1,12 +1,10 @@
 """A confirmed document holds the stock its line names, where its line names it.
 
 Confirmation blocks the stock a document is about to take, and completion
-takes it. The two used to read the line differently: the hold went by the
-document's source shelf and the line's card alone, the draw by the record the
-line points at. A write-off with no source shelf held the oldest stock of the
-product anywhere in the organization while the record named on the line was
-the one that left; a line that named a record but no card held nothing at
-all, and still took the stock at completion.
+takes it. The two read the line the same way: the hold and the draw both go by the
+record the line points at. A write-off with no source shelf holds the stock of that
+record, not the oldest stock of the product anywhere in the organization, and a
+line that names a record holds that record's stock, which completion then takes.
 
 These tests pin the hold to the draw: same shelf, same card, and a refusal
 that says where it looked when the shelf cannot cover the line.

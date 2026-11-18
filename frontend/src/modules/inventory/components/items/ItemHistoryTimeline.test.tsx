@@ -285,14 +285,14 @@ describe("ItemHistoryTimeline — the reason has a reader", () => {
 
   it("names the places a MOVED row names only by id", () => {
     // from/to arrive as location UUIDs — the only trace of a transfer the
-    // app keeps, and it used to print "4c3d… → 7174…".
+    // app keeps — and the row names the places, not the ids.
     renderTimeline();
     expect(screen.getByText("Cold Storage → Home")).toBeInTheDocument();
   });
 
   it("lists the fields an UPDATED row touched instead of both records", () => {
-    // One row used to print half a screen of JSON.stringify for both
-    // snapshots; the reader needs the field names.
+    // A row lists the fields the update touched; the reader needs their names,
+    // not both snapshots.
     renderTimeline();
     expect(
       screen.getByText(
@@ -311,8 +311,7 @@ describe("ItemHistoryTimeline — the reason has a reader", () => {
 
   it("names a category the way the journal names the same event", () => {
     // The write records the name beside the id, and the card reads it —
-    // the row used to say "Category: 67d57628 → 84f70f85" while the
-    // organization journal spelled "Dairy → Drinks".
+    // the row spells it as the organization journal does: "Dairy → Drinks".
     renderTimeline();
     expect(screen.getByText("Category: Dairy → Drinks")).toBeInTheDocument();
   });
@@ -549,8 +548,8 @@ describe("parseChanges (unit)", () => {
   });
 
   it("UPDATED speaks of a place, not of the column that holds it", () => {
-    // `storage_location_id` used to reach the screen as "storage location
-    // id", and its value as eight characters of a UUID.
+    // `storage_location_id` reaches the screen as a place name, never as the
+    // column name or eight characters of a UUID.
     expect(
       parseChanges(
         "UPDATED",

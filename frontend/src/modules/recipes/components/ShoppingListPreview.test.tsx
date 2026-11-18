@@ -196,8 +196,8 @@ describe("ShoppingListPreview", () => {
     expect(screen.queryByText("Shopping list ready")).not.toBeInTheDocument();
   });
 
-  // The line used to stand under every generated list, true or not; the plan
-  // now says whether a meal was planned after the list was made.
+  // The line stands under a generated list only when a meal was planned after
+  // the list was made; the plan itself says whether one was.
   it("says meals are missing from the list only when some are", () => {
     const hint = "Meals added after the list was generated are not on it yet.";
     const { unmount } = renderPreview({ existingListId: "list-9" });

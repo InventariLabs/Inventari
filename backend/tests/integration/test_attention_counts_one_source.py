@@ -2,12 +2,11 @@
 
 The inventory dashboard's heading and the statistics health card answer
 the same question — expired records, records expiring inside the horizon,
-and products that reached their threshold. They used to compute it apart:
-the dashboard from three capped item lists, the statistics card from the
-overview endpoint. On the same data the two could disagree, and the
-running-low share silently stopped at the list's hundred-row cap.
+and products that reached their threshold. Both read them from one place, so
+the two cannot disagree, and the running-low share counts every product rather
+than stopping at a capped list.
 
-The counts live in one service function now. The endpoint the dashboard
+The counts live in one service function. The endpoint the dashboard
 reads and the overview the statistics screen reads both call it, so the
 two screens cannot drift again. Here we pin that the endpoint answers
 with the overview's own numbers, that a product is one shortage however
@@ -274,9 +273,8 @@ class TestTheCountsAreOneComputation:
         """Its last record is not on a shelf, and that does not hide it.
 
         Consuming the last unit files the record under the virtual Consumed
-        location, outside the shelves the visibility check used to look in.
-        The tile counted the product (nothing left, minimum set) while the
-        heading, asking with module data hidden, said none.
+        location, outside the shelves the visibility check looks in. The tile and the
+        heading, asking with module data hidden, both count the product.
         """
         consumed = StorageLocation(
             organization_id=async_test_user.organization_id,

@@ -444,8 +444,8 @@ test.describe.serial("Warehouse — from home to business", () => {
       timeout: 15000,
     });
 
-    // Both shelves read like their place now, and both old stickers are
-    // listed for replacing, old code first.
+    // Both shelves read like their place and both stickers are
+    // listed for replacing, with their codes first.
     const codes = new Map<string, string>();
     for (const { id } of [near, far]) {
       const read = await page.request.get(`/api/v1/locations/${id}`, {

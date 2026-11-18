@@ -1,8 +1,8 @@
 """The community scaffold's migration chain is a real one.
 
-The scaffold used to create a ``models.py`` with no model and no migrations at
-all, so the guide's migration advice had nothing to run — and a community author
-had no ``env.py`` to run it with. What the package ships now is proved the way
+The scaffold's ``models.py`` declares a model and the package ships migrations,
+so the guide's migration advice has something to run, and a community author
+has an ``env.py`` to run it with. What the package ships is proved the way
 the platform applies it: ``run_module_migrations`` against an empty database,
 through the package's own ``env.py``. Upgrade creates the table the model
 declares, downgrade removes it, and the chain records itself in a version table

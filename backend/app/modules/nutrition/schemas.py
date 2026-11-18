@@ -1,10 +1,8 @@
 """Pydantic shapes owned by the nutrition module.
 
-``NutritionFacts`` used to live in ``vision/schemas.py``, in the same model as
-``expiry_date`` and ``brand``, with the rule "for non-food items leave all
-nutritional values as null" written into vision's prompt. That made the
-generic label reader carry a food vertical's vocabulary, and every equipment
-nameplate came back with six empty grams-per-100g.
+``NutritionFacts`` lives here, apart from the generic label reader's model in
+``vision/schemas.py``, so the reader carries no food vertical's vocabulary: an
+equipment nameplate does not come back with six empty grams-per-100g.
 
 The field descriptions are the prompt: Core renders them into the request
 (:func:`app.core.llm.structured_extraction.build_shape_prompt`), so the

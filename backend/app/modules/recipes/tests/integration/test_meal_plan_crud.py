@@ -383,8 +383,8 @@ class TestMealPlanEntries:
         """POST /meal-plans/{id}/copy-to clones entries into a NEW plan.
 
         The new plan covers the target range so copied entries are visible in
-        the calendar (previously they landed in the source plan, outside its
-        date range, and were never rendered).
+        the calendar; entries never land in the source plan outside its date
+        range, where they would not be rendered.
         """
         plan_id, recipe_id = self._create_plan_and_recipe(client, auth_headers)
         today = date.today()
@@ -686,8 +686,7 @@ class TestMealPlanEntries:
         """A nutrient nobody measured is null, so the table can print a dash.
 
         Zero is a measurement. A plan of recipes whose ingredients carry no
-        nutrition data used to report "0 g" for every nutrient, one screen
-        away from "nutrition data available for 0% of ingredients".
+        nutrition data reports a dash for every nutrient, never "0 g".
         """
         plan_id, recipe_id = self._create_plan_and_recipe(client, auth_headers)
         client.post(
@@ -721,8 +720,8 @@ class TestMealPlanEntries:
         """Either the day describes the food, or it says nothing about it.
 
         A product whose profile knows calories and fat but not protein or
-        carbs used to fill two of the four columns. The dashes beside them
-        read as zeroes, and the calorie count read as a fact about a day the
+        carbs fill two of the four columns, and the dashes beside them are not
+        read as zeroes; the calorie count is not read as a fact about a day the
         application elsewhere reports no data for.
         """
         template = ProductTemplate(

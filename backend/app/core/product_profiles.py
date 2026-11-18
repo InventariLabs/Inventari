@@ -59,7 +59,7 @@ class ProfileStorageLocation(BaseModel):
     type_code: str
     #: English name written to the database.
     name: str
-    #: English names this location used to carry. A row that has no seed
+    #: Legacy English names this location bears. A row that has no seed
     #: handle yet and still bears one is the same location, so a rename
     #: here does not seed a second one beside it.
     former_names: list[str] = []
@@ -116,7 +116,7 @@ class ProductProfile(BaseModel):
     module_config: dict[str, dict[str, Any]] = Field(default_factory=dict)
     # Optional DocumentProfile preset name (see
     # ``app.modules.warehouse.document_profile_service.PRESETS``) applied
-    # after the warehouse module is enabled. Used to flip
+    # after the warehouse module is enabled. It flips
     # ``value_tracking_enabled`` and related value-tracking settings that
     # cannot be expressed through ``module_config`` (the warehouse module
     # declares no settings schema). ``None`` leaves the default 'Simple'
@@ -272,7 +272,7 @@ PRODUCT_PROFILES: dict[str, ProductProfile] = {
             '--color-primary-950': '2 44 34',
         },
         branding={'subtitle_key': 'profiles.food_home.subtitle'},
-        # The three Core used to create for everyone. They belong here: this
+        # The three types Core creates for everyone belong here: this
         # is the profile whose seed brings the types they stand on.
         default_locations=[
             ProfileStorageLocation(
@@ -454,10 +454,9 @@ PRODUCT_PROFILES: dict[str, ProductProfile] = {
         # holds none. It also does not declare `module_config` overrides —
         # every module keeps its own defaults. This is the "neutral" baseline.
         launcher_categories={},
-        # Amber palette. This profile used to declare no theme at all, which
-        # meant it fell back to the default accent — the very emerald
-        # `food_home` declares explicitly, so the two modes were visually
-        # indistinguishable. Neutral about domains is not the same as having
+        # Amber palette. This profile declares its own theme rather than falling back
+        # to the default accent, the very emerald
+        # `food_home` declares explicitly, so the two modes stay visibly apart. Neutral about domains is not the same as having
         # no identity.
         # Steps are Tailwind's amber ramp unshifted: `primary-700` is what
         # the filled Button variants paint, and amber-700 measures 5.0:1

@@ -512,10 +512,9 @@ class TestR3UndoPickRestoresStock:
             (layer.remaining_qty * layer.unit_cost for layer in layers), Decimal('0')
         )
         total_qty = sum((layer.remaining_qty for layer in layers), Decimal('0'))
-        # Read straight off the layers. This used to be written to
-        # `maka_tpl.current_valuation_rate` and then read back — a round trip
-        # through a column that a global template shares with every
-        # organization, and which is gone for that reason.
+        # Read straight off the layers, not from
+        # `maka_tpl.current_valuation_rate`: a column that a global template
+        # shares with every organization is not a place to read the rate from.
         assert total_qty > 0
         assert (total_value / total_qty).quantize(Decimal('0.01')) == Decimal('10.00')
         db_session.commit()

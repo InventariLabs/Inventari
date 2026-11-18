@@ -25,9 +25,9 @@ interface WorkflowActivationDialogProps {
  * Switching a workflow on is its own act, and the reader is told first what
  * it will hold.
  *
- * A workflow used to come into force the moment it was saved: a document
- * workflow under a silent document profile then held every confirmed
- * document, and nothing on the screen said so. The scope comes from the
+ * Saving a workflow must not bring it into force: a document workflow under a
+ * silent document profile would hold every confirmed document, and nothing on
+ * the screen would say so. The scope comes from the
  * module that owns the gate, and the link goes to the settings that change
  * it, so a reader who did not mean "everything" can narrow it before saying
  * yes.

@@ -190,8 +190,8 @@ class CoreLlmAPI:
             instructions: What the picture is and what matters on it.
             action_type: The quota bucket this call is billed to.
             disable_reasoning: Ask the provider to skip the chain of thought.
-                True is the default because the budget was once spent on
-                thinking and the answer never arrived — see the comment on
+                True is the default because otherwise the budget goes to
+                thinking and the answer never arrives — see the comment on
                 *max_tokens* below. It is a parameter rather than a constant
                 because that value was chosen from a single observation on a
                 single model, and reading a label is not purely transcription:

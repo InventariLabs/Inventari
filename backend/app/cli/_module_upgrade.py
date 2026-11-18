@@ -289,7 +289,7 @@ def _do_upgrade(
     # The record is written only after the new files' migrations succeed:
     # "v0.2.0 installed" must not be true on any surface an operator reads
     # while the schema is still at 0.1.0. Until the record moves, it keeps
-    # naming the old version — the one the schema can answer for — and a
+    # naming the installed version — the one the schema can answer for — and a
     # retry of the same package walks the forward path, so a failed or
     # killed migration leaves nothing to flag and nothing to undo.
     _run_module_migrations_after_upgrade(name)

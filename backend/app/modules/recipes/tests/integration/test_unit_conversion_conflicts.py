@@ -1,8 +1,8 @@
 """A duplicate unit conversion is refused, not a raw 500.
 
 The unique index holds one row per (organization, ingredient, unit, language).
-A second write for the same key used to reach the client as
-``Internal Server Error``; the refusals here name the rule instead, so the
+A second write for the same key is refused, never reaching the client as
+``Internal Server Error``; the refusals here name the rule, so the
 person at the screen knows to edit the existing conversion.
 """
 

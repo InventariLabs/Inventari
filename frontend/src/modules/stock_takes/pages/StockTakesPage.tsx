@@ -248,7 +248,7 @@ export default function StockTakesPage() {
                     {formatDateTime(stockTake.started_at)}
                   </p>
                   {/* The list is how somebody returns to their own count, and
-                      the card used to say when but never by whom. */}
+                      the card names who started it as well as when. */}
                   {stockTake.started_by_name && (
                     <p className="text-xs text-on-muted">
                       {stockTake.started_by_name}

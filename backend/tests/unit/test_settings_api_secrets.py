@@ -146,8 +146,8 @@ async def test_get_async_handles_missing_module_gracefully() -> None:
 async def test_get_decrypted_async_refuses_a_whole_namespace() -> None:
     """No key means no answer, rather than an answer that is not plaintext.
 
-    The keyless branch used to hand back the settings object exactly as
-    stored — ciphertext for every secret field in it — under a name that
+    The keyless branch refuses rather than handing back the settings object exactly
+    as stored — ciphertext for every secret field in it — under a name that
     promises the plaintext value, with nothing in the result to tell the two
     apart. Decrypting a namespace wholesale is also what the method's own
     warning says not to do, so it refuses instead.

@@ -86,7 +86,7 @@ describe("MaintenanceLogModal", () => {
     const { onClose, user } = renderModal();
 
     // Pressed, not submitted directly: the browser's own constraint check
-    // used to stop the empty form at the title — in the browser's language,
+    // must not stop the empty form at the title — in the browser's language,
     // about the title alone — before the form's answer could be heard.
     await user.click(screen.getByRole("button", { name: "Save" }));
     expect(

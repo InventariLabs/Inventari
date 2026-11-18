@@ -3,8 +3,7 @@
 Initial migration for the purchase_orders module, extracted from core baseline_001
 as part of the module migration isolation effort.
 
-These tables were previously created by the consolidated
-``baseline_001_full_schema.py``. They now belong to the purchase_orders module.
+These tables belong to the purchase_orders module.
 
 This migration reflects the FINAL state after core migration ``poorguniq01``
 (non-unique index on ``number`` + unique constraint on ``(org, number)``).

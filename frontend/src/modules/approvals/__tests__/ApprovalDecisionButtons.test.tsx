@@ -351,10 +351,9 @@ describe("ApprovalDecisionButtons", () => {
   });
 
   it("shows an error toast when the server refuses the rejection", async () => {
-    // a refused reject (409 "Cannot reject your own request") used to
-    // be read as silence — the dialog stayed open with the reason still in it
-    // and nothing said why. The typed reason survives the failure so the
-    // reader can retry without typing it again.
+    // A refused reject (409 "Cannot reject your own request") shows an error
+    // toast, and the dialog stays open with the reason still in it. The typed
+    // reason survives the failure so the reader can retry without typing it again.
     const { toast } = await import("sonner");
     server.use(
       http.post("/api/v1/approvals/requests/:id/reject", () =>

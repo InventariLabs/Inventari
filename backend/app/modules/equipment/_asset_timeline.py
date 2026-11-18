@@ -1,15 +1,11 @@
 """The asset timeline, assembled where the data lives.
 
-The tab used to stitch its events in the browser from three reads — the
-item's row, its assignments, its maintenance logs — and the history the
-register already keeps in ``item_history`` was not among the sources, so a
-status change had no way to appear on it. The timeline is now one
-server-side read whose spine is that history: ``STATUS_CHANGED`` rows become
-timeline entries directly, and the item's own creation opens the list so
-every entry rides one ordering. The handover and maintenance records still
-come along for the details only they carry — who handed the asset over, who
-signed a return off, what a repair cost — none of which a history row
-preserves.
+The timeline is one server-side read whose spine is the register's history in
+``item_history``: ``STATUS_CHANGED`` rows become timeline entries directly, and
+the item's own creation opens the list so every entry rides one ordering. The
+handover and maintenance records come along for the details only they carry —
+who handed the asset over, who signed a return off, what a repair cost — none
+of which a history row preserves.
 """
 
 from __future__ import annotations
@@ -188,7 +184,7 @@ async def get_asset_timeline_async(
         )
 
     # A problem the holder reported in an attestation belongs to the asset's
-    # story: it used to live on the campaign's response and nowhere else.
+    # story, alongside its checkouts and repairs.
     from ._attestation_responses import disputes_for_item_async
 
     for line, response, campaign_name in await disputes_for_item_async(

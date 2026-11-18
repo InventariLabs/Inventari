@@ -14,8 +14,8 @@
  *
  * Facing the other way: two sheets, one over the other — the storage wizard
  * and the location list its first step opens. Both listen on `document`, and
- * a press used to close both: the list AND the wizard under it, which raised
- * its "discard this draft?" question over a list that no longer existed. One
+ * a press must not close both: the list AND the wizard under it, which would
+ * raise its "discard this draft?" question over a list that no longer exists. One
  * press belongs to one layer, the highest one, so every sheet registers here
  * and asks {@link OverlaySheetHandle.isTopmost} before it acts.
  */
@@ -84,8 +84,8 @@ export function getTopmostOverlaySheetPanel(): HTMLElement | null {
  *
  * The mirror image of the stack above: there, a sheet stacked on a dialog;
  * here, a list opened from inside a sheet. Radix closes that list from its
- * own document listener, and the sheet used to close itself in the same
- * keystroke, so an Escape aimed at a unit list took the whole form with it.
+ * own document listener, and the sheet must not close itself in the same
+ * keystroke, so an Escape aimed at a unit list must not take the form with it.
  *
  * Read from the DOM rather than counted, because these layers are opened by
  * Radix itself and nothing in this codebase is told when they appear.
@@ -104,7 +104,7 @@ export function hasPopperLayerOpen(): boolean {
  *
  * The list carries `role="listbox"` only while it holds results, so that role
  * cannot be the only signal: the empty "No products found" panel carries no
- * listbox, and an Escape aimed at it used to reach the sheet while the panel
+ * listbox, and an Escape aimed at it must not reach the sheet while the panel
  * stayed open. The picker marks every open panel with
  * `data-line-item-dropdown`, which is what this reads alongside the role.
  */

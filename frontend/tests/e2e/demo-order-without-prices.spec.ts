@@ -4,8 +4,8 @@ import { test, expect } from "./fixtures/base";
  * A demo visitor can finish an order they confirmed without prices.
  *
  * The demo's workflow holds every order it cannot show to be under its limit,
- * and the visitor is the only person who can sign in, so the order used to wait
- * for good while the screen showed its total as 0.00. This walks what they do,
+ * and the visitor is the only person who can sign in, so an order must not be
+ * left waiting for good while the screen shows its total as 0.00. This walks what they do,
  * from "Try the demo" on the sign-in page to a confirmed order.
  *
  * It needs an instance built as the demo (`manage.py demo reset`, then

@@ -24,14 +24,9 @@ vi.mock("@/contexts/ModulesContext", async (importOriginal) => ({
 }));
 
 /**
- * The panel used to draw every switch for an account that could not move one.
- *
- * Measured: a read-only account got the full panel plus the line "Each choice
- * saves as you make it. There is no undo — set it back the same way", and a
- * click on Margin answered 403 with "Failed to save settings" — a sentence
- * about a failure where the truth was a boundary. The neighbouring module got
- * this right: /recipes/settings shows such an account a refusal and no
- * switches at all.
+ * A read-only account sees a refusal, not the panel: no switch, and no line
+ * promising a save it cannot make. The neighbouring module shows such an
+ * account the same refusal: /recipes/settings shows it no switches at all.
  */
 function renderPanel() {
   const queryClient = new QueryClient({

@@ -1,10 +1,8 @@
 """The warehouse loads, and runs, without the purchase orders module.
 
-The two modules used to import each other: the warehouse weighed receipts
-against the order, read replenishment, reorder rules and pricelists from the
-orders module, and the orders module required the warehouse. The over-order
-guard is now a pre-post check the orders module registers, the replenishment
-routes are the orders module's own, and what is left (a price hint, a shelf's
+The two modules do not import each other. The over-order guard is a pre-post
+check the orders module registers, the replenishment routes are the orders
+module's own, and what is left (a price hint, a shelf's
 reorder ceiling, an order's currency, the count on completion) is asked of
 the orders module on the call, only while it is there (``_order_side``).
 """

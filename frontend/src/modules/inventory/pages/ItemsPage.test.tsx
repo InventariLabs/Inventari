@@ -441,7 +441,7 @@ describe("ItemsPage — module-owned data is an organization policy", () => {
 
   it("states no count while the list request has failed", async () => {
     // Zero answers "how many are there", and with the request down there is
-    // no answer: the bar used to say "0 records" beside "An error occurred".
+    // no answer, so the bar shows no count beside "An error occurred".
     // The bar is there once the reader has narrowed the list, so the search
     // is what makes the request fail.
     server.use(
@@ -497,11 +497,10 @@ describe("ItemsPage — module-owned data is an organization policy", () => {
   });
 
   /**
-   * The two halves of this screen used to answer differently: `/items` hides
-   * an item by its *category* tag, `/locations` hides a location by its own —
-   * so an unclaimed item put away on an equipment rack stayed in the list
-   * while the rack it names disappeared from the lookup, and 83 rows read
-   * "Unknown" over a perfectly good location.
+   * The two halves of this screen answer alike: `/items` hides an item by its
+   * *category* tag and `/locations` hides a location by its own, so an unclaimed
+   * item on a hidden rack is not left in the list while its rack disappears from
+   * the lookup.
    */
   it("names the location of a row it decided to show", async () => {
     const rack = {
@@ -757,10 +756,9 @@ describe("ItemsPage — module-owned data is an organization policy", () => {
   });
 
   /**
-   * A warehouse of two thousand shelves: the screen used to download all of
-   * them, page after page and twice over, to name the dozen on screen and to
-   * fill a filter. It names the places its rows stand in and searches for the
-   * rest.
+   * A warehouse of two thousand shelves: the screen names the places its rows
+   * stand in and searches for the rest, rather than downloading every shelf,
+   * page after page, to name a dozen and to fill a filter.
    */
   it("names the rows' places and searches the filter without reading the catalogue", async () => {
     const shelves = Array.from({ length: 2000 }, (_, i) => ({
@@ -1278,10 +1276,8 @@ describe("ItemsPage — bulk selection", () => {
 });
 
 /**
- * sort and the result count used to occupy two bands of their own
- * below the bar. The bar already had slots for both — they just were not
- * used. This test pins the sort select and the counter inside the bar so the
- * page does not grow the bands back.
+ * The sort and the result count sit inside the bar, which has slots for both.
+ * This test pins them there so the page does not grow a band of its own for each.
  */
 describe("ItemsPage — control bar layout", () => {
   beforeEach(() => {
@@ -1938,8 +1934,7 @@ describe("ItemsPage — the ?import=1 deep link", () => {
 
   it("closes a product dialog that a link opened by going back to the link", async () => {
     // A row of the overview links here with ?open=<id>. Closing the dialog
-    // used to rewrite the address and leave the reader on the list, a screen
-    // they never asked for.
+    // goes back to the link, not to a list the reader never asked for.
     mockNavigate.mockClear();
     // Earlier tests mount a browser router, which leaves its entry count in
     // the window's history; this one runs on a memory router.

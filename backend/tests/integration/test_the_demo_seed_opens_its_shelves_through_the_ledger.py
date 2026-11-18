@@ -89,7 +89,7 @@ def test_every_seeded_record_opens_with_a_movement_of_its_own(
     shelves before its documents execute, so a seeded dispatch may draw an
     opened record down to nothing, and the record then leaves the shelves
     while its opening stays (a full-suite run once landed on exactly that
-    dataset and the equality that used to stand here went red on it). An
+    dataset, so no equality is asserted here). An
     opening for a record that holds nothing is goods consumed, not a
     record the register never opened."""
     org_id, _user_id = seeded

@@ -796,25 +796,24 @@ async def list_receipts_for_aging_async(
     stock a reader can still count — not everything that ever arrived.
 
     The netting happens in the query, and ``limit`` (``None``: no limit)
-    counts only the receipts that still stand, oldest first. The receipts
-    used to be cut at the limit before the issues were netted off them,
-    so a product with more receipts than that lost the newest ones — the
-    very stock still on the shelf.
+    counts only the receipts that still stand, oldest first. The issues are netted off
+    the receipts before the limit is applied, so a product with more receipts
+    than that keeps the newest ones — the very stock still on the shelf.
     """
     if as_of is None:
         as_of = datetime.now(UTC)
 
     # The age follows the movement's business date — the same
     # coalesce(completed_at, created_at) the ledger itself sorts by. A
-    # booking typed days after the goods arrived used to make the stock
+    # booking typed days after the goods arrived would make the stock
     # look younger than it is.
     business_date = _moved_at()
     age_expr = func.extract('epoch', as_of - business_date) / literal_column('86400')
 
     # Issues consume the receipts, oldest business date first, so the
     # buckets say what is still on the shelf: ten received, four later
-    # dispatched, and the buckets used to still age all ten — their sum
-    # never tied back to the stock a reader could count.
+    # dispatched; the buckets must not still age all ten, or their sum would never
+    # tie back to the stock a reader could count.
     out_total = await db.scalar(
         select(func.coalesce(func.sum(StockMove.quantity), 0)).where(
             StockMove.organization_id == organization_id,

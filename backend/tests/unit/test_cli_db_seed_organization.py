@@ -180,11 +180,11 @@ class TestTheProfileFallback:
     """The profile ``seed_all`` picks for an organization when none is named.
 
     Every command above hands one over, so the fallback is the line none of
-    them reaches. ``SEED_PROFILE`` used to be read here — and the shipped
-    example file offered it to operators as the way to choose — while the read
-    happened once at import, where anything setting the variable later had no
-    say. The module is therefore reloaded with the variable set, which is the
-    one arrangement in which the old read would have had an answer; the seeder
+    them reaches. ``SEED_PROFILE`` is read once, at import, and the shipped
+    example file offers it to operators as the way to choose, so anything
+    setting the variable later has no say. The module is therefore reloaded
+    with the variable set, the one arrangement in which that read has an
+    answer; the seeder
     must still be handed the default profile, which is what lets the example
     drop the variable with a test behind it.
     """

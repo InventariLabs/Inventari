@@ -1,12 +1,9 @@
 """A checkout approval says who the asset goes to, and covers only that.
 
-The request used to carry the asset alone: the approver decided without
-knowing who would get it or until when, and the approval was then spent by
-whichever checkout came next — granted on one person's request and used by
-somebody else's hand-out to a third person. The request now names the
-checkout it asks for, the approvals queue shows it, and a checkout to anybody
-else needs a request of its own. The queue's search finds the request by the
-asset name its card shows.
+The approver decides knowing who will get the asset and until when. The request
+names the checkout it asks for, the approvals queue shows it, and a checkout to
+anybody else needs a request of its own. The queue's search finds the request
+by the asset name its card shows.
 """
 
 from __future__ import annotations

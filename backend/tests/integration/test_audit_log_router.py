@@ -326,7 +326,7 @@ class TestAuditLogRouter:
 # ---------------------------------------------------------------------------
 # Instrument item mutation services with audit logs.
 #
-# create_item / update_item / delete_item now write audit entries via
+# create_item / update_item / delete_item write audit entries via
 # log_action_async. These tests fail (RED) until the instrumentation
 # lands. Once green, the audit-log endpoint will surface real entries.
 # ---------------------------------------------------------------------------
@@ -457,10 +457,9 @@ class TestItemAuditInstrumentation:
         describes. `formatAuditValue` prints a string as it stands, so
         `2.000 -> 5` reads on the screen exactly as it is stored.
 
-        This test used to require the opposite -- a number, explicitly not
-        `'5.000'`. The quantity-change path had already moved to strings by
-        then, so the same field read one way on one row and the other way on
-        the next; the rule in `docs/subsystems/AUDIT.md` settles it.
+        A quantity stays a string here, so the same field never reads one way on one
+        row and another way on the next; the rule in `docs/subsystems/AUDIT.md`
+        settles it.
         """
         from app.schemas.item import ItemUpdate
         from app.services.items import update_item

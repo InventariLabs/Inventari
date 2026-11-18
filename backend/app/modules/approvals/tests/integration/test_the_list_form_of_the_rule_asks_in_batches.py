@@ -1,10 +1,8 @@
 """A page of documents is asked about the approval rule in batches.
 
 The list form of the rule is what a filtered To do calls for every row about
-to start. It used to ask the sign-off and the active workflow once per
-document, so the cost of the screen grew with the page. It now asks the
-profile's verdict for all the documents at once and the workflow once, so a
-bigger page costs the same queries as a small one.
+to start. It asks the profile's verdict for all the documents at once and the
+workflow once, so a bigger page costs the same queries as a small one.
 """
 
 from __future__ import annotations

@@ -69,8 +69,8 @@ describe("MakerResultWidget", () => {
   });
 
   it("marks the amounts unsigned when the organization set no currency", () => {
-    // Every figure here used to be labelled PLN whatever the organization
-    // trades in — a wrong currency reads as a real one.
+    // A figure labelled PLN whatever the organization trades in would pass
+    // for a real one, so with no currency set the amounts carry no sign.
     organizationCurrency.value = undefined;
     try {
       renderWidget();

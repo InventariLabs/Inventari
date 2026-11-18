@@ -23,14 +23,13 @@ export interface LaunchableCampaign {
  *
  * Launching sends an attestation email to every assignee in scope and cannot
  * be undone, so it always asks first — and the question now carries the
- * number it is asking about. The reader used to walk through the
- * irreversible gate to learn, from the refusal behind it, that there was
- * nobody in scope to attest anything: the count is fetched before the
- * dialog, and a scope covering no assets is answered with where to fill it
- * in rather than with a launch that cannot succeed.
+ * number it is asking about. The reader learns that nobody is in scope to
+ * attest anything from the count, not from the refusal behind the irreversible
+ * gate: the count is fetched before the dialog, and a scope covering no assets
+ * is answered with where to fill it in, not with a launch that cannot succeed.
  *
  * The list screen and the campaign's own detail screen share this hook: the
- * detail screen used to tell the reader to launch the campaign while
+ * detail screen must not tell the reader to launch the campaign while
  * offering no way to do it.
  */
 export function useCampaignLaunch() {

@@ -1,8 +1,8 @@
 """Before a pick walk starts, the dispatches stock cannot cover are named.
 
 A confirmed dispatch reserved its stock, but a count, a scrap or a move since
-can leave the shelf with less than the document orders. Picking used to start
-over it regardless and the picker found out line by line at the shelf. The
+can leave the shelf with less than the document orders. Picking would otherwise
+start over it regardless, and the picker would find out line by line at the shelf. The
 coverage read names each short product with what was ordered and what is
 there, so the person starts without those documents or with them anyway.
 

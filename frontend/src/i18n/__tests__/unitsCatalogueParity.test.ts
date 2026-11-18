@@ -28,9 +28,10 @@ import plItems from "../locales/pl/items.json";
  * the seed's English name, falls back to that name when the key is missing —
  * a Polish workspace reading "Bag" among "Worek" and "Butelka".
  *
- * The symbol list used to be hand-copied into this file, which measured the
- * dictionary against its own copy of the catalogue: a unit planted in the
- * seed with no entry went green, and only a deleted label went red. The list
+ * The symbol list is read from the catalogue rather than hand-copied into this
+ * file: a copy would measure the dictionary against itself, and a unit planted
+ * in the seed with no entry has to turn the test red, as a deleted label does.
+ * The list
  * is read from the seed module now, and the planted unit is the measurement.
  * `items:uomNames.Cup (Metric)` is kept on purpose: the seed carries
  * "Cup (US)" only, and a workspace may still define a metric cup of its own.

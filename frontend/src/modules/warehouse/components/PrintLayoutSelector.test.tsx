@@ -42,10 +42,8 @@ vi.mock("@/modules/shared/hooks/useDocumentTemplates", () => ({
 describe("PrintLayoutSelector — the choice says what it reaches", () => {
   /**
    * Saving this selector re-dresses every printout in the organization the
-   * moment it lands, and nothing on screen used to say so — the difference
-   * showed up on the first printed document. The selector now says what the
-   * choice covers and what it does not: a template written for a document's
-   * type still wins for that type.
+   * moment it lands, so the selector says what the choice covers and what it
+   * does not: a template written for a document's type still wins for that type.
    */
   it("names the scope of the change before anyone saves it", () => {
     render(<PrintLayoutSelector />);

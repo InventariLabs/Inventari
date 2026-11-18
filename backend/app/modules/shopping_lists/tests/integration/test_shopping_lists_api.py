@@ -374,8 +374,8 @@ class TestShoppingListItems:
         auth_headers: dict[str, str],
         test_shopping_list: ShoppingList,
     ) -> None:
-        """numeric(12, 3) overflows on a twelve-digit quantity, and the
-        overflow used to surface as a bare 500 from the driver. The schema
+        """numeric(12, 3) overflows on a twelve-digit quantity, and that
+        answers with a sentence, never a bare 500 from the driver. The schema
         knows the column's ceiling and refuses above it with the same kind
         of sentence every other quantity refusal gets."""
         response = client.post(

@@ -1,16 +1,13 @@
 """The three doors that create an asset land it in stock the same way.
 
-Bulk create, POST /items and the spreadsheet import all write an asset
-with Item.quantity = 1 — and the import alone used to turn the record's
-own posting off, so an asset's stock stood behind it or not
-depending on which door it entered through, and the reconciliation
-report read that as a permanent mismatch. Every door now writes the
-record, and beside it the movement that brought it onto the shelf.
+Bulk create, POST /items and the spreadsheet import all write an asset with
+Item.quantity = 1, and each door writes the record together with the movement
+that brought it onto the shelf. The reconciliation report therefore finds the
+stock behind every asset, whichever door it came through.
 
-The test builds its own org with ``stock_takes`` on. The posting used to
-run only for organizations with a stock-consuming module; it now runs
-for every organization, and the module stays here
-as the ordinary shape of an equipment organization.
+The test builds its own org with ``stock_takes`` on. The posting runs for every
+organization, not only for those with a stock-consuming module, and this module
+stays the ordinary shape of an equipment organization.
 """
 
 from __future__ import annotations

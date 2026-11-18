@@ -59,10 +59,9 @@ def closure_reason(response: AuditResponse) -> str | None:
     if response.token_expires_at < now:
         return 'expired'
 
-    # Closed only when everything it asks about is back. One returned laptop
-    # used to close the whole envelope, and the holder could not confirm the
-    # phone they still had: the link said "already returned" and the
-    # response stayed unanswered for good.
+    # Closed only when everything it asks about is back. A returned laptop does
+    # not close the envelope while the phone is still with the holder, who can
+    # still confirm it.
     if response.assets_returned:
         return 'assignment_already_returned'
 
@@ -290,9 +289,8 @@ async def _tell_the_admins(
 ) -> None:
     """A reported problem reaches the people who can act on it.
 
-    It used to be written on the response and nowhere else: nobody was told,
-    and the asset's page said nothing. The administrators get a notification
-    that opens the asset, whose timeline now carries the report.
+    The report is stored on the response, and the administrators are notified
+    with a link that opens the asset, whose timeline carries the report.
     """
     from app.core.public_api import core_api
 

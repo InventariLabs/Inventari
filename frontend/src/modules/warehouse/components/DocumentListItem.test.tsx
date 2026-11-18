@@ -30,8 +30,8 @@ vi.mock("@/modules/warehouse/hooks/useDocumentProfile", () => ({
 }));
 
 // Cancel and delete ask for `warehouse:manage`, which is the key the API
-// checks. The menu used to ask the account's role instead — a different rule,
-// and one that told a custom role holding the permission it could not.
+// checks. The menu asks for that permission, not the account's role: a custom
+// role holding it gets the entries it needs.
 const rights = vi.hoisted(() => ({ manage: true }));
 vi.mock("@/hooks/useCanWrite", () => ({
   useCanWrite: () => true,
@@ -153,8 +153,7 @@ describe("DocumentListItem permission gating", () => {
 
   it("leaves a read-only account no menu at all", () => {
     // Every entry in this menu ends in a mutating request, so the whole menu
-    // goes. It used to offer Duplicate, Edit, Confirm and Execute and answer
-    // 403 to each — on all 48 rows of the list.
+    // goes, so a read-only account sees no Duplicate, Edit, Confirm or Execute on any of the 48 rows.
     render(
       <DocumentListItem
         doc={makeDoc()}

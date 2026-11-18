@@ -22,9 +22,9 @@ vi.mock("sonner", () => ({
  * What five equipment modals say when the save is refused.
  *
  * A 500 from FastAPI arrives as `{"detail": "Internal Server Error"}`, and
- * the reader used to get it verbatim — English, technical, and no use to
- * anyone in any language. `extractApiError` now withholds a 5xx `detail`,
- * which left these five falling back to the shared "The action could not be
+ * the reader must not get it verbatim — English, technical, and no use to
+ * anyone in any language. `extractApiError` withholds a 5xx `detail`, so these
+ * five fall back to the shared "The action could not be
  * completed.": true, and no help in a modal that could say which action.
  *
  * Business rules still speak for themselves — a 4xx carries a sentence

@@ -1,8 +1,7 @@
 """What happens when a counted number is far above the system quantity.
 
-The growth cap used to rewrite the counted number in silence: count 20 where
-the system says 2 and the item ended up at 10, while the report kept claiming
-20. Industry practice for a physical inventory is the opposite — a count
+The growth cap never rewrites the counted number in silence: count 20 where
+the system says 2 is held back and reported as 20. Industry practice for a physical inventory is the opposite — a count
 outside tolerance is *flagged*, never edited, and posting it takes an explicit
 decision that leaves a trace of who made it.
 """

@@ -140,8 +140,8 @@ export default function PickingActivePhase({
   // One notice for the whole list: the fact is collective, and the way out of
   // it costs the session, so it is stated once instead of in every row.
   const unlinkedCount = trackableItems.filter(needsProductLink).length;
-  // A recipe none of whose ingredients is on the shelf used to be refused a
-  // session at all, on a guess made from `template_id`. The session now
+  // A recipe none of whose ingredients is on the shelf is still given a
+  // session, not refused on a guess made from `template_id`. The session
   // starts and the sheet says the true reason it is empty.
   const nothingInStock =
     trackableItems.length > 0 &&

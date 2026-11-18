@@ -1,9 +1,8 @@
 """The licence gate looks at versions, not only at package names.
 
-`THIRD_PARTY_LICENSES.md` carries a version column and the gate that guards
-its freshness compared names alone: a dependency bumped in `uv.lock` left the
-report quoting the old version and the check answered "117 listed packages
-match pyproject and the lock". The table is the reader's answer to "what is
+`THIRD_PARTY_LICENSES.md` carries a version column, and the gate that guards
+its freshness compares names and versions: a dependency bumped in `uv.lock`
+without a new report fails it. The table is the reader's answer to "what is
 this shipping" — a wrong number there is the stale report the gate exists to
 catch, arriving through the one door it did not watch.
 """

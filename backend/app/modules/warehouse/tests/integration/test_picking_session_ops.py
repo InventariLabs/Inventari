@@ -155,8 +155,8 @@ class TestConfirmShortPick:
     ) -> None:
         """A short line names the shortage by code, not by a stored sentence.
 
-        The default reason this used to write was an English sentence
-        ("Short picking") shown as is to every reader, in every language.
+        No default reason is written: an English sentence such as
+        ("Short picking") would be shown as is to every reader, in every language.
         The code the person chose is the name and the screens translate it.
         """
         session, lines, doc_lines = await _create_pick_session(

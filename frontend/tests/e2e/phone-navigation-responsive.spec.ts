@@ -106,7 +106,7 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
     await expect(heading).toBeInViewport();
     expect(await page.evaluate(() => window.scrollY)).toBe(0);
 
-    // Back is the previous screen: the list, not the launcher.
+    // Back leads to the screen before this one: the list, not the launcher.
     await page.getByRole("button", { name: "Back" }).click();
     await expect(page).toHaveURL(/\/inventory\/items\?search=phone-nav/);
     await expect(menus.first()).toBeVisible();
@@ -256,8 +256,8 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
       await expect(page).toHaveURL(entry.url);
 
       // The start is on screen again, and one more Back leaves for the
-      // launcher. The shell used to push the start a second time, so the next
-      // Back popped to the action and the two screens took turns for ever.
+      // launcher. The shell pushes the start only once, so the next
+      // Back leaves for the launcher, not back to the action.
       await page.getByRole("button", { name: "Back" }).click();
       await expect(page).toHaveURL(/\/warehouse\/todo$/);
       await page.getByRole("button", { name: "Back" }).click();

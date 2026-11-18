@@ -1,9 +1,8 @@
 """The floor's queue: what each document waits for, derived from its own rows.
 
-To do used to be the plain document list narrowed to confirmed receipts and
-dispatches, with one button each. It could not tell a document nobody had
-started from one whose session was open, from one already picked and packed —
-and a dispatch picked short and packed still offered *Pick*.
+To do tells a document nobody has started from one whose session is open and
+from one already picked and packed, and a dispatch picked short and packed does
+not offer *Pick* again.
 
 Nothing here adds a document status. The stage is read from what the work
 already left behind:

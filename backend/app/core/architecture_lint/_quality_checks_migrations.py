@@ -300,9 +300,8 @@ def _separate_database_tablenames(module_dir: Path) -> set[str]:
     """Tables of the classes that live on the separate database.
 
     The exclusion is per TABLE, not per module: one class inheriting the
-    separate-database base used to switch the whole module to the
-    Core-Base-only reading, hiding every other table the module owns. Now
-    only the tables of the inheriting classes leave the module's set.
+    separate-database base is out of the module's set, and no other table is:
+    the module keeps every table it owns outside those classes.
     """
     tables: set[str] = set()
     for cls in _separate_database_classes(module_dir):

@@ -1,11 +1,9 @@
 """Which HTML a printout renders: the type's own template, else the profile's.
 
-The template's ``document_type`` column used to be decorative at print
-time: the PDF endpoint read the profile's single ``default_template_id``
-and printed every document through it — a receipt wearing a scrap layout,
-because that happened to be the template the profile named. The data
-model already kept one default per (organization, module, document_type);
-this is the reading that honours it.
+The template's ``document_type`` column decides which layout prints: the PDF
+endpoint takes the template of the document's own type, so a receipt never
+wears a scrap layout. The data model keeps one default per (organization,
+module, document_type); this is the reading that honours it.
 """
 
 from __future__ import annotations

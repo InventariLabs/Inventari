@@ -1,15 +1,14 @@
 """Equipment import asks the questions the rest of the module already asks.
 
 ``status_machine.validate_transition`` is the gate three write paths call
-before an asset changes state; import did not call it, so a cell reading
-``BANANA`` became the status badge on the list and on the asset card — by
-the same door the ``UNKNOWN_STATUS`` contract closed for the word
-"UNKNOWN". Beside it, an unreadable price was swallowed by a bare ``pass``
-and an unreadable date travelled into ``meta_data`` as text, in a field the
+before an asset changes state, and import calls it too: a cell reading
+``BANANA`` is refused, not shown as the status badge on the list and on the
+asset card, by the same door the ``UNKNOWN_STATUS`` contract closes for the
+word "UNKNOWN". Beside it, an unreadable price is refused rather than dropped,
+and an unreadable date is refused rather than stored as text in a field the
 rest of the module reads as a date.
 
-Each test here fails on the previous behaviour: the row counted as
-imported.
+Each test here pins a refusal: the row fails and is not counted as imported.
 """
 
 from typing import Any, cast
@@ -127,7 +126,7 @@ class TestImportRefusesWhatTheFormRefuses:
     async def test_a_price_that_is_not_a_number_fails_the_row(
         self, _stubs: Any
     ) -> None:
-        """It used to be dropped in silence and the row counted as imported."""
+        """A price that is not a number fails the row, which is not counted as imported."""
         _stubs.return_value = pd.DataFrame({'name': ['Laptop'], 'cena': ['ABC']})
         result = await _run(
             _stubs.return_value, {'name': 'name', 'purchase_price': 'cena'}

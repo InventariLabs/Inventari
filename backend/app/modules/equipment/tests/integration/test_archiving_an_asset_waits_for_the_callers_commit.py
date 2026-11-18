@@ -1,9 +1,7 @@
 """Archiving an asset is not durable until the caller commits.
 
-The maintenance service used to commit inside the archive, so a request
-that failed after it had already taken the asset out of the register. The
-caller owns the commit now: a rollback after the call leaves the asset
-where it was.
+The maintenance service leaves the commit to its caller, so a rollback after
+the archive leaves the asset where it was in the register.
 """
 
 from __future__ import annotations

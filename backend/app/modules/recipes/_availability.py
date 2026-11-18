@@ -17,9 +17,9 @@ changes daily, so freezing the resolution at save time would hide every
 product added afterwards until somebody re-saved the recipe by hand.
 
 The reads are batched into a :class:`StockContext` — five queries, whether
-the caller asks about one recipe or two hundred. There used to be two
-nearly identical code paths, one with a cache and one without; a context
-that a lone recipe also builds removes that fork.
+the caller asks about one recipe or two hundred. One code path serves
+both: a lone recipe builds the same context, so there is no second path
+with a cache of its own to keep in step.
 """
 
 from __future__ import annotations
@@ -370,8 +370,8 @@ def _check_ingredient_availability(
     sorted_items = fefo_order(items, context.today)
     best = sorted_items[0]
     # What is past its date is on the shelf, not in the pot: it counts
-    # towards nothing the recipe needs. It used to count in full, so a
-    # fridge holding only spoiled chicken made the curry cookable.
+    # towards nothing the recipe needs, so a fridge holding only spoiled
+    # chicken does not make the curry cookable.
     usable = [item for item in sorted_items if not is_past(item, context.today)]
     if not usable:
         return IngredientAvailability(
@@ -494,10 +494,9 @@ async def annotate_recipes_with_availability(
 ) -> list[dict[str, Any]]:
     """Attach the availability summary to a page of recipes.
 
-    The list card used to render ``ingredients_available`` straight from the
-    schema default, so every recipe read "0 of N" while the detail screen, the
-    cooking session and the planner — all asking this same function — said the
-    ingredient was on the shelf. One stock context serves the whole page.
+    The list card renders ``ingredients_available`` from the same answer as the
+    detail screen, the cooking session and the planner: they all ask this
+    function. One stock context serves the whole page.
     """
     if not recipes:
         return []

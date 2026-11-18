@@ -271,13 +271,10 @@ async def list_recipes(
         estimated_uncosted = 0
         if last_run is None and ingredient_counts.get(recipe.id, 0) > 0:
             # Never run: the card's number is today's estimate from the same
-            # rollup the cost tab computes — the dash it used to show read
-            # as "the system does not know" one click before the same
-            # application showed the number. A recipe with a run keeps the
-            # run's figure, under a label that says so. Quantized to the
-            # run's four decimals: a raw division printed 4.200000 next to
-            # the run's 4.2000 and read as a different precision, not a
-            # different time.
+            # rollup the cost tab computes, so the card and the cost tab show one
+            # number. A recipe with a run keeps the run's figure, under a label that
+            # says so. Quantized to the run's four decimals, so an estimate reads at
+            # the same precision as a run.
             rollup = estimates.get(recipe.id)
             # The estimate is the cost of the batch, not of its ingredients:
             # the fixed lines and the labour the steps take are what the

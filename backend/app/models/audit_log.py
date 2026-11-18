@@ -76,9 +76,8 @@ class AuditLog(Base):
     )
 
 
-# The immutability trigger used to be defined here and executed by a migration
-# that imported it. It lives in the migration now
-# (the core baseline migration), because a migration
+# The immutability trigger lives in the migration, not here: the core baseline
+# migration, because a migration
 # that reads today's model is not a snapshot of anything — and because the
 # copy here outlived the only migration that ran it, so the constant said the
 # rule was enforced while the database it described had no trigger at all.

@@ -1,8 +1,8 @@
 """Integration tests for GET /items/product-templates/count.
 
 The count answers "is the product catalog empty" before a form opens —
-the search endpoint needs a 2-char query, so an empty catalog used to be
-discoverable only inside an open picker. The count covers the same
+the search endpoint needs a 2-char query, so an empty catalog can only be
+discovered here, before a picker opens. The count covers the same
 visibility set as the picker: org-scoped + global templates.
 """
 

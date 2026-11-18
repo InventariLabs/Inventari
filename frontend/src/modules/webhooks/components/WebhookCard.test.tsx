@@ -74,9 +74,8 @@ describe("WebhookCard status", () => {
 
   it("refers the reader to the delivery log instead of prescribing a URL fix", () => {
     // An unreadable signing secret, a timeout and a receiver's 500 all trip
-    // the breaker too; the sentence used to send the administrator to fix the
-    // URL whatever the cause had been. The cause of the last attempt is on
-    // its own log row, one press away from the card.
+    // the breaker too; the sentence points at the cause of the last attempt, not
+    // always at the URL. That cause is on its own log row, one press away from the card.
     const onLogs = vi.fn();
     renderCard(
       {
@@ -163,9 +162,8 @@ describe("WebhookCard status", () => {
     });
 
     it("offers exactly one Reactivate, named after the webhook", () => {
-      // The action row used to repeat it, so a phone (where the row spells
-      // its labels out) showed the word twice and a screen reader heard two
-      // identical buttons.
+      // The action row does not repeat it: a phone, where the row spells its
+      // labels out, shows the word once, and a screen reader hears no two identical buttons.
       renderCard(TRIPPED);
 
       const buttons = screen.getAllByRole("button", { name: /Reactivate/ });

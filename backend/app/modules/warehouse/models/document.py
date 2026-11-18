@@ -444,7 +444,7 @@ class DocumentLine(CoreModelBase):
     )
     # Where the goods of this line actually went, which is not always where
     # the document asked: a putaway rule can send a delivery to another
-    # shelf, and the document used to say nothing about it.
+    # shelf, and the document records where they went.
     executed_location_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey('storage_locations.id', ondelete='SET NULL'), nullable=True
     )
@@ -467,7 +467,7 @@ class DocumentLine(CoreModelBase):
     # where the line's goods WILL land while the document still waits for
     # execution, and who decided it. Deliberately not declared as class
     # attributes — a stored plan would go stale the moment a rule changed,
-    # the same way a booked "landed elsewhere" used to surprise.
+    # the way a booked "landed elsewhere" would surprise.
     product_snapshot: Mapped[dict[str, Any] | None] = mapped_column(
         JSONB, nullable=True
     )

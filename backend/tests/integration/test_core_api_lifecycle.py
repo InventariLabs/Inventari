@@ -321,9 +321,8 @@ class TestItemLifecycleOperations:
         """An archive that names no why stores no why, through the facade too.
 
         The HTTP DELETE and this one are two doors onto the same write, and
-        the facade's default used to answer the absence with ``OTHER`` — so
-        an archive made by a module read "Status: Other" on the sheet the
-        same way the one made from the list did.
+        the facade's default leaves the absence without a reason, so an archive made by
+        a module reads on the sheet the same way as one made from the list.
         """
         db = real_async_db_session
         item = await _make_item(

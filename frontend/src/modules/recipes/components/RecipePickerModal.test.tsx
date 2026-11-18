@@ -159,9 +159,8 @@ describe("RecipePickerModal — one height for both lists", () => {
     twoLists();
     renderModal();
 
-    // The shorter list used to size the sheet on its tab and the longer one
-    // on the other, so the dialog moved on every switch. Both stay in the
-    // layout, one over the other, and the cell is as tall as the taller.
+    // Both lists stay in the layout, one over the other, and the cell is as tall
+    // as the taller, so the dialog does not move on every switch.
     const panels = screen.getAllByRole("tabpanel", { hidden: true });
     expect(panels).toHaveLength(2);
     for (const panel of panels) {

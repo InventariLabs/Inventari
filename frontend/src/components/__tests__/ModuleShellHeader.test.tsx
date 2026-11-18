@@ -7,8 +7,8 @@ import ModuleShell from "@/components/ModuleShell";
 /**
  * A nav item's title and subtitle describe that item's own screen. The tab
  * underline follows the prefix, because a nested screen still belongs to its
- * section — but the header used to follow it too, so the creation form
- * introduced itself with the list's description.
+ * section — but the header must not follow it too, or the creation form would
+ * introduce itself with the list's description.
  */
 
 const getModuleNav = vi.fn();

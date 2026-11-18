@@ -232,7 +232,7 @@ async def _update_stats_after_delivery(
         webhook.consecutive_failures = (webhook.consecutive_failures or 0) + 1
 
         # The cut-off is one event. A test ping still reaches a channel the
-        # breaker switched off, and each failing one used to journal and
+        # breaker switched off, and each failing one must not journal and
         # announce the same cut-off again; the mark is cleared only when a
         # person turns the channel back on, which opens the next one.
         if (
@@ -279,9 +279,9 @@ async def _log_circuit_breaker(db: AsyncSession, webhook: WebhookEndpoint) -> No
         reason='circuit_breaker',
         meta_data={
             # The same structured actor the API-key entries carry: the row
-            # says who acted, not only who did not. A null account used to
-            # read on the screen as an unknown user; this says the system
-            # did it, which is the truth and reads as one.
+            # says who acted, not only who did not. A null account reads as an
+            # unknown user; this says the system did it, which is the truth and reads
+            # as one.
             'actor': {'type': 'system'},
             'consecutive_failures': webhook.consecutive_failures,
             'auto_disabled': True,

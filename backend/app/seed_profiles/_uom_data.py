@@ -4,19 +4,16 @@ Pure data, no DB access. :func:`app.seed_profiles.base.seed_uom` persists it
 and :mod:`app._seed_uom` delegates there, so an installation gets the same
 units whether it was built by ``seed_data`` or by applying a product profile.
 
-They used to be two lists that had drifted: twenty units here, sixteen there,
-and ``rounding`` only on one side — so a workspace built from a profile could
-record a quantity of 1.5 pieces, because the column default is 0.01 and
-nothing had said otherwise.
+One list serves both paths, so a workspace built from a profile gets the same
+rounding as any other: pieces are whole, not 1.5, because the rounding says so
+rather than the column default of 0.01.
 
 ``factor`` is relative to the category's reference unit, and the reference is
 the one whose factor is 1. Factors and roundings are written as ``Decimal``:
 the columns are exact, and a float literal here would only describe the
 catalogue wrongly — SQLAlchemy converted it on the way in, but a reader saw
-``28.3495`` and had to know that a double cannot hold it. Length is stated in centimetres for that reason:
-the flag used to sit on Meter while the scale was centimetre-based, which
-converts correctly — every conversion is a ratio — but describes the
-catalogue wrongly to anyone reading it.
+``28.3495`` and had to know that a double cannot hold it. Length is stated in centimetres: every
+conversion is a ratio, so the base only decides how the catalogue reads.
 """
 
 from decimal import Decimal
@@ -172,7 +169,7 @@ UOM_UNITS: list[dict[str, Any]] = [
 
 
 # US kitchen measures — food vertical, not the neutral base. A workspace in
-# the neutral mode used to pick its default unit between pieces, kilograms
+# the neutral mode picks its default unit between pieces, kilograms
 # and teacups. The food profile's seed adds these; installations that already
 # have the rows keep them (``uoms`` has no owner column and is referenced by
 # items, so nothing is deleted anywhere).

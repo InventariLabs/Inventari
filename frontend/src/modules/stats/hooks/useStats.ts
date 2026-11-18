@@ -33,7 +33,7 @@ export function useStatsConfig() {
 /**
  * Fetches overview stats.
  * NOTE: Use `queryKeys.stats.overview` = ['stats', 'overview'] as the canonical key.
- * Old code may invalidate ['stats-overview'] — see invalidation.ts for details.
+ * Some callers may still invalidate ['stats-overview'] — see invalidation.ts for details.
  */
 export function useStatsOverview() {
   return useModuleQuery<OverviewStats>("stats", {

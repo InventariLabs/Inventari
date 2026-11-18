@@ -133,9 +133,8 @@ describe("AiConnectionFields", () => {
   });
 
   it("hands the provider's default back when the field is emptied", async () => {
-    // An emptied base URL used to strand the connection: the save went
-    // through and the first call died on a relative URL. The default comes
-    // back when the field is left empty.
+    // An emptied base URL is never saved: the default comes back when the
+    // field is left empty, so the first call does not die on a relative URL.
     const onChange = vi.fn();
     const user = userEvent.setup();
     const { fireEvent } = await import("@/test/utils");
@@ -182,8 +181,8 @@ describe("AiConnectionFields", () => {
   it("asks for a model only where there is one to name", () => {
     // The model input is present for every provider that serves models,
     // with a generic placeholder. The reader is a service, not a model —
-    // its field used to render with another provider's placeholder, asking
-    // a question the credential has no answer for.
+    // its field shows that provider's placeholder, never another provider's,
+    // which would ask a question the credential has no answer for.
     const onChange = vi.fn();
     const { rerender } = renderWithProviders(
       <AiConnectionFields value={empty} onChange={onChange} />,
@@ -204,11 +203,10 @@ describe("AiConnectionFields", () => {
   });
 
   it("lets the reader say the model does not read images", async () => {
-    // The provider's suggestion used to be drawn as a fixed badge with a
-    // tick. A protocol is not a model: a connection to a text-only model
-    // through an OpenAI-compatible endpoint inherited VISION from the shape
-    // of the API and could not be told otherwise, so it stayed on the list of
-    // things to read photographs with.
+    // The provider's suggestion is a checkbox the reader can clear. A protocol
+    // is not a model: a text-only model behind an OpenAI-compatible endpoint
+    // gets VISION from the shape of the API, and the reader must be able to
+    // take it off the list of things to read photographs with.
     const user = userEvent.setup();
     const onChange = vi.fn();
     renderWithProviders(
@@ -608,10 +606,10 @@ describe("AiConnectionFields — what the connection test reports", () => {
     //
     // The mock sits at the network layer on purpose, and the request body
     // is examined: the test endpoint forbids extra fields, so a draft's
-    // save-time baggage (name, tuning knobs) used to come back as a 422
-    // about "name: Extra inputs are not permitted" — a pin at the api
-    // boundary could not see that leak, because the shape it answered was
-    // one the real screen never produced.
+    // save-time baggage (name, tuning knobs) must be stripped before the call,
+    // or it comes back as a 422 about "name: Extra inputs are not permitted".
+    // A pin at the api boundary cannot catch that, because the shape it
+    // answers is one the real screen never produces.
     // Earlier tests in this file spy on aiConnectionsApi.test; the spies
     // outlive their tests (clearAllMocks clears calls, not replacements),
     // and a stale one would answer before the real client ever built a

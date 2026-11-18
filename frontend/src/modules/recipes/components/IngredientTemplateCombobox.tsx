@@ -106,7 +106,7 @@ export default function IngredientTemplateCombobox({
 
   // The suggestions are ordinary buttons in a portal, so the keyboard has to
   // be walked from here: a `<button>` fires `click` on Enter and Space and
-  // never `mousedown`, which is where accepting a suggestion used to live.
+  // never `mousedown`, which is where a press on a suggestion is handled.
   // The mousedown handler stays — it is what beats the input's `blur` on a
   // real press — and the keyboard gets its own way in beside it.
   const optionButtons = () =>

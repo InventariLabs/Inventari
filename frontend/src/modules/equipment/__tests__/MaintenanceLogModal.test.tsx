@@ -1,7 +1,7 @@
 /**
- * The maintenance type used to open on "Inspection" — the fourth chip of
- * five, and the one that says least about what was actually done — so
- * whoever filed quickly filed that, and the log filled with inspections.
+ * The maintenance type must not open on "Inspection" — the fourth chip of
+ * five, and the one that says least about what was actually done — or whoever
+ * filed quickly would file that, and the log would fill with inspections.
  */
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -41,10 +41,8 @@ describe("MaintenanceLogModal", () => {
   });
 
   /**
-   * Save used to grey out until all three answers were in, and said nothing
-   * about which one was missing — no toast, no text at the field, no
-   * `aria-invalid`. Measured on this dialog: title and technician filled,
-   * Save dead, and the reason was a chip nobody had pressed.
+   * Save with an answer missing says which one: a toast, text at the field and
+   * `aria-invalid`.
    */
   it("says which answer is missing instead of greying Save out", async () => {
     const user = userEvent.setup();

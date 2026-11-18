@@ -367,7 +367,7 @@ export function useScanCamera({ onCodeScanned }: UseScanCameraOptions) {
       startCamera();
     }
     // Otherwise the reader never asked for the camera (a wide screen waits
-    // for "Start Camera"): a refused typed code used to start it here and
+    // for "Start Camera"): a refused typed code must not start it here and
     // swap the notice for a camera error nobody had asked about.
   };
 
@@ -587,8 +587,8 @@ export function useScanCamera({ onCodeScanned }: UseScanCameraOptions) {
 
           // The exception text stays in the log, where it belongs. What
           // reaches the screen is a sentence in the reader's language naming
-          // the next step — the browser's own words used to be printed under
-          // a translated heading and answered nothing.
+          // the next step; the browser's own words are not printed under a
+          // translated heading, where they answer nothing.
           setScannerError(
             cameraErrorMessage(
               err,

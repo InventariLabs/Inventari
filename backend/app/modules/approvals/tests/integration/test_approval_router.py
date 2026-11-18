@@ -673,11 +673,9 @@ class TestRequestEndpoints:
     ) -> None:
         """Users without admin/manager role cannot approve requests.
 
-        The previous code only checked ``get_current_user_context`` (auth +
-        org membership). A regular user with no role in the workflow could
-        hit /approve and either silently advance the request or hit a 500
-        from a downstream check. The router now enforces the role gate
-        before delegating to the service.
+        The router checks the role gate before delegating to the service, so a
+        user with no role in the workflow is refused here, not by a check
+        further down.
         """
         # Manager (router_user) creates a workflow + request as the requester.
         self._seed_workflow(client, router_auth)
@@ -786,8 +784,7 @@ class TestRequestEndpoints:
 class TestRouterBugFixes:
     """End-to-end coverage of the router-level bug fixes.
 
-    Each test below reproduces a previously-broken behaviour and verifies
-    the corrected contract.
+    Each test below pins one router-level contract.
     """
 
     def test_create_workflow_with_uuid_approvers_does_not_crash(
@@ -796,10 +793,8 @@ class TestRouterBugFixes:
         router_auth: dict[str, str],
         router_user: User,
     ) -> None:
-        """Bug fix: ``model_dump()`` previously produced UUID objects which
-        could not be stored in the JSONB ``stages`` column.  The fix is to
-        use ``model_dump(mode='json')`` in the router so UUIDs are
-        serialised to strings before insertion.
+        """The router dumps the payload with ``model_dump(mode='json')``, so
+        UUIDs reach the JSONB ``stages`` column as strings.
         """
         approver_uuid = str(router_user.id)
         payload = {
@@ -1370,8 +1365,7 @@ class TestWorkflowVisibilityScope:
     request list does: 200 with what that role may see — for workflows,
     nothing at all.
 
-    The two lists used to disagree at the same role: /requests filtered
-    (200, zero) while /workflows refused (403). One module, one contract.
+    One module, one contract: both lists answer the same way at the same role.
     """
 
     def _seed_workflow(self, client: TestClient, auth: dict[str, str]) -> None:

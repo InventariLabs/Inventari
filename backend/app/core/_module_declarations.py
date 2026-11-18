@@ -89,13 +89,10 @@ class StorageLocationDeclaration(BaseModel):
     #: name that was written — which is how a later pass tells a row nobody
     #: has touched from one the user has renamed.
     #:
-    #: It used to serve a second purpose: a client translated the code at
-    #: display time, because the name was written in English and then read by
-    #: people working in five languages. That covered React screens and
-    #: nothing else — the path under a picker, the search box, the label
-    #: printed on the door and every exported document still carried the
-    #: stored name, so the same room answered to two names depending on where
-    #: you looked. A location's name is data: editable, printed, exported.
+    #: The name is data, not a translation key: the path under a picker, the
+    #: search box, the label printed on the door and every exported document all
+    #: show the same stored name, so a room answers to one name wherever you look.
+    #: A location's name is editable, printed and exported.
     #: Its language is chosen once, when it is written (see ``translations``).
     code: str | None = None
     #: The declared name and description per language, keyed by language code.
@@ -124,10 +121,9 @@ class ModuleMetadata(BaseModel):
     #: database). This is not a security boundary — it is
     #: information for the operator, shown on the store card.
     capabilities: list[str] = []
-    #: None means nobody signed the module. The default used to be 'Core Team',
-    #: which made every anonymous community module present itself under the
-    #: core team's name — the one place a user decides whether to trust
-    #: installed code. Core modules are labelled by the registry, not by this
+    #: None means nobody signed the module. A community module must not present
+    #: itself under the core team's name, the one place a user decides whether to
+    #: trust installed code. Core modules are labelled by the registry, not by this
     #: default (see module_registry's is_core handling).
     author: str | None = None
     license: str | None = None

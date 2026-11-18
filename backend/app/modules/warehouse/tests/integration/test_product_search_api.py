@@ -515,7 +515,7 @@ class TestStockSearchTellsRowsApart:
         doc_source_location: StorageLocation,
         doc_target_location: StorageLocation,
     ) -> None:
-        """Two records of the same product on the same shelf used to read as
+        """Two records of the same product on the same shelf must not read as
         the same line twice, with two numbers and nothing to tell them apart.
         The best-before is what makes the grocery pair two rows in the first
         place, so it rides along."""
@@ -599,8 +599,8 @@ class TestStockSearchTellsRowsApart:
         doc_source_location: StorageLocation,
         doc_target_location: StorageLocation,
     ) -> None:
-        """A scrap searches the whole organisation: same-named rows on different shelves used to
-        differ by nothing but their quantity."""
+        """A scrap searches the whole organisation: same-named rows on different shelves
+        differ by their shelf, not only by their quantity."""
         here = Item(
             name='Yogurt',
             organization_id=doc_org.id,
@@ -697,8 +697,8 @@ class TestStockSearchTellsRowsApart:
         doc_org: Organization,
         doc_source_location: StorageLocation,
     ) -> None:
-        """A page full of emptied records used to push the one record still
-        holding goods off the page, and the dialog answered "nothing found"
+        """A page full of emptied records does not push the one record still
+        holding goods off the page, or the dialog answers "nothing found"
         about a shelf that had them."""
         stocked = Item(
             name='Ration pack',

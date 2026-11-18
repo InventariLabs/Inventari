@@ -1,8 +1,8 @@
 """The recipe reader fetch runs off the event loop.
 
-``scrape_with_jina_llm_async`` used to call its synchronous ``httpx.get``
-straight from the coroutine: one slow page froze the whole worker — every
-request on it, health checks included — until the 30 s timeout allowed.
+``scrape_with_jina_llm_async`` runs its synchronous ``httpx.get`` off the event
+loop: one slow page must not freeze the whole worker — every request on it,
+health checks included.
 This pins the loop's liveness against a deliberately hanging reader.
 """
 

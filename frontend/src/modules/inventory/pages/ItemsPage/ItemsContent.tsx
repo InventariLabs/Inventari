@@ -166,7 +166,7 @@ export default function ItemsContent({
       className={`transition-opacity duration-200 ${isPlaceholderData ? "opacity-50 pointer-events-none" : "opacity-100"}`}
     >
       {/* The hidden counter belongs to the list, not to its empty state: a
-          row in view used to silence it, and one hidden record behind three
+          row in view does not silence it, and one hidden record behind three
           visible ones is exactly the case nobody spots alone. */}
       {items.length > 0 && (hiddenCount ?? 0) > 0 && (
         <div className="mb-3">

@@ -1,11 +1,7 @@
 """
 Tests for a record's posting across module sets.
 
-The posting (``_post_the_change_async``, the bridge to the quant table while
-there was one) used to be conditional: active only for orgs with a
-stock-consuming module enabled (documents, purchase_orders, stock_takes),
-skipped for home-only orgs, whose Item.quantity was their sole stock truth.
-It is now active for every org — a home org keeps
+The posting (``_post_the_change_async``) is active for every org: a home org keeps
 the same register, and only the screens that show it stay behind the module
 list. The register is the records themselves, their
 movements and their cost layers: a record change writes its movement, and

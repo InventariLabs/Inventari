@@ -27,14 +27,16 @@ export const queryKeys = {
   },
   stockAsOf: {
     report: (query: unknown) => ["stock-as-of", query] as const,
+    /** The value statement of a period: the on-a-date report's sibling. */
+    movement: (query: unknown) => ["stock-value-movement", query] as const,
   },
   items: {
     all: ["items"] as const,
     /** Under the namespace root on purpose: a receipt, a correction or a
      * return funnels through `invalidation.documents()` → `items()`, which
-     * clears the `["items"]` prefix. The singular root this key used to
-     * carry escaped every one of those invalidations, and an open item card
-     * kept the stock from before the write for the whole session. */
+     * clears the `["items"]` prefix, so a singular root would escape those
+     * invalidations, and an open item card would keep the stock from before the
+     * write for the whole session. */
     detail: (id: string) => ["items", "detail", id] as const,
     search: (q: string, storageId?: string) =>
       storageId

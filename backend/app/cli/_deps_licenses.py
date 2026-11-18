@@ -1,8 +1,8 @@
 """Licence classification for declared dependencies.
 
-This answers "what did we install". It was once unguarded: a GPL package sat
-in ``pyproject.toml`` as a direct runtime dependency for months, because
-nothing read the licences of what the manifests declare.
+This answers "what did we install". Without it, nothing reads the licences of
+what the manifests declare, and a GPL package listed as a runtime dependency
+in ``pyproject.toml`` passes unnoticed.
 
 Scope is what actually ships. Backend: the runtime set from
 ``uv export --no-dev`` intersected with installed distribution metadata.

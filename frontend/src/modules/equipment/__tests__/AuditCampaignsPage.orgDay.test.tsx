@@ -12,8 +12,8 @@ import { onePage } from "@/test/mocks/page";
  * The campaign was created with deadline "the 25th" for an organization
  * whose clock is America/New_York; the stored instant is the end of that
  * org day. A reader in Europe/Warsaw (two hours east of UTC, New York four
- * west) used to see "09/26/2026" on this list — the browser's zone reading
- * a value pinned to another clock. With the organization's timezone mocked,
+ * west) must not see "09/26/2026" on this list, where the browser's zone would
+ * read a value pinned to another clock. With the organization's timezone mocked,
  * the card must name the org's day.
  */
 

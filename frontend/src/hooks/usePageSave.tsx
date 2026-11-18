@@ -32,8 +32,8 @@ const PageSaveContext = createContext<PageSaveContextValue | null>(null);
 /**
  * The one Save of a settings page (UI_GUIDELINES §11.9).
  *
- * A page made of several sections, each with its own request, used to carry
- * one Save button per fragment, and a reader could not tell which edits
+ * A page made of several sections, each with its own request, carries one Save
+ * for the page, not one per fragment, since a reader could not tell which edits
  * a given button would keep. Here every section registers itself as a part
  * while it holds an edit; the page shows a single Save when any part is dirty
  * and writes them in turn.

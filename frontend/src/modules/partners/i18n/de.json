@@ -74,9 +74,9 @@
     "codePlaceholder": "z.B. LIE-001",
     "taxIdPlaceholder": "z.B. DE123456789",
     "isConsumerHint": "Hat keine Steuer-ID: Belege werden ohne sie bestätigt, auch wo das Gesetz sie von Unternehmen verlangt.",
-    "emailPlaceholder": "kontakt@unternehmen.de",
+    "emailPlaceholder": "kontakt@example.com",
     "phonePlaceholder": "+49 123 456 789",
-    "websitePlaceholder": "https://unternehmen.de",
+    "websitePlaceholder": "https://example.com",
     "contactPersonPlaceholder": "z.B. Max Mustermann (Einkauf)",
     "positionPlaceholder": "z.B. IT-Spezialist, IT-Abteilung",
     "notesPlaceholder": "Interne Notizen…",
@@ -101,8 +101,8 @@
     "deactivateFailed": "Partner konnte nicht deaktiviert werden",
     "saveFailed": "Partner konnte nicht gespeichert werden",
     "createFailed": "Partner konnte nicht erstellt werden",
-    "invalidEmail": "Geben Sie eine E-Mail-Adresse ein, zum Beispiel name@firma.de.",
-    "invalidWebsite": "Geben Sie eine Webadresse ein, zum Beispiel https://firma.de."
+    "invalidEmail": "Geben Sie eine E-Mail-Adresse ein, zum Beispiel name@example.com.",
+    "invalidWebsite": "Geben Sie eine Webadresse ein, zum Beispiel https://example.com."
   },
   "inlineCreateHint": "Schnell einen Partner erstellen",
   "inlineCreateSuccess": "Partner „{{name}}“ wurde erstellt. Ergänzen Sie Steuer-ID und Adresse, bevor Sie ein Dokument mit Adresse ausstellen.",

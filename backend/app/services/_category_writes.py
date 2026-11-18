@@ -295,8 +295,8 @@ async def rename_category_group(
     """Give every category in a group a different group label, or none.
 
     A group is not a record. It is a label typed on each category that has
-    it, so the only way to rename one used to be to open every category
-    carrying it — and the food profile seeds a dozen or more per group.
+    it, so renaming one means changing every category carrying it — and the
+    food profile seeds a dozen or more per group.
 
     Each category goes through :func:`update_category`, which is what makes a
     catalogue category belonging to no organisation fork into this one before

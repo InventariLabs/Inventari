@@ -457,9 +457,8 @@ async def list_documents(
 
     if doc_type:
         # The stored types are canonical; a caller still filtering with the
-        # legacy Polish codes (PZ/WZ/MM) used to get an empty list rather than
-        # their receipts. Several list filters — and the API docs —
-        # promised those codes for years.
+        # legacy Polish codes (PZ/WZ/MM) map to their receipts, as the list filters
+        # and the API docs promise.
         # Several types may be asked at once, comma-separated: a work queue
         # of receipts and dispatches is one list, one order and one count.
         conditions.append(

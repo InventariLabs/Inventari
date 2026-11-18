@@ -1,8 +1,8 @@
 """Peanuts, tree nuts and nut butters in the allergen inference.
 
 Polish has two common spellings for a peanut ("orzeszki ziemne" and "orzechy
-ziemne"); the second contains "orzech" and used to read as a tree nut. The
-English generic nut words carried no allergen because bare "nut" also sits in
+ziemne"); the second contains "orzech" and must not read as a tree nut. The
+English generic nut words carry no allergen, because bare "nut" also sits in
 coconut and donut.
 """
 

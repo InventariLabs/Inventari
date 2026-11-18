@@ -1,16 +1,10 @@
 """Goods nobody had a record of reach the shelf when the count closes, once.
 
 The counting screen opens a record for a product found on the shelf, then
-records the find as a surplus row of the count. It used to open the record
-holding the counted quantity: the goods were on the shelf before anyone
-closed the count, a cancelled count left them there, the row's baseline read
-the same number as its count, and the correction document closing the count
-had no line for them — the shelf grew with only an opening movement behind
-it and the count reporting nothing found.
-
-The record is now opened holding nothing, the way the screen asks for it
-here: the count holds the find until it closes, and closing it posts the
-surplus once — in the report, the correction document and the movements.
+records the find as a surplus row of the count. The record is opened holding
+nothing, the way the screen asks for it here: the count holds the find until
+it closes, and closing it posts the surplus once — in the report, the
+correction document and the movements.
 """
 
 from __future__ import annotations

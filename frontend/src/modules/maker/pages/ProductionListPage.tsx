@@ -48,9 +48,9 @@ const PAGE_LIMIT = 50;
 /**
  * Which of the four things the list has to say.
  *
- * Deriving it once beats re-deriving it at each render site: the branches used
- * to spell out "not failed and not loading and empty", and every new state had
- * to be subtracted again from the ones after it.
+ * Deriving it in one place beats re-deriving it at each render site: no branch spells
+ * out "not failed and not loading and empty", and a new state is subtracted
+ * only here.
  */
 type ListState = "error" | "loading" | "empty" | "ready";
 
@@ -211,8 +211,8 @@ export default function ProductionListPage() {
   const controlsVisible = showListControls({ isLoading, total, isNarrowed });
 
   const { duplicate, isDuplicating } = useDuplicateOrderNavigation();
-  // Duplicating an order writes one. An account that may only read the list
-  // used to be offered the action and refused at the end of it.
+  // Duplicating an order writes one, so an account that may only read the list
+  // is not offered the action.
   const canWrite = useCanWrite("maker");
 
   const filteredOrders = useMemo(() => {

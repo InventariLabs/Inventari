@@ -112,8 +112,8 @@ describe("AddItemPage", () => {
       </PageHeaderContext.Provider>,
     );
 
-    // The title lives in the module shell header now, not in the page — the
-    // page used to paint a second one under the list's header.
+    // The title lives in the module shell header, not in the page, so the page
+    // does not paint a second one under the list's header.
     // Both tabs should be present
     expect(
       await screen.findByRole("tab", { name: /Vision AI/i }),
@@ -144,7 +144,7 @@ describe("AddItemPage", () => {
 
   it("arms the nav-leave guard once something is typed, and disarms on the way out", async () => {
     // The same navigation click that the asset form answers with a
-    // confirmation used to walk out of this form in silence.
+    // confirmation must not walk out of this form in silence.
     // The page's half of that contract is the store: dirty while the form
     // differs from what it opened with, null again on unmount.
     const user = userEvent.setup();
@@ -301,12 +301,12 @@ describe("AddItemPage", () => {
   });
 
   it("keeps the form on screen when every location belongs to a module", async () => {
-    // The page used to be replaced whole by a panel whose only way out was
-    // the settings screen — the module's main write path ended in a dead
-    // end. The form stays, and the note under the storage field carries the
-    // way out that works: create a location. The module-data switch is not
-    // offered — this is a stock flow, which keeps a module's places out
-    // whatever that switch says, so the reader would be sent to a dead end.
+    // The form stays on screen rather than being replaced by a panel whose only
+    // way out is the settings screen, which would end the module's main write
+    // path in a dead end. The note under the storage field carries the way out
+    // that works: create a location. The module-data switch is not offered —
+    // this is a stock flow, which keeps a module's places out whatever that
+    // switch says.
     server.use(
       http.get("/api/v1/locations", ({ request }) => {
         const url = new URL(request.url);

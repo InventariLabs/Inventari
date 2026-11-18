@@ -8,8 +8,8 @@ import SettingsEmailTab from "../components/SettingsEmailTab";
  * Mail server settings — admin only, rendered at /settings/email.
  *
  * Configuring SMTP is an administrative act, not a programming one, and it is
- * what makes invitations and notifications leave the building. It used to sit
- * under "Developer", where an administrator looking for it had no reason to go.
+ * what makes invitations and notifications leave the building. It is not
+ * filed under "Developer", where an administrator has no reason to look for it.
  */
 export default function SettingsEmailSection() {
   const { t } = useTranslation("common");

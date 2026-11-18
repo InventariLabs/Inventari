@@ -62,8 +62,8 @@ interface Options {
  * Delete asks a second question, because the API does: `PUT` and the quantity
  * moves are `items:write`, while `DELETE` is `items:delete` — a key built-in
  * roles grant only to the administrator. Topping up a shelf and erasing the
- * record are different rights, and the discard action used to be offered on
- * the strength of the first.
+ * record are different rights, so the discard action is offered only with the
+ * second.
  */
 export function useItemQuickActions(
   item: Item,
@@ -143,13 +143,11 @@ export function useItemQuickActions(
     );
 
   /** The same operation the row's bin performs, so the reason dialog they
-   *  both open describes what actually happens. This used to discard the
-   *  whole quantity instead — the record stayed behind at zero while the
-   *  dialog said the product was being deleted. */
+   *  both open describes what actually happens: the record is deleted. */
   const confirmDelete = async (reason: string, notes: string) => {
     // Awaited rather than fired: the dialog closes on the way out of a delete
     // that happened, and stays put — reason and note intact — on one that did
-    // not. It used to close either way, so both looked the same.
+    // not, so the two outcomes look different.
     try {
       await deleteItemMutation.mutateAsync({ itemId: item.id, reason, notes });
     } catch (error: unknown) {
@@ -198,11 +196,10 @@ export function useItemQuickActions(
           // contributes it through the `quick_action_extra` slot. Core kept its own
           // copy of the same action, so the sheet offered it twice — and offered it
           // at all on an installation without the module.
-          // Equipment actions used to sit here — "Check out" and "Decommission",
-          // both of which opened the edit form. An asset is handed over and retired
-          // from its own detail page, where those actions ask what they need to
-          // ask; a button named after a movement that opens a form is worse than
-          // no button, because it reads as though the movement was recorded.
+          // Equipment actions are not offered here. "Check out" and "Decommission"
+          // belong to the asset's own detail page, where they ask what they need
+          // to ask; a button named after a movement that opens a form is worse
+          // than no button, because it reads as though the movement was recorded.
           canDelete && {
             id: "discard",
             label: isEquipmentItem

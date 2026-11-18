@@ -387,9 +387,9 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 
 | Method | Signature | R/W | Description |
 |---|---|---|---|
-| `delete_for_org_async` | `(organization_id: UUID, module_name: str, file_path: str) -> None` | WRITE | Delete a file previously saved via :meth:`save_for_org_async`. |
+| `delete_for_org_async` | `(organization_id: UUID, module_name: str, file_path: str) -> None` | WRITE | Delete a file saved via :meth:`save_for_org_async`. |
 | `exists_for_org_async` | `(organization_id: UUID, module_name: str, file_path: str) -> bool` | READ | Check whether a file saved via :meth:`save_for_org_async` exists. |
-| `get_for_org_async` | `(organization_id: UUID, module_name: str, file_path: str) -> bytes` | READ | Retrieve a file previously saved via :meth:`save_for_org_async`. |
+| `get_for_org_async` | `(organization_id: UUID, module_name: str, file_path: str) -> bytes` | READ | Retrieve a file saved via :meth:`save_for_org_async`. |
 | `get_url_for_org_async` | `(organization_id: UUID, module_name: str, file_path: str, expires_in: int \| None=None) -> str` | READ | Get a URL for a file saved via :meth:`save_for_org_async`. |
 | `save_for_org_async` | `(organization_id: UUID, module_name: str, file_path: str, content: bytes, content_type: str='application/octet-stream') -> str` | WRITE | Save *content* under an enforced ``<org>/<module>/`` prefix. |
 
@@ -477,7 +477,7 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 
 | Method | Signature | R/W | Description |
 |---|---|---|---|
-| `activate_async` | `(db: AsyncSession, organization_id: uuid.UUID, partner_id: uuid.UUID, *, user_id: uuid.UUID \| None=None) -> PartnerDTO \| None` | WRITE | Reactivate a previously deactivated partner. Returns None if not found. |
+| `activate_async` | `(db: AsyncSession, organization_id: uuid.UUID, partner_id: uuid.UUID, *, user_id: uuid.UUID \| None=None) -> PartnerDTO \| None` | WRITE | Reactivate a deactivated partner. Returns None if not found. |
 | `create_async` | `(db: AsyncSession, organization_id: uuid.UUID, data: PartnerCreateDTO, user: UserContextDTO) -> PartnerDTO` | WRITE | Create a partner through the standard service pipeline. |
 | `deactivate_async` | `(db: AsyncSession, organization_id: uuid.UUID, partner_id: uuid.UUID, *, user_id: uuid.UUID \| None=None) -> PartnerDTO \| None` | WRITE | Soft-deactivate a partner (sets is_active=False). Returns None if not found. |
 | `get_async` | `(db: AsyncSession, org_id: uuid.UUID, partner_id: uuid.UUID) -> PartnerDTO \| None` | READ | — |

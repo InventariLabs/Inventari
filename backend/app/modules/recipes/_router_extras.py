@@ -236,7 +236,7 @@ def register_extras_routes(router: APIRouter) -> None:  # noqa: C901, PLR0915 - 
             )
         except CoverUnreadableError as exc:
             # A right magic number on the front of a file the decoder cannot
-            # finish reading used to be stored and served back as a broken
+            # finish reading is refused, not stored and served back as a broken
             # frame.
             raise catalogue_refusal('image_unreadable') from exc
 

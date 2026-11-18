@@ -13,13 +13,13 @@ interface PageHeaderData {
 export type { PageHeaderData };
 
 /**
- * The default `setHeader` used to be `() => {}`, and silence is the wrong
- * answer: only `SettingsShell` and `ModuleShell` provide this context, so a
- * page rendered on a flat route under `AppShell` handed its title and its
- * actions to nothing. `/webhooks` shipped that way — the "Add webhook" button
- * lived in the header it never reached, and once the first webhook existed the
- * empty state (which held the only other copy of that button) disappeared with
- * it, leaving no way to add a second one.
+ * The default `setHeader` must not be `() => {}`: silence is the wrong
+ * answer. Only `SettingsShell` and `ModuleShell` provide this context, so a
+ * page rendered on a flat route under `AppShell` would lose its title and its
+ * actions without a word. `/webhooks` shows the cost: the "Add webhook" button
+ * lives in a header the page never reaches, and the empty state, which holds the
+ * only other copy of it, disappears with the first webhook, leaving no way to
+ * add a second one.
  */
 function warnAboutMissingProvider(data: PageHeaderData): void {
   // The hook's own unmount cleanup passes `{}`; that one is not a complaint.

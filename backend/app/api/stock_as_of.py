@@ -10,7 +10,7 @@ nothing was recorded in is more dangerous than one that names the boundary.
 
 from __future__ import annotations
 
-from datetime import UTC, date, datetime, time
+from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -18,7 +18,12 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.contracts import StockAsOfReportDTO, SystemPermission, UserContextDTO
+from app.core.contracts import (
+    StockAsOfReportDTO,
+    StockValueMovementDTO,
+    SystemPermission,
+    UserContextDTO,
+)
 from app.core.datetimes import format_date_for
 from app.core.deps import (
     get_async_db,
@@ -36,7 +41,11 @@ from app.services.analytics._common import (
     get_org_currency_async,
     org_uses_valuation_layers_async,
 )
-from app.services.stock_as_of_service import ledger_starts_at_async, report_async
+from app.services.stock_as_of_service import (
+    layer_movements_async,
+    ledger_starts_at_async,
+    report_async,
+)
 
 router = APIRouter()
 
@@ -53,8 +62,8 @@ def _resolve_instant(as_of: date | datetime) -> datetime:
     A bare date is the whole day, so it resolves to the end of it: the shelf
     on the 23rd is the shelf once the 23rd is over, not the one at midnight
     before the day's movements. A timestamp without an offset is read as UTC
-    — the ledger is stored in UTC, and comparing it against a naive value is
-    what used to end the request in a 500 rather than an answer.
+    — the ledger is stored in UTC, and a naive value compared against it would
+    end the request in a 500 rather than an answer.
     """
     if isinstance(as_of, datetime):
         return as_of if as_of.tzinfo else as_of.replace(tzinfo=UTC)
@@ -301,4 +310,146 @@ async def stock_as_of_pdf(
         content=pdf,
         media_type='application/pdf',
         headers={'Content-Disposition': f'attachment; filename={filename}'},
+    )
+
+
+async def _build_value_movement(
+    db: AsyncSession, org_id: UUID, date_from: date, date_to: date
+) -> StockValueMovementDTO:
+    """The statement of a period: the value it opened with, what moved it,
+    the value it closed with.
+
+    The two ends are the stock-on-a-date report itself, asked for the evening
+    before the first day and for the last — one source of truth, so the
+    closing here is the figure that report gives for the same day. The
+    movements are what the cost layers say between them; whatever the two
+    ends differ by that the layers do not account for is said, not hidden,
+    as ``other_changes``.
+    """
+    if date_to < date_from:
+        raise catalogue_refusal('stock_value_period_reversed')
+    opening, _ = await _build_report(
+        db, org_id, date_from - timedelta(days=1), None, limit=1
+    )
+    closing, organization = await _build_report(db, org_id, date_to, None, limit=1)
+
+    base = {
+        'date_from': date_from,
+        'date_to': date_to,
+        'generated_at': closing.generated_at,
+        'complete_from': closing.complete_from,
+        'organization_name': closing.organization_name,
+        'currency': closing.currency,
+    }
+    if opening.total_value is None or closing.total_value is None:
+        # No cost history: the two ends are quantities only, and a statement
+        # of value over them would be a page of zeros nobody computed.
+        return StockValueMovementDTO(**base)
+
+    moved = await layer_movements_async(
+        db,
+        org_id,
+        opening.as_of,
+        closing.as_of,
+        org_currency=closing.currency or '',
+    )
+    in_production = (closing.work_in_progress_value or Decimal('0')) - (
+        opening.work_in_progress_value or Decimal('0')
+    )
+    listed = (
+        moved.receipts
+        + moved.internal_receipts
+        + moved.used
+        + moved.disposed
+        + moved.dispatched
+        + moved.other_issues
+        + in_production
+    )
+    return StockValueMovementDTO(
+        **base,
+        value_source=closing.value_source,
+        excluded_currency_receipts=moved.excluded,
+        opening_value=opening.total_value,
+        receipts=moved.receipts,
+        internal_receipts=moved.internal_receipts,
+        used=moved.used,
+        disposed=moved.disposed,
+        dispatched=moved.dispatched,
+        other_issues=moved.other_issues,
+        work_in_progress_change=in_production,
+        other_changes=closing.total_value - opening.total_value - listed,
+        closing_value=closing.total_value,
+    )
+
+
+@router.get('/stock-value-movement', response_model=StockValueMovementDTO)
+async def stock_value_movement(
+    date_from: date = Query(..., description='The first day of the period.'),
+    date_to: date = Query(..., description='The last day of the period, included.'),
+    _: object = require_permission(SystemPermission.ITEMS_READ),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    current_user: UserContextDTO = Depends(get_current_user_context),
+) -> Any:
+    """What the stock was worth at the start of a period, what moved it, and
+    what it was worth at the end.
+
+    Not a ledger: no chart of accounts, no double entry, no closing of
+    periods. A statement over the cost layers, for a person or a bookkeeper
+    to take from.
+    """
+    return await _build_value_movement(
+        db, require_org(current_user), date_from, date_to
+    )
+
+
+#: The lines of the spreadsheet, in the order the statement reads them.
+_MOVEMENT_LINES = (
+    ('Opening value', 'opening_value'),
+    ('Receipts', 'receipts'),
+    ('Produced and returned to stock', 'internal_receipts'),
+    ('Used', 'used'),
+    ('Disposed', 'disposed'),
+    ('Dispatched', 'dispatched'),
+    ('Other issues', 'other_issues'),
+    ('Work in progress change', 'work_in_progress_change'),
+    ('Other changes', 'other_changes'),
+    ('Closing value', 'closing_value'),
+)
+
+
+@router.get('/stock-value-movement/export/xlsx', response_model=None)
+async def stock_value_movement_xlsx(
+    date_from: date = Query(...),
+    date_to: date = Query(...),
+    _: object = require_permission(SystemPermission.ITEMS_READ),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    current_user: UserContextDTO = Depends(get_current_user_context),
+) -> Any:
+    """The same statement, as one spreadsheet."""
+    import pandas as pd
+
+    org_id = require_org(current_user)
+    # The statement is nothing but value: where the profile withholds the
+    # figure, a file of it would say what the screen does not.
+    if not await _shows_inventory_value_async(db, org_id):
+        raise catalogue_refusal('stock_value_hidden')
+    statement = await _build_value_movement(db, org_id, date_from, date_to)
+    frame = pd.DataFrame(
+        [
+            {
+                'Line': label,
+                'Value': (
+                    float(value)
+                    if (value := getattr(statement, field)) is not None
+                    else None
+                ),
+            }
+            for label, field in _MOVEMENT_LINES
+        ],
+        columns=['Line', 'Value'],
+    )
+    return to_xlsx_response(
+        frame,
+        sheet_name='Value movement',
+        filename_stem=f'inventari_value_movement_{date_from.isoformat()}_{date_to.isoformat()}',
     )

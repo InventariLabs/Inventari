@@ -1,8 +1,8 @@
 /**
  * The products list's plain confirmation answers through `useConfirmDialog`:
- * its `onConfirm` used to run the action, drop the promise and close the
- * question. A refused bulk delete then closed the dialog with no word, the
- * rows stayed, and the console got an unhandled rejection.
+ * its `onConfirm` runs the action and keeps the promise, so a refused bulk
+ * delete does not close the dialog with no word, and the console gets no
+ * unhandled rejection.
  */
 import { AxiosError, type AxiosResponse } from "axios";
 import { fireEvent, render, screen, waitFor } from "@/test/utils";

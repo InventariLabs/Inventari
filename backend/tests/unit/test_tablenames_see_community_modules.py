@@ -2,10 +2,10 @@
 
 A community module may not import ``app.database`` (the safety validator
 forbids it), so every community model sits on a ``DeclarativeBase`` of its
-own. The table walk used to skip exactly those files — non-Core bases are
-not tracked by core Alembic — and reported zero tables for the one kind of
-module the migration checks exist for: the gate read green while the module
-had tables and no migrations.
+own. The table walk reads exactly those files, since core Alembic does not track
+non-Core bases. Skipping them would report zero tables for the one kind of
+module the migration checks exist for, and the gate would read green while the
+module had tables and no migrations.
 """
 
 from __future__ import annotations
@@ -310,7 +310,7 @@ class TestConsumerUpgradeModulesStampDecision:
         )
         assert _should_stamp_at_baseline(tables, set()) is False
         assert _should_stamp_at_baseline(tables, tables) is True
-        # A module the helper reads as tableless keeps the old path.
+        # A module the helper reads as tableless is stamped at baseline.
         assert _should_stamp_at_baseline(set(), set()) is True
 
 
@@ -379,7 +379,7 @@ class TestExternalModuleRoots:
         self, tmp_path: Path, monkeypatch
     ):
         """In the container ``/modules-workspace`` and the repo-root twin are
-        one directory; a module there used to be reported twice."""
+        one directory; a module there is reported once, not twice."""
         from app.core.architecture_lint import _main
 
         real = tmp_path / 'workspace'

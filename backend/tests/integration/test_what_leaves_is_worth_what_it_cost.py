@@ -145,7 +145,7 @@ async def test_an_outflow_across_two_currencies_has_no_sum(
 
     Layers drain by age, not by what they were bought in, so a template with
     a foreign receipt in its history can hand the drain two currencies. The
-    rate this used to be posted at refused a mixed batch; summing the costs
+    rate posted here refuses a mixed batch; summing the costs
     instead must refuse it for the same reason.
     """
     db = real_async_db_session

@@ -292,9 +292,9 @@ async def _refuse_unit_swap_under_stock(
 ) -> None:
     """Refuse a unit change on a record that holds stock.
 
-    ``uom_id`` used to be applied like any other field, so "5 pcs" became
-    "5 kg" without conversion, without refusal and without a readable trace:
-    the history logged a pair of UUIDs and no symbols. The number on the
+    ``uom_id`` is not applied like any other field: that would turn "5 pcs"
+    into "5 kg" without conversion, without refusal and without a readable
+    trace. The history would log a pair of UUIDs and no symbols. The number on the
     shelf did not change, so the unit under it must not either — Odoo blocks
     the same edit on a product with stock or movements, and this is that
     rule. An empty record is free to change its mind.
@@ -512,10 +512,10 @@ async def _sync_template_fields(
     if item.template_id is None:
         if all(v is None for v in values.values()):
             return {}
-        # This door used to mint the card itself: a twin beside any card of
-        # the same name, bound with no paper, and the stock the record held
-        # left outside the register it had just joined — the record said 4
-        # and its shelf said nothing. The adoption the record's posting runs carries
+        # This door does not mint the card itself: that would make a twin beside
+        # any card of the same name, bound with no paper, and leave the stock the
+        # record holds outside the register it has just joined. The adoption the
+        # record's posting runs carries
         # the record's unit onto a minted card (pieces for a record older
         # than the default) and posts the holding; a quantity changed in the
         # same request has already been through it.
@@ -679,9 +679,8 @@ async def _log_and_emit(
             db, {f: update_data.get(f, changed[f][1]) for f in changed}
         )
     )
-    # The card's own history carries the names too. It used to keep the ids
-    # alone, so one event read `Category: ffb4a9cd → 7ab33755` on the card
-    # while the journal beside it spelled the words.
+    # The card's own history carries the names too, not only the ids, so an
+    # event reads the same words on the card as in the journal beside it.
     await log_history_async(
         db,
         item,
@@ -800,8 +799,8 @@ async def update_quantity(
         source_document_id=source_document_id,
     )
     # The caller's ``history_changes`` already says why the quantity moved and
-    # what it came from; the organization log used to get neither, so a
-    # correction from a stock take was indistinguishable from a manual edit.
+    # what it came from; the organization log gets them too, so a
+    # correction from a stock take stays distinct from a manual edit.
     audit_extras = dict(history_changes or {})
     audit_reason = audit_extras.pop('reason', None)
     # The history row has carried this since it was written; the log row did

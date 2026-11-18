@@ -3,11 +3,9 @@
 Creation refuses a duplicate type code inside an organization, so the shape is
 a legacy one — but it exists, and four readers meet it: the listing, the seed
 of the profile's starting locations, a module's declared types and the
-profile's own seed. The listing sorts; the other three used to ask Postgres
-for the rows with no ORDER BY and let the first or the last one win, so which
-row took the seed depended on the table's physical layout — the same
-organization could land on one row at one enable and on the other at the next,
-with nothing to say anything was ambiguous.
+profile's own seed. Each of them reads the rows in a fixed order, so the same
+organization lands on the same row at every enable, whatever the table's
+physical layout.
 
 Each test plants the pair in BOTH insertion orders. A reader that sorts picks
 the same row either way; one that trusts the heap picks the one inserted

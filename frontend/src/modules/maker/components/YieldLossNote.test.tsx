@@ -5,8 +5,8 @@ import { YieldLossNote } from "@/modules/maker/components/YieldLossNote";
 /**
  * The sign is the whole point. `effective_qty = qty_per_batch *
  * (1 + yield_loss_pct / 100)`, so the annotation has to read as "more is
- * consumed"; the tree editor used to render `(-10%)`, telling the opposite
- * story about the same line.
+ * consumed", never `(-10%)`, which would tell the opposite story about the same
+ * line.
  */
 describe("YieldLossNote", () => {
   it("annotates a loss as extra consumption, never as a reduction", () => {

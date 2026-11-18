@@ -207,7 +207,7 @@ export default function AddEquipmentPage() {
   const [mode, setMode] = useState<"single" | "batch">("single");
   const [scanOpen, setScanOpen] = useState(false);
 
-  // The navigation gate: this page used to lose a filled form to
+  // The navigation gate: this page must not lose a filled form to
   // a click on the module tab, without a question. The pristine snapshot
   // freezes once the edit-mode read has settled — before that the form is
   // still filling itself, and nothing the reader typed exists yet.

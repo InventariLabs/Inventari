@@ -1,8 +1,8 @@
 """The capacity row names the unit its limit is counted in.
 
 The limit speaks the product's stock unit — the same sentence the write
-path already obeys — but the response used to carry the number without the
-unit, and "holds up to 10" reads the same for ten packages as for ten
+path already obeys — and the response carries the unit with the number, because
+"holds up to 10" reads the same for ten packages as for ten
 kilograms. The router resolves the template's unit symbol beside the
 product's name; a template without a unit answers None and the screen
 shows the no-unit marker instead of inventing one.

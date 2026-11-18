@@ -2,12 +2,11 @@
 
 Three doors — dispatch, scrap and transfer — adopt a card for a record whose
 ``template_id`` is still NULL, the same resolve-or-mint the receipt runs.
-Adoption used to be where the ledger stopped: the goods left the record and
-the movement was written, but nothing ever said the record had held stock
-before. From that moment the pair *(card, location)* read two different
-numbers for the same shelf — the record refused a second dispatch off a shelf
-its own card said was full, and the reconciliation report named a drift
-nobody had caused.
+Adoption joins the record to the ledger: the stock it held before is written as an
+opening balance, so the goods that leave it are the ones the ledger holds.
+Otherwise the pair *(card, location)* reads two different numbers for the same
+shelf — the record refuses a second dispatch off a shelf its own card says is full,
+and the reconciliation report names a drift nobody caused.
 
 These tests hold every adopting door to one relation: for every (card,
 location) the records and the movement ledger net to the same number, and the

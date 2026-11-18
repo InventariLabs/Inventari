@@ -1,8 +1,8 @@
 """Transactional batch reorganization of the storage location tree.
 
-The reorg modal used to save its changes as a sequence of individual
-create/update/delete requests — a failure in the middle left the tree
-half-applied. This service executes the whole operation list inside one
+The reorg modal saves its changes as one operation list, not as a sequence
+of individual create/update/delete requests: a failure in the middle would
+leave the tree half-applied. This service executes the whole operation list inside one
 transaction and validates the FINAL tree state, so an intermediate cycle
 that disappears by the end of the batch (e.g. swapping two nodes) is legal
 while a batch ending in a cycle changes nothing and reports the reason.
@@ -456,9 +456,9 @@ async def _log_batch(
 ) -> None:
     """One journal row per operation, in the shape of the single-door writes.
 
-    The batch used to be the one storage write path that left no trail: a
-    person could move a shelf, create a rack and delete a zone in one save,
-    and ``/settings/audit-log`` showed none of it. The rows here answer with
+    The batch leaves a trail like the single-door writes: a person can move a
+    shelf, create a rack and delete a zone in one save, and each of those is in
+    ``/settings/audit-log``. The rows here answer with
     the same shape the edit sheet, the create form and the delete button
     write — the parent named beside its id — and ``meta_data.bulk`` says the
     rows arrived as one batch, as the bulk item edit already does

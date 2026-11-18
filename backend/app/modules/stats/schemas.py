@@ -17,8 +17,8 @@ class OverviewStats(BaseModel):
     #: False when no record carries a price — see OverviewDTO.
     value_known: bool = True
     #: Where ``total_value`` came from — see OverviewDTO. The domain layer
-    #: has always returned this; the response model used to drop it, so the
-    #: screen showed a figure with no way to check where it was from.
+    #: has always returned this, and the response model passes it on, so the
+    #: screen can say where the figure came from.
     value_source: str = 'purchase_price'
     #: Records left out of ``total_value`` for their currency — see
     #: OverviewDTO. Cut off here, the tile could only say "0.00" where the
@@ -150,7 +150,7 @@ class CostAnalysis(BaseModel):
     total_spent: float
     #: ``None`` when the ledger has no outgoing value for this window — see
     #: ``CostSummaryDTO.total_wasted``. Zero and "no idea" are different
-    #: answers and this field used to give the first for both.
+    #: answers, and this field keeps them apart.
     total_wasted: float | None
     #: ``None`` for the same reason: a percentage of an unknown is unknown.
     waste_value_percentage: float | None

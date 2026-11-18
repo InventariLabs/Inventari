@@ -412,9 +412,9 @@ async def _resolve_or_create_category(
 ) -> UUID | None:
     """The category_id for a row, founding one when allowed — else refusing.
 
-    An unknown category with founding off used to come back as ``None``:
-    the row imported with no category at all and was counted a success,
-    while the same sheet naming an unknown shelf was refused. One question,
+    An unknown category with founding off is refused: ``None`` would import the
+    row with no category at all and count it a success, while a sheet naming
+    an unknown shelf is refused. One question,
     one answer — the refusal names the column and the cell, as the
     location's does.
     """
@@ -467,7 +467,7 @@ def _quantity_from_cell(row: pd.Series, mapping: dict) -> Decimal:
     """The row's quantity: 1 when the sheet has no quantity column at all.
 
     A column the reader mapped to quantity and left blank in this row is a
-    gap, not an answer: it used to import as 1 with no word in the result,
+    gap, not an answer: it does not import as 1 with no word in the result,
     a stock figure nobody typed. The row is refused and says so.
     """
     if not mapping.get('quantity'):
@@ -554,9 +554,9 @@ def _parse_date_cell(row: pd.Series, mapping: dict, key: str) -> date | None:
     parsing of whatever the user typed. Item import is its only caller.
 
     A cell the parser cannot read refuses the row with the column and the
-    cell, the way quantity and location word theirs: it used to be logged
-    and dropped, so the term the reader had typed vanished under a report
-    of zero failures and the product stayed off every expiring-soon screen.
+    cell, the way quantity and location word theirs: a cell logged and dropped
+    would let the term the reader had typed vanish under a report of zero
+    failures, and the product would stay off every expiring-soon screen.
     """
     raw = _row_get(row, mapping, key)
     if isinstance(raw, datetime):
@@ -880,10 +880,10 @@ async def _process_import_row(
     ctx.begin_row()
     try:
         # Wrap the whole row in a savepoint (pattern: _bulk_update.py).
-        # A failure after the item was flushed used to leave the flushed row
-        # in the session, where the batch commit silently persisted it while
-        # the per-row ``except`` reported it as failed — a phantom item with
-        # no StockQuant. A failed row now rolls back its item; storage and
+        # A failure after the item was flushed rolls the flushed row back: left
+        # in the session, the batch commit would persist it while the per-row
+        # ``except`` reports the row as failed — a phantom item with no
+        # StockQuant. A failed row rolls back its item; storage and
         # category rows founded by it persist only on the refusal paths
         # inside (by design — they are shared org data), never on the
         # exception path.

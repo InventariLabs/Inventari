@@ -1,12 +1,9 @@
 """A fresh warehouse organization finishes a receipt that carries damage.
 
 The floor records what arrived — nine of ten, one of those damaged — through
-a receiving session, and the document is closed when the session ends. It
-used to be refused there: the document profile named no quarantine
-location, so the receipt executor had nowhere to put the damaged unit, and
-the answer arrived as a 400 on the last step, after every quantity was
-already recorded. The person who met it could not clear it either — the
-document settings open for an administrator only.
+a receiving session, and the document is closed when the session ends. The
+document profile names a quarantine location, so the receipt executor has somewhere
+to put the damaged unit, and the receipt completes on the last step.
 
 Onboarding now names the quarantine shelf the product profile seeds, so the
 same receipt completes: the good part lands where the receipt was aimed and
@@ -191,9 +188,8 @@ def test_a_fresh_warehouse_receives_a_damaged_unit_and_completes(
         doc_template,
     )
 
-    # The page closes the document when the session ends — the step that
-    # used to answer 400 with ``receipt_needs_quarantine_location`` and leave
-    # the receipt at CONFIRMED with every quantity already recorded.
+    # The page closes the document when the session ends. That step answers 200
+    # with the receipt COMPLETED and every quantity recorded, damaged units included.
     completed = client.patch(
         f'/api/v1/warehouse/documents/{doc_id}/complete', headers=doc_auth_headers
     )

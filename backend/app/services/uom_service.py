@@ -171,8 +171,8 @@ async def to_canonical_measure_async(
     The reference unit is the canonical measure of the family — grams for
     Weight, millilitres for Volume — so this is the one doorway for "how
     many grams is this": ask it, read the symbol, and refuse when it says
-    the measures don't meet. Nutrition used to carry private tables whose
-    ounce was 28.35 against the catalogue's 28.3495; everything now goes
+    the measures don't meet. Nutrition carries no private tables of its own, since one whose
+    ounce is 28.35 would disagree with the catalogue's 28.3495; everything goes
     through :func:`convert_quantity` and the seeded factors.
 
     Returns ``None`` when there is no unit, the category has no reference
@@ -413,9 +413,8 @@ async def to_stock_uom_async(
             ),
         )
     # Rounded here, where the conversion happens, to the three decimals every
-    # stock column holds. The quotient used to be handed over at full
-    # precision and rounded on the way into the column — the right answer,
-    # arrived at by nobody's decision, and a number the code that computed it
-    # could not recognise afterwards. Half away from zero, like every other
-    # rounding in this codebase.
+    # stock column holds. The quotient is not left at full precision for the
+    # column to round: this is the rule the result is computed by, and the code
+    # that computed it can recognise the number afterwards. Half away from zero, like every
+    # other rounding in this codebase.
     return quantise(converted, STOCK_PLACES)

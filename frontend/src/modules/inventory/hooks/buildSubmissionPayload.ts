@@ -15,8 +15,8 @@ export function buildSubmissionPayload(
    *
    * It decides what an empty optional field means, and there is no reading
    * that works for both: on a new product an empty field was never filled in,
-   * on an existing one it was emptied on purpose. Dropping the key — the only
-   * behaviour there used to be — made clearing a category, a brand or a date
+   * on an existing one it was emptied on purpose. Dropping the key in both
+   * modes would make clearing a category, a brand or a date
    * impossible while the form still reported the save as done.
    */
   mode: "create" | "update" = "create",

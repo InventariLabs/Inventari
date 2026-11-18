@@ -4,13 +4,10 @@ The rules live in ``backend/scripts/check_docs_paths.py`` — one implementation
 three readers: this test, ``make lint`` on the host, and ``pytest`` inside the
 backend container.
 
-WHY IT NO LONGER SKIPS. It used to skip whenever the docs directory was not
-mounted, and it was not mounted in the containers everybody works in, so the
-suite reported green by skipping while the check itself was red on ``dev``:
-five broken references nobody could see, because the only place the colour
-showed was a CI run, and CI ran on ``main`` alone. ``docker-compose.yml`` now
-mounts the documents into the backend container, so this test measures them
-there; and a document it cannot see is now a failure rather than a skip, so a
+WHY IT NEVER SKIPS. A missing docs directory is a failure, so the suite cannot
+go green by skipping while the check is red. ``docker-compose.yml`` mounts the
+documents into the backend container, so this test measures them there; and a
+document it cannot see is a failure, not a skip, so a
 partial mount can never turn into a green run that measured a smaller input
 than it claims.
 """

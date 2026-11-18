@@ -1,8 +1,8 @@
 """Picking answers "where is it" and "which one" for name-matched ingredients.
 
-Every one of these paths used to be gated on ``template_id``. An ingredient
-typed by hand has none, so the checklist showed no location, no recommended
-item and no FEFO warning — for most ingredients, most of the time.
+These paths do not wait for ``template_id``. An ingredient typed by hand has
+none, and the checklist still shows its location, recommended item and FEFO
+warning.
 """
 
 from __future__ import annotations
@@ -282,7 +282,7 @@ class TestPickingReportsTheLinkState:
         test_storage_location: StorageLocation,
         db_session: Session,
     ) -> None:
-        """The case the sheet used to describe backwards: no link, but stock."""
+        """No link, but stock: the sheet still answers this case."""
         _shelve(
             db_session,
             test_user,
@@ -349,10 +349,9 @@ class TestPickingReportsTheLinkState:
 class TestPickingSessionCanBeReread:
     """Linking mid-session is a correction in place, not a lost session.
 
-    The sheet used to answer "this ingredient means nothing to me" by
-    cancelling the session and throwing the user into the recipe editor.
-    The link endpoint never needed that — so the session can simply be
-    read again afterwards.
+    The sheet answers "this ingredient means nothing to me" without cancelling
+    the session or throwing the user into the recipe editor. The link endpoint
+    does not need that, so the session is simply read again afterwards.
     """
 
     def _recipe_with_two_ingredients(
@@ -465,9 +464,9 @@ class TestPickingSessionCanBeReread:
 class TestPickingFoldsOnlySeasonings:
     """An ingredient counted in pieces is never pre-skipped by its amount.
 
-    The checklist used to send every pcs/szt row at one or less — one egg,
-    one onion, half a carton — into the collapsed seasonings section, the
-    same symptom the recipe card dropped. What still folds away on its own
+    The checklist does not send every pcs/szt row at one or less — one egg,
+    one onion, half a carton — into the collapsed seasonings section, and the
+    recipe card does not either. What still folds away on its own
     is a small weight or volume, and what the cook skipped explicitly.
     """
 

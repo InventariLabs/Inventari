@@ -417,9 +417,8 @@ describe("Launcher greeting", () => {
     );
 
   it("welcomes a first visit without assuming an earlier one and names the organization", async () => {
-    // The title used to be "Welcome back" for anyone whose name was known,
-    // forty seconds after the account was made, and the screen never said
-    // which organization the person had just joined.
+    // The title welcomes a first visit, not "Welcome back" for anyone whose name
+    // is known, and the screen names the organization the person has just joined.
     useJoinedOrg();
     renderLauncher();
 

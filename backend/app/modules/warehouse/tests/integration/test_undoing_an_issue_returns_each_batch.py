@@ -1,10 +1,9 @@
 """Undoing an issue that drew across batches puts each batch back.
 
 An issue (or a write-off) of two on a shelf holding one batchless and one of batch L-1 draws
-one from each. Undoing it used to write a single correction line that named
-no batch, so the quantity came back as one batchless record and the recall
-trace of L-1 was gone. The issue now stands on one line per batch it took,
-and the undo restates each of them.
+one from each. Undoing it writes one correction line per batch, so each batch
+comes back as itself and the recall trace of L-1 holds. The issue stands on
+one line per batch it took, and the undo restates each of them.
 """
 
 from __future__ import annotations

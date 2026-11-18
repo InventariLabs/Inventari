@@ -1,14 +1,13 @@
 """A location that physically moves takes its stock's history with it.
 
-Moving a location in the tree used to write one journal row and nothing
-else. The products inside kept their shelf id, so their history said
-nothing had happened, and anything that reads stock per warehouse from the
-movements — the stock on a date above all — showed last month's stock
+Moving a location in the tree is recorded in the journal, and a physical move
+carries its stock with it: anything that reads stock per warehouse from the
+movements — the stock on a date above all — must not show last month's stock
 already standing in the building it was carried to this week.
 
 A move is now one of two things, and the person moving says which:
 
-- a correction of the layout (the default, and all a move used to be):
+- a correction of the layout (the default):
   the journal row and nothing else — the stock was always there;
 - a physical move: one relocation document naming the location, the path it
   left and the path it reached, and a movement of every product inside it

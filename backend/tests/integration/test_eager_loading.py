@@ -44,10 +44,10 @@ class TestEagerLoadingGuards:
 
         await real_async_db_session.run_sync(_check)
 
-    # The uom and template guards used to skip whenever the item had neither,
-    # and async_test_item sets neither — so both skipped in every run. They now
-    # give the item what they are about, and load it fresh: an object still in
-    # the identity map would carry whatever the fixture already loaded.
+    # The uom and template guards need the item to carry a unit and a template, and
+    # async_test_item sets neither, so both give the item what they are about and
+    # load it fresh: an object still in the identity map would carry whatever the
+    # fixture already loaded.
 
     async def test_item_uom_is_eager_loaded(
         self, real_async_db_session: AsyncSession, async_test_item

@@ -1,11 +1,8 @@
 """Moving fifty records at once is the same operation as moving one.
 
-The single move refuses when the source shelf still holds reservations —
-draining the quant used to release ``reserved_quantity`` while the
-``StockReservation`` rows went on pointing at it, so a later per-document
-release would take the same goods off the shelf twice; the rows stand for
-themselves now, and the guard stays so that none of them is left without the
-goods it holds. It also carries lots across, so a delivery's batch travels
+The single move refuses when the source shelf still holds reservations: the
+``StockReservation`` rows stand for themselves, and the guard keeps every one of
+them backed by the goods it holds. It also carries lots across, so a delivery's batch travels
 with the goods.
 
 The bulk edit did neither. Selecting the records and setting their location
@@ -281,8 +278,8 @@ class TestLotsTravelWithTheGoods:
         bm_source,
         bm_target,
     ):
-        # A delivery arrives as a lot. Moved in bulk, it used to land at the
-        # destination on a lot-less quant, and the batch stopped existing.
+        # A delivery arrives as a lot. Moved in bulk, it lands at the destination with
+        # its batch still attached.
         lot = StockLot(
             organization_id=bm_org.id,
             product_template_id=bm_template.id,

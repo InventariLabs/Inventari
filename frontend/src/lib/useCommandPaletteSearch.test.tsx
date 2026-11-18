@@ -108,7 +108,7 @@ describe("useCommandPaletteSearch", () => {
   });
 
   it("subtitles a record with its category in the reader's language", async () => {
-    // The hit used to read `category_name`, a field the item list does not
+    // The hit does not read `category_name`, a field the item list does not
     // send; the category travels nested, with the code that names it.
     const { result } = renderHook(
       () => useCommandPaletteSearch("apple", ["inventory"]),
@@ -213,7 +213,7 @@ describe("useCommandPaletteSearch", () => {
     });
 
     it("is one hit carrying the product's whole stock", async () => {
-      // Five records of one tin used to be five identical rows.
+      // Five records of one tin must be one row, not five identical rows.
       server.use(
         http.get("/api/v1/items", () =>
           HttpResponse.json({

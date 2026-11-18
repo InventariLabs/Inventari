@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
  *
  * The reset is delayed work on the global timer queue, and the arm call
  * comes from an event handler, so nobody owns the id: a dialog that closes
- * inside the window used to fire its state set on a dead component, which
+ * inside the window must not fire its state set on a dead component, which
  * vitest reports as an unhandled error after teardown — green tests, exit 1.
  * The id lives in a ref and unmount takes the timer back.
  */

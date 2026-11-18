@@ -392,9 +392,8 @@ export function CheckoutModal({
       return;
     }
     // The warning is named before the save, not after it: an address pasted
-    // and submitted inside the highlighting's settle window used to be stored
-    // with no warning ever shown. This submit then only raises it; the next
-    // one saves.
+    // and submitted inside the highlighting's settle window must not be stored
+    // with no warning shown. This submit then only raises it; the next one saves.
     setVerifying(true);
     const hold = await address.holdForWarning();
     setVerifying(false);

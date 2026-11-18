@@ -27,7 +27,7 @@ export function makeTDynamic(
  * line and "3 pcs" on the next, about the same position. The translation
  * lives under `common:units.<symbol>` — mirrored in the backend and guarded
  * by `check-units-labels`, which is why it and not one of the two catalogues
- * that used to stand beside it; a unit nobody translated keeps its symbol,
+ * beside it; a unit nobody translated keeps its symbol,
  * which is a better answer than an empty string.
  *
  * Callers with an amount in hand want `formatQuantityLocalized`, which is
@@ -35,8 +35,8 @@ export function makeTDynamic(
  * the raw symbol out of every other render.
  *
  * The WMS screens route their quantity sentences here as well, and the
- * record with no unit gives them nothing: the answer used to be an em dash,
- * and a dash printed straight after a quantity — "1 —", "expected 1 —" —
+ * record with no unit gives them nothing: an em dash is never printed, since
+ * a dash printed straight after a quantity — "1 —", "expected 1 —" —
  * reads as a unit called "—". Nothing stands where the unit would. A
  * table's own "no value" column is a different question and keeps its dash;
  * the capacity rows on a location carry theirs with a tooltip.

@@ -110,7 +110,7 @@ describe("isSpiceQuantity", () => {
 
   it("never treats pieces as seasoning by amount", () => {
     // One egg, one onion, half a carton of milk — each is a main ingredient,
-    // and the card used to hide all of them under the spices heading.
+    // and the card keeps all of them out of the spices heading.
     expect(isSpiceQuantity(1, "pcs")).toBe(false);
     expect(isSpiceQuantity(0.5, "szt")).toBe(false);
     expect(isSpiceQuantity(1, "jajko")).toBe(false);

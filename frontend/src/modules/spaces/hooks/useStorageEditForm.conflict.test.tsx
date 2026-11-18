@@ -66,8 +66,8 @@ const failWith = (status: number, code: string, message: string) =>
   );
 
 /**
- * The same collision used to arrive as 400 from one endpoint and 409 from
- * another, and the screen relayed whichever English sentence came with it.
+ * The same collision must not arrive as 400 from one endpoint and 409 from
+ * another, nor be relayed as whichever English sentence came with it.
  * A status code and a machine-readable code are what let it say something
  * in the reader's own language instead.
  */

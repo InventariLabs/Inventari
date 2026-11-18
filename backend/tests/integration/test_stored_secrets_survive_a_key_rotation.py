@@ -1,10 +1,10 @@
 """Every stored secret can be moved to a new encryption key.
 
-Until now a key change was a one-way door: no command rewrote what was
-stored, so rotating SECRET_KEY on an install that never set ENCRYPTION_KEY —
-which is every Docker install — made every SMTP password, AI key and webhook
-secret unreadable. ``manage.py secrets reencrypt`` walks every place a secret
-is stored and rewrites it under the current key; these tests start from values
+``manage.py secrets reencrypt`` walks every place a secret is stored and
+rewrites it under the current key, so a key change strands nothing. Rotating
+SECRET_KEY on an install that never set ENCRYPTION_KEY, which is every Docker
+install, would otherwise make every SMTP password, AI key and webhook secret
+unreadable. These tests start from values
 sealed under SECRET_KEY alone, which is what an existing install has, and
 check them through the strict readers after the old key is gone.
 """

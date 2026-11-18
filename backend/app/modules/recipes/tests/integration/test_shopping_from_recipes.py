@@ -196,8 +196,8 @@ class TestFractionalQuantitiesKeepTheirUnit:
     ) -> None:
         """The rounding reads the unit's step, not whole pieces.
 
-        0.5 g of saffron used to become "1 g" — a ten-times over-buy that
-        the unit's rounding (0.001 for a gram) never asked for. Countable
+        0.5 g of saffron does not become "1 g" — a ten-times over-buy that
+        the unit's rounding (0.001 for a gram) never asks for. Countable
         units keep their ceiling: 0.3 pcs is still 1 pc to buy.
         """
         grams = str(_uom_id(db_session, 'g'))
@@ -420,7 +420,7 @@ class TestARecipeOnTheListTwice:
         auth_headers: dict[str, str],
         db_session: Session,
     ) -> None:
-        """The card used to preselect a finished list and write onto it."""
+        """The card does not preselect a finished list or write onto it."""
         grams = str(_uom_id(db_session, 'g'))
         bread = _recipe(
             client,

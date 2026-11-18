@@ -199,8 +199,8 @@ describe("ProductionOrderStats", () => {
   });
 
   it("groups thousands like every other screen: 10000 reads as 10 000", async () => {
-    // The preview header and this tile used to disagree about the same
-    // number; quantities now group thousands everywhere, this tile included.
+    // The preview header and this tile agree on the same number: quantities
+    // group thousands everywhere, this tile included.
     await withLanguage("pl", () => {
       render(
         <ProductionOrderStats
@@ -220,8 +220,8 @@ describe("ProductionOrderStats", () => {
   });
 
   it("prints the overproduction delta with its unit and the localized number", async () => {
-    // The tile used to print a bare "+2" — no unit, no localization — three
-    // lines under the tile this convention was edited in.
+    // The overproduction delta carries its unit and the localized number, as
+    // every quantity does.
     await withLanguage("pl", () => {
       render(
         <ProductionOrderStats

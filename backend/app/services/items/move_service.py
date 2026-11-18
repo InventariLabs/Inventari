@@ -207,9 +207,9 @@ async def move_item(
 
     old_storage_id = item.storage_location_id
 
-    # A move to the same location is a no-op. Previously the code below
-    # still decremented the source and re-incremented the destination, which
-    # for a reserved source quant silently eroded reserved_quantity.
+    # A move to the same location is a no-op. Otherwise the code below would
+    # decrement the source and re-increment the destination, which for a
+    # reserved source quant would silently erode reserved_quantity.
     if old_storage_id == move_data.to_location_id:
         await db.flush()
         await log_history_async(

@@ -1,9 +1,9 @@
 """The picking order is a strategy the organization chooses, not a fork.
 
-The walk used to be one hard-coded pass over the lines: the numbers on the
-locations, then the code, then the name. A warehouse that picks by another
-rule — a zone first, a route a module computes — had no way in short of a
-fork of the picking code. A module now registers a named strategy through
+The walk is a strategy the organization chooses, not one fixed pass over the
+lines. A warehouse that picks by another rule — a zone first, a route a module
+computes — needs no fork of the picking code. A module registers a named strategy
+through
 ``warehouse_api``, the organization names one in the warehouse settings, and
 the session's lines are ordered by the strategy that choice resolves to.
 

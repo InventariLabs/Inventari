@@ -51,9 +51,9 @@ async def _prefetch_completed_sessions_async(
     A session started from a plan entry completes that entry, whatever day it
     finished. Any other session (started from the recipe page) completes an
     entry of its recipe dated the day it finished, in the organization's own
-    zone, and each session completes one entry. It used to complete the
-    earliest entry on or before that day, so a recipe cooked on Saturday
-    ticked off Thursday's dinner and the week read a meal as cooked that
+    zone, and each session completes one entry. It never completes the
+    earliest entry on or before that day: a recipe cooked on Saturday must not
+    tick off Thursday's dinner, or the week would read a meal as cooked that
     nobody had made.
     """
     recipe_ids = list({e.recipe_id for e in entries if e.recipe_id})
@@ -152,7 +152,7 @@ async def _build_daily_nutrition_async(
     A nutrient nothing contributed to stays ``None``, not 0.0. The two say
     opposite things and the table renders them differently — "0 g" is a
     measurement, "–" is the absence of one. A plan of recipes whose
-    ingredients carry no nutrition data used to read "0 g · 0 g · 0 g ·
+    ingredients carry no nutrition data must not read "0 g · 0 g · 0 g ·
     0 kcal", one screen away from "nutrition data for 0% of ingredients".
 
     A recipe contributes only when it knows all four. Half a profile summed

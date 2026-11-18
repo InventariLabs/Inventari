@@ -4,10 +4,9 @@ The item list shows ``Item.quantity``: one row per record, and the right
 answer for a household. A warehouse works from the sum — how much of a
 product is at one place, out of which batch, and how much of it is already
 promised. That is a quant, the records of a group summed with their
-reservation rows beside them (``stock_quants_from_records``), and until now
-the only way in was a route the warehouse module registered,
-so an organization running purchase orders and stock takes without documents
-could not open its own shelves.
+reservation rows beside them (``stock_quants_from_records``), and the way in
+is a route Core serves itself, so an organization that runs purchase orders
+and stock takes without documents can open its own shelves.
 
 Reservations are never subtracted from the quantity: "six on the shelf, four
 promised" and "two on the shelf" are different sentences, and only the first

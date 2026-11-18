@@ -13,8 +13,7 @@ import { onePage } from "@/test/mocks/page";
 
 /*
  * A workflow comes into force only when somebody switches it on, knowing what
- * it will hold. It used to hold every confirmed document the moment it was
- * saved under a silent document profile, with nothing on the screen saying so.
+ * it will hold. The screen says what it will hold before the switch is flipped.
  */
 
 vi.mock("sonner", () => ({
@@ -155,7 +154,7 @@ describe("Switching a workflow on", () => {
 
     await user.click(within(dialog).getByRole("button", { name: "Switch on" }));
     // The consent travels with the switch: the server refuses if the rule
-    // it describes is no longer the live one.
+    // it describes is not the live one.
     await waitFor(() =>
       expect(patches).toEqual([
         { is_active: true, expected_scope: onlyIssues },

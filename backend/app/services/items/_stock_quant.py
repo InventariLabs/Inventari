@@ -96,8 +96,8 @@ async def post_opening_balance_async(
     The one place this rule is written. Every door that gives a record its
     card posts the opening here — the core's edit and quantity paths, and
     the documents executor through ``core_api.items`` — so a change to what
-    an opening writes cannot reach one door and miss another; it used to be
-    written twice, once per side.
+    an opening writes cannot reach one door and miss another: it is written
+    once, here, not once per side.
 
     *quantity* is what the record held before the door changed it, in the
     record's own unit, and lands in the card's. *location_id* is the shelf

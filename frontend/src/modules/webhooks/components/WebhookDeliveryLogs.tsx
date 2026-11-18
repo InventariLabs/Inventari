@@ -73,8 +73,8 @@ function StatusBadge({
 }
 
 // The row dates the attempt that produced its status, not the enqueue: a
-// retry answering after minutes of backoff used to wear the enqueue time and
-// read as a result that arrived before the event it describes. Seconds stay,
+// retry answering after minutes of backoff wears its own attempt's time, so it
+// never reads as a result that arrived before the event it describes. Seconds stay,
 // because telling two attempts apart is still what this log is read for.
 // Rows written before attempts were dated fall back to the enqueue time.
 

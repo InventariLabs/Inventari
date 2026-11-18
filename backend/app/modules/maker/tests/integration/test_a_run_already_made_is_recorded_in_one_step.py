@@ -1,9 +1,8 @@
 """A run that already happened is recorded in one step.
 
-"I made 20 kg of plum butter" used to be a draft first and a completion
-second, and the completion refused the run when the records held fewer plums
-than the recipe asked for — goods that had already been made could not be
-recorded. Saving a run as made now opens and closes the order in one
+"I made 20 kg of plum butter" is recorded in one step, even when the records
+hold fewer plums than the recipe asked for: goods that have already been made
+are not refused. Saving a run as made opens and closes the order in one
 transaction, in the product's own unit. An ingredient the records lack is
 consumed as far as they go; the rest is recorded on the order's line and the
 place it is kept is put up for a count in To do. Before saving, the preview
@@ -188,9 +187,9 @@ class TestAlreadyMade:
     ) -> None:
         """22 kg used, 18 kg in the records: the run is not refused.
 
-        It used to answer "cannot complete — out of stock" for goods already
-        made. The records give up their 18 kg, the line names the 4 kg they
-        lacked, and the butter is on the shelf.
+        Goods already made are never refused as out of stock. The records give up
+        their 18 kg, the line names the 4 kg they lacked, and the butter is on the
+        shelf.
         """
         seed = _plum_butter(
             db_session, client, org, headers, pantry, plums_on_shelf='18'
@@ -566,9 +565,8 @@ class TestBeforeSaving:
 
         The preview converts the shortfall back from the recipe's unit, the
         line writes the difference in the stock unit. The two routes agree
-        exactly, but a hair of division noise on the preview's side used to
-        round one step above the write — the button promised 53.900 g and the
-        list held 53.899 g.
+        exactly, so a hair of division noise must not round one step above the write:
+        the button and the list show the same figure.
         """
         grams = db_session.scalars(select(Uom).where(Uom.symbol == 'g')).one()
         ounces = db_session.scalars(select(Uom).where(Uom.symbol == 'oz')).one()
@@ -636,8 +634,8 @@ class TestBeforeSaving:
     ) -> None:
         """A line already listed is not "covered" whatever the run now needs.
 
-        The shortfall used to skip any product already on the list, so a run
-        that grew from 20 to 30 left the 4 kg the smaller run asked for.
+        The shortfall counts a product already on the list too, so a run that grows
+        from 20 to 30 is short by what the larger run now needs.
         """
         seed = _plum_butter(
             db_session, client, org, headers, pantry, plums_on_shelf='18'

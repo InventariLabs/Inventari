@@ -332,9 +332,9 @@ class TestRecipesCRUD:
     ) -> None:
         """PUT with new ingredients must return the updated ingredient list.
 
-        Regression guard: previously the refresh was swallowed in a
-        try/except and, with expire_on_commit=False, the stale relationship
-        collection could be returned instead of the new ingredients.
+        Regression guard: the refresh is not swallowed in a try/except, so with
+        expire_on_commit=False the stale relationship collection is never
+        returned instead of the new ingredients.
         """
         create_r = client.post(
             RECIPE_URL,
@@ -799,7 +799,7 @@ class TestIngredientDefaultsRouter:
     def test_import_counts_a_name_the_column_cannot_hold(
         self, client: TestClient, auth_headers: dict[str, str]
     ) -> None:
-        """The repro from the report: a 400-character name used to lose Rye.
+        """A 400-character name must not lose Rye.
 
         The INSERT for the long name failed after the row was already in the
         session, the session stayed rolled back, and the commit of the good
@@ -1702,9 +1702,8 @@ class TestRecipePickingSession:
     ) -> None:
         """Partial pick from item1 then item2 completes the ingredient.
 
-        Regression guard: previously the first (partial) scan marked the
-        ingredient as picked and blocked any further scans, even though the
-        required quantity was not reached.
+        Regression guard: a first partial scan does not mark the ingredient as
+        picked or block further scans while the required quantity is not reached.
         """
         grams = _get_uom_id(db_session, 'g')
         assert grams is not None, "'g' is not seeded"
@@ -1842,9 +1841,8 @@ class TestRecipePickingSession:
     ) -> None:
         """Cancel after a partial pick must restore consumed stock to inventory.
 
-        Regression guard: previously cancel only flipped session status and
-        left already-picked quantities permanently removed from inventory
-        (Item.quantity drift).
+        Regression guard: cancel also restores the already-picked quantities to
+        inventory, so Item.quantity does not drift.
         """
         recipe_id, item_id = self._create_recipe_with_item(
             client, auth_headers, db_session, test_user, test_storage_location
@@ -2288,9 +2286,9 @@ class TestRecipeShoppingList:
     ) -> None:
         """The add's statement count stays put while the recipe grows lines.
 
-        Rounding reads the unit's step, and the loop used to resolve the
-        unit per merged line with its own query — the request's query count
-        grew with the ingredient count (a recipe may name a hundred). A
+        Rounding reads the unit's step, and the unit is resolved once, not per
+        merged line with its own query: the request's query count does not grow
+        with the ingredient count (a recipe may name a hundred). A
         count of one reader's calls is the narrower pin: it stays green
         when the same query moves anywhere else on the line. The bound
         below is on the request's own statements, counted on the engine the
@@ -2869,9 +2867,9 @@ class TestRecipeImageUpload:
     def test_stored_extension_comes_from_the_mime_not_the_filename(
         self, client: TestClient, auth_headers: dict[str, str]
     ) -> None:
-        """the upload used to name the stored file after whatever the
-        client called it, so `cover.php`/`cover.svg` could land in the storage
-        backend and be served back. The extension now follows the validated
+        """The upload names the stored file by its validated type, not by whatever the
+        client called it, so `cover.php`/`cover.svg` cannot land in the storage
+        backend and be served back. The extension follows the validated
         content type, which the magic bytes have to agree with.
         """
         from io import BytesIO
@@ -3349,9 +3347,9 @@ class TestRecipeTagManagement:
     ) -> None:
         """The chips count the view, not the organization.
 
-        A collection showing zero recipes used to keep "obiad 1" on its
-        chips — a number that answered for recipes the reader could not
-        see, and that clicking turned into zero results.
+        A collection showing zero recipes shows zero on its chips, never "obiad 1":
+        that number would answer for recipes the reader cannot see, and clicking
+        it turns into zero results.
         """
         inside = client.post(
             RECIPE_URL,
@@ -3766,7 +3764,7 @@ def test_add_to_shopping_list_rejected_when_module_disabled(
 
 @pytest.mark.integration
 class TestDeleteTag:
-    """A typo in a comma-separated field used to be permanent.
+    """A typo in a comma-separated field can be removed.
 
     The panel could merge one tag into another and give it a colour; nothing
     took a tag away, so every misspelling stayed on the list for good.

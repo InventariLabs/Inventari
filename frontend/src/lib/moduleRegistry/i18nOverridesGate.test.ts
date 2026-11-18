@@ -12,9 +12,9 @@ import { MAINTAINED_LANGUAGES } from "@/test/languageClasses";
  * The "Changes the interface" gate: every i18n override a module declares
  * must target a key that exists in the shipped bundles, that some code
  * actually reads, and a namespace whose catalogs the dynamic backend
- * announces. An override without a reader used to sit in the registry
- * doing nothing — the badge promised a change the screen never showed
- * (the equipment module renamed `common:navigation.items` while the sidebar
+ * announces. An override without a reader must not sit in the registry
+ * doing nothing — the badge would promise a change the screen never shows
+ * (the equipment module renames `common:navigation.items` while the sidebar
  * reads `inventory:nav.items`). A namespace the backend never serves is the
  * same kind of silence with a longer fuse: no catalog ever lands for it, so
  * the re-application that keeps a standing override on top after a late

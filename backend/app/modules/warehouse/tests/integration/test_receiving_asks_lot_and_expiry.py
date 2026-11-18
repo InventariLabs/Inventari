@@ -1,9 +1,9 @@
 """A receiving scan asks for lot and expiry when the product tracks them.
 
-A scan carries a code and a quantity, so a FEFO product used to arrive on
-the shelf with no date: the lot and expiry existed only if somebody typed
-them on the document beforehand, and under FEFO undated stock sorts last.
-The first scan of such a line now answers ``needs_lot_expiry`` and records
+A scan carries a code and a quantity, so a FEFO product must not arrive on
+the shelf with no date: the lot and expiry come from the scan's question, not
+only from a document typed beforehand, and under FEFO undated stock sorts last.
+The first scan of such a line answers ``needs_lot_expiry`` and records
 nothing; the same scan sent again with the values attaches them to the line,
 and completing the document puts them on the stock record the delivery opens.
 
@@ -498,9 +498,9 @@ class TestTheReceivedStockCarriesLotAndExpiry:
         """The lot is optional on the sheet; the date is what makes it FEFO stock.
 
         A pack that shows a date and no lot number lands on the shelf with an
-        expiry date and no batch. The draw used to read the batch alone, so
-        that record sorted with the undated stock - the very case the scan's
-        question exists to close. It is received between an earlier-dated
+        expiry date and no batch. The draw reads the batch and the expiry together, so
+        that record sorts by its date, not with the undated stock - the very
+        case the scan's question exists to close. It is received between an earlier-dated
         record and a later-dated one, with an undated one beside them, and the
         draw has to take them in the order of their dates.
         """

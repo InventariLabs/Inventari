@@ -747,7 +747,7 @@ class TestPackagesNeverHoldMoreThanWasDone:
     async def test_cancelling_a_session_whose_picked_line_a_package_holds_is_refused(
         self, real_async_db_session: AsyncSession, org: Organization, user: User
     ) -> None:
-        """One line of two picked and boxed: a cancel used to zero it under the box."""
+        """One line of two picked and boxed: a cancel keeps what is already under the box."""
         db = real_async_db_session
         doc = await _dispatch(
             db,

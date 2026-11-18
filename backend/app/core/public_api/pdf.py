@@ -1,7 +1,7 @@
 """Module-safe PDF/template rendering helpers.
 
 Replaces direct ``app.services.pdf_utils`` / ``app.services.template_engine``
-imports in module code (previously baselined architecture-lint bypasses).
+imports in module code, which the architecture lint refuses.
 All methods are synchronous, stateless utilities — no DB access.
 """
 

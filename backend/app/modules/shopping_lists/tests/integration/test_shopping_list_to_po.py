@@ -220,9 +220,9 @@ class TestConvertShoppingListToPO:
     ) -> None:
         """The reference joins what the item already said; it replaces none of it.
 
-        The English line the conversion used to append to ``notes`` reached
-        every language, and on an item whose note the list composes from
-        ``note_data`` (a meal-plan line) it never showed at all.
+        The conversion does not append an English line to ``notes``, so no
+        language sees one. On an item whose note the list composes from
+        ``note_data`` (a meal-plan line) it never shows at all.
         """
         list_id = _create_list(client, auth_headers)
         own = _add_item(
@@ -279,7 +279,8 @@ class TestConvertShoppingListToPO:
 
         It is the order's own free-text note — printed on its PDF and
         editable there — so it is written once, at conversion, rather than
-        composed later; "From shopping list: …" used to reach every language.
+        composed later, so the order's note is the order's own text, not a line
+        shown in every language.
         """
         list_id = _create_list(client, auth_headers)
         _add_item(

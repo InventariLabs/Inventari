@@ -140,8 +140,8 @@ describe("ModulesContext — a failed module list is not the default install", (
   });
 
   it("reports the outage and offers no modules instead of the default install's list", async () => {
-    // A 500 on GET /modules/my used to leave data undefined and substitute
-    // FALLBACK_MODULES: the module the organization had switched off came
+    // A 500 on GET /modules/my leaves data undefined and does not substitute
+    // FALLBACK_MODULES, or the module the organization switched off comes
     // back into the navigation, five enabled modules vanished, and the
     // switched-off module's full route rendered a data panel saying
     // "error / try again" over a 403 that would never go away.

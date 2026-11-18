@@ -20,9 +20,9 @@ interface RequesterScopeFieldProps {
 /**
  * Whose submissions the workflow holds: everyone, or chosen people and roles.
  *
- * Nothing is preselected. "Everyone" used to be the only answer, implied, and
- * it held the administrator's receipts like the warehouse staff's — so the
- * form asks, and the save waits for an answer. Roles come from the roles
+ * Nothing is preselected: "Everyone" would be an implied answer that holds the
+ * administrator's receipts like the warehouse staff's, so the form asks, and
+ * the save waits for an answer. Roles come from the roles
  * listing, which answers 403 to a reader without the configuration grant;
  * people can still be chosen then.
  */

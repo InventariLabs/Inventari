@@ -613,8 +613,8 @@ describe("useItemForm — submit payload cleaning", () => {
 
 describe("useItemForm — the category the form draws is the one it sends", () => {
   // A food category declares nothing: no field_definitions, no context.
-  // The picker offers it, so the payload owes it — this is the record that
-  // used to come back with `category: null` while the form said "added".
+  // The picker offers it, so the payload owes it: the record keeps the category
+  // it was saved with.
   it("sends a category the profile does not declare", () => {
     const onSubmit = vi.fn();
     const { result } = renderItemForm({
@@ -748,10 +748,9 @@ describe("useItemForm — the category the form draws is the one it sends", () =
     expect(payload.category_id).toBe("cat-new");
   });
 
-  // Picking "Cheese" used to take the expiry date out of the form and out of
-  // the submission in the same frame, without a word. The field is
-  // visible again — and a category change that would still drop a filled
-  // value has to name it before anything is written.
+  // Picking "Cheese" keeps the expiry date: the field stays visible, and a
+  // category change that would drop a filled value names it before anything
+  // is written.
   it("keeps the expiry date in the payload for a category the food profile seeds", () => {
     const onSubmit = vi.fn();
     const { result } = renderItemForm({

@@ -6,8 +6,8 @@ import { useAuthStore } from "@/store/authStore";
 /**
  * Shown in place of a protected screen when the session check got no answer.
  *
- * The shell used to read any failure of `/auth/me` as "nobody is signed in" and
- * send the reader to the sign-in form, where signing in failed for the same
+ * A failure of `/auth/me` is not read as "nobody is signed in", which would
+ * send the reader to the sign-in form, where signing in fails for the same
  * reason. Naming the outage keeps the route, keeps the token, and gives the one
  * action that can change the outcome — asking again.
  */

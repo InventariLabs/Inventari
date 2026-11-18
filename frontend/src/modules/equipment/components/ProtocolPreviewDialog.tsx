@@ -21,8 +21,9 @@ interface Props {
 /**
  * The handover protocol, shown as it will print — inside a sandbox.
  *
- * It used to open as a blob URL in a new tab. A blob inherits the origin of
- * the page that created it, so this document ran as the application: its
+ * It renders in a sandbox, not as a blob URL in a new tab: a blob inherits
+ * the origin of the page that created it, so the document would run as the
+ * application: its
  * scripts could read the session and call the API as the reader. The HTML is
  * a Jinja layout an organization admin can edit, which makes "the reader is
  * also the author" an assumption rather than a guarantee.

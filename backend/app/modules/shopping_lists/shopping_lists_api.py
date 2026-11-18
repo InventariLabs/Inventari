@@ -167,13 +167,12 @@ class ShoppingListsAPI:
     ) -> list[ShoppingListItemDTO]:
         """Async: add multiple items to a shopping list of *org_id*.
 
-        ``org_id`` is not a convenience: the method used to be addressed by a
-        bare ``list_id``, so whether the list belonged to the caller was the
-        caller's word. Both callers in the tree happen to check — which is
-        what a confused deputy looks like right up until the third one is
+        ``org_id`` is not a convenience: the method is addressed by ``list_id``
+        within the organization, so whether the list belongs to the caller is
+        not the caller's word. Both callers in the tree happen to check — which
+        is what a confused deputy looks like right up until the third one is
         written. A list that is not this organization's, or not there at all,
-        is refused; the old code skipped the module gate for a missing list
-        and inserted the rows anyway, pointing them at nothing.
+        is refused before any row is inserted that points at nothing.
 
         Quantities are guarded here, at the door — not borrowed from the
         consumers. The contract DTO's only bound is ``gt=0`` and this method
@@ -389,7 +388,7 @@ class ShoppingListsAPI:
 
         The list's own endpoints freeze a completed or archived list; these
         doors serve the recipe card, the meal plan and production runs, and
-        used to write onto a list the reader had already finished — a new
+        must not write onto a list the reader has already finished — a new
         line through ``add_items_async``, a raised quantity through
         ``raise_item_quantity_async`` (and so through ``top_up_async``).
         """

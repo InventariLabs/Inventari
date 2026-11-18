@@ -59,8 +59,8 @@ interface ProductFormContentProps {
  * list and a bulk edit that changes it. Its visibility is decided once, in
  * `SYSTEM_FIELDS` (with the category's own `field_definitions` as override),
  * so the field this form draws is the same definition the submission payload
- * is built from: a picker the form shows and a payload that drops the value
- * used to be two different answers to one choice.
+ * is built from, so the picker the form shows and the payload cannot disagree
+ * about one choice.
  */
 export default function ProductFormContent({
   formData,
@@ -236,9 +236,8 @@ export default function ProductFormContent({
               {errors.location_id}
             </p>
           )}
-          {/* An empty picker used to cost the whole form: the page above was
-              replaced by a panel that sent the reader to settings. The field
-              keeps its place and the way forward sits under it. */}
+          {/* An empty picker keeps its place in the form: the way forward sits
+              under the field, not in a panel that replaces the page. */}
           {storageGate && <div className="mt-1.5">{storageGate}</div>}
           {/* Below the control, not above it: a row of its own above the
               label started this column ~24px lower than the name field

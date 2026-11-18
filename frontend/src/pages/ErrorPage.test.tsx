@@ -2,11 +2,9 @@
  * The screen named by the route tree's `errorElement`, in the reader's
  * language.
  *
- * It used to be three English literals — "Oops! Something went wrong", "An
- * unexpected error occurred." and "Go back home" — so the one moment the
- * application owed the reader an explanation was the one it stopped speaking
- * their language. What this pins is not the wording but where the words come
- * from: the catalogue.
+ * The three strings come from the catalogue, so the moment the application owes
+ * the reader an explanation is also in their language. What this pins is where
+ * the words come from, not the wording itself.
  *
  * `useRouteError` is mocked rather than reached through a router, and that is
  * deliberate. The rendering is what is under test here; the wiring is pinned
@@ -76,7 +74,7 @@ describe("ErrorPage", () => {
       </MemoryRouter>,
     );
 
-    // The two literals this screen used to carry, gone in every language.
+    // The screen carries no English literal of its own.
     expect(screen.queryByText(/Oops! Something went wrong/)).toBeNull();
     expect(screen.queryByText(/Go back home/)).toBeNull();
     expect(screen.getByRole("heading").textContent).toBe(

@@ -111,11 +111,10 @@ class TestADraftCarriesATemporaryIdentifier:
         doc_target_location: StorageLocation,
         doc_template: ProductTemplate,
     ) -> None:
-        """The defect this replaces: a draft used to spend a sequence number.
+        """A draft does not spend a sequence number.
 
-        Three drafts written and thrown away left IN/2026/001 through
-        003 gone from the register. Deletion cannot give a number back
-        now, because no draft ever held one.
+        Three drafts written and thrown away leave no gap in IN/2026/001 through
+        003. Deletion cannot give a number back, because no draft ever held one.
         """
         for _ in range(3):
             draft = _create_draft(

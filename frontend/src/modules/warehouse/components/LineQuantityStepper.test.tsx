@@ -173,8 +173,8 @@ describe("LineQuantityStepper", () => {
   });
 
   // While "12.5" is typed, the number field reports the dot step
-  // as "" — the stepper used to answer that with Number("") === 0, the
-  // field rewrote itself to "0", and the correction got 5 instead of 12.5.
+  // as "". The stepper keeps that empty report instead of reading it as 0, so
+  // the field is not rewritten to "0" and the correction stays 12.5.
   it("does not drop the quantity to zero on the dot step's empty report", () => {
     const onChange = vi.fn();
     render(

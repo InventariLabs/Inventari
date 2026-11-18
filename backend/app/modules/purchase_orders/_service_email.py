@@ -25,11 +25,10 @@ async def send_po_email(
     if po.status not in {'CONFIRMED', 'COMPLETED'}:
         raise ServiceRejectionError('po_email_invalid_status', status=po.status)
 
-    # Two different refusals used to share one sentence. A confirmed order
-    # always named a supplier, but deleting that partner sets `partner_id` to
-    # NULL on the completed orders that reference it — and "the partner has no
-    # email address" then sends the reader looking at an address book for a
-    # partner that is not there any more.
+    # Two different refusals get two sentences. A confirmed order always names
+    # a supplier, but deleting that partner sets `partner_id` to NULL on the
+    # completed orders that reference it, and "the partner has no email address"
+    # would send the reader to an address book for a partner that is gone.
     partner = po.partner
     if not partner:
         raise ServiceRejectionError('po_has_no_partner')

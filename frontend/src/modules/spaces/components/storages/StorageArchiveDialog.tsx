@@ -2,9 +2,9 @@
  * Archiving a location: hides it from lists and pickers, relocating whatever
  * it holds in the same operation.
  *
- * This used to be a full-width button in the sheet footer that expanded into
- * its own picker. Archiving speaks about the record, not about the edit being
- * made, so the trigger moved to the header's `ActionMenu` and the question it
+ * Archiving is not a full-width button in the sheet footer that expands into
+ * its own picker. It speaks about the record, not about the edit being
+ * made, so the trigger sits in the header's `ActionMenu` and the question it
  * asks moved into a confirm dialog — the same place deleting already asked it.
  */
 import { useEffect, useMemo, useState } from "react";
@@ -45,8 +45,8 @@ export function StorageArchiveDialog({
   const enabledModules = useEnabledModulesOptional();
   const hasDocuments = enabledModules.includes("warehouse");
   /**
-   * Three states, not two. "Unknown" used to be folded into "empty", which
-   * hid the target picker — and the backend then refused to archive a
+   * Three states, not two. "Unknown" is kept apart from "empty", which would
+   * hide the target picker — and the backend would then refuse to archive a
    * location holding items, leaving the reader an error and nothing on the
    * screen to answer it with.
    */

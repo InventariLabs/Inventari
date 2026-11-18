@@ -30,7 +30,7 @@ describe("Button", () => {
 
   it("keeps its label while loading, and swaps the leading icon for a spinner", () => {
     // A button that becomes a bare spinner stops saying what is taking time;
-    // on the SMTP test that dot used to spin for two minutes with no label.
+    // on the SMTP test, a bare dot would spin for two minutes with no label.
     const LeftIcon = () => <span data-testid="left-icon" />;
     const { container } = render(
       <Button isLoading leftIcon={<LeftIcon />}>

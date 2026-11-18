@@ -351,7 +351,7 @@ def keyed_dynamic_value_error_entries(app_root: Path) -> set[str]:
     ``raise ValueError(get_error_message('key', lang))`` (and the ``*.translated``
     shape) is a refusal whose message lives in the i18n catalogue, but its
     argument is a call, not a literal — invisible to the raw-sentence scan,
-    which is why the ledger's count used to read as a floor, not a total.
+    which is why the ledger's count reads as a floor, not a total.
     The entry names the key when the key is written as a literal, and the
     helper's name when it is not, so a reader can find the site either way.
     These entries are classification, not debt: they never belong in the

@@ -348,9 +348,8 @@ describe("CategoriesPage", () => {
     ).not.toBeInTheDocument();
   });
 
-  // A filter that found nothing used to show the "add your first category"
-  // state — an invitation to create a duplicate of something that is plainly
-  // there, just filtered away.
+  // A filter that finds nothing shows its own way back, not the "add your first
+  // category" state, which would invite a duplicate of something plainly there.
   it("gives a filtered-out list its own way back", async () => {
     renderPage(queryClient);
     await waitFor(() => expect(screen.getByText("Dairy")).toBeInTheDocument());
@@ -398,10 +397,9 @@ describe("CategoriesPage", () => {
     expect(dialog).toHaveTextContent(/another category/i);
   });
 
-  // The dialog that had just announced the refusal still offered an active red
-  // "Delete" whose only possible answer was the same 400. It is an
-  // informational dialog now: the button that could only fail is gone, and the
-  // one left closes it.
+  // A dialog that announces a refusal offers no active red "Delete" whose only
+  // possible answer is the same 400. It is an informational dialog: the button
+  // that could only fail is gone, and the one left closes it.
   it("does not offer the delete it has already refused", async () => {
     const user = userEvent.setup();
     server.use(
@@ -490,8 +488,8 @@ describe("CategoriesPage — module data kept out of the list", () => {
   afterEach(() => signOut());
 
   it("says how many the policy keeps out instead of claiming there are none", async () => {
-    // The list used to read "No categories — add your first" over eight live
-    // ones, and the name collision refused the reader who believed it.
+    // The list never reads "No categories — add your first" over eight live
+    // ones: that sends the reader to create a name the server already refuses.
     renderPage(queryClient);
 
     expect(
@@ -596,8 +594,8 @@ describe("CategoriesPage — module data kept out of the list", () => {
   });
 
   it("the module-data switch reaches this list too", async () => {
-    // The exclusion used to be a literal `true` on this page — the one list
-    // where the organization's policy had no effect at either position.
+    // The exclusion follows the organization's policy on this page too, at
+    // either position.
     server.use(
       http.get("/api/v1/organizations/my", () =>
         HttpResponse.json({
@@ -707,9 +705,8 @@ describe("CategoriesPage — an account that may not change a category", () => {
 });
 
 /**
- * The new-category form used to keep its state while closed, so the next
- * opening showed the last name typed: after a save, one that the server then
- * refused as already taken.
+ * The new-category form opens empty, so a reopening never shows the last name
+ * typed, even one the server refused as already taken.
  */
 describe("CategoriesPage — Add Category opens empty", () => {
   function HeaderHost({ children }: { children: ReactNode }) {

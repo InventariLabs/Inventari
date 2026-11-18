@@ -27,7 +27,7 @@ class TestGetTypeLabel:
         """A table that skips a type must not leak the stored value.
 
         The label table names some types and not others; the one it skips
-        used to print ``INTERNAL_OUT`` on a number whose screen said ``II``.
+        must not print ``INTERNAL_OUT`` on a number whose screen says ``II``.
         """
         labels = {'IN': 'PZ'}
         assert _get_type_label('INTERNAL_OUT', labels) == 'II'
@@ -234,7 +234,7 @@ class TestGenerateNumber:
     async def test_non_numeric_suffix_does_not_crash(self) -> None:
         """A legacy/manual number with a non-numeric suffix must not crash.
 
-        Previously int(suffix) raised on e.g. 'IN/2026/999-MANUAL'; the next
+        Non-numeric suffixes such as 'IN/2026/999-MANUAL' are skipped; the next
         number is computed from the highest *numeric* suffix only.
         """
         db = MagicMock()
@@ -445,11 +445,10 @@ class TestAnUndatedNumberReadsTheOrganizationsYear:
 class TestHighestSequenceReadsThePrefix:
     """The prefix is matched, not just measured.
 
-    `_extract_seq` used to cut by the prefix's *length*, so any number of
-    the same shape counted: 'PZ/2026/999' answered for the prefix
-    'PO/2026/'. Both callers filter with `LIKE 'prefix%'` in SQL, which is
-    why nothing broke — but the function is part of the warehouse module's
-    public API, so its contract now binds callers this repository cannot see.
+    `_extract_seq` matches the prefix, so 'PZ/2026/999' does not answer for the
+    prefix 'PO/2026/'. Both callers filter with `LIKE 'prefix%'` in SQL, but the
+    function is part of the warehouse module's public API, so its contract binds
+    callers this repository cannot see.
     """
 
     def test_a_number_of_another_type_does_not_count(self) -> None:

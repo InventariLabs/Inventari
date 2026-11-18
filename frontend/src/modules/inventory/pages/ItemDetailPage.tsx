@@ -12,11 +12,9 @@ import ItemDetailContent from "@/modules/inventory/components/items/ItemDetailCo
 /**
  * One product, at an address of its own.
  *
- * `/inventory/items/:id` used to redirect to the list with the action sheet
- * open — a menu of things to do with the record, over a list, with no way to
- * link to it, open it in a second tab, or read the fields it was not asked
- * about. The same physical rack had a page when the Equipment module looked
- * at it and a menu when Inventory did.
+ * `/inventory/items/:id` opens the product's own page, which can be linked to,
+ * opened in a second tab, and read field by field. The same physical rack has
+ * that page whether the Equipment module or Inventory looks at it.
  *
  * Overview and History for everyone, and a Movements tab where a module
  * reads the stock ledger: the history lists what happened to the record

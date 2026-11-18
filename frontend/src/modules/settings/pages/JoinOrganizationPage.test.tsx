@@ -53,8 +53,9 @@ describe("JoinOrganizationPage", () => {
   });
 
   it("shows the written message instead of the silent login redirect when the link carries no code", () => {
-    // No code at all is a malformed link; redirecting it home used to end
-    // signed-out readers on /login with no word about the link they came by.
+    // No code at all is a malformed link, and the page answers it with a
+    // message: a redirect home would end signed-out readers on /login with no
+    // word about the link they came by.
     renderJoin("/join");
 
     expect(screen.getByText(INVALID_LINK)).toBeVisible();
@@ -102,7 +103,7 @@ describe("JoinOrganizationPage", () => {
   });
 
   it("tells the reader a dead path-form link is dead instead of redirecting", async () => {
-    // A dead link such as /join/QACFAKETOKEN123 used to fall through the
+    // A dead link such as /join/QACFAKETOKEN123 must not fall through the
     // catch-all to "/" and, signed out, silently on to /login — where
     // registering mints an organization of one's own instead of joining.
     server.use(

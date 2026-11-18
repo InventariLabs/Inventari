@@ -21,10 +21,9 @@ import { onePage } from "@/test/mocks/page";
  * The return day reproduction in "My assets".
  *
  * The checkout form said "2026-09-30" and the record stores
- * ``2026-09-30T00:00:00Z``. A Los Angeles reader used to see "Sep 29, 2026"
- * here — the browser reading its own day off an instant the organization's
- * clock owns (the same defect as the assignments tab on /equipment/<id>,
- * seen here on this screen too).
+ * ``2026-09-30T00:00:00Z``. A Los Angeles reader must not see "Sep 29, 2026"
+ * here: the day is read off the instant in the organization's clock, not the
+ * browser's, the same as on the assignments tab on /equipment/<id>.
  */
 
 const ASSET = {
@@ -152,8 +151,8 @@ describe("My Assets — a day is written the way the rest of the module writes i
       renderPage();
       await screen.findByText("ThinkPad T14");
 
-      // The card used to spell the month ("1. Aug. 2026") beside lists
-      // that print "01.08.2026".
+      // The card prints the day numerically, as the lists beside it do: no
+      // spelled-out month ("1. Aug. 2026") next to lists that print "01.08.2026".
       expect(screen.getByText(/01\.08\.2026/)).toBeInTheDocument();
     } finally {
       await act(() => i18n.changeLanguage("en"));

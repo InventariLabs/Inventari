@@ -2,9 +2,9 @@
 
 ``StockMove`` is written by every path that changes physical stock, and one
 of those paths is Core's own (``services/items/_stock_quant.py``). The only
-reader used to be a route the warehouse module registered behind
-``require_module('warehouse')``, so an organization that ran a warehouse
-without that module wrote to a ledger it could not open.
+reader is a route Core serves itself, not one the warehouse module registers
+behind ``require_module('warehouse')``, so an organization that runs a
+warehouse without that module can open the ledger it writes to.
 
 The ledger is therefore served from Core. It answers for every organization:
 with rows where there are rows and with an empty page where nothing was

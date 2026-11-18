@@ -1,10 +1,8 @@
 """The refusals of members, roles, sign-up, onboarding and module switching
 answer in the reader's language.
 
-Each of these used to be an English sentence raised in the service or the
-router, so a Polish reader got English under a language stamp. They are
-catalogue keys now: the sentence is looked up in the request language, and the
-machine code a client branches on stays what it was.
+Each of these is a catalogue key: the sentence is looked up in the request
+language, and the machine code a client branches on stays what it is.
 """
 
 from __future__ import annotations

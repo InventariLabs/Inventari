@@ -28,9 +28,7 @@ LOCK_KEY_SOURCES = [
     'app/modules/warehouse/document_numbering_service.py',
 ]
 
-#: The maker used to be here — it carried its own numbering and its own
-#: advisory lock, keyed from ``hash()`` like the one above. It now takes its
-#: numbers from the document register, which locks its counter row instead, so
+#: The numbers come from the document register, which locks its counter row, so
 #: there is no key left in this file to be wrong about. What would go wrong
 #: from here is a private numbering engine coming back, and that is what the
 #: last class of this file refuses.

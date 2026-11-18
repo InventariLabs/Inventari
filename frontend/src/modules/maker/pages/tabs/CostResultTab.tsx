@@ -52,10 +52,9 @@ export function CostResultTab({ recipe }: CostResultTabProps) {
   const currency = useOrganizationCurrency();
   const { t, i18n } = useTranslation("maker");
   // The estimate is asked for THIS formula at a full batch, so the tab
-  // divides by the yield exactly once. It used to fetch one unit of the
-  // product's default formula and divide that by the yield again — a
-  // variant priced someone else's ingredients, and a yield of 2 halved a
-  // number that was already per unit.
+  // divides by the yield exactly once. Fetching one unit of the product's
+  // default formula and dividing that by the yield would price someone else's
+  // ingredients for a variant, and halve a number that is already per unit.
   const {
     data: breakdown,
     isLoading,
@@ -119,9 +118,9 @@ export function CostResultTab({ recipe }: CostResultTabProps) {
 
   return (
     <div className="space-y-4">
-      {/* Summary cards. The fixed-costs total is not one of them: it moved
-          into the fixed-cost lines section below, whose heading it used to
-          duplicate — the figure belongs with the lines it sums. */}
+      {/* Summary cards. The fixed-costs total is not one of them: it sits in
+          the fixed-cost lines section below, because the figure belongs with
+          the lines it sums. */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Card className="p-4">
           <p className="text-xs text-on-muted uppercase tracking-widest font-medium">
@@ -142,9 +141,8 @@ export function CostResultTab({ recipe }: CostResultTabProps) {
               describedBy="maker-cost-gap-note"
             />
           </p>
-          {/* The figure above is total ÷ batch yield, so it is per
-              unit — the caption used to read "per batch" and passed
-              a {{qty}} none of the five translations used. */}
+          {/* The figure above is total ÷ batch yield, so it is per unit. The
+              caption is passed the {{qty}} that the translations use. */}
           <p className="text-xs text-on-muted mt-0.5">
             {t("detail.cost.perYieldUnit", {
               qty: formatQuantityLocalized(

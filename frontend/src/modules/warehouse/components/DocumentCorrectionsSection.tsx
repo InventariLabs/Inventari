@@ -16,8 +16,7 @@ interface DocumentCorrectionsSectionProps {
    *  demanded this answer, the row names it. */
   formatReason: (code: string) => string;
   /** False keeps the list of corrections and drops the button that starts a
-   *  new one. It used to open the whole form, take the delta and the reason,
-   *  enable the submit — and refuse with a 403 at the end of the work. */
+   *  new one, so an account without the right never opens a form it cannot submit. */
   canWrite?: boolean;
   formatDate: (dateStr: string | null) => string;
 }

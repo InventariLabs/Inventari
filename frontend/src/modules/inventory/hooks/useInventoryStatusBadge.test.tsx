@@ -80,8 +80,8 @@ describe("useInventoryStatusBadge", () => {
   });
 
   it("shares one request with the dashboard heading that reads the same counts", async () => {
-    // The tile and the heading used to hold the same answer under two keys:
-    // two requests per launcher visit and two per dashboard visit.
+    // The tile and the heading hold the same answer under one key, so one request
+    // serves both on each launcher and dashboard visit.
     const asked = serve(true);
     const client = new QueryClient({
       defaultOptions: { queries: { retry: false } },

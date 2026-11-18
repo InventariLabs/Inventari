@@ -125,7 +125,7 @@ class TestUpdatePurchaseOrder:
 @pytest.mark.unit
 class TestComputeLineTotals:
     """Line totals via the shared ``line_amounts`` (the PO context builder's
-    math — the PDF used to duplicate it in ``_compute_line_totals``)."""
+    math, which the PDF also uses)."""
 
     def _amounts(
         self,

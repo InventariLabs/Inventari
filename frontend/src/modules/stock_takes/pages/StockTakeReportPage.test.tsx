@@ -515,8 +515,8 @@ describe("StockTakeReportPage", () => {
   });
 
   it("keeps a way back when there is no report to show", async () => {
-    // The header used to be emptied whenever the report was missing, so this
-    // screen offered no title, no arrow and nothing at all to press.
+    // The header stays filled when the report is missing, so this screen still
+    // offers a title, a back arrow and something to press.
     server.use(
       http.get(
         "/api/v1/stock-takes/st-1/report",

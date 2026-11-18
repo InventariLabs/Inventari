@@ -14,7 +14,7 @@ export interface GettingStartedStep extends EmptyStateStep {
 }
 
 export interface GettingStartedProps {
-  /** Module namespace (e.g. "equipment"). Used to derive i18n keys. */
+  /** Module namespace (e.g. "equipment"). Derives the i18n keys. */
   moduleName: string;
   /** Lucide icon. */
   icon?: LucideIcon;

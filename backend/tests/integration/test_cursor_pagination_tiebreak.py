@@ -1,9 +1,8 @@
 """Regression tests for cursor pagination tie-breaker.
 
-Rows sharing an identical created_at (bulk imports, seeded data) used to
-be skipped or returned twice when paginating /items/cursor-page, because
-the keyset predicate compared only ``created_at < cursor_ts``. The cursor
-now carries (id, created_at) and the predicate uses both.
+Rows sharing an identical created_at (bulk imports, seeded data) are neither
+skipped nor returned twice when paginating /items/cursor-page: the cursor
+carries (id, created_at) and the keyset predicate uses both.
 """
 
 from __future__ import annotations

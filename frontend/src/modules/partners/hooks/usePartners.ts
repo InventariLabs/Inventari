@@ -20,9 +20,9 @@ export function usePartners(params?: PartnersListParams) {
 /**
  * One partner by id.
  *
- * Screens that need a single partner used to search for it in `usePartners()`,
- * which lists the active ones up to a page size — so a deactivated supplier, or
- * the 101st, simply was not there and the screen showed a raw UUID or lost the
+ * Screens that need a single partner read it by id, not by search: `usePartners()`
+ * lists the active ones up to a page size, so a deactivated supplier or the
+ * 101st would be missing and the screen would show a raw UUID or lose the
  * e-mail address.
  */
 export function usePartner(
@@ -41,8 +41,8 @@ export function usePartner(
  * The names of the partners a screen points at, read by id.
  *
  * A screen that names a few partners (the supplier of each price, the
- * preferred supplier of each rule) used to look them up in a list capped at a
- * page, so the one past the cap printed as a raw id. Each is read on its own
+ * preferred supplier of each rule) reads each one by id, so a partner past the
+ * first page of any list still gets its name. Each is read on its own
  * and shares the cache of `usePartner`; a partner that cannot be read is left
  * out and the caller falls back to whatever it shows without a name.
  */

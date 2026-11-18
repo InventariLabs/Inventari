@@ -1,11 +1,10 @@
 """The public GET says the link is closed before the visitor clicks.
 
-The page used to learn about a closed link only by clicking: the GET
-answered PENDING while the equipment had long been returned or the
-campaign cancelled, so the buttons stayed on offer and every press
-returned the same 409. The GET now carries the closure reason — the same
-vocabulary the refusals use — while the stored status stays untouched: a
-read does not write, and a confirmed answer is still a confirmed answer.
+The public GET carries the closure reason when the equipment has been returned
+or the campaign cancelled, so the page can say the link is closed before anyone
+clicks. It uses the vocabulary the refusals use, and the stored status stays
+untouched: a read does not write, and a confirmed answer is still a confirmed
+answer.
 """
 
 from __future__ import annotations

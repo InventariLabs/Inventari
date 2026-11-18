@@ -49,9 +49,9 @@ export function PlannedPutawayLine({ line }: { line: DocumentLine }) {
 
   // The warning is the sentence: a matched rule that had to step aside is
   // the one thing the reader must not miss about this plan. It still has to
-  // end with the shelf the line will actually reach — the sentence used to
-  // drop it, leaving the reader knowing why the rule lost and not where the
-  // goods go, which is the question they opened the line to answer.
+  // end with the shelf the line will actually reach: the reader learns where
+  // the goods go, not only why the rule lost, which is the question they opened
+  // the line to answer.
   if (planned.warning) {
     return (
       <p className="text-xs text-amber-700">

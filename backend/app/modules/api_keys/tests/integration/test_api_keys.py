@@ -274,10 +274,9 @@ class TestListApiKeys:
     ) -> None:
         """Reading the register of issued keys is the authority that issues them.
 
-        This assertion used to say the opposite, and passed: creating and
-        revoking asked for `org:settings:write`, listing asked only for
-        `org:read`. A viewer could name every key, its prefix, who issued it
-        and when it was last used.
+        Listing needs the same authority as creating and revoking, because it
+        names every key, its prefix, who issued it and when it was last used. A
+        viewer with only `org:read` must not be able to list them.
         """
         await _create_key(real_async_client, admin_headers, name='Visible')
         resp = await real_async_client.get(API_KEYS_URL, headers=viewer_headers)

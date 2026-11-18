@@ -33,47 +33,80 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, onEscapeKeyDown, ...props }, ref) => {
-  const { t } = useTranslation("common");
-  return (
-    <DialogPortal>
-      <DialogOverlay />
-      <DialogPrimitive.Content
-        ref={ref}
-        onEscapeKeyDown={(event) => {
-          // A sheet opened from inside this dialog closes itself on Escape.
-          // Radix would dismiss the dialog under it in the same keystroke,
-          // so the form the reader was filling in would go with the picker.
-          if (hasOverlaySheetOpen()) event.preventDefault();
-          onEscapeKeyDown?.(event);
-        }}
-        className={cn(
-          "fixed left-[50%] top-[50%] z-[var(--z-modal)] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-surface-card p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
-          className,
-        )}
-        {...props}
-      >
-        {children}
-        {/* One shell, one close target. Sheet has always closed with a 44px
+>(
+  (
+    {
+      className,
+      children,
+      onEscapeKeyDown,
+      onOpenAutoFocus,
+      onCloseAutoFocus,
+      ...props
+    },
+    ref,
+  ) => {
+    const { t } = useTranslation("common");
+    // Every dialog here is controlled, so there is no Dialog.Trigger for Radix
+    // to hand focus back to and a keyboard user would restart from the top of
+    // the page. The element focused when the dialog opens is the one to return to.
+    const opener = React.useRef<HTMLElement | null>(null);
+    return (
+      <DialogPortal>
+        <DialogOverlay />
+        <DialogPrimitive.Content
+          ref={ref}
+          onOpenAutoFocus={(event) => {
+            const active = document.activeElement;
+            opener.current =
+              active instanceof HTMLElement && active !== document.body
+                ? active
+                : null;
+            onOpenAutoFocus?.(event);
+          }}
+          onCloseAutoFocus={(event) => {
+            onCloseAutoFocus?.(event);
+            const target = opener.current;
+            opener.current = null;
+            if (event.defaultPrevented || !target?.isConnected) return;
+            // Radix skips its own trigger handling once the event is prevented.
+            event.preventDefault();
+            target.focus();
+          }}
+          onEscapeKeyDown={(event) => {
+            // A sheet opened from inside this dialog closes itself on Escape.
+            // Radix would dismiss the dialog under it in the same keystroke,
+            // so the form the reader was filling in would go with the picker.
+            if (hasOverlaySheetOpen()) event.preventDefault();
+            onEscapeKeyDown?.(event);
+          }}
+          className={cn(
+            "fixed left-[50%] top-[50%] z-[var(--z-modal)] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-surface-card p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
+            className,
+          )}
+          {...props}
+        >
+          {children}
+          {/* One shell, one close target. Sheet has always closed with a 44px
             icon button below `md:`; Dialog closed with the glyph itself —
             16×16, the size of the X and nothing around it, which on a phone
             is a target a thumb cannot land on twice the same way. Same
             Button, same size, same accessible name as the sheet's. */}
-        <DialogPrimitive.Close asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            aria-label={t("common:a11y.close")}
-            className="absolute right-2 top-2 z-[var(--z-modal)] text-on-muted"
-          >
-            <X size={20} />
-          </Button>
-        </DialogPrimitive.Close>
-      </DialogPrimitive.Content>
-    </DialogPortal>
-  );
-});
+          <DialogPrimitive.Close asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label={t("common:a11y.close")}
+              className="absolute right-2 top-2 z-[var(--z-modal)] text-on-muted"
+            >
+              <X size={20} />
+            </Button>
+          </DialogPrimitive.Close>
+        </DialogPrimitive.Content>
+      </DialogPortal>
+    );
+  },
+);
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({

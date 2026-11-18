@@ -590,9 +590,7 @@ class TestAiConnectionsBindings:
     ):
         """A module's second purpose must not take the first one's slot.
 
-        The module-owned binding used to be one id per module
-        (``settings.modules.<owner>.ai_default_connection_id``), which
-        worked while every module had exactly one purpose. Recipes now has
+        Each purpose of a module has a binding slot of its own. Recipes has
         two — the page reader and the text parser — and a shared slot
         would let the last binding silently re-route the other purpose.
         Bindings are written per purpose key
@@ -1072,9 +1070,7 @@ class TestAiConnectionsDelete:
     ):
         """The 409 detail comes from the error catalog, not a raw f-string.
 
-        The refusal used to carry the connection's UUID in an English
-        sentence no matter the session language — a Polish reader saw
-        "Connection 1f832c3a-… is still the default". The catalog entry
+        The refusal names no UUID and reads in the session language. The catalog entry
         says what to do next without naming a UUID at all."""
         conn = AiConnection(
             organization_id=test_household.id,

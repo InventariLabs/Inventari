@@ -1,11 +1,10 @@
 /**
  * The parts one audit entry is made of, and the card a phone reads it on.
  *
- * The log used to be a five-column table in a horizontal scroller: at 390px
- * 391 of its 755 pixels were off-screen — "Target" and "Details", which is
- * the answer the reader came for — and "Action" broke mid-word. A row of this
- * log is one sentence ("who, when, what, on what"), and a scroller cuts it in
- * half with no way to see both halves at once.
+ * A five-column table in a horizontal scroller cuts a row in half at 390px:
+ * "Target" and "Details", the answer the reader came for, sit off-screen, and
+ * "Action" breaks mid-word. A row of this log is one sentence ("who, when,
+ * what, on what"), and a scroller shows only half of it at a time.
  *
  * So below `md` the same four facts are stacked in a card, and the table keeps
  * the width it needs above it. The pieces live here rather than in the page so
@@ -91,9 +90,9 @@ function codedTargetLabel(row: AuditLogEntry, t: TranslateFn): string | null {
 /**
  * What the Target column says a row is about.
  *
- * Every entry about a document used to show eight characters of a UUID — the
- * one an auditor filtering for `IN/2026/009` came here to read included —
- * because a document is known by its number and the page read only `name`.
+ * A document is known by its number, so its entry names the number rather than
+ * eight characters of a UUID: an auditor filtering for `IN/2026/009` reads the
+ * number they filtered on.
  */
 function targetLabel(row: AuditLogEntry, t: TranslateFn): string {
   return (
@@ -114,10 +113,10 @@ function reasonLabel(reason: string, t: (key: string) => string): string {
 /**
  * The key an entry was written by, when one was — `meta_data.actor.key_prefix`.
  *
- * An entry a key wrote and one the same person wrote from the screen used to
- * read identically: same `user_email`, no `meta_data`. Once the key is
- * revoked it also leaves the list of keys, so this prefix is the only thing
- * that still ties a row to the credential that wrote it.
+ * An entry a key wrote carries the key's prefix in `meta_data`; the same
+ * person's entry from the screen carries only `user_email`. Once the key is
+ * revoked it leaves the list of keys, so this prefix is the only thing that
+ * still ties a row to the credential that wrote it.
  */
 export function apiKeyActor(row: AuditLogEntry): string | null {
   const actor = row.meta_data?.actor;
@@ -166,9 +165,9 @@ export function targetTypeLabel(
 /**
  * The change list in one cell: two lines, then the rest on request.
  *
- * A row used to be as tall as the JSON document behind it — a product's
- * nutrition data from a food database, printed whole on both sides of the
- * arrow, took half a screen for one entry.
+ * A product's nutrition data from a food database is a JSON document; printed
+ * whole on both sides of the arrow it would fill half a screen for one entry,
+ * so the cell shows only its first lines.
  */
 function AuditChanges({
   changes,

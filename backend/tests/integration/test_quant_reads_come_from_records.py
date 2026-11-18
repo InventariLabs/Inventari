@@ -1,10 +1,9 @@
-"""The reads that used to take numbers from the quant table take them from the records.
+"""The reads take their numbers from the records, not from the quant table.
 
-Five places read rows of the quant table directly — the batch detail and the
+Five places read the records and reservation rows directly — the batch detail and the
 batch list's on-hand column, the shelf occupancy behind a location delete, the
 reservation guard inside deleting a record, and the CLI's reservation check.
-They were moved onto the records and the reservation rows before the table
-was dropped.
+They read the records and the reservation rows; the quant table does not exist.
 
 With the table gone there is no mirror left to tamper with, so these tests no
 longer prove that a read ignores it; they pin what each read answers from the
@@ -136,9 +135,8 @@ class TestTheRecordDeleteGuardReadsTheReservationRows:
     """Deleting a record asks for a release when the ROWS hold stock.
 
     The guard decides whether the unbacked part of the holds has to go
-    before the record is zeroed. It used to read the quant's running total
-    of reservations while a release acts on the reservation rows; it reads
-    the rows now.
+    before the record is zeroed. It reads the reservation rows, the same rows a
+    release acts on.
     """
 
     async def test_the_rows_holding_the_shelf_are_seen(

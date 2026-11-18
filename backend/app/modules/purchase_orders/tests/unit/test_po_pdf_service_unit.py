@@ -295,7 +295,7 @@ class TestGeneratePoPdf:
         assert context['po_title'] == 'Zamówienie zakupowe'
 
     def test_build_po_context_lines_carry_tax_pct(self) -> None:
-        """The VAT column needs tax_pct per line — it used to render 0.00%."""
+        """The VAT column needs tax_pct per line, or it renders 0.00%."""
         po = SimpleNamespace(
             id=uuid4(),
             number='PO/2025/0009',

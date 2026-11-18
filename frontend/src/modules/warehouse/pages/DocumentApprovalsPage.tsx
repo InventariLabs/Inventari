@@ -185,9 +185,8 @@ export default function DocumentApprovalsPage() {
           title={t("approvalsQueue.empty")}
           description={t("approvalsQueue.emptyHint")}
           primaryAction={
-            // The hint used to name the Approvals module in prose, in a
-            // workspace mode where that module does not exist — and called it
-            // "cross-module", a word from this project's architecture rather
+            // The hint names the Approvals module only where the workspace has it, and
+            // avoids "cross-module", a word from this project's architecture rather
             // than from the reader's work.
             enabledModules.includes("approvals") ? (
               <Link

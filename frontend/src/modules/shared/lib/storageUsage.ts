@@ -6,8 +6,8 @@ import type { TFunction } from "i18next";
 // "internal"; the other three are the virtual counterparts the system seeds
 // per organization, and the only reason the front end knows their names is to
 // mark such a row on a list as "not your shelf" (StorageLocationCard,
-// StorageZoneCard). The picker that used to offer them is gone: choosing one
-// took the shelf's contents out of stock, reports, purchase suggestions and
+// StorageZoneCard). No picker offers them: choosing one would take the shelf's
+// contents out of stock, reports, purchase suggestions and
 // scan lookup, and the shelf itself out of the tree it was reached from.
 const STORAGE_USAGE_DEFAULT = "internal";
 

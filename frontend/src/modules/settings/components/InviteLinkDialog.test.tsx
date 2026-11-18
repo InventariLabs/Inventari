@@ -4,14 +4,11 @@ import { renderWithProviders } from "@/test/utils";
 import InviteLinkDialog from "./InviteLinkDialog";
 
 /**
- * The hint used to warn "there will be no second chance to copy it" while
- * the invitation's own row menu offered Copy link and the API kept
- * returning the code for as long as the invitation was pending — so an
- * administrator who believed it pasted the link into a note or a chat,
- * which is the careless keeping the warning looked like it guarded
- * against. The sentence now names the recovery that exists, and this test
- * holds that shape: the old claim stays unread, the promise of a second
- * copy stays on the screen, and the button delivers it.
+ * The hint names the recovery that exists: the invitation's row menu offers
+ * Copy link, and the API returns the code for as long as the invitation is
+ * pending. This test holds that shape: no claim that the link cannot be
+ * copied again, the promise of a second copy stays on the screen, and the
+ * button delivers it.
  */
 
 const writeText = vi.fn().mockResolvedValue(undefined);

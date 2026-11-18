@@ -3,14 +3,14 @@
 The tracking file (``community_modules.json``) is written by the CLI
 installer (``app.cli._module_meta``). It records which modules an
 installation has, which is deployment state and not repository content —
-it used to sit in ``backend/`` as a tracked file, so installing any module
-left a modified file the operator never edited and a conflict on the
-documented update path (``git pull``). It now lives in ``backend/data/``,
+it lives in ``backend/data/``, outside the tracked tree, so installing a module
+leaves no modified file the operator never edited and no conflict on the
+documented update path (``git pull``). The directory
 which is ignored by git and shares a bind mount with the module files
 themselves, so registry and modules cannot drift apart.
 
-A registry left over at the old path is still read once, so an installation
-that predates the move does not appear to have lost its modules; the next
+A list left at the legacy path in ``backend/`` is still read, so an installation
+that still has one does not appear to have lost its modules; the next
 write lands in the new place.
 
 Services must read it through THIS module — importing the private CLI

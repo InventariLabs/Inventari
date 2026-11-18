@@ -229,8 +229,8 @@ export default function RegisterPage() {
               <CheckCircle className="text-primary-600" size={24} />
             </div>
             {/* One sentence for what happened, one for what happens next.
-                The card used to print the headline again underneath itself,
-                and to offer sign-in to somebody who has no account to sign
+                The card does not print the headline again underneath itself,
+                and does not offer sign-in to somebody who has no account to sign
                 in to — the approval mails a link instead. */}
             <h2 className="text-xl font-semibold text-on mb-3 leading-none">
               {t("requestSubmitted")}

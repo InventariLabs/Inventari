@@ -72,8 +72,8 @@ export const ModulesProvider: React.FC<{ children: React.ReactNode }> = ({
   // The module list lives in the React Query cache under `queryKeys.modules.my`
   // so that existing invalidations — e.g. `invalidation.modules()` after a
   // profile switch or onboarding setup — refresh it without a page reload.
-  // Previously the context fetched directly, leaving the nav stale after a
-  // switch until a manual reload.
+  // Fetching directly here would leave the nav stale after a switch until a
+  // manual reload.
   const { data, isPending, isError, refetch } = useQuery<string[]>({
     queryKey: queryKeys.modules.my,
     queryFn: async () => {

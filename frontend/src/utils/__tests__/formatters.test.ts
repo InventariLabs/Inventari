@@ -297,7 +297,7 @@ describe("formatPercentLocale — the percent speaks the reader's mark", () => {
   });
 
   it("widens a computed percent to its first significant digit, not to eight places", () => {
-    // 100/3000 printed "0,03333333%" where it used to read "0%": a number has
+    // 100/3000 prints "0,03333333%" and not "0%": a number has
     // no written digits to follow, so the guard that keeps it non-zero stops
     // at the first one that is not.
     expect(formatPercentLocale(100 / 3000, 0, "pl")).toBe("0,03%");

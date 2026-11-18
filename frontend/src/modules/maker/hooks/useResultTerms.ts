@@ -12,9 +12,9 @@ export interface ResultTerms {
  *
  * The number is always the reference price minus the cost to make; the
  * organization's reference direction decides what that price is — a sale
- * price (margin) or a shop price (savings). The same number used to be
- * "Savings" on a card, "Result" on an order and "Monthly result" on the
- * summary, and only the settings screen said they were one thing.
+ * price (margin) or a shop price (savings). The same number is "Savings" on a
+ * card, "Result" on an order and "Monthly result" on the summary; the settings
+ * screen says they are one thing.
  */
 export function resultTerms(
   t: TFunction<"maker">,

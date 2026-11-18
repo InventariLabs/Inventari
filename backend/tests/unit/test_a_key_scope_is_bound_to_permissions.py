@@ -1,8 +1,8 @@
 """A key scope admits the endpoints that guard its permissions, by no path.
 
-A scope used to be a list of URL prefixes, so renaming a route silently
-changed what a scoped key could reach. It is a list of permissions now: the
-route is read for what it guards, wherever it lives.
+A scope is a list of permissions, so renaming a route cannot silently change
+what a scoped key reaches: the route is read for what it guards, wherever it
+lives.
 """
 
 from collections.abc import Iterator

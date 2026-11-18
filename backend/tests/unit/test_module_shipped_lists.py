@@ -5,11 +5,11 @@ screen: only a name on the list keeps its manifest's ``module_type``.
 A name on the list without a directory behind it is the one shape a
 dropped directory can exploit — nothing in the repository answers to the
 name, so a directory appearing under ``app/modules/`` with that name can
-only be somebody else's drop, and it used to inherit the repository's
+only be somebody else's drop, and it must not inherit the repository's
 own trust from the list entry: Official, trusted, always-on, from a
 manifest the dropper wrote themselves. Five product features without
 module directories (core, items, locations, categories, announcements)
-sat in the list exactly that way.
+must not sit in the list that way.
 """
 
 from __future__ import annotations

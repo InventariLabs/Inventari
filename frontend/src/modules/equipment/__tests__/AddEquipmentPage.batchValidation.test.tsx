@@ -18,10 +18,10 @@ import AddEquipmentPage from "../pages/AddEquipmentPage";
 /**
  * A batch refused for a missing location says so on the field.
  *
- * The refusal used to be a toast alone: on a phone the Location select sits
- * screens above the Create button, so the message named a field nobody could
- * see and nothing marked or reached it. The single tab marks the field and
- * focuses it; the batch tab goes through the same check now.
+ * The refusal is shown on the field itself: on a phone the Location select sits
+ * screens above the Create button, so a toast alone would name a field nobody
+ * could see and nothing would mark or reach it. The single tab marks the field
+ * and focuses it; the batch tab goes through the same check.
  */
 
 vi.mock("sonner", () => ({

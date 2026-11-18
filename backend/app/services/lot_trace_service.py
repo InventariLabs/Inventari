@@ -3,8 +3,8 @@
 EU 178/2002 Art. 18 asks every food business to name the immediate supplier
 and the immediate customer of what it handled, with quantities and dates.
 Every fact is in the ledger already — each movement of a batch carries its
-date, quantity and source — and the lot page used to hand the reader the raw
-rows and leave the adding up to them.
+date, quantity and source — and the lot page does the adding up rather than
+leaving the raw rows to the reader.
 
 The trace reads the ledger by source instead of by row. Every movement of the
 batch under one reference nets into one entry, in or out; movements between

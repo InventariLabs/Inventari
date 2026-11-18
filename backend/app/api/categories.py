@@ -151,8 +151,8 @@ async def update_category(
     org_id = require_org(current_user)
     # A refusal of the payload (a system field's label renamed, a dropdown
     # without options) is the global handler's to answer with a 400 in the
-    # request language. Every ValueError used to be answered "category not
-    # found" here, which told the reader the row they were editing was gone.
+    # request language. A ValueError is never answered as "category not found":
+    # that would tell the reader that the row they were editing is gone.
     # A missing row is the ``None`` below.
     result = await core_api.categories.update_async(
         db, org_id, category_id, category_in, current_user

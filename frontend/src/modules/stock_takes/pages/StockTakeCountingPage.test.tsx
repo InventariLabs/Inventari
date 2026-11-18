@@ -181,7 +181,7 @@ describe("StockTakeCountingPage", () => {
 
   // A search hit that is NOT on the stock take list must be
   // registered as a surplus — the search is the only path to add an
-  // existing product (the old behaviour silently did nothing).
+  // existing product.
   it("registers a non-listed search result as a surplus", async () => {
     server.use(
       http.get("/api/v1/stock-takes/1", () =>
@@ -367,8 +367,9 @@ describe("StockTakeCountingPage", () => {
 
   it("takes the count back off the card when the server refuses the save", async () => {
     // The card and the progress bar are drawn from local state, so a refused
-    // save used to leave "1 / 1 items" on a shelf nobody counted — and the
-    // counter moved on to the next bay believing the work was recorded.
+    // save takes the count back off the card. Otherwise "1 / 1 items" would
+    // stand on a shelf nobody counted, and the counter would move on to the
+    // next bay believing the work was recorded.
     server.use(
       http.get("/api/v1/stock-takes/1", () =>
         HttpResponse.json({

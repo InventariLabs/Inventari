@@ -53,9 +53,8 @@ async def create_storage_hierarchy(
 ):
     """Atomically create a full location chain: [Site →] [Zone →] Storage."""
     # A router docstring is the endpoint's public description in the schema, so
-    # the reason lives here instead: every ``ValueError`` used to become a 404,
-    # and somebody adding a second shelf to a zone was told the location did
-    # not exist. The service raises ``NotFoundException`` where a referenced
+    # the reason lives here instead: a ``ValueError`` is bad input, not a missing
+    # location, so it never becomes a 404. The service raises ``NotFoundException`` where a referenced
     # record really is missing, and the canonical mapping (§3) takes the rest
     # to 400 with the reason the service gave.
     require_org(current_user)
@@ -89,9 +88,9 @@ async def update_storage(
     try:
         return await svc_update_storage(db, storage_model, storage_in, current_user)
     except ValueError as exc:
-        # A name or short-code collision now arrives already typed as a 409
-        # from the service, so what is left here is ordinary invalid input.
-        # This clause used to call every one of them a conflict.
+        # A name or short-code collision arrives already typed as a 409
+        # from the service, so what is left here is ordinary invalid input,
+        # never a conflict.
         raise refusal_exception(exc) from exc
 
 

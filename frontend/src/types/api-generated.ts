@@ -423,7 +423,7 @@ export interface paths {
          *     then does are one rule, asked twice.
          *
          *     The answer also says whether the stage the document would wait at has
-         *     anybody who could decide it for the person asking: the dialog used to
+         *     anybody who could decide it for the person asking: the dialog must not
          *     promise the queue for a request that no queue would ever show.
          */
         get: operations["get_document_approval_requirement_api_v1_approvals_documents__doc_id__approval_requirement_get"];
@@ -2588,11 +2588,11 @@ export interface paths {
          *     Stock value is FIFO; the rate is the average cost of the cost layers
          *     still on hand (source fields keep the historical ``avco`` label).
          *
-         *     The rate is computed here rather than read off the row. It used to be a
-         *     cached column on ``product_templates``, and a global template — the whole
-         *     default catalogue — is one row shared by every organization: the number
-         *     there belonged to whichever organization had last taken a delivery, so this
-         *     endpoint handed one organization another's purchase cost.
+         *     The rate is computed here rather than read off the row. A global template,
+         *     the whole default catalogue, is one row shared by every organization, so a
+         *     stored rate there would belong to whichever organization had last taken a
+         *     delivery; computing it per organization keeps one organization's purchase
+         *     cost away from another.
          */
         get: operations["get_product_template_api_v1_items_product_templates__template_id__get"];
         put?: never;
@@ -3587,7 +3587,7 @@ export interface paths {
          * @description Batched BOM existence + line count for a list of templates.
          *
          *     Returns one entry per template that has >=1 BOM line. Templates with no
-         *     BOM are omitted. Used to render 'has BOM' badges in product lists without
+         *     BOM are omitted. Product lists render their 'has BOM' badges from this, without
          *     N+1 queries.
          */
         get: operations["get_bom_summary_api_v1_maker_bom_summary_get"];
@@ -4399,9 +4399,8 @@ export interface paths {
          *
          *     Includes both ingredient consumption moves (from_location → None) and
          *     the output receipt move (None → output_location), with the lot for
-         *     traceability. Products, lots and locations come back named: the table
-         *     used to print truncated UUIDs, which identify nothing to the person
-         *     reading them.
+         *     traceability. Products, lots and locations come back named, since a truncated
+         *     UUID identifies nothing to the person reading the table.
          */
         get: operations["get_production_stock_moves_api_v1_maker_production_orders__order_id__stock_moves_get"];
         put?: never;
@@ -5205,9 +5204,8 @@ export interface paths {
          * Revoke Invitation
          * @description Withdraw an invitation that nobody has redeemed yet.
          *
-         *     A code used to be a fifteen-minute affair, so taking one back was a matter
-         *     of waiting. Living a week, it needs a way out: an address typed wrong, a
-         *     person who left before arriving, a role chosen by mistake.
+         *     A code lives for a week, so it needs a way out before then: an address typed
+         *     wrong, a person who left before arriving, a role chosen by mistake.
          */
         delete: operations["revoke_invitation_api_v1_organizations_my_invitations__invitation_id__delete"];
         options?: never;
@@ -7373,10 +7371,8 @@ export interface paths {
          * Preview Suggestions
          * @description What the app would propose buying. It creates nothing.
          *
-         *     The dashboard used to reach this answer through a list it had just
-         *     created, because the only route to it was addressed by ``list_id`` —
-         *     so opening a preview left an empty active list the reader had never
-         *     asked for, and Cancel did not take it back.
+         *     The dashboard reads this answer without creating a list it does not need,
+         *     so opening a preview leaves no empty active list the reader never asked for.
          *
          *     The three switches are here because the button that opens this hangs
          *     on the tile counting shortages, and the engine returns every source it
@@ -7952,8 +7948,8 @@ export interface paths {
          * Set Stock Lot Status
          * @description Hold a batch back, or let it go again.
          *
-         *     Every picking path already obeys the status; until now nobody could set
-         *     it. The reason is kept with the batch, because "quarantined" without
+         *     Every picking path obeys the status, and this endpoint is the only place
+         *     it is set. The reason is kept with the batch, because "quarantined" without
          *     "supplier notice 41/26" is a decision nobody can review.
          */
         patch: operations["set_stock_lot_status_api_v1_stock_lots__lot_id__patch"];
@@ -8382,6 +8378,51 @@ export interface paths {
          * @description Changes inventory status.
          */
         patch: operations["update_stock_take_status_api_v1_stock_takes__stock_take_id__status_patch"];
+        trace?: never;
+    };
+    "/api/v1/stock-value-movement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stock Value Movement
+         * @description What the stock was worth at the start of a period, what moved it, and
+         *     what it was worth at the end.
+         *
+         *     Not a ledger: no chart of accounts, no double entry, no closing of
+         *     periods. A statement over the cost layers, for a person or a bookkeeper
+         *     to take from.
+         */
+        get: operations["stock_value_movement_api_v1_stock_value_movement_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock-value-movement/export/xlsx": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stock Value Movement Xlsx
+         * @description The same statement, as one spreadsheet.
+         */
+        get: operations["stock_value_movement_xlsx_api_v1_stock_value_movement_export_xlsx_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/uoms": {
@@ -10725,8 +10766,8 @@ export interface paths {
          * Preview Template
          * @description What this layout prints, on a document made up for the purpose.
          *
-         *     The preview used to show the source — `{% for line in lines %}` and all —
-         *     which answers "what does this template say" and not "what will the paper
+         *     The preview shows the rendered page, not the template source, because what
+         *     matters is "what will the paper
          *     look like". The rendering is the same one the PDF goes through, on the
          *     same example context the placeholder catalog is derived from, so a
          *     preview cannot describe a document the printer would not produce.
@@ -13617,10 +13658,9 @@ export interface components {
          * CategoryFieldDefinition
          * @description A single custom field definition on a category — read shape.
          *
-         *     Previously field_definitions was ``list[dict[str, Any]]`` with no key
-         *     or type validation, letting malformed entries through and raising KeyError
-         *     downstream. This typed model enforces a non-empty key and a closed type set
-         *     on NEW definitions. ``type`` defaults to 'text' so legacy/system definitions
+         *     A raw ``list[dict[str, Any]]`` would accept malformed entries and fail later
+         *     with KeyError, so this typed model enforces a non-empty key and a closed type
+         *     set on NEW definitions. ``type`` defaults to 'text' so legacy/system definitions
          *     that predate the type field (e.g. {'key':'category_id','is_system':True})
          *     are not rejected at response-serialization time.
          *
@@ -21727,10 +21767,10 @@ export interface components {
          * ProcessStep
          * @description One step of a formula's process, and how long it takes.
          *
-         *     A step used to be a bare sentence, so a formula that took two hours to
-         *     make said nothing about the two hours and its labour could only be a
-         *     lump sum typed per batch. The duration is optional: a step nobody timed
-         *     still reads, and costs no labour.
+         *     A step is a sentence and an optional duration, so a formula that takes two
+         *     hours to make says so, and its labour is costed per step instead of as a lump
+         *     sum typed per batch. The duration is optional: a step nobody timed still
+         *     reads, and costs no labour.
          */
         "ProcessStep-Input": {
             /** Text */
@@ -21742,10 +21782,10 @@ export interface components {
          * ProcessStep
          * @description One step of a formula's process, and how long it takes.
          *
-         *     A step used to be a bare sentence, so a formula that took two hours to
-         *     make said nothing about the two hours and its labour could only be a
-         *     lump sum typed per batch. The duration is optional: a step nobody timed
-         *     still reads, and costs no labour.
+         *     A step is a sentence and an optional duration, so a formula that takes two
+         *     hours to make says so, and its labour is costed per step instead of as a lump
+         *     sum typed per batch. The duration is optional: a step nobody timed still
+         *     reads, and costs no labour.
          */
         "ProcessStep-Output": {
             /** Text */
@@ -22091,9 +22131,9 @@ export interface components {
          * @description How much of one product the organization has on its shelves.
          *
          *     The number a threshold is measured against, so the screen that sets
-         *     one can name it. That screen used to show the quantity of the single
-         *     record the reader had opened, and offered to copy it into a field
-         *     governing the product as a whole.
+         *     one can name it. That screen shows the product's total across its shelves,
+         *     never the quantity of the single record the reader has opened, so the two
+         *     are not confused with a field governing the product as a whole.
          */
         ProductTemplateStockResponse: {
             /**
@@ -24877,10 +24917,9 @@ export interface components {
          * @description Create a reorder rule for one (product, location) pair.
          *
          *     ``min_quantity`` is the threshold that makes the rule fire; ``max_quantity``
-         *     is only the level to reach once it has. Requiredness used to be the other
-         *     way round -- MIN defaulted to 0 -- and the engine skips a rule at 0
-         *     outright, so a rule saved with the required fields alone could never
-         *     produce an alert while sitting on the list looking like every other one.
+         *     is only the level to reach once it has. ``min_quantity`` is required, and
+         *     the engine skips a rule at 0 outright, so a rule must set it above zero to
+         *     ever produce an alert.
          */
         ReorderRuleCreate: {
             /**
@@ -26991,6 +27030,74 @@ export interface components {
              * @default []
              */
             items: components["schemas"]["StockTakeItemWithDetails"][];
+        };
+        /**
+         * StockValueMovementDTO
+         * @description What the stock was worth when a period opened, what moved it, and what
+         *     it was worth when it closed.
+         *
+         *     Every movement is signed as it changes the value: what came in is
+         *     positive, what left is negative, so ``opening_value`` plus every
+         *     movement field is ``closing_value`` to the cent. ``other_changes``
+         *     is what is left to make that true — the part of the closing that the
+         *     layers' own receipts and issues do not account for, such as a cost
+         *     added to a receipt after it was posted; it is 0.00 when nothing of the
+         *     kind happened. All of the figures are None where the organization keeps
+         *     no cost history (``value_source`` is None): there is nothing to state,
+         *     and zeros would state it.
+         */
+        StockValueMovementDTO: {
+            /**
+             * Date From
+             * Format: date
+             */
+            date_from: string;
+            /**
+             * Date To
+             * Format: date
+             */
+            date_to: string;
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+            /**
+             * Complete From
+             * Format: date-time
+             */
+            complete_from: string;
+            /** Organization Name */
+            organization_name?: string | null;
+            /** Currency */
+            currency?: string | null;
+            /** Value Source */
+            value_source?: string | null;
+            /**
+             * Excluded Currency Receipts
+             * @default 0
+             */
+            excluded_currency_receipts: number;
+            /** Opening Value */
+            opening_value?: string | null;
+            /** Receipts */
+            receipts?: string | null;
+            /** Internal Receipts */
+            internal_receipts?: string | null;
+            /** Used */
+            used?: string | null;
+            /** Disposed */
+            disposed?: string | null;
+            /** Dispatched */
+            dispatched?: string | null;
+            /** Other Issues */
+            other_issues?: string | null;
+            /** Work In Progress Change */
+            work_in_progress_change?: string | null;
+            /** Other Changes */
+            other_changes?: string | null;
+            /** Closing Value */
+            closing_value?: string | null;
         };
         /**
          * StorageArchiveRequest
@@ -29709,10 +29816,9 @@ export interface components {
          * CategoryFieldDefinition
          * @description A single custom field definition on a category — read shape.
          *
-         *     Previously field_definitions was ``list[dict[str, Any]]`` with no key
-         *     or type validation, letting malformed entries through and raising KeyError
-         *     downstream. This typed model enforces a non-empty key and a closed type set
-         *     on NEW definitions. ``type`` defaults to 'text' so legacy/system definitions
+         *     A raw ``list[dict[str, Any]]`` would accept malformed entries and fail later
+         *     with KeyError, so this typed model enforces a non-empty key and a closed type
+         *     set on NEW definitions. ``type`` defaults to 'text' so legacy/system definitions
          *     that predate the type field (e.g. {'key':'category_id','is_system':True})
          *     are not rejected at response-serialization time.
          *
@@ -46169,6 +46275,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StockTakeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stock_value_movement_api_v1_stock_value_movement_get: {
+        parameters: {
+            query: {
+                /** @description The first day of the period. */
+                date_from: string;
+                /** @description The last day of the period, included. */
+                date_to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockValueMovementDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stock_value_movement_xlsx_api_v1_stock_value_movement_export_xlsx_get: {
+        parameters: {
+            query: {
+                date_from: string;
+                date_to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

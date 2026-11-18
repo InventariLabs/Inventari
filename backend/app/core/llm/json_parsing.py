@@ -3,8 +3,8 @@
 Models are asked for JSON and answer with something JSON-adjacent: wrapped in
 a markdown fence, prefixed with "Here is the JSON:", carrying a literal
 newline inside a string value, or cut in half by the token budget. Every call
-site used to cope with that on its own and at a different level of paranoia,
-so the same model output parsed fine in recipes and raised a 500 in vision.
+site would cope with that on its own and at a different level of paranoia,
+so the same model output could parse in recipes and raise a 500 in vision.
 
 This module is the one shared answer. It is Core and stdlib-only by design —
 it has to be importable from any module and from Core itself.

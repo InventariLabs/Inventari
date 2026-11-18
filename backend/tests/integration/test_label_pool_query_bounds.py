@@ -1,8 +1,7 @@
 """Generating a label pool costs a fixed number of queries, not one per label.
 
-Each label used to ask the database twice whether its code was free, and once
-more to reload itself after the commit: 485 statements for 120 labels, measured
-in the request log. The modal offers up to 500 — the number somebody with a
+The taken codes are read in one query and the batch is reloaded once, so the
+statement count does not grow with the labels. The modal offers up to 500 — the number somebody with a
 sheet printer types once, and the only time they ever do it.
 
 The bound below is deliberately loose. What it guards is the shape: a batch ten
@@ -83,7 +82,7 @@ class TestLabelPoolQueryBounds:
         assert len(labels) == 500
         assert len({label.short_code for label in labels}) == 500
         # Read the taken codes (2), lock, insert, commit, reload the batch (1).
-        # The old path issued about four per label.
+        # A query per label would exceed it.
         assert query_counter.count < 25, (
             f'{query_counter.count} statements for 500 labels — '
             'the batch is paying per row again'

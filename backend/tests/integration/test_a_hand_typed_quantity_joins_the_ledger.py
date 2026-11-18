@@ -14,8 +14,8 @@ already held is posted as an opening before the edit moves any of it, so the
 shelf starts from what the record says it holds instead of from a number the
 ledger never counted.
 
-An organization that keeps no warehouse modules used to be a different
-silence: the bridge wrote nothing there, so nothing was minted behind the
+An organization that keeps no warehouse modules is a different
+silence: the bridge writes nothing there, so nothing is minted behind the
 record either. Now every organization keeps the register, and the same edit
 gets the same answer whatever modules are on.
 
@@ -50,8 +50,8 @@ from app.services.token_service import create_access_token
 _LEDGER_MODULES = ['core', 'items', 'locations', 'categories', 'warehouse', 'stats']
 
 #: The same organization without a single module that consumes StockQuant.
-#: It used to keep ``Item.quantity`` as its only stock truth; it keeps the
-#: register now, like every other.
+#: ``Item.quantity`` is not the stock truth: it keeps the
+#: register, like every other.
 _HOME_MODULES = ['core', 'items', 'locations', 'categories']
 
 
@@ -367,9 +367,8 @@ class TestAnOrganizationWithoutRegisterModulesKeepsItToo:
         await _edit_quantity_async(real_async_client, home, home.cardless_id, 13)
 
         # The card is adopted and the edit is registered in both. The home
-        # organization used to get no card, no stock, no layer and no
-        # movement — its record was its only truth, and a move of it was
-        # refused for stock the register had never been told about.
+        # organization gets a card, stock, a layer and a movement too, so a
+        # move of its record is refused for stock the register had never been told about.
         for room in (warehouse, home):
             assert await _quantity_of_async(db, room.cardless_id) == Decimal('13')
             adopted = await _template_of_async(db, room.cardless_id)

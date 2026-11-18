@@ -16,7 +16,7 @@ interface AddToShoppingListButtonProps {
  * slot. Its only act is adding a row to a list, which the shopping-lists
  * router guards with `shopping_lists:write` — the module's key, not the one
  * the page around it asks about. The caller cannot ask it: the slot hands the
- * component the item and nothing else, and a read-only account used to be
+ * component the item and nothing else, so a read-only account is not
  * offered the button and refused on click.
  */
 export default function AddToShoppingListButton({

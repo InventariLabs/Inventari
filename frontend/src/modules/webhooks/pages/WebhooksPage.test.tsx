@@ -120,10 +120,9 @@ describe("WebhooksPage", () => {
   });
 
   it("still offers a way to add one when the list is not empty", async () => {
-    // The empty state used to hold the only reachable "Add webhook" button:
-    // the other lives in the page header, and on the flat `/webhooks` route
-    // nothing provided that header. Adding the first webhook therefore removed
-    // the only way to add a second.
+    // The empty state holds an "Add webhook" button as well as the page
+    // header, which the flat `/webhooks` route also provides, so adding the first
+    // webhook leaves a way to add a second.
     server.use(
       http.get("/api/v1/webhooks/endpoints", () =>
         HttpResponse.json(
@@ -211,8 +210,8 @@ describe("WebhooksPage", () => {
   });
 
   it("marks an event whose module is off instead of offering it as an equal", async () => {
-    // The catalogue used to return all 42 events with no idea what this
-    // organization runs — and 17 of them rendered as their own technical name.
+    // The catalogue answers with what this organization runs, and every event
+    // has a readable name.
     server.use(
       http.get("/api/v1/webhooks/events", () =>
         HttpResponse.json([
@@ -279,8 +278,7 @@ describe("WebhooksPage", () => {
   });
 
   it("names the status a test ping was refused with, not the page that came back", async () => {
-    // The receiver's whole HTML body used to be the toast; its status was the
-    // only useful part of it.
+    // The toast names the receiver's status, not its whole HTML body.
     server.use(
       http.get("/api/v1/webhooks/endpoints", () =>
         HttpResponse.json(

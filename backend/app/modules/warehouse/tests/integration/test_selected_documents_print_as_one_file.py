@@ -1,7 +1,7 @@
 """Selected documents print as one PDF, in the order they were chosen.
 
-Forty dispatches a day used to be forty downloads, each opened and sent to
-the printer by hand. The register now asks for the selection and gets back a
+Forty dispatches a day come back as one file, not forty downloads opened and
+sent to the printer by hand. The register asks for the selection and gets back a
 single file; a document that cannot be printed refuses the whole file by name
 rather than leaving a gap in the stack.
 """

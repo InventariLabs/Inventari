@@ -1,12 +1,11 @@
 """The test database refuses what the migrated one refuses.
 
-The test databases are built from the models (``create_all``), and four unique
-indexes used to exist only in a migration: a barcode per organization on the
+The test databases are built from the models (``create_all``), so the models declare the four
+unique indexes the migrations build: a barcode per organization on the
 records, a barcode and a SKU per organization on the catalogue, and one
-reference unit per category. The models declared nothing — or a plain index
-under the same columns — so every test that was meant to prove one of these
-refusals passed for the wrong reason, and an assertion could rest on a
-duplicate that production cannot hold.
+reference unit per category. Each test that proves one of these refusals
+proves it for the right reason, and no assertion rests on a duplicate that
+production cannot hold.
 
 The comparison against the migrated schema keeps the names in step; this file
 pins that they are unique, partial the way the migration made them, and that

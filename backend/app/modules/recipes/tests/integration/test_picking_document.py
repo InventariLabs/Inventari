@@ -103,7 +103,7 @@ class _ItemIdThatBecomesNone:
 
     ``register_picking_as_document_async`` filters on ``i.item_id`` before
     reading ``picked[0].item_id`` again inside the block. This double is
-    used to cover the defensive ``if first_item_id is None`` branch.
+    there to cover the defensive ``if first_item_id is None`` branch.
     """
 
     status = 'picked'

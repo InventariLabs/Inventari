@@ -765,12 +765,10 @@ async def explode_recipes_in_stock_units(
 ) -> dict[UUID, list[tuple[UUID, Decimal, str]]]:
     """Explode many recipes in one pass, sharing every cache across the batch.
 
-    A catalogue page of never-run recipes used to pay the whole explosion per
-    recipe — child-recipe lookups, the unit catalogue, the ingredient
-    templates, the rates — and the page's query count grew with the page
-    size. Here the child-recipe map is warmed a level at a time for the
-    whole page, and the unit and template catalogues load once for the
-    union of the batch's leaves.
+    A catalogue page of never-run recipes shares its lookups: the child-recipe map
+    is warmed a level at a time for the whole page, and the unit and template
+    catalogues load once for the union of the batch's leaves, so the page's query
+    count does not grow with its size.
     """
     child_cache = await _warm_child_cache(
         db, organization_id, (recipe for recipe, _qty in requests)
@@ -877,12 +875,9 @@ async def explode_in_stock_units(
 ) -> list[tuple[UUID, Decimal, str]]:
     """Explode a bill of materials and answer in each ingredient's stock unit.
 
-    The conversion used to be a second step the caller had to remember, and
-    two of them did not: the cost preview and the per-ingredient breakdown
-    multiplied a rate held per kilogram by a quantity read in grams, so both
-    were wrong by the factor between the units — a thousand, for the pair a
-    kitchen uses most. Consumption converted; the numbers shown beside it did
-    not, and the two disagreed about the same run.
+    The conversion happens inside the explosion, so no caller has to remember it.
+    The cost preview, the per-ingredient breakdown and consumption all read the
+    same stock unit, so they agree about the same run.
 
     One entry point, so the question "in what unit is this number" has one
     answer for everything downstream of a formula.

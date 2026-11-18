@@ -44,10 +44,9 @@ from .services import (
 def _validate_external_url(url: str) -> None:
     """Refuse a URL that would aim the server at its own network.
 
-    This used to read the hostname and stop: an IP literal in a private range
-    was refused, but a *name* was not resolved, so a hostname whose owner
-    points it at 169.254.169.254 walked through and the importer fetched it.
-    The shared guard resolves the name and checks the address it gets — the
+    An IP literal in a private range is refused, and so is a *name* that
+    resolves into one: a hostname whose owner points it at 169.254.169.254 is
+    not fetched. The shared guard resolves the name and checks the address it gets — the
     same one the cover downloader on the neighbouring path already uses, and
     the same one that treats a name it cannot resolve as a refusal rather
     than a free pass.
@@ -135,9 +134,9 @@ def register_crud_routes(router: APIRouter) -> None:  # noqa: C901 - route regis
     @router.get('/available', response_model=PaginatedResponse[dict[str, Any]])
     async def available_recipes_endpoint(
         # "Available" means cookable: every ingredient on the shelf in the
-        # quantity the recipe asks for. The default used to be half of them,
-        # so the answer to "what can I cook" included meals that were missing
-        # two ingredients out of four. Callers after a looser reading — a
+        # quantity the recipe asks for. The default, min_match 1.0, asks for all
+        # of them, so a meal missing two ingredients out of four is left out.
+        # Callers after a looser reading — a
         # "nearly there" list — ask for it by name.
         min_match: float = Query(1.0, ge=0.0, le=1.0),
         servings: int | None = Query(None, ge=1),

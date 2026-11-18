@@ -1,10 +1,9 @@
-"""Two acts the organization log used to miss entirely.
+"""Two acts the organization log must record: a bulk edit and a removal.
 
 The journal's own contract says a state-changing act on a record an
-organization owns writes one row here. Editing fifty items at once wrote
-only the per-item history and said so in a comment; taking somebody out of
-the organization wrote nothing at all, while inviting them and changing
-their role both wrote. Access changes are a first-order audit category
+organization owns writes one row here. Editing fifty items at once writes a
+row of its own besides the per-item history; taking somebody out of the
+organization writes one too, as inviting them and changing their role do. Access changes are a first-order audit category
 precisely because they are the ones an intruder would want unrecorded.
 """
 
@@ -77,10 +76,9 @@ class TestTheLogSeesABulkEdit:
     ) -> None:
         """The bulk row says what the record took, nothing else.
 
-        A freeze date used to be the example of a field the record lacks:
-        the setattr loop dropped it, and the snapshot named it anyway. The
-        batch now keeps it where the single edit keeps it, in ``meta_data``,
-        so the row names it — beside the date it replaced, not a blank. That
+        The batch keeps a freeze date where the single edit keeps it, in
+        ``meta_data``, so the row names it beside the date it replaced, not a
+        blank. That
         no field of the schema is left without a writer is held on its own,
         in ``test_the_bulk_edit_writes_what_it_accepts``.
         """

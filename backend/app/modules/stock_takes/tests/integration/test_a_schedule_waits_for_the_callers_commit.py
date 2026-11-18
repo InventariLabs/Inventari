@@ -1,8 +1,8 @@
 """Creating a cycle-count schedule is not durable until the caller commits.
 
-The service used to commit inside the call, so a request that failed after
-it left a schedule (and its log entry) behind. The caller owns the commit
-now: a rollback after the call leaves nothing.
+The service does not commit inside the call. The caller owns the commit, so a
+request that fails after the call leaves no schedule (and no log entry)
+behind: a rollback after the call leaves nothing.
 """
 
 from __future__ import annotations

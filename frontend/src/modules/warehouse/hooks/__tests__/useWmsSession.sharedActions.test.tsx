@@ -180,10 +180,8 @@ const SIDES = [
  * Picking and receiving run the same session machine, so the actions that
  * are not about scanning have to answer identically on both.
  *
- * They used to be two hand-kept copies, and each repair landed on one side
- * only: `completeSession` learned to report the server's refusal in
- * receiving while picking kept firing a success toast next to it. This is
- * the test that would have said so.
+ * Both screens take these actions from one implementation, so a repair cannot
+ * land on one side only. This is the test that pins them to the same answers.
  */
 describe.each(SIDES)("useWmsSession through $name", (side) => {
   beforeEach(() => {

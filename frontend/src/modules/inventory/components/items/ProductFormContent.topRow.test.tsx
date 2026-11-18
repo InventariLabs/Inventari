@@ -39,10 +39,9 @@ function renderForm(
 
 describe("ProductFormContent — the row above the sections", () => {
   /**
-   * The name used to carry a hand-written label while the storage picker drew
-   * its own, so two fields side by side had two label voices and sat ~24px
-   * apart. The control owns the label (UI_GUIDELINES §2.10); a label written
-   * beside it is the thing that drifts.
+   * The control owns its label (UI_GUIDELINES §2.10). A label written beside it
+   * is the thing that drifts, and two fields side by side would show two
+   * label voices.
    */
   it("names the product through the control, not a label beside it", () => {
     renderForm({ name: "" });
@@ -55,9 +54,7 @@ describe("ProductFormContent — the row above the sections", () => {
   });
 
   it("opens the chosen location in the mode the link promises", () => {
-    // "Configure" used to open the location's product list, leaving the
-    // person to find Edit themselves — while the target page already knew
-    // how to open the sheet, through a parameter nobody passed.
+    // "Configure" opens the location's edit sheet, the mode its link promises.
     renderForm({ name: "", location_id: "loc-1" });
 
     expect(screen.getByRole("link", { name: /configure/i })).toHaveAttribute(
@@ -73,8 +70,7 @@ describe("ProductFormContent — the row above the sections", () => {
     expect(link).toHaveAttribute("href", "/inventory/locations");
   });
 
-  // A place missing from the list used to be made on the Storages screen, in
-  // another tab, and the form reloaded on return.
+  // A place missing from the list is made from the picker, without leaving the form.
   it("offers a new location from the picker itself", async () => {
     const onAddStorage = vi.fn();
     renderForm({ name: "" }, onAddStorage);

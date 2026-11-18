@@ -587,11 +587,9 @@ class TestSettingsAllowOverproduction:
 class TestExplicitRecipeExplosion:
     """Order with an explicit non-default recipe consumes by THAT recipe.
 
-    Regression: completion used to explode by the DEFAULT recipe while
-    fixed costs read ``order.recipe_id`` — consumption and costs could
-    come from different recipes. With an explicit recipe, the top-level
-    explosion must follow the order's recipe; nested sub-assemblies keep
-    the default-recipe lookup (documented design).
+    With an explicit recipe, the top-level explosion follows the order's recipe,
+    the same recipe the fixed costs read from ``order.recipe_id``. Nested
+    sub-assemblies keep the default-recipe lookup (documented design).
     """
 
     def _variant_recipe(

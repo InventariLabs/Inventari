@@ -17,9 +17,9 @@ Two handlers are configured, both with the SAME format:
 2. **RotatingFileHandler** (``LOG_DIR/app.log``) — rotates at 10 MB with 5
    backups (max ~50 MB on disk)
 
-The console used to run a shorter format without ``%(asctime)s``, so the
-stream people actually read had no clock on it and no line could be tied to
-an incident.  One format now serves both, and the timestamp is ISO-8601 in
+The console runs the same format as the file, ``%(asctime)s`` included, so the
+stream people actually read has a clock on it and every line can be tied to
+an incident.  One format serves both, and the timestamp is ISO-8601 in
 **UTC** — containers run UTC anyway, and an explicit ``Z`` is what log
 aggregators parse without guessing a local zone.
 

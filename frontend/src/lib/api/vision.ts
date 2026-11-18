@@ -5,7 +5,7 @@ import type { VisionExtractResult } from "@/types";
 /**
  * Image recognition, which is a Core subsystem (docs/subsystems/VISION_AI.md).
  *
- * It used to live inside the stats module, so three other modules reached
+ * It lives in Core and not in the stats module, so no other module reaches
  * across a module boundary to scan a photo — nutrition, quick-add and the
  * scan page. Nothing about vision belongs to statistics; the endpoint is
  * Core's, and so is this client.

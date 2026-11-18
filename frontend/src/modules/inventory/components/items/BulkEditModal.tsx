@@ -187,8 +187,8 @@ export default function BulkEditModal({ itemIds, onClose, onSuccess }: Props) {
       {
         item_ids: itemIds,
         // The contract requires the confirmation flag; a bulk edit changes no
-        // unit, which is the flag's "no" — the same answer the server used to
-        // default to when the payload omitted it.
+        // unit, which is the flag's "no" — the same answer the server gives
+        // when the payload omits it.
         update_data: {
           ...updateData,
           unit_confirmed_over_template: false,

@@ -7,11 +7,10 @@ import { tFor } from "@/test/mocks/i18n";
 import type { RotationAnalysis } from "../types/analytics";
 
 /**
- * The age tiles used to print "—" whenever nothing had been
- * consumed, on the strength of a guard whose premise no longer held —
- * stock age is measured from intake, so an intake-only organization
- * (everyone's first days) had a real number the screen refused to show,
- * two hundred pixels above a table showing it from the same payload.
+ * The age tiles print "—" only where the server sends no age. Stock age is
+ * measured from intake, so an intake-only organization (everyone's first days)
+ * has a real number, and the screen shows it, two hundred pixels above a table
+ * showing it from the same payload.
  */
 const base = {
   slow_movers: [],
