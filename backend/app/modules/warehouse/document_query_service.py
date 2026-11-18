@@ -14,6 +14,7 @@ from app.core.db_utils import escape_ilike, in_ids, paginate_async
 from app.core.public_api import core_api
 
 from . import document_types as dt
+from ._line_reversals import reversible_quantities_async
 from .document_register_service import document_date_column
 from .models import Document, DocumentLine, DocumentRelation, DocumentStatus
 from .schemas import (
@@ -202,7 +203,23 @@ async def get_document(
         if corrected is not None:
             doc.corrects_document_type = corrected.type  # type: ignore[attr-defined]
         await attach_shipments_async(db, org_id, [doc])
+        await _attach_returnable(db, org_id, doc)
     return doc
+
+
+async def _attach_returnable(db: AsyncSession, org_id: UUID, doc: Document) -> None:
+    """Name, on each line of a completed document, what a return can still take.
+
+    The return form cannot know it from ``done_quantity``: earlier returns and
+    corrections, drafts included, have already taken some of it, and the
+    service refuses anything past the remainder. The same rule the service
+    applies, asked once for the whole document.
+    """
+    if doc.status != DocumentStatus.COMPLETED.value:
+        return
+    left = await reversible_quantities_async(db, org_id, doc.lines)
+    for line in doc.lines:
+        line.returnable_quantity = max(left[line.id], Decimal(0))  # type: ignore[attr-defined]
 
 
 async def _attach_generated_backorder(db: AsyncSession, doc: Document) -> None:

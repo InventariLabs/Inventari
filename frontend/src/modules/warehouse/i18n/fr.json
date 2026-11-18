@@ -773,6 +773,8 @@
     "warningTyped": "Un nouveau document {{type}} sera créé pour annuler le mouvement de stock.",
     "lineQuantity": "Qté retournée",
     "maxQuantity": "Max : {{max}}",
+    "overMaxQuantity": "Impossible de retourner plus de {{max}}",
+    "nothingToReturn": "Il ne reste rien à retourner sur ce document.",
     "reasonPlaceholder": "Motif de retour de cette ligne",
     "creating": "Création…",
     "created": "Retour {{number}} créé",

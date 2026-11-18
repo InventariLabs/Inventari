@@ -489,6 +489,46 @@ class TestReturnDocument:
         assert 'A return of 99' in message
         assert '.000' not in message
 
+    def test_the_document_names_what_a_return_can_still_take(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_source_location: StorageLocation,
+        doc_target_location: StorageLocation,
+        doc_partner: Partner,
+        doc_item: Item,
+    ) -> None:
+        """Each line reports what is left to return, earlier returns taken off."""
+        doc = self._create_and_complete_out(
+            client,
+            doc_auth_headers,
+            doc_source_location.id,
+            doc_target_location.id,
+            doc_partner.id,
+            doc_item.id,
+            qty=5,
+        )
+
+        def returnable() -> Decimal:
+            read = client.get(
+                f'/api/v1/warehouse/documents/{doc["id"]}', headers=doc_auth_headers
+            )
+            assert read.status_code == status.HTTP_200_OK, read.text
+            return Decimal(read.json()['lines'][0]['returnable_quantity'])
+
+        assert returnable() == Decimal(5)
+        for quantity, left in ((2, 3), (3, 0)):
+            made = client.post(
+                f'/api/v1/warehouse/documents/{doc["id"]}/return',
+                headers=doc_auth_headers,
+                json={
+                    'reason_code': 'DAMAGED',
+                    'lines': [{'original_line_number': 1, 'return_quantity': quantity}],
+                },
+            )
+            assert made.status_code == status.HTTP_201_CREATED, made.text
+            assert returnable() == Decimal(left)
+
     def test_return_in_document_succeeds(
         self,
         client: TestClient,

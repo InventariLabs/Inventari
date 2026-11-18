@@ -773,6 +773,8 @@
     "warningTyped": "Es wird ein neuer Beleg vom Typ {{type}} erstellt, der die Lagerbewegung umkehrt.",
     "lineQuantity": "Rückgabemenge",
     "maxQuantity": "Max: {{max}}",
+    "overMaxQuantity": "Es können höchstens {{max}} zurückgegeben werden",
+    "nothingToReturn": "Von diesem Beleg ist nichts mehr zurückzugeben.",
     "reasonPlaceholder": "Grund für die Rückgabe dieser Position",
     "creating": "Wird erstellt…",
     "created": "Rückgabe {{number}} erstellt",
