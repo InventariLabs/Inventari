@@ -851,6 +851,9 @@ ignore_names = [
     # exclude above covers, only the assignment sits in a scanned service.
     "reversed_by_id",
     "reversed_by_number",
+    # The same, on a line: what a return can still take, stamped by the
+    # document read and serialized by ``DocumentLineSchema``.
+    "returnable_quantity",
 ]
 
 # ---------------------------------------------------------------------------
