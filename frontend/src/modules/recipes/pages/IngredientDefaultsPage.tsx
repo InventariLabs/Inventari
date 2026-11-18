@@ -225,7 +225,9 @@ export default function IngredientDefaultsPage() {
   };
 
   const handleAdd = async () => {
-    if (!form.name || form.calories_kcal == null) {
+    // A name of only spaces passes a bare truthiness check and comes back
+    // from the server as "Should have at least 1 character", naming no field.
+    if (!form.name?.trim() || form.calories_kcal == null) {
       toast.error(t("ingredient_defaults.error_required_fields"));
       return;
     }
