@@ -172,8 +172,9 @@ async def import_ingredient_defaults(
             code=refusal_code(exc, 'FILE_TOO_LARGE'),
             message=refusal_text(exc),
         ) from exc
-    # 'utf-8-sig' drops the BOM an Excel "CSV UTF-8" file opens with; plain
-    # 'utf-8' keeps it in the first header and every row then lacks 'name'.
+    # 'utf-8-sig' drops the byte order mark a file saved with one opens with.
+    # It is the JSON branch's decode: a CSV goes through the shared reader,
+    # which names the encoding itself (BOM, codepage and all).
     content = raw.decode('utf-8-sig', errors='replace')
     filename = (file.filename or '').lower()
 

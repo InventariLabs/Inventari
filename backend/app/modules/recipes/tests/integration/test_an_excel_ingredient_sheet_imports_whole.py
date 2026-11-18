@@ -4,8 +4,8 @@ Excel in Polish, German, French and Spanish locales separates columns with a
 semicolon and writes the text in the local codepage. This door had a reader
 of its own — comma-separated, decoded as utf-8 with ``errors='replace'`` —
 so a semicolon sheet was refused as unreadable whatever its rows held, and a
-cp1250 sheet was accepted under a 200 with every Polish letter replaced by a
-question mark: a dictionary that no longer says what the file says.
+cp1250 sheet was accepted under a 200 with replacement characters where the
+Polish letters were: a dictionary that no longer says what the file says.
 
 The door now reads through the shared reader every other import uses, so
 what the spreadsheet saved is what the rows become.
