@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import { Link } from "react-router-dom";
 import { Camera, Edit, ImageOff, Plus, RefreshCw, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -47,29 +47,40 @@ export function VisionTab({
     setImagePreviews([]);
   };
 
-  const addPhoto = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.capture = "environment";
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        setSelectedFiles((p) => [...p, file]);
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          if (typeof ev.target?.result === "string") {
-            setImagePreviews((p) => [...p, ev.target?.result as string]);
-          }
-        };
-        reader.readAsDataURL(file);
+  // The picker lives in the document, hidden, and the buttons click it: a
+  // file input made on the fly and never attached cannot be found by a
+  // selector, so a browser driver has nowhere to hand it a file.
+  const fileInput = useRef<HTMLInputElement>(null);
+  const addPhoto = () => fileInput.current?.click();
+
+  const onPhotoChosen = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    // Emptied so choosing the same photo again still fires a change.
+    e.target.value = "";
+    if (!file) return;
+    setSelectedFiles((p) => [...p, file]);
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      if (typeof ev.target?.result === "string") {
+        setImagePreviews((p) => [...p, ev.target?.result as string]);
       }
     };
-    input.click();
+    reader.readAsDataURL(file);
   };
 
   return (
     <div className="space-y-6 py-2">
+      <input
+        ref={fileInput}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        tabIndex={-1}
+        aria-hidden="true"
+        data-testid="vision-photo-input"
+        onChange={onPhotoChosen}
+      />
       {imagePreviews.length === 0 ? (
         <div className="space-y-6">
           {/* A camera, not a QR code: this feature photographs the product.
