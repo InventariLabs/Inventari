@@ -19,14 +19,14 @@ get_db_baseline.txt 0
 internal_id_baseline.txt 0
 manifest_permission_deferrals.txt 0
 mixed_status_assert_baseline.txt 0
-module_import_surface_baseline.txt 290
+module_import_surface_baseline.txt 289
 module_migrations_baseline.txt 0
 public_api_missing_org_baseline.txt 0
 raw_http_exception_baseline.txt 0
 refusal_sentences_baseline.txt 0
 request_scope_baseline.txt 26
 services_public_api_import_baseline.txt 0
-sync_async_twin_baseline.txt 12
+sync_async_twin_baseline.txt 10
 test_skip_baseline.txt 0
 toctou_risk_baseline.txt 0
 transaction_ownership_baseline.txt 0

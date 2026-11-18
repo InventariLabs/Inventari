@@ -5,7 +5,6 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import undefer
 
-from app.core.async_utils import await_if_awaitable
 from app.models.organization import Organization
 
 #: Deferred Organization columns a reader must load before validating the
@@ -40,16 +39,9 @@ def _deferred_org_options() -> tuple[Any, ...]:
 async def get_by_id_async(
     db: AsyncSession, organization_id: UUID
 ) -> Organization | None:
-    """Get organization by id (async).
-
-    The scalar is awaited only when it is awaitable, for the same reason
-    ``is_module_enabled_async`` below does the same dance: the event bus
-    hands a sync ``Session`` to subscribers written against this
-    signature, and module settings reads (the circuit-breaker threshold
-    rides one) go through here on that path.
-    """
-    result = await await_if_awaitable(
-        db.scalar(select(Organization).where(Organization.id == organization_id))
+    """Get organization by id (async)."""
+    result = await db.scalar(
+        select(Organization).where(Organization.id == organization_id)
     )
     return cast(Organization | None, result)
 
@@ -61,19 +53,9 @@ async def is_module_enabled_async(
 
     Returns False for a missing organization. Logic shared with the ORM
     method via ``Organization.is_module_enabled_value``.
-
-    The result is awaited only when it is awaitable: the event bus hands a sync
-    ``Session`` to subscribers written against this signature — webhook dispatch
-    already does the same dance for ``execute``, ``commit`` and ``flush`` — and
-    a check whose answer decides whether an event leaves the installation has to
-    work on both.
     """
-    enabled_modules = await await_if_awaitable(
-        db.scalar(
-            select(Organization.enabled_modules).where(
-                Organization.id == organization_id
-            )
-        )
+    enabled_modules = await db.scalar(
+        select(Organization.enabled_modules).where(Organization.id == organization_id)
     )
     if enabled_modules is None:
         return False

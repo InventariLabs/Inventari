@@ -15,7 +15,6 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import db_facade
-from app.core.async_utils import await_if_awaitable
 from app.core.events import SystemEvent, TenantEventPayload
 from app.core.logging import get_logger
 from app.core.public_api import core_api
@@ -45,10 +44,6 @@ MASKED_VALUE = core_api.secrets.MASKED
 logger = get_logger(__name__)
 
 
-async def _execute(db: AsyncSession, stmt: Any) -> Any:
-    return await await_if_awaitable(db.execute(stmt))
-
-
 async def count_endpoints_that_would_resume(
     db: AsyncSession, organization_id: UUID
 ) -> int:
@@ -65,11 +60,7 @@ async def count_endpoints_that_would_resume(
             WebhookEndpoint.is_active.is_(True),
         )
     )
-    return int((await _execute(db, stmt)).scalar_one())
-
-
-async def _flush(db: AsyncSession) -> None:
-    await await_if_awaitable(db.flush())
+    return int((await db.execute(stmt)).scalar_one())
 
 
 def encrypt_secret(plain: str) -> str:
@@ -132,7 +123,7 @@ async def dispatch_event(
                 # later in the dispatch.
                 .with_for_update()
             )
-            endpoints = (await _execute(session, stmt)).scalars().all()
+            endpoints = (await session.execute(stmt)).scalars().all()
 
             # Filter by event type (JSONB contains check done in Python to
             # remain DB-agnostic)
@@ -174,7 +165,7 @@ async def dispatch_event(
                         delivery_id,
                     )
                 )
-            await _flush(session)
+            await session.flush()
 
         # The probes leave the process and touch no session while they run,
         # so the fan-out races only the network — never the database. Every
@@ -326,7 +317,7 @@ async def deliver_test_ping(
     await _update_stats_after_delivery(db, webhook, is_success, status_code, threshold)
     # The caller owns the commit: flush here and let the request dependency
     # close the unit of work (this must not commit mid-stack).
-    await _flush(db)
+    await db.flush()
 
     return (
         is_success,

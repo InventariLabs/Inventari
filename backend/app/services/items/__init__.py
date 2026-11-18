@@ -13,8 +13,8 @@ from ._query_get import (
     get_any_by_id_async,
     get_by_id_async,
     get_by_id_for_update_async,
-    get_items,
-    get_items_aggregates,
+    get_items_aggregates_async,
+    get_items_async,
     lock_records_async,
 )
 from ._query_listing import distinct_uom_ids_for_template_async, list_by_org_async
@@ -34,8 +34,8 @@ __all__ = [
     'bind_item_to_template_async',
     'distinct_uom_ids_for_template_async',
     'existing_item_ids_async',
-    'get_items',
-    'get_items_aggregates',
+    'get_items_async',
+    'get_items_aggregates_async',
     'get_by_id_async',
     'get_by_id_for_update_async',
     'lock_records_async',

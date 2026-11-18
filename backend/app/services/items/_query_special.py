@@ -125,7 +125,7 @@ async def get_archived_items_async(
         equipment form has never required a category, so an asset saved
         without one was archived out of the module's sight and could not be
         restored from inside it. A module nobody registered claims nothing.
-    search: same ILIKE fields as the active list (``get_items``) — the
+    search: same ILIKE fields as the active list (``get_items_async``) — the
         archive is that list in another state, so it narrows the same way.
     Returns (items, total) so callers can build a paginated envelope.
     """

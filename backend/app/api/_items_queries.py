@@ -39,7 +39,7 @@ from app.services.analytics._common import (
 )
 from app.services.analytics.overview import get_health_counts_async
 from app.services.items import (
-    get_items_aggregates as get_items_aggregates_service,
+    get_items_aggregates_async as get_items_aggregates_service,
 )
 from app.services.items._query_get import count_needing_attention_async
 from app.services.items._query_special import (
@@ -146,29 +146,27 @@ async def get_items_aggregates_endpoint(
     )
     org_currency = await get_org_currency_async(db, org_id) if org_id else None
 
-    totals = await db.run_sync(
-        lambda s: get_items_aggregates_service(
-            db=s,
-            # Tenancy, and the same one the list gives: without it the
-            # footer would count rows the list no longer shows.
-            user_organization_id=current_user.organization_id,
-            location_usage=location_usage,
-            include_empty=include_empty,
-            storage_id=location_id,
-            category_id=category_id,
-            context_tag=context_tag,
-            claimed_tags=claimed_tags or None,
-            search=search,
-            expiring_days=expiring_days,
-            only_expired=only_expired,
-            only_low_stock=only_low_stock,
-            needs_attention=needs_attention,
-            source_document_id=source_document_id,
-            template_ids=parsed_template_ids or None,
-            today=today,
-            has_layers=has_layers,
-            org_currency=org_currency,
-        )
+    totals = await get_items_aggregates_service(
+        db=db,
+        # Tenancy, and the same one the list gives: without it the
+        # footer would count rows the list no longer shows.
+        user_organization_id=current_user.organization_id,
+        location_usage=location_usage,
+        include_empty=include_empty,
+        storage_id=location_id,
+        category_id=category_id,
+        context_tag=context_tag,
+        claimed_tags=claimed_tags or None,
+        search=search,
+        expiring_days=expiring_days,
+        only_expired=only_expired,
+        only_low_stock=only_low_stock,
+        needs_attention=needs_attention,
+        source_document_id=source_document_id,
+        template_ids=parsed_template_ids or None,
+        today=today,
+        has_layers=has_layers,
+        org_currency=org_currency,
     )
     answer = asdict(totals)
     # The sentence beside the sum says the statistics total counts what the

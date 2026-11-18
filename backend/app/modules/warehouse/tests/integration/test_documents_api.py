@@ -23,7 +23,7 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 from sqlalchemy import select, text
-from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import Session
 
 from app.models.item import Item
@@ -35,6 +35,7 @@ from app.models.uom import Uom
 from app.models.user import User
 from app.modules.approvals.models import ApprovalWorkflow
 from app.modules.warehouse.tests.integration._records import sow as _sow
+from tests.integration._shelf import run_in_async_session
 
 
 def _stand_on(db_session: Session, item: Item, location: StorageLocation) -> None:
@@ -3807,19 +3808,19 @@ class TestSimpleRateTaxFallback:
 
     def _set_profile(
         self,
-        db_session: Session,
+        engine: AsyncEngine,
         org_id: UUID,
         tax_handling: str,
         default_tax_rate: Decimal | None = None,
     ) -> None:
-        import asyncio
-
         from app.modules.warehouse.document_profile_service import get_or_create_profile
 
-        profile = asyncio.run(get_or_create_profile(db_session, org_id))
-        profile.tax_handling = tax_handling
-        profile.default_tax_rate = default_tax_rate
-        db_session.commit()
+        async def _set(session: AsyncSession) -> None:
+            profile = await get_or_create_profile(session, org_id)
+            profile.tax_handling = tax_handling
+            profile.default_tax_rate = default_tax_rate
+
+        run_in_async_session(engine, _set)
 
     def test_simple_rate_applies_default_to_lines(
         self,
@@ -3829,9 +3830,11 @@ class TestSimpleRateTaxFallback:
         doc_partner: Partner,
         doc_template: ProductTemplate,
         doc_org: Organization,
-        db_session: Session,
+        async_engine_fixture: AsyncEngine,
     ) -> None:
-        self._set_profile(db_session, doc_org.id, 'SIMPLE_RATE', Decimal('23.00'))
+        self._set_profile(
+            async_engine_fixture, doc_org.id, 'SIMPLE_RATE', Decimal('23.00')
+        )
 
         response = client.post(
             '/api/v1/warehouse/documents',
@@ -3862,9 +3865,11 @@ class TestSimpleRateTaxFallback:
         doc_partner: Partner,
         doc_template: ProductTemplate,
         doc_org: Organization,
-        db_session: Session,
+        async_engine_fixture: AsyncEngine,
     ) -> None:
-        self._set_profile(db_session, doc_org.id, 'SIMPLE_RATE', Decimal('23.00'))
+        self._set_profile(
+            async_engine_fixture, doc_org.id, 'SIMPLE_RATE', Decimal('23.00')
+        )
 
         response = client.post(
             '/api/v1/warehouse/documents',
@@ -3896,9 +3901,11 @@ class TestSimpleRateTaxFallback:
         doc_partner: Partner,
         doc_template: ProductTemplate,
         doc_org: Organization,
-        db_session: Session,
+        async_engine_fixture: AsyncEngine,
     ) -> None:
-        self._set_profile(db_session, doc_org.id, 'PER_LINE_RATE', Decimal('23.00'))
+        self._set_profile(
+            async_engine_fixture, doc_org.id, 'PER_LINE_RATE', Decimal('23.00')
+        )
 
         response = client.post(
             '/api/v1/warehouse/documents',
@@ -3929,13 +3936,13 @@ class TestSimpleRateTaxFallback:
         doc_partner: Partner,
         doc_template: ProductTemplate,
         doc_org: Organization,
-        db_session: Session,
+        async_engine_fixture: AsyncEngine,
     ) -> None:
         """The shape a preset without a rate now produces: SIMPLE_RATE and
         no default rate anywhere. The document is worth its net — gross
         falls back to net, it does not read as zero (a missing rate is "no
         tax is charged", not "the gross is unknown")."""
-        self._set_profile(db_session, doc_org.id, 'SIMPLE_RATE', None)
+        self._set_profile(async_engine_fixture, doc_org.id, 'SIMPLE_RATE', None)
 
         response = client.post(
             '/api/v1/warehouse/documents',

@@ -1,8 +1,8 @@
 """Shared database utilities: pagination, org-scoped 404 lookups, after-commit work.
 
-The pagination and lookup helpers exist in sync (``Session``) and async (``AsyncSession``)
-variants. Services that paginate or fetch a single org-owned row should use
-these instead of duplicating the count/limit/offset or id+org query pattern.
+Services that paginate or fetch a single org-owned row should use the
+``AsyncSession`` helpers here instead of duplicating the count/limit/offset or
+id+org query pattern.
 """
 
 from collections.abc import Awaitable, Callable, Iterable
@@ -147,11 +147,8 @@ async def acquire_advisory_lock(db: AsyncSession, key: str) -> None:
     ``toctou_risk_baseline.txt`` entries for the cases where it is skipped
     deliberately).
 
-    Async only, on purpose. ``db_utils`` already registers two sync/async
-    twins in ``app/core/sync_async_twin_baseline.txt``; adding an
-    ``acquire_advisory_lock`` / ``_async`` pair here would emit a blocking
-    architecture-lint error. Every one of the 23 call sites this replaces was
-    already async, so there is nothing to serve.
+    Async only, on purpose: a sync/async pair here would emit a blocking
+    architecture-lint error, and every call site is already async.
 
     ``services/auth_service.py`` still passes a literal integer to
     ``pg_advisory_xact_lock`` directly. That one is a fixed magic number for a
@@ -269,21 +266,6 @@ async def paginate_async(  # noqa: UP047
     return list(result.scalars().all()), total
 
 
-def paginate(  # noqa: UP047
-    db: Session,
-    stmt: Select[tuple[T]],
-    *,
-    limit: int = 100,
-    offset: int = 0,
-    count_cap: int | None = None,
-) -> tuple[list[T], int]:
-    """Sync variant of ``paginate_async``."""
-    window = count_window(offset, limit, count_cap) if count_cap else None
-    total = db.scalar(_count_stmt(stmt, window)) or 0
-    result = db.execute(stmt.offset(offset).limit(limit))
-    return list(result.scalars().all()), total
-
-
 def _require_org_id(org_id: UUID | None) -> UUID:
     """Reject a missing organization instead of querying for org-less rows.
 
@@ -327,31 +309,6 @@ async def get_org_owned_or_404_async(  # noqa: UP047
     """
     org_id = _require_org_id(org_id)
     result = await db.execute(
-        select(model_cls).where(
-            model_cls.id == item_id,
-            model_cls.organization_id == org_id,
-        )
-    )
-    obj = result.scalar_one_or_none()
-    if obj is None:
-        raise NotFoundException(
-            resource or _resource_name_from_table(model_cls.__tablename__), lang
-        )
-    return cast(M, obj)
-
-
-def get_org_owned_or_404(  # noqa: UP047
-    db: Session,
-    model_cls: type[M],
-    item_id: UUID,
-    org_id: UUID,
-    *,
-    resource: str | None = None,
-    lang: Language | None = None,
-) -> M:
-    """Sync variant of ``get_org_owned_or_404_async``."""
-    org_id = _require_org_id(org_id)
-    result = db.execute(
         select(model_cls).where(
             model_cls.id == item_id,
             model_cls.organization_id == org_id,

@@ -45,7 +45,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.testing import ModuleTestHelper
 from app.models.organization import Organization
 from app.models.storage_location import StorageLocation
-from app.services.items import get_items as get_items_service
+from app.services.items import get_items_async as get_items_service
 
 pytestmark = pytest.mark.integration
 
@@ -232,14 +232,12 @@ async def _first_page(
     ``sort_order='desc'`` is the direction the list opens with — the
     endpoint's own default, which the service does not assume.
     """
-    return await db.run_sync(
-        lambda session: get_items_service(
-            db=session,
-            user_storage_ids=list(fixture.location_ids),
-            user_organization_id=fixture.org_id,
-            limit=_PAGE,
-            sort_order='desc',
-        )
+    return await get_items_service(
+        db=db,
+        user_storage_ids=list(fixture.location_ids),
+        user_organization_id=fixture.org_id,
+        limit=_PAGE,
+        sort_order='desc',
     )
 
 

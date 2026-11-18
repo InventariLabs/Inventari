@@ -31,7 +31,10 @@ from app.services.analytics.overview import (
     get_health_counts_async,
     get_overview_async,
 )
-from app.services.items._query_get import get_items, get_items_aggregates
+from app.services.items._query_get import (
+    get_items_aggregates_async,
+    get_items_async,
+)
 from tests.integration._shelf import anchor_pending_records
 
 pytestmark = pytest.mark.integration
@@ -175,8 +178,8 @@ class TestTheCountsAreOneComputation:
         counts = await get_health_counts_async(
             real_async_db_session, async_test_user.organization_id
         )
-        _, record_total = await real_async_db_session.run_sync(
-            lambda s: get_items(s, async_test_user, only_low_stock=True)
+        _, record_total = await get_items_async(
+            real_async_db_session, async_test_user, only_low_stock=True
         )
 
         # The list holds a hundred and fifty records of this one product; the
@@ -506,13 +509,11 @@ class TestTheListBehindTheNumber:
         await real_async_db_session.run_sync(anchor_pending_records)
         await real_async_db_session.flush()
 
-        items, total = await real_async_db_session.run_sync(
-            lambda s: get_items(
-                s,
-                async_test_user,
-                needs_attention=True,
-                today=date.today(),
-            )
+        items, total = await get_items_async(
+            real_async_db_session,
+            async_test_user,
+            needs_attention=True,
+            today=date.today(),
         )
         counts = await get_health_counts_async(
             real_async_db_session, async_test_user.organization_id
@@ -582,10 +583,8 @@ class TestTheListBehindTheNumber:
         await db.run_sync(anchor_pending_records)
         await db.flush()
 
-        items, total = await db.run_sync(
-            lambda s: get_items(
-                s, async_test_user, needs_attention=True, today=date.today()
-            )
+        items, total = await get_items_async(
+            db, async_test_user, needs_attention=True, today=date.today()
         )
         counts = await get_health_counts_async(db, org_id)
 
@@ -594,13 +593,11 @@ class TestTheListBehindTheNumber:
         )
         assert total == counts.low_stock == 2
         # The footer under the list counts the same rows.
-        footer = await db.run_sync(
-            lambda s: get_items_aggregates(
-                s,
-                user_organization_id=org_id,
-                needs_attention=True,
-                today=date.today(),
-            )
+        footer = await get_items_aggregates_async(
+            db,
+            user_organization_id=org_id,
+            needs_attention=True,
+            today=date.today(),
         )
         assert footer.count == 2
 
@@ -627,17 +624,13 @@ class TestTheListBehindTheNumber:
         await db.run_sync(anchor_pending_records)
         await db.flush()
 
-        items, total = await db.run_sync(
-            lambda s: get_items(s, async_test_user, only_low_stock=True)
-        )
+        items, total = await get_items_async(db, async_test_user, only_low_stock=True)
         counts = await get_health_counts_async(db, org_id)
         # The footer under the chip counts the same rows: the aggregates keep
         # only_low_stock and take the same used-up branch, so the screen's two
         # halves cannot part on the product the tile counted.
-        footer = await db.run_sync(
-            lambda s: get_items_aggregates(
-                s, user_organization_id=org_id, only_low_stock=True
-            )
+        footer = await get_items_aggregates_async(
+            db, user_organization_id=org_id, only_low_stock=True
         )
 
         assert [i.name for i in items] == [oats.name]

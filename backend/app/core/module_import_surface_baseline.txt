@@ -314,7 +314,6 @@ warehouse | owner=core | expires=2027-06-30 | warehouse documents use core scan,
 webhooks | owner=core | expires=2027-06-30 | delivery uses the core cursor, retry and claim helpers directly; the module predates the SDK.
   app.api.dependencies
   app.config
-  app.core.async_utils
   app.core.context
   app.core.cursor
   app.core.db_claim

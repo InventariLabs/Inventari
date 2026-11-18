@@ -49,7 +49,7 @@ from app.services.audit_service import audit_value
 from app.services.items._query_special import get_product_template_or_404
 from app.services.items._template import (
     find_template_async,
-    update_product_template_nutrition,
+    update_product_template_nutrition_async,
 )
 from app.services.items.low_stock import template_stock_total_async
 from app.services.sku_service import SkuService
@@ -72,18 +72,14 @@ async def update_template_nutrition(
     org_id = require_org(current_user)
     before = await core_api.product_templates.get_async(db, org_id, template_id)
     try:
-        template = await db.run_sync(
-            lambda s: update_product_template_nutrition(
-                s, template_id, org_id, data.nutrition_info
-            )
+        template = await update_product_template_nutrition_async(
+            db, template_id, org_id, data.nutrition_info
         )
     except ValueError as exc:
         raise NotFoundException('product_template') from exc
 
-    # Written here rather than in the service: that one is sync (the caller
-    # hands it a session through ``run_sync``) and the journal writer is
-    # async-only. Nutrition is an edit of a template like any other, and
-    # this is the only path that makes it.
+    # Journalled here, beside the one path that edits nutrition: a nutrition
+    # edit is an edit of a template like any other.
     was = get_template_nutrition(before) if before is not None else None
     now = get_template_nutrition(template)
     if was != now:

@@ -44,7 +44,7 @@ from app.services.items import (
     create_item as create_item_service,
 )
 from app.services.items import (
-    get_items as get_items_service,
+    get_items_async as get_items_service,
 )
 
 router = APIRouter()
@@ -146,37 +146,35 @@ async def get_items(
         else None
     )
 
-    items, total = await db.run_sync(
-        lambda s: get_items_service(
-            db=s,
-            user=current_user,
-            storage_id=location_id,
-            category_id=category_id,
-            context_tag=context_tag,
-            claimed_tags=claimed_tags or None,
-            location_usage=location_usage,
-            include_empty=include_empty,
-            search=search,
-            expiring_days=expiring_days,
-            only_expired=only_expired,
-            only_low_stock=only_low_stock,
-            needs_attention=needs_attention,
-            low_stock_threshold=low_stock_threshold,
-            offset=offset,
-            limit=limit,
-            # The scope is the reader's organization, named rather than
-            # listed location by location: the page is then walked in the
-            # organization's index order instead of read whole and sorted.
-            user_organization_id=current_user.organization_id,
-            sort_by=sort_by,
-            sort_order=sort_order,
-            source_document_id=source_document_id,
-            template_ids=parsed_template_ids or None,
-            today=today,
-            # A large organization's list is not counted to the last row on
-            # every page; the footer's sums carry the exact count.
-            count_cap=LIST_COUNT_CAP,
-        )
+    items, total = await get_items_service(
+        db=db,
+        user=current_user,
+        storage_id=location_id,
+        category_id=category_id,
+        context_tag=context_tag,
+        claimed_tags=claimed_tags or None,
+        location_usage=location_usage,
+        include_empty=include_empty,
+        search=search,
+        expiring_days=expiring_days,
+        only_expired=only_expired,
+        only_low_stock=only_low_stock,
+        needs_attention=needs_attention,
+        low_stock_threshold=low_stock_threshold,
+        offset=offset,
+        limit=limit,
+        # The scope is the reader's organization, named rather than
+        # listed location by location: the page is then walked in the
+        # organization's index order instead of read whole and sorted.
+        user_organization_id=current_user.organization_id,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        source_document_id=source_document_id,
+        template_ids=parsed_template_ids or None,
+        today=today,
+        # A large organization's list is not counted to the last row on
+        # every page; the footer's sums carry the exact count.
+        count_cap=LIST_COUNT_CAP,
     )
 
     return ItemListResponse.from_slice(

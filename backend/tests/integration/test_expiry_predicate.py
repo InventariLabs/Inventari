@@ -19,7 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.exceptions import ContractViolationError
 from app.core.public_api import core_api
 from app.models.item import Item
-from app.services.items._query_get import get_items
+from app.services.items._query_get import get_items_async
 
 pytestmark = pytest.mark.integration
 
@@ -71,13 +71,11 @@ class TestExpiryPredicate:
 
         overview = await core_api.queries.get_overview_async(db, org_id)
 
-        listed, total = await db.run_sync(
-            lambda s: get_items(
-                db=s,
-                organization_id=org_id,
-                only_expired=True,
-                today=today,
-            )
+        listed, total = await get_items_async(
+            db=db,
+            organization_id=org_id,
+            only_expired=True,
+            today=today,
         )
 
         assert overview.expired == 1
@@ -117,13 +115,11 @@ class TestExpiryPredicate:
 
         overview = await core_api.queries.get_overview_async(db, org_id)
 
-        listed, total = await db.run_sync(
-            lambda s: get_items(
-                db=s,
-                organization_id=org_id,
-                expiring_days=7,
-                today=today,
-            )
+        listed, total = await get_items_async(
+            db=db,
+            organization_id=org_id,
+            expiring_days=7,
+            today=today,
         )
 
         assert total == overview.expiring_soon
@@ -171,8 +167,6 @@ class TestExpiryPredicate:
             {'needs_attention': True},
         ):
             with pytest.raises(ContractViolationError):
-                await real_async_db_session.run_sync(
-                    lambda s, filters=filters: get_items(
-                        db=s, organization_id=org_id, **filters
-                    )
+                await get_items_async(
+                    db=real_async_db_session, organization_id=org_id, **filters
                 )

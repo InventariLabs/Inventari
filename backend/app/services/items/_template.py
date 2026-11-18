@@ -13,9 +13,8 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
 
-from app.core.db_utils import get_org_owned_or_404
+from app.core.db_utils import get_org_owned_or_404_async
 from app.core.exceptions import NotFoundException, ServiceRejectionError
 from app.core.money import quantise
 from app.core.product_template_metadata import (
@@ -371,15 +370,15 @@ async def resolve_template_default_async(
     return template, False
 
 
-def update_product_template_nutrition(
-    db: Session,
+async def update_product_template_nutrition_async(
+    db: AsyncSession,
     template_id: UUID,
     org_id: UUID,
     nutrition_info: dict[str, Any] | None,
 ) -> ProductTemplate:
     """Update nutrition_info on a ProductTemplate scoped to the organization."""
 
-    template = get_org_owned_or_404(
+    template = await get_org_owned_or_404_async(
         db,
         ProductTemplate,
         template_id,
@@ -389,6 +388,6 @@ def update_product_template_nutrition(
     )
 
     set_template_nutrition(template, nutrition_info)
-    db.flush()
-    db.refresh(template)
+    await db.flush()
+    await db.refresh(template)
     return template

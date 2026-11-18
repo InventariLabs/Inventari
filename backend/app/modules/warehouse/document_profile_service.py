@@ -17,7 +17,6 @@ from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.async_utils import await_if_awaitable
 from app.core.exceptions import ServiceRejectionError
 from app.core.public_api import core_api
 
@@ -190,16 +189,14 @@ PRESETS: dict[str, dict[str, Any]] = {
 }
 
 
-async def get_profile(db: Any, org_id: UUID) -> DocumentProfile | None:
-    result = await await_if_awaitable(
-        db.execute(
-            select(DocumentProfile).where(DocumentProfile.organization_id == org_id)
-        )
+async def get_profile(db: AsyncSession, org_id: UUID) -> DocumentProfile | None:
+    result = await db.execute(
+        select(DocumentProfile).where(DocumentProfile.organization_id == org_id)
     )
     return cast(DocumentProfile | None, result.scalars().first())
 
 
-async def create_default_profile(db: Any, org_id: UUID) -> DocumentProfile:
+async def create_default_profile(db: AsyncSession, org_id: UUID) -> DocumentProfile:
     """Give the organization the Simple profile, unless somebody just did.
 
     Two first postings of one organization can both find no profile and both
@@ -208,12 +205,10 @@ async def create_default_profile(db: Any, org_id: UUID) -> DocumentProfile:
     ``ON CONFLICT DO NOTHING`` waits for the other transaction's row and
     leaves it alone, and the read after it returns whichever row stands.
     """
-    await await_if_awaitable(
-        db.execute(
-            pg_insert(DocumentProfile)
-            .values(organization_id=org_id, name='Simple', **PRESETS['Simple'])
-            .on_conflict_do_nothing(constraint='uq_document_profile_org')
-        )
+    await db.execute(
+        pg_insert(DocumentProfile)
+        .values(organization_id=org_id, name='Simple', **PRESETS['Simple'])
+        .on_conflict_do_nothing(constraint='uq_document_profile_org')
     )
     profile = await get_profile(db, org_id)
     if profile is None:
@@ -221,7 +216,7 @@ async def create_default_profile(db: Any, org_id: UUID) -> DocumentProfile:
     return profile
 
 
-async def get_or_create_profile(db: Any, org_id: UUID) -> DocumentProfile:
+async def get_or_create_profile(db: AsyncSession, org_id: UUID) -> DocumentProfile:
     profile = await get_profile(db, org_id)
     if not profile:
         profile = await create_default_profile(db, org_id)
@@ -229,7 +224,7 @@ async def get_or_create_profile(db: Any, org_id: UUID) -> DocumentProfile:
 
 
 async def name_quarantine_shelf(
-    db: Any, org_id: UUID, location_id: UUID
+    db: AsyncSession, org_id: UUID, location_id: UUID
 ) -> DocumentProfile:
     """Take *location_id* as the profile's quarantine shelf, if it names none.
 
@@ -300,7 +295,9 @@ async def resolve_partner_tax_id_required(
     return country_requires_partner_tax_id(org.country if org else None)
 
 
-async def apply_preset(db: Any, org_id: UUID, preset_name: str) -> DocumentProfile:
+async def apply_preset(
+    db: AsyncSession, org_id: UUID, preset_name: str
+) -> DocumentProfile:
     if preset_name not in PRESETS:
         raise ServiceRejectionError(
             'document_preset_unknown',
@@ -327,13 +324,13 @@ async def apply_preset(db: Any, org_id: UUID, preset_name: str) -> DocumentProfi
     profile.print_template = preset['print_template']
     profile.default_currency = preset.get('default_currency')
 
-    await await_if_awaitable(db.flush())
-    await await_if_awaitable(db.refresh(profile))
+    await db.flush()
+    await db.refresh(profile)
     return profile
 
 
 async def apply_country_preset(
-    db: Any, org_id: UUID, country: str | None
+    db: AsyncSession, org_id: UUID, country: str | None
 ) -> DocumentProfile | None:
     """Apply the preset of the organization's country, keeping the profile's
     choice of value tracking and tax handling.
@@ -398,7 +395,7 @@ _PRESETTABLE_FIELDS = {
 
 
 async def update_profile(
-    db: Any,
+    db: AsyncSession,
     org_id: UUID,
     data: DocumentProfileUpdate,
 ) -> DocumentProfile:
@@ -420,6 +417,6 @@ async def update_profile(
     for field in provided_fields:
         setattr(profile, field, getattr(data, field))
 
-    await await_if_awaitable(db.flush())
-    await await_if_awaitable(db.refresh(profile))
+    await db.flush()
+    await db.refresh(profile)
     return profile

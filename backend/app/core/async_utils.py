@@ -28,20 +28,3 @@ async def maybe_await(value: Callable[..., Any], *args: Any, **kwargs: Any) -> A
         return await value(*args, **kwargs)
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, lambda: value(*args, **kwargs))
-
-
-async def await_if_awaitable(value: Any) -> Any:
-    """Await *value* if it is awaitable, otherwise return it unchanged.
-
-    Dual-mode helper for services that accept either an ``AsyncSession``
-    or a sync ``Session`` (the ``asyncio.run`` + sync-Session test path):
-    ``db.execute(stmt)`` yields a coroutine on the former and a ready
-    ``Result`` on the latter.
-
-    Distinct from :func:`maybe_await`, which takes a **callable** and
-    dispatches sync/async handlers. This one takes an already-produced
-    **value** — different signature, different contract, don't merge them.
-    """
-    if hasattr(value, '__await__'):
-        return await value
-    return value

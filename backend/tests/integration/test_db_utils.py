@@ -15,9 +15,7 @@ from sqlalchemy.orm import Session
 from app.core.db_utils import (
     after_commit,
     escape_ilike,
-    get_org_owned_or_404,
     get_org_owned_or_404_async,
-    paginate,
     paginate_async,
 )
 from app.core.events import SystemEvent, TenantEventPayload, event_bus
@@ -132,47 +130,30 @@ class TestEscapeIlikeAgainstDatabase:
 
 
 @pytest.mark.integration
-class TestPaginate:
-    """Sync ``paginate`` variant."""
-
-    def test_returns_items_and_total(
-        self, db_session: Session, partner_org: Organization
-    ):
-        _seed_partners(db_session, partner_org.id, count=5)
-
-        items, total = paginate(
-            db_session, _partners_stmt(partner_org.id), limit=2, offset=1
-        )
-
-        assert total == 5
-        assert len(items) == 2
-        assert [p.name for p in items] == ['Partner 1', 'Partner 2']
-
-    def test_total_ignores_preexisting_limit_on_statement(
-        self, db_session: Session, partner_org: Organization
-    ):
-        _seed_partners(db_session, partner_org.id, count=5)
-        stmt = _partners_stmt(partner_org.id).limit(3)
-
-        items, total = paginate(db_session, stmt, limit=2, offset=0)
-
-        assert total == 5
-        assert len(items) == 2
-
-    def test_returns_empty_when_no_rows(
-        self, db_session: Session, partner_org: Organization
-    ):
-        items, total = paginate(
-            db_session, _partners_stmt(partner_org.id), limit=10, offset=0
-        )
-
-        assert items == []
-        assert total == 0
-
-
-@pytest.mark.integration
 class TestPaginateAsync:
-    """Async ``paginate_async`` variant."""
+    """``paginate_async``."""
+
+    @pytest.mark.asyncio
+    async def test_total_ignores_preexisting_limit_on_statement(
+        self, real_async_db_session: AsyncSession, async_partner_org: Organization
+    ):
+        for i in range(5):
+            real_async_db_session.add(
+                Partner(
+                    organization_id=async_partner_org.id,
+                    name=f'Partner {i}',
+                    type='SUPPLIER',
+                )
+            )
+        await real_async_db_session.flush()
+        stmt = _partners_stmt(async_partner_org.id).limit(3)
+
+        items, total = await paginate_async(
+            real_async_db_session, stmt, limit=2, offset=0
+        )
+
+        assert total == 5
+        assert len(items) == 2
 
     @pytest.mark.asyncio
     async def test_returns_items_and_total(
@@ -215,73 +196,21 @@ class TestPaginateAsync:
 
 
 @pytest.mark.integration
-class TestGetOrgOwnedOr404:
-    """Sync ``get_org_owned_or_404`` variant."""
+class TestGetOrgOwnedOr404Async:
+    """``get_org_owned_or_404_async``."""
 
-    def test_returns_row_for_matching_org(
-        self, db_session: Session, partner_org: Organization
-    ):
-        partner = Partner(organization_id=partner_org.id, name='Acme', type='SUPPLIER')
-        db_session.add(partner)
-        db_session.commit()
-
-        result = get_org_owned_or_404(db_session, Partner, partner.id, partner_org.id)
-
-        assert result.id == partner.id
-        assert result.name == 'Acme'
-
-    def test_raises_404_when_id_missing(
-        self, db_session: Session, partner_org: Organization
-    ):
-        with pytest.raises(NotFoundException) as excinfo:
-            get_org_owned_or_404(db_session, Partner, uuid.uuid4(), partner_org.id)
-
-        assert excinfo.value.status_code == 404
-        assert excinfo.value.detail['code'] == 'PARTNER_NOT_FOUND'
-
-    def test_raises_404_when_org_mismatch(
-        self, db_session: Session, partner_org: Organization
-    ):
-        partner = Partner(organization_id=partner_org.id, name='Acme', type='SUPPLIER')
-        other_org = Organization(name='Other Test Org')
-        db_session.add_all([partner, other_org])
-        db_session.commit()
-
-        with pytest.raises(NotFoundException) as excinfo:
-            get_org_owned_or_404(db_session, Partner, partner.id, other_org.id)
-
-        assert excinfo.value.status_code == 404
-
-    def test_irregular_plural_resource_maps_categories_to_category(
-        self, db_session: Session, partner_org: Organization
+    @pytest.mark.asyncio
+    async def test_irregular_plural_resource_maps_categories_to_category(
+        self, real_async_db_session: AsyncSession, async_partner_org: Organization
     ):
         """``categories`` must map to ``category``, not ``categorie``."""
         with pytest.raises(NotFoundException) as excinfo:
-            get_org_owned_or_404(db_session, Category, uuid.uuid4(), partner_org.id)
+            await get_org_owned_or_404_async(
+                real_async_db_session, Category, uuid.uuid4(), async_partner_org.id
+            )
 
         assert excinfo.value.status_code == 404
         assert excinfo.value.detail['code'] == 'CATEGORY_NOT_FOUND'
-
-    def test_without_a_language_the_refusal_speaks_the_requests(
-        self, db_session: Session, partner_org: Organization
-    ):
-        # The helper defaulted to English and passed that on, so every caller
-        # that left the language out answered a Polish reader in English.
-        set_current_lang('pl')
-        try:
-            with pytest.raises(NotFoundException) as excinfo:
-                get_org_owned_or_404(db_session, Partner, uuid.uuid4(), partner_org.id)
-        finally:
-            set_current_lang('en')
-
-        assert excinfo.value.detail['message'] == get_error_message(
-            'partner_not_found', 'pl'
-        )
-
-
-@pytest.mark.integration
-class TestGetOrgOwnedOr404Async:
-    """Async ``get_org_owned_or_404_async`` variant."""
 
     @pytest.mark.asyncio
     async def test_returns_row_for_matching_org(
@@ -353,7 +282,7 @@ class TestGetOrgOwnedRefusesMissingOrg:
 
     ``organization_id == None`` compiles to ``IS NULL``, so a caller that
     lost its tenant on the way here would read system/global rows instead
-    of being turned away. Both tests pass ``db=None``: reaching the session
+    of being turned away. The test passes ``db=None``: reaching the session
     at all would raise ``AttributeError``, so a passing test also proves the
     refusal happens *before* the query is built.
     """
@@ -362,15 +291,6 @@ class TestGetOrgOwnedRefusesMissingOrg:
     async def test_async_refuses_none_org_before_querying(self):
         with pytest.raises(RuntimeError, match='requires an organization id'):
             await get_org_owned_or_404_async(
-                None,
-                Partner,
-                uuid.uuid4(),
-                None,
-            )
-
-    def test_sync_refuses_none_org_before_querying(self):
-        with pytest.raises(RuntimeError, match='requires an organization id'):
-            get_org_owned_or_404(
                 None,
                 Partner,
                 uuid.uuid4(),

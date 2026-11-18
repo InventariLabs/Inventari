@@ -20,7 +20,7 @@ from app.models.item import Item
 from app.models.organization import Organization
 from app.models.product_template import ProductTemplate
 from app.schemas.item import ItemCreate
-from app.services.items import create_item, get_items
+from app.services.items import create_item, get_items_async
 from tests.integration._shelf import anchor_pending_records
 
 
@@ -35,8 +35,8 @@ class TestItemServiceLayer:
         self, real_async_db_session, async_test_item, async_test_user
     ):
         """Test searching items by name."""
-        items, total = await real_async_db_session.run_sync(
-            lambda s: get_items(s, async_test_user, search=async_test_item.name)
+        items, total = await get_items_async(
+            real_async_db_session, async_test_user, search=async_test_item.name
         )
 
         assert len(items) >= 1
@@ -46,8 +46,8 @@ class TestItemServiceLayer:
         self, real_async_db_session, async_test_item, async_test_user
     ):
         """Test searching items by brand."""
-        items, total = await real_async_db_session.run_sync(
-            lambda s: get_items(s, async_test_user, search=async_test_item.brand)
+        items, total = await get_items_async(
+            real_async_db_session, async_test_user, search=async_test_item.brand
         )
 
         assert len(items) >= 1
@@ -57,11 +57,11 @@ class TestItemServiceLayer:
         self, real_async_db_session, async_test_items_batch, async_test_user
     ):
         """Test pagination with skip and limit."""
-        items_page1, total1 = await real_async_db_session.run_sync(
-            lambda s: get_items(s, async_test_user, offset=0, limit=2)
+        items_page1, total1 = await get_items_async(
+            real_async_db_session, async_test_user, offset=0, limit=2
         )
-        items_page2, total2 = await real_async_db_session.run_sync(
-            lambda s: get_items(s, async_test_user, offset=2, limit=2)
+        items_page2, total2 = await get_items_async(
+            real_async_db_session, async_test_user, offset=2, limit=2
         )
 
         assert len(items_page1) <= 2
@@ -72,10 +72,11 @@ class TestItemServiceLayer:
         self, real_async_db_session, async_test_items_batch, async_test_user
     ):
         """Test sorting by expiry date."""
-        items_asc, _ = await real_async_db_session.run_sync(
-            lambda s: get_items(
-                s, async_test_user, sort_by='created_at', sort_order='asc'
-            )
+        items_asc, _ = await get_items_async(
+            real_async_db_session,
+            async_test_user,
+            sort_by='created_at',
+            sort_order='asc',
         )
 
         # Verify ordering
@@ -105,8 +106,8 @@ class TestItemServiceLayer:
         await real_async_db_session.run_sync(anchor_pending_records)
         await real_async_db_session.flush()
 
-        items, total = await real_async_db_session.run_sync(
-            lambda s: get_items(s, async_test_user, only_low_stock=True)
+        items, total = await get_items_async(
+            real_async_db_session, async_test_user, only_low_stock=True
         )
 
         assert any(item.id == low_stock_item.id for item in items)
@@ -115,8 +116,8 @@ class TestItemServiceLayer:
         self, real_async_db_session, async_test_items_batch, async_test_user
     ):
         """Test sorting by name."""
-        items_asc, _ = await real_async_db_session.run_sync(
-            lambda s: get_items(s, async_test_user, sort_by='name', sort_order='asc')
+        items_asc, _ = await get_items_async(
+            real_async_db_session, async_test_user, sort_by='name', sort_order='asc'
         )
 
         if len(items_asc) > 1:
@@ -127,10 +128,11 @@ class TestItemServiceLayer:
         self, real_async_db_session, async_test_items_batch, async_test_user
     ):
         """Test sorting by quantity."""
-        items_desc, _ = await real_async_db_session.run_sync(
-            lambda s: get_items(
-                s, async_test_user, sort_by='quantity', sort_order='desc'
-            )
+        items_desc, _ = await get_items_async(
+            real_async_db_session,
+            async_test_user,
+            sort_by='quantity',
+            sort_order='desc',
         )
 
         if len(items_desc) > 1:
@@ -353,8 +355,8 @@ class TestItemServiceLayer:
         await real_async_db_session.refresh(model)
         assert model.barcode is None
 
-        rows, _total = await real_async_db_session.run_sync(
-            lambda s: get_items(s, async_test_user, search='LAP-0001')
+        rows, _total = await get_items_async(
+            real_async_db_session, async_test_user, search='LAP-0001'
         )
         found = {row.id for row in rows}
         assert first.id in found

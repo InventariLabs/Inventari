@@ -35,7 +35,7 @@ from app.models import Item, ProductTemplate
 from app.models.storage_location import StorageLocation
 from app.models.user import User
 from app.services.analytics.overview import get_overview_async
-from app.services.items._query_get import get_items
+from app.services.items._query_get import get_items_async
 from tests.integration._shelf import anchor_pending_records
 
 SPREAD = [8, 7, 8, 5, 2, 4]  # 34 in total
@@ -133,8 +133,8 @@ class TestStockSplitOverRecordsIsNotAShortage:
             MINIMUM,
         )
 
-        items, _total = await real_async_db_session.run_sync(
-            lambda s: get_items(s, async_test_user, only_low_stock=True)
+        items, _total = await get_items_async(
+            real_async_db_session, async_test_user, only_low_stock=True
         )
 
         assert not [item for item in items if item.template_id == product.id]
@@ -157,8 +157,8 @@ class TestStockSplitOverRecordsIsNotAShortage:
         overview = await get_overview_async(
             real_async_db_session, async_test_user.organization_id
         )
-        items, _total = await real_async_db_session.run_sync(
-            lambda s: get_items(s, async_test_user, only_low_stock=True)
+        items, _total = await get_items_async(
+            real_async_db_session, async_test_user, only_low_stock=True
         )
 
         assert overview.low_stock == 1
@@ -231,8 +231,8 @@ class TestActiveStockOutsideTheShelfSuppressesTheShortage:
         overview = await get_overview_async(
             real_async_db_session, async_test_user.organization_id
         )
-        items, _total = await real_async_db_session.run_sync(
-            lambda s: get_items(s, async_test_user, only_low_stock=True)
+        items, _total = await get_items_async(
+            real_async_db_session, async_test_user, only_low_stock=True
         )
         suggestions = await generate_suggestions(
             real_async_db_session,
@@ -270,8 +270,8 @@ class TestActiveStockOutsideTheShelfSuppressesTheShortage:
         overview = await get_overview_async(
             real_async_db_session, async_test_user.organization_id
         )
-        items, _total = await real_async_db_session.run_sync(
-            lambda s: get_items(s, async_test_user, only_low_stock=True)
+        items, _total = await get_items_async(
+            real_async_db_session, async_test_user, only_low_stock=True
         )
         suggestions = await generate_suggestions(
             real_async_db_session,

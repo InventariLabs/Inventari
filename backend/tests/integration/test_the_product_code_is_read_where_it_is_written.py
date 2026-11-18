@@ -18,13 +18,12 @@ from decimal import Decimal
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
 
 from app.models.item import Item
 from app.models.product_template import ProductTemplate
 from app.models.storage_location import LocationUsage, StorageLocation
 from app.services.items._list import search_by_org_async
-from app.services.items._query_get import get_items
+from app.services.items._query_get import get_items_async
 from tests.integration._shelf import anchor_pending_records
 
 pytestmark = pytest.mark.integration
@@ -102,29 +101,24 @@ class TestTheCodeIsFoundOnEitherCarrier:
         assert items[0].name == 'Jednorazówka'
 
 
+@pytest.mark.asyncio
 class TestTheFilteredListAnswersTheSame:
     """Two entry points, one answer: the items list and the search box must
     not disagree about what a product code finds."""
 
-    def test_the_items_list_finds_a_code_on_the_template(
-        self, db_session: Session, test_user
+    async def test_the_items_list_finds_a_code_on_the_template(
+        self, real_async_db_session: AsyncSession, async_test_user
     ) -> None:
-        org_id = test_user.organization_id
+        db = real_async_db_session
+        org_id = async_test_user.organization_id
         barcode = _barcode()
         template = ProductTemplate(
             organization_id=org_id, name='Herbata', barcode=barcode
         )
-        db_session.add(template)
-        db_session.flush()
-        location = StorageLocation(
-            organization_id=org_id,
-            created_by=test_user.id,
-            name='Main Warehouse',
-            usage=LocationUsage.INTERNAL,
-        )
-        db_session.add(location)
-        db_session.flush()
-        db_session.add(
+        db.add(template)
+        await db.flush()
+        location = await _location_async(db, org_id, async_test_user.id)
+        db.add(
             Item(
                 organization_id=org_id,
                 storage_location_id=location.id,
@@ -133,10 +127,10 @@ class TestTheFilteredListAnswersTheSame:
                 template_id=template.id,
             )
         )
-        anchor_pending_records(db_session)
-        db_session.commit()
+        await db.run_sync(anchor_pending_records)
+        await db.commit()
 
-        items, total = get_items(db_session, organization_id=org_id, search=barcode)
+        items, total = await get_items_async(db, organization_id=org_id, search=barcode)
 
         assert total == 1
         assert items[0].name == 'Herbata'

@@ -4,7 +4,7 @@ from uuid import UUID
 
 from sqlalchemy import exists, func, literal, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.elements import ColumnElement
 
 from app.core.db_utils import acquire_advisory_lock, in_ids
@@ -84,18 +84,18 @@ async def locations_holding_stock_async(
     return set(rows.all())
 
 
-def get_organization_storage_ids(
-    db: Session, organization_id: UUID | None
+async def get_organization_storage_ids_async(
+    db: AsyncSession, organization_id: UUID | None
 ) -> list[UUID]:
-    """Sync helper: all storage location IDs for a given organization."""
+    """All storage location IDs for a given organization."""
     if organization_id is None:
         return []
-    storages = db.scalars(
+    storages = await db.scalars(
         select(StorageLocation.id).where(
             StorageLocation.organization_id == organization_id
         )
-    ).all()
-    return list(storages)
+    )
+    return list(storages.all())
 
 
 async def get_storage_with_type_async(

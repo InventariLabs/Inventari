@@ -26,11 +26,11 @@ from sqlalchemy import (
     true,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session, aliased, lazyload, selectinload
+from sqlalchemy.orm import aliased, lazyload, selectinload
 from sqlalchemy.sql.selectable import Subquery
 
 from app.core.contracts import UserContextDTO
-from app.core.db_utils import in_ids, paginate
+from app.core.db_utils import in_ids, paginate_async
 from app.core.exceptions import ContractViolationError, NotFoundException
 from app.core.read_scope import keep_loaded
 from app.core.txn_memo import records_locked
@@ -51,7 +51,7 @@ from app.services.items.weight import (
     REFERENCE_UNITS_PER_STORED_UNIT,
     VOLUME_UOM_CATEGORY,
 )
-from app.services.storage._queries import get_organization_storage_ids
+from app.services.storage._queries import get_organization_storage_ids_async
 
 from ._loaded import give_the_card_and_category
 from ._search_terms import item_matches_text
@@ -328,8 +328,8 @@ async def count_needing_attention_async(
     return await db.scalar(query) or 0
 
 
-def get_items(
-    db: Session,
+async def get_items_async(
+    db: AsyncSession,
     user: UserContextDTO | None = None,
     storage_id: UUID | None = None,
     category_id: UUID | None = None,
@@ -367,10 +367,10 @@ def get_items(
 
     Text search uses ILIKE across ``name``, ``brand``, ``barcode``, ``label_code``.
 
-    *today* is the organization's own day, resolved by the async caller
-    (the sync body has no org clock to ask) — expiry filters cut on it.
+    *today* is the organization's own day, resolved by the caller — expiry
+    filters cut on it.
 
-    *count_cap* stops the count there (``db_utils.paginate``); the caller
+    *count_cap* stops the count there (``db_utils.paginate_async``); the caller
     hands the same cap to ``from_slice``.
     """
     if (
@@ -379,7 +379,9 @@ def get_items(
         and user_organization_id is None
     ):
         if user and user.organization_id:
-            user_storage_ids = get_organization_storage_ids(db, user.organization_id)
+            user_storage_ids = await get_organization_storage_ids_async(
+                db, user.organization_id
+            )
         else:
             user_storage_ids = []
     # The organization a whole-product question has to be asked about. The
@@ -399,7 +401,9 @@ def get_items(
         # every record of the organization ran twice per page.
         from app.services.items.low_stock import low_stock_template_ids
 
-        short = set(db.scalars(low_stock_template_ids(scope_organization_id)).all())
+        short = set(
+            (await db.scalars(low_stock_template_ids(scope_organization_id))).all()
+        )
         template_ids = (
             [tid for tid in template_ids if tid in short]
             if template_ids
@@ -484,7 +488,9 @@ def get_items(
         ordering = ordering.nullslast()
     query = query.order_by(ordering)
 
-    return paginate(db, query, limit=limit, offset=offset, count_cap=count_cap)
+    return await paginate_async(
+        db, query, limit=limit, offset=offset, count_cap=count_cap
+    )
 
 
 @dataclass(frozen=True)
@@ -503,7 +509,7 @@ class ItemTotals:
     total_volume: float
     #: None when a filter narrowed the set and the organization prices from
     #: the cost ledger: the ledger has no value for a slice (see
-    #: ``get_items_aggregates``), and the footer says so instead.
+    #: ``get_items_aggregates_async``), and the footer says so instead.
     total_value: float | None
     value_source: str
     unpriced_count: int
@@ -520,8 +526,8 @@ class ItemTotals:
     excludes_unlisted_layers: bool = False
 
 
-def get_items_aggregates(
-    db: Session,
+async def get_items_aggregates_async(
+    db: AsyncSession,
     *,
     user_storage_ids: list[UUID] | None = None,
     user_organization_id: UUID | None = None,
@@ -733,8 +739,8 @@ def get_items_aggregates(
         ).select_from(sums.join(valued, true()))
 
     count, product_count, total_weight, total_volume, total_value, unpriced = (
-        db.execute(query).one()
-    )
+        await db.execute(query)
+    ).one()
     if has_layers and filtered:
         source = VALUE_NOT_AVAILABLE_UNDER_FILTER
         unpriced = 0
@@ -769,7 +775,7 @@ def get_items_aggregates(
             template_ids=template_ids,
             today=today,
         ).where(~unclaimed_by_a_module(claimed_tags))
-        excludes_module_items = (db.execute(rejected).scalar() or 0) > 0
+        excludes_module_items = ((await db.execute(rejected)).scalar() or 0) > 0
 
     # The other half of the same question: the footer clamps each product
     # to the cards this list can see, so an open layer whose product has no
@@ -831,7 +837,7 @@ def get_items_aggregates(
                 StockValuationLayer.organization_id.in_(reader_orgs)
             )
         unlisted = select(func.count()).select_from(unlisted_layers.limit(1).subquery())
-        excludes_unlisted_layers = (db.execute(unlisted).scalar() or 0) > 0
+        excludes_unlisted_layers = ((await db.execute(unlisted)).scalar() or 0) > 0
 
     return ItemTotals(
         count=int(count),
@@ -849,7 +855,7 @@ def get_items_aggregates(
 def _weight_and_volume(groups: Any) -> tuple[Any, Any, Any]:
     """The kilograms and the litres of the record groups, and what to join.
 
-    Weight is the ADR-015 line weight (see ``get_items_aggregates``); a
+    Weight is the ADR-015 line weight (see ``get_items_aggregates_async``); a
     group carries its quantity, its product and its unit, so the factors
     are applied to the group as they were to each record of it.
     """
@@ -903,7 +909,7 @@ def _ledger_value(
     """The ledger's value of the record groups, and the records it cannot price.
 
     Per product, the smaller of the cards in scope and the layers on hand,
-    at the layers' average rate (see ``get_items_aggregates``); a record
+    at the layers' average rate (see ``get_items_aggregates_async``); a record
     whose product has no rate is counted as unpriced.
     """
     rates = _layer_average_rates(org_currency, organization_id)
