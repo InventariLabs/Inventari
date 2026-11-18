@@ -190,6 +190,39 @@ describe("WmsReceivingView on a phone", () => {
     ).toBeInTheDocument();
   });
 
+  it("wraps a product name without spaces on the card and in the held list", async () => {
+    // overflow-wrap needs the class on the text's own element: the card
+    // would otherwise grow past a 390 px screen and scroll the sheet.
+    const name =
+      "Supercalifragilisticexpialidociousproductnamewithoutspaces123456";
+    serveDocument();
+    server.use(
+      http.post(`${BASE}/start`, () =>
+        HttpResponse.json(
+          session([
+            line("held", `${name}-held`, {
+              status: "short",
+              expected_quantity: 12,
+              received_quantity: 10,
+              held_quantity: 2,
+              discrepancy_code: "DAMAGE",
+            }),
+            line("open", `${name}-open`),
+          ]),
+        ),
+      ),
+    );
+
+    render(<WmsReceivingView documentId={DOC} onClose={vi.fn()} />);
+
+    const card = await screen.findByRole("region", { name: `${name}-open` });
+    const heading = within(card).getByRole("heading", { name: `${name}-open` });
+    expect(heading).toHaveClass("[overflow-wrap:anywhere]");
+    const held = screen.getByText(`${name}-held`);
+    expect(held).toHaveClass("[overflow-wrap:anywhere]");
+    expect(held).not.toHaveClass("truncate");
+  });
+
   it("records the count set with the buttons as the line's total and moves to the next item", async () => {
     serveDocument();
     let body: Record<string, unknown> | null = null;

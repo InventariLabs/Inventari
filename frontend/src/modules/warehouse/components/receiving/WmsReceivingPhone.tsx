@@ -598,7 +598,7 @@ export default function WmsReceivingPhone({
                     {t("receiving.phone.scanned")}
                   </p>
                 )}
-                <h3 className="text-xl font-semibold text-on">
+                <h3 className="text-xl font-semibold text-on [overflow-wrap:anywhere]">
                   {line.product_name}
                 </h3>
                 <p className="text-sm text-on-secondary">
@@ -662,7 +662,9 @@ export default function WmsReceivingPhone({
             {heldLines.map((ln) => (
               <li key={ln.id}>
                 <p className="flex justify-between gap-x-3 text-sm font-medium text-on">
-                  <span className="min-w-0 truncate">{ln.product_name}</span>
+                  <span className="min-w-0 [overflow-wrap:anywhere]">
+                    {ln.product_name}
+                  </span>
                   <span className="shrink-0 text-xs text-on-secondary">
                     {formatQuantityValue(ln.received_quantity)}/
                     {formatQuantityValue(ln.expected_quantity)}{" "}

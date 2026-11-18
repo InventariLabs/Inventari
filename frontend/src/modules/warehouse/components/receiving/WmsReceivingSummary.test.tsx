@@ -58,6 +58,18 @@ function renderSummary(rows: WmsReceiveLine[] = lines) {
   );
 }
 
+describe("a product name without spaces", () => {
+  it("wraps in the summary instead of being cut", () => {
+    const name =
+      "Supercalifragilisticexpialidociousproductnamewithoutspaces123456";
+    renderSummary([{ ...lines[0], product_name: name }]);
+
+    const el = screen.getByText(name);
+    expect(el).toHaveClass("[overflow-wrap:anywhere]");
+    expect(el).not.toHaveClass("truncate");
+  });
+});
+
 describe("WmsReceivingSummary — the list accounts for every expected unit", () => {
   it("keeps the skipped line on the list the claim is filed from", () => {
     renderSummary();
