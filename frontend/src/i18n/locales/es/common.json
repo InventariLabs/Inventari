@@ -714,7 +714,9 @@
         "production_run": "Orden de producción",
         "production_run_reversed": "Orden de producción revertida",
         "package_opened": "Envase abierto",
-        "circuit_breaker": "Desactivado por el fusible tras fallos de entrega repetidos"
+        "circuit_breaker": "Desactivado por el fusible tras fallos de entrega repetidos",
+        "workflow deactivated": "Flujo desactivado",
+        "workflow deleted": "Flujo eliminado"
       },
       "targetTypes": {
         "item": "Producto",

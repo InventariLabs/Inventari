@@ -1981,6 +1981,38 @@ describe("AuditLogPage — the breaker's rows name their actor", () => {
     expect(screen.queryByText("circuit_breaker")).not.toBeInTheDocument();
   });
 
+  it("translates the reason a workflow release records, in Polish", async () => {
+    await withLanguage("pl", async () => {
+      stubAudit(
+        {
+          ...BREAKER_ENTRY,
+          id: "e6",
+          target_type: "approval_request",
+          reason: "workflow deactivated",
+          meta_data: null,
+        },
+        {
+          ...BREAKER_ENTRY,
+          id: "e7",
+          target_type: "approval_request",
+          reason: "workflow deleted",
+          meta_data: null,
+        },
+      );
+      renderPage();
+
+      expect(
+        (await screen.findAllByText("Przepływ wyłączony")).length,
+      ).toBeGreaterThanOrEqual(1);
+      expect(
+        screen.getAllByText("Przepływ usunięty").length,
+      ).toBeGreaterThanOrEqual(1);
+      expect(
+        screen.queryByText("workflow deactivated"),
+      ).not.toBeInTheDocument();
+    });
+  });
+
   it("reads a reactivation as an answer to the cut-off, in Polish", async () => {
     await withLanguage("pl", async () => {
       stubAudit(REACTIVATION_ENTRY);
