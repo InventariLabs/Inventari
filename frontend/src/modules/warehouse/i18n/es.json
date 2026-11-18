@@ -1516,6 +1516,7 @@
     "sectionTitle": "Costes que no llegaron a ningún producto",
     "sectionSubtitle": "Un coste que llega después de contabilizar la entrada no se puede repartir entre la mercancía: parte puede haber salido ya. Regístralo aquí: se guarda con su motivo, aparece en la lista y nunca pasa a formar parte del valor del stock.",
     "reasonLabel": "Motivo",
+    "dayLabel": "Día al que corresponde",
     "record": "Registrar como desviación",
     "addFailed": "No se pudo registrar la desviación.",
     "removeLabel": "Quitar esta desviación",

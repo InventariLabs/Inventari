@@ -171,6 +171,27 @@ describe("WmsReceivingView", () => {
     ).toBeInTheDocument();
   });
 
+  it("wraps a product name without spaces in the line under the scan field", async () => {
+    const name =
+      "Supercalifragilisticexpialidociousproductnamewithoutspaces123456";
+    const base = buildSession();
+    server.use(
+      http.post(START_PATH, () =>
+        HttpResponse.json({
+          ...base,
+          lines: [{ ...base.lines[0], product_name: name }],
+        }),
+      ),
+    );
+
+    render(<WmsReceivingView documentId={DOCUMENT_ID} onClose={vi.fn()} />);
+
+    const next = await screen.findByText(new RegExp(`^${name} — 5 pcs\\.`), {
+      selector: "p",
+    });
+    expect(next).toHaveClass("[overflow-wrap:anywhere]");
+  });
+
   it("closes with a 44 px target, not the compact 32 px one", async () => {
     server.use(http.post(START_PATH, () => HttpResponse.json(buildSession())));
 

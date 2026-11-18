@@ -1516,6 +1516,7 @@
     "sectionTitle": "Coûts qui n'ont atteint aucun produit",
     "sectionSubtitle": "Un coût qui arrive après la comptabilisation de la réception ne peut plus être réparti sur la marchandise : une partie peut déjà être partie. Enregistrez-le ici : il est conservé avec son motif, listé, et n'entre jamais dans la valeur du stock.",
     "reasonLabel": "Motif",
+    "dayLabel": "Jour concerné",
     "record": "Enregistrer comme écart",
     "addFailed": "L'écart n'a pas pu être enregistré.",
     "removeLabel": "Supprimer cet écart",
