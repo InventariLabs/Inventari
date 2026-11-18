@@ -1209,6 +1209,7 @@
     "nextPage": "Próxima página",
     "editNamed": "Editar {{name}}",
     "deleteNamed": "Excluir {{name}}",
+    "archiveNamed": "Arquivar {{name}}",
     "cloneNamed": "Duplicar {{name}}",
     "closeToast": "Fechar notificação",
     "toastsRegion": "Notificações"

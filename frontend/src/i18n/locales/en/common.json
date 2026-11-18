@@ -1256,6 +1256,7 @@
     "nextPage": "Next page",
     "editNamed": "Edit {{name}}",
     "deleteNamed": "Delete {{name}}",
+    "archiveNamed": "Archive {{name}}",
     "cloneNamed": "Clone {{name}}",
     "closeToast": "Close notification",
     "toastsRegion": "Notifications"

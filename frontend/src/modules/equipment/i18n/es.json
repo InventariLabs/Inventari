@@ -562,6 +562,7 @@
     "updateFailed": "Error al actualizar la ubicación",
     "deleted": "Ubicación eliminada",
     "deleteFailed": "Error al eliminar la ubicación",
+    "archiveConfirm": "La ubicación dejará de aparecer en listas y selectores.",
     "deleteTitle": "Eliminar ubicación",
     "confirmDelete": "¿Eliminar ubicación \"{{name}}\"?",
     "parent": "Ubicación superior",

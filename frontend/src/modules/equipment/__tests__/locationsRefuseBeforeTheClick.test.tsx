@@ -342,3 +342,129 @@ describe("the count on a scoped row", () => {
     expect(refused).toBeDisabled();
   });
 });
+
+describe("archiving the place the delete will refuse", () => {
+  // A place an asset was checked out to and returned from holds no record, so
+  // its row shows no count and Delete is live — and the server refuses the
+  // delete and names archiving as the way out. The row has to carry that verb.
+  const ARCHIVE_LOCATIONS = [
+    {
+      ...base,
+      id: "loc-history",
+      name: "Review Room",
+      context_tag: "equipment",
+      items_count: 0,
+      total_items_count: 0,
+      direct_children_count: 2,
+    },
+    {
+      ...base,
+      id: "loc-parent",
+      name: "Floor Two",
+      context_tag: "equipment",
+      items_count: 0,
+      total_items_count: 0,
+      total_subtree_items_count: 3,
+    },
+    {
+      ...base,
+      id: "loc-busy",
+      name: "Desk 14",
+      context_tag: "equipment",
+      items_count: 1,
+      total_items_count: 1,
+    },
+  ] as unknown as StorageLocationSummary[];
+
+  let archived: string[];
+
+  beforeEach(() => {
+    archived = [];
+    server.resetHandlers();
+    server.use(
+      http.get("/api/v1/locations", () =>
+        HttpResponse.json(onePage(ARCHIVE_LOCATIONS)),
+      ),
+      http.post("/api/v1/locations/:id/archive", ({ params }) => {
+        archived.push(String(params.id));
+        return HttpResponse.json({ id: params.id });
+      }),
+    );
+  });
+
+  it("archives a place that holds nothing, after asking", async () => {
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText("Review Room")).toBeInTheDocument();
+    });
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Archive Review Room" }),
+    );
+    expect(archived).toEqual([]);
+    fireEvent.click(await screen.findByRole("button", { name: "Archive" }));
+
+    await waitFor(() => expect(archived).toEqual(["loc-history"]));
+  });
+
+  it("offers no archive over a place with records below it", async () => {
+    // Archiving relocates the whole subtree's records and the server refuses
+    // without a target, so the verb is not offered where it would be refused.
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText("Floor Two")).toBeInTheDocument();
+    });
+
+    expect(
+      screen.queryByRole("button", { name: "Archive Floor Two" }),
+    ).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Archive Review Room" }),
+    ).toBeEnabled();
+  });
+
+  it("offers no archive over a place that still holds a record", async () => {
+    // Archiving such a place needs a target for what stands in it; the row's
+    // answer is the one it already gives: move it first.
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText("Desk 14")).toBeInTheDocument();
+    });
+
+    expect(
+      screen.queryByRole("button", { name: "Archive Desk 14" }),
+    ).toBeNull();
+  });
+
+  it("asks without the stock wording, and says what happens to the places inside", async () => {
+    // "Products are not deleted" is the core sentence for a place that holds
+    // some; nothing stands here. The places inside it are left where they are.
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText("Review Room")).toBeInTheDocument();
+    });
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Archive Review Room" }),
+    );
+
+    expect(
+      await screen.findByText(/The 2 locations inside it are not archived/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Products are not deleted/)).toBeNull();
+  });
+
+  it("leads to the archived places, carrying the module", async () => {
+    // Places made here are tagged for the module, which the inventory list of
+    // archived places hides unless the organization shows module data: the
+    // dialog promises a way back, so the screen has to carry the door.
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText("Review Room")).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByRole("link", { name: "Archived locations" }),
+    ).toHaveAttribute("href", "/inventory/locations/archived?module=equipment");
+  });
+});

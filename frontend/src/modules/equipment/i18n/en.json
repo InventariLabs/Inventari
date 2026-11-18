@@ -555,6 +555,7 @@
     "updateFailed": "Failed to update location",
     "deleted": "Location deleted",
     "deleteFailed": "Failed to delete location",
+    "archiveConfirm": "This will hide the location from lists and pickers.",
     "deleteTitle": "Delete location",
     "confirmDelete": "Delete location \"{{name}}\"?",
     "parent": "Parent location",

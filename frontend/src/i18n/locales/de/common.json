@@ -1256,6 +1256,7 @@
     "nextPage": "Nächste Seite",
     "editNamed": "{{name}} bearbeiten",
     "deleteNamed": "{{name}} löschen",
+    "archiveNamed": "{{name}} archivieren",
     "cloneNamed": "{{name}} duplizieren",
     "closeToast": "Benachrichtigung schließen",
     "toastsRegion": "Benachrichtigungen"

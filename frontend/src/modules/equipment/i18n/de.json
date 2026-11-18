@@ -555,6 +555,7 @@
     "updateFailed": "Fehler beim Aktualisieren des Lagerorts",
     "deleted": "Lagerort gelöscht",
     "deleteFailed": "Fehler beim Löschen des Lagerorts",
+    "archiveConfirm": "Der Lagerort wird in Listen und Auswahlfeldern ausgeblendet.",
     "deleteTitle": "Lagerort löschen",
     "confirmDelete": "Lagerort \"{{name}}\" löschen?",
     "parent": "Übergeordneter Lagerort",

@@ -33,6 +33,18 @@ export function useDeleteStorage(errorFallback?: string) {
   );
 }
 
+/** Archiving a place that holds nothing: the way out when a delete is refused
+ * because the place is part of an asset's history. */
+export function useArchiveStorage(errorFallback?: string) {
+  return useAppMutation(
+    (storageId: string) => storagesApi.archive(storageId),
+    (qc, _data, storageId) => {
+      invalidation.storages(qc, storageId);
+    },
+    { errorFallback },
+  );
+}
+
 export function useCreateStorageHierarchy(errorFallback?: string) {
   return useAppMutation(
     (data: Parameters<typeof storagesApi.createHierarchy>[0]) =>
