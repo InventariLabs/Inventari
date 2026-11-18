@@ -536,6 +536,7 @@ class ErrorMessages(TypedDict):
     document_correction_not_duplicable: str
     field_cannot_be_cleared: str
     ingredient_defaults_unreadable_file: str
+    ingredient_default_name_has_no_key: str
     onboarding_modules_not_offered: str
     location_chain_step_incomplete: str
     current_password_incorrect: str

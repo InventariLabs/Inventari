@@ -761,6 +761,24 @@ class TestIngredientDefaultsRouter:
 
         assert r.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT, r.text
 
+    @pytest.mark.parametrize('name', ['\u200b', '\ufeff', ' \u200b '])
+    def test_create_refuses_a_name_whose_key_is_empty(
+        self, client: TestClient, auth_headers: dict[str, str], name: str
+    ) -> None:
+        """A name of only invisible characters is still a blank name.
+
+        ``strip`` removes whitespace but keeps a zero-width space or a BOM,
+        and the ASCII fold turns both into '': the row would be filed under
+        the empty key every nameless row shares.
+        """
+        r = client.post(
+            f'{RECIPE_URL}/ingredient-defaults',
+            json={'name': name, 'lang': 'en', 'calories_kcal': '100'},
+            headers=auth_headers,
+        )
+
+        assert r.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT, r.text
+
     def test_create_refuses_a_name_the_column_cannot_hold(
         self, client: TestClient, auth_headers: dict[str, str]
     ) -> None:
@@ -795,6 +813,56 @@ class TestIngredientDefaultsRouter:
             headers=auth_headers,
         ).json()
         assert all(item['name'].strip() for item in listing['items'])
+
+    def test_import_counts_a_name_whose_key_is_empty(
+        self, client: TestClient, auth_headers: dict[str, str]
+    ) -> None:
+        """An invisible-only name is a row error, not an empty key."""
+        from io import BytesIO
+
+        payload = 'name,calories_kcal\n\u200b,100\nRye,330\n'.encode()
+        r = client.post(
+            f'{RECIPE_URL}/ingredient-defaults/import',
+            files={'file': ('defaults.csv', BytesIO(payload), 'text/csv')},
+            headers=auth_headers,
+        )
+
+        assert r.status_code == status.HTTP_200_OK, r.text
+        assert r.json()['created'] == 1
+        assert r.json()['errors'] == 1
+        listing = client.get(
+            f'{RECIPE_URL}/ingredient-defaults',
+            params={'lang': 'en'},
+            headers=auth_headers,
+        ).json()
+        assert all(item['name_normalized'] for item in listing['items'])
+
+    def test_import_reads_a_csv_saved_with_a_utf8_bom(
+        self, client: TestClient, auth_headers: dict[str, str]
+    ) -> None:
+        """Excel's 'CSV UTF-8' opens the file with a BOM.
+
+        Decoding it as plain UTF-8 leaves the mark in the first header
+        (``'\\ufeffname'``), so every row lacks 'name' and the whole file is
+        refused as unreadable.
+        """
+        from io import BytesIO
+
+        payload = b'\xef\xbb\xbfname,calories_kcal\nBarley,350\n'
+        r = client.post(
+            f'{RECIPE_URL}/ingredient-defaults/import',
+            files={'file': ('defaults.csv', BytesIO(payload), 'text/csv')},
+            headers=auth_headers,
+        )
+
+        assert r.status_code == status.HTTP_200_OK, r.text
+        assert r.json()['created'] == 1
+        lookup = client.get(
+            f'{RECIPE_URL}/ingredient-defaults/lookup',
+            params={'name': 'Barley', 'lang': 'en'},
+            headers=auth_headers,
+        ).json()
+        assert lookup['found'] is True
 
     def test_import_counts_a_name_the_column_cannot_hold(
         self, client: TestClient, auth_headers: dict[str, str]
