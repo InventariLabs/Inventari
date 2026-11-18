@@ -2,9 +2,9 @@
  * A delivery cost that reached no product — recorded, listed, never valued.
  *
  * A freight bill that arrives after the receipt is posted cannot be spread
- * over the goods: some of them may be gone. The refusal used to end there;
- * here the same amount is kept with its reason and the day it belongs to, and
- * the section says in so many words that the stock value does not move.
+ * over the goods: some of them may be gone. The amount is kept here with its
+ * reason and the day it belongs to, and the section says in so many words
+ * that the stock value does not move.
  */
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
