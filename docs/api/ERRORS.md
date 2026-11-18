@@ -349,7 +349,7 @@ apart.
 | `DOCUMENT_UNIT_PRICE_REQUIRED` | Every line needs a unit price — missing on lines {lines} |
 | `DOCUMENT_UPDATE_STATUS` | Only DRAFT documents can be updated |
 | `DOCUMENT_ZONE_SPLIT_NEEDS_STOCK_UNIT` | The line for "{item_name}" is written in a unit other than the product's stock unit and cannot be split over several shelves — write it in the stock unit, or take it from one shelf |
-| `EQUIPMENT_ASSIGNMENT_ALREADY_ACTIVE` | Item already has an active assignment |
+| `EQUIPMENT_ASSIGNMENT_ALREADY_ACTIVE` | Asset already has an active assignment |
 | `EQUIPMENT_ASSIGNMENT_NEEDS_PERSON_OR_LOCATION` | Name the person receiving the asset or the location it is deployed to, not both |
 | `EQUIPMENT_BULK_ITEM_FAILED` | This asset could not be changed. |
 | `EQUIPMENT_CANNOT_CHECKOUT_IN_MAINTENANCE` | Cannot check out an asset that is in maintenance; set it to Available first |

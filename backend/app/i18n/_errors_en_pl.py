@@ -515,7 +515,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'equipment_cannot_checkout_in_maintenance': 'Cannot check out an asset that is in maintenance; set it to Available first',
         'equipment_assignment_needs_person_or_location': 'Name the person receiving the asset or the location it is deployed to, not both',
         'equipment_bulk_scope_too_large': '{matched} assets match the filters; one action can cover at most {limit}. Narrow the filters.',
-        'equipment_assignment_already_active': 'Item already has an active assignment',
+        'equipment_assignment_already_active': 'Asset already has an active assignment',
         'equipment_assignment_already_checked_in': 'Assignment already checked in',
         'api_key_cannot_manage': 'API keys cannot manage other API keys',
         'api_key_cannot_create': 'API keys cannot create other API keys',
