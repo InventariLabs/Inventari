@@ -13,14 +13,17 @@ import { hasHistoryToPop } from "@/module-sdk";
  *
  * `&at=expiry` opens the dialog at the expiry date. It belongs to the link that
  * carried it: the next product opened from the list starts at the top.
+ *
+ * The address is written through the list's own queue (`writeParams` of
+ * `useFilteredList`), so a chip tapped and a product opened in the same
+ * moment both stay in it.
  */
-export function useOpenProductParam(): [
-  string | null,
-  (id: string | null) => void,
-] {
+export function useOpenProductParam(
+  writeParams: (edit: (next: URLSearchParams) => void) => void,
+): [string | null, (id: string | null) => void] {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [openId, setOpenId] = useState<string | null>(() =>
     searchParams.get("open"),
   );
@@ -37,13 +40,13 @@ export function useOpenProductParam(): [
         return;
       }
       setOpenId(id);
-      const next = new URLSearchParams(searchParams);
-      next.delete("at");
-      if (id) next.set("open", id);
-      else next.delete("open");
-      setSearchParams(next, { replace: true });
+      writeParams((next) => {
+        next.delete("at");
+        if (id) next.set("open", id);
+        else next.delete("open");
+      });
     },
-    [navigate, searchParams, setSearchParams],
+    [navigate, writeParams],
   );
 
   return [openId, setOpen];

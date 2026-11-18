@@ -182,16 +182,6 @@ export default function ItemsPage() {
   );
   const [searchParams] = useSearchParams();
 
-  const [editingItemId, setEditingItemId] = useOpenProductParam();
-
-  // A product's name opens the product dialog, the pencil's own — on the
-  // desktop table and on a phone card alike. It used to open a quick-action
-  // sheet first, a step no visitor expects from a name.
-  const openProduct = useCallback(
-    (item: Item) => setEditingItemId(item.id),
-    [setEditingItemId],
-  );
-
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
   // Selection mode is a property of the list, so its trigger lives in the
   // header sheet — not on a single card. Below 1024px there is no
@@ -215,6 +205,18 @@ export default function ItemsPage() {
   const [deleteReasonItem, setDeleteReasonItem] = useState<Item | null>(null);
 
   const filters = useItemFilters();
+
+  const [editingItemId, setEditingItemId] = useOpenProductParam(
+    filters.writeParams,
+  );
+
+  // A product's name opens the product dialog, the pencil's own — on the
+  // desktop table and on a phone card alike. It used to open a quick-action
+  // sheet first, a step no visitor expects from a name.
+  const openProduct = useCallback(
+    (item: Item) => setEditingItemId(item.id),
+    [setEditingItemId],
+  );
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
   // The one expiry decision, the same one the statistics screens read.
   const tracksExpiry = useTracksExpiry();
@@ -298,14 +300,6 @@ export default function ItemsPage() {
   const exitSelectionMode = useCallback(() => {
     setSelectionMode(false);
     setSelectedItemIds([]);
-  }, []);
-
-  const handleSelectAll = useCallback((ids: string[]) => {
-    setSelectedItemIds(ids);
-  }, []);
-
-  const handleSetThreshold = useCallback((item: Item) => {
-    setThresholdItem(item);
   }, []);
 
   const handlePrevPage = useCallback(() => {
@@ -575,8 +569,8 @@ export default function ItemsPage() {
         onDelete={handleDelete}
         onSwipeDelete={handleSwipeDelete}
         onToggleSelect={handleToggleSelect}
-        onSelectAll={handleSelectAll}
-        onSetThreshold={handleSetThreshold}
+        onSelectAll={setSelectedItemIds}
+        onSetThreshold={setThresholdItem}
         onRefetch={refetch}
         onPrevPage={handlePrevPage}
         onNextPage={handleNextPage}
