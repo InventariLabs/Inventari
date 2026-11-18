@@ -211,6 +211,25 @@ describe("DocumentDetailLinesCard — quantity column", () => {
     expect(screen.getAllByText(/done 5 \/ planned 1/i).length).toBe(2);
   });
 
+  it("does not call a typed count planned once it was raised", () => {
+    // The 1 was typed on the receive sheet to get a row; nobody planned it,
+    // so "planned 1" beside the 5 that arrived has no author.
+    const { container } = renderCard(
+      [
+        line({
+          quantity: "1",
+          expected_quantity: "1",
+          done_quantity: "5",
+          expected_is_count: true,
+        }),
+      ],
+      { status: "COMPLETED" },
+    );
+    const card = container.querySelector("ul li .font-semibold");
+    expect(card).toHaveTextContent(/^5$/);
+    expect(screen.queryByText(/planned/i)).not.toBeInTheDocument();
+  });
+
   it("compares wire quantities numerically, not lexicographically", () => {
     // The API ships quantities as decimal strings, and "3.000" < "10.000"
     // is false read as text — a line done 3 of 10 then printed its plan

@@ -50,6 +50,37 @@ describe("WmsShortReceiveDialog", () => {
     );
   });
 
+  it("asks for no reason when a typed count is raised", async () => {
+    const user = userEvent.setup();
+    const onConfirm = vi.fn();
+    render(
+      <WmsShortReceiveDialog
+        line={{ ...line, expected_is_count: true }}
+        isLoading={false}
+        onConfirm={onConfirm}
+        onCancel={vi.fn()}
+      />,
+    );
+
+    const qtyInput = screen.getByRole("spinbutton", {
+      name: "Final received quantity",
+    });
+    await user.clear(qtyInput);
+    await user.type(qtyInput, "5");
+
+    expect(screen.queryByText("Discrepancy")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Confirm" }));
+
+    expect(onConfirm).toHaveBeenCalledWith(
+      "line-1",
+      5,
+      "",
+      undefined,
+      false,
+      0,
+    );
+  });
+
   it("does not require a discrepancy code for a full receive", async () => {
     const user = userEvent.setup();
     const onConfirm = vi.fn();
