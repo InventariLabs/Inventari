@@ -166,23 +166,8 @@ function useDocumentFormGuard(
   hasUnsavedInput: boolean,
   label: string,
 ): void {
-  const snapshot = JSON.stringify([
-    workspace.partnerId,
-    workspace.sourceLocationId,
-    workspace.targetLocationId,
-    workspace.scheduledDate,
-    workspace.notes,
-    workspace.externalReference,
-    workspace.lines.map((l) => [
-      lineSignature(l),
-      l.name,
-      l.unit_price,
-      l.tax_rate,
-      l.batch_number,
-      l.expiry_date,
-      l.notes,
-    ]),
-  ]);
+  // What Save would send, so a field the form carries cannot be left out.
+  const snapshot = JSON.stringify(workspace.toUpdatePayload());
   const opened = useRef(snapshot);
   useFormGuard(
     workspace.isEdit ? snapshot !== opened.current : hasUnsavedInput,
@@ -533,7 +518,8 @@ export default function DocumentFormModal({
     !!partnerId ||
     changedFrom(sourceLocationId, prefilledLocations.current.source) ||
     changedFrom(targetLocationId, prefilledLocations.current.target) ||
-    !!(notes.trim() || externalReference.trim());
+    !!(notes.trim() || externalReference.trim()) ||
+    !!workspace.scrapReason.code;
 
   const lineImport = useDocumentLineImport({
     documentId: document?.id,

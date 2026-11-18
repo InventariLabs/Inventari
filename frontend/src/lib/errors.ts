@@ -15,7 +15,10 @@ interface ApiErrorDetail {
  */
 export function extractApiError(error: unknown, fallback: string): string {
   const readable = readableErrorMessage(error);
-  if (readable) return readable;
+  if (readable) {
+    if (error instanceof SessionEndedError) sessionEndSpoken = true;
+    return readable;
+  }
   if (axios.isAxiosError(error)) {
     // A 5xx `detail` is written for whoever reads the logs — an exception
     // message, a stack summary, the fault injector's own sentence. Handing it
@@ -68,6 +71,21 @@ export class ReadableError extends Error {}
  */
 export class SessionEndedError extends ReadableError {
   readonly status = 401;
+}
+
+// Whether a caller has taken a session-end sentence for its own toast since
+// the shell last asked. The shell speaks for the requests that show nothing
+// (a picker's search) and stays quiet when a caller already has.
+let sessionEndSpoken = false;
+
+/** Forgets earlier session-end sentences; the shell calls it as one begins. */
+export function resetSessionEndSpoken(): void {
+  sessionEndSpoken = false;
+}
+
+/** Whether a caller has taken a session-end sentence since the last reset. */
+export function hasSessionEndSpoken(): boolean {
+  return sessionEndSpoken;
 }
 
 /**

@@ -1428,6 +1428,37 @@ describe("DocumentFormModal validation accessibility", () => {
     );
   });
 
+  it("reports a changed scrap reason on an existing draft as work", async () => {
+    // Save sends the reason, so a change to it alone is work to keep.
+    const existing = {
+      id: "doc-2",
+      organization_id: "org-1",
+      type: "SCRAP",
+      number: "SCR/2026/001",
+      status: "DRAFT",
+      partner_id: null,
+      source_location_id: "loc-1",
+      target_location_id: null,
+      scheduled_date: null,
+      notes: null,
+      external_reference: null,
+      currency: null,
+      reason_code: "DAMAGED",
+      lines: [{ id: "line-1", name: "Widget", quantity: 1, uom_id: null }],
+    } as unknown as React.ComponentProps<typeof DocumentFormModal>["document"];
+    await act(async () => {
+      render(<DocumentFormModal document={existing} onClose={vi.fn()} />);
+    });
+    expect(useFormGuardStore.getState().dirtyForm).toBeNull();
+
+    const reason = screen.getByDisplayValue(/damaged/i);
+    fireEvent.change(reason, { target: { value: "EXPIRED" } });
+
+    await waitFor(() =>
+      expect(useFormGuardStore.getState().dirtyForm).toBe("The document form"),
+    );
+  });
+
   it("closes on Escape when nothing has been entered", () => {
     const onClose = vi.fn();
     render(<DocumentFormModal initialType="IN" onClose={onClose} />);

@@ -11,6 +11,7 @@ import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useFormGuardStore } from "@/store/formGuardStore";
+import { hasSessionEndSpoken, resetSessionEndSpoken } from "@/lib/errors";
 import { Settings, Search, ChevronLeft } from "lucide-react";
 import { useModules } from "@/contexts/ModulesContext";
 import { useAuthStore } from "@/store/authStore";
@@ -24,6 +25,9 @@ import { useShellBack } from "@/hooks/useShellBack";
 import { moduleRegistry, applyNavOverrides } from "@/lib/moduleRegistry";
 import type { ModuleNavItem } from "@/lib/moduleRegistry";
 import { makeTDynamic } from "@/lib/i18nHelpers";
+// How long the shell waits for a caller to toast the session end itself.
+const SESSION_END_GRACE_MS = 300;
+
 const NotificationTray = lazy(
   () => import("@/modules/announcements/components/NotificationTray"),
 );
@@ -77,11 +81,17 @@ export default function AppShell() {
     const handleLogout = () => {
       // The sign-in drops whatever a form on screen holds. A request that
       // shows no toast of its own (a picker's search, a background read)
-      // would end the session without a word, so the shell says so, one toast however many requests fail.
+      // would end the session without a word, so the shell says so — unless
+      // a caller's toast has already carried the news, which the callers'
+      // catch blocks reach right after this handler returns.
       if (useFormGuardStore.getState().dirtyForm !== null) {
-        toast.error(t("errors.sessionEndedReadUnsaved"), {
-          id: "session-ended-unsaved",
-        });
+        resetSessionEndSpoken();
+        window.setTimeout(() => {
+          if (hasSessionEndSpoken()) return;
+          toast.error(t("errors.sessionEndedReadUnsaved"), {
+            id: "session-ended-unsaved",
+          });
+        }, SESSION_END_GRACE_MS);
       }
       logout();
       navigate("/login");
