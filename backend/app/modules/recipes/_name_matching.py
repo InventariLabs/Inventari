@@ -23,8 +23,12 @@ from anyascii import anyascii
 
 
 def normalize_name(name: str) -> str:
-    """Return *name* transliterated to ASCII, lowercased and stripped."""
-    return anyascii(name.strip()).lower()
+    """Return *name* transliterated to ASCII, lowercased and stripped.
+
+    Stripped again after the fold: a zero-width space or a no-break space
+    outside a name becomes a plain space only once transliterated.
+    """
+    return anyascii(name.strip()).strip().lower()
 
 
 def match_key(name: str) -> str:

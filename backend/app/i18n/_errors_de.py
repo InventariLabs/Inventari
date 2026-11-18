@@ -687,6 +687,7 @@ ERRORS_DE: ErrorMessages = {
     'document_correction_not_duplicable': 'Eine Korrektur kann nicht dupliziert werden: Sie berichtigt ein bestimmtes Dokument. Erstellen Sie stattdessen eine neue Korrektur dieses Dokuments.',
     'field_cannot_be_cleared': 'Diese Felder können nicht geleert werden: {fields}.',
     'ingredient_defaults_unreadable_file': 'Die Datei konnte nicht gelesen werden. Der Import erwartet eine .json- oder .csv-Datei mit einer Zeile pro Zutat.',
+    'ingredient_default_name_has_no_key': 'Ein Name, der nur aus unsichtbaren Zeichen besteht, kann nicht gespeichert werden.',
     'onboarding_modules_not_offered': 'Das Profil „{profile}“ bietet diese Module nicht an: {modules}',
     'location_chain_step_incomplete': 'Jeder Schritt einer Lagerortkette braucht eine ID oder einen Namen.',
     'current_password_incorrect': 'Das aktuelle Passwort ist falsch',

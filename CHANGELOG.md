@@ -430,6 +430,12 @@ says what the release does rather than what changed since them.
   history: the dates stayed, the place the card named was gone. The delete is
   now refused with a message that points to archiving the place instead, as a
   place with stock movements already was.
+- The ingredient dictionary refuses a name made only of invisible characters
+  (a zero-width space, a byte order mark) instead of filing it under the empty
+  key every blank row shares, and counts such a row as an error on import. A
+  CSV that starts with a byte order mark (Excel's *CSV UTF-8*, comma-separated)
+  imports its rows rather than being refused as unreadable, and the add form answers a name of only spaces with its own
+  "Name and kcal are required" message instead of a request to the server.
 
 ### Removed
 

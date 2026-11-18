@@ -11,6 +11,10 @@ from pydantic import (
     field_validator,
 )
 
+from app.core.exceptions import ServiceRejectionError
+
+from ._name_matching import normalize_name
+
 # === Tag Management ===
 
 
@@ -96,6 +100,19 @@ class IngredientDefaultCreate(IngredientDefaultBase):
         str,
         StringConstraints(strip_whitespace=True, min_length=1, max_length=255),
     ]
+
+    @field_validator('name')
+    @classmethod
+    def name_needs_a_key(cls, v: str) -> str:
+        """A name that folds to no key is a blank name.
+
+        ``strip`` removes whitespace but leaves a zero-width space or a BOM,
+        and the ASCII fold turns both into '': the row would be filed under
+        the empty key every nameless row shares.
+        """
+        if not normalize_name(v):
+            raise ServiceRejectionError('ingredient_default_name_has_no_key')
+        return v
 
 
 class IngredientDefaultSchema(IngredientDefaultBase):

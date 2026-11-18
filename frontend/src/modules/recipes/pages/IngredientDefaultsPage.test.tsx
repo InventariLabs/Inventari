@@ -6,6 +6,7 @@ import { signInWith } from "@/test/auth";
 import IngredientDefaultsPage from "./IngredientDefaultsPage";
 
 const importMutate = vi.hoisted(() => vi.fn());
+const createMutate = vi.hoisted(() => vi.fn());
 
 vi.mock("sonner", () => ({
   toast: { error: vi.fn(), success: vi.fn(), warning: vi.fn() },
@@ -49,7 +50,7 @@ vi.mock("@/modules/recipes/hooks/useIngredientDefaults", () => ({
     refetch: vi.fn(),
   }),
   useCreateIngredientDefault: () => ({
-    mutateAsync: vi.fn(),
+    mutateAsync: createMutate,
     isPending: false,
   }),
   useDeleteIngredientDefault: () => ({ mutateAsync: vi.fn() }),
@@ -132,6 +133,29 @@ describe("IngredientDefaultsPage — reading a nutrition table off a label", () 
     expect(
       screen.queryByRole("button", { name: /read from a label/i }),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe("IngredientDefaultsPage — a name of only spaces", () => {
+  beforeEach(() => {
+    signInWith(["recipes:read", "recipes:write"]);
+    createMutate.mockReset();
+    vi.mocked(toast.error).mockClear();
+  });
+
+  it("is refused before the request is sent", async () => {
+    render(<IngredientDefaultsPage />);
+    await userEvent.click(
+      screen.getByRole("button", { name: /add override/i }),
+    );
+    await userEvent.type(screen.getByLabelText("Ingredient name"), "   ");
+    await userEvent.type(screen.getByLabelText("kcal"), "100");
+    await userEvent.click(screen.getByRole("button", { name: /^save$/i }));
+
+    // The sentence names the fields; the bare server message ("Should have
+    // at least 1 character") named none.
+    expect(toast.error).toHaveBeenCalledWith("Name and kcal are required.");
+    expect(createMutate).not.toHaveBeenCalled();
   });
 });
 

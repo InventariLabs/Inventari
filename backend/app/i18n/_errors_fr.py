@@ -684,6 +684,7 @@ ERRORS_FR: ErrorMessages = {
     'document_correction_not_duplicable': 'Une correction ne peut pas être dupliquée : elle rectifie un seul document. Créez plutôt une nouvelle correction de ce document.',
     'field_cannot_be_cleared': 'Ces champs ne peuvent pas être vidés : {fields}.',
     'ingredient_defaults_unreadable_file': "Impossible de lire le fichier. L'import attend un fichier .json ou .csv avec une ligne par ingrédient.",
+    'ingredient_default_name_has_no_key': 'Un nom composé uniquement de caractères invisibles ne peut pas être enregistré.',
     'onboarding_modules_not_offered': 'Le profil « {profile} » ne propose pas ces modules : {modules}',
     'location_chain_step_incomplete': "Chaque étape d'une chaîne d'emplacements doit avoir un identifiant ou un nom.",
     'current_password_incorrect': 'Le mot de passe actuel est incorrect',
