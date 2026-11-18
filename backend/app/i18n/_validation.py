@@ -50,6 +50,21 @@ _VALIDATION_TEMPLATES: dict[str, tuple[str, tuple[str, ...]]] = {
 #: pydantic wraps a validator's own ValueError as "Value error, <message>".
 _VALUE_ERROR_PREFIX = 'Value error, '
 
+#: email-validator's refusal reaches pydantic as a plain ``value_error`` whose
+#: message is ``value is not a valid email address: <reason>``; the reason is
+#: the only part that varies, and it is English. Each fragment below names a
+#: family of reasons a person can act on; a reason none of them matches still
+#: answers in the session's language with the general sentence.
+_EMAIL_ERROR_PREFIX = 'value is not a valid email address'
+_EMAIL_REASONS: tuple[tuple[str, str], ...] = (
+    ('special-use or reserved', 'validation_email_reserved'),
+    ('must have an @-sign', 'validation_email_at_sign'),
+    ('something before the @-sign', 'validation_email_at_sign'),
+    ('something after the @-sign', 'validation_email_at_sign'),
+    ('should have a period', 'validation_email_domain_dot'),
+    ('invalid characters', 'validation_email_characters'),
+)
+
 #: Types whose sentence counts characters; the count is the one ctx parameter
 #: and the catalogue carries the plural forms the language needs.
 _COUNTED_ERROR_TYPES = frozenset({'string_too_long', 'string_too_short'})
@@ -59,6 +74,15 @@ _COUNTED_ERROR_TYPES = frozenset({'string_too_long', 'string_too_short'})
 #: takes the reader's decimal mark — a Polish reader gets "999999999,999",
 #: never the store's dot, which is a wire format, not a word.
 _BOUND_PARAM_NAMES = frozenset({'ge', 'gt', 'le', 'lt'})
+
+
+def _email_error_key(msg: str) -> str:
+    """The catalog key for the reason email-validator gave inside ``msg``."""
+    reason = msg.removeprefix(_EMAIL_ERROR_PREFIX)
+    for fragment, key in _EMAIL_REASONS:
+        if fragment in reason:
+            return key
+    return 'validation_email'
 
 
 def translate_validation_error(
@@ -77,6 +101,8 @@ def translate_validation_error(
     kind = str(error.get('type', ''))
     if kind == 'value_error':
         msg = str(error.get('msg', ''))
+        if msg.startswith(_EMAIL_ERROR_PREFIX):
+            return get_error_message(_email_error_key(msg), lang)
         return (
             msg.removeprefix(_VALUE_ERROR_PREFIX)
             if msg.startswith(_VALUE_ERROR_PREFIX)

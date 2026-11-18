@@ -308,9 +308,11 @@ class TaskScheduler:
         for msg_id, data in messages:
             if data:
                 task_key = data.get('task_key')
-                payload = json.loads(data.get('payload', '{}'))
+                payload = self._decode_payload(msg_id, data)
                 task = self._tasks.get(task_key) if task_key else None
-                if task:
+                if payload is None:
+                    pass  # logged; the ACK below parks it
+                elif task:
                     await self._execute_task(task, payload)
                 else:
                     logger.warning(
@@ -321,6 +323,25 @@ class TaskScheduler:
         if reclaimed:
             logger.info('[Scheduler] Reclaimed %d pending task(s)', reclaimed)
         return reclaimed
+
+    @staticmethod
+    def _decode_payload(msg_id: str, data: Any) -> dict[str, Any] | None:
+        """The JSON payload of a stream message, or None when it cannot be read.
+
+        A message that cannot be decoded never will be: it is logged here, once,
+        and the caller acknowledges it instead of leaving it pending for every
+        reclaim to claim again.
+        """
+        try:
+            payload: dict[str, Any] = json.loads(data.get('payload', '{}'))
+        except ValueError as e:
+            logger.error(
+                '[Scheduler] Dropping task message %s with an unreadable payload: %s',
+                msg_id,
+                e,
+            )
+            return None
+        return payload
 
     async def prune_dead_consumers(self, min_idle_ms: int) -> int:
         """Remove the group's idle, empty-handed consumers other than this one."""
@@ -357,10 +378,12 @@ class TaskScheduler:
                 for _, messages in streams:  # type: ignore[str-unpack]
                     for msg_id, data in messages:  # type: ignore[str-unpack,union-attr]
                         task_key = data.get('task_key')  # type: ignore[union-attr]
-                        payload = json.loads(data.get('payload', '{}'))  # type: ignore[union-attr]
+                        payload = self._decode_payload(msg_id, data)
 
                         task = self._tasks.get(task_key)
-                        if task:
+                        if payload is None:
+                            pass  # logged; the ACK below parks it
+                        elif task:
                             await self._execute_task(task, payload)
                         else:
                             logger.warning(

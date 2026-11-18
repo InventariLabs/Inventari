@@ -277,6 +277,49 @@ class TestTheStripMeasuresWhatHappenedThisWeek:
         assert measures['shipped_total'] == 2
         assert measures['shipped_same_day'] == 1
 
+    def test_an_undone_dispatch_and_an_undone_receipt_are_not_counted(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_org: Organization,
+        doc_user: User,
+        doc_auth_headers: dict[str, str],
+    ) -> None:
+        now = datetime.now(UTC)
+        dispatch = _document(
+            db_session, doc_org, doc_user,
+            doc_type='OUT', status_word='COMPLETED',
+            created_at=now, completed_at=now,
+        )  # fmt: skip
+        receipt = _document(
+            db_session, doc_org, doc_user,
+            doc_type='IN', status_word='COMPLETED', completed_at=now,
+        )  # fmt: skip
+        _session(
+            db_session, doc_org, doc_user, receipt,
+            started_at=now - timedelta(hours=2),
+        )  # fmt: skip
+        for original in (dispatch, receipt):
+            reversal = _document(
+                db_session, doc_org, doc_user,
+                doc_type='COR', status_word='COMPLETED', completed_at=now,
+            )  # fmt: skip
+            db_session.add(
+                DocumentRelation(
+                    source_document_id=reversal.id,
+                    target_document_id=original.id,
+                    relation_type='reverses',
+                )
+            )
+        db_session.commit()
+
+        assert _measures(client, doc_auth_headers) == {
+            'dock_to_stock_seconds': None,
+            'dock_to_stock_count': 0,
+            'shipped_same_day': 0,
+            'shipped_total': 0,
+        }
+
     def test_another_organizations_work_is_not_counted(
         self,
         client: TestClient,

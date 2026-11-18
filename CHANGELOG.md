@@ -279,18 +279,22 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
-- Switching an approval workflow off, or deleting it, while requests are
-  waiting on it now records why those requests were closed in the audit log's
-  reason column, and the Settings audit log shows that reason in the reader's
-  language ("Workflow deactivated", "Workflow deleted") instead of the raw
-  English text. The audit entry of a closed request no longer reads as a
-  cascade of another change.
+- The Settings audit log shows the reason a workflow release left on the
+  requests it closed in the reader's language ("Workflow deactivated",
+  "Workflow deleted") instead of the raw English text.
 - Importing rows into a document that is not saved yet, when the session has
   ended, no longer says "this was not saved" over an empty form: the import
   only reads the rows, so the message is the plain "your session has ended".
   A form that already holds something the reader typed, and an import that
   also creates products, keep the longer warning, because signing in again
   loses that work.
+
+- When the session ends on a request that only reads (picking an import file,
+  looking up a product) while a document form holds unsaved work, the reader
+  is now told that what was entered was not kept, instead of landing on the
+  sign-in page with nothing said. The document form also asks before the page
+  is reloaded or left once something in it has been changed, and says nothing
+  while an opened draft is untouched.
 
 - The price a document suggests for a supplier's product is the price that
   line can get: valid today, from a quantity tier the line's quantity

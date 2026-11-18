@@ -7,6 +7,7 @@ import {
   type MutableRefObject,
 } from "react";
 import { useTranslation } from "react-i18next";
+import { useFormGuard } from "@/hooks/useFormGuard";
 import { toast } from "sonner";
 import { TriangleAlert } from "lucide-react";
 import axios from "axios";
@@ -152,6 +153,28 @@ function hasUserFilledLine(
       !!line.item_id || !!line.name.trim() || !!line.barcode?.trim();
     return filled && !prefilled.has(lineSignature(line));
   });
+}
+
+/**
+ * Reports whether the form holds work to the form guard. A new form holds
+ * work once the user has filled something in; an existing document opens
+ * with its own partner, locations and lines, so there work is any difference
+ * from what it opened with.
+ */
+function useDocumentFormGuard(
+  workspace: ReturnType<typeof useDocumentWorkspaceState>,
+  hasUnsavedInput: boolean,
+  label: string,
+): void {
+  // What Save would send, so a field the form carries cannot be left out.
+  const snapshot = JSON.stringify(workspace.toUpdatePayload());
+  const opened = useRef(snapshot);
+  useFormGuard(
+    workspace.isEdit
+      ? snapshot !== opened.current
+      : hasUnsavedInput || !!workspace.scrapReason.code,
+    label,
+  );
 }
 
 /** A location the user picked, as opposed to none or the one handed in. */
@@ -509,6 +532,11 @@ export default function DocumentFormModal({
     appendImportedLines,
   });
 
+  // The shell-wide navigation gate (the command palette, the header) and the
+  // reader's own words after a session ended under the form both ask whether
+  // the form holds work.
+  useDocumentFormGuard(workspace, hasUnsavedInput, t("form.guardName"));
+
   // when the inline partner-create popover is open, Esc/backdrop must
   // close the popover first — not discard the whole document form.
   //
@@ -517,13 +545,11 @@ export default function DocumentFormModal({
   const handleSheetClose = useCallback(() => {
     if (partnerCreateOpen) {
       handlePartnerCreateCancel();
-      return;
-    }
-    if (hasUnsavedInput) {
+    } else if (hasUnsavedInput) {
       setDiscardConfirmOpen(true);
-      return;
+    } else {
+      onClose();
     }
-    onClose();
   }, [partnerCreateOpen, handlePartnerCreateCancel, hasUnsavedInput, onClose]);
 
   // Map a backend line index to the current line's stable _key, so 422

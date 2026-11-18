@@ -106,6 +106,7 @@
   "form": {
     "createTitle": "Nuevo documento",
     "editTitle": "Editar documento",
+    "guardName": "El formulario del documento",
     "discardTitle": "¿Descartar este documento?",
     "discardMessage": "Se perderán el socio, las ubicaciones y las líneas introducidas. Esta acción no se puede deshacer.",
     "discardConfirm": "Descartar",
