@@ -20,6 +20,7 @@ from app.core.public_api import core_api
 
 from . import document_types as dt
 from ._schemas_work_items import WorkItemMeasures
+from .document_query_service import not_undone_conditions
 from .models import Document, DocumentStatus, WmsPickSession
 
 
@@ -55,6 +56,7 @@ async def work_measures_async(
                 Document.status == DocumentStatus.COMPLETED.value,
                 Document.type == dt.IN,
                 Document.completed_at >= week_start,
+                *not_undone_conditions(),
             )
         )
     ).all()
@@ -71,6 +73,7 @@ async def work_measures_async(
                 Document.status == DocumentStatus.COMPLETED.value,
                 Document.type == dt.OUT,
                 Document.completed_at >= week_start,
+                *not_undone_conditions(),
             )
         )
     ).all()
