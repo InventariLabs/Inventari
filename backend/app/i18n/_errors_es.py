@@ -462,6 +462,7 @@ ERRORS_ES: ErrorMessages = {
     'template_import_invalid_field': 'El campo «{field}» falta o no es válido.',
     'template_import_unknown_placeholders': 'La plantilla hace referencia a campos que no existen: {placeholders}.',
     'template_import_not_renderable': 'No se pudo renderizar la plantilla: {detail}',
+    'template_not_saved_syntax': 'No se guardó la plantilla: línea {line}: {detail}',
     'model_not_found': 'Modelo de equipo no encontrado',
     'widget_not_found': 'Widget no encontrado',
     'bom_line_not_found': 'Línea de lista de materiales no encontrada',

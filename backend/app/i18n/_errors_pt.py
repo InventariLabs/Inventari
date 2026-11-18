@@ -361,6 +361,7 @@ ERRORS_PT: dict[str, str] = {
     'template_import_invalid_field': 'O campo "{field}" está ausente ou não é válido.',
     'template_import_unknown_placeholders': 'O modelo faz referência a campos que não existem: {placeholders}.',
     'template_import_not_renderable': 'Não foi possível renderizar o modelo: {detail}',
+    'template_not_saved_syntax': 'O modelo não foi guardado: linha {line}: {detail}',
     'model_not_found': 'Modelo de equipamento não encontrado',
     'widget_not_found': 'Widget não encontrado',
     'bom_line_not_found': 'Linha da lista de materiais não encontrada',

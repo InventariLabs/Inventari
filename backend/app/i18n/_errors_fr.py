@@ -461,6 +461,7 @@ ERRORS_FR: ErrorMessages = {
     'template_import_invalid_field': 'Le champ « {field} » est absent ou invalide.',
     'template_import_unknown_placeholders': 'Le modèle référence des champs qui n’existent pas : {placeholders}.',
     'template_import_not_renderable': 'Le modèle n’a pas pu être rendu : {detail}',
+    'template_not_saved_syntax': 'Le modèle n’a pas été enregistré : ligne {line} : {detail}',
     'model_not_found': "Modèle d'équipement introuvable",
     'widget_not_found': 'Widget introuvable',
     'bom_line_not_found': 'Ligne de nomenclature introuvable',

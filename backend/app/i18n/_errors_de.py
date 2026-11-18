@@ -464,6 +464,7 @@ ERRORS_DE: ErrorMessages = {
     'template_import_invalid_field': 'Das Feld „{field}“ fehlt oder ist ungültig.',
     'template_import_unknown_placeholders': 'Die Vorlage verweist auf Felder, die nicht existieren: {placeholders}.',
     'template_import_not_renderable': 'Die Vorlage konnte nicht gerendert werden: {detail}',
+    'template_not_saved_syntax': 'Die Vorlage wurde nicht gespeichert: Zeile {line}: {detail}',
     'model_not_found': 'Gerätemodell nicht gefunden',
     'widget_not_found': 'Widget nicht gefunden',
     'bom_line_not_found': 'Stücklistenposition nicht gefunden',

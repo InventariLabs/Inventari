@@ -126,9 +126,10 @@ async def create_template_async(
     # source-level sanitizer pass would reorder the HTML around Jinja spans
     # (html5lib foster-parenting). Sanitization happens on the rendered
     # output (TemplateEngine.render), where it cannot mangle the template.
+    engine = TemplateEngine()
     if partials:
-        engine = TemplateEngine()
         body_html = engine.inline_includes(body_html, partials)
+    engine.check_syntax(body_html)
 
     if is_default:
         await db.execute(
@@ -192,9 +193,10 @@ async def update_template_async(
 
     if body_html is not None:
         # Stored verbatim; sanitized at render time (see create_template_async).
+        engine = TemplateEngine()
         if partials:
-            engine = TemplateEngine()
             body_html = engine.inline_includes(body_html, partials)
+        engine.check_syntax(body_html)
         tpl.body_html = body_html
 
     if name is not None:

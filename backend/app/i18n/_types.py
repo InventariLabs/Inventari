@@ -348,6 +348,7 @@ class ErrorMessages(TypedDict):
     template_import_invalid_field: str
     template_import_unknown_placeholders: str
     template_import_not_renderable: str
+    template_not_saved_syntax: str
     model_not_found: str
     widget_not_found: str
     bom_line_not_found: str

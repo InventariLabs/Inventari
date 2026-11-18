@@ -9,8 +9,9 @@ from pathlib import Path
 from typing import Any
 
 import nh3
-from jinja2 import BaseLoader, sandbox
+from jinja2 import BaseLoader, TemplateSyntaxError, sandbox
 
+from app.core.exceptions import ServiceRejectionError
 from app.core.logging import get_logger
 from app.services.pdf_utils import register_pdf_filters
 
@@ -372,6 +373,19 @@ class TemplateEngine:
             else:
                 result = result[: match.start()] + partial_html + result[match.end() :]
         return result
+
+    def check_syntax(self, body_html: str) -> None:
+        """Refuse a body Jinja cannot parse, naming the line it stopped at.
+
+        Run on every save: a layout that does not parse fails every document
+        printed with it, and nothing at print time is left to say why.
+        """
+        try:
+            self._env.parse(body_html)
+        except TemplateSyntaxError as exc:
+            raise ServiceRejectionError(
+                'template_not_saved_syntax', line=exc.lineno, detail=exc.message
+            ) from exc
 
     def render(self, body_html: str | None, context: dict[str, Any]) -> str:
         """Render template string with sandboxed Jinja2, then sanitize.
