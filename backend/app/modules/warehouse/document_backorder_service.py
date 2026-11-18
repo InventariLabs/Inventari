@@ -40,15 +40,13 @@ async def maybe_create_backorder(
 
 def _owed_on_backorder(line: DocumentLine) -> Decimal:
     # A line taken from a purchase order is never backordered: the order is
-    # the expectation. It still owes what did not arrive and counts what was
-    # held as delivered, so a draft for either would ask for the same goods
-    # twice. A held quantity on any other line arrived but is not usable, so
-    # it is outstanding like a shortage — and only it is: the rest of the
-    # line is ordinary stock.
+    # the expectation and still owes what did not arrive. What a receipt held
+    # back did arrive — it is part of the done quantity and waits for a
+    # decision under To do — so a backorder asks only for the goods that never
+    # came, on any line.
     if line.source_po_line_id is not None:
         return Decimal('0')
-    held = line.held_quantity or Decimal('0')
-    return line.expected_quantity - line.done_quantity + held
+    return line.expected_quantity - line.done_quantity
 
 
 def _find_shortage_lines(doc: Document) -> list[DocumentLine]:
