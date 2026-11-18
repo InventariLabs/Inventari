@@ -419,6 +419,7 @@ ERRORS_FR: ErrorMessages = {
     'meal_plan_entry_date_out_of_range': "La date de l'entrée est en dehors de la période du plan.",
     'meal_plan_slot_not_enabled': "Ce repas n'est pas activé pour ce plan.",
     'shopping_exclusion_exists': 'Cette exclusion existe déjà.',
+    'shopping_exclusion_name_has_no_key': "Une exclusion a besoin d'un nom : des espaces ou des caractères invisibles seuls ne suffisent pas.",
     'shopping_item_already_purchased': 'Cet article est déjà marqué comme acheté.',
     'shopping_item_already_purchased_reset': "Cet article est déjà marqué comme acheté. Marquez-le d'abord comme non acheté pour le modifier.",
     'shopping_list_not_editable': 'Une liste de courses terminée ou archivée ne peut pas être modifiée.',

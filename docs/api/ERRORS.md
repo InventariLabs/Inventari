@@ -630,6 +630,7 @@ apart.
 | `SETTINGS_VALUE_NOT_OBJECT` | The setting '{path}' must be an object |
 | `SETTINGS_VALUE_NOT_STRING` | The setting '{path}' must be text |
 | `SHEET_UNREADABLE` | This file could not be read as a spreadsheet. Check that it is a valid .xlsx or .csv file and try again. |
+| `SHOPPING_EXCLUSION_NAME_HAS_NO_KEY` | An exclusion needs a name; spaces or invisible characters alone cannot be saved. |
 | `SHOPPING_LIST_ITEM_CATEGORY_UNKNOWN` | Unknown category (category_id: {category_id}) — the category does not exist |
 | `SHOPPING_LIST_ITEM_ITEM_UNKNOWN` | Unknown product (item_id: {item_id}) — the item does not exist |
 | `SHOPPING_LIST_ITEM_QUANTITY_ABOVE_CEILING` | The quantity {quantity} is past what the column holds — the largest storable value is {ceiling} |

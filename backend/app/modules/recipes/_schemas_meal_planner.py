@@ -6,6 +6,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.core.module_sdk import ServiceRejectionError
 from app.modules.recipes.models import MealSlot
 
 from ._name_matching import match_key
@@ -222,13 +223,13 @@ class ShoppingExclusionCreate(BaseModel):
         The minimum length counts characters, and whitespace, a zero-width
         space or a BOM are characters that fold to '': the exclusion would be
         stored under the matching key every nameless exclusion shares, and
-        the next invisible name — whichever of them it is — would be answered
-        with 409. Refused here, the write never reaches the column, and the
-        name stored is the stripped one the matching was taken from.
+        the next invisible name — whichever of them it is — was answered with
+        409. Refused here, the write never reaches the column, and the name
+        stored is the stripped one the matching was taken from.
         """
         name = value.strip()
         if not match_key(name):
-            raise ValueError('name must not be blank')
+            raise ServiceRejectionError('shopping_exclusion_name_has_no_key')
         return name
 
 

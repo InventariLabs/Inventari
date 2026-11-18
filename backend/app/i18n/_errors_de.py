@@ -422,6 +422,7 @@ ERRORS_DE: ErrorMessages = {
     'meal_plan_entry_date_out_of_range': 'Das Datum des Eintrags liegt außerhalb des Zeitraums des Plans.',
     'meal_plan_slot_not_enabled': 'Diese Mahlzeit ist für diesen Plan nicht aktiviert.',
     'shopping_exclusion_exists': 'Dieser Ausschluss existiert bereits.',
+    'shopping_exclusion_name_has_no_key': 'Ein Ausschluss braucht einen Namen; Leerzeichen oder unsichtbare Zeichen allein reichen nicht.',
     'shopping_item_already_purchased': 'Dieser Artikel ist bereits als gekauft markiert.',
     'shopping_item_already_purchased_reset': 'Dieser Artikel ist bereits als gekauft markiert. Markieren Sie ihn zuerst als nicht gekauft, um ihn zu ändern.',
     'shopping_list_not_editable': 'Eine abgeschlossene oder archivierte Einkaufsliste kann nicht bearbeitet werden.',
