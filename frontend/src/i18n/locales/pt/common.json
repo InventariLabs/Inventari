@@ -248,7 +248,7 @@
       "loadFailedHint": "As configurações da organização não puderam ser lidas agora, então nada é exibido, em vez de valores padrão que nunca foram salvos. Tente novamente.",
       "peopleTitle": "Pessoas",
       "inviteEmail": "Endereço de e-mail",
-      "inviteEmailPlaceholder": "pessoa@empresa.com",
+      "inviteEmailPlaceholder": "pessoa@example.com",
       "inviteEmailRequired": "Informe o e-mail da pessoa que você está convidando",
       "inviteEmailInvalid": "Isso não parece um endereço de e-mail",
       "sendInvite": "Enviar convite",

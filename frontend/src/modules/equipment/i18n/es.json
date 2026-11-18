@@ -136,7 +136,7 @@
       "select_location": "Ubicación",
       "placeholders": {
         "name": "p. ej. Juan Pérez",
-        "email": "nombre@ejemplo.com"
+        "email": "nombre@example.com"
       },
       "error_person_required": "Introduzca o seleccione la persona asignada",
       "return_date_past_error": "La fecha de devolución no puede estar en el pasado.",

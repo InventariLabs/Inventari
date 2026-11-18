@@ -250,7 +250,7 @@
       "loadFailedHint": "Les réglages de l'organisation n'ont pas pu être lus pour le moment ; rien n'est affiché plutôt que des valeurs par défaut jamais enregistrées. Réessayez.",
       "peopleTitle": "Personnes",
       "inviteEmail": "Adresse e-mail",
-      "inviteEmailPlaceholder": "personne@entreprise.fr",
+      "inviteEmailPlaceholder": "personne@example.com",
       "inviteEmailRequired": "Saisissez l'adresse e-mail de la personne invitée",
       "inviteEmailInvalid": "Cela ne ressemble pas à une adresse e-mail",
       "sendInvite": "Envoyer l'invitation",

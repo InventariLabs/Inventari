@@ -250,7 +250,7 @@
       "loadFailedHint": "The organization's settings could not be read just now, so nothing is shown rather than defaults that were never saved. Try again.",
       "peopleTitle": "People",
       "inviteEmail": "Email address",
-      "inviteEmailPlaceholder": "person@company.com",
+      "inviteEmailPlaceholder": "person@example.com",
       "inviteEmailRequired": "Enter the email address of the person you are inviting",
       "inviteEmailInvalid": "That doesn't look like an email address",
       "sendInvite": "Send invitation",

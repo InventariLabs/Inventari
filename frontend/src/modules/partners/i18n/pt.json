@@ -76,9 +76,9 @@
     "codePlaceholder": "ex.: SUP-001",
     "taxIdPlaceholder": "ex.: PL1234567890",
     "isConsumerHint": "Não tem ID fiscal: os documentos são confirmados sem ele, mesmo onde a lei o exige das empresas.",
-    "emailPlaceholder": "contato@empresa.com",
+    "emailPlaceholder": "contato@example.com",
     "phonePlaceholder": "+48 123 456 789",
-    "websitePlaceholder": "https://empresa.com",
+    "websitePlaceholder": "https://example.com",
     "contactPersonPlaceholder": "ex.: Maria Souza (Depto. de Compras)",
     "positionPlaceholder": "ex.: Especialista de TI, Departamento de TI",
     "notesPlaceholder": "Observações internas…",
@@ -103,8 +103,8 @@
     "deactivateFailed": "Não foi possível desativar o parceiro",
     "saveFailed": "Não foi possível salvar o parceiro",
     "createFailed": "Não foi possível criar o parceiro",
-    "invalidEmail": "Informe um endereço de e-mail, por exemplo nome@empresa.com.",
-    "invalidWebsite": "Informe um endereço da web, por exemplo https://empresa.com."
+    "invalidEmail": "Informe um endereço de e-mail, por exemplo nome@example.com.",
+    "invalidWebsite": "Informe um endereço da web, por exemplo https://example.com."
   },
   "inlineCreateHint": "Criar um parceiro rapidamente",
   "inlineCreateSuccess": "Parceiro \"{{name}}\" criado. Adicione o ID fiscal e o endereço antes de emitir um documento com endereço.",
