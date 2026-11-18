@@ -60,14 +60,14 @@ export default function CostVariancesPage() {
                   <th scope="col" className="py-2 px-3">
                     {t("costVariances.columns.document")}
                   </th>
+                  <th scope="col" className="py-2 px-3 text-right">
+                    {t("costVariances.columns.amount")}
+                  </th>
                   <th scope="col" className="py-2 px-3">
                     {t("costVariances.columns.kind")}
                   </th>
                   <th scope="col" className="py-2 px-3">
                     {t("costVariances.columns.reason")}
-                  </th>
-                  <th scope="col" className="py-2 pl-3 text-right">
-                    {t("costVariances.columns.amount")}
                   </th>
                 </tr>
               </thead>
@@ -77,7 +77,7 @@ export default function CostVariancesPage() {
                     key={item.id}
                     className="border-b border-border last:border-0"
                   >
-                    <td className="py-2 pr-3 text-on-secondary">
+                    <td className="py-2 pr-3 whitespace-nowrap text-on-secondary">
                       {formatDate(item.occurred_on)}
                     </td>
                     <td className="py-2 px-3">
@@ -88,15 +88,15 @@ export default function CostVariancesPage() {
                         {item.document_number ?? "—"}
                       </Link>
                     </td>
+                    <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-on">
+                      {money(Number(item.amount), item.currency)}
+                    </td>
                     <td className="py-2 px-3 text-on">
                       {t(`extraCosts.kind.${item.kind}`, {
                         defaultValue: item.kind,
                       })}
                     </td>
                     <td className="py-2 px-3 text-on">{item.reason}</td>
-                    <td className="py-2 pl-3 text-right tabular-nums text-on">
-                      {money(Number(item.amount), item.currency)}
-                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -105,14 +105,15 @@ export default function CostVariancesPage() {
                   <tr key={currency} className="font-medium text-on">
                     <th
                       scope="row"
-                      colSpan={4}
+                      colSpan={2}
                       className="pt-3 pr-3 text-right text-sm"
                     >
                       {t("costVariances.total")}
                     </th>
-                    <td className="pt-3 pl-3 text-right tabular-nums">
+                    <td className="pt-3 px-3 text-right tabular-nums whitespace-nowrap">
                       {money(Number(total), currency || null)}
                     </td>
+                    <td colSpan={2} />
                   </tr>
                 ))}
               </tfoot>
