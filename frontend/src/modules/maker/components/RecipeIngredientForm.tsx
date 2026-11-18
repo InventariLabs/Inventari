@@ -191,6 +191,19 @@ export function RecipeIngredientForm({
             />
           </div>
         </div>
+        {/* Said at the full row width: inside the picker's 8rem column the
+            sentence wrapped to a ribbon of a few words a line. Placed right
+            after the unit picker so that on a phone, where the row is a
+            column, it reads under the picker it explains; `sm:order-last`
+            moves it under the whole row once the row is horizontal. */}
+        {stockUomId && !unitsFailed && (
+          <p
+            className="text-xs text-on-muted sm:order-last sm:basis-full"
+            data-testid="uom-convertible-hint"
+          >
+            {t("bom.unitMustBeConvertible", { unit: stockSymbol })}
+          </p>
+        )}
         <Button
           onClick={handleAdd}
           disabled={!canSubmit}
@@ -200,16 +213,6 @@ export function RecipeIngredientForm({
         >
           {addLine.isPending ? t("bom.adding") : t("bom.add")}
         </Button>
-        {/* Said at the full row width: inside the picker's 8rem column the
-            sentence wrapped to a ribbon of a few words a line. */}
-        {stockUomId && !unitsFailed && (
-          <p
-            className="text-xs text-on-muted sm:basis-full"
-            data-testid="uom-convertible-hint"
-          >
-            {t("bom.unitMustBeConvertible", { unit: stockSymbol })}
-          </p>
-        )}
       </div>
 
       {error && (

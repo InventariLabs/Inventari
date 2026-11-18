@@ -47,7 +47,9 @@ _USABLE_ROW_TALLIES = ('created', 'overridden', 'updated', 'unchanged')
 
 @router.get('', response_model=PaginatedResponse[IngredientDefaultSchema])
 async def list_ingredient_defaults(
-    lang: str = Query('en', description='Language code: en | pl'),
+    lang: str = Query(
+        'en', description='Interface language code, for example en, pl or de'
+    ),
     q: str | None = Query(None, description='Name search query'),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
@@ -70,7 +72,9 @@ async def list_ingredient_defaults(
 @router.get('/lookup', response_model=IngredientDefaultLookupResponse)
 async def lookup_ingredient_default(
     name: str = Query(..., description='Ingredient name to look up'),
-    lang: str = Query('en', description='Language code: en | pl'),
+    lang: str = Query(
+        'en', description='Interface language code, for example en, pl or de'
+    ),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> IngredientDefaultLookupResponse:
@@ -100,7 +104,9 @@ async def lookup_ingredient_default(
 
 @router.get('/export')
 async def export_ingredient_defaults(
-    lang: str = Query('en', description='Language code: en | pl'),
+    lang: str = Query(
+        'en', description='Interface language code, for example en, pl or de'
+    ),
     fmt: str = Query('json', description='json | csv'),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
@@ -155,7 +161,9 @@ async def delete_ingredient_default(
 )
 async def import_ingredient_defaults(
     file: UploadFile = File(...),
-    lang: str = Query('en', description='Language code: en | pl'),
+    lang: str = Query(
+        'en', description='Interface language code, for example en, pl or de'
+    ),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> ImportDefaultsResult:
