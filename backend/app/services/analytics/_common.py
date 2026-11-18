@@ -9,10 +9,11 @@ from __future__ import annotations
 
 from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
+from typing import Any, cast
 from uuid import UUID
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import ColumnElement, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db_utils import in_ids
@@ -79,7 +80,7 @@ async def get_org_currency_async(db: AsyncSession, org_id: UUID) -> str:
     row = result.first()
     if not row or not row[0]:
         raise ServiceRejectionError('organization_currency_missing')
-    return row[0]
+    return cast(str, row[0])
 
 
 #: Where a stock-value figure came from — carried on the DTO so a screen can
@@ -100,7 +101,7 @@ VALUE_SCOPE_ORGANIZATION = 'organization'
 VALUE_SCOPE_LOCATIONS = 'locations'
 
 
-def org_currency_filter(column, org_currency: str | None):
+def org_currency_filter(column: Any, org_currency: str | None) -> ColumnElement[bool]:
     """One currency policy, in one place: the organization's own, or unstated.
 
     An organization that has stated no currency keeps only the unstated
@@ -118,7 +119,7 @@ def org_currency_filter(column, org_currency: str | None):
     assumed before the column existed, and what the backfill wrote wherever
     it could.
     """
-    return (column == org_currency) | (column.is_(None))
+    return cast(ColumnElement[bool], (column == org_currency) | (column.is_(None)))
 
 
 async def _org_offers_the_register_async(db: AsyncSession, org_id: UUID) -> bool:

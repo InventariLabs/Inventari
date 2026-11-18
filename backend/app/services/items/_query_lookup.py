@@ -7,9 +7,10 @@ view-specific specialized queries in ``_query_special.py``.
 """
 
 from datetime import date
+from typing import Any
 from uuid import UUID
 
-from sqlalchemy import exists, func, select
+from sqlalchemy import Exists, Select, exists, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import lazyload
 
@@ -21,7 +22,7 @@ from app.models.storage_location import StorageLocation
 from ._loaded import give_the_card_and_category
 
 
-def _barcode_exists_query(organization_id: UUID, barcode: str):
+def _barcode_exists_query(organization_id: UUID, barcode: str) -> Exists:
     """EXISTS probe matching a non-deleted item by barcode in *organization_id*."""
     return exists(
         select(Item.id)
@@ -228,7 +229,9 @@ async def inherited_category_async(
     return await db.scalar(stmt)
 
 
-def _serial_numbers_query(organization_id: UUID, serial_numbers: set[str]):
+def _serial_numbers_query(
+    organization_id: UUID, serial_numbers: set[str]
+) -> Select[Any]:
     return select(Item.serial_number).where(
         Item.organization_id == organization_id,
         Item.serial_number.in_(serial_numbers),
@@ -255,7 +258,7 @@ def _count_by_org_query(
     category_id: UUID | None = None,
     context_tag: str | None = None,
     storage_location_id: UUID | None = None,
-):
+) -> Select[Any]:
     query = (
         select(Item)
         .join(StorageLocation, Item.storage_location_id == StorageLocation.id)

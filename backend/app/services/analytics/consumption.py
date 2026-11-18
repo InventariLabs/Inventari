@@ -48,7 +48,9 @@ _KIND_OF_ACTION: dict[str, str] = {
 _QUERIED_ACTIONS: tuple[str, ...] = tuple(_KIND_OF_ACTION)
 
 
-def _top_ten(by_product: dict[str, dict], measure: str) -> list[dict]:
+def _top_ten(
+    by_product: dict[str, dict[str, Any]], measure: str
+) -> list[dict[str, Any]]:
     """The ten products largest by *measure*; equal ones in the order of their names.
 
     The lines come out of a ``GROUP BY`` in no order of their own, so a
@@ -63,7 +65,7 @@ def _top_ten(by_product: dict[str, dict], measure: str) -> list[dict]:
     )[:10]
 
 
-def _by_category(by_product: dict[str, dict]) -> list[CategoryConsumptionDTO]:
+def _by_category(by_product: dict[str, dict[str, Any]]) -> list[CategoryConsumptionDTO]:
     """The product lines rolled up per category, largest value first.
 
     Ranked by value, then by name: a quantity summed over a category adds
@@ -71,7 +73,7 @@ def _by_category(by_product: dict[str, dict]) -> list[CategoryConsumptionDTO]:
     another. The quantity is still the sum the lines carry, as the contract
     has it.
     """
-    lines: dict[tuple[str, str | None], dict] = {}
+    lines: dict[tuple[str, str | None], dict[str, Any]] = {}
     for product in by_product.values():
         key = (product['category'], product['category_code'])
         line = lines.setdefault(
@@ -182,7 +184,7 @@ async def get_consumption_stats_async(
 
     def _aggregate(
         rows: Sequence[Any], value_by_item: dict[UUID, Decimal]
-    ) -> tuple[dict[str, dict], Decimal, int]:
+    ) -> tuple[dict[str, dict[str, Any]], Decimal, int]:
         """Roll the per-record lines up per product, with the ledger's value.
 
         A record contributes its value once, on the first line that names
@@ -190,8 +192,8 @@ async def get_consumption_stats_async(
         window, and adding it per line would multiply it by the number of
         vocabularies its events were written in.
         """
-        by_product: dict[str, dict] = {}
-        counted: set = set()
+        by_product: dict[str, dict[str, Any]] = {}
+        counted: set[Any] = set()
         total = Decimal('0')
         events = 0
         for record in rows:

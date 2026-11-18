@@ -1,4 +1,5 @@
 import asyncio
+from typing import Any
 from uuid import UUID
 
 from fastapi import (
@@ -55,7 +56,7 @@ async def upload_item_image(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-):
+) -> Any:
     """Upload a cover image for an item."""
     org_id = require_org(current_user)
     item = await get_item_or_404_async(db, item_id, user_storage_ids)
@@ -124,7 +125,7 @@ async def delete_item_image(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-):
+) -> None:
     """Delete the cover image for an item."""
     org_id = require_org(current_user)
     item = await get_item_or_404_async(db, item_id, user_storage_ids)

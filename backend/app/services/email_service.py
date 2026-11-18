@@ -224,13 +224,16 @@ def email_fallback_link(intro: str, url: str) -> str:
 
 class EmailService:
     @staticmethod
-    def is_configured(smtp_config: dict | None = None) -> bool:
+    def is_configured(smtp_config: dict[str, Any] | None = None) -> bool:
         """Whether a message sent with this configuration could leave at all."""
         return _resolve_smtp_config(smtp_config).is_configured
 
     @staticmethod
     def deliver(
-        to_email: str, subject: str, html_content: str, smtp_config: dict | None = None
+        to_email: str,
+        subject: str,
+        html_content: str,
+        smtp_config: dict[str, Any] | None = None,
     ) -> EmailDeliveryResult:
         """Send an HTML email and report what happened.
 
@@ -264,7 +267,10 @@ class EmailService:
 
     @staticmethod
     def send_email(
-        to_email: str, subject: str, html_content: str, smtp_config: dict | None = None
+        to_email: str,
+        subject: str,
+        html_content: str,
+        smtp_config: dict[str, Any] | None = None,
     ) -> bool:
         """Sends an HTML email using provided or default SMTP settings."""
         return EmailService.deliver(
@@ -276,7 +282,7 @@ class EmailService:
         to_email: str,
         registration_link: str,
         lang: str = 'en',
-        smtp_config: dict | None = None,
+        smtp_config: dict[str, Any] | None = None,
         organization_id: UUID | None = None,
         failure_notice: dict[str, str] | None = None,
     ) -> bool:
@@ -315,7 +321,7 @@ class EmailService:
         organization_name: str,
         role: str,
         lang: str = 'en',
-        smtp_config: dict | None = None,
+        smtp_config: dict[str, Any] | None = None,
         organization_id: UUID | None = None,
     ) -> bool:
         """Render and queue the organization-invitation email.
@@ -365,7 +371,7 @@ class EmailService:
         to_email: str,
         reset_link: str,
         lang: str = 'en',
-        smtp_config: dict | None = None,
+        smtp_config: dict[str, Any] | None = None,
         organization_id: UUID | None = None,
     ) -> bool:
         """Render and queue the password-reset email.
@@ -405,7 +411,7 @@ class EmailService:
         html_content: str,
         attachment_bytes: bytes,
         attachment_filename: str,
-        smtp_config: dict | None = None,
+        smtp_config: dict[str, Any] | None = None,
     ) -> EmailDeliveryResult:
         """Send HTML email with binary attachment (sync, real SMTP I/O).
 
@@ -452,7 +458,7 @@ class EmailService:
         to_email: str,
         subject: str,
         html_content: str,
-        smtp_config: dict | None = None,
+        smtp_config: dict[str, Any] | None = None,
         organization_id: UUID | None = None,
         failure_notice: dict[str, str] | None = None,
     ) -> bool:
@@ -495,7 +501,7 @@ class EmailService:
         html_content: str,
         attachment_bytes: bytes,
         attachment_filename: str,
-        smtp_config: dict | None = None,
+        smtp_config: dict[str, Any] | None = None,
         organization_id: UUID | None = None,
     ) -> bool:
         """Queue an email with attachment for durable delivery.

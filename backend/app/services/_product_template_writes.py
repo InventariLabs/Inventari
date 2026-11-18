@@ -9,6 +9,7 @@ module.
 from __future__ import annotations
 
 import uuid
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import func, select
@@ -42,7 +43,7 @@ _AUDITED = (
 )
 
 
-def _template_snapshot(tpl: ProductTemplate) -> dict:
+def _template_snapshot(tpl: ProductTemplate) -> dict[str, Any]:
     return {field: audit_value(getattr(tpl, field, None)) for field in _AUDITED}
 
 
@@ -60,7 +61,9 @@ async def _uom_word_async(db: AsyncSession, uom_id: UUID | None) -> str | None:
     return uom.symbol if uom is not None else None
 
 
-async def _journal_record_async(db: AsyncSession, tpl: ProductTemplate) -> dict:
+async def _journal_record_async(
+    db: AsyncSession, tpl: ProductTemplate
+) -> dict[str, Any]:
     """The full snapshot, with every reference the writer can name named.
 
     Journal entries have two layers to say in the reader's language — the
@@ -94,7 +97,7 @@ async def _log_template_async(
     org_id: UUID,
     user_id: UUID | None,
     action: AuditAction,
-    snapshot: dict | None = None,
+    snapshot: dict[str, Any] | None = None,
 ) -> None:
     """Record a write to a product template.
 
@@ -184,7 +187,7 @@ async def create_stub_template_async(
 
     resolved_uom_id = await _default_piece_uom_id_async(db, org_id)
 
-    meta_data: dict = {'is_stub': True}
+    meta_data: dict[str, Any] = {'is_stub': True}
 
     tpl = ProductTemplate(
         organization_id=org_id,
@@ -272,7 +275,7 @@ async def create_product_template_async(
     sku: str | None = None,
     description: str | None = None,
     image_url: str | None = None,
-    meta_data: dict | None = None,
+    meta_data: dict[str, Any] | None = None,
     uom_id: UUID | None = None,
     weight_value: float | None = None,
     weight_uom_id: UUID | None = None,
@@ -327,7 +330,7 @@ async def update_product_template_async(
     barcode: str | None = None,
     description: str | None = None,
     image_url: str | None = None,
-    meta_data: dict | None = None,
+    meta_data: dict[str, Any] | None = None,
     user_id: UUID | None = None,
 ) -> object:
     tpl = await db.get(ProductTemplate, template_id)

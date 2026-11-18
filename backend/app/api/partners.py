@@ -1,5 +1,6 @@
 import json
 import uuid
+from typing import Any
 
 from fastapi import APIRouter, Depends, File, Form, Query, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -53,7 +54,7 @@ async def create_partner(
     data: PartnerCreate,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     org_id = require_org(current_user)
     try:
         result = await partner_service.create_async(db, org_id, data, current_user.id)
@@ -68,7 +69,7 @@ async def create_partner(
 async def analyze_partner_import_file(
     file: UploadFile = File(...),
     current_user: UserContextDTO = Depends(get_current_user_context),
-):
+) -> Any:
     """Headers, the first rows and the row count, for the mapping step.
 
     The preview travels with the headers because the mapping step shows it:
@@ -92,7 +93,7 @@ async def import_partners_from_file(
     default_type: str = Form('SUPPLIER'),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """Imports partners based on mapping; the report names every refused row."""
     require_org(current_user)
     try:
@@ -136,7 +137,7 @@ async def list_partners(
     sort_order: str = Query('asc', pattern='^(asc|desc)$'),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     org_id = require_org(current_user)
     partner_types = [t.upper() for t in types] if types else None
     partners, total = await partner_service.list_partners_async(
@@ -164,7 +165,7 @@ async def get_partner(
     partner_id: uuid.UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     org_id = require_org(current_user)
     partner = await partner_service.get_async(db, org_id, partner_id)
     if partner is None:
@@ -178,7 +179,7 @@ async def update_partner(
     data: PartnerUpdate,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     org_id = require_org(current_user)
     try:
         partner = await partner_service.update_async(
@@ -198,7 +199,7 @@ async def delete_partner(
     partner_id: uuid.UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> None:
     org_id = require_org(current_user)
     try:
         deleted = await partner_service.delete_async(
@@ -218,7 +219,7 @@ async def deactivate_partner(
     partner_id: uuid.UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     org_id = require_org(current_user)
     partner = await partner_service.deactivate_async(
         db, org_id, partner_id, user_id=current_user.id
@@ -233,7 +234,7 @@ async def activate_partner(
     partner_id: uuid.UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     org_id = require_org(current_user)
     partner = await partner_service.activate_async(
         db, org_id, partner_id, user_id=current_user.id
@@ -250,7 +251,7 @@ async def get_partner_items(
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     org_id = require_org(current_user)
     if await partner_service.get_async(db, org_id, partner_id) is None:
         raise NotFoundException('partner')

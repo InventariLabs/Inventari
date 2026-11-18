@@ -1,3 +1,4 @@
+from typing import Any
 from uuid import UUID
 
 from fastapi import (
@@ -12,6 +13,7 @@ from fastapi import (
     status,
 )
 from pydantic import BaseModel, EmailStr, model_validator
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.concurrency import run_in_threadpool
 
 from app.api.dependencies import get_current_admin_user, get_superuser
@@ -171,9 +173,9 @@ class RemoveMemberResponse(BaseModel):
 async def list_all_organizations(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
-    current_user=Depends(get_superuser),
-    db=Depends(get_async_db, scope='function'),
-):
+    current_user: Any = Depends(get_superuser),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     page = PaginatedResponse.from_full_list(
         await core_api.organizations.list_all_async(db), offset=offset, limit=limit
     )
@@ -186,8 +188,8 @@ async def list_all_organizations(
 async def create_organization(
     organization_in: OrganizationCreate,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     lang = get_current_lang()
     if current_user.organization_id:
         raise ConflictException(
@@ -211,7 +213,7 @@ async def create_organization(
 async def send_test_email(
     smtp_config: SmtpConfig = Body(...),
     current_user: UserContextDTO = Depends(get_current_admin_user),
-):
+) -> Any:
     from app.services.email_service import email_service
 
     subject = 'Inventari - Test Email'
@@ -252,9 +254,9 @@ async def send_test_email(
 
 
 async def _mail_the_invitation(
-    db,
+    db: AsyncSession,
     current_user: UserContextDTO,
-    invitation: dict,
+    invitation: dict[str, Any],
 ) -> bool:
     """Hand the invitation to the mail queue, if there is one to hand it to.
 
@@ -300,8 +302,8 @@ async def create_invitation_code(
     request: Request,
     body: InvitationCodeRequest,
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     lang = get_current_lang()
     if not current_user.organization_id:
         raise NotFoundException('organization', lang)
@@ -357,8 +359,8 @@ async def list_invitations(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Invitations issued for this organization, newest first.
 
     The screen showed a freshly generated link and nothing else: whether an
@@ -376,8 +378,8 @@ async def list_failed_emails(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Mail this organization sent that never arrived, newest first.
 
     The queue retries for about seven and a half minutes and then marks the
@@ -404,8 +406,8 @@ async def resend_invitation(
     request: Request,
     invitation_id: UUID,
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Send a pending invitation again and give it another seven days.
 
     Rate-limited like issuing one: the endpoint puts mail in somebody else's
@@ -444,7 +446,7 @@ async def resend_invitation(
 async def revoke_invitation(
     invitation_id: UUID,
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> None:
     """Withdraw an invitation that nobody has redeemed yet.
 
@@ -485,8 +487,8 @@ async def join_organization(
     request: Request,
     code: str = Body(..., embed=True),
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Join an organization with an invitation code.
 
     Rate-limited like code creation: a failed attempt costs the caller nothing
@@ -526,8 +528,8 @@ async def join_organization(
 @router.get('/my', response_model=OrganizationSchema)
 async def get_my_organization(
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     lang = get_current_lang()
     if not current_user.organization_id:
         raise NotFoundException('organization', lang)
@@ -551,12 +553,12 @@ async def get_my_organization(
 @router.post(
     '/current/defaults',
     # list-envelope-exception: a bulk result, the locations this request just seeded
-    response_model=list[dict],
+    response_model=list[dict[str, Any]],
 )
 async def create_default_locations_for_current_organization(
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Seed the starting locations declared by the organization's profile.
 
     Took a module list until, when the set moved to the product
@@ -577,12 +579,12 @@ async def create_default_locations_for_current_organization(
 @router.get('/my/members', response_model=PaginatedResponse[OrganizationMember])
 async def get_organization_members(
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     offset: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     search: str | None = Query(None, max_length=100),
     _: object = require_permission(SystemPermission.ORG_READ),
-):
+) -> Any:
     if not current_user.organization_id:
         return PaginatedResponse(
             items=[], total=0, limit=limit, offset=offset, has_more=False
@@ -622,8 +624,8 @@ async def get_organization_members(
 async def update_organization(
     organization_in: OrganizationUpdate,
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     # The organization's general settings, which are administration — and
     # not the AI purpose bindings, although the settings block carries them:
     # those have their own door, `PUT /ai-connections/bindings`, under the
@@ -662,8 +664,8 @@ _LOGO_MIME_TO_EXT = {
 async def upload_organization_logo(
     image: UploadFile = File(...),
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Upload the logo printed on documents and other outbound material.
 
     the issuer block on document printouts needs the organization's
@@ -713,8 +715,8 @@ async def upload_organization_logo(
 @router.delete('/logo', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_organization_logo(
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Response:
     """Remove the organization logo; documents print without one."""
     lang = get_current_lang()
     if not current_user.organization_id:
@@ -729,8 +731,8 @@ async def delete_organization_logo(
 @router.post('/my/leave', response_model=MessageResponse)
 async def leave_organization(
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     if not current_user.organization_id:
         raise catalogue_refusal('organization_not_found')
 
@@ -750,8 +752,8 @@ async def change_member_role(
     user_id: UUID,
     data: MemberRoleUpdate,
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Change what a member of this organization is allowed to do. Admin only.
 
     Accepts either a built-in level (``role``) or an org-scoped custom role
@@ -781,8 +783,8 @@ async def change_member_role(
 async def remove_member(
     user_id: UUID,
     current_user: UserContextDTO = Depends(get_current_admin_user),
-    db=Depends(get_async_db, scope='function'),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     if user_id == current_user.id:
         raise catalogue_refusal('cannot_remove_yourself')
 

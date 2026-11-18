@@ -1,9 +1,12 @@
+from typing import Any, cast
+from uuid import UUID
+
 from fastapi import APIRouter, Cookie, Depends, Request, status
 from fastapi.responses import JSONResponse, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import API_KEY_HEADER, UserContextDTO
-from app.core.contributions import contribution_registry
+from app.core.contributions import OwnedFileMeta, contribution_registry
 from app.core.deps import get_async_db, require_org
 from app.core.exceptions import catalogue_status_refusal
 from app.core.file_storage.service import FileStorageService
@@ -36,7 +39,9 @@ def _not_found() -> JSONResponse:
     return _refused(404, 'not_found')
 
 
-async def _resolve(db: AsyncSession, file_path: str, org_id):
+async def _resolve(
+    db: AsyncSession, file_path: str, org_id: UUID | None
+) -> OwnedFileMeta | None:
     """Return OwnedFileMeta for the first resolver that owns ``file_path``.
 
     Core resolvers are consulted first, then any module-registered
@@ -46,7 +51,7 @@ async def _resolve(db: AsyncSession, file_path: str, org_id):
     for resolver in resolvers:
         meta = await resolver.resolve(db, file_path, org_id)
         if meta is not None:
-            return meta
+            return cast(OwnedFileMeta | None, meta)
     return None
 
 
@@ -92,7 +97,7 @@ async def serve_upload(
     filepath: str,
     current_user: UserContextDTO = Depends(get_media_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """Serve an uploaded file with organization ownership verification.
 
     Ownership is resolved by the upload path resolvers (core + module

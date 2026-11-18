@@ -5,7 +5,7 @@ queue, which freezes it when a label is sent to a printer — so a label printed
 either way carries the same text.
 """
 
-from typing import Any
+from typing import Any, cast
 
 
 def label_shows_description(storage: Any) -> bool:
@@ -23,4 +23,4 @@ def storage_label_caption(storage: Any, show_description: bool) -> str | None:
     """
     if not show_description:
         return None
-    return storage.description or storage.name
+    return cast(str | None, storage.description or storage.name)

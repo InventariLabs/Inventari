@@ -11,8 +11,8 @@
     "countedOf": "{{counted}} / {{total}} itens",
     "discrepanciesDetected_one": "1 divergência detectada",
     "discrepanciesDetected_other": "{{count}} divergências detectadas",
-    "unsaved_one": "1 contagem digitada e não salva",
-    "unsaved_other": "{{count}} contagens digitadas e não salvas"
+    "unsaved_one": "1 linha com alterações não salvas",
+    "unsaved_other": "{{count}} linhas com alterações não salvas"
   },
   "differencesBadge_one": "{{count}} diferença",
   "differencesBadge_other": "{{count}} diferenças",
@@ -102,6 +102,7 @@
     "countFor": "Quantidade contada de {{name}}",
     "countMalformed": "Isso não é um número. Digite algarismos com um único separador decimal, por exemplo 12 ou 1,5.",
     "unsaved": "Não salvo",
+    "unsavedNeedsCount": "Não salvo — digite uma contagem para salvar",
     "awaitingRecount": "Contar novamente",
     "countAgain": "Contar {{name}} novamente",
     "countedPass": "Contagem {{sequence}}: {{quantity}} ({{name}})",
@@ -122,10 +123,10 @@
     "complete": {
       "title": "Concluir contagem de estoque",
       "confirmLabel": "Concluir",
-      "unsaved_one": "Um número contado não foi salvo e será perdido.",
-      "unsaved_other": "{{count}} números contados não foram salvos e serão perdidos.",
       "message_one": "Concluir esta contagem de estoque substitui o estoque de um produto pelo número contado. Depois disso, não será possível editar os itens contados.",
-      "message_other": "Concluir esta contagem de estoque substitui o estoque de {{count}} produtos pelos números contados. Depois disso, não será possível editar os itens contados."
+      "message_other": "Concluir esta contagem de estoque substitui o estoque de {{count}} produtos pelos números contados. Depois disso, não será possível editar os itens contados.",
+      "unsaved_one": "Uma linha tem um número, um motivo ou uma nota não salvos; serão perdidos.",
+      "unsaved_other": "{{count}} linhas têm um número, um motivo ou uma nota não salvos; serão perdidos."
     },
     "cancel": {
       "title": "Cancelar contagem de estoque",
@@ -245,14 +246,14 @@
     "closeEmpty": "Nada foi encontrado em {{location}}. Confirmar como contado e vazio?",
     "closeCounted": "Todas as linhas em {{location}} foram contadas. Encerrar o local?",
     "closeConfirm": "Encerrar local",
-    "closeUnsaved_one": "Um número neste local não foi salvo. Salve-o antes de encerrar o local.",
-    "closeUnsaved_other": "{{count}} números neste local não foram salvos. Salve-os antes de encerrar o local.",
     "closedDone_one": "{{location}} encerrado: uma linha contada como 0.",
     "closedDone_other": "{{location}} encerrado: {{count}} linhas contadas como 0.",
     "closedEmptyDone": "{{location}} confirmado como vazio.",
     "closedCountedDone": "{{location}} encerrado.",
     "closedBy": "Encerrado por {{name}}",
-    "closedEmptyBy": "Confirmado como vazio por {{name}}"
+    "closedEmptyBy": "Confirmado como vazio por {{name}}",
+    "closeUnsaved_one": "Uma linha neste local tem alterações não salvas. Salve-a antes de encerrar o local.",
+    "closeUnsaved_other": "{{count}} linhas neste local têm alterações não salvas. Salve-as antes de encerrar o local."
   },
   "count": {
     "action": "Contar um local",

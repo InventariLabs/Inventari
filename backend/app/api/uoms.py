@@ -14,9 +14,11 @@ window, and an invalidator with no caller would be exactly the dead surface
  was spent removing.
 """
 
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.cache import cache_get_or_set
 from app.core.contracts import UomCategoryDTO, UomDTO, UserContextDTO
@@ -41,13 +43,13 @@ def _uom_categories_key(org_id: UUID) -> str:
 async def get_uoms(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     current_user: UserContextDTO = Depends(get_current_user_context),
-):
+) -> Any:
     """List all units of measure visible to the current organization (system + org-specific)."""
     org_id = require_org(current_user)
 
-    async def _compute():
+    async def _compute() -> list[UomDTO]:
         return await core_api.uoms.list_for_org_async(db, org_id)
 
     uoms = await cache_get_or_set(_uoms_key(org_id), ttl=_TTL, factory=_compute)
@@ -58,13 +60,13 @@ async def get_uoms(
 async def get_uom_categories(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     current_user: UserContextDTO = Depends(get_current_user_context),
-):
+) -> Any:
     """List all UoM categories visible to the current organization (system + org-specific)."""
     org_id = require_org(current_user)
 
-    async def _compute():
+    async def _compute() -> list[UomCategoryDTO]:
         return await core_api.uoms.list_categories_for_org_async(db, org_id)
 
     categories = await cache_get_or_set(

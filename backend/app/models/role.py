@@ -1,11 +1,16 @@
 import uuid
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+
+if TYPE_CHECKING:
+    from app.models.organization import Organization
+    from app.models.user import User
 
 
 class Role(Base):
@@ -41,7 +46,7 @@ class Role(Base):
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
 
-    organization: Mapped['Organization'] = relationship(foreign_keys=[organization_id])  # type: ignore[name-defined]
+    organization: Mapped['Organization'] = relationship(foreign_keys=[organization_id])
     user_roles: Mapped[list['UserRole']] = relationship(
         back_populates='role', cascade='all, delete-orphan'
     )
@@ -55,5 +60,5 @@ class UserRole(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('users.id'), primary_key=True)
     role_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('roles.id'), primary_key=True)
 
-    user: Mapped['User'] = relationship(back_populates='user_roles')  # type: ignore[name-defined]
+    user: Mapped['User'] = relationship(back_populates='user_roles')
     role: Mapped['Role'] = relationship(back_populates='user_roles')

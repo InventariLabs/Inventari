@@ -10,7 +10,7 @@ Keys stored in system_settings table:
 """
 
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from sqlalchemy import select
@@ -23,7 +23,7 @@ from app.models.system_setting import SystemSetting
 logger = get_logger(__name__)
 
 # Default values seeded at migration time — these are fallback if DB is empty
-DEFAULT_MODEL_PRICING: dict[str, dict] = {
+DEFAULT_MODEL_PRICING: dict[str, dict[str, Any]] = {
     'google/gemini-2.0-flash-001': {'input_per_1k': 0.000075, 'output_per_1k': 0.0003},
     'google/gemini-2.0-flash-exp:free': {'input_per_1k': 0.0, 'output_per_1k': 0.0},
     'google/gemini-2.5-pro': {'input_per_1k': 0.00125, 'output_per_1k': 0.01},
@@ -64,12 +64,18 @@ async def get_setting_async(db: AsyncSession, key: str, default: Any = None) -> 
 
 async def get_default_org_limits_async(db: AsyncSession) -> dict[str, Any]:
     """Async: return default org limits from system settings."""
-    return await get_setting_async(db, 'default_org_limits', DEFAULT_ORG_LIMITS)
+    return cast(
+        dict[str, Any],
+        await get_setting_async(db, 'default_org_limits', DEFAULT_ORG_LIMITS),
+    )
 
 
-async def get_model_pricing_async(db: AsyncSession) -> dict[str, dict]:
+async def get_model_pricing_async(db: AsyncSession) -> dict[str, dict[str, Any]]:
     """Async: return model pricing from system settings."""
-    return await get_setting_async(db, 'model_pricing', DEFAULT_MODEL_PRICING)
+    return cast(
+        dict[str, dict[str, Any]],
+        await get_setting_async(db, 'model_pricing', DEFAULT_MODEL_PRICING),
+    )
 
 
 async def estimate_cost_async(
@@ -101,7 +107,7 @@ async def estimate_cost_async(
     return cost, True
 
 
-async def get_all_settings_async(db: AsyncSession) -> list[dict]:
+async def get_all_settings_async(db: AsyncSession) -> list[dict[str, Any]]:
     """Async: return all system settings."""
     rows = (await db.scalars(select(SystemSetting))).all()
     return [

@@ -498,7 +498,9 @@ describe("StockTakeCountingPage", () => {
     await user.type(countedField, "20");
 
     expect(screen.getByText("Not saved")).toBeInTheDocument();
-    expect(screen.getByText("1 count typed but not saved")).toBeInTheDocument();
+    expect(
+      screen.getByText("1 line has changes that are not saved"),
+    ).toBeInTheDocument();
     // The record says nothing was counted, and says so on the row too.
     expect(screen.getByText("0 / 1 items")).toBeInTheDocument();
     expect(screen.getByText("—")).toBeInTheDocument();
@@ -980,6 +982,29 @@ describe("StockTakeCountingPage — filter, notes and a product that was not lis
       counted_quantity: 7,
       notes: "Dented box",
     });
+  });
+
+  it("names a typed note as a change, and asks for a count when the box is empty", async () => {
+    const user = userEvent.setup();
+    await renderPage();
+
+    await user.type(
+      screen.getByRole("textbox", { name: "Note about Bread" }),
+      "Dented box",
+    );
+    // No number was typed: the words must not say one was.
+    expect(screen.getByText("Not saved")).toBeInTheDocument();
+    expect(
+      screen.getByText("1 line has changes that are not saved"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/count typed/)).not.toBeInTheDocument();
+
+    await user.clear(
+      screen.getByRole("textbox", { name: "Counted quantity of Bread" }),
+    );
+    expect(
+      screen.getByText("Not saved — enter a count to save"),
+    ).toBeInTheDocument();
   });
 
   it("creates the product in the counted location, then books it as a surplus", async () => {

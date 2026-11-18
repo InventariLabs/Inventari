@@ -1,11 +1,15 @@
 import uuid
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import JSON, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+
+if TYPE_CHECKING:
+    from app.models.item import Item
+    from app.models.organization import Organization
 
 
 class Category(Base):
@@ -71,8 +75,8 @@ class Category(Base):
     )
 
     # Relationships
-    organization: Mapped['Organization'] = relationship(backref='custom_categories')  # type: ignore[name-defined]
-    items: Mapped[list['Item']] = relationship(back_populates='category')  # type: ignore[name-defined]
+    organization: Mapped['Organization'] = relationship(backref='custom_categories')
+    items: Mapped[list['Item']] = relationship(back_populates='category')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<Category(name="{self.name}", tag="{self.context_tag}")>'

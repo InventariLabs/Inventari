@@ -1,4 +1,5 @@
 import io
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request, status
@@ -78,7 +79,7 @@ async def generate_label_pool(
     _: object = _ITEMS_WRITE,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """Generates a pool of N unique labels for the user's organization."""
     require_org(current_user)
 
@@ -109,7 +110,7 @@ async def create_labels_from_codes(
     _: object = _ITEMS_WRITE,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """Create labels from explicit short_codes (e.g. equipment serials).
 
     Per-org uniqueness: a short_code already used in the org, or duplicated
@@ -157,7 +158,7 @@ async def get_label_pool(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
-):
+) -> Any:
     """List of labels for the user's organization - Optimized."""
     items, total = await core_api.labels.list_for_org_with_relations_async(
         db,
@@ -192,7 +193,7 @@ async def get_label_stats(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
-):
+) -> Any:
     """Returns statistics for the label pool."""
     return await core_api.labels.get_pool_stats_async(db, current_user.organization_id)  # type: ignore[arg-type]
 
@@ -203,7 +204,7 @@ async def delete_label(
     _: object = _ITEMS_WRITE,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Response:
     """Deletes a specific label."""
     org_id = require_org(current_user)
     label = await core_api.labels.get_by_id_async(db, label_id, org_id)
@@ -241,7 +242,7 @@ async def scan_label(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
-):
+) -> Any:
     """Endpoint called after scanning a QR code (Place or Product) or Barcode."""
 
     input_code = short_code
@@ -280,7 +281,7 @@ async def unassign_label(
     _: object = _ITEMS_WRITE,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """Manually frees a label from an archived/deleted item."""
     org_id = require_org(current_user)
     label = await core_api.labels.unassign_async(
@@ -299,7 +300,7 @@ async def assign_label_to_existing_item(
     _: object = _ITEMS_WRITE,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """Assigns a free label to an already-existing item (ITAM flow)."""
 
     org_id = require_org(current_user)
@@ -333,7 +334,7 @@ async def assign_label_to_item(
     _: object = _ITEMS_WRITE,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """Assigns a label to a newly created product OR creates a product with a barcode.
 
     The canonical mapping answers its refusals, the item limit included, in
@@ -410,7 +411,7 @@ async def export_labels_png(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = _READS_LABELS,
-):
+) -> Any:
     """Exports labels as one PNG: each label at its size, in mm, at 300 dpi."""
     org_id = require_org(current_user)
 

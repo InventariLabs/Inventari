@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from decimal import ROUND_CEILING, ROUND_FLOOR, ROUND_HALF_UP, Decimal
-from typing import NamedTuple, Protocol
+from typing import Any, NamedTuple, Protocol
 from uuid import UUID
 
 from sqlalchemy import or_, select
@@ -268,7 +268,7 @@ async def list_uoms_for_org_async(db: AsyncSession, organization_id: UUID) -> li
 
 async def list_uom_categories_for_org_async(
     db: AsyncSession, organization_id: UUID
-) -> list:
+) -> list[Any]:
     """Return all UomCategory rows visible to *organization_id* with eager-loaded uoms."""
     from app.models.uom import UomCategory
 

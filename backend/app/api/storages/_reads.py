@@ -1,8 +1,10 @@
 import io
+from typing import Any
 from uuid import UUID
 
 from fastapi import Depends, Query
 from fastapi.responses import StreamingResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.core.contracts import SystemPermission, UserContextDTO
@@ -142,9 +144,9 @@ async def get_storages(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = _READS_LOCATIONS,
-):
+) -> Any:
     """One page of the user's storage locations, with item counts.
 
     The page is selected, ordered (walk order, then name) and counted from
@@ -211,9 +213,9 @@ async def get_storage_tree(
         'record below the nodes answered.',
     ),
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.STORAGES_READ),
-):
+) -> Any:
     """Hierarchical tree of the organization's storage locations, whole or one level at a time."""
     org_id = require_org(current_user)
 
@@ -263,9 +265,9 @@ async def get_storage_tree(
 async def get_storage_breadcrumb(
     location_id: UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = _READS_WAREHOUSE_LOCATIONS,
-):
+) -> Any:
     """Returns ordered path from root to this location."""
     lang = get_current_lang()
     org_id = require_org(current_user)
@@ -283,9 +285,9 @@ async def list_archived_storages(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.STORAGES_READ),
-):
+) -> Any:
     """Archived locations — the same module scope as the active tab next to it.
 
     The pair of tabs describes one population: an archive that lists rows the
@@ -302,9 +304,9 @@ async def list_archived_storages(
 async def get_storage_detail(
     location_id: UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = _READS_LOCATIONS,
-):
+) -> Any:
     """Storage location details."""
     lang = get_current_lang()
     org_id = require_org(current_user)
@@ -317,9 +319,9 @@ async def get_storage_detail(
 async def get_storage_summary(
     location_id: UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.STORAGES_READ),
-):
+) -> Any:
     """Storage location status summary."""
     lang = get_current_lang()
     org_id = require_org(current_user)
@@ -340,7 +342,7 @@ async def get_storage_summary(
     return StorageLocationSummary(
         id=storage.id,
         name=storage.name,
-        location_type=storage.location_type,  # type: ignore[arg-type]
+        location_type=storage.location_type,
         usage=storage.usage,
         items_count=items_count,
         subtree_items_count=subtree_items_count,
@@ -363,9 +365,9 @@ async def get_storage_items(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = _READS_WAREHOUSE_LOCATIONS,
-):
+) -> Any:
     """List of products in given storage location."""
     lang = get_current_lang()
     org_id = require_org(current_user)
@@ -401,9 +403,9 @@ async def print_storage_label(
     base_url: str | None = Query(None),
     show_description: bool | None = Query(None),
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.STORAGES_READ),
-):
+) -> StreamingResponse:
     """Generates a PNG label for a specific storage location."""
     from app.core.label_rendering import render_label_png
 
@@ -418,7 +420,7 @@ async def print_storage_label(
         raise catalogue_refusal('storage_no_short_code')
 
     class MockLabel:
-        def __init__(self, code, desc):
+        def __init__(self, code: str, desc: str | None) -> None:
             self.short_code = code
             self.description = desc
             self.label_type = 'STORAGE'
@@ -459,9 +461,9 @@ async def print_storage_label(
 async def get_storage_codes(
     location_id: UUID,
     current_user: UserContextDTO = Depends(get_current_user_context),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = _READS_WAREHOUSE_LOCATIONS,
-):
+) -> Any:
     """How the warehouse holding this location makes its codes, and which
     locations wait for a new sticker."""
     from app.services.storage._codes import warehouse_codes_async

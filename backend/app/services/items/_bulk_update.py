@@ -53,7 +53,7 @@ async def _get_storage_ids(
 
 
 async def _ensure_referenced_ids_are_own(
-    db: AsyncSession, update_dict: dict, org_id: UUID | None
+    db: AsyncSession, update_dict: dict[str, Any], org_id: UUID | None
 ) -> None:
     """Refuse ids in the payload that belong to another organization.
 

@@ -18,6 +18,7 @@ and answers, per move, what it would carry — the scope the confirmation
 names before the person moving chooses.
 """
 
+from typing import Any
 from uuid import UUID, uuid4
 
 from sqlalchemy import String, cast, func, select, update
@@ -57,7 +58,12 @@ from app.services.storage._relocation import (
 class _Plan:
     """Resolved batch: candidate final state plus the planned operations."""
 
-    def __init__(self, name_by_id: dict, parent_by_id: dict, usage_by_id: dict) -> None:
+    def __init__(
+        self,
+        name_by_id: dict[UUID, str],
+        parent_by_id: dict[UUID, UUID | None],
+        usage_by_id: dict[UUID, str],
+    ) -> None:
         self.name_by_id = dict(name_by_id)
         self.parent_map = dict(parent_by_id)
         # Kept apart from ``parent_map``, which resolution mutates into the
@@ -66,7 +72,7 @@ class _Plan:
         self.original_parent_by_id = dict(parent_by_id)
         self.usage_by_id = dict(usage_by_id)
         self.deleted_ids: list[UUID] = []
-        self.creates: list[tuple[str, dict]] = []  # (temporary_id, data)
+        self.creates: list[tuple[str, dict[str, Any]]] = []  # (temporary_id, data)
         self.moves: list[tuple[UUID, UUID | None]] = []
         # Beside ``moves``, one per move: the operation's index and what the
         # move means (``StorageReorgOperation.relocation``).
@@ -108,7 +114,9 @@ def _find_cycle(
     return None
 
 
-async def _load_snapshot(db: AsyncSession, org_id: UUID) -> tuple[dict, dict, dict]:
+async def _load_snapshot(
+    db: AsyncSession, org_id: UUID
+) -> tuple[dict[UUID, str], dict[UUID, UUID | None], dict[UUID, str]]:
     """Return (name_by_id, parent_by_id, usage_by_id) for the org's locations.
 
     The usage and the names ride along for the journal: a delete entry names
@@ -554,7 +562,7 @@ async def _apply_writes(
                 ]
                 if parent is not None
             }
-            tag_by_parent: dict = {}
+            tag_by_parent: dict[UUID | None, str] = {}
             if batch_parent_ids:
                 parent_rows = await db.scalars(
                     select(StorageLocation).where(
@@ -601,7 +609,7 @@ async def _apply_writes(
                     if inherited:
                         final_data['context_tag'] = inherited
                 storage = StorageLocation(**final_data)
-                storage.organization_id = org_id  # type: ignore[assignment]
+                storage.organization_id = org_id
                 storage.created_by = user.id
                 # The same rule as a single create: the next shelf code under a
                 # numbered parent — one created earlier in this batch included,

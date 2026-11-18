@@ -1,6 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Literal
+from typing import Any, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -68,12 +68,12 @@ class ProductTemplateBase(BaseModel):
 
     @field_validator('barcode', mode='before')
     @classmethod
-    def normalize_barcode_field(cls, v):
+    def normalize_barcode_field(cls, v: Any) -> Any:
         return normalize_barcode(v)
 
     @field_validator('sku', mode='before')
     @classmethod
-    def validate_sku(cls, v):
+    def validate_sku(cls, v: Any) -> Any:
         return normalize_sku(v)
 
     uom_id: UUID | None = None
@@ -98,13 +98,13 @@ class ProductTemplateCreate(ProductTemplateBase):
     OpenAPI surface advertises it to the E2E seeding client.
     """
 
-    meta_data: dict | None = None
+    meta_data: dict[str, Any] | None = None
 
 
 class ProductTemplateNutritionUpdate(BaseModel):
     """Lightweight schema for updating only nutrition_info on a template."""
 
-    nutrition_info: dict | None = None
+    nutrition_info: dict[str, Any] | None = None
 
 
 class ProductTemplateClone(BaseModel):
@@ -118,7 +118,7 @@ class ProductTemplate(ProductTemplateBase):
     id: UUID
     organization_id: UUID | None = None
     # Module-owned enrichment data (namespaced per module, e.g. meta_data['nutrition']).
-    meta_data: dict | None = None
+    meta_data: dict[str, Any] | None = None
     # This organization's AVCO rate. Not a column: it is filled per request
     # from the caller's own valuation layers: a global template row is shared with
     # every organization, so the figure cannot live on it.

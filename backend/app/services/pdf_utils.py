@@ -245,7 +245,9 @@ def country_name(code: str, lang: str = 'en') -> str:
 _BABEL_LOCALES: dict[str, Any] = {lang: Locale(lang) for lang in SUPPORTED_LANGUAGES}
 
 
-def format_partner_address(address: dict | None, lang: str = 'en') -> str | None:
+def format_partner_address(
+    address: dict[str, Any] | None, lang: str = 'en'
+) -> str | None:
     if not address:
         return None
     parts = []

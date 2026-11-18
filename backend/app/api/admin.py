@@ -1,4 +1,7 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_superuser
 from app.core.deps import get_async_db
@@ -12,7 +15,9 @@ router = APIRouter()
     response_model=dict,
     dependencies=[Depends(get_superuser)],
 )
-async def get_system_summary(db=Depends(get_async_db, scope='function')):
+async def get_system_summary(
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Returns high-level system metrics."""
     return await admin_service.get_system_summary(db)
 
@@ -22,7 +27,9 @@ async def get_system_summary(db=Depends(get_async_db, scope='function')):
     response_model=dict,
     dependencies=[Depends(get_superuser)],
 )
-async def get_ai_usage_stats(db=Depends(get_async_db, scope='function'), days: int = 7):
+async def get_ai_usage_stats(
+    db: AsyncSession = Depends(get_async_db, scope='function'), days: int = 7
+) -> Any:
     """Returns detailed AI usage statistics per organization."""
     return await admin_service.get_ai_usage_stats(db, days)
 
@@ -32,6 +39,8 @@ async def get_ai_usage_stats(db=Depends(get_async_db, scope='function'), days: i
     response_model=dict,
     dependencies=[Depends(get_superuser)],
 )
-async def get_activity_stats(db=Depends(get_async_db, scope='function'), days: int = 7):
+async def get_activity_stats(
+    db: AsyncSession = Depends(get_async_db, scope='function'), days: int = 7
+) -> Any:
     """Returns activity timeline."""
     return await admin_service.get_activity_stats(db, days)

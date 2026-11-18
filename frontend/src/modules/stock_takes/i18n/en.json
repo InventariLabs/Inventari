@@ -11,8 +11,8 @@
     "countedOf": "{{counted}} / {{total}} items",
     "discrepanciesDetected_one": "1 discrepancy detected",
     "discrepanciesDetected_other": "{{count}} discrepancies detected",
-    "unsaved_one": "1 count typed but not saved",
-    "unsaved_other": "{{count}} counts typed but not saved"
+    "unsaved_one": "1 line has changes that are not saved",
+    "unsaved_other": "{{count}} lines have changes that are not saved"
   },
   "differencesBadge_one": "{{count}} difference",
   "differencesBadge_other": "{{count}} differences",
@@ -102,6 +102,7 @@
     "countFor": "Counted quantity of {{name}}",
     "countMalformed": "That is not a number. Type digits with one decimal point, for example 12 or 1.5.",
     "unsaved": "Not saved",
+    "unsavedNeedsCount": "Not saved — enter a count to save",
     "awaitingRecount": "To count again",
     "countAgain": "Count {{name}} again",
     "countedPass": "Count {{sequence}}: {{quantity}} ({{name}})",
@@ -122,10 +123,10 @@
     "complete": {
       "title": "Complete stock take",
       "confirmLabel": "Complete",
-      "unsaved_one": "One counted number has not been saved and will be lost.",
-      "unsaved_other": "{{count}} counted numbers have not been saved and will be lost.",
       "message_one": "Completing this stock take overwrites the stock of one product with the counted number. You won't be able to edit counted items afterwards.",
-      "message_other": "Completing this stock take overwrites the stock of {{count}} products with the counted numbers. You won't be able to edit counted items afterwards."
+      "message_other": "Completing this stock take overwrites the stock of {{count}} products with the counted numbers. You won't be able to edit counted items afterwards.",
+      "unsaved_one": "One line has a number, reason or note that has not been saved; it will be lost.",
+      "unsaved_other": "{{count}} lines have a number, reason or note that has not been saved; they will be lost."
     },
     "cancel": {
       "title": "Cancel stock take",
@@ -245,14 +246,14 @@
     "closeEmpty": "Nothing was found at {{location}}. Confirm it as counted and empty?",
     "closeCounted": "Every row at {{location}} is counted. Close the location?",
     "closeConfirm": "Close location",
-    "closeUnsaved_one": "One number at this location has not been saved. Save it before closing the location.",
-    "closeUnsaved_other": "{{count}} numbers at this location have not been saved. Save them before closing the location.",
     "closedDone_one": "{{location}} closed: one row counted as 0.",
     "closedDone_other": "{{location}} closed: {{count}} rows counted as 0.",
     "closedEmptyDone": "{{location}} confirmed as empty.",
     "closedCountedDone": "{{location}} closed.",
     "closedBy": "Closed by {{name}}",
-    "closedEmptyBy": "Confirmed empty by {{name}}"
+    "closedEmptyBy": "Confirmed empty by {{name}}",
+    "closeUnsaved_one": "One line at this location has changes that are not saved. Save it before closing the location.",
+    "closeUnsaved_other": "{{count}} lines at this location have changes that are not saved. Save them before closing the location."
   },
   "count": {
     "action": "Count a location",

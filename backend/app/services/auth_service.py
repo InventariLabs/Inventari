@@ -1,5 +1,6 @@
 from datetime import UTC, datetime, timedelta
 from functools import partial
+from typing import Any, cast
 from uuid import UUID
 
 from sqlalchemy import case, func, or_, select, text, update
@@ -293,25 +294,31 @@ class AuthService:
     async def get_request_by_id_async(
         db: AsyncSession, request_id: str
     ) -> RegistrationRequest | None:
-        return await db.scalar(
-            select(RegistrationRequest).where(RegistrationRequest.id == request_id)
+        return cast(
+            RegistrationRequest | None,
+            await db.scalar(
+                select(RegistrationRequest).where(RegistrationRequest.id == request_id)
+            ),
         )
 
     @staticmethod
     async def get_request_by_token_async(
         db: AsyncSession, token: str
     ) -> RegistrationRequest | None:
-        return await db.scalar(
-            select(RegistrationRequest).where(
-                RegistrationRequest.token == token,
-                RegistrationRequest.expires_at > datetime.now(UTC),
-            )
+        return cast(
+            RegistrationRequest | None,
+            await db.scalar(
+                select(RegistrationRequest).where(
+                    RegistrationRequest.token == token,
+                    RegistrationRequest.expires_at > datetime.now(UTC),
+                )
+            ),
         )
 
     @staticmethod
     async def get_org_smtp_config_async(
         db: AsyncSession, organization_id: UUID | None
-    ) -> dict | None:
+    ) -> dict[str, Any] | None:
         """The organization's SMTP settings, decrypted for sending.
 
         The password leaf is read strictly and downgraded HERE, at the one
@@ -655,7 +662,7 @@ class AuthService:
 
     @staticmethod
     async def update_user_profile_async(
-        db: AsyncSession, user_id: UUID, update_data: dict
+        db: AsyncSession, user_id: UUID, update_data: dict[str, Any]
     ) -> User:
         user = await db.scalar(select(User).where(User.id == user_id))
         if not user:

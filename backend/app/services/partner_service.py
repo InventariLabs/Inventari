@@ -1,7 +1,7 @@
 import uuid
 from collections.abc import Iterable
 from decimal import Decimal
-from typing import Literal
+from typing import Any, Literal, cast
 
 from sqlalchemy import select, text
 from sqlalchemy.exc import IntegrityError
@@ -43,7 +43,7 @@ _SORTABLE_COLUMNS = {
 AUDIT_PAYLOAD_SCHEMA = ('PartnerUpdate', 'Partner')
 
 
-def _identity(partner: Partner) -> dict:
+def _identity(partner: Partner) -> dict[str, Any]:
     """What names a partner in the journal, after the row itself is gone."""
     return {'name': partner.name, 'type': partner.type, 'code': partner.code}
 
@@ -51,8 +51,8 @@ def _identity(partner: Partner) -> dict:
 async def _journal_change_async(
     db: AsyncSession,
     partner: Partner,
-    before: dict,
-    after: dict,
+    before: dict[str, Any],
+    after: dict[str, Any],
     user_id: uuid.UUID | None,
 ) -> None:
     """One UPDATE entry for the fields that moved; none when nothing did."""
@@ -101,7 +101,7 @@ async def create_async(
 
 
 async def _flush_partner_async(
-    db: AsyncSession, partner: Partner, changes: dict | None = None
+    db: AsyncSession, partner: Partner, changes: dict[str, Any] | None = None
 ) -> None:
     """Write the partner, answering a lost race for its name or code as a refusal.
 
@@ -198,7 +198,7 @@ async def get_async(
     )
     if for_update:
         stmt = stmt.with_for_update().execution_options(populate_existing=True)
-    return await db.scalar(stmt)
+    return cast(Partner | None, await db.scalar(stmt))
 
 
 async def display_names_by_ids_async(
@@ -368,7 +368,7 @@ async def _attach_document_stats_async(
         row.partner_id: row.purchase_order_count for row in po_rows
     }
 
-    stats: dict[uuid.UUID, list] = {}
+    stats: dict[uuid.UUID, list[Any]] = {}
     for row in rows:
         stats.setdefault(row.partner_id, []).append(row)
     for item in items:

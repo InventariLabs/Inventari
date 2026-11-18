@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends, Query, Request, status
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -46,7 +48,7 @@ async def register(
     request: Request,
     user_in: UserCreate,
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """Register a user directly — bootstrap or invite only.
 
     Two callers are legitimate here, and the UI only ever produces those two:
@@ -100,7 +102,9 @@ async def register(
 
 
 @router.get('/init-status', response_model=InitStatusResponse)
-async def get_init_status(db: AsyncSession = Depends(get_async_db, scope='function')):
+async def get_init_status(
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
     """Check if the system has any users, where the demo's inbox is, and who runs it."""
     # A demo always reads as initialized: it is never set up by the first
     # visitor (``/register`` refuses that), so the sign-in screen must not offer
@@ -128,7 +132,7 @@ async def create_registration_request(
     request: Request,
     request_in: RegistrationRequestCreate,
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """Create a new registration request.
 
     Answers the same way whichever branch runs: this endpoint is
@@ -164,9 +168,9 @@ async def create_registration_request(
 async def list_registration_requests(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
-    _current_user=Depends(get_superuser),
+    _current_user: object = Depends(get_superuser),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """List all pending registration requests (admin only)."""
     requests = await AuthService.get_pending_requests_async(db)
     return PaginatedResponse.from_full_list(requests, offset=offset, limit=limit)
@@ -178,10 +182,10 @@ async def list_registration_requests(
 )
 async def approve_registration_request(
     request_id: str,
-    current_user=Depends(get_superuser),
+    current_user: Any = Depends(get_superuser),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     lang: Language = Depends(get_current_lang),
-):
+) -> Any:
     """Approve a registration request and generate a token (admin only)."""
     req = await AuthService.get_request_by_id_async(db, request_id)
     if not req:
@@ -264,10 +268,10 @@ async def approve_registration_request(
 )
 async def reject_registration_request(
     request_id: str,
-    current_user=Depends(get_superuser),
+    current_user: Any = Depends(get_superuser),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     lang: Language = Depends(get_current_lang),
-):
+) -> Any:
     """Reject a registration request (admin only)."""
     req = await AuthService.get_request_by_id_async(db, request_id)
     if not req:
@@ -311,7 +315,7 @@ async def registration_link_info(
     token: str,
     request: Request,
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """Whose account an approval link finishes, so the form can show it.
 
     The caller holds the link the administrator handed them: the address and
@@ -328,7 +332,7 @@ async def registration_link_info(
 async def register_complete(
     user_in: RegistrationComplete,
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """Complete registration using a token."""
     req = await AuthService.get_request_by_token_async(db, user_in.token)
     if not req:

@@ -87,7 +87,9 @@ async def _preload_known(db: AsyncSession, org_id: UUID | None) -> _Known:
     return known
 
 
-def _build_partner(row: pd.Series, mapping: dict, default_type: str) -> PartnerCreate:
+def _build_partner(
+    row: pd.Series, mapping: dict[str, Any], default_type: str
+) -> PartnerCreate:
     """One row as the create endpoint would have received it."""
     name = cell_text(row_get(row, mapping, 'name'))
     if not name:
@@ -110,10 +112,10 @@ async def import_partners(
     db: AsyncSession,
     file_content: bytes,
     filename: str,
-    mapping: dict,
+    mapping: dict[str, Any],
     user: UserContextDTO,
     default_type: str = 'SUPPLIER',
-) -> dict:
+) -> dict[str, Any]:
     """Import partners from an XLSX or CSV file based on column mapping."""
     df = read_rows(file_content, filename)
     known = await _preload_known(db, user.organization_id)
@@ -121,7 +123,7 @@ async def import_partners(
     assert org_id is not None
 
     imported = 0
-    errors: list[dict] = []
+    errors: list[dict[str, Any]] = []
     for index, row in df.iterrows():
         row_num = int(index) + 2  # header row + 1-based numbering
         partner_in: PartnerCreate | None = None

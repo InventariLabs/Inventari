@@ -1,12 +1,17 @@
 import uuid
 from datetime import UTC, datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+
+if TYPE_CHECKING:
+    from app.models.organization import Organization
+    from app.models.user import User
 
 
 class AIUsageLog(Base):
@@ -46,5 +51,5 @@ class AIUsageLog(Base):
         DateTime(timezone=True), default=lambda: datetime.now(UTC), index=True
     )
 
-    user: Mapped['User'] = relationship(backref='ai_usage_history')  # type: ignore[name-defined]
-    organization: Mapped['Organization'] = relationship(backref='ai_usage_history')  # type: ignore[name-defined]
+    user: Mapped['User'] = relationship(backref='ai_usage_history')
+    organization: Mapped['Organization'] = relationship(backref='ai_usage_history')

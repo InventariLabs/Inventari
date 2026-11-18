@@ -12,10 +12,10 @@ from __future__ import annotations
 from collections.abc import Collection
 from datetime import date
 from decimal import Decimal
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
-from sqlalchemy import Row, func, literal_column, or_, select
+from sqlalchemy import ColumnElement, Row, func, literal_column, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import PickGroupDTO, ShelfContentsDTO
@@ -46,7 +46,7 @@ def earliest_lot_date(*fallbacks: Any) -> Any:
     )
 
 
-def active_lot_predicate(lot_column: Any):
+def active_lot_predicate(lot_column: Any) -> ColumnElement[bool]:
     """OR predicate: stock is consumable when it has no lot or an ACTIVE lot.
 
     Shared by the picking/strategy reads — quarantined/held/recalled
@@ -100,14 +100,17 @@ async def assert_lot_consumable_async(
         )
 
 
-def owner_predicate(owner_id: UUID | None, owner_column: Any):
+def owner_predicate(owner_id: UUID | None, owner_column: Any) -> ColumnElement[bool]:
     """Owner filter: default (None) = own stock only (``owner_id IS NULL``).
 
     Pass a partner UUID to consume consignment stock owned by that partner.
     *owner_column* is the owner of whatever is being filtered — a record's
     for a draw.
     """
-    return owner_column.is_(None) if owner_id is None else owner_column == owner_id
+    return cast(
+        ColumnElement[bool],
+        owner_column.is_(None) if owner_id is None else owner_column == owner_id,
+    )
 
 
 async def list_quants_async(
@@ -210,12 +213,15 @@ async def _anchor_id_for_group_async(
     """
     from app.models.stock_anchor import StockAnchor
 
-    return await db.scalar(
-        select(StockAnchor.id).where(
-            StockAnchor.organization_id == organization_id,
-            StockAnchor.product_template_id == product_template_id,
-            StockAnchor.storage_location_id == storage_location_id,
-        )
+    return cast(
+        UUID | None,
+        await db.scalar(
+            select(StockAnchor.id).where(
+                StockAnchor.organization_id == organization_id,
+                StockAnchor.product_template_id == product_template_id,
+                StockAnchor.storage_location_id == storage_location_id,
+            )
+        ),
     )
 
 
@@ -350,7 +356,9 @@ async def _next_draw_date_async(
             Item.quantity > 0,
         )
     )
-    return await db.scalar(records_in_removal_order(stmt, strategy).limit(1))
+    return cast(
+        date | None, await db.scalar(records_in_removal_order(stmt, strategy).limit(1))
+    )
 
 
 async def shelf_contents_async(

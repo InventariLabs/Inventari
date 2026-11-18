@@ -27,6 +27,7 @@ from ._over_receipt import OverReceiptRefusedError, order_surplus_async
 if TYPE_CHECKING:
     from .document_filters import DocumentFilterProvider
     from .document_numbering_service import HighestInUse
+    from .models import Document
     from .pick_order_strategies import PickOrderStrategy
     from .pre_post_checks import PrePostCheck, WithdrawalListener
     from .putaway_criteria import PutawayCriterion
@@ -193,7 +194,7 @@ class WarehouseAPI:
         user_id: UUID,
         *,
         currency: str | None = None,
-    ) -> Any:
+    ) -> Document:
         """Create and confirm a document from an async caller.
 
         Pass ``currency`` when the document is derived from something already
@@ -201,7 +202,6 @@ class WarehouseAPI:
         has to travel too.
         """
         from .document_workflow_service import confirm_document, create_document
-        from .models import Document
 
         doc = await create_document(db, org_id, data, user_id, currency=currency)
         doc = await confirm_document(db, org_id, doc.id, user_id)
@@ -213,7 +213,7 @@ class WarehouseAPI:
         org_id: UUID,
         data: DocumentCreate,
         user_id: UUID,
-    ) -> Any:
+    ) -> Document:
         """Create a DRAFT document without confirming or executing stock.
 
         For callers that already applied the stock movement themselves
@@ -224,7 +224,6 @@ class WarehouseAPI:
         off the shelf a second time.
         """
         from ._document_workflow_crud import create_document
-        from .models import Document
 
         doc = await create_document(
             db, org_id, data, user_id, stock_already_applied=True
@@ -279,7 +278,7 @@ class WarehouseAPI:
         scheduled_date: date | None = None,
         notes: str | None = None,
         lines: list[ReceiptLineFromPODTO] | None = None,
-    ) -> Any:
+    ) -> DocumentCreate:
         from .schemas import DocumentCreate, DocumentLineCreate
 
         doc_lines = [
@@ -318,7 +317,7 @@ class WarehouseAPI:
         notes: str | None = None,
         lines: list[ReceiptLineFromPODTO] | None = None,
         currency: str | None = None,
-    ) -> Any:
+    ) -> Document:
         """Create and confirm an IN receipt document from an async caller.
 
         ``currency`` is the order's — the line prices below are copied off it

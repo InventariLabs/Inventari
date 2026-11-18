@@ -11,8 +11,8 @@
     "countedOf": "{{counted}} / {{total}} artículos",
     "discrepanciesDetected_one": "1 discrepancia detectada",
     "discrepanciesDetected_other": "{{count}} discrepancias detectadas",
-    "unsaved_one": "1 cantidad escrita pero sin guardar",
-    "unsaved_other": "{{count}} cantidades escritas pero sin guardar"
+    "unsaved_one": "1 línea con cambios sin guardar",
+    "unsaved_other": "{{count}} líneas con cambios sin guardar"
   },
   "differencesBadge_one": "{{count}} diferencia",
   "differencesBadge_other": "{{count}} diferencias",
@@ -102,6 +102,7 @@
     "countFor": "Cantidad contada: {{name}}",
     "countMalformed": "Eso no es un número. Escribe cifras con un solo separador decimal, por ejemplo 12 o 1,5.",
     "unsaved": "Sin guardar",
+    "unsavedNeedsCount": "Sin guardar — escriba una cantidad para guardar",
     "awaitingRecount": "Volver a contar",
     "countAgain": "Contar {{name}} otra vez",
     "countedPass": "Recuento {{sequence}}: {{quantity}} ({{name}})",
@@ -122,10 +123,10 @@
     "complete": {
       "title": "Completar inventario",
       "confirmLabel": "Completar",
-      "unsaved_one": "Una cantidad contada no se ha guardado y se perderá.",
-      "unsaved_other": "{{count}} cantidades contadas no se han guardado y se perderán.",
       "message_one": "Cerrar este inventario sobrescribe el stock de un producto con el número contado. Después no podrás editar las líneas contadas.",
-      "message_other": "Cerrar este inventario sobrescribe el stock de {{count}} productos con los números contados. Después no podrás editar las líneas contadas."
+      "message_other": "Cerrar este inventario sobrescribe el stock de {{count}} productos con los números contados. Después no podrás editar las líneas contadas.",
+      "unsaved_one": "Una línea tiene una cantidad, un motivo o una nota sin guardar; se perderá.",
+      "unsaved_other": "{{count}} líneas tienen una cantidad, un motivo o una nota sin guardar; se perderán."
     },
     "cancel": {
       "title": "Cancelar inventario",
@@ -245,14 +246,14 @@
     "closeEmpty": "No se encontró nada en {{location}}. ¿Confirmarla como contada y vacía?",
     "closeCounted": "Todas las filas de {{location}} están contadas. ¿Cerrar la ubicación?",
     "closeConfirm": "Cerrar ubicación",
-    "closeUnsaved_one": "Un número de esta ubicación no se ha guardado. Guárdelo antes de cerrar la ubicación.",
-    "closeUnsaved_other": "{{count}} números de esta ubicación no se han guardado. Guárdelos antes de cerrar la ubicación.",
     "closedDone_one": "{{location}} cerrada: una fila contada como 0.",
     "closedDone_other": "{{location}} cerrada: {{count}} filas contadas como 0.",
     "closedEmptyDone": "{{location}} confirmada como vacía.",
     "closedCountedDone": "{{location}} cerrada.",
     "closedBy": "Cerrada por {{name}}",
-    "closedEmptyBy": "Confirmada vacía por {{name}}"
+    "closedEmptyBy": "Confirmada vacía por {{name}}",
+    "closeUnsaved_one": "Una línea de esta ubicación tiene cambios sin guardar. Guárdela antes de cerrar la ubicación.",
+    "closeUnsaved_other": "{{count}} líneas de esta ubicación tienen cambios sin guardar. Guárdelas antes de cerrar la ubicación."
   },
   "count": {
     "action": "Contar una ubicación",

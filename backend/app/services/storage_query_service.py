@@ -36,9 +36,9 @@ from app.services.storage._queries import (
 
 def _compute_full_path(
     storage_id: UUID,
-    id_to_name: dict,
-    id_to_parent: dict,
-    visited: set | None = None,
+    id_to_name: dict[UUID, str],
+    id_to_parent: dict[UUID, UUID | None],
+    visited: set[UUID] | None = None,
 ) -> str:
     """Recursively build full path string for a storage location."""
     if visited is None:
@@ -54,7 +54,9 @@ def _compute_full_path(
     return name
 
 
-def _inherited_fields(storage_id: UUID, tree_by_id: dict) -> dict[str, list]:
+def _inherited_fields(
+    storage_id: UUID, tree_by_id: dict[UUID, Any]
+) -> dict[str, list[Any]]:
     """The product fields a location takes from the locations above it.
 
     Walks up from the parent, nearest level first; the first level that sets
@@ -106,8 +108,8 @@ def _inherited_fields(storage_id: UUID, tree_by_id: dict) -> dict[str, list]:
 async def _backfill_filtered_ancestors_async(
     db: AsyncSession,
     organization_id: UUID,
-    id_to_name: dict,
-    id_to_parent: dict,
+    id_to_name: dict[UUID, str],
+    id_to_parent: dict[UUID, UUID | None],
 ) -> None:
     """Extend the naming maps with ancestors the listing filter dropped.
 
@@ -504,7 +506,7 @@ async def list_storages_with_counts_async(
     storages = [by_id[i] for i in page_ids if i in by_id]
 
     listed_parents: dict[UUID, UUID | None] = {row.id: row.parent_id for row in listed}
-    ids_with_children: set = {p for p in listed_parents.values() if p is not None}
+    ids_with_children: set[UUID] = {p for p in listed_parents.values() if p is not None}
     direct_children_map: dict[UUID, int] = {}
     for parent in all_parents.values():
         if parent is not None:
@@ -543,7 +545,7 @@ async def list_storages_with_counts_async(
             short_code=s.short_code,
             sequence=s.sequence,
             settings=s.settings,
-            location_type=s.storage_type,  # type: ignore[arg-type]
+            location_type=s.storage_type,
             context_schema=s.context_schema or [],
             behavior_mode=s.behavior_mode or 'STOCK',
             field_definitions=s.field_definitions or [],
@@ -614,8 +616,8 @@ async def list_archived_with_details_async(
     storages = await list_archived_async(db, organization_id, claimed_tags)
     if not storages:
         return []
-    id_to_name: dict = {s.id: s.name for s in storages}
-    id_to_parent: dict = {s.id: s.parent_id for s in storages}
+    id_to_name: dict[UUID, str] = {s.id: s.name for s in storages}
+    id_to_parent: dict[UUID, UUID | None] = {s.id: s.parent_id for s in storages}
     await _backfill_filtered_ancestors_async(
         db, organization_id, id_to_name, id_to_parent
     )

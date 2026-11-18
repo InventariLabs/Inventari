@@ -10,6 +10,8 @@ from app.core.contracts import (
     AuditAction,
     AuditTargetType,
     ItemCreateDTO,
+    ItemDTO,
+    ProductTemplateDTO,
     RecordPostDTO,
     UserContextDTO,
 )
@@ -34,7 +36,7 @@ async def _template_for_new_row(
     db: AsyncSession,
     doc: Document,
     template_id: UUID | None,
-) -> Any:
+) -> ProductTemplateDTO | None:
     """The product a record about to be opened is a record *of*.
 
     Read only when a record has to be opened — a line topping up one that
@@ -58,7 +60,7 @@ async def _stock_row_at(
     stock_template_id: UUID,
     location_id: UUID,
     lot_id: UUID | None,
-) -> Any:
+) -> ItemDTO | None:
     """Point the delivery at the record it tops up on this shelf, if any.
 
     A line that names a product rather than a record is pointed at the record
@@ -144,7 +146,7 @@ async def _open_received_row(
     history: dict[str, Any],
     named: Any = None,
     lot_id: UUID | None = None,
-) -> Any:
+) -> ItemDTO:
     """Open a record of *template* for goods arriving where none stands.
 
     A line naming an existing record that stands on another shelf — the

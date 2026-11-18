@@ -53,8 +53,9 @@ async def supplier_rates_async(
         stock_uom_id = offer.product_template.uom_id
         units = Decimal('1')
         if offer.uom_id is not None:
+            stock_uom = uoms.get(stock_uom_id) if stock_uom_id is not None else None
             units, ok = core_api.uoms.convert_quantity(
-                units, uoms.get(stock_uom_id), uoms.get(offer.uom_id)
+                units, stock_uom, uoms.get(offer.uom_id)
             )
             if not ok:
                 continue

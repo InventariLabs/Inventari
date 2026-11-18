@@ -24,6 +24,7 @@ changes — the endpoint alone answered only when someone thought to ask.
 from __future__ import annotations
 
 from decimal import Decimal
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import CTE, Select, and_, func, select, text, true
@@ -137,7 +138,7 @@ def _shelf_totals(organization_id: UUID) -> CTE:
     )
 
 
-def _drift_of(left: CTE, right: CTE, *keys: str) -> Select:
+def _drift_of(left: CTE, right: CTE, *keys: str) -> Select[Any]:
     """How many keys the two sums disagree on, and by how much in all.
 
     A key one side lacks counts as zero there. The join is full, so a key

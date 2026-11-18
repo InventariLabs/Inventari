@@ -20,6 +20,7 @@ import hashlib
 import os
 from collections.abc import Callable
 from functools import lru_cache
+from typing import Any
 
 from cryptography.exceptions import InvalidTag
 from cryptography.fernet import Fernet, InvalidToken
@@ -92,15 +93,15 @@ SENSITIVE_PATHS: list[tuple[str, ...]] = [
 _KDF_ITERATIONS = 600_000
 
 
-def _read_leaf(data: dict, path: tuple[str, ...]) -> str | None:
+def _read_leaf(data: dict[str, Any], path: tuple[str, ...]) -> str | None:
     """Return the value at the nested path, or None if any segment is missing
     or non-dict along the way. Empty string is returned as-is so that callers
     can distinguish "cleared" from "absent" when needed."""
-    cur: dict | None = data
+    cur: dict[str, Any] | None = data
     for segment in path[:-1]:
         if not isinstance(cur, dict):
             return None
-        cur = cur.get(segment)  # type: ignore[assignment]
+        cur = cur.get(segment)
         if cur is None:
             return None
     if not isinstance(cur, dict):
@@ -108,7 +109,9 @@ def _read_leaf(data: dict, path: tuple[str, ...]) -> str | None:
     return cur.get(path[-1])
 
 
-def _set_leaf(data: dict, path: tuple[str, ...], value: str) -> dict:
+def _set_leaf(
+    data: dict[str, Any], path: tuple[str, ...], value: str
+) -> dict[str, Any]:
     """Return a SHALLOW copy of *data* with the nested leaf at *path* set to
     *value*. Original dict and untouched siblings are not mutated.
 
@@ -123,7 +126,7 @@ def _set_leaf(data: dict, path: tuple[str, ...], value: str) -> dict:
 
     head = path[0]
     branch = data.get(head)
-    new_branch: dict = {**branch} if isinstance(branch, dict) else {}
+    new_branch: dict[str, Any] = {**branch} if isinstance(branch, dict) else {}
     new_branch = _set_leaf(new_branch, path[1:], value)
     new_data = {**data}
     new_data[head] = new_branch
@@ -504,9 +507,9 @@ def reencrypt_module_secret(module_name: str, value: str) -> str | None:
 
 
 def _transform_sensitive(
-    org_settings: dict,
+    org_settings: dict[str, Any],
     transformer: Callable[[str], str],
-) -> dict:
+) -> dict[str, Any]:
     """Apply *transformer* to every sensitive leaf value in org_settings.
 
     Walks every path in ``SENSITIVE_PATHS`` regardless of depth, so tuples
@@ -514,7 +517,7 @@ def _transform_sensitive(
     alongside legacy 2-tuples. Returns a shallow copy where each touched
     branch is itself a new dict — the original is never mutated.
     """
-    result: dict = {**org_settings}
+    result: dict[str, Any] = {**org_settings}
     for path in SENSITIVE_PATHS:
         leaf = _read_leaf(result, path)
         if leaf:
@@ -522,7 +525,7 @@ def _transform_sensitive(
     return result
 
 
-def decrypt_settings(org_settings: dict) -> dict:
+def decrypt_settings(org_settings: dict[str, Any]) -> dict[str, Any]:
     """Return a copy of org_settings with sensitive leaf values decrypted.
 
     Use this only for internal service calls (Vision, SMTP) — never return
@@ -537,7 +540,7 @@ def decrypt_settings(org_settings: dict) -> dict:
     return _transform_sensitive(org_settings, decrypt_value_lenient)
 
 
-def mask_settings(org_settings: dict) -> dict:
+def mask_settings(org_settings: dict[str, Any]) -> dict[str, Any]:
     """Return a copy of org_settings safe for API responses.
 
     Sensitive values that are set are replaced with MASKED_VALUE so the
@@ -547,9 +550,9 @@ def mask_settings(org_settings: dict) -> dict:
 
 
 def merge_incoming_settings(
-    incoming: dict,
-    existing_encrypted: dict | None,
-) -> dict:
+    incoming: dict[str, Any],
+    existing_encrypted: dict[str, Any] | None,
+) -> dict[str, Any]:
     """Merge incoming settings from a PUT request with the existing encrypted
     settings in the database.
 
@@ -565,7 +568,7 @@ def merge_incoming_settings(
     deeper paths (e.g. ``('modules', 'recipes', 'jina', 'api_key')``).
     """
     existing = existing_encrypted or {}
-    result: dict = {**incoming}
+    result: dict[str, Any] = {**incoming}
 
     for path in SENSITIVE_PATHS:
         incoming_val = _read_leaf(incoming, path)

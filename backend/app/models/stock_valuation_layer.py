@@ -3,7 +3,7 @@
 import uuid
 from datetime import UTC, date, datetime
 from decimal import Decimal
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import (
     CheckConstraint,
@@ -21,6 +21,11 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+
+if TYPE_CHECKING:
+    from app.models.organization import Organization
+    from app.models.product_template import ProductTemplate
+    from app.modules.warehouse.models.document import DocumentLine
 
 #: The date a cost layer is *about*, written as SQL so an index can hold it.
 #:
@@ -263,11 +268,11 @@ class StockValuationLayer(Base):
         """
         return self.cost_basis != CostBasis.UNKNOWN
 
-    organization: Mapped['Organization'] = relationship()  # type: ignore[name-defined]
-    product_template: Mapped['ProductTemplate'] = relationship()  # type: ignore[name-defined]
-    document_line: Mapped['DocumentLine | None'] = relationship()  # type: ignore[name-defined]
+    organization: Mapped['Organization'] = relationship()
+    product_template: Mapped['ProductTemplate'] = relationship()
+    document_line: Mapped['DocumentLine | None'] = relationship()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f'<StockValuationLayer(template={self.product_template_id}, '
             f'qty={self.quantity}, remaining={self.remaining_qty}, '

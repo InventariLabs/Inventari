@@ -1,5 +1,6 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from typing import cast
 from uuid import UUID
 
 from sqlalchemy import and_, or_, select, true, update
@@ -52,7 +53,7 @@ def _org_id(user: UserContextDTO) -> UUID:
 
 
 async def _get_parent_in_org(
-    db: AsyncSession, organization_id, parent_id
+    db: AsyncSession, organization_id: UUID | None, parent_id: UUID
 ) -> StorageLocation:
     """Fetch the parent in the same organization or raise 404."""
     parent = await db.scalar(
@@ -68,9 +69,9 @@ async def _get_parent_in_org(
 
 async def _validate_parent_id(
     db: AsyncSession,
-    organization_id,
-    storage_id,
-    parent_id,
+    organization_id: UUID | None,
+    storage_id: UUID | None,
+    parent_id: UUID | None,
 ) -> StorageLocation | None:
     """Validate a storage location's new parent and return it.
 
@@ -85,7 +86,7 @@ async def _validate_parent_id(
         raise catalogue_refusal('storage_own_parent')
     parent = await _get_parent_in_org(db, organization_id, parent_id)
     if storage_id is not None and await is_descendant_async(
-        db, organization_id, storage_id, parent_id
+        db, parent.organization_id, storage_id, parent_id
     ):
         raise ConflictException(
             code='STORAGE_CYCLE',
@@ -94,7 +95,9 @@ async def _validate_parent_id(
     return parent
 
 
-async def _parent_name(db: AsyncSession, organization_id, parent_id) -> str | None:
+async def _parent_name(
+    db: AsyncSession, organization_id: UUID | None, parent_id: UUID | None
+) -> str | None:
     """The name of the location above this one, or ``None`` when there is none.
 
     ``Parent: 67d57628`` is eight characters of a UUID, which is not an answer
@@ -111,7 +114,9 @@ async def _parent_name(db: AsyncSession, organization_id, parent_id) -> str | No
     return parent.name
 
 
-async def _storage_type_name(db: AsyncSession, storage_type_id) -> str | None:
+async def _storage_type_name(
+    db: AsyncSession, storage_type_id: UUID | None
+) -> str | None:
     """The kind of place this is, or ``None`` when it has no type.
 
     ``Storage type: 4a2e2c4b`` is the same eight characters of a UUID as the
@@ -171,10 +176,10 @@ async def _flush_under_the_name_rule(db: AsyncSession, name: str) -> None:
 
 async def _check_name_unique(
     db: AsyncSession,
-    organization_id,
+    organization_id: UUID | None,
     name: str,
-    parent_id=None,
-    exclude_id=None,
+    parent_id: UUID | None = None,
+    exclude_id: UUID | None = None,
 ) -> None:
     """Raise 409 if a sibling with the same name already exists.
 
@@ -198,9 +203,9 @@ async def _check_name_unique(
 
 async def _check_short_code_unique(
     db: AsyncSession,
-    organization_id,
+    organization_id: UUID | None,
     short_code: str,
-    exclude_id=None,
+    exclude_id: UUID | None = None,
 ) -> None:
     """Raise if the organization already uses this short code.
 
@@ -668,23 +673,26 @@ async def _lifted_child_meeting_a_namesake(
     gives its name up before the lift.
     """
     sibling = aliased(StorageLocation)
-    return await db.scalar(
-        select(StorageLocation.name)
-        .join(
-            sibling,
-            and_(
-                sibling.organization_id == StorageLocation.organization_id,
-                sibling.name == StorageLocation.name,
-                sibling.id != storage.id,
-                sibling.parent_id.is_not_distinct_from(storage.parent_id),
-            ),
-        )
-        .where(
-            StorageLocation.organization_id == storage.organization_id,
-            StorageLocation.parent_id == storage.id,
-        )
-        .order_by(StorageLocation.name)
-        .limit(1)
+    return cast(
+        str | None,
+        await db.scalar(
+            select(StorageLocation.name)
+            .join(
+                sibling,
+                and_(
+                    sibling.organization_id == StorageLocation.organization_id,
+                    sibling.name == StorageLocation.name,
+                    sibling.id != storage.id,
+                    sibling.parent_id.is_not_distinct_from(storage.parent_id),
+                ),
+            )
+            .where(
+                StorageLocation.organization_id == storage.organization_id,
+                StorageLocation.parent_id == storage.id,
+            )
+            .order_by(StorageLocation.name)
+            .limit(1)
+        ),
     )
 
 

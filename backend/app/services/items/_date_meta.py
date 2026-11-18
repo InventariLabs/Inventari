@@ -40,8 +40,8 @@ def fold_legacy_dates_into_meta(item_data: dict[str, Any]) -> None:
 
 
 def merge_legacy_date_into_meta(
-    current_meta: dict | None, field: str, value: Any
-) -> dict | None:
+    current_meta: dict[str, Any] | None, field: str, value: Any
+) -> dict[str, Any] | None:
     """Return a new ``meta_data`` dict with ``field`` merged into its namespace.
 
     Unlike ``fold_legacy_dates_into_meta`` this preserves all existing
@@ -64,7 +64,7 @@ def merge_legacy_date_into_meta(
     return meta
 
 
-def legacy_date_in_meta(meta: dict | None, field: str) -> str | None:
+def legacy_date_in_meta(meta: dict[str, Any] | None, field: str) -> str | None:
     """The legacy date ``field`` as ``meta_data`` holds it, in ISO form.
 
     The read half of :func:`merge_legacy_date_into_meta`, for a writer that

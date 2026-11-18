@@ -44,6 +44,7 @@ answer inside this one query.
 """
 
 from decimal import Decimal
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import Select, String, case, cast, exists, func, select, true
@@ -71,7 +72,7 @@ def claimed_tags_for(exclude_module_contexts: bool) -> set[str] | None:
 
 def low_stock_template_ids(
     organization_id: UUID, claimed_tags: set[str] | None = None
-) -> Select:
+) -> Select[Any]:
     """Products whose stock on the shelves has reached their threshold.
 
     Returns a selectable of ``ProductTemplate.id`` — one row per product,
@@ -132,7 +133,7 @@ def low_stock_template_ids(
 
 def used_up_short_product_records(
     organization_id: UUID, claimed_tags: set[str] | None = None
-) -> Select:
+) -> Select[Any]:
     """The record a list shows for a short product with nothing on the shelves.
 
     Using up the last unit moves the record to the virtual Consumed place, so

@@ -1,15 +1,20 @@
 import uuid
 from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import DateTime, ForeignKey, Index, Numeric, String, text
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import InstrumentedAttribute, Mapped, mapped_column, relationship
 
 from app.core.file_reference import served_url, stored_reference
 from app.database import Base
+
+if TYPE_CHECKING:
+    from app.models.item import Item
+    from app.models.organization import Organization
+    from app.models.uom import Uom
 
 
 class ProductTemplate(Base):
@@ -108,17 +113,17 @@ class ProductTemplate(Base):
     )
 
     # Relationships
-    organization: Mapped['Organization'] = relationship()  # type: ignore[name-defined]
-    uom: Mapped['Uom | None'] = relationship(foreign_keys=[uom_id], lazy='selectin')  # type: ignore[name-defined]
+    organization: Mapped['Organization'] = relationship()
+    uom: Mapped['Uom | None'] = relationship(foreign_keys=[uom_id], lazy='selectin')
     # Eager: Item.total_weight reads this factor while the response is being
     # serialised, where a lazy load would run outside the async greenlet.
-    weight_uom: Mapped['Uom | None'] = relationship(  # type: ignore[name-defined]
+    weight_uom: Mapped['Uom | None'] = relationship(
         foreign_keys=[weight_uom_id], lazy='selectin'
     )
-    volume_uom: Mapped['Uom | None'] = relationship(foreign_keys=[volume_uom_id])  # type: ignore[name-defined]
-    items: Mapped[list['Item']] = relationship(back_populates='template')  # type: ignore[name-defined]
+    volume_uom: Mapped['Uom | None'] = relationship(foreign_keys=[volume_uom_id])
+    items: Mapped[list['Item']] = relationship(back_populates='template')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<ProductTemplate(name="{self.name}", barcode="{self.barcode}")>'
 
     @hybrid_property
@@ -132,6 +137,6 @@ class ProductTemplate(Base):
 
     @image_url.inplace.expression
     @classmethod
-    def _image_url_expression(cls):
+    def _image_url_expression(cls) -> InstrumentedAttribute[str | None]:
         """Filters on the column, not on the computed address."""
         return cls.image_key

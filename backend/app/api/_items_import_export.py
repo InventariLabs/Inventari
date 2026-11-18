@@ -1,4 +1,5 @@
 import json
+from typing import Any
 from uuid import UUID
 
 from fastapi import (
@@ -51,7 +52,7 @@ async def analyze_import_file(
     # and must name the permission itself. The export route below stays open
     # on purpose: reading the catalogue out is not changing it.
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-):
+) -> Any:
     """Headers, the first rows and the row count of an XLSX/CSV upload.
 
     The preview travels with the headers because the mapping step shows it:
@@ -81,7 +82,7 @@ async def import_items(
     current_user: UserContextDTO = Depends(get_current_user_context),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """Imports items based on mapping.
 
     ``on_label_match`` says what a row does when its Label Code names a
@@ -180,7 +181,7 @@ async def read_import_job(
     current_user: UserContextDTO = Depends(get_current_user_context),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """How far an import that went to the background has got, and how it ended."""
     job = await import_jobs.read_job_async(db, current_user, job_id)
     answer = ItemImportJobResponse.model_validate(job, from_attributes=True)
@@ -226,7 +227,7 @@ async def export_items_xlsx(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
-):
+) -> Any:
     """Export the rows the list shows for the same filters, as a workbook.
 
     Takes the filters of ``GET /items`` minus pagination and sorting and runs

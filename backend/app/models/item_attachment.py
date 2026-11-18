@@ -1,10 +1,14 @@
 import uuid
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+
+if TYPE_CHECKING:
+    from app.models.item import Item
 
 
 class ItemAttachment(Base):
@@ -31,7 +35,7 @@ class ItemAttachment(Base):
     )
 
     # Relationships
-    item: Mapped['Item'] = relationship(back_populates='attachments')  # type: ignore[name-defined]
+    item: Mapped['Item'] = relationship(back_populates='attachments')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<ItemAttachment(name="{self.file_name}", type="{self.file_type}")>'

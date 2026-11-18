@@ -1,6 +1,7 @@
 import uuid
 from datetime import UTC, date, datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import (
     Date,
@@ -15,6 +16,11 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.db_facade import Base
+
+# Core tables this module may not import, even for typing, stay ``Any`` here:
+# the relationship names its class to SQLAlchemy as a string.
+if TYPE_CHECKING:
+    from app.models.item import Item
 
 
 class EquipmentAttachment(Base):
@@ -122,9 +128,9 @@ class EquipmentAssignment(Base):
     )
 
     # Relationships
-    item: Mapped['Item'] = relationship(lazy='selectin')  # type: ignore[name-defined]
-    assignee_partner: Mapped['Partner | None'] = relationship(lazy='selectin')  # type: ignore[name-defined]
-    checkout_location: Mapped['StorageLocation | None'] = relationship(lazy='selectin')  # type: ignore[name-defined]
+    item: Mapped['Item'] = relationship(lazy='selectin')
+    assignee_partner: Mapped[Any] = relationship('Partner', lazy='selectin')
+    checkout_location: Mapped[Any] = relationship('StorageLocation', lazy='selectin')
 
 
 class EquipmentMaintenanceLog(Base):
@@ -180,7 +186,7 @@ class EquipmentMaintenanceLog(Base):
     )
 
     # Relationships
-    item: Mapped['Item'] = relationship(lazy='selectin')  # type: ignore[name-defined]
+    item: Mapped['Item'] = relationship(lazy='selectin')
 
 
 class AuditCampaign(Base):
