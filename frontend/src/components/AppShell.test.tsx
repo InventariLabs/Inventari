@@ -181,7 +181,7 @@ describe("AppShell — a session that ends under a form holding work says so", (
     act(() => {
       window.dispatchEvent(new CustomEvent("auth:logout"));
       // A caller that puts the sentence into its own state (a picker's inline
-      // error) reads it, but nothing on screen shows it once /login mounts.
+      // error) reads it, but nothing on screen shows it after /login mounts.
       extractApiError(new SessionEndedError("Your session has ended."), "x");
       vi.advanceTimersByTime(1000);
     });
