@@ -83,7 +83,7 @@ export default function CostVariancesPage() {
                     <td className="py-2 px-3">
                       <Link
                         to={`/warehouse/documents/${item.document_id}`}
-                        className="text-primary-600 hover:underline"
+                        className="text-on-primary hover:underline"
                       >
                         {item.document_number ?? "—"}
                       </Link>
