@@ -497,8 +497,7 @@ export default function DocumentFormModal({
     !!partnerId ||
     changedFrom(sourceLocationId, prefilledLocations.current.source) ||
     changedFrom(targetLocationId, prefilledLocations.current.target) ||
-    !!notes.trim() ||
-    !!externalReference.trim();
+    !!(notes.trim() || externalReference.trim());
 
   const lineImport = useDocumentLineImport({
     documentId: document?.id,
