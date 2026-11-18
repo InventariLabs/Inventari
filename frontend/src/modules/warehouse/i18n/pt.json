@@ -106,6 +106,7 @@
   "form": {
     "createTitle": "Novo documento",
     "editTitle": "Editar documento",
+    "guardName": "O formulário do documento",
     "discardTitle": "Descartar este documento?",
     "discardMessage": "O parceiro, os locais e as linhas que você informou serão perdidos. Esta ação não pode ser desfeita.",
     "discardConfirm": "Descartar",

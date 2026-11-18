@@ -108,6 +108,7 @@
   "form": {
     "createTitle": "Nowy dokument",
     "editTitle": "Edytuj dokument",
+    "guardName": "Formularz dokumentu",
     "discardTitle": "Odrzucić ten dokument?",
     "discardMessage": "Wprowadzony kontrahent, miejsca i pozycje zostaną utracone. Tej operacji nie można cofnąć.",
     "discardConfirm": "Odrzuć",

@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@/test/utils";
 import DocumentFormModal from "./DocumentFormModal";
+import { useFormGuardStore } from "@/store/formGuardStore";
 import * as modulesCtx from "@/contexts/ModulesContext";
 import { moduleRegistry, slotComponent } from "@/lib/moduleRegistry";
 import type { SlotDataMap } from "@/lib/moduleRegistry";
@@ -1345,6 +1346,21 @@ describe("DocumentFormModal validation accessibility", () => {
 
     expect(onClose).not.toHaveBeenCalled();
     expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+  });
+
+  it("reports a filled-in form to the navigation gate, and only while it holds work", async () => {
+    // The sentence a session's end gives a read reads the same signal.
+    const onClose = vi.fn();
+    render(<DocumentFormModal initialType="IN" onClose={onClose} />);
+    expect(useFormGuardStore.getState().dirtyForm).toBeNull();
+
+    fireEvent.change(screen.getAllByPlaceholderText("Item")[0], {
+      target: { value: "Widget" },
+    });
+
+    await waitFor(() =>
+      expect(useFormGuardStore.getState().dirtyForm).toBe("The document form"),
+    );
   });
 
   it("closes on Escape when nothing has been entered", () => {

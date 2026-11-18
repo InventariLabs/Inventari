@@ -3,6 +3,7 @@ import type { InternalAxiosRequestConfig } from "axios";
 import i18next from "i18next";
 
 import { SessionEndedError, isServerRefusal } from "@/lib/errors";
+import { useFormGuardStore } from "@/store/formGuardStore";
 
 declare module "axios" {
   interface AxiosRequestConfig {
@@ -161,7 +162,9 @@ const READ_ONLY_POST_ENDPOINTS = new Set([
  * to add" says instead that the session ended — and, for a request that was
  * going to save something, that the work was not saved. A request that saves
  * nothing (a read, or one of the POSTs above) gets the sentence that does not
- * claim otherwise.
+ * claim otherwise — unless a form on screen holds unsaved work (the same
+ * signal the navigation gate reads): the sign-in that follows throws it away,
+ * and that is said, whatever the request was.
  */
 function sessionEndedError(
   request: { method?: string; url?: string; readOnly?: boolean } | undefined,
@@ -175,10 +178,13 @@ function sessionEndedError(
     (method === "post" &&
       (request?.readOnly === true ||
         READ_ONLY_POST_ENDPOINTS.has(lastSegment)));
+  const holdsUnsavedWork = useFormGuardStore.getState().dirtyForm !== null;
   return new SessionEndedError(
-    i18next.t(
-      reads ? "common:errors.sessionEndedRead" : "common:errors.sessionEnded",
-    ),
+    !reads
+      ? i18next.t("common:errors.sessionEnded")
+      : holdsUnsavedWork
+        ? i18next.t("common:errors.sessionEndedReadUnsaved")
+        : i18next.t("common:errors.sessionEndedRead"),
   );
 }
 
