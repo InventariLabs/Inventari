@@ -265,6 +265,13 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Importing rows into a document that is not saved yet, when the session has
+  ended, no longer says "this was not saved" over an empty form: the import
+  only reads the rows, so the message is the plain "your session has ended".
+  A form that already holds something the reader typed, and an import that
+  also creates products, keep the longer warning, because signing in again
+  loses that work.
+
 - The price a document suggests for a supplier's product is the price that
   line can get: valid today, from a quantity tier the line's quantity
   reaches, and in the organization's own currency before any other. It used

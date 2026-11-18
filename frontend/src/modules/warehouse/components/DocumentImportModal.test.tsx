@@ -35,7 +35,12 @@ vi.mock("./ColumnMappingForm", () => ({
 const DOC_ID = "11111111-1111-1111-1111-111111111111";
 
 type Target =
-  { documentId: string } | { documentType: string; sourceLocationId?: string };
+  | { documentId: string }
+  | {
+      documentType: string;
+      sourceLocationId?: string;
+      holdsUnsavedWork?: boolean;
+    };
 
 function renderModal(
   onImported = vi.fn(),
@@ -267,6 +272,43 @@ describe("DocumentImportModal", () => {
       await waitFor(() => expect(post).toHaveBeenCalledTimes(2));
       expect(lastPost()[0]).toBe("/warehouse/import/lines");
       expect(lastPost()[2]).toEqual({ readOnly: true });
+    });
+
+    it("keeps saying the work was not saved when the form already holds some", async () => {
+      asUser(["warehouse:read", "warehouse:write"]);
+      renderModal(vi.fn(), { ...unsaved, holdsUnsavedWork: true });
+      await reachMapping();
+      post.mockResolvedValueOnce(importResult);
+      fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+
+      await waitFor(() => expect(post).toHaveBeenCalledTimes(2));
+      expect(lastPost()[2]).toEqual({ readOnly: false });
+    });
+
+    it("keeps saying so for pasted rows into a form that holds work", async () => {
+      asUser(["warehouse:read", "warehouse:write"]);
+      renderModal(vi.fn(), { ...unsaved, holdsUnsavedWork: true });
+      fireEvent.mouseDown(
+        screen.getByRole("tab", { name: /paste from clipboard/i }),
+      );
+      fireEvent.change(
+        screen.getByRole("textbox", { name: /paste from clipboard/i }),
+        { target: { value: "nazwa\tilosc\nMąka\t2" } },
+      );
+      post.mockResolvedValueOnce({
+        data: {
+          headers: ["nazwa", "ilosc"],
+          preview_rows: [{ nazwa: "Mąka", ilosc: 2 }],
+          total_rows: 1,
+        },
+      });
+      fireEvent.click(screen.getByRole("button", { name: "Parse" }));
+      fireEvent.click(await screen.findByRole("button", { name: "map name" }));
+      post.mockResolvedValueOnce(importResult);
+      fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+
+      await waitFor(() => expect(post).toHaveBeenCalledTimes(2));
+      expect(lastPost()[2]).toEqual({ readOnly: false });
     });
 
     it("is a write for a file that also creates products", async () => {

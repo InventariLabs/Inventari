@@ -52,6 +52,9 @@ type ImportTarget =
       documentType: string;
       /** The shelf those records stand on. */
       sourceLocationId?: string;
+      /** The form already holds what the reader typed. A session that ends
+       *  during the import loses it too, so the refusal says so. */
+      holdsUnsavedWork?: boolean;
     };
 
 type DocumentImportModalProps = ImportTarget & {
@@ -231,6 +234,16 @@ function newDocumentFields(target: ImportTarget): Record<string, string> {
   };
 }
 
+/**
+ * Into an unsaved document the rows are only read, unless unmatched rows found
+ * products. A session that ended during such a read loses nothing the import
+ * held, but a form already filled in goes with it: that refusal keeps saying
+ * the work was not saved.
+ */
+function importReadsOnly(target: ImportTarget, stubs: boolean): boolean {
+  return !stubs && !("holdsUnsavedWork" in target && target.holdsUnsavedWork);
+}
+
 export function DocumentImportModal(props: DocumentImportModalProps) {
   const { onClose, onImported } = props;
   const documentId = "documentId" in props ? props.documentId : undefined;
@@ -353,9 +366,8 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
       return;
     }
 
-    // Into an unsaved document the rows are only read, unless unmatched rows
-    // found products: a session that ended there lost nothing to say so.
     const stubs = createStubsForUnmatched && canCreateStubs;
+    const readOnly = importReadsOnly(props, stubs);
 
     setIsImporting(true);
     try {
@@ -377,7 +389,7 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
               formData,
             )
           : await api.post<ImportResult>(`/warehouse/import/lines`, formData, {
-              readOnly: !stubs,
+              readOnly,
             });
       } else if (sourceMode === "paste" && pasteText) {
         const body = {
@@ -394,7 +406,7 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
           : await api.post<ImportResult>(
               `/warehouse/import/lines/paste`,
               body,
-              { readOnly: !stubs },
+              { readOnly },
             );
       } else {
         return;
