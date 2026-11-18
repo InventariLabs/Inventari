@@ -117,6 +117,23 @@ async def _batch_assess_volatility(
     return result
 
 
+def most_recurring(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """The ten products bought most often; equal ones in the order of their names.
+
+    The rows come out of a ``GROUP BY`` in no order of their own, so a
+    ranking by the count alone left a tie at the tenth place to the order the
+    database returned them in.
+    """
+    return sorted(
+        products,
+        key=lambda x: (
+            -x['total_purchases_last_6_months'],
+            x['name'].casefold(),
+            x['name'],
+        ),
+    )[:10]
+
+
 async def get_purchase_patterns_async(
     db: AsyncSession, organization_id: UUID
 ) -> dict[str, Any]:
@@ -215,11 +232,7 @@ async def get_purchase_patterns_async(
             }
         )
 
-    top_recurring.sort(
-        key=lambda x: x['total_purchases_last_6_months'],
-        reverse=True,
-    )
-    top_recurring = top_recurring[:10]
+    top_recurring = most_recurring(top_recurring)
 
     seasonal_products = analyze_seasonality(product_purchases)
     bulk_opportunities = find_bulk_opportunities(product_purchases)
