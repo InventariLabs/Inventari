@@ -353,6 +353,10 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
       return;
     }
 
+    // Into an unsaved document the rows are only read, unless unmatched rows
+    // found products: a session that ended there lost nothing to say so.
+    const stubs = createStubsForUnmatched && canCreateStubs;
+
     setIsImporting(true);
     try {
       let response;
@@ -361,7 +365,7 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("mapping_json", JSON.stringify(mapping));
-        if (createStubsForUnmatched && canCreateStubs) {
+        if (stubs) {
           formData.append("create_stubs_for_unmatched", "true");
         }
         for (const [key, value] of Object.entries(newDocumentFields(props))) {
@@ -372,12 +376,14 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
               `/warehouse/documents/${documentId}/import-lines`,
               formData,
             )
-          : await api.post<ImportResult>(`/warehouse/import/lines`, formData);
+          : await api.post<ImportResult>(`/warehouse/import/lines`, formData, {
+              readOnly: !stubs,
+            });
       } else if (sourceMode === "paste" && pasteText) {
         const body = {
           text: pasteText,
           mapping_json: mapping,
-          create_stubs_for_unmatched: createStubsForUnmatched && canCreateStubs,
+          create_stubs_for_unmatched: stubs,
           ...newDocumentFields(props),
         };
         response = documentId
@@ -385,7 +391,11 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
               `/warehouse/documents/${documentId}/import-paste`,
               body,
             )
-          : await api.post<ImportResult>(`/warehouse/import/lines/paste`, body);
+          : await api.post<ImportResult>(
+              `/warehouse/import/lines/paste`,
+              body,
+              { readOnly: !stubs },
+            );
       } else {
         return;
       }

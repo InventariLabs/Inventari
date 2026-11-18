@@ -233,6 +233,120 @@ describe("DocumentImportModal", () => {
     expect(invalidate).not.toHaveBeenCalled();
   });
 
+  describe("what a session that ended says", () => {
+    // Into a document not saved yet the rows are only read and nothing is
+    // written, unless unmatched rows found products; the client words the
+    // refusal from `readOnly`. Into a saved document the import writes lines.
+    const unsaved = { documentType: "IN" };
+    const lastPost = () => post.mock.calls[post.mock.calls.length - 1];
+    const asUser = (permissions: string[]) =>
+      useAuthStore.setState({
+        user: { ...DOCSTUBS_USER, permissions },
+        isAuthenticated: true,
+      });
+    const importResult = {
+      data: {
+        imported: 0,
+        matched: 0,
+        unmatched: 0,
+        stubs_created: 0,
+        failed: 0,
+        errors: [],
+        no_stock: [],
+        lines: [],
+      },
+    };
+
+    it("is a read for a file imported into an unsaved document", async () => {
+      asUser(["warehouse:read", "warehouse:write", "items:write"]);
+      renderModal(vi.fn(), unsaved);
+      await reachMapping();
+      post.mockResolvedValueOnce(importResult);
+      fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+
+      await waitFor(() => expect(post).toHaveBeenCalledTimes(2));
+      expect(lastPost()[0]).toBe("/warehouse/import/lines");
+      expect(lastPost()[2]).toEqual({ readOnly: true });
+    });
+
+    it("is a write for a file that also creates products", async () => {
+      asUser(["warehouse:read", "warehouse:write", "items:write"]);
+      renderModal(vi.fn(), unsaved);
+      await reachMapping();
+      fireEvent.click(screen.getByRole("checkbox"));
+      post.mockResolvedValueOnce(importResult);
+      fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+
+      await waitFor(() => expect(post).toHaveBeenCalledTimes(2));
+      expect(lastPost()[2]).toEqual({ readOnly: false });
+    });
+
+    it("is a read for pasted rows imported into an unsaved document", async () => {
+      asUser(["warehouse:read", "warehouse:write"]);
+      renderModal(vi.fn(), unsaved);
+      fireEvent.mouseDown(
+        screen.getByRole("tab", { name: /paste from clipboard/i }),
+      );
+      fireEvent.change(
+        screen.getByRole("textbox", { name: /paste from clipboard/i }),
+        { target: { value: "nazwa\tilosc\nMąka\t2" } },
+      );
+      post.mockResolvedValueOnce({
+        data: {
+          headers: ["nazwa", "ilosc"],
+          preview_rows: [{ nazwa: "Mąka", ilosc: 2 }],
+          total_rows: 1,
+        },
+      });
+      fireEvent.click(screen.getByRole("button", { name: "Parse" }));
+      fireEvent.click(await screen.findByRole("button", { name: "map name" }));
+      post.mockResolvedValueOnce(importResult);
+      fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+
+      await waitFor(() => expect(post).toHaveBeenCalledTimes(2));
+      expect(lastPost()[0]).toBe("/warehouse/import/lines/paste");
+      expect(lastPost()[2]).toEqual({ readOnly: true });
+    });
+
+    it("is a write for pasted rows that also create products", async () => {
+      asUser(["warehouse:read", "warehouse:write", "items:write"]);
+      renderModal(vi.fn(), unsaved);
+      fireEvent.mouseDown(
+        screen.getByRole("tab", { name: /paste from clipboard/i }),
+      );
+      fireEvent.change(
+        screen.getByRole("textbox", { name: /paste from clipboard/i }),
+        { target: { value: "nazwa\tilosc\nMąka\t2" } },
+      );
+      post.mockResolvedValueOnce({
+        data: {
+          headers: ["nazwa", "ilosc"],
+          preview_rows: [{ nazwa: "Mąka", ilosc: 2 }],
+          total_rows: 1,
+        },
+      });
+      fireEvent.click(screen.getByRole("button", { name: "Parse" }));
+      fireEvent.click(await screen.findByRole("button", { name: "map name" }));
+      fireEvent.click(screen.getByRole("checkbox"));
+      post.mockResolvedValueOnce(importResult);
+      fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+
+      await waitFor(() => expect(post).toHaveBeenCalledTimes(2));
+      expect(lastPost()[2]).toEqual({ readOnly: false });
+    });
+
+    it("is left to the client for a saved document, which the import writes into", async () => {
+      renderModal();
+      await reachMapping();
+      post.mockResolvedValueOnce(importResult);
+      fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+
+      await waitFor(() => expect(post).toHaveBeenCalledTimes(2));
+      expect(lastPost()[0]).toBe(`/warehouse/documents/${DOC_ID}/import-lines`);
+      expect(lastPost()).toHaveLength(2);
+    });
+  });
+
   it("does not re-read the document when the import failed", async () => {
     const { invalidate, onImported } = renderModal();
     await reachMapping();
