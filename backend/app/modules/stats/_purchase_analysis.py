@@ -137,8 +137,11 @@ def find_bulk_opportunities(
 
     return sorted(
         opportunities,
-        key=lambda x: x['potential_annual_savings'],
-        reverse=True,
+        key=lambda x: (
+            -x['potential_annual_savings'],
+            x['product'].casefold(),
+            x['product'],
+        ),
     )[:5]
 
 
