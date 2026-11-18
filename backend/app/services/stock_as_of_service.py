@@ -561,6 +561,7 @@ class LayerMovements:
     internal_receipts: Decimal
     used: Decimal
     disposed: Decimal
+    dispatched: Decimal
     other_issues: Decimal
     excluded: int
 
@@ -591,6 +592,7 @@ async def layer_movements_async(
     layer = StockValuationLayer
     hidden_tags = await hidden_module_tags_async(db, organization_id)
     dated = _layer_dated_at()
+    on_document = layer.document_line_id.is_not(None)
     in_period = (
         layer.organization_id == organization_id,
         dated > after,
@@ -605,6 +607,7 @@ async def layer_movements_async(
                 layer.direction,
                 layer.internal,
                 layer.reason,
+                on_document,
                 func.sum(layer.total_value),
             )
             .where(
@@ -615,13 +618,13 @@ async def layer_movements_async(
                 | (layer.currency.is_(None))
                 | (layer.currency == org_currency),
             )
-            .group_by(layer.direction, layer.internal, layer.reason)
+            .group_by(layer.direction, layer.internal, layer.reason, on_document)
         )
     ).all()
 
     zero = Decimal('0')
-    receipts = internal = used = disposed = other = zero
-    for direction, is_internal, reason, total in rows:
+    receipts = internal = used = disposed = dispatched = other = zero
+    for direction, is_internal, reason, is_document, total in rows:
         total = total or zero
         if direction == 'IN':
             if is_internal:
@@ -632,6 +635,8 @@ async def layer_movements_async(
             used -= total
         elif reason == ItemAction.DISPOSED.value:
             disposed -= total
+        elif is_document:
+            dispatched -= total
         else:
             other -= total
 
@@ -651,6 +656,7 @@ async def layer_movements_async(
         internal_receipts=quantise(internal),
         used=quantise(used),
         disposed=quantise(disposed),
+        dispatched=quantise(dispatched),
         other_issues=quantise(other),
         excluded=excluded,
     )

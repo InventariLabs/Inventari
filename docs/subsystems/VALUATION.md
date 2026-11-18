@@ -113,14 +113,18 @@ stock-on-a-date report itself, asked for the evening before the first day and
 for the last — the closing is that report's figure, not a second
 implementation. The lines between them come from the layers dated inside the
 period, cut with the same expression as the report (`layer_dated_at`): inflows
-split by `internal`, outflows by `reason` (used, disposed, everything else).
+split by `internal`, outflows by `reason` (used, disposed) and by whether a
+document line stands behind them (dispatched), everything else last.
 Each line is signed as it changes the value, so opening plus every line is the
 closing. The ends replay the FIFO draw while the lines read the layers as
 posted, so they can differ by a cost added after a receipt or a rounding cent;
 that difference is the `other_changes` line, and the change in the value of
 production runs under way is `work_in_progress_change`. A count's surpluses and
 shortages are not marked on their layers, so they appear as receipts and
-other issues.
+other issues. The statement is nothing but value, so it follows the stats
+module's `show_inventory_value` switch like the other stock-value surfaces: the
+screen says the value is hidden and the spreadsheet is refused
+(`STOCK_VALUE_HIDDEN`).
 
 ## A cost added after the receipt
 

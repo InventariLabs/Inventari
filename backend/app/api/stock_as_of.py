@@ -361,6 +361,7 @@ async def _build_value_movement(
         + moved.internal_receipts
         + moved.used
         + moved.disposed
+        + moved.dispatched
         + moved.other_issues
         + in_production
     )
@@ -373,6 +374,7 @@ async def _build_value_movement(
         internal_receipts=moved.internal_receipts,
         used=moved.used,
         disposed=moved.disposed,
+        dispatched=moved.dispatched,
         other_issues=moved.other_issues,
         work_in_progress_change=in_production,
         other_changes=closing.total_value - opening.total_value - listed,
@@ -407,6 +409,7 @@ _MOVEMENT_LINES = (
     ('Produced and returned to stock', 'internal_receipts'),
     ('Used', 'used'),
     ('Disposed', 'disposed'),
+    ('Dispatched', 'dispatched'),
     ('Other issues', 'other_issues'),
     ('Work in progress change', 'work_in_progress_change'),
     ('Other changes', 'other_changes'),
@@ -425,9 +428,12 @@ async def stock_value_movement_xlsx(
     """The same statement, as one spreadsheet."""
     import pandas as pd
 
-    statement = await _build_value_movement(
-        db, require_org(current_user), date_from, date_to
-    )
+    org_id = require_org(current_user)
+    # The statement is nothing but value: where the profile withholds the
+    # figure, a file of it would say what the screen does not.
+    if not await _shows_inventory_value_async(db, org_id):
+        raise catalogue_refusal('stock_value_hidden')
+    statement = await _build_value_movement(db, org_id, date_from, date_to)
     frame = pd.DataFrame(
         [
             {

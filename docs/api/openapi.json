@@ -85299,6 +85299,17 @@
             ],
             "title": "Disposed"
           },
+          "dispatched": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dispatched"
+          },
           "other_issues": {
             "anyOf": [
               {

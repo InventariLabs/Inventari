@@ -28,6 +28,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import UserContextDTO
+from app.core.public_api import core_api
 from app.core.testing import ModuleTestHelper
 from app.models.item import Item
 from app.models.organization import Organization
@@ -37,6 +38,7 @@ from app.models.stock_valuation_layer import StockValuationLayer
 from app.models.storage_location import StorageLocation
 from app.models.storage_type import StorageType
 from app.models.user import User
+from app.modules.warehouse.models import Document, DocumentLine
 from app.schemas.item import ItemConsumeRequest, ItemDiscardRequest
 from app.services.items import consume_item, discard_item
 from app.services.token_service import create_access_token
@@ -192,7 +194,60 @@ async def _period(
     )
 
 
+async def _dispatch_against_a_document(db: AsyncSession, books: _Books) -> None:
+    """Ship three sugar at 4.00 against a document line, inside the period.
+
+    The layer is written the way a delivery writes it: no reason, but the
+    line it was posted for.
+    """
+    document = Document(
+        organization_id=books.org.id,
+        type='OUT',
+        number=f'OUT/{uuid4().hex[:6]}',
+        created_by=books.user.id,
+    )
+    line = DocumentLine(
+        product_template_id=books.sugar.id,
+        quantity=Decimal('3'),
+        expected_quantity=Decimal('3'),
+        done_quantity=Decimal('3'),
+        line_number=1,
+    )
+    document.lines.append(line)
+    db.add(document)
+    await db.flush()
+    db.add(
+        StockValuationLayer(
+            organization_id=books.org.id,
+            product_template_id=books.sugar.id,
+            document_line_id=line.id,
+            direction='OUT',
+            quantity=Decimal('3'),
+            remaining_qty=Decimal('0'),
+            unit_cost=Decimal('4.00'),
+            total_value=Decimal('12.00'),
+            created_at=_days_ago(_INSIDE),
+        )
+    )
+    await db.commit()
+
+
 class TestThePeriodStatement:
+    async def test_a_dispatch_against_a_document_is_a_line_of_its_own(
+        self,
+        real_async_client: AsyncClient,
+        real_async_db_session: AsyncSession,
+        books: _Books,
+    ) -> None:
+        await _dispatch_against_a_document(real_async_db_session, books)
+
+        body = (await _period(real_async_client, books)).json()
+
+        assert Decimal(body['dispatched']) == Decimal('-12.00')
+        # It is not hidden among the issues nobody can tell apart.
+        assert Decimal(body['other_issues']) == Decimal('0.00')
+        assert Decimal(body['used']) == Decimal('-8.00')
+
     async def test_it_says_what_opened_moved_and_closed(
         self, real_async_client: AsyncClient, books: _Books
     ) -> None:
@@ -224,6 +279,7 @@ class TestThePeriodStatement:
                 'internal_receipts',
                 'used',
                 'disposed',
+                'dispatched',
                 'other_issues',
                 'work_in_progress_change',
                 'other_changes',
@@ -327,6 +383,27 @@ class TestTheStatementAsASheet:
         assert rows['Opening value'] == pytest.approx(20.0)
         assert rows['Closing value'] == pytest.approx(28.0)
         assert rows['Used'] == pytest.approx(-8.0)
+
+    async def test_where_the_profile_hides_the_value_the_file_does_not_state_it(
+        self,
+        real_async_client: AsyncClient,
+        real_async_db_session: AsyncSession,
+        books: _Books,
+    ) -> None:
+        await core_api.settings.set_bulk_async(
+            real_async_db_session,
+            books.org.id,
+            'stats',
+            {'show_inventory_value': False},
+        )
+        await real_async_db_session.commit()
+
+        response = await _period(
+            real_async_client, books, path='/api/v1/stock-value-movement/export/xlsx'
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json()['detail']['code'] == 'STOCK_VALUE_HIDDEN'
 
     async def test_nobody_signed_out_reads_the_statement(
         self, real_async_client: AsyncClient

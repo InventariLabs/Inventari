@@ -268,6 +268,7 @@
     "caption": "Valor do estoque de {{organization}} de {{from}} a {{to}}",
     "completeFrom": "O registro de movimentações começa em {{date}}. Nada antes disso é conhecido — não é zero.",
     "noValueSource": "Não há histórico de custos, então não há valor a informar. O demonstrativo é montado a partir do histórico de custos do que entrou e saiu.",
+    "valueHidden": "O perfil da organização não mostra o valor do estoque, então não há demonstrativo para ler aqui.",
     "cannotAnswer": "Não é possível responder para este período.",
     "excludedCurrency_one": "{{count}} recebimento deixado de fora: a moeda dele não é a da organização.",
     "excludedCurrency_other": "{{count}} recebimentos deixados de fora: a moeda deles não é a da organização.",
@@ -280,7 +281,8 @@
       "internal_receipts": "Produzido e devolvido ao estoque",
       "used": "Consumo",
       "disposed": "Descarte",
-      "other_issues": "Outras saídas (expedições, faltas de inventário, correções)",
+      "dispatched": "Expedições",
+      "other_issues": "Outras saídas (faltas de inventário, correções)",
       "work_in_progress_change": "Variação da produção em andamento",
       "other_changes": "Outras variações (custos adicionados após o recebimento, arredondamentos)"
     }

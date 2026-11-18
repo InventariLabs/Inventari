@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { screen, waitFor, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { renderWithProviders } from "@/test/utils";
 import { PageHeaderContext } from "@/hooks/useModulePageHeader";
@@ -9,6 +11,8 @@ import StockValueMovementPage from "./StockValueMovementPage";
 
 const mocks = vi.hoisted(() => ({
   asked: [] as Record<string, unknown>[],
+  enabled: [] as boolean[],
+  showValue: true,
   downloadBlob: vi.fn(),
   state: {
     data: undefined as unknown,
@@ -31,6 +35,7 @@ const STATEMENT = {
   internal_receipts: "0.00",
   used: "-8.00",
   disposed: "-4.00",
+  dispatched: "0.00",
   other_issues: "0.00",
   work_in_progress_change: "0.00",
   other_changes: "0.00",
@@ -42,8 +47,9 @@ vi.mock("sonner", () => ({
 }));
 
 vi.mock("@/modules/inventory/hooks/useStockValueMovement", () => ({
-  useStockValueMovement: (query: Record<string, unknown>) => {
+  useStockValueMovement: (query: Record<string, unknown>, enabled = true) => {
     mocks.asked.push(query);
+    mocks.enabled.push(enabled);
     return {
       data: mocks.state.isError ? undefined : mocks.state.data,
       isLoading: false,
@@ -52,6 +58,10 @@ vi.mock("@/modules/inventory/hooks/useStockValueMovement", () => ({
       refetch: vi.fn(),
     };
   },
+}));
+
+vi.mock("@/modules/shared/hooks/useShowInventoryValue", () => ({
+  useShowInventoryValue: () => mocks.showValue,
 }));
 
 vi.mock("@/modules/inventory/api/stockValueMovement", () => ({
@@ -75,6 +85,8 @@ describe("StockValueMovementPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.asked.length = 0;
+    mocks.enabled.length = 0;
+    mocks.showValue = true;
     mocks.state.data = STATEMENT;
     mocks.state.isError = false;
     mocks.state.error = undefined;
@@ -88,6 +100,43 @@ describe("StockValueMovementPage", () => {
       date_from: `${today.slice(0, 8)}01`,
       date_to: today,
     });
+  });
+
+  it("opens on the month of a day it is linked to, not on one that starts after it", () => {
+    // The stock-on-a-date screen links here with the day alone.
+    render(
+      <PageHeaderContext.Provider value={{ data: {}, setHeader: vi.fn() }}>
+        <QueryClientProvider client={new QueryClient()}>
+          <MemoryRouter initialEntries={["/?to=2026-06-30"]}>
+            <StockValueMovementPage />
+          </MemoryRouter>
+        </QueryClientProvider>
+      </PageHeaderContext.Provider>,
+    );
+
+    expect(mocks.asked[0]).toEqual({
+      date_from: "2026-06-01",
+      date_to: "2026-06-30",
+    });
+  });
+
+  it("gives a dispatch its own line once it holds something", () => {
+    mocks.state.data = { ...STATEMENT, dispatched: "-12.00" };
+    renderPage();
+
+    expect(screen.getByText("Dispatched")).toBeInTheDocument();
+  });
+
+  it("prints no figure, asks for none and offers no file where the profile hides the value", () => {
+    mocks.showValue = false;
+    renderPage();
+
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    expect(screen.getByRole("note")).toHaveTextContent(
+      /does not show what its stock is worth/,
+    );
+    expect(mocks.enabled.every((enabled) => !enabled)).toBe(true);
+    expect(screen.getByRole("button", { name: /export/i })).toBeDisabled();
   });
 
   it("reads the period as opening, movements and closing", () => {

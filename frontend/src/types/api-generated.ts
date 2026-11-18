@@ -27065,6 +27065,8 @@ export interface components {
             used?: string | null;
             /** Disposed */
             disposed?: string | null;
+            /** Dispatched */
+            dispatched?: string | null;
             /** Other Issues */
             other_issues?: string | null;
             /** Work In Progress Change */

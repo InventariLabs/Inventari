@@ -284,6 +284,7 @@
     "caption": "Wartość zapasu {{organization}} od {{from}} do {{to}}",
     "completeFrom": "Rejestr ruchów zaczyna się {{date}}. Nic wcześniejszego nie jest znane — i nie jest zerem.",
     "noValueSource": "Nie ma historii kosztów, więc nie ma wartości do podania. Zestawienie powstaje z historii kosztów tego, co przyszło i wyszło.",
+    "valueHidden": "Profil organizacji nie pokazuje wartości zapasu, więc nie ma tu zestawienia do odczytania.",
     "cannotAnswer": "Na ten okres nie da się odpowiedzieć.",
     "excludedCurrency_one": "Pominięto {{count}} przyjęcie: jego waluta nie jest walutą organizacji.",
     "excludedCurrency_few": "Pominięto {{count}} przyjęcia: ich waluta nie jest walutą organizacji.",
@@ -298,7 +299,8 @@
       "internal_receipts": "Wyprodukowane i zwrócone na stan",
       "used": "Zużycie",
       "disposed": "Utylizacja",
-      "other_issues": "Inne rozchody (wydania, braki z inwentaryzacji, korekty)",
+      "dispatched": "Wydania",
+      "other_issues": "Inne rozchody (braki z inwentaryzacji, korekty)",
       "work_in_progress_change": "Zmiana produkcji w toku",
       "other_changes": "Inne zmiany (koszty dopisane po przyjęciu, zaokrąglenia)"
     }

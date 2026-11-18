@@ -21,6 +21,7 @@ import { DateInput } from "@/components/ui/DateInput";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { QueryError } from "@/components/ui/QueryResult";
 import { useFilteredList } from "@/hooks/useFilteredList";
+import { useShowInventoryValue } from "@/modules/shared/hooks/useShowInventoryValue";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useMoney } from "@/hooks/useMoney";
 import { extractApiError, isServerRefusal } from "@/lib/errors";
@@ -45,6 +46,7 @@ type LineKey =
   | "internal_receipts"
   | "used"
   | "disposed"
+  | "dispatched"
   | "other_issues"
   | "work_in_progress_change"
   | "other_changes";
@@ -53,23 +55,30 @@ export default function StockValueMovementPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const { setHeader } = useModulePageHeader();
   const money = useMoney();
+  // The statement is nothing but value: where the profile withholds the
+  // figure the screen says so instead of printing it, and offers no file.
+  const showInventoryValue = useShowInventoryValue();
 
   // The period lives in the address, so a refresh keeps the statement and a
   // copied link opens the same one. It opens on the current month.
   const [today] = useState(todayIso);
   const filters = useFilteredList(
     {
-      from: { default: `${today.slice(0, 8)}01`, urlKey: "from" },
+      from: { default: "", urlKey: "from" },
       to: { default: today, urlKey: "to" },
     },
     { limit: 1, syncToUrl: true },
   );
-  const from = isDay(String(filters.values.from))
-    ? String(filters.values.from)
-    : `${today.slice(0, 8)}01`;
   const to = isDay(String(filters.values.to))
     ? String(filters.values.to)
     : today;
+  // A link that names only the last day (the stock-on-a-date screen's) means
+  // the month that day is in; a period whose first day came after its last
+  // would be refused, and the link would land on the refusal.
+  const monthOf = `${to.slice(0, 8)}01`;
+  const from = isDay(String(filters.values.from))
+    ? String(filters.values.from)
+    : monthOf;
 
   useEffect(() => {
     setHeader({
@@ -85,7 +94,7 @@ export default function StockValueMovementPage() {
     isError,
     error,
     refetch,
-  } = useStockValueMovement(query);
+  } = useStockValueMovement(query, showInventoryValue);
 
   const download = async () => {
     try {
@@ -109,9 +118,7 @@ export default function StockValueMovementPage() {
           <DateInput
             label={t("inventory:valueMovement.from")}
             value={from}
-            onChange={(value) =>
-              filters.setFilter("from", value || `${today.slice(0, 8)}01`)
-            }
+            onChange={(value) => filters.setFilter("from", value)}
             wrapperClassName="w-full sm:w-48"
           />
           <DateInput
@@ -126,7 +133,11 @@ export default function StockValueMovementPage() {
               variant="outline"
               leftIcon={<FileDown size={16} />}
               onClick={() => void download()}
-              disabled={!statement || statement.value_source == null}
+              disabled={
+                !showInventoryValue ||
+                !statement ||
+                statement.value_source == null
+              }
             >
               {t("common:actions.export")}
             </Button>
@@ -134,7 +145,16 @@ export default function StockValueMovementPage() {
         </div>
       </Card>
 
-      {isLoading ? (
+      {!showInventoryValue ? (
+        <Card className="p-4">
+          <div className="flex items-start gap-2 text-on-secondary" role="note">
+            <Info size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
+            <p className="text-sm">
+              {t("inventory:valueMovement.valueHidden")}
+            </p>
+          </div>
+        </Card>
+      ) : isLoading ? (
         <LoadingSpinner />
       ) : isError && !isServerRefusal(error) ? (
         <QueryError onRetry={() => void refetch()} />
@@ -206,6 +226,11 @@ function Statement({ statement, money }: StatementProps) {
       key: "disposed",
       label: t("inventory:valueMovement.lines.disposed"),
       always: true,
+    },
+    {
+      key: "dispatched",
+      label: t("inventory:valueMovement.lines.dispatched"),
+      always: false,
     },
     {
       key: "other_issues",

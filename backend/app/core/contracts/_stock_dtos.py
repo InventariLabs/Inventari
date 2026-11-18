@@ -552,8 +552,11 @@ class StockValueMovementDTO(BaseModel):
     internal_receipts: Decimal | None = None
     used: Decimal | None = None
     disposed: Decimal | None = None
-    #: Every other way stock left: dispatches against a document, counted
-    #: shortages, corrections.
+    #: Goods that left against a document line — a dispatch or a delivery.
+    dispatched: Decimal | None = None
+    #: Every other way stock left: counted shortages, corrections. The layer
+    #: keeps no reason for those, so a count difference cannot be told from
+    #: any other correction.
     other_issues: Decimal | None = None
     #: What production runs under way held at the close, less at the opening.
     work_in_progress_change: Decimal | None = None

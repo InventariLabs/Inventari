@@ -17,14 +17,15 @@ says what the release does rather than what changed since them.
 - A statement of what the stock was worth over a period. **Value movement**,
   reached from *Stock on a date*, takes a first and a last day and gives the
   value when the period opened, what came in (bought, and produced or returned
-  to stock), what was used, what was thrown away, every other way stock left,
-  and the value when it closed. The opening and the closing are the figures
+  to stock), what was used, what was thrown away, what was dispatched against a
+  document, every other way stock left, and the value when it closed. The opening and the closing are the figures
   *Stock on a date* gives for the evening before the first day and for the last
   one, and the lines add up to the cent; where the two ends differ by something
   the cost history does not account for (a cost added to a receipt after it
   arrived, a rounding cent) the statement says so on a line of its own. It
-  downloads as a spreadsheet, and an organization that keeps no cost history
-  gets an explanation rather than a page of zeros. It is a statement over the
+  downloads as a spreadsheet, an organization that keeps no cost history gets
+  an explanation rather than a page of zeros, and where the profile hides the
+  value of the stock the screen and the file hide it too. It is a statement over the
   cost history, not a ledger: no chart of accounts, no double entry, no closing
   of periods.
 - Planning several production runs at once. A planned run no longer reads the
