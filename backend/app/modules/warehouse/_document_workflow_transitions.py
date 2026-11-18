@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import Any
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import select
@@ -75,6 +75,9 @@ from .shipment_service import (
     emit_shipped_async,
     record_shipment_async,
 )
+
+if TYPE_CHECKING:
+    from .models import Document
 
 
 class WmsSessionActiveError(ValueError):
@@ -632,7 +635,7 @@ async def complete_document(
     execution_data: DocumentComplete | None = None,
     *,
     may_exceed_over_receipt: bool = False,
-) -> Any:
+) -> Document:
     """Post a confirmed document's stock.
 
     Like ``confirm_document`` it leaves the commit to the caller: the one-step
@@ -695,7 +698,7 @@ async def cancel_document(
     org_id: UUID,
     doc_id: UUID,
     user_id: UUID,
-) -> Any:
+) -> Document:
     # Under the row's lock, like confirm and completion: cancelling
     # decides on the status it read after the wait, so a cancel cannot
     # close a document another door has just moved, and the anchors it
@@ -807,7 +810,7 @@ async def release_after_approval_withdrawn(
     org_id: UUID,
     doc_id: UUID,
     module: str,
-) -> Any:
+) -> Document:
     """Take a document back out of PENDING_APPROVAL when nothing is pending.
 
     Withdrawing the request removes the question; the document that was
@@ -837,7 +840,7 @@ async def confirm_after_approval(
     doc_id: UUID,
     module: str,
     user_id: UUID | None = None,
-) -> Any:
+) -> Document:
     """Transition a document from PENDING_APPROVAL to CONFIRMED.
 
     Called when the module the document waits for lets it go — for the

@@ -7,6 +7,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.contracts import ItemDTO
 from app.core.exceptions import AppException, ServiceRejectionError
 from app.core.public_api import core_api
 
@@ -88,7 +89,7 @@ async def _get_item_or_raise(
     item_id: UUID,
     *,
     lock: bool = False,
-) -> Any:
+) -> ItemDTO:
     """Fetch an item via CoreAPI or refuse with a keyed sentence.
 
     With *lock* the record is taken under its row lock, for a door that is
@@ -106,7 +107,7 @@ async def _get_item_or_raise(
 
 async def _get_correction_item_or_raise(
     db: AsyncSession, org_id: UUID, line: DocumentLine
-) -> Any:
+) -> ItemDTO:
     """Fetch the item a correction line targets, with a structured failure.
 
     A missing item raises a structured ``CORRECTION_ITEM_MISSING`` error that
@@ -146,7 +147,7 @@ async def _apply_qty_change(
     new_qty: Decimal,
     user_id: UUID,
     history: dict[str, str],
-) -> Any:
+) -> ItemDTO:
     """Call update_quantity with standard kwargs; raise if item vanishes.
 
     *new_qty* is absolute: derive it from ``_locked_quantity``, never from a
