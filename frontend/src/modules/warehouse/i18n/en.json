@@ -106,6 +106,7 @@
   "form": {
     "createTitle": "New document",
     "editTitle": "Edit document",
+    "guardName": "The document form",
     "discardTitle": "Discard this document?",
     "discardMessage": "The partner, locations and lines you entered will be lost. This cannot be undone.",
     "discardConfirm": "Discard",

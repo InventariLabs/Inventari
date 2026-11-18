@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@/test/utils";
 import DocumentFormModal from "./DocumentFormModal";
+import { useFormGuardStore } from "@/store/formGuardStore";
 import * as modulesCtx from "@/contexts/ModulesContext";
 import { moduleRegistry, slotComponent } from "@/lib/moduleRegistry";
 import type { SlotDataMap } from "@/lib/moduleRegistry";
@@ -1378,6 +1379,84 @@ describe("DocumentFormModal validation accessibility", () => {
 
     expect(onClose).not.toHaveBeenCalled();
     expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+  });
+
+  it("reports a filled-in form to the navigation gate", async () => {
+    // The sentence a session's end gives a read reads the same signal.
+    const onClose = vi.fn();
+    render(<DocumentFormModal initialType="IN" onClose={onClose} />);
+    expect(useFormGuardStore.getState().dirtyForm).toBeNull();
+
+    fireEvent.change(screen.getAllByPlaceholderText("Item")[0], {
+      target: { value: "Widget" },
+    });
+
+    await waitFor(() =>
+      expect(useFormGuardStore.getState().dirtyForm).toBe("The document form"),
+    );
+  });
+
+  it("does not report an existing document as work until it is changed", async () => {
+    const existing = {
+      id: "doc-1",
+      organization_id: "org-1",
+      type: "IN",
+      number: "IN/2026/001",
+      status: "DRAFT",
+      partner_id: "partner-1",
+      source_location_id: null,
+      target_location_id: "loc-1",
+      scheduled_date: null,
+      notes: "Dock 2",
+      external_reference: null,
+      currency: null,
+      lines: [{ id: "line-1", name: "Widget", quantity: 10, uom_id: null }],
+    } as unknown as React.ComponentProps<typeof DocumentFormModal>["document"];
+    await act(async () => {
+      render(<DocumentFormModal document={existing} onClose={vi.fn()} />);
+    });
+
+    // Its own partner, location, notes and line are what it opened with.
+    expect(useFormGuardStore.getState().dirtyForm).toBeNull();
+
+    fireEvent.change(screen.getAllByPlaceholderText("Item")[0], {
+      target: { value: "Widget 2" },
+    });
+
+    await waitFor(() =>
+      expect(useFormGuardStore.getState().dirtyForm).toBe("The document form"),
+    );
+  });
+
+  it("reports a changed scrap reason on an existing draft as work", async () => {
+    // Save sends the reason, so a change to it alone is work to keep.
+    const existing = {
+      id: "doc-2",
+      organization_id: "org-1",
+      type: "SCRAP",
+      number: "SCR/2026/001",
+      status: "DRAFT",
+      partner_id: null,
+      source_location_id: "loc-1",
+      target_location_id: null,
+      scheduled_date: null,
+      notes: null,
+      external_reference: null,
+      currency: null,
+      reason_code: "DAMAGED",
+      lines: [{ id: "line-1", name: "Widget", quantity: 1, uom_id: null }],
+    } as unknown as React.ComponentProps<typeof DocumentFormModal>["document"];
+    await act(async () => {
+      render(<DocumentFormModal document={existing} onClose={vi.fn()} />);
+    });
+    expect(useFormGuardStore.getState().dirtyForm).toBeNull();
+
+    const reason = screen.getByDisplayValue(/damaged/i);
+    fireEvent.change(reason, { target: { value: "EXPIRED" } });
+
+    await waitFor(() =>
+      expect(useFormGuardStore.getState().dirtyForm).toBe("The document form"),
+    );
   });
 
   it("closes on Escape when nothing has been entered", () => {

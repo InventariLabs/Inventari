@@ -7,11 +7,12 @@
  * requests it was queueing. So the refresh call has to carry the header by
  * hand; this pins it.
  */
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { http, HttpResponse } from "msw";
 import i18next from "i18next";
 import { server } from "@/test/mocks/server";
 import { apiErrorStatus, extractApiError } from "@/lib/errors";
+import { useFormGuardStore } from "@/store/formGuardStore";
 import { api, tokenStore } from "./client";
 
 describe("the silent refresh speaks the app's language", () => {
@@ -491,5 +492,51 @@ describe("the sentence follows what the request was doing", () => {
     await message(api.get("/things"));
 
     expect(refreshes).toBe(2);
+  });
+});
+
+describe("a read that meets the end of the session while a form holds unsaved work", () => {
+  const refuse = () =>
+    HttpResponse.json({ detail: "stale token" }, { status: 401 });
+  const ended = () => new HttpResponse(null, { status: 204 });
+  const message = (run: Promise<unknown>) =>
+    run.then(
+      () => null,
+      (e: unknown) => extractApiError(e, "Failed"),
+    );
+
+  afterEach(() => useFormGuardStore.getState().setDirtyForm(null));
+
+  it.each([
+    ["a GET", () => api.get("/things")],
+    [
+      "a read-only POST",
+      () => api.post("/warehouse/import/analyze", {}, { readOnly: true }),
+    ],
+  ])("tells %s that the work on screen was not kept", async (_name, run) => {
+    server.use(
+      http.get("*/api/v1/things", refuse),
+      http.post("*/api/v1/warehouse/import/analyze", refuse),
+      http.post("*/api/v1/auth/refresh", ended),
+    );
+    tokenStore.set("expired-token");
+    useFormGuardStore.getState().setDirtyForm("Goods receipt");
+
+    const sentence = await message(run());
+
+    expect(sentence).toBe(i18next.t("common:errors.sessionEndedReadUnsaved"));
+    expect(sentence).not.toBe(i18next.t("common:errors.sessionEndedRead"));
+  });
+
+  it("keeps the plain sentence when nothing is unsaved", async () => {
+    server.use(
+      http.get("*/api/v1/things", refuse),
+      http.post("*/api/v1/auth/refresh", ended),
+    );
+    tokenStore.set("expired-token");
+
+    expect(await message(api.get("/things"))).toBe(
+      i18next.t("common:errors.sessionEndedRead"),
+    );
   });
 });
