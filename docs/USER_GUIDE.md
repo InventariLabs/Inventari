@@ -109,7 +109,8 @@ My modules** (chapter 14).
   equipment when those modules are on. It also lists every module under
   **Switch to**, and has **Quick actions**: **Add new product** and
   **Scan barcode** — and, with the Warehouse module on, **Scan document**.
-- **The bell** holds your notifications.
+- **The bell** holds your notifications. Unless your administrator has changed
+  it, one you have read goes after 90 days and one you have not after a year.
 - **The screen icon** switches between **Light**, **Dark** and **Follow system**.
   The choice is kept by this browser.
 - **The language selector** (EN, PL, DE, FR, ES, and PT, a community translation that may still show English in places) is saved to your account.
@@ -1822,7 +1823,7 @@ a link to the source code; the rest is for administrators.
   module off hides its screens; its data stays.
 - **Email** — the SMTP server for invitations, purchase orders and
   notifications, with **Send Test Email** and a list of mail that never
-  arrived.
+  arrived, going back 120 days unless the installation is set up otherwise.
 - **AI connections** — the AI providers Inventari may use (hosted services such
   as OpenAI, Anthropic, Gemini or OpenRouter, or a local model through Ollama,
   LM Studio or vLLM), with **Test connection**, and which connection serves

@@ -9,18 +9,21 @@ Tests cover:
 
 import uuid
 from datetime import UTC, datetime
+from decimal import Decimal
 
 import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.ai_usage_log import AIUsageLog
+from app.services.admin_metrics_service import get_global_admin_stats_async
 from app.services.ai_usage_service import (
     AIUsageLimitExceededError,
     check_ai_limit_async,
     get_org_limits_async,
     log_ai_usage_async,
 )
+from app.services.ai_usage_stats_service import get_global_ai_stats_async
 from app.services.system_settings_service import set_setting_async
 
 
@@ -76,8 +79,67 @@ class TestLogAiUsage:
         assert db_entry.prompt_tokens == 150
         assert db_entry.completion_tokens == 50
         assert db_entry.total_tokens == 200
-        assert db_entry.estimated_cost_usd == 0.003
+        assert db_entry.estimated_cost_usd == Decimal('0.003')
         assert db_entry.cost_is_estimated is True
+
+    async def test_a_cost_under_a_millionth_of_a_dollar_is_not_rounded_away(
+        self, real_async_db_session: AsyncSession, async_test_household, async_test_user
+    ):
+        """A short embedding call costs this little, and there are many of them."""
+        result = await log_ai_usage_async(
+            db=real_async_db_session,
+            user_id=async_test_user.id,
+            organization_id=async_test_household.id,
+            model_name='embedding-model',
+            provider='p',
+            action_type='embed',
+            estimated_cost_usd=0.0000004,
+        )
+        await real_async_db_session.commit()
+        await real_async_db_session.refresh(result)
+
+        assert result.estimated_cost_usd == Decimal('0.0000004')
+
+    async def test_the_admin_total_adds_costs_up_exactly(
+        self, real_async_db_session: AsyncSession, async_test_household, async_test_user
+    ):
+        """Ten calls at ten cents are a dollar, not 0.9999999999999999."""
+        for _ in range(10):
+            await log_ai_usage_async(
+                db=real_async_db_session,
+                user_id=async_test_user.id,
+                organization_id=async_test_household.id,
+                model_name='model',
+                provider='p',
+                action_type='chat',
+                estimated_cost_usd=0.1,
+            )
+        await real_async_db_session.commit()
+
+        stats = await get_global_admin_stats_async(real_async_db_session)
+
+        assert stats.total_llm_cost_usd == 1.0
+
+    async def test_the_global_report_reads_a_period_with_no_estimated_cost(
+        self, real_async_db_session: AsyncSession, async_test_household, async_test_user
+    ):
+        """No estimated row sums to nothing, next to a total that is a Decimal."""
+        await log_ai_usage_async(
+            db=real_async_db_session,
+            user_id=async_test_user.id,
+            organization_id=async_test_household.id,
+            model_name='model',
+            provider='p',
+            action_type='chat',
+            estimated_cost_usd=0.25,
+            cost_is_estimated=False,
+        )
+        await real_async_db_session.commit()
+
+        stats = await get_global_ai_stats_async(real_async_db_session)
+
+        assert stats.total_cost_usd == 0.25
+        assert stats.estimated_cost_ratio == 0.0
 
     async def test_default_token_values(
         self, real_async_db_session: AsyncSession, async_test_household, async_test_user

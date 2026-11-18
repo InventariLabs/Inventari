@@ -41,6 +41,10 @@ reconciliation_job.py::run_reconciliation_once
 scoped_session.py::AsyncModuleScopedSession.commit
 scoped_session.py::AsyncModuleScopedSession.rollback
 stock_takes/router.py::request_recount
+# The daily retention run, on sessions of its own: each slice of a purge
+# commits, so the first run over years of rows is not one long transaction.
+table_retention.py::_delete_in_batches
+table_retention.py::run_table_retention_once
 testing.py::ModuleTestHelper.create_org
 testing.py::ModuleTestHelper.create_partner
 testing.py::ModuleTestHelper.create_storage_location

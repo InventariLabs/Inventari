@@ -218,6 +218,41 @@ class TestEmailJobWorker:
         job = await _fetch(session_factory, job_id)
         assert job.status == 'sent'
 
+    async def test_a_sent_job_lets_go_of_its_attachment(
+        self, session_factory: SessionFactory
+    ) -> None:
+        job_id = await _add_job(
+            session_factory,
+            attachment_bytes=b'%PDF-1.4 fake',
+            attachment_filename='protocol.pdf',
+        )
+
+        with patch('smtplib.SMTP', _mock_smtp(ok=True)):
+            async with session_factory() as session:
+                await process_email_jobs_batch(session)
+
+        job = await _fetch(session_factory, job_id)
+        assert job.status == 'sent'
+        assert job.attachment_bytes is None
+        assert job.attachment_filename == 'protocol.pdf'
+
+    async def test_a_job_that_will_be_retried_keeps_its_attachment(
+        self, session_factory: SessionFactory
+    ) -> None:
+        job_id = await _add_job(
+            session_factory,
+            attachment_bytes=b'%PDF-1.4 fake',
+            attachment_filename='protocol.pdf',
+        )
+
+        with patch('smtplib.SMTP', _mock_smtp(ok=False)):
+            async with session_factory() as session:
+                await process_email_jobs_batch(session)
+
+        job = await _fetch(session_factory, job_id)
+        assert job.status == 'pending'
+        assert job.attachment_bytes == b'%PDF-1.4 fake'
+
 
 @pytest.mark.integration
 class TestEnqueueEmailJob:
