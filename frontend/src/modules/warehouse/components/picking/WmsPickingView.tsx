@@ -154,13 +154,15 @@ function announceScan(
 // leaves behind.
 function startFailureMessage(
   t: TFunction,
-  heldSession: { holderName: string } | null,
+  heldSession: { holderName: string; own: boolean } | null,
   errorCode: string | null,
   errorStatus: number,
   error: string | null,
 ) {
   if (heldSession !== null) {
-    return t("picking.error.session_held", { owner: heldSession.holderName });
+    return heldSession.own
+      ? t("picking.error.session_own")
+      : t("picking.error.session_held", { owner: heldSession.holderName });
   }
   if (errorCode === "APPROVAL_REQUIRED") {
     return t("picking.error.approval_required");
@@ -177,6 +179,12 @@ function WmsPickingView({
   onPack,
 }: Props) {
   const { t } = useTranslation("warehouse");
+  // Continuing the caller's own session that blocked a start over several
+  // documents opens it through the document it holds: the session is reached
+  // through any of its documents, so every later call addresses that one.
+  const [resumedFrom, setResumedFrom] = useState<string | null>(null);
+  const sessionDocumentId = resumedFrom ?? documentId;
+  const sessionDocumentIds = resumedFrom ? [resumedFrom] : documentIds;
   const {
     state,
     isLoading,
@@ -197,7 +205,7 @@ function WmsPickingView({
     requestShortPick,
     cancelShortPick,
     reset,
-  } = useWmsPicking(documentId, documentIds);
+  } = useWmsPicking(sessionDocumentId, sessionDocumentIds);
 
   const sessionError =
     error ?? (errorContext ? failureSentence(t, errorContext) : null);
@@ -215,6 +223,10 @@ function WmsPickingView({
       startSession();
     }
   }, [state.phase, startSession]);
+
+  useEffect(() => {
+    if (resumedFrom !== null) void startSession();
+  }, [resumedFrom, startSession]);
 
   // A finished picking session changes the document's done quantities. The
   // receiving view refreshed the detail behind it; this one left the reader
@@ -384,12 +396,18 @@ function WmsPickingView({
               ? undefined
               : {
                   owner: heldSession.holderName,
-                  onTakeOver: () => handleHeldSession(takeOverHeldSession),
+                  own: heldSession.own,
+                  onTakeOver: () =>
+                    heldSession.own
+                      ? setResumedFrom(heldSession.documentId)
+                      : handleHeldSession(takeOverHeldSession),
                   onRelease: () => handleHeldSession(releaseHeldSession),
                 }
           }
+          // Only a failure of the server's own can pass on a second try; a
+          // refusal repeats itself.
           retry={
-            isApprovalRequired || refused || heldSession !== null
+            errorStatus < 500
               ? undefined
               : { label: t("picking.error.retry"), onRetry: startSession }
           }
@@ -421,7 +439,8 @@ function WmsPickingView({
     // opened — a list passes the ids it ticked even when it ticked one, and
     // Resume passes the row's id while the session it resumes may cover more.
     const completesDocument =
-      (documentIds?.length ?? 1) <= 1 && state.session.documents.length <= 1;
+      (sessionDocumentIds?.length ?? 1) <= 1 &&
+      state.session.documents.length <= 1;
     // The last scan can close the session by itself and nothing has refreshed
     // the document since: a register behind a multi-document session has no
     // handler that refreshes its rows, and the Pack step reads the picked
@@ -443,7 +462,7 @@ function WmsPickingView({
         onClose={(shipment) =>
           leave(() =>
             completesDocument
-              ? onClose(true, shipment, documentId)
+              ? onClose(true, shipment, sessionDocumentId)
               : onClose(false, shipment),
           )
         }
@@ -451,7 +470,8 @@ function WmsPickingView({
         // waits, as picked, for its Pack step or its own Complete.
         onLeave={() => leave(() => onClose(false))}
         onPack={
-          onPack && ((shipment) => leave(() => onPack(shipment, documentId)))
+          onPack &&
+          ((shipment) => leave(() => onPack(shipment, sessionDocumentId)))
         }
       />
     );

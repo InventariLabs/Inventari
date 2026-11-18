@@ -392,4 +392,131 @@ describe("WmsPickingView over several dispatches", () => {
       ).toBeInTheDocument();
     });
   });
+
+  describe("when a document of the selection is already in a session", () => {
+    const held = (code: string) =>
+      HttpResponse.json(
+        {
+          detail: {
+            code,
+            message: "Document WZ/2026/002 is already being picked.",
+            held_session_id: "held-1",
+            held_by: "Ola Magazyn",
+            held_document_id: "doc-2",
+          },
+        },
+        { status: 409 },
+      );
+
+    it("calls the caller's own session theirs and offers Continue and Discard scans", async () => {
+      let listStarts = 0;
+      const released: string[] = [];
+      server.use(
+        http.post(START_PATH, () => {
+          listStarts += 1;
+          return listStarts === 1
+            ? held("SESSION_HELD_BY_YOU")
+            : HttpResponse.json(buildSession());
+        }),
+        // The release door addresses the session through the held document,
+        // not the first of the selection.
+        http.post(
+          "/api/v1/warehouse/documents/doc-2/picking/held-1/release",
+          () => {
+            released.push("doc-2");
+            return new HttpResponse(null, { status: 204 });
+          },
+        ),
+      );
+
+      render(view());
+
+      expect(
+        await screen.findByText(/already open in your own session/),
+      ).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Retry" })).toBeNull();
+      expect(screen.queryByRole("button", { name: /Take over/ })).toBeNull();
+      await userEvent.click(
+        screen.getByRole("button", { name: "Discard scans" }),
+      );
+
+      await screen.findByText("Gadget");
+      expect(released).toEqual(["doc-2"]);
+      expect(listStarts).toBe(2);
+    });
+
+    it("continues the own session through the held document", async () => {
+      server.use(
+        http.post(START_PATH, () => held("SESSION_HELD_BY_YOU")),
+        http.post("/api/v1/warehouse/documents/doc-2/picking/start", () =>
+          HttpResponse.json(buildSession()),
+        ),
+      );
+
+      render(view());
+
+      await userEvent.click(
+        await screen.findByRole("button", { name: "Continue that session" }),
+      );
+
+      expect(await screen.findByText("Gadget")).toBeInTheDocument();
+    });
+
+    it("offers Take over and Release when someone else holds the document", async () => {
+      let listStarts = 0;
+      const tookOver: string[] = [];
+      server.use(
+        http.post(START_PATH, () => {
+          listStarts += 1;
+          return listStarts === 1
+            ? held("SESSION_HELD_BY_OTHER_USER")
+            : HttpResponse.json(buildSession());
+        }),
+        http.post(
+          "/api/v1/warehouse/documents/doc-2/picking/held-1/take-over",
+          () => {
+            tookOver.push("doc-2");
+            return HttpResponse.json(buildSession());
+          },
+        ),
+      );
+
+      render(view());
+
+      expect(
+        await screen.findByText(/Ola Magazyn has an active picking session/),
+      ).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Retry" })).toBeNull();
+      expect(
+        screen.getByRole("button", {
+          name: "Discard Ola Magazyn's scans and start over",
+        }),
+      ).toBeInTheDocument();
+      await userEvent.click(
+        screen.getByRole("button", {
+          name: "Take over Ola Magazyn's session and continue",
+        }),
+      );
+
+      await screen.findByText("Gadget");
+      expect(tookOver).toEqual(["doc-2"]);
+    });
+  });
+
+  it("offers no retry for a refusal that would only repeat itself", async () => {
+    server.use(
+      http.post(START_PATH, () =>
+        HttpResponse.json(
+          { detail: "Document WZ/2026/002 is not confirmed." },
+          { status: 400 },
+        ),
+      ),
+    );
+
+    render(view());
+
+    await screen.findByText("Document WZ/2026/002 is not confirmed.");
+    expect(screen.queryByRole("button", { name: "Retry" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Close" })).toBeInTheDocument();
+  });
 });

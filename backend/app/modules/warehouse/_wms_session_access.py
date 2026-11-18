@@ -57,14 +57,22 @@ async def _holder_name_async(
 
 
 def _session_held_conflict(exc: SessionHeldByOtherUserError) -> ConflictException:
-    """The 409 envelope ``start`` and the operation door both answer with."""
+    """The 409 envelope ``start`` and the operation door both answer with.
+
+    A session of the caller's own that a start over several documents ran
+    into is ``SESSION_HELD_BY_YOU``: the screen offers to continue it, not to
+    take it over from the person at the keyboard.
+    """
+    details = {
+        'held_session_id': str(exc.session_id),
+        'held_by': exc.owner,
+    }
+    if exc.document_id is not None:
+        details['held_document_id'] = str(exc.document_id)
     return ConflictException(
-        'SESSION_HELD_BY_OTHER_USER',
+        'SESSION_HELD_BY_YOU' if exc.mine else 'SESSION_HELD_BY_OTHER_USER',
         str(exc),
-        details={
-            'held_session_id': str(exc.session_id),
-            'held_by': exc.owner,
-        },
+        details=details,
     )
 
 

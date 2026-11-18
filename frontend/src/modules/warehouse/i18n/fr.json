@@ -923,7 +923,8 @@
       "undo_failed": "Impossible d’annuler la ligne.",
       "complete_failed": "Impossible de terminer la session de préparation.",
       "cancel_failed": "Impossible d’annuler la session de préparation.",
-      "session_held": "{{owner}} a une session de prélèvement active sur ce document. Reprenez-la pour continuer à partir de ses scans, ou abandonnez ses scans et recommencez."
+      "session_held": "{{owner}} a une session de prélèvement active sur ce document. Reprenez-la pour continuer à partir de ses scans, ou abandonnez ses scans et recommencez.",
+      "session_own": "Ce document est déjà ouvert dans votre propre session — sur un autre appareil ou dans une autre sélection. Poursuivez cette session ou abandonnez ses scans."
     },
     "lot": "Lot : {{name}}",
     "expires": "À consommer avant le {{date}}",
@@ -1430,6 +1431,7 @@
     "closeTitle": "Abandonner les scans de cette session ?",
     "closeMessage": "L'abandon annule chaque scan enregistré dans la session. Cette action est irréversible.",
     "takeOver": "Reprendre la session de {{owner}} et continuer",
+    "continueOwn": "Poursuivre cette session",
     "discardAndStart": "Abandonner les scans de {{owner}} et recommencer",
     "closeConfirm": "Abandonner les scans",
     "closeFailed": "La session n'a pas pu être fermée.",
