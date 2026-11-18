@@ -91,6 +91,16 @@ export function useRefreshTemplateCopy(module: TemplateUrlSegment) {
   );
 }
 
+/** Overwrite a copy with the built-in it came from; ask first. */
+export function useResetTemplateToBuiltIn(module: TemplateUrlSegment) {
+  return useAppMutation<DocumentTemplate, string>(
+    (templateId: string) => templatesApi.resetToBuiltIn(module, templateId),
+    (qc) => {
+      invalidation.templates(qc, module);
+    },
+  );
+}
+
 /**
  * Copies the built-in layouts into the organization as editable templates.
  *

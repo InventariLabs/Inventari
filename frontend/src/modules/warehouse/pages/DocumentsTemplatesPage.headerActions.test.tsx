@@ -46,6 +46,7 @@ vi.mock("@/modules/shared/hooks/useDocumentTemplates", () => {
     useDeleteTemplate: idle,
     useSeedDefaultTemplates: () => ({ mutate: m.seed, isPending: false }),
     useRefreshTemplateCopy: idle,
+    useResetTemplateToBuiltIn: idle,
     useExportTemplate: idle,
     useImportTemplate: idle,
   };

@@ -46,6 +46,9 @@ class DocumentTemplateSchema(BaseModel):
     #: belongs to the organization and nothing rewrites it; this is what the
     #: screen needs to say so.
     source_outdated: bool = False
+    #: True when the copy's body is no longer the built-in's — edited, or left
+    #: behind by a built-in that moved on. Only the list fills it in.
+    source_modified: bool = False
     model_config = ConfigDict(from_attributes=True)
 
 

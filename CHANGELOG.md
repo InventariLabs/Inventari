@@ -14,6 +14,13 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- Putting a print layout back as the built-in it came from. A copy of a
+  built-in print layout on the Document templates screen that no longer
+  matches it now carries a **Changed from the built-in** badge and a **Reset
+  to built-in** action. After a confirmation that says everything changed in
+  the template is lost, the copy's body is replaced in place — it keeps its
+  name and whether it prints by default. A template written from scratch is
+  neither marked nor offered the action.
 - Planning several production runs at once. A planned run no longer reads the
   shelf as if it were the only one on it: the draft runs are counted one after
   another, by planned day and then by creation, so two runs that each fit on

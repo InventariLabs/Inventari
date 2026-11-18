@@ -140,6 +140,22 @@ export const templatesApi = {
     return response.data;
   },
 
+  /**
+   * Put a copy back as the built-in it came from, in place.
+   *
+   * Whatever was written into the copy is replaced; its name and whether it
+   * prints by default stay. A template not copied from a built-in is a 404.
+   */
+  resetToBuiltIn: async (
+    module: TemplateUrlSegment,
+    templateId: string,
+  ): Promise<DocumentTemplate> => {
+    const response = await api.post<DocumentTemplate>(
+      `/${module}/templates/${templateId}/reset`,
+    );
+    return response.data;
+  },
+
   seedDefaults: async (
     module: TemplateUrlSegment,
   ): Promise<DocumentTemplate[]> => {

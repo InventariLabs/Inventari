@@ -310,6 +310,164 @@ describe("DocumentsTemplatesPage — a copy of an older built-in", () => {
   });
 });
 
+describe("DocumentsTemplatesPage — putting a copy back as the built-in", () => {
+  const copy = {
+    id: "t1",
+    module: "warehouse",
+    name: "Standard Template",
+    document_type: "STANDARD",
+    body_html: "<p>ours</p>",
+    version: 1,
+    is_default: true,
+    created_by: null,
+    created_at: "2026-01-02T00:00:00Z",
+    updated_at: null,
+    source_builtin: "Standard Template",
+    source_outdated: false,
+  };
+
+  it("marks a changed copy, asks before resetting it, and clears the mark", async () => {
+    let reset = false;
+    const resets = vi.fn();
+    server.use(
+      http.get("*/api/v1/warehouse/templates", () =>
+        HttpResponse.json(onePage([{ ...copy, source_modified: !reset }])),
+      ),
+      http.get("*/api/v1/warehouse/templates/built-in", () =>
+        HttpResponse.json([builtIn]),
+      ),
+      http.post("*/api/v1/warehouse/templates/t1/reset", () => {
+        reset = true;
+        resets();
+        return HttpResponse.json({ ...copy, source_modified: false });
+      }),
+    );
+    render(<DocumentsTemplatesPage />);
+
+    expect(
+      await screen.findByTestId("template-modified-badge"),
+    ).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole("button", { name: /reset to built-in/i }),
+    );
+
+    const dialog = await screen.findByRole("alertdialog");
+    expect(dialog).toHaveTextContent("Standard Template");
+    expect(dialog).toHaveTextContent(/lost/i);
+    expect(resets).not.toHaveBeenCalled();
+
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Reset" }),
+    );
+
+    await waitFor(() => expect(resets).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(
+        screen.queryByTestId("template-modified-badge"),
+      ).not.toBeInTheDocument(),
+    );
+    expect(
+      screen.queryByRole("button", { name: /reset to built-in/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("previews the layout without an error once the copy is reset", async () => {
+    let reset = false;
+    const rendered = vi.fn();
+    server.use(
+      http.get("*/api/v1/warehouse/templates", () =>
+        HttpResponse.json(
+          onePage([
+            {
+              ...copy,
+              body_html: reset ? builtIn.body_html : "<p>{{ broken</p>",
+              source_modified: !reset,
+            },
+          ]),
+        ),
+      ),
+      http.get("*/api/v1/warehouse/templates/built-in", () =>
+        HttpResponse.json([builtIn]),
+      ),
+      http.post("*/api/v1/warehouse/templates/t1/reset", () => {
+        reset = true;
+        return HttpResponse.json({ ...copy, source_modified: false });
+      }),
+      // The renderer's verdict follows the body it is sent: the broken
+      // source is refused, the built-in body renders.
+      http.post("*/api/v1/warehouse/templates/preview", async ({ request }) => {
+        const { body_html } = (await request.json()) as { body_html: string };
+        if (body_html.includes("{{ broken")) {
+          return HttpResponse.json({ detail: "bad layout" }, { status: 400 });
+        }
+        rendered(body_html);
+        return HttpResponse.json({ html: renderedBuiltIn });
+      }),
+    );
+    render(<DocumentsTemplatesPage />);
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: /reset to built-in/i }),
+    );
+    await userEvent.click(
+      within(await screen.findByRole("alertdialog")).getByRole("button", {
+        name: "Reset",
+      }),
+    );
+    await waitFor(() =>
+      expect(
+        screen.queryByTestId("template-modified-badge"),
+      ).not.toBeInTheDocument(),
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /edit standard template/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("button", { name: /show preview/i }),
+    );
+
+    const frame = await screen.findByTitle(/template preview/i);
+    await waitFor(() =>
+      expect(frame).toHaveAttribute("srcdoc", renderedBuiltIn),
+    );
+    expect(rendered).toHaveBeenCalledWith(builtIn.body_html);
+    expect(screen.queryByText(/does not render/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/bad layout/i)).not.toBeInTheDocument();
+  });
+
+  it("offers nothing on a copy that matches, or on a template of the organization's own", async () => {
+    server.use(
+      http.get("*/api/v1/warehouse/templates", () =>
+        HttpResponse.json(
+          onePage([
+            { ...copy, source_modified: false },
+            {
+              ...copy,
+              id: "t2",
+              name: "Delivery Note EU",
+              source_builtin: null,
+              source_modified: false,
+            },
+          ]),
+        ),
+      ),
+      http.get("*/api/v1/warehouse/templates/built-in", () =>
+        HttpResponse.json([builtIn]),
+      ),
+    );
+    render(<DocumentsTemplatesPage />);
+
+    await screen.findByText("Delivery Note EU");
+    expect(
+      screen.queryByTestId("template-modified-badge"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /reset to built-in/i }),
+    ).not.toBeInTheDocument();
+  });
+});
+
 describe("DocumentsTemplatesPage — an account that may only read", () => {
   afterEach(() => {
     rights.write = true;
