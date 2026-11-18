@@ -71,7 +71,7 @@ describe("useCompleteStockTakeFlow", () => {
 
     await waitFor(() => expect(asked.length).toBe(1));
     expect(asked[0].message).toContain(
-      "3 counted numbers have not been saved and will be lost.",
+      "3 lines have a number, reason or note that has not been saved; they will be lost.",
     );
   });
 
@@ -131,7 +131,7 @@ describe("useCompleteStockTakeFlow", () => {
     expect(confirm).not.toHaveBeenCalled();
     expect(toast.error).toHaveBeenCalledWith(
       expect.stringMatching(
-        /One product is still uncounted.*2 counted numbers have not been saved/,
+        /One product is still uncounted.*2 lines have a number, reason or note that has not been saved/,
       ),
     );
   });

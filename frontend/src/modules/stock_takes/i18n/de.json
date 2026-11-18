@@ -11,8 +11,8 @@
     "countedOf": "{{counted}} / {{total}} Artikel",
     "discrepanciesDetected_one": "1 Abweichung erkannt",
     "discrepanciesDetected_other": "{{count}} Abweichungen erkannt",
-    "unsaved_one": "1 Zählung eingetragen, aber nicht gespeichert",
-    "unsaved_other": "{{count}} Zählungen eingetragen, aber nicht gespeichert"
+    "unsaved_one": "1 Zeile mit nicht gespeicherten Änderungen",
+    "unsaved_other": "{{count}} Zeilen mit nicht gespeicherten Änderungen"
   },
   "differencesBadge_one": "{{count}} Unterschied",
   "differencesBadge_other": "{{count}} Unterschiede",
@@ -102,6 +102,7 @@
     "countFor": "Gezählte Menge: {{name}}",
     "countMalformed": "Das ist keine Zahl. Geben Sie Ziffern mit höchstens einem Dezimalzeichen ein, zum Beispiel 12 oder 1,5.",
     "unsaved": "Nicht gespeichert",
+    "unsavedNeedsCount": "Nicht gespeichert — Menge eintragen zum Speichern",
     "awaitingRecount": "Erneut zählen",
     "countAgain": "{{name}} erneut zählen",
     "countedPass": "Zählung {{sequence}}: {{quantity}} ({{name}})",
@@ -122,10 +123,10 @@
     "complete": {
       "title": "Inventur abschließen",
       "confirmLabel": "Abschließen",
-      "unsaved_one": "Eine gezählte Menge wurde nicht gespeichert und geht verloren.",
-      "unsaved_other": "{{count}} gezählte Mengen wurden nicht gespeichert und gehen verloren.",
       "message_one": "Der Abschluss dieser Inventur überschreibt den Bestand eines Produkts mit der gezählten Zahl. Gezählte Positionen lassen sich danach nicht mehr ändern.",
-      "message_other": "Der Abschluss dieser Inventur überschreibt den Bestand von {{count}} Produkten mit den gezählten Zahlen. Gezählte Positionen lassen sich danach nicht mehr ändern."
+      "message_other": "Der Abschluss dieser Inventur überschreibt den Bestand von {{count}} Produkten mit den gezählten Zahlen. Gezählte Positionen lassen sich danach nicht mehr ändern.",
+      "unsaved_one": "Bei einer Zeile wurden Zahl, Grund oder Notiz nicht gespeichert; sie gehen verloren.",
+      "unsaved_other": "Bei {{count}} Zeilen wurden Zahl, Grund oder Notiz nicht gespeichert; sie gehen verloren."
     },
     "cancel": {
       "title": "Inventur abbrechen",
@@ -245,14 +246,14 @@
     "closeEmpty": "An {{location}} wurde nichts gefunden. Als gezählt und leer bestätigen?",
     "closeCounted": "Alle Zeilen an {{location}} sind gezählt. Lagerort abschließen?",
     "closeConfirm": "Lagerort abschließen",
-    "closeUnsaved_one": "Eine Zahl an diesem Lagerort ist nicht gespeichert. Speichern Sie sie, bevor Sie den Lagerort abschließen.",
-    "closeUnsaved_other": "{{count}} Zahlen an diesem Lagerort sind nicht gespeichert. Speichern Sie sie, bevor Sie den Lagerort abschließen.",
     "closedDone_one": "{{location}} abgeschlossen: eine Zeile als 0 gezählt.",
     "closedDone_other": "{{location}} abgeschlossen: {{count}} Zeilen als 0 gezählt.",
     "closedEmptyDone": "{{location}} als leer bestätigt.",
     "closedCountedDone": "{{location}} abgeschlossen.",
     "closedBy": "Abgeschlossen von {{name}}",
-    "closedEmptyBy": "Als leer bestätigt von {{name}}"
+    "closedEmptyBy": "Als leer bestätigt von {{name}}",
+    "closeUnsaved_one": "Eine Zeile an diesem Lagerort hat nicht gespeicherte Änderungen. Speichern Sie sie, bevor Sie den Lagerort abschließen.",
+    "closeUnsaved_other": "{{count}} Zeilen an diesem Lagerort haben nicht gespeicherte Änderungen. Speichern Sie sie, bevor Sie den Lagerort abschließen."
   },
   "count": {
     "action": "Lagerplatz zählen",
