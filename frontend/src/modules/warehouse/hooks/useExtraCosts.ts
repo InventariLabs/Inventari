@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/hooks/queries/keys";
 import { useAppMutation } from "@/lib/api/mutationFactory";
 import {
   extraCostsApi,
+  type CostVarianceInput,
   type ExtraCostInput,
 } from "@/modules/warehouse/api/extraCosts";
 
-const key = (documentId: string) => ["document-extra-costs", documentId];
+const key = queryKeys.documents.extraCosts;
 
 /** The costs on this receipt, and what they do to each line. */
 export function useExtraCosts(documentId: string, enabled = true) {
@@ -31,6 +33,38 @@ export function useRemoveExtraCost(documentId: string) {
     (costId: string) => extraCostsApi.remove(documentId, costId),
     (queryClient) => {
       void queryClient.invalidateQueries({ queryKey: key(documentId) });
+    },
+  );
+}
+
+const variancesKey = queryKeys.documents.costVariances;
+
+/** Every cost that reached no product, newest first, with its sums. */
+export function useCostVariances() {
+  return useQuery({
+    queryKey: variancesKey,
+    queryFn: () => extraCostsApi.listVariances(),
+    staleTime: 30_000,
+  });
+}
+
+export function useAddCostVariance(documentId: string) {
+  return useAppMutation(
+    (input: CostVarianceInput) => extraCostsApi.addVariance(documentId, input),
+    (queryClient) => {
+      void queryClient.invalidateQueries({ queryKey: key(documentId) });
+      void queryClient.invalidateQueries({ queryKey: variancesKey });
+    },
+  );
+}
+
+export function useRemoveCostVariance(documentId: string) {
+  return useAppMutation(
+    (varianceId: string) =>
+      extraCostsApi.removeVariance(documentId, varianceId),
+    (queryClient) => {
+      void queryClient.invalidateQueries({ queryKey: key(documentId) });
+      void queryClient.invalidateQueries({ queryKey: variancesKey });
     },
   );
 }

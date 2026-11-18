@@ -823,6 +823,50 @@ class ExtraCostLinePreview(BaseModel):
     unit_cost_after: Decimal | None = None
 
 
+class CostVarianceCreate(BaseModel):
+    kind: ExtraCostKind = ExtraCostKind.FREIGHT
+    amount: Decimal = Field(gt=0, max_digits=12, decimal_places=2)
+    currency: str | None = Field(default=None, max_length=3)
+    reason: str = Field(min_length=1, max_length=255)
+    #: Defaults to today.
+    occurred_on: date | None = None
+
+    @field_validator('reason')
+    @classmethod
+    def _reason_is_text(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError('reason must not be blank')
+        return value
+
+
+class CostVarianceOut(BaseModel):
+    id: UUID
+    document_id: UUID
+    kind: str
+    amount: Decimal
+    currency: str | None = None
+    reason: str
+    occurred_on: date
+
+
+class CostVarianceRow(CostVarianceOut):
+    """One variance in the organization-wide list, with its document's number."""
+
+    document_number: str | None = None
+
+
+class CostVariancesList(BaseModel):
+    """Costs that reached no product, listed and added up.
+
+    ``total`` is per currency: a variance is never converted, so two
+    currencies are two sums.
+    """
+
+    items: list[CostVarianceRow] = []
+    totals: dict[str, Decimal] = {}
+
+
 class ExtraCostsView(BaseModel):
     costs: list[ExtraCostOut] = []
     total: Decimal = Decimal('0')
@@ -833,3 +877,6 @@ class ExtraCostsView(BaseModel):
     #: allocation needs values, and weight allocation needs weights.
     fell_back: list[str] = []
     lines: list[ExtraCostLinePreview] = []
+    #: Costs recorded as variances: part of no stock value.
+    variances: list[CostVarianceOut] = []
+    variance_total: Decimal = Decimal('0')

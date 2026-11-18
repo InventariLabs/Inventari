@@ -686,7 +686,8 @@
         "response_id": "Response",
         "sku_schema": "SKU schema",
         "body_html": "Template body",
-        "reset_to_builtin": "Reset to built-in template"
+        "reset_to_builtin": "Reset to built-in template",
+        "occurred_on": "Day it belongs to"
       },
       "showWholeChange": "Show the whole change",
       "showLess": "Show less",

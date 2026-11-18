@@ -23,12 +23,16 @@ from app.core.deps import (
 )
 from app.core.exceptions import catalogue_refusal
 from app.core.modules import require_module
+from app.core.public_api import core_api
 
+from . import cost_variance_service as variances_svc
 from . import document_types as dt
 from . import extra_costs_service as svc
 from ._document_workflow_crud import _get_doc_for_update
 from .extra_costs_service import _planned_quantity
 from .schemas import (
+    CostVarianceCreate,
+    CostVarianceOut,
     ExtraCostCreate,
     ExtraCostLinePreview,
     ExtraCostOut,
@@ -41,6 +45,9 @@ router = APIRouter(dependencies=[Depends(require_module('warehouse'))])
 async def _view(db: AsyncSession, doc: Any) -> ExtraCostsView:
     costs = await svc.list_async(db, doc.organization_id, doc.id)
     surcharges, fell_back = await svc.surcharges_async(db, doc, planned=True)
+    variances = await variances_svc.list_for_document_async(
+        db, doc.organization_id, doc.id
+    )
 
     lines = []
     for line in doc.lines:
@@ -71,6 +78,13 @@ async def _view(db: AsyncSession, doc: Any) -> ExtraCostsView:
         editable=doc.status in svc.OPEN_STATES,
         fell_back=fell_back,
         lines=lines,
+        variances=[
+            CostVarianceOut.model_validate(item, from_attributes=True)
+            for item in variances
+        ],
+        variance_total=sum(
+            (Decimal(item.amount) for item in variances), start=Decimal('0')
+        ),
     )
 
 
@@ -133,6 +147,63 @@ async def delete_extra_cost(
     """Take a cost off an unposted receipt."""
     doc = await _get_doc_for_update(db, org_id, doc_id)
     await svc.delete_async(db, org_id, doc, cost_id, user_id=current_user.id)
+    await db.commit()
+    doc = await _get_doc_for_update(db, org_id, doc_id)
+    return await _view(db, doc)
+
+
+@router.post(
+    '/{doc_id}/cost-variances',
+    response_model=ExtraCostsView,
+    status_code=status.HTTP_201_CREATED,
+)
+async def add_cost_variance(
+    doc_id: UUID,
+    data: CostVarianceCreate,
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+    _: None = require_permission('warehouse:manage'),
+) -> Any:
+    """Record a delivery cost that reached no product.
+
+    The choice a posted receipt gives instead of the refusal: the amount is
+    kept with its reason and reported, and the stock value does not move.
+    """
+    doc = await _get_doc_for_update(db, org_id, doc_id)
+    if not dt.is_receipt(doc.type):
+        raise catalogue_refusal('extra_cost_not_a_receipt')
+    await variances_svc.add_async(
+        db,
+        org_id,
+        doc,
+        kind=data.kind.value,
+        amount=data.amount,
+        currency=data.currency,
+        reason=data.reason,
+        occurred_on=data.occurred_on
+        or await core_api.organizations.today_async(db, org_id),
+        user_id=current_user.id,
+    )
+    await db.commit()
+    doc = await _get_doc_for_update(db, org_id, doc_id)
+    return await _view(db, doc)
+
+
+@router.delete('/{doc_id}/cost-variances/{variance_id}', response_model=ExtraCostsView)
+async def delete_cost_variance(
+    doc_id: UUID,
+    variance_id: UUID,
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+    _: None = require_permission('warehouse:manage'),
+) -> Any:
+    """Remove a recorded variance."""
+    doc = await _get_doc_for_update(db, org_id, doc_id)
+    await variances_svc.delete_async(
+        db, org_id, doc, variance_id, user_id=current_user.id
+    )
     await db.commit()
     doc = await _get_doc_for_update(db, org_id, doc_id)
     return await _view(db, doc)

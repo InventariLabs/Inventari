@@ -686,7 +686,8 @@
         "response_id": "Antwort-ID",
         "sku_schema": "SKU-Schema",
         "body_html": "Vorlageninhalt",
-        "reset_to_builtin": "Auf eingebaute Vorlage zurückgesetzt"
+        "reset_to_builtin": "Auf eingebaute Vorlage zurückgesetzt",
+        "occurred_on": "Zugehöriger Tag"
       },
       "showWholeChange": "Ganze Änderung anzeigen",
       "showLess": "Weniger anzeigen",

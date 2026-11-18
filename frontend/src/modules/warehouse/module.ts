@@ -7,6 +7,7 @@ import {
   Gauge,
   History,
   LayoutDashboard,
+  ReceiptText,
   Settings2,
   Tags,
 } from "lucide-react";
@@ -14,6 +15,7 @@ import { moduleRegistry, slotComponent } from "@/lib/moduleRegistry";
 import { ApprovalsQueueBadge } from "./components/ApprovalsQueueBadge";
 import { useDocumentsStatusBadge } from "./hooks/useDocumentsStatusBadge";
 
+const CostVariancesPage = lazy(() => import("./pages/CostVariancesPage"));
 const DocumentsPage = lazy(() => import("./pages/DocumentsPage"));
 const DocumentDetailPage = lazy(() => import("./pages/DocumentDetailPage"));
 const DocumentsTodoPage = lazy(() => import("./pages/DocumentsTodoPage"));
@@ -109,6 +111,7 @@ moduleRegistry.register({
     { path: "/warehouse/settings", component: DocumentProfileSettingsPage },
     { path: "/warehouse/profile", component: DocumentsLegacyRedirect },
     { path: "/warehouse/periods", component: InventoryPeriodPanel },
+    { path: "/warehouse/cost-variances", component: CostVariancesPage },
     { path: "/warehouse/documents/:id", component: DocumentDetailPage },
   ],
   settingsSections: [],
@@ -221,6 +224,17 @@ moduleRegistry.register({
         titleKey: "warehouse:periods.title",
         subtitleKey: "warehouse:periods.subtitle",
         order: 82,
+        showOnDesktop: false,
+        showOnMobile: false,
+      },
+      {
+        // Reached from the office panel in History, beside the register.
+        path: "/warehouse/cost-variances",
+        icon: ReceiptText,
+        labelKey: "warehouse:costVariances.navLabel",
+        titleKey: "warehouse:costVariances.title",
+        subtitleKey: "warehouse:costVariances.subtitle",
+        order: 84,
         showOnDesktop: false,
         showOnMobile: false,
       },

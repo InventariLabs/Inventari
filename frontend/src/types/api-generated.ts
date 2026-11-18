@@ -8654,6 +8654,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/warehouse/cost-variances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Cost Variances
+         * @description The variances of the organization in a period, newest first.
+         *
+         *     Part of no stock value: the list and its sums are the whole of what the
+         *     figures do. A sum is kept per currency, because a variance is never
+         *     converted.
+         */
+        get: operations["list_cost_variances_api_v1_warehouse_cost_variances_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/warehouse/documents": {
         parameters: {
             query?: never;
@@ -8842,6 +8866,49 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/warehouse/documents/{doc_id}/cost-variances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Cost Variance
+         * @description Record a delivery cost that reached no product.
+         *
+         *     The choice a posted receipt gives instead of the refusal: the amount is
+         *     kept with its reason and reported, and the stock value does not move.
+         */
+        post: operations["add_cost_variance_api_v1_warehouse_documents__doc_id__cost_variances_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/warehouse/documents/{doc_id}/cost-variances/{variance_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Cost Variance
+         * @description Remove a recorded variance.
+         */
+        delete: operations["delete_cost_variance_api_v1_warehouse_documents__doc_id__cost_variances__variance_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -14102,6 +14169,96 @@ export interface components {
             /** Recipe Id */
             recipe_id?: string | null;
         };
+        /** CostVarianceCreate */
+        CostVarianceCreate: {
+            kind?: components["schemas"]["ExtraCostKind"];
+            /** Amount */
+            amount: number | string;
+            /** Currency */
+            currency?: string | null;
+            /** Reason */
+            reason: string;
+            /** Occurred On */
+            occurred_on?: string | null;
+        };
+        /** CostVarianceOut */
+        CostVarianceOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Document Id
+             * Format: uuid
+             */
+            document_id: string;
+            /** Kind */
+            kind: string;
+            /** Amount */
+            amount: string;
+            /** Currency */
+            currency?: string | null;
+            /** Reason */
+            reason: string;
+            /**
+             * Occurred On
+             * Format: date
+             */
+            occurred_on: string;
+        };
+        /**
+         * CostVarianceRow
+         * @description One variance in the organization-wide list, with its document's number.
+         */
+        CostVarianceRow: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Document Id
+             * Format: uuid
+             */
+            document_id: string;
+            /** Kind */
+            kind: string;
+            /** Amount */
+            amount: string;
+            /** Currency */
+            currency?: string | null;
+            /** Reason */
+            reason: string;
+            /**
+             * Occurred On
+             * Format: date
+             */
+            occurred_on: string;
+            /** Document Number */
+            document_number?: string | null;
+        };
+        /**
+         * CostVariancesList
+         * @description Costs that reached no product, listed and added up.
+         *
+         *     ``total`` is per currency: a variance is never converted, so two
+         *     currencies are two sums.
+         */
+        CostVariancesList: {
+            /**
+             * Items
+             * @default []
+             */
+            items: components["schemas"]["CostVarianceRow"][];
+            /**
+             * Totals
+             * @default {}
+             */
+            totals: {
+                [key: string]: string;
+            };
+        };
         /**
          * CountedLocation
          * @description A location the count covers, named by its whole path ("Rack A / Shelf 1").
@@ -15834,6 +15991,16 @@ export interface components {
              * @default []
              */
             lines: components["schemas"]["ExtraCostLinePreview"][];
+            /**
+             * Variances
+             * @default []
+             */
+            variances: components["schemas"]["CostVarianceOut"][];
+            /**
+             * Variance Total
+             * @default 0
+             */
+            variance_total: string;
         };
         /**
          * FailedEmailSummary
@@ -46712,6 +46879,38 @@ export interface operations {
             };
         };
     };
+    list_cost_variances_api_v1_warehouse_cost_variances_get: {
+        parameters: {
+            query?: {
+                date_from?: string | null;
+                date_to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CostVariancesList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_documents_api_v1_warehouse_documents_get: {
         parameters: {
             query?: {
@@ -47112,6 +47311,73 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PaginatedResponse_DocumentSummary_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_cost_variance_api_v1_warehouse_documents__doc_id__cost_variances_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CostVarianceCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExtraCostsView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_cost_variance_api_v1_warehouse_documents__doc_id__cost_variances__variance_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+                variance_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExtraCostsView"];
                 };
             };
             /** @description Validation Error */

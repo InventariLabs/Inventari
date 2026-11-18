@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from enum import StrEnum
 
 from sqlalchemy import (
     CheckConstraint,
+    Date,
     DateTime,
     ForeignKey,
     Index,
@@ -155,6 +156,53 @@ class DocumentExtraCost(CoreModelBase):
         String(10), nullable=False, default=ExtraCostAllocation.VALUE
     )
     note: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    created_by: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey('users.id', ondelete='SET NULL'), nullable=True
+    )
+
+
+class DocumentCostVariance(CoreModelBase):
+    """A cost of a delivery that did not reach any product.
+
+    A freight bill that arrives after the receipt is posted has nowhere to go:
+    the layers are written and the goods may have left. The number is still a
+    fact about the delivery, so it is kept here, with its reason, and reported.
+
+    It is deliberately not part of any stock value: no report adds it to the
+    shelf, and it has no counter-account, no double entry and no chart of
+    accounts. Systems with a general ledger book the same figure to a price
+    variance account; this product records the figure itself.
+    """
+
+    __tablename__ = 'document_cost_variances'
+    __table_args__ = (
+        Index('ix_document_cost_variances_document', 'document_id'),
+        Index('ix_document_cost_variances_org_date', 'organization_id', 'occurred_on'),
+        CheckConstraint('amount > 0', name='ck_document_cost_variances_amount'),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('organizations.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+    document_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey('documents.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+    kind: Mapped[str] = mapped_column(String(20), nullable=False)
+    amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    #: NULL means the document's own currency; any other is refused, as it is
+    #: for an extra cost.
+    currency: Mapped[str | None] = mapped_column(String(3), nullable=True)
+    #: Why the cost is not part of the value of the goods.
+    reason: Mapped[str] = mapped_column(String(255), nullable=False)
+    #: The day the cost belongs to, which the person states: the invoice may
+    #: have been entered a week after it arrived.
+    occurred_on: Mapped[date] = mapped_column(Date, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

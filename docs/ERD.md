@@ -111,6 +111,7 @@ erDiagram
     DOCUMENT_LINE ||--o{ DOCUMENT_PACKAGE_LINE : packed_as
     DOCUMENT ||--o| DOCUMENT_SHIPMENT : shipped_by
     DOCUMENT ||--o{ DOCUMENT_EXTRA_COST : landed_cost
+    DOCUMENT ||--o{ DOCUMENT_COST_VARIANCE : unassigned_cost
     DOCUMENT }o--o| PARTNER : partner
     DOCUMENT }o--o| STORAGE_LOCATION : source
     DOCUMENT }o--o| STORAGE_LOCATION : target
@@ -230,6 +231,7 @@ owner the quant key names.
 | **DOCUMENT_SHIPMENT** | `document_shipments` | What left with a dispatch: carrier, tracking number, when and by whom (at most one per document) |
 | **DOCUMENT_WAREHOUSE_RECEIVING** | `document_warehouse_receiving` | How one warehouse receives: in one step, or into a receiving area first |
 | **DOCUMENT_EXTRA_COST** | `document_extra_costs` | Landed cost (freight, duty, …) added to a document |
+| **DOCUMENT_COST_VARIANCE** | `document_cost_variances` | A delivery cost that reached no product: amount, reason and day, kept apart from every stock value |
 | **DOCUMENT_NUMBER_SEQUENCE** | `document_number_sequences` | Counter behind document numbers |
 | **DOCUMENT_WORK_ITEM_OVERLAY** | `document_work_item_overlays` | An assignee for a derived task, or a custom task of its own; it names its source by kind and id, with no foreign key |
 | **TAX_RATE** | `tax_rates` | A named tax rate |

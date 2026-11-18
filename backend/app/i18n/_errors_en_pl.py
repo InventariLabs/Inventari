@@ -175,7 +175,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'invalid_mapping_json': 'Invalid mapping JSON',
         'extra_cost_not_a_receipt': 'Extra costs belong on a receipt: only goods coming in can carry the cost of getting them here.',
         'extra_cost_document_posted': (
-            'This receipt is already posted, so an extra cost cannot be added to it: the goods may have left the shelf and there is nothing left to charge. Issue a correction to the receipt while its period is open instead.'
+            'This receipt is already posted, so an extra cost cannot be added to it: the goods may have left the shelf and there is nothing left to charge. Issue a correction to the receipt while its period is open, or record the amount as a cost variance: it is listed with its reason and is never part of the stock value.'
         ),
         'extra_cost_currency_mismatch': (
             "The extra cost is in a different currency than the document. Enter it in the document's currency — converting at a rate nobody recorded would put a number in the stock value with no history behind it."
@@ -1241,7 +1241,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'invalid_mapping_json': 'Nieprawidłowy JSON mapowania',
         'extra_cost_not_a_receipt': 'Koszty dodatkowe dotyczą przyjęcia: tylko towar przychodzący może nieść koszt dostarczenia go tutaj.',
         'extra_cost_document_posted': (
-            'To przyjęcie jest już zaksięgowane, więc nie da się dopisać do niego kosztu: towar mógł już zejść i nie ma czego obciążyć. Wystaw korektę przyjęcia w otwartym okresie.'
+            'To przyjęcie jest już zaksięgowane, więc nie da się dopisać do niego kosztu: towar mógł już zejść i nie ma czego obciążyć. Wystaw korektę przyjęcia w otwartym okresie albo zapisz kwotę jako odchylenie kosztu: zostanie wypisana z powodem i nigdy nie wchodzi do wartości zapasu.'
         ),
         'extra_cost_currency_mismatch': (
             'Koszt dodatkowy jest w innej walucie niż dokument. Podaj go w walucie dokumentu — przeliczenie po kursie, którego nikt nie zapisał, wstawiłoby do wartości zapasu liczbę bez historii.'
