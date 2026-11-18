@@ -170,7 +170,9 @@ function useDocumentFormGuard(
   const snapshot = JSON.stringify(workspace.toUpdatePayload());
   const opened = useRef(snapshot);
   useFormGuard(
-    workspace.isEdit ? snapshot !== opened.current : hasUnsavedInput,
+    workspace.isEdit
+      ? snapshot !== opened.current
+      : hasUnsavedInput || !!workspace.scrapReason.code,
     label,
   );
 }
@@ -518,8 +520,7 @@ export default function DocumentFormModal({
     !!partnerId ||
     changedFrom(sourceLocationId, prefilledLocations.current.source) ||
     changedFrom(targetLocationId, prefilledLocations.current.target) ||
-    !!(notes.trim() || externalReference.trim()) ||
-    !!workspace.scrapReason.code;
+    !!(notes.trim() || externalReference.trim());
 
   const lineImport = useDocumentLineImport({
     documentId: document?.id,
