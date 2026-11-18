@@ -176,6 +176,10 @@ services:
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       EMAILS_FROM_EMAIL: ${EMAILS_FROM_EMAIL:-noreply@inventari.app}
       EMAILS_FROM_NAME: ${EMAILS_FROM_NAME:-Inventari}
+      EVENT_OUTBOX_RETENTION_DAYS: ${EVENT_OUTBOX_RETENTION_DAYS:-7}
+      EMAIL_JOB_RETENTION_DAYS: ${EMAIL_JOB_RETENTION_DAYS:-120}
+      NOTIFICATION_READ_RETENTION_DAYS: ${NOTIFICATION_READ_RETENTION_DAYS:-90}
+      NOTIFICATION_UNREAD_RETENTION_DAYS: ${NOTIFICATION_UNREAD_RETENTION_DAYS:-365}
       # Where uploads live. Listed because this service has no `env_file:`: a
       # name that is not here never reaches the container, so `s3` in .env
       # alone left the files on local disk (docs/subsystems/FILE_STORAGE.md).

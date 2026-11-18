@@ -64,6 +64,14 @@ class Settings(BaseSettings):
     TASK_STREAM_MAXLEN: int = 10000
     STREAM_CLAIM_IDLE_MS: int = 60000
 
+    # How many days finished rows stay in the tables that would otherwise only
+    # grow (app/services/table_retention.py, docs/SCALING.md). Mail outlives
+    # the 97 days an invitation can be listed with how its mail ended.
+    EVENT_OUTBOX_RETENTION_DAYS: int = Field(7, ge=1)
+    EMAIL_JOB_RETENTION_DAYS: int = Field(120, ge=1)
+    NOTIFICATION_READ_RETENTION_DAYS: int = Field(90, ge=1)
+    NOTIFICATION_UNREAD_RETENTION_DAYS: int = Field(365, ge=1)
+
     # JWT
     SECRET_KEY: str = ''
     ALGORITHM: str = 'HS256'

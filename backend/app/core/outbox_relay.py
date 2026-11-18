@@ -14,7 +14,7 @@ import json
 from datetime import UTC, datetime
 
 from redis.exceptions import RedisError
-from sqlalchemy import select
+from sqlalchemy import Select, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
@@ -25,6 +25,22 @@ from app.models.event_outbox import EventOutbox
 logger = get_logger(__name__)
 
 RELAY_BATCH_LIMIT = 100
+
+
+def unpublished_batch(batch_limit: int) -> Select[tuple[EventOutbox]]:
+    """The oldest rows still to publish, past those another node holds.
+
+    Runs every two seconds and usually finds nothing, so it has to cost nothing
+    however many published rows the table holds: the partial index
+    ``ix_event_outbox_unpublished`` contains exactly these rows, in this order.
+    """
+    return (
+        select(EventOutbox)
+        .where(EventOutbox.published_at.is_(None))
+        .order_by(EventOutbox.created_at)
+        .with_for_update(skip_locked=True)
+        .limit(batch_limit)
+    )
 
 
 async def relay_outbox_batch(
@@ -41,14 +57,7 @@ async def relay_outbox_batch(
     if redis_client is None:
         return 0
 
-    stmt = (
-        select(EventOutbox)
-        .where(EventOutbox.published_at.is_(None))
-        .order_by(EventOutbox.created_at)
-        .with_for_update(skip_locked=True)
-        .limit(batch_limit)
-    )
-    rows = (await db.execute(stmt)).scalars().all()
+    rows = (await db.execute(unpublished_batch(batch_limit))).scalars().all()
 
     published = 0
     for row in rows:
