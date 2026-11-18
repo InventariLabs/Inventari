@@ -1629,6 +1629,7 @@
     "sectionTitle": "Koszty, które nie trafiły na żaden produkt",
     "sectionSubtitle": "Koszt, który przychodzi po zaksięgowaniu przyjęcia, nie da się rozdzielić na towar — część mogła już zejść. Zapisz go tutaj: zostanie z powodem na liście i nigdy nie wejdzie do wartości zapasu.",
     "reasonLabel": "Powód",
+    "dayLabel": "Dzień, którego dotyczy",
     "record": "Zapisz jako odchylenie",
     "addFailed": "Nie udało się zapisać odchylenia.",
     "removeLabel": "Usuń to odchylenie",

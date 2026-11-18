@@ -1479,6 +1479,7 @@
     "sectionTitle": "Custos que não chegaram a nenhum produto",
     "sectionSubtitle": "Um custo que chega depois do lançamento do recebimento não pode ser rateado entre as mercadorias — parte delas pode já ter saído. Registre-o aqui: ele fica guardado com o motivo, aparece na lista e nunca entra no valor do estoque.",
     "reasonLabel": "Motivo",
+    "dayLabel": "Dia a que pertence",
     "record": "Registrar como desvio",
     "addFailed": "Não foi possível registrar o desvio.",
     "removeLabel": "Remover este desvio",

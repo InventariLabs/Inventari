@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderWithProviders } from "@/test/utils";
@@ -18,6 +18,22 @@ vi.mock("@/modules/warehouse/hooks/useExtraCosts", () => ({
   useExtraCosts: () => ({ data: view }),
   useAddCostVariance: () => ({ mutate: addMutate, isPending: false }),
   useRemoveCostVariance: () => ({ mutate: removeMutate, isPending: false }),
+}));
+
+// The real DateInput is a popover with its own calendar; these tests only
+// need to know which day was picked.
+vi.mock("@/components/ui/DateInput", () => ({
+  DateInput: (props: {
+    label: string;
+    value: string;
+    onChange: (value: string) => void;
+  }) => (
+    <input
+      aria-label={props.label}
+      value={props.value}
+      onChange={(event) => props.onChange(event.target.value)}
+    />
+  ),
 }));
 
 const posted = {
@@ -42,11 +58,14 @@ const posted = {
 };
 
 describe("DocumentCostVariancesSection", () => {
+  afterEach(() => vi.useRealTimers());
+
   beforeEach(() => {
     addMutate.mockClear();
     removeMutate.mockClear();
     rights.manage = true;
     view = { ...posted };
+    vi.useFakeTimers({ toFake: ["Date"], now: new Date(2026, 10, 18, 12) });
   });
 
   it("lists what was recorded, with its reason, and adds it up", () => {
@@ -71,7 +90,31 @@ describe("DocumentCostVariancesSection", () => {
     );
 
     expect(addMutate).toHaveBeenCalledWith(
-      { kind: "freight", amount: "50", reason: "Late invoice" },
+      {
+        kind: "freight",
+        amount: "50",
+        reason: "Late invoice",
+        occurred_on: "2026-11-18",
+      },
+      expect.anything(),
+    );
+  });
+
+  it("sends the day the cost belongs to, not the day it was typed", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<DocumentCostVariancesSection documentId="doc-1" />);
+
+    await user.type(screen.getByLabelText("Amount"), "50");
+    await user.type(screen.getByLabelText("Reason"), "Freight bill");
+    const day = screen.getByLabelText("Day it belongs to");
+    await user.clear(day);
+    await user.type(day, "2026-11-10");
+    await user.click(
+      screen.getByRole("button", { name: /record as variance/i }),
+    );
+
+    expect(addMutate).toHaveBeenCalledWith(
+      expect.objectContaining({ occurred_on: "2026-11-10" }),
       expect.anything(),
     );
   });
