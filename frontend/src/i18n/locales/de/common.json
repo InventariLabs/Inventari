@@ -250,7 +250,7 @@
       "loadFailedHint": "Die Einstellungen der Organisation konnten gerade nicht gelesen werden. Statt nie gespeicherter Standardwerte wird daher nichts angezeigt. Bitte erneut versuchen.",
       "peopleTitle": "Personen",
       "inviteEmail": "E-Mail-Adresse",
-      "inviteEmailPlaceholder": "person@firma.de",
+      "inviteEmailPlaceholder": "person@example.com",
       "inviteEmailRequired": "Geben Sie die E-Mail-Adresse der eingeladenen Person ein",
       "inviteEmailInvalid": "Das sieht nicht nach einer E-Mail-Adresse aus",
       "sendInvite": "Einladung senden",

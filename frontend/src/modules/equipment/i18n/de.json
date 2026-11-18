@@ -129,7 +129,7 @@
       "select_location": "Lagerort",
       "placeholders": {
         "name": "z. B. Max Mustermann",
-        "email": "name@beispiel.de"
+        "email": "name@example.com"
       },
       "error_person_required": "Geben Sie die zugewiesene Person ein oder wählen Sie sie aus",
       "return_date_past_error": "Das Rückgabedatum darf nicht in der Vergangenheit liegen.",

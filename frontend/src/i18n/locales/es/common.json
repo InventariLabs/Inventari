@@ -250,7 +250,7 @@
       "loadFailedHint": "Los ajustes de la organización no se han podido leer ahora mismo, así que no se muestra nada en lugar de valores por defecto que nunca se guardaron. Inténtalo de nuevo.",
       "peopleTitle": "Personas",
       "inviteEmail": "Dirección de correo",
-      "inviteEmailPlaceholder": "persona@empresa.es",
+      "inviteEmailPlaceholder": "persona@example.com",
       "inviteEmailRequired": "Introduce la dirección de correo de la persona invitada",
       "inviteEmailInvalid": "Esto no parece una dirección de correo",
       "sendInvite": "Enviar invitación",

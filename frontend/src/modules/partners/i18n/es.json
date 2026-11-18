@@ -74,9 +74,9 @@
     "codePlaceholder": "ej. PRO-001",
     "taxIdPlaceholder": "ej. ESB12345678",
     "isConsumerHint": "Sin identificador fiscal: los documentos se confirman sin él, incluso donde la ley lo exige a las empresas.",
-    "emailPlaceholder": "contacto@empresa.es",
+    "emailPlaceholder": "contacto@example.com",
     "phonePlaceholder": "+34 123 456 789",
-    "websitePlaceholder": "https://empresa.es",
+    "websitePlaceholder": "https://example.com",
     "contactPersonPlaceholder": "ej. Juan Pérez (Depto. Compras)",
     "positionPlaceholder": "ej. Especialista IT, Departamento IT",
     "notesPlaceholder": "Notas internas…",
@@ -101,8 +101,8 @@
     "deactivateFailed": "Error al desactivar socio",
     "saveFailed": "Error al guardar socio",
     "createFailed": "Error al crear socio",
-    "invalidEmail": "Introduce una dirección de correo, por ejemplo nombre@empresa.es.",
-    "invalidWebsite": "Introduce una dirección web, por ejemplo https://empresa.es."
+    "invalidEmail": "Introduce una dirección de correo, por ejemplo nombre@example.com.",
+    "invalidWebsite": "Introduce una dirección web, por ejemplo https://example.com."
   },
   "inlineCreateHint": "Creación rápida de socio",
   "inlineCreateSuccess": "Socio «{{name}}» creado. Añada su ID fiscal y su dirección antes de emitir un documento con dirección.",

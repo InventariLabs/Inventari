@@ -74,9 +74,9 @@
     "codePlaceholder": "ex. FRN-001",
     "taxIdPlaceholder": "ex. FR12345678901",
     "isConsumerHint": "Sans identifiant fiscal : les documents se confirment sans lui, même là où la loi l'exige des entreprises.",
-    "emailPlaceholder": "contact@entreprise.fr",
+    "emailPlaceholder": "contact@example.com",
     "phonePlaceholder": "+33 1 23 45 67 89",
-    "websitePlaceholder": "https://entreprise.fr",
+    "websitePlaceholder": "https://example.com",
     "contactPersonPlaceholder": "ex. Jean Dupont (Service Achats)",
     "positionPlaceholder": "ex. Spécialiste IT, Département IT",
     "notesPlaceholder": "Notes internes…",
@@ -101,8 +101,8 @@
     "deactivateFailed": "Échec de la désactivation du partenaire",
     "saveFailed": "Échec de l'enregistrement du partenaire",
     "createFailed": "Échec de la création du partenaire",
-    "invalidEmail": "Saisissez une adresse e-mail, par exemple nom@societe.fr.",
-    "invalidWebsite": "Saisissez une adresse web, par exemple https://societe.fr."
+    "invalidEmail": "Saisissez une adresse e-mail, par exemple nom@example.com.",
+    "invalidWebsite": "Saisissez une adresse web, par exemple https://example.com."
   },
   "inlineCreateHint": "Création rapide d'un partenaire",
   "inlineCreateSuccess": "Partenaire « {{name}} » créé. Ajoutez son identifiant fiscal et son adresse avant d'émettre un document avec adresse.",
