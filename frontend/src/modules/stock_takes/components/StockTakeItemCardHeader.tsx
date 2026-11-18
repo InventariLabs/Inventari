@@ -13,6 +13,8 @@ interface Props {
   discrepancy: "missing" | "surplus" | null;
   twin?: Twin | null;
   isUnsaved: boolean;
+  /** Unsaved, with no number in the box: only a count lets Save send it. */
+  needsCount?: boolean;
   awaitingRecount: boolean;
 }
 
@@ -36,6 +38,7 @@ export default function StockTakeItemCardHeader({
   discrepancy,
   twin,
   isUnsaved,
+  needsCount = false,
   awaitingRecount,
 }: Props) {
   const { t } = useTranslation(["stock_takes"]);
@@ -58,7 +61,11 @@ export default function StockTakeItemCardHeader({
         {savedCount === 0 && (
           <Badge variant="warning">{t("countedZero")}</Badge>
         )}
-        {isUnsaved && <Badge>{t("item.unsaved")}</Badge>}
+        {isUnsaved && (
+          <Badge>
+            {t(needsCount ? "item.unsavedNeedsCount" : "item.unsaved")}
+          </Badge>
+        )}
         {awaitingRecount && (
           <Badge variant="info">{t("item.awaitingRecount")}</Badge>
         )}

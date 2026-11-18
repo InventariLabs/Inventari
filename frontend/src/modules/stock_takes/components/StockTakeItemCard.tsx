@@ -154,6 +154,7 @@ const StockTakeItemCard = memo(function StockTakeItemCard({
             discrepancy={discrepancy}
             twin={twin}
             isUnsaved={isUnsaved}
+            needsCount={countedAmount(counted) === null}
             awaitingRecount={awaitingRecount}
           />
           {stockTakeItem &&

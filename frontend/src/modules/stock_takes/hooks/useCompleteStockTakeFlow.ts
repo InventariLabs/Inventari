@@ -64,7 +64,7 @@ export function useCompleteStockTakeFlow(
       ),
     );
 
-    // The numbers typed but not saved, in the words the confirmation uses.
+    // The lines with a number, reason or note not saved, in the confirmation's words.
     const unsavedSentence =
       unsavedCount > 0
         ? t("confirm.complete.unsaved", { count: unsavedCount })
