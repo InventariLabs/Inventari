@@ -827,17 +827,11 @@ class CostVarianceCreate(BaseModel):
     kind: ExtraCostKind = ExtraCostKind.FREIGHT
     amount: Decimal = Field(gt=0, max_digits=12, decimal_places=2)
     currency: str | None = Field(default=None, max_length=3)
-    reason: str = Field(min_length=1, max_length=255)
+    reason: Annotated[
+        str, StringConstraints(strip_whitespace=True, min_length=1, max_length=255)
+    ]
     #: Defaults to today.
     occurred_on: date | None = None
-
-    @field_validator('reason')
-    @classmethod
-    def _reason_is_text(cls, value: str) -> str:
-        value = value.strip()
-        if not value:
-            raise ValueError('reason must not be blank')
-        return value
 
 
 class CostVarianceOut(BaseModel):
