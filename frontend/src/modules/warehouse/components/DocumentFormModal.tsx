@@ -509,10 +509,34 @@ export default function DocumentFormModal({
     !!notes.trim() ||
     !!externalReference.trim();
 
+  // An existing document opens with its own partner, locations and lines, so
+  // there "work" is any difference from what it opened with.
+  const formSnapshot = JSON.stringify([
+    partnerId,
+    sourceLocationId,
+    targetLocationId,
+    scheduledDate,
+    notes,
+    externalReference,
+    lines.map((l) => [
+      lineSignature(l),
+      l.name,
+      l.unit_price,
+      l.tax_rate,
+      l.batch_number,
+      l.expiry_date,
+      l.notes,
+    ]),
+  ]);
+  const openedSnapshot = useRef(formSnapshot);
+
   // The shell-wide navigation gate (the command palette, the header) and the
   // reader's own words after a session ended under the form both ask whether
   // the form holds work.
-  useFormGuard(hasUnsavedInput, t("form.guardName"));
+  useFormGuard(
+    isEdit ? formSnapshot !== openedSnapshot.current : hasUnsavedInput,
+    t("form.guardName"),
+  );
 
   // when the inline partner-create popover is open, Esc/backdrop must
   // close the popover first — not discard the whole document form.

@@ -1348,7 +1348,7 @@ describe("DocumentFormModal validation accessibility", () => {
     expect(screen.getByRole("alertdialog")).toBeInTheDocument();
   });
 
-  it("reports a filled-in form to the navigation gate, and only while it holds work", async () => {
+  it("reports a filled-in form to the navigation gate", async () => {
     // The sentence a session's end gives a read reads the same signal.
     const onClose = vi.fn();
     render(<DocumentFormModal initialType="IN" onClose={onClose} />);
@@ -1356,6 +1356,38 @@ describe("DocumentFormModal validation accessibility", () => {
 
     fireEvent.change(screen.getAllByPlaceholderText("Item")[0], {
       target: { value: "Widget" },
+    });
+
+    await waitFor(() =>
+      expect(useFormGuardStore.getState().dirtyForm).toBe("The document form"),
+    );
+  });
+
+  it("does not report an existing document as work until it is changed", async () => {
+    const existing = {
+      id: "doc-1",
+      organization_id: "org-1",
+      type: "IN",
+      number: "IN/2026/001",
+      status: "DRAFT",
+      partner_id: "partner-1",
+      source_location_id: null,
+      target_location_id: "loc-1",
+      scheduled_date: null,
+      notes: "Dock 2",
+      external_reference: null,
+      currency: null,
+      lines: [{ id: "line-1", name: "Widget", quantity: 10, uom_id: null }],
+    } as unknown as React.ComponentProps<typeof DocumentFormModal>["document"];
+    await act(async () => {
+      render(<DocumentFormModal document={existing} onClose={vi.fn()} />);
+    });
+
+    // Its own partner, location, notes and line are what it opened with.
+    expect(useFormGuardStore.getState().dirtyForm).toBeNull();
+
+    fireEvent.change(screen.getAllByPlaceholderText("Item")[0], {
+      target: { value: "Widget 2" },
     });
 
     await waitFor(() =>

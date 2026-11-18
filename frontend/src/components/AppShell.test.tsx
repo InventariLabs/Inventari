@@ -11,6 +11,8 @@ import {
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { act } from "@testing-library/react";
+import { toast } from "sonner";
 
 import AppShell from "./AppShell";
 import "@/modules/warehouse/module";
@@ -155,6 +157,43 @@ describe("AppShell — the header's exits walk the same gate as the module tabs"
     await user.click(screen.getByRole("button", { name: "Cancel" }));
 
     expect(screen.getByTestId("path")).toHaveTextContent("/equipment");
+  });
+});
+
+describe("AppShell — a session that ends under a form holding work says so", () => {
+  beforeEach(() => {
+    useFormGuardStore.getState().setDirtyForm(null);
+    modulesState.enabledModules = [];
+    modulesState.focusModule = null;
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("says the work was not kept, whichever request met the end", () => {
+    const error = vi.spyOn(toast, "error").mockReturnValue("id");
+    useFormGuardStore.getState().setDirtyForm("The document form");
+    renderShell();
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent("auth:logout"));
+    });
+
+    expect(error).toHaveBeenCalledWith(
+      "Your session has ended, so what you entered on this screen was not kept. Sign in again and start over.",
+      expect.objectContaining({ id: "session-ended-unsaved" }),
+    );
+  });
+
+  it("stays quiet when nothing on screen holds work", () => {
+    const error = vi.spyOn(toast, "error").mockReturnValue("id");
+    renderShell();
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent("auth:logout"));
+    });
+
+    expect(error).not.toHaveBeenCalled();
   });
 });
 

@@ -9,6 +9,8 @@ import {
 } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { useFormGuardStore } from "@/store/formGuardStore";
 import { Settings, Search, ChevronLeft } from "lucide-react";
 import { useModules } from "@/contexts/ModulesContext";
 import { useAuthStore } from "@/store/authStore";
@@ -73,12 +75,20 @@ export default function AppShell() {
   const homePath = focusModule ? "/" : "/launcher";
   useEffect(() => {
     const handleLogout = () => {
+      // The sign-in drops whatever a form on screen holds. A request that
+      // shows no toast of its own (a picker's search, a background read)
+      // would end the session without a word, so the shell says it once.
+      if (useFormGuardStore.getState().dirtyForm !== null) {
+        toast.error(t("errors.sessionEndedReadUnsaved"), {
+          id: "session-ended-unsaved",
+        });
+      }
       logout();
       navigate("/login");
     };
     window.addEventListener("auth:logout", handleLogout);
     return () => window.removeEventListener("auth:logout", handleLogout);
-  }, [logout, navigate]);
+  }, [logout, navigate, t]);
 
   // Owner recognition searches every enabled module, hidden ones included:
   // a route opened by direct link still needs its shell and header even when
