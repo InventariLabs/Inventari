@@ -279,9 +279,12 @@ async def start_picking_documents(
     the same per-document routes a single-document session uses.
     """
     org_id = require_org(current_user)
-    session = await start_pick_session_over_documents_async(
-        db, data.document_ids, org_id, current_user.id
-    )
+    try:
+        session = await start_pick_session_over_documents_async(
+            db, data.document_ids, org_id, current_user.id
+        )
+    except SessionHeldByOtherUserError as exc:
+        raise _session_held_conflict(exc) from exc
     return await _session_to_out(db, session)
 
 

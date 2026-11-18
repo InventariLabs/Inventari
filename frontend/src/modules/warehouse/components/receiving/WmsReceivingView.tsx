@@ -219,8 +219,10 @@ function ReceivingStartFailure({
               onRelease,
             }
       }
+      // Only a failure of the server's own can pass on a second try; a
+      // refusal repeats itself.
       retry={
-        isApprovalRequired || refused || holderName !== null
+        errorStatus < 500
           ? undefined
           : { label: t("receiving.error.retry"), onRetry }
       }

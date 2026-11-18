@@ -19,10 +19,13 @@ export interface WmsStartFailureProps {
    * holder named in both labels. Taking over keeps the scans already made;
    * releasing goes through the release door and discards them, and its label
    * says so. Without them the refusal is a dead end — the document waits for
-   * a holder who walked away.
+   * a holder who walked away. When `own` is set the session is the reader's
+   * own: nobody takes it over from them, so the first act continues it
+   * (`onTakeOver`) and the second discards its scans.
    */
   heldSession?: {
     owner: string;
+    own?: boolean;
     onTakeOver: () => void | Promise<void>;
     onRelease: () => void | Promise<void>;
   };
@@ -80,14 +83,20 @@ export function WmsStartFailure({
           {heldSession && (
             <>
               <Button size="sm" onClick={() => void heldSession.onTakeOver()}>
-                {t("scanSession.takeOver", { owner: heldSession.owner })}
+                {heldSession.own
+                  ? t("scanSession.continueOwn")
+                  : t("scanSession.takeOver", { owner: heldSession.owner })}
               </Button>
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => void heldSession.onRelease()}
               >
-                {t("scanSession.discardAndStart", { owner: heldSession.owner })}
+                {heldSession.own
+                  ? t("scanSession.close")
+                  : t("scanSession.discardAndStart", {
+                      owner: heldSession.owner,
+                    })}
               </Button>
             </>
           )}

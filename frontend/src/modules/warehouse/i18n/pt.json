@@ -912,7 +912,8 @@
       "undo_failed": "Falha ao reverter a linha.",
       "complete_failed": "Falha ao concluir a sessão de separação.",
       "cancel_failed": "Falha ao cancelar a sessão de separação.",
-      "session_held": "{{owner}} tem uma sessão de separação ativa neste documento. Assuma-a para continuar de onde os escaneamentos pararam, ou descarte os escaneamentos e comece do zero."
+      "session_held": "{{owner}} tem uma sessão de separação ativa neste documento. Assuma-a para continuar de onde os escaneamentos pararam, ou descarte os escaneamentos e comece do zero.",
+      "session_own": "Este documento já está aberto na sua própria sessão — em outro dispositivo ou em outra seleção. Continue essa sessão ou descarte os escaneamentos dela."
     },
     "lot": "Lote: {{name}}",
     "expires": "Vence em {{date}}",
@@ -1403,6 +1404,7 @@
     "closeTitle": "Descartar os escaneamentos desta sessão?",
     "closeMessage": "Descartar desfaz todos os escaneamentos registrados na sessão. Esta ação não pode ser desfeita.",
     "takeOver": "Assumir a sessão de {{owner}} e continuar",
+    "continueOwn": "Continuar essa sessão",
     "discardAndStart": "Descartar os escaneamentos de {{owner}} e recomeçar",
     "closeConfirm": "Descartar escaneamentos",
     "closeFailed": "Não foi possível encerrar a sessão.",

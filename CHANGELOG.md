@@ -284,6 +284,13 @@ says what the release does rather than what changed since them.
   parser's complaint, instead of being stored and then breaking every PDF
   printed with it. A purchase order whose stored layout no longer renders
   prints with the built-in layout rather than failing with "An error occurred".
+- Picking several documents from the list no longer ends in a dead end when
+  one of them is already in a picking session. If the session is your own —
+  opened on a phone and left — the dialog says so and offers **Continue that
+  session** or **Discard scans**; if a colleague holds it, it offers to take
+  it over or discard their scans, as the document's own page already did.
+  **Retry** now appears only after a server failure, never after a refusal
+  that would only repeat itself.
 - The Settings audit log shows the reason a workflow release left on the
   requests it closed in the reader's language ("Workflow deactivated",
   "Workflow deleted") instead of the raw English text.
