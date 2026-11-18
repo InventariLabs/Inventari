@@ -12,12 +12,13 @@ import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { DateInput } from "@/components/ui/DateInput";
 import { Input } from "@/components/ui/Input";
 import { NativeSelect } from "@/components/ui/NativeSelect";
 import { useCanManage } from "@/hooks/useCanWrite";
 import { useMoney } from "@/hooks/useMoney";
 import { extractApiError } from "@/lib/errors";
-import { formatDate } from "@/utils/formatters";
+import { formatDate, todayIso } from "@/utils/formatters";
 import {
   useAddCostVariance,
   useExtraCosts,
@@ -42,6 +43,9 @@ export function DocumentCostVariancesSection({
   const [kind, setKind] = useState<ExtraCostKind>("freight");
   const [amount, setAmount] = useState("");
   const [reason, setReason] = useState("");
+  // The day the cost belongs to — a bill entered a week after the goods came
+  // is dated by the delivery, not by the day it was typed.
+  const [day, setDay] = useState(todayIso);
 
   if (!data) return null;
   // While the receipt is open a cost goes into the value of the goods — that
@@ -50,13 +54,19 @@ export function DocumentCostVariancesSection({
   if (!canRecord && data.variances.length === 0) return null;
 
   const submit = () => {
-    if (!amount.trim() || !reason.trim()) return;
+    if (!amount.trim() || !reason.trim() || !day) return;
     add.mutate(
-      { kind, amount: amount.trim(), reason: reason.trim() },
+      {
+        kind,
+        amount: amount.trim(),
+        reason: reason.trim(),
+        occurred_on: day,
+      },
       {
         onSuccess: () => {
           setAmount("");
           setReason("");
+          setDay(todayIso());
         },
         onError: (error) =>
           toast.error(
@@ -151,11 +161,18 @@ export function DocumentCostVariancesSection({
             value={reason}
             onChange={(event) => setReason(event.target.value)}
           />
+          <DateInput
+            label={t("warehouse:costVariances.dayLabel")}
+            wrapperClassName="w-full sm:w-44"
+            value={day}
+            onChange={setDay}
+            required
+          />
           <Button
             leftIcon={<Plus size={16} />}
             onClick={submit}
             isLoading={add.isPending}
-            disabled={!amount.trim() || !reason.trim()}
+            disabled={!amount.trim() || !reason.trim() || !day}
           >
             {t("warehouse:costVariances.record")}
           </Button>
