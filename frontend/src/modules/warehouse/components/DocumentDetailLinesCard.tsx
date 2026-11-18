@@ -10,6 +10,7 @@ import { LineTargetPicker } from "@/modules/warehouse/components/LineTargetPicke
 import { PlannedPutawayLine } from "./PlannedPutawayLine";
 import {
   documentHasExecution,
+  isRaisedTypedCount,
   getDocumentLineStatus,
   getDocumentLineStatusVariant,
 } from "@/modules/warehouse/lineStatus";
@@ -165,9 +166,18 @@ export function DocumentDetailLinesCard({
                   // the quantity that entered stock. The quantities ride the
                   // wire as decimal strings, so the comparison is numeric:
                   // "3.000" < "10.000" is false lexicographically.
+                  //
+                  // A count typed on the receive sheet and then raised was
+                  // never a plan, so it prints no plan beside what came in.
+                  const raisedTypedCount = isRaisedTypedCount(
+                    line,
+                    doneQuantity,
+                    expectedQuantity,
+                  );
                   const owesExecutionSummary =
                     documentHasExecution(document) &&
-                    doneQuantity !== expectedQuantity;
+                    doneQuantity !== expectedQuantity &&
+                    !raisedTypedCount;
                   const discrepancyLabel = line.discrepancy_code
                     ? t(`detail.discrepancyCodes.${line.discrepancy_code}`)
                     : null;
@@ -206,7 +216,7 @@ export function DocumentDetailLinesCard({
                           <div className="flex flex-col items-end">
                             <div className="font-semibold">
                               {formatQuantity(
-                                owesExecutionSummary
+                                owesExecutionSummary || raisedTypedCount
                                   ? doneQuantity
                                   : expectedQuantity,
                               )}

@@ -6,6 +6,7 @@ import {
   documentHasExecution,
   getDocumentLineStatus,
   getDocumentLineStatusVariant,
+  isRaisedTypedCount,
 } from "@/modules/warehouse/lineStatus";
 import { landedElsewhere } from "@/modules/warehouse/landedLocation";
 import { LineTargetPicker } from "@/modules/warehouse/components/LineTargetPicker";
@@ -102,8 +103,18 @@ function LineCard({
   // surplus never shows the quantity that entered stock. The quantities ride
   // the wire as decimal strings, so the comparison is numeric: "3.000" <
   // "10.000" is false lexicographically.
+  //
+  // A count somebody typed on the receive sheet raised above itself was never
+  // planned by anyone, so there is no plan to print beside what came in.
+  const raisedTypedCount = isRaisedTypedCount(
+    line,
+    doneQuantity,
+    expectedQuantity,
+  );
   const owesExecutionSummary =
-    documentHasExecution(document) && doneQuantity !== expectedQuantity;
+    documentHasExecution(document) &&
+    doneQuantity !== expectedQuantity &&
+    !raisedTypedCount;
 
   return (
     <li className="px-4 py-3 space-y-1.5">
@@ -134,7 +145,9 @@ function LineCard({
         ) : (
           <span className="font-semibold text-on">
             {formatQuantity(
-              owesExecutionSummary ? doneQuantity : expectedQuantity,
+              owesExecutionSummary || raisedTypedCount
+                ? doneQuantity
+                : expectedQuantity,
             )}
           </span>
         )}

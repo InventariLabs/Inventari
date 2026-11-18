@@ -60,15 +60,21 @@ SURPLUS_CODE = 'SURPLUS'
 
 
 def is_surplus(
-    doc_line: DocumentLine | None, quantity: Decimal, expected: Decimal
+    doc_line: DocumentLine | None,
+    quantity: Decimal,
+    expected: Decimal,
+    *,
+    receiving: bool = True,
 ) -> bool:
     """Whether *quantity* is goods beyond what somebody promised.
 
     A line whose expected quantity is only a count somebody typed
     (``expected_is_count``) promised nothing, so receiving more than it is the
-    true count, not a surplus from the supplier.
+    true count, not a surplus from the supplier. Only a receiving session reads
+    it that way: a picking session over a line that somehow carries the flag
+    still stops at the quantity it was asked for (*receiving* False).
     """
-    if doc_line is not None and doc_line.expected_is_count:
+    if receiving and doc_line is not None and doc_line.expected_is_count:
         return False
     return quantity > expected
 

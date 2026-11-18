@@ -667,7 +667,12 @@ async def create_document(
     for i, line_data in enumerate(data.lines, 1):
         doc.lines.append(
             await build_document_line(
-                line_data, i, currency=currency, db=db, org_id=org_id
+                line_data,
+                i,
+                currency=currency,
+                db=db,
+                org_id=org_id,
+                document_type=data.type,
             )
         )
     await _apply_line_tax_rates(db, org_id, profile, doc.lines)
@@ -1028,6 +1033,7 @@ async def update_document(
                     currency=currency,
                     db=db,
                     org_id=org_id,
+                    document_type=doc.type,
                 )
             )
         await _apply_line_tax_rates(db, org_id, profile, doc.lines)

@@ -132,7 +132,8 @@ class DocumentLineCreate(BaseModel):
     meta_data: ModuleMetaData | None = None
     #: The expected quantity is a count somebody typed to get a row — the
     #: receive sheet's — not a figure from an order or a delivery note, so
-    #: receiving more than it says is not a surplus. Kept on the line.
+    #: receiving more than it says is not a surplus. Kept on the line of a
+    #: receipt only; any other document type drops it.
     expected_is_count: bool | None = None
     # What a receipt posted in one press says about the goods that arrived:
     # how much of ``expected_quantity`` (the count that arrived) is held back
@@ -334,6 +335,10 @@ class DocumentLineSchema(BaseModel):
     discrepancy_reason: str | None
     line_number: int
     source_po_line_id: UUID | None = None
+    #: ``expected_quantity`` is a count somebody typed on the receive sheet,
+    #: not a figure from an order or a delivery note — so the screens do not
+    #: call it planned.
+    expected_is_count: bool = False
     # Where this line's goods actually landed. A putaway rule can send a
     # delivery somewhere other than the document's target location, and the
     # document records where they landed.

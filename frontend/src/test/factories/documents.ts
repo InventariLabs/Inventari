@@ -23,6 +23,7 @@ export function documentLine(
     barcode: null,
     quantity,
     expected_quantity: quantity,
+    expected_is_count: false,
     // The contract requires the progress fields and the server always sends them. A fixture that
     // leaves them out is how a test exercises the screen computing the status from the quantities
     // and the document's own status, so the defaults stay "not reported" rather than a value.

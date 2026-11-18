@@ -13,7 +13,10 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { unitLabel } from "@/lib/i18nHelpers";
 import { groupLinesByUnit } from "@/lib/unitQuantities";
-import { getDocumentLineStatus } from "@/modules/warehouse/lineStatus";
+import {
+  getDocumentLineStatus,
+  isRaisedTypedCount,
+} from "@/modules/warehouse/lineStatus";
 import { correctionStockSign } from "@/modules/warehouse/types";
 import { formatQuantityLocale } from "@/utils/formatters";
 import type { TranslateFn } from "@/types/i18n";
@@ -69,13 +72,18 @@ function buildUnitQuantities(document: WarehouseDocument): UnitQuantities[] {
         const linePlanned = Number(
           line.expected_quantity ?? line.quantity ?? 0,
         );
-        planned += linePlanned;
         const stockPlanned = stockSign * linePlanned;
         if (stockPlanned > 0) added += stockPlanned;
         if (stockPlanned < 0) removed += Math.abs(stockPlanned);
         const fallbackDoneQuantity =
           document.status === "COMPLETED" ? linePlanned : 0;
-        executed += Number(line.done_quantity ?? fallbackDoneQuantity);
+        const lineExecuted = Number(line.done_quantity ?? fallbackDoneQuantity);
+        executed += lineExecuted;
+        // A count somebody typed on the receive sheet and then raised was
+        // never a plan: what came in is the whole of it.
+        planned += isRaisedTypedCount(line, lineExecuted, linePlanned)
+          ? lineExecuted
+          : linePlanned;
       }
       return { unit: group.unit, planned, executed, added, removed };
     },

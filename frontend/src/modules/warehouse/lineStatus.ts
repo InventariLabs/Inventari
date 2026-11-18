@@ -83,3 +83,16 @@ export function documentHasExecution(document: {
     return doneQuantity > 0;
   });
 }
+
+/**
+ * True when a count somebody typed on the receive sheet was raised by what
+ * arrived. That figure was never a plan, so no screen prints it as one beside
+ * what came in.
+ */
+export function isRaisedTypedCount(
+  line: { expected_is_count?: boolean },
+  doneQuantity: number,
+  expectedQuantity: number,
+): boolean {
+  return Boolean(line.expected_is_count) && doneQuantity > expectedQuantity;
+}
