@@ -11,7 +11,8 @@
  */
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Boxes, FileDown, Info, Printer } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ArrowRightLeft, Boxes, FileDown, Info, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -186,6 +187,7 @@ function StockAsOfResult({
 export default function StockAsOfPage() {
   const { t } = useTranslation(["inventory", "common"]);
   const { setHeader } = useModulePageHeader();
+  const navigate = useNavigate();
   const money = useMoney();
   // The value is a business metric: the home profile presets it off and an
   // admin can flip it back. The report stays — what the shelves held is
@@ -296,7 +298,20 @@ export default function StockAsOfPage() {
             clearable
             clearLabel={t("inventory:asOf.everywhere")}
           />
-          <div className="flex gap-2 sm:ml-auto">
+          <div className="flex flex-wrap gap-2 sm:ml-auto">
+            {showInventoryValue && (
+              // The movement behind two such days: what the stock was worth
+              // when a period opened, what moved it, and when it closed.
+              <Button
+                variant="outline"
+                leftIcon={<ArrowRightLeft size={16} />}
+                onClick={() =>
+                  navigate(`/inventory/stock/value-movement?to=${day}`)
+                }
+              >
+                {t("inventory:valueMovement.title")}
+              </Button>
+            )}
             <Button
               variant="outline"
               leftIcon={<FileDown size={16} />}

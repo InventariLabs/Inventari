@@ -257,5 +257,34 @@
     },
     "unpriced_one": "{{count}} produto não tem histórico de custos e ficou fora do total.",
     "unpriced_other": "{{count}} produtos não têm histórico de custos e ficaram fora do total."
+  },
+  "valueMovement": {
+    "title": "Movimento de valor",
+    "subtitle": "Quanto valia o estoque na abertura de um período, o que o movimentou e quanto valia no fechamento",
+    "from": "De",
+    "to": "Até",
+    "opening": "Valor em {{date}}, no início do dia",
+    "closing": "Valor em {{date}}, no fim do dia",
+    "caption": "Valor do estoque de {{organization}} de {{from}} a {{to}}",
+    "completeFrom": "O registro de movimentações começa em {{date}}. Nada antes disso é conhecido — não é zero.",
+    "noValueSource": "Não há histórico de custos, então não há valor a informar. O demonstrativo é montado a partir do histórico de custos do que entrou e saiu.",
+    "valueHidden": "O modo de trabalho não mostra o valor do estoque, então não há demonstrativo para ler aqui.",
+    "cannotAnswer": "Não é possível responder para este período.",
+    "excludedCurrency_one": "{{count}} recebimento deixado de fora: a moeda dele não é a da organização.",
+    "excludedCurrency_other": "{{count}} recebimentos deixados de fora: a moeda deles não é a da organização.",
+    "columns": {
+      "line": "Linha",
+      "value": "Valor"
+    },
+    "lines": {
+      "receipts": "Recebimentos",
+      "internal_receipts": "Produzido e devolvido ao estoque",
+      "used": "Consumo",
+      "disposed": "Descarte",
+      "dispatched": "Expedições",
+      "other_issues": "Outras saídas (faltas de inventário, correções)",
+      "work_in_progress_change": "Variação da produção em andamento",
+      "other_changes": "Outras variações (custos adicionados após o recebimento, arredondamentos)"
+    }
   }
 }

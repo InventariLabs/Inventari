@@ -257,5 +257,34 @@
     },
     "unpriced_one": "{{count}} product has no cost history and is left out of the total.",
     "unpriced_other": "{{count}} products have no cost history and are left out of the total."
+  },
+  "valueMovement": {
+    "title": "Value movement",
+    "subtitle": "What the stock was worth when a period opened, what moved it, and what it was worth when it closed",
+    "from": "From",
+    "to": "To",
+    "opening": "Value on {{date}}, at the start of the day",
+    "closing": "Value on {{date}}, at the end of the day",
+    "caption": "Stock value of {{organization}} from {{from}} to {{to}}",
+    "completeFrom": "The movement ledger starts on {{date}}. Nothing before that is known — not zero.",
+    "noValueSource": "No cost history is kept, so there is no value to state. The statement is built from the cost history of what came in and went out.",
+    "valueHidden": "The workspace mode does not show what the stock is worth, so there is no statement to read here.",
+    "cannotAnswer": "This period cannot be answered for.",
+    "excludedCurrency_one": "{{count}} receipt left out: its currency is not the organization's.",
+    "excludedCurrency_other": "{{count}} receipts left out: their currency is not the organization's.",
+    "columns": {
+      "line": "Line",
+      "value": "Value"
+    },
+    "lines": {
+      "receipts": "Receipts",
+      "internal_receipts": "Produced and returned to stock",
+      "used": "Used",
+      "disposed": "Disposed of",
+      "dispatched": "Dispatched",
+      "other_issues": "Other issues (count shortages, corrections)",
+      "work_in_progress_change": "Change in production under way",
+      "other_changes": "Other changes (costs added after receipt, rounding)"
+    }
   }
 }

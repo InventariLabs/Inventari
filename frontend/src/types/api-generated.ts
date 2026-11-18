@@ -8384,6 +8384,51 @@ export interface paths {
         patch: operations["update_stock_take_status_api_v1_stock_takes__stock_take_id__status_patch"];
         trace?: never;
     };
+    "/api/v1/stock-value-movement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stock Value Movement
+         * @description What the stock was worth at the start of a period, what moved it, and
+         *     what it was worth at the end.
+         *
+         *     Not a ledger: no chart of accounts, no double entry, no closing of
+         *     periods. A statement over the cost layers, for a person or a bookkeeper
+         *     to take from.
+         */
+        get: operations["stock_value_movement_api_v1_stock_value_movement_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stock-value-movement/export/xlsx": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stock Value Movement Xlsx
+         * @description The same statement, as one spreadsheet.
+         */
+        get: operations["stock_value_movement_xlsx_api_v1_stock_value_movement_export_xlsx_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/uoms": {
         parameters: {
             query?: never;
@@ -26991,6 +27036,74 @@ export interface components {
              * @default []
              */
             items: components["schemas"]["StockTakeItemWithDetails"][];
+        };
+        /**
+         * StockValueMovementDTO
+         * @description What the stock was worth when a period opened, what moved it, and what
+         *     it was worth when it closed.
+         *
+         *     Every movement is signed as it changes the value: what came in is
+         *     positive, what left is negative, so ``opening_value`` plus every
+         *     movement field is ``closing_value`` to the cent. ``other_changes``
+         *     is what is left to make that true — the part of the closing that the
+         *     layers' own receipts and issues do not account for, such as a cost
+         *     added to a receipt after it was posted; it is 0.00 when nothing of the
+         *     kind happened. All of the figures are None where the organization keeps
+         *     no cost history (``value_source`` is None): there is nothing to state,
+         *     and zeros would state it.
+         */
+        StockValueMovementDTO: {
+            /**
+             * Date From
+             * Format: date
+             */
+            date_from: string;
+            /**
+             * Date To
+             * Format: date
+             */
+            date_to: string;
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+            /**
+             * Complete From
+             * Format: date-time
+             */
+            complete_from: string;
+            /** Organization Name */
+            organization_name?: string | null;
+            /** Currency */
+            currency?: string | null;
+            /** Value Source */
+            value_source?: string | null;
+            /**
+             * Excluded Currency Receipts
+             * @default 0
+             */
+            excluded_currency_receipts: number;
+            /** Opening Value */
+            opening_value?: string | null;
+            /** Receipts */
+            receipts?: string | null;
+            /** Internal Receipts */
+            internal_receipts?: string | null;
+            /** Used */
+            used?: string | null;
+            /** Disposed */
+            disposed?: string | null;
+            /** Dispatched */
+            dispatched?: string | null;
+            /** Other Issues */
+            other_issues?: string | null;
+            /** Work In Progress Change */
+            work_in_progress_change?: string | null;
+            /** Other Changes */
+            other_changes?: string | null;
+            /** Closing Value */
+            closing_value?: string | null;
         };
         /**
          * StorageArchiveRequest
@@ -46169,6 +46282,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StockTakeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stock_value_movement_api_v1_stock_value_movement_get: {
+        parameters: {
+            query: {
+                /** @description The first day of the period. */
+                date_from: string;
+                /** @description The last day of the period, included. */
+                date_to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockValueMovementDTO"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stock_value_movement_xlsx_api_v1_stock_value_movement_export_xlsx_get: {
+        parameters: {
+            query: {
+                date_from: string;
+                date_to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

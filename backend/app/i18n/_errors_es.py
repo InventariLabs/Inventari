@@ -83,6 +83,12 @@ ERRORS_ES: ErrorMessages = {
         'caben en una impresión. Expórtalo como hoja de cálculo o elige una '
         'ubicación para acotarlo.'
     ),
+    'stock_value_period_reversed': (
+        'El periodo termina antes de empezar. Elige una fecha final que no sea anterior a la fecha inicial.'
+    ),
+    'stock_value_hidden': (
+        'La organización no muestra el valor de su stock, así que no hay estado que exportar. Activa primero el valor del stock en los ajustes de estadísticas.'
+    ),
     'item_create_failed': 'Error al crear el artículo',
     'item_update_failed': 'Error al actualizar el artículo',
     'item_delete_failed': 'Error al eliminar el artículo',

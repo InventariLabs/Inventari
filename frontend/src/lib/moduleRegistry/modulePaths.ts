@@ -83,6 +83,7 @@ export const MODULE_PATHS: Readonly<Record<string, ModulePaths>> = {
       "/inventory/stock",
       "/inventory/lots",
       "/inventory/stock/as-of",
+      "/inventory/stock/value-movement",
       "/inventory/lots/:id",
       "/inventory/moves",
       "/inventory/labels",

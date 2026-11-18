@@ -642,6 +642,12 @@ ERRORS_PT: dict[str, str] = {
     'stock_as_of_no_history': 'Esta organização não registra movimentações de estoque, então não há histórico para consultar. Os níveis de estoque de hoje são a única resposta possível.',
     'stock_as_of_before_ledger': 'O registro de movimentações começa em {starts_at}. Nada é conhecido antes disso — nem mesmo zero — então um relatório de {as_of} seria um palpite.',
     'stock_as_of_pdf_too_many': 'O relatório tem {total} produtos — mais do que as {limit} linhas que cabem em uma impressão. Exporte-o como planilha ou escolha um local para restringi-lo.',
+    'stock_value_period_reversed': (
+        'O período termina antes de começar. Escolha uma data final que não seja anterior à data inicial.'
+    ),
+    'stock_value_hidden': (
+        'A organização não mostra o valor do seu stock, por isso não há demonstração para exportar. Ative primeiro o valor do stock nas definições de estatísticas.'
+    ),
     'equipment_still_assigned': 'O ativo ainda está retirado por alguém. Faça a devolução primeiro.',
     'equipment_deploy_requires_checkout': 'Um ativo passa a ser implantado ao ser retirado por alguém. Faça a retirada em vez de definir o status.',
     'equipment_status_invalid': 'Status inválido: {status}',

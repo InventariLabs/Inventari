@@ -82,6 +82,12 @@ ERRORS_FR: ErrorMessages = {
         'qu’une impression peut contenir. Exportez-le en tableur ou '
         'choisissez un emplacement pour le restreindre.'
     ),
+    'stock_value_period_reversed': (
+        'La période se termine avant de commencer. Choisissez une date de fin qui ne précède pas la date de début.'
+    ),
+    'stock_value_hidden': (
+        "L'organisation n'affiche pas la valeur de son stock : il n'y a donc aucun état à exporter. Activez d'abord la valeur du stock dans les paramètres des statistiques."
+    ),
     'item_create_failed': "Échec de la création de l'article",
     'item_update_failed': "Échec de la mise à jour de l'article",
     'item_delete_failed': "Échec de la suppression de l'article",

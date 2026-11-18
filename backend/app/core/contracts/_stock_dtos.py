@@ -516,6 +516,55 @@ class StockAsOfReportDTO(BaseModel):
     unpriced: int = 0
 
 
+class StockValueMovementDTO(BaseModel):
+    """What the stock was worth when a period opened, what moved it, and what
+    it was worth when it closed.
+
+    Every movement is signed as it changes the value: what came in is
+    positive, what left is negative, so ``opening_value`` plus every
+    movement field is ``closing_value`` to the cent. ``other_changes``
+    is what is left to make that true — the part of the closing that the
+    layers' own receipts and issues do not account for, such as a cost
+    added to a receipt after it was posted; it is 0.00 when nothing of the
+    kind happened. All of the figures are None where the organization keeps
+    no cost history (``value_source`` is None): there is nothing to state,
+    and zeros would state it.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    date_from: date
+    date_to: date
+    generated_at: datetime
+    complete_from: datetime
+    organization_name: str | None = None
+    currency: str | None = None
+    value_source: str | None = None
+    #: Receipts in the period left out because their currency is not the
+    #: organization's — two currencies do not add.
+    excluded_currency_receipts: int = 0
+    #: The stock-on-a-date figure for the evening before ``date_from``.
+    opening_value: Decimal | None = None
+    #: Goods that came in from outside.
+    receipts: Decimal | None = None
+    #: Goods the organization's own books put back on the shelf: what a
+    #: production run made, ingredients returned, a return taken in.
+    internal_receipts: Decimal | None = None
+    used: Decimal | None = None
+    disposed: Decimal | None = None
+    #: Goods that left against a document line — a dispatch or a delivery.
+    dispatched: Decimal | None = None
+    #: Every other way stock left: counted shortages, corrections. The layer
+    #: keeps no reason for those, so a count difference cannot be told from
+    #: any other correction.
+    other_issues: Decimal | None = None
+    #: What production runs under way held at the close, less at the opening.
+    work_in_progress_change: Decimal | None = None
+    other_changes: Decimal | None = None
+    #: The stock-on-a-date figure for ``date_to``.
+    closing_value: Decimal | None = None
+
+
 class StockAgeEntryDTO(BaseModel):
     """One receipt entry — a single StockMove for a product, with age.
 
