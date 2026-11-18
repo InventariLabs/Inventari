@@ -166,10 +166,10 @@ async def get_overview_async(db: AsyncSession, organization_id: UUID) -> Overvie
     ).one()
 
     # What the stock is worth comes from the cost ledger where the
-    # organization keeps one. It used to be `quantity * purchase_price`, and
-    # `purchase_price` is a field on a form — so correcting a price rewrote
-    # the history of what the warehouse was worth, with no document behind
-    # the change and nothing to reconcile against.
+    # organization keeps one. It is not `quantity * purchase_price`:
+    # `purchase_price` is a field on a form, and correcting a price there
+    # would rewrite the history of what the warehouse was worth, with no
+    # document behind the change and nothing to reconcile against.
     total_value, value_source, excluded, value_scope = await stock_value_async(
         db, organization_id, storage_ids, hidden
     )

@@ -28,11 +28,12 @@ async def _drop_org_role_links(
 ) -> None:
     """Forget the roles *user_id* held in *organization_id*.
 
-    ``UserRole`` carries no organization, so a membership change used to
-    leave the old links in place — a user with a role in organization A who
-    joined B kept the A grants, and rejoining A silently restored them.
-    Only links to roles owned by the organization being left are removed —
-    which, now that every role has an organization, is all of the user's.
+    ``UserRole`` carries no organization, so a membership change removes the
+    links that point at the organization being left. Without that, a user with
+    a role in organization A who joined B would keep the A grants, and
+    rejoining A would restore them. Only links to roles owned by the
+    organization being left are removed — which, since every role has an
+    organization, is all of the user's.
     """
     from app.models.role import Role, UserRole
 
@@ -144,11 +145,10 @@ async def create_invitation_code(
 ) -> dict:
     """Mint one invitation, for one address.
 
-    Every call issues a new code. An earlier version handed back a live code
-    for the same ``(role, role_id)`` pair instead, which was a harmless saving
-    while a code was a bearer token: now that it names a recipient, returning
-    it to a second caller would send one person the invitation meant for
-    another, bound to that other person's address.
+    Every call issues a new code. A code names a recipient, so handing back a
+    live code for the same ``(role, role_id)`` pair to a second caller would
+    send one person the invitation meant for another, bound to that other
+    person's address.
     """
     role_label = role
     if role_id is not None:
@@ -182,7 +182,7 @@ async def create_invitation_code(
     await db.flush()
     return {
         # Not in the public response: the entry in the log points at this row,
-        # where it used to point at the organization.
+        # and not at the organization.
         'id': invitation.id,
         'code': code,
         'expires_at': invitation.expires_at.isoformat(),
@@ -566,7 +566,7 @@ async def join_organization(db: AsyncSession, code: str, user_id: UUID) -> Organ
 
     user.organization_id = invitation.organization_id
     # The role the inviter chose, not a constant: an admin inviting a manager
-    # used to have to wait for them to arrive and then promote them by hand.
+    # gives them that role on arrival.
     user.role = invitation.role or 'user'
 
     # Mark the invitation as consumed so the code cannot be reused by

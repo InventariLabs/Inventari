@@ -28,10 +28,10 @@ logger = get_logger(__name__)
 
 #: The statuses an asset cannot be handed out from, and the refusal each one
 #: reads. A retired asset has left the lifecycle; one in maintenance is in the
-#: workshop, and a checkout used to write DEPLOYED over it and leave its
-#: repair entry open on an asset out on loan. The asset page offers Check Out
-#: for neither, and the single and the batch checkout both ask this table, so
-#: the two routes cannot drift apart again.
+#: workshop, and a checkout must not write DEPLOYED over it, which would leave
+#: its repair entry open on an asset out on loan. The asset page offers Check
+#: Out for neither, and the single and the batch checkout both ask this table,
+#: so the two routes cannot drift apart.
 CHECKOUT_REFUSALS: dict[str, str] = {
     'RETIRED': 'equipment_cannot_checkout_retired',
     'MAINTENANCE': 'equipment_cannot_checkout_in_maintenance',
@@ -84,8 +84,8 @@ async def _log_asset_async(
     """One row per asset, and a flag saying it came from a batch.
 
     The shape the core settled on for its own bulk edits: fifty items
-    recategorised at once used to leave the same trace as nothing having
-    happened, while the same edit made one at a time was fully recorded.
+    recategorised at once are recorded one row per asset, just as the same edit
+    made one at a time is.
     The log is not supposed to depend on which button somebody pressed.
     """
     from app.core.public_api import core_api
@@ -498,16 +498,11 @@ async def bulk_edit_items(
 ) -> tuple[int, list[dict[str, str]]]:
     """Apply *action* to each item; one item's refusal never stops the batch.
 
-    The docstring used to promise that and the code did the opposite. A
-    database error was caught per item and the loop went on, but the failed
-    statement had already poisoned the transaction: every later ``execute``
-    raised ``PendingRollbackError`` — itself a ``SQLAlchemyError``, so it fell
-    into the same handler and looked like one more rejected row — and the
-    final ``commit()`` then failed outright. One bad asset took down the whole
-    batch with a 500, including every row that had gone through.
-
-    A savepoint per item is what makes the promise true: a rollback undoes
-    that one asset and leaves the transaction usable.
+    Each item runs under its own savepoint. A database error rolls back that
+    one asset and leaves the transaction usable, so the loop goes on. Without
+    the savepoint, the failed statement poisons the transaction: every later
+    ``execute`` raises ``PendingRollbackError``, and the final ``commit()``
+    fails with every good row in the batch.
     """
     updated = 0
     errors: list[dict[str, str]] = []

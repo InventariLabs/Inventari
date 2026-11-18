@@ -1,13 +1,11 @@
 """A row saved with a unit answers with that unit — not a 500, not a stale one.
 
-Adding a list row that names a unit ended in a 500 with the row saved: the
-write path returned the freshly constructed ORM object, whose ``uom``
-relationship nothing had loaded, and the response schema reads it — the
-serialization lazy-load outside the greenlet took the response down. The
-read path never noticed because ``lazy='joined'`` loads the unit on every
-query; only the doors that answer with the object they just built were
-blind to it. The bulk door carried the same blind spot, and the edit door
-answered 200 with the unit the row used to wear.
+A write door answers with the object it has just built, and the response
+schema reads its ``uom`` relationship, which a freshly constructed object has
+not loaded. The lazy-load would run outside the greenlet, so every such door
+loads the unit before it answers. The read path needs no such step, because
+``lazy='joined'`` loads the unit on every query. The bulk door and the edit
+door answer with the unit the row carries.
 """
 
 from __future__ import annotations

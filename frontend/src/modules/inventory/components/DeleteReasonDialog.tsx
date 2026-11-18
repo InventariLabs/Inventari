@@ -26,9 +26,9 @@ export function DeleteReasonDialog({
   onCancel,
 }: DeleteReasonDialogProps) {
   const { t } = useTranslation(["items", "common"]);
-  // No default. "Other" used to be pre-selected — the last entry on the list
-  // and the only one that means nothing — so whoever clicked quickly filed
-  // the answer that cannot be counted, and the archive filled up with it.
+  // No default: "Other" is never pre-selected, since it is the last entry on
+  // the list and the only one that means nothing. A quick click must not file
+  // the answer that cannot be counted.
   const [reason, setReason] = useState("");
   const [notes, setNotes] = useState("");
 

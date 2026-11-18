@@ -1,7 +1,7 @@
 """A second import of the same sheet updates instead of duplicating.
 
-The export carries a Label Code for every product; until now the import
-ignored it, so a corrected sheet re-imported the whole file as new products.
+The export carries a Label Code for every product; the import reads it, so a corrected
+sheet re-imported updates products instead of adding them as new.
 The update mode reads that column: a row whose code names a product the
 organization already has is skipped or overwritten, as the reader chose. A
 row without a code, or with an unknown one, still becomes a new product.

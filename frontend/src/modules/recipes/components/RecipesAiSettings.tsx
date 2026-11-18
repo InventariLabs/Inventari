@@ -21,8 +21,8 @@ const RECIPES_URL_FETCH_PURPOSE_KEY = "recipes.url_fetch";
  * Rendered in two places on purpose: on the global AI screen next to the other
  * purposes, and on the recipes module settings page next to the options it
  * belongs with. Both drive the same binding endpoint, so there is one value
- * per purpose — unlike the reader key, which used to live on this screen in
- * a field that asked a cook what a rate limit is.
+ * per purpose. The reader key is a connection like the others, not a field that
+ * asks a cook what a rate limit is.
  *
  * The connections themselves belong to the installation, not to this module,
  * so they come from the `settings` shared layer (frontend/AGENTS.md §2, Module-First File

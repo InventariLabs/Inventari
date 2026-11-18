@@ -54,11 +54,11 @@ vi.mock("@/contexts/ModulesContext", () => ({
 }));
 
 /**
- * `openEdit` used to build the form state with the template id in the
- * field named `name`, so the first caller that showed `form.product.name` in
- * edit mode would print a UUID. The API returns `product_name` — the form
- * must carry it. The modal is mocked so the test can read the form state the
- * page hands it.
+ * `openEdit` builds the form state with the product's name in the field named
+ * `name`. The API returns `product_name`, and the form must carry it: the first
+ * caller that shows `form.product.name` in edit mode would print a UUID
+ * otherwise. The modal is mocked so the test can read the form state the page
+ * hands it.
  */
 const formProp = vi.fn();
 /** The whole prop object: a spec that has to drive the save button itself. */
@@ -322,8 +322,7 @@ describe("ReorderRulesPage edit form state", () => {
     };
     expect(form.id).toBe("rule-1");
     expect(form.product?.name).toBe("Latte cups");
-    // The regression this guards against: the UUID used to stand in for the
-    // name.
+    // The name is the product's name, never the UUID of its template.
     expect(form.product?.name).not.toBe("tpl-abc");
     expect(form.product?.product_template_id).toBe("tpl-abc");
   });
@@ -380,11 +379,10 @@ describe("ReorderRulesPage edit form state", () => {
 
 /**
  * A save that wants more than the shelf holds still succeeds, and the warning
- * beside it has two numbers to place. It used to put the shelf's limit in the
- * sentence's "it wants {{max}}": a rule asking for 300 on a shelf that holds
- * 200 read "it wants 200", which is the shelf's number in the rule's mouth —
- * the opposite of what happened. The warehouse module has said it the other
- * way round since it was written ("wants {{reorder}} … holds ({{max}})").
+ * beside it has two numbers to place. The rule's own number is the one the
+ * sentence gives as "wants", so a rule asking for 300 on a shelf that holds 200
+ * reads "wants 300". The warehouse module words it the same way ("wants
+ * {{reorder}} … holds ({{max}})").
  */
 describe("ReorderRulesPage — a save that outruns the shelf", () => {
   beforeEach(() => {

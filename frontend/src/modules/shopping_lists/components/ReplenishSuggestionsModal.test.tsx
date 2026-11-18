@@ -169,7 +169,7 @@ describe("ReplenishSuggestionsModal", () => {
     ).toBeEnabled();
 
     // Cancel closes the sheet, it does not unmount the component — so the
-    // opening edge is what has to clear the tick. It used to survive and
+    // opening edge is what has to clear the tick, so it does not survive and
     // come back on the next visit.
     rerender(<ReplenishSuggestionsModal isOpen={false} onClose={onClose} />);
     rerender(<ReplenishSuggestionsModal isOpen={true} onClose={onClose} />);
@@ -249,8 +249,8 @@ describe("ReplenishSuggestionsModal — the wire's quantity is a string", () => 
   });
 
   it("steps a wire-string quantity numerically, not by concatenation", () => {
-    // The API serializes a Decimal as a string ("1"), so the old code held
-    // the string in its stepper state and the first plus produced "11".
+    // The API serializes a Decimal as a string ("1"), so the stepper state
+    // holds a number: a string would make the first plus produce "11".
     mockUseShoppingSuggestions.mockReturnValue({
       data: {
         suggestions: [

@@ -1,9 +1,9 @@
 """What a model or an HTTP library said never becomes the reader's sentence.
 
-``recipe_scrape_failed`` used to carry ``{error}``: whatever the scraper
-raised — a provider's answer, ``httpx``'s message, the "unexpected type"
-guard — was glued onto the Polish sentence, so a Polish reader got English
-internals. The malformed-answer guards now raise ``LlmContractError``, the
+``recipe_scrape_failed`` carries no ``{error}``: whatever the scraper raises — a
+provider's answer, ``httpx``'s message, the "unexpected type" guard — is not
+glued onto the Polish sentence, so a Polish reader gets no English internals.
+The malformed-answer guards raise ``LlmContractError``, the
 class that says its text is for the log.
 """
 

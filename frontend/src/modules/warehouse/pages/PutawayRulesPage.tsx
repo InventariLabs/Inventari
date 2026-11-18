@@ -181,7 +181,7 @@ export default function PutawayRulesPage() {
         <LoadingSpinner />
       ) : placeCount === 0 ? (
         // The rule editor's target field has nothing to aim at until a storage
-        // exists, and the screen used to say nothing about it.
+        // exists, and the screen says so.
         <StorageRequired />
       ) : !rules || rules.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-16 text-center">

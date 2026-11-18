@@ -12,8 +12,8 @@ is either the organization's own choice or no rate at all — an untaxed
 document is worth its net, which is long-settled behaviour
 (``compute_line_gross``).
 
-The partner-tax-id requirement is the second legal axis a preset used to
-pin (``PL Magazyn`` and ``DE Lager`` demanded it, the others did not). It
+The partner-tax-id requirement is the second legal axis a preset can
+pin (``PL Magazyn`` and ``DE Lager`` demand it, the others do not). It
 belongs to the country too, and the profile carries ``None`` — "no
 opinion" — until the organization says otherwise.
 """

@@ -55,7 +55,7 @@ def _scratch_db_name() -> str:
 
 
 def _admin_url() -> str:
-    """URL of the maintenance database, used to issue CREATE DATABASE."""
+    """URL of the maintenance database, used for issuing CREATE DATABASE."""
     return f'{settings.DATABASE_URL.rsplit("/", 1)[0]}/postgres'
 
 
@@ -126,8 +126,8 @@ def controller_run_id(*, mint: bool = False) -> str:
 
     Minting overwrites whatever the environment already holds: an
     ``INVENTARI_TEST_RUN_ID`` exported in the shell — natural while looking
-    at orphaned databases — used to be inherited through ``setdefault``, and
-    every run started from that shell then shared one id. A second mint in
+    at orphaned databases — would otherwise be inherited through ``setdefault``, and
+    every run started from that shell would share one id. A second mint in
     the same process (a test that imports the configuration again) keeps the
     id it made.
     """

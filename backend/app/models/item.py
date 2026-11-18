@@ -258,9 +258,7 @@ class Item(Base):
         FiniteNumeric(10, 2, nonfinite_read_default=None)
     )  # purchase price
     currency: Mapped[str | None] = mapped_column(String(3))
-    # `price_per_unit` used to sit here, commented "price per kg/L". Nothing
-    # ever wrote it and nothing read it — `GET /items` returned null for every
-    # row since the initial schema. Meanwhile `purchase_price` above *is* the
+    # `purchase_price` above *is* the
     # per-unit rate: it opens a valuation layer at that unit cost, AVCO comes
     # off those layers, and a production cost is rate × quantity. Two columns
     # with one meaning and the opposite names is how a form comes to suggest

@@ -4,9 +4,9 @@ import { FILTER_PARAMS } from "@/modules/warehouse/hooks/useDocumentsList";
 /**
  * The warehouse addresses that outlived their screens.
  *
- * The document list this module used to open on is now History, which tells
- * the same records in plain words; the old profile tab was folded into the
- * settings screen that is now Configuration. A bookmark, a link from a
+ * The document list this module opens on is History, which tells the same
+ * records in plain words; the former profile tab lives in the settings screen,
+ * now Configuration. A bookmark, a link from a
  * partner card or an old email keeps working, with its query string and hash
  * carried over.
  *

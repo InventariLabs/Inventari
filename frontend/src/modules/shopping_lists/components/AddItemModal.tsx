@@ -173,7 +173,7 @@ export default function AddItemModal({ listId, onClose, onSuccess }: Props) {
                     ? (formData.quantity ?? 0) > QUANTITY_MAX
                       ? t("addItem.validation.quantityMax", {
                           // The store's ceiling, written the way this reader
-                          // writes numbers: the raw `999999999.999` used to
+                          // writes numbers: the raw `999999999.999` would
                           // print its dot in a Polish interface, beside a
                           // server refusal that already said `999999999,999`.
                           max: formatQuantityLocale(QUANTITY_MAX),

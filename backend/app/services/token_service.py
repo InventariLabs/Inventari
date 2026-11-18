@@ -152,7 +152,7 @@ def read_password_reset_claims(token: str) -> tuple[UUID, str, datetime] | None:
     """Return ``(user_id, jti, expires_at)`` for a valid reset token.
 
     The ``jti`` and the expiry are what let the reset flow burn the token
-    after its first use — a leaked reset link used to work for the full 30
+    after its first use — a leaked reset link would otherwise work for the full 30
     minutes, however many times it was replayed.
 
     Returns None on any failure (invalid signature, wrong type, expired,
@@ -182,9 +182,9 @@ async def verify_token_async(
 ) -> User:
     """Resolve the user behind *token*, or raise 401.
 
-    ``expected_type`` is enforced, so a refresh token sent as
-    ``Authorization: Bearer`` no longer authenticates a request — it used to,
-    which handed an attacker a 30-day access token outside the rotation
+    ``expected_type`` is enforced: a refresh token sent as
+    ``Authorization: Bearer`` does not authenticate a request, as that would
+    hand an attacker a 30-day access token outside the rotation
     machinery. Tokens minted before this claim existed carry no ``type`` and
     are rejected: the deployment logs everyone out once, a one-time cost of
     closing the hole.

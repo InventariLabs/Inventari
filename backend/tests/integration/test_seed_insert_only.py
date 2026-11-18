@@ -448,17 +448,16 @@ class TestCommitFalseSeed:
 @pytest.mark.integration
 @pytest.mark.asyncio
 class TestDefaultBehaviorPreserved:
-    """When called with no arguments, the seeders keep their old behaviour."""
+    """When called with no arguments, the seeders keep their default behaviour."""
 
     async def test_default_mode_keeps_a_name_the_organization_changed(
         self, real_async_db_session: AsyncSession, seeded_org
     ):
         """A name that is not the literal the seeder wrote is the user's.
 
-        This used to assert the opposite — the profile seeder overwrote
-        ``existing.name`` on every call while a module's declared types left a
-        renamed row alone. Two seeders of one table disagreeing about who owns
-        a name is the defect, not a default: a type's name is editable and
+        The profile seeder does not overwrite ``existing.name`` on every call, and a
+        module's declared types leave a renamed row alone. Two seeders of one table
+        agree about who owns a name: a type's name is editable and
         printed, so a row that says something else is the organization's. What
         a later seed may still bring into line is a row still carrying the
         literal it was seeded with (see the storage-type language tests).

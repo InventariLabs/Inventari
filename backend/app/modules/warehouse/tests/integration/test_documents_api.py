@@ -1302,11 +1302,9 @@ class TestDocumentWorkflow:
     ) -> None:
         """A negative done_quantity is refused on a dispatch.
 
-               Previously it passed validation with a discrepancy code, was persisted,
-               and the executor skipped it → an EXCEPTION line carrying a negative
-        quantity. Since the check moved from the schema to the line it
-               applies to — corrections carry a signed delta, everything else cannot —
-               so the refusal arrives as a 400 rather than a 422.
+               A negative quantity is refused on the line, not in the schema:
+        corrections carry a signed delta, everything else cannot, so the refusal
+        arrives as a 400 rather than a 422.
         """
         resp = client.post(
             '/api/v1/warehouse/documents',
@@ -3098,8 +3096,8 @@ class TestDocumentProfileAPI:
         client: TestClient,
         doc_auth_headers: dict[str, str],
     ) -> None:
-        """the UK Warehouse preset used to pin GBP over the
-        organization currency — it must leave the currency unset."""
+        """the UK Warehouse preset leaves the currency unset, so the organization's
+        own currency stands."""
         response = client.post(
             '/api/v1/warehouse/profile/apply-preset/UK Warehouse',
             headers=doc_auth_headers,

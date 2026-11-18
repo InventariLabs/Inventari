@@ -27,8 +27,8 @@ describe("cameraErrorKey", () => {
 
   // A camera refusing the constraints is not a missing camera: the device is
   // right there — it is the ask it cannot satisfy (a laptop with only a
-  // front camera asked for `facingMode: "environment"`). It used to be folded
-  // into "no camera was found", which sent the reader looking for hardware
+  // front camera asked for `facingMode: "environment"`). It must not be folded
+  // into "no camera was found", which would send the reader looking for hardware
   // standing in front of them.
   it("tells a camera that cannot meet the constraints from a missing one", () => {
     expect(

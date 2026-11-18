@@ -141,9 +141,9 @@ class PickingStartResponse(BaseModel):
     scale: Decimal | None = None
     items_to_pick: list[PickingItemSchema]
     # True when this is a session that was already open, handed back instead of
-    # thrown away. Starting used to cancel an unfinished session on sight,
-    # which put the ingredients of a meal that had been cooked back on the
-    # shelf — silently, on the next tap of "Get ingredients".
+    # thrown away. Starting never cancels an unfinished session on sight, which
+    # would put the ingredients of a meal already cooked back on the shelf,
+    # silently, on the next tap of "Get ingredients".
     resumed: bool = False
 
 

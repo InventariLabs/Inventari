@@ -109,9 +109,9 @@ export function CookForStockModal({
     typeof parseShortageError
   > | null>(null);
   // The bridge builds two records in two calls. When the second one is
-  // refused and the operator walks away, the first used to stay: a formula
-  // in the production catalogue that nobody asked for and no screen
-  // mentioned. Remember what this attempt created so leaving takes it along.
+  // refused and the operator walks away, the first must not stay behind: a
+  // formula in the production catalogue that nobody asked for and no screen
+  // mentions. Remember what this attempt created so leaving takes it along.
   const strandedRecipeId = useRef<string | null>(null);
 
   // The location the last batch went to, or the only one there is. Asking for

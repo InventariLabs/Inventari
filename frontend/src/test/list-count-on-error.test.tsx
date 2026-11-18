@@ -9,8 +9,8 @@ import PurchaseOrdersPage from "@/modules/purchase_orders/pages/PurchaseOrdersPa
 
 /**
  * A failed list query has no answer to "how many", and the register bar
- * used to answer anyway — `data?.total ?? 0` reads as zero, so a reader
- * meeting a 500 saw "0 stock entries" over the error card, on the one
+ * must not answer anyway: `data?.total ?? 0` reads as zero, so a reader
+ * meeting a 500 would see "0 stock entries" over the error card, on the one
  * screen whose whole job is answering whether there is anything at all.
  * The correct shape already existed on the label pool: the count is
  * withheld while the query is failing (`resultCount={isError ? undefined :

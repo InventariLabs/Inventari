@@ -1,11 +1,9 @@
 """
 Integration tests for Document Register — the paged one.
 
-The register used to fetch every document in the window — the sums
-and the rows arrived in one answer, and a year of a busy warehouse grew both
-the payload and the DOM it fed. The sums now come from a SQL GROUP BY over
-the whole window, the rows are one page of one group, and the CSV export is
-the only answer without a limit.
+The sums come from a SQL GROUP BY over the whole window, the rows are one
+page of one group, and the CSV export is the only answer without a limit. A
+year of a busy warehouse does not grow the payload or the DOM it feeds.
 
 Verifies:
 - Summary: date-range filtering, type filter, group_by, group sums and the
@@ -184,8 +182,8 @@ class TestDocumentRegisterBasic:
     ) -> None:
         """The answer's size stops depending on the window's size.
 
-        The register used to fetch every document in the window, so a year of
-        a busy warehouse came back as thousands of rows for the DOM to
+        The register does not fetch every document in the window, so a year of
+        a busy warehouse does not come back as thousands of rows for the DOM to
         render. The summary carries one tuple per group — the rows live at
         the rows endpoint, one page at a time.
         """
@@ -326,9 +324,9 @@ class TestDocumentRegisterFilters:
     ) -> None:
         """A document with no partner lands in a group with no label.
 
-        The service used to send an em dash as the label, which the register
-        then printed as the group's name: a display string, untranslated,
-        travelling as data. The bucket has no name of its own — naming it is
+        The service sends no label for the bucket, not an em dash: a display string
+        would print as the group's name, untranslated, travelling as data. The
+        bucket has no name of its own — naming it is
         the reader's job.
         """
         resp = client.post(
@@ -872,9 +870,8 @@ class TestDocumentRegisterCsv:
     ) -> None:
         """The paged register must not shrink the export.
 
-        The export used to read the register's groups; once the register
-        started serving pages, the export would have silently lost everything
-        past page one. It queries its own rows, and no limit touches it.
+        The export queries its own rows, not the register's groups, so no page
+        limit touches it and it keeps every row.
         """
         numbers = []
         for _ in range(3):

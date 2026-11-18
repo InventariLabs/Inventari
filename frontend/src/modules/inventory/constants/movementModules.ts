@@ -1,12 +1,10 @@
 /**
  * The modules whose presence offers the organization the movement ledger.
  *
- * Every organization records its stock movements (ADR-004). An
- * organization with none of these modules used to record none, and when it
- * started to, it was on the condition that nothing on its screens changed:
- * the ledger tab and the navigation entry stay where a module that reads
- * them is on. Offering the history to everyone is a product
- * decision of its own, not a side effect of keeping it.
+ * Every organization records its stock movements (ADR-004). The ledger tab and
+ * the navigation entry show only where a module that reads them is on. Offering
+ * the history to everyone is a product decision of its own, not a side effect
+ * of keeping the ledger.
  *
  * The authority is the backend manifest flag `consumes_stock_quant`; this
  * list mirrors it and `test_which_modules_record_movements.py` fails if the

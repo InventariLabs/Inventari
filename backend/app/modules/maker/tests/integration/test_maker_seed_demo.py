@@ -195,8 +195,8 @@ class TestMakerSeedDemo:
     ) -> None:
         """An organization already keeps the cinnamon as 20 g jars.
 
-        The seed reuses a template it finds by name, and the food catalogue's
-        jar used to share the cinnamon's. The recipe's kilograms cannot be
+        The seed reuses a template it finds by name, so the food catalogue's jar must
+        not share the cinnamon's. The recipe's kilograms cannot be
         written as a kilogram line against a product counted in pieces —
         nothing converts one into the other — so the seed states it in the
         product's own unit, through the jar's weight: 5 g of 20 g jars is a

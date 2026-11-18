@@ -92,10 +92,9 @@ const th = "px-4 py-2.5 text-xs font-medium text-on-muted";
 /**
  * The lines as columns, the way the document detail lays out its own.
  *
- * Each line used to be a sentence — the name at the left edge, and at the
- * right one "4 200,00 zł / szt. = 20 664,00 zł (Netto: 16 800,00 zł + 23,0%
- * = 3 864,00 zł)", whose second half read as if the net plus the rate came
- * to the tax. The net, the tax and the total each have a column now.
+ * Each line is a row: the name at the left edge, and the net, the tax and the
+ * total each in a column of their own, so the tax never reads as the net plus
+ * the rate.
  */
 function LinesTable({
   rows,

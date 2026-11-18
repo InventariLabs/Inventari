@@ -191,8 +191,8 @@ export default function ScanPage() {
         setShowStockActions(true);
       } else {
         // A scanned printout opens its document. Where it opens is
-        // one decision, shared with every other scanning screen —
-        // it used to be spelled out here and nowhere else.
+        // one decision, shared with every other scanning screen, so it is
+        // never spelled out here.
         const documentTarget = documentScanTarget(data);
         if (documentTarget) navigate(documentTarget);
       }
@@ -233,8 +233,8 @@ export default function ScanPage() {
    * expiry.
    *
    * The button under the list says "Remove 1 (first to expire)", and this is the only entry to
-   * that rule; it used to take the whole record, so a reader asking for one
-   * kilogram lost both. The per-location "−" asks the same question and
+   * that rule; it takes one unit, not the whole record, so a reader asking for
+   * one kilogram keeps the other. The per-location "−" asks the same question and
    * answers it the same way.
    */
   const handleStockConsume = useCallback(

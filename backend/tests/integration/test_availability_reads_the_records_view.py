@@ -3,12 +3,11 @@
 ``core_api.stock.list_quants_async`` is where every module asks what stands
 on a shelf and what of it is free: the documents' capacity and putaway, the
 purchasing engine, the meal planner's shopping list, production's
-availability, the stock take's corrections. It used to read ``stock_quants``,
-which agreed with the records only because the bridge kept writing both.
-It reads ``stock_quants_from_records`` — the records summed per product,
+availability, the stock take's corrections. It reads
+``stock_quants_from_records`` — the records summed per product,
 shelf, batch and owner, with the reservation rows beside them — so the
 number every one of those readers sees is the records' own. The table is
-gone now; every filter a reader asks by is checked against what the records
+gone; every filter a reader asks by is checked against what the records
 put on the shelves.
 """
 

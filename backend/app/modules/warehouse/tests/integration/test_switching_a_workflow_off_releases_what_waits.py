@@ -1,11 +1,9 @@
 """Switching an approval workflow off lets what waited on it go on.
 
 A workflow is a control someone switched on; switching it off must not leave a
-document parked behind it. The deactivate and delete refusals used to tell the
-admin to resolve the requests first, and a request on a stage nobody can decide
-cannot be resolved by anyone — so the admin had no move left. Now the open
-requests are closed as the admin, the documents leave PENDING_APPROVAL, and the
-requester is told why.
+document parked behind it. Deactivating or deleting a workflow closes its open
+requests as the admin, a request on a stage nobody can decide included, so the
+documents leave PENDING_APPROVAL and the requester is told why.
 """
 
 from typing import Any, cast

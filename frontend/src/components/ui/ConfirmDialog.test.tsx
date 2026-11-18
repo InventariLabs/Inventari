@@ -177,7 +177,7 @@ describe("ConfirmDialog", () => {
 
   it("does not report a confirm-triggered close as a cancellation", () => {
     // A synchronous confirm lets Radix close the dialog, and that close also
-    // arrives through onOpenChange — so the answer used to be followed by
+    // arrives through onOpenChange — so the answer is not followed by
     // onCancel from the same click. A consumer whose cancel means "the
     // reader declined" (revert the choice) then saw the refusal applied
     // right after the confirmation.

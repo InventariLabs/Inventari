@@ -67,8 +67,7 @@ import {
 
 /**
  * The stage a new workflow starts with. Its label is a suggestion the user
- * edits, so it belongs in their language — it used to read "Manager Approval"
- * in all five.
+ * edits, so it belongs in their language: it is translated in all five.
  */
 function emptyStages(t: TFunction): StageDraft[] {
   return [
@@ -602,7 +601,7 @@ export default function WorkflowSettingsPage() {
   };
 
   // A rejection keeps the dialog open with the reason inside it (the
-  // ConfirmDialog contract), so the toast the old handlers raised is gone.
+  // ConfirmDialog contract), so the handler raises no toast for it.
   const confirmSwitchOff = async () => {
     if (!switchOff) return;
     if (switchOff.mode === "delete") await handleDelete(switchOff.workflow);

@@ -1,11 +1,9 @@
 """The printout answers to the document's type, not to one org-wide choice.
 
-The template's ``document_type`` column used to be decorative: the PDF
-endpoint read the profile's single ``default_template_id`` and printed
-every document through it — a receipt wearing a scrap layout, because
-that happened to be the template the profile named. The data model
-already kept one default per (organization, module, document_type);
-these tests pin the reading that honours it.
+The template's ``document_type`` column decides the layout: the PDF endpoint
+reads the default for the document's own type, so a receipt never wears a
+scrap layout. The data model keeps one default per (organization, module,
+document_type), and these tests pin the reading that honours it.
 """
 
 import asyncio

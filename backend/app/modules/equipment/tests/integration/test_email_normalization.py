@@ -1,10 +1,9 @@
 """
 Integration tests for assigned_to_email normalization.
 
-The checkout used to store the email verbatim ("Anna.Kowalska@Example.org")
-and "My assets" compared it with ``==`` — so the same mailbox with
-different casing produced an empty page. Emails are case-insensitive by
-RFC 5321: store them lowercase and compare case-insensitively.
+The checkout stores the email lowercased, so "My assets" finds the same mailbox
+whatever the casing it was typed in. Emails are case-insensitive by RFC 5321:
+store them lowercase and compare case-insensitively.
 """
 
 from uuid import uuid4

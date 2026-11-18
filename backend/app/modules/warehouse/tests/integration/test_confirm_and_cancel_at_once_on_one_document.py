@@ -11,7 +11,7 @@ stayed on the shelf with nobody left to release it.
 
 Every door now takes the document's row first — the row completion already
 locks, in the same order — and decides only under that lock. These tests
-stage the meetings the old code lost: one door is held at its step until
+stage the meetings that would lose a race: one door is held at its step until
 the other has got where the collision happens, the way
 ``test_two_documents_take_their_shelves_in_one_order`` holds its two
 documents, and what is asserted is the shelf and the document afterwards,

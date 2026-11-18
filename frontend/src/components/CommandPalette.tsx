@@ -236,9 +236,9 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   /**
    * The module a result came from, named the way the launcher names it.
    *
-   * A result used to be tagged with the technical name run through
-   * `capitalize` — "Inventory" beside a launcher tile and a navigation entry
-   * that both read "Inwentarz". The launcher's own label comes first because
+   * A result is named the way the launcher names its module, not by the
+   * technical name run through `capitalize`, so it reads the same as the tile
+   * and the navigation entry beside it. The launcher's own label comes first because
    * that is the string the reader has already seen; the module catalogue
    * name covers a module with no tile.
    */

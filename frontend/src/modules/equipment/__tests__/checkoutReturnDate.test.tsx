@@ -1,11 +1,10 @@
 /**
- * regression: the checkout return-date validation speaks the app's
- * language, not the browser's.
+ * The checkout return-date validation speaks the app's language, not the
+ * browser's.
  *
- * Previously the field relied on a native `min` attribute — the browser
- * produced its own message ("You must enter a value ... or later") in the
- * browser language. Now the component validates the date and shows an
- * i18n message. The picker no longer offers a past day at all.
+ * The component validates the date itself and shows an i18n message, so no
+ * browser-language message ("You must enter a value ... or later") appears.
+ * The picker offers no past day at all.
  */
 import { describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent } from "@/test/utils";

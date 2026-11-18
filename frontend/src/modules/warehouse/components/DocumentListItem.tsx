@@ -290,7 +290,7 @@ function ModuleValues({
  * "from whom, where to, for how much" inline (partner, route, value — all
  * already present in the list response), and every action lives behind a
  * single "⋯" overflow menu so the row keeps a stable structure no matter
- * the document status (a DRAFT used to show five icons, PENDING two).
+ * the document status: the status changes the menu's entries, not the row.
  * Menu markup follows the pattern from PurchaseOrderListItem.
  */
 const DocumentListItem = memo(function DocumentListItem({
@@ -311,10 +311,8 @@ const DocumentListItem = memo(function DocumentListItem({
   const { t, i18n } = useTranslation("warehouse");
   const lang = i18n.language?.substring(0, 2) ?? "en";
   // Cancel and delete are the manage-guarded pair; everything else in this
-  // menu is a plain write. Both used to be asked of the account's role rather
-  // than its permissions, which is a different rule from the one the API
-  // applies — and `canWrite` was not asked at all, so a read-only account got
-  // Duplicate, Edit, Confirm and Execute and a 403 after each.
+  // menu is a plain write, gated by `canWrite`. Both gates follow the rule the
+  // API applies, so the menu offers nothing the API would refuse.
   const canManage = useCanManage("warehouse");
 
   const partnerName = doc.partner_snapshot?.name ?? null;
@@ -402,7 +400,7 @@ const DocumentListItem = memo(function DocumentListItem({
   }
 
   // The whole card answers a tap through the number button, stretched over
-  // it (UI_GUIDELINES §2.3a): it opens the document, or toggles it once a
+  // it (UI_GUIDELINES §2.3a): it opens the document, or toggles it when a
   // selection is under way. The checkbox and the menu sit above the overlay.
   // The button's press-scale would make it the overlay's containing block
   // for as long as it is held (any transform does, even `scale(1)`), shrinking

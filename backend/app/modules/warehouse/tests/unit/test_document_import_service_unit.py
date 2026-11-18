@@ -172,9 +172,8 @@ class TestImportLinesFromFile:
     ) -> None:
         """A spelled-out unit is a unit here too, not an unknown one.
 
-        Document import used to look the symbol up verbatim while purchase
-        order import went through the shared alias map, so the same sheet
-        carried its units into one importer and lost them in the other.
+        Document import looks the symbol up through the shared alias map, as
+        purchase order import does, so the same sheet carries its units into both importers.
         """
         db = MagicMock()
         db.add = MagicMock()
@@ -241,7 +240,7 @@ class TestImportLinesFromFile:
 
     @pytest.mark.asyncio
     async def test_a_quantity_that_is_not_a_number_refuses_the_row(self) -> None:
-        # "abc" used to import as 1 in silence; an opening balance built on
+        # "abc" must not import as 1 in silence; an opening balance built on
         # that is wrong in a way nobody is told about.
         db = MagicMock()
         db.add = MagicMock()

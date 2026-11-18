@@ -587,7 +587,7 @@ export function ProductCombobox<T extends ProductComboboxOption>({
   // suggestions drift away from the input they belong to. Only a scroll of
   // something holding the input moves it: the panel's own list does not, nor
   // does the input scrolling its own text sideways, which a long name does
-  // when the focus comes back to it — that used to wipe the name the reader
+  // when the focus comes back to it — that must not wipe the name the reader
   // had just been refused on.
   //
   // "Holding the input" is not enough: a scroll event reaches the listener a
@@ -603,7 +603,7 @@ export function ProductCombobox<T extends ProductComboboxOption>({
   // nobody scrolling, and a box filled at machine speed can have its list open
   // by then. So a frame checks whether the input came to rest, and carries the
   // panel along if not. A scroll closes the list only when it finds an input
-  // that stood still until now, which the first scroll of a reader's always does.
+  // that stands still, which the first scroll of a reader's always does.
   useEffect(() => {
     if (!dropdownOpen) return;
     let lastSeen = inputRef.current?.getBoundingClientRect();

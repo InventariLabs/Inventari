@@ -993,17 +993,13 @@ class TestDocumentsWmsEdgeCases:
     ) -> None:
         """A scan quoting a session that is not there is refused as not found.
 
-        What stood here posted to `/api/v1/warehouse/picking/scan`, a path
-        this module has never served — the route carries both ids,
-        `/{document_id}/picking/{session_id}/scan`. So the request collected
-        the 404 that any unrouted path returns, `status_code >= 400` passed,
-        and it would have passed for as long as the file existed. The body
-        now posts to the real route.
+        The request posts to the real route, `/{document_id}/picking/{session_id}/scan`,
+        which carries both ids, so an unrouted path cannot answer for it.
 
-        The refusal used to be `value_error_handler`'s 400 for the bare
-        ValueError `_get_active_session_async` raises. The session access
-        door now reads the id under the URL's document and answers 404 when
-        no such session is there — the pin moves with the door. The test
+        The refusal is a 404, not `value_error_handler`'s 400 for the bare
+        ValueError `_get_active_session_async` raises: the session access door
+        reads the id under the URL's document and answers 404 when no such
+        session is there. The test
         stays here rather than in test_wms_picking.py because every scan
         there opens a real session first, so none of them reaches the
         refusal.

@@ -102,10 +102,9 @@ async def generate_po_number(
     """Next free number for an order dated *document_date*.
 
     Through the document numbering engine: it holds the advisory lock, the
-    persistent counter and the organization's format. This used to be a
-    second engine beside it — its own lock, its own regex, the shape
-    ``PO/{year}/{seq}`` hardcoded — so an organization that changed how its
-    documents are numbered saw the change everywhere except on its orders.
+    persistent counter and the organization's format. There is no second
+    engine here with its own lock, regex or hardcoded ``PO/{year}/{seq}``
+    shape, so an organization's document numbering applies to its orders too.
     """
     return await warehouse_api.generate_number_async(
         db,

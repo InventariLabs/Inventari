@@ -130,9 +130,9 @@ async def carry_record_stock_async(
 
     Every door that writes a record's shelf calls this after writing it — the
     move, the single edit, the bulk edit, and whatever reaches them (the
-    public API, a re-imported sheet). Three of those five used to set the
-    column and write nothing else, so the record moved and the register did
-    not say how.
+    public API, a re-imported sheet). None of them sets the column and
+    writes nothing else, so a record never moves without the register saying
+    how.
 
     *quantity* is what the record held on the old shelf — before any
     quantity change made in the same request, which the caller applies

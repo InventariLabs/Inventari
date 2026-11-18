@@ -16,11 +16,9 @@ interface POApprovalWorkflowWarningProps {
 /**
  * Says out loud that the approval setting has nothing behind it.
  *
- * "Require approval" used to confirm the order anyway when no workflow
- * existed, so the manager who switched it on believed purchases were
- * controlled while every order sailed through. Confirmation is now
- * refused instead — which is only fair if the screen that switched the
- * requirement on also says what is missing and leads to where it is fixed.
+ * Confirmation is refused when no workflow exists, so a manager who switches
+ * "Require approval" on is told what is missing: the screen says what is
+ * missing and leads to where it is fixed.
  *
  * The one bit — "an active ``purchase_order`` workflow with a stage
  * exists" — comes from ``usePOApprovalWorkflowConfigured``, the same hook that

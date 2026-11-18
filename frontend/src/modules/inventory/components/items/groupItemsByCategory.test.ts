@@ -37,10 +37,8 @@ function item(
 
 describe("groupItemsByCategory", () => {
   it("names a group header the way the picker does", () => {
-    // The rows' group headers used to print the raw record name, so the
-    // products list read "SPICES AND HERBS" over rows that say
-    // "PRZYPRAWY I ZIOŁA" — one screen, two words, the exact shape of
-    // the picker-versus-bulk-edit split.
+    // A group header uses the name the picker shows: the raw record name and
+    // the localized row name would be two words for one category on one screen.
     const deli = category();
     const groups = groupItemsByCategory(
       [item({ category: deli })],

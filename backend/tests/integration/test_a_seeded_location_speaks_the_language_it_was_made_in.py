@@ -1,11 +1,8 @@
 """A location a module seeds is named in the language it was enabled in.
 
-The seeded name used to be an English literal from install day -- "Server
-Room" sitting in a Polish interface -- and one module carried a translation
-handle to paper over it at display time. That covered React screens and
-nothing else: the path under the picker, the search box, the printed label on
-the door and every exported document still read the stored name, so the same
-room answered to two names depending on where you looked.
+A seeded name is written in the language the seeding runs in, and the stored
+name is what every surface reads: the path under the picker, the search box,
+the printed label on the door and every exported document.
 
 A location's name is data. It is editable, it is printed, it is exported: the
 place to choose its language is the moment it is written, once, and every

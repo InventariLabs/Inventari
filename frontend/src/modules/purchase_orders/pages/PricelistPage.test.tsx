@@ -172,8 +172,8 @@ describe("PricelistPage", () => {
     mockApi();
     render(<PageHost />);
 
-    // The table used to answer "No prices yet" on a page with no supplier
-    // picked — an answer to a question nobody had asked.
+    // With no supplier picked, the table asks for one rather than answering
+    // "No prices yet", which would answer a question nobody had asked.
     expect(await screen.findByText("Pick a supplier")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Add price" })).toBeDisabled();
   });

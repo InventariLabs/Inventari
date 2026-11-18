@@ -150,9 +150,9 @@ class TestStatsContract:
 def planted_delivery(db_session: Session, test_user: User) -> WebhookDeliveryLog:
     """One endpoint with one delivery, written as rows.
 
-    Both shape tests used to read whatever the org happened to have, and a
-    fresh org has no endpoints — so the list check never looked at an element
-    and the deliveries check skipped in every run. Rows, not the API: the
+    Both shape tests read this planted row rather than whatever the org happens to
+    have: a fresh org has no endpoints, so a list check would never look at an
+    element and a deliveries check would skip. Rows, not the API: the
     create route resolves the URL against SSRF rules, which is not the subject.
     """
     endpoint = WebhookEndpoint(

@@ -1,8 +1,7 @@
 """A document writes each of its records once.
 
-The document executor and the stock service used to split one operation in
-two: the door changed the record's number on its own, and the service
-settled the quants and wrote the movement after it. The one-number stock
+The document executor and the stock service run one operation in a single pass:
+the record's number, the quants and the movement change together. The one-number stock
 model (ADR-022) makes the service's ``post_movement_async`` the one
 pass that changes the records it is handed, checks the grain it took from
 and writes the movement — under the anchor locks it takes up front. Whatever

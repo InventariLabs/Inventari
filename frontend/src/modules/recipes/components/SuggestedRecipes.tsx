@@ -19,10 +19,9 @@ interface SuggestedRecipesProps {
 /**
  * The suggestion's ingredient coverage, written as the recipe cards write it.
  *
- * This used to be a percent icon followed by a bare number — "⁒ 100" — with
- * no title and no accessible name, so a screen reader announced "100" and a
- * sighted reader got a 16px glyph beside 12px text. The percentage came from
- * the same count the card shows as a ratio.
+ * The badge is the ratio the cards write, with a title and an accessible name,
+ * so a screen reader says what the number counts. The percentage comes from the
+ * same count the card shows as a ratio.
  */
 export function AvailabilityBadge({
   available,

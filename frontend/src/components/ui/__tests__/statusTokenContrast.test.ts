@@ -92,8 +92,8 @@ describe("status foreground tokens", () => {
     expect(contrast(dark, fg, bg)).toBeGreaterThanOrEqual(AA);
   });
 
-  // Badges used to switch to `surface-raised` in dark; a caller can still put
-  // one there (a badge inside a raised panel), so the pair has to hold.
+  // A caller can put a badge on `surface-raised` in dark (a badge inside a
+  // raised panel), so the pair has to hold.
   it.each(STATUS_PAIRS)("%s reads on a raised surface in dark mode", (fg) => {
     expect(contrast(dark, fg, "--surface-raised")).toBeGreaterThanOrEqual(AA);
   });

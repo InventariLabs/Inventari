@@ -145,10 +145,9 @@ describe("ActionItemsFeed", () => {
   });
 
   /**
-   * Nothing to do is not news. The card used to hold its place with a heading
-   * and "All done" inside it — and on first paint that was a claim made before
-   * a single provider had answered, since an empty result and an unanswered
-   * one look the same from here.
+   * Nothing to do is not news, so the card is not rendered while the providers
+   * are still answering: an empty result and an unanswered one look the same
+   * from here, and "All done" on first paint would be a claim made too early.
    */
   it("does not render the card while every provider returns nothing", async () => {
     moduleRegistry.register(makeModule("quiet", () => []));

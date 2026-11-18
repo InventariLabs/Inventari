@@ -142,9 +142,8 @@ describe("DocumentActionButtons permission gating", () => {
  *
  * ``cancel_document`` in ``_document_workflow_transitions.py`` accepts DRAFT,
  * PENDING_APPROVAL and CONFIRMED and refuses the rest; a backend test pins
- * that set and points back here. The screen used to offer the action on a
- * draft alone, so a document that stuck at execution held its reservation on
- * the whole shelf with no way out of it for anybody.
+ * that set and points back here. The screen offers the action on each of those
+ * statuses, so no document is left holding its reservation without a way out.
  */
 const CANCELLABLE = ["DRAFT", "PENDING_APPROVAL", "CONFIRMED"];
 

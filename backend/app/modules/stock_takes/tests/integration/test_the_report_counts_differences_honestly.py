@@ -2,10 +2,9 @@
 The report must answer "was this count clean?" without lying.
 
 ``is_discrepancy`` means "beyond the tolerance — somebody must explain it".
-The report used to read it as "differs", so a row the tolerance excused was
-published as a perfect match while the correction it produced sat in the
-ledger, and the list card said "0 discrepancies" about a completion that
-overwrote a product's stock.
+The report counts a row by what the flag means, so a row the tolerance excused
+is a tolerated difference, and a completion that overwrote a product's stock
+is never counted as "0 discrepancies".
 """
 
 from decimal import Decimal

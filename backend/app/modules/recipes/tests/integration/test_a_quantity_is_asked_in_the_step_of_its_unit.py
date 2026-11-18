@@ -106,8 +106,8 @@ class TestOnlyWhatSharesAMeasureIsAddedUp:
     ) -> None:
         """Weight and count do not meet, so the list keeps them apart.
 
-        They used to be added as bare numbers: 500 g plus 2 pcs came out as
-        502 of whichever unit the first recipe happened to name.
+        They are never added as bare numbers: 500 g plus 2 pcs is not 502 of
+        whichever unit the first recipe happens to name.
         """
         name = f'Flour {uuid.uuid4().hex[:6]}'
         result = _plan_of(

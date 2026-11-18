@@ -692,10 +692,9 @@ class TestAlwaysAtHomeAndTheRefresh:
         auth_headers: dict[str, str],
         db_session: Session,
     ) -> None:
-        """The second run used to return the list with zeros and add nothing.
+        """The second run refreshes the list it made, with what the plan needs now.
 
-        A meal planned after the first generation was a meal that never
-        reached the shopping list; the run now refreshes the list it made.
+        A meal planned after the first generation reaches the shopping list.
         """
         plan_id = _plan_with(
             client,
@@ -776,9 +775,9 @@ class TestAlwaysAtHomeAndTheRefresh:
     ) -> None:
         """Updating the list tops an open line up to what the plan asks now.
 
-        The refresh used to skip a line whose name and unit were on the list
-        and record the meals as listed, so 200 g stayed 200 g where 500 g was
-        needed and the plan stopped saying anything was missing.
+        The refresh does not skip a line whose name and unit are on the list and
+        record the meals as listed: 200 g becomes 500 g where 500 g is needed, and
+        the plan says what is missing.
         """
         plan_id = _plan_with(
             client,

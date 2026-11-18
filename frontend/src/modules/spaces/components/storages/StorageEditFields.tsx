@@ -42,9 +42,9 @@ interface StorageEditFieldsProps {
  *
  * The fields were the Edit dialog's body before; the dialog is gone and the
  * same controls now sit on the page under one Save. Tracked and custom
- * product fields used to appear only on a leaf — a location that holds both
- * locations and products of its own had no way to say what a product placed
- * directly there records. Every level edits them now.
+ * product fields appear on every level, not only on a leaf: a location that
+ * holds both locations and products of its own says what a product placed
+ * directly there records. Every level edits them.
  */
 export function StorageEditFields({
   formData,

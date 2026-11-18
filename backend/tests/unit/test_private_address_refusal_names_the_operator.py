@@ -1,10 +1,10 @@
 """A refused private address sends an organization administrator to the operator.
 
-The refusal for a webhook (and for an AI connection) used to tell the reader
-to set a variable in ``.env`` and restart the server. On an instance with
-several organizations the reader is an administrator of one of them, not the
-person who runs the installation, and has no ``.env`` to edit. The sentence now
-says to ask whoever runs the installation, in every language; the name of the
+The refusal for a webhook (and for an AI connection) tells the reader to ask
+whoever runs the installation, not to set a variable in ``.env`` and restart
+the server. On an instance with several organizations the reader is an
+administrator of one of them, not the person who runs the installation, and has
+no ``.env`` to edit. The sentence says so in every language; the name of the
 setting stays so the operator knows what to look for.
 """
 

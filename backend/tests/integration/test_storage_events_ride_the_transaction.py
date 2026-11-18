@@ -283,7 +283,7 @@ class TestTheEventIsAnOutboxRow:
     async def test_a_reorg_batch_whose_commit_is_refused_leaves_no_event(
         self, session_factory, member
     ) -> None:
-        """The original scenario, with the commit where it now lives: the
+        """The scenario, with the commit where it lives: the
         request's. The batch applied, the caller's commit failed, and the
         events that rode the transaction went with it."""
         request = StorageReorgRequest(
@@ -390,8 +390,8 @@ class TestLabelWritesLeaveTheCommitToTheCaller:
     async def test_a_pool_collision_retries_without_touching_the_callers_work(
         self, session_factory, member
     ) -> None:
-        """The retry used to roll the whole session back. It now undoes only
-        its own batch, so what the caller wrote before survives it."""
+        """The retry undoes only its own batch, so what the caller wrote before
+        survives it."""
         async with session_factory() as session:
             session.add(
                 LabelPool(

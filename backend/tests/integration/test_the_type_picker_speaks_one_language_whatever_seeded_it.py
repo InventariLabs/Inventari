@@ -23,7 +23,7 @@ from app.models.storage_type import StorageType
 
 #: The picker's visible seeded rows: install-day English literal → the Polish
 #: name a Polish reader picks. Deliberately drawn from more than one profile
-#: and from a module declaration — the mixture the picker used to show.
+#: and from a module declaration — the mixture the picker must not show.
 LITERAL_ROWS = {
     'SHELF': ('Shelf / Cabinet', 'Półka / szafa'),
     'STORAGE_ROOM': ('Storage Room', 'Pomieszczenie magazynowe'),

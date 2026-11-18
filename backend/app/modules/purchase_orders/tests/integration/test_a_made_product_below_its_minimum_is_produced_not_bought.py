@@ -1,8 +1,7 @@
 """A product the organization makes, below its minimum, is produced — not bought.
 
-The reorder rule used to turn every shortage into a purchase, even for a
-product with a recipe of its own. With production on, the alert says to make
-it: no supplier is proposed, no draft order is raised for it, and To do
+A product with a recipe of its own is not bought while production is on.
+The alert says to make it: no supplier is proposed, no draft order is raised for it, and To do
 carries a production task that opens the production screen on the product.
 With production off nothing is made here and the shortage is a purchase.
 """

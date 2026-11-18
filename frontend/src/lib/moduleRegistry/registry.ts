@@ -85,7 +85,7 @@ class ModuleRegistry {
    */
   warnOrphanedNav(moduleNames: string[]) {
     const hosted = [...this.modules.values()].flatMap((m) => m.routes ?? []);
-    // The registry keeps a module it once loaded after the organization
+    // The registry keeps a module it has loaded after the organization
     // switches it off, so "registered" is not "enabled": the names handed in
     // are the modules that are on now, and a nav item needing one that is
     // not among them is not shown.

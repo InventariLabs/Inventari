@@ -55,11 +55,10 @@ async def _create_node(
 ) -> StorageLocation:
     """Add one step of the chain through the audited writer.
 
-    Intermediate steps used to go straight to the model — a bare
-    ``StorageLocation`` and a flush — while only the last step passed through
-    ``storage/_writes.create_storage``. The journal then held leaf entries
-    naming a parent whose own creation it never recorded, and the step skipped
-    the interceptors and the ``location.created`` event besides. One writer for
+    Every intermediate step passes through ``storage/_writes.create_storage``,
+    not a bare ``StorageLocation`` and a flush: otherwise the journal would hold
+    leaf entries naming a parent whose own creation it never recorded, and the
+    step would skip the interceptors and the ``location.created`` event. One writer for
     the whole chain: every created level earns its CREATE entry, written in
     the same transaction as the row.
     """

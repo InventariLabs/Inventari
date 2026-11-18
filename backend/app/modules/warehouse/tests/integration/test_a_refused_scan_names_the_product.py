@@ -3,8 +3,8 @@
 On a phone the worker holds the product up to the camera and reads the answer
 off the screen. "Not in the document" without a name leaves them to wonder
 whether the camera read the right box, and a product whose line is already
-done used to be mistaken for one that was never on the document: picking had
-no word for it, so the picker was told the product did not belong there.
+done is recognised as a line on the document: picking has a word for it, so the
+picker is not told the product does not belong there.
 """
 
 from __future__ import annotations

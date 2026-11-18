@@ -4,9 +4,9 @@ The executor settles which product card a line stands for before it asks the
 planner where the goods go: the line's own, its record's, the one a record
 without a card adopts, and — once the receipt is confirmed — the one a bare
 barcode names. The plan shown beforehand (the one-screen preview, the read of
-a draft, the count of receipts waiting for space) used to ask with only the
-first two, so a card whose putaway rule was the whole answer showed the
-document's shelf and the goods reached the rule's.
+a draft, the count of receipts waiting for space) asks with the same cards,
+so a card whose putaway rule is the whole answer shows the rule's shelf, the
+one the goods reach.
 """
 
 from __future__ import annotations

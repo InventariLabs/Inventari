@@ -84,7 +84,7 @@ describe("StorageEditFields — neutral base fields", () => {
 
   it("keeps the product fields on a location that also holds locations", () => {
     // A warehouse's own products record the same fields a shelf's do. The
-    // fields used to be hidden unless the location had no children.
+    // fields stay visible whether or not the location has children.
     renderFields();
     expect(screen.getByText("Product fields here")).toBeInTheDocument();
     expect(screen.getByText("Tracked fields")).toBeInTheDocument();

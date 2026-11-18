@@ -60,7 +60,7 @@ const INLINE_ERROR_FIELDS: ReadonlySet<string> = new Set([
 
 // A 422 whose loc names a field speaks to one input, not to the whole
 // screen. The name-required rule renders red under its input; a server
-// refusal with the same information used to surface only as a vanishing
+// refusal with the same information lands on that field, not in a vanishing
 // toast with the wire string.
 const fieldErrorsFrom422 = (
   error: unknown,

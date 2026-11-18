@@ -2,9 +2,9 @@
 
 The unit selector in the UI offers only real units, but the API is
 reachable by integrations, import scripts and external tests — every
-caller that assembles its own request.  A random UUID as uom_id used to
+caller that assembles its own request.  A random UUID as uom_id must not
 hit the database and die on ``shopping_list_items_uom_id_fkey`` with a
-bare 500.  The write layer now refuses before the row is built, naming
+bare 500.  The write layer refuses before the row is built, naming
 the field.
 """
 

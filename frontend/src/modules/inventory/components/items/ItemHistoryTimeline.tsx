@@ -242,9 +242,8 @@ function HistoryEntry({ entry, locationName, unit }: HistoryEntryProps) {
 /**
  * The document behind the row, named and reachable.
  *
- * The row used to print eight hex characters of the document's id and three
- * dots, which is neither a name a person recognizes nor a string the document
- * search accepts — that field looks up numbers and references. Meanwhile the
+ * The row shows the document's number, which a person recognizes and the
+ * document search accepts, not a fragment of its id. Meanwhile the
  * same response already carries the number the document is filed under, and
  * for a correction the number of the document it corrects. History reads
  * forward everywhere in the application, document to stock; this is the way

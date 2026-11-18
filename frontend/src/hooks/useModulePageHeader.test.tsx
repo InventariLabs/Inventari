@@ -29,8 +29,8 @@ function Shell({ children }: { children: React.ReactNode }) {
 describe("useModulePageHeader without a provider", () => {
   it("says so instead of dropping the header in silence", () => {
     // Only SettingsShell and ModuleShell provide the context. A page mounted
-    // on a flat route under AppShell used to hand its title and its actions to
-    // a no-op default — which is how `/webhooks` lost the only button that
+    // on a flat route under AppShell must not hand its title and its actions to
+    // a no-op default — `/webhooks` would lose the only button that
     // could add a second webhook.
     const complain = vi
       .spyOn(console, "error")

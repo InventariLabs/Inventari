@@ -39,8 +39,9 @@ function renderSection() {
 
 describe("PurchaseNotesSection", () => {
   /**
-   * The label used to be hand-rolled and inline, which left the price field
-   * about 8px below the date field beside it in the same grid row. Asking for
+   * The label is the control's own, not hand-rolled and inline: a hand-rolled
+   * label left the price field about 8px below the date field beside it in the
+   * same grid row. Asking for
    * the control by its label is what proves the component renders it.
    */
   it("reaches the price field through its label", async () => {

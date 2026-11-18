@@ -87,5 +87,5 @@ moduleRegistry.register({
   ],
   useActionItems: useApprovalActionItems,
   // Permissions live in backend/app/modules/approvals/manifest.json — one
-  // declaration point. They used to be repeated here, where nothing read them.
+  // declaration point. They are not repeated here, since nothing here reads them.
 });

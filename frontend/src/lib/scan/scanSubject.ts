@@ -6,9 +6,9 @@ import type { LabelScanView } from "@/types";
  *
  * The registry resolves every kind of code the app prints — label codes,
  * product barcodes, storage-location codes, document numbers, and any of
- * those wrapped in a `?code=` URL — in a single chain. Screens used to keep
- * their own copy of that decision, which is why each of them knew exactly one
- * kind and answered "not found" to the other four.
+ * those wrapped in a `?code=` URL — in a single chain. Screens must not keep
+ * their own copy of that decision: each of them would know exactly one kind
+ * and answer "not found" to the other four.
  */
 export type ScanSubjectKind =
   "product" | "blankLabel" | "archived" | "storage" | "document";

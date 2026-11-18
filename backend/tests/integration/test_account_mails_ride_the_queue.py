@@ -1,11 +1,8 @@
 """The account mails ride the durable queue, not a bare SMTP socket.
 
-Registration links, invitations and password resets used to send
-directly — offloaded to a thread, one refused SMTP connection and the
-mail was gone while the caller still reported success. The exact class
-of mail whose loss hurts most had the least protection behind it. They
-now enqueue ``email_jobs`` rows like every other mail, so an outage
-retries instead of stranding the recipient.
+Registration links, invitations and password resets are enqueued as
+``email_jobs`` rows like every other mail, so an outage retries instead of
+stranding the recipient.
 """
 
 import smtplib

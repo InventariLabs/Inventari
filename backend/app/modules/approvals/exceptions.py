@@ -18,7 +18,7 @@ class ApprovalError(ServiceRejectionError):
         HTTP envelope and lands in a toast verbatim — here and in the modules
         that proxy the engine (documents, purchase orders, equipment). An
         English literal at the raise site therefore answers a Polish interface
-        in English, which is exactly what it used to do.
+        in English, which is exactly the failure to avoid.
 
         ``ApprovalNotFoundError`` needs no such treatment: routers turn it into
         ``NotFoundException``, which looks its own message up by resource slug.

@@ -1,9 +1,8 @@
 /**
- * regression: the public attestation page used to offer its
- * buttons on a link it already knew would refuse them — the equipment
- * returned, the campaign cancelled, the token expired. The GET now
- * carries ``closed_reason``, and the page tells it instead of inviting a
- * click that can only 409.
+ * The public attestation page offers no buttons on a link it already knows
+ * will refuse them — the equipment returned, the campaign cancelled, the token
+ * expired. The GET carries ``closed_reason``, and the page tells the reader
+ * instead of inviting a click that can only 409.
  */
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test/utils";

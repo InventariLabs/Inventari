@@ -21,8 +21,8 @@ describe("RecipeEditForm", () => {
   });
 
   it("answers the click with a sheet while the recipe is still loading", () => {
-    // Cold cache or a slow link: the form used to return nothing until the
-    // detail landed, so the Edit button looked dead.
+    // Cold cache or a slow link: the form answers with the sheet while the
+    // detail travels, so the Edit button does not look dead.
     mocks.useRecipe.mockReturnValue({ data: undefined, isError: false });
 
     render(<RecipeEditForm {...props} />);

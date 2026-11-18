@@ -93,11 +93,9 @@ describe("ApiKeysPage", () => {
   });
 
   it("says what no key may carry, including the part nobody expects", async () => {
-    // It used to describe org:settings:write as "change organization
-    // settings", a thing too vague to act on; then as the SKU naming alone,
-    // which was two of the four areas behind it. The route table names all
-    // four, and no key may hold it, so the line has to be worth reading on
-    // the side that says what a key does NOT get.
+    // The line names all four areas org:settings:write covers: the route table
+    // lists them and no key may hold it, so a vague line would not help the
+    // reader. It is worth reading on the side that says what a key does NOT get.
     renderPage();
 
     expect(await screen.findByText("Never on a key")).toBeInTheDocument();

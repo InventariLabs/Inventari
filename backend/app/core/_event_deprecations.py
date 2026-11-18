@@ -1,14 +1,10 @@
 """Deprecated event aliases with removal expiry.
 
-**The register stands empty today.** Every qualifier it once named — nine
-vertical aliases parked in the core ``SystemEvent`` enum, then the two
-neutral-vocabulary spellings ``item.consumed``/``item.discarded`` — left
-without a window. The last two were on the wire in the one sense that
-matters for a deprecation window: administrators could subscribe to them,
-and the names sat in ``webhook_endpoints.event_types`` rows. No database
-outside disposable dev/demo data, which resets with its stack, held such
-rows, so the aliases left without a window and without a migration rather
-than carry a deadline for nobody.
+**The register stands empty today.** An alias gets a window only when a database
+outside disposable dev/demo data can hold a subscription to it, because
+administrators subscribe through ``webhook_endpoints.event_types``. An alias
+that no such database holds needs neither a window nor a migration, and a
+deadline for nobody would only be noise.
 
 The machinery below is not dead weight. An event deprecated once outside
 subscribers can depend on it gets a real, dated window: register it

@@ -1,11 +1,10 @@
 """The maker refusals speak the reader's language.
 
-The module's refusals used to be raw English literals: a Polish reader met a
-sentence about a line that cannot be its own parent in the tree editor's error
-slot and "Overproduction is disabled in settings" on a run card, right next to
-siblings that already read from the error catalog. Each refusal a reader can
-trigger now raises through the keyed rejection, and these tests pin the
-sentences they see.
+The module's refusals are keyed and read from the error catalog, like the siblings
+beside them, so a Polish reader meets the same refusals in Polish: a line that
+cannot be its own parent, and "Overproduction is disabled in settings" on a run
+card. Each refusal a reader can trigger raises through the keyed rejection, and
+these tests pin the sentences they see.
 
 The assertions are equalities against the Polish text, not status codes: with
 a service reverted to its literal the response still answers 400, and only

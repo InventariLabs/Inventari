@@ -64,7 +64,7 @@ class TestOneCodeForOneCollision:
     def test_invalid_input_is_still_a_validation_error(
         self, client, auth_headers
     ) -> None:
-        """The update endpoint used to call every service refusal a conflict."""
+        """Invalid input stays a validation error on the update endpoint, not a conflict."""
         site = _create(client, auth_headers, 'Site A')
         site_id = site.json()['id']
 

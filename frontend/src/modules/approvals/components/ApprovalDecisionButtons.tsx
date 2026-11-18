@@ -118,8 +118,7 @@ export function ApprovalDecisionButtons({
   };
 
   // "Withdraw", not "Cancel": the requester takes back their own open
-  // request. The dialog used to offer "Cancel request" next to "Cancel" —
-  // one cancelled the request, the other cancelled the cancelling.
+  // request. "Cancel" beside it would read as cancelling the cancelling.
   const handleWithdraw = async () => {
     try {
       await cancelRequest.mutateAsync({ id: approval.id });
@@ -139,9 +138,9 @@ export function ApprovalDecisionButtons({
   // which is the whole point of the full-width phone layout.
   const actionClass = cn(widthClass, "whitespace-nowrap");
 
-  // A resolved request has nothing to decide. The check used to live in
-  // ApprovalDecisionPanel only, so the detail page — which renders these
-  // buttons directly — offered Approve on a rejected or withdrawn
+  // A resolved request has nothing to decide. The check lives here, not only
+  // in ApprovalDecisionPanel, because the detail page renders these buttons
+  // directly and would otherwise offer Approve on a rejected or withdrawn
   // request.
   const isTerminal = TERMINAL_STATUSES.has(approval.status);
 
@@ -211,8 +210,7 @@ a hairline across a stack, a rule beside a row.
       {showRejectInput && (
         <div className="flex flex-col gap-1">
           <div className="flex flex-wrap items-center justify-end gap-2">
-            {/* The field used to carry aria-invalid and nothing
-                else — no visible change, no message tied to it. `error`
+            {/* The field carries aria-invalid and a message tied to it. `error`
                 gives all three at once (red border, role="alert" message,
                 aria-describedby), the same way every other form reports. */}
             <Input
@@ -261,7 +259,7 @@ a hairline across a stack, a rule beside a row.
           for warehouse execution (the stock moves later, at the receipt) —
  so it asks, exactly as the bulk action has since.
           Withdrawing your own open request changes nothing about the
-          document and no longer opens a dialog for it. */}
+          document and does not open a dialog for it. */}
       <ApproveConfirmDialog
         open={showApproveConfirm}
         approval={approval}

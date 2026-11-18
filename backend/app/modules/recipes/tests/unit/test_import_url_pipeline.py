@@ -105,10 +105,10 @@ class TestCheckAiLimit:
 class TestTheRefusalReachesTheCaller:
     """An over-limit import must refuse, not fall through to the scraper.
 
-    The gate this pins used to be wrapped in ``except Exception`` — and an
+    The gate this pins is not wrapped in ``except Exception``: an
     ``HTTPException`` is an ``Exception``, so the 429 raised by the counter
-    was logged as "non-blocking" and the import continued. Restore that
-    wrapper and this test fails on the 429 that never comes.
+    must pass through rather than be logged as "non-blocking". A wrapper that
+    swallows it makes this test fail on the 429 that never comes.
     """
 
     async def test_a_refused_import_never_reaches_the_scraper(self) -> None:

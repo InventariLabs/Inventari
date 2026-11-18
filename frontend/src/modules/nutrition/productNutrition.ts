@@ -51,7 +51,7 @@ const groupOf = (
  * The product's nutrition per 100 g, or null when nothing is known.
  *
  * A value typed in by hand is saved to the product, not to the record, and the
- * edit sheet used to read the record alone — so a save came back as "No data".
+ * edit sheet reads that figure too.
  * The product's figure wins; the record's enrichment fills what it lacks.
  */
 export function productNutrition(

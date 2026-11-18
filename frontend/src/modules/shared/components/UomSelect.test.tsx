@@ -45,12 +45,11 @@ const PIECE = {
  * The word for a unit comes from one catalogue, and every reader takes it
  * from there.
  *
- * This picker used to read its own — `items:uomSymbols`, keyed by the unit's
- * *name* rather than its symbol, and neither mirrored in the backend nor
- * covered by `check-units-labels`. Both said "szt." on the day they were
- * written, which is exactly the state a guard exists for: a word changed on
- * the canonical side would have left the picker saying the old one, beside a
- * list that had moved on.
+ * This picker reads the canonical unit labels, not a copy of its own such as
+ * `items:uomSymbols`, which would be keyed by the unit's *name* rather than its
+ * symbol and would not be mirrored in the backend or covered by
+ * `check-units-labels`. A word changed on the canonical side must reach the
+ * picker, so the picker has no copy of its own to fall behind.
  */
 describe("UomSelect", () => {
   it("writes the unit the way the canonical catalogue does", async () => {

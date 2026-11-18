@@ -1,8 +1,8 @@
 """Recipe and production estimates ask one price policy; completion uses layers.
 
 Without the shared policy the supplier-only case costs 8.40 in recipes and
-zero in maker. A stated zero-cost layer also used to fall through to an offer
-in recipes, although maker correctly kept it at zero.
+zero in maker. A stated zero-cost layer stays at zero in recipes too, as it
+does in maker, and never falls through to an offer.
 """
 
 from datetime import date

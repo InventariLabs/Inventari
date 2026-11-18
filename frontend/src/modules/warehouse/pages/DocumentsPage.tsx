@@ -203,10 +203,8 @@ export default function DocumentsPage() {
         <DocumentsGettingStarted onCreateFirst={() => setNewDocType("IN")} />
       ) : documents.length === 0 ? (
         // The two empties of a filtered list are different answers. This one
-        // used to give the other's: "No documents yet. Create your first
-        // warehouse document" over a shelf of forty-nine, telling the reader
-        // their search was a missing database and prescribing a cure a
-        // read-only account is not allowed to take.
+        // never gives the other's answer: the "No documents yet" prompt is for an
+        // empty warehouse, not for a search that matched nothing.
         <EmptyState
           icon={SearchX}
           title={t("empty.noResultsTitle")}

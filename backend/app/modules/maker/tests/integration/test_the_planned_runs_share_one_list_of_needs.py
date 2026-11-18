@@ -394,7 +394,7 @@ class TestTheCombinedList:
         coverage = {row['id']: row['coverage'] for row in listed}
 
         # Five flour, five dough from it, five bread from the dough: all of it
-        # is met. Bread used to explode the dough down to flour again and
+        # is met. Bread does not explode the dough down to flour again, so it does not
         # claim the same five the dough run claims.
         assert coverage[dough_run['id']] == 'covered'
         assert coverage[bread_run['id']] == 'covered'

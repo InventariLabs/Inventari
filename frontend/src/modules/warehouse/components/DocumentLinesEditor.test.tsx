@@ -574,7 +574,7 @@ describe("DocumentLinesEditor — a search limited to the source location", () =
 
   it("points to where a product stands that the source does not hold", async () => {
     // A transfer from Dry Goods, searching for a cheese that stands in Fridge
-    // B, used to say "No items found" and nothing more.
+    // B, points to where it stands, not only "No items found".
     elsewhereResults.current = [
       { name: "Gouda Cheese", location_name: "Fridge B" },
     ];

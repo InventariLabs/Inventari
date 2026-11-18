@@ -1,7 +1,7 @@
 /**
  * Which sentence a camera refusal deserves.
  *
- * The scanner used to print the browser's own words under a translated
+ * The scanner must not print the browser's own words under a translated
  * heading: "Błąd kamery" over "Error getting userMedia, error =
  * NotSupportedError: Not supported". English in a Polish interface, and no
  * answer to the only question the reader has — what do I do now. The causes
@@ -54,8 +54,8 @@ export function cameraErrorKey(
   }
   // Not a missing camera: the device answered and refused the ask. A laptop
   // whose only camera faces the user, scanned at with `facingMode:
-  // "environment"`, used to be told there was no camera on it — while the
-  // reader was looking into the one there was.
+  // "environment"`, must not be told there is no camera on it — while the
+  // reader is looking into the one there is.
   if (saidAny("OverconstrainedError")) {
     return "errorCameraOverconstrained";
   }

@@ -54,8 +54,8 @@ def _iter_forbidden_imports(
 
     One walk serves the four scans in this module. ``ImportFrom`` names one
     module; ``Import`` binds a list, and every alias is checked — the layer
-    scans used to read only the first one, so ``import os, app.models.item``
-    slipped past them. An import under ``if TYPE_CHECKING:`` is a hint, not
+    scans read every alias, since one that read only the first would let
+    ``import os, app.models.item`` slip past. An import under ``if TYPE_CHECKING:`` is a hint, not
     a dependency, and stays out.
     """
     type_checking_lines = _collect_type_checking_line_ranges(tree)
@@ -370,9 +370,9 @@ def find_module_boundary_violations(
         if _is_model_file(py_file) or _is_alembic_env(py_file, root):
             continue
 
-        # A file that is not valid Python used to take the whole gate down
-        # with a traceback: every other check after it went unrun, and the
-        # operator read a stack trace instead of a finding. Reading and
+        # A file that is not valid Python is reported as a finding, so it does
+        # not take the whole gate down with a traceback and leave every other
+        # check unrun. Reading and
         # parsing happen once here; a file that fails is skipped and named
         # where the skip belongs — ``_check_cross_module_imports`` walks the
         # same module tree and reports it as "not read".

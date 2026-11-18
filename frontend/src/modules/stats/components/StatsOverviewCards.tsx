@@ -81,10 +81,11 @@ export function StatsOverviewCards({
         label={t("stats:places")}
       />
       {/* The same decision the health card above reads, from the same count:
-          these tiles used to read the overview — a second computation of
-          the numbers beside them. And these two used to be unconditional,
-          so a workspace the card had just told "you keep no dates"
-          answered "0 expiring, 8 expired" one click lower. */}
+          these tiles read the same count as the health card, not the overview,
+          which would be a second computation of the numbers beside them. These
+          two are conditional on the same decision, so a workspace the card
+          tells "you keep no dates" never sees "0 expiring, 8 expired" one click
+          lower. */}
       {tracksExpiry && (
         <>
           <OverviewTile

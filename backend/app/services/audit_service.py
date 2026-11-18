@@ -410,9 +410,10 @@ async def list_target_types_async(
 ) -> list[str]:
     """Distinct ``target_type`` values this organization's log actually holds.
 
-    The screen's filter used to offer three hand-written values, two of which
-    belonged to modules the profile does not install, while the things that
-    really changed — locations, users, modules — were not on the list at all.
+    The screen's filter is built from the log, not from a hand-written list:
+    a hand-written one offers values that belong to modules the profile does
+    not install, and misses the things that really changed — locations, users,
+    modules.
     A filter built from the log cannot offer a choice that matches nothing.
 
     Read as a loose index scan: the smallest type, then the smallest one above

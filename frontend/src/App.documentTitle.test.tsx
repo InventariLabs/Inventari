@@ -11,8 +11,8 @@ import App from "./App";
 /**
  * The tab, the bookmark and the history entry name the page — in the language
  * on screen — and follow it from one route to the next. A screen reader
- * announces the document title on every navigation; it used to be
- * `Inventari` everywhere.
+ * announces the document title on every navigation, so the title is the
+ * page's own name in that language, never a fixed `Inventari`.
  */
 describe("the document title on the routes reached before signing in", () => {
   beforeEach(() => {

@@ -179,10 +179,9 @@ export function useItemsPageActions({
     [items, setConsumeDialogItem],
   );
 
-  /** One way to delete a record, and it asks why. The row used to open a
-   * plain "are you sure?" while the edit modal asked for a reason, so the
-   * reason on file said more about which button people reach for than about
-   * what happened to the things. */
+  /** One way to delete a record, and it asks why. Every delete path asks, so
+   * the reasons on file say what happened to the things, not which button was
+   * pressed. */
   const handleDelete = useCallback(
     (id: string) => {
       const item = items.find((i) => i.id === id);

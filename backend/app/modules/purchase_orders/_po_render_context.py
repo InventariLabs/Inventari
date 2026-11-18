@@ -3,9 +3,8 @@
 Extracted from ``_router_po.py`` to keep that file under the 400-LOC lint
 limit. This is the SINGLE context builder for both output paths — the HTML
 preview endpoint and ``generate_po_pdf`` render the same template with the
-same context, so a placeholder that works in one works in both (
-follow-up: the two builders used to drift apart, e.g. ``tax_pct`` existed
-only in the PDF and ``po_title`` only in the preview).
+same context, so a placeholder that works in one works in both. Both paths
+build the same keys, so the two cannot drift apart.
 
 PDF helpers go through ``core_api.pdf`` — no direct
 ``app.services`` imports in module code.

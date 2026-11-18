@@ -18,8 +18,7 @@ class LabelPoolCreate(BaseModel):
     count: int = Field(50, ge=1, le=500, description='Number of labels to generate')
     # The character class and the cap come from the same module the
     # scanner reads its pattern out of: this field's own example ('B12')
-    # used to produce codes the scanner refused, because the two were
-    # written apart and disagreed about digits.
+    # must produce codes the scanner accepts, so the two stay in one module.
     prefix: str = Field(
         'STM',
         min_length=1,
@@ -126,7 +125,6 @@ class LabelAssignRequest(BaseModel):
     #: The form after a scan is the product form, so it asks this too — a
     #: unit that differs from the matched template's is a deliberate choice
     #: and has to be confirmed (``app.services.items._unit_choice``). The
-    #: field used to live only on ``ItemCreate``: the form settled it on the
-    #: payload, this model dropped it on the floor, and the scan door kept
-    #: its own opinion about the rule.
+    #: field lives here as well as on ``ItemCreate``: the form settles it on the
+    #: payload, and the scan door follows the same rule.
     unit_confirmed_over_template: bool = False

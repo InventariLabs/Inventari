@@ -1,9 +1,9 @@
 """A module outside this repository imports Core through the SDK, nothing else.
 
-The install-time scan used to be a denylist: ``app.core.deps``,
+The install-time scan admits only the declared surface. ``app.core.deps``,
 ``app.core.logging``, ``app.i18n.service`` and every other helper a shipped
-module happened to use loaded fine, so an author copied them and each became a
-contract nobody had promised to keep. The surface is now declared
+module happens to use would load fine, so an author would copy them and each
+would become a contract nobody had promised to keep. The surface is declared
 (``MODULE_IMPORT_SURFACE``): a module installed from outside may reach
 ``app.core.contracts``, ``app.core.public_api`` and ``app.core.module_sdk``,
 plus its own package. The modules this repository ships predate the door and

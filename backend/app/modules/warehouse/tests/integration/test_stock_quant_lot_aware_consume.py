@@ -264,10 +264,9 @@ class TestLotAwareConsumeMove:
 
         # Receive 6 into LOT-D naming the SAME item. A record holds one
         # batch, so the delivery opens a record of its own beside it
-        # (LOT-C=4 on the first, LOT-D=6 on the second). It used to top the
-        # first record up to 10 across two batches; a record that still
-        # spans batches is the bridge's fallback, pinned where the bridge is
-        # tested.
+        # (LOT-C=4 on the first, LOT-D=6 on the second); the delivery never tops the
+        # first record up across two batches. A record that still spans batches
+        # is the bridge's fallback, pinned where the bridge is tested.
         resp = client.post(
             '/api/v1/warehouse/documents',
             headers=doc_auth_headers,

@@ -4,10 +4,8 @@ One question with two directions — what a named vertical module counts as
 its own, and what a general (non-module) list may show — and they are
 mirrors of each other by construction. They sit in the core rather than in
 ``app.services`` because the modules themselves ask them: the equipment
-list used to hold its own copy of "is this equipment", and the copy
-disagreed with the core in both directions — a location row promising an
-asset the list could not produce, and an asset in a location the module's
-own map did not show.
+list asks the core for "is this equipment" instead of keeping a copy, so a
+location row and the list cannot promise different assets.
 """
 
 from collections.abc import Callable, Iterable
@@ -165,9 +163,9 @@ async def hidden_module_tags_async(
     module claims a tag in this build, which is how the item list reads the
     same setting (``claimed_tags or None``).
 
-    A report used to read the organization whole while the products list
-    beside it left the module's records out, so a household's statistics
-    counted the family laptop among the food.
+    A report and the products list both read only the records their module
+    claims, so a household's statistics do not count the family laptop among
+    the food.
     """
     from app.core.module_scope import get_claimed_context_tags
     from app.models.organization import Organization

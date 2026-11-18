@@ -3,10 +3,9 @@ import declaredCoverage from "../../scripts/translation-coverage.json";
 /**
  * The one list of the languages the application ships.
  *
- * It used to live inside `config.ts`, and every other place that needed the
- * set copied it: the language picker, two test gates and the whole backend
- * each carried their own five codes (see the new-language recipe in
- * CONTRIBUTING.md). The gates now read the locales directory instead of a
+ * It lives here rather than inside `config.ts`, so every place that needs the
+ * set imports it instead of keeping its own copy (see the new-language recipe in
+ * CONTRIBUTING.md). The gates read the locales directory instead of a
  * list in code; this module stays the runtime's own answer — what the
  * detector may resolve, what the picker offers, what the API accepts — and
  * the parity gate holds the directory and this list to each other.

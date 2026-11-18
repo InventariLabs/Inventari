@@ -446,9 +446,8 @@ describe("ItemTable — focus ring and the quantity button's name", () => {
 });
 
 /**
- * row actions used to sit at opacity-40 until hover — reading as
- * disabled, failing AA, and never appearing on touch. They rest on
- * text-on-muted now, and Delete is separated and marked danger at rest.
+ * Row actions rest on text-on-muted: visible on touch, not dimmed as disabled,
+ * and AA-readable. Delete is separated and marked danger at rest.
  */
 describe("ItemTable — always-visible row actions", () => {
   it("never hides the actions behind hover opacity", () => {

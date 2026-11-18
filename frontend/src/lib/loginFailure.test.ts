@@ -1,7 +1,7 @@
 /**
- * A failed sign-in used to have one sentence for every cause. A reader
- * blocked by the rate limiter was told their password was wrong, and so was
- * a reader with no connection — both then changed a password that worked.
+ * A failed sign-in has one sentence for every cause. A reader blocked by the
+ * rate limiter must not be told their password is wrong, and neither may a
+ * reader with no connection: either would change a password that works.
  */
 import { AxiosError, AxiosHeaders } from "axios";
 import { describe, expect, it } from "vitest";

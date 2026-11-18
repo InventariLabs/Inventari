@@ -111,8 +111,8 @@ class TestAuthRegister:
         """`/register` is bootstrap-or-invite, not open self-service.
 
         The UI only ever posts here for the first account or with an invite
-        code in the URL; the endpoint used to accept a bare email/password
-        from anyone and mint an account plus a fresh organization.
+        code in the URL; the endpoint refuses a bare email/password from anyone,
+        where it would otherwise mint an account plus a fresh organization.
         """
         response = client.post(
             '/api/v1/auth/register',

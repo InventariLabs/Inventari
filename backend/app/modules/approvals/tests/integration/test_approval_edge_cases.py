@@ -490,8 +490,8 @@ class TestDeleteWorkflowEdgeCases:
     ) -> None:
         """a workflow that ran is archived, and its history stays.
 
-        Deleting used to wipe every request and decision raised under the
-        workflow — who approved what, and when, gone from a settings screen.
+        Deleting keeps every request and decision raised under the workflow,
+        so who approved what, and when, stays on record.
         """
         from sqlalchemy import select
 
@@ -672,10 +672,9 @@ class TestApprovalNotes:
 
 @pytest.mark.integration
 class TestCreateWorkflowUpdateGuardsActiveRequests:
-    """Bug fix: ``create_workflow`` previously silently overwrote an
-    existing workflow's stages even when there were active requests, which
-    could leave in-flight requests pointing at non-existent stage orders.
-    The fix: refuse to overwrite if any active requests exist.
+    """``create_workflow`` refuses to overwrite a workflow's stages while any
+    active request exists, since in-flight requests would point at stage orders
+    that no longer exist.
     """
 
     async def test_recreate_raises_when_active_requests_exist(
@@ -763,9 +762,8 @@ class TestCreateWorkflowUpdateGuardsActiveRequests:
 
 @pytest.mark.integration
 class TestUpdateWorkflowRejectsEmptyStages:
-    """Bug fix: ``update_workflow`` previously accepted ``stages=[]``,
-    which would put the workflow into an unusable state.  The fix: reject
-    empty stages with a clear error.
+    """``update_workflow`` rejects ``stages=[]`` with a clear error, since an
+    empty stage list leaves the workflow unusable.
     """
 
     async def test_update_with_empty_stages_raises(
@@ -813,9 +811,8 @@ class TestUpdateWorkflowRejectsEmptyStages:
 
 @pytest.mark.integration
 class TestStagesListNotMutated:
-    """Bug fix: the service previously mutated the caller's stages list/dict
-    in place when auto-assigning ``order``.  The fix: work on a defensive
-    copy so the caller's data is never modified.
+    """The service works on a copy of the caller's stages, so auto-assigning
+    ``order`` never modifies the caller's list or dicts.
     """
 
     async def test_create_does_not_mutate_caller_stages(

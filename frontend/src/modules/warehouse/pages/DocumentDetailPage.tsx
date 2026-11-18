@@ -145,7 +145,7 @@ function approvalSlotData<TApproval extends { status?: string }>(
  * exists at all — a threshold somebody configured — and the
  * approval-requirement endpoint answers whether this document waits for an
  * approval and whether anybody can give it one. Without a threshold there is
- * no exception to name, and the sentence used to name one anyway. The module
+ * no exception to name, so the sentence names none. The module
  * switch is the fourth fact for the same reason: with the approvals module
  * off the server's gate stands down entirely, so there is no queue for any
  * sentence to name.
@@ -296,7 +296,7 @@ export function confirmDialogMessage(
     }
     // The type is not gated, and the value threshold still is server
     // business — but an organization that has configured no threshold has
-    // no exception to name, and the sentence used to name it anyway. Nor
+    // no exception to name, so the sentence does not name one. Nor
     // has one whose approvals module is off: the gate stands down with it,
     // so nothing is sent anywhere and the threshold is inert.
     if (facts.hasThreshold && facts.approvalsEnabled) {
@@ -406,9 +406,9 @@ export default function DocumentDetailPage() {
   });
   // The confirm dialog names the consequence the server's own rule settles —
   // the profile's listed types and threshold, and, when the profile names
-  // neither, an active approval workflow for documents. The page used to
-  // recompute the workflow half itself from the approvals module's list,
-  // which was a second definition of one rule.
+  // neither, an active approval workflow for documents. The page asks the
+  // server for that answer rather than recomputing the workflow half from the
+  // approvals module's list, which would be a second definition of one rule.
   const { data: approvalRequirement } = useDocumentApprovalRequirement(id, {
     enabled: isModuleEnabled("approvals"),
   });

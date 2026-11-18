@@ -1,11 +1,10 @@
 """Confirming a dispatch holds the batch the dispatch will draw.
 
 A line without a named batch draws by the product's removal strategy when it
-is completed. The hold made at confirmation used to plan by FIFO whatever the
-product said, so a first-expired-first-out product had the oldest-received
-batch promised to the dispatch while the dispatch itself took the one that
-expires first: the promise covered the wrong stock, and the batch that was
-actually taken stood unprotected for another document in between.
+is completed, and the hold made at confirmation plans by that same strategy. So a
+first-expired-first-out product has the batch that expires first promised to the
+dispatch, and the batch the dispatch takes is held for it, not left unprotected
+for another document in between.
 """
 
 from __future__ import annotations

@@ -36,9 +36,8 @@ describe("ImportMappingStep", () => {
   });
 
   it("shows the first rows under the mapping, in the mapped columns", () => {
-    // The step used to ask for a mapping and show no data at all, so a sheet
-    // with a shifted header row looked correctly mapped and the mismatch
-    // only turned up after the rows had been written.
+    // The step shows the first rows under the mapping, so a sheet with a
+    // shifted header row is visibly wrong before anything is written.
     render(
       <ImportMappingStep
         {...mockProps}

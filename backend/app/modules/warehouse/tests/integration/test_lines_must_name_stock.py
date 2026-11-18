@@ -68,7 +68,7 @@ class TestLinesMustNameStock:
         doc_stock_item: Item,
         db_session: Session,
     ) -> None:
-        """The shape that used to close as done and move nothing."""
+        """A scrap naming only a product is refused, not closed as done and moved nothing."""
         template_id = doc_stock_item.template_id
         assert template_id is not None
         doc_id = _create(
@@ -153,9 +153,9 @@ class TestLinesMustNameStock:
         doc_target_location: StorageLocation,
         doc_stock_item: Item,
     ) -> None:
-        """It used to be issued, confirmed, and only then found unexecutable.
+        """A transfer naming only a product is refused at confirmation, not found unexecutable later.
 
-        Worse than that from the floor: the scan session would start, take the
+        On the floor the scan session would start, take the
         line to picked, and leave the document unable to complete or cancel.
         """
         template_id = doc_stock_item.template_id
@@ -209,9 +209,8 @@ class TestLinesMustNameStock:
     ) -> None:
         """Without a location too — a scrap has no shelf of its own to give.
 
-        The location used to be the only way to ask for stock, so the scrap
-        form fell back to the catalogue and built the lines this test's first
-        case refuses.
+        A location is not required to ask for stock, so the scrap form searches
+        the stock itself rather than the catalogue.
         """
         resp = client.get(
             '/api/v1/warehouse/product-search',

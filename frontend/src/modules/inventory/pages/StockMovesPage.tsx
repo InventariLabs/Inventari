@@ -3,8 +3,7 @@
  *
  * The organization's movement ledger: what came in, what left, what moved
  * between its own places, and who recorded it. Every path that changes
- * physical stock writes one of these rows, and until now none of them was
- * visible anywhere in the application.
+ * physical stock writes one of these rows, and every one of them is shown here.
  *
  * Nobody comes to a ledger asking for everything, so the controls are the
  * questions a warehouse actually asks: which direction, which place (and
@@ -65,9 +64,9 @@ export interface MoveFilterNames {
 
 /**
  * The filters the reader actually set, named the way the controls name
- * them. The empty state used to advise widening "the dates" and clearing
- * "the storage" whatever was on: a reader whose only narrowing was a
- * direction tab was sent looking for controls that were not even open.
+ * them. The empty state advises widening "the dates" or clearing "the storage"
+ * only for the filters that are on: a reader whose only narrowing is a
+ * direction tab is not sent looking for controls that are not even open.
  */
 export function describeMoveFilters(
   t: TFunction,

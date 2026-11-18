@@ -5,10 +5,6 @@ particular shelf, so it draws on every location the organization has.
 That draw lives in Core — ``core_api.stock.take_from_the_records_async``
 with no shelf named — beside the single-shelf one it shares its removal
 order with.
-
-It used to live here, with a Python re-implementation of Core's FEFO/FIFO
-sort and a comment naming the line numbers it mirrored. The mirror is gone;
-what is left is the module's own vocabulary for the result.
 """
 
 from __future__ import annotations

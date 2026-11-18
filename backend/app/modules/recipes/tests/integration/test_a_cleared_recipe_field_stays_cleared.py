@@ -1,9 +1,8 @@
 """A cleared recipe field saves as empty — and reads back empty.
 
 The form's four clearable fields (description, instructions, prep time,
-tags) used to travel only as `undefined`, so the update's exclude_unset
-never saw them and the old values came back after every save. The form
-now sends explicit nulls; this pins the server side of that contract:
+tags) is sent as explicit nulls, so the update's exclude_unset sees them and
+an emptied field stays empty. This pins the server side of that contract:
 an explicit null clears the field, a missing key leaves it alone.
 """
 

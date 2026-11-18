@@ -8,8 +8,8 @@ import { useStorageTypesTrackExpiry } from "./useStorages";
  * card, the detail cards, the alerts and the products list alike.
  *
  * Two signals, either of which settles it: a location that behaves that way, or
- * a record that carries a date. Four screens used to ask their own version of
- * this question, and two of them disagreed in the same organization.
+ * a record that carries a date. The four screens that ask this question share
+ * one answer, so two of them cannot disagree in the same organization.
  *
  * The second signal is the statistics overview, read over its route under the
  * key the stats module's own overview uses, so both share one answer. With the

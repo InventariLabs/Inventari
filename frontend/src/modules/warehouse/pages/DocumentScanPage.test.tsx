@@ -96,7 +96,7 @@ const unrecognized = () =>
   });
 
 /** The default profile: the shape `models/profile.py` ships, which numbers
- *  `IN/2026/001` — the example the hint used to spell out wrongly. */
+ *  `IN/2026/001`. */
 const defaultProfile = {
   numbering_format: "{TYPE}/{YEAR}/{SEQ:03d}",
   number_padding: 3,
@@ -424,12 +424,10 @@ describe("DocumentScanPage", () => {
 });
 
 /**
- * The example under the field used to be written into the catalogue:
- * "Receipt/2026/0001" in four languages, "PZ/2026/0001" in Polish — numbers
- * this configuration never produces, since `{TYPE}` writes the receipt's
- * neutral short code and the sequence is padded to the profile's own width.
- * The hint now takes its example from the organization's numbering format, so
- * what it promises is what a scan of a printed number can find.
+ * The example under the field comes from the organization's numbering format,
+ * so what it shows is what a scan of a printed number can find. A fixed string
+ * such as "Receipt/2026/0001" would show numbers this configuration never
+ * produces, since `{TYPE}` writes the receipt's neutral short code.
  */
 describe("DocumentScanPage — the example number follows the profile", () => {
   // The line under the manual field — the only sentence carrying an example.

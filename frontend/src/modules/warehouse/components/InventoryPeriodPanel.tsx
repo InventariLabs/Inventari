@@ -167,12 +167,9 @@ export default function InventoryPeriodPanel() {
               const period = getPeriodForMonth(month);
               const isClosed = period?.is_closed ?? false;
               const monthName = formatMonthName(selectedYear, month);
-              // A month that was closed and then unlocked used to look
-              // exactly like one nobody had ever touched — an empty cell
-              // either way — while the API had been sending `reopened_at`,
-              // `reopened_by` and the note all along. Whoever asks who took
-              // the lock off March is asking a question the system can
-              // answer.
+              // A month that was closed and then unlocked looks different from one nobody
+              // has touched: the API sends `reopened_at`, `reopened_by` and the note,
+              // so whoever asks who took the lock off March gets an answer.
               const wasReopened = !isClosed && !!period?.reopened_at;
               const trace = periodTrace(period, isClosed, t);
 
@@ -197,10 +194,9 @@ export default function InventoryPeriodPanel() {
                       {!isClosed && isCurrent(month) && (
                         <Badge variant="info">{t("periods.current")}</Badge>
                       )}
-                      {/* A month over with the lock off used to show
-                          nothing at all — the same picture as a year with
-                          nothing recorded — while the truth is that the
-                          month is open and takes documents. Every other
+                      {/* A month over with the lock off is shown as open:
+                          it takes documents, and it is not left blank like
+                          a year with nothing recorded. Every other
                           state of a month already had its word. */}
                       {!isClosed &&
                         !wasReopened &&

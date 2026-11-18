@@ -213,7 +213,7 @@ describe("FocusModeSettings", () => {
     expect(dialog).toHaveTextContent("Show only Equipment Tracking?");
     expect(dialog).toHaveTextContent("Will switch off");
     // The visible name comes from modules.items.name (the inventory card),
-    // not from the manifest fallback — a missing key used to let the raw
+    // not from the manifest fallback, so a missing key cannot let the raw
     // "Items" through here.
     expect(dialog).toHaveTextContent("Inventory");
     expect(dialog).toHaveTextContent("Nutrition");

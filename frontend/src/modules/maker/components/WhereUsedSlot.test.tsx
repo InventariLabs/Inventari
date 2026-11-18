@@ -91,8 +91,8 @@ describe("WhereUsedSlot", () => {
   });
 
   it("writes the per-batch unit in the reader's language", async () => {
-    // The line used to paste the raw symbol, so a Polish interface said
-    // "2 pcs na partię" beside lists saying "2 szt.".
+    // The line writes the unit in the reader's language, so a Polish interface
+    // names it the way the lists beside it do.
     mocks.useWhereUsed.mockReturnValue({
       data: {
         items: [

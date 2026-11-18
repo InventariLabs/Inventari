@@ -1,8 +1,8 @@
 """A picking session walks the warehouse in the order its locations are numbered.
 
 Shelf codes rarely say how a warehouse is walked: "C-01" may be the first
-rack past the door and "A-07" the last. Picking used to sort its lines by the
-shelf code alone, so a worker crossed the hall back and forth. A location now
+rack past the door and "A-07" the last. Picking follows the location numbers,
+not the shelf code alone, so the walk follows the hall. A location now
 carries a plain ordering number, and a session's lines follow the numbers of
 the locations they are picked from — each ancestor's number first, then the
 location's own. A location nobody numbered comes after the numbered ones,

@@ -299,8 +299,9 @@ class TestAuthService:
     ):
         """A deactivated user's valid token must be rejected.
 
-        verify_token_async previously checked only is_blocked, so a deactivated
-        user kept API access until the token naturally expired.
+        verify_token_async checks the active flag as well as the block, so a
+        deactivated user loses API access at once rather than when the token
+        expires.
         """
         async_test_user.is_active = False
         await real_async_db_session.flush()

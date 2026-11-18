@@ -38,8 +38,8 @@ function isShort(item: AvailabilityItem): boolean {
  * What one batch needs that the records do not hold, at the top of the
  * formula's page, with the two ways out of it.
  *
- * The page used to answer a shortage only when a run was attempted, two
- * screens away from the formula that caused it. The user can enter the stock
+ * The page answers a shortage at the formula that causes it, not only when a run
+ * is attempted two screens away. The user can enter the stock
  * they have — quantity and price, one record per ingredient — or order what
  * they lack when purchasing is on, without leaving production.
  */

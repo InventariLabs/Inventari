@@ -8,7 +8,7 @@ The sums arrive from SQL as ``Decimal`` and stay that way until the last
 step: every figure leaves through ``rounded``, which rounds half away from
 zero like every document line and cost layer, so a total on this report is
 the total the valuation engine would state for the same rows. Casting to
-float first and calling ``round`` on it used to lose a cent on exactly the
+float first and calling ``round`` on it loses a cent on exactly the
 halves — 2.275 sits a hair under the half in binary.
 """
 
@@ -81,7 +81,7 @@ def analyze_seasonality(
                 # Seasonality is peak measured against off-season. With every
                 # purchase inside the peak months there is no off-season to
                 # measure against — which is what one month of history looks
-                # like, and it used to be reported as 100% for everything.
+                # like, and its score stays None rather than 100% for everything.
                 seasonality_score = (
                     rounded((avg_peak - avg_off) / avg_off) if avg_off > 0 else None
                 )

@@ -30,9 +30,9 @@ vi.mock("@/contexts/ModulesContext", () => ({
 }));
 
 /**
- * A failed add used to say "Request failed with status code 404" in a toast
- * that then vanished, so two identical failures read as one unregistered
- * click. The reason now comes from the response and stays on the sheet.
+ * A failed add shows the reason from the response on the sheet, not in a toast
+ * that vanishes after a moment: two identical failures must not read as one
+ * unregistered click.
  */
 describe("AddFromRecipesModal", () => {
   beforeEach(() => {

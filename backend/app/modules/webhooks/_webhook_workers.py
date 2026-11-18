@@ -161,11 +161,11 @@ async def retry_failed_deliveries(db: AsyncSession) -> None:
 
         # Abandonments say why we stopped, and nothing else: no status code
         # (nobody answered — the previous attempt's code is someone else's
-        # reply, and the history used to print it under "response from the
+        # reply, and the history must not print it under "response from the
         # target"), no borrowed error text. The reason travels as a stable
         # value the view translates, and it says WHICH of the stops this
-        # was — "disabled or deleted" sent administrators looking for the
-        # fault on the receiver's side when the breaker lived here.
+        # was — "disabled or deleted" would send administrators looking for the
+        # fault on the receiver's side, but the breaker lives here.
         if not webhook or not webhook.is_active:
             if webhook is None:
                 reason = _ABANDON_WEBHOOK_DELETED
@@ -205,9 +205,9 @@ async def retry_failed_deliveries(db: AsyncSession) -> None:
 
         # One recorder for both outcomes. The retry is as real an HTTP probe
         # as the first delivery, so its result must age every marker the
-        # first delivery ages — a success that arrived on the second attempt
-        # used to reset the failure tally inline while last_triggered_at
-        # stayed standing at the first attempt.
+        # first delivery ages — a success that arrives on the second attempt
+        # passes through this recorder, so last_triggered_at never stays at the
+        # first attempt.
         #
         # The loop is sequential, so the threshold read can live here — a
         # batch may span organizations and the threshold belongs to the
@@ -282,14 +282,10 @@ async def cleanup_old_logs(
 ) -> int:
     """Delete this organization's delivery logs older than *retention_days*.
 
-    The organization is a keyword argument rather than part of the signature's
-    shape because it used to be absent entirely: the caller read
-    `log_retention_days` from whichever organization the installation listed
-    first and then deleted across every one of them. The module's settings
-    schema promises each organization its own choice between 1 and 365 days, so
-    an organization that asked for a year lost its history after thirty, and one
-    that asked for a week kept it for a year — invisible on a single-tenant
-    install, which is the only kind this was ever watched on.
+    The organization is a keyword argument, so the caller applies each
+    organization's own `log_retention_days` (the module's settings promise each
+    organization its own choice between 1 and 365 days) and deletes only that
+    organization's logs.
 
     ``None`` still means every organization, for a caller that has already
     decided the window applies to all of them.

@@ -73,9 +73,8 @@ export function ApprovalWorkflowSettings({
           <p className="text-sm text-on-secondary leading-relaxed">
             {t("profile.approvalHowItWorks")}
           </p>
-          {/* The real cycle, in the reader's language. This diagram used to
-              show PENDING and APPROVED — two states a document never enters —
-              while the state it does enter, PENDING_APPROVAL, was missing.
+          {/* The real cycle, in the reader's language. This diagram shows the states a document
+              really enters, including PENDING_APPROVAL.
               Approval sends the document back to Confirmed, which is
               where completion is allowed from. */}
           <div

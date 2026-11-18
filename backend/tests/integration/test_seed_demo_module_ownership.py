@@ -187,9 +187,7 @@ class TestResolveCategoryIds:
     ) -> None:
         """The code may resolve — but never to the neighbour's row.
 
-        This used to assert the code was absent altogether, which held only
-        while the food lookup asked for untagged categories and so could not
-        see the organization's own tagged ones. It can now, so the question
+        The food lookup sees the organization's own tagged categories, so the question
         that matters is whose row answers.
         """
         stranger = Organization(id=uuid.uuid4(), name='Neighbour')

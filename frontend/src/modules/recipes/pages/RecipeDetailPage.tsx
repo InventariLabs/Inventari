@@ -78,7 +78,7 @@ export default function RecipeDetailPage() {
     activeServings,
   );
   // The cost payload names its own currency; when it does not, the org's is
-  // the only honest answer. Both surfaces used to print a hardcoded "PLN".
+  // the only honest answer; neither surface prints a hardcoded currency.
   const orgCurrency = useOrganizationCurrency();
 
   const updateMutation = useUpdateRecipe();
@@ -241,9 +241,9 @@ export default function RecipeDetailPage() {
   }
 
   // A failed request and a recipe that does not exist are two different
-  // answers: the first one is worth retrying, the second one never is — which
-  // the branch below used to say and the one above used to undo, because it
-  // caught the 404 first and offered "try again" for a recipe that was gone.
+  // answers: the first one is worth retrying, the second one never is. The
+  // error branch takes everything except a 404, and the not-found branch below
+  // answers for the recipe that is gone.
   if (recipeQuery.isError && !isNotFoundError(recipeQuery.error)) {
     return <QueryError onRetry={() => recipeQuery.refetch()} />;
   }
@@ -262,8 +262,8 @@ export default function RecipeDetailPage() {
   return (
     <>
       {/* Screen content — hidden when printing */}
-      {/* Sections space themselves — the cards used to carry `mb-4` each, so a
-          card that was conditionally hidden took its spacing with it. */}
+      {/* Sections space themselves, so a card that is conditionally hidden takes
+          no spacing with it. */}
       <div className="flex flex-col gap-6 pb-28 print:hidden animate-in fade-in duration-300 motion-reduce:animate-none">
         <ReadOnlyNotice module="recipes" />
         {/* Hero image card */}

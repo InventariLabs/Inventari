@@ -55,9 +55,9 @@ async def search_stock_items_async(
     """Search the stock on hand, narrowed to *location_id* when there is one.
 
     The location is a filter, not the reason to search stock at all: a scrap
-    document names no shelf of its own, and its search used to fall back to
-    the catalogue for want of a location, handing back entries the stock
-    executors could do nothing with.
+    document names no shelf of its own, and its search does not fall back to the
+    catalogue for want of a location, since the stock executors could do nothing
+    with those entries.
 
     The location is a zone or a shelf. A shelf is exact: it holds its own
     records and nothing below it. A zone (a location with locations under

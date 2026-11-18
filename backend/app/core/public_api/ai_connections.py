@@ -228,7 +228,7 @@ class CoreAIConnectionsAPI:
         :class:`ConnectionStillBoundError` when the row is still the
         default for some registered purpose. The refusal text comes from
         the error catalog in the reader's language — a UUID-bearing
-        English sentence is what a Polish session used to get here."""
+        English sentence is never what a Polish session gets here."""
         if await self._service.is_bound_to_any_purpose(db, org_id, conn_id):
             from app.i18n.service import get_current_lang, get_error_message
 

@@ -32,8 +32,8 @@ const fade = (container: HTMLElement) =>
 
 describe("MealPlanScroller", () => {
   it("draws no fade when the whole grid fits", () => {
-    // The fade used to sit on the last column unconditionally, so a week that
-    // fit at 1440px still had its right edge washed out.
+    // The fade sits only where there is more grid behind it, so a week that fits
+    // at 1440px keeps its right edge clear.
     stubMetrics(1348, 1348);
     const { container } = render(
       <MealPlanScroller>

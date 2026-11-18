@@ -5,9 +5,8 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import SettingsShell from "./SettingsShell";
 
-// Registering the two modules whose settings screens used to be reachable
-// only by typing their address: the sidebar builds its module
-// entries from the manifests' settingsSections.
+// Registering the two modules whose settings screens belong in the sidebar:
+// it builds its module entries from the manifests' settingsSections.
 import "@/modules/approvals/module";
 import "@/modules/stats/module";
 // A module whose settings section names a key of its own.
@@ -67,8 +66,8 @@ describe("SettingsShell access", () => {
   it.each(["manager", "viewer"])(
     "answers %s with a sentence instead of the audit log",
     (role) => {
-      // The screen used to be protected by hiding its sidebar link; typing the
-      // address rendered it in full and the API then refused the data.
+      // The screen is protected by its own check, not by hiding its sidebar
+      // link: typing the address must not render it in full.
       renderAt("/settings/audit-log", role);
 
       expect(screen.queryByText("audit log body")).not.toBeInTheDocument();
@@ -196,9 +195,8 @@ describe("SettingsShell access", () => {
   });
 
   it("links the approvals and stats settings screens from the sidebar", () => {
-    // Both screens declare a settings schema and used to be reachable only
-    // by typing their address: the settings sidebar builds its module
-    // entries from the manifests, and neither module declared one.
+    // Both screens declare a settings schema, and the settings sidebar builds
+    // its module entries from the manifests, so both are listed there.
     modulesState.enabledModules = ["core", "items", "approvals", "stats"];
     try {
       renderAt("/settings", "admin", ["admin:access"]);

@@ -12,8 +12,7 @@ import {
 /**
  * Org-level switch for mixing vertical-module data into the general lists.
  *
- * The isolation it governs used to be a constant in the Inventory page, which
- * made a policy question look like a rendering detail. It is a policy: one
+ * The isolation it governs is a policy: one
  * organization runs equipment and groceries as separate worlds, another wants
  * a single list of everything it owns. Off is the default, and it is also the
  * only way to reach data a module left behind — the claim on a `context_tag`

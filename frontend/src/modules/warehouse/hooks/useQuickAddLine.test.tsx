@@ -39,10 +39,8 @@ describe("useQuickAddLine — submit", () => {
     vi.mocked(toast.success).mockClear();
   });
 
-  // An emptied quantity field used to fall back to 1 through
-  // `Number(value) || 1` — a line nobody meant got appended as a single
-  // piece, silently. The draft now holds null while the field is empty, and
-  // submit says so instead of guessing a number.
+  // An emptied quantity field holds null in the draft, and submit says so
+  // instead of guessing a number, so no line is appended as a single piece.
   it("refuses to add a line whose quantity field is empty", async () => {
     const result = setup();
     act(() => {

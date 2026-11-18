@@ -85,9 +85,8 @@ _FIGURES = frozenset(
 )
 
 #: How long a drift may stand unchanged before the admins hear of it again.
-#: A change is news the pass it happens; a drift nobody acts on used to go
-#: quiet for good after its first warning — "a fact of the hydration design"
-#: — and a fact nobody is told about again is one nobody looks at.
+#: A change is news the pass it happens. A drift nobody acts on is repeated at
+#: this interval, since a fact nobody is told about again is one nobody looks at.
 _STANDING_REMINDER = timedelta(days=7)
 
 #: How often the pass runs, and so how old a stored pass may be before an
@@ -177,8 +176,8 @@ def decode_previous_measurement(raw: object) -> PreviousMeasurementDTO | None:
 
     A record from before the structured shape, or the absence of one, has
     no timestamp to show — ``None`` is the honest answer, and the screen
-    says the previous measurement has not been taken yet. So has a value
-    of another shape under the key: it used to fail the whole screen.
+    says the previous measurement has not been taken yet. So does a value
+    of another shape under the key, which must not fail the whole screen.
     """
     if not isinstance(raw, str) or not raw.startswith('{'):
         return None
@@ -257,18 +256,18 @@ async def _record_pass_and_alert_admins_async(
     keeps the language it was written in, so the copy is a table keyed by
     language — taken from the core catalogue, so it cannot drift from the
     rest of the application — and the recipient's ``preferred_language``
-    picks the entry. It used to be one English literal for every admin at
-    once: a Polish administrator read it beside notifications that were
+    picks the entry. It is not one English literal for every admin at
+    once: a Polish administrator would read it beside notifications that were
     already translated. The sentence also names the two tabs the way the
     interface names them (Statistics → Reconciliation, Statystyki →
-    Uzgodnienie); "Stats → Reconciliation" pointed at labels no screen
+    Uzgodnienie); "Stats → Reconciliation" would point at labels no screen
     carries.
 
-    Only a drift is news. The warning used to fire on any change of the
-    figures, so the first pass of every organization — nothing stored to
-    compare with — told a new organization "Stock drift detected" in its
-    first minute while the screen it linked to said "In agreement", and a
-    drift that disappeared was announced as if it had just been found. A
+    Only a drift is news. The warning is not raised on any change of the
+    figures: the first pass of every organization, with nothing stored to
+    compare with, would tell a new organization "Stock drift detected" in its
+    first minute while the screen it linked to says "In agreement", and a
+    drift that disappeared would be announced as if it had just been found. A
     clean pass is still stored, so a drift that comes back later is a change
     again and warns.
     """

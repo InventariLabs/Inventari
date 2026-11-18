@@ -115,8 +115,8 @@ def _patch_core_api(mock_core: MagicMock) -> ExitStack:
     # The planner also resolves shelf names for the lines it decides about.
     mock_core.locations.get_async = AsyncMock(return_value=None)
     # The planner resolves the product name behind a template match even
-    # when the line only tops a row up — a read the old code never made on
-    # that path. Default to None unless the test stubbed the attribute
+    # when the line only tops a row up — a read that path otherwise skips.
+    # Default to None unless the test stubbed the attribute
     # itself: the open-row tests do, with the template the row is a record
     # of, and a blanket default would overwrite their stub.
     if not isinstance(mock_core.product_templates.get_async, AsyncMock):
@@ -462,10 +462,9 @@ class TestExecuteStockOperations:
     async def test_scrap_insufficient_stock_leaves_the_stock_untouched(self) -> None:
         """Scrap checks stock sufficiency BEFORE taking any stock.
 
-        Previously the quant (and SVL delivery) were decremented first and
-        the item-level sufficiency check ran afterwards — so an insufficient
-        scrap could drive the stock negative before raising. Now the guard runs
-        before any mutation: neither the draw nor the valuation is called.
+        The guard runs before any mutation: an insufficient scrap raises before the
+        quant or the item is decremented, so it cannot drive the stock negative.
+        Neither the draw nor the valuation is called.
         """
         db = _make_async_db()
         user_id = uuid4()

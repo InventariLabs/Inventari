@@ -3,9 +3,8 @@
 An order with no price, or above the threshold, goes to approval when it is
 confirmed. In an organization whose one holder of the approve grant is the
 person confirming, that parks it where nobody can answer: the door refuses a
-self-decision. The dialog used to promise "the approval queue" for it, and the
-reader learned the truth from the queue, afterwards. The answer is known before
-the click, so the order answers the same question a document does.
+self-decision. The dialog says where such an order goes, so the reader knows
+before the click; the order answers the same question a document does.
 """
 
 from __future__ import annotations

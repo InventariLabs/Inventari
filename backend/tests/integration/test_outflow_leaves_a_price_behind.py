@@ -1,10 +1,8 @@
 """Stock that leaves says what it was worth, and says it once.
 
-``StockValuationLayer.direction`` has been on the table since it was created
-and only ever held ``'IN'``. An outflow drained the receipt layers, recomputed
-the average, and left no record of its own value — so the reports that exist
-to say what was used and what was thrown away had no source, and read the
-figure out of ``ItemHistory.changes`` under four keys nothing writes.
+An outflow leaves its own valuation layer, so the reports that say what was used
+and what was thrown away read the figure from the ledger, not from
+``ItemHistory.changes``.
 
 Every ERP posts the value of an outgoing move when it happens, at the cost in
 force then, and never recomputes it: a report about March has to say the same

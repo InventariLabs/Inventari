@@ -1,8 +1,7 @@
 """Who a printout is issued by, and the header every family shares.
 
-The identity block used to live in the warehouse module, so purchase orders
-printed a bare organization name where warehouse documents printed a
-letterhead — the same fact, told twice, differently. It is neutral by nature:
+The identity block lives here rather than in the warehouse module, so every
+family of documents tells the same fact once, the same way. It is neutral by nature:
 an organization has a name, a tax id, an address and a logo whatever it keeps
 in stock, so it belongs here rather than in whichever module needed it
 first.
@@ -130,9 +129,9 @@ def _printed_date(
 ) -> str:
     """A stamp as the document's own language writes it.
 
-    The header used to print ``%d.%m.%Y`` whatever the document's language
-    was: an English screen showed ``26.09.2026`` beside interface dates it
-    spelled ``Sep 26, 2026`` — one day in two spellings. The stamp is part of
+    The header prints the stamp in the document's language, so an English screen
+    never shows ``26.09.2026`` beside interface dates spelled ``Sep 26, 2026``
+    — one day in two spellings. The stamp is part of
     the document a person reads, so it follows the language that document is
     printed in (``format_date_for``). A bare string is passed through: it is
     already the writer's text and there is no date here to re-spell.

@@ -34,7 +34,7 @@ def seed_org_storage_types(db: Session, organization_id: Any) -> None:
     Storage types have an owner since, so a test that builds an
        ``Organization`` by hand has to seed them the way org creation does in
        production. The suite was written against the food vertical, so both sets
-       are seeded — the rows the session snapshot used to hold globally.
+       are seeded — the rows a session snapshot would otherwise hold globally.
     """
     from app.seed_profiles._food_home_storage_types import seed_food_storage_types
     from app.seed_profiles.base import seed_neutral_storage_types
@@ -257,7 +257,7 @@ class _ShelfRowBase(DeclarativeBase):
 
 
 class ShelfRow(_ShelfRowBase):
-    """A group of stock as the records hold it — what a test used to read off a quant.
+    """A group of stock as the records hold it — what a test reads, rather than a quant.
 
     Mapped onto ``stock_quants_from_records``, restricted to the groups that
     stand on a shelf (the quant table never held any other), so it reads the

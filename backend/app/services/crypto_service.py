@@ -418,9 +418,9 @@ def decrypt_module_secret(module_name: str, value: str) -> str:
 
     A value that still carries a sealed body but whose ``enc:mod1:``
     marker was renamed or stripped is refused too, by shape: reading it
-    as legacy used to return an empty string and log a key-rotation
-    warning — a diagnosis pointing away from the edit — and let a
-    delivery sign with an empty key.
+    as legacy would return an empty string and log a key-rotation warning,
+    a diagnosis pointing away from the edit, and let a delivery sign with an
+    empty key.
 
     Two shapes written before binding are read without verification,
     because that is what they are — app-wide values, isolated by

@@ -676,9 +676,9 @@ class TestShoppingSuggestionsService:
     ) -> None:
         """A thing past its date is not "expiring in minus forty-nine days".
 
-        The modal is where somebody decides what to buy; it used to hand them a
-        minus sign and let them work it out. The two reasons also travel apart
-        now — "running out" and "gone off" are different answers to "why is this
+        The modal is where somebody decides what to buy, so the age of an
+        expired item is stated as a plain phrase. The two reasons travel apart
+        — "running out" and "gone off" are different answers to "why is this
         on my list".
         """
         item = Item(

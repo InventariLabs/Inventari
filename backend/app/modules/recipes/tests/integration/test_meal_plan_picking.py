@@ -88,9 +88,9 @@ def _complete_a_cook(
 class TestARepeatedRecipeIsCookedOnItsOwnDay:
     """A cook marks the plan entry of the day it happened, and no other.
 
-    A session used to complete the earliest entry of the recipe on or before
-    the day it finished: cooking Tuna Pasta Salad on Saturday ticked off
-    Thursday's dinner, and the week read Thursday as done.
+    A session completes the entry of the day it happened, never the earliest
+    entry of the recipe on or before it: cooking Tuna Pasta Salad on Saturday
+    does not tick off Thursday's dinner, so the week does not read Thursday as done.
     """
 
     def _plan_with_the_recipe_twice(

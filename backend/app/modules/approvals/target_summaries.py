@@ -2,16 +2,11 @@
 
 The approvals queue shows a card per request. Filling that card needs
 knowledge only the requesting module has — a document's number and value, a
-purchase order's supplier and total — and the enrichment used to reach for
-``warehouse_api`` directly, skipping every other target type in silence. That
-made the engine the keeper of a list of its own consumers, the opposite of the
-cross-module contract, and it left purchase orders rendering as eight
-characters of a UUID.
-
-So the direction is reversed: a module that requests approval registers a
-provider for its own target type at import time, and the engine asks whoever
-is registered. A target type with no provider degrades exactly as before —
-``target_summary`` stays ``None`` and the card falls back to the identifier.
+purchase order's supplier and total — so the engine keeps no list of the
+modules it asks. A module that requests approval registers a provider for its
+own target type at import time, and the engine asks whoever is registered. A
+target type with no provider degrades to ``target_summary`` of ``None``, and
+the card falls back to the identifier.
 """
 
 from collections.abc import Awaitable, Callable, Collection, Mapping

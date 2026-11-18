@@ -25,8 +25,9 @@ describe("StockCoverage", () => {
   });
 
   it("spells the ratio out for a reader who cannot see it", () => {
-    // The card used to carry the meaning in a `title`, which a touch screen
-    // never opens; "4/5" alone sat in a row of numbers next to "30 min".
+    // The card carries the meaning in text, not in a `title`, which a touch
+    // screen never opens; "4/5" alone in a row of numbers next to "30 min" is
+    // not enough.
     const { container } = render(<StockCoverage available={4} total={5} />);
 
     expect(container.querySelector(".sr-only")).toHaveTextContent(
@@ -39,8 +40,8 @@ describe("StockCoverage", () => {
   });
 
   it("names the lines it could not count instead of reading them as missing", () => {
-    // An ingredient whose measure cannot meet the shelf's used to
-    // count as "have" on the card. Not counted in — and not read as an
+    // An ingredient whose measure cannot meet the shelf's unit is not counted
+    // as "have" on the card, and is not read as an
     // empty shelf either: "0/1 in stock" alone would be the same lie told
     // the other way round.
     render(<StockCoverage available={0} total={1} incomparable={1} />);

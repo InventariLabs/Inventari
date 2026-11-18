@@ -69,9 +69,9 @@ const PAGE_SIZE = 100;
  * The actions the log records, in the order a record meets them.
  *
  * The subtitle names them with the same labels the Action column puts on its
- * badges — it used to spell the raw enum out instead (`CREATE / UPDATE /
- * SOFT_DELETE / PURGE`), which was the one part of the page no language ever
- * translated and which named nothing the reader could find in the table.
+ * badges, and never the raw enum (`CREATE / UPDATE / SOFT_DELETE / PURGE`),
+ * which no language translates and which names nothing the reader can find in
+ * the table.
  */
 const LOGGED_ACTIONS = [
   "CREATE",

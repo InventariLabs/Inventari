@@ -13,9 +13,9 @@ vi.mock("sonner", () => ({
 }));
 
 /**
- * Copying the built-in layouts is idempotent, and the screen used to report
- * the request rather than the answer: pressed a second time it said the
- * layouts had been copied while the server had copied nothing and answered
+ * Copying the built-in layouts is idempotent, and the screen reports the
+ * answer rather than the request: pressed a second time it must not say the
+ * layouts were copied while the server copied nothing and answered
  * with an empty list. Somebody who deleted their own copy and wants it back
  * is the one this misleads — they go looking for a row that was never made.
  */

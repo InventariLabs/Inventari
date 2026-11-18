@@ -149,12 +149,11 @@ test.describe("Scan — fake camera", () => {
 });
 
 /**
- * The document scan page, opened as the test's first page. It once sat in the
- * describe above, whose beforeEach opens the item scan page: the test then
- * navigated away while that page was still starting its camera and loading
- * its modules, and WebKit now and then never finished the second navigation
- * (a timeout, or "WebKit encountered an internal error"). Nothing a user does
- * looks like that, and both CI failures were that second navigation.
+ * The document scan page, opened as the test's first page. It is kept out of the
+ * describe above, whose beforeEach opens the item scan page: navigating away
+ * while that page is still starting its camera and loading its modules can leave
+ * WebKit unable to finish the second navigation (a timeout, or "WebKit encountered
+ * an internal error"). Nothing a user does looks like that.
  */
 test.describe("Scan — fake camera on the document scan page", () => {
   // `camera` installs the fake before the first navigation.

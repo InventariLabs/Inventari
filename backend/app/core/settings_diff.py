@@ -1,8 +1,8 @@
 """What moved between two readings of one settings record.
 
 A module's own configuration endpoints (a document profile, a purchase
-order's approval flag) used to write without a trace, exactly like the
-shared module-settings path once did. Building the journal entry's
+order's approval flag) must leave a trace, as the
+shared module-settings path does. Building the journal entry's
 before/after is mechanical and lives here once: name the top-level keys
 that changed, mask the leaves marked secret, and answer ``None`` when
 nothing moved — a journal records changes, not keystrokes.

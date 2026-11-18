@@ -4,8 +4,8 @@ The dead end is a property of the definition, not of the request that
 discovers it: a stage naming people who cannot see approvals, or open to a
 grant nobody in the organization holds, parks the first document that walks
 into it. The request side already says so (``_services_solvability``); the
-list is the earliest place the administrator could see it, and it used to
-render the dead end exactly like the workflow next to it that works.
+list is the earliest place the administrator can see it, so each row marks its
+own dead end beside the workflows that work.
 
 The reason codes travel under the same names the enriched request uses, so
 the row and the parked request tell the reader the same story.

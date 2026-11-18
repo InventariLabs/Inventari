@@ -61,10 +61,9 @@ async def register(
     invite, which is not a position an anonymous prober is in.
     """
     # An account created without an explicit choice inherits the language the
-    # request arrived in. The sign-in screen already speaks it; the onboarding
-    # that follows used to switch to English because the schema defaulted
-    # there, and the reader had to find the picker to get their own language
-    # back. An explicit choice from the form still wins.
+    # request arrived in. The sign-in screen already speaks it, and so does the
+    # onboarding that follows, so nobody has to hunt for the picker to get their
+    # own language back. An explicit choice from the form still wins.
     if user_in.preferred_language is None:
         user_in.preferred_language = get_current_lang()
 

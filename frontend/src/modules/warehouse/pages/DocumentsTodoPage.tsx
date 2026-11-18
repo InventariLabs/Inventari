@@ -348,9 +348,8 @@ export default function DocumentsTodoPage() {
   // one pass. Both live in the page header so the list itself stays one thing.
   //
   // The queue lists what waits on *this* account's decision, so it is offered
-  // to an account that may approve: the link used to open a page that said
-  // "Approving is not something your account can do" — a control that
-  // refuses after the click.
+  // to an account that may approve: no link leads to a page that says
+  // "Approving is not something your account can do".
   const approvalsEnabled = useOffersApprovalsQueue();
   const headerActions = useMemo(() => {
     const approvals = approvalsEnabled ? (

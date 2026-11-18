@@ -9,7 +9,7 @@ import { useLocationsById } from "@/module-sdk";
  * screen shows (`ids`), never the organization's whole list. Rows the lookup
  * does not know keep the name the API sent.
  *
- * This used to translate the name as well: a seeded location was written to
+ * This does not translate the name: a seeded location is written to
  * the database in English and read by people working in five languages. It is
  * written in the reader's language now — see
  * `StorageLocationDeclaration.translations` — so there is nothing left to

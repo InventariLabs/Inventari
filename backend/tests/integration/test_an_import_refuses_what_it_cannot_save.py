@@ -1,13 +1,10 @@
 """A value the import could not save is a refused row, not a quiet loss.
 
-The importer asked the same question in three places — the sheet names
-something the organization does not have — and used to answer it three
-ways. An unknown location refused the row; an unknown category was
-dropped and the row still counted as a success; a date nobody could read
-went to the server log and the row kept its success too. The report then
-said "failed 0" while the sheet's own data was gone: the category the
-reader typed never existed, and the term they wrote for a product never
-reached "expiring soon".
+The importer asks the same question in three places — the sheet names
+something the organization does not have — and answers it the same way in each.
+An unknown location, an unknown category and a date nobody can read all refuse
+the row, so the report counts every failure and never says "failed 0" over
+data that did not land.
 
 One answer for all three: a cell the importer cannot honour refuses the
 row, naming the column and the cell — the way quantity and location

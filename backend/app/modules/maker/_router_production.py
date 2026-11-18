@@ -814,9 +814,8 @@ async def get_production_stock_moves(
 
     Includes both ingredient consumption moves (from_location → None) and
     the output receipt move (None → output_location), with the lot for
-    traceability. Products, lots and locations come back named: the table
-    used to print truncated UUIDs, which identify nothing to the person
-    reading them.
+    traceability. Products, lots and locations come back named, since a truncated
+    UUID identifies nothing to the person reading the table.
     """
     total = await core_api.stock_moves.count_by_reference_async(
         db, org_id, 'maker_production', order_id

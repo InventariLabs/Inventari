@@ -222,9 +222,9 @@ function StatusLine({
   actions?: ReactNode;
 }) {
   // A card with an action beside the link wraps: the heading keeps at least
-  // 12rem and the actions fall under it, where they used to leave it ~60px on
-  // a phone, one word per line. A card with only the link keeps the single
-  // row it always had -- the link beside a two-line heading, not under it.
+  // 12rem and the actions fall under it, where they would otherwise leave it
+  // ~60px on a phone, one word per line. A card with only the link keeps the
+  // single row -- the link beside a two-line heading, not under it.
   return (
     <div
       className={cn(

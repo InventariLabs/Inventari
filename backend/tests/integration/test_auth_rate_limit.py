@@ -12,9 +12,9 @@ The limiter counts in the stack's Redis, which every xdist worker shares, so
 a test gets a bucket nobody else can touch: ``get_client_key`` falls back to
 ``get_remote_address`` for an anonymous request, and the fixture points that
 name, as ``app.core.limiter`` holds it, at a fresh UUID. Counters are never
-wiped. A global reset used to run in each worker that started this module,
-and it cleared the counters of a test halfway through its walk on another
-worker — the fourth request of a 3/hour limit then passed with 202.
+wiped, because a global reset in one worker would clear the counters of a test
+halfway through its walk on another, and the fourth request of a 3/hour limit
+would then pass with 202.
 
 Two things did not isolate anything, and are worth knowing before changing
 this: patching ``slowapi.util.get_remote_address`` misses the name
@@ -171,10 +171,9 @@ class TestAuthRateLimitEnforced:
     def test_made_up_api_keys_do_not_buy_a_fresh_allowance(self, rate_limited_client):
         """A key header is a client of its own only once it authenticated.
 
-        The key function runs before any route, and it used to take every
-        nonempty ``X-API-Key`` — and every key-shaped Bearer token — as a new
-        client, so a burned bucket was refilled by sending a different
-        made-up key on each request.
+        The key function runs before any route, so a made-up ``X-API-Key`` — or a
+        key-shaped Bearer token — is not a new client, and a burned bucket
+        cannot be refilled by sending a different made-up key on each request.
         """
         login = {'username': 'nosuch@example.com', 'password': 'wrong'}
         burned = [
@@ -201,12 +200,9 @@ class TestAuthRateLimitEnforced:
     ):
         """An issued key is a client of its own from its first request.
 
-        The key function runs before authentication, so a key this worker had
-        never seen authenticate used to count under its sender: once the
-        sender's allowance was spent, an issued key arriving at a fresh worker
-        was refused before it could authenticate, and two keys behind one
-        address shared one count. The limiter now asks about such a key before
-        counting it.
+        The key function runs before authentication, so the limiter asks about a key
+        it has not seen authenticate before counting it. An issued key then keeps
+        its own count, and two keys behind one address do not share one.
         """
         raws = []
         for _ in range(2):
@@ -248,11 +244,10 @@ class TestAuthRateLimitEnforced:
         key through to authentication.
 
         A forger spends its address's lookups, after which an unknown key there
-        is no longer looked up one by one. An issued key from the same address
-        — an office behind one NAT — used to count under the exhausted address
-        and get 429 until the window ended; the issued-key list tells it apart
-        without a lookup per forged key, even when the key was issued after
-        the list was last loaded.
+        is not looked up one by one. An issued key from the same address
+        — an office behind one NAT — is not counted under the exhausted address:
+        the issued-key list tells it apart without a lookup per forged key, even
+        when the key was issued after the list was last loaded.
         """
         # A fresh worker, whose issued-key list is due for a load.
         monkeypatch.setattr(limiter_module, '_issued_api_key_buckets', OrderedDict())

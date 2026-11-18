@@ -76,8 +76,8 @@ describe("useCompleteStockTakeFlow", () => {
   });
 
   // "Require full count" refuses the close on every line without a number.
-  // The refusal used to come after the confirmation, so the dialog offered
-  // Complete and a toast then took it back.
+  // The refusal comes before the confirmation, so the dialog never offers
+  // Complete for a close that a toast would then take back.
   it("refuses before asking when a full count is required and lines are open", async () => {
     const open = [
       ...lines,

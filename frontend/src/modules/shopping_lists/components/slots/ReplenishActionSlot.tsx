@@ -13,9 +13,9 @@ type Props = { data: SlotDataMap["dashboard_replenish_action"] };
  * The dashboard's "replenish" door.
  *
  * The door and the modal behind it ask the engine the same question, so
- * they cannot disagree: the button used to hang on the tile counting
- * shortages — a different query with different filters — and stayed open
- * over an empty modal after the run's proposals were already on a list.
+ * they cannot disagree: the button does not hang on the tile counting
+ * shortages, a different query with different filters, and stay open
+ * over an empty modal when the run's proposals are already on a list.
  * Same hook, same sources, same cache entry as the modal's.
  *
  * The suggestions become a shopping list; for an account that may not write

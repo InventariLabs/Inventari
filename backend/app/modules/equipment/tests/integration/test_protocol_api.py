@@ -326,7 +326,7 @@ class TestTheProtocolReadsInTheSignersLanguage:
         html = resp.text
         assert 'Protokół przekazania sprzętu' in html
         # "Data wydania 18.09.2026 18:10" — the day first, as the interface
-        # writes it, and not the wire's 2026-09-18 that used to be printed.
+        # writes it, and not the wire's 2026-09-18.
         assert re.search(r'\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}', html)
         assert 'Data wydania' in html
         # The reference number keeps its canonical shape.

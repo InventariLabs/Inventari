@@ -34,9 +34,9 @@ vi.mock("sonner", () => ({
 
 /**
  * Every picker in this module reads a list the server may not deliver. A list
- * that failed used to render as an empty one — a "Location" picker with
- * nothing in it, "no matches" under a name that exists — which reads as a
- * statement about the organization instead of about the request.
+ * that failed must not render as an empty one — a "Location" picker with
+ * nothing in it, "no matches" under a name that exists — which would read as a
+ * statement about the organization rather than about the request.
  */
 function renderWith(ui: React.ReactNode) {
   const queryClient = new QueryClient({
@@ -233,8 +233,8 @@ describe("BulkEditDialogs — the target location", () => {
  * Behaviour documents, not teeth: when the list fails the name simply is not
  * there, which is the same screen as with the lookup removed — both pass
  * either way, on purpose. What they pin is the fallback a reader gets (the
- * model's own words, the scope type alone) and the absence of the empty
- * default the picker used to offer beside it.
+ * model's own words, the scope type alone) and that no empty
+ * default sits beside the picker.
  */
 describe("names that only decorate keep the honest fallback", () => {
   const model = {

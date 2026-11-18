@@ -1,25 +1,21 @@
 """The document executor keeps each record on the batch its stock is in.
 
 A record names its batch and owner (``Item.lot_id``, ``Item.owner_id``), and
-the executor used to write records and quants separately — with the
-record's own posting off — so every door had to keep the two on the same
-batch itself. None did:
+every door keeps the record and its quant on that same batch and owner. Each
+case below is a door that must hold this:
 
-- a receipt with a batch opened, or topped up, a record that named none,
-  while the quant took the batch — two batches on one shelf became one
-  record;
-- a dispatch took the records down itself, the one the line named first and
-  then by expiry, while the quants went by the removal strategy, so a line
-  naming the later batch's record took that record down and the earlier
-  batch's quant;
-- a transfer that named no batch moved the quants by strategy while the
-  record carried its own batch, and a partial line left the remainder as a
-  record without one;
-- a correction naming no batch changed the batch-less quant under a record
-  that has one.
+- a receipt with a batch opens or tops up a record with that batch, and the
+  quant takes the same batch, so two batches on one shelf stay two records;
+- a dispatch draws the records the line names first and then by expiry, and the
+  quants go with those records, so the later batch's record and its quant
+  leave together;
+- a transfer that names no batch moves the quants and the records by the same
+  strategy, and a partial line keeps the remainder on the batch it came from;
+- a correction naming no batch changes the batch-less quant and the record
+  under it together.
 
-The quants are gone; the records are the stock, and the ledger's movements
-say which batch each change was made on. Every scenario below is built so the
+The quants are not the stock; the records are, and the ledger's movements say
+which batch each change was made on. Every scenario below is built so the
 records and the movements agree batch by batch before the document runs;
 whatever is out of step afterwards is the door's own doing.
 """

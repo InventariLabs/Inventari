@@ -234,8 +234,7 @@ export function useStockTakeCounting(id: string | undefined) {
     uomId?: string;
   }) => {
     // Create the product in the counted location, then
-    // register it as a surplus on the stock take. Replaces the old
-    // in-memory temp id that no endpoint could ever save.
+    // register it as a surplus on the stock take.
     if (!payload.name.trim() || !stockTake?.location_id) return;
     createItemMutation.mutate(
       {
@@ -250,7 +249,7 @@ export function useStockTakeCounting(id: string | undefined) {
         category_id: payload.categoryId || undefined,
         uom_id: payload.uomId || undefined,
         // Created beside the counted stock; no template match to contradict —
-        // the flag's "no", which the server used to default to.
+        // the flag is sent as an explicit "no".
         unit_confirmed_over_template: false,
         location_id: stockTake.location_id,
       },

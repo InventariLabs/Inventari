@@ -9,8 +9,8 @@ import { onePage } from "@/test/mocks/page";
 /**
  * Regression guard.
  *
- * - InfoRow used to return null for empty values, leaving bare section
- *   headers in Basic Info / Identification when the item has no
+ * - Empty values in InfoRow keep their row, so a section never shows a bare
+ *   header in Basic Info / Identification when the item has no
  *   meta_data.equipment.* values.
  * - getEquipmentMeta ignored top-level Item.serial_number / Item.brand,
  *   even though the backend falls back to them (dashboard_service.py).

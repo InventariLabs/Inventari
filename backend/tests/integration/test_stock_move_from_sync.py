@@ -192,9 +192,8 @@ class TestSyncStockQuantCreatesMove:
     ):
         """A record that predates its card joins the ledger; it is not skipped.
 
-        This test used to pin the opposite — "no template, no StockMove
-        target" — and that was the defect: the number on the record moved
-        while the shelf it stood on stood still and the register stayed
+        A record without a card still writes a movement: the number on the record and
+        the shelf it stands on move together, and the register does not stay
         empty.
         """
         db = real_async_db_session
@@ -242,10 +241,8 @@ class TestSyncStockQuantCreatesMove:
     ):
         """No stock module is enabled, and the register is kept all the same.
 
-        It used to be left exactly as it was — no card minted, no movement,
-        ``Item.quantity`` its only truth. Now every organization
-        keeps the register, so the record adopts its card and the change is
-        a movement, as in an organization with the modules.
+        Every organization keeps the register, so the record adopts its card and the
+        change is a movement, as in an organization with the modules.
         """
         db = real_async_db_session
         async_test_household.enabled_modules = [

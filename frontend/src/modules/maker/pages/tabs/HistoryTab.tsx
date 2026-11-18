@@ -22,8 +22,8 @@ interface HistoryTabProps {
 /**
  * Past production runs for this formula.
  *
- * Each run used to be three lines of prose stacked at `mt-0.5` inside one
- * button — date, quantities and money all competing at the same size. It is
+ * Each run is one row, with date, quantities and money in columns of their own
+ * rather than three lines of prose inside one button, all at the same size. It is
  * a record list, so it is a table (UI_GUIDELINES §14.1) with one column per
  * question: when, what state, how much was made, what it cost, what it
  * returned. Phones get the same fields as stacked cards.

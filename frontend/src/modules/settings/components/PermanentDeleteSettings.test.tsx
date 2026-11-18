@@ -96,8 +96,8 @@ describe("PermanentDeleteSettings", () => {
   });
 
   it("asks before arming an irreversible action", async () => {
-    // One click used to be the whole ceremony for handing every deleting user
-    // a button that no export undoes.
+    // Handing every deleting user a button that no export undoes takes more
+    // than one click.
     mockOrg({ allow_permanent_delete: false });
 
     let requests = 0;
@@ -154,9 +154,8 @@ describe("PermanentDeleteSettings", () => {
   });
 
   it("shows a member the policy without a switch they cannot save", async () => {
-    // The manager's click used to reach `PUT /organizations`, which is
-    // admin-only — an irreversible-deletion policy that looked switchable and
-    // was not.
+    // A manager's click would reach `PUT /organizations`, which is admin-only,
+    // so the irreversible-deletion policy is shown without a switch.
     authState.user = { role: "manager", is_superuser: false, permissions: [] };
     mockOrg({});
     renderSettings();

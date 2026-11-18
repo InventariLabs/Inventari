@@ -1,12 +1,10 @@
 /**
  * The asset card tells an approval waiting to be used from one already used.
  *
- * An approved checkout request used to read the same however often it had
- * already opened the door: the card hid the request button as soon as the
- * status was APPROVED, so a spent approval looked identical to a fresh one
- * and the check-out button sat there with nothing left to authorise it. The
- * card now shows a waiting approval as "Approved for the next checkout" and
- * a spent one as a live "Request Approval" button.
+ * An approved checkout request reads differently once it has opened the door:
+ * a waiting approval shows "Approved for the next checkout", and a spent one
+ * shows a live "Request Approval" button. A spent approval must not look
+ * identical to a fresh one, with a check-out button that nothing authorises.
  */
 import React, { useState } from "react";
 import { render, screen } from "@testing-library/react";

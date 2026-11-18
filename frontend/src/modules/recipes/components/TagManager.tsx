@@ -119,9 +119,8 @@ function TagRow({
           defaultValue: `${tag.count}`,
         })}
       </Badge>
-      {/* Tags are typed into a comma-separated field, so a typo used to be
-          permanent: the panel could colour a tag and merge it into another,
-          and nothing here renamed one or took it away. */}
+      {/* Tags are typed into a comma-separated field, so a typo stays until it is
+          fixed here: the panel can colour a tag and merge it into another. */}
       <ActionMenu
         label={t("common:actions.more")}
         actions={[
@@ -216,7 +215,7 @@ export default function TagManager({
       setMergeInto("");
       onMergeDone?.();
     } catch (err) {
-      // The 404 used to be recognised by grepping axios' own sentence
+      // The 404 is recognised by its status, not by axios' own sentence
       // ("Request failed with status code 404"), which is not a contract.
       if (isNotFoundError(err)) {
         toast.error(t("tags_manager.merge_not_found"));
@@ -230,8 +229,8 @@ export default function TagManager({
     <div>
       {/* Merge form — the toggle sits in the panel header. It needs a tag to
           merge away, so it stays out of the way until there is one: the tool
-          whose job is to clean up free text used to ask for free text over an
-          empty list, and answer with "tag not found". */}
+          whose job is to clean up free text is not offered over an empty list,
+          where it would answer with "tag not found". */}
       {mergeOpen && tags.length > 0 && (
         <div className="py-3 border-b border-border space-y-2">
           <div className="flex gap-2">

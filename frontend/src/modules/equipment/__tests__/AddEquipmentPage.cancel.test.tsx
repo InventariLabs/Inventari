@@ -18,12 +18,9 @@ import AddEquipmentPage from "../pages/AddEquipmentPage";
 /**
  * Cancel ends the task, so it has to land somewhere that belongs to it.
  *
- * It used to pop the history stack. Entered from the asset list that
- * happened to land right; entered by address, from a scan or from another
- * module, it left the reader wherever they had been before — measured in the
- * app: open /equipment/add by address, click Cancel, land on /apps. Every
- * case below enters the form as the first history entry, where the old
- * `navigate(-1)` has nowhere to go and the form stays on screen.
+ * Cancel does not depend on the history stack. Every case below enters the
+ * form as the first history entry, where going back has nowhere to go and the
+ * form stays on screen.
  */
 
 vi.mock("sonner", () => ({

@@ -262,7 +262,7 @@ class TestTheComparisonHappensInTheDatabase:
 
 
 def _whole_ledger(organization_id: UUID):
-    """The ledger's net as the reconciliation used to read it: every done movement.
+    """The ledger's net, summed over every done movement.
 
     Kept here as the oracle the totals table is held against.
     """

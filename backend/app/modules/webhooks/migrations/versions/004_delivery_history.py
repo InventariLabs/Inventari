@@ -3,17 +3,15 @@
 Three columns, one reader: the operator comparing this module's history with
 what their receiver actually received.
 
-``delivery_id`` — the identity the receiver saw. It used to be rolled fresh
-inside every attempt, so a retry arrived as a new event and nothing tied the
-attempts together; now it is minted once with the row and sent in the header
-and the payload body on every attempt. NULL only on rows written before this
-change — an old row never had the id, and inventing one afterwards would be
-a fact nobody's receiver ever saw.
+``delivery_id`` — the identity the receiver saw. It is minted once with the row
+and sent in the header and the payload body on every attempt, so a retry is
+recognised as the same event. NULL on rows that predate the column — an old row
+never had the id, and inventing one afterwards would be a fact nobody's receiver
+ever saw.
 
 ``abandon_reason`` — why the application itself stopped trying (breaker cut,
-endpoint switched off, endpoint deleted, module off). Abandonment used to
-reuse the previous attempt's status code, so the history read our refusal as
-the receiver's answer.
+endpoint switched off, endpoint deleted, module off). An abandonment carries no
+status code, so the history never reads our refusal as the receiver's answer.
 
 ``last_attempt_at`` — when the attempt that produced the row's current
 status ended. ``created_at`` is the enqueue time and drifts from the outcome

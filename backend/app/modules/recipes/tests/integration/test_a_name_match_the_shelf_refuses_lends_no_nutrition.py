@@ -144,7 +144,7 @@ async def test_a_unitless_salt_line_does_not_borrow_the_crisps_calories(
         db, recipe, async_test_household.id, recipe.servings
     )
 
-    # One 165 g bag at 536 kcal/100 g is the 884.4 the recipe used to report.
+    # One 165 g bag at 536 kcal/100 g is 884.4 kcal, and the recipe must not report that.
     assert result['per_serving'].get('calories_kcal') != pytest.approx(884.4)
     assert result['total'] == {}
     assert result['ingredients'][0]['has_data'] is False

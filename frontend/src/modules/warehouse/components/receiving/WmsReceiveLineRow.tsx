@@ -200,9 +200,8 @@ export default function WmsReceiveLineRow({
   const canPick = Boolean(onTargetChange) && line.status === "pending";
 
   return (
-    // a plain row, not a fake button — screen readers used to
-    // announce the whole row as one glued-together button even though
-    // clicking it did nothing; the real actions are the buttons inside.
+    // a plain row, not a fake button — screen readers would announce the whole
+    // row as one button that does nothing; the real actions are the buttons inside.
     //
     // One row, laid out like the picking session's: name and its context on
     // the left, the number and the status and the actions on the right, all
@@ -248,9 +247,8 @@ export default function WmsReceiveLineRow({
         {/* Once part of the line has arrived, the count is two numbers —
             what landed and what was ordered — and the pair is how every
             other screen here says it: the scan field above and the summary
-            below both read "2/5". The row used to stop at the ordered half,
-            so the worker taking over an interrupted session had to undo the
-            line to learn what was already counted. */}
+            below both read "2/5". The row shows both halves too, so a worker
+            taking over an interrupted session sees what was already counted. */}
         <span className="text-xs text-on-secondary">
           {line.received_quantity > 0
             ? `${formatQuantityValue(line.received_quantity)}/${formatQuantityValue(line.expected_quantity)}`
@@ -267,9 +265,8 @@ export default function WmsReceiveLineRow({
         {line.status === "pending" && (
           <>
             {/* The action that closes the line in full, named like the other
-                two. It used to have no button of its own: a full delivery
-                meant typing the expected quantity into the window that
-                records the received quantity. */}
+                two. A full delivery needs no typing into the window
+                that records the received quantity. */}
             <Button
               variant="ghost"
               size="icon"

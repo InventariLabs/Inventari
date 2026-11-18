@@ -24,8 +24,8 @@ export interface TemplateUnitHint {
  * Asked of the same endpoint the create path resolves its template through,
  * and with the same fields the form will submit, so the hint shown before a
  * save and the unit the record lands with are one answer rather than two.
- * Naming the unit in a form used to be a guess: the picker said whatever the
- * reader left in it, and the backend then settled the record's unit itself.
+ * The hint comes from the backend, which settles the record's unit itself, and
+ * not from whatever the picker holds.
  */
 export function useTemplateUnitHint(
   name: string | undefined,

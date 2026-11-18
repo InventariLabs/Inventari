@@ -1,15 +1,9 @@
 """A refusal for size carries the same envelope as every other answer.
 
-The gate used to sit outside every layer that decorates a response, so its
-413 left the application wearing nothing but ``content-type``: no CORS
-headers, no security headers. A browser on an allowed origin could not even
-see the 413 — without CORS headers the fetch fails as a network error, and
-"the file is too large" never reaches the user; the performance log, fed by
-the app's doomed inner response, reported a status that never hit the wire.
-
-The fix is the stack order, not header duplication: the gate is added
-first, so it sits innermost and its answer flows back out through CORS,
-the security headers and the performance log like any other response.
+The gate is added first, so it sits innermost: its 413 flows back out through
+CORS, the security headers and the performance log like any other response.
+A browser on an allowed origin can read the refusal, so "the file is too
+large" reaches the user.
 These tests hold that order in place.
 """
 

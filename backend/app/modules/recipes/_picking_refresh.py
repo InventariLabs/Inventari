@@ -2,8 +2,8 @@
 
 A session is a list of decisions the user has already made ("this one is in
 the basket") laid over a reading of the shelf that ages the moment it is
-taken. Linking an ingredient to a product mid-session used to mean throwing
-the session away, because there was no way to ask for that reading again.
+taken. Linking an ingredient to a product mid-session re-reads the shelf and
+keeps the session, so the user's decisions survive the link.
 """
 
 from __future__ import annotations

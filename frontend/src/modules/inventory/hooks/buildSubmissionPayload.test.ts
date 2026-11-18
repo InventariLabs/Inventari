@@ -26,8 +26,8 @@ const FIELDS = [
 
 describe("buildSubmissionPayload", () => {
   it("sends an emptied optional field as an explicit null when editing", () => {
-    // The whole of the "save that saved nothing": the key used to be dropped,
-    // which the API cannot tell from a field the form never had.
+    // The whole of the "save that saved nothing" is here: the key is sent,
+    // because the API cannot tell a dropped key from a field the form never had.
     const payload = buildSubmissionPayload(
       {
         name: "Canned peas",

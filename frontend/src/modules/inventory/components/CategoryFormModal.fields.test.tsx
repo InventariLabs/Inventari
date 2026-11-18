@@ -1,8 +1,8 @@
 /**
- * The equipment fields section used to promise "Predefined fields · expand
+ * The equipment fields section must not promise "Predefined fields · expand
  * with custom ones" over an empty list: a category created from the UI has
  * no predefined fields — only the module's built-in ones do. The subtitle
- * now says which of the two the list holds.
+ * says which of the two the list holds.
  */
 import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";

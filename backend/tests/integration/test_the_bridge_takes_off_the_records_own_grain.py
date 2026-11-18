@@ -1,10 +1,9 @@
 """A change to a record comes off the record's own grain, under the group's anchor.
 
-The bridge used to take a decrease off the quant of the record's batch and
-owner, and when that quant could not cover it — because the rest was promised
-to an order — it fell back to the removal strategy, which found the change in
-another batch. The record lost its stock, the quant of a batch nobody touched
-lost it too, and the order's hold stood on stock no longer there.
+A decrease comes off the record's own grain. When that grain cannot cover it,
+because the rest is promised to an order, the change is refused by name rather
+than taken from another batch, so no record loses stock it does not hold and
+no hold stands on stock that is gone.
 
 A record's grain is its shelf, batch and owner. What the grain has free is
 what its records hold less what its reservation rows hold, read under the

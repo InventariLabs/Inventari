@@ -161,11 +161,10 @@ class TestGuardReadsTheWholeShelf:
     ) -> None:
         """Mixed units → the guard steps aside, whatever the page order.
 
-        The fallback used to read a page of 100 newest rows: a product with
-        a hundred piece-items and one older kilogram-item looked like a
-        pieces-only shelf, and a kilogram line got refused. The verdict
-        must come from the whole set — mixed means no single stock unit,
-        mixed means silence.
+        The verdict comes from the whole set of items, not from a page of the newest
+        rows: a product with a hundred piece-items and one older kilogram-item is
+        mixed, so the guard steps aside for a kilogram line. Mixed means no single
+        stock unit, and mixed means silence.
         """
         from datetime import datetime, timedelta
 
@@ -256,10 +255,8 @@ class TestItemInheritsTheTemplatesUnit:
     ) -> None:
         """Template kg + item created without a unit + kg line: consistent.
 
-        The record used to land in pieces while its catalogue row said
-        kilograms, so the guard and the shelf disagreed about what the line
-        meant. The record now inherits the matched template's unit before
-        any line is written against it."""
+        The record inherits the matched template's unit before any line is written
+        against it, so the guard and the shelf agree about what the line means."""
         kg = _uom(db_session, 'kg')
         child = _template(db_session, mk_org, name='Kilo flour', uom_id=kg.id)
         item = _create_item_without_unit(

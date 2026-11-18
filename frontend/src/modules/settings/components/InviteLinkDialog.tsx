@@ -17,16 +17,13 @@ interface InviteLinkDialogProps {
 /**
  * The invitation link, shown deliberately.
  *
- * It used to appear in a panel under the form, where a refresh took it away
- * without saying so. The same shape as the API-key dialog: one habit to learn
- * for "here is something you have to carry somewhere yourself", not two.
+ * It is shown in a dialog rather than a panel under the form, so a refresh
+ * cannot take it away without notice. The same shape as the API-key dialog:
+ * one habit to learn for "here is something you have to carry somewhere
+ * yourself", not two.
  *
- * One sentence here used to overstate that: "there will be no second chance
- * to copy it", while the invitation's own row menu kept offering Copy link
- * and the API kept returning the code while the invitation was pending. An
- * administrator who believed the warning pasted the link into a note or a
- * chat — exactly the careless keeping the sentence looked like it guarded
- * against. The hint now says the recovery exists, and for how long it does.
+ * The hint says what is true: the invitation's row menu offers Copy link and
+ * the API returns the code for as long as the invitation is pending.
  */
 export default function InviteLinkDialog({
   email,

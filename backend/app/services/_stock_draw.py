@@ -4,8 +4,8 @@ The records are the stock (the one-number stock model, ADR-022), so what
 a draw takes is chosen here, from the records of the group and the
 reservation rows of each (shelf, batch, owner): the batch order off the
 records' lot and ``created_at``, the free part as what a grain's records
-hold less what its rows hold. The quant primitives that used to make this
-choice by reading the quants went with the quant table.
+hold less what its rows hold. There is no quant table: the records are the
+stock.
 
 Read under the group's anchor. Every writer of a group locks its anchor
 first (``lock_stock_async``), so while the caller holds it nobody else
@@ -324,7 +324,7 @@ async def free_in_grains_async(
 
     The answer :func:`free_in_grain_async` gives for one, asked of every
     product and shelf named in a single statement (a chunk of them, past a
-    few thousand) -- a document's lines used to ask it once each.
+    few thousand) -- so a document's lines get their answers in one call.
     """
     free = {key: Decimal('0') for key in grains}
     places = list({(template, grain[0]) for template, grain in free})

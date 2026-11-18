@@ -32,13 +32,12 @@ function AttestationRoute() {
 /**
  * Everything reachable without an account, and nothing else.
  *
- * These pages used to be routes inside `App`, which meant reaching one loaded
- * the whole application: `App` opened by eagerly globbing every `module.ts`
- * under `src/modules/`, and that registry brought the modules, their API
- * clients and their translations with it. An employee clicking a link in an
- * email to tick off ten pieces of equipment was made to download the
- * warehouse, the recipes and the approvals engine — code they have no account
- * to use and, for the data behind it, no right to see.
+ * These pages stay out of `App`: reaching one must not load the whole
+ * application, with the modules, their API clients and their translations. An
+ * employee clicking a link in an email to tick off ten pieces of equipment
+ * would otherwise download the warehouse, the recipes and the approvals engine
+ * — code they have no account to use and, for the data behind it, no right to
+ * see.
  *
  * `Root.tsx` picks between this tree and `App` from `window.location` before
  * either is imported, so the two never share a bundle. There is no catch-all

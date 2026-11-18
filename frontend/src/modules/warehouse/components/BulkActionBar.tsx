@@ -28,8 +28,8 @@ interface BulkActionBarProps {
    *  it must outlive this bar, which goes when a scan empties the list. */
   onPick: (documentIds: string[]) => void;
   /** False drops the delete action. Exporting what you may already read is
-   *  not a write; deleting drafts is, and the refusal used to arrive after
-   *  the "this cannot be undone" dialog had been accepted. */
+   *  not a write; deleting drafts is, and the refusal comes before
+   *  the "this cannot be undone" dialog. */
   canWrite?: boolean;
   t: (key: string, options?: Record<string, unknown>) => string;
 }

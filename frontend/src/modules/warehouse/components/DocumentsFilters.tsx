@@ -81,8 +81,7 @@ export function DocumentsFilters({
   t,
 }: DocumentsFiltersProps) {
   // on phones the discrepancy/sort selects are collapsed behind a
-  // "Filters" toggle with an active-count badge — they used to consume the
-  // first screen permanently.
+  // "Filters" toggle with an active-count badge, so they do not take the first screen.
   const [filtersOpen, setFiltersOpen] = useState(false);
   // A code a hardware scanner reads — a document number, a partner's
   // reference — is a search, wherever the focus is, unless a picking session

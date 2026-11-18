@@ -135,10 +135,9 @@ class TestRetrySemantics:
         self, session_factory: SessionFactory, webhook: WebhookEndpoint
     ) -> None:
         """The endpoint answered on the second attempt, so the endpoint's
-        last-triggered marker must read the retry — a success that arrived
-        only after a failure used to leave the marker standing at the first
-        delivery, because the retry recorded its outcome inline instead of
-        through the recorder the first delivery uses."""
+        last-triggered marker must read the retry — a success that arrives only
+        after a failure is recorded through the recorder the first delivery uses,
+        so the marker never stays at the first delivery."""
         stale = datetime.now(UTC) - timedelta(hours=3)
         async with session_factory() as session:
             marker = await session.get(WebhookEndpoint, webhook.id)
@@ -218,7 +217,7 @@ class TestRetrySemantics:
         log = await _fetch_log(session_factory, log_id)
         assert log.delivery_status == _DELIVERY_STATUS_FAILED
         # A delivery given up on promises no next attempt: the last scheduled
-        # time used to stay standing, in the past, for the raw API to read.
+        # time is cleared, so the raw API never reads one in the past.
         assert log.next_retry_at is None
 
     async def test_disabled_webhook_marks_failed(

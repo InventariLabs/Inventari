@@ -1,9 +1,8 @@
 """A webhook endpoint is a channel organization data leaves by.
 
-``grep audit_log backend/app/modules/webhooks/*.py`` used to return nothing.
-Across a session that created four endpoints, deleted three, changed one and
-had one cut off by the circuit breaker and restored by hand, the organization
-journal held a single line — the module being switched on.
+The module writes its own audit entries: a session that creates four endpoints,
+deletes three, changes one and has one cut off by the circuit breaker and
+restored by hand leaves a line for each act in the organization journal.
 
 That matters more here than for an ordinary record: the endpoint carries an
 HMAC signature the receiver may treat as proof of origin, and the delivery
@@ -216,8 +215,8 @@ class TestTheChannelLeavesATrace:
         """A cut-off is one event, however many probes fail after it.
 
         Test pings still reach a channel the breaker switched off, and each
-        failing one used to write the same "disabled by the circuit breaker"
-        row again — four identical System entries for one cut-off.
+        failing one must not write the same "disabled by the circuit breaker"
+        row again — one cut-off is one System entry.
         """
         from app.modules.webhooks._webhook_delivery import _update_stats_after_delivery
 

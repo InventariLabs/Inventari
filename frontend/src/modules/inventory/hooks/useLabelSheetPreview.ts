@@ -23,14 +23,10 @@ interface SheetPreview {
 /**
  * The preview of a label sheet — which is the sheet.
  *
- * The window used to draw its own composition in HTML: a box in the label's
- * proportions, a QR at 90% of its height, the code at a sixth of it. The
- * generator drew another one, on a canvas three quarters as tall, with the
- * code at 38%. Two independent compositions of the same label, and the file
- * was the one nobody had seen until it came out of the printer. So the
- * preview asks the generator for the actual PNG — the same call the download
- * makes, with `markPrinted` off, because looking at the pool must not spend
- * it.
+ * The preview asks the generator for the actual PNG, the same call the download
+ * makes, so there is one composition of the label and the preview shows what
+ * the printer receives. It runs with `markPrinted` off, because looking at the
+ * pool must not spend a label.
  *
  * Debounced: the description field changes the settings on every keystroke,
  * and every change is a render on the server.

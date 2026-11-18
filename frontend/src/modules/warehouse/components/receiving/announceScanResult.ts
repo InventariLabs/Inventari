@@ -74,7 +74,7 @@ export function announceScanResult(
   ) {
     toast.error(receivingRefusal(t, result));
   } else if (result.status === "over_quantity") {
-    // the server refuses over-receiving and said so; the screen used to
+    // the server refuses over-receiving and says so; the screen must not
     // swallow the answer and look like nothing had happened.
     toast.error(
       t("warehouse:receiving.toast.over_quantity", {

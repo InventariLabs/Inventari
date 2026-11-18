@@ -134,9 +134,8 @@ describe("useItemsPageActions — the used-up toast leads back to the record", (
       string,
       ToastOptions | undefined,
     ];
-    // One catalogue key, not a sentence glued from three parts: the toast
-    // used to read "Removed 1 unit (4 pcs left)" — the English word `left`
-    // and the raw symbol, in a message whose other branch was translated.
+    // One catalogue key, not a sentence glued from parts: a glued English word
+    // and a raw symbol would leave a translated message half in English.
     expect(String(message)).toBe(
       i18next.t("items:quickActions.consumedSuccessRemaining", {
         remaining: "4 pcs.",
@@ -238,14 +237,13 @@ describe("useItemsPageActions — the two doors that never ask carry no reason",
       (call: unknown[]) => (call as [{ itemId: string; reason?: string }])[0],
     );
     expect(variables).toEqual([{ itemId: "item-1" }, { itemId: "item-2" }]);
-    // Four deleted used to read "Product deleted" — one product's word for
-    // a whole selection.
+    // A bulk delete names the count, not one product's word for a whole selection.
     expect(toastSuccess).toHaveBeenCalledWith("2 products deleted");
   });
 
   it("hands a refused bulk delete back to the dialog that asked", async () => {
     // The confirmation shows the reason only if the rejection reaches it;
-    // `showConfirm`'s wrapper used to swallow it.
+    // `showConfirm`'s wrapper passes it on.
     const refusal = new Error("Network Error");
     mocks.deleteMutateAsync.mockRejectedValueOnce(refusal);
     const toastSuccess = vi

@@ -279,9 +279,9 @@ class ValuationService:
 
         A priceless inflow — a surplus off a count, a quantity raised by hand,
         a correction or a receipt line with no price — is valued at this
-        organization's own current rate. Posting it at zero used to dilute
+        organization's own current rate. Posting it at zero would dilute
         the average and understate the assets on every surplus, and posting
-        nothing at all used to break the equality between the shelf and the
+        nothing at all would break the equality between the shelf and the
         sum of the layers. When there is no rate to fall back on the layer is
         still posted, marked ``unknown``: the quantity is real even where the
         value is not known, and "unknown" is an answer a report can act on
@@ -470,10 +470,10 @@ class ValuationService:
         (AVCO). The ``avco`` name in identifiers is historical; this
         docstring is the formula's honest label.
 
-        The only place this arithmetic lives. It used to be cached on
-        ``ProductTemplate.current_valuation_rate`` and read from there, which
-        cannot work: that column sits on a row a global template shares with
-        every organization, so the figure belonged to whichever one wrote
+        The only place this arithmetic lives. It is not cached on
+        ``ProductTemplate.current_valuation_rate`` and read from there: that column
+        sits on a row a global template shares with every organization, so the
+        figure would belong to whichever one wrote
         last. Two organizations stocking the same catalogue product at
         different prices valued each other's stock and read each other's
         purchase costs. The cache is gone; this is computed per read.
@@ -523,7 +523,7 @@ class ValuationService:
         # this function bare and every reader takes it for the organization's
         # money — the recipe cost labels it with the org currency, the
         # outgoing layer is written beside it — so a unanimous foreign
-        # currency used to slip past the refusal above and come out as
+        # currency must not slip past the refusal above and come out as
         # dollars. A rate that lies about its currency is worth less than no
         # rate, and no rate is what a mixed batch already gets.
         (currency,) = currencies
@@ -624,9 +624,8 @@ class ValuationService:
         row, and a global template — the whole default catalogue — is shared by
         every organization, so the figure there belonged to whichever one wrote
         last: an organization could read a competitor's purchase cost off a
-        catalogue product, and value its own stock with it. The org filter that
-        used to be missing from this method was added once already; it does not
-        help while the number itself is shared.
+        catalogue product, and value its own stock with it. An org filter on this method
+        does not help while the number itself is shared.
 
         ``None`` also when the layers cannot back a rate in the organization's
         own money — they mix currencies, or all of the stock was bought in one
@@ -756,8 +755,8 @@ class ValuationService:
         cheapest delivery in the warehouse off the books and left the
         expensive one that is actually being sent back standing on them.
 
-        It used to be posted at the average of the layers still on hand, read
-        before the drain. The drain was FIFO, so one move carried two
+        It is not posted at the average of the layers still on hand, read
+        before the drain: the drain is FIFO, so one move carries two
         formulas: ten units bought at 1.00 and ten at 3.00, then ten
         delivered, took a 10.00 layer off the shelf and wrote a 20.00 row.
         The books then held 40.00 bought, 20.00 gone and 30.00 standing, and
@@ -823,10 +822,10 @@ class ValuationService:
             await db.flush()
 
         if remaining_to_deliver > 0:
-            # The layers did not cover the move. This used to end here in
-            # silence — no exception, no log line — and the average then fell
-            # to None while stock still stood on the shelf, quietly pushing
-            # recipe costs onto the supplier price instead. Refusing the move
+            # The layers did not cover the move. This does not end here in
+            # silence: no exception, no log line, and the average does not fall to
+            # None while stock still stands on the shelf, which would quietly push
+            # recipe costs onto the supplier price. Refusing the move
             # is not an option: the goods have already left, and legacy stock
             # that predates the cost history is a real and blameless case.
             # So it is said out loud, and the layer below records it as
@@ -863,7 +862,7 @@ class ValuationService:
         #   told every report the goods had cost nothing;
         # * the layers consumed do not agree on a currency, or agree on one
         #   that is not the organization's. Amounts in different money do not
-        #   add, and the rate this used to be posted at refused a mixed batch
+        #   add, and the rate posted here refuses a mixed batch
         #   for the same reason. There is no sum to write, so there is none.
         house = await _organization_currency(db, organization_id)
         priced_in_house = {house if c is None else c for c in consumed_currencies} <= {

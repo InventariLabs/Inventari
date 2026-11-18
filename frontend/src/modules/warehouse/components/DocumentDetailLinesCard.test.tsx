@@ -129,13 +129,12 @@ describe("DocumentDetailLinesCard — quantity column", () => {
   });
 
   it("prints the received number next to the planned one while part-done", () => {
-    // The done number used to live only in a title attribute - invisible on
-    // touch, in print, and in copied text - while the Quantity column read
-    // the planned figure alone.
+    // The done number is printed beside the planned one, not only in a title
+    // attribute, which is invisible on touch, in print and in copied text.
+    // The Quantity column alone would show the planned figure.
     renderCard([line({ done_quantity: "4" })]);
-    // The mobile card variant already prints it; the desktop table used to
-    // hide the number in a title attribute - invisible on touch, in print
-    // and in copied text. Both variants have to print it.
+    // The mobile card variant prints it, and so must the desktop table, which
+    // does not hide the number in a title attribute. Both variants print it.
     expect(
       screen.getAllByText(/done 4 \/ planned 10/i).length,
     ).toBeGreaterThanOrEqual(2);
@@ -299,7 +298,7 @@ describe("DocumentDetailLinesCard — heading level", () => {
 describe("DocumentDetailLinesCard — where the goods went", () => {
   it("names the shelf when a putaway rule sent the line elsewhere", () => {
     // The header says Floor 2, the rule sent the delivery to Floor 1, and
-    // the document used to say nothing at all about the difference.
+    // the document names that difference.
     renderCard(
       [
         line({
@@ -335,9 +334,8 @@ describe("DocumentDetailLinesCard — where the goods went", () => {
 
 describe("DocumentDetailLinesCard — planned putaway", () => {
   it("says where a matching rule will put the line, and by what match", () => {
-    // The rule used to decide while booking: the first honest sentence about
-    // its choice appeared only after the goods were on the shelf, as "landed
-    // elsewhere". Before execution the line now names the shelf up front.
+    // The rule decides up front: before execution the line names the shelf
+    // the rule chose, rather than reporting "landed elsewhere" after booking.
     renderCard([
       line({
         planned_location_id: "loc-1",
@@ -431,9 +429,8 @@ describe("DocumentDetailLinesCard — planned putaway", () => {
       screen.getAllByText(/A matching rule points at an archived location/)
         .length,
     ).toBeGreaterThanOrEqual(2);
-    // And it says where the goods go instead. The sentence used to stop at
-    // the reason, leaving the reader knowing why the rule lost and not the
-    // one thing they opened the line to find out.
+    // And it says where the goods go instead, so the reader learns the one
+    // thing they opened the line to find out, not only why the rule lost.
     expect(
       screen.getAllByText(/the line goes to Receiving Dock/).length,
     ).toBeGreaterThanOrEqual(2);

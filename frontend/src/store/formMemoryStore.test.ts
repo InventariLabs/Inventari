@@ -23,7 +23,7 @@ describe("useFormMemoryStore", () => {
 
   it("remembers nothing that describes one product", () => {
     // The name, the brand, the weight, the expiry date and the custom fields
-    // used to travel too. On the next product they were data nobody typed —
+    // do not travel. On the next product they would be data nobody typed —
     // and the expiry date of the carton before it is the kind of wrong that
     // does not look wrong. A payload carrying them changes nothing here.
     const payload = {

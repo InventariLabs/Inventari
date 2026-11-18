@@ -239,8 +239,8 @@ class TestAnUncheckedReportIsNotAnEmptyOne:
     def test_a_complete_report_with_nothing_found_still_says_so(
         self, installed_reporting: str, monkeypatch: pytest.MonkeyPatch
     ):
-        """Pins the honest path; the old code says this too, so it only
-        documents that the fix did not silence a truthful line."""
+        """Pins the honest path: a truthful line stays in the summary, and nothing silences
+        it."""
         buffer = _capturing_console(monkeypatch)
         monkeypatch.setattr('app.database.SessionLocal', _EmptyDatabase)
         monkeypatch.setattr('app.cli._module_orphans._file_group', lambda name: None)
@@ -440,7 +440,7 @@ class TestTheDropMessageTellsTheTruth:
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ):
         """A tracking entry whose backend files are already gone has no
-        hook to run, so no table was touched — and the summary used to
+        hook to run, so no table was touched — and the summary must not
         say they were dropped anyway."""
         buffer = _capturing_console(monkeypatch)
 
@@ -521,8 +521,8 @@ class TestTheDropMessageTellsTheTruth:
     ):
         """The files are on disk but the module never made it into the
         registry (a rejected import), so the drop-hook could not run and
-        the tables are still in the database. The summary used to say
-        they were dropped — contradicting the database two lines below
+        the tables are still in the database. The summary must not say
+        they were dropped, which would contradict the database two lines below
         the promise."""
         buffer = _capturing_console(monkeypatch)
         monkeypatch.setattr('typer.prompt', lambda text: 'data')
@@ -617,8 +617,8 @@ class TestTheDropMessageTellsTheTruth:
     ):
         """The schema check exists to silence a false claim, not the true
         one: when the database confirms the tables are gone, the summary
-        keeps saying so. Passes on the old code too — it pins the honest
-        path, it does not discriminate."""
+        keeps saying so. It pins the honest path and does not
+        discriminate."""
         (module_packaging.BACKEND_MODULES_DIR / installed / 'models.py').write_text(
             "class Thing:\n    __tablename__ = 'fixture_mod_thing'\n",
             encoding='utf-8',

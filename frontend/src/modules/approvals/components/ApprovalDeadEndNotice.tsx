@@ -61,9 +61,8 @@ const ONLY_REQUESTER = "only_the_requester_can_decide";
  * at all; or the stage is open and the grant's only holder is the
  * requester, whom the door refuses a self-decision. A workflow definition
  * is judged without a requester, so it carries the first two. All of them
- * used to read exactly like something waiting its turn — and, on a queue
- * that shows only what the reader can act on, like a queue with nothing in
- * it.
+ * read as a dead end, not as something waiting its turn — and, on a queue
+ * that shows only what the reader can act on, they look like an empty queue.
  *
  * The cause is the same for every reader; the way out is not. The workflow
  * cannot be changed or switched off while a request waits on it, so the one

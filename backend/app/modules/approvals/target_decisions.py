@@ -1,10 +1,10 @@
 """Who wants to hear that a request about their target was settled.
 
 The engine decides; the module that owns the target has to act on the
-decision. Approving a request used to end at ``request.status = 'APPROVED'``
-and nothing else -- the document it was about stayed in PENDING_APPROVAL, so
-a document that was approved and ready to post looked, on the list and in
-the "Pending Approval" filter, exactly like one still waiting for somebody.
+decision. Approving a request ends at ``request.status = 'APPROVED'``, and the target
+module moves its document on from there, so an approved document never sits in
+PENDING_APPROVAL, where it would look, on the list and in the "Pending Approval"
+filter, like one still waiting for somebody.
 
 Reading the other module's tables from here is not an option (the engine
 never does), and the consuming module cannot poll. So the direction is the

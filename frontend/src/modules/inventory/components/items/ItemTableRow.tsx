@@ -66,10 +66,9 @@ interface ItemTableRowProps {
 /**
  * Where the product sits, written as the whole path.
  *
- * The row used to print `storage.name` alone, so a nested location read as
- * "Shelf A - Top" with no sign of which warehouse it belongs to — and it
- * joined its own segments with `·` while the rest of the product speaks
- * `LOCATION_PATH_SEPARATOR` (§14.2: one concept, one word — and one glyph).
+ * A nested location shows its warehouse as well as its shelf, and the segments
+ * are joined with `LOCATION_PATH_SEPARATOR` (§14.2: one concept, one word — and
+ * one glyph), the separator the rest of the product speaks.
  * `getStorageLocationPath` is the shared answer: the backend's `full_path`
  * when the record carries one, the ancestor walk when it does not.
  */
@@ -431,12 +430,8 @@ function ItemTableRowBase({
       ))}
 
       {/* Location — the name of a place opens the place.
-          It used to narrow this list to that storage instead, which made the
-          link a no-op exactly where a reader is most likely to press it: on
-          the list it had just narrowed, every row names the same storage, so
-          the destination was the page already on screen. Narrowing by storage
-          is what the filter panel is for. The storage's own page always has
-          something to show.
+          The link opens the storage's own page, which always has something to
+          show. Narrowing this list by storage is what the filter panel is for.
 
           The leaf comes first and is never cut: a product held in twelve
           records on twelve shelves of one warehouse differs only in its last

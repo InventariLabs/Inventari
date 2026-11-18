@@ -1,11 +1,9 @@
-"""A scanning session nobody is working in no longer blocks its document.
+"""A scanning session nobody is working in does not block its document.
 
-Closing the picking or receiving sheet used to leave the session open and
-held: the document refused completion until someone resumed the session or
-discarded every scan in it. Now closing the sheet pauses the session, and a
-session left untouched for the organization's idle time counts the same: the
-scans stay, anyone who starts the document continues them, and completing the
-document books what was scanned.
+Closing the picking or receiving sheet pauses the session, and a session left
+untouched for the organization's idle time counts the same: the scans stay,
+anyone who starts the document continues them, and completing the document
+books what was scanned. A paused session does not refuse completion.
 """
 
 import uuid

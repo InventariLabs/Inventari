@@ -469,7 +469,7 @@ class TestAnalyzeExecuteRoundtrip:
 @pytest.mark.integration
 class TestTheImportReadsTheSheetTheAppExports:
     """A list exported, edited and imported back carries the words the app
-    prints — "Available", not AVAILABLE — and every row of it used to fail."""
+    prints — "Available", not AVAILABLE — and the import reads every row of it."""
 
     def test_status_as_the_app_shows_it_in_any_language_and_case(
         self,

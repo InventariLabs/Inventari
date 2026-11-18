@@ -79,7 +79,7 @@ export function AssignmentsTab({
       setPreviewHtml(await equipmentApi.fetchProtocolHtml(assignmentId));
     } catch (err) {
       setPreviewAssignmentId(null);
-      // A refusal no longer vanishes into an unhandled rejection: the reader
+      // A refusal never vanishes into an unhandled rejection: the reader
       // gets the backend's own sentence.
       toast.error(
         extractApiError(err, t("protocol.preview_failed", "Preview failed")),
@@ -207,13 +207,11 @@ export function AssignmentsTab({
                     </span>
                   )}
                 </div>
-                {/* The document, on every row and under its own name. Two
-                    14px ghost icons used to stand here, and only while the
-                    assignment was open -- so the return protocol, which the
-                    backend renders from the CHECKIN template and an admin can
-                    edit under Templates, had no way in at all. One control,
-                    one label (UI_GUIDELINES 14.4): which of the two protocols
-                    it is, the document's own title says. */}
+                {/* The document, on every row and under its own name. One control,
+                    one label (UI_GUIDELINES 14.4): the document's own title says
+                    which of the two protocols it is, so the return protocol, which
+                    the backend renders from the CHECKIN template, has its way in
+                    on every row. */}
                 <div className="self-end sm:self-auto">
                   <Button
                     type="button"

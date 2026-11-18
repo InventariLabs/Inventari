@@ -81,9 +81,8 @@ const rolesApi = {
 
 export function useRoles(enabled = true) {
   return useQuery({
-    // The mutations below invalidate the "roles" prefix — the key used to be
-    // parked under the audit-log list key, so creating a role in the matrix
-    // never refreshed the pickers that read this hook.
+    // The mutations below invalidate the "roles" prefix, so creating a role in
+    // the matrix refreshes the pickers that read this hook.
     queryKey: queryKeys.roles.all,
     queryFn: () => rolesApi.list(),
     staleTime: 30_000,

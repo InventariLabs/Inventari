@@ -329,10 +329,9 @@ export function TemplateEditorModal({
                 )}
                 {placeholders.map((p: PlaceholderInfo) => {
                   // One resolver, one reading: the tooltip and the line under
-                  // the key are the same sentence. They used to be resolved
-                  // separately, so hovering a symbol answered in the API's
-                  // English while the text six lines below it answered in the
-                  // reader's language.
+                  // the key are the same sentence, resolved once, so a tooltip
+                  // and the text six lines below it answer in the reader's
+                  // language.
                   const descriptionKey = placeholderDescriptions.find(
                     (d) => d.key === p.key,
                   )?.descriptionKey;

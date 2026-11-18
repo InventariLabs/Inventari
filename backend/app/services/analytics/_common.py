@@ -217,9 +217,9 @@ async def stock_value_async(
 
     *scope* says whom the figure is about. The layers carry no location, so
     the ledger branch cannot honour *storage_ids* and does not pretend to:
-    it answers for the whole organization and says so, where it used to
-    take the filter and drop it on the floor — a count of records in the
-    internal locations beside a value for every location there is.
+    it answers for the whole organization and says so, rather than taking the
+    filter and dropping it: a count of records in the internal locations
+    would otherwise sit beside a value for every location there is.
     """
     from app.models.stock_valuation_layer import StockValuationLayer
 

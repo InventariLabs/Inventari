@@ -254,8 +254,8 @@ describe("StockAsOfPage", () => {
 /**
  * The report stays — what the shelves held is quantity, not a business
  * metric — but where the profile does not show stock value, the money
- * column, its total and the cost-ledger notes go with it. The page used to
- * answer a home organization with prices it keeps nowhere.
+ * column, its total and the cost-ledger notes go with it, so the page never
+ * answers a home organization with prices it keeps nowhere.
  */
 describe("StockAsOfPage — a profile that does not show stock value", () => {
   beforeEach(() => {
@@ -358,9 +358,8 @@ it("distinguishes equally named shelves by the way to them", async () => {
 });
 
 /**
- * The day and the place used to live only in the page's own state: a refresh
- * brought back today and every storage, and a link copied to a colleague
- * opened a different report from the one on screen.
+ * The day and the place live in the address, so a refresh keeps the report, and
+ * a link copied to a colleague opens the same one.
  */
 describe("StockAsOfPage — the address carries the report", () => {
   beforeEach(() => {

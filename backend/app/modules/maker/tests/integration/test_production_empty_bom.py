@@ -1,8 +1,8 @@
 """Completing a run whose recipe lists no ingredients must be refused.
 
-A DRAFT for an ingredient-less recipe used to complete happily: nothing was
-consumed, yet the output item was created and stood on the shelf — goods out
-of thin air. The rule is now explicit: no bill of materials, no production.
+A DRAFT for an ingredient-less recipe does not complete: nothing would be
+consumed, so the output item would be created out of thin air. The rule is
+explicit: no bill of materials, no production.
 """
 
 from __future__ import annotations

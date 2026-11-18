@@ -171,9 +171,9 @@ class TestAvailableEvents:
     def test_every_event_has_a_description(
         self, client: TestClient, admin_headers: dict[str, str]
     ) -> None:
-        """A missing description used to fall back to the technical name.
+        """A missing description must not fall back to the technical name.
 
-        Seventeen of forty-two rendered as `purchase_order.confirmed` and the
+        A missing one would render as `purchase_order.confirmed` and the
         like — a catalog that names itself explains nothing. The gap is caught
         here rather than on screen.
         """
@@ -221,9 +221,9 @@ class TestAvailableEvents:
     ) -> None:
         """Events a module registers must be offerable, not just `SystemEvent`.
 
-        The catalog used to iterate `SystemEvent`, so anything a module declared
-        in the payload registry — every `recipe.*` event — stayed invisible in
-        the UI even once the API started accepting it.
+        The catalog iterates `SystemEvent` and the payload registry, so anything a
+        module declared — every `recipe.*` event — is offered in the UI, as the
+        API accepts it.
         """
         response = client.get('/api/v1/webhooks/events', headers=admin_headers)
         assert response.status_code == status.HTTP_200_OK
@@ -271,8 +271,8 @@ class TestListEndpoints:
     ) -> None:
         """A target URL is a credential at most receivers, so reading is admin work.
 
-        This assertion used to say the opposite, and passed: the five mutating
-        endpoints each carried the admin guard and the reads carried none.
+        Reads are admin work too: the five mutating endpoints and the reads all carry
+        the admin guard.
         """
         response = client.get('/api/v1/webhooks/endpoints', headers=member_headers)
         assert response.status_code == status.HTTP_403_FORBIDDEN

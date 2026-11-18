@@ -184,7 +184,7 @@ describe("useQuickAdd", () => {
 
   it("does not say the product was not saved when only its photo was refused by an ended session", async () => {
     // The product is created first; the photo goes up after. A session that
-    // ends in between used to put "this was not saved" in a toast beside
+    // ends in between puts no "this was not saved" in the toast beside
     // "Product added".
     server.use(
       http.post("/api/v1/items", () =>
@@ -278,11 +278,10 @@ describe("useQuickAdd", () => {
 });
 
 /**
- * The picker used to read the full list while the products list underneath it
- * read the scoped one, so the form handed out locations the list then called
- * "Unknown". It now offers what the general screens are about — and keeps
- * whatever the form arrived holding, so a record already put away in a
- * module's location can still be opened.
+ * The picker offers what the general screens are about, the same set the
+ * products list reads, so the form never hands out a location the list calls
+ * "Unknown". It keeps whatever the form arrived holding, so a record already
+ * put away in a module's location can still be opened.
  */
 describe("useQuickAdd — which locations the form offers", () => {
   const shelf = { id: "loc-shelf", name: "Shelf A" };
@@ -609,12 +608,11 @@ describe("useQuickAdd — why the picker is empty", () => {
 });
 
 /**
- * The picker used to read the full catalogue while the products list
- * underneath it read the scoped one, so the form handed out categories the
- * list then hid — and a category owned by a module moves the record into
- * that module on the way past, silently. It now offers the same set the list
- * shows, keeps whatever the record deliberately carries, and refuses to hold
- * a remembered category it cannot show.
+ * The picker offers the same set of categories the products list shows, so the
+ * form never hands out one the list hides. A category owned by a module moves
+ * the record into that module on the way past, so the form keeps whatever the
+ * record deliberately carries and refuses to hold a remembered category it
+ * cannot show.
  */
 describe("useQuickAdd — which categories the form offers", () => {
   const dairy = { id: "cat-dairy", name: "Dairy", sort_order: 1 };
@@ -900,8 +898,8 @@ describe("useQuickAdd — the fields a category declares", () => {
 describe("useQuickAdd — what the previous product leaves behind", () => {
   it("carries the shelf and the category, and nothing that described one product", async () => {
     // A tin of peas filed as cold cuts, with the expiry date of the carton
-    // before it: the form used to reopen holding the whole of the last
-    // product, and the scan that followed only overwrote the fields it knew.
+    // before it. The form reopens holding the shelf and the category, not the
+    // whole of the last product, and a scan overwrites only the fields it knows.
     useFormMemoryStore.getState().setLastItem({
       location_id: "loc-shelf",
       category_id: "cat-1",
@@ -956,9 +954,9 @@ describe("useQuickAdd — reading a label with the camera", () => {
   };
 
   it("takes the nutrition module's contributed group from `extra`", async () => {
-    // These fields used to sit alongside `expiry_date` in one shared type.
-    // They arrive namespaced now, and the form has to read them there or a
-    // photographed nutrition table quietly stops being recorded.
+    // These fields arrive namespaced under `extra`, not beside `expiry_date`;
+    // the form has to read them there or a photographed nutrition table quietly
+    // stops being recorded.
     answering({
       name: "Mleko",
       expiry_date: "2026-12-31",

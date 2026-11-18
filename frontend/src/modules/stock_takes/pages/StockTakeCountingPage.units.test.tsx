@@ -142,11 +142,10 @@ describe("StockTakeCountingPage — counting in the row's own unit", () => {
 
     const counted = within(cardFor("Yoghurt"));
     // "pcs." is what the unit catalogue calls the symbol on the record; the
-    // card used to append the symbol itself and read "5 pcs".
+    // card shows that symbol as stored and appends none of its own.
     expect(counted.getByText("5 pcs.")).toBeInTheDocument();
     // The step button says "pcs." too, so the announcement matches the figure
-    // it steps: "One more pcs of Yoghurt" was the record's spelling read out
-    // loud beside a resolved one.
+    // it steps, and the record's spelling is not read out loud beside it.
     expect(
       counted.getByRole("button", { name: "One more pcs. of Yoghurt" }),
     ).toBeInTheDocument();

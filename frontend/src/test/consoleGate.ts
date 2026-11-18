@@ -1,9 +1,9 @@
 /**
  * A green run that printed React warnings is not a green run.
  *
- * The suite used to pass while React filled stderr with "each child in a list
- * should have a unique key" or "validateDOMNesting" — noise that buried the
- * warnings which were real defects, and taught everyone to skim past them.
+ * A suite that passes while React fills stderr with "each child in a list
+ * should have a unique key" or "validateDOMNesting" hides the warnings that are
+ * real defects, and teaches everyone to skim past them.
  * This gate makes a `console.error` (or a React `console.warn`) fail the test
  * that caused it, with the message inside the failure where it cannot be
  * skimmed.

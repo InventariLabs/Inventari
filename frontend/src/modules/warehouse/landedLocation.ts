@@ -8,9 +8,9 @@ import type {
  * for.
  *
  * A putaway rule can redirect a delivery: the document names Floor 2, the rule
- * says Floor 1, and the goods go to Floor 1. The document used to say nothing
- * about it, so the record, the ledger and the header each answered "where is
- * this" differently and only one of them was right.
+ * says Floor 1, and the goods go to Floor 1. The document reports where the
+ * goods landed, so the record, the ledger and the header answer "where is this"
+ * the same way.
  *
  * Returns `null` when the goods landed where the document said, which is the
  * ordinary case and needs no second sentence, and on a line a zone pinned to

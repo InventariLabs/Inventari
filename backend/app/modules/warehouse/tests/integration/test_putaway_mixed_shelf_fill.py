@@ -1,9 +1,9 @@
 """A mixed shelf is full when its products' shares add up to 100%.
 
-The planner used to ask one product at a time: rice limited to 40 and plums
-to 50 kg on one shelf, 20 rice and 25 kg plums standing there, and each
-product alone read half full — so the shelf kept receiving while it was
-physically full. A shelf now has room for a quantity q of product P only
+The planner asks about the shelf as a whole, never one product at a time: rice
+limited to 40 and plums to 50 kg on one shelf, 20 rice and 25 kg plums standing
+there, and each product alone reads half full, yet the shelf is full. A shelf has
+room for a quantity q of product P only
 while the sum of the shares already there plus q / limit(P) stays within 1.
 A line goes to one shelf whole: one that only partly fits sends the line on
 to the next shelf in the rule.

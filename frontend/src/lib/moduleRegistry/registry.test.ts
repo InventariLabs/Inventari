@@ -123,7 +123,7 @@ describe("ModuleRegistry.warnOrphanedNav", () => {
         ],
       },
     });
-    // The registry keeps what it once loaded; only the names handed to the
+    // The registry keeps what it has loaded; only the names handed to the
     // check say what is enabled now.
     moduleRegistry.register({ name: guest, routes: [] });
     moduleRegistry.warnOrphanedNav([name]);

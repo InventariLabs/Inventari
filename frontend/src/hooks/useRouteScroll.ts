@@ -36,7 +36,7 @@ function remember(entry: string, y: number) {
  * Where the page is scrolled on each screen, for the whole app shell.
  *
  * The page scrolls as a whole and the shell outlives every route, so a new
- * screen used to open where the last one was scrolled: a product's name above
+ * screen must not open where the last one was scrolled: a product's name above
  * the fold, the journal's newest move out of sight.
  *
  * - A link or a button (PUSH, REPLACE) opens a screen at its top. Only a

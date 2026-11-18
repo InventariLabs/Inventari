@@ -2,17 +2,17 @@
 
 Confirming an outbound document reserves against the shelf's quantity per
 (template, location) — then the quant table's, now the records' view that
-sums them. Execution used to check ``Item.quantity`` of the line's one
-record — that same figure, split across however many records stand on the
-shelf. One product on one shelf in two records is an
-ordinary situation: two batches, or two deliveries that arrived apart. The
-two numbers then differed every time, and a document could pass confirmation,
-gather a reservation on the whole shelf, and break on its last step quoting a
-figure matching neither the shelf nor the reservation.
+sums them. Execution checks ``Item.quantity`` of the line's one record — that same
+figure, split across however many records stand on the shelf. One product on
+one shelf in two records is an ordinary situation: two batches, or two
+deliveries that arrived apart. Read that way, the two numbers differ, and a
+document could pass confirmation, gather a reservation on the whole shelf, and
+break on its last step quoting a figure matching neither the shelf nor the
+reservation.
 
-The way out the warehouse was left with wrote down an untruth: dispatch what
-the single record admits to and mark the rest SHORTAGE — a shortage of goods
-that were on the shelf the whole time.
+Execution must not dispatch only what the single record admits to and mark the
+rest SHORTAGE: that is a shortage of goods that were on the shelf the whole
+time.
 """
 
 from __future__ import annotations

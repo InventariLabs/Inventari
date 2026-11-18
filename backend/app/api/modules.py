@@ -694,9 +694,9 @@ async def get_module_settings(
         # A name this installation knows without a BaseModule behind it — an
         # always-on feature (items, locations, categories), a frontend-only
         # shell name, the virtual partners card — has no settings to read,
-        # but it is not unknown. The 404 this branch used to produce is what
-        # let the settings screen tell an admin the products module "does
-        # not exist" while it sat enabled in their own organization.
+        # but it is not unknown, so it must not answer 404: that would let the
+        # settings screen tell an admin the products module "does not exist"
+        # while it sits enabled in their own organization.
         if module_name in (
             set(_effective_always_on())
             | set(_ALWAYS_ON_FRONTEND_ONLY)
@@ -737,7 +737,7 @@ async def update_module_settings(
     if change is not None:
         # A module's settings decide what the module may do — up to whether
         # an approval step can be closed by its own author — and the write
-        # used to leave no trace. Same shape as the module toggle: the
+        # is recorded in the audit log. Same shape as the module toggle: the
         # module's name is the identity worth keeping, the organization id
         # fills the target column, and the snapshot names the keys that
         # moved with secret leaves masked.

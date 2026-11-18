@@ -169,11 +169,10 @@ describe("POLinesCard — a line received three of ten says so", () => {
 });
 
 /**
- * The line used to be a sentence: the name at the left edge, and at the
- * right one "4 200,00 zł / szt. = 20 664,00 zł (Netto: 16 800,00 zł +
- * 23,0% = 3 864,00 zł)" — whose second half read as if the net plus the rate
- * came to the tax. Every amount has a column now, the way the document
- * detail lays out its lines.
+ * The line is a row of columns: the name at the left edge, and every amount in
+ * a column of its own, the way the document detail lays out its lines. A
+ * sentence such as "4 200,00 zł / szt. = 20 664,00 zł (Netto: …)" would read as
+ * if the net plus the rate came to the tax.
  */
 describe("POLinesCard — the lines read as columns", () => {
   const cellUnder = (header: string) => {

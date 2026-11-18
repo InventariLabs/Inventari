@@ -330,8 +330,8 @@ describe("StorageArchiveDialog", () => {
   });
 
   it("keeps the only way out on screen when the summary cannot be read", async () => {
-    // A failed read used to be filed as "empty": the picker disappeared,
-    // Archive stayed enabled, and the backend then refused to archive a
+    // A failed read is not filed as "empty": the picker stays visible, Archive
+    // is not enabled on a guess, and the backend would otherwise refuse to archive a
     // location holding items — with nothing on the screen to fix it.
     server.use(
       http.get("*/api/v1/locations/:id/summary", () =>

@@ -168,8 +168,8 @@ describe("useWmsReceiving.scan", () => {
 
 describe("useWmsReceiving.completeSession", () => {
   it("reports the server's refusal, so no success message can follow it", async () => {
-    // "Receiving completed" used to appear next to "Cannot complete: 1 lines
-    // still pending", because the caller had no way to tell the two apart.
+    // The caller tells a refused completion from a closed one, so "Receiving completed"
+    // never appears next to "Cannot complete: 1 lines still pending".
     completeMock.mockRejectedValue(
       Object.assign(new Error("refused"), {
         response: {

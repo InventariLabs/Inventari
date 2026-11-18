@@ -1,10 +1,7 @@
 """Item attachments live where every other upload lives: in file storage.
 
-The writer used to open an upload directory of its own while ``/uploads/``
-served through ``FileStorageService``. On the local backend the two happen to
-be one directory in the container, so nothing showed; on S3 the upload
-reported success, the object never reached the bucket, and the download was a
-404. The provider below stands in for any non-local backend: it keeps objects
+The writer goes through ``FileStorageService``, as ``/uploads/`` does. The
+provider below stands in for any non-local backend: it keeps objects
 in memory, behind the same ``StorageProvider`` interface S3 implements, so a
 write that bypasses the abstraction cannot reach it.
 """

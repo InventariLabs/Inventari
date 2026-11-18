@@ -44,8 +44,8 @@ export interface ItemFormData {
   name: string;
   location_id: string;
   quantity: string;
-  /** The only carrier of the unit. Everything that used to branch on a unit
-   * symbol asks the UoM catalogue about this id instead. */
+  /** The only carrier of the unit. Everything that branches on a unit asks the
+   * UoM catalogue about this id, never a unit symbol. */
   uom_id?: string;
   /** Weight of a single unit and the unit it is given in. Both belong to the
    * product template, not to this line (ADR-015). */
@@ -671,10 +671,9 @@ export function useItemForm({
         { templateUomId, isConfirmedChoice, initialUomId },
       );
 
-      // Only a new product feeds the batch-mode memory. Fixing a category on
-      // an existing record used to set the default for the next new one,
-      // which is how a correction on one item became a wrong value on the
-      // next.
+      // Only a new product feeds the batch-mode memory: fixing a category on an
+      // existing record must not set the default for the next new one, or a
+      // correction on one item becomes a wrong value on the next.
       if (form === "item_create") setLastItem(submission);
       onSubmit(submission);
     },

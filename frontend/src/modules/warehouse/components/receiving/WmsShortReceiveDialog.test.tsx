@@ -183,7 +183,7 @@ describe("WmsShortReceiveDialog", () => {
     await user.click(screen.getByRole("button", { name: "Confirm" }));
 
     // Nothing arrived on this line is an answer, not an omission: the
-    // dialog used to refuse zero with "Enter how much actually arrived".
+    // dialog accepts zero rather than asking how much arrived.
     expect(onConfirm).toHaveBeenCalledWith(
       "line-1",
       0,

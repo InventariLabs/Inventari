@@ -58,9 +58,9 @@ async def _canonical_measure(
 ) -> tuple[Decimal, str] | None:
     """Restate *quantity* in its unit's canonical measure via the core converter.
 
-    The one conversion mechanism every mass/volume answer goes through —
-    the private tables this module used to carry had an ounce of 28.35
-    against the catalogue's 28.3495. ``None`` means the measures don't
+    The one conversion mechanism every mass/volume answer goes through: the
+    catalogue's ounce is 28.3495, not a rounded 28.35 kept in a table of this
+    module's own. ``None`` means the measures don't
     meet; never a silently unchanged quantity.
     """
     from app.core.public_api import core_api

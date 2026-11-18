@@ -235,7 +235,7 @@ describe("ShoppingListDetailPage", () => {
     expect(
       await screen.findByText(/Lista jest pusta|List is empty/i),
     ).toBeInTheDocument();
-    // The empty state used to send the reader to auto-suggestions, which
+    // The empty state must not send the reader to auto-suggestions, which
     // this screen does not have — the door it names must be one that is on
     // the screen ("Add item").
     expect(screen.queryByText(/auto-sugestii|auto-suggestions/i)).toBeNull();

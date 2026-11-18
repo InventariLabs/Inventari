@@ -28,8 +28,8 @@ interface ProductionIngredientsTableProps {
   /**
    * The refusal's own list, by template id — the server's answer the banner
    * counts, not a forecast the browser made. Only a draft can have it: the
-   * numbers on this list used to stand next to the shortage in silence, and
-   * the refusal arrived two clicks later.
+   * numbers on this list stand next to the shortage they explain, rather than
+   * waiting for a refusal two clicks later.
    */
   shortages?: Map<string, ShortageEntry>;
   /**
@@ -212,10 +212,8 @@ export function ProductionIngredientsTable({
             <div className="hidden sm:grid grid-cols-[1fr_auto_auto_auto] gap-4 p-3 text-xs uppercase tracking-widest text-on-muted font-medium">
               <span>{t("detail.line.ingredient")}</span>
               <span className="text-right">{t("detail.line.qty")}</span>
-              {/* Both named, in both states: the closed run used to fill
-                  "UNIT COST" with the rate while the draft filled it with
-                  the line amount — the same header, two meanings two rows
-                  of magnitude apart. */}
+              {/* Both named, in both states: "UNIT COST" holds the rate in the
+                  closed run and in the draft alike, one header, one meaning. */}
               <span className="text-right">{t("detail.line.unitCost")}</span>
               <span className="text-right">{t("detail.line.lineCost")}</span>
             </div>

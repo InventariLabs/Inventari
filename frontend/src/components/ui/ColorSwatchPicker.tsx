@@ -45,8 +45,8 @@ export const PALETTE_KEYS: string[] = Object.keys(SWATCH_STYLES);
  * back to a hash of the category name (consistent color per name).
  *
  * **What a swatch is called.** The palette is a design-system token
- * (`sky`, `slate`, `accent`), and those keys used to be the buttons'
- * accessible names — a screen reader announced "slate" in a Polish
+ * (`sky`, `slate`, `accent`), and those keys must never be the buttons'
+ * accessible names — a screen reader would announce "slate" in a Polish
  * dialog, and `accent` is not even a colour but a role. The names live in
  * the catalogue instead, under ``modal.colors.<key>``, one per language:
  * `accent` is named after the role it plays ("Primary"), the rest after

@@ -39,8 +39,8 @@ vi.mock("sonner", () => ({
  * handlers were still calling `mutate` and returning nothing. Two of the
  * cases here are not refused requests at all: a bulk endpoint answers `200`
  * having purged nothing, and retiring a selection of checked-out assets is
- * turned down before a request is sent. Both used to close the dialog over a
- * toast, and both now keep it open with the reason inside.
+ * turned down before a request is sent. In both, the dialog stays open with
+ * the reason inside.
  */
 const ITEM_ID = "ec6be09a-90ba-449d-a45b-6217ef627d37";
 

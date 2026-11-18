@@ -19,7 +19,7 @@ def storage_label_caption(storage: Any, show_description: bool) -> str | None:
     The toggle offering this is called "show description on label", so the
     description is what it prints. Records written before the edit sheet
     offered a description field have none — those fall back to the name,
-    which is what the label used to print unconditionally.
+    which the label prints in place of a description.
     """
     if not show_description:
         return None

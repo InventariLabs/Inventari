@@ -219,10 +219,8 @@ class TestOnboardingProfileApplication:
         real_async_db_session: AsyncSession,
     ):
         """The home profile declares a Fridge, Shelf A and
-        a Freezer, and the declaration used to stay dead — the first thing
-        someone wanting to take stock of their fridge saw was "create a
-        storage". Onboarding now seeds what the profile declares, the way
-        equipment seeds its own through ``system_on_enable``."""
+        a Freezer, and onboarding seeds what the profile declares, the way equipment
+        seeds its own through ``system_on_enable``."""
         from sqlalchemy import select
 
         from app.core.contracts import UserContextDTO
@@ -365,10 +363,9 @@ class TestOnboardingProfileApplication:
     ):
         """A Polish organization taking the real ``equipment_wms`` profile
         must not find a tax rate waiting on its document profile. That
-        profile applies the ``Full Value`` preset, which used to carry the
-        UK basic rate (20%) — a silent 20% on every document a Polish
-        company would ever raise. A preset is a way of working, not a
-        country: the rate is either the organization's own or none at all."""
+        profile applies the ``Full Value`` preset, which carries no tax rate of its
+        own: the rate is either the organization's own or none at all, since a
+        preset is a way of working, not a country."""
         from app.modules.warehouse.document_profile_service import (
             get_profile as get_document_profile,
         )
@@ -487,12 +484,9 @@ class TestOnboardingProfileApplication:
     ):
         """What the organization had before onboarding does not survive it.
 
-        This assertion used to say the opposite — "modules already enabled
-        before onboarding are not dropped" — and that premise is the defect:
-        onboarding added the profile to whatever was there, so the answer to
-        "what kind of place is this?" was always a union. On a fresh
-        organization "whatever was there" was an eight-module ORM default, and
-        a household choosing Food & Home was handed the document register its
+        Onboarding decides the set rather than adding the profile to what was there,
+        so the answer to "what kind of place is this?" is one answer, not a union.
+        A household choosing Food & Home is not handed the document register its
         profile does not list.
 
         Onboarding runs once, on an organization that has answered nothing.
@@ -770,9 +764,9 @@ class TestOnboardingKeepsManualToggles:
     """A module the admin switched on before answering the profile question
     survives the answer.
 
-    Onboarding used to overwrite ``enabled_modules`` with the profile's
-    chosen set, so a module enabled through POST /modules/toggle before
-    'Get started' was dropped without its disable hook and without a word.
+    Onboarding does not overwrite ``enabled_modules`` with the profile's chosen set,
+    so a module enabled through POST /modules/toggle before 'Get started' stays
+    enabled, and its disable hook does not run.
     The toggle path records the explicit choice on the organization while
     onboarding stands open; onboarding keeps it.
     """

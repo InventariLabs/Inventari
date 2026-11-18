@@ -11,8 +11,8 @@ import { onePage } from "@/test/mocks/page";
 
 /**
  * Switching off api_keys or webhooks revokes something that is live right now.
- * The toggle used to be one unguarded click with a toast afterwards, which is
- * too late to be a warning — and an admin reaching for this lever *because*
+ * The toggle asks first, because a toast afterwards is too late to be a warning,
+ * and an admin reaching for this lever *because*
  * they suspect a leaked key deserves to be told it is the right lever.
  *
  * Every other module asks too, with the general sentence about its data:

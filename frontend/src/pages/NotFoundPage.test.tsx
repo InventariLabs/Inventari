@@ -96,8 +96,8 @@ describe("NotFoundPage", () => {
   });
 
   it("does not send a member to the store that refuses them", () => {
-    // "Open Modules" led to /apps, which used to bounce a non-admin back to
-    // the launcher without a word.
+    // "Open Modules" leads to /apps, which sends a non-admin back to the launcher
+    // without a word.
     renderAt("/shopping-lists");
 
     expect(

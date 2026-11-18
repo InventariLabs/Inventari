@@ -337,7 +337,7 @@ class AuditTargetType(StrEnum):
     API_KEY = 'api_key'
     #: A channel organization data leaves by, signed with a secret the
     #: receiver may treat as proof of origin. Who opened one, where it
-    #: pointed and when it went away used to be nowhere -- and the delivery
+    #: pointed and when it went away is not recorded anywhere -- and the delivery
     #: history, the module's only other trace, is cascaded away with the
     #: endpoint it belonged to.
     WEBHOOK_ENDPOINT = 'webhook_endpoint'

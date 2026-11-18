@@ -10,7 +10,7 @@ green for months.
 
 Most of those tests could set their own precondition, and now do. What is
 left skips because of where it runs — the three documentation-drift tests that
-used to sit here read a repository the backend container now mounts — and those
+read a repository the backend container mounts — and those
 are written down in
 ``app/core/test_skip_baseline.txt``, one entry per test, with an owner and an
 expiry, because an environmental reason is also a premise that stops being

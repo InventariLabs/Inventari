@@ -39,9 +39,8 @@ describe("NutritionToolbar — the export button answers for what it hands over"
   });
 
   it("says why it is dead when the dictionary has no entries", () => {
-    // An export of an empty dictionary used to download a file with a
-    // header in it and no word of explanation — the reader got the empty
-    // artifact as if it were the data.
+    // An export of an empty dictionary says why it is empty, rather than
+    // downloading a file with a header in it and no word of explanation.
     renderToolbar({ canExport: false, exportHint: "Nothing to export yet" });
     const button = screen
       .getByText("recipes:ingredient_defaults.export")

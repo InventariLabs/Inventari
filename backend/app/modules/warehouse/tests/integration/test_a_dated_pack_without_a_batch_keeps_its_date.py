@@ -1,10 +1,9 @@
 """Stock with a date and no batch tells the picker, the document and the ledger its date.
 
 A pack received with a date but no lot number is a record carrying the date
-itself, and FEFO draws by it. The picking row used to show the batch only,
-so two dated packs of one product on a shelf left the picker guessing which
-one the draw chose, and the completed dispatch line and the movement it
-wrote said nothing of the date that left.
+itself, and FEFO draws by it. The picking row shows the date with the batch, so the
+picker sees which of two dated packs the draw chooses, and the completed dispatch
+line and the movement it writes carry the date that left.
 """
 
 from __future__ import annotations

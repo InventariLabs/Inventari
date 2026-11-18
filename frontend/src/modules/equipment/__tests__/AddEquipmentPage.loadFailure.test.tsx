@@ -40,9 +40,9 @@ vi.mock("sonner", () => ({
 const ITEM_ID = "0d0c30b6-5b2f-4d09-9a1e-6f0c1b7bb0f1";
 
 /**
- * A failed read used to leave the edit form standing and empty.
+ * A failed read must not leave the edit form standing and empty.
  *
- * Measured before the fix: inject a 500 on the asset read, open the edit
+ * Measured: inject a 500 on the asset read, open the edit
  * screen, let the failure pass, type a name and save. The save succeeded —
  * and the record lost its serial number, its purchase price and the whole
  * meta_data block of category fields. The form had nothing to write back

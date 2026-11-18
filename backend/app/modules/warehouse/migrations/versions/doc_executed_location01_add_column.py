@@ -5,8 +5,8 @@ Revises: doc_reason_code01
 Create Date: 2026-08-28
 
 A receipt does not always land where the document asked. A putaway rule can
-send the goods to another shelf, and until now nothing on the document said
-so: the header named one place, the record another and the ledger a third.
+send the goods to another shelf, and the document must say so: the header
+names one place, the record another and the ledger a third.
 
 This column records where the line's goods actually went, so the document
 can show it next to the place it asked for.

@@ -296,8 +296,8 @@ describe("CommandPalette — where a module switch lands", () => {
 
 /**
  * The palette is one of the persistent exits a dirty form has to survive.
- * It used to be the quiet one: the module tabs asked, and a "Switch to"
- * chosen a few pixels away threw the work away without a word.
+ * It asks the way the module tabs do, so a "Switch to" chosen a few pixels away
+ * cannot throw the work away without a word.
  */
 describe("CommandPalette — jumping away asks a dirty form first", () => {
   beforeEach(() => {

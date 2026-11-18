@@ -116,12 +116,12 @@ def packaged_files(source_dir: Path, meta: ModuleYaml) -> list[Path]:
     hashed for identity but is not itself installed — its identity fields
     land in ``manifest.json`` through the metadata merge.
 
-    The frontend half used to keep its tests, on the grounds that a
-    frontend test cannot run by being copied: nothing in the bundle
-    imports it. True of the bundle, and beside the point — vitest has no
-    ``include``, so it collects ``**/*.{test,spec}.*`` from the whole
-    tree, and a stranger's test file ran in node, with the file system,
-    for anyone who typed ``npm run test:run`` after installing.
+    The frontend half's tests are left out of the package, on the grounds that
+    a frontend test cannot run by being copied: nothing in the bundle imports
+    it. That holds for the bundle and is beside the point: vitest has no
+    ``include``, so it collects ``**/*.{test,spec}.*`` from the whole tree, and
+    a stranger's test file would run in node, with the file system, for anyone
+    who typed ``npm run test:run`` after installing.
     """
     return package_walk(source_dir, meta)[0]
 

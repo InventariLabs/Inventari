@@ -171,7 +171,7 @@ export function DateInput({
 
   const locale = formatLocale();
 
-  // The same numeric day every other screen prints — the picker used to
+  // The same numeric day every other screen prints — the picker must not
   // spell it as "25 lis 2026" beside "30.11.2026" on the page behind it.
   const formatted = selected ? formatDate(value) : "";
 

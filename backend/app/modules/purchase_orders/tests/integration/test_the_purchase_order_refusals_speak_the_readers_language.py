@@ -1,17 +1,16 @@
 """The purchase-order refusals speak the reader's language.
 
-Every refusal this module's services and routers answered with used to be an
-English literal: a supplier who sent an order past its draft state, or cleared
-a price the schema refuses to clear, read "Only DRAFT purchase orders can be
-updated" on a screen the rest of the workspace had already answered in Polish.
-Each of them now raises through a catalogue key, and these tests pin the
-sentence the reader gets.
+Every refusal this module's services and routers answer with is a catalogue
+key, not an English literal: a supplier who sends an order past its draft
+state, or clears a price the schema refuses to clear, reads the sentence in
+the language of the screen, as the rest of the workspace does. Each of them
+raises through a catalogue key, and these tests pin the sentence the reader
+gets.
 
 The assertions are equalities against the Polish text, not status codes: with
 a service reverted to its literal the response still answers 400 (or 409), and
 only the sentence tells the two builds apart. Where the envelope carries a
-language claim it is asserted too — it used to be possible for the claim and
-the text to disagree.
+language claim it is asserted too, so the claim and the text cannot disagree.
 
 Covered here, one class per file: ``_service_crud.py``, ``reorder_service.py``,
 ``pricelist_service.py``, ``_router_import.py``, ``_router_templates.py`` and

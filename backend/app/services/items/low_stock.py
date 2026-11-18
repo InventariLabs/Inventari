@@ -6,19 +6,17 @@ per-location thresholds on top of it says so in the docstring of its own
 table: *"Per-location granularity is the main value-add over the flat
 ProductTemplate.min_quantity field, which is org-global."*
 
-Three places used to answer "is this running out" and two of them compared
-that org-global number against a single ``Item`` row. For a product kept
-in six places — 8, 7, 8, 5, 2 and 4 units against a minimum of 10 — the
-dashboard tile and the list filter answered "six shortages" while the
-purchasing engine, which summed, answered "none". Thirty-four units
-against a minimum of ten is not six shortages, and the more carefully
-somebody spread their stock the more shortages the tile invented.
+The answer to "is this running out" is the product's stock summed over its
+places. A product kept in six places — 8, 7, 8, 5, 2 and 4 units against a
+minimum of 10 — holds 34 units, which is not six shortages, and the more
+carefully somebody spreads their stock, the more shortages a per-place count
+would invent.
 
-It was unstable as well as wrong: an ``Item`` row is not a quant. A
+A count of ``Item`` rows would also be unstable: an ``Item`` row is not a quant. A
 quant is one (org, product, location, lot, owner) group, however many
 records it sums; ``Item`` carries none of that, and two receipts of the same
-hand-typed name into one place leave two rows. So the number on the tile
-moved with how a name had been typed at goods-in.
+hand-typed name into one place leave two rows. So a count of rows would move
+with how a name was typed at goods-in.
 
 Two conditions complete the rule, and both are read from this one place by
 every surface — the dashboard tile, the products filter, the statistics
@@ -179,11 +177,11 @@ async def template_stock_total_async(
     """How much of one product is on the shelves, summed the same way.
 
     The number the threshold is compared against, so the screen that sets
-    a threshold can show it. It used to show the quantity of the single
-    record the reader had opened, and offered to copy that number into a
-    field governing the product as a whole: on a product kept in six
-    places, "set the alert to what is here now" set it to a sixth of what
-    is there now, and the alert then never fired.
+    a threshold can show it. It shows the product's total, not the quantity of the single
+    record the reader has opened. A field governing the product as a whole must
+    not be set from one record: on a product kept in six places, "set the alert
+    to what is here now" would set it to a sixth of what is there now, and the
+    alert would never fire.
     """
     total = await db.scalar(
         select(func.coalesce(func.sum(Item.quantity), 0))

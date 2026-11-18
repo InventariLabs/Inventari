@@ -474,10 +474,9 @@ describe("ScanPage", () => {
   });
 
   /**
-   * The sheet's primary button says "Remove 1 (first to expire)" and used to take the whole
-   * record that expires first — two kilograms of beef gone after one click.
-   * The per-location "−" beside it takes one. Reverting the fix makes the
-   * assertion below expect quantity 2 and fail.
+   * The sheet's primary button says "Remove 1 (first to expire)" and takes one
+   * unit from the record that expires first, never the whole of it. The
+   * per-location "−" beside it takes one.
    */
   it("takes one unit from the first-expiring record when the button says Remove 1 (first to expire)", async () => {
     vi.mocked(labelsApi.scan).mockResolvedValue({
@@ -587,8 +586,7 @@ describe("ScanPage", () => {
  * `GET /labels/scan/{code}` asks for nothing beyond membership, so "what is
  * this thing" stays answerable. A blank label is the opposite case: its only
  * use is creating the record it will name, and opening that form for an
- * account that may not create one is the whole defect this screen had — the
- * refusal used to arrive after the form was filled in.
+ * account that may not create one is refused before the form is filled in.
  */
 describe("ScanPage — an account that may not change stock", () => {
   let queryClient: QueryClient;

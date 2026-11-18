@@ -209,7 +209,7 @@ class TestItemServiceLayer:
 
         Two cards share a name; the request names the second and carries the
         first card's barcode. The record must stand on the card the caller
-        named — barcode matching used to answer first and pull it onto the
+        named — barcode matching does not run first and pull it onto the
         other one.
         """
         first = ProductTemplate(
@@ -368,9 +368,8 @@ class TestItemServiceLayer:
         The card the caller named by ``template_id`` and the card matched by
         name are the same card as far as these two product-level fields are
         concerned: both take ``weight_value`` and ``min_quantity`` from the
-        payload. The named branch used to return early and write neither,
-        and ``min_quantity`` was not even on the create schema — a value the
-        client named was dropped at the API edge, on both branches.
+        payload. The named branch writes both, and ``min_quantity`` is on the create schema, so
+        a value the client names reaches the card on both branches.
         """
         named = ProductTemplate(
             organization_id=async_test_user.organization_id,

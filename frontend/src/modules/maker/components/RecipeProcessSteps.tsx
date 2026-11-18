@@ -33,7 +33,7 @@ function toDraft(steps: MakerRecipe["process_steps"]): DraftStep[] {
  * Ordered how-to steps for a recipe.
  *
  * The edit affordance is a labelled button, not a bare pencil icon: the
- * section used to look read-only, so nobody found the only way to write
+ * section must not look read-only, or nobody finds the only way to write
  * the process down. Each step carries how long it takes, because that time
  * at the production settings' hourly rate is the batch's labour cost — the
  * line the cost tab shows beside the fixed ones.
@@ -172,9 +172,8 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
               <span className="text-on-muted font-medium w-5 flex-shrink-0 text-sm pt-2.5">
                 {idx + 1}.
               </span>
-              {/* Editable in place. The row used to be read-only text with a
-                  bin beside it, so fixing a typo in a multi-line instruction
-                  meant deleting it and typing the whole thing again. */}
+              {/* Editable in place: fixing a typo in a multi-line instruction
+                  does not mean deleting the step and typing the whole thing again. */}
               <Textarea
                 value={step.text}
                 onChange={(e) =>

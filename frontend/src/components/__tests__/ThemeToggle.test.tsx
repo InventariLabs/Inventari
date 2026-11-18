@@ -28,8 +28,8 @@ describe("ThemeToggle", () => {
   });
 
   it("names the state it is in, not just 'Theme'", () => {
-    // The accessible name used to be a bare "Theme" for both positions, so the
-    // button said nothing about which one it was in.
+    // The accessible name carries the state for both positions, so the button
+    // says which one it is in.
     render(<ThemeToggle />);
     expect(
       screen.getByRole("button", { name: "Theme: Follow system" }),

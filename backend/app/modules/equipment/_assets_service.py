@@ -64,12 +64,11 @@ def _asset_filters(
 
     "Is this record equipment" is asked of the core, in the same predicate
     that lists this module's locations and counts the assets standing in
-    them. This list used to answer it on its own — the ``meta_data``
-    namespace or a category tagged ``equipment`` — and the two answers
-    disagreed in both directions: a location row promising one asset opened
-    a list with none, and a location holding an asset the list could show
-    had no count and no link at all. Both are promises the reader can check
-    against each other, so there is one answer to check.
+    them. This list answers it the same way, so the two answers agree in both
+    directions: a location row promising one asset opens a list with that
+    asset, and a location holding an asset the list shows has its count and
+    its link. Both are promises the reader can check against each other, so
+    there is one answer to check.
     """
     clauses: list[ColumnElement[bool]] = [
         Item.organization_id == org_id,
@@ -255,11 +254,10 @@ async def get_asset_async(
     """The record *item_id* names, when it is one of the register's assets.
 
     Every route of the register that addresses one record by id reads it
-    here. They used to read it as any product of the organization, so a role
-    holding only ``equipment:read`` opened the valuation (name, serial,
-    purchase price), the papers, the histories and the approval state of an
-    ordinary product whose id it knew, and a retire or an archive sent here
-    wrote the register's status into a product or took it off the shelf. The
+    here. It answers only for the register's own records, so a role holding only
+    ``equipment:read`` cannot open the valuation (name, serial, purchase price),
+    the papers, the histories or the approval state of an ordinary product, and
+    a retire or an archive cannot write the register's status into one. The
     question is the list's own (:func:`claimed_by_module`): a record the
     register does not list is one its routes do not know — ``None``, which
     each caller answers with the 404 it gives an id that names nothing.

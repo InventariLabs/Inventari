@@ -1,9 +1,8 @@
 """A module's own screen asks for its own locations.
 
-The equipment locations screen is called "Equipment Locations" and used to
-list every location the organization has, with Edit and Delete on each row —
-so an IT manager was offered the deletion of a walk-in cooler from the
-equipment screen.
+The equipment locations screen is called "Equipment Locations" and lists only
+its module's locations, so an IT manager is not offered the deletion of a
+walk-in cooler from it.
 
 Filtering on ``context_tag`` alone is not the answer: an asset can stand in
 an untagged location, and a filter that drops those drops the places where

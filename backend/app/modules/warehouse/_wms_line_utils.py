@@ -1,8 +1,7 @@
 """Shared WMS document-line helpers for picking and receiving sessions.
 
-These helpers were previously duplicated between ``_picking_helpers.py``
-and ``_receiving_helpers.py`` with identical behavior. They are
-consolidated here; both sides re-export them so existing imports keep
+These helpers are shared by ``_picking_helpers.py`` and
+``_receiving_helpers.py``, which both re-export them so existing imports keep
 working. The refusal they raise speaks one sentence in the reader's
 language — the screen already says which direction the session runs.
 """

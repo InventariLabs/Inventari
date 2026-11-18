@@ -1,8 +1,8 @@
 """A workflow stage is its name and the people who decide it — no role.
 
-The stage used to carry a ``role``: a free-form label the editor offered first
-and the decision door never read. A stage is now saved without it, and a stage
-saved with it before still loads, is listed and is decided as it was.
+A stage carries no ``role``: that free-form label is offered first in the
+editor and never read by the decision door. A stage saved with a legacy
+``role`` still loads, is listed and is decided by its approvers alone.
 """
 
 import uuid

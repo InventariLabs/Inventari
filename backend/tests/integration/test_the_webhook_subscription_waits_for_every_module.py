@@ -1,10 +1,8 @@
 """A module that sorts after webhooks still gets its webhooks delivered.
 
 Module startup is an alphabetical walk of the modules directory, and webhooks
-used to subscribe to the event catalogue in the middle of it — taking the
-catalogue once, at its own turn. Every module in the tree happens to sort
-before webhooks, so the one-shot subscription looked complete and was never
-questioned.
+subscribe to the event catalogue in the middle of it, at their own turn, and a
+module that sorts after them must still have its webhooks delivered.
 
 A community module named after w is the case that breaks it: ``work_orders``,
 ``warehouse_tools``, ``zendesk_sync``. They register their payloads after

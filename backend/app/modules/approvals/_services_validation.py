@@ -3,7 +3,7 @@
 The workflow form promises that a named approver decides, and delegation
 makes that true — but a stage is only decidable when at least one of its
 named approvers can see approvals at all. A stage whose every named approver
-holds neither grant used to save silently and produce requests nobody could
+holds neither grant must not save silently and produce requests nobody could
 approve, reject, or sometimes even see: the deadlock an administrator built
 by picking a colleague from a list that offered everyone in the organization.
 

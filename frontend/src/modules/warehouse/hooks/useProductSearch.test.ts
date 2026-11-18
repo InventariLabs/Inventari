@@ -171,7 +171,7 @@ describe("useProductSearch — the merge flag rides only where it was set", () =
 
   it("keeps the answer to the last keystroke when an earlier answer arrives late", async () => {
     // The reported stall: the picker stopped following what was typed. Each
-    // keystroke is its own request, and the slow answer to "ba" used to land
+    // keystroke is its own request, and a slow answer to "ba" must not land
     // after the answer to "bar" and put the older list back.
     let answerFirst: (rows: never[]) => void = () => {};
     vi.mocked(documentsApi.productSearch)

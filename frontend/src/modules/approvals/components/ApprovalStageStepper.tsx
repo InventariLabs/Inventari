@@ -95,9 +95,9 @@ export function ApprovalStageStepper({
   }
 
   if (stages.length === 1) {
-    // A single-stage workflow used to collapse to the bare label,
-    // which dropped the decision — including the rejection reason the
-    // approver is required to type. Most workflows have exactly one stage,
+    // A single-stage workflow keeps the decision and the rejection reason the
+    // approver is required to type; a bare label would drop them. Most
+    // workflows have exactly one stage,
     // so this was the common case, not the edge case.
     const stage = stages[0];
     const decision = decisions.find((d) => d.stage_order === stage.order);

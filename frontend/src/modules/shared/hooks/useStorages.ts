@@ -84,7 +84,7 @@ export function useStorageTypes() {
 /**
  * Whether this organization keeps anything somewhere that watches expiry.
  *
- * The dashboard used to spend half its tiles on "expiring soon" and "expired"
+ * The dashboard does not spend half its tiles on "expiring soon" and "expired"
  * for every workspace, including the neutral one, where an expiry date may
  * never be entered. Storage types carry the behaviour, so the question is
  * whether any of the organization's own locations uses one that watches it —

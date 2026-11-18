@@ -215,7 +215,7 @@ async def get_document_approval_requirement(
     then does are one rule, asked twice.
 
     The answer also says whether the stage the document would wait at has
-    anybody who could decide it for the person asking: the dialog used to
+    anybody who could decide it for the person asking: the dialog must not
     promise the queue for a request that no queue would ever show.
     """
     org_id = require_org(current_user)

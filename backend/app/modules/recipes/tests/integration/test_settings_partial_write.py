@@ -1,9 +1,9 @@
 """A partial settings write must not reset the keys it omits.
 
-The PUT /modules/{name}/settings door used to let ``_validate_and_clean``
-fill schema defaults for every key absent from the body, and the storage
-``update`` then overwrote the saved values with those defaults: writing one
-setting silently reset the rest of the module's configuration. The
+The PUT /modules/{name}/settings door does not let ``_validate_and_clean``
+fill schema defaults for every key absent from the body, so the storage
+``update`` does not overwrite the saved values with those defaults: writing one
+setting leaves the rest of the module's configuration alone. The
 resolution recorded on the task: the write is a PARTIAL update — the body
 merges over the saved settings at the top level, a key absent from the body
 keeps its saved value, and a key that was never written gets the schema
@@ -75,8 +75,8 @@ def test_a_first_write_of_one_key_still_carries_schema_defaults(
 async def test_the_change_report_names_only_the_key_that_moved(
     real_async_db_session: AsyncSession,
 ) -> None:
-    """The journal snapshot reports what moved. A write of one key used to
-    also report the omitted keys resetting to their defaults — a reset the
+    """The journal snapshot reports what moved. A write of one key does not
+    also report the omitted keys resetting to their defaults: a reset the
     client never asked for is not a change it made."""
     org = Organization(
         name=f'Mig {uuid4().hex[:6]}', enabled_modules=['core', 'items', 'recipes']

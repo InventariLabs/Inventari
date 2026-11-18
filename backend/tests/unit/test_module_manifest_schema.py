@@ -1,10 +1,9 @@
 """`capabilities` is the import allow-list; `permissions` is RBAC vocabulary.
 
-Both used to live in `capabilities: list[str]`, so 13 of 15 in-tree manifests
-mixed `maker:write` in with `database`. The AST safety scan only ever looked at
-the four capability names (module_safety.CAPABILITY_MAP), which meant the
-permission strings sat there doing nothing while the enum meant to constrain the
-field went unused. These tests pin the split so they cannot merge back.
+`capabilities` lists the import capabilities and `permissions` the RBAC names, so a
+manifest cannot mix `maker:write` in with `database`. The AST safety scan reads
+the capability names (module_safety.CAPABILITY_MAP), and the enum constrains its
+own field. These tests pin the split so they cannot merge back.
 """
 
 import json
@@ -116,7 +115,7 @@ class TestInTreeManifests:
 @pytest.mark.unit
 class TestModuleTypeRequired:
     """The trust level is the one fact a store reader cannot guess
-    — a manifest that omits it used to fall back to
+    — a manifest that omits it is refused, rather than falling back to
     'community' — the lowest level — without declaring anything."""
 
     def test_a_manifest_without_module_type_is_a_validation_error(self):

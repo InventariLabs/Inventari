@@ -179,7 +179,7 @@ async def apply_onboarding_profile_async(
         org.currency = currency
     # And the zone the setup screen's browser reported: when a day starts
     # for expiry dates, inventory periods and reports is the organization's
-    # clock, and a fresh one used to sit on UTC whatever its readers' did.
+    # clock, and a fresh one must not sit on UTC whatever its readers' zone is.
     # The name was settled to a readable one at the door, so storing it
     # here cannot put an unreadable zone on the row.
     if timezone:
@@ -191,8 +191,8 @@ async def apply_onboarding_profile_async(
     db.add(org)
 
     # The starting locations the profile declares: a home
-    # organization's "Fridge / Shelf A / Freezer" used to stay a
-    # dead declaration, and the first product landed on a "create a
+    # organization's "Fridge / Shelf A / Freezer" must not stay a
+    # dead declaration, and the first product must not land on a "create a
     # storage" wall. Run for every profile, declared locations or not: the
     # seeder also leaves one ordinary location where nothing else did. The
     # seeder reads active_profile_id, set above — the pending org write
@@ -238,10 +238,10 @@ async def _settle_the_module_set_async(
     admin toggled on by hand, naming anything that did not survive.
 
     The answer to "what kind of place is this?" is the profile's list, plus
-    what nobody opts into. It used to be the union of the profile and
-    whatever the organization already had, which on a fresh one meant an
-    eight-module default written into the ORM — so a household choosing
-    "Food & Home" received the document register its profile does not list.
+    what nobody opts into. It is not the union of the profile and
+    whatever the organization already had: on a fresh one that union would be
+    an eight-module default written into the ORM, so a household choosing
+    "Food & Home" would receive the document register its profile does not list.
 
     The manual record is the one exception, and an earned one: a
     module the admin switched on through POST /modules/toggle while

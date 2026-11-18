@@ -18,8 +18,8 @@ def check_opened_suggestion(
 
     Open means the mark opening writes (``is_open_pack``), the same answer the
     FEFO order and the candidates' ``opened`` flag give. A record without the
-    mark used to be guessed open when it weighed less than the card's full
-    pack, which took a smaller sealed bag for an open one.
+    mark is not guessed open from its weight, so a smaller sealed bag is never
+    taken for an open one.
 
     Accepts either ORM ``Item``/``ProductTemplate`` rows or ``ItemDTO``/
     ``ProductTemplateDTO`` (CoreAPI returns the DTO shape). Reads are

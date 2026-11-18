@@ -172,10 +172,7 @@ describe("DocumentFormatSettings — number padding", () => {
 });
 
 describe("DocumentFormatSettings — the example under the format", () => {
-  // The hint used to print the receipt's label in this language followed by
-  // "/2026/001" whatever the format said: "Receipt/2026/001" for a profile
-  // that names no label (the engine writes the short code, IN) and for one
-  // numbering PZ/<year>/<month>/<four digits>.
+  // The hint takes its example from the format, not a fixed label: a profile that // names no label gets the short code (IN) in the example, and one numbering // PZ/<year>/<month>/<four digits> gets that shape.
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, "0");

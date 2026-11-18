@@ -252,9 +252,8 @@ class TestProductionDuplicate:
     ) -> None:
         """A duplicate must keep the source order's recipe (even non-default).
 
-        Regression: the copy used to drop ``recipe_id``, so completing the
-        duplicate exploded via the DEFAULT recipe instead of the source
-        order's recipe.
+        A duplicate keeps ``recipe_id``, so completing it explodes via the source
+        order's recipe, not the DEFAULT one.
         """
         output = _template(db_session, mk_org, name='MultiRecipe')
         default_recipe = _ensure_recipe(db_session, mk_org, template_id=output.id)

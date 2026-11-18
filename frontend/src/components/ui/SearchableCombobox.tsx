@@ -330,8 +330,8 @@ const ComboboxPanel: React.FC<ComboboxPanelProps> = ({
 
         {/* The door shows for a typed query, and also for an empty one when
             the list itself is empty: an organization with zero partners
-            opens this panel to the empty message and used to find nothing
-            but the header close — nobody types into an empty register, so
+            opens this panel to the empty message and must find more than the header
+            close — nobody types into an empty register, so
             the create way out has to be there before anything is typed. */}
         {onCreateNew &&
           createLabel &&

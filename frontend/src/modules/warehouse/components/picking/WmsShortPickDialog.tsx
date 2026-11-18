@@ -84,9 +84,7 @@ export default function WmsShortPickDialog({
   return (
     // The shared primitive, so this window is a dialog to a screen reader and
     // to the surface scanner the same way its receiving twin already is: role,
-    // accessible name, focus trap and Escape all come from `Sheet`. It used to
-    // be a bare `absolute inset-0` div, which announced nothing and left the
-    // page underneath in the tab order.
+    // accessible name, focus trap and Escape all come from `Sheet`.
     <Sheet
       open
       onClose={onCancel}
@@ -155,9 +153,8 @@ export default function WmsShortPickDialog({
           )}
           {!isFullPick && (
             /* The same question its receiving twin asks: why did the line
-               come up short. The answer used to be hardcoded server-side —
-               every short pick on record claimed SHORTAGE, including the
-               damaged cartons. */
+               come up short. The reader gives the answer, so a damaged
+               carton is not recorded as a shortage. */
             <NativeSelect
               label={t("picking.discrepancy")}
               value={code}

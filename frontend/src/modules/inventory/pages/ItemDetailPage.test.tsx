@@ -90,11 +90,9 @@ const item = {
 };
 
 /**
- * `/inventory/items/:id` used to redirect to the list with the action sheet
- * open — a menu of things to do with the record, with no way to link to it,
- * open it in a second tab, or read the fields it was not asked about. The
- * same physical rack had a page when Equipment looked at it and a menu when
- * Inventory did.
+ * `/inventory/items/:id` opens the product's own page, which can be linked to,
+ * opened in a second tab, and read field by field. The same physical rack has
+ * that page whether Equipment or Inventory looks at it.
  */
 describe("ItemDetailPage", () => {
   beforeEach(() => {
@@ -360,7 +358,7 @@ describe("ItemDetailPage", () => {
 
   /**
    * The record's audit trail and the place's movement ledger are two
-   * different questions, and the page used to answer only the first.
+   * different questions, and the page answers both.
    */
   it("offers the movements of the product in this place", async () => {
     enabledModules = ["warehouse"];

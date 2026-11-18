@@ -8,8 +8,8 @@ import type {
 /**
  * Tell the person who pressed Send Reminders what came of it.
  *
- * The button used to answer `{reminders_sent: 0}` with an unchanged page, and
- * the admin believed the people had been chased. A run that sent nothing now
+ * The button never answers `{reminders_sent: 0}` with an unchanged page, and
+ * the admin must not believe the people had been chased. A run that sends nothing
  * says why — nobody is left to ask, there is no outgoing e-mail, everyone was
  * reminded within the day — and a run that sent some says how many.
  */
@@ -42,10 +42,10 @@ export function announceReminderRun(t: TFunction, run: ReminderRunResult) {
 /**
  * Tell the person who launched a campaign who was asked and who was not.
  *
- * The launch used to end on silence. Holders without an e-mail address were
- * left out without a word, and an organization that sends no mail had its
- * whole campaign go nowhere while the dialog had promised an e-mail to
- * everyone. Their links are on the campaign page, to hand over in person.
+ * The launch ends with a word, never on silence. Holders without an e-mail
+ * address are named as left out, and an organization that sends no mail is
+ * told so before it expects anything to go out. Their links are on the
+ * campaign page, to hand over in person.
  */
 export function announceLaunch(t: TFunction, run: LaunchResult) {
   const skipped = run.skipped_people ?? [];

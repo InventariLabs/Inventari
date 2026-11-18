@@ -189,8 +189,8 @@ class CoreValuationAPI:
         """Record stock arriving with nobody having named a price.
 
         A surplus off a count, a quantity raised by hand, a correction. It
-        used to be posted at 0.00 — which diluted the average and understated
-        the assets every time — so it is now valued at the organization's own
+        is never posted at 0.00 — which would dilute the average and understate
+        the assets every time — so it is valued at the organization's own
         current rate, and marked ``unknown`` where there is no rate to use.
         """
         from app.services.valuation_service import ValuationService

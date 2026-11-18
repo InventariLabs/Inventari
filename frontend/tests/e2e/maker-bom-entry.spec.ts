@@ -8,9 +8,8 @@ import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
  * formula for that product — no UUID paste needed.
  *
  * Two destinations, because a product may not have a formula yet. The
- * button used to deep-link into `/maker/bom?parent=`, and when that screen
- * was removed the no-formula case — the common one — walked into a dead
- * route. It now opens the catalog's create sheet on that product.
+ * button opens the catalog's create sheet on that product; it does not
+ * deep-link into `/maker/bom?parent=`, a route that no longer exists.
  */
 test.describe("Maker — BoM entry from item view", () => {
   let api: ApiHelper;

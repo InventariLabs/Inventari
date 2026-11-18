@@ -40,7 +40,7 @@ def _encryption_implied_by_port(port: int) -> SmtpEncryption:
 
     New configurations always carry ``encryption``; this only interprets old
     ones, and it interprets 465 the way the rest of the world does — as
-    implicit TLS, not as plaintext, which is what the previous code did.
+    implicit TLS, not as plaintext.
     """
     if port == 465:
         return SmtpEncryption.SSL
@@ -163,12 +163,9 @@ def _connect(cfg: SMTPConfig) -> smtplib.SMTP:
 def _send_message(cfg: SMTPConfig, msg: MIMEMultipart) -> None:
     """Hand a built message to the server the configuration names.
 
-    One transport for every message, attachment or not. The attachment path
-    used to open a plain ``smtplib.SMTP`` of its own, with no timeout and
-    with STARTTLS decided by the port being exactly 587 — so an
-    organization on SSL/465 could receive a notification and never the
-    protocol attached to it, and an unreachable host held the worker for
-    the system TCP limit instead of fifteen seconds.
+    One transport for every message, attachment or not, so the configured
+    encryption applies to all of them. An unreachable host gives up after
+    fifteen seconds rather than holding the worker for the system TCP limit.
     """
     with _connect(cfg) as server:
         if cfg.encryption is SmtpEncryption.STARTTLS:

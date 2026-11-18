@@ -34,8 +34,8 @@ interface ReadOnlyNoticeProps {
  * One line saying why this screen has no buttons on it.
  *
  * Hiding the write actions from an account that may not write is only half an
- * answer. A list that used to carry "Add", "Import" and eight bulk actions and
- * now carries none reads as a broken page, not as a boundary — the reader has
+ * answer. A list that loses its "Add", "Import" and eight bulk actions and
+ * carries none reads as a broken page, not as a boundary — the reader has
  * no way to tell "you may not" from "it failed to load". So a module page that
  * hides its actions says this instead, in the same words the module settings
  * screen already uses for the same situation.

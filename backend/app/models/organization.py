@@ -34,9 +34,9 @@ class Organization(Base):
     # not a choice: the always-on set. Onboarding then writes the chosen
     # profile's list over this.
     #
-    # It used to be a hand-written list of eight, which onboarding *added* the
-    # profile to rather than replacing. So the answer to "what kind of place is
-    # this?" was always a union, and a household picking "Food & Home" was
+    # It is not a hand-written list of eight: onboarding *adds* the
+    # profile to it rather than replacing it. So the answer to "what kind of place is
+    # this?" is a union, and a household picking "Food & Home" must not be
     # handed the document register — numbering, accounting periods, approval
     # thresholds — that its profile does not list and is not meant to. Two
     # sources of truth, and this one won every time because it went first.
@@ -193,9 +193,8 @@ class OrganizationInvitation(Base):
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     created_by: Mapped[uuid.UUID] = mapped_column(ForeignKey('users.id'))
     is_used: Mapped[bool] = mapped_column(default=False)
-    # What the account that redeems this code becomes. The join flow used to
-    # hardcode 'user', so inviting a manager meant waiting for them to arrive
-    # and then promoting them.
+    # What the account that redeems this code becomes. The join flow reads it from
+    # the code, so inviting a manager needs no promotion after they arrive.
     role: Mapped[str] = mapped_column(String(50), default='user', server_default='user')
     # An org-scoped custom role the account that redeems this code gets on top
     # of the base level in `role`. NULL for plain enum-level invitations;

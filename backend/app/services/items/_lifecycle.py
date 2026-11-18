@@ -209,9 +209,9 @@ async def restore_item(
     await apply_quantity_change(db, item, restore_qty, user_id=user.id)
     await db.flush()
 
-    # The SOFT_DELETE entry above it used to be the last word, and reading
-    # the journal alone said the product was gone. A restore is the pair
-    # that entry lacked.
+    # The SOFT_DELETE entry above it is not the last word: reading the journal
+    # alone would say the product is gone. A restore is the pair that entry
+    # lacks.
     await log_action_async(
         db,
         organization_id=item.organization_id,

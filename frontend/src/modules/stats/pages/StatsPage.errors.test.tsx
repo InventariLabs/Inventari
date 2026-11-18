@@ -30,7 +30,7 @@ const renderAt = (path: string) => {
 };
 
 /**
- * The tabs over one prefix used to disagree about what a failed request
+ * The tabs over one prefix must agree about what a failed request
  * looks like: Analytics said so, Overview said so, and Inventory sat on a
  * spinner with no message, no retry and nothing to read. The inventory tab
  * is gone; the remaining two must keep reporting failure.

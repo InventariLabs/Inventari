@@ -257,9 +257,9 @@ describe("LabelRow", () => {
   });
 
   it("does not call a label pointing at an asset a product", () => {
-    // The assignment outlived the printing: a generic label assigned to an
-    // equipment asset used to read "Product in use" over a column that said
-    // "PRODUCTS" — both lies about what the sheet points at.
+    // The assignment outlives the printing, so a label pointing at an equipment
+    // asset is not called a product: the sheet never reads "Product in use"
+    // under a "PRODUCTS" column.
     render(
       <table>
         <tbody>

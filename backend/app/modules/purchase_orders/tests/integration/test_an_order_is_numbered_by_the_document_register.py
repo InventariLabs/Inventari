@@ -1,15 +1,12 @@
 """Orders are numbered by the register the organization already keeps.
 
-Purchase orders used to carry a numbering engine of their own — its own
-advisory lock, its own regex over `PO/{year}/{seq}`, the shape hardcoded —
-beside the one every document goes through. An organization that changed
-how its documents are numbered saw the change everywhere except on its
-orders, and two counters were kept in step by hand.
+Orders are numbered by the one engine every document goes through: no order
+has an advisory lock, a regex or a `PO/{year}/{seq}` shape of its own, so an
+organization's numbering applies to its orders as to the rest.
 
-The risk in moving them across is the counter's starting point: the engine
-seeds a new counter from the highest number already in use, and it looks in
-`documents`, where no order has ever been. An organization a year into its
-register must not be offered number one again.
+The engine seeds a new counter from the highest number already in use, and it
+looks in `documents`, where no order has ever been. An organization a year
+into its register must not be offered number one again.
 """
 
 from __future__ import annotations

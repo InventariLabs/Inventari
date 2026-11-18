@@ -560,8 +560,8 @@ async def response_link_async(
     """The public link of one response, for handing over in person.
 
     A person without an e-mail address, or an organization that sends no
-    mail, gets no invitation; the warning used to say requests "will have to
-    be delivered by hand" while no screen gave out the link to deliver.
+    mail, gets no invitation, and the warning says the request must be delivered
+    by hand. This function returns the link to do so.
     """
     result = await db.execute(
         select(AuditResponse).where(

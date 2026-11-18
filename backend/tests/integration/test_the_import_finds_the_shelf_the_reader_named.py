@@ -1,9 +1,10 @@
 """The import finds the shelf the reader named.
 
 The app shows every location as a path ("Pantry › Dry Goods › Shelf A"), so
-that is what a reader types into the sheet. The importer used to match the
-bare leaf name only, and founded a root location named after the whole path
-when it missed; an empty cell founded one named "nan".
+that is what a reader types into the sheet. The importer matches the
+path the reader typed, not only the leaf name. An empty cell founds no
+location, and a path that misses never founds a root location named after the
+whole path.
 """
 
 import pandas as pd

@@ -91,10 +91,9 @@ class TestStatsOverview:
 
         assert overview.status_code == status.HTTP_200_OK
         assert overview.json()['total_value'] == pytest.approx(37.5)
-        # The per-category breakdown used to drop this crate twice over: it
-        # carries no category, and it carries no currency either, and the
-        # query demanded an exact currency match. It now agrees with the
-        # overview under the uncategorised row.
+        # The per-category breakdown keeps this crate, though it carries no
+        # category and no currency. It agrees with the overview under the
+        # uncategorised row.
         rows = by_category.json()['items']
         assert sum(row['total_value'] for row in rows) == pytest.approx(37.5)
         assert any(row['category_id'] is None for row in rows)
@@ -563,11 +562,9 @@ def _record_outflow(
     quantity under ``qty`` — the key the consume and discard path writes — and
     the valuation ledger carries what it was worth, in an outgoing layer.
 
-    These tests used to seed ``quantity_consumed``, ``consumed_cost``,
-    ``quantity_discarded`` and ``wasted_cost``: four keys that exist nowhere
-    else in the application. They passed against a shape production never
-    creates, which is why the report read zero for years while the suite
-    stayed green.
+    These tests seed the keys the consume and discard path writes, and no
+    others: a key that exists nowhere else in the application passes against a
+    shape production never creates.
     """
     from decimal import Decimal
 

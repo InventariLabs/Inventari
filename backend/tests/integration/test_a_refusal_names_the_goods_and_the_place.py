@@ -15,7 +15,7 @@ The reason the strings had gone unfixed was written above one of them: the
 caller decided whether to auto-hydrate a legacy quant by testing
 ``'No stock found' in str(exc)``. The sentence was load-bearing, so
 translating it would have silently switched the healing path off. The reason
-now travels as a code on the exception, and the sentence is free to be
+travels as a code on the exception, and the sentence is free to be
 a sentence. (The quant and its healing are gone since; the refusal stayed.)
 
 The doors that refuse are the draw off one shelf,
@@ -223,6 +223,6 @@ async def test_the_refusal_speaks_the_workspace_language(
 
     said = str(refusal.value)
     assert PRODUCT in said
-    # Polish, not the English sentence that used to be the only one there.
+    # Polish, not an English sentence.
     assert 'No stock found' not in said
     assert said != ''

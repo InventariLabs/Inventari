@@ -70,7 +70,7 @@ const askedMessage = () => {
 /**
  * Deleting a location that parents a subtree is a tree rebuild: the children
  * move up a level and every record standing inside them changes its place.
- * The spaces sheet used to ask about it as if only the location itself were
+ * The spaces sheet asks about it as if the whole subtree were
  * at stake, while the equipment screen — over the same core rows — named
  * both numbers. One operation, one sentence: the consequences now come from
  * the shared `locations:edit.…` keys on both screens.

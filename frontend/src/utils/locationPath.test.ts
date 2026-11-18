@@ -60,7 +60,7 @@ describe("the location path is written one way", () => {
 /**
  * Not every screen holds a record the backend put `full_path` on. The list
  * endpoint sends one (`StorageLocationSummary`), but several callers hold the
- * plainer `StorageLocation`, and the product list used to print the bare
+ * plainer `StorageLocation`, and the product list must not print the bare
  * `storage.name` for those — "Shelf A - Top" with no sign of which warehouse
  * it stands in. When the caller passes the list it already has, the path can
  * be rebuilt from `parent_id` instead of being given up on.

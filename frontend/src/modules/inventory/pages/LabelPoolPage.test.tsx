@@ -162,9 +162,9 @@ describe("LabelPoolPage", () => {
   });
 
   /**
-   * The selection used to own a band of the page: two `flex-1` buttons above
-   * the filter row, each half the screen wide on a desktop, present whether or
-   * not the selection still mattered.
+   * The selection is a passing state: its actions sit in a floating toolbar, not
+   * in a band of the page that is present whether or not the selection still
+   * matters.
    */
   it("puts the actions for a selection in a floating toolbar", async () => {
     render(
@@ -453,9 +453,9 @@ describe("LabelPoolPage", () => {
 
   it("leaves the primary slot to the header's generate on the empty pool", async () => {
     // The header already carries the view's one filled generate button; the
-    // empty pool used to repeat it as a second filled one. The entry
-    // stays — demoted, not removed — because the empty pool is where the
-    // reader decides to make the first codes.
+    // empty pool does not repeat it as a second filled one. The entry stays,
+    // demoted rather than removed, because the empty pool is where the reader
+    // decides to make the first codes.
     server.use(
       http.get("/api/v1/labels/pool", () =>
         HttpResponse.json({

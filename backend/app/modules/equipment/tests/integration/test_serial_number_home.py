@@ -1,11 +1,9 @@
 """An asset's serial number has one home, whichever door it came through.
 
-The application used to write it in two places: the batch path filled the
-core ``Item.serial_number`` column, the single form and the import wrote
-only ``meta_data['equipment']['serial_number']``. Two assets created two
-ways therefore carried their number in two different places, and the core
-search — the one the command palette asks — read neither, so a reader
-holding the device and typing the number off its sticker got "no results".
+The serial number is stored in the core ``Item.serial_number`` column, whichever
+door the asset came through. The core search, which the command palette asks,
+reads that column, so a reader holding the device and typing the number off its
+sticker finds the asset.
 """
 
 from __future__ import annotations

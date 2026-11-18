@@ -229,9 +229,9 @@ const ImportIngredientRow = memo(function ImportIngredientRow({
             // same `aria-pressed`. On an amount-derived spice it is pressed
             // and disabled: the recipe screens count a small amount as a spice
             // whatever the stored mark says, so a press that appeared to clear
-            // it would change nothing. Its explanation used to live in `title`,
-            // which a touch screen never shows; it is now a line of help text
-            // under this row, wired here through `aria-describedby`.
+            // it would change nothing. The explanation is a line of help text under
+            // this row, wired here through `aria-describedby`, because a touch screen
+            // never shows a `title`.
             <Button
               type="button"
               variant="ghost"

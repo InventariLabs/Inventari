@@ -10,9 +10,9 @@ import {
  * The scroller around the week grid, with a fade on the trailing edge that
  * shows only while there is more grid behind it.
  *
- * The fade used to be drawn unconditionally. At a width where all seven days
- * fit there is nothing to hint at, and the 32px gradient sat over the last
- * column anyway, so its cards looked cut off at the right edge.
+ * The fade is drawn only while there is more grid behind it. At a width where
+ * all seven days fit there is nothing to hint at, and no gradient sits over the
+ * last column, so its cards are not cut off at the right edge.
  */
 export function MealPlanScroller({ children }: { children: ReactNode }) {
   const trackRef = useRef<HTMLDivElement>(null);

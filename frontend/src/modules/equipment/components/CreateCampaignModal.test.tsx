@@ -10,9 +10,9 @@ import type { Organization } from "@/types";
 
 /**
  * An attestation is a request that travels by mail. On an installation that
- * sends no mail the dialog used to offer subject lines and reminders as if
+ * sends no mail, the dialog offers no subject lines and reminders as if
  * something would go out — the invitations screen already reads
- * `can_send_email` and says so; the campaign dialog now does the same.
+ * `can_send_email` and says so; the campaign dialog does the same.
  */
 
 const organization: { can_send_email?: boolean; timezone?: string } = {};
@@ -159,7 +159,7 @@ describe("CreateCampaignModal — the day travels on the org's clock", () => {
 
 /**
  * A scope covers the assets somebody holds — that is who can attest. The
- * control used to say "All assets", a set one word wider than the sentence
+ * control must not say "All assets" for a set one word wider than the sentence
  * beneath it ("Every checked-out asset will be attested"): an organization
  * with nothing checked out read a promise of an inventory-wide attestation
  * and learned the truth only from the count line, if at all.

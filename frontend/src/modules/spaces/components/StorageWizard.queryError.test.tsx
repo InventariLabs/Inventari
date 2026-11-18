@@ -13,9 +13,9 @@ vi.mock("sonner", () => ({
 }));
 
 /**
- * The wizard offers every existing location as a parent. When the list did
- * not arrive the picker used to vanish without a word, and the first step
- * read as an organization that has nothing yet.
+ * The wizard offers every existing location as a parent. When the list does
+ * not arrive, the picker must not vanish without a word, and the first step
+ * must not read as an organization that has nothing yet.
  */
 describe("StorageWizard — the locations did not load", () => {
   it("says so with a retry, and the retry asks again", async () => {

@@ -12,10 +12,9 @@ interface Props {
 /**
  * How far the count has got — measured in rows the stock take holds.
  *
- * The bar used to move on a number typed into a box, which is work that
- * disappears on the way out of the screen. It now moves on saves, and the
- * numbers still waiting in their boxes are named beside it rather than
- * counted into it.
+ * The bar moves only on saves: a number typed into a box is work that
+ * disappears on the way out of the screen. The numbers still waiting in their
+ * boxes are named beside the bar rather than counted into it.
  */
 export default function StockTakeProgress({
   countedCount,

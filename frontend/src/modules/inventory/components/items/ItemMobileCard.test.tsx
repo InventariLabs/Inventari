@@ -10,9 +10,8 @@ vi.mock("sonner", () => ({
 }));
 
 /**
- * the card's text block used to be a `<div onClick>` — invisible to
- * keyboards and announced as plain text by screen readers. It is a real
- * button now, named after the product it opens.
+ * The card's text block is a real button named after the product it opens,
+ * so keyboards reach it and screen readers announce it as one.
  */
 
 const makeItem = (overrides: Partial<Item> = {}): Item =>
@@ -232,7 +231,7 @@ describe("ItemMobileCard — selection mode", () => {
     const props = baseProps();
     render(<ItemMobileCard item={makeItem()} {...props} selectionMode />);
 
-    // Checkbox where the quantity badge used to be…
+    // Checkbox in the slot the quantity badge occupies…
     expect(
       screen.getByRole("checkbox", { name: /rack 42u/i }),
     ).toBeInTheDocument();
@@ -331,10 +330,8 @@ describe("ItemMobileCard — the row name carries its metadata", () => {
 });
 
 /**
- * the swipe used to announce "<name> removed" and then, five seconds
- * later, open a confirmation dialog — the toast said the deed was done while
- * the deed had not started. The Undo window is the confirmation now, so the
- * gesture deletes for real and the wording promises exactly that.
+ * The Undo window is the confirmation, so the swipe deletes for real and the
+ * wording promises exactly that.
  */
 describe("ItemMobileCard — swipe to delete keeps its word", () => {
   afterEach(() => {

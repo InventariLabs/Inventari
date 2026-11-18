@@ -1,6 +1,6 @@
 """The lookup and ledger reads the warehouse's own screens ask Core for.
 
-Three questions the warehouse used to answer by joining Core's tables: the
+Three questions the warehouse asks Core, rather than joining Core's tables: the
 name of the partners a document search matches, the name of the shelves a
 register groups by, and whether stock a posted line put on a shelf has left
 it since. Each is measured here against the real PostgreSQL test DB, because

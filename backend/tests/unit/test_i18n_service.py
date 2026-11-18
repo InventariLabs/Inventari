@@ -316,10 +316,10 @@ class TestLanguageType:
 
 class TestTheAttestationRefusalsExistInEveryCatalog:
     """``campaign_closed`` and ``assignment_already_returned`` are the keys
-    the public confirm endpoint maps its ValueErrors to. They used to exist
-    nowhere, and get_error_message answers an unknown key with the key
-    itself — so the public page showed the identifier raw, in every
-    language, to a reader who holds the equipment."""
+    the public confirm endpoint maps its ValueErrors to. They exist in every
+    catalog: get_error_message answers an unknown key with the key itself, so the
+    public page would show the identifier raw, in every language, to a reader who
+    holds the equipment."""
 
     def test_both_keys_read_as_sentences_in_every_language(self):
         from app.i18n.service import get_error_message

@@ -180,11 +180,9 @@ class TestRbacDbSchema:
 
         The subject is ``resolve_permission_strings_async`` — the one place
         both paths meet, the session context built at the door and the fresh
-        lookup about somebody off the request. The version of this test that
-        stood here until now copied the fallback branch into its own body and
-        asserted against the copy, so it stayed green while the real mapping
-        moved out from under it: the copy gave an admin the 15 system
-        permissions, where the live resolver gives the whole catalogue —
+        lookup about somebody off the request. The test asserts against the live
+        resolver, not against a copy of its fallback branch, and the resolver
+        gives the whole catalogue —
         43 keys, because the modules' manifests are part of the answer.
         """
         ids: dict[str, uuid.UUID] = {}

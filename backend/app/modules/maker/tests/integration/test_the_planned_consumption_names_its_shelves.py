@@ -1,10 +1,9 @@
 """The planned consumption names its shelves before the run takes anything.
 
-A draft's ingredient table used to say how much would leave stock and say
-nothing about where from — the run draws FIFO/FEFO across the whole
-organization deterministically, so the answer exists before completion,
-and the operator only learned which shelf had been emptied after the
-action that cannot be undone. The breakdown now carries the draw's own
+A draft's ingredient table says how much would leave stock and where from: the run
+draws FIFO/FEFO across the whole organization deterministically, so the answer
+exists before completion, and the operator learns which shelf would be emptied
+before the action that cannot be undone. The breakdown carries the draw's own
 plan, shelf by shelf.
 """
 

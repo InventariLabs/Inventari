@@ -322,9 +322,8 @@ class TestScrapDocument:
             db_session, doc_org.id, doc_template.id, doc_source_location.id
         )
         assert float(quant.quantity) == 97.0
-        # And the record it came off, which used to be left alone: the line
-        # named no record, so the quant fell while the catalogue went on
-        # claiming the goods.
+        # And the record it came off, which the line names, so the quant and the
+        # catalogue fall together.
         db_session.refresh(doc_stock_item)
         assert doc_stock_item.quantity == Decimal('97')
 

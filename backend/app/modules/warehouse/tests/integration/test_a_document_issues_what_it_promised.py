@@ -3,11 +3,10 @@
 The reservation holds stock for a document across every owner on the
 shelf — a consignor's goods standing beside the organization's own are
 stock the shelf holds, and the promise at confirmation counts them. The
-draw at completion used to answer a different question: it planned from
-the records with the owner filter closed to the organization's own, so a
-document that confirmed against eight (four ours, four the consignor's)
-released its reservation and then refused with NOT_ENOUGH — the promise
-and the issue disagreed about whose goods may serve the line.
+draw at completion asks the same question: it plans from every record the promise
+counted, so a document that confirmed against eight (four ours, four the consignor's)
+issues them rather than refusing with NOT_ENOUGH, and the promise and the issue agree
+about whose goods may serve the line.
 
 The one rule that settles it (recorded in ``docs/subsystems/STOCK.md``):
 the owner comes from the document line.

@@ -1,10 +1,9 @@
 """The warehouse names approvals as an optional companion and loads without it.
 
-It used to import the approvals module at module level in a dozen files and
-call its gate itself, while its manifest required only items and locations:
-documents could not load without the approvals package, and no other module
-could gate a document the way approvals did. The gate is now a pre-post check
-approvals registers. What the warehouse still says to approvals — how to
+The warehouse imports nothing from approvals at module level: its manifest requires
+only items and locations, so documents load without the approvals package, and
+approvals gates a document through a pre-post check it registers. What the
+warehouse still says to approvals — how to
 describe a document in its queue, what a document workflow would hold — it
 says through imports made when approvals asks, never when the warehouse is
 imported.

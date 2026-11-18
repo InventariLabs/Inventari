@@ -46,10 +46,9 @@ function HeaderHost({ children }: { children: ReactNode }) {
 }
 
 /**
- * A count far above the system stock used to be rewritten in silence — the
- * item ended at five times its old quantity while the report confirmed the
- * number that was counted. Now the posting is held back and the person who
- * counted decides.
+ * A count far above the system stock is held back until the person who counted
+ * decides. The item keeps the number that was counted, and the posting waits
+ * for that decision.
  */
 describe("StockTakeCountingPage — a count above the growth cap", () => {
   let queryClient: QueryClient;

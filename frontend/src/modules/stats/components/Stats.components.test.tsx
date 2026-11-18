@@ -263,7 +263,7 @@ describe("StatsOverviewCards", () => {
 
   it("calls the row count records, as the products list does", () => {
     // total_items counts stock rows, so a product held as two rows is two
-    // of them; the tile used to call that number "Products".
+    // of them; the tile calls that number "records", not "Products".
     render(
       wrap(
         <StatsOverviewCards
@@ -278,9 +278,9 @@ describe("StatsOverviewCards", () => {
   });
 
   it("offers no expiry tiles where the workspace keeps no dates", () => {
-    // One decision for the whole screen: these two used to be unconditional,
-    // so the card above could say "you keep no dates" while the tiles one
-    // click lower answered "0 expiring, 8 expired".
+    // One decision for the whole screen: these two are not unconditional, so
+    // the card above must not say "you keep no dates" while the tiles one
+    // click lower answer "0 expiring, 8 expired".
     const { rerender } = render(
       wrap(
         <StatsOverviewCards
@@ -322,8 +322,8 @@ describe("StatsOverviewCards", () => {
   });
 
   it("renders the expiry tiles from the one count, not the overview", () => {
-    // The tiles used to read `overview`, the second computation the health
-    // card above had just stopped reading. A number only in the overview
+    // The tiles read the count the health card above reads, not `overview`,
+    // a second computation. A number only in the overview
     // must not appear here.
     render(
       wrap(
@@ -490,7 +490,7 @@ describe("StatsHealthCard", () => {
   it("captions the needs-attention tile with what it counts", () => {
     render(wrap(<StatsHealthCard {...defaultProps} />));
     // The rows the list opens with, and nothing the number does not contain
-    // ("requiring review" used to be named here and counted nowhere).
+    // ("requiring review" is not named here, since the number does not count it).
     expect(
       screen.getByText(
         "Records expired or expiring soon, and every record of a product running low.",
@@ -509,8 +509,8 @@ describe("StatsHealthCard", () => {
 
   it("shows the age the server sent even where nothing has moved", () => {
     // Stock age is measured from intake, so zero consumption is not
-    // a reason to hide it — the guard used to print "—" over a computed,
-    // sent number. "—" now means only what the server's null means:
+    // a reason to hide it — the guard must not print "—" over a computed,
+    // sent number. "—" means only what the server's null means:
     // nothing measurable stands on any shelf.
     const { rerender } = render(
       wrap(<RotationAnalysisCard data={rotationAnalysis} t={t} />),

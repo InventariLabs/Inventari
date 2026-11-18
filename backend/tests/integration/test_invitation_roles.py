@@ -109,10 +109,9 @@ class TestInvitationRole:
         """The link an administrator opens to look at it is their own role.
 
         Minting a `role=user` code for the organization you already administer
-        and following it used to answer 200 and take `admin` away: the join
-        wrote the invitation's role over the member's, and the guard that
-        protects the last administrator only runs when the organization
-        changes.
+        and following it answers 200 without taking `admin` away: the join keeps the
+        member's role, and the guard that protects the last administrator runs
+        only when the organization changes.
         """
         issued = await real_async_client.post(
             '/api/v1/organizations/my/invitation-code',
@@ -155,10 +154,9 @@ class TestInvitationRole:
     async def test_each_invitation_gets_its_own_code(
         self, real_async_client, async_test_household, admin
     ):
-        # The endpoint used to hand back a live code issued for the same role
-        # rather than mint a second one. Once a code carries the address it
-        # was meant for, that is a way to send one person another person's
-        # invitation.
+        # Each request mints a second code, never the live one for the same role. A
+        # code carries the address it was meant for, so handing back a shared one
+        # would let a person send another person's invitation.
         first = await real_async_client.post(
             '/api/v1/organizations/my/invitation-code',
             json={'role': 'user', 'email': 'anna@example.com'},

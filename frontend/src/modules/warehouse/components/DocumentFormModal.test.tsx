@@ -1196,11 +1196,9 @@ describe("DocumentFormModal", () => {
     });
   });
 
-  // A dispatch's recipient picker lists customers only. The inline layer
-  // used to start on "Supplier" regardless of the field that opened it, and
-  // the created partner went straight into the field's value: the picker
-  // (filtered to the role set) showed the placeholder, the form treated the
-  // field as filled, and the submit never mentioned it.
+  // A dispatch's recipient picker lists customers only, so the inline layer
+  // starts on the role of the field that opened it, and the created partner
+  // goes straight into that field's value.
   it("refuses a supplier as the dispatch recipient and reports the empty field", async () => {
     const user = userEvent.setup();
 

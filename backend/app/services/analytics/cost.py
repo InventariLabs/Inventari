@@ -77,22 +77,20 @@ async def _compute_total_spent_async(
 ) -> Decimal:
     """What the period's receipts cost, read from the valuation ledger.
 
-    The denominator of the waste percentage used to be the purchase value
-    of what the window's receipts had *left* — an item bought and then
-    thrown away left the denominator while its disposal stayed in the
-    numerator, and the percentage crossed 100. Both figures now read the
-    same population: what arrived in the window, priced by the layers,
-    in the organization's money.
+    Both figures read the same population: what arrived in the window, priced
+    by the layers, in the organization's money. The denominator is not the
+    purchase value of what the window's receipts had *left*: an item bought
+    and then thrown away would leave the denominator while its disposal stayed
+    in the numerator, and the percentage would cross 100.
 
     Goods the organization's own books posted to themselves -- a production
     run's product, ingredients put back -- are not receipts from outside and
     are left out: the money was spent when the ingredients were bought, and
     counting the product too counted it twice.
 
-    That last clause is a filter, not a figure of speech. The rewrite onto
-    the ledger dropped the ``storage_ids`` this used to be narrowed by and
-    put nothing in its place, so every tenant was handed the sum of all of
-    them -- see the organization filter first in the WHERE clause below.
+    That last clause is a filter, not a figure of speech. The query is
+    narrowed by the organization first, in the WHERE clause below: the ledger
+    holds every tenant's layers, and that filter keeps them apart.
 
     *hidden_tags* leaves a vertical module's products out
     (:func:`hidden_module_tags_async`): a household's family laptop is not
@@ -162,10 +160,9 @@ async def _compute_wasted_by_product_async(
 ) -> tuple[Decimal, dict[str, dict]]:
     """What was thrown away, per product, priced by the valuation ledger.
 
-    The figure used to come from ``ItemHistory.changes['wasted_cost']``, a key
-    nothing in the application writes — so this whole report read zero in
-    every organization, and the "Wasted" tile on the cost screen was a
-    confident 0.00 over however much had gone in the bin.
+    The figure is read from the valuation ledger, not from
+    ``ItemHistory.changes['wasted_cost']``: no code writes that key, so a
+    figure read from it would be 0.00 whatever had gone in the bin.
 
     An outflow is priced once, when it happens, and the ledger keeps it. See
     ``_outflow_value`` for what that leaves unknowable: outflows from before
@@ -242,8 +239,8 @@ async def _compute_category_costs_async(
     of the record, and the cost ledger knows only the product template, so
     there is no ledger figure per category to read. The rows say so
     (``value_source``) and count the records that carried no price, which
-    used to be filtered out of the count as well as the sum — a category of
-    ten unpriced records reported as no records at all.
+    are counted as well as summed — a category of ten unpriced records
+    reports ten records, not none.
 
     Keyed by the category's id, not its name: two categories may share a
     name, and the code that names a seeded category in the reader's
@@ -327,12 +324,9 @@ async def _compute_monthly_trend_async(
     """Last 6 months spent + wasted, aligned to month-start buckets.
 
     Both figures come from the cost ledger, on the business date of the
-    layer. Spent used to be price times quantity off the records, dated by
-    when the record was typed in; wasted read ``changes['wasted_cost']`` off
-    the history, a key nothing writes, so it was zero in every month for
-    every organization. A receipt is an IN layer worth what it cost, a
-    disposal is an OUT layer with the reason on it, and the ledger already
-    prices both once, when they happen.
+    layer, not from the records' typed-in dates. A receipt is an IN layer
+    worth what it cost, a disposal is an OUT layer with the reason on it, and
+    the ledger prices both once, when they happen.
     """
     business_date = func.coalesce(
         StockValuationLayer.document_date,

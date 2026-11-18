@@ -98,7 +98,7 @@ describe("RolesPage", () => {
 
   it("names a module that has no translation by its manifest, not its identifier", async () => {
     // A scaffolded or community module has no entry in the modules catalog;
-    // the technical name used to stand in for it.
+    // the manifest's name is shown in its place, never the technical name.
     server.use(
       http.get("*/roles/permission-catalog", () =>
         HttpResponse.json({
@@ -197,8 +197,8 @@ describe("RolesPage", () => {
   });
 
   it("keeps the advice about custom roles once the table is never empty", async () => {
-    // The empty state used to carry it. Built-in levels are always listed,
-    // so the list has no empty state left to put it in.
+    // Built-in levels are always listed, so the table is never empty and has
+    // no empty state to carry the advice.
     withRoles([BUILTIN_VIEWER]);
     renderPage();
 

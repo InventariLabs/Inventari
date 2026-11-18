@@ -270,7 +270,7 @@ class CoreItemsReadMixin:
     ) -> dict[UUID, list[ItemDTO]]:
         """Load items expiring within a date range, grouped by template_id.
 
-        Used to surface soon-to-expire items for rotation decisions
+        Surfaces soon-to-expire items for rotation decisions
         (FEFO picking, planner suggestions, recall queries).
         Returns a dict mapping template_id → list of matching ItemDTOs.
         """

@@ -113,9 +113,8 @@ class TestBackorderCreation:
         assert len(bo['lines']) == 1
         assert bo['lines'][0]['expected_quantity'] == '3.000'
         # The backorder links to its original through ``backorder_id``, which
-        # the screens render in the reader's language. It used to store the
-        # English sentence "Backorder for IN/…" in notes, which every
-        # language showed verbatim and printed.
+        # the screens render in the reader's language, so notes stay empty: no
+        # sentence in one language is shown to every reader.
         assert bo['backorder_id'] == doc_id
         assert bo['notes'] is None
 
@@ -551,9 +550,8 @@ def _pdf_text(pdf_bytes: bytes) -> str:
 class TestThePrintoutNamesTheDocumentItContinues:
     """The paper a backorder prints points at the receipt it continues.
 
-    The stored English sentence the backorder used to carry in its notes
-    ("Backorder for IN/…") is dropped, and no screen-facing column links the
-    two documents — so the printout renders the reference line, in the
+    The backorder stores no sentence in its notes, and no screen-facing column
+    links the two documents — so the printout renders the reference line, in the
     document's language, the way a correction prints the document it
     corrects.
     """

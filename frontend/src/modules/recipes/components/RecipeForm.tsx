@@ -110,11 +110,9 @@ function emptyIngredient(key: number): IngredientDraft {
 
 /**
  * Auto-fill kcal and inferred allergens for the ingredients of a recipe loaded
- * for editing, looking each name up at most once per form. The effect used to
- * write state and depend on `ingredients`: a lookup answering allergens but no
- * kcal left the ingredient in `missing`, the fresh array identity re-armed the
- * effect, and one ingredient produced a steady stream of GETs for as long as
- * the dialog stayed open.
+ * for editing, looking each name up at most once per form. The effect does not
+ * depend on the `ingredients` array identity, so a lookup that answers with
+ * allergens but no kcal does not start the lookups again.
  *
  * The in-flight promise is held per (recipe, language, name) in a ref that
  * survives StrictMode's throwaway remount, and whichever effect pass is still
@@ -354,9 +352,9 @@ function RecipeFormContent({
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
 
   // The form as it stood when it opened — the yardstick for "is there
-  // anything to lose". The longest form in the module used to be thrown away
-  // by Escape, the cross, or a click on the backdrop, without a word and
-  // without a draft.
+  // anything to lose". The longest form in the module is guarded on Escape, the
+  // cross and a click on the backdrop, so none of them drops it without a word
+  // or a draft.
   const written = useMemo(
     () =>
       JSON.stringify({
@@ -522,7 +520,7 @@ function RecipeFormContent({
           />
 
           {/* One label variant across the form — the one the field components
- write themselves. This field used to opt out of it. */}
+ write themselves, this field included. */}
           <Textarea
             label={t("form.description")}
             value={description}

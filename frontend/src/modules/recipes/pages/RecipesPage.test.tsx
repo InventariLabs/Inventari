@@ -430,9 +430,8 @@ describe("RecipesPage", () => {
       expect(screen.getByText("Pasta Carbonara")).toBeInTheDocument();
     });
 
-    // The panel used to shrink to a lone "+ New collection" floating in
-    // whitespace, and the phone layout kept a dashed chip saying the same
-    // thing. Creating the first collection is a header action now, so both
+    // With no collections the panel is not drawn at all. Creating the first one is
+    // a header action, so both
     // surfaces wait until there is something to list.
     expect(screen.queryByTestId("collections-sidebar")).not.toBeInTheDocument();
     expect(screen.queryByTestId("collections-chips")).not.toBeInTheDocument();

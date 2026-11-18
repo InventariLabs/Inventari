@@ -119,12 +119,12 @@ class TestDefaultLimitEnforcement:
 
 class TestTheRefusalEnvelope:
     def test_a_refused_request_answers_in_the_coded_envelope(self, limited_app):
-        """429 used to be the one error under ``{"error": ...}``.
+        """A 429 answers in the coded envelope, not under ``{"error": ...}``.
 
         The handler is synchronous on purpose: ``sync_check_limits`` in the
         middleware falls back to slowapi's own handler for a coroutine, so an
-        ``async def`` here would leave the default limits answering the old
-        shape while only the decorator paths used the new one.
+        ``async def`` here would leave the default limits answering in a shape
+        of their own while only the decorator paths use the coded one.
         """
         limited_app.add_exception_handler(
             RateLimitExceeded, rate_limit_exceeded_handler

@@ -1,7 +1,7 @@
 """The demo seeder never gives two locations of one organization the same code.
 
 Codes are drawn at random; a draw that lands on a code the organization
-already holds used to end the whole seed in a unique violation.
+already holds must not end the whole seed in a unique violation.
 """
 
 from __future__ import annotations

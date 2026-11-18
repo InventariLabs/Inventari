@@ -1,9 +1,8 @@
 """Editing a shopping list is one unit of work with whatever the caller does next.
 
-The service used to commit inside the edit, so a request that failed after
-it (a serializer, a later write) had already renamed the list for good. The
-caller owns the commit now: a rollback after the edit leaves the list as it
-was.
+The caller owns the commit. A request that fails after the edit (a serializer,
+a later write) leaves the list as it was, because a rollback after the edit
+undoes it.
 """
 
 from __future__ import annotations

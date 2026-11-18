@@ -1,11 +1,9 @@
 """Printed code geometry — the numbers that decide whether a scan works.
 
 The module width and the bar height are call parameters in millimetres.
-They used to be a side effect of the ``height`` a template gave the ``<img>``:
-the image was generated at 0.25 mm/module and scaled to 80 px, so one knob
-moved both the bar height and the module width at once, and lowering the bar
-to a sane 10-12 mm silently narrowed the modules back below the readable
-threshold (the documented measurement).
+They are call parameters, not a side effect of the ``height`` a template gives
+the ``<img>``: lowering the bar leaves the module width where the readable
+threshold (the documented measurement) needs it.
 
 The decode measurement itself lives in
 ``backend/tests/integration/test_printed_code_decodes.py`` — this file guards

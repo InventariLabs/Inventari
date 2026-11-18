@@ -12,9 +12,10 @@ import {
 /**
  * The translations, one language at a time.
  *
- * These used to be fifty static imports plus an eager glob over every module's
- * bundle — all five languages of all of it, in the entry chunk, downloaded by
- * everyone including a visitor with no account. Measured: 1.3 MB of raw JSON
+ * These are loaded one language at a time, not as fifty static imports plus an
+ * eager glob over every module's bundle: that would put all five languages of
+ * all of it in the entry chunk, downloaded by everyone including a visitor with
+ * no account. Measured: 1.3 MB of raw JSON
  * of which a reader uses a fifth, and the module half is the larger one
  * (920 kB against the core's 386 kB), which the report that opened this did
  * not know.

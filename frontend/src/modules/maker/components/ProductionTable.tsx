@@ -108,8 +108,8 @@ export function ProductionTable({
                     <span className="block truncate max-w-[260px]">
                       {/* The name is the row's one way in — a real link, so
                           Enter, the middle button and "open in a new tab"
-                          all reach the order. The row-wide click it used to
-                          carry ate all three. */}
+                          all reach the order. The row carries no click of its
+                          own, which would eat all three. */}
                       <Link
                         to={`/maker/production/${order.id}`}
                         className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:text-accent"

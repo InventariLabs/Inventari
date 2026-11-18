@@ -1,8 +1,8 @@
 """The over-order guard is a pre-post check this module registers.
 
-The warehouse used to import the orders module to weigh a receipt against
-the order it names, so neither module could be taken out without the other.
-The rule is now ours: the warehouse asks every module's pre-post check when it
+The warehouse does not import the orders module to weigh a receipt against
+the order it names: the rule is ours, and the warehouse asks every module's
+pre-post check when it
 confirms and completes a document, and ours refuses a receipt that overdraws
 an order line. Where the module is off for an organization nobody asks, and a
 receipt that names an order line is a receipt like any other.

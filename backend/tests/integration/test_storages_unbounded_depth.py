@@ -86,7 +86,7 @@ class TestUnboundedDepth:
         assert 'level' not in response.json()
 
     def test_move_a_subtree_under_a_deep_node_succeeds(self, client, auth_headers):
-        """The move that used to be refused for pushing descendants too deep."""
+        """A subtree moves under a deep node, whatever depth its descendants reach."""
         _, _, rack = _chain(client, auth_headers, 'Warehouse', 'Aisle 3', 'Rack B')
         spare_root, spare_child = _chain(client, auth_headers, 'Overflow', 'Bin 1')
 

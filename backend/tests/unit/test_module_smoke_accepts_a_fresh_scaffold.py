@@ -2,9 +2,9 @@
 
 The community scaffold ships a model and its migration, so it declares the one
 capability those imports need (`database`); smoke reads the declaration, it
-does not infer it. Smoke used to fail the scaffold for declaring nothing, and
-looked for the frontend half under ``./frontend/src/modules`` of whatever
-directory it was started from rather than where the installer put it.
+does not infer it. Smoke fails a scaffold that declares nothing, and it looks for the frontend half
+where the installer put it, not under ``./frontend/src/modules`` of whatever
+directory it was started from.
 """
 
 from __future__ import annotations

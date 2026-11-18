@@ -8,10 +8,9 @@ factor left exact arithmetic the moment it touched the unit table. A
 coefficient is a definition, not a measurement; there is no reason for it to
 be the one number in the chain that is approximate.
 
-The result of a conversion is rounded here as well. It used to be handed to
-Postgres at full precision and rounded on the way into a ``numeric(12,3)``
-column — the right answer, arrived at by nobody's decision, and invisible to
-the code that had just computed it.
+The result of a conversion is rounded here as well. It is not handed to
+Postgres at full precision to be rounded on the way into a ``numeric(12,3)``
+column, where it would be invisible to the code that had just computed it.
 """
 
 from __future__ import annotations
@@ -45,11 +44,10 @@ class TestAConvertedQuantityIsRoundedWhereItIsComputed:
     ) -> None:
         """1000 g of something kept in kilograms, divided three ways.
 
-        The stock columns hold three decimals. The conversion used to hand
-        Postgres the full quotient and let the column decide — the right
-        answer, arrived at by nobody's decision and invisible to the code
-        that had just computed it, which then compared its own number
-        against the stored one and found them different.
+        The stock columns hold three decimals. The conversion does not hand
+        Postgres the full quotient to let the column decide: the code that had
+        just computed it would compare its own number against the stored one and
+        find them different.
         """
         from app.models.product_template import ProductTemplate
         from app.services.uom_service import to_stock_uom_async

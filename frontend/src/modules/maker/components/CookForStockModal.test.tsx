@@ -322,8 +322,8 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
     /**
      * The bridge builds two records in two calls: the snapshot, then the
      * order. When the second is refused and the operator walks away, the
-     * first used to stay — a formula in the production catalogue that nobody
-     * created on purpose and no screen mentioned.
+     * first is taken along with it: no formula is left in the production
+     * catalogue that nobody created on purpose and no screen mentioned.
      */
     async function refuseTheOrderAndLeave() {
       const onClose = vi.fn();
@@ -445,8 +445,8 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
 
     it("offers to create the first location instead of an empty list", () => {
       // "No location matches" answers a search. An organization with none
-      // has not searched for anything — and the way to fix that used to be
-      // three screens away, with this sheet abandoned on the way.
+      // has not searched for anything, and the way to fix that is here, not three
+      // screens away with this sheet abandoned on the way.
       serveScopedStorages([]);
 
       render(

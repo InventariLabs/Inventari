@@ -168,8 +168,8 @@ async def _name_the_stock_record(
     """Give a line that takes goods off a shelf the record it will take from.
 
     Confirmation refuses a dispatch, issue, transfer or scrap line naming
-    only a product, and import used to stop at the product — so a document
-    built from a sheet never confirmed. The record is the first one the
+    only a product, so import gives each such line its record, and a document
+    built from a sheet confirms. The record is the first one the
     draw would take: on the document's source shelf (every shelf when it
     names none), in the product's removal strategy's order, among the stock
     nobody has reserved, whoever owns it — the scope the dispatch itself
@@ -319,9 +319,8 @@ async def _lines_from_rows(
             line_number += 1
         except (ValueError, SQLAlchemyError, InvalidOperation) as e:
             # The number the reader just saw. The mapping step numbers the
-            # rows of *data* from 1; this used to count the header as row 1,
-            # so a refusal pointed at the row below the one it meant and the
-            # reader looked at a row where nothing was wrong.
+            # rows of *data* from 1, so the header is not row 1 and a refusal
+            # points at the row the reader sees.
             if isinstance(e, ValueError) and is_reader_facing_value_error(e):
                 # A refusal this codebase wrote, in the request's language.
                 errors.append(refusal_row(e, row=_row_number(index)))

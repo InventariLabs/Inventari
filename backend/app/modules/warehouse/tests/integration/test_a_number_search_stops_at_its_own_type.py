@@ -1,9 +1,9 @@
 """A number search answers the number it names, not every number containing it.
 
 ``OUT/2026/001`` and ``INTERNAL_OUT/2026/001`` are two documents of two
-different types, and one search used to find both: the one number contains
-the other, and plain substring matching cannot tell them apart. New numbers
-no longer spell their type that way — ``{TYPE}`` writes a short code — but a
+different types, and a search must not find both: the one number contains the
+other, and plain substring matching cannot tell them apart. New numbers spell their
+type with a short code — ``{TYPE}`` writes it — but a
 register that has been running still holds numbers written before, and a
 search must be able to name one of them without the other answering.
 

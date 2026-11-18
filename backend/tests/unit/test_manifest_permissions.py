@@ -1,9 +1,8 @@
 """Manifest permissions are typed definitions in the module's own namespace.
 
-Permissions used to be bare strings with nothing checking where they lived, so
-a module could declare ``admin:access`` and the registry would publish it as
-that module's own — the RBAC matrix would then offer an admin grant that looks
-like it belongs to a third-party module.
+A permission is a typed definition, so a module cannot declare ``admin:access``
+and have the registry publish it as its own: the RBAC matrix would otherwise
+offer an admin grant that looks like it belongs to a third-party module.
 
 Two rules make that impossible: a key sits under the module's name, and the one
 exception (a core key the module depends on) is published by the system section

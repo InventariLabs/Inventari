@@ -435,7 +435,7 @@ class TestTheWholeDeliveryHeldBackOnTheFloor:
         assert counted.json()['session_complete'] is True
 
         # The summary's close is a completion with no execution body, which is
-        # exactly the path that used to clear a code from a line at its figure.
+        # exactly the path that clears a code from a line at its figure.
         completed = client.patch(
             f'/api/v1/warehouse/documents/{doc_id}/complete',
             headers=doc_auth_headers,

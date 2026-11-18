@@ -1,9 +1,9 @@
 """A cleared field clears; a field the payload did not carry stays.
 
 The contract backend AGENTS.md §2b calls "named null clears, absent key
-leaves alone". `update_document` used to read every field with a blanket
-`is not None`, so the two instructions collapsed into one: the screen said
-"updated" over a note or a partner that never changed. The same test also
+leaves alone". `update_document` reads each field by whether its key was sent: a
+named null clears it and an absent key leaves it alone. The screen never says
+"updated" over a note or a partner that did not change. The same test also
 pins the other half — a key the payload did not send must not touch the
 column — because a writer that acts on every key it receives would pass the
 first test and lose the value the next save never mentioned.

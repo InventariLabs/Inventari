@@ -40,9 +40,9 @@ describe("Select", () => {
   });
 
   /**
-   * The box used to appear only alongside a label, so `wrapperClassName` was
-   * accepted, type-checked and thrown away on every unlabelled call site —
-   * the same defect NativeSelect already fixed and documented.
+   * The box appears with or without a label, so `wrapperClassName` is never
+   * accepted, type-checked and thrown away on an unlabelled call site — the
+   * same contract NativeSelect keeps.
    */
   it("renders its box with no label, so wrapperClassName lands somewhere", () => {
     render(
@@ -89,10 +89,9 @@ describe("Select", () => {
 });
 
 /**
- * The placeholder used to be an English literal in a default parameter
- * (`placeholder = "Select…"`) — the same shape removed from
- * ConfirmDialog. It surfaced on the public attestation page, where every
- * other word was translated.
+ * The placeholder is translated, not an English literal in a default parameter
+ * (`placeholder = "Select…"`), the same shape kept out of ConfirmDialog. On the
+ * public attestation page, where every other word is translated, it must be too.
  *
  * The check reads the placeholder in a language that is not English: the
  * English catalogue says "Select…" too, so comparing the rendered text with

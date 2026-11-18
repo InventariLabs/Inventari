@@ -2,11 +2,11 @@
 
 Confirming a document under a workflow raises the approval request, and the
 document parks on the first stage it cannot walk past. When nobody can decide
-that stage, the sentence the dialog used to show — "it will go to the approval
-queue" — promised a queue the request would never reach: the document sat in
-PENDING_APPROVAL and looked like something waiting its turn. The requirement
-endpoint now carries the same verdict the parked request would carry, so the
-page can say it before the click.
+that stage, the dialog must not say "it will go to the approval queue": that
+queue is one the request would never reach, and the document would sit in
+PENDING_APPROVAL looking like something waiting its turn. The requirement
+endpoint carries the same verdict the parked request would carry, so the
+page says it before the click.
 """
 
 import uuid

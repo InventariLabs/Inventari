@@ -1,11 +1,9 @@
 """Every country code the API accepts must print as a name, in five languages.
 
-The printed name used to come from a hand-maintained map of 40 codes while
-the API validated against the full ISO 3166-1 set, so a partner in Dubai
-appeared on screen as "United Arab Emirates" and on the PDF as "AE". The map
-is gone — names now come from Babel's CLDR territory tables — but nothing
-pinned the guarantee, and a fallback map is exactly the kind of thing that
-gets reintroduced for one missing locale.
+The printed name comes from Babel's CLDR territory tables, and the guarantee is
+pinned here: the API validates against the full ISO 3166-1 set, so every code it
+accepts prints as a name, never as the bare code. A fallback map is exactly the
+kind of thing that gets reintroduced for one missing locale.
 """
 
 import pytest

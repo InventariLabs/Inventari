@@ -3,8 +3,8 @@
 The demo recipes carry NULL on ``recipe_ingredients.picking_skip`` — the
 migration's "use the heuristic" contract, which ``_should_auto_skip`` still
 reads. GET hands that null to the form, the form hands it back on save, and
-the update schema used to refuse it (``bool = False``): every recipe with a
-seeded ingredient answered 422 the moment any field was edited. The named
+the update schema accepts it, so a recipe with a seeded ingredient saves
+when any field is edited. The named
 null is a real answer on this nullable column, so the update accepts it and
 stores it as it read it.
 """

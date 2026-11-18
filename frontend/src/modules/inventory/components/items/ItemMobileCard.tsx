@@ -61,9 +61,8 @@ interface ItemMobileCardProps {
  * Promise a deletion, then keep the promise unless it is taken back.
  *
  * The undo window stands in for a confirmation dialog: the toast says the
- * deletion is pending and the deletion then happens. It used to announce a
- * removal that had not happened and ask for permission five seconds later,
- * when the reader was already looking elsewhere.
+ * deletion is pending and the deletion then happens, and no dialog asks again
+ * once the reader has moved on.
  *
  * Outside the component because the card sits at the complexity ceiling and
  * this is a self-contained promise about a name and a callback.
@@ -377,9 +376,7 @@ export default memo(function ItemMobileCard({
     } else if (swipeX < -threshold && onSwipeDelete) {
       // Swipe left -> delete, with the Undo window standing in for the
       // confirmation dialog. The toast promises a deletion that is
-      // still pending, and the deletion then happens — it used to announce a
-      // removal that had not happened and ask for permission five seconds
-      // later, when the user was already looking elsewhere.
+      // still pending, and the deletion then happens.
       setSwipeX(0);
       setIsSwiping(false);
 

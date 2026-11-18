@@ -234,8 +234,8 @@ describe("DateInput", () => {
 
     fireEvent.click(screen.getByRole("combobox"));
     const dialog = screen.getByRole("dialog");
-    // The default used to be `["today"]`, so every date field in the app grew
-    // a bar offering the one date already sitting on the open grid.
+    // The default is no presets: a date field does not grow a bar offering the
+    // one date already sitting on the open grid.
     expect(within(dialog).queryAllByTestId("date-preset")).toHaveLength(0);
   });
 

@@ -24,8 +24,8 @@ export default function CreateShoppingListModal({ onClose, onSuccess }: Props) {
 
     setSubmitting(true);
     try {
-      // The fallback used to be an English template string, so a Polish
-      // interface produced Polish lists called "List 20.08.2026".
+      // The fallback is a translated string, so a Polish interface names its
+      // lists in Polish.
       const defaultName = t("modal.defaultName", {
         date: formatDate(new Date().toISOString()),
       });

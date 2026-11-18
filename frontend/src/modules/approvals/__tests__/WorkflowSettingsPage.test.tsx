@@ -603,7 +603,7 @@ describe("WorkflowSettingsPage", () => {
 
   it("keeps the empty state's create out of the primary slot the header owns", async () => {
     // The header carries the view's one filled create button; the empty
-    // state used to repeat it as a second filled one on the same screen
+    // state keeps its create action as a secondary one on the same screen
     // The entry stays — demoted, not removed — because the empty
     // state is where a first-time reader is looking.
     server.use(
@@ -667,8 +667,8 @@ describe("WorkflowSettingsPage", () => {
   });
 
   it("says no switched-on module asks for approvals, and saves nothing", async () => {
-    // Nothing that raises requests is on: the form used to fall back to a
-    // Document target it did not show, and saved a workflow guarding nothing.
+    // Nothing that raises requests is on, so the form must not fall back to a
+    // Document target it does not show, and must not save a workflow guarding nothing.
     withModules([]);
     const posted = vi.fn();
     server.use(
@@ -714,8 +714,8 @@ describe("WorkflowSettingsPage", () => {
     await screen.findByText("No workflows configured");
     fireEvent.click(screen.getByRole("button", { name: "Create Workflow" }));
     // Purchase orders and equipment checkouts both request approval, so a
-    // workflow for them has to be creatable here — the screen used to offer
-    // documents alone, which left the "require approval" setting unusable.
+    // workflow for them has to be creatable here, not documents alone, or the
+    // "require approval" setting would be unusable.
     // The trigger carries the field name; the options ride the native select
     // Radix keeps in the form for submission.
     expect(
@@ -735,9 +735,8 @@ describe("WorkflowSettingsPage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create Workflow" }));
 
     // A workflow is the *who*: it stands in for a silent document profile,
-    // while a configured threshold or type list stays the filter. The screen
-    // used to say the stages were all a workflow did, and later that the
-    // workflow sent every confirmed document to approval.
+    // while a configured threshold or type list stays the filter, so a
+    // workflow alone does not send every confirmed document to approval.
     expect(screen.getByTestId("workflow-gates-documents")).toHaveTextContent(
       /decides who approves/i,
     );
@@ -934,8 +933,7 @@ describe("WorkflowSettingsPage", () => {
     await openTheStage();
     fireEvent.click(screen.getByTestId("workflow-submit-btn"));
     // The server's refusal names the requests waiting and the move that
-    // exists; the page used to swap it for a stock sentence whenever the
-    // text happened to contain "active request".
+    // exists; the page shows that text as it arrives, not a stock sentence.
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith(
         "Cannot modify workflow: 3 active request(s) in progress.",
@@ -1299,8 +1297,8 @@ describe("WorkflowSettingsPage without approvals:configure", () => {
 /**
  * The approval path form is a page form: name, target type and a stage list,
  * typed by hand, with the module tabs one click away. The equipment and
- * product forms ask before a tab takes the page; this one used to let the
- * draft go in silence.
+ * product forms ask before a tab takes the page; this one asks too, so the
+ * draft is never dropped in silence.
  */
 function GuardedShell({ children }: { children: React.ReactNode }) {
   const { guardClick, confirmDialogProps } = useNavLeaveGuard();

@@ -1,35 +1,32 @@
 """Rendering one label to a PNG.
 
 Three things decide whether a label looks made or looks generated, and this
-file used to get all three wrong at once.
+file gets all three right.
 
 **A QR is a grid, and a grid survives only whole-number scaling.** The
-generator drew it at ten pixels to a module and then LANCZOS'd the square
-down to whatever the label had left. Module edges land between pixels, so
-every module comes out a slightly different width with grey along its edges,
-and a decoder has to guess the grid back. The module size is chosen first
-now, and the code is drawn once at that size — identical squares, edges
-black or white, nothing in between.
+module size is chosen first, and the code is drawn once at that size: every
+module is an identical square with edges black or white, nothing in between. A
+resampled square would land module edges between pixels, with grey along them
+that a decoder has to guess the grid back through.
 
-**Antialiasing is what makes letters look like letters.** The old pipeline
-rendered four times over and downscaled — which does produce smooth greys —
-and then threw every one of them away on ``point(p < 128)``. An office
+**Antialiasing is what makes letters look like letters.** The pipeline
+renders four times over and downscales, which does produce smooth greys, and
+keeps every one of them: nothing is thresholded on ``point(p < 128)``. An office
 printer lays down grey, and a screen showing the file at label size has
 nothing to smooth the strokes with, so the file keeps the greys the glyphs
 were drawn with. A thermal head prints a dot or no dot; making the label
 1-bit for one is the print agent's job, next to the head that needs it.
 
 **A QR does not need the whole label, and the caption is not sized by it.**
-Sized as "the height, less padding", the square took 22.6 mm of a 50 x 24
-label — 45% of its width — while the caption used a fifth of the room left
-over. The square takes all of the height when no caption shares the label.
-Beside a caption it starts from a third of the width and grows into the
-height for as long as the caption keeps the size it has beside that third;
-it grows past the third to keep its modules readable too, and never shrinks
-them below that. The short code sits
-under it as part of the same column, and the caption keeps one size of its
-own beside them — whether or not the code is printed, since the sentence has
-not changed when a switch is flipped.
+Sized to the full height, the square would take nearly half the width of a
+50 x 24 label and leave the caption a fifth of the room. The square takes all
+of the height when no caption shares the label. Beside a caption it starts from
+a third of the width and grows into the height for as long as the caption keeps
+the size it has beside that third; it grows past the third to keep its modules
+readable too, and never shrinks them below that. The short code sits under it
+as part of the same column, and the caption keeps one size of its own beside
+them — whether or not the code is printed, since the sentence does not change
+when a switch is flipped.
 """
 
 import io
@@ -162,8 +159,7 @@ def generate_label_png(
     The code is off by default and small when it is on: on a shelf a person
     reads "minced beef 8.2026", not "STM-K9XP". It is there for the moment a
     scan fails and somebody types the code in, so it belongs to the square
-    rather than to the caption's column, where it used to be the biggest
-    thing on the label.
+    rather than to the caption's column, where it would dominate the label.
 
     ``edge_to_edge`` is a printer's word that it leaves a white edge of its
     own above and below the label — a P-touch's tape is wider than its head
@@ -174,8 +170,8 @@ def generate_label_png(
     if width_mm <= 0 or height_mm <= 0:
         # Refused rather than clamped: the caller has asked for a label with
         # no size, and every downstream number (QR side, font size, padding)
-        # is a fraction of one of these. It used to reach Pillow and come
-        # back as "height and width must be > 0" from the QR resize.
+        # is a fraction of one of these, so it is refused here rather than reaching
+        # Pillow and failing as "height and width must be > 0" from the QR resize.
         raise ServiceRejectionError('label_size_invalid')
 
     raster = raster_for(width_mm, height_mm, dpi, max_height_px)
@@ -198,8 +194,7 @@ def generate_label_png(
     # The two switches are independent: ``qr_only`` silences the caption,
     # ``show_code`` prints the short code. Both off is the caption alone,
     # both on is the code alone — the arrangement for a label pool nobody has
-    # described yet, which used to be unreachable because ``qr_only`` was
-    # taken to mean "no text at all" rather than "no caption".
+    # described yet. ``qr_only`` means "no caption", not "no text at all".
     prints_code = show_code
     code_line_h = (
         round(round(CODE_RATIO * target_h) * LINE_SPACING) if prints_code else 0
@@ -443,10 +438,10 @@ def _draw_code_under_qr(
 ) -> None:
     """The short code centred under the square, shrunk to the square's width.
 
-    It used to stand beside the QR in the caption's column, where it was the
-    biggest thing on the label and the caption a footnote under it. Nobody
-    reads a shelf by short code; it is there for the moment a scan fails and
-    somebody types it in, so it belongs to the square and stays small.
+    It stands under the QR, not beside it in the caption's column, so it does not
+    compete with the caption. Nobody reads a shelf by short code; it is there for
+    the moment a scan fails and somebody types it in, so it belongs to the square
+    and stays small.
     """
 
     def fits(size: int) -> bool:
@@ -581,11 +576,10 @@ def _overflows(
 ) -> bool:
     """True when any line is wider than the box it has to sit in.
 
-    The fitter used to ask only how many lines the text broke into, never
-    how wide they came out. A caption whose longest word does not fit was
-    then accepted at any size: "opis etykiety" printed at full height with
-    "etykiety" running off the right edge of the label — visible in the
-    preview, and cut off by the die on paper.
+    The fitter asks how wide each line comes out, not only how many lines the text
+    breaks into. A caption whose longest word does not fit counts as overflowing,
+    whatever its size, so "opis etykiety" never prints at full height with
+    "etykiety" running off the right edge of the label.
     """
     return any(draw.textbbox((0, 0), line, font=font)[2] > max_width for line in lines)
 
@@ -689,11 +683,9 @@ def _render_caption(
 ) -> None:
     """Draw the caption beside the QR, at one size whatever else is printed.
 
-    The caption used to be sized against the short code — so flipping "also
-    print the code" changed the sentence's size, though the sentence had not
-    changed. It is a fraction of the label now, shrinking only when the text
-    is too long for the room, and the code has moved under the square where
-    it does not compete for the width.
+    The caption is a fraction of the label, shrinking only when the text is too long
+    for the room, so flipping "also print the code" leaves the sentence's size
+    alone. The code sits under the square, where it does not compete for the width.
     """
     if not caption or box_width <= 0 or box_height <= 0:
         return

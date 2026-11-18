@@ -515,9 +515,8 @@ class TestItemsCreate:
         """The default is pieces, and pieces count whole.
 
         The unit is settled before the quantity is measured, so a request
-        that names no unit is measured in the unit it lands with. It used to
-        land after the gate: this same 0.5 came back 201 here while the same
-        0.5 with ``uom_id: pcs`` spelled out came back 400."""
+        that names no unit is measured in the unit it lands with: the same 0.5 is
+        refused here with a 400, as it is with ``uom_id: pcs`` spelled out."""
         from sqlalchemy import select
 
         from app.models.item import Item
@@ -676,7 +675,7 @@ class TestItemDetails:
     def test_get_archived_item_names_the_archive(self, client, auth_headers, test_item):
         """A soft-deleted product is in the archive, not nowhere.
 
-        The detail screen answered "this product no longer exists" about a
+        The detail screen must not say a product is gone about a
         record sitting one click away with a Restore button under it. The
         404 keeps its status — the product is not part of the live lists —
         but carries a code the page can read and follow to the archive.
@@ -765,9 +764,8 @@ class TestItemUpdate:
 
         A product without a category is a normal state — the products list
         filters by it — and this is the request the form now sends when the
-        picker's "No category" is chosen. Dropping the key instead, which is
-        what the form used to do, is indistinguishable from not having touched
-        the field.
+        picker's "No category" is chosen. Dropping the key instead is
+        indistinguishable from not having touched the field.
         """
         assert test_item.category_id is not None
 
@@ -868,7 +866,7 @@ class TestItemDelete:
 
         The history and audit JSONB snapshots serialize the value
         the column type healed on load — not float('nan'), which PostgreSQL's
-        jsonb refuses and which used to 500 the delete."""
+        jsonb refuses, so the delete must not 500 on it."""
         from sqlalchemy import text
 
         db_session.execute(
@@ -899,14 +897,12 @@ class TestItemDelete:
     ):
         """Regression for spurious 'N unaccounted' WARNING on item delete.
 
-        When deleting an item that never had any reservations, the
-        lifecycle used to call ``release_reservation_async(quantity=old_qty)``
-        unconditionally — a release-by-quantity that has since been removed
-        from the core API. It logged ``Could not fully release N for
-        product ... — N unaccounted`` whenever no reserved_quantity
-        existed, polluting logs with a misleading warning.
+        When deleting an item that never had any reservations, no release is attempted:
+        the lifecycle does not call ``release_reservation_async`` unconditionally,
+        so no ``Could not fully release N ... N unaccounted`` warning is logged
+        for an item with no reserved_quantity.
 
-        After the fix, ``delete_item`` pre-checks whether any
+        ``delete_item`` pre-checks whether any
         ``reserved_quantity > 0`` exists for the item's quant and skips
         the release call when none. This test asserts the warning is not
         emitted in the common no-reservation case.

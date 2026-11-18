@@ -23,9 +23,9 @@ class TestSoftDelete:
 
         Both reason-less doors in the interface — the bulk delete behind one
         confirmation and the swipe on the mobile card — send no body at all,
-        so this request is what they look like on the wire. It used to come
-        back filed as ``OTHER``, and the archived sheet read that out loud as
-        "Status: Other": an answer nobody gave, said with confidence.
+        so this request is what they look like on the wire. The reason
+        stays empty, so the archived sheet never reads "Status: Other": an answer
+        nobody gave, said with confidence.
         """
         response = client.delete(f'/api/v1/items/{test_item.id}', headers=auth_headers)
 
@@ -43,9 +43,9 @@ class TestSoftDelete:
     ):
         """A body that names only notes is not a reason either.
 
-        The schema used to default the field to ``OTHER``, so a caller that
-        arrived with something to say about the delete but nothing about the
-        why had the why invented for them.
+        The schema leaves the field empty, so a caller that arrives with something to
+        say about the delete but nothing about the why does not have the why
+        invented for them.
         """
         response = client.request(
             'DELETE',

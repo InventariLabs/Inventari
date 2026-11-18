@@ -167,8 +167,8 @@ class TestTheScanSheetRows:
         """One hold of 4 over records of 3 and 5 reads 4 once, never twice.
 
         A receipt with another use-by date lands as its own record in the
-        same group; the reservation names the group, so each record used to
-        show the whole 4 and the first one a free figure of -1.
+        same group; the reservation names the group, so the hold is split across the records:
+        each shows its own share, and none shows a free figure of -1.
         """
         db = real_async_db_session
         org_id = async_test_user.organization_id

@@ -95,8 +95,8 @@ function approvalStateOf(
  * What the order is worth, from the order.
  *
  * It already carries totals, computed by the same arithmetic that stores
- * them; this page used to recompute them in floats and disagreed by a cent
- * whenever a line's own tax landed on a half. The fallback is for an order
+ * them, and this page does not recompute them in floats, which would disagree
+ * by a cent whenever a line's own tax lands on a half. The fallback is for an order
  * whose totals the API did not send; a ``null`` total is a line with no price,
  * and the card behind this says so instead of printing these.
  */
@@ -219,8 +219,7 @@ export default function PurchaseOrderDetailPage() {
           {t(`status.${po.status}`)}
         </Badge>
       ) : undefined,
-      // On the line of the number, as on the document detail. They used to
-      // stand in a row of their own under the title.
+      // On the line of the number, as on the document detail.
       actions: po ? (
         <POActionBar
           po={po}

@@ -120,7 +120,7 @@ export const test = playwrightTest.extend({
     // What the page itself reported while the test ran. A start that ends on a
     // blank page leaves nothing else to attribute a timeout to: the assertion
     // only says the element never came. Kept for a failing test only, and
-    // never used to retry or to excuse one.
+    // never retries or excuses one.
     const diagnostics: string[] = [];
     const note = (kind: string, detail: string) =>
       diagnostics.push(`${new Date().toISOString()} ${kind} ${detail}`);

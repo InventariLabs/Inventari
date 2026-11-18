@@ -49,7 +49,7 @@ def _inject_org_filter(
 
     ``column_descriptions`` carries no entity for
     ``select(func.count()).select_from(Item)`` — the only column is a bare
-    function — so that shape used to slip through unfiltered and counted
+    function — so that shape would slip through unfiltered and count
     every organization's rows. When nothing matched, fall back to the FROM
     clause:
 

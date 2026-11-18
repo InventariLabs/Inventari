@@ -42,9 +42,8 @@ async function renderExpanded() {
 
 describe("SettingsEmailTab", () => {
   it("reads the encryption of a configuration saved before the field existed", async () => {
-    // 465 used to mean plain SMTP with no STARTTLS — login and message in the
-    // clear. The stored port now resolves to the transport it implies, and the
-    // screen says which one that is.
+    // The stored port resolves to the transport it implies (465 is TLS from the
+    // first byte), and the screen says which one that is.
     mockSmtp({ host: "smtp.example.com", port: 465, user: "u", password: "p" });
     await renderExpanded();
 

@@ -137,8 +137,8 @@ describe("RecipeIngredientForm — the units the guard will take", () => {
     const user = userEvent.setup();
     render(<RecipeIngredientForm recipeId="r-1" outputTemplateId="tpl-out" />);
 
-    // The first catalogue unit used to be pre-filled here. It is a unit
-    // nobody chose, and once a product is picked the guard may well refuse
+    // No catalogue unit is pre-filled here. It is a unit nobody chose, and once
+    // a product is picked the guard may well refuse
     // it — so the picker starts empty and the Add button stays off until
     // both a product and a unit are on the line.
     expect(screen.getByTestId("product-default-uom").textContent).toBe("");
@@ -157,8 +157,7 @@ describe("RecipeIngredientForm — the units the guard will take", () => {
     await user.click(screen.getByTestId("product-picker"));
 
     // The pick is on the line, and the picker below it followed the
-    // product's own unit — the stale unit a product change used to leave
-    // behind is gone with the fallback that created it.
+    // product's own unit, and no stale unit from an earlier product stays behind.
     await waitFor(() =>
       expect(
         screen.getByTestId("maker-composition-child-selected"),

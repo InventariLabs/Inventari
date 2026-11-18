@@ -296,9 +296,8 @@ export default function EquipmentLocationsPage() {
   const { confirm, confirmDialogProps } = useConfirm();
 
   // Location is a required field of every record standing in one, so the API
-  // refuses to delete a location that holds anything. The screen used to ask
-  // anyway and report a bare "Failed to delete" afterwards; it says so before
-  // the click instead, which is how the rest of the application refuses.
+  // refuses to delete a location that holds anything. The screen does not ask
+  // anyway: it says so before the click, which is how the rest of the application refuses.
   //
   // Two questions live on a row, and folding them into one number is how the
   // count under an IT screen's title came to include the organization's

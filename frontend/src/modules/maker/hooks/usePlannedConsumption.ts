@@ -21,9 +21,9 @@ import type {
  *
  * Which ingredients are short is not recomputed here: the server answers
  * with the refusal's own list (`shortage_items`), the same one completion
- * refuses with. A browser-side forecast used to sit next to the server's
- * banner and disagree with it — different batches, no location context —
- * and the rows a run would be refused over carried no marker at all.
+ * refuses with. A browser-side forecast would sit next to the server's banner
+ * and could disagree with it — different batches, no location context — so the
+ * rows a run would be refused over are marked from that same list.
  */
 export function usePlannedConsumption(order: ProductionOrder | undefined) {
   const { data: recipe } = useMakerRecipe(order?.recipe_id ?? undefined);

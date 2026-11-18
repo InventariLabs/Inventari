@@ -48,7 +48,7 @@ export function PageHeader({
   return (
     <div className={className}>
       {/* The action bar never shrinks, so on a half-width desktop window a
-          wide set of actions used to squeeze the title down to a couple of
+          wide set of actions would squeeze the title down to a couple of
           characters. Let the row wrap instead: the title keeps at least 20rem
           and the actions drop to a line of their own when they no longer fit
           beside it. */}

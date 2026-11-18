@@ -1,7 +1,7 @@
 """A backorder draft in To do says whether the stock it waits for has arrived.
 
-The draft a short dispatch leaves behind is a decision, and until now the
-person deciding had to open it and compare it with the shelves by hand. The
+The draft a short dispatch leaves behind is a decision, and the person deciding
+needs to know whether the shelves cover it. The
 queue now reads the answer from the stock itself, at request time: how much
 of the draft the pickable shelves cover — ``full``, ``partial`` or ``none``.
 

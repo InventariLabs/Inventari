@@ -1,11 +1,8 @@
 """Stock that arrives without a price, and stock that leaves without a layer.
 
-Two questions of the same kind, and the ledger used to answer them
-differently. A surplus off a count, a quantity raised by hand and a
-correction with no price all posted a layer at 0.00 — every one of them
-diluted the average and understated the assets. A receipt document with no
-price on the line posted **nothing**, so the physical stock stopped equalling
-the sum of the layers, and nothing looks for that gap.
+Two questions of the same kind, and the ledger answers them alike: stock that
+arrives or leaves without a price still moves the layers, so the physical stock
+keeps equalling the sum of the layers.
 
 On the way out, a delivery the layers could not cover consumed what it found
 and dropped the rest without a word: no exception, no log line, and after the

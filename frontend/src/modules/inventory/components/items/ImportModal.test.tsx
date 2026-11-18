@@ -148,9 +148,9 @@ describe("ImportModal (products)", () => {
   });
 
   it("keeps the Grocy preset and the create-missing option on the mapping step", async () => {
-    // The preset used to be gated on a `grocy_importer` module that exists
-    // nowhere in this product, so a column mapping computed entirely in the
-    // browser was unreachable for everyone.
+    // The preset is not gated on a `grocy_importer` module, which this product
+    // does not have, so a column mapping computed entirely in the browser is
+    // reachable for everyone.
     analyzeImport.mockResolvedValue({
       headers: ["name", "amount", "location"],
       preview_rows: [],
@@ -310,7 +310,7 @@ describe("ImportModal (products)", () => {
 
   it("reads the gate's refusal to the reader instead of a generic failure", async () => {
     // The refusal a backend gate writes carries its reason and its remedy;
-    // the bare catch used to bury it under "Import failed".
+    // the catch shows it to the reader, not a generic "Import failed".
     analyzeImport.mockResolvedValue({
       headers: ["name"],
       preview_rows: [],
@@ -374,9 +374,8 @@ describe("ImportModal (products)", () => {
   });
 
   it("opens the report with what the overwrite did, not only what it added", async () => {
-    // The headline used to read "Added 1 product." while the same import
-    // had overwritten two: the first sentence a reader sees skipped the
-    // effect the mode was chosen for.
+    // The headline names what the overwrite did as well as what it added, so
+    // the first sentence a reader sees carries the effect the mode was chosen for.
     analyzeImport.mockResolvedValue({
       headers: ["Name", "Label Code"],
       preview_rows: [],

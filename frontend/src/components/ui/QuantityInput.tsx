@@ -12,7 +12,7 @@ export interface QuantityInputProps extends Omit<
   "type" | "step" | "min"
 > {
   /**
-   * UoM id used to resolve step/precision constraints.
+   * UoM id resolves the step/precision constraints.
    * Falls back to permissive defaults (step="any") when null or undefined.
    */
   uomId?: string | null;
@@ -86,7 +86,7 @@ export function QuantityInput({
   // The text of a field in committed-value mode, from the first change
   // until blur. Echoing the browser's report verbatim — including the empty
   // one of a half-typed fraction — is what lets React leave the input's
-  // editing buffer alone; rewriting it to a number is what used to eat the
+  // editing buffer alone; rewriting it to a number would eat the
   // dot. `null` means nobody is typing: the field shows `value`.
   const [draft, setDraft] = useState<string | null>(null);
   const ownsTyping = onQuantityChange !== undefined;

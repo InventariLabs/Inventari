@@ -15,10 +15,8 @@ import { queryKeys } from "@/hooks/queries/keys";
  * listed, with an owner and an expiry, in `invalidation-keys-baseline.json`.
  *
  * Stats note: the `["stats"]` prefix covers `["stats", "overview"]` and its
- * siblings. A second, flat `["stats-overview"]` key used to be invalidated
- * beside it "since some components still use the old key directly" — none
- * did; nothing ever read it, so three invalidations were addressed to a
- * cache entry that did not exist.
+ * siblings. No flat `["stats-overview"]` key exists: nothing reads one, so an
+ * invalidation addressed to it would reach a cache entry that does not exist.
  */
 export const invalidation = {
   /** Invalidate the movement ledger — the answer to "what just happened to
@@ -34,8 +32,8 @@ export const invalidation = {
     // filtered lists carry stock counts (their second key part is the params
     // object); "what can I cook" is `["recipes", "available", ...]`; an open
     // card's availability is `["recipes", "detail", id, "availability", ...]`.
-    // Only a pick used to refresh the last two, so a receipt, a product edit,
-    // a stock take or a production run left the old verdict on screen for the
+    // A pick refreshes the last two, and so must a receipt, a product edit, a
+    // stock take or a production run, or the old verdict stays on screen for the
     // whole staleTime. The rest of the detail family (history, cost,
     // nutrition) does not depend on stock and is left alone.
     queryClient.invalidateQueries({
@@ -245,12 +243,12 @@ export const invalidation = {
     queryClient.invalidateQueries({ queryKey: queryKeys.documents.all });
     // A document is a stock write. Receipts, issues, transfers, corrections
     // and returns all funnel through here, and each of them changes the
-    // product list, the quants, the lots and the statistics — none of which
-    // this helper used to touch. With the global five-minute staleTime and
+    // product list, the quants, the lots and the statistics — all of which
+    // this helper touches. With the global five-minute staleTime and
     // no refetch on focus, the product list opened within five minutes of a
-    // receipt showed the stock from before it. The stock screens had each
-    // patched themselves with a 30-second staleTime, which is the same bug
-    // found and treated three times locally instead of once here.
+    // receipt must not show the stock from before it. The stock screens do not
+    // each patch themselves with a 30-second staleTime: that would treat the same
+    // bug three times locally instead of once here.
     this.items(queryClient);
     queryClient.invalidateQueries({ queryKey: queryKeys.stockQuants.all });
     queryClient.invalidateQueries({ queryKey: queryKeys.stockLots.all });

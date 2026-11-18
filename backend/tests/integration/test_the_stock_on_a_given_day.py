@@ -1016,7 +1016,7 @@ class TestTheValueTheProfileHidesDoesNotLeaveInAFile:
 
     The organization's profile hides its stock value — a home inventory
     keeps no cost ledger for the figure to stand on — and the report as a
-    file used to state the Value column anyway. What the profile withholds
+    file must not state the Value column either. What the profile withholds
     on the screen it withholds in the spreadsheet and on the printed sheet.
     """
 

@@ -1,9 +1,9 @@
 """A refusal raised inside a validator or before a request is read keeps its code.
 
-These sites used to translate the sentence themselves and raise it as a plain
-``ValueError``: the words were right, but the envelope saw no catalogue key and
-answered ``VALIDATION_ERROR``, so a client could tell the reasons apart only by
-reading them. Each test reads the code from the exception the site raises,
+These sites raise a refusal that carries its catalogue key, not a plain
+``ValueError``: the envelope answers with the key rather than a generic
+``VALIDATION_ERROR``, so a client can tell the reasons apart without reading
+them. Each test reads the code from the exception the site raises,
 which is what the 400 handler and the 422 entry turn into ``code``.
 """
 

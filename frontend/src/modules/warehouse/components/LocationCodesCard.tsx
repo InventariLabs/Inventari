@@ -69,8 +69,8 @@ function templateExamples(template: string): string[] {
  * relabelled.
  *
  * A business numbers its shelves like the shelf reads (`A-02-01`); a
- * household's codes are random (`LOC-7KQ2`). Renumbering keeps every old code
- * scanning as an alias, and lists the locations whose sticker should be
+ * household's codes are random (`LOC-7KQ2`). Renumbering keeps each code it
+ * replaces scanning as an alias, and lists the locations whose sticker should be
  * replaced — printed from here, so a warehouse in focus mode never leaves
  * the module.
  */

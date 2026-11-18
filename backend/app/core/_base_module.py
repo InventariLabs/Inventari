@@ -87,10 +87,10 @@ class BaseModule(ABC):
     async def run_install_async(self, context: ModuleContext) -> None:
         """Install the module: its migrations, then its own install hooks.
 
-        The framework's entry point, not a hook. The migrations used to run
-        in the base ``on_install``, so a module overriding the hook without
-        ``super()`` was installed with no tables; outside the hook, what an
-        override does or forgets cannot take them away.
+        The framework's entry point, not a hook. The migrations run here,
+        not in the base ``on_install``, so a module overriding the hook without
+        ``super()`` still gets its tables; outside the hook, what an override
+        does or forgets cannot take them away.
         """
         self._run_module_migrations('upgrade')
         await self.on_install_async(context)
@@ -141,9 +141,9 @@ class BaseModule(ABC):
     def _reconcile_existing_schema(self, module_name: str) -> bool:
         """A migration hit tables that already exist — stamp only what is proven.
 
-        This used to stamp ``head`` outright. That skipped every revision after
-        the one that collided: a module whose 002 adds a column ended up marked
-        up to date with the column missing, and the first query using it 500s —
+        It stamps only what is proven. Stamping ``head`` outright would skip every
+        revision after the one that collided: a module whose 002 adds a column
+        would be marked up to date with the column missing, and the first query using it 500s —
         a quieter failure than the crash it was avoiding.
 
         ``suggest_stamp_revision`` advances only over revisions whose DDL the
@@ -216,10 +216,9 @@ class BaseModule(ABC):
     def run_startup(self, context: ModuleContext) -> None:
         """Start the module: the framework's wiring, then its ``on_startup``.
 
-        The framework's entry point, not a hook. The wiring used to live in
-        the base ``on_startup``, and a module overriding the hook without
-        ``super()`` lost its services, its contributions and its
-        interceptors without a word.
+        The framework's entry point, not a hook. The wiring lives here, not
+        in the base ``on_startup``, so a module overriding that hook without
+        ``super()`` keeps its services, its contributions and its interceptors.
         """
         from app.core.container import service_container
 
@@ -286,11 +285,11 @@ class BaseModule(ABC):
     ) -> None:
         """Give *organization_id* the storage types this module declares.
 
-               Declared types used to be written once per installation with
-               ``organization_id IS NULL`` by a startup sync, which meant every
-               tenant saw every enabled module's types whether or not they had the
-        module. They are copied per organization now, the same way
-               categories and default locations are.
+               Declared types are copied per organization, the same way
+               categories and default locations are. A startup sync writing them once
+               per installation, with ``organization_id IS NULL``, would let every
+               tenant see every enabled module's types, whether or not they had the
+        module.
 
         The name is written in the language the module is being enabled in,
         like a location's (see ``_seed_declared_storage_locations``): a type's

@@ -1,9 +1,9 @@
 """The module scan names what it could not read.
 
 Path.rglob does not descend into a symlinked directory and ast.parse
-gives up on a file that is not valid Python — both used to end as a
-silent ``continue``, so the gate printed "Architecture lint passed" over
-a tree whose parts nobody had read. Certification rests on that scan
+gives up on a file that is not valid Python. Both end in the report, not in a
+silent ``continue``: the gate does not print "Architecture lint passed" over a
+tree whose parts nobody has read. Certification rests on that scan
 being exhaustive, so a gap is reported rather than skipped quietly.
 Same recipe as ``module validate``: name the gap, keep the
 exit code, leave the judgement to the reviewer.
@@ -72,8 +72,8 @@ def test_the_gaps_do_not_turn_the_gate_red(tmp_path):
 
 
 def test_an_unparsable_file_does_not_take_the_gate_down(tmp_path):
-    """It used to raise out of the walk: a traceback instead of a report,
-    with every check queued behind it left unrun."""
+    """An unparsable file is reported, not raised out of the walk: the gate prints a
+    report instead of a traceback, and every check queued behind it still runs."""
     from app.core.architecture_lint import find_module_boundary_violations
 
     modules_root = tmp_path / 'modules'

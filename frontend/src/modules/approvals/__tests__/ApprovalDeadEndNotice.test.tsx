@@ -256,8 +256,8 @@ describe("ApprovalDeadEndNotice — on a workflow", () => {
 describe("ApprovalDeadEndNotice — the requester named beside someone who cannot decide", () => {
   // The server's named dead end already excluded the requester: the decision
   // door refuses a self-decision, so the person on the stage who cannot decide
-  // is the one beside them. The notice used to call the requester an approver
-  // and advise access they already have.
+  // is the one beside them. The notice never calls the requester an approver
+  // or advises access they already have.
   const requestWithRequesterNamed = {
     ...request,
     workflow_stages: [

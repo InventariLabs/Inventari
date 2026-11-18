@@ -1,12 +1,11 @@
 """A warning for the administrators reaches the custom roles that administer.
 
 An organization that builds a custom role instead of handing out full
-administrator accounts used to get silence in return: the query behind every
-"tell the admins" notice asked for the literal ``role == 'admin'`` level, so a
-member whose custom role carries ``admin:access`` — or ``system:config:write``,
+administrator accounts gets the warnings too: the query behind every
+"tell the admins" notice must not ask only for the literal ``role == 'admin'``
+level, or a member whose custom role carries ``admin:access`` — or ``system:config:write``,
 which docs/subsystems/ROLES.md calls administrator access in all but name —
-never heard that the books and the shelves had stopped agreeing. Nothing told
-them they were missing it.
+must hear that the books and the shelves have stopped agreeing.
 
 The measurement this pins is the one that found it: five members, and the
 warning is checked person by person, not counted.

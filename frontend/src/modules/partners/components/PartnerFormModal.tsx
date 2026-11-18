@@ -208,9 +208,9 @@ export default function PartnerFormModal({ partner, onClose }: Props) {
             </div>
             <div className="space-y-1.5">
               <NativeSelect
-                // The star used to be baked into the label string, where a
-                // screen reader read it as the word "star"; the component draws
-                // it from `required` and announces the requirement instead.
+                // The component draws the star from `required` and announces the
+                // requirement, so the label string carries no star for a screen
+                // reader to read as the word "star".
                 label={t("fields.type")}
                 required
                 value={form.type}

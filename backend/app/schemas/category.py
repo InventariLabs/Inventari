@@ -38,10 +38,9 @@ _OPTIONS_REQUIRED_TYPES: frozenset[str] = frozenset({'select', 'multi-select'})
 class CategoryFieldDefinition(BaseModel):
     """A single custom field definition on a category — read shape.
 
-    Previously field_definitions was ``list[dict[str, Any]]`` with no key
-    or type validation, letting malformed entries through and raising KeyError
-    downstream. This typed model enforces a non-empty key and a closed type set
-    on NEW definitions. ``type`` defaults to 'text' so legacy/system definitions
+    A raw ``list[dict[str, Any]]`` would accept malformed entries and fail later
+    with KeyError, so this typed model enforces a non-empty key and a closed type
+    set on NEW definitions. ``type`` defaults to 'text' so legacy/system definitions
     that predate the type field (e.g. {'key':'category_id','is_system':True})
     are not rejected at response-serialization time.
 

@@ -137,7 +137,7 @@ class OpenAiCompatibleClient:
 
         # A provider that was never reached is not a provider that answered
         # badly: `httpx` transport failures inherit from none of the types a
-        # router catches, so an unreachable endpoint used to leave image
+        # router catches, so an unreachable endpoint would leave image
         # recognition as a bare HTTP 500 (see `LlmTransportError`).
         try:
             async with httpx.AsyncClient(

@@ -17,10 +17,9 @@ fail on the regressions this file exists for — a lost index turns the page
 into a scan and a sort, a name resolved per row turns two statements into
 fifty-two — and neither depends on who else is using the machine.
 
-This used to be a clock: three hundred milliseconds per read. It was red at
-1117 ms on a host at load 73, on a branch that did not touch the ledger, and
-green on the deep page whose plan *is* a full scan and a sort — so it flagged
-the neighbours and missed the thing it was named for.
+The measure is the statements and their plans, not a clock: a wall-clock budget
+goes red on a loaded host whatever the query does, and it passes a deep page
+whose plan is a full scan and a sort.
 
 Note the seeding goes around the service, straight into the table. The
 development stack runs with ``fsync=off``, so none of this is about write
@@ -445,8 +444,8 @@ class TestThePlanIsTheIndexsNotTheStatistics:
         The rows deleted here are invisible to the ANALYZE that follows, as
         uncommitted rows are to an autovacuum's: it records a table with
         nothing in it. Planned on that, with sorting allowed, the first page
-        is read off another index and sorted — the red these tests used to
-        show on a loaded full run while passing alone.
+        is read off another index and sorted — so the plan is only meaningful
+        on the committed state.
         """
         db = real_async_db_session
         await db.execute(text('DELETE FROM stock_moves'))

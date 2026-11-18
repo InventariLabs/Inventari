@@ -665,8 +665,8 @@ class TestPickingOffDayCook:
         """A cook completes the entry of the day it happened, not an earlier one.
 
         The recipe is planned yesterday and today and cooked once, today. Only
-        today's entry reads as cooked: yesterday's used to take the session,
-        so a week of a repeated recipe read meals as cooked that nobody made.
+        today's entry reads as cooked: yesterday's does not take the session,
+        so a week of a repeated recipe does not read meals as cooked that nobody made.
         Verifies the flag through the meal-plan API, not just the session
         status."""
         from datetime import date, timedelta

@@ -7,12 +7,10 @@ Covers:
 - record_receipt_by_id / record_delivery_by_id: by-template-id helpers
 - the AVCO rate itself, which is computed per organization from its own layers
 
-The rate used to be cached on ``ProductTemplate.current_valuation_rate`` and
-these tests read it straight off the row — several of them wrote it there by
-hand as a shortcut. That shortcut is why the sharing was invisible for so long:
-a global template is one row every organization uses, so the cached number
-belonged to whichever one wrote last. The column is gone; the rate is asked for
-the way the application asks for it.
+The rate is not cached on ``ProductTemplate.current_valuation_rate``: a global
+template is one row every organization uses, so a cached number would belong to
+whichever organization wrote last. These tests ask for the rate the way the
+application asks for it, and none writes it by hand.
 """
 
 from decimal import Decimal
@@ -107,9 +105,8 @@ class TestRecordReceipt:
     ):
         """No price is not no receipt — see the cost-basis policy.
 
-        This used to assert ``None``: an inflow nobody priced left no layer at
-        all, so the shelf and the sum of the layers stopped agreeing and
-        nothing looked for the gap.
+        An inflow nobody priced still leaves a layer: otherwise the shelf and the sum
+        of the layers stop agreeing and nothing looks for the gap.
         """
         db = real_async_db_session
         template = ProductTemplate(
@@ -456,9 +453,9 @@ class TestTheRate:
         await db.flush()
         await db.refresh(template)
 
-        # A product holding no stock has no average cost. It used to be
-        # possible to seed a stale one onto the row, which is what this test
-        # did — the number then survived every recompute that never ran.
+        # A product holding no stock has no average cost. A stale number seeded onto
+        # the row would survive every recompute that never runs, so this test
+        # seeds one and expects None.
         assert await _rate(db, async_test_household.id, template) is None
 
     async def test_avco_after_full_delivery_clears_rate(
@@ -892,6 +889,6 @@ class TestValuationWriteIsOrgScoped:
 
         # Each organization reads its own layers off the shared template:
         # (6 * 5) / 6 here, and the other organization's 3.00 stays theirs.
-        # These two numbers used to be one column on one row.
+        # The two numbers live in their own organizations' layers, not in one column.
         assert await _rate(db, async_test_household.id, shared) == Decimal('5.00')
         assert await _rate(db, other_org.id, shared) == Decimal('3.00')

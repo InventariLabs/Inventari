@@ -104,8 +104,8 @@ UNKNOWN_HOLDER: dict[str, str] = {
     'es': 'un poseedor desconocido',
 }
 
-#: An attestation answered with a problem. It used to be stored on the
-#: response and nowhere else: nobody was told, and the asset said nothing.
+#: An attestation answered with a problem. The problem is stored on the
+#: response, and the administrators are told about it.
 DISPUTE_TITLE: dict[str, str] = {
     'en': 'Problem reported: {item}',
     'pl': 'Zgłoszono problem: {item}',

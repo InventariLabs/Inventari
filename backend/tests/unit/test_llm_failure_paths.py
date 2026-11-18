@@ -1,6 +1,6 @@
 """What the LLM layer does when the call does not go well.
 
-Three failures that used to look alike from the outside and are nothing alike
+Three failures that look alike from the outside are nothing alike
 to whoever is waiting:
 
 * the provider was never reached — a refused connection, a timeout, a
@@ -189,8 +189,8 @@ class TestWhyTheModelStopped:
         assert response.finish_reason is None
 
     async def test_the_warning_carries_the_three_numbers(self, caplog) -> None:
-        """The log line used to read ``Answer began: ''`` — a report on what
-        had just been cut out, silent about what arrived."""
+        """The log line reports what arrived as well as what was cut out, rather than
+        an empty ``Answer began: ''``."""
         client = _client(
             _answering(
                 '<think>still thinking', finish_reason='length', completion_tokens=2000

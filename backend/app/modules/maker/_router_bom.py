@@ -1,9 +1,8 @@
 """BOM (Bill of Materials) endpoints — read, tree, move and line delete.
 
-Composing a formula happens under ``/maker/recipes/{id}/bom-lines``. The two
-write endpoints that used to live here resolved a *product* to its default
-recipe, so a product with a second formula could not be addressed at all —
-they are gone, and with them the second editor screen that called them.
+Composing a formula happens under ``/maker/recipes/{id}/bom-lines``, which
+addresses the recipe itself, so a product with a second formula is edited like
+any other.
 """
 
 from __future__ import annotations
@@ -131,7 +130,7 @@ async def get_bom_summary(
     """Batched BOM existence + line count for a list of templates.
 
     Returns one entry per template that has >=1 BOM line. Templates with no
-    BOM are omitted. Used to render 'has BOM' badges in product lists without
+    BOM are omitted. Product lists render their 'has BOM' badges from this, without
     N+1 queries.
     """
     raw = [tid.strip() for tid in template_ids.split(',') if tid.strip()]

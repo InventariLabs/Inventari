@@ -1,9 +1,9 @@
 """A shelf's fill is the sum of each product's quantity over its own limit.
 
-The owner's example is the one the planner used to get wrong: rice limited
+The owner's example is the one the planner must get right: rice limited
 to 40 and plums to 50 kg on one shelf, 20 rice and 25 kg plums standing
-there. Each product alone is half full; the shelf is full. Asked one
-product at a time, the planner kept sending goods to it.
+there. Each product alone is half full; the shelf is full. A planner that
+asks one product at a time keeps sending goods to it.
 """
 
 from __future__ import annotations

@@ -7,11 +7,11 @@ import { Button } from "./ui/Button";
  * Shown in place of the whole shell when the organization's module list
  * cannot be read.
  *
- * A failed `GET /modules/my` used to stand in the default install's module
- * list: the module the organization had switched off came back into the
- * navigation, the five that were actually on vanished, and the switched-off
- * one's complete route rendered a data panel saying "error / try again"
- * about a 403 that would never clear. The list is the shell's map — without
+ * A failed `GET /modules/my` must not stand in the default install's module
+ * list: a module the organization switched off would come back into the
+ * navigation, the modules actually on would vanish, and the switched-off one's
+ * complete route would render a data panel saying "error / try again" about a
+ * 403 that never clears. The list is the shell's map — without
  * it nothing can be named, so this screen says exactly that and offers the
  * one action that can change the outcome: asking again.
  */

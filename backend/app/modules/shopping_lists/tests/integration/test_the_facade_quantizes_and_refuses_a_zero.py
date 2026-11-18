@@ -10,9 +10,8 @@ deputy has before someone writes the third caller. A stored zero is a row no
 read schema accepts: the list stops opening and nothing in the interface can
 undo it.
 
-The response half: the echo used to be validated from the in-memory objects —
-``db.refresh(item, ['category'])`` answered only the relationship — so it
-could name a number the column had silently rounded away.
+The response half: the echo is validated from a full reload of the stored row,
+because the in-memory object can name a number the column silently rounded away.
 """
 
 from __future__ import annotations

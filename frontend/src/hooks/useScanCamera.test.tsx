@@ -139,7 +139,7 @@ describe("useScanCamera", () => {
 
   it("maps html5-qrcode string rejections to translated errors", async () => {
     // html5-qrcode rejects with a plain string, not an Error — the
-    // err.name mapping used to miss and leak the raw English message.
+    // err.name mapping must catch it and not leak the raw English message.
     const MockQr = Html5Qrcode as unknown as { rejectError: unknown };
     MockQr.rejectError = "NotAllowedError: Permission denied";
 
@@ -532,9 +532,9 @@ describe("useScanCamera", () => {
 
   it("clears every timer it scheduled when it goes away", () => {
     // A test environment (or a screen) that goes away inside the restart
-    // cooldown used to take the callback with it: the timer fired after
-    // teardown, state was set on a dead world, and vitest reported an
-    // unhandled error — green tests, exit 1.
+    // cooldown must cancel its callback: no timer may fire after teardown,
+    // since state set on a dead world is an unhandled error — green tests,
+    // exit 1.
     const setTimeoutSpy = vi.spyOn(window, "setTimeout");
     const clearTimeoutSpy = vi.spyOn(window, "clearTimeout");
 

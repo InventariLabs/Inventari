@@ -4,25 +4,23 @@ One convention covers every layer below the router: flush, and let the
 caller commit. The request-scoped session commits once, on success, before
 the response is written. A service that commits slices the caller's unit of
 work in two; one that rolls back erases everything the caller wrote before
-asking. Conversions that came with the rule, each pinned here:
+asking. Each of these writes follows the rule, and each is pinned here:
 
-- ``delete_storage`` used to commit mid-flight (and to roll the caller back
-  when the delete itself was refused);
-- ``create_storage_hierarchy`` committed mid-chain while its docstring says
-  "atomically";
-- the CoreAPI write methods that promised flush-only and did not:
+- ``delete_storage`` flushes mid-flight, and a refused delete leaves the
+  caller's work in place;
+- ``create_storage_hierarchy`` flushes the whole chain, so it is atomic as its
+  docstring says;
+- the CoreAPI write methods, which flush and leave the commit to the caller:
   ``_category_writes``, ``onboarding_service.apply_onboarding_profile_async``
-  and ``template_crud`` each committed at the end of their own write, so a
-  module composing a CoreAPI call with its own write got a transaction cut
-  in two underneath it;
-- ``import_lines_from_dataframe`` committed when it finished, which made the
-  opening-stock import two transactions: the draft survived an error raised
-  in the step after the lines (see
+  and ``template_crud``, so a module composing a CoreAPI call with its own
+  write keeps one transaction;
+- ``import_lines_from_dataframe`` leaves the commit to the caller, so the
+  opening-stock import is one transaction and an error raised in the step
+  after the lines leaves no draft behind (see
   ``test_opening_stock_lands_as_one_draft_receipt``).
 
-A third, ``decrement_quant_by_strategy_async`` flushing partial draws before
-it refused, went with the quant table: the draw that replaced it plans from
-the records and writes nothing unless the whole of it can be taken.
+A draw plans from the records and writes nothing unless the whole of it can be
+taken.
 
 The label-scan provider's core commit is pinned by its absence from the
 architecture-lint baseline rather than here.
@@ -299,10 +297,10 @@ async def test_onboarding_stays_inside_the_callers_transaction(
 ) -> None:
     """The profile seed and the module switch flush; the caller commits.
 
-    ``apply_onboarding_profile_async`` used to commit at its end — after
-    the router had handed it the request session, before the router could
-    write anything of its own. The seed it runs is asked to stay inside the
-    transaction for the same reason (``commit=False``).
+    ``apply_onboarding_profile_async`` leaves the commit to the router, which
+    hands it the request session and may write more of its own. The seed it
+    runs is asked to stay inside the transaction for the same reason
+    (``commit=False``).
     """
     from app.models.organization import Organization
     from app.models.user import User

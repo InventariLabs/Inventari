@@ -9,9 +9,9 @@ import { MAINTAINED_LANGUAGES } from "@/test/languageClasses";
 /**
  * Module display-name parity guard (docs/MODULE_NAMES.md).
  *
- * The user-visible module name used to have four independent sources
- * (backend manifest, modules.json, launcher.title, README) that drifted
- * apart. This test enforces the repair rules mechanically:
+ * The user-visible module name has four independent sources (backend manifest,
+ * modules.json, launcher.title, README) that must not drift apart. This test
+ * enforces the repair rules mechanically:
  *
  * 1. Every backend-registered module (dir with manifest.json) plus the
  *    virtual `partners` module has `modules.<name>.name` and

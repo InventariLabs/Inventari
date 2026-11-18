@@ -2,8 +2,8 @@
  * StockAsOfPage — /inventory/stock/as-of
  *
  * What was in stock on a day. An auditor, an accountant closing a
- * quarter and an insurer after a fire all ask it, and until now the
- * application could only answer "what is on the shelf now".
+ * quarter and an insurer after a fire all ask it, and the application answers
+ * "what was on the shelf on that day" as well as "what is on the shelf now".
  *
  * It refuses rather than guesses: a date before the ledger's first movement
  * comes back with the boundary named, and that sentence is the answer — so

@@ -119,8 +119,7 @@ export function buildProfileUpdate(draft: ProfileDraft): DocumentProfileUpdate {
     approval_threshold: toString(draft.approvalThreshold).trim() || null,
     // Always the array, empty included. `undefined` drops the key from a
     // JSON body, the backend reads presence off the key set, and an emptied
-    // list could then never be saved — unticking the last type used to
-    // leave the old list standing.
+    // list is still saved: unticking the last type stores the empty list.
     approval_required_for_types: draft.approvalRequiredTypes,
   };
 }

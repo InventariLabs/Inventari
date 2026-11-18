@@ -6,10 +6,8 @@ import { RecipesAiSettings } from "@/modules/recipes/components/RecipesAiSetting
 /**
  * Recipes settings, inside the module they configure.
  *
- * They used to be reachable only from the App Store shell
- * (/settings/modules/recipes), while the module's own "settings" nav entry led
- * to the ingredient reference data — so the one entry named settings opened the
- * screen that was not settings.
+ * The module's own "settings" nav entry leads here, so the one entry named
+ * settings opens the screen that is settings.
  */
 export default function RecipesModuleSettingsPage() {
   const { t } = useTranslation("recipes");

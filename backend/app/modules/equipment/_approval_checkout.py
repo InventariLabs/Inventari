@@ -1,16 +1,11 @@
 """Which checkout an approval was granted for.
 
-A checkout request used to carry nothing but the asset: the approver
-decided without knowing who would get it or until when, and the approval was
-then spent by whichever checkout of the asset came next — granted on one
-person's request, used by somebody else's hand-out to a third person.
-
-So the request names the checkout it asks for — the holder and the expected
-return, the fields of the checkout dialog — and the approval covers that
-checkout: one to a different holder is refused and needs a request of its
-own. A request raised without a holder (the generic approvals endpoint, or
-one raised before requests carried it) names nobody, and covers the next
-checkout as it always did.
+A checkout request names the checkout it asks for: the holder and the expected
+return, the fields of the checkout dialog. The approver therefore decides
+knowing who would get the asset and until when, and the approval covers that
+checkout alone. One to a different holder is refused and needs a request of
+its own. A request raised without a holder (the generic approvals endpoint, or
+an older record that carries none) names nobody, and covers the next checkout.
 """
 
 from __future__ import annotations

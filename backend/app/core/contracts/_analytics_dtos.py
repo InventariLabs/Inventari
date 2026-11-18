@@ -68,8 +68,8 @@ class OverviewDTO(BaseModel):
     #: Whom ``total_value`` is about: ``organization`` when it comes from the
     #: cost ledger, which knows products and not shelves, or ``locations``
     #: when it was summed over the records in the locations the counts use.
-    #: The ledger branch used to take the storage filter and ignore it, so
-    #: the tile counted one population and valued another without a word.
+    #: The storage filter applies on both branches, so the tile counts one
+    #: population and values the same one.
     value_scope: str = 'locations'
     #: Receipts on the shelf that were posted at no cost (nobody priced
     #: them). They add nothing to ``total_value``, so a tile that shows the
@@ -241,7 +241,7 @@ class CostSummaryDTO(BaseModel):
     #: What the disposals cost, or ``None`` when the ledger has nothing to
     #: say about this window.
     #:
-    #: The two are different answers and used to read the same. An outflow is
+    #: The two are different answers and must not read the same. An outflow is
     #: priced when it happens; before the ledger kept outgoing value there is
     #: no price to read, and there is no honest way to invent one afterwards —
     #: today's average was not the average then. So the screen says it does
@@ -329,9 +329,9 @@ class ReconciliationDTO(BaseModel):
     """The stock reconciliation: the shelf against its ledger and its cost.
 
     "The shelf" is the records summed per ``(template, location)``. Shelf vs
-    movement ledger: a shelf whose first quant was once hydrated with its
-    full quantity while the movement recorded only the delta carries that
-    gap from its past (ADR-004, superseded by ADR-022) — this measures it
+    movement ledger: a shelf whose first quant is hydrated with its
+    full quantity while the movement records only the delta carries that
+    gap (ADR-004, superseded by ADR-022) — this measures it
     instead of presuming it, so a gap that grows is visible. Layers vs
     shelf: stock that arrived without a priced receipt has no cost layer
     (the unpriced-receipt answer); the gap counts what the cost history

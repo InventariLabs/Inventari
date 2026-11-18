@@ -40,8 +40,8 @@ test.describe("Settings — member row responsive", () => {
     });
   });
 
-  // 768 px is the band the side navigation used to squeeze: the row was
-  // already horizontal (`md`) and the address clipped at 182 px of 307.
+  // 768 px is the band the side navigation squeezes: the row is
+  // already horizontal (`md`) and the address must not clip at 182 px of 307.
   for (const width of [390, 768]) {
     test(`${width}px: identity takes the line, address is not clipped, role control sits below`, async ({
       page,

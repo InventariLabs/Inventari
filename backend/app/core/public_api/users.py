@@ -63,7 +63,7 @@ class CoreUsersAPI:
 
         ``organization_id=None`` is the deliberate cross-org path (superuser
         tooling, bootstrap). It has no default, so a module cannot slip into
-        it by omission — which is exactly how this method used to let a
+        it by omission — which is exactly how this method would otherwise let a
         module read a user from another organization by id alone.
         """
         from app.services.user_service import UserService

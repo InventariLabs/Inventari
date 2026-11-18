@@ -276,7 +276,7 @@ describe("DocumentRegisterPage — totals columns", () => {
     );
 
     // The sums are there at once; the rows are not — a register over a year
-    // of a busy warehouse used to arrive as every row at once.
+    // of a busy warehouse does not arrive as every row at once.
     expect(screen.getAllByText("$60.00").length).toBeGreaterThan(0);
     expect(screen.queryByText("IN/2026/001")).not.toBeInTheDocument();
   });
@@ -599,8 +599,7 @@ describe("DocumentRegisterPage empty buckets", () => {
   it("names the group of documents that have no partner", async () => {
     // Grouped by partner, documents without one produced a row called "—".
     // The shape here is the one the API sends for that bucket: an empty
-    // grouping key and no label at all. An earlier version of this test
-    // asserted against `label: ""`, which the backend never produced.
+    // grouping key and no label at all.
     const base = buildRegisterResponse();
     mockedUseDocumentRegister.mockReturnValue({
       data: {

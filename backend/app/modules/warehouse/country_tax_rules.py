@@ -8,9 +8,9 @@ organization's country — the division the organization currency already
 follows: the preset's entry is an override and the organization is the
 source of truth.
 
-The table starts with the three countries the presets used to name — the
-law their presets pinned moved here, so ``PL Magazyn`` still means 23% for
-a Polish organization, and now means it on every work profile — and France
+The table starts with the three countries the presets name — the law their
+presets pin lives here, so ``PL Magazyn`` means 23% for a Polish organization
+on every work profile — and France
 and Spain, whose presets name their own paperwork. The Polish tax-id
 requirement is a product default for B2B practice rather than a statute;
 only a row grounded in the country's law says ``True`` by right. Adding a

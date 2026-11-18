@@ -307,11 +307,8 @@ export function CompositionTab({ recipe }: CompositionTabProps) {
       </Card>
 
       {/* Sub-assemblies: the only view that shows a formula nested inside a
-          formula, and the only place a line can be re-parented. It used to
-          live on the removed /maker/bom screen — and that sentence stayed a
-          comment while the reader was left to open the panel and guess.
-          Re-parenting writes the formula, so the whole section is the
-          manager's. */}
+          formula, and the only place a line can be re-parented. Re-parenting
+          writes the formula, so the whole section is the manager's. */}
       {canManage && (
         <div>
           {" "}

@@ -1,11 +1,9 @@
 /**
  * The vocabulary for "where did it go".
  *
- * Two dialogs in this module used to ask that question with two lists of their
- * own — Used / Expired / Damaged / Lost / Retired / Test data / Other on the
- * one deleting a record, Used / Disposed / Damaged / Expired / Other on the one
- * taking stock down — and drew the words from two separate key families, so
- * "Used" was written twice and could drift apart.
+ * Two dialogs ask that question with different lists: one deleting a record and
+ * one taking stock down. Both draw the words from one key family, so "Used" is
+ * written once and cannot drift apart.
  *
  * The two questions are genuinely different: a record goes away for reasons a
  * quantity never does (it was somebody's test data), and stock goes down for

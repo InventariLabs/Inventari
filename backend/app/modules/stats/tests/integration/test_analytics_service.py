@@ -370,7 +370,7 @@ class TestStatsAnalyticsService:
         """An expired record is the most urgent alert, not one left out.
 
         The overview counts it among what needs attention; the alerts beside
-        it used to stop at today and never named the one item already spoiled.
+        it also names the one item already spoiled, not only what expires from today on.
         Each expiry alert leads to its record.
         """
         today = await core_api.organizations.today_async(
@@ -666,10 +666,8 @@ class TestStatsAnalyticsService:
     ) -> None:
         """Confidence measures the forecast, not the waste next to it.
 
-        It used to be ``0.8 if annual_savings > 0`` — the potential for
-        halving waste, which is why a six-figure prediction stood next to a
-        bar reading 0%. Neither organization here wastes anything, so the
-        only thing separating them is how long each has been observed.
+        Neither organization here wastes anything, so the only thing separating
+        them is how long each has been observed.
         """
         longer_org = Organization(name='Longer History Org')
         real_async_db_session.add(longer_org)

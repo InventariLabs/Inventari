@@ -279,8 +279,8 @@ class TestAnUnwritableModuleTree:
     ) -> None:
         # The production bind mounts are the checkout's own directories, which
         # may belong to root or any other uid. The installer runs as appuser
-        # and used to get halfway through the copy before `[Errno 13]`, which
-        # names neither the cause nor the remedy.
+        # and must check access before the copy, not fail halfway through it with
+        # `[Errno 13]`, which names neither the cause nor the remedy.
         monkeypatch.setenv('INVENTARI_DEPLOYMENT', 'production')
         source = _minimal_package(tmp_path)
         dest = tmp_path / 'backend-modules'

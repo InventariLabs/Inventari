@@ -79,7 +79,7 @@ const buttonVariants = cva(
         row: "h-auto w-full justify-start text-left text-sm gap-3 px-3 py-3 rounded-lg",
         // `content` / `contentSm` — `default` and `sm` with the height left
         // to the content. Everything else about them is identical, so a call
-        // site that used to write `h-auto` in its className moves across
+        // site that writes `h-auto` in its className moves across
         // without changing a pixel below `md` — and stops being clipped above
         // it. They exist because the height is the only part of a size that
         // cannot be overridden from outside.

@@ -46,8 +46,8 @@ def layer_dated_at() -> ColumnElement[Any]:
 class CostBasis:
     """Where a layer's ``unit_cost`` came from.
 
-    An inflow with no price used to be posted at 0.00 by one caller and not
-    posted at all by another. Both answers lie in the same direction: the
+    An inflow with no price must not be posted at 0.00 by one caller and not at
+    all by another. Both answers lie in the same direction: the
     first dilutes the average and understates the assets, the second breaks
     the equality between what is on the shelf and what the layers add up to.
     A cost that nobody stated is neither zero nor absent — it is unknown, and
@@ -89,9 +89,9 @@ class StockValuationLayer(Base):
     __tablename__ = 'stock_valuation_layers'
     __table_args__ = (
         # A layer holds what is left of a receipt. Less than nothing is not a
-        # state it can be in, and the table used to have no opinion — so a
-        # lost update while two outflows drained it at once left damage that
-        # read like data.
+        # state it can be in, and the table enforces that, so a lost update
+        # while two outflows drain it at once cannot leave damage that reads like
+        # data.
         CheckConstraint('remaining_qty >= 0', name='ck_svl_remaining_not_negative'),
         # The drain reads one organization's open layers of one product
         # (``remaining_qty > 0``) and nothing else. A template id alone is
@@ -171,7 +171,7 @@ class StockValuationLayer(Base):
 
     #: What currency ``unit_cost`` is in — and nothing else.
     #:
-    #: Recorded rather than assumed. Every reader used to take this number for
+    #: Recorded rather than assumed. No reader takes this number for
     #: the organization's own currency, so a receipt priced in the supplier's
     #: wrote a foreign amount into the cost history where nothing could see it
     #: for what it was. NULL means the organization's currency, which is what
@@ -250,10 +250,10 @@ class StockValuationLayer(Base):
 
         An ``unknown`` layer holds 0.00 where nobody named a price and there
         was no rate to borrow. The quantity on it is real; the figure is not a
-        cost. Readers used to decide this one by one, and they disagreed: the
-        footer left such layers out of its rate, while the rate a priceless
-        receipt borrows averaged them in — so the second priceless arrival of
-        a product nobody priced borrowed 0.00 from the first and wrote it down
+        cost. Readers decide this one in one place, so they cannot disagree: the
+        footer leaves such layers out of its rate, and the rate a priceless
+        receipt borrows averages them in. A product nobody priced must not borrow
+        0.00 from its first priceless arrival and write it down
         as the organization's ``average``, a known cost of zero for goods
         whose cost was never known.
 

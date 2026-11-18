@@ -10,9 +10,8 @@ interface Props {
 /**
  * The plan's default servings — the number every entry falls back to.
  *
- * Left empty, each entry follows the servings written on its own recipe.
- * That fallback used to be an invisible 2, so a recipe for one landed in a
- * plan as two and the shopping list bought for two.
+ * Left empty, each entry follows the servings written on its own recipe, so a
+ * recipe for one lands in a plan as one and the shopping list buys for one.
  */
 export function DefaultServingsField({ value, onChange, disabled }: Props) {
   const { t } = useTranslation("recipes");

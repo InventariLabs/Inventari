@@ -114,9 +114,9 @@ export function MakerSettingsPanel() {
     return <ReadOnlyNotice module="maker" right="manage" />;
   }
 
-  // `!settings` used to stand in for "still loading". After a failed read
-  // `isLoading` is already false and `settings` stays undefined, so the
-  // loading card was shown for ever — no message, no way out.
+  // `!settings` does not stand in for "still loading". After a failed read
+  // `isLoading` is false and `settings` stays undefined, so the error state is
+  // checked first, not a loading card that never ends.
   if (isError) {
     return (
       <Card className="p-8">

@@ -14,8 +14,8 @@ function renderCard() {
 
 describe("ModelSelectCard", () => {
   it("keeps the create link out of the heading's accessible name", () => {
-    // The link used to live inside the heading's node, so the heading's
-    // accessible name glued into "Select model (optional)Create model" —
+    // The link sits outside the heading's node, so the heading's
+    // accessible name never glues into "Select model (optional)Create model" —
     // one name for a heading and an action that are two things.
     renderCard();
 

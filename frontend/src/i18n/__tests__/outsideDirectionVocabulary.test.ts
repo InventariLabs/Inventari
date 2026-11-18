@@ -2,9 +2,9 @@
  * The world outside the organisation is named after the end of the arrow it
  * stands on.
  *
- * One key used to fill both ends, and every translation but English phrased
+ * One key must not fill both ends: every translation but English must phrase
  * it as the source: "z zewnątrz", "desde fuera", "von außen", "de
- * l'extérieur". On an issue row that read as the goods arriving from outside
+ * l'extérieur". On an issue row this reads as the goods arriving from outside
  * on their way out — an issue never arrives from anywhere; it leaves. Two
  * ends, two words, the same source/target split UI_GUIDELINES §14.2 guards
  * for named locations.

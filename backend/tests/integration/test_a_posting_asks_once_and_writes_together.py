@@ -611,7 +611,7 @@ class TestALongListOfGroupsIsLockedByIndex:
 
 
 class TestTheShortageQuestionIsAskedOnce:
-    """Each movement off a shelf used to be followed by a read of what the grain has free.
+    """Each movement off a shelf is not followed by its own read of what the grain has free.
 
     A correction of two hundred lines asked it two hundred times. Inside
     ``ask_what_each_grain_has_free_once`` the movements are written as before

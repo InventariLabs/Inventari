@@ -11,7 +11,7 @@ For each module with ``migrations/versions/``, verifies:
    ``system_quantity`` match while carrying a third of the digits the model
    copied from ``items.quantity``
 6. So do its indexes, unique constraints and foreign keys — a dropped index
-   used to pass unnoticed, which is how the trigram indexes went missing
+   fails it, so a missing trigram index cannot pass unseen
 7. ``001_initial`` re-runs cleanly against a schema that already exists, the
    reconciliation case that crash-looped the backend
 

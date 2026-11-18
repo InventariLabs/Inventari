@@ -8,7 +8,7 @@ open stage in an organization where nobody holds ``approvals:approve``, a
 stage naming people who cannot see approvals, and — the default shape of a
 fresh solo organization — an open stage where the only holder of the grant
 is the requester the door refuses a self-decision to. All three produce a
-request parked where nobody can act on it — and such a request used to look
+request parked where nobody can act on it — and such a request must not look
 exactly like an empty queue.
 
 The rule is the decision door's own, so that this module can neither refuse

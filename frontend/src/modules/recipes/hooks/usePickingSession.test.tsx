@@ -129,10 +129,10 @@ describe("usePickingSession", () => {
   });
 
   it("ends the session in the database when the last ingredient is picked", async () => {
-    // The sheet used to go straight to "complete" and show "Completed ✓" on
-    // the card, while the session stayed `active` in the database. Nothing
-    // could close it afterwards, and the next "Take from stock" cancelled it
-    // and put every ingredient back on the shelf — a meal that had been
+    // The sheet goes to "complete" only once the session is closed in the
+    // database, so the card never shows "Completed ✓" while the session stays
+    // `active`. A session left open would be cancelled by the next "Take from
+    // stock", which puts every ingredient back on the shelf: a meal that had been
     // cooked, un-cooked, silently.
     let completeCalls = 0;
     server.use(
@@ -193,9 +193,9 @@ describe("usePickingSession", () => {
 /**
  * The sheet takes stock off the shelf, and the screens behind it — an item
  * list, an item card, the movement ledger, the quants, the lots, the
- * recipe's own availability — used to keep the shelf from before the scan
- * for the whole five-minute staleTime, with no refetch on focus. The sheet
- * reached for the API directly and invalidated nothing.
+ * recipe's own availability — are refetched once the scan lands, so none of
+ * them keeps the shelf from before it. The sheet goes through the shared
+ * invalidation, which covers them all.
  */
 describe("usePickingSession — the stock views behind the sheet", () => {
   beforeEach(() => {

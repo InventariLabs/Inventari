@@ -17,7 +17,7 @@ const t = tFor("stats") as never;
 
 /**
  * "Nothing was thrown away" and "we were not counting yet" are different
- * answers, and this screen used to give the first for both: a confident
+ * answers, and this screen must not give the first for both: a confident
  * 0.00 over a month of waste. An outflow is priced when it happens; for a
  * window from before the ledger kept that price there is nothing to read,
  * and today's average was not the average then.
@@ -43,8 +43,8 @@ describe("StatsCostAnalysis — an unpriced window says so", () => {
   });
 
   /**
-   * `waste_value_percentage` is read off the wire, so it used to be printed
-   * as JavaScript writes numbers: a fractional percent showed a dot on a
+   * `waste_value_percentage` is read off the wire, so it is not printed
+   * as JavaScript writes numbers: a fractional percent shows a dot on a
    * Polish screen.
    */
   it("writes the waste percent the way the reader's language does", async () => {

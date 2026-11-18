@@ -4,11 +4,9 @@ A label W x H mm is drawn as W x H mm, at ``LABEL_DPI``. That file is what
 the download gives, what the preview shows and what a print job carries, so
 the three cannot disagree about the size of a label.
 
-It used to depend on a named media profile, and the tape profile cropped the
-label to its content, drew only the cassette's printable strip and snapped
-its height to the raster a Brother expects. A 50 x 24 label then had four
-sizes at once: the settings, the file (12 x 18 mm), the preview (that file
-stretched to 24 mm) and the tape (38 x 24 mm with the printer's blank lead).
+The size is the label's own, not a named media profile's, so the settings, the
+file, the preview and the tape agree: a 50 x 24 label is one size everywhere,
+with no cropping to content and no snapping to a printer's raster.
 Fitting a label to a printer is now the job of the print agent next to it.
 
 The agent may still ask for the same label at its own raster, ``dpi`` and at

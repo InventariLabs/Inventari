@@ -1,13 +1,13 @@
 """Who is calling: the module a unit of work belongs to.
 
-The certified model (ADR-019) trusts a module by name, and several seams
-used to take that name as a parameter anyone could pass: settings and
-secrets keyed a namespace by it, the scheduler keyed its task registry by
-it, the event registry keyed event ownership by it. A module copying a
-``module_name`` from another one read that module's settings — including
-``get_decrypted_async``, the plaintext of another team's secret — unhooked
-another module's jobs, or emitted events under another module's namespace,
-and nothing in the failure left a trace of who actually ran.
+The certified model (ADR-019) trusts a module by name, so every seam takes that
+name from the running unit of work and never from a parameter anyone could pass:
+settings and secrets key a namespace by it, the scheduler keys its task registry
+by it, and the event registry keys event ownership by it. A module that copies a
+``module_name`` from another one would read that module's settings — including
+``get_decrypted_async``, the plaintext of another team's secret — unhook another
+module's jobs, or emit events under another module's namespace, and nothing in
+the failure would leave a trace of who actually ran.
 
 The identity travels in a :class:`~contextvars.ContextVar` set at the
 boundaries where control enters a module:

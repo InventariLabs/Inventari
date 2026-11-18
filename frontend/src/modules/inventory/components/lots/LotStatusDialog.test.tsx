@@ -5,8 +5,8 @@ import { describe, expect, it, vi } from "vitest";
 import { LotStatusDialog } from "./LotStatusDialog";
 
 /**
- * A status change the server failed without a reason used to read "The
- * action could not be completed." — the sentence every dialog falls back to,
+ * A status change the server fails without a reason is not reported as "The
+ * action could not be completed.", the sentence every dialog falls back to,
  * which says nothing about which change it was or whether it happened.
  */
 describe("LotStatusDialog", () => {

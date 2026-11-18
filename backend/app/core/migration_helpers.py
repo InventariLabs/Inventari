@@ -6,7 +6,7 @@ created those tables, and ``db upgrade-modules`` reconciles the two by stamping
 ``001_initial`` — but only when it can see that every table is there. Anything
 that confuses that check (a table renamed, a stamp that never happened, DDL
 applied by hand) leaves the migration to run against a schema that already
-exists, which used to mean ``relation already exists`` on every restart.
+exists, which would mean ``relation already exists`` on every restart.
 
 Guarding the create calls makes the baseline safe to re-run: it fills in what is
 missing and leaves what is there alone. Only ``001_initial`` migrations should

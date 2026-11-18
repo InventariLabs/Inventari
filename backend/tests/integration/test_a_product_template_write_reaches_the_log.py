@@ -7,9 +7,9 @@ journal holds, and this was the one catalogue table nothing recorded at all.
 
 The second half is who writes the entry. An equipment model *is* a product
 template -- the same row in the same table, reached from a second screen --
-and the equipment module used to log it under a word of its own. So the same
-act was in the journal when equipment did it, absent when the products screen
-did it, and named two different things in the filter. The entry is written in
+and the equipment module must not log it under a word of its own. So the same
+act must be in the journal whichever screen does it, and under one name in
+the filter. The entry is written in
 the core now, once, for whoever wrote the row.
 """
 
@@ -182,7 +182,7 @@ class TestNobodyToName:
 class TestTheUnitIsNamedNotNumbered:
     """A reference the writer can name is written down with its name.
 
-    The journal row used to read `Unit: 16282d80` — the label translated,
+    The journal row must not read `Unit: 16282d80` — the label translated,
     the value eight characters of a uuid the reader cannot pronounce. The
     unit is chosen from a catalogue of words, so the entry owes the same
     word the product screen prints, read while the row is still in hand.

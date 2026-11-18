@@ -1,16 +1,14 @@
-"""A count is the truth about the shelf, and two rules used to outrank it.
+"""A count is the truth about the shelf, and no rule outranks it.
 
-A shortage on goods somebody had reserved could not be posted at all. The
-shelf refuses to be taken below what is held — right for a dispatch, which
-must not eat into another document's claim — and the count went through the
-same door, so the whole finalization came back as a 400. Nothing was
-recorded, the shelf kept a number the counter had just disproved, and the
-reservation kept protecting stock that is not there. Odoo and ERPNext both
-give way here: a physical count releases what it cannot back.
+A shortage on goods somebody has reserved is posted by the count. The shelf
+refuses to be taken below what is held — right for a dispatch, which must not
+eat into another document's claim — but a count releases what it cannot back,
+so the finalization is never refused for a reservation. Odoo and ERPNext both
+give way here.
 
-And accepting a count far above the system quantity — the guard against a
-typed 200 for 20 — asked for nothing beyond the permission to count. Its
-neighbour, accepting a difference beyond the organization's tolerance, asks
+Accepting a count far above the system quantity — the guard against a typed
+200 for 20 — asks for more than the permission to count. Its neighbour,
+accepting a difference beyond the organization's tolerance, asks
 for the approval permission, and the cap is the larger claim of the two.
 """
 

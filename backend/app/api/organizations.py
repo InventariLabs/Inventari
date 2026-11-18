@@ -448,9 +448,8 @@ async def revoke_invitation(
 ) -> None:
     """Withdraw an invitation that nobody has redeemed yet.
 
-    A code used to be a fifteen-minute affair, so taking one back was a matter
-    of waiting. Living a week, it needs a way out: an address typed wrong, a
-    person who left before arriving, a role chosen by mistake.
+    A code lives for a week, so it needs a way out before then: an address typed
+    wrong, a person who left before arriving, a role chosen by mistake.
     """
     lang = get_current_lang()
     if not current_user.organization_id:

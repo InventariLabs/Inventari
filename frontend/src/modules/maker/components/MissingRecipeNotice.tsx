@@ -18,10 +18,9 @@ interface MissingRecipeNoticeProps {
 /**
  * "This product has no formula."
  *
- * The cost preview and the pricing calculator used to render the empty-BOM
- * notice here — a sentence claiming a recipe exists and waits for
- * ingredients, on a product that has no recipe at all, while the create
- * button beside it answered "no recipe for this product". The two truths
+ * The cost preview and the pricing calculator draw the empty-BOM notice here,
+ * not a sentence claiming a recipe exists and waits for ingredients, since the
+ * product has no recipe at all. The two truths
  * share a shape (zero entries, a total of 0.00) and nothing else: this one
  * leads where a formula is created, the empty one where a formula is
  * filled.

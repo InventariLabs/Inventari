@@ -11,10 +11,10 @@ knows, and pieces for a record that predates the default.
 
 The second half is what "no piece unit" means. ``_default_piece_uom_id_async``
 answers with the catalogue's piece row — the organization's own, else the
-system one — and used to return ``None`` when the installation has neither,
-letting that ``None`` travel on as a blank unit: the same silent hole, three
-doors wide. The installation that cannot answer "a quantity of what" now says
-so, in the reader's language, instead of recording a number nobody can read.
+system one — and returns ``None`` when the installation has neither. The
+installation that cannot answer "a quantity of what" says so, in the reader's
+language, instead of letting that ``None`` travel on as a blank unit or
+recording a number nobody can read.
 """
 
 from __future__ import annotations

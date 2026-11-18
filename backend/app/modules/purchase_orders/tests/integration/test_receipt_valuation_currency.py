@@ -89,10 +89,10 @@ def _layers(db: Session, template_id: Any) -> list[StockValuationLayer]:
 def _rate(client: TestClient, headers: dict[str, str], template_id: Any) -> Any:
     """This organization's AVCO rate, asked for the way the screen asks.
 
-    Read through the API rather than off the row: the rate used to be a cached
-    column on `product_templates`, which a global template shares with every
-    organization, so the figure there belonged to whoever wrote last. It is
-    computed per organization now, and this endpoint is where a reader gets it.
+    Read through the API rather than off the row: the rate is computed per
+    organization, and this endpoint is where a reader gets it. A cached column
+    on `product_templates` would be shared by every organization using a global
+    template, so its figure would belong to whoever wrote last.
     """
     response = client.get(
         f'/api/v1/items/product-templates/{template_id}', headers=headers
@@ -213,10 +213,11 @@ class TestTheCostHistoryKnowsItsCurrency:
     ) -> None:
         """All of it in one foreign currency is still none of it in ours.
 
-        The mixed batch was refused, and a unanimous foreign currency used to
-        slip past that guard: one currency agrees with itself, so a bare
-        number came back — and every reader of the rate takes it for the
-        organization's own, which is how 40.10 złoty was read as dollars.
+        The mixed batch is refused, and a unanimous foreign currency is refused
+        too: one currency agrees with itself, so a bare number must not come
+        back, since every reader of the rate takes it for the organization's
+        own. A foreign rate read as the house figure is how 40.10 złoty reads
+        as dollars.
         """
         po_org.currency = 'USD'
         db_session.add(po_org)

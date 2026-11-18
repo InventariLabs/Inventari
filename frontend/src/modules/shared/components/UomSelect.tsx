@@ -397,10 +397,10 @@ export const UomSelect: React.FC<UomSelectProps> = ({
     </>
   );
 
-  // Inline mode: Radix Popover with Portal. The panel used to be
-  // positioned `absolute` inside the trigger wrapper, so overflowing rows
-  // clipped it (the fixed click-catcher backdrop escaped the clip but merely
-  // closed the panel). The portal escapes the clipping containers, and
+  // Inline mode: Radix Popover with Portal. The panel is not positioned
+  // `absolute` inside the trigger wrapper, where overflowing rows would clip
+  // it (the fixed click-catcher backdrop escapes the clip but merely closes
+  // the panel). The portal escapes the clipping containers, and
   // Popover handles outside clicks, Escape and collision-free positioning.
   if (inline) {
     return (

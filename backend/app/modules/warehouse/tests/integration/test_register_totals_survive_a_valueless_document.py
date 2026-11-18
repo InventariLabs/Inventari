@@ -109,8 +109,7 @@ class TestValuelessDocumentIsNotACurrency:
             doc_partner.id,
         )
 
-        # A document with neither a currency nor a price — the shape the
-        # correction service used to produce.
+        # A document with neither a currency nor a price; the totals must still add up.
         bare = client.post(
             '/api/v1/warehouse/documents',
             headers=doc_auth_headers,
@@ -234,10 +233,9 @@ class TestTheWindowSummaryAddsTheGroupsOfOneCurrency:
 
         The SQL groups by (group, currency), so a register grouped by
         partner carries one tuple per partner for the same currency. The
-        fold used to pass those through untouched: two partners of PLN
-        gave the summary two PLN buckets, the stacked totals rendered two
-        children keyed "PLN" — React's duplicate-key warning — and the
-        window's own total read as two parallel amounts instead of one.
+        fold merges those per currency: two partners of PLN are one PLN bucket,
+        so the stacked totals never render two children keyed "PLN" (React's
+        duplicate-key warning), and the window's own total is one amount.
         """
         _enable_value_tracking(client, doc_auth_headers)
         _priced_receipt(

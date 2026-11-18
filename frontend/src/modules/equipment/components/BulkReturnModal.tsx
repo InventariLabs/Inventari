@@ -35,9 +35,9 @@ interface BulkReturnModalProps {
  * One checkin-condition dialog for the whole batch — the leaving employee
  * returns five devices at once, not five dialogs.
  *
- * The dialog counts what it will actually do. It used to promise "Return 2
- * selected assets?" when one of the two was sitting on a shelf, and the shelf
- * one came back as a failure the reader had not asked for.
+ * The dialog counts what it will actually do: it never promises "Return 2
+ * selected assets?" when one of the two is sitting on a shelf, since that one
+ * would come back as a failure the reader had not asked for.
  */
 export function BulkReturnModal({
   selectedCount,

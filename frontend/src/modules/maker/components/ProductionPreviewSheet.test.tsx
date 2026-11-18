@@ -214,9 +214,9 @@ describe("ProductionPreviewSheet", () => {
 
 describe("ProductionPreviewSheet — quantities", () => {
   it("prints the quantity the reader writes, not the padding the wire sent", () => {
-    // The preview used to echo `consumed_qty` raw: "50.00000 pcs" next to
-    // a cost rounded to two places. The shared formatter strips the
-    // column's padding; this pins that the strip reaches this panel.
+    // The preview prints the quantity the reader writes, not the wire's padding.
+    // The shared formatter strips the column's padding; this pins that the
+    // strip reaches this panel.
     renderSheet();
 
     expect(screen.getByText(/4 kg/)).toBeInTheDocument();

@@ -2,10 +2,9 @@
 
 Freight, duty and insurance are spread over the lines of a delivery. A line
 with a price carries it plus its share, and the layer says the cost was
-stated. A line with *no* price used to be posted as a stated cost worth only
-its share of the freight: two a piece on a hundred-unit line, filed as what
-the supplier charged, beside an average cost of ten that the same shelf
-would have been valued at had the freight never been booked. The layer model
+stated. A line with *no* price is not posted as a stated cost: its share of the
+freight alone would be filed as what the supplier charged, beside the average cost
+the same shelf is valued at without the freight. The layer model
 says an unpriced line keeps the basis an unpriced line has - average where
 the organization has a rate, unknown where it has none - and the freight rides
 on top of that.

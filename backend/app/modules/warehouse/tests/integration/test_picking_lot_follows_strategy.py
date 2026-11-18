@@ -1,10 +1,9 @@
 """The batch a pick line plans, shows, checks and books is one batch.
 
-Planning used to take the oldest record whatever the product's strategy
-said, the row showed the batch only when the document line happened to name
-one, a scan naming another batch warned nobody, and completion drew by the
-strategy over every active batch — so the batch in the books could differ
-from the batch that left the shelf.
+Planning takes the batch the product's strategy names, the row shows that
+batch whether or not the document line names one, a scan naming another batch
+warns, and completion draws by the same strategy — so the batch in the books
+is the batch that left the shelf.
 """
 
 from __future__ import annotations

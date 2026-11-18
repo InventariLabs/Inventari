@@ -439,10 +439,8 @@ class TestPerDocumentReservations:
     ):
         """No document, no reservation: nothing is held and no row is written.
 
-        It used to go through, moving the quant's running total and leaving
-        no row behind — a hold the records' view could not see and no
-        document could release. A hold is its row now: the document is a
-        required argument, so the call cannot name a hold without one.
+        A hold is its row, and the document is a required argument, so the call
+        cannot name a hold without one.
         """
         from app.core.public_api import core_api
 

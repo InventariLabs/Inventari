@@ -170,7 +170,7 @@ class TestAHandlerThatFinishes:
 
 class TestDisconnect:
     async def test_it_waits_for_a_running_handler(self):
-        """Shutdown used to return while handlers were still in flight."""
+        """Shutdown waits until the handlers already in flight have finished."""
         bus = await _make_bus()
         entered = asyncio.Event()
         finished: list[str] = []

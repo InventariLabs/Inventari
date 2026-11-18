@@ -160,8 +160,8 @@ export interface VisionNutritionFields {
 /**
  * What a photographed label yields.
  *
- * Identity only: the nutrition figures that used to sit alongside
- * `expiry_date` here belong to the nutrition module and arrive under
+ * Identity only: the nutrition figures that sit alongside
+ * `expiry_date` belong to the nutrition module and arrive under
  * `extra.nutrition`, present only when that module is on and the label was
  * printed for products.
  */
@@ -286,7 +286,7 @@ export interface LabelScanView {
   /**
    * Catalog key for the line under the status, and the values it needs.
    *
-   * The server used to send the sentence itself, in English, for every reader
+   * The server sends a key rather than the sentence, so each reader gets it in their language
    * — see `LabelScanResponse` in `app/schemas/label_pool.py`.
    */
   message_key?: string | null;

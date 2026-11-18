@@ -1,11 +1,10 @@
 """The mapping step is told about the file, not about its first rows.
 
-The analyze preview stops at five rows, and the warning the items mapping
-step shows — "not a single row carries a code" — used to be decided by
-scanning those five. A sheet whose codes start below them warned about a
-coded sheet; the mode the reader picked for its codes then ran without a
-word. The counts travel with the analysis now, counted over the whole
-frame, and the warning reads them.
+The analyze preview stops at five rows, but the warning the items mapping
+step shows — "not a single row carries a code" — is decided over the whole
+file: the counts travel with the analysis, taken over the whole frame, and the
+warning reads them. A sheet whose codes start below the preview therefore gets
+no such warning.
 """
 
 import pandas as pd

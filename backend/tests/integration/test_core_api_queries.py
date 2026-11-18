@@ -65,10 +65,8 @@ async def _record_outflow(
     the consume and discard path writes — and the valuation ledger carries
     what it was worth, in an outgoing layer.
 
-    These tests used to seed ``quantity_consumed``, ``consumed_cost``,
-    ``quantity_discarded`` and ``wasted_cost``: four keys that exist nowhere
-    else in the application, so they passed against a shape production never
-    creates while the report itself read zero.
+    The seed uses the keys the application writes, because a shape production never
+    creates would pass while the report itself reads zero.
     """
     from app.models.product_template import ProductTemplate
     from app.models.stock_valuation_layer import StockValuationLayer
@@ -206,9 +204,9 @@ class TestCoreQueriesOverview:
         """A product below ``ProductTemplate.min_quantity`` is one shortage.
 
         The threshold is one value per product, so what is compared with it
-        is the product's stock, not each record of it: this used to count
-        the five-unit record as a shortage while fifty-five units of the
-        same staple sat on the shelves against a minimum of ten.
+        is the product's stock, not each record of it: a five-unit record is not a
+        shortage while fifty-five units of the same staple sit on the shelves
+        against a minimum of ten.
         """
         db = real_async_db_session
         org_id = async_test_storage_location.organization_id

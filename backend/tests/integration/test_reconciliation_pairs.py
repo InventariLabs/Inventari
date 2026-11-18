@@ -1,12 +1,9 @@
 """The reconciliation measures both pairs, and a scheduled job alerts on change.
 
-The report used to compare one pair — ``Item.quantity`` against the quant
-table — while two other disagreements were left to be presumed rather than
-measured: the shelf-vs-ledger gap the hydration design left, and the shelf
-the cost layers do not cover. The first pair ended with the table (there is
-one number of stock now), and its fields went with it; these tests hold the
-measured numbers of the other two, that the table's pairs stay gone, and the
-job's alert-once-per-signature behaviour.
+The report measures both pairs: the shelf-vs-ledger gap, and the shelf the cost
+layers do not cover. There is one number of stock now, so the table's pairs stay
+gone; these tests hold the measured numbers of the two pairs, and the job's
+alert-once-per-signature behaviour.
 """
 
 import json
@@ -196,7 +193,7 @@ class TestTheWireCarriesEveryPairThatWasMeasured:
 
         # The shelf holds seven with no movement behind it, and its cost
         # history covers four of them — one disagreement in each of the two
-        # pairs the answer used to drop on the way out.
+        # pairs, both of which the answer reports.
         assert body['quant_move_drift_count'] == 1
         assert body['quant_move_drift_total'] == '7.000'
         assert body['layer_quant_drift_count'] == 1
@@ -364,11 +361,9 @@ class TestTheJobAlertsOncePerSignature:
 
 @pytest.mark.asyncio
 class TestAStandingDriftComesBackWeekly:
-    """A drift that stands unchanged used to warn once and never again.
+    """A drift that stands unchanged comes back weekly.
 
-    "A fact of the hydration design" was the reason, and a fact the admins
-    are told about once is one nobody looks at after that week. Unchanged
-    non-zero figures now come back once seven days after the admins last
+    Unchanged non-zero figures come back once seven days after the admins last
     heard of them, with a sentence that says the drift is still there.
     """
 
@@ -503,10 +498,9 @@ class TestTheWarningIsWrittenInTheReadersLanguage:
 class TestTheScreenReadsTheRecordTheWarningReads:
     """One stored pass answers both readers.
 
-    The screen's "previous" and the warning's "changed?" question used to
-    have only a bare signature string between them — a record no screen
-    could show. The job now stores every pass with its timestamp, and the
-    endpoint hands it out beside the fresh figures.
+    The screen's "previous" and the warning's "changed?" question both read the
+    stored pass: the job stores every pass with its timestamp, and the endpoint
+    hands it out beside the fresh figures.
     """
 
     async def test_every_pass_is_stored_and_a_standing_drift_stays_silent(

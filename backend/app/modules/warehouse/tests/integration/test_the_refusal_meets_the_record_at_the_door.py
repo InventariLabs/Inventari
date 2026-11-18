@@ -1,12 +1,12 @@
 """A record standing off the document's source is refused at the entrance.
 
 A dispatch that names a source shelf while the record it takes from stands
-on another used to sail through confirmation — the reservation skips a line
-that names no card, and a record that predates its card is exactly such a
-line — and died mid-flight at completion, confirmed and stuck, quoting a
-shelf that had never held the stock. The refusal belongs where the document
-is still a draft: confirmation refuses, the record keeps standing where it
-stood, and nobody has to dig a document out of CONFIRMED.
+on another is refused at confirmation: the reservation skips a line that names
+no card, and a record that predates its card is exactly such a line, so the
+document would otherwise fail mid-flight at completion, confirmed and stuck,
+quoting a shelf that never held the stock. The refusal belongs where the
+document is still a draft: confirmation refuses, the record keeps standing where
+it stands, and nobody has to dig a document out of CONFIRMED.
 
 These tests hold the gate to two relations: a cardless record whose shelf
 disagrees with the document's source never gets past confirmation, and a

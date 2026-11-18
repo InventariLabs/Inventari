@@ -297,8 +297,8 @@ def build_pdf_context(
     corrected_doc_number = (
         document.corrected_document.number if document.corrected_document else None
     )
-    # A backorder keeps no note naming the receipt it continues (the English
-    # sentence it used to store reached every language), and its link column
+    # A backorder keeps no note naming the receipt it continues (a stored sentence
+    # would be in one language for every reader), and its link column
     # is what the screens read — so the printout names the original here,
     # the same shape a correction prints its corrected document.
     backorder_of_number = (
@@ -320,8 +320,8 @@ def build_pdf_context(
     is_internal_out = doc_type == 'INTERNAL_OUT'
     is_transfer = doc_type in ('INT', 'MM')
     # A write-off prints why it was made, in the reader's words, and what
-    # the cost layers it drew were worth — the two things the document page
-    # shows and the binder copy used to leave out.
+    # the cost layers it drew were worth — the two things the document page shows
+    # and the binder copy carries too.
     scrap_reason = (
         _get_scrap_reason_map(lang).get(document.reason_code, document.reason_code)
         if is_scrap(doc_type) and document.reason_code

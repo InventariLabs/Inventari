@@ -1,12 +1,7 @@
 """Performance regression tests for approval enrichment.
 
-Regression for the N+1 query hell in ``list_requests_enriched``:
-previously the function issued 1 list query + 1 user lookup per
-request + 1 workflow lookup per request + 1 user lookup per decision
-resulting in O(N) queries and O(4s) latency for 100 requests.
-
-After the batch-load refactor, the same call must use a bounded number
-of queries regardless of result size.
+``list_requests_enriched`` loads its related rows in batches, so the query
+count stays bounded regardless of result size.
 """
 
 from __future__ import annotations

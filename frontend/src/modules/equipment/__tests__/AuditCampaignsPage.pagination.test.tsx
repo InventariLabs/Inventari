@@ -10,8 +10,8 @@ import type { User } from "@/types";
 import { onePage } from "@/test/mocks/page";
 
 /**
- * The campaigns list endpoint returns the full list; the page used to render
- * every campaign. Client-side pagination keeps the DOM bounded at tens of
+ * The campaigns list endpoint returns the full list, and the page renders one
+ * page of it at a time. Client-side pagination keeps the DOM bounded at tens of
  * records (an acceptable scale for campaigns).
  */
 
@@ -61,8 +61,8 @@ describe("AuditCampaignsPage — the empty state explains the word", () => {
 
   it("does not point a reader without write rights at a button they do not have", async () => {
     // The default signed-in account here holds no permissions, so the page
-    // renders no "New attestation" — and the description used to tell that
-    // reader "Start with New attestation above" anyway.
+    // renders no "New attestation", so the description must not tell that
+    // reader "Start with New attestation above".
     server.use(
       http.get("/api/v1/equipment/campaigns", () =>
         HttpResponse.json(onePage([])),

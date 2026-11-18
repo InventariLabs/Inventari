@@ -2,10 +2,8 @@
 
 Extracted from ``service.py`` — pure functions with no LLM/DB dependencies.
 
-What used to sit beside ``compress_image`` was ``get_storage_context``, which
-turned a storage type into a sentence about frozen meat or dairy and defaulted
-to a pantry. A shelf\'s temperature is one vertical\'s furniture; the scan\'s
-intent travels as the label\'s ``context_tag`` now, and the sentence is gone.
+The scan\'s intent travels as the label\'s ``context_tag``. A shelf\'s
+temperature is one vertical\'s furniture and has no place in this module.
 """
 
 import io

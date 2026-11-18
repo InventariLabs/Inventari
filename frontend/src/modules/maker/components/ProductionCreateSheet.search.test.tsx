@@ -75,10 +75,10 @@ describe("ProductionCreateSheet — product suggestion semantics", () => {
   });
 
   it("opens a listbox of options under the combobox, like the recipe sheet", async () => {
-    // The sheet used to answer its search with plain buttons in plain divs:
-    // after a query a screen reader heard nothing, and the arrow keys had
-    // nothing to walk. The shared picker owns the combobox/listbox/option
-    // semantics, so the test pins them on this sheet too.
+    // The sheet answers its search with the shared picker's combobox: after a
+    // query a screen reader hears the results, and the arrow keys walk them.
+    // The shared picker owns the combobox/listbox/option semantics, so the test
+    // pins them on this sheet too.
     mockedSearch.mockResolvedValue([product()]);
     renderSheet();
     const input = screen.getByTestId("maker-create-search-input");

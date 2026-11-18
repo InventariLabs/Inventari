@@ -15,7 +15,7 @@ from app.modules.purchase_orders.schemas import (
 
 @pytest.mark.unit
 class TestCurrencyValidation:
-    """The currency field used to accept any three letters."""
+    """The currency field accepts only codes in the curated ISO 4217 set."""
 
     def test_pricelist_rejects_non_iso_code(self) -> None:
         with pytest.raises(ValidationError):

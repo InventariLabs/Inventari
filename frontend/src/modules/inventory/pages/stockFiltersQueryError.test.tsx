@@ -15,7 +15,7 @@ vi.mock("sonner", () => ({
 
 /**
  * Each of the three stock screens narrows by location, through a search the
- * server answers. A search that failed used to leave a filter holding only
+ * server answers. A search that fails must not leave a filter holding only
  * "Any location" — a screen that says the organization has no locations.
  */
 function renderPage(ui: React.ReactElement) {

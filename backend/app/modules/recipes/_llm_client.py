@@ -92,7 +92,7 @@ async def call_llm_async(
 
     Args:
         db: Async SQLAlchemy session (must belong to ``org_id``).
-        org_id: Organization id used to look up the bound connection.
+        org_id: Organization id that looks up the bound connection.
         prompt: Full user prompt to send to the model.
         usage_ctx: Optional dict with ``user_id`` and ``organization_id``
             keys for AI usage logging. Must match ``org_id`` if provided.

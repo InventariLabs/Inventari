@@ -246,7 +246,7 @@ export default function WebhookForm({
 
   return (
     // The fields scroll, the actions do not: with forty-two events on offer
-    // the form is taller than a 900px window, and Save used to sit below the
+    // the form is taller than a 900px window, and Save stays within the
     // bottom edge of the dialog.
     <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
       <SheetBody className="space-y-5 p-5">
@@ -416,7 +416,7 @@ export default function WebhookForm({
         </div>
 
         {/* A refusal that is not about one field still has to be readable — it
-            used to vanish with the rejected promise. */}
+            is shown rather than lost with the rejected promise. */}
         {formRejection && (
           <p
             role="alert"

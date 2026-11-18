@@ -192,9 +192,9 @@ describe("POApprovalSettings", () => {
   });
 
   it("says the approval setting has nothing behind it, and where to fix that", async () => {
-    // The setting used to be an ornament: with no workflow the order confirmed
-    // anyway. Confirmation is refused now, so the screen that switched the
-    // requirement on has to name the missing piece.
+    // With no workflow the setting has nothing behind it, so confirmation is
+    // refused, and the screen that switched the requirement on has to name the
+    // missing piece.
     withWorkflows([]);
     arrange(vi.fn());
 
@@ -264,8 +264,8 @@ describe("POApprovalSettings", () => {
 
   describe("behind purchase_orders:manage", () => {
     // Whether an order needs approval is not a buyer's own call: the PUT
-    // answers to :manage, and a member holding only :write used to get the
-    // whole form and a "Settings saved" for it.
+    // answers to :manage, so a member holding only :write gets no form and no
+    // "Settings saved" for it.
     it.each([
       [
         "a member who may write orders",

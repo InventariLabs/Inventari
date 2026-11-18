@@ -3,8 +3,8 @@
 Two dead ends, one shape: a request parked where no one can act on it. A
 stage left open to "anyone with the grant" in an organization that has
 granted it to nobody; a stage naming people who cannot see approvals at all.
-Both used to save silently and produce a queue entry that looked exactly
-like a decision waiting its turn.
+Left alone, either would save silently and produce a queue entry that looks
+exactly like a decision waiting its turn.
 
 The refusal is the default and the consent flag is the way past it — an
 administrator who has read what it costs may save the stage, and the request
@@ -358,8 +358,8 @@ class TestOnlyTheRequesterHoldsTheGrant:
 
     The default shape of a fresh solo organization — one admin, an open
     stage. The door refuses a self-decision, so the request parks; every
-    surface used to read it as merely waiting its turn, which is how the
-    scenario in the field report reproduced: confirm, silence, nobody to
+    surface must say that nobody else can decide it, not that it waits its
+    turn. Otherwise the requester confirms and hears nothing, with nobody to
     ask.
     """
 

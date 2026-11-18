@@ -187,9 +187,8 @@ export default function RecipeIngredientRow({
             onUpdate(ing._key, "template_id", templateId);
             // The name is a read key downstream, not a caption: nutrition
             // defaults, the shopping list and the shortage modal all match
-            // on it. Linking used to keep whatever had been typed to find
-            // the product, so one thing carried four names — "Mąk" on the
-            // recipe, "Mąka pszenna typ 550" in the shortage modal.
+            // on it. Linking takes the product's name, so one thing carries one
+            // name: "Mąka pszenna typ 550" on the recipe and in the shortage modal.
             if (templateId) onUpdate(ing._key, "name", templateName);
           }}
           onQueryChange={(name) => onUpdate(ing._key, "name", name)}

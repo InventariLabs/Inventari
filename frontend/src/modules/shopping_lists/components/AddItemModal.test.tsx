@@ -115,8 +115,8 @@ describe("AddItemModal", () => {
 
   it("keeps a fraction being typed — the dot step's empty report is not a zero", () => {
     // While "2.5" is typed, the number field reports the dot step
-    // as "". The form used to answer that with `parseFloat("") || 0`, which
-    // rewrote the field to "0" mid-typing and ate the dot.
+    // as "". The form must not answer that with `parseFloat("") || 0`, which
+    // would rewrite the field to "0" mid-typing and eat the dot.
     render(
       <AddItemModal listId="1" onClose={() => {}} onSuccess={() => {}} />,
       {

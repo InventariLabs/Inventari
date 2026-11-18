@@ -191,10 +191,10 @@ export const RecipeCard = memo(function RecipeCard({
                 })}
               </span>
             )}
-            {/* One badge for both tabs. The "I can cook" tab used to render
-                the same fraction as a percentage, which is the ratio rounded:
-                80% of five ingredients cannot be read back as "4 of 5", and
-                the one that is missing is the point. */}
+            {/* One badge for both tabs. The "I can cook" tab shows the fraction, not
+                a percentage, which is the ratio rounded: 80% of five ingredients
+                cannot be read back as "4 of 5", and the one that is missing is the
+                point. */}
             {recipe.ingredients_total > 0 && (
               <Badge
                 variant={

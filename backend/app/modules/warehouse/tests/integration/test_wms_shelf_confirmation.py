@@ -1124,7 +1124,7 @@ def renumbered_shelf(
 
 @pytest.mark.integration
 class TestAnOldStickerStillNamesTheShelf:
-    """The sticker on the shelf is the old code, or a QR whose whole address a
+    """The sticker on the shelf is the legacy code, or a QR whose whole address a
     2D hardware scanner types into the field: either names the same shelf."""
 
     @pytest.mark.parametrize(

@@ -2,11 +2,11 @@
 
 A record checked out to a place names that place as well as its home, and
 the delete guard counts both. The home half is one pass over the records.
-The placement half used to ask, for every record of the organization,
-whether a module had put it somewhere — a subquery correlated with the
-record, evaluated once per row, whether or not the organization had a single
-checkout. At a hundred thousand records that was ~150 ms on every narrowed
-locations listing and every delete.
+The placement half asks once for the open checkouts of the organization, not
+once per record. A subquery correlated with the record would be evaluated per
+row, whether or not the organization had a single checkout: at a hundred
+thousand records that form costs ~150 ms on every narrowed locations listing and
+every delete.
 
 Driven from the placements instead — the open checkouts joined to the
 records they name — the work follows the number of checkouts, not the number

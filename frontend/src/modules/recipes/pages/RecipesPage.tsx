@@ -65,9 +65,9 @@ type CookScope = "ready" | "almost";
 /**
  * Everything the recipe asks for is on the shelf.
  *
- * The tab used to show whatever was half covered, so a recipe reading "3 of 4
- * in stock" sat under a heading promising it could be cooked. The two are
- * split now, and both are named on screen.
+ * The tab shows only what is fully covered, so a recipe reading "3 of 4 in
+ * stock" never sits under a heading promising it can be cooked. The two halves
+ * are named on screen.
  */
 const READY_TO_COOK = 1;
 

@@ -528,8 +528,8 @@ class TestUndoAPostedDocument:
         """A return of the original is not a use of its stock, like a correction.
 
         The return is stored original -> return, the other way round from a
-        correction, and its departure used to be counted as some later
-        document drawing on the receipt, so the undo was refused. It
+        correction, and its departure is not counted as some later
+        document drawing on the receipt, so the undo is not refused. It
         reverses what the line has left.
         """
         posted = _post(
@@ -691,7 +691,7 @@ class TestUndoAPostedDocument:
             return row
 
         # One group of batches landing after the receipt's own group, one row
-        # per batch: one more movement than the page the check used to read.
+        # per batch: one more movement than the page the check reads.
         db_session.execute(
             insert(StockMove),
             [

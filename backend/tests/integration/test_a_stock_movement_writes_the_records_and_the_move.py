@@ -8,9 +8,8 @@ forgot. ``post_movement_async`` is the one operation that does both: it
 states the records it is handed and writes the movement, so each assertion
 below reads the shelf *and* the ledger.
 
-It used to keep a quant beside the records and to draw by removal strategy
-when no batch was named; the quant table is gone, and the draw by strategy
-is ``take_from_the_records_async`` (``test_a_draw_writes_its_own_moves``).
+A draw by removal strategy, when no batch is named, is
+``take_from_the_records_async`` (``test_a_draw_writes_its_own_moves``).
 """
 
 from __future__ import annotations

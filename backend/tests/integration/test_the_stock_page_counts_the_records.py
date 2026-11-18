@@ -2,10 +2,9 @@
 
 ``GET /stock-quants`` walks the anchors — one per product on a shelf — for its
 rows, sums each group's records (and its reservation rows) beside them, and
-takes its count off the records. It used to read its row keys from the quant
-table, and a quantity written over the table's head could not change what the
-page said; the table is gone (archived ``quantdrop01``), and so is the only shape that
-could. What the page says of a group is pinned here.
+takes its count off the records. Its row keys come from the anchors, so no
+quantity written beside the records can change what the page says. What the
+page says of a group is pinned here.
 """
 
 from __future__ import annotations

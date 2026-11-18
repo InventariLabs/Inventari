@@ -4,7 +4,7 @@ One distinction earns its own exception: *the provider never answered* versus
 *the provider answered something we cannot use*. They look alike at the call
 site and are nothing alike to the person waiting for the result — the first is
 our outage, the second is a model that needs swapping. Collapsing both into
-``RuntimeError`` is why an unreadable label used to surface as HTTP 500 with a
+``RuntimeError`` would surface an unreadable label as HTTP 500 with a
 Python parser message in the body.
 
 The transport side is named here too, and for the same reason. ``httpx``

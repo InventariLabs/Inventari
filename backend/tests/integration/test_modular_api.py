@@ -296,10 +296,9 @@ class TestModularAPI:
     ):
         """Declared categories seed per organization and merge field definitions.
 
-        The startup ``sync_categories`` used to write one installation-wide
-        row (``organization_id IS NULL``) per declared category; the merge
-        behaviour now lives in ``BaseModule.system_on_enable``, scoped to the
-        enabling organization.
+        The merge behaviour lives in ``BaseModule.system_on_enable``, scoped to the
+        enabling organization, and no declared category is written as an
+        installation-wide row (``organization_id IS NULL``).
         """
 
         class MockModule(BaseModule):

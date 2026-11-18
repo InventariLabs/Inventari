@@ -252,10 +252,10 @@ export function PartnerDetailSheet({
 /**
  * Where this partner appears elsewhere in the app.
  *
- * The card used to end at the phone number: the list behind it counts a
- * partner's documents and turnover, and opening them led nowhere. The flow
- * partner → order → receipt → document existed in the backend and stopped at
- * this sheet. Each link is offered only where its module is on.
+ * The card goes past the phone number: the list behind it counts a partner's
+ * documents and turnover, and opening them leads there. The flow
+ * partner → order → receipt → document is followed from this sheet. Each link
+ * is offered only where its module is on.
  */
 function PartnerRelatedLinks({ partner }: { partner: Partner }) {
   const { t } = useTranslation("partners");

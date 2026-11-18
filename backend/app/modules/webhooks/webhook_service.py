@@ -325,7 +325,7 @@ async def deliver_test_ping(
     threshold = await _breaker_threshold_async(db, webhook.organization_id)
     await _update_stats_after_delivery(db, webhook, is_success, status_code, threshold)
     # The caller owns the commit: flush here and let the request dependency
-    # close the unit of work (this used to commit mid-stack).
+    # close the unit of work (this must not commit mid-stack).
     await _flush(db)
 
     return (

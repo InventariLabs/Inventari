@@ -5,11 +5,10 @@ Revises: doc_executed_location01
 Create Date: 2026-08-29
 
 The document register filters by organization, status and a date window,
-then sorts by created_at. It used to have no index carrying
-``created_at`` at all — ``ix_document_org_type_status`` and
-``ix_document_org_partner`` both miss it — so every page of rows sorted the
-whole matching set. Pagination moved the cost instead of removing it; this
-index lets Postgres walk the window in order.
+then sorts by created_at. No index carries ``created_at`` beside those columns:
+``ix_document_org_type_status`` and ``ix_document_org_partner`` both miss it, so
+every page of rows sorts the whole matching set. Pagination alone would only
+move that cost; this index lets Postgres walk the window in order.
 
 Downgrade drops the index.
 """

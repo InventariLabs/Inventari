@@ -206,8 +206,8 @@ class TestDurableFirstAttempt:
         """A webhook on `recipe.created` must actually receive the event.
 
         Module events have no `SystemEvent` member, so they travel as plain
-        strings. Matching used to read `event.value`, which meant a string
-        dispatch raised before reaching any endpoint.
+        strings. Matching reads the name itself, so a string dispatch reaches every
+        endpoint subscribed to it.
         """
         async with session_factory() as session:
             wh = await session.get(WebhookEndpoint, webhook.id)

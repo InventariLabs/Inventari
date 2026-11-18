@@ -23,8 +23,8 @@ from starlette.routing import BaseRoute
 from app.database import get_async_db
 from app.main import app
 
-# No endpoint may keep the request scope. The stats SSE stream used to be
-# the one exception — it now borrows a fresh AsyncSessionLocal per tick
+# No endpoint may keep the request scope. The stats SSE stream borrows a
+# fresh AsyncSessionLocal per tick
 # instead of declaring a session, so nothing legitimately outlives the path
 # operation and the gate stays armed for whoever re-adds one.
 REQUEST_SCOPED_ENDPOINTS: set[str] = set()

@@ -1,11 +1,10 @@
 """One threshold governs every probe the breaker counts.
 
 The circuit-breaker counter is fed by three paths — the delivery, the
-retry worker, and the Test button — and only the first used to hand it
-the organization's configured threshold; retries and the Test button cut
-off on the built-in default of ten, so the setting on screen chose a
-policy for one probe in three. The threshold is now read where the
-counter is updated, from the organization the endpoint belongs to, and
+retry worker, and the Test button, and each hands it the organization's
+configured threshold, so the setting on screen chooses the policy for every
+probe. The threshold is read where the counter is updated, from the organization
+the endpoint belongs to, and
 no caller can hand the breaker a different policy by omitting an
 argument. A retry counts as its own probe: it is a real HTTP attempt,
 and its failure lands on the same consecutive tally the first attempt

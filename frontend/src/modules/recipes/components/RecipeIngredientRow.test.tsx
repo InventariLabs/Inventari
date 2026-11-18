@@ -96,8 +96,8 @@ describe("RecipeIngredientRow — the unit beside a number", () => {
   it("names the calorie unit once while the field is still empty", async () => {
     await renderExpanded();
 
-    // The suffix carries it; the placeholder used to say it a second time,
-    // so an empty field read "kcal/100g   kcal/100g".
+    // The suffix carries it; the placeholder does not say it a second time, so
+    // an empty field reads "kcal/100g" once.
     expect(screen.getAllByText("kcal/100g")).toHaveLength(1);
     expect(
       screen.getByPlaceholderText("0"),
@@ -114,8 +114,7 @@ describe("RecipeIngredientRow — the unit beside a number", () => {
   it("says just 'Price' for an ingredient with no unit chosen yet", async () => {
     await renderExpanded();
 
-    // "Price per {{unit}}" has no unit to name, and the key that used to
-    // stand in for one was never written — so it rendered as its own name.
+    // "Price per {{unit}}" has no unit to name, so the label is just "Price".
     expect(screen.getByText("Price")).toBeInTheDocument();
     expect(screen.queryByText(/form\.unit/)).not.toBeInTheDocument();
   });
@@ -244,8 +243,8 @@ describe("RecipeIngredientRow — a counted unit with nothing saying what it mea
   });
 
   it("says the measure's units are offered once the card carries it", async () => {
-    // The sentence used to keep saying only the stock unit was offered while
-    // the card's weight or volume made g and ml readable as it.
+    // The sentence says the measure's units are offered as well, once the
+    // card's weight or volume makes g and ml readable as it.
     pieceCatalogue();
 
     await renderExpanded({}, { uomId: "u-pcs", measureUomIds: ["u-ml"] });

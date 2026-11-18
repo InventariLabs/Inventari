@@ -178,8 +178,7 @@ export function useLaunchCampaign() {
 /**
  * What a campaign's scope covers, before anything is sent.
  *
- * Both places that used to ask the reader to commit without a number read
- * this: the creation screen's scope picker and the launch confirmation.
+ * Both places that ask the reader to commit read this: the creation screen's scope picker and the launch confirmation.
  */
 export function useScopePreview(scopeType: ScopeType, scopeFilterId?: string) {
   // A narrowed scope without a filter has nothing to count, and asking would

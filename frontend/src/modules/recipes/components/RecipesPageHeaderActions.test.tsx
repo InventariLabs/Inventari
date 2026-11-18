@@ -93,8 +93,8 @@ describe("RecipesPageHeaderActions — tools over an empty list", () => {
 
 describe("RecipesPageHeaderActions — collections", () => {
   it("offers a new collection in the bar with the page's other verbs", () => {
-    // It used to live only in the sidebar, and on a phone in a dashed chip
-    // over the list — never where the reader looks for what a page can do.
+    // It lives in the bar with the page's other verbs, where the reader looks for
+    // what a page can do, not in the sidebar or a dashed chip over the list.
     render(<RecipesPageHeaderActions {...baseProps} />);
 
     expect(

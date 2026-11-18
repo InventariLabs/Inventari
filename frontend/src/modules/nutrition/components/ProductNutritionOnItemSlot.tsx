@@ -9,9 +9,9 @@ import CommunityDataNote from "./CommunityDataNote";
 /**
  * What is in the product, on the product's own page.
  *
- * The figures used to be reachable only through Edit → Food & Health Info,
- * so the page a person opens to see what a product is never said what it
- * contains. Nothing renders when the product carries no figures: an empty
+ * The figures are on this page as well as behind Edit → Food & Health Info,
+ * so the page a person opens to see what a product is says what it contains.
+ * Nothing renders when the product carries no figures: an empty
  * nutrition card on a drill or a screwdriver would be noise.
  */
 export default function ProductNutritionOnItemSlot({

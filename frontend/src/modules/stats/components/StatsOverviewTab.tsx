@@ -18,8 +18,8 @@ import { QueryFailure } from "@/components/ui/QueryResult";
 /**
  * One of the tab's sections whose numbers did not arrive.
  *
- * The page used to gate its whole body on the cost query having succeeded,
- * so a single failing request left the reader with a header, two tabs and
+ * Each section waits on its own query, so a single failing request does not
+ * leave the reader with a header, two tabs and
  * nothing else -- no message, no retry, and no sign that the four sections
  * which did arrive existed at all. A section that failed says so and offers
  * the one action that can change it; the rest of the tab renders.

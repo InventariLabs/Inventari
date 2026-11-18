@@ -35,8 +35,7 @@ interface ItemActionsSheetProps {
 }
 
 /**
- * the per-row ⋮ used to replay the row tap — a control that promised
- * a menu and never opened one. It opens this sheet now. Order is safest
+ * The per-row ⋮ opens this sheet. Order is safest
  * first; Delete sits below a divider and carries its danger in the label
  * colour (ghostDanger, UI_GUIDELINES §2.13a), and routes through the page's
  * ConfirmDialog rather than deleting on tap.

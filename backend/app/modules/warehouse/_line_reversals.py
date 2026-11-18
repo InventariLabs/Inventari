@@ -1,12 +1,10 @@
 """How much of an executed line is still there to take back.
 
 A correction and a return both restate part of one line of one completed
-document, and each used to be measured against that line on its own: a
-delivery of ten accepted a correction of minus ten, and then accepted a
-second one, because the question asked was always "is ten more than ten?"
-and never "how much of it is left?". The two paths did not see each other
-either, so six returned and six corrected away took twelve off a line that
-received ten.
+document, and each is measured against what is left of that line: a delivery
+of ten accepts a correction of minus ten and no second one. The question is
+"how much of it is left?", and both paths answer it together, so six returned
+and six corrected away cannot take twelve off a line that received ten.
 
 One rule, asked once, in one place: what is left is what the line executed,
 plus what corrections have added to it, less what corrections and returns

@@ -189,8 +189,7 @@ def snapshot_ddl(conn) -> None:
             )
         },
         # Triggers the worker was born with (the hold guard's) stay; the
-        # guard used to drop every trigger it found, which no trigger
-        # installed at provisioning could survive.
+        # guard drops only the triggers that provisioning did not install.
         'triggers': _live_triggers(conn),
         'fingerprint': _fingerprint(conn),
     }
@@ -205,8 +204,8 @@ def drop_leftover_ddl(conn) -> list[str]:
     instead of truncating, a left-behind trigger also detonates on the next
     test's DELETE. The baseline is what ``create_all`` built for this
     worker (see ``snapshot_ddl``); everything outside it is a test's doing.
-    Each kind is probed separately — a guard written for the example in a
-    review used to watch exactly one of the five.
+    Each kind is probed separately, because a guard written for one example
+    would watch just one of the five.
 
     The drops run inside the caller's transaction, tables first so
     CASCADE takes a leftover table's own indexes and triggers with it; the

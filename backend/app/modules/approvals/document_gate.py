@@ -1,10 +1,10 @@
 """The approvals module's gate on the warehouse's documents.
 
-The warehouse used to ask for approvals itself: confirming a document called
+The warehouse does not ask for approvals itself: confirming a document calls
 this module to decide whether a request was due, raised it and parked the
 document; completing it called the check that refuses an unapproved one. It
-imported the module to do so, in a dozen files, so documents did not load
-without it and no other module could gate a document the same way.
+does not import the module to do so, so documents load without it and any
+module can gate a document the same way.
 
 The direction is now the platform's. The warehouse asks every module's
 pre-post check before it confirms a document and before it moves its stock;

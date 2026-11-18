@@ -41,12 +41,7 @@ class SystemEvent(StrEnum):
     cross-module subscriber names the event by its string, never by
     importing another module's enum.
 
-    No deprecated members today. The two neutral-vocabulary aliases this
-    enum used to carry — ``ITEM_CONSUMED`` / ``ITEM_DISCARDED``, re-emitted
-    beside ``ITEM_USED`` / ``ITEM_DISPOSED`` by a shim in
-    ``services/items/move_service`` — left before the repository went
-    public, together with the entries that named them in
-    ``app.core._event_deprecations``.
+    No deprecated members today; ``app.core._event_deprecations`` lists none.
     """
 
     ITEM_CREATED = 'item.created'

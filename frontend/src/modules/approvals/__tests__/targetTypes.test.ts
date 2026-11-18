@@ -7,11 +7,10 @@ import { AVAILABLE_TARGET_TYPES, targetTypeLabel } from "../targetTypes";
 
 /**
  * A workflow can only fire for a target type some module actually requests
- * approval for. That used to be asserted as a hand-written list of exceptions,
- * with a comment claiming purchase_orders and equipment "never call
- * approvals_api" — both untrue, and the list outlived the claim: the editor
- * offered one target type while two more had live integrations, so a purchase
- * order could never be routed through approvals from the UI.
+ * approval for. The test reads that set from the modules, so no hand-written
+ * list of exceptions can drift from them: each target type a module requests
+ * is one the editor must offer, or a purchase order could never be routed
+ * through approvals from the UI.
  *
  * So the rule is read from the backend instead of restated here: whichever
  * target types the modules pass to `approvals_api.request_approval` are the

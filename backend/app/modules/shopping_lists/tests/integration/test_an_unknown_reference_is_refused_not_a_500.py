@@ -3,9 +3,9 @@
 The pickers in the UI offer only real cards, but the API is reachable by
 integrations, import scripts and external tests — every caller that
 assembles its own request. A random UUID in any of the three product
-reference columns used to reach the INSERT and die on the foreign key
-with a bare 500 — the same class the unit refusal closed. The write
-layer now refuses before the row is built, naming the field.
+reference columns must not reach the INSERT and die on the foreign key with a
+bare 500: the same class the unit refusal covers. The write layer refuses
+before the row is built, naming the field.
 
 The update door carries none of the three columns — ShoppingListItemUpdate
 has no item_id, category_id or template_id — so a PUT cannot set them and

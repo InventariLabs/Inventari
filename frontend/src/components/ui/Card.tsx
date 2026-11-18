@@ -22,10 +22,10 @@ interface CardProps
   /**
    * Lift the card under the pointer.
    *
-   * It raises the shadow and nothing else. It used to add `cursor-pointer`
-   * too, which is a promise the card cannot keep on its own: whether anything
-   * happens on click is the caller's business, and one caller had it on a card
-   * with no action at all. A pointing cursor belongs to the element that
+   * It raises the shadow and nothing else. It does not add `cursor-pointer`,
+   * which is a promise the card cannot keep on its own: whether anything happens
+   * on click is the caller's business, and a card with no action at all must not
+   * point. A pointing cursor belongs to the element that
    * actually does something — see the clickable-card pattern in
    * UI_GUIDELINES §2.3a, which puts a real link there instead.
    */

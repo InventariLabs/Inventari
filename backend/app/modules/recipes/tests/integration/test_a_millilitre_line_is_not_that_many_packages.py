@@ -1,10 +1,10 @@
 """A millilitre line on a bottled product is not that many bottles.
 
-A recipe line of 30 ml of olive oil linked to a 750 g bottle used to
-contribute 30 x 750 g = 22.5 kg of oil — the stew reported about 50,000
+A recipe line of 30 ml of olive oil linked to a 750 g bottle must not
+contribute 30 x 750 g = 22.5 kg of oil; the stew would report about 50,000
 kcal per serving. The package weight answers "what does one whole package
-weigh", and a millilitre is not a package: the multiplication ignored the
-line's own unit and read the quantity as a count of bottles.
+weigh", and a millilitre is not a package: the line's own unit decides its
+amount, never a count of bottles.
 
 A volume measure therefore answers through a density — 30 ml x 0.92 g/ml
 = 27.6 g — and through nothing else. When the ingredient's name carries no

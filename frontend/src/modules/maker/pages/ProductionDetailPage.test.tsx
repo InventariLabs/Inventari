@@ -123,9 +123,8 @@ describe("ProductionDetailPage — the manager's cancel", () => {
   it("shows the account that runs the floor a Cancel it cannot press, and why", () => {
     // Taking a run back is the manager's call, the same split the documents
     // module draws: the person at the goods executes, only the manager
-    // cancels. The button used to sit on every member's screen, with the 403
-    // waiting behind it — and then it was removed without a word, which left
-    // the author of a draft unable to withdraw it and not told why.
+    // cancels. The button stays visible to every member, disabled, with the
+    // reason beside it, so nobody is left wondering why it is missing.
     currentOrder = draftOrder;
     signInWith(["maker:read", "maker:write"]);
     renderPage();
@@ -365,8 +364,8 @@ describe("ProductionDetailPage header identity", () => {
   });
 
   it("says the formula is empty before the irreversible step, not after", () => {
-    // The 422 used to arrive four screens in: preview → calculator →
-    // "Complete run" → "this cannot be undone" → confirm → refused.
+    // The 422 is answered before the irreversible step: the preview names the
+    // empty formula, and the confirmation is never the first place it appears.
     currentOrder = { ...draftOrder, recipe_id: "rec-1" };
     currentRecipe = { lines: [] };
     renderPage();
@@ -497,10 +496,9 @@ describe("ProductionDetailPage — the forecast is the refusal's own list", () =
   };
 
   it("marks the rows the refusal names, straight from the server's list", () => {
-    // The banner and the rows used to come from two different minds: the
-    // count from the server, the markers from a browser forecast that
-    // disagreed with it — and on a run the server refuses, the rows under
-    // "1 ingredient short" carried no marker at all.
+    // The banner and the rows come from the same answer: the count and the
+    // markers both follow the server's list, so the rows under "1 ingredient
+    // short" carry their marker from the refusal itself.
     currentOrder = orderShort([
       {
         child_template_id: "tpl-wax",
@@ -627,9 +625,9 @@ describe("ProductionDetailPage — the draft says when its quantities are read",
   it("tells the reader the BOM is read at completion, not frozen at creation", () => {
     // Editing a BOM line while an order is open changes what that order
     // will take off the shelf — a recorded design decision (fresh
-    // expansion, the recipe journal as its witness). The draft used to
-    // show the forecast as if it were a promise; the section now says the
-    // quantities are read from the BOM when the run closes.
+    // expansion, the recipe journal as its witness). The draft shows the
+    // forecast as a forecast: the section says the quantities are read from
+    // the BOM when the run closes.
     currentOrder = { ...draftOrder, recipe_id: "rec-1" };
     currentPlanned = {
       entries: [
@@ -656,7 +654,7 @@ describe("ProductionDetailPage — the draft says when its quantities are read",
     // Under-production consumes the full planned ingredients — recorded
     // decision (consumption against planned, output against actual). The
     // completion dialog is the last place to say so before the
-    // irreversible click; the hint used to stop at scrap and overproduction.
+    // irreversible click, and its hint covers scrap and overproduction too.
     currentOrder = { ...draftOrder, recipe_id: "rec-1" };
     currentPlanned = { entries: [] };
     renderPage();

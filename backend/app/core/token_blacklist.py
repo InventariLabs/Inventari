@@ -40,9 +40,9 @@ class TokenBlacklist:
     silently dropping a revocation on the floor.  In development and test
     mode the checks fail open to allow running without Redis.
 
-    The credential-change pair used to be the exception — a Redis outage
-    right after a password reset quietly resurrected exactly the sessions
-    the reset was meant to kill.
+    The credential-change pair is never the exception — a Redis outage right
+    after a password reset must not quietly resurrect the sessions the reset
+    was meant to kill.
     """
 
     PREFIX = 'token_blacklist:'

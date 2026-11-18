@@ -1,11 +1,9 @@
 """An item event leaves with the write that caused it, not after it.
 
-The items services used to announce a change with a plain ``emit`` -- an XADD
-the moment the line ran. Two windows followed from that: a rollback after the
-emit announced something that never happened (and the webhook went out
-anyway), and a crash between the commit and the XADD changed the data and told
-nobody. The events now go through ``emit_transactional``: a row in the outbox
-in the caller's transaction, relayed after the commit.
+The items services announce a change through ``emit_transactional``: a row in
+the outbox in the caller's transaction, relayed after the commit. A rollback
+therefore announces nothing, and a crash between the commit and the relay loses
+no event.
 
 Outside TESTING the outbox row is the whole mechanism, so these tests switch
 TESTING off around the write and read the row back.

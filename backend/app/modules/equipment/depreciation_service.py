@@ -45,10 +45,10 @@ def compute_book_value(
 ) -> dict[str, Any]:
     """Straight-line book value of one asset as at *as_of*.
 
-    *as_of* is required on purpose. It used to default to ``date.today()``,
-    which is the server's day: an organization a day ahead of the server saw
-    a month of depreciation start late, and nothing on the screen said which
-    clock it was reading. The callers pass the organization's own day
+    *as_of* is required on purpose: a default of ``date.today()`` would be the
+    server's day, and an organization a day ahead of the server would see a
+    month of depreciation start late, with nothing on the screen naming the
+    clock it reads. The callers pass the organization's own day
     (``core_api.organizations.today_async``), so the fallback has no honest
     value left to hold.
     """

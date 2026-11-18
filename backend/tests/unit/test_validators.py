@@ -11,8 +11,8 @@ class TestQuantizeQuantity:
     """quantize_quantity: the entry gate for the columns' 3-dp scale."""
 
     def test_fraction_beyond_column_scale_is_rounded_half_up(self) -> None:
-        """1.0005 used to reach Postgres and round silently; now the schema
-        says which number is stored."""
+        """1.0005 is rounded half up before it reaches Postgres, so the schema says which
+        number is stored."""
         assert quantize_quantity(Decimal('1.0005')) == Decimal('1.001')
 
     def test_string_input_is_quantized(self) -> None:

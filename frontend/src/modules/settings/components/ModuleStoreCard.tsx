@@ -192,10 +192,9 @@ function ModuleCardBadges({
           {t("modules:enabled")}
         </Badge>
       ) : (
-        // The state used to live only in the button label, and switching a
-        // module off left its card with no status at all — an admin tidying
-        // the store could not tell a switched-off module from one waiting
-        // to be switched on.
+        // The card carries its own status as well as the button label, so a
+        // module switched off reads differently from one waiting to be
+        // switched on.
         <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
           {t("modules:disabled")}
         </Badge>
@@ -276,11 +275,9 @@ function CapabilitiesLine({ capabilities }: { capabilities?: string[] }) {
  * One tile in the module store.
  *
  * Everything it says about the module comes from `GET /modules/available`.
- * It used to read three of those facts off the frontend launcher tile
- * instead — the category, the icon and whether the module could be switched
- * off — which only modules with a tile declare. Six had none, so their cards
- * drew an empty coloured square and fell out of every category filter, and
- * two always-on modules got a Deactivate button that could only come back 403.
+ * The category, the icon and whether the module can be switched off come from
+ * this endpoint, not from the frontend launcher tile: only modules with a tile
+ * declare them there.
  *
  * The launcher tile still supplies the accent colour, which is a matter of
  * how the module looks in this build rather than what it is.

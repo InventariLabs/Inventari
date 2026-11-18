@@ -1,13 +1,9 @@
 """A workflow deleted with history behind it is archived, and steps aside.
 
-Deleting a workflow that had requests used to switch it off and nothing more.
-A workflow that was already off stayed on the list exactly as it was, while
-the toast reported an archive; and the row kept the only place its target
-type had, so the next workflow overwrote its name and stages, and every past
-request — which reads its stage labels from its workflow — read the new ones.
-
-Archived is now a state of its own: off the list, frozen, and the next
-workflow for the target type is a new row beside it.
+Deleting a workflow that has requests archives it. The row stays, off the list
+and frozen, because every past request reads its stage labels from its
+workflow. The next workflow for the same target type is a new row beside it,
+never an overwrite of this one.
 """
 
 from __future__ import annotations

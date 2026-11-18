@@ -180,8 +180,7 @@ export function ReceiveHeaderFields({
   // session walks them, so the note does not point "below".
   const isPhone = useMediaQuery("(max-width: 639px)");
   // Opened from an order (a task's "Receive delivery"): what the order expects
-  // leads the screen, because the reader came for that delivery. It used to sit
-  // below the question the order had already answered.
+  // leads the screen, because the reader came for that delivery.
   const [searchParams] = useSearchParams();
   const openedFromOrder = Boolean(searchParams.get("order"));
 

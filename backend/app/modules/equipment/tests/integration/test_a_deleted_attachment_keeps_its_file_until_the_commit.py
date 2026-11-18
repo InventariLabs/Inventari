@@ -1,9 +1,9 @@
 """Deleting an attachment removes its file only once the row is gone for good.
 
-The service used to delete the stored file inside the request, ahead of the
-commit. A commit that then failed left the row in place and the file gone, so
-the asset's attachment list lost a document it still named. The row goes in
-the caller's transaction now; the file is removed afterwards.
+The row is deleted inside the caller's transaction, and the stored file is
+removed only after the commit. A commit that fails leaves the row and its file
+both in place, so the asset's attachment list never names a document that is
+gone.
 """
 
 from __future__ import annotations

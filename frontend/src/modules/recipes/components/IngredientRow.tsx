@@ -97,7 +97,7 @@ const IngredientRow = memo(function IngredientRow({
   const showsBothReadings =
     !ingredient.quantities_comparable && ingredient.available_quantity != null;
   // What the dot stands for. "Found, but the measures cannot meet" is its own
-  // answer and used to borrow the one for "found, and enough of it".
+  // answer, separate from "found, and enough of it".
   const dotStatus = showsBothReadings ? "not_comparable" : ingredient.status;
   const dot = statusDot[dotStatus] ?? statusDot.unknown;
   const dotLabel = t(statusLabel[dotStatus] ?? statusLabel.unknown);
@@ -124,10 +124,9 @@ const IngredientRow = memo(function IngredientRow({
   // linking an ingredient to a product and the "always at home" exclusion.
   // Offered to a reader, they ended in a 403 after the choice was made.
   const canWrite = useCanWrite("recipes");
-  // Offered on an ingredient that points at no product, and only there. It
-  // used to follow the stock answer instead, so "Link to product" sat on a
-  // row whose product was linked and whose only trouble was that there was
-  // not quite enough of it — a control that could change nothing.
+  // Offered on an ingredient that points at no product, and only there: a row
+  // whose product is linked and whose only trouble is that there is not quite
+  // enough of it has nothing to link, so the control is not offered.
   const canLink = canWrite && !ingredient.is_linked;
   const linkIsPrimary = ingredient.status === "unknown";
 
@@ -221,8 +220,8 @@ const IngredientRow = memo(function IngredientRow({
           </span>
         )}
         {isShort && (
-          // How much is short, in words. The row used to say "Missing" and
-          // nothing else, so 492 ml of the 500 ml wanted read as no milk.
+          // How much is short, in words: the row says the amount missing as well as
+          // that it is short, so 492 ml of the 500 ml wanted is not read as no milk.
           <span className="text-xs text-on-warning" data-testid="short-of">
             {t("availability.short_of", {
               available: availableReading,
@@ -274,9 +273,8 @@ const IngredientRow = memo(function IngredientRow({
           </span>
         )}
         {ingredient.best_item?.expired && ingredient.best_item.expiry_date ? (
-          // The pack is on the shelf and past its date. The row used to read
-          // that date as "Short shelf life", a warning about a future the
-          // chicken no longer had.
+          // The pack is on the shelf and past its date. The row reads that date as
+          // an expiry, not as a warning about a future the chicken does not have.
           <span className="text-xs text-on-danger" data-testid="expired">
             {t("availability.expired_since", {
               date: formatDate(ingredient.best_item.expiry_date),
@@ -307,10 +305,8 @@ const IngredientRow = memo(function IngredientRow({
       />
 
       {/* One reading for every ingredient: what it is, then how much of it.
-          An ingredient added by hand used to get three fixed columns — the
-          amount right-aligned, the unit, then the name — while an imported
-          one read as a sentence, so a list holding both had a row in it that
-          looked like a stray.
+          Hand-added and imported ingredients take the same columns, so no row in
+          a list looks like a stray.
 
           The measure is parenthesised only for an imported line, where it is
           not the amount but a restatement of it: the recipe said "4 łyżki"

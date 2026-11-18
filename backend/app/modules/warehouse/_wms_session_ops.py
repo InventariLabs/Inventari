@@ -255,8 +255,7 @@ async def confirm_short_async(
 
     # Zero is an answer — nothing arrived — and it is negative quantities
     # that cannot be true of a line's tally. The dialog at the other end of
-    # this call used to refuse zero as well, which sent "nothing came of
-    # this line" down the one road that had no way to record it.
+    # this call takes zero as well, so "nothing came of this line" can be recorded.
     if quantity < 0:
         raise ServiceRejectionError('wms_quantity_cannot_be_negative')
 
@@ -325,8 +324,8 @@ async def confirm_short_async(
             # unexplained — and then be read as a line nobody had
             # answered for. Naming the shortage is the honest default;
             # whoever knows more overwrites it. The name is the code,
-            # which every screen reads in the reader's language — the
-            # sentence it used to store was English in all of them.
+            # which every screen reads in the reader's language, so the stored value
+            # is a code and not a sentence.
             doc_line.discrepancy_code = discrepancy_code or 'SHORTAGE'
             doc_line.discrepancy_reason = discrepancy_reason
         elif over_expected:
@@ -386,8 +385,8 @@ async def complete_session_async(
 
     # A session with no lines resolves vacuously — `all([])` is True — so
     # without this guard an empty session reports completion over a document
-    # whose lines are all still pending. It used to sit on the picking side
-    # only, and the receiving copy answered success for the empty session.
+    # whose lines are all still pending. It guards the picking and the receiving
+    # side alike, so an empty session is refused on both.
     if not lines:
         raise ServiceRejectionError('wms_cannot_complete_no_lines')
 
@@ -443,10 +442,9 @@ async def undo_line_async(
 ) -> WmsPickLine:
     """Undo a line the session has anything recorded on.
 
-    The filter reads the quantity, not the status word. Picking used to ask
-    for a resolved status, which stopped matching the moment a partial scan
-    began leaving a pending line carrying a quantity; receiving had filtered
-    on the quantity all along. The quantity is the honest source, so the
+    The filter reads the quantity, not the status word: a pending line carries a
+    quantity once a partial scan has begun, so a status filter would miss it.
+    The quantity is the honest source, so the
     stale copy follows the healthy one — with one case the quantity alone
     cannot see: a line somebody resolved with nothing on it. A short receive
     of zero is a recorded answer, and its row offers Undo like any other,
@@ -759,9 +757,8 @@ async def start_session_async(
     # The session holding the document may hold others with it; the caller
     # who opened it over several dispatches gets the whole of it back.
     existing = await open_session_holding_async(db, org_id, document_id)
-    # A session left behind by a closed tab used to make the document
-    # unreachable: start refused because one was open, and nothing in the
-    # interface could open, finish or cancel it. Handing the caller their
+    # A session left behind by a closed tab keeps the document reachable: the
+    # interface can open, finish or cancel it. Handing the caller their
     # own session back is what the button already promised — the sheet reopens
     # on the lines already counted, and finishing or cancelling it works from
     # there. Someone else's session refuses, but names its holder and carries

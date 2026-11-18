@@ -37,7 +37,7 @@ async def display_names_by_ids_async(
 ) -> dict[UUID, str]:
     """The name of each shelf these ids name, asked in one read.
 
-    A report that prints a shelf beside a stored id used to fetch each
+    A report that prints a shelf beside a stored id must not fetch each
     location on its own, or list the shelves and filter — and the list hides
     archived ones, while the document filed there still prints. Only ids of
     this organization answer; an id of another organization, or one that no

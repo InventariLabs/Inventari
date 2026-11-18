@@ -463,8 +463,7 @@ class TestAvailabilityEndpoint:
         assert resp.status_code == 200
         body = resp.json()
         assert Decimal(body['max_batches']) == Decimal('0')
-        # Not "almost": 1.8 of the 2 needed is short, and 0.9 batches was
-        # the number the screen used to offer instead.
+        # Not "almost": 1.8 of the 2 needed is short, and the answer says so.
         assert body['has_shortage'] is True
 
     def test_available_excludes_reserved(

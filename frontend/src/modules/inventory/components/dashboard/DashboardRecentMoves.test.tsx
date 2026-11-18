@@ -273,7 +273,7 @@ describe("DashboardRecentMoves", () => {
 
   it("does not call a correction or a put-back a delivery", async () => {
     // A number typed up on the record, and flour returned after cooking,
-    // used to read "received" exactly like goods arriving from a supplier.
+    // must not read "received" exactly like goods arriving from a supplier.
     server.use(
       http.get("*/stock-moves", () =>
         HttpResponse.json({

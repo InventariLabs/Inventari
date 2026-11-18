@@ -37,8 +37,8 @@ async def analyze_import_file(file_content: bytes, filename: str) -> dict[str, A
     """Return headers, a short preview, the total row count and per-column
     filled counts.
 
-    The file is parsed ONCE. It used to be read for five preview rows and
-    then read again in full purely to count them — and an xlsx is a ZIP, so
+    The file is parsed ONCE. The five preview rows and the count come from the
+    same pass, not from a second read in full purely to count them — and an xlsx is a ZIP, so
     the second pass paid the decompression cost a second time on a file
     somebody uploaded. When that second read failed the count silently
     stayed at five, which is the other reason it is gone: a wrong total is
@@ -114,9 +114,8 @@ async def resolve_storage_location_async(
     A bare name is not an address. Names are unique among siblings and
     nowhere else, so "Shelf 1" may sit under every rack in the building —
     and since the depth limit was lifted, naming places that way is the
-    ordinary thing to do. This used to take the first row it found, so one
-    spreadsheet could file a whole delivery onto the wrong shelf without a
-    word to anybody.
+    ordinary thing to do. The location is read from every row, so no first row can file a whole
+    delivery onto the wrong shelf without a word to anybody.
 
     A path resolves as far as it is given: the last step names the location,
     the ones before it name its parents, and a partial path is enough as

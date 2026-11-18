@@ -11,8 +11,8 @@ import { moduleRegistry } from "../moduleRegistry";
  * product form or a typed address.
  *
  * Equipment's Locations screen lists only the module scope and its
- * Categories screen filters on the module's context tag, so the hiding
- * overrides it once declared are gone and the honest allowance is empty.
+ * Categories screen filters on the module's context tag, so no hiding
+ * override is declared, and the honest allowance is empty.
  * Re-adding one strands the organization's locations again — this gate
  * goes red until the module's own screen actually covers the dataset.
  */

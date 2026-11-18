@@ -347,10 +347,8 @@ def test_two_records_of_one_batch_leave_the_one_the_draw_named(
 
     Two records of one batch and one owner stand on a shelf, five and five.
     FIFO's plan names the older — that is what the run eats. The per-shelf
-    mirror that used to follow summed the draw for the grain and reached for
-    the shelf's newest record of it: the two tie on claim and the shelf lists
-    newest first, so the newer went down and the older, the one actually
-    eaten, stood untouched.
+    mirror that follows it names the record the draw eats, not the shelf's newest:
+    the two tie on claim, and the shelf lists newest first.
     """
     shelf = _Shelf(db_session, mk_org, mk_input_loc, mk_user, async_engine_fixture)
     batch = shelf.batch('LOT-SPLIT')
@@ -435,8 +433,8 @@ def test_the_books_of_every_batch_stay_in_step_with_what_the_run_ate(
 
     The consumption each batch gave up is the run's journal rows for it, so
     this reads the answer back out of the books rather than out of the plan.
-    Green before this change too — the mirror kept the totals even while it
-    moved the wrong record — so it pins the invariant rather than the fix.
+    The totals alone do not show which record was drawn, so this pins the
+    invariant itself.
     """
     from app.models.stock_move import StockMove
 

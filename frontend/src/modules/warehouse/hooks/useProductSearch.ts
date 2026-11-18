@@ -13,9 +13,8 @@ interface UseProductSearchOptions {
   /**
    * Answer with the stock on hand rather than the product catalogue.
    *
-   * A location used to be the only way to ask for stock, so a document with
-   * no location of its own — a scrap — got catalogue entries, and the line it
-   * built could not be carried out.
+   * A document with no location of its own, such as a scrap, gets stock on hand
+   * rather than catalogue entries, since a line built from one could not be carried out.
    */
   stockOnly?: boolean;
   /**

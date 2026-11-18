@@ -1,10 +1,9 @@
 """To do tells the floor what the document is waiting for, not just that it exists.
 
-The queue used to be one list of confirmed receipts and dispatches with one
-button each: *Receive* or *Pick*, whatever had already happened on the floor.
-A dispatch picked short and packed still offered *Pick*; a receipt somebody
-had already counted offered *Receive* again. Transfers were not in the queue
-at all.
+The queue tells the floor what each document is waiting for, not just that
+it exists: *Receive* or *Pick* only while the floor still has that step to do.
+A dispatch picked short and packed offers no *Pick*, a receipt already counted
+offers no *Receive*, and transfers are in the queue too.
 
 The work stage is derived from the rows that already exist — the session, who
 holds it, the picked quantities and the packages — never a new document

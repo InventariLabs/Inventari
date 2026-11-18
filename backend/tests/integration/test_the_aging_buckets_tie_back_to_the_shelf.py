@@ -1,11 +1,9 @@
 """What the aging buckets add up to is what a reader can still count.
 
-The buckets used to age everything that ever arrived: ten received and four
-later dispatched still showed ten, so their sum tied back to nothing anybody
-could verify by walking the racks. Issues now consume the receipts oldest
-business date first — but the suite could not tell: every case in it received
-stock and never issued any, so a version that ignored issues altogether went
-on passing.
+The buckets age what is still on the shelf: issues consume the receipts oldest
+business date first, so the buckets sum to what anybody can count on the racks.
+The cases here both receive and issue stock, so a version that ignores issues
+fails them.
 
 Two things this pins down. The buckets net off what left, and a report cut at
 a past date does not see an issue made after it — otherwise a back-dated

@@ -1,9 +1,9 @@
 """A draw is planned from the records of the group, less what their grain holds.
 
-Which batch goes first and how much of it is free used to be read off the
-quants: FEFO by the batch's date and then the quant's ``created_at``, the
-free part as the quant's quantity less its reserved total. The quants are
-gone and the records are the only count, so the draw reads the records —
+Which batch goes first and how much of it is free is read off the records:
+FEFO by the batch's date and then the record's ``created_at``, the free part
+as the record's quantity less what its rows hold. There are no quants: the
+records are the only count, so the draw reads the records —
 in one order for every caller, down to the record's id, so two records of
 one batch written in the same instant still come out the same way every
 time — and the holds from the reservation rows of each (batch, owner).

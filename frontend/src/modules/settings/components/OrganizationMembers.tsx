@@ -179,11 +179,10 @@ export default function OrganizationMembers() {
                   </div>
                 </div>
                 {isAdmin && member.id === user?.id && (
-                  /* The row used to end here with nothing said, so the one
-                     account whose role cannot be changed looked like a
-                     rendering slip. The server refuses the change (an admin
-                     demoting themselves can lock the organization out of its
-                     own settings), and now the row says so. */
+                  /* The one account whose role cannot be changed says so in
+                     the row: the server refuses the change (an admin demoting
+                     themselves can lock the organization out of its own
+                     settings). */
                   <p className="text-xs text-on-muted lg:max-w-xs lg:text-right lg:shrink-0">
                     {t("settings.organization.ownRoleFixed")}
                   </p>

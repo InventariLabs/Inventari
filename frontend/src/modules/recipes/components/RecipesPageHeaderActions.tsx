@@ -64,7 +64,7 @@ function SecondaryAction({
  *
  * Three weights: the gear is the lightest thing here and stays a ghost icon,
  * the list's own tools are outlined, and creating a recipe is the one filled
- * button. They used to be four identical ghosts and a primary.
+ * button, so the weights tell the tools apart.
  *
  * Three of the tools only mean something once there is something to act on:
  * batch selection over zero recipes selects nothing, the tag manager over zero

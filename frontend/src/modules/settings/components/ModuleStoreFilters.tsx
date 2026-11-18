@@ -30,8 +30,8 @@ const UNCHOSEN = "text-on-secondary hover:bg-surface-raised hover:text-on";
  * 390×844 phone — so the first view of the platform's storefront contained no
  * modules at all.
  *
- * Each option says whether it is the chosen one. The state used to be carried
- * by the background colour alone, which a screen reader cannot see.
+ * Each option says whether it is the chosen one. The state is carried in text
+ * as well as by the background colour, which a screen reader cannot see.
  */
 export function ModuleStoreFilters<T extends string>({
   filters,

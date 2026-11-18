@@ -20,9 +20,9 @@ import { server } from "@/test/mocks/server";
 
 /**
  * The header is one of the persistent exits a dirty form has to survive.
- * It used to be the hole in the gate: the module tabs asked, the module
- * switcher asked, and clicking the very same address on the logo or the
- * settings link threw the work away without a word.
+ * The module tabs ask, the module switcher asks, and so must the logo and the
+ * settings link: clicking the very same address there may not throw the work
+ * away without a word.
  */
 
 /** The module set the shell resolves against. A test that needs the module
@@ -262,7 +262,7 @@ describe("AppShell — header controls are named by the words they show", () => 
   it("climbs to the parent when a replaced screen has no earlier entry", async () => {
     // A `replace` gives the screen a fresh key without adding history, so the
     // key alone says "there is something behind" where there is nothing: the
-    // browser's own entry count (idx 0) is the truth. Back used to do nothing.
+    // browser's own entry count (idx 0) is the truth, so Back climbs to the parent.
     window.history.replaceState({ idx: 0, key: "fresh" }, "");
     const user = userEvent.setup();
     modulesState.enabledModules = ["equipment"];
@@ -550,8 +550,8 @@ describe("AppShell — the header says the workspace shows one module", () => {
 
 /**
  * The phone keeps the three working tabs in its bottom bar and puts the rest
- * one entry away. It used to mirror the desktop bar exactly, which is how
- * configuration screens reached the phone and the board would have.
+ * one entry away. Mirroring the desktop bar exactly would let configuration
+ * screens reach the phone, and the board with them.
  */
 describe("AppShell — the phone's bar is the module's three working tabs", () => {
   beforeEach(() => {

@@ -47,8 +47,8 @@ vi.mock("@/hooks/usePartners", () => ({
       total: 1,
     },
   })),
-  // The detail page reads the supplier by id now: the active-partner page it
-  // used to search kept deactivated and off-page suppliers out.
+  // The detail page reads the supplier by id: a search of the active partners
+  // would keep deactivated and off-page suppliers out.
   usePartner: vi.fn(() => ({
     data: { id: "partner-1", name: "ACME Supplies", email: "acme@test.com" },
   })),
@@ -294,9 +294,8 @@ describe("PurchaseOrderDetailPage", () => {
   });
 
   it("puts the order's actions in the page header, beside its number", async () => {
-    // They used to stand in a row of their own under the title, with
-    // "Scheduled: …" at its other end — the document detail keeps its actions
-    // in the header, on the line of the number.
+    // The actions sit in the header, on the line of the number, as on the
+    // document detail.
     render(<PurchaseOrderDetailPage />, { wrapper: createWrapper() });
 
     expect(
@@ -453,9 +452,8 @@ describe("PurchaseOrderDetailPage", () => {
   });
 
   it("receives a confirmed order on the receive screen, which loads its lines", async () => {
-    // The order used to build a confirmed receipt in a panel of its own and
-    // jump to the documents, where the goods still waited for a second
-    // press. The receive screen takes the order's lines and posts them.
+    // The receive screen takes the order's lines and posts them; the order does
+    // not build a receipt in a panel of its own.
     server.use(
       http.get("/api/v1/purchase-orders/po-1", () =>
         HttpResponse.json(confirmedPO),

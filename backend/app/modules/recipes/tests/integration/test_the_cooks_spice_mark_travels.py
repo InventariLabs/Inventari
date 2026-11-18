@@ -1,9 +1,9 @@
 """The cook's spice mark lives on the recipe, not only in the import sheet.
 
-The import review's "Spice" chip flips a local flag; the flag used to be
-dropped on save, so a bay leaf the cook had marked came back in the main
-list, its section decided by the bare amount. The mark is written with the
-ingredient now, read back on GET, and carried by the availability answer
+The import review's "Spice" chip flips a local flag; the flag is kept on save,
+so a bay leaf the cook has marked does not come back in the main list with its
+section decided by the bare amount. The mark is written with the
+ingredient, read back on GET, and carried by the availability answer
 the card folds the seasonings section from.
 """
 
