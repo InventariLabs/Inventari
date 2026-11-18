@@ -119,3 +119,17 @@ def test_a_file_below_its_baseline_passes_with_a_notice(
 
     assert failures == []
     assert notices == ['backend/app/a.py: 0 now, 3 recorded.']
+
+
+def test_a_comment_is_reported_on_its_own_line_after_jsx_text_and_division(
+    gate: ModuleType,
+) -> None:
+    # An apostrophe in JSX text, a closing tag and a division must not swallow
+    # a newline: a finding names the line the comment is on.
+    source = (
+        "const a = <p>don't</p>;\n"
+        'const b = c / d;\n'
+        'const e = <i>x</i>;\n'
+        f'// it {USED} be\n'
+    )
+    assert list(gate.typescript_comment_lines(source)) == [4]

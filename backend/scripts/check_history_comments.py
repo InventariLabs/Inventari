@@ -114,14 +114,14 @@ def python_comment_lines(source: str) -> dict[int, str]:
             and isinstance(first.value.value, str)
         ):
             end = first.end_lineno or first.lineno
-            raw = source.splitlines()[first.lineno - 1 : end]
+            raw = source.split('\n')[first.lineno - 1 : end]
             for offset, text in enumerate(raw):
                 lines[first.lineno + offset] = text
     return lines
 
 
 # After one of these a "/" opens a regular expression rather than dividing.
-_REGEX_PRECEDERS = set('(,=:[!&|?{};+-*%<>~^')
+_REGEX_PRECEDERS = set('(,=:[!&|?{};+-*%~^')
 _REGEX_KEYWORDS = ('return', 'typeof', 'case', 'in', 'of', 'delete', 'void', 'throw')
 
 
@@ -204,7 +204,8 @@ class _TypeScriptScanner:
         j = self.i + 1
         while j < self.n and self.source[j] not in (quote, '\n'):
             j += 2 if self.source[j] == '\\' else 1
-        self._literal_done(j + 1)
+        # An unterminated string (an apostrophe in JSX text) ends at the line.
+        self._literal_done(j + 1 if self.source[j : j + 1] == quote else j)
 
     def _template(self, opener: str) -> None:
         if opener == '}':
@@ -247,7 +248,9 @@ class _TypeScriptScanner:
             elif char == '/' and not in_class:
                 break
             j += 1
-        self._literal_done(j + 1)
+        # A regex ends on its closing slash; on a newline it was no regex (a
+        # division, a JSX closing tag), and the newline is still to be counted.
+        self._literal_done(j + 1 if self.source[j : j + 1] == '/' else j)
 
     def _word(self) -> None:
         j = self.i
