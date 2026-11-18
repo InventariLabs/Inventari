@@ -8,11 +8,11 @@ import type { WarehouseDocument } from "../types";
  * A quantity that arrived over the wire is a number here, not text.
  *
  * The backend serialises Decimal as a JSON string, and the generated schema
- * says so — `DocumentLineSchema.quantity: string`. The hand-written type in
- * this module says `number`, so `tsc` had nothing to object to when the
- * consolidation added two of them: for lines typed into the form that was
- * addition, and for lines loaded from an existing document it was string
- * concatenation. Two units and three became twenty-three.
+ * says so — `DocumentLineSchema.quantity: string`. A line held by this
+ * module carries a number, so the text is converted where a document's lines
+ * come in; left as text, the consolidation would add two of them as strings
+ * (two units and three become twenty-three) while lines typed into the form
+ * are added as numbers.
  */
 const wireDocument = (quantity: unknown): WarehouseDocument =>
   ({

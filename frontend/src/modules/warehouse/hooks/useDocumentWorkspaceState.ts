@@ -127,10 +127,11 @@ function mapDocumentLineToReceiptLine(line: LineSource): ReceiptDraftLine {
     sku: line.sku ?? undefined,
     image_url: undefined,
     // The wire carries a Decimal as text (the generated schema says
-    // `quantity: string`); this module's hand-written type says `number`,
-    // so nothing objected when the consolidation below added two of them
-    // and got "2.0003" out of two and three. The conversion belongs here,
-    // at the one door a document's lines come through.
+    // `quantity: string`) while a line in this module holds a number, so
+    // the text has to become a number before the consolidation below adds
+    // two of them — otherwise two and three come out as "2.0003". The
+    // conversion belongs here, at the one door a document's lines come
+    // through.
     quantity: Number(line.quantity) || 0,
     uom_id: line.uom_id ?? null,
     batch_number: line.batch_number ?? "",
