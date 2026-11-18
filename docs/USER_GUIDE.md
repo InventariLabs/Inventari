@@ -1066,9 +1066,10 @@ on which nothing was picked has no destination to confirm.
     one is named, a receipt that holds goods back cannot be completed. The
     rest of the delivery lands as ordinary stock, and the order counts the whole
     delivery as received: the quarantined part waits for a decision under
-    **To do**, not on the order. A separate backorder draft asks for the held
-    quantity again; any goods that never arrived remain owed on the original
-    purchase order. The same field is in
+    **To do**, not on the order. The order is not asked for that part again, so
+    no backorder draft is opened for it; any goods that never arrived remain
+    owed on the original purchase order. A receipt that was not taken from an
+    order opens a backorder draft for the held quantity. The same field is in
     the **Record received quantity** window on the floor, where **All
     received goods are quarantined** fills it with the whole count.
   - Nothing in quarantine is picked. A held batch is released under

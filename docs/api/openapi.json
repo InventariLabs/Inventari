@@ -52313,6 +52313,10 @@
             "type": "integer",
             "title": "Line Count"
           },
+          "moved_line_count": {
+            "type": "integer",
+            "title": "Moved Line Count"
+          },
           "unit_progress": {
             "items": {
               "$ref": "#/components/schemas/DocumentUnitProgressSchema"
@@ -52354,6 +52358,7 @@
           "total_gross",
           "currency",
           "line_count",
+          "moved_line_count",
           "unit_progress",
           "first_lines",
           "module_lines"

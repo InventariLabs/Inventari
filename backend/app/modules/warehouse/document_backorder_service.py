@@ -38,25 +38,26 @@ async def maybe_create_backorder(
     return backorder
 
 
+def _owed_on_backorder(line: DocumentLine) -> Decimal:
+    # A line taken from a purchase order is never backordered: the order is
+    # the expectation. It still owes what did not arrive and counts what was
+    # held as delivered, so a draft for either would ask for the same goods
+    # twice. A held quantity on any other line arrived but is not usable, so
+    # it is outstanding like a shortage — and only it is: the rest of the
+    # line is ordinary stock.
+    if line.source_po_line_id is not None:
+        return Decimal('0')
+    held = line.held_quantity or Decimal('0')
+    return line.expected_quantity - line.done_quantity + held
+
+
 def _find_shortage_lines(doc: Document) -> list[DocumentLine]:
-    # What the order is owed is the expected quantity minus what arrived as
-    # usable stock. A held quantity arrived, but is not usable, so it is
-    # outstanding like a shortage — and only it is: the rest of the line is
-    # ordinary stock.
-    #
-    # The purchase order still owes the goods that did not arrive, but counts
-    # held goods as delivered. Only the held part needs a separate replacement.
-    result = []
-    for line in doc.lines:
-        held = line.held_quantity or Decimal('0')
-        remaining = (
-            held
-            if line.source_po_line_id is not None
-            else (line.expected_quantity - line.done_quantity + held)
-        )
-        if remaining > Decimal('0') and line.discrepancy_code in BACKORDER_CODES:
-            result.append(line)
-    return result
+    return [
+        line
+        for line in doc.lines
+        if _owed_on_backorder(line) > Decimal('0')
+        and line.discrepancy_code in BACKORDER_CODES
+    ]
 
 
 async def _create_backorder_document(
@@ -95,13 +96,7 @@ async def _create_backorder_document(
     )
 
     for i, orig_line in enumerate(shortage_lines, 1):
-        held = orig_line.held_quantity or Decimal('0')
-        from_order = orig_line.source_po_line_id is not None
-        remaining = (
-            held
-            if from_order
-            else (orig_line.expected_quantity - orig_line.done_quantity + held)
-        )
+        remaining = _owed_on_backorder(orig_line)
         new_line = DocumentLine(
             line_number=i,
             item_id=orig_line.item_id,
@@ -113,9 +108,9 @@ async def _create_backorder_document(
             expected_quantity=remaining,
             done_quantity=Decimal('0'),
             uom_id=orig_line.uom_id,
-            batch_number=None if from_order else orig_line.batch_number,
-            serial_number=None if from_order else orig_line.serial_number,
-            expiry_date=None if from_order else orig_line.expiry_date,
+            batch_number=orig_line.batch_number,
+            serial_number=orig_line.serial_number,
+            expiry_date=orig_line.expiry_date,
             unit_price=orig_line.unit_price,
             tax_rate=orig_line.tax_rate,
             currency=orig_line.currency,

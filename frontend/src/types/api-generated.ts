@@ -15002,6 +15002,8 @@ export interface components {
             shipment?: components["schemas"]["DocumentShipmentSchema"] | null;
             /** Line Count */
             line_count: number;
+            /** Moved Line Count */
+            moved_line_count: number;
             /** Unit Progress */
             unit_progress: components["schemas"]["DocumentUnitProgressSchema"][];
             /** First Lines */
