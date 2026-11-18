@@ -195,6 +195,8 @@ lint: ## Check code style with ruff
 	@python3 backend/scripts/check_internal_ids.py --public-tree
 	@echo "$(BLUE)[INFO]$(NC) Checking tests for dates that the clock will overtake..."
 	@python3 backend/scripts/check_time_bombs.py
+	@echo "$(BLUE)[INFO]$(NC) Checking that backend comments describe the code as it is (baseline)..."
+	@python3 backend/scripts/check_history_comments.py --tree backend
 	@echo "$(BLUE)[INFO]$(NC) Checking the size budget of the agent instruction files..."
 	@python3 backend/scripts/check_agents_md_budget.py
 	@$(MAKE) --no-print-directory audit
@@ -303,6 +305,8 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 	docker compose exec frontend npm run check:suppressions
 	@echo "$(BLUE)[INFO]$(NC) Checking no baselined function grew past its frozen complexity or length..."
 	docker compose exec frontend npm run check:function-baseline
+	@echo "$(BLUE)[INFO]$(NC) Checking that frontend comments describe the code as it is (baseline)..."
+	@python3 backend/scripts/check_history_comments.py --tree frontend
 	@echo "$(BLUE)[INFO]$(NC) Checking no accessibility finding was added to a relaxed file (jsx-a11y baseline)..."
 	docker compose exec frontend npm run check:a11y-baseline
 	@echo "$(BLUE)[INFO]$(NC) Checking module settings snapshot..."
