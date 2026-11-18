@@ -761,7 +761,18 @@ class TestIngredientDefaultsRouter:
 
         assert r.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT, r.text
 
-    @pytest.mark.parametrize('name', ['\u200b', '\ufeff', ' \u200b '])
+    @pytest.mark.parametrize(
+        'name',
+        [
+            '\u200b',
+            '\ufeff',
+            ' \u200b ',
+            '\u200b \u200b',
+            '\ufeff \ufeff',
+            '\u200b\u00a0\u200b',
+            '\u2800',
+        ],
+    )
     def test_create_refuses_a_name_whose_key_is_empty(
         self, client: TestClient, auth_headers: dict[str, str], name: str
     ) -> None:
@@ -820,7 +831,9 @@ class TestIngredientDefaultsRouter:
         """An invisible-only name is a row error, not an empty key."""
         from io import BytesIO
 
-        payload = 'name,calories_kcal\n\u200b,100\nRye,330\n'.encode()
+        payload = (
+            'name,calories_kcal\n\u200b,100\n\u200b \u200b,111\nRye,330\n'.encode()
+        )
         r = client.post(
             f'{RECIPE_URL}/ingredient-defaults/import',
             files={'file': ('defaults.csv', BytesIO(payload), 'text/csv')},
@@ -829,13 +842,13 @@ class TestIngredientDefaultsRouter:
 
         assert r.status_code == status.HTTP_200_OK, r.text
         assert r.json()['created'] == 1
-        assert r.json()['errors'] == 1
+        assert r.json()['errors'] == 2
         listing = client.get(
             f'{RECIPE_URL}/ingredient-defaults',
             params={'lang': 'en'},
             headers=auth_headers,
         ).json()
-        assert all(item['name_normalized'] for item in listing['items'])
+        assert all(item['name_normalized'].strip() for item in listing['items'])
 
     def test_import_reads_a_csv_saved_with_a_utf8_bom(
         self, client: TestClient, auth_headers: dict[str, str]
