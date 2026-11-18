@@ -11,10 +11,13 @@ import {
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { act } from "@testing-library/react";
+import { toast } from "sonner";
 
 import AppShell from "./AppShell";
 import "@/modules/warehouse/module";
 import { useFormGuardStore } from "@/store/formGuardStore";
+import { SessionEndedError, extractApiError } from "@/lib/errors";
 import { http, HttpResponse } from "msw";
 import { server } from "@/test/mocks/server";
 
@@ -155,6 +158,73 @@ describe("AppShell — the header's exits walk the same gate as the module tabs"
     await user.click(screen.getByRole("button", { name: "Cancel" }));
 
     expect(screen.getByTestId("path")).toHaveTextContent("/equipment");
+  });
+});
+
+describe("AppShell — a session that ends under a form holding work says so", () => {
+  beforeEach(() => {
+    useFormGuardStore.getState().setDirtyForm(null);
+    modulesState.enabledModules = [];
+    modulesState.focusModule = null;
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it("says the work was not kept when no toast carried the news", () => {
+    vi.useFakeTimers();
+    const error = vi.spyOn(toast, "error").mockReturnValue("id");
+    useFormGuardStore.getState().setDirtyForm("The document form");
+    renderShell();
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent("auth:logout"));
+      // A caller that puts the sentence into its own state (a picker's inline
+      // error) reads it, but nothing on screen shows it after /login mounts.
+      extractApiError(new SessionEndedError("Your session has ended."), "x");
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(error).toHaveBeenCalledWith(
+      "Your session has ended, so what you entered on this screen was not kept. Sign in again and start over.",
+      expect.objectContaining({ id: "session-ended-unsaved" }),
+    );
+  });
+
+  it("leaves the news to a toast that already carries it", () => {
+    vi.useFakeTimers();
+    const error = vi.spyOn(toast, "error").mockReturnValue("id");
+    vi.spyOn(toast, "getToasts").mockReturnValue([
+      {
+        id: 1,
+        title:
+          "Your session has ended, so this was not saved. Sign in again and start over.",
+      },
+    ]);
+    useFormGuardStore.getState().setDirtyForm("The document form");
+    renderShell();
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent("auth:logout"));
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(error).not.toHaveBeenCalled();
+  });
+
+  it("stays quiet when nothing on screen holds work", () => {
+    vi.useFakeTimers();
+    const error = vi.spyOn(toast, "error").mockReturnValue("id");
+    renderShell();
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent("auth:logout"));
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(error).not.toHaveBeenCalled();
   });
 });
 

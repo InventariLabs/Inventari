@@ -106,6 +106,7 @@
   "form": {
     "createTitle": "Neues Dokument",
     "editTitle": "Dokument bearbeiten",
+    "guardName": "Das Belegformular",
     "discardTitle": "Diesen Beleg verwerfen?",
     "discardMessage": "Der eingegebene Partner, die Lagerorte und die Positionen gehen verloren. Das lässt sich nicht rückgängig machen.",
     "discardConfirm": "Verwerfen",

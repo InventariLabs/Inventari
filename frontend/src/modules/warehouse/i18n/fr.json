@@ -106,6 +106,7 @@
   "form": {
     "createTitle": "Nouveau document",
     "editTitle": "Modifier le document",
+    "guardName": "Le formulaire du document",
     "discardTitle": "Abandonner ce document ?",
     "discardMessage": "Le partenaire, les emplacements et les lignes saisis seront perdus. Cette action est irréversible.",
     "discardConfirm": "Abandonner",

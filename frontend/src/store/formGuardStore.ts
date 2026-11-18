@@ -8,6 +8,10 @@ import { create } from "zustand";
  * link through: a click on a module tab asks before it discards the filled
  * fields of a long form.
  *
+ * Two readers: the navigation gate, and the end of a session — the API client
+ * words a read's sentence by it and the shell says the work was not kept,
+ * because the sign-in that follows drops what the form holds.
+ *
  * The label travels already localized — the store is not a translator.
  *
  * Why registration is opt-in — the recorded decision: knowing whether a form

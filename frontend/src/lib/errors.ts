@@ -15,7 +15,9 @@ interface ApiErrorDetail {
  */
 export function extractApiError(error: unknown, fallback: string): string {
   const readable = readableErrorMessage(error);
-  if (readable) return readable;
+  if (readable) {
+    return readable;
+  }
   if (axios.isAxiosError(error)) {
     // A 5xx `detail` is written for whoever reads the logs — an exception
     // message, a stack summary, the fault injector's own sentence. Handing it

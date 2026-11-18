@@ -9,6 +9,8 @@ import {
 } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { useFormGuardStore } from "@/store/formGuardStore";
 import { Settings, Search, ChevronLeft } from "lucide-react";
 import { useModules } from "@/contexts/ModulesContext";
 import { useAuthStore } from "@/store/authStore";
@@ -22,6 +24,38 @@ import { useShellBack } from "@/hooks/useShellBack";
 import { moduleRegistry, applyNavOverrides } from "@/lib/moduleRegistry";
 import type { ModuleNavItem } from "@/lib/moduleRegistry";
 import { makeTDynamic } from "@/lib/i18nHelpers";
+// How long the shell waits for a caller to toast the session end itself.
+const SESSION_END_GRACE_MS = 300;
+// The three sentences the API client gives a request that met the ended session.
+const SESSION_END_KEYS = [
+  "errors.sessionEnded",
+  "errors.sessionEndedRead",
+  "errors.sessionEndedReadUnsaved",
+] as const;
+
+/**
+ * A request that shows no toast of its own (a picker's search, a background
+ * read) would end the session without a word, so the shell says that what a
+ * form held was not kept — unless a toast with a session-end sentence is
+ * already on screen, which the callers' catch blocks raise right after the
+ * logout event.
+ */
+function sayWorkWasNotKept(t: (key: string) => string): void {
+  const sentences = SESSION_END_KEYS.map((key) => t(key));
+  const shown = toast
+    .getToasts()
+    .some(
+      (item) =>
+        !("dismiss" in item) &&
+        typeof item.title === "string" &&
+        sentences.includes(item.title),
+    );
+  if (shown) return;
+  toast.error(t("errors.sessionEndedReadUnsaved"), {
+    id: "session-ended-unsaved",
+  });
+}
+
 const NotificationTray = lazy(
   () => import("@/modules/announcements/components/NotificationTray"),
 );
@@ -73,12 +107,16 @@ export default function AppShell() {
   const homePath = focusModule ? "/" : "/launcher";
   useEffect(() => {
     const handleLogout = () => {
+      // The sign-in drops whatever a form on screen holds.
+      if (useFormGuardStore.getState().dirtyForm !== null) {
+        window.setTimeout(() => sayWorkWasNotKept(t), SESSION_END_GRACE_MS);
+      }
       logout();
       navigate("/login");
     };
     window.addEventListener("auth:logout", handleLogout);
     return () => window.removeEventListener("auth:logout", handleLogout);
-  }, [logout, navigate]);
+  }, [logout, navigate, t]);
 
   // Owner recognition searches every enabled module, hidden ones included:
   // a route opened by direct link still needs its shell and header even when
