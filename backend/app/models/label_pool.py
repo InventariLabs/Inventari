@@ -7,6 +7,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, synonym
 
 from app.database import Base
 
+if TYPE_CHECKING:
+    from app.models.item import Item
+    from app.models.organization import Organization
+    from app.models.storage_location import StorageLocation
+    from app.models.user import User
+
 
 class LabelPool(Base):
     __tablename__ = 'label_pool'
@@ -56,10 +62,10 @@ class LabelPool(Base):
     scan_count: Mapped[int] = mapped_column(Integer, default=0)
     last_scanned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
-    organization: Mapped['Organization'] = relationship()  # type: ignore[name-defined]
-    creator: Mapped['User'] = relationship()  # type: ignore[name-defined]
-    target_storage: Mapped['StorageLocation'] = relationship()  # type: ignore[name-defined]
-    assigned_item: Mapped['Item'] = relationship(foreign_keys=[item_id])  # type: ignore[name-defined]
+    organization: Mapped['Organization'] = relationship()
+    creator: Mapped['User'] = relationship()
+    target_storage: Mapped['StorageLocation'] = relationship()
+    assigned_item: Mapped['Item'] = relationship(foreign_keys=[item_id])
 
     if TYPE_CHECKING:
         # Non-DB enrichment attributes (populated at query time, not persisted)

@@ -17,11 +17,12 @@ on that date, not in the one the tree names today.
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from datetime import datetime
+from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import Row, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db_utils import in_ids
@@ -82,7 +83,7 @@ def subtree_of(
 
 async def _groups_holding_stock_async(
     db: AsyncSession, organization_id: UUID, location_ids: list[UUID]
-):
+) -> Sequence[Row[Any]]:
     view = stock_quants_from_records
     return (
         await db.execute(

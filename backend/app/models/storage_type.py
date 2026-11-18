@@ -57,8 +57,8 @@ class StorageType(Base):
     # Relationships
     storage_locations: Mapped[list['StorageLocation']] = relationship(
         back_populates='storage_type'
-    )  # type: ignore[name-defined]
-    organization: Mapped['Organization'] = relationship(back_populates='storage_types')  # type: ignore[name-defined]
+    )
+    organization: Mapped['Organization'] = relationship(back_populates='storage_types')
 
 
 #: The one order every reader of an organization's storage types uses.

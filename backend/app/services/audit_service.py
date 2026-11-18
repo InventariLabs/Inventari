@@ -33,11 +33,11 @@ freshness it trades away.
 """
 
 import uuid
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import ColumnElement, Row, ScalarSelect, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -50,6 +50,9 @@ from app.core.logging import get_logger
 from app.core.posting_batch import current_batch
 from app.core.utils import isoformat_or_none
 from app.models.audit_log import AuditLog
+
+if TYPE_CHECKING:
+    from app.models.item import Item
 
 logger = get_logger(__name__)
 
@@ -105,9 +108,9 @@ async def log_action_async(
     action: AuditAction,
     target_type: str,
     target_id: uuid.UUID,
-    snapshot: dict | None = None,
+    snapshot: dict[str, Any] | None = None,
     reason: str | None = None,
-    meta_data: dict | None = None,
+    meta_data: dict[str, Any] | None = None,
 ) -> AuditLog:
     """Persist a single AuditLog row inside the caller's transaction.
 
@@ -184,9 +187,9 @@ async def log_purge_async(
     user_id: uuid.UUID | None,
     target_type: str,
     target_id: uuid.UUID,
-    snapshot: dict | None = None,
+    snapshot: dict[str, Any] | None = None,
     reason: str | None = None,
-    meta_data: dict | None = None,
+    meta_data: dict[str, Any] | None = None,
 ) -> AuditLog:
     """Backward-compat wrapper for the legacy PURGE-only audit writer.
 
@@ -207,7 +210,7 @@ async def log_purge_async(
     )
 
 
-def audit_value(value):
+def audit_value(value: Any) -> object:
     """Serialise a field value **for the record**.
 
     Snapshots live in a JSONB column and are rendered by the Detail column,
@@ -225,7 +228,7 @@ def audit_value(value):
     return _render(value, decimal=lambda d: str(d))
 
 
-def audit_key(value):
+def audit_key(value: Any) -> object:
     """Normalise a field value **for comparison**, never for the record.
 
     Two records of the same fact must not read as a change. ``Decimal('1.000')``
@@ -246,7 +249,7 @@ def audit_key(value):
     return _render(value, decimal=float)
 
 
-def _render(value, *, decimal):
+def _render(value: Any, *, decimal: Callable[[Decimal], object]) -> object:
     """Shared walk. *decimal* decides what a ``Decimal`` becomes."""
     if isinstance(value, bool) or value is None:
         return value
@@ -276,7 +279,7 @@ def _render(value, *, decimal):
     return str(value)
 
 
-def item_to_snapshot(item) -> dict:
+def item_to_snapshot(item: 'Item') -> dict[str, Any]:
     data = {
         'id': str(item.id),
         'name': item.name,

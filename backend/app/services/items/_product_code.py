@@ -8,7 +8,7 @@ same rule.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from sqlalchemy import select
@@ -54,12 +54,15 @@ async def live_record_wearing_async(
     which is the state of every existing installation — so this is not an
     edge case, it is what most databases look like.
     """
-    return await db.scalar(
-        select(Item).where(
-            Item.organization_id == org_id,
-            Item.barcode == barcode,
-            Item.is_deleted.is_(False),
-        )
+    return cast(
+        Item | None,
+        await db.scalar(
+            select(Item).where(
+                Item.organization_id == org_id,
+                Item.barcode == barcode,
+                Item.is_deleted.is_(False),
+            )
+        ),
     )
 
 

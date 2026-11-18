@@ -13,10 +13,23 @@ from datetime import date
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import and_, case, distinct, false, func, literal, or_, select, true
+from sqlalchemy import (
+    Select,
+    and_,
+    case,
+    distinct,
+    false,
+    func,
+    literal,
+    or_,
+    select,
+    true,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session, aliased, lazyload, selectinload
+from sqlalchemy.sql.selectable import Subquery
 
+from app.core.contracts import UserContextDTO
 from app.core.db_utils import in_ids, paginate
 from app.core.exceptions import ContractViolationError, NotFoundException
 from app.core.read_scope import keep_loaded
@@ -45,7 +58,7 @@ from ._search_terms import item_matches_text
 
 
 def _apply_item_filters(  # noqa: C901 - the filter list is the list's contract
-    query,
+    query: Select[Any],
     *,
     organization_id: UUID | None = None,
     user_organization_id: UUID | None = None,
@@ -67,7 +80,7 @@ def _apply_item_filters(  # noqa: C901 - the filter list is the list's contract
     template_ids: list[UUID] | None = None,
     today: date | None = None,
     short_products_listed: bool = False,
-):
+) -> Select[Any]:
     """Every narrowing the items list supports, applied to any ``Item`` select.
 
     The list and the aggregates endpoint share this so the footer sums can
@@ -237,7 +250,7 @@ def _apply_item_filters(  # noqa: C901 - the filter list is the list's contract
 
 
 def _apply_dated_filters(
-    query,
+    query: Select[Any],
     *,
     today: date,
     expiring_days: int | None,
@@ -245,7 +258,7 @@ def _apply_dated_filters(
     needs_attention: bool,
     stock_org_id: UUID | None,
     claimed_tags: set[str] | None,
-):
+) -> Select[Any]:
     """The filters that ask which day it is, cut on the organization's *today*."""
     if expiring_days is not None:
         from app.services.items.expiry import is_expiring_soon
@@ -317,7 +330,7 @@ async def count_needing_attention_async(
 
 def get_items(
     db: Session,
-    user=None,
+    user: UserContextDTO | None = None,
     storage_id: UUID | None = None,
     category_id: UUID | None = None,
     context_tag: str | None = None,
@@ -648,7 +661,7 @@ def get_items_aggregates(
             func.sum(unit_price * Item.quantity).label('priced_value'),
             func.count(Item.id).filter(unit_price.is_(None)).label('unpriced'),
         ]
-    groups = _apply_item_filters(
+    grouped_records = _apply_item_filters(
         select(*group_columns)
         .select_from(Item)
         .join(StorageLocation, Item.storage_location_id == StorageLocation.id),
@@ -669,7 +682,7 @@ def get_items_aggregates(
         template_ids=template_ids,
         today=today,
     ).group_by(Item.organization_id, Item.template_id, Item.uom_id)
-    groups = groups.cte('record_groups')
+    groups = grouped_records.cte('record_groups')
 
     weight_kg, volume_l, measured = _weight_and_volume(groups)
 
@@ -932,7 +945,9 @@ def _ledger_value(
     )
 
 
-def _layer_average_rates(org_currency: str | None, organization_id: UUID | None = None):
+def _layer_average_rates(
+    org_currency: str | None, organization_id: UUID | None = None
+) -> Subquery:
     """Per (organization, product): the average cost of the layers on hand.
 
     The same figure ``core_api.valuation.get_rates_batch_async`` hands out,
@@ -993,7 +1008,7 @@ def _layer_average_rates(org_currency: str | None, organization_id: UUID | None 
     ).subquery()
 
 
-def _item_active_query(organization_id: UUID, item_id: UUID):
+def _item_active_query(organization_id: UUID, item_id: UUID) -> Select[Any]:
     return select(Item).where(
         Item.id == item_id,
         Item.organization_id == organization_id,
@@ -1001,7 +1016,7 @@ def _item_active_query(organization_id: UUID, item_id: UUID):
     )
 
 
-def _item_any_query(organization_id: UUID, item_id: UUID):
+def _item_any_query(organization_id: UUID, item_id: UUID) -> Select[Any]:
     return select(Item).where(
         Item.id == item_id,
         Item.organization_id == organization_id,

@@ -1,6 +1,8 @@
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_superuser
 from app.core.contracts import AnnouncementCreateDTO, AnnouncementDTO, UserContextDTO
@@ -15,9 +17,9 @@ router = APIRouter()
 async def get_all_announcements(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
-    db=Depends(get_async_db, scope='function'),
-    _superuser=Depends(get_superuser),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    _superuser: object = Depends(get_superuser),
+) -> Any:
     """Superuser-only: Fetch all announcements (active, expired, and future)."""
     announcements = await core_api.announcements.list_all_async(db)
     return PaginatedResponse.from_full_list(announcements, offset=offset, limit=limit)
@@ -27,9 +29,9 @@ async def get_all_announcements(
 async def get_active_announcements(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     current_user: UserContextDTO = Depends(get_current_user_context),
-):
+) -> Any:
     """Fetch all currently active global announcements."""
     announcements = await core_api.announcements.list_active_async(db)
     return PaginatedResponse.from_full_list(announcements, offset=offset, limit=limit)
@@ -38,10 +40,10 @@ async def get_active_announcements(
 @router.post('', response_model=AnnouncementDTO, status_code=status.HTTP_201_CREATED)
 async def create_announcement(
     announcement_in: AnnouncementCreateDTO,
-    db=Depends(get_async_db, scope='function'),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
     current_user: UserContextDTO = Depends(get_current_user_context),
-    _superuser=Depends(get_superuser),
-):
+    _superuser: object = Depends(get_superuser),
+) -> Any:
     """Superuser-only: Create a new installation-wide announcement.
 
     Announcements carry no ``organization_id`` — one row is read by every
@@ -55,9 +57,9 @@ async def create_announcement(
 @router.delete('/{announcement_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_announcement(
     announcement_id: UUID,
-    db=Depends(get_async_db, scope='function'),
-    _superuser=Depends(get_superuser),
-):
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    _superuser: object = Depends(get_superuser),
+) -> None:
     """Superuser-only: Delete an announcement."""
     deleted = await core_api.announcements.delete_async(db, announcement_id)
     if not deleted:

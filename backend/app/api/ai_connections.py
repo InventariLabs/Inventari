@@ -38,6 +38,7 @@ The router is registered in app/main.py with prefix
 
 from __future__ import annotations
 
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -145,7 +146,7 @@ async def list_connections(
     offset: int = Query(0, ge=0),
     org_id: UUID = Depends(require_org),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """List the caller's org connections."""
     connections = await core_api.ai_connections.list_async(db, org_id)
     return PaginatedResponse.from_full_list(connections, offset=offset, limit=limit)
@@ -158,7 +159,7 @@ async def create_connection(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ORG_SETTINGS_WRITE),
-):
+) -> Any:
     """Create a new connection.
 
     Returns 409 on the unique-constraint violation
@@ -199,13 +200,13 @@ async def list_purposes(
     offset: int = Query(0, ge=0),
     org_id: UUID = Depends(require_org),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """List every registered purpose with the caller's binding UUID."""
     purposes = await core_api.ai_connections.list_purposes_async(db, org_id)
     return PaginatedResponse.from_full_list(purposes, offset=offset, limit=limit)
 
 
-@router.put('/bindings')
+@router.put('/bindings', response_model=None)
 @map_service_errors
 async def set_binding(
     data: SetBindingRequest,
@@ -213,7 +214,7 @@ async def set_binding(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ORG_SETTINGS_WRITE),
-):
+) -> dict[str, bool]:
     """Set a purpose->connection binding on org settings.
 
     400 when the purpose key is not registered.
@@ -224,13 +225,13 @@ async def set_binding(
     return {'bound': True}
 
 
-@router.post('/test')
+@router.post('/test', response_model=None)
 async def test_connection_endpoint(
     data: TestConnectionRequest,
     org_id: UUID = Depends(require_org),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ORG_SETTINGS_WRITE),
-):
+) -> dict[str, Any]:
     """Test a connection: credentials first, then the output contract.
 
     Accepts either an existing ``connection_id`` (uses the stored cipher)
@@ -344,7 +345,7 @@ async def get_connection(
     conn_id: UUID,
     org_id: UUID = Depends(require_org),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """Read one — 404 on missing OR cross-tenant. The public API
     refuses to leak existence across orgs, returning None which we
     map to 404."""
@@ -362,7 +363,7 @@ async def update_connection(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ORG_SETTINGS_WRITE),
-):
+) -> Any:
     """PATCH-style update. ``api_key='**********'`` means leave the
     existing cipher alone.
 
@@ -402,14 +403,14 @@ async def update_connection(
     return result
 
 
-@router.delete('/{conn_id}')
+@router.delete('/{conn_id}', response_model=None)
 async def delete_connection(
     conn_id: UUID,
     org_id: UUID = Depends(require_org),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ORG_SETTINGS_WRITE),
-):
+) -> dict[str, bool]:
     """Delete a connection. 409 when the row is still bound to any
     declared purpose (caller must detach the binding first)."""
     before = await core_api.ai_connections.get_async(db, org_id, conn_id)

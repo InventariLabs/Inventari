@@ -8,9 +8,10 @@ and warehouse turnover alike.
 from __future__ import annotations
 
 from datetime import date, timedelta
+from typing import Any
 from uuid import UUID
 
-from sqlalchemy import ColumnElement, func, select
+from sqlalchemy import ColumnElement, Row, Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import (
@@ -180,7 +181,7 @@ async def get_rotation_analysis_async(
     )
 
 
-def _stock_columns(today: date):
+def _stock_columns(today: date) -> tuple[Any, ...]:
     """Shared column list for slow_movers / dead_stock detail queries."""
     return (
         Item.id,
@@ -205,7 +206,7 @@ def _stock_detail_stmt(
     limit: int = 10,
     *,
     scope: ColumnElement[bool],
-):
+) -> Select[Any]:
     """Build a slow-mover or dead-stock detail query by age window."""
     stmt = (
         select(*_stock_columns(today))
@@ -232,7 +233,7 @@ def _value_stmt(
     min_days: int,
     max_days: int | None,
     scope: ColumnElement[bool],
-):
+) -> Select[Any]:
     """Value of the records in an age window: price times quantity.
 
     Off the records, because age belongs to a record on a shelf and the cost
@@ -259,7 +260,7 @@ def _count_stmt(
     min_days: int,
     max_days: int | None,
     scope: ColumnElement[bool],
-):
+) -> Select[Any]:
     stmt = select(func.count(Item.id)).where(
         Item.organization_id == org_id,
         Item.is_deleted.is_(False),
@@ -272,7 +273,7 @@ def _count_stmt(
     return stmt
 
 
-def _row_to_dto(row, today: date) -> RotationItemDTO:
+def _row_to_dto(row: Row[Any], today: date) -> RotationItemDTO:
     days = row.days_in_storage
     return RotationItemDTO(
         item_id=str(row.id),
@@ -287,7 +288,7 @@ def _row_to_dto(row, today: date) -> RotationItemDTO:
     )
 
 
-def _stats_of(result) -> tuple[float, float, int]:
+def _stats_of(result: Any) -> tuple[float, float, int]:
     """``(average, median, count)`` from a one-row (avg, median, count) select.
 
     The first two are NULL when nothing matched, which reads as zero here:

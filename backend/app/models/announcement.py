@@ -46,5 +46,5 @@ class Announcement(Base):
     )
     created_by: Mapped[uuid.UUID | None] = mapped_column(nullable=True)  # Admin ID
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<Announcement(title="{self.title}", type="{self.type}")>'

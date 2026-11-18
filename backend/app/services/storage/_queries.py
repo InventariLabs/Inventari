@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from typing import cast
 from uuid import UUID
 
 from sqlalchemy import exists, func, literal, or_, select
@@ -429,11 +430,14 @@ async def get_storage_async(
     db: AsyncSession, organization_id: UUID, storage_id: UUID
 ) -> StorageLocation | None:
     """Async: fetch a single storage location by ID within organization."""
-    return await db.scalar(
-        select(StorageLocation).where(
-            StorageLocation.id == storage_id,
-            StorageLocation.organization_id == organization_id,
-        )
+    return cast(
+        StorageLocation | None,
+        await db.scalar(
+            select(StorageLocation).where(
+                StorageLocation.id == storage_id,
+                StorageLocation.organization_id == organization_id,
+            )
+        ),
     )
 
 
@@ -441,11 +445,14 @@ async def find_by_context_tag_async(
     db: AsyncSession, organization_id: UUID, context_tag: str
 ) -> StorageLocation | None:
     """Async: find first storage location with given context_tag."""
-    return await db.scalar(
-        select(StorageLocation).where(
-            StorageLocation.organization_id == organization_id,
-            StorageLocation.context_tag == context_tag,
-        )
+    return cast(
+        StorageLocation | None,
+        await db.scalar(
+            select(StorageLocation).where(
+                StorageLocation.organization_id == organization_id,
+                StorageLocation.context_tag == context_tag,
+            )
+        ),
     )
 
 
@@ -638,14 +645,17 @@ async def list_storages_by_ids_async(
     return sorted(found, key=lambda row: row.name)
 
 
-def not_archived_condition():
+def not_archived_condition() -> ColumnElement[bool]:
     """SQLAlchemy condition: archived rows are hidden from lists.
 
        The flag lives in the existing JSON ``settings`` (no Core column, per
     the decision) — ``settings->>'archived' IS DISTINCT FROM 'true'``
        keeps rows with NULL/missing flags visible.
     """
-    return StorageLocation.settings['archived'].as_string().is_distinct_from('true')
+    return cast(
+        ColumnElement[bool],
+        StorageLocation.settings['archived'].as_string().is_distinct_from('true'),
+    )
 
 
 async def list_archived_async(
@@ -679,11 +689,11 @@ async def list_archived_async(
 
 
 async def get_breadcrumb_async(
-    db: AsyncSession, storage_id, organization_id
+    db: AsyncSession, storage_id: UUID, organization_id: UUID
 ) -> list[StorageLocationBreadcrumb]:
     path: list[StorageLocationBreadcrumb] = []
-    current_id = storage_id
-    visited: set = set()
+    current_id: UUID | None = storage_id
+    visited: set[UUID] = set()
     while current_id and current_id not in visited:
         visited.add(current_id)
         loc = await db.scalar(
@@ -701,11 +711,11 @@ async def get_breadcrumb_async(
 
 def build_tree(
     locations: list[StorageLocation],
-    item_counts: dict,
+    item_counts: dict[UUID, int],
 ) -> list[StorageLocationNode]:
     """Builds a nested tree from a flat list of StorageLocation objects."""
-    node_map: dict = {}
-    below: dict = {}
+    node_map: dict[UUID, StorageLocationNode] = {}
+    below: dict[UUID, int] = {}
     for loc in locations:
         if loc.parent_id is not None and loc.parent_id != loc.id:
             below[loc.parent_id] = below.get(loc.parent_id, 0) + 1
@@ -740,7 +750,7 @@ def build_tree(
     # in GET /locations but not in GET /locations/tree, making their items
     # unreachable from the whole UI. Append them as standalone roots instead
     # and log a warning so pre-existing damage stays visible and repairable.
-    reachable: set = set()
+    reachable: set[UUID] = set()
     stack = list(roots)
     while stack:
         node = stack.pop()
@@ -897,12 +907,15 @@ async def scannable_code_async(
     )
     if own:
         return own
-    return await db.scalar(
-        select(func.min(LabelPool.short_code)).where(
-            LabelPool.target_storage_location_id == storage_id,
-            LabelPool.organization_id == organization_id,
-            LabelPool.label_type == 'STORAGE',
-        )
+    return cast(
+        str | None,
+        await db.scalar(
+            select(func.min(LabelPool.short_code)).where(
+                LabelPool.target_storage_location_id == storage_id,
+                LabelPool.organization_id == organization_id,
+                LabelPool.label_type == 'STORAGE',
+            )
+        ),
     )
 
 
@@ -924,15 +937,18 @@ async def find_by_scanned_code_async(
     )
     if shelf is not None:
         return shelf
-    return await db.scalar(
-        select(StorageLocation)
-        .join(
-            LabelPool,
-            LabelPool.target_storage_location_id == StorageLocation.id,
-        )
-        .where(
-            LabelPool.short_code == code,
-            LabelPool.organization_id == organization_id,
-            LabelPool.label_type == 'STORAGE',
-        )
+    return cast(
+        StorageLocation | None,
+        await db.scalar(
+            select(StorageLocation)
+            .join(
+                LabelPool,
+                LabelPool.target_storage_location_id == StorageLocation.id,
+            )
+            .where(
+                LabelPool.short_code == code,
+                LabelPool.organization_id == organization_id,
+                LabelPool.label_type == 'STORAGE',
+            )
+        ),
     )

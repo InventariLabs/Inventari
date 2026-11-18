@@ -9,6 +9,7 @@ without pulling in the heavier write-side code paths.
 from __future__ import annotations
 
 from collections.abc import Iterable
+from typing import cast
 from uuid import UUID
 
 from sqlalchemy import Select, func, or_, select
@@ -234,13 +235,16 @@ async def get_template_by_barcode_async(
     template = await db.scalar(template_by_code_query(org_id, code))
     if template is not None:
         return template
-    return await db.scalar(
-        select(ProductTemplate)
-        .join(Item, Item.template_id == ProductTemplate.id)
-        .where(
-            Item.barcode == code,
-            Item.organization_id == org_id,
-            Item.is_deleted.is_(False),
-        )
-        .order_by(Item.created_at.desc())
+    return cast(
+        ProductTemplate | None,
+        await db.scalar(
+            select(ProductTemplate)
+            .join(Item, Item.template_id == ProductTemplate.id)
+            .where(
+                Item.barcode == code,
+                Item.organization_id == org_id,
+                Item.is_deleted.is_(False),
+            )
+            .order_by(Item.created_at.desc())
+        ),
     )

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from decimal import Decimal
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import Date, cast, func, or_, select
@@ -157,7 +158,7 @@ async def _compute_wasted_by_product_async(
     storage_ids: list[UUID],
     date_from: datetime,
     hidden_tags: set[str] | None = None,
-) -> tuple[Decimal, dict[str, dict]]:
+) -> tuple[Decimal, dict[str, dict[str, Any]]]:
     """What was thrown away, per product, priced by the valuation ledger.
 
     The figure is read from the valuation ledger, not from
@@ -198,8 +199,8 @@ async def _compute_wasted_by_product_async(
     wasted_value = await wasted_value_by_item_async(db, organization_id, date_from)
 
     total_wasted = Decimal('0')
-    wasted_by_product: dict[str, dict] = {}
-    counted: set = set()
+    wasted_by_product: dict[str, dict[str, Any]] = {}
+    counted: set[Any] = set()
     for record in discarded_history:
         name = record.name
         wasted_by_product.setdefault(
@@ -228,9 +229,9 @@ async def _compute_category_costs_async(
     storage_ids: list[UUID],
     org_currency: str,
     date_from: datetime,
-    wasted_by_product: dict[str, dict],
+    wasted_by_product: dict[str, dict[str, Any]],
     hidden_tags: set[str] | None = None,
-) -> dict[UUID | None, dict]:
+) -> dict[UUID | None, dict[str, Any]]:
     """Per-category spent + items_count, merged with wasted amounts.
 
     The top-5 by total_spent is applied by the caller.
@@ -276,7 +277,7 @@ async def _compute_category_costs_async(
         )
         .group_by(Category.id, Category.name, Category.code)
     )
-    category_costs: dict[UUID | None, dict] = {}
+    category_costs: dict[UUID | None, dict[str, Any]] = {}
     for row in category_costs_result.all():
         category_costs[row.category_id] = {
             'category_name': row.category_name,
@@ -295,7 +296,7 @@ async def _compute_category_costs_async(
 
 
 def _build_savings_opportunities(
-    wasted_by_product: dict[str, dict],
+    wasted_by_product: dict[str, dict[str, Any]],
 ) -> list[SavingsOpportunityDTO]:
     """Top-5 products with waste, each paired with a planning suggestion."""
     return [

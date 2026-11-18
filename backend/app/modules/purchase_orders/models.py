@@ -3,6 +3,7 @@
 import uuid
 from datetime import date, datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import (
     CheckConstraint,
@@ -19,6 +20,11 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, synonym
 
 from app.core.module_sdk import utc_now
 from app.database import Base
+
+# Core tables this module may not import, even for typing, stay ``Any`` here:
+# the relationship names its class to SQLAlchemy as a string.
+if TYPE_CHECKING:
+    from app.models.product_template import ProductTemplate
 
 
 class PurchaseOrder(Base):
@@ -76,8 +82,8 @@ class PurchaseOrder(Base):
         lazy='selectin',
     )
 
-    organization: Mapped['Organization'] = relationship(lazy='selectin')  # type: ignore[name-defined]
-    partner: Mapped['Partner | None'] = relationship(lazy='selectin')  # type: ignore[name-defined]
+    organization: Mapped[Any] = relationship('Organization', lazy='selectin')
+    partner: Mapped[Any] = relationship('Partner', lazy='selectin')
 
     def __repr__(self) -> str:
         return f'<PurchaseOrder(number="{self.number}", status="{self.status}")>'
@@ -130,8 +136,8 @@ class PurchaseOrderLine(Base):
     purchase_order: Mapped['PurchaseOrder'] = relationship(
         back_populates='lines', lazy='selectin'
     )
-    product_template: Mapped['ProductTemplate | None'] = relationship(lazy='selectin')  # type: ignore[name-defined]
-    uom: Mapped['Uom | None'] = relationship(lazy='joined', foreign_keys=[uom_id])  # type: ignore[name-defined]
+    product_template: Mapped['ProductTemplate | None'] = relationship(lazy='selectin')
+    uom: Mapped[Any] = relationship('Uom', lazy='joined', foreign_keys=[uom_id])
 
     def __repr__(self) -> str:
         return f'<PurchaseOrderLine(name="{self.name}", qty={self.quantity_ordered})>'
@@ -218,9 +224,9 @@ class ReorderRule(Base):
         onupdate=utc_now,
     )
 
-    product_template: Mapped['ProductTemplate'] = relationship(lazy='selectin')  # type: ignore[name-defined]
-    storage_location: Mapped['StorageLocation'] = relationship(lazy='selectin')  # type: ignore[name-defined]
-    preferred_partner: Mapped['Partner | None'] = relationship(lazy='selectin')  # type: ignore[name-defined]
+    product_template: Mapped['ProductTemplate'] = relationship(lazy='selectin')
+    storage_location: Mapped[Any] = relationship('StorageLocation', lazy='selectin')
+    preferred_partner: Mapped[Any] = relationship('Partner', lazy='selectin')
 
     @property
     def product_name(self) -> str:
@@ -344,9 +350,9 @@ class PartnerPricelist(Base):
         onupdate=utc_now,
     )
 
-    partner: Mapped['Partner'] = relationship(lazy='selectin')  # type: ignore[name-defined]
-    product_template: Mapped['ProductTemplate'] = relationship(lazy='selectin')  # type: ignore[name-defined]
-    uom: Mapped['Uom | None'] = relationship(lazy='joined', foreign_keys=[uom_id])  # type: ignore[name-defined]
+    partner: Mapped[Any] = relationship('Partner', lazy='selectin')
+    product_template: Mapped['ProductTemplate'] = relationship(lazy='selectin')
+    uom: Mapped[Any] = relationship('Uom', lazy='joined', foreign_keys=[uom_id])
 
     @property
     def product_name(self) -> str:

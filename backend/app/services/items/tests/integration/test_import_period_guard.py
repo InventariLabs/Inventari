@@ -16,6 +16,9 @@ ledger untouched.
 from __future__ import annotations
 
 from datetime import date
+from decimal import Decimal
+from typing import Any, cast
+from uuid import UUID
 
 import pandas as pd
 import pytest
@@ -26,12 +29,13 @@ from app.core.contracts import UserContextDTO
 from app.models.item import Item
 from app.models.stock_move import StockMove
 from app.models.storage_location import StorageLocation
+from app.models.user import User
 from app.modules.warehouse.inventory_period_service import close_period
 from app.services.items import import_items
 from app.services.items._stock_quant import apply_quantity_change_async
 
 
-def _make_user_ctx(user) -> UserContextDTO:
+def _make_user_ctx(user: User) -> UserContextDTO:
     """Minimal user context matching what ``import_items`` reads."""
     return UserContextDTO(
         organization_id=user.organization_id,
@@ -40,13 +44,16 @@ def _make_user_ctx(user) -> UserContextDTO:
     )
 
 
-def _make_csv_bytes(rows: list[dict]) -> bytes:
+def _make_csv_bytes(rows: list[dict[str, Any]]) -> bytes:
     """Encode rows as CSV bytes, matching the import endpoint's input."""
-    return pd.DataFrame(rows).to_csv(index=False).encode()
+    return cast(bytes, pd.DataFrame(rows).to_csv(index=False).encode())
 
 
-async def _close_current_period(db: AsyncSession, org_id, user_id) -> None:
+async def _close_current_period(
+    db: AsyncSession, org_id: UUID | None, user_id: UUID
+) -> None:
     """Close the period containing ``date.today()`` for the given org."""
+    assert org_id is not None
     today = date.today()
     await close_period(db, org_id, today.year, today.month, user_id)
 
@@ -58,8 +65,8 @@ class TestImportFailedRowNotPersisted:
     async def test_import_row_failed_on_closed_period_is_not_persisted(
         self,
         real_async_db_session: AsyncSession,
-        async_test_user,
-        async_test_storage_location,
+        async_test_user: User,
+        async_test_storage_location: StorageLocation,
     ) -> None:
         """A row rejected on a closed period must not end up in the DB.
 
@@ -136,7 +143,7 @@ class TestImportFailedRowCacheRollback:
     async def test_failed_row_does_not_poison_storage_cache(
         self,
         real_async_db_session: AsyncSession,
-        async_test_user,
+        async_test_user: User,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Row 1 creates storage 'NewWH' then fails; row 2 reuses 'NewWH'.
@@ -153,7 +160,9 @@ class TestImportFailedRowCacheRollback:
         # cause, and ``explain`` passes a ValueError through verbatim — so
         # the assertion below pins the actual reason this row failed, not
         # just its position.
-        async def fail_first_call(db, item, new_quantity, **kwargs):
+        async def fail_first_call(
+            db: AsyncSession, item: Item, new_quantity: Decimal, **kwargs: Any
+        ) -> Any:
             nonlocal calls
             calls += 1
             if calls == 1:

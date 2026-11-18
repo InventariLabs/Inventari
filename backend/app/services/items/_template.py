@@ -375,7 +375,7 @@ def update_product_template_nutrition(
     db: Session,
     template_id: UUID,
     org_id: UUID,
-    nutrition_info: dict | None,
+    nutrition_info: dict[str, Any] | None,
 ) -> ProductTemplate:
     """Update nutrition_info on a ProductTemplate scoped to the organization."""
 

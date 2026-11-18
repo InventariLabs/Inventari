@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import UTC, datetime
+from typing import Any
 
 from sqlalchemy import (
     DateTime,
@@ -83,7 +84,7 @@ class AiConnection(Base):
     #: was being thrown away: the probe ran, judged the answer, and told nobody
     #: but the toast. A capability absent here has never been tested; present
     #: with ``ok: false`` failed the last time it was.
-    capability_checks: Mapped[dict[str, dict]] = mapped_column(
+    capability_checks: Mapped[dict[str, dict[str, Any]]] = mapped_column(
         JSONB, nullable=False, default=dict, server_default='{}'
     )
 

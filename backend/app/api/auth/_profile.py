@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,7 +28,7 @@ router = APIRouter()
 async def get_me(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """Fetches currently logged in user's profile, with their permissions.
 
     The permission set is what makes frontend gating possible at all: without
@@ -63,7 +65,7 @@ async def update_me(
     user_update: UserUpdate,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """Update current user's profile."""
     update_data = user_update.model_dump(exclude_unset=True)
     try:
@@ -85,7 +87,7 @@ async def update_my_language(
     language_update: LanguageUpdate,
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-):
+) -> Any:
     """Update current user's preferred language."""
     try:
         return await AuthService.update_user_profile_async(

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, timedelta
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import Select, case, func, or_, select
@@ -56,7 +57,7 @@ class HealthCounts:
     low_stock: int
 
 
-def _internal_shelves(organization_id: UUID) -> Select:
+def _internal_shelves(organization_id: UUID) -> Select[Any]:
     # The organization's own shelves, asked of the locations table inside the
     # statement: a list of their ids bound one by one ran past what one
     # statement may carry, and as ``= ANY(...)`` it steered the planner onto
@@ -67,7 +68,7 @@ def _internal_shelves(organization_id: UUID) -> Select:
     )
 
 
-def _dated_counts_query(organization_id: UUID, today: date) -> Select:
+def _dated_counts_query(organization_id: UUID, today: date) -> Select[Any]:
     horizon = today + timedelta(days=DEFAULT_EXPIRING_SOON_DAYS)
     return select(
         func.count(case((is_expiring_soon(today), 1))).label('expiring_soon'),

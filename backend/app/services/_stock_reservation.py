@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
 from decimal import Decimal
+from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 from sqlalchemy import func, select
@@ -30,6 +31,9 @@ from app.services._stock_quant_ops import (
     lock_stock_async,
 )
 from app.services.stock_strategy import resolve_removal_strategy
+
+if TYPE_CHECKING:
+    from app.models.stock_reservation import StockReservation
 
 logger = get_logger(__name__)
 
@@ -329,7 +333,7 @@ async def list_reservations_async(
     location_id: UUID | None = None,
     document_id: UUID | None = None,
     limit: int = 500,
-):
+) -> list[StockReservation]:
     """List per-document stock reservations, newest first.
 
     Returns ORM ``StockReservation`` rows; the caller maps to DTOs. The

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import uuid
+from typing import cast
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -98,12 +99,15 @@ async def get_template_async(
     template_id: uuid.UUID,
     module: str,
 ) -> DocumentTemplate | None:
-    return await db.scalar(
-        select(DocumentTemplate).where(
-            DocumentTemplate.id == template_id,
-            DocumentTemplate.organization_id == org_id,
-            DocumentTemplate.module == module,
-        )
+    return cast(
+        DocumentTemplate | None,
+        await db.scalar(
+            select(DocumentTemplate).where(
+                DocumentTemplate.id == template_id,
+                DocumentTemplate.organization_id == org_id,
+                DocumentTemplate.module == module,
+            )
+        ),
     )
 
 

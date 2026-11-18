@@ -8,6 +8,7 @@ not the act also rose to the organization journal.
 """
 
 import uuid
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,7 +27,7 @@ async def log_async(
     organization_id: UUID,
     user_id: UUID,
     action: str,
-    changes: dict,
+    changes: dict[str, Any],
 ) -> None:
     """Create an ItemHistory record and flush (caller commits)."""
     entry = ItemHistory(
@@ -44,7 +45,7 @@ async def log_history_async(
     db: AsyncSession,
     item: Item,
     action: ItemAction,
-    changes: dict,
+    changes: dict[str, Any],
     user_id: UUID | None = None,
     source_document_id: UUID | None = None,
 ) -> None:

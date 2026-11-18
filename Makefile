@@ -402,9 +402,10 @@ quality-index: ## Compute Quality Index (track weekly, target >90)
 	@echo "$(BLUE)[INFO]$(NC) Computing Quality Index..."
 	$(BACKEND_EXEC) uv run python scripts/quality_index.py
 
-typecheck: ## Run mypy type checking on app/core + strict modules
-	@echo "$(BLUE)[INFO]$(NC) Running mypy on app/core + strict modules..."
+typecheck: ## Run mypy type checking on the Core layers + strict modules
+	@echo "$(BLUE)[INFO]$(NC) Running mypy on the Core layers + strict modules..."
 	$(BACKEND_EXEC) uv run mypy app/core app/cli \
+		app/api app/services app/schemas app/models \
 		app/modules/api_keys app/modules/printing app/modules/example_widgets \
 		app/modules/nutrition app/modules/vision app/modules/webhooks \
 		app/modules/shopping_lists \

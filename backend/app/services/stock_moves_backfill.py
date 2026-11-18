@@ -39,7 +39,7 @@ def _to_decimal(value: Any) -> Decimal | None:
         return None
 
 
-def _extract_quantity(changes: dict | None) -> Decimal | None:
+def _extract_quantity(changes: dict[str, Any] | None) -> Decimal | None:
     if not changes:
         return None
     for key in _QUANTITY_KEYS:
@@ -50,7 +50,7 @@ def _extract_quantity(changes: dict | None) -> Decimal | None:
     return None
 
 
-def _extract_from_to(changes: dict) -> tuple[UUID | None, UUID | None]:
+def _extract_from_to(changes: dict[str, Any]) -> tuple[UUID | None, UUID | None]:
     """Pull from/to location UUIDs from a free-form ``changes`` dict.
 
     Tries several common key spellings.  Returns (None, None) if either

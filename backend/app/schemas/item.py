@@ -1,12 +1,13 @@
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Any, Literal
+from typing import Any, Literal, Self
 from uuid import UUID
 
 from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    ModelWrapValidatorHandler,
     PrivateAttr,
     field_validator,
     model_validator,
@@ -51,7 +52,9 @@ class _QuantityAsNamed(BaseModel):
 
     @model_validator(mode='wrap')
     @classmethod
-    def _remember_quantity_as_named(cls, data, handler):
+    def _remember_quantity_as_named(
+        cls, data: Any, handler: ModelWrapValidatorHandler[Self]
+    ) -> Self:
         model = handler(data)
         if isinstance(data, dict) and data.get('quantity') is not None:
             model._quantity_as_named = Decimal(decimal_from_int_float(data['quantity']))
@@ -94,7 +97,7 @@ class ItemBase(BaseModel):
 
     @field_validator('barcode', mode='before')
     @classmethod
-    def normalize_barcode_field(cls, v):
+    def normalize_barcode_field(cls, v: Any) -> Any:
         return normalize_barcode(v)
 
     @field_validator(
@@ -105,24 +108,24 @@ class ItemBase(BaseModel):
         check_fields=False,
     )
     @classmethod
-    def empty_string_to_none_field(cls, v):
+    def empty_string_to_none_field(cls, v: Any) -> Any:
         return empty_string_to_none(v)
 
     @field_validator('expiry_date', 'freeze_date', mode='before')
     @classmethod
-    def empty_string_date_to_none(cls, v):
+    def empty_string_date_to_none(cls, v: Any) -> Any:
         if v == '' or v is None:
             return None
         return v
 
     @field_validator('quantity', mode='before')
     @classmethod
-    def to_decimal(cls, v):
+    def to_decimal(cls, v: Any) -> Any:
         return decimal_from_int_float(v)
 
     @field_validator('quantity', mode='after')
     @classmethod
-    def to_store_precision(cls, v):
+    def to_store_precision(cls, v: Any) -> Any:
         return quantize_quantity(v)
 
 
@@ -215,17 +218,17 @@ class ItemCreate(_QuantityAsNamed, ItemBase):
 
     @field_validator('sku', mode='before')
     @classmethod
-    def normalize_sku_field(cls, v):
+    def normalize_sku_field(cls, v: Any) -> Any:
         return normalize_sku(v)
 
     @model_validator(mode='before')
     @classmethod
-    def _accept_meta_data_spelling(cls, data):
+    def _accept_meta_data_spelling(cls, data: Any) -> Any:
         return _fold_meta_data_spelling(data)
 
     @field_validator('currency', mode='before')
     @classmethod
-    def default_currency(cls, v):
+    def default_currency(cls, v: Any) -> Any:
         return v or None
 
 
@@ -244,7 +247,7 @@ class ItemUpdate(_QuantityAsNamed):
 
     @field_validator('barcode', mode='before')
     @classmethod
-    def normalize_barcode_field(cls, v):
+    def normalize_barcode_field(cls, v: Any) -> Any:
         return normalize_barcode(v)
 
     expiry_date: date | None = None
@@ -268,22 +271,22 @@ class ItemUpdate(_QuantityAsNamed):
 
     @field_validator('sku', mode='before')
     @classmethod
-    def normalize_sku_field(cls, v):
+    def normalize_sku_field(cls, v: Any) -> Any:
         return normalize_sku(v)
 
     @field_validator('quantity', mode='before')
     @classmethod
-    def to_decimal(cls, v):
+    def to_decimal(cls, v: Any) -> Any:
         return decimal_from_int_float(v)
 
     @field_validator('quantity', mode='after')
     @classmethod
-    def to_store_precision(cls, v):
+    def to_store_precision(cls, v: Any) -> Any:
         return quantize_quantity(v)
 
     @model_validator(mode='before')
     @classmethod
-    def _accept_meta_data_spelling(cls, data):
+    def _accept_meta_data_spelling(cls, data: Any) -> Any:
         return _fold_meta_data_spelling(data)
 
 
@@ -304,12 +307,12 @@ class ItemQuantityUpdate(_QuantityAsNamed):
 
     @field_validator('quantity', mode='before')
     @classmethod
-    def to_decimal(cls, v):
+    def to_decimal(cls, v: Any) -> Any:
         return decimal_from_int_float(v)
 
     @field_validator('quantity', mode='after')
     @classmethod
-    def to_store_precision(cls, v):
+    def to_store_precision(cls, v: Any) -> Any:
         return quantize_quantity(v)
 
 
@@ -348,7 +351,7 @@ class ItemImportResponse(BaseModel):
     updated: int = 0
     skipped: int = 0
     failed: int
-    errors: list[dict] = []
+    errors: list[dict[str, Any]] = []
     created_locations: list[str] = []
     created_categories: list[str] = []
 
@@ -408,7 +411,7 @@ class Item(ItemBase):
 
     @model_validator(mode='before')
     @classmethod
-    def map_meta_data_to_metadata(cls, data):
+    def map_meta_data_to_metadata(cls, data: Any) -> Any:
         # Pydantic model instances (e.g. ItemDTO returned by the CoreAPI):
         # dump to a dict and normalize the embedded uom — UomDTO carries no
         # `category` relation, so build UomInfo from the flat fields instead
@@ -469,7 +472,7 @@ class Item(ItemBase):
         return data
 
     @model_validator(mode='after')
-    def fix_metadata_property(self):
+    def fix_metadata_property(self) -> Self:
         # Override the SQLAlchemy .metadata property with the actual meta_data value
         if hasattr(self, '__dict__') and 'meta_data' in self.__dict__:
             object.__setattr__(self, 'metadata', self.__dict__['meta_data'])
@@ -486,7 +489,7 @@ class ItemConsumeRequest(BaseModel):
 
     @field_validator('quantity', mode='before')
     @classmethod
-    def to_decimal(cls, v):
+    def to_decimal(cls, v: Any) -> Any:
         return decimal_from_int_float(v)
 
 
@@ -506,7 +509,7 @@ class ItemUsePartiallyRequest(BaseModel):
 
     @field_validator('left', mode='before')
     @classmethod
-    def to_decimal(cls, v):
+    def to_decimal(cls, v: Any) -> Any:
         return decimal_from_int_float(v)
 
 
@@ -523,7 +526,7 @@ class ItemDiscardRequest(BaseModel):
 
     @field_validator('quantity', mode='before')
     @classmethod
-    def to_decimal(cls, v):
+    def to_decimal(cls, v: Any) -> Any:
         return decimal_from_int_float(v)
 
 
@@ -546,7 +549,7 @@ class ItemBulkUpdate(BaseModel):
     update_data: ItemUpdate
 
 
-class ItemListResponse(PaginatedResponse[Item]):  # type: ignore[type-arg]
+class ItemListResponse(PaginatedResponse[Item]):
     """Paginated response for the items list endpoint.
 
     Concrete specialisation of PaginatedResponse[Item] — provides a stable

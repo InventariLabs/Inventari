@@ -1,5 +1,6 @@
 """SKU generation and validation service, and the internal product code."""
 
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import or_, select
@@ -11,7 +12,7 @@ from app.core.exceptions import ContractViolationError
 
 class SkuService:
     @staticmethod
-    def get_schema(db: Session, org_id: UUID) -> dict | None:
+    def get_schema(db: Session, org_id: UUID) -> dict[str, Any] | None:
         """Get SKU naming schema for organization."""
         from app.models.organization import Organization
 
@@ -21,7 +22,7 @@ class SkuService:
         return org.settings.get('sku_schema')
 
     @staticmethod
-    def set_schema(db: Session, org_id: UUID, schema: dict) -> dict:
+    def set_schema(db: Session, org_id: UUID, schema: dict[str, Any]) -> dict[str, Any]:
         """Set SKU naming schema for organization. Flushes but does not commit."""
         from app.models.organization import Organization
 

@@ -104,8 +104,8 @@ class ModuleEnablePreview(BaseModel):
 
 
 class ModuleSettingsResponse(BaseModel):
-    settings: dict
-    settings_schema: dict | None = None
+    settings: dict[str, Any]
+    settings_schema: dict[str, Any] | None = None
 
 
 class ModuleSettingsUpdateResponse(BaseModel):
@@ -113,7 +113,7 @@ class ModuleSettingsUpdateResponse(BaseModel):
 
 
 class SkuSchemaResponse(BaseModel):
-    sku_schema: dict
+    sku_schema: dict[str, Any]
 
 
 class RegistrationRequestResponse(BaseModel):

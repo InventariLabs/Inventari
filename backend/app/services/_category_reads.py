@@ -1,3 +1,4 @@
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import func, or_, select
@@ -8,9 +9,9 @@ from app.models.item import Item
 
 
 def _merge_field_definitions(
-    existing: list[dict] | None,
-    update: list[dict] | None,
-) -> list[dict]:
+    existing: list[dict[str, Any]] | None,
+    update: list[dict[str, Any]] | None,
+) -> list[dict[str, Any]]:
     """Merge field_definitions while preserving is_system flags.
 
     This is the merge of a category *update* and the home of the label rule.
@@ -60,15 +61,15 @@ def _merge_field_definitions(
     if update is None:
         return existing or []
 
-    existing_by_key: dict[str, dict] = {f['key']: f for f in (existing or [])}
-    result: dict[str, dict] = {}
+    existing_by_key: dict[str, dict[str, Any]] = {f['key']: f for f in (existing or [])}
+    result: dict[str, dict[str, Any]] = {}
 
     # Apply user's update as a patch over the stored entry, stripping any
     # attempted is_system grants.
     for field in update:
         key = field['key']
         prior = existing_by_key.get(key)
-        merged: dict = {} if prior is None else dict(prior)
+        merged: dict[str, Any] = {} if prior is None else dict(prior)
         for k, v in field.items():
             if k == 'is_system':
                 continue

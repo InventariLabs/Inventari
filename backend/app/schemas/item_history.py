@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
@@ -12,7 +13,7 @@ class ItemHistorySchema(BaseModel):
     organization_id: UUID | None
     user_id: UUID | None
     action: str  # ItemAction enum value
-    changes: dict | None
+    changes: dict[str, Any] | None
     created_at: datetime
 
     # Enriched data for display

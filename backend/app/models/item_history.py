@@ -1,12 +1,17 @@
 import uuid
 from datetime import UTC, datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import JSON, DateTime, ForeignKey, Index, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.contracts import ItemAction
 from app.database import Base
+
+if TYPE_CHECKING:
+    from app.models.item import Item
+    from app.models.organization import Organization
+    from app.models.user import User
 
 __all__ = ['ItemAction', 'ItemHistory', 'CONSUMPTION_ACTIONS', 'DISPOSAL_ACTIONS']
 
@@ -63,6 +68,6 @@ class ItemHistory(Base):
     )
 
     # Relationships
-    organization: Mapped['Organization'] = relationship()  # type: ignore[name-defined]
-    item: Mapped['Item'] = relationship(back_populates='history')  # type: ignore[name-defined]
-    user: Mapped['User | None'] = relationship(backref='activity_history')  # type: ignore[name-defined]
+    organization: Mapped['Organization'] = relationship()
+    item: Mapped['Item'] = relationship(back_populates='history')
+    user: Mapped['User | None'] = relationship(backref='activity_history')

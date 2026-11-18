@@ -31,7 +31,7 @@ Three rules hold everywhere below.
 from __future__ import annotations
 
 import re
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from typing import Any
 from uuid import UUID
@@ -421,7 +421,7 @@ class _Numbering:
         self.given[row.id] = code
         self.assigned.add(code)
 
-    def free_for(self, row: StorageLocation):
+    def free_for(self, row: StorageLocation) -> Callable[[str], bool]:
         def free(code: str) -> bool:
             owner = self.held.get(code)
             return (

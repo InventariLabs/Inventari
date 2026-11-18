@@ -1,11 +1,18 @@
 import functools
 import uuid
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import BigInteger, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+
+if TYPE_CHECKING:
+    from app.models.organization import Organization
+    from app.models.role import UserRole
+    from app.models.storage_location import StorageLocation
+    from app.modules.stock_takes.models import StockTake
 
 
 # Default language from environment variable, fallback to 'en'
@@ -64,19 +71,19 @@ class User(Base):
     )
 
     # Relationships
-    organization: Mapped['Organization'] = relationship(  # type: ignore[name-defined]
+    organization: Mapped['Organization'] = relationship(
         back_populates='members', foreign_keys=[organization_id], lazy='selectin'
     )
-    created_organizations: Mapped[list['Organization']] = relationship(  # type: ignore[name-defined]
+    created_organizations: Mapped[list['Organization']] = relationship(
         back_populates='creator', foreign_keys='Organization.created_by'
     )
-    storage_locations: Mapped[list['StorageLocation']] = relationship(  # type: ignore[name-defined]
+    storage_locations: Mapped[list['StorageLocation']] = relationship(
         back_populates='user', cascade='all, delete-orphan'
     )
-    stock_takes: Mapped[list['StockTake']] = relationship(  # type: ignore[name-defined]
+    stock_takes: Mapped[list['StockTake']] = relationship(
         back_populates='user', cascade='all, delete-orphan'
     )
-    user_roles: Mapped[list['UserRole']] = relationship(  # type: ignore[name-defined]
+    user_roles: Mapped[list['UserRole']] = relationship(
         back_populates='user', cascade='all, delete-orphan'
     )
 

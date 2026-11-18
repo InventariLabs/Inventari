@@ -16,7 +16,7 @@ expiry date uses FEFO'.
 
 from __future__ import annotations
 
-from typing import Protocol
+from typing import Protocol, cast
 
 from app.core.exceptions import ContractViolationError
 
@@ -52,4 +52,4 @@ def _read_template_strategy(template: _TemplateLike | None) -> str:
     value = getattr(template, 'removal_strategy', None)
     if not value:  # None or empty string
         return DEFAULT_STRATEGY
-    return value
+    return cast(str, value)

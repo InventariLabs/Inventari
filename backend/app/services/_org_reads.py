@@ -1,3 +1,6 @@
+from typing import Any, cast
+from uuid import UUID
+
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import undefer
@@ -26,7 +29,7 @@ DEFERRED_DTO_COLUMNS: tuple[str, ...] = (
 # NOTE: build the Load options at call time, not at module level — module-level
 # construction forces configuration of ALL mappers at import time, before
 # module models (e.g. StockTakeItem) are registered, which crashes app startup.
-def _deferred_org_options() -> tuple:
+def _deferred_org_options() -> tuple[Any, ...]:
     return (
         undefer(Organization.active_profile_id),
         undefer(Organization.onboarding_completed),
@@ -34,7 +37,9 @@ def _deferred_org_options() -> tuple:
     )
 
 
-async def get_by_id_async(db: AsyncSession, organization_id) -> Organization | None:
+async def get_by_id_async(
+    db: AsyncSession, organization_id: UUID
+) -> Organization | None:
     """Get organization by id (async).
 
     The scalar is awaited only when it is awaitable, for the same reason
@@ -46,11 +51,11 @@ async def get_by_id_async(db: AsyncSession, organization_id) -> Organization | N
     result = await await_if_awaitable(
         db.scalar(select(Organization).where(Organization.id == organization_id))
     )
-    return result
+    return cast(Organization | None, result)
 
 
 async def is_module_enabled_async(
-    db: AsyncSession, organization_id, module_name: str
+    db: AsyncSession, organization_id: UUID, module_name: str
 ) -> bool:
     """Column-level module-enablement check (no full row load).
 

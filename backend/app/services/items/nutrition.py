@@ -1,5 +1,7 @@
 """Nutrition helpers for ProductTemplate enrichment."""
 
+from typing import Any
+
 _OFF_TO_NUTRITION_INFO: dict[str, str] = {
     'energy_kcal': 'calories_kcal',
     'proteins': 'protein_g',
@@ -11,7 +13,9 @@ _OFF_TO_NUTRITION_INFO: dict[str, str] = {
 }
 
 
-def extract_nutrition_info_from_off_metadata(meta_data: dict) -> dict | None:
+def extract_nutrition_info_from_off_metadata(
+    meta_data: dict[str, Any],
+) -> dict[str, Any] | None:
     """Convert OFF metadata.nutrition dict to ProductTemplate.nutrition_info format.
 
     Args:

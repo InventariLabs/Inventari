@@ -1,3 +1,4 @@
+from typing import Any
 from uuid import UUID
 
 from fastapi import (
@@ -59,7 +60,7 @@ async def update_item_quantity(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-):
+) -> Any:
     """Change product quantity."""
     item = await get_item_or_404_async(db, item_id, user_storage_ids)
     # A used-up record stands in the virtual Consumed place, where stock is
@@ -113,7 +114,7 @@ async def move_item(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-):
+) -> Any:
     """Move product to another storage location."""
     item = await get_item_or_404_async(db, item_id, user_storage_ids)
     return await move_item_service(
@@ -135,7 +136,7 @@ async def consume_item(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-):
+) -> Any:
     """Consume product (eaten, used)."""
     item = await get_item_or_404_async(db, item_id, user_storage_ids)
     # The same door the quantity endpoint keeps: a number a person typed is
@@ -163,7 +164,7 @@ async def use_item_partially(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-):
+) -> Any:
     """Open a package, or say how much of an open one is left.
 
     Answers with the record that is now the open package: the same one when
@@ -190,7 +191,7 @@ async def set_item_use_by(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-):
+) -> Any:
     """Edit, or with ``null`` clear, the use-by of an opened package."""
     item = await get_item_or_404_async(db, item_id, user_storage_ids)
     return await set_use_by_async(db, item, current_user, use_by_data.use_by)
@@ -206,7 +207,7 @@ async def discard_item(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
-):
+) -> Any:
     """Discard product (expired, damaged, lost)."""
     item = await get_item_or_404_async(db, item_id, user_storage_ids)
     if item.uom_id is not None:

@@ -102,7 +102,7 @@ async def enqueue_email_job(
             )
             db.add(job)
             await db.commit()
-            return job.id  # type: ignore[no-any-return]
+            return job.id
     except Exception:  # email enqueue must never break the caller
         logger.exception('[email-jobs] Failed to enqueue email to %s', to_email)
         return None

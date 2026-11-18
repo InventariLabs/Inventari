@@ -17,7 +17,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from decimal import Decimal
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from sqlalchemy import Date, Select, distinct, func, literal, select
@@ -58,8 +58,11 @@ class DeliveryPosting:
 
 async def _organization_currency(db: AsyncSession, organization_id: UUID) -> str | None:
     """What this organization keeps its books in, or None if it never said."""
-    return await db.scalar(
-        select(Organization.currency).where(Organization.id == organization_id)
+    return cast(
+        str | None,
+        await db.scalar(
+            select(Organization.currency).where(Organization.id == organization_id)
+        ),
     )
 
 
@@ -77,12 +80,15 @@ async def _template_for_organization(
         if template is None or template.organization_id not in (organization_id, None):
             return None
         return template
-    return await db.scalar(
-        select(ProductTemplate).where(
-            ProductTemplate.id == product_template_id,
-            (ProductTemplate.organization_id == organization_id)
-            | (ProductTemplate.organization_id.is_(None)),
-        )
+    return cast(
+        ProductTemplate | None,
+        await db.scalar(
+            select(ProductTemplate).where(
+                ProductTemplate.id == product_template_id,
+                (ProductTemplate.organization_id == organization_id)
+                | (ProductTemplate.organization_id.is_(None)),
+            )
+        ),
     )
 
 

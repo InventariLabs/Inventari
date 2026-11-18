@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import hashlib
 from decimal import Decimal
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import (
@@ -89,7 +90,7 @@ def _product_matches(pattern: str) -> ColumnElement[bool]:
     )
 
 
-def searched_products(organization_id: UUID, pattern: str) -> CompoundSelect:
+def searched_products(organization_id: UUID, pattern: str) -> CompoundSelect[Any]:
     """The products a typed string can reach: by their own fields or by a batch.
 
     Narrowing to these first is what keeps a search cheap: the groups of

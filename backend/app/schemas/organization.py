@@ -49,7 +49,7 @@ class OrganizationBase(BaseModel):
 
 
 class OrganizationCreate(OrganizationBase):
-    settings: dict | None = None
+    settings: dict[str, Any] | None = None
 
 
 class OrganizationAddress(BaseModel):
@@ -71,7 +71,7 @@ class OrganizationUpdate(BaseModel):
     name: str | None = None
     currency: str | None = None
     timezone: str | None = None
-    settings: dict | None = None
+    settings: dict[str, Any] | None = None
     # Issuer identity: the fields already existed on the model but
     # were never exposed — a document profile cannot be completed without them.
     tax_id: str | None = Field(None, max_length=50)
@@ -111,7 +111,7 @@ class Organization(OrganizationBase):
     created_by: UUID | None = None
     currency: str
     timezone: str
-    settings: dict | None = None
+    settings: dict[str, Any] | None = None
     member_count: int | None = None
     active_profile_id: str | None = None
     onboarding_completed: bool | None = None

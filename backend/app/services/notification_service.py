@@ -84,7 +84,7 @@ class NotificationService:
         content: str,
         type: str = 'info',
         link: str | None = None,
-        meta_data: dict | None = None,
+        meta_data: dict[str, Any] | None = None,
     ) -> Notification | None:
         """Persist a new in-app notification row.
 
@@ -117,7 +117,7 @@ class NotificationService:
         content: str,
         type: str = 'info',
         link: str | None = None,
-        meta_data: dict | None = None,
+        meta_data: dict[str, Any] | None = None,
     ) -> list[Notification]:
         """Persist one notification per *user_ids* in a single flush.
 
@@ -152,7 +152,7 @@ class NotificationService:
         content: LocalizedText,
         type: str = 'info',
         link: str | None = None,
-        meta_data: dict | None = None,
+        meta_data: dict[str, Any] | None = None,
         exclude_user_id: UUID | None = None,
     ) -> list[Notification]:
         """Persist in-app notifications for the instance's superusers.
@@ -250,7 +250,7 @@ class NotificationService:
         return {row.id: row.organization_id for row in rows}
 
     @staticmethod
-    def to_dto(notification: Notification):
+    def to_dto(notification: Notification) -> NotificationDTO:
         """Convert a Notification ORM row to the public DTO."""
         from app.core.contracts import NotificationDTO
 

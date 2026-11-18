@@ -1,6 +1,6 @@
 import uuid
 from datetime import UTC, datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import (
     Boolean,
@@ -17,6 +17,9 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+
+if TYPE_CHECKING:
+    from app.models.item import Item
 
 
 class Partner(Base):
@@ -92,7 +95,7 @@ class Partner(Base):
     )
 
     # --- Relationships ---
-    items: Mapped[list['Item']] = relationship(  # type: ignore[name-defined]
+    items: Mapped[list['Item']] = relationship(
         'Item',
         back_populates='partner',
         lazy='dynamic',

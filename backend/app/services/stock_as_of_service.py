@@ -73,12 +73,12 @@ from app.services.storage._queries import descendant_ids_async
 from app.services.storage._relocation import parents_as_of_async, subtree_of
 
 
-def _moved_at():
+def _moved_at() -> ColumnElement[datetime]:
     """The date a movement is *about*, not the date its row was written."""
     return func.coalesce(StockMove.completed_at, StockMove.created_at)
 
 
-def _layer_dated_at():
+def _layer_dated_at() -> ColumnElement[datetime]:
     """The date a cost layer is *about*, not the date its row was written.
 
     The document's date, or its UTC write date when there is no document.
@@ -92,7 +92,7 @@ def _layer_dated_at():
     return layer_dated_at()
 
 
-def _settled():
+def _settled() -> ColumnElement[bool]:
     """Only movements that actually happened.
 
     The count runs backwards from the current shelves, and the shelves were
@@ -138,12 +138,13 @@ async def ledger_starts_at_async(
     Everything before it is unknown, not zero. A draft nobody posted does not
     extend the coverage: the report could not reconstruct that far anyway.
     """
-    return await db.scalar(
+    oldest: datetime | None = await db.scalar(
         select(func.min(_moved_at())).where(
             StockMove.organization_id == organization_id,
             _settled(),
         )
     )
+    return oldest
 
 
 def _quantities_as_of(
@@ -152,7 +153,7 @@ def _quantities_as_of(
     location_ids: list[UUID] | None,
     hidden_tags: set[str] | None = None,
     product_pattern: str | None = None,
-) -> Select:
+) -> Select[Any]:
     """Quantity per product on the date, summed over the places asked about.
 
     Today's side counts the live records on a shelf, summed the way
@@ -238,7 +239,9 @@ def _quantities_as_of(
     return quantities
 
 
-def _values_as_of(organization_id: UUID, as_of: datetime, org_currency: str) -> Select:
+def _values_as_of(
+    organization_id: UUID, as_of: datetime, org_currency: str
+) -> Select[Any]:
     """Value per product on the date, replaying the FIFO draw of the layers.
 
     One row per product with a receipt up to the date: ``value``, what its

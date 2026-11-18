@@ -3,6 +3,7 @@ from datetime import UTC, date, datetime
 from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import (
+    ColumnElement,
     Date,
     DateTime,
     ForeignKey,
@@ -118,7 +119,7 @@ class StockLot(Base):
     )
 
 
-def effective_status_expression():
+def effective_status_expression() -> ColumnElement[Any]:
     """SQL twin of :attr:`StockLot.effective_status`.
 
     Written as an expression rather than computed per row so that the batch

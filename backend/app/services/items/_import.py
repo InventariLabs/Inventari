@@ -10,7 +10,7 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
-from typing import Literal
+from typing import Any, Literal, cast
 from uuid import UUID
 
 import pandas as pd
@@ -74,13 +74,13 @@ async def import_items(
     db: AsyncSession,
     file_content: bytes,
     filename: str,
-    mapping: dict,
+    mapping: dict[str, Any],
     user: UserContextDTO,
     create_missing_locations: bool = True,
     create_missing_categories: bool = True,
     on_label_match: LabelMatch = 'add',
     on_batch: Callable[[int], Awaitable[None]] | None = None,
-) -> dict:
+) -> dict[str, Any]:
     """Import items from XLSX or CSV file based on column mapping.
 
     ``on_batch`` is told how many rows have been read each time a batch is
@@ -120,7 +120,7 @@ async def import_items(
     updated = 0
     skipped = 0
     failed = 0
-    errors: list[dict] = []
+    errors: list[dict[str, Any]] = []
 
     for index, row in df.iterrows():
         row_result = await _process_import_row(ctx, row, index)
@@ -165,7 +165,7 @@ class _StorageIndex:
         self._by_name: dict[str, UUID] = {}
         self._name: dict[UUID, str] = {}
         self._parent: dict[UUID, UUID | None] = {}
-        self._fields: dict[UUID, list[dict]] = {}
+        self._fields: dict[UUID, list[dict[str, Any]]] = {}
 
     @staticmethod
     def _key(name: str) -> str:
@@ -176,7 +176,7 @@ class _StorageIndex:
         loc_id: UUID,
         name: str,
         parent_id: UUID | None,
-        fields: list[dict] | None = None,
+        fields: list[dict[str, Any]] | None = None,
     ) -> None:
         self._children[(parent_id, self._key(name))] = loc_id
         self._by_name.setdefault(self._key(name), loc_id)
@@ -211,7 +211,7 @@ class _StorageIndex:
             current = self._parent.get(current)
         return join_location_path(reversed(names))
 
-    def fields_of(self, loc_id: UUID) -> dict[str, dict]:
+    def fields_of(self, loc_id: UUID) -> dict[str, dict[str, Any]]:
         """The product fields a location asks for: its own and every level's above.
 
         The rule the storages listing and the form follow: the nearest level
@@ -219,7 +219,7 @@ class _StorageIndex:
         over its rack's and the rack's over the warehouse's. A location this
         import founds sets nothing itself and still inherits.
         """
-        fields: dict[str, dict] = {}
+        fields: dict[str, dict[str, Any]] = {}
         seen: set[UUID] = set()
         current: UUID | None = loc_id
         while current is not None and current not in seen:
@@ -265,7 +265,7 @@ async def _preload_category_cache(
 
 async def _preload_category_fields(
     db: AsyncSession, org_id: UUID | None
-) -> dict[UUID, dict[str, dict]]:
+) -> dict[UUID, dict[str, dict[str, Any]]]:
     """Each category's own product fields, by category id and field key.
 
     A category asks for fields of its own ("Thread size" on Fasteners), and
@@ -275,7 +275,7 @@ async def _preload_category_fields(
     money and file fields, which a cell cannot carry — the writer's own
     refusal of a value that does not fit them still applies.
     """
-    fields: dict[UUID, dict[str, dict]] = {}
+    fields: dict[UUID, dict[str, dict[str, Any]]] = {}
     if org_id is None:
         return fields
     result = await db.execute(
@@ -332,8 +332,11 @@ async def _default_storage_type_id(
     )
     if own:
         return own
-    return await db.scalar(
-        select(StorageType.id).where(StorageType.organization_id.is_(None)).limit(1)
+    return cast(
+        UUID | None,
+        await db.scalar(
+            select(StorageType.id).where(StorageType.organization_id.is_(None)).limit(1)
+        ),
     )
 
 
@@ -441,7 +444,7 @@ async def _resolve_or_create_category(
 
 
 def _number_from_cell(
-    row: pd.Series, mapping: dict, key: str, default: Decimal | None
+    row: pd.Series, mapping: dict[str, Any], key: str, default: Decimal | None
 ) -> Decimal | None:
     """Parse a mapped numeric cell, or fall back to ``default`` when empty.
 
@@ -463,7 +466,7 @@ def _number_from_cell(
         ) from None
 
 
-def _quantity_from_cell(row: pd.Series, mapping: dict) -> Decimal:
+def _quantity_from_cell(row: pd.Series, mapping: dict[str, Any]) -> Decimal:
     """The row's quantity: 1 when the sheet has no quantity column at all.
 
     A column the reader mapped to quantity and left blank in this row is a
@@ -546,7 +549,7 @@ async def _known_units(ctx: '_ImportContext') -> str:
     return ', '.join(sorted({get_unit_label(u.symbol) for u in uoms}))
 
 
-def _parse_date_cell(row: pd.Series, mapping: dict, key: str) -> date | None:
+def _parse_date_cell(row: pd.Series, mapping: dict[str, Any], key: str) -> date | None:
     """Read and parse a mapped date column (expiry, freeze), or refuse the cell.
 
     Not app.core.datetimes.parse_iso_date: the input is a spreadsheet cell,
@@ -576,11 +579,15 @@ def _parse_date_cell(row: pd.Series, mapping: dict, key: str) -> date | None:
         ) from None
     if pd.isna(parsed):
         raise ServiceRejectionError('import_date_invalid', column=column, value=text)
-    return parsed.date()
+    return cast(date | None, parsed.date())
 
 
 def _field_value(
-    definition: dict, row: pd.Series, mapping: dict, key: str, text: str
+    definition: dict[str, Any],
+    row: pd.Series,
+    mapping: dict[str, Any],
+    key: str,
+    text: str,
 ) -> object:
     """One field cell as the form stores the value, or refuse the cell.
 
@@ -629,7 +636,9 @@ def _field_value(
     return value
 
 
-def _field_value_refusal(mapping: dict, exc: FieldValueError) -> ServiceRejectionError:
+def _field_value_refusal(
+    mapping: dict[str, Any], exc: FieldValueError
+) -> ServiceRejectionError:
     """A refused field value, worded for the reader in the session language.
 
     The shared field contract raises English sentences meant for a log or an
@@ -655,7 +664,7 @@ def _field_values(
     category_id: UUID | None = None,
     *,
     require_filled: bool = False,
-) -> dict:
+) -> dict[str, Any]:
     """The mapped field columns the row's location and category ask for, typed.
 
     A field set on a warehouse applies to every shelf inside it, so the
@@ -756,10 +765,10 @@ class _ImportContext:
 
     db: AsyncSession
     user: UserContextDTO
-    mapping: dict
+    mapping: dict[str, Any]
     storages: _StorageIndex
     category_cache: dict[str, UUID]
-    category_fields: dict[UUID, dict[str, dict]]
+    category_fields: dict[UUID, dict[str, dict[str, Any]]]
     default_storage_type_id: UUID | None
     create_missing_locations: bool
     create_missing_categories: bool
@@ -800,7 +809,7 @@ class _RowResult:
         self,
         *,
         outcome: Literal['imported', 'updated', 'skipped', 'failed'],
-        error: dict | None = None,
+        error: dict[str, Any] | None = None,
         joined_existing: bool = False,
     ) -> None:
         self.outcome = outcome

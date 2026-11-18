@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import select
@@ -176,7 +177,7 @@ async def move_item(
     move_data: ItemMove,
     user: UserContextDTO,
     source_document_id: UUID | None = None,
-    history_changes: dict | None = None,
+    history_changes: dict[str, Any] | None = None,
     history_action: ItemAction = ItemAction.MOVED,
     post_the_change: bool = True,
 ) -> Item:

@@ -1,5 +1,6 @@
 import secrets
 import string
+from typing import Any
 from uuid import UUID
 
 from pydantic import ValidationError as PydanticValidationError
@@ -98,7 +99,9 @@ async def create_organization(
 _LEGACY_BINDING_SLOT = 'ai_default_connection_id'
 
 
-def _keep_the_ai_bindings(incoming: dict, stored: dict | None) -> dict:
+def _keep_the_ai_bindings(
+    incoming: dict[str, Any], stored: dict[str, Any] | None
+) -> dict[str, Any]:
     """*incoming* with the AI purpose bindings put back as *stored* has them.
 
     The organization's settings had two doors with two keys: this route,
@@ -163,7 +166,7 @@ async def apply_organization_update(
     return organization
 
 
-def refuse_smtp_settings_in_demo(settings_blob: dict | None) -> None:
+def refuse_smtp_settings_in_demo(settings_blob: dict[str, Any] | None) -> None:
     """Refuse organization-level SMTP settings on the public demo.
 
     A demo publishes its administrator login, so whoever is reading this is
@@ -180,7 +183,9 @@ def refuse_smtp_settings_in_demo(settings_blob: dict | None) -> None:
         raise catalogue_refusal('demo_smtp_settings_locked')
 
 
-def changed_fields(before: dict, after: dict) -> dict[str, dict]:
+def changed_fields(
+    before: dict[str, Any], after: dict[str, Any]
+) -> dict[str, dict[str, Any]]:
     """Top-level keys whose value differs, as ``{'before': …, 'after': …}``.
 
     Both sides arrive masked, so a changed SMTP password records that it
@@ -195,7 +200,7 @@ def changed_fields(before: dict, after: dict) -> dict[str, dict]:
     }
 
 
-def _address_line(address: dict | None) -> str | None:
+def _address_line(address: dict[str, Any] | None) -> str | None:
     """The address as one line a reader can take in, ``None`` when it is empty.
 
     The journal's Detail column prints a string as it stands and an object as
@@ -205,7 +210,7 @@ def _address_line(address: dict | None) -> str | None:
     return ', '.join(p for p in parts if p) or None
 
 
-def _audited_view(organization: Organization) -> dict:
+def _audited_view(organization: Organization) -> dict[str, Any]:
     # The tax ID, country and address are what every printed document says the
     # organization is: a change to them is as much the journal's business as
     # the name or the currency beside them.
@@ -302,7 +307,7 @@ async def create_default_locations(
     db: AsyncSession,
     organization_id: UUID,
     user_id: UUID,
-) -> list:
+) -> list[Any]:
     from app.services.storage._defaults import (
         create_default_storage_locations_async,
     )

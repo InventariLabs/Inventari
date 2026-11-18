@@ -8,6 +8,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
+from app.core.contracts import UserContextDTO
 from app.core.location_path import join_location_path
 from app.core.xlsx_export import rows_to_xlsx_response
 from app.models.category import Category
@@ -348,7 +349,7 @@ class _Scan:
 
 def export_items_to_xlsx(
     db: Session,
-    current_user,
+    current_user: UserContextDTO,
     filters: dict[str, Any] | None = None,
     enrichment: dict[UUID, dict[str, object]] | None = None,
     user_storage_ids: list[UUID] | None = None,
@@ -421,7 +422,7 @@ def export_items_to_xlsx(
 
     def _rows() -> Iterator[list[object]]:
         for item in _items():
-            row: dict = {
+            row: dict[str, Any] = {
                 'Name': item.name,
                 'Brand': item.brand,
                 'Quantity': float(item.quantity) if item.quantity else 0,
