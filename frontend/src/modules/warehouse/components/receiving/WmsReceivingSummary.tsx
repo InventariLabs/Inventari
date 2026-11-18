@@ -111,7 +111,7 @@ export default function WmsReceivingSummary({
             <div key={ln.id} className="rounded-lg bg-surface-inset px-3 py-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="flex min-w-0 items-center gap-2">
-                  <span className="truncate font-medium text-on">
+                  <span className="font-medium text-on [overflow-wrap:anywhere]">
                     {ln.product_name ?? ln.document_line_id}
                   </span>
                   {ln.status === "skipped" && (
