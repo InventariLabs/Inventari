@@ -5,6 +5,8 @@
   XAUTOCLAIM and actually processed.
 """
 
+import asyncio
+import logging
 import uuid
 from datetime import timedelta
 from typing import Any
@@ -17,6 +19,7 @@ from app.config import settings
 from app.core._event_bus import EventBus
 from app.core._event_types import EventPayload, TenantEventPayload
 from app.core.scheduler import TaskScheduler
+from app.core.stream_reaper import reap_streams_once
 
 
 @pytest.fixture(autouse=True)
@@ -148,6 +151,129 @@ class TestTaskStreamReclaim:
         finally:
             assert scheduler._redis is not None
             await scheduler._redis.delete(stream)
+            await scheduler._redis.aclose()
+
+
+@pytest.mark.integration
+class TestMalformedTaskMessage:
+    async def test_reclaim_acknowledges_an_unreadable_payload_and_runs_the_rest(self):
+        stream, group = _names('task_bad_reclaim')
+        scheduler = await _make_scheduler(stream, group)
+        executions: list[str] = []
+
+        async def handler(payload: dict | None = None) -> None:
+            executions.append('ran')
+
+        scheduler.register(
+            name='t',
+            interval=timedelta(hours=1),
+            handler=handler,
+            module_name='mod',
+            is_persistent=True,
+        )
+        try:
+            assert scheduler._redis is not None
+            await scheduler._redis.xadd(
+                stream, {'task_key': 'mod.t', 'payload': '{not json'}
+            )
+            await scheduler.enqueue('mod.t')
+            await scheduler._redis.xreadgroup(
+                group, 'dead-worker', {stream: '>'}, count=2
+            )
+
+            await scheduler.reclaim_pending_tasks(min_idle_ms=0)
+
+            assert executions == ['ran']
+            assert (await scheduler._redis.xpending(stream, group))['pending'] == 0
+        finally:
+            assert scheduler._redis is not None
+            await scheduler._redis.delete(stream)
+            await scheduler._redis.aclose()
+
+    async def test_worker_acknowledges_an_unreadable_payload(self):
+        stream, group = _names('task_bad_worker')
+        scheduler = await _make_scheduler(stream, group)
+        try:
+            assert scheduler._redis is not None
+            await scheduler._redis.xadd(
+                stream, {'task_key': 'mod.t', 'payload': '{not json'}
+            )
+            scheduler._running = True
+            worker = asyncio.create_task(scheduler._run_persistent_worker())
+            try:
+                for _ in range(40):
+                    pending = await scheduler._redis.xpending(stream, group)
+                    if pending[
+                        'pending'
+                    ] == 0 and await scheduler._redis.xinfo_consumers(stream, group):
+                        break
+                    await asyncio.sleep(0.1)
+            finally:
+                scheduler._running = False
+                worker.cancel()
+                await asyncio.gather(worker, return_exceptions=True)
+
+            assert (await scheduler._redis.xpending(stream, group))['pending'] == 0
+            assert await scheduler._redis.xinfo_consumers(stream, group)
+        finally:
+            assert scheduler._redis is not None
+            await scheduler._redis.delete(stream)
+            await scheduler._redis.aclose()
+
+    async def test_reaper_pass_still_prunes_dead_consumers_of_both_groups(self):
+        event_stream, event_group = _names('evt_bad_reap')
+        task_stream, task_group = _names('task_bad_reap')
+        bus = await _make_bus(event_stream, event_group)
+        scheduler = await _make_scheduler(task_stream, task_group)
+        try:
+            assert bus._redis is not None and scheduler._redis is not None
+            await bus._redis.xgroup_createconsumer(event_stream, event_group, 'gone')
+            await scheduler._redis.xadd(
+                task_stream, {'task_key': 'mod.t', 'payload': '{not json'}
+            )
+            await scheduler._redis.xreadgroup(
+                task_group, 'gone', {task_stream: '>'}, count=1
+            )
+
+            with (
+                patch('app.core.stream_reaper.event_bus', bus),
+                patch('app.core.stream_reaper.task_scheduler', scheduler),
+                patch('app.core.stream_reaper.DEAD_CONSUMER_IDLE_MS', 0),
+                patch.object(settings, 'STREAM_CLAIM_IDLE_MS', 0),
+            ):
+                await reap_streams_once()
+
+            assert 'gone' not in await _consumer_names(bus)
+            assert 'gone' not in {
+                c['name']
+                for c in await scheduler._redis.xinfo_consumers(task_stream, task_group)
+            }
+            assert (await scheduler._redis.xpending(task_stream, task_group))[
+                'pending'
+            ] == 0
+        finally:
+            assert bus._redis is not None and scheduler._redis is not None
+            await bus._redis.delete(event_stream)
+            await scheduler._redis.delete(task_stream)
+            await bus.disconnect()
+            await scheduler._redis.aclose()
+
+
+@pytest.mark.integration
+class TestPruneMissingStream:
+    async def test_a_stream_that_does_not_exist_is_not_an_error(self, caplog):
+        stream, group = _names('missing')
+        scheduler = await _make_scheduler(stream, group)
+        try:
+            assert scheduler._redis is not None
+            await scheduler._redis.delete(stream)
+
+            with caplog.at_level(logging.ERROR):
+                assert await scheduler.prune_dead_consumers(0) == 0
+
+            assert not [r for r in caplog.records if r.levelno >= logging.ERROR]
+        finally:
+            assert scheduler._redis is not None
             await scheduler._redis.aclose()
 
 

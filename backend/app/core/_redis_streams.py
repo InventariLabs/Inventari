@@ -79,6 +79,12 @@ async def prune_consumers(
                 continue
             await redis_client.xgroup_delconsumer(stream, group, name)
             removed += 1
+    except redis.ResponseError as e:
+        # A stream nobody has written to yet has no key, so no group to tidy.
+        if 'no such key' in str(e).lower():
+            return 0
+        logger.error('[%s] Consumer cleanup failed: %s', label, e)
+        return 0
     except (RedisError, OSError) as e:
         logger.error('[%s] Consumer cleanup failed: %s', label, e)
         return 0
