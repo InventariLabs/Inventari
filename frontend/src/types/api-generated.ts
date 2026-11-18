@@ -42405,7 +42405,7 @@ export interface operations {
     list_ingredient_defaults_api_v1_recipes_ingredient_defaults_get: {
         parameters: {
             query?: {
-                /** @description Language code: en | pl */
+                /** @description Interface language code, for example en, pl or de */
                 lang?: string;
                 /** @description Name search query */
                 q?: string | null;
@@ -42474,7 +42474,7 @@ export interface operations {
     export_ingredient_defaults_api_v1_recipes_ingredient_defaults_export_get: {
         parameters: {
             query?: {
-                /** @description Language code: en | pl */
+                /** @description Interface language code, for example en, pl or de */
                 lang?: string;
                 /** @description json | csv */
                 fmt?: string;
@@ -42508,7 +42508,7 @@ export interface operations {
     import_ingredient_defaults_api_v1_recipes_ingredient_defaults_import_post: {
         parameters: {
             query?: {
-                /** @description Language code: en | pl */
+                /** @description Interface language code, for example en, pl or de */
                 lang?: string;
             };
             header?: never;
@@ -42546,7 +42546,7 @@ export interface operations {
             query: {
                 /** @description Ingredient name to look up */
                 name: string;
-                /** @description Language code: en | pl */
+                /** @description Interface language code, for example en, pl or de */
                 lang?: string;
             };
             header?: never;
