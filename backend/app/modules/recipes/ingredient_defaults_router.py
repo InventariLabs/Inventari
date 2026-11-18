@@ -172,7 +172,9 @@ async def import_ingredient_defaults(
             code=refusal_code(exc, 'FILE_TOO_LARGE'),
             message=refusal_text(exc),
         ) from exc
-    content = raw.decode('utf-8', errors='replace')
+    # 'utf-8-sig' drops the BOM an Excel "CSV UTF-8" file opens with; plain
+    # 'utf-8' keeps it in the first header and every row then lacks 'name'.
+    content = raw.decode('utf-8-sig', errors='replace')
     filename = (file.filename or '').lower()
 
     try:
