@@ -23300,11 +23300,11 @@
             "required": false,
             "schema": {
               "type": "string",
-              "description": "Language code: en | pl",
+              "description": "Interface language code, for example en, pl or de",
               "default": "en",
               "title": "Lang"
             },
-            "description": "Language code: en | pl"
+            "description": "Interface language code, for example en, pl or de"
           },
           {
             "name": "q",
@@ -23443,11 +23443,11 @@
             "required": false,
             "schema": {
               "type": "string",
-              "description": "Language code: en | pl",
+              "description": "Interface language code, for example en, pl or de",
               "default": "en",
               "title": "Lang"
             },
-            "description": "Language code: en | pl"
+            "description": "Interface language code, for example en, pl or de"
           },
           {
             "name": "fmt",
@@ -23507,11 +23507,11 @@
             "required": false,
             "schema": {
               "type": "string",
-              "description": "Language code: en | pl",
+              "description": "Interface language code, for example en, pl or de",
               "default": "en",
               "title": "Lang"
             },
-            "description": "Language code: en | pl"
+            "description": "Interface language code, for example en, pl or de"
           }
         ],
         "requestBody": {
@@ -23582,11 +23582,11 @@
             "required": false,
             "schema": {
               "type": "string",
-              "description": "Language code: en | pl",
+              "description": "Interface language code, for example en, pl or de",
               "default": "en",
               "title": "Lang"
             },
-            "description": "Language code: en | pl"
+            "description": "Interface language code, for example en, pl or de"
           }
         ],
         "responses": {

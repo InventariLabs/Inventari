@@ -103,6 +103,23 @@ describe("RecipeIngredientForm", () => {
     expect(screen.getByTestId("uom-select").getAttribute("data-hint")).toBe("");
   });
 
+  it("reads the hint before the Add button on a phone and after the row from sm up", async () => {
+    // Below sm the row is a column: the sentence explains the unit picker, so
+    // it comes right after it and above the button. From sm up `order-last`
+    // moves it back under the whole row.
+    const user = userEvent.setup();
+    render(<RecipeIngredientForm recipeId="r1" outputTemplateId="tpl-out" />);
+    await user.click(screen.getByText("pick a product"));
+
+    const hint = screen.getByTestId("uom-convertible-hint");
+    const addButton = screen.getByTestId("maker-composition-add-line");
+    expect(
+      hint.compareDocumentPosition(addButton) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(hint.className).toContain("sm:order-last");
+  });
+
   it("drops the hint rather than naming a unit it cannot read when the units failed", async () => {
     // The hint reads "convertible into {{unit}}"; without the catalogue the
     // unit came out empty and the sentence broke in the middle.
