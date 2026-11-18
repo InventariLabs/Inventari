@@ -1120,7 +1120,7 @@
           "Approvals"
         ],
         "summary": "Get Document Approval Requirement",
-        "description": "Whether confirming this document would send it to the approval queue.\n\nThe dialog behind the confirm button has to name the consequence before\nthe button is pressed. A draft is weighed here as the document it is about\nto become: the sentence the reader is shown and the thing the confirmation\nthen does are one rule, asked twice.\n\nThe answer also says whether the stage the document would wait at has\nanybody who could decide it for the person asking: the dialog used to\npromise the queue for a request that no queue would ever show.",
+        "description": "Whether confirming this document would send it to the approval queue.\n\nThe dialog behind the confirm button has to name the consequence before\nthe button is pressed. A draft is weighed here as the document it is about\nto become: the sentence the reader is shown and the thing the confirmation\nthen does are one rule, asked twice.\n\nThe answer also says whether the stage the document would wait at has\nanybody who could decide it for the person asking: the dialog must not\npromise the queue for a request that no queue would ever show.",
         "operationId": "get_document_approval_requirement_api_v1_approvals_documents__doc_id__approval_requirement_get",
         "security": [
           {
@@ -9078,7 +9078,7 @@
           "Items"
         ],
         "summary": "Get Product Template",
-        "description": "Get a product template by ID including this organization's layer-average rate.\n\nStock value is FIFO; the rate is the average cost of the cost layers\nstill on hand (source fields keep the historical ``avco`` label).\n\nThe rate is computed here rather than read off the row. It used to be a\ncached column on ``product_templates``, and a global template \u2014 the whole\ndefault catalogue \u2014 is one row shared by every organization: the number\nthere belonged to whichever organization had last taken a delivery, so this\nendpoint handed one organization another's purchase cost.",
+        "description": "Get a product template by ID including this organization's layer-average rate.\n\nStock value is FIFO; the rate is the average cost of the cost layers\nstill on hand (source fields keep the historical ``avco`` label).\n\nThe rate is computed here rather than read off the row. A global template,\nthe whole default catalogue, is one row shared by every organization, so a\nstored rate there would belong to whichever organization had last taken a\ndelivery; computing it per organization keeps one organization's purchase\ncost away from another.",
         "operationId": "get_product_template_api_v1_items_product_templates__template_id__get",
         "security": [
           {
@@ -12942,7 +12942,7 @@
           "maker"
         ],
         "summary": "Get Bom Summary",
-        "description": "Batched BOM existence + line count for a list of templates.\n\nReturns one entry per template that has >=1 BOM line. Templates with no\nBOM are omitted. Used to render 'has BOM' badges in product lists without\nN+1 queries.",
+        "description": "Batched BOM existence + line count for a list of templates.\n\nReturns one entry per template that has >=1 BOM line. Templates with no\nBOM are omitted. Product lists render their 'has BOM' badges from this, without\nN+1 queries.",
         "operationId": "get_bom_summary_api_v1_maker_bom_summary_get",
         "security": [
           {
@@ -15596,7 +15596,7 @@
           "maker"
         ],
         "summary": "Get Production Stock Moves",
-        "description": "Return the stock moves attributed to this production order.\n\nIncludes both ingredient consumption moves (from_location \u2192 None) and\nthe output receipt move (None \u2192 output_location), with the lot for\ntraceability. Products, lots and locations come back named: the table\nused to print truncated UUIDs, which identify nothing to the person\nreading them.",
+        "description": "Return the stock moves attributed to this production order.\n\nIncludes both ingredient consumption moves (from_location \u2192 None) and\nthe output receipt move (None \u2192 output_location), with the lot for\ntraceability. Products, lots and locations come back named, since a truncated\nUUID identifies nothing to the person reading the table.",
         "operationId": "get_production_stock_moves_api_v1_maker_production_orders__order_id__stock_moves_get",
         "security": [
           {
@@ -18169,7 +18169,7 @@
           "Organizations"
         ],
         "summary": "Revoke Invitation",
-        "description": "Withdraw an invitation that nobody has redeemed yet.\n\nA code used to be a fifteen-minute affair, so taking one back was a matter\nof waiting. Living a week, it needs a way out: an address typed wrong, a\nperson who left before arriving, a role chosen by mistake.",
+        "description": "Withdraw an invitation that nobody has redeemed yet.\n\nA code lives for a week, so it needs a way out before then: an address typed\nwrong, a person who left before arriving, a role chosen by mistake.",
         "operationId": "revoke_invitation_api_v1_organizations_my_invitations__invitation_id__delete",
         "security": [
           {
@@ -27156,7 +27156,7 @@
           "Shopping Lists"
         ],
         "summary": "Preview Suggestions",
-        "description": "What the app would propose buying. It creates nothing.\n\nThe dashboard used to reach this answer through a list it had just\ncreated, because the only route to it was addressed by ``list_id`` \u2014\nso opening a preview left an empty active list the reader had never\nasked for, and Cancel did not take it back.\n\nThe three switches are here because the button that opens this hangs\non the tile counting shortages, and the engine returns every source it\nknows unless it is asked otherwise: a low-stock button opened a\nscreenful of expired products.\n\nDeclared above ``GET /{list_id}`` on purpose \u2014 below it, \"suggestions\"\nis parsed as a malformed UUID and answered 422.",
+        "description": "What the app would propose buying. It creates nothing.\n\nThe dashboard reads this answer without creating a list it does not need,\nso opening a preview leaves no empty active list the reader never asked for.\n\nThe three switches are here because the button that opens this hangs\non the tile counting shortages, and the engine returns every source it\nknows unless it is asked otherwise: a low-stock button opened a\nscreenful of expired products.\n\nDeclared above ``GET /{list_id}`` on purpose \u2014 below it, \"suggestions\"\nis parsed as a malformed UUID and answered 422.",
         "operationId": "preview_suggestions_api_v1_shopping_lists_suggestions_get",
         "security": [
           {
@@ -29112,7 +29112,7 @@
           "Stock Ledger"
         ],
         "summary": "Set Stock Lot Status",
-        "description": "Hold a batch back, or let it go again.\n\nEvery picking path already obeys the status; until now nobody could set\nit. The reason is kept with the batch, because \"quarantined\" without\n\"supplier notice 41/26\" is a decision nobody can review.",
+        "description": "Hold a batch back, or let it go again.\n\nEvery picking path obeys the status, and this endpoint is the only place\nit is set. The reason is kept with the batch, because \"quarantined\" without\n\"supplier notice 41/26\" is a decision nobody can review.",
         "operationId": "set_stock_lot_status_api_v1_stock_lots__lot_id__patch",
         "security": [
           {
@@ -39825,7 +39825,7 @@
           "Warehouse"
         ],
         "summary": "Preview Template",
-        "description": "What this layout prints, on a document made up for the purpose.\n\nThe preview used to show the source \u2014 `{% for line in lines %}` and all \u2014\nwhich answers \"what does this template say\" and not \"what will the paper\nlook like\". The rendering is the same one the PDF goes through, on the\nsame example context the placeholder catalog is derived from, so a\npreview cannot describe a document the printer would not produce.",
+        "description": "What this layout prints, on a document made up for the purpose.\n\nThe preview shows the rendered page, not the template source, because what\nmatters is \"what will the paper\nlook like\". The rendering is the same one the PDF goes through, on the\nsame example context the placeholder catalog is derived from, so a\npreview cannot describe a document the printer would not produce.",
         "operationId": "preview_template_api_v1_warehouse_templates_preview_post",
         "requestBody": {
           "content": {
@@ -48099,7 +48099,7 @@
           "key"
         ],
         "title": "CategoryFieldDefinition",
-        "description": "A single custom field definition on a category \u2014 read shape.\n\nPreviously field_definitions was ``list[dict[str, Any]]`` with no key\nor type validation, letting malformed entries through and raising KeyError\ndownstream. This typed model enforces a non-empty key and a closed type set\non NEW definitions. ``type`` defaults to 'text' so legacy/system definitions\nthat predate the type field (e.g. {'key':'category_id','is_system':True})\nare not rejected at response-serialization time.\n\nthe type Literal is extended to include ``textarea``, ``file``,\n``money`` and ``multi-select``. See the ``FieldType`` alias above.\n\n**Lenient on read paths.** This model does NOT enforce \"select/multi-select\nmust have a non-empty options list\" because legacy data in\n``categories.field_definitions`` JSONB was written before the rule existed\n(e.g. system categories with ``equipment_status`` and ``options=[]``).\nStrict validation lives in :class:`FieldDefinitionCreate` and is invoked at\nAPI write boundaries; the read model here accepts whatever the DB stored\nso /items and /categories endpoints keep serializing legacy rows."
+        "description": "A single custom field definition on a category \u2014 read shape.\n\nA raw ``list[dict[str, Any]]`` would accept malformed entries and fail later\nwith KeyError, so this typed model enforces a non-empty key and a closed type\nset on NEW definitions. ``type`` defaults to 'text' so legacy/system definitions\nthat predate the type field (e.g. {'key':'category_id','is_system':True})\nare not rejected at response-serialization time.\n\nthe type Literal is extended to include ``textarea``, ``file``,\n``money`` and ``multi-select``. See the ``FieldType`` alias above.\n\n**Lenient on read paths.** This model does NOT enforce \"select/multi-select\nmust have a non-empty options list\" because legacy data in\n``categories.field_definitions`` JSONB was written before the rule existed\n(e.g. system categories with ``equipment_status`` and ``options=[]``).\nStrict validation lives in :class:`FieldDefinitionCreate` and is invoked at\nAPI write boundaries; the read model here accepts whatever the DB stored\nso /items and /categories endpoints keep serializing legacy rows."
       },
       "CategoryGroupRename": {
         "properties": {
@@ -70596,7 +70596,7 @@
           "text"
         ],
         "title": "ProcessStep",
-        "description": "One step of a formula's process, and how long it takes.\n\nA step used to be a bare sentence, so a formula that took two hours to\nmake said nothing about the two hours and its labour could only be a\nlump sum typed per batch. The duration is optional: a step nobody timed\nstill reads, and costs no labour."
+        "description": "One step of a formula's process, and how long it takes.\n\nA step is a sentence and an optional duration, so a formula that takes two\nhours to make says so, and its labour is costed per step instead of as a lump\nsum typed per batch. The duration is optional: a step nobody timed still\nreads, and costs no labour."
       },
       "ProcessStep-Output": {
         "properties": {
@@ -70623,7 +70623,7 @@
           "text"
         ],
         "title": "ProcessStep",
-        "description": "One step of a formula's process, and how long it takes.\n\nA step used to be a bare sentence, so a formula that took two hours to\nmake said nothing about the two hours and its labour could only be a\nlump sum typed per batch. The duration is optional: a step nobody timed\nstill reads, and costs no labour."
+        "description": "One step of a formula's process, and how long it takes.\n\nA step is a sentence and an optional duration, so a formula that takes two\nhours to make says so, and its labour is costed per step instead of as a lump\nsum typed per batch. The duration is optional: a step nobody timed still\nreads, and costs no labour."
       },
       "ProductLabelExport": {
         "properties": {
@@ -71825,7 +71825,7 @@
           "total_quantity"
         ],
         "title": "ProductTemplateStockResponse",
-        "description": "How much of one product the organization has on its shelves.\n\nThe number a threshold is measured against, so the screen that sets\none can name it. That screen used to show the quantity of the single\nrecord the reader had opened, and offered to copy it into a field\ngoverning the product as a whole."
+        "description": "How much of one product the organization has on its shelves.\n\nThe number a threshold is measured against, so the screen that sets\none can name it. That screen shows the product's total across its shelves,\nnever the quantity of the single record the reader has opened, so the two\nare not confused with a field governing the product as a whole."
       },
       "ProductionAttachmentRead": {
         "properties": {
@@ -80023,7 +80023,7 @@
           "max_quantity"
         ],
         "title": "ReorderRuleCreate",
-        "description": "Create a reorder rule for one (product, location) pair.\n\n``min_quantity`` is the threshold that makes the rule fire; ``max_quantity``\nis only the level to reach once it has. Requiredness used to be the other\nway round -- MIN defaulted to 0 -- and the engine skips a rule at 0\noutright, so a rule saved with the required fields alone could never\nproduce an alert while sitting on the list looking like every other one."
+        "description": "Create a reorder rule for one (product, location) pair.\n\n``min_quantity`` is the threshold that makes the rule fire; ``max_quantity``\nis only the level to reach once it has. ``min_quantity`` is required, and\nthe engine skips a rule at 0 outright, so a rule must set it above zero to\never produce an alert."
       },
       "ReorderRuleSchema": {
         "properties": {
