@@ -32078,7 +32078,7 @@
           "Warehouse"
         ],
         "summary": "List Cost Variances",
-        "description": "The variances of the organization in a period, newest first.\n\nPart of no stock value: the list and its sums are the whole of what the\nfigures do. A sum is kept per currency, because a variance is never\nconverted.",
+        "description": "A page of the organization's variances in a period, newest first.\n\nPart of no stock value: the list and its sums are the whole of what the\nfigures do. The sums cover the whole period, not the page, and are kept\nper currency because a variance is never converted.",
         "operationId": "list_cost_variances_api_v1_warehouse_cost_variances_get",
         "security": [
           {
@@ -32121,6 +32121,29 @@
                 }
               ],
               "title": "Date To"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
             }
           }
         ],
@@ -49688,8 +49711,28 @@
               "$ref": "#/components/schemas/CostVarianceRow"
             },
             "type": "array",
-            "title": "Items",
-            "default": []
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
+          "total_capped": {
+            "type": "boolean",
+            "title": "Total Capped",
+            "default": false
           },
           "totals": {
             "additionalProperties": {
@@ -49701,8 +49744,15 @@
           }
         },
         "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset",
+          "has_more"
+        ],
         "title": "CostVariancesList",
-        "description": "Costs that reached no product, listed and added up.\n\n``total`` is per currency: a variance is never converted, so two\ncurrencies are two sums."
+        "description": "A page of the costs that reached no product, with the sums of all.\n\n``totals`` is per currency and covers the whole period, not the page: a\nvariance is never converted, so two currencies are two sums."
       },
       "CountedLocation": {
         "properties": {

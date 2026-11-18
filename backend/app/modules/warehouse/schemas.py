@@ -855,14 +855,13 @@ class CostVarianceRow(CostVarianceOut):
     document_number: str | None = None
 
 
-class CostVariancesList(BaseModel):
-    """Costs that reached no product, listed and added up.
+class CostVariancesList(PaginatedResponse[CostVarianceRow]):
+    """A page of the costs that reached no product, with the sums of all.
 
-    ``total`` is per currency: a variance is never converted, so two
-    currencies are two sums.
+    ``totals`` is per currency and covers the whole period, not the page: a
+    variance is never converted, so two currencies are two sums.
     """
 
-    items: list[CostVarianceRow] = []
     totals: dict[str, Decimal] = {}
 
 

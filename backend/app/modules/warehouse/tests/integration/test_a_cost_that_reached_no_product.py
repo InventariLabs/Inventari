@@ -111,6 +111,23 @@ class TestRecordingAVariance:
         assert recorded['occurred_on'] == on
         assert Decimal(body['variance_total']) == Decimal('200.00')
 
+    def test_the_card_names_the_documents_currency_when_none_was_stated(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_target_location: StorageLocation,
+        doc_partner: Partner,
+        doc_template: ProductTemplate,
+    ) -> None:
+        doc_id = _posted_receipt(
+            client, doc_auth_headers, doc_target_location, doc_partner, doc_template
+        )
+
+        body = _variance(client, doc_auth_headers, doc_id).json()
+
+        assert body['currency']
+        assert body['variances'][0]['currency'] == body['currency']
+
     def test_the_day_defaults_to_today(
         self,
         client: TestClient,
@@ -252,6 +269,31 @@ class TestWhereItIsListed:
             Decimal('200.00')
         ]
         assert sum(Decimal(v) for v in lately['totals'].values()) == Decimal('200.00')
+
+    def test_the_list_is_a_page_and_its_sums_cover_the_whole_filter(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_target_location: StorageLocation,
+        doc_partner: Partner,
+        doc_template: ProductTemplate,
+    ) -> None:
+        doc_id = _posted_receipt(
+            client, doc_auth_headers, doc_target_location, doc_partner, doc_template
+        )
+        for amount in ('10.00', '20.00', '30.00'):
+            _variance(client, doc_auth_headers, doc_id, amount=amount)
+
+        page = client.get(
+            '/api/v1/warehouse/cost-variances',
+            params={'limit': 2, 'offset': 2},
+            headers=doc_auth_headers,
+        ).json()
+
+        assert page['total'] == 3
+        assert (page['limit'], page['offset'], page['has_more']) == (2, 2, False)
+        assert len(page['items']) == 1
+        assert sum(Decimal(v) for v in page['totals'].values()) == Decimal('60.00')
 
 
 class TestTheRefusalOffersTheChoice:

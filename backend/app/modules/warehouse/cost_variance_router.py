@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from datetime import date
-from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
@@ -23,17 +22,19 @@ router = APIRouter(dependencies=[Depends(require_module('warehouse'))])
 async def list_cost_variances(
     date_from: date | None = Query(default=None),
     date_to: date | None = Query(default=None),
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     org_id: UUID = Depends(require_org),
 ) -> Any:
-    """The variances of the organization in a period, newest first.
+    """A page of the organization's variances in a period, newest first.
 
     Part of no stock value: the list and its sums are the whole of what the
-    figures do. A sum is kept per currency, because a variance is never
-    converted.
+    figures do. The sums cover the whole period, not the page, and are kept
+    per currency because a variance is never converted.
     """
-    rows = await svc.list_for_organization_async(
-        db, org_id, date_from=date_from, date_to=date_to
+    rows, total = await svc.list_for_organization_async(
+        db, org_id, date_from=date_from, date_to=date_to, limit=limit, offset=offset
     )
     items = [
         CostVarianceRow(
@@ -48,9 +49,8 @@ async def list_cost_variances(
         )
         for variance, number, document_currency in rows
     ]
-    return CostVariancesList(
-        items=items,
-        totals=svc.totals_by_currency(
-            [(item.currency, Decimal(item.amount)) for item in items]
-        ),
+    page = CostVariancesList.from_slice(items, offset=offset, limit=limit, total=total)
+    page.totals = await svc.totals_by_currency_async(
+        db, org_id, date_from=date_from, date_to=date_to
     )
+    return page

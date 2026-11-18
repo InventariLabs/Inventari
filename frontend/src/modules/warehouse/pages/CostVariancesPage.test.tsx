@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { http, HttpResponse } from "msw";
+import userEvent from "@testing-library/user-event";
 import { render, screen } from "@/test/utils";
 import { server } from "@/test/mocks/server";
 import CostVariancesPage from "./CostVariancesPage";
@@ -32,6 +33,10 @@ describe("CostVariancesPage", () => {
             },
           ],
           totals: { PLN: "200.00", EUR: "50.50" },
+          total: 2,
+          limit: 50,
+          offset: 0,
+          has_more: false,
         }),
       ),
     );
@@ -51,7 +56,14 @@ describe("CostVariancesPage", () => {
   it("says plainly that nothing has been recorded", async () => {
     server.use(
       http.get("*/api/v1/warehouse/cost-variances", () =>
-        HttpResponse.json({ items: [], totals: {} }),
+        HttpResponse.json({
+          items: [],
+          totals: {},
+          total: 0,
+          limit: 50,
+          offset: 0,
+          has_more: false,
+        }),
       ),
     );
 
@@ -60,5 +72,42 @@ describe("CostVariancesPage", () => {
     expect(
       await screen.findByText(/No cost has been recorded as a variance/),
     ).toBeInTheDocument();
+  });
+
+  it("asks for the next page and keeps the sums of the whole period", async () => {
+    const offsets: string[] = [];
+    server.use(
+      http.get("*/api/v1/warehouse/cost-variances", ({ request }) => {
+        const offset = new URL(request.url).searchParams.get("offset") ?? "";
+        offsets.push(offset);
+        return HttpResponse.json({
+          items: [
+            {
+              id: `v${offset}`,
+              document_id: "d1",
+              document_number: `IN/${offset}`,
+              kind: "freight",
+              amount: "10.00",
+              currency: "PLN",
+              reason: "Late bill",
+              occurred_on: "2026-11-10",
+            },
+          ],
+          totals: { PLN: "1000.00" },
+          total: 120,
+          limit: 50,
+          offset: Number(offset),
+          has_more: Number(offset) + 50 < 120,
+        });
+      }),
+    );
+
+    render(<CostVariancesPage />);
+    expect(await screen.findByText("IN/0")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: /next/i }));
+
+    expect(await screen.findByText("IN/50")).toBeInTheDocument();
+    expect(offsets).toEqual(["0", "50"]);
   });
 });

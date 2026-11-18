@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/hooks/queries/keys";
 import { useAppMutation } from "@/lib/api/mutationFactory";
 import {
@@ -39,12 +39,13 @@ export function useRemoveExtraCost(documentId: string) {
 
 const variancesKey = queryKeys.documents.costVariances;
 
-/** Every cost that reached no product, newest first, with its sums. */
-export function useCostVariances() {
+/** A page of the costs that reached no product, with the sums of them all. */
+export function useCostVariances(page: { limit: number; offset: number }) {
   return useQuery({
-    queryKey: variancesKey,
-    queryFn: () => extraCostsApi.listVariances(),
+    queryKey: [...variancesKey, page],
+    queryFn: () => extraCostsApi.listVariances(page),
     staleTime: 30_000,
+    placeholderData: keepPreviousData,
   });
 }
 

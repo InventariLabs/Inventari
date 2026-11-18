@@ -82,9 +82,13 @@ export const extraCostsApi = {
     return response.data;
   },
 
-  listVariances: async (): Promise<CostVarianceList> => {
+  listVariances: async (page: {
+    limit: number;
+    offset: number;
+  }): Promise<CostVarianceList> => {
     const response = await api.get<CostVarianceList>(
       "/warehouse/cost-variances",
+      { params: page },
     );
     return response.data;
   },

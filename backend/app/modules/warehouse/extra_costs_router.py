@@ -79,7 +79,9 @@ async def _view(db: AsyncSession, doc: Any) -> ExtraCostsView:
         fell_back=fell_back,
         lines=lines,
         variances=[
-            CostVarianceOut.model_validate(item, from_attributes=True)
+            CostVarianceOut.model_validate(item, from_attributes=True).model_copy(
+                update={'currency': item.currency or doc.currency}
+            )
             for item in variances
         ],
         variance_total=sum(

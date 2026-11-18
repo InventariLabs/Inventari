@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/Card";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { Pagination } from "@/module-sdk";
 import { QueryFailure } from "@/components/ui/QueryResult";
 import { useMoney } from "@/hooks/useMoney";
 import { formatDate } from "@/utils/formatters";
@@ -14,10 +16,16 @@ import { useCostVariances } from "@/modules/warehouse/hooks/useExtraCosts";
  * not a ledger entry. They are kept per currency, because a variance is never
  * converted.
  */
+const PAGE_SIZE = 50;
+
 export default function CostVariancesPage() {
   const { t } = useTranslation("warehouse");
   const money = useMoney();
-  const { data, isLoading, isError, error, refetch } = useCostVariances();
+  const [offset, setOffset] = useState(0);
+  const { data, isLoading, isError, error, refetch } = useCostVariances({
+    limit: PAGE_SIZE,
+    offset,
+  });
 
   if (isError) {
     return (
@@ -121,6 +129,14 @@ export default function CostVariancesPage() {
           </div>
         </Card>
       )}
+
+      <Pagination
+        skip={offset}
+        limit={PAGE_SIZE}
+        total={data.total}
+        onPrev={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
+        onNext={() => setOffset(offset + PAGE_SIZE)}
+      />
     </div>
   );
 }

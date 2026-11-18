@@ -8663,11 +8663,11 @@ export interface paths {
         };
         /**
          * List Cost Variances
-         * @description The variances of the organization in a period, newest first.
+         * @description A page of the organization's variances in a period, newest first.
          *
          *     Part of no stock value: the list and its sums are the whole of what the
-         *     figures do. A sum is kept per currency, because a variance is never
-         *     converted.
+         *     figures do. The sums cover the whole period, not the page, and are kept
+         *     per currency because a variance is never converted.
          */
         get: operations["list_cost_variances_api_v1_warehouse_cost_variances_get"];
         put?: never;
@@ -14240,17 +14240,27 @@ export interface components {
         };
         /**
          * CostVariancesList
-         * @description Costs that reached no product, listed and added up.
+         * @description A page of the costs that reached no product, with the sums of all.
          *
-         *     ``total`` is per currency: a variance is never converted, so two
-         *     currencies are two sums.
+         *     ``totals`` is per currency and covers the whole period, not the page: a
+         *     variance is never converted, so two currencies are two sums.
          */
         CostVariancesList: {
-            /**
-             * Items
-             * @default []
-             */
+            /** Items */
             items: components["schemas"]["CostVarianceRow"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Has More */
+            has_more: boolean;
+            /**
+             * Total Capped
+             * @default false
+             */
+            total_capped: boolean;
             /**
              * Totals
              * @default {}
@@ -46889,6 +46899,8 @@ export interface operations {
             query?: {
                 date_from?: string | null;
                 date_to?: string | null;
+                limit?: number;
+                offset?: number;
             };
             header?: never;
             path?: never;
