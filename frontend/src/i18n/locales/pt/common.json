@@ -674,7 +674,9 @@
         "production_run": "Produção",
         "production_run_reversed": "Produção desfeita",
         "package_opened": "Embalagem aberta",
-        "circuit_breaker": "Desativado pelo disjuntor após falhas repetidas de entrega"
+        "circuit_breaker": "Desativado pelo disjuntor após falhas repetidas de entrega",
+        "workflow deactivated": "Fluxo desativado",
+        "workflow deleted": "Fluxo eliminado"
       },
       "targetTypes": {
         "item": "Produto",

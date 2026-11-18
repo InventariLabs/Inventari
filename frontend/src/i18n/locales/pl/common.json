@@ -716,7 +716,9 @@
         "production_run": "Zlecenie produkcyjne",
         "production_run_reversed": "Zlecenie produkcyjne cofnięte",
         "package_opened": "Otwarcie opakowania",
-        "circuit_breaker": "Odłączone przez bezpiecznik po powtarzających się niepowodzeniach dostawy"
+        "circuit_breaker": "Odłączone przez bezpiecznik po powtarzających się niepowodzeniach dostawy",
+        "workflow deactivated": "Przepływ wyłączony",
+        "workflow deleted": "Przepływ usunięty"
       },
       "targetTypes": {
         "item": "Produkt",

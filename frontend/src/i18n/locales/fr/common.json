@@ -714,7 +714,9 @@
         "production_run": "Ordre de fabrication",
         "production_run_reversed": "Ordre de fabrication annulé",
         "package_opened": "Emballage ouvert",
-        "circuit_breaker": "Désactivé par le disjoncteur après des échecs de livraison répétés"
+        "circuit_breaker": "Désactivé par le disjoncteur après des échecs de livraison répétés",
+        "workflow deactivated": "Circuit désactivé",
+        "workflow deleted": "Circuit supprimé"
       },
       "targetTypes": {
         "item": "Produit",

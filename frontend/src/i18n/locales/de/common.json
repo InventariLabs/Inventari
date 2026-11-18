@@ -714,7 +714,9 @@
         "production_run": "Produktionsauftrag",
         "production_run_reversed": "Produktionsauftrag zurückgenommen",
         "package_opened": "Packung geöffnet",
-        "circuit_breaker": "Durch den Schutzschalter nach wiederholten Zustellfehlern deaktiviert"
+        "circuit_breaker": "Durch den Schutzschalter nach wiederholten Zustellfehlern deaktiviert",
+        "workflow deactivated": "Ablauf deaktiviert",
+        "workflow deleted": "Ablauf gelöscht"
       },
       "targetTypes": {
         "item": "Produkt",
