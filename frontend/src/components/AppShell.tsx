@@ -77,7 +77,7 @@ export default function AppShell() {
     const handleLogout = () => {
       // The sign-in drops whatever a form on screen holds. A request that
       // shows no toast of its own (a picker's search, a background read)
-      // would end the session without a word, so the shell says it once.
+      // would end the session without a word, so the shell says so, one toast however many requests fail.
       if (useFormGuardStore.getState().dirtyForm !== null) {
         toast.error(t("errors.sessionEndedReadUnsaved"), {
           id: "session-ended-unsaved",
