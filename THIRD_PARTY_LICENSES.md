@@ -159,7 +159,7 @@ and the static assets the frontend serves.
 | `yarl` | 1.25.1 | Apache-2.0 |  |
 | `zopfli` | 0.4.3 | Apache-2.0 |  |
 
-## Frontend production bundle (304 packages)
+## Frontend production bundle (303 packages)
 
 | Package | Version | Licence | Note |
 |---|---|---|---|
@@ -181,44 +181,43 @@ and the static assets the frontend serves.
 | `@nodelib/fs.stat` | 2.0.5 | MIT |  |
 | `@nodelib/fs.walk` | 1.2.8 | MIT |  |
 | `@radix-ui/number` | 1.1.3 | MIT |  |
-| `@radix-ui/primitive` | 1.1.7 | MIT |  |
-| `@radix-ui/react-alert-dialog` | 1.1.23 | MIT |  |
-| `@radix-ui/react-arrow` | 1.1.15 | MIT |  |
-| `@radix-ui/react-collection` | 1.1.15 | MIT |  |
+| `@radix-ui/primitive` | 1.2.0 | MIT |  |
+| `@radix-ui/react-alert-dialog` | 1.2.1 | MIT |  |
+| `@radix-ui/react-arrow` | 1.1.17 | MIT |  |
+| `@radix-ui/react-collection` | 1.2.0 | MIT |  |
 | `@radix-ui/react-compose-refs` | 1.1.5 | MIT |  |
-| `@radix-ui/react-context` | 1.2.2 | MIT |  |
-| `@radix-ui/react-dialog` | 1.1.23 | MIT |  |
-| `@radix-ui/react-direction` | 1.1.4 | MIT |  |
-| `@radix-ui/react-dismissable-layer` | 1.1.19 | MIT |  |
-| `@radix-ui/react-focus-guards` | 1.1.6 | MIT |  |
-| `@radix-ui/react-focus-scope` | 1.1.16 | MIT |  |
+| `@radix-ui/react-context` | 1.3.0 | MIT |  |
+| `@radix-ui/react-dialog` | 1.3.1 | MIT |  |
+| `@radix-ui/react-direction` | 1.2.0 | MIT |  |
+| `@radix-ui/react-dismissable-layer` | 1.2.1 | MIT |  |
+| `@radix-ui/react-focus-guards` | 1.2.0 | MIT |  |
+| `@radix-ui/react-focus-scope` | 1.3.1 | MIT |  |
 | `@radix-ui/react-id` | 1.1.4 | MIT |  |
-| `@radix-ui/react-popover` | 1.1.23 | MIT |  |
-| `@radix-ui/react-popper` | 1.3.7 | MIT |  |
-| `@radix-ui/react-portal` | 1.1.17 | MIT |  |
-| `@radix-ui/react-presence` | 1.1.10 | MIT |  |
-| `@radix-ui/react-primitive` | 2.1.10 | MIT |  |
-| `@radix-ui/react-roving-focus` | 1.1.19 | MIT |  |
-| `@radix-ui/react-select` | 2.3.7 | MIT |  |
-| `@radix-ui/react-slot` | 1.3.3 | MIT |  |
-| `@radix-ui/react-tabs` | 1.1.21 | MIT |  |
-| `@radix-ui/react-use-callback-ref` | 1.1.4 | MIT |  |
-| `@radix-ui/react-use-controllable-state` | 1.2.6 | MIT |  |
+| `@radix-ui/react-popover` | 1.3.1 | MIT |  |
+| `@radix-ui/react-popper` | 1.4.0 | MIT |  |
+| `@radix-ui/react-portal` | 1.2.0 | MIT |  |
+| `@radix-ui/react-presence` | 1.1.11 | MIT |  |
+| `@radix-ui/react-primitive` | 2.2.0 | MIT |  |
+| `@radix-ui/react-roving-focus` | 1.2.1 | MIT |  |
+| `@radix-ui/react-select` | 2.4.1 | MIT |  |
+| `@radix-ui/react-slot` | 1.5.0 | MIT |  |
+| `@radix-ui/react-tabs` | 1.2.1 | MIT |  |
+| `@radix-ui/react-use-callback-ref` | 1.1.5 | MIT |  |
+| `@radix-ui/react-use-controllable-state` | 1.3.0 | MIT |  |
 | `@radix-ui/react-use-effect-event` | 0.0.5 | MIT |  |
 | `@radix-ui/react-use-is-hydrated` | 0.1.3 | MIT |  |
 | `@radix-ui/react-use-layout-effect` | 1.1.4 | MIT |  |
-| `@radix-ui/react-use-previous` | 1.1.4 | MIT |  |
 | `@radix-ui/react-use-rect` | 1.1.4 | MIT |  |
-| `@radix-ui/react-use-size` | 1.1.4 | MIT |  |
-| `@radix-ui/react-visually-hidden` | 1.2.11 | MIT |  |
+| `@radix-ui/react-use-size` | 1.1.5 | MIT |  |
+| `@radix-ui/react-visually-hidden` | 1.2.13 | MIT |  |
 | `@radix-ui/rect` | 1.1.3 | MIT |  |
 | `@reduxjs/toolkit` | 2.12.0 | MIT |  |
 | `@standard-schema/spec` | 1.1.0 | MIT |  |
 | `@standard-schema/utils` | 0.3.0 | MIT |  |
-| `@tanstack/query-core` | 5.104.0 | MIT |  |
-| `@tanstack/react-query` | 5.104.0 | MIT |  |
-| `@tanstack/react-virtual` | 3.14.13 | MIT |  |
-| `@tanstack/virtual-core` | 3.17.11 | MIT |  |
+| `@tanstack/query-core` | 5.108.0 | MIT |  |
+| `@tanstack/react-query` | 5.108.0 | MIT |  |
+| `@tanstack/react-virtual` | 3.14.26 | MIT |  |
+| `@tanstack/virtual-core` | 3.19.11 | MIT |  |
 | `@types/d3-array` | 3.2.2 | MIT |  |
 | `@types/d3-color` | 3.1.3 | MIT |  |
 | `@types/d3-ease` | 3.0.2 | MIT |  |
@@ -248,7 +247,7 @@ and the static assets the frontend serves.
 | `arg` | 5.0.2 | MIT |  |
 | `aria-hidden` | 1.2.6 | MIT |  |
 | `asynckit` | 0.4.0 | MIT |  |
-| `axios` | 1.20.0 | MIT |  |
+| `axios` | 1.21.1 | MIT |  |
 | `bail` | 2.0.2 | MIT |  |
 | `binary-extensions` | 2.3.0 | MIT |  |
 | `braces` | 3.0.3 | MIT |  |
@@ -324,7 +323,7 @@ and the static assets the frontend serves.
 | `html5-qrcode` | 2.3.8 | Apache-2.0 |  |
 | `https-proxy-agent` | 5.0.1 | MIT |  |
 | `i18next` | 26.4.2 | MIT |  |
-| `i18next-browser-languagedetector` | 8.2.1 | MIT |  |
+| `i18next-browser-languagedetector` | 8.3.1 | MIT |  |
 | `immer` | 11.1.18 | MIT |  |
 | `inline-style-parser` | 0.2.7 | MIT |  |
 | `internmap` | 2.0.3 | ISC |  |
@@ -345,7 +344,7 @@ and the static assets the frontend serves.
 | `lines-and-columns` | 1.2.4 | MIT |  |
 | `longest-streak` | 3.1.0 | MIT |  |
 | `loose-envify` | 1.4.0 | MIT |  |
-| `lucide-react` | 1.48.0 | ISC |  |
+| `lucide-react` | 1.74.0 | ISC |  |
 | `math-intrinsics` | 1.1.0 | MIT |  |
 | `mdast-util-from-markdown` | 2.0.3 | MIT |  |
 | `mdast-util-mdx-expression` | 2.0.1 | MIT |  |
@@ -411,8 +410,8 @@ and the static assets the frontend serves.
 | `react-redux` | 9.3.0 | MIT |  |
 | `react-remove-scroll` | 2.7.2 | MIT |  |
 | `react-remove-scroll-bar` | 2.3.8 | MIT |  |
-| `react-router` | 7.18.4 | MIT |  |
-| `react-router-dom` | 7.18.4 | MIT |  |
+| `react-router` | 7.18.5 | MIT |  |
+| `react-router-dom` | 7.18.5 | MIT |  |
 | `react-style-singleton` | 2.2.3 | MIT |  |
 | `read-cache` | 1.0.2 | MIT |  |
 | `readdirp` | 3.6.0 | MIT |  |
@@ -427,7 +426,7 @@ and the static assets the frontend serves.
 | `reusify` | 1.1.0 | MIT |  |
 | `run-parallel` | 1.2.0 | MIT |  |
 | `scheduler` | 0.23.2 | MIT |  |
-| `set-cookie-parser` | 2.7.2 | MIT |  |
+| `set-cookie-parser` | 2.7.3 | MIT |  |
 | `sonner` | 2.0.8 | MIT |  |
 | `source-map-js` | 1.2.2 | BSD-3-Clause |  |
 | `space-separated-tokens` | 2.0.2 | MIT |  |
@@ -463,9 +462,9 @@ and the static assets the frontend serves.
 | `vfile` | 6.0.3 | MIT |  |
 | `vfile-message` | 4.0.3 | MIT |  |
 | `victory-vendor` | 37.3.6 | MIT AND ISC |  |
-| `web-vitals` | 6.2.2 | Apache-2.0 |  |
+| `web-vitals` | 6.2.3 | Apache-2.0 |  |
 | `yaml` | 2.9.1 | ISC |  |
-| `zustand` | 5.0.15 | MIT |  |
+| `zustand` | 5.1.0 | MIT |  |
 | `zwitch` | 2.0.4 | MIT |  |
 
 ## Backend and backup images — system layer

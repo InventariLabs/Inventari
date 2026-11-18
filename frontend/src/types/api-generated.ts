@@ -10866,6 +10866,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/warehouse/templates/{template_id}/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reset Template To Built In
+         * @description Put a copy back as the built-in it came from, in place.
+         *
+         *     Whatever was written into the copy is gone; its name, its place among
+         *     the defaults and everything that points at it stay. A template that was
+         *     not copied from a built-in has nothing to go back to: 404.
+         */
+        post: operations["reset_template_to_built_in_api_v1_warehouse_templates__template_id__reset_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/warehouse/todo": {
         parameters: {
             query?: never;
@@ -15268,6 +15292,11 @@ export interface components {
              * @default false
              */
             source_outdated: boolean;
+            /**
+             * Source Modified
+             * @default false
+             */
+            source_modified: boolean;
         };
         /** DocumentTracking */
         DocumentTracking: {
@@ -50935,6 +50964,37 @@ export interface operations {
         responses: {
             /** @description Successful Response */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentTemplateSchema"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reset_template_to_built_in_api_v1_warehouse_templates__template_id__reset_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

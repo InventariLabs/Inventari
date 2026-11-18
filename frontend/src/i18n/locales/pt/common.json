@@ -99,6 +99,12 @@
     "outdatedCopy": "Feito a partir de uma versão antiga do layout integrado.",
     "refreshCopy": "Copiar o integrado atual ao lado",
     "refreshedCopy": "\"{{name}}\" criado a partir do layout integrado atual",
+    "modifiedNote": "Alterado em relação ao integrado",
+    "reset": "Repor o layout integrado",
+    "resetTitle": "Repor \"{{name}}\" para o layout integrado?",
+    "resetMessage": "Todas as alterações feitas neste modelo serão perdidas e substituídas pelo layout integrado. O nome e a definição de impressão por omissão mantêm-se. Não é possível anular.",
+    "resetConfirm": "Repor",
+    "resetDone": "\"{{name}}\" voltou a ser o layout integrado",
     "export": "Exportar modelo",
     "import": "Importar modelo",
     "imported": "\"{{name}}\" importado.",
@@ -638,7 +644,9 @@
         "emailed_to": "Enviado por e-mail para",
         "imported_from": "Importado de",
         "skipped": "Linhas ignoradas",
-        "approval": "Aprovação"
+        "approval": "Aprovação",
+        "body_html": "Conteúdo do modelo",
+        "reset_to_builtin": "Reposto no modelo integrado"
       },
       "showWholeChange": "Mostrar a alteração completa",
       "showLess": "Mostrar menos",
@@ -1201,6 +1209,7 @@
     "nextPage": "Próxima página",
     "editNamed": "Editar {{name}}",
     "deleteNamed": "Excluir {{name}}",
+    "archiveNamed": "Arquivar {{name}}",
     "cloneNamed": "Duplicar {{name}}",
     "closeToast": "Fechar notificação",
     "toastsRegion": "Notificações"

@@ -20,6 +20,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.core.testing import ModuleTestHelper
+from app.i18n.service import get_error_message
 from app.models.item import Item
 from app.models.organization import Organization
 from app.models.storage_location import StorageLocation
@@ -129,3 +130,42 @@ class TestAPlaceInAnAssetsHistoryIsNotDeleted:
         resp = client.delete(f'/api/v1/locations/{place.id}', headers=eq_auth_headers)
 
         assert resp.status_code in (200, 204), resp.text
+
+
+class TestAPlaceWithAnOpenAndAClosedCheckoutIsRefusedInOneVoice:
+    def test_both_doors_give_the_core_reason(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        eq_item: Item,
+        h: ModuleTestHelper,
+        eq_org: Organization,
+        eq_storage_type: StorageType,
+        eq_user: User,
+    ) -> None:
+        place = h.create_storage_location(
+            eq_org, eq_storage_type, eq_user, name='Workstations'
+        )
+        # One checkout closed, the same asset checked out there again: the
+        # place is in the asset's history and a record stands in it now.
+        _check_in(
+            client, eq_auth_headers, _check_out(client, eq_auth_headers, eq_item, place)
+        )
+        _check_out(client, eq_auth_headers, eq_item, place)
+
+        single = client.delete(f'/api/v1/locations/{place.id}', headers=eq_auth_headers)
+        reorg = client.post(
+            '/api/v1/locations/reorg',
+            headers=eq_auth_headers,
+            json={'operations': [{'op': 'delete', 'id': str(place.id)}]},
+        )
+
+        assert single.status_code == 400, single.text
+        assert reorg.json()['applied'] is False, reorg.text
+        assert [r['reason'] for r in reorg.json()['rejections']] == [
+            get_error_message('storage_delete_failed_items', 'en')
+        ]
+        assert (
+            single.json()['detail']['message']
+            == reorg.json()['rejections'][0]['reason']
+        )

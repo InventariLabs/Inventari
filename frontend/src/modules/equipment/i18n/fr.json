@@ -562,6 +562,7 @@
     "updateFailed": "Échec de la mise à jour de l'emplacement",
     "deleted": "Emplacement supprimé",
     "deleteFailed": "Échec de la suppression de l'emplacement",
+    "archiveConfirm": "L'emplacement n'apparaîtra plus dans les listes ni les sélecteurs.",
     "deleteTitle": "Supprimer l'emplacement",
     "confirmDelete": "Supprimer l'emplacement « {{name}} » ?",
     "parent": "Emplacement parent",

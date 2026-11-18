@@ -528,6 +528,7 @@ export const API_ROUTES = [
   "/api/v1/warehouse/templates/{template_id}",
   "/api/v1/warehouse/templates/{template_id}/export",
   "/api/v1/warehouse/templates/{template_id}/refresh-copy",
+  "/api/v1/warehouse/templates/{template_id}/reset",
   "/api/v1/warehouse/todo",
   "/api/v1/warehouse/work-items/custom",
   "/api/v1/warehouse/work-items/custom/{item_id}",

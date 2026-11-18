@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Archive, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
@@ -36,6 +36,11 @@ export default function ArchivedStoragesPage() {
   const { setHeader } = useModulePageHeader();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  // A module screen that archives places of its own sends the reader here with
+  // its name: the places it tagged are hidden from this list while module data
+  // is hidden, and the way back has to be reachable from where the way in was.
+  const [searchParams] = useSearchParams();
+  const fromModule = searchParams.get("module");
 
   // The same pair of tabs the active list carries: the way back has to be
   // where the way in was, now that neither state has a menu entry.
@@ -59,14 +64,26 @@ export default function ArchivedStoragesPage() {
   // list in two states, and a restore is confirmed on the tab the row must
   // reappear on. The flag is part of the cache identity: scoped and unscoped
   // archives are different answers to one endpoint.
-  const excludeModuleContexts = !useShowModuleData();
+  // Arriving from a module screen, the scope is that module's instead: its
+  // own places and the untagged ones, never another module's.
+  const excludeModuleContexts = !useShowModuleData() && !fromModule;
   const query = useQuery({
     queryKey: [
       ...queryKeys.storages.all,
       "archived",
-      { excludeModuleContexts },
+      { excludeModuleContexts, fromModule },
     ],
-    queryFn: () => storagesApi.listArchived({ excludeModuleContexts }),
+    queryFn: async () => {
+      const archived = await storagesApi.listArchived({
+        excludeModuleContexts,
+      });
+      return fromModule
+        ? archived.filter(
+            (storage) =>
+              !storage.context_tag || storage.context_tag === fromModule,
+          )
+        : archived;
+    },
   });
 
   const restoreMutation = useAppMutation<StorageLocation, string>(

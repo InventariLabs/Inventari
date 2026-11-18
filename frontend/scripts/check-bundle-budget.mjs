@@ -448,10 +448,24 @@ const dist = join(root, "dist");
  * first paint 400, login 405, launcher 420, issue 585); the other screens
  * stand under theirs (start 631.5, receive 468.0, history 604.5, products
  * 619.5, initial 189.5).
+ *
+ * Re-measured 2026-11-17 on the branch that updated the frontend's packages:
+ * axios 1.20.0 to 1.21.1 is the only one that grows the start path, by 2.6
+ * KiB gz — new code in the library itself (response timing, the opt-in UTF-8
+ * Basic authentication, the Cookie Store read for the XSRF token, the error
+ * diagnostics), not lost tree-shaking: the entry already imported all of axios.
+ * Every screen carries it. Before the update app first paint measured 397.4,
+ * initial 189.5, login 402.2, launcher 417.3, start 634.2, receive 470.0,
+ * issue 582.7, history 607.3, products 624.7; after it 400.0, 192.0, 404.8,
+ * 419.8, 636.8, 472.6, 585.3, 609.9, 627.2. The Radix primitives, react-query,
+ * lucide-react and the build tools moved nothing by more than 1.5 KiB. Each
+ * budget a screen came within a KiB of moves a step of five (app first paint
+ * 405, login 410, launcher 425, start 640, receive 475, issue 590, history
+ * 615, products 630), so the next update does not trip them again.
  */
 const BUDGETS = {
   initial: 245,
-  appFirstPaint: 400,
+  appFirstPaint: 405,
 };
 
 /**

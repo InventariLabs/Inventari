@@ -555,6 +555,7 @@
     "updateFailed": "Falha ao atualizar o local",
     "deleted": "Local excluído",
     "deleteFailed": "Falha ao excluir o local",
+    "archiveConfirm": "O local deixará de aparecer em listas e seletores.",
     "deleteTitle": "Excluir local",
     "confirmDelete": "Excluir o local \"{{name}}\"?",
     "parent": "Local superior",

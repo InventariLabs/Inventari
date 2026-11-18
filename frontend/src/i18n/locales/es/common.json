@@ -101,6 +101,12 @@
     "outdatedCopy": "Creado a partir de una versión anterior de la plantilla integrada.",
     "refreshCopy": "Copiar la plantilla integrada actual al lado",
     "refreshedCopy": "Se creó «{{name}}» a partir de la plantilla integrada",
+    "modifiedNote": "Modificada respecto a la integrada",
+    "reset": "Restablecer a la integrada",
+    "resetTitle": "¿Restablecer «{{name}}» a la plantilla integrada?",
+    "resetMessage": "Se perderán todos los cambios de esta plantilla y se sustituirán por la plantilla integrada. El nombre y si se imprime por defecto no cambian. No se puede deshacer.",
+    "resetConfirm": "Restablecer",
+    "resetDone": "«{{name}}» vuelve a ser la plantilla integrada",
     "export": "Exportar plantilla",
     "import": "Importar plantilla",
     "imported": "Plantilla «{{name}}» importada.",
@@ -678,7 +684,9 @@
         "purpose": "Finalidad",
         "registration": "Registro",
         "response_id": "ID de la respuesta",
-        "sku_schema": "Esquema de SKU"
+        "sku_schema": "Esquema de SKU",
+        "body_html": "Contenido de la plantilla",
+        "reset_to_builtin": "Restablecida a la plantilla integrada"
       },
       "showWholeChange": "Mostrar el cambio completo",
       "showLess": "Mostrar menos",
@@ -1250,6 +1258,7 @@
     "nextPage": "Página siguiente",
     "editNamed": "Editar {{name}}",
     "deleteNamed": "Eliminar {{name}}",
+    "archiveNamed": "Archivar {{name}}",
     "cloneNamed": "Duplicar {{name}}",
     "closeToast": "Cerrar notificación",
     "toastsRegion": "Notificaciones"
