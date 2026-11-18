@@ -451,14 +451,6 @@ export default function DocumentFormModal({
   );
   // The picker folds shelf-total rows only where the executor can spend
   // them — one executor truth, mirrored from document_types.py.
-  const lineImport = useDocumentLineImport({
-    documentId: document?.id,
-    docType,
-    sourceLocationId,
-    requiresSource,
-    replaceLinesFrom,
-    appendImportedLines,
-  });
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   // Server (422) errors, set by handleApiError; cleared on input change.
   const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
@@ -505,8 +497,17 @@ export default function DocumentFormModal({
     !!partnerId ||
     changedFrom(sourceLocationId, prefilledLocations.current.source) ||
     changedFrom(targetLocationId, prefilledLocations.current.target) ||
-    !!notes.trim() ||
-    !!externalReference.trim();
+    !!(notes.trim() || externalReference.trim());
+
+  const lineImport = useDocumentLineImport({
+    documentId: document?.id,
+    docType,
+    sourceLocationId,
+    requiresSource,
+    hasUnsavedInput,
+    replaceLinesFrom,
+    appendImportedLines,
+  });
 
   // when the inline partner-create popover is open, Esc/backdrop must
   // close the popover first — not discard the whole document form.
