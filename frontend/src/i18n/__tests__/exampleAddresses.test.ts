@@ -36,7 +36,7 @@ const addressesIn = (catalogue: unknown) =>
   strings(catalogue).flatMap((s) => s.match(ADDRESS) ?? []);
 
 describe("example addresses in the catalogues", () => {
-  it("scans the catalogues of all five maintained languages", () => {
+  it("scans the catalogues of every language, community translations included", () => {
     const names = Object.keys(catalogues);
     for (const lang of ["de", "en", "es", "fr", "pl", "pt"]) {
       expect(names.some((n) => n.includes(`/${lang}/`))).toBe(true);
