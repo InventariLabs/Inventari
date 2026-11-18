@@ -331,6 +331,8 @@ describe("SettingsShell — the mobile nav sheet marks and guards its entries", 
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(screen.getByText("general body")).toBeInTheDocument();
+    // …and the picker now names the section the reader moved to.
+    expect(screen.getByRole("button", { name: "People" })).toBeInTheDocument();
 
     useFormGuardStore.setState({ dirtyForm: null });
   });

@@ -216,9 +216,13 @@ jobs:
         # cancel still shows what ran) and is kept in a log that is read
         # after the run, as `make test-backend` reads it: an error at setup
         # is not a failed test, and the summary line is where it shows when
-        # the exit code is lost.
+        # the exit code is lost. GitHub runs `shell: bash` as
+        # `bash --noprofile --norc -eo pipefail`, which would end the script
+        # at the pipe on a failing pytest; `set +e` lets the checker read the
+        # log of every run and the step exit with the verdict below.
         shell: bash
         run: |
+          set +e
           log="$RUNNER_TEMP/pytest.log"
           uv run pytest -n "$(python3 ../scripts/test-workers.py pytest)" -q --tb=short --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70 2>&1 | tee "$log"
           rc=${PIPESTATUS[0]}

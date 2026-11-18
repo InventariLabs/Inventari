@@ -12,6 +12,8 @@ interface UseDocumentLineImportOptions {
   docType: string;
   sourceLocationId: string;
   requiresSource: boolean;
+  /** The form holds something the reader typed. */
+  hasUnsavedInput: boolean;
   replaceLinesFrom: (source: WarehouseDocument) => void;
   appendImportedLines: (lines: ImportResult["lines"]) => void;
 }
@@ -22,6 +24,7 @@ export function useDocumentLineImport({
   docType,
   sourceLocationId,
   requiresSource,
+  hasUnsavedInput,
   replaceLinesFrom,
   appendImportedLines,
 }: UseDocumentLineImportOptions) {
@@ -65,6 +68,7 @@ export function useDocumentLineImport({
     : {
         documentType: docType,
         sourceLocationId: sourceLocationId || undefined,
+        holdsUnsavedWork: hasUnsavedInput,
       };
 
   return {
