@@ -574,6 +574,7 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | `get_async` | `(db: AsyncSession, organization_id: UUID, template_id: UUID, module: str) -> DocumentTemplateSchema \| None` | READ | — |
 | `get_default_async` | `(db: AsyncSession, organization_id: UUID, module: str, document_type: str) -> DocumentTemplateSchema \| None` | READ | Get the default template for ``(module, document_type)``. |
 | `list_async` | `(db: AsyncSession, organization_id: UUID, module: str, built_ins: list[tuple[str, str, str]] \| None=None) -> list[DocumentTemplateSchema]` | READ | The organization's own templates. |
+| `reset_to_builtin_async` | `(db: AsyncSession, organization_id: UUID, module: str, user: UserContextDTO, template_id: UUID, built_ins: list[tuple[str, str, str]]) -> DocumentTemplateSchema` | WRITE | Overwrite a copy's body with its built-in, keeping name and default. |
 | `seed_defaults_async` | `(db: AsyncSession, organization_id: UUID, module: str, user_id: UUID, built_ins: list[tuple[str, str, str]], partials: dict[str, str] \| None=None) -> list[DocumentTemplateSchema]` | WRITE | Seed built-in templates; existing names are skipped (idempotent). |
 | `update_async` | `(db: AsyncSession, organization_id: UUID, template_id: UUID, module: str, *, name: str \| None=None, body_html: str \| None=None, document_type: str \| None=None, is_default: bool \| None=None, partials: dict[str, str] \| None=None, user_id: UUID \| None=None) -> DocumentTemplateSchema` | WRITE | Raises ``NotFoundException`` when the template does not exist. |
 
@@ -596,9 +597,9 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 
 ## Statistics
 
-- **Total methods:** 313
+- **Total methods:** 314
 - **Namespaces:** 33
-- **Documented methods:** 313 (100%)
+- **Documented methods:** 314 (100%)
 - **READ methods:** 219 (70%)
-- **WRITE methods:** 94 (30%)
+- **WRITE methods:** 95 (30%)
 

@@ -103,6 +103,12 @@
     "outdatedCopy": "Powstał ze starszej wersji szablonu wbudowanego.",
     "refreshCopy": "Utwórz obok kopię z aktualnego wbudowanego",
     "refreshedCopy": "Utworzono „{{name}}” z aktualnego szablonu wbudowanego",
+    "modifiedNote": "Zmieniony względem wbudowanego",
+    "reset": "Resetuj do wbudowanego",
+    "resetTitle": "Zresetować „{{name}}” do układu wbudowanego?",
+    "resetMessage": "Wszystkie zmiany w tym szablonie zostaną utracone i zastąpione układem wbudowanym. Nazwa i to, czy szablon drukuje się domyślnie, zostają bez zmian. Tego nie można cofnąć.",
+    "resetConfirm": "Resetuj",
+    "resetDone": "„{{name}}” jest znów układem wbudowanym",
     "export": "Eksportuj szablon",
     "import": "Importuj szablon",
     "imported": "Zaimportowano szablon „{{name}}”.",
@@ -680,7 +686,9 @@
         "purpose": "Przeznaczenie",
         "registration": "Rejestracja",
         "response_id": "Odpowiedź (identyfikator)",
-        "sku_schema": "Schemat SKU"
+        "sku_schema": "Schemat SKU",
+        "body_html": "Treść szablonu",
+        "reset_to_builtin": "Zresetowany do szablonu wbudowanego"
       },
       "showWholeChange": "Pokaż całą zmianę",
       "showLess": "Pokaż mniej",
@@ -1290,6 +1298,7 @@
     "nextPage": "Następna strona",
     "editNamed": "Edytuj: {{name}}",
     "deleteNamed": "Usuń: {{name}}",
+    "archiveNamed": "Archiwizuj: {{name}}",
     "cloneNamed": "Powiel: {{name}}",
     "closeToast": "Zamknij powiadomienie",
     "toastsRegion": "Powiadomienia"

@@ -48,9 +48,9 @@ describe("ArchivedStoragesPage", () => {
   let queryClient: QueryClient;
   let restored: string[];
 
-  const renderPage = () =>
+  const renderPage = (entry = "/") =>
     render(
-      <MemoryRouter>
+      <MemoryRouter initialEntries={[entry]}>
         <QueryClientProvider client={queryClient}>
           <HeaderHost>
             <ArchivedStoragesPage />
@@ -255,6 +255,32 @@ describe("ArchivedStoragesPage", () => {
       expect(seen.some((u) => !u.includes("exclude_module_contexts"))).toBe(
         true,
       ),
+    );
+  });
+
+  it("lists a module's own archived places when sent there by that module", async () => {
+    // Places made on the equipment screen are tagged for it, and the default
+    // scope hides them: without this the Archive verb there is a one-way door.
+    const seen: string[] = [];
+    server.use(
+      http.get("/api/v1/locations/archived", ({ request }) => {
+        seen.push(request.url);
+        return HttpResponse.json(
+          onePage([
+            { id: "s-1", name: "Review Room", context_tag: "equipment" },
+            { id: "s-2", name: "Walk-in Cooler", context_tag: "food" },
+            { id: "s-3", name: "Spare Shelf", context_tag: null },
+          ]),
+        );
+      }),
+    );
+    renderPage("/inventory/locations/archived?module=equipment");
+
+    expect(await screen.findByText("Review Room")).toBeInTheDocument();
+    expect(screen.getByText("Spare Shelf")).toBeInTheDocument();
+    expect(screen.queryByText("Walk-in Cooler")).toBeNull();
+    expect(seen.every((u) => !u.includes("exclude_module_contexts"))).toBe(
+      true,
     );
   });
 });

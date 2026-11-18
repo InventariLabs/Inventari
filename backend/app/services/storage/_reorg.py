@@ -798,6 +798,13 @@ async def execute_storage_reorg(
     if plan.rejected:
         return StorageReorgResponse(applied=False, rejections=plan.rejections)
 
+    # The core's own refusals come first, as they do at the single delete: a
+    # place holding a record is refused in the core's words whatever a module
+    # would add, so one place is refused in one voice by both doors.
+    await _check_delete_guards(db, org_id, plan, data)
+    if plan.rejected:
+        return StorageReorgResponse(applied=False, rejections=plan.rejections)
+
     # A dry run writes nothing, so it asks no module to approve a write.
     if not data.dry_run:
         hook_error = await _run_before_hooks(db, user, org_id, plan)
@@ -805,10 +812,6 @@ async def execute_storage_reorg(
             return hook_error
 
     _validate_final_state(plan, data)
-    if plan.rejected:
-        return StorageReorgResponse(applied=False, rejections=plan.rejections)
-
-    await _check_delete_guards(db, org_id, plan, data)
     if plan.rejected:
         return StorageReorgResponse(applied=False, rejections=plan.rejections)
 

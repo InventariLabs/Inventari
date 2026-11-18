@@ -869,8 +869,12 @@ describe("PutawayRuleEditorDialog on the rule's targets", () => {
     const items = within(await screen.findByRole("list")).getAllByRole(
       "listitem",
     );
-    expect(items[0]).toHaveTextContent("2 product limits · different products");
-    expect(items[1]).toHaveTextContent("No limit · different products");
+    await waitFor(() => {
+      expect(items[0]).toHaveTextContent(
+        "2 product limits · different products",
+      );
+      expect(items[1]).toHaveTextContent("No limit · different products");
+    });
   });
 
   it("says one product only where the target takes one product", async () => {

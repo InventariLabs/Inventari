@@ -14,6 +14,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.contracts import UserContextDTO
 from app.core.public_api._access import reads, writes
 from app.core.template_schemas import DocumentTemplateSchema
 
@@ -45,7 +46,8 @@ class CoreTemplatesAPI:
         return [
             DocumentTemplateSchema.model_validate(t).model_copy(
                 update={
-                    'source_outdated': template_crud.builtin_has_moved_on(t, built_ins)
+                    'source_outdated': template_crud.builtin_has_moved_on(t, built_ins),
+                    'source_modified': template_crud.differs_from_builtin(t, built_ins),
                 }
             )
             for t in templates
@@ -78,6 +80,33 @@ class CoreTemplatesAPI:
             built_ins=built_ins,
         )
         return DocumentTemplateSchema.model_validate(created)
+
+    @writes
+    async def reset_to_builtin_async(
+        self,
+        db: AsyncSession,
+        organization_id: UUID,
+        module: str,
+        user: UserContextDTO,
+        template_id: UUID,
+        built_ins: list[tuple[str, str, str]],
+    ) -> DocumentTemplateSchema:
+        """Overwrite a copy's body with its built-in, keeping name and default.
+
+        Raises ``NotFoundException`` when the template does not exist or was
+        not copied from a built-in.
+        """
+        from app.services import template_crud
+
+        reset = await template_crud.reset_to_builtin_async(
+            db=db,
+            org_id=organization_id,
+            module=module,
+            user_id=user.id,
+            template_id=template_id,
+            built_ins=built_ins,
+        )
+        return DocumentTemplateSchema.model_validate(reset)
 
     @reads
     async def get_async(

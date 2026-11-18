@@ -40156,6 +40156,58 @@
         }
       }
     },
+    "/api/v1/warehouse/templates/{template_id}/reset": {
+      "post": {
+        "tags": [
+          "Warehouse"
+        ],
+        "summary": "Reset Template To Built In",
+        "description": "Put a copy back as the built-in it came from, in place.\n\nWhatever was written into the copy is gone; its name, its place among\nthe defaults and everything that points at it stay. A template that was\nnot copied from a built-in has nothing to go back to: 404.",
+        "operationId": "reset_template_to_built_in_api_v1_warehouse_templates__template_id__reset_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentTemplateSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/warehouse/todo": {
       "get": {
         "tags": [
@@ -53380,6 +53432,11 @@
           "source_outdated": {
             "type": "boolean",
             "title": "Source Outdated",
+            "default": false
+          },
+          "source_modified": {
+            "type": "boolean",
+            "title": "Source Modified",
             "default": false
           }
         },

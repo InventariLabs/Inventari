@@ -101,6 +101,12 @@
     "outdatedCopy": "Créé à partir d'une version antérieure du modèle intégré.",
     "refreshCopy": "Copier le modèle intégré actuel à côté",
     "refreshedCopy": "« {{name}} » créé à partir du modèle intégré actuel",
+    "modifiedNote": "Modifié par rapport au modèle intégré",
+    "reset": "Rétablir le modèle intégré",
+    "resetTitle": "Rétablir « {{name}} » au modèle intégré ?",
+    "resetMessage": "Toutes les modifications apportées à ce modèle seront perdues et remplacées par le modèle intégré. Son nom et son statut de modèle par défaut restent inchangés. Cette action est irréversible.",
+    "resetConfirm": "Rétablir",
+    "resetDone": "« {{name}} » est de nouveau le modèle intégré",
     "export": "Exporter le modèle",
     "import": "Importer un modèle",
     "imported": "Modèle « {{name}} » importé.",
@@ -678,7 +684,9 @@
         "purpose": "Usage",
         "registration": "Inscription",
         "response_id": "Identifiant de la réponse",
-        "sku_schema": "Schéma de SKU"
+        "sku_schema": "Schéma de SKU",
+        "body_html": "Contenu du modèle",
+        "reset_to_builtin": "Rétabli au modèle intégré"
       },
       "showWholeChange": "Afficher toute la modification",
       "showLess": "Afficher moins",
@@ -1250,6 +1258,7 @@
     "nextPage": "Page suivante",
     "editNamed": "Modifier {{name}}",
     "deleteNamed": "Supprimer {{name}}",
+    "archiveNamed": "Archiver {{name}}",
     "cloneNamed": "Dupliquer {{name}}",
     "closeToast": "Fermer la notification",
     "toastsRegion": "Notifications"
