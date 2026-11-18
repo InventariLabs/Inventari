@@ -268,7 +268,7 @@
     "caption": "Valor do estoque de {{organization}} de {{from}} a {{to}}",
     "completeFrom": "O registro de movimentações começa em {{date}}. Nada antes disso é conhecido — não é zero.",
     "noValueSource": "Não há histórico de custos, então não há valor a informar. O demonstrativo é montado a partir do histórico de custos do que entrou e saiu.",
-    "valueHidden": "O perfil da organização não mostra o valor do estoque, então não há demonstrativo para ler aqui.",
+    "valueHidden": "O modo de trabalho não mostra o valor do estoque, então não há demonstrativo para ler aqui.",
     "cannotAnswer": "Não é possível responder para este período.",
     "excludedCurrency_one": "{{count}} recebimento deixado de fora: a moeda dele não é a da organização.",
     "excludedCurrency_other": "{{count}} recebimentos deixados de fora: a moeda deles não é a da organização.",

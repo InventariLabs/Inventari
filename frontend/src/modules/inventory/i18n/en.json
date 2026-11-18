@@ -268,7 +268,7 @@
     "caption": "Stock value of {{organization}} from {{from}} to {{to}}",
     "completeFrom": "The movement ledger starts on {{date}}. Nothing before that is known — not zero.",
     "noValueSource": "No cost history is kept, so there is no value to state. The statement is built from the cost history of what came in and went out.",
-    "valueHidden": "The organization's profile does not show what its stock is worth, so there is no statement to read here.",
+    "valueHidden": "The workspace mode does not show what the stock is worth, so there is no statement to read here.",
     "cannotAnswer": "This period cannot be answered for.",
     "excludedCurrency_one": "{{count}} receipt left out: its currency is not the organization's.",
     "excludedCurrency_other": "{{count}} receipts left out: their currency is not the organization's.",

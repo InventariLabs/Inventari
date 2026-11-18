@@ -268,7 +268,7 @@
     "caption": "Valor de las existencias de {{organization}} del {{from}} al {{to}}",
     "completeFrom": "El libro de movimientos empieza el {{date}}. Nada anterior se conoce, y no es cero.",
     "noValueSource": "No se lleva historial de costes, así que no hay valor que indicar. El estado se construye con el historial de costes de lo que entró y salió.",
-    "valueHidden": "El perfil de la organización no muestra el valor del stock, así que aquí no hay estado que leer.",
+    "valueHidden": "El modo de espacio de trabajo no muestra el valor del stock, así que aquí no hay estado que leer.",
     "cannotAnswer": "No se puede responder para este periodo.",
     "excludedCurrency_one": "{{count}} recepción excluida: su moneda no es la de la organización.",
     "excludedCurrency_other": "{{count}} recepciones excluidas: su moneda no es la de la organización.",

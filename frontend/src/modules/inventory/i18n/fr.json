@@ -268,7 +268,7 @@
     "caption": "Valeur du stock de {{organization}} du {{from}} au {{to}}",
     "completeFrom": "Le journal des mouvements commence le {{date}}. Rien avant n'est connu — et ce n'est pas zéro.",
     "noValueSource": "Aucun historique des coûts n'est tenu, donc il n'y a pas de valeur à indiquer. L'état est construit à partir de l'historique des coûts des entrées et des sorties.",
-    "valueHidden": "Le profil de l'organisation n'affiche pas la valeur du stock : il n'y a donc pas d'état à lire ici.",
+    "valueHidden": "Le mode d’espace de travail n’affiche pas la valeur du stock : il n’y a donc pas d’état à lire ici.",
     "cannotAnswer": "Impossible de répondre pour cette période.",
     "excludedCurrency_one": "{{count}} réception écartée : sa devise n'est pas celle de l'organisation.",
     "excludedCurrency_other": "{{count}} réceptions écartées : leur devise n'est pas celle de l'organisation.",

@@ -133,7 +133,7 @@ describe("StockValueMovementPage", () => {
 
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
     expect(screen.getByRole("note")).toHaveTextContent(
-      /does not show what its stock is worth/,
+      /does not show what the stock is worth/,
     );
     expect(mocks.enabled.every((enabled) => !enabled)).toBe(true);
     expect(screen.getByRole("button", { name: /export/i })).toBeDisabled();
