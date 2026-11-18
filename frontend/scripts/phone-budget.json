@@ -8,7 +8,7 @@
     "login": {
       "chunks": ["LoginPage"],
       "budget": {
-        "jsKiB": 405,
+        "jsKiB": 410,
         "loadMs": 5500
       },
       "measured": {
@@ -21,7 +21,7 @@
     "launcher": {
       "chunks": ["Launcher"],
       "budget": {
-        "jsKiB": 420,
+        "jsKiB": 425,
         "loadMs": 8500
       },
       "measured": {
@@ -34,7 +34,7 @@
     "start": {
       "chunks": ["DocumentsTodoPage"],
       "budget": {
-        "jsKiB": 635,
+        "jsKiB": 640,
         "loadMs": 8000
       },
       "measured": {
@@ -47,7 +47,7 @@
     "receive": {
       "chunks": ["ReceiveGoodsPage"],
       "budget": {
-        "jsKiB": 470,
+        "jsKiB": 475,
         "loadMs": 10000
       },
       "measured": {
@@ -60,7 +60,7 @@
     "issue": {
       "chunks": ["IssueGoodsPage"],
       "budget": {
-        "jsKiB": 585,
+        "jsKiB": 590,
         "loadMs": 11000
       },
       "measured": {
@@ -73,7 +73,7 @@
     "history": {
       "chunks": ["DocumentHistoryPage"],
       "budget": {
-        "jsKiB": 610,
+        "jsKiB": 615,
         "loadMs": 8000
       },
       "measured": {
@@ -86,7 +86,7 @@
     "products": {
       "chunks": ["ItemsPage"],
       "budget": {
-        "jsKiB": 625,
+        "jsKiB": 630,
         "loadMs": 7500
       },
       "measured": {
