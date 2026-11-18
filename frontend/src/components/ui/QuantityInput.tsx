@@ -112,8 +112,13 @@ export function QuantityInput({
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (ownsTyping) {
-      setDraft(event.target.value);
-      onQuantityChange?.(parseDraftedQuantity(event.target.value));
+      // A field showing 0 takes the next digit after the zero: "09". A
+      // number input keeps that buffer on its own, since "09" and "9" are
+      // the same number to React, so the text is rewritten on the element.
+      const text = event.target.value.replace(/^(-?)0+(?=\d)/, "$1");
+      if (text !== event.target.value) event.target.value = text;
+      setDraft(text);
+      onQuantityChange?.(parseDraftedQuantity(text));
       return;
     }
     setTypedError(quantityStepMessage(event.target.value, precision, t));

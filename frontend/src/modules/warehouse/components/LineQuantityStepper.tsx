@@ -22,6 +22,8 @@ interface Props {
   label: string;
   /** Tone applied to the number, decided by the caller's own arithmetic. */
   className?: string;
+  /** A sentence for a number the field holds but the window will not accept. */
+  error?: string;
 }
 
 /**
@@ -54,6 +56,7 @@ export function LineQuantityStepper({
   uomId,
   label,
   className,
+  error,
 }: Props) {
   const { t } = useTranslation(["common"]);
   const precision = useUomPrecision(uomId);
@@ -91,6 +94,7 @@ export function LineQuantityStepper({
         value={value}
         onQuantityChange={onChange}
         aria-label={label}
+        error={error}
         className={`w-24 text-center ${className ?? ""}`}
       />
       <Button

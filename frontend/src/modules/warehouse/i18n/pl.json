@@ -850,6 +850,8 @@
     "warningTyped": "Powstanie nowy dokument {{type}}, który odwróci ruch magazynowy.",
     "lineQuantity": "Ilość zwrotu",
     "maxQuantity": "Maks: {{max}}",
+    "overMaxQuantity": "Nie można zwrócić więcej niż {{max}}",
+    "nothingToReturn": "Z tego dokumentu nie zostało nic do zwrotu.",
     "reasonPlaceholder": "Powód zwrotu tej pozycji",
     "creating": "Tworzenie…",
     "created": "Zwrot {{number}} utworzony",

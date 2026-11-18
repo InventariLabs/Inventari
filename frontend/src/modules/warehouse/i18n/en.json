@@ -772,6 +772,8 @@
     "warningTyped": "A new {{type}} document will be created to reverse the stock movement.",
     "lineQuantity": "Return qty",
     "maxQuantity": "Max: {{max}}",
+    "overMaxQuantity": "Can't return more than {{max}}",
+    "nothingToReturn": "Nothing on this document is left to return.",
     "reasonPlaceholder": "Reason for returning this line",
     "creating": "Creating…",
     "created": "Return {{number}} created",
