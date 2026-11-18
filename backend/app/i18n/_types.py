@@ -691,6 +691,11 @@ class ErrorMessages(TypedDict):
     validation_string_too_short_one: NotRequired[str]
     validation_string_too_short_few: NotRequired[str]
     validation_pattern: str
+    validation_email: str
+    validation_email_reserved: str
+    validation_email_at_sign: str
+    validation_email_domain_dot: str
+    validation_email_characters: str
     validation_greater_than_equal: str
     validation_greater_than: str
     validation_less_than_equal: str
