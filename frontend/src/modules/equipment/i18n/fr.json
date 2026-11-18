@@ -136,7 +136,7 @@
       "select_location": "Emplacement",
       "placeholders": {
         "name": "p. ex. Jean Dupont",
-        "email": "nom@exemple.com"
+        "email": "nom@example.com"
       },
       "error_person_required": "Saisissez ou sélectionnez la personne assignée",
       "return_date_past_error": "La date de retour ne peut pas être dans le passé.",
