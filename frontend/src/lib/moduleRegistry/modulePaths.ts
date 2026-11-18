@@ -51,6 +51,7 @@ export const MODULE_PATHS: Readonly<Record<string, ModulePaths>> = {
       "/warehouse/settings",
       "/warehouse/profile",
       "/warehouse/periods",
+      "/warehouse/cost-variances",
       "/warehouse/documents/:id",
     ],
   },

@@ -1508,6 +1508,28 @@
       "unitCostAfter": "Unit cost"
     }
   },
+  "costVariances": {
+    "title": "Costs that reached no product",
+    "subtitle": "Amounts recorded as variances, with the reason and the day each belongs to",
+    "navLabel": "Cost variances",
+    "sectionTitle": "Costs that reached no product",
+    "sectionSubtitle": "A cost that arrives after the receipt is posted cannot be spread over the goods — some of them may be gone. Record it here instead: it is kept with its reason and listed, and it never becomes part of the stock value.",
+    "reasonLabel": "Reason",
+    "record": "Record as variance",
+    "addFailed": "The variance could not be recorded.",
+    "removeLabel": "Remove this variance",
+    "total": "Total",
+    "loadFailed": "The cost variances could not be loaded.",
+    "empty": "No cost has been recorded as a variance.",
+    "notValued": "These amounts are part of no stock value: no report adds them to what the stock is worth. Each is the figure and the reason it was not spread over the goods.",
+    "columns": {
+      "date": "Date",
+      "document": "Receipt",
+      "kind": "Cost",
+      "reason": "Reason",
+      "amount": "Amount"
+    }
+  },
   "openingStock": {
     "button": "Opening stock",
     "title": "Opening stock from a sheet",
@@ -1790,6 +1812,10 @@
       },
       "documents": {
         "hint": "Every document with filters by type, status and date"
+      },
+      "costVariances": {
+        "title": "Cost variances",
+        "hint": "Delivery costs that reached no product, listed and added up"
       }
     },
     "mistake": {

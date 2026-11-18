@@ -101,7 +101,9 @@ vi.mock("@/modules/warehouse/hooks/useExtraCosts", async (importOriginal) => ({
   ...(await importOriginal<
     typeof import("@/modules/warehouse/hooks/useExtraCosts")
   >()),
-  useExtraCosts: vi.fn(() => ({ data: { editable: false, costs: [] } })),
+  useExtraCosts: vi.fn(() => ({
+    data: { editable: false, costs: [], variances: [] },
+  })),
 }));
 
 vi.mock("@/modules/warehouse/hooks/useDocumentApproval", () => ({

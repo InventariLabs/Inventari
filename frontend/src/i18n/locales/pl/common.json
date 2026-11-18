@@ -688,7 +688,8 @@
         "response_id": "Odpowiedź (identyfikator)",
         "sku_schema": "Schemat SKU",
         "body_html": "Treść szablonu",
-        "reset_to_builtin": "Zresetowany do szablonu wbudowanego"
+        "reset_to_builtin": "Zresetowany do szablonu wbudowanego",
+        "occurred_on": "Dzień, którego dotyczy"
       },
       "showWholeChange": "Pokaż całą zmianę",
       "showLess": "Pokaż mniej",

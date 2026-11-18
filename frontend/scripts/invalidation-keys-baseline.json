@@ -69,14 +69,6 @@
       "reason": "key forwarded from a typed QueryKey prop, not built here",
       "verdict": "by-design",
       "owner": "jerzy"
-    },
-    {
-      "file": "src/modules/warehouse/hooks/useExtraCosts.ts",
-      "count": 3,
-      "reason": "local mini-registry declared next to the hooks; to be folded into hooks/queries/keys.ts",
-      "verdict": "to-fold",
-      "owner": "jerzy",
-      "expiry": "2027-01-08"
     }
   ]
 }

@@ -59,6 +59,12 @@ export function HistoryOfficePanel({
             hint={t("warehouse:history.panel.register.hint")}
           />
         </Link>
+        <Link to="/warehouse/cost-variances" className={ROW_CLASS}>
+          <PanelEntry
+            title={t("warehouse:history.panel.costVariances.title")}
+            hint={t("warehouse:history.panel.costVariances.hint")}
+          />
+        </Link>
         <Link to="/warehouse/periods" className={ROW_CLASS}>
           <PanelEntry
             title={t("warehouse:history.panel.closeMonth.title")}

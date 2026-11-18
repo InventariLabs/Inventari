@@ -16,6 +16,8 @@
 bootstrap_service.py::run_startup_bootstrap_async
 warehouse/extra_costs_router.py::add_extra_cost
 warehouse/extra_costs_router.py::delete_extra_cost
+warehouse/extra_costs_router.py::add_cost_variance
+warehouse/extra_costs_router.py::delete_cost_variance
 # One batch of the mail queue, on the session run_email_jobs_once opened for
 # it: each job commits on its own, and a job that crashes is rolled back so the
 # next one in the batch starts clean.
