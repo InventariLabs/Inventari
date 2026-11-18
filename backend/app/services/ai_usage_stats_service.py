@@ -146,7 +146,9 @@ async def get_global_ai_stats_async(
         total_requests=total_requests,
         total_tokens=int(total_tokens),
         total_cost_usd=float(total_cost),
-        estimated_cost_ratio=float(estimated_cost / total_cost) if total_cost else 0.0,
+        estimated_cost_ratio=(
+            float(estimated_cost) / float(total_cost) if total_cost else 0.0
+        ),
         top_orgs=[
             AIUsageTopOrgDTO(
                 id=r.id,

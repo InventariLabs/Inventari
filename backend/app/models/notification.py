@@ -2,7 +2,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import DateTime, ForeignKey, String
+from sqlalchemy import DateTime, ForeignKey, Index, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -11,10 +11,14 @@ from app.database import Base
 
 class Notification(Base):
     __tablename__ = 'notifications'
+    __table_args__ = (
+        # The bell: one user's notifications, or only the unread, newest first.
+        Index('ix_notifications_user_read_created', 'user_id', 'is_read', 'created_at'),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey('users.id', ondelete='CASCADE'), index=True
+        ForeignKey('users.id', ondelete='CASCADE')
     )
     title: Mapped[str] = mapped_column(String(255))
     content: Mapped[str] = mapped_column(String(1000))

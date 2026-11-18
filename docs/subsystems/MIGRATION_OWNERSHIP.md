@@ -301,6 +301,9 @@ the revisions are listed by what they would hold up there.
   runs them once. `archivedat01` (`items`) was still unreleased and is
   `CONCURRENTLY` now. `ledgertotals02` takes `stock_moves` in `SHARE` mode by
   design, see above.
+- *Core chain, rewriting a table:* `aicost01` changes the type of a column of
+  `ai_usage_logs`, which blocks that table while it is rewritten. Its rows are
+  small and only AI calls write them; the revision says why that is accepted.
 - *Core chain, harmless at any size:* `itemtypes01`, `fknames01` and `locnames02`
   (catalog-only changes or tables that stay small), `locnames01` (touches only the
   duplicate names), `fieldwords01` (`categories`), `itemimportjob01`,

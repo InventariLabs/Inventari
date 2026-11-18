@@ -228,3 +228,39 @@ emission.
   logs is expected on multi-node; missing entirely on all nodes means the
   lock Redis is down (tasks then run per-node — check notification dedup
   pressure).
+- **Retention**: `[table-retention] <table>: deleted <n>` appears once a day
+  for each table that had rows to delete; `[table-retention] <table> failed`
+  means that table waits for the next day's run.
+
+---
+
+## 4. Tables that grow
+
+No table is partitioned. A table either has a retention policy, or keeps every
+row for a reason given here.
+
+**Trimmed.** The first three are trimmed by the daily `table_retention` job
+(`app/services/table_retention.py`), in committed batches, with the windows set
+in the environment (`.env.example`).
+
+| Table | What goes, and when | What stays |
+|---|---|---|
+| `event_outbox` | Rows published more than `EVENT_OUTBOX_RETENTION_DAYS` (7) ago: they are already on the stream | Unpublished rows, however old |
+| `email_jobs` | `sent` and `failed` mail queued more than `EMAIL_JOB_RETENTION_DAYS` (120) ago. A sent job drops its attachment the moment it leaves | `pending` and `sending` mail. The window outlives the 97 days an invitation can be listed with how its mail ended |
+| `notifications` | Read after `NOTIFICATION_READ_RETENTION_DAYS` (90), unread after `NOTIFICATION_UNREAD_RETENTION_DAYS` (365) | Anything younger: unread notices get the longer window because nobody has seen them yet |
+| `webhook_delivery_logs` | After each organization's `log_retention_days` (30 by default), by the webhooks module's own job | |
+| `items` (archived) | After an organization's `archive_retention_days`, only if it set one | Everything otherwise |
+
+**Kept on purpose.** These grow with use and nothing deletes their rows while
+the organization or the record they belong to exists.
+
+| Table | Why every row stays |
+|---|---|
+| `stock_moves` | The stock ledger. Quantities on a past date and the movement history are read from it, and a gap would change them |
+| `stock_valuation_layers` | Value on a past date replays every receipt and every outflow, so a layer that is used up (`remaining_qty = 0`) still decides what the others were worth |
+| `item_history` | The timeline of a product and the source of the consumption figures. It goes when the product is purged |
+| `ai_usage_logs` | What the organization's AI calls cost: the monthly limits and the cost reports read it, and a row is small |
+| `audit_log` | The journal is immutable: a trigger refuses `UPDATE` and `DELETE`. Whether it should ever expire is an open decision (section 2) |
+
+When one of these becomes a problem at a real installation, the answer is
+archiving or partitioning, decided from measurements of that table.

@@ -96,6 +96,32 @@ describe("DocumentExecutionSection — the summary names what it counted", () =>
     expect(screen.queryByText(/Units 0\/5/)).toBeNull();
   });
 
+  it("counts a raised typed count as received, not as 6 of 5", () => {
+    // One line planned at 4 and received in full, one typed as 1 and raised
+    // to 2: the second line planned nothing beyond what came in.
+    render(
+      <DocumentExecutionSection
+        document={document_(
+          [
+            line({ expected_quantity: "4", done_quantity: "4" }),
+            line({
+              id: "line-2",
+              expected_quantity: "1",
+              done_quantity: "2",
+              expected_is_count: true,
+            }),
+          ],
+          "COMPLETED",
+        )}
+        isCorrection={false}
+      />,
+    );
+
+    expect(
+      screen.getByText("Lines 2/2 done · quantity 6/6"),
+    ).toBeInTheDocument();
+  });
+
   it("stops asking a booked document to be closed", () => {
     // A COMPLETED document's remaining actions are "Download PDF" and
     // "Duplicate" — there is nothing left to click, yet the section kept

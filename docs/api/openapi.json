@@ -51502,6 +51502,11 @@
             ],
             "title": "Source Po Line Id"
           },
+          "expected_is_count": {
+            "type": "boolean",
+            "title": "Expected Is Count",
+            "default": false
+          },
           "executed_location_id": {
             "anyOf": [
               {

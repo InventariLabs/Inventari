@@ -473,7 +473,10 @@ def _module_chain_changes(gap, pending) -> bool:
 #: it. Tables, ``(table, column)`` pairs, and indexes on tables that stay.
 _DROPPED_AFTER_BASELINE_TABLES = {'item_type_definitions'}
 _DROPPED_AFTER_BASELINE_COLUMNS = {('items', 'item_type')}
-_DROPPED_AFTER_BASELINE_INDEXES = {'ix_audit_log_organization_id'}
+_DROPPED_AFTER_BASELINE_INDEXES = {
+    'ix_audit_log_organization_id',
+    'ix_notifications_user_id',
+}
 
 
 #: The indexes the core revisions after the baseline build on tables the
@@ -481,6 +484,7 @@ _DROPPED_AFTER_BASELINE_INDEXES = {'ix_audit_log_organization_id'}
 #: from the previous chain lacks them until the upgrade that follows the stamp.
 _ADDED_AFTER_BASELINE_INDEXES = {
     'ix_items_org_archived_at',
+    'ix_notifications_user_read_created',
     'uq_storage_locations_org_parent_name',
     'uq_storage_locations_org_root_name',
 }
@@ -493,15 +497,22 @@ _ADDED_AFTER_BASELINE_COLUMNS = {
     ('stock_valuation_layers', 'internal'),
 }
 
+#: The columns those revisions give another type, as ``(table, column)`` pairs.
+_RETYPED_AFTER_BASELINE_COLUMNS = {('ai_usage_logs', 'estimated_cost_usd')}
+
 
 def _added_after_baseline(gap) -> bool:
-    """Whether one ``compare_metadata`` entry is an index or a column a later revision adds."""
+    """Whether one ``compare_metadata`` entry is what a later revision adds or retypes."""
     entries = gap if isinstance(gap, list) else [gap]
     return all(
         (entry[0] == 'add_index' and entry[1].name in _ADDED_AFTER_BASELINE_INDEXES)
         or (
             entry[0] == 'add_column'
             and (entry[2], entry[3].name) in _ADDED_AFTER_BASELINE_COLUMNS
+        )
+        or (
+            entry[0] == 'modify_type'
+            and (entry[2], entry[3]) in _RETYPED_AFTER_BASELINE_COLUMNS
         )
         for entry in entries
     )

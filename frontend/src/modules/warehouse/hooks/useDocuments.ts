@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDocumentLineNames } from "./useDocumentLineNames";
 import { useAppMutation } from "@/lib/api/mutationFactory";
@@ -18,6 +18,7 @@ import type {
   ReturnCreate,
 } from "@/modules/warehouse/types";
 import { queryKeys } from "@/hooks/queries/keys";
+import { sendOnePress, type Press } from "@/modules/warehouse/lib/sendOnePress";
 import { useModuleQuery } from "@/hooks/queries/useModuleQuery";
 import { invalidation } from "@/lib/api/invalidation";
 
@@ -56,10 +57,19 @@ export function useFetchDocument() {
   );
 }
 
+/**
+ * Write a DRAFT. A caller that keeps its own press passes its `key`; any
+ * other save goes under one this hook holds for as long as the answer is
+ * owed — the form's Save pressed again after a lost answer is answered with
+ * the draft the first press wrote, and a form that changed is a new draft.
+ */
 export function useCreateDocument() {
+  const press = useRef<Press | null>(null);
   return useAppMutation(
     ({ data, key }: { data: DocumentCreate; key?: string }) =>
-      documentsApi.create(data, key),
+      key
+        ? documentsApi.create(data, key)
+        : sendOnePress(press, data, (own) => documentsApi.create(data, own)),
     (qc) => {
       invalidation.documents(qc);
     },

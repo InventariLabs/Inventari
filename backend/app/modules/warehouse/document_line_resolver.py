@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.public_api import core_api
 
+from . import document_types as dt
 from .models import DocumentLine
 from .schemas import DocumentLineCreate
 
@@ -47,6 +48,7 @@ async def build_document_line(
     currency: str | None = None,
     db: AsyncSession | None = None,
     org_id: UUID | None = None,
+    document_type: str | None = None,
 ) -> DocumentLine:
     product_snapshot = None
     if db is not None:
@@ -107,6 +109,12 @@ async def build_document_line(
         source_po_line_id=line_data.source_po_line_id,
         target_location_id=line_data.target_location_id,
         meta_data=line_data.meta_data or None,
-        expected_is_count=bool(line_data.expected_is_count),
+        # Only a receipt has a count to type: on any other document the flag
+        # would let a picker go past the quantity somebody asked for.
+        expected_is_count=bool(
+            line_data.expected_is_count
+            and document_type is not None
+            and dt.is_receipt(document_type)
+        ),
     )
     return line

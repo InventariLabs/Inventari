@@ -63,6 +63,26 @@ interface Props {
   hidden?: boolean;
 }
 
+/**
+ * Whether the count needs a reason. A line that lands exactly on the expected
+ * figure carries none — the backend stores NULL for it anyway, so asking for a
+ * code forces a lie. Everything else says why, a zero included: an arrival
+ * of nothing is the shortage itself. A held quantity is itself a reason. A figure
+ * somebody typed on the start card is a count, not a promise: raising it is
+ * the true count, so there is no surplus to explain.
+ */
+function asksWhy(answer: {
+  entered: boolean;
+  isExact: boolean;
+  isOver: boolean;
+  holds: boolean;
+  typedCount: boolean;
+}): boolean {
+  if (!answer.entered) return false;
+  if (answer.holds) return true;
+  return !answer.isExact && !(answer.typedCount && answer.isOver);
+}
+
 export default function WmsShortReceiveDialog({
   line,
   initialQuantity,
@@ -119,13 +139,13 @@ export default function WmsShortReceiveDialog({
   // makes a field still unanswered.
   const entered = quantity.trim() !== "" && Number.isFinite(qty);
   const isBelowScanned = entered && qty < scanned;
-  // A line that lands exactly on the expected figure carries no
-  // discrepancy — the backend stores NULL for it anyway, so asking for a
-  // code forces a lie. Everything else says why, a zero included: an
-  // arrival of nothing is the shortage itself.
-  // A held quantity is itself a reason, so the code shows even when the
-  // count lands exactly on the expected figure.
-  const showsDiscrepancy = entered && (!isExact || holds);
+  const showsDiscrepancy = asksWhy({
+    entered,
+    isExact,
+    isOver,
+    holds,
+    typedCount: line.expected_is_count,
+  });
   const errorToShow = validationError ?? serverError;
   const showQuarantineGapHint = explainsAGapOnly(
     showsDiscrepancy,

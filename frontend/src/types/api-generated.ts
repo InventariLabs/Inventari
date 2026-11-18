@@ -14780,6 +14780,11 @@ export interface components {
             line_number: number;
             /** Source Po Line Id */
             source_po_line_id?: string | null;
+            /**
+             * Expected Is Count
+             * @default false
+             */
+            expected_is_count: boolean;
             /** Executed Location Id */
             executed_location_id?: string | null;
             /** Executed Location Name */

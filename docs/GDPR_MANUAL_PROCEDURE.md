@@ -57,12 +57,12 @@ touches none of them: see *Records the organization owns*.
 | `registration_requests` | `email` (as the person typed it), `full_name` | yes | anonymized by `anonymize_user_async`, matched on the address without regard to case |
 | `organization_invitations` | `invited_email` — the address the code was issued for; `created_by`, `used_by_user_id` are UUIDs | yes | `invited_email` anonymized by `anonymize_user_async`; UUIDs kept |
 | `audit_log` | `user_id` (UUID); on member and invitation entries the address itself: `snapshot.name` when a member is created, changed or leaves, `snapshot.invited_email` when an invitation is issued, resent, revoked or accepted; on equipment hand-over entries the holder's name (`snapshot.before.assigned_to` / `snapshot.after.assigned_to`); on partner entries the partner's name and, when a field changed, its old and new value (`snapshot.before` / `snapshot.after`, e.g. `email`, `phone`, `contact_person`) | yes for entries by the person and entries naming the address (member and invitation entries); entries that name a holder or a partner only by name are found with the queries under *Records the organization owns* | **not rewritten by erasure**: the database refuses `UPDATE` and `DELETE` on it (`audit_log_immutable` trigger). Kept only on a legal ground, otherwise redacted by hand — see *Records that keep the address* |
-| `email_jobs` | `to_email`, `subject`; `html_content` quotes the address in the delivered body | yes (`to_email`, `subject`, timestamps) | kept — a copy of mail already delivered; rows deleted on request, see *Records that keep the address* |
+| `email_jobs` | `to_email`, `subject`; `html_content` quotes the address in the delivered body | yes (`to_email`, `subject`, timestamps) | kept until the retention job deletes it, 120 days after it was queued by default; rows deleted earlier on request, see *Records that keep the address* |
 | `item_history` | `user_id` (FK); on equipment `CHECKOUT` entries `changes.assigned_to`, the holder's name as typed at checkout | metadata (by `user_id`) | FK kept (audit value); the holder's name stays — see *Records the organization owns* |
 | `stock_moves` | `created_by` (FK only) | no | FK kept |
 | `items` / `item_attachments` | created/modified by user inside their org; no direct user PII columns | via org export | stays with the organization |
 | `ai_usage_logs` | `user_id` (FK only) | metadata | FK kept |
-| `notifications` | `user_id` (FK); `title` / `content` can quote a name — an overdue-equipment notice names the holder | no | FK kept; the text stays |
+| `notifications` | `user_id` (FK); `title` / `content` can quote a name — an overdue-equipment notice names the holder | no | FK kept; the text stays until the retention job deletes the notification, by default 90 days after it was created if read and a year if not |
 | `partners` | `name`, `email`, `phone`, `contact_person`, `address` (JSON), `tax_id`, `notes` — of suppliers, customers and employees; a natural person when `type = 'EMPLOYEE'`, when `is_consumer` is set, or a sole trader | yes, by query under *Records the organization owns* | **not touched** — belongs to the organization |
 | `equipment_assignments` | `assigned_to_name`, `assigned_to_email` — free text, so a person without an account can hold an asset; `checkout_notes`, `checkin_notes` | yes, by query | **not touched** — organization record, matched to a person by address |
 | `audit_responses` (equipment attestation campaigns) | `assignee_name`, `assignee_email`, and from the person's answer on the public link `response_ip`, `response_user_agent`, `dispute_reason` | yes, by query | **not touched** — organization record |
@@ -241,12 +241,14 @@ controller's decision, made for each request:
   updates to redact one organization's entries only. Record the redaction
   with the request: the journal itself no longer shows that it was changed.
 
-### Delivered mail (`email_jobs`) — kept, deletable
+### Delivered mail (`email_jobs`) — kept for a while, deletable
 
-The queue keeps the mail it delivered: `to_email`, `subject` and
-`html_content`, whose body quotes the address. It is a copy of a message
-that has already left the system, not an audit record, and nothing reads
-it once the retries have ended. When the request asks for it:
+The queue keeps the mail it delivered for `EMAIL_JOB_RETENTION_DAYS` (120 by
+default): `to_email`, `subject` and `html_content`, whose body quotes the
+address. An attachment is dropped as soon as the mail has been sent. The row is
+a copy of a message that has already left the system, not an audit record; what
+reads it is the list of invitations, for how their mail ended, and the list of
+mail that never arrived. When the request asks for it sooner:
 
 ```sql
 DELETE FROM email_jobs WHERE lower(to_email) = lower('<EMAIL>');

@@ -234,6 +234,19 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
+- Rows that have finished their work no longer stay for ever. Once a day an
+  instance deletes outbox events published more than 7 days ago, sent and failed
+  mail queued more than 120 days ago, read notifications older than 90 days and
+  unread ones older than a year, so the list of mail that never arrived now goes
+  back 120 days. An administrator changes the windows with
+  `EVENT_OUTBOX_RETENTION_DAYS`, `EMAIL_JOB_RETENTION_DAYS`,
+  `NOTIFICATION_READ_RETENTION_DAYS` and `NOTIFICATION_UNREAD_RETENTION_DAYS`.
+  Sent mail drops its attachment as soon as it has left. The first run on an
+  older instance can take a while and works through the backlog in batches.
+- AI costs are stored as exact numbers, so the totals on the administration
+  screens add up to the cent. The upgrade rewrites `ai_usage_logs` and blocks
+  that table while it does; a stored cost that was not a usable number (not a
+  number, infinite, or a million dollars or more for one call) becomes unknown.
 - An ingredient that has a BOM of its own is now taken from its own stock first,
   and only the part that stock does not cover is made through its BOM — the
   dough made yesterday is used before flour is taken again. The availability
