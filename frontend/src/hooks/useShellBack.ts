@@ -13,9 +13,18 @@ const trimmed = (path: string) => path.replace(/\/+$/, "") || "/";
  * The screen one level up inside a module: `/inventory/items/42` ->
  * `/inventory/items`. Never climbs out of the module — its root is the top.
  */
-function parentWithinModule(pathname: string, basePath: string): string {
+function parentWithinModule(
+  pathname: string,
+  basePath: string,
+  routeExists: (path: string) => boolean,
+): string {
   const base = trimmed(basePath);
-  const parent = trimmed(pathname).split("/").slice(0, -1).join("/") || "/";
+  let parent = trimmed(pathname).split("/").slice(0, -1).join("/") || "/";
+  // A path segment is not always a screen: `/warehouse/documents/42` has no
+  // `/warehouse/documents` above it, and a Back that lands there is a dead page.
+  while (parent.startsWith(base) && parent !== base && !routeExists(parent)) {
+    parent = parent.split("/").slice(0, -1).join("/") || "/";
+  }
   return parent.startsWith(base) ? parent : base;
 }
 
@@ -44,11 +53,13 @@ export function hasHistoryToPop(location: Location): boolean {
  * 2. a module's root is the top, and leads home (the launcher);
  * 3. anywhere else it pops the history, like the browser button — the list
  *    with its filter and scroll position, not the launcher;
- * 4. a screen opened by a direct link has no history to pop, so it climbs to its parent in the module.
+ * 4. a screen opened by a direct link has no history to pop, so it climbs to
+ *    the nearest screen above it that exists in the module (`routeExists`).
  */
 export function useShellBack(
   basePath: string | undefined,
   homePath: string,
+  routeExists: (path: string) => boolean = () => true,
 ): () => void {
   const navigate = useNavigate();
   const location = useLocation();
@@ -83,7 +94,7 @@ export function useShellBack(
     } else if (hasHistoryToPop(location)) {
       navigate(-1);
     } else {
-      navigate(parentWithinModule(location.pathname, basePath), {
+      navigate(parentWithinModule(location.pathname, basePath, routeExists), {
         replace: true,
       });
     }

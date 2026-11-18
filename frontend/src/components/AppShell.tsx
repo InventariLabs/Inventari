@@ -7,7 +7,13 @@ import {
   Suspense,
   lazy,
 } from "react";
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Outlet,
+  Link,
+  matchPath,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useFormGuardStore } from "@/store/formGuardStore";
@@ -145,7 +151,16 @@ export default function AppShell() {
   const moduleNav = activeModule?.moduleNav ?? null;
   // The page header's arrow is hidden on a phone, so the shell's must do what
   // it does: go back to the screen the person came from.
-  const goBack = useShellBack(moduleNav?.basePath, homePath);
+  // A screen opened by a direct link climbs to the nearest screen above it
+  // that a module really registers.
+  const routeExists = useCallback(
+    (path: string) =>
+      moduleRegistry
+        .getRoutes(enabledModules)
+        .some((route) => matchPath({ path: route.path, end: true }, path)),
+    [enabledModules],
+  );
+  const goBack = useShellBack(moduleNav?.basePath, homePath, routeExists);
 
   useRouteScroll();
 

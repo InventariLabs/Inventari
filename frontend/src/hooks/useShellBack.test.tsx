@@ -17,10 +17,16 @@ const moduleOf = (path: string) =>
       ? "/warehouse"
       : "/inventory";
 
+// The screens the app registers: `/warehouse/documents` is not one of them,
+// only a document under it is.
+const SCREENS = ["/warehouse/todo", "/warehouse/receive", "/inventory/stock"];
+
 /** What AppShell does: one header Back that lives across every screen. */
 function Shell() {
   const { pathname } = useLocation();
-  const back = useShellBack(moduleOf(pathname), "/launcher");
+  const back = useShellBack(moduleOf(pathname), "/launcher", (path) =>
+    SCREENS.includes(path),
+  );
   return (
     <>
       <output data-testid="at">{pathname}</output>
@@ -71,6 +77,8 @@ function renderApp(entries: InitialEntry[], index?: number) {
           }
         />
         <Route path="/warehouse/receive" element={<p>receipt</p>} />
+        <Route path="/warehouse/documents/7" element={<p>document</p>} />
+        <Route path="/warehouse" element={<p>module root</p>} />
       </Routes>
     </MemoryRouter>,
   );
@@ -134,5 +142,13 @@ describe("useShellBack", () => {
     // The move screen is gone from the history, not buried under the start.
     back();
     expect(at()).toBe("/inventory/stock");
+  });
+
+  it("never climbs from a document opened by a direct link to a path no screen answers", () => {
+    // The receiving sheet's way in: the receive page replaces itself with the
+    // document, so a phone that opened that link has no entry to pop.
+    renderApp(["/warehouse/documents/7"]);
+    back();
+    expect(at()).toBe("/warehouse");
   });
 });
