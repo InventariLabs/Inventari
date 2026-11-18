@@ -730,10 +730,9 @@ class TestTheHandshakeCarriesTheVersions:
 class TestTheJobCarriesItsLabelSize:
     """One label file for every printer, at the size the person chose.
 
-    A printer used to carry a media profile and a label size, and a job
-    printed at those: the preview showed one label and the printer made
-    another. The size now travels with the job and the printer adds nothing;
-    fitting the file to the printer is its agent's job.
+    A job carries the label size the person chose, and the printer adds
+    nothing to it: the preview and the printer both get the same label.
+    Fitting the file to the printer is its agent's job.
     """
 
     async def test_the_printed_image_is_the_preview_at_the_jobs_size(

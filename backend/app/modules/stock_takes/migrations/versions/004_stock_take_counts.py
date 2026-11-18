@@ -4,8 +4,8 @@ Revision ID: 004_stock_take_counts
 Revises: 003_discrepancy_reason_code
 Create Date: 2026-08-31
 
-A recount used to overwrite the first number, which threw away the one
-thing that makes a correction believable: two people walking the same shelf
+A recount keeps the first number, which is the one thing that makes a
+correction believable: two people walking the same shelf
 and arriving at the same figure. A disagreement between them is information
 too. So each pass is a row, the way SAP keeps the original document beside
 its recount and Dynamics hangs many recordings off one inventory order.

@@ -1,8 +1,7 @@
 """A production run's movement trace pages through every movement it has.
 
-The trace used to read the newest 200 movements and slice that list, so a
-run with more answered a total of 200 and an empty page past it: the oldest
-movements of a large run could not be reached and the count was wrong.
+The trace pages through every movement of the run, so the oldest movements of a
+large run are reachable and the count is right.
 """
 
 from __future__ import annotations

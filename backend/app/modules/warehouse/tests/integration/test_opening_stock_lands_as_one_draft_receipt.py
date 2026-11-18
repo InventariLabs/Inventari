@@ -115,8 +115,8 @@ class TestOpeningStockLandsAsOneDraftReceipt:
         # The row as the import preview numbers it: data rows from 1, the
         # header not counted. One numbering for the whole import screen —
         # the preview the reader picks the mapping on, and the refusals the
-        # result screen lists. It used to count the header as row 1, so a
-        # refusal pointed one row past the row it meant.
+        # result screen lists, with the header not counted, so a refusal names the
+        # row it means.
         assert [e['row'] for e in body['errors']] == [51, 52, 53]
         assert 'name' in body['errors'][0]['error'].lower()
         assert 'dużo' in body['errors'][1]['error']
@@ -203,11 +203,10 @@ class TestOpeningStockLandsAsOneDraftReceipt:
         """The whole import is one unit of work, not two transactions.
 
         The failure is forced in the step right after the lines were built
-        — the one that used to run behind the importer's own commit. With
-        that commit there, the draft and its lines were already in the
-        database when the request answered the error: revert
-        ``import_lines_from_dataframe`` to commit and the last assertion
-        finds the row it must not.
+        — the step that runs after the lines are built and before the importer's
+        commit. With a commit in the importer there, the draft and its lines
+        would already be in the database when the request answers the error,
+        and the last assertion would find the row it must not.
         """
         from app.modules.warehouse import opening_stock_service
 

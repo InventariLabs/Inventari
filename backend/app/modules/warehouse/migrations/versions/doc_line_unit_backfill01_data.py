@@ -4,11 +4,10 @@ Revision ID: doc_line_unit_backfill01
 Revises: doc_neutral_type_codes01
 Create Date: 2026-09-09
 
-A line naming a record on a shelf used to keep the record's name and lose
-its unit: only a catalogue entry passed one on. Every reader downstream then
-printed a bare quantity — the picker's row, the execution sheet, the PDF —
-and "3" tells a warehouseman nothing, since three pieces, three packs and
-three kilograms are three different picks.
+A line naming a record on a shelf carries the record's unit, not only a catalogue
+entry's. Every reader downstream prints a quantity with its unit — the picker's
+row, the execution sheet, the PDF — since "3" tells a warehouseman nothing:
+three pieces, three packs and three kilograms are three different picks.
 
 The write path now takes the unit off the record the line names. This fills
 in the lines written before it did, from the same two sources and in the

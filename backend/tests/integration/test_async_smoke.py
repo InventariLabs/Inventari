@@ -27,9 +27,9 @@ def _ensure_async_smoke_schema(setup_test_db):
     conftest's ``setup_test_db``, and it fires only when a test asks for it.
     The async smoke tests build their own engines and ask for nothing, so on
     a worker whose first test lives in this file the database was never
-    created: the bridge used to run ``create_all`` directly, which builds
-    tables only in a database that already exists, and the run died with
-    "database does not exist" under whichever tests crossed that worker.
+    created. The bridge must not run ``create_all`` directly: it builds tables only
+    in a database that already exists, so it would die with "database does not
+    exist" under whichever tests cross that worker.
     Asking for the fixture is the whole bridge. The name stays: this module
     is the one that must never find an empty schema.
     """

@@ -1,9 +1,9 @@
 """A demo with no room for the cover still saves the recipe it came with.
 
 The cover is fetched and stored after the recipe is committed. When the demo's
-upload cap refuses that write, the refusal used to reach the caller as a 413
-for a recipe that had in fact been saved, so the client reported a failure and
-the user imported it a second time. The cap here is the real one, asked through
+upload cap refuses that write, the refusal does not reach the caller as a 413
+for a recipe that has in fact been saved: the client reports no failure, and
+the user does not import it a second time. The cap here is the real one, asked through
 the real storage facade; only the remote host is stood in for.
 """
 

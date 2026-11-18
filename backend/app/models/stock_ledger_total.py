@@ -14,7 +14,7 @@ class StockLedgerTotal(Base):
 
     The arrivals at the shelf minus the departures from it, over every done
     movement there ever was. The stock reconciliation compares the shelf with
-    this number, and used to add it up from the whole ledger on every pass:
+    this number, rather than adding it up from the whole ledger on every pass:
     the ledger only grows, so each pass cost more than the one before, for
     ever.
 

@@ -1,10 +1,8 @@
 """A scanning session nobody is working in stops holding its document.
 
-Closing the picking or receiving sheet used to leave the session open and
-held by whoever closed it: the document then refused completion and
-cancellation, and the page offered a resume or a discard of every scan. A
-worker who walked away from the sheet had blocked the document for
-everyone.
+Closing the picking or receiving sheet releases the session, so whoever closed it
+no longer holds the document: completion and cancellation stay open. A worker
+who walked away from the sheet blocks nobody.
 
 A session is released when its holder closes the sheet (``paused``), or when
 nobody has scanned in it for the organization's idle time. A released

@@ -705,10 +705,10 @@ async def add_surplus_item(
     """Create a surplus StockTakeItem for an item not in the original stock take list.
 
     "Surplus" means the snapshot did not expect it here, not that the system
-    holds none of it. The row used to be written with ``system_quantity=0``,
-    and finalising writes the count as an absolute quantity — so an item the
-    system holds seven of, counted as three, ended the count at three with the
-    missing four recorded nowhere. The growth cap missed it too: it skips rows
+    holds none of it. Finalising writes the count as an absolute quantity, so the
+    row must carry what the system holds: an item the system holds seven of,
+    counted as three, would otherwise end the count at three with the missing
+    four recorded nowhere. The growth cap checks it as well, and it skips rows
     whose system quantity is falsy.
 
     The item must be stored inside the tree this count covers. It was looked

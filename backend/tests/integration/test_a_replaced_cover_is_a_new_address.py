@@ -1,8 +1,8 @@
 """Replacing an item's photo changes the address the screens load.
 
-The cover used to be saved as ``cover.<ext>`` every time, so the address of
-the new picture was the address of the old one and a page that had shown the
-old picture kept showing it. The file name now carries a digest of the bytes.
+A cover is saved under a name that carries a digest of its bytes, so the
+address of a new picture differs from the address of the old one, and a page
+that has shown the old picture loads the new one.
 """
 
 import io

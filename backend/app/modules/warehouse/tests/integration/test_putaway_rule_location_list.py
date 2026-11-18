@@ -252,9 +252,8 @@ class TestPutawayRuleLocationList:
         The test fails on the line it is meant to catch: the one that
         forgets what earlier lines of the same document already sent.
 
-        The numbers are load-bearing, and this docstring used to say 180.
-        At 180 the first line alone would overflow and be sent on, and the
-        test would stop telling the two readings apart at all."""
+        The numbers are load-bearing: at 180 the first line alone would overflow
+        and be sent on, and the test would stop telling the two readings apart at all."""
         from app.core.testing import ModuleTestHelper
 
         h = ModuleTestHelper(db_session)

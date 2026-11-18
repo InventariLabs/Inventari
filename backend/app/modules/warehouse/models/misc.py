@@ -53,8 +53,8 @@ class InventoryPeriod(CoreModelBase):
 
     __tablename__ = 'inventory_periods'
     __table_args__ = (
-        # one period row per (org, year, month). Previously uniqueness
-        # relied only on an advisory lock, so a race or a bypassed code path could
+        # one period row per (org, year, month). Uniqueness is a hard constraint,
+        # not only an advisory lock, so a race or a bypassed code path cannot
         # create duplicate closure rows.
         UniqueConstraint(
             'organization_id',
@@ -166,10 +166,9 @@ class DocumentExtraCost(CoreModelBase):
 class DocumentNumberSequence(CoreModelBase):
     """The counter behind one numbering prefix, which only ever goes up.
 
-    The next number used to be derived by scanning the numbers already taken
-    and adding one to the highest. That reads the register as if it were the
-    counter, and the register forgets: a draft deleted the same afternoon
-    dropped out of the scan and handed its number to the next document. A
+    The next number comes from a counter that only goes up, not from a scan of
+    the numbers already taken. A register is not a counter, and a draft deleted
+    the same afternoon leaves no number behind for the next document. A
     number that identifies two documents in the same year is the one thing a
     register may not do, and it is why Odoo (``ir.sequence``) and ERPNext
     (Naming Series) both keep a stored counter rather than a maximum.

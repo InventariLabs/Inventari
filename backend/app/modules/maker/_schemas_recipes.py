@@ -24,10 +24,10 @@ CostLineKind = Literal['LABOR', 'PACKAGING', 'OVERHEAD', 'OTHER']
 class ProcessStep(BaseModel):
     """One step of a formula's process, and how long it takes.
 
-    A step used to be a bare sentence, so a formula that took two hours to
-    make said nothing about the two hours and its labour could only be a
-    lump sum typed per batch. The duration is optional: a step nobody timed
-    still reads, and costs no labour.
+    A step is a sentence and an optional duration, so a formula that takes two
+    hours to make says so, and its labour is costed per step instead of as a lump
+    sum typed per batch. The duration is optional: a step nobody timed still
+    reads, and costs no labour.
     """
 
     text: str = Field(min_length=1, max_length=2000)

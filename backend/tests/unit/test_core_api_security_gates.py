@@ -74,10 +74,10 @@ class TestSecretsNamespace:
 
     def test_the_owner_is_bound_inside_the_cipher_not_beside_it(self):
         """Rewriting the owner in the stored text must be a refusal, not
-        another module's read. The owner used to be a text suffix the
-        cipher never saw, so a reader answered whoever claimed the tail
-        of the string — ``cipher`` + ``':mod_b'`` read module A's
-        secret as module B's."""
+        another module's read. The owner is bound inside the cipher, so a
+        reader cannot be answered by whoever claims the tail of the string:
+        ``cipher`` + ``':mod_b'`` does not read module A's secret as module
+        B's."""
         from app.core.public_api.secrets import CoreSecretsAPI
 
         api = CoreSecretsAPI()

@@ -349,8 +349,8 @@ class TestAsyncModuleScopedSessionPassthrough:
 
 class TestSelectFromIsFiltered:
     """``select(func.count()).select_from(Item)`` names no entity in
-    ``column_descriptions``, so it used to reach the database unfiltered and
-    count every organization's rows."""
+    ``column_descriptions``, and it must reach the database filtered, never
+    counting every organization's rows."""
 
     @staticmethod
     def _executed_sql(statement) -> str:
@@ -411,7 +411,7 @@ class TestDerivedFromClauses:
 
     def test_count_over_a_subquery_is_filtered(self):
         """The count sees no entity, and the FROM is a subquery rather than a
-        table — the shape that used to count every tenant's rows."""
+        table — the shape that must never count every tenant's rows."""
         from sqlalchemy import func
 
         sub = select(Item).subquery()

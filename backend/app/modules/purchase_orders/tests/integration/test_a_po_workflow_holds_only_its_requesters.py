@@ -1,9 +1,8 @@
 """A purchase-order workflow holds the orders of the people it names.
 
-"Every order needs approval" used to mean every order by anybody, the
-administrator's included. The workflow now says whose orders it holds, and
-an order confirmed by somebody it does not name goes straight to CONFIRMED,
-whatever the settings ask of everybody else's.
+The workflow says whose orders it holds, and an order confirmed by somebody
+it does not name goes straight to CONFIRMED, whatever the settings ask of
+everybody else's.
 """
 
 import pytest

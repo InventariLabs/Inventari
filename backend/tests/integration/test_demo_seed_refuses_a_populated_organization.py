@@ -1,9 +1,9 @@
 """The demo seeder refuses to seed on top of an organization that already
 carries items — before it writes anything, with the way out named.
 
-A second run used to die halfway through the quant uniqueness constraint:
-the organization left half populated, nothing in the final state saying so,
-every later measurement on it unreproducible.
+Refusing up front means no run dies halfway through the quant uniqueness
+constraint and leaves the organization half populated: every later measurement
+on it would be unreproducible.
 """
 
 from __future__ import annotations

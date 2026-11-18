@@ -1,7 +1,7 @@
 """How long one model call may take, by the kind of provider behind it.
 
-The clients used to carry ``timeout=60.0`` as a literal. That number is a
-policy about somebody else's hardware, and it was wrong for half the
+The clients take their timeout from here and never carry ``timeout=60.0`` as a
+literal. That number would be a policy about somebody else's hardware, and it is wrong for half the
 installations we recommend: a model on the user's own graphics card takes
 minutes, not seconds, and answering that with "could not reach the provider"
 sends them to check an address that was never the problem.

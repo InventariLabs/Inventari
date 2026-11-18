@@ -1,12 +1,10 @@
 """A document number is handed out once, and it says when the document is for.
 
-The next number used to be derived by scanning the numbers already taken
-and adding one to the highest. A draft deleted the same afternoon dropped
-out of that scan, so the next document was handed the number the deleted
-one had — against a register whose whole purpose is that a number
-identifies one document for good, and against the way every system our
-users arrive from does it: Odoo's ir.sequence and ERPNext's Naming Series
-both keep a counter that only ever goes up.
+The next number comes from a counter that only goes up, not from a scan of the
+numbers already taken. A draft deleted the same afternoon must not hand its number
+to the next document, since a number identifies one document for good. Odoo's
+ir.sequence and ERPNext's Naming Series both keep such a counter, as the systems our
+users arrive from do.
 
 Numbering moved to confirmation, which closes the gap at its root — a
 draft holds an identifier of its own and never touches the counter — and

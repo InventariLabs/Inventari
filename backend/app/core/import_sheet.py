@@ -32,7 +32,7 @@ _CSV_ENCODINGS = ('utf-8-sig', 'cp1250')
 #: reader consults them: the comma first, and a non-comma separator only
 #: when the comma cannot be right — when it leaves the whole header in one
 #: column, the shape a semicolon sheet arrives in. Ranking candidates by
-#: column count instead used to let the semicolons inside a quoted header
+#: column count instead would let the semicolons inside a quoted header
 #: cell ("name,"opis; a; b; c"") steal the split from a comma that already
 #: worked. Sniffing the whole file instead mangles small sheets: pandas'
 #: probe invents separators a one-column header has not got.
@@ -183,7 +183,7 @@ def read_csv_sheet(
                 break
         if not _header_is_text(header_line):
             # cp1250 names 251 of 256 bytes, so the ladder decodes almost
-            # any blob and a binary file used to reach the mapping step as
+            # any blob and a binary file would reach the mapping step as
             # one garbage column. A header carrying control characters
             # means this rung is naming noise; the first rung's refusal
             # names the file.
@@ -247,9 +247,8 @@ def read_sheet(content: bytes, filename: str, **kwargs: Any) -> pd.DataFrame:
 
     Cells the NA vocabulary catches ('NA', 'N/A', 'NULL') read as missing
     on both branches — pandas' answer, and the one the items and partners
-    doors have always given. The equipment door's private reader used to
-    keep them as literal text; one shared reader cannot carry both answers,
-    so a row whose only name is 'NA' is refused at the door as missing —
+    doors have always given. The equipment door reads them through the same shared reader, which cannot
+    carry both answers, so a row whose only name is 'NA' is refused at the door as missing —
     loudly, at import time — rather than imported as the string.
     """
     try:

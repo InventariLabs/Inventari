@@ -16,8 +16,8 @@ holds only among workflows that are not archived, so the next workflow is a
 new row and the archived one keeps the stages its requests were decided
 under.
 
-Backfill: until now a delete left a workflow inactive with its history, and
-nothing recorded that it had been a delete — a workflow switched off by hand
+Backfill: a delete leaves a workflow inactive with its history, and
+nothing records that it had been a delete — a workflow switched off by hand
 looks the same. Every inactive workflow with requests and none of them open
 is archived, because that is what the delete promised and what an
 administrator who pressed it is still looking at. A workflow that was only

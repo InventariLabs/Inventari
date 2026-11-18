@@ -105,8 +105,7 @@ class TestEmailService:
 
     def test_send_email_port_465_uses_implicit_tls(self, monkeypatch):
         """Port 465 is implicit TLS: no STARTTLS, because the socket is already
-        encrypted. It used to mean plain SMTP with no STARTTLS either — login
-        and message in the clear."""
+        encrypted, and login and message never travel in the clear."""
         mock_smtp = MagicMock()
         mock_smtp_class = MagicMock(return_value=mock_smtp)
         monkeypatch.setattr('smtplib.SMTP_SSL', mock_smtp_class)
@@ -563,12 +562,10 @@ class TestEmailService:
 class TestSmtpTransport:
     """Which transport a configuration gets, and how long it may hang.
 
-    The port used to decide encryption on its own: ``starttls()`` was called
-    when the port was exactly 587 and never otherwise, so a configuration on
-    465 — the standard TLS port an administrator types by reflex — logged in
-    and sent the message in the clear. And no call carried a ``timeout``, so
-    an unreachable host held the request for the system TCP limit: 134 seconds
-    measured in the walkthrough, ending in a 502.
+    The configured encryption decides the transport, not the port: a configuration
+    on 465 — the standard TLS port an administrator types by reflex — is
+    encrypted, and every call carries a ``timeout``, so an unreachable host fails
+    within it instead of holding the request for the system TCP limit.
     """
 
     @staticmethod
@@ -662,9 +659,9 @@ class TestSmtpTransport:
     def test_attachment_path_honours_ssl(self, monkeypatch):
         """An attached protocol travels the transport the settings chose.
 
-        It used to open a plain connection of its own, so an organization on
-        SSL/465 received the notification and never the file — the two
-        halves of the same feature disagreeing about the same setting.
+        It travels the same connection as the notification, so an organization on
+        SSL/465 receives the file too: both halves of the feature read the same
+        setting.
         """
         plain, ssl = self._send_with_attachment(monkeypatch, port=465)
 
@@ -675,8 +672,8 @@ class TestSmtpTransport:
     def test_attachment_path_starts_tls_when_asked(self, monkeypatch):
         """STARTTLS follows the stored choice, not the port number.
 
-        Port 2525 with ``starttls`` stored used to send the login in the
-        clear, because only 587 counted.
+        Port 2525 with ``starttls`` stored upgrades the connection before the login,
+        because the stored choice counts, not the port.
         """
         plain, ssl = self._send_with_attachment(
             monkeypatch, port=2525, encryption='starttls'

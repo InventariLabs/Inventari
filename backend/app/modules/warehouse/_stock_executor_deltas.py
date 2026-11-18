@@ -47,9 +47,8 @@ async def _move_delta_at(
     """Apply a signed delta to one location's stock, and record the move.
 
     The movement and the records named on this pass have to agree about
-    direction, so the sign is read once, here, rather than three times in
-    the branches that used to spell this out: a transfer correction's two
-    sides and a plain one's.
+    direction, so the sign is read once, here, not separately in each branch:
+    a transfer correction's two sides and a plain one's.
 
     A correction restates one named grain — the batch-less one too, when the
     original line named no batch — and the movement takes exactly that
@@ -174,9 +173,9 @@ async def execute_correction(
     # that line landed, and a document's target is not the same thing.
     original_lines_by_id = {line.id: line for line in original.lines}
 
-    # The same reason every other document door writes. A correction used to
-    # spell its own dict and left the reason out, so its quantity row read as
-    # a manual edit beside the receipt rows that carry one.
+    # The same reason every other document door writes. A correction spells its
+    # own dict with the reason in it, so its quantity row sits beside the receipt
+    # rows that carry one.
     history_base = {
         **_base_history(doc),
         'corrects_document_number': original.number,
@@ -191,8 +190,8 @@ async def execute_correction(
             # of the original the correction leaves alone.
             continue
         if not line.item_id:
-            # This used to be skipped alongside the zero deltas, so a
-            # correction could report itself applied while one of its lines
+            # This is refused rather than skipped with the zero deltas, so a
+            # correction cannot report itself applied while one of its lines
             # moved nothing.
             raise ServiceRejectionError('document_correction_lines_reference_items')
 
@@ -264,8 +263,8 @@ async def execute_correction(
             )
         # The batch the line names — copied from the line it corrects — and
         # without one the record's own: the record holds one batch, and a
-        # correction that named none used to change the batch-less stock
-        # under a record that has one.
+        # correction that names none would change the batch-less stock under
+        # a record that has one.
         lot_id = (
             await _resolve_lot(db, doc, line, create_if_missing=False) or item.lot_id
         )

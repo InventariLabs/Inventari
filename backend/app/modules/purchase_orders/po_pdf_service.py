@@ -174,15 +174,13 @@ async def generate_po_pdf(
     org_id: uuid.UUID | None = None,
 ) -> bytes:
     # The single context builder shared with the HTML preview endpoint
-    # (_po_render_context.build_po_context) — the two used to be separate
-    # builders that drifted apart (tax_pct only in the PDF, po_title only in
-    # the preview). Lazy import: _po_render_context imports get_po_labels
+    # (_po_render_context.build_po_context), so the two cannot drift apart.
+    # Lazy import: _po_render_context imports get_po_labels
     # from this module, so a module-level import here would be circular.
     from ._po_render_context import build_po_context
 
-    # The letterhead the shared header prints. An order used to print
-    # a bare organization name where a warehouse document printed the full
-    # issuer identity — the same fact, told twice, differently.
+    # The letterhead the shared header prints: the same issuer identity a
+    # warehouse document prints.
     issuer = await build_issuer_context(po.organization, lang)
     context = build_po_context(po, lang, issuer)
 

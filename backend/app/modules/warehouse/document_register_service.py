@@ -141,7 +141,7 @@ def _name_lookup(column: Any, names: dict[UUID, str]) -> ColumnElement[Any]:
     """A ``CASE`` naming each id, or ``NULL`` when the map is empty.
 
     The map is small — the ids of one register window — and it is what the
-    grouping expression used to read from a joined Core table.
+    grouping expression reads instead of a joined Core table.
     """
     if not names:
         return null()
@@ -155,8 +155,8 @@ def _group_column(
 ) -> ColumnElement[Any]:
     """The SQL expression a group's key and label both read from.
 
-    The Python register used to group rows after fetching all of them; the
-    expression moves that grouping into the database so the sums
+    The grouping happens in the database, not in Python after every row is
+    fetched; the expression does it so the sums
     describe the whole window while the rows stay a page. ``partner`` reads
     the frozen snapshot first and falls back to the live partner — the same
     order ``_row`` uses for its column.
@@ -192,10 +192,9 @@ def _fold_currency_totals(
     One tuple per (group, currency) arrives from the SQL ``GROUP BY``, so a
     grouped window carries one tuple per GROUP for the same currency — and
     the window summary answers per currency, not per group. Same-currency
-    tuples therefore merge into one bucket here: three type groups of PLN
-    used to leave three PLN entries in the summary, the React list above
-    them keyed three children "PLN", and the window total read as three
-    parallel amounts instead of one. A bucket with a currency counts even
+    tuples therefore merge into one bucket here, so three type groups of PLN make
+    one PLN entry in the summary, the React list above keys one child "PLN", and
+    the window total reads as one amount. A bucket with a currency counts even
     when it sums to nothing (two currencies make the scope multi-currency),
     while a bucket with neither a currency nor a figure is not a currency
     at all.
@@ -237,10 +236,9 @@ async def get_register_summary_async(
 ) -> RegisterResponse:
     """Groups and totals over the whole window — no document rows.
 
-        The register used to fetch every document in the window to sum it
-    ; a year of a busy warehouse made the answer — and the DOM it
-        fed — grow with the window. The sums still describe the whole window,
-        but one tuple per (group, currency) is all that crosses the wire.
+    The window is summed in the database, so the answer and the DOM it feeds
+    do not grow with the window. The sums still describe the whole window,
+    but one tuple per (group, currency) is all that crosses the wire.
     """
     if group_by not in _VALID_GROUP_BY:
         group_by = 'type'
@@ -464,9 +462,8 @@ async def get_register_csv(
 ) -> str:
     """The export stays the one way to get everything.
 
-    It used to read the register's groups, so once the register started
-    serving pages the export would have silently lost everything past page
-    one. It queries its own rows, and no limit touches it.
+    It queries its own rows rather than reading the register's groups, so no page
+    limit touches it.
 
     It reads only the columns it prints: a whole ``Document`` brings every
     line, product, partner and user through its relations, none of which the

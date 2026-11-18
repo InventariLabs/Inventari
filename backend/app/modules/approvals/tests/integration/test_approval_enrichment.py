@@ -739,9 +739,8 @@ class TestEnrichmentTargetSummary:
     ) -> None:
         """A target type nobody registered degrades to ``target_summary=None``.
 
-               ``equipment_checkout`` used to prove this because no provider existed,
-        but it now claims one; an unclaimed type keeps the contract
-               honest.
+        Uses a type no module claims: ``equipment_checkout`` has a provider, so
+        it cannot show the fallback.
         """
         from app.modules.approvals.approvals_api import approvals_api
 

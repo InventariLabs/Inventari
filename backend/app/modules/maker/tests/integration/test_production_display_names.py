@@ -1,8 +1,8 @@
 """A production order answers with names, not with raw identifiers.
 
-Four places used to print UUIDs at the operator: the source location of a
-consumed line, the product and lot of a stock move, and the produced item.
-The API resolves all four now; the UI keeps the id in a tooltip.
+The API names four things an operator reads: the source location of a consumed
+line, the product and lot of a stock move, and the produced item. The UI keeps
+the id in a tooltip.
 """
 
 from __future__ import annotations

@@ -1,7 +1,7 @@
 """To do can be narrowed to one warehouse, and the tasks that stand in a place follow it.
 
 A person who works in one of several warehouses chose it on the Start screen,
-and the task list used to show every warehouse's work regardless. Documents
+and the task list shows the chosen warehouse's work. Documents
 name the place they go to or come from, and a putaway task stands in the
 receiving area of one warehouse, so those follow the choice. A task that names
 no warehouse (an order, a production run, a count, a task typed in by hand)

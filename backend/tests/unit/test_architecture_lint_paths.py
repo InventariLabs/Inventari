@@ -1,10 +1,10 @@
 """Where the checkout sits must not change what the gate sees.
 
-Every "is this file in scope" predicate in the linter used to read the
-absolute path, so a checkout under any directory named ``tests`` (a CI
-workspace at ``~/tests/inventari``, say) answered "test file" for every
-file in the tree — and the gate printed "Architecture lint passed" over a
-tree it had judged nothing in. The predicates now read the path relative
+Every "is this file in scope" predicate in the linter reads the path relative
+to the repository root, never the absolute path: a checkout under a directory
+named ``tests`` (a CI workspace at ``~/tests/inventari``, say) does not answer
+"test file" for every file in the tree, and the gate does not print
+"Architecture lint passed" over a tree it judged nothing in. The predicates read the path relative
 to the root they were handed.
 """
 

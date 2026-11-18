@@ -1,7 +1,7 @@
 """A key issued before keys had permission lists keeps what it could do.
 
-Every key used to carry one fixed set, the agent endpoints of the printing
-module asked for no permission, and a ``printing`` key was confined by path.
+A key without a permission list keeps the reach it had: the agent endpoints
+of the printing module ask for no permission, and a ``printing`` key stays confined by path.
 The upgrade writes each existing key the list it effectively had, so nothing
 that worked the day before stops working the day after — and nothing that was
 refused starts to work.

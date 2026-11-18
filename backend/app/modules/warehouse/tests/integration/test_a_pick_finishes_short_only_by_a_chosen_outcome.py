@@ -1,11 +1,11 @@
 """A dispatch finishes with a line short only after someone chose that.
 
 A shortfall is a decision: the shortage owes the rest to the customer on a
-backorder, any other reason closes the gap. Three doors used to write the
-choice for the person — a short pick sent without a reason was stored as a
-shortage, a session left by closing its sheet wrote a shortage on every line
-it had not finished, and a bodiless completion booked a part-picked line as
-it stood. Each now waits for an answer, like the skipped line beside them.
+backorder, any other reason closes the gap. Three doors leave the choice to the
+person: a short pick sent without a reason is not stored as a shortage, a session
+left by closing its sheet writes no shortage on the lines it has not finished, and
+a bodiless completion does not book a part-picked line as it stood. Each waits for
+an answer, like the skipped line beside them.
 """
 
 import uuid

@@ -1,14 +1,12 @@
 """The LLM URL guard refuses in its own voice, through the catalogue.
 
-`guard_llm_url` delegates the check to the shared webhook validator, and
-used to delegate the sentence too: an installer saving an AI connection
-was told about "Webhook URL"s and pointed at WEBHOOKS_ALLOW_PRIVATE_
-NETWORKS — a switch that has nothing to do with what they were
-configuring, and one the two flags' documentation says is deliberately
-separate. Every refusal now carries its own key, so an unresolvable name
-(a typo) and a private address (a policy) stay different causes with
-different sentences, the catalogue says them in the reader's language,
-and the word "webhook" leaves this path never.
+`guard_llm_url` delegates the check to the shared webhook validator, but not the
+sentence: an installer saving an AI connection must never be told about
+"Webhook URL"s or pointed at WEBHOOKS_ALLOW_PRIVATE_NETWORKS, a switch that has
+nothing to do with what they are configuring. Every refusal carries its own
+key, so an unresolvable name (a typo) and a private address (a policy) stay
+different causes with different sentences, the catalogue says them in the
+reader's language, and the word "webhook" never reaches this path.
 """
 
 from __future__ import annotations

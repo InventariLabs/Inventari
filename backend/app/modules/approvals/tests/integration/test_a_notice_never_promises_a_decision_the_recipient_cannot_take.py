@@ -326,10 +326,9 @@ class TestADecidableStageStillNotifies:
 class TestAnOpenStageRingsWhoeverHoldsTheApproveGrant:
     """An open stage is decided by the holders of the approve grant, and they are told.
 
-    The open-stage notice used to ring members by role name — admins and
-    managers — while the door decides by the grant. A custom role carrying the
-    grant never heard, and a manager whose role stops short of it was told a
-    decision was theirs that the door then refused.
+    The open-stage notice rings the holders of the approve grant, the same test
+    the door decides by. A custom role carrying the grant hears of the request,
+    and a role name alone counts for nothing.
     """
 
     def test_the_grant_holders_are_told_and_the_role_name_counts_for_nothing(

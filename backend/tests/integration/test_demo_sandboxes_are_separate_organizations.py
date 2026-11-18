@@ -122,10 +122,9 @@ class TestTheSeedStaysInsideItsOrganization:
     ) -> None:
         """Every organization has a SHELF of its own; the map asked for one names its.
 
-        The map used to be read across the instance, so a code two
-        organizations share resolved to whichever row came back last — the
-        newest organization's, on a fresh table — and the older one's shelves
-        were built on the newer one's types.
+        The map is read within this organization, so a code two organizations share
+        resolves to this organization's own type, and its shelves are built on
+        its own types.
         """
         from seed_demo_data import _ensure_storage_types
 

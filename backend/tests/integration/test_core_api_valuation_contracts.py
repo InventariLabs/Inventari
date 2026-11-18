@@ -62,8 +62,8 @@ class TestCoreValuationReceiptContract:
     ):
         """The rate is read back through the API, not off the template row.
 
-        It used to be a cached column there, and a global template is one row
-        every organization shares — so the figure belonged to whoever wrote
+        It is not a cached column there: a global template is one row every
+        organization shares, so a cached figure would belong to whoever wrote
         last.
         """
 

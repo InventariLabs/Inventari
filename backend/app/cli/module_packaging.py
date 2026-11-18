@@ -210,9 +210,8 @@ def _check_install_guards(
         console.print(
             f"[red]✗ Module '{name}' is already installed (v{tracking[name]['version']}).[/]"
         )
-        # Sending people to uninstall used to be sending them through a
-        # DROP TABLE: that is what the default on_uninstall hook did, and
-        # there was no other route between two versions.
+        # An uninstall is not a route between two versions: the default on_uninstall
+        # hook runs a DROP TABLE, so the upgrade path is the one that keeps the data.
         console.print(
             f'[red]  To move to another version: [bold]module upgrade <source>[/bold] '
             f'(keeps the data). To remove it: [bold]module uninstall {name}[/bold].[/]'
@@ -729,7 +728,7 @@ def _do_install(
 def uninstall_module(
     name: str, *, force: bool = False, drop_data: bool = False
 ) -> None:
-    """Remove a previously installed community module.
+    """Remove an installed community module.
 
     By default this removes code, not data. The module's tables stay
     exactly as they are, and what the uninstall would leave behind is
@@ -739,9 +738,8 @@ def uninstall_module(
     ``drop_data=True`` runs the module's ``on_uninstall`` hook, whose
     default implementation downgrades the module's migrations to base —
     ``DROP TABLE`` on every table the module owns, for every organization
-    on this installation. That used to be what an uninstall did, behind a
-    prompt that spoke only about files. It is now an explicit choice,
-    confirmed by typing the word ``data``.
+    on this installation. Dropping them is an explicit choice, confirmed by
+    typing the word ``data``, never a side effect of removing the code.
     """
 
     # 1. Guard: not a core module

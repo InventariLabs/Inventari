@@ -1,7 +1,7 @@
 """A scanning session can be handed to another person with its scans.
 
 One person picks half a dispatch and goes home; a colleague finishes it. The
-only road used to be releasing the session, which is a cancel and throws the
+handover is not a release, which would cancel and throw the
 holder's scans away. Taking over moves the session itself: the scans stay, the
 new holder continues from them, the previous holder's screen is refused with
 the new holder's name, and both names are in the audit log.

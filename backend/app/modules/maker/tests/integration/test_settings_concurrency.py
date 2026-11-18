@@ -1,9 +1,8 @@
-"""Regression: concurrent first ``get_settings`` calls must not 500.
+"""Concurrent first ``get_settings`` calls must not 500.
 
-Two parallel requests that both find no settings row used to race the
-get-or-create INSERT and one died on the ``maker_module_settings_pkey``
-unique constraint (observed as an Internal Server Error while parallel E2E
-specs created the first production order for an org).
+Two parallel requests that both find no settings row race on the get-or-create
+INSERT, and the loser must not die on the ``maker_module_settings_pkey`` unique
+constraint with an Internal Server Error.
 """
 
 from __future__ import annotations

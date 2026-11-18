@@ -2,11 +2,9 @@
 
 A document that went through approval has two hands on it: the one that
 confirmed it and sent it into the queue, and the one that approved it.
-The detail used to keep only one -- the approval overwrote the
-confirmation -- so the card named the approver as the confirmer and the
-person who actually confirmed the document disappeared. The approval
-decisions travel with their approver now, and the confirmation keeps its
-author through the whole workflow.
+The detail keeps both: the approval travels with its approver, and the
+confirmation keeps its author through the whole workflow, so the card never
+names the approver as the confirmer.
 """
 
 from __future__ import annotations

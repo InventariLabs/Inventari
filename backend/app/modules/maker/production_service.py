@@ -281,11 +281,9 @@ async def _next_order_number(db: AsyncSession, organization_id: UUID) -> str:
     after midnight on the local first of January is numbered into the new
     year.
 
-    This used to be a second engine beside it — its own lock, its own prefix
-    scan, the shape ``PR/{year}/{seq}`` hardcoded — so an organization that
-    changed how its documents are numbered saw the change everywhere except on
-    its runs. That engine and its hardcoded shape are gone. What the earlier
-    decision asked for stands: the number is one a person can say out loud.
+    The number comes from the warehouse's document numbering, so an organization
+    that changes how its documents are numbered sees the change on its runs too.
+    The number stays one a person can say out loud.
     """
     from app.modules.warehouse.warehouse_api import warehouse_api
 
@@ -530,8 +528,8 @@ async def _resolve_actual_qty(
     if actual_qty is None:
         actual_qty = order.planned_qty
 
-    # actual_qty must be > 0. The request schema allows 0 (`ge=0` — a
-    # zero output used to mean "cancel"), so this refusal is reachable.
+    # actual_qty must be > 0. The request schema allows 0 (`ge=0`), so this
+    # refusal is reachable.
     if actual_qty <= 0:
         raise ServiceRejectionError('production_actual_qty_must_be_positive')
 
@@ -560,23 +558,18 @@ async def _explode_planned_consumption(
     move under an open order and nothing would say so.
 
     Recipe-aware top-level explosion: when the order references an explicit
-    recipe, consumption uses THAT recipe's lines (previously the default
-    recipe was used here while fixed costs read order.recipe_id — the two
-    could diverge). Nested sub-assemblies keep the default-recipe lookup
+    recipe, consumption uses THAT recipe's lines, the same recipe the fixed costs
+    read from order.recipe_id. Nested sub-assemblies keep the default-recipe lookup
     (documented design), and an intermediate on the shelf is taken from the
     *pool* first: only the part its stock does not cover is exploded through
     its recipe.
 
     Quantities come back **in each ingredient's stock unit**, converted here so
     that consumption, cost and the order lines cannot disagree about what the
-    number means. They used to come back in the recipe line's unit and be
-    passed straight to the ledger, which knows nothing about units: a line
-    reading 500 g against stock kept in kilograms passed the availability check
-    — that one converts — and then took 500 kg off the shelf. The valuation
-    layers, the history and every later count carried the inflated figure, and
-    a shelf too small for it failed hard against a check that had just said
-    yes. This was the only place the application actively falsified
-    authoritative stock.
+    number means. The ledger knows nothing about units, so a figure in the recipe
+    line's unit would be taken as it stands: a line reading 500 g against stock
+    kept in kilograms would pass the availability check, which converts, and then
+    take 500 kg off the shelf.
     """
     flat = await bom_service.explode_in_stock_units(
         db,
@@ -1104,10 +1097,8 @@ def _write_order_lines(
 ) -> None:
     """One line per ingredient, at what that ingredient actually cost.
 
-    The snapshot used to be the layer-average rate while the order total was
-    the same average, so the two agreed. The total is now the real cost of the
-    layers the run consumed, and a line that kept quoting the average would
-    not add up to the order it belongs to.
+    The snapshot is the real cost of the layers the run consumed, the same figure
+    the order total is built from, so the lines add up to the order they belong to.
     """
     for index, (child_template_id, child_qty, unit) in enumerate(flat):
         rate = consumption.unit_costs.get(child_template_id)
@@ -1205,7 +1196,7 @@ async def _take_for_run(
     # Consume first, then cost. The material cost is what the cost ledger
     # actually gave up for these ingredients, which is only known once the
     # layers have been drained — and it is not the average of the layers
-    # standing beforehand, which is what this used to charge. A manufacturing
+    # standing beforehand, which is not what is charged. A manufacturing
     # order in Odoo and ERPNext values its output at the real cost of the
     # components it consumed, and after the outgoing layer is posted at its
     # FIFO cost the two figures stop agreeing. An ingredient the ledger
@@ -1781,10 +1772,9 @@ async def record_made(
 ) -> ProductionOrder:
     """Record a run that has already happened: one step, create and complete.
 
-    "I made 20 kg" used to be a draft first and a completion second, and the
-    completion refused a run whose ingredients the records did not hold —
-    for goods that were already made. Here the order is opened and closed in
-    the same transaction. The shortage strategy is not asked: it decides
+    "I made 20 kg" is one step: the order is opened and closed in the same
+    transaction, so goods already made are not refused for ingredients the records
+    do not hold. The shortage strategy is not asked: it decides
     whether to plan a run over stock, and this one is not a plan. An
     ingredient short in the records is taken as far as they go and the rest
     is recorded on its line, which puts the ingredient up for a count.

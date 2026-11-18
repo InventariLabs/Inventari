@@ -1,6 +1,6 @@
 """A recipe's cover image, held by the app rather than pointed at.
 
-An import used to keep whatever address the source page advertised for its
+An import does not keep whatever address the source page advertises for its
 picture. That address is not a picture: what the reader sees is whatever the
 other server decides to serve today, every open of the recipe sends the
 reader's address to a host they never chose, some sites refuse requests that

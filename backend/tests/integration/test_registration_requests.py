@@ -140,9 +140,9 @@ async def test_a_rejected_person_who_asks_again_reaches_the_queue(
 ):
     """The public answer says "submitted", so the request has to exist.
 
-    A rejected row used to keep the unique address and swallow the next
-    request: the person waited for an approval that could never come, and no
-    screen could reopen the case.
+    A rejected row does not keep the unique address, so the next request is queued:
+    the person is not left waiting for an approval that could never come, and a
+    screen can reopen the case.
     """
     await real_async_db_session.commit()
     headers = _auth(registration_superuser)

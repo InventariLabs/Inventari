@@ -593,9 +593,8 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
     ) -> None:
         """Both claims park on the row; releasing it leaves one holder.
 
-        The claim used to read the overlay and then write it back, so both
-        requests read 'nobody' before either wrote, both answered success, and
-        the later one silently overwrote the first. A third connection holds
+        The claim reads the overlay and writes it under the row lock, so a second
+        request waits for the first and sees its holder. A third connection holds
         the row so the claims write behind one lock — the window the lost
         holder lived in — rather than a window the scheduler happened to pick.
         """

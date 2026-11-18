@@ -79,8 +79,8 @@ class TestStepByStepCookingHistory:
     ) -> None:
         recipe_id = _recipe(client, auth_headers)
 
-        # An older, unrelated closed session — the one the finished screen
-        # used to write onto, because it was whatever the history had.
+        # An older, unrelated closed session, which the finished screen must not
+        # write onto.
         older = PickingSession(
             organization_id=test_user.organization_id,
             recipe_id=uuid.UUID(recipe_id),

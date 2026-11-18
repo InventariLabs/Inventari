@@ -2,11 +2,10 @@
 
 A group of stock is shared: it holds the stock of one product at one place,
 no matter how many item records stand behind it. Reservations hang off the
-group and belong to documents, not to records. Deleting a record used to
-release ``old_quantity`` worth of them regardless -- so scrapping one bottle
-of six released the hold a picking document had on the other five, and left
-the document's own StockReservation rows behind claiming stock that was no
-longer protected.
+group and belong to documents, not to records. Deleting a record releases only
+the part of the holds its own stock backs: scrapping one bottle of six leaves
+the hold a picking document has on the other five in place, and the document's
+StockReservation rows claim only protected stock.
 
 The rule the sibling case already established for decrements applies here
 too: what remains after stock leaves still covers every reservation, so

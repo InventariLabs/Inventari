@@ -1,10 +1,8 @@
 """A workflow holds nothing until somebody switches it on, knowing what it will hold.
 
-A document workflow used to come into force the moment it was saved. With
-the document profile naming neither a threshold nor a type list, that meant
-every confirmed document from then on waited for an approval — and nothing
-on the form said so. An organization that set one up to look at the feature
-found, months later, its first receipt parked behind a stage nobody could
+A document workflow holds nothing until somebody switches it on, and the form says
+what it will hold once it is on. An organization that set one up only to look at
+the feature must not find its first receipt parked behind a stage nobody can
 decide, with no memory of having asked for any control at all.
 
 So a new workflow is saved switched off, and switching it on is its own act.

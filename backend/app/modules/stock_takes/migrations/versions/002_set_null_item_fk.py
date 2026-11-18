@@ -4,10 +4,10 @@ Revision ID: 002_set_null_item_fk
 Revises: 001_initial
 Create Date: 2026-08-17
 
-Purging an item used to CASCADE-delete its stock-take lines, destroying the
-counting evidence. The ``before_purge`` interceptor now blocks that path, but
-it only exists while the module is enabled — this constraint change is the
-defense-in-depth so the rows survive (``item_name`` is denormalised) even if
+Purging an item must not CASCADE-delete its stock-take lines, since that would
+destroy the counting evidence. The ``before_purge`` interceptor blocks that
+path, but it only exists while the module is enabled, so this constraint is
+the defense-in-depth that lets the rows survive (``item_name`` is denormalised) even if
 the purge happens with the module switched off.
 
 Downgrade restores the CASCADE behaviour.

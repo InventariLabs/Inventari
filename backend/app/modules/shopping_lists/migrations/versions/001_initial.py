@@ -3,7 +3,7 @@
 Initial migration for the shopping_lists module, extracted from core baseline_001
 as part of the module migration isolation effort.
 
-These tables were previously created by:
+These tables come from:
 - ``baseline_001_full_schema.py``: shopping_lists, shopping_list_items
 - ``e4f5a6b7c8d9``: shopping_list_history
 - ``d1e2f3a4b5c6``: added status, completed_at, archived_at columns to shopping_lists

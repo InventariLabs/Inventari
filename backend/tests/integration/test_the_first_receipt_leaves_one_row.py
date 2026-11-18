@@ -51,8 +51,8 @@ class TestTheSameRaceThroughTheDocumentPath:
     the instrument that kept flagging the old duplicates — must find nothing
     between the shelf and the ledger to flag.
 
-    The race used to be left to the scheduler, and twice went red on a loaded
-    full run with nothing kept of why. It is forced now: every register queues
+    The race is forced rather than left to the scheduler, so the outcome does not
+    depend on load: every register queues
     on the group's anchor — the one lock racing receipts of one product on one
     shelf meet — before any of them is let through, and what each register
     raised, if anything, is the failure's message."""

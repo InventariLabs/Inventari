@@ -3,7 +3,7 @@
 Listing models proves the credentials work. It says nothing about whether the
 model can answer in the shape the app needs — which is exactly what breaks
 after switching provider, and it breaks in the field rather than in Settings.
-These tests pin the three verdicts the endpoint now distinguishes.
+These tests pin the three verdicts the endpoint distinguishes.
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ _GOOD_ANSWER = (
 _PROSE = 'The image shows a carton, but I cannot make out the printed text.'
 
 #: The shape is right and every value is from the ceiling. This is the answer
-#: the test used to pass without comment.
+#: the test must not accept it without comment.
 _WELL_FORMED_GUESS = (
     '{"name": "Milk", "brand": null, "weight": null, "expiry_date": null}'
 )
@@ -335,7 +335,7 @@ class TestTheProbeThatRanOutOfTime:
 
     A local runtime loads the model's weights on the first call after the
     model name changes, and that load happens inside the request the probe
-    waits on. The first test of a working model used to come back as "the
+    waits on. A working model that is still loading gets its own answer, not "the
     connection test could not be completed — check the address": an errand to
     an address that answered. The two failures are different errands, so they
     get different sentences.

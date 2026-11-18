@@ -81,8 +81,8 @@ async def product_search(
 )
 async def product_quick_create(
     data: QuickCreateStub,
-    # Founding a product template is items work: the door used to hand a
-    # stub to any documents writer, and the record it founded was real.
+    # Founding a product template is items work: the door requires items-write,
+    # since the record it founds is real.
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),

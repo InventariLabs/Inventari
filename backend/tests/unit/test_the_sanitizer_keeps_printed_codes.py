@@ -2,8 +2,8 @@
 
 The codes reach the template as ``data:`` URIs inside ``<img src>``. The
 engine cleans the *rendered* HTML with nh3, whose default URL schemes have
-no ``data:``, so the whole ``src`` used to be stripped and the printout
-(and the editor preview, which goes through the same call) came out with
+no ``data:``, so the codes' ``src`` must be allowed explicitly, or the printout
+(and the editor preview, which goes through the same call) comes out with
 two empty ``<img>`` tags. The pins here measure the rendered result — the
 bytes of the image that survive, and what WeasyPrint draws from them — not
 just that an attribute exists, and they pin the other side of the policy:

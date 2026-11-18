@@ -1,9 +1,9 @@
 """Deleting a storage location used by production orders is vetoed cleanly.
 
 the RESTRICT FK on ``maker_production_orders.output_storage_location_id``
-used to surface as a misleading "concurrent transaction created stock
-movements" 409. The ``ProductionOrderStorageGuard`` interceptor now answers
-with a domain message before any DELETE is attempted.
+must not surface as a misleading "concurrent transaction created stock
+movements" 409: the ``ProductionOrderStorageGuard`` interceptor answers with a
+domain message before any DELETE is attempted.
 """
 
 from __future__ import annotations

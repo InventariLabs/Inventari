@@ -3,9 +3,8 @@
 Initial migration for the stock_takes module, extracted from core baseline_001
 as part of the module migration isolation effort.
 
-These tables were previously created by the consolidated
-``baseline_001_full_schema.py``. They now belong to the stock_takes module so
-that ``module enable stock_takes`` / ``module disable stock_takes`` can manage
+The tables come out of the consolidated ``baseline_001_full_schema.py``, and
+they belong to the stock_takes module so that ``module enable stock_takes`` / ``module disable stock_takes`` can manage
 them independently via the per-module version table
 ``alembic_version_stock_takes``.
 

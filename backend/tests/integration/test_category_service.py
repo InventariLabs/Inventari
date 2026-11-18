@@ -88,9 +88,8 @@ class TestMergeFieldDefinitions:
 
         The entry replaces only the keys it carries: what it leaves out
         stays as stored. That is what makes a change of type or required
-        possible without echoing the stored label back — echoing it is what
-        the contract used to demand, and losing it is what the write used to
-        do when the echo was missing.
+        possible without echoing the stored label back: a missing echo keeps the
+        stored label.
         """
         existing = [
             {
@@ -260,8 +259,8 @@ class TestGetCategory:
     ):
         """System categories (org_id IS NULL) are accessible to any org.
 
-        The test plants its own instead of borrowing one from the food seed,
-        which it used to skip without — a precondition it can set costs a row.
+        The test plants its own instead of borrowing one from the food seed:
+        a precondition the test can set costs a row.
         """
         sys_cat = Category(name='System, planted', organization_id=None, is_active=True)
         real_async_db_session.add(sys_cat)
@@ -448,13 +447,10 @@ class TestUpdate:
     ):
         """A request that carries no name renames nothing.
 
-        The lock used to compare `incoming.get('label')` to the stored label
-        and read the schema's own "no label sent" (None) as a rename of
-        "Cut", so changing type or required passed only when the client
-        echoed the raw stored label back — and on the contract before the
-        lock the same write passed while silently dropping the label.
-        Neither is the truth: the entry names no field, so the stored name
-        stands and the rest of the entry lands.
+        The lock compares only a label that was sent, so an absent label (None) is
+        not read as a rename of "Cut", and changing type or required passes
+        without the client echoing the stored label back. The entry names no
+        label, so the stored name stands and the rest of the entry lands.
         """
         cat = Category(
             name='Nameless Edit',

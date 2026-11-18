@@ -18,9 +18,9 @@ router = APIRouter()
 USER_CHANNEL_PREFIX = 'notifications:user:'
 
 #: How often an open socket re-asks whether its credential is still good.
-#: The handler used to authorise once, at connect, so a session revoked while
-#: the socket was open kept receiving notifications until the client happened
-#: to disconnect — which for a notification socket is "until the tab closes".
+#: The handler checks the credential again at this cadence, so a session revoked
+#: while the socket is open stops receiving notifications at the next check,
+#: not only when the client happens to disconnect.
 REVALIDATE_EVERY_SECONDS = 30.0
 
 #: The subprotocol a client offers just ahead of its access token. The browser
@@ -170,9 +170,9 @@ async def notifications_ws(websocket: WebSocket) -> None:
     """WebSocket endpoint for real-time notifications.
 
     The client offers two subprotocols, ``bearer`` and then its JWT access
-    token, and the socket answers with ``bearer``. The token used to travel in
+    token, and the socket answers with ``bearer``. The token is not read from
     the query string, where uvicorn's own log and every proxy's access log
-    wrote it down on each connect, and those logs outlive the token by far.
+    would write it down on each connect, and those logs outlive the token by far.
     In a header it goes where every other API request already sends one.
     A ``token`` query parameter is not read: a client still putting it there
     is refused, so the address never becomes a way in again.

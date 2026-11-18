@@ -1,11 +1,11 @@
 """Planned runs are measured one after another against the same shelf.
 
-Each draft used to read its availability alone, so two drafts that each
-needed six of ten flour both read as covered while together they needed
-twelve. A planned run now counts what the runs planned before it need — by
-planned day, then by creation — and the list shows each draft as covered,
-partly covered or short. Completion's own verdict (``shortage_count``) stays
-what it was: it judges the shelf as it is when the run is closed.
+Each draft reads the availability left by the runs planned before it: two drafts
+that each need six of ten flour are not both covered when together they need
+twelve. A planned run counts what the runs planned before it need — by planned
+day, then by creation — and the list shows each draft as covered, partly covered
+or short. Completion's own verdict (``shortage_count``) judges the shelf as it is
+when the run is closed.
 """
 
 from datetime import date, timedelta

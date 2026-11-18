@@ -276,11 +276,11 @@ class TestCancellingLeavesNothingBehind:
         doc_template: ProductTemplate,
         db_session: Session,
     ) -> None:
-        """A part-scanned line stays `pending`, and used to survive the cancel.
+        """A part-scanned line does not survive the cancel.
 
-        The document then showed a receipt of 5 of 12.5 that no finished
-        session had made, and the session that wrote it no longer existed to
-        be asked about it.
+        Otherwise the document would show a receipt of 5 of 12.5 that no finished
+        session made, and the session that wrote it would no longer exist to be
+        asked about it.
         """
         doc_id = _create_in(
             client,
@@ -427,9 +427,8 @@ class TestReopeningAFinishedScan:
     """A session that ended over a document nobody completed comes back.
 
     The summary that books the document can be left by the back arrow or a
-    closed tab, and the next start used to open a new session at 0 of N over
-    lines the document already read as done — inviting every line to be
-    scanned again, while the only way to book was the manual panel.
+    closed tab, and the next start reopens that session over lines the document
+    already reads as done, so no line is scanned again.
     """
 
     def test_receiving_hands_back_the_finished_session(

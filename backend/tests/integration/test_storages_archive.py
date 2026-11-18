@@ -173,8 +173,8 @@ class TestStorageUnarchive:
     """POST /locations/{id}/unarchive — the way back.
 
     Archiving is where the app sends anyone who may not delete a location,
-    so it cannot be a one-way door: the only known way back used to be an
-    UPDATE against the database.
+    so it cannot be a one-way door: the way back is this endpoint, not an UPDATE
+    against the database.
     """
 
     def _make(self, db_session, user, name, parent_id=None):

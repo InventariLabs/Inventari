@@ -27,8 +27,8 @@ class TestNormalizeBarcode:
 
     def test_ean8_padded_to_ean13(self):
         # B-6: EAN-8 (8 digits) is padded to EAN-13 so it collides with its
-        # EAN-13 form (previously it passed through unchanged, letting the same
-        # product be stored twice under two different canonical codes).
+        # EAN-13 form, so the same product cannot be stored twice under two canonical
+        # codes.
         assert normalize_barcode('96385074') == '0000096385074'
 
     def test_upc_a_to_ean13(self):

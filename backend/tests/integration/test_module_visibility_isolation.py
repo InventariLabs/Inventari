@@ -662,9 +662,9 @@ class TestStorageCountsScope:
     """The counts on a location answer the question the flag asked.
 
     With exclude_module_contexts the general screens drop the module's
-    locations; the counts on the locations that remain used to go on counting
-    the module's records. The inventory overview then said "0 products in
-    1 place" above a storage bar of 27 — both answers to one question, from
+    locations; the counts on the locations that remain follow the same flag, so
+    the overview never says "0 products in 1 place" above a storage bar of 27 —
+    both answers to one question, from
     two requests carrying the same flag.
     """
 

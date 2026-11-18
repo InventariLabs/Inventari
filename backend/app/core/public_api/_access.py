@@ -1,9 +1,9 @@
 """What a ``core_api`` method does to the data, stated beside the method.
 
 The CoreAPI reference (``docs/subsystems/CORE_API.md``) labels every method
-READ or WRITE. The generator used to guess the label from words in the
-method's name and docstring, and the guess called a lookup of existing ids a
-write ("exist" holds "set") and a rename a read. The label is now declared
+READ or WRITE. The label is declared, never guessed from words in the
+method's name and docstring: a guess calls a lookup of existing ids a write
+("exist" holds "set") and a rename a read. The label is declared
 here, on the method, and the generator only reads it; a public method that
 declares none stops the generator, so a new method cannot reach the reference
 unlabelled.

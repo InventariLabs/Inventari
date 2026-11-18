@@ -1,8 +1,8 @@
 """A skipped pick line is answered as skipped, and its summary opens for anyone.
 
-Scanning the product of a line the picker put off used to answer "already
-picked: 0 of 2", straight above a card that says Skipped and offers Undo skip.
-Nothing was picked of it. The scan now says the line was skipped.
+Scanning the product of a line the picker put off says the line was skipped, not
+"already picked: 0 of 2" above a card that says Skipped and offers Undo skip.
+Nothing was picked of it.
 
 The summary a skip of the last line leaves behind is handed to whoever opens
 it again, so a colleague who finds the dispatch finished can take the skip

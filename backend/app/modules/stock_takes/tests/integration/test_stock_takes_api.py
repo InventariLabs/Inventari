@@ -117,9 +117,8 @@ class TestStockTakesCreate:
     ) -> None:
         """Options from the creation dialog must be persisted on the stock take.
 
-        Regression guard for: the router used to pass only name,
-               description and notes to the service, silently dropping
-               blind_mode, tolerance_percent and require_full_count.
+        The creation options reach the service: name, description and notes,
+        and blind_mode, tolerance_percent and require_full_count with them.
         """
         response = client.post(
             '/api/v1/stock-takes',
@@ -228,9 +227,8 @@ class TestStockTakesList:
     ) -> None:
         """list rows must carry progress and the storage location name.
 
-        Previously the row was built only from table columns, so the UI
-        showed 0 % progress at 12/12 and "unknown place" even though the
-        relation was loaded and left unused.
+        Each row carries its progress and the storage location's name from the
+        loaded relation, so the UI shows 12/12 as 100 % and names the place.
         """
         items = client.get(
             f'/api/v1/stock-takes/{test_stock_take.id}/items', headers=auth_headers

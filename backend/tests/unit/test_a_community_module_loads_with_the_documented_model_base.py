@@ -8,8 +8,8 @@ exports one (``ModuleModelBase``), the guide, the quickstart and the community
 scaffold use it, and this file walks the author's path end to end: scaffold,
 install it as an untrusted (unsigned) package, let module discovery load it.
 
-The last test pins the refusal that made the export necessary: the import the
-guide used to show still does not load. If that ever starts passing, the
+The last test pins the refusal that made the export necessary: the bare
+``app.database.Base`` import still does not load. If that ever starts passing, the
 sanctioned base is the only thing between an author and a refused install, and
 the documents must say so for a reason.
 """

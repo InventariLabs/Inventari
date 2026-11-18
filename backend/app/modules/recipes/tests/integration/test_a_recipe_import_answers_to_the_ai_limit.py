@@ -1,11 +1,9 @@
 """Importing a recipe spends the organization's AI budget, so the budget gates it.
 
 The URL import pipeline books every provider call against the same monthly
-ceiling as vision and the connection test, but until now nothing asked that
-ceiling first — and the one check that existed was doubly wrong: it counted a
-single action bucket against a hardcoded ``50``, and its "safe" wrapper caught
-the very refusal it raised (an ``HTTPException`` is an ``Exception``), so an
-overage was logged as "non-blocking" and the import continued.
+ceiling as vision and the connection test, so the import asks that ceiling
+first. An overage refuses the import: the refusal is raised through, not
+logged as non-blocking.
 
 These tests pin both halves of the gate on both import doors: over the limit
 the scraping stage is never reached and the refusal carries the counter's

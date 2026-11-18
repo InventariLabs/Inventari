@@ -76,8 +76,8 @@ def _keep_a_short_product_in_two_records(db: Session, org_id: uuid.UUID) -> None
     moves up with it.
 
     The seed dates its records at random, and a dated record of a short
-    product parts the two the other way: the shares count it once as dated
-    and again in its product, which cancelled the added record on some runs.
+    product parts the two the other way: the shares would count it once as dated
+    and again in its product, which could cancel the added record on some runs.
     The short products' records carry no date here, so the shares summed fall
     short of the list on every run, not on most.
     """

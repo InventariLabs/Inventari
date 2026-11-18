@@ -1,9 +1,9 @@
 """A partial transfer moves what the line names, and the rest stays put.
 
-The transfer executor used to do two independent writes: the record moved
-to the target shelf whole, while the stock moved only the line's quantity.
-A line smaller than its record left the two books disagreeing — the drift
-the reconciliation read. These tests hold the executor to the line: the
+The transfer executor moves the record with the line, and the stock by the line's
+quantity, so the two books agree. A line smaller than its record leaves the
+remainder where it stood, and the reconciliation finds no drift. These tests hold
+the executor to the line: the
 quantity the line names changes shelves, the remainder stays where it stood,
 and the records and the movement ledger agree on both shelves.
 """

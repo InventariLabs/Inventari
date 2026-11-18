@@ -657,8 +657,8 @@ class TestTheRegisterFilter:
 def test_the_guide_quotes_the_modules_own_files() -> None:
     """The worked example's code blocks are the module's files, verbatim.
 
-    The chapter used to carry snippets of a module nobody ran; they drifted
-    from the registries they named. Each block marked ``example-file`` must
+    The chapter quotes the module's files, which are run, so the snippets cannot
+    drift from the registries they name. Each block marked ``example-file`` must
     read exactly as the file it names.
     """
     package = _example_package()

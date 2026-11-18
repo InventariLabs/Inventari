@@ -160,8 +160,8 @@ class TestAuditCampaign:
     def test_deadline_utc_organization_keeps_its_own_day_end(
         self, client: TestClient, eq_auth_headers: dict[str, str]
     ) -> None:
-        """For an org on UTC the old behavior was already right: the end of
-        the UTC day. The timezone-aware path must not change that."""
+        """For an org on UTC the deadline is the end of the UTC day. The
+        timezone-aware path must keep that."""
         from datetime import UTC, datetime, timedelta
 
         day = (datetime.now(UTC) + timedelta(days=1)).date()
@@ -191,13 +191,10 @@ class TestAuditCampaign:
     ) -> None:
         """ "Today" is a legal pick for the whole of the organization's day.
 
-        The form sends noon of the picked day on the org's clock, and the
-        schema validator used to compare that instant with "now": from the
-        org's noon onward the arrival was already past, so picking today was
-        refused for half of the org's day — while dev accepted it. The check
-        now lives where the org's clock is known and tests the stored value
-        (the day's end): the picked day is over for the org exactly when
-        creation must refuse.
+        The form sends noon of the picked day on the org's clock. The check lives
+        where the org's clock is known and tests the stored value, the day's
+        end: the picked day is over for the org exactly when creation must
+        refuse, so picking today stays valid for the whole of the org's day.
 
         The zone is picked from a spread covering every hour, so the "org is
         in its afternoon" premise holds at whatever moment the suite runs.
@@ -634,7 +631,7 @@ class TestAttestationPublic:
         """a deadline is a day, not a moment.
 
         A client that sends midnight of day D ("last day to answer" read as
-        "start of day D") used to expire every token the moment day D began.
+        "start of day D") must not expire every token the moment day D begins.
         The service pins the contract on write: the stored deadline is the end
         of the deadline's own day, and the launch token is valid until then.
         """
@@ -961,9 +958,8 @@ class TestAReturnClosesTheQuestion:
 @pytest.mark.integration
 class TestAPartlyReturnedEnvelope:
     """Alice holds a laptop and a phone and returns the phone after the
-    request went out. One returned asset used to close her whole envelope:
-    the link said "already returned" and the laptop she still had could not
-    be confirmed, so her answer stayed missing for good."""
+    request went out. One returned asset does not close her whole envelope: the
+    laptop she still has can be confirmed, and her answer is not left missing."""
 
     def _launch_for_two(
         self,

@@ -8,8 +8,8 @@ that prints them — so a shared catalogue such as Open Food Facts holds
 numbers in it that say nothing about the product in hand. The demo's own
 seed uses the range too.
 
-The scan of a generated code used to fall through to the products database
-like any package barcode, and a code printed in our own warehouse proposed
+The scan of a generated code does not fall through to the products database like
+any package barcode: a code printed in our own warehouse must not propose
 whatever a stranger once typed into Open Food Facts under that number. The
 rule is pinned here, at the scan resolution: restricted-circulation numbers
 are not looked up in a shared catalogue, and the reader gets the plain

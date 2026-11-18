@@ -425,8 +425,8 @@ async def delete_workflow(
 ) -> dict[str, Any]:
     """Remove a workflow — without erasing the decisions taken under it.
 
-    Deleting used to cascade through every request and decision ever raised
-    against the workflow, terminal ones included. Who approved a €40,000
+    Deleting leaves the requests and decisions raised against the workflow in
+    place, terminal ones included. Who approved a €40,000
     order, and when, is exactly the record an approval feature exists to
     leave behind; a settings screen must not be able to delete it.
 

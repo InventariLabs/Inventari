@@ -247,7 +247,7 @@ class TestEntityNotFoundMapping:
 class TestLlmPurposeUnboundMapping:
     """An unbound AI purpose is a configuration gap, not a broken request.
 
-    Left unmapped it used to fall through to the global handler as a 500
+    Left unmapped it would fall through to the global handler as a 500
     carrying the raw purpose key inside two glued sentence prefixes.
     """
 
@@ -332,8 +332,8 @@ class TestLibraryValueErrorsAreNotMapped:
 class TestTheLimitAndTheGuardAreEachTheirOwn:
     """The item limit is a refusal with its own envelope; the tenant guard is not a refusal.
 
-    Both used to travel as a bare ``PermissionError``, so whatever answered
-    one answered the other: a route that caught the limit also caught the
+    Both must not travel as a bare ``PermissionError``, or whatever answers
+    one answers the other: a route that caught the limit also caught the
     guard's message — table names, row ids, the organization's id — and sent
     it to the client as the reason for a 403.
     """

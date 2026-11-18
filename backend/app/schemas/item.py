@@ -412,8 +412,8 @@ class Item(ItemBase):
         # Pydantic model instances (e.g. ItemDTO returned by the CoreAPI):
         # dump to a dict and normalize the embedded uom — UomDTO carries no
         # `category` relation, so build UomInfo from the flat fields instead
-        # of calling from_orm_with_category (which used to raise AttributeError
-        # and turn GET /locations/{id}/items into a 500).
+        # of calling from_orm_with_category, which needs a relation the DTO does
+        # not carry, so the location item list would fail with AttributeError.
         if isinstance(data, BaseModel):
             data_dict = data.model_dump()
             uom = data_dict.get('uom')

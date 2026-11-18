@@ -412,9 +412,8 @@ async def lifespan(app: 'FastAPI'):
     except Exception as e:  # startup must never crash past failed background services
         logger.error(f'Startup failed: {e}', exc_info=True)
 
-    # STRICT_STARTUP gate — enforced AFTER the blanket catch so it actually
-    # fires instead of being swallowed. Previous code raised inside the try
-    # block, landing in this same except handler.
+    # STRICT_STARTUP gate. It sits after the blanket catch, outside the try
+    # block, so the raise is not swallowed by the handler above.
     if not settings.TESTING and settings.STRICT_STARTUP and failed_modules:
         raise RuntimeError(
             f'STRICT_STARTUP enabled — modules failed to initialize: '

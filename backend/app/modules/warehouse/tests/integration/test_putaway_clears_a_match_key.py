@@ -1,4 +1,4 @@
-"""A putaway rule can give up the match key it once had.
+"""A putaway rule can give up a match key.
 
 The update endpoint serialized the payload with ``exclude_none``, which
 throws away exactly the keys the client sent as null — and the update

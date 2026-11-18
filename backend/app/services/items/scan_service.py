@@ -226,10 +226,9 @@ async def _create_new_item(
 ) -> Item:
     """Create a new item from the scan, through the door the form uses.
 
-    A scan is one more door into the same warehouse. It used to hold a
-    second copy of the create sequence — same guards, hand-wired in a
-    different order — and every rule added to one door was a rule the other
-    did not have: the unit-vs-template confirmation never reached this side
+    A scan is one more door into the same warehouse. It runs the create sequence
+    the form uses rather than a second copy of it, so a rule added to one door
+    is a rule the other has: the unit-vs-template confirmation reaches this side
     at all. What stays here is what is genuinely scan-shaped: which label
     the record is born wearing, and how its birth reads in the history.
     """

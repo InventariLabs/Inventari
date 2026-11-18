@@ -131,8 +131,8 @@ class TestInheritedLocationFields:
         self, client, auth_headers
     ):
         """The own definition wins the clash, so there is nothing left to
-        take from above — the settings list used to show one field twice,
-        own and "Set on a level above"."""
+        take from above — the settings list shows the field once, as its own, not as
+        "Set on a level above"."""
         warehouse = _create(
             client,
             auth_headers,

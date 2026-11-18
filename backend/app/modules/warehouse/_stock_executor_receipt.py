@@ -61,11 +61,11 @@ async def _stock_row_at(
 ) -> Any:
     """Point the delivery at the record it tops up on this shelf, if any.
 
-    A line that names a product rather than a record used to go straight to
-    ``items.create``, so a catalogued product could be received exactly once:
-    with a barcode the second delivery broke ``uq_items_org_barcode_active``
-    and the endpoint answered 500, and without one the catalogue quietly grew
-    a second row holding half the stock.
+    A line that names a product rather than a record is pointed at the record
+    already on this shelf, so a catalogued product takes any number of
+    deliveries. Creating a second item would break ``uq_items_org_barcode_active``
+    when there is a barcode, and without one the catalogue would quietly grow a
+    second row holding half the stock.
 
     The place is part of the question. Asking it organization-wide answered
     with whichever row was oldest, so a delivery steered to Floor 1 topped up
@@ -225,8 +225,8 @@ async def _the_number_the_delivery_lands_on(
     """What the found record says once this delivery lands, as a record post.
 
     Found without a lock, so what the record holds is asked again under one:
-    two receipts that both read the record before either wrote it used to
-    write the same sum, and one delivery left the record but not the ledger.
+    two receipts that both read the record before either wrote it would write
+    the same sum, and a delivery could leave the record but not the ledger.
     The number goes back as a :class:`RecordPostDTO` — the movement pass
     states it inside the stock's locks, where the movement is written, so
     one operation is one transition of the record and its ledger, not a
@@ -273,8 +273,8 @@ async def _quarantine_shelf_async(db: AsyncSession, doc: Document) -> UUID:
     A receipt line coded DAMAGE or QUALITY_HOLD that names no batch has
     nothing to hold back in place, so it is booked onto this shelf instead
     of the one the putaway decision would have picked. With none named the
-    receipt is refused: the alternative is the old behaviour, goods that
-    were declared unfit landing among those a picking can draw.
+    receipt is refused, because otherwise goods declared unfit would land among
+    those a picking can draw.
     """
     profile = await get_profile(db, doc.organization_id)
     if profile is None or profile.quarantine_location_id is None:
@@ -498,10 +498,9 @@ async def _receive_item(
     )
 
     # A record that predates its card holds its stock in a unit only the card
-    # can name, and the conversion below asks it. The card used to be adopted
-    # after the delivery had been written to the record, so the sum happened
-    # across two units — 4 g of stock plus a 2 kg delivery read as 6 — while
-    # the shelf took the grams. The card comes first.
+    # can name, and the conversion below asks it, so the card is adopted before
+    # the delivery is written to the record. The sum then stays in one unit: 4 g
+    # of stock and a 2 kg delivery make 2004 g, and the shelf takes the grams.
     if stock_template_id is None:
         if named is None:
             raise ServiceRejectionError('document_line_needs_identity')
@@ -650,16 +649,16 @@ async def _record_receipt_valuation(
     spread over the converted quantity — 500 g at 0.02 is 10.00 for half a
     kilogram, not 0.02 per kilogram.
     """
-    # A line with no price used to post no layer at all, so the goods reached
-    # the shelf and the cost history never heard of them — and nothing looked
-    # for that gap, because reconciliation compared records against quants and
-    # not against the layers. A receipt is a receipt whether or not somebody
+    # A line with no price still posts a layer, so the goods reach the shelf and
+    # the cost history hears of them. Reconciliation compares records against
+    # quants and against the layers, so a gap cannot pass unseen. A receipt is a
+    # receipt whether or not somebody
     # typed a price; ``unit_cost=None`` says only that nobody did.
     #
     # Where there is a price it is the supplier's, so the currency is theirs
     # too — the line carries it, the document carries it, and the cost history
-    # used to receive neither. A receipt of 100 x 40.10 PLN into an
-    # organization keeping USD wrote 40.10 and nothing knew it was złoty.
+    # receives both. A receipt of 100 x 40.10 PLN into an organization keeping
+    # USD keeps the currency of the line, so the layer knows it is złoty.
     unit_cost = line.unit_price
     if unit_cost is not None and stock_quantity > 0:
         line_quantity = _executed_quantity(line)

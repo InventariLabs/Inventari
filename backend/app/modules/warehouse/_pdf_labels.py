@@ -493,10 +493,9 @@ def _resolve_doc_title(
 # Discrepancy codes
 # ---------------------------------------------------------------------------
 #
-# The printout used to carry the stored constant — "SHORTAGE" — to a supplier
-# or a driver who has no reason to know it, followed by a colon with nothing
-# after it whenever the optional reason was left blank. The wording matches
-# what the screens show for the same code.
+# The printout names the code in the words the screens show for it, not with
+# the stored constant "SHORTAGE", since a supplier or a driver has no reason to
+# know that constant. The reason follows a colon only when one was given.
 
 _DISCREPANCY_LABELS_EN: dict[str, str] = {
     'SHORTAGE': 'Shortage',

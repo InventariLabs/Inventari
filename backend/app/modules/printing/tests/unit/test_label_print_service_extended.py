@@ -107,8 +107,7 @@ class TestGenerateLabelPng:
     def test_a_label_with_no_size_is_refused(self) -> None:
         """Every other number on the label is a fraction of these two.
 
-        This used to reach Pillow and come back from the QR resize, which
-        told the caller about a resize they never asked for.
+        A zero size is refused up front, before anything is drawn.
         """
         label = _make_label()
         with pytest.raises(ValueError, match='height and width must be > 0'):
@@ -196,11 +195,8 @@ class TestGenerateLabelBatchPng:
 class TestTheImageIsTheLabel:
     """A file for a 50 x 24 label is 50 x 24 mm, and says so.
 
-    It used to depend on a media profile. The tape one drew only the
-    cassette's printable strip, snapped its height and cropped the label to
-    its content, so one label had a size in the settings, another in the file,
-    a third in the preview and a fourth on the tape. There is one geometry
-    now, the label's own, for the download, the preview and the printer.
+    The size is the label's own, with no media profile behind it: the
+    download, the preview and the printer all draw the same geometry.
     """
 
     def test_a_label_is_its_size_in_millimetres_at_300_dpi(self) -> None:
@@ -210,7 +206,7 @@ class TestTheImageIsTheLabel:
         assert img.info['dpi'] == pytest.approx((300, 300), abs=0.5)
 
     def test_a_square_alone_is_not_cropped_to_itself(self) -> None:
-        """The code alone used to come out as a 12 x 18 mm strip of a 50 x 24."""
+        """The code alone keeps the label's own 50 x 24 mm size, not a strip cut to the code."""
         img = Image.open(
             io.BytesIO(
                 generate_label_png(
@@ -484,11 +480,10 @@ class TestTheSquareLeavesRoomForTheRest:
         assert (right - left + 1) < image.width * 0.35
 
     def test_the_square_grows_with_the_label(self) -> None:
-        """The cap used to be 18 mm whatever the label measured.
+        """The square takes a share of the label's width, so it grows with the label.
 
-        So asking for a 100 x 50 label bought 100 x 50 of blank paper around
-        the same small square: the only thing the size changed was the area
-        around the code. The share is measured against the width now.
+        A 100 x 50 label gets a square that scales with it, not the same
+        small square in blank paper around it.
         """
         label = _make_label('STM-K9XP', 'Minced beef 8.2026')
 
@@ -561,10 +556,7 @@ class TestTheCodeBelongsToTheSquare:
     def test_the_caption_is_the_same_size_either_way(self) -> None:
         """Flipping a switch does not resize a sentence it did not change.
 
-        The caption used to be sized as a fraction of the short code, so
-        turning the code on shrank the caption to 1.95 mm and turning it off
-        let it grow to 8.8 mm — the same words, three times the size,
-        because of a checkbox about something else.
+        The caption's size does not depend on whether the code is printed.
         """
         label = _make_label('STM-K9XP', 'Minced beef 8.2026')
 
@@ -588,12 +580,10 @@ class TestTheCodeBelongsToTheSquare:
         assert _caption_height(image) / px_per_mm < 5.0
 
     def test_the_code_can_be_printed_without_a_caption(self) -> None:
-        """The fourth arrangement, which used to be unreachable.
+        """The fourth arrangement: the code without its caption.
 
-        ``qr_only`` was taken to mean "no text at all" and forced the code
-        off with the caption, so a pool label could carry the square and the
-        string to type when a scan fails — and nothing else — only by having
-        no description in the first place.
+        ``qr_only`` drops the caption and keeps the code, so a label can carry
+        the square and the string to type when a scan fails, and nothing else.
         """
         label = _make_label('STM-K9XP', 'Minced beef 8.2026')
 
@@ -685,25 +675,22 @@ class TestTheCodeStaysReadable:
         assert _module_px(image) / px_per_mm >= MIN_MODULE_MM
 
 
-#: A 58-character base URL — the length the square was measured on when
-#: the floor first won over the ceiling.
+#: A 58-character base URL, the length the square is measured against.
 LONG_BASE_URL = 'https://inventari12.warehouse-north.example-co.example.org'
 
 
 @pytest.mark.unit
 class TestALongAddressStaysInsideTheSquare:
-    """The ceiling and the floor used to contradict each other.
+    """A long address keeps the square inside its share of the label.
 
     A label leaves the code 18 mm, and a phone wants half a millimetre per
-    module; 37 modules at that floor are 18.8 mm. A 58-character base URL
-    under the old ``?code=`` address at error-correction M needed exactly 37,
-    so the renderer could keep only one of the two promises. The payload is shorter
-    now (``/s/<code>``) and the matrix drops to level L when M could keep
-    the floor only by growing past the ceiling — 33 modules, both promises
-    kept.
+    module; 37 modules at that floor are 18.8 mm. The payload is the short
+    ``/s/<code>`` path, and the matrix drops to level L when level M could
+    keep the floor only by growing past the ceiling: 33 modules, both
+    promises kept.
 
-    Measured the way the review measured it: the span of the dark modules on
-    a 50 x 24 sheet label at 300 dpi.
+    Measured as the span of the dark modules on a 50 x 24 sheet label at
+    300 dpi.
     """
 
     def _render(self) -> Image.Image:
@@ -887,10 +874,8 @@ class TestGenerateLabelBatchRendersEachLabelOnce:
     def test_three_labels_render_three_times_not_four(self) -> None:
         """The sheet measures its tile from the first label's own render.
 
-        The batch used to render labels[0] to learn the tile size and then
-        ran the very same label through the loop again — one wasted full
-        render per sheet. The render count is the property to keep: exactly
-        one render per label on the sheet."""
+        The render count is the property to keep: exactly one render per
+        label on the sheet."""
         labels = [_make_label(f'CODE-{n}') for n in range(3)]
         with patch(
             'app.modules.printing.services.label_print_service.generate_label_png',
@@ -911,12 +896,8 @@ class TestGenerateLabelBatchRendersEachLabelOnce:
 class TestNothingRunsOffTheLabel:
     """A run of characters with no space in it stays inside the label.
 
-    The fitter used to answer ``MIN_FONT_PX`` to a question it had failed:
-    ``_overflows`` reported that the longest line did not fit at any size,
-    and the bisection returned the floor anyway because that was its seed.
-    So a serial number or a URL pasted into a description was drawn at 8 px
-    and ran out through the right edge — the guard existed and nothing read
-    what it said.
+    A serial number or a URL pasted into a description is kept inside the
+    label, whatever its length.
     """
 
     @staticmethod

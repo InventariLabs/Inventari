@@ -3,12 +3,11 @@
 The field descriptions are the prompt: Core renders them into the request
 (:func:`app.core.llm.structured_extraction.build_shape_prompt`), so the
 vocabulary of a domain lives beside the field it fills and cannot drift away
-from it. A hand-written prompt block listing the same keys used to sit in
-``_prompts.py``; when a field was added to one, the other kept its old shape.
+from it.
 
 What is *not* here: fields a particular vertical cares about. Nutrition
-figures used to share this model with ``expiry_date``, which made every
-reader of an equipment nameplate carry six null grams-per-100g. Those fields
+figures belong to the module that wants them, so an equipment nameplate
+reader carries no null grams-per-100g. Those fields
 belong to the module that wants them and arrive through
 :mod:`app.modules.vision.field_contributions`.
 

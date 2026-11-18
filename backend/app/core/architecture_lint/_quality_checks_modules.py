@@ -163,7 +163,7 @@ def _check_cross_module_imports(modules_root: Path) -> list[str]:
     What the walk cannot reach is a different matter and is named rather
     than skipped: ``Path.rglob`` stops at a symlinked directory and
     ``ast.parse`` gives up on a file that is not valid Python, so both
-    used to end in a silent ``continue`` — and "Architecture lint passed"
+    would end in a silent ``continue`` — and "Architecture lint passed"
     over a tree nobody read is the report a certification review is run
     on. The gaps come back as ``::warning`` entries, the recipe ``module
     validate`` already uses: the tool says what it did not read, the exit

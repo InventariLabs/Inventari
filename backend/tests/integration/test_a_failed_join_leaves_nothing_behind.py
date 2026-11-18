@@ -1,9 +1,9 @@
 """Joining and registering with an invitation ride the request's transaction.
 
-Both used to commit halfway. Joining committed the move, the spent code and
-the journal entries before it gave the newcomer the custom role the
-invitation named; registering committed the new account the same way, one
-step before the same role. A failure after that point -- the role step
+Both commit as one unit. Joining must not commit the move, the spent code and
+the journal entries before it gives the newcomer the custom role the
+invitation named; registering must not commit the new account the same way,
+one step before the same role. A failure after that point -- the role step
 itself, or anything else the request did once the service returned -- found
 the person already moved, the account already created and the code already
 spent, with nothing left to roll back. The invitation could not be used

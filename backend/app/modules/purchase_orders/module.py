@@ -180,8 +180,8 @@ class PurchaseOrdersModule(BaseModule):
 
         # By string, not by importing app.modules.warehouse.events: an event
         # name is a contract, another module's code is not (see the docstring
-        # of DocumentEvent). These two used to read SystemEvent.DOCUMENT_*,
-        # which was the warehouse module's surface parked in the core table.
+        # of DocumentEvent). These two subscribe to the warehouse module's
+        # document names.
         context.subscribe('document.cancelled', self._handle_document_cancelled)
         context.subscribe('document.completed', self._handle_document_completed)
 

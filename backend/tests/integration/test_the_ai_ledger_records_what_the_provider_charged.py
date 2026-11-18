@@ -1,20 +1,11 @@
 """The AI usage ledger records what the provider actually charged.
 
-Three refusals used to hide real spend from ``ai_usage_logs``:
-
-- a call without a user (connection tests, background jobs) wrote nothing,
-  though the column is nullable and the provider charged the tokens —
-  the cost stats and the monthly limit never saw the money;
-- the row was only flushed into the request's transaction, so an endpoint
-  that answered 422 or 503 after the provider replied rolled the row back
-  together with the business data — precisely the calls a reader wants to
-  see were the ones that vanished;
-- every row claimed ``provider='openrouter'``, whether OpenRouter answered
-  or a local Ollama did, so cost could not be broken down per provider.
-
-The ledger row is bookkeeping, not part of the business transaction: it is
-written and committed in its own session, and it names the provider the
-call actually went through.
+The ledger row is bookkeeping, not part of the business transaction: a call
+without a user (connection tests, background jobs) still writes its row,
+because the column is nullable and the provider charged the tokens. The row is
+written and committed in its own session, so an endpoint that answers 422 or
+503 after the provider replied keeps it, and it names the provider the call
+actually went through, OpenRouter or a local Ollama.
 """
 
 from uuid import UUID

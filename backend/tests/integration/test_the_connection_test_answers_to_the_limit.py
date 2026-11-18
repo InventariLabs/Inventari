@@ -211,9 +211,8 @@ class TestAnUnreachableProviderBooksNothing:
     """A provider that was never reached delivered nothing and charged
     nothing, so the ledger must stay exactly as it was. The connection
     test books its rows through a per-answer callback of its own — a
-    separate arrangement from the vision endpoint's, and until now pinned
-    by nothing: a refactor that wrote a row for the attempt itself would
-    have shipped green."""
+    separate arrangement from the vision endpoint's, and pinned here: a
+    refactor that wrote a row for the attempt itself would fail this test."""
 
     def test_an_unreachable_provider_leaves_the_ledger_unchanged(
         self, db_session, test_household, client, auth_headers

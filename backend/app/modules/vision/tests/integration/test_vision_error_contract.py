@@ -1,9 +1,9 @@
 """Integration tests: what the client sees when the model lets us down.
 
-Two failures used to arrive as the same HTTP 500 carrying a Python parser
-message in English — ``Error during data extraction: Expecting value: line 1
-column 1 (char 0)``. They are not the same failure, and neither string was
-ever meant for the person holding the phone.
+Two failures get their own answers, and neither arrives as an HTTP 500 carrying
+a Python parser message in English — ``Error during data extraction: Expecting
+value: line 1 column 1 (char 0)``. They are not the same failure, and neither
+string is meant for the person holding the phone.
 """
 
 import pytest
@@ -344,9 +344,9 @@ class TestTheModelAnsweredWithNothing:
 class TestTheProviderRefusalNamesTheKey:
     """The most common first-setup state is a key the provider refuses.
 
-    It used to reach the screen as HTTP 500 "An internal error occurred"
-    while the log knew it was 401 — the administrator who had just pasted
-    the key was pointed at the application instead of at the key. The
+    It reaches the screen as the provider's 401, not as HTTP 500 "An internal
+    error occurred", so the administrator who has just pasted the key is
+    pointed at the key rather than at the application. The
     provider saying no about the request is a configuration answer, and it
     arrives as one.
     """
@@ -448,8 +448,8 @@ class TestAPhotographTheServerWillNotDecode:
     A few-kilobyte PNG can describe a canvas that takes half a gigabyte to
     decode, and scaling a photograph for the model decodes it first. That
     canvas is refused before its pixels are, as on every other picture
-    upload; so is a file that only starts like a picture, which used to come
-    back as an internal error.
+    upload; so is a file that only starts like a picture, and it gets the same
+    refusal.
     """
 
     def test_a_canvas_past_the_bound_is_refused_before_the_model_is_asked(

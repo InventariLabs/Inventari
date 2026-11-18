@@ -1,10 +1,9 @@
 """A page of locations costs what the page holds.
 
-The list used to read every location of the organization, count the records
-in every one of them and slice the answer, so each request paid for the whole
-warehouse and a screen that wanted twenty places downloaded them all, page by
-page. These are the asks that replace it: search, naming a set of ids, one
-level of the tree, and a count that is skipped when nobody prints it.
+Each request pays for the places it holds, not for the whole warehouse, and a
+screen that wants twenty places downloads twenty, page by page. The asks are:
+search, naming a set of ids, one level of the tree, and a count that is skipped
+when nobody prints it.
 """
 
 from uuid import uuid4

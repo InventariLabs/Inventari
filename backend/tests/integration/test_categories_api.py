@@ -953,9 +953,9 @@ class TestCategoryDelete:
     ):
         """The refusal travels in the interface's language, not English.
 
-        The backend used to raise a plain English f-string here, so a reader
-        working in Polish got the one sentence that mattered — why the delete
-        failed — in a language the rest of their screen does not speak.
+        The backend raises the refusal from the error catalogue, so a reader working
+        in Polish gets the one sentence that matters — why the delete failed — in
+        the language the rest of their screen speaks.
         """
         from app.models.category import Category
 

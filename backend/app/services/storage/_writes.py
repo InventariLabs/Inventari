@@ -178,11 +178,10 @@ async def _check_name_unique(
 ) -> None:
     """Raise 409 if a sibling with the same name already exists.
 
-    Typed here rather than left to the endpoint. The same collision used to
-    surface as 400 from create, 409 from update and 400 from the hierarchy
-    builder, because each endpoint mapped one bare ``ValueError`` its own way
-    — so a client wanting to tell "bad name" from "name taken" had to read
-    the English sentence, which is exactly what the copy gate forbids.
+    Typed here rather than left to the endpoint, so every caller sees the same
+    collision as the same error. Each endpoint mapping one bare ``ValueError``
+    its own way would leave a client telling "bad name" from "name taken" to
+    read the English sentence, which the copy gate forbids.
     """
     query = select(StorageLocation).where(
         StorageLocation.organization_id == organization_id,
@@ -205,9 +204,9 @@ async def _check_short_code_unique(
 ) -> None:
     """Raise if the organization already uses this short code.
 
-    Scoped to the organization on purpose: the check used to span the whole
-    table, so a code taken by any tenant was refused to all the others — and
-    the refusal message ("another location") confirmed that a row existed
+    Scoped to the organization on purpose: the check spans only the
+    organization's rows, so a code taken by one tenant is not refused to the
+    others — and the refusal message ("another location") would confirm that a row exists
     somewhere the caller cannot see.
     """
     query = select(StorageLocation).where(
@@ -451,7 +450,7 @@ async def update_storage(
     # A re-filing that changed nothing is not an event — the same rule the
     # item update applies. A change of `usage` is the quiet, org-wide one
     # (a virtual location stops counting into the stock the reader sees),
-    # and this entry is the trail it used to leave nowhere.
+    # and this entry is the trail it leaves.
     after = {f: getattr(storage, f) for f in audited_fields}
     # A list, not a set: the order the fields were audited in decides the
     # order the Detail column prints them, and a set has none — the same
@@ -623,7 +622,7 @@ async def unarchive_storage(
     """Put an archived location back on the lists, trees and pickers.
 
     Archiving is where a location that may not be deleted is sent, so the
-    door has to open both ways — the only way back used to be an UPDATE
+    door has to open both ways — the only way back must not be an UPDATE
     against the database. Restoring under a still-archived parent is
     refused: the child would return to a branch that is not there.
     """

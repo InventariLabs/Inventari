@@ -383,9 +383,8 @@ def test_api_layer_import_violations_skip_type_checking(tmp_path):
         pytest.param('app.modules.approvals.services', False, id='services'),
         pytest.param('app.modules.approvals.router', False, id='router'),
         # The contract names one door per module, not an `_api` naming habit:
-        # the suffix alone used to be the whole test, so any file ending in
-        # `_api` opened the module — including one named after somebody
-        # else's.
+        # the suffix alone never opens the module, so a file ending in `_api` is not
+        # a door, even one named after somebody else's.
         pytest.param(
             'app.modules.maker.secret_internal_api', False, id='api-suffix-only'
         ),
@@ -498,10 +497,9 @@ def test_a_mixed_statement_is_judged_name_by_name(tmp_path):
 def test_the_prefix_is_derived_from_the_root_the_check_is_handed(tmp_path):
     """A modules root under another name gets its own package name.
 
-    The check takes the root as a parameter but used to assume its name:
-    relative climbs resolved against ('app', 'modules') and findings
-    named the wrong package. Red before the fix: this finding named
-    `app.modules.other.services`.
+    The check takes the root as a parameter and derives the package name from it:
+    relative climbs resolve against that name, and findings name the right
+    package. This finding names `app.modules.other.services`.
     """
     modules_root = tmp_path / 'plugins'
     other = modules_root / 'other'
@@ -658,8 +656,8 @@ def test_a_cross_module_import_outside_the_contract_is_an_error(tmp_path, monkey
     """A leak into a sibling module's private service must fail the gate.
 
     The finding is an ``::error`` annotation, not a ``::warning``: the gate
-    used to print the leak and still exit 0, so the boundary held by
-    discipline, not by the check.
+    must not print the leak and still exit 0, so the boundary holds by the
+    check, not by discipline.
     """
     monkeypatch.chdir(tmp_path)
     modules_root = _two_modules(
@@ -1011,10 +1009,10 @@ def test_list_version_files_empty_when_no_dir(tmp_path):
 def test_extract_tablenames_counts_own_declarative_base(tmp_path):
     """Own-DeclarativeBase tables count at the file level now.
 
-    The walk used to exclude them because core Alembic does not track
-    non-Core bases — which made the helper blind to every community
-    module, since a community module may not import app.database and so
-    every one of its models sits on a base of its own. The exclusion for
+    The walk includes them. Core Alembic does not track non-Core bases, and a
+    community module may not import app.database, so every one of its models
+    sits on a base of its own; a walk that skipped them would be blind to every
+    community module. The exclusion for
     genuinely separate-database models (nutrition's products db) lives at
     the module level now, keyed on the database seam the module imports,
     not on the base.

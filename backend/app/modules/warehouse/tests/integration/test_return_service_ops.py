@@ -548,10 +548,7 @@ class TestCreateReturn:
     ) -> None:
         """An empty note stays empty whichever language asked for the return.
 
-        The server used to write a sentence here: first English for every
-        reader, then the creator's request language — and a return created
-        from an English session still read "Return for IN/…" on a Polish
-        screen and printout. The pointer to the original is the stored
+        The server writes no sentence here: the pointer to the original is the stored
         ``returns`` relation, rendered at read time, so no sentence is
         written at all.
         """

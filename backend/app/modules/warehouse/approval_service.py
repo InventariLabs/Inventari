@@ -32,8 +32,8 @@ class ApprovalError(ValueError):
 def document_value(doc: Document) -> Decimal | None:
     """What the document is worth, or ``None`` when nobody has said.
 
-    ``None`` used to be flattened to zero here, which put the one document
-    whose worth nobody wrote down under every threshold there is. Zero and
+    ``None`` stays ``None`` here, so a document whose worth nobody wrote down is
+    not treated as worth zero. Zero and
     unknown are different answers — the cost layers keep them apart for the
     same reason — and the threshold is entitled to know which it has.
     """

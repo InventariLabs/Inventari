@@ -232,11 +232,10 @@ async def _stock_verdict(
 ) -> _StockVerdict:
     """Weigh what is on the shelf against what the plan needs.
 
-    The deduction runs through the same unit bridge availability uses. It
-    used to compare a StockQuant total, in the product's own unit, against
-    a quantity in the recipe's — harmless only while the branch never ran
-    for an ingredient without a template link, and about to start producing
-    deficits like "363.6 g short" derived from 36.4 cans.
+    The deduction runs through the same unit bridge availability uses, so a
+    StockQuant total in the product's own unit is converted before it is set
+    against the recipe's quantity. A deficit like "363.6 g short" is never
+    derived from 36.4 cans.
     """
     if template is None:
         return _StockVerdict(covered=False, deficit=required_qty)
@@ -284,8 +283,7 @@ async def generate_shopping_list_async(  # noqa: C901, PLR0915 - existing comple
     # A plan that already has a list is not done shopping: entries may have
     # been added since. The run goes on — the existing list is refreshed with
     # the lines it does not carry yet, and the answer describes what the plan
-    # needs now. It used to return the list with a zero count and no items,
-    # so nothing added after the first generation ever reached it.
+    # needs now, so entries added after the first generation reach it.
     existing_list = None
     if plan.shopping_list_id is not None:
         existing_list = await shopping_lists_api.get_shopping_list_async(
@@ -355,7 +353,7 @@ async def generate_shopping_list_async(  # noqa: C901, PLR0915 - existing comple
             # Aggregate on the product the ingredient resolves to, so two
             # recipes wording the same goods differently buy it once — but
             # only within one measure. "500 g" and "2 pcs" of a product are
-            # two lines on the list; added together they were a number in no
+            # two lines on the list; added together they would be a number in no
             # unit at all, which is what a shopper cannot act on.
             resolved = resolve_template(ing, stock)
             product_key = str(resolved.id) if resolved else match_key(ing.name)

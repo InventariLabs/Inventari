@@ -149,7 +149,7 @@ _ATTRIBUTE_RE = re.compile(
 #: ``<img src>``. The printed Code128 (SVG) and QR (PNG) reach every print
 #: template this way, and so does the organization's logo in any format the
 #: logo upload takes (WebP included); nh3's default URL schemes have no
-#: ``data:``, so the whole ``src`` used to vanish and the printout came out
+#: ``data:``; without it the whole ``src`` vanishes and the printout comes out
 #: without either code. ``<img>`` never executes what it holds; the same URI
 #: in a link (``data:text/html``) is a document of its own, so everywhere
 #: else it is still dropped.

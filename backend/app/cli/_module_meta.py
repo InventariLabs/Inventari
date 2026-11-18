@@ -166,8 +166,8 @@ TrackingEntry = ModuleTrackingEntry
 
 
 def _load_tracking() -> dict[str, TrackingEntry]:
-    # An installation made before the registry moved out of the tracked tree
-    # still has its list at the old path; reading it keeps those modules known.
+    # A list at the legacy path, outside the tracked tree, is still read, so an
+    # installation that keeps its list there keeps those modules known.
     path = TRACKING_FILE if TRACKING_FILE.exists() else LEGACY_TRACKING_FILE
     if not path.exists():
         return {}

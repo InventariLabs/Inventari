@@ -1,10 +1,8 @@
 """Every door that changes a record's number writes it once.
 
 The record is the one number of a product on a shelf, and a door that wrote
-it twice in one operation — the number, then the number again after the
-bridge had moved the quant — left a moment in which the record and the
-ledger told two stories, and gave a concurrent reader the chance to see the
-first. The count is taken at the database: the statements that set
+it twice in one operation would leave a moment in which the record and the
+ledger tell two stories, and a concurrent reader could see the first. The count is taken at the database: the statements that set
 ``items.quantity`` for the record while the door runs.
 """
 

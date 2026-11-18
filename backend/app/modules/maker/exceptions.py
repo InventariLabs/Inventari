@@ -85,10 +85,10 @@ class InsufficientStockError(ShortageError):
 class EmptyBillOfMaterialsError(Exception):
     """complete_production: the run would consume nothing (422).
 
-    Completing an order whose recipe lists no ingredients used to create the
-    output item and its StockQuant row against zero consumption — goods out of
-    thin air. The recipe identity travels with the error so the UI can send the
-    operator straight to the composition tab.
+    Completing an order whose recipe lists no ingredients is refused: it would
+    create the output item and its StockQuant row against zero consumption, goods
+    out of thin air. The recipe identity travels with the error so the UI can send
+    the operator straight to the composition tab.
     """
 
     def __init__(self, recipe_id: UUID | None, recipe_name: str | None) -> None:

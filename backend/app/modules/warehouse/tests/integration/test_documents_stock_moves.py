@@ -656,11 +656,10 @@ def _create_in_free_text(
 class TestOutboundOfACardlessRecord:
     """The doors beyond the receipt must not skip the ledger for a legacy row.
 
-    Every executor used to gate its ledger writes on ``stock_template_id``:
-    a record whose card was never minted (``items.template_id`` NULL — the
-    shape of anything stocked before the catalogue existed) had its quantity
-    taken off the record while the movement register, the shelf quant and
-    the cost layers all read empty. The receipt already adopts the card such
+    Every executor writes its ledger for a record whose card was never minted
+    (``items.template_id`` NULL — the shape of anything stocked before the
+    catalogue existed), so the record, the movement register, the shelf quant
+    and the cost layers agree. The receipt already adopts the card such
     a row lacks; these tests hold the other doors to the same answer. Each
     runs a pair of documents differing in exactly one thing — whether the
     line's record carries a card — and demands the same number of movements

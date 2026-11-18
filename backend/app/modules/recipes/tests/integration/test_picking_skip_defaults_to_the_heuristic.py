@@ -2,9 +2,9 @@
 
 ``recipe_ingredients.picking_skip`` is tri-state: TRUE always skips, FALSE
 never does, NULL lets ``_should_auto_skip`` decide (small spice amounts,
-optional lines). The create schema used to default the field to FALSE, so
-every ingredient written through the API — the form, an import, a duplicate —
-opted out of the heuristic without anyone asking it to.
+optional lines). The create schema does not default the field to FALSE, so every
+ingredient written through the API — the form, an import, a duplicate — keeps
+the heuristic unless someone sets the field.
 """
 
 from __future__ import annotations

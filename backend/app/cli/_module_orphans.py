@@ -8,11 +8,9 @@ only this module could read, core items and categories still carry its
 ``module_name``, webhooks still subscribe to its events, files still sit
 under ``<org>/<module>/``.
 
-Uninstalling used to answer that question by deleting the schema — the
-default ``on_uninstall`` downgrades the module's migrations to base — so
-the leftovers question never came up and the data went with it. Now that
-the tables stay, somebody has to say what stayed, in numbers, at the
-moment of the decision. That is this module: it counts, it never deletes,
+Uninstalling keeps the tables: the default ``on_uninstall`` downgrades the
+module's migrations to base and leaves the schema in place. So somebody has
+to say what stayed, in numbers, at the moment of the decision. That is this module: it counts, it never deletes,
 and every probe degrades to silence when the table it asks about is not
 installed here.
 """
@@ -90,9 +88,8 @@ class OrphanReport:
     """What the probes found, and whether every probe could run.
 
     An empty group list alone cannot say whether the module stored
-    nothing or the database could not be read: both used to arrive as
-    an empty list, and the uninstall printed the first meaning for the
-    second case. A non-empty ``failures`` marks the report incomplete,
+    nothing or the database could not be read: both arrive as an empty
+    list, and the uninstall would print the first meaning for the second case. A non-empty ``failures`` marks the report incomplete,
     so no caller can mistake it for an answer.
     """
 

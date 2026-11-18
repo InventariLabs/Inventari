@@ -26,10 +26,9 @@ there. The count is what a year costs in round trips: two, whatever the
 size of the history, so a lookup made per layer or per day shows up as a
 number rather than as a slow afternoon.
 
-That last one used to be a clock, 300 ms for the day's replay. It failed at
-4000 ms on a host at load 60, on a branch that changed one frontend file, and
-passed alone — it measured the neighbours, and the plan assertion above
-already covered the regression it was named for.
+That last one is a clock, 300 ms for the day's replay, and a clock goes red on
+a loaded host whatever the query does; the plan assertion above already covers
+the regression it is named for.
 
 Note the measurement is of reads only. The development stack runs with
 ``fsync=off``, so the seeding time in this file means nothing.

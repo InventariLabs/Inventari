@@ -1,11 +1,10 @@
 """An intermediate with stock of its own is taken from it before it is made.
 
-Dough in the bread: a formula line whose ingredient has a recipe used to be
-exploded to its leaves every time, so the dough made yesterday stayed on the
-shelf while today's run took flour again. A run now takes what the shelf
-holds of the intermediate and makes only the rest through its recipe; the
+Dough in the bread: a formula line whose ingredient has a recipe takes what the
+shelf holds of the intermediate and makes only the rest through its recipe; the
 availability, the preview, the shortage list, the draw and the recipe tree all
-read that one split. A line marked fresh keeps the old behaviour.
+read that one split. A line marked fresh is exploded to its leaves, not taken
+from the shelf.
 """
 
 from __future__ import annotations

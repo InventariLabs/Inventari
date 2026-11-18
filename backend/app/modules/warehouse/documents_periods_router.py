@@ -20,7 +20,7 @@ from .schemas import InventoryPeriodCreate, InventoryPeriodSchema
 router = APIRouter()
 
 #: The months a period can be: the row is made on its first touch, so a path
-#: naming month 13 used to close a thirteenth month. The years are the ones
+#: naming month 13 is refused. The years are the ones
 #: the list's own filter takes.
 _Year = Annotated[int, Path(ge=2000, le=2100)]
 _Month = Annotated[int, Path(ge=1, le=12)]

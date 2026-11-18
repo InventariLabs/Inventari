@@ -1,12 +1,10 @@
 """To do reads a picking session the picker walked away from as work under way.
 
 Closing the picking sheet mid-way pauses the session instead of leaving it
-running, and To do used to count only a running session as work in
-progress; anything else was judged by the lines' picked quantities. A picker
-who picked a line, took it back and closed the sheet left a row that read as
-untouched and offered *Pick*; one who picked one line of two and closed it
-left a row offering *Complete* — the action for a dispatch picked in full —
-with nobody named as holding it.
+running. To do counts a paused session as work in progress whatever its lines
+show: a picker who picked a line and took it back, or one who picked one line
+of two and closed it, gets the same row, not one that reads as untouched or
+offers *Complete*, the action for a dispatch picked in full.
 
 A session left paused is the same work as one still being scanned: the row
 is in progress, names who left it and offers *Resume*, however much was

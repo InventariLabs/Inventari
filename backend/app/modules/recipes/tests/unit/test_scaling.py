@@ -1,8 +1,7 @@
 """One definition of the recipe multiplier.
 
-The rule used to live in every consumer at once — four spellings of
-``requested / recipe.servings``, two of them on ``float``, one guarded against
-a recipe of zero servings and the rest dividing by whatever the recipe said.
+The rule lives here once, rather than in every consumer: one spelling of
+``requested / recipe.servings``, guarded against a recipe of zero servings.
 A recipe of no servings is nonsense, but it is the kind of nonsense that
 should cost a multiplier of one rather than a 500 on somebody's shopping
 list. These tests are the one place that decides what a multiplier is.

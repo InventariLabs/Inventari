@@ -1,9 +1,9 @@
 """The two conflicts of the storage tree answer in the reader's language.
 
 A short code taken by another location, and a move of a location under its
-own descendant, used to carry an English sentence under a ``lang`` stamp. They
-come from the error catalogue now; the 409 and the machine code a client
-branches on (``STORAGE_SHORT_CODE_CONFLICT``, ``STORAGE_CYCLE``) are unchanged.
+own descendant, come from the error catalogue in the reader's language; the 409
+and the machine code a client branches on (``STORAGE_SHORT_CODE_CONFLICT``,
+``STORAGE_CYCLE``) stay as the API defines them.
 
 A label that cannot be rendered is a 500 nobody supplied: it is answered by the
 global handler with the catalogue's sentence, not an English literal.

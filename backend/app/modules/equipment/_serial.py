@@ -1,14 +1,10 @@
 """Where an asset's serial number lives, and how to read it.
 
-An asset is identified by its serial number, and the application used to
-write it in two places depending on which door the asset came through: the
-batch path filled the core ``Item.serial_number`` column, while the single
-form and the import wrote only ``meta_data['equipment']['serial_number']``.
-Two assets created two ways therefore carried their number in two different
-places, and the core search — which the command palette asks — could see
-neither.
+An asset is identified by its serial number, which lives in the core
+``Item.serial_number`` column, so core search, which the command palette asks,
+can find every asset by it.
 
-The column is now the one place every write path fills. It is a system
+Every write path fills that column. It is a system
 column the core already owns, it is indexable, and core search can reach it
 without knowing this module exists. The namespace is read here as a
 fallback so rows written before the consolidation keep showing their number

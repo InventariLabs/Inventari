@@ -184,8 +184,8 @@ async def update_meal_plan_async(
         disabled_slots = old_slot_values - new_slot_values
         if disabled_slots:
             # report only the slots that actually hold entries, in a
-            # deterministic order, with per-slot counts — the old code blamed
-            # every disabled slot (even empty ones) in set order.
+            # deterministic order, with per-slot counts, not every disabled slot
+            # (even empty ones) in set order.
             counts = {
                 row[0]: row[1]
                 for row in (
@@ -311,7 +311,7 @@ async def _insert_entry_at_a_free_position_async(
     """Write the entry, stepping past a position another request just took.
 
     Two people filling the same meal both read the same free position and both
-    try to write it; the loser used to leave the API with a bare
+    try to write it; the loser must not leave the API with a bare
     ``IntegrityError``, which is a 500 for something the plan allows. The
     insert runs inside a SAVEPOINT so the outer transaction survives the
     collision, and the position is recomputed before trying again.

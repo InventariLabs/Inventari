@@ -1,11 +1,10 @@
 """
  integration tests: one attestation response and email per person.
 
-Launching a campaign used to create one AuditResponse per active
-assignment — seven assets held by four people produced seven emails. Now
-responses are grouped by (case-insensitive) email: one envelope with one
-token and several item rows; the public page confirms everything at once
-and disputes a specific asset.
+Launching a campaign creates one AuditResponse per person: responses are
+grouped by (case-insensitive) email, so seven assets held by four people make
+four emails. Each envelope has one token and several item rows; the public page
+confirms everything at once and disputes a specific asset.
 """
 
 from datetime import datetime

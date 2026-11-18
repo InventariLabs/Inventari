@@ -127,12 +127,8 @@ class CoreSettingsAPI:
 
         The module name is authenticated data inside the cipher, so the
         stored text cannot be read as another module's secret and cannot
-        be edited into one. It used to take only the value and call
-        ``encrypt_value``, which binds nothing: its docstring said
-        "modules use this instead of reaching into the crypto service"
-        while producing exactly what reaching into the crypto service
-        produces, and a secret written through it read back as any
-        module's. The name is now a parameter because a function that
+        be edited into one. ``encrypt_value`` binds nothing: a secret written through it
+        reads back as any module's. The name is a parameter because a function that
         cannot name the owner cannot bind to it.
 
         Core secrets that belong to the installation rather than to a

@@ -38,9 +38,9 @@ async def _split_record_for_partial_line(
 ) -> tuple[UUID | None, list[RecordPostDTO]]:
     """Leave what the line does not name behind, as a record of its own.
 
-    A partial transfer used to move the record whole while the stock moved
-    only the line's quantity, and the two books disagreed from that commit
-    on. The record now rides with what the line names; the remainder stays
+    A partial transfer moves the record along with what the line names, and the
+    stock moves only the line's quantity, so the two books agree. The remainder
+    stays
     on the shelf it stood on as a new record with the same card and the
     same goods. The identity fields — barcode, serial number — are not
     copied: they name this record, not the stock in it, and they travel

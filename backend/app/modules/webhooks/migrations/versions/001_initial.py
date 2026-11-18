@@ -1,11 +1,10 @@
 """webhooks module baseline — create webhook_endpoints and webhook_delivery_logs.
 
-Initial migration for the webhooks module, extracted from core baseline_001
-as part of the module migration isolation effort.
+Initial migration for the webhooks module: its tables live here, not in core
+baseline_001.
 
-These tables were previously created by the consolidated
-``baseline_001_full_schema.py``. They now belong to the webhooks module so
-that ``module enable webhooks`` / ``module disable webhooks`` can manage
+These tables belong to the webhooks module, not to the consolidated
+``baseline_001_full_schema.py``, so that ``module enable webhooks`` / ``module disable webhooks`` can manage
 them independently via the per-module version table
 ``alembic_version_webhooks``.
 

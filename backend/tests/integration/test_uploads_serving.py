@@ -1,8 +1,8 @@
 """Integration tests for the /uploads/{filepath} serving route.
 
-Covers the global fix where files stored outside the core ``item_attachments``
-table (item cover images, recipe cover images, equipment attachments) were
-previously unservable (HTTP 404) despite existing on disk.
+Covers files stored outside the core ``item_attachments`` table (item cover
+images, recipe cover images, equipment attachments): they are served, not
+answered with 404 although they exist on disk.
 """
 
 from uuid import uuid4

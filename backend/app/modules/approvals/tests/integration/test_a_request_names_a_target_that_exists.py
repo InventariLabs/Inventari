@@ -1,11 +1,10 @@
 """A request raised over HTTP has to point at something that is there.
 
-``POST /approvals/requests`` takes the target id from the client. A mistyped
-id used to answer 201 and store a pending request that no queue lists: every
-queue reaches a request through the record it is about, and there was none, so
-nobody could see the request and nobody could decide it. The module that owns
-the target type already describes its targets for the queue; the same provider
-now says whether the target exists before the request is stored.
+``POST /approvals/requests`` takes the target id from the client, so the id is
+checked before the request is stored. Every queue reaches a request through the
+record it is about; a request pointing at nothing would be listed by no queue
+and decided by no one. The module that owns the target type describes its
+targets for the queue, and the same provider says whether the target exists.
 """
 
 import uuid

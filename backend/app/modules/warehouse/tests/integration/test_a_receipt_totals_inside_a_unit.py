@@ -5,9 +5,9 @@ the app really produces: a receipt read back out of the database — lines
 and units loaded the way the PDF endpoint loads them — through the
 organization's pl_pz layout and WeasyPrint.
 
-The totals row used to add the columns up whatever units the lines were
-kept in: 123 pieces and 2,5 kilograms printed as "125,5", a number about
-nothing. It prints one total per unit now, and the single sum for a
+The totals row adds the columns up per unit: 123 pieces and 2,5 kilograms print as
+two totals, never as "125,5", a number about nothing. It prints one total per unit,
+and the single sum for a
 document kept in one unit.
 """
 

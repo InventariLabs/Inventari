@@ -256,9 +256,8 @@ class TestConcurrentFailedAttemptsAreNotLost:
     ):
         """Five failures landing together must leave the counter at five.
 
-        Each caller used to load the row, add one in Python and write the
-        sum back: four of the five increments were overwritten by the fifth
-        writer, so the lockout arrived later than the threshold said. The
+        Each failure is added in the database, so no increment is lost and the
+        lockout arrives at the threshold. The
         sessions below load the row before any of them writes — the window
         the old read-add-write could not survive — and the counter must come
         back as the number of failures, not as one.

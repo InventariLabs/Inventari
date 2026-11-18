@@ -1,9 +1,8 @@
 """The count on a location and the list behind it ask one question.
 
-Two predicates used to answer "is this record equipment": the core's
-``claimed_by_module`` (which lists the module's locations and counts the
-row) and the module's own marker list. They disagreed in both directions,
-and both promises are ones a user can check:
+The core's ``claimed_by_module`` (which lists the module's locations and counts
+the row) and the module's own marker list must answer "is this record
+equipment" the same way, since both promises are ones a user can check:
 
 - a location whose row said "1 asset" opened a list with nothing in it;
 - a location holding an asset the module could list had no count and no
@@ -55,9 +54,8 @@ class TestTheRowAndTheListAgree:
     ) -> None:
         """The category speaks first — and now it speaks to both surfaces.
 
-        The module's own list used to show this record while the location
-        holding it was missing from the module's locations entirely: a row
-        the user could reach from the list and not from the map.
+        The module's own list shows this record, and the location holding it lists
+        it too: a row reachable from the list is reachable from the map.
         """
         ordinary = Category(
             name='Cheese', code='CHEESE', context_tag=None, organization_id=eq_org.id

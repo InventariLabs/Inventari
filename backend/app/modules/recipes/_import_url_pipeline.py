@@ -82,7 +82,7 @@ async def _scrape_recipe(
         # An answer that is finished: the quota refusal carries its numbers,
         # the unbound purpose its "set it up in Settings". Only a broken
         # scrape becomes a scrape failure — gluing a prefix onto a finished
-        # sentence was how a 429 used to leave here as a 400.
+        # sentence would turn a 429 into a 400.
         raise
     except Exception as exc:  # any scraper failure is a scrape failure
         # The exception's text is English and for operators (a provider's

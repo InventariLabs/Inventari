@@ -83,11 +83,11 @@ PERMISSION_ACTIONS = frozenset(
 )
 
 
-# Where a module sits in the store's taxonomy. The store used to read this off
-# the frontend launcher tile, which only modules with a tile declare — six had
-# none, so three of the eight filters returned nothing and answered "no modules
-# found", the same sentence a failed search gets. It belongs to the module, not
-# to its tile, so it is declared here and travels through the API.
+# Where a module sits in the store's taxonomy. It belongs to the module, not to
+# its frontend launcher tile, which only modules with a tile declare: a filter
+# built on tiles returns nothing for a module without one, and answers "no
+# modules found", the same sentence a failed search gets. So it is declared here
+# and travels through the API.
 ModuleCategory = Literal[
     'core',
     'business',
@@ -279,7 +279,7 @@ class ModuleManifest(BaseModel):
         description='Lucide icon name',
     )
     # Required on purpose: the trust level is the one fact a store reader
-    # cannot guess, and a manifest that omits it used to fall back to
+    # cannot guess, and a manifest that omits it would fall back to
     # 'community' — the lowest level — without declaring anything.
     module_type: Literal['core', 'official', 'cloud', 'community'] = Field(
         description='Module classification: who stands behind this module',

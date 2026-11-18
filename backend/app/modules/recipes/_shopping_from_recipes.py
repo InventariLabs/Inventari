@@ -45,9 +45,8 @@ _SHOPPING_NOTE_LABELS: dict[str, str] = {
 }
 
 # The name of the list the recipe screen makes when the organization has
-# none. It used to be the recipe's own name — and that list then became the
-# destination of every other recipe's missing goods, still called after the
-# first one. It is a shopping list, and is named as one.
+# none. It is a shopping list, and is named as one: the list is the destination
+# of every recipe's missing goods, so it is not called after the first recipe.
 _DEFAULT_LIST_NAME_LABELS: dict[str, str] = {
     'en': 'Shopping list',
     'pl': 'Lista zakupów',
@@ -73,9 +72,9 @@ async def collect_shopping_items(
     shelf holds of it (``available``) and the shortfall of the two
     (``quantity``), the same arithmetic the meal plan applies: the
     requirements are summed first and the shelf is subtracted once. Each
-    recipe used to be netted against the whole shelf on its own and the
-    shortfalls added, so 250 g of flour covered Bread's 200 g and Cake's
-    300 g alike and the list asked for 50 g where 250 g were short.
+    recipe is not netted against the whole shelf on its own: shortfalls added
+    that way would let 250 g of flour cover Bread's 200 g and Cake's 300 g
+    alike, and the list would ask for 50 g where 250 g are short.
 
     A line the shelf covers stays in the answer with a zero shortfall: a
     list already carrying other recipes' need for the goods may still be

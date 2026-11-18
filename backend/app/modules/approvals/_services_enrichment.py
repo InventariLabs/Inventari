@@ -501,8 +501,8 @@ async def _batch_load_target_summaries(
     """Batched target summaries, one call per target type that has a provider.
 
        Modules describe their own targets — see ``target_summaries`` — so this
-       used to name ``warehouse_api`` and skip everything else in silence, which
-    is why a purchase order reached the queue as a truncated UUID. A
+       asks each registered provider, so no target type is skipped in silence and a
+    purchase order reaches the queue with its summary, not a truncated UUID. A
        target type nobody registered still degrades to ``target_summary: None``.
     """
     ids_by_type: dict[str, list[UUID]] = {}

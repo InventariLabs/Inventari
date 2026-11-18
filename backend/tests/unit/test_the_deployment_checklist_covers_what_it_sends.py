@@ -80,7 +80,7 @@ class TestFrontendUrlWarning:
 
     def test_importing_the_settings_prints_nothing_about_it(self) -> None:
         # Every manage.py command and lint run imports the settings; on a
-        # stack with DEBUG=false the line used to head each of them.
+        # stack with DEBUG=false a warning line would head each of them.
         env = {
             'PATH': '/usr/bin:/bin',
             'DEBUG': 'false',

@@ -63,7 +63,7 @@ async def _alert_admins(db: AsyncSession, row: EventDelivery) -> list[Any]:
 
     An organization's event goes to that organization's admins. An event of
     no organization — one of the installation itself — goes to the instance's
-    superusers: it used to be only recorded and logged, and a log line is
+    superusers: it is not only recorded and logged, because a log line is
     read by nobody who could act on it.
 
     Returns the notifications written, for the caller to publish once its

@@ -333,11 +333,11 @@ class EventBus:
 
         The caller is the consumer loop, and it acknowledges the stream
         message when this returns — so "to completion" is the whole point.
-        This used to hand each handler to ``asyncio.create_task`` outside of
-        tests and return immediately: the message was acknowledged before a
-        single handler had run, a crash in the window between lost the event
-        with no pending entry to reclaim, and the tasks were not even held in
-        a reference, so the garbage collector was free to drop one mid-flight.
+        Handlers are awaited here, one by one. Handing them to
+        ``asyncio.create_task`` and returning at once would acknowledge the message
+        before a single handler had run, lose the event to a crash in that window
+        with no pending entry to reclaim, and let the garbage collector drop an
+        unheld task mid-flight.
 
         Sequential, and the same in tests as in production. ``subscribe``
         takes a priority and sorts the listener list by it, which only means
@@ -502,10 +502,7 @@ class EventBus:
         once, not exactly once: a worker that dies after running a handler
         but before the ACK leaves the message pending, and the next
         ``reclaim_pending_events`` runs the handlers again. Handlers must
-        therefore tolerate being re-run. (This docstring used to say
-        "exactly once" while the consumer acknowledged before dispatching at
-        all, which made the real guarantee *at most* once — the opposite
-        error, and the expensive one.)
+        therefore tolerate being re-run.
 
         A handler that fails — an exception, or outlasting
         ``HANDLER_TIMEOUT_S`` — is retried from the delivery log with

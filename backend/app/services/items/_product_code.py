@@ -2,8 +2,8 @@
 
 One question, asked by every door that creates a record: the scan, the
 quick-add form, and the resolver that mints a catalogue row for a product
-nobody entered yet. It used to be answered in two copies, and a rule added
-to one of them was a rule the other door did not have.
+nobody entered yet. It is answered in one place, so every door applies the
+same rule.
 """
 
 from __future__ import annotations
@@ -92,9 +92,9 @@ async def place_product_code_async(
 
     A code already worn by a live record of a *different* product is not
     written onto this template at all. Scanning such a code under a changed
-    name used to mint a second carrier, and from then on the scan answered
-    with the new product while the older record — holding the same code —
-    dropped out of the answer entirely. The code stays where it is and the
+    name must not mint a second carrier: the scan would answer with the new
+    product, and the older record holding the same code would drop out of
+    the answer. The code stays where it is and the
     refusal below names it, exactly as the manual form answers the same
     collision. A record of the *same* product is no conflict: that is the
     code moving to where it belongs.
@@ -148,8 +148,8 @@ async def place_edited_product_code_async(
 
     An emptied field says the same thing in the other direction. The form
     shows the record's code or, failing that, its product's, so clearing it
-    clears the product's code as well — left on the row, the save reported
-    success and the page showed the old code again. A module-owned record
+    clears the product's code as well — left on the row, the save would report
+    success and the page would still show the old code. A module-owned record
     is the exception: what it wears is its unit's tag, and emptying that
     must not take the product's code from the catalogue.
 

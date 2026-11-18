@@ -190,7 +190,7 @@ async def create_default_storage_locations_async(
 
     # Whatever the profile and the modules brought, the first product needs
     # an ordinary place to go. A business that unticks equipment tracking on
-    # the second onboarding step used to be left with the quarantine shelf
+    # the second onboarding step must not be left with the quarantine shelf
     # alone — the equipment module is what brought its shared warehouse —
     # and the product form then sent it to set up a warehouse before
     # anything else.
@@ -231,8 +231,8 @@ async def _seed_location_async(
     st_type = storage_type_map.get(default.type_code)
     if st_type is None:
         # The profile asks for a type its own seed bundle should have
-        # brought. Skipping used to be silent, which is how the neutral
-        # profile ended up with an empty storage list nobody could explain.
+        # brought. Skipping is never silent: a silent skip would leave the neutral
+        # profile with an empty storage list nobody could explain.
         logger.error(
             'Profile %s declares default location %r on storage type %s, '
             'which organization %s does not have — location not created.',

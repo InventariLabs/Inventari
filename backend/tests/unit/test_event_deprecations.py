@@ -24,9 +24,8 @@ def _backend_version() -> tuple[int, ...]:
 
 
 #: What each module owns, and the exact string it is on the wire. These
-#: nine used to be spelled twice — once here, once as a ``SystemEvent``
-#: member parked in the core table — and the core spelling was removed
-#: before the repository went public.
+#: each of these nine is spelled once, here, and not also as a ``SystemEvent``
+#: member parked in the core table.
 _MODULE_OWNED_EVENTS = {
     'app.modules.warehouse.events:DocumentEvent': {
         'CONFIRMED': 'document.confirmed',

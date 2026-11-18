@@ -179,14 +179,10 @@ class TestTakingACustomRoleAwayIsJournalled:
 
     A custom role is taken away either way the member endpoint can be called,
     because the service drops the member's links on both paths: picking a
-    built-in level, and picking another custom role. Both entries used to
-    forget it. Picking a level sent ``{'role': 'user'}``, so both sides of the
-    snapshot carried the same built-in level and nothing else, and the entry
-    read as no change at all — the Detail column showed ``—`` and the role
-    that actually went away was named nowhere in the journal. Swapping one
-    custom role for another sent ``{'role_id': …}``, and the held role was
-    read only on the other path, so that entry said the member had held no
-    custom role.
+    built-in level, and picking another custom role. Both entries name
+    the role that went away: the snapshot carries it on both sides, so a
+    change to a built-in level and a swap of one custom role for another each
+    show it.
     """
 
     @pytest.fixture

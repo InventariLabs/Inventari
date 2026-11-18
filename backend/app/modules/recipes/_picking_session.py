@@ -31,12 +31,10 @@ async def record_cooking_session(
 ) -> PickingSession:
     """Record a finished cook, or close the one it continues.
 
-    The step-by-step mode never touches the shelf, so until now it also
-    never appeared in the cooking history — and its rating, asked for on
-    the "Bon appétit" screen, landed on whatever session happened to have
-    closed last: a wrong day, wrong servings, "no items picked" under a
-    note about a different dinner. Finishing a cook records its own entry
-    — its own date, its own servings, nothing picked.
+    The step-by-step mode never touches the shelf, so it appears in the cooking
+    history like any other cook. A rating asked for on the "Bon appétit" screen
+    belongs to that cook, not to whichever session closed last. Finishing a cook
+    records its own entry — its own date, its own servings, nothing picked.
 
     One dinner is one entry, though. Picking the ingredients and then
     cooking them step by step is one meal, and the screen says which

@@ -112,10 +112,9 @@ class TestResolveSourceGitCheckout:
         shutil.rmtree(path, ignore_errors=True)
 
     def test_unknown_revision_message_names_only_the_revision(self, tmp_path: Path):
-        """git's own checkout failure used to be appended verbatim, and an
-        unknown rev makes git argue about a path argument to --detach — a
-        problem the user never caused. The message now says what is missing
-        and how to look, and stops there."""
+        """git's own checkout failure is not appended verbatim: an unknown rev makes git
+        argue about a path argument to --detach, a problem the user never caused.
+        The message says what is missing and how to look, and stops there."""
         source = self._bare_repo_with_tag(tmp_path)
 
         with pytest.raises(ValueError) as exc:

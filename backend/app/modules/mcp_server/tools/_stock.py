@@ -186,8 +186,8 @@ def register_stock_tools(server: MCPServer) -> None:
                 db, identity.organization_id
             )
             # The window is a filter on the query, not a cut of a capped list:
-            # a workspace whose oldest rows are already expired used to spend
-            # the whole cap on them and answer an empty window.
+            # a workspace whose oldest rows are already expired does not spend the whole
+            # cap on them, so the window is not answered empty.
             rows = await core_api.items.list_by_expiry_async(
                 db,
                 identity.organization_id,

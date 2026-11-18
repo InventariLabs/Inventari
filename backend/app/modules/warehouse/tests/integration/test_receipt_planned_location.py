@@ -1,8 +1,8 @@
 """The receipt line says where it will land before it lands.
 
-A putaway rule decides at execution time, so the decision used to become
-visible only after the goods were booked — as "landed elsewhere". The read
-of a pre-execution receipt now carries each line's planned location and the
+A putaway rule decides at execution time, so the decision is shown before
+the goods are booked, not as "landed elsewhere" afterwards. The read
+of a pre-execution receipt carries each line's planned location and the
 source of the decision (serial / rule / document / record), computed at
 read time by the same function the executor calls.
 

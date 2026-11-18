@@ -5,16 +5,15 @@ and in every exported row. Every seeder wrote it in English whichever language
 the organization was being set up in, so a Polish organization met its first
 storage screen — the wizard's third step — with twelve English options beside
 a Polish "Brak (wyspecjalizowane pola)", indistinguishable from a label the
-user had typed themselves. Its sibling, the location, had been fixed already,
-which is why the same room answered to "Server Room" as a type and
-"Serwerownia" as a place.
+user had typed themselves. Its sibling, the location, is written in the same language, so the same room
+answers to "Server Room" as a type and "Serwerownia" as a place.
 
-Both seeders now write the name in the language the seeding runs in, and an
+Both seeders write the name in the language the seeding runs in, and an
 organization seeded before that joins the language of the session that seeds
 it again — but only while the row still carries the literal the seeder wrote.
 A name the organization changed is the organization's, and the two seeders
-used to disagree about exactly that: a module declaration left a renamed row
-alone while the profile seeder overwrote it on every switch.
+agree about exactly that: a module declaration leaves a renamed row alone, and
+so does the profile seeder on every switch.
 """
 
 from uuid import uuid4

@@ -117,9 +117,8 @@ class TestSeedData:
     ):
         """Lock: seed creates categories grouped as 'FREEZER'.
 
-        The group used to arrive in a read-only column, so the screen filed
-        those rows under a group its own form could not show, let alone
-        rename. It is a label the organisation owns now.
+        The group is a label the organisation owns, so the screen files those rows
+        under a group its own form can show and rename.
         """
         freezer_categories = (
             await real_async_db_session.scalars(
@@ -140,9 +139,8 @@ class TestSeedData:
     ):
         """Lock: seed creates categories grouped as 'FRIDGE'.
 
-        The group used to arrive in a read-only column, so the screen filed
-        those rows under a group its own form could not show, let alone
-        rename. It is a label the organisation owns now.
+        The group is a label the organisation owns, so the screen files those rows
+        under a group its own form can show and rename.
         """
         fridge_categories = (
             await real_async_db_session.scalars(
@@ -157,9 +155,8 @@ class TestSeedData:
     ):
         """Lock: seed creates categories grouped as 'PANTRY'.
 
-        The group used to arrive in a read-only column, so the screen filed
-        those rows under a group its own form could not show, let alone
-        rename. It is a label the organisation owns now.
+        The group is a label the organisation owns, so the screen files those rows
+        under a group its own form can show and rename.
         """
         pantry_categories = (
             await real_async_db_session.scalars(
@@ -174,10 +171,10 @@ class TestSeedData:
     ):
         """Bulk packaging is a label, not a share of the piece's dimension.
 
-        ``pack``, ``can``, ``bottle``, ``box`` and ``bag`` used to sit beside
-        ``pcs`` in the Unit category at factor 1.0, so "100 pack → 100 pcs"
-        came back as a successful conversion — stated with total confidence,
-        though no unit table can know how many pieces a pack holds. That
+        ``pack``, ``can``, ``bottle``, ``box`` and ``bag`` are kept out of the Unit
+        category beside ``pcs``, so "100 pack → 100 pcs" is not a conversion
+        stated with confidence: no unit table can know how many pieces a pack
+        holds. That
         ratio belongs to the product (Odoo's ``product.packaging``, which
         this app does not model yet). Until it does, each packaging unit
         forms its own single-unit category, so the category rule — the one

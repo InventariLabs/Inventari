@@ -53,8 +53,8 @@ def is_expiring_soon(
 async def expiry_today_async(db: AsyncSession, organization_id: UUID) -> date:
     """The day this organization's expiry horizon is measured from.
 
-    Every caller of the two predicates above needs it and each used to
-    resolve it inline. A caller with no organization has no day to measure
+    Every caller of the two predicates above needs it, so they all take it from
+    this one function. A caller with no organization has no day to measure
     from, and nothing to measure either: it answers before asking.
     """
     from app.services.analytics._common import org_today_async

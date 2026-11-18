@@ -1,8 +1,9 @@
 """The approvals module refuses in the reader's language, not in English.
 
-Every refusal the engine raises used to travel as an English sentence inside
-``ApprovalError`` and reach the toast verbatim, so a Polish, German, French or
-Spanish interface answered "Cannot reject your own request". These tests drive
+Every refusal the engine raises is a message key inside ``ApprovalError``,
+rendered in the reader's language, so a Polish, German, French or Spanish
+interface never shows an English sentence such as "Cannot reject your own
+request". These tests drive
 the real endpoints with ``Accept-Language: pl`` and pin the negotiated message.
 
 They compare against ``get_error_message(key, 'pl')`` rather than a literal:

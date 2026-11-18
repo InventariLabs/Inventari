@@ -17,8 +17,8 @@ class TestProductProfiles:
         """'recipes' must be in food_home.default_modules.
 
         The profile description says 'Includes recipes and shopping lists'
-        — the module list must reflect that promise. Before this fix,
-        recipes (77-file FE module) was described but not enabled.
+        — the module list must reflect that promise, so recipes (a 77-file FE module)
+        is enabled.
         """
         from app.core.product_profiles import get_profile
 
@@ -218,7 +218,7 @@ class TestProfileTheme:
     def test_every_profile_declares_a_theme(self):
         """A profile without a theme falls back to the default accent, which
         is the emerald `food_home` declares explicitly — so the neutral mode
-        used to be visually indistinguishable from the food one."""
+        must not be visually indistinguishable from the food one."""
         from app.core.product_profiles import get_all_profiles
 
         for profile in get_all_profiles():

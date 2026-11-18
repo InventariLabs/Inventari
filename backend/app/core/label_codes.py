@@ -1,8 +1,8 @@
 """What a label's short code looks like — said once, for both sides.
 
 A short code is a prefix, a hyphen and a body: ``STM-2BWO``, ``B12-6UPR``,
-``DELL-LAT5540``. Two rules about that shape used to live apart, and they
-disagreed on one character class. The creation schema invited digits in
+``DELL-LAT5540``. Both rules about that shape live here, so they
+cannot disagree on a character class. The creation schema invited digits in
 the prefix — its own field description offered ``B12`` as the example —
 while the recognition pattern took letters only, so a label generated as
 ``B12-6UPR`` was printed, stuck to a shelf, and then met

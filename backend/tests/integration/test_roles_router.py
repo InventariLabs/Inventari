@@ -299,7 +299,7 @@ class TestRolesRouter:
 
 @pytest.mark.asyncio
 class TestRoleLifecycle:
-    """Renaming and deleting a custom role — the half the API used to lack.
+    """Renaming and deleting a custom role.
 
     A role could be created and its permissions edited, and then neither
     renamed nor removed. The delete is deliberately the strict kind: the
@@ -510,10 +510,8 @@ class TestRoleLifecycle:
     ):
         """A role belongs to one organisation, and this is not it.
 
-        This case used to be written about a role belonging to *no*
-        organisation, which the roles list showed to every tenant and the
-        permission check honoured in every tenant. There is no such row any
-        more; what is left to refuse is somebody else's.
+        There is no row without an organisation; what is refused here is somebody
+        else's role.
         """
         from app.models.organization import Organization
 
@@ -574,9 +572,7 @@ class TestBuiltInRolesAreListed:
         assert set(builtin) == {'admin', 'manager', 'user', 'viewer'}
         assert all(r['organization_id'] is None for r in builtin.values())
         # And nothing else: a fresh organisation has no roles of its own, and
-        # the two rows an archived RBAC migration seeded without an
-        # organisation used to appear here as a second "Administrator" and a
-        # second "User", in every tenant of the installation.
+        # no second "Administrator" or "User" appears here in any tenant.
         assert [r['name'] for r in body] == ['admin', 'manager', 'user', 'viewer']
 
     async def test_a_built_in_level_carries_the_permissions_it_grants(

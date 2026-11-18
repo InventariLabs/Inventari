@@ -21,9 +21,9 @@ because outflow layers are priced at the average of the day and the receipts
 they drain are not.
 
 Both are one statement, and so is the page of the report built from them. At
-a hundred thousand products the count and the draw used to arrive in Python
-as hundreds of thousands of rows, and reading them was most of the ten
-seconds the screen waited; the database now answers with the page asked for
+a hundred thousand products the count and the draw would arrive in Python
+as hundreds of thousands of rows, and reading them would be most of the ten
+seconds the screen waits; the database answers with the page asked for
 and the figures of the whole report beside it.
 """
 

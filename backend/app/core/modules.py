@@ -23,9 +23,8 @@ async def is_module_enabled_async(
     Exposed so cross-module APIs (e.g. ``shopping_lists_api``) can guard
     their writes against a disabled module without importing a private
     symbol. It reads the column, which is the same answer
-    ``core_api.organizations`` gives — the two used to be one name over two
-    freshnesses, and for a minute after a toggle a module was on or off
-    depending on which of them an endpoint happened to call.
+    ``core_api.organizations`` gives — the two read one column, so an endpoint
+    cannot see a module on while another sees it off.
 
     ``_check_module_enabled`` keeps its cache, because it answers a
     different question: a per-request HTTP guard that would otherwise put a

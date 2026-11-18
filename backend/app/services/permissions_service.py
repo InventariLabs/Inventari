@@ -8,9 +8,8 @@ be stale.
 ``resolve_permission_strings_async`` is where the two paths meet: the
 session context built at the door resolves through it, and so does the
 fresh lookup a caller makes about somebody who is not on the request.
-They used to resolve separately and disagreed — the fresh one read
-``roles`` rows only, so a member holding a permission by their built-in
-level alone read as holding nothing.
+Both resolve through one path, so a member who holds a permission by their
+built-in level alone is not read as holding nothing.
 
 Used by ``core_api.permissions`` and ``core_api.roles`` facades.
 """
@@ -258,9 +257,9 @@ async def administrators_async(
 
     The built-in level, and a custom role carrying either key of
     ``ADMINISTRATION_PERMISSIONS``. The question a notice "for the
-    administrators" asks: it used to be answered with ``role == 'admin'``
-    alone, so an organization that built its own administration role instead
-    of handing out the built-in level got no warnings at all. Accounts that
+    administrators" asks is not ``role == 'admin'`` alone: that would give an
+    organization that built its own administration role instead of handing out
+    the built-in level no warnings at all. Accounts that
     are switched off are not in it.
     """
     administrators: set[uuid.UUID] = set()
@@ -507,8 +506,7 @@ async def update_role_permissions_async(
     """Replace the permission set on an existing role.
 
     Org-scoping guard: refuses to mutate a role that belongs to a different
-    organisation. The case this used to guard on top of that — a role
-    belonging to none, and therefore to all — is now refused by the column.
+    organisation. The column refuses a role belonging to none, and therefore to all.
     """
     role = await db.get(Role, role_id)
     if role is None:

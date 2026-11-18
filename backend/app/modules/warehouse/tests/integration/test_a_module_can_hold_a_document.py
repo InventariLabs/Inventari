@@ -1,8 +1,7 @@
 """A module's pre-post check can hold a document until the module lets it go.
 
-The approvals module used to be the only thing that ever parked a document,
-and the warehouse called it to do so. The parking is now the document's own
-state: a check answers ``'hold'`` at confirmation, the document waits in
+The document's own state does the parking: a check answers ``'hold'`` at
+confirmation, and the document waits in
 PENDING_APPROVAL under that module's name, and only that module releases it,
 takes the hold back or sends it to a draft — through ``warehouse_api``, which
 any module can call. These tests hold documents with a module of their own,

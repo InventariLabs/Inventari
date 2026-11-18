@@ -1,8 +1,8 @@
-"""Every door that hashes or checks a password used to run bcrypt on the loop.
+"""Every door that hashes or checks a password runs bcrypt off the event loop.
 
 bcrypt at cost 12 takes roughly a quarter of a second. Login, registration,
-password change and reset each paid it inside the coroutine, so one request
-stalled every other request the worker was serving. The tests below put a spy
+password change and reset each run it off the loop, so one slow hash does not
+stall every other request the worker is serving. The tests below put a spy
 on the password functions and record the thread each call ran on: the loop's
 own thread must never be among them. The dummy round an unknown account pays
 is pinned the same way — it is the timing equalisation, and equalisation that

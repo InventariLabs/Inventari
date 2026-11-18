@@ -1,10 +1,10 @@
 """The public attestation page says who is asking and until which day.
 
-The page used to print only the product's name: a person who followed a link
-from an email had nothing on the page to tell them which organization wanted
-the answer or how long it had to wait. The public GET now carries the
-organization's name and the last day to answer — a calendar day on the
-organization's own clock, so every reader sees the day the organizer picked.
+The page names the organization that asks and the last day to answer, so a
+person who follows a link from an email sees who wants the answer and how long
+they have. The public GET carries the organization's name and that day, a
+calendar day on the organization's own clock, so every reader sees the day the
+organizer picked.
 """
 
 from __future__ import annotations

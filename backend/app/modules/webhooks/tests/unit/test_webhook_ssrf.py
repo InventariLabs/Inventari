@@ -95,7 +95,7 @@ class TestSSRFGuard:
         self, url: str, allow_private: bool, stub_dns: object
     ) -> None:
         # stub_dns keeps this off the network: validation resolves every
-        # hostname, so these cases used to need a working resolver.
+        # hostname, so these cases need no working resolver.
         validate_webhook_url(url, allow_private=allow_private)
 
     # ------------------------------------------------------------------

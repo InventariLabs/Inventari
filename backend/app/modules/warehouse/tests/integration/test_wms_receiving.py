@@ -431,7 +431,7 @@ class TestWmsReceiveScan:
         doc_template: ProductTemplate,
     ) -> None:
         """an auto-closed session must not block the document — the
-        complete endpoint used to be guarded only for picking in tests."""
+        complete endpoint is guarded for receiving as well as picking."""
         doc_id = _create_in_document(
             client,
             doc_auth_headers,
@@ -857,9 +857,9 @@ class TestWmsReceiveShort:
     ) -> None:
         """Nothing arrived is a quantity this door accepts.
 
-        The floor used to be the figure itself, so a line checked and found
-        empty could only be skipped — "we looked at it and nothing came" and
-        "we never looked" were the same record.
+        The floor is a quantity of its own, so a line checked and found empty is not
+        skipped — "we looked at it and nothing came" and "we never looked" are
+        different records.
         """
         doc_id = _create_in_document(
             client,

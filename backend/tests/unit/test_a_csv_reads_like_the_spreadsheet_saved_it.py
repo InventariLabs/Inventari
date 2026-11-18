@@ -77,9 +77,9 @@ class TestTheProductSheetShell:
     async def test_semicolons_inside_quoted_headers_do_not_steal_the_split(
         self,
     ) -> None:
-        # A comma sheet with a descriptive header cell used to lose to the
-        # semicolons inside the quotes: the probe counted them and split the
-        # header into four garbage columns. A comma that already yields more
+        # A comma sheet with a descriptive header cell keeps its commas: the probe
+        # must not let the semicolons inside the quotes split the header into
+        # four garbage columns. A comma that already yields more
         # than one column is never overruled.
         sheet = b'nazwa,"opis; a; b; c",ilosc\n'
         report = await analyze_import_file(sheet, 'sheet.csv')

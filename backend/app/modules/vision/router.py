@@ -54,10 +54,8 @@ _ALLOWED_IMAGE_MIME_TYPES = frozenset(
     {'image/jpeg', 'image/png', 'image/webp', 'image/gif'}
 )
 
-#: What one photograph may weigh. It used to be ``settings.MAX_UPLOAD_SIZE`` —
-#: a value sitting close enough to the request ceiling that a body big enough
-#: to trip this limit was refused by the middleware first, so the endpoint had
-#: no working limit of its own. Ten megabytes is above any phone camera's
+#: What one photograph may weigh, on a limit of its own below the request
+#: ceiling the middleware enforces. Ten megabytes is above any phone camera's
 #: output and a quarter of the ceiling (pinned by
 #: ``test_a_per_file_limit_is_reachable.py``), and the service scales every
 #: image to 1200x1200 before a model sees it, so nothing larger carries
@@ -101,7 +99,7 @@ async def _read_images(images: list[UploadFile], lang: Language) -> list[bytes]:
             # Same refusal, same code, as every other image endpoint: a
             # file too large is 413 no matter which door it came through,
             # and the message names the ceiling — this endpoint's own,
-            # not the request ceiling the middleware used to own.
+            # not the request ceiling the middleware owns.
             raise AppException(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                 code='FILE_TOO_LARGE',

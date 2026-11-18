@@ -154,7 +154,7 @@ class TestBothGatesAgree:
         assert all(e.startswith('community_thing: ') for e in errors)
 
     def test_an_unparsable_file_is_a_finding_not_a_crash(self, tmp_path: Path):
-        """The CLI copy used to let a bad encoding abort the whole run."""
+        """The CLI copy reports a bad encoding as a finding, never as an abort of the whole run."""
         module_dir = tmp_path / 'community_thing'
         module_dir.mkdir()
         (module_dir / 'broken.py').write_bytes(b'def f(:\n')

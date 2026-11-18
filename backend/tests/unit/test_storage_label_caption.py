@@ -1,9 +1,8 @@
 """What a storage label prints under its QR code.
 
-The toggle offering the caption says "show description on label". It used to
-print the storage's name behind a hardcoded "Place: " prefix instead — a word
-the interface does not use for a level of the hierarchy, and a field the
-reader had no way to fill in.
+The toggle offering the caption says "show description on label", and the label
+prints that description, never the name behind a hardcoded "Place: " prefix — a
+word the interface does not use for a level of the hierarchy.
 """
 
 from dataclasses import dataclass

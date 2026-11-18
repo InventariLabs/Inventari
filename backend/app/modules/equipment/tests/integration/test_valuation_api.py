@@ -161,9 +161,8 @@ class TestAssetValuationEndpoint:
     ) -> None:
         """A zero-year life is a missing configuration, not a fact.
 
-        The asset used to come back fully depreciated on its purchase date:
-        book value 0.00 and 100% depreciation, inferred from a number nobody
-        entered. It now reads as not depreciable at all.
+        The asset is not depreciable at all, rather than fully depreciated on its
+        purchase date by a number nobody entered.
         """
         eq_item.purchase_price = Decimal('1000.00')
         meta = dict(eq_item.meta_data or {})
@@ -336,9 +335,8 @@ class TestFleetValuationEndpoint:
         db_session: Session,
     ) -> None:
         """An asset received without an invoice sits in the
-        register but cannot be summed. It used to fall out of the loop
-        without a trace while ``excluded_count`` claimed nothing was
-        skipped — the number the totals rest on was quietly too low."""
+        register but cannot be summed, and ``excluded_count`` reports it, so the
+        totals say what they left out."""
         _make_item_with_price(
             db_session,
             eq_org,

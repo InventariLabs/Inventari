@@ -159,11 +159,10 @@ def test_a_column_type_that_drifted_is_a_diff(monkeypatch):
 def test_the_migrated_schema_enforces_what_the_models_promise(monkeypatch):
     """The cascade and the refusal, exercised on the migrated database.
 
-    A fresh install used to keep the orphan: the journal row survived its
-    organization, and an item could point at an organization that does
-    not exist, because the foreign keys the models declare were words
-    without a constraint behind them. This runs on the schema the
-    migrations built — not on ``create_all``.
+    A fresh install keeps no orphan: the journal row goes with its organization,
+    and an item cannot point at an organization that does not exist, because
+    each foreign key the models declare is a constraint in the schema. This
+    runs on the schema the migrations built — not on ``create_all``.
     """
     from uuid import uuid4
 

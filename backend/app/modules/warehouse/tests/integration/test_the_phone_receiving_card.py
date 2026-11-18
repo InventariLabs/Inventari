@@ -2,8 +2,8 @@
 
 The phone receives one item at a time. Scanning the product only says which
 line is in hand — the count is the worker's, confirmed on the card — so the
-scan must not count anything: a one-unit line scanned once used to be
-received, the session closed and the document posted before the worker had
+scan must not count anything: a one-unit line scanned once must not be
+received, nor the session closed and the document posted, before the worker has
 looked at the number.
 
 When no rule names a shelf, the plan is the document's own target, which on

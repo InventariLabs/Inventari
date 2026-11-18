@@ -1,10 +1,9 @@
 """A change to a group of stock waits on the group's anchor.
 
-The stock lock used to lock the quants an operation was about to write. A
-group nobody had stocked yet had no quant, so the first receipt to a shelf
-locked nothing: two of them at once both went on to insert, and only the
-quant's unique key, with a retry, kept them from leaving two rows. The
-records are the only count now, and the quants are gone.
+The stock lock takes the group's anchor, which exists before the group is
+stocked. A group nobody has stocked yet has no quant, so a lock on quants
+would lock nothing for the first receipt to a shelf: two of them at once would
+both go on to insert. The records are the only count, and there are no quants.
 
 Every group now has an anchor — a row with no quantity per product and
 shelf — which the lock creates when it is missing and then locks. Each test

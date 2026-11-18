@@ -392,8 +392,8 @@ class TestListMealPlans:
         assert len(rows) == 2
         by_id = {row['id']: row for row in rows}
         assert by_id[plan_a.id]['entry_count'] == 2
-        # A plan that states no default reports none — the list used to
-        # substitute 2, which reads as a setting somebody chose.
+        # A plan that states no default reports none, not a substitute 2, which
+        # would read as a setting somebody chose.
         assert by_id[plan_a.id]['default_servings'] is None
         assert by_id[plan_a.id]['enabled_slots'] == [MealSlot.LUNCH]
 

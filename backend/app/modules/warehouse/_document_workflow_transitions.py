@@ -81,7 +81,7 @@ class WmsSessionActiveError(ValueError):
     """Raised when a document transition is blocked because a WMS session
     is still open. Carries the session count and the direction's own word,
     so the sentence the reader gets names the kind of session standing in
-    the way — receiving used to be answered with picking's sentence — and
+    the way, and receiving has its own sentence, not picking's, and
     no session id, which meant nothing to a worker reading the document
     page."""
 
@@ -305,9 +305,7 @@ async def _require_products_on_receipt_lines(
 ) -> None:
     """Refuse to take goods into stock under words no product stands behind.
 
-    A receipt line typed by hand used to post as it was written — "Test
-    laptop Dell" at 3000 landed on a shelf as stock of nothing on the
-    product list. A line now names a record, a product, or a code the list
+    A receipt line typed by hand names a record, a product, or a code the list
     knows; the code is settled onto the line as the product it stands for.
     The form offers to make a typed name a product, so the refusal names the
     lines the reader has to fix.
@@ -673,10 +671,8 @@ async def complete_document(
 #:
 #: The screen offers the action from its own copy of this list — see
 #: ``frontend/src/modules/warehouse/components/DocumentActionButtons.tsx``.
-#: The two used to disagree: the API cancelled a CONFIRMED document for
-#: anyone holding ``warehouse:manage``, and the screen offered it on a draft
-#: only, so a document stuck at execution held its reservation over a whole
-#: shelf with no button anywhere to let it go.
+#: Both places carry the same statuses, so a document holding its reservation
+#: over a whole shelf can always be cancelled from the screen that shows it.
 CANCELLABLE_STATUSES = frozenset(
     {
         DocumentStatus.DRAFT.value,

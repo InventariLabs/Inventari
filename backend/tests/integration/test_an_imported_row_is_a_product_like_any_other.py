@@ -1,10 +1,9 @@
 """An imported row is a product like any other.
 
-The importer used to build ``Item(**data)`` by hand and skip
-``create_item_async``, so an imported product had no template, no unit and
-no stock entry: the products list counted it and the stock screen did not
-know it. It also handed the reader the repr of whatever exception a bad cell
-raised.
+The importer builds each row through ``create_item_async``, so an imported
+product gets a template, a unit and a stock entry like any other: the products
+list and the stock screen both count it. A bad cell is reported as a sentence,
+not as the repr of the exception it raised.
 """
 
 from decimal import Decimal

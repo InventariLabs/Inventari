@@ -47,9 +47,9 @@ class MealPlanEntryCreate(BaseModel):
     recipe_id: UUID
     servings: int | None = None
     notes: str | None = None
-    # Omitted means "put it at the end of that meal". It used to default to 0,
-    # which is exactly where the dish already in the cell sits, so a second
-    # dish collided with the unique constraint and came back as a 500.
+    # Omitted means "put it at the end of that meal". It does not default to 0,
+    # which is where the dish already in the cell sits: a second dish there
+    # would collide with the unique constraint and come back as a 500.
     order: int | None = None
 
 

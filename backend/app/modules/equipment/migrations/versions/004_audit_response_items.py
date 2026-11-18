@@ -1,10 +1,9 @@
 """equipment: per-person attestation responses with per-item rows.
 
-. Campaigns used to create one ``audit_responses`` row per active
-assignment — seven assets held by four people produced seven emails. This
-migration adds ``audit_response_items`` so one response per person
-(grouped by email) can carry many assets, and makes the legacy
-``assignment_id`` column nullable for grouped envelopes.
+Campaigns create one ``audit_responses`` row per person, grouped by email, so
+seven assets held by four people make four emails. This migration adds
+``audit_response_items`` so one response can carry many assets, and makes the
+legacy ``assignment_id`` column nullable for grouped envelopes.
 
 * Upgrade — creates ``audit_response_items``, makes ``assignment_id``
   nullable, and backfills one item row per legacy response so existing

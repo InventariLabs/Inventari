@@ -1131,7 +1131,7 @@ def _run_checks() -> int:
     i18n_errors, i18n_warnings = _emit_i18n_findings()
 
     # 10. Cross-module imports (must use public API) — blocking: a leak into
-    # a sibling's private service used to print here and still pass the gate.
+    # a sibling's private service is named here and fails the gate.
     # The same check also names what it could not read (symlinked directory,
     # unparsable file) as ``::warning``: printed, because a scan nobody can
     # audit is worth less than a red one, and non-blocking, because what sits

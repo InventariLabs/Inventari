@@ -117,8 +117,8 @@ async def enable_modules_async(
     Every enable path comes through here — onboarding, a profile switch, the
     store's toggle and the demo seed — and each runs both hooks:
     ``system_on_enable`` seeds what the module declares, then the module's own
-    ``on_enable``. Onboarding used to run only the first, so a module that
-    seeds in ``on_enable`` left every onboarded organization without it.
+    ``on_enable``. Onboarding runs both as well, so a module that seeds in
+    ``on_enable`` reaches every onboarded organization.
     """
     for module in modules:
         # The hooks are the module's own code: run them under its identity so

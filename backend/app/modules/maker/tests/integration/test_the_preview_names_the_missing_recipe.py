@@ -1,9 +1,9 @@
 """The preview answers what create would say, before the order exists.
 
 A product with no formula and a formula with no lines are two different
-truths, and the preview used to flatten them into one (``entries=[]``), so
-the screen told the reader a recipe existed and was empty while the create
-button answered "no recipe for this product". These cases pin the answer's
+truths, and the preview keeps them apart rather than flattening both into one
+(``entries=[]``), so the screen never says a recipe exists and is empty while the
+create button answers "no recipe for this product". These cases pin the answer's
 own words: ``no_recipe``, ``empty`` or ``has_lines`` — and the id of the
 formula the answer is about, which is what turns the sentence into a door.
 """
@@ -150,10 +150,9 @@ class TestThePreviewNamesTheMissingRecipe:
         db_session: Session,
     ) -> None:
         # The dry-run owes the caller the same refusal the real create
-        # would voice, not a 200 about a formula that is not there. Passes
-        # on the old code too — ``_resolve_recipe`` already refused inside
-        # the explosion; it is kept as the pinned old behaviour, not as
-        # proof of the new one.
+        # would voice, not a 200 about a formula that is not there. The refusal already
+        # comes from ``_resolve_recipe`` inside the explosion, so the case passes there
+        # too; it pins that behaviour rather than proving the new one.
         product = _make_template(db_session, mk_org, name='Wrong id')
 
         response = client.post(

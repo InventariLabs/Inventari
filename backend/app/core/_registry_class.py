@@ -391,9 +391,8 @@ class ModuleRegistry:
             {
                 'key': p.value,
                 'label_key': f'permissions:system.{p.name.lower()}',
-                # A module permission carries a description and a system one
-                # used to carry None, so half the roles editor could say what a
-                # tick does and the other half could not.
+                # A module permission carries a description, and so does a system
+                # one, so the roles editor can say what every tick does.
                 'description_key': f'permissions:system.{p.name.lower()}Desc',
                 'default_roles': [],
             }
@@ -474,7 +473,7 @@ class ModuleRegistry:
             )
         elif record.installed_version != module.metadata.version:
             # Same situation as the claim above, one row later: every worker
-            # booting after an upgrade reads the old version and would run
+            # booting after an upgrade reads the stored version and would run
             # the hook. Take the row with FOR UPDATE and read the version
             # again under the lock -- the worker that loses finds the new
             # version already written and does nothing. Without this an

@@ -1,10 +1,7 @@
 """``db reset``, ``db downgrade`` and ``demo reset`` destroy data, so they ask first.
 
-They used to refuse only when ``INVENTARI_ENV`` said production — a variable the
-production compose never sets, so a real install read as ``development`` and
-``db reset --yes-i-am-sure`` dropped its schema. They now ask the question the
-``qa`` commands ask: is ``DEBUG`` or ``TESTING`` on, or does ``INVENTARI_ENV``
-name an install that exists to be thrown away?
+They ask the question the ``qa`` commands ask: is ``DEBUG`` or ``TESTING`` on,
+or does ``INVENTARI_ENV`` name an install that exists to be thrown away?
 
 Each command runs through its Typer app, as an operator would call it, and the
 first step past the guard is replaced by a note: the runner swallows exceptions

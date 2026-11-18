@@ -1,9 +1,9 @@
 """The purpose-card gate holds the shape docs/purpose/README.md promises.
 
 The README says a card has seven headings "and nothing else" and that every
-module and every Core area has one. The gate used to check the seven headings
-and the backend modules only, so a card with an extra section and a Core area
-with no card both passed.
+module and every Core area has one. The gate checks the seven headings of every card and every backend module
+and Core area, so a card with an extra section and a Core area with no card both
+fail.
 """
 
 from __future__ import annotations

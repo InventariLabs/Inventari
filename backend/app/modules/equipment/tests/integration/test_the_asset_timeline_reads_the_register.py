@@ -482,8 +482,8 @@ class TestAssetTimeline:
         assert f'status_changed:{row.id}' not in [e['id'] for e in events]
         named = [e for e in events if e['kind'] == 'status_changed']
         assert all(e['old_status'] or e['new_status'] for e in named)
-        # The skip is not silent: a kind added tomorrow would otherwise
-        # vanish from the screen as quietly as it used to lie on it.
+        # The skip is not silent: a kind the reader does not know would otherwise
+        # vanish from the screen with no trace.
         skips = [r for r in caplog.records if 'cannot name' in r.getMessage()]
         assert len(skips) == 1
         assert "{'UPDATED': 1}" in skips[0].getMessage()

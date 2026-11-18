@@ -39,11 +39,11 @@ def seed_equipment_storage_types(
     Only the two types the equipment module does not declare itself: the
     module seeds "Server Room" and "IT Storage / Warehouse" with the
     equipment field set (serial number, manufacturer, model, IP, status),
-    and this profile used to seed near-duplicates of both ("IT Rack /
-    Server Room", "Asset Storage") with the neutral set — two entries that
-    meant the same place and chose their fields at random. The duplicates
-    are retired: fresh installations never see them, and existing rows are
-    held back from the picker like every other retired code.
+    and this profile does not seed near-duplicates of both ("IT Rack /
+    Server Room", "Asset Storage") with the neutral set: two entries for one
+    place would choose their fields at random. Those duplicates are retired:
+    fresh installations never see them, and existing rows are held back from
+    the picker like every other retired code.
 
     Args:
         db: Active SQLAlchemy session.

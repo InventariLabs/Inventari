@@ -123,11 +123,9 @@ def upsert_storage_types(
        something a seeder can forget: rows without one are read by every
     organization on the installation.
 
-    A name the organization has changed is never rewritten. The two seeders of
-    storage types used to disagree about this — a module declaration left a
-    changed name alone, this one overwrote it on every profile switch, and the
-    only thing standing between the difference and data loss was a caller
-    passing ``insert_only=True``. Which behaviour is right is not a matter of
+    A name the organization has changed is never rewritten. The module
+    declarations that seed storage types leave a changed name alone, and so
+    does this seeder. Which behaviour is right is not a matter of
     taste: a type's name is editable and printed, so a row carrying something
     other than the literal this table seeded is the organization's own. What
     arrives here is therefore written, and the rest of the row refreshed,

@@ -1,8 +1,8 @@
 """A demo organization seeded once per run, put back for every test that reads it.
 
 Seeding a demo organization takes seconds (the ledger, the documents, the
-recipes) and the tests that check one detail of it used to pay that price
-each. The database is emptied after every test, so a seed cannot simply stay
+recipes) and each test that checks one detail of it would pay that price
+again. The database is emptied after every test, so a seed cannot simply stay
 in it; instead the seed is kept beside the tables and copied in:
 
 * the first worker to ask for a world builds it and writes every table it

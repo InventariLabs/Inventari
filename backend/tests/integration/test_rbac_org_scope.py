@@ -5,10 +5,10 @@ alone gave a member of several organizations the union of their permissions in
 every one of them. These tests pin the scope: a role belongs to one
 organization, grants there and nowhere else.
 
-There used to be an exception — a role with no organization at all, read as
-belonging to every one of them by the roles list, the permission check and a
-user's own roles alike. One such row was a grant across the whole
-installation. The column refuses it now, and the case below says so.
+A role with no organization at all would read as belonging to every one of them,
+by the roles list, the permission check and a user's own roles alike: one such
+row would be a grant across the whole installation. The column refuses it, and
+the case below says so.
 """
 
 import uuid
@@ -109,7 +109,8 @@ class TestRoleOrganizationScope:
     def test_a_role_belonging_to_no_organization_cannot_be_written(
         self, db_session: Session
     ) -> None:
-        """The row that used to grant its permissions in every organization.
+        """A role row without an organization cannot be written, since it would grant its
+        permissions in every organization.
 
         Three queries read ``organization_id IS NULL`` as "belongs to all of
         them". Nothing in the app writes such a row — and nothing needs to,
@@ -134,8 +135,8 @@ class TestRoleOrganizationScope:
 @pytest.mark.asyncio
 class TestRoleLinksFollowMembership:
     """``UserRole`` carries no organization, so a membership change
-    used to leave the old grants in place, and a role could be granted to a
-    member of another organization."""
+    takes the old grants away, and a role cannot be granted to a member of another
+    organization."""
 
     @staticmethod
     async def _org(db) -> Organization:

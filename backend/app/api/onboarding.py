@@ -245,11 +245,10 @@ async def onboarding_setup(
             message=get_error_message('internal_error', get_current_lang()),
         ) from None
 
-    # The wizard decides the module set the organization runs with, and it
-    # used to leave no row at all — an audit of a fresh org showed a counter
-    # that had not moved while the modules had. The switch route writes the
-    # same shape for the same reason; here the "before" side is the set the
-    # organization was created with, which onboarding replaces wholesale.
+    # The wizard decides the module set the organization runs with, so it
+    # writes an audit row, as the switch route does, and the counter moves with
+    # the modules. Here the "before" side is the set the organization was
+    # created with, which onboarding replaces wholesale.
     await core_api.audit_log.log_action_async(
         db,
         organization_id=applied.id,

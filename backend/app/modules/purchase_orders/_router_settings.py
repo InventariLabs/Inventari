@@ -87,7 +87,7 @@ def register_settings_routes(router: APIRouter) -> None:
             approval_required=data.approval_required,
         )
         # Whether a purchase order needs anyone's approval is the sharpest
-        # switch this module owns; turning it used to leave no trace.
+        # switch this module owns, and every change to it is journaled.
         await journal_config_change(
             db,
             org_id,

@@ -213,7 +213,7 @@ async def test_a_retry_sends_the_bytes_the_first_attempt_sent(
 
     The signature is computed over the bytes, so a receiver verifying it, or
     deduplicating on a hash of the body, has to see the same bytes twice. The
-    retry used to rebuild them from the row's JSONB copy, whose keys come back
+    retry must not rebuild them from the row's JSONB copy, whose keys come back
     in an order of their own: the same content, other bytes, another
     signature. The payload here carries keys JSONB reorders — it sorts
     shorter keys first.

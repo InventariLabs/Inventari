@@ -18,9 +18,8 @@ class TestInstallRollback:
     def test_safety_validation_failure_triggers_rollback(self, tmp_path):
         """A module with AST safety violations must be cleaned up, not left on disk.
 
-        Previously the rollback handler only caught (OSError, PermissionError,
-        json.JSONDecodeError), so RuntimeError('Safety validation failed')
-        propagated without cleanup — files stayed on disk.
+        The rollback handler catches RuntimeError('Safety validation failed') as well
+        as (OSError, PermissionError, json.JSONDecodeError), so no files stay on disk.
         """
         from app.cli import module_packaging
 

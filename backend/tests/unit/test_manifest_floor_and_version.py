@@ -1,9 +1,8 @@
 """A manifest written for a newer platform says so, instead of listing its fields.
 
 ``ModuleManifest`` refuses unknown fields. A module written for 0.12 that uses
-a field added in 0.12 and is installed on 0.11 used to be reported as "Extra
-inputs are not permitted"; the administrator needs "requires Inventari >=
-0.12.0". The floor is read from the raw JSON when the strict parse fails, and
+a field added in 0.12 and installed on 0.11 is reported as "requires Inventari
+>= 0.12.0", not as "Extra inputs are not permitted". The floor is read from the raw JSON when the strict parse fails, and
 ``manifest_version`` names the shape of the file itself.
 
 ``module.yaml`` and ``manifest.json`` also share one name rule, and the fields

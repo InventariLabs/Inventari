@@ -90,9 +90,9 @@ class AIUsageLimitExceededError(ServiceRejectionError):
     A ``ValueError`` as the service contract promises (AGENTS.md §Backend.3),
     and one that carries what the counter measured: which ceiling fired
     (``limit_key``), how much of it is used, and the period the count was taken
-    over. The sentence alone used to be all a caller got, and an API can only
-    hand a reader back what it was given — "quota exceeded" with no numbers in
-    it sends whoever hit the ceiling looking for the reason in the wrong place.
+    over. The sentence alone is not enough for a caller: an API can only hand a
+    reader back what it was given, and "quota exceeded" with no numbers in it
+    sends whoever hit the ceiling looking for the reason in the wrong place.
     """
 
     def __init__(

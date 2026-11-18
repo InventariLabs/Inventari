@@ -77,7 +77,7 @@ class CoreFileStorageAPI:
     async def get_for_org_async(
         self, organization_id: UUID, module_name: str, file_path: str
     ) -> bytes:
-        """Retrieve a file previously saved via :meth:`save_for_org_async`."""
+        """Retrieve a file saved via :meth:`save_for_org_async`."""
         scoped = self._scoped_path(organization_id, module_name, file_path)
         buf: BytesIO = await FileStorageService().get(scoped)
         return buf.read()
@@ -98,7 +98,7 @@ class CoreFileStorageAPI:
     async def delete_for_org_async(
         self, organization_id: UUID, module_name: str, file_path: str
     ) -> None:
-        """Delete a file previously saved via :meth:`save_for_org_async`."""
+        """Delete a file saved via :meth:`save_for_org_async`."""
         scoped = self._scoped_path(organization_id, module_name, file_path)
         await FileStorageService().delete(scoped)
 

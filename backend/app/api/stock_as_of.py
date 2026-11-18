@@ -53,8 +53,8 @@ def _resolve_instant(as_of: date | datetime) -> datetime:
     A bare date is the whole day, so it resolves to the end of it: the shelf
     on the 23rd is the shelf once the 23rd is over, not the one at midnight
     before the day's movements. A timestamp without an offset is read as UTC
-    — the ledger is stored in UTC, and comparing it against a naive value is
-    what used to end the request in a 500 rather than an answer.
+    — the ledger is stored in UTC, and a naive value compared against it would
+    end the request in a 500 rather than an answer.
     """
     if isinstance(as_of, datetime):
         return as_of if as_of.tzinfo else as_of.replace(tzinfo=UTC)

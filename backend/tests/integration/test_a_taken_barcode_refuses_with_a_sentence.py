@@ -5,11 +5,10 @@ Two lives for one number, one column each: the code a scan reads is the
 write it and where a scan looks it up. The record's own column is for the
 one-off nobody catalogued.
 
-Creation used to copy a scanned code onto the record as well, so the
-second record of the same product died on ``uq_items_org_barcode_active``
-with a blind refusal — and the form has no code field to recover with.
-Creation now lets the catalogue row carry the code and keeps the record
-bare; the one-off that genuinely collides at the record level still gets
+Creation lets the catalogue row carry a scanned code and keeps the record
+bare, so a second record of the same product does not collide on
+``uq_items_org_barcode_active``; the form has no code field to recover with.
+The one-off that genuinely collides at the record level still gets
 the clean, naming refusal.
 """
 
@@ -184,8 +183,8 @@ def test_the_bulk_edit_refuses_a_taken_code_with_the_same_sentence(
 ):
     """The fifth write path, the taken case. A batch of one record is the
     single edit's own shape, so it runs the single edit's check and answers
-    with the sentence POST and PUT answer with. It used to skip the check,
-    reach ``uq_items_org_barcode_active`` and hand back a raw 500."""
+    with the sentence POST and PUT answer with: the check runs before the write,
+    so the unique index is never reached and no raw 500 comes back."""
     taken = _record_level_holder(client, auth_headers, test_storage_location.id)
     other = _create(client, auth_headers, test_storage_location.id, name='Bulk target')
     assert other.status_code == status.HTTP_201_CREATED, other.text
@@ -208,8 +207,8 @@ def test_the_bulk_edit_refuses_to_share_one_code_between_records(
 ):
     """What one code on many records means: nothing the record column can
     hold. The request contradicts itself whatever the database holds — the
-    unique index allows one live bearer — and the measured repro used a code
-    no record wore yet and still died on the second record's flush. So the
+    unique index allows one live bearer — and a code no record wears yet can still die
+    on the second record's flush. So the
     refusal names the contradiction and writes nothing."""
     from app.models.item import Item
 
@@ -281,7 +280,7 @@ def test_two_creates_racing_for_one_new_code_share_the_template(
 
     The look is made to find nothing once, as it does for a request that ran
     before the other one committed — the card already stands when the write
-    comes, and the unique code refuses it. That used to surface as a 500.
+    comes, and the unique code refuses it. The refusal is the clean one, not a 500.
     """
     from app.models.product_template import ProductTemplate
     from app.services.items import _template

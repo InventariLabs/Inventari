@@ -3,9 +3,9 @@
 ``maker_production_orders.short_at_create`` (BOOLEAN, NOT NULL, default false):
 whether the planned consumption already exceeded stock when the order was
 created (recomputed when a draft's planned_qty changes). The refusal dialog
-used to invent history — "these ingredients ran out since the draft was
-created" — for an order that was never satisfiable; with the flag recorded
-at birth the sentence can tell that case from a real shortage.
+tells "these ingredients ran out since the draft was created" apart from an
+order that was never satisfiable: with the flag recorded at birth, the dialog
+can tell that case from a real shortage.
 
 Also sets the organization default shortage strategy to WARN: an order over
 stock still gets created, but with a warning instead of silence. Rows that

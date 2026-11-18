@@ -133,11 +133,10 @@ async def _update_equipment_status(
     db: AsyncSession, item_id: UUID, org_id: UUID, status_value: str
 ) -> None:
     # Enforce the status state machine on every write path
-    # (checkout/checkin/maintenance). Previously each caller wrote the new
-    # status directly into meta_data, bypassing ``validate_transition``;
-    # that allowed illegal transitions (e.g. RETIRED → DEPLOYED via a
-    # stale code path). The caller is expected to catch ``ValueError`` and
-    # translate it into an HTTP 400.
+    # (checkout/checkin/maintenance). The new status is written only through
+    # ``validate_transition``, which refuses an illegal move such as RETIRED →
+    # DEPLOYED reached through a stale code path. The caller is expected to
+    # catch ``ValueError`` and translate it into an HTTP 400.
     from app.core.public_api import core_api
 
     from .status_machine import validate_transition

@@ -60,11 +60,10 @@ async def get_reconciliation_async(
 
     Both pairs are compared in the database: each side is summed per key,
     the two sums are joined, and one row of ``(count, total)`` comes back.
-    The comparison used to run in Python over every group of both sides —
-    342 099 shelf groups and 894 478 ledger groups at 100 000 products — so
-    the answer took 17–25 s and the memory of the pass grew with the
-    organization until a million products ran a worker out of it. Now what
-    crosses the wire is the same two numbers whatever the organization's
+    The comparison runs in the database, not in Python over every group of
+    both sides: at 100 000 products that is 342 099 shelf groups and 894 478
+    ledger groups, which would take 17–25 s and grow in memory with the
+    organization. What crosses the wire is the same two numbers whatever the organization's
     size.
     """
     # Both sums have one group per (product, shelf): hundreds of thousands at
@@ -161,19 +160,19 @@ def _drift_of(left: CTE, right: CTE, *keys: str) -> Select:
 def _ledger_totals(organization_id: UUID) -> CTE:
     """What the movement ledger nets to per ``(template, location)``.
 
-    The shelf and the movement ledger can tell different stories. The first
-    quant of a product used to be hydrated with its full quantity while its
-    movement carried only the delta, so a gap here is expected on a database
-    with that past and *measured* rather than presumed — the number to watch
+    The shelf and the movement ledger can tell different stories. On a database with
+    rows written by the older hydration, the first quant of a product carries
+    its full quantity while its movement carries only the delta, so a gap here
+    is expected: it is *measured* rather than presumed, and the number to watch
     is one that grows.
 
     The net stays whole-history on purpose — this pair compares the shelf's
     current state against the ledger's full net, and a time window would
     measure the shelf against nothing. It is read from
     ``stock_ledger_totals``, which the ledger's own triggers keep in the
-    statement that writes each movement: this used to add up every done
-    movement of the organization on every pass, and the ledger only grows,
-    so each pass cost more than the last. Now the pass reads one row per
+    statement that writes each movement: this avoids adding up every done
+    movement of the organization on every pass, a cost that would grow with
+    the ledger. The pass reads one row per
     product and shelf, however long the history behind them.
     """
     totals = StockLedgerTotal

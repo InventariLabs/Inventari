@@ -40,8 +40,8 @@ _ZERO_REFUSAL_KEY = 'shopping_list_item_quantity_rounds_to_zero'
 _UOM_REFUSAL_KEY = 'shopping_list_item_uom_unknown'
 
 # The same class for the three product references: a category_id, item_id
-# or template_id no visible row answers used to reach the INSERT and die
-# on the foreign key with a bare 500.  The check is scoped the
+# or template_id that no visible row answers is refused here, not left to
+# reach the INSERT and die on the foreign key with a bare 500.  The check is scoped the
 # way the uom check is — what the organization can see (its own rows plus
 # the system catalogue) — so an id borrowed from another organization is
 # refused too, not only a missing one.

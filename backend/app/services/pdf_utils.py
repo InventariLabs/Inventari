@@ -81,10 +81,9 @@ def filter_format_pct(value: Decimal | float | str | None, lang: str = 'en') -> 
 # Two numbers decide whether a printed Code128 can be scanned: the module (the
 # width of the narrowest bar) and the bar height. They are set here, in
 # millimetres, and the image carries them as its intrinsic size — templates do
-# not scale it. They used to: the image was generated at 0.25 mm/module and
-# stretched to a CSS ``height``, which moved both numbers at once, so the
-# earlier fix ("raise the height") worked by accident and any later attempt to
-# lower the bar to a sane height would have narrowed the modules back.
+# not scale it. Were it scaled, the image generated at 0.25 mm/module and stretched to a CSS
+# ``height`` would move both numbers at once, so raising the height would work
+# by accident, and lowering the bar to a sane height would narrow the modules back.
 #
 # ISO/IEC 15417 asks for a bar height of at least 6.35 mm or 15% of the symbol
 # length; 11 mm clears both for every number this app prints, at a third of

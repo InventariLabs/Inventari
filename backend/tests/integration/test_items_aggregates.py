@@ -255,11 +255,11 @@ class TestTheWeightIsExact:
 class TestVolumeIsNotWeight:
     """Two quantities, two sums.
 
-    A litre is not a kilogram, and the footer used to add them: 2 l of milk
-    arrived in ``total_weight``, which the footer labels kilograms. The
-    sum now splits by the same rule ``Item.total_weight_unit`` applies per
-    row — a line counted in a volume unit reports litres, and a kilogram
-    total exists only when the set really holds weight.
+    A litre is not a kilogram, so the footer does not add them: 2 l of milk stays out
+    of ``total_weight``, which the footer labels kilograms. The sum splits by the
+    same rule ``Item.total_weight_unit`` applies per row — a line counted in a
+    volume unit reports litres, and a kilogram total exists only when the set
+    really holds weight.
     """
 
     def _litre(self, db_session):
@@ -336,10 +336,8 @@ class TestTheFooterNamesItsSource:
     """The footer's value comes from the same place the statistics read.
 
     The list stands on the module's front screen, beside "Stock on a date"
-    and "Statistics" — both of which read the cost ledger. The footer used
-    to read the price typed on the record instead, so a delivery posted by
-    document changed the ledger and left the footer where it was, while a
-    typo corrected on a card moved the footer and left the ledger alone.
+    and "Statistics" — both of which read the cost ledger. The footer reads the price from the ledger, not from the record: a delivery posted
+    by document moves the footer, and a price corrected on a card does not.
 
     That holds for the whole organization. A filtered slice gets no ledger
     figure at all — the layers know products, not shelves.
@@ -381,8 +379,8 @@ class TestTheFooterNamesItsSource:
     def test_the_slice_names_the_module_items_it_leaves_out(
         self, client, auth_headers, test_storage_location, db_session
     ):
-        """The footer and the statistics tile declare the same book and used
-        to disagree in silence: the list's default view leaves the items a
+        """The footer and the statistics tile declare the same book, and a difference
+        between them is named: the list's default view leaves the items a
         vertical module owns to that module, while the tile sums the whole
         ledger. The difference is real money — the footer says what it is
         made of."""
@@ -696,7 +694,7 @@ class TestTheFooterNamesItsSource:
         # import) moves the card without the ledger. Done here the way
         # those paths leave the data: the card says eleven, the ledger
         # still holds the eight received units. The six units nobody
-        # received used to be priced at the received rate.
+        # received are not priced at the received rate.
         from sqlalchemy import update as _update
 
         db_session.execute(
@@ -747,9 +745,8 @@ class TestTheFooterNamesEveryReasonItIsSmaller:
     The tile sums the cost ledger; the footer clamps each product to what
     the list can see (`least(cards, ledger)`), so a layer whose product has
     no record on this list contributes to one number and not the other. The
-    module sentence used to be the footer's only explanation — and with a
-    layer like that in the book it accounted for part of the gap while
-    implying it accounted for all of it.
+    module sentence states both reasons: with a layer like that in the book, it
+    accounts for part of the gap and says so, rather than implying all of it.
     """
 
     def test_a_layer_whose_product_has_no_record_is_named(

@@ -266,11 +266,10 @@ async def scrap_item(
 ) -> None:
     """Scrap: take the goods off the shelf, then decrement the record.
 
-    The record used to be optional here. A line naming only a product left
-    both the record and — with no source location on the document — the shelf
-    unresolved, so the whole stock block was skipped and the document closed
-    as COMPLETED anyway. The register then said a jar of honey had been
-    written off while the jar stood on the shelf. A dispatch in the same
+    The record is required here. A line naming only a product leaves both the
+    record and, with no source location on the document, the shelf unresolved,
+    so the scrap refuses that line rather than closing the document as COMPLETED
+    with the stock block skipped. A dispatch in the same
     position refuses, and so does this now.
     """
     executed_quantity = _executed_quantity(line)
@@ -321,8 +320,8 @@ async def scrap_item(
     scrap_location = line_source_shelf(line, doc, item)
 
     # verify stock sufficiency BEFORE the cost layer and the records are drawn.
-    # Previously this check ran after the quant was already decremented, so an
-    # insufficient scrap could drive the quant negative before raising.
+    # The check runs before the quant is decremented, so an insufficient scrap
+    # cannot drive the quant negative before it raises.
     await _require_stock_at(
         db,
         doc,

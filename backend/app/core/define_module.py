@@ -94,9 +94,8 @@ def _manifest_to_metadata(manifest: ModuleManifest) -> ModuleMetadata:
 class _ModuleSpec:
     """Everything ``define_module`` was told, in one object.
 
-    The declarative module used to be a class defined inside the factory, so
-    every hook was a closure variable and ruff counted the whole nest as one
-    28-branch function. The hooks travel in this spec instead.
+    The hooks are not closure variables of a class defined inside the factory,
+    which ruff would count as one 28-branch function. The hooks travel in this spec instead.
     """
 
     metadata: ModuleMetadata

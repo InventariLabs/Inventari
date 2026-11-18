@@ -301,8 +301,8 @@ class TestTheModulesOwnRecordsAreCountedInOneRead:
     """The equipment locations page asks the same count, narrowed to its records.
 
     Its filter is the mirror of the general one — "is this record ours" — and
-    used to ask the category question correlated with every record. The
-    planner priced that per record and walked the warehouse through the
+    does not ask the category question correlated with every record. The
+    planner would price that per record and walk the warehouse through the
     organization index, visiting a record at a time; named as the values they
     are, the claimed categories let it read the records in the table's own
     order.

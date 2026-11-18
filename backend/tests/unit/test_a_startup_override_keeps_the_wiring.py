@@ -1,10 +1,9 @@
 """A module that overrides ``on_startup`` without ``super()`` still gets wired.
 
-The base ``on_startup`` used to be where the framework registered the
-module's services and contributions and wired its interceptors. A module
-author overriding the hook for a scheduled task of their own, and not
-calling ``super()``, lost all three without a word: the module started,
-its routes answered, and its interceptors were simply never run.
+The base ``on_startup`` is where the framework registers the module's services
+and contributions and wires its interceptors. An override that does not call
+``super()``, such as a scheduled task of the author's own, keeps all three: the
+module starts, its routes answer, and its interceptors run.
 
 The startup walk now does the wiring itself, before the hook, so what the
 module's own ``on_startup`` does or forgets cannot take it away.

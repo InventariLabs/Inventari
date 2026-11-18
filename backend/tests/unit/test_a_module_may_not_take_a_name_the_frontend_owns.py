@@ -157,8 +157,8 @@ class TestTheInstallerRefusesEitherSide:
         self, install_env, capsys: pytest.CaptureFixture[str]
     ) -> None:
         """The half the installer never looked at: a module without a
-        backend half used to install into whatever the frontend tree already
-        held under that name."""
+        backend half must not install into whatever the frontend tree already
+        holds under that name."""
         source, _, dest_frontend = install_env
         (dest_frontend / 'stale_mod').mkdir()
 
@@ -182,7 +182,7 @@ class TestTheInstallerRefusesEitherSide:
         self, install_env, capsys: pytest.CaptureFixture[str]
     ) -> None:
         """A core frontend directory with no backend counterpart — the one a
-        frontend-only module used to sail past every guard."""
+        frontend-only module must not sail past every guard."""
         source, _, _ = install_env
 
         out = self._refusal('settings', source, capsys)

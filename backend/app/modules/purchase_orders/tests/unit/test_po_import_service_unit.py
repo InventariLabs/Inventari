@@ -286,8 +286,8 @@ class TestAWorkbookThatCannotBeOpenedIsRefused:
         """A workbook cut off mid-download is a refused file, not a 500.
 
         The truncation surfaces as zipfile's BadZipFile, which none of the
-        parse errors the reader words for — it used to escape the reader
-        and answer the upload with an unhandled Internal Server Error.
+        parse errors the reader words for: the upload is answered in the
+        reader's own words, never with an unhandled Internal Server Error.
         """
         db = MagicMock()
         po = _make_po(status='DRAFT')

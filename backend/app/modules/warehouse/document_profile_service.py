@@ -67,8 +67,8 @@ PRESETS: dict[str, dict[str, Any]] = {
         'default_unit': 'pcs',
         'visible_line_fields': ['batch_number', 'expiry_date'],
         'print_template': 'pl_pz',
-        # no pinned currency — regional presets must not override the
-        # organization currency the way EUR/PLN/GBP used to.
+        # no pinned currency: regional presets leave the organization currency
+        # alone.
         'default_currency': None,
     },
     'UK Warehouse': {
@@ -174,9 +174,8 @@ PRESETS: dict[str, dict[str, Any]] = {
         'value_tracking_enabled': True,
         'tax_handling': TaxHandling.SIMPLE_RATE.value,
         # no pinned rate — this preset ships with the equipment_wms
-        # profile, which is a way of working, not a country: the 20% that
-        # used to sit here was the UK basic rate, silently applied to
-        # organizations in every other one. An untaxed document is worth
+        # profile, which is a way of working, not a country: a rate here would
+        # apply silently to organizations in every country. An untaxed document is worth
         # its net, so an empty rate costs the profile nothing.
         'default_tax_rate': None,
         'require_partner_tax_id': None,

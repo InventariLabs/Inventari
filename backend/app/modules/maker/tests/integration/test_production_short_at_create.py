@@ -1,10 +1,9 @@
 """The refusal tells the truth about when the shortage appeared.
 
-An order for 1000 candles against stock for 30 used to be refused with
-"These ingredients ran out since the draft was created" — history nobody
-lived through. The order records, at birth, whether its planned consumption
-already exceeded stock; the refusal's ``short_at_create`` lets the sentence
-distinguish "never enough" from "ran out since".
+An order for 1000 candles against stock for 30 is refused with a sentence that
+tells "never enough" from "ran out since". The order records, at birth, whether
+its planned consumption already exceeded stock, and the refusal's
+``short_at_create`` lets the sentence tell the two apart.
 """
 
 from __future__ import annotations
@@ -44,8 +43,8 @@ class TestClosingFacts:
     ) -> None:
         """The date is optional at planning and known to the day at closing.
 
-        A finished run used to show "PRODUCTION DATE —" next to its CREATED
-        stamp.
+        A finished run shows the production date next to its CREATED stamp, not a
+        dash.
         """
         run = _seed_run(
             db_session, client, mk_org, mk_auth_headers, mk_input_loc, mk_output_loc

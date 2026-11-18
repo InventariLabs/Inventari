@@ -1,9 +1,8 @@
 """Disposed goods answer the one question the waste report exists for.
 
-The remove-from-stock window used to file every exit as USED — the discard
-endpoint existed and nobody called it — so ``total_wasted`` read 0.00 over a
-bin holding 26.00 worth of stock, and the journal's verb said "Use" beside
-the word "DISPOSED".
+The remove-from-stock window files a discard as DISPOSED through the discard
+endpoint, so ``total_wasted`` counts the goods thrown away, and the journal's
+verb agrees with the word "DISPOSED".
 """
 
 from __future__ import annotations

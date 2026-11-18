@@ -3,8 +3,8 @@
 A movement and a cost layer carry a number and no unit, and the records'
 view — the shelf — sums ``items.quantity`` as it stands. So the only unit any
 of them can mean is the card's. A record confirmed in grams on a card kept in
-kilograms used to be written as it was named — 500 on the record, and 500 on
-the shelf and in the ledger, where it read as 500 kg.
+kilograms must not be written as it was named — 500 on the record, and 500 on
+the shelf and in the ledger, where it would read as 500 kg.
 
 The rule every stock system keeps instead is that a product names one stock
 unit and every entry is converted into it on the way in. The confirmation

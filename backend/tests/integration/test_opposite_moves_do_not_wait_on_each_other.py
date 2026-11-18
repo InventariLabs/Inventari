@@ -1,10 +1,8 @@
 """Two moves of one product in opposite directions finish together.
 
-A move takes the goods off one shelf and puts them on the other, and each
-half used to lock the quant it wrote as it got there. Moving flour from A to
-B while someone moved flour from B to A therefore locked A in one
-transaction and B in the other, and then each asked for the shelf the other
-held: the database broke the circle by aborting one of them, and a person got
+A move takes the goods off one shelf and puts them on the other. Moving flour
+from A to B while someone moves flour from B to A must not lock A and B in
+opposite orders: the database would abort one of them, and a person would get
 an error for a move nothing was wrong with.
 
 Every group a move will write is now locked before the first write — its

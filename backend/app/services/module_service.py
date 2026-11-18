@@ -154,8 +154,8 @@ class ModuleService:
         The return value carries before/after for the top-level keys that
         changed — ``None`` when the write changes nothing — with secret
         leaves masked. The caller, which knows the actor, turns it into the
-        journal entry; a settings write that silently decided who may close
-        their own approval used to leave no trace at all.
+        journal entry; a settings write that decides who may close
+        their own approval is journaled like any other.
         """
         from app.services._org_reads import get_by_id_async
 

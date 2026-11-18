@@ -119,8 +119,8 @@ async def create_correction(
     if original.status != DocumentStatus.COMPLETED.value:
         raise ServiceRejectionError('document_correction_requires_completed')
     # A type with no direction (an adjustment) is refused here, where the
-    # correction would be written, and not at completion, where it used to
-    # fail after it had already been saved and confirmed.
+    # correction would be written, and not at completion, where it would fail
+    # after it had already been saved and confirmed.
     dt.correction_sign(original.type)
 
     original_lines_by_number: dict[int, DocumentLine] = {

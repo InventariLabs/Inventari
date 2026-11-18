@@ -197,9 +197,8 @@ class TestGetReplenishmentAlertsPerLocation:
     def test_alert_when_stock_below_safety_even_above_minimum(self) -> None:
         # The rule promises stock never falls below the safety stock, and
         # the form says so in every language; a quantity sitting between
-        # the minimum and the safety used to sit there unalerted (the
-        # promise broken exactly when the safety stands above the
-        # minimum).
+        # the minimum and the safety is alerted, so the promise holds when the
+        # safety stands above the minimum.
         loc = uuid4()
         tpl = uuid4()
         rule = _make_rule(
@@ -374,10 +373,10 @@ class TestGetReplenishmentAlertsPerLocation:
 
 
 class TestARuleWithNoThresholdIsNotSilentlySkipped:
-    """A rule at 0 cannot fire, and the engine used to drop it without a word.
+    """A rule at 0 cannot fire, and the engine says so rather than dropping it silently.
 
-    The API refuses to write one now, so this is a row from before that: it
-    sits on the list looking like every other rule and produces nothing. It
+    The API refuses to write one, so such a row can only predate that check:
+    it sits on the list looking like every other rule and produces nothing. It
     stays skipped — an alert with a threshold of zero is not an alert — but it
     says so where the operator of an installation can find out, which is the
     only channel a row already in the database has.

@@ -144,12 +144,10 @@ class TestTheRestOfAShortDelivery:
     ) -> None:
         """Four of six on the phone, then the last two from the order.
 
-        The short receipt used to leave a draft backorder for the two the
-        order already expected. Receiving them from the order then built a
-        second receipt for two: refused for anyone who may not receive over
-        tolerance, because the draft counted as spoken for, and left behind
-        as a stale document describing goods that had arrived for anyone
-        who could. The order is the expectation; the rest is received from
+        A short receipt leaves no draft for the two the order still expects.
+        Receiving them from the order builds one receipt for two, refused for
+        anyone who may not receive over tolerance, and the draft counts as
+        spoken for. The order is the expectation; the rest is received from
         it in one post — the screen the order's Receive delivery opens.
         """
         receiver = _receiver(h, po_org)

@@ -254,8 +254,8 @@ def test_a_module_built_in_code_reads_as_what_its_manifest_declares(
 def test_validate_dependencies_rejects_module_depending_on_rejected():
     """A module whose dependency was rejected must also be rejected.
 
-    Regression: previously ``_rejected_modules`` keys were counted as
-    'available', so module B requiring rejected module A would pass.
+    ``_rejected_modules`` keys are not counted as 'available', so module B
+    requiring rejected module A does not pass.
     """
     registry = ModuleRegistry()
     registry.register(DepModule('mod_a', requires=[]))
@@ -275,8 +275,8 @@ def test_validate_dependencies_rejects_module_depending_on_rejected():
 def test_validate_dependencies_cascades_transitively():
     """If A is missing, B (requires A) and C (requires B) must all be rejected.
 
-    Regression: previously the ``registered`` snapshot was computed once,
-    so C passed because B was still in the stale set after removal.
+    Each removal is seen by the next check, so C is rejected once B is, rather
+    than passing against a stale set.
     """
     registry = ModuleRegistry()
     registry.register(DepModule('mod_b', requires=['mod_a']))

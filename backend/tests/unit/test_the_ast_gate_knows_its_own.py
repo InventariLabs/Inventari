@@ -49,7 +49,7 @@ class TestTheGrantBelongsToShippedDirectories:
     def test_a_dropped_directory_with_a_trusted_name_is_rejected(
         self, tmp_path: Path
     ) -> None:
-        # The twin that used to register cleanly: the name comes from the
+        # The twin that registers cleanly: the name comes from the
         # trusted list, and no shipped directory carries it.
         dropped = _module_with_forbidden_import(tmp_path, 'announcements')
 

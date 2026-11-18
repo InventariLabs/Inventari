@@ -136,9 +136,9 @@ class TestTheImportKeepsTheDigitsTheSheetTyped:
     ) -> None:
         """An extension the browser upper-cased still names the format.
 
-        'ASSETS.CSV' used to miss the case-sensitive comparison and land on
-        the Excel branch, which refused a perfectly good sheet as an
-        unreadable workbook.
+        'ASSETS.CSV' is matched case-insensitively, so it takes the CSV branch and
+        is not sent to the Excel branch, which would refuse it as an unreadable
+        workbook.
         """
         csv = _csv('name,serial_number\nBarcode scanner,5901234123457\n')
         result = await self._import(

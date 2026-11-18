@@ -29,9 +29,9 @@ class ProductTemplateStockResponse(BaseModel):
     """How much of one product the organization has on its shelves.
 
     The number a threshold is measured against, so the screen that sets
-    one can name it. That screen used to show the quantity of the single
-    record the reader had opened, and offered to copy it into a field
-    governing the product as a whole.
+    one can name it. That screen shows the product's total across its shelves,
+    never the quantity of the single record the reader has opened, so the two
+    are not confused with a field governing the product as a whole.
     """
 
     product_template_id: UUID
@@ -120,9 +120,8 @@ class ProductTemplate(ProductTemplateBase):
     # Module-owned enrichment data (namespaced per module, e.g. meta_data['nutrition']).
     meta_data: dict | None = None
     # This organization's AVCO rate. Not a column: it is filled per request
-    # from the caller's own valuation layers. It used to be cached on the
-    # template row, which a global template shares with every organization, so
-    # the figure served here belonged to whoever wrote it last.
+    # from the caller's own valuation layers: a global template row is shared with
+    # every organization, so the figure cannot live on it.
     current_valuation_rate: float | None = None
     #: The order this product's stock leaves in; None reads as FIFO. Written
     #: through the item payload, like the threshold (ADR-015).

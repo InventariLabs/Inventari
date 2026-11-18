@@ -117,7 +117,7 @@ async def test_before_onboarding_an_organization_has_only_what_is_not_a_choice(
 
     An organization is created at registration and `onboarding_completed` is
     set by the profile step, so this is a real state a person can sit in. It
-    used to be eight hand-written names; it is now the always-on set, which is
+    is the always-on set, not eight hand-written names, which is
     a usable inventory — items, locations, categories — and no opinion about
     anything else.
 

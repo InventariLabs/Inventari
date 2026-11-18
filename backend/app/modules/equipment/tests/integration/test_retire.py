@@ -290,8 +290,8 @@ class TestBulkRetire:
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data['retired'] == 1
-        # The row speaks the 404's sentence and code; it used to carry the
-        # envelope's repr, braces and quotes included.
+        # The row carries the 404's sentence and code, not the envelope's repr
+        # with its braces and quotes.
         assert data['errors'] == [
             {
                 'item_id': str(fake_id),

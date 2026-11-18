@@ -62,8 +62,7 @@ async def list_equipment_models(
         db, org_id, limit=10_000
     )
     # One read for the whole list: the category's name is the only thing a
-    # card can show, and the list used to hard-code None for every model, so
-    # a category that had been saved would still have been invisible here.
+    # card can show, so every model's category name is loaded here in one read.
     names = await _category_names(db, org_id)
 
     results = []
@@ -123,8 +122,8 @@ async def create_equipment_model(
         brand=tpl.brand,
         image_url=tpl.image_url,
         description=tpl.description,
-        # Read back from what was stored, never echoed from the request: the
-        # response used to confirm a category no row carried.
+        # Read back from what was stored, never echoed from the request, so the
+        # response confirms only a category that a row carries.
         category_id=saved_category,
         category_name=names.get(saved_category) if saved_category else None,
         equipment_meta=saved,

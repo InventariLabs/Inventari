@@ -65,11 +65,11 @@ def default_organization_name(full_name: str | None, lang: str | None = None) ->
 def _is_locked_out(user: User) -> bool:
     """True while the account is temporarily locked after failed attempts.
 
-    This used to raise ``PermissionError``, which the router turned into a
-    403 with a specific message — before any password was checked, so an
-    attacker could tell an existing account from a non-existent one (and
-    read its state) without credentials. The caller now folds it into the
-    same "no user" answer as a wrong password.
+    It is not raised as ``PermissionError``: the router would turn that into a
+    403 with a specific message before any password is checked, so an attacker
+    could tell an existing account from a non-existent one (and read its state)
+    without credentials. The caller folds it into the same "no user" answer as
+    a wrong password.
     """
     return bool(
         user.failed_login_count is not None
@@ -392,8 +392,7 @@ class AuthService:
         invitation: OrganizationInvitation | None = None
         if user_in.invite_code:
             # A consumed code must not admit anyone else within its validity
-            # window — the join flow already filters is_used; this path
-            # used to skip the filter and never burn the code at all.
+            # window, so this path filters is_used the same way the join flow does.
             invitation = await AuthService.find_usable_invitation_async(
                 db, user_in.invite_code, user_in.email
             )

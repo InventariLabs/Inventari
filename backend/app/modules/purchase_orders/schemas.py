@@ -61,8 +61,8 @@ CURRENCY_CODES: frozenset[str] = frozenset(
 class _CurrencyValidationMixin(BaseModel):
     """Normalise and validate the ``currency`` field shared by the write schemas.
 
-       The field used to be a bare three-letter string, so ``"dolary"`` became
-    ``"DOL"`` and was accepted as a currency code. The mixin rejects
+       A bare three-letter string is not enough: ``"dolary"`` is rejected, not
+    cut to ``"DOL"``. The mixin rejects
        any code outside the curated ISO 4217 set; inheriting schemas declare the
        field themselves.
     """
@@ -174,8 +174,8 @@ class PurchaseOrderUpdate(_CurrencyValidationMixin):
     scheduled_date: date | None = None
     notes: str | None = None
     # An order with no lines is not an order. Omitting ``lines`` leaves them
-    # untouched; sending an empty list used to empty a draft that could then
-    # be confirmed and e-mailed to a supplier.
+    # untouched; an empty list is refused, so a draft cannot be emptied and then
+    # confirmed and e-mailed to a supplier.
     lines: list[PurchaseOrderLineCreate] | None = Field(default=None, min_length=1)
     currency: str | None = Field(default=None, max_length=3)
 
@@ -515,10 +515,9 @@ class ReorderRuleCreate(BaseModel):
     """Create a reorder rule for one (product, location) pair.
 
     ``min_quantity`` is the threshold that makes the rule fire; ``max_quantity``
-    is only the level to reach once it has. Requiredness used to be the other
-    way round -- MIN defaulted to 0 -- and the engine skips a rule at 0
-    outright, so a rule saved with the required fields alone could never
-    produce an alert while sitting on the list looking like every other one.
+    is only the level to reach once it has. ``min_quantity`` is required, and
+    the engine skips a rule at 0 outright, so a rule must set it above zero to
+    ever produce an alert.
     """
 
     product_template_id: UUID

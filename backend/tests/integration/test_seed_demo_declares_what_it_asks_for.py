@@ -1,7 +1,7 @@
 """Every category code the demo seeder asks for is declared somewhere.
 
-``make dev-up && make db-seed-demo`` used to stop halfway on a fresh
-installation, asking for categories nobody had created. Two separate reasons,
+``make dev-up && make db-seed-demo`` asks a fresh installation only for
+categories that are declared, so the run does not stop halfway. Two separate reasons,
 and this pins both of the declarations they depend on:
 
 * the food catalogue is declared by the ``food_home`` seed profile, and the

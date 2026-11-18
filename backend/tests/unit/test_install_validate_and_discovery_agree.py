@@ -1,11 +1,11 @@
 """One package, four gates, one verdict.
 
 ``module validate``, ``module install`` and ``module upgrade`` run ahead of the
-next start, and each used to disagree with module discovery about a package:
+next start, and each must agree with module discovery about a package:
 discovery refused a manifest whose ``name`` differs from its directory, a
 module from outside the repository claiming ``official``, and a platform floor
-above the running version, while the three commands printed success and the
-module was rejected at the restart. The other way round, ``install`` and
+above the running version. Each of the three commands refuses what discovery
+refuses, rather than printing success for a module the restart rejects. The other way round, ``install`` and
 ``upgrade`` refused ``requires: [items]`` — they looked for a directory — while
 discovery loads it, since an always-on feature is part of the platform.
 And ``validate`` could not read a package at all: it looked for

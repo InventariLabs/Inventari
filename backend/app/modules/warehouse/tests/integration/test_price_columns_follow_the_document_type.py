@@ -21,7 +21,7 @@ pytestmark = pytest.mark.integration
 
 def _value_tracking_profile() -> DocumentProfile:
     """A profile that tracks value and charges a rate — the one whose
-    printout used to draw price columns for every document type."""
+    printout draws price columns only for document types that carry prices."""
     profile = DocumentProfile(name='Full value')
     profile.value_tracking_enabled = True
     profile.tax_handling = TaxHandling.SIMPLE_RATE.value

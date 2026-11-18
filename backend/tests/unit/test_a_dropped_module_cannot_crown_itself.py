@@ -4,9 +4,9 @@ Who stands behind a module is the one fact a store reader cannot guess.
 Signatures (ADR-019) are specified but not built, so the only issuer of
 trust in the running system is the repository itself: a directory the
 repository ships is first-party, anything else is community. A dropped
-directory used to keep whatever ``module_type`` its manifest declared —
+directory does not keep whatever ``module_type`` its manifest declares —
 ``official`` or ``core`` on a file the dropper wrote — and a manifest
-author line could carry the core team's own name. Discovery now refuses
+author line cannot carry the core team's own name. Discovery refuses
 the title and strips the borrowed name; what it does not do is certify a
 community author, so an honest one stays visible as the unverified claim
 the store already labels ``unsigned``.

@@ -105,11 +105,10 @@ class TestEquipmentExportColumns:
     ) -> None:
         """A field lands in one column for the whole sheet.
 
-        Headers used to come from the row's own category, so an asset
-        without one (or with a category that does not declare the field)
-        produced a second column — "Equipment Status" next to "Status" —
-        and the sheet could no longer be re-imported without remapping
-        (audit 2026-08-16).
+        Headers are fixed for the whole sheet, so an asset without a category, or
+        with one that does not declare the field, fills the same column. A second
+        column beside "Status" would stop the sheet from being re-imported without
+        remapping.
         """
         # A second equipment category that declares no equipment_status
         # field — its assets still carry the value in meta_data.

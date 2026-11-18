@@ -474,10 +474,10 @@ class TestCreateStorageHierarchy:
         hierarchy_org: Organization,
         hierarchy_user: User,
     ) -> None:
-        """Ids and names interleave down a path longer than the old three.
+        """Ids and names interleave down a path longer than three.
 
-        A chain of three fits the site/zone/leaf shape the endpoints used to
-        take, so a test of three steps cannot tell walking from guessing.
+        A chain of three fits the site/zone/leaf shape the endpoints take, so a
+        test of three steps cannot tell walking from guessing.
         This one is five deep and switches between id and name on the way
         down: resolving only one of the two shapes hangs the leaf on the
         wrong parent.
@@ -526,13 +526,8 @@ class TestCreateStorageHierarchy:
 class TestTheChainInventsNoRootAtAll:
     """What the chain names is what the chain creates, and nothing above it.
 
-    ``_resolve_root`` used to answer a chain with no parent by creating a
-    top-level location named after the organization, flagged
-    ``settings.is_default_site``, and hanging the reader's warehouse beneath
-    it. The storages card then wore an overline nobody had typed, the
-    archive dialog offered "QA Many › Magazyn › Regał" beside six paths that
-    started at a warehouse, and the invented level could not be deleted from
-    the interface. The organization is not a place; it owns them.
+    ``_resolve_root`` creates no location above a chain with no parent. The
+    organization is not a place; it owns them.
     """
 
     async def test_a_chain_under_an_existing_location_invents_nothing(

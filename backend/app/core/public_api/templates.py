@@ -1,7 +1,7 @@
 """Module-safe access to DocumentTemplate management.
 
 Replaces direct ``app.services.template_crud`` imports in module routers
-(previously baselined architecture-lint bypasses).
+which the architecture lint refuses.
 
 Transaction semantics: like the rest of CoreAPI, the write methods flush
 and return — the caller owns the commit, so a template write composes with

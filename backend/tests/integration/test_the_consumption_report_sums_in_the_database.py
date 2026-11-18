@@ -1,11 +1,8 @@
 """The consumption report adds its quantities up where the rows live.
 
-The report used to pull every use and every disposal in the window into
-Python and read ``qty`` out of each row's JSON there — an active organization
-over ninety days sent tens of thousands of rows across the wire to produce
-twenty lines. The sum now happens in SQL, grouped per record, and the figures
-must not move: this test pins the answer the row-by-row version gave on a
-window that exercises every branch it had — two records sharing a name, both
+The report sums in SQL, grouped per record, so the rows of a long window never
+travel to Python to produce a few lines. The figures are pinned on a window
+that exercises every branch: two records sharing a name, both
 vocabularies of each kind, a row with no quantity, a row with no changes at
 all, an edit that is neither kind, a row older than the window and a stranger
 organization's row.

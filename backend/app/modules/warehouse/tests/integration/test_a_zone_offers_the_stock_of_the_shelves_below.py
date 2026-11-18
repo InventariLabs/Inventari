@@ -1,10 +1,10 @@
 """A location named as a document's source is offered with the shelves below it.
 
 A zone or a warehouse is a location with locations under it. The product
-search used to read a location as exact, so a dispatch naming the warehouse
-was offered nothing, and an order spread over three shelves could not be one
-document. Now a zone searches the subtree and every hit names the shelf it
-stands on; a shelf stays exact, because its own records are all it holds.
+search reads a zone as the subtree beneath it, so a dispatch naming the
+warehouse is offered that stock, and an order spread over three shelves is one
+document. Every hit names the shelf it stands on; a shelf stays exact, because
+its own records are all it holds.
 """
 
 from __future__ import annotations

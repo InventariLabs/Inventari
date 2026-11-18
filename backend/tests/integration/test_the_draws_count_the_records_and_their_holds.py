@@ -1,10 +1,10 @@
 """Every draw counts what is free from the records and the reservation rows.
 
-A draw used to ask the quants: which batch goes first, and how much of it
-is free — the quant's quantity less its ``reserved_quantity``. The records
-are the count now, and the reservation rows are the holds, so the draws that
-choose what to take — a draw off the records, a reservation, the release of
-what no stock covers any more and the picking suggestion — ask them. The
+A draw asks the records and the reservation rows: which batch goes first, and
+how much of it is free. The records are the count, and the reservation rows are
+the holds, so the draws that choose what to take — a draw off the records, a
+reservation, the release of what no stock covers any more and the picking
+suggestion — ask them. The
 draw off the records is measured through its doors: a dispatch
 (``test_documents_fefo.py``) and a production run
 (``test_a_run_takes_its_ingredients_off_their_own_records.py``).

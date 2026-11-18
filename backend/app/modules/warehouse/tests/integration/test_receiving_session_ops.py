@@ -270,9 +270,9 @@ class TestConfirmShortReceive:
     ) -> None:
         """A short line names the shortage by code, not by a stored sentence.
 
-        The default reason this used to write was an English sentence
-        ("Short receiving") shown as is to every reader, in every language.
-        The code SHORTAGE is the name now and the screens translate it.
+        No default reason is written: an English sentence such as
+        ("Short receiving") would be shown as is to every reader, in every language.
+        The code SHORTAGE is the name and the screens translate it.
         """
         session, lines, doc_lines = await _create_receive_session(
             real_async_db_session,

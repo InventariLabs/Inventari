@@ -201,9 +201,9 @@ class TestWhichEntriesInvalidate:
 
     Every cached read-model is built from stock, catalogue or custody rows,
     so an entry about who may access the organization — or about somebody's
-    own working note — cannot have made one stale. Those entries used to pay
-    for the invalidation anyway, and since that invalidation walked the
-    keyspace, a role change cost the whole installation a SCAN.
+    own working note — cannot have made one stale. Those entries skip the
+    invalidation, which walks the keyspace, so a role change does not cost the
+    whole installation a SCAN.
     """
 
     @pytest.mark.parametrize('target', [AuditTargetType.ROLE, 'role'])

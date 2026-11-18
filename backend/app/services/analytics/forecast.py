@@ -53,10 +53,10 @@ async def _calculate_waste_potential_async(
 ) -> float:
     """Annual savings achievable by halving monthly waste.
 
-    The month's waste used to be summed out of
-    ``ItemHistory.changes['wasted_cost']`` — a key nothing writes — so this
-    number was always zero, and the forecast quietly promised no savings to
-    an organization throwing away real money. It comes from the valuation
+    The month's waste is summed from the valuation ledger, not from
+    ``ItemHistory.changes['wasted_cost']``: no code writes that key, so a
+    forecast read from it would promise no savings to an organization
+    throwing away real money. It comes from the valuation
     ledger now, where the price of an outflow is recorded when it happens.
     """
     date_from = await org_window_start_async(db, organization_id, 30)
@@ -167,9 +167,9 @@ def _forecast_confidence(series: list[float]) -> float:
     steady the spending was (a series that swings by its own size week after
     week predicts nothing at all).
 
-    It used to be ``0.8 if annual_savings > 0`` — the potential for halving
-    waste, a quantity the forecast is not made of. That is how a six-figure
-    prediction came to stand next to a confidence bar reading 0%.
+    It is not ``0.8 if annual_savings > 0``: that would be the potential for
+    halving waste, a quantity the forecast is not made of, and it would put a
+    six-figure prediction next to a confidence bar reading 0%.
     """
     if not series:
         return 0.0
@@ -200,10 +200,9 @@ async def get_expense_forecast_async(
     date_from = await org_window_start_async(db, organization_id, 90)
 
     # What arrived each week, at what it cost, read from the receipt layers
-    # on their business date. This used to sum the records' unit prices by
-    # the day the record was typed in — one unit at 1000 weighed the same as
-    # a thousand units at 1, and a delivery dated last month counted in the
-    # week somebody entered it. Summed per week in the database: read as
+    # on their business date, not the day the record was typed in: one unit
+    # at 1000 is not the same as a thousand units at 1, and a delivery dated
+    # last month counts in its own week. Summed per week in the database: read as
     # rows the query kept the five hundred newest purchases in the window,
     # which empties the oldest weeks first -- and the trend comparison, first
     # three weeks against last three, then reads the truncation itself as a

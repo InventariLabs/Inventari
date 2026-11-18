@@ -482,11 +482,11 @@ async def get_product_template(
     Stock value is FIFO; the rate is the average cost of the cost layers
     still on hand (source fields keep the historical ``avco`` label).
 
-    The rate is computed here rather than read off the row. It used to be a
-    cached column on ``product_templates``, and a global template — the whole
-    default catalogue — is one row shared by every organization: the number
-    there belonged to whichever organization had last taken a delivery, so this
-    endpoint handed one organization another's purchase cost.
+    The rate is computed here rather than read off the row. A global template,
+    the whole default catalogue, is one row shared by every organization, so a
+    stored rate there would belong to whichever organization had last taken a
+    delivery; computing it per organization keeps one organization's purchase
+    cost away from another.
     """
     org_id = require_org(current_user)
     template = await db.run_sync(

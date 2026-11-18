@@ -1,11 +1,10 @@
 """A draw on every shelf hands stock out in the removal order.
 
 A production run asks for an ingredient, not for an ingredient on a
-particular shelf. The maker module used to answer that with a re-implementation
-of Core's FEFO/FIFO sort, in Python over DTOs, carrying a comment naming the
-line numbers it mirrored — a synchronisation kept by hand.
+particular shelf. The maker module asks Core for that answer rather than
+re-implementing Core's FEFO/FIFO sort in Python over DTOs.
 
-The rule is now written once, as the draw plan over the records, and this
+The rule is written once, as the draw plan over the records, and this
 checks that a draw with no shelf named (``take_from_the_records_async`` with
 ``storage_location_id=None``, the production run's draw) obeys it: earliest
 date first under FEFO, oldest record first under FIFO, and nothing taken at

@@ -12,8 +12,8 @@ class Role(Base):
     """
     Represents a named set of permissions that can be assigned to users.
 
-    Every role belongs to exactly one organisation. A row without one used to
-    be legal and was read as belonging to all of them — the roles list, the
+    Every role belongs to exactly one organisation. A row without one would
+    be legal and would be read as belonging to all of them — the roles list, the
     permission check and a user's own roles each asked for
     ``organization_id = :org OR organization_id IS NULL`` — so a single row
     granted its permissions in every organisation of the installation.

@@ -370,8 +370,8 @@ def _check_ingredient_availability(
     sorted_items = fefo_order(items, context.today)
     best = sorted_items[0]
     # What is past its date is on the shelf, not in the pot: it counts
-    # towards nothing the recipe needs. It used to count in full, so a
-    # fridge holding only spoiled chicken made the curry cookable.
+    # towards nothing the recipe needs, so a fridge holding only spoiled
+    # chicken does not make the curry cookable.
     usable = [item for item in sorted_items if not is_past(item, context.today)]
     if not usable:
         return IngredientAvailability(
@@ -494,10 +494,9 @@ async def annotate_recipes_with_availability(
 ) -> list[dict[str, Any]]:
     """Attach the availability summary to a page of recipes.
 
-    The list card used to render ``ingredients_available`` straight from the
-    schema default, so every recipe read "0 of N" while the detail screen, the
-    cooking session and the planner — all asking this same function — said the
-    ingredient was on the shelf. One stock context serves the whole page.
+    The list card renders ``ingredients_available`` from the same answer as the
+    detail screen, the cooking session and the planner: they all ask this
+    function. One stock context serves the whole page.
     """
     if not recipes:
         return []

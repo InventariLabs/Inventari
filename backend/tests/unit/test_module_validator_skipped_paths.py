@@ -1,8 +1,8 @@
 """The skipped-path report names exactly what the safety scan cannot see.
 
-``skipped_paths`` used to answer one question too broadly (every symlinked
-directory, even one whose content the walk reads at its real path) and one
-too narrowly (a dangling link, which ``is_dir`` hides, went unnamed). These
+``skipped_paths`` names only what the scan cannot read: a symlinked directory
+whose content the walk reads at its real path is not named, and a dangling
+link, which ``is_dir`` hides, is named. These
 tests pin the three shapes: a link resolved inside the tree is content the
 scan already read and is not a hole; a link resolved outside it is unread
 content and must be named; a link whose target does not exist is unread

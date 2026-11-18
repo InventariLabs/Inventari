@@ -1,12 +1,9 @@
 """Revoking a session family has to reach the access tokens it minted.
 
-Reuse detection revokes a whole family, and so does a GDPR delete. Until now
-the marker was consulted in exactly two places — ``/auth/refresh`` and the
-media cookie — while ordinary requests carrying ``Authorization: Bearer``
-checked only the per-token blacklist. An attacker caught replaying a stolen
-refresh cookie therefore kept a working access token for up to its natural
-lifetime, which is the half-hour after the moment the system decided it was
-under attack.
+Reuse detection revokes a whole family, and so does a GDPR delete. The marker
+is consulted by ``/auth/refresh``, by the media cookie and by requests carrying
+``Authorization: Bearer``, so a replayed refresh cookie does not leave a working
+access token behind until it expires.
 """
 
 from __future__ import annotations

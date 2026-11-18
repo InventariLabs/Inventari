@@ -46,8 +46,8 @@ class WebhookEndpoint(Base):
     consecutive_failures: Mapped[int] = mapped_column(Integer, default=0)
     #: When the circuit breaker switched this endpoint off — and nothing else.
     #: An administrator pausing an endpoint leaves it NULL, which is the whole
-    #: point: the card used to read "auto-disabled" off ``is_active`` alone and
-    #: sent people looking for deliveries that never failed. Recorded rather
+    #: point: the card reads "auto-disabled" from this column, not from ``is_active``
+    #: alone, which would send people looking for deliveries that never failed. Recorded rather
     #: than derived from ``consecutive_failures >= threshold``, because the
     #: threshold is a setting an administrator may raise afterwards, and what
     #: happened does not change when the rule for it does.

@@ -1,10 +1,8 @@
 """Integration test: the equipment notification worker COMMITS its rows.
 
-Regression: run_equipment_notification_check_async previously never
-committed — create_async only flushes, the scheduler path never commits,
-so every notification was silently rolled back on session close and the
-worker produced nothing in production. Found during multi-worker
-staging verification.
+run_equipment_notification_check_async commits its rows. create_async only
+flushes, so the worker commits itself; otherwise every notification is rolled
+back on session close, and the worker produces nothing.
 
 Also pins the dedup under repeated runs: a second full pass must not
 insert a duplicate.
@@ -111,8 +109,8 @@ class TestNotificationWorkerPersistence:
     ) -> None:
         async with session_factory() as db:
             await run_equipment_notification_check_async(db)
-        # A NEW session must see the row — proves the worker committed
-        # (regression: previously rolled back on session close).
+        # A NEW session must see the row, which proves the worker committed
+        # (a row left uncommitted would vanish on session close).
         assert await _warranty_notifications(session_factory, org_id) == 1
 
     async def test_second_run_does_not_duplicate(

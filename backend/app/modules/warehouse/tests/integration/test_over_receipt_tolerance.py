@@ -204,7 +204,7 @@ class TestTheRampAcceptsASurplus:
     ) -> None:
         """The permission lifts the tolerance, but the count is asked about.
 
-        The holder used to record any surplus on the spot. The session now
+        The holder does not record any surplus on the spot. The session
         answers 409 with a question naming the product and the surplus,
         records nothing, and records the count once it is sent with the
         answer.

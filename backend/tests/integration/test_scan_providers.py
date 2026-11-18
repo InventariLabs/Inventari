@@ -88,7 +88,7 @@ async def _make_item(
         is_deleted=kwargs.pop('is_deleted', False),
         meta_data=kwargs.pop('meta_data', None),
     )
-    # freeze_date now lives in meta_data['food'] (a shim), not a column.
+    # freeze_date lives in meta_data['food'] (a shim), not a column.
     from app.services.items._date_meta import merge_legacy_date_into_meta
 
     item.meta_data = merge_legacy_date_into_meta(
@@ -503,11 +503,11 @@ class TestLabelPoolScanProvider:
     ):
         """Deleting the thing must not erase the answer to "what was this?".
 
-        Deletion used to free the label slot in the same transaction that set
-        is_deleted, so the archived branch above, the sheet it opens and the
-        label pool's "Consumed (Archived)" filter described a state nothing
-        could produce. A sticker outlives the thing it was stuck to; the sheet
-        frees the slot when someone says the label is free.
+        Deletion does not free the label slot in the transaction that sets is_deleted,
+        so the archived branch above, the sheet it opens and the label pool's
+        "Consumed (Archived)" filter describe a state that is actually reachable.
+        A sticker outlives the thing it was stuck to; the sheet frees the slot when
+        someone says the label is free.
         """
         from app.core.contracts import UserContextDTO
         from app.services.items import delete_item

@@ -246,7 +246,7 @@ class StockMoveReferenceType(StrEnum):
     list rather than the other way round — adding one without a label in
     ``frontend/src/modules/inventory/i18n`` fails
     ``moveSourceVocabulary.test.ts``, which reads this class here in the
-    contracts rather than in the model, where it used to sit.
+    contracts rather than in the model.
 
     Re-exported from ``app.models.stock_move`` for callers on that import
     path.
@@ -557,7 +557,7 @@ class ReservedSliceDTO(BaseModel):
 
     The row that records it is the reservation's own id, so a caller that
     has to give a hold back — or say which hold it means — names the row
-    and never the quant the hold used to point at. ``reservation_id`` is
+    and never a quant: a hold is named by its own row. ``reservation_id`` is
     ``None`` when the reservation was made without a document, because
     then no row exists to name.
     """
@@ -587,7 +587,7 @@ class ReservationDTO(BaseModel):
     """Per-document stock reservation record.
 
     Named by lot and owner, the way the stock it holds is counted, and by
-    its own row id. The quant it used to point at is gone from the
+    its own row id. There is no quant reference in the
     contract: after the record migration nothing reads one, and a
     contract that named it would keep the id alive in every caller.
     """

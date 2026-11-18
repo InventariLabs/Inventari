@@ -1,10 +1,9 @@
 """The register's ORDER BY is chosen from a table, not from the argument.
 
-The route validates ``sort_by`` against a regex, and the service used to hand
-whatever arrived to ``getattr(Document, sort_by, ...)``. That made the route
-the only thing standing between a caller and an arbitrary attribute of the
-model — and a service does not get to assume its caller is a route. These
-tests call the service with no route in front of it.
+The route validates ``sort_by`` against a regex, and the service picks the
+ORDER BY column from a table, so no argument reaches ``getattr(Document, ...)``.
+A service does not get to assume its caller is a route, so these tests call the
+service with no route in front of it.
 """
 
 from __future__ import annotations

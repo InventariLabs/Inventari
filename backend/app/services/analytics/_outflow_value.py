@@ -1,15 +1,9 @@
 """What the stock that left was worth, read from the ledger.
 
-The consumption and waste reports used to take this figure out of
-``ItemHistory.changes`` under the keys ``wasted_cost``, ``consumed_cost``,
-``quantity_consumed`` and ``quantity_discarded``. Nothing in the application
-writes those keys — the consume and discard path records ``{qty, old, reason,
-notes}`` — so the value of waste, the waste percentage and the per-product
-consumption were silent zeros in every organization. The keys existed only in
-the tests, which seeded the shape production never creates: that is why the
-defect survived a green suite for so long.
-
-The value now comes from where an ERP keeps it. Every outflow posts a
+The value of what left comes from the valuation ledger, not from
+``ItemHistory.changes``: the consume and discard path records ``{qty, old,
+reason, notes}`` there, and no cost keys, so a figure read from those keys
+could only be zero. The value comes from where an ERP keeps it. Every outflow posts a
 ``StockValuationLayer`` with ``direction='OUT'``, priced at the rate in force
 at that moment and never recomputed, so a report about March says the same
 thing in December.
@@ -56,10 +50,9 @@ async def outflow_value_by_item_async(
     across the several records that share it.
 
     Exact all the way. The sum comes out of the ledger as a ``Decimal`` and
-    used to be cast to ``float`` here, at the first step — so every total
-    built on top of it was accumulated in binary and rounded by a rule
-    nothing else in the application uses. It becomes a float once, at the
-    edge where the report is built.
+    stays one until the edge where the report is built, so
+    every total on top of it is accumulated in decimal, not in binary floats.
+    It becomes a float once, at that edge.
 
     *hidden_tags* leaves out the records a vertical module claims, for a
     report that sums the whole answer rather than the records it lists.

@@ -158,9 +158,9 @@ def test_a_factory_set_on_the_facade_stops_shadowing_the_live_one(
     forwarding to ``app.database``. A later webhook test pointed
     ``app.database`` at its own engine, reached that pool through the facade
     and failed with "attached to a different loop", on whichever worker the
-    files happened to meet. pytest used to leave such an attribute behind when
-    ``monkeypatch.setattr(..., raising=False)`` was undone over a forwarded
-    name; since 9.2 it does not, so the leftover is set directly here, the way
+    files happened to meet. pytest leaves no such attribute behind when
+    ``monkeypatch.setattr(..., raising=False)`` is undone over a forwarded
+    name, so the leftover is set directly here, the way
     any test that assigns to the facade leaves it.
     """
     left_over = object()

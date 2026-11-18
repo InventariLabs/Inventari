@@ -20,9 +20,9 @@ def _get_type_label(doc_type: str, type_labels: dict[str, str] | None) -> str:
     """The organization's own label for *doc_type*, else its short code.
 
     ``{TYPE_LABEL}`` promises what the profile's label table shows. The
-    table may name some types and skip others, and the skipped one used to
-    print its stored value — a number reading ``INTERNAL_OUT`` beside a
-    screen reading ``II``. The fallback is the same short code ``{TYPE}``
+    table may name some types and skip others, and the skipped one falls back
+    to the short code, so a number never reads ``INTERNAL_OUT`` beside a screen
+    reading ``II``. The fallback is the same short code ``{TYPE}``
     writes, so no path out of here can put an enum name on paper.
     """
     if type_labels and doc_type in type_labels:
@@ -59,12 +59,11 @@ def _extract_seq(number: str, prefix: str) -> int | None:
     int() crash and keeping the next sequence anchored to the highest numeric
     suffix actually in use.
 
-    The number must actually start with the prefix. It used to be cut by the
-    prefix's *length*, so 'PZ/2026/999' read as sequence 999 under the prefix
-    'PO/2026/'. Both callers filter by `LIKE 'prefix%'` in SQL first, which
-    is why nothing has gone wrong — but this function is part of the
-    warehouse module's public API now, and its contract binds callers nobody
-    here can see.
+    The number must actually start with the prefix, not merely have its length:
+    'PZ/2026/999' is not sequence 999 under the prefix 'PO/2026/'. Both callers
+    filter by `LIKE 'prefix%'` in SQL first, and this function is part of the
+    warehouse module's public API, so its contract binds callers nobody here can
+    see.
     """
     if not number.startswith(prefix):
         return None

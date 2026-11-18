@@ -65,7 +65,7 @@ from .storage_lookup_service import get_storage_tree
 # tolerance threshold, not an edit: a count above it holds the whole posting
 # back (409) until the supervisor accepts it with force_over_cap=True, which
 # then writes the counted number as counted. Rewriting the count in silence —
-# what this used to do — leaves a report confirming a number nobody stored.
+# leaves a report confirming a number nobody stored.
 _MAX_GROWTH_FACTOR = 5
 
 
@@ -601,12 +601,10 @@ def calculate_discrepancy_stats(
     """Pure computation of report statistics from a list of counted items.
 
     "A perfect match" means what it says: counted equals the system, exactly.
-    It used to be read off ``is_discrepancy`` — a flag that means "beyond the
-    tolerance, somebody must explain it" — so a row the tolerance excused
-    (2.1 counted against 2.3, −8.7% inside a 10% tolerance) was reported as
-    a perfect match while the correction it produced sat in the ledger.
-    ``is_discrepancy`` keeps its gating job; the report stops reading it as
-    "agrees". A row that differs inside the tolerance is a
+    It is decided by counted quantity against system quantity, never by
+    ``is_discrepancy``, which means "beyond the tolerance, somebody must
+    explain it" and keeps its gating job. A row that differs inside the
+    tolerance (2.1 counted against 2.3, −8.7% inside a 10% tolerance) is a
     ``tolerated_differences`` — accepted without an explanation, still
     counted, never hidden.
     """
@@ -1204,7 +1202,7 @@ async def finalize_stock_take(
         total_items=len(items),
         # What somebody actually counted, not how many rows the count had.
         # A partial count is an ordinary thing — a cycle count is one by
-        # definition — and this page used to say twelve of twelve at a
+        # definition — and this page never says twelve of twelve at a
         # hundred per cent directly above "three not counted".
         counted_items=counted_items,
         # The rows the count just overwrote — the same number the

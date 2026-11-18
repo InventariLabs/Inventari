@@ -4,12 +4,9 @@
 returns nodes. It touches no session and performs no I/O, so nothing here
 needs a database.
 
-The shape half of this file used to live in
-``tests/integration/test_storage_service.py``, where each case took the real
-async session, added its locations and flushed them purely to obtain ids that
-Python assigns anyway (``StorageLocation.id`` is a ``uuid.uuid4`` default, not
-a sequence the server hands out). One of them called ``build_tree([], {})``
-and never touched the session at all, while still paying for the fixture.
+The shape cases need no session: ``StorageLocation.id`` is a ``uuid.uuid4``
+default, not a sequence the server hands out, so no flush is needed to obtain
+ids, and ``build_tree([], {})`` never touches the session at all.
 
 The cycle half pins an older fix: nodes whose parent chain never reached a
 root — a cycle, or a node hanging below one — were silently dropped, so

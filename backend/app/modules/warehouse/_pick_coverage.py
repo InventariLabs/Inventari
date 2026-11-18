@@ -2,10 +2,9 @@
 
 A picking session starts over a confirmed dispatch whatever the shelves hold
 now. Confirmation reserved the stock, but a count, a scrap or a move since
-then can leave the document short, and the picker used to learn it at the
-shelf, one line at a time. This reads the same records the walk will draw
-from and names every line that will come back short, so the person can start
-without those documents or with them anyway.
+then can leave the document short. This reads the same records the walk will
+draw from, before the walk starts, and names every line that will come back
+short, so the person can start without those documents or with them anyway.
 
 What counts as available to a document: the free stock of its product on the
 shelf its lines pick from, the document's own reservation included (it holds

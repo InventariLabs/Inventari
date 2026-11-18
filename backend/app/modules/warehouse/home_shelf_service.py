@@ -192,8 +192,8 @@ async def set_home_shelf_async(
     """Make ``location_id`` the product's home: the head of its own rule.
 
     A product that has a rule of its own keeps it: the new home goes first and
-    the shelves it had follow, so a full home still overflows to where the
-    goods used to go. A product with none gets one.
+    the shelves it had follow, so a full home still overflows to the shelves
+    behind it. A product with none gets one.
     """
     if await core_api.product_templates.get_async(db, org_id, template_id) is None:
         raise ServiceRejectionError('product_template_not_found')

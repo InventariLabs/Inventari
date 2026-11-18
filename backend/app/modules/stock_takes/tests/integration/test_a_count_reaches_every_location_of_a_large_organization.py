@@ -1,9 +1,8 @@
 """A stock take works for any location, however many the organization has.
 
-The lookups behind a count used to read the organization's first 2 000
-locations and search them, so once there were more, a location past that
-point answered "not found" for a shelf that existed and scanned. They now
-read the counted location's subtree and its ancestors only.
+The lookups behind a count read the counted location's subtree and its
+ancestors only, so a location resolves at any position in the organization,
+including past the first 2 000 locations, and a shelf that exists is found.
 """
 
 from __future__ import annotations
@@ -26,7 +25,7 @@ from app.models.user import User
 from app.modules.stock_takes.models import StockTake, StockTakeStatus
 from tests.integration._shelf import post_on_shelf
 
-# Past the cap the lookups used to carry.
+# Above the 2 000 mark, where a capped lookup would stop.
 _BEFORE = 2_050
 
 

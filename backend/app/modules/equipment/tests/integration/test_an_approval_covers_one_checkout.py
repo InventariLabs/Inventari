@@ -1,16 +1,13 @@
 """One approved checkout buys one checkout, not every one from then on.
 
-The gate used to ask only whether the newest request on the asset was
-APPROVED. Nothing marked an approval as spent when the checkout it was
-raised for happened, so the row stayed APPROVED on the table and its
-answer never changed again: check out, check in, check out — the same
-old approval kept the door open, for ever, for anybody. That is the
-opposite of what the approvals module promises anywhere else: a decision
-applies to a pending request, not to everything done after it.
+The gate asks whether an approval covers this checkout. A checkout spends the
+approval it was raised for, so check out, check in and check out again needs a
+new approval. The approvals module works the same way everywhere else: a
+decision applies to a pending request, not to everything done after it.
 
-So a checkout spends the approval it was raised for. The next checkout of
-the same asset needs its own, and the asset card has to say which of the
-two it is looking at — one waiting to be used, or one already used.
+The next checkout of the same asset needs its own approval, and the asset card
+says which of the two it is looking at: one waiting to be used, or one already
+used.
 """
 
 from __future__ import annotations

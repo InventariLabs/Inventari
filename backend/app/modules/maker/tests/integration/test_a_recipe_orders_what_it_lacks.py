@@ -171,7 +171,7 @@ def test_a_second_click_does_not_order_the_same_shortage_again(
     """An open order is what the next click remembers.
 
     Neither click moves stock, so the same shortage is computed both times
-    and the second used to raise an identical draft. The quantity an open
+    and the second must not raise an identical draft. The quantity an open
     order already expects comes off the shortfall, so the second click
     orders nothing and says the ingredient is already on its way.
     """

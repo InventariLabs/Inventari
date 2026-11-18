@@ -114,7 +114,7 @@ class TestARetiredAssetIsRefusedByBothRoutes:
         eq_item: Item,
         db_session: Session,
     ) -> None:
-        """The refusal that mattered: it used to write DEPLOYED over RETIRED."""
+        """The refusal that matters: a checkout must not write DEPLOYED over RETIRED."""
         from app.modules.equipment.models import EquipmentAssignment
 
         _retire(eq_item, db_session)

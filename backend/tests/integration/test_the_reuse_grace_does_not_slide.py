@@ -56,9 +56,8 @@ def _login(client, user) -> str:
 
 
 def _refresh_with(client, cookie: str):
-    # Replace the jar's cookie, not add beside it: the client used to keep one
-    # cookie per name, and the HTTP client Starlette now uses can keep the
-    # login's rotated cookie next to the replay and send both.
+    # Replace the jar's cookie, not add beside it: the HTTP client Starlette uses
+    # can keep the login's rotated cookie next to the replay and send both.
     client.cookies.clear()
     client.cookies.set('refresh_token', cookie)
     return client.post('/api/v1/auth/refresh')
@@ -110,7 +109,7 @@ class TestTheGraceWindowIsAnchored:
         _refresh_with(client, first)
 
         # Two seconds of window left, then replayed twice — which is exactly
-        # the pattern that used to keep the grace alive for ever.
+        # the pattern that would keep the grace alive for ever.
         _age_the_revocation(blacklist_on, first, REFRESH_REUSE_GRACE_SECONDS - 2)
         assert _refresh_with(client, first).status_code == status.HTTP_200_OK
 

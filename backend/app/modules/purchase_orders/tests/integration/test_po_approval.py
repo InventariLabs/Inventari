@@ -227,9 +227,8 @@ class TestPOSettingsAPI:
 
         The user who once set a threshold has to be able to take it back:
         the settings screen sends ``approval_threshold: null`` when the
-        field is emptied, and the API used to read that as "leave
-        unchanged" — the old value survived, and orders above it kept
-        routing to approval with no way to stop it.
+        field is emptied, and the API reads that as clearing the threshold,
+        not as leaving it unchanged.
         """
         _set_settings(client, approval_headers, approval_threshold='500.00')
         resp = client.put(
@@ -284,11 +283,7 @@ class TestPOApprovalFlow:
         approval_headers: dict[str, str],
         approval_template: Any,
     ) -> None:
-        """The supplier is demanded where it can still be added.
-
-        It used to be optional through confirmation and required by the
-        receipt — the one screen with no way to add one.
-        """
+        """The supplier is demanded where it can still be added."""
         created = client.post(
             PO_URL,
             headers=approval_headers,
@@ -319,9 +314,9 @@ class TestPOApprovalFlow:
     ) -> None:
         """Approval required with no workflow → refuse, do not confirm silently.
 
-               This used to confirm the PO and call it graceful degradation, so the
-               setting a manager switched on to control spending did nothing and said
-        nothing. Refusing names the missing piece instead.
+        Confirming anyway would leave the setting a manager switched on to
+        control spending doing nothing and saying nothing. Refusing names the
+        missing piece instead.
         """
         po = _create_po(client, approval_headers, approval_partner, approval_template)
         _set_settings(client, approval_headers, approval_required=True)
@@ -474,7 +469,7 @@ class TestPOApprovalFlow:
         approval_template: Any,
         approval_workflow: None,
     ) -> None:
-        """A total nobody stated used to read as zero and pass under any limit."""
+        """A total nobody stated is unknown, not zero, so it passes no limit."""
         _set_settings(client, approval_headers, approval_threshold='500.00')
         po = _create_po(
             client,
@@ -583,10 +578,8 @@ class TestPOApprovalFlow:
     ) -> None:
         """No road reaches Confirmed past the supplier control.
 
-        Confirm refuses a PO whose supplier is missing; the approval road
-        used to carry such an order from Draft through PENDING_APPROVAL
-        straight into Confirmed — the one road with no way left to fill
-        the supplier in.
+        Confirm refuses a PO whose supplier is missing, and so does the
+        approval road: such an order cannot reach Confirmed.
         """
         _set_settings(client, approval_headers, approval_required=True)
         created = client.post(
@@ -674,10 +667,10 @@ class TestPOApprovalFlow:
         approval_template: Any,
         approval_workflow: None,
     ) -> None:
-        """A withdrawn request used to strand the PO.
+        """A withdrawn request leaves the PO open to a new request.
 
-        Every offered action answered 409: approve and reject found no active
-        request, and request-approval insisted on DRAFT. The PO stays in
+        Approve and reject find no active request once it is withdrawn, and
+        request-approval accepts the PO again. The PO stays in
         PENDING_APPROVAL by design, so asking again has to be allowed.
         """
         po = _create_po(client, approval_headers, approval_partner, approval_template)
@@ -747,7 +740,7 @@ class TestPOApprovalFlow:
         approval_template: Any,
         approval_workflow: None,
     ) -> None:
-        """The approvals queue used to show eight characters of a UUID."""
+        """The approvals queue identifies each order by a readable reference."""
         po = _create_po(
             client,
             approval_headers,
@@ -785,10 +778,9 @@ class TestPOApprovalFlow:
 
         The card's ``total_value`` is documented as the figure the approval
         threshold is compared against. The threshold answers "cannot be
-        known" for an order with an unpriced line; the card used to answer a
-        partial sum — so an approver read "300.00" about an order the rule
-        refused to call below 500, and the two answers looked like a
-        disagreement rather than one fact.
+        known" for an order with an unpriced line, and so does the card: an
+        approver never reads a partial sum such as "300.00" about an order the
+        rule refused to call below 500. The two answers are one fact.
         """
         resp = client.post(
             PO_URL,

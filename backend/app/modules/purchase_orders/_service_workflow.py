@@ -89,9 +89,9 @@ def _po_line_remaining(
 def po_net_total(po: PurchaseOrder) -> Decimal | None:
     """Net total of the order's lines, or ``None`` where it cannot be known.
 
-    ``unit_price`` is nullable, and a line with no price used to count as
-    zero — so the one order whose worth nobody had written down passed
-    under every threshold. Zero and unknown are not the same answer: a
+    ``unit_price`` is nullable, and a line with no price counts as unknown,
+    not zero, so an order whose worth nobody has written down is not waved
+    through under every threshold. Zero and unknown are not the same answer: a
     price of 0.00 is a price, and a missing one is a total that cannot be
     compared with anything. The warehouse module keeps the same distinction
     for its own threshold.
@@ -212,13 +212,9 @@ async def _refuse_unusable_supplier(
     Returns the partner row the caller may name further on (the audit
     snapshot names the supplier as the create entry names them).
 
-    The supplier is required where it can still be filled in. It used
-    to be optional all the way through confirmation and then demanded
-    by the receipt — in the one place with no way to add one, in
-    English, with internal vocabulary ("IN documents require a
-    partner"). The approval road used to skip this control and carry an
-    order with a missing, inactive or non-supplier partner straight
-    into Confirmed.
+    The supplier is required wherever the order can still be filled in. The
+    approval road runs this control too, so an order with a missing, inactive
+    or non-supplier partner cannot reach Confirmed.
     """
     if not po.partner_id:
         raise ServiceRejectionError('po_supplier_required')
@@ -272,10 +268,10 @@ async def confirm_purchase_order(
     # Approval gate: per-org settings decide whether this PO must be
     # parked in PENDING_APPROVAL before it can become CONFIRMED. With no
     # workflow for target_type "purchase_order" the request would have
-    # nowhere to go — and confirming anyway (the old behavior)
-    # turned the whole setting into an ornament: the manager who switched
-    # it on believed purchases were controlled while every PO sailed
-    # through. Refusing names the missing piece instead.
+    # nowhere to go. Confirming anyway would turn the whole setting into an
+    # ornament: the manager who switched it on would believe purchases were
+    # controlled while every PO sailed through. Refusing names the missing
+    # piece instead.
     settings = await get_po_settings(db, org_id)
     approval_required = await _is_approval_required(
         db, org_id, settings, po, requester_id=user_id
@@ -387,10 +383,9 @@ async def cancel_purchase_order(
         if has_received:
             raise ServiceRejectionError('po_cancel_received_quantities')
 
-        # Block cancel when any active (non-terminal) receipt still
-        # references this PO. Previously only DRAFT receipts blocked; a
-        # CONFIRMED (in-progress) receipt would let the PO cancel and later
-        # "resurrect" quantity_received on a cancelled PO.
+        # Block cancel when any active (non-terminal) receipt still references
+        # this PO, DRAFT and CONFIRMED alike: a CONFIRMED receipt left open would
+        # let the PO cancel and later "resurrect" quantity_received on it.
         linked_receipts = await list_linked_receipts(db, po.id, org_id)
         open_receipts = [
             r

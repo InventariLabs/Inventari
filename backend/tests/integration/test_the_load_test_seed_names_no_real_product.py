@@ -70,7 +70,7 @@ def test_every_pooled_barcode_is_a_restricted_circulation_ean() -> None:
 
 
 def test_names_and_brands_are_plain_english_text() -> None:
-    # The pools used to be Polish product names; English names are what the
+    # The pools are English product names, because English names are what the
     # k6 searches look for.
     not_plain = [
         (name, brand)
@@ -89,7 +89,7 @@ def test_the_seed_fills_an_organization_with_these_products_only(
     db_session: Session, test_household: Organization, test_user: User
 ) -> None:
     # 120 items from 83 products repeat some of them, and an organization
-    # holds one active item per barcode: this seed used to stop there.
+    # holds one active item per barcode, so a repeat must not add a second.
     created = seed.seed_org_data(db_session, test_household.id, 120)
     db_session.flush()
 

@@ -1,9 +1,9 @@
 """The QA fixture makes administrators with a password printed in this repository.
 
 So the question is where it agrees to run, and the answer has to fail closed.
-It used to refuse only when ``INVENTARI_ENV`` said production — a variable the
-production compose never sets, so a real install read as ``development`` and
-the command ran. The settings that production does set are the ones to ask:
+It asks the settings that production does set, not ``INVENTARI_ENV``, which the
+production compose never sets: a real install must not read as ``development``
+and run the command. The settings to ask are:
 ``DEBUG`` is off there, and so is ``TESTING``.
 
 Three answers are tested apart because each is a different mistake:

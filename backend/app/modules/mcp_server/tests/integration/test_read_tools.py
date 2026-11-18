@@ -261,8 +261,8 @@ class TestStockAndLots:
     ) -> None:
         """The answer names the total and that limit cut it, not only the page.
 
-        It used to read the whole quant list and slice it silently: a caller
-        with 200 rows and limit 1 had no way to know 199 were missing.
+        The total is counted over the whole quant list, so a caller with 200 rows and
+        limit 1 can see that 199 are missing.
         """
         from app.models.product_template import ProductTemplate
 

@@ -1,14 +1,13 @@
-"""Two accounts the demo seed used to write without the thing behind them.
+"""Two accounts the demo seed writes come with the thing behind them.
 
 A confirmed dispatch holds the stock it will take: Confirm reserves it, and
 the stock screen reads "Available" as what is on hand minus those holds. The
-seed wrote its dispatches already confirmed and held nothing, so Available
-equalled On hand for goods two open dispatches were about to take.
+dispatches are seeded confirmed and holding their stock, so Available is what
+is on hand less what open dispatches are about to take.
 
 An order line's received quantity is recounted from the completed receipts
-that name it each time one completes. The seed wrote "3 received" on the
-half delivered order with no receipt, so the first real receipt turned the
-3 of 5 into whatever it brought.
+that name it each time one completes, so a line marked as received must have
+those receipts behind it.
 """
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 """What the log has to say when a model's answer is not usable.
 
-The line it used to leave was::
+The line it writes is::
 
     LLM answer unusable after 2 attempt(s): LLM did not return JSON.
     Answer began: ''

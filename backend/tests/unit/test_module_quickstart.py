@@ -133,8 +133,8 @@ _RUN_BY_THE_COMMIT_HOOK = {
 def test_the_quickstart_does_not_say_the_commit_hook_skips_what_it_runs():
     """Step 7 sends the author to `make lint` for what the hook leaves out.
 
-    It once listed ruff and the architecture lint there while the next
-    paragraph said the hook runs both — the hook's coverage is the one fact in
+    It must not list ruff and the architecture lint there while the next
+    paragraph says the hook runs both — the hook's coverage is the one fact in
     that step the reader cannot check from the page.
     """
     repo = Path(os.environ.get('INVENTARI_REPO_ROOT', Path(__file__).parents[3]))

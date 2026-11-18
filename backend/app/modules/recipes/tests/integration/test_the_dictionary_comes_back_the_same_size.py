@@ -1,10 +1,9 @@
 """The ingredient dictionary comes back the same size it left.
 
 Export writes the organization's view — system rows and its own overrides.
-Import used to make an override for every row it read, system rows
-included, so the cheapest way to fix two values in a spreadsheet doubled
-the list: every ingredient once as the system's and once as a "Custom"
-copy with the same numbers, and from then on the copy applied.
+Import does not make an override for every row it reads, system rows
+included: fixing two values in a spreadsheet must not double the list with a
+"Custom" copy of every ingredient carrying the same numbers.
 """
 
 import csv

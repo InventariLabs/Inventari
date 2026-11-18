@@ -1,9 +1,9 @@
 """A status refusal reaches a Polish reader in Polish.
 
-The transition refusal used to be bare ``ValueError`` prose — English no
-matter which language the interface was set to. It carries a catalog key
-now (``ServiceRejectionError``), so the 400 envelope arrives translated and
-stamped with the language it actually speaks.
+The transition refusal carries a catalog key (``ServiceRejectionError``), not
+bare ``ValueError`` prose in English whatever the interface language, so the
+400 envelope arrives translated and stamped with the language it actually
+speaks.
 
 The refusal is a reachable screen, not a dead path: the counting page
 renders Cancel while the take is in_progress, and a second operator can

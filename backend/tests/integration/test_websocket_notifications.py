@@ -69,8 +69,8 @@ class TestWebSocketEndpoint:
     ) -> None:
         """A token in the query string lands in every access log on the way.
 
-        The socket used to take it there; a client that still does is refused,
-        so the address never becomes a way in again.
+        The socket does not take it there; a client that still sends one is refused,
+        so the address never becomes a way in.
         """
         from starlette.websockets import WebSocketDisconnect
 

@@ -5,7 +5,7 @@ limits on one shelf never add up: 40 bags of rice and 50 kg of plums are
 not 90 of anything. What does add up is each product's share of the room
 it was given. 20 bags of rice is half of the rice room, 25 kg of plums half
 of the plum room, and a shelf holding both is full: 0.5 + 0.5. The planner
-used to ask one product at a time and kept sending goods to that shelf.
+reads the shelf's fill across every product at once, so a full shelf takes no more goods.
 
 The putaway planner, the occupancy read and every screen that draws a fill
 go through ``shelf_fill``; none of them computes a percentage of its own, so

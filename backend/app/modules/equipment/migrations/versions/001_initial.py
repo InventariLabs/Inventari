@@ -3,8 +3,7 @@
 Initial migration for the equipment module, extracted from core baseline_001
 as part of the module migration isolation effort.
 
-These six tables were previously created by the consolidated
-``baseline_001_full_schema.py``. They now belong to the equipment module so
+These six tables belong to the equipment module so
 ``module enable equipment`` / ``module disable equipment`` can manage them
 independently via ``alembic_version_equipment``.
 

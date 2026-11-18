@@ -2,10 +2,10 @@
 
 A location's fields are its own plus those of every location above it — a
 field set on a warehouse applies to each shelf inside. The form asks for
-them; the import used to know only its fixed system columns, so a sheet
-carrying "Supplier" saved every product with no supplier and reported no
-failure. A mapped field column now lands in the product's metadata wherever
-the row's location has that field, typed the way the form stores it.
+them; the import reads the fields the row's location asks for, so a sheet
+carrying "Supplier" saves the supplier with each product. A mapped field column
+lands in the product's metadata wherever the row's location has that field,
+typed the way the form stores it.
 """
 
 import pandas as pd
@@ -222,7 +222,7 @@ class TestAnImportFillsTheFieldsItsLocationAsksFor:
         self, real_async_db_session, async_test_user, async_test_storage_type
     ):
         """The form refuses a product its location's required field leaves
-        empty; the import used to skip the field and create it anyway."""
+        empty, and the import refuses such a row the same way."""
         db = real_async_db_session
         await _location(
             db,

@@ -1,17 +1,8 @@
 """The scanner and the panel answer the same question about the same document.
 
-They used to answer different ones. Starting a WMS session refused whenever
-the organization had an active approval workflow for documents, whatever the
-profile said; completing the document asked the profile. In an organization
-that had configured *who* signs off but never said *what* needs signing off,
-the warehouse terminal refused every document while the panel beside it
-completed those same documents — with no approval request anywhere in the
-database.
-
-Two corrections, in order. The two scanning directions were made to agree
-with each other, and then all three were made to agree on the rule itself —
-which the next review split again, because "a workflow alone gates" had
-quietly become "a workflow overrides the profile". The rule the settings
+Starting a WMS session and completing a document answer from one rule, never
+two. The profile says *what* needs signing off, and the workflow says *who*
+signs off; a workflow alone does not override the profile. The rule the settings
 screens promise is the one here: the profile says *what* needs signing off
 (a listed type, or a value over the threshold), the workflow says *who*
 approves, and the workflow stands in for the profile only while the profile
@@ -199,8 +190,7 @@ class TestAWorkflowAloneDemandsApproval:
 
     The profile can say *what* needs signing off. An organization that
     configured *who* signs off and listed nothing has said "everything", and
-    it used to say nothing at all: documents confirmed and executed with no
-    request anywhere. The moment the profile names a threshold or a type,
+    every confirmed document waits for a request. The moment the profile names a threshold or a type,
     that is the filter — see ``TestAProfileThatSpeaksIsTheFilter``.
     """
 
@@ -494,11 +484,10 @@ class TestTheProfileClosesBothDoorsTogether:
 class TestTheDialogIsToldTheSameAnswerTheConfirmWillActOn:
     """The sentence beside the button, asked a step before the button.
 
-    The page used to answer this itself from the workflow list and the
-    profile, which was a second definition of the rule — and one that could
-    name a consequence confirmation would not carry out. The endpoint asks
-    the rule the confirmation asks, about the document a draft is about to
-    become, and the page reads that answer.
+    The page reads the answer from the endpoint, which asks the rule the
+    confirmation asks, about the document a draft is about to become — one
+    definition of the rule, so the sentence names only what confirmation will
+    carry out.
     """
 
     def test_a_draft_under_an_active_workflow_is_told_it_will_wait(
@@ -595,13 +584,11 @@ class TestTheDialogIsToldTheSameAnswerTheConfirmWillActOn:
 class TestAProfileThatSpeaksIsTheFilter:
     """The workflow answers *who*; the profile answers *what*.
 
-    An active workflow used to demand approval for every confirmed document
-    whatever the profile said, so a threshold of 100 and a workflow together
-    parked a receipt worth 2.20 — the screen promised "documents above this
-    value", and the threshold filtered anything only in a state with no
-    workflow, where the document it did filter was refused instead. The type
-    list read the same way: a workflow made "never approve OUT" and "always
-    approve OUT" mean the same thing.
+    With a threshold or a type set, the profile is the filter: an active workflow
+    does not demand approval for every confirmed document. A threshold of 100
+    lets a receipt worth 2.20 through, as the screen promises "documents above
+    this value", and the type list is read as a filter too, so "never approve
+    OUT" and "always approve OUT" differ.
     """
 
     def test_a_value_under_the_threshold_confirms_with_a_workflow(

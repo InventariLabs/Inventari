@@ -628,8 +628,8 @@ class TestPurchaseOrdersAPIPricelist:
     ) -> None:
         """EUR 4.00 is not "cheaper" than 5.00 in the house currency.
 
-        The list used to be one sort by the bare number, so a quote in another
-        currency stood above the house's own on the strength of its digits.
+        The list compares quotes in the house currency, so a quote in another
+        currency cannot stand above the house's own on the strength of its digits.
         """
         db = real_async_db_session
         template = ProductTemplate(

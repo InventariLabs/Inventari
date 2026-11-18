@@ -143,7 +143,7 @@ class CorePartnersAPI:
         *,
         user_id: uuid.UUID | None = None,
     ) -> PartnerDTO | None:
-        """Reactivate a previously deactivated partner. Returns None if not found.
+        """Reactivate a deactivated partner. Returns None if not found.
 
         Flushes; caller commits. Emits PARTNER_ACTIVATED event via service
         and journals the change under *user_id*.

@@ -1,8 +1,7 @@
 """One picking session walks several confirmed dispatches, and lets each go on its own.
 
-A picker with three small orders on the board used to walk the warehouse
-three times: a session held exactly one document. A session can now be
-started over several dispatches at once — one walk, its lines from all of
+A picker with three small orders on the board walks the warehouse once: a
+session can span several dispatches at once — one walk, its lines from all of
 them in pick-path order — and each dispatch is done with the session the
 moment its own lines are answered: it can be completed while the others are
 still being picked, and a shortage on one marks that one alone.
