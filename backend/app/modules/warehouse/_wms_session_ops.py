@@ -293,7 +293,12 @@ async def confirm_short_async(
 
     _refuse_a_shortfall_nobody_chose(direction, line, quantity, discrepancy_code)
 
-    over_expected = is_surplus(doc_line, quantity, line.expected_quantity)
+    over_expected = is_surplus(
+        doc_line,
+        quantity,
+        line.expected_quantity,
+        receiving=direction.kind == RECEIVING.kind,
+    )
     if over_expected:
         if may_exceed_over_receipt is None:
             raise ServiceRejectionError('wms_quantity_above_expected')
