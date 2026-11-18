@@ -1009,7 +1009,8 @@
       "undo_failed": "Nie udało się cofnąć linii.",
       "complete_failed": "Nie udało się zakończyć sesji kompletacji.",
       "cancel_failed": "Nie udało się anulować sesji kompletacji.",
-      "session_held": "{{owner}} ma aktywną sesję kompletacji w tym dokumencie. Przejmij ją, by kontynuować od jej skanów, albo odrzuć jej skany i zacznij od nowa."
+      "session_held": "{{owner}} ma aktywną sesję kompletacji w tym dokumencie. Przejmij ją, by kontynuować od jej skanów, albo odrzuć jej skany i zacznij od nowa.",
+      "session_own": "Ten dokument jest już otwarty w Twojej własnej sesji — na innym urządzeniu lub w innym zaznaczeniu. Kontynuuj tę sesję albo odrzuć jej skany."
     },
     "lot": "Partia: {{name}}",
     "expires": "Ważne do {{date}}",
@@ -1544,6 +1545,7 @@
     "closeTitle": "Odrzucić skany tej sesji?",
     "closeMessage": "Odrzucenie cofa każde skanowanie zapisane w sesji. Tego nie można cofnąć.",
     "takeOver": "Przejmij sesję użytkownika {{owner}} i kontynuuj",
+    "continueOwn": "Kontynuuj tę sesję",
     "discardAndStart": "Odrzuć skany użytkownika {{owner}} i zacznij od nowa",
     "closeConfirm": "Odrzuć skany",
     "closeFailed": "Nie udało się zamknąć sesji.",

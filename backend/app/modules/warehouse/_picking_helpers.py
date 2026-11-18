@@ -38,6 +38,7 @@ from ._wms_line_utils import (  # noqa: F401  (re-exported for existing importer
 from ._wms_session_access import _holder_name_async
 from ._wms_session_close import journal_session_async, lot_covers_async
 from ._wms_session_ops import (
+    SessionHeldByOtherUserError,
     get_session_async,
     list_sessions_for_document_async,
     load_document_async,
@@ -149,10 +150,13 @@ async def start_pick_session_over_documents_async(
 
     if held:
         doc, open_session = held[0]
-        raise ServiceRejectionError(
+        raise SessionHeldByOtherUserError(
+            open_session.id,
+            await _holder_name_async(db, org_id, open_session.assigned_to),
             'wms_pick_document_in_session',
+            document_id=doc.id,
+            mine=open_session.assigned_to == user_id,
             number=doc.number,
-            owner=await _holder_name_async(db, org_id, open_session.assigned_to),
         )
 
     session = await open_session_async(

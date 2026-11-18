@@ -923,7 +923,8 @@
       "undo_failed": "No se pudo revertir la línea.",
       "complete_failed": "No se pudo completar la sesión de picking.",
       "cancel_failed": "No se pudo cancelar la sesión de picking.",
-      "session_held": "{{owner}} tiene una sesión de picking activa en este documento. Asúmala para continuar con sus escaneos, o descarte sus escaneos y empiece de nuevo."
+      "session_held": "{{owner}} tiene una sesión de picking activa en este documento. Asúmala para continuar con sus escaneos, o descarte sus escaneos y empiece de nuevo.",
+      "session_own": "Este documento ya está abierto en su propia sesión, en otro dispositivo o en otra selección. Continúe esa sesión o descarte sus escaneos."
     },
     "lot": "Lote: {{name}}",
     "expires": "Caduca el {{date}}",
@@ -1430,6 +1431,7 @@
     "closeTitle": "¿Descartar los escaneos de esta sesión?",
     "closeMessage": "Al descartarla se revierte cada escaneo registrado en la sesión. Esto no se puede deshacer.",
     "takeOver": "Asumir la sesión de {{owner}} y continuar",
+    "continueOwn": "Continuar esa sesión",
     "discardAndStart": "Descartar los escaneos de {{owner}} y empezar de nuevo",
     "closeConfirm": "Descartar los escaneos",
     "closeFailed": "No se pudo cerrar la sesión.",

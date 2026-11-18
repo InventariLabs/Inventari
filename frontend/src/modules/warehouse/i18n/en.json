@@ -923,7 +923,8 @@
       "undo_failed": "Failed to revert the line.",
       "complete_failed": "Failed to complete the picking session.",
       "cancel_failed": "Failed to cancel the picking session.",
-      "session_held": "{{owner}} has an active picking session on this document. Take it over to carry on from their scans, or discard their scans and start afresh."
+      "session_held": "{{owner}} has an active picking session on this document. Take it over to carry on from their scans, or discard their scans and start afresh.",
+      "session_own": "This document is already open in your own session — on another device or another selection. Continue that session, or discard its scans."
     },
     "lot": "Lot: {{name}}",
     "expires": "Expires {{date}}",
@@ -1430,6 +1431,7 @@
     "closeTitle": "Discard the scans of this session?",
     "closeMessage": "Discarding puts back every scan recorded in the session. This cannot be undone.",
     "takeOver": "Take over {{owner}}'s session and continue",
+    "continueOwn": "Continue that session",
     "discardAndStart": "Discard {{owner}}'s scans and start over",
     "closeConfirm": "Discard scans",
     "closeFailed": "The session could not be closed.",

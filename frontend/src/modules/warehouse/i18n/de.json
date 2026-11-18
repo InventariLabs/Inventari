@@ -923,7 +923,8 @@
       "undo_failed": "Die Position konnte nicht zurückgesetzt werden.",
       "complete_failed": "Die Kommissionierung konnte nicht abgeschlossen werden.",
       "cancel_failed": "Die Kommissionierung konnte nicht abgebrochen werden.",
-      "session_held": "{{owner}} hat eine aktive Kommissionier-Sitzung für dieses Dokument. Übernehmen Sie sie, um mit den bisherigen Scans weiterzumachen, oder verwerfen Sie die Scans und beginnen Sie neu."
+      "session_held": "{{owner}} hat eine aktive Kommissionier-Sitzung für dieses Dokument. Übernehmen Sie sie, um mit den bisherigen Scans weiterzumachen, oder verwerfen Sie die Scans und beginnen Sie neu.",
+      "session_own": "Dieses Dokument ist bereits in Ihrer eigenen Sitzung geöffnet – auf einem anderen Gerät oder in einer anderen Auswahl. Setzen Sie diese Sitzung fort oder verwerfen Sie ihre Scans."
     },
     "lot": "Charge: {{name}}",
     "expires": "Haltbar bis {{date}}",
@@ -1430,6 +1431,7 @@
     "closeTitle": "Die Scans dieser Sitzung verwerfen?",
     "closeMessage": "Beim Verwerfen werden alle in der Sitzung erfassten Scans zurückgesetzt. Das lässt sich nicht rückgängig machen.",
     "takeOver": "Sitzung von {{owner}} übernehmen und fortsetzen",
+    "continueOwn": "Diese Sitzung fortsetzen",
     "discardAndStart": "Scans von {{owner}} verwerfen und neu beginnen",
     "closeConfirm": "Scans verwerfen",
     "closeFailed": "Die Sitzung konnte nicht geschlossen werden.",

@@ -323,13 +323,18 @@ export function useWmsSession<
   ).length;
 
   /**
-   * The held session behind a SESSION_HELD_BY_OTHER_USER refusal: the id
-   * the release calls and the holder's name the dialog shows. Null for any
-   * other failure, and for a refusal that arrived without the detail
-   * envelope — nothing to release, nothing to name.
+   * The held session behind a SESSION_HELD_BY_OTHER_USER or SESSION_HELD_BY_YOU
+   * refusal: the id the release calls, the holder's name the dialog shows, and
+   * the document the doors address it through — a start over several
+   * documents names the held one, which may not be the first. `own` says the
+   * session is the caller's, so the dialog offers to continue it rather than
+   * take it over. Null for any other failure, and for a refusal that arrived
+   * without the detail envelope — nothing to release, nothing to name.
    */
   const heldSessionId =
-    errorCode === "SESSION_HELD_BY_OTHER_USER" && startError !== null
+    (errorCode === "SESSION_HELD_BY_OTHER_USER" ||
+      errorCode === "SESSION_HELD_BY_YOU") &&
+    startError !== null
       ? extractApiErrorField(startError, "held_session_id")
       : null;
   const heldSession = useMemo(
@@ -338,9 +343,13 @@ export function useWmsSession<
         ? {
             id: heldSessionId,
             holderName: extractApiErrorField(startError, "held_by") ?? "",
+            documentId:
+              extractApiErrorField(startError, "held_document_id") ??
+              documentId,
+            own: errorCode === "SESSION_HELD_BY_YOU",
           }
         : null,
-    [heldSessionId, startError],
+    [heldSessionId, startError, errorCode, documentId],
   );
 
   /**
@@ -351,12 +360,12 @@ export function useWmsSession<
   const releaseHeldSession = useCallback(async (): Promise<unknown | null> => {
     if (heldSession === null) return null;
     try {
-      await transport.release(documentId, heldSession.id);
+      await transport.release(heldSession.documentId, heldSession.id);
       return null;
     } catch (e) {
       return e;
     }
-  }, [heldSession, documentId, transport]);
+  }, [heldSession, transport]);
 
   /**
    * Take the held session over, scans and all. Resolves null when it worked
@@ -366,12 +375,12 @@ export function useWmsSession<
   const takeOverHeldSession = useCallback(async (): Promise<unknown | null> => {
     if (heldSession === null) return null;
     try {
-      await transport.takeOver(documentId, heldSession.id);
+      await transport.takeOver(heldSession.documentId, heldSession.id);
       return null;
     } catch (e) {
       return e;
     }
-  }, [heldSession, documentId, transport]);
+  }, [heldSession, transport]);
 
   return {
     state,

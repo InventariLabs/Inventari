@@ -95,10 +95,20 @@ class SessionHeldByOtherUserError(ServiceRejectionError):
         session_id: UUID,
         owner: str,
         key: str = 'wms_session_held_by_other_user',
+        *,
+        document_id: UUID | None = None,
+        mine: bool = False,
+        **params: Any,
     ) -> None:
         self.session_id = session_id
         self.owner = owner
-        super().__init__(key, owner=owner)
+        # A document of the session, when the caller asked over several: the
+        # take-over and release doors address the session through one of its
+        # documents, and the first of the selection may not be among them.
+        self.document_id = document_id
+        # The holder is the caller: the same refusal, worded as theirs.
+        self.mine = mine
+        super().__init__(key, owner=owner, **params)
 
 
 async def _line_document_async(db: AsyncSession, line: WmsPickLine) -> Document | None:

@@ -223,18 +223,22 @@ class TestStartingOverSeveralDispatches:
         assert 'not confirmed' in resp.text
         assert _sessions_holding(db_session, ready) == 0
 
-    def test_a_dispatch_already_in_a_session_refuses_the_whole_start(
+    def test_a_dispatch_in_the_callers_own_session_refuses_and_names_that_session(
         self,
         client: TestClient,
         db_session: Session,
         async_engine_fixture: AsyncEngine,
         doc_org: Organization,
-        doc_user: User,
         doc_auth_headers: dict[str, str],
         doc_partner: Partner,
         doc_template: ProductTemplate,
         shelves: list[StorageLocation],
     ) -> None:
+        """A document is picked in one session at a time, the caller's own included.
+
+        The refusal says the session is the caller's and carries the session
+        and a document in it, so the screen can continue or discard it.
+        """
         record = sow(
             db_session, async_engine_fixture, doc_org, doc_template, shelves[0].id, 10
         )
@@ -246,13 +250,54 @@ class TestStartingOverSeveralDispatches:
         )
         assert held.status_code == status.HTTP_201_CREATED
 
-        # The caller's own session counts too: a document is picked in one
-        # session at a time.
         resp = _start(client, doc_auth_headers, ready, busy)
 
-        assert resp.status_code == status.HTTP_400_BAD_REQUEST, resp.text
-        assert busy['number'] in resp.text
-        assert cast(str, doc_user.full_name) in resp.text
+        assert resp.status_code == status.HTTP_409_CONFLICT, resp.text
+        detail = resp.json()['detail']
+        assert detail['code'] == 'SESSION_HELD_BY_YOU'
+        assert detail['held_session_id'] == held.json()['id']
+        assert detail['held_document_id'] == busy['id']
+        assert busy['number'] in detail['message']
+        assert _sessions_holding(db_session, ready) == 0
+
+    def test_a_dispatch_in_another_users_session_refuses_with_a_way_out(
+        self,
+        client: TestClient,
+        db_session: Session,
+        async_engine_fixture: AsyncEngine,
+        h: ModuleTestHelper,
+        doc_org: Organization,
+        doc_user: User,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_template: ProductTemplate,
+        shelves: list[StorageLocation],
+    ) -> None:
+        """The refusal carries what the take-over and release doors take.
+
+        Both doors address a session through one of its documents, so the
+        refusal names the held one — not the first of the selection.
+        """
+        record = sow(
+            db_session, async_engine_fixture, doc_org, doc_template, shelves[0].id, 10
+        )
+        ready = _dispatch(client, doc_auth_headers, doc_partner, shelves[0], record, 1)
+        busy = _dispatch(client, doc_auth_headers, doc_partner, shelves[0], record, 1)
+        held = client.post(
+            f'/api/v1/warehouse/documents/{busy["id"]}/picking/start',
+            headers=doc_auth_headers,
+        )
+        assert held.status_code == status.HTTP_201_CREATED
+        other = h.get_auth_headers(h.create_user(doc_org, email='picker2@example.com'))
+
+        resp = _start(client, other, ready, busy)
+
+        assert resp.status_code == status.HTTP_409_CONFLICT, resp.text
+        detail = resp.json()['detail']
+        assert detail['code'] == 'SESSION_HELD_BY_OTHER_USER'
+        assert detail['held_session_id'] == held.json()['id']
+        assert detail['held_document_id'] == busy['id']
+        assert detail['held_by'] == doc_user.full_name
         assert _sessions_holding(db_session, ready) == 0
 
     def test_a_session_left_open_midway_is_handed_back_over_the_same_dispatches(
