@@ -438,6 +438,12 @@ says what the release does rather than what changed since them.
   mark is refused instead of being saved as an empty name that excludes
   nothing, and the next such name no longer answers that the exclusion
   already exists.
+- The ingredient dictionary refuses a name made only of invisible characters
+  (a zero-width space, a byte order mark) instead of filing it under the empty
+  key every blank row shares, and counts such a row as an error on import. A
+  CSV that starts with a byte order mark (Excel's *CSV UTF-8*, comma-separated)
+  imports its rows rather than being refused as unreadable, and the add form answers a name of only spaces with its own
+  "Name and kcal are required" message instead of a request to the server.
 
 ### Removed
 

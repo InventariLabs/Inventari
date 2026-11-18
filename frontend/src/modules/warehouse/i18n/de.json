@@ -1515,6 +1515,7 @@
     "sectionTitle": "Kosten, die kein Produkt erreicht haben",
     "sectionSubtitle": "Ein Kostenbetrag, der nach der Buchung des Wareneingangs eintrifft, lässt sich nicht mehr auf die Ware verteilen — ein Teil kann bereits weg sein. Erfassen Sie ihn stattdessen hier: Er wird mit Grund aufgeführt und wird nie Teil des Lagerwerts.",
     "reasonLabel": "Grund",
+    "dayLabel": "Zugehöriger Tag",
     "record": "Als Abweichung erfassen",
     "addFailed": "Die Abweichung konnte nicht erfasst werden.",
     "removeLabel": "Diese Abweichung entfernen",

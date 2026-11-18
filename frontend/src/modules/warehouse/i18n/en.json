@@ -1515,6 +1515,7 @@
     "sectionTitle": "Costs that reached no product",
     "sectionSubtitle": "A cost that arrives after the receipt is posted cannot be spread over the goods — some of them may be gone. Record it here instead: it is kept with its reason and listed, and it never becomes part of the stock value.",
     "reasonLabel": "Reason",
+    "dayLabel": "Day it belongs to",
     "record": "Record as variance",
     "addFailed": "The variance could not be recorded.",
     "removeLabel": "Remove this variance",

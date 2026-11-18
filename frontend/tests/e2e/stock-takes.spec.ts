@@ -52,6 +52,14 @@ test.describe("Stock Takes — inventory counting flow", () => {
     }
   });
 
+  // The count this describe seeded, opened by id: the list links every take
+  // that is not completed to its counting screen, cancelled ones included,
+  // and a parallel test may have just cancelled the first one in it.
+  function countingPath(): string {
+    expect(seedStockTakeId, "a stock take was seeded to count").toBeTruthy();
+    return `/inventory/stock-takes/${seedStockTakeId}/counting`;
+  }
+
   test.beforeEach(async ({ page, authenticatedPage }) => {
     await page.goto("/inventory/stock-takes");
     await page
@@ -112,12 +120,7 @@ test.describe("Stock Takes — inventory counting flow", () => {
     page,
     authenticatedPage,
   }) => {
-    const countingLink = page.locator('a[href*="/counting"]').first();
-    await expect(countingLink).toBeVisible({ timeout: 10000 });
-    const href = await countingLink.getAttribute("href");
-    expect(href).toBeTruthy();
-
-    await page.goto(href!);
+    await page.goto(countingPath());
     await page
       .waitForLoadState("networkidle", { timeout: 15000 })
       .catch(() => {});
@@ -132,11 +135,7 @@ test.describe("Stock Takes — inventory counting flow", () => {
     page,
     authenticatedPage,
   }) => {
-    const countingLink = page.locator('a[href*="/counting"]').first();
-    await expect(countingLink).toBeVisible({ timeout: 5000 });
-    const href = await countingLink.getAttribute("href");
-    expect(href, "the counting link carries an href").toBeTruthy();
-    await page.goto(href);
+    await page.goto(countingPath());
     await page
       .waitForLoadState("networkidle", { timeout: 15000 })
       .catch(() => {});
@@ -150,11 +149,7 @@ test.describe("Stock Takes — inventory counting flow", () => {
     page,
     authenticatedPage,
   }) => {
-    const countingLink = page.locator('a[href*="/counting"]').first();
-    await expect(countingLink).toBeVisible({ timeout: 5000 });
-    const href = await countingLink.getAttribute("href");
-    expect(href, "the counting link carries an href").toBeTruthy();
-    await page.goto(href);
+    await page.goto(countingPath());
     await page
       .waitForLoadState("networkidle", { timeout: 15000 })
       .catch(() => {});
