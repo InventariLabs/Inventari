@@ -345,6 +345,16 @@ class ProductionOrder(Base):
         ForeignKey('items.id', ondelete='SET NULL'),
         nullable=True,
     )
+    #: The cost layer the run's output opened, when it was completed in one
+    #: step: what the goods put on the shelf are worth. Undoing the run takes
+    #: them off at that layer, not at whichever layer of the product is
+    #: oldest — those differ as soon as the product was made more than once
+    #: at different costs. NULL on a run filled in portions (each portion
+    #: keeps its own layer) and on runs that closed before it was kept.
+    output_layer_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey('stock_valuation_layers.id', ondelete='SET NULL'),
+        nullable=True,
+    )
     # Whether the planned consumption already exceeded stock at creation —
     # recomputed when a draft's planned_qty changes. The refusal dialog used
     # to invent history ("ran out since the draft was created") for an order

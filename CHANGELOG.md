@@ -279,6 +279,12 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Undoing a production run no longer changes what the stock is worth. The
+  output leaves the books at the value its own run put in, instead of at the
+  product's oldest cost layer, which can belong to an earlier run made at a
+  different cost; each batch of a run filled in portions leaves at its own
+  value too. Undoing a run used to leave every quantity back as it was while
+  the total fell or rose by the difference between the two runs' costs.
 - *Stock on a date* and *Value movement* now cut a day where the organization
   lives, not at midnight UTC. A receipt booked at half past midnight local time
   used to sit in the opening value of its own day, the note about where the
