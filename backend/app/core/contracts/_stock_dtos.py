@@ -182,6 +182,10 @@ class RecordPostDTO(BaseModel):
     new_quantity: Decimal
     history: dict[str, Any] | None = None
     source_document_id: UUID | None = None
+    #: A record the movement leaves with nothing is filed under the Consumed
+    #: place, like one used up by hand (a run's reversal taking its output
+    #: back). A document's correction leaves its record where it stands.
+    file_when_emptied: bool = False
 
 
 class ItemHistoryDTO(BaseModel):
