@@ -678,4 +678,75 @@ describe("StockTakeReportPage — quantities carry their unit, the file its proo
       vi.unstubAllGlobals();
     }
   });
+
+  it("tells two rows of one product on one shelf apart, on the page and in the file", async () => {
+    const user = userEvent.setup();
+    const cable = {
+      item_name: "USB-C cable",
+      item_id: "cab",
+      location_id: "dock",
+      shelf_location: "Warehouse > Dock",
+      notes: null,
+      is_discrepancy: 1,
+      system_quantity: 3,
+      counted_quantity: 2,
+      difference: -1,
+    };
+    const lots = [
+      {
+        ...cable,
+        id: "a",
+        expiry_date: "2027-03-01",
+        record_added_at: "2026-01-05T09:00:00Z",
+      },
+      {
+        ...cable,
+        id: "b",
+        expiry_date: "2027-06-01",
+        record_added_at: "2026-01-05T10:00:00Z",
+      },
+    ];
+    server.use(
+      http.get("/api/v1/stock-takes/st-1/report", () =>
+        HttpResponse.json({
+          ...mockReport,
+          all_items: lots,
+          discrepancy_items: lots,
+          tolerated_items: [],
+        }),
+      ),
+    );
+    let captured = "";
+    class BlobSpy extends Blob {
+      constructor(parts: BlobPart[], options?: BlobPropertyBag) {
+        super(parts, options);
+        captured += (parts ?? []).map(String).join("");
+      }
+    }
+    vi.stubGlobal("Blob", BlobSpy);
+    vi.stubGlobal(
+      "URL",
+      Object.assign(URL, {
+        createObjectURL: vi.fn(() => "blob:report"),
+        revokeObjectURL: vi.fn(),
+      }),
+    );
+
+    try {
+      renderPage();
+      expect(await screen.findByText(/expires Mar 1, 2027/)).toBeVisible();
+      expect(screen.getByText(/expires Jun 1, 2027/)).toBeVisible();
+
+      await user.click(screen.getByRole("button", { name: "Export CSV" }));
+      const rows = captured
+        .split("\n")
+        .slice(1)
+        .filter((line) => line.includes("USB-C cable"));
+      expect(rows).toHaveLength(2);
+      expect(rows[0]).toContain("expires Mar 1, 2027");
+      expect(rows[1]).toContain("expires Jun 1, 2027");
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });

@@ -26925,6 +26925,10 @@ export interface components {
             uom_rounding?: string | null;
             /** Difference */
             difference?: string | null;
+            /** Expiry Date */
+            expiry_date?: string | null;
+            /** Record Added At */
+            record_added_at?: string | null;
         };
         /**
          * StockTakeReport
