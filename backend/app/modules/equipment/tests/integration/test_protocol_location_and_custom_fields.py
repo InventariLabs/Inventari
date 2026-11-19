@@ -28,9 +28,9 @@ from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from jinja2.exceptions import SecurityError as JinjaSecurityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.exceptions import ServiceRejectionError
 from app.core.public_api import core_api
 from app.core.testing import ModuleTestHelper
 from app.models.category import Category
@@ -371,8 +371,9 @@ class TestTheAccessorReachesNoObjects:
         )
         assert 'dict' not in quiet and 'class' not in quiet and 'object' not in quiet
 
-        # Escaping through the dunder is refused the moment it would run.
-        with pytest.raises(JinjaSecurityError):
+        # Escaping through the dunder is refused when the layout is saved: the
+        # check renders it once, and the sandbox stops the call.
+        with pytest.raises(ServiceRejectionError):
             await _render('<html><body>{{ custom.__class__() }}</body></html>')
 
         # The probe templates above were never committed — CoreAPI writes
