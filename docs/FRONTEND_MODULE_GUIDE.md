@@ -353,7 +353,7 @@ moduleRegistry.register({
 
 | Slot name | Render location | Props shape | Status |
 |---|---|---|---|
-| `item_edit_extra` | Item Edit modal — below standard fields | `item`, `formData`, `handleInputChange(field, value)`, `storageType?`, `requestLeave?` | Active |
+| `item_edit_extra` | Item Edit modal — below standard fields | `item`, `formData`, `handleInputChange(field, value)`, `storageType?`, `requestLeave?`, `registerBeforeSubmit?`, `reportDirty?(dirty)` | Active |
 | `quick_action_extra` | Quick Actions panel per item | `item` | Active |
 | `stock_action_extra` | Stock Action modal (barcode scan) | `barcode`, `template` | Active |
 | `global_notifications` | Global notification layer | `{}` | Active |

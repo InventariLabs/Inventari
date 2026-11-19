@@ -297,7 +297,7 @@ def measures_meet(
     """
     items = context.items_by_template.get(template.id, [])
     if items:
-        total = _total_available(items, ingredient.uom, template, context.uoms_by_id)
+        total = total_available(items, ingredient.uom, template, context.uoms_by_id)
         return total is not None
     stock_uom = context.uoms_by_id.get(template.uom_id) if template.uom_id else None
     if stock_uom is None:
@@ -308,7 +308,12 @@ def measures_meet(
     return converted is not None
 
 
-def _total_available(
+def usable_items(items: list[ItemDTO], today: date) -> list[ItemDTO]:
+    """The stock fit to cook with: what is not past its date, in the order given."""
+    return [item for item in items if not is_past(item, today)]
+
+
+def total_available(
     items: list[ItemDTO],
     ingredient_uom: Any,
     template: ProductTemplateDTO | None,
@@ -372,7 +377,7 @@ def _check_ingredient_availability(
     # What is past its date is on the shelf, not in the pot: it counts
     # towards nothing the recipe needs, so a fridge holding only spoiled
     # chicken does not make the curry cookable.
-    usable = [item for item in sorted_items if not is_past(item, context.today)]
+    usable = usable_items(sorted_items, context.today)
     if not usable:
         return IngredientAvailability(
             **base,
@@ -386,7 +391,7 @@ def _check_ingredient_availability(
                 _item_to_schema(i, None, today=context.today) for i in sorted_items[1:5]
             ],
         )
-    total = _total_available(usable, ingredient.uom, template, context.uoms_by_id)
+    total = total_available(usable, ingredient.uom, template, context.uoms_by_id)
 
     if total is None:
         # The goods are there; only the two measures refuse to meet. The
