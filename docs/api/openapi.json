@@ -72751,6 +72751,18 @@
             ],
             "title": "Actual Qty"
           },
+          "made_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Made On"
+          },
           "best_before": {
             "anyOf": [
               {
@@ -73506,6 +73518,18 @@
               }
             ],
             "title": "Started On"
+          },
+          "planned_for": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned For"
           },
           "material_cost": {
             "anyOf": [
