@@ -135,14 +135,24 @@ describe("documentsApi — each call reaches the route the server serves", () =>
     const seen = record({ items: [], total: 0 });
 
     await documentsApi.listAwaitingMyApproval({ limit: 5 });
-    await documentsApi.priceHint({ template_id: "pt-1", partner_id: null });
-    await documentsApi.priceHint({ template_id: "pt-1", partner_id: "p-1" });
+    await documentsApi.priceHint({
+      template_id: "pt-1",
+      document_type: "IN",
+      partner_id: null,
+    });
+    await documentsApi.priceHint({
+      template_id: "pt-1",
+      document_type: "OUT",
+      partner_id: "p-1",
+    });
 
     expect(seen[0].path).toBe("/warehouse/awaiting-my-approval");
     expect(seen[0].search.get("limit")).toBe("5");
     expect(seen[1].search.get("template_id")).toBe("pt-1");
+    expect(seen[1].search.get("document_type")).toBe("IN");
     expect(seen[1].search.has("partner_id")).toBe(false);
     expect(seen[2].search.get("partner_id")).toBe("p-1");
+    expect(seen[2].search.get("document_type")).toBe("OUT");
   });
 
   it("posts a new document under the press's idempotency key, and the surplus yes only when given", async () => {

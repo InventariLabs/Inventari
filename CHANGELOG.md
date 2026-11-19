@@ -367,6 +367,15 @@ says what the release does rather than what changed since them.
   kept under its own currency. The supplier price comparison lists the
   organization's currency first instead of sorting different currencies by
   their digits.
+- The last purchase price a receipt suggests is what was last paid for the
+  product. It was the price of whichever document came last, so a product
+  bought at 8.00 and then delivered to a customer at 10.00 was offered at
+  10.00 on the next receipt, and that price went on into the stock value.
+  Only receipts and internal receipts count now; a delivery, a customer's
+  return, a correction, a scrap or a transfer does not. A delivery form is
+  offered the rate of tax alone: neither what was paid nor a supplier's
+  offer is the price a customer is charged. `GET /api/v1/warehouse/price-hint`
+  takes the document's type as `document_type` to tell the two apart.
 
 - The first `make dev-up` on a machine that has no images yet no longer
   fails with a duplicate-type error from a module's migration. The backend's

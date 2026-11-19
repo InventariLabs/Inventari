@@ -45,6 +45,11 @@ interface DocumentLinesEditorProps {
   currency?: string | null;
   partnerId?: string | null;
   /**
+   * The document's type, for the price suggestion: a receipt is offered what
+   * was last paid, a delivery the rate of tax alone.
+   */
+  documentType: string;
+  /**
    * When set, the line search offers the stock standing in this location and
    * every result carries an item id. Dispatch documents need one; a receipt
    * has nothing on the shelf yet, so it searches the catalogue instead.
@@ -127,6 +132,13 @@ function toReceiptLineUpdates(
 }
 
 /**
+ * A delivery to a customer, which the price hint offers the rate of tax and
+ * never a price: what the goods cost is not what the customer pays. Its line
+ * never goes looking for a price, so it never reports finding none.
+ */
+const SALE_TYPES: ReadonlySet<string> = new Set(["OUT", "WZ"]);
+
+/**
  * Two answers, kept apart. A product nobody has bought yet has no price to
  * suggest, but the rate that came with it — the partner's, the most specific
  * one there is — is kept. A quote in another currency is a number the document
@@ -173,6 +185,7 @@ export function DocumentLinesEditor({
   defaultTaxRate,
   currency,
   partnerId,
+  documentType,
   stockLocationId,
   stockLocationName,
   onChangeSource,
@@ -343,18 +356,22 @@ export function DocumentLinesEditor({
 
     // auto-suggest unit price from the partner pricelist or the
     // most recent purchase — never overwrite a price the user already set.
+    const reportPrice = SALE_TYPES.has(documentType)
+      ? undefined
+      : onPriceHintResult;
     if (!product.product_template_id || !showValueFields) {
       // A hand-named product has no catalogue entry to hint from, and a form
       // that shows no price must not store one the reader never saw (a
       // transfer): the answer is known before asking, and the form counts it
       // asked.
-      onPriceHintResult?.(key, false);
+      reportPrice?.(key, false);
       return;
     }
     if (alreadyPriced) return;
     try {
       const hint = await documentsApi.priceHint({
         template_id: product.product_template_id,
+        document_type: documentType,
         partner_id: partnerId ?? null,
         // The tier the line reaches: a volume price is not the price of five.
         quantity: existing.quantity > 0 ? existing.quantity : null,
@@ -364,15 +381,15 @@ export function DocumentLinesEditor({
         currency,
       );
       if (Object.keys(suggestion).length === 0) {
-        onPriceHintResult?.(key, false);
+        reportPrice?.(key, false);
         return;
       }
-      onPriceHintResult?.(key, priceFitsDocument);
+      reportPrice?.(key, priceFitsDocument);
       onUpdateLine(index, suggestion);
     } catch {
       // The ask failed, but it was made: the form may not keep promising
       // a suggestion this line already went looking for.
-      onPriceHintResult?.(key, false);
+      reportPrice?.(key, false);
     }
   };
 

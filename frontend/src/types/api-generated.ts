@@ -10033,6 +10033,12 @@ export interface paths {
          *     most recent priced purchase → nothing. Enables the "auto-suggest price"
          *     step of value tracking without making the warehouse module depend on
          *     the purchase_orders module being enabled.
+         *
+         *     Both prices are what the goods cost: a supplier's offer and what was
+         *     last paid. A delivery's line price is what the customer pays, and
+         *     nothing here knows that, so a delivery gets the rate of tax alone. A
+         *     document that takes goods into its own use (an internal issue) is
+         *     valued at cost and keeps the chain.
          */
         get: operations["get_price_hint_api_v1_warehouse_price_hint_get"];
         put?: never;
@@ -49481,6 +49487,8 @@ export interface operations {
                 partner_id?: string | null;
                 /** @description Line quantity; a volume price it does not reach is not offered */
                 quantity?: number | string | null;
+                /** @description Type of the document the line is on; a delivery to a partner (OUT) is offered the rate of tax and no price */
+                document_type?: string | null;
             };
             header?: never;
             path?: never;

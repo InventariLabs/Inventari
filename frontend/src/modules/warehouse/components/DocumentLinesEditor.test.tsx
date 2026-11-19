@@ -96,6 +96,7 @@ function renderEditor(
       scannerError={null}
       isCameraActive={false}
       isTorchOn={false}
+      documentType="IN"
       {...defaultCallbacks}
       {...overrides}
     />,
@@ -313,6 +314,7 @@ describe("DocumentLinesEditor", () => {
         scannerError={null}
         isCameraActive={false}
         isTorchOn={false}
+        documentType="IN"
         showValueFields={true}
         currency="PLN"
         {...defaultCallbacks}
@@ -385,6 +387,33 @@ describe("DocumentLinesEditor — what it keeps from a price suggestion", () => 
         expect.objectContaining({ unit_price: "5.14", tax_rate: "23" }),
       );
     });
+  });
+
+  it("asks for a delivery's rate of tax and reports no search for a price", async () => {
+    // A delivery is offered no purchase price, so the line was never short
+    // of one the price books or past purchases could have given.
+    priceHint.mockResolvedValue({ unit_price: null, tax_rate: 23 });
+    searchResults.current = [product];
+    const onUpdateLine = vi.fn();
+    const reported = vi.fn();
+    const user = userEvent.setup();
+    renderEditor({
+      lines: [{ ...emptyLine, name: "" }],
+      showValueFields: true,
+      documentType: "OUT",
+      onUpdateLine,
+      onPriceHintResult: reported,
+    });
+    await user.type(screen.getAllByPlaceholderText("Item")[0], "Wid");
+    await user.click(screen.getAllByRole("option")[0]);
+
+    await vi.waitFor(() =>
+      expect(onUpdateLine).toHaveBeenCalledWith(0, { tax_rate: "23" }),
+    );
+    expect(priceHint).toHaveBeenCalledWith(
+      expect.objectContaining({ template_id: "tmpl-1", document_type: "OUT" }),
+    );
+    expect(reported).not.toHaveBeenCalled();
   });
 
   it("asks for the price of the quantity the line already carries", async () => {
