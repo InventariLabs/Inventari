@@ -89,6 +89,24 @@ describe("CorrectionFormModal", () => {
     expect((deltaInput as HTMLInputElement).value).toBe("-3");
   });
 
+  it("bounds a negative delta by what the document says can still be removed", () => {
+    // Part of the receipt was held back, or an earlier return took some: the
+    // line executed 3, the server says 2 can still come off.
+    const base = makeDocument();
+    const document = makeDocument({
+      lines: [{ ...base.lines[0], returnable_quantity: "2" }],
+    });
+    render(<CorrectionFormModal document={document} onClose={vi.fn()} />);
+
+    expect(screen.getByText("Executed: 3")).toBeInTheDocument();
+    expect(screen.getByText("You can remove up to 2")).toBeInTheDocument();
+
+    const deltaInput = screen.getByRole("spinbutton", { name: "Change" });
+    fireEvent.change(deltaInput, { target: { value: "-3" } });
+    fireEvent.blur(deltaInput);
+    expect((deltaInput as HTMLInputElement).value).toBe("-2");
+  });
+
   it("treats a cleared field as no change, not as NaN", async () => {
     // Number("") is NaN; it survived the clamp, counted as a changed line and
     // was posted as null, which the API answered with a 422. A cleared field

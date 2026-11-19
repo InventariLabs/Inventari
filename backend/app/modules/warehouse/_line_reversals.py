@@ -30,6 +30,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.contracts import StockMoveReferenceType
 from app.core.public_api import core_api
 
+from . import document_types as dt
 from .models import (
     Document,
     DocumentLine,
@@ -79,6 +80,49 @@ async def reversible_quantities_async(
         line.id: line.done_quantity + net.get(line.id, Decimal('0'))
         for line in original_lines
     }
+
+
+async def correctable_quantities_async(
+    db: AsyncSession,
+    organization_id: UUID,
+    original: Document,
+    original_lines: Sequence[DocumentLine],
+) -> dict[UUID, Decimal]:
+    """What a correction of *original* can really take off each of its lines.
+
+    :func:`reversible_quantities_async` answers for the document: what the
+    line executed, less what has been restated since. A receipt that held
+    part of a line back booked the two parts apart, and the line points at the
+    record of the part that was not held; the held part lies on the
+    quarantine shelf under a record of its own, so a correction — which
+    changes the line's record — cannot reach it. For such a line the answer
+    is the smaller of the two: what the document says is left, and what the
+    line's record holds.
+
+    Only a line that held something back is measured against its record: the
+    others are held to the document alone, as before, and cost no extra read.
+    Only a receipt holds goods back; any other document is answered by the
+    document alone.
+    """
+    left = await reversible_quantities_async(db, organization_id, original_lines)
+    if not dt.is_receipt(original.type):
+        return left
+    for line in original_lines:
+        if not line.held_quantity or line.item_id is None or left[line.id] <= 0:
+            continue
+        record = await core_api.items.get_async(db, organization_id, line.item_id)
+        if record is None or record.quantity is None:
+            continue
+        left_in_stock_unit = await core_api.uoms.to_stock_uom_async(
+            db, organization_id, line.product_template_id, left[line.id], line.uom_id
+        )
+        if left_in_stock_unit > record.quantity:
+            # The ratio carries the cap back into the line's own unit,
+            # whatever the factor between the two is.
+            left[line.id] = (
+                left[line.id] * max(record.quantity, Decimal(0)) / left_in_stock_unit
+            )
+    return left
 
 
 async def reversible_quantity_async(

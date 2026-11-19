@@ -36,6 +36,7 @@ from ._document_workflow_helpers import (
     keep_line_tracking,
 )
 from ._order_side import order_side_async
+from ._stock_executor_deltas import require_correction_fits_records
 from ._wms_line_utils import session_holds_document
 from ._wms_session_close import (
     destination_awaited,
@@ -395,6 +396,8 @@ async def confirm_document(
     _require_positive_quantities(doc)
     _require_stock_rows_on_lines(doc)
     await _require_products_on_receipt_lines(db, doc, posting=False)
+    if doc.type == dt.CORRECTION:
+        await require_correction_fits_records(db, doc)
     # The number is given out here, where the draft becomes a document of
     # the register. A draft written and thrown away costs nothing (it never
     # held a number), and the number drawn now carries the period the

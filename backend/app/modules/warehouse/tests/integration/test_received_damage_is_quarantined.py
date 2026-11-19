@@ -1265,3 +1265,143 @@ class TestAHeldAnswerSurvivesAnApproval:
         ) == Decimal('3')
         line = _line_of(client, doc_auth_headers, doc_id)
         assert Decimal(line['held_quantity']) == Decimal('3')
+
+
+class TestCorrectingAReceiptWithAHeldPart:
+    """A correction reaches the goods on the shelf, not the ones held back.
+
+    The line points at the record of the good part; the held part lies on the
+    quarantine shelf under a record of its own. What a correction can take off
+    the line is therefore what that record holds, and a correction refused for
+    it is refused before it takes a number.
+    """
+
+    @pytest.fixture
+    def held_receipt(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_target_location: StorageLocation,
+        doc_quarantine_location: StorageLocation,
+        doc_template: ProductTemplate,
+    ) -> dict[str, Any]:
+        """Seven arrived on a receipt of ten, three of them held back."""
+        _name_quarantine_shelf(client, doc_auth_headers, doc_quarantine_location)
+        doc_id, line_id = _receipt(
+            client, doc_auth_headers, doc_partner, doc_target_location, doc_template
+        )
+        done = _complete(
+            client, doc_auth_headers, doc_id, line_id, 'DAMAGE', done=7, held=3
+        )
+        assert done.status_code == 200, done.text
+        original: dict[str, Any] = client.get(
+            f'/api/v1/warehouse/documents/{doc_id}', headers=doc_auth_headers
+        ).json()
+        return original
+
+    @staticmethod
+    def _correct(
+        client: TestClient, headers: dict[str, str], original: Any, delta: int
+    ) -> Any:
+        return client.post(
+            '/api/v1/warehouse/corrections',
+            headers=headers,
+            json={
+                'corrects_document_id': original['id'],
+                'reason_code': 'DATA_ENTRY_ERROR',
+                'lines': [
+                    {
+                        'original_line_number': original['lines'][0]['line_number'],
+                        'quantity_delta': delta,
+                    }
+                ],
+            },
+        )
+
+    def test_the_document_offers_only_what_the_shelf_can_give(
+        self, held_receipt: dict[str, Any]
+    ) -> None:
+        line = held_receipt['lines'][0]
+        assert Decimal(line['done_quantity']) == Decimal('7')
+        assert Decimal(line['returnable_quantity']) == Decimal('4')
+
+    def test_a_correction_past_that_is_refused_before_it_is_written(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        held_receipt: dict[str, Any],
+    ) -> None:
+        resp = self._correct(client, doc_auth_headers, held_receipt, -7)
+
+        assert resp.status_code == 400, resp.text
+        assert resp.json()['detail']['code'] == 'DOCUMENT_CORRECTION_BELOW_ZERO'
+        listed = client.get(
+            f'/api/v1/warehouse/documents/{held_receipt["id"]}/corrections',
+            headers=doc_auth_headers,
+        )
+        assert listed.status_code == 200, listed.text
+        assert listed.json()['items'] == []
+
+    def test_a_correction_the_form_allows_can_be_applied(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_target_location: StorageLocation,
+        doc_quarantine_location: StorageLocation,
+        doc_template: ProductTemplate,
+        held_receipt: dict[str, Any],
+    ) -> None:
+        resp = self._correct(client, doc_auth_headers, held_receipt, -4)
+        assert resp.status_code == 201, resp.text
+        doc_id = resp.json()['id']
+        confirmed = client.patch(
+            f'/api/v1/warehouse/documents/{doc_id}/confirm', headers=doc_auth_headers
+        )
+        assert confirmed.status_code == 200, confirmed.text
+        posted = client.patch(
+            f'/api/v1/warehouse/documents/{doc_id}/complete',
+            headers=doc_auth_headers,
+            json={'complete_as_planned': True},
+        )
+        assert posted.status_code == 200, posted.text
+        assert _stock_at(
+            client, doc_auth_headers, doc_template, doc_target_location
+        ) == Decimal('0')
+        assert _stock_at(
+            client, doc_auth_headers, doc_template, doc_quarantine_location
+        ) == Decimal('3')
+
+    def test_a_draft_the_record_can_no_longer_take_is_refused_at_confirmation(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_org: Organization,
+        doc_target_location: StorageLocation,
+        doc_template: ProductTemplate,
+        held_receipt: dict[str, Any],
+        db_session: Session,
+    ) -> None:
+        drafted = self._correct(client, doc_auth_headers, held_receipt, -4)
+        assert drafted.status_code == 201, drafted.text
+        draft = drafted.json()
+        # Something else took two off the shelf after the draft was written.
+        record = _record_at(db_session, doc_org.id, doc_template, doc_target_location)
+        record.quantity = Decimal('2')
+        db_session.commit()
+
+        resp = client.patch(
+            f'/api/v1/warehouse/documents/{draft["id"]}/confirm',
+            headers=doc_auth_headers,
+        )
+
+        assert resp.status_code == 400, resp.text
+        message = resp.json()['detail']['message']
+        assert doc_template.name in message
+        assert str(record.id) not in message
+        assert '2.000' not in message
+        after = client.get(
+            f'/api/v1/warehouse/documents/{draft["id"]}', headers=doc_auth_headers
+        ).json()
+        assert after['status'] == 'DRAFT'
+        assert after['number'] == draft['number']
