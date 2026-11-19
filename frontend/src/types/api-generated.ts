@@ -27331,9 +27331,9 @@ export interface components {
          * StorageArchiveRequest
          * @description «Move content and close» payload.
          *
-         *     ``move_items_to`` is required when the location (or any of its
-         *     descendants) still holds items; the archive then relocates them in the
-         *     same operation.
+         *     ``move_items_to`` is required when the location itself still holds
+         *     items; the archive then relocates them in the same operation. The
+         *     locations inside stay active and keep their own stock.
          */
         StorageArchiveRequest: {
             /** Move Items To */
