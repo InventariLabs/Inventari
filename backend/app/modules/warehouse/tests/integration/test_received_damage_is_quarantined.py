@@ -7,7 +7,8 @@ it did receive is itself held back — damaged goods or goods awaiting a
 quality decision. That quantity alone is kept out of available stock (a named
 batch is quarantined, anything else goes to the quarantine shelf the profile
 names), the rest lands as ordinary stock, and the order counts only what is
-not held, so the difference is asked for again on a backorder.
+not held. A backorder asks only for what never arrived: what was held back
+did arrive and waits for a decision, so it is not asked for again.
 
 This file pins those two readings and the tests that keep them apart.
 """
@@ -257,12 +258,13 @@ class TestTheCodeOnAShortLine:
         line = _line_of(client, doc_auth_headers, doc_id)
         assert Decimal(line['held_quantity']) == Decimal('3')
         assert line['executed_location_id'] == str(doc_target_location.id)
-        # The order got four usable pieces; the other six are asked for again.
+        # Seven of ten arrived: the three that did not are backordered, the
+        # three held back are not asked for again.
         assert (
             _backorder_for(client, doc_auth_headers, doc_id)['lines'][0][
                 'expected_quantity'
             ]
-            == '6.000'
+            == '3.000'
         )
 
     def test_the_audit_log_names_the_held_quantity_and_its_reason(
@@ -353,12 +355,11 @@ class TestTheCodeOnAShortLine:
         assert _line_of(client, doc_auth_headers, doc_id)[
             'executed_location_id'
         ] == str(doc_quarantine_location.id)
-        assert (
-            _backorder_for(client, doc_auth_headers, doc_id)['lines'][0][
-                'expected_quantity'
-            ]
-            == '10.000'
-        )
+        # Everything that was expected arrived, so nothing is asked for again.
+        listed = client.get('/api/v1/warehouse/documents', headers=doc_auth_headers)
+        assert [
+            d for d in listed.json()['items'] if d.get('backorder_id') == doc_id
+        ] == []
 
     @pytest.mark.parametrize('code', ['SHORTAGE', 'COUNT_VARIANCE', 'OTHER'])
     def test_the_other_codes_land_on_the_ordinary_shelf(
@@ -626,12 +627,12 @@ class TestTheBatchThatCarriesHeldGoods:
         assert _line_of(client, doc_auth_headers, doc_id)[
             'executed_location_id'
         ] == str(doc_target_location.id)
-        # Four usable pieces reached the order; six are asked for again.
+        # Seven of ten arrived: only the three that did not are backordered.
         assert (
             _backorder_for(client, doc_auth_headers, doc_id)['lines'][0][
                 'expected_quantity'
             ]
-            == '6.000'
+            == '3.000'
         )
 
 

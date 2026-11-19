@@ -111,6 +111,15 @@ def document_list_row(document: Document) -> DocumentListRowSchema:
     detail screen lists the lines.
     """
     lines = document.lines
+    # A completed document says what it did, and a line nothing arrived of (a
+    # receipt closed short keeps it, at nought) did nothing: the lines that
+    # moved lead and are counted apart, so the sentence names what happened.
+    moved = [line for line in lines if line.done_quantity]
+    named = (
+        [*moved, *(line for line in lines if not line.done_quantity)]
+        if document.status == DocumentStatus.COMPLETED.value
+        else lines
+    )
     progress: dict[str | None, DocumentUnitProgressSchema] = {}
     for line in lines:
         # The screen's own grouping: a blank symbol is no unit.
@@ -135,10 +144,11 @@ def document_list_row(document: Document) -> DocumentListRowSchema:
                 document.target_location.name if document.target_location else None
             ),
             'line_count': len(lines),
+            'moved_line_count': len(moved),
             'unit_progress': list(progress.values()),
             'first_lines': [
                 DocumentListLineSchema.model_validate(line)
-                for line in lines[:_FIRST_LINES]
+                for line in named[:_FIRST_LINES]
             ],
             'module_lines': [
                 DocumentModuleLineSchema.model_validate(line)

@@ -135,6 +135,8 @@ export function documentRow(
     stage_holder_name: doc.stage_holder_name,
     shipment: doc.shipment,
     line_count: doc.lines.length,
+    moved_line_count: doc.lines.filter((line) => Number(line.done_quantity) > 0)
+      .length,
     unit_progress: [...progress.values()].map((group) => ({
       unit: group.unit,
       planned: String(group.planned),
