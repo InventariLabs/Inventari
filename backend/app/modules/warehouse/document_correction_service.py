@@ -215,10 +215,15 @@ async def create_correction(
                     may_exceed=may_exceed_over_receipt,
                 )
             else:
+                # What the line received, held part included: the shelf's
+                # share is a floor for removing, not a measure of the receipt.
                 await assert_over_receipt_allowed_async(
                     db,
                     org_id,
-                    quantity=left + qty_delta,
+                    quantity=(
+                        await reversible_quantities_async(db, org_id, [original_line])
+                    )[original_line.id]
+                    + qty_delta,
                     basis=original_line.expected_quantity,
                     may_exceed=may_exceed_over_receipt,
                 )

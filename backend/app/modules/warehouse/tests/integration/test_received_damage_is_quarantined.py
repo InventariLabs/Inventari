@@ -1372,6 +1372,24 @@ class TestCorrectingAReceiptWithAHeldPart:
             client, doc_auth_headers, doc_template, doc_quarantine_location
         ) == Decimal('3')
 
+    def test_a_surplus_correction_is_still_weighed_against_what_the_line_received(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        doc_org: Organization,
+        held_receipt: dict[str, Any],
+    ) -> None:
+        # 7 received of 10 expected, 4 of them on the shelf: +4 makes 11
+        # received. Measured against the shelf alone (4 + 4 = 8) it would
+        # pass the over-receipt gate; measured against what was received
+        # it must not.
+        user = h.create_user(doc_org, email='no-surplus@example.com', role='user')
+        h.grant_permissions(user, ['warehouse:read', 'warehouse:write'])
+        resp = self._correct(client, h.get_auth_headers(user), held_receipt, 4)
+
+        assert resp.status_code == 400, resp.text
+        assert 'over-receipt tolerance' in resp.text
+
     def test_a_draft_the_record_can_no_longer_take_is_refused_at_confirmation(
         self,
         client: TestClient,
