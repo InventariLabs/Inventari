@@ -59,6 +59,45 @@ describe("RecipeProcessSteps in-place editing", () => {
     ]);
   });
 
+  it("saves the step typed in the add row, with its minutes, when Save is pressed", async () => {
+    renderSteps();
+    fireEvent.change(screen.getByTestId("maker-steps-input"), {
+      target: { value: "Shape and bake at 160 C" },
+    });
+    fireEvent.change(screen.getByTestId("maker-steps-minutes-input"), {
+      target: { value: "40" },
+    });
+    fireEvent.click(screen.getByTestId("maker-steps-save"));
+
+    await waitFor(() => expect(updateRecipe).toHaveBeenCalled());
+    expect(updateRecipe.mock.calls[0][0].data.process_steps).toEqual([
+      { text: "Mix the oats", minutes: "10" },
+      { text: "Bake for 20 minutes", minutes: "20" },
+      { text: "Shape and bake at 160 C", minutes: "40" },
+    ]);
+  });
+
+  it("asks before the X throws away a typed, unadded step", () => {
+    renderSteps();
+    fireEvent.change(screen.getByTestId("maker-steps-input"), {
+      target: { value: "Cool on a rack" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
+
+    // The editor is still open, with the question on top of it.
+    expect(screen.getByRole("alertdialog")).toBeTruthy();
+    expect(screen.getByTestId("maker-steps-input")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /discard step/i }));
+    expect(screen.queryByTestId("maker-steps-input")).toBeNull();
+  });
+
+  it("closes the editor without a question when the add row is empty", () => {
+    renderSteps();
+    fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(screen.queryByTestId("maker-steps-input")).toBeNull();
+  });
+
   it("keeps newlines inside a step", async () => {
     renderSteps();
     fireEvent.change(screen.getByTestId("maker-steps-edit-0"), {

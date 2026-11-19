@@ -349,7 +349,11 @@
     "processStepMinutesLabel": "Minuty kroku {{number}}",
     "minutesShort": "min",
     "minutesPlaceholder": "min",
-    "processStepsGuard": "Kroki procesu"
+    "processStepsGuard": "Kroki procesu",
+    "processStepsDiscardTitle": "Odrzucić niedodany krok?",
+    "processStepsDiscardMessage": "Wpisany krok nie został dodany do listy. Zamknięcie edytora go usunie.",
+    "processStepsDiscardConfirm": "Odrzuć krok",
+    "processStepsDiscardKeep": "Wróć do edycji"
   },
   "bom": {
     "childLabel": "Składnik",
