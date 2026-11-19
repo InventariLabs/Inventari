@@ -177,6 +177,11 @@ class ItemDTO(BaseModel):
     shelf_location: str | None = None
     quantity: Decimal | None = None
     barcode: str | None = None
+    template_barcode: str | None = Field(
+        None,
+        description="The product card's code; a record created with a barcode "
+        'carries it here and leaves ``barcode`` empty',
+    )
     purchase_price: Decimal | None = None
     currency: str | None = None
     added_date: date | None = None

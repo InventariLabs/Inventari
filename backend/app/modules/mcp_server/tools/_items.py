@@ -89,18 +89,6 @@ def register_item_tools(server: MCPServer) -> None:
                     limit=limit,
                 )
                 records = [_item_view(item) for item in page.items]
-            if not stock and not records:
-                # A barcode is written on the product, not on every record; the
-                # two searches above ask the record name, so the scan code gets
-                # one lookup of its own instead of an empty answer.
-                item = await core_api.items.find_by_barcode_async(
-                    db,
-                    identity.organization_id,
-                    query,
-                    quantity_positive=False,
-                )
-                if item is not None:
-                    records = [_item_view(item)]
         return SearchItemsResult(query=query, stock=stock, records=records)
 
     @server.tool(

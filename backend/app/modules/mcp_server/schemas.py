@@ -52,7 +52,7 @@ class ItemView(BaseModel):
             id=item.id,
             name=item.name,
             brand=item.brand,
-            barcode=item.barcode,
+            barcode=item.barcode or item.template_barcode,
             serial_number=item.serial_number,
             quantity=item.quantity,
             uom_symbol=item.uom_symbol,
