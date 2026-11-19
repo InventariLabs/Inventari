@@ -99,7 +99,7 @@ describe("AttachLabelToItemSheet — a scanned free label, a product that exists
               label_code: null,
               location_id: "s2",
               quantity: "4.000",
-              effective_expiry_date: "2027-03-01",
+              effective_expiry_date: "2020-03-01",
             },
           ],
           total: 2,
