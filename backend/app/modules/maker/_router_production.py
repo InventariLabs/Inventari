@@ -244,6 +244,7 @@ def _to_read(
         result_per_batch=order.result_per_batch,
         lines=[ProductionOrderLineRead.model_validate(line) for line in line_rows],
         started_on=order.started_on,
+        planned_for=order.planned_for,
         material_cost=order.material_cost,
         unshelved_cost=order.unshelved_cost,
         steps=[ProductionStepRead.model_validate(step) for step in order.steps or []],
@@ -515,6 +516,7 @@ async def complete_production_order(
             actual_qty=data.actual_qty,
             best_before=data.best_before,
             ingredient_lots=data.ingredient_lots,
+            made_on=data.made_on,
         )
     except InsufficientStockError as exc:
         raise _shortage_refusal(
