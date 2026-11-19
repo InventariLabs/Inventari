@@ -791,6 +791,8 @@ class ErrorMessages(TypedDict):
     putaway_capacity_not_found: str
     no_fields_to_update: str
     putaway_rule_needs_location: str
+    putaway_rule_target_receiving: str
+    putaway_rule_target_quarantine: str
     putaway_rule_needs_match_key: str
     document_template_wrong_module: str
     search_query_empty: str
