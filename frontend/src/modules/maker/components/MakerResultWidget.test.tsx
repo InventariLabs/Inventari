@@ -13,6 +13,7 @@ interface MonthRow {
   month: string;
   result: string;
   orders: number;
+  overproduced_orders?: number;
 }
 
 const WITH_RESULTS: MonthRow[] = [
@@ -119,5 +120,25 @@ describe("MakerResultWidget", () => {
         name: "Shop price minus the cost to make it",
       }),
     ).toHaveAttribute("href", "/maker/settings");
+  });
+
+  it("says when a month's result counts runs that closed above their plan", () => {
+    monthly.rows = [
+      { month: "2026-07", result: "5.00", orders: 1, overproduced_orders: 1 },
+      { month: "2026-08", result: "40.50", orders: 3, overproduced_orders: 2 },
+    ];
+    try {
+      renderWidget();
+      const notes = screen.getAllByTestId("maker-result-overproduced");
+      expect(notes).toHaveLength(2);
+      expect(notes[0].textContent).toContain("2 runs closed above their plan");
+    } finally {
+      monthly.rows = WITH_RESULTS;
+    }
+  });
+
+  it("stays quiet when no run closed above its plan", () => {
+    renderWidget();
+    expect(screen.queryByTestId("maker-result-overproduced")).toBeNull();
   });
 });

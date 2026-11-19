@@ -105,6 +105,14 @@ export function MakerResultWidget() {
               {t("widget.orders", { count: latest.orders })}
             </div>
           )}
+          {latest.overproduced_orders > 0 && (
+            <div
+              className="text-[10px] text-amber-700 mt-0.5"
+              data-testid="maker-result-overproduced"
+            >
+              {t("widget.overproduced", { count: latest.overproduced_orders })}
+            </div>
+          )}
         </div>
       )}
 
@@ -122,6 +130,21 @@ export function MakerResultWidget() {
                 className={`font-medium shrink-0 ${resultTone(month.result)}`}
               >
                 {formatMoney(month.result, currency, i18n.language)}
+                {month.overproduced_orders > 0 && (
+                  <span
+                    className="ml-1 text-[10px] font-normal text-amber-700"
+                    role="img"
+                    aria-label={t("widget.overproduced", {
+                      count: month.overproduced_orders,
+                    })}
+                    title={t("widget.overproduced", {
+                      count: month.overproduced_orders,
+                    })}
+                    data-testid="maker-result-overproduced"
+                  >
+                    ▲
+                  </span>
+                )}
               </span>
             </div>
           ))}

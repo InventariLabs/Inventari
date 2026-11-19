@@ -63010,6 +63010,11 @@
           "orders": {
             "type": "integer",
             "title": "Orders"
+          },
+          "overproduced_orders": {
+            "type": "integer",
+            "title": "Overproduced Orders",
+            "default": 0
           }
         },
         "type": "object",
@@ -78127,6 +78132,11 @@
             "type": "integer",
             "title": "Uncosted Ingredients",
             "default": 0
+          },
+          "last_run_overproduced": {
+            "type": "boolean",
+            "title": "Last Run Overproduced",
+            "default": false
           },
           "estimated_unit_cost": {
             "anyOf": [
