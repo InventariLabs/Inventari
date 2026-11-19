@@ -292,6 +292,12 @@ says what the release does rather than what changed since them.
   the suggested price sat below what the run cost; the calculator now lists
   the three parts under the total, and the production preview's total matches
   the per-unit figure beside it.
+- Counting a location that has sub-locations now tells two records of one
+  product apart. The count cards and the scan chooser show the expiry of
+  items standing on any depth below the counted location, so a scan no longer
+  adds one to whichever of two identical rows is tapped. The completed report
+  and its CSV export carry the same expiry and record number the counting
+  screen shows.
 - A fixed cost line of a production BOM can no longer be saved with a negative
   amount, which lowered the BOM's unit cost, the run preview and the cost of
   every run after it. The refusal appears beside the Amount field with what was
