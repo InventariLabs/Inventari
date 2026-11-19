@@ -15,6 +15,10 @@ import {
 import { useDebounce } from "@/module-sdk";
 import { useItemSearch } from "@/modules/inventory/hooks/useItems";
 import { useAssignLabelToItem } from "@/hooks/useAssignLabelToItem";
+import { useStorages } from "@/modules/shared/hooks/useStorages";
+import { formatQuantityLocalized } from "@/lib/i18nHelpers";
+import { formatDate } from "@/utils/formatters";
+import { getStorageLocationPath } from "@/utils/helpers";
 
 interface Props {
   /** The free label in the reader's hand. */
@@ -28,6 +32,11 @@ interface Props {
  * the product and the label becomes its code. Products that carry a label are
  * left out — binding another one would free the first, and a sticker already
  * on the shelf would stop opening anything.
+ *
+ * A product with stock on several shelves, in several batches or on hold is
+ * several rows, and a label names exactly one of them: each row says where it
+ * stands, when it expires and how much it holds, so the reader picks the pack
+ * in their hand and not the first twin.
  */
 export function AttachLabelToItemSheet({
   labelCode,
@@ -38,6 +47,9 @@ export function AttachLabelToItemSheet({
   const [query, setQuery] = useState("");
   const search = useDebounce(query.trim(), 250);
   const { data, isFetching, isError, refetch } = useItemSearch(search);
+  // Only names the place of a row the search already found, so every kind of
+  // location is wanted, virtual ones included.
+  const { data: storages } = useStorages(undefined, { usage: "all" });
   const assign = useAssignLabelToItem();
 
   const candidates = (data?.items ?? []).filter((item) => !item.label_code);
@@ -87,19 +99,43 @@ export function AttachLabelToItemSheet({
           </p>
         ) : (
           <ul className="space-y-1">
-            {candidates.map((item) => (
-              <li key={item.id}>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start gap-3"
-                  disabled={assign.isPending}
-                  onClick={() => attach(item.id, item.name)}
-                >
-                  <Package size={16} className="text-on-muted shrink-0" />
-                  <span className="truncate">{item.name}</span>
-                </Button>
-              </li>
-            ))}
+            {candidates.map((item) => {
+              const place = getStorageLocationPath(
+                storages?.find((s) => s.id === item.location_id),
+                item.shelf_location,
+                undefined,
+                storages,
+              );
+              const expiry = item.effective_expiry_date;
+              const details = [
+                place,
+                expiry
+                  ? t("labels:attachToItem.expires", {
+                      date: formatDate(expiry),
+                    })
+                  : "",
+                formatQuantityLocalized(t, item.quantity, item.uom?.symbol),
+              ].filter(Boolean);
+              return (
+                <li key={item.id}>
+                  <Button
+                    variant="ghost"
+                    size="content"
+                    className="w-full justify-start gap-3 py-2 text-left"
+                    disabled={assign.isPending}
+                    onClick={() => attach(item.id, item.name)}
+                  >
+                    <Package size={16} className="text-on-muted shrink-0" />
+                    <span className="flex min-w-0 flex-col items-start">
+                      <span className="truncate">{item.name}</span>
+                      <span className="text-sm text-on-secondary">
+                        {details.join(" • ")}
+                      </span>
+                    </span>
+                  </Button>
+                </li>
+              );
+            })}
           </ul>
         )}
       </SheetBody>

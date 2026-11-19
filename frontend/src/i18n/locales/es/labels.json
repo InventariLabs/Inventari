@@ -167,7 +167,8 @@
     "searchPlaceholder": "Buscar productos…",
     "noResults": "Ningún producto sin etiqueta coincide.",
     "submit": "Asociar etiqueta",
-    "success": "Etiqueta {{code}} asociada a {{name}}"
+    "success": "Etiqueta {{code}} asociada a {{name}}",
+    "expires": "caduca el {{date}}"
   },
   "productLabel": {
     "action": "Imprimir etiqueta",

@@ -167,7 +167,8 @@
     "searchPlaceholder": "Produkte suchen…",
     "noResults": "Kein Produkt ohne Etikett passt.",
     "submit": "Etikett anheften",
-    "success": "Etikett {{code}} an {{name}} angeheftet"
+    "success": "Etikett {{code}} an {{name}} angeheftet",
+    "expires": "haltbar bis {{date}}"
   },
   "productLabel": {
     "action": "Etikett drucken",

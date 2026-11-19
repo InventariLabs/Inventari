@@ -31,6 +31,20 @@ describe("AttachLabelToItemSheet — a scanned free label, a product that exists
           total: 2,
         }),
       ),
+      http.get("/api/v1/locations", () =>
+        HttpResponse.json({
+          items: [
+            { id: "s1", name: "Main Warehouse", full_path: "Main Warehouse" },
+            {
+              id: "s2",
+              name: "Quarantine",
+              full_path: "Main Warehouse › Quarantine",
+            },
+          ],
+          total: 2,
+          has_more: false,
+        }),
+      ),
       http.post(
         "/api/v1/labels/pool/:code/assign-item",
         ({ params, request }) => {
@@ -65,5 +79,51 @@ describe("AttachLabelToItemSheet — a scanned free label, a product that exists
 
     await waitFor(() => expect(onAttached).toHaveBeenCalled());
     expect(assigned).toEqual({ code: "STM-0001", itemId: "i1" });
+  });
+
+  it("tells the stock rows of one product apart by where each stands", async () => {
+    server.use(
+      http.get("/api/v1/items", () =>
+        HttpResponse.json({
+          items: [
+            {
+              id: "i1",
+              name: "QA Product",
+              label_code: null,
+              location_id: "s1",
+              quantity: "6.000",
+            },
+            {
+              id: "i2",
+              name: "QA Product",
+              label_code: null,
+              location_id: "s2",
+              quantity: "4.000",
+              effective_expiry_date: "2027-03-01",
+            },
+          ],
+          total: 2,
+        }),
+      ),
+    );
+    wrap(
+      <AttachLabelToItemSheet
+        labelCode="STM-0001"
+        onClose={() => {}}
+        onAttached={() => {}}
+      />,
+    );
+
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "QA Prod" },
+    });
+
+    const rows = await screen.findAllByRole("button", { name: /QA Product/ });
+    expect(rows).toHaveLength(2);
+    await waitFor(() => expect(rows[0]).toHaveTextContent("Main Warehouse"));
+    expect(rows[0]).not.toHaveTextContent("Quarantine");
+    expect(rows[1]).toHaveTextContent("Main Warehouse › Quarantine");
+    expect(rows[1]).toHaveTextContent("expires");
+    expect(rows[1]).toHaveTextContent("4");
   });
 });
