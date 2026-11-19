@@ -18796,6 +18796,11 @@ export interface components {
             result: string;
             /** Orders */
             orders: number;
+            /**
+             * Overproduced Orders
+             * @default 0
+             */
+            overproduced_orders: number;
         };
         /** MonthlyTrendItem */
         MonthlyTrendItem: {
@@ -24259,6 +24264,11 @@ export interface components {
              * @default 0
              */
             uncosted_ingredients: number;
+            /**
+             * Last Run Overproduced
+             * @default false
+             */
+            last_run_overproduced: boolean;
             /** Estimated Unit Cost */
             estimated_unit_cost?: string | null;
             /**

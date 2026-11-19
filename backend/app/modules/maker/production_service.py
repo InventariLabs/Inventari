@@ -22,7 +22,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import select
@@ -160,9 +160,11 @@ async def list_orders(
     return await paginate_async(db, stmt, limit=limit, offset=offset)
 
 
-class _MonthBucket(TypedDict):
-    result: Decimal
-    orders: int
+@dataclass
+class _MonthBucket:
+    result: Decimal = Decimal('0')
+    orders: int = 0
+    overproduced_orders: int = 0
 
 
 async def monthly_result(
@@ -215,7 +217,7 @@ async def monthly_result(
     cur_year, cur_month = year, month
     for _ in range(months):
         key = f'{cur_year:04d}-{cur_month:02d}'
-        buckets[key] = {'result': Decimal('0'), 'orders': 0}
+        buckets[key] = _MonthBucket()
         cur_month += 1
         if cur_month == 13:
             cur_month = 1
@@ -224,17 +226,20 @@ async def monthly_result(
     for row in rows:
         completed_at = row.completed_at.astimezone(tz)
         key = f'{completed_at.year:04d}-{completed_at.month:02d}'
-        bucket = buckets.setdefault(key, {'result': Decimal('0'), 'orders': 0})
+        bucket = buckets.setdefault(key, _MonthBucket())
         effective_qty = row.actual_qty or row.planned_qty
         if effective_qty and effective_qty > 0:
-            bucket['result'] += row.result_per_unit * effective_qty
-        bucket['orders'] += 1
+            bucket.result += row.result_per_unit * effective_qty
+        bucket.orders += 1
+        if row.actual_qty is not None and row.actual_qty > row.planned_qty:
+            bucket.overproduced_orders += 1
 
     return [
         {
             'month': key,
-            'result': quantise(value['result']),
-            'orders': value['orders'],
+            'result': quantise(value.result),
+            'orders': value.orders,
+            'overproduced_orders': value.overproduced_orders,
         }
         for key, value in sorted(buckets.items())
     ]

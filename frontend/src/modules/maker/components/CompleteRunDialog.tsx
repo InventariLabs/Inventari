@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/Input";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import { QUANTITY_STEP } from "@/module-sdk";
 import { BestBeforeField } from "@/modules/maker/components/BestBeforeField";
+import { useOverproductionGuard } from "@/modules/maker/components/OverproductionGuard";
 import { EmptyBomNotice } from "@/modules/maker/components/EmptyBomNotice";
 import { IngredientBatchPicker } from "@/modules/maker/components/IngredientBatchPicker";
 import type { useCompleteRun } from "@/modules/maker/hooks/useCompleteRun";
@@ -27,6 +28,7 @@ export function CompleteRunDialog({
 }: CompleteRunDialogProps) {
   const { t } = useTranslation("maker");
   const anyShort = run.batches.short.size > 0;
+  const overproduction = useOverproductionGuard(order, run.actualQty);
   return (
     <ConfirmDialog
       open={run.showConfirm}
@@ -39,7 +41,7 @@ export function CompleteRunDialog({
       })}
       confirmLabel={t("detail.complete", { defaultValue: "Complete run" })}
       cancelLabel={t("create.cancel", { defaultValue: "Cancel" })}
-      confirmDisabled={bomIsEmpty || anyShort}
+      confirmDisabled={bomIsEmpty || anyShort || overproduction.blocked}
       onConfirm={() => {
         run.setShowConfirm(false);
         run.complete();
@@ -82,6 +84,7 @@ export function CompleteRunDialog({
                 "Leave empty to use planned quantity. Enter less for scrap, more for overproduction. Ingredients are consumed as planned regardless of the actual quantity.",
             })}
           </p>
+          {overproduction.notice}
         </div>
         <BestBeforeField
           id="maker-complete-best-before"

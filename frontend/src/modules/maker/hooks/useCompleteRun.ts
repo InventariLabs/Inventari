@@ -53,6 +53,9 @@ export function useCompleteRun(order: ProductionOrder | undefined) {
 
   function setShowConfirm(open: boolean) {
     if (open && order) {
+      // Every opening starts from an empty quantity: a refused attempt
+      // leaves nothing behind to be confirmed again by accident.
+      setActualQty("");
       setBestBefore(
         defaultBestBefore(
           order.production_date ?? todayIso(),

@@ -21,6 +21,7 @@ const baseRecipe: RecipeCatalogItem = {
   ingredient_count: 3,
   unit_cost: "5.00",
   uncosted_ingredients: 0,
+  last_run_overproduced: false,
   estimated_uncosted_ingredients: 0,
   reference_price: null,
   result: null,
