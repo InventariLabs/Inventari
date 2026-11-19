@@ -174,6 +174,7 @@
       "title": "Terminer l'ordre ?",
       "description": "Consomme les ingrédients listés et fabrique le produit. Tant que rien de ce qu'elle a fabriqué n'a été utilisé, « Annuler la production » la reprend.",
       "actualQtyLabel": "Quantité réelle produite (facultatif)",
+      "madeOnLabel": "Jour de fabrication",
       "actualQtyHint": "Laisser vide pour la quantité prévue. Moins pour les pertes, plus pour la surproduction. Les ingrédients sont consommés comme prévu, quelle que soit la quantité réelle."
     },
     "cancelConfirm": {

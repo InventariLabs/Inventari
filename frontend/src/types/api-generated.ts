@@ -22422,6 +22422,8 @@ export interface components {
         ProductionOrderComplete: {
             /** Actual Qty */
             actual_qty?: number | string | null;
+            /** Made On */
+            made_on?: string | null;
             /** Best Before */
             best_before?: string | null;
             /** Ingredient Lots */

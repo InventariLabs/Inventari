@@ -72691,6 +72691,18 @@
             ],
             "title": "Actual Qty"
           },
+          "made_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Made On"
+          },
           "best_before": {
             "anyOf": [
               {

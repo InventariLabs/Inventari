@@ -171,6 +171,7 @@
       "title": "Concluir a produção?",
       "description": "Isso consome os ingredientes listados e gera o produto final. Enquanto nada do que foi produzido tiver sido usado, \"Desfazer produção\" reverte tudo.",
       "actualQtyLabel": "Quantidade realmente produzida (opcional)",
+      "madeOnLabel": "Dia de fabricação",
       "actualQtyHint": "Deixe em branco para usar a quantidade planejada. Informe menos em caso de perda, mais em caso de superprodução. Os ingredientes são consumidos conforme o planejado, independentemente da quantidade real."
     },
     "cancelConfirm": {

@@ -515,6 +515,7 @@ async def complete_production_order(
             actual_qty=data.actual_qty,
             best_before=data.best_before,
             ingredient_lots=data.ingredient_lots,
+            made_on=data.made_on,
         )
     except InsufficientStockError as exc:
         raise _shortage_refusal(

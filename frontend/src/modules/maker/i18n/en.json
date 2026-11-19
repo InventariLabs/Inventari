@@ -174,6 +174,7 @@
       "title": "Complete production run?",
       "description": "This consumes the listed ingredients and produces the output. While nothing it made has been used, Undo run takes it back.",
       "actualQtyLabel": "Actual quantity produced (optional)",
+      "madeOnLabel": "Day it was made",
       "actualQtyHint": "Leave empty to use planned quantity. Enter less for scrap, more for overproduction. Ingredients are consumed as planned regardless of the actual quantity."
     },
     "cancelConfirm": {

@@ -1241,6 +1241,7 @@ async def complete_production(
     record_shortfall: bool = False,
     best_before: date | None = None,
     ingredient_lots: list[IngredientLotChoice] | None = None,
+    made_on: date | None = None,
 ) -> ProductionOrder:
     """Execute the full atomic production pipeline (see module docstring).
 
@@ -1258,14 +1259,17 @@ async def complete_production(
     - ``record_shortfall``: the run already happened, so an ingredient the
       records hold too little of is taken as far as they go and the rest is
       recorded on its line (``record_made``) instead of refusing the run.
+    - ``made_on``: the day the goods were made, else the organization's
+      today. Never the planned day: the plan says when the run was meant to
+      happen, and a run planned for a later day is not made on a day that has
+      not come.
     - ``best_before``: the output batch's date, else the run's day plus the
       product's shelf life (``output_batch.best_before_for_run``).
     - ``ingredient_lots``: the batches the person chose for ingredients;
       the run takes exactly those (``ingredient_batches.resolve_choices``).
     """
     order = await _lock_order(db, organization_id, order_id)
-    # The day the run is booked on: the one it was planned for, else today.
-    run_day = await _run_day(db, organization_id, order.production_date)
+    run_day = await _run_day(db, organization_id, made_on)
     actual_qty = await _resolve_actual_qty(db, organization_id, order, actual_qty)
     output_best_before = await output_batch.best_before_for_run(
         db, organization_id, order.output_template_id, run_day, best_before
@@ -1318,10 +1322,9 @@ async def complete_production(
     order.scrap_qty = scrap_qty
     order.completed_at = datetime.now(tz=UTC)
     order.completed_by = user.id
-    # The date is optional at planning and nobody plans it; at closing it is
-    # known to the day — an empty "PRODUCTION DATE —" on a finished run
-    # served nobody. The day the guard asked about, not the UTC date of
-    # ``completed_at``.
+    # The planned day gives way to the day the run was made: the stamp the
+    # batch record and the statements read. The day the guard asked about,
+    # not the UTC date of ``completed_at``.
     order.production_date = run_day
     await _journal_closed(
         db, organization_id, order, user, 'DRAFT', actual_qty, total_cost
@@ -1788,6 +1791,7 @@ async def record_made(
         record_shortfall=True,
         best_before=data.best_before,
         ingredient_lots=data.ingredient_lots,
+        made_on=data.production_date,
     )
 
 

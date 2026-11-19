@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { extractApiError } from "@/lib/errors";
 import { useCompleteProduction } from "@/modules/maker/hooks/useProduction";
 import { useBatchChoice } from "@/modules/maker/hooks/useBatchChoice";
-import { defaultBestBefore } from "@/modules/maker/lib/bestBefore";
+import { useProposedBestBefore } from "@/modules/maker/hooks/useProposedBestBefore";
 import { todayIso } from "@/utils/formatters";
 import {
   parseEmptyBomError,
@@ -32,9 +32,14 @@ export function useCompleteRun(order: ProductionOrder | undefined) {
 
   const [showConfirm, setShowConfirmState] = useState(false);
   const [actualQty, setActualQty] = useState("");
-  // The output batch's best-before, proposed from the run's day and the
-  // product's shelf life each time the dialog opens; the person may change it.
-  const [bestBefore, setBestBefore] = useState("");
+  // The day the goods were made: today until the person names another. The
+  // plan's day is where the run was meant to happen, not where it did.
+  const [madeOn, setMadeOn] = useState(todayIso());
+  // The output batch's best-before, proposed from the day it was made and the
+  // product's shelf life; the person may change it.
+  const proposed = useProposedBestBefore(madeOn, order?.shelf_life_days);
+  const bestBefore = proposed.value;
+  const setBestBefore = proposed.set;
   // The batches the ingredients come from — asked only while the dialog is
   // open on a draft, since a closed run has taken its batches already.
   const batchQuery = useMemo(
@@ -52,13 +57,9 @@ export function useCompleteRun(order: ProductionOrder | undefined) {
   const batches = useBatchChoice(batchQuery);
 
   function setShowConfirm(open: boolean) {
-    if (open && order) {
-      setBestBefore(
-        defaultBestBefore(
-          order.production_date ?? todayIso(),
-          order.shelf_life_days,
-        ),
-      );
+    if (open) {
+      setMadeOn(todayIso());
+      proposed.reset();
     }
     setShowConfirmState(open);
   }
@@ -72,6 +73,7 @@ export function useCompleteRun(order: ProductionOrder | undefined) {
     if (!order) return;
     const payload = {
       ...(actualQty.trim() !== "" && { actual_qty: actualQty.trim() }),
+      ...(madeOn && { made_on: madeOn }),
       ...(bestBefore && { best_before: bestBefore }),
       ...(batches.payload.length > 0 && { ingredient_lots: batches.payload }),
     };
@@ -127,6 +129,8 @@ export function useCompleteRun(order: ProductionOrder | undefined) {
     setShowConfirm,
     actualQty,
     setActualQty,
+    madeOn,
+    setMadeOn,
     bestBefore,
     setBestBefore,
     batches,

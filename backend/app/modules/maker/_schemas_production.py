@@ -273,6 +273,9 @@ class ProductionOrderComplete(BaseModel):
     """
 
     actual_qty: Decimal | None = Field(None, ge=0, max_digits=12, decimal_places=3)
+    #: The day the goods were made; the organization's today when omitted,
+    #: never the day the run was planned for.
+    made_on: date | None = None
     #: The output batch's best-before; left out, the run's day plus the
     #: product's shelf life.
     best_before: date | None = None
