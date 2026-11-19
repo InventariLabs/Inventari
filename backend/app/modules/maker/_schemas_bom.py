@@ -49,6 +49,11 @@ class BoMLineRead(BaseModel):
     #: the recipe is used. Null for an ingredient with no recipe, or when the
     #: line's unit has no bridge to the stock's.
     stock_on_hand: Decimal | None = None
+    #: The line's unit cannot be read as the ingredient's stock unit, so its
+    #: quantity means nothing a run can take off the shelf. A run refuses such
+    #: a line; the composition tab marks it as needing a unit before the next
+    #: run instead of letting the refusal be the first word.
+    unit_mismatch: bool = False
 
 
 class BoMTemplateIdsResponse(BaseModel):

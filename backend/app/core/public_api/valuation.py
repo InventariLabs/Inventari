@@ -234,6 +234,7 @@ class CoreValuationAPI:
         reason: str | None = None,
         item_id: UUID | None = None,
         reverses_line_id: UUID | None = None,
+        reverses_layer_id: UUID | None = None,
     ) -> Decimal | None:
         """Take stock off the receipt layers and post what it was worth.
 
@@ -252,6 +253,11 @@ class CoreValuationAPI:
         where the outflow is a correction or a return. Those goods came in on
         one layer at one price, so that layer is drained before the rest of
         the queue.
+
+        *reverses_layer_id* names the layer itself where no document line
+        does — the layer a production run opened for the output being undone.
+        The goods leave at what that layer cost, not at whatever layer of the
+        product is oldest.
         """
         from app.services.valuation_service import ValuationService
 
@@ -264,6 +270,7 @@ class CoreValuationAPI:
             reason=reason,
             item_id=item_id,
             reverses_line_id=reverses_line_id,
+            reverses_layer_id=reverses_layer_id,
         )
         return posting.cost
 

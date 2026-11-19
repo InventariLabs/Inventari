@@ -2394,6 +2394,37 @@
         }
       }
     },
+    "UomResolverAsync": {
+      "bases": [
+        "object"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "db",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "organization_id",
+          "required": true
+        }
+      ],
+      "kind": "class",
+      "members": {
+        "resolve": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "symbol",
+              "required": true
+            }
+          ]
+        }
+      }
+    },
     "UploadMessages": {
       "bases": [
         "object"

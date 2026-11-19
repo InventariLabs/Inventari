@@ -12783,6 +12783,11 @@ export interface components {
             typed_unit_price_in_use: boolean;
             /** Stock On Hand */
             stock_on_hand?: string | null;
+            /**
+             * Unit Mismatch
+             * @default false
+             */
+            unit_mismatch: boolean;
         };
         /**
          * BoMLineUpdate
@@ -15307,6 +15312,11 @@ export interface components {
              * @default false
              */
             is_opening: boolean;
+            /**
+             * Stock Already Applied
+             * @default false
+             */
+            stock_already_applied: boolean;
             /** Lines */
             lines: components["schemas"]["DocumentLineSchema"][];
             /**
@@ -23416,6 +23426,11 @@ export interface components {
              * @default false
              */
             is_opening: boolean;
+            /**
+             * Stock Already Applied
+             * @default false
+             */
+            stock_already_applied: boolean;
             /** Lines */
             lines: components["schemas"]["DocumentLineSchema"][];
             /**
@@ -27335,9 +27350,9 @@ export interface components {
          * StorageArchiveRequest
          * @description «Move content and close» payload.
          *
-         *     ``move_items_to`` is required when the location (or any of its
-         *     descendants) still holds items; the archive then relocates them in the
-         *     same operation.
+         *     ``move_items_to`` is required when the location itself still holds
+         *     items; the archive then relocates them in the same operation. The
+         *     locations inside stay active and keep their own stock.
          */
         StorageArchiveRequest: {
             /** Move Items To */

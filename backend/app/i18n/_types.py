@@ -773,9 +773,11 @@ class ErrorMessages(TypedDict):
     document_correction_no_lines: str
     document_correction_below_zero: str
     document_correction_type_not_correctable: str
+    document_correction_posts_nothing: str
     document_undo_type_not_supported: str
     document_undo_requires_completed: str
     document_undo_nothing_left: str
+    document_undo_posts_nothing: str
     document_undo_blocked: str
     document_undo_stock_used: str
     document_post_already_posted: str

@@ -29,6 +29,8 @@ import {
 } from "@/modules/inventory/hooks/useItemForm";
 import { useItem } from "@/modules/inventory/hooks/useItems";
 import { usePickedItemImage } from "@/modules/inventory/hooks/usePickedItemImage";
+import { useLeaveGuard } from "@/modules/inventory/hooks/useLeaveGuard";
+import { useSheetExtensions } from "@/modules/inventory/hooks/useSheetExtensions";
 import { useFreeLabel } from "@/modules/inventory/hooks/useFreeLabel";
 import { useScopedCategories } from "@/modules/shared/hooks/useCategories";
 import {
@@ -238,6 +240,8 @@ export default function ItemEditModal({
 
   const updateItemMutation = useUpdateItem();
 
+  const extensions = useSheetExtensions();
+
   const updateMutation = {
     mutate: (submission: Record<string, unknown>) =>
       updateItemMutation.mutate(
@@ -275,11 +279,20 @@ export default function ItemEditModal({
   } = useItemForm({
     initialData: item as unknown as Partial<ItemFormData>,
     categories,
-    onSubmit: (data) => updateMutation.mutate(data),
+    onSubmit: (data) => {
+      // A module's own values save first; one that refuses stops the save.
+      extensions.runBeforeSubmit().then(
+        () => updateMutation.mutate(data),
+        (error: unknown) =>
+          setErrors({
+            submit: extractApiError(error, t("messages.updateFailed")),
+          }),
+      );
+    },
     form: "item_edit",
   });
 
-  const isDirty = formIsDirty || hasPicked;
+  const isDirty = [formIsDirty, hasPicked, extensions.dirty].some(Boolean);
 
   // Once, when the field first exists: the fields arrive with the record and
   // its category, and a reader who has scrolled since is not moved again.
@@ -294,35 +307,13 @@ export default function ItemEditModal({
     field.scrollIntoView({ block: "center" });
   }, [openAtExpiry, isLoadingItem, fieldDefinitions, modalRef]);
 
-  /**
-   * Every way out of this form goes through here, so an edit in progress is
-   * never lost without a word. A module slot rendered inside the form can
-   * navigate away too, which is why this is handed to the slot rather than
-   * kept private: the slot has no way to know what the form is holding.
-   */
-  const requestLeave = useCallback(
-    (go: () => void) => {
-      if (isDirty) {
-        setPendingLeave(() => go);
-        return;
-      }
-      go();
-    },
-    [isDirty],
+  const { requestLeave, requestClose } = useLeaveGuard(
+    isDirty,
+    onClose,
+    // The setter takes a function as its next state, so the destination is
+    // wrapped to be stored as one.
+    useCallback((go: () => void) => setPendingLeave(() => go), []),
   );
-
-  const requestClose = useCallback(
-    () => requestLeave(onClose),
-    [requestLeave, onClose],
-  );
-
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") requestClose();
-    };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, [requestClose]);
 
   const handleFileSelect = async (fieldKey: string, file: File) => {
     try {
@@ -477,6 +468,8 @@ export default function ItemEditModal({
                   handleInputChange,
                   storageType: selectedStorageType,
                   requestLeave,
+                  registerBeforeSubmit: extensions.registerBeforeSubmit,
+                  reportDirty: extensions.reportDirty,
                 }}
               />
             </fieldset>

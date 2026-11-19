@@ -365,8 +365,7 @@ async def count_items_in_subtree_async(
 ) -> int:
     """Count non-deleted items in *storage_id* and all its descendants.
 
-    Mirrors the relocation scope of ``archive_storage`` — no usage filter, so
-    the UI can require a move target exactly when the backend would.
+    No usage filter, the way the subtree counters on the storage lists count.
     """
     scope_ids = [storage_id] + await descendant_ids_async(
         db, organization_id, storage_id

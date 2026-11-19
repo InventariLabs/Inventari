@@ -68,6 +68,7 @@ export function warehouseDocument(
     notes: null,
     external_reference: null,
     is_opening: false,
+    stock_already_applied: false,
     hold_stood_down: false,
     lines: [],
     created_by: "user-1",

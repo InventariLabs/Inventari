@@ -116,6 +116,7 @@ def _open_layers(
     organization_id: UUID,
     template_ids: Iterable[UUID],
     reverses_line_id: UUID | None = None,
+    reverses_layer_id: UUID | None = None,
 ) -> Select[Any]:
     """The layers a delivery of these products drains, locked, in the order they go.
 
@@ -134,6 +135,14 @@ def _open_layers(
         .order_by(
             # The product's own queue; across products the order is by product.
             StockValuationLayer.product_template_id,
+            # The layer the goods came in on, when the caller can name it —
+            # a production run's output, whose layer the run itself opened —
+            # before anything else. ``False`` sorts before ``True``, so a
+            # query with no layer to reverse orders every row alike and the
+            # FIFO below decides on its own.
+            (StockValuationLayer.id != reverses_layer_id)
+            if reverses_layer_id is not None
+            else literal(False),
             # The layer these goods arrived on, when the caller can name
             # it, before anything else. ``False`` sorts before ``True``,
             # so a query with no line to reverse orders every row alike
@@ -168,22 +177,32 @@ def _open_layers(
 
 
 def _drain_order(
-    queue: list[StockValuationLayer], reverses_line_id: UUID | None
+    queue: list[StockValuationLayer],
+    reverses_line_id: UUID | None,
+    reverses_layer_id: UUID | None,
 ) -> list[StockValuationLayer]:
     """What is left of a product's prefetched layers, in the order a delivery drains them.
 
-    The same order the statement gives: the layer of the line being reversed
-    first, then the FIFO order the queue is already in. A layer with no line
-    behind it sorts last, as ``NULL`` does there.
+    The same order the statement gives: the named layer first, then the layer
+    of the line being reversed, then FIFO. A layer with no line behind it
+    sorts last, as ``NULL`` does there.
     """
     left = [layer for layer in queue if layer.remaining_qty > 0]
-    if reverses_line_id is None:
+    if reverses_line_id is None and reverses_layer_id is None:
         return left
 
-    def rank(layer: StockValuationLayer) -> int:
+    def line_rank(layer: StockValuationLayer) -> int:
+        if reverses_line_id is None:
+            return 0
         if layer.document_line_id is None:
             return 2
         return 0 if layer.document_line_id == reverses_line_id else 1
+
+    def rank(layer: StockValuationLayer) -> tuple[int, int]:
+        named = (
+            0 if reverses_layer_id is not None and layer.id == reverses_layer_id else 1
+        )
+        return (named, line_rank(layer))
 
     return sorted(left, key=rank)
 
@@ -584,6 +603,7 @@ class ValuationService:
         reason: str | None = None,
         item_id: UUID | None = None,
         reverses_line_id: UUID | None = None,
+        reverses_layer_id: UUID | None = None,
     ) -> DeliveryPosting:
         """Async: record delivery by template_id (Public API helper).
 
@@ -610,6 +630,7 @@ class ValuationService:
             reason=reason,
             item_id=item_id,
             reverses_line_id=reverses_line_id,
+            reverses_layer_id=reverses_layer_id,
         )
 
     @staticmethod
@@ -740,6 +761,7 @@ class ValuationService:
         reason: str | None = None,
         item_id: UUID | None = None,
         reverses_line_id: UUID | None = None,
+        reverses_layer_id: UUID | None = None,
     ) -> DeliveryPosting:
         """Take *quantity* off the receipt layers and post what it was worth.
 
@@ -760,6 +782,13 @@ class ValuationService:
         can no longer cover itself. Draining strict FIFO instead took the
         cheapest delivery in the warehouse off the books and left the
         expensive one that is actually being sent back standing on them.
+
+        *reverses_layer_id* names the exact layer the goods came in on, where
+        no document line names it — a production run's output, whose layer
+        the run opened for itself. Undoing that run takes the goods off at
+        what the run put in, not at whichever layer of the product is
+        oldest; the two differ as soon as the product was made more than
+        once at different costs.
 
         It is not posted at the average of the layers still on hand, read
         before the drain: the drain is FIFO, so one move carries two
@@ -799,12 +828,17 @@ class ValuationService:
             # Read and locked ahead of the posting (``lock_open_layers_async``):
             # the lines before this one have drained what they took from the
             # objects, and the queue is in FIFO order already.
-            layers = _drain_order(queue, reverses_line_id)
+            layers = _drain_order(queue, reverses_line_id, reverses_layer_id)
         else:
             layers = list(
                 (
                     await db.scalars(
-                        _open_layers(organization_id, [template.id], reverses_line_id)
+                        _open_layers(
+                            organization_id,
+                            [template.id],
+                            reverses_line_id,
+                            reverses_layer_id,
+                        )
                     )
                 ).all()
             )

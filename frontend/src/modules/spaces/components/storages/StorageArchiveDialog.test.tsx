@@ -224,12 +224,20 @@ describe("StorageArchiveDialog — putaway rules warning", () => {
 });
 
 describe("StorageArchiveDialog", () => {
-  it("shows the target picker when items live only in descendant locations", async () => {
-    mockSummary(0, 3);
+  it("shows the target picker when the location itself holds items", async () => {
+    mockSummary(3, 3);
     renderDialog();
 
     expect(await screen.findByText("Move products to")).toBeInTheDocument();
     expect(screen.getByRole("combobox")).toBeInTheDocument();
+  });
+
+  it("asks no target when items stand only on the locations inside, which stay active", async () => {
+    mockSummary(0, 3);
+    renderDialog();
+
+    await waitFor(() => expect(confirmButton()).toBeEnabled());
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
   });
 
   it("asks a plain question when the whole subtree is empty", async () => {
@@ -241,7 +249,7 @@ describe("StorageArchiveDialog", () => {
   });
 
   it("excludes the archived node and its descendants from the targets", async () => {
-    mockSummary(0, 3);
+    mockSummary(3, 3);
     renderDialog();
     await userEvent.click(await screen.findByRole("combobox"));
 
@@ -256,7 +264,7 @@ describe("StorageArchiveDialog", () => {
     // ADR-018: a location that has sublocations can hold records directly,
     // and the archive accepts any target. Leaving such a place out sent the
     // reader looking for a shelf below it they never wanted.
-    mockSummary(0, 3);
+    mockSummary(3, 3);
     renderDialog();
     await userEvent.click(await screen.findByRole("combobox"));
 
@@ -266,7 +274,7 @@ describe("StorageArchiveDialog", () => {
   });
 
   it("names each target by its path, not by its bare name", async () => {
-    mockSummary(0, 3);
+    mockSummary(3, 3);
     // Two shelves called "Top", in different storages. A list of names shows
     // the same entry twice and the reader cannot tell which one the items
     // would land in.
@@ -287,7 +295,7 @@ describe("StorageArchiveDialog", () => {
   });
 
   it("finds a target by asking the server, not by loading every location", async () => {
-    mockSummary(0, 3);
+    mockSummary(3, 3);
     const { requests } = renderDialog([
       ...FLOOR,
       ...Array.from({ length: 300 }, (_, i) => ({
@@ -318,7 +326,7 @@ describe("StorageArchiveDialog", () => {
   });
 
   it("keeps confirming blocked until a target is chosen", async () => {
-    mockSummary(0, 3);
+    mockSummary(3, 3);
     renderDialog();
     await userEvent.click(await screen.findByRole("combobox"));
 
@@ -365,7 +373,7 @@ describe("StorageArchiveDialog", () => {
   });
 
   it("archives with the chosen target location", async () => {
-    mockSummary(0, 3);
+    mockSummary(3, 3);
     let archiveBody: unknown = null;
     server.use(
       http.post("*/api/v1/locations/:id/archive", async ({ request }) => {
