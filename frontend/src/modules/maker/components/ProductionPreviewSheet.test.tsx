@@ -16,6 +16,9 @@ const breakdown: CostBreakdownResponse = {
   output_template_id: "tpl-jam",
   planned_qty: "4",
   total_cost: "10.00",
+  ingredients_cost: "10.00",
+  fixed_cost: "0.00",
+  labour_cost: "0.00",
   recipe_state: "has_lines",
   recipe_id: "recipe-jam",
   entries: [
@@ -73,6 +76,9 @@ describe("ProductionPreviewSheet", () => {
         ...breakdown,
         entries: [],
         total_cost: "0.00",
+        ingredients_cost: "0.00",
+        fixed_cost: "0.00",
+        labour_cost: "0.00",
         recipe_state: "empty",
         recipe_id: "recipe-jam",
       },
@@ -108,6 +114,9 @@ describe("ProductionPreviewSheet", () => {
               ...breakdown,
               entries: [],
               total_cost: "0.00",
+              ingredients_cost: "0.00",
+              fixed_cost: "0.00",
+              labour_cost: "0.00",
               recipe_state: "no_recipe",
               recipe_id: null,
             }}
@@ -149,6 +158,9 @@ describe("ProductionPreviewSheet", () => {
       breakdown: {
         ...breakdown,
         total_cost: "0.00",
+        ingredients_cost: "0.00",
+        fixed_cost: "0.00",
+        labour_cost: "0.00",
         entries: [
           {
             ...breakdown.entries[0],
@@ -172,6 +184,9 @@ describe("ProductionPreviewSheet", () => {
       breakdown: {
         ...breakdown,
         total_cost: "10.00",
+        ingredients_cost: "10.00",
+        fixed_cost: "0.00",
+        labour_cost: "0.00",
         entries: [
           breakdown.entries[0],
           {

@@ -49484,6 +49484,32 @@
             "type": "string",
             "title": "Total Cost"
           },
+          "ingredients_cost": {
+            "type": "string",
+            "title": "Ingredients Cost",
+            "default": "0.00"
+          },
+          "fixed_cost": {
+            "type": "string",
+            "title": "Fixed Cost",
+            "default": "0.00"
+          },
+          "labour_cost": {
+            "type": "string",
+            "title": "Labour Cost",
+            "default": "0.00"
+          },
+          "unit_cost": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Cost"
+          },
           "entries": {
             "items": {
               "$ref": "#/components/schemas/CostBreakdownEntry"
@@ -70741,6 +70767,18 @@
             "type": "string",
             "title": "Total Cost"
           },
+          "ingredients_cost": {
+            "type": "string",
+            "title": "Ingredients Cost"
+          },
+          "fixed_cost": {
+            "type": "string",
+            "title": "Fixed Cost"
+          },
+          "labour_cost": {
+            "type": "string",
+            "title": "Labour Cost"
+          },
           "unit_cost": {
             "type": "string",
             "title": "Unit Cost"
@@ -70788,6 +70826,9 @@
           "template_id",
           "produced_qty",
           "total_cost",
+          "ingredients_cost",
+          "fixed_cost",
+          "labour_cost",
           "unit_cost",
           "target_margin_pct",
           "unit_sale_price",
@@ -73750,6 +73791,32 @@
             "type": "string",
             "title": "Total Cost"
           },
+          "ingredients_cost": {
+            "type": "string",
+            "title": "Ingredients Cost",
+            "default": "0.00"
+          },
+          "fixed_cost": {
+            "type": "string",
+            "title": "Fixed Cost",
+            "default": "0.00"
+          },
+          "labour_cost": {
+            "type": "string",
+            "title": "Labour Cost",
+            "default": "0.00"
+          },
+          "unit_cost": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Cost"
+          },
           "entries": {
             "items": {
               "$ref": "#/components/schemas/CostBreakdownEntry"
@@ -73807,27 +73874,6 @@
               }
             ],
             "title": "Batch Yield Qty"
-          },
-          "fixed_cost": {
-            "type": "string",
-            "title": "Fixed Cost",
-            "default": "0"
-          },
-          "labour_cost": {
-            "type": "string",
-            "title": "Labour Cost",
-            "default": "0"
-          },
-          "unit_cost": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Unit Cost"
           },
           "reference_price": {
             "anyOf": [

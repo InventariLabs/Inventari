@@ -66,6 +66,15 @@ class CostBreakdownResponse(BaseModel):
     """Unit ``planned_qty`` is counted in (the output product's)."""
 
     total_cost: Decimal
+    """What the quantity costs to make: ingredients, fixed costs and labour."""
+    ingredients_cost: Decimal = Decimal('0.00')
+    """The ingredients' part of ``total_cost`` — what ``entries`` add up to."""
+    fixed_cost: Decimal = Decimal('0.00')
+    """The formula's fixed cost lines, scaled to the quantity."""
+    labour_cost: Decimal = Decimal('0.00')
+    """The formula's timed steps at the organization's rate, scaled to the quantity."""
+    unit_cost: Decimal | None = None
+    """``total_cost`` per unit; None when nothing was costed."""
     entries: list[CostBreakdownEntry]
     missing_cost_lines: list[str]  # template IDs with no layer rate or usable offer
     recipe_state: RecipeState

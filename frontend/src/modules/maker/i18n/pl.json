@@ -351,7 +351,11 @@
     "processStepMinutesLabel": "Minuty kroku {{number}}",
     "minutesShort": "min",
     "minutesPlaceholder": "min",
-    "processStepsGuard": "Kroki procesu"
+    "processStepsGuard": "Kroki procesu",
+    "processStepsDiscardTitle": "Odrzucić niedodany krok?",
+    "processStepsDiscardMessage": "Wpisany krok nie został dodany do listy. Zamknięcie edytora go usunie.",
+    "processStepsDiscardConfirm": "Odrzuć krok",
+    "processStepsDiscardKeep": "Wróć do edycji"
   },
   "bom": {
     "childLabel": "Składnik",
@@ -425,6 +429,9 @@
     "preview": "Oblicz cenę",
     "calculating": "Obliczanie…",
     "totalCost": "Koszt całkowity",
+    "ingredientsCost": "Składniki",
+    "fixedCost": "Koszty stałe",
+    "labourCost": "Robocizna",
     "suggestedPrice": "Sugerowana cena sprzedaży",
     "close": "Zamknij",
     "saveDefault": "Zapisz jako domyślną",

@@ -14157,6 +14157,23 @@ export interface components {
             planned_uom_symbol?: string | null;
             /** Total Cost */
             total_cost: string;
+            /**
+             * Ingredients Cost
+             * @default 0.00
+             */
+            ingredients_cost: string;
+            /**
+             * Fixed Cost
+             * @default 0.00
+             */
+            fixed_cost: string;
+            /**
+             * Labour Cost
+             * @default 0.00
+             */
+            labour_cost: string;
+            /** Unit Cost */
+            unit_cost?: string | null;
             /** Entries */
             entries: components["schemas"]["CostBreakdownEntry"][];
             /** Missing Cost Lines */
@@ -21751,6 +21768,12 @@ export interface components {
             produced_qty: string;
             /** Total Cost */
             total_cost: string;
+            /** Ingredients Cost */
+            ingredients_cost: string;
+            /** Fixed Cost */
+            fixed_cost: string;
+            /** Labour Cost */
+            labour_cost: string;
             /** Unit Cost */
             unit_cost: string;
             /** Target Margin Pct */
@@ -22751,6 +22774,23 @@ export interface components {
             planned_uom_symbol?: string | null;
             /** Total Cost */
             total_cost: string;
+            /**
+             * Ingredients Cost
+             * @default 0.00
+             */
+            ingredients_cost: string;
+            /**
+             * Fixed Cost
+             * @default 0.00
+             */
+            fixed_cost: string;
+            /**
+             * Labour Cost
+             * @default 0.00
+             */
+            labour_cost: string;
+            /** Unit Cost */
+            unit_cost?: string | null;
             /** Entries */
             entries: components["schemas"]["CostBreakdownEntry"][];
             /** Missing Cost Lines */
@@ -22771,18 +22811,6 @@ export interface components {
             has_shortage: boolean;
             /** Batch Yield Qty */
             batch_yield_qty?: string | null;
-            /**
-             * Fixed Cost
-             * @default 0
-             */
-            fixed_cost: string;
-            /**
-             * Labour Cost
-             * @default 0
-             */
-            labour_cost: string;
-            /** Unit Cost */
-            unit_cost?: string | null;
             /** Reference Price */
             reference_price?: string | null;
             /** Result Per Unit */

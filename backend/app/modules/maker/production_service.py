@@ -1806,7 +1806,7 @@ async def preview_production(
     """What a run would take, what is short and what it would cost — read-only.
 
     The shortages are judged where completion judges them: the scope the
-    run's own output location resolves to. The cost per unit adds the
+    run's own output location resolves to. The breakdown's total adds the
     recipe's fixed costs and its labour the way completion does
     (``_batch_overheads_and_recipe``), so the figure the person saves on is
     the figure the run records.
@@ -1830,7 +1830,6 @@ async def preview_production(
     preview.reference_price = recipe.reference_price
     if not recipe.batch_yield_qty:
         return preview
-    batches = data.planned_qty / recipe.batch_yield_qty
     check_location_id = await resolve_check_location(
         db, organization_id, context_location_id=data.output_location_id
     )
@@ -1846,20 +1845,10 @@ async def preview_production(
         for ingredient in availability.ingredients
     ]
     preview.has_shortage = availability.has_shortage or availability.has_unknown
-    preview.fixed_cost = quantise(
-        sum((line.amount for line in recipe.cost_lines), Decimal('0')) * batches
-    )
-    settings = await recipe_service.get_settings(db, organization_id)
-    preview.labour_cost = quantise(
-        cost_rollup.labour_cost_per_batch(recipe, settings.labor_hourly_rate) * batches
-    )
-    total = breakdown.total_cost + preview.fixed_cost + preview.labour_cost
-    if total > 0:
-        preview.unit_cost = quantise(total / data.planned_qty, 4)
-        if recipe.reference_price is not None:
-            preview.result_per_unit = quantise(
-                recipe.reference_price - total / data.planned_qty
-            )
+    if breakdown.total_cost > 0 and recipe.reference_price is not None:
+        preview.result_per_unit = quantise(
+            recipe.reference_price - breakdown.total_cost / data.planned_qty
+        )
     return preview
 
 

@@ -345,7 +345,11 @@
     "processStepMinutesLabel": "Minutos del paso {{number}}",
     "minutesShort": "min",
     "minutesPlaceholder": "min",
-    "processStepsGuard": "Los pasos del proceso"
+    "processStepsGuard": "Los pasos del proceso",
+    "processStepsDiscardTitle": "¿Descartar el paso sin añadir?",
+    "processStepsDiscardMessage": "El paso escrito no se ha añadido a la lista. Cerrar el editor lo descarta.",
+    "processStepsDiscardConfirm": "Descartar paso",
+    "processStepsDiscardKeep": "Seguir editando"
   },
   "bom": {
     "childLabel": "Ingrediente",
@@ -419,6 +423,9 @@
     "preview": "Calcular precio",
     "calculating": "Calculando…",
     "totalCost": "Coste total",
+    "ingredientsCost": "Ingredientes",
+    "fixedCost": "Costes fijos",
+    "labourCost": "Mano de obra",
     "suggestedPrice": "Precio de venta sugerido",
     "close": "Cerrar",
     "saveDefault": "Guardar como predeterminado",

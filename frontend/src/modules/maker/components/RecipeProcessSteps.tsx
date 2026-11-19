@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { extractApiError } from "@/lib/errors";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { useCanManage } from "@/hooks/useCanWrite";
@@ -49,6 +50,9 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
   const [draft, setDraft] = useState<DraftStep[] | null>(null);
   const [newStep, setNewStep] = useState("");
   const [newMinutes, setNewMinutes] = useState("");
+  // The X with a typed, unadded step in the add row asks before it throws
+  // that text away.
+  const [confirmingClose, setConfirmingClose] = useState(false);
 
   const steps = recipe.process_steps ?? [];
   // The editor holds two fields per step — the text and its time — so leaving
@@ -60,7 +64,13 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
     // A step edited down to nothing is a deletion the operator started and
     // did not finish — saving a blank line would show as an empty numbered
     // row forever.
-    const cleaned = draft
+    // The add row counts as a step: text typed there and never added with
+    // "Add step" is saved with the rest, not dropped under a success toast.
+    const pending: DraftStep[] =
+      newStep.trim() === ""
+        ? []
+        : [{ text: newStep.trim(), minutes: newMinutes.trim() }];
+    const cleaned = [...draft, ...pending]
       .filter((step) => step.text.trim() !== "")
       .map((step) => ({
         text: step.text.trim(),
@@ -78,6 +88,13 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
     } catch (err) {
       toast.error(extractApiError(err, t("detail.processStepsSaveFailed")));
     }
+  }
+
+  function closeEditor() {
+    setDraft(null);
+    setNewStep("");
+    setNewMinutes("");
+    setConfirmingClose(false);
   }
 
   function addStep() {
@@ -122,11 +139,11 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() => {
-                  setDraft(null);
-                  setNewStep("");
-                  setNewMinutes("");
-                }}
+                onClick={() =>
+                  newStep.trim() === ""
+                    ? closeEditor()
+                    : setConfirmingClose(true)
+                }
                 aria-label={t("common:actions.cancel")}
               >
                 <X size={16} />
@@ -271,6 +288,18 @@ export function RecipeProcessSteps({ recipe }: RecipeProcessStepsProps) {
             </Button>
           </div>
         </div>
+      )}
+      {confirmingClose && (
+        <ConfirmDialog
+          open
+          title={t("detail.processStepsDiscardTitle")}
+          message={t("detail.processStepsDiscardMessage")}
+          confirmLabel={t("detail.processStepsDiscardConfirm")}
+          cancelLabel={t("detail.processStepsDiscardKeep")}
+          variant="warning"
+          onConfirm={closeEditor}
+          onCancel={() => setConfirmingClose(false)}
+        />
       )}
     </Card>
   );
