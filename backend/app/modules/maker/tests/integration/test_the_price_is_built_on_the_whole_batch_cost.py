@@ -1,9 +1,8 @@
 """The suggested price, the cost estimate and the recipe quote one cost.
 
 A batch costs its ingredients, its fixed cost lines and the labour its timed
-steps take. The recipe page, the run preview and the completed run added all
-three; the pricing calculator and the per-product cost estimate stopped at the
-ingredients, so a price suggested from them sat below what the run cost.
+steps take. Every reader that says what a quantity costs adds all three, so a
+price built on that figure never sits below what the run costs.
 """
 
 import uuid
