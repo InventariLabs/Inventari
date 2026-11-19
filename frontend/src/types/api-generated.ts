@@ -22450,6 +22450,8 @@ export interface components {
         ProductionOrderComplete: {
             /** Actual Qty */
             actual_qty?: number | string | null;
+            /** Made On */
+            made_on?: string | null;
             /** Best Before */
             best_before?: string | null;
             /** Ingredient Lots */
@@ -22673,6 +22675,8 @@ export interface components {
             lines?: components["schemas"]["ProductionOrderLineRead"][];
             /** Started On */
             started_on?: string | null;
+            /** Planned For */
+            planned_for?: string | null;
             /** Material Cost */
             material_cost?: string | null;
             /** Unshelved Cost */

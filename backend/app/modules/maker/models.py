@@ -371,6 +371,10 @@ class ProductionOrder(Base):
     #: finished: its ingredients left the records that day. NULL on a run
     #: that was completed in one step.
     started_on: Mapped[date | None] = mapped_column(Date())
+    #: The day a draft was planned for, kept when the run closes on another
+    #: day (``production_date`` then holds the day it was made). NULL when the
+    #: run was made on its planned day, or never had one.
+    planned_for: Mapped[date | None] = mapped_column(Date())
     #: The moment the run was started, for the as-of valuation: the work in
     #: progress is held from this instant until the run closes.
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

@@ -277,6 +277,51 @@ class TestFromRecipeEndpoint:
         assert len(recipes) == 1
         assert len(recipes[0].lines) == 1
 
+    def test_from_recipe_reuse_refuses_a_yield_that_differs_from_the_stored_one(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        mk_user: User,
+        db_session: Session,
+    ) -> None:
+        """A reused snapshot keeps its yield, so an answer that differs is refused.
+
+        The caller plans ``yield x batches`` against the snapshot's per-batch
+        yield; taking the new number and dropping it would plan 1.1 kg of
+        output against ingredients for 12 kg.
+        """
+        output = _make_template(db_session, mk_org, 'Shortbread')
+        culinary = _make_culinary_recipe(
+            db_session, mk_org, servings=12, created_by=mk_user.id
+        )
+        payload = {
+            'source_recipe_id': str(culinary.id),
+            'output_template_id': str(output.id),
+            'batch_yield_qty': '12',
+        }
+        first = client.post(
+            '/api/v1/maker/recipes/from-recipe', headers=mk_auth_headers, json=payload
+        )
+        assert first.status_code == 201, first.text
+
+        same = client.post(
+            '/api/v1/maker/recipes/from-recipe', headers=mk_auth_headers, json=payload
+        )
+        assert same.status_code == 201, same.text
+        assert same.json()['id'] == first.json()['id']
+
+        differs = client.post(
+            '/api/v1/maker/recipes/from-recipe',
+            headers=mk_auth_headers,
+            json={**payload, 'batch_yield_qty': '1.1'},
+        )
+        assert differs.status_code == 400, differs.text
+        assert '12' in differs.text
+        recipe = db_session.get(MakerRecipe, uuid.UUID(first.json()['id']))
+        assert recipe is not None
+        assert recipe.batch_yield_qty == Decimal('12')
+
     def test_from_recipe_missing_culinary_recipe_returns_404(
         self,
         client: TestClient,

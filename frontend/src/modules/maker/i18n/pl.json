@@ -176,6 +176,7 @@
       "title": "Zakończyć zlecenie?",
       "description": "Zużyje wymienione składniki i wytworzy produkt. Dopóki nikt nie ruszył tego, co wytworzył, „Cofnij przebieg” go wycofa.",
       "actualQtyLabel": "Rzeczywista ilość produktu (opcjonalnie)",
+      "madeOnLabel": "Dzień wykonania",
       "actualQtyHint": "Pozostaw puste, aby użyć ilości planowanej. Wpisz mniej dla odpadu, więcej dla nadprodukcji. Składniki zużywane są według planu niezależnie od ilości faktycznej."
     },
     "cancelConfirm": {
@@ -194,6 +195,7 @@
       "totalCostUndone": "Koszt przed cofnięciem przebiegu",
       "created": "Utworzone",
       "productionDate": "Data produkcji",
+      "plannedFor": "Zaplanowano na",
       "notes": "Notatki",
       "actualQty": "Rzeczywista produkcja",
       "plannedSuffix": "planowano: {{qty}}",

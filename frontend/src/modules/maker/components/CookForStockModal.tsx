@@ -16,11 +16,14 @@ import {
   writeJson,
 } from "@/module-sdk";
 import type { SlotDataMap } from "@/lib/moduleRegistry";
+import type { UomCategory } from "@/types";
 import { ProductSearchInput } from "./ProductSearchInput";
 import { ShortageModal } from "./ShortageModal";
 import { parseShortageError } from "../lib/shortageError";
 import { extractApiError } from "@/lib/errors";
 import { QueryFailure } from "@/components/ui/QueryResult";
+import { unitLabel } from "@/lib/i18nHelpers";
+import { findUom, isCountedUom, useUoms } from "@/modules/shared/hooks/useUoms";
 import {
   createMakerRecipeFromCulinary,
   createProductionOrderFromBridge,
@@ -39,6 +42,8 @@ interface CookForStockModalProps {
 interface SelectedProduct {
   product_template_id: string;
   name: string;
+  uom_id: string | null;
+  uom_symbol: string | null;
 }
 
 /**
@@ -59,6 +64,50 @@ function readLastOutputLocation(): string {
   // claim, not one.
   const stored = readJson<unknown>(LAST_OUTPUT_LOCATION_KEY, "");
   return typeof stored === "string" ? stored : "";
+}
+
+/**
+ * The output product's unit as this sheet needs it.
+ *
+ * Servings are a count of portions. They stand for the batch's yield only
+ * where the product is counted too (a piece, a pack) or has no unit yet; a
+ * product kept in kilograms or litres is asked how much a batch makes, never
+ * handed the number of servings — twelve servings are not twelve kilograms.
+ * Until the unit catalogue has loaded a product with a unit is asked. The
+ * product search does not always carry the unit's symbol; the catalogue names
+ * it by id.
+ */
+function outputUnit(
+  categories: UomCategory[] | undefined,
+  product: SelectedProduct | null,
+) {
+  return {
+    servingsFit: !product?.uom_id || isCountedUom(categories, product.uom_id),
+    unitSymbol:
+      findUom(categories, product?.uom_id)?.symbol ?? product?.uom_symbol,
+  };
+}
+
+/**
+ * What a run comes to: the amount one batch makes times the number of
+ * batches, or null while either is missing. Rounded to the four places the
+ * backend keeps, which also hides binary noise (1.1 × 3).
+ */
+function planBatch(yieldText: string, scale: string) {
+  // Four places is what the backend accepts for a yield too, so the number
+  // sent and the number planned with are the same one.
+  const yieldNum =
+    yieldText.trim() === ""
+      ? NaN
+      : Math.round(Number(yieldText) * 10000) / 10000;
+  const validYield = Number.isFinite(yieldNum) && yieldNum > 0;
+  const scaleNum = Number(scale);
+  const validScale = Number.isFinite(scaleNum) && scaleNum >= 1;
+  const plannedQty =
+    validYield && validScale
+      ? String(Math.round(yieldNum * scaleNum * 10000) / 10000)
+      : null;
+  return { yieldNum, validYield, scaleNum, validScale, plannedQty };
 }
 
 function rememberOutputLocation(id: string): void {
@@ -103,6 +152,10 @@ export function CookForStockModal({
 
   const [product, setProduct] = useState<SelectedProduct | null>(null);
   const [scale, setScale] = useState("1");
+  // What one batch makes, in the product's unit. `null` is "not typed yet":
+  // the number then comes from the servings when they fit the product, and is
+  // asked for when they do not.
+  const [batchYield, setBatchYield] = useState<string | null>(null);
   const [storageId, setStorageId] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [shortage, setShortage] = useState<ReturnType<
@@ -136,10 +189,17 @@ export function CookForStockModal({
     rememberedOffered.data,
   ]);
 
-  const scaleNum = Number(scale);
-  const validScale = Number.isFinite(scaleNum) && scaleNum >= 1;
-  const plannedQty = validScale ? recipe.servings * scaleNum : null;
-  const canSubmit = !!product && validScale && !!storageId && !submitting;
+  const { data: uomCategories } = useUoms();
+
+  const { servingsFit, unitSymbol } = outputUnit(uomCategories, product);
+  const yieldText = batchYield ?? (servingsFit ? String(recipe.servings) : "");
+  const unit = unitLabel(t, unitSymbol);
+  const { yieldNum, validYield, scaleNum, validScale, plannedQty } = planBatch(
+    yieldText,
+    scale,
+  );
+  const canSubmit =
+    !!product && validYield && validScale && !!storageId && !submitting;
 
   const handleSubmit = async (confirmShortage = false) => {
     if (!product || !storageId || plannedQty === null) return;
@@ -150,7 +210,7 @@ export function CookForStockModal({
         output_template_id: product.product_template_id,
         name: recipe.name,
         // One batch = one culinary cook; the order's planned_qty scales it.
-        batch_yield_qty: String(recipe.servings),
+        batch_yield_qty: String(yieldNum),
       };
       const makerRecipe: MakerRecipeBridgeResult =
         await createMakerRecipeFromCulinary(payload);
@@ -158,7 +218,7 @@ export function CookForStockModal({
       const order = await createProductionOrderFromBridge({
         output_template_id: product.product_template_id,
         recipe_id: makerRecipe.id,
-        planned_qty: String(plannedQty),
+        planned_qty: plannedQty,
         output_location_id: storageId,
         confirm_shortage: confirmShortage,
       });
@@ -229,18 +289,38 @@ export function CookForStockModal({
               </div>
             ) : (
               <ProductSearchInput
-                onSelect={(p) =>
+                onSelect={(p) => {
+                  setBatchYield(null);
                   setProduct({
                     product_template_id: p.product_template_id,
                     name: p.name,
-                  })
-                }
+                    uom_id: p.uom_id ?? null,
+                    uom_symbol: p.uom_symbol ?? null,
+                  });
+                }}
                 label={t("cookForStock.productLabel")}
                 placeholder={t("cookForStock.productPlaceholder")}
                 testId="cook-for-stock-product-search"
               />
             )}
           </div>
+
+          <Input
+            id="cook-for-stock-yield"
+            label={t("cookForStock.yieldLabel")}
+            description={
+              servingsFit
+                ? t("cookForStock.yieldHint", { servings: recipe.servings })
+                : t("cookForStock.yieldAsk", { servings: recipe.servings })
+            }
+            type="number"
+            min="0"
+            step="any"
+            suffix={unit || undefined}
+            value={yieldText}
+            onChange={(e) => setBatchYield(e.target.value)}
+            data-testid="cook-for-stock-yield-input"
+          />
 
           <div className="grid grid-cols-2 gap-3">
             <Input
@@ -266,11 +346,19 @@ export function CookForStockModal({
                 className="h-10 flex items-center text-lg font-semibold text-on tabular-nums"
                 data-testid="cook-for-stock-planned-qty"
               >
-                {plannedQty === null ? "—" : plannedQty}
+                {plannedQty === null
+                  ? "—"
+                  : unit
+                    ? `${plannedQty} ${unit}`
+                    : plannedQty}
               </p>
               <p className="text-xs text-on-muted">
                 {t("cookForStock.plannedQtyFormula", {
-                  servings: recipe.servings,
+                  qty: validYield
+                    ? unit
+                      ? `${yieldNum} ${unit}`
+                      : yieldNum
+                    : "—",
                   batches: validScale ? scaleNum : "—",
                 })}
               </p>

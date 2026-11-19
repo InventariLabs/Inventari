@@ -11,6 +11,8 @@ import {
 import ProductionDetailPage from "./ProductionDetailPage";
 import type { ProductionOrder } from "@/modules/maker/types/maker";
 import { signInWith } from "@/test/auth";
+import { todayIso } from "@/utils/formatters";
+import { defaultBestBefore } from "@/modules/maker/lib/bestBefore";
 
 const updateMutate = vi.fn();
 const duplicateMutate = vi.fn();
@@ -301,6 +303,36 @@ describe("ProductionDetailPage edit + duplicate", () => {
     );
   });
 
+  it("keeps the day a closed run was planned for beside the day it was made", () => {
+    currentOrder = {
+      ...draftOrder,
+      status: "COMPLETED",
+      production_date: "2020-01-02",
+      planned_for: "2020-01-05",
+    };
+    renderPage();
+
+    expect(screen.getByText(/Planned for: .*2020/)).toBeInTheDocument();
+  });
+
+  it("completes a run planned for a later day on today, not on the plan", () => {
+    // The dialog opens on the day the goods are made — today — whatever day
+    // the run was planned for, and sends it.
+    currentOrder = { ...draftOrder, production_date: "2999-01-05" };
+    renderPage();
+
+    fireEvent.click(screen.getByTestId("maker-detail-complete-button"));
+    const confirmButtons = screen.getAllByRole("button", {
+      name: "Complete run",
+    });
+    fireEvent.click(confirmButtons[confirmButtons.length - 1]);
+
+    expect(completeMutate).toHaveBeenCalledWith(
+      { orderId: "ord-1", data: { made_on: todayIso() } },
+      expect.anything(),
+    );
+  });
+
   it("surfaces the backend detail message when completing fails", () => {
     currentOrder = draftOrder;
     renderPage();
@@ -315,7 +347,7 @@ describe("ProductionDetailPage edit + duplicate", () => {
     fireEvent.click(confirmButtons[confirmButtons.length - 1]);
 
     expect(completeMutate).toHaveBeenCalledWith(
-      { orderId: "ord-1", data: { actual_qty: "6" } },
+      { orderId: "ord-1", data: { actual_qty: "6", made_on: todayIso() } },
       expect.objectContaining({ onError: expect.any(Function) }),
     );
 
@@ -668,7 +700,7 @@ describe("ProductionDetailPage — the draft says when its quantities are read",
 });
 
 describe("ProductionDetailPage — closing a run dates its batch and names its ingredients' batches", () => {
-  it("proposes the best-before from the shelf life and sends it with the batch chosen", async () => {
+  it("proposes the best-before from the day made and the shelf life and sends it with the batch chosen", async () => {
     server.use(
       http.get("*/api/v1/maker/production/ingredient-batches", () =>
         HttpResponse.json({
@@ -690,7 +722,6 @@ describe("ProductionDetailPage — closing a run dates its batch and names its i
     );
     currentOrder = {
       ...draftOrder,
-      production_date: "2025-11-02",
       shelf_life_days: 30,
     };
     completeMutate.mockClear();
@@ -709,7 +740,8 @@ describe("ProductionDetailPage — closing a run dates its batch and names its i
       {
         orderId: "ord-1",
         data: {
-          best_before: "2025-12-02",
+          made_on: todayIso(),
+          best_before: defaultBestBefore(todayIso(), 30),
           ingredient_lots: [
             { template_id: "tpl-honey", lot_id: "late", quantity: "6" },
           ],
