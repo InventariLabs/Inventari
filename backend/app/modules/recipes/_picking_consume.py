@@ -131,6 +131,7 @@ async def consume_for_picking(
         user_id=_resolve_user_id(user),
         history_changes=history_changes,
         sync_valuation=False,
+        file_when_emptied=True,
         **picking_move_reference(history_changes),
     )
     if updated_item is None:

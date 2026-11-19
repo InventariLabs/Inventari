@@ -798,6 +798,7 @@ async def _write_the_records(
             # The movement is written by this pass; the posting would write it
             # a second time.
             post_the_change=False,
+            file_when_emptied=record.file_when_emptied,
         )
 
 

@@ -25,7 +25,7 @@ from app.models.item import Item
 from app.models.organization import Organization
 from app.models.product_template import ProductTemplate
 from app.models.stock_valuation_layer import StockValuationLayer
-from app.models.storage_location import StorageLocation
+from app.models.storage_location import LocationUsage, StorageLocation
 from app.modules.maker.models import BoMLine, MakerRecipe
 
 pytestmark = pytest.mark.integration
@@ -228,6 +228,34 @@ class TestACompletedRunIsTakenBack:
         ]
         assert [Decimal(m['quantity']) for m in taken_off] == [Decimal('2')]
         assert _drift(client, mk_auth_headers) == (0, 0)
+
+    def test_the_output_record_the_reversal_empties_leaves_the_products_list(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_output_loc: StorageLocation,
+        db_session: Session,
+        plum_butter: dict[str, Any],
+    ) -> None:
+        """Undo run files the emptied output like a record used up by hand."""
+        run = _run(client, mk_auth_headers, plum_butter['butter'], mk_output_loc, '2')
+        produced = UUID(run['produced_item_id'])
+
+        response = client.post(f'{ORDERS}/{run["id"]}/reverse', headers=mk_auth_headers)
+
+        assert response.status_code == 200, response.text
+        db_session.expire_all()
+        record = db_session.execute(
+            select(Item).where(Item.id == produced)
+        ).scalar_one()
+        place = db_session.execute(
+            select(StorageLocation).where(
+                StorageLocation.id == record.storage_location_id
+            )
+        ).scalar_one()
+        assert place.usage == LocationUsage.CUSTOMER
+        listed = client.get('/api/v1/items', headers=mk_auth_headers).json()['items']
+        assert str(produced) not in {row['id'] for row in listed}
 
     def test_a_run_is_taken_back_once(
         self,

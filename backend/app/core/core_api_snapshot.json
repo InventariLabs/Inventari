@@ -2247,6 +2247,11 @@
               "kind": "KEYWORD_ONLY",
               "name": "move_reference_id",
               "required": false
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "file_when_emptied",
+              "required": false
             }
           ]
         }

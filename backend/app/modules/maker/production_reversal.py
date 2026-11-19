@@ -291,6 +291,7 @@ async def _take_the_output_off(
                 item_id=produced.id,
                 new_quantity=(produced.quantity or Decimal('0')) - made,
                 history=history,
+                file_when_emptied=True,
             )
         ],
     )
