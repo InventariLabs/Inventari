@@ -39,7 +39,7 @@ export function useManualNutrition({
     defaultValue: "Error saving nutrition",
   });
 
-  // Throws when the product refuses the figures.
+  // Throws a ReadableError when the product refuses the figures.
   const save = async () => {
     if (!item?.template_id) return;
     const payload = Object.fromEntries(
@@ -47,17 +47,21 @@ export function useManualNutrition({
         ([, v]) => v !== "" && v !== undefined && v !== null,
       ),
     ) as ProductTemplateNutritionInfo;
-    await updateNutrition.mutateAsync({
-      templateId: item.template_id,
-      nutritionInfo: payload,
-      itemId: item.id,
-    });
+    try {
+      await updateNutrition.mutateAsync({
+        templateId: item.template_id,
+        nutritionInfo: payload,
+        itemId: item.id,
+      });
+    } catch (error) {
+      throw new ReadableError(extractApiError(error, failure));
+    }
     setShowForm(false);
     setTouched(false);
   };
 
-  const latest = useRef({ touched, save, failure });
-  latest.current = { touched, save, failure };
+  const latest = useRef({ touched, save });
+  latest.current = { touched, save };
 
   useEffect(() => {
     reportDirty?.(touched);
@@ -67,14 +71,7 @@ export function useManualNutrition({
   useEffect(
     () =>
       registerBeforeSubmit?.(async () => {
-        if (!latest.current.touched) return;
-        try {
-          await latest.current.save();
-        } catch (error) {
-          throw new ReadableError(
-            extractApiError(error, latest.current.failure),
-          );
-        }
+        if (latest.current.touched) await latest.current.save();
       }),
     [registerBeforeSubmit],
   );
