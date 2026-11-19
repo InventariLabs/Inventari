@@ -167,7 +167,8 @@
     "searchPlaceholder": "Rechercher des produits…",
     "noResults": "Aucun produit sans étiquette ne correspond.",
     "submit": "Associer l'étiquette",
-    "success": "Étiquette {{code}} associée à {{name}}"
+    "success": "Étiquette {{code}} associée à {{name}}",
+    "expires": "expire le {{date}}"
   },
   "productLabel": {
     "action": "Imprimer l'étiquette",
