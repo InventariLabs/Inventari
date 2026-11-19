@@ -10,7 +10,7 @@ nothing was recorded in is more dangerous than one that names the boundary.
 
 from __future__ import annotations
 
-from datetime import UTC, date, datetime, time, timedelta
+from datetime import UTC, date, datetime, time, timedelta, tzinfo
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -56,18 +56,20 @@ router = APIRouter()
 PDF_ROW_LIMIT = 5_000
 
 
-def _resolve_instant(as_of: date | datetime) -> datetime:
+def _resolve_instant(as_of: date | datetime, zone: tzinfo = UTC) -> datetime:
     """The instant a caller meant by what they typed.
 
-    A bare date is the whole day, so it resolves to the end of it: the shelf
-    on the 23rd is the shelf once the 23rd is over, not the one at midnight
-    before the day's movements. A timestamp without an offset is read as UTC
-    — the ledger is stored in UTC, and a naive value compared against it would
-    end the request in a 500 rather than an answer.
+    A bare date is the whole day on the organization's calendar (*zone*), so
+    it resolves to the end of it there: the shelf on the 23rd is the shelf
+    once the 23rd is over where the organization lives, not the one at
+    midnight before the day's movements, and not the one at midnight UTC. A
+    timestamp without an offset is read as UTC — the ledger is stored in UTC,
+    and a naive value compared against it would end the request in a 500
+    rather than an answer.
     """
     if isinstance(as_of, datetime):
         return as_of if as_of.tzinfo else as_of.replace(tzinfo=UTC)
-    return datetime.combine(as_of, time.max, tzinfo=UTC)
+    return datetime.combine(as_of, time.max, tzinfo=zone)
 
 
 async def _build_report(
@@ -85,7 +87,8 @@ async def _build_report(
     The screen asks for a page; the files ask for no ``limit`` and carry
     every row.
     """
-    as_of = _resolve_instant(as_of)
+    zone = await core_api.organizations.timezone_async(db, org_id)
+    as_of = _resolve_instant(as_of, zone)
     starts_at = await ledger_starts_at_async(db, org_id)
     if starts_at is None:
         raise catalogue_refusal('stock_as_of_no_history')
@@ -101,8 +104,10 @@ async def _build_report(
         country = organization.country if organization else None
         raise catalogue_refusal(
             'stock_as_of_before_ledger',
-            starts_at=format_date_for(lang, starts_at, country=country),
-            as_of=format_date_for(lang, as_of, country=country),
+            starts_at=format_date_for(
+                lang, starts_at.astimezone(zone), country=country
+            ),
+            as_of=format_date_for(lang, as_of.astimezone(zone), country=country),
         )
 
     org_currency = await get_org_currency_async(db, org_id)
@@ -117,6 +122,7 @@ async def _build_report(
         limit=limit,
         offset=offset,
         search=search,
+        zone=zone,
     )
     organization = await core_api.organizations.get_async(db, org_id)
     # What a started production run still holds is the organization's on that
@@ -313,8 +319,27 @@ async def stock_as_of_pdf(
     )
 
 
+async def _default_period_start(db: AsyncSession, org_id: UUID, date_to: date) -> date:
+    """The first day a statement ending on *date_to* can honestly open on.
+
+    The month *date_to* is in — unless the ledger began inside it, when the
+    first day with a known evening before it: the day after the ledger's
+    first movement, on the organization's calendar. An organization in its
+    first month is shown a statement at once instead of a refusal to be
+    argued with by hand. A ledger that begins on *date_to* itself leaves no
+    such day; the period then stays one day long and the refusal that
+    follows names the boundary.
+    """
+    first = date_to.replace(day=1)
+    starts_at = await ledger_starts_at_async(db, org_id)
+    if starts_at is not None:
+        zone = await core_api.organizations.timezone_async(db, org_id)
+        first = max(first, starts_at.astimezone(zone).date() + timedelta(days=1))
+    return min(first, date_to)
+
+
 async def _build_value_movement(
-    db: AsyncSession, org_id: UUID, date_from: date, date_to: date
+    db: AsyncSession, org_id: UUID, date_from: date | None, date_to: date
 ) -> StockValueMovementDTO:
     """The statement of a period: the value it opened with, what moved it,
     the value it closed with.
@@ -326,6 +351,8 @@ async def _build_value_movement(
     ends differ by that the layers do not account for is said, not hidden,
     as ``other_changes``.
     """
+    if date_from is None:
+        date_from = await _default_period_start(db, org_id, date_to)
     if date_to < date_from:
         raise catalogue_refusal('stock_value_period_reversed')
     opening, _ = await _build_report(
@@ -352,6 +379,7 @@ async def _build_value_movement(
         opening.as_of,
         closing.as_of,
         org_currency=closing.currency or '',
+        zone=await core_api.organizations.timezone_async(db, org_id),
     )
     in_production = (closing.work_in_progress_value or Decimal('0')) - (
         opening.work_in_progress_value or Decimal('0')
@@ -384,7 +412,14 @@ async def _build_value_movement(
 
 @router.get('/stock-value-movement', response_model=StockValueMovementDTO)
 async def stock_value_movement(
-    date_from: date = Query(..., description='The first day of the period.'),
+    date_from: date | None = Query(
+        None,
+        description=(
+            'The first day of the period. Left out, it is the first day of '
+            'the month of `date_to` — or the first day the ledger can open '
+            'on, when it began inside that month.'
+        ),
+    ),
     date_to: date = Query(..., description='The last day of the period, included.'),
     _: object = require_permission(SystemPermission.ITEMS_READ),
     db: AsyncSession = Depends(get_async_db, scope='function'),
@@ -419,7 +454,7 @@ _MOVEMENT_LINES = (
 
 @router.get('/stock-value-movement/export/xlsx', response_model=None)
 async def stock_value_movement_xlsx(
-    date_from: date = Query(...),
+    date_from: date | None = Query(None),
     date_to: date = Query(...),
     _: object = require_permission(SystemPermission.ITEMS_READ),
     db: AsyncSession = Depends(get_async_db, scope='function'),
@@ -451,5 +486,8 @@ async def stock_value_movement_xlsx(
     return to_xlsx_response(
         frame,
         sheet_name='Value movement',
-        filename_stem=f'inventari_value_movement_{date_from.isoformat()}_{date_to.isoformat()}',
+        filename_stem=(
+            f'inventari_value_movement_{statement.date_from.isoformat()}'
+            f'_{date_to.isoformat()}'
+        ),
     )

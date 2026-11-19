@@ -11,8 +11,11 @@ import { api, type components } from "@/module-sdk";
 export type StockValueMovement = components["schemas"]["StockValueMovementDTO"];
 
 export interface StockValueMovementQuery {
-  /** The first day of the period, `YYYY-MM-DD`. */
-  date_from: string;
+  /**
+   * The first day of the period, `YYYY-MM-DD`. Left out, the server opens it
+   * on the first day it can report for the month of `date_to`.
+   */
+  date_from?: string;
   /** The last day of the period, included. */
   date_to: string;
 }

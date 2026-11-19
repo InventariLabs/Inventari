@@ -991,6 +991,10 @@ class LastProduction:
     unit_cost: Decimal | None
     completed_at: datetime | None
     uncosted_ingredients: int = 0
+    #: The run closed with more than it planned, so its per-unit cost is the
+    #: cost of the whole batch spread over a quantity the ingredients did not
+    #: grow with.
+    overproduced: bool = False
 
 
 async def get_last_unit_costs(
@@ -1047,6 +1051,8 @@ async def get_last_unit_costs(
             unit_cost=unit_cost,
             completed_at=row.completed_at,
             uncosted_ingredients=uncosted.get(row.id, 0),
+            overproduced=row.actual_qty is not None
+            and row.actual_qty > row.planned_qty,
         )
     return costs
 

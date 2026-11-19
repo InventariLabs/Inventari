@@ -192,4 +192,56 @@ describe("FinishRunAction", () => {
 
     expect(mocks.finish.mock.calls[0][0].data.actual_qty).toBeUndefined();
   });
+
+  it("opens on empty fields after a refused finish", () => {
+    render(<FinishRunAction order={order} />);
+    fireEvent.click(screen.getByTestId("maker-detail-finish-button"));
+    fireEvent.change(screen.getByTestId("maker-finish-actual-qty-input"), {
+      target: { value: "5" },
+    });
+    fireEvent.click(
+      within(screen.getByRole("alertdialog")).getByRole("button", {
+        name: "Finish run",
+      }),
+    );
+    mocks.finish.mock.calls[0][1].onError(new Error("refused"));
+
+    fireEvent.click(screen.getByTestId("maker-detail-finish-button"));
+    expect(
+      (screen.getByTestId("maker-finish-actual-qty-input") as HTMLInputElement)
+        .value,
+    ).toBe("");
+  });
+
+  it("asks before closing far above the plan, naming the extra quantity", () => {
+    render(<FinishRunAction order={order} />);
+    fireEvent.click(screen.getByTestId("maker-detail-finish-button"));
+    fireEvent.change(screen.getByTestId("maker-finish-actual-qty-input"), {
+      target: { value: "59" },
+    });
+    const dialog = screen.getByRole("alertdialog");
+    const finishButton = within(dialog).getByRole("button", {
+      name: "Finish run",
+    }) as HTMLButtonElement;
+
+    const notice = screen.getByTestId("maker-overproduction-notice");
+    expect(notice.textContent).toContain("49");
+    expect(notice.textContent).toContain("ingredients stay as planned");
+    expect(finishButton.disabled).toBe(true);
+
+    fireEvent.click(screen.getByTestId("maker-overproduction-confirm"));
+    expect(finishButton.disabled).toBe(false);
+    fireEvent.click(finishButton);
+    expect(mocks.finish.mock.calls[0][0].data.actual_qty).toBe("59");
+  });
+
+  it("does not ask for a quantity within a quarter of the plan", () => {
+    render(<FinishRunAction order={order} />);
+    fireEvent.click(screen.getByTestId("maker-detail-finish-button"));
+    fireEvent.change(screen.getByTestId("maker-finish-actual-qty-input"), {
+      target: { value: "12" },
+    });
+
+    expect(screen.queryByTestId("maker-overproduction-notice")).toBeNull();
+  });
 });

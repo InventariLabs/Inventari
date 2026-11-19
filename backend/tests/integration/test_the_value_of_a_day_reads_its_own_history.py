@@ -92,7 +92,9 @@ _INDEX = 'ix_svl_org_direction_dated_at'
 _STATEMENTS = 2
 
 _NOW = datetime(2026, 6, 30, 0, 0, tzinfo=UTC)
-_AS_OF = _NOW - timedelta(days=_AS_OF_DAYS_AGO)
+#: The end of that day: a layer is cut on the day it is about, so every layer
+#: written that day belongs to the report, whatever minute it was written at.
+_AS_OF = (_NOW - timedelta(days=_AS_OF_DAYS_AGO)).replace(hour=23, minute=59, second=59)
 
 #: A layer is three numbers and two dates, and the fixture needs thousands of
 #: them: seeded row by row through the ORM, the fixture costs more than the
