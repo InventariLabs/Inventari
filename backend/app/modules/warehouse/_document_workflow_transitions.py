@@ -353,6 +353,7 @@ async def confirm_document(
     *,
     may_exceed_over_receipt: bool = False,
     complete_on_approval: bool = False,
+    precheck_correction_records: bool = True,
 ) -> Document:
     """Confirm a draft: give it a number, reserve its stock, gate its approval.
 
@@ -360,6 +361,11 @@ async def confirm_document(
     when an approval stands between the confirmation and the posting, the
     approval completes the document rather than handing it back to the reader
     (see ``confirm_after_approval``).
+
+    ``precheck_correction_records`` asks a correction's records whether they can
+    take its delta before the number is drawn. A caller that completes in the
+    same transaction (undo) turns it off: the completion asks the same
+    question and a refusal there takes the number back with the rest.
 
     Nothing is committed here: the caller owns the transaction, so the
     one-step action writes nothing until both halves have succeeded.
@@ -396,7 +402,7 @@ async def confirm_document(
     _require_positive_quantities(doc)
     _require_stock_rows_on_lines(doc)
     await _require_products_on_receipt_lines(db, doc, posting=False)
-    if doc.type == dt.CORRECTION:
+    if precheck_correction_records and doc.type == dt.CORRECTION:
         await require_correction_fits_records(db, doc)
     # The number is given out here, where the draft becomes a document of
     # the register. A draft written and thrown away costs nothing (it never

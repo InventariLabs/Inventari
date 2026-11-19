@@ -526,6 +526,9 @@ async def _undo_document(
             # stock: granting it posts the reversal, as it does for the
             # one-step action.
             complete_on_approval=True,
+            # Completed in this transaction, which asks the records the same
+            # question and takes the number back with a refusal.
+            precheck_correction_records=False,
         )
         # An approval standing in front of the reversal parks it: the stock
         # moves when the approval is granted, and the caller says so.
