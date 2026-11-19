@@ -248,7 +248,12 @@ lists them all, the run's own first. A run nobody named a batch for names its ow
 a counter, unique among the product's batches in the organization
 (`20261115-1`, `20261115-2`, …) — computed under the output card's lock the
 run takes from the top, so two runs of one product closing at once count on
-from each other. The batch is opened with the run's day as `production_date`
+from each other. The run's day is the day it was made, never the day a
+draft was planned for: `made_on` on completion (and on each step of a run in
+portions), else the organization's today, and for `/orders/made` its
+`production_date`. Closing overwrites the plan's `production_date` with it
+and keeps the plan's day in `planned_for` when the two differ. The batch is
+opened with the run's day as `production_date`
 and a best-before (`expiry_date`) of that day plus the product's shelf life
 (`maker_shelf_lives`), unless the person closing the run names another
 (`best_before` on completion and on `/orders/made`); a date before the run's

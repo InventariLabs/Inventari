@@ -148,11 +148,17 @@ function RunDayTile({ order }: { order: ProductionOrder }) {
       }
       valueSize="text-base"
       valueClass="text-on font-medium"
-      // The batch the run put its output into, beside the day it made it.
+      // The batch the run put its output into, and the day it was planned
+      // for when it was made on another, beside the day it made it.
       note={
-        runBatchNames(order)
-          ? `${t("detail.card.outputLot")}: ${runBatchNames(order)}`
-          : undefined
+        [
+          order.planned_for &&
+            `${t("detail.card.plannedFor")}: ${formatDate(order.planned_for)}`,
+          runBatchNames(order) &&
+            `${t("detail.card.outputLot")}: ${runBatchNames(order)}`,
+        ]
+          .filter(Boolean)
+          .join(" · ") || undefined
       }
     >
       {day ? formatDate(day) : "—"}

@@ -316,6 +316,7 @@ ERRORS_PT: dict[str, str] = {
     'document_adjustment_lines_reference_items': 'As linhas de um documento de ajuste devem referenciar itens existentes',
     'recipe_collection_name_taken': 'Já existe uma coleção de receitas chamada "{name}" nesta organização.',
     'recipe_name_taken': 'Já existe uma lista de materiais com este nome para este produto.',
+    'bridge_yield_differs': 'Já existe uma lista de materiais para esta receita e este produto, e ela rende {qty} por lote; informe essa quantidade ou altere antes o rendimento do lote da lista.',
     'recipe_not_found': 'Receita não encontrada',
     'picking_active_recipe_locked': 'Os ingredientes não podem ser editados enquanto uma sessão de separação estiver ativa. Cancele ou conclua a sessão primeiro.',
     'meal_plan_dates_exclude_entries': 'Remova primeiro as entradas das datas excluídas.',

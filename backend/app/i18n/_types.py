@@ -302,6 +302,7 @@ class ErrorMessages(TypedDict):
     document_adjustment_lines_reference_items: str
     recipe_collection_name_taken: str
     recipe_name_taken: str
+    bridge_yield_differs: str
     recipe_not_found: str
     picking_active_recipe_locked: str
     meal_plan_dates_exclude_entries: str
