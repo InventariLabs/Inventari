@@ -16,6 +16,24 @@ const mocks = vi.hoisted(() => ({
   discardBridgeRecipe: vi.fn(),
   navigate: vi.fn(),
   productSelect: vi.fn(),
+  // What the product search hands back: a product with no unit by default.
+  product: {
+    product_template_id: "tpl-jam",
+    name: "Jam Jar",
+    uom_id: null as string | null,
+    uom_symbol: null as string | null,
+  },
+}));
+
+// The unit catalogue: a kilogram is measured, a piece is counted.
+vi.mock("@/modules/shared/hooks/useUoms", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/modules/shared/hooks/useUoms")>()),
+  useUoms: () => ({
+    data: [
+      { id: "cat-w", name: "Weight", uoms: [{ id: "uom-kg", symbol: "kg" }] },
+      { id: "cat-u", name: "Unit", uoms: [{ id: "uom-pc", symbol: "pcs" }] },
+    ],
+  }),
 }));
 
 // What the output picker offers is the server's answer (useLocationOffer, and
@@ -81,9 +99,7 @@ vi.mock("@/modules/maker/components/ProductSearchInput", () => ({
       <button
         type="button"
         data-testid="mock-product-option"
-        onClick={() =>
-          onSelect({ product_template_id: "tpl-jam", name: "Jam Jar" })
-        }
+        onClick={() => onSelect(mocks.product)}
       >
         Jam Jar
       </button>
@@ -190,6 +206,12 @@ function renderModal(onClose: () => void = vi.fn()) {
 describe("CookForStockModal (cooking-to-stock bridge)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.product = {
+      product_template_id: "tpl-jam",
+      name: "Jam Jar",
+      uom_id: null,
+      uom_symbol: null,
+    };
     serveScopedStorages([{ id: "loc-1", name: "Output Store" }]);
     mocks.createMakerRecipeFromCulinary.mockResolvedValue({
       id: "maker-recipe-1",
@@ -240,6 +262,72 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
     });
     expect(screen.getByTestId("cook-for-stock-planned-qty").textContent).toBe(
       "18",
+    );
+  });
+
+  describe("a product counted in a weight", () => {
+    beforeEach(() => {
+      mocks.product = {
+        product_template_id: "tpl-jam",
+        name: "Jam Jar",
+        uom_id: "uom-kg",
+        uom_symbol: "kg",
+      };
+    });
+
+    it("never takes the servings as the amount of a kilogram product", () => {
+      renderModal();
+      fireEvent.click(screen.getByTestId("mock-product-option"));
+
+      expect(screen.getByTestId("cook-for-stock-yield-input")).toHaveValue(
+        null,
+      );
+      expect(screen.getByTestId("cook-for-stock-planned-qty").textContent).toBe(
+        "—",
+      );
+      pickStorage("Output Store");
+      expect(screen.getByTestId("cook-for-stock-submit")).toBeDisabled();
+    });
+
+    it("plans the run from what one batch makes, in the product's unit", async () => {
+      renderModal();
+      fireEvent.click(screen.getByTestId("mock-product-option"));
+      fireEvent.change(screen.getByTestId("cook-for-stock-yield-input"), {
+        target: { value: "1.1" },
+      });
+      fireEvent.change(screen.getByTestId("cook-for-stock-scale-input"), {
+        target: { value: "2" },
+      });
+      expect(screen.getByTestId("cook-for-stock-planned-qty").textContent).toBe(
+        "2.2 kg",
+      );
+      pickStorage("Output Store");
+      fireEvent.click(screen.getByTestId("cook-for-stock-submit"));
+
+      await waitFor(() => {
+        expect(mocks.createMakerRecipeFromCulinary).toHaveBeenCalledWith(
+          expect.objectContaining({ batch_yield_qty: "1.1" }),
+        );
+        expect(mocks.createProductionOrderFromBridge).toHaveBeenCalledWith(
+          expect.objectContaining({ planned_qty: "2.2" }),
+        );
+      });
+    });
+  });
+
+  it("offers the servings as the amount for a product counted in pieces", () => {
+    mocks.product = {
+      product_template_id: "tpl-jam",
+      name: "Jam Jar",
+      uom_id: "uom-pc",
+      uom_symbol: "pcs",
+    };
+    renderModal();
+    fireEvent.click(screen.getByTestId("mock-product-option"));
+
+    expect(screen.getByTestId("cook-for-stock-yield-input")).toHaveValue(6);
+    expect(screen.getByTestId("cook-for-stock-planned-qty").textContent).toBe(
+      "6 pcs.",
     );
   });
 
