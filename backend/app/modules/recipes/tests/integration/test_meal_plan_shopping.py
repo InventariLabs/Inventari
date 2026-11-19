@@ -48,6 +48,7 @@ def _shelve(
     cans: int = 7,
     weight_value: Decimal | None = Decimal('400'),
     reserved: int = 0,
+    expiry_date: date | None = None,
 ) -> ProductTemplate:
     pcs = db.execute(text("SELECT id FROM uoms WHERE symbol = 'pcs'")).fetchone()
     grams = db.execute(text("SELECT id FROM uoms WHERE symbol = 'g'")).fetchone()
@@ -64,7 +65,9 @@ def _shelve(
     db.commit()
 
     async def _put(session: AsyncSession) -> None:
-        await put_on_shelf(session, user, template, location.id, cans)
+        await put_on_shelf(
+            session, user, template, location.id, cans, expiry_date=expiry_date
+        )
         if reserved:
             await reserve_for_an_order(session, template, location.id, reserved)
 
@@ -648,6 +651,66 @@ class TestStockSpokenForIsNotStockYouHave:
             headers=auth_headers,
         )
         assert '1 pcs in stock' in list_r.json()['items'][0]['notes']
+
+
+@pytest.mark.integration
+class TestStockPastItsDateIsNotInThePantry:
+    """The plan counts what the recipe card counts: only goods fit to cook with."""
+
+    def test_expired_stock_lands_on_the_list_and_not_in_the_pantry(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        test_user: User,
+        test_storage_location: StorageLocation,
+        db_session: Session,
+        async_engine_fixture: AsyncEngine,
+    ) -> None:
+        """Seven cans, all past their date, against 800 g wanted: buy it all."""
+        _shelve(
+            db_session,
+            async_engine_fixture,
+            test_user,
+            test_storage_location,
+            name='Ciecierzyca w puszce',
+            expiry_date=date.today() - timedelta(days=2),
+        )
+        plan_id = _plan_with(
+            client, auth_headers, db_session, ingredient_names=['Ciecierzyca z puszki']
+        )
+
+        result = _generate(client, auth_headers, plan_id)
+
+        assert result['available_count'] == 0
+        assert result['to_buy_count'] == 1
+        assert Decimal(str(result['items'][0]['quantity'])) == 800
+
+    def test_the_same_stock_still_in_date_buys_nothing(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        test_user: User,
+        test_storage_location: StorageLocation,
+        db_session: Session,
+        async_engine_fixture: AsyncEngine,
+    ) -> None:
+        """The control: the date itself is still good."""
+        _shelve(
+            db_session,
+            async_engine_fixture,
+            test_user,
+            test_storage_location,
+            name='Ciecierzyca w puszce',
+            expiry_date=date.today(),
+        )
+        plan_id = _plan_with(
+            client, auth_headers, db_session, ingredient_names=['Ciecierzyca z puszki']
+        )
+
+        result = _generate(client, auth_headers, plan_id)
+
+        assert result['available_count'] == 1
+        assert result['to_buy_count'] == 0
 
 
 @pytest.mark.integration
