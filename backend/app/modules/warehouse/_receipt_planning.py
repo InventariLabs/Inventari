@@ -25,6 +25,7 @@ from app.core.public_api import core_api
 
 from ._receiving_area import receiving_area_for_async
 from ._shelf_fill import ShelfFill, shelf_fill
+from .home_shelf_service import held_back_locations_async
 from .models import (
     Document,
     PutawayCapacity,
@@ -212,6 +213,9 @@ class ReceiptLocationPlanner:
         self._active_rules: list[PutawayRule] = []
         self._rule_locations: dict[UUID, list[UUID]] = {}
         self._targets: dict[UUID, Any] = {}
+        #: Locations goods are not kept in (receiving areas, quarantine and
+        #: what is inside them); a rule naming one steps aside.
+        self._held_back: dict[UUID, str] = {}
         self._location_names: dict[UUID, str | None] = {}
         self._doc_type_code: str | None | None = None  # None = not loaded yet
         self._categories: dict[UUID, Any] = {}
@@ -276,6 +280,7 @@ class ReceiptLocationPlanner:
             planner._rules = like._rules
             planner._rule_locations = like._rule_locations
             planner._targets = like._targets
+            planner._held_back = like._held_back
             planner._location_names = like._location_names
             await planner._load_target(doc.target_location_id)
             planner._active_rules = like._active_rules
@@ -312,6 +317,7 @@ class ReceiptLocationPlanner:
             .scalars()
             .all()
         )
+        planner._held_back = await held_back_locations_async(db, doc.organization_id)
         for row in rows:
             planner._rule_locations.setdefault(row.rule_id, []).append(row.location_id)
             await planner._load_target(row.location_id)
@@ -337,7 +343,7 @@ class ReceiptLocationPlanner:
             return False
         if (target.settings or {}).get('archived') is True:
             return False
-        return bool(target.usage == 'internal')
+        return target.usage == 'internal' and location_id not in self._held_back
 
     def _target_warning(self, location_id: UUID | None) -> str | None:
         """Why this shelf cannot take goods, for the reader of the plan."""

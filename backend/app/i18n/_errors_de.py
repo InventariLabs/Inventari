@@ -959,6 +959,8 @@ ERRORS_DE: ErrorMessages = {
     'putaway_capacity_not_found': 'Kapazitätseintrag nicht gefunden',
     'no_fields_to_update': 'Keine Felder zum Aktualisieren',
     'putaway_rule_needs_location': 'Eine Einlagerungsregel braucht mindestens einen Lagerort.',
+    'putaway_rule_target_receiving': 'Ein Wareneingangsbereich kann kein Ziel einer Einlagerungsregel sein: Die Ware wartet dort nur.',
+    'putaway_rule_target_quarantine': 'Ein Quarantäne-Lagerort kann kein Ziel einer Einlagerungsregel sein: Zurückgehaltene Ware wird dort getrennt aufbewahrt.',
     'putaway_rule_needs_match_key': 'Eine Einlagerungsregel braucht mindestens eine Bedingung — ein Produkt, eine Kategorie, einen Kontext-Tag oder einen Lagerorttyp.',
     'document_template_wrong_module': 'Eine Dokumentvorlage gehört zum Modul Dokumente',
     'search_query_empty': 'Geben Sie einen Suchbegriff ein',
