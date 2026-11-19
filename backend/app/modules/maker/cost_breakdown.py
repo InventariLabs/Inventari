@@ -19,7 +19,7 @@ from app.core.cost_estimates import UnitCostEstimate
 from app.core.money import quantise, quantise_or_none
 from app.core.public_api import core_api
 
-from . import bom_service
+from . import bom_service, cost_rollup
 from ._schemas_breakdown import (
     CostBreakdownEntry,
     CostBreakdownPlannedDraw,
@@ -131,13 +131,19 @@ async def compute_breakdown(
         else:
             rows.append((child_id, child_qty, unit, rate * child_qty))
 
-    total_cost = sum((c for _, _, _, c in rows if c is not None), Decimal('0'))
+    ingredients_cost = sum((c for _, _, _, c in rows if c is not None), Decimal('0'))
+    # The batch costs more than its ingredients: the fixed lines and the
+    # time its steps take are part of what a unit has to be sold for.
+    fixed_cost, labour_cost = await cost_rollup.overheads_for_qty(
+        db, organization_id, recipe, qty
+    )
+    total_cost = ingredients_cost + fixed_cost + labour_cost
 
     entries: list[CostBreakdownEntry] = []
     for index, (child_id, child_qty, unit, cost) in enumerate(rows):
         pct: Decimal | None = None
-        if cost is not None and total_cost > 0:
-            pct = quantise_or_none(cost / total_cost * Decimal('100'))
+        if cost is not None and ingredients_cost > 0:
+            pct = quantise_or_none(cost / ingredients_cost * Decimal('100'))
         entries.append(
             CostBreakdownEntry(
                 child_template_id=child_id,
@@ -162,6 +168,10 @@ async def compute_breakdown(
         planned_qty=qty,
         planned_uom_symbol=planned_uom.symbol if planned_uom else None,
         total_cost=quantise_or_none(total_cost) or Decimal('0.00'),
+        ingredients_cost=quantise_or_none(ingredients_cost) or Decimal('0.00'),
+        fixed_cost=fixed_cost,
+        labour_cost=labour_cost,
+        unit_cost=quantise(total_cost / qty, 4) if total_cost > 0 else None,
         entries=entries,
         missing_cost_lines=missing,
         recipe_state='empty' if not flat else 'has_lines',

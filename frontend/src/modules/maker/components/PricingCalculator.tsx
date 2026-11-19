@@ -11,6 +11,7 @@ import { EmptyBomNotice } from "@/modules/maker/components/EmptyBomNotice";
 import { MissingRecipeNotice } from "@/modules/maker/components/MissingRecipeNotice";
 import type { ProductOption } from "@/modules/maker/api/products";
 import { extractApiError } from "@/lib/errors";
+import { useMoney } from "@/hooks/useMoney";
 import { formatPercentLocale } from "@/utils/formatters";
 import {
   useMargin,
@@ -48,6 +49,7 @@ export function PricingCalculator({
   product,
 }: PricingCalculatorProps) {
   const { t } = useTranslation("maker");
+  const money = useMoney();
 
   const { data: storedMargin, isLoading: marginLoading } = useMargin(
     open ? templateId : undefined,
@@ -238,6 +240,38 @@ export function PricingCalculator({
                 />
               </span>
             </div>
+            {/* What the total is made of: a cost that leaves one of the
+                three out would otherwise pass unseen. Fixed costs and labour
+                appear when the formula has them. */}
+            <dl
+              className="space-y-0.5 text-xs text-on-muted"
+              data-testid="maker-pricing-cost-parts"
+            >
+              <div className="flex items-baseline justify-between">
+                <dt>{t("pricing.ingredientsCost")}</dt>
+                <dd className="font-mono">
+                  <CostFigure
+                    value={result.ingredients_cost}
+                    priced={priced}
+                    unpriced={unpriced}
+                    announce={false}
+                    describedBy="pricing-gap-note"
+                  />
+                </dd>
+              </div>
+              {Number(result.fixed_cost) > 0 && (
+                <div className="flex items-baseline justify-between">
+                  <dt>{t("pricing.fixedCost")}</dt>
+                  <dd className="font-mono">{money(result.fixed_cost)}</dd>
+                </div>
+              )}
+              {Number(result.labour_cost) > 0 && (
+                <div className="flex items-baseline justify-between">
+                  <dt>{t("pricing.labourCost")}</dt>
+                  <dd className="font-mono">{money(result.labour_cost)}</dd>
+                </div>
+              )}
+            </dl>
             <div className="flex items-baseline justify-between">
               <span className="text-xs uppercase tracking-widest text-on-muted font-medium">
                 {/* Today's rates, not a measurement: the card above the tab
