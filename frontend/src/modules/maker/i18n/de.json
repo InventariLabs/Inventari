@@ -343,7 +343,11 @@
     "processStepMinutesLabel": "Minuten für Schritt {{number}}",
     "minutesShort": "Min.",
     "minutesPlaceholder": "Min.",
-    "processStepsGuard": "Die Prozessschritte"
+    "processStepsGuard": "Die Prozessschritte",
+    "processStepsDiscardTitle": "Nicht hinzugefügten Schritt verwerfen?",
+    "processStepsDiscardMessage": "Der eingegebene Schritt wurde der Liste nicht hinzugefügt. Beim Schließen des Editors geht er verloren.",
+    "processStepsDiscardConfirm": "Schritt verwerfen",
+    "processStepsDiscardKeep": "Weiter bearbeiten"
   },
   "bom": {
     "childLabel": "Zutat",

@@ -343,7 +343,11 @@
     "processStepMinutesLabel": "Minutes de l'étape {{number}}",
     "minutesShort": "min",
     "minutesPlaceholder": "min",
-    "processStepsGuard": "Les étapes du procédé"
+    "processStepsGuard": "Les étapes du procédé",
+    "processStepsDiscardTitle": "Abandonner l'étape non ajoutée ?",
+    "processStepsDiscardMessage": "L'étape saisie n'a pas été ajoutée à la liste. Fermer l'éditeur la supprime.",
+    "processStepsDiscardConfirm": "Abandonner l'étape",
+    "processStepsDiscardKeep": "Continuer la modification"
   },
   "bom": {
     "childLabel": "Ingrédient",
