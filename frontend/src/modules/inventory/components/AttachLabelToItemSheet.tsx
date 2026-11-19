@@ -12,10 +12,9 @@ import {
   SheetFooter,
   SheetHeader,
 } from "@/components/ui/Sheet";
-import { useDebounce } from "@/module-sdk";
+import { useDebounce, useLocationsById } from "@/module-sdk";
 import { useItemSearch } from "@/modules/inventory/hooks/useItems";
 import { useAssignLabelToItem } from "@/hooks/useAssignLabelToItem";
-import { useStorages } from "@/modules/shared/hooks/useStorages";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import { formatDate } from "@/utils/formatters";
 import { getStorageLocationPath } from "@/utils/helpers";
@@ -47,12 +46,35 @@ export function AttachLabelToItemSheet({
   const [query, setQuery] = useState("");
   const search = useDebounce(query.trim(), 250);
   const { data, isFetching, isError, refetch } = useItemSearch(search);
-  // Only names the place of a row the search already found, so every kind of
-  // location is wanted, virtual ones included.
-  const { data: storages } = useStorages(undefined, { usage: "all" });
   const assign = useAssignLabelToItem();
 
   const candidates = (data?.items ?? []).filter((item) => !item.label_code);
+  // Names only the places of the rows on screen, never the whole catalogue.
+  const { byId: places } = useLocationsById(
+    candidates.map((item) => item.location_id),
+  );
+  const rows = candidates.map((item) => {
+    const expiry = item.effective_expiry_date;
+    const marks = [
+      item.serial_number,
+      getStorageLocationPath(
+        places.get(item.location_id ?? ""),
+        item.shelf_location,
+      ),
+      expiry
+        ? t("labels:attachToItem.expires", { date: formatDate(expiry) })
+        : "",
+      formatQuantityLocalized(t, item.quantity, item.uom?.symbol),
+    ].filter(Boolean);
+    return { item, text: marks.join(" • ") };
+  });
+  // Rows that still read the same — two receipts of one product into one
+  // place, say — get the tail of their id, which never ties.
+  const ties = new Map<string, number>();
+  for (const { item, text } of rows) {
+    const key = `${item.name}|${text}`;
+    ties.set(key, (ties.get(key) ?? 0) + 1);
+  }
 
   const attach = (itemId: string, name: string) =>
     assign.mutate(
@@ -99,23 +121,11 @@ export function AttachLabelToItemSheet({
           </p>
         ) : (
           <ul className="space-y-1">
-            {candidates.map((item) => {
-              const place = getStorageLocationPath(
-                storages?.find((s) => s.id === item.location_id),
-                item.shelf_location,
-                undefined,
-                storages,
-              );
-              const expiry = item.effective_expiry_date;
-              const details = [
-                place,
-                expiry
-                  ? t("labels:attachToItem.expires", {
-                      date: formatDate(expiry),
-                    })
-                  : "",
-                formatQuantityLocalized(t, item.quantity, item.uom?.symbol),
-              ].filter(Boolean);
+            {rows.map(({ item, text }) => {
+              const twin =
+                (ties.get(`${item.name}|${text}`) ?? 0) > 1
+                  ? `#${item.id.slice(-6)}`
+                  : "";
               return (
                 <li key={item.id}>
                   <Button
@@ -129,7 +139,8 @@ export function AttachLabelToItemSheet({
                     <span className="flex min-w-0 flex-col items-start">
                       <span className="truncate">{item.name}</span>
                       <span className="text-sm text-on-secondary">
-                        {details.join(" • ")}
+                        {text}
+                        {twin && <span className="ml-2 font-mono">{twin}</span>}
                       </span>
                     </span>
                   </Button>

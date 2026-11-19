@@ -126,4 +126,52 @@ describe("AttachLabelToItemSheet — a scanned free label, a product that exists
     expect(rows[1]).toHaveTextContent("expires");
     expect(rows[1]).toHaveTextContent("4");
   });
+
+  it("prints the serial of a unit and numbers twins that still read the same", async () => {
+    const stock = {
+      label_code: null,
+      location_id: "s1",
+      quantity: "1.000",
+    };
+    server.use(
+      http.get("/api/v1/items", () =>
+        HttpResponse.json({
+          items: [
+            { ...stock, id: "i1", name: "QA Laptop", serial_number: "SN-001" },
+            { ...stock, id: "i2", name: "QA Laptop", serial_number: "SN-002" },
+            { ...stock, id: "iaaa111", name: "QA Cable" },
+            { ...stock, id: "ibbb222", name: "QA Cable" },
+            { ...stock, id: "icc3333", name: "QA Cord" },
+          ],
+          total: 5,
+        }),
+      ),
+    );
+    wrap(
+      <AttachLabelToItemSheet
+        labelCode="STM-0001"
+        onClose={() => {}}
+        onAttached={() => {}}
+      />,
+    );
+
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "QA" },
+    });
+
+    const laptops = await screen.findAllByRole("button", {
+      name: /QA Laptop/,
+    });
+    expect(laptops[0]).toHaveTextContent("SN-001");
+    expect(laptops[1]).toHaveTextContent("SN-002");
+    // The serials already tell the laptops apart: no twin mark on them.
+    expect(laptops[0]).not.toHaveTextContent("#");
+    const cables = screen.getAllByRole("button", { name: /QA Cable/ });
+    expect(cables[0]).toHaveTextContent("#aaa111");
+    expect(cables[1]).toHaveTextContent("#bbb222");
+    // A lone row carries no mark.
+    expect(
+      screen.getByRole("button", { name: /QA Cord/ }),
+    ).not.toHaveTextContent("#");
+  });
 });
