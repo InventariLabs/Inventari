@@ -20,6 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.contracts import AuditAction, AuditTargetType, UserContextDTO
 from app.core.db_utils import acquire_advisory_lock, escape_ilike, paginate_async
 from app.core.exceptions import EntityNotFoundError, ServiceRejectionError
+from app.core.module_sdk import UomResolverAsync
 from app.core.money import quantise, quantise_or_none
 from app.core.public_api import core_api
 
@@ -598,7 +599,8 @@ async def _refuse_unconvertible_unit(
     organization_id: UUID,
     child_template_id: UUID,
     line_uom_id: UUID | None,
-) -> None:
+    line_unit_text: str | None = None,
+) -> str | None:
     """Refuse a line written in a unit the ingredient's stock cannot be read in.
 
     The line's unit and the product's stock unit have to meet somewhere, or the
@@ -607,20 +609,25 @@ async def _refuse_unconvertible_unit(
     flour" against stock kept in kilograms could be saved and then costed and
     consumed as a number with no unit attached to it.
 
+    The line names its unit by id or, on a line written before units, by free
+    text: the catalogue resolves the text (``UomResolverAsync``, aliases
+    included), so a line saying "g" is read as grams and not as the shelf's
+    pieces. Text no unit knows is refused too — its number cannot be shown to
+    mean anything the shelf can take — but a blank text beside no id is a bare
+    number counted in the stock unit, the reading every record predating units
+    has.
+
     The stock unit comes from the template, falling back to the unit the
     template's items actually carry — the whole set, not a page of it: a
     hundred newest rows must not outvote an older one and flip the verdict
     both ways. The silence this leaves is narrow on purpose: with the piece
     backfill in place, a unitless template that has no items at all is the
     only state where nothing knows the unit — a record that genuinely
-    predates the units world. A unitless template whose shelves hold pieces
-    gets the refusal, because there the silence protected a live hole, not
-    history. And the pieces those shelves hold are not merely the default's
-    guess: the backfill wrote real rows, so the shelf genuinely holds
-    pieces now.
+    predates the units world.
+
+    Returns the line's unit symbol (for the label the row stores), or ``None``
+    when the line names no unit the catalogue knows.
     """
-    if line_uom_id is None:
-        return
     templates = await core_api.product_templates.get_many_async(
         db, organization_id, [child_template_id]
     )
@@ -630,24 +637,26 @@ async def _refuse_unconvertible_unit(
         stock_uom_id = await _stock_unit_from_items_async(
             db, organization_id, child_template_id
         )
-    if stock_uom_id is None or stock_uom_id == line_uom_id:
-        return
+    if stock_uom_id is None:
+        return None
 
     uoms = {
         uom.id: uom
         for uom in await core_api.uoms.list_for_org_async(db, organization_id)
     }
-    line_uom = uoms.get(line_uom_id)
     stock_uom = uoms.get(stock_uom_id)
-    _, convertible = core_api.uoms.convert_quantity(Decimal('1'), line_uom, stock_uom)
-    if convertible:
-        return
+    text = (line_unit_text or '').strip()
+    if line_uom_id is None and text:
+        line_uom_id = await UomResolverAsync(db, organization_id).resolve(text)
+    line_uom = uoms.get(line_uom_id) if line_uom_id is not None else None
 
-    raise ServiceRejectionError(
-        'bom_line_unit_not_convertible',
-        line_unit=line_uom.symbol if line_uom else '?',
-        stock_unit=stock_uom.symbol if stock_uom else '?',
-    )
+    if not bom_service.unit_reads_as_stock(line_uom_id, line_uom, text, stock_uom):
+        raise ServiceRejectionError(
+            'bom_line_unit_not_convertible',
+            line_unit=line_uom.symbol if line_uom else text,
+            stock_unit=stock_uom.symbol if stock_uom else '?',
+        )
+    return line_uom.symbol if line_uom else None
 
 
 async def add_bom_line(
@@ -695,10 +704,9 @@ async def add_bom_line(
         db, organization_id, recipe.output_template_id, data.child_template_id
     )
 
-    await _refuse_unconvertible_unit(
-        db, organization_id, data.child_template_id, data.uom_id
+    unit_symbol = await _refuse_unconvertible_unit(
+        db, organization_id, data.child_template_id, data.uom_id, data.unit
     )
-
     line = BoMLine(
         organization_id=organization_id,
         recipe_id=recipe.id,
@@ -706,7 +714,10 @@ async def add_bom_line(
         child_template_id=data.child_template_id,
         qty_per_batch=data.qty_per_batch,
         uom_id=data.uom_id,
-        unit=data.unit,
+        # The label follows the unit when one is named: the column is eight
+        # characters and a symbol may hold ten, so it is cut to fit as the
+        # recipe bridge already does.
+        unit=(unit_symbol or data.unit)[:8],
         yield_loss_pct=data.yield_loss_pct,
         make_fresh=data.make_fresh,
         notes=data.notes,
@@ -778,16 +789,27 @@ async def update_bom_line(
     # The same gate the add path runs: an edit is one more way to write a
     # line the shelf cannot be read in, and skipping it here made the
     # refusal bypassable by adding the line in one unit and patching it to
-    # another afterwards.
-    if data.uom_id is not None:
-        await _refuse_unconvertible_unit(
-            db, organization_id, line.child_template_id, data.uom_id
-        )
+    # another afterwards. The unit that will stand after this edit is the
+    # one checked — a quantity change keeps the old unit, so a line already
+    # mismatched cannot slip past as a bare quantity edit.
+    resulting_uom_id = data.uom_id if data.uom_id is not None else line.uom_id
+    unit_symbol = await _refuse_unconvertible_unit(
+        db,
+        organization_id,
+        line.child_template_id,
+        resulting_uom_id,
+        line.unit,
+    )
 
     if data.qty_per_batch is not None:
         line.qty_per_batch = data.qty_per_batch
     if data.uom_id is not None:
         line.uom_id = data.uom_id
+        # The label follows the unit that is now structural: a row showing
+        # grams beside a number the shelf reads in pieces is the same lie in
+        # a smaller font.
+        if unit_symbol:
+            line.unit = unit_symbol[:8]
     if data.yield_loss_pct is not None:
         line.yield_loss_pct = data.yield_loss_pct
     if data.make_fresh is not None:

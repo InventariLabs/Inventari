@@ -12783,6 +12783,11 @@ export interface components {
             typed_unit_price_in_use: boolean;
             /** Stock On Hand */
             stock_on_hand?: string | null;
+            /**
+             * Unit Mismatch
+             * @default false
+             */
+            unit_mismatch: boolean;
         };
         /**
          * BoMLineUpdate
