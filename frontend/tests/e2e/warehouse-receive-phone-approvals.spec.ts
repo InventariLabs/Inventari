@@ -13,6 +13,7 @@ import {
   chooseLocation,
   choosePartner,
   countField,
+  openReceive,
   scanProduct,
   scanShelf,
   session,
@@ -620,5 +621,37 @@ test.describe("Receiving on a phone", () => {
       session(page).getByText("0 of 1", { exact: true }),
     ).toBeVisible();
     await expect(session(page).getByText("Still due 4 pcs.")).toBeVisible();
+  });
+
+  test("Back out of a receipt lands on a screen, never on a missing address", async ({
+    page,
+    playwright,
+    baseURL,
+    authenticatedPage: _auth,
+  }, testInfo) => {
+    const seed = await startSeed({ playwright }, baseURL, testInfo);
+    const d = await waitingDelivery(seed);
+
+    // The phone's door to a receipt: the receive page saves the delivery,
+    // confirms it and replaces itself with the document, so the history holds
+    // nothing of the receive page to come back to.
+    await openReceive(page);
+    await choosePartner(page, d.supplier.name);
+    await openSession(page, d.supplier.name, d.shelf.name);
+
+    // The sheet's own Back keeps the scans and leaves the document behind it.
+    await session(page).getByRole("button", { name: "Back" }).click();
+    await expect(session(page)).toBeHidden();
+    await expect(page).toHaveURL(/\/warehouse\/documents\/[^/]+#receive/);
+
+    // The header's Back is the way out of that document. `/warehouse/documents`
+    // — the path one segment up — answers no screen, and landing there is the
+    // dead page a thumb met.
+    await page.getByRole("button", { name: "Back" }).click();
+    await expect(page).not.toHaveURL(/\/warehouse\/documents\/?$/);
+    await expect(
+      page.getByRole("heading", { name: "Page Not Found" }),
+    ).toHaveCount(0);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 });
