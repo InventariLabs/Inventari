@@ -309,6 +309,11 @@ class StockMoveRowDTO(StockMoveDTO):
     uom_symbol: str | None = None
     from_location_name: str | None = None
     to_location_name: str | None = None
+    #: The path an end had when the goods moved, set only where it is not the
+    #: path today: the location, or one above it, physically moved since.
+    #: ``None`` means today's path is the one it had.
+    from_location_path: str | None = None
+    to_location_path: str | None = None
     lot_name: str | None = None
     user_name: str | None = None
     #: A movement of a location that physically moved (``reference_type``

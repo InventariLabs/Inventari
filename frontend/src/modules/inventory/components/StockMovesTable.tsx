@@ -114,6 +114,7 @@ export function StockMovesTable({
                     <Place
                       name={
                         relocation(move)?.from ??
+                        move.from_location_path ??
                         placeName(
                           move.from_location_id,
                           move.from_location_name,
@@ -129,6 +130,7 @@ export function StockMovesTable({
                     <Place
                       name={
                         relocation(move)?.to ??
+                        move.to_location_path ??
                         placeName(move.to_location_id, move.to_location_name)
                       }
                       outside={t("inventory:moves.outsideTo")}
