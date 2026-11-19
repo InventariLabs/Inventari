@@ -8,9 +8,10 @@ import type { Item } from "@/types";
 import { productNutrition } from "../productNutrition";
 import { useUpdateNutrition } from "./useNutrition";
 
-interface Options {
+/** What the product sheet's slot hands over (`item_edit_extra`). */
+interface SheetSlotData {
   item?: Item;
-  /** From the host sheet: run before its own save, and report unsaved input. */
+  /** Run before the sheet's own save, and report unsaved input. */
   registerBeforeSubmit?: RegisterBeforeSubmit;
   reportDirty?: (dirty: boolean) => void;
 }
@@ -23,11 +24,8 @@ interface Options {
  * changes saves them first (a refusal stops the whole save), and closing the
  * sheet over them asks.
  */
-export function useManualNutrition({
-  item,
-  registerBeforeSubmit,
-  reportDirty,
-}: Options) {
+export function useManualNutrition(data?: SheetSlotData) {
+  const { item, registerBeforeSubmit, reportDirty } = data ?? {};
   const { t } = useTranslation(["nutrition", "common"]);
   const updateNutrition = useUpdateNutrition();
   const [showForm, setShowForm] = useState(false);

@@ -51,11 +51,7 @@ const FoodAndHealthExtra: React.FC<Props> = ({ data }) => {
   const tDyn = makeTDynamic(t);
   const item = data?.item;
   const storageType = data?.storageType;
-  const manual = useManualNutrition({
-    item,
-    registerBeforeSubmit: data?.registerBeforeSubmit,
-    reportDirty: data?.reportDirty,
-  });
+  const manual = useManualNutrition(data);
   const [showScanner, setShowScanner] = useState(false);
   const [showFullIngredients, setShowFullIngredients] = useState(false);
 
