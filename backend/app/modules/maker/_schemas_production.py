@@ -388,10 +388,6 @@ class ProductionPreviewResponse(CostBreakdownResponse):
     ingredients: list[IngredientAvailabilityItem] = Field(default_factory=list)
     has_shortage: bool = False
     batch_yield_qty: Decimal | None = None
-    fixed_cost: Decimal = Decimal('0')
-    #: The batch's labour, from the timed steps at the organization's rate.
-    labour_cost: Decimal = Decimal('0')
-    unit_cost: Decimal | None = None
     reference_price: Decimal | None = None
     result_per_unit: Decimal | None = None
     #: The output product's shelf life in days, for the best-before the

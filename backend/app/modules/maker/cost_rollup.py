@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.cost_estimates import UnitCostEstimate
@@ -13,7 +14,7 @@ from app.core.public_api import core_api
 
 from . import bom_service
 from ._valuation_batch import fetch_estimates_batch
-from .models import MakerRecipe
+from .models import MakerModuleSettings, MakerRecipe
 
 
 @dataclass(frozen=True)
@@ -180,3 +181,34 @@ def labour_cost_per_batch(recipe: MakerRecipe, hourly_rate: Decimal | None) -> D
 def fixed_cost_per_batch(recipe: MakerRecipe) -> Decimal:
     """The fixed cost lines of one batch, summed."""
     return sum((line.amount for line in recipe.cost_lines), Decimal('0'))
+
+
+async def overheads_for_qty(
+    db: AsyncSession,
+    organization_id: UUID,
+    recipe: MakerRecipe,
+    qty: Decimal,
+) -> tuple[Decimal, Decimal]:
+    """Fixed cost and labour of making ``qty`` units: ``(fixed, labour)``.
+
+    Both scale with the batches the quantity amounts to, the way a run
+    records them. Every figure that says what a quantity costs — the
+    preview, the cost estimate, the price calculator — adds these two to
+    the ingredients, so they all agree with the recipe page.
+    """
+    if recipe.batch_yield_qty <= 0:
+        return Decimal('0.00'), Decimal('0.00')
+    from app.core.money import quantise
+
+    batches = qty / recipe.batch_yield_qty
+    # A plain read of the rate: no settings row yet means no rate, and
+    # nothing is created for a figure that only looks.
+    hourly_rate = await db.scalar(
+        select(MakerModuleSettings.labor_hourly_rate).where(
+            MakerModuleSettings.organization_id == organization_id
+        )
+    )
+    return (
+        quantise(fixed_cost_per_batch(recipe) * batches),
+        quantise(labour_cost_per_batch(recipe, hourly_rate) * batches),
+    )

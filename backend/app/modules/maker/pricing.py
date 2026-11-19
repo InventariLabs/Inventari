@@ -45,6 +45,9 @@ class PricingOutcome:
     """
 
     total_cost: Decimal
+    ingredients_cost: Decimal
+    fixed_cost: Decimal
+    labour_cost: Decimal
     unit_cost: Decimal
     unit_sale_price: Decimal
     ingredient_count: int
@@ -128,11 +131,6 @@ async def compute_pricing(
         db, organization_id, template_id, produced_qty
     )
 
-    if produced_qty <= 0:
-        unit_cost = Decimal('0')
-    else:
-        unit_cost = quantise(rollup.total / produced_qty)
-
     # The price is computed on the default formula; a product without one
     # and a formula with no lines both answer zero ingredients, and the
     # reader is sent to create the first and to fill the second — so the
@@ -140,6 +138,22 @@ async def compute_pricing(
     from . import bom_service
 
     recipe = await bom_service.find_default_recipe(db, organization_id, template_id)
+
+    # What the quantity costs to make is its ingredients, the formula's
+    # fixed lines and its labour — the cost the recipe page and the run
+    # quote, so a price built on it never sits below what the run costs.
+    fixed_cost, labour_cost = (
+        await cost_rollup.overheads_for_qty(db, organization_id, recipe, produced_qty)
+        if recipe is not None
+        else (Decimal('0.00'), Decimal('0.00'))
+    )
+    total_cost = rollup.total + fixed_cost + labour_cost
+
+    if produced_qty <= 0:
+        unit_cost = Decimal('0')
+    else:
+        unit_cost = quantise(total_cost / produced_qty)
+
     recipe_state = (
         'no_recipe'
         if recipe is None
@@ -147,7 +161,10 @@ async def compute_pricing(
     )
 
     return PricingOutcome(
-        total_cost=rollup.total,
+        total_cost=total_cost,
+        ingredients_cost=rollup.total,
+        fixed_cost=fixed_cost,
+        labour_cost=labour_cost,
         unit_cost=unit_cost,
         unit_sale_price=compute_sale_price(unit_cost, target_margin_pct),
         ingredient_count=rollup.ingredient_count,
