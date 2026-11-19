@@ -1324,7 +1324,10 @@ async def complete_production(
     order.completed_by = user.id
     # The planned day gives way to the day the run was made: the stamp the
     # batch record and the statements read. The day the guard asked about,
-    # not the UTC date of ``completed_at``.
+    # not the UTC date of ``completed_at``. The plan's day stays on the run
+    # when it differs.
+    if order.production_date != run_day:
+        order.planned_for = order.production_date
     order.production_date = run_day
     await _journal_closed(
         db, organization_id, order, user, 'DRAFT', actual_qty, total_cost

@@ -193,6 +193,7 @@
       "totalCostUndone": "Cost before the run was undone",
       "created": "Created",
       "productionDate": "Production date",
+      "plannedFor": "Planned for",
       "notes": "Notes",
       "actualQty": "Actual output",
       "plannedSuffix": "planned: {{qty}}",

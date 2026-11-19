@@ -195,6 +195,7 @@
       "totalCostUndone": "Koszt przed cofnięciem przebiegu",
       "created": "Utworzone",
       "productionDate": "Data produkcji",
+      "plannedFor": "Zaplanowano na",
       "notes": "Notatki",
       "actualQty": "Rzeczywista produkcja",
       "plannedSuffix": "planowano: {{qty}}",

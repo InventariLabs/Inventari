@@ -73459,6 +73459,18 @@
             ],
             "title": "Started On"
           },
+          "planned_for": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned For"
+          },
           "material_cost": {
             "anyOf": [
               {

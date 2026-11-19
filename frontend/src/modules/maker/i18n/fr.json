@@ -193,6 +193,7 @@
       "totalCostUndone": "Coût avant l'annulation de la production",
       "created": "Créé",
       "productionDate": "Date de production",
+      "plannedFor": "Prévu pour",
       "notes": "Notes",
       "actualQty": "Production réelle",
       "plannedSuffix": "prévu : {{qty}}",

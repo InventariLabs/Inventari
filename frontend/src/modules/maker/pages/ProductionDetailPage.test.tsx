@@ -303,6 +303,18 @@ describe("ProductionDetailPage edit + duplicate", () => {
     );
   });
 
+  it("keeps the day a closed run was planned for beside the day it was made", () => {
+    currentOrder = {
+      ...draftOrder,
+      status: "COMPLETED",
+      production_date: "2026-11-19",
+      planned_for: "2026-11-22",
+    };
+    renderPage();
+
+    expect(screen.getByText(/Planned for: .*2026/)).toBeInTheDocument();
+  });
+
   it("completes a run planned for a later day on today, not on the plan", () => {
     // The dialog opens on the day the goods are made — today — whatever day
     // the run was planned for, and sends it.

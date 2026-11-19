@@ -193,6 +193,7 @@
       "totalCostUndone": "Kosten vor dem Rückgängigmachen des Laufs",
       "created": "Erstellt",
       "productionDate": "Produktionsdatum",
+      "plannedFor": "Geplant für",
       "notes": "Notizen",
       "actualQty": "Tatsächliche Menge",
       "plannedSuffix": "geplant: {{qty}}",

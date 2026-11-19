@@ -193,6 +193,7 @@
       "totalCostUndone": "Coste antes de deshacer la producción",
       "created": "Creada",
       "productionDate": "Fecha de producción",
+      "plannedFor": "Planificado para",
       "notes": "Notas",
       "actualQty": "Producción real",
       "plannedSuffix": "planificado: {{qty}}",

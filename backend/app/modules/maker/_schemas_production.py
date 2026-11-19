@@ -214,6 +214,8 @@ class ProductionOrderRead(BaseModel):
     #: ingredients cost — its work in progress until it closes. Null on a run
     #: completed in one step.
     started_on: date | None = None
+    #: The day a closed run was planned for, when it was made on another.
+    planned_for: date | None = None
     material_cost: Decimal | None = None
     #: What of the run's cost could not go on the shelf because its output left
     #: it before the run closed. Null unless the run was filled in portions.

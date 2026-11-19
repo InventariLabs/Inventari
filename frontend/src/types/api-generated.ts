@@ -22647,6 +22647,8 @@ export interface components {
             lines?: components["schemas"]["ProductionOrderLineRead"][];
             /** Started On */
             started_on?: string | null;
+            /** Planned For */
+            planned_for?: string | null;
             /** Material Cost */
             material_cost?: string | null;
             /** Unshelved Cost */

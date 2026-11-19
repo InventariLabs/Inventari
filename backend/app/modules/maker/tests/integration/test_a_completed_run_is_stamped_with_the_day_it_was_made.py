@@ -124,6 +124,23 @@ def test_a_run_planned_for_a_later_day_is_stamped_with_the_day_it_is_completed(
     lot = db_session.get(StockLot, UUID(done['output_lot_id']))
     assert lot is not None and lot.production_date == day
     assert done['output_lot_name'].startswith(day.strftime('%Y%m%d'))
+    # The plan's day stays on the run beside the day it was made.
+    assert done['planned_for'] == planned.isoformat()
+
+
+def test_a_run_made_on_its_planned_day_carries_no_separate_plan(
+    client: TestClient,
+    mk_auth_headers: dict[str, str],
+    mk_output_loc: StorageLocation,
+    jam: ProductTemplate,
+) -> None:
+    run_id = _draft_planned_for(
+        client, mk_auth_headers, jam, mk_output_loc, date.today()
+    )
+
+    done = _complete(client, mk_auth_headers, run_id, made_on=date.today().isoformat())
+
+    assert done['planned_for'] is None
 
 
 def test_the_person_completing_the_run_names_the_day_it_was_made(
