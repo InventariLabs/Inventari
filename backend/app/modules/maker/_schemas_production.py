@@ -373,6 +373,8 @@ class MonthlyResultItem(BaseModel):
     month: str
     result: Decimal
     orders: int
+    #: How many of those runs closed with more than they planned.
+    overproduced_orders: int = 0
 
 
 class ProductionPreviewResponse(CostBreakdownResponse):

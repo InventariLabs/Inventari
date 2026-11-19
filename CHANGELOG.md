@@ -284,6 +284,13 @@ says what the release does rather than what changed since them.
   the line and the complaint, instead of being stored and then breaking every
   PDF printed with it. A purchase order whose stored layout no longer renders
   prints with the built-in layout rather than failing with "An error occurred".
+- *Stock on a date* and *Value movement* now cut a day where the organization
+  lives, not at midnight UTC. A receipt booked at half past midnight local time
+  used to sit in the opening value of its own day, the note about where the
+  ledger starts named the wrong day, and a first-month organization saw only a
+  refusal because the page opened on a period starting before its ledger. The
+  statement now opens on the first day it can report when no first day is
+  picked.
 - The sale price calculator and the per-product cost estimate now count the
   formula's fixed costs and the labour its timed steps take, not only the
   ingredients. A batch that cost 25.28 a kilogram was priced from 11.28, so

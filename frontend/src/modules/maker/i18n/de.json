@@ -485,7 +485,8 @@
     "unitCostAfterRun": "Stückkosten nach letzter Produktion",
     "unitCostEstimated": "Geschätzte Stückkosten",
     "estimateCostIncomplete_one": "Für 1 Zutat dieser Schätzung ist kein Einkaufspreis hinterlegt.",
-    "estimateCostIncomplete_other": "Für {{count}} Zutaten dieser Schätzung ist kein Einkaufspreis hinterlegt."
+    "estimateCostIncomplete_other": "Für {{count}} Zutaten dieser Schätzung ist kein Einkaufspreis hinterlegt.",
+    "unitCostOverproduced": "Der letzte Lauf hat mehr ergeben als geplant; diese Kosten sind auf eine Menge verteilt, für die die Zutaten nicht gewachsen sind."
   },
   "settings": {
     "title": "Produktionseinstellungen",
@@ -539,7 +540,9 @@
     "hintSource": "Wird in den Einstellungen des Produktionsmoduls gesetzt",
     "orders_one": "{{count}} Durchlauf",
     "orders_other": "{{count}} Durchläufe",
-    "empty": "Noch keine abgeschlossenen Durchläufe mit Ergebnis."
+    "empty": "Noch keine abgeschlossenen Durchläufe mit Ergebnis.",
+    "overproduced_one": "{{count}} Lauf wurde über dem Plan abgeschlossen; sein Ergebnis zählt die Mehrmenge mit.",
+    "overproduced_other": "{{count}} Läufe wurden über dem Plan abgeschlossen; ihr Ergebnis zählt die Mehrmenge mit."
   },
   "whereUsed": {
     "title": "In Formeln verwendet",
@@ -867,5 +870,9 @@
       "planned_other": "{{count}} Aufträge geplant",
       "failed": "Die Aufträge konnten nicht geplant werden."
     }
+  },
+  "overproduction": {
+    "warning": "Das sind {{extra}} mehr als die geplanten {{planned}}. Die Zutaten bleiben wie geplant, daher fallen die Kosten pro Einheit deutlich niedriger aus als bei einer echten Charge.",
+    "confirm": "Ja, der Lauf hat so viel ergeben"
   }
 }
