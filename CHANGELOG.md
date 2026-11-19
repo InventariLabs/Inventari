@@ -279,6 +279,12 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Archiving a location no longer moves the stock of the locations inside it.
+  Those locations stay active, but their products were relocated to the chosen
+  target and the shelf was left empty while the goods had not moved. Only what
+  stands on the archived location itself is relocated, the archive dialog
+  asks for a target only when that location holds products, and a location
+  that holds nothing of its own archives without one.
 - *Stock on a date* and *Value movement* now cut a day where the organization
   lives, not at midnight UTC. A receipt booked at half past midnight local time
   used to sit in the opening value of its own day, the note about where the

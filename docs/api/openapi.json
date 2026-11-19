@@ -86048,7 +86048,7 @@
         },
         "type": "object",
         "title": "StorageArchiveRequest",
-        "description": "\u00abMove content and close\u00bb payload.\n\n``move_items_to`` is required when the location (or any of its\ndescendants) still holds items; the archive then relocates them in the\nsame operation."
+        "description": "\u00abMove content and close\u00bb payload.\n\n``move_items_to`` is required when the location itself still holds\nitems; the archive then relocates them in the same operation. The\nlocations inside stay active and keep their own stock."
       },
       "StorageCodeChange": {
         "properties": {

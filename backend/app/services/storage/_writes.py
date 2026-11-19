@@ -538,9 +538,10 @@ async def archive_storage(
     """Archive a location, optionally relocating its items first.
 
     The flag lives in the existing JSONB ``settings`` (decision: no new Core
-    column). Items in the location and all of its descendants are moved to
+    column). Items standing on the location itself are moved to
     *move_items_to* when given; without a target, a location that still
-    holds items is rejected.
+    holds items is rejected. The locations inside are not archived with it —
+    they stay active, so the stock on them stays where it is.
     """
     from app.models.item import Item
     from app.schemas.item import ItemMove
@@ -566,13 +567,12 @@ async def archive_storage(
         if (target.settings or {}).get('archived') is True:
             raise ServiceRejectionError('storage_archive_target_archived')
 
-    scope_ids = [storage.id] + descendant_ids
     item_ids = list(
         (
             await db.scalars(
                 select(Item.id).where(
                     Item.organization_id == org_id,
-                    Item.storage_location_id.in_(scope_ids),
+                    Item.storage_location_id == storage.id,
                     Item.is_deleted.is_(False),
                 )
             )
