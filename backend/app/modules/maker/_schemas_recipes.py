@@ -100,7 +100,9 @@ class RecipeCostLineCreate(BaseModel):
 
     kind: CostLineKind
     label: str = Field(min_length=1, max_length=120)
-    amount: Decimal = Field(max_digits=12, decimal_places=2)
+    #: Never negative: a fixed cost that subtracts would lower the BOM's unit
+    #: cost and the cost of every run after it. Zero is a line costing nothing.
+    amount: Decimal = Field(ge=0, max_digits=12, decimal_places=2)
     sort_order: int = 0
 
 
@@ -109,7 +111,7 @@ class RecipeCostLineUpdate(BaseModel):
 
     kind: CostLineKind | None = None
     label: str | None = Field(None, min_length=1, max_length=120)
-    amount: Decimal | None = Field(None, max_digits=12, decimal_places=2)
+    amount: Decimal | None = Field(None, ge=0, max_digits=12, decimal_places=2)
     sort_order: int | None = None
 
 

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { act, render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { AxiosError, type AxiosResponse } from "axios";
 import { CostLinesEditor } from "./CostLinesEditor";
 import type { RecipeCostLine } from "@/modules/maker/types/maker";
 
@@ -93,6 +94,56 @@ describe("CostLinesEditor", () => {
       recipeId: "r-1",
       data: { kind: "OVERHEAD", label: "Electricity", amount: "8.75" },
     });
+  });
+
+  it("shows the server's refusal of a negative amount beside the Amount field", async () => {
+    addMutate.mockRejectedValueOnce(
+      new AxiosError(
+        "Request failed",
+        "ERR_BAD_REQUEST",
+        undefined,
+        undefined,
+        {
+          status: 422,
+          data: {
+            detail: [
+              {
+                loc: ["body", "amount"],
+                msg: "Must be greater than or equal to 0",
+                type: "greater_than_equal",
+              },
+            ],
+          },
+        } as AxiosResponse,
+      ),
+    );
+    renderEditor();
+    fireEvent.click(screen.getByTestId("maker-cost-line-add"));
+    fireEvent.change(screen.getByTestId("maker-cost-line-label"), {
+      target: { value: "Oven electricity" },
+    });
+    fireEvent.change(screen.getByTestId("maker-cost-line-amount"), {
+      target: { value: "-5" },
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText("Save"));
+    });
+
+    const amount = screen.getByTestId("maker-cost-line-amount");
+    expect(
+      screen.getByText("Must be greater than or equal to 0"),
+    ).toBeVisible();
+    expect(amount).toHaveAttribute("aria-invalid", "true");
+    // What was typed stays, so it can be corrected rather than retyped.
+    expect(amount).toHaveValue(-5);
+    expect(screen.getByTestId("maker-cost-line-label")).toHaveValue(
+      "Oven electricity",
+    );
+
+    fireEvent.change(amount, { target: { value: "5" } });
+    expect(
+      screen.queryByText("Must be greater than or equal to 0"),
+    ).not.toBeInTheDocument();
   });
 
   it("does not save an invalid draft", () => {

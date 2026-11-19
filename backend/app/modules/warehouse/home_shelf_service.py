@@ -54,6 +54,29 @@ async def _under_async(db: AsyncSession, org_id: UUID, root_id: UUID) -> set[UUI
     }
 
 
+async def held_back_locations_async(db: AsyncSession, org_id: UUID) -> dict[UUID, str]:
+    """Every location goods are not kept in, with why: the receiving areas
+    and the quarantine location, and everything inside them.
+
+    One read answers for any number of locations — the putaway planner and
+    the rules list read the answer a single time for all the shelves they look at.
+    """
+    held: dict[UUID, str] = {}
+    for row in await list_receiving_modes_async(db, org_id):
+        if row.receiving_location_id is not None:
+            for location_id in await _under_async(
+                db, org_id, row.receiving_location_id
+            ):
+                held.setdefault(location_id, REFUSED_RECEIVING)
+    profile = await get_profile(db, org_id)
+    if profile is not None and profile.quarantine_location_id is not None:
+        for location_id in await _under_async(
+            db, org_id, profile.quarantine_location_id
+        ):
+            held.setdefault(location_id, REFUSED_QUARANTINE)
+    return held
+
+
 async def home_refusal_async(
     db: AsyncSession, org_id: UUID, location_id: UUID
 ) -> str | None:
@@ -62,6 +85,8 @@ async def home_refusal_async(
     A receiving area is where goods wait, a quarantine location is where they
     are held back, and a location that does not take stock (virtual, archived,
     not found) takes no goods at all — none of them is where a product lives.
+    A putaway rule's target is asked the same question: a rule is where the
+    next delivery of its goods is sent.
     """
     location = await core_api.locations.get_async(db, org_id, location_id)
     if (
@@ -70,18 +95,7 @@ async def home_refusal_async(
         or (location.settings or {}).get('archived') is True
     ):
         return REFUSED_NOT_STOCK
-    for row in await list_receiving_modes_async(db, org_id):
-        if row.receiving_location_id is not None and location_id in (
-            await _under_async(db, org_id, row.receiving_location_id)
-        ):
-            return REFUSED_RECEIVING
-    profile = await get_profile(db, org_id)
-    quarantine_id = profile.quarantine_location_id if profile else None
-    if quarantine_id is not None and location_id in (
-        await _under_async(db, org_id, quarantine_id)
-    ):
-        return REFUSED_QUARANTINE
-    return None
+    return (await held_back_locations_async(db, org_id)).get(location_id)
 
 
 async def _product_rule_async(

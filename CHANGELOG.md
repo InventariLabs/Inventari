@@ -285,6 +285,10 @@ says what the release does rather than what changed since them.
   adds one to whichever of two identical rows is tapped. The completed report
   and its CSV export carry the same expiry and record number the counting
   screen shows.
+- A fixed cost line of a production BOM can no longer be saved with a negative
+  amount, which lowered the BOM's unit cost, the run preview and the cost of
+  every run after it. The refusal appears beside the Amount field with what was
+  typed kept; a line saved negative earlier still opens and can be corrected.
 - Picking several documents from the list no longer ends in a dead end when
   one of them is already in a picking session. If the session is your own —
   opened on a phone and left — the dialog says so and offers **Continue that
@@ -292,6 +296,10 @@ says what the release does rather than what changed since them.
   it over or discard their scans, as the document's own page already did.
   **Retry** now appears only after a server failure, never after a refusal
   that would only repeat itself.
+- On a phone, the header's Back arrow on a screen opened by a direct link —
+  a document opened from a link or a refreshed page, for one — no longer ends
+  on a "Page Not Found" at `/warehouse/documents`. With nothing earlier in the
+  history it climbs to the nearest screen above that exists, the module's start.
 - The Settings audit log shows the reason a workflow release left on the
   requests it closed in the reader's language ("Workflow deactivated",
   "Workflow deleted") instead of the raw English text.

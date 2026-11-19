@@ -958,6 +958,8 @@ ERRORS_FR: ErrorMessages = {
     'putaway_capacity_not_found': 'Entrée de capacité introuvable',
     'no_fields_to_update': 'Aucun champ à mettre à jour',
     'putaway_rule_needs_location': 'Une règle de rangement doit indiquer au moins un emplacement.',
+    'putaway_rule_target_receiving': "Une zone de réception ne peut pas être la cible d'une règle de rangement : la marchandise n'y fait qu'attendre.",
+    'putaway_rule_target_quarantine': "Un emplacement de quarantaine ne peut pas être la cible d'une règle de rangement : la marchandise retenue y est conservée à part.",
     'putaway_rule_needs_match_key': 'Une règle de rangement doit avoir au moins une condition — un produit, une catégorie, une étiquette de contexte ou un type d’emplacement.',
     'document_template_wrong_module': 'Un modèle de document appartient au module Documents',
     'search_query_empty': 'Saisissez un terme à rechercher',
