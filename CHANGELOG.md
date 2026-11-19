@@ -279,6 +279,10 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A fixed cost line of a production BOM can no longer be saved with a negative
+  amount, which lowered the BOM's unit cost, the run preview and the cost of
+  every run after it. The refusal appears beside the Amount field with what was
+  typed kept; a line saved negative earlier still opens and can be corrected.
 - Picking several documents from the list no longer ends in a dead end when
   one of them is already in a picking session. If the session is your own —
   opened on a phone and left — the dialog says so and offers **Continue that
