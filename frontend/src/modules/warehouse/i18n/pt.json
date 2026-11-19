@@ -765,6 +765,8 @@
     "warningTyped": "Um novo documento {{type}} será criado para estornar a movimentação de estoque.",
     "lineQuantity": "Qtd. devolvida",
     "maxQuantity": "Máx.: {{max}}",
+    "overMaxQuantity": "Não é possível devolver mais de {{max}}",
+    "nothingToReturn": "Nada neste documento resta para devolver.",
     "reasonPlaceholder": "Motivo da devolução desta linha",
     "creating": "Criando…",
     "created": "Devolução {{number}} criada",

@@ -122,6 +122,102 @@ describe("ReturnFormModal", () => {
     ).toBeInTheDocument();
   });
 
+  it("flags a quantity above the maximum and holds the button back", async () => {
+    render(
+      <ReturnFormModal document={buildDocument("OUT")} onClose={vi.fn()} />,
+    );
+
+    fireEvent.change(screen.getByRole("spinbutton"), {
+      target: { value: "9" },
+    });
+
+    expect(screen.getByRole("spinbutton")).toHaveValue(9);
+    expect(screen.getByText("Can't return more than 3")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /create return/i }),
+    ).toBeDisabled();
+    expect(mutateMock).not.toHaveBeenCalled();
+  });
+
+  it("leaves out a line with nothing left to return", () => {
+    const document = buildDocument("OUT");
+    document.lines.push({
+      id: "line-2",
+      line_number: 2,
+      name: "Flour",
+      quantity: 5,
+      done_quantity: 0,
+    } as unknown as WarehouseDocument["lines"][number]);
+    render(<ReturnFormModal document={document} onClose={vi.fn()} />);
+
+    expect(screen.getByText("Widget")).toBeInTheDocument();
+    expect(screen.queryByText("Flour")).not.toBeInTheDocument();
+  });
+
+  it("limits a line to what earlier returns left of it", () => {
+    const document = buildDocument("OUT");
+    document.lines.push(
+      ...([
+        {
+          id: "line-2",
+          line_number: 2,
+          name: "Bolt",
+          quantity: 2,
+          done_quantity: 2,
+          returnable_quantity: 0,
+        },
+        {
+          id: "line-3",
+          line_number: 3,
+          name: "Nail",
+          quantity: 3,
+          done_quantity: 3,
+          returnable_quantity: 1,
+        },
+      ] as unknown as WarehouseDocument["lines"]),
+    );
+    render(<ReturnFormModal document={document} onClose={vi.fn()} />);
+
+    expect(screen.queryByText("Bolt")).not.toBeInTheDocument();
+    expect(screen.getByText("Max: 1")).toBeInTheDocument();
+    fireEvent.change(screen.getAllByRole("spinbutton")[1], {
+      target: { value: "3" },
+    });
+    expect(screen.getByText("Can't return more than 1")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /create return/i }),
+    ).toBeDisabled();
+  });
+
+  it("reads a digit typed left of the zero as that digit", () => {
+    render(
+      <ReturnFormModal document={buildDocument("OUT")} onClose={vi.fn()} />,
+    );
+
+    fireEvent.change(screen.getByRole("spinbutton"), {
+      target: { value: "90" },
+    });
+
+    expect((screen.getByRole("spinbutton") as HTMLInputElement).value).toBe(
+      "9",
+    );
+  });
+
+  it("does not keep the zero in front of a typed digit", () => {
+    render(
+      <ReturnFormModal document={buildDocument("OUT")} onClose={vi.fn()} />,
+    );
+
+    fireEvent.change(screen.getByRole("spinbutton"), {
+      target: { value: "02" },
+    });
+
+    expect(screen.getByRole("spinbutton")).toHaveValue(2);
+    expect((screen.getByRole("spinbutton") as HTMLInputElement).value).toBe(
+      "2",
+    );
+  });
+
   describe("leaving a filled-in sheet", () => {
     it("asks before Escape throws away an entered quantity", async () => {
       const onClose = vi.fn();

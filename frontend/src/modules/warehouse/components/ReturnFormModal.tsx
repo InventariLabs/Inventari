@@ -27,7 +27,8 @@ import { formatQuantityValue } from "@/utils/formatters";
 interface ReturnLineDraft {
   original_line_number: number;
   line_name: string;
-  done_quantity: number;
+  /** What a return can still take: the line's done quantity less earlier returns. */
+  max_quantity: number;
   return_quantity: number;
   /** The line's unit — what the quantity is counted in, and its step. */
   uom_id: string | null;
@@ -61,7 +62,11 @@ export function ReturnFormModal({ document, onClose }: ReturnFormModalProps) {
     document.lines.map((line) => ({
       original_line_number: line.line_number ?? 1,
       line_name: line.name ?? line.barcode ?? `Line ${line.line_number ?? 1}`,
-      done_quantity: Number(line.done_quantity ?? line.quantity ?? 0),
+      // The server names what is left once returns and corrections are taken
+      // off; a document read without it falls back to what the line did.
+      max_quantity: Number(
+        line.returnable_quantity ?? line.done_quantity ?? line.quantity ?? 0,
+      ),
       return_quantity: 0,
       uom_id: line.uom_id ?? null,
       reason: "",
@@ -81,16 +86,14 @@ export function ReturnFormModal({ document, onClose }: ReturnFormModalProps) {
   );
 
   const updateQuantity = (index: number, value: number) => {
-    const max = lines[index].done_quantity;
-    // An empty field is Number("") = NaN, and Math.min(max, NaN) is NaN — the
-    // same hole the correction form had.
-    const clamped = Math.max(
-      0,
-      Math.min(max, Number.isFinite(value) ? value : 0),
-    );
+    // The number stays as typed: a quantity above the line's maximum is
+    // flagged on the line and holds the button back, never saved as another
+    // number. An empty field is Number("") = NaN — the same hole the
+    // correction form had — and counts as nothing.
+    const quantity = Math.max(0, Number.isFinite(value) ? value : 0);
     setLines((prev) =>
       prev.map((line, i) =>
-        i === index ? { ...line, return_quantity: clamped } : line,
+        i === index ? { ...line, return_quantity: quantity } : line,
       ),
     );
   };
@@ -101,6 +104,10 @@ export function ReturnFormModal({ document, onClose }: ReturnFormModalProps) {
     );
   };
 
+  // A line with nothing left has nothing to give back.
+  const returnableLines = lines
+    .map((line, index) => ({ line, index }))
+    .filter(({ line }) => line.max_quantity > 0);
   const activeLines = lines.filter((l) => l.return_quantity > 0);
   const hasSelection = activeLines.length > 0;
   // A quantity the unit cannot hold is refused by the service; the button
@@ -110,8 +117,12 @@ export function ReturnFormModal({ document, onClose }: ReturnFormModalProps) {
     (line) => stepCheck(line.return_quantity, { uomId: line.uom_id }) !== "",
   );
 
+  const overMaxLine = activeLines.some(
+    (line) => line.return_quantity > line.max_quantity,
+  );
+
   const handleSubmit = () => {
-    if (!hasSelection) return;
+    if (!hasSelection || overMaxLine) return;
     // Saying what is missing beats a button that will not press: the count on
     // it is a count of lines, so a disabled one reads as "pick more lines".
     setTriedToSubmit(true);
@@ -190,7 +201,12 @@ export function ReturnFormModal({ document, onClose }: ReturnFormModalProps) {
 
       {/* Lines */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
-        {lines.map((line, index) => (
+        {returnableLines.length === 0 && (
+          <p className="text-sm text-on-secondary">
+            {t("returns.nothingToReturn")}
+          </p>
+        )}
+        {returnableLines.map(({ line, index }) => (
           <div
             key={line.original_line_number}
             className="rounded-xl border border-border bg-surface-raised p-3 space-y-2"
@@ -200,7 +216,7 @@ export function ReturnFormModal({ document, onClose }: ReturnFormModalProps) {
                 {line.line_name}
               </span>
               <span className="text-xs text-on-secondary shrink-0">
-                {t("returns.maxQuantity", { max: line.done_quantity })}
+                {t("returns.maxQuantity", { max: line.max_quantity })}
               </span>
             </div>
 
@@ -214,9 +230,16 @@ export function ReturnFormModal({ document, onClose }: ReturnFormModalProps) {
                 // the window's own meaning for "cleared", not the field's.
                 onChange={(next) => updateQuantity(index, next ?? 0)}
                 min={0}
-                max={line.done_quantity}
+                max={line.max_quantity}
                 uomId={line.uom_id}
                 label={t("returns.lineQuantity")}
+                error={
+                  line.return_quantity > line.max_quantity
+                    ? t("returns.overMaxQuantity", {
+                        max: formatQuantityValue(line.max_quantity),
+                      })
+                    : undefined
+                }
                 className={
                   line.return_quantity > 0
                     ? "text-accent-600 dark:text-accent-400"
@@ -225,7 +248,7 @@ export function ReturnFormModal({ document, onClose }: ReturnFormModalProps) {
               />
               {line.return_quantity > 0 && (
                 <span className="text-xs text-on-secondary">
-                  / {formatQuantityValue(line.done_quantity)}
+                  / {formatQuantityValue(line.max_quantity)}
                 </span>
               )}
             </div>
@@ -262,7 +285,12 @@ export function ReturnFormModal({ document, onClose }: ReturnFormModalProps) {
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!hasSelection || offStepLine || createReturn.isPending}
+            disabled={
+              !hasSelection ||
+              offStepLine ||
+              overMaxLine ||
+              createReturn.isPending
+            }
           >
             {createReturn.isPending
               ? t("returns.creating")
