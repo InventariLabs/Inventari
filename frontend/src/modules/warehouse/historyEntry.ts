@@ -53,15 +53,24 @@ export interface HistoryEntryText {
   detail: string;
 }
 
+/** The lines an entry speaks of. A completed document says what it did, so a
+ *  line nothing was done on (a receipt closed short keeps it, at nought) is
+ *  not counted; one that did nothing at all is still named by its lines. */
+function linesOf(doc: WarehouseDocumentRow, completed: boolean): number {
+  return completed && doc.moved_line_count > 0
+    ? doc.moved_line_count
+    : doc.line_count;
+}
+
 /** The contents of an entry: one product with its quantity, else a count. */
 function describeWhat(
   doc: WarehouseDocumentRow,
   completed: boolean,
   t: TranslateFn,
 ): string {
-  const only = doc.line_count === 1 ? doc.first_lines[0] : undefined;
-  if (!only?.name)
-    return t("warehouse:history.items", { count: doc.line_count });
+  const count = linesOf(doc, completed);
+  const only = count === 1 ? doc.first_lines[0] : undefined;
+  if (!only?.name) return t("warehouse:history.items", { count });
   if (NAME_ONLY_TYPES.has(doc.type)) return only.name;
   const quantity = completed ? only.done_quantity : only.quantity;
   if (doc.type === "CORRECTION") {
@@ -93,6 +102,7 @@ function describeWhat(
 /** The line under the sentence: partner, path, and the products it names. */
 function describeDetail(
   doc: WarehouseDocumentRow,
+  completed: boolean,
   partnerInSentence: boolean,
   t: TranslateFn,
 ): string {
@@ -109,9 +119,10 @@ function describeDetail(
   const names = doc.first_lines.flatMap((line) =>
     line.name ? [line.name] : [],
   );
-  if (doc.line_count > 1 && names.length > 0) {
+  const count = linesOf(doc, completed);
+  if (count > 1 && names.length > 0) {
     const shown = names.slice(0, NAMED_PRODUCTS_IN_SUB_LINE);
-    const rest = doc.line_count - shown.length;
+    const rest = count - shown.length;
     const list = shown.join(", ");
     detail.push(
       rest > 0
@@ -149,5 +160,8 @@ export function describeHistoryEntry(
           what,
         });
   const partnerInSentence = completed && withPartner;
-  return { sentence, detail: describeDetail(doc, partnerInSentence, t) };
+  return {
+    sentence,
+    detail: describeDetail(doc, completed, partnerInSentence, t),
+  };
 }

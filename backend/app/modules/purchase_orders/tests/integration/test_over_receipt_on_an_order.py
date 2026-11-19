@@ -644,8 +644,8 @@ class TestHeldGoodsAreDeliveredToTheOrder:
     A batch that arrived with part of it held back is still one batch, so the
     stock stays together and is blocked; the order counts the whole delivery,
     because the goods are in the building and wait for a decision, not for
-    the supplier. The held part has a separate replacement draft; goods that
-    never arrived remain owed on the order.
+    the supplier. The held part is not asked for again on a draft of its own;
+    goods that never arrived remain owed on the order.
     """
 
     def test_the_held_quantity_is_counted_as_received(
@@ -705,18 +705,10 @@ class TestHeldGoodsAreDeliveredToTheOrder:
         assert completed.status_code == status.HTTP_200_OK, completed.text
 
         assert _quantity_received(client, po_auth_headers, po_id) == 7
-        backorders = [
+        assert [
             doc
             for doc in client.get(
                 '/api/v1/warehouse/documents', headers=po_auth_headers
             ).json()['items']
             if doc.get('backorder_id') == receipt['id']
-        ]
-        assert len(backorders) == 1
-        draft = client.get(
-            f'/api/v1/warehouse/documents/{backorders[0]["id"]}',
-            headers=po_auth_headers,
-        )
-        assert draft.status_code == status.HTTP_200_OK, draft.text
-        assert float(draft.json()['lines'][0]['expected_quantity']) == 3
-        assert draft.json()['lines'][0]['source_po_line_id'] is None
+        ] == []

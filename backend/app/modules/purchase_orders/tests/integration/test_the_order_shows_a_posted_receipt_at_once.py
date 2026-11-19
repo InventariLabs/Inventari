@@ -160,7 +160,7 @@ class TestTheOrderShowsAPostedReceiptAtOnce:
         assert detail.json()['status'] == 'COMPLETED'
 
     @pytest.mark.parametrize('arrived', [5, 8])
-    def test_held_goods_get_a_separate_replenishment_without_claiming_the_order(
+    def test_held_goods_are_not_asked_for_again_on_a_draft_of_their_own(
         self,
         client: TestClient,
         po_auth_headers: dict[str, str],
@@ -199,19 +199,11 @@ class TestTheOrderShowsAPostedReceiptAtOnce:
         assert receipt.json()['status'] == 'COMPLETED'
         documents = client.get('/api/v1/warehouse/documents', headers=po_auth_headers)
         assert documents.status_code == 200, documents.text
-        drafts = [
+        assert [
             d
             for d in documents.json()['items']
             if d['backorder_id'] == receipt.json()['id']
-        ]
-        assert len(drafts) == 1
-        draft = client.get(
-            f'/api/v1/warehouse/documents/{drafts[0]["id"]}', headers=po_auth_headers
-        ).json()
-        assert draft['status'] == 'DRAFT'
-        assert float(draft['lines'][0]['expected_quantity']) == 2
-        assert draft['lines'][0]['source_po_line_id'] is None
-        assert draft['lines'][0]['batch_number'] is None
+        ] == []
         detail = client.get(
             f'/api/v1/purchase-orders/{order["id"]}', headers=po_auth_headers
         ).json()

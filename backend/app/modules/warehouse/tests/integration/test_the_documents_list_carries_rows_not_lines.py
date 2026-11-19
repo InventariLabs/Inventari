@@ -129,6 +129,29 @@ class TestTheRow:
             'Flat washer',
         ]
 
+    def test_a_completed_row_counts_and_names_the_lines_that_moved(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        db_session: Session,
+        receipt: Document,
+    ) -> None:
+        # A phone receipt closed with "the rest did not come" keeps the lines
+        # nothing arrived of, at nought: they are not what the receipt did.
+        receipt.status = DocumentStatus.COMPLETED.value
+        for line in receipt.lines:
+            line.done_quantity = Decimal('4' if line.name == 'Cable tie' else '0')
+        db_session.commit()
+
+        (row,) = _rows(client, doc_auth_headers)
+
+        assert row['line_count'] == 4
+        assert row['moved_line_count'] == 1
+        assert [line['name'] for line in row['first_lines']] == [
+            'Cable tie',
+            'Hex bolt M6',
+        ]
+
     def test_a_correction_names_the_type_of_the_document_it_corrects(
         self,
         client: TestClient,
