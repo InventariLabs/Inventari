@@ -11,21 +11,26 @@ const trimmed = (path: string) => path.replace(/\/+$/, "") || "/";
 
 /**
  * The screen one level up inside a module: `/inventory/items/42` ->
- * `/inventory/items`. Never climbs out of the module — its root is the top.
+ * `/inventory/items`. Never climbs out of the module — its root is the top —
+ * and never lands on a path no screen answers: a path segment is not always a
+ * screen (`/warehouse/documents/42` has no `/warehouse/documents` above it),
+ * so it climbs past the empty ones and answers `null` when the module
+ * registers no screen above this one at all.
  */
 function parentWithinModule(
   pathname: string,
   basePath: string,
   routeExists: (path: string) => boolean,
-): string {
+): string | null {
   const base = trimmed(basePath);
+  const inside = (path: string) => path === base || path.startsWith(`${base}/`);
   let parent = trimmed(pathname).split("/").slice(0, -1).join("/") || "/";
-  // A path segment is not always a screen: `/warehouse/documents/42` has no
-  // `/warehouse/documents` above it, and a Back that lands there is a dead page.
-  while (parent.startsWith(base) && parent !== base && !routeExists(parent)) {
+  while (inside(parent)) {
+    if (routeExists(parent)) return parent;
+    if (parent === base) break;
     parent = parent.split("/").slice(0, -1).join("/") || "/";
   }
-  return parent.startsWith(base) ? parent : base;
+  return null;
 }
 
 /**
@@ -54,7 +59,8 @@ export function hasHistoryToPop(location: Location): boolean {
  * 3. anywhere else it pops the history, like the browser button — the list
  *    with its filter and scroll position, not the launcher;
  * 4. a screen opened by a direct link has no history to pop, so it climbs to
- *    the nearest screen above it that exists in the module (`routeExists`).
+ *    the nearest screen above it that the module registers (`routeExists`) —
+ *    and home when it registers none, never to a path that renders nothing.
  */
 export function useShellBack(
   basePath: string | undefined,
@@ -94,9 +100,13 @@ export function useShellBack(
     } else if (hasHistoryToPop(location)) {
       navigate(-1);
     } else {
-      navigate(parentWithinModule(location.pathname, basePath, routeExists), {
-        replace: true,
-      });
+      // Nothing in the history to pop: one screen up, or home when the module
+      // has none above this one.
+      navigate(
+        parentWithinModule(location.pathname, basePath, routeExists) ??
+          homePath,
+        { replace: true },
+      );
     }
   };
 }

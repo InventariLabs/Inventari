@@ -294,6 +294,21 @@ describe("AppShell — header controls are named by the words they show", () => 
     );
   });
 
+  it("climbs past a path segment that is no screen, the way a receipt opened by link does", async () => {
+    // A phone's receiving sheet opens on `/warehouse/documents/<id>#receive`;
+    // its own Back closes onto the document, and the header's is the way out
+    // of it. The segment above a document — `/warehouse/documents` — names no
+    // screen, so climbing to it is the "Page Not Found" a thumb met.
+    const user = userEvent.setup();
+    useFormGuardStore.getState().setDirtyForm(null);
+    modulesState.enabledModules = ["warehouse"];
+    renderShell("/warehouse/documents/d1");
+    await user.click(screen.getByRole("button", { name: "Back" }));
+    await waitFor(() =>
+      expect(screen.getByTestId("path")).toHaveTextContent(/^\/warehouse$/),
+    );
+  });
+
   it("leaves the module only from its root", async () => {
     const user = userEvent.setup();
     modulesState.enabledModules = ["equipment"];

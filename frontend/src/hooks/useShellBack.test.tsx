@@ -19,7 +19,12 @@ const moduleOf = (path: string) =>
 
 // The screens the app registers: `/warehouse/documents` is not one of them,
 // only a document under it is.
-const SCREENS = ["/warehouse/todo", "/warehouse/receive", "/inventory/stock"];
+const SCREENS = [
+  "/warehouse",
+  "/warehouse/todo",
+  "/warehouse/receive",
+  "/inventory/stock",
+];
 
 /** What AppShell does: one header Back that lives across every screen. */
 function Shell() {
@@ -78,6 +83,7 @@ function renderApp(entries: InitialEntry[], index?: number) {
         />
         <Route path="/warehouse/receive" element={<p>receipt</p>} />
         <Route path="/warehouse/documents/7" element={<p>document</p>} />
+        <Route path="/inventory/items/42" element={<p>item</p>} />
         <Route path="/warehouse" element={<p>module root</p>} />
       </Routes>
     </MemoryRouter>,
@@ -150,5 +156,13 @@ describe("useShellBack", () => {
     renderApp(["/warehouse/documents/7"]);
     back();
     expect(at()).toBe("/warehouse");
+  });
+
+  it("goes home when the module registers no screen above this one", () => {
+    // `/inventory` has a list and a stock screen, but no root of its own: the
+    // climb runs out of screens and the launcher is the only answer left.
+    renderApp(["/inventory/items/42"]);
+    back();
+    expect(at()).toBe("/launcher");
   });
 });

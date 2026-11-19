@@ -62,6 +62,23 @@ function sayWorkWasNotKept(t: (key: string) => string): void {
   });
 }
 
+/**
+ * The screens the enabled modules really draw. A route whose own modules are
+ * all switched off draws the not-found page, so it is no screen at all.
+ */
+function screensOf(enabledModules: string[]): (path: string) => boolean {
+  const routes = moduleRegistry.getRoutes(enabledModules);
+  return (path) =>
+    routes.some(
+      (route) =>
+        (!route.requiresModules ||
+          route.requiresModules.some((name) =>
+            enabledModules.includes(name),
+          )) &&
+        matchPath({ path: route.path, end: true }, path) !== null,
+    );
+}
+
 const NotificationTray = lazy(
   () => import("@/modules/announcements/components/NotificationTray"),
 );
@@ -150,14 +167,10 @@ export default function AppShell() {
 
   const moduleNav = activeModule?.moduleNav ?? null;
   // The page header's arrow is hidden on a phone, so the shell's must do what
-  // it does: go back to the screen the person came from.
-  // A screen opened by a direct link climbs to the nearest screen above it
-  // that a module really registers.
-  const routeExists = useCallback(
-    (path: string) =>
-      moduleRegistry
-        .getRoutes(enabledModules)
-        .some((route) => matchPath({ path: route.path, end: true }, path)),
+  // it does: go back to the screen the person came from. A screen opened by a
+  // direct link climbs to the nearest screen above it that exists.
+  const routeExists = useMemo(
+    () => screensOf(enabledModules),
     [enabledModules],
   );
   const goBack = useShellBack(moduleNav?.basePath, homePath, routeExists);
