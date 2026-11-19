@@ -1,11 +1,9 @@
-import { extractApiError } from "@/lib/errors";
 import React, { useState } from "react";
 import { makeTDynamic } from "@/lib/i18nHelpers";
 import { Leaf, Camera, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import NutritionScanner from "./NutritionScanner";
-import { useUpdateNutrition } from "@/modules/nutrition/hooks/useNutrition";
+import { useManualNutrition } from "@/modules/nutrition/hooks/useManualNutrition";
 import type { ProductTemplateNutritionInfo } from "@/lib/api/productTemplates";
 import type { Item } from "@/types";
 import { NutritionEmptyState } from "./NutritionEmptyState";
@@ -15,6 +13,7 @@ import { NutritionValuesGrid } from "./NutritionValuesGrid";
 import { productNutrition } from "../productNutrition";
 import { Button } from "@/components/ui/Button";
 import { useModules } from "@/contexts/ModulesContext";
+import type { RegisterBeforeSubmit } from "@/lib/moduleRegistry";
 
 interface FoodNutrition {
   nutrient_levels?: Record<string, string>;
@@ -42,6 +41,8 @@ interface Props {
     item?: Item;
     formData?: Record<string, unknown>;
     storageType?: { type_code: string };
+    registerBeforeSubmit?: RegisterBeforeSubmit;
+    reportDirty?: (dirty: boolean) => void;
   };
 }
 
@@ -50,13 +51,9 @@ const FoodAndHealthExtra: React.FC<Props> = ({ data }) => {
   const tDyn = makeTDynamic(t);
   const item = data?.item;
   const storageType = data?.storageType;
-  const updateNutrition = useUpdateNutrition();
+  const manual = useManualNutrition(data);
   const [showScanner, setShowScanner] = useState(false);
   const [showFullIngredients, setShowFullIngredients] = useState(false);
-  const [showNutritionForm, setShowNutritionForm] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [nutritionForm, setNutritionForm] =
-    useState<ProductTemplateNutritionInfo>({});
 
   // Reading a photo belongs to the vision module, which can be switched off.
   // Where it is off the camera is a dead end — the request behind it comes
@@ -149,63 +146,18 @@ const FoodAndHealthExtra: React.FC<Props> = ({ data }) => {
     },
   ];
 
-  const handleOpenNutritionForm = () => {
-    // The saved figures, so correcting one does not mean retyping the rest.
-    setNutritionForm(values ?? {});
-    setShowNutritionForm(true);
-  };
-
-  const handleSaveNutrition = async () => {
-    if (!item?.template_id) return;
-    setIsSaving(true);
-    try {
-      const payload: ProductTemplateNutritionInfo = Object.fromEntries(
-        Object.entries(nutritionForm).filter(
-          ([, v]) => v !== "" && v !== undefined && v !== null,
-        ),
-      ) as ProductTemplateNutritionInfo;
-      await updateNutrition.mutateAsync({
-        templateId: item.template_id,
-        nutritionInfo: payload,
-        itemId: item.id,
-      });
-      toast.success(t("nutritionForm.saved"));
-      setShowNutritionForm(false);
-    } catch (error) {
-      toast.error(
-        extractApiError(
-          error,
-          t("nutritionForm.saveError", {
-            defaultValue: "Error saving nutrition",
-          }),
-        ),
-      );
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   // The same form in both branches, so the empty state is not a closed loop:
   // typing values in by hand does not first require values, and a camera, a
   // legible label and an AI provider an admin configured are not the only way out.
   const editForm = item.template_id ? (
     <NutritionEditForm
       nutritionFields={nutritionFields}
-      nutritionForm={nutritionForm}
-      showNutritionForm={showNutritionForm}
-      isSaving={isSaving}
-      onToggleForm={() =>
-        showNutritionForm
-          ? setShowNutritionForm(false)
-          : handleOpenNutritionForm()
-      }
-      onFieldChange={(key, value) =>
-        setNutritionForm((prev) => ({
-          ...prev,
-          [key]: value === "" ? undefined : Number(value),
-        }))
-      }
-      onSave={handleSaveNutrition}
+      nutritionForm={manual.form}
+      showNutritionForm={manual.showForm}
+      isSaving={manual.isSaving}
+      onToggleForm={manual.onToggleForm}
+      onFieldChange={manual.onFieldChange}
+      onSave={manual.onSave}
       t={t}
     />
   ) : null;
