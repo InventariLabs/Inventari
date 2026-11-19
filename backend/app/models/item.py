@@ -501,3 +501,8 @@ class Item(Base):
     @property
     def template_name(self) -> str | None:
         return self.template.name if self.template else None
+
+    @property
+    def template_barcode(self) -> str | None:
+        """The code on the product card, where a scanned or typed code is kept."""
+        return self.template.barcode if self.template else None

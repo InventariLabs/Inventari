@@ -125,6 +125,48 @@ class TestCreateItem:
         }
         assert meta['mcp_request_id'] == changes['mcp_request_id']
 
+    def test_a_barcode_given_on_create_reads_back_and_is_searchable(
+        self,
+        mcp_tool,
+        db_session: Session,
+        mcp_write_key: str,
+        shelf: StorageLocation,
+    ) -> None:
+        """The code lives on the product card, and the read tools follow it there.
+
+        The record created with a barcode is read back by ``get_item`` with
+        that barcode, ``search_items`` finds the stock row by the code, and
+        both agree with the product card the workspace holds.
+        """
+        code = '5901234123457'
+        created = _structured(
+            mcp_tool(
+                mcp_write_key,
+                'create_item',
+                {
+                    'name': 'Olive oil 500 ml',
+                    'quantity': 6,
+                    'location_id': str(shelf.id),
+                    'barcode': code,
+                },
+            )
+        )
+        assert created['barcode'] == code
+
+        read_back = _structured(
+            mcp_tool(mcp_write_key, 'get_item', {'item_id': created['id']})
+        )
+        assert read_back['item']['barcode'] == code
+
+        found = _structured(mcp_tool(mcp_write_key, 'search_items', {'query': code}))
+        assert [row['id'] for row in found['stock']] == [created['id']]
+        assert found['stock'][0]['barcode'] == code
+
+        db_session.expire_all()
+        record = _record(db_session, UUID(created['id']))
+        assert record.template is not None
+        assert record.template.barcode == code
+
     def test_needs_items_write(
         self,
         mcp_tool,
