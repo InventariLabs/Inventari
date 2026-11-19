@@ -30,6 +30,8 @@ interface CorrectionLineDraft {
   original_line_number: number;
   line_name: string;
   original_quantity: number;
+  /** What a correction can still take off the line (the server's answer). */
+  removable_quantity: number;
   quantity_delta: number;
   /** The line's unit — what the delta is counted in, and its step. */
   uom_id: string | null;
@@ -56,6 +58,9 @@ export function CorrectionFormModal({
       original_line_number: line.line_number ?? 1,
       line_name: line.name ?? line.barcode ?? `Line ${line.line_number ?? 1}`,
       original_quantity: Number(line.done_quantity ?? line.quantity ?? 0),
+      removable_quantity: Number(
+        line.returnable_quantity ?? line.done_quantity ?? line.quantity ?? 0,
+      ),
       quantity_delta: 0,
       uom_id: line.uom_id ?? null,
       notes: "",
@@ -85,9 +90,9 @@ export function CorrectionFormModal({
         i === index
           ? {
               ...line,
-              // the negative side is bounded by the executed
-              // quantity, mirroring the return window's Max: N clamp.
-              quantity_delta: Math.max(-line.original_quantity, safeDelta),
+              // the negative side is bounded by what the document says can
+              // still be taken back, as the return window's Max: N is.
+              quantity_delta: Math.max(-line.removable_quantity, safeDelta),
             }
           : line,
       ),
@@ -175,7 +180,7 @@ export function CorrectionFormModal({
                 {formatQuantityValue(line.original_quantity)}
               </span>
               <span className="text-xs text-on-secondary shrink-0">
-                {t("corrections.minDelta", { max: line.original_quantity })}
+                {t("corrections.minDelta", { max: line.removable_quantity })}
               </span>
             </div>
 
@@ -188,7 +193,7 @@ export function CorrectionFormModal({
                 // A field holding no number is a delta of zero — the window's
                 // own meaning for "cleared", not the field's.
                 onChange={(next) => updateDelta(index, next ?? 0)}
-                min={-line.original_quantity}
+                min={-line.removable_quantity}
                 uomId={line.uom_id}
                 label={t("corrections.delta")}
                 className={

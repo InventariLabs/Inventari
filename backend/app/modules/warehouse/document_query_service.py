@@ -14,7 +14,7 @@ from app.core.db_utils import escape_ilike, in_ids, paginate_async
 from app.core.public_api import core_api
 
 from . import document_types as dt
-from ._line_reversals import reversible_quantities_async
+from ._line_reversals import correctable_quantities_async
 from .document_register_service import document_date_column
 from .models import Document, DocumentLine, DocumentRelation, DocumentStatus
 from .schemas import (
@@ -227,7 +227,7 @@ async def _attach_returnable(db: AsyncSession, org_id: UUID, doc: Document) -> N
     """
     if doc.status != DocumentStatus.COMPLETED.value:
         return
-    left = await reversible_quantities_async(db, org_id, doc.lines)
+    left = await correctable_quantities_async(db, org_id, doc, doc.lines)
     for line in doc.lines:
         line.returnable_quantity = max(left[line.id], Decimal(0))  # type: ignore[attr-defined]
 
