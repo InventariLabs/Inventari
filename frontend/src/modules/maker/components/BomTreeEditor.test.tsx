@@ -141,6 +141,20 @@ describe("BomTreeEditor", () => {
     });
   });
 
+  it("marks a line whose unit cannot be read as the stock unit", () => {
+    renderTree({
+      line: null,
+      children: [
+        {
+          line: { ...line("a"), unit_mismatch: true } as BomLine,
+          children: [],
+        },
+      ],
+    });
+
+    expect(screen.getByTestId("maker-tree-unit-mismatch")).toBeInTheDocument();
+  });
+
   describe("an ingredient that has a BOM of its own", () => {
     const withSubAssembly = (over: Partial<BomLine>): BomTreeNode => ({
       line: null,

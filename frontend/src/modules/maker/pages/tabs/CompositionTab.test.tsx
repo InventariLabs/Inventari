@@ -125,6 +125,7 @@ const line: BomLine = {
   created_at: "2026-01-01T00:00:00Z",
   updated_at: "2026-01-01T00:00:00Z",
   typed_unit_price_in_use: false,
+  unit_mismatch: false,
 };
 
 const recipe: MakerRecipe = {
@@ -314,6 +315,22 @@ describe("CompositionTab ingredients", () => {
     renderTab({ lines: [{ ...line, yield_loss_pct: "7.50" }] });
     expect(screen.getByText("2 kg")).toBeInTheDocument();
     expect(screen.getByText("+7.5%")).toBeInTheDocument();
+  });
+
+  it("marks a line whose unit cannot be read as the stock unit", () => {
+    renderTab({ lines: [{ ...line, unit_mismatch: true }] });
+
+    expect(
+      screen.getByTestId("maker-composition-unit-mismatch"),
+    ).toHaveTextContent(/set one before the next run/);
+  });
+
+  it("leaves a line whose unit reads as the stock unit unmarked", () => {
+    renderTab({ lines: [line] });
+
+    expect(
+      screen.queryByTestId("maker-composition-unit-mismatch"),
+    ).not.toBeInTheDocument();
   });
 
   it("lets an ingredient row wrap, and keeps the name a readable width", () => {

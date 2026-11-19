@@ -285,6 +285,15 @@ says what the release does rather than what changed since them.
   stands on the archived location itself is relocated, the archive dialog
   asks for a target only when that location holds products, and a location
   that holds nothing of its own archives without one.
+- A BOM line's unit is read against the ingredient's stock unit, and a line
+  that cannot be converted is refused instead of silently drawing the wrong
+  number. A formula line reading "Wheat flour 300 g" on a product kept in
+  pieces used to take 600 pieces for two batches and record "600 pcs"; the
+  line is now refused when it is saved, naming both units, and a run refuses
+  one already stored that way. The Composition tab marks such a line as a
+  unit mismatch until a unit is set, and a line that does convert — 500 g
+  against stock kept in kilograms — draws the converted amount and records
+  it in the shelf's unit.
 - *Stock on a date* and *Value movement* now cut a day where the organization
   lives, not at midnight UTC. A receipt booked at half past midnight local time
   used to sit in the opening value of its own day, the note about where the
