@@ -773,6 +773,8 @@
     "warningTyped": "Se creará un nuevo documento {{type}} para revertir el movimiento de existencias.",
     "lineQuantity": "Cant. devuelta",
     "maxQuantity": "Máx: {{max}}",
+    "overMaxQuantity": "No se puede devolver más de {{max}}",
+    "nothingToReturn": "No queda nada por devolver de este documento.",
     "reasonPlaceholder": "Motivo para devolver esta línea",
     "creating": "Creando…",
     "created": "Devolución {{number}} creada",

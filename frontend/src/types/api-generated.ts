@@ -14771,6 +14771,8 @@ export interface components {
             done_quantity: string;
             /** Held Quantity */
             held_quantity: string;
+            /** Returnable Quantity */
+            returnable_quantity?: string | null;
             /** Uom Id */
             uom_id: string | null;
             uom: components["schemas"]["UomInfoDTO"] | null;
