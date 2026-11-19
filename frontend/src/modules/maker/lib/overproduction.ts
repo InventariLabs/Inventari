@@ -3,7 +3,7 @@
  * so: a quarter. A 10 kg batch finished as 12 kg is a good day; as 59 kg it
  * is almost certainly a typo, and the ingredients stay as planned either way.
  */
-export const OVERPRODUCTION_SHARE = 0.25;
+const OVERPRODUCTION_SHARE = 0.25;
 
 /**
  * The quantity a typed total puts above the plan, or `null` when the total
