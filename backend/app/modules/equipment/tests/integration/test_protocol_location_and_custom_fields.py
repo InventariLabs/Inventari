@@ -372,7 +372,8 @@ class TestTheAccessorReachesNoObjects:
         assert 'dict' not in quiet and 'class' not in quiet and 'object' not in quiet
 
         # Escaping through the dunder is refused when the layout is saved: the
-        # check renders it once, and the sandbox stops the call.
+        # save renders the body on an empty context, and the sandbox stops
+        # the call.
         with pytest.raises(ServiceRejectionError):
             await _render('<html><body>{{ custom.__class__() }}</body></html>')
 
