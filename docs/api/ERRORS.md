@@ -574,6 +574,8 @@ apart.
 | `PUTAWAY_NEEDS_ANOTHER_LOCATION` | The goods already stand there: choose the location they go to. |
 | `PUTAWAY_RULE_NEEDS_LOCATION` | A putaway rule needs at least one location. |
 | `PUTAWAY_RULE_NEEDS_MATCH_KEY` | A putaway rule needs at least one condition — a product, a category, a context tag or a storage type. |
+| `PUTAWAY_RULE_TARGET_QUARANTINE` | A quarantine location cannot be a putaway rule's target: goods held back are not sent there by a rule. |
+| `PUTAWAY_RULE_TARGET_RECEIVING` | A receiving area cannot be a putaway rule's target: goods only wait there. |
 | `PUTAWAY_SHELF_SCAN_REQUIRED` | Scan the shelf label before the goods go on it. |
 | `PUTAWAY_UNKNOWN_CONTEXT_TAG` | Unknown category group '{value}' — choose one that an existing category defines |
 | `PUTAWAY_UNKNOWN_STORAGE_TYPE` | Unknown storage type '{value}' — choose one of the organization's storage types |

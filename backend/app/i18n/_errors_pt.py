@@ -724,6 +724,8 @@ ERRORS_PT: dict[str, str] = {
     'putaway_capacity_not_found': 'Entrada de capacidade não encontrada',
     'no_fields_to_update': 'Nenhum campo para atualizar',
     'putaway_rule_needs_location': 'Uma regra de armazenagem precisa de pelo menos um local.',
+    'putaway_rule_target_receiving': 'Uma área de receção não pode ser o destino de uma regra de armazenagem: a mercadoria apenas aguarda ali.',
+    'putaway_rule_target_quarantine': 'Um local de quarentena não pode ser o destino de uma regra de armazenagem: a mercadoria retida é mantida ali à parte.',
     'putaway_rule_needs_match_key': 'Uma regra de armazenagem precisa de pelo menos uma condição — um produto, uma categoria, uma etiqueta de contexto ou um tipo de armazenamento.',
     'document_template_wrong_module': 'Um modelo de documento pertence ao módulo de armazém',
     'search_query_empty': 'Digite algo para pesquisar',
