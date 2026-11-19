@@ -12,12 +12,7 @@ from pathlib import Path
 from typing import Any
 from uuid import UUID
 
-from jinja2 import (
-    ChoiceLoader,
-    Environment,
-    FileSystemLoader,
-    select_autoescape,
-)
+from jinja2 import ChoiceLoader, Environment, FileSystemLoader, select_autoescape
 from sqlalchemy.ext.asyncio import AsyncSession
 from weasyprint import HTML
 
