@@ -64,9 +64,11 @@ function moveJournalEntry(
   // The outside is declined by the slot it fills: what came in "from
   // outside" did not also leave "from outside".
   const from =
+    move.from_location_path ??
     placeName(move.from_location_id, move.from_location_name) ??
     t("inventory:moves.outsideFrom");
   const to =
+    move.to_location_path ??
     placeName(move.to_location_id, move.to_location_name) ??
     t("inventory:moves.outsideTo");
   const at = move.completed_at ?? move.created_at ?? null;

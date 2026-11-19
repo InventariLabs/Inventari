@@ -247,8 +247,38 @@ def test_a_physical_move_records_one_document_and_a_move_per_product(
     ).json()['items']
     assert len(listed) == 1
     assert listed[0]['relocated_location_name'] == 'Cold Storage'
-    assert listed[0]['relocated_from_path'] == 'Main Warehouse'
-    assert listed[0]['relocated_to_path'] == 'Pantry Building'
+    assert listed[0]['relocated_from_path'] == 'Main Warehouse › Cold Storage'
+    assert listed[0]['relocated_to_path'] == 'Pantry Building › Cold Storage'
+
+
+def test_an_earlier_movement_reads_the_path_the_shelf_had_then(
+    client, auth_headers, db_session, warehouses
+):
+    """Movements made before a physical move name the old path, after it the new."""
+    _reorg(
+        client,
+        auth_headers,
+        [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
+    )
+
+    def rows(**params):
+        return client.get(
+            '/api/v1/stock-moves', headers=auth_headers, params=params
+        ).json()['items']
+
+    flour = str(warehouses['flour'].id)
+    (earlier,) = [
+        r
+        for r in rows(product_template_id=flour)
+        if r['reference_type'] != 'location_relocation'
+    ]
+    assert earlier['to_location_id'] == str(warehouses['shelf'].id)
+    assert earlier['to_location_path'] == ('Main Warehouse › Cold Storage › Shelf A')
+
+    # A movement made after the move stands where the tree puts it today.
+    post_on_shelf(client, auth_headers, warehouses['flour'], warehouses['shelf'].id, 1)
+    newest = rows(product_template_id=flour)[0]
+    assert newest['to_location_path'] is None
 
 
 def test_the_stock_on_a_date_stands_where_the_location_stood_then(

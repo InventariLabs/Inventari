@@ -7,7 +7,7 @@ commits).  Reads are pure queries.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from datetime import UTC, date, datetime, tzinfo
 from decimal import Decimal
 from typing import Any
@@ -43,6 +43,7 @@ from app.core.contracts import (
 from app.core.db_utils import in_ids
 from app.core.exceptions import ContractViolationError
 from app.core.keyset import read_page_after
+from app.core.location_path import join_location_path
 from app.core.posting_batch import current_batch
 from app.models.item import Item
 from app.models.location_relocation import LocationRelocation
@@ -518,22 +519,121 @@ async def list_rows_for_org_async(
             read, moment=_moved_at(), row_id=StockMove.id, after=after, limit=limit
         )
 
-    rows = [
-        StockMoveRowDTO(
-            **StockMoveDTO.model_validate(row.StockMove).model_dump(),
-            product_name=row.product_name,
-            uom_symbol=row.uom_symbol,
-            from_location_name=row.from_location_name,
-            to_location_name=row.to_location_name,
-            lot_name=row.lot_name,
-            user_name=row.user_name,
-            relocated_location_name=row.relocated_location_name,
-            relocated_from_path=row.relocated_from_path,
-            relocated_to_path=row.relocated_to_path,
+    paths_then = await _paths_as_of_async(db, organization_id, page)
+    rows = []
+    for row in page:
+        from_path, to_path = paths_then(row.StockMove)
+        rows.append(
+            StockMoveRowDTO(
+                **StockMoveDTO.model_validate(row.StockMove).model_dump(),
+                product_name=row.product_name,
+                uom_symbol=row.uom_symbol,
+                from_location_name=row.from_location_name,
+                to_location_name=row.to_location_name,
+                from_location_path=from_path,
+                to_location_path=to_path,
+                lot_name=row.lot_name,
+                user_name=row.user_name,
+                relocated_location_name=row.relocated_location_name,
+                relocated_from_path=_with_name(
+                    row.relocated_from_path, row.relocated_location_name
+                ),
+                relocated_to_path=_with_name(
+                    row.relocated_to_path, row.relocated_location_name
+                ),
+            )
         )
-        for row in page
-    ]
     return rows, int(total or 0)
+
+
+def _with_name(parent_path: str | None, name: str | None) -> str | None:
+    """The moved location's own path: the parent's path with its name last.
+
+    A relocation document stores the path of the parent it left and the one
+    it reached; a person reads where *the location* stood, so the name is
+    added at the end. A location at the top level has the name alone.
+    """
+    if name is None:
+        return parent_path
+    return join_location_path([parent_path, name]) if parent_path else name
+
+
+async def _paths_as_of_async(
+    db: AsyncSession, organization_id: UUID, page: Sequence[Row[Any]]
+) -> Callable[[StockMove], tuple[str | None, str | None]]:
+    """For a movement, the paths its two ends had when it happened.
+
+    A location keeps its id when it physically moves, so today's tree names
+    the wrong path for every movement made before the move. The paths are the
+    tree with the physical moves that came after the movement undone (the
+    relocation documents, newest first). A movement no physical move came
+    after — and every movement of an organization that never moved a location
+    physically — gets ``None``: today's path is the right one and the caller
+    already has it.
+    """
+
+    def unchanged(_move: StockMove) -> tuple[str | None, str | None]:
+        return None, None
+
+    relocations = (
+        await db.execute(
+            select(
+                LocationRelocation.location_id,
+                LocationRelocation.from_parent_id,
+                LocationRelocation.moved_at,
+            )
+            .where(
+                LocationRelocation.organization_id == organization_id,
+                LocationRelocation.location_id.is_not(None),
+            )
+            .order_by(LocationRelocation.moved_at.desc(), LocationRelocation.id.desc())
+        )
+    ).all()
+    if not relocations or not page:
+        return unchanged
+    tree = (
+        await db.execute(
+            select(
+                StorageLocation.id, StorageLocation.name, StorageLocation.parent_id
+            ).where(StorageLocation.organization_id == organization_id)
+        )
+    ).all()
+    names = {row.id: row.name for row in tree}
+    today = {row.id: row.parent_id for row in tree}
+    trees: dict[int, dict[UUID, UUID | None]] = {}
+
+    def path_of(location_id: UUID | None, later: int) -> str | None:
+        if location_id is None or location_id not in names:
+            return None
+        if later not in trees:
+            parents = dict(today)
+            for location, from_parent, _moved_at in relocations[:later]:
+                parents[location] = from_parent
+            trees[later] = parents
+        chain: list[str] = []
+        seen: set[UUID] = set()
+        current: UUID | None = location_id
+        while current is not None and current not in seen:
+            seen.add(current)
+            chain.append(names.get(current, ''))
+            current = trees[later].get(current)
+        return join_location_path(reversed(chain))
+
+    def paths_then(move: StockMove) -> tuple[str | None, str | None]:
+        moment = move.completed_at or move.created_at
+        if moment is None:
+            return None, None
+        later = sum(1 for r in relocations if r.moved_at > moment)
+        if (
+            later == 0
+            or move.reference_type == StockMoveReferenceType.LOCATION_RELOCATION
+        ):
+            return None, None
+        return path_of(move.from_location_id, later), path_of(
+            move.to_location_id, later
+        )
+
+    return paths_then
 
 
 async def list_by_reference_async(

@@ -309,11 +309,17 @@ class StockMoveRowDTO(StockMoveDTO):
     uom_symbol: str | None = None
     from_location_name: str | None = None
     to_location_name: str | None = None
+    #: The path each end had when the goods moved, set only where it differs
+    #: from today's: a location that physically moved afterwards stood
+    #: elsewhere then. ``None`` means today's path is the right one.
+    from_location_path: str | None = None
+    to_location_path: str | None = None
     lot_name: str | None = None
     user_name: str | None = None
     #: A movement of a location that physically moved (``reference_type``
     #: ``location_relocation``): its name and the paths it left and reached,
-    #: which the shelf on both ends of the row cannot say.
+    #: which the shelf on both ends of the row cannot say. The paths are the
+    #: moved location's own, its name last.
     relocated_location_name: str | None = None
     relocated_from_path: str | None = None
     relocated_to_path: str | None = None

@@ -115,8 +115,8 @@ describe("a location carried with its stock reads as where it went", () => {
             reference_type: "location_relocation",
             reference_id: "reloc-1",
             relocated_location_name: "Cold Storage",
-            relocated_from_path: "Main Warehouse",
-            relocated_to_path: "Pantry Building",
+            relocated_from_path: "Main Warehouse › Cold Storage",
+            relocated_to_path: "Pantry Building › Cold Storage",
           }),
         ]}
       />,
@@ -125,8 +125,32 @@ describe("a location carried with its stock reads as where it went", () => {
     // The shelf is the same on both ends — the location kept its id — so
     // naming it twice would say nothing moved.
     expect(screen.queryByText("Shelf A")).not.toBeInTheDocument();
-    expect(screen.getByText("Main Warehouse")).toBeInTheDocument();
-    expect(screen.getByText("Pantry Building")).toBeInTheDocument();
+    expect(
+      screen.getByText("Main Warehouse › Cold Storage"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Pantry Building › Cold Storage"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Moved with Cold Storage")).toBeInTheDocument();
+  });
+
+  it("names a movement made before the move by the path the shelf had then", () => {
+    registerAnswer.data = {};
+    renderWithProviders(
+      <StockMovesTable
+        moves={[
+          move({
+            from_location_id: null,
+            to_location_id: "shelf-a",
+            to_location_name: "Shelf A",
+            to_location_path: "Main Warehouse › Cold Storage › Shelf A",
+          }),
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByText("Main Warehouse › Cold Storage › Shelf A"),
+    ).toBeInTheDocument();
   });
 });
