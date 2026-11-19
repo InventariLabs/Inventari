@@ -59,7 +59,7 @@ async def held_back_locations_async(db: AsyncSession, org_id: UUID) -> dict[UUID
     and the quarantine location, and everything inside them.
 
     One read answers for any number of locations — the putaway planner and
-    the rules list ask it once for all the shelves they look at.
+    the rules list read the answer a single time for all the shelves they look at.
     """
     held: dict[UUID, str] = {}
     for row in await list_receiving_modes_async(db, org_id):
