@@ -61,7 +61,7 @@ WebhookDeliveryLog  (payload_json JSONB, status_code, response_body, error_messa
 
 ## Circuit Breaker
 
-After `consecutive_failures >= circuit_breaker_threshold` (default 10, a per-organization module setting between 3 and 100), the endpoint is automatically set `is_active = False`. Admins receive a notification and must reactivate manually via `POST /api/v1/webhooks/endpoints/{id}/reactivate`.
+After `consecutive_failures >= circuit_breaker_threshold` (default 10, a per-organization module setting between 3 and 100), the endpoint is automatically set `is_active = False`. Admins receive a notification and must reactivate manually via `POST /api/v1/webhooks/endpoints/{id}/reactivate`. Deliveries still waiting for a retry when the endpoint goes off are abandoned by the retry worker (`failed`, with an `abandon_reason`) and are not replayed on reactivation; the row keeps the status code and body of the last real attempt next to the reason.
 
 ## Retry Worker
 

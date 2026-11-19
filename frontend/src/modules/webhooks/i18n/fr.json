@@ -60,6 +60,7 @@
     "targetResponse": "Réponse du destinataire",
     "truncated": "abrégé",
     "abandonedByApp": "Abandonné par Inventari — la cible n'a jamais répondu",
+    "abandonedByAppAnswered": "Abandonné par Inventari — plus de nouvelle tentative après la réponse de la cible",
     "deliveryId": "Identifiant de livraison",
     "abandon": {
       "circuitBreaker": "Le disjoncteur a coupé ce endpoint après des échecs répétés.",
@@ -89,7 +90,7 @@
   },
   "circuitBreakerWarning_one": "Ce webhook a été automatiquement désactivé après 1 échec consécutif — la cause de la dernière tentative figure dans les journaux de livraison.",
   "circuitBreakerWarning_other": "Ce webhook a été automatiquement désactivé après {{count}} échecs consécutifs — la cause de la dernière tentative figure dans les journaux de livraison.",
-  "eventsWhileOff": "Les événements qui surviennent pendant qu'il est désactivé ne sont ni livrés, ni mis en file, ni consignés, et Réactiver ne les rejoue pas.",
+  "eventsWhileOff": "Les événements qui surviennent pendant qu'il est désactivé ne sont ni livrés, ni mis en file, ni consignés, et Réactiver ne les rejoue pas. Les livraisons encore en attente d'une nouvelle tentative au moment de la désactivation sont abandonnées de la même façon — elles restent dans le journal des livraisons comme échouées.",
   "settings": {
     "logRetentionDays": "Conservation des journaux (jours)",
     "logRetentionDaysDescription": "Durée de conservation des journaux de livraison des webhooks.",

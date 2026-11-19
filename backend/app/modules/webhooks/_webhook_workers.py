@@ -38,17 +38,14 @@ _DELIVERY_STATUS_RETRYING = 'retrying'
 def _abandon_delivery(log: WebhookDeliveryLog, reason: str) -> None:
     """Fold an application-side stop into the row — memory only, no I/O.
 
-    Nobody answered: the previous attempt's status code is someone else's
-    reply and must not survive as this row's answer, and the reason travels
-    as a stable value the history view translates. The scheduled retry goes
-    with it — a delivery we stopped must not keep promising a next attempt
+    What the target answered to the last real attempt (status code, body,
+    error text) stays on the row: it is the only record of why the delivery
+    never succeeded, and the reason travels next to it as a stable value the
+    history view translates. The scheduled retry goes with it — a delivery we stopped must not keep promising a next attempt
     to readers of the delivery API (our own view hides the field behind the
     status; the raw API does not).
     """
     log.delivery_status = _DELIVERY_STATUS_FAILED
-    log.status_code = None
-    log.response_body = None
-    log.error_message = None
     log.next_retry_at = None
     log.abandon_reason = reason
     log.last_attempt_at = datetime.now(UTC)
@@ -159,12 +156,10 @@ async def retry_failed_deliveries(db: AsyncSession) -> None:
             select(WebhookEndpoint).where(WebhookEndpoint.id == log.webhook_endpoint_id)
         )
 
-        # Abandonments say why we stopped, and nothing else: no status code
-        # (nobody answered — the previous attempt's code is someone else's
-        # reply, and the history must not print it under "response from the
-        # target"), no borrowed error text. The reason travels as a stable
-        # value the view translates, and it says WHICH of the stops this
-        # was — "disabled or deleted" would send administrators looking for the
+        # An abandonment adds why we stopped and erases nothing: the last
+        # attempt's answer stays. The reason travels as a stable value the
+        # view translates, and it says WHICH of the stops this was —
+        # "disabled or deleted" would send administrators looking for the
         # fault on the receiver's side, but the breaker lives here.
         if not webhook or not webhook.is_active:
             if webhook is None:
