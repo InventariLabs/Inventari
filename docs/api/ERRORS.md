@@ -251,6 +251,7 @@ apart.
 | `BOM_LINE_PARENT_MISMATCH` | The line's parent product does not match the product this BOM produces |
 | `BOM_LINE_SELF_REFERENCE` | A BOM line cannot reference the product itself — it would make the product an ingredient of its own BOM. |
 | `BOM_LINE_UNIT_NOT_CONVERTIBLE` | This ingredient is kept in {stock_unit}, and {line_unit} cannot be read as {stock_unit}. Use a unit of the same kind, or record what one {stock_unit} weighs or holds on the product. |
+| `BRIDGE_YIELD_DIFFERS` | A BOM already exists for this recipe and product, and it makes {qty} per batch; enter that amount, or change the batch yield of that BOM first. |
 | `CAMPAIGN_CLOSED` | This attestation campaign has been closed — your confirmation can no longer be recorded. If you still hold the equipment, please contact your organisation. |
 | `CAMPAIGN_DEADLINE_PAST` | Campaign deadline must be today or later |
 | `CAMPAIGN_NOT_FOUND` | Campaign not found |
