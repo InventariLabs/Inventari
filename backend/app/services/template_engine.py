@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import nh3
-from jinja2 import BaseLoader, sandbox
+from jinja2 import BaseLoader, meta, sandbox
 from jinja2.exceptions import UndefinedError
 
 from app.core.exceptions import ServiceRejectionError
@@ -403,18 +403,25 @@ class TemplateEngine:
         empty context, where what depends on a document's data — a missing
         variable, a filter handed ``None`` — says nothing about the layout and
         is let through, while an error of the layout's own (``{{ 1 / 0 }}``)
-        is refused.
+        is refused. A ``TypeError`` is let through only when the body reads a
+        variable: one that reads none (``{{ 'a' + 1 }}``) fails on every
+        document.
         """
         try:
             self._env.from_string(body_html).render()
-        except (UndefinedError, TypeError):
+        except UndefinedError:
             return
         except Exception as exc:
+            if isinstance(exc, TypeError) and self._reads_variables(body_html):
+                return
             raise ServiceRejectionError(
                 'template_not_saved_syntax',
                 line=_template_line(exc),
                 detail=getattr(exc, 'message', None) or str(exc),
             ) from exc
+
+    def _reads_variables(self, body_html: str) -> bool:
+        return bool(meta.find_undeclared_variables(self._env.parse(body_html)))
 
     def render(self, body_html: str | None, context: dict[str, Any]) -> str:
         """Render template string with sandboxed Jinja2, then sanitize.

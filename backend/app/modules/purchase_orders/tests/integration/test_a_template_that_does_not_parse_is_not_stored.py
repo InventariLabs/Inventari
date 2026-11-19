@@ -54,6 +54,9 @@ def test_a_new_layout_with_a_syntax_error_is_refused_and_not_stored(
     [
         ('<p>{{ 1 / 0 }}</p>', 'division by zero'),
         ('<p>{{ po_number | no_such_filter }}</p>', 'no_such_filter'),
+        ("<p>{{ 'a' + 1 }}</p>", 'concatenate'),
+        ('<p>{{ none + 1 }}</p>', 'NoneType'),
+        ('<p>{% for x in 5 %}x{% endfor %}</p>', 'not iterable'),
     ],
 )
 def test_a_layout_that_parses_but_does_not_render_is_refused(
