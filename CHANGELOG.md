@@ -279,6 +279,13 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- *Stock on a date* and *Value movement* now cut a day where the organization
+  lives, not at midnight UTC. A receipt booked at half past midnight local time
+  used to sit in the opening value of its own day, the note about where the
+  ledger starts named the wrong day, and a first-month organization saw only a
+  refusal because the page opened on a period starting before its ledger. The
+  statement now opens on the first day it can report when no first day is
+  picked.
 - A fixed cost line of a production BOM can no longer be saved with a negative
   amount, which lowered the BOM's unit cost, the run preview and the cost of
   every run after it. The refusal appears beside the Amount field with what was

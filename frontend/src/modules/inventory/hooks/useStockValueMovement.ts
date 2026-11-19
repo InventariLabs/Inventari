@@ -19,7 +19,7 @@ export function useStockValueMovement(
   return useQuery({
     queryKey: queryKeys.stockAsOf.movement(query),
     queryFn: () => stockValueMovementApi.get(query),
-    enabled: enabled && Boolean(query.date_from && query.date_to),
+    enabled: enabled && Boolean(query.date_to),
     retry: false,
     staleTime: 60_000,
   });
