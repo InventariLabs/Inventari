@@ -8,7 +8,7 @@ the run's own layer. NULL on a run filled in portions (each portion keeps its
 own) and on runs that closed before the column existed.
 
 Revision ID: 023_output_cost_layer
-Revises: 021_label_facts
+Revises: 022_planned_for
 Create Date: 2026-11-19
 """
 
@@ -18,7 +18,7 @@ import sqlalchemy as sa
 from alembic import op
 
 revision: str = '023_output_cost_layer'
-down_revision: str | None = '021_label_facts'
+down_revision: str | None = '022_planned_for'
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
