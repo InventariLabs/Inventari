@@ -412,6 +412,7 @@ ERRORS_FR: ErrorMessages = {
     'document_adjustment_lines_reference_items': "Les lignes d'un document d'ajustement doivent référencer des produits existants",
     'recipe_collection_name_taken': 'Une collection de recettes nommée « {name} » existe déjà dans cette organisation.',
     'recipe_name_taken': 'Une formule portant ce nom existe déjà pour ce produit.',
+    'bridge_yield_differs': 'Une formule issue de cette source existe déjà pour ce produit et donne {qty} par lot ; saisissez cette quantité, ou modifiez d’abord le rendement du lot de la formule.',
     'recipe_not_found': 'Recette introuvable',
     'picking_active_recipe_locked': "Les ingrédients ne peuvent pas être modifiés tant qu'une session de prélèvement est active. Annulez ou terminez d'abord la session.",
     'meal_plan_dates_exclude_entries': "Supprimez d'abord les entrées des dates exclues.",

@@ -171,6 +171,7 @@
       "title": "Concluir a produção?",
       "description": "Isso consome os ingredientes listados e gera o produto final. Enquanto nada do que foi produzido tiver sido usado, \"Desfazer produção\" reverte tudo.",
       "actualQtyLabel": "Quantidade realmente produzida (opcional)",
+      "madeOnLabel": "Dia de fabricação",
       "actualQtyHint": "Deixe em branco para usar a quantidade planejada. Informe menos em caso de perda, mais em caso de superprodução. Os ingredientes são consumidos conforme o planejado, independentemente da quantidade real."
     },
     "cancelConfirm": {
@@ -189,6 +190,7 @@
       "totalCostUndone": "Custo antes de desfazer a produção",
       "created": "Criada em",
       "productionDate": "Data de produção",
+      "plannedFor": "Planeado para",
       "notes": "Observações",
       "actualQty": "Produção real",
       "plannedSuffix": "planejado: {{qty}}",
@@ -451,7 +453,8 @@
     "unitCostAfterRun": "Custo unitário após a última produção",
     "unitCostEstimated": "Custo unitário estimado",
     "estimateCostIncomplete_one": "1 ingrediente desta estimativa está sem custo de compra registrado.",
-    "estimateCostIncomplete_other": "{{count}} ingredientes desta estimativa estão sem custo de compra registrado."
+    "estimateCostIncomplete_other": "{{count}} ingredientes desta estimativa estão sem custo de compra registrado.",
+    "unitCostOverproduced": "A última produção rendeu mais do que o previsto; este custo está distribuído por uma quantidade a que os ingredientes não chegaram."
   },
   "settings": {
     "title": "Configurações de produção",
@@ -503,7 +506,9 @@
     "hintSource": "Definido nas configurações do módulo Produção",
     "orders_one": "{{count}} produção",
     "orders_other": "{{count}} produções",
-    "empty": "Nenhuma produção concluída com resultado ainda."
+    "empty": "Nenhuma produção concluída com resultado ainda.",
+    "overproduced_one": "{{count}} produção foi encerrada acima do plano; o seu resultado conta a quantidade a mais.",
+    "overproduced_other": "{{count}} produções foram encerradas acima do plano; o seu resultado conta a quantidade a mais."
   },
   "whereUsed": {
     "title": "Usado em listas de materiais",
@@ -544,5 +549,9 @@
       "label": "Economia em relação ao preço da loja",
       "definition": "Preço da loja menos o custo de produção"
     }
+  },
+  "overproduction": {
+    "warning": "São {{extra}} a mais do que os {{planned}} previstos. Os ingredientes ficam como no plano, por isso o custo por unidade sairá muito mais baixo do que o de um lote real.",
+    "confirm": "Sim, a produção rendeu essa quantidade"
   }
 }

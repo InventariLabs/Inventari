@@ -1,9 +1,12 @@
 import { useTranslation } from "react-i18next";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { DateInput } from "@/components/ui/DateInput";
 import { Input } from "@/components/ui/Input";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import { QUANTITY_STEP } from "@/module-sdk";
+import { todayIso } from "@/utils/formatters";
 import { BestBeforeField } from "@/modules/maker/components/BestBeforeField";
+import { useOverproductionGuard } from "@/modules/maker/components/OverproductionGuard";
 import { EmptyBomNotice } from "@/modules/maker/components/EmptyBomNotice";
 import { IngredientBatchPicker } from "@/modules/maker/components/IngredientBatchPicker";
 import type { useCompleteRun } from "@/modules/maker/hooks/useCompleteRun";
@@ -16,9 +19,10 @@ interface CompleteRunDialogProps {
 }
 
 /**
- * Closing a draft: how much came out, until when it keeps, and which batch
- * each ingredient is taken from. The best-before opens on the run's day plus
- * the product's shelf life; the batches on the draw the run makes by default.
+ * Closing a draft: how much came out, the day it was made, until when it
+ * keeps, and which batch each ingredient is taken from. The day opens on
+ * today, whatever day the run was planned for; the best-before on that day
+ * plus the product's shelf life; the batches on the draw the run makes by default.
  */
 export function CompleteRunDialog({
   order,
@@ -27,6 +31,7 @@ export function CompleteRunDialog({
 }: CompleteRunDialogProps) {
   const { t } = useTranslation("maker");
   const anyShort = run.batches.short.size > 0;
+  const overproduction = useOverproductionGuard(order, run.actualQty);
   return (
     <ConfirmDialog
       open={run.showConfirm}
@@ -39,7 +44,7 @@ export function CompleteRunDialog({
       })}
       confirmLabel={t("detail.complete", { defaultValue: "Complete run" })}
       cancelLabel={t("create.cancel", { defaultValue: "Cancel" })}
-      confirmDisabled={bomIsEmpty || anyShort}
+      confirmDisabled={bomIsEmpty || anyShort || overproduction.blocked}
       onConfirm={() => {
         run.setShowConfirm(false);
         run.complete();
@@ -82,12 +87,20 @@ export function CompleteRunDialog({
                 "Leave empty to use planned quantity. Enter less for scrap, more for overproduction. Ingredients are consumed as planned regardless of the actual quantity.",
             })}
           </p>
+          {overproduction.notice}
         </div>
+        <DateInput
+          label={t("detail.completeConfirm.madeOnLabel")}
+          value={run.madeOn}
+          max={todayIso()}
+          onChange={run.setMadeOn}
+          id="maker-complete-made-on"
+        />
         <BestBeforeField
           id="maker-complete-best-before"
           value={run.bestBefore}
           onChange={run.setBestBefore}
-          min={order.production_date ?? undefined}
+          min={run.madeOn || undefined}
           shelfLifeDays={order.shelf_life_days}
         />
         <IngredientBatchPicker choice={run.batches} />

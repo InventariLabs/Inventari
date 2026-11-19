@@ -6,7 +6,7 @@ from uuid import UUID
 from sqlalchemy import Select, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.db_utils import escape_ilike, in_ids, paginate_async
+from app.core.db_utils import in_ids, paginate_async
 from app.core.logging import get_logger
 from app.models.item import Item
 from app.models.storage_location import StorageLocation
@@ -97,8 +97,7 @@ async def search_cursor_paginated_async(
     if storage_id:
         q = q.where(Item.storage_location_id == storage_id)
     if search:
-        pattern = f'%{escape_ilike(search)}%'
-        q = q.where(Item.name.ilike(pattern))
+        q = q.where(item_matches_text(search, organization_id))
     if quantity_above is not None:
         # A stock floor has to bite before the LIMIT cut: applied after it,
         # a page full of emptied records pushes the record that still has
@@ -178,8 +177,7 @@ async def search_stock_summary_async(
         if storage_ids:
             q = q.where(in_ids(Item.storage_location_id, storage_ids))
         if search:
-            pattern = f'%{escape_ilike(search)}%'
-            q = q.where(Item.name.ilike(pattern))
+            q = q.where(item_matches_text(search, organization_id))
         if quantity_above is not None:
             q = q.where(Item.quantity > quantity_above)
         # Tenant scoping MUST be applied unconditionally (see the cursor

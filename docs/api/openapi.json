@@ -31325,14 +31325,21 @@
           {
             "name": "date_from",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
-              "type": "string",
-              "format": "date",
-              "description": "The first day of the period.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The first day of the period. Left out, it is the first day of the month of `date_to` \u2014 or the first day the ledger can open on, when it began inside that month.",
               "title": "Date From"
             },
-            "description": "The first day of the period."
+            "description": "The first day of the period. Left out, it is the first day of the month of `date_to` \u2014 or the first day the ledger can open on, when it began inside that month."
           },
           {
             "name": "date_to",
@@ -31391,10 +31398,17 @@
           {
             "name": "date_from",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
-              "type": "string",
-              "format": "date",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Date From"
             }
           },
@@ -63015,6 +63029,11 @@
           "orders": {
             "type": "integer",
             "title": "Orders"
+          },
+          "overproduced_orders": {
+            "type": "integer",
+            "title": "Overproduced Orders",
+            "default": 0
           }
         },
         "type": "object",
@@ -72737,6 +72756,18 @@
             ],
             "title": "Actual Qty"
           },
+          "made_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Made On"
+          },
           "best_before": {
             "anyOf": [
               {
@@ -73492,6 +73523,18 @@
               }
             ],
             "title": "Started On"
+          },
+          "planned_for": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned For"
           },
           "material_cost": {
             "anyOf": [
@@ -78137,6 +78180,11 @@
             "type": "integer",
             "title": "Uncosted Ingredients",
             "default": 0
+          },
+          "last_run_overproduced": {
+            "type": "boolean",
+            "title": "Last Run Overproduced",
+            "default": false
           },
           "estimated_unit_cost": {
             "anyOf": [

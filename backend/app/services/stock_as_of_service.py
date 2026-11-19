@@ -30,19 +30,22 @@ and the figures of the whole report beside it.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime, timedelta, tzinfo
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
 from sqlalchemy import (
     Numeric,
+    and_,
     case,
     cast,
     func,
     literal,
     literal_column,
+    not_,
     null,
+    or_,
     select,
     text,
     true,
@@ -90,6 +93,50 @@ def _layer_dated_at() -> ColumnElement[datetime]:
     asked about instead of replaying the organization's whole history.
     """
     return layer_dated_at()
+
+
+def _layers_on_or_before(as_of: datetime, zone: tzinfo) -> ColumnElement[bool]:
+    """Layers about a moment up to *as_of*, on the organization's calendar.
+
+    A document's date is a day the organization chose, so it counts when that
+    day is on or before *as_of*'s day in *zone*. A layer with no document is
+    about the instant it was written, so it counts when that instant is not
+    after *as_of* — read as a UTC date it would put a receipt booked at 00:30
+    local time into the evening before.
+    """
+    layer = StockValuationLayer
+    day = as_of.astimezone(zone).date()
+    return or_(
+        and_(layer.document_date.is_not(None), layer.document_date <= day),
+        and_(layer.document_date.is_(None), layer.created_at <= as_of),
+    )
+
+
+def _layers_dated_by(as_of: datetime, zone: tzinfo) -> ColumnElement[bool]:
+    """The layers up to *as_of*, with the bound the index can serve.
+
+    The UTC-dated expression the index holds stays in the predicate as the
+    later of the two days the exact cut can mean — *as_of*'s day in *zone*
+    for a document's date, its UTC day for a write instant — which is what
+    lets the database stop reading at the date asked about.
+    """
+    latest = max(as_of.astimezone(zone).date(), as_of.astimezone(UTC).date())
+    return and_(
+        _layer_dated_at() <= latest,
+        _layers_on_or_before(as_of, zone),
+    )
+
+
+def _layers_after(as_of: datetime, zone: tzinfo) -> ColumnElement[bool]:
+    """The layers past *as_of*, with the bound the index can serve."""
+    earliest = min(
+        as_of.astimezone(zone).date(),
+        as_of.astimezone(UTC).date() - timedelta(days=1),
+    )
+    return and_(
+        _layer_dated_at() > earliest,
+        not_(_layers_on_or_before(as_of, zone)),
+    )
 
 
 def _settled() -> ColumnElement[bool]:
@@ -240,7 +287,10 @@ def _quantities_as_of(
 
 
 def _values_as_of(
-    organization_id: UUID, as_of: datetime, org_currency: str
+    organization_id: UUID,
+    as_of: datetime,
+    org_currency: str,
+    zone: tzinfo = UTC,
 ) -> Select[Any]:
     """Value per product on the date, replaying the FIFO draw of the layers.
 
@@ -284,7 +334,7 @@ def _values_as_of(
         .where(
             layer.organization_id == organization_id,
             layer.direction == 'OUT',
-            _layer_dated_at() <= as_of,
+            _layers_dated_by(as_of, zone),
         )
         .group_by(layer.product_template_id)
         .subquery('delivered')
@@ -317,7 +367,7 @@ def _values_as_of(
         .where(
             layer.organization_id == organization_id,
             layer.direction == 'IN',
-            _layer_dated_at() <= as_of,
+            _layers_dated_by(as_of, zone),
             (layer.currency.is_(None)) | (layer.currency == org_currency),
         )
         .subquery('receipts')
@@ -345,7 +395,11 @@ def _values_as_of(
 
 
 async def _foreign_receipts_async(
-    db: AsyncSession, organization_id: UUID, as_of: datetime, org_currency: str
+    db: AsyncSession,
+    organization_id: UUID,
+    as_of: datetime,
+    org_currency: str,
+    zone: tzinfo = UTC,
 ) -> int:
     """Receipts up to the date priced in a currency that is not the
     organization's — left out of the draw, because two currencies do not add."""
@@ -354,7 +408,7 @@ async def _foreign_receipts_async(
             select(func.count()).where(
                 StockValuationLayer.organization_id == organization_id,
                 StockValuationLayer.direction == 'IN',
-                _layer_dated_at() <= as_of,
+                _layers_dated_by(as_of, zone),
                 StockValuationLayer.currency.is_not(None),
                 StockValuationLayer.currency != org_currency,
             )
@@ -391,6 +445,7 @@ async def report_async(
     limit: int | None = None,
     offset: int = 0,
     search: str | None = None,
+    zone: tzinfo = UTC,
 ) -> StockAsOfPage:
     """The rows of one organization on one date, ``limit`` of them from
     ``offset`` in name order — all of them when ``limit`` is None, as the
@@ -431,7 +486,9 @@ async def report_async(
         f'%{escape_ilike(search)}%' if search else None,
     ).cte('quantities')
     if priced:
-        values = _values_as_of(organization_id, as_of, org_currency).cte('stock_values')
+        values = _values_as_of(organization_id, as_of, org_currency, zone).cte(
+            'stock_values'
+        )
         rows = (
             select(
                 quantities.c.product_template_id,
@@ -514,7 +571,7 @@ async def report_async(
         )
 
     excluded = (
-        await _foreign_receipts_async(db, organization_id, as_of, org_currency)
+        await _foreign_receipts_async(db, organization_id, as_of, org_currency, zone)
         if priced
         else 0
     )
@@ -576,6 +633,7 @@ async def layer_movements_async(
     until: datetime,
     *,
     org_currency: str,
+    zone: tzinfo = UTC,
 ) -> LayerMovements:
     """The layers dated after *after* and up to *until*, told apart by what
     they are: what came in (from outside, or from the organization's own
@@ -594,12 +652,11 @@ async def layer_movements_async(
     """
     layer = StockValuationLayer
     hidden_tags = await hidden_module_tags_async(db, organization_id)
-    dated = _layer_dated_at()
     on_document = layer.document_line_id.is_not(None)
     in_period = (
         layer.organization_id == organization_id,
-        dated > after,
-        dated <= until,
+        _layers_dated_by(until, zone),
+        _layers_after(after, zone),
         outside_module_products(
             layer.product_template_id, organization_id, hidden_tags
         ),

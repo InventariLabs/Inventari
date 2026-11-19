@@ -275,6 +275,8 @@ class RecipeCatalogItem(BaseModel):
     #: prices those at zero so the run can finish, so a total of 0 with a
     #: count above zero means "nobody knows", not "it is free".
     uncosted_ingredients: int = 0
+    #: That run made more than it planned.
+    last_run_overproduced: bool = False
     #: Today's estimate from layer rates, computed only when no run has ever
     #: closed — the dash it replaced read as "the system does not know", one
     #: click before the same application showed the number. A recipe with a

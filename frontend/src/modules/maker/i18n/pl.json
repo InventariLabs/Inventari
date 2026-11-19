@@ -176,6 +176,7 @@
       "title": "Zakończyć zlecenie?",
       "description": "Zużyje wymienione składniki i wytworzy produkt. Dopóki nikt nie ruszył tego, co wytworzył, „Cofnij przebieg” go wycofa.",
       "actualQtyLabel": "Rzeczywista ilość produktu (opcjonalnie)",
+      "madeOnLabel": "Dzień wykonania",
       "actualQtyHint": "Pozostaw puste, aby użyć ilości planowanej. Wpisz mniej dla odpadu, więcej dla nadprodukcji. Składniki zużywane są według planu niezależnie od ilości faktycznej."
     },
     "cancelConfirm": {
@@ -194,6 +195,7 @@
       "totalCostUndone": "Koszt przed cofnięciem przebiegu",
       "created": "Utworzone",
       "productionDate": "Data produkcji",
+      "plannedFor": "Zaplanowano na",
       "notes": "Notatki",
       "actualQty": "Rzeczywista produkcja",
       "plannedSuffix": "planowano: {{qty}}",
@@ -497,7 +499,8 @@
     "estimateCostIncomplete_one": "1 składnik tego szacunku nie ma zapisanej ceny zakupu.",
     "estimateCostIncomplete_few": "{{count}} składniki tego szacunku nie mają zapisanej ceny zakupu.",
     "estimateCostIncomplete_many": "{{count}} składników tego szacunku nie ma zapisanej ceny zakupu.",
-    "estimateCostIncomplete_other": "{{count}} składnika tego szacunku nie ma zapisanej ceny zakupu."
+    "estimateCostIncomplete_other": "{{count}} składnika tego szacunku nie ma zapisanej ceny zakupu.",
+    "unitCostOverproduced": "Ostatnie zlecenie dało więcej, niż zaplanowano; ten koszt jest rozłożony na ilość, do której składniki nie urosły."
   },
   "settings": {
     "title": "Ustawienia produkcji",
@@ -555,7 +558,11 @@
     "orders_few": "{{count}} zlecenia",
     "orders_many": "{{count}} zleceń",
     "orders_other": "{{count}} zleceń",
-    "empty": "Brak ukończonych zleceń z wynikiem."
+    "empty": "Brak ukończonych zleceń z wynikiem.",
+    "overproduced_one": "{{count}} zlecenie zamknięto powyżej planu; jego wynik liczy dodatkową ilość.",
+    "overproduced_other": "{{count}} zleceń zamknięto powyżej planu; ich wynik liczy dodatkową ilość.",
+    "overproduced_few": "{{count}} zlecenia zamknięto powyżej planu; ich wynik liczy dodatkową ilość.",
+    "overproduced_many": "{{count}} zleceń zamknięto powyżej planu; ich wynik liczy dodatkową ilość."
   },
   "whereUsed": {
     "title": "Używany w recepturach produkcyjnych",
@@ -905,5 +912,9 @@
       "planned_other": "Zaplanowano {{count}} zleceń",
       "failed": "Nie udało się zaplanować zleceń."
     }
+  },
+  "overproduction": {
+    "warning": "To {{extra}} więcej niż zaplanowane {{planned}}. Składniki zostają takie, jak w planie, więc koszt jednostkowy wyjdzie dużo niższy niż w prawdziwej partii.",
+    "confirm": "Tak, zlecenie dało tyle"
   }
 }

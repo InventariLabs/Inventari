@@ -18801,6 +18801,11 @@ export interface components {
             result: string;
             /** Orders */
             orders: number;
+            /**
+             * Overproduced Orders
+             * @default 0
+             */
+            overproduced_orders: number;
         };
         /** MonthlyTrendItem */
         MonthlyTrendItem: {
@@ -22450,6 +22455,8 @@ export interface components {
         ProductionOrderComplete: {
             /** Actual Qty */
             actual_qty?: number | string | null;
+            /** Made On */
+            made_on?: string | null;
             /** Best Before */
             best_before?: string | null;
             /** Ingredient Lots */
@@ -22673,6 +22680,8 @@ export interface components {
             lines?: components["schemas"]["ProductionOrderLineRead"][];
             /** Started On */
             started_on?: string | null;
+            /** Planned For */
+            planned_for?: string | null;
             /** Material Cost */
             material_cost?: string | null;
             /** Unshelved Cost */
@@ -24269,6 +24278,11 @@ export interface components {
              * @default 0
              */
             uncosted_ingredients: number;
+            /**
+             * Last Run Overproduced
+             * @default false
+             */
+            last_run_overproduced: boolean;
             /** Estimated Unit Cost */
             estimated_unit_cost?: string | null;
             /**
@@ -46519,8 +46533,8 @@ export interface operations {
     stock_value_movement_api_v1_stock_value_movement_get: {
         parameters: {
             query: {
-                /** @description The first day of the period. */
-                date_from: string;
+                /** @description The first day of the period. Left out, it is the first day of the month of `date_to` — or the first day the ledger can open on, when it began inside that month. */
+                date_from?: string | null;
                 /** @description The last day of the period, included. */
                 date_to: string;
             };
@@ -46553,7 +46567,7 @@ export interface operations {
     stock_value_movement_xlsx_api_v1_stock_value_movement_export_xlsx_get: {
         parameters: {
             query: {
-                date_from: string;
+                date_from?: string | null;
                 date_to: string;
             };
             header?: never;

@@ -536,6 +536,66 @@ class TestMonthlyResult:
         assert prev_entry['result'] == '16.00'
         assert prev_entry['orders'] == 1
 
+    def test_counts_the_runs_that_made_more_than_planned(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        mk_output_loc: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """A month says how many of its runs closed above their plan."""
+        output = _template(db_session, mk_org, name='Jam')
+        now = datetime.now(tz=UTC)
+        for planned, actual in (('10.000', '59.000'), ('10.000', '9.000')):
+            _insert_order_row(
+                db_session,
+                org_id=mk_org.id,
+                output_template_id=output.id,
+                output_location_id=mk_output_loc.id,
+                planned_qty=planned,
+                actual_qty=actual,
+                completed_at=now,
+                result_per_unit='1.00',
+            )
+
+        resp = client.get(
+            '/api/v1/maker/production/monthly-result', headers=mk_auth_headers
+        )
+        assert resp.status_code == 200
+        latest = resp.json()[-1]
+        assert latest['orders'] == 2
+        assert latest['overproduced_orders'] == 1
+
+    def test_the_catalogue_says_when_the_last_run_made_more_than_planned(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        mk_output_loc: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """The unit cost after the last run is flagged when that run overproduced."""
+        output = _template(db_session, mk_org, name='Jam')
+        recipe = _recipe(db_session, mk_org, output.id, reference_price='5.00')
+        _insert_order_row(
+            db_session,
+            org_id=mk_org.id,
+            output_template_id=output.id,
+            output_location_id=mk_output_loc.id,
+            recipe_id=recipe.id,
+            planned_qty='10.000',
+            actual_qty='59.000',
+            completed_at=datetime.now(tz=UTC),
+            unit_cost_snapshot='4.25',
+            result_per_unit='0.75',
+        )
+
+        resp = client.get('/api/v1/maker/recipes', headers=mk_auth_headers)
+        assert resp.status_code == 200
+        item = next(i for i in resp.json()['items'] if i['id'] == str(recipe.id))
+        assert item['last_run_overproduced'] is True
+
     def test_ignores_drafts_cancelled_and_snapshotless(
         self,
         client: TestClient,

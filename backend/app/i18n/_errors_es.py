@@ -413,6 +413,7 @@ ERRORS_ES: ErrorMessages = {
     'document_adjustment_lines_reference_items': 'Las líneas de un documento de ajuste deben hacer referencia a productos existentes',
     'recipe_collection_name_taken': 'Ya existe una colección de recetas llamada «{name}» en esta organización.',
     'recipe_name_taken': 'Ya existe una fórmula con este nombre para este producto.',
+    'bridge_yield_differs': 'Ya existe para este producto una fórmula creada a partir de esta fuente, que rinde {qty} por lote; indique esa cantidad o cambie antes el rendimiento del lote de la fórmula.',
     'recipe_not_found': 'Receta no encontrada',
     'picking_active_recipe_locked': 'No se pueden editar los ingredientes mientras haya una sesión de recolección activa. Cancela o completa primero la sesión.',
     'meal_plan_dates_exclude_entries': 'Elimina primero las entradas de las fechas excluidas.',
