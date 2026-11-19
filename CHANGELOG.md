@@ -279,6 +279,13 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A recipe imported from JSON or from a web page now carries the allergens its
+  ingredient names suggest, as one typed through **New recipe** does. An
+  imported cheese omelette of eggs, butter and cheddar read "No allergens
+  marked" on its page and in its export; the review screen now shows Eggs and
+  Milk ticked for the cook to correct, and a line that names its own allergens
+  keeps them. Recipes imported earlier get theirs when the instance is
+  upgraded.
 - *Stock on a date* and *Value movement* now cut a day where the organization
   lives, not at midnight UTC. A receipt booked at half past midnight local time
   used to sit in the opening value of its own day, the note about where the
