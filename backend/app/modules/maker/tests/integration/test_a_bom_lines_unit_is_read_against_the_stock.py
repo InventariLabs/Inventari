@@ -294,6 +294,44 @@ class TestAStoredLineStopsTheRun:
         assert shortage['shortage'] is None
         assert _on_shelf(db_session, flour.id) == Decimal('7000')
 
+    def test_a_line_naming_no_known_unit_stops_the_run_too(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        mk_input_loc: StorageLocation,
+        mk_output_loc: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """A line saying "1 cup" cannot be read either, and is refused as one.
+
+        The text names a unit no catalogue entry holds, so nothing says what
+        its number means; taking it for the stock unit would be the same
+        silent guess this check exists to stop.
+        """
+        pcs = _uom(db_session, 'pcs')
+        output = _template(db_session, mk_org, name='Rye bread')
+        flour = _template(db_session, mk_org, name='Wheat flour', uom_id=pcs.id)
+        recipe = _recipe(db_session, mk_org, output.id)
+        _stored_line(
+            db_session,
+            mk_org,
+            recipe=recipe,
+            child_id=flour.id,
+            qty='1',
+            unit='cup',
+        )
+        post_on_shelf(client, mk_auth_headers, flour, mk_input_loc.id, '100')
+
+        completed = _run(client, mk_auth_headers, output.id, mk_output_loc)
+
+        assert completed.status_code == 422, completed.text
+        [shortage] = completed.json()['detail']['shortages']
+        assert shortage['convertible'] is False
+        assert shortage['uom_symbol'] == 'cup'
+        assert shortage['available_uom_symbol'] == 'pcs'
+        assert _on_shelf(db_session, flour.id) == Decimal('100')
+
     def test_a_convertible_line_draws_the_converted_amount(
         self,
         client: TestClient,
