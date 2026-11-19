@@ -133,6 +133,16 @@ function announceCompletion(
     setExecutionOpen: (open: boolean) => void;
   },
 ): void {
+  // A document that only records a movement another step already made — a
+  // recipe's internal issue, whose goods the picking session took — moves no
+  // stock when it is posted. "Stock updated" would be untrue of it, and Undo
+  // would offer a reversal the server refuses, so the sentence says what the
+  // press did.
+  if (completed?.stock_already_applied) {
+    toast.success(context.t("toast.completedRecordOnly"));
+    context.setExecutionOpen(false);
+    return;
+  }
   if (completed?.generated_backorder_id) {
     toast.success(
       context.t("backorder.createdToast", {

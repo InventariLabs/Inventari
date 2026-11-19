@@ -224,7 +224,7 @@ interface ConfirmFacts {
 
 export function confirmDialogMessage(
   confirmAction: ConfirmAction,
-  doc: { type: string; status: string },
+  doc: { type: string; status: string; stock_already_applied?: boolean },
   facts: ConfirmFacts,
   t: (key: string, options?: Record<string, unknown>) => string,
 ): string {
@@ -259,6 +259,12 @@ export function confirmDialogMessage(
         return t("confirmDialog.postNowMessageDeadEndNoApprover", { stage });
       }
       return t("confirmDialog.postNowApprovalMessage");
+    }
+    // The goods of a document another step already posted left the shelf
+    // then; this press only keeps the record. Promising a movement here was
+    // the sentence the screen disproved a second later.
+    if (doc.stock_already_applied) {
+      return t("confirmDialog.postNowRecordOnlyMessage");
     }
     // The rule answers for the type and the value it can weigh; an
     // organization that set a threshold may still be overruled server-side,
@@ -305,6 +311,22 @@ export function confirmDialogMessage(
     return t("confirmDialog.confirmMessage");
   }
   return confirmAction ? t(`confirmDialog.${confirmAction}Message`) : "";
+}
+
+/** Whether the page shows the corrections card: a completed document the API
+ * lets take a correction. A document that only records another step's
+ * movement posted nothing, so it has no movement of its own to restate — the
+ * card would offer a form no submission can pass. */
+function showsCorrections(doc: {
+  status: string;
+  type: string;
+  stock_already_applied?: boolean;
+}): boolean {
+  return (
+    doc.status === "COMPLETED" &&
+    doc.type !== "CORRECTION" &&
+    !doc.stock_already_applied
+  );
 }
 
 /** Sets the document's partner from the metadata grid and says how it went,
@@ -354,13 +376,21 @@ function requestApprovalFromSheet(
  * may refuse for a reason the screen could not see. */
 function offersUndo(
   doc:
-    | { type: string; status: string; reversed_by_id?: string | null }
+    | {
+        type: string;
+        status: string;
+        reversed_by_id?: string | null;
+        stock_already_applied?: boolean;
+      }
     | undefined,
   corrections: { status: string }[] | undefined,
   correctionsFailed: boolean,
 ): boolean {
   if (!doc || doc.status !== "COMPLETED") return false;
   if (!UNDOABLE_DOCUMENT_TYPES.has(doc.type)) return false;
+  // A document that only records another step's movement posted nothing:
+  // there is no stock to take back, and the server refuses the undo.
+  if (doc.stock_already_applied) return false;
   if (doc.reversed_by_id) return false;
   if (correctionsFailed) return false;
   return !(corrections ?? []).some((c) => c.status !== "CANCELLED");
@@ -739,23 +769,21 @@ export default function DocumentDetailPage() {
           which batch. */}
       <DocumentDetailExtra document={doc} />
 
-      {doc.status === "COMPLETED" &&
-        doc.type !== "CORRECTION" &&
-        corrections !== undefined && (
-          <DocumentCorrectionsSection
-            corrections={corrections}
-            documentType={doc.type}
-            onNewCorrection={() => setCorrectionOpen(true)}
-            correctionsTitle={t("corrections.sectionTitle")}
-            correctionsNewText={t("corrections.new")}
-            correctionsNoneText={t("corrections.none")}
-            formatReason={(code) =>
-              makeTDynamic(t)(`reasons.correction.codes.${code}`)
-            }
-            canWrite={canWrite}
-            formatDate={formatDateTime}
-          />
-        )}
+      {corrections !== undefined && showsCorrections(doc) && (
+        <DocumentCorrectionsSection
+          corrections={corrections}
+          documentType={doc.type}
+          onNewCorrection={() => setCorrectionOpen(true)}
+          correctionsTitle={t("corrections.sectionTitle")}
+          correctionsNewText={t("corrections.new")}
+          correctionsNoneText={t("corrections.none")}
+          formatReason={(code) =>
+            makeTDynamic(t)(`reasons.correction.codes.${code}`)
+          }
+          canWrite={canWrite}
+          formatDate={formatDateTime}
+        />
+      )}
 
       <DocumentDetailModals
         doc={doc}
