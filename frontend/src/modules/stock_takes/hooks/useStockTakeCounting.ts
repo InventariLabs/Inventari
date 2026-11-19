@@ -97,6 +97,13 @@ function itemList(raw: Item[] | { items?: Item[] } | undefined): Item[] {
   return Array.isArray(raw) ? raw : (raw?.items ?? []);
 }
 
+/** The products of the counted place and of every place below it. A parent
+ * count's rows stand on its sub-places, and the cards read a record's expiry
+ * from here. */
+function useItemsInside(locationId: string | undefined) {
+  return useStorageItems(locationId || "", true).data;
+}
+
 /** The boxes of the "new product" form: what a counter types for goods the
  *  organization has no record of yet. */
 function useNewItemDraft() {
@@ -177,6 +184,7 @@ export function useStockTakeCounting(id: string | undefined) {
     refetch,
   } = useStockTake(id);
   const { data: storageItems } = useStorageItems(stockTake?.location_id || "");
+  const itemsInside = useItemsInside(stockTake?.location_id);
 
   // What the reader has typed but not yet saved lives here; everything that
   // counts or summarises reads the stock take's own rows instead.
@@ -397,7 +405,7 @@ export function useStockTakeCounting(id: string | undefined) {
   }, [confirm, cancelMutate, navigate, id, t]);
 
   const getItemById = (itemId: string): Item | undefined =>
-    itemList(storageItems).find((item) => item.id === itemId);
+    itemList(itemsInside).find((item) => item.id === itemId);
 
   const getStockTakeItem = (itemId: string): StockTakeItem | undefined =>
     stockTake?.items?.find((item) => item.item_id === itemId);
