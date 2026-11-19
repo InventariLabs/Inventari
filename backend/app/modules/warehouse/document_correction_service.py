@@ -122,6 +122,12 @@ async def create_correction(
     # correction would be written, and not at completion, where it would fail
     # after it had already been saved and confirmed.
     dt.correction_sign(original.type)
+    # A document that only records a movement another step made (a recipe's
+    # internal issue, whose goods the picking session took) posted nothing
+    # itself. A correction of it would apply its delta to a shelf the
+    # original never touched, so the same goods would move twice.
+    if original.stock_already_applied:
+        raise ServiceRejectionError('document_correction_posts_nothing')
 
     original_lines_by_number: dict[int, DocumentLine] = {
         line.line_number: line for line in original.lines
@@ -454,6 +460,12 @@ async def _undo_document(
         raise ServiceRejectionError('document_undo_type_not_supported')
     if original.status != DocumentStatus.COMPLETED.value:
         raise ServiceRejectionError('document_undo_requires_completed')
+    # Undo reverses what the document posted. A document marked as a record
+    # of a movement another step already made posted nothing — reversing it
+    # would put back goods that step's own movement never took from the
+    # shelf, so the shelf would end up one issue richer than it was.
+    if original.stock_already_applied:
+        raise ServiceRejectionError('document_undo_posts_nothing')
 
     # A transfer is reversed through the return service: the goods themselves
     # have to change shelves, and a transfer correction's two movements state

@@ -6,6 +6,11 @@ tests hold the two promises that make the button safe — the stock it posted
 goes back, and the original names the document that reversed it — and the
 refusal that sends the reader to a correction when later movements have used
 the stock up.
+
+A document that only records a movement another step already made — a
+recipe's internal issue, whose goods the picking session took — posted
+nothing itself, so neither Undo nor a correction may move the shelf through
+it: the movement happened once, in the step that made it.
 """
 
 from __future__ import annotations
@@ -19,15 +24,22 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 from sqlalchemy import func, insert, select
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import Session
 
+from app.core.public_api import core_api
 from app.models.item import Item
+from app.models.organization import Organization
 from app.models.partner import Partner
 from app.models.product_template import ProductTemplate
 from app.models.stock_lot import StockLot
 from app.models.stock_move import StockMove, StockMoveReferenceType
 from app.models.storage_location import StorageLocation
+from app.models.user import User
 from app.modules.warehouse.models import Document, DocumentRelation
+from app.modules.warehouse.schemas import DocumentCreate, DocumentLineCreate
+from app.modules.warehouse.warehouse_api import warehouse_api
+from tests.integration._shelf import run_in_async_session
 
 
 def _post(
@@ -724,6 +736,172 @@ class TestUndoAPostedDocument:
         assert (
             db_session.scalars(
                 select(Document).where(Document.corrects_document_id == document_id)
+            ).all()
+            == []
+        )
+
+
+def _a_picking_session_document(
+    client: TestClient,
+    headers: dict[str, str],
+    engine: AsyncEngine,
+    db_session: Session,
+    *,
+    org: Organization,
+    user: User,
+    source: StorageLocation,
+    record: Item,
+    taken: Decimal = Decimal('1'),
+) -> dict[str, Any]:
+    """A recipe's internal issue, posted: the goods left the shelf as they were picked.
+
+    The picking session takes the goods through the items door, exactly as
+    the flow does; the register's copy is then written as a draft marked
+    ``stock_already_applied`` and posted through the one-step action, which
+    moves nothing.
+    """
+    db_session.commit()
+
+    async def _take_and_register(session: AsyncSession) -> uuid.UUID:
+        await core_api.items.update_quantity_async(
+            session,
+            org.id,
+            record.id,
+            record.quantity - taken,
+            user_id=user.id,
+        )
+        doc = await warehouse_api.create_document_draft_async(
+            session,
+            org.id,
+            DocumentCreate(
+                type='INTERNAL_OUT',
+                source_location_id=source.id,
+                lines=[DocumentLineCreate(item_id=record.id, expected_quantity=taken)],
+                external_reference='picking:session',
+                notes='stock already consumed',
+            ),
+            user.id,
+        )
+        return doc.id
+
+    document_id = run_in_async_session(engine, _take_and_register)
+    posted = client.post(
+        f'/api/v1/warehouse/documents/{document_id}/post', headers=headers
+    )
+    assert posted.status_code == status.HTTP_200_OK, posted.text
+    return cast(dict[str, Any], posted.json())
+
+
+@pytest.mark.integration
+class TestADocumentThatOnlyRecordsAnotherStepsMovement:
+    def test_the_undo_is_refused_because_the_document_posted_no_stock(
+        self,
+        client: TestClient,
+        db_session: Session,
+        async_engine_fixture: AsyncEngine,
+        doc_org: Organization,
+        doc_user: User,
+        doc_auth_headers: dict[str, str],
+        doc_source_location: StorageLocation,
+        doc_stock_item: Item,
+    ) -> None:
+        """The shelf holds what the picking session left, not what Undo would add.
+
+        The session took one, so the shelf reads ninety-nine. The reversal
+        the undo writes would take the document's line at its word and put
+        that one back — stock nothing ever removed. The refusal says the
+        document posted nothing, and it points at no correction, which would
+        move the same goods the same way.
+        """
+        posted = _a_picking_session_document(
+            client,
+            doc_auth_headers,
+            async_engine_fixture,
+            db_session,
+            org=doc_org,
+            user=doc_user,
+            source=doc_source_location,
+            record=doc_stock_item,
+        )
+        assert posted['status'] == 'COMPLETED'
+        assert posted['stock_already_applied'] is True
+
+        undone = client.post(
+            f'/api/v1/warehouse/documents/{posted["id"]}/undo', headers=doc_auth_headers
+        )
+        assert undone.status_code == status.HTTP_400_BAD_REQUEST, undone.text
+        message = undone.json()['detail']['message']
+        assert 'nothing to undo' in message
+        assert 'Correct' not in message
+
+        # The refusal wrote nothing and moved nothing.
+        db_session.expire_all()
+        record = db_session.get(Item, doc_stock_item.id)
+        assert record is not None
+        assert record.quantity == Decimal('99')
+        original = client.get(
+            f'/api/v1/warehouse/documents/{posted["id"]}', headers=doc_auth_headers
+        )
+        assert original.json()['reversed_by_id'] is None
+        assert (
+            db_session.scalars(
+                select(Document).where(
+                    Document.corrects_document_id == uuid.UUID(posted['id'])
+                )
+            ).all()
+            == []
+        )
+
+    def test_a_new_correction_is_refused_for_the_same_reason(
+        self,
+        client: TestClient,
+        db_session: Session,
+        async_engine_fixture: AsyncEngine,
+        doc_org: Organization,
+        doc_user: User,
+        doc_auth_headers: dict[str, str],
+        doc_source_location: StorageLocation,
+        doc_stock_item: Item,
+    ) -> None:
+        """The correction door has to answer like Undo: neither may move the shelf.
+
+        A correction of minus one on this document would be applied as a
+        receipt of one — the same goods the picking session took, back on
+        the shelf a second time.
+        """
+        posted = _a_picking_session_document(
+            client,
+            doc_auth_headers,
+            async_engine_fixture,
+            db_session,
+            org=doc_org,
+            user=doc_user,
+            source=doc_source_location,
+            record=doc_stock_item,
+        )
+        assert posted['stock_already_applied'] is True
+
+        correction = client.post(
+            '/api/v1/warehouse/corrections',
+            headers=doc_auth_headers,
+            json={
+                'corrects_document_id': posted['id'],
+                'reason_code': 'DATA_ENTRY_ERROR',
+                'lines': [{'original_line_number': 1, 'quantity_delta': -1}],
+            },
+        )
+        assert correction.status_code == status.HTTP_400_BAD_REQUEST, correction.text
+        assert 'cannot move stock' in correction.json()['detail']['message']
+
+        db_session.expire_all()
+        record = db_session.get(Item, doc_stock_item.id)
+        assert record is not None
+        assert record.quantity == Decimal('99')
+        assert (
+            db_session.scalars(
+                select(Document).where(
+                    Document.corrects_document_id == uuid.UUID(posted['id'])
+                )
             ).all()
             == []
         )

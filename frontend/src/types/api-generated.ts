@@ -15307,6 +15307,11 @@ export interface components {
              * @default false
              */
             is_opening: boolean;
+            /**
+             * Stock Already Applied
+             * @default false
+             */
+            stock_already_applied: boolean;
             /** Lines */
             lines: components["schemas"]["DocumentLineSchema"][];
             /**
@@ -23416,6 +23421,11 @@ export interface components {
              * @default false
              */
             is_opening: boolean;
+            /**
+             * Stock Already Applied
+             * @default false
+             */
+            stock_already_applied: boolean;
             /** Lines */
             lines: components["schemas"]["DocumentLineSchema"][];
             /**
