@@ -32,6 +32,7 @@ from app.core.exceptions import (
     ServiceRejectionError,
     catalogue_refusal,
 )
+from app.core.module_sdk import effective_expiry
 from app.core.public_api import core_api
 from app.i18n.service import get_current_lang, get_error_message
 from app.modules.warehouse.warehouse_api import warehouse_api
@@ -658,6 +659,47 @@ async def _started_by_name(db: AsyncSession, stock_take: StockTake) -> str | Non
     return user.full_name or user.email
 
 
+async def _with_record_marks(
+    db: AsyncSession,
+    stock_take: StockTake,
+    rows: list[StockTakeItemWithDetails],
+) -> list[StockTakeItemWithDetails]:
+    """Give each row the expiry and the add moment of the record it counts.
+
+    Two rows of one product on one shelf differ in nothing else, and the
+    counting screen tells them apart by exactly these. The records are read
+    from the counted tree in one query per location; a record that has since
+    left it is asked for by id.
+    """
+    wanted = {row.item_id for row in rows if row.item_id is not None}
+    if not wanted:
+        return rows
+    records = await _the_shelf_today(db, stock_take.organization_id, stock_take)
+    for item_id in wanted - records.keys():
+        record = await core_api.items.get_any_async(
+            db, stock_take.organization_id, item_id
+        )
+        if record is not None:
+            records[item_id] = record
+    marked: list[StockTakeItemWithDetails] = []
+    for row in rows:
+        record = records.get(row.item_id) if row.item_id is not None else None
+        if record is None:
+            marked.append(row)
+            continue
+        marked.append(
+            row.model_copy(
+                update={
+                    'expiry_date': effective_expiry(
+                        record.expiry_date, record.meta_data
+                    ),
+                    'record_added_at': record.created_at,
+                }
+            )
+        )
+    return marked
+
+
 async def _as_reported(
     db: AsyncSession, stock_take: StockTake, items: list[StockTakeItem]
 ) -> list[StockTakeItemWithDetails]:
@@ -668,7 +710,11 @@ async def _as_reported(
     found — so the report says both: a shortage on the one shelf, a surplus
     on the other.
     """
-    rows = [StockTakeItemWithDetails.model_validate(item) for item in items]
+    rows = await _with_record_marks(
+        db,
+        stock_take,
+        [StockTakeItemWithDetails.model_validate(item) for item in items],
+    )
     if all(row.expected_location_id is None for row in rows):
         return rows
     _tree_ids, _family_ids, paths = await get_storage_tree(
