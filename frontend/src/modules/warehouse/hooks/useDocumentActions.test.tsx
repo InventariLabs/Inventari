@@ -223,6 +223,53 @@ describe("useDocumentActions session completion", () => {
   });
 });
 
+describe("useDocumentActions failed dispatch completion", () => {
+  it("hands the carrier and tracking number typed in the summary to the Pack step", () => {
+    const { m, utils } = renderActions("CONFIRMED");
+    const navigate = vi.spyOn(window.history, "replaceState");
+
+    act(() =>
+      utils.result.current.handleSessionComplete({
+        carrier: "DPD",
+        tracking_number: "TRK-123456",
+      }),
+    );
+    const onError = m.completeMutate.mock.calls[0][1].onError;
+    act(() =>
+      onError({
+        isAxiosError: true,
+        response: { status: 500, data: {} },
+      }),
+    );
+
+    expect(toast.error).toHaveBeenCalled();
+    expect(navigate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        usr: { shipment: { carrier: "DPD", trackingNumber: "TRK-123456" } },
+      }),
+      "",
+      expect.stringContaining("#pack"),
+    );
+    navigate.mockRestore();
+  });
+
+  it("leaves the page alone when a completion without a shipment fails", () => {
+    const { m, utils } = renderActions("CONFIRMED");
+    const navigate = vi.spyOn(window.history, "replaceState");
+
+    act(() => utils.result.current.handleSessionComplete());
+    act(() =>
+      m.completeMutate.mock.calls[0][1].onError({
+        isAxiosError: true,
+        response: { status: 500, data: {} },
+      }),
+    );
+
+    expect(navigate).not.toHaveBeenCalled();
+    navigate.mockRestore();
+  });
+});
+
 describe("useDocumentActions unit mismatch", () => {
   const payload = { lines: [{ line_id: "l1", done_quantity: 2 }] };
   const mismatchError = {
