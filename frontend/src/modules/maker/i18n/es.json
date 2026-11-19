@@ -378,6 +378,7 @@
     "ingredientAdded": "Ingrediente añadido",
     "ingredientRemoved": "Ingrediente eliminado",
     "emptyLines": "Aún no hay ingredientes — añade el primero abajo.",
+    "unitMismatch": "La unidad de esta línea no puede leerse como la unidad de existencias del ingrediente: elige una antes del próximo lote.",
     "introduction": "Una fórmula es la lista de lo que entra en un lote de este producto. De ella salen los costes de la pestaña «Coste y resultado», y de ella se descuenta el stock al cerrar una orden de producción.",
     "removeConfirm": {
       "title": "¿Quitar el ingrediente?",

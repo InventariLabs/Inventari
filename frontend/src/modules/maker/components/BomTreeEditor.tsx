@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronDown, ChevronRight, GripVertical, Move } from "lucide-react";
+import {
+  AlertTriangle,
+  ChevronDown,
+  ChevronRight,
+  GripVertical,
+  Move,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/Card";
 import { extractApiError } from "@/lib/errors";
@@ -104,6 +110,19 @@ function NodeRow({
         <span className="text-on-secondary">
           {formatQuantityLocalized(t, line.qty_per_batch, line.unit)}
         </span>
+        {line.unit_mismatch && (
+          <span
+            className="text-on-warning"
+            title={t("composition.unitMismatch")}
+            data-testid="maker-tree-unit-mismatch"
+          >
+            <AlertTriangle
+              size={12}
+              role="img"
+              aria-label={t("composition.unitMismatch")}
+            />
+          </span>
+        )}
         <YieldLossNote pct={line.yield_loss_pct} />
         {hasChildren && <MakeFreshToggle line={line} canManage={canManage} />}
         <Move

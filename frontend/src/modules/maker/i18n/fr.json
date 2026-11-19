@@ -378,6 +378,7 @@
     "ingredientAdded": "Ingrédient ajouté",
     "ingredientRemoved": "Ingrédient retiré",
     "emptyLines": "Aucun ingrédient — ajoutez le premier ci-dessous.",
+    "unitMismatch": "L'unité de cette ligne ne peut pas être lue comme l'unité de stock de l'ingrédient — choisissez-en une avant le prochain lot.",
     "introduction": "Une formule est la liste de ce qui entre dans un lot de ce produit. Les coûts de l'onglet « Coût et résultat » en sont issus, et le stock en est sorti à la clôture d'un ordre de production.",
     "removeConfirm": {
       "title": "Retirer l'ingrédient ?",

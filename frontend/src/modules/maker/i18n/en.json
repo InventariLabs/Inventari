@@ -378,6 +378,7 @@
     "ingredientAdded": "Ingredient added",
     "ingredientRemoved": "Ingredient removed",
     "emptyLines": "No ingredients yet — add the first one below.",
+    "unitMismatch": "The unit on this line cannot be read as the ingredient's stock unit — set one before the next run.",
     "introduction": "A BOM is the list of what goes into one batch of this product. The costs on the Cost & result tab are added up from it, and stock is issued against it when a production order is closed.",
     "removeConfirm": {
       "title": "Remove ingredient?",
