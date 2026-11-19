@@ -14157,6 +14157,23 @@ export interface components {
             planned_uom_symbol?: string | null;
             /** Total Cost */
             total_cost: string;
+            /**
+             * Ingredients Cost
+             * @default 0.00
+             */
+            ingredients_cost: string;
+            /**
+             * Fixed Cost
+             * @default 0.00
+             */
+            fixed_cost: string;
+            /**
+             * Labour Cost
+             * @default 0.00
+             */
+            labour_cost: string;
+            /** Unit Cost */
+            unit_cost?: string | null;
             /** Entries */
             entries: components["schemas"]["CostBreakdownEntry"][];
             /** Missing Cost Lines */
@@ -15004,6 +15021,8 @@ export interface components {
             shipment?: components["schemas"]["DocumentShipmentSchema"] | null;
             /** Line Count */
             line_count: number;
+            /** Moved Line Count */
+            moved_line_count: number;
             /** Unit Progress */
             unit_progress: components["schemas"]["DocumentUnitProgressSchema"][];
             /** First Lines */
@@ -21749,6 +21768,12 @@ export interface components {
             produced_qty: string;
             /** Total Cost */
             total_cost: string;
+            /** Ingredients Cost */
+            ingredients_cost: string;
+            /** Fixed Cost */
+            fixed_cost: string;
+            /** Labour Cost */
+            labour_cost: string;
             /** Unit Cost */
             unit_cost: string;
             /** Target Margin Pct */
@@ -22745,6 +22770,23 @@ export interface components {
             planned_uom_symbol?: string | null;
             /** Total Cost */
             total_cost: string;
+            /**
+             * Ingredients Cost
+             * @default 0.00
+             */
+            ingredients_cost: string;
+            /**
+             * Fixed Cost
+             * @default 0.00
+             */
+            fixed_cost: string;
+            /**
+             * Labour Cost
+             * @default 0.00
+             */
+            labour_cost: string;
+            /** Unit Cost */
+            unit_cost?: string | null;
             /** Entries */
             entries: components["schemas"]["CostBreakdownEntry"][];
             /** Missing Cost Lines */
@@ -22765,18 +22807,6 @@ export interface components {
             has_shortage: boolean;
             /** Batch Yield Qty */
             batch_yield_qty?: string | null;
-            /**
-             * Fixed Cost
-             * @default 0
-             */
-            fixed_cost: string;
-            /**
-             * Labour Cost
-             * @default 0
-             */
-            labour_cost: string;
-            /** Unit Cost */
-            unit_cost?: string | null;
             /** Reference Price */
             reference_price?: string | null;
             /** Result Per Unit */
@@ -26927,6 +26957,10 @@ export interface components {
             uom_rounding?: string | null;
             /** Difference */
             difference?: string | null;
+            /** Expiry Date */
+            expiry_date?: string | null;
+            /** Record Added At */
+            record_added_at?: string | null;
         };
         /**
          * StockTakeReport

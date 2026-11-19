@@ -26,6 +26,10 @@ class PricingResponse(BaseModel):
     template_id: UUID
     produced_qty: Decimal
     total_cost: Decimal
+    """Ingredients, fixed costs and labour of the whole quantity."""
+    ingredients_cost: Decimal
+    fixed_cost: Decimal
+    labour_cost: Decimal
     unit_cost: Decimal
     target_margin_pct: Decimal
     unit_sale_price: Decimal

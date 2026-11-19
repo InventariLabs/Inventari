@@ -1,10 +1,12 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import { addDays, format } from "date-fns";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PageHeaderContext } from "@/hooks/useModulePageHeader";
 import StockTakeReportPage from "./StockTakeReportPage";
+import { formatDate } from "@/utils/formatters";
 import { withLanguage } from "@/test/mocks/i18n";
 import { server } from "@/test/mocks/server";
 import { http, HttpResponse } from "msw";
@@ -653,6 +655,7 @@ describe("StockTakeReportPage — quantities carry their unit, the file its proo
         "Counted",
         "Unit",
         "Location",
+        "Lot and record",
         "Started at",
         "Completed at",
         "Started by",
@@ -674,6 +677,146 @@ describe("StockTakeReportPage — quantities carry their unit, the file its proo
         .find((line) => line.includes("Bananas"));
       expect(csvRow).toContain("Aug 13, 2026");
       expect(csvRow).not.toMatch(/\d{1,2}\/\d{1,2}\/\d{4}/);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("tells two rows of one product on one shelf apart, on the page and in the file", async () => {
+    const user = userEvent.setup();
+    const cable = {
+      item_name: "USB-C cable",
+      item_id: "cab",
+      location_id: "dock",
+      shelf_location: "Warehouse > Dock",
+      notes: null,
+      is_discrepancy: 1,
+      system_quantity: 3,
+      counted_quantity: 2,
+      difference: -1,
+    };
+    const firstExpiry = format(addDays(new Date(), 90), "yyyy-MM-dd");
+    const secondExpiry = format(addDays(new Date(), 180), "yyyy-MM-dd");
+    const lots = [
+      {
+        ...cable,
+        id: "a",
+        expiry_date: firstExpiry,
+        record_added_at: "2026-01-05T09:00:00Z",
+      },
+      {
+        ...cable,
+        id: "b",
+        expiry_date: secondExpiry,
+        record_added_at: "2026-01-05T10:00:00Z",
+      },
+    ];
+    server.use(
+      http.get("/api/v1/stock-takes/st-1/report", () =>
+        HttpResponse.json({
+          ...mockReport,
+          all_items: lots,
+          discrepancy_items: lots,
+          tolerated_items: [],
+        }),
+      ),
+    );
+    let captured = "";
+    class BlobSpy extends Blob {
+      constructor(parts: BlobPart[], options?: BlobPropertyBag) {
+        super(parts, options);
+        captured += (parts ?? []).map(String).join("");
+      }
+    }
+    vi.stubGlobal("Blob", BlobSpy);
+    vi.stubGlobal(
+      "URL",
+      Object.assign(URL, {
+        createObjectURL: vi.fn(() => "blob:report"),
+        revokeObjectURL: vi.fn(),
+      }),
+    );
+
+    try {
+      renderPage();
+      const firstMark = `expires ${formatDate(firstExpiry)}`;
+      const secondMark = `expires ${formatDate(secondExpiry)}`;
+      expect(await screen.findByText(new RegExp(firstMark))).toBeVisible();
+      expect(screen.getByText(new RegExp(secondMark))).toBeVisible();
+
+      await user.click(screen.getByRole("button", { name: "Export CSV" }));
+      const rows = captured
+        .split("\n")
+        .slice(1)
+        .filter((line) => line.includes("USB-C cable"));
+      expect(rows).toHaveLength(2);
+      expect(rows[0]).toContain(firstMark);
+      expect(rows[1]).toContain(secondMark);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("numbers two records of one batch the way the counting screen does, on the page and in the file", async () => {
+    const user = userEvent.setup();
+    const cable = {
+      item_name: "USB-C cable",
+      item_id: "cab",
+      location_id: "dock",
+      shelf_location: "Warehouse > Dock",
+      lot_name: "L-7",
+      notes: null,
+      is_discrepancy: 1,
+      system_quantity: 3,
+      counted_quantity: 2,
+      difference: -1,
+      expiry_date: format(addDays(new Date(), 90), "yyyy-MM-dd"),
+    };
+    // Same product, batch, expiry and shelf: the moment each record was
+    // added is all that is left to order them by.
+    const records = [
+      { ...cable, id: "a", record_added_at: "2026-01-05T09:00:00Z" },
+      { ...cable, id: "b", record_added_at: "2026-01-06T09:00:00Z" },
+    ];
+    server.use(
+      http.get("/api/v1/stock-takes/st-1/report", () =>
+        HttpResponse.json({
+          ...mockReport,
+          all_items: records,
+          discrepancy_items: records,
+          tolerated_items: [],
+        }),
+      ),
+    );
+    let captured = "";
+    class BlobSpy extends Blob {
+      constructor(parts: BlobPart[], options?: BlobPropertyBag) {
+        super(parts, options);
+        captured += (parts ?? []).map(String).join("");
+      }
+    }
+    vi.stubGlobal("Blob", BlobSpy);
+    vi.stubGlobal(
+      "URL",
+      Object.assign(URL, {
+        createObjectURL: vi.fn(() => "blob:report"),
+        revokeObjectURL: vi.fn(),
+      }),
+    );
+
+    try {
+      renderPage();
+      expect(await screen.findByText(/Record 1 of 2/)).toBeVisible();
+      expect(screen.getByText(/Record 2 of 2/)).toBeVisible();
+
+      await user.click(screen.getByRole("button", { name: "Export CSV" }));
+      const rows = captured
+        .split("\n")
+        .slice(1)
+        .filter((line) => line.includes("USB-C cable"));
+      expect(rows).toHaveLength(2);
+      expect(rows[0]).toContain("Record 1 of 2");
+      expect(rows[1]).toContain("Record 2 of 2");
     } finally {
       vi.unstubAllGlobals();
     }

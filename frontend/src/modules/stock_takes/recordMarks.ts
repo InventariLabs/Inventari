@@ -21,8 +21,8 @@ export interface Twin {
  */
 export function recordMarks(
   t: TranslateFn,
-  item: Item | undefined,
-  stockTakeItem: StockTakeItem | undefined,
+  item: Pick<Item, "effective_expiry_date"> | undefined,
+  stockTakeItem: Pick<StockTakeItem, "lot_name"> | undefined,
   /** Which of several otherwise identical records this is. */
   twin?: Twin | null,
 ): string[] {
@@ -46,4 +46,33 @@ export function recordMarks(
       );
   }
   return marks;
+}
+
+/**
+ * Numbers the rows that share a key — the same product, batch, expiry and
+ * place — in the order their records were added, so neither the eye nor a
+ * screen reader meets the same row twice. Rows with no sibling get no number.
+ */
+export function numberTwins<Id>(
+  rows: { id: Id; key: string; added: string }[],
+  idOrder: (a: Id, b: Id) => number,
+): Map<Id, Twin> {
+  const groups = new Map<string, typeof rows>();
+  for (const row of rows) {
+    groups.set(row.key, [...(groups.get(row.key) ?? []), row]);
+  }
+  const twinOf = new Map<Id, Twin>();
+  for (const group of groups.values()) {
+    if (group.length < 2) continue;
+    [...group]
+      .sort((a, b) => a.added.localeCompare(b.added) || idOrder(a.id, b.id))
+      .forEach((row, index) =>
+        twinOf.set(row.id, {
+          position: index + 1,
+          of: group.length,
+          added: row.added || null,
+        }),
+      );
+  }
+  return twinOf;
 }

@@ -49484,6 +49484,32 @@
             "type": "string",
             "title": "Total Cost"
           },
+          "ingredients_cost": {
+            "type": "string",
+            "title": "Ingredients Cost",
+            "default": "0.00"
+          },
+          "fixed_cost": {
+            "type": "string",
+            "title": "Fixed Cost",
+            "default": "0.00"
+          },
+          "labour_cost": {
+            "type": "string",
+            "title": "Labour Cost",
+            "default": "0.00"
+          },
+          "unit_cost": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Cost"
+          },
           "entries": {
             "items": {
               "$ref": "#/components/schemas/CostBreakdownEntry"
@@ -52324,6 +52350,10 @@
             "type": "integer",
             "title": "Line Count"
           },
+          "moved_line_count": {
+            "type": "integer",
+            "title": "Moved Line Count"
+          },
           "unit_progress": {
             "items": {
               "$ref": "#/components/schemas/DocumentUnitProgressSchema"
@@ -52365,6 +52395,7 @@
           "total_gross",
           "currency",
           "line_count",
+          "moved_line_count",
           "unit_progress",
           "first_lines",
           "module_lines"
@@ -70736,6 +70767,18 @@
             "type": "string",
             "title": "Total Cost"
           },
+          "ingredients_cost": {
+            "type": "string",
+            "title": "Ingredients Cost"
+          },
+          "fixed_cost": {
+            "type": "string",
+            "title": "Fixed Cost"
+          },
+          "labour_cost": {
+            "type": "string",
+            "title": "Labour Cost"
+          },
           "unit_cost": {
             "type": "string",
             "title": "Unit Cost"
@@ -70783,6 +70826,9 @@
           "template_id",
           "produced_qty",
           "total_cost",
+          "ingredients_cost",
+          "fixed_cost",
+          "labour_cost",
           "unit_cost",
           "target_margin_pct",
           "unit_sale_price",
@@ -73721,6 +73767,32 @@
             "type": "string",
             "title": "Total Cost"
           },
+          "ingredients_cost": {
+            "type": "string",
+            "title": "Ingredients Cost",
+            "default": "0.00"
+          },
+          "fixed_cost": {
+            "type": "string",
+            "title": "Fixed Cost",
+            "default": "0.00"
+          },
+          "labour_cost": {
+            "type": "string",
+            "title": "Labour Cost",
+            "default": "0.00"
+          },
+          "unit_cost": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Cost"
+          },
           "entries": {
             "items": {
               "$ref": "#/components/schemas/CostBreakdownEntry"
@@ -73778,27 +73850,6 @@
               }
             ],
             "title": "Batch Yield Qty"
-          },
-          "fixed_cost": {
-            "type": "string",
-            "title": "Fixed Cost",
-            "default": "0"
-          },
-          "labour_cost": {
-            "type": "string",
-            "title": "Labour Cost",
-            "default": "0"
-          },
-          "unit_cost": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Unit Cost"
           },
           "reference_price": {
             "anyOf": [
@@ -78473,7 +78524,8 @@
           "amount": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "minimum": 0.0
               },
               {
                 "type": "string"
@@ -78572,7 +78624,8 @@
           "amount": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "minimum": 0.0
               },
               {
                 "type": "string"
@@ -85113,6 +85166,30 @@
               }
             ],
             "title": "Difference"
+          },
+          "expiry_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expiry Date"
+          },
+          "record_added_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Record Added At"
           }
         },
         "type": "object",

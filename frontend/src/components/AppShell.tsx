@@ -7,7 +7,13 @@ import {
   Suspense,
   lazy,
 } from "react";
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Outlet,
+  Link,
+  matchPath,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useFormGuardStore } from "@/store/formGuardStore";
@@ -54,6 +60,23 @@ function sayWorkWasNotKept(t: (key: string) => string): void {
   toast.error(t("errors.sessionEndedReadUnsaved"), {
     id: "session-ended-unsaved",
   });
+}
+
+/**
+ * The screens the enabled modules really draw. A route whose own modules are
+ * all switched off draws the not-found page, so it is no screen at all.
+ */
+function screensOf(enabledModules: string[]): (path: string) => boolean {
+  const routes = moduleRegistry.getRoutes(enabledModules);
+  return (path) =>
+    routes.some(
+      (route) =>
+        (!route.requiresModules ||
+          route.requiresModules.some((name) =>
+            enabledModules.includes(name),
+          )) &&
+        matchPath({ path: route.path, end: true }, path) !== null,
+    );
 }
 
 const NotificationTray = lazy(
@@ -144,8 +167,13 @@ export default function AppShell() {
 
   const moduleNav = activeModule?.moduleNav ?? null;
   // The page header's arrow is hidden on a phone, so the shell's must do what
-  // it does: go back to the screen the person came from.
-  const goBack = useShellBack(moduleNav?.basePath, homePath);
+  // it does: go back to the screen the person came from. A screen opened by a
+  // direct link climbs to the nearest screen above it that exists.
+  const routeExists = useMemo(
+    () => screensOf(enabledModules),
+    [enabledModules],
+  );
+  const goBack = useShellBack(moduleNav?.basePath, homePath, routeExists);
 
   useRouteScroll();
 

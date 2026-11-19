@@ -583,6 +583,9 @@ class DocumentListRowSchema(BaseModel):
     #: The dispatch's hand-over and its tracking link, where one was recorded.
     shipment: DocumentShipmentSchema | None = None
     line_count: int
+    #: The lines a quantity was done on. A completed document's first lines
+    #: are these first.
+    moved_line_count: int
     unit_progress: list[DocumentUnitProgressSchema]
     first_lines: list[DocumentListLineSchema]
     module_lines: list[DocumentModuleLineSchema]

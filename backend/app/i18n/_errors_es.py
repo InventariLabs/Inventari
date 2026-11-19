@@ -957,6 +957,8 @@ ERRORS_ES: ErrorMessages = {
     'putaway_capacity_not_found': 'Entrada de capacidad no encontrada',
     'no_fields_to_update': 'No hay campos que actualizar',
     'putaway_rule_needs_location': 'Una regla de ubicación necesita al menos una ubicación.',
+    'putaway_rule_target_receiving': 'Una zona de recepción no puede ser el destino de una regla de ubicación: la mercancía solo espera allí.',
+    'putaway_rule_target_quarantine': 'Una ubicación de cuarentena no puede ser el destino de una regla de ubicación: la mercancía retenida se guarda allí aparte.',
     'putaway_rule_needs_match_key': 'Una regla de ubicación necesita al menos una condición: un producto, una categoría, una etiqueta de contexto o un tipo de ubicación.',
     'document_template_wrong_module': 'Una plantilla de documento pertenece al módulo de documentos',
     'search_query_empty': 'Escriba algo que buscar',

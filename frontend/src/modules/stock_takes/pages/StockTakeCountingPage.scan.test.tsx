@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import { addDays, format } from "date-fns";
 import {
   act,
   render,
@@ -137,7 +138,7 @@ const serve = (blindMode = false) => {
   );
 };
 
-const renderPage = async () => {
+const renderPage = async (firstText = "Milk") => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false, gcTime: 0 } },
   });
@@ -159,7 +160,7 @@ const renderPage = async () => {
       </Routes>
     </MemoryRouter>,
   );
-  await screen.findByText("Milk");
+  await screen.findAllByText(firstText);
   return screen.getByTestId("stock-take-counting-input");
 };
 
@@ -511,6 +512,70 @@ describe("counting by scanning on the stock take screen", () => {
       lineId: "sti-jam",
       body: { counted_quantity: 2 },
     });
+  });
+
+  it("tells two lots on a sub-location apart when the counted place is its parent", async () => {
+    // The records stand on a child of the counted place: only the read that
+    // reaches inside the place finds them, and without them the two rows of
+    // one product carry no date to be told apart by.
+    const firstExpiry = format(addDays(new Date(), 90), "yyyy-MM-dd");
+    const secondExpiry = format(addDays(new Date(), 180), "yyyy-MM-dd");
+    server.use(
+      http.get("/api/v1/stock-takes/1", () =>
+        HttpResponse.json({
+          id: "1",
+          name: "Stock Take 1",
+          location_id: "loc-1",
+          location_name: "Warehouse",
+          status: "in_progress",
+          blind_mode: false,
+          items_count: 2,
+          items: [
+            { ...line("sti-a", "cab-a", "Cable", 0), shelf_location: "W > D" },
+            { ...line("sti-b", "cab-b", "Cable", 0), shelf_location: "W > D" },
+          ],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }),
+      ),
+      http.get("/api/v1/locations/loc-1/items", ({ request }) => {
+        const inside =
+          new URL(request.url).searchParams.get("include_inside") === "true";
+        return HttpResponse.json(
+          onePage(
+            inside
+              ? [
+                  {
+                    id: "cab-a",
+                    name: "Cable",
+                    quantity: "1",
+                    location_id: "loc-dock",
+                    effective_expiry_date: firstExpiry,
+                  },
+                  {
+                    id: "cab-b",
+                    name: "Cable",
+                    quantity: "1",
+                    location_id: "loc-dock",
+                    effective_expiry_date: secondExpiry,
+                  },
+                ]
+              : [],
+          ),
+        );
+      }),
+    );
+    vi.mocked(labelsApi.scan).mockResolvedValue(
+      productScan(["cab-a", "cab-b"]),
+    );
+    const input = await renderPage("Cable");
+
+    expect(await screen.findAllByText(/expires/i)).not.toHaveLength(0);
+    enter(input, "5901234123457");
+
+    const chooser = await screen.findByRole("dialog");
+    expect(within(chooser).getAllByText(/expires/i)).toHaveLength(2);
+    expect(patches).toHaveLength(0);
   });
 
   it("says the search failed instead of showing an empty result", async () => {

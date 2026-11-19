@@ -2,7 +2,7 @@
 Pydantic schemas for the stock take module.
 """
 
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -183,6 +183,11 @@ class StockTakeItemWithDetails(StockTakeItemResponse):
     counts: list[StockTakeCountRead] = Field(default_factory=list)
     shelf_location: str | None = None
     notes: str | None = None
+    #: What tells one record of a product from another on one shelf, as the
+    #: counting screen prints it: the day the goods stop being fit to use and
+    #: the moment the record was added. Filled on the rows of a reported count.
+    expiry_date: date | None = None
+    record_added_at: datetime | None = None
 
 
 class StockTakeBase(BaseModel):

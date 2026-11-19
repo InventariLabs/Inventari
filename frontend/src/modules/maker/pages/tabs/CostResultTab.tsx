@@ -23,24 +23,14 @@ interface CostResultTabProps {
   recipe: MakerRecipe;
 }
 
-/**
- * What the batch costs besides its ingredients: the fixed lines and the
- * labour its timed steps take at the organization's rate. The breakdown
- * stays the ingredients' own sum, so the list and the figure under it add
- * up; the tile above adds these to it.
- */
-function batchOverheads(recipe: MakerRecipe) {
-  const fixedCost = (recipe.cost_lines ?? []).reduce(
-    (sum, line) => sum + Number(line.amount),
-    0,
-  );
-  const labourCost = Number(recipe.labour_cost ?? 0);
-  const labourMinutes =
+/** Minutes the timed steps take, shown beside the labour line. */
+function labourMinutesOf(recipe: MakerRecipe) {
+  return (
     recipe.process_steps?.reduce(
       (sum, step) => sum + Number(step.minutes ?? 0),
       0,
-    ) ?? 0;
-  return { fixedCost, labourCost, labourMinutes };
+    ) ?? 0
+  );
 }
 
 export function CostResultTab({ recipe }: CostResultTabProps) {
@@ -74,12 +64,12 @@ export function CostResultTab({ recipe }: CostResultTabProps) {
   // while the row it came from said "—". The counts say which zero it is.
   const unpriced = breakdown?.missing_cost_lines.length ?? 0;
   const priced = (breakdown?.entries.length ?? 0) - unpriced;
-  const { fixedCost, labourCost, labourMinutes } = batchOverheads(recipe);
-  // breakdown is a full batch of this formula: one division, batch → unit.
+  const labourMinutes = labourMinutesOf(recipe);
+  // breakdown is a full batch of this formula, its total already carrying
+  // the fixed lines and the labour: one division, batch → unit.
   const unitCost =
     breakdown && priced > 0
-      ? (Number(breakdown.total_cost) + fixedCost + labourCost) /
-        Number(recipe.batch_yield_qty)
+      ? Number(breakdown.total_cost) / Number(recipe.batch_yield_qty)
       : null;
   const referencePrice = recipe.reference_price
     ? Number(recipe.reference_price)
@@ -294,7 +284,7 @@ export function CostResultTab({ recipe }: CostResultTabProps) {
                     sentence is announced there once, not once per figure.
                     Both figures point at the same note. */}
                 <CostFigure
-                  value={breakdown.total_cost}
+                  value={breakdown.ingredients_cost}
                   priced={priced}
                   unpriced={unpriced}
                   announce={false}

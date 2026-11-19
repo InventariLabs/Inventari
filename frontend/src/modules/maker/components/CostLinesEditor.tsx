@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
-import { extractApiError } from "@/lib/errors";
+import { extractApiError, extractFieldValidationError } from "@/lib/errors";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -40,6 +40,8 @@ interface DraftLine {
   kind: RecipeCostLineKind;
   label: string;
   amount: string;
+  /** The server's refusal of the amount, shown beside the field it names. */
+  amountError?: string;
 }
 
 const KINDS: RecipeCostLineKind[] = ["LABOR", "PACKAGING", "OVERHEAD", "OTHER"];
@@ -104,6 +106,11 @@ export function CostLinesEditor({
       setDraft(null);
       toast.success(t("detail.cost.lineSaved"));
     } catch (err) {
+      const refusal = extractFieldValidationError(err, "amount");
+      if (refusal) {
+        setDraft({ ...draft, amountError: refusal });
+        return;
+      }
       toast.error(
         extractApiError(
           err,
@@ -299,7 +306,14 @@ export function CostLinesEditor({
                 step="0.01"
                 min="0"
                 value={draft.amount}
-                onChange={(e) => setDraft({ ...draft, amount: e.target.value })}
+                onChange={(e) => {
+                  setDraft({
+                    ...draft,
+                    amount: e.target.value,
+                    amountError: undefined,
+                  });
+                }}
+                error={draft.amountError}
                 className="h-8 text-sm"
                 aria-label={t("detail.cost.lineAmount")}
                 // The only money field in the app that did not say which

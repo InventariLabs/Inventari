@@ -48,6 +48,7 @@
     "startedAt": "Iniciado el",
     "completedAt": "Finalizado el",
     "startedBy": "Iniciado por",
+    "record": "Lote y registro",
     "closedLocations": "Ubicaciones cerradas",
     "closedEmpty": "Vacía",
     "closedCounted": "Cerrada",

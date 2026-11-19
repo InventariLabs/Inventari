@@ -17,6 +17,7 @@ import { makeTDynamic } from "@/lib/i18nHelpers";
 import { useStockTakeReport } from "../hooks/useStockTakes";
 import StockTakeClosedLocations from "../components/StockTakeClosedLocations";
 import StockTakePostingNote from "../components/StockTakePostingNote";
+import { numberTwins, recordMarks } from "../recordMarks";
 import type { StockTakeItem } from "../types/stock-takes";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import type { TranslateFn } from "@/types/i18n";
@@ -40,6 +41,40 @@ function withUnit(
 ): string {
   if (quantity == null) return "—";
   return formatQuantityLocalized(t, quantity, unit, rounding) || "—";
+}
+
+/** The row of a line in the report. A unit counted away from its record is
+ * one line reported twice, so the place is part of the identity. */
+const rowKey = (item: StockTakeItem): string =>
+  `${item.id}:${item.location_id ?? ""}`;
+
+/** What tells one report row from another of the same product on the same
+ * shelf: the lot, the expiry and the record, in the words the counting screen
+ * uses. Numbered over the whole report, so a row keeps its number when the
+ * discrepancy view hides its siblings. */
+function useRowMarks(
+  items: StockTakeItem[] | undefined,
+): (item: StockTakeItem) => string[] {
+  const { t } = useTranslation(["stock_takes"]);
+  return useMemo(() => {
+    const expiryOf = (item: StockTakeItem) => ({
+      effective_expiry_date: item.expiry_date,
+    });
+    const twinOf = numberTwins(
+      (items ?? []).map((item) => ({
+        id: rowKey(item),
+        key: [
+          item.location_id,
+          item.item_name,
+          ...recordMarks(t, expiryOf(item), item),
+        ].join("|"),
+        added: item.record_added_at ?? "",
+      })),
+      (a, b) => a.localeCompare(b),
+    );
+    return (item) =>
+      recordMarks(t, expiryOf(item), item, twinOf.get(rowKey(item)));
+  }, [items, t]);
 }
 
 export default function StockTakeReportPage() {
@@ -88,6 +123,7 @@ export default function StockTakeReportPage() {
       ]),
     [report],
   );
+  const marksOf = useRowMarks(report?.all_items);
   const visibleItems = showAll
     ? sortByAbsDifference(report?.all_items ?? [])
     : discrepancies;
@@ -118,6 +154,7 @@ export default function StockTakeReportPage() {
       t("report.unit"),
       t("report.difference"),
       t("report.location"),
+      t("report.record"),
       t("report.reason"),
       t("report.notes"),
       t("report.storage"),
@@ -133,6 +170,7 @@ export default function StockTakeReportPage() {
         csvCell(item.uom_symbol ?? ""),
         item.difference ?? "",
         csvCell(item.shelf_location ?? ""),
+        csvCell(marksOf(item).join(" · ")),
         csvCell(
           item.discrepancy_reason_code
             ? tDyn(`reasons.discrepancy.codes.${item.discrepancy_reason_code}`)
@@ -255,7 +293,7 @@ export default function StockTakeReportPage() {
               // A unit counted away from its record's location is one line
               // reported twice: the shortage where expected, the surplus
               // where found.
-              key={`${item.id}:${item.location_id ?? ""}`}
+              key={rowKey(item)}
               className="p-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4"
             >
               <div className="flex-1 min-w-0">
@@ -263,6 +301,11 @@ export default function StockTakeReportPage() {
                 {item.shelf_location && (
                   <p className="text-xs text-on-muted">
                     {t("report.location")}: {item.shelf_location}
+                  </p>
+                )}
+                {marksOf(item).length > 0 && (
+                  <p className="text-xs text-on-muted">
+                    {marksOf(item).join(" • ")}
                   </p>
                 )}
                 {/* The count found the difference; this is the only place

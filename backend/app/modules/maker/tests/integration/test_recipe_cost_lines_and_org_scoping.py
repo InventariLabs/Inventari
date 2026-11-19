@@ -217,6 +217,60 @@ class TestCostLinesCrud:
         ).json()
         assert [line['kind'] for line in detail['cost_lines']] == ['OVERHEAD']
 
+    def test_a_fixed_cost_cannot_be_negative(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        db_session: Session,
+    ) -> None:
+        """A negative fixed cost would lower the BOM's unit cost and every run
+        after it, so create and change both refuse it, in the session's
+        language and naming the amount field; zero stays allowed, and a line
+        saved negative earlier can still be renamed."""
+        template = ProductTemplate(organization_id=mk_org.id, name='Bread')
+        db_session.add(template)
+        db_session.commit()
+        db_session.refresh(template)
+        recipe = _create_recipe(client, mk_auth_headers, template.id, name='Rye')
+        url = f'/api/v1/maker/recipes/{recipe["id"]}/cost-lines'
+        polish = {**mk_auth_headers, 'Accept-Language': 'pl'}
+
+        refused = client.post(
+            url,
+            headers=mk_auth_headers,
+            json={'kind': 'LABOR', 'label': 'Oven', 'amount': '-5'},
+        )
+        refused_pl = client.post(
+            url,
+            headers=polish,
+            json={'kind': 'LABOR', 'label': 'Oven', 'amount': '-5'},
+        )
+        free = client.post(
+            url,
+            headers=mk_auth_headers,
+            json={'kind': 'OTHER', 'label': 'Free', 'amount': '0'},
+        )
+        assert free.status_code == 201, free.text
+        change = client.patch(
+            f'{url}/{free.json()["id"]}',
+            headers=mk_auth_headers,
+            json={'amount': '-1'},
+        )
+
+        assert refused.status_code == 422
+        assert refused.json()['detail'][0]['loc'][-1] == 'amount'
+        assert refused.json()['detail'][0]['msg'] == (
+            'Must be greater than or equal to 0'
+        )
+        assert refused_pl.status_code == 422
+        assert refused_pl.json()['detail'][0]['msg'] == ('Musi być większe lub równe 0')
+        assert change.status_code == 422
+        detail = client.get(
+            f'/api/v1/maker/recipes/{recipe["id"]}', headers=mk_auth_headers
+        ).json()
+        assert [c['label'] for c in detail['cost_lines']] == ['Free']
+
     def test_create_cost_line_unknown_recipe_returns_404(
         self,
         client: TestClient,

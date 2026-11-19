@@ -30,6 +30,12 @@ from app.core.public_api import core_api
 
 from ._receipt_planning import ReceiptLocationPlanner, receipt_line_card_async
 from .document_validation_service import validate_location_async
+from .home_shelf_service import (
+    REFUSED_QUARANTINE,
+    REFUSED_RECEIVING,
+    held_back_locations_async,
+    home_refusal_async,
+)
 from .models import PutawayRule, PutawayRuleLocation
 from .putaway_schemas import (
     PutawayPreviewLineOut,
@@ -41,6 +47,14 @@ from .putaway_schemas import (
 )
 
 router = APIRouter()
+
+#: The refusal for each reason a shelf cannot be a rule's target, named in
+#: full so the catalogue of refusal codes can read them. A location that does
+#: not take stock is refused before this, by ``validate_location_async``.
+_RULE_TARGET_REFUSALS = {
+    REFUSED_RECEIVING: 'putaway_rule_target_receiving',
+    REFUSED_QUARANTINE: 'putaway_rule_target_quarantine',
+}
 
 
 async def _validate_match_keys(
@@ -91,9 +105,11 @@ async def _validate_target_location(
     db: AsyncSession, org_id: UUID, target_location_id: UUID
 ) -> None:
     """Refuse any target that cannot take goods: not this organization's,
-    not a real shelf, or archived away. The line picker asks its shelves the
-    same questions through the same function (``validate_location_async``) —
-    a rule simply answers for a decision that runs unattended."""
+    not a real shelf, archived away, a receiving area or the quarantine
+    location. The line picker asks its shelves the first questions through
+    the same function (``validate_location_async``) and the home-shelf prompt
+    asks the last two — a rule simply answers for a decision that runs
+    unattended."""
     await validate_location_async(
         db,
         org_id,
@@ -101,6 +117,9 @@ async def _validate_target_location(
         internal_only=True,
         active_only=True,
     )
+    reason = await home_refusal_async(db, org_id, target_location_id)
+    if reason is not None:
+        raise ServiceRejectionError(_RULE_TARGET_REFUSALS[reason])
 
 
 async def _resolve_display_names(
@@ -115,6 +134,7 @@ async def _resolve_display_names(
     category_names: dict[UUID, str] = {}
     location_names: dict[UUID, str] = {}
     location_states: dict[UUID, bool] = {}
+    held_back = await held_back_locations_async(db, org_id)
 
     for rule in rules:
         tid = rule.product_template_id
@@ -133,9 +153,14 @@ async def _resolve_display_names(
                 loc = await core_api.locations.get_async(db, org_id, lid)
                 if loc is not None:
                     location_names[lid] = loc.name
-                    location_states[lid] = (loc.settings or {}).get(
-                        'archived'
-                    ) is not True and loc.usage == 'internal'
+                    # A rule stored before a location became a receiving
+                    # area or quarantine still names it: the planner steps
+                    # past it, so the list shows it as one that takes none.
+                    location_states[lid] = (
+                        (loc.settings or {}).get('archived') is not True
+                        and loc.usage == 'internal'
+                        and lid not in held_back
+                    )
 
     out: list[PutawayRuleOut] = []
     for rule in rules:

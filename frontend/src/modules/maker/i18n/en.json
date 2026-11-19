@@ -343,7 +343,11 @@
     "processStepMinutesLabel": "Minutes for step {{number}}",
     "minutesShort": "min",
     "minutesPlaceholder": "min",
-    "processStepsGuard": "The process steps"
+    "processStepsGuard": "The process steps",
+    "processStepsDiscardTitle": "Discard the unadded step?",
+    "processStepsDiscardMessage": "The step you typed has not been added to the list. Closing the editor throws it away.",
+    "processStepsDiscardConfirm": "Discard step",
+    "processStepsDiscardKeep": "Keep editing"
   },
   "bom": {
     "childLabel": "Ingredient product",
@@ -417,6 +421,9 @@
     "preview": "Calculate price",
     "calculating": "Calculating…",
     "totalCost": "Total cost",
+    "ingredientsCost": "Ingredients",
+    "fixedCost": "Fixed costs",
+    "labourCost": "Labour",
     "suggestedPrice": "Suggested sale price",
     "close": "Close",
     "saveDefault": "Save as default",

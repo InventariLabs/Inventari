@@ -284,6 +284,22 @@ says what the release does rather than what changed since them.
   the line and the complaint, instead of being stored and then breaking every
   PDF printed with it. A purchase order whose stored layout no longer renders
   prints with the built-in layout rather than failing with "An error occurred".
+- The sale price calculator and the per-product cost estimate now count the
+  formula's fixed costs and the labour its timed steps take, not only the
+  ingredients. A batch that cost 25.28 a kilogram was priced from 11.28, so
+  the suggested price sat below what the run cost; the calculator now lists
+  the three parts under the total, and the production preview's total matches
+  the per-unit figure beside it.
+- Counting a location that has sub-locations now tells two records of one
+  product apart. The count cards and the scan chooser show the expiry of
+  items standing on any depth below the counted location, so a scan no longer
+  adds one to whichever of two identical rows is tapped. The completed report
+  and its CSV export carry the same expiry and record number the counting
+  screen shows.
+- A fixed cost line of a production BOM can no longer be saved with a negative
+  amount, which lowered the BOM's unit cost, the run preview and the cost of
+  every run after it. The refusal appears beside the Amount field with what was
+  typed kept; a line saved negative earlier still opens and can be corrected.
 - Picking several documents from the list no longer ends in a dead end when
   one of them is already in a picking session. If the session is your own —
   opened on a phone and left — the dialog says so and offers **Continue that
@@ -291,6 +307,10 @@ says what the release does rather than what changed since them.
   it over or discard their scans, as the document's own page already did.
   **Retry** now appears only after a server failure, never after a refusal
   that would only repeat itself.
+- On a phone, the header's Back arrow on a screen opened by a direct link —
+  a document opened from a link or a refreshed page, for one — no longer ends
+  on a "Page Not Found" at `/warehouse/documents`. With nothing earlier in the
+  history it climbs to the nearest screen above that exists, the module's start.
 - The Settings audit log shows the reason a workflow release left on the
   requests it closed in the reader's language ("Workflow deactivated",
   "Workflow deleted") instead of the raw English text.

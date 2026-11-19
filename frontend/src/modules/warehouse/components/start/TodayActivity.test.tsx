@@ -34,6 +34,7 @@ function postedDocument(overrides: Partial<WarehouseDocumentRow> = {}) {
     source_location_name: "Fridge A",
     target_location_name: "Fridge B",
     line_count: 1,
+    moved_line_count: 1,
     first_lines: [
       { name: "Gouda Cheese", quantity: "12", done_quantity: "12", uom: null },
     ],
@@ -73,6 +74,35 @@ describe("Today in the warehouse", () => {
       "href",
       "/warehouse/documents/doc-1",
     );
+  });
+
+  it("counts the lines a receipt received, not the ones it kept at nought", () => {
+    answer({
+      data: {
+        items: [
+          postedDocument({
+            type: "IN",
+            line_count: 3,
+            moved_line_count: 1,
+            first_lines: [
+              {
+                name: "Olive oil",
+                quantity: "20",
+                done_quantity: "20",
+                uom: null,
+              },
+              { name: "Flour", quantity: "50", done_quantity: "0", uom: null },
+            ],
+          }),
+        ],
+        total: 1,
+      },
+    } as Partial<ReturnType<typeof useTodayActivity>>);
+    render(<TodayActivity warehouseId={null} />);
+
+    expect(
+      screen.getByText("Marek: Received 20 Olive oil"),
+    ).toBeInTheDocument();
   });
 
   it("retries when the day could not be read", async () => {
