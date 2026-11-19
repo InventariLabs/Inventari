@@ -796,6 +796,7 @@ export default function DocumentFormModal({
                   defaultTaxRate={defaultTaxRate}
                   currency={linesCurrency}
                   partnerId={partnerId}
+                  documentType={docType}
                   stockLocationId={stockLocationId}
                   stockLocationName={places.stockPlaceName}
                   onChangeSource={openSourceField}

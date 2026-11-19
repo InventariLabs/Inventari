@@ -578,9 +578,13 @@ async def get_last_purchase_price_async(
 
     Fallback in the price-hint chain when the partner has no pricelist
     entry. Only CONFIRMED/COMPLETED documents count — drafts must not
-    leak placeholder prices. A line names its product through its own
-    template or, when the scanner built it, through its stock record alone —
-    both feed the hint.
+    leak placeholder prices. A purchase is a receipt (from a supplier or
+    an internal one): a delivery's price is what the customer paid, and a
+    correction, scrap, transfer or internal issue says nothing about what
+    the goods cost. A receipt line that undoes another line is no purchase
+    either — the goods a customer sends back carry the delivery's price.
+    A line names its product through its own template or, when the scanner
+    built it, through its stock record alone — both feed the hint.
     """
     # The module reads the record's template through the relation, not the
     # Item model: it is core's table and the module never imports it.
@@ -594,6 +598,8 @@ async def get_last_purchase_price_async(
             func.coalesce(DocumentLine.product_template_id, item.template_id)
             == template_id,
             DocumentLine.unit_price.is_not(None),
+            DocumentLine.corrects_line_id.is_(None),
+            Document.type.in_(sorted(dt._RECEIPT)),
             Document.status.in_(
                 [DocumentStatus.CONFIRMED.value, DocumentStatus.COMPLETED.value]
             ),
