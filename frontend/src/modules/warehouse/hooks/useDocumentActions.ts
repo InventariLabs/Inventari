@@ -9,7 +9,6 @@ import {
   extractApiErrorCode,
   extractApiErrorField,
 } from "@/lib/errors";
-import type { ShipmentCreate } from "@/modules/warehouse/api/shipments";
 import { downloadDocumentPdf } from "@/modules/warehouse/lib/downloadDocumentPdf";
 import {
   UNDOABLE_DOCUMENT_TYPES,
@@ -18,7 +17,7 @@ import {
   type DocumentTrackingPayload,
   type WarehouseDocument,
 } from "@/modules/warehouse/types";
-import { useHandedOverCompletion } from "./usePickingHandOff";
+import { useSessionCompletion } from "./usePickingHandOff";
 import { useReceiptExpiryQuestion } from "./useReceiptExpiryQuestion";
 
 /** Which irreversible step the detail page's confirm dialog is asking about. */
@@ -575,26 +574,11 @@ export function useDocumentActions({
    * A dispatch's shipment may ride along: a body that names no line books
    * the lines the way no body does.
    */
-  const handleSessionComplete = useCallback(
-    (shipment?: ShipmentCreate) => {
-      if (!docId) return;
-      const payload: DocumentCompletePayload = shipment ? { shipment } : {};
-      completeMutation.mutate(
-        { id: docId, data: shipment ? payload : undefined },
-        {
-          onSuccess: reportCompletion,
-          // A refusal that is a question — a line still undated, a record in
-          // another unit — is answered on the payload the retry builds from
-          // the document's own quantities; the others reach the reader.
-          onError: (err) => handleCompletionError(err, payload),
-        },
-      );
-    },
-    [docId, completeMutation, reportCompletion, handleCompletionError],
-  );
-  // A list's picking sheet that ended over this one document handed its
-  // completion here, with the carrier its summary took.
-  useHandedOverCompletion(doc, handleSessionComplete);
+  const handleSessionComplete = useSessionCompletion(doc, docId, {
+    complete: completeMutation.mutate,
+    onCompleted: reportCompletion,
+    onRefused: handleCompletionError,
+  });
 
   return {
     confirmAction,

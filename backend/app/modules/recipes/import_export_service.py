@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.contracts import ProductTemplateCandidateDTO
 from app.core.exceptions import ServiceRejectionError
 
+from ._allergens import infer_allergens
 from .models import Recipe
 from .schemas import RecipeCreate, RecipeIngredientCreate
 from .services import create_recipe
@@ -131,7 +132,10 @@ async def _parse_import_json(
                 is_optional=ing.get('is_optional', False),
                 is_spice=ing.get('is_spice', False),
                 sort_order=ing.get('sort_order', idx),
-                allergens=ing.get('allergens') or [],
+                # A line without allergens of its own gets what its name
+                # suggests, as the recipe form's lookup gives it: the review
+                # screen pre-ticks them for the cook to correct.
+                allergens=ing.get('allergens') or infer_allergens(str(ing['name'])),
             )
         )
 

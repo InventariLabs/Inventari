@@ -20,7 +20,9 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.contracts import UomDTO
 from app.core.exceptions import ServiceRejectionError
+from app.core.module_sdk import UomResolverAsync
 from app.core.public_api import core_api
 
 from .models import BoMLine, MakerRecipe
@@ -30,6 +32,57 @@ _MAX_DEPTH = 10
 
 #: ``maker_recipes.name`` is ``String(200)``; a product template's name holds 255.
 _RECIPE_NAME_MAX = 200
+
+
+def unit_reads_as_stock(
+    line_uom_id: UUID | None,
+    line_uom: UomDTO | None,
+    line_text: str | None,
+    stock_uom: UomDTO | None,
+) -> bool:
+    """Whether a line's number can be read as its ingredient's stock unit.
+
+    The one answer the save guard, the availability check and the composition
+    tab ask. A line naming a unit is read in it when it converts to the stock
+    unit; a line naming none is a bare number counted in the stock unit — the
+    reading every record predating units has. Text that names no unit the
+    catalogue knows is neither: its number means nothing the shelf can take,
+    so it is refused instead of being taken for the stock unit.
+
+    *line_uom_id* is the line's own id; *line_uom* its catalogue row, loaded by
+    the caller that already holds the catalogue (``None`` with an id means the
+    catalogue does not know it). *line_text* is the free text the line was
+    written with. With no stock unit nothing says what the shelves hold, and
+    the documented legacy silence answers yes.
+    """
+    if stock_uom is None:
+        return True
+    if line_uom_id is None:
+        return not (line_text or '').strip()
+    if line_uom is None:
+        return False
+    if line_uom.id == stock_uom.id:
+        return True
+    _, convertible = core_api.uoms.convert_quantity(Decimal('1'), line_uom, stock_uom)
+    return convertible
+
+
+async def line_unit_id(
+    uom_id: UUID | None,
+    unit: str | None,
+    resolver: UomResolverAsync,
+) -> UUID | None:
+    """The catalogue unit a line is written in.
+
+    Its own ``uom_id`` when it names one; otherwise the unit its free text
+    names, resolved through the catalogue so a line saved before units (by
+    the maker bridge, or by a client that sent only the symbol) keeps its
+    meaning. ``None`` when it names neither: a bare number counts in the
+    ingredient's stock unit.
+    """
+    if uom_id is not None:
+        return uom_id
+    return await resolver.resolve(unit)
 
 
 # ---------------------------------------------------------------------------
@@ -364,7 +417,14 @@ async def explode_with_uom(
     if recipe is None:
         return []
     return await _explode_recipe(
-        db, organization_id, recipe, Decimal(str(qty)), depth=0, _seen=None, pool=pool
+        db,
+        organization_id,
+        recipe,
+        Decimal(str(qty)),
+        depth=0,
+        _seen=None,
+        pool=pool,
+        _uom_resolver=UomResolverAsync(db, organization_id),
     )
 
 
@@ -408,7 +468,14 @@ async def explode_by_recipe_with_uom(
     """
     recipe = await resolve_recipe(db, organization_id, recipe_id)
     return await _explode_recipe(
-        db, organization_id, recipe, Decimal(str(qty)), depth=0, _seen=None, pool=pool
+        db,
+        organization_id,
+        recipe,
+        Decimal(str(qty)),
+        depth=0,
+        _seen=None,
+        pool=pool,
+        _uom_resolver=UomResolverAsync(db, organization_id),
     )
 
 
@@ -424,6 +491,7 @@ async def exploder_for(
     for the walk only, not for a round of lookups per question.
     """
     child_cache = await _warm_child_cache(db, organization_id, [recipe])
+    uom_resolver = UomResolverAsync(db, organization_id)
 
     async def explode(
         qty: Decimal, pool: StockPool | None
@@ -437,6 +505,7 @@ async def exploder_for(
             _seen=None,
             _child_cache=child_cache,
             pool=pool,
+            _uom_resolver=uom_resolver,
         )
 
     return explode
@@ -480,6 +549,7 @@ async def explode_by_recipes_with_uom(
     # A child resolved for one recipe serves every recipe that names it,
     # and a resolved absence is remembered too.
     child_cache = await _warm_child_cache(db, organization_id, tops.values())
+    uom_resolver = UomResolverAsync(db, organization_id)
 
     return {
         (recipe_id, qty, scope): await _explode_recipe(
@@ -491,6 +561,7 @@ async def explode_by_recipes_with_uom(
             _seen=None,
             _child_cache=child_cache,
             pool=pools[scope].fork() if pools is not None and scope in pools else None,
+            _uom_resolver=uom_resolver,
         )
         for recipe_id, qty, scope in wanted
         if recipe_id in tops
@@ -595,6 +666,7 @@ async def _explode_recipe(
     _seen: set[UUID] | None,
     _child_cache: dict[UUID, MakerRecipe | None] | None = None,
     pool: StockPool | None = None,
+    _uom_resolver: UomResolverAsync | None = None,
 ) -> list[tuple[UUID, Decimal, str, UUID | None]]:
     """Flatten one recipe at *qty* of its output.
 
@@ -603,6 +675,10 @@ async def _explode_recipe(
     only the rest is exploded through its recipe. A line marked ``make_fresh``
     never asks the pool. Without a pool every sub-assembly is exploded whole,
     as the catalogue's formula cost reads it.
+
+    Each leaf carries the unit its line is written in — the line's own id, or
+    the unit its free text names (``line_unit_id``) — so a shelf and a run
+    read the same unit the check did.
     """
     # Depth is reachable: nothing bounds nesting on the write side (unlike
     # cycles, which ``ensure_no_cycle`` refuses at every door), so a chain
@@ -610,6 +686,11 @@ async def _explode_recipe(
     # ``bom_tree.get_tree``.
     if depth > _MAX_DEPTH:
         raise ServiceRejectionError('bom_depth_exceeded', max_depth=_MAX_DEPTH)
+    resolver = (
+        _uom_resolver
+        if _uom_resolver is not None
+        else UomResolverAsync(db, organization_id)
+    )
     seen = _seen if _seen is not None else set()
     if recipe.output_template_id in seen:
         # Defensive: a persisted cycle (which no write path can create)
@@ -658,12 +739,13 @@ async def _explode_recipe(
             * (Decimal('1') + line.yield_loss_pct / Decimal('100'))
             / recipe.batch_yield_qty
         )
+        line_uom_id = await line_unit_id(line.uom_id, line.unit, resolver)
         child_recipe = child_recipes.get(line.child_template_id)
         if child_recipe is not None:
             if pool is not None and not line.make_fresh:
-                taken = pool.take(line.child_template_id, effective_qty, line.uom_id)
+                taken = pool.take(line.child_template_id, effective_qty, line_uom_id)
                 if taken > 0:
-                    flat.append((line.child_template_id, taken, line.unit, line.uom_id))
+                    flat.append((line.child_template_id, taken, line.unit, line_uom_id))
                 effective_qty -= taken
                 if effective_qty <= 0:
                     continue
@@ -676,16 +758,17 @@ async def _explode_recipe(
                 _seen=seen_with_self,
                 _child_cache=_child_cache,
                 pool=pool,
+                _uom_resolver=resolver,
             )
             if sub:
                 flat.extend(sub)
             else:
                 # Sub-assembly with no ingredients — treat as leaf.
                 flat.append(
-                    (line.child_template_id, effective_qty, line.unit, line.uom_id)
+                    (line.child_template_id, effective_qty, line.unit, line_uom_id)
                 )
         else:
-            flat.append((line.child_template_id, effective_qty, line.unit, line.uom_id))
+            flat.append((line.child_template_id, effective_qty, line.unit, line_uom_id))
     return flat
 
 
@@ -696,16 +779,18 @@ async def _in_stock_units(
 ) -> list[tuple[UUID, Decimal, str]]:
     """Re-express each exploded line in the ingredient's own stock unit.
 
-    A line whose unit matches the stock's, or where either side names no unit,
-    passes through untouched — a bare number against a bare number is how every
-    product predating units is written, and refusing those would stop
-    production for all of them.
+    A line is read in the unit ``_explode_recipe`` named for it: its own id,
+    or the unit its free text names. A line with no unit id and no text is a
+    bare number counted in its ingredient's unit — how every product predating
+    units is written — and a product whose card names no unit passes through
+    as it stands.
 
     A pair that cannot be converted (grams against pieces, with nothing saying
-    what a piece weighs) also passes through, because the availability check
-    reaches that conclusion first and refuses the run; and ``add_bom_line``
-    refuses to write such a line at all. Converting here would be inventing a
-    ratio; leaving it is the same answer the rest of the module gives.
+    what a piece weighs) passes through, because the availability check
+    reaches that conclusion first and refuses the run; ``unit_reads_as_stock``
+    and the save guard give the same answer. Text naming no unit at all is left
+    with the number it was written beside, so no reader shows it as the stock
+    unit; the run refuses it too. Converting here would be inventing a ratio.
     """
     uoms = {
         uom.id: uom
@@ -732,10 +817,15 @@ def _convert_flat_to_stock_units(
         template = templates.get(child_id)
         stock_uom_id = template.uom_id if template else None
         if line_uom_id is None and stock_uom_id is not None:
-            # A line that names no unit is counted in its ingredient's: that is
-            # the number its stock move takes off the shelf, so that is the
-            # unit it is labelled with. Its free-text unit said "kg" beside a
-            # move of the same number in pieces.
+            if (unit or '').strip():
+                # Text naming a unit the catalogue does not hold: the number
+                # means nothing the shelf can take, so it keeps the label it
+                # was written with (the availability check refuses the run).
+                converted.append((child_id, qty, unit))
+                continue
+            # A bare number is counted in its ingredient's unit: that is the
+            # number its stock move takes off the shelf, so that is the unit
+            # it is labelled with.
             stock_uom = uoms.get(stock_uom_id)
             converted.append((child_id, qty, stock_uom.symbol if stock_uom else unit))
             continue
@@ -773,6 +863,7 @@ async def explode_recipes_in_stock_units(
     child_cache = await _warm_child_cache(
         db, organization_id, (recipe for recipe, _qty in requests)
     )
+    uom_resolver = UomResolverAsync(db, organization_id)
 
     flats: dict[UUID, list[tuple[UUID, Decimal, str, UUID | None]]] = {}
     for recipe, qty in requests:
@@ -787,6 +878,7 @@ async def explode_recipes_in_stock_units(
             depth=0,
             _seen=None,
             _child_cache=child_cache,
+            _uom_resolver=uom_resolver,
         )
 
     uoms = {

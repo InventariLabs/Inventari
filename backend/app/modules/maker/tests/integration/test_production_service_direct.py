@@ -2602,9 +2602,11 @@ class TestExplodeQueryCount:
         )
         # Constant per level: root recipe lookup + lazy ``lines`` load, one
         # batched recipe fetch (+ its batched ``lines``) per level, plus the
-        # model's own selectin loads (``output_template``, ``cost_lines``).
+        # model's own selectin loads (``output_template``, ``cost_lines``),
+        # and one unit lookup for the free-text unit a line names with no id
+        # (these lines carry "pcs" as text; a line with a unit id costs none).
         # Two levels must stay well under a per-line cost.
-        assert large_queries <= 10, f'expected ≤10 queries, got {large_queries}'
+        assert large_queries <= 11, f'expected ≤11 queries, got {large_queries}'
 
 
 @pytest.mark.integration

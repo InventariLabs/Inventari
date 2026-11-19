@@ -158,13 +158,15 @@ def _line_unit_symbol(
 ) -> str | None:
     """The unit a line's needed quantity is counted in.
 
-    Its own unit when it names one. A line that names none is counted in its
-    ingredient's stock unit — the unit its stock move uses — and only a
-    product without a unit either falls back to the line's free text.
+    The line's own unit when it names one — its id, or the unit its free text
+    resolved to. Text the catalogue could not resolve stays as written, so a
+    reader sees "1 cup" and not "1 pcs" beside a number nobody can convert. A
+    line that names no unit at all is counted in its ingredient's stock unit,
+    the unit its stock move uses.
     """
     if recipe_uom is not None:
         return recipe_uom.symbol
-    return stock_symbol or legacy_unit
+    return (legacy_unit or '').strip() or stock_symbol
 
 
 async def _measure_stock_against_recipe(
@@ -172,6 +174,7 @@ async def _measure_stock_against_recipe(
     *,
     per_batch_needs: dict[UUID, Decimal],
     line_uom_ids: dict[UUID, UUID | None],
+    legacy_units: dict[UUID, str | None],
     template_cache: dict[UUID, ProductTemplateDTO | None],
     get_uom: Callable[[UUID | None], Awaitable[UomDTO | None]],
     raw_stocks: dict[UUID, Decimal],
@@ -180,7 +183,9 @@ async def _measure_stock_against_recipe(
 
     An ingredient whose measures have no bridge contributes no batch count:
     dividing a litre count by a kilogram requirement is how "0.002 batches"
-    was born. It is reported as unknown instead.
+    was born. It is reported as unknown instead — and so is a line whose free
+    text names no unit the catalogue knows, because nothing says what its
+    number means.
 
     ``raw_stocks`` maps each leaf template to its total available stock
     (pre-fetched in one query by the caller).
@@ -200,12 +205,21 @@ async def _measure_stock_against_recipe(
         stock_uom = await get_uom(template.uom_id if template else None)
 
         converted = raw_stock
-        convertible = True
-        if recipe_uom is not None and stock_uom is not None:
-            if recipe_uom.id != stock_uom.id:
-                converted, convertible = core_api.uoms.convert_quantity(
-                    raw_stock, stock_uom, recipe_uom
-                )
+        convertible = bom_service.unit_reads_as_stock(
+            line_uom_ids.get(child_id),
+            recipe_uom,
+            legacy_units.get(child_id),
+            stock_uom,
+        )
+        if (
+            convertible
+            and recipe_uom is not None
+            and stock_uom is not None
+            and recipe_uom.id != stock_uom.id
+        ):
+            converted, convertible = core_api.uoms.convert_quantity(
+                raw_stock, stock_uom, recipe_uom
+            )
 
         converted_stocks[child_id] = converted
         convertibles[child_id] = convertible
@@ -467,6 +481,7 @@ async def compute_availability(
         db,
         per_batch_needs=measured_needs,
         line_uom_ids=line_uom_ids,
+        legacy_units=legacy_units,
         template_cache=template_cache,
         get_uom=_get_uom,
         raw_stocks=raw_stocks,
@@ -649,12 +664,21 @@ async def _shortages_from_needs(
         stock_uom = await _get_uom(template.uom_id if template else None)
 
         converted = raw_stock
-        convertible = True
-        if recipe_uom is not None and stock_uom is not None:
-            if recipe_uom.id != stock_uom.id:
-                converted, convertible = core_api.uoms.convert_quantity(
-                    raw_stock, stock_uom, recipe_uom
-                )
+        convertible = bom_service.unit_reads_as_stock(
+            line_uom_ids.get(child_id),
+            recipe_uom,
+            legacy_units.get(child_id),
+            stock_uom,
+        )
+        if (
+            convertible
+            and recipe_uom is not None
+            and stock_uom is not None
+            and recipe_uom.id != stock_uom.id
+        ):
+            converted, convertible = core_api.uoms.convert_quantity(
+                raw_stock, stock_uom, recipe_uom
+            )
 
         # An ingredient nobody can measure against the requirement still
         # stops the order — but as "unknown", not as an invented quantity.

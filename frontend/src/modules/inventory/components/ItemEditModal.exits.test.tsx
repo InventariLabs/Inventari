@@ -329,4 +329,97 @@ describe("ItemEditModal — leaving, refusals and the photo", () => {
       screen.getByRole("button", { name: /save changes/i }),
     ).toBeInTheDocument();
   });
+
+  describe("nutrition typed by hand in the sheet", () => {
+    const withTemplate = () =>
+      server.use(
+        http.get("/api/v1/modules/my", () =>
+          HttpResponse.json(["core", "items", "nutrition"]),
+        ),
+        http.get("/api/v1/items/1", () =>
+          HttpResponse.json({ ...record, template_id: "tpl-1", metadata: {} }),
+        ),
+        http.get("/api/v1/items/product-templates/tpl-1", () =>
+          HttpResponse.json({ id: "tpl-1", name: "Test Item", meta_data: {} }),
+        ),
+      );
+
+    const typeEnergy = async () => {
+      fireEvent.click(
+        await screen.findByRole("button", { name: /enter values by hand/i }),
+      );
+      fireEvent.change(await screen.findByLabelText(/^energy \(kcal\)/i), {
+        target: { value: "64" },
+      });
+    };
+
+    it("is saved by Save changes, before the product's own save", async () => {
+      withTemplate();
+      const calls: string[] = [];
+      let sent: unknown;
+      server.use(
+        http.patch(
+          "/api/v1/items/product-templates/tpl-1/nutrition",
+          async ({ request }) => {
+            calls.push("nutrition");
+            sent = await request.json();
+            return HttpResponse.json({});
+          },
+        ),
+        http.put("/api/v1/items/1", async ({ request }) => {
+          calls.push("item");
+          return HttpResponse.json(await request.json());
+        }),
+      );
+      const onClose = vi.fn();
+      render(<ItemEditModal itemId="1" onClose={onClose} />);
+      await screen.findByDisplayValue("Test Item");
+      await typeEnergy();
+
+      fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+
+      await waitFor(() => expect(onClose).toHaveBeenCalled());
+      expect(calls).toEqual(["nutrition", "item"]);
+      expect(sent).toEqual({ nutrition_info: { calories_kcal: 64 } });
+    });
+
+    it("stops the save, naming the refusal, when the figures are refused", async () => {
+      withTemplate();
+      let itemSaved = false;
+      server.use(
+        http.patch("/api/v1/items/product-templates/tpl-1/nutrition", () =>
+          HttpResponse.json({ detail: "Energy is too high" }, { status: 422 }),
+        ),
+        http.put("/api/v1/items/1", () => {
+          itemSaved = true;
+          return HttpResponse.json(record);
+        }),
+      );
+      const onClose = vi.fn();
+      render(<ItemEditModal itemId="1" onClose={onClose} />);
+      await screen.findByDisplayValue("Test Item");
+      await typeEnergy();
+
+      fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+
+      expect(await screen.findByText("Energy is too high")).toBeInTheDocument();
+      expect(itemSaved).toBe(false);
+      expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it("asks before the sheet closes over unsaved figures", async () => {
+      withTemplate();
+      const onClose = vi.fn();
+      render(<ItemEditModal itemId="1" onClose={onClose} />);
+      await screen.findByDisplayValue("Test Item");
+      await typeEnergy();
+
+      fireEvent.keyDown(window, { key: "Escape" });
+
+      expect(await screen.findByRole("alertdialog")).toHaveTextContent(
+        "Leave without saving?",
+      );
+      expect(onClose).not.toHaveBeenCalled();
+    });
+  });
 });

@@ -285,6 +285,28 @@ says what the release does rather than what changed since them.
   stands on the archived location itself is relocated, the archive dialog
   asks for a target only when that location holds products, and a location
   that holds nothing of its own archives without one.
+- A BOM line's unit is read against the ingredient's stock unit, and a line
+  that cannot be converted is refused instead of silently drawing the wrong
+  number. A formula line reading "Wheat flour 300 g" on a product kept in
+  pieces used to take 600 pieces for two batches and record "600 pcs"; the
+  line is now refused when it is saved, naming both units, and a run refuses
+  one already stored that way. The Composition tab marks such a line as a
+  unit mismatch until a unit is set, and a line that does convert — 500 g
+  against stock kept in kilograms — draws the converted amount and records
+  it in the shelf's unit.
+- Undoing a production run no longer changes what the stock is worth. The
+  output leaves the books at the value its own run put in, instead of at the
+  product's oldest cost layer, which can belong to an earlier run made at a
+  different cost; each batch of a run filled in portions leaves at its own
+  value too. Undoing a run used to leave every quantity back as it was while
+  the total fell or rose by the difference between the two runs' costs.
+- A recipe imported from JSON or from a web page now carries the allergens its
+  ingredient names suggest, as one typed through **New recipe** does. An
+  imported cheese omelette of eggs, butter and cheddar read "No allergens
+  marked" on its page and in its export; the review screen now shows Eggs and
+  Milk ticked for the cook to correct, and a line that names its own allergens
+  keeps them. Recipes imported earlier get theirs when the instance is
+  upgraded.
 - *Stock on a date* and *Value movement* now cut a day where the organization
   lives, not at midnight UTC. A receipt booked at half past midnight local time
   used to sit in the opening value of its own day, the note about where the

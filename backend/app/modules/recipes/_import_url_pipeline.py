@@ -17,6 +17,8 @@ from app.core.logging import get_logger
 from app.core.public_api import core_api
 from app.core.public_api.llm import LlmProviderRefusalError, LlmPurposeUnboundError
 
+from ._allergens import infer_allergens
+
 log = get_logger(__name__)
 
 
@@ -197,6 +199,7 @@ async def _parse_import_url(
             else None,
             is_optional=False,
             sort_order=idx,
+            allergens=infer_allergens(parsed.name),
         )
         for idx, parsed in enumerate(parsed_list)
     ]
@@ -332,6 +335,7 @@ async def _preview_import_url(
                 else None,
                 template_name=template_names.get(idx),
                 is_optional=False,
+                allergens=infer_allergens(parsed.name),
                 original_quantity=float(parsed.original_quantity)
                 if parsed.original_quantity is not None
                 else None,

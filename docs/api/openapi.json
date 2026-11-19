@@ -45847,6 +45847,11 @@
               }
             ],
             "title": "Stock On Hand"
+          },
+          "unit_mismatch": {
+            "type": "boolean",
+            "title": "Unit Mismatch",
+            "default": false
           }
         },
         "type": "object",
