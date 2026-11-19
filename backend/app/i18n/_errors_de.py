@@ -415,6 +415,7 @@ ERRORS_DE: ErrorMessages = {
     'document_adjustment_lines_reference_items': 'Positionen eines Bestandskorrekturbelegs müssen sich auf vorhandene Produkte beziehen',
     'recipe_collection_name_taken': 'Eine Rezeptsammlung mit dem Namen „{name}“ existiert in dieser Organisation bereits.',
     'recipe_name_taken': 'Eine Formel mit diesem Namen existiert für dieses Produkt bereits.',
+    'bridge_yield_differs': 'Für dieses Rezept und dieses Produkt gibt es bereits eine Formel, die {qty} pro Charge ergibt; geben Sie diese Menge ein oder ändern Sie zuerst die Chargenausbeute der Formel.',
     'recipe_not_found': 'Rezept nicht gefunden',
     'picking_active_recipe_locked': 'Zutaten können nicht bearbeitet werden, solange eine Kommissionierungssitzung aktiv ist. Brechen Sie die Sitzung zuerst ab oder schließen Sie sie ab.',
     'meal_plan_dates_exclude_entries': 'Entfernen Sie zuerst die Einträge an den ausgeschlossenen Tagen.',

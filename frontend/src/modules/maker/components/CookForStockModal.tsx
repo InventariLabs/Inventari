@@ -94,7 +94,12 @@ function outputUnit(
  * backend keeps, which also hides binary noise (1.1 × 3).
  */
 function planBatch(yieldText: string, scale: string) {
-  const yieldNum = yieldText.trim() === "" ? NaN : Number(yieldText);
+  // Four places is what the backend accepts for a yield too, so the number
+  // sent and the number planned with are the same one.
+  const yieldNum =
+    yieldText.trim() === ""
+      ? NaN
+      : Math.round(Number(yieldText) * 10000) / 10000;
   const validYield = Number.isFinite(yieldNum) && yieldNum > 0;
   const scaleNum = Number(scale);
   const validScale = Number.isFinite(scaleNum) && scaleNum >= 1;
@@ -205,7 +210,7 @@ export function CookForStockModal({
         output_template_id: product.product_template_id,
         name: recipe.name,
         // One batch = one culinary cook; the order's planned_qty scales it.
-        batch_yield_qty: yieldText.trim(),
+        batch_yield_qty: String(yieldNum),
       };
       const makerRecipe: MakerRecipeBridgeResult =
         await createMakerRecipeFromCulinary(payload);

@@ -314,6 +314,22 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
         );
       });
     });
+
+    it("sends a yield with the four places the backend keeps", async () => {
+      renderModal();
+      fireEvent.click(screen.getByTestId("mock-product-option"));
+      fireEvent.change(screen.getByTestId("cook-for-stock-yield-input"), {
+        target: { value: "1.12345" },
+      });
+      pickStorage("Output Store");
+      fireEvent.click(screen.getByTestId("cook-for-stock-submit"));
+
+      await waitFor(() => {
+        expect(mocks.createMakerRecipeFromCulinary).toHaveBeenCalledWith(
+          expect.objectContaining({ batch_yield_qty: "1.1235" }),
+        );
+      });
+    });
   });
 
   it("offers the servings as the amount for a product counted in pieces", () => {
