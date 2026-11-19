@@ -129,7 +129,7 @@ async def create_template_async(
     engine = TemplateEngine()
     if partials:
         body_html = engine.inline_includes(body_html, partials)
-    engine.check_syntax(body_html)
+    engine.check_renders(body_html)
 
     if is_default:
         await db.execute(
@@ -196,7 +196,7 @@ async def update_template_async(
         engine = TemplateEngine()
         if partials:
             body_html = engine.inline_includes(body_html, partials)
-        engine.check_syntax(body_html)
+        engine.check_renders(body_html)
         tpl.body_html = body_html
 
     if name is not None:

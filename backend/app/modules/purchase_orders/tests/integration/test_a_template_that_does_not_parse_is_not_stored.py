@@ -1,9 +1,9 @@
-"""A purchase order layout that does not parse is refused at save.
+"""A purchase order layout that does not render is refused at save.
 
-A body stored with a syntax error failed every order's PDF with an
-unreadable 500, and the save that caused it said nothing. The save names
-the line instead; a layout already stored in that state prints the
-built-in one.
+A body stored with a syntax error, or one that fails when it runs, failed
+every order's PDF with an unreadable 500, and the save that caused it said
+nothing. The save names the line instead; a layout already stored in that
+state prints the built-in one.
 """
 
 from __future__ import annotations
@@ -49,6 +49,34 @@ def test_a_new_layout_with_a_syntax_error_is_refused_and_not_stored(
     assert listed == []
 
 
+@pytest.mark.parametrize(
+    ('body', 'complaint'),
+    [
+        ('<p>{{ 1 / 0 }}</p>', 'division by zero'),
+        ('<p>{{ po_number | no_such_filter }}</p>', 'no_such_filter'),
+    ],
+)
+def test_a_layout_that_parses_but_does_not_render_is_refused(
+    client: TestClient, po_auth_headers: dict[str, str], body: str, complaint: str
+) -> None:
+    response = _create(client, po_auth_headers, body)
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
+    assert 'line 1' in response.text
+    assert complaint in response.text
+    assert client.get(TEMPLATES, headers=po_auth_headers).json()['items'] == []
+
+
+def test_a_layout_reading_data_the_empty_context_lacks_is_saved(
+    client: TestClient, po_auth_headers: dict[str, str]
+) -> None:
+    body = '<p>{{ po.partner.name | upper }} {{ total_net | round(2) }}</p>'
+
+    response = _create(client, po_auth_headers, body)
+
+    assert response.status_code == status.HTTP_201_CREATED, response.text
+
+
 def test_an_edit_into_a_syntax_error_is_refused_and_the_body_stays(
     client: TestClient, po_auth_headers: dict[str, str]
 ) -> None:
@@ -66,7 +94,9 @@ def test_an_edit_into_a_syntax_error_is_refused_and_the_body_stays(
     assert kept['body_html'] == good
 
 
-def test_a_stored_layout_that_does_not_parse_prints_the_built_in_one(
+@pytest.mark.parametrize('stored', [BROKEN, '<p>{{ 1 / 0 }}</p>'])
+def test_a_stored_layout_that_does_not_render_prints_the_built_in_one(
+    stored: str,
     client: TestClient,
     po_auth_headers: dict[str, str],
     db_session: Session,
@@ -81,7 +111,7 @@ def test_a_stored_layout_that_does_not_parse_prints_the_built_in_one(
             module='purchase_orders',
             name='Saved before the check',
             document_type='STANDARD',
-            body_html=BROKEN,
+            body_html=stored,
             is_default=True,
             created_by=po_user.id,
         )

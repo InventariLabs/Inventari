@@ -279,10 +279,10 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
-- Saving a print layout whose template code does not parse — a purchase order,
-  warehouse document or equipment layout — is refused, with the line and the
-  parser's complaint, instead of being stored and then breaking every PDF
-  printed with it. A purchase order whose stored layout no longer renders
+- Saving a print layout whose template code does not parse or render — a
+  purchase order, warehouse document or equipment layout — is refused, with
+  the line and the complaint, instead of being stored and then breaking every
+  PDF printed with it. A purchase order whose stored layout no longer renders
   prints with the built-in layout rather than failing with "An error occurred".
 - Picking several documents from the list no longer ends in a dead end when
   one of them is already in a picking session. If the session is your own —

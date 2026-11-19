@@ -16,7 +16,6 @@ from jinja2 import (
     ChoiceLoader,
     Environment,
     FileSystemLoader,
-    TemplateError,
     select_autoescape,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -117,7 +116,7 @@ class PdfServiceBase:
         logger.debug('Using DB template %s for %s', tpl.id, self.module_name)
         try:
             return engine.render(tpl.body_html, context)
-        except TemplateError:
+        except Exception:
             # A body stored before saves were checked can still fail to
             # parse or render; the built-in layout prints the document
             # instead of the whole request failing.

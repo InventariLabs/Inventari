@@ -9,7 +9,8 @@ from pathlib import Path
 from typing import Any
 
 import nh3
-from jinja2 import BaseLoader, TemplateSyntaxError, sandbox
+from jinja2 import BaseLoader, sandbox
+from jinja2.exceptions import UndefinedError
 
 from app.core.exceptions import ServiceRejectionError
 from app.core.logging import get_logger
@@ -333,6 +334,25 @@ def _stash_jinja_spans(body_html: str) -> tuple[str, list[tuple[str, str]]]:
     return _JINJA_SPAN_RE.sub(_stash, body_html), spans
 
 
+def _template_line(exc: BaseException) -> int:
+    """The line of the template an error came from.
+
+    Jinja names it on its own errors; an error raised while the template runs
+    (a division by zero) carries it only in the traceback frame of the
+    compiled template.
+    """
+    lineno = getattr(exc, 'lineno', None)
+    if isinstance(lineno, int):
+        return lineno
+    line = 1
+    tb = exc.__traceback__
+    while tb is not None:
+        if tb.tb_frame.f_code.co_filename == '<template>':
+            line = tb.tb_lineno
+        tb = tb.tb_next
+    return line
+
+
 class TemplateEngine:
     """Shared Jinja2 sandboxed template engine for user-authored document templates."""
 
@@ -374,17 +394,26 @@ class TemplateEngine:
                 result = result[: match.start()] + partial_html + result[match.end() :]
         return result
 
-    def check_syntax(self, body_html: str) -> None:
-        """Refuse a body Jinja cannot parse, naming the line it stopped at.
+    def check_renders(self, body_html: str) -> None:
+        """Refuse a body that cannot be compiled or rendered, naming its line.
 
-        Run on every save: a layout that does not parse fails every document
-        printed with it, and nothing at print time is left to say why.
+        Run on every save: a layout that fails fails every document printed
+        with it, and nothing at print time is left to say why. The body is
+        compiled (an unknown filter or test fails here) and rendered once on an
+        empty context, where what depends on a document's data — a missing
+        variable, a filter handed ``None`` — says nothing about the layout and
+        is let through, while an error of the layout's own (``{{ 1 / 0 }}``)
+        is refused.
         """
         try:
-            self._env.parse(body_html)
-        except TemplateSyntaxError as exc:
+            self._env.from_string(body_html).render()
+        except (UndefinedError, TypeError):
+            return
+        except Exception as exc:
             raise ServiceRejectionError(
-                'template_not_saved_syntax', line=exc.lineno, detail=exc.message
+                'template_not_saved_syntax',
+                line=_template_line(exc),
+                detail=getattr(exc, 'message', None) or str(exc),
             ) from exc
 
     def render(self, body_html: str | None, context: dict[str, Any]) -> str:
