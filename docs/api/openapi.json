@@ -53500,6 +53500,11 @@
             "title": "Is Opening",
             "default": false
           },
+          "stock_already_applied": {
+            "type": "boolean",
+            "title": "Stock Already Applied",
+            "default": false
+          },
           "lines": {
             "items": {
               "$ref": "#/components/schemas/DocumentLineSchema"
@@ -75667,6 +75672,11 @@
           "is_opening": {
             "type": "boolean",
             "title": "Is Opening",
+            "default": false
+          },
+          "stock_already_applied": {
+            "type": "boolean",
+            "title": "Stock Already Applied",
             "default": false
           },
           "lines": {

@@ -269,6 +269,40 @@ describe("useDocumentActions backorder toast", () => {
       "Document completed — stock updated",
     );
   });
+
+  it("does not claim the stock moved for a document that only records it", () => {
+    // A recipe's internal issue was taken by the picking session. The page
+    // said "stock updated" over a shelf that had not changed, and offered an
+    // Undo the server refuses.
+    const { result } = renderHook(
+      () =>
+        useDocumentActions({
+          docId: "doc-1",
+          duplicateMutation: { mutateAsync: vi.fn() },
+          confirmMutation: stubMutation(),
+          postNowMutation: stubMutation(),
+          completeMutation: resolvingCompleteMutation({
+            generated_backorder_id: null,
+            stock_already_applied: true,
+          }),
+          cancelMutation: stubMutation(),
+          deleteMutation: stubMutation(),
+          undoMutation: stubMutation(),
+        }),
+      { wrapper },
+    );
+
+    act(() => {
+      result.current.handleComplete({});
+    });
+
+    expect(toast.success).toHaveBeenCalledWith(
+      "Document completed — it records the stock already taken",
+    );
+    expect(toast.success).not.toHaveBeenCalledWith(
+      "Document completed — stock updated",
+    );
+  });
 });
 
 function resolvingUndoMutation(data: Partial<WarehouseDocument>) {

@@ -529,6 +529,24 @@ describe("DocumentActionButtons one-step posting", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("names a record-only draft's action for the record, not for a stock movement", () => {
+    // A recipe's internal issue was already taken by the picking session,
+    // so "Remove from stock" promised a second movement that never comes.
+    render(
+      <DocumentActionButtons
+        {...baseProps}
+        docType="INTERNAL_OUT"
+        stockAlreadyApplied
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: "Record it — stock already taken" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Remove from stock" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("leaves the confirm step in the menu as 'Plan' for a future date", async () => {
     const onConfirm = vi.fn();
     render(

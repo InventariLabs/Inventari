@@ -438,6 +438,11 @@ class DocumentSchema(BaseModel):
     #: Other modules' fields on the document, under each module's name.
     meta_data: dict[str, dict[str, Any]] | None = None
     is_opening: bool = False
+    #: The document only records a movement another step already made — a
+    #: recipe's picking session took the goods. Posting it moves no stock,
+    #: and neither Undo nor a correction may move the shelf through it. The
+    #: screen reads this to name the action for what it does.
+    stock_already_applied: bool = False
     lines: list[DocumentLineSchema]
     created_by: UUID
     confirmed_by: UUID | None
