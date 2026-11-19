@@ -307,12 +307,12 @@ describe("ProductionDetailPage edit + duplicate", () => {
     currentOrder = {
       ...draftOrder,
       status: "COMPLETED",
-      production_date: "2026-11-19",
-      planned_for: "2026-11-22",
+      production_date: "2020-01-02",
+      planned_for: "2020-01-05",
     };
     renderPage();
 
-    expect(screen.getByText(/Planned for: .*2026/)).toBeInTheDocument();
+    expect(screen.getByText(/Planned for: .*2020/)).toBeInTheDocument();
   });
 
   it("completes a run planned for a later day on today, not on the plan", () => {
