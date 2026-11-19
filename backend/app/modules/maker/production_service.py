@@ -22,7 +22,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import select
@@ -160,9 +160,11 @@ async def list_orders(
     return await paginate_async(db, stmt, limit=limit, offset=offset)
 
 
-class _MonthBucket(TypedDict):
-    result: Decimal
-    orders: int
+@dataclass
+class _MonthBucket:
+    result: Decimal = Decimal('0')
+    orders: int = 0
+    overproduced_orders: int = 0
 
 
 async def monthly_result(
@@ -215,7 +217,7 @@ async def monthly_result(
     cur_year, cur_month = year, month
     for _ in range(months):
         key = f'{cur_year:04d}-{cur_month:02d}'
-        buckets[key] = {'result': Decimal('0'), 'orders': 0}
+        buckets[key] = _MonthBucket()
         cur_month += 1
         if cur_month == 13:
             cur_month = 1
@@ -224,17 +226,20 @@ async def monthly_result(
     for row in rows:
         completed_at = row.completed_at.astimezone(tz)
         key = f'{completed_at.year:04d}-{completed_at.month:02d}'
-        bucket = buckets.setdefault(key, {'result': Decimal('0'), 'orders': 0})
+        bucket = buckets.setdefault(key, _MonthBucket())
         effective_qty = row.actual_qty or row.planned_qty
         if effective_qty and effective_qty > 0:
-            bucket['result'] += row.result_per_unit * effective_qty
-        bucket['orders'] += 1
+            bucket.result += row.result_per_unit * effective_qty
+        bucket.orders += 1
+        if row.actual_qty is not None and row.actual_qty > row.planned_qty:
+            bucket.overproduced_orders += 1
 
     return [
         {
             'month': key,
-            'result': quantise(value['result']),
-            'orders': value['orders'],
+            'result': quantise(value.result),
+            'orders': value.orders,
+            'overproduced_orders': value.overproduced_orders,
         }
         for key, value in sorted(buckets.items())
     ]
@@ -1241,6 +1246,7 @@ async def complete_production(
     record_shortfall: bool = False,
     best_before: date | None = None,
     ingredient_lots: list[IngredientLotChoice] | None = None,
+    made_on: date | None = None,
 ) -> ProductionOrder:
     """Execute the full atomic production pipeline (see module docstring).
 
@@ -1258,14 +1264,17 @@ async def complete_production(
     - ``record_shortfall``: the run already happened, so an ingredient the
       records hold too little of is taken as far as they go and the rest is
       recorded on its line (``record_made``) instead of refusing the run.
+    - ``made_on``: the day the goods were made, else the organization's
+      today. Never the planned day: the plan says when the run was meant to
+      happen, and a run planned for a later day is not made on a day that has
+      not come.
     - ``best_before``: the output batch's date, else the run's day plus the
       product's shelf life (``output_batch.best_before_for_run``).
     - ``ingredient_lots``: the batches the person chose for ingredients;
       the run takes exactly those (``ingredient_batches.resolve_choices``).
     """
     order = await _lock_order(db, organization_id, order_id)
-    # The day the run is booked on: the one it was planned for, else today.
-    run_day = await _run_day(db, organization_id, order.production_date)
+    run_day = await _run_day(db, organization_id, made_on)
     actual_qty = await _resolve_actual_qty(db, organization_id, order, actual_qty)
     output_best_before = await output_batch.best_before_for_run(
         db, organization_id, order.output_template_id, run_day, best_before
@@ -1318,10 +1327,12 @@ async def complete_production(
     order.scrap_qty = scrap_qty
     order.completed_at = datetime.now(tz=UTC)
     order.completed_by = user.id
-    # The date is optional at planning and nobody plans it; at closing it is
-    # known to the day — an empty "PRODUCTION DATE —" on a finished run
-    # served nobody. The day the guard asked about, not the UTC date of
-    # ``completed_at``.
+    # The planned day gives way to the day the run was made: the stamp the
+    # batch record and the statements read. The day the guard asked about,
+    # not the UTC date of ``completed_at``. The plan's day stays on the run
+    # when it differs.
+    if order.production_date != run_day:
+        order.planned_for = order.production_date
     order.production_date = run_day
     await _journal_closed(
         db, organization_id, order, user, 'DRAFT', actual_qty, total_cost
@@ -1788,6 +1799,7 @@ async def record_made(
         record_shortfall=True,
         best_before=data.best_before,
         ingredient_lots=data.ingredient_lots,
+        made_on=data.production_date,
     )
 
 

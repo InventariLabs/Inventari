@@ -11,6 +11,7 @@ import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import { QUANTITY_STEP } from "@/module-sdk";
 import { todayIso } from "@/utils/formatters";
 import { BestBeforeField } from "@/modules/maker/components/BestBeforeField";
+import { useOverproductionGuard } from "@/modules/maker/components/OverproductionGuard";
 import { useProposedBestBefore } from "@/modules/maker/hooks/useProposedBestBefore";
 import { useFinishProduction } from "@/modules/maker/hooks/useProduction";
 import type { ProductionOrder } from "@/modules/maker/types/maker";
@@ -29,6 +30,17 @@ export function FinishRunAction({ order }: { order: ProductionOrder }) {
   const [day, setDay] = useState(todayIso());
   const [lot, setLot] = useState("");
   const bestBefore = useProposedBestBefore(day, order.shelf_life_days);
+  const overproduction = useOverproductionGuard(order, qty);
+
+  // Every opening starts from empty fields: a refused or cancelled attempt
+  // leaves nothing behind to be confirmed again by accident.
+  function open() {
+    setQty("");
+    setDay(todayIso());
+    setLot("");
+    bestBefore.reset();
+    setAsking(true);
+  }
 
   function confirm() {
     setAsking(false);
@@ -43,12 +55,7 @@ export function FinishRunAction({ order }: { order: ProductionOrder }) {
         },
       },
       {
-        onSuccess: () => {
-          toast.success(t("progress.finishSuccess"));
-          setQty("");
-          setLot("");
-          bestBefore.reset();
-        },
+        onSuccess: () => toast.success(t("progress.finishSuccess")),
         onError: (err) =>
           toast.error(extractApiError(err, t("progress.finishFailed"))),
       },
@@ -60,7 +67,7 @@ export function FinishRunAction({ order }: { order: ProductionOrder }) {
       <Button
         leftIcon={<CheckCircle2 size={16} />}
         disabled={finish.isPending}
-        onClick={() => setAsking(true)}
+        onClick={open}
         data-testid="maker-detail-finish-button"
       >
         {t("progress.finish")}
@@ -72,6 +79,7 @@ export function FinishRunAction({ order }: { order: ProductionOrder }) {
         confirmLabel={t("progress.finish")}
         cancelLabel={t("create.cancel")}
         variant="default"
+        confirmDisabled={overproduction.blocked}
         onConfirm={confirm}
         onCancel={() => setAsking(false)}
       >
@@ -91,6 +99,7 @@ export function FinishRunAction({ order }: { order: ProductionOrder }) {
             data-testid="maker-finish-actual-qty-input"
           />
           <p className="text-xs text-on-muted">{t("progress.finishQtyHint")}</p>
+          {overproduction.notice}
           <DateInput
             label={t("progress.finishDay")}
             value={day}

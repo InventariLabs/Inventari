@@ -24,6 +24,7 @@ const baseRecipe: RecipeCatalogItem = {
   ingredient_count: 3,
   unit_cost: "5.00",
   uncosted_ingredients: 0,
+  last_run_overproduced: false,
   estimated_uncosted_ingredients: 0,
   reference_price: "8.00",
   result: "3.00",
@@ -99,6 +100,22 @@ describe("RecipeCard — the unit-cost line names its number", () => {
     });
 
     expect(screen.getByText("Unit cost")).toBeInTheDocument();
+  });
+});
+
+describe("RecipeCard — a run that made more than planned", () => {
+  it("says so under the unit cost after the last run", () => {
+    renderCard({ ...baseRecipe, last_run_overproduced: true });
+    expect(
+      screen.getByTestId("maker-recipe-unit-cost-overproduced").textContent,
+    ).toContain("made more than it planned");
+  });
+
+  it("says nothing when the last run made what it planned", () => {
+    renderCard(baseRecipe);
+    expect(
+      screen.queryByTestId("maker-recipe-unit-cost-overproduced"),
+    ).toBeNull();
   });
 });
 

@@ -303,7 +303,9 @@ async def create_recipe_from_culinary(
     whether the snapshot is its own litter or a record that was already
     there.
 
-    Raises ``LookupError`` when the culinary recipe is not found in the org.
+    Raises ``LookupError`` when the culinary recipe is not found in the org,
+    and ``ServiceRejectionError`` when an existing snapshot is asked for with
+    a batch yield other than its own.
     """
     # Lazy import — keeps the maker module loadable and the dependency
     # direction explicit (maker → recipes public API, never the reverse).
@@ -324,6 +326,17 @@ async def create_recipe_from_culinary(
     if existing is not None:
         recipe = await get_recipe(db, organization_id, existing)
         assert recipe is not None  # fetched by id from the same org
+        # The snapshot's BOM lines are scaled to its own yield, and the caller
+        # plans `yield x batches` against it. A different answer cannot be
+        # applied to a snapshot that orders may already use, and dropping it
+        # would plan the typed output against ingredients for another amount.
+        if (
+            data.batch_yield_qty is not None
+            and data.batch_yield_qty != recipe.batch_yield_qty
+        ):
+            raise ServiceRejectionError(
+                'bridge_yield_differs', qty=f'{recipe.batch_yield_qty.normalize():f}'
+            )
         return recipe, False
 
     snapshot = await recipes_api.get_recipe_snapshot_async(
@@ -1000,6 +1013,10 @@ class LastProduction:
     unit_cost: Decimal | None
     completed_at: datetime | None
     uncosted_ingredients: int = 0
+    #: The run closed with more than it planned, so its per-unit cost is the
+    #: cost of the whole batch spread over a quantity the ingredients did not
+    #: grow with.
+    overproduced: bool = False
 
 
 async def get_last_unit_costs(
@@ -1056,6 +1073,8 @@ async def get_last_unit_costs(
             unit_cost=unit_cost,
             completed_at=row.completed_at,
             uncosted_ingredients=uncosted.get(row.id, 0),
+            overproduced=row.actual_qty is not None
+            and row.actual_qty > row.planned_qty,
         )
     return costs
 

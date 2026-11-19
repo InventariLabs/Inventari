@@ -317,6 +317,7 @@ async def list_recipes(
                 ingredient_count=ingredient_counts.get(recipe.id, 0),
                 unit_cost=unit_cost,
                 uncosted_ingredients=uncosted,
+                last_run_overproduced=bool(last_run and last_run.overproduced),
                 estimated_unit_cost=estimated_unit_cost,
                 estimated_uncosted_ingredients=estimated_uncosted,
                 reference_price=recipe.reference_price,

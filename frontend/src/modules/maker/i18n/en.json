@@ -174,6 +174,7 @@
       "title": "Complete production run?",
       "description": "This consumes the listed ingredients and produces the output. While nothing it made has been used, Undo run takes it back.",
       "actualQtyLabel": "Actual quantity produced (optional)",
+      "madeOnLabel": "Day it was made",
       "actualQtyHint": "Leave empty to use planned quantity. Enter less for scrap, more for overproduction. Ingredients are consumed as planned regardless of the actual quantity."
     },
     "cancelConfirm": {
@@ -192,6 +193,7 @@
       "totalCostUndone": "Cost before the run was undone",
       "created": "Created",
       "productionDate": "Production date",
+      "plannedFor": "Planned for",
       "notes": "Notes",
       "actualQty": "Actual output",
       "plannedSuffix": "planned: {{qty}}",
@@ -486,7 +488,8 @@
     "unitCostAfterRun": "Unit cost after last run",
     "unitCostEstimated": "Estimated unit cost",
     "estimateCostIncomplete_one": "1 ingredient in this estimate has no purchase cost recorded.",
-    "estimateCostIncomplete_other": "{{count}} ingredients in this estimate have no purchase cost recorded."
+    "estimateCostIncomplete_other": "{{count}} ingredients in this estimate have no purchase cost recorded.",
+    "unitCostOverproduced": "The last run made more than it planned; this cost is spread over output the ingredients did not grow with."
   },
   "settings": {
     "title": "Production settings",
@@ -540,7 +543,9 @@
     "hintSource": "Set in the Production module's settings",
     "orders_one": "{{count}} run",
     "orders_other": "{{count}} runs",
-    "empty": "No completed runs with a result yet."
+    "empty": "No completed runs with a result yet.",
+    "overproduced_one": "{{count}} run closed above its plan; its result counts the extra output.",
+    "overproduced_other": "{{count}} runs closed above their plan; their result counts the extra output."
   },
   "whereUsed": {
     "title": "Used in BOMs",
@@ -868,5 +873,9 @@
       "planned_other": "{{count}} runs planned",
       "failed": "The runs could not be planned."
     }
+  },
+  "overproduction": {
+    "warning": "That is {{extra}} more than the {{planned}} planned. The ingredients stay as planned, so the cost per unit will come out much lower than a real batch.",
+    "confirm": "Yes, this run made that much"
   }
 }

@@ -174,6 +174,7 @@
       "title": "Terminer l'ordre ?",
       "description": "Consomme les ingrédients listés et fabrique le produit. Tant que rien de ce qu'elle a fabriqué n'a été utilisé, « Annuler la production » la reprend.",
       "actualQtyLabel": "Quantité réelle produite (facultatif)",
+      "madeOnLabel": "Jour de fabrication",
       "actualQtyHint": "Laisser vide pour la quantité prévue. Moins pour les pertes, plus pour la surproduction. Les ingrédients sont consommés comme prévu, quelle que soit la quantité réelle."
     },
     "cancelConfirm": {
@@ -192,6 +193,7 @@
       "totalCostUndone": "Coût avant l'annulation de la production",
       "created": "Créé",
       "productionDate": "Date de production",
+      "plannedFor": "Prévu pour",
       "notes": "Notes",
       "actualQty": "Production réelle",
       "plannedSuffix": "prévu : {{qty}}",
@@ -486,7 +488,8 @@
     "unitCostAfterRun": "Coût unitaire après la dernière production",
     "unitCostEstimated": "Coût unitaire estimé",
     "estimateCostIncomplete_one": "1 ingrédient de cette estimation n'a pas de prix d'achat enregistré.",
-    "estimateCostIncomplete_other": "{{count}} ingrédients de cette estimation n'ont pas de prix d'achat enregistré."
+    "estimateCostIncomplete_other": "{{count}} ingrédients de cette estimation n'ont pas de prix d'achat enregistré.",
+    "unitCostOverproduced": "La dernière production a donné plus que prévu ; ce coût est réparti sur une quantité que les ingrédients n’ont pas fait croître."
   },
   "settings": {
     "title": "Paramètres de production",
@@ -540,7 +543,9 @@
     "hintSource": "Défini dans les paramètres du module Production",
     "orders_one": "{{count}} opération",
     "orders_other": "{{count}} opérations",
-    "empty": "Aucune opération terminée avec résultat pour l'instant."
+    "empty": "Aucune opération terminée avec résultat pour l'instant.",
+    "overproduced_one": "{{count}} production a été clôturée au-dessus du plan ; son résultat compte la quantité en plus.",
+    "overproduced_other": "{{count}} productions ont été clôturées au-dessus du plan ; leur résultat compte la quantité en plus."
   },
   "whereUsed": {
     "title": "Utilisé dans des formules",
@@ -873,5 +878,9 @@
       "planned_other": "{{count}} ordres planifiés",
       "failed": "Les ordres n'ont pas pu être planifiés."
     }
+  },
+  "overproduction": {
+    "warning": "C’est {{extra}} de plus que les {{planned}} prévus. Les ingrédients restent ceux du plan, donc le coût unitaire sera bien plus bas que celui d’un vrai lot.",
+    "confirm": "Oui, la production a donné cette quantité"
   }
 }

@@ -183,11 +183,12 @@ def test_the_person_closing_the_run_names_another_best_before(
     )
     assert draft.status_code == 201, draft.text
 
-    keeps_until = date(2026, 11, 12)
+    made_on = date.today() - timedelta(days=3)
+    keeps_until = made_on + timedelta(days=10)
     done = client.post(
         f'{ORDERS}/{draft.json()["id"]}/complete',
         headers=mk_auth_headers,
-        json={'best_before': keeps_until.isoformat()},
+        json={'made_on': made_on.isoformat(), 'best_before': keeps_until.isoformat()},
     )
 
     assert done.status_code == 200, done.text

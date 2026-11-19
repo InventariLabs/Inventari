@@ -79,7 +79,7 @@ class TestSearchAndRead:
             storage_location_id=shelf.id,
             name='Uncatalogued Thing',
             barcode='5901234567890',
-            quantity=Decimal('2'),
+            quantity=Decimal('0'),
         )
         db_session.add(record)
         from tests.integration._shelf import anchor_pending_records

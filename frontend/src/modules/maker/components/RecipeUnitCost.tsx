@@ -55,17 +55,31 @@ export function RecipeUnitCost({
     </span>
   );
 
+  // The figure is the whole batch's cost over what came out: when the run
+  // made more than it planned, that is not what a normal batch costs.
+  const overproduced =
+    recipe.unit_cost != null && recipe.last_run_overproduced ? (
+      <span
+        className="block text-[10px] font-normal text-amber-700"
+        data-testid="maker-recipe-unit-cost-overproduced"
+      >
+        {t("catalog.unitCostOverproduced")}
+      </span>
+    ) : null;
+
   if (layout === "stacked") {
     return (
       <span className="inline-flex flex-col items-end">
         {value}
         <span className="text-[10px] font-normal text-on-muted">{label}</span>
+        {overproduced}
       </span>
     );
   }
   return (
     <>
       <span className="text-on-muted">{label}</span> {value}
+      {overproduced}
     </>
   );
 }
