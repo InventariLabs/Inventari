@@ -393,5 +393,16 @@ class AuditResponseItem(Base):
 
     @property
     def returned(self) -> bool:
-        """The asset came back after the request went out: nothing to attest."""
-        return self.assignment is not None and self.assignment.checked_in_at is not None
+        """The asset came back before it was answered, on a live campaign.
+
+        An answered item keeps its answer, and a closed campaign keeps the
+        record as it was when it closed: a return afterwards is a custody
+        move, not a change to who confirmed what.
+        """
+        return (
+            self.status == 'PENDING'
+            and self.response.campaign is not None
+            and self.response.campaign.status == 'ACTIVE'
+            and self.assignment is not None
+            and self.assignment.checked_in_at is not None
+        )

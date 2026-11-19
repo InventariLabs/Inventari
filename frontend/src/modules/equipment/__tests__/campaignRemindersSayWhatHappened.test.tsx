@@ -220,6 +220,28 @@ describe("a returned asset is not a person who has not answered", () => {
   });
 });
 
+describe("a closed campaign keeps the answers it recorded", () => {
+  it("reads an unanswered response as awaiting even once its assets came back", async () => {
+    server.use(
+      http.get(`/api/v1/equipment/campaigns/${CAMPAIGN_ID}`, () =>
+        HttpResponse.json({
+          ...campaign([response({ assets_returned: true })], {
+            total: 1,
+            pending: 1,
+          }),
+          status: "COMPLETED",
+        }),
+      ),
+    );
+    renderPage();
+
+    expect(
+      (await screen.findAllByText("Awaiting reply")).length,
+    ).toBeGreaterThan(0);
+    expect(screen.queryByText("Returned")).not.toBeInTheDocument();
+  });
+});
+
 describe("Complete asks first, here as on the list", () => {
   it("closes the campaign only after the question is answered", async () => {
     let completed = 0;
