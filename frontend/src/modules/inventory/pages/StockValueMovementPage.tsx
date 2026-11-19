@@ -72,14 +72,14 @@ export default function StockValueMovementPage() {
   const to = isDay(String(filters.values.to))
     ? String(filters.values.to)
     : today;
-  // A link that names only the last day (the stock-on-a-date screen's) means
-  // the month that day is in; a period whose first day came after its last
-  // would be refused, and the link would land on the refusal.
-  const monthOf = `${to.slice(0, 8)}01`;
-  const from = isDay(String(filters.values.from))
+  // No first day picked (a fresh page, or a link that names only the last
+  // day — the stock-on-a-date screen's): the server opens the period on the
+  // month that day is in, or on the first day its ledger can open on, so a
+  // new organization is shown a statement and not a refusal. The field then
+  // shows the day the statement came back for.
+  const pickedFrom = isDay(String(filters.values.from))
     ? String(filters.values.from)
-    : monthOf;
-
+    : null;
   useEffect(() => {
     setHeader({
       title: t("inventory:valueMovement.title"),
@@ -87,7 +87,9 @@ export default function StockValueMovementPage() {
     });
   }, [setHeader, t]);
 
-  const query = { date_from: from, date_to: to };
+  const query = pickedFrom
+    ? { date_from: pickedFrom, date_to: to }
+    : { date_to: to };
   const {
     data: statement,
     isLoading,
@@ -95,6 +97,7 @@ export default function StockValueMovementPage() {
     error,
     refetch,
   } = useStockValueMovement(query, showInventoryValue);
+  const from = pickedFrom ?? statement?.date_from ?? `${to.slice(0, 8)}01`;
 
   const download = async () => {
     try {

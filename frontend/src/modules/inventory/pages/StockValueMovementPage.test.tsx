@@ -6,7 +6,7 @@ import userEvent from "@testing-library/user-event";
 import { renderWithProviders } from "@/test/utils";
 import { PageHeaderContext } from "@/hooks/useModulePageHeader";
 import { stockValueMovementApi } from "@/modules/inventory/api/stockValueMovement";
-import { todayIso } from "@/utils/formatters";
+import { formatDate, todayIso } from "@/utils/formatters";
 import StockValueMovementPage from "./StockValueMovementPage";
 
 const mocks = vi.hoisted(() => ({
@@ -92,17 +92,35 @@ describe("StockValueMovementPage", () => {
     mocks.state.error = undefined;
   });
 
-  it("opens on the current month and asks for it", () => {
+  it("opens without a first day and shows the one the statement came back for", () => {
     renderPage();
 
-    const today = todayIso();
+    // The server picks the first day it can report, so an organization in
+    // its first month is not shown a refusal.
+    expect(mocks.asked[0]).toEqual({ date_to: todayIso() });
+    expect(screen.getByRole("combobox", { name: "From" })).toHaveTextContent(
+      formatDate("2026-06-01"),
+    );
+  });
+
+  it("asks for the first day it was linked to", () => {
+    render(
+      <PageHeaderContext.Provider value={{ data: {}, setHeader: vi.fn() }}>
+        <QueryClientProvider client={new QueryClient()}>
+          <MemoryRouter initialEntries={["/?from=2026-06-10&to=2026-06-30"]}>
+            <StockValueMovementPage />
+          </MemoryRouter>
+        </QueryClientProvider>
+      </PageHeaderContext.Provider>,
+    );
+
     expect(mocks.asked[0]).toEqual({
-      date_from: `${today.slice(0, 8)}01`,
-      date_to: today,
+      date_from: "2026-06-10",
+      date_to: "2026-06-30",
     });
   });
 
-  it("opens on the month of a day it is linked to, not on one that starts after it", () => {
+  it("leaves the first day to the server for a link that names only the last", () => {
     // The stock-on-a-date screen links here with the day alone.
     render(
       <PageHeaderContext.Provider value={{ data: {}, setHeader: vi.fn() }}>
@@ -114,10 +132,7 @@ describe("StockValueMovementPage", () => {
       </PageHeaderContext.Provider>,
     );
 
-    expect(mocks.asked[0]).toEqual({
-      date_from: "2026-06-01",
-      date_to: "2026-06-30",
-    });
+    expect(mocks.asked[0]).toEqual({ date_to: "2026-06-30" });
   });
 
   it("gives a dispatch its own line once it holds something", () => {
@@ -201,15 +216,13 @@ describe("StockValueMovementPage", () => {
     await user.click(screen.getByRole("button", { name: "Export" }));
 
     const today = todayIso();
-    const first = `${today.slice(0, 8)}01`;
     await waitFor(() =>
       expect(mocks.downloadBlob).toHaveBeenCalledWith(
         blob,
-        `value_movement_${first}_${today}.xlsx`,
+        `value_movement_2026-06-01_${today}.xlsx`,
       ),
     );
     expect(stockValueMovementApi.exportXlsx).toHaveBeenCalledWith({
-      date_from: first,
       date_to: today,
     });
   });
