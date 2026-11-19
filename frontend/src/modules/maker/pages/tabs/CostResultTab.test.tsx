@@ -81,6 +81,9 @@ describe("CostResultTab when nobody has priced the ingredients", () => {
       output_template_id: "tpl-1",
       planned_qty: "1",
       total_cost: "0.00",
+      ingredients_cost: "0.00",
+      fixed_cost: "0.00",
+      labour_cost: "0.00",
       entries: [entry, { ...entry, child_template_id: "tpl-honey" }],
       missing_cost_lines: ["tpl-oats", "tpl-honey"],
       recipe_state: "has_lines",
@@ -132,6 +135,9 @@ describe("CostResultTab when some ingredients are priced", () => {
       output_template_id: "tpl-1",
       planned_qty: "1",
       total_cost: "10.00",
+      ingredients_cost: "10.00",
+      fixed_cost: "0.00",
+      labour_cost: "0.00",
       entries: [
         { ...entry, unit_cost: "5.00", cost: "10.00", cost_source: "avco" },
         { ...entry, child_template_id: "tpl-honey" },
@@ -157,6 +163,45 @@ describe("CostResultTab when some ingredients are priced", () => {
     ).toBeGreaterThan(0);
   });
 
+  it("reads the unit cost from the estimate's total, which already carries the fixed lines and the labour", () => {
+    // 50.00 of ingredients + 10.00 fixed + 0.00 labour = 60.00 over a yield
+    // of 5. Adding the recipe's own fixed line to a total that holds it
+    // already would read 14.00.
+    breakdown = {
+      ...breakdown!,
+      total_cost: "60.00",
+      ingredients_cost: "50.00",
+      fixed_cost: "10.00",
+      entries: [
+        { ...entry, unit_cost: "25.00", cost: "50.00", cost_source: "avco" },
+      ],
+      missing_cost_lines: [],
+    };
+    render(
+      <QueryWrapper>
+        <CostResultTab
+          recipe={{
+            ...recipe,
+            cost_lines: [
+              {
+                id: "cl-1",
+                recipe_id: "r-1",
+                kind: "PACKAGING",
+                label: "Jar",
+                amount: "10.00",
+                sort_order: 0,
+              },
+            ],
+          }}
+        />
+      </QueryWrapper>,
+    );
+
+    const tile = screen.getByText("Estimated unit cost").closest("div");
+    expect(tile?.textContent).toMatch(/12[.,]00/);
+    expect(tile?.textContent).not.toMatch(/14[.,]00/);
+  });
+
   it("still states the savings, because the cost is a figure", () => {
     renderTab();
 
@@ -171,6 +216,9 @@ describe("CostResultTab when some ingredients are priced", () => {
       output_template_id: "tpl-1",
       planned_qty: "1",
       total_cost: "10.00",
+      ingredients_cost: "10.00",
+      fixed_cost: "0.00",
+      labour_cost: "0.00",
       entries: [
         {
           ...entry,

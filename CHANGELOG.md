@@ -286,6 +286,12 @@ says what the release does rather than what changed since them.
   refusal because the page opened on a period starting before its ledger. The
   statement now opens on the first day it can report when no first day is
   picked.
+- The sale price calculator and the per-product cost estimate now count the
+  formula's fixed costs and the labour its timed steps take, not only the
+  ingredients. A batch that cost 25.28 a kilogram was priced from 11.28, so
+  the suggested price sat below what the run cost; the calculator now lists
+  the three parts under the total, and the production preview's total matches
+  the per-unit figure beside it.
 - A fixed cost line of a production BOM can no longer be saved with a negative
   amount, which lowered the BOM's unit cost, the run preview and the cost of
   every run after it. The refusal appears beside the Amount field with what was

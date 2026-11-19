@@ -121,6 +121,27 @@ describe("PricingCalculator", () => {
     ).toBeGreaterThan(0);
   });
 
+  it("shows what the cost is made of, so a figure that leaves one out cannot pass unseen", async () => {
+    await preview({
+      template_id: "t-1",
+      produced_qty: "10",
+      total_cost: "252.80",
+      ingredients_cost: "112.80",
+      fixed_cost: "20.00",
+      labour_cost: "120.00",
+      unit_cost: "25.28",
+      target_margin_pct: "30",
+      unit_sale_price: "36.11",
+      ingredient_count: 3,
+      unrated_ingredient_count: 0,
+    });
+
+    const parts = await screen.findByTestId("maker-pricing-cost-parts");
+    expect(parts.textContent).toMatch(/Ingredients.*112[.,]80/);
+    expect(parts.textContent).toMatch(/Fixed costs.*20[.,]00/);
+    expect(parts.textContent).toMatch(/Labour.*120[.,]00/);
+  });
+
   it("says a product with no formula has no formula, not an empty one", async () => {
     signInWith(["maker:read", "maker:write", "maker:manage"]);
     await preview({
