@@ -16,13 +16,14 @@ import {
   writeJson,
 } from "@/module-sdk";
 import type { SlotDataMap } from "@/lib/moduleRegistry";
+import type { UomCategory } from "@/types";
 import { ProductSearchInput } from "./ProductSearchInput";
 import { ShortageModal } from "./ShortageModal";
 import { parseShortageError } from "../lib/shortageError";
 import { extractApiError } from "@/lib/errors";
 import { QueryFailure } from "@/components/ui/QueryResult";
 import { unitLabel } from "@/lib/i18nHelpers";
-import { isCountedUom, useUoms } from "@/modules/shared/hooks/useUoms";
+import { findUom, isCountedUom, useUoms } from "@/modules/shared/hooks/useUoms";
 import {
   createMakerRecipeFromCulinary,
   createProductionOrderFromBridge,
@@ -63,6 +64,28 @@ function readLastOutputLocation(): string {
   // claim, not one.
   const stored = readJson<unknown>(LAST_OUTPUT_LOCATION_KEY, "");
   return typeof stored === "string" ? stored : "";
+}
+
+/**
+ * The output product's unit as this sheet needs it.
+ *
+ * Servings are a count of portions. They stand for the batch's yield only
+ * where the product is counted too (a piece, a pack) or has no unit yet; a
+ * product kept in kilograms or litres is asked how much a batch makes, never
+ * handed the number of servings — twelve servings are not twelve kilograms.
+ * Until the unit catalogue has loaded a product with a unit is asked. The
+ * product search does not always carry the unit's symbol; the catalogue names
+ * it by id.
+ */
+function outputUnit(
+  categories: UomCategory[] | undefined,
+  product: SelectedProduct | null,
+) {
+  return {
+    servingsFit: !product?.uom_id || isCountedUom(categories, product.uom_id),
+    unitSymbol:
+      findUom(categories, product?.uom_id)?.symbol ?? product?.uom_symbol,
+  };
 }
 
 /**
@@ -163,15 +186,9 @@ export function CookForStockModal({
 
   const { data: uomCategories } = useUoms();
 
-  // Servings are a count of portions. They stand for the batch's yield only
-  // where the product is counted too (a piece, a pack) or has no unit yet; a
-  // product kept in kilograms or litres is asked how much a batch makes, never
-  // handed the number of servings — twelve servings are not twelve kilograms.
-  // Until the unit catalogue has loaded a product with a unit is asked.
-  const servingsFit =
-    !product?.uom_id || isCountedUom(uomCategories, product.uom_id);
+  const { servingsFit, unitSymbol } = outputUnit(uomCategories, product);
   const yieldText = batchYield ?? (servingsFit ? String(recipe.servings) : "");
-  const unit = unitLabel(t, product?.uom_symbol);
+  const unit = unitLabel(t, unitSymbol);
   const { yieldNum, validYield, scaleNum, validScale, plannedQty } = planBatch(
     yieldText,
     scale,

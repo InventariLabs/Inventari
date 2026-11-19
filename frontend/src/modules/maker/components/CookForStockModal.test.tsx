@@ -271,7 +271,8 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
         product_template_id: "tpl-jam",
         name: "Jam Jar",
         uom_id: "uom-kg",
-        uom_symbol: "kg",
+        // The search result may not carry the symbol; the catalogue does.
+        uom_symbol: null,
       };
     });
 
