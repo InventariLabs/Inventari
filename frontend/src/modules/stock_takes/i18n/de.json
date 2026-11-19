@@ -48,6 +48,7 @@
     "startedAt": "Begonnen am",
     "completedAt": "Abgeschlossen am",
     "startedBy": "Begonnen von",
+    "record": "Charge und Bestand",
     "closedLocations": "Abgeschlossene Lagerorte",
     "closedEmpty": "Leer",
     "closedCounted": "Abgeschlossen",

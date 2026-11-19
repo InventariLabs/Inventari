@@ -279,6 +279,12 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Counting a location that has sub-locations now tells two records of one
+  product apart. The count cards and the scan chooser show the expiry of
+  items standing on any depth below the counted location, so a scan no longer
+  adds one to whichever of two identical rows is tapped. The completed report
+  and its CSV export carry the same expiry and record number the counting
+  screen shows.
 - Picking several documents from the list no longer ends in a dead end when
   one of them is already in a picking session. If the session is your own —
   opened on a phone and left — the dialog says so and offers **Continue that

@@ -5,7 +5,7 @@ import { toAmount } from "@/utils/formatters";
 import type { StockTakeItem } from "@/modules/stock_takes/types/stock-takes";
 import type { StockTakeDiscrepancyCode } from "@/modules/stock_takes/discrepancyCodes";
 import StockTakeItemCard from "./StockTakeItemCard";
-import { recordMarks, type Twin } from "@/modules/stock_takes/recordMarks";
+import { numberTwins, recordMarks } from "@/modules/stock_takes/recordMarks";
 
 interface Props {
   allItemIds: string[];
@@ -92,30 +92,18 @@ export default function StockTakeItemsList({
   // so neither the eye nor a screen reader meets the same row twice. Grouped
   // over the whole count, not the rows a filter leaves, so a row keeps its
   // number when the discrepancy filter hides its siblings.
-  const twinOf = new Map<string, Twin>();
-  const twinGroups = new Map<string, string[]>();
-  for (const itemId of allItemIds) {
-    const key = [
-      getStockTakeItem(itemId)?.location_id,
-      getItemById(itemId)?.name ?? getStockTakeItem(itemId)?.item_name,
-      ...recordMarks(t, getItemById(itemId), getStockTakeItem(itemId)),
-    ].join("|");
-    twinGroups.set(key, [...(twinGroups.get(key) ?? []), itemId]);
-  }
-  for (const ids of twinGroups.values()) {
-    if (ids.length < 2) continue;
-    [...ids]
-      .sort(
-        (a, b) => addedAt(a).localeCompare(addedAt(b)) || a.localeCompare(b),
-      )
-      .forEach((id, index) =>
-        twinOf.set(id, {
-          position: index + 1,
-          of: ids.length,
-          added: addedAt(id) || null,
-        }),
-      );
-  }
+  const twinOf = numberTwins(
+    allItemIds.map((itemId) => ({
+      id: itemId,
+      key: [
+        getStockTakeItem(itemId)?.location_id,
+        getItemById(itemId)?.name ?? getStockTakeItem(itemId)?.item_name,
+        ...recordMarks(t, getItemById(itemId), getStockTakeItem(itemId)),
+      ].join("|"),
+      added: addedAt(itemId),
+    })),
+    (a, b) => a.localeCompare(b),
+  );
 
   const levelMatches = (itemId: string): boolean => {
     if (!locationLevelFilter) return true;
