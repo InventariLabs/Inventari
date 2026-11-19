@@ -48,13 +48,15 @@ export function campaignScopeLabel(t: TFunction, scopeType: string): string {
 /**
  * The status a response is shown with. An unanswered response whose assets
  * have all come back is not waiting for anybody: it read "Awaiting reply"
- * while the person's own link already said "Already Returned".
+ * while the person's own link already said "Already Returned". Only a live
+ * campaign reads that way: a closed one keeps the answer it recorded, however
+ * the assets moved afterwards.
  */
-export function responseDisplayStatus(response: {
-  status: string;
-  assets_returned?: boolean;
-}): string {
-  return response.status === "PENDING" && response.assets_returned
+export function responseDisplayStatus(
+  response: { status: string; assets_returned?: boolean },
+  live = true,
+): string {
+  return live && response.status === "PENDING" && response.assets_returned
     ? "RETURNED"
     : response.status;
 }

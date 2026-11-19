@@ -222,9 +222,12 @@ function ResponsesTable({
   campaignId,
   canHandOver,
   canSendEmail,
+  live,
 }: {
   responses: CampaignResponseRecord[];
   campaignId: string;
+  /** The campaign is still open: a closed one keeps the answers it recorded. */
+  live: boolean;
   /** Links can be given out: the reader may write and the campaign is live. */
   canHandOver: boolean;
   canSendEmail: boolean;
@@ -300,7 +303,7 @@ function ResponsesTable({
                   )}
                 </td>
                 <td className="py-2 pr-4">
-                  <ResponseBadge status={responseDisplayStatus(r)} />
+                  <ResponseBadge status={responseDisplayStatus(r, live)} />
                   {canHandOver && needsHandingOver(r, canSendEmail) && (
                     <CopyLinkButton campaignId={campaignId} responseId={r.id} />
                   )}
@@ -321,6 +324,7 @@ function ResponsesTable({
         campaignId={campaignId}
         canHandOver={canHandOver}
         canSendEmail={canSendEmail}
+        live={live}
       />
     </>
   );
@@ -340,9 +344,12 @@ function ResponsesCards({
   campaignId,
   canHandOver,
   canSendEmail,
+  live,
 }: {
   responses: CampaignResponseRecord[];
   campaignId: string;
+  /** The campaign is still open: a closed one keeps the answers it recorded. */
+  live: boolean;
   canHandOver: boolean;
   canSendEmail: boolean;
 }) {
@@ -360,7 +367,7 @@ function ResponsesCards({
                 {r.assignee_email}
               </div>
             </div>
-            <ResponseBadge status={responseDisplayStatus(r)} />
+            <ResponseBadge status={responseDisplayStatus(r, live)} />
           </div>
           {canHandOver && needsHandingOver(r, canSendEmail) && (
             <CopyLinkButton campaignId={campaignId} responseId={r.id} />
@@ -619,6 +626,7 @@ export default function CampaignDetailPage() {
             campaignId={campaign.id}
             canHandOver={canWrite && campaign.status === "ACTIVE"}
             canSendEmail={canSendEmail}
+            live={campaign.status === "ACTIVE"}
           />
         )}
       </Card>

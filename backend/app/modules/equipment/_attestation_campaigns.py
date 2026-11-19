@@ -157,7 +157,16 @@ def _calc_stats(responses: list[AuditResponse]) -> dict[str, Any]:
     # A response nobody answered because the assets came back first is
     # closed, not pending: counting it as waiting kept the campaign short
     # of 100% forever and put the person back on the reminder list.
-    returned = sum(1 for r in responses if r.status == 'PENDING' and r.assets_returned)
+    # A closed campaign keeps the record it closed with: a return afterwards
+    # does not turn an unanswered response into a returned one.
+    returned = sum(
+        1
+        for r in responses
+        if r.status == 'PENDING'
+        and r.assets_returned
+        and r.campaign is not None
+        and r.campaign.status == 'ACTIVE'
+    )
     pending = sum(1 for r in responses if r.status == 'PENDING') - returned
     expired = sum(1 for r in responses if r.status == 'EXPIRED')
     return {
