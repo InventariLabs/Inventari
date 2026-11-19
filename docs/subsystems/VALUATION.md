@@ -111,7 +111,12 @@ location or a search leaves it out.
 what moved it, and what it was worth when it closed. The two ends are the
 stock-on-a-date report itself, asked for the evening before the first day and
 for the last — the closing is that report's figure, not a second
-implementation. The lines between them come from the layers dated inside the
+implementation. A bare date is a whole day on the organization's calendar
+(`core_api.organizations.timezone_async`): the evening before the first day
+and the end of the last are cut at the organization's midnight, not at
+midnight UTC. Without `date_from` the period opens on the first day of the
+month of `date_to`, or on the day after the ledger's first movement when that
+is later. The lines between them come from the layers dated inside the
 period, cut with the same expression as the report (`layer_dated_at`): inflows
 split by `internal`, outflows by `reason` (used, disposed) and by whether a
 document line stands behind them (dispatched), everything else last.

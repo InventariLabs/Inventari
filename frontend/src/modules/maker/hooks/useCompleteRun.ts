@@ -58,6 +58,10 @@ export function useCompleteRun(order: ProductionOrder | undefined) {
 
   function setShowConfirm(open: boolean) {
     if (open) {
+      // Every opening starts from an empty quantity (a refused attempt
+      // leaves nothing behind to be confirmed again by accident), today as
+      // the day made and the best-before proposed from that day.
+      setActualQty("");
       setMadeOn(todayIso());
       proposed.reset();
     }

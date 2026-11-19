@@ -53,6 +53,12 @@ export function StartRunAction({
   );
   const batches = useBatchChoice(batchQuery);
 
+  // Every opening starts from today, not from a refused attempt's day.
+  function open() {
+    setDay(todayIso());
+    setAsking(true);
+  }
+
   function confirm() {
     setAsking(false);
     start.mutate(
@@ -97,7 +103,7 @@ export function StartRunAction({
         variant="outline"
         leftIcon={<Play size={16} />}
         disabled={start.isPending}
-        onClick={() => setAsking(true)}
+        onClick={open}
         data-testid="maker-detail-start-button"
       >
         {t("progress.start")}
