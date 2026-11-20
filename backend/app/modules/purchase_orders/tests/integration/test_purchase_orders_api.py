@@ -2041,7 +2041,7 @@ class TestUomPropagation:
         po_partner: Any,
         po_template: Any,
     ) -> None:
-        """PO line without uom_id has uom_id=None and uom_symbol=None."""
+        """A product with no unit leaves the line without a symbol either."""
         response = client.post(
             '/api/v1/purchase-orders',
             headers=po_auth_headers,
@@ -2060,6 +2060,41 @@ class TestUomPropagation:
         line = response.json()['lines'][0]
         assert line['uom_id'] is None
         assert line['uom_symbol'] is None
+
+    def test_po_line_without_uom_id_takes_the_products_unit(
+        self,
+        client: TestClient,
+        po_auth_headers: dict[str, str],
+        db_session: Session,
+        po_org: Any,
+        po_partner: Any,
+        po_template_with_uom: Any,
+    ) -> None:
+        """A line created from a product names that product's unit.
+
+        A client that names the product and no unit leaves the column empty,
+        and every screen printed a bare number — the receive sheet's "Still
+        due" and "Arrived" columns among them. The product's own unit is the
+        answer the line meant.
+        """
+        response = client.post(
+            '/api/v1/purchase-orders',
+            headers=po_auth_headers,
+            json={
+                'partner_id': str(po_partner.id),
+                'lines': [
+                    {
+                        'product_template_id': str(po_template_with_uom.id),
+                        'quantity_ordered': 10,
+                        'unit_price': '5.00',
+                    }
+                ],
+            },
+        )
+        assert response.status_code == status.HTTP_201_CREATED
+        line = response.json()['lines'][0]
+        assert line['uom_id'] is None
+        assert line['uom_symbol'] == 'kg'
 
     def test_get_po_returns_uom_on_lines(
         self,

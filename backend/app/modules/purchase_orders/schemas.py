@@ -134,6 +134,13 @@ class PurchaseOrderLineSchema(BaseModel):
         template = (
             data.product_template if 'product_template' not in state.unloaded else None
         )
+        # A line created from a product template names that product's unit
+        # even when the request did not repeat it: the order form sends both,
+        # but a client that names only the product left the line without one
+        # and every screen printed a bare number. An explicit unit on the
+        # line still wins -- a supplier may sell in boxes.
+        if uom is None and template is not None:
+            uom = template.uom
         # The UI always sends a name; the API path (a line created from a
         # product template with no name) stored an empty one, and the reader
         # met a row that named nothing. The template is one relationship
