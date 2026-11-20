@@ -486,6 +486,7 @@ apart.
 | `ONLY_IMAGE_FILES_ALLOWED` | Only image files are allowed (jpg, png, gif, webp) |
 | `ORGANIZATION_CURRENCY_MISSING` | Organization currency not configured |
 | `ORGANIZATION_INVITE_INVALID` | This invitation can't be used. Check that you are registering with the e-mail address it was sent to, or ask for a new one. |
+| `ORGANIZATION_NAME_REQUIRED` | Organization name cannot be empty. |
 | `ORGANIZATION_NOT_FOUND` | Organization not found |
 | `ORGANIZATION_REQUIRED` | Organization required |
 | `OVER_RECEIPT_PAST_CEILING` | Receiving {quantity} against {basis} goes past the {ceiling}% over-receipt ceiling — nobody may receive that much |
