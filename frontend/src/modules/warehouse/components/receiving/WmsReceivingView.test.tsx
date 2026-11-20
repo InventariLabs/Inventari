@@ -773,7 +773,7 @@ describe("WmsReceivingView", () => {
     expect(await screen.findByText("Receiving complete")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Closing this summary completes the document and books the stock.",
+        "\u201cComplete and post stock\u201d completes the document and books the stock. Leaving this summary any other way keeps the document open, as received.",
       ),
     ).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
@@ -782,6 +782,27 @@ describe("WmsReceivingView", () => {
       screen.getByRole("button", { name: "Complete and post stock" }),
     );
     expect(onClose).toHaveBeenCalledExactlyOnceWith(true);
+  });
+
+  it("leaves the summary by Escape with the document still open, as received", async () => {
+    // The button books the stock; every other way out keeps the document
+    // open, as the picking summary does.
+    const finished = buildSession();
+    finished.status = "completed";
+    finished.received_lines = 1;
+    finished.pending_lines = 0;
+    finished.lines = [
+      { ...finished.lines[0], status: "received", received_quantity: 5 },
+    ];
+    server.use(http.post(START_PATH, () => HttpResponse.json(finished)));
+    const onClose = vi.fn();
+
+    render(<WmsReceivingView documentId={DOCUMENT_ID} onClose={onClose} />);
+    expect(await screen.findByText("Receiving complete")).toBeInTheDocument();
+
+    await userEvent.keyboard("{Escape}");
+
+    expect(onClose).toHaveBeenCalledExactlyOnceWith(false);
   });
 
   it("reopens on the summary of a session that finished without completing the document", async () => {

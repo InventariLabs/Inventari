@@ -318,8 +318,8 @@ function ApprovalRequestCard({
       <CardContent className="p-5">
         {/* Two columns from xl (UI_GUIDELINES §3.2b): the document facts sit
             beside the approval progress instead of stacking into a tall
-            half-empty card. Below xl the decision block still comes first
-            (order-1), the facts after it. */}
+            half-empty card. Below xl they stack in reading order — what is
+            approved (order-1), then the decision (order-2). */}
         <div className="grid grid-cols-1 gap-x-8 gap-y-4 xl:grid-cols-12">
           {/* the number is the link to the document. "Open document"
               beside it pointed at the same place — two links, one target,
@@ -366,8 +366,10 @@ function ApprovalRequestCard({
             </div>
           </div>
 
-          {/* The facts of what is being decided. */}
-          <section className="flex flex-col gap-3 order-2 xl:order-1 xl:col-span-7">
+          {/* The facts of what is being decided. On a phone they come
+              first: the approver reads what the document is, who sent it and
+              what it is worth before the button that signs it off. */}
+          <section className="flex flex-col gap-3 order-1 xl:order-1 xl:col-span-7">
             {/* Requester prominent (mirrors ApprovalsDashboard); how long
                 the request has waited is part of the decision. Both are the
                 request's: the document's author and creation date are
@@ -456,7 +458,7 @@ function ApprovalRequestCard({
               own rule: the shared panel keeps the caption and the action row
               together at the column's edge. */}
           {approval && (
-            <section className="flex flex-col gap-4 order-1 xl:order-2 xl:col-span-5 xl:border-l xl:border-border xl:pl-8">
+            <section className="flex flex-col gap-4 order-2 xl:order-2 xl:col-span-5 xl:border-l xl:border-border xl:pl-8">
               {/* Inline approve/reject via the shared decision panel. The
                   adapters route through the document-specific endpoints so
                   the approve triggers the atomic confirm transition and

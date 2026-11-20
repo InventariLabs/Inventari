@@ -13,7 +13,10 @@ import type { SkipOutcome } from "../SkippedLineAnswers";
 
 interface Props {
   lines: WmsReceiveLine[];
+  /** The button: completes the document and books the stock. */
   onClose: () => void;
+  /** Escape or a tap outside: leaves the document open, as received. */
+  onLeave?: () => void;
   /** Called once, when the summary first appears. */
   onShown?: () => void;
   /** Takes a skip back: the line returns to the list to be received. */
@@ -30,6 +33,7 @@ interface Props {
 export default function WmsReceivingSummary({
   lines,
   onClose,
+  onLeave,
   onShown,
   onUndoSkip,
   onAnswerSkip,
@@ -74,10 +78,9 @@ export default function WmsReceivingSummary({
   return (
     <Sheet
       open
-      onClose={close}
-      // Closing books the stock, so the only way out is the button that
-      // says so: no corner X, and neither Escape nor the backdrop.
-      dismissible={false}
+      // The button completes the document; every other way out leaves it
+      // open, as received — the way the picking summary reads.
+      onClose={() => onLeave?.()}
       zIndex="modal"
       maxWidth="md"
       aria-label={t("receiving.summary.title")}

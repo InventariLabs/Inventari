@@ -232,15 +232,6 @@ export default function WmsReceiveLineRow({
         {shelfState && line.status === "pending" && (
           <ShelfConfirmation state={shelfState} kind="receiving" />
         )}
-        {canPick && (
-          <ShelfSelect
-            value={targetLocationId ?? null}
-            plannedId={line.planned_location_id}
-            disabled={targetChangePending}
-            onChange={(target) => onTargetChange?.(line, target)}
-            wrapperClassName="mt-1.5 max-w-full"
-          />
-        )}
       </div>
 
       <div className="ml-auto flex shrink-0 items-center gap-2">
@@ -312,6 +303,22 @@ export default function WmsReceiveLineRow({
           </Button>
         )}
       </div>
+
+      {/* The shelf picker takes a row of its own, the same row on every
+          line: inside the text column its width followed the product name,
+          so one line squeezed it beside the count and cut "Follow the
+          plan…" while the next gave it the full width. */}
+      {canPick && (
+        <div className="basis-full">
+          <ShelfSelect
+            value={targetLocationId ?? null}
+            plannedId={line.planned_location_id}
+            disabled={targetChangePending}
+            onChange={(target) => onTargetChange?.(line, target)}
+            wrapperClassName="mt-1.5 max-w-full"
+          />
+        </div>
+      )}
     </div>
   );
 }
