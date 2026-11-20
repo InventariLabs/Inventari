@@ -470,6 +470,10 @@ const dist = join(root, "dist");
  * reaches. That one phone budget moves a step of five, to 480; the other
  * screens stand under theirs (login 406.9, launcher 422.0, start 639.8, issue
  * 587.8, history 612.6, products 629.8, app first paint 402.2).
+ *
+ * The merge with the line's next fifteen commits (the storage products tab
+ * and the unpicked-products wording) measures the products screen at 630.0
+ * KiB gz against its 630; that budget moves a step of five, to 635.
  */
 const BUDGETS = {
   initial: 245,

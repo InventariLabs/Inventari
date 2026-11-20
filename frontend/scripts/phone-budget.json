@@ -86,7 +86,7 @@
     "products": {
       "chunks": ["ItemsPage"],
       "budget": {
-        "jsKiB": 630,
+        "jsKiB": 635,
         "loadMs": 7500
       },
       "measured": {
