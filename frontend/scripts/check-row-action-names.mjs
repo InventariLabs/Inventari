@@ -262,7 +262,7 @@ function derivedInside(body, names) {
 
 /** The label as a person would recognise it, for the baseline. */
 function labelOf(name) {
-  const match = /^t\(\s*["']([^"']+)["']/.exec(name);
+  const match = /t\(\s*["']([^"']+)["']/.exec(name);
   if (match) return match[1];
   return name
     .replace(/\s+/g, " ")
