@@ -4,7 +4,9 @@ import { Check, Pencil, X } from "lucide-react";
 import { toast } from "sonner";
 import { extractApiError } from "@/lib/errors";
 import { Button } from "@/components/ui/Button";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/Input";
+import { useOpenDraftsOfRecipe } from "@/modules/maker/hooks/useOpenDraftsOfRecipe";
 import { useUpdateMakerRecipe } from "@/modules/maker/hooks/useRecipes";
 import { formatDecimalQty } from "@/utils/formatters";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
@@ -22,6 +24,10 @@ export function BatchYieldEditor({ recipe }: BatchYieldEditorProps) {
   const updateRecipe = useUpdateMakerRecipe();
   // null = not editing; otherwise the draft yield value.
   const [yieldDraft, setYieldDraft] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
+  // The open drafts take their quantities from the BOM when they close, so a
+  // new yield changes each of them: the person is asked first, with the count.
+  const openDrafts = useOpenDraftsOfRecipe(recipe, yieldDraft !== null);
 
   // The server names the unit: the BOM's own, or its product's when the BOM
   // stores none — looking up batch_yield_uom_id alone left the second case,
@@ -32,7 +38,7 @@ export function BatchYieldEditor({ recipe }: BatchYieldEditorProps) {
     recipe.batch_yield_uom_symbol,
   );
 
-  async function saveYield() {
+  function askOrSaveYield() {
     if (yieldDraft === null) return;
     const value = yieldDraft.trim();
     if (value === "" || Number.isNaN(Number(value)) || Number(value) <= 0) {
@@ -41,6 +47,14 @@ export function BatchYieldEditor({ recipe }: BatchYieldEditorProps) {
       toast.error(t("composition.errors.yieldInvalid"));
       return;
     }
+    if (openDrafts > 0) setConfirming(true);
+    else void saveYield();
+  }
+
+  async function saveYield() {
+    if (yieldDraft === null) return;
+    const value = yieldDraft.trim();
+    setConfirming(false);
     try {
       await updateRecipe.mutateAsync({
         recipeId: recipe.id,
@@ -53,61 +67,78 @@ export function BatchYieldEditor({ recipe }: BatchYieldEditorProps) {
     }
   }
 
-  return yieldDraft === null ? (
-    <div className="flex flex-col items-end gap-1 shrink-0">
-      <Button
-        size="contentSm"
-        variant="ghost"
-        className="h-7 min-h-11 md:min-h-0 shrink-0"
-        onClick={() => setYieldDraft(formatDecimalQty(recipe.batch_yield_qty))}
-        aria-label={t("composition.batchYieldEdit")}
-        data-testid="maker-yield-edit"
-      >
-        <span className="text-xs text-on-muted">
-          {t("composition.batchYield", { qty: yieldText })}
-        </span>
-        <Pencil size={12} />
-      </Button>
-    </div>
-  ) : (
-    <div className="flex flex-col items-end gap-1 shrink-0">
-      <div className="flex items-center gap-1.5">
-        <span className="text-xs text-on-muted">
-          {t("composition.batchYieldLabel")}
-        </span>
-        <Input
-          wrapperClassName="w-20"
-          type="number"
-          step="any"
-          min="0"
-          value={yieldDraft}
-          onChange={(e) => setYieldDraft(e.target.value)}
-          className="h-8 text-sm"
-          aria-label={t("composition.batchYieldLabel")}
-          data-testid="maker-yield-input"
-        />
+  const field =
+    yieldDraft === null ? (
+      <div className="flex flex-col items-end gap-1 shrink-0">
         <Button
-          size="sm"
+          size="contentSm"
           variant="ghost"
-          onClick={saveYield}
-          disabled={updateRecipe.isPending}
-          aria-label={t("common:actions.save")}
-          data-testid="maker-yield-save"
+          className="h-7 min-h-11 md:min-h-0 shrink-0"
+          onClick={() =>
+            setYieldDraft(formatDecimalQty(recipe.batch_yield_qty))
+          }
+          aria-label={t("composition.batchYieldEdit")}
+          data-testid="maker-yield-edit"
         >
-          <Check size={16} className="text-accent-600" />
-        </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => setYieldDraft(null)}
-          aria-label={t("common:actions.cancel")}
-        >
-          <X size={16} />
+          <span className="text-xs text-on-muted">
+            {t("composition.batchYield", { qty: yieldText })}
+          </span>
+          <Pencil size={12} />
         </Button>
       </div>
-      <p className="text-xs text-on-muted max-w-xs text-right">
-        {t("composition.batchYieldHint")}
-      </p>
-    </div>
+    ) : (
+      <div className="flex flex-col items-end gap-1 shrink-0">
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-on-muted">
+            {t("composition.batchYieldLabel")}
+          </span>
+          <Input
+            wrapperClassName="w-20"
+            type="number"
+            step="any"
+            min="0"
+            value={yieldDraft}
+            onChange={(e) => setYieldDraft(e.target.value)}
+            className="h-8 text-sm"
+            aria-label={t("composition.batchYieldLabel")}
+            data-testid="maker-yield-input"
+          />
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={askOrSaveYield}
+            disabled={updateRecipe.isPending}
+            aria-label={t("common:actions.save")}
+            data-testid="maker-yield-save"
+          >
+            <Check size={16} className="text-accent-600" />
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setYieldDraft(null)}
+            aria-label={t("common:actions.cancel")}
+          >
+            <X size={16} />
+          </Button>
+        </div>
+        <p className="text-xs text-on-muted max-w-xs text-right">
+          {t("composition.batchYieldHint")}
+        </p>
+      </div>
+    );
+
+  return (
+    <>
+      {field}
+      <ConfirmDialog
+        open={confirming}
+        title={t("composition.yieldConfirm.title")}
+        message={t("composition.openDraftsChange", { count: openDrafts })}
+        confirmLabel={t("common:actions.save")}
+        onConfirm={() => void saveYield()}
+        onCancel={() => setConfirming(false)}
+      />
+    </>
   );
 }

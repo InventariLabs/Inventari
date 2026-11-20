@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { DateInput } from "@/components/ui/DateInput";
-import { extractApiError } from "@/lib/errors";
 import { todayIso } from "@/utils/formatters";
 import { IngredientBatchPicker } from "@/modules/maker/components/IngredientBatchPicker";
 import { useBatchChoice } from "@/modules/maker/hooks/useBatchChoice";
@@ -59,42 +58,42 @@ export function StartRunAction({
     setAsking(true);
   }
 
-  function confirm() {
-    setAsking(false);
-    start.mutate(
-      {
+  // A refusal that is not a list to act on stays inside the dialog, which
+  // keeps the day and the batches as chosen.
+  async function confirm() {
+    try {
+      await start.mutateAsync({
         orderId: order.id,
         data: {
           started_on: day || undefined,
           ingredient_lots:
             batches.payload.length > 0 ? batches.payload : undefined,
         },
-      },
-      {
-        onSuccess: () => toast.success(t("progress.startSuccess")),
-        onError: (err) => {
-          const shortage = parseShortageError(err);
-          if (shortage?.error === "insufficient_stock") {
-            onShortage(shortage.shortages, shortage.shortAtCreate ?? false);
-            return;
-          }
-          const emptyBom = parseEmptyBomError(err);
-          if (emptyBom) {
-            toast.error(t("detail.emptyBom"), {
-              action: emptyBom.recipeId
-                ? {
-                    label: t("detail.emptyBomAction"),
-                    onClick: () =>
-                      navigate(`/maker/recipes/${emptyBom.recipeId}`),
-                  }
-                : undefined,
-            });
-            return;
-          }
-          toast.error(extractApiError(err, t("progress.startFailed")));
-        },
-      },
-    );
+      });
+    } catch (err) {
+      const shortage = parseShortageError(err);
+      if (shortage?.error === "insufficient_stock") {
+        setAsking(false);
+        onShortage(shortage.shortages, shortage.shortAtCreate ?? false);
+        return;
+      }
+      const emptyBom = parseEmptyBomError(err);
+      if (emptyBom) {
+        setAsking(false);
+        toast.error(t("detail.emptyBom"), {
+          action: emptyBom.recipeId
+            ? {
+                label: t("detail.emptyBomAction"),
+                onClick: () => navigate(`/maker/recipes/${emptyBom.recipeId}`),
+              }
+            : undefined,
+        });
+        return;
+      }
+      throw err;
+    }
+    setAsking(false);
+    toast.success(t("progress.startSuccess"));
   }
 
   return (
@@ -116,6 +115,7 @@ export function StartRunAction({
         cancelLabel={t("create.cancel")}
         variant="default"
         confirmDisabled={batches.short.size > 0}
+        errorFallback={t("progress.startFailed")}
         onConfirm={confirm}
         onCancel={() => setAsking(false)}
       >

@@ -140,7 +140,8 @@
       "added": "Añadido a {{name}}",
       "alreadyListed": "Ya está en la lista de la compra",
       "addFailed": "No se pudo añadir a la lista de la compra"
-    }
+    },
+    "qtyNeedsProduct": "Elija primero un producto: la cantidad se cuenta en su unidad."
   },
   "createRecipe": {
     "title": "Nueva fórmula",
@@ -300,7 +301,8 @@
       "labourFromSteps": "Mano de obra de los pasos",
       "labourTime": "{{minutes}} min a la tarifa por hora",
       "labourRateMissing": "Los pasos duran {{minutes}} min. Define la tarifa por hora en los ajustes de producción para valorar ese tiempo.",
-      "labourRateLink": "Ajustes de producción"
+      "labourRateLink": "Ajustes de producción",
+      "labourCountedTwice": "La mano de obra de los pasos del proceso ya está contada arriba. Una línea de Mano de obra se suma a ella, así que se puede contar dos veces."
     },
     "history": {
       "title": "Historial de producción",
@@ -349,7 +351,8 @@
     "processStepsDiscardTitle": "¿Descartar el paso sin añadir?",
     "processStepsDiscardMessage": "El paso escrito no se ha añadido a la lista. Cerrar el editor lo descarta.",
     "processStepsDiscardConfirm": "Descartar paso",
-    "processStepsDiscardKeep": "Seguir editando"
+    "processStepsDiscardKeep": "Seguir editando",
+    "ingredientsReturned": "Ingredientes tomados y devueltos"
   },
   "bom": {
     "childLabel": "Ingrediente",
@@ -398,7 +401,12 @@
     "setPrice": "Fijar precio",
     "editPrice": "Editar precio",
     "priceSaved": "Precio guardado",
-    "priceSaveFailed": "No se pudo guardar el precio"
+    "priceSaveFailed": "No se pudo guardar el precio",
+    "yieldConfirm": {
+      "title": "¿Cambiar lo que produce esta fórmula?"
+    },
+    "openDraftsChange_one": "{{count}} borrador abierto lee esta fórmula y cambia con ella al cerrarse.",
+    "openDraftsChange_other": "{{count}} borradores abiertos leen esta fórmula y cambian con ella al cerrarse."
   },
   "tree": {
     "title": "Lista de materiales multinivel",
@@ -535,7 +543,9 @@
     "unknown_one": "{{count}} ingrediente no comparable",
     "unknown_other": "{{count}} ingredientes no comparables",
     "shortUnknown": "se desconoce",
-    "completeShortageHintNever": "Estos ingredientes nunca bastaron para esta corrida — la orden se creó por encima de las existencias."
+    "completeShortageHintNever": "Estos ingredientes nunca bastaron para esta corrida — la orden se creó por encima de las existencias.",
+    "unitMismatchTitle": "No se puede continuar: una unidad no coincide",
+    "unitMismatchHint": "No falta ninguna cantidad: la unidad de la línea no se puede comparar con el stock. Corrija la unidad de la línea de la fórmula."
   },
   "widget": {
     "title": "{{result}} por mes",
@@ -611,7 +621,11 @@
     "stockSaved": "Existencias guardadas.",
     "stockSaveFailed": "No se pudieron guardar las existencias.",
     "stockSavePartial": "Guardados {{saved}} de {{total}}. El resto sigue en la hoja.",
-    "locationsFailed": "No se pudieron cargar las ubicaciones"
+    "locationsFailed": "No se pudieron cargar las ubicaciones",
+    "titleUnit": "Una unidad de esta fórmula no coincide con el stock",
+    "unitBody": "Aquí no falta nada: la unidad de la línea no se puede comparar con el stock, ningún stock la cerraría. Corrija la unidad de la línea de la fórmula: {{names}}.",
+    "onOrder": "La cantidad que falta está pedida, en el borrador del pedido de compra",
+    "openOrder": "Abrir el pedido"
   },
   "progress": {
     "start": "Iniciar orden",
@@ -668,7 +682,6 @@
       "titleHome": "Tarros de esta producción",
       "codeHome": "Código del lote {{code}}",
       "madeOn": "Fabricado el",
-      "onHold": "Retenido",
       "expired": "Caducado",
       "recalled": "Retirado",
       "printLabels": "Imprimir etiquetas del lote",
@@ -685,7 +698,13 @@
       "holdTitle_one": "¿Retener este lote?",
       "holdTitle_other": "¿Retener estos lotes?",
       "holdMessage": "Un lote retenido sigue en su estante, pero ninguna producción, preparación ni envío toma de él hasta que se libere.",
-      "holdReason": "¿Por qué se retiene?"
+      "holdReason": "¿Por qué se retiene?",
+      "state": {
+        "quarantined": "En cuarentena",
+        "held": "Retenido"
+      },
+      "heldBecause": "{{batch}} — {{state}}: {{reason}}",
+      "heldNoReason": "{{batch}} — {{state}}, sin motivo indicado"
     }
   },
   "record": {
@@ -711,7 +730,8 @@
     "completedBy": "Terminado",
     "byAt": "{{who}}, {{when}}",
     "print": "Imprimir",
-    "failed": "No se pudo leer el registro del lote."
+    "failed": "No se pudo leer el registro del lote.",
+    "costBasis": "Los ingredientes se valoran con las capas de coste más antiguas del producto (FIFO), no con el precio del lote del que se tomaron."
   },
   "attachments": {
     "title": "Fotos y archivos",

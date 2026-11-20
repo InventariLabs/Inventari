@@ -7,7 +7,7 @@ import { useCanWrite } from "@/hooks/useCanWrite";
 import { DateInput } from "@/components/ui/DateInput";
 import { Input } from "@/components/ui/Input";
 import { extractApiError } from "@/lib/errors";
-import { formatQuantityLocalized } from "@/lib/i18nHelpers";
+import { formatQuantityLocalized, unitLabel } from "@/lib/i18nHelpers";
 import { QUANTITY_STEP } from "@/module-sdk";
 import { formatDate } from "@/utils/helpers";
 import { todayIso } from "@/utils/formatters";
@@ -96,6 +96,7 @@ export function RunPortions({
           <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-3">
             <Input
               label={t("progress.portionQty")}
+              suffix={unitLabel(t, order.output_uom_symbol) || undefined}
               type="number"
               step={QUANTITY_STEP}
               min="0"

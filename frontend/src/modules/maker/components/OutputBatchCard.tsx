@@ -15,7 +15,8 @@ import { BarcodeLabelSheet } from "@/modules/shared/components/BarcodeLabelSheet
 import { useOutputBatchStatus } from "@/modules/maker/hooks/useBatches";
 import { useIsHomeProfile } from "@/modules/maker/hooks/useIsHomeProfile";
 import { useUoms } from "@/modules/shared/hooks/useUoms";
-import { runBatches } from "@/modules/maker/lib/runBatches";
+import { HoldNote } from "@/modules/maker/components/HoldNote";
+import { HELD, runBatches } from "@/modules/maker/lib/runBatches";
 import type { ProductionOrder } from "@/modules/maker/types/maker";
 import type { UomCategory } from "@/types";
 
@@ -49,13 +50,15 @@ function isMeasuredOutput(
   );
 }
 
-const HELD = new Set(["quarantined", "held"]);
-
 function StatusNote({ status }: { status: string | null | undefined }) {
   const { t } = useTranslation("maker");
   if (!status || status === "active") return null;
   if (HELD.has(status))
-    return <Badge variant="warning">{t("batches.card.onHold")}</Badge>;
+    return (
+      <Badge variant="warning">
+        {t(`batches.card.state.${status}` as const)}
+      </Badge>
+    );
   if (status === "expired")
     return <Badge variant="danger">{t("batches.card.expired")}</Badge>;
   return <Badge variant="danger">{t("batches.card.recalled")}</Badge>;
@@ -86,15 +89,11 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
   const anyHeld = batches.some((batch) => HELD.has(batch.status));
   const allHeld = batches.every((batch) => HELD.has(batch.status));
 
-  function putOnHold() {
-    hold.mutate(reason.trim(), {
-      onSuccess: () => {
-        toast.success(t("batches.card.heldToast", { count: batches.length }));
-        setReason("");
-      },
-      onError: (err) =>
-        toast.error(extractApiError(err, t("batches.card.holdFailed"))),
-    });
+  async function putOnHold() {
+    await hold.mutateAsync(reason.trim());
+    setAsking(false);
+    setReason("");
+    toast.success(t("batches.card.heldToast", { count: batches.length }));
   }
 
   function releaseBatch() {
@@ -128,6 +127,13 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
                 : batches[0].lot_name}
             </p>
           )}
+          {batches.map((batch) => (
+            <HoldNote
+              key={batch.lot_id}
+              batch={batch}
+              className="text-xs text-amber-700 dark:text-amber-400"
+            />
+          ))}
           <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
             <dt className="text-on-muted">{t("batches.card.madeOn")}</dt>
             <dd className="text-on">
@@ -242,10 +248,8 @@ export function OutputBatchCard({ order }: { order: ProductionOrder }) {
         confirmLabel={t("batches.card.hold")}
         cancelLabel={t("create.cancel")}
         confirmDisabled={reason.trim() === ""}
-        onConfirm={() => {
-          setAsking(false);
-          putOnHold();
-        }}
+        errorFallback={t("batches.card.holdFailed")}
+        onConfirm={putOnHold}
         onCancel={() => {
           setAsking(false);
           setReason("");

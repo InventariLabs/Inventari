@@ -4,6 +4,8 @@ import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import { formatMoney } from "@/utils/formatters";
 import { formatDate, formatDateTime } from "@/utils/helpers";
+import { CostGapNote } from "@/modules/maker/components/CostFigure";
+import { HoldNote } from "@/modules/maker/components/HoldNote";
 import type { BatchRecord } from "@/modules/maker/types/maker";
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
@@ -30,6 +32,42 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
+/** The batches the output was filed under, each with how much of it was made, and a batch's hold. */
+function OutputBatches({
+  batches,
+  fallbackName,
+  qty,
+}: {
+  batches: BatchRecord["output_batches"];
+  fallbackName: string | null | undefined;
+  qty: (value: string | number | null | undefined) => string;
+}) {
+  const list = batches ?? [];
+  return (
+    <>
+      <span className="font-mono" data-testid="maker-record-batches">
+        {list.length > 1
+          ? list.map((batch) => (
+              <span key={batch.lot_id} className="block">
+                {batch.lot_name}
+                {batch.quantity != null && ` — ${qty(batch.quantity)}`}
+              </span>
+            ))
+          : list.length > 0
+            ? list[0].lot_name
+            : (fallbackName ?? "—")}
+      </span>
+      {list.map((batch) => (
+        <HoldNote
+          key={batch.lot_id}
+          batch={batch}
+          className="text-xs text-amber-700 dark:text-amber-400 print:text-black"
+        />
+      ))}
+    </>
+  );
+}
+
 /**
  * The batch record of a completed run, one page: what was made and in which
  * batch, of what — every ingredient with the batches and quantities taken —
@@ -43,6 +81,7 @@ export function BatchRecordSheet({ record }: { record: BatchRecord }) {
   const currency = useOrganizationCurrency();
   const unit = record.output_uom_symbol ?? null;
   const batches = record.output_batches ?? [];
+  const uncosted = record.uncosted_ingredients ?? 0;
   const money = (value: string | number | null | undefined) =>
     value === null || value === undefined
       ? "—"
@@ -69,11 +108,11 @@ export function BatchRecordSheet({ record }: { record: BatchRecord }) {
       <dl className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <Fact label={t("record.recipe")}>{record.recipe_name ?? "—"}</Fact>
         <Fact label={t("record.batch")}>
-          <span className="font-mono" data-testid="maker-record-batches">
-            {batches.length > 0
-              ? batches.map((batch) => batch.lot_name).join(", ")
-              : (record.output_lot_name ?? "—")}
-          </span>
+          <OutputBatches
+            batches={batches}
+            fallbackName={record.output_lot_name}
+            qty={qty}
+          />
         </Fact>
         <Fact label={t("batches.card.madeOn")}>
           {record.production_date ? formatDate(record.production_date) : "—"}
@@ -151,6 +190,20 @@ export function BatchRecordSheet({ record }: { record: BatchRecord }) {
           </Fact>
           <Fact label={t("record.unitCost")}>{money(record.unit_cost)}</Fact>
         </dl>
+        {(record.ingredients ?? []).some((line) =>
+          (line.batches ?? []).some((batch) => batch.lot_id),
+        ) && (
+          <p className="text-xs text-on-muted print:text-black">
+            {t("record.costBasis")}
+          </p>
+        )}
+        <CostGapNote
+          priced={Math.max(
+            (record.ingredients ?? []).length - uncosted,
+            Number(record.total_cost) > 0 ? 1 : 0,
+          )}
+          unpriced={uncosted}
+        />
       </Section>
 
       <Section title={t("record.whoAndWhen")}>

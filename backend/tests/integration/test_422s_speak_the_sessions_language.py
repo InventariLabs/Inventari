@@ -306,3 +306,31 @@ def test_each_email_refusal_keeps_its_reason_in_polish(email: str, expected: str
         Probe(address=email)
 
     assert translate_validation_error(refused.value.errors()[0], lang='pl') == expected
+
+
+@pytest.mark.parametrize(
+    ('lang', 'expected'),
+    [
+        ('en', 'Must have no more than 8 digits before the decimal point'),
+        ('pl', 'Może mieć co najwyżej 8 cyfr przed przecinkiem'),
+        ('de', 'Darf höchstens 8 Stellen vor dem Komma haben'),
+    ],
+)
+def test_a_quantity_with_too_many_digits_is_refused_in_the_sessions_language(
+    lang, expected
+):
+    """pydantic's 'Decimal input should have no more than 8 digits ...' is
+    translated, not handed to the reader as written."""
+    from app.i18n._validation import translate_validation_error
+
+    message = translate_validation_error(
+        {
+            'type': 'decimal_whole_digits',
+            'msg': 'Decimal input should have no more than 8 digits before the '
+            'decimal point',
+            'ctx': {'whole_digits': 8},
+        },
+        lang,
+    )
+
+    assert message == expected

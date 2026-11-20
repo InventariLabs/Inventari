@@ -137,7 +137,8 @@
       "added": "Adicionado a {{name}}",
       "alreadyListed": "Já está na lista de compras",
       "addFailed": "Não foi possível adicionar à lista de compras"
-    }
+    },
+    "qtyNeedsProduct": "Pick a product first: the quantity is counted in its unit."
   },
   "createRecipe": {
     "title": "Nova lista de materiais",
@@ -286,7 +287,8 @@
       "deleteConfirm": {
         "title": "Excluir linha de custo?",
         "description": "Remover \"{{label}}\" dos custos fixos?"
-      }
+      },
+      "labourCountedTwice": "The labour from the process steps is already counted above. A Labor line is added on top of it, so labour can be counted twice."
     },
     "history": {
       "title": "Histórico de produção",
@@ -326,7 +328,8 @@
     },
     "notFound": "Ordem de produção não encontrada",
     "plannedShortageHint_one": "O consumo planejado excede o estoque — falta {{count}} ingrediente. A conclusão desta produção será recusada.",
-    "plannedShortageHint_other": "O consumo planejado excede o estoque — faltam {{count}} ingredientes. A conclusão desta produção será recusada."
+    "plannedShortageHint_other": "O consumo planejado excede o estoque — faltam {{count}} ingredientes. A conclusão desta produção será recusada.",
+    "ingredientsReturned": "Ingredients taken and put back"
   },
   "bom": {
     "childLabel": "Produto ingrediente",
@@ -367,7 +370,12 @@
       "duplicateIngredient": "Esta lista já tem esse ingrediente.",
       "removeIngredient": "Não foi possível remover o ingrediente",
       "yieldInvalid": "A quantidade que a lista produz deve ser maior que zero."
-    }
+    },
+    "yieldConfirm": {
+      "title": "Change what this BOM makes?"
+    },
+    "openDraftsChange_one": "{{count}} open draft reads this BOM and changes with it when it closes.",
+    "openDraftsChange_other": "{{count}} open drafts read this BOM and change with it when they close."
   },
   "tree": {
     "title": "Lista de materiais em vários níveis",
@@ -498,7 +506,9 @@
     "unknown_one": "{{count}} ingrediente não pode ser comparado",
     "unknown_other": "{{count}} ingredientes não podem ser comparados",
     "shortUnknown": "desconhecido",
-    "completeShortageHintNever": "Esses ingredientes nunca foram suficientes para esta produção — ela foi criada acima do estoque."
+    "completeShortageHintNever": "Esses ingredientes nunca foram suficientes para esta produção — ela foi criada acima do estoque.",
+    "unitMismatchTitle": "Cannot continue — a unit does not match",
+    "unitMismatchHint": "No quantity is missing: the unit of the line cannot be compared with the stock. Fix the unit on the BOM line."
   },
   "widget": {
     "title": "{{result}} por mês",
@@ -553,5 +563,24 @@
   "overproduction": {
     "warning": "São {{extra}} a mais do que os {{planned}} previstos. Os ingredientes ficam como no plano, por isso o custo por unidade sairá muito mais baixo do que o de um lote real.",
     "confirm": "Sim, a produção rendeu essa quantidade"
+  },
+  "batches": {
+    "card": {
+      "state": {
+        "quarantined": "Quarantined",
+        "held": "Held"
+      },
+      "heldBecause": "{{batch}} — {{state}}: {{reason}}",
+      "heldNoReason": "{{batch}} — {{state}}, no reason given"
+    }
+  },
+  "record": {
+    "costBasis": "Ingredients are costed from the product's oldest cost layers (FIFO), not from the price of the batch an ingredient was taken from."
+  },
+  "shortage": {
+    "titleUnit": "A unit on this BOM does not match the stock",
+    "unitBody": "Nothing is missing here: the unit of the line cannot be compared with the stock, so no stock would close it. Fix the unit on the BOM line: {{names}}.",
+    "onOrder": "The missing quantity is on order, on draft purchase order",
+    "openOrder": "Open the order"
   }
 }

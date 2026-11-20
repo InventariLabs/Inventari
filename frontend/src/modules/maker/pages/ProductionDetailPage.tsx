@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { Hammer, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
-import { extractApiError, isNotFoundError } from "@/lib/errors";
+import { isNotFoundError } from "@/lib/errors";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useCanManage, useCanWrite } from "@/hooks/useCanWrite";
 import { Button } from "@/components/ui/Button";
@@ -21,6 +21,7 @@ import { ProductionIngredientsTable } from "@/modules/maker/components/Productio
 import { RunCoverageCard } from "@/modules/maker/components/RunCoverageCard";
 import { ProductionStockMovesTable } from "@/modules/maker/components/ProductionStockMovesTable";
 import { ProductionOrderStats } from "@/modules/maker/components/ProductionOrderStats";
+import { OrderMissingButton } from "@/modules/maker/components/OrderMissingButton";
 import { ShortageModal } from "@/modules/maker/components/ShortageModal";
 import { CompleteRunDialog } from "@/modules/maker/components/CompleteRunDialog";
 import { OutputBatchCard } from "@/modules/maker/components/OutputBatchCard";
@@ -142,29 +143,18 @@ export default function ProductionDetailPage() {
   const isDraft = order.status === "DRAFT";
   const completedLines = order.lines ?? [];
 
-  function handleCancel() {
+  // The dialog waits: a refusal stays inside it with the reason as typed.
+  async function handleCancel() {
     if (!order) return;
-    cancelMutation.mutate(
-      { orderId: order.id, reason: cancelReason.trim() || undefined },
-      {
-        onSuccess: () => {
-          toast.success(
-            t("detail.cancelSuccess", { defaultValue: "Production cancelled" }),
-          );
-          setCancelReason("");
-        },
-        onError: (err) => {
-          toast.error(
-            extractApiError(
-              err,
-              t("detail.cancelFailed", {
-                defaultValue: "Failed to cancel production",
-              }),
-            ),
-          );
-        },
-      },
+    await cancelMutation.mutateAsync({
+      orderId: order.id,
+      reason: cancelReason.trim() || undefined,
+    });
+    setShowCancelConfirm(false);
+    toast.success(
+      t("detail.cancelSuccess", { defaultValue: "Production cancelled" }),
     );
+    setCancelReason("");
   }
 
   return (
@@ -238,6 +228,7 @@ export default function ProductionDetailPage() {
         lines={completedLines}
         planned={plannedEntries}
         isPlanned={isPlanned}
+        returned={order.status === "CANCELLED" && completedLines.length > 0}
         shortages={shortages}
         shortageCount={order.shortage_count}
       />
@@ -310,6 +301,7 @@ export default function ProductionDetailPage() {
             : t("availability.completeShortageHint")
         }
         onCancel={() => setCompleteShortages(null)}
+        action={<OrderMissingButton scope={{ order_id: order.id }} />}
       />
 
       <ConfirmDialog
@@ -329,10 +321,10 @@ export default function ProductionDetailPage() {
           defaultValue: "Yes, cancel run",
         })}
         cancelLabel={t("create.cancel", { defaultValue: "Cancel" })}
-        onConfirm={() => {
-          setShowCancelConfirm(false);
-          handleCancel();
-        }}
+        errorFallback={t("detail.cancelFailed", {
+          defaultValue: "Failed to cancel production",
+        })}
+        onConfirm={handleCancel}
         onCancel={() => {
           setShowCancelConfirm(false);
           setCancelReason("");

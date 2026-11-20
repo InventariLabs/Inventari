@@ -62,7 +62,7 @@ export function RecipeCard({ recipe, onProduce }: RecipeCardProps) {
                   unreachable by keyboard and could not be opened in a tab. */}
               <Link
                 to={`/maker/recipes/${recipe.id}`}
-                className="hover:text-accent focus-visible:text-accent"
+                className="inline-block max-w-full truncate py-1 align-bottom hover:text-accent focus-visible:text-accent"
               >
                 {recipe.name}
               </Link>

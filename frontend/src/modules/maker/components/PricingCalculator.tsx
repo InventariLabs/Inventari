@@ -193,8 +193,9 @@ export function PricingCalculator({
           />
         </div>
 
+        {/* The calculation is what this sheet exists for; saving the margin
+            as the default is the side action. */}
         <Button
-          variant="outline"
           onClick={handlePreview}
           disabled={qty <= 0 || computeMutation.isPending}
           className="w-full"
@@ -327,6 +328,7 @@ export function PricingCalculator({
           {t("pricing.close")}
         </Button>
         <Button
+          variant="outline"
           onClick={handleSaveDefault}
           leftIcon={<Save size={16} />}
           disabled={!templateId || setMarginMutation.isPending}

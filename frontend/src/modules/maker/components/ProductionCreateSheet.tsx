@@ -12,6 +12,7 @@ import {
   useProductionSave,
   type PreselectedProduct,
 } from "@/modules/maker/hooks/useProductionSheet";
+import type { ProductionMode } from "@/modules/maker/types/maker";
 import { ProductionPreviewSheet } from "./ProductionPreviewSheet";
 import { PricingCalculator } from "./PricingCalculator";
 import { ShortageModal } from "./ShortageModal";
@@ -28,6 +29,8 @@ interface ProductionCreateSheetProps {
    * order as long as the user keeps the preselected product.
    */
   preselectedProduct?: PreselectedProduct;
+  /** The mode a fresh sheet opens in; the plan page opens it as a plan. */
+  startAs?: ProductionMode;
 }
 
 /**
@@ -42,13 +45,14 @@ export function ProductionCreateSheet({
   onClose,
   onSuccess,
   preselectedProduct,
+  startAs = "made",
 }: ProductionCreateSheetProps) {
   const { t } = useTranslation("maker");
   // What may hold stock, never a place a module owns — asked with the
   // flow's own purpose at the query, or an empty picker here would still
   // blame the module-data switch, which reveals nothing in a stock flow.
   const locations = useLocationOffer({ purpose: "stock" });
-  const form = useProductionForm(open, locations, preselectedProduct);
+  const form = useProductionForm(open, locations, preselectedProduct, startAs);
   const { save, isSaving, shortageState, setShortageState } = useProductionSave(
     form,
     { onClose, onSuccess },

@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { extractApiError } from "@/lib/errors";
 import { useCompleteProduction } from "@/modules/maker/hooks/useProduction";
 import { useBatchChoice } from "@/modules/maker/hooks/useBatchChoice";
 import { useProposedBestBefore } from "@/modules/maker/hooks/useProposedBestBefore";
@@ -73,7 +72,12 @@ export function useCompleteRun(order: ProductionOrder | undefined) {
   // out since the draft was created" only when that is what happened.
   const [shortAtCreate, setShortAtCreate] = useState<boolean | null>(null);
 
-  function complete() {
+  /**
+   * Resolves when the run is closed or when the refusal was handed to its own
+   * surface (the shortage list, the empty-BOM notice); any other refusal
+   * rejects, so the dialog stays open with the reason inside.
+   */
+  async function complete() {
     if (!order) return;
     const payload = {
       ...(actualQty.trim() !== "" && { actual_qty: actualQty.trim() }),
@@ -82,43 +86,38 @@ export function useCompleteRun(order: ProductionOrder | undefined) {
       ...(batches.payload.length > 0 && { ingredient_lots: batches.payload }),
     };
 
-    completeMutation.mutate(
-      { orderId: order.id, data: payload },
-      {
-        onSuccess: () => {
-          toast.success(t("detail.completeSuccess"));
-          setActualQty("");
-        },
-        onError: (err) => {
-          // An actionable shortage list, not a blind generic toast.
-          const shortageInfo = parseShortageError(err);
-          if (shortageInfo?.error === "insufficient_stock") {
-            setShowConfirm(false);
-            setShortages(shortageInfo.shortages);
-            setShortAtCreate(shortageInfo.shortAtCreate ?? null);
-            return;
-          }
-          // A BOM with no ingredients is refused: the run would create the
-          // output against zero consumption. Say so, and offer the one place
-          // where it can be fixed.
-          const emptyBom = parseEmptyBomError(err);
-          if (emptyBom) {
-            setShowConfirm(false);
-            toast.error(t("detail.emptyBom"), {
-              action: emptyBom.recipeId
-                ? {
-                    label: t("detail.emptyBomAction"),
-                    onClick: () =>
-                      navigate(`/maker/recipes/${emptyBom.recipeId}`),
-                  }
-                : undefined,
-            });
-            return;
-          }
-          toast.error(extractApiError(err, t("detail.completeFailed")));
-        },
-      },
-    );
+    try {
+      await completeMutation.mutateAsync({ orderId: order.id, data: payload });
+    } catch (err) {
+      // An actionable shortage list, not a blind generic toast.
+      const shortageInfo = parseShortageError(err);
+      if (shortageInfo?.error === "insufficient_stock") {
+        setShowConfirm(false);
+        setShortages(shortageInfo.shortages);
+        setShortAtCreate(shortageInfo.shortAtCreate ?? null);
+        return;
+      }
+      // A BOM with no ingredients is refused: the run would create the
+      // output against zero consumption. Say so, and offer the one place
+      // where it can be fixed.
+      const emptyBom = parseEmptyBomError(err);
+      if (emptyBom) {
+        setShowConfirm(false);
+        toast.error(t("detail.emptyBom"), {
+          action: emptyBom.recipeId
+            ? {
+                label: t("detail.emptyBomAction"),
+                onClick: () => navigate(`/maker/recipes/${emptyBom.recipeId}`),
+              }
+            : undefined,
+        });
+        return;
+      }
+      throw err;
+    }
+    setShowConfirm(false);
+    toast.success(t("detail.completeSuccess"));
+    setActualQty("");
   }
 
   /** A refusal from another door (starting the run) opens the same dialog. */

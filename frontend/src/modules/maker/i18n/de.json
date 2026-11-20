@@ -1,7 +1,7 @@
 {
   "launcher": {
-    "title": "Fertigung",
-    "description": "Fertigung für den Verkauf: Stücklisten, Kosten und Produktionsaufträge"
+    "title": "Produktion",
+    "description": "Produktion für den Verkauf: Formeln, Kosten und Produktionsläufe"
   },
   "navigation": {
     "production": "Produktionsläufe",
@@ -10,19 +10,19 @@
     "plan": "Plan"
   },
   "productionList": {
-    "title": "Produktionsaufträge",
+    "title": "Produktionsläufe",
     "subtitle": "Geplante und abgeschlossene Produktionsläufe mit Kosten und Ergebnis.",
     "newProduction": "Neue Produktion",
     "searchPlaceholder": "Nach Ausgangsprodukt suchen…",
     "loading": "Aufträge werden geladen…",
-    "error": "Produktionsaufträge konnten nicht geladen werden",
+    "error": "Produktionsläufe konnten nicht geladen werden",
     "empty": {
-      "title": "Noch keine Produktionsaufträge",
-      "subtitle": "Plane einen Produktionsauftrag, um Zutaten zu verbrauchen und Output zu erzeugen.",
+      "title": "Noch keine Produktionsläufe",
+      "subtitle": "Plane einen Produktionslauf, um Zutaten zu verbrauchen und Output zu erzeugen.",
       "subtitleReadOnly": "Produktionsläufe erscheinen hier, sobald sie jemand einplant."
     },
     "noMatches": {
-      "title": "Keine passenden Produktionsaufträge",
+      "title": "Keine passenden Produktionsläufe",
       "subtitle": "Mit diesen Filtern wurde nichts gefunden. Erweitern Sie die Auswahl."
     },
     "card": {
@@ -87,7 +87,7 @@
     "notesPlaceholder": "Interne Notizen zu diesem Auftrag…",
     "outputLotLabel": "Charge des Erzeugnisses (optional)",
     "outputLotHint": "Benennen Sie eine Charge, damit ein Rückruf einer Zutat über diesen Auftrag bis zu den Empfängern des Erzeugnisses reicht. Leer lassen, wenn Sie keine Chargen führen.",
-    "guardName": "Der Produktionsauftrag",
+    "guardName": "Der Produktionslauf",
     "hints": {
       "product": "Wählen Sie ein Ausgabeprodukt aus, um die Vorschau zu aktivieren.",
       "quantity": "Geben Sie eine geplante Menge größer als null ein, um die Vorschau zu aktivieren.",
@@ -96,7 +96,7 @@
     "preview": "Kosten anzeigen",
     "creating": "Erstellen…",
     "cancel": "Abbrechen",
-    "success": "Produktionsauftrag erstellt",
+    "success": "Produktionslauf erstellt",
     "errors": {
       "missingFields": "Wählen Sie Produkt, Menge und Lagerort.",
       "create": "Auftrag konnte nicht erstellt werden"
@@ -112,8 +112,8 @@
     "batchHintPlanned": "Die Formel ist für {{batch}}. Geben Sie ein, wie viel hergestellt werden soll, nicht die Zahl der Chargen.",
     "dateLabel": "Wann",
     "submitMade": "Als hergestellt speichern",
-    "submitNeedsBom": "Zuerst wird eine Stückliste benötigt",
-    "submitNeedsIngredients": "Fügen Sie der Stückliste zuerst Zutaten hinzu",
+    "submitNeedsBom": "Zuerst wird eine Formel benötigt",
+    "submitNeedsIngredients": "Fügen Sie der Formel zuerst Zutaten hinzu",
     "submitPlanned": "Produktion planen",
     "successMade": "Produktion erfasst",
     "needs": {
@@ -140,7 +140,8 @@
       "added": "Zu {{name}} hinzugefügt",
       "alreadyListed": "Steht schon auf der Einkaufsliste",
       "addFailed": "Konnte nicht zur Einkaufsliste hinzugefügt werden"
-    }
+    },
+    "qtyNeedsProduct": "Wählen Sie zuerst ein Produkt: Die Menge zählt in dessen Einheit."
   },
   "createRecipe": {
     "title": "Neue Formel",
@@ -161,7 +162,7 @@
     "unitFirst": "Wählen Sie zuerst die Einheit neben der Menge."
   },
   "detail": {
-    "title": "Produktionsauftrag",
+    "title": "Produktionslauf",
     "subtitle": "Zutaten, Kosten und Status prüfen.",
     "back": "Zurück zur Liste",
     "loading": "Auftrag wird geladen…",
@@ -300,7 +301,8 @@
       "labourFromSteps": "Arbeitszeit aus den Schritten",
       "labourTime": "{{minutes}} Min. zum Stundensatz",
       "labourRateMissing": "Die Schritte dauern {{minutes}} Min. Legen Sie den Stundensatz in den Produktionseinstellungen fest, um diese Zeit zu bewerten.",
-      "labourRateLink": "Produktionseinstellungen"
+      "labourRateLink": "Produktionseinstellungen",
+      "labourCountedTwice": "Die Arbeit aus den Prozessschritten ist oben bereits eingerechnet. Eine Zeile Arbeit kommt obendrauf, die Arbeit kann also doppelt zählen."
     },
     "history": {
       "title": "Produktionsverlauf",
@@ -311,7 +313,7 @@
       "unitCostColumn": "Stückkosten",
       "resultColumn": "{{result}} pro Stück",
       "totalColumn": "Chargenkosten",
-      "open": "Produktionsauftrag öffnen"
+      "open": "Produktionslauf öffnen"
     },
     "completeFailed": "Produktion konnte nicht abgeschlossen werden",
     "emptyBom": "Diese Formel enthält keine Zutaten — der Auftrag würde Ware aus dem Nichts erzeugen. Fügen Sie zuerst Zutaten hinzu.",
@@ -336,9 +338,9 @@
     "plannedSummary": "Geplant {{qty}}",
     "deleteConfirm": {
       "title": "Diese Formel löschen?",
-      "description": "Zutaten und Prozessschritte verschwinden mit ihr. Bereits erfasste Produktionsaufträge bleiben erhalten."
+      "description": "Zutaten und Prozessschritte verschwinden mit ihr. Bereits erfasste Produktionsläufe bleiben erhalten."
     },
-    "notFound": "Fertigungsauftrag nicht gefunden",
+    "notFound": "Produktionslauf nicht gefunden",
     "plannedShortageHint_one": "Der geplante Verbrauch übersteigt den Bestand — {{count}} Zutat fehlt. Der Abschluss dieser Produktion wird abgelehnt.",
     "plannedShortageHint_other": "Der geplante Verbrauch übersteigt den Bestand — {{count}} Zutaten fehlen. Der Abschluss dieser Produktion wird abgelehnt.",
     "processStepMinutes": "{{minutes}} Min.",
@@ -349,7 +351,8 @@
     "processStepsDiscardTitle": "Nicht hinzugefügten Schritt verwerfen?",
     "processStepsDiscardMessage": "Der eingegebene Schritt wurde der Liste nicht hinzugefügt. Beim Schließen des Editors geht er verloren.",
     "processStepsDiscardConfirm": "Schritt verwerfen",
-    "processStepsDiscardKeep": "Weiter bearbeiten"
+    "processStepsDiscardKeep": "Weiter bearbeiten",
+    "ingredientsReturned": "Entnommene und zurückgelegte Zutaten"
   },
   "bom": {
     "childLabel": "Zutat",
@@ -381,7 +384,7 @@
     "ingredientRemoved": "Zutat entfernt",
     "emptyLines": "Noch keine Zutaten — füge unten die erste hinzu.",
     "unitMismatch": "Die Einheit dieser Zeile lässt sich nicht als Bestandseinheit der Zutat lesen — legen Sie sie vor der nächsten Charge fest.",
-    "introduction": "Eine Formel ist die Liste dessen, was in einen Ansatz dieses Produkts geht. Daraus summieren sich die Kosten auf dem Tab „Kosten & Ergebnis“, und daraus wird beim Abschluss eines Produktionsauftrags Bestand entnommen.",
+    "introduction": "Eine Formel ist die Liste dessen, was in einen Ansatz dieses Produkts geht. Daraus summieren sich die Kosten auf dem Tab „Kosten & Ergebnis“, und daraus wird beim Abschluss eines Produktionslaufs Bestand entnommen.",
     "removeConfirm": {
       "title": "Zutat entfernen?",
       "description": "\"{{name}}\" aus dieser Formel entfernen?"
@@ -398,10 +401,15 @@
     "setPrice": "Preis festlegen",
     "editPrice": "Preis ändern",
     "priceSaved": "Preis gespeichert",
-    "priceSaveFailed": "Preis konnte nicht gespeichert werden"
+    "priceSaveFailed": "Preis konnte nicht gespeichert werden",
+    "yieldConfirm": {
+      "title": "Ändern, was diese Formel ergibt?"
+    },
+    "openDraftsChange_one": "{{count}} offener Entwurf liest diese Formel und ändert sich beim Abschluss mit ihr.",
+    "openDraftsChange_other": "{{count}} offene Entwürfe lesen diese Formel und ändern sich beim Abschluss mit ihr."
   },
   "tree": {
-    "title": "Mehrstufige Stückliste",
+    "title": "Mehrstufige Formel",
     "hint": "Zeile auf eine andere ziehen, um sie zu verschachteln.",
     "empty": "Noch keine Zutaten. Fügen Sie sie im Abschnitt darüber hinzu; sie erscheinen hier, sobald es etwas zu verschachteln gibt.",
     "loading": "Baum wird geladen…",
@@ -448,7 +456,7 @@
   },
   "catalog": {
     "title": "Formeln",
-    "subtitle": "Fertigung für den Verkauf: Produktionsformeln mit Kosten, Margen und Bestand",
+    "subtitle": "Produktion für den Verkauf: Formeln mit Kosten, Margen und Bestand",
     "searchPlaceholder": "Formeln suchen…",
     "sortLabel": "Sortieren nach",
     "default": "Standard",
@@ -535,7 +543,9 @@
     "unknown_one": "{{count}} Zutat ist nicht vergleichbar",
     "unknown_other": "{{count}} Zutaten sind nicht vergleichbar",
     "shortUnknown": "unbekannt",
-    "completeShortageHintNever": "Diese Zutaten reichten nie für diesen Lauf — der Auftrag wurde über Bestand angelegt."
+    "completeShortageHintNever": "Diese Zutaten reichten nie für diesen Lauf — der Auftrag wurde über Bestand angelegt.",
+    "unitMismatchTitle": "Weiter nicht möglich — eine Einheit passt nicht",
+    "unitMismatchHint": "Es fehlt keine Menge: Die Einheit der Zeile lässt sich nicht mit dem Bestand vergleichen. Korrigieren Sie die Einheit in der Formelzeile."
   },
   "widget": {
     "title": "{{result}} pro Monat",
@@ -553,9 +563,9 @@
   },
   "permissions": {
     "read": "Produktion ansehen",
-    "readDesc": "Kann Formeln, Kosten und Fertigungsaufträge einsehen",
+    "readDesc": "Kann Formeln, Kosten und Produktionsläufe einsehen",
     "write": "Produktion ausführen",
-    "writeDesc": "Kann Fertigungsaufträge anlegen und Läufe abschließen — das bewegt Bestand",
+    "writeDesc": "Kann Produktionsläufe anlegen und Läufe abschließen — das bewegt Bestand",
     "manage": "Formeln und Einstellungen verwalten",
     "manageDesc": "Kann Formeln, Prozessschritte und Moduleinstellungen bearbeiten sowie Läufe abbrechen — eine Formel entscheidet, was die Produktion dem Bestand entnimmt"
   },
@@ -611,7 +621,11 @@
     "stockSaved": "Bestand gespeichert.",
     "stockSaveFailed": "Bestand konnte nicht gespeichert werden.",
     "stockSavePartial": "{{saved}} von {{total}} gespeichert. Der Rest bleibt im Formular.",
-    "locationsFailed": "Orte konnten nicht geladen werden"
+    "locationsFailed": "Orte konnten nicht geladen werden",
+    "titleUnit": "Eine Einheit in dieser Formel passt nicht zum Bestand",
+    "unitBody": "Hier fehlt nichts: Die Einheit der Zeile lässt sich nicht mit dem Bestand vergleichen, kein Bestand würde sie schließen. Korrigieren Sie die Einheit in der Formelzeile: {{names}}.",
+    "onOrder": "Die fehlende Menge ist bestellt, auf dem Entwurf der Bestellung",
+    "openOrder": "Bestellung öffnen"
   },
   "progress": {
     "start": "Lauf starten",
@@ -668,7 +682,6 @@
       "titleHome": "Gläser aus diesem Lauf",
       "codeHome": "Chargencode {{code}}",
       "madeOn": "Hergestellt am",
-      "onHold": "Gesperrt",
       "expired": "Abgelaufen",
       "recalled": "Zurückgerufen",
       "printLabels": "Chargenetiketten drucken",
@@ -685,7 +698,13 @@
       "holdTitle_one": "Diese Charge sperren?",
       "holdTitle_other": "Diese Chargen sperren?",
       "holdMessage": "Eine gesperrte Charge bleibt im Regal, aber kein Lauf, keine Kommissionierung und kein Versand entnimmt daraus, bis sie freigegeben ist.",
-      "holdReason": "Warum wird sie gesperrt?"
+      "holdReason": "Warum wird sie gesperrt?",
+      "state": {
+        "quarantined": "In Quarantäne",
+        "held": "Gesperrt"
+      },
+      "heldBecause": "{{batch}} — {{state}}: {{reason}}",
+      "heldNoReason": "{{batch}} — {{state}}, ohne Angabe eines Grundes"
     }
   },
   "record": {
@@ -711,7 +730,8 @@
     "completedBy": "Abgeschlossen",
     "byAt": "{{who}}, {{when}}",
     "print": "Drucken",
-    "failed": "Das Chargenprotokoll konnte nicht gelesen werden."
+    "failed": "Das Chargenprotokoll konnte nicht gelesen werden.",
+    "costBasis": "Zutaten werden mit den ältesten Kostenschichten des Produkts bewertet (FIFO), nicht mit dem Preis der Charge, aus der sie entnommen wurden."
   },
   "attachments": {
     "title": "Fotos und Dateien",

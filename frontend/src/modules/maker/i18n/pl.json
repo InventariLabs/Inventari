@@ -142,7 +142,8 @@
       "added": "Dodano do listy „{{name}}”",
       "alreadyListed": "To już jest na liście zakupów",
       "addFailed": "Nie udało się dodać do listy zakupów"
-    }
+    },
+    "qtyNeedsProduct": "Najpierw wybierz produkt: ilość liczy się w jego jednostce."
   },
   "createRecipe": {
     "title": "Nowa receptura",
@@ -304,7 +305,8 @@
       "labourFromSteps": "Praca z czasu kroków",
       "labourTime": "{{minutes}} min według stawki godzinowej",
       "labourRateMissing": "Kroki zajmują {{minutes}} min. Ustaw stawkę godzinową w ustawieniach produkcji, aby wycenić ten czas.",
-      "labourRateLink": "Ustawienia produkcji"
+      "labourRateLink": "Ustawienia produkcji",
+      "labourCountedTwice": "Praca z kroków procesu jest już policzona wyżej. Pozycja Robocizna dolicza się do niej, więc robocizna może być policzona dwa razy."
     },
     "history": {
       "title": "Historia produkcji",
@@ -355,7 +357,8 @@
     "processStepsDiscardTitle": "Odrzucić niedodany krok?",
     "processStepsDiscardMessage": "Wpisany krok nie został dodany do listy. Zamknięcie edytora go usunie.",
     "processStepsDiscardConfirm": "Odrzuć krok",
-    "processStepsDiscardKeep": "Wróć do edycji"
+    "processStepsDiscardKeep": "Wróć do edycji",
+    "ingredientsReturned": "Składniki pobrane i zwrócone"
   },
   "bom": {
     "childLabel": "Składnik",
@@ -404,7 +407,14 @@
     "setPrice": "Ustaw cenę",
     "editPrice": "Zmień cenę",
     "priceSaved": "Cena zapisana",
-    "priceSaveFailed": "Nie udało się zapisać ceny"
+    "priceSaveFailed": "Nie udało się zapisać ceny",
+    "yieldConfirm": {
+      "title": "Zmienić, ile powstaje z tej receptury?"
+    },
+    "openDraftsChange_one": "{{count}} otwarty szkic czyta tę recepturę i zmieni się razem z nią przy zamknięciu.",
+    "openDraftsChange_few": "{{count}} otwarte szkice czytają tę recepturę i zmienią się razem z nią przy zamknięciu.",
+    "openDraftsChange_many": "{{count}} otwartych szkiców czyta tę recepturę i zmieni się razem z nią przy zamknięciu.",
+    "openDraftsChange_other": "{{count}} otwartego szkicu czyta tę recepturę i zmieni się razem z nią przy zamknięciu."
   },
   "tree": {
     "title": "Wielopoziomowy BOM",
@@ -549,7 +559,9 @@
     "unknown_many": "{{count}} składników nie da się porównać",
     "unknown_other": "{{count}} składników nie da się porównać",
     "shortUnknown": "nie wiadomo",
-    "completeShortageHintNever": "Te składniki nigdy nie starczyły na to zlecenie — zlecenie powstało ponad stan."
+    "completeShortageHintNever": "Te składniki nigdy nie starczyły na to zlecenie — zlecenie powstało ponad stan.",
+    "unitMismatchTitle": "Nie można kontynuować — jednostka nie pasuje",
+    "unitMismatchHint": "Żadnej ilości nie brakuje: jednostki pozycji nie da się porównać z zapasem. Popraw jednostkę w pozycji receptury."
   },
   "widget": {
     "title": "{{result}} miesięcznie",
@@ -633,7 +645,11 @@
     "stockSaved": "Zapas zapisany.",
     "stockSaveFailed": "Nie udało się zapisać zapasu.",
     "stockSavePartial": "Zapisano {{saved}} z {{total}}. Reszta wciąż jest w arkuszu.",
-    "locationsFailed": "Nie udało się wczytać miejsc"
+    "locationsFailed": "Nie udało się wczytać miejsc",
+    "titleUnit": "Jednostka w tej recepturze nie pasuje do zapasu",
+    "unitBody": "Niczego tu nie brakuje: jednostki pozycji nie da się porównać z zapasem, więc żaden zapas jej nie domknie. Popraw jednostkę w pozycji receptury: {{names}}.",
+    "onOrder": "Brakująca ilość jest zamówiona, na szkicu zamówienia zakupu",
+    "openOrder": "Otwórz zamówienie"
   },
   "progress": {
     "start": "Rozpocznij zlecenie",
@@ -692,7 +708,6 @@
       "titleHome": "Słoiki z tej produkcji",
       "codeHome": "Kod partii {{code}}",
       "madeOn": "Data produkcji",
-      "onHold": "Na wstrzymaniu",
       "expired": "Po terminie",
       "recalled": "Wycofano z obrotu",
       "printLabels": "Drukuj etykiety partii",
@@ -715,7 +730,13 @@
       "holdTitle_many": "Wstrzymać te partie?",
       "holdTitle_other": "Wstrzymać te partie?",
       "holdMessage": "Wstrzymana partia zostaje na półce, ale żadna produkcja, kompletacja ani wydanie nie pobierze z niej, dopóki jej nie zwolnisz.",
-      "holdReason": "Dlaczego jest wstrzymana?"
+      "holdReason": "Dlaczego jest wstrzymana?",
+      "state": {
+        "quarantined": "Kwarantanna",
+        "held": "Wstrzymane"
+      },
+      "heldBecause": "{{batch}} — {{state}}: {{reason}}",
+      "heldNoReason": "{{batch}} — {{state}}, bez podania powodu"
     }
   },
   "record": {
@@ -741,7 +762,8 @@
     "completedBy": "Zakończono",
     "byAt": "{{who}}, {{when}}",
     "print": "Drukuj",
-    "failed": "Nie udało się odczytać karty partii."
+    "failed": "Nie udało się odczytać karty partii.",
+    "costBasis": "Składniki są wyceniane według najstarszych warstw kosztu produktu (FIFO), a nie według ceny partii, z której je pobrano."
   },
   "attachments": {
     "title": "Zdjęcia i pliki",

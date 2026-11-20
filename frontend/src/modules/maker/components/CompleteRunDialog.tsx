@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { DateInput } from "@/components/ui/DateInput";
 import { Input } from "@/components/ui/Input";
-import { formatQuantityLocalized } from "@/lib/i18nHelpers";
+import { formatQuantityLocalized, unitLabel } from "@/lib/i18nHelpers";
 import { QUANTITY_STEP } from "@/module-sdk";
 import { todayIso } from "@/utils/formatters";
 import { BestBeforeField } from "@/modules/maker/components/BestBeforeField";
@@ -45,10 +45,8 @@ export function CompleteRunDialog({
       confirmLabel={t("detail.complete", { defaultValue: "Complete run" })}
       cancelLabel={t("create.cancel", { defaultValue: "Cancel" })}
       confirmDisabled={bomIsEmpty || anyShort || overproduction.blocked}
-      onConfirm={() => {
-        run.setShowConfirm(false);
-        run.complete();
-      }}
+      errorFallback={t("detail.completeFailed")}
+      onConfirm={run.complete}
       onCancel={() => {
         run.setShowConfirm(false);
         run.setActualQty("");
@@ -66,6 +64,7 @@ export function CompleteRunDialog({
             label={t("detail.completeConfirm.actualQtyLabel", {
               defaultValue: "Actual quantity produced (optional)",
             })}
+            suffix={unitLabel(t, order.output_uom_symbol) || undefined}
             type="number"
             step={QUANTITY_STEP}
             min="0"

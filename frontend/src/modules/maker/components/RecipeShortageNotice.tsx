@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AlertTriangle, PackagePlus, ShoppingCart } from "lucide-react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -53,6 +54,12 @@ export function RecipeShortageNotice({
   const { t } = useTranslation("maker");
   const orderShortages = useOrderRecipeShortages();
   const [stockOpen, setStockOpen] = useState(false);
+  // What the order made out, once one has: the notice then says the missing
+  // quantity is on order instead of offering to order it again.
+  const [ordered, setOrdered] = useState<{
+    id: string | null;
+    number: string | null;
+  } | null>(null);
 
   const short = useMemo(
     () => (availability?.ingredients ?? []).filter(isShort),
@@ -60,22 +67,34 @@ export function RecipeShortageNotice({
   );
   if (short.length === 0) return null;
 
-  const names = short
-    .slice(0, 3)
-    .map((item) => item.child_template_name)
-    .filter(Boolean)
-    .join(", ");
+  // A line whose unit cannot be compared with the shelf's is not a quantity
+  // that is missing: no stock bought or entered would close it. It is named
+  // apart, and the ways to add or order stock are for the real shortages.
+  const missing = short.filter((item) => item.shortage !== null);
+  const mismatched = short.filter((item) => item.shortage === null);
+  const namesOf = (items: AvailabilityItem[]) =>
+    items
+      .slice(0, 3)
+      .map((item) => item.child_template_name)
+      .filter(Boolean)
+      .join(", ");
 
   async function order() {
     try {
       const result = await orderShortages.mutateAsync(recipeId);
       if (result.purchase_order_id === null) {
+        if ((result.already_ordered_count ?? 0) > 0)
+          setOrdered({ id: null, number: null });
         toast.success(
           (result.already_ordered_count ?? 0) > 0
             ? t("shortage.alreadyOrdered")
             : t("shortage.nothingToOrder"),
         );
       } else {
+        setOrdered({
+          id: result.purchase_order_id ?? null,
+          number: result.number ?? null,
+        });
         toast.success(
           t("shortage.ordered", {
             number: result.number ?? "",
@@ -103,11 +122,20 @@ export function RecipeShortageNotice({
           />
           <div className="min-w-0 flex-1 space-y-1">
             <h2 className="text-sm font-semibold text-on">
-              {t("shortage.title")}
+              {missing.length > 0
+                ? t("shortage.title")
+                : t("shortage.titleUnit")}
             </h2>
-            <p className="text-xs text-on-muted">
-              {t("shortage.body", { names })}
-            </p>
+            {missing.length > 0 && (
+              <p className="text-xs text-on-muted">
+                {t("shortage.body", { names: namesOf(missing) })}
+              </p>
+            )}
+            {mismatched.length > 0 && (
+              <p className="text-xs text-on-muted">
+                {t("shortage.unitBody", { names: namesOf(mismatched) })}
+              </p>
+            )}
             <ul className="text-xs text-on-muted space-y-0.5">
               {short.map((item) => (
                 <li key={item.child_template_id} className="truncate">
@@ -127,9 +155,29 @@ export function RecipeShortageNotice({
                 </li>
               ))}
             </ul>
-            {(canAddStock || canOrder) && (
+            {ordered && (
+              <p
+                className="text-xs text-on"
+                data-testid="maker-recipe-on-order"
+              >
+                {t("shortage.onOrder")}
+                {ordered.id && (
+                  <>
+                    {" "}
+                    <Link
+                      to={`/purchase-orders/${ordered.id}`}
+                      className="underline"
+                    >
+                      {ordered.number ?? t("shortage.openOrder")}
+                    </Link>
+                  </>
+                )}
+              </p>
+            )}
+            {((canAddStock && missing.length > 0) ||
+              (canOrder && missing.length > 0 && !ordered)) && (
               <div className="flex flex-wrap gap-2 pt-1">
-                {canAddStock && (
+                {canAddStock && missing.length > 0 && (
                   <Button
                     size="sm"
                     variant="outline"
@@ -140,7 +188,7 @@ export function RecipeShortageNotice({
                     {t("shortage.addStock")}
                   </Button>
                 )}
-                {canOrder && (
+                {canOrder && missing.length > 0 && !ordered && (
                   <Button
                     size="sm"
                     variant="outline"
@@ -161,7 +209,7 @@ export function RecipeShortageNotice({
       {stockOpen && (
         <AddIngredientStockSheet
           onClose={() => setStockOpen(false)}
-          items={short}
+          items={missing}
         />
       )}
     </>

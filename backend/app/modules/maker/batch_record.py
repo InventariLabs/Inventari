@@ -10,6 +10,7 @@ shelves gave, not what the formula asked.
 
 from __future__ import annotations
 
+from datetime import date
 from decimal import Decimal
 from uuid import UUID
 
@@ -55,13 +56,15 @@ async def _all_moves(
 
 def _taken_by_batch(
     moves: list[StockMoveDTO], output_template_id: UUID
-) -> dict[UUID, dict[UUID | None, Decimal]]:
-    """Ingredient -> batch -> quantity the run took off the shelves.
+) -> dict[UUID, dict[tuple[UUID | None, date | None], Decimal]]:
+    """Ingredient -> (batch, date of the goods) -> quantity the run took.
 
     The way in only: a move off a shelf into the run. A run taken back
-    writes the way back too, and those return to a shelf.
+    writes the way back too, and those return to a shelf. Stock kept
+    without a batch is grouped by its own date, which the move records:
+    a record with an expiry and no batch name still has that expiry.
     """
-    taken: dict[UUID, dict[UUID | None, Decimal]] = {}
+    taken: dict[UUID, dict[tuple[UUID | None, date | None], Decimal]] = {}
     for move in moves:
         if (
             move.product_template_id == output_template_id
@@ -70,8 +73,26 @@ def _taken_by_batch(
         ):
             continue
         per_lot = taken.setdefault(move.product_template_id, {})
-        per_lot[move.lot_id] = per_lot.get(move.lot_id, Decimal('0')) + move.quantity
+        key = (move.lot_id, None if move.lot_id else move.expiry_date)
+        per_lot[key] = per_lot.get(key, Decimal('0')) + move.quantity
     return taken
+
+
+def _made_by_batch(
+    moves: list[StockMoveDTO], output_template_id: UUID
+) -> dict[UUID, Decimal]:
+    """Batch -> quantity of the run's output that went onto a shelf in it."""
+    made: dict[UUID, Decimal] = {}
+    for move in moves:
+        if (
+            move.product_template_id != output_template_id
+            or move.lot_id is None
+            or move.to_location_id is None
+            or move.from_location_id is not None
+        ):
+            continue
+        made[move.lot_id] = made.get(move.lot_id, Decimal('0')) + move.quantity
+    return made
 
 
 async def build_batch_record(
@@ -100,9 +121,8 @@ async def build_batch_record(
             db, organization_id, template_id
         ):
             lots[lot.id] = lot
-    taken = _taken_by_batch(
-        await _all_moves(db, organization_id, order_id), order.output_template_id
-    )
+    moves = await _all_moves(db, organization_id, order_id)
+    taken = _taken_by_batch(moves, order.output_template_id)
 
     ingredients: list[BatchRecordIngredient] = []
     material = Decimal('0')
@@ -130,11 +150,13 @@ async def build_batch_record(
                         expiry_date=(
                             (lots[lot_id].expiry_date or lots[lot_id].use_by_date)
                             if lot_id in lots
-                            else None
+                            else expiry
                         ),
                         quantity=qty,
                     )
-                    for lot_id, qty in taken.pop(line.child_template_id, {}).items()
+                    for (lot_id, expiry), qty in taken.pop(
+                        line.child_template_id, {}
+                    ).items()
                 ],
             )
         )
@@ -187,7 +209,9 @@ async def build_batch_record(
         scrap_qty=order.scrap_qty,
         output_lot_name=order.output_lot_name,
         output_lot_status=output_lot.status if output_lot else None,
-        output_batches=output_batch.run_batch_reads(output_lots),
+        output_batches=output_batch.run_batch_reads(
+            output_lots, _made_by_batch(moves, order.output_template_id)
+        ),
         production_date=order.production_date,
         best_before=(
             (output_lot.expiry_date or output_lot.use_by_date) if output_lot else None
@@ -195,6 +219,9 @@ async def build_batch_record(
         output_location_name=location.name if location else None,
         ingredients=ingredients,
         material_cost=material if lines else None,
+        uncosted_ingredients=sum(
+            1 for line in lines if line.unit_cost_snapshot is None
+        ),
         total_cost=order.total_cost,
         estimated_total_cost=order.estimated_total_cost,
         unit_cost=(

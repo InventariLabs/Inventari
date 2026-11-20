@@ -140,7 +140,8 @@
       "added": "Ajouté à {{name}}",
       "alreadyListed": "Déjà sur la liste de courses",
       "addFailed": "Impossible d’ajouter à la liste de courses"
-    }
+    },
+    "qtyNeedsProduct": "Choisissez d'abord un produit : la quantité est comptée dans son unité."
   },
   "createRecipe": {
     "title": "Nouvelle formule",
@@ -300,7 +301,8 @@
       "labourFromSteps": "Main-d'œuvre issue des étapes",
       "labourTime": "{{minutes}} min au taux horaire",
       "labourRateMissing": "Les étapes durent {{minutes}} min. Réglez le taux horaire dans les réglages de production pour valoriser ce temps.",
-      "labourRateLink": "Réglages de production"
+      "labourRateLink": "Réglages de production",
+      "labourCountedTwice": "Le travail issu des étapes du procédé est déjà compté ci-dessus. Une ligne Main-d'œuvre s'y ajoute : le travail peut donc être compté deux fois."
     },
     "history": {
       "title": "Historique de production",
@@ -349,7 +351,8 @@
     "processStepsDiscardTitle": "Abandonner l'étape non ajoutée ?",
     "processStepsDiscardMessage": "L'étape saisie n'a pas été ajoutée à la liste. Fermer l'éditeur la supprime.",
     "processStepsDiscardConfirm": "Abandonner l'étape",
-    "processStepsDiscardKeep": "Continuer la modification"
+    "processStepsDiscardKeep": "Continuer la modification",
+    "ingredientsReturned": "Ingrédients prélevés puis remis"
   },
   "bom": {
     "childLabel": "Ingrédient",
@@ -398,7 +401,12 @@
     "setPrice": "Définir le prix",
     "editPrice": "Modifier le prix",
     "priceSaved": "Prix enregistré",
-    "priceSaveFailed": "Impossible d'enregistrer le prix"
+    "priceSaveFailed": "Impossible d'enregistrer le prix",
+    "yieldConfirm": {
+      "title": "Modifier ce que produit cette formule ?"
+    },
+    "openDraftsChange_one": "{{count}} brouillon ouvert lit cette formule et change avec elle à sa clôture.",
+    "openDraftsChange_other": "{{count}} brouillons ouverts lisent cette formule et changent avec elle à leur clôture."
   },
   "tree": {
     "title": "Nomenclature multi-niveaux",
@@ -535,7 +543,9 @@
     "unknown_one": "{{count}} ingrédient non comparable",
     "unknown_other": "{{count}} ingrédients non comparables",
     "shortUnknown": "inconnu",
-    "completeShortageHintNever": "Ces ingrédients n'ont jamais suffi pour cette campagne — elle a été créée au-dessus du stock."
+    "completeShortageHintNever": "Ces ingrédients n'ont jamais suffi pour cette campagne — elle a été créée au-dessus du stock.",
+    "unitMismatchTitle": "Impossible de continuer — une unité ne correspond pas",
+    "unitMismatchHint": "Aucune quantité ne manque : l'unité de la ligne ne peut pas être comparée au stock. Corrigez l'unité de la ligne de la formule."
   },
   "widget": {
     "title": "{{result}} par mois",
@@ -611,7 +621,11 @@
     "stockSaved": "Stock enregistré.",
     "stockSaveFailed": "Impossible d'enregistrer le stock.",
     "stockSavePartial": "{{saved}} sur {{total}} enregistrés. Le reste est encore dans la feuille.",
-    "locationsFailed": "Impossible de charger les emplacements"
+    "locationsFailed": "Impossible de charger les emplacements",
+    "titleUnit": "Une unité de cette formule ne correspond pas au stock",
+    "unitBody": "Rien ne manque ici : l'unité de la ligne ne peut pas être comparée au stock, aucun stock ne la fermerait. Corrigez l'unité de la ligne de la formule : {{names}}.",
+    "onOrder": "La quantité manquante est commandée, sur le brouillon de commande",
+    "openOrder": "Ouvrir la commande"
   },
   "progress": {
     "start": "Démarrer l’ordre",
@@ -668,7 +682,6 @@
       "titleHome": "Bocaux de cette fabrication",
       "codeHome": "Code du lot {{code}}",
       "madeOn": "Fabriqué le",
-      "onHold": "Bloqué",
       "expired": "Périmé",
       "recalled": "Rappelé",
       "printLabels": "Imprimer les étiquettes du lot",
@@ -685,7 +698,13 @@
       "holdTitle_one": "Bloquer ce lot ?",
       "holdTitle_other": "Bloquer ces lots ?",
       "holdMessage": "Un lot bloqué reste sur son étagère, mais aucune fabrication, préparation ni expédition n'y prend tant qu'il n'est pas libéré.",
-      "holdReason": "Pourquoi est-il bloqué ?"
+      "holdReason": "Pourquoi est-il bloqué ?",
+      "state": {
+        "quarantined": "En quarantaine",
+        "held": "Bloqué"
+      },
+      "heldBecause": "{{batch}} — {{state}} : {{reason}}",
+      "heldNoReason": "{{batch}} — {{state}}, sans motif indiqué"
     }
   },
   "record": {
@@ -711,7 +730,8 @@
     "completedBy": "Terminé",
     "byAt": "{{who}}, {{when}}",
     "print": "Imprimer",
-    "failed": "La fiche de lot n'a pas pu être lue."
+    "failed": "La fiche de lot n'a pas pu être lue.",
+    "costBasis": "Les ingrédients sont valorisés selon les plus anciennes couches de coût du produit (FIFO), et non selon le prix du lot dans lequel ils ont été prélevés."
   },
   "attachments": {
     "title": "Photos et fichiers",
