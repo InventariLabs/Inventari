@@ -37,7 +37,7 @@ cats     = await core_api.categories.list_async(db, org_id)             # → li
 consumed = await core_api.stock.post_movement_async(db, org_id, template_id, qty, to_location_id=loc_id, reference_type="my_module.receipt", reference_id=rec_id)  # → list[QuantConsumptionDTO]
 ```
 
-Nearly every method is **async** and says so in its name (`*_async`) — `await` it in routers and services. The synchronous ones are named without the suffix; the ones a module most often calls are `secrets.encrypt_for_module` / `decrypt_for_module`, `settings.encrypt_secret`, `uoms.quantize` / `convert_quantity` / `quantity_step` / `round_up`, `events.subscribe`, `scheduler.register_task`, `email.is_configured` and the `pdf` renderers ([CORE_API.md](docs/subsystems/CORE_API.md) lists the full set).
+Nearly every method is **async** and says so in its name (`*_async`) — `await` it in routers and services. The synchronous ones are named without the suffix; the ones a module most often calls are `secrets.encrypt_for_module` / `decrypt_for_module`, `settings.encrypt_secret`, `uoms.quantize` / `convert_quantity` / `quantity_step` / `round_up`, `events.subscribe`, `scheduler.register_task`, `email.is_configured` (and `can_send_async` for an organization) and the `pdf` renderers ([CORE_API.md](docs/subsystems/CORE_API.md) lists the full set).
 
 Stock has no direct quant mutation: goods arrive, leave and move through
 `post_movement_async`, which states the reference the movement is
@@ -524,7 +524,7 @@ E-mail is its own sub-API: `core_api.email.send_async(to_email, subject, html_co
 | `core_api.ai_usage` | `CoreAIUsageAPI` — check AI usage limits, estimate costs |
 | `core_api.item_history` | `CoreItemHistoryAPI` — `log_async(db, item_id, org_id, user_id, action, changes)` (flush-only) and `list_for_item_async(db, item_id, org_id, *, limit?, actions?)` |
 | `core_api.stock` | `CoreStockAPI` — goods arrive, leave and move through `post_movement_async`; a draw is `take_from_the_records_async` (see the stock rule near the top of this section) |
-| `core_api.email` | `CoreEmailAPI` — `send_async()`, `send_with_attachment_async()` and the helpers `render_shell()`, `render_button()`, `render_fallback_link()` and `is_configured()` |
+| `core_api.email` | `CoreEmailAPI` — `send_async()`, `send_with_attachment_async()` and the helpers `render_shell()`, `render_button()`, `render_fallback_link()`, `is_configured()` and `can_send_async()` |
 
 > Full method signatures for all sub-APIs: see `docs/subsystems/CORE_API.md`. The facade has more namespaces than this guide shows (among them `ai_connections`, `announcements`, `attachments`, `audit_log`, `events`, `labels`, `llm`, `location_types`, `periods`, `pdf`, `queries`, `roles`, `scheduler`, `stock_moves`, `templates` and `valuation`); that file lists them all.
 

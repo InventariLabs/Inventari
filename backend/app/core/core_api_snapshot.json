@@ -945,6 +945,20 @@
     "email": {
       "class": "CoreEmailAPI",
       "methods": {
+        "can_send_async": {
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            }
+          ]
+        },
         "is_configured": {
           "params": []
         },
