@@ -22,14 +22,13 @@ vi.mock("sonner", () => ({
  *
  * An empty state ("No locations yet"), a quiet line ("Fleet under control")
  * and a counted heading ("8 assets need attention") are all claims about the
- * organization's data. On a slow connection they were drawn before the data
- * arrived and were false for as long as the request took. Each overview is
- * mounted with its requests held open (and, in the second scenario, with the
+ * organization's data, so none of them is drawn before the data has arrived.
+ * Each overview is mounted with its requests held open (and, in the second scenario, with the
  * module list itself still pending, which keeps every module query disabled)
  * and the page must not state any of these.
  *
  * Every card of an overview is in the set below: a new card that draws an
- * empty state or a count from a query belongs in `cards`.
+ * empty state or a count from a query belongs in `claims`.
  */
 
 const t = (key: string, options?: Record<string, unknown>) =>
@@ -148,7 +147,9 @@ describe("overview cards while their queries are pending", () => {
     const ending = ["a", "b", "c", "d"].map((id) => ({
       item_id: id,
       item_name: `Laptop ${id}`,
-      warranty_until: "2026-12-01",
+      warranty_until: new Date(Date.now() + 10 * 86_400_000)
+        .toISOString()
+        .slice(0, 10),
       days_remaining: 10,
       serial_number: null,
       assigned_to: null,
