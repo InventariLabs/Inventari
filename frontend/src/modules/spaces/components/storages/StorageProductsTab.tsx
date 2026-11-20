@@ -3,7 +3,9 @@ import { useTranslation } from "react-i18next";
 import { extractApiError } from "@/lib/errors";
 import { toast } from "sonner";
 import { DeleteReasonDialog } from "@/modules/inventory/moduleApi";
+import { PackageOpen } from "lucide-react";
 import { Checkbox } from "@/components/ui/Checkbox";
+import { EmptyState, EmptyStateAction } from "@/components/ui/EmptyState";
 import { InlineQueryError } from "@/components/ui/QueryResult";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import StorageItemsSection from "@/modules/spaces/components/StorageItemsSection";
@@ -70,7 +72,12 @@ export function StorageProductsTab({
   const [deletingItem, setDeletingItem] = useState<Item | null>(null);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [actionItem, setActionItem] = useState<Item | null>(null);
-  const [includeInside, setIncludeInside] = useState(false);
+  // Records that all stand in locations inside are what the count beside
+  // this place promised, so the list opens on them rather than on "empty".
+  const recordsInside = summary.subtree_items_count - summary.items_count;
+  const [includeInside, setIncludeInside] = useState(
+    summary.items_count === 0 && summary.subtree_items_count > 0,
+  );
 
   // What stands inside is read when the reader asks to see it: one request
   // for the place and everything below it, not one per place.
@@ -201,6 +208,22 @@ export function StorageProductsTab({
 
       {readingInside ? (
         <LoadingSpinner />
+      ) : !includeInside &&
+        (allItems?.length ?? 0) === 0 &&
+        recordsInside > 0 ? (
+        <EmptyState
+          icon={PackageOpen}
+          title={t("locations:products.noneHere")}
+          description={t("locations:products.insideDescription", {
+            count: recordsInside,
+          })}
+          primaryAction={
+            <EmptyStateAction
+              label={t("locations:products.includeInside")}
+              onClick={() => setIncludeInside(true)}
+            />
+          }
+        />
       ) : (
         <StorageItemsSection
           t={t}

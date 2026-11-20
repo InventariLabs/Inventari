@@ -451,6 +451,7 @@
     "inArchiveDesc": "Eliminar un producto es reversible — la cantidad, la ubicación y el precio vuelven al restaurarlo. Solo la eliminación permanente es realmente irreversible.",
     "openArchive": "Abrir el archivo",
     "viewDetails": "Detalles del producto",
+    "productTotal": "En todas las ubicaciones",
     "minQuantity": "Umbral de stock bajo",
     "backToList": "Volver a los productos",
     "removalStrategy": "Orden de salida"

@@ -489,6 +489,7 @@
     "inArchiveDesc": "Usunięcie produktu jest odwracalne — przy przywracaniu wracają ilość, miejsce i cena. Tylko trwałe usunięcie jest naprawdę nieodwracalne.",
     "openArchive": "Otwórz archiwum",
     "viewDetails": "Szczegóły produktu",
+    "productTotal": "We wszystkich miejscach",
     "minQuantity": "Próg niskiego stanu",
     "backToList": "Wróć do produktów",
     "removalStrategy": "Kolejność wydawania"
