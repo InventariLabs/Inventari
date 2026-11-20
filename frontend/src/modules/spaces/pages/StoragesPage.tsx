@@ -62,6 +62,7 @@ export default function StoragesPage() {
     data: roots = [],
     isLoading: isTreeLoading,
     isError: isTreeError,
+    error: treeError,
     refetch: refetchTree,
   } = useStoragesTree(undefined, { excludeModuleContexts, depth: 1 });
 
@@ -139,7 +140,7 @@ export default function StoragesPage() {
   };
 
   if (isTreeLoading) return <LoadingSpinner />;
-  if (isTreeError) return <QueryError onRetry={refetchAll} />;
+  if (isTreeError) return <QueryError error={treeError} onRetry={refetchAll} />;
 
   const hiddenNotice =
     hiddenStorageCount > 0 && roots.length > 0 ? (
@@ -177,7 +178,7 @@ export default function StoragesPage() {
       return <WithheldPane withheld={withheld} onBack={() => select("")} />;
     }
     if (selectedId && selected.isError) {
-      return <QueryError onRetry={refetchAll} />;
+      return <QueryError error={selected.error} onRetry={refetchAll} />;
     }
     // Only the pane waits for the chosen place: the tree it was chosen from,
     // its open branches and a wizard opened right behind the choice stay.
@@ -209,7 +210,7 @@ export default function StoragesPage() {
       );
     }
     if (isDetailError && !isNotFoundError(detailError)) {
-      return <QueryError onRetry={refetchDetail} />;
+      return <QueryError error={detailError} onRetry={refetchDetail} />;
     }
     if (isDetailLoading || !storage) return <LoadingSpinner />;
     return (
@@ -231,7 +232,13 @@ export default function StoragesPage() {
           select(parentId ?? "");
         }}
         initialTab={
-          searchParams.get("configure") === "true" ? "settings" : "contents"
+          searchParams.get("configure") === "true"
+            ? "settings"
+            : // A place with no locations inside has nothing to list on
+              // Contents: its records are what the count beside it promised.
+              node.direct_children_count === 0 && node.items_count > 0
+              ? "products"
+              : "contents"
         }
       />
     );

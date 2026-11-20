@@ -87,6 +87,7 @@ export default function LabelScanPage() {
           {/* Past the per-minute allowance a retry right away is refused
               again: the reader is told to wait, in the scanner's words. */}
           <QueryError
+            error={error}
             onRetry={refetch}
             message={
               apiErrorStatus(error) === 429 ? t("scan:tooManyScans") : undefined

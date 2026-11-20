@@ -111,10 +111,36 @@ describe("ActionItemsFeed", () => {
     renderFeed();
 
     await waitFor(() => {
-      expect(
-        screen.getByText("5 pending across enabled modules"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Waiting in this list: 5")).toBeInTheDocument();
     });
+  });
+
+  /**
+   * The card lists what its providers ask for — approvals, stock takes — and
+   * not what the module tiles count beside it (warranty alerts, warehouse
+   * tasks). Its subtitle says it counts this list, not "every module".
+   */
+  it("does not claim to count every enabled module", async () => {
+    moduleRegistry.getActionItemProviders = vi.fn(() => [
+      {
+        moduleName: "approvals",
+        hook: () => [
+          {
+            id: "approve-1",
+            labelKey: "approvals:launcher.actionItems.pendingLabel",
+            icon: Bell,
+            severity: "warning" as const,
+            linkTo: "/approvals",
+            count: 1,
+          },
+        ],
+      },
+    ]);
+
+    renderFeed();
+
+    await screen.findByText("Waiting in this list: 1");
+    expect(screen.queryByText(/across enabled modules/)).toBeNull();
   });
 
   /**
@@ -199,7 +225,7 @@ describe("ActionItemsFeed", () => {
     expect(screen.getByTestId("action-items-feed")).toBeInTheDocument();
     expect(queryFn).toHaveBeenCalledTimes(1);
     // An error row is not a pending thing.
-    expect(screen.queryByText(/pending across/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Waiting in this list/)).not.toBeInTheDocument();
   });
 
   /**

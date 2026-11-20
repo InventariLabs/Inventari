@@ -451,6 +451,7 @@
     "inArchiveDesc": "Deleting a product is reversible — quantity, location and price come back when it is restored. Permanent deletion is the only irreversible one.",
     "openArchive": "Open the archive",
     "viewDetails": "Product details",
+    "productTotal": "In all locations",
     "minQuantity": "Low-stock threshold",
     "backToList": "Back to products",
     "removalStrategy": "Issue order"

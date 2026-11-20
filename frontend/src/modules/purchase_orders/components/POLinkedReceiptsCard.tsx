@@ -11,6 +11,7 @@ interface POLinkedReceiptsCardProps {
   isLoading?: boolean;
   /** The read failed: the count is unknown, not zero. */
   isError?: boolean;
+  error?: unknown;
   onRetry?: () => void;
 }
 
@@ -19,6 +20,7 @@ export function POLinkedReceiptsCard({
   receiptCount,
   isLoading = false,
   isError = false,
+  error,
   onRetry,
 }: POLinkedReceiptsCardProps) {
   const { t } = useTranslation(["purchase_orders", "common"]);
@@ -34,7 +36,7 @@ export function POLinkedReceiptsCard({
           {t("common:messages.loading")}
         </div>
       ) : isError ? (
-        <QueryError onRetry={onRetry} />
+        <QueryError error={error} onRetry={onRetry} />
       ) : receiptCount > 0 ? (
         <div className="space-y-2">
           <div className="text-xs text-on-secondary">{t("receiptsNote")}</div>

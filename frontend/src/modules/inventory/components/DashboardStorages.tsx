@@ -21,6 +21,7 @@ interface DashboardStoragesProps {
   composition: readonly StorageComposition[];
   /** The tree never arrived: say so rather than offer "add your first storage". */
   loadFailed?: boolean;
+  loadError?: unknown;
   onRetry?: () => void;
 }
 
@@ -50,6 +51,7 @@ export default function DashboardStorages({
   storageZones,
   composition,
   loadFailed = false,
+  loadError,
   onRetry,
 }: DashboardStoragesProps) {
   const { t } = useTranslation("common");
@@ -77,7 +79,7 @@ export default function DashboardStorages({
       </CardHeader>
 
       {loadFailed ? (
-        <QueryError onRetry={onRetry} />
+        <QueryError error={loadError} onRetry={onRetry} />
       ) : rows.length === 0 ? (
         // The call to action must not land on the storage list, where the
         // reader would have to find "add" a second time.

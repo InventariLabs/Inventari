@@ -45,7 +45,7 @@ export function AttachLabelToItemSheet({
   const { t } = useTranslation(["labels", "common"]);
   const [query, setQuery] = useState("");
   const search = useDebounce(query.trim(), 250);
-  const { data, isFetching, isError, refetch } = useItemSearch(search);
+  const { data, isFetching, isError, error, refetch } = useItemSearch(search);
   const assign = useAssignLabelToItem();
 
   const candidates = (data?.items ?? []).filter((item) => !item.label_code);
@@ -112,7 +112,7 @@ export function AttachLabelToItemSheet({
           onChange={(e) => setQuery(e.target.value)}
         />
         {isError ? (
-          <QueryError onRetry={() => void refetch()} />
+          <QueryError error={error} onRetry={() => void refetch()} />
         ) : isFetching ? (
           <Loader2 className="animate-spin text-on-muted" size={18} />
         ) : search && candidates.length === 0 ? (

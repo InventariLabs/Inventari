@@ -124,7 +124,7 @@ export function useDocumentsList(options: UseDocumentsListOptions = {}) {
     moduleFilters.active,
   ]);
 
-  const { data, isLoading, isError, refetch } = useDocuments({
+  const { data, isLoading, isError, error, refetch } = useDocuments({
     partner_id: partnerId ?? undefined,
     search: deferredSearch || undefined,
     type: typeFilter === "ALL" ? undefined : typeFilter,
@@ -193,6 +193,7 @@ export function useDocumentsList(options: UseDocumentsListOptions = {}) {
     // failed — the same screen for "the list is empty" and "we could not
     // load it", and no way to try again.
     isError,
+    error,
     refetch,
     partnerId,
     clearPartnerFilter,

@@ -14,9 +14,9 @@
     "emptyRecent": "No recent items yet",
     "actionItems": {
       "title": "To do",
-      "subtitle": "{{count}} pending across enabled modules",
-      "subtitle_one": "{{count}} pending across enabled modules",
-      "subtitle_other": "{{count}} pending across enabled modules"
+      "subtitle": "Waiting in this list: {{count}}",
+      "subtitle_one": "Waiting in this list: {{count}}",
+      "subtitle_other": "Waiting in this list: {{count}}"
     }
   },
   "sections": {

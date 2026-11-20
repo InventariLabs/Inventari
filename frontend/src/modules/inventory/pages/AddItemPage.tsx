@@ -69,6 +69,7 @@ export default function AddItemPage() {
     handleFileSelect,
     handleImageSelect,
     isStoragesError,
+    storagesError,
     refetchStorages,
     pendingUnitChoice,
     resolveUnitChoice,
@@ -131,7 +132,7 @@ export default function AddItemPage() {
           StorageRequired, under the picker). */}
       {isStoragesError ? (
         <div className="flex-1 flex flex-col items-center justify-center p-8">
-          <QueryError onRetry={refetchStorages} />
+          <QueryError error={storagesError} onRetry={refetchStorages} />
         </div>
       ) : (
         <>

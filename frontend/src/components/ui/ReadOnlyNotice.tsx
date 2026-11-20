@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Eye } from "lucide-react";
+import { Eye, Lock } from "lucide-react";
 
 import { useCanManage, useCanWrite } from "@/hooks/useCanWrite";
 import { useHasPermission } from "@/hooks/useHasPermission";
@@ -40,8 +40,12 @@ interface ReadOnlyNoticeProps {
  * hides its actions says this instead, in the same words the module settings
  * screen already uses for the same situation.
  *
- * Renders nothing for an account that holds the right, which is what lets a
- * page place it unconditionally.
+ * An account that lacks the module's read permission gets a different
+ * sentence: it cannot see the records at all, which "you can view this" would
+ * contradict.
+ *
+ * Renders nothing for an account that holds the right (and the read), which is
+ * what lets a page place it unconditionally.
  */
 export function ReadOnlyNotice({
   module,
@@ -54,25 +58,38 @@ export function ReadOnlyNotice({
   // Hooks cannot be called conditionally, so the explicit key is always
   // asked about and only consulted when one was given.
   const holdsExplicit = useHasPermission(permission ?? `${module}:write`);
+  // "Your account can read this module" is only true of an account that holds
+  // the read key. A screen guarded by an explicit key (API keys, approval
+  // workflows) is not a module read screen, so the question is not asked there.
+  const canRead = useHasPermission(`${module}:read`);
+  const cannotRead = !permission && !canRead;
 
   const granted = permission
     ? holdsExplicit
     : right === "manage"
       ? canManage
       : canWrite;
-  if (granted) return null;
+  if (granted && !cannotRead) return null;
 
-  const title =
-    right === "manage" ? t("access.manageOnly") : t("access.readOnly");
-  const hint =
-    right === "manage" ? t("access.manageOnlyHint") : t("access.readOnlyHint");
+  const title = cannotRead
+    ? t("access.noRead")
+    : right === "manage"
+      ? t("access.manageOnly")
+      : t("access.readOnly");
+  const hint = cannotRead
+    ? t("access.noReadHint")
+    : right === "manage"
+      ? t("access.manageOnlyHint")
+      : t("access.readOnlyHint");
+
+  const Icon = cannotRead ? Lock : Eye;
 
   return (
     <div
       className="flex items-start gap-2 rounded-xl bg-surface-inset px-4 py-3 text-on-secondary"
       role="note"
     >
-      <Eye size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
+      <Icon size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
       <div>
         <p className="text-sm font-medium text-on">{title}</p>
         <p className="text-sm">{hint}</p>

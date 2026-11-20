@@ -317,6 +317,23 @@ export function confirmDialogMessage(
  * lets take a correction. A document that only records another step's
  * movement posted nothing, so it has no movement of its own to restate — the
  * card would offer a form no submission can pass. */
+function DocumentLoadFailed({
+  error,
+  onRetry,
+}: {
+  error: unknown;
+  onRetry: () => void;
+}) {
+  const { t } = useTranslation("warehouse");
+  return (
+    <QueryError
+      error={error}
+      message={t("errors.loadDocumentFailed")}
+      onRetry={onRetry}
+    />
+  );
+}
+
 function showsCorrections(doc: {
   status: string;
   type: string;
@@ -589,12 +606,7 @@ export default function DocumentDetailPage() {
 
   if (isError && !isNotFoundError(error)) {
     // A network failure is not a deleted document.
-    return (
-      <QueryError
-        message={t("errors.loadDocumentFailed")}
-        onRetry={() => void refetch()}
-      />
-    );
+    return <DocumentLoadFailed error={error} onRetry={() => void refetch()} />;
   }
 
   if (!doc) {

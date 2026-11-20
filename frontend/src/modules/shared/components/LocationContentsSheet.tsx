@@ -75,7 +75,7 @@ export function LocationContentsSheet({
   const [printing, setPrinting] = useState(false);
 
   const filters = { location_id: location.id, limit: LINES };
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: queryKeys.stockQuants.list(filters),
     queryFn: () => stockQuantsApi.list(filters),
   });
@@ -100,7 +100,7 @@ export function LocationContentsSheet({
         {isLoading ? (
           <LoadingSpinner />
         ) : isError ? (
-          <QueryError onRetry={() => refetch()} />
+          <QueryError error={error} onRetry={() => refetch()} />
         ) : rows.length === 0 ? (
           <EmptyState title={t("scan:locationSheet.empty")} />
         ) : (

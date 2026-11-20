@@ -451,6 +451,7 @@
     "inArchiveDesc": "Supprimer un produit est réversible — la quantité, l'emplacement et le prix reviennent à la restauration. Seule la suppression définitive est vraiment irréversible.",
     "openArchive": "Ouvrir l'archive",
     "viewDetails": "Détails du produit",
+    "productTotal": "Dans tous les emplacements",
     "minQuantity": "Seuil de stock bas",
     "backToList": "Retour aux produits",
     "removalStrategy": "Ordre de sortie"

@@ -46,10 +46,13 @@ export function StorageContentsTab({
   const [checked, setChecked] = useState<Set<string>>(() => new Set());
   const [skip, setSkip] = useState(0);
   useEffect(() => setSkip(0), [parent.id]);
-  const { data, isLoading, isError, refetch } = useStorageChildren(parent.id, {
-    excludeModuleContexts,
-    skip,
-  });
+  const { data, isLoading, isError, error, refetch } = useStorageChildren(
+    parent.id,
+    {
+      excludeModuleContexts,
+      skip,
+    },
+  );
   const children = data?.items ?? [];
   // A checked location that has moved away, or belongs to a location no
   // longer selected, is not in this table — so it is not part of the action.
@@ -66,13 +69,20 @@ export function StorageContentsTab({
     });
 
   if (isLoading) return <LoadingSpinner />;
-  if (isError) return <QueryError onRetry={() => void refetch()} />;
+  if (isError)
+    return <QueryError error={error} onRetry={() => void refetch()} />;
 
   if (children.length === 0) {
     return (
       <EmptyState
         icon={PackageOpen}
-        title={t("locations:contents.emptyTitle")}
+        // A place that holds records is not empty: it has no locations
+        // inside, and its records are on the Products tab.
+        title={
+          parent.items_count > 0
+            ? t("locations:contents.noLocationsInside")
+            : t("locations:contents.emptyTitle")
+        }
         description={
           parent.items_count > 0
             ? t("locations:contents.emptyDescription", {

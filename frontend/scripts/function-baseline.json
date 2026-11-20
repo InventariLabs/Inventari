@@ -116,7 +116,7 @@
     },
     "src/modules/inventory/pages/LabelPoolPage.tsx": {
       "LabelPoolPage": [
-        319
+        318
       ]
     },
     "src/modules/recipes/components/PickingActivePhase.tsx": {
@@ -151,7 +151,7 @@
     },
     "src/modules/warehouse/pages/DocumentDetailPage.tsx": {
       "DocumentDetailPage": [
-        371
+        366
       ]
     }
   }

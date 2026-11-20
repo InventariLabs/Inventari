@@ -30,7 +30,7 @@ export default function AddFromRecipesModal({
   const [submitting, setSubmitting] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
 
-  const { data, isLoading, isError, refetch } = useRecipeOptions({
+  const { data, isLoading, isError, error, refetch } = useRecipeOptions({
     search: search || undefined,
     limit: 50,
   });
@@ -141,7 +141,7 @@ export default function AddFromRecipesModal({
           </div>
         )}
         {recipesEnabled && isError && (
-          <QueryError onRetry={() => void refetch()} />
+          <QueryError error={error} onRetry={() => void refetch()} />
         )}
         {recipesEnabled && !isLoading && !isError && recipes.length === 0 && (
           <p className="text-sm text-on-muted text-center py-8">

@@ -220,13 +220,14 @@ export function LabelTab({ recipe }: { recipe: MakerRecipe }) {
     data: label,
     isLoading,
     isError,
+    error,
     refetch,
   } = useRecipeLabel(recipe.id);
 
   if (isError) {
     return (
       <Card className="p-4">
-        <QueryError onRetry={() => void refetch()} />
+        <QueryError error={error} onRetry={() => void refetch()} />
       </Card>
     );
   }

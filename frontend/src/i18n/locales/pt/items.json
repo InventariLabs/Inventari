@@ -451,6 +451,7 @@
     "inArchiveDesc": "Excluir um produto é reversível — quantidade, local e preço voltam quando ele é restaurado. A exclusão permanente é a única irreversível.",
     "openArchive": "Abrir o arquivo",
     "viewDetails": "Detalhes do produto",
+    "productTotal": "Em todos os locais",
     "minQuantity": "Limite de estoque baixo",
     "backToList": "Voltar aos produtos",
     "removalStrategy": "Ordem de saída"

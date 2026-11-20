@@ -451,6 +451,7 @@
     "inArchiveDesc": "Das Löschen eines Produkts ist umkehrbar — Menge, Lagerort und Preis kommen beim Wiederherstellen zurück. Nur das endgültige Löschen ist wirklich unwiderruflich.",
     "openArchive": "Archiv öffnen",
     "viewDetails": "Produktdetails",
+    "productTotal": "An allen Lagerorten",
     "minQuantity": "Mindestbestand",
     "backToList": "Zurück zu den Produkten",
     "removalStrategy": "Ausgabereihenfolge"
