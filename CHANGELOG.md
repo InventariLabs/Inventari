@@ -286,6 +286,12 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- On a slow connection the Inventory and Equipment overviews no longer state
+  something that is not true while they load. *My locations* shows placeholders
+  instead of "No locations yet" and its create button, and the Equipment
+  attention card shows no count ("8 assets need attention", later 9) until every
+  list it adds up has arrived; the fleet by category and the recent check-outs
+  wait for their answer the same way.
 - A member whose role cannot read a module is now told so. A module screen
   opened without that module's read permission says the account cannot open
   it and whom to ask, instead of "Your account can read this module", and the
