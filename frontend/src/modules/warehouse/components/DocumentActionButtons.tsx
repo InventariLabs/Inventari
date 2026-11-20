@@ -29,7 +29,7 @@ import {
 // what differs: the inline panel takes the document type's verb, the WMS
 // session is prefixed "Scan" (see the labels in i18n). A scrap is executed by
 // writing the goods off; nothing is picked for anybody.
-function executeLabelKeyFor(docType: string) {
+export function executeLabelKeyFor(docType: string) {
   if (docType === "IN" || docType === "INTERNAL_IN")
     return "warehouse:actions.executeReceive";
   if (docType === "SCRAP") return "warehouse:actions.executeScrap";

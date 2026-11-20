@@ -217,7 +217,7 @@
     "postNowScrap": "Dar baixa no estoque",
     "postNowAdjust": "Ajustar estoque",
     "postNowDefault": "Lançar documento",
-    "plan": "Planejar",
+    "plan": "Confirmar",
     "sendForApproval": "Enviar para aprovação",
     "undoReceive": "Desfazer recebimento",
     "undoIssue": "Desfazer expedição",
@@ -314,7 +314,10 @@
     "noStockCount_one": "{{count}} linha não encontrou estoque de onde retirar",
     "noStockCount_other": "{{count}} linhas não encontraram estoque de onde retirar",
     "noStockHint": "Não há nada livre desses produtos no local de origem. Escolha cada linha a partir do estoque manualmente, ou receba as mercadorias antes; o documento não pode ser confirmado até lá.",
-    "chooseSourceFirst": "Escolha primeiro o local de origem — as linhas importadas são retiradas do estoque que está lá."
+    "chooseSourceFirst": "Escolha primeiro o local de origem — as linhas importadas são retiradas do estoque que está lá.",
+    "columnsHint": "A folha precisa de uma coluna para o produto — nome, código de barras ou SKU — e outra para a quantidade. Marca, unidade, preço unitário, taxa de IVA, número de lote e data de validade são opcionais.",
+    "pastedText": "Texto colado",
+    "rowsRead": "Linhas lidas"
   },
   "empty": {
     "noResultsTitle": "Nenhum documento corresponde ao filtro",
@@ -326,7 +329,7 @@
     "description": "Receba, expeça, mova e conte o estoque — os documentos numerados vêm por conta própria.",
     "step1": {
       "title": "Crie seu primeiro documento",
-      "description": "Comece com um recebimento (IN) para registrar as mercadorias que chegam de um parceiro.",
+      "description": "Comece com um recebimento ({{code}}) para registrar as mercadorias que chegam de um parceiro.",
       "cta": "Criar seu primeiro documento"
     },
     "step2": {
@@ -513,7 +516,6 @@
     "snapshotPlanned": "Qtd. planejada",
     "snapshotDeltaPlus": "Adicionado",
     "snapshotDeltaMinus": "Removido",
-    "executionTitle": "Executar documento",
     "executionHelp": "Ajuste a quantidade realmente processada em cada linha antes de encerrar o documento.",
     "executionMeta": "Planejado {{expected}} {{unit}} · restante {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Planejado {{expected}} · restante {{remaining}} (sem unidade)",
@@ -866,7 +868,7 @@
     "print_list": "Imprimir lista de separação",
     "print_list_failed": "Não foi possível criar a lista de separação",
     "summary_title": "Separação concluída",
-    "summary_subtitle": "{{picked}} de {{total}} linhas separadas",
+    "summary_subtitle": "{{picked}} de {{total}} linhas separadas por completo",
     "summary_picked": "{{count}} separados",
     "summary_short": "{{count}} com separação parcial",
     "summary_skipped": "{{count}} ignorados",
@@ -1371,7 +1373,7 @@
       "title": "Recebimento concluído",
       "total": "{{received}} de {{expected}} {{unit}} recebidos",
       "backToDocument": "Concluir e lançar estoque",
-      "bookingNote": "Fechar este resumo conclui o documento e lança o estoque.",
+      "bookingNote": "«Concluir e lançar o stock» conclui o documento e lança o stock. Sair deste resumo de outra forma deixa o documento aberto, tal como recebido.",
       "skippedUndo": "Desfazer",
       "skippedBackorder": "Pedido pendente",
       "skippedNotComing": "Não chegará",
@@ -1562,13 +1564,14 @@
     "intoPackage": "No volume {{code}}",
     "intoNewPackage": "Em um novo volume",
     "qtyRequired": "Informe quanto vai para o volume",
-    "qtyOver": "Só restam {{amount}} para embalar",
     "scanned": "{{product}} embalado em {{code}}",
     "errors": {
       "writeFailed": "A alteração da embalagem não foi salva",
       "slipFailed": "Não foi possível baixar o romaneio de embalagem",
       "labelFailed": "Não foi possível baixar a etiqueta"
-    }
+    },
+    "qtyOver_one": "Só resta {{amount}} para embalar",
+    "qtyOver_other": "Só restam {{amount}} para embalar"
   },
   "statusBadge": {
     "todo": "a fazer hoje"

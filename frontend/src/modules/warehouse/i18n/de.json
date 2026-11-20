@@ -218,7 +218,7 @@
     "postNowScrap": "Bestand abschreiben",
     "postNowAdjust": "Bestand anpassen",
     "postNowDefault": "Beleg buchen",
-    "plan": "Planen",
+    "plan": "Bestätigen",
     "sendForApproval": "Zur Genehmigung senden",
     "undoReceive": "Wareneingang rückgängig machen",
     "undoIssue": "Warenausgang rückgängig machen",
@@ -316,7 +316,10 @@
     "noStockCount_one": "{{count}} Zeile hat keinen Bestand zum Entnehmen gefunden",
     "noStockCount_other": "{{count}} Zeilen haben keinen Bestand zum Entnehmen gefunden",
     "noStockHint": "Am Quelllagerort ist von diesen Produkten nichts frei. Wählen Sie den Bestand für jede Zeile von Hand oder buchen Sie die Ware zuerst ein; bis dahin lässt sich das Dokument nicht bestätigen.",
-    "chooseSourceFirst": "Wählen Sie zuerst den Quelllagerort — importierte Zeilen werden aus dem dortigen Bestand entnommen."
+    "chooseSourceFirst": "Wählen Sie zuerst den Quelllagerort — importierte Zeilen werden aus dem dortigen Bestand entnommen.",
+    "columnsHint": "Die Tabelle braucht eine Spalte für das Produkt — Name, Barcode oder SKU — und eine für die Menge. Marke, Einheit, Stückpreis, MwSt.-Satz, Chargennummer und Ablaufdatum sind optional.",
+    "pastedText": "Eingefügter Text",
+    "rowsRead": "Gelesene Zeilen"
   },
   "empty": {
     "noResultsTitle": "Keine Dokumente für diesen Filter",
@@ -328,7 +331,7 @@
     "description": "Ware annehmen, ausgeben, umlagern und zählen — die nummerierten Belege entstehen von selbst.",
     "step1": {
       "title": "Erstes Dokument erstellen",
-      "description": "Beginnen Sie mit einem Eingang (IN), um Wareneingänge von einem Partner zu erfassen.",
+      "description": "Beginnen Sie mit einem Eingang ({{code}}), um Wareneingänge von einem Partner zu erfassen.",
       "cta": "Erstes Dokument erstellen"
     },
     "step2": {
@@ -517,7 +520,6 @@
     "snapshotPlanned": "Geplante Menge",
     "snapshotDeltaPlus": "Hinzugefügt",
     "snapshotDeltaMinus": "Entfernt",
-    "executionTitle": "Dokument ausführen",
     "executionHelp": "Passen Sie die tatsächlich verarbeitete Menge für jede Position an, bevor Sie das Dokument schließen.",
     "executionMeta": "Geplant {{expected}} {{unit}} · verbleibend {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Geplant {{expected}} · verbleibend {{remaining}} (ohne Einheit)",
@@ -846,11 +848,11 @@
     "unknown_product": "Unbekanntes Produkt",
     "status": {
       "pending": "Ausstehend",
-      "picked": "Gepickt",
+      "picked": "Kommissioniert",
       "short": "Fehlmenge",
       "skipped": "Übersprungen"
     },
-    "full_pick": "Volle Menge picken",
+    "full_pick": "Volle Menge kommissionieren",
     "short_pick": "Fehlmenge",
     "short_pick_title": "Fehlmenge",
     "short_pick_description": "Erwartet {{expected}} · gescannt {{scanned}} · verbleibend {{remaining}}",
@@ -876,10 +878,10 @@
     "close": "Schließen",
     "completeAndBook": "Abschließen und buchen",
     "start_picking": "Kommissionierung scannen",
-    "print_list": "Pickliste drucken",
-    "print_list_failed": "Die Pickliste konnte nicht erstellt werden",
+    "print_list": "Kommissionierliste drucken",
+    "print_list_failed": "Die Kommissionierliste konnte nicht erstellt werden",
     "summary_title": "Kommissionierung abgeschlossen",
-    "summary_subtitle": "{{picked}} von {{total}} Positionen kommissioniert",
+    "summary_subtitle": "{{picked}} von {{total}} Positionen vollständig kommissioniert",
     "summary_picked": "{{count}} kommissioniert",
     "summary_short": "{{count}} Fehlmenge",
     "summary_skipped": "{{count}} übersprungen",
@@ -968,7 +970,7 @@
     "type_standard": "Standard",
     "type_pl_pz": "PL PZ (Polnisch)",
     "type_packing_slip": "Packliste",
-    "type_pick_list": "Pickliste",
+    "type_pick_list": "Kommissionierliste",
     "builtInPreviewTitle": "Integriertes Layout",
     "builtInPreviewAction": "Integrierte Layouts ansehen",
     "placeholders": {
@@ -990,7 +992,7 @@
         "notes": "Freitext-Notizen zum Beleg",
         "lines": "Die Positionen, für {% for line in document.lines %} — jede hat name, quantity, done_quantity, uom und die Wertspalten"
       },
-      "documents": "Nur Pickliste: die Lieferungen auf dem Blatt — Nummer und ihr Code128 (code128_img, code128_width_mm, code128_height_mm)",
+      "documents": "Nur Kommissionierliste: die Lieferungen auf dem Blatt — Nummer und ihr Code128 (code128_img, code128_width_mm, code128_height_mm)",
       "is_correction": "Wahr, wenn der Beleg eine Korrektur ist",
       "is_external": "Wahr für Belege mit Geschäftspartner (IN, PZ, OUT, WZ)",
       "is_external_in": "Wahr für Wareneingänge (IN, PZ)",
@@ -1013,7 +1015,7 @@
         "tax_id": "Steuernummer des Geschäftspartners (USt-IdNr.)",
         "address": "Adresse des Geschäftspartners, Ländername übersetzt"
       },
-      "pick_lines": "Nur Pickliste: die Positionen in Laufreihenfolge — shelf_code, shelf_name, quantity, unit, name, sku, lot und document_number",
+      "pick_lines": "Nur Kommissionierliste: die Positionen in Laufreihenfolge — shelf_code, shelf_name, quantity, unit, name, sku, lot und document_number",
       "print_dates": "Druckenswerte Datumsangaben als [{label, value}] — eine, die die vorige wiederholt, entfällt",
       "print_number": "Die Belegnummer, wie der gemeinsame Kopf sie druckt",
       "print_status": "Übersetzter Status, wie der gemeinsame Kopf ihn druckt",
@@ -1401,7 +1403,7 @@
       "title": "Wareneingang abgeschlossen",
       "total": "{{received}} von {{expected}} {{unit}} erhalten",
       "backToDocument": "Abschließen und Bestand buchen",
-      "bookingNote": "Mit dem Schließen dieser Zusammenfassung wird der Beleg abgeschlossen und der Bestand gebucht.",
+      "bookingNote": "„Abschließen und Bestand buchen“ schließt den Beleg ab und bucht den Bestand. Wer diese Zusammenfassung anders verlässt, lässt den Beleg offen, wie angenommen.",
       "skippedUndo": "Überspringen rückgängig",
       "skippedBackorder": "Nachlieferung",
       "skippedNotComing": "Kommt nicht",
@@ -1601,13 +1603,14 @@
     "intoPackage": "In Paket {{code}}",
     "intoNewPackage": "In ein neues Paket",
     "qtyRequired": "Geben Sie an, wie viel ins Paket kommt",
-    "qtyOver": "Zu verpacken bleiben nur {{amount}}",
     "scanned": "{{product}} in {{code}} verpackt",
     "errors": {
       "writeFailed": "Die Änderung am Verpacken wurde nicht gespeichert",
       "slipFailed": "Der Packzettel konnte nicht heruntergeladen werden",
       "labelFailed": "Das Etikett konnte nicht heruntergeladen werden"
-    }
+    },
+    "qtyOver_one": "Zu verpacken bleibt nur {{amount}}",
+    "qtyOver_other": "Zu verpacken bleiben nur {{amount}}"
   },
   "statusBadge": {
     "todo": "heute zu erledigen"

@@ -218,7 +218,7 @@
     "postNowScrap": "Dar de baja",
     "postNowAdjust": "Ajustar existencias",
     "postNowDefault": "Registrar documento",
-    "plan": "Planificar",
+    "plan": "Confirmar",
     "sendForApproval": "Enviar para aprobación",
     "undoReceive": "Deshacer la recepción",
     "undoIssue": "Deshacer la salida",
@@ -316,7 +316,10 @@
     "noStockCount_one": "{{count}} línea no encontró existencias que retirar",
     "noStockCount_other": "{{count}} líneas no encontraron existencias que retirar",
     "noStockHint": "No hay nada libre de estos productos en la ubicación de origen. Elige las existencias de cada línea a mano o recibe primero la mercancía; hasta entonces el documento no se puede confirmar.",
-    "chooseSourceFirst": "Elige primero la ubicación de origen: las líneas importadas se retiran de sus existencias."
+    "chooseSourceFirst": "Elige primero la ubicación de origen: las líneas importadas se retiran de sus existencias.",
+    "columnsHint": "La hoja necesita una columna para el producto — nombre, código de barras o SKU — y otra para la cantidad. Marca, unidad, precio unitario, tipo de IVA, número de lote y fecha de caducidad son opcionales.",
+    "pastedText": "Texto pegado",
+    "rowsRead": "Filas leídas"
   },
   "empty": {
     "noResultsTitle": "Ningún documento coincide con el filtro",
@@ -328,7 +331,7 @@
     "description": "Recibe, entrega, mueve y cuenta existencias: los documentos numerados se crean solos.",
     "step1": {
       "title": "Cree su primer documento",
-      "description": "Comience con una recepción (IN) para registrar mercancías entrantes de un socio.",
+      "description": "Comience con una recepción ({{code}}) para registrar mercancías entrantes de un socio.",
       "cta": "Crear su primer documento"
     },
     "step2": {
@@ -517,7 +520,6 @@
     "snapshotPlanned": "Cant. planificada",
     "snapshotDeltaPlus": "Agregado",
     "snapshotDeltaMinus": "Eliminado",
-    "executionTitle": "Ejecutar documento",
     "executionHelp": "Ajuste la cantidad realmente procesada para cada línea antes de cerrar el documento.",
     "executionMeta": "Planificado {{expected}} {{unit}} · restante {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Planificado {{expected}} · restante {{remaining}} (sin unidad)",
@@ -879,7 +881,7 @@
     "print_list": "Imprimir lista de picking",
     "print_list_failed": "No se pudo crear la lista de picking",
     "summary_title": "Recogida completada",
-    "summary_subtitle": "{{picked}} de {{total}} líneas recogidas",
+    "summary_subtitle": "{{picked}} de {{total}} líneas recogidas por completo",
     "summary_picked": "{{count}} recogidos",
     "summary_short": "{{count}} faltantes",
     "summary_skipped": "{{count}} omitidos",
@@ -1401,7 +1403,7 @@
       "title": "Recepción completada",
       "total": "{{received}} de {{expected}} {{unit}} recibidas",
       "backToDocument": "Completar y registrar el stock",
-      "bookingNote": "Al cerrar este resumen se completa el documento y se contabiliza el stock.",
+      "bookingNote": "«Completar y contabilizar stock» completa el documento y contabiliza el stock. Salir de este resumen de otra forma deja el documento abierto, tal como se recibió.",
       "skippedUndo": "Deshacer omisión",
       "skippedBackorder": "Pedido pendiente",
       "skippedNotComing": "No llegará",
@@ -1601,13 +1603,14 @@
     "intoPackage": "En el paquete {{code}}",
     "intoNewPackage": "En un paquete nuevo",
     "qtyRequired": "Indique cuánto va en el paquete",
-    "qtyOver": "Solo quedan {{amount}} por embalar",
     "scanned": "{{product}} embalado en {{code}}",
     "errors": {
       "writeFailed": "El cambio de embalaje no se guardó",
       "slipFailed": "No se pudo descargar el albarán",
       "labelFailed": "No se pudo descargar la etiqueta"
-    }
+    },
+    "qtyOver_one": "Solo queda {{amount}} por embalar",
+    "qtyOver_other": "Solo quedan {{amount}} por embalar"
   },
   "statusBadge": {
     "todo": "por hacer hoy"

@@ -5,6 +5,7 @@ import { useScanCamera } from "@/hooks/useScanCamera";
 import { useScanResolver } from "@/hooks/useScanResolver";
 import { useDocumentScanResult } from "../hooks/useDocumentScanResult";
 import { ExecutionLineCard } from "./ExecutionLineCard";
+import { executeLabelKeyFor } from "./DocumentActionButtons";
 import { ExecutionActions } from "./ExecutionActions";
 import { ScanModeSection } from "./ScanModeSection";
 import { isPackedType } from "./packing/DocumentPackingStep";
@@ -137,8 +138,11 @@ export function DocumentExecutionPanel({
       className="p-4 sm:p-6 space-y-4 border-primary-200 bg-primary-50/20"
     >
       <div className="space-y-1">
+        {/* The heading names the same act as the button that opened the
+            panel: "Pick items" beside a sheet titled "Execute document" read
+            as two actions. */}
         <h2 className="text-base font-semibold text-on">
-          {t("detail.executionTitle")}
+          {t(executeLabelKeyFor(document.type))}
         </h2>
         <p className="text-sm text-on-secondary">{t("detail.executionHelp")}</p>
       </div>
