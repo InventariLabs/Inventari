@@ -108,6 +108,35 @@ class TestGroupedCatalog:
         assert names['warranty'] == 'Warranty Tracker'
         assert names['unregistered'] is None
 
+    def test_a_section_names_the_modules_its_screens_read_from(self):
+        """The role editor warns about reads the module's screens depend on."""
+        from unittest.mock import MagicMock
+
+        module = MagicMock()
+        module.metadata.display_name = 'Warranty Tracker'
+        module.metadata.requires = ['items', 'locations']
+        module_registry._modules['warranty'] = module
+        module_registry.register_permission_defs(
+            'warranty', [PermissionDef(key='warranty:read')]
+        )
+        try:
+            catalog = module_registry.get_permissions_catalog()
+        finally:
+            del module_registry._modules['warranty']
+
+        (section,) = [m for m in catalog['modules'] if m['module'] == 'warranty']
+        assert section['requires'] == ['items', 'locations']
+
+    def test_a_module_the_registry_does_not_know_requires_nothing(self):
+        module_registry.register_permission_defs(
+            'unregistered', [PermissionDef(key='unregistered:read')]
+        )
+
+        catalog = module_registry.get_permissions_catalog()
+
+        (section,) = [m for m in catalog['modules'] if m['module'] == 'unregistered']
+        assert section['requires'] == []
+
     def test_a_disabled_module_contributes_no_columns(self):
         """A grant for a module the org does not run could never take effect."""
         module_registry.register_permission_defs(

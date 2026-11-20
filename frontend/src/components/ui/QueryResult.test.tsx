@@ -189,6 +189,27 @@ describe("QueryResult", () => {
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 
+  it("tells a refused list it may not read, with no retry to press", () => {
+    const refused = Object.assign(new Error("no"), {
+      isAxiosError: true,
+      response: { status: 403 },
+    });
+    render(<QueryError error={refused} onRetry={() => {}} />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "You do not have access to this",
+    );
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.queryByText("An error occurred")).not.toBeInTheDocument();
+  });
+
+  it("keeps the retry for a failure that is not a refusal", () => {
+    render(<QueryError error={new Error("boom")} onRetry={() => {}} />);
+
+    expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    expect(screen.getByRole("button")).toBeInTheDocument();
+  });
+
   it("retries from inside a form without submitting it", async () => {
     const onSubmit = vi.fn((e: React.FormEvent) => e.preventDefault());
     const retryInline = vi.fn();

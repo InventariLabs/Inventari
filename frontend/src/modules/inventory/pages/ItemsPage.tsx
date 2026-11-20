@@ -254,7 +254,7 @@ export default function ItemsPage() {
   // the previous filter left behind as placeholders.
   const matchesNothing = moduleFilters.templateIds?.length === 0;
   const listQuery = useItems(listParams, true, { enabled: !matchesNothing });
-  const { isLoading, isError, refetch } = listQuery;
+  const { isLoading, isError, error, refetch } = listQuery;
   const itemsResponse = matchesNothing ? undefined : listQuery.data;
   const isPlaceholderData = listQuery.isPlaceholderData && !matchesNothing;
   const aggregatesQuery = useItemAggregates(aggregateParams, {
@@ -533,6 +533,7 @@ export default function ItemsPage() {
       <ItemsContent
         canWrite={canWrite}
         isError={isError}
+        error={error}
         isLoading={isLoading}
         itemsResponse={itemsResponse}
         items={items}

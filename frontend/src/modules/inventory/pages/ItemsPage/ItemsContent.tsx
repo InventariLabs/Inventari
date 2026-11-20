@@ -22,6 +22,7 @@ import type {
 
 interface ItemsContentProps {
   isError: boolean;
+  error?: unknown;
   isLoading: boolean;
   itemsResponse:
     { items: Item[]; total: number; total_capped?: boolean } | undefined;
@@ -76,6 +77,7 @@ interface ItemsContentProps {
 
 export default function ItemsContent({
   isError,
+  error,
   isLoading,
   itemsResponse,
   items,
@@ -128,7 +130,7 @@ export default function ItemsContent({
     [groupByCategory, items, categories, t],
   );
   if (isError) {
-    return <QueryError onRetry={onRefetch} />;
+    return <QueryError error={error} onRetry={onRefetch} />;
   }
 
   if (isLoading && !itemsResponse) {
