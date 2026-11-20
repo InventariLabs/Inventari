@@ -119,8 +119,6 @@ export default function AssetListPage() {
   const { t } = useTranslation("equipment");
   const { setHeader } = useModulePageHeader();
   const canWrite = useCanWrite("equipment");
-  // Archived assets: Delete Permanently needs the organization's policy and
-  // `items:purge`; without both the archive offers Restore only.
   const canPurge = useCanPurge();
   const [showImport, setShowImport] = useState(false);
 
@@ -408,7 +406,7 @@ export default function AssetListPage() {
         </div>
       )}
 
-      {hasSelection && canWrite && (listTab === "active" || canPurge) && (
+      {hasSelection && canWrite && (
         <AssetBulkActionsBar
           selectedCount={selectedCount}
           unreachedMatches={allMatching ? 0 : Math.max(0, total - items.length)}
@@ -416,6 +414,7 @@ export default function AssetListPage() {
           allMatching={allMatching}
           onSelectAllMatching={selectAllMatching}
           listTab={listTab}
+          canPurge={canPurge}
           onBulkRetire={() => setShowBulkRetireConfirm(true)}
           onBulkArchive={() => setShowBulkArchiveConfirm(true)}
           onBulkReturn={openBulkReturn}
