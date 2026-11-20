@@ -973,6 +973,39 @@ class TestDocumentApprovalWorkflow:
         assert as_requester.json()['viewer_can_decide'] is False
         assert as_approver.json()['viewer_can_decide'] is True
 
+    def test_document_approval_says_a_reader_without_the_approve_right_cannot_decide(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        doc_org: Organization,
+        doc_auth_headers: dict[str, str],
+        doc_approval_workflow: ApprovalWorkflow,
+        doc_partner: Partner,
+        doc_target_location: StorageLocation,
+        doc_item: Item,
+    ) -> None:
+        """the verdict is the one the decision door reaches, grant included.
+
+        Whoever lacks ``approvals:approve`` is refused by approve and reject,
+        so the read must not offer them the buttons on an open stage.
+        """
+        doc_id = self._doc_pending_approval(
+            client, doc_auth_headers, doc_partner, doc_target_location, doc_item
+        )
+        reader = h.create_user(doc_org, email='reader@example.com', role='viewer')
+        headers = h.get_auth_headers(reader)
+
+        read = client.get(
+            f'/api/v1/approvals/documents/{doc_id}/approval', headers=headers
+        )
+        decide = client.post(
+            f'/api/v1/approvals/documents/{doc_id}/approve', headers=headers
+        )
+
+        assert read.status_code == status.HTTP_200_OK, read.text
+        assert decide.status_code == status.HTTP_403_FORBIDDEN
+        assert read.json()['viewer_can_decide'] is False
+
     def test_withdrawn_request_can_be_raised_again(
         self,
         client: TestClient,
