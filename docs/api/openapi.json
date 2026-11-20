@@ -3205,6 +3205,18 @@
               "title": "With Counts"
             },
             "description": "Include how many live items each category holds"
+          },
+          {
+            "name": "count_records",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "With counts: count every live record, not distinct products",
+              "default": false,
+              "title": "Count Records"
+            },
+            "description": "With counts: count every live record, not distinct products"
           }
         ],
         "responses": {

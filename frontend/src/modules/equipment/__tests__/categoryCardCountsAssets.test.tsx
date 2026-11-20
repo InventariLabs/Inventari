@@ -67,14 +67,18 @@ function renderPage() {
 }
 
 let askedForCounts = false;
+let askedForEveryRecord = false;
 
 beforeEach(() => {
   askedForCounts = false;
+  askedForEveryRecord = false;
   signInWith(["equipment:read", "categories:read", "categories:write"]);
   server.use(
     http.get("/api/v1/categories", ({ request }) => {
       askedForCounts =
         new URL(request.url).searchParams.get("with_counts") === "true";
+      askedForEveryRecord =
+        new URL(request.url).searchParams.get("count_records") === "true";
       return HttpResponse.json(onePage([CATEGORY]));
     }),
   );
@@ -117,6 +121,14 @@ describe("the equipment category row", () => {
     // Counts are opt-in on the list endpoint, so a row showing a number
     // without asking for one would be showing a default.
     expect(askedForCounts).toBe(true);
+  });
+
+  it("asks for every asset to be counted, not one per catalogue card", async () => {
+    renderPage();
+    await cellsOfRow();
+
+    // Three assets made from one model are three assets in this column.
+    expect(askedForEveryRecord).toBe(true);
   });
 
   it("still says how many fields it declares", async () => {

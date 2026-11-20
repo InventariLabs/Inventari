@@ -35,7 +35,9 @@ export default function EquipmentCategoriesPage() {
     // With counts: the number that decides whether a category can be deleted
     // is how much is filed under it, and the card was showing how many custom
     // fields it declares — a fact about the form, not about the register.
-  } = useCategories(undefined, undefined, true);
+    // Per record: every asset is one physical thing, however many share a
+    // catalogue card.
+  } = useCategories(undefined, undefined, true, { countRecords: true });
   const deleteMutation = useDeleteCategory();
   const { confirm, confirmDialogProps } = useConfirm();
 
