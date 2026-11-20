@@ -26,6 +26,7 @@ import { extractApiError } from "@/lib/errors";
 import { useScanStore } from "@/store/scanStore";
 import { useScanCamera } from "@/hooks/useScanCamera";
 import { useCanWrite } from "@/hooks/useCanWrite";
+import { useEnabledModulesOptional } from "@/contexts/ModulesContext";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { documentScanTarget } from "@/lib/scan/scanSubject";
 import { scanFailure } from "@/lib/scan/toastScanError";
@@ -98,7 +99,12 @@ export default function ScanPage() {
   // offer afterwards. The shopping list is a second module with a second key,
   // so it is asked separately rather than folded into the first answer.
   const canWrite = useCanWrite("items");
-  const canAddToShoppingList = useCanWrite("shopping_lists");
+  // Permission alone is not enough: an administrator passes every module key,
+  // enabled or not, while the API refuses a module the organization has off.
+  const shoppingListsEnabled =
+    useEnabledModulesOptional().includes("shopping_lists");
+  const canAddToShoppingList =
+    useCanWrite("shopping_lists") && shoppingListsEnabled;
 
   const consumeMutation = useScanConsume();
   const updateQuantityMutation = useScanUpdateQuantity();
