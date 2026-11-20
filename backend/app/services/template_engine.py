@@ -9,8 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import nh3
-from jinja2 import BaseLoader, meta, sandbox
-from jinja2.exceptions import UndefinedError
+from jinja2 import BaseLoader, ChainableUndefined, sandbox
 
 from app.core.exceptions import ServiceRejectionError
 from app.core.logging import get_logger
@@ -353,6 +352,57 @@ def _template_line(exc: BaseException) -> int:
     return line
 
 
+def _absorb(self: Any, *_args: Any, **_kwargs: Any) -> Any:
+    return self
+
+
+def _never_less(self: Any, _other: Any) -> bool:
+    return False
+
+
+# A value the check run was not given, which absorbs whatever is done to it.
+# A real document supplies the data a layout reads; the check supplies none (or
+# only an example), so an attribute, a call, arithmetic or a comparison on a
+# missing value must give a missing value back rather than fail — otherwise
+# the check would stop at the first ``{{ labels.footer }}`` and never reach the
+# rest of the layout. Built with ``type`` because Jinja's own operators are
+# typed as always raising, which a subclass cannot override.
+_MissingValue = type(
+    '_MissingValue',
+    (ChainableUndefined,),
+    {
+        '__slots__': (),
+        **dict.fromkeys(
+            (
+                '__add__',
+                '__radd__',
+                '__sub__',
+                '__rsub__',
+                '__mul__',
+                '__rmul__',
+                '__truediv__',
+                '__rtruediv__',
+                '__floordiv__',
+                '__rfloordiv__',
+                '__mod__',
+                '__rmod__',
+                '__pow__',
+                '__rpow__',
+                '__pos__',
+                '__neg__',
+                '__abs__',
+                '__round__',
+                '__call__',
+            ),
+            _absorb,
+        ),
+        **dict.fromkeys(('__lt__', '__le__', '__gt__', '__ge__'), _never_less),
+        '__int__': lambda self: 0,
+        '__float__': lambda self: 0.0,
+    },
+)
+
+
 class TemplateEngine:
     """Shared Jinja2 sandboxed template engine for user-authored document templates."""
 
@@ -394,34 +444,30 @@ class TemplateEngine:
                 result = result[: match.start()] + partial_html + result[match.end() :]
         return result
 
-    def check_renders(self, body_html: str) -> None:
+    def check_renders(
+        self, body_html: str, context: dict[str, Any] | None = None
+    ) -> None:
         """Refuse a body that cannot be compiled or rendered, naming its line.
 
         Run on every save: a layout that fails fails every document printed
         with it, and nothing at print time is left to say why. The body is
-        compiled (an unknown filter or test fails here) and rendered once on an
-        empty context, where what depends on a document's data — a missing
-        variable, a filter handed ``None`` — says nothing about the layout and
-        is let through, while an error of the layout's own (``{{ 1 / 0 }}``)
-        is refused. A ``TypeError`` is let through only when the body reads a
-        variable: one that reads none (``{{ 'a' + 1 }}``) fails on every
-        document.
+        rendered the way a print renders it — through this engine's loader, so
+        an ``{% include %}`` resolves — on the module's example ``context``
+        (empty when it gives none), in which a missing
+        value (``document.number``, a filter handed nothing) neither stops the
+        render nor raises, so every line of the layout runs. What still fails
+        is the layout's own: a syntax error, an unknown filter, a missing
+        partial, ``{{ 1 / 0 }}``, ``{{ 'a' + 1 }}``.
         """
         try:
-            self._env.from_string(body_html).render()
-        except UndefinedError:
-            return
+            checking = self._env.overlay(undefined=_MissingValue)
+            checking.from_string(body_html).render(**(context or {}))
         except Exception as exc:
-            if isinstance(exc, TypeError) and self._reads_variables(body_html):
-                return
             raise ServiceRejectionError(
                 'template_not_saved_syntax',
                 line=_template_line(exc),
                 detail=getattr(exc, 'message', None) or str(exc),
             ) from exc
-
-    def _reads_variables(self, body_html: str) -> bool:
-        return bool(meta.find_undeclared_variables(self._env.parse(body_html)))
 
     def render(self, body_html: str | None, context: dict[str, Any]) -> str:
         """Render template string with sandboxed Jinja2, then sanitize.
