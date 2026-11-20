@@ -13,7 +13,7 @@ import { ListControlBar } from "@/components/ui/ListControlBar";
 import { GettingStarted } from "@/components/ui/GettingStarted";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { QueryError } from "@/components/ui/QueryResult";
-import { Pagination, useCanPurge } from "@/module-sdk";
+import { Pagination } from "@/module-sdk";
 import { AssetBulkActionsBar } from "@/modules/equipment/components/AssetBulkActionsBar";
 import { selectedLabelTarget } from "@/modules/equipment/lib/printTarget";
 import { AssetListHeaderActions } from "@/modules/equipment/components/AssetListHeaderActions";
@@ -119,7 +119,6 @@ export default function AssetListPage() {
   const { t } = useTranslation("equipment");
   const { setHeader } = useModulePageHeader();
   const canWrite = useCanWrite("equipment");
-  const canPurge = useCanPurge();
   const [showImport, setShowImport] = useState(false);
 
   const {
@@ -414,7 +413,6 @@ export default function AssetListPage() {
           allMatching={allMatching}
           onSelectAllMatching={selectAllMatching}
           listTab={listTab}
-          canPurge={canPurge}
           onBulkRetire={() => setShowBulkRetireConfirm(true)}
           onBulkArchive={() => setShowBulkArchiveConfirm(true)}
           onBulkReturn={openBulkReturn}
@@ -571,7 +569,6 @@ export default function AssetListPage() {
                   key={item.id}
                   item={item}
                   selectable={canWrite}
-                  purgeable={canPurge}
                   isSelected={selectedIds.has(item.id)}
                   isRestorePending={restoreMutation.isPending}
                   isPurgePending={bulkPurgeMutation.isPending}

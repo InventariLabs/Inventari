@@ -2,6 +2,7 @@ import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { RotateCcw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useCanPurge } from "@/module-sdk";
 import { Badge } from "@/components/ui/Badge";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { formatDate } from "@/utils/helpers";
@@ -13,9 +14,6 @@ interface ArchivedAssetRowProps {
   item: ArchivedItem;
   /** False drops the checkbox and both actions — a reader restores nothing. */
   selectable?: boolean;
-  /** False drops Delete Permanently and the checkbox, whose only action it is:
-   *  the organization does not allow it, or the account may not. */
-  purgeable?: boolean;
   isSelected: boolean;
   isRestorePending: boolean;
   isPurgePending: boolean;
@@ -27,7 +25,6 @@ interface ArchivedAssetRowProps {
 export const ArchivedAssetRow = memo(function ArchivedAssetRow({
   item,
   selectable = true,
-  purgeable = true,
   isSelected,
   isRestorePending,
   isPurgePending,
@@ -39,6 +36,9 @@ export const ArchivedAssetRow = memo(function ArchivedAssetRow({
   // the same dictionary the inventory archive reads, and the raw value ("EXPIRED")
   // is the database's word, not the reader's.
   const { t } = useTranslation(["equipment", "items"]);
+  // Delete Permanently, and the checkbox whose only action it feeds, need the
+  // organization's policy and `items:purge`; without both the row offers Restore.
+  const purgeable = useCanPurge();
 
   return (
     <div

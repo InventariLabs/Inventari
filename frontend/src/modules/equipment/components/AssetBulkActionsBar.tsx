@@ -11,7 +11,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { SelectionToolbar } from "@/module-sdk";
+import { SelectionToolbar, useCanPurge } from "@/module-sdk";
 import { SendToPrinterButton } from "@/modules/shared/components/SendToPrinterButton";
 import type { PrintTarget } from "@/modules/shared/lib/printQueue";
 
@@ -29,9 +29,6 @@ interface AssetBulkActionsBarProps {
   /** The selection is the whole filtered set, not one page of ticks. */
   allMatching: boolean;
   listTab: "active" | "archived";
-  /** The archive's only bulk action is Delete Selected; without the
-   *  organization's policy and `items:purge` there is no bar for it. */
-  canPurge?: boolean;
   onSelectAllMatching: () => void;
   onBulkRetire: () => void;
   onBulkArchive: () => void;
@@ -91,7 +88,6 @@ export function AssetBulkActionsBar({
   matchingTotal,
   allMatching,
   listTab,
-  canPurge = false,
   onSelectAllMatching,
   onBulkRetire,
   onBulkArchive,
@@ -105,8 +101,11 @@ export function AssetBulkActionsBar({
   onClearSelection,
 }: AssetBulkActionsBarProps) {
   const { t } = useTranslation("equipment");
+  const canPurge = useCanPurge();
 
   if (listTab === "archived") {
+    // Delete Selected is the archive's only bulk action: without the
+    // organization's policy and `items:purge` there is no bar for it.
     if (!canPurge) return null;
     return (
       <SelectionToolbar count={selectedCount} onClear={onClearSelection}>
