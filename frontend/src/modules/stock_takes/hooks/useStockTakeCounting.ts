@@ -74,22 +74,36 @@ function useCountSearch(
   locationId: string | undefined,
   listedItemIds: Set<string>,
   locationItems: Item[],
-): [Item[], Item[], boolean] {
+): [Item[], Item[], "failed" | "missed" | null] {
   // "Here" is the count's own list plus everything standing in the counted
   // place and below it — the count claims the location and its descendants.
   const hereItemIds = new Set(listedItemIds);
   for (const item of locationItems) hereItemIds.add(item.id);
-  const { data: hereResults, isError: hereFailed } = useItemSearch(
-    query,
-    locationId,
-  );
-  const { data: orgResults, isError: orgFailed } = useItemSearch(query);
+  const {
+    data: hereResults,
+    isError: hereFailed,
+    isFetching: hereFetching,
+  } = useItemSearch(query, locationId);
+  const {
+    data: orgResults,
+    isError: orgFailed,
+    isFetching: orgFetching,
+  } = useItemSearch(query);
   const [here, elsewhere] = splitByPlace(
     hereResults?.items ?? [],
     orgResults?.items ?? [],
     hereItemIds,
   );
-  return [here, elsewhere, hereFailed || orgFailed];
+  if (hereFailed || orgFailed) return [here, elsewhere, "failed"];
+  // Both halves have answered this query, so an empty list is a miss and not
+  // a slow answer.
+  const settled =
+    hereResults !== undefined &&
+    orgResults !== undefined &&
+    !hereFetching &&
+    !orgFetching;
+  const missed = settled && here.length + elsewhere.length === 0;
+  return [here, elsewhere, missed ? "missed" : null];
 }
 
 /** The live list of a place, whether the API answers an array or a page. */
@@ -480,7 +494,7 @@ export function useStockTakeCounting(id: string | undefined) {
     (item) => !listedItemIds.has(item.id),
   );
   const surplusItemIds = allItemIds.filter((id) => !listedItemIds.has(id));
-  const [searchHere, searchElsewhere, searchFailed] = useCountSearch(
+  const [searchHere, searchElsewhere, searchNote] = useCountSearch(
     searchQuery,
     stockTake?.location_id,
     listedItemIds,
@@ -581,6 +595,6 @@ export function useStockTakeCounting(id: string | undefined) {
     confirmDialogProps,
     searchHere,
     searchElsewhere,
-    searchFailed,
+    searchNote,
   };
 }

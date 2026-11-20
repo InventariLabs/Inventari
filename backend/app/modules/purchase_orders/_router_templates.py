@@ -84,24 +84,24 @@ async def list_placeholders(
     return PO_PLACEHOLDERS
 
 
-class TemplatePreviewRequest(BaseModel):
+class PoTemplatePreviewRequest(BaseModel):
     """A layout to render, as the editor currently has it."""
 
     body_html: str
 
 
-class TemplatePreviewResponse(BaseModel):
+class PoTemplatePreviewResponse(BaseModel):
     """The layout rendered onto the example order."""
 
     html: str
 
 
-@_templates_router.post('/preview', response_model=TemplatePreviewResponse)
+@_templates_router.post('/preview', response_model=PoTemplatePreviewResponse)
 @read_only_post
 async def preview_template(
-    data: TemplatePreviewRequest,
+    data: PoTemplatePreviewRequest,
     current_user: UserContextDTO = Depends(get_current_user_context),
-) -> TemplatePreviewResponse:
+) -> PoTemplatePreviewResponse:
     """What this layout prints, on an order made up for the purpose.
 
     The same render the PDF goes through, on the context ``build_po_context``
@@ -122,7 +122,7 @@ async def preview_template(
         raise ServiceRejectionError(
             'template_import_not_renderable', detail=str(exc)
         ) from exc
-    return TemplatePreviewResponse(html=html)
+    return PoTemplatePreviewResponse(html=html)
 
 
 @_templates_router.post(

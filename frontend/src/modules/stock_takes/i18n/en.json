@@ -90,7 +90,8 @@
     "placeholder": "Search item by name or barcode…",
     "here": "In this count",
     "elsewhere": "Elsewhere in the organization",
-    "failed": "The search failed, so nothing is listed here. Try again."
+    "failed": "The search failed, so nothing is listed here. Try again.",
+    "noMatch": "Nothing matches “{{query}}”. Check the code or the name, or add it as a new product below."
   },
   "item": {
     "barcode": "Barcode",

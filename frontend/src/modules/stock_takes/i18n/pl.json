@@ -96,7 +96,8 @@
     "placeholder": "Szukaj produktu po nazwie lub kodzie…",
     "here": "W tej inwentaryzacji",
     "elsewhere": "W innych miejscach organizacji",
-    "failed": "Wyszukiwanie się nie powiodło, więc nic tu nie widać. Spróbuj ponownie."
+    "failed": "Wyszukiwanie się nie powiodło, więc nic tu nie widać. Spróbuj ponownie.",
+    "noMatch": "Nic nie pasuje do „{{query}}”. Sprawdź kod lub nazwę albo dodaj nowy produkt poniżej."
   },
   "item": {
     "barcode": "Kod",

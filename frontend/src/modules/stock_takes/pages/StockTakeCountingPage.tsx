@@ -11,6 +11,7 @@ import { QueryError } from "@/components/ui/QueryResult";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useStockTakeCounting } from "../hooks/useStockTakeCounting";
 import { useScanCounting } from "../hooks/useScanCounting";
+import StockTakeReadOnlyView from "../components/StockTakeReadOnlyView";
 import StockTakeScanChooser from "../components/StockTakeScanChooser";
 import StockTakeProgress from "../components/StockTakeProgress";
 import StockTakeSearchSection from "../components/StockTakeSearchSection";
@@ -19,7 +20,6 @@ import StockTakeFilters from "../components/StockTakeFilters";
 import StockTakeItemsList from "../components/StockTakeItemsList";
 import StockTakeShelfBar from "../components/StockTakeShelfBar";
 import { useCanWrite } from "@/hooks/useCanWrite";
-import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 
 /** Held back while finishing runs and while a saved count is still on its way. */
 function CompleteButton({
@@ -116,7 +116,7 @@ export default function StockTakeCountingPage() {
     confirmDialogProps,
     searchHere,
     searchElsewhere,
-    searchFailed,
+    searchNote,
   } = useStockTakeCounting(id);
 
   // choosing a fuzzy search hit must not silently add +1 to the
@@ -260,9 +260,14 @@ export default function StockTakeCountingPage() {
   // anybody can type, so the counting screen itself refuses such an account.
   if (!canWrite) {
     return (
-      <div className="space-y-4">
-        <ReadOnlyNotice module="stock_takes" />
-      </div>
+      <StockTakeReadOnlyView
+        stockTakeId={stockTake.id}
+        completed={stockTake.status === "completed"}
+        countedCount={countedCount}
+        totalCount={totalCount}
+        progress={progress}
+        discrepanciesCount={discrepanciesCount}
+      />
     );
   }
 
@@ -298,7 +303,7 @@ export default function StockTakeCountingPage() {
         onSearchChange={setSearchQuery}
         searchHere={searchHere}
         searchElsewhere={searchElsewhere}
-        searchFailed={searchFailed}
+        searchNote={searchNote}
         onSubmitCode={(code) => void scanCounting.countByCode(code)}
         isAddingNewItem={isAddingNewItem}
         onToggleAddNewItem={() => setIsAddingNewItem(!isAddingNewItem)}

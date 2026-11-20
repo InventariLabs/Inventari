@@ -90,7 +90,8 @@
     "placeholder": "Rechercher un article par nom ou code-barres…",
     "here": "Dans cet inventaire",
     "elsewhere": "Ailleurs dans l’organisation",
-    "failed": "La recherche a échoué, rien n’est donc affiché ici. Réessayez."
+    "failed": "La recherche a échoué, rien n’est donc affiché ici. Réessayez.",
+    "noMatch": "Rien ne correspond à « {{query}} ». Vérifiez le code ou le nom, ou ajoutez un nouveau produit ci-dessous."
   },
   "item": {
     "barcode": "Code-barres",

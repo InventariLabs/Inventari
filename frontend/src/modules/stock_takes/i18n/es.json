@@ -90,7 +90,8 @@
     "placeholder": "Buscar artículo por nombre o código de barras…",
     "here": "En este inventario",
     "elsewhere": "En otros lugares de la organización",
-    "failed": "La búsqueda ha fallado, por eso no aparece nada aquí. Inténtalo de nuevo."
+    "failed": "La búsqueda ha fallado, por eso no aparece nada aquí. Inténtalo de nuevo.",
+    "noMatch": "Nada coincide con «{{query}}». Revise el código o el nombre, o añada un producto nuevo abajo."
   },
   "item": {
     "barcode": "Código de barras",

@@ -90,7 +90,8 @@
     "placeholder": "Artikel nach Name oder Barcode suchen…",
     "here": "In dieser Inventur",
     "elsewhere": "An anderen Orten der Organisation",
-    "failed": "Die Suche ist fehlgeschlagen, daher wird hier nichts angezeigt. Versuchen Sie es erneut."
+    "failed": "Die Suche ist fehlgeschlagen, daher wird hier nichts angezeigt. Versuchen Sie es erneut.",
+    "noMatch": "Nichts passt zu „{{query}}“. Prüfen Sie Code oder Name oder legen Sie unten ein neues Produkt an."
   },
   "item": {
     "barcode": "Barcode",

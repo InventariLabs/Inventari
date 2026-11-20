@@ -960,6 +960,25 @@ describe("StockTakeCountingPage — filter, notes and a product that was not lis
     expect(await screen.findByText("Bread")).toBeInTheDocument();
   });
 
+  it("says so when a typed code or name matches nothing", async () => {
+    // A scanner's miss used to leave the box as it was, which reads as a slow
+    // answer: the sentence appears only once the search has answered.
+    const user = userEvent.setup();
+    server.use(
+      http.get("/api/v1/items", () => HttpResponse.json(onePage([]))),
+      http.get("/api/v1/scan/resolve", () =>
+        HttpResponse.json({}, { status: 404 }),
+      ),
+    );
+    await renderPage();
+
+    await user.type(screen.getByTestId("stock-take-counting-input"), "zzzzqq");
+
+    expect(
+      await screen.findByText(/Nothing matches “zzzzqq”/),
+    ).toBeInTheDocument();
+  });
+
   it("sends the note typed on a card along with the count", async () => {
     const user = userEvent.setup();
     await renderPage();

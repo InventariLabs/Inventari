@@ -90,7 +90,8 @@
     "placeholder": "Pesquisar item por nome ou código de barras…",
     "here": "Nesta contagem",
     "elsewhere": "Em outros pontos da organização",
-    "failed": "A pesquisa falhou, por isso nada é listado aqui. Tente novamente."
+    "failed": "A pesquisa falhou, por isso nada é listado aqui. Tente novamente.",
+    "noMatch": "Nada corresponde a “{{query}}”. Confira o código ou o nome, ou adicione um produto novo abaixo."
   },
   "item": {
     "barcode": "Código de barras",
