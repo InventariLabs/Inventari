@@ -38,7 +38,7 @@ export default function StockTakeReadOnlyView({
       />
       {completed && (
         <Link to={`/inventory/stock-takes/${stockTakeId}/report`}>
-          <Button variant="outline" rightIcon={<ChevronRight size={14} />}>
+          <Button variant="outline" rightIcon={<ChevronRight size={16} />}>
             {t("report.title")}
           </Button>
         </Link>

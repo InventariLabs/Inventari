@@ -141,16 +141,17 @@ export function ReorderAlertsCard({
                   {/* A rule with no supplier of its own is proposed the
                       cheapest one on the price list; say so, because the
                       rules table beside it shows no supplier for the rule. */}
-                  {t(
-                    rules.some(
-                      (rule) =>
-                        rule.id === alert.reorder_rule_id &&
-                        !rule.preferred_partner_id,
-                    )
-                      ? "reorderRules.alertSupplierPriceList"
-                      : "reorderRules.alertSupplier",
-                    { supplier: alert.preferred_partner_name },
-                  )}
+                  {rules.some(
+                    (rule) =>
+                      rule.id === alert.reorder_rule_id &&
+                      !rule.preferred_partner_id,
+                  )
+                    ? t("reorderRules.alertSupplierPriceList", {
+                        supplier: alert.preferred_partner_name,
+                      })
+                    : t("reorderRules.alertSupplier", {
+                        supplier: alert.preferred_partner_name,
+                      })}
                 </span>
               ) : (
                 <Badge variant="warning">{t("reorderRules.noSupplier")}</Badge>

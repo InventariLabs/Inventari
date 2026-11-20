@@ -252,7 +252,7 @@ describe("PutawayRuleEditorDialog", () => {
     renderDialog();
 
     expect(
-      screen.getByText(/fires when any one of these matches/i),
+      screen.getByText(/applies when any one of these matches/i),
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole("combobox", { name: /Category$/i }));
@@ -275,7 +275,9 @@ describe("PutawayRuleEditorDialog", () => {
     renderDialog();
 
     expect(
-      screen.getByText(/only decides between rules of the same specificity/i),
+      screen.getByText(
+        /only breaks a tie between rules that match equally specifically/i,
+      ),
     ).toBeInTheDocument();
   });
 

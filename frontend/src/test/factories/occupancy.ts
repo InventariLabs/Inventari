@@ -189,8 +189,8 @@ export function containerNode(
 
 export const floor: PutawayOccupancyOverview = {
   nodes: [
-    containerNode("Main", null, 0, summary(5, 3, 2, 1, 1, 83)),
-    containerNode("Cold", "Main", 1, summary(4, 3, 2, 1, 1, 83)),
+    containerNode("Main", null, 0, summary(5, 3, 1, 1, 1, 83)),
+    containerNode("Cold", "Main", 1, summary(4, 3, 1, 1, 1, 83)),
     shelfNode("Fridge A", "Cold", 2, 10, [entry("Plums", "26", "50", "kg")]),
     shelfNode("Fridge B", "Cold", 2, 20, [
       entry("Gouda", "12", "40"),
@@ -201,5 +201,5 @@ export const floor: PutawayOccupancyOverview = {
     containerNode("Dry", "Main", 1, summary(1, 0, 0, 0, 0, null)),
     shelfNode("Rack 1", "Dry", 2, 10, [entry("Flour", "30", null, "kg")]),
   ],
-  totals: summary(5, 3, 2, 1, 1, 83),
+  totals: summary(5, 3, 1, 1, 1, 83),
 };

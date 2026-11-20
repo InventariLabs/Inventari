@@ -1286,10 +1286,10 @@
         "mixingHint": "To decyduje, czy odłożenie może dodać tu drugi produkt.",
         "mixedDescription": "Odłożenie może umieścić w tym miejscu kilka produktów.",
         "singleDescription": "Gdy stoi tu jeden produkt, odłożenie nie wpuści innych.",
-        "singleCrowded_one": "Na tej półce stoi już {{count}} produkt. Zostają, gdzie są; jednego produktu będzie pilnować tylko odkładanie nowych towarów.",
-        "singleCrowded_few": "Na tej półce stoją już {{count}} produkty. Zostają, gdzie są; jednego produktu będzie pilnować tylko odkładanie nowych towarów.",
-        "singleCrowded_many": "Na tej półce stoi już {{count}} produktów. Zostają, gdzie są; jednego produktu będzie pilnować tylko odkładanie nowych towarów.",
-        "singleCrowded_other": "Na tej półce stoi już {{count}} produktu. Zostają, gdzie są; jednego produktu będzie pilnować tylko odkładanie nowych towarów.",
+        "singleCrowded_one": "Stoi tu już {{count}} produkt. Zostają; jednego produktu pilnuje tylko odkładanie nowych towarów.",
+        "singleCrowded_few": "Stoją tu już {{count}} produkty. Zostają; jednego produktu pilnuje tylko odkładanie nowych towarów.",
+        "singleCrowded_many": "Stoi tu już {{count}} produktów. Zostają; jednego produktu pilnuje tylko odkładanie nowych towarów.",
+        "singleCrowded_other": "Stoi tu już {{count}} produktu. Zostają; jednego produktu pilnuje tylko odkładanie nowych towarów.",
         "limits": "Limity na produkt",
         "limitsHint": "Limit dotyczy jednego produktu i jest liczony w jego jednostce. Produkt bez limitu jest nieograniczony.",
         "product": "1. Produkt",
@@ -1840,7 +1840,7 @@
         "change": "{{product}} zwykle trafia gdzie indziej. Ustawić {{location}} jako jego stałe miejsce od teraz?"
       },
       "yes": "Tak, ustaw jako stałe",
-      "done": "{{location}} jest teraz domem produktu {{product}}. Reguła dodana w Regułach odkładania; ma pierwszeństwo przed innymi regułami tego produktu.",
+      "done": "{{location}} to teraz dom produktu {{product}}; reguła jest w Regułach odkładania.",
       "no": "Nie",
       "dontAsk": "Nie pytaj więcej o {{product}}",
       "refused": {

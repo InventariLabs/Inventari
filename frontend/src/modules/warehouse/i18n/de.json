@@ -1184,8 +1184,8 @@
         "mixingHint": "Das entscheidet, ob die Einlagerung hier ein zweites Produkt zulässt.",
         "mixedDescription": "Die Einlagerung darf mehrere Produkte an diesen Lagerort stellen.",
         "singleDescription": "Sobald ein Produkt hier steht, hält die Einlagerung andere fern.",
-        "singleCrowded_one": "Hier steht schon {{count}} Produkt. Sie bleiben, wo sie sind; nur die Einlagerung neuer Ware bleibt bei einem Produkt.",
-        "singleCrowded_other": "Hier stehen schon {{count}} Produkte. Sie bleiben, wo sie sind; nur die Einlagerung neuer Ware bleibt bei einem Produkt.",
+        "singleCrowded_one": "Hier steht schon {{count}} Produkt. Sie bleiben; nur die Einlagerung neuer Ware bleibt bei einem.",
+        "singleCrowded_other": "Hier stehen schon {{count}} Produkte. Sie bleiben; nur die Einlagerung neuer Ware bleibt bei einem.",
         "limits": "Limits je Produkt",
         "limitsHint": "Ein Limit gilt je Produkt in dessen eigener Einheit. Ein Produkt ohne Limit ist unbegrenzt.",
         "product": "1. Produkt",
@@ -1716,7 +1716,7 @@
         "change": "{{product}} kommt sonst woanders hin. {{location}} ab jetzt zum Stammplatz machen?"
       },
       "yes": "Ja, als Stammplatz festlegen",
-      "done": "{{location}} ist jetzt der Standardplatz von {{product}}. Die Regel steht unter Einlagerungsregeln und geht anderen Regeln dieses Produkts vor.",
+      "done": "{{location}} ist jetzt der Platz von {{product}}; die Regel steht unter Einlagerungsregeln.",
       "no": "Nein",
       "dontAsk": "Zu {{product}} nicht mehr fragen",
       "refused": {

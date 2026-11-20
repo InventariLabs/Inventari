@@ -1184,8 +1184,8 @@
         "mixingHint": "This decides whether putaway may add a second product here.",
         "mixedDescription": "Putaway may put several products in this location.",
         "singleDescription": "Once one product stands here, putaway keeps others out.",
-        "singleCrowded_one": "{{count}} product already stands here. They stay where they are; only putaway of new goods keeps to one product.",
-        "singleCrowded_other": "{{count}} products already stand here. They stay where they are; only putaway of new goods keeps to one product.",
+        "singleCrowded_one": "{{count}} product already stands here. They stay put; only putaway of new goods keeps to one.",
+        "singleCrowded_other": "{{count}} products already stand here. They stay put; only putaway of new goods keeps to one.",
         "limits": "Limits per product",
         "limitsHint": "A limit is per product, in that product's own unit. A product without a limit is unlimited.",
         "product": "1. Product",
@@ -1716,7 +1716,7 @@
         "change": "{{product}} usually goes elsewhere. Make {{location}} its home location from now on?"
       },
       "yes": "Yes, make it the home",
-      "done": "{{location}} is now the home of {{product}}. Rule added under Putaway rules; it comes before other rules for this product.",
+      "done": "{{location}} is now the home of {{product}}; the rule is under Putaway rules.",
       "no": "No",
       "dontAsk": "Don't ask about {{product}} again",
       "refused": {

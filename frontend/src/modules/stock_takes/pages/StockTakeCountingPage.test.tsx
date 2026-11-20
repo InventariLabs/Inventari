@@ -961,8 +961,8 @@ describe("StockTakeCountingPage — filter, notes and a product that was not lis
   });
 
   it("says so when a typed code or name matches nothing", async () => {
-    // A scanner's miss used to leave the box as it was, which reads as a slow
-    // answer: the sentence appears only once the search has answered.
+    // A miss must read as a miss, not as a slow answer: the sentence appears
+    // only once the search has answered and found nothing.
     const user = userEvent.setup();
     server.use(
       http.get("/api/v1/items", () => HttpResponse.json(onePage([]))),

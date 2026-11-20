@@ -1184,8 +1184,8 @@
         "mixingHint": "Cela décide si le rangement peut ajouter un second produit ici.",
         "mixedDescription": "Le rangement peut placer plusieurs produits dans cet emplacement.",
         "singleDescription": "Dès qu’un produit est ici, le rangement en écarte les autres.",
-        "singleCrowded_one": "{{count}} produit se trouve déjà ici. Ils restent en place ; seul le rangement des nouvelles marchandises se limite à un produit.",
-        "singleCrowded_other": "{{count}} produits se trouvent déjà ici. Ils restent en place ; seul le rangement des nouvelles marchandises se limite à un produit.",
+        "singleCrowded_one": "{{count}} produit est déjà ici. Ils restent ; seul le rangement du neuf se limite à un.",
+        "singleCrowded_other": "{{count}} produits sont déjà ici. Ils restent ; seul le rangement du neuf se limite à un.",
         "limits": "Limites par produit",
         "limitsHint": "Une limite s’applique à un produit, dans sa propre unité. Un produit sans limite est illimité.",
         "product": "1. Produit",
@@ -1716,7 +1716,7 @@
         "change": "{{product}} va d'habitude ailleurs. Faire de {{location}} son emplacement habituel ?"
       },
       "yes": "Oui, en faire l'emplacement habituel",
-      "done": "{{location}} est maintenant l'emplacement habituel de {{product}}. Règle ajoutée dans les règles de rangement ; elle passe avant les autres règles de ce produit.",
+      "done": "{{location}} est maintenant l'emplacement de {{product}} ; la règle est dans les règles de rangement.",
       "no": "Non",
       "dontAsk": "Ne plus demander pour {{product}}",
       "refused": {

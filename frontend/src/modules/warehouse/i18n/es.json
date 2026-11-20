@@ -1184,8 +1184,8 @@
         "mixingHint": "Esto decide si la colocación puede añadir un segundo producto aquí.",
         "mixedDescription": "La colocación puede poner varios productos en esta ubicación.",
         "singleDescription": "Cuando hay un producto aquí, la colocación mantiene fuera los demás.",
-        "singleCrowded_one": "Ya hay {{count}} producto aquí. Se quedan donde están; solo el almacenamiento de mercancía nueva se limita a un producto.",
-        "singleCrowded_other": "Ya hay {{count}} productos aquí. Se quedan donde están; solo el almacenamiento de mercancía nueva se limita a un producto.",
+        "singleCrowded_one": "Ya hay {{count}} producto aquí. Se quedan; solo el almacenamiento nuevo se limita a uno.",
+        "singleCrowded_other": "Ya hay {{count}} productos aquí. Se quedan; solo el almacenamiento nuevo se limita a uno.",
         "limits": "Límites por producto",
         "limitsHint": "Un límite es por producto, en su propia unidad. Un producto sin límite es ilimitado.",
         "product": "1. Producto",
@@ -1716,7 +1716,7 @@
         "change": "{{product}} suele ir a otro sitio. ¿Hacer de {{location}} su ubicación habitual a partir de ahora?"
       },
       "yes": "Sí, hacerla habitual",
-      "done": "{{location}} es ahora la ubicación habitual de {{product}}. Regla añadida en Reglas de almacenamiento; va antes que otras reglas de este producto.",
+      "done": "{{location}} es ahora la ubicación de {{product}}; la regla está en Reglas de almacenamiento.",
       "no": "No",
       "dontAsk": "No volver a preguntar por {{product}}",
       "refused": {
