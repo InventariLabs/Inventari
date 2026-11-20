@@ -473,6 +473,29 @@ describe("ItemsPage — module-owned data is an organization policy", () => {
     expect(screen.queryByText(/\b0 records/)).toBeNull();
   });
 
+  it("tells a refused account it may not read products, with no retry", async () => {
+    server.use(
+      http.get("*/organizations/my", () =>
+        HttpResponse.json({ ...org, settings: {} }),
+      ),
+      http.get("*/items", () =>
+        HttpResponse.json({ detail: "forbidden" }, { status: 403 }),
+      ),
+    );
+
+    render(
+      <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
+        <ItemsPage />
+      </PageHeaderContext.Provider>,
+    );
+
+    expect(
+      await screen.findByText("You do not have access to this"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/an error occurred/i)).toBeNull();
+    expect(screen.queryByRole("button", { name: /try again/i })).toBeNull();
+  });
+
   it("shows no hidden counter when nothing is kept out", async () => {
     server.use(
       http.get("*/organizations/my", () =>

@@ -532,8 +532,7 @@ export default function ItemsPage() {
 
       <ItemsContent
         canWrite={canWrite}
-        isError={isError}
-        error={error}
+        failure={isError ? { error } : undefined}
         isLoading={isLoading}
         itemsResponse={itemsResponse}
         items={items}
