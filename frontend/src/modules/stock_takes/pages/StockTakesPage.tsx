@@ -112,6 +112,7 @@ export default function StockTakesPage() {
     data: stockTakesData,
     isLoading,
     isError,
+    error,
     refetch,
   } = useStockTakes(statusFilter as StockTakeStatus | "", {
     offset,
@@ -151,7 +152,7 @@ export default function StockTakesPage() {
   // "No stock takes" over nine counts in progress invites a tenth count of a
   // location somebody is already walking.
   if (isError) {
-    return <QueryError onRetry={refetch} />;
+    return <QueryError error={error} onRetry={refetch} />;
   }
 
   return (

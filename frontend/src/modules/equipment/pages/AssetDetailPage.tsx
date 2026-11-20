@@ -205,7 +205,7 @@ export default function AssetDetailPage() {
   }
 
   if (isError && !isNotFoundError(error)) {
-    return <QueryError onRetry={() => void refetch()} />;
+    return <QueryError error={error} onRetry={() => void refetch()} />;
   }
 
   if (!item) {

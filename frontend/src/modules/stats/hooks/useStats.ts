@@ -63,6 +63,7 @@ export function useStatsHeadline(excludeModuleContexts: boolean) {
         : undefined,
     isLoading: overview.isLoading || attention.isLoading,
     isError: overview.isError || attention.isError,
+    error: overview.error ?? attention.error,
     refetch: () => {
       void overview.refetch();
       void attention.refetch();

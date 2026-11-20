@@ -276,7 +276,7 @@ function useArchivedListing(listTab: ListTab, search: string) {
   const archivedSearch = listTab === "archived" ? search : "";
   const paging = useKeysetPaging({ listTab, archivedSearch });
 
-  const { data, isLoading, isError, isPlaceholderData, refetch } = useQuery({
+  const { data, isLoading, error, isPlaceholderData, refetch } = useQuery({
     queryKey: [
       ...queryKeys.equipment.assets.list({}),
       "archived",
@@ -307,8 +307,8 @@ function useArchivedListing(listTab: ListTab, search: string) {
     archivedSearch,
     data,
     isLoading,
-    isError,
-    refetch,
+    error,
+    refetch: () => void refetch(),
     // The page bar, ready to spread onto Pagination.
     pagination: {
       skip: paging.page * PAGE_SIZE,
@@ -378,7 +378,7 @@ export function useAssetListActions() {
     ],
   );
 
-  const { data, isLoading, isError, refetch } = useEquipmentAssets({
+  const { data, isLoading, error, refetch } = useEquipmentAssets({
     ...scope,
     checked_out: checkedOut || undefined,
     sort,
@@ -445,7 +445,7 @@ export function useAssetListActions() {
     archivedSearch,
     data: archivedItems,
     isLoading: archivedLoading,
-    isError: archivedError,
+    error: archiveError,
     refetch: refetchArchived,
     pagination: archivedPagination,
   } = useArchivedListing(listTab, search);
@@ -814,10 +814,10 @@ export function useAssetListActions() {
     handleSortChange,
     applySort,
     isLoading,
-    isError,
+    error,
     refetch,
     archivedLoading,
-    archivedError,
+    archiveError,
     refetchArchived,
     items,
     equipmentArchived,

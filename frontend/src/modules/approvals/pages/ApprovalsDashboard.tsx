@@ -131,7 +131,7 @@ export default function ApprovalsDashboard() {
   // The settings screen behind the link below is administrator-only
   // (settingsAccess), so the link shows only to those it lets in.
   const isAdmin = useHasPermission("admin:access");
-  const { data, isLoading, isError, refetch } = useApprovalRequests({
+  const { data, isLoading, isError, error, refetch } = useApprovalRequests({
     status: statusFilter || undefined,
     search: search.trim() || undefined,
     offset,
@@ -180,7 +180,7 @@ export default function ApprovalsDashboard() {
       ) : isError ? (
         /* "Nothing to approve" and "we could not reach the server" are not the
  same message to give someone waiting on a decision. */
-        <QueryError onRetry={() => void refetch()} />
+        <QueryError error={error} onRetry={() => void refetch()} />
       ) : requests.length === 0 ? (
         <QueueEmptyState
           canDecide={canDecide}

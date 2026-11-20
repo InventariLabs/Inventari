@@ -73,6 +73,7 @@ export default function DocumentsPage() {
     onPageChange,
     onLimitChange,
     isError,
+    error,
     refetch,
     partnerId,
     clearPartnerFilter,
@@ -198,6 +199,7 @@ export default function DocumentsPage() {
         </div>
       ) : isError ? (
         <QueryError
+          error={error}
           message={t("errors.loadDocumentsFailed")}
           onRetry={() => void refetch()}
         />

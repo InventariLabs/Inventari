@@ -160,7 +160,7 @@ export default function StockValueMovementPage() {
       ) : isLoading ? (
         <LoadingSpinner />
       ) : isError && !isServerRefusal(error) ? (
-        <QueryError onRetry={() => void refetch()} />
+        <QueryError error={error} onRetry={() => void refetch()} />
       ) : isError ? (
         // The refusal is the answer: it names the day the ledger starts, or
         // says the period ends before it begins.
