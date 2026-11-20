@@ -25,6 +25,7 @@ function renderActions(overrides: Record<string, unknown> = {}) {
         onCheckin={noop}
         onRestore={noop}
         onPurge={noop}
+        canPurge
         onRetire={noop}
         onArchive={noop}
         {...overrides}
@@ -68,5 +69,22 @@ describe("icon controls on the asset detail header", () => {
     expect(
       screen.getByText("Cannot retire — return the asset first"),
     ).toBeInTheDocument();
+  });
+});
+
+describe("an archived asset's header", () => {
+  it("offers Delete Permanently only to an account the organization lets purge", () => {
+    renderActions({ isArchived: true, canPurge: true });
+    expect(
+      screen.getByRole("button", { name: "Delete Permanently" }),
+    ).toBeInTheDocument();
+  });
+
+  it("offers Restore alone when purging is not allowed", () => {
+    renderActions({ isArchived: true, canPurge: false });
+    expect(screen.getByRole("button", { name: "Restore" })).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Delete Permanently" }),
+    ).not.toBeInTheDocument();
   });
 });

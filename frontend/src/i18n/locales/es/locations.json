@@ -353,6 +353,7 @@
     "emptyDescriptionNone": "No contiene registros ni ubicaciones.",
     "emptyDescription_one": "Su {{count}} registro está en la pestaña Productos.",
     "emptyDescription_other": "Sus {{count}} registros están en la pestaña Productos.",
+    "noLocationsInside": "No hay ubicaciones dentro",
     "showProducts": "Mostrar productos",
     "selected_one": "{{count}} ubicación seleccionada",
     "selected_other": "{{count}} ubicaciones seleccionadas",
@@ -367,6 +368,9 @@
   },
   "products": {
     "includeInside": "Incluir ubicaciones dentro",
+    "noneHere": "Aquí no hay registros directamente",
+    "insideDescription_one": "{{count}} registro está en las ubicaciones de dentro.",
+    "insideDescription_other": "{{count}} registros están en las ubicaciones de dentro.",
     "includingInside_one": "Incluyendo 1 ubicación dentro",
     "includingInside_other": "Incluyendo {{count}} ubicaciones dentro"
   },

@@ -25,6 +25,7 @@ import {
 import { computeFieldDefinitions } from "@/modules/inventory/hooks/computeFieldDefinitions";
 import { getLabel } from "@/modules/inventory/components/FieldRenderers/helpers";
 import { useMoney } from "@/hooks/useMoney";
+import { useProductTemplateStock } from "@/modules/inventory/hooks/useProductTemplateStock";
 import {
   quantityText,
   usePartialPackage,
@@ -211,6 +212,14 @@ export default function ItemDetailOverview({
   const money = useMoney();
   const partial = usePartialPackage()(item);
   const showInventoryValue = useShowInventoryValue();
+  const { data: productStock } = useProductTemplateStock(item.template_id);
+  // Said only when the product has more than this record: a search result
+  // reads "2 pcs. in 2 records", and the record it opens owes that total.
+  const productTotal =
+    productStock &&
+    Number(productStock.total_quantity) !== Number(item.quantity)
+      ? productStock
+      : null;
 
   const storage = storages?.find((s) => s.id === item.location_id);
   const category = categories?.find((c) => c.id === item.category_id);
@@ -248,6 +257,15 @@ export default function ItemDetailOverview({
               {t("inventory:stock.seeForProduct")}
             </Link>
           ) : null}
+        </Field>
+        <Field label={t("items:detail.productTotal")}>
+          {productTotal
+            ? formatQuantityLocalized(
+                t,
+                productTotal.total_quantity,
+                productTotal.uom_symbol,
+              )
+            : null}
         </Field>
         <Field label={t("items:itemStorage")}>
           <RecordLocation

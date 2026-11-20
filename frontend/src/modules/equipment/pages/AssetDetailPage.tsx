@@ -9,7 +9,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { QueryError } from "@/components/ui/QueryResult";
 import { RecordNotFound } from "@/components/ui/RecordNotFound";
 import { isNotFoundError } from "@/lib/errors";
-import { useRecordVisit } from "@/module-sdk";
+import { useCanPurge, useRecordVisit } from "@/module-sdk";
 import { AssetStatusBadge } from "@/modules/equipment/components/AssetStatusBadge";
 import { AssetDetailHeaderActions } from "@/modules/equipment/components/AssetDetailHeaderActions";
 import { CheckoutModal } from "@/modules/equipment/components/CheckoutModal";
@@ -110,6 +110,7 @@ export default function AssetDetailPage() {
 
   const { setHeader } = useModulePageHeader();
   const canWrite = useCanWrite("equipment");
+  const canPurge = useCanPurge();
   // retired (status) and archived (soft-deleted) are distinct —
   // restore/purge apply to archived assets only.
   const isArchived = Boolean(item?.is_deleted);
@@ -136,6 +137,7 @@ export default function AssetDetailPage() {
           onCheckin={(assignment) => setCheckinTarget(assignment)}
           onRestore={() => setShowRestoreConfirm(true)}
           onPurge={() => setShowPurgeConfirm(true)}
+          canPurge={canPurge}
           onRetire={() => setShowRetireConfirm(true)}
           onArchive={() => setShowArchiveConfirm(true)}
         />
@@ -154,6 +156,7 @@ export default function AssetDetailPage() {
     approvalStatus,
     activeAssignment,
     canWrite,
+    canPurge,
     handleChangeStatus,
     isBulkEditing,
   ]);

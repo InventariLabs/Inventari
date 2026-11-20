@@ -232,7 +232,13 @@ export default function StoragesPage() {
           select(parentId ?? "");
         }}
         initialTab={
-          searchParams.get("configure") === "true" ? "settings" : "contents"
+          searchParams.get("configure") === "true"
+            ? "settings"
+            : // A place with no locations inside has nothing to list on
+              // Contents: its records are what the count beside it promised.
+              node.direct_children_count === 0 && node.items_count > 0
+              ? "products"
+              : "contents"
         }
       />
     );
