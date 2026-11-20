@@ -31,14 +31,23 @@
  *     computed off a defaulted list. A quantity derived from the query and
  *     then compared is read here, and the expression that renders it — the
  *     JSX braces or the attribute value — has to name the error or the
- *     loading state. A name carries the query only through its own
+ *     loading state, by its field name or by the name the read bound it to
+ *     (`locationsLoading`). A name carries the query only through its own
  *     initializer (`const total = itemTotals(response)`); a `useState` beside
- *     a hook is not query data, nor is a mutation's result. The whole-query
- *     spelling (`const q = useItems()`) is a query only when the scope reads
- *     `q.data` or one of its outcome fields; a virtualizer or a router handle
- *     is a hook too. An early `return` on the error or loading flag in the
- *     same component answers for the claim below it: nothing renders after
- *     that return until the read has an answer.
+ *     a hook is not query data, nor is a mutation's result, and a name read
+ *     through an object the query does not carry (`result.runs.length`) is
+ *     not the query's either. The whole-query spelling (`const q =
+ *     useItems()`) is a query only when the scope reads `q.data` or one of
+ *     its outcome fields; a virtualizer or a router handle is a hook too, and
+ *     a record's own `status` is not the read's. Two shapes answer for the claim below them, and both
+ *     have to be in the component's own body: an `if (isError) return …` in
+ *     it, whose following statements run only once the read has an answer;
+ *     and the claim in the alternate branch of `isError ? … : <claim>`. A
+ *     guard inside a click handler or an effect answers for nothing — it
+ *     runs after the screen has drawn — and a ternary or an outcome word
+ *     elsewhere in the JSX does not answer either: a claim beside
+ *     `{isError ? <QueryFailure /> : null}` still renders while the read
+ *     failed.
  *   - A component that models loading and not failure. The recipe picker's
  *     `SuggestedRecipes` took `suggestions` and `isLoading`, drew a spinner
  *     while loading, and answered "No suggestions for this slot" on a
@@ -380,31 +389,147 @@ function renderedExpression(text, index) {
 const OUTCOME =
   /\b(?:isError|error|isLoadingError|status|isLoading|isPending|isFetching|isPlaceholderData|failed)\b/;
 
+/** `name` as a whole word in `text`; the names are identifiers. */
+function mentions(text, name) {
+  return new RegExp(String.raw`\b${name.replace(/\$/g, "\\$")}\b`).test(text);
+}
+
 /**
- * Whether the component has already answered with the error or the loading
- * state above `at`: `if (isError) return <QueryFailure />` leaves nothing of
- * the claim rendered until the read has an answer.
+ * A test read positively. `if (!isError) return <List />` returns on
+ * success and leaves the claim below it to render while the read failed, so
+ * a negated flag answers for nothing. `outcomes` holds the names the read
+ * bound its outcome to — `isTreeLoading`, `locationsFailed` — which the
+ * fixed list of field names does not spell.
  */
-function earlyOutcome(text, scope, at) {
-  const head = text.slice(scope.start, at);
-  for (const guard of head.matchAll(
-    /\bif\s*\(\s*([^)]*)\)\s*\{?\s*return\b/g,
-  )) {
-    if (OUTCOME.test(guard[1])) return true;
+function readsOutcome(test, outcomes) {
+  const positive = test.replace(/!\s*[\w$]+(?:\.[\w$]+)*/g, "");
+  return (
+    OUTCOME.test(positive) || outcomes.some((name) => mentions(positive, name))
+  );
+}
+
+/** Whether a statement cannot complete: it returns or throws, itself or last. */
+function alwaysExits(statement) {
+  if (!statement) return false;
+  if (ts.isReturnStatement(statement) || ts.isThrowStatement(statement)) {
+    return true;
   }
-  // The same guard as a conditional return: `return isError ? … : isLoading
-  // ? … : <Button disabled={rows.length === 0} />`.
-  const returned = head.lastIndexOf("return");
-  if (returned === -1) return false;
-  const tail = head.slice(returned);
-  return !tail.includes(";") && tail.includes("?") && OUTCOME.test(tail);
+  if (ts.isBlock(statement)) {
+    return alwaysExits(statement.statements[statement.statements.length - 1]);
+  }
+  return false;
+}
+
+/** The deepest node of `tree` that holds `at`. */
+function nodeAt(tree, at) {
+  let node = tree;
+  for (;;) {
+    let next = null;
+    ts.forEachChild(node, (child) => {
+      if (child.getStart(tree) <= at && at < child.end) {
+        next = child;
+        return true;
+      }
+      return false;
+    });
+    if (!next) return node;
+    node = next;
+  }
+}
+
+/**
+ * The component, hook or helper declaration the scope names, when the syntax
+ * tree has one. `memo(…)` and `forwardRef(…)` hold it as their argument.
+ */
+function scopeFunctionAt(tree, start) {
+  for (const statement of tree.statements) {
+    if (statement.getStart(tree) !== start) continue;
+    if (ts.isFunctionDeclaration(statement)) return statement;
+    if (!ts.isVariableStatement(statement)) return null;
+    for (const declaration of statement.declarationList.declarations) {
+      let init = declaration.initializer;
+      if (init && ts.isCallExpression(init) && init.arguments.length > 0) {
+        init = init.arguments[0];
+      }
+      if (init && (ts.isArrowFunction(init) || ts.isFunctionExpression(init))) {
+        return init;
+      }
+    }
+    return null;
+  }
+  return null;
+}
+
+/** Whether `block` belongs to the component's own body, not a nested function. */
+function ownedBy(block, scopeFunction) {
+  if (!scopeFunction) return false;
+  for (let node = block.parent; node; node = node.parent) {
+    if (ts.isFunctionLike(node)) return node === scopeFunction;
+  }
+  return false;
+}
+
+/**
+ * Whether the claim at `at` cannot render before the read has an answer.
+ *
+ * Two shapes answer for it, and both have to be in the component's own
+ * body: `if (isError) return <QueryFailure />`, whose remaining statements
+ * run only once the read has answered; and the claim in the alternate
+ * branch of `isError ? <QueryFailure /> : <Button disabled={rows.length === 0}>`.
+ * A guard inside a click handler or an effect answers for nothing — it runs
+ * after the screen has drawn — and a ternary or an outcome word elsewhere
+ * in the JSX does not either: `{isError ? <QueryFailure /> : null}` beside
+ * `hasRows={total > 0}` draws the claim while the read failed.
+ */
+function earlyOutcome(tree, scopeFunction, at, outcomes) {
+  const leaf = nodeAt(tree, at);
+  let node = leaf;
+  while (node && node !== scopeFunction) {
+    const parent = node.parent;
+    if (!parent) break;
+    if (ts.isConditionalExpression(parent)) {
+      const alternate = parent.whenFalse;
+      if (
+        at >= alternate.getStart(tree) &&
+        at < alternate.end &&
+        readsOutcome(parent.condition.getText(tree), outcomes)
+      ) {
+        return true;
+      }
+    }
+    if (ts.isBlock(parent) && ownedBy(parent, scopeFunction)) {
+      for (const statement of parent.statements) {
+        if (statement.end > at) break;
+        if (
+          ts.isIfStatement(statement) &&
+          alwaysExits(statement.thenStatement) &&
+          readsOutcome(statement.expression.getText(tree), outcomes)
+        ) {
+          return true;
+        }
+      }
+    }
+    node = parent;
+  }
+  return false;
 }
 
 /**
  * Findings for the claims `derived` makes in one scope: a length or a
  * zero-comparison that decides an empty state or a disabled action.
+ * `outcomes` are the names the read bound its outcome to; `answersEarly`
+ * says whether the component has already answered with that outcome above
+ * the claim.
  */
-function claimFindings(rel, text, scope, derived, lineOf) {
+function claimFindings(
+  rel,
+  text,
+  scope,
+  derived,
+  outcomes,
+  lineOf,
+  answersEarly,
+) {
   const out = [];
   if (derived.length === 0) return out;
   const names = derived.map((n) => n.replace(/\$/g, "\\$")).join("|");
@@ -414,6 +539,13 @@ function claimFindings(rel, text, scope, derived, lineOf) {
   );
   for (const claim of text.slice(scope.start, scope.end).matchAll(claims)) {
     const at = scope.start + claim.index;
+    // A name reached through an object the query does not carry is not the
+    // query's data: `result.runs.length` reads a mutation's result beside
+    // the `runs` query, and its count is not a claim about the read.
+    const owner = /([A-Za-z_$][\w$]*)\s*\??\.\s*$/.exec(
+      text.slice(scope.start, at),
+    );
+    if (owner && !derived.includes(owner[1])) continue;
     const plain = claim[0].replace(/\s+/g, "");
     const comparison = !/\.length$/.test(plain);
     if (
@@ -428,8 +560,13 @@ function claimFindings(rel, text, scope, derived, lineOf) {
       text
         .slice(Math.max(0, text.lastIndexOf("return", at)), at + 400)
         .split(";")[0];
-    if (OUTCOME.test(expression)) continue;
-    if (earlyOutcome(text, scope, at)) continue;
+    if (
+      OUTCOME.test(expression) ||
+      outcomes.some((name) => mentions(expression, name))
+    ) {
+      continue;
+    }
+    if (answersEarly(scope, at, outcomes)) continue;
     const before = text.slice(Math.max(0, at - 80), at);
     // The claims that lie are the ones deciding emptiness, a disabled action,
     // or a count in a sentence: an ordinary ".length" in a list header says
@@ -456,6 +593,23 @@ export function unguardedClaimsIn(rel, source) {
   const text = blankComments(source);
   const out = [];
   const lineOf = (index) => text.slice(0, index).split("\n").length;
+  // The syntax tree is built once, and only when a claim needs it: the text
+  // scan narrows the file to the few places that ask a question about data.
+  let tree = null;
+  const scopes = new Map();
+  const answersEarly = (scope, at, outcomes) => {
+    tree ??= ts.createSourceFile(
+      rel,
+      text,
+      ts.ScriptTarget.Latest,
+      true,
+      /\.tsx$/.test(rel) ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+    );
+    if (!scopes.has(scope.start)) {
+      scopes.set(scope.start, scopeFunctionAt(tree, scope.start));
+    }
+    return earlyOutcome(tree, scopes.get(scope.start), at, outcomes);
+  };
   const pattern = /\bconst\s*\{/g;
   let match;
   while ((match = pattern.exec(text)) !== null) {
@@ -471,16 +625,21 @@ export function unguardedClaimsIn(rel, source) {
     const seeds = [
       data.alias,
       ...boundNames(body).filter((name) =>
-        /Error|error|Loading|Pending|Fetching|status|Placeholder/.test(name),
+        /Error|error|Loading|Pending|Fetching|status|Placeholder|Failed|failed|Failure|failure/.test(
+          name,
+        ),
       ),
     ];
+    const outcomes = seeds.slice(1).filter((name) => name !== data.alias);
     out.push(
       ...claimFindings(
         rel,
         text,
         scope,
         derivedNames(text, scope, seeds),
+        outcomes,
         lineOf,
+        answersEarly,
       ),
     );
   }
@@ -492,13 +651,17 @@ export function unguardedClaimsIn(rel, source) {
     const scope = scopeOf(text, match.index);
     // Only a hook read through the query's own fields is a query: a
     // virtualizer or a router handle is a hook too, and its methods are not
-    // data whose failure the screen has to answer for.
+    // data whose failure the screen has to answer for. A `status` the hook
+    // returns is often the record's own — a document's, a job's — not the
+    // read's, so reading one does not make the hook a query.
     const readsQuery = new RegExp(
-      String.raw`\b${name}\.(?:data|error|status|refetch|isLoading|isLoadingError|isPending|isFetching|isPlaceholderData)\b`,
+      String.raw`\b${name}\.(?:data|error|refetch|isLoading|isLoadingError|isPending|isFetching|isPlaceholderData)\b`,
     ).test(text.slice(scope.start, scope.end));
     if (!readsQuery) continue;
     const derived = derivedNames(text, scope, [name]);
-    out.push(...claimFindings(rel, text, scope, derived, lineOf));
+    out.push(
+      ...claimFindings(rel, text, scope, derived, [], lineOf, answersEarly),
+    );
   }
   return out;
 }

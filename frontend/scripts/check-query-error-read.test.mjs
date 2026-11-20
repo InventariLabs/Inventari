@@ -297,6 +297,130 @@ describe("unguardedClaimsIn", () => {
     ].join("\n");
     expect(unguardedClaimsIn(rel, source)).toEqual([]);
   });
+
+  it("leaves a claim in the alternate branch of a conditional on the flag", () => {
+    const source = [
+      "function List() {",
+      "  const { data: things = [], isError } = useThings();",
+      "  return (",
+      "    <div>",
+      "      {isError ? <QueryFailure /> : <Button disabled={things.length === 0}>Save</Button>}",
+      "    </div>",
+      "  );",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toEqual([]);
+  });
+
+  it("leaves a claim whose expression names the outcome under another name", () => {
+    const source = [
+      "function List() {",
+      "  const { data: locations = [], isLoading: locationsLoading } = useThings();",
+      "  return <Select disabled={locationsLoading || locations.length === 0} />;",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toEqual([]);
+  });
+
+  it("does not make a hook whose record carries a status a query", () => {
+    const source = [
+      "function Card({ stored }) {",
+      "  const doc = useLineNames(stored) ?? stored;",
+      "  const preview = doc.lines.slice(0, 3);",
+      "  return <Button status={doc.status} disabled={preview.length === 0}>Go</Button>;",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toEqual([]);
+  });
+
+  it("does not read a mutation result's property as the query's", () => {
+    const source = [
+      "function List() {",
+      "  const { data: runs = [], isLoading } = useRuns();",
+      "  const plan = usePlan();",
+      "  return (",
+      "    <Button",
+      '      onClick={() => plan.mutate(1, { onSuccess: (result) => toast.success(t("planned", { count: result.runs.length })) })}',
+      "      disabled={isLoading || runs.length === 0}",
+      "    >",
+      "      Go",
+      "    </Button>",
+      "  );",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toEqual([]);
+  });
+
+  it("fires on a claim beside an error drawn as a sibling", () => {
+    const source = [
+      "function List() {",
+      "  const { data: rows = [], isError } = useThings();",
+      "  const total = rows.length;",
+      "  return (",
+      "    <div>",
+      "      {isError ? <QueryFailure /> : null}",
+      "      <ListHeader hasRows={total > 0} />",
+      "    </div>",
+      "  );",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toMatchObject([
+      { site: "List :: total>0" },
+    ]);
+  });
+
+  it("fires on an empty state beside the error and a mutation's progress", () => {
+    const source = [
+      "function List() {",
+      "  const { data: rows = [], isError } = useThings();",
+      "  const save = useSave();",
+      "  return (",
+      "    <div>",
+      '      <Button>{save.isPending ? "Saving" : "Save"}</Button>',
+      "      {isError && <p>An error occurred</p>}",
+      '      {rows.length === 0 && <EmptyState title="No things yet" />}',
+      "    </div>",
+      "  );",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toMatchObject([
+      { site: "List :: rows.length" },
+    ]);
+  });
+
+  it("does not accept a guard inside a handler or an effect", () => {
+    const source = [
+      "function List() {",
+      "  const { data: rows = [], isError, isFetching } = useThings();",
+      "  const total = rows.length;",
+      "  const save = useSave();",
+      "  const onSave = () => { if (save.isPending) return; doSave(); };",
+      "  useEffect(() => { if (isFetching) return; doThing(); }, []);",
+      "  return (",
+      "    <div>",
+      "      {isError && <QueryFailure />}",
+      "      <ListHeader hasRows={total > 0} />",
+      "    </div>",
+      "  );",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toMatchObject([
+      { site: "List :: total>0" },
+    ]);
+  });
+
+  it("does not accept a guard that returns on the answer", () => {
+    const source = [
+      "function List() {",
+      "  const { data: things = [], isLoading } = useThings();",
+      "  if (!isLoading) return <ListBody rows={things} />;",
+      "  return <Button disabled={things.length === 0}>Save</Button>;",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toMatchObject([
+      { site: "List :: things.length" },
+    ]);
+  });
 });
 
 describe("loadingWithoutFailureIn", () => {
