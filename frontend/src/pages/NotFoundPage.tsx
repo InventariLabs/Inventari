@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { buttonVariants } from "@/components/ui/Button";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import { useModules } from "@/contexts/ModulesContext";
 import { MODULE_PATHS } from "@/lib/moduleRegistry/modulePaths";
 import { useHasPermission } from "@/hooks/useHasPermission";
@@ -23,7 +22,7 @@ function matchesRoute(pattern: string, path: string): boolean {
 export default function NotFoundPage() {
   const location = useLocation();
   const { t } = useTranslation("common");
-  const { enabledModules, isLoading: modulesLoading } = useModules();
+  const { enabledModules } = useModules();
   const moduleLabels = useModuleLabels();
   const isAdmin = useHasPermission("admin:access");
 
@@ -52,12 +51,6 @@ export default function NotFoundPage() {
   useDocumentTitle(
     isDisabledModule ? t("notFound.moduleNotEnabled") : t("notFound.title"),
   );
-
-  // A route that is not in the tree yet is not a route that does not exist.
-  // Until the module list (and with it the module routes) has landed, this
-  // screen reports "wait", not "Page Not Found": a full page load of a
-  // module address met the answer for an address nobody knows.
-  if (modulesLoading) return <LoadingSpinner fullScreen />;
 
   if (isDisabledModule) {
     // `modules.<name>.name`, the single source of truth (docs/MODULE_NAMES.md).

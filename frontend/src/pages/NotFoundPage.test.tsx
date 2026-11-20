@@ -16,14 +16,12 @@ vi.mock("@/store/authStore", () => ({
     selector ? selector(authState) : authState,
 }));
 
-const modulesState = vi.hoisted(() => ({ loading: false }));
-
 vi.mock("@/contexts/ModulesContext", () => ({
   useModules: () => ({
     // Neither module is on — that is the situation under test.
     enabledModules: ["core", "items"],
     isModuleEnabled: () => false,
-    isLoading: modulesState.loading,
+    isLoading: false,
     refreshModules: vi.fn(),
   }),
 }));
@@ -39,19 +37,6 @@ function renderAt(path: string) {
 describe("NotFoundPage", () => {
   beforeEach(() => {
     authState.user = { role: "manager", is_superuser: false, permissions: [] };
-    modulesState.loading = false;
-  });
-
-  it("waits rather than answer a module address before the list arrives", () => {
-    // A full load of a module address builds its routes only once the
-    // module list has landed; answering "Page Not Found" in that window told
-    // the reader their warehouse was gone.
-    modulesState.loading = true;
-
-    renderAt("/warehouse/todo");
-
-    expect(screen.queryByText("Page Not Found")).not.toBeInTheDocument();
-    expect(screen.queryByText("Module Not Enabled")).not.toBeInTheDocument();
   });
 
   it("names a module no chunk was ever loaded for", () => {
