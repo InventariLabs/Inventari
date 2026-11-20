@@ -276,24 +276,23 @@ function useArchivedListing(listTab: ListTab, search: string) {
   const archivedSearch = listTab === "archived" ? search : "";
   const paging = useKeysetPaging({ listTab, archivedSearch });
 
-  const { data, isLoading, isError, error, isPlaceholderData, refetch } =
-    useQuery({
-      queryKey: [
-        ...queryKeys.equipment.assets.list({}),
-        "archived",
-        archivedSearch,
-        paging.cursor ?? null,
-      ],
-      queryFn: async () => {
-        return itemsApi.getArchived({
-          module_scope: "equipment",
-          search: archivedSearch || undefined,
-          cursor: paging.cursor,
-          limit: PAGE_SIZE,
-        });
-      },
-      placeholderData: keepPreviousData,
-    });
+  const { data, isLoading, error, isPlaceholderData, refetch } = useQuery({
+    queryKey: [
+      ...queryKeys.equipment.assets.list({}),
+      "archived",
+      archivedSearch,
+      paging.cursor ?? null,
+    ],
+    queryFn: async () => {
+      return itemsApi.getArchived({
+        module_scope: "equipment",
+        search: archivedSearch || undefined,
+        cursor: paging.cursor,
+        limit: PAGE_SIZE,
+      });
+    },
+    placeholderData: keepPreviousData,
+  });
 
   const { goNext } = paging;
   const nextCursor = data?.next_cursor;
@@ -308,9 +307,8 @@ function useArchivedListing(listTab: ListTab, search: string) {
     archivedSearch,
     data,
     isLoading,
-    isError,
     error,
-    refetch,
+    refetch: () => void refetch(),
     // The page bar, ready to spread onto Pagination.
     pagination: {
       skip: paging.page * PAGE_SIZE,
@@ -380,7 +378,7 @@ export function useAssetListActions() {
     ],
   );
 
-  const { data, isLoading, isError, error, refetch } = useEquipmentAssets({
+  const { data, isLoading, error, refetch } = useEquipmentAssets({
     ...scope,
     checked_out: checkedOut || undefined,
     sort,
@@ -447,8 +445,7 @@ export function useAssetListActions() {
     archivedSearch,
     data: archivedItems,
     isLoading: archivedLoading,
-    isError: archivedError,
-    error: archivedFailure,
+    error: archiveError,
     refetch: refetchArchived,
     pagination: archivedPagination,
   } = useArchivedListing(listTab, search);
@@ -817,12 +814,10 @@ export function useAssetListActions() {
     handleSortChange,
     applySort,
     isLoading,
-    isError,
     error,
     refetch,
     archivedLoading,
-    archivedError,
-    archivedFailure,
+    archiveError,
     refetchArchived,
     items,
     equipmentArchived,

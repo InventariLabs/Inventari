@@ -405,9 +405,7 @@ export default function RecipesPage() {
     activeQuery.data as { items?: RecipeList[]; total?: number } | undefined,
     cookScope === "ready" ? readyRecipes : almostRecipes,
   );
-  const isLoading = activeQuery.isLoading;
-  const isError = activeQuery.isError;
-  const queryError = activeQuery.error;
+  const { isLoading, isError, error: queryError } = activeQuery;
 
   const controlsVisible = showListControls({
     isLoading,

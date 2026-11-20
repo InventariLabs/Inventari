@@ -35,6 +35,15 @@ import { LabelPageSelectAll } from "@/modules/inventory/components/labels/LabelP
 
 const PAGE_SIZE = 50;
 
+/** One page of the unassigned labels, narrowed to a status when one is chosen. */
+function usePoolLabels(filterStatus: string, offset: number) {
+  return useLabels(false, undefined, {
+    status: filterStatus === "ALL" ? undefined : filterStatus,
+    offset,
+    limit: PAGE_SIZE,
+  });
+}
+
 export default function LabelPoolPage() {
   const { t } = useTranslation(["labels", "common"]);
   const { setHeader } = useModulePageHeader();
@@ -122,14 +131,9 @@ export default function LabelPoolPage() {
     showGenForm,
   ]);
 
-  const { data, isLoading, isError, error, refetch } = useLabels(
-    false,
-    undefined,
-    {
-      status: filterStatus === "ALL" ? undefined : filterStatus,
-      offset,
-      limit: PAGE_SIZE,
-    },
+  const { data, isLoading, isError, error, refetch } = usePoolLabels(
+    filterStatus,
+    offset,
   );
   // useMemo is REQUIRED: ``data?.items ?? []`` creates a new array reference
   // on every render while data is undefined, which would re-fire the
