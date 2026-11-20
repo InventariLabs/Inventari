@@ -38,6 +38,8 @@ interface AssetDetailHeaderActionsProps {
   onCheckin: (assignment: EquipmentAssignment) => void;
   onRestore: () => void;
   onPurge: () => void;
+  /** False hides Delete Permanently: the organization or the account does not allow it. */
+  canPurge: boolean;
   onRetire: () => void;
   onArchive: () => void;
 }
@@ -55,6 +57,7 @@ export function AssetDetailHeaderActions({
   onCheckin,
   onRestore,
   onPurge,
+  canPurge,
   onRetire,
   onArchive,
 }: AssetDetailHeaderActionsProps) {
@@ -81,16 +84,18 @@ export function AssetDetailHeaderActions({
         >
           <RotateCcw size={16} />
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onPurge}
-          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-          aria-label={t("actions.purge")}
-          title={t("actions.purge")}
-        >
-          <Trash2 size={16} />
-        </Button>
+        {canPurge && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onPurge}
+            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+            aria-label={t("actions.purge")}
+            title={t("actions.purge")}
+          >
+            <Trash2 size={16} />
+          </Button>
+        )}
       </div>
     );
   }
