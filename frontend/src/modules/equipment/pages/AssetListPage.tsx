@@ -13,7 +13,7 @@ import { ListControlBar } from "@/components/ui/ListControlBar";
 import { GettingStarted } from "@/components/ui/GettingStarted";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { QueryError } from "@/components/ui/QueryResult";
-import { Pagination } from "@/module-sdk";
+import { Pagination, useCanPurge } from "@/module-sdk";
 import { AssetBulkActionsBar } from "@/modules/equipment/components/AssetBulkActionsBar";
 import { selectedLabelTarget } from "@/modules/equipment/lib/printTarget";
 import { AssetListHeaderActions } from "@/modules/equipment/components/AssetListHeaderActions";
@@ -119,6 +119,9 @@ export default function AssetListPage() {
   const { t } = useTranslation("equipment");
   const { setHeader } = useModulePageHeader();
   const canWrite = useCanWrite("equipment");
+  // Archived assets: Delete Permanently needs the organization's policy and
+  // `items:purge`; without both the archive offers Restore only.
+  const canPurge = useCanPurge();
   const [showImport, setShowImport] = useState(false);
 
   const {
@@ -405,7 +408,7 @@ export default function AssetListPage() {
         </div>
       )}
 
-      {hasSelection && canWrite && (
+      {hasSelection && canWrite && (listTab === "active" || canPurge) && (
         <AssetBulkActionsBar
           selectedCount={selectedCount}
           unreachedMatches={allMatching ? 0 : Math.max(0, total - items.length)}
@@ -569,6 +572,7 @@ export default function AssetListPage() {
                   key={item.id}
                   item={item}
                   selectable={canWrite}
+                  purgeable={canPurge}
                   isSelected={selectedIds.has(item.id)}
                   isRestorePending={restoreMutation.isPending}
                   isPurgePending={bulkPurgeMutation.isPending}

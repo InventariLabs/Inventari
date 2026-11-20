@@ -13,6 +13,9 @@ interface ArchivedAssetRowProps {
   item: ArchivedItem;
   /** False drops the checkbox and both actions — a reader restores nothing. */
   selectable?: boolean;
+  /** False drops Delete Permanently and the checkbox, whose only action it is:
+   *  the organization does not allow it, or the account may not. */
+  purgeable?: boolean;
   isSelected: boolean;
   isRestorePending: boolean;
   isPurgePending: boolean;
@@ -24,6 +27,7 @@ interface ArchivedAssetRowProps {
 export const ArchivedAssetRow = memo(function ArchivedAssetRow({
   item,
   selectable = true,
+  purgeable = true,
   isSelected,
   isRestorePending,
   isPurgePending,
@@ -40,7 +44,7 @@ export const ArchivedAssetRow = memo(function ArchivedAssetRow({
     <div
       className={`flex items-center gap-4 py-3 px-1 ${isSelected ? "bg-red-50/50 dark:bg-red-900/10" : ""}`}
     >
-      {selectable && (
+      {selectable && purgeable && (
         <Checkbox
           checked={isSelected}
           onChange={() => onToggleSelect(item.id)}
@@ -75,16 +79,18 @@ export const ArchivedAssetRow = memo(function ArchivedAssetRow({
           >
             <span className="hidden sm:inline">{t("actions.restore")}</span>
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onPurge(item.id)}
-            disabled={isPurgePending}
-            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-            leftIcon={<Trash2 size={14} />}
-          >
-            <span className="hidden sm:inline">{t("actions.purge")}</span>
-          </Button>
+          {purgeable && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onPurge(item.id)}
+              disabled={isPurgePending}
+              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              leftIcon={<Trash2 size={14} />}
+            >
+              <span className="hidden sm:inline">{t("actions.purge")}</span>
+            </Button>
+          )}
         </div>
       )}
     </div>
