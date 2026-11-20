@@ -74,6 +74,11 @@ export function ColumnMappingForm({
 
   return (
     <div className="grid grid-cols-2 gap-3">
+      {/* What the sheet is expected to carry, before the reader matches a
+          column and before a pasted text that maps nothing says why. */}
+      <p className="col-span-2 text-xs text-on-secondary">
+        {t("import.columnsHint")}
+      </p>
       {fields.map(({ key, label, required }) => (
         <div key={key}>
           <Select

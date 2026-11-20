@@ -508,7 +508,12 @@ function RouteGate({
   requiresModules?: string[];
   children: ReactNode;
 }) {
-  const { enabledModules } = useModules();
+  const { enabledModules, isLoading } = useModules();
+  // The list a page load starts from is a guess until the server answers;
+  // the 404 must not be that guess's verdict. A full navigation straight to
+  // a module screen met "Page Not Found" for a module the organization had
+  // simply not been told about yet.
+  if (isLoading) return <LoadingSpinner fullScreen />;
   if (
     requiresModules &&
     !requiresModules.some((name) => enabledModules.includes(name))
