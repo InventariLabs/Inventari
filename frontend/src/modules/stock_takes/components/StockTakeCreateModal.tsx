@@ -46,6 +46,7 @@ export default function StockTakeCreateModal({
     total: storageCount,
     first: storages,
     isError: isStoragesError,
+    error: storagesError,
     refetch: refetchStorages,
   } = useLocationOffer({ purpose: "stock" });
   const createMutation = useCreateStockTake();
@@ -133,7 +134,10 @@ export default function StockTakeCreateModal({
             // to an empty list; a failed one says so and offers to ask again
             // — the guard below cannot cover it: `storages` is undefined on
             // a failure, so that path never opened either.
-            <QueryError onRetry={() => refetchStorages()} />
+            <QueryError
+              error={storagesError}
+              onRetry={() => refetchStorages()}
+            />
           ) : storageCount === 0 ? (
             // A required select holding zero options states the requirement
             // and gives no way to meet it without abandoning the modal. The

@@ -8,6 +8,7 @@ import {
   groupState,
   invisiblePermissions,
   matchPermissions,
+  missingReads,
   permissionGroups,
   summarizeRole,
 } from "./rolePermissions";
@@ -125,5 +126,46 @@ describe("matchPermissions", () => {
 
   it("returns everything for an empty or blank term", () => {
     expect(matchPermissions(permissions, "   ", labelOf)).toHaveLength(2);
+  });
+});
+
+describe("missingReads", () => {
+  const groups = permissionGroups({
+    system: [perm("items:read"), perm("locations:read")],
+    modules: [
+      {
+        module: "stock_takes",
+        requires: ["items", "locations"],
+        permissions: [perm("stock_takes:read"), perm("stock_takes:write")],
+      },
+    ],
+  });
+
+  it("names the reads a granted module's screens list but the role lacks", () => {
+    const missing = missingReads(
+      new Set(["stock_takes:read", "stock_takes:write"]),
+      groups,
+    );
+
+    expect(missing.map((p) => p.key)).toEqual(["items:read", "locations:read"]);
+  });
+
+  it("names the module's own read when only its actions are granted", () => {
+    const missing = missingReads(
+      new Set(["stock_takes:write", "items:read", "locations:read"]),
+      groups,
+    );
+
+    expect(missing.map((p) => p.key)).toEqual(["stock_takes:read"]);
+  });
+
+  it("says nothing when every read is held, or the module is not granted", () => {
+    expect(
+      missingReads(
+        new Set(["stock_takes:read", "items:read", "locations:read"]),
+        groups,
+      ),
+    ).toEqual([]);
+    expect(missingReads(new Set(["items:read"]), groups)).toEqual([]);
   });
 });

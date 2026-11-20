@@ -285,6 +285,15 @@ says what the release does rather than what changed since them.
   attention card shows no count ("8 assets need attention", later 9) until every
   list it adds up has arrived; the fleet by category and the recent check-outs
   wait for their answer the same way.
+- A member whose role cannot read a module is now told so. A module screen
+  opened without that module's read permission says the account cannot open
+  it and whom to ask, instead of "Your account can read this module", and the
+  product, purchase order, stock take and category lists show the refusal
+  without a *Try again* button that could only be refused again. The role
+  editor also warns, before a role is saved, about a granted module whose own
+  read or whose required modules' reads (stock takes need products and
+  locations) the role does not hold; the role can still be saved as it is.
+
 - After a location is moved physically, **Movements** and a product's
   *Movements* tab show what happened before the move at the path the location
   had then, as the move dialog promises. Goods put on a shelf while it stood

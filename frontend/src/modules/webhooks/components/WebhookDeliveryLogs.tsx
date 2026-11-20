@@ -230,7 +230,7 @@ export default function WebhookDeliveryLogs({
   const [cursor, setCursor] = useState<string | null>(null);
   const [cursorHistory, setCursorHistory] = useState<(string | null)[]>([null]);
 
-  const { data, isLoading, isError, refetch } = useWebhookDeliveries(
+  const { data, isLoading, isError, error, refetch } = useWebhookDeliveries(
     webhookId,
     cursor,
     PAGE_SIZE,
@@ -269,7 +269,7 @@ export default function WebhookDeliveryLogs({
         </div>
       )}
 
-      {isError && <QueryError onRetry={() => void refetch()} />}
+      {isError && <QueryError error={error} onRetry={() => void refetch()} />}
 
       {!isLoading && !isError && items.length === 0 && (
         <p className="text-sm text-on-secondary dark:text-on-muted py-4 text-center">

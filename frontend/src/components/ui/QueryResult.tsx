@@ -10,17 +10,39 @@ import LoadingSpinner from "../LoadingSpinner";
 interface QueryErrorProps {
   onRetry?: () => void;
   message?: string;
+  /**
+   * The rejected query's error. Given it, a refusal (403) is told apart from
+   * a failure: the reader is told the account may not read this, and no retry
+   * is offered, because a refusal repeats itself.
+   */
+  error: unknown;
 }
 
 /**
- * The shared "we could not ask" state.
+ * The shared "we could not ask" state, and "you may not" when the error says so.
  *
  * `role="alert"` because it replaces content that was expected to appear: a
  * screen reader that is not told has no way to notice the message arrived and
  * left again, and none of the error states in the inventory announced anything.
  */
-export function QueryError({ onRetry, message }: QueryErrorProps) {
+export function QueryError({ onRetry, message, error }: QueryErrorProps) {
   const { t } = useTranslation("common");
+
+  if (isForbiddenError(error)) {
+    return (
+      <div
+        role="alert"
+        className="flex flex-col items-center justify-center gap-3 p-8 text-center"
+      >
+        <Lock className="w-10 h-10 text-on-muted" aria-hidden="true" />
+        <p className="text-sm font-medium text-on">{t("access.denied")}</p>
+        <p className="text-sm text-on-secondary max-w-md">
+          {t("access.deniedHint")}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div
       role="alert"
@@ -40,42 +62,8 @@ export function QueryError({ onRetry, message }: QueryErrorProps) {
   );
 }
 
-interface QueryFailureProps {
-  /** The rejected query's error, so the state can read its status. */
-  error: unknown;
-  onRetry?: () => void;
-  message?: string;
-}
-
-/**
- * The failure state that knows "we could not" from "you may not".
- *
- * A list that renders both as its empty state tells the reader nothing is
- * there; a list that renders both as a retry offers a button that, on a
- * refusal, will never work. Neither answer is one the reader can act on.
- * `QueryFailure` reads the status and says which of the two happened, and
- * withholds the retry where retrying is pointless.
- */
-export function QueryFailure({ error, onRetry, message }: QueryFailureProps) {
-  const { t } = useTranslation("common");
-
-  if (isForbiddenError(error)) {
-    return (
-      <div
-        role="alert"
-        className="flex flex-col items-center justify-center gap-3 p-8 text-center"
-      >
-        <Lock className="w-10 h-10 text-on-muted" aria-hidden="true" />
-        <p className="text-sm font-medium text-on">{t("access.denied")}</p>
-        <p className="text-sm text-on-secondary max-w-md">
-          {t("access.deniedHint")}
-        </p>
-      </div>
-    );
-  }
-
-  return <QueryError onRetry={onRetry} message={message} />;
-}
+/** `QueryError` under the name the guarded lists import it by. */
+export const QueryFailure = QueryError;
 
 interface InlineQueryErrorProps {
   /** The rejected query's error, so a refusal is not offered a retry. */
@@ -149,7 +137,11 @@ export function QueryResult<T>({
   }
   if (query.isError) {
     return (
-      <>{errorFallback ?? <QueryError onRetry={() => query.refetch()} />}</>
+      <>
+        {errorFallback ?? (
+          <QueryError error={query.error} onRetry={() => query.refetch()} />
+        )}
+      </>
     );
   }
   if (!renderWhenEmpty && (query.data === null || query.data === undefined)) {

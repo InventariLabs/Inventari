@@ -43,7 +43,13 @@ export default function MyAssetsPage() {
     holder_kind?: "person" | "location" | null;
   } | null>(null);
 
-  const { data: assets = [], isLoading, isError, refetch } = useMyAssets();
+  const {
+    data: assets = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useMyAssets();
   // The return day is pinned to the organization's calendar, so it prints
   // in the card's own medium style on the org's clock.
   const formatReturnDay = useFormatOrgDay("medium");
@@ -51,6 +57,7 @@ export default function MyAssetsPage() {
     data: history = [],
     isLoading: historyLoading,
     isError: historyError,
+    error: historyFailure,
     refetch: refetchHistory,
   } = useMyAssetHistory();
 
@@ -62,7 +69,7 @@ export default function MyAssetsPage() {
   }, [setHeader, t]);
 
   if (isError) {
-    return <QueryError onRetry={() => refetch()} />;
+    return <QueryError error={error} onRetry={() => refetch()} />;
   }
 
   if (isLoading) {
@@ -212,7 +219,10 @@ export default function MyAssetsPage() {
       {showHistory && (
         <>
           {historyError ? (
-            <QueryError onRetry={() => refetchHistory()} />
+            <QueryError
+              error={historyFailure}
+              onRetry={() => refetchHistory()}
+            />
           ) : historyLoading ? (
             <LoadingSpinner />
           ) : history.length === 0 ? (

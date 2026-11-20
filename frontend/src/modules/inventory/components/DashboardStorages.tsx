@@ -23,6 +23,7 @@ interface DashboardStoragesProps {
   loadFailed?: boolean;
   /** The tree has not answered yet: an empty list says nothing about it. */
   loading?: boolean;
+  loadError?: unknown;
   onRetry?: () => void;
 }
 
@@ -53,6 +54,7 @@ export default function DashboardStorages({
   composition,
   loadFailed = false,
   loading = false,
+  loadError,
   onRetry,
 }: DashboardStoragesProps) {
   const { t } = useTranslation("common");
@@ -80,7 +82,7 @@ export default function DashboardStorages({
       </CardHeader>
 
       {loadFailed ? (
-        <QueryError onRetry={onRetry} />
+        <QueryError error={loadError} onRetry={onRetry} />
       ) : loading ? (
         <div aria-busy="true" className="space-y-3 py-2.5">
           {[0, 1, 2].map((i) => (

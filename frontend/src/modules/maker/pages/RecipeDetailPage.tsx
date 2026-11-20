@@ -156,7 +156,7 @@ export default function RecipeDetailPage() {
   // A recipe that was deleted is not a failed request: one of the two is worth
   // asking about again, and the other never will be.
   if (error && !isNotFoundError(error)) {
-    return <QueryError onRetry={() => void refetch()} />;
+    return <QueryError error={error} onRetry={() => void refetch()} />;
   }
 
   if (!recipe) {

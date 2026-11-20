@@ -298,7 +298,7 @@ export default function DocumentsTodoPage() {
   const filter = shownFilter(filterChoice);
   const { warehouses, storageTreeFailed } = useWarehouses();
   const [warehouseId, setWarehouseId] = useState<string | null>(null);
-  const { data, isLoading, isError, refetch } = useDocumentsTodo({
+  const { data, isLoading, isError, error, refetch } = useDocumentsTodo({
     limit,
     view: filter,
     locationId: warehouseId ?? undefined,
@@ -452,6 +452,7 @@ export default function DocumentsTodoPage() {
         <LoadingSpinner />
       ) : isError ? (
         <QueryError
+          error={error}
           message={t("errors.loadDocumentsFailed")}
           onRetry={() => void refetch()}
         />

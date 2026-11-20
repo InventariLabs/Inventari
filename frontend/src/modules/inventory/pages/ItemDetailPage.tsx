@@ -34,7 +34,7 @@ export default function ItemDetailPage() {
   // A product that was deleted and a request that failed are two different
   // answers, and only the second one is worth repeating.
   if (isError && !isNotFoundError(error)) {
-    return <QueryError onRetry={() => void refetch()} />;
+    return <QueryError error={error} onRetry={() => void refetch()} />;
   }
 
   if (!item) {
