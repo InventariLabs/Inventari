@@ -188,6 +188,60 @@ describe("DashboardRecentMoves", () => {
     );
   });
 
+  it("names where a physically moved location went and when goods arrived", async () => {
+    // Regal 1 stood in Hala B when the flour came and was carried to the
+    // packing room later; today's tree puts it in the packing room.
+    serveLocations([
+      { id: "main", name: "Main Warehouse", parent_id: null },
+      { id: "hala", name: "Hala B", parent_id: "main" },
+      { id: "pack", name: "Pakownia", parent_id: null },
+      { id: "regal", name: "Regal 1", parent_id: "pack" },
+    ]);
+    server.use(
+      http.get("*/stock-moves", () =>
+        HttpResponse.json({
+          items: [
+            move({
+              id: "carried",
+              from_location_id: "regal",
+              from_location_name: "Regal 1",
+              to_location_id: "regal",
+              to_location_name: "Regal 1",
+              reference_type: "location_relocation",
+              reference_id: "reloc-1",
+              relocated_location_name: "Regal 1",
+              relocated_from_path: "Main Warehouse › Hala B",
+              relocated_to_path: "Pakownia",
+            }),
+            move({
+              id: "earlier",
+              to_location_id: "regal",
+              to_location_name: "Regal 1",
+              to_location_path: "Main Warehouse › Hala B › Regal 1",
+            }),
+          ],
+          total: 2,
+          offset: 0,
+          limit: RECENT_MOVES_LIMIT,
+          has_more: false,
+        }),
+      ),
+    );
+    render(<DashboardRecentMoves />, { wrapper });
+    await screen.findAllByText("Flour");
+    await waitFor(() =>
+      expect(screen.getAllByRole("listitem")[0]).toHaveTextContent(
+        "Main Warehouse › Hala B › Regal 1 → Pakownia › Regal 1",
+      ),
+    );
+    expect(screen.getAllByRole("listitem")[1]).toHaveTextContent(
+      "Main Warehouse › Hala B › Regal 1",
+    );
+    expect(screen.getAllByRole("listitem")[1]).not.toHaveTextContent(
+      "Pakownia",
+    );
+  });
+
   it("tells a receipt, an issue and a transfer apart in words", async () => {
     render(<DashboardRecentMoves />, { wrapper });
     // The loading placeholders are list items too; wait for the rows.

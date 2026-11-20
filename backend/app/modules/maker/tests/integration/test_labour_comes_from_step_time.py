@@ -63,7 +63,7 @@ def _recipe_with_steps(
         json={
             'child_template_id': str(ingredient.id),
             'qty_per_batch': '2',
-            'unit': 'kg',
+            'unit': 'pcs',
         },
     )
     assert line.status_code == 201, line.text

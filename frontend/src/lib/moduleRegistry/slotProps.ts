@@ -89,6 +89,18 @@ export interface SlotDataMap {
      * linking straight out.
      */
     requestLeave?: (go: () => void) => void;
+    /**
+     * Run something just before the form sends the product's own save — the
+     * moment a module writes what it collected to its own API. A throw stops
+     * the save and the form shows the message (`RegisterBeforeSubmit`).
+     */
+    registerBeforeSubmit?: RegisterBeforeSubmit;
+    /**
+     * Tell the form that the slot holds typed values nobody has saved yet, so
+     * closing the sheet asks first, as it does for the form's own fields.
+     * Report `false` once they are saved or discarded.
+     */
+    reportDirty?: (dirty: boolean) => void;
   };
   quick_action_extra: { item: Item };
   /**

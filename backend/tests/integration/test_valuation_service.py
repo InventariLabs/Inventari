@@ -292,6 +292,46 @@ class TestRecordDelivery:
         # Second layer partially consumed (5 - 3 = 2 remaining)
         assert consumed.consumed_layers[1].remaining_qty == Decimal('2')
 
+    async def test_a_named_layer_is_drained_before_the_older_one(
+        self, real_async_db_session: AsyncSession, async_test_household
+    ):
+        """Goods going back off a known receipt leave at that receipt's cost.
+
+        The layer is named, not found by age: the newer layer the goods came
+        in on empties first, and the older one is untouched. A production
+        run's undo names the layer its own run opened for exactly this.
+        """
+        db = real_async_db_session
+        template = ProductTemplate(
+            organization_id=async_test_household.id,
+            name='Named Layer',
+            sku=f'NL-{uuid4().hex[:8]}',
+        )
+        db.add(template)
+        await db.flush()
+        await db.refresh(template)
+        older = await ValuationService._record_receipt_async(
+            db, template, Decimal('5'), Decimal('3.00'), async_test_household.id
+        )
+        newer = await ValuationService._record_receipt_async(
+            db, template, Decimal('5'), Decimal('6.00'), async_test_household.id
+        )
+        await db.flush()
+
+        consumed = await ValuationService._post_delivery_async(
+            db,
+            template,
+            Decimal('2'),
+            async_test_household.id,
+            reverses_layer_id=newer.id,
+        )
+        await db.flush()
+
+        assert [layer.id for layer in consumed.consumed_layers] == [newer.id]
+        assert consumed.cost == Decimal('12.00')
+        assert older.remaining_qty == Decimal('5')
+        assert newer.remaining_qty == Decimal('3')
+
     async def test_delivery_with_no_layers_returns_empty(
         self, real_async_db_session: AsyncSession, async_test_household
     ):

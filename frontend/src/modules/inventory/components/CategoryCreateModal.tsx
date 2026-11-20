@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { X, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/hooks/queries/keys";
 import { useCreateCategory } from "@/modules/shared/hooks/useCategories";
 import { EmojiPicker } from "@/components/ui/EmojiPicker";
 import { Button } from "@/components/ui/Button";
@@ -27,6 +29,7 @@ export default function CategoryCreateModal({
   }>({ name: "", emoji: null });
 
   const createCategoryMutation = useCreateCategory();
+  const queryClient = useQueryClient();
 
   return (
     <Sheet
@@ -91,12 +94,19 @@ export default function CategoryCreateModal({
                   emoji: newCategoryData.emoji,
                 },
                 {
-                  onSuccess: (newCat) => {
+                  onSuccess: async (newCat) => {
                     toast.success(
                       t("categories:messages.created", {
                         defaultValue: "Category created",
                       }),
                     );
+                    // The pick waits for the list that holds it: a form drops
+                    // a chosen category its picker does not offer, and handed
+                    // the new one before the refetch landed, it emptied the
+                    // field again and said the category was gone.
+                    await queryClient.invalidateQueries({
+                      queryKey: queryKeys.categories.all,
+                    });
                     onSuccess(newCat);
                   },
                 },

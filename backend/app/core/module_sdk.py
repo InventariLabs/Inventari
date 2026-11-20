@@ -8,7 +8,8 @@ dependencies, a logger, the model bases, the system event names a subscription
 needs, the migration helpers a revision uses, the field type a scanned code
 arrives in, the lot-trace source a module names its movements through, the
 pagination envelopes with the helper that pages a query into one, the helper
-that writes a location's path, and the effective-expiry rule an opened
+that writes a location's path, the resolver that reads a free-text unit
+against the catalogue, and the effective-expiry rule an opened
 package is judged by. Anything under ``app.`` that is not
 re-exported here is Core's own business: it may be renamed, split or deleted
 between releases.
@@ -121,6 +122,7 @@ from app.core.module_ownership import general_rows, hidden_module_tags_async
 from app.core.open_package import effective_expiry
 from app.core.scan_registry import ScanProvider, scan_registry
 from app.core.settings_diff import journal_config_change, record_settings
+from app.core.uom_resolver import UomResolverAsync
 from app.core.upload_validation import (
     ATTACHMENT_CONTENT_TYPES,
     FileSignatureMismatchError,
@@ -200,6 +202,7 @@ __all__ = [
     'UploadMessages',
     'UploadPathResolver',
     'UploadPolicy',
+    'UomResolverAsync',
     'ValidationException',
     'audit_actor_scope',
     'cell_text',

@@ -4,7 +4,9 @@ import {
   useRef,
   useState,
   type ComponentProps,
+  type Dispatch,
   type MutableRefObject,
+  type SetStateAction,
 } from "react";
 import { useTranslation } from "react-i18next";
 import { useFormGuard } from "@/hooks/useFormGuard";
@@ -87,12 +89,12 @@ function openSourceField() {
   document.getElementById(FIELD_IDS.source)?.click();
 }
 
-/** The patch that records whether picking a product suggested a price. */
-function withPriceHint(lineKey: string, suggested: boolean) {
-  return (previous: Record<string, boolean>) => ({
-    ...previous,
-    [lineKey]: suggested,
-  });
+/** Records, per line, whether picking a product suggested a price. */
+function recordingPriceHints(
+  setAnswers: Dispatch<SetStateAction<Record<string, boolean>>>,
+) {
+  return (lineKey: string, suggested: boolean) =>
+    setAnswers((previous) => ({ ...previous, [lineKey]: suggested }));
 }
 
 /** Move focus to the first field the validator rejected. */
@@ -796,6 +798,7 @@ export default function DocumentFormModal({
                   defaultTaxRate={defaultTaxRate}
                   currency={linesCurrency}
                   partnerId={partnerId}
+                  documentType={docType}
                   stockLocationId={stockLocationId}
                   stockLocationName={places.stockPlaceName}
                   onChangeSource={openSourceField}
@@ -822,9 +825,7 @@ export default function DocumentFormModal({
                     workspace,
                     extensions.registerBeforeSubmit,
                   )}
-                  onPriceHintResult={(lineKey, suggested) =>
-                    setPriceHintByLine(withPriceHint(lineKey, suggested))
-                  }
+                  onPriceHintResult={recordingPriceHints(setPriceHintByLine)}
                 />
                 {showValueFields && <MissingValueWarning lines={lines} />}
               </div>

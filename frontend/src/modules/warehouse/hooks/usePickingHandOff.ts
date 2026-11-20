@@ -1,9 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PACKING_HASH } from "@/modules/warehouse/components/packing/packingHash";
 import type { ShipmentCreate } from "@/modules/warehouse/api/shipments";
 import type { ShipmentDraft } from "@/modules/warehouse/components/shipping/shipmentDraft";
-import type { WarehouseDocument } from "@/modules/warehouse/types";
+import type {
+  DocumentCompletePayload,
+  WarehouseDocument,
+} from "@/modules/warehouse/types";
 
 /** What a list's picking sheet leaves for the document's page to finish. */
 interface HandedOver {
@@ -65,4 +68,65 @@ export function useHandedOverCompletion(
     navigate(location, { replace: true, state: null });
     if (doc.status === "CONFIRMED") complete(handed.shipment);
   }, [handed, doc, complete, navigate, location]);
+}
+
+/**
+ * Completes a document a scanning session has finished, with the dispatch's
+ * shipment when one rides along, and takes over what a list's picking sheet
+ * handed to the page (`useHandedOverCompletion`).
+ *
+ * A failed completion that carried a shipment goes on to the Pack step: the
+ * picking summary that took the carrier is gone, so the step's Shipping fields
+ * carry what was typed and pressing Complete there does not ship without it.
+ */
+export function useSessionCompletion(
+  doc: WarehouseDocument | undefined,
+  docId: string | undefined,
+  {
+    complete,
+    onCompleted,
+    onRefused,
+  }: {
+    complete: (
+      payload: { id: string; data?: DocumentCompletePayload },
+      opts: {
+        onSuccess: (completed?: WarehouseDocument) => void;
+        onError: (err: unknown) => void;
+      },
+    ) => void;
+    onCompleted: (completed?: WarehouseDocument) => void;
+    onRefused: (err: unknown, payload: DocumentCompletePayload) => void;
+  },
+) {
+  const navigate = useNavigate();
+  const handleSessionComplete = useCallback(
+    (shipment?: ShipmentCreate) => {
+      if (!docId) return;
+      const payload: DocumentCompletePayload = shipment ? { shipment } : {};
+      complete(
+        { id: docId, data: shipment ? payload : undefined },
+        {
+          onSuccess: onCompleted,
+          // A refusal that is a question — a line still undated, a record in
+          // another unit — is answered on the payload the retry builds from
+          // the document's own quantities; the others reach the reader.
+          onError: (err) => {
+            onRefused(err, payload);
+            if (!shipment) return;
+            const kept: ShipmentDraft = {
+              carrier: shipment.carrier,
+              trackingNumber: shipment.tracking_number ?? "",
+            };
+            navigate(
+              { hash: PACKING_HASH },
+              { replace: true, state: { shipment: kept } },
+            );
+          },
+        },
+      );
+    },
+    [docId, complete, onCompleted, onRefused, navigate],
+  );
+  useHandedOverCompletion(doc, handleSessionComplete);
+  return handleSessionComplete;
 }

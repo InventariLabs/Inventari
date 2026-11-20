@@ -33,7 +33,7 @@ from app.core.public_api import core_api
 from app.i18n.service import get_current_lang, get_error_message
 
 from . import cost_rollup, production_service, recipe_service, stock_consumption
-from ._router_bom import _attach_child_names
+from ._router_bom import _attach_child_names, _attach_unit_mismatch
 from ._schemas_bom import BoMLineRead
 from ._schemas_recipes import (
     AvailabilityResponse,
@@ -425,6 +425,7 @@ async def get_recipe(
     lines = list(recipe.lines)
     cost_lines = list(recipe.cost_lines)
     await _attach_child_names(db, org_id, lines)
+    await _attach_unit_mismatch(db, org_id, lines)
     # The typed price is the product's, read for the page in one query, and
     # carried on the line the editor shows. It is not an attribute of the
     # ORM row, so the read is built rather than stamped on the instance.

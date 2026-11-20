@@ -19,7 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
-from app.core.testing import ShelfRow
+from app.core.testing import ShelfRow, seed_org_storage_types
 from app.models.item import Item
 from app.models.organization import Organization
 from app.models.product_template import ProductTemplate
@@ -54,6 +54,10 @@ def rec_org(db_session: Session) -> Organization:
         ],
     )
     db_session.add(org)
+    db_session.flush()
+    # A pick that takes the last of a record files it under the Consumed
+    # place, which an organization can book only once it owns its storage types.
+    seed_org_storage_types(db_session, org.id)
     db_session.commit()
     db_session.refresh(org)
     return org

@@ -144,7 +144,7 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | `transfer_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, to_storage_location_id: UUID, *, user_id: UUID, source_document_id: UUID \| None=None, notes: str \| None=None, history_changes: dict[str, Any] \| None=None, history_action: ItemAction=ItemAction.MOVED, post_the_change: bool=True) -> ItemDTO \| None` | WRITE | — |
 | `update_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, data: ItemUpdateDTO, user: UserContextDTO, *, bulk: bool=False) -> ItemDTO \| None` | WRITE | Update one item. ``bulk=True`` marks the edit as one of a batch, so its journal entry carries ``meta_data.bulk`` like the core's own batch edits. |
 | `update_meta_data_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, namespace: str, data: dict[str, Any]) -> ItemDTO \| None` | WRITE | Update item meta_data in a namespaced way. |
-| `update_quantity_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, quantity: Decimal, *, user_id: UUID, source_document_id: UUID \| None=None, history_changes: dict[str, Any] \| None=None, sync_valuation: bool=True, post_the_change: bool=True, lot_id: UUID \| None=None, move_reference_type: str='item', move_reference_id: UUID \| None=None) -> ItemDTO \| None` | WRITE | Set an item's quantity and post the change to the ledger. |
+| `update_quantity_async` | `(db: AsyncSession, organization_id: UUID, item_id: UUID, quantity: Decimal, *, user_id: UUID, source_document_id: UUID \| None=None, history_changes: dict[str, Any] \| None=None, sync_valuation: bool=True, post_the_change: bool=True, lot_id: UUID \| None=None, move_reference_type: str='item', move_reference_id: UUID \| None=None, file_when_emptied: bool=False) -> ItemDTO \| None` | WRITE | Set an item's quantity and post the change to the ledger. |
 
 ---
 
@@ -313,7 +313,7 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | `existing_ids_async` | `(db: AsyncSession, organization_id: UUID, category_ids: set[UUID]) -> set[UUID]` | READ | Return the subset of *category_ids* visible to *organization_id* — one query. |
 | `get_by_id_async` | `(db: AsyncSession, organization_id: UUID, category_id: UUID) -> CategoryDTO \| None` | READ | Return a single category visible to *organization_id*, or ``None``. |
 | `list_async` | `(db: AsyncSession, organization_id: UUID) -> list[CategoryDTO]` | READ | Return all active categories using an AsyncSession. |
-| `list_with_filters_async` | `(db: AsyncSession, organization_id: UUID, *, include_inactive: bool=False, claimed_tags: set[str] \| None=None, with_counts: bool=False) -> list[CategoryDTO]` | READ | List categories visible to *organization_id* with optional filters. |
+| `list_with_filters_async` | `(db: AsyncSession, organization_id: UUID, *, include_inactive: bool=False, claimed_tags: set[str] \| None=None, with_counts: bool=False, count_records: bool=False) -> list[CategoryDTO]` | READ | List categories visible to *organization_id* with optional filters. |
 | `rename_group_async` | `(db: AsyncSession, organization_id: UUID, *, current_name: str, new_name: str \| None, category_ids: list[UUID] \| None=None, user: UserContextDTO) -> list[UUID]` | WRITE | Rename a category group, or take it off the categories that carry it. |
 | `update_async` | `(db: AsyncSession, organization_id: UUID, category_id: UUID, category_in: CategoryUpdateDTO, user: UserContextDTO) -> CategoryDTO \| None` | WRITE | Update a category by ID. Returns the updated CategoryDTO or ``None``. |
 
@@ -323,7 +323,8 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 
 | Method | Signature | R/W | Description |
 |---|---|---|---|
-| `is_configured` | `() -> bool` | READ | Whether a message sent through ``send_async`` could leave at all. |
+| `can_send_async` | `(db: AsyncSession, organization_id: UUID) -> bool` | READ | Whether a message ``send_async`` queues for this organization could leave. |
+| `is_configured` | `() -> bool` | READ | Whether the installation's own server could send a message at all. |
 | `render_button` | `(url: str, label: str) -> str` | READ | The one centred call to action these emails carry. |
 | `render_fallback_link` | `(intro: str, url: str) -> str` | READ | The address spelled out, for a client that shows no button. |
 | `render_shell` | `(heading: str, body_html: str, footer: str) -> str` | READ | The card every transactional email arrives in. |
@@ -589,7 +590,7 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | `get_current_rate_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID) -> Decimal \| None` | READ | Return the template's layer-average valuation rate, or None. |
 | `get_rates_batch_async` | `(db: AsyncSession, organization_id: UUID, product_template_ids: list[UUID]) -> dict[UUID, Decimal \| None]` | READ | Return ``{template_id: layer-average valuation rate}`` for *product_template_ids*. |
 | `lock_open_layers_async` | `(db: AsyncSession, organization_id: UUID, product_template_ids: Iterable[UUID]) -> None` | READ | Lock and read the cost layers of these products in one statement. |
-| `record_delivery_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID, quantity: Decimal, document_line_id: UUID \| None=None, reason: str \| None=None, item_id: UUID \| None=None, reverses_line_id: UUID \| None=None) -> Decimal \| None` | WRITE | Take stock off the receipt layers and post what it was worth. |
+| `record_delivery_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID, quantity: Decimal, document_line_id: UUID \| None=None, reason: str \| None=None, item_id: UUID \| None=None, reverses_line_id: UUID \| None=None, reverses_layer_id: UUID \| None=None) -> Decimal \| None` | WRITE | Take stock off the receipt layers and post what it was worth. |
 | `record_receipt_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID, quantity: Decimal, unit_cost: Decimal \| None, document_line_id: UUID \| None=None, currency: str \| None=None, document_date: date \| None=None, reverses_line_id: UUID \| None=None, extra_unit_cost: Decimal=Decimal('0'), unpriced_stays_unknown: bool=False, internal: bool=False) -> UUID \| None` | WRITE | Record a receipt into the cost history; answers the layer it opened. |
 | `record_unpriced_receipt_async` | `(db: AsyncSession, organization_id: UUID, product_template_id: UUID, quantity: Decimal) -> None` | WRITE | Record stock arriving with nobody having named a price. |
 
@@ -597,9 +598,9 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 
 ## Statistics
 
-- **Total methods:** 314
+- **Total methods:** 315
 - **Namespaces:** 33
-- **Documented methods:** 314 (100%)
-- **READ methods:** 219 (70%)
+- **Documented methods:** 315 (100%)
+- **READ methods:** 220 (70%)
 - **WRITE methods:** 95 (30%)
 

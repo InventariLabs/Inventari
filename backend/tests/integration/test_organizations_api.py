@@ -187,6 +187,32 @@ class TestHouseholdsUpdate:
         data = response.json()
         assert data['name'] == 'Updated Organization Name'
 
+    @pytest.mark.parametrize('blank', ['', '   ', '\t \n'])
+    def test_update_refuses_a_blank_name(
+        self, client, auth_headers, test_household, blank
+    ):
+        """An organization is never left without a name."""
+        response = client.put(
+            '/api/v1/organizations', headers=auth_headers, json={'name': blank}
+        )
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        assert 'name' in response.text.lower()
+        kept = client.get('/api/v1/organizations/my', headers=auth_headers).json()
+        assert kept['name'] == test_household.name
+
+    def test_update_stores_the_name_stripped(
+        self, client, auth_headers, test_household
+    ):
+        response = client.put(
+            '/api/v1/organizations',
+            headers=auth_headers,
+            json={'name': '  Cold Storage \n'},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['name'] == 'Cold Storage'
+
     def test_update_household_not_in_household(
         self, client, auth_headers, db_session, test_user
     ):

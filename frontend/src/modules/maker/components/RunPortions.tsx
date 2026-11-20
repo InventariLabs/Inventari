@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
+import { useCanWrite } from "@/hooks/useCanWrite";
 import { DateInput } from "@/components/ui/DateInput";
 import { Input } from "@/components/ui/Input";
 import { extractApiError } from "@/lib/errors";
@@ -28,6 +29,8 @@ export function RunPortions({
   canWrite: boolean;
 }) {
   const { t } = useTranslation("maker");
+  // A portion lands on the shelf as stock: the endpoint asks for items:write.
+  const canMoveStock = useCanWrite("items");
   const addPortion = useAddPortion();
   const [qty, setQty] = useState("");
   const [day, setDay] = useState(todayIso());
@@ -88,7 +91,7 @@ export function RunPortions({
           ))}
         </ul>
       )}
-      {canWrite && (
+      {canWrite && canMoveStock && (
         <div className="space-y-3">
           <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-3">
             <Input

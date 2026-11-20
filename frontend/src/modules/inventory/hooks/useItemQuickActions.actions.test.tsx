@@ -141,7 +141,7 @@ describe("useItemQuickActions — offers, results and the delete dialog", () => 
     expect(toast.success).toHaveBeenLastCalledWith("Product has been used up");
 
     lastOptions(mocks.consumeMutate).onSuccess?.({ quantity: "1" });
-    expect(toast.success).toHaveBeenLastCalledWith("Removed 1 unit — 1 left");
+    expect(toast.success).toHaveBeenLastCalledWith("Removed 1 — 1 left");
     expect(onDone).toHaveBeenCalledTimes(2);
   });
 

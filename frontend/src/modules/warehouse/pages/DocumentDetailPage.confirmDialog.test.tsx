@@ -161,6 +161,27 @@ describe("DocumentDetailPage.confirmDialogMessage", () => {
     expect(message).toMatch(/continue/i);
   });
 
+  it("the one-step press on a record-only document says nothing will move", () => {
+    // A recipe's internal issue was posted by the picking session; posting
+    // the draft only keeps the register's copy, and "posts its stock
+    // movement now" was the sentence the next screen disproved.
+    const message = confirmDialogMessage(
+      "postNow",
+      { type: "INTERNAL_OUT", status: "DRAFT", stock_already_applied: true },
+      {
+        required: false,
+        workflowConfigured: false,
+        hasThreshold: false,
+        approvalsEnabled: true,
+      },
+      t,
+    );
+
+    expect(message).toMatch(/already taken from stock/i);
+    expect(message).toMatch(/stock does not change/i);
+    expect(message).not.toMatch(/undo it right after/i);
+  });
+
   describe("when nobody could decide the stage the document would wait at", () => {
     const base = {
       required: true,

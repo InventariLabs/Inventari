@@ -452,6 +452,7 @@ class TestAvailabilityEndpoint:
             parent_id=output.id,
             child_id=flour.id,
             qty='2',
+            unit='kg',
         )
         _stock(client, mk_auth_headers, flour, mk_input_loc, '1.8')
 

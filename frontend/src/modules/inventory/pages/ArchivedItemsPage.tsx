@@ -10,7 +10,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ListControlBar } from "@/components/ui/ListControlBar";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { Pagination } from "@/module-sdk";
+import { Pagination, useAllowPermanentDelete, useCanPurge } from "@/module-sdk";
 import { Textarea } from "@/components/ui/Textarea";
 import { QueryResult } from "@/components/ui/QueryResult";
 import {
@@ -22,13 +22,9 @@ import { archivedReasonLabel } from "@/modules/shared/lib/archiveReasons";
 import { useArchiveTabs } from "@/hooks/useArchiveTabs";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { useFilteredList } from "@/hooks/useFilteredList";
-import { useHasPermission } from "@/hooks/useHasPermission";
 import { useKeysetPaging } from "@/hooks/useKeysetPaging";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
-import {
-  useOrganization,
-  useShowModuleData,
-} from "@/modules/settings/hooks/useOrganization";
+import { useShowModuleData } from "@/modules/settings/hooks/useOrganization";
 import { formatDate } from "@/utils/helpers";
 import { cn } from "@/lib/utils";
 
@@ -38,28 +34,6 @@ const PAGE_SIZE = 50;
  *  showing the same records in two states. */
 const headerCell = "bg-surface px-4 py-2 border-b border-border";
 const bodyCell = "px-4 py-2 align-middle border-b border-border";
-
-/** Business profiles that start with permanent deletion locked (mirrors the
- * backend resolver in items/_lifecycle.py). */
-const PURGE_LOCKED_PROFILES = ["equipment_wms", "clean_core"];
-
-/** Effective allow_permanent_delete: explicit setting wins, otherwise the
- *  product profile decides; legacy orgs without a profile stay allowed. */
-function resolveAllowPermanentDelete(
-  org:
-    | {
-        settings?: Record<string, unknown> | null;
-        active_profile_id?: string | null;
-      }
-    | null
-    | undefined,
-): boolean {
-  const flag = org?.settings?.allow_permanent_delete;
-  if (typeof flag === "boolean") {
-    return flag;
-  }
-  return !PURGE_LOCKED_PROFILES.includes(org?.active_profile_id ?? "");
-}
 
 /** Columns that give way below `sm`: five columns of a table are wider than
  *  a phone, and the way back (Restore) sat in the one that fell off the right
@@ -178,15 +152,11 @@ export default function ArchivedItemsPage() {
   const total = pagination.total;
   const restoreMutation = useRestoreItem();
   const purgeMutation = usePurgeItem();
-  const { data: org } = useOrganization();
-  // Two different questions, and the screen asks both.
-  // `allow_permanent_delete` is the organization's policy; `items:purge` and
-  // `items:write` are this account's rights, which the API checks on the other
-  // end. Offered without them, both buttons ended in a 403 after the click.
-  const allowPermanentDelete = resolveAllowPermanentDelete(org);
+  // The organization's policy and this account's rights are two questions
+  // (`usePermanentDelete`); Restore needs `items:write` as well.
+  const allowPermanentDelete = useAllowPermanentDelete();
   const canRestore = useCanWrite("items");
-  const mayPurge = useHasPermission("items:purge");
-  const canPurge = allowPermanentDelete && mayPurge;
+  const canPurge = useCanPurge();
   const showActions = canRestore || canPurge;
 
   const [purgeTarget, setPurgeTarget] = useState<string | null>(null);

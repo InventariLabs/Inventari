@@ -49,7 +49,7 @@ export default function BatchRecordPage() {
         <p className="text-sm text-on-secondary">
           {extractApiError(error, t("record.failed"))}
         </p>
-        <QueryError onRetry={() => void refetch()} />
+        <QueryError error={error} onRetry={() => void refetch()} />
       </div>
     );
   }

@@ -117,9 +117,8 @@ describe("StorageContentsTab", () => {
     serveChildren(0, 0);
     const props = renderTab();
 
-    expect(
-      await screen.findByText("Nothing inside this location"),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("No locations inside")).toBeInTheDocument();
+    expect(screen.queryByText("Nothing inside this location")).toBeNull();
     expect(
       screen.getByText("Its 4 records are on the Products tab."),
     ).toBeInTheDocument();

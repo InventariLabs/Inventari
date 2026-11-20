@@ -90,11 +90,10 @@ export function StorageArchiveDialog({
     setTargetId(null);
     storagesApi
       .getSummary(storageId)
-      // Items in descendants count too — the backend relocates the whole
-      // subtree, so a zone holding items only in child locations still
-      // requires a move target.
+      // Only what stands on this location is relocated: the locations inside
+      // stay active and keep their own stock, so it does not count here.
       .then((result) => {
-        if (!cancelled) setSummary(result.subtree_items_count);
+        if (!cancelled) setSummary(result.items_count);
       })
       .catch(() => {
         if (!cancelled) setSummary("unknown");

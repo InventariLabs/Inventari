@@ -123,6 +123,14 @@ export function ActionMenu({
           align={align}
           sideOffset={4}
           style={{ zIndex: LAYER_TO_VAR[layer] }}
+          // Closing returns the focus to the trigger in a step of its own. An
+          // action that opened a window has put the focus there by then, and
+          // taking it back would leave that window's field unreachable by
+          // keyboard.
+          onCloseAutoFocus={(event) => {
+            const active = document.activeElement;
+            if (active && active !== document.body) event.preventDefault();
+          }}
           className={cn(
             "w-56 bg-surface-card rounded-xl border border-border shadow-xl p-1 flex flex-col gap-1",
             contentClassName,

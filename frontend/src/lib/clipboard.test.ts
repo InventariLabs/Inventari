@@ -1,7 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { toast } from "sonner";
-
-import { copyText, copyTextOrExplain } from "./clipboard";
+import { copyText, copyTextOrExplain, manualCopyStore } from "./clipboard";
 
 /**
  * The clipboard answers three ways and only one of them is a copy. The other
@@ -15,6 +13,7 @@ const stubClipboard = (clipboard: unknown) => {
 };
 
 afterEach(() => {
+  manualCopyStore.dismiss();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -44,38 +43,38 @@ describe("copyText", () => {
 });
 
 describe("copyTextOrExplain", () => {
-  it("says what to do instead when the clipboard is not there", async () => {
+  it("hands the text over to be shown when the clipboard is not there", async () => {
     stubClipboard(undefined);
-    const error = vi.spyOn(toast, "error").mockImplementation(() => "");
 
     await expect(
       copyTextOrExplain("value", "select it and copy it by hand"),
     ).resolves.toBe(false);
 
-    expect(error).toHaveBeenCalledWith("select it and copy it by hand");
+    expect(manualCopyStore.get()).toEqual({
+      text: "value",
+      message: "select it and copy it by hand",
+    });
   });
 
-  it("says what to do instead when the clipboard refuses", async () => {
+  it("hands the text over to be shown when the clipboard refuses", async () => {
     stubClipboard({
       writeText: vi.fn().mockRejectedValue(new Error("NotAllowedError")),
     });
-    const error = vi.spyOn(toast, "error").mockImplementation(() => "");
 
     await expect(
       copyTextOrExplain("value", "select it and copy it by hand"),
     ).resolves.toBe(false);
 
-    expect(error).toHaveBeenCalledWith("select it and copy it by hand");
+    expect(manualCopyStore.get()?.text).toBe("value");
   });
 
   it("leaves the success notice to the caller", async () => {
     stubClipboard({ writeText: vi.fn().mockResolvedValue(undefined) });
-    const error = vi.spyOn(toast, "error").mockImplementation(() => "");
 
     await expect(
       copyTextOrExplain("value", "select it and copy it by hand"),
     ).resolves.toBe(true);
 
-    expect(error).not.toHaveBeenCalled();
+    expect(manualCopyStore.get()).toBeNull();
   });
 });

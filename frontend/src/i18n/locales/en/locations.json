@@ -347,6 +347,7 @@
     "emptyDescriptionNone": "It holds no records and has no locations inside.",
     "emptyDescription_one": "Its {{count}} record is on the Products tab.",
     "emptyDescription_other": "Its {{count}} records are on the Products tab.",
+    "noLocationsInside": "No locations inside",
     "showProducts": "Show products",
     "selected_one": "{{count}} location selected",
     "selected_other": "{{count}} locations selected",
@@ -361,6 +362,9 @@
   },
   "products": {
     "includeInside": "Include locations inside",
+    "noneHere": "No records directly here",
+    "insideDescription_one": "{{count}} record is in the locations inside.",
+    "insideDescription_other": "{{count}} records are in the locations inside.",
     "includingInside_one": "Including 1 location inside",
     "includingInside_other": "Including {{count}} locations inside"
   },

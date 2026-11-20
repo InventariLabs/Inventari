@@ -167,7 +167,8 @@
     "searchPlaceholder": "Search products…",
     "noResults": "No product without a label matches.",
     "submit": "Attach label",
-    "success": "Label {{code}} attached to {{name}}"
+    "success": "Label {{code}} attached to {{name}}",
+    "expires": "expires {{date}}"
   },
   "productLabel": {
     "action": "Print label",

@@ -14,11 +14,11 @@
     "emptyRecent": "Brak ostatnich elementów",
     "actionItems": {
       "title": "Do zrobienia",
-      "subtitle": "{{count}} oczekujących we włączonych modułach",
-      "subtitle_one": "{{count}} oczekujące we włączonych modułach",
-      "subtitle_few": "{{count}} oczekujące we włączonych modułach",
-      "subtitle_many": "{{count}} oczekujących we włączonych modułach",
-      "subtitle_other": "{{count}} oczekujących we włączonych modułach"
+      "subtitle": "Na tej liście: {{count}}",
+      "subtitle_one": "Na tej liście: {{count}}",
+      "subtitle_few": "Na tej liście: {{count}}",
+      "subtitle_many": "Na tej liście: {{count}}",
+      "subtitle_other": "Na tej liście: {{count}}"
     }
   },
   "sections": {

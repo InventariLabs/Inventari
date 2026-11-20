@@ -26,7 +26,13 @@ from app.core.utils import isoformat_or_none
 from app.i18n import Language
 from app.modules.shopping_lists.shopping_lists_api import shopping_lists_api
 
-from ._availability import build_stock_context, resolve_template
+from ._availability import (
+    StockContext,
+    build_stock_context,
+    resolve_template,
+    total_available,
+    usable_items,
+)
 from ._constants import localized
 from ._helpers import _round_shopping_qty
 from ._meal_plan_async_schema import _require_plan_async
@@ -229,6 +235,7 @@ async def _stock_verdict(
     required_qty: Decimal,
     ingredient_uom: UomDTO | None,
     uoms_by_id: dict[UUID, UomDTO],
+    stock: StockContext,
 ) -> _StockVerdict:
     """Weigh what is on the shelf against what the plan needs.
 
@@ -236,8 +243,17 @@ async def _stock_verdict(
     StockQuant total in the product's own unit is converted before it is set
     against the recipe's quantity. A deficit like "363.6 g short" is never
     derived from 36.4 cans.
+
+    Stock past its date is not on the shelf for this purpose: the recipe
+    screen leaves it out, and a list that counted it would say "in the
+    pantry" over goods nobody can cook with.
     """
     if template is None:
+        return _StockVerdict(covered=False, deficit=required_qty)
+
+    items = stock.items_by_template.get(template.id, [])
+    usable = usable_items(items, stock.today)
+    if items and not usable:
         return _StockVerdict(covered=False, deficit=required_qty)
 
     quants = await core_api.stock.list_quants_async(
@@ -253,6 +269,13 @@ async def _stock_verdict(
     available = convert_qty_for_template(
         on_hand, stock_uom, ingredient_uom, template, uoms_by_id
     )
+
+    if available is not None and items:
+        # Free stock is never more than what is fit to use: a reservation
+        # lowers the first, a date past lowers the second.
+        in_date = total_available(usable, ingredient_uom, template, uoms_by_id)
+        if in_date is not None:
+            available = min(available, in_date)
 
     if available is None:
         return _StockVerdict(
@@ -412,7 +435,7 @@ async def generate_shopping_list_async(  # noqa: C901, PLR0915 - existing comple
         ingredient_uom = uoms_by_id.get(agg['uom_id']) if agg['uom_id'] else None
 
         verdict = await _stock_verdict(
-            db, org_id, product, required_qty, ingredient_uom, uoms_by_id
+            db, org_id, product, required_qty, ingredient_uom, uoms_by_id, stock
         )
         if verdict.covered:
             available_count += 1

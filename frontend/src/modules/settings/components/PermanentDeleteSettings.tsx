@@ -6,6 +6,7 @@ import { InlineQueryError } from "@/components/ui/QueryResult";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useHasPermission } from "@/hooks/useHasPermission";
+import { resolveAllowPermanentDelete } from "@/module-sdk";
 import {
   useOrganization,
   useUpdateOrganization,
@@ -37,11 +38,7 @@ export default function PermanentDeleteSettings() {
   const isAdmin = useHasPermission("admin:access");
   const [confirmingEnable, setConfirmingEnable] = useState(false);
 
-  const flag = org?.settings?.allow_permanent_delete;
-  const current =
-    typeof flag === "boolean"
-      ? flag
-      : !["equipment_wms", "clean_core"].includes(org?.active_profile_id ?? "");
+  const current = resolveAllowPermanentDelete(org);
 
   const save = (checked: boolean) => {
     updateOrg.mutate(

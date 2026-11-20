@@ -62,6 +62,10 @@ async def get_categories(
     with_counts: bool = Query(
         False, description='Include how many live items each category holds'
     ),
+    count_records: bool = Query(
+        False,
+        description='With counts: count every live record, not distinct products',
+    ),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = _READS_CATEGORIES,
@@ -79,6 +83,7 @@ async def get_categories(
         include_inactive=include_inactive,
         claimed_tags=claimed_tags or None,
         with_counts=with_counts,
+        count_records=count_records,
     )
     deduped = _dedupe_categories(categories)
     ordered = sorted(deduped, key=lambda x: (x.sort_order or 0, x.name))

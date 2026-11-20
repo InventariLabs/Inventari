@@ -1,5 +1,3 @@
-import { toast } from "sonner";
-
 /**
  * Whether the clipboard took the text, and when it did not, why.
  *
@@ -29,9 +27,40 @@ export async function copyText(text: string): Promise<CopyOutcome> {
   }
 }
 
+/** The text a refused copy asks the reader to carry by hand, and the words around it. */
+export interface ManualCopy {
+  text: string;
+  message: string;
+}
+
+let pending: ManualCopy | null = null;
+const listeners = new Set<() => void>();
+
+const publish = (next: ManualCopy | null) => {
+  pending = next;
+  listeners.forEach((listener) => listener());
+};
+
+/** The refused copy the screen is showing, for `ManualCopyHost`. */
+export const manualCopyStore = {
+  subscribe(listener: () => void) {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  },
+  get: () => pending,
+  dismiss: () => publish(null),
+};
+
 /**
  * The path a copy button with nothing else to say takes: copy, and when the
- * clipboard is not there or refuses the text, say what to do instead.
+ * clipboard is not there or refuses the text, show the text where it can be
+ * selected and copied by hand.
+ *
+ * A sentence telling the reader to select a value is true only when the
+ * value is on the screen, and most copy buttons sit beside a value the screen
+ * does not show in full (an invitation link, an id, an export). So the text
+ * itself is handed to `ManualCopyHost`, mounted once at the root, which shows
+ * it under `message`.
  *
  * `message` is already translated — one sentence lives in the `common`
  * bundle and every module that owns a copy button borrows it, rather than
@@ -44,7 +73,7 @@ export async function copyTextOrExplain(
 ): Promise<boolean> {
   const outcome = await copyText(text);
   if (outcome !== "copied") {
-    toast.error(message);
+    publish({ text, message });
     return false;
   }
   return true;

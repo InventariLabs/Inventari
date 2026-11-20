@@ -4,6 +4,7 @@ import { addDays, format } from "date-fns";
 import { RunPortions } from "./RunPortions";
 import { RunSteps } from "./RunSteps";
 import { ProductionStatusBadge } from "./ProductionStatusBadge";
+import { signInWith } from "@/test/auth";
 import { todayIso } from "@/utils/formatters";
 import type { ProductionOrder } from "@/modules/maker/types/maker";
 
@@ -36,7 +37,10 @@ const order = (over: Partial<ProductionOrder> = {}): ProductionOrder =>
     ...over,
   }) as unknown as ProductionOrder;
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  signInWith(["maker:read", "maker:write", "items:write"]);
+});
 
 describe("RunPortions", () => {
   it("says no output has been added yet", () => {
@@ -149,5 +153,14 @@ describe("ProductionStatusBadge", () => {
   it("names a run in progress in its own words, not the raw status", () => {
     render(<ProductionStatusBadge status="IN_PROGRESS" />);
     expect(screen.getByText("In progress")).toBeTruthy();
+  });
+});
+
+describe("RunPortions — an account without items:write", () => {
+  it("shows the portions but not the form that adds one", () => {
+    signInWith(["maker:read", "maker:write"]);
+    render(<RunPortions order={order()} canWrite />);
+    expect(screen.getByText("Output so far")).toBeInTheDocument();
+    expect(screen.queryByTestId("maker-portion-add-button")).toBeNull();
   });
 });

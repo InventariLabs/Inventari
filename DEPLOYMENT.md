@@ -292,6 +292,21 @@ own, so the import cannot take down the application's workers.
 > **Deploying a public demo instead?** A demo instance rebuilds its database
 > from the seed every night and keeps nothing — different enough from a real
 > deployment to have its own page: [docs/DEMO.md](docs/DEMO.md).
+>
+> **Serving a website on the main domain, with the application on a
+> subdomain?** Set `DOMAIN` to the application's address (`app.<domain>`:
+> `FRONTEND_URL`, and so every address in a label, an invitation and a
+> registration e-mail, is built from it) and put the site's Caddy block in a
+> `*.caddy` file in `caddy-extra/`. The Caddyfile reads every such file, the
+> directory ships empty, and a stack without one configures what it always
+> did; `CADDY_EXTRA_DIR` in `.env` points it elsewhere. Reload with
+> `docker compose -f docker-compose.prod.yml exec -T caddy caddy reload --config /etc/caddy/Caddyfile`
+> after changing a file, and recreate Caddy
+> (`docker compose -f docker-compose.prod.yml up -d caddy`) the first time, for
+> the mount. A block there must not repeat `DOMAIN`, `WWW_DOMAIN` or
+> `DEMO_DOMAIN`. Paths the site does not own can be redirected to the
+> application with a permanent redirect that keeps path and query, so labels
+> already printed with the old address still open.
 
 ## Step 5: Deploy — everything but the proxy
 

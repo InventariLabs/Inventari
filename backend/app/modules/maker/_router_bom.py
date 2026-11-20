@@ -24,11 +24,11 @@ from app.core.deps import (
     require_permission,
 )
 from app.core.exceptions import NotFoundException
-from app.core.module_sdk import PaginatedResponse
+from app.core.module_sdk import PaginatedResponse, UomResolverAsync
 from app.core.public_api import core_api
 from app.i18n.service import get_current_lang
 
-from . import bom_tree, cost_breakdown, recipe_service
+from . import bom_service, bom_tree, cost_breakdown, recipe_service
 from ._schemas_bom import (
     BoMLineRead,
     BomMoveRequest,
@@ -79,6 +79,50 @@ async def _attach_child_names(
         # Table form).
         setattr(line, 'child_template_name', names.get(line.child_template_id))  # noqa: B010
         setattr(line, 'child_template_image_url', images.get(line.child_template_id))  # noqa: B010
+
+
+async def _attach_unit_mismatch(
+    db: AsyncSession, org_id: UUID, lines: Sequence[BoMLine]
+) -> None:
+    """Set the transient ``unit_mismatch`` a line read carries to its page.
+
+    A line's unit has to be readable as its ingredient's stock unit, or a run
+    cannot say what its number means and refuses it. The composition tab shows
+    such a line as needing a unit before the next run, so a mismatch stored
+    before the save guard existed is fixed where it is read, not discovered by
+    a run that will not complete.
+
+    The reading is the one the run and the save guard take
+    (``bom_service.unit_reads_as_stock``): a line naming a unit is read in it
+    when it converts to the stock unit, a line naming none is a bare number
+    counted in the stock unit, and text the catalogue cannot resolve is a
+    mismatch. A product whose card names no stock unit has nothing to compare
+    and is left alone, as it is everywhere else.
+    """
+    if not lines:
+        return
+    templates = await core_api.product_templates.get_many_async(
+        db, org_id, sorted({line.child_template_id for line in lines})
+    )
+    uoms = {uom.id: uom for uom in await core_api.uoms.list_for_org_async(db, org_id)}
+    resolver = UomResolverAsync(db, org_id)
+    for line in lines:
+        template = templates.get(line.child_template_id)
+        stock_uom = uoms.get(template.uom_id) if template and template.uom_id else None
+        line_uom_id = await bom_service.line_unit_id(line.uom_id, line.unit, resolver)
+        # ``unit_mismatch`` is a transient, non-persisted attribute that
+        # ``BoMLineRead.model_validate()`` picks up, exactly like the display
+        # names above; ``setattr`` keeps it off the mapped model.
+        setattr(  # noqa: B010
+            line,
+            'unit_mismatch',
+            not bom_service.unit_reads_as_stock(
+                line_uom_id,
+                uoms.get(line_uom_id) if line_uom_id is not None else None,
+                line.unit,
+                stock_uom,
+            ),
+        )
 
 
 def _collect_tree_lines(node: dict[str, Any], acc: list[BoMLine]) -> None:
@@ -230,6 +274,7 @@ async def get_bom_lines(
     """The lines of one recipe of the product: *recipe_id*, else the default."""
     lines = await list_lines(db, org_id, template_id, recipe_id=recipe_id)
     await _attach_child_names(db, org_id, lines)
+    await _attach_unit_mismatch(db, org_id, lines)
     return PaginatedResponse[BoMLineRead].from_full_list(
         [BoMLineRead.model_validate(line) for line in lines],
         offset=offset,
@@ -299,6 +344,7 @@ async def get_bom_tree(
     tree_lines: list[BoMLine] = []
     _collect_tree_lines(tree, tree_lines)
     await _attach_child_names(db, org_id, tree_lines)
+    await _attach_unit_mismatch(db, org_id, tree_lines)
     root_node = BomTreeNode.model_validate(tree)
     # What the shelf holds of each intermediate: a run takes that first and
     # makes only the rest through the recipe the tree shows below it.

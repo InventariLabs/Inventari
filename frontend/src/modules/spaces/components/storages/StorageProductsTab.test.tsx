@@ -108,3 +108,63 @@ describe("StorageProductsTab — module data hidden", () => {
     expect(asked[0]).toContain("exclude_module_contexts=true");
   });
 });
+
+describe("StorageProductsTab — a location whose records are all inside it", () => {
+  const warehouse = {
+    ...zoneRow,
+    items_count: 0,
+    subtree_items_count: 33,
+  } as StorageLocationSummary;
+
+  function renderWarehouse() {
+    const asked: string[] = [];
+    server.use(
+      http.get("/api/v1/locations/:id/items", ({ request }) => {
+        const inside = new URL(request.url).searchParams.get("include_inside");
+        asked.push(inside ? "inside" : "direct");
+        return HttpResponse.json(
+          onePage(inside ? [item("1", "On a shelf below")] : []),
+        );
+      }),
+      http.get("/api/v1/locations", () => HttpResponse.json(onePage([]))),
+    );
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    render(
+      <QueryClientProvider client={client}>
+        <StorageProductsTab
+          storage={zone}
+          summary={warehouse}
+          isArchived={false}
+          canWriteItems
+        />
+      </QueryClientProvider>,
+    );
+    return asked;
+  }
+
+  it("lists the records inside at once, as the 33 the tile promised", async () => {
+    const asked = renderWarehouse();
+
+    await screen.findByText("On a shelf below");
+    expect(screen.getByRole("checkbox")).toBeChecked();
+    expect(asked).not.toContain("direct");
+  });
+
+  it("does not call the location empty when the box is cleared", async () => {
+    renderWarehouse();
+    await screen.findByText("On a shelf below");
+
+    await userEvent.click(screen.getByRole("checkbox"));
+
+    expect(
+      await screen.findByText(/33 records are in the locations inside/),
+    ).toBeVisible();
+    expect(screen.queryByText("This location is empty")).toBeNull();
+    await userEvent.click(
+      screen.getByRole("button", { name: "Include locations inside" }),
+    );
+    await screen.findByText("On a shelf below");
+  });
+});

@@ -9,7 +9,7 @@ import { http, HttpResponse } from "msw";
 import * as React from "react";
 
 import { server } from "@/test/mocks/server";
-import { useScanAddToShoppingList } from "./useScanActions";
+import { useScanAddToShoppingList, useScanConsume } from "./useScanActions";
 
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
@@ -81,5 +81,35 @@ describe("useScanAddToShoppingList", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(added).toEqual(["list-new"]);
+  });
+});
+
+describe("useScanConsume", () => {
+  it("confirms the amount that was removed, with its unit", async () => {
+    const { toast } = await import("sonner");
+    server.use(
+      http.patch("/api/v1/items/:id/consume", () =>
+        HttpResponse.json({
+          id: "item-1",
+          quantity: 20,
+          uom: { symbol: "pcs" },
+        }),
+      ),
+    );
+    const client = new QueryClient({
+      defaultOptions: { mutations: { retry: false } },
+    });
+    const { result } = renderHook(() => useScanConsume(), {
+      wrapper: ({ children }: { children: React.ReactNode }) => (
+        <QueryClientProvider client={client}>{children}</QueryClientProvider>
+      ),
+    });
+
+    await act(() =>
+      result.current.mutateAsync({ itemId: "item-1", quantity: 5 }),
+    );
+
+    const [message] = vi.mocked(toast.success).mock.calls.at(-1) as [string];
+    expect(message).toBe("Removed 5 pcs.");
   });
 });

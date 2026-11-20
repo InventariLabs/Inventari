@@ -31,6 +31,7 @@ export function useQuickAddStorages() {
     noStorages: offer.total === undefined ? undefined : offer.total === 0,
     hasHidden: offer.emptyReason === "module-data-hidden",
     isError: offer.isError,
+    error: offer.error,
     refetch: offer.refetch,
   };
 }

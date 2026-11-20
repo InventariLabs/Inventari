@@ -18,8 +18,8 @@ _DELIVERY_STATUS_FAILED = 'failed'
 _DELIVERY_STATUS_PENDING = 'pending'
 
 #: Why the application itself stopped trying — stable values stored on the
-#: delivery row and translated in the history view. Nobody answered in these
-#: cases, so the row carries the reason instead of a receiver's status code.
+#: delivery row and translated in the history view. The row keeps what the
+#: receiver answered to the last attempt; the reason says who stopped.
 _ABANDON_CIRCUIT_BREAKER = 'circuit_breaker'
 _ABANDON_WEBHOOK_DISABLED = 'webhook_disabled'
 _ABANDON_WEBHOOK_DELETED = 'webhook_deleted'

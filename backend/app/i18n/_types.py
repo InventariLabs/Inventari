@@ -583,6 +583,7 @@ class ErrorMessages(TypedDict):
     invalid_country_code: str
     invalid_print_page_size: str
     invalid_timezone: str
+    organization_name_required: str
     invalid_currency_code: str
     admin_permissions_required: str
     invalid_url_missing_host: str
@@ -774,9 +775,11 @@ class ErrorMessages(TypedDict):
     document_correction_no_lines: str
     document_correction_below_zero: str
     document_correction_type_not_correctable: str
+    document_correction_posts_nothing: str
     document_undo_type_not_supported: str
     document_undo_requires_completed: str
     document_undo_nothing_left: str
+    document_undo_posts_nothing: str
     document_undo_blocked: str
     document_undo_stock_used: str
     document_post_already_posted: str

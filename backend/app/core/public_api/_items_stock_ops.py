@@ -39,8 +39,13 @@ class CoreItemsStockOpsMixin:
         lot_id: UUID | None = None,
         move_reference_type: str = 'item',
         move_reference_id: UUID | None = None,
+        file_when_emptied: bool = False,
     ) -> ItemDTO | None:
         """Set an item's quantity and post the change to the ledger.
+
+        *file_when_emptied* is for a door that takes stock out (a recipe
+        pick): a record it leaves with nothing is filed under the Consumed
+        place, as when the last unit is used by hand, and leaves the lists.
 
         *lot_id* names the batch the change belongs to, for a caller that
         knows one — a count that named a batch; a record that names no batch
@@ -74,6 +79,7 @@ class CoreItemsStockOpsMixin:
             lot_id=lot_id,
             move_reference_type=move_reference_type,
             move_reference_id=move_reference_id,
+            file_when_emptied=file_when_emptied,
         )
         return ItemDTO.model_validate(updated)
 

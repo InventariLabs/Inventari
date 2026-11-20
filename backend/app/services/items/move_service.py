@@ -19,6 +19,7 @@ from app.models.storage_location import LocationUsage, StorageLocation
 from app.schemas.item import ItemConsumeRequest, ItemDiscardRequest, ItemMove
 from app.services.audit_service import log_action_async
 
+from ._consumed_place import file_under_consumed_async
 from ._stock_relocation import carry_record_stock_async, lock_shelf_change_async
 from .history import log_history_async
 
@@ -94,20 +95,7 @@ async def _reduce_quantity(
     )
 
     if item.quantity <= 0:
-        from app.services.storage._defaults import (
-            ensure_virtual_locations_async,
-            get_virtual_location_async,
-        )
-
-        await ensure_virtual_locations_async(
-            db, str(user.organization_id), str(user.id)
-        )
-        virtual_loc = await get_virtual_location_async(
-            db, str(user.organization_id), virtual_usage
-        )
-        if virtual_loc:
-            await lock_shelf_change_async(db, [item], virtual_loc.id)
-            item.storage_location_id = virtual_loc.id
+        await file_under_consumed_async(db, item, user.id, virtual_usage=virtual_usage)
 
     await db.flush()
     await db.refresh(item)
