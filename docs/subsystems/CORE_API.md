@@ -323,7 +323,8 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 
 | Method | Signature | R/W | Description |
 |---|---|---|---|
-| `is_configured` | `() -> bool` | READ | Whether a message sent through ``send_async`` could leave at all. |
+| `is_configured` | `() -> bool` | READ | Whether the installation's own server could send a message at all. |
+| `can_send_async` | `(db: AsyncSession, organization_id: UUID) -> bool` | READ | Whether a message ``send_async`` queues for this organization could leave. |
 | `render_button` | `(url: str, label: str) -> str` | READ | The one centred call to action these emails carry. |
 | `render_fallback_link` | `(intro: str, url: str) -> str` | READ | The address spelled out, for a client that shows no button. |
 | `render_shell` | `(heading: str, body_html: str, footer: str) -> str` | READ | The card every transactional email arrives in. |

@@ -858,6 +858,47 @@ class TestWhatTheReminderRunReports:
         }
         enqueue.assert_not_called()
 
+    def test_an_organization_server_alone_is_enough_to_launch_and_remind(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        eq_item: Item,
+        eq_org: Any,
+        db_session: Session,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """The installation names no server, the organization's own is set up.
+
+        Launch queues the invitation and Send Reminders the reminder: neither
+        answers "this organization does not send email" while Settings → Email
+        reads "Sends mail".
+        """
+        from unittest.mock import AsyncMock, patch
+
+        _smtp(monkeypatch, configured=False)
+        eq_org.settings = {
+            'smtp': {
+                'host': 'mail.org.invalid',
+                'port': 587,
+                'from_email': 'org@test.invalid',
+            }
+        }
+        db_session.commit()
+
+        enqueue = AsyncMock(return_value=uuid.uuid4())
+        with patch('app.services.email_jobs.enqueue_email_job', enqueue):
+            campaign_id, _ = _launched_campaign(client, eq_auth_headers, eq_item.id)
+            assert enqueue.call_count == 1
+            enqueue.reset_mock()
+            reminded = client.post(
+                f'/api/v1/equipment/campaigns/{campaign_id}/remind',
+                headers=eq_auth_headers,
+            ).json()
+
+        assert reminded['email_unavailable'] is False
+        assert reminded['reminders_sent'] == 1
+        assert enqueue.call_count == 1
+
     def test_a_second_run_the_same_day_names_the_24_hour_rule(
         self,
         client: TestClient,
