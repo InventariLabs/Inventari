@@ -14,6 +14,13 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- A place for a site of your own beside the application on the production
+  server. Every `*.caddy` file in `caddy-extra/` (or the directory
+  `CADDY_EXTRA_DIR` names) is read as part of the Caddyfile, so a website on
+  the main domain can be served by the same Caddy while the application runs on
+  a subdomain, and survives updates, which an addition in a second compose file
+  would not. The directory ships empty and a stack that does not use it is
+  configured as before.
 - A place for a delivery cost that reached no product. Freight that arrives
   after a receipt is posted can no longer be added to the goods, and the
   refusal now offers a way forward: on a posted receipt the **Costs that

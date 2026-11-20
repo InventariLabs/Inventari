@@ -192,3 +192,7 @@ inventari-module-validation/
 backend/scripts/internal_id_prefixes.local
 backend/scripts/internal_private_words.local
 mutants/
+
+# Files an installation puts in caddy-extra/ (see its README).
+/caddy-extra/*
+!/caddy-extra/README.md
