@@ -545,6 +545,7 @@ ERRORS_PT: dict[str, str] = {
     'over_receipt_confirm_surplus': '{product}: receber {quantity} é {surplus} a mais do que os {basis} esperados. Receber o excedente?',
     'over_receipt_confirm_order_surplus': '{product}: receber {quantity} é {surplus} a mais do que os {basis} restantes no pedido {order}, linha {line}. Receber o excedente?',
     'over_receipt_past_ceiling': 'Receber {quantity} contra {basis} ultrapassa o limite de {ceiling}% de recebimento a mais — ninguém pode receber tanto',
+    'over_receipt_tolerance_above_ceiling': 'A tolerância de recebimento a mais ({tolerance}%) está acima do limite ({ceiling}%) e nunca se aplicaria. Reduza a tolerância ou aumente o limite.',
     'document_update_status': 'Somente documentos DRAFT podem ser atualizados',
     'document_correction_locked': 'Documentos de correção estão bloqueados — só as observações podem ser alteradas. Tentativa de alterar: {fields}. Cancele e crie uma nova correção se os dados estiverem errados.',
     'document_correction_not_duplicable': 'Uma correção não pode ser duplicada: ela retifica um único documento. Crie em vez disso uma nova correção desse documento.',

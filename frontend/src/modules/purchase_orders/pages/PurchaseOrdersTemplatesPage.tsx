@@ -108,7 +108,7 @@ export default function PurchaseOrdersTemplatesPage() {
               setEditorOpen(true);
             }}
           >
-            {t("common:templates.add", "Add Template")}
+            {t("common:templates.add", "Add template")}
           </Button>
         ) : undefined,
     });

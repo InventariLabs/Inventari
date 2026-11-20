@@ -17,6 +17,7 @@ import {
   useReopenPeriod,
 } from "@/modules/warehouse/hooks/useInventoryPeriods";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import type { InventoryPeriod } from "@/modules/warehouse/types";
 import { extractApiError } from "@/lib/errors";
 
@@ -146,6 +147,7 @@ export default function InventoryPeriodPanel() {
 
   return (
     <div className="space-y-6">
+      <ReadOnlyNotice module="warehouse" right="manage" />
       <Card className="overflow-hidden">
         <div className="px-4 sm:px-6 py-4">
           <div className="flex items-center gap-3 mb-4">
@@ -299,6 +301,11 @@ export default function InventoryPeriodPanel() {
                 })
           }
           variant={confirmAction.action === "close" ? "default" : "danger"}
+          confirmLabel={
+            confirmAction.action === "close"
+              ? t("periods.closeAction")
+              : t("periods.reopenAction")
+          }
           onConfirm={handleConfirm}
           onCancel={() => setConfirmAction(null)}
         />

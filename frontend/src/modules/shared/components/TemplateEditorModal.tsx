@@ -238,8 +238,8 @@ export function TemplateEditorModal({
             className="text-lg font-semibold text-on"
           >
             {isEdit
-              ? t("common:templates.edit", "Edit Template")
-              : t("common:templates.create", "Create Template")}
+              ? t("common:templates.edit", "Edit template")
+              : t("common:templates.create", "Create template")}
           </h2>
           <Button
             variant="ghost"
@@ -398,7 +398,7 @@ export function TemplateEditorModal({
               ? t("common:form.saving", "Saving…")
               : isEdit
                 ? t("common:actions.save", "Save")
-                : t("common:templates.create", "Create Template")}
+                : t("common:templates.create", "Create template")}
           </Button>
         </div>
       </>

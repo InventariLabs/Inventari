@@ -188,6 +188,12 @@ class ModuleService:
         for key, prop in properties.items():
             if key not in merged and isinstance(prop, dict) and 'default' in prop:
                 merged[key] = prop['default']
+        # A rule between two values is the module's to state; checked on the
+        # whole blob as it would stand, so a body naming one key is judged
+        # against the saved value of the other.
+        module_instance = module_registry.get(module_name)
+        if module_instance is not None:
+            module_instance.check_settings(merged)
         if namespace not in org_settings:
             org_settings[namespace] = {}
         # The stamp is core's metadata about the blob: written last so it

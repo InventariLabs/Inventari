@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { Card } from "@/components/ui/Card";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { QueryError } from "@/components/ui/QueryResult";
@@ -71,6 +72,7 @@ export default function LinkedReceiptsPage() {
 
   return (
     <div className="space-y-6">
+      <ReadOnlyNotice module="purchase_orders" />
       <Card className="p-5">
         <h2 className="text-sm font-medium text-on-secondary mb-4">
           {t("linkedReceipts")} — {po.number}

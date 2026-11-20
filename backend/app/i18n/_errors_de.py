@@ -684,6 +684,7 @@ ERRORS_DE: ErrorMessages = {
     'over_receipt_confirm_surplus': '{product}: Die Annahme von {quantity} sind {surplus} mehr als die erwarteten {basis}. Überschuss annehmen?',
     'over_receipt_confirm_order_surplus': '{product}: Die Annahme von {quantity} sind {surplus} mehr als die {basis}, die in Bestellung {order}, Position {line} offen sind. Überschuss annehmen?',
     'over_receipt_past_ceiling': 'Die Annahme von {quantity} gegenüber {basis} überschreitet die Obergrenze für Mehrlieferungen von {ceiling}% — so viel darf niemand annehmen',
+    'over_receipt_tolerance_above_ceiling': 'Die Toleranz für Mehrlieferungen ({tolerance}%) liegt über der Obergrenze ({ceiling}%) und könnte nie greifen. Senken Sie die Toleranz oder erhöhen Sie die Obergrenze.',
     'document_update_status': 'Nur Dokumente im Entwurfsstatus können aktualisiert werden',
     'document_correction_locked': 'Korrekturdokumente sind gesperrt — nur Notizen können geändert werden. Änderungsversuch: {fields}. Brechen Sie die Korrektur ab und erstellen Sie eine neue, wenn die Daten falsch sind.',
     'document_correction_not_duplicable': 'Eine Korrektur kann nicht dupliziert werden: Sie berichtigt ein bestimmtes Dokument. Erstellen Sie stattdessen eine neue Korrektur dieses Dokuments.',

@@ -681,6 +681,7 @@ ERRORS_FR: ErrorMessages = {
     'over_receipt_confirm_surplus': "{product} : recevoir {quantity}, c'est {surplus} de plus que les {basis} attendus. Recevoir l'excédent ?",
     'over_receipt_confirm_order_surplus': "{product} : recevoir {quantity}, c'est {surplus} de plus que les {basis} restant sur la commande {order}, ligne {line}. Recevoir l'excédent ?",
     'over_receipt_past_ceiling': 'Recevoir {quantity} pour {basis} dépasse le plafond de sur-réception de {ceiling} % — personne ne peut recevoir autant',
+    'over_receipt_tolerance_above_ceiling': "La tolérance de sur-réception ({tolerance} %) dépasse le plafond ({ceiling} %) et ne pourrait jamais s'appliquer. Baissez la tolérance ou relevez le plafond.",
     'document_update_status': 'Seuls les documents au statut brouillon peuvent être mis à jour',
     'document_correction_locked': 'Les documents de correction sont verrouillés — seules les notes peuvent être modifiées. Tentative de modification : {fields}. Annulez la correction et créez-en une nouvelle si les données sont erronées.',
     'document_correction_not_duplicable': 'Une correction ne peut pas être dupliquée : elle rectifie un seul document. Créez plutôt une nouvelle correction de ce document.',

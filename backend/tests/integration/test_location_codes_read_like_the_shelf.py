@@ -465,7 +465,14 @@ class TestTheTemplate:
         )
 
     @pytest.mark.parametrize(
-        'template', ['{zone}{rack:02}', 'TOO-LONG-PREFIX', '{zone}-{rack:02}x?', '']
+        'template',
+        [
+            '{zone}{rack:02}',
+            'TOO-LONG-PREFIX',
+            '{zone}-{rack:02}x?',
+            '',
+            '{foo}-{rack:02}',
+        ],
     )
     def test_a_template_that_cannot_number_is_refused(
         self, client, auth_headers, db_session, test_user, template

@@ -682,6 +682,7 @@ ERRORS_ES: ErrorMessages = {
     'over_receipt_confirm_surplus': '{product}: recibir {quantity} son {surplus} más que los {basis} esperados. ¿Recibir el excedente?',
     'over_receipt_confirm_order_surplus': '{product}: recibir {quantity} son {surplus} más que los {basis} pendientes en el pedido {order}, línea {line}. ¿Recibir el excedente?',
     'over_receipt_past_ceiling': 'Recibir {quantity} frente a {basis} supera el límite de sobrerecepción del {ceiling} % — nadie puede recibir tanto',
+    'over_receipt_tolerance_above_ceiling': 'La tolerancia de sobrerecepción ({tolerance} %) supera el límite ({ceiling} %) y nunca se aplicaría. Baje la tolerancia o suba el límite.',
     'document_update_status': 'Solo se pueden actualizar los documentos en estado borrador',
     'document_correction_locked': 'Los documentos de corrección están bloqueados: solo se pueden modificar las notas. Intento de cambio: {fields}. Cancele la corrección y cree una nueva si los datos son incorrectos.',
     'document_correction_not_duplicable': 'Una corrección no se puede duplicar: rectifica un único documento. Cree en su lugar una nueva corrección de ese documento.',

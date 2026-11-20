@@ -308,7 +308,7 @@ describe("TemplatesPage — the document templates", () => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
     );
 
-    await user.click(screen.getByRole("button", { name: "Add Template" }));
+    await user.click(screen.getByRole("button", { name: "Add template" }));
     editor = await screen.findByRole("dialog");
     expect(
       within(editor).queryByDisplayValue("Standard Checkout"),

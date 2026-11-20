@@ -113,14 +113,29 @@ export default function ModuleShell({ moduleName }: ModuleShellProps) {
     [sortedItems, location.pathname],
   );
 
+  // A page nested under no other tab (an order's page, its linked receipts)
+  // belongs to the module's base tab: the underline falls back to it rather
+  // than leaving the bar with nothing highlighted.
+  const underOtherTab = useMemo(
+    () =>
+      sortedItems.some(
+        (item) =>
+          item.path !== moduleNav?.basePath &&
+          location.pathname.startsWith(item.path + "/"),
+      ),
+    [sortedItems, location.pathname, moduleNav?.basePath],
+  );
+
   const isActive = useCallback(
     (path: string) => {
       if (location.pathname === path) return true;
       if (hasExactMatch) return false;
-      if (path === moduleNav?.basePath) return false;
+      if (path === moduleNav?.basePath) {
+        return !underOtherTab && location.pathname.startsWith(path + "/");
+      }
       return location.pathname.startsWith(path + "/");
     },
-    [location.pathname, hasExactMatch, moduleNav?.basePath],
+    [location.pathname, hasExactMatch, moduleNav?.basePath, underOtherTab],
   );
 
   /**

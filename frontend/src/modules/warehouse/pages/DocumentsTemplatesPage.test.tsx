@@ -474,7 +474,7 @@ describe("DocumentsTemplatesPage — an account that may only read", () => {
 
   it("offers no way to write a template, and says why", async () => {
     // The editor does not open in full for an account holding `warehouse:read`
-    // alone: Add Template, Edit and Delete are not offered, so no refusal arrives
+    // alone: Add template, Edit and Delete are not offered, so no refusal arrives
     // after the HTML was written. With the buttons gone, this screen's notice
     // reads as a boundary rather than as broken.
     rights.write = false;

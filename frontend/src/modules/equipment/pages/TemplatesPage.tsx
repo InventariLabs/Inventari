@@ -191,7 +191,7 @@ export default function TemplatesPage() {
                 setEditorOpen(true);
               }}
             >
-              {t("common:templates.add", "Add Template")}
+              {t("common:templates.add", "Add template")}
             </Button>
           </div>
         ) : undefined,

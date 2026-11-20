@@ -7,6 +7,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { Badge } from "@/components/ui/Badge";
 import { STATUS_COLORS } from "@/modules/purchase_orders/lib/statusColors";
 import { InlineQueryError, QueryError } from "@/components/ui/QueryResult";
+import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { RecordNotFound } from "@/components/ui/RecordNotFound";
 import { isNotFoundError } from "@/lib/errors";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
@@ -366,6 +367,7 @@ export default function PurchaseOrderDetailPage() {
 
   return (
     <div className="space-y-6">
+      <ReadOnlyNotice module="purchase_orders" />
       {requestsQuery.isError && approvalsEnabled && (
         <InlineQueryError
           error={requestsQuery.error}

@@ -109,3 +109,64 @@ describe("ModuleShell — a module's theme variables", () => {
     root.style.removeProperty("--shell-test-had-value");
   });
 });
+
+/**
+ * A page nested under the module's base tab — an order's page, its linked
+ * receipts — belongs to that tab, so the bar highlights it instead of
+ * showing nothing; a page under another tab keeps that tab.
+ */
+describe("ModuleShell — the active tab of a nested page", () => {
+  moduleRegistry.register({
+    name: "shell-fallback-test",
+    routes: [],
+    moduleNav: {
+      basePath: "/shell-fallback-test",
+      items: [
+        { path: "/shell-fallback-test", icon: Package, labelKey: "baseTab" },
+        {
+          path: "/shell-fallback-test/other",
+          icon: Package,
+          labelKey: "otherTab",
+        },
+      ],
+    },
+  });
+
+  const open = (path: string) =>
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter initialEntries={[path]}>
+          <Routes>
+            <Route
+              path="/shell-fallback-test/*"
+              element={<ModuleShell moduleName="shell-fallback-test" />}
+            />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+  it("highlights the base tab for a page that sits under no other tab", () => {
+    open("/shell-fallback-test/42/details");
+
+    expect(screen.getByRole("link", { name: /baseTab/ })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(screen.getByRole("link", { name: /otherTab/ })).not.toHaveAttribute(
+      "aria-current",
+    );
+  });
+
+  it("keeps the other tab for a page under it", () => {
+    open("/shell-fallback-test/other/42");
+
+    expect(screen.getByRole("link", { name: /otherTab/ })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(screen.getByRole("link", { name: /baseTab/ })).not.toHaveAttribute(
+      "aria-current",
+    );
+  });
+});
