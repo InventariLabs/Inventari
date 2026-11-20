@@ -118,6 +118,62 @@ class TestCategoriesList:
         # card, which is a product of its own.
         assert category['items_count'] == 2
 
+    def test_get_categories_counts_every_record_when_asked(
+        self,
+        client,
+        auth_headers,
+        db_session,
+        test_category,
+        test_item,
+        test_storage_location,
+    ):
+        """Three assets made from one catalogue card are three assets.
+
+        A screen whose rows are physical things asks for ``count_records``;
+        the default stays one per product.
+        """
+        from app.models.item import Item
+        from app.models.product_template import ProductTemplate
+        from app.models.stock_anchor import StockAnchor
+
+        org_id = test_storage_location.organization_id
+        card = ProductTemplate(name='Dell Latitude 5540', organization_id=org_id)
+        db_session.add(card)
+        db_session.commit()
+        db_session.add(
+            StockAnchor(
+                organization_id=org_id,
+                product_template_id=card.id,
+                storage_location_id=test_storage_location.id,
+            )
+        )
+        db_session.commit()
+        for serial in ('A', 'B', 'C'):
+            db_session.add(
+                Item(
+                    organization_id=org_id,
+                    storage_location_id=test_storage_location.id,
+                    category_id=test_category.id,
+                    template_id=card.id,
+                    name=f'Dell Latitude 5540 {serial}',
+                    quantity=1,
+                )
+            )
+        db_session.commit()
+
+        def count(query: str) -> int:
+            response = client.get(f'/api/v1/categories?{query}', headers=auth_headers)
+            return next(
+                c['items_count']
+                for c in response.json()['items']
+                if c['id'] == str(test_category.id)
+            )
+
+        # The fixture's card-less record plus the one card.
+        assert count('with_counts=true') == 2
+        # The fixture's record plus the three assets.
+        assert count('with_counts=true&count_records=true') == 4
+
     def test_get_categories_exclude_module_contexts(
         self, client, auth_headers, db_session
     ):

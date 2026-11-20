@@ -313,7 +313,7 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | `existing_ids_async` | `(db: AsyncSession, organization_id: UUID, category_ids: set[UUID]) -> set[UUID]` | READ | Return the subset of *category_ids* visible to *organization_id* — one query. |
 | `get_by_id_async` | `(db: AsyncSession, organization_id: UUID, category_id: UUID) -> CategoryDTO \| None` | READ | Return a single category visible to *organization_id*, or ``None``. |
 | `list_async` | `(db: AsyncSession, organization_id: UUID) -> list[CategoryDTO]` | READ | Return all active categories using an AsyncSession. |
-| `list_with_filters_async` | `(db: AsyncSession, organization_id: UUID, *, include_inactive: bool=False, claimed_tags: set[str] \| None=None, with_counts: bool=False) -> list[CategoryDTO]` | READ | List categories visible to *organization_id* with optional filters. |
+| `list_with_filters_async` | `(db: AsyncSession, organization_id: UUID, *, include_inactive: bool=False, claimed_tags: set[str] \| None=None, with_counts: bool=False, count_records: bool=False) -> list[CategoryDTO]` | READ | List categories visible to *organization_id* with optional filters. |
 | `rename_group_async` | `(db: AsyncSession, organization_id: UUID, *, current_name: str, new_name: str \| None, category_ids: list[UUID] \| None=None, user: UserContextDTO) -> list[UUID]` | WRITE | Rename a category group, or take it off the categories that carry it. |
 | `update_async` | `(db: AsyncSession, organization_id: UUID, category_id: UUID, category_in: CategoryUpdateDTO, user: UserContextDTO) -> CategoryDTO \| None` | WRITE | Update a category by ID. Returns the updated CategoryDTO or ``None``. |
 
