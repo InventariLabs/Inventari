@@ -11,6 +11,7 @@ import { useEnabledModulesOptional } from "@/contexts/ModulesContext";
 import { recordsMovements } from "@/modules/inventory/constants/movementModules";
 import { useShowModuleData } from "@/modules/settings/hooks/useOrganization";
 import { useStorageLocationLabels } from "@/modules/shared/hooks/useStorageLocationLabels";
+import { useRelocationReading } from "@/modules/inventory/moveRelocation";
 
 /** How many moves the overview shows; the journal holds the rest. */
 export const RECENT_MOVES_LIMIT = 5;
@@ -48,13 +49,15 @@ function outboundPhrase(
 /**
  * One ledger row as a journal sentence. Direction is the shape of the pair
  * of locations, the same rule the ledger's own direction filter applies: no
- * origin came in from outside, no destination left, both moved inside.
+ * origin came in from outside, no destination left, both moved inside. A
+ * row a physical location move wrote names the same shelf on both ends, so
+ * it reads the paths the location left and reached, as the journal does.
  */
 function moveJournalEntry(
   move: StockMoveRow,
   t: TFunction,
   placeName: ReturnType<typeof useStorageLocationLabels>,
-  now?: Date,
+  relocation: ReturnType<typeof useRelocationReading>,
 ): JournalEntry {
   const quantity = formatQuantityLocalized(
     t,
@@ -63,10 +66,15 @@ function moveJournalEntry(
   );
   // The outside is declined by the slot it fills: what came in "from
   // outside" did not also leave "from outside".
+  const carried = relocation(move);
   const from =
+    carried?.from ??
+    move.from_location_path ??
     placeName(move.from_location_id, move.from_location_name) ??
     t("inventory:moves.outsideFrom");
   const to =
+    carried?.to ??
+    move.to_location_path ??
     placeName(move.to_location_id, move.to_location_name) ??
     t("inventory:moves.outsideTo");
   const at = move.completed_at ?? move.created_at ?? null;
@@ -85,7 +93,7 @@ function moveJournalEntry(
         <strong>{move.product_name ?? "—"}</strong> {phrase}
       </>
     ),
-    timeLabel: formatRecentMoment(at, now),
+    timeLabel: formatRecentMoment(at),
     dateTime: at ?? undefined,
   };
 }
@@ -111,6 +119,7 @@ export function DashboardRecentMoves() {
       move.to_location_id,
     ]),
   );
+  const relocation = useRelocationReading();
 
   if (isError) {
     return (
@@ -124,7 +133,7 @@ export function DashboardRecentMoves() {
     <JournalCard
       title={t("common:dashboard.journal.title")}
       entries={(data?.items ?? []).map((move) =>
-        moveJournalEntry(move, t, placeName),
+        moveJournalEntry(move, t, placeName, relocation),
       )}
       linkLabel={hasJournal ? t("common:dashboard.journal.link") : undefined}
       linkHref={hasJournal ? "/inventory/moves" : undefined}

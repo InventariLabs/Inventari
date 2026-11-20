@@ -518,6 +518,12 @@ async def list_rows_for_org_async(
             read, moment=_moved_at(), row_id=StockMove.id, after=after, limit=limit
         )
 
+    # Imported here: the relocation writes its movements through this module.
+    from app.services.storage._relocation import paths_then_async
+
+    paths_then = await paths_then_async(
+        db, organization_id, [row.StockMove for row in page]
+    )
     rows = [
         StockMoveRowDTO(
             **StockMoveDTO.model_validate(row.StockMove).model_dump(),
@@ -525,6 +531,8 @@ async def list_rows_for_org_async(
             uom_symbol=row.uom_symbol,
             from_location_name=row.from_location_name,
             to_location_name=row.to_location_name,
+            from_location_path=paths_then.get(row.StockMove.id, (None, None))[0],
+            to_location_path=paths_then.get(row.StockMove.id, (None, None))[1],
             lot_name=row.lot_name,
             user_name=row.user_name,
             relocated_location_name=row.relocated_location_name,
