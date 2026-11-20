@@ -24,11 +24,18 @@ export function ReverseRunAction({ order }: { order: ProductionOrder }) {
   const { t } = useTranslation("maker");
   const canManage = useCanManage("maker");
   const canWrite = useCanWrite("maker");
+  // Undoing posts stock back, so the endpoint asks for items:write as well.
+  const canMoveStock = useCanWrite("items");
   const [asking, setAsking] = useState(false);
   const reverse = useReverseProduction();
 
   // Only a completed run posted anything to take back.
-  if (order.status !== "COMPLETED" || (!canManage && !canWrite)) return null;
+  if (
+    order.status !== "COMPLETED" ||
+    !canMoveStock ||
+    (!canManage && !canWrite)
+  )
+    return null;
 
   const button = (
     <Button

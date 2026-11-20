@@ -459,8 +459,9 @@ export default {
   corpus: "scripts",
   says:
     "A module page calls a mutation — or opens a write flow through a route " +
-    "fragment — and never names a permission. The backend refuses correctly, " +
-    "but only after the reader has done the work.",
+    "fragment — and never names a permission, or a component takes the " +
+    "permission and then offers a write outside the question it asks. The " +
+    "backend refuses correctly, but only after the reader has done the work.",
   advice:
     '  const canWrite = useCanWrite("warehouse");\n' +
     "  …\n" +

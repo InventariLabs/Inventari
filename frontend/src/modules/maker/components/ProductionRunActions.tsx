@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { CheckCircle2, Copy, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useCanWrite } from "@/hooks/useCanWrite";
 import { CancelRunButton } from "@/modules/maker/components/CancelRunButton";
 import { ReverseRunAction } from "@/modules/maker/components/ReverseRunAction";
 import { ProductionStatusBadge } from "@/modules/maker/components/ProductionStatusBadge";
@@ -31,7 +32,10 @@ interface Props {
  * to run past the edge — "Complete run" cut mid-label, "Duplicate" invisible.
  * Same pattern as DocumentActionButtons. Every action but the manager's own
  * (cancel, undo) is for an account that may write; a reader sees the status
- * alone, and the page above says why.
+ * alone, and the page above says why. Starting, completing, finishing,
+ * cancelling a run in progress and undoing one move stock, so their endpoints
+ * ask for items:write on top of the module's own key, and the buttons ask the
+ * same.
  */
 export function ProductionRunActions({
   order,
@@ -47,6 +51,7 @@ export function ProductionRunActions({
   const { t } = useTranslation("maker");
   const isDraft = order.status === "DRAFT";
   const isInProgress = order.status === "IN_PROGRESS";
+  const canMoveStock = useCanWrite("items");
 
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -61,14 +66,14 @@ export function ProductionRunActions({
           {t("detail.edit", { defaultValue: "Edit" })}
         </Button>
       )}
-      {(isDraft || isInProgress) && (
+      {(isDraft || (isInProgress && canMoveStock)) && (
         <CancelRunButton
           canManage={canManage}
           canWrite={canWrite}
           onCancel={onCancel}
         />
       )}
-      {isDraft && canWrite && (
+      {isDraft && canWrite && canMoveStock && (
         <>
           <StartRunAction order={order} onShortage={onShortage} />
           <Button
@@ -80,7 +85,9 @@ export function ProductionRunActions({
           </Button>
         </>
       )}
-      {isInProgress && canWrite && <FinishRunAction order={order} />}
+      {isInProgress && canWrite && canMoveStock && (
+        <FinishRunAction order={order} />
+      )}
       <ReverseRunAction order={order} />
       {canWrite && (
         <Button

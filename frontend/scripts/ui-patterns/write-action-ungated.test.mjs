@@ -365,8 +365,7 @@ describe("write-action-ungated", () => {
 
     it("reports an …Action component that writes and does not ask for itself", () => {
       const files = [
-        row(`<StartThingAction />`).text &&
-          component(`import { StartThingAction } from "@/modules/things/components/StartThingAction";
+        component(`import { StartThingAction } from "@/modules/things/components/StartThingAction";
             export function Row({ canWrite }) {
               return <div><StartThingAction /></div>;
             }`),
