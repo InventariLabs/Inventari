@@ -31,16 +31,25 @@
  *     computed off a defaulted list. A quantity derived from the query and
  *     then compared is read here, and the expression that renders it — the
  *     JSX braces or the attribute value — has to name the error or the
- *     loading state.
+ *     loading state. A name carries the query only through its own
+ *     initializer (`const total = itemTotals(response)`); a `useState` beside
+ *     a hook is not query data, nor is a mutation's result. The whole-query
+ *     spelling (`const q = useItems()`) is a query only when the scope reads
+ *     `q.data` or one of its outcome fields; a virtualizer or a router handle
+ *     is a hook too. An early `return` on the error or loading flag in the
+ *     same component answers for the claim below it: nothing renders after
+ *     that return until the read has an answer.
  *   - A component that models loading and not failure. The recipe picker's
  *     `SuggestedRecipes` took `suggestions` and `isLoading`, drew a spinner
  *     while loading, and answered "No suggestions for this slot" on a
  *     request that failed: it never received the failure its parent had.
- *   - A paged screen that reads `isLoading` over a list kept from the
- *     previous page. `keepPreviousData` swaps a search's results out while
- *     the next request runs, and `isLoading` is false by then — the
- *     equipment locations screen drew "No locations yet" over 38 of them,
- *     and its dashboard counted "8 assets need attention" before 9.
+ *   - A screen that reads `isLoading` over a list kept from the previous
+ *     request. `keepPreviousData` swaps a search's results out while the
+ *     next one runs, and `isLoading` is false by then — the equipment
+ *     locations screen drew "No locations yet" over 38 of them, and its
+ *     dashboard counted "8 assets need attention" before 9. An infinite
+ *     query is one such list (`.pages`); `placeholderData: keepPreviousData`
+ *     on an ordinary query is the other, and both are read here.
  *
  * Modes:
  *   node check-query-error-read.mjs                    # report and exit 1
@@ -281,7 +290,25 @@ export function unreadErrorsIn(rel, source) {
   return out;
 }
 
-/** The identifier names a destructured pattern binds, and their locals. */
+/** The initializer expression starting at `from`, to its `;` or scope end. */
+function initializerAt(slice, from) {
+  let depth = 0;
+  for (let i = from; i < slice.length; i++) {
+    const char = slice[i];
+    if (char === "(" || char === "[" || char === "{") depth++;
+    else if (char === ")" || char === "]" || char === "}") {
+      if (depth === 0) return slice.slice(from, i);
+      depth--;
+    } else if (char === ";" && depth === 0) {
+      return slice.slice(from, i);
+    }
+  }
+  return slice.slice(from);
+}
+
+/**
+ * The identifier names a destructured pattern binds, and their locals.
+ */
 function boundNames(body) {
   const names = [];
   for (const part of body.split(",")) {
@@ -295,7 +322,9 @@ function boundNames(body) {
 /**
  * Names in the scope whose value comes from the query: `const items = …data`
  * and `const { total } = itemTotals(itemsResponse)` both carry it, and the
- * screen's claim is written against them.
+ * screen's claim is written against them. Only a declaration's own
+ * initializer carries it: a `useState` array or a mutation's result beside a
+ * query is not that query's data.
  */
 function derivedNames(text, scope, seeds) {
   const derived = new Set(seeds);
@@ -305,7 +334,7 @@ function derivedNames(text, scope, seeds) {
   for (let pass = 0; pass < 3; pass++) {
     let grew = false;
     for (const match of slice.matchAll(declaration)) {
-      const rhs = slice.slice(match.index, match.index + 400);
+      const rhs = initializerAt(slice, match.index + match[0].length);
       const bound = boundNames(match[1] ?? match[2] ?? match[3] ?? "");
       if (bound.length === 0) continue;
       if (bound.some((name) => derived.has(name))) continue;
@@ -351,6 +380,77 @@ function renderedExpression(text, index) {
 const OUTCOME =
   /\b(?:isError|error|isLoadingError|status|isLoading|isPending|isFetching|isPlaceholderData|failed)\b/;
 
+/**
+ * Whether the component has already answered with the error or the loading
+ * state above `at`: `if (isError) return <QueryFailure />` leaves nothing of
+ * the claim rendered until the read has an answer.
+ */
+function earlyOutcome(text, scope, at) {
+  const head = text.slice(scope.start, at);
+  for (const guard of head.matchAll(
+    /\bif\s*\(\s*([^)]*)\)\s*\{?\s*return\b/g,
+  )) {
+    if (OUTCOME.test(guard[1])) return true;
+  }
+  // The same guard as a conditional return: `return isError ? … : isLoading
+  // ? … : <Button disabled={rows.length === 0} />`.
+  const returned = head.lastIndexOf("return");
+  if (returned === -1) return false;
+  const tail = head.slice(returned);
+  return !tail.includes(";") && tail.includes("?") && OUTCOME.test(tail);
+}
+
+/**
+ * Findings for the claims `derived` makes in one scope: a length or a
+ * zero-comparison that decides an empty state or a disabled action.
+ */
+function claimFindings(rel, text, scope, derived, lineOf) {
+  const out = [];
+  if (derived.length === 0) return out;
+  const names = derived.map((n) => n.replace(/\$/g, "\\$")).join("|");
+  const claims = new RegExp(
+    String.raw`\b(?:${names})\b\s*\.\s*length\b|\b(?:${names})\b\s*(?:>=?|<=?|===?|!==?)\s*0\b`,
+    "g",
+  );
+  for (const claim of text.slice(scope.start, scope.end).matchAll(claims)) {
+    const at = scope.start + claim.index;
+    const plain = claim[0].replace(/\s+/g, "");
+    const comparison = !/\.length$/.test(plain);
+    if (
+      comparison &&
+      !/(count|total|rows|items|list|records|entries|results)/i.test(plain)
+    ) {
+      continue;
+    }
+    const rendered = renderedExpression(text, at);
+    const expression =
+      rendered ??
+      text
+        .slice(Math.max(0, text.lastIndexOf("return", at)), at + 400)
+        .split(";")[0];
+    if (OUTCOME.test(expression)) continue;
+    if (earlyOutcome(text, scope, at)) continue;
+    const before = text.slice(Math.max(0, at - 80), at);
+    // The claims that lie are the ones deciding emptiness, a disabled action,
+    // or a count in a sentence: an ordinary ".length" in a list header says
+    // how many records there are, and while one page loads the number is on
+    // its way with it — the screens that read it as zero are the ones that
+    // decide the empty state or block the action.
+    const decides =
+      /(?:has|is|show)[A-Z]\w*=\{\s*[\w?.]*$/.test(before) ||
+      /\bdisabled=\{\s*[^}]*$/.test(before) ||
+      /<EmptyState\b/.test(expression) ||
+      /\bcount\s*:/.test(expression);
+    if (!decides) continue;
+    out.push({
+      file: rel,
+      line: lineOf(at),
+      site: `${scope.name} :: ${claim[0].replace(/\s+/g, "")}`,
+    });
+  }
+  return out;
+}
+
 /** Claims about a query's data rendered with no outcome in the expression. */
 export function unguardedClaimsIn(rel, source) {
   const text = blankComments(source);
@@ -374,47 +474,15 @@ export function unguardedClaimsIn(rel, source) {
         /Error|error|Loading|Pending|Fetching|status|Placeholder/.test(name),
       ),
     ];
-    const derived = derivedNames(text, scope, seeds);
-    const names = derived.map((n) => n.replace(/\$/g, "\\$")).join("|");
-    const claims = new RegExp(
-      String.raw`\b(?:${names})\b\s*\.\s*length\b|\b(?:${names})\b\s*(?:>=?|<=?|===?|!==?)\s*0\b`,
-      "g",
+    out.push(
+      ...claimFindings(
+        rel,
+        text,
+        scope,
+        derivedNames(text, scope, seeds),
+        lineOf,
+      ),
     );
-    for (const claim of text.slice(scope.start, scope.end).matchAll(claims)) {
-      const at = scope.start + claim.index;
-      const plain = claim[0].replace(/\s+/g, "");
-      const comparison = !/\.length$/.test(plain);
-      if (
-        comparison &&
-        !/(count|total|rows|items|list|records|entries|results)/i.test(plain)
-      ) {
-        continue;
-      }
-      const rendered = renderedExpression(text, at);
-      const expression =
-        rendered ??
-        text
-          .slice(Math.max(0, text.lastIndexOf("return", at)), at + 400)
-          .split(";")[0];
-      if (OUTCOME.test(expression)) continue;
-      const before = text.slice(Math.max(0, at - 80), at);
-      // The claims that lie are the ones deciding emptiness, a disabled
-      // action, or a count in a sentence: an ordinary ".length" in a list
-      // header says how many records there are, and while one page loads the
-      // number is on its way with it — the screens that read it as zero
-      // are the ones that decide the empty state or block the action.
-      const decides =
-        /(?:has|is|show)[A-Z]\w*=\{\s*[\w?.]*$/.test(before) ||
-        /\bdisabled=\{\s*[^}]*$/.test(before) ||
-        /<EmptyState\b/.test(expression) ||
-        /\bcount\s*:/.test(expression);
-      if (!decides) continue;
-      out.push({
-        file: rel,
-        line: lineOf(at),
-        site: `${scope.name} :: ${claim[0].replace(/\s+/g, "")}`,
-      });
-    }
   }
   // The whole-query variable (`const listQuery = useItems(…)`) is the other
   // spelling, and the page then builds its count out of `listQuery.data`.
@@ -422,42 +490,15 @@ export function unguardedClaimsIn(rel, source) {
   while ((match = whole.exec(text)) !== null) {
     const name = match[1];
     const scope = scopeOf(text, match.index);
+    // Only a hook read through the query's own fields is a query: a
+    // virtualizer or a router handle is a hook too, and its methods are not
+    // data whose failure the screen has to answer for.
+    const readsQuery = new RegExp(
+      String.raw`\b${name}\.(?:data|error|status|refetch|isLoading|isLoadingError|isPending|isFetching|isPlaceholderData)\b`,
+    ).test(text.slice(scope.start, scope.end));
+    if (!readsQuery) continue;
     const derived = derivedNames(text, scope, [name]);
-    const names = derived.map((n) => n.replace(/\$/g, "\\$")).join("|");
-    const claims = new RegExp(
-      String.raw`\b(?:${names})\b\s*\.\s*length\b|\b(?:${names})\b\s*(?:>=?|<=?|===?|!==?)\s*0\b`,
-      "g",
-    );
-    for (const claim of text.slice(scope.start, scope.end).matchAll(claims)) {
-      const at = scope.start + claim.index;
-      const plain = claim[0].replace(/\s+/g, "");
-      const comparison = !/\.length$/.test(plain);
-      if (
-        comparison &&
-        !/(count|total|rows|items|list|records|entries|results)/i.test(plain)
-      ) {
-        continue;
-      }
-      const rendered = renderedExpression(text, at);
-      const expression =
-        rendered ??
-        text
-          .slice(Math.max(0, text.lastIndexOf("return", at)), at + 400)
-          .split(";")[0];
-      if (OUTCOME.test(expression)) continue;
-      const before = text.slice(Math.max(0, at - 80), at);
-      const decides =
-        /(?:has|is|show)[A-Z]\w*=\{\s*[\w?.]*$/.test(before) ||
-        /\bdisabled=\{\s*[^}]*$/.test(before) ||
-        /<EmptyState\b/.test(expression) ||
-        /\bcount\s*:/.test(expression);
-      if (!decides) continue;
-      out.push({
-        file: rel,
-        line: lineOf(at),
-        site: `${scope.name} :: ${claim[0].replace(/\s+/g, "")}`,
-      });
-    }
+    out.push(...claimFindings(rel, text, scope, derived, lineOf));
   }
   return out;
 }
@@ -556,7 +597,7 @@ export function loadingWithoutFailureIn(rel, source) {
 }
 
 /**
- * A paged screen that reads `isLoading` for a list kept from the last page.
+ * A screen that reads `isLoading` for a list kept from the last request.
  *
  * `placeholderData: keepPreviousData` swaps the list out while the next page
  * of a search arrives, and `isLoading` is only true before the first one — so
@@ -564,11 +605,18 @@ export function loadingWithoutFailureIn(rel, source) {
  * over data that is on its way. The equipment locations screen was read that
  * way at 38 locations. `isFetching` and `isPlaceholderData` are the flags
  * that cover the second request.
+ *
+ * An infinite query (`.pages`) and an ordinary query with `keepPreviousData`
+ * both keep the previous list on screen; both are read here.
  */
 export function pagedEmptyIn(rel, source) {
   const text = blankComments(source);
   if (/\b(?:isPlaceholderData|isFetching)\b/.test(text)) return [];
-  if (!/\.pages\b/.test(text) && !/\bpages\s*\?/.test(text)) return [];
+  const keepsPrevious =
+    /\bkeepPreviousData\b/.test(text) ||
+    /\.pages\b/.test(text) ||
+    /\bpages\s*\?/.test(text);
+  if (!keepsPrevious) return [];
   const empty = /<EmptyState\b/.exec(text);
   if (!empty) return [];
   return [

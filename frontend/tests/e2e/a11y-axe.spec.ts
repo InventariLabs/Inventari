@@ -10,10 +10,11 @@ import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
 /**
  * Automated accessibility scan of the screens a user meets first.
  *
- * Runs axe-core (WCAG 2.0/2.1 A and AA rules) on each screen and fails on any
- * serious or critical violation the baseline does not already cover for that
- * screen. The baseline (`a11y-baseline.json`, next to this spec) freezes, per
- * rule, the kinds of element that were flagged when the scan was switched on,
+ * Runs axe-core (WCAG 2.0/2.1 A and AA rules) on each screen, and WCAG 2.2's
+ * target size rule in the phone pass at 390 px, and fails on any serious or
+ * critical violation the baseline does not already cover for that screen.
+ * The baseline (`a11y-baseline.json`, next to this spec) freezes, per rule,
+ * the kinds of element that were flagged when the scan was switched on,
  * so the suite is green on the code that exists and red on a screen that gets
  * worse: a new rule fails, and so does a new kind of element under a rule the
  * screen already breaks. It is written by the suite, never by hand:
@@ -229,6 +230,26 @@ test.describe("Accessibility — axe scan of the first screens", () => {
       await page.goto("/settings/audit-log");
       await settle(page);
       await scan(page, "phone-audit-log", { wcag22: true });
+    });
+
+    // The screens the round met the class on: the register's checkboxes, the
+    // recipe collections' Rename/Delete, and the asset cards' checkboxes.
+    test("document register at 390", async ({ page, authenticatedPage }) => {
+      await page.goto("/warehouse/register");
+      await settle(page);
+      await scan(page, "phone-document-register", { wcag22: true });
+    });
+
+    test("recipes at 390", async ({ page, authenticatedPage }) => {
+      await page.goto("/recipes");
+      await settle(page);
+      await scan(page, "phone-recipes", { wcag22: true });
+    });
+
+    test("asset list at 390", async ({ page, authenticatedPage }) => {
+      await page.goto("/equipment/assets");
+      await settle(page);
+      await scan(page, "phone-asset-list", { wcag22: true });
     });
   });
 

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   rowActionNamesIn,
   rowComponentPaths,
+  withKeys,
 } from "./check-row-action-names.mjs";
 
 /**
@@ -100,6 +101,37 @@ describe("check-row-action-names", () => {
         whole: true,
       }),
     ).toMatchObject([{ label: "appStore.activate" }]);
+  });
+
+  it("reads the card a row is rendered through a relative import", () => {
+    const page = `import { ThingCard } from "./ThingCard";
+      things.map((thing) => <ThingCard key={thing.id} thing={thing} />);`;
+    const files = [
+      { path: "modules/things/components/ThingsBoard.tsx", text: page },
+      {
+        path: "modules/things/components/ThingCard.tsx",
+        text: `export function ThingCard({ thing }) {
+          return <Button>Activate</Button>;
+        }`,
+      },
+    ];
+    expect([...rowComponentPaths(files)]).toEqual([
+      "modules/things/components/ThingCard.tsx",
+    ]);
+  });
+
+  it("reports two rows with the same constant name as two sites", () => {
+    const source = `things.map((thing) => (
+      <div>
+        <Button>Edit</Button>
+        <Button>Edit</Button>
+      </div>
+    ));`;
+    const findings = rowActionNamesIn(rel, source);
+    expect(findings).toHaveLength(2);
+    expect(new Set(withKeys(findings).map((finding) => finding.key)).size).toBe(
+      2,
+    );
   });
 
   it("reads an aria-label inside a card rendered per row", () => {

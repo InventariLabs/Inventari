@@ -29,11 +29,12 @@
  *   node check-row-action-names.mjs --write-baseline   # snapshot current
  *   node check-row-action-names.mjs --quiet            # exit code only
  *
- * Baseline: frontend/scripts/row-action-baseline.json (one entry per file
- * and constant name). The goal is an empty baseline.
+ * Baseline: frontend/scripts/row-action-baseline.json (one entry per file,
+ * constant name and occurrence, so two rows with the same constant name are
+ * two findings). The goal is an empty baseline.
  */
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import { dirname, join, normalize, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
 
@@ -303,13 +304,14 @@ function findingsIn(source, rel, checker, { translatedOnly = false } = {}) {
         /^["'`]/.test(name?.text ?? "");
       if (name && (!translatedOnly || translated) && !checker(name)) {
         const label = labelOf(name.text);
-        if (label && !seen.has(label)) {
-          seen.add(label);
+        const at = node.getStart();
+        if (label && !seen.has(at)) {
+          seen.add(at);
           out.push({
             file: rel,
-            line:
-              source.getLineAndCharacterOfPosition(node.getStart()).line + 1,
+            line: source.getLineAndCharacterOfPosition(at).line + 1,
             label,
+            at,
           });
         }
       }
@@ -336,11 +338,13 @@ export function rowActionNamesIn(rel, text, { whole = false } = {}) {
     ts.ScriptKind.TSX,
   );
   const out = [];
+  // A site is a control, not a label: a second constant "Edit" in the same
+  // file is a second row action, and the baseline has to hold it separately.
   const seen = new Set();
   const add = (findings) => {
     for (const finding of findings) {
-      if (seen.has(finding.label)) continue;
-      seen.add(finding.label);
+      if (seen.has(finding.at)) continue;
+      seen.add(finding.at);
       out.push(finding);
     }
   };
@@ -384,14 +388,14 @@ export function rowActionNamesIn(rel, text, { whole = false } = {}) {
               )
             ) {
               const label = labelOf(name.text);
-              if (label && !seen.has(label)) {
-                seen.add(label);
+              const at = inner.getStart();
+              if (label && !seen.has(at)) {
+                seen.add(at);
                 out.push({
                   file: rel,
-                  line:
-                    source.getLineAndCharacterOfPosition(inner.getStart())
-                      .line + 1,
+                  line: source.getLineAndCharacterOfPosition(at).line + 1,
                   label,
+                  at,
                 });
               }
             }
@@ -413,7 +417,9 @@ export function rowActionNamesIn(rel, text, { whole = false } = {}) {
  * A page that renders `<ModuleCard module={mod} />` from inside its map has
  * put the row's actions in the card: the card's button is the row action,
  * and reading only the page would call the module store clean while fourteen
- * "Activate" buttons sit one file away.
+ * "Activate" buttons sit one file away. The import is followed whether it is
+ * written with the `@/` alias or relatively (`./PlantCard`), because both
+ * spellings are in the modules.
  */
 export function rowComponentPaths(files) {
   const byPath = new Map(files.map((file) => [file.path, file]));
@@ -422,8 +428,14 @@ export function rowComponentPaths(files) {
     if (!file.path.endsWith(".tsx")) continue;
     const imports = new Map();
     for (const match of file.text.matchAll(
-      /import\s+(?:type\s+)?([^"']+?)\s+from\s+"(@\/[^"]+)"/g,
+      /import\s+(?:type\s+)?([^"']+?)\s+from\s+"([^"]+)"/g,
     )) {
+      const specifier = match[2].startsWith("@/")
+        ? match[2].slice(2)
+        : match[2].startsWith(".")
+          ? normalize(join(dirname(file.path), match[2]))
+          : null;
+      if (!specifier) continue;
       const names = [];
       const named = /\{([^}]*)\}/.exec(match[1]);
       if (named) {
@@ -438,7 +450,7 @@ export function rowComponentPaths(files) {
       }
       const fallback = /^\s*([A-Za-z_$][\w$]*)\s*(?:,|$)/.exec(match[1]);
       if (fallback && !match[1].trim().startsWith("{")) names.push(fallback[1]);
-      for (const name of names) imports.set(name, match[2].slice(2));
+      for (const name of names) imports.set(name, specifier);
     }
 
     const source = ts.createSourceFile(
@@ -505,7 +517,22 @@ function isControl(element, source) {
   return Boolean(attribute(element, "onClick"));
 }
 
-const keyOf = (finding) => `${finding.file} :: ${finding.label}`;
+const keyOf = (finding) => finding.key;
+
+/**
+ * Give every finding its baseline key. A file can hold two constant "Edit"
+ * actions on different rows; the occurrence keeps them apart, so one
+ * baselined label does not exempt the next control that repeats it.
+ */
+export function withKeys(findings) {
+  const counts = new Map();
+  return findings.map((finding) => {
+    const base = `${finding.file} :: ${finding.label}`;
+    const occurrence = (counts.get(base) ?? 0) + 1;
+    counts.set(base, occurrence);
+    return { ...finding, key: `${base} :: #${occurrence}` };
+  });
+}
 
 function readBaseline() {
   return existsSync(BASELINE_PATH)
@@ -526,10 +553,12 @@ function runCli() {
     text: readFileSync(resolve(SRC, path), "utf8"),
   }));
   const rowComponents = rowComponentPaths(corpus);
-  const findings = corpus.flatMap((file) =>
-    rowActionNamesIn(file.path, file.text, {
-      whole: rowComponents.has(file.path),
-    }),
+  const findings = withKeys(
+    corpus.flatMap((file) =>
+      rowActionNamesIn(file.path, file.text, {
+        whole: rowComponents.has(file.path),
+      }),
+    ),
   );
 
   if (writeBaseline) {
@@ -539,9 +568,9 @@ function runCli() {
       generatedBy: "node scripts/check-row-action-names.mjs --write-baseline",
       note:
         "Row actions whose accessible name is the same constant for every " +
-        "row. One entry per file and name; a plain run fails on any entry the " +
-        "tree no longer holds as well as on a new one, and --write-baseline " +
-        "is the only writer.",
+        "row. One entry per file, name and occurrence; a plain run fails on " +
+        "any entry the tree no longer holds as well as on a new one, and " +
+        "--write-baseline is the only writer.",
       sites,
     };
     writeFileSync(BASELINE_PATH, `${JSON.stringify(body, null, 2)}\n`);

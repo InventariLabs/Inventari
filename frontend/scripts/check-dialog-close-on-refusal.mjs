@@ -33,10 +33,14 @@
  *
  * The scan is narrow where the class is. A file is read when it draws a
  * dialog-shaped component and holds a controlled text field, or when the
- * handler sits in a dialog's `onConfirm`/`onSubmit`/`onSave`; an action
- * sheet that closes after handing the work to the page above has nothing
- * typed to lose. The handler is followed into a local function it calls
- * (`onConfirm={() => { setOpen(false); save(); }}`), one hop.
+ * handler sits in a dialog's `onConfirm`/`onSubmit`/`onSave` — a confirm
+ * handler is read whether or not the file holds a text field. Every callback
+ * nested in that handler is read too, because a confirm dialog's close can
+ * arrive in `onSettled`, `onError`, `.catch` or `.finally` instead of the
+ * handler's own body. An action sheet that closes after handing the work to
+ * the page above has nothing typed to lose. The handler is followed into a
+ * local function it calls (`onConfirm={() => { setOpen(false); save(); }}`),
+ * one hop.
  *
  * Modes:
  *   node check-dialog-close-on-refusal.mjs                    # report and exit 1
@@ -44,8 +48,9 @@
  *   node check-dialog-close-on-refusal.mjs --write-baseline   # snapshot current
  *   node check-dialog-close-on-refusal.mjs --quiet            # exit code only
  *
- * Baseline: frontend/scripts/dialog-close-baseline.json (one entry per file
- * and handler). The goal is an empty baseline.
+ * Baseline: frontend/scripts/dialog-close-baseline.json (one entry per file,
+ * handler, close call and occurrence, so two inline handlers in one file do
+ * not share an exemption). The goal is an empty baseline.
  */
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
@@ -264,6 +269,19 @@ export function handlerEvents(fn, local = new Map(), seen = new Set()) {
   return { mutations, closes };
 }
 
+/** The name `fn` is declared under, when it is a named function or a const. */
+function declaredName(fn) {
+  if (fn.name && ts.isIdentifier(fn.name)) return fn.name.text;
+  const parent = fn.parent;
+  if (
+    parent &&
+    ts.isVariableDeclaration(parent) &&
+    ts.isIdentifier(parent.name)
+  )
+    return parent.name.text;
+  return null;
+}
+
 /**
  * Is `fn` itself one of a request's callbacks, and which one?
  *
@@ -271,36 +289,42 @@ export function handlerEvents(fn, local = new Map(), seen = new Set()) {
  * to stay open for, and null means the function is a handler of its own,
  * read from its body.
  */
-function callbackKind(fn) {
+function callbackKind(fn, refusalNames = new Set()) {
   let cur = fn;
   while (cur.parent && ts.isParenthesizedExpression(cur.parent))
     cur = cur.parent;
   const holder = cur.parent;
-  if (!holder) return null;
-  if (ts.isPropertyAssignment(holder)) {
-    const name =
-      ts.isIdentifier(holder.name) || ts.isStringLiteral(holder.name)
-        ? holder.name.text
-        : "";
-    if (name === "onSuccess") return "success";
-    if (name === "onSettled" || name === "onError") return "refusal";
+  if (holder) {
+    if (ts.isPropertyAssignment(holder)) {
+      const name =
+        ts.isIdentifier(holder.name) || ts.isStringLiteral(holder.name)
+          ? holder.name.text
+          : "";
+      if (name === "onSuccess") return "success";
+      if (name === "onSettled" || name === "onError") return "refusal";
+    }
+    if (
+      ts.isCallExpression(holder) &&
+      ts.isPropertyAccessExpression(holder.expression) &&
+      holder.arguments.includes(cur)
+    ) {
+      const method = holder.expression.name.text;
+      if (method === "then") return "success";
+      if (method === "catch" || method === "finally") return "refusal";
+    }
   }
-  if (
-    ts.isCallExpression(holder) &&
-    ts.isPropertyAccessExpression(holder.expression) &&
-    holder.arguments.includes(cur)
-  ) {
-    const method = holder.expression.name.text;
-    if (method === "then") return "success";
-    if (method === "catch" || method === "finally") return "refusal";
-  }
-  return null;
+  return refusalNames.has(declaredName(fn) ?? "") ? "refusal" : null;
 }
 
 /** Why the close at `node` is not a refusal-safe one, or null. */
-export function closeIsRefusalSafe(node, fn, local = new Map()) {
+export function closeIsRefusalSafe(
+  node,
+  fn,
+  local = new Map(),
+  refusalNames = new Set(),
+) {
   // Closing from a success callback is the right shape.
-  const own = callbackKind(fn);
+  const own = callbackKind(fn, refusalNames);
   if (own === "success") return null;
   if (own === "refusal") return "closes in a refusal path";
   if (inside(node, ["onSuccess", "then"], fn)) return null;
@@ -368,36 +392,111 @@ export function closeOnRefusalIn(rel, text) {
   collect(source);
 
   const local = localFunctions(source);
-  const visit = (node) => {
+  // Functions handed to a request's refusal path by name (`onSettled: close`,
+  // `.catch(close)`) are refusal callbacks wherever their declaration sits.
+  const refusalNames = new Set();
+  const refusalPass = (node) => {
+    if (
+      ts.isPropertyAssignment(node) &&
+      (node.name.getText() === "onSettled" ||
+        node.name.getText() === "onError") &&
+      ts.isIdentifier(node.initializer)
+    ) {
+      refusalNames.add(node.initializer.text);
+    }
+    if (
+      ts.isCallExpression(node) &&
+      ts.isPropertyAccessExpression(node.expression) &&
+      (node.expression.name.text === "catch" ||
+        node.expression.name.text === "finally") &&
+      node.arguments[0] &&
+      ts.isIdentifier(node.arguments[0])
+    ) {
+      refusalNames.add(node.arguments[0].text);
+    }
+    ts.forEachChild(node, refusalPass);
+  };
+  refusalPass(source);
+
+  // The confirm handlers themselves, and the local functions they hand the
+  // work to. Everything nested inside one is read too: a dialog's answer can
+  // arrive in `onSettled`, `onError` or a `.catch`, and those closes are the
+  // ones that run on the refusal with the dialog gone.
+  const roots = new Set();
+  const addRoot = (fn) => {
+    if (!fn || roots.has(fn)) return;
+    roots.add(fn);
+    inBody(fn, (node) => {
+      if (
+        ts.isCallExpression(node) &&
+        ts.isIdentifier(node.expression) &&
+        local.has(node.expression.text)
+      ) {
+        addRoot(local.get(node.expression.text));
+      }
+    });
+  };
+  for (const node of confirmNodes) addRoot(node);
+  for (const name of confirmNames) {
+    const fn = local.get(name);
+    if (fn) addRoot(fn);
+  }
+  for (const name of refusalNames) {
+    const fn = local.get(name);
+    if (fn) addRoot(fn);
+  }
+
+  const visit = (node, nested = false) => {
     if (ts.isFunctionLike(node) && node.body) {
       const name = functionName(node, source);
-      if (!typed && !confirmNodes.has(node) && !confirmNames.has(name)) {
-        ts.forEachChild(node, visit);
-        return;
-      }
-      const { closes } = handlerEvents(node, local);
-      for (const close of closes) {
-        const reason = closeIsRefusalSafe(close.node, node, local);
-        if (reason) {
-          out.push({
-            file: rel,
-            line:
-              source.getLineAndCharacterOfPosition(close.node.getStart()).line +
-              1,
-            handler: functionName(node, source),
-            close: close.name,
-            reason,
-          });
+      const root = roots.has(node) || confirmNames.has(name);
+      if (typed || nested || root) {
+        const { closes } = handlerEvents(node, local);
+        for (const close of closes) {
+          const reason = closeIsRefusalSafe(
+            close.node,
+            node,
+            local,
+            refusalNames,
+          );
+          if (reason) {
+            out.push({
+              file: rel,
+              line:
+                source.getLineAndCharacterOfPosition(close.node.getStart())
+                  .line + 1,
+              handler: functionName(node, source),
+              close: close.name,
+              reason,
+            });
+          }
         }
       }
+      ts.forEachChild(node, (child) => visit(child, nested || root));
+      return;
     }
-    ts.forEachChild(node, visit);
+    ts.forEachChild(node, (child) => visit(child, nested));
   };
   visit(source);
   return out;
 }
 
-const keyOf = (finding) => `${finding.file} :: ${finding.handler}`;
+const keyOf = (finding) => finding.key;
+
+/**
+ * Give every finding its baseline key. Inline handlers all read `<arrow>`, so
+ * the close call and its occurrence in the file are part of the identity; a
+ * second inline handler in a file must not inherit the first one's entry.
+ */
+export function withKeys(findings) {
+  const counts = new Map();
+  return findings.map((finding) => {
+    const base = `${finding.file} :: ${finding.handler} :: ${finding.close}`;
+    const occurrence = (counts.get(base) ?? 0) + 1;
+    counts.set(base, occurrence);
+    return { ...finding, key: `${base} :: #${occurrence}` };
+  });
+}
 
 function readBaseline() {
   return existsSync(BASELINE_PATH)
@@ -413,8 +512,10 @@ function runCli() {
   const files = walk(SRC)
     .map((file) => relative(SRC, file).split("\\").join("/"))
     .filter(isScanned);
-  const findings = files.flatMap((rel) =>
-    closeOnRefusalIn(rel, readFileSync(resolve(SRC, rel), "utf8")),
+  const findings = withKeys(
+    files.flatMap((rel) =>
+      closeOnRefusalIn(rel, readFileSync(resolve(SRC, rel), "utf8")),
+    ),
   );
 
   if (writeBaseline) {
@@ -425,9 +526,9 @@ function runCli() {
         "node scripts/check-dialog-close-on-refusal.mjs --write-baseline",
       note:
         "Dialogs that close before the server accepted the change. One entry " +
-        "per file, handler and close call; a plain run fails on any entry the " +
-        "tree no longer holds as well as on a new one, and --write-baseline " +
-        "is the only writer.",
+        "per file, handler, close call and occurrence; a plain run fails on " +
+        "any entry the tree no longer holds as well as on a new one, and " +
+        "--write-baseline is the only writer.",
       sites,
     };
     writeFileSync(BASELINE_PATH, `${JSON.stringify(body, null, 2)}\n`);

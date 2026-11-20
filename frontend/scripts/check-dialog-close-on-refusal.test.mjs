@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   closeOnRefusalIn,
   isScanned,
+  withKeys,
 } from "./check-dialog-close-on-refusal.mjs";
 
 /**
@@ -49,6 +50,76 @@ describe("check-dialog-close-on-refusal", () => {
     }`);
     expect(closeOnRefusalIn(rel, source)).toMatchObject([
       { reason: "closes in a refusal path" },
+    ]);
+  });
+
+  const untypedDialog = (body) => `function ThingDialog() {
+    const [open, setOpen] = useState(false);
+    return (
+      <ConfirmDialog open onConfirm={${body}}>
+        <p>Sure?</p>
+      </ConfirmDialog>
+    );
+  }`;
+
+  it("fires on an inline onSettled beside no typed state", () => {
+    const source = untypedDialog(`() => {
+      save.mutate(values, { onSettled: () => setOpen(false) });
+    }`);
+    expect(closeOnRefusalIn(rel, source)).toMatchObject([
+      { reason: "closes in a refusal path" },
+    ]);
+  });
+
+  it("fires on a named confirm's onSettled and onError", () => {
+    const source = `function ThingDialog() {
+      const [open, setOpen] = useState(false);
+      function confirm() {
+        save.mutate(values, {
+          onSettled: () => setOpen(false),
+          onError: () => setOpen(false),
+        });
+      }
+      return (
+        <ConfirmDialog open onConfirm={confirm}>
+          <p>Sure?</p>
+        </ConfirmDialog>
+      );
+    }`;
+    const found = closeOnRefusalIn(rel, source);
+    expect(found).toHaveLength(2);
+    expect(found).toMatchObject([
+      { handler: "onSettled", reason: "closes in a refusal path" },
+      { handler: "onError", reason: "closes in a refusal path" },
+    ]);
+  });
+
+  it("fires on a close in .catch beside no typed state", () => {
+    const source = untypedDialog(`() => {
+      save.mutateAsync(values).catch(() => setOpen(false));
+    }`);
+    expect(closeOnRefusalIn(rel, source)).toMatchObject([
+      { reason: "closes in a refusal path" },
+    ]);
+  });
+
+  it("fires on a refusal callback handed to onSettled by name", () => {
+    const source = `function ThingDialog() {
+      const [open, setOpen] = useState(false);
+      function closeIt() {
+        setOpen(false);
+      }
+      function confirm() {
+        save.mutate(values, { onSettled: closeIt });
+      }
+      return (
+        <ConfirmDialog open onConfirm={confirm}>
+          <p>Sure?</p>
+        </ConfirmDialog>
+      );
+    }`;
+    expect(closeOnRefusalIn(rel, source)).toMatchObject([
+      { handler: "closeIt", reason: "closes in a refusal path" },
     ]);
   });
 
@@ -160,6 +231,39 @@ describe("check-dialog-close-on-refusal", () => {
       return <Input value={q} onChange={(e) => setQ(e.target.value)} />;
     }`;
     expect(closeOnRefusalIn(rel, source)).toEqual([]);
+  });
+
+  it("keys two inline handlers in one file apart", () => {
+    const source = `function ThingDialog() {
+      const [open, setOpen] = useState(false);
+      return (
+        <>
+          <ConfirmDialog
+            open
+            onConfirm={() => {
+              setOpen(false);
+              save.mutate(values);
+            }}
+          >
+            <p>Sure?</p>
+          </ConfirmDialog>
+          <ConfirmDialog
+            open
+            onConfirm={() => {
+              setOpen(false);
+              other.mutate(values);
+            }}
+          >
+            <p>Sure?</p>
+          </ConfirmDialog>
+        </>
+      );
+    }`;
+    const findings = closeOnRefusalIn(rel, source);
+    expect(findings).toHaveLength(2);
+    expect(new Set(withKeys(findings).map((finding) => finding.key)).size).toBe(
+      2,
+    );
   });
 
   it("scans product sources but not tests", () => {

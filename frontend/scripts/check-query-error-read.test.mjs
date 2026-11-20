@@ -252,6 +252,51 @@ describe("unguardedClaimsIn", () => {
     ].join("\n");
     expect(unguardedClaimsIn(rel, source)).toHaveLength(1);
   });
+
+  it("does not make a local array query data because a hook sits beside it", () => {
+    const source = [
+      "function Form() {",
+      "  const [names] = useState<string[]>([]);",
+      "  const { mutate } = useCreateNames();",
+      "  const { data: options = [] } = useNameOptions();",
+      "  return <Button disabled={names.length === 0}>Save</Button>;",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toEqual([]);
+  });
+
+  it("does not take a non-query hook's result for query data", () => {
+    const source = [
+      "function Table({ count }) {",
+      "  const virtualizer = useWindowVirtualizer({ count });",
+      "  const virtualRows = virtualizer.getVirtualItems();",
+      "  return <Button disabled={virtualRows.length === 0}>Go</Button>;",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toEqual([]);
+  });
+
+  it("leaves a claim under an early return on the error or the load", () => {
+    const source = [
+      "function List() {",
+      "  const { data: things = [], isError, isLoading } = useThings();",
+      "  if (isError) return <QueryFailure />;",
+      "  if (isLoading) return <Spinner />;",
+      "  return <Button disabled={things.length === 0}>Save</Button>;",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toEqual([]);
+  });
+
+  it("leaves a claim under a conditional return on the error or the load", () => {
+    const source = [
+      "function List() {",
+      "  const { data: things = [], isError, isLoading } = useThings();",
+      "  return isError ? <QueryFailure /> : isLoading ? <Spinner /> : <Button disabled={things.length === 0}>Save</Button>;",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toEqual([]);
+  });
 });
 
 describe("loadingWithoutFailureIn", () => {
@@ -319,5 +364,25 @@ describe("pagedEmptyIn", () => {
         page("const { isPlaceholderData } = useLocationPages();"),
       ),
     ).toEqual([]);
+  });
+
+  it("fires on an ordinary query that keeps the previous data", () => {
+    const source = [
+      "const { data: locations = [], isLoading } = useLocations({ placeholderData: keepPreviousData });",
+      "return isLoading ? <Spinner /> : locations.length === 0 ? <EmptyState /> : <List />;",
+    ].join("\n");
+    expect(
+      pagedEmptyIn("modules/things/pages/ThingsPage.tsx", source),
+    ).toMatchObject([{ site: expect.stringContaining("isPlaceholderData") }]);
+  });
+
+  it("leaves a list that does not keep the previous data", () => {
+    const source = [
+      "const { data: locations = [], isLoading } = useLocations();",
+      "return isLoading ? <Spinner /> : locations.length === 0 ? <EmptyState /> : <List />;",
+    ].join("\n");
+    expect(pagedEmptyIn("modules/things/pages/ThingsPage.tsx", source)).toEqual(
+      [],
+    );
   });
 });
