@@ -132,8 +132,8 @@ export function POApprovalSettings() {
 
         <div className="space-y-4">
           <POApprovalWorkflowWarning
-            requireAll={requireAll}
-            thresholdSet={threshold.trim() !== ""}
+            requireAll={settings?.approval_required ?? false}
+            thresholdSet={settings?.approval_threshold != null}
           />
 
           <label className="flex items-center gap-2 text-sm">

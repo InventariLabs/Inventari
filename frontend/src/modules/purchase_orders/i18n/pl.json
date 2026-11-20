@@ -61,6 +61,8 @@
   "cancelOrderDescription": "Spowoduje to anulowanie zamówienia zakupowego. Tej operacji nie można cofnąć.",
   "confirm": "Potwierdź",
   "cancelOrderAction": "Anuluj zamówienie",
+  "keepOrderAction": "Zachowaj zamówienie",
+  "approvalWorkflowMissingForAdmin": "To zamówienie zakupowe wymaga akceptacji, ale nie ma jeszcze przepływu akceptacji. Utwórz go i potwierdź zamówienie ponownie.",
   "receiveDelivery": "Przyjmij dostawę",
   "receiveDeliveryNoPartner": "Zamówienie nie ma dostawcy.",
   "details": "Szczegóły zamówienia",

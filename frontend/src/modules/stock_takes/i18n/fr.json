@@ -101,7 +101,7 @@
     "increaseCount": "Un de plus : {{name}}",
     "saveCount": "Enregistrer le comptage : {{name}}",
     "countFor": "Quantité comptée : {{name}}",
-    "countMalformed": "Ce n'est pas un nombre. Saisissez des chiffres avec un seul séparateur décimal, par exemple 12 ou 1,5.",
+    "countMalformed": "Une quantité comptée est de zéro ou plus : des chiffres avec un seul séparateur décimal, par exemple 12 ou 1,5.",
     "unsaved": "Non enregistré",
     "unsavedNeedsCount": "Non enregistré — saisissez une quantité pour enregistrer",
     "awaitingRecount": "À recompter",
@@ -132,7 +132,8 @@
     "cancel": {
       "title": "Annuler l'inventaire",
       "message": "Voulez-vous vraiment annuler cet inventaire ? Toutes les données seront perdues.",
-      "confirmLabel": "Annuler l'inventaire"
+      "confirmLabel": "Annuler l'inventaire",
+      "cancelLabel": "Continuer l'inventaire"
     },
     "overCap": {
       "title": "Quantité comptée bien supérieure au système",

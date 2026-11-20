@@ -208,6 +208,27 @@ describe("POApprovalSettings", () => {
     ).toBeInTheDocument();
   });
 
+  it("reads the saved settings, not the value being typed", async () => {
+    // Nothing is saved yet, so nothing needs a workflow; a threshold typed
+    // into the field raises no banner until it is saved.
+    withWorkflows([]);
+    mockedUsePOSettings.mockReturnValue({
+      data: { approval_threshold: null, approval_required: false },
+      isLoading: false,
+    } as unknown as ReturnType<typeof poHooks.usePOSettings>);
+    mockedUseUpdatePOSettings.mockReturnValue({
+      mutateAsync: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof poHooks.useUpdatePOSettings>);
+
+    render(<POApprovalSettings />);
+    await userEvent.type(screen.getByLabelText(/Approval threshold/), "-5");
+
+    expect(
+      screen.queryByText(/Approval is required, but nothing enforces it/),
+    ).not.toBeInTheDocument();
+  });
+
   it("points at the module store when approvals is off entirely", async () => {
     isModuleEnabled.mockReturnValue(false);
     withWorkflows([]);

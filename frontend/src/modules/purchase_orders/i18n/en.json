@@ -61,6 +61,8 @@
   "cancelOrderDescription": "This will cancel the purchase order. This action cannot be undone.",
   "confirm": "Confirm",
   "cancelOrderAction": "Cancel order",
+  "keepOrderAction": "Keep order",
+  "approvalWorkflowMissingForAdmin": "This purchase order needs an approval, but no approval workflow exists yet. Create one, then confirm the order again.",
   "receiveDelivery": "Receive delivery",
   "receiveDeliveryNoPartner": "The order names no supplier.",
   "details": "Order details",

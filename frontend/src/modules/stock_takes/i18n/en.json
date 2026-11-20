@@ -101,7 +101,7 @@
     "increaseCount": "One more {{name}}",
     "saveCount": "Save the count for {{name}}",
     "countFor": "Counted quantity of {{name}}",
-    "countMalformed": "That is not a number. Type digits with one decimal point, for example 12 or 1.5.",
+    "countMalformed": "A count is zero or more: digits with one decimal point, for example 12 or 1.5.",
     "unsaved": "Not saved",
     "unsavedNeedsCount": "Not saved — enter a count to save",
     "awaitingRecount": "To count again",
@@ -132,7 +132,8 @@
     "cancel": {
       "title": "Cancel stock take",
       "message": "Are you sure you want to cancel this stock take? All data will be lost.",
-      "confirmLabel": "Cancel stock take"
+      "confirmLabel": "Cancel stock take",
+      "cancelLabel": "Keep counting"
     },
     "overCap": {
       "title": "Counted much more than the system holds",

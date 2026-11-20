@@ -61,6 +61,8 @@
   "cancelOrderDescription": "Dies wird die Bestellung stornieren. Diese Aktion kann nicht rückgängig gemacht werden.",
   "confirm": "Bestätigen",
   "cancelOrderAction": "Bestellung stornieren",
+  "keepOrderAction": "Bestellung behalten",
+  "approvalWorkflowMissingForAdmin": "Diese Bestellung braucht eine Freigabe, aber es gibt noch keinen Freigabe-Workflow. Legen Sie einen an und bestätigen Sie die Bestellung dann erneut.",
   "receiveDelivery": "Lieferung annehmen",
   "receiveDeliveryNoPartner": "Die Bestellung nennt keinen Lieferanten.",
   "details": "Bestelldetails",

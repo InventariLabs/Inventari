@@ -1148,7 +1148,9 @@ describe("StockTakeCountingPage — filter, notes and a product that was not lis
 
     await user.click(screen.getByTestId("stock-take-cancel-btn"));
     const dialog = await screen.findByRole("alertdialog");
-    await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
+    await user.click(
+      within(dialog).getByRole("button", { name: "Keep counting" }),
+    );
 
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
     expect(cancelled).toEqual([]);

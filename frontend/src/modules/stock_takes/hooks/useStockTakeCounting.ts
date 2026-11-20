@@ -396,6 +396,7 @@ export function useStockTakeCounting(id: string | undefined) {
         message: t("confirm.cancel.message"),
         variant: "danger",
         confirmLabel: t("confirm.cancel.confirmLabel"),
+        cancelLabel: t("confirm.cancel.cancelLabel"),
       })
     ) {
       cancelMutate(id!, {

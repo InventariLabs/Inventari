@@ -61,6 +61,8 @@
   "cancelOrderDescription": "Isso cancelará o pedido de compra. Esta ação não pode ser desfeita.",
   "confirm": "Confirmar",
   "cancelOrderAction": "Cancelar pedido",
+  "keepOrderAction": "Manter pedido",
+  "approvalWorkflowMissingForAdmin": "Este pedido precisa de aprovação, mas ainda não existe um fluxo de aprovação. Crie um e confirme o pedido novamente.",
   "receiveDelivery": "Receber entrega",
   "receiveDeliveryNoPartner": "O pedido não indica um fornecedor.",
   "details": "Detalhes do pedido",

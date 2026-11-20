@@ -27,6 +27,7 @@ import {
   usePOApprovalRequests,
   usePOApprovalWorkflowConfigured,
 } from "../hooks/usePurchaseOrders";
+import { usePOConfirmRefusalToast } from "../hooks/usePOConfirmRefusalToast";
 import type { TargetApprovalRequest as ApprovalRequest } from "@/lib/moduleRegistry";
 import { usePartner } from "@/hooks/usePartners";
 import PurchaseOrderFormModal from "../components/PurchaseOrderFormModal";
@@ -153,6 +154,7 @@ export default function PurchaseOrderDetailPage() {
   // answers it nothing.
   const workflowConfigured = usePOApprovalWorkflowConfigured();
   const confirmMutation = useConfirmPurchaseOrder();
+  const showConfirmRefusal = usePOConfirmRefusalToast();
   const cancelMutation = useCancelPurchaseOrder();
   const sendEmailMutation = useSendPoEmail();
   const downloadPdfMutation = useDownloadPoPdf();
@@ -260,17 +262,16 @@ export default function PurchaseOrderDetailPage() {
 
   const handleConfirm = async () => {
     if (!po) return;
-    await runWithToast(
-      async () => {
-        const updated = await confirmMutation.mutateAsync(po.id);
-        toast.success(
-          updated.status === "PENDING_APPROVAL"
-            ? t("sentForApproval")
-            : t("confirmSuccess"),
-        );
-      },
-      { errorFallback: t("unknownError") },
-    );
+    try {
+      const updated = await confirmMutation.mutateAsync(po.id);
+      toast.success(
+        updated.status === "PENDING_APPROVAL"
+          ? t("sentForApproval")
+          : t("confirmSuccess"),
+      );
+    } catch (err) {
+      showConfirmRefusal(err);
+    }
     setActionType(null);
   };
 
