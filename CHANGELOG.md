@@ -14,6 +14,13 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- A place for a site of your own beside the application on the production
+  server. Every `*.caddy` file in `caddy-extra/` (or the directory
+  `CADDY_EXTRA_DIR` names) is read as part of the Caddyfile, so a website on
+  the main domain can be served by the same Caddy while the application runs on
+  a subdomain, and survives updates, which an addition in a second compose file
+  would not. The directory ships empty and a stack that does not use it is
+  configured as before.
 - A place for a delivery cost that reached no product. Freight that arrives
   after a receipt is posted can no longer be added to the goods, and the
   refusal now offers a way forward: on a posted receipt the **Costs that
@@ -279,6 +286,12 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- On a slow connection the Inventory and Equipment overviews no longer state
+  something that is not true while they load. *My locations* shows placeholders
+  instead of "No locations yet" and its create button, and the Equipment
+  attention card shows no count ("8 assets need attention", later 9) until every
+  list it adds up has arrived; the fleet by category and the recent check-outs
+  wait for their answer the same way.
 - A member whose role cannot read a module is now told so. A module screen
   opened without that module's read permission says the account cannot open
   it and whom to ask, instead of "Your account can read this module", and the
