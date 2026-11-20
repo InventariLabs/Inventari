@@ -582,6 +582,7 @@ class ErrorMessages(TypedDict):
     invalid_country_code: str
     invalid_print_page_size: str
     invalid_timezone: str
+    organization_name_required: str
     invalid_currency_code: str
     admin_permissions_required: str
     invalid_url_missing_host: str

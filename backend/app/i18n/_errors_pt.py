@@ -574,6 +574,7 @@ ERRORS_PT: dict[str, str] = {
     'invalid_country_code': 'O país deve ser um código ISO 3166-1 alfa-2 de duas letras (por exemplo, PL).',
     'invalid_print_page_size': 'O tamanho do papel deve ser A4 ou Letter.',
     'invalid_timezone': 'O fuso horário deve ser um nome de zona IANA válido (por exemplo, Europe/Warsaw).',
+    'organization_name_required': 'O nome da organização não pode estar vazio.',
     'invalid_currency_code': 'A moeda deve ser um código ISO 4217 válido (por exemplo, PLN).',
     'admin_permissions_required': 'Esta ação exige permissões de administrador',
     'invalid_url_missing_host': 'URL inválida: host ausente',
