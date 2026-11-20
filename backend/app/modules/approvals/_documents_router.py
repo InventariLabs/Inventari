@@ -194,7 +194,11 @@ async def get_document_approval(
     if not matching:
         return None
     return await approvals_api.get_request_enriched(
-        db, org_id, matching[0].id, viewer_id=current_user.id
+        db,
+        org_id,
+        matching[0].id,
+        viewer_id=current_user.id,
+        viewer_has_approve_grant=current_user.has_permission('approvals:approve'),
     )
 
 
