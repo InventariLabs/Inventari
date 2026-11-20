@@ -86,3 +86,14 @@
     header Strict-Transport-Security "max-age=31536000; includeSubDomains"
     reverse_proxy {$DEMO_UPSTREAM:demo-caddy:80}
 }
+
+# Sites that belong to this installation and not to every one: a website on the
+# main domain beside the application, say. Every *.caddy file in the directory
+# mounted at /etc/caddy/extra (caddy-extra/ of the checkout, or CADDY_EXTRA_DIR)
+# is read as part of this file. The directory ships with nothing in it, and an
+# import that matches no file is not an error, so a stack that has no such site
+# configures exactly what it did. It lives in this file, not in a second compose
+# file, because the documented commands all name -f docker-compose.prod.yml,
+# which makes Docker Compose ignore COMPOSE_FILE and the override file: an
+# addition made there would drop out at the next update.
+import /etc/caddy/extra/*.caddy

@@ -2,6 +2,8 @@
   "access": {
     "readOnly": "You can view this, not change it",
     "readOnlyHint": "Your account can read this module. Ask an administrator of your organization if you need to make changes.",
+    "noRead": "You cannot open this",
+    "noReadHint": "Your role does not include permission to read this module. Ask an administrator of your organization to add it.",
     "manageOnly": "You can use this, not reconfigure it",
     "manageOnlyHint": "Your account can use this module, but not change how it behaves. Ask someone who can manage it in your organization.",
     "hiddenRecordsAdminOnly": "Only an administrator can turn this on — ask one.",
@@ -836,6 +838,7 @@
       "builtInBadge": "Built-in",
       "builtInNote": "Built-in levels are the same in every organization, so their permissions are read-only. To grant a different set, create a role of your own:",
       "carriedPermissions": "This role also holds {{n}} permissions from modules that are switched off. They are kept as they are.",
+      "missingReads": "This role grants actions in modules whose lists it cannot read: add “{{permissions}}”, or a member will see these modules and a refusal on every list. You can still save it as it is.",
       "countColumn": "Permissions",
       "createError": "Failed to create role. Does a role with this name already exist?",
       "createHint": "You will choose the permissions in the next step.",

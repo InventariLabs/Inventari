@@ -2,6 +2,8 @@
   "access": {
     "readOnly": "Możesz to oglądać, ale nie zmieniać",
     "readOnlyHint": "Twoje konto ma podgląd tego modułu. Jeśli potrzebujesz wprowadzać zmiany, poproś administratora organizacji.",
+    "noRead": "Nie możesz tego otworzyć",
+    "noReadHint": "Twoja rola nie obejmuje uprawnienia do odczytu tego modułu. Poproś administratora organizacji o jego dodanie.",
     "manageOnly": "Możesz z tego korzystać, ale nie zmieniać jego działania",
     "manageOnlyHint": "Twoje konto może korzystać z modułu, ale nie zmieniać jego działania. Poproś osobę w organizacji, która może nim zarządzać.",
     "hiddenRecordsAdminOnly": "Tylko administrator może to włączyć — poproś go o to.",
@@ -838,6 +840,7 @@
       "builtInBadge": "Wbudowana",
       "builtInNote": "Poziomy wbudowane są takie same w każdej organizacji, więc ich uprawnień nie da się zmieniać. Aby nadać inny zestaw, utwórz własną rolę:",
       "carriedPermissions": "Ta rola ma też uprawnienia z wyłączonych modułów: {{n}}. Zostaną zachowane bez zmian.",
+      "missingReads": "Ta rola daje akcje w modułach, których list nie może odczytać: dodaj „{{permissions}}”, bo członek zobaczy te moduły i odmowę na każdej liście. Możesz ją mimo to zapisać.",
       "countColumn": "Uprawnień",
       "createError": "Nie udało się utworzyć roli. Czy rola o tej nazwie już istnieje?",
       "createHint": "Uprawnienia wybierzesz w następnym kroku.",

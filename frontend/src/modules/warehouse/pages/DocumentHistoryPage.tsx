@@ -72,6 +72,7 @@ export default function DocumentHistoryPage() {
             </div>
           ) : history.isError ? (
             <QueryError
+              error={history.error}
               message={t("errors.loadDocumentsFailed")}
               onRetry={() => void history.refetch()}
             />

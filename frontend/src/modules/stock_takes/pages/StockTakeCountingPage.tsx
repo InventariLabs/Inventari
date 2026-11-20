@@ -60,6 +60,7 @@ export default function StockTakeCountingPage() {
     isLoading,
     isNotFound,
     isError,
+    error,
     refetch,
     searchQuery,
     setSearchQuery,
@@ -243,7 +244,8 @@ export default function StockTakeCountingPage() {
 
   // A failed request is not a deleted stock take: telling someone halfway
   // through counting a bay that their count does not exist reads as work lost.
-  if (isError && !isNotFound) return <QueryError onRetry={refetch} />;
+  if (isError && !isNotFound)
+    return <QueryError error={error} onRetry={refetch} />;
 
   if (!stockTake) {
     return (

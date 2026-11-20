@@ -2,6 +2,8 @@
   "access": {
     "readOnly": "Vous pouvez consulter, pas modifier",
     "readOnlyHint": "Votre compte peut lire ce module. Adressez-vous à l'administration de votre organisation si vous devez apporter des modifications.",
+    "noRead": "Vous ne pouvez pas ouvrir ceci",
+    "noReadHint": "Votre rôle n’inclut pas l’autorisation de lire ce module. Demandez à l’administration de votre organisation de l’ajouter.",
     "manageOnly": "Vous pouvez l'utiliser, pas le reconfigurer",
     "manageOnlyHint": "Votre compte peut utiliser ce module, mais pas modifier son fonctionnement. Demandez à quelqu'un de votre organisation qui peut le gérer.",
     "hiddenRecordsAdminOnly": "Seul un administrateur peut l’activer — demandez-lui.",
@@ -836,6 +838,7 @@
       "builtInBadge": "Intégré",
       "builtInNote": "Les niveaux intégrés sont les mêmes dans chaque organisation ; leurs autorisations ne peuvent donc pas être modifiées. Pour accorder un autre ensemble, créez votre propre rôle :",
       "carriedPermissions": "Ce rôle détient aussi {{n}} autorisations de modules désactivés. Elles sont conservées telles quelles.",
+      "missingReads": "Ce rôle accorde des actions dans des modules dont il ne peut pas lire les listes : ajoutez « {{permissions}} », sinon un membre verra ces modules et un refus sur chaque liste. Vous pouvez tout de même l’enregistrer tel quel.",
       "countColumn": "Autorisations",
       "createError": "Échec de la création du rôle. Un rôle portant ce nom existe-t-il déjà ?",
       "createHint": "Vous choisirez les autorisations à l'étape suivante.",

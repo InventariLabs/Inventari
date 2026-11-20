@@ -48,6 +48,7 @@ function usePlaces(
   /** The place chosen, whether or not the page on screen holds it. */
   chosen: CountablePlace | undefined;
   isError: boolean;
+  error: unknown;
   isSearching: boolean;
   hasNoPlaces: boolean;
   refetch: () => void;
@@ -92,6 +93,7 @@ function usePlaces(
     places,
     chosen,
     isError: list.isError || states.isError,
+    error: list.error ?? states.error,
     // Typed text the server has not been asked about yet: the rows on screen
     // answer the previous query.
     isSearching: typed !== debounced,
@@ -126,8 +128,15 @@ export default function CountLocationPage() {
   const [code, setCode] = useState("");
   const [blind, setBlind] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { places, chosen, isError, isSearching, hasNoPlaces, refetch } =
-    usePlaces(query, selectedId);
+  const {
+    places,
+    chosen,
+    isError,
+    error: loadError,
+    isSearching,
+    hasNoPlaces,
+    refetch,
+  } = usePlaces(query, selectedId);
   const create = useCreateStockTake();
 
   useEffect(() => {
@@ -145,7 +154,7 @@ export default function CountLocationPage() {
     },
   });
 
-  if (isError) return <QueryError onRetry={refetch} />;
+  if (isError) return <QueryError error={loadError} onRetry={refetch} />;
   if (!places) return <LoadingSpinner />;
   if (hasNoPlaces)
     return (

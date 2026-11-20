@@ -39,6 +39,7 @@ export default function LinkedReceiptsPage() {
     data: receipts = [],
     isLoading: receiptsLoading,
     isError: receiptsFailed,
+    error: receiptsError,
     refetch: refetchReceipts,
   } = useLinkedReceipts(id ?? "");
   const pendingQuantities = usePendingQuantities(id ?? "", true);
@@ -57,7 +58,7 @@ export default function LinkedReceiptsPage() {
   // truth was about the server. The detail route of the same record has
   // answered this correctly all along.
   if (poFailed && !isNotFoundError(poError)) {
-    return <QueryError onRetry={() => refetchPo()} />;
+    return <QueryError error={poError} onRetry={() => refetchPo()} />;
   }
 
   if (!po) {
@@ -78,7 +79,10 @@ export default function LinkedReceiptsPage() {
           {t("linkedReceipts")} — {po.number}
         </h2>
         {receiptsFailed ? (
-          <QueryError onRetry={() => void refetchReceipts()} />
+          <QueryError
+            error={receiptsError}
+            onRetry={() => void refetchReceipts()}
+          />
         ) : receipts.length > 0 ? (
           <div className="space-y-2">
             <div className="text-xs text-on-secondary mb-4">

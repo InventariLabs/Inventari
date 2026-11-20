@@ -57,10 +57,11 @@ export default function DocumentApprovalsPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkApproving, setBulkApproving] = useState(false);
   const queryClient = useQueryClient();
-  const { data, isLoading, isError, refetch } = useAwaitingApprovalDocuments({
-    offset,
-    limit: PAGE_SIZE,
-  });
+  const { data, isLoading, isError, error, refetch } =
+    useAwaitingApprovalDocuments({
+      offset,
+      limit: PAGE_SIZE,
+    });
   const [confirmBulk, setConfirmBulk] = useState(false);
 
   // A request parked where nobody can decide it never reaches this queue —
@@ -144,6 +145,7 @@ export default function DocumentApprovalsPage() {
     // thing to show someone whose request simply failed.
     return (
       <QueryError
+        error={error}
         message={t("errors.loadApprovalsFailed")}
         onRetry={() => void refetch()}
       />

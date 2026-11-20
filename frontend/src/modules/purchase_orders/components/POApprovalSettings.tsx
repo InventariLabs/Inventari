@@ -23,7 +23,13 @@ import { POApprovalWorkflowWarning } from "./POApprovalWorkflowWarning";
  */
 export function POApprovalSettings() {
   const { t } = useTranslation("purchase_orders");
-  const { data: settings, isLoading, isError, refetch } = usePOSettings();
+  const {
+    data: settings,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = usePOSettings();
   const updateSettings = useUpdatePOSettings();
   const orgCurrency = useOrganizationCurrency();
   // The PUT behind this form answers to purchase_orders:manage: whether an
@@ -111,6 +117,7 @@ export function POApprovalSettings() {
       <Card>
         <CardContent className="p-5">
           <QueryError
+            error={error}
             message={t("settings.loadFailed")}
             onRetry={() => void refetch()}
           />

@@ -115,7 +115,7 @@ export default function ProductionDetailPage() {
   // different answers: "failed to load" over a deleted order sends the reader
   // looking for a fault that is not there.
   if (error && !isNotFoundError(error)) {
-    return <QueryError onRetry={() => void refetch()} />;
+    return <QueryError error={error} onRetry={() => void refetch()} />;
   }
 
   if (isLoading) {

@@ -66,6 +66,7 @@ export function useSelectedStorage(
       (scoped.isError && !malformed) ||
       breadcrumb.isError ||
       (missed && named.isError),
+    error: scoped.error ?? breadcrumb.error ?? named.error,
     refetch: () => {
       void scoped.refetch();
       void breadcrumb.refetch();

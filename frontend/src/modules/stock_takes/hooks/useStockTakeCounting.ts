@@ -547,6 +547,7 @@ export function useStockTakeCounting(id: string | undefined) {
     // work lost. Only a 404 says that; a 500 says the question went unanswered.
     isNotFound: isNotFoundError(error),
     isError,
+    error,
     refetch,
     searchQuery,
     setSearchQuery,

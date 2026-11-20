@@ -2,6 +2,8 @@
   "access": {
     "readOnly": "Sie können das ansehen, aber nicht ändern",
     "readOnlyHint": "Ihr Konto darf dieses Modul lesen. Wenden Sie sich an die Administration Ihrer Organisation, wenn Sie etwas ändern müssen.",
+    "noRead": "Sie können das nicht öffnen",
+    "noReadHint": "Ihre Rolle enthält nicht die Berechtigung, dieses Modul zu lesen. Bitten Sie die Administration Ihrer Organisation, sie hinzuzufügen.",
     "manageOnly": "Sie dürfen das nutzen, aber nicht umstellen",
     "manageOnlyHint": "Ihr Konto darf das Modul nutzen, aber sein Verhalten nicht ändern. Bitten Sie jemanden in Ihrer Organisation, der es verwalten darf.",
     "hiddenRecordsAdminOnly": "Nur ein Administrator kann das einschalten – bitten Sie einen darum.",
@@ -836,6 +838,7 @@
       "builtInBadge": "Integriert",
       "builtInNote": "Integrierte Stufen sind in jeder Organisation gleich, ihre Berechtigungen lassen sich daher nicht ändern. Für einen anderen Satz legen Sie eine eigene Rolle an:",
       "carriedPermissions": "Diese Rolle hält außerdem {{n}} Berechtigungen aus abgeschalteten Modulen. Sie bleiben unverändert.",
+      "missingReads": "Diese Rolle erlaubt Aktionen in Modulen, deren Listen sie nicht lesen darf: Fügen Sie „{{permissions}}“ hinzu, sonst sieht ein Mitglied diese Module und auf jeder Liste eine Ablehnung. Sie können sie trotzdem so speichern.",
       "countColumn": "Berechtigungen",
       "createError": "Rolle konnte nicht erstellt werden. Gibt es bereits eine Rolle mit diesem Namen?",
       "createHint": "Die Berechtigungen wählen Sie im nächsten Schritt.",

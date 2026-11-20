@@ -31,6 +31,7 @@ export default function EquipmentCategoriesPage() {
     data: allCategories = [],
     isLoading,
     isError,
+    error,
     refetch,
     // With counts: the number that decides whether a category can be deleted
     // is how much is filed under it, and the card was showing how many custom
@@ -111,7 +112,7 @@ export default function EquipmentCategoriesPage() {
       <ReadOnlyNotice module="categories" />
       {/* List */}
       {isError ? (
-        <QueryError onRetry={() => refetch()} />
+        <QueryError error={error} onRetry={() => refetch()} />
       ) : isLoading ? (
         <LoadingSpinner />
       ) : equipmentCategories.length === 0 ? (

@@ -252,6 +252,7 @@ export default function EquipmentLocationsPage() {
     data: pages,
     isLoading,
     isError,
+    error,
     refetch,
     hasNextPage,
     fetchNextPage,
@@ -431,7 +432,7 @@ export default function EquipmentLocationsPage() {
       )}
 
       {isError ? (
-        <QueryError onRetry={() => refetch()} />
+        <QueryError error={error} onRetry={() => refetch()} />
       ) : isLoading ? (
         <LoadingSpinner />
       ) : !needle && locations.length === 0 && !showAddForm ? (

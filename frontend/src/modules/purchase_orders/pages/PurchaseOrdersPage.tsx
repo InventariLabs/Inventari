@@ -123,7 +123,7 @@ export default function PurchaseOrdersPage() {
     setSearchParams(next, { replace: true });
   };
 
-  const { data, isLoading, isError, refetch } = usePurchaseOrders({
+  const { data, isLoading, isError, error, refetch } = usePurchaseOrders({
     search: deferredSearch || undefined,
     status: statusFilter === "ALL" ? undefined : statusFilter,
     partner_id: partnerId ?? undefined,
@@ -208,7 +208,7 @@ export default function PurchaseOrdersPage() {
         /* A failed request shows its error, not the "no orders yet" card, which
            invites the reader to create an order they may already have
 . */
-        <QueryError onRetry={() => void refetch()} />
+        <QueryError error={error} onRetry={() => void refetch()} />
       ) : purchaseOrders.length === 0 ? (
         <PurchaseOrdersEmptyState
           hasFilters={hasFilters}

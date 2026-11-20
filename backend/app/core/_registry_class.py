@@ -410,6 +410,14 @@ class ModuleRegistry:
                     if name in self._modules
                     else None
                 ),
+                # The modules whose records this one's screens list: a role
+                # granting this module needs their reads too, and the editor
+                # says so before the role is saved.
+                'requires': (
+                    list(self._modules[name].metadata.requires)
+                    if name in self._modules
+                    else []
+                ),
                 'permissions': [p.model_dump() for p in perms],
             }
             for name, perms in sorted(self._custom_permissions.items())
