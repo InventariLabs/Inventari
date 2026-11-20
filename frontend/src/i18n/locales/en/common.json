@@ -56,7 +56,9 @@
   },
   "copy": {
     "failed": "Couldn't copy — select the value and copy it by hand.",
-    "selectManually": "This browser would not copy it. Select the value above and copy it by hand (Ctrl+C)."
+    "selectManually": "This browser would not copy it. Select the value above and copy it by hand (Ctrl+C).",
+    "manualTitle": "Copy by hand",
+    "manualDone": "Done"
   },
   "form": {
     "save": "Save",

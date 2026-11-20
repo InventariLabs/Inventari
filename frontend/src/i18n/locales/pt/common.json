@@ -54,7 +54,9 @@
   },
   "copy": {
     "failed": "Não foi possível copiar — selecione o valor e copie manualmente.",
-    "selectManually": "Este navegador não permitiu copiar. Selecione o valor acima e copie manualmente (Ctrl+C)."
+    "selectManually": "Este navegador não permitiu copiar. Selecione o valor acima e copie manualmente (Ctrl+C).",
+    "manualTitle": "Copiar manualmente",
+    "manualDone": "Concluído"
   },
   "form": {
     "save": "Salvar",
