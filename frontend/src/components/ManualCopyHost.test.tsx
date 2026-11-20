@@ -12,7 +12,7 @@ import ManualCopyHost from "./ManualCopyHost";
  */
 
 afterEach(() => {
-  manualCopyStore.dismiss();
+  act(() => manualCopyStore.dismiss());
   vi.unstubAllGlobals();
 });
 
@@ -37,8 +37,9 @@ describe("ManualCopyHost", () => {
   });
 
   it("closes on Done", async () => {
-    vi.stubGlobal("navigator", { clipboard: undefined });
+    // `setup()` installs a clipboard stub of its own, so it comes first.
     const user = userEvent.setup();
+    vi.stubGlobal("navigator", { clipboard: undefined });
     render(<ManualCopyHost />);
     await act(async () => {
       await copyTextOrExplain("v", "m");
