@@ -1,7 +1,7 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
-import { Sheet } from "@/components/ui/Sheet";
+import { Sheet, SheetBody } from "@/components/ui/Sheet";
 import { manualCopyStore } from "@/lib/clipboard";
 
 /**
@@ -32,7 +32,7 @@ export default function ManualCopyHost() {
       zIndex="confirm"
       aria-label={t("copy.manualTitle")}
     >
-      <div className="p-5 space-y-3">
+      <SheetBody className="p-5 space-y-3">
         <h2 className="text-base font-semibold text-on">
           {t("copy.manualTitle")}
         </h2>
@@ -54,7 +54,7 @@ export default function ManualCopyHost() {
         >
           {t("copy.manualDone")}
         </Button>
-      </div>
+      </SheetBody>
     </Sheet>
   );
 }
