@@ -1403,7 +1403,7 @@
       "title": "Réception terminée",
       "total": "{{received}} sur {{expected}} {{unit}} reçues",
       "backToDocument": "Terminer et comptabiliser le stock",
-      "bookingNote": "« Terminer et comptabiliser le stock » termine le document et comptabilise le stock. Quitter ce récapitulatif autrement laisse le document ouvert, tel que réceptionné.",
+      "bookingNote": "« {{action}} » termine le document et comptabilise le stock. Quitter ce récapitulatif autrement laisse le document ouvert, tel que réceptionné.",
       "skippedUndo": "Annuler l'omission",
       "skippedBackorder": "Reliquat",
       "skippedNotComing": "Ne viendra pas",

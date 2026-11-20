@@ -172,7 +172,9 @@ export default function WmsReceivingSummary({
 
         {/* Stock is booked when the summary is closed, not by the last scan. */}
         <p className="mt-4 text-xs text-on-muted">
-          {t("receiving.summary.bookingNote")}
+          {t("receiving.summary.bookingNote", {
+            action: t("receiving.summary.backToDocument"),
+          })}
         </p>
 
         {/* The end of the path said "Done" and led nowhere. It leads back

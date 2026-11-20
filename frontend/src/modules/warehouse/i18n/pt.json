@@ -1373,7 +1373,7 @@
       "title": "Recebimento concluído",
       "total": "{{received}} de {{expected}} {{unit}} recebidos",
       "backToDocument": "Concluir e lançar estoque",
-      "bookingNote": "«Concluir e lançar o stock» conclui o documento e lança o stock. Sair deste resumo de outra forma deixa o documento aberto, tal como recebido.",
+      "bookingNote": "“{{action}}” conclui o documento e lança o estoque. Sair deste resumo de outra forma deixa o documento aberto, tal como recebido.",
       "skippedUndo": "Desfazer",
       "skippedBackorder": "Pedido pendente",
       "skippedNotComing": "Não chegará",

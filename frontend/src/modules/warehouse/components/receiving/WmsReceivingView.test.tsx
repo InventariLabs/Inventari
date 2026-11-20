@@ -805,6 +805,33 @@ describe("WmsReceivingView", () => {
     expect(onClose).toHaveBeenCalledExactlyOnceWith(false);
   });
 
+  it("quotes the button under the label the button itself carries", async () => {
+    // The note names the button the reader is about to press, so it takes
+    // that label from the button's own key rather than a second copy of it.
+    await act(() => i18n.changeLanguage("es"));
+    try {
+      const finished = buildSession();
+      finished.status = "completed";
+      finished.received_lines = 1;
+      finished.pending_lines = 0;
+      finished.lines = [
+        { ...finished.lines[0], status: "received", received_quantity: 5 },
+      ];
+      server.use(http.post(START_PATH, () => HttpResponse.json(finished)));
+
+      render(<WmsReceivingView documentId={DOCUMENT_ID} onClose={vi.fn()} />);
+
+      const button = await screen.findByRole("button", {
+        name: "Completar y registrar el stock",
+      });
+      expect(
+        screen.getByText(/completa el documento y contabiliza el stock/),
+      ).toHaveTextContent(`«${button.textContent}»`);
+    } finally {
+      await act(() => i18n.changeLanguage("en"));
+    }
+  });
+
   it("reopens on the summary of a session that finished without completing the document", async () => {
     // The summary was left by the back arrow or a closed tab; the start
     // hands that session back instead of a fresh one at 0 of N.

@@ -1403,7 +1403,7 @@
       "title": "Recepción completada",
       "total": "{{received}} de {{expected}} {{unit}} recibidas",
       "backToDocument": "Completar y registrar el stock",
-      "bookingNote": "«Completar y contabilizar stock» completa el documento y contabiliza el stock. Salir de este resumen de otra forma deja el documento abierto, tal como se recibió.",
+      "bookingNote": "«{{action}}» completa el documento y contabiliza el stock. Salir de este resumen de otra forma deja el documento abierto, tal como se recibió.",
       "skippedUndo": "Deshacer omisión",
       "skippedBackorder": "Pedido pendiente",
       "skippedNotComing": "No llegará",

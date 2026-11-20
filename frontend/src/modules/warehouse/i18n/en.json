@@ -1403,7 +1403,7 @@
       "title": "Receiving complete",
       "total": "{{received}} of {{expected}} {{unit}} received",
       "backToDocument": "Complete and post stock",
-      "bookingNote": "“Complete and post stock” completes the document and books the stock. Leaving this summary any other way keeps the document open, as received.",
+      "bookingNote": "“{{action}}” completes the document and books the stock. Leaving this summary any other way keeps the document open, as received.",
       "skippedUndo": "Undo skip",
       "skippedBackorder": "Backorder",
       "skippedNotComing": "Not coming",

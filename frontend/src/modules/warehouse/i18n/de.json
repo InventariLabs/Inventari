@@ -1403,7 +1403,7 @@
       "title": "Wareneingang abgeschlossen",
       "total": "{{received}} von {{expected}} {{unit}} erhalten",
       "backToDocument": "Abschließen und Bestand buchen",
-      "bookingNote": "„Abschließen und Bestand buchen“ schließt den Beleg ab und bucht den Bestand. Wer diese Zusammenfassung anders verlässt, lässt den Beleg offen, wie angenommen.",
+      "bookingNote": "„{{action}}“ schließt den Beleg ab und bucht den Bestand. Wer diese Zusammenfassung anders verlässt, lässt den Beleg offen, wie angenommen.",
       "skippedUndo": "Überspringen rückgängig",
       "skippedBackorder": "Nachlieferung",
       "skippedNotComing": "Kommt nicht",

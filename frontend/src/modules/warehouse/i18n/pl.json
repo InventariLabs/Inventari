@@ -1517,7 +1517,7 @@
       "title": "Przyjmowanie zakończone",
       "total": "Przyjęto {{received}} z {{expected}} {{unit}}",
       "backToDocument": "Zakończ i zaksięguj stan",
-      "bookingNote": "„Zakończ i zaksięguj stan” kończy dokument i księguje stan. Wyjście z podsumowania w inny sposób zostawia dokument otwarty, z przyjętym towarem.",
+      "bookingNote": "„{{action}}” kończy dokument i księguje stan. Wyjście z podsumowania w inny sposób zostawia dokument otwarty, z przyjętym towarem.",
       "skippedUndo": "Cofnij pominięcie",
       "skippedBackorder": "Dostawa uzupełniająca",
       "skippedNotComing": "Nie dojdzie",
