@@ -62,20 +62,8 @@ export function QueryError({ onRetry, message, error }: QueryErrorProps) {
   );
 }
 
-interface QueryFailureProps {
-  /** The rejected query's error, so the state can read its status. */
-  error: unknown;
-  onRetry?: () => void;
-  message?: string;
-}
-
-/**
- * `QueryError` with the error required: the failure state that knows "we could
- * not" from "you may not", withholding the retry where retrying is pointless.
- */
-export function QueryFailure({ error, onRetry, message }: QueryFailureProps) {
-  return <QueryError error={error} onRetry={onRetry} message={message} />;
-}
+/** `QueryError` under the name the guarded lists import it by. */
+export const QueryFailure = QueryError;
 
 interface InlineQueryErrorProps {
   /** The rejected query's error, so a refusal is not offered a retry. */
