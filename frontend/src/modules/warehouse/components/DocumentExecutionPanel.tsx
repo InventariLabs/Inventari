@@ -138,9 +138,8 @@ export function DocumentExecutionPanel({
       className="p-4 sm:p-6 space-y-4 border-primary-200 bg-primary-50/20"
     >
       <div className="space-y-1">
-        {/* The heading names the same act as the button that opened the
-            panel: "Pick items" beside a sheet titled "Execute document" read
-            as two actions. */}
+        {/* The heading names the same act as the button that opens the
+            panel: two names for one act read as two actions. */}
         <h2 className="text-base font-semibold text-on">
           {t(executeLabelKeyFor(document.type))}
         </h2>

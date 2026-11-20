@@ -36,8 +36,8 @@ export default function WriteOffHoldDialog({
   const { t } = useTranslation("warehouse");
   const post = usePostNewDocument();
   // No reason is chosen for the reader: the hold's own code explains why
-  // the goods were set aside, not why they are being scrapped now, and a
-  // required field that already holds an answer is one nobody read.
+  // the goods are held, not why they are being scrapped now, and a required
+  // field that already holds an answer is one nobody read.
   const [code, setCode] = useState<ScrapReasonCode | "">("");
   const [note, setNote] = useState("");
   const [attempted, setAttempted] = useState(false);

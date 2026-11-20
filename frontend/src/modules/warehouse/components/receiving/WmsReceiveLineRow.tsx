@@ -305,9 +305,9 @@ export default function WmsReceiveLineRow({
       </div>
 
       {/* The shelf picker takes a row of its own, the same row on every
-          line: inside the text column its width followed the product name,
-          so one line squeezed it beside the count and cut "Follow the
-          plan…" while the next gave it the full width. */}
+          line: inside the text column its width follows the product name, so
+          one line squeezes it beside the count and cuts "Follow the plan…"
+          while the next gives it the whole row. */}
       {canPick && (
         <div className="basis-full">
           <ShelfSelect

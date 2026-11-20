@@ -2072,10 +2072,9 @@ class TestUomPropagation:
     ) -> None:
         """A line created from a product names that product's unit.
 
-        A client that names the product and no unit leaves the column empty,
-        and every screen printed a bare number — the receive sheet's "Still
-        due" and "Arrived" columns among them. The product's own unit is the
-        answer the line meant.
+        A client names the product and no unit, and the line answers with the
+        product's own — the unit every screen prints beside a quantity, the
+        receive sheet's "Still due" and "Arrived" columns among them.
         """
         response = client.post(
             '/api/v1/purchase-orders',

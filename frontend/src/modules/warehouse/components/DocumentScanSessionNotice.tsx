@@ -66,8 +66,8 @@ export function DocumentScanSessionNotice({
   const { t } = useTranslation("warehouse");
   // Every branch of this notice asks the reader to act — continue, complete,
   // or discard. A viewer can do none of them, so the read-only notice above
-  // is the whole answer; "complete the dispatch in the Packing step below"
-  // pointed at buttons the same page had hidden.
+  // is the whole answer: telling them to complete the dispatch in the Packing
+  // step points at buttons the same page hides.
   const canWrite = useCanWrite("warehouse");
   const [confirmOpen, setConfirmOpen] = useState(false);
   const { id: documentId, status: documentStatus } = document;

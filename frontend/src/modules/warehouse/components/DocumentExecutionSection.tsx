@@ -163,11 +163,11 @@ function buildSummaryText(
         : formatAmounts(t, groups, (group) => group.removed),
     });
   }
-  // A quantity is only a measurement with its unit: the single-unit sentence
-  // dropped it, so a card reading "quantity 4/4" stood beside a line reading
-  // "3/5 pcs." and the reader had to guess whether the number was pieces,
-  // litres or packs. A group with no unit records none and says so by
-  // printing the plain pair.
+  // A quantity is only a measurement with its unit: a single-unit sentence
+  // carries that unit, or a card reading "quantity 4/4" stands beside a line
+  // reading "3/5 pcs." and the reader has to guess whether the number is
+  // pieces, litres or packs. A group with no unit records none and says so
+  // by printing the plain pair.
   const namedUnit = singleUnit ? Boolean(groups[0]?.unit) : false;
   if (isExecutionPhase) {
     return singleUnit && !namedUnit

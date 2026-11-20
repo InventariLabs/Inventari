@@ -1279,7 +1279,7 @@ describe("DocumentDetailPage", () => {
     // What was scrolled is the panel itself, not some other section of the
     // page that happens to mount at the same time.
     const panel = within(scrolled.mock.instances[0] as HTMLElement);
-    // The sheet is named after the button that opened it.
+    // The sheet is named after the button that opens it.
     expect(panel.getByText("Pick items")).toBeInTheDocument();
   });
 
