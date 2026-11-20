@@ -1,7 +1,14 @@
 import { extractApiError } from "@/lib/errors";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Info, Lock, Pencil, Search, Trash2 } from "lucide-react";
+import {
+  AlertTriangle,
+  Info,
+  Lock,
+  Pencil,
+  Search,
+  Trash2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { ActionMenu } from "@/components/ui/ActionMenu";
 import { Button } from "@/components/ui/Button";
@@ -26,6 +33,7 @@ import {
 import { PermissionGroupSection } from "./PermissionGroupSection";
 import {
   invisiblePermissions,
+  missingReads,
   roleDisplayName,
   type PermissionGroup,
 } from "./rolePermissions";
@@ -97,6 +105,13 @@ export function RolePermissionsSheet({
   const carried = useMemo(
     () => invisiblePermissions(granted, groups),
     [granted, groups],
+  );
+
+  // Reads the granted modules' screens list but this role does not hold: the
+  // member would see the module and a refusal on every list in it.
+  const unreadable = useMemo(
+    () => (readOnly ? [] : missingReads(granted, groups)),
+    [granted, groups, readOnly],
   );
 
   function labelFor(group: PermissionGroup): string {
@@ -215,6 +230,22 @@ export function RolePermissionsSheet({
               aria-hidden
             />
             {t("settings.rbac.carriedPermissions", { n: carried.length })}
+          </p>
+        )}
+
+        {unreadable.length > 0 && (
+          <p
+            role="status"
+            className="flex items-start gap-2 rounded-lg bg-surface-raised px-3 py-2 text-xs text-on-secondary"
+          >
+            <AlertTriangle
+              size={14}
+              className="mt-0.5 shrink-0 text-amber-500"
+              aria-hidden
+            />
+            {t("settings.rbac.missingReads", {
+              permissions: unreadable.map(labelOf).join(", "),
+            })}
           </p>
         )}
 

@@ -2,6 +2,8 @@
   "access": {
     "readOnly": "Puede consultarlo, pero no modificarlo",
     "readOnlyHint": "Su cuenta puede leer este módulo. Consulte con la administración de su organización si necesita hacer cambios.",
+    "noRead": "No puede abrir esto",
+    "noReadHint": "Su rol no incluye el permiso para leer este módulo. Pida a la administración de su organización que lo añada.",
     "manageOnly": "Puede usarlo, pero no reconfigurarlo",
     "manageOnlyHint": "Su cuenta puede usar este módulo, pero no cambiar su comportamiento. Pídaselo a alguien de su organización que pueda gestionarlo.",
     "hiddenRecordsAdminOnly": "Solo un administrador puede activarlo; pídaselo a uno.",
@@ -836,6 +838,7 @@
       "builtInBadge": "Integrado",
       "builtInNote": "Los niveles integrados son iguales en todas las organizaciones, por lo que sus permisos no se pueden cambiar. Para conceder otro conjunto, cree su propio rol:",
       "carriedPermissions": "Este rol también tiene {{n}} permisos de módulos desactivados. Se conservan tal cual.",
+      "missingReads": "Este rol concede acciones en módulos cuyas listas no puede leer: añada «{{permissions}}», o un miembro verá esos módulos y un rechazo en cada lista. Aun así puede guardarlo tal cual.",
       "countColumn": "Permisos",
       "createError": "No se pudo crear el rol. ¿Ya existe un rol con ese nombre?",
       "createHint": "Elegirás los permisos en el paso siguiente.",

@@ -462,6 +462,18 @@ const dist = join(root, "dist");
  * budget a screen came within a KiB of moves a step of five (app first paint
  * 405, login 410, launcher 425, start 640, receive 475, issue 590, history
  * 615, products 630), so the next update does not trip them again.
+ *
+ * Re-measured 2026-11-20 on the merge of the refusal states with the
+ * development line: the receive screen measures 475.0 KiB gz against its 475,
+ * after three days of the line's own growth (472.6 on 11-17) and the shared
+ * failure state's refusal branch, which every list that can be refused now
+ * reaches. That one phone budget moves a step of five, to 480; the other
+ * screens stand under theirs (login 406.9, launcher 422.0, start 639.8, issue
+ * 587.8, history 612.6, products 629.8, app first paint 402.2).
+ *
+ * The merge with the line's next fifteen commits (the storage products tab
+ * and the unpicked-products wording) measures the products screen at 630.0
+ * KiB gz against its 630; that budget moves a step of five, to 635.
  */
 const BUDGETS = {
   initial: 245,

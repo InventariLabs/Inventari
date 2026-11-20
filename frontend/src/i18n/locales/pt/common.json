@@ -2,6 +2,8 @@
   "access": {
     "readOnly": "Você pode ver isto, mas não alterar",
     "readOnlyHint": "Sua conta pode ler este módulo. Peça a um administrador da sua organização se precisar fazer alterações.",
+    "noRead": "Você não pode abrir isto",
+    "noReadHint": "Seu perfil não inclui a permissão para ler este módulo. Peça a um administrador da sua organização que a adicione.",
     "hiddenRecordsAdminOnly": "Só um administrador pode ativar isto — peça a um.",
     "denied": "Você não tem acesso a isto",
     "deniedHint": "Sua conta não pode ler estes dados. Peça acesso a um administrador da sua organização."
@@ -791,6 +793,7 @@
       "builtInBadge": "Integrada",
       "builtInNote": "Os níveis integrados são iguais em todas as organizações, então suas permissões são somente leitura. Para conceder um conjunto diferente, crie uma função própria:",
       "carriedPermissions": "Esta função também tem {{n}} permissões de módulos que estão desativados. Elas são mantidas como estão.",
+      "missingReads": "Este perfil concede ações em módulos cujas listas ele não pode ler: adicione “{{permissions}}”, ou um membro verá esses módulos e uma recusa em cada lista. Você ainda pode salvá-lo assim.",
       "countColumn": "Permissões",
       "createError": "Não foi possível criar a função. Já existe uma função com esse nome?",
       "createHint": "Você escolherá as permissões na próxima etapa.",

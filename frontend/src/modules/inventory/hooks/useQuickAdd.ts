@@ -136,6 +136,7 @@ export function useQuickAdd({
     noStorages,
     hasHidden: hasHiddenStorages,
     isError: isStoragesError,
+    error: storagesError,
     refetch: refetchStorages,
   } = useQuickAddStorages();
   const { allCategories, scopedCategories, categoriesFailure } =
@@ -454,6 +455,7 @@ export function useQuickAdd({
     carriedOver,
     clearCarriedOver,
     isStoragesError,
+    storagesError,
     refetchStorages,
     categories: scopedCategories,
     categoriesFailure,
