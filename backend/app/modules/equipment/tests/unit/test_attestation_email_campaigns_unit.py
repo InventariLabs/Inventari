@@ -97,6 +97,7 @@ async def _call_launch(
     mock_core = MagicMock()
     send_mock = AsyncMock(return_value=True)
     mock_core.email.send_async = send_mock
+    mock_core.email.can_send_async = AsyncMock(return_value=True)
     mock_core.audit_log.log_action_async = AsyncMock()
     # launch/reminders read the organization's clock for the printed
     # deadline day; UTC keeps those assertions reading as they always did.
@@ -135,6 +136,7 @@ async def _call_send_reminders(
     mock_core = MagicMock()
     send_mock = AsyncMock(return_value=True)
     mock_core.email.send_async = send_mock
+    mock_core.email.can_send_async = AsyncMock(return_value=True)
     mock_core.audit_log.log_action_async = AsyncMock()
     # launch/reminders read the organization's clock for the printed
     # deadline day; UTC keeps those assertions reading as they always did.
@@ -458,6 +460,7 @@ class TestDeadlinePrintedInOrganizationDay:
         mock_core = MagicMock()
         send_mock = AsyncMock(return_value=True)
         mock_core.email.send_async = send_mock
+        mock_core.email.can_send_async = AsyncMock(return_value=True)
         mock_core.audit_log.log_action_async = AsyncMock()
         mock_core.organizations.timezone_async = AsyncMock(
             return_value=ZoneInfo('America/New_York')
