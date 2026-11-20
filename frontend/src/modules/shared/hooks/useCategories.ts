@@ -36,17 +36,27 @@ export function useCategories(
   includeInactive?: boolean,
   excludeModuleContexts?: boolean,
   withCounts?: boolean,
-  options?: { enabled?: boolean },
+  options?: { enabled?: boolean; countRecords?: boolean },
 ) {
   return useQuery<CategoryDTO[]>({
     // The flags belong in the key: a list cached without counts cannot answer
     // a caller that asked for them.
     queryKey: [
       ...queryKeys.categories.all,
-      { includeInactive, excludeModuleContexts, withCounts },
+      {
+        includeInactive,
+        excludeModuleContexts,
+        withCounts,
+        countRecords: options?.countRecords,
+      },
     ],
     queryFn: () =>
-      categoriesApi.getAll(includeInactive, excludeModuleContexts, withCounts),
+      categoriesApi.getAll(
+        includeInactive,
+        excludeModuleContexts,
+        withCounts,
+        options?.countRecords,
+      ),
     enabled: options?.enabled ?? true,
   });
 }

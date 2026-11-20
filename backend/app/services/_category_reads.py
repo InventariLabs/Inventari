@@ -108,24 +108,28 @@ async def get_categories_async(
 
 
 async def count_items_per_category_async(
-    db: AsyncSession, organization_id: UUID
+    db: AsyncSession, organization_id: UUID, *, per_record: bool = False
 ) -> dict[UUID, int]:
     """How many products each category holds, keyed by category id.
 
     A product is counted once however many records it has: a tin held on
     three shelves and in two batches is five records and one product, and the
     card says "products". A record without a catalogue card is its own
-    product.
+    product. With *per_record*, every live record counts once: a screen whose
+    rows are physical things (assets) counts each one, however many share a
+    catalogue card.
 
     One grouped query rather than a count per card: a list of 76 categories
     would otherwise be 76 round trips. Categories nobody filed anything under
     are absent from the result — callers default them to zero.
     """
+    counted = (
+        func.count(Item.id)
+        if per_record
+        else func.count(func.distinct(func.coalesce(Item.template_id, Item.id)))
+    )
     rows = await db.execute(
-        select(
-            Item.category_id,
-            func.count(func.distinct(func.coalesce(Item.template_id, Item.id))),
-        )
+        select(Item.category_id, counted)
         .where(
             Item.organization_id == organization_id,
             Item.is_deleted.is_(False),

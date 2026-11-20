@@ -357,14 +357,20 @@ class ApprovalsAPI:
         org_id: UUID,
         request_id: UUID,
         viewer_id: UUID | None = None,
+        viewer_has_approve_grant: bool | None = None,
     ) -> dict[str, Any] | None:
         """Return a request with workflow stages, user names and target
         summary already resolved (JSON-compatible dict).
 
                Pass ``viewer_id`` to have the response carry ``viewer_can_decide``
-        for that person."""
+        for that person, and ``viewer_has_approve_grant`` so that verdict
+        counts the ``approvals:approve`` right the decision door demands."""
         return await services.get_request_enriched(
-            db, org_id, request_id, viewer_id=viewer_id
+            db,
+            org_id,
+            request_id,
+            viewer_id=viewer_id,
+            viewer_has_approve_grant=viewer_has_approve_grant,
         )
 
     @staticmethod
