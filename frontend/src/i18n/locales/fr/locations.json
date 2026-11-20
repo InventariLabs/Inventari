@@ -347,6 +347,7 @@
     "emptyDescriptionNone": "Il ne contient aucun enregistrement ni emplacement.",
     "emptyDescription_one": "Son {{count}} enregistrement est dans l’onglet Produits.",
     "emptyDescription_other": "Ses {{count}} enregistrements sont dans l’onglet Produits.",
+    "noLocationsInside": "Aucun emplacement à l’intérieur",
     "showProducts": "Afficher les produits",
     "selected_one": "{{count}} emplacement sélectionné",
     "selected_other": "{{count}} emplacements sélectionnés",
@@ -361,6 +362,9 @@
   },
   "products": {
     "includeInside": "Inclure les emplacements à l’intérieur",
+    "noneHere": "Aucun enregistrement directement ici",
+    "insideDescription_one": "{{count}} enregistrement est dans les emplacements à l’intérieur.",
+    "insideDescription_other": "{{count}} enregistrements sont dans les emplacements à l’intérieur.",
     "includingInside_one": "Y compris 1 emplacement à l’intérieur",
     "includingInside_other": "Y compris {{count}} emplacements à l’intérieur"
   },

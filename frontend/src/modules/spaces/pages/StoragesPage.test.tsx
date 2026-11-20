@@ -828,12 +828,34 @@ describe("StoragesPage — one screen", () => {
     expect(within(path).getByText("Shelf A")).toBeInTheDocument();
   });
 
-  it("says a leaf has nothing inside and points at its products", async () => {
+  it("opens a leaf that holds records on those records", async () => {
     renderPage("/inventory/locations/leaf");
 
+    expect((await screen.findAllByText("Flour")).length).toBeGreaterThan(0);
+    expect(screen.getByRole("tab", { name: "Products" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+  });
+
+  it("opens a location that holds other locations on its contents", async () => {
+    renderPage("/inventory/locations/zone");
+
+    expect(await screen.findByRole("table")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Contents" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+  });
+
+  it("says a leaf has no locations inside and points at its records", async () => {
+    renderPage("/inventory/locations/leaf");
+
+    await userEvent.click(await screen.findByRole("tab", { name: "Contents" }));
+    expect(await screen.findByText("No locations inside")).toBeInTheDocument();
     expect(
-      await screen.findByText("Nothing inside this location"),
-    ).toBeInTheDocument();
+      screen.queryByText("Nothing inside this location"),
+    ).not.toBeInTheDocument();
     await userEvent.click(
       screen.getByRole("button", { name: "Show products" }),
     );

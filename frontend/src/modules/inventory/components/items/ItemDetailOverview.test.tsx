@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { server } from "@/test/mocks/server";
@@ -291,5 +291,48 @@ describe("ItemDetailOverview — a label put on the wrong product", () => {
     renderOverview({ item: item({ location_id: "loc-1" }), storages: [shelf] });
 
     expect(screen.queryByRole("button", { name: /^Free label/ })).toBeNull();
+  });
+});
+
+describe("ItemDetailOverview — a product held in several records", () => {
+  const rice = (fields: Record<string, unknown> = {}) =>
+    item({
+      name: "Rice 1 kg",
+      quantity: "1",
+      location_id: "loc-1",
+      template_id: "tpl-rice",
+      uom: { symbol: "pcs" },
+      ...fields,
+    });
+
+  function serveTotal(total: string) {
+    server.use(
+      http.get("/api/v1/items/product-templates/tpl-rice/stock", () =>
+        HttpResponse.json({
+          product_template_id: "tpl-rice",
+          total_quantity: total,
+          uom_symbol: "pcs",
+        }),
+      ),
+    );
+  }
+
+  it("shows the product's total on the first screen, where a search result promised it", async () => {
+    serveTotal("2");
+    renderOverview({ item: rice(), storages: [shelf] });
+
+    expect(await screen.findByText("In all locations")).toBeInTheDocument();
+    expect(screen.getByText("2 pcs.")).toBeInTheDocument();
+  });
+
+  it("adds nothing when the record is all there is of the product", async () => {
+    serveTotal("1");
+    renderOverview({ item: rice(), storages: [shelf] });
+
+    await screen.findByText("Quantity");
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+    expect(screen.queryByText("In all locations")).toBeNull();
   });
 });

@@ -14,9 +14,9 @@
     "emptyRecent": "Noch keine kürzlich besuchten Elemente",
     "actionItems": {
       "title": "Zu erledigen",
-      "subtitle": "{{count}} ausstehend in aktivierten Modulen",
-      "subtitle_one": "{{count}} ausstehend in aktivierten Modulen",
-      "subtitle_other": "{{count}} ausstehend in aktivierten Modulen"
+      "subtitle": "In dieser Liste: {{count}}",
+      "subtitle_one": "In dieser Liste: {{count}}",
+      "subtitle_other": "In dieser Liste: {{count}}"
     }
   },
   "sections": {
