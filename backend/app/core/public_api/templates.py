@@ -10,6 +10,8 @@ whatever else the caller is writing.
 
 from __future__ import annotations
 
+from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -143,6 +145,8 @@ class CoreTemplatesAPI:
         document_type: str = 'DEFAULT',
         is_default: bool = False,
         partials: dict[str, str] | None = None,
+        templates_dir: Path | None = None,
+        check_context: dict[str, Any] | None = None,
     ) -> DocumentTemplateSchema:
         from app.services import template_crud
 
@@ -156,6 +160,8 @@ class CoreTemplatesAPI:
             document_type=document_type,
             is_default=is_default,
             partials=partials,
+            templates_dir=templates_dir,
+            check_context=check_context,
         )
         return DocumentTemplateSchema.model_validate(template)
 
@@ -173,6 +179,8 @@ class CoreTemplatesAPI:
         is_default: bool | None = None,
         partials: dict[str, str] | None = None,
         user_id: UUID | None = None,
+        templates_dir: Path | None = None,
+        check_context: dict[str, Any] | None = None,
     ) -> DocumentTemplateSchema:
         """Raises ``NotFoundException`` when the template does not exist.
 
@@ -193,6 +201,8 @@ class CoreTemplatesAPI:
             is_default=is_default,
             partials=partials,
             user_id=user_id,
+            templates_dir=templates_dir,
+            check_context=check_context,
         )
         return DocumentTemplateSchema.model_validate(template)
 

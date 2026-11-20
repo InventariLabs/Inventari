@@ -8,6 +8,7 @@ state prints the built-in one.
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -68,6 +69,54 @@ def test_a_layout_that_parses_but_does_not_render_is_refused(
     assert 'line 1' in response.text
     assert complaint in response.text
     assert client.get(TEMPLATES, headers=po_auth_headers).json()['items'] == []
+
+
+def test_a_failure_below_the_first_missing_value_is_refused(
+    client: TestClient, po_auth_headers: dict[str, str]
+) -> None:
+    built_in = (
+        Path(__file__).parents[2] / 'templates' / 'po_standard.html'
+    ).read_text()
+    body = built_in.replace('</body>', '<p>{{ 1 / 0 }}</p></body>')
+    assert '<p>{{ 1 / 0 }}</p>' in body
+
+    response = _create(client, po_auth_headers, body)
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
+    assert 'division by zero' in response.text
+    assert client.get(TEMPLATES, headers=po_auth_headers).json()['items'] == []
+
+
+def test_a_failure_after_a_line_that_reads_data_names_its_own_line(
+    client: TestClient, po_auth_headers: dict[str, str]
+) -> None:
+    body = '<p>{{ labels.title }}</p>\n<p>{{ supplier.name }}</p>\n<p>{{ 1 / 0 }}</p>'
+
+    response = _create(client, po_auth_headers, body)
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
+    assert 'line 3' in response.text
+
+
+def test_a_layout_including_a_partial_that_does_not_exist_is_refused(
+    client: TestClient, po_auth_headers: dict[str, str]
+) -> None:
+    response = _create(client, po_auth_headers, "{% include 'nope.html' %}")
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
+    assert 'nope.html' in response.text
+
+
+def test_the_built_in_layout_saves_as_it_is(
+    client: TestClient, po_auth_headers: dict[str, str]
+) -> None:
+    built_in = (
+        Path(__file__).parents[2] / 'templates' / 'po_standard.html'
+    ).read_text()
+
+    response = _create(client, po_auth_headers, built_in)
+
+    assert response.status_code == status.HTTP_201_CREATED, response.text
 
 
 def test_a_layout_reading_data_the_empty_context_lacks_is_saved(
