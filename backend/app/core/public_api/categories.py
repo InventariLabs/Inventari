@@ -87,6 +87,7 @@ class CoreCategoriesAPI:
         include_inactive: bool = False,
         claimed_tags: set[str] | None = None,
         with_counts: bool = False,
+        count_records: bool = False,
     ) -> list[CategoryDTO]:
         """List categories visible to *organization_id* with optional filters.
 
@@ -94,7 +95,8 @@ class CoreCategoriesAPI:
         ones.  When *claimed_tags* is provided, categories whose
         ``context_tag`` is in that set are excluded (module-context isolation).
         Inactive categories are excluded by default.  With *with_counts*, each
-        DTO carries how many live items are filed under it.
+        DTO carries how many live items are filed under it — products by
+        default, every record with *count_records*.
         """
 
         categories = await list_with_filters_async(
@@ -106,7 +108,9 @@ class CoreCategoriesAPI:
         dtos = [CategoryDTO.model_validate(c) for c in categories]
         _stamp_module_ownership(categories, dtos)
         if with_counts:
-            counts = await count_items_per_category_async(db, organization_id)
+            counts = await count_items_per_category_async(
+                db, organization_id, per_record=count_records
+            )
             for dto in dtos:
                 dto.items_count = counts.get(dto.id, 0)
         return dtos
