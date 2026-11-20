@@ -102,6 +102,19 @@ describe("check-row-action-names", () => {
     ).toMatchObject([{ label: "appStore.activate" }]);
   });
 
+  it("reads an aria-label inside a card rendered per row", () => {
+    // The AI connection card: the button's name is its aria-label, and the
+    // card's own file holds no map.
+    const card = `export function ThingCard({ thing }) {
+      return <Button aria-label={t("config.editConnection")} />;
+    }`;
+    expect(
+      rowActionNamesIn("modules/things/components/ThingCard.tsx", card, {
+        whole: true,
+      }),
+    ).toMatchObject([{ label: "config.editConnection" }]);
+  });
+
   it("leaves a card whose button names the row", () => {
     const card = `export function ThingCard({ thing }) {
       return (

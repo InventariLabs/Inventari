@@ -141,7 +141,7 @@ function accessibleName(element) {
     )
       return {
         nodes: [labelAttr.initializer.expression],
-        text: labelAttr.initializer.getText(),
+        text: labelAttr.initializer.expression.getText(),
       };
   }
   const children = childrenLabel(element);
@@ -156,7 +156,7 @@ function accessibleName(element) {
     )
       return {
         nodes: [titleAttr.initializer.expression],
-        text: titleAttr.initializer.getText(),
+        text: titleAttr.initializer.expression.getText(),
       };
   }
   return null;
@@ -586,9 +586,10 @@ function runCli() {
   }
 
   if (!quiet) {
+    const scope = baselineMode ? "held by the baseline" : "in the tree";
     console.log(
-      `row-action-names: ${findings.length} finding(s) in ${rels.length} ` +
-        "file(s) scanned.",
+      `row-action-names: ${findings.length} finding(s) ${scope} in ` +
+        `${rels.length} file(s) scanned.`,
     );
   }
   process.exit(0);

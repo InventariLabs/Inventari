@@ -477,7 +477,7 @@ function runCli() {
   }
 
   if (!quiet) {
-    const scope = baselineMode ? "beyond the baseline" : "in the tree";
+    const scope = baselineMode ? "held by the baseline" : "in the tree";
     console.log(
       `dialog-close-refusal: ${findings.length} finding(s) ${scope} ` +
         `(${files.length} file(s) scanned).`,

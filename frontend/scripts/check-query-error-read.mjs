@@ -668,7 +668,8 @@ function main() {
   if (!quiet) {
     console.log(
       `query-error-read: ${files.length} file(s) scanned, ` +
-        `${findings.length} finding(s)${baselineMode ? " beyond the baseline" : ""}.`,
+        `${findings.length} finding(s)` +
+        `${baselineMode ? ", all held by the baseline" : ""}.`,
     );
   }
   process.exit(0);
