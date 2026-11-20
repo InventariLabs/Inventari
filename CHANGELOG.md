@@ -539,6 +539,13 @@ says what the release does rather than what changed since them.
   CSV that starts with a byte order mark (Excel's *CSV UTF-8*, comma-separated)
   imports its rows rather than being refused as unreadable, and the add form answers a name of only spaces with its own
   "Name and kcal are required" message instead of a request to the server.
+- A production run no longer offers an account what its server would refuse.
+  An account that may only read sees a run's status and the same notice as the
+  rest of the module, without Edit, Start run, Complete run or Duplicate. An
+  account that may write production but not stock is still offered Edit and
+  Duplicate on a draft, but no Start run, Complete run, Finish run, portion
+  form, Undo run or Cancel of a run in progress, and *New production* opens
+  planning only, without the *Save as made* choice: each of those posts stock.
 
 ### Removed
 

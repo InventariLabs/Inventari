@@ -71,6 +71,7 @@ beforeEach(() => {
     "equipment:write",
     "items:read",
     "items:write",
+    "items:purge",
     "locations:read",
     "categories:read",
   ]);

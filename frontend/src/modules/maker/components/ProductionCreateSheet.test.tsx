@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { defaultBestBefore } from "@/modules/maker/lib/bestBefore";
@@ -74,10 +74,15 @@ const activeProfile = vi.hoisted(() => ({
 vi.mock("@/hooks/useActiveProfile", () => ({
   useActiveProfile: () => activeProfile,
 }));
+const writeAccess = vi.hoisted(() => ({ items: true }));
 vi.mock("@/hooks/useCanWrite", () => ({
-  useCanWrite: () => true,
+  useCanWrite: (module: string) =>
+    module === "items" ? writeAccess.items : true,
   useCanManage: () => true,
 }));
+afterEach(() => {
+  writeAccess.items = true;
+});
 vi.mock("@/hooks/useMoney", () => ({
   useMoney: () => (amount: unknown) => `${Number(amount).toFixed(2)} zł`,
 }));
@@ -561,6 +566,21 @@ describe("ProductionCreateSheet — already made, in one step", () => {
     mocks.addMutate.mockReset();
     mocks.navigate.mockReset();
     mocks.preview.data = PLUM_PREVIEW;
+  });
+
+  it("plans only, with no choice of mode, for an account without items:write", () => {
+    // Recording a run already made posts stock: POST /orders/made asks for
+    // items:write, so the sheet does not open in that mode for anyone else.
+    writeAccess.items = false;
+    renderSheet();
+    typeQuantity("20");
+    pickStorage("Warehouse");
+
+    expect(screen.queryByText("Save as made")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Save as made" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("radiogroup")).not.toBeInTheDocument();
   });
 
   it("records the run as made by default, in the product's unit", () => {
