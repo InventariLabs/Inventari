@@ -251,6 +251,109 @@ def test_a_physical_move_records_one_document_and_a_move_per_product(
     assert listed[0]['relocated_to_path'] == 'Pantry Building'
 
 
+def _date_the_relocations(db_session, moved_at: datetime) -> None:
+    """Every physical move so far, and the movements it wrote, happened at *moved_at*."""
+    db_session.execute(update(LocationRelocation).values(moved_at=moved_at))
+    db_session.execute(
+        update(StockMove)
+        .where(StockMove.reference_type == StockMoveReferenceType.LOCATION_RELOCATION)
+        .values(completed_at=moved_at)
+    )
+    db_session.commit()
+
+
+def _ledger(client, auth_headers, product) -> list[dict]:
+    """The product's movements, newest first, without those a move wrote."""
+    response = client.get(
+        '/api/v1/stock-moves',
+        headers=auth_headers,
+        params={'product_template_id': str(product.id)},
+    )
+    assert response.status_code == status.HTTP_200_OK, response.text
+    return [
+        row
+        for row in response.json()['items']
+        if row['reference_type'] != 'location_relocation'
+    ]
+
+
+def test_an_earlier_movement_names_the_path_the_shelf_had_then(
+    client, auth_headers, db_session, warehouses
+):
+    """A movement made before a physical move stands where the shelf stood then."""
+    _reorg(
+        client,
+        auth_headers,
+        [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
+    )
+
+    (earlier,) = _ledger(client, auth_headers, warehouses['flour'])
+    assert earlier['to_location_id'] == str(warehouses['shelf'].id)
+    assert earlier['to_location_path'] == 'Main Warehouse › Cold Storage › Shelf A'
+    # Outside has no path, then or now.
+    assert earlier['from_location_path'] is None
+
+    # A movement made after the move stands where the tree puts it today,
+    # which the row's own location already names.
+    post_on_shelf(client, auth_headers, warehouses['flour'], warehouses['shelf'].id, 1)
+    newest, _earlier = _ledger(client, auth_headers, warehouses['flour'])
+    assert newest['to_location_path'] is None
+
+
+def test_a_location_moved_twice_names_where_it_stood_at_each_movement(
+    client, auth_headers, db_session, warehouses
+):
+    """Only the physical moves after a movement are undone, not every one."""
+    _reorg(
+        client,
+        auth_headers,
+        [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
+    )
+    _date_the_relocations(db_session, _TWO_WEEKS_AGO)
+    post_on_shelf(client, auth_headers, warehouses['flour'], warehouses['shelf'].id, 1)
+    db_session.execute(
+        update(StockMove)
+        .where(
+            StockMove.product_template_id == warehouses['flour'].id,
+            StockMove.completed_at > _A_WEEK_AGO,
+        )
+        .values(completed_at=_A_WEEK_AGO)
+    )
+    db_session.commit()
+    _reorg(
+        client,
+        auth_headers,
+        [_move(warehouses['shelf'], warehouses['empty'], 'physical')],
+    )
+
+    in_between, a_month_ago = _ledger(client, auth_headers, warehouses['flour'])
+    assert in_between['to_location_path'] == 'Pantry Building › Cold Storage › Shelf A'
+    assert a_month_ago['to_location_path'] == 'Main Warehouse › Cold Storage › Shelf A'
+
+
+def test_a_movement_on_a_location_that_never_moved_keeps_todays_path(
+    client, auth_headers, db_session, test_user, warehouses
+):
+    """A physical move of one shelf leaves every other place's history alone."""
+    rice = _template(db_session, test_user, 'Rice')
+    db_session.commit()
+    post_on_shelf(client, auth_headers, rice, warehouses['empty'].id, 2)
+    db_session.execute(
+        update(StockMove)
+        .where(StockMove.product_template_id == rice.id)
+        .values(completed_at=_A_MONTH_AGO)
+    )
+    db_session.commit()
+    _reorg(
+        client,
+        auth_headers,
+        [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
+    )
+
+    (earlier,) = _ledger(client, auth_headers, rice)
+    assert earlier['to_location_path'] is None
+
+
 def test_the_stock_on_a_date_stands_where_the_location_stood_then(
     client, auth_headers, db_session, warehouses
 ):
@@ -259,13 +362,7 @@ def test_the_stock_on_a_date_stands_where_the_location_stood_then(
         auth_headers,
         [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
     )
-    db_session.execute(update(LocationRelocation).values(moved_at=_A_WEEK_AGO))
-    db_session.execute(
-        update(StockMove)
-        .where(StockMove.reference_type == StockMoveReferenceType.LOCATION_RELOCATION)
-        .values(completed_at=_A_WEEK_AGO)
-    )
-    db_session.commit()
+    _date_the_relocations(db_session, _A_WEEK_AGO)
     now = datetime.now(UTC)
 
     before = {'Flour': Decimal('3'), 'Sugar': Decimal('5')}

@@ -166,7 +166,7 @@ describe("StorageProductsTab — removing and deleting a product", () => {
     expect(bodies).toEqual([
       { id: "i-flour", body: expect.objectContaining({ quantity: 1 }) },
     ]);
-    expect(toast.success).toHaveBeenCalledWith("Removed 1 unit — 2 kg left");
+    expect(toast.success).toHaveBeenCalledWith("Removed 1 kg — 2 kg left");
   });
 
   it("announces a finished product instead of a remainder when the last unit goes", async () => {

@@ -98,6 +98,12 @@ export function useItemQuickActions(
           } else {
             toast.success(
               t("items:quickActions.consumedSuccessRemaining", {
+                removed: formatQuantityLocalized(
+                  t,
+                  1,
+                  updatedItem.uom?.symbol,
+                  updatedItem.uom?.rounding,
+                ),
                 remaining: formatQuantityLocalized(
                   t,
                   updatedItem.quantity,
