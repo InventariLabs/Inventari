@@ -71,7 +71,11 @@ function signature(html: string): string {
   return [tag, ...kept].join(" ");
 }
 
-async function scan(page: Page, screen: string) {
+async function scan(
+  page: Page,
+  screen: string,
+  { wcag22 = false }: { wcag22?: boolean } = {},
+) {
   // A screen that fades in (the sign-in form takes 700 ms) is measured with
   // its text still half transparent when the machine is slow, and axe then
   // reports the contrast of a frame nobody reads. Wait for the animations
@@ -84,9 +88,21 @@ async function scan(page: Page, screen: string) {
         .map((a) => a.finished.catch(() => undefined)),
     ),
   );
-  const results = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-    .analyze();
+  let builder = new AxeBuilder({ page }).withTags(
+    wcag22
+      ? ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22a", "wcag22aa"]
+      : ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"],
+  );
+  if (wcag22) {
+    // axe ships `target-size` disabled by default; a tag alone does not turn
+    // it on. Asking for it explicitly is the whole point of the phone pass:
+    // a 16 px checkbox beside a 10 px dead zone is not a 24 px target, and
+    // WCAG 2.2 AA asks for one.
+    builder = builder.options({
+      rules: { "target-size": { enabled: true } },
+    });
+  }
+  const results = await builder.analyze();
 
   const blocking = results.violations.filter((v) =>
     BLOCKING.has(v.impact ?? ""),
@@ -164,6 +180,56 @@ test.describe("Accessibility — axe scan of the first screens", () => {
     await page.goto("/login");
     await settle(page);
     await scan(page, "login");
+  });
+
+  test.describe("phone at 390 px", () => {
+    // WCAG 2.2's target size (24 × 24 CSS px, outside running text) is the
+    // class the 2026-11 QA round met again and again at 390: document
+    // register checkboxes, label-pool select-all, audit-log copy buttons,
+    // recipe collections' Rename/Delete, asset-card checkboxes. The desktop
+    // pass below never measured it — axe's WCAG 2.0/2.1 tag set does not
+    // include the rule — so a screen could lose a target and stay green.
+    const PHONE = { width: 390, height: 844 };
+
+    test.beforeEach(async ({ page }) => {
+      await page.setViewportSize(PHONE);
+    });
+
+    test("item list at 390", async ({ page, authenticatedPage }) => {
+      await page.goto("/inventory/items");
+      await settle(page);
+      await scan(page, "phone-item-list", { wcag22: true });
+    });
+
+    test("storages at 390", async ({ page, authenticatedPage }) => {
+      await page.goto("/inventory/locations");
+      await settle(page);
+      await scan(page, "phone-storages", { wcag22: true });
+    });
+
+    test("dashboard at 390", async ({ page, authenticatedPage }) => {
+      await page.goto("/launcher");
+      await settle(page);
+      await scan(page, "phone-dashboard", { wcag22: true });
+    });
+
+    test("item form at 390", async ({ page, authenticatedPage }) => {
+      await page.goto("/inventory/items/add");
+      await settle(page);
+      await scan(page, "phone-item-form", { wcag22: true });
+    });
+
+    test("label pool at 390", async ({ page, authenticatedPage }) => {
+      await page.goto("/inventory/labels");
+      await settle(page);
+      await scan(page, "phone-label-pool", { wcag22: true });
+    });
+
+    test("audit log at 390", async ({ page, authenticatedPage }) => {
+      await page.goto("/settings/audit-log");
+      await settle(page);
+      await scan(page, "phone-audit-log", { wcag22: true });
+    });
   });
 
   test.describe("signed in", () => {

@@ -1,0 +1,18 @@
+{
+  "generatedBy": "node scripts/check-dialog-close-on-refusal.mjs --write-baseline",
+  "note": "Dialogs that close before the server accepted the change. One entry per file, handler and close call; a plain run fails on any entry the tree no longer holds as well as on a new one, and --write-baseline is the only writer.",
+  "sites": {
+    "modules/approvals/components/ApprovalDecisionButtons.tsx :: handleApprove": 1,
+    "modules/maker/components/FinishRunAction.tsx :: confirm": 1,
+    "modules/maker/components/OutputBatchCard.tsx :: <arrow>": 1,
+    "modules/maker/components/ReverseRunAction.tsx :: <arrow>": 1,
+    "modules/maker/components/StartRunAction.tsx :: confirm": 1,
+    "modules/maker/pages/ProductionDetailPage.tsx :: <arrow>": 1,
+    "modules/maker/pages/RecipeDetailPage.tsx :: <arrow>": 1,
+    "modules/recipes/components/PickingActivePhase.tsx :: <arrow>": 1,
+    "modules/recipes/components/RecipeBulkBar.tsx :: applyTags": 1,
+    "modules/recipes/components/RecipeBulkBar.tsx :: <arrow>": 1,
+    "modules/recipes/components/TagManager.tsx :: handleRename": 1,
+    "modules/recipes/components/TagManager.tsx :: handleDelete": 1
+  }
+}

@@ -269,8 +269,12 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 	docker compose exec frontend npm run check:storage-scope
 	@echo "$(BLUE)[INFO]$(NC) Checking every category query states its scope (baseline)..."
 	docker compose exec frontend npm run check:category-scope
-	@echo "$(BLUE)[INFO]$(NC) Checking no failed load reads as an empty answer..."
+	@echo "$(BLUE)[INFO]$(NC) Checking no failed or loading read renders as an answer (baseline)..."
 	docker compose exec frontend npm run check:query-error-read
+	@echo "$(BLUE)[INFO]$(NC) Checking no dialog closes before the server accepted (baseline)..."
+	docker compose exec frontend npm run check:dialog-close
+	@echo "$(BLUE)[INFO]$(NC) Checking every row action names its row (baseline)..."
+	docker compose exec frontend npm run check:row-action-names
 	@echo "$(BLUE)[INFO]$(NC) Checking every mutateAsync refusal reaches the reader (baseline)..."
 	docker compose exec frontend npm run check:mutate-async
 	@echo "$(BLUE)[INFO]$(NC) Checking no unit symbol reaches the screen unresolved (baseline)..."
@@ -361,7 +365,10 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 #   check:storage-scope:baseline /
 #   check:category-scope:baseline /
 #   check:mutate-async:baseline /
-#   check:quantity-render:baseline   — WRITERS that regenerate golden files
+#   check:quantity-render:baseline /
+#   check:query-error-read:baseline /
+#   check:dialog-close:baseline /
+#   check:row-action-names:baseline  — WRITERS that regenerate golden files
 #                                      after an intentional change; their
 #                                      verdicts run inside the gates above.
 #                                      The three baselines shrink as the

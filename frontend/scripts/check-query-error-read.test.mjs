@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { unreadErrorsIn } from "./check-query-error-read.mjs";
+import {
+  loadingWithoutFailureIn,
+  pagedEmptyIn,
+  unguardedClaimsIn,
+  unreadErrorsIn,
+} from "./check-query-error-read.mjs";
 
 /**
  * The gate flags a defaulted query result whose error the same destructuring
@@ -205,5 +210,114 @@ describe("check-query-error-read", () => {
         unreadErrorsIn(rel, `export function Z() { const b = ${read}; }`),
       ).toHaveLength(1);
     }
+  });
+});
+
+describe("unguardedClaimsIn", () => {
+  it("fires on a has-rows claim built from a defaulted query", () => {
+    const source = [
+      "const listQuery = useItems(params);",
+      "const items = listQuery.data?.items ?? [];",
+      "const total = countOf(items);",
+      "return <Header hasRows={total > 0} />;",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toMatchObject([
+      { file: rel, line: 4 },
+    ]);
+  });
+
+  it("leaves the claim once the expression reads the outcome", () => {
+    const source = [
+      "const listQuery = useItems(params);",
+      "const total = listQuery.data?.total ?? 0;",
+      "return <Header hasRows={!listQuery.isLoading && total > 0} />;",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toEqual([]);
+  });
+
+  it("leaves a count that no empty state or disabled action decides", () => {
+    const source = [
+      "const q = useThings();",
+      "const rows = q.data ?? [];",
+      "return <p>{rows.length} records</p>;",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toEqual([]);
+  });
+
+  it("fires on a count inside an empty-state branch", () => {
+    const source = [
+      "const q = useThings();",
+      "const rows = q.data ?? [];",
+      "return rows.length === 0 ? <EmptyState title={t('none')} /> : <Table rows={rows} />;",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toHaveLength(1);
+  });
+});
+
+describe("loadingWithoutFailureIn", () => {
+  const leaf = (body) =>
+    [
+      "interface ThingListProps {",
+      "  suggestions: Thing[];",
+      "  isLoading: boolean;",
+      "}",
+      `export function ThingList({ suggestions, isLoading }: ThingListProps) {`,
+      "  if (isLoading) return <Spinner />;",
+      body,
+      "}",
+    ].join("\n");
+
+  it("fires on a list component that models loading and not failure", () => {
+    expect(
+      loadingWithoutFailureIn(
+        "modules/things/components/ThingList.tsx",
+        leaf("  if (suggestions.length === 0) return <EmptyState />;"),
+      ),
+    ).toMatchObject([{ site: expect.stringContaining("no failure prop") }]);
+  });
+
+  it("leaves the component once it takes the failure", () => {
+    const source = leaf(
+      "  if (suggestions.length === 0) return <EmptyState />;",
+    )
+      .replace(
+        "  isLoading: boolean;",
+        "  isLoading: boolean;\n  isError: boolean;",
+      )
+      .replace(
+        "{ suggestions, isLoading }",
+        "{ suggestions, isLoading, isError }",
+      );
+    expect(
+      loadingWithoutFailureIn(
+        "modules/things/components/ThingList.tsx",
+        source,
+      ),
+    ).toEqual([]);
+  });
+});
+
+describe("pagedEmptyIn", () => {
+  const page = (guard) =>
+    [
+      "const { data: pages, isLoading } = useLocationPages();",
+      "const locations = pages?.pages.flatMap((page) => page.items) ?? [];",
+      `return isLoading ? <Spinner /> : locations.length === 0 ? <EmptyState /> : <List />;`,
+      guard,
+    ].join("\n");
+
+  it("fires on an empty state over a paged list guarded by isLoading alone", () => {
+    expect(
+      pagedEmptyIn("modules/things/pages/ThingsPage.tsx", page("")),
+    ).toMatchObject([{ site: expect.stringContaining("isPlaceholderData") }]);
+  });
+
+  it("leaves the page once it reads the placeholder flag", () => {
+    expect(
+      pagedEmptyIn(
+        "modules/things/pages/ThingsPage.tsx",
+        page("const { isPlaceholderData } = useLocationPages();"),
+      ),
+    ).toEqual([]);
   });
 });
