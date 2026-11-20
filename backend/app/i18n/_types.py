@@ -781,6 +781,7 @@ class ErrorMessages(TypedDict):
     document_undo_posts_nothing: str
     document_undo_blocked: str
     document_undo_stock_used: str
+    document_undo_held_goods: str
     document_post_already_posted: str
     document_post_cancelled: str
     document_filter_unknown: str

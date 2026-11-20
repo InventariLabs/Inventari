@@ -945,6 +945,7 @@ ERRORS_ES: ErrorMessages = {
     'document_undo_posts_nothing': 'Este documento solo registra mercancías que ya se retiraron: no movió existencias, así que no hay nada que deshacer.',
     'document_undo_blocked': 'No se puede deshacer: {reason} Use «Corregir» para cambiar lo que queda.',
     'document_undo_stock_used': 'No se puede deshacer: movimientos posteriores consumieron el stock contabilizado. Use «Corregir» para cambiar lo que queda.',
+    'document_undo_held_goods': 'No se puede deshacer: parte de la recepción está retenida en cuarentena. Use «Corregir» para cambiar lo que hay en la estantería y trate aparte los artículos retenidos.',
     'document_correction_posts_nothing': 'Este documento solo registra mercancías que ya se retiraron: una corrección no puede mover existencias a través de él.',
     'document_post_already_posted': 'Este documento ya se contabilizó; no se contabilizó nada por segunda vez.',
     'document_post_cancelled': 'Este documento fue cancelado, así que no se puede contabilizar.',

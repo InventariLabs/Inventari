@@ -86,6 +86,23 @@ describe("PostedActionResult", () => {
     );
   });
 
+  it("offers no undo for a receipt that held part of a line back", () => {
+    renderResult(
+      posted({
+        type: "IN",
+        number: "IN/2026/017",
+        lines: [{ id: "l1", held_quantity: "5" }],
+      } as unknown as Partial<WarehouseDocument>),
+      1,
+      undefined,
+      "receive",
+    );
+
+    expect(
+      screen.queryByRole("button", { name: /Undo/ }),
+    ).not.toBeInTheDocument();
+  });
+
   it("undoes the posting and names the reversal instead of offering undo again", async () => {
     const user = userEvent.setup();
     server.use(

@@ -48,6 +48,7 @@ import {
   cancelReleasesStock,
   mayBePlanned,
   UNDOABLE_DOCUMENT_TYPES,
+  holdsGoodsBack,
 } from "@/modules/warehouse/types";
 import {
   useDocument,
@@ -398,6 +399,7 @@ function offersUndo(
         status: string;
         reversed_by_id?: string | null;
         stock_already_applied?: boolean;
+        lines?: ReadonlyArray<{ held_quantity?: number | string | null }>;
       }
     | undefined,
   corrections: { status: string }[] | undefined,
@@ -408,6 +410,9 @@ function offersUndo(
   // A document that only records another step's movement posted nothing:
   // there is no stock to take back, and the server refuses the undo.
   if (doc.stock_already_applied) return false;
+  // Goods a receipt held back are on the quarantine shelf, out of the
+  // reversal's reach: the server refuses, so the button is not offered.
+  if (holdsGoodsBack(doc.lines)) return false;
   if (doc.reversed_by_id) return false;
   if (correctionsFailed) return false;
   return !(corrections ?? []).some((c) => c.status !== "CANCELLED");

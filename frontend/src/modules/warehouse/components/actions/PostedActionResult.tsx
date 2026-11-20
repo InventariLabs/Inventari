@@ -9,6 +9,7 @@ import { useUndoDocument } from "@/modules/warehouse/hooks/useDocuments";
 import { downloadDocumentPdf } from "@/modules/warehouse/lib/downloadDocumentPdf";
 import {
   UNDOABLE_DOCUMENT_TYPES,
+  holdsGoodsBack,
   undoLabelKey,
   type WarehouseDocument,
 } from "@/modules/warehouse/types";
@@ -145,7 +146,10 @@ export function PostedActionResult({
   const pending = document.status === "PENDING_APPROVAL";
   const count = lineCount ?? document.lines?.length ?? 0;
   const canUndo =
-    !pending && !reversal && UNDOABLE_DOCUMENT_TYPES.has(document.type);
+    !pending &&
+    !reversal &&
+    UNDOABLE_DOCUMENT_TYPES.has(document.type) &&
+    !holdsGoodsBack(document.lines);
   // Once the reversal is posted the heading and the sentence under it tell
   // the undo: "Issued 1 line — the goods have left stock" above "Undone"
   // said two opposite things. An undo waiting for approval has moved
