@@ -60,6 +60,7 @@
     "targetResponse": "Response from the target",
     "truncated": "shortened",
     "abandonedByApp": "Abandoned by Inventari — the target never answered",
+    "abandonedByAppAnswered": "Abandoned by Inventari — it stopped retrying after the target's answer",
     "deliveryId": "Delivery ID",
     "abandon": {
       "circuitBreaker": "The circuit breaker cut this endpoint off after repeated failures.",
@@ -89,7 +90,7 @@
   },
   "circuitBreakerWarning_one": "This webhook was auto-disabled after 1 consecutive failure — the cause of the last attempt is named in the delivery log.",
   "circuitBreakerWarning_other": "This webhook was auto-disabled after {{count}} consecutive failures — the cause of the last attempt is named in the delivery log.",
-  "eventsWhileOff": "Events that happen while it is off are not delivered, queued or logged, and Reactivate does not replay them.",
+  "eventsWhileOff": "Events that happen while it is off are not delivered, queued or logged, and Reactivate does not replay them. Deliveries still waiting for a retry when it went off are abandoned the same way — they stay in the delivery log as failed.",
   "settings": {
     "logRetentionDays": "Log retention (days)",
     "logRetentionDaysDescription": "How long to keep webhook delivery logs.",

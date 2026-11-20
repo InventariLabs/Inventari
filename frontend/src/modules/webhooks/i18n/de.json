@@ -60,6 +60,7 @@
     "targetResponse": "Antwort der Gegenstelle",
     "truncated": "gekürzt",
     "abandonedByApp": "Von Inventari abgebrochen — das Ziel hat nie geantwortet",
+    "abandonedByAppAnswered": "Von Inventari abgebrochen — nach der Antwort des Ziels wurde nicht mehr wiederholt",
     "deliveryId": "Zustellungs-ID",
     "abandon": {
       "circuitBreaker": "Der Schutzschalter hat diesen Endpunkt nach wiederholten Fehlern abgeschaltet.",
@@ -89,7 +90,7 @@
   },
   "circuitBreakerWarning_one": "Dieser Webhook wurde nach 1 aufeinanderfolgendem Fehler automatisch deaktiviert — die Ursache des letzten Versuchs steht im Zustellprotokoll.",
   "circuitBreakerWarning_other": "Dieser Webhook wurde nach {{count}} aufeinanderfolgenden Fehlern automatisch deaktiviert — die Ursache des letzten Versuchs steht im Zustellprotokoll.",
-  "eventsWhileOff": "Ereignisse, die eintreten, solange er ausgeschaltet ist, werden weder zugestellt noch eingereiht oder protokolliert, und Reaktivieren spielt sie nicht nach.",
+  "eventsWhileOff": "Ereignisse, die eintreten, solange er ausgeschaltet ist, werden weder zugestellt noch eingereiht oder protokolliert, und Reaktivieren spielt sie nicht nach. Zustellungen, die beim Abschalten noch auf einen Wiederholungsversuch warteten, werden ebenso abgebrochen — sie bleiben als fehlgeschlagen im Zustellprotokoll.",
   "settings": {
     "logRetentionDays": "Protokollaufbewahrung (Tage)",
     "logRetentionDaysDescription": "Wie lange Zustellprotokolle der Webhooks aufbewahrt werden.",

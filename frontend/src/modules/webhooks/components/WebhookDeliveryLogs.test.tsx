@@ -150,9 +150,7 @@ describe("WebhookDeliveryLogs", () => {
     ).toBeInTheDocument();
   });
 
-  it("signs an abandonment as ours, with the reason and no borrowed status", async () => {
-    // The breaker cut the endpoint after a 500; the row reads "Response from the target:
-    // Webhook disabled or deleted", since the breaker lives here, not at the receiver.
+  it("signs an abandonment as ours, with the reason, when no attempt got an answer", async () => {
     mockDelivery({
       status_code: null,
       response_body: null,
@@ -178,6 +176,36 @@ describe("WebhookDeliveryLogs", () => {
       screen.queryByText("Response from the target"),
     ).not.toBeInTheDocument();
     expect(screen.queryByText(/HTTP \d+/)).not.toBeInTheDocument();
+  });
+
+  it("keeps the target's answer on a delivery the breaker abandoned", async () => {
+    mockDelivery({
+      status_code: 500,
+      response_body: "upstream exploded",
+      error_message: "upstream exploded",
+      abandon_reason: "circuit_breaker",
+      delivery_status: "failed",
+    });
+    renderLogs();
+
+    // The event type is server data, not a catalogue key.
+    // not-an-i18n-key
+    fireEvent.click(await screen.findByText(/^item\.created$/));
+
+    expect(screen.getByText("HTTP 500")).toBeInTheDocument();
+    expect(screen.getByText("Response from the target")).toBeInTheDocument();
+    expect(screen.getAllByText("upstream exploded").length).toBeGreaterThan(0);
+    expect(
+      screen.getByText(
+        "Abandoned by Inventari — it stopped retrying after the target's answer",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/never answered/)).not.toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "The circuit breaker cut this endpoint off after repeated failures.",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("offers a retry instead of saying there are no deliveries when the log failed", async () => {

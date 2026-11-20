@@ -10,8 +10,8 @@ never had the id, and inventing one afterwards would be a fact nobody's receiver
 ever saw.
 
 ``abandon_reason`` — why the application itself stopped trying (breaker cut,
-endpoint switched off, endpoint deleted, module off). An abandonment carries no
-status code, so the history never reads our refusal as the receiver's answer.
+endpoint switched off, endpoint deleted, module off). The row keeps the
+status code and body of the last real attempt next to the reason.
 
 ``last_attempt_at`` — when the attempt that produced the row's current
 status ended. ``created_at`` is the enqueue time and drifts from the outcome
