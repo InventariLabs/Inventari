@@ -27,6 +27,20 @@ def _validated_timezone(v: object) -> str:
     return name
 
 
+def _validated_name(v: object) -> object:
+    """Strip an organization name; a blank one is refused, never stored.
+
+    The name is what invitations, emails and printed documents call the
+    organization, so an empty one has no reader it could mean anything to.
+    """
+    if not isinstance(v, str):
+        return v
+    name = v.strip()
+    if not name:
+        raise ServiceRejectionError('organization_name_required')
+    return name
+
+
 def validated_country_code(v: object) -> str | None:
     """Coerce and check an ISO 3166-1 alpha-2 code: empty → no country."""
     if v is None or v == '':
@@ -50,6 +64,11 @@ class OrganizationBase(BaseModel):
 
 class OrganizationCreate(OrganizationBase):
     settings: dict[str, Any] | None = None
+
+    @field_validator('name', mode='before')
+    @classmethod
+    def validate_name(cls, v: object) -> object:
+        return _validated_name(v)
 
 
 class OrganizationAddress(BaseModel):
@@ -80,6 +99,11 @@ class OrganizationUpdate(BaseModel):
     # The paper the office prints on — absent/empty means the country
     # answers, so an organization moving countries has nothing to clear.
     print_page_size: str | None = Field(None, max_length=10)
+
+    @field_validator('name', mode='before')
+    @classmethod
+    def validate_name(cls, v: object) -> object:
+        return _validated_name(v)
 
     @field_validator('timezone', mode='before')
     @classmethod

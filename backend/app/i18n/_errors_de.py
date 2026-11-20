@@ -724,6 +724,7 @@ ERRORS_DE: ErrorMessages = {
     'invalid_country_code': 'Das Land muss ein zweistelliger ISO-3166-1-alpha-2-Code sein (z. B. PL).',
     'invalid_print_page_size': 'Das Papierformat muss A4 oder Letter sein.',
     'invalid_timezone': 'Die Zeitzone muss ein gültiger IANA-Zonenname sein (z. B. Europe/Warsaw).',
+    'organization_name_required': 'Der Name der Organisation darf nicht leer sein.',
     'invalid_currency_code': 'Die Währung muss ein gültiger ISO-4217-Code sein (z. B. PLN).',
     'admin_permissions_required': 'Für diese Aktion sind Administratorrechte erforderlich',
     'invalid_url_missing_host': 'Ungültige URL: Host fehlt',

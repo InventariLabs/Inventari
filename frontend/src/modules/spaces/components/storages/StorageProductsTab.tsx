@@ -152,6 +152,12 @@ export function StorageProductsTab({
               // message put the remainder where the amount taken belongs.
               toast.success(
                 t("items:quickActions.consumedSuccessRemaining", {
+                  removed: formatQuantityLocalized(
+                    t,
+                    1,
+                    updatedItem.uom?.symbol,
+                    updatedItem.uom?.rounding,
+                  ),
                   remaining: formatQuantityLocalized(
                     t,
                     updatedItem.quantity,

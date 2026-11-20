@@ -12,7 +12,9 @@ move that only corrects the layout writes none of it.
 
 The stock on a past date reads the documents back
 (:func:`parents_as_of_async`): a subtree counts in the warehouse it stood in
-on that date, not in the one the tree names today.
+on that date, not in the one the tree names today. The movement register
+reads them the same way (:func:`paths_then_async`): a movement names the
+path its shelf had when the goods moved.
 """
 
 from __future__ import annotations
@@ -28,7 +30,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db_utils import in_ids
 from app.core.location_path import join_location_path
 from app.models.location_relocation import LocationRelocation
-from app.models.stock_move import StockMoveReferenceType
+from app.models.stock_move import StockMove, StockMoveReferenceType
 from app.models.stock_quants_from_records import stock_quants_from_records
 from app.models.storage_location import StorageLocation
 from app.services import stock_moves_service
@@ -225,3 +227,78 @@ async def parents_as_of_async(
     for location_id, from_parent_id in later:
         parent_by_id[location_id] = from_parent_id
     return parent_by_id
+
+
+async def paths_then_async(
+    db: AsyncSession, organization_id: UUID, moves: Sequence[StockMove]
+) -> dict[UUID, tuple[str | None, str | None]]:
+    """The paths each movement's two ends had when it happened, where not today's.
+
+    A location keeps its id when it physically moves, so today's tree would
+    name the place it was carried to for every movement made before the move.
+    The tree a movement stood in is today's with the physical moves after it
+    undone, newest first, as in :func:`parents_as_of_async`. An end whose path
+    then is its path today answers ``None``, and a movement both of whose ends
+    do is left out of the answer. A movement a physical move wrote is left out
+    too: it names the same shelf on both ends, and its document says where the
+    shelf went.
+
+    One query answers a page no physical move came after, which is every page
+    of an organization that never moved a location physically.
+    """
+    moments = {
+        move.id: move.completed_at or move.created_at
+        for move in moves
+        if move.reference_type != StockMoveReferenceType.LOCATION_RELOCATION
+    }
+    if not moments:
+        return {}
+    later = (
+        await db.execute(
+            select(
+                LocationRelocation.location_id,
+                LocationRelocation.from_parent_id,
+                LocationRelocation.moved_at,
+            )
+            .where(
+                LocationRelocation.organization_id == organization_id,
+                LocationRelocation.moved_at > min(moments.values()),
+                LocationRelocation.location_id.is_not(None),
+            )
+            .order_by(LocationRelocation.moved_at.desc(), LocationRelocation.id.desc())
+        )
+    ).all()
+    if not later:
+        return {}
+    name_by_id, today = await _tree_async(db, organization_id)
+    # Keyed by how many of the newest physical moves are undone.
+    trees: dict[int, dict[UUID, UUID | None]] = {0: today}
+
+    def tree_before(undone: int) -> dict[UUID, UUID | None]:
+        if undone not in trees:
+            parents = dict(today)
+            for location_id, from_parent_id, _moved_at in later[:undone]:
+                parents[location_id] = from_parent_id
+            trees[undone] = parents
+        return trees[undone]
+
+    def path_then(
+        location_id: UUID | None, parents: Mapping[UUID, UUID | None]
+    ) -> str | None:
+        if location_id is None or parents is today:
+            return None
+        then = path_to(name_by_id, parents, location_id)
+        return None if then == path_to(name_by_id, today, location_id) else then
+
+    paths: dict[UUID, tuple[str | None, str | None]] = {}
+    for move in moves:
+        if (moment := moments.get(move.id)) is None:
+            continue
+        parents = tree_before(sum(1 for row in later if row.moved_at > moment))
+        ends = (
+            path_then(move.from_location_id, parents),
+            path_then(move.to_location_id, parents),
+        )
+        if ends != (None, None):
+            paths[move.id] = ends
+    return paths

@@ -3205,6 +3205,18 @@
               "title": "With Counts"
             },
             "description": "Include how many live items each category holds"
+          },
+          {
+            "name": "count_records",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "With counts: count every live record, not distinct products",
+              "default": false,
+              "title": "Count Records"
+            },
+            "description": "With counts: count every live record, not distinct products"
           }
         ],
         "responses": {
@@ -84152,6 +84164,28 @@
               }
             ],
             "title": "To Location Name"
+          },
+          "from_location_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Location Path"
+          },
+          "to_location_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Location Path"
           },
           "lot_name": {
             "anyOf": [

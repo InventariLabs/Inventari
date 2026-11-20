@@ -26597,6 +26597,10 @@ export interface components {
             from_location_name?: string | null;
             /** To Location Name */
             to_location_name?: string | null;
+            /** From Location Path */
+            from_location_path?: string | null;
+            /** To Location Path */
+            to_location_path?: string | null;
             /** Lot Name */
             lot_name?: string | null;
             /** User Name */
@@ -31988,6 +31992,8 @@ export interface operations {
                 exclude_module_contexts?: boolean;
                 /** @description Include how many live items each category holds */
                 with_counts?: boolean;
+                /** @description With counts: count every live record, not distinct products */
+                count_records?: boolean;
             };
             header?: never;
             path?: never;

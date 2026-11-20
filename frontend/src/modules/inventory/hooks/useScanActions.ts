@@ -7,6 +7,7 @@ import { api } from "@/module-sdk";
 import { invalidation } from "@/lib/api/invalidation";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 
 export function useScanConsume() {
   const { t } = useTranslation("labels");
@@ -14,9 +15,18 @@ export function useScanConsume() {
   return useAppMutation(
     ({ itemId, quantity }: { itemId: string; quantity: number }) =>
       itemsApi.consume(itemId, quantity),
-    (qc) => {
+    (qc, updatedItem, { quantity }) => {
       invalidation.items(qc);
-      toast.success(t("items:quickActions.consumedSuccess"));
+      toast.success(
+        t("items:quickActions.consumedSuccess", {
+          removed: formatQuantityLocalized(
+            t,
+            quantity,
+            updatedItem.uom?.symbol,
+            updatedItem.uom?.rounding,
+          ),
+        }),
+      );
     },
   );
 }

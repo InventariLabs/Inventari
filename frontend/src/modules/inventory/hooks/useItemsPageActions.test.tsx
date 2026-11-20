@@ -138,12 +138,30 @@ describe("useItemsPageActions — the used-up toast leads back to the record", (
     // and a raw symbol would leave a translated message half in English.
     expect(String(message)).toBe(
       i18next.t("items:quickActions.consumedSuccessRemaining", {
+        removed: "1 pcs.",
         remaining: "4 pcs.",
       }),
     );
     expect(options?.description).toBeUndefined();
     expect(options?.action).toBeUndefined();
     expect(mocks.navigate).not.toHaveBeenCalled();
+  });
+
+  it("confirms the amount that was removed, not a single unit", () => {
+    const { result } = renderActions();
+    result.current.consumeMutation.mutate("item-9", 5);
+
+    mocks.consumeOptions?.onSuccess({
+      id: "item-9",
+      quantity: 20,
+      uom: { symbol: "pcs" },
+      is_deleted: false,
+    });
+
+    const [message] = toastSuccess.mock.calls[0] as unknown as [string];
+    expect(String(message)).toContain("Removed 5 pcs.");
+    expect(String(message)).toContain("20 pcs. left");
+    expect(String(message)).not.toContain("1 unit");
   });
 
   it("names the unit the way the interface names it", async () => {
