@@ -17,6 +17,9 @@ vi.mock("./App", async () => {
     },
   };
 });
+vi.mock("./components/ManualCopyHost", () => ({
+  default: () => <p>manual copy host</p>,
+}));
 vi.mock("./PublicApp", () => ({
   default: () => <p>public page</p>,
 }));
@@ -42,6 +45,12 @@ describe("Root", () => {
     await renderRootAt("/");
 
     expect(await screen.findByText("application")).toBeInTheDocument();
+  });
+
+  it("mounts the host that shows a copy the browser refused", async () => {
+    await renderRootAt("/");
+
+    expect(await screen.findByText("manual copy host")).toBeInTheDocument();
   });
 
   it("serves a public address the public tree and not the application", async () => {

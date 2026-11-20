@@ -56,7 +56,9 @@
   },
   "copy": {
     "failed": "Kopieren fehlgeschlagen — markieren Sie den Wert und kopieren Sie ihn von Hand.",
-    "selectManually": "Dieser Browser hat das Kopieren nicht angenommen. Markieren Sie den Wert oben und kopieren Sie ihn von Hand (Strg+C)."
+    "selectManually": "Dieser Browser hat das Kopieren nicht angenommen. Markieren Sie den Wert oben und kopieren Sie ihn von Hand (Strg+C).",
+    "manualTitle": "Von Hand kopieren",
+    "manualDone": "Fertig"
   },
   "form": {
     "save": "Speichern",

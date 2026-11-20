@@ -56,7 +56,9 @@
   },
   "copy": {
     "failed": "Nie udało się skopiować — zaznacz wartość i skopiuj ją ręcznie.",
-    "selectManually": "Ta przeglądarka nie przyjęła kopiowania. Zaznacz wartość powyżej i skopiuj ją ręcznie (Ctrl+C)."
+    "selectManually": "Ta przeglądarka nie przyjęła kopiowania. Zaznacz wartość powyżej i skopiuj ją ręcznie (Ctrl+C).",
+    "manualTitle": "Skopiuj ręcznie",
+    "manualDone": "Gotowe"
   },
   "form": {
     "save": "Zapisz",
