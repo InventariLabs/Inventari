@@ -226,7 +226,7 @@ ERRORS_DE: ErrorMessages = {
     'pagination_cursor_invalid': 'Ungültiger oder abgelaufener Paginierungs-Cursor',
     'webhook_url_scheme': 'Für Webhooks sind nur {schemes}-Adressen erlaubt.',
     'webhook_url_no_hostname': 'Die Webhook-Adresse muss einen Hostnamen enthalten, z. B. https://example.com/hook.',
-    'picking_already_picked': '{name} wurde bereits gepickt',
+    'picking_already_picked': '{name} wurde bereits kommissioniert',
     'picking_unit_mismatch': (
         'Einheiten für {name} sind nicht vergleichbar — Rezept und Bestand '
         'verwenden unterschiedliche Maße. Hinterlegen Sie, wie viel eine '
