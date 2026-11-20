@@ -14,9 +14,9 @@
     "emptyRecent": "Aucun élément récent",
     "actionItems": {
       "title": "À faire",
-      "subtitle": "{{count}} en attente dans les modules activés",
-      "subtitle_one": "{{count}} en attente dans les modules activés",
-      "subtitle_other": "{{count}} en attente dans les modules activés"
+      "subtitle": "Dans cette liste : {{count}}",
+      "subtitle_one": "Dans cette liste : {{count}}",
+      "subtitle_other": "Dans cette liste : {{count}}"
     }
   },
   "sections": {

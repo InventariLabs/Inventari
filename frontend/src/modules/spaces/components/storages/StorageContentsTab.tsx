@@ -72,7 +72,13 @@ export function StorageContentsTab({
     return (
       <EmptyState
         icon={PackageOpen}
-        title={t("locations:contents.emptyTitle")}
+        // A place that holds records is not empty: it has no locations
+        // inside, and its records are on the Products tab.
+        title={
+          parent.items_count > 0
+            ? t("locations:contents.noLocationsInside")
+            : t("locations:contents.emptyTitle")
+        }
         description={
           parent.items_count > 0
             ? t("locations:contents.emptyDescription", {
