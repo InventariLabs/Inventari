@@ -168,9 +168,11 @@ export default function AssetListPage() {
     applySort,
     isLoading,
     isError,
+    error,
     refetch,
     archivedLoading,
     archivedError,
+    archivedFailure,
     refetchArchived,
     items,
     equipmentArchived,
@@ -429,7 +431,7 @@ export default function AssetListPage() {
       {listTab === "active" && (
         <>
           {isError ? (
-            <QueryError onRetry={() => refetch()} />
+            <QueryError error={error} onRetry={() => refetch()} />
           ) : isLoading ? (
             <LoadingSpinner />
           ) : items.length === 0 && !search && !hasListFilters ? (
@@ -557,7 +559,10 @@ export default function AssetListPage() {
       {listTab === "archived" && (
         <>
           {archivedError ? (
-            <QueryError onRetry={() => refetchArchived()} />
+            <QueryError
+              error={archivedFailure}
+              onRetry={() => refetchArchived()}
+            />
           ) : archivedLoading ? (
             <LoadingSpinner />
           ) : equipmentArchived.length === 0 ? (

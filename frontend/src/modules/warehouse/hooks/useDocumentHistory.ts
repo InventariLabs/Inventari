@@ -31,7 +31,7 @@ export function useDocumentHistory() {
   }, [deferredSearch, chip, planned, moduleFilters.active]);
 
   const types = HISTORY_CHIPS.find((c) => c.key === chip)?.types;
-  const { data, isLoading, isError, refetch } = useDocuments({
+  const { data, isLoading, isError, error, refetch } = useDocuments({
     search: deferredSearch.trim() || undefined,
     type: types,
     status: planned ? HISTORY_PLANNED_STATUSES : "COMPLETED",
@@ -55,6 +55,7 @@ export function useDocumentHistory() {
     total: data?.total ?? 0,
     isLoading,
     isError,
+    error,
     refetch,
     search,
     setSearch,

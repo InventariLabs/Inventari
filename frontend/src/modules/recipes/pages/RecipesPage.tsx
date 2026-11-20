@@ -407,6 +407,7 @@ export default function RecipesPage() {
   );
   const isLoading = activeQuery.isLoading;
   const isError = activeQuery.isError;
+  const queryError = activeQuery.error;
 
   const controlsVisible = showListControls({
     isLoading,
@@ -734,6 +735,7 @@ export default function RecipesPage() {
               recipes={recipes}
               isLoading={isLoading}
               isError={isError}
+              error={queryError}
               page={page}
               pageSize={PAGE_SIZE}
               total={total}

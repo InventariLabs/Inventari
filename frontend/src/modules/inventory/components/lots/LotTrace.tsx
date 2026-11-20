@@ -202,7 +202,13 @@ function LotSteps({
 
 export function LotTrace({ lotId }: { lotId: string }) {
   const { t } = useTranslation(["inventory", "common"]);
-  const { data: trace, isLoading, isError, refetch } = useLotTrace(lotId);
+  const {
+    data: trace,
+    isLoading,
+    isError,
+    error: loadError,
+    refetch,
+  } = useLotTrace(lotId);
 
   const handleExport = useCallback(async () => {
     try {
@@ -245,7 +251,7 @@ export function LotTrace({ lotId }: { lotId: string }) {
       {isLoading ? (
         <LoadingSpinner />
       ) : isError || !trace ? (
-        <QueryError onRetry={() => void refetch()} />
+        <QueryError error={loadError} onRetry={() => void refetch()} />
       ) : (
         <div className="space-y-4">
           {trace.lots.map((lot) => (

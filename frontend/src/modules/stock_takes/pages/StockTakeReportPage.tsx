@@ -195,7 +195,7 @@ export default function StockTakeReportPage() {
   }
 
   if (isError && !isNotFoundError(error)) {
-    return <QueryError onRetry={refetch} />;
+    return <QueryError error={error} onRetry={refetch} />;
   }
 
   // This one had no way onwards at all — a sentence in the middle of an

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Eye } from "lucide-react";
+import { Eye, Lock } from "lucide-react";
 
 import { useCanManage, useCanWrite } from "@/hooks/useCanWrite";
 import { useHasPermission } from "@/hooks/useHasPermission";
@@ -82,12 +82,14 @@ export function ReadOnlyNotice({
       ? t("access.manageOnlyHint")
       : t("access.readOnlyHint");
 
+  const Icon = cannotRead ? Lock : Eye;
+
   return (
     <div
       className="flex items-start gap-2 rounded-xl bg-surface-inset px-4 py-3 text-on-secondary"
       role="note"
     >
-      <Eye size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
+      <Icon size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
       <div>
         <p className="text-sm font-medium text-on">{title}</p>
         <p className="text-sm">{hint}</p>

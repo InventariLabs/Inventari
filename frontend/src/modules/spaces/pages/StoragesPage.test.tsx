@@ -1008,6 +1008,23 @@ describe("StoragesPage — one screen", () => {
     ).toBeInTheDocument();
   });
 
+  it("tells an account refused the location tree that it cannot open this, without a retry", async () => {
+    server.use(
+      http.get("/api/v1/locations/tree", () =>
+        HttpResponse.json({ detail: "forbidden" }, { status: 403 }),
+      ),
+    );
+    renderPage("/inventory/locations");
+
+    expect(
+      await screen.findByText("You do not have access to this"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Try again" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("An error occurred")).not.toBeInTheDocument();
+  });
+
   it.each([
     [
       "a module-owned",

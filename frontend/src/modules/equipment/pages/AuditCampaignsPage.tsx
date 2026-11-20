@@ -106,7 +106,13 @@ export default function AuditCampaignsPage() {
   // The deadline is pinned to the organization's clock on write, so it is
   // read through that same clock; `launched_at` stays a reader moment.
   const formatOrgDay = useFormatOrgDay();
-  const { data: campaigns = [], isLoading, isError, refetch } = useCampaigns();
+  const {
+    data: campaigns = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useCampaigns();
   const {
     launch,
     launchingId,
@@ -203,7 +209,7 @@ export default function AuditCampaignsPage() {
         resultCount={search ? filteredCampaigns.length : undefined}
       />
 
-      {isError && <QueryError onRetry={() => refetch()} />}
+      {isError && <QueryError error={error} onRetry={() => refetch()} />}
 
       {!isError && isLoading && <LoadingSpinner />}
 

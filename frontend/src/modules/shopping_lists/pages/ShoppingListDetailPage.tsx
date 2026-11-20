@@ -165,7 +165,7 @@ export default function ShoppingListDetailPage() {
   // A list that was deleted is not a failed request, and the reader can act on
   // only one of the two.
   if (error && !isNotFoundError(error)) {
-    return <QueryError onRetry={() => void refetch()} />;
+    return <QueryError error={error} onRetry={() => void refetch()} />;
   }
 
   if (!list) {

@@ -15,7 +15,7 @@ interface QueryErrorProps {
    * a failure: the reader is told the account may not read this, and no retry
    * is offered, because a refusal repeats itself.
    */
-  error?: unknown;
+  error: unknown;
 }
 
 /**

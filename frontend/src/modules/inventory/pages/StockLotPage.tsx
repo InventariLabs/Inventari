@@ -131,7 +131,7 @@ export default function StockLotPage() {
   if (isLoading) return <LoadingSpinner />;
 
   if (isError && !isNotFoundError(error)) {
-    return <QueryError onRetry={() => void refetch()} />;
+    return <QueryError error={error} onRetry={() => void refetch()} />;
   }
 
   if (!lot) {

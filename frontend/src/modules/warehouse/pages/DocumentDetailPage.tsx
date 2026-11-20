@@ -591,6 +591,7 @@ export default function DocumentDetailPage() {
     // A network failure is not a deleted document.
     return (
       <QueryError
+        error={error}
         message={t("errors.loadDocumentFailed")}
         onRetry={() => void refetch()}
       />

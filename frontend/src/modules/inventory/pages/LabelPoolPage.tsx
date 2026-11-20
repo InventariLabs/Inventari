@@ -122,11 +122,15 @@ export default function LabelPoolPage() {
     showGenForm,
   ]);
 
-  const { data, isLoading, isError, refetch } = useLabels(false, undefined, {
-    status: filterStatus === "ALL" ? undefined : filterStatus,
-    offset,
-    limit: PAGE_SIZE,
-  });
+  const { data, isLoading, isError, error, refetch } = useLabels(
+    false,
+    undefined,
+    {
+      status: filterStatus === "ALL" ? undefined : filterStatus,
+      offset,
+      limit: PAGE_SIZE,
+    },
+  );
   // useMemo is REQUIRED: ``data?.items ?? []`` creates a new array reference
   // on every render while data is undefined, which would re-fire the
   // ``useEffect([selectedIds, labels])`` below in an infinite render loop.
@@ -278,7 +282,7 @@ export default function LabelPoolPage() {
         ) : isError ? (
           /* Not an empty pool: the codes are on shelves, and "generate the
              first labels" would print a second set of the same numbers. */
-          <QueryError onRetry={refetch} />
+          <QueryError error={error} onRetry={refetch} />
         ) : labels && labels.length > 0 ? (
           viewMode === "grid" ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-4">

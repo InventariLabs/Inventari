@@ -35,7 +35,7 @@ export function HistoryTab({ recipe }: HistoryTabProps) {
   const resultDefinitionId = useId();
   const navigate = useNavigate();
 
-  const { data, isLoading, isError, refetch } = useProductionOrders({
+  const { data, isLoading, isError, error, refetch } = useProductionOrders({
     output_template_id: recipe.output_template_id,
     limit: 50,
   });
@@ -60,7 +60,7 @@ export function HistoryTab({ recipe }: HistoryTabProps) {
   if (isError) {
     return (
       <Card className="p-4">
-        <QueryError onRetry={() => void refetch()} />
+        <QueryError error={error} onRetry={() => void refetch()} />
       </Card>
     );
   }

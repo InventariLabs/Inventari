@@ -169,7 +169,7 @@ describe("QueryResult", () => {
   it("announces itself — it stands where content was expected", () => {
     // A message that appears and leaves without a word is invisible to a screen
     // reader, and none of the module's error states announced anything.
-    render(<QueryError />);
+    render(<QueryError error={new Error("boom")} />);
     expect(screen.getByRole("alert")).toBeInTheDocument();
   });
 
@@ -217,7 +217,7 @@ describe("QueryResult", () => {
     render(
       <form onSubmit={onSubmit}>
         <InlineQueryError error={new Error("boom")} onRetry={retryInline} />
-        <QueryError onRetry={retryBlock} />
+        <QueryError error={new Error("boom")} onRetry={retryBlock} />
       </form>,
     );
     for (const button of screen.getAllByRole("button")) {

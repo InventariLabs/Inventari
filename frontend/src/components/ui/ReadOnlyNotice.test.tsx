@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ReadOnlyNotice } from "./ReadOnlyNotice";
 
@@ -25,6 +25,10 @@ vi.mock("@/hooks/useHasPermission", () => ({
  * person instead of sending the reader to an administrator.
  */
 describe("ReadOnlyNotice", () => {
+  afterEach(() => {
+    rights.read = true;
+  });
+
   it("sends an account without the manage right to whoever can manage", () => {
     rights.write = true;
     rights.manage = false;
@@ -54,7 +58,6 @@ describe("ReadOnlyNotice", () => {
     expect(note).toHaveTextContent("You cannot open this");
     expect(note).toHaveTextContent(/administrator/i);
     expect(note).not.toHaveTextContent(/can read this module/);
-    rights.read = true;
   });
 
   it("says the module cannot be read even when only the manage right is missing", () => {
@@ -63,7 +66,6 @@ describe("ReadOnlyNotice", () => {
     render(<ReadOnlyNotice module="maker" right="manage" />);
 
     expect(screen.getByRole("note")).toHaveTextContent("You cannot open this");
-    rights.read = true;
   });
 
   it("renders nothing for an account that holds the right", () => {
