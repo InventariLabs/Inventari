@@ -21,6 +21,8 @@ interface DashboardStoragesProps {
   composition: readonly StorageComposition[];
   /** The tree never arrived: say so rather than offer "add your first storage". */
   loadFailed?: boolean;
+  /** The tree has not answered yet: an empty list says nothing about it. */
+  loading?: boolean;
   onRetry?: () => void;
 }
 
@@ -50,6 +52,7 @@ export default function DashboardStorages({
   storageZones,
   composition,
   loadFailed = false,
+  loading = false,
   onRetry,
 }: DashboardStoragesProps) {
   const { t } = useTranslation("common");
@@ -78,6 +81,15 @@ export default function DashboardStorages({
 
       {loadFailed ? (
         <QueryError onRetry={onRetry} />
+      ) : loading ? (
+        <div aria-busy="true" className="space-y-3 py-2.5">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="h-8 animate-pulse rounded bg-surface-inset"
+            />
+          ))}
+        </div>
       ) : rows.length === 0 ? (
         // The call to action must not land on the storage list, where the
         // reader would have to find "add" a second time.

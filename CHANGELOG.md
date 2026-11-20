@@ -279,6 +279,12 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- On a slow connection the Inventory and Equipment overviews no longer state
+  something that is not true while they load. *My locations* shows placeholders
+  instead of "No locations yet" and its create button, and the Equipment
+  attention card shows no count ("8 assets need attention", later 9) until every
+  list it adds up has arrived; the fleet by category and the recent check-outs
+  wait for their answer the same way.
 - After a location is moved physically, **Movements** and a product's
   *Movements* tab show what happened before the move at the path the location
   had then, as the move dialog promises. Goods put on a shelf while it stood
