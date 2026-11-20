@@ -371,10 +371,11 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 #   check:row-action-names:baseline  — WRITERS that regenerate golden files
 #                                      after an intentional change; their
 #                                      verdicts run inside the gates above.
-#                                      The three baselines shrink as the
-#                                      classes are retired — refresh them
-#                                      when a gate reports fixed entries,
-#                                      never to admit a new finding.
+#                                      Baselines shrink as the classes are
+#                                      retired — refresh them with their
+#                                      --write-baseline when a gate reports
+#                                      fixed entries, never by hand and never
+#                                      to admit a new finding.
 #   sync-audit-fields                — the same, one step further out: the
 #                                      backend reads its own snapshot writers
 #                                      and the artefact it prints is what

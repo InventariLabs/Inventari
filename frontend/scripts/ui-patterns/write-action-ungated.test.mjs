@@ -363,6 +363,26 @@ describe("write-action-ungated", () => {
       expect(findings).toEqual([]);
     });
 
+    it("reports a run header that threads canWrite and gates only the cancel", () => {
+      // The production run's shape on the frozen QA pass: canWrite is in the
+      // props and wraps Cancel, while Edit, Start, Complete and Duplicate sit
+      // in the draft branch ungated — a viewer saw all four and met the
+      // refusal after doing the work.
+      const { findings } = writeActionUngated.run([
+        component(`export function RunActions({ canWrite, isDraft, onEdit, onComplete, onDuplicate }) {
+          return (
+            <div>
+              {isDraft && <Button onClick={onEdit}>Edit</Button>}
+              {isDraft && <Button onClick={onComplete}>Complete</Button>}
+              {canWrite && <Button onClick={onDuplicate}>Duplicate</Button>}
+            </div>
+          );
+        }`, "modules/things/components/RunActions.tsx"),
+      ]);
+
+      expect(findings).toEqual(["modules/things/components/RunActions.tsx"]);
+    });
+
     it("reports an …Action component that writes and does not ask for itself", () => {
       const files = [
         component(`import { StartThingAction } from "@/modules/things/components/StartThingAction";

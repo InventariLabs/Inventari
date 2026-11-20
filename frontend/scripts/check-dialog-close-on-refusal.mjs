@@ -31,14 +31,21 @@
  * `catch`, or in `onError` — the dialog is gone exactly when the reader
  * needs it.
  *
+ * The scan is narrow where the class is. A file is read when it draws a
+ * dialog-shaped component and holds a controlled text field, or when the
+ * handler sits in a dialog's `onConfirm`/`onSubmit`/`onSave`; an action
+ * sheet that closes after handing the work to the page above has nothing
+ * typed to lose. The handler is followed into a local function it calls
+ * (`onConfirm={() => { setOpen(false); save(); }}`), one hop.
+ *
  * Modes:
  *   node check-dialog-close-on-refusal.mjs                    # report and exit 1
  *   node check-dialog-close-on-refusal.mjs --baseline         # only NEW findings fail
  *   node check-dialog-close-on-refusal.mjs --write-baseline   # snapshot current
  *   node check-dialog-close-on-refusal.mjs --quiet            # exit code only
  *
- * Baseline: frontend/scripts/dialog-close-baseline.json (one entry per file,
- * handler and close call). The goal is an empty baseline.
+ * Baseline: frontend/scripts/dialog-close-baseline.json (one entry per file
+ * and handler). The goal is an empty baseline.
  */
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
