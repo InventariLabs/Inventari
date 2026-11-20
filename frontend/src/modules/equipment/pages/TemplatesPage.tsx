@@ -128,6 +128,7 @@ export default function TemplatesPage() {
     data: templates,
     isLoading,
     isError,
+    error,
     refetch,
   } = useDocumentTemplates("equipment");
   const deleteTemplateMutation = useDeleteTemplate("equipment");
@@ -137,6 +138,7 @@ export default function TemplatesPage() {
     data: models = [],
     isLoading: modelsLoading,
     isError: modelsError,
+    error: modelsFailure,
     refetch: refetchModels,
   } = useEquipmentModels();
   const { confirm, confirmDialogProps } = useConfirm();
@@ -336,7 +338,7 @@ export default function TemplatesPage() {
 
         <TabsContent value="documents">
           {isError ? (
-            <QueryError onRetry={() => refetch()} />
+            <QueryError error={error} onRetry={() => refetch()} />
           ) : isLoading ? (
             <LoadingSpinner />
           ) : !templates || templates.length === 0 ? (
@@ -384,6 +386,7 @@ export default function TemplatesPage() {
             models={models}
             isLoading={modelsLoading}
             isError={modelsError}
+            error={modelsFailure}
             onRetry={() => refetchModels()}
             onEdit={(m) => {
               setEditingModel(m);

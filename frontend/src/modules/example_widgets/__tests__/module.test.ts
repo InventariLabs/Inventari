@@ -6,6 +6,7 @@
  */
 import { describe, it, expect, beforeAll, vi, beforeEach } from "vitest";
 import { toast } from "sonner";
+import { manualCopyStore } from "@/lib/clipboard";
 import { moduleRegistry } from "@/lib/moduleRegistry";
 
 vi.mock("sonner", () => ({
@@ -87,7 +88,9 @@ describe("example_widgets contributions at work", () => {
     await copyAction().handler(["id-1"]);
 
     expect(toast.success).not.toHaveBeenCalled();
-    expect(toast.error).toHaveBeenCalled();
+    // The ids are not on the screen, so the refused copy puts them there.
+    expect(manualCopyStore.get()?.text).toContain("id-1");
+    manualCopyStore.dismiss();
   });
 
   describe("the name rule on the product form", () => {

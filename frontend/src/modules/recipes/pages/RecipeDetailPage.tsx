@@ -245,7 +245,12 @@ export default function RecipeDetailPage() {
   // error branch takes everything except a 404, and the not-found branch below
   // answers for the recipe that is gone.
   if (recipeQuery.isError && !isNotFoundError(recipeQuery.error)) {
-    return <QueryError onRetry={() => recipeQuery.refetch()} />;
+    return (
+      <QueryError
+        error={recipeQuery.error}
+        onRetry={() => recipeQuery.refetch()}
+      />
+    );
   }
 
   if (!recipe) {

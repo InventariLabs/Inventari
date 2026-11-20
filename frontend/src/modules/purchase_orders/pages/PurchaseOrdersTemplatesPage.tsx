@@ -73,6 +73,7 @@ export default function PurchaseOrdersTemplatesPage() {
     data: templates,
     isLoading,
     isError,
+    error,
     refetch,
   } = useDocumentTemplates("purchase-orders");
   const deleteMutation = useDeleteTemplate("purchase-orders");
@@ -132,6 +133,7 @@ export default function PurchaseOrdersTemplatesPage() {
         <LoadingSpinner />
       ) : isError ? (
         <QueryError
+          error={error}
           onRetry={() => refetch()}
           message={t("templates.load_error", "Failed to load templates.")}
         />

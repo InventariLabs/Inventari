@@ -164,6 +164,7 @@ export default function PurchaseOrderDetailPage() {
     data: linkedReceipts = [],
     isLoading: receiptsLoading,
     isError: receiptsFailed,
+    error: receiptsError,
     refetch: refetchReceipts,
   } = useLinkedReceipts(id ?? "");
 
@@ -349,7 +350,7 @@ export default function PurchaseOrderDetailPage() {
   if (isError && !isNotFoundError(error)) {
     // "This order does not exist" is a different sentence from "we could not
     // load it" — and only the second one is worth retrying.
-    return <QueryError onRetry={() => void refetch()} />;
+    return <QueryError error={error} onRetry={() => void refetch()} />;
   }
   if (!po) {
     return (
@@ -413,6 +414,7 @@ export default function PurchaseOrderDetailPage() {
         receiptCount={linkedReceipts.length}
         isLoading={receiptsLoading}
         isError={receiptsFailed}
+        error={receiptsError}
         onRetry={() => void refetchReceipts()}
       />
 

@@ -137,6 +137,9 @@ export default function DocumentsBoardPage() {
   });
   const isLoading = COLUMN_STATES.some((state) => queries[state].isLoading);
   const isError = COLUMN_STATES.some((state) => queries[state].isError);
+  const error = COLUMN_STATES.map((state) => queries[state].error).find(
+    Boolean,
+  );
   const refetch = () =>
     Promise.all(COLUMN_STATES.map((state) => queries[state].refetch()));
   const measures = useWorkMeasures(REFRESH_MS);
@@ -204,6 +207,7 @@ export default function DocumentsBoardPage() {
         <LoadingSpinner />
       ) : isError ? (
         <QueryError
+          error={error}
           message={t("errors.loadDocumentsFailed")}
           onRetry={() => void refetch()}
         />

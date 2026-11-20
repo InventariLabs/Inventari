@@ -37,6 +37,8 @@ export interface PermissionCatalog {
     module: string;
     /** The manifest's name; null when the registry does not know the module. */
     display_name?: string | null;
+    /** Modules whose records this module's screens list. */
+    requires?: string[];
     permissions: PermissionDefinition[];
   }>;
 }

@@ -29,6 +29,8 @@ export interface PermissionGroup {
   module?: string;
   /** The manifest's name for the module, the label's last resort. */
   displayName?: string | null;
+  /** Modules whose records this module's screens list. */
+  requires?: string[];
   permissions: PermissionDefinition[];
 }
 
@@ -51,6 +53,7 @@ export function permissionGroups(
       id: m.module,
       module: m.module,
       displayName: m.display_name,
+      requires: m.requires,
       permissions: m.permissions,
     })),
   ].filter((g) => g.permissions.length > 0);
@@ -122,4 +125,34 @@ export function matchPermissions(
       labelOf(p).toLowerCase().includes(needle) ||
       p.key.toLowerCase().includes(needle),
   );
+}
+
+/**
+ * The read permissions a role needs for the modules it grants and does not hold.
+ *
+ * A module's screens list its own records and those of the modules it requires
+ * (stock takes list products and locations). A role granting stock-take actions
+ * without those reads opens a screen that answers 403 on every list, so the
+ * editor names the missing reads before the role is saved. Only a read the
+ * catalog offers is named: one that cannot be granted here is not a thing to
+ * warn about.
+ */
+export function missingReads(
+  granted: ReadonlySet<string>,
+  groups: PermissionGroup[],
+): PermissionDefinition[] {
+  const offered = new Map(
+    groups.flatMap((g) => g.permissions.map((p) => [p.key, p] as const)),
+  );
+  const missing = new Map<string, PermissionDefinition>();
+  for (const group of groups) {
+    if (!group.module) continue;
+    if (!group.permissions.some((p) => granted.has(p.key))) continue;
+    for (const name of [group.module, ...(group.requires ?? [])]) {
+      const key = `${name}:read`;
+      const definition = offered.get(key);
+      if (definition && !granted.has(key)) missing.set(key, definition);
+    }
+  }
+  return [...missing.values()];
 }
