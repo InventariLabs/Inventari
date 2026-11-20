@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test/utils";
 import { copyTextOrExplain, manualCopyStore } from "@/lib/clipboard";
+import { ActionMenu } from "@/components/ui/ActionMenu";
 import ManualCopyHost from "./ManualCopyHost";
 
 /**
@@ -48,5 +49,39 @@ describe("ManualCopyHost", () => {
     await user.click(screen.getByRole("button", { name: /done/i }));
 
     expect(screen.queryByTestId("manual-copy-value")).toBeNull();
+  });
+
+  it("keeps the focus in the field when the copy was asked for from a menu", async () => {
+    // The menu hands focus back to its trigger in a step of its own after it
+    // closes; with no clipboard there is no await gap, so the sheet has
+    // already focused the field by then.
+    const user = userEvent.setup();
+    vi.stubGlobal("navigator", { clipboard: undefined });
+    render(
+      <>
+        <ActionMenu
+          label="Row actions"
+          actions={[
+            {
+              id: "copy",
+              label: "Copy link",
+              onSelect: () => {
+                void copyTextOrExplain("http://192.168.1.20/join?code=x", "m");
+              },
+            },
+          ]}
+        />
+        <ManualCopyHost />
+      </>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Row actions" }));
+    await user.click(screen.getByRole("button", { name: "Copy link" }));
+
+    const field = await screen.findByTestId("manual-copy-value");
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+    expect(field).toHaveFocus();
   });
 });
