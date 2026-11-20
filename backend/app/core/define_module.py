@@ -245,8 +245,8 @@ def define_module(
     on_upgrade_hook: Callable[[str, ModuleContext], None] | None = None,
     consumes_stock_quant: bool = False,
     settings_schema: dict[str, Any] | None = None,
-    settings_check: Callable[[dict[str, Any]], None] | None = None,
     default_settings: dict[str, Any] | None = None,
+    settings_check: Callable[[dict[str, Any]], None] | None = None,
 ) -> BaseModule:
     """Create a ``BaseModule`` instance declaratively.
 
@@ -302,6 +302,12 @@ def define_module(
     default_settings:
         Optional ``get_default_settings()`` values applied when the org has not
         overridden them.
+    settings_check:
+        Optional ``check_settings(settings)`` override: refuses a combination
+        of saved settings that the schema, which judges one value at a time,
+        cannot (a tolerance above the ceiling it is measured against). Called
+        on every write with the settings as they would stand, defaults filled;
+        it raises ``ServiceRejectionError``.
     """
     if router is None and router_factory is None:
         raise OperatorError('Either router or router_factory must be provided')

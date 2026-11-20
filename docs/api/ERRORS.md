@@ -490,6 +490,7 @@ apart.
 | `ORGANIZATION_NOT_FOUND` | Organization not found |
 | `ORGANIZATION_REQUIRED` | Organization required |
 | `OVER_RECEIPT_PAST_CEILING` | Receiving {quantity} against {basis} goes past the {ceiling}% over-receipt ceiling — nobody may receive that much |
+| `OVER_RECEIPT_TOLERANCE_ABOVE_CEILING` | The over-receipt tolerance ({tolerance}%) is above the ceiling ({ceiling}%), so it could never apply. Lower the tolerance or raise the ceiling. |
 | `PACKING_DOCUMENT_NOT_OPEN` | Packages can be changed only while the dispatch is confirmed and not yet completed. A completed dispatch keeps its packages as they were shipped. |
 | `PACKING_EXCEEDS_DONE` | {name}: the packages hold {packed}, more than the {done} this dispatch ships. Take the difference out of the packages first, or complete with the quantity they hold. |
 | `PACKING_EXCEEDS_PICKED` | {name}: only {remaining} picked and not yet packed. A package holds what was picked, and nothing that is already in another package. |
