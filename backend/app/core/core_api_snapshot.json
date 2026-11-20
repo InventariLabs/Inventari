@@ -869,6 +869,11 @@
               "kind": "KEYWORD_ONLY",
               "name": "with_counts",
               "required": false
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "count_records",
+              "required": false
             }
           ]
         },
