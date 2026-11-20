@@ -42,7 +42,8 @@
   "viewLinkedReceipts": "Ver recepciones",
   "noReceiptsYet": "Aún no se han creado recepciones",
   "receiptsNote": "Recepciones generadas desde esta orden de compra",
-  "units": "unidades",
+  "units_one": "unidad",
+  "units_other": "unidades",
   "received": "Recibido",
   "receivedCompleted": "Recibido (completado)",
   "linesProgressHint": "Recibido solo cuenta las recepciones completadas; las cantidades en recepciones abiertas se muestran como En tránsito.",
@@ -148,7 +149,9 @@
       "organization_name": "Nombre de la organización",
       "barcode_img": "Imagen de código de barras Code128 (data URI)",
       "qr_img": "Imagen de código QR (data URI)",
-      "currency": "Código de moneda"
+      "currency": "Código de moneda",
+      "lang": "Código de idioma del documento",
+      "labels_footer": "Texto del pie de página en el idioma del documento"
     },
     "documentType": {
       "standard": "Estándar"
@@ -206,6 +209,8 @@
     "price": "Precio",
     "validity": "Validez",
     "minQuantity": "Cant. mín",
+    "anyQuantity": "Cualquier cantidad",
+    "fromQuantity": "Desde {{quantity}} {{unit}}",
     "actions": "Acciones",
     "currency": "Moneda",
     "currencyPlaceholder": "Seleccionar moneda",

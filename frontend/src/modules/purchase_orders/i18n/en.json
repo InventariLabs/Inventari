@@ -42,7 +42,8 @@
   "viewLinkedReceipts": "View receipts",
   "noReceiptsYet": "No receipts created yet",
   "receiptsNote": "Receipts generated from this purchase order",
-  "units": "units",
+  "units_one": "unit",
+  "units_other": "units",
   "received": "Received",
   "receivedCompleted": "Received (completed)",
   "linesProgressHint": "Received counts completed receipts only; quantities on open receipts are shown as in transit.",
@@ -148,7 +149,9 @@
       "organization_name": "Organization name",
       "barcode_img": "Code128 barcode image (data URI)",
       "qr_img": "QR code image (data URI)",
-      "currency": "Currency code"
+      "currency": "Currency code",
+      "lang": "Document language code",
+      "labels_footer": "Footer text in the document language"
     },
     "documentType": {
       "standard": "Standard"
@@ -206,6 +209,8 @@
     "price": "Price",
     "validity": "Valid",
     "minQuantity": "Min qty",
+    "anyQuantity": "Any quantity",
+    "fromQuantity": "From {{quantity}} {{unit}}",
     "actions": "Actions",
     "currency": "Currency",
     "currencyPlaceholder": "Select currency",

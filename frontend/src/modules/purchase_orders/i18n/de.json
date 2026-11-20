@@ -42,7 +42,8 @@
   "viewLinkedReceipts": "Wareneingänge anzeigen",
   "noReceiptsYet": "Noch keine Wareneingänge erstellt",
   "receiptsNote": "Aus dieser Bestellung generierte Wareneingänge",
-  "units": "Einheiten",
+  "units_one": "Einheit",
+  "units_other": "Einheiten",
   "received": "Empfangen",
   "receivedCompleted": "Empfangen (abgeschlossen)",
   "linesProgressHint": "Empfangen zählt nur abgeschlossene Wareneingänge; Mengen auf offenen Wareneingängen werden als Unterwegs angezeigt.",
@@ -148,7 +149,9 @@
       "organization_name": "Organisationsname",
       "barcode_img": "Code128-Barcodebild (Data-URI)",
       "qr_img": "QR-Codebild (Data-URI)",
-      "currency": "Währungscode"
+      "currency": "Währungscode",
+      "lang": "Sprachcode des Dokuments",
+      "labels_footer": "Fußzeilentext in der Dokumentsprache"
     },
     "documentType": {
       "standard": "Standard"
@@ -206,6 +209,8 @@
     "price": "Preis",
     "validity": "Gültigkeit",
     "minQuantity": "Mindestmenge",
+    "anyQuantity": "Beliebige Menge",
+    "fromQuantity": "Ab {{quantity}} {{unit}}",
     "actions": "Aktionen",
     "currency": "Währung",
     "currencyPlaceholder": "Währung auswählen",

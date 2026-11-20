@@ -1,12 +1,19 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, status
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts.dtos import UserContextDTO
-from app.core.deps import get_async_db, get_current_user_context, require_org
+from app.core.deps import (
+    get_async_db,
+    get_current_user_context,
+    read_only_post,
+    require_org,
+)
 from app.core.exceptions import (
     NotFoundException,
+    ServiceRejectionError,
     catalogue_refusal,
 )
 from app.core.logging import get_logger
@@ -45,6 +52,10 @@ PO_PLACEHOLDERS: list[PlaceholderInfo] = [
     ),
     PlaceholderInfo(key='{{qr_img}}', description='QR code image (data URI)'),
     PlaceholderInfo(key='{{currency}}', description='Currency code'),
+    PlaceholderInfo(key='{{lang}}', description='Document language code'),
+    PlaceholderInfo(
+        key='{{labels.footer}}', description='Footer text in the document language'
+    ),
 ]
 
 
@@ -71,6 +82,47 @@ async def list_placeholders(
     current_user: UserContextDTO = Depends(get_current_user_context),
 ) -> list[PlaceholderInfo]:
     return PO_PLACEHOLDERS
+
+
+class TemplatePreviewRequest(BaseModel):
+    """A layout to render, as the editor currently has it."""
+
+    body_html: str
+
+
+class TemplatePreviewResponse(BaseModel):
+    """The layout rendered onto the example order."""
+
+    html: str
+
+
+@_templates_router.post('/preview', response_model=TemplatePreviewResponse)
+@read_only_post
+async def preview_template(
+    data: TemplatePreviewRequest,
+    current_user: UserContextDTO = Depends(get_current_user_context),
+) -> TemplatePreviewResponse:
+    """What this layout prints, on an order made up for the purpose.
+
+    The same render the PDF goes through, on the context ``build_po_context``
+    builds, so the preview cannot describe a document the printer would not
+    produce.
+    """
+    from pathlib import Path
+
+    from ._po_render_context import build_po_context, example_order
+
+    try:
+        html = core_api.pdf.render_html(
+            data.body_html,
+            build_po_context(example_order(), get_current_lang()),
+            templates_dir=Path(__file__).parent / 'templates',
+        )
+    except Exception as exc:  # a draft template is user input
+        raise ServiceRejectionError(
+            'template_import_not_renderable', detail=str(exc)
+        ) from exc
+    return TemplatePreviewResponse(html=html)
 
 
 @_templates_router.post(

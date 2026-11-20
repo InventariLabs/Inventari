@@ -42,7 +42,10 @@
   "viewLinkedReceipts": "Zobacz przyjęcia",
   "noReceiptsYet": "Nie utworzono jeszcze żadnych przyjęć",
   "receiptsNote": "Dokumenty przyjęcia wygenerowane z tego zamówienia",
-  "units": "jednostki",
+  "units_one": "jednostka",
+  "units_few": "jednostki",
+  "units_many": "jednostek",
+  "units_other": "jednostki",
   "received": "Przyjęto",
   "receivedCompleted": "Przyjęto (zakończone)",
   "linesProgressHint": "Przyjęto uwzględnia tylko zakończone przyjęcia; ilości na otwartych przyjęciach są pokazane jako W drodze.",
@@ -150,7 +153,9 @@
       "organization_name": "Nazwa organizacji",
       "barcode_img": "Obraz kodu kreskowego Code128 (data URI)",
       "qr_img": "Obraz kodu QR (data URI)",
-      "currency": "Kod waluty"
+      "currency": "Kod waluty",
+      "lang": "Kod języka dokumentu",
+      "labels_footer": "Tekst stopki w języku dokumentu"
     },
     "documentType": {
       "standard": "Standardowy"
@@ -212,6 +217,8 @@
     "price": "Cena",
     "validity": "Ważność",
     "minQuantity": "Min. ilość",
+    "anyQuantity": "Dowolna ilość",
+    "fromQuantity": "Od {{quantity}} {{unit}}",
     "actions": "Akcje",
     "currency": "Waluta",
     "currencyPlaceholder": "Wybierz walutę",

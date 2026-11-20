@@ -42,7 +42,8 @@
   "viewLinkedReceipts": "Voir les réceptions",
   "noReceiptsYet": "Aucune réception créée pour l'instant",
   "receiptsNote": "Réceptions générées à partir de ce bon de commande",
-  "units": "unités",
+  "units_one": "unité",
+  "units_other": "unités",
   "received": "Reçu",
   "receivedCompleted": "Reçu (terminé)",
   "linesProgressHint": "Reçu ne compte que les réceptions terminées ; les quantités sur les réceptions ouvertes sont indiquées comme En transit.",
@@ -148,7 +149,9 @@
       "organization_name": "Nom de l'organisation",
       "barcode_img": "Image du code-barres Code128 (data URI)",
       "qr_img": "Image du QR code (data URI)",
-      "currency": "Code devise"
+      "currency": "Code devise",
+      "lang": "Code de langue du document",
+      "labels_footer": "Texte de pied de page dans la langue du document"
     },
     "documentType": {
       "standard": "Standard"
@@ -206,6 +209,8 @@
     "price": "Prix",
     "validity": "Validité",
     "minQuantity": "Qté min",
+    "anyQuantity": "Toute quantité",
+    "fromQuantity": "À partir de {{quantity}} {{unit}}",
     "actions": "Actions",
     "currency": "Devise",
     "currencyPlaceholder": "Sélectionner une devise",

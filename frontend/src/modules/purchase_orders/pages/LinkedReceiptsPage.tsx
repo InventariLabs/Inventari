@@ -138,13 +138,15 @@ export default function LinkedReceiptsPage() {
                     {t("receivedCompleted")}:{" "}
                     {formatQuantityLocale(line.quantity_received)} /{" "}
                     {formatQuantityLocale(line.quantity_ordered)}{" "}
-                    {unitLabel(t, line.uom_symbol) || t("units")}
+                    {unitLabel(t, line.uom_symbol) ||
+                      t("units", { count: Number(line.quantity_ordered) })}
                     {inTransit > 0 && (
                       <span className="text-amber-600">
                         {" · "}
                         {t("receipt.colInTransit")}:{" "}
                         {formatQuantityValue(inTransit)}{" "}
-                        {unitLabel(t, line.uom_symbol) || t("units")}
+                        {unitLabel(t, line.uom_symbol) ||
+                          t("units", { count: inTransit })}
                       </span>
                     )}
                   </div>
