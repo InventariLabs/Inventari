@@ -20,6 +20,7 @@ const mocks = vi.hoisted(() => ({
     toggleTorch: vi.fn(),
     setIsCameraActive: vi.fn(),
   },
+  enabledModules: [] as string[],
   addToShoppingList: vi.fn(),
   consume: vi.fn(),
   updateQuantity: vi.fn(),
@@ -32,6 +33,11 @@ vi.mock("react-router-dom", async (importOriginal) => {
 
 vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
+}));
+
+// The organization's enabled modules; a test sets it to say what is switched on.
+vi.mock("@/contexts/ModulesContext", () => ({
+  useEnabledModulesOptional: () => mocks.enabledModules,
 }));
 
 vi.mock("@/lib/api/labels", () => ({
@@ -192,6 +198,7 @@ function renderPage(entries = ["/"], index = 0) {
 describe("ScanPage — the sheets a scan opens, and the ways out of them", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.enabledModules = ["shopping_lists"];
     signInWith(["items:read", "items:write", "shopping_lists:write"]);
     useScanStore.getState().setStorageContext(null);
   });
@@ -335,6 +342,21 @@ describe("ScanPage — the sheets a scan opens, and the ways out of them", () =>
       expect(screen.queryByRole("dialog", { name: "stock" })).toBeNull(),
     );
     expect(mocks.camera.resumeCamera).toHaveBeenCalledTimes(1);
+  });
+
+  it("offers no shopping-list action to an administrator when the module is off", async () => {
+    scanAnswers(stockView);
+    mocks.enabledModules = [];
+    signOut();
+    signInWith([], { role: "admin" });
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(screen.getByRole("button", { name: "type code" }));
+    await screen.findByRole("dialog", { name: "stock" });
+    expect(
+      screen.queryByRole("button", { name: "to shopping list" }),
+    ).toBeNull();
   });
 
   it("keeps the stock sheet and says so when the shopping list refuses", async () => {

@@ -355,7 +355,7 @@ async def launch_campaign(
     # Without a mail server the links are still made — each person's can be
     # copied from the campaign page and handed over — but nothing is queued
     # that could never leave, and the answer says so.
-    email_unavailable = not core_api.email.is_configured()
+    email_unavailable = not await core_api.email.can_send_async(db, org_id)
 
     created_count = 0
     email_sent = 0
@@ -485,7 +485,7 @@ async def send_reminders(
     reminded_recently = 0
     not_delivered = 0
     # The queue accepts a message whether or not anything can deliver it.
-    email_unavailable = not core_api.email.is_configured()
+    email_unavailable = not await core_api.email.can_send_async(db, org_id)
 
     # Same clock as the invitation: the reminder prints the organization's
     # deadline day, not UTC's.

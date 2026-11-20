@@ -63,7 +63,12 @@ let listRequests: URLSearchParams[];
 
 beforeEach(() => {
   listRequests = [];
-  signInWith(["equipment:read", "equipment:write", "items:read"]);
+  signInWith([
+    "equipment:read",
+    "equipment:write",
+    "items:read",
+    "items:purge",
+  ]);
   server.use(
     http.get("/api/v1/categories", () => HttpResponse.json(onePage([]))),
     http.get("/api/v1/locations", () =>
@@ -271,6 +276,73 @@ describe("AssetListPage — the archive tab", () => {
       within(dialog).getByRole("button", { name: "Delete Permanently" }),
     );
     await waitFor(() => expect(purged).toHaveBeenCalledWith(["asset-9"]));
+  });
+});
+
+describe("AssetListPage — the archive tab without permanent deletion", () => {
+  async function openArchive(user: ReturnType<typeof renderList>) {
+    await screen.findAllByText("Laptop 1");
+    await user.click(screen.getByRole("tab", { name: /Archived/ }));
+    await screen.findByText("Old Printer");
+  }
+
+  function organizationWith(allow: boolean) {
+    server.use(
+      http.get("/api/v1/organizations/my", () =>
+        HttpResponse.json({
+          id: "1",
+          name: "Test Organization",
+          currency: "PLN",
+          settings: { allow_permanent_delete: allow },
+        }),
+      ),
+    );
+  }
+
+  it("offers Restore only when the organization does not allow it", async () => {
+    organizationWith(false);
+    const user = renderList();
+    await openArchive(user);
+
+    expect(screen.getByRole("button", { name: /Restore/ })).toBeVisible();
+    expect(
+      screen.queryByRole("button", { name: /Delete Permanently/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("checkbox", { name: /Old Printer/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Delete Selected/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("offers no purge control to an account without items:purge", async () => {
+    organizationWith(true);
+    signInWith(["equipment:read", "equipment:write", "items:read"]);
+    const user = renderList();
+    await openArchive(user);
+
+    expect(screen.getByRole("button", { name: /Restore/ })).toBeVisible();
+    expect(
+      screen.queryByRole("button", { name: /Delete Permanently/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("checkbox", { name: /Old Printer/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("offers Delete Permanently and Delete Selected when both allow it", async () => {
+    organizationWith(true);
+    const user = renderList();
+    await openArchive(user);
+
+    expect(
+      screen.getByRole("button", { name: /Delete Permanently/ }),
+    ).toBeVisible();
+    await user.click(screen.getByRole("checkbox", { name: /Old Printer/ }));
+    expect(
+      await screen.findByRole("button", { name: /Delete Selected/ }),
+    ).toBeVisible();
   });
 });
 
