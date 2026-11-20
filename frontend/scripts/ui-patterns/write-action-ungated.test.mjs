@@ -301,4 +301,84 @@ describe("write-action-ungated", () => {
     expect(considered).toBe(0);
     expect(findings).toEqual([]);
   });
+
+  describe("a component that threads the gate and guards nothing", () => {
+    const component = (text, path = "modules/things/components/Row.tsx") => ({
+      path,
+      text,
+    });
+    const ROW = `export function Row({ canWrite, onEdit }) {
+      return (
+        <div>
+          CONTROLS
+        </div>
+      );
+    }`;
+    const row = (controls) => component(ROW.replace("CONTROLS", controls));
+
+    it("reports a click handed down by the page when the gate is only passed on", () => {
+      const { findings } = writeActionUngated.run([
+        row(`<Child canWrite={canWrite} /><Button onClick={onEdit}>Edit</Button>`),
+      ]);
+
+      expect(findings).toEqual(["modules/things/components/Row.tsx"]);
+    });
+
+    it("reports one ungated button among gated ones", () => {
+      const { findings } = writeActionUngated.run([
+        row(`{canWrite && (
+            <Button onClick={onEdit}>Edit</Button>
+          )}
+          <Button onClick={onDuplicate}>Duplicate</Button>`),
+      ]);
+
+      expect(findings).toEqual(["modules/things/components/Row.tsx"]);
+    });
+
+    it("leaves a button the gate encloses, or one that disables itself on it", () => {
+      const { findings } = writeActionUngated.run([
+        row(`{canWrite && <Button onClick={onEdit}>Edit</Button>}
+          <Button disabled={!canWrite} onClick={onDuplicate}>Copy</Button>`),
+      ]);
+
+      expect(findings).toEqual([]);
+    });
+
+    it("leaves a file that returns early for an account that may not write", () => {
+      const { findings } = writeActionUngated.run([
+        component(`export function Row({ canWrite, onEdit }) {
+          if (!canWrite) return null;
+          return <Button onClick={onEdit}>Edit</Button>;
+        }`),
+      ]);
+
+      expect(findings).toEqual([]);
+    });
+
+    it("ignores a click that dismisses rather than writes", () => {
+      const { findings } = writeActionUngated.run([
+        row(`<Button onClick={onClose}>Close</Button>`),
+      ]);
+
+      expect(findings).toEqual([]);
+    });
+
+    it("reports an …Action component that writes and does not ask for itself", () => {
+      const files = [
+        row(`<StartThingAction />`).text &&
+          component(`import { StartThingAction } from "@/modules/things/components/StartThingAction";
+            export function Row({ canWrite }) {
+              return <div><StartThingAction /></div>;
+            }`),
+        component(
+          `export function StartThingAction() { const go = useAppMutation(x); return null; }`,
+          "modules/things/components/StartThingAction.tsx",
+        ),
+      ];
+
+      const { findings } = writeActionUngated.run(files);
+
+      expect(findings).toContain("modules/things/components/Row.tsx");
+    });
+  });
 });

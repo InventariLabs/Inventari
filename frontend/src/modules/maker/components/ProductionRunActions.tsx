@@ -29,7 +29,9 @@ interface Props {
  * cancelled; a completed one is undone. flex-wrap, not smaller buttons: the
  * row holds the status badge and up to five actions, and on a phone it used
  * to run past the edge — "Complete run" cut mid-label, "Duplicate" invisible.
- * Same pattern as DocumentActionButtons.
+ * Same pattern as DocumentActionButtons. Every action but the manager's own
+ * (cancel, undo) is for an account that may write; a reader sees the status
+ * alone, and the page above says why.
  */
 export function ProductionRunActions({
   order,
@@ -49,7 +51,7 @@ export function ProductionRunActions({
   return (
     <div className="flex flex-wrap items-center gap-3">
       <ProductionStatusBadge status={order.status} />
-      {isDraft && (
+      {isDraft && canWrite && (
         <Button
           variant="outline"
           onClick={onEdit}
@@ -66,7 +68,7 @@ export function ProductionRunActions({
           onCancel={onCancel}
         />
       )}
-      {isDraft && (
+      {isDraft && canWrite && (
         <>
           <StartRunAction order={order} onShortage={onShortage} />
           <Button
@@ -78,17 +80,19 @@ export function ProductionRunActions({
           </Button>
         </>
       )}
-      {isInProgress && <FinishRunAction order={order} />}
+      {isInProgress && canWrite && <FinishRunAction order={order} />}
       <ReverseRunAction order={order} />
-      <Button
-        variant="outline"
-        onClick={onDuplicate}
-        disabled={isDuplicating}
-        leftIcon={<Copy size={16} />}
-        data-testid="maker-detail-duplicate-button"
-      >
-        {t("detail.duplicate", { defaultValue: "Duplicate" })}
-      </Button>
+      {canWrite && (
+        <Button
+          variant="outline"
+          onClick={onDuplicate}
+          disabled={isDuplicating}
+          leftIcon={<Copy size={16} />}
+          data-testid="maker-detail-duplicate-button"
+        >
+          {t("detail.duplicate", { defaultValue: "Duplicate" })}
+        </Button>
+      )}
     </div>
   );
 }

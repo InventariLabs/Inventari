@@ -325,6 +325,133 @@ function publicPages(files) {
   );
 }
 
+
+/**
+ * The controls of a component that hand the click to the page above it.
+ *
+ * `<Button onClick={onEdit}>` carries the write in a prop: the file has no
+ * mutation to find, and the page above it already "asks", so the page-level
+ * rule is satisfied however the row is drawn. The production run's header was
+ * exactly this — Edit, Start, Complete and Duplicate offered to an account
+ * that holds none of them, in a file that threaded `canWrite` to its Cancel
+ * button and to nothing else.
+ */
+const PROP_CLICK =
+  /onClick=\{\s*on(?:Edit|Duplicate|Complete|Start|Finish|Delete|Remove|Add|Create|Save|Submit|Confirm|Apply|Receive|Pick|Execute|Move|Reverse|Archive|Restore|Import|Adjust)\w*\s*\}/;
+
+/** The first `>` of a tag that is not inside a `{…}` expression. */
+function tagEnd(text, from) {
+  let depth = 0;
+  for (let i = from; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === "{") depth++;
+    else if (ch === "}") depth--;
+    else if (ch === ">" && depth === 0 && text[i - 1] !== "=") return i;
+  }
+  return text.length;
+}
+
+/**
+ * Is the gate used to decide something, not just carried?
+ *
+ * `canWrite={canWrite}`, a prop type and a destructured parameter name the
+ * answer without acting on it; only an operator, a ternary, a negation or an
+ * `if` does. An early `if (!canWrite) return null` guards the whole file.
+ */
+const GUARD =
+  /(?:\bcan(?:Write|Manage)\w*|\buseCan\w+\s*\([^)]*\))\s*(?:&&|\|\||\?(?!\.))|(?:&&|\|\||\?)\s*!?\s*can(?:Write|Manage)\w*\b|!\s*can(?:Write|Manage)\w*\b|\bif\s*\([^)]*\bcan(?:Write|Manage)\w*/;
+const EARLY_RETURN =
+  /\bif\s*\(\s*!\s*can(?:Write|Manage)\w*[^)]*\)\s*(?:\{\s*)?return\b/;
+
+/**
+ * The text of every enclosing `{…}` and `(…)` opener on the way back to the
+ * start of the file, each as the line it opens on — where `{canWrite && (`
+ * says what the control inside depends on.
+ */
+function enclosingOpeners(text, at) {
+  const lines = [];
+  const closers = [];
+  for (let i = at - 1; i >= 0; i--) {
+    const ch = text[i];
+    if (ch === ")" || ch === "}") closers.push(ch);
+    else if (ch === "(" || ch === "{") {
+      if (closers.length > 0) closers.pop();
+      else {
+        const start = text.lastIndexOf("\n", i) + 1;
+        const end = text.indexOf("\n", i);
+        lines.push(text.slice(start, end === -1 ? text.length : end));
+      }
+    }
+  }
+  return lines;
+}
+
+/**
+ * Components whose controls are gated one hop away, in the same file or by
+ * the state they are rendered in — said here with the reason, so the entry
+ * is checked when the file changes.
+ */
+const GATED_ELSEWHERE = new Map([
+  [
+    "modules/shopping_lists/components/ShoppingListCard.tsx",
+    "the save button exists only while renaming, which the gated menu starts",
+  ],
+  [
+    "modules/inventory/components/StockActionSheet.tsx",
+    "the page withholds the handler from an account that may not write",
+  ],
+  [
+    "modules/warehouse/components/DocumentActionButtons.tsx",
+    "the row is mounted only inside the `canWrite` branch of the same file",
+  ],
+]);
+
+/** The leaf components under `modules/*\/components/` that offer a write. */
+const COMPONENT = /^modules\/[^/]+\/components\/(?:[^/]+\/)*[^/]+\.tsx$/;
+
+/**
+ * A component that names a permission, offers a write, and does not let the
+ * permission decide whether the write is offered.
+ *
+ * Narrower than the page rule on purpose: it reads only a file that already
+ * mentions the question (a file that never does is the page's to answer for,
+ * and the page rule reads it), and then asks of each control whether the
+ * question encloses it. A control is a button whose click is a prop callback,
+ * or an `…Action` component of this module that writes and does not ask for
+ * itself.
+ */
+export function ungatedControls(file, byPath, hooks) {
+  const text = withoutComments(file.text);
+  if (!GATES.test(text) || EARLY_RETURN.test(text)) return [];
+
+  const found = [];
+  const unguarded = (at) =>
+    !enclosingOpeners(text, at).some((line) => GUARD.test(line));
+
+  for (const match of text.matchAll(/<Button(?=[\s/>])/g)) {
+    const tag = text.slice(match.index, tagEnd(text, match.index));
+    if (PROP_CLICK.test(tag) && !GUARD.test(tag) && unguarded(match.index))
+      found.push(tag);
+  }
+
+  const seen = new Set();
+  for (const { specifier, names } of importsIn(text)) {
+    const target = resolveImport(byPath, specifier);
+    if (!target || target.path === file.path) continue;
+    if (!COMPONENT.test(target.path) || ASKS.test(withoutComments(target.text)))
+      continue;
+    if (!anyWriteBelow(target.path, byPath, hooks, new Set())) continue;
+    for (const name of names.filter((n) => n.endsWith("Action"))) {
+      const tag = new RegExp(`<${name}(?=[\\s/>])`).exec(text);
+      if (tag && !seen.has(name) && unguarded(tag.index)) {
+        seen.add(name);
+        found.push(name);
+      }
+    }
+  }
+  return found;
+}
+
 export default {
   name: "write-action-ungated",
   // Hooks are `.ts`; the pages' own corpus stops at `.tsx` and would hide
@@ -376,6 +503,16 @@ export default {
       })
       .map((file) => file.path);
 
-    return { considered: considered.length, findings };
+    // The component half: a threaded gate that guards nothing.
+    const components = files.filter((file) => COMPONENT.test(file.path));
+    const ungated = components
+      .filter((file) => !GATED_ELSEWHERE.has(file.path))
+      .filter((file) => ungatedControls(file, byPath, hooks).length > 0)
+      .map((file) => file.path);
+
+    return {
+      considered: considered.length,
+      findings: [...new Set([...findings, ...ungated])],
+    };
   },
 };

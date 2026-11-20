@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
@@ -102,6 +102,12 @@ let currentPlanned: { entries: Array<Record<string, unknown>> } | undefined =
 vi.mock("@/modules/maker/hooks/useCostBreakdown", () => ({
   useCostBreakdown: () => ({ data: currentPlanned }),
 }));
+
+// A run is acted on by an account that may write; the cases about an account
+// that may not sign in as one themselves.
+beforeEach(() => {
+  signInWith(["maker:read", "maker:write"]);
+});
 
 function renderPage() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -244,6 +250,40 @@ describe("ProductionDetailPage — the stock moves did not load", () => {
     expect(screen.getByRole("alert")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /try again/i }));
     expect(stockMovesRead.refetch).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("ProductionDetailPage — an account that may only read", () => {
+  const ACTIONS = [
+    "maker-detail-edit-button",
+    "maker-detail-start-button",
+    "maker-detail-complete-button",
+    "maker-detail-duplicate-button",
+    "maker-detail-cancel-button",
+  ];
+
+  it("offers a draft none of its actions and says why", () => {
+    currentOrder = draftOrder;
+    signInWith(["maker:read"]);
+    renderPage();
+    for (const id of ACTIONS) {
+      expect(screen.queryByTestId(id)).not.toBeInTheDocument();
+    }
+    expect(
+      screen.getByText(/you can view this, not change it/i),
+    ).toBeInTheDocument();
+  });
+
+  it("offers a completed run no Duplicate and no Undo", () => {
+    currentOrder = { ...draftOrder, status: "COMPLETED" };
+    signInWith(["maker:read"]);
+    renderPage();
+    expect(
+      screen.queryByTestId("maker-detail-duplicate-button"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("maker-detail-reverse-button"),
+    ).not.toBeInTheDocument();
   });
 });
 
