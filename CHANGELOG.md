@@ -295,6 +295,9 @@ says what the release does rather than what changed since them.
   upgrade start reads as expected, and *Updating* in `DEPLOYMENT.md` says how
   a development stack takes the backup and lists the variables a release
   added.
+- Counting a location that has sub-locations now offers, in the bar of
+  products outside the stock take, a product received onto a sub-location
+  after the count started, as counting that sub-location itself does.
 - A production recipe's reference price can no longer be negative. Creating
   or changing a recipe with one is refused with a message naming the field,
   instead of being stored and understating the result per unit of every run
