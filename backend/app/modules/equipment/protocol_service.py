@@ -232,7 +232,20 @@ async def render_protocol_html(
     # out — the same treatment every documents/PO template gets. A
     # sandboxed render alone stops template injection, not markup the
     # template's author wrote on purpose.
-    return core_api.pdf.render_html(template_html, context)
+    try:
+        return core_api.pdf.render_html(template_html, context)
+    except Exception:
+        # A stored layout that does not render prints through the built-in one.
+        logger.warning(
+            'A stored protocol layout does not render; using the built-in one',
+            exc_info=True,
+        )
+        built_in = (
+            _DEFAULT_CHECKIN_TEMPLATE
+            if assignment.checked_in_at
+            else _DEFAULT_CHECKOUT_TEMPLATE
+        )
+        return core_api.pdf.render_html(built_in, context)
 
 
 async def render_protocol_pdf_async(
