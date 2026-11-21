@@ -23,8 +23,6 @@ from typing import Any
 
 import pytest
 
-from app.modules.mcp_server.tests.conftest import issue_key  # noqa: F401  (fixtures)
-
 SNAPSHOT = Path(__file__).parent.parent / 'snapshots' / 'tools.json'
 
 #: Fragments the MCP server library and pydantic put in their validation text.
