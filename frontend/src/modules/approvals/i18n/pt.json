@@ -121,6 +121,7 @@
     "saveFailed": "Não foi possível salvar o fluxo",
     "removeStage": "Remover etapa",
     "addApprover": "Adicionar aprovador",
+    "cannotApprove": "não vê as aprovações",
     "removeApprover": "Remover aprovador",
     "selectApprovers": "Selecionar aprovadores",
     "searchUsers": "Buscar usuários…",

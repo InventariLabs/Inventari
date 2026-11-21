@@ -1,12 +1,13 @@
 {
   "auth_required": "This endpoint needs an API key: send it in the 'X-API-Key' header.",
-  "permission_required": "This API key does not hold the mcp_server:use permission.",
+  "permission_required": "This API key is missing a permission: 'Use the MCP endpoint'.",
   "module_disabled": "The MCP Server module is switched off for this organization.",
   "organization_required": "An MCP call acts in an organization, and this key belongs to none.",
   "insufficient_permission": "This API key does not hold the {permission} permission.",
   "call_without_identity": "This tool call has no authenticated workspace.",
   "item_not_found": "No record with id {item_id} exists in this workspace.",
   "location_not_found": "No location with id {location_id} exists in this workspace.",
+  "location_required": "A record needs a shelf: pass location_id. Call list_locations to find one.",
   "lot_not_found": "No batch with id {lot_id} exists in this workspace.",
   "reason_required": "A correction needs a reason: say why the quantity changes.",
   "quantity_not_negative": "A stock quantity cannot be negative."

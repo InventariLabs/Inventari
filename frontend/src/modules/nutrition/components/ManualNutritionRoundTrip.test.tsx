@@ -1,7 +1,8 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { signInWith, signOut } from "@/test/auth";
 import FoodAndHealthExtra from "@/modules/nutrition/components/FoodAndHealthExtra";
 import ProductNutritionOnItemSlot from "@/modules/nutrition/components/ProductNutritionOnItemSlot";
 import * as modulesCtx from "@/contexts/ModulesContext";
@@ -19,7 +20,12 @@ vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
  * show it.
  */
 describe("a nutrition value typed in by hand", () => {
+  afterEach(() => {
+    signOut();
+  });
+
   beforeEach(() => {
+    signInWith(["items:read", "items:write"]);
     vi.restoreAllMocks();
     vi.spyOn(modulesCtx, "useModules").mockReturnValue({
       enabledModules: ["nutrition"],

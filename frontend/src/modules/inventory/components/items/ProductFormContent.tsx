@@ -50,6 +50,77 @@ interface ProductFormContentProps {
    * form that creates a record asks: an open record is not a new product.
    */
   suggestExistingProducts?: boolean;
+  /**
+   * The reader may look but not change. The caller's fieldset disables the
+   * inputs; the photo tile (a label that takes a file) and the "configure"
+   * link (a way into a write screen) are drawn plain or left out here.
+   */
+  readOnly?: boolean;
+}
+
+/**
+ * The photo tile: a label that takes a file where the reader may change the
+ * product, a plain frame showing the picture where they may not.
+ */
+function PhotoTile({
+  preview,
+  readOnly,
+  onPreview,
+  onImageSelect,
+}: {
+  preview: string | null;
+  readOnly: boolean;
+  onPreview: (url: string | null) => void;
+  onImageSelect?: (file: File) => void | Promise<void>;
+}) {
+  const { t } = useTranslation(["items", "common"]);
+  const photo = preview ? (
+    <img
+      src={preview}
+      className="w-full h-full object-cover"
+      alt={t("common:a11y.imagePreview")}
+      loading="lazy"
+    />
+  ) : (
+    <Camera size={22} className="text-on-muted" />
+  );
+  if (readOnly) {
+    return (
+      <div className="w-24 h-24 rounded-xl border border-border bg-surface flex flex-col items-center justify-center overflow-hidden shrink-0">
+        {photo}
+      </div>
+    );
+  }
+  return (
+    <label className="w-24 h-24 rounded-xl border border-dashed border-border bg-surface flex flex-col items-center justify-center cursor-pointer hover:bg-primary-50 hover:border-primary-300 transition-all overflow-hidden shrink-0">
+      {photo}
+      <input
+        type="file"
+        className="hidden"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          // Emptied so that picking this file again, after a refusal
+          // say, is a change the browser reports.
+          e.target.value = "";
+          if (file) {
+            // The local preview bridges the wait for an upload;
+            // once the handler's promise settles it must not land
+            // over whatever the handler put on show.
+            let settled = false;
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              if (!settled) onPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+            void onImageSelect?.(file)?.finally(() => {
+              settled = true;
+            });
+          }
+        }}
+      />
+    </label>
+  );
 }
 
 /**
@@ -78,6 +149,7 @@ export default function ProductFormContent({
   onAddStorage,
   templateUnit = null,
   suggestExistingProducts = false,
+  readOnly = false,
 }: ProductFormContentProps) {
   const { t } = useTranslation(["items", "categories", "common"]);
 
@@ -139,43 +211,12 @@ export default function ProductFormContent({
         <div className="space-y-5">
           <div className="flex gap-4 items-start">
             {setImagePreview && (
-              <label className="w-24 h-24 rounded-xl border border-dashed border-border bg-surface flex flex-col items-center justify-center cursor-pointer hover:bg-primary-50 hover:border-primary-300 transition-all overflow-hidden shrink-0">
-                {imagePreview ? (
-                  <img
-                    src={imagePreview}
-                    className="w-full h-full object-cover"
-                    alt={t("common:a11y.imagePreview")}
-                    loading="lazy"
-                  />
-                ) : (
-                  <Camera size={22} className="text-on-muted" />
-                )}
-                <input
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    // Emptied so that picking this file again, after a refusal
-                    // say, is a change the browser reports.
-                    e.target.value = "";
-                    if (file) {
-                      // The local preview bridges the wait for an upload;
-                      // once the handler's promise settles it must not land
-                      // over whatever the handler put on show.
-                      let settled = false;
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        if (!settled) setImagePreview(reader.result as string);
-                      };
-                      reader.readAsDataURL(file);
-                      void onImageSelect?.(file)?.finally(() => {
-                        settled = true;
-                      });
-                    }
-                  }}
-                />
-              </label>
+              <PhotoTile
+                preview={imagePreview ?? null}
+                readOnly={readOnly}
+                onPreview={setImagePreview}
+                onImageSelect={onImageSelect}
+              />
             )}
             <div className="flex-1">
               <Input
@@ -255,29 +296,33 @@ export default function ProductFormContent({
                 {t("addStorage")}
               </Button>
             )}
-            <a
-              href={
-                selectedStorageId
-                  ? // The link says "configure", so it opens the edit sheet.
-                    // Without the parameter it landed on the location's
-                    // product list and left one more click to guess.
-                    `/inventory/locations/${selectedStorageId}?configure=true`
-                  : "/inventory/locations"
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-              // The link-text token: `primary-500` measured 2.53:1 on white
-              // at 12px, where AA asks 4.5:1 in both themes.
-              className="flex min-h-6 items-center gap-1 text-xs text-on-primary hover:underline"
-              title={
-                selectedStorageId
-                  ? t("configureStorageTitle")
-                  : t("manageStoragesTitle")
-              }
-            >
-              <ExternalLink size={12} />
-              {selectedStorageId ? t("configureStorage") : t("manageStorages")}
-            </a>
+            {!readOnly && (
+              <a
+                href={
+                  selectedStorageId
+                    ? // The link says "configure", so it opens the edit sheet.
+                      // Without the parameter it landed on the location's
+                      // product list and left one more click to guess.
+                      `/inventory/locations/${selectedStorageId}?configure=true`
+                    : "/inventory/locations"
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                // The link-text token: `primary-500` measured 2.53:1 on white
+                // at 12px, where AA asks 4.5:1 in both themes.
+                className="flex min-h-6 items-center gap-1 text-xs text-on-primary hover:underline"
+                title={
+                  selectedStorageId
+                    ? t("configureStorageTitle")
+                    : t("manageStoragesTitle")
+                }
+              >
+                <ExternalLink size={12} />
+                {selectedStorageId
+                  ? t("configureStorage")
+                  : t("manageStorages")}
+              </a>
+            )}
           </div>
         </div>
       </div>

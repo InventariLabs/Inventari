@@ -417,6 +417,31 @@ class ApprovalsAPI:
             reason=reason,
         )
 
+    @staticmethod
+    async def notify_approval_async(
+        db: AsyncSession,
+        *,
+        org_id: UUID,
+        doc_id: UUID,
+        request_id: UUID,
+        requester_id: UUID,
+        notes: str | None,
+    ) -> None:
+        """Notify the requester their request was approved.
+
+        Best-effort, never raises. See ``_services_notify.notify_approval_async``.
+        """
+        from ._services_notify import notify_approval_async as _impl
+
+        await _impl(
+            db,
+            org_id=org_id,
+            doc_id=doc_id,
+            request_id=request_id,
+            requester_id=requester_id,
+            notes=notes,
+        )
+
 
 approvals_api = ApprovalsAPI()
 

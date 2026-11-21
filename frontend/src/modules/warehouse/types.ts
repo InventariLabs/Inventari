@@ -358,6 +358,9 @@ export type DocumentApprovalRequirement =
 
 export type InventoryPeriod = components["schemas"]["InventoryPeriodSchema"];
 
+export type OpenDocumentsInPeriod =
+  components["schemas"]["OpenDocumentsInPeriod"];
+
 /** What an opening-stock sheet became: one draft receipt, or nothing. */
 export type OpeningStockImportResponse =
   components["schemas"]["OpeningStockImportResponse"];

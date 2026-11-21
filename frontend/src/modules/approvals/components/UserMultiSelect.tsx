@@ -8,7 +8,10 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { InlineQueryError } from "@/components/ui/QueryResult";
 import { cn } from "@/lib/utils";
-import { useOrgMembers } from "@/modules/approvals/hooks/useOrgMembers";
+import {
+  useOrgMembers,
+  usePeopleWhoCanDecide,
+} from "@/modules/approvals/hooks/useOrgMembers";
 import { roleLabel } from "@/modules/approvals/roleLabels";
 
 /** What the picker calls its button, its popover and its remove control. */
@@ -23,12 +26,19 @@ interface UserMultiSelectProps {
   onChange: (ids: string[]) => void;
   /** Defaults to picking approvers; a workflow's requesters are people too. */
   wording?: UserMultiSelectWording;
+  /**
+   * Mark the people who cannot decide approvals. Only the picker that names
+   * approvers asks: naming such a person hands them nothing, and a stage
+   * naming only them is refused at the save.
+   */
+  markWhoCannotDecide?: boolean;
 }
 
 export function UserMultiSelect({
   selectedUserIds,
   onChange,
   wording,
+  markWhoCannotDecide = false,
 }: UserMultiSelectProps) {
   const { t } = useTranslation("approvals");
   const words = wording ?? {
@@ -40,6 +50,9 @@ export function UserMultiSelect({
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: users = [], isError, error, refetch } = useOrgMembers();
+  const { data: deciderIds } = usePeopleWhoCanDecide(markWhoCannotDecide);
+  const cannotDecide = (id: string) =>
+    markWhoCannotDecide && deciderIds !== undefined && !deciderIds.includes(id);
 
   const selectedUsers = useMemo(
     () => users.filter((u) => selectedUserIds.includes(u.id)),
@@ -242,6 +255,8 @@ export function UserMultiSelect({
                                 list says what each person is — the offer was
                                 silent about this when the promise was made. */}
                             {roleLabel(t, user.role)}
+                            {cannotDecide(user.id) &&
+                              ` · ${t("workflows.cannotApprove")}`}
                           </p>
                         </div>
                         <div

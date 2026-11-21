@@ -442,6 +442,117 @@ class TestInventoryPeriodClosure:
         )
         assert resp.status_code == status.HTTP_409_CONFLICT, resp.text
 
+    def test_a_draft_cannot_be_dated_into_a_closed_month(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_target_location: StorageLocation,
+        doc_item: Item,
+    ) -> None:
+        """Moving a draft's date into a closed month is refused at the edit.
+
+        Creating a document there answers 409; the edit of the date answered
+        200 and left a draft that could be neither confirmed nor changed.
+        """
+        doc_id = self._create_doc(
+            client,
+            doc_auth_headers,
+            'IN',
+            doc_partner.id,
+            doc_target_location.id,
+            [{'item_id': str(doc_item.id), 'expected_quantity': 5}],
+            scheduled_date='2026-07-10',
+        )
+        client.post('/api/v1/warehouse/periods/2026/8/close', headers=doc_auth_headers)
+
+        resp = client.put(
+            f'/api/v1/warehouse/documents/{doc_id}',
+            headers=doc_auth_headers,
+            json={'scheduled_date': '2026-08-20'},
+        )
+
+        assert resp.status_code == status.HTTP_409_CONFLICT, resp.text
+        assert resp.json()['detail']['code'] == 'PERIOD_CLOSED'
+        kept = client.get(
+            f'/api/v1/warehouse/documents/{doc_id}', headers=doc_auth_headers
+        ).json()
+        assert kept['scheduled_date'].startswith('2026-07-10')
+
+    def test_closing_names_the_documents_still_open_in_the_month(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_target_location: StorageLocation,
+        doc_item: Item,
+    ) -> None:
+        """The close dialog asks how many documents the lock would strand."""
+        lines = [{'item_id': str(doc_item.id), 'expected_quantity': 5}]
+        draft = self._create_doc(
+            client,
+            doc_auth_headers,
+            'IN',
+            doc_partner.id,
+            doc_target_location.id,
+            lines,
+            scheduled_date='2026-09-05',
+        )
+        confirmed = self._create_doc(
+            client,
+            doc_auth_headers,
+            'IN',
+            doc_partner.id,
+            doc_target_location.id,
+            lines,
+            scheduled_date='2026-09-12',
+        )
+        client.patch(
+            f'/api/v1/warehouse/documents/{confirmed}/confirm',
+            headers=doc_auth_headers,
+        )
+        done = self._create_doc(
+            client,
+            doc_auth_headers,
+            'IN',
+            doc_partner.id,
+            doc_target_location.id,
+            lines,
+            scheduled_date='2026-09-14',
+        )
+        self._confirm_and_complete(client, doc_auth_headers, done)
+        # A document of another month does not count.
+        self._create_doc(
+            client,
+            doc_auth_headers,
+            'IN',
+            doc_partner.id,
+            doc_target_location.id,
+            lines,
+            scheduled_date='2026-10-02',
+        )
+
+        resp = client.get(
+            '/api/v1/warehouse/periods/2026/9/open-documents',
+            headers=doc_auth_headers,
+        )
+
+        assert resp.status_code == status.HTTP_200_OK, resp.text
+        body = resp.json()
+        assert body['count'] == 2
+        assert {d['id'] for d in body['documents']} == {draft, confirmed}
+        assert {d['status'] for d in body['documents']} == {'DRAFT', 'CONFIRMED'}
+
+    def test_the_open_documents_of_a_month_are_for_whoever_may_close_it(
+        self, client: TestClient, h: Any, doc_org: Any
+    ) -> None:
+        user = h.create_user(doc_org, email='period-user3@example.com', role='user')
+        resp = client.get(
+            '/api/v1/warehouse/periods/2026/9/open-documents',
+            headers=h.get_auth_headers(user),
+        )
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
+
     # ------------------------------------------------------------------
     # Non-closed periods are fine
     # ------------------------------------------------------------------

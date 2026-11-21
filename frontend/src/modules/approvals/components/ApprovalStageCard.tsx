@@ -103,6 +103,7 @@ export function ApprovalStageCard({
             <UserMultiSelect
               selectedUserIds={approvers}
               onChange={(ids) => onChange({ ...stage, approver_user_ids: ids })}
+              markWhoCannotDecide
             />
             <RoleMembersPicker
               selectedUserIds={approvers}

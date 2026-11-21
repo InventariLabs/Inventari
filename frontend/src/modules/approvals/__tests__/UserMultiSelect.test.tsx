@@ -108,6 +108,44 @@ describe("UserMultiSelect", () => {
     expect(screen.getByText("carol@example.com")).toBeInTheDocument();
   });
 
+  it("marks the people who cannot see approvals when it is the approvers' picker", async () => {
+    server.use(
+      http.get("/api/v1/approvals/workflows/approvers", () =>
+        HttpResponse.json({ user_ids: ["u-2"] }),
+      ),
+    );
+    render(
+      <UserMultiSelect
+        selectedUserIds={[]}
+        onChange={vi.fn()}
+        markWhoCannotDecide
+      />,
+      { wrapper: createWrapper() },
+    );
+    openPopover();
+
+    const carol = (await screen.findByText("carol@example.com")).closest(
+      "button",
+    ) as HTMLElement;
+    await waitFor(() =>
+      expect(carol).toHaveTextContent(/cannot see approvals/i),
+    );
+    const bob = screen.getByText("Bob").closest("button") as HTMLElement;
+    expect(bob).not.toHaveTextContent(/cannot see approvals/i);
+  });
+
+  it("marks nobody in a picker that does not name approvers", async () => {
+    render(<UserMultiSelect selectedUserIds={[]} onChange={vi.fn()} />, {
+      wrapper: createWrapper(),
+    });
+    openPopover();
+
+    const carol = (await screen.findByText("carol@example.com")).closest(
+      "button",
+    ) as HTMLElement;
+    expect(carol).not.toHaveTextContent(/cannot see approvals/i);
+  });
+
   it("adds a user when their row is clicked in the popover", async () => {
     const onChange = vi.fn();
     render(<UserMultiSelect selectedUserIds={["u-1"]} onChange={onChange} />, {

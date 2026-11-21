@@ -1,12 +1,13 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import NutritionSummary from "@/modules/nutrition/components/NutritionSummary";
 import ProductInfoDisplay from "@/modules/nutrition/components/ProductInfoDisplay";
 import FoodAndHealthExtra from "@/modules/nutrition/components/FoodAndHealthExtra";
 import * as modulesCtx from "@/contexts/ModulesContext";
 import { withLanguage } from "@/test/mocks/i18n";
+import { signInWith, signOut } from "@/test/auth";
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
@@ -18,8 +19,15 @@ vi.mock("@/modules/nutrition/components/NutritionScanner", () => ({
   ),
 }));
 
+afterEach(() => {
+  signOut();
+});
+
 beforeEach(() => {
   vi.clearAllMocks();
+  // Scanning and typing values in write the product, so the card offers them
+  // to an account that may write products.
+  signInWith(["items:read", "items:write"]);
   // The camera route belongs to the vision module; tests run with it on
   // unless a suite says otherwise.
   vi.spyOn(modulesCtx, "useModules").mockReturnValue({
@@ -426,6 +434,62 @@ describe("FoodAndHealthExtra with nothing recorded yet", () => {
     expect(
       screen.getByRole("button", { name: /scan table/i }),
     ).toBeInTheDocument();
+  });
+});
+
+describe("FoodAndHealthExtra for an account that may only read", () => {
+  beforeEach(() => {
+    signInWith(["items:read"]);
+  });
+
+  it("offers neither the camera nor the typed values", () => {
+    render(
+      <FoodAndHealthExtra
+        data={{
+          item: {
+            id: "item-2",
+            name: "Wheat flour type 550",
+            template_id: "tpl-2",
+            metadata: {},
+          } as never,
+          storageType: { type_code: "PANTRY" },
+        }}
+      />,
+      { wrapper: createWrapper() },
+    );
+
+    expect(
+      screen.getByText("No data for this product yet."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /scan table/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /enter values by hand/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows the values a card already has, without the scan entry", () => {
+    render(
+      <FoodAndHealthExtra
+        data={{
+          item: {
+            id: "item-1",
+            name: "Apple Juice",
+            metadata: {
+              nutrition: { energy_kcal: 50 },
+              off_enriched: true,
+            },
+          } as never,
+          storageType: { type_code: "PANTRY" },
+        }}
+      />,
+      { wrapper: createWrapper() },
+    );
+
+    expect(
+      screen.queryByRole("button", { name: /scan table/i }),
+    ).not.toBeInTheDocument();
   });
 });
 
