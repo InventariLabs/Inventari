@@ -594,6 +594,33 @@ def unvalidated_constraints(engine: Engine) -> list[tuple[str, str]]:
     return [(row[0], row[1]) for row in rows]
 
 
+def pending_core_revisions(engine: Engine) -> list[str]:
+    """The core revisions after the one the database records, oldest first.
+
+    What ``db upgrade`` is about to apply to the core tables. Empty for a
+    database that records no revision (a fresh one has nothing to be behind
+    on) and for one already at head.
+
+    Raises ``DoctorInfrastructureError`` if the database cannot be inspected.
+    """
+    from alembic.config import Config
+
+    script = ScriptDirectory.from_config(Config('alembic.ini'))
+    try:
+        with engine.connect() as conn:
+            current = set(MigrationContext.configure(conn).get_current_heads())
+    except SQLAlchemyError as exc:
+        raise DoctorInfrastructureError(str(exc)) from exc
+    if not current:
+        return []
+    pending: list[str] = []
+    for revision in script.walk_revisions():
+        if revision.revision in current:
+            break
+        pending.append(revision.revision)
+    return pending[::-1]
+
+
 @dataclass(frozen=True)
 class ColumnTypeDrift:
     """A column whose live type is not the type its model declares."""

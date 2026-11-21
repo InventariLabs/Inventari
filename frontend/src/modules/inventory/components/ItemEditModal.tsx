@@ -446,6 +446,7 @@ export default function ItemEditModal({
                 }
                 imagePreview={imagePreview}
                 setImagePreview={setImagePreview}
+                readOnly={!canWrite}
               />
 
               <StockThresholdSection

@@ -154,6 +154,14 @@ export const approvalsApi = {
     return response.data;
   },
 
+  /** The members who could decide a stage naming them — the save's own test. */
+  listPeopleWhoCanDecide: async (): Promise<string[]> => {
+    const response = await api.get<{ user_ids: string[] }>(
+      "/approvals/workflows/approvers",
+    );
+    return response.data.user_ids;
+  },
+
   createWorkflow: async (
     data: WorkflowCreateInput,
   ): Promise<ApprovalWorkflow> => {

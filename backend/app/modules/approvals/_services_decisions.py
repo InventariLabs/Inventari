@@ -202,6 +202,7 @@ async def approve_stage(
                 outcome='APPROVED',
                 requester_id=request.created_by,
                 decided_by=approver_id,
+                notes=notes,
             ),
         )
 
@@ -313,6 +314,7 @@ async def reject_request(
             request_id=request.id,
             outcome='REJECTED',
             requester_id=request.created_by,
+            decided_by=approver_id,
             notes=notes,
         ),
     )

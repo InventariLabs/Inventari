@@ -11,7 +11,7 @@ from rich.console import Console
 
 from app.i18n import SUPPORTED_LANGUAGES
 
-from ._module_meta import _VALID_NAME_RE, _reserved_name_refusal
+from ._module_meta import _VALID_NAME_RE, _reserved_name_refusal, compose_command
 
 console = Console()
 
@@ -684,14 +684,17 @@ def scaffold_community_module(  # noqa: PLR0915 - existing complexity/size
     console.print(f'  3. Implement [cyan]{module_name}/frontend/pages/IndexPage.tsx[/]')
     # The path, not a name relative to a working directory the reader may not
     # be standing in: with --output the two differ, and the Makefile always
-    # passes one. The key likewise: the command runs in the backend
-    # container, whose working directory is /app, and the quickstart writes
-    # the key to /modules-workspace.
+    # passes one. The commands are the host's — the quickstart's form, with
+    # the compose invocation and the container prefix — because the reader
+    # stands at the checkout root, where there is no manage.py. The path and
+    # the key are the container's: its working directory is /app, and the
+    # quickstart writes the key to /modules-workspace.
+    compose = compose_command()
     console.print(
-        f'  4. Sign the package:  [bold]python manage.py module sign {out} --key /modules-workspace/my-ed25519.key --key-id my-releases[/]'
+        f'  4. Sign the package:  [bold]{compose} exec backend uv run python manage.py module sign {out} --key /modules-workspace/my-ed25519.key --key-id my-releases[/]'
     )
     console.print(
-        f'  5. Test locally:  [bold]python manage.py module install {out}[/]'
+        f'  5. Test locally:  [bold]{compose} exec backend uv run python manage.py module install {out}[/]'
         ' (with your key in MODULE_SIGNING_PUBLIC_KEYS, or --allow-unsigned)'
     )
     console.print(

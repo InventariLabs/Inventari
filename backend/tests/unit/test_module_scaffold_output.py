@@ -306,3 +306,29 @@ class TestScaffoldLinksPointAtTheRealRepository:
         }
 
         assert orgs <= {'InventariLabs', 'yourname'}
+
+
+@pytest.mark.unit
+class TestScaffoldNextSteps:
+    """The commands it prints are the ones the reader can run where they stand.
+
+    The scaffold runs inside the backend container; the author who reads its
+    answer stands at the checkout root, which holds no manage.py. The
+    quickstart prints the host form — the compose invocation, then the
+    container's own paths — and the scaffold says the same.
+    """
+
+    def test_the_sign_and_install_steps_carry_the_quickstart_prefix(
+        self, tmp_path, capsys
+    ):
+        scaffold_community_module('demo_mod', output_dir=str(tmp_path))
+
+        out = ' '.join(capsys.readouterr().out.split())
+        steps = out.split('Next steps:', 1)[1]
+        assert (
+            'docker compose exec backend uv run python manage.py module sign' in steps
+        )
+        assert (
+            'docker compose exec backend uv run python manage.py module install'
+            in steps
+        )

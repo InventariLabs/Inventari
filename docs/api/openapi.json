@@ -1850,6 +1850,36 @@
         }
       }
     },
+    "/api/v1/approvals/workflows/approvers": {
+      "get": {
+        "tags": [
+          "Approvals"
+        ],
+        "summary": "List People Who Can Decide",
+        "description": "Which members of the organization could decide a stage they are named on.\n\nThe picker that names approvers reads it, so a person who cannot see\napprovals is marked before the save refuses a stage that names only such\npeople. It is the same test the save applies (``deciders_async``).\nDeclared above ``/workflows/{workflow_id}`` for the reason the\n``configured`` route is.",
+        "operationId": "list_people_who_can_decide_api_v1_approvals_workflows_approvers_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkflowApprovers"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/v1/approvals/workflows/configured": {
       "get": {
         "tags": [
@@ -36949,6 +36979,70 @@
         }
       }
     },
+    "/api/v1/warehouse/periods/{year}/{month}/open-documents": {
+      "get": {
+        "tags": [
+          "Warehouse"
+        ],
+        "summary": "List Open Documents In Period",
+        "description": "The documents closing this month would leave unfinished.",
+        "operationId": "list_open_documents_in_period_api_v1_warehouse_periods__year___month__open_documents_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "maximum": 2100,
+              "minimum": 2000,
+              "title": "Year"
+            }
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "maximum": 12,
+              "minimum": 1,
+              "title": "Month"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenDocumentsInPeriod"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/warehouse/periods/{year}/{month}/reopen": {
       "post": {
         "tags": [
@@ -63898,6 +63992,57 @@
           "profile_id"
         ],
         "title": "OnboardingSetupRequest"
+      },
+      "OpenDocumentInPeriod": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "type",
+          "status"
+        ],
+        "title": "OpenDocumentInPeriod"
+      },
+      "OpenDocumentsInPeriod": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/OpenDocumentInPeriod"
+            },
+            "type": "array",
+            "title": "Documents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "count",
+          "documents"
+        ],
+        "title": "OpenDocumentsInPeriod",
+        "description": "What closing a month would strand: the documents dated in it not finished."
       },
       "OpenedSuggestion": {
         "properties": {
@@ -92410,6 +92555,24 @@
         ],
         "title": "WorkItemsSection",
         "description": "The tasks and the server's own count of every task there is.\n\nA capped dashboard section, not a pageable list; see ``DocumentsTodoSection``."
+      },
+      "WorkflowApprovers": {
+        "properties": {
+          "user_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "User Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_ids"
+        ],
+        "title": "WorkflowApprovers",
+        "description": "The members of the organization who could decide a stage naming them."
       },
       "WorkflowConfigured": {
         "properties": {

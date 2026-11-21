@@ -14,8 +14,13 @@ from app.core.exceptions import ConflictException, refusal_code, refusal_text
 from app.core.module_sdk import PaginatedResponse
 from app.i18n.service import get_current_lang
 
-from .inventory_period_service import close_period, list_periods, reopen_period
-from .schemas import InventoryPeriodCreate, InventoryPeriodSchema
+from .inventory_period_service import (
+    close_period,
+    list_periods,
+    open_documents_in_period,
+    reopen_period,
+)
+from .schemas import InventoryPeriodCreate, InventoryPeriodSchema, OpenDocumentsInPeriod
 
 router = APIRouter()
 
@@ -48,6 +53,22 @@ async def list_inventory_periods(
         db, org_id, year=year, limit=limit, offset=offset
     )
     return PaginatedResponse.from_slice(periods, offset, limit, total)
+
+
+@router.get(
+    '/periods/{year}/{month}/open-documents', response_model=OpenDocumentsInPeriod
+)
+async def list_open_documents_in_period(
+    year: _Year,
+    month: _Month,
+    _: None = require_permission('warehouse:manage'),
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
+    """The documents closing this month would leave unfinished."""
+    org_id = require_org(current_user)
+    count, documents = await open_documents_in_period(db, org_id, year, month)
+    return {'count': count, 'documents': documents}
 
 
 @router.post('/periods/{year}/{month}/close', response_model=InventoryPeriodSchema)
