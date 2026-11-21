@@ -565,9 +565,10 @@ says what the release does rather than what changed since them.
 - The return sheet keeps to what is still left of a line. Its maximum is what
   earlier returns and corrections have not already taken back, not the full
   quantity done, so a quantity above it is named under the field and the sheet
-  cannot be submitted, and a line already returned in full shows the sheet's
-  own sentence instead of a field. The quantity field no longer keeps a
-  leading zero.
+  cannot be submitted. A line already returned in full is left out of the
+  sheet, and a document with nothing left to return says so instead of
+  listing lines. Quantity fields everywhere no longer keep a leading zero: a
+  digit typed after a 0 replaces it.
 
 ### Removed
 
