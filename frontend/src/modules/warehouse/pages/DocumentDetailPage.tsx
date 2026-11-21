@@ -49,6 +49,7 @@ import {
   mayBePlanned,
   UNDOABLE_DOCUMENT_TYPES,
   holdsGoodsBack,
+  type WarehouseDocument,
 } from "@/modules/warehouse/types";
 import {
   useDocument,
