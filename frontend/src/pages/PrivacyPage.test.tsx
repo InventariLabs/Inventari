@@ -1,5 +1,5 @@
-import { render, screen, within } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { cleanup, render, screen, within } from "@testing-library/react";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { http, HttpResponse } from "msw";
@@ -7,6 +7,7 @@ import { server } from "@/test/mocks/server";
 import { ModulesProvider } from "@/contexts/ModulesContext";
 import type { InitStatus } from "@/lib/api/auth";
 import App from "@/App";
+import { useAuthStore } from "@/store/authStore";
 import PrivacyPage from "./PrivacyPage";
 
 /**
@@ -37,6 +38,43 @@ describe("PrivacyPage", () => {
         </MemoryRouter>
       </QueryClientProvider>,
     );
+
+  describe("the way back", () => {
+    const initial = useAuthStore.getState();
+    afterEach(() => {
+      // Unmount first: resetting the store under a mounted page is an update
+      // outside act.
+      cleanup();
+      useAuthStore.setState(initial, true);
+    });
+
+    it("leads a visitor to the sign-in screen", async () => {
+      serveStatus({});
+      renderPage();
+
+      expect(
+        await screen.findByRole("link", { name: "Back to sign in" }),
+      ).toHaveAttribute("href", "/login");
+    });
+
+    it("leads someone who is signed in back to the app", async () => {
+      useAuthStore.setState({
+        user: { email: "ola@example.com" } as ReturnType<
+          typeof useAuthStore.getState
+        >["user"],
+      });
+      serveStatus({ operator_name: "Example Foods Ltd" });
+      renderPage();
+      await screen.findByText("It is run by Example Foods Ltd.");
+
+      expect(
+        await screen.findByRole("link", { name: "Back to the app" }),
+      ).toHaveAttribute("href", "/");
+      expect(
+        screen.queryByRole("link", { name: "Back to sign in" }),
+      ).not.toBeInTheDocument();
+    });
+  });
 
   it("names the operator and links an email contact as a message", async () => {
     serveStatus({

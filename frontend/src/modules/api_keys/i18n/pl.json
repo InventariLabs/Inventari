@@ -24,6 +24,9 @@
     "noPermissions": "Bez uprawnień"
   },
   "revoke": "Odwołaj",
+  "revokeNamed": "Odwołaj {{name}}",
+  "generateFailed": "Nie udało się utworzyć klucza.",
+  "revokeFailed": "Nie udało się odwołać klucza.",
   "revokeConfirm": {
     "title": "Odwołaj klucz API",
     "message": "Czy na pewno chcesz odwołać klucz „{{name}}”? Przestanie działać natychmiast.",

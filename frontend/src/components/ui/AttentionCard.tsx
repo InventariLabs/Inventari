@@ -276,7 +276,11 @@ function AttentionRow({ item }: { item: AttentionItem }) {
       <div className="min-w-0 flex-1 sm:flex sm:items-baseline sm:gap-4">
         <Link
           to={item.href}
-          className="block truncate text-sm font-semibold text-on hover:underline py-3 md:py-1 sm:w-56 sm:shrink-0"
+          // A unit's title is its name and its serial; at 224px the serial
+          // was cut while half the row stood empty, so the column widens
+          // where the row has the room. A cut title still reads in full on hover.
+          title={item.title}
+          className="block truncate text-sm font-semibold text-on hover:underline py-3 md:py-1 sm:w-56 lg:w-80 sm:shrink-0"
         >
           {item.title}
         </Link>

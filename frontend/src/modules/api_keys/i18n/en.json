@@ -24,6 +24,9 @@
     "noPermissions": "No permissions"
   },
   "revoke": "Revoke",
+  "revokeNamed": "Revoke {{name}}",
+  "generateFailed": "The key could not be created.",
+  "revokeFailed": "The key could not be revoked.",
   "revokeConfirm": {
     "title": "Revoke API Key",
     "message": "Are you sure you want to revoke the key \"{{name}}\"? It will stop working immediately.",

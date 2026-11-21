@@ -183,6 +183,9 @@ async def _change_status(
     old_status = resolve_previous_status(
         ((item.meta_data or {}).get('equipment', {})).get('equipment_status')
     )
+    if old_status == str(new_status):
+        # Already in the chosen status: nothing to change, nothing to refuse.
+        return None
     validate_transition(old_status, str(new_status))
 
     # Resolve any active checkout once — used both by the status/assignment

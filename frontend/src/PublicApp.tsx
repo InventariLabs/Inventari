@@ -10,6 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { useDocumentLanguage } from "@/hooks/useDocumentLanguage";
+import { useNativeValidationMessages } from "@/hooks/useNativeValidationMessages";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorPage from "@/pages/ErrorPage";
@@ -62,6 +63,7 @@ export default function PublicApp({
   // The attestation page speaks the language of `?lang=` or the browser, and
   // the document has to say so (see the hook).
   useDocumentLanguage();
+  useNativeValidationMessages();
   const router = useMemo(() => {
     const routes = createRoutesFromElements(
       <Route

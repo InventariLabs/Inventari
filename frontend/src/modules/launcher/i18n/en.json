@@ -42,7 +42,7 @@
     "diffUnchanged": "Unchanged",
     "diffConfig": "Reset settings for",
     "confirmTitle": "Switch to {{name}}?",
-    "confirmMessage": "Modules will be enabled and disabled for your organization. You can switch back at any time.",
+    "confirmMessage": "Modules will be enabled and disabled for your organization.",
     "confirmApply": "Switch workspace mode",
     "confirmReapplyTitle": "Run {{name}} setup again?",
     "confirmReapplyMessage": "No modules are added or removed. The workspace mode's setup runs again: its default settings are reset to the mode's values, and the names it seeded — location types included — are rewritten in the language of this session.",
@@ -51,6 +51,7 @@
     "diffManualKept": "Kept (added manually)",
     "diffCascadeHint": "Disabled because they require a removed module",
     "diffConfigHint": "The workspace mode's defaults will overwrite current settings",
+    "confirmConfigHint": "The workspace mode's defaults will overwrite current settings, and switching back does not bring them back",
     "renumberOffer": "Your locations keep their codes and stickers. For codes that read like A-02-01, choose Renumber by template under Configuration → Location codes, labels and walk order; old stickers keep scanning."
   },
   "activeProfile": {

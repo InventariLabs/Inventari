@@ -12603,6 +12603,8 @@ export interface components {
             closed_reason?: string | null;
             /** Organization Name */
             organization_name?: string | null;
+            /** Organization Country */
+            organization_country?: string | null;
             /** Deadline Day */
             deadline_day?: string | null;
         };
@@ -13513,6 +13515,8 @@ export interface components {
             closed_reason?: string | null;
             /** Organization Name */
             organization_name?: string | null;
+            /** Organization Country */
+            organization_country?: string | null;
             /** Deadline Day */
             deadline_day?: string | null;
             /**

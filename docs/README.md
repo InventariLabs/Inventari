@@ -17,7 +17,7 @@ ships with the repository, not a guide.
 | [Getting started](../README.md#quick-start) | Install and run your own instance, first login |
 | [USER_GUIDE.md](USER_GUIDE.md) | The end-user guide, illustrated with screens of the demo: locations, products, scanning, documents, reports |
 | [GALLERY.md](GALLERY.md) | Screens of the running application, module by module |
-| [FOCUS_MODE.md](FOCUS_MODE.md) | Showing a single module (Settings → My modules) |
+| [FOCUS_MODE.md](FOCUS_MODE.md) | Showing a single module (Settings → Organization modules) |
 
 ## Running and maintaining it
 

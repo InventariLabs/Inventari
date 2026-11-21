@@ -66,7 +66,7 @@ class OnboardingSetupRequest(BaseModel):
     modules: list[str] | None = None
     # The fourth choice beside the profiles: one module that is the whole
     # application. ``profile_id`` then names the neutral base the mode sits on
-    # and is what Settings -> My modules returns to when the mode is left.
+    # and is what Settings -> Organization modules returns to when the mode is left.
     focus_module: str | None = Field(None, min_length=1, max_length=50)
     # The zone the setup screen's browser reported, sent beside the currency
     # so a fresh organization's day starts where its readers' does — expiry
@@ -294,7 +294,7 @@ async def _enter_chosen_module(
 ) -> OrganizationDTO:
     """Enter focus mode on top of the profile applied in this transaction.
 
-    The same service Settings -> My modules calls, so leaving the mode
+    The same service Settings -> Organization modules calls, so leaving the mode
     restores the snapshot taken here and ``active_profile_id`` is untouched.
     Nothing is committed before this runs: any refusal or failure rolls the
     profile back with it, so onboarding stays open for a retry.

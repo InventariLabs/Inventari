@@ -8,7 +8,7 @@ import type { ProductProfile } from "@/types";
 
 // The card beside the profiles is not a profile: it stands for one module that
 // is the whole app. The organization still gets a neutral profile underneath,
-// which Settings -> My modules returns to when the mode is left.
+// which Settings -> Organization modules returns to when the mode is left.
 export const CHOSEN_MODULE = "__chosen_module__";
 
 interface ModeCardsProps {

@@ -362,7 +362,7 @@ apart.
 | `EQUIPMENT_STATUS_INVALID` | Invalid status: {status} |
 | `EQUIPMENT_STATUS_TRANSITION_DENIED` | Cannot change status from {old} to {new} |
 | `EQUIPMENT_STATUS_TRANSITION_FROM_RETIRED` | Cannot change status from {old} to {new}. Retired assets must be explicitly unretired first. |
-| `EQUIPMENT_STILL_ASSIGNED` | The asset is still checked out to someone. Check it in first. |
+| `EQUIPMENT_STILL_ASSIGNED` | The asset is still checked out to someone. Return it first. |
 | `EXTRA_COST_CURRENCY_MISMATCH` | The extra cost is in a different currency than the document. Enter it in the document's currency — converting at a rate nobody recorded would put a number in the stock value with no history behind it. |
 | `EXTRA_COST_DOCUMENT_POSTED` | This receipt is already posted, so an extra cost cannot be added to it: the goods may have left the shelf and there is nothing left to charge. Issue a correction to the receipt while its period is open, or record the amount as a cost variance: it is listed with its reason and is never part of the stock value. |
 | `EXTRA_COST_NOT_A_RECEIPT` | Extra costs belong on a receipt: only goods coming in can carry the cost of getting them here. |

@@ -117,7 +117,7 @@ const DEEPLINK_ALLOWLIST = [
   // The whole content of this page was a sentence and a button pointing at
   // apps, which is also where the sidebar links. Now a redirect.
   "/settings/modules",
-  // "My modules" holds the module set and the show-only-one toggles on one
+  // "Organization modules" holds the module set and the show-only-one toggles on one
   // screen; the two addresses that used to hold one half each now redirect
   // there, so a bookmark still lands on the whole.
   "/settings/workspace",

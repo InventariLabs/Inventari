@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/Card";
 import { QueryResult } from "@/components/ui/QueryResult";
 import { useInitStatus } from "@/hooks/useInitStatus";
+import { useAuthStore } from "@/store/authStore";
 import type { InitStatus } from "@/lib/api/auth";
 import { AuthLayout } from "./AuthLayout";
 
@@ -24,6 +25,8 @@ const LINK_CLASS =
 export default function PrivacyPage() {
   const { t } = useTranslation("auth");
   const initStatus = useInitStatus();
+  // Someone signed in has no sign-in to go back to: the way back is the app.
+  const signedIn = Boolean(useAuthStore((state) => state.user));
 
   return (
     <AuthLayout title={t("privacy.title")}>
@@ -36,10 +39,10 @@ export default function PrivacyPage() {
           {(status) => <PrivacyNotice status={status} />}
         </QueryResult>
         <Link
-          to="/login"
+          to={signedIn ? "/" : "/login"}
           className={`mt-8 inline-flex min-h-11 items-center md:min-h-0 text-xs ${LINK_CLASS}`}
         >
-          {t("privacy.backToSignIn")}
+          {signedIn ? t("privacy.backToApp") : t("privacy.backToSignIn")}
         </Link>
       </Card>
     </AuthLayout>
