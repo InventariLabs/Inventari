@@ -18,6 +18,7 @@ from fastapi.testclient import TestClient
 from pypdf import PdfReader
 from sqlalchemy.orm import Session
 
+from app.core.template_models import DocumentTemplate
 from app.core.testing import ModuleTestHelper
 from app.models.organization import Organization
 from app.models.partner import Partner
@@ -336,6 +337,40 @@ class TestThePackingSlipAndTheLabel:
         text = PdfReader(io.BytesIO(slip.content)).pages[0].extract_text()
         assert 'BOX OUT/2026/0042-P1' in text
         assert 'BOX OUT/2026/0042-P2' in text
+
+    def test_a_stored_slip_that_does_not_render_prints_the_built_in_one(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_org: Organization,
+        doc_auth_headers: dict[str, str],
+        picked_dispatch: Document,
+    ) -> None:
+        """A slip layout stored before saves were checked still prints."""
+        self._pack_in_two(client, doc_auth_headers, picked_dispatch)
+        # Straight into the table: the editor refuses such a body on save, so
+        # only a row stored before that check can be in this state.
+        db_session.add(
+            DocumentTemplate(
+                organization_id=doc_org.id,
+                module='warehouse',
+                name='Broken slip',
+                document_type='PACKING_SLIP',
+                body_html='<p>{{ broken </p>',
+                is_default=True,
+            )
+        )
+        db_session.commit()
+
+        slip = client.get(
+            f'/api/v1/warehouse/documents/{picked_dispatch.id}/packing-slip',
+            headers=doc_auth_headers,
+        )
+
+        assert slip.status_code == 200, slip.text[:300]
+        text = PdfReader(io.BytesIO(slip.content)).pages[0].extract_text()
+        assert 'OUT/2026/0042-P1' in text
+        assert 'Package 1 of 2' in text
 
     def test_the_label_is_a_png_from_the_printing_module(
         self,
