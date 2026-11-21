@@ -549,6 +549,17 @@ const dist = join(root, "dist");
  * budget moves a step of five, to 485; the other screens stand under theirs
  * (app first paint 405.5, login 410.3, launcher 425.4, start 643.8, issue
  * 591.2, history 616.3, products 635.0, initial 194.0).
+ *
+ * Re-measured 2026-11-21 on the branch that keeps raw machine values out of
+ * reader text, merged with the line that carries the catalogue, locations and
+ * labels branch: the products screen measures 635.0 KiB gz against its 635.
+ * The screen already stood at the edge of its budget (634.8 on the
+ * catalogue branch); this branch adds the field-scoped audit value lookup to
+ * the shared audit-change renderer, a few lines in a chunk the products screen
+ * walks, no new import. That phone budget moves a step of
+ * five, to 640; the other screens stand under theirs (app first paint 405.5,
+ * login 410.3, launcher 425.3, start 643.8, receive 480.1, issue 591.2,
+ * history 616.3, initial 194.0).
  */
 const BUDGETS = {
   initial: 245,
