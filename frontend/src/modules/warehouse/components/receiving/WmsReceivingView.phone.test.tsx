@@ -347,6 +347,36 @@ describe("WmsReceivingView on a phone", () => {
     ).toBeInTheDocument();
   });
 
+  it("names no expected figure for goods only the sheet counted", async () => {
+    // A product added beside an order, or scanned on a receipt with none,
+    // starts at the sheet's own count of one: nobody expected it, and the
+    // card read "Expected 1 pcs.".
+    serveDocument();
+    server.use(
+      http.post(`${BASE}/start`, () =>
+        HttpResponse.json(
+          session([
+            line("yoghurt", "Yoghurt", {
+              expected_quantity: 1,
+              from_order: false,
+              expected_is_count: true,
+            }),
+          ]),
+        ),
+      ),
+    );
+    const user = userEvent.setup();
+
+    render(<WmsReceivingView documentId={DOC} onClose={vi.fn()} />);
+    const card = await screen.findByRole("region", { name: "Yoghurt" });
+
+    expect(within(card).queryByText(/Expected/)).not.toBeInTheDocument();
+    await user.click(within(card).getByRole("button", { name: "Increase" }));
+    await user.click(within(card).getByRole("button", { name: "Decrease" }));
+    await user.click(within(card).getByRole("button", { name: "Decrease" }));
+    expect(within(card).queryByText(/than expected/)).not.toBeInTheDocument();
+  });
+
   it.each([
     { typedCount: true, warns: false },
     { typedCount: false, warns: true },
