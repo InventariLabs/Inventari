@@ -510,10 +510,19 @@ const dist = join(root, "dist");
  * the language chunk every first paint loads, and one document-level listener;
  * no import walked in. Those two phone budgets move a step of five (issue 595,
  * history 620); the other screens stand under theirs.
+ *
+ * Re-measured 2026-11-21 on the branch that words the persona walk's
+ * findings, merged with the two changes above: app first paint measures
+ * 405.3 KiB gz against its 405, login 410.0 against 410 and launcher 425.1
+ * against 425. The branches add copy in six languages to the language chunk
+ * every first paint loads; no import walked in. The three budgets move a step
+ * of five (app first paint 410, login 415, launcher 430); the other screens
+ * stand under theirs (start 643.3, receive 478.9, issue 590.9, history 616.0,
+ * products 634.0).
  */
 const BUDGETS = {
   initial: 245,
-  appFirstPaint: 405,
+  appFirstPaint: 410,
 };
 
 /**
