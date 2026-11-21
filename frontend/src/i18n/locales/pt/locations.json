@@ -344,7 +344,7 @@
   "masterDetailSubtitle": "Escolha um local para ver o que há nele, seus produtos e suas configurações.",
   "select": {
     "title": "Escolha um local",
-    "description": "A árvore à esquerda lista todos os locais. Escolha um para ver o que há nele."
+    "description": "Escolha um local na árvore à esquerda para ver o que há nele."
   },
   "path": {
     "label": "Caminho do local",

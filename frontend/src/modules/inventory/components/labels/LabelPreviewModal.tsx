@@ -69,6 +69,10 @@ export function LabelPreviewModal({
     copiesPerLabel: printSettings.copiesPerLabel,
     showCode: printSettings.showCode,
     enabled: open,
+    fieldNames: {
+      width: `${t("previewModal.width")} (mm)`,
+      height: `${t("previewModal.height")} (mm)`,
+    },
   });
 
   // A pool label has no description until something is attached to it, and
@@ -136,7 +140,7 @@ export function LabelPreviewModal({
           <div className="flex flex-col items-center gap-3">
             {sheet.failed ? (
               <p className="text-sm text-on-muted py-10">
-                {t("previewModal.previewFailed")}
+                {sheet.refusal ?? t("previewModal.previewFailed")}
               </p>
             ) : (
               <div className="w-full max-w-full overflow-x-auto">

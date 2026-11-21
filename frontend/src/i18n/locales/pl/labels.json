@@ -49,6 +49,7 @@
   "generateModal": {
     "title": "Generuj etykiety",
     "count": "Liczba etykiet (1–500)",
+    "countTooHigh": "W jednej partii mieści się najwyżej {{max}} etykiet.",
     "purpose": "Do czego są te naklejki?",
     "purposeHelp": "Pusta naklejka otwiera formularz tego, do czego ją wydrukowano.",
     "purposeProduct": "Towar",
@@ -206,7 +207,7 @@
   "history": {
     "label": "Etykieta",
     "previouslyUsedFor": "Wcześniej używana dla",
-    "title": "Historia produktu"
+    "title": "Etykieta zarchiwizowana"
   },
   "openScanActions": "Otwórz akcje skanowania",
   "scanNotFound": "Nie znaleziono etykiety",
@@ -215,6 +216,11 @@
   "statusUnassigned": "Nieprzypisana",
   "viewPool": "Zobacz pulę etykiet",
   "labelDeleted": "Etykieta usunięta",
+  "deleteOne": "Usunąć etykietę {{code}}? Naklejka już wydrukowana z tym kodem nie będzie rozpoznawana przy skanowaniu.",
+  "deleteMany_one": "Usunąć {{count}} etykietę? Naklejka już wydrukowana z jej kodem nie będzie rozpoznawana przy skanowaniu.",
+  "deleteMany_few": "Usunąć {{count}} etykiety? Naklejki już wydrukowane z ich kodami nie będą rozpoznawane przy skanowaniu.",
+  "deleteMany_many": "Usunąć {{count}} etykiet? Naklejki już wydrukowane z ich kodami nie będą rozpoznawane przy skanowaniu.",
+  "deleteMany_other": "Usunąć {{count}} etykiety? Naklejki już wydrukowane z ich kodami nie będą rozpoznawane przy skanowaniu.",
   "printQueue": {
     "send": "Wyślij na drukarkę",
     "choose": "Wybierz drukarkę",

@@ -129,19 +129,24 @@ describe("LabelGenerateModal — label purpose", () => {
     });
   });
 
-  it("holds the number of labels at the 500 the server accepts", async () => {
-    // The input's max attribute is only a hint to the spinner arrows, so typing
-    // 600 is held here, before a request carries it to a 422.
+  it("says so when the number of labels is above the 500 the server accepts", async () => {
+    // The number stays as typed, with the limit named beside it, and nothing
+    // can be sent until it is brought under — never a silent 500 in its place.
     renderModal();
 
     const count = screen.getByLabelText("Number of labels (1–500)");
-    fireEvent.change(count, { target: { value: "600" } });
+    fireEvent.change(count, { target: { value: "501" } });
 
-    expect(count).toHaveValue(500);
+    expect(count).toHaveValue(501);
+    expect(
+      screen.getByText("At most 500 labels fit in one batch."),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("export-labels-btn")).toBeDisabled();
     fireEvent.click(screen.getByTestId("export-labels-btn"));
-    await waitFor(() => {
-      expect(generatePayload).toMatchObject({ count: 500 });
-    });
+    expect(generatePayload).toBeUndefined();
+
+    fireEvent.change(count, { target: { value: "500" } });
+    expect(screen.getByTestId("export-labels-btn")).toBeEnabled();
   });
 
   it("sends the number of labels and the internal description as typed", async () => {

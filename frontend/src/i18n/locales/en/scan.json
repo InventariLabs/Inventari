@@ -40,6 +40,7 @@
   "searchForCode": "Search for this code",
   "retry": "Try again",
   "manualInputLabel": "Or type code manually",
+  "typeCode": "Type a code",
   "manualInputPlaceholder": "Barcode or label code…",
   "manualInputSubmit": "Scan",
   "storageContextTitle": "Scan location",

@@ -40,7 +40,7 @@ export default function ArchivedItemSheet({
       open
       onClose={onClose}
       backdropOpacity={60}
-      aria-label={t("history.title", { defaultValue: "Product history" })}
+      aria-label={t("history.title", { defaultValue: "Archived label" })}
     >
       <div className="w-12 h-1.5 bg-surface-inset rounded-full mx-auto mt-3 mb-1 sm:hidden"></div>
 
@@ -52,7 +52,7 @@ export default function ArchivedItemSheet({
             </div>
             <div>
               <h3 className="font-semibold text-lg text-on leading-tight">
-                {t("history.title", { defaultValue: "Product history" })}
+                {t("history.title", { defaultValue: "Archived label" })}
               </h3>
               <p className="text-on-secondary text-sm mt-0.5">
                 {t("history.label", { defaultValue: "Label" })}:{" "}

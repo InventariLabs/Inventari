@@ -103,6 +103,7 @@
     "topLevel": "Niveau supérieur"
   },
   "lot": {
+    "pageTitle": "Lot",
     "notFound": "Ce lot n'existe plus",
     "backToLots": "Retour aux lots",
     "onHand": "En stock",

@@ -1,6 +1,7 @@
 import React from "react";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { signInWith, signOut } from "@/test/auth";
 import { itemsApi } from "@/lib/api/items";
@@ -63,7 +64,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
       })
     }
   >
-    {children}
+    <MemoryRouter>{children}</MemoryRouter>
   </QueryClientProvider>
 );
 

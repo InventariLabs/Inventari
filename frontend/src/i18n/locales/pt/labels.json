@@ -45,6 +45,7 @@
   "generateModal": {
     "title": "Gerar etiquetas",
     "count": "Número de etiquetas (1–500)",
+    "countTooHigh": "Um lote comporta no máximo {{max}} etiquetas.",
     "purpose": "Para que servem estas etiquetas?",
     "purposeHelp": "Uma etiqueta em branco abre o formulário de cadastro do que ela foi impressa para identificar.",
     "purposeProduct": "Produtos",
@@ -194,7 +195,7 @@
   "history": {
     "label": "Etiqueta",
     "previouslyUsedFor": "Usada anteriormente para",
-    "title": "Histórico do produto"
+    "title": "Etiqueta arquivada"
   },
   "openScanActions": "Abrir ações de leitura",
   "scanNotFound": "Etiqueta não encontrada",
@@ -203,6 +204,9 @@
   "statusUnassigned": "Não atribuída",
   "viewPool": "Ver conjunto de etiquetas",
   "labelDeleted": "Etiqueta excluída",
+  "deleteOne": "Excluir a etiqueta {{code}}? Um adesivo já impresso com este código deixa de ser reconhecido ao escanear.",
+  "deleteMany_one": "Excluir {{count}} etiqueta? Um adesivo já impresso com o código dela deixa de ser reconhecido ao escanear.",
+  "deleteMany_other": "Excluir {{count}} etiquetas? Adesivos já impressos com esses códigos deixam de ser reconhecidos ao escanear.",
   "printQueue": {
     "send": "Enviar para a impressora",
     "choose": "Escolha uma impressora",

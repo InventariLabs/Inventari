@@ -154,9 +154,15 @@ export default function LabelScanPage() {
               isAssigned ? "text-accent-600" : "text-amber-600"
             }`}
           >
+            {/* The pool calls a label whose product was archived "Archived";
+                the scan says the same. */}
             {isAssigned
               ? t("labels:statusAssigned")
-              : t("labels:statusUnassigned", { defaultValue: "Not assigned" })}
+              : data.status === "archived"
+                ? t("labels:filters.statusArchived")
+                : t("labels:statusUnassigned", {
+                    defaultValue: "Not assigned",
+                  })}
           </span>
         </div>
 

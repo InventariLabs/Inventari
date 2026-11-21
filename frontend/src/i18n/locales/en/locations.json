@@ -317,7 +317,7 @@
   "masterDetailSubtitle": "Pick a location to see what is inside it, its products and its settings.",
   "select": {
     "title": "Choose a location",
-    "description": "The tree on the left lists every location. Pick one to see what is inside it."
+    "description": "Pick a location in the tree on the left to see what is inside it."
   },
   "path": {
     "label": "Location path",

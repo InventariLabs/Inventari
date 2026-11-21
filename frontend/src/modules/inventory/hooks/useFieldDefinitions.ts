@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useActiveProfile } from "@/hooks/useActiveProfile";
 import { useShowInventoryValue } from "@/modules/shared/hooks/useShowInventoryValue";
 import type {
   CategoryDTO,
@@ -33,6 +34,12 @@ export function useFieldDefinitions({
   scannedAsFood,
 }: UseFieldDefinitionsProps): FieldDefinition[] {
   const showInventoryValue = useShowInventoryValue();
+  // A category the user made carries no context, so the profile speaks for
+  // it: a cable in an equipment and warehouse workspace has no freeze date.
+  const profileContext =
+    useActiveProfile()?.seed_profile === "equipment_wms"
+      ? "equipment"
+      : undefined;
 
   return useMemo(
     () =>
@@ -42,6 +49,7 @@ export function useFieldDefinitions({
         uomCategoryName,
         showInventoryValue,
         scannedAsFood,
+        profileContext,
       }),
     [
       selectedCategory,
@@ -49,6 +57,7 @@ export function useFieldDefinitions({
       uomCategoryName,
       showInventoryValue,
       scannedAsFood,
+      profileContext,
     ],
   );
 }

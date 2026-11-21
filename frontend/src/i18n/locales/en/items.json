@@ -8,6 +8,7 @@
   "subtitle": "Browse and manage your products",
   "addProduct": "Add product",
   "exportNeedsProducts": "Nothing to export: this list is empty.",
+  "exportListFailed": "The list could not be loaded, so there is nothing to export yet.",
   "searchPlaceholder": "Search products…",
   "allPlaces": "All locations",
   "allCategories": "All categories",
@@ -381,6 +382,7 @@
     "justNow": "Just now",
     "actions": {
       "CREATED": "Created",
+      "UNIT_CHOSEN": "Unit chosen",
       "CREATED_VIA_SCAN": "Created via scan",
       "UPDATED": "Updated",
       "MOVED": "Moved",
@@ -399,6 +401,10 @@
     "corrects": "corrects {{number}}",
     "createdWith_one": "Created with quantity {{amount}}",
     "createdWith_other": "Created with quantity {{amount}}",
+    "unitChosen": {
+      "entered": "Entered {{entered}}, kept as {{kept}}",
+      "unit": "Entered in {{chosen_unit}}; the product is kept in {{template_unit}}"
+    },
     "createdViaScan": {
       "label": "Created by scanning label {{code}}",
       "barcode": "Created by scanning barcode {{code}}",
@@ -441,6 +447,7 @@
   "itemVolume": "Volume",
   "backToActiveItems": "Go to active products",
   "detail": {
+    "pageTitle": "Product",
     "overviewTab": "Overview",
     "useBy": "Use by after opening",
     "useByClear": "Clear",

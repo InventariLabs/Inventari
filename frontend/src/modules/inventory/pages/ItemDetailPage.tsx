@@ -6,6 +6,8 @@ import { QueryError } from "@/components/ui/QueryResult";
 import { RecordNotFound } from "@/components/ui/RecordNotFound";
 import { extractApiErrorCode, isNotFoundError } from "@/lib/errors";
 import { useRecordVisit } from "@/module-sdk";
+import { useEffect } from "react";
+import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useItem } from "@/modules/inventory/hooks/useItems";
 import ItemDetailContent from "@/modules/inventory/components/items/ItemDetailContent";
 
@@ -28,12 +30,25 @@ export default function ItemDetailPage() {
 
   const { data: item, isLoading, isError, error, refetch } = useItem(id ?? "");
   useRecordVisit("inventory", item);
+  const { setHeader } = useModulePageHeader();
+  const requestFailed = isError && !isNotFoundError(error);
+
+  // A failed request keeps the page's frame — its name and the way back —
+  // so the reader is not left on a bare error with nowhere to go.
+  useEffect(() => {
+    if (!requestFailed) return;
+    setHeader({
+      title: t("items:detail.pageTitle"),
+      backTo: "/inventory/items",
+    });
+    return () => setHeader({});
+  }, [requestFailed, setHeader, t]);
 
   if (isLoading) return <LoadingSpinner />;
 
   // A product that was deleted and a request that failed are two different
   // answers, and only the second one is worth repeating.
-  if (isError && !isNotFoundError(error)) {
+  if (requestFailed) {
     return <QueryError error={error} onRetry={() => void refetch()} />;
   }
 

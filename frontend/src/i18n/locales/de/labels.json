@@ -45,6 +45,7 @@
   "generateModal": {
     "title": "Etiketten erzeugen",
     "count": "Anzahl Etiketten (1–500)",
+    "countTooHigh": "In einen Stapel passen höchstens {{max}} Etiketten.",
     "purpose": "Wofür sind diese Etiketten?",
     "purposeHelp": "Ein leeres Etikett öffnet das Formular für das, wofür es gedruckt wurde.",
     "purposeProduct": "Produkte",
@@ -194,7 +195,7 @@
   "history": {
     "label": "Etikett",
     "previouslyUsedFor": "Zuvor verwendet für",
-    "title": "Produkthistorie"
+    "title": "Archiviertes Etikett"
   },
   "openScanActions": "Scan-Aktionen öffnen",
   "scanNotFound": "Etikett nicht gefunden",
@@ -203,6 +204,9 @@
   "statusUnassigned": "Nicht zugewiesen",
   "viewPool": "Etikettenpool anzeigen",
   "labelDeleted": "Etikett gelöscht",
+  "deleteOne": "Etikett {{code}} löschen? Ein bereits gedruckter Aufkleber mit diesem Code wird beim Scannen nicht mehr erkannt.",
+  "deleteMany_one": "{{count}} Etikett löschen? Ein bereits gedruckter Aufkleber mit seinem Code wird beim Scannen nicht mehr erkannt.",
+  "deleteMany_other": "{{count}} Etiketten löschen? Bereits gedruckte Aufkleber mit diesen Codes werden beim Scannen nicht mehr erkannt.",
   "printQueue": {
     "send": "An Drucker senden",
     "choose": "Drucker wählen",

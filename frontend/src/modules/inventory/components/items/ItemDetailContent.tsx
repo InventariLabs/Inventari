@@ -9,6 +9,7 @@ import { useCanWrite } from "@/hooks/useCanWrite";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useAllCategories } from "@/modules/shared/hooks/useCategories";
 import { useLocationsById } from "@/module-sdk";
+import { ConsumeDialog } from "@/modules/inventory/components/ConsumeDialog";
 import { DeleteReasonDialog } from "@/modules/inventory/components/DeleteReasonDialog";
 import { MoveItemModal } from "@/modules/inventory/components/MoveItemModal";
 import { QuickActionGrid } from "@/modules/inventory/components/QuickActionGrid";
@@ -69,13 +70,14 @@ export default function ItemDetailContent({ item }: { item: Item }) {
     Boolean(item.template_id) && recordsMovements(enabledModules);
   const locationName = places.get(item.location_id)?.name;
 
-  const { actions, vocabularyNote, deleteDialog } = useItemQuickActions(item, {
-    onDone: () => {},
-    onMove: () => setMoving(true),
-    // The address stops resolving the moment the record goes.
-    onDeleted: () => navigate("/inventory/items"),
-    inVirtualPlace: isVirtualUsage(places.get(item.location_id)?.usage),
-  });
+  const { actions, vocabularyNote, deleteDialog, consumeDialog } =
+    useItemQuickActions(item, {
+      onDone: () => {},
+      onMove: () => setMoving(true),
+      // The address stops resolving the moment the record goes.
+      onDeleted: () => navigate("/inventory/items"),
+      inVirtualPlace: isVirtualUsage(places.get(item.location_id)?.usage),
+    });
 
   useEffect(() => {
     setHeader({
@@ -165,6 +167,14 @@ export default function ItemDetailContent({ item }: { item: Item }) {
           onSuccess={() => setMoving(false)}
         />
       )}
+
+      <ConsumeDialog
+        key={consumeDialog.item?.id ?? "closed"}
+        open={consumeDialog.item !== null}
+        item={consumeDialog.item}
+        onConfirm={consumeDialog.onConfirm}
+        onCancel={consumeDialog.onCancel}
+      />
 
       <DeleteReasonDialog
         key={String(deleteDialog.open)}

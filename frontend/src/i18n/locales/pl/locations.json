@@ -337,7 +337,7 @@
   "masterDetailSubtitle": "Wybierz miejsce, aby zobaczyć, co jest w środku, jego produkty i ustawienia.",
   "select": {
     "title": "Wybierz miejsce",
-    "description": "Drzewo po lewej wymienia wszystkie miejsca. Wybierz jedno, aby zobaczyć, co jest w środku."
+    "description": "Wybierz miejsce w drzewie po lewej, aby zobaczyć, co jest w środku."
   },
   "path": {
     "label": "Ścieżka miejsca",

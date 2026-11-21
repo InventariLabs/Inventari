@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, Plus, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { NativeSelect } from "@/components/ui/NativeSelect";
 import { FieldDefinition } from "@/types";
@@ -125,13 +126,16 @@ export default function FieldBuilderFieldForm({
           <span className="text-[10px] font-medium uppercase tracking-widest text-on-muted">
             {t("modules:fieldBuilder.addCustomField")}
           </span>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="iconSm"
             onClick={onCancel}
+            aria-label={t("common:actions.close")}
             className="text-on-muted hover:text-on"
           >
             <X size={14} />
-          </button>
+          </Button>
         </div>
       )}
       <div className="grid grid-cols-2 items-end gap-2">

@@ -311,7 +311,7 @@
   "masterDetailSubtitle": "Wählen Sie einen Lagerort, um seinen Inhalt, seine Produkte und Einstellungen zu sehen.",
   "select": {
     "title": "Lagerort wählen",
-    "description": "Der Baum links listet alle Lagerorte. Wählen Sie einen, um seinen Inhalt zu sehen."
+    "description": "Wählen Sie im Baum links einen Lagerort, um seinen Inhalt zu sehen."
   },
   "path": {
     "label": "Lagerortpfad",

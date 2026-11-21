@@ -148,6 +148,61 @@ describe("useItemForm — the unit the catalogue counts the product in", () => {
     expect(payload.unit_confirmed_over_template).toBe(true);
   });
 
+  it("carries on with the save the press raised once the choice is confirmed", async () => {
+    catalogueKnows(KILOGRAM, "kg");
+    const onSubmit = vi.fn();
+    const { result } = renderItemForm({ onSubmit });
+
+    await typeMatchedProduct(result);
+    act(() => {
+      result.current.handleInputChange("location_id", "loc-1");
+      result.current.handleInputChange("quantity", "1000");
+    });
+    act(() => {
+      result.current.handleInputChange("uom_id", GRAM);
+    });
+    // The press that raised (or re-raised) the question is the reader's
+    // request to save; the answer must not drop it.
+    act(() => {
+      result.current.submit();
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    act(() => {
+      result.current.resolveUnitChoice(true);
+    });
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
+    const payload = onSubmit.mock.calls[0][0] as Record<string, unknown>;
+    expect(payload.uom_id).toBe(GRAM);
+    expect(payload.unit_confirmed_over_template).toBe(true);
+  });
+
+  it("saves in the product's own unit when the press's question is declined", async () => {
+    catalogueKnows(KILOGRAM, "kg");
+    const onSubmit = vi.fn();
+    const { result } = renderItemForm({ onSubmit });
+
+    await typeMatchedProduct(result);
+    act(() => {
+      result.current.handleInputChange("location_id", "loc-1");
+      result.current.handleInputChange("quantity", "1000");
+    });
+    act(() => {
+      result.current.handleInputChange("uom_id", GRAM);
+    });
+    act(() => {
+      result.current.submit();
+    });
+    act(() => {
+      result.current.resolveUnitChoice(false);
+    });
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
+    const payload = onSubmit.mock.calls[0][0] as Record<string, unknown>;
+    expect("uom_id" in payload).toBe(false);
+  });
+
   it("puts the template's unit back when the choice is declined", async () => {
     catalogueKnows(KILOGRAM, "kg");
     const onSubmit = vi.fn();
