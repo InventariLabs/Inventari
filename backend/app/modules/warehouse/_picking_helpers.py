@@ -150,12 +150,15 @@ async def start_pick_session_over_documents_async(
 
     if held:
         doc, open_session = held[0]
+        mine = open_session.assigned_to == user_id
         raise SessionHeldByOtherUserError(
             open_session.id,
             await _holder_name_async(db, org_id, open_session.assigned_to),
-            'wms_pick_document_in_session',
+            'wms_pick_document_in_own_session'
+            if mine
+            else 'wms_pick_document_in_session',
             document_id=doc.id,
-            mine=open_session.assigned_to == user_id,
+            mine=mine,
             number=doc.number,
         )
 

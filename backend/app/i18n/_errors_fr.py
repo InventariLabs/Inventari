@@ -306,6 +306,7 @@ ERRORS_FR: ErrorMessages = {
     'wms_pick_document_not_confirmed': "Le document {number} n'est pas confirmé : la session de préparation n'a pas été lancée. Seuls les documents confirmés peuvent être préparés.",
     'wms_pick_document_not_dispatch': "Le document {number} n'est pas une expédition : la session de préparation n'a pas été lancée. Seules les expéditions peuvent être préparées ensemble.",
     'wms_pick_document_in_session': "Le document {number} est déjà en préparation dans une autre session (ouverte par {owner}) : la session de préparation n'a pas été lancée.",
+    'wms_pick_document_in_own_session': "Le document {number} est déjà en préparation dans votre propre session : la session de préparation n'a pas été lancée.",
     'wms_line_document_closed': 'Le document {number} est {status} : ses lignes dans cette session ne peuvent plus être modifiées.',
     'wms_short_below_scanned': 'La quantité finale ne peut pas être inférieure à la quantité scannée ({scanned}) ; pour enregistrer moins, elle doit remplacer les scans.',
     'wms_short_pick_needs_outcome': 'Une ligne prélevée en moins demande un motif : « Manquant » laisse le reste dû dans un reliquat, tout autre motif clôt l’écart.',

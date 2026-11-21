@@ -716,6 +716,7 @@ class ErrorMessages(TypedDict):
     wms_pick_document_not_confirmed: str
     wms_pick_document_not_dispatch: str
     wms_pick_document_in_session: str
+    wms_pick_document_in_own_session: str
     wms_line_document_closed: str
     wms_short_below_scanned: str
     wms_short_pick_needs_outcome: str

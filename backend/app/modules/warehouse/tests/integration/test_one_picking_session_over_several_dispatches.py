@@ -258,6 +258,8 @@ class TestStartingOverSeveralDispatches:
         assert detail['held_session_id'] == held.json()['id']
         assert detail['held_document_id'] == busy['id']
         assert busy['number'] in detail['message']
+        assert 'your own session' in detail['message']
+        assert 'another session' not in detail['message']
         assert _sessions_holding(db_session, ready) == 0
 
     def test_a_dispatch_in_another_users_session_refuses_with_a_way_out(
