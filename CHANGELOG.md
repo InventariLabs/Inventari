@@ -379,8 +379,10 @@ says what the release does rather than what changed since them.
 - Saving a print layout whose template code does not parse or render — a
   purchase order, warehouse document or equipment layout — is refused, with
   the line and the complaint, instead of being stored and then breaking every
-  PDF printed with it. A purchase order whose stored layout no longer renders
-  prints with the built-in layout rather than failing with "An error occurred".
+  printout made with it. A layout already stored in that state — a purchase
+  order, a warehouse document, the file over several documents, a packing
+  slip, a pick list or an equipment protocol — prints with the built-in
+  layout rather than failing with "An error occurred".
 - On a slow connection the Inventory and Equipment overviews no longer state
   something that is not true while they load. *My locations* shows placeholders
   instead of "No locations yet" and its create button, and the Equipment

@@ -60,6 +60,33 @@ logger = get_logger(__name__)
 # Absolute path to the templates directory shipped with this module.
 _TEMPLATES_DIR = Path(__file__).parent / 'templates'
 
+
+def _render_stored_layout(
+    template_html: str, context: dict[str, Any], built_in: str
+) -> str:
+    """Render an organization's stored layout, else the built-in file *built_in*.
+
+    A body the sandbox cannot render (a syntax error stored before saves were
+    checked, an error of its own at run time) prints through the built-in
+    layout instead of failing the whole document.
+    """
+    try:
+        return core_api.pdf.render_html(
+            template_html, context, templates_dir=_TEMPLATES_DIR
+        )
+    except Exception:
+        logger.warning(
+            'A stored layout does not render; printing through %s',
+            built_in,
+            exc_info=True,
+        )
+        return core_api.pdf.render_html(
+            (_TEMPLATES_DIR / built_in).read_text(encoding='utf-8'),
+            context,
+            templates_dir=_TEMPLATES_DIR,
+        )
+
+
 # A layout written in one language says so on its root element,
 # ``<html lang="pl">``; one that follows the reader writes
 # ``<html lang="{{ lang }}">``, which this does not match.
@@ -483,9 +510,28 @@ def render_document_html(
         # PDF API (the same path purchase_orders uses), includes resolved
         # from the module's templates directory, output sanitized by the
         # engine itself.
-        html_content = core_api.pdf.render_html(
-            user_template_html, context, templates_dir=_TEMPLATES_DIR
-        )
+        # A layout that does not render prints through the family the profile
+        # names, as if no layout were stored.
+        try:
+            html_content = core_api.pdf.render_html(
+                user_template_html, context, templates_dir=_TEMPLATES_DIR
+            )
+        except Exception:
+            logger.warning(
+                'The stored layout for document %s does not render; '
+                'printing through the built-in family',
+                document.id,
+                exc_info=True,
+            )
+            return render_document_html(
+                document,
+                profile,
+                lang,
+                issuer,
+                user_template_html=None,
+                page_size=page_size,
+                country=country,
+            )
     else:
         html_content = _svc.render_filesystem_template(f'{template_name}.html', context)
 
@@ -594,9 +640,7 @@ async def generate_packing_slip_pdf_async(
             packages=packages,
             country=getattr(organization, 'country', None),
         )
-        html = core_api.pdf.render_html(
-            template_html, context, templates_dir=_TEMPLATES_DIR
-        )
+        html = _render_stored_layout(template_html, context, 'packing_slip.html')
         return _svc.render_to_pdf(apply_page_size(html, page_size))
 
     return await run_sync_in_thread(render)
@@ -656,10 +700,10 @@ async def generate_pick_list_pdf_async(
     page_size = page_size_of(organization)
 
     def render() -> bytes:
-        html = core_api.pdf.render_html(
+        html = _render_stored_layout(
             template_html,
             build_pick_list_context(documents, pick_lines, effective_lang, issuer),
-            templates_dir=_TEMPLATES_DIR,
+            'pick_list.html',
         )
         return _svc.render_to_pdf(apply_page_size(html, page_size))
 
