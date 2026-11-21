@@ -582,3 +582,19 @@ describe("RecipeForm — ingredient defaults are looked up once", () => {
     }
   });
 });
+
+describe("RecipeForm — field errors", () => {
+  it("drops the name error and aria-invalid once a valid name is typed", () => {
+    renderForm({ onSubmit: vi.fn(), onCancel: vi.fn() });
+    const field = screen.getByPlaceholderText("e.g. Pasta Bolognese");
+
+    fireEvent.submit(field.closest("form") as HTMLFormElement);
+    expect(screen.getByText("Recipe name is required")).toBeInTheDocument();
+    expect(field).toHaveAttribute("aria-invalid", "true");
+
+    fireEvent.change(field, { target: { value: "Pancakes" } });
+
+    expect(screen.queryByText("Recipe name is required")).toBeNull();
+    expect(field).not.toHaveAttribute("aria-invalid", "true");
+  });
+});
