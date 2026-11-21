@@ -7,11 +7,11 @@ import { ApiHelper } from "./helpers/api";
  * the live stack: the apply test mutates
  * the org's active profile and restores it afterwards.
  *
- * The profile choice lives on "My modules" since it merged with the
+ * The profile choice lives on "Organization modules" since it merged with the
  * single-module switch; /settings/workspace only redirects there.
  *
  * Covers:
- *   1. Settings sidebar exposes a "My modules" entry with the profile choice.
+ *   1. Settings sidebar exposes a "Organization modules" entry with the profile choice.
  *   2. Selecting a profile radio shows what will change (no Preview button).
  *   3. Apply via ConfirmDialog repaints --color-primary-500 and persists
  *      the new active_profile_id.
@@ -77,7 +77,7 @@ async function switchProfile(page: Page, targetName: string) {
 }
 
 test.describe.serial("Workspace mode", () => {
-  test("settings sidebar links to My modules with the profile choice", async ({
+  test("settings sidebar links to Organization modules with the profile choice", async ({
     page,
     authenticatedPage,
   }) => {
@@ -86,7 +86,10 @@ test.describe.serial("Workspace mode", () => {
       .waitForLoadState("networkidle", { timeout: 15000 })
       .catch(() => {});
 
-    const navLink = page.getByRole("link", { name: "My modules", exact: true });
+    const navLink = page.getByRole("link", {
+      name: "Organization modules",
+      exact: true,
+    });
     await expect(navLink).toBeVisible({ timeout: 15000 });
     await navLink.click();
 
@@ -175,10 +178,10 @@ test.describe.serial("Workspace mode", () => {
 
     const menu = page.getByRole("menu");
     await expect(menu).toBeVisible({ timeout: 10000 });
-    // An admin's last entry opens My modules (others get "All modules", the
+    // An admin's last entry opens Organization modules (others get "All modules", the
     // launcher); the suite signs in as an admin.
     await expect(
-      menu.getByRole("menuitem", { name: "My modules", exact: true }),
+      menu.getByRole("menuitem", { name: "Organization modules", exact: true }),
     ).toBeVisible();
 
     // Click the first non-active module entry and expect a route change.
@@ -189,7 +192,10 @@ test.describe.serial("Workspace mode", () => {
       const item = items.nth(i);
       const isActive = await item.getAttribute("aria-current");
       const label = (await item.textContent()) ?? "";
-      if (!isActive && !/^(my modules|all modules|settings)$/i.test(label.trim())) {
+      if (
+        !isActive &&
+        !/^(my modules|organization modules|all modules|settings)$/i.test(label.trim())
+      ) {
         await item.click();
         clicked = true;
         break;

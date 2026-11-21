@@ -503,7 +503,22 @@ describe("ApiKeysPage — acting on keys", () => {
       within(dialog).getByRole("button", { name: "Revoke" }),
     );
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith("The key could not be revoked."),
+    );
     expect(toast.success).not.toHaveBeenCalled();
+  });
+
+  it("names the key on every Revoke button, so eight keys are not eight identical buttons", async () => {
+    signInWith(["org:read", "org:settings:write"]);
+    renderPage();
+
+    const buttons = await screen.findAllByRole("button", {
+      name: "Revoke Home Assistant",
+    });
+    expect(buttons.length).toBe(2);
+    expect(
+      screen.queryByRole("button", { name: "Revoke" }),
+    ).not.toBeInTheDocument();
   });
 });

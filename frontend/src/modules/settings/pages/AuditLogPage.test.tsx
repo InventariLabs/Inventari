@@ -261,7 +261,7 @@ describe("AuditLogPage", () => {
     const header = renderPage();
 
     expect(header.current.subtitle).toContain(
-      "Create · Update · Quantity change · Move · Use · Dispose · Restore · Soft delete · Purge",
+      "Create · Update · Quantity change · Move · Use · Dispose · Restore · Soft delete · Purge · Hard delete · Revoked · Accepted · Removed · Workspace mode default",
     );
     expect(
       await screen.findByText("No audit entries yet."),
@@ -654,6 +654,9 @@ describe("AuditLogPage", () => {
     ["invitation", "SOFT_DELETE", "Revoked"],
     ["invitation", "USE", "Accepted"],
     ["api_key", "SOFT_DELETE", "Revoked"],
+    ["role", "HARD_DELETE", "Removed"],
+    ["webhook_endpoint", "HARD_DELETE", "Removed"],
+    ["ai_connection", "HARD_DELETE", "Removed"],
   ])(
     "calls %s %s by its own verb: %s",
     async (target_type, action, expected) => {
@@ -686,6 +689,7 @@ describe("AuditLogPage", () => {
       expect(await screen.findByText(expected)).toBeInTheDocument();
       expect(screen.queryByText("Soft delete")).not.toBeInTheDocument();
       expect(screen.queryByText("Use")).not.toBeInTheDocument();
+      expect(screen.queryByText("Hard delete")).not.toBeInTheDocument();
     },
   );
 

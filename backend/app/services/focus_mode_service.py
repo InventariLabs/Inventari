@@ -289,7 +289,8 @@ async def enter_focus_mode(
     """Enter single-module mode on *focus_module*.
 
     Snapshots the current enabled set, plans and applies the narrowing through
-    the profile-switch planner, and records the choice. Idempotency is a
+    the profile-switch planner, records the choice and journals each module it
+    switches on or off, as leaving does. Idempotency is a
     refusal: an organization already in focus mode must leave before focusing
     on something else, so the snapshot is never overwritten mid-mode.
 
@@ -321,6 +322,14 @@ async def enter_focus_mode(
             organization.enabled_modules = list(plan.final_enabled_modules)
             organization.focus_module = focus_module
             organization.pre_focus_enabled_modules = snapshot
+            if user is not None:
+                await _journal_module_switches(
+                    db,
+                    organization,
+                    user,
+                    enabled=list(plan.enable),
+                    disabled=list(plan.disable_all),
+                )
     except ModuleLifecycleError as exc:
         raise FocusModeApplyError(str(exc)) from exc
     except Exception as exc:  # any apply failure rolls the mode back whole

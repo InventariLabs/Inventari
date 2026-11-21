@@ -14,7 +14,7 @@ import { AuthLayout } from "./AuthLayout";
 import { SignedInNotice } from "./SignedInNotice";
 import { PasswordRules } from "./PasswordRules";
 import { firstBrokenRule } from "@/lib/passwordPolicy";
-import { extractApiError } from "@/lib/errors";
+import { extractApiError, refusesTheLink } from "@/lib/errors";
 import { authApi } from "@/lib/api/auth";
 import { organizationsApi } from "@/lib/api/organizations";
 
@@ -50,6 +50,53 @@ function OtherSessionNotice() {
   );
 }
 
+/**
+ * What the approval link already tells, and whether the link is spent.
+ *
+ * "New link" on an approved request replaces the token, so a link from the
+ * earlier email is refused here — before the form asks for a password it
+ * could never save. A refusal of the pace or a failure of the server says
+ * nothing about the link, and leaves the form.
+ */
+function useApprovedRequest(token: string | null) {
+  const query = useQuery({
+    queryKey: queryKeys.admin.registerApprovedRequest(token),
+    queryFn: () => authApi.getRegistrationLink(token ?? ""),
+    enabled: Boolean(token),
+    retry: false,
+  });
+  return {
+    approvedRequest: query.data,
+    linkSpent: query.isError && refusesTheLink(query.error),
+  };
+}
+
+function SpentLinkCard() {
+  const { t } = useTranslation("auth");
+  return (
+    <AuthLayout title={t("registrationLinkSpent.title")}>
+      <Card className="p-6 sm:p-8 border border-transparent shadow-lg">
+        <div data-testid="registration-link-spent">
+          <h2 className="text-xl font-semibold text-on mb-3 leading-none">
+            {t("registrationLinkSpent.title")}
+          </h2>
+          <p className="text-sm text-on-secondary leading-relaxed">
+            {t("registrationLinkSpent.body")}
+          </p>
+          <p className="mt-3 text-sm leading-relaxed">
+            <Link
+              to="/login"
+              className="inline-flex min-h-11 items-center md:min-h-0 font-medium text-primary-700 hover:text-primary-800 dark:text-primary-500 dark:hover:text-primary-500 underline decoration-2 underline-offset-4 transition-colors"
+            >
+              {t("registrationLinkSpent.next")}
+            </Link>
+          </p>
+        </div>
+      </Card>
+    </AuthLayout>
+  );
+}
+
 export default function RegisterPage() {
   const { t } = useTranslation("auth");
   const [searchParams] = useSearchParams();
@@ -79,12 +126,7 @@ export default function RegisterPage() {
     enabled: Boolean(inviteCode),
     retry: false,
   }).data;
-  const approvedRequest = useQuery({
-    queryKey: queryKeys.admin.registerApprovedRequest(token),
-    queryFn: () => authApi.getRegistrationLink(token ?? ""),
-    enabled: Boolean(token),
-    retry: false,
-  }).data;
+  const { approvedRequest, linkSpent } = useApprovedRequest(token);
 
   // The API names a built-in level by its key (`user`, `viewer`...) and a
   // custom role by the name its author gave it. Every other screen says
@@ -245,6 +287,8 @@ export default function RegisterPage() {
       </AuthLayout>
     );
   }
+
+  if (linkSpent) return <SpentLinkCard />;
 
   return (
     <AuthLayout title={getTitle()}>

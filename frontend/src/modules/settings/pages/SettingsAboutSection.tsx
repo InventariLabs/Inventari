@@ -82,6 +82,13 @@ export default function SettingsAboutSection() {
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-on-secondary">
           <p>{t("settings.about.guide_hint")}</p>
+          {info && (
+            <p>
+              {t("settings.about.guide_version_hint", {
+                version: info.version,
+              })}
+            </p>
+          )}
           <OutLink href={USER_GUIDE_URL}>
             {t("settings.about.guide_link")}
           </OutLink>
@@ -94,6 +101,11 @@ export default function SettingsAboutSection() {
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-on-secondary">
           <p>{t("settings.about.source_hint")}</p>
+          {info && (
+            <p>
+              {t("settings.about.source_tag_hint", { version: info.version })}
+            </p>
+          )}
           {about.error ? (
             <QueryFailure
               error={about.error}

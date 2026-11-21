@@ -110,7 +110,7 @@ export default function SettingsEmailTab() {
     user: "",
     password: "",
     from_email: "",
-    from_name: "Inventari",
+    from_name: "",
   });
   const [errors, setErrors] = useState<
     Partial<Record<keyof SMTPSettings, string>>
@@ -129,10 +129,23 @@ export default function SettingsEmailTab() {
         user: (smtp.user as string) || "",
         password: (smtp.password as string) || "",
         from_email: (smtp.from_email as string) || "",
-        from_name: (smtp.from_name as string) || "Inventari",
+        from_name: (smtp.from_name as string) || "",
       });
     }
   }, [organization]);
+
+  // A field that was reported wrong stops being reported once it is edited:
+  // the message under it described the value that was there.
+  const change = (patch: Partial<SMTPSettings>) => {
+    setSmtpSettings((current) => ({ ...current, ...patch }));
+    setErrors((current) => {
+      const next = { ...current };
+      for (const key of Object.keys(patch) as (keyof SMTPSettings)[]) {
+        delete next[key];
+      }
+      return next;
+    });
+  };
 
   const validate = (): boolean => {
     const next = validateSmtp(smtpSettings, t);
@@ -281,9 +294,7 @@ export default function SettingsEmailTab() {
               type="text"
               required
               value={smtpSettings.host}
-              onChange={(e) =>
-                setSmtpSettings({ ...smtpSettings, host: e.target.value })
-              }
+              onChange={(e) => change({ host: e.target.value })}
               placeholder="smtp.gmail.com"
               error={errors.host}
             />
@@ -294,10 +305,7 @@ export default function SettingsEmailTab() {
               max={65535}
               value={smtpSettings.port}
               onChange={(e) =>
-                setSmtpSettings({
-                  ...smtpSettings,
-                  port: parseInt(e.target.value) || 587,
-                })
+                change({ port: parseInt(e.target.value) || 587 })
               }
               error={errors.port}
             />
@@ -305,10 +313,7 @@ export default function SettingsEmailTab() {
               label={t("settings.smtp.encryption")}
               value={smtpSettings.encryption}
               onChange={(value) =>
-                setSmtpSettings({
-                  ...smtpSettings,
-                  encryption: value as SmtpEncryption,
-                })
+                change({ encryption: value as SmtpEncryption })
               }
               options={[
                 {
@@ -323,30 +328,21 @@ export default function SettingsEmailTab() {
               label={t("settings.smtp.user")}
               type="text"
               value={smtpSettings.user}
-              onChange={(e) =>
-                setSmtpSettings({ ...smtpSettings, user: e.target.value })
-              }
+              onChange={(e) => change({ user: e.target.value })}
               error={errors.user}
             />
             <Input
               label={t("settings.smtp.password")}
               type="password"
               value={smtpSettings.password}
-              onChange={(e) =>
-                setSmtpSettings({ ...smtpSettings, password: e.target.value })
-              }
+              onChange={(e) => change({ password: e.target.value })}
               error={errors.password}
             />
             <Input
               label={t("settings.smtp.fromEmail")}
               type="email"
               value={smtpSettings.from_email}
-              onChange={(e) =>
-                setSmtpSettings({
-                  ...smtpSettings,
-                  from_email: e.target.value,
-                })
-              }
+              onChange={(e) => change({ from_email: e.target.value })}
               placeholder="no-reply@example.com"
               error={errors.from_email}
             />
@@ -354,12 +350,9 @@ export default function SettingsEmailTab() {
               label={t("settings.smtp.fromName")}
               type="text"
               value={smtpSettings.from_name}
-              onChange={(e) =>
-                setSmtpSettings({
-                  ...smtpSettings,
-                  from_name: e.target.value,
-                })
-              }
+              // Left blank, mail goes out under the organization's name.
+              placeholder={organization?.name}
+              onChange={(e) => change({ from_name: e.target.value })}
             />
           </div>
 

@@ -96,7 +96,7 @@ and must name each key from this catalog, not from a vocabulary of its own.
 
 A **workspace mode** is a product profile (`app.core.product_profiles.PRODUCT_PROFILES`) —
 the set of modules, seeds, theme and branding a user picks in the onboarding wizard and can
-change later in Settings → My modules. Three ship with Inventari. Their names are the second
+change later in Settings → Organization modules. Three ship with Inventari. Their names are the second
 layer of user-visible naming and follow the module rules above, restated here for the
 profile registry:
 

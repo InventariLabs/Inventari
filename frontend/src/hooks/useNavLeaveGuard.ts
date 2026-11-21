@@ -35,7 +35,7 @@ export function useNavLeaveGuard() {
         title: t("form.unsavedTitle", "Unsaved changes"),
         message: t("form.unsavedLeave", {
           form: dirtyForm,
-          defaultValue: "{{form}} holds unsaved changes. Leave anyway?",
+          defaultValue: "{{form}}: you have unsaved changes. Leave anyway?",
         }),
         confirmLabel: t("form.leaveAnyway", "Leave anyway"),
         cancelLabel: t("actions.cancel", "Cancel"),

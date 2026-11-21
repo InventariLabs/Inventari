@@ -24,6 +24,9 @@
     "noPermissions": "Keine Berechtigungen"
   },
   "revoke": "Widerrufen",
+  "revokeNamed": "{{name}} widerrufen",
+  "generateFailed": "Der Schlüssel konnte nicht erstellt werden.",
+  "revokeFailed": "Der Schlüssel konnte nicht widerrufen werden.",
   "revokeConfirm": {
     "title": "API-Schlüssel widerrufen",
     "message": "Möchten Sie den Schlüssel \"{{name}}\" wirklich widerrufen? Er funktioniert dann sofort nicht mehr.",

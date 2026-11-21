@@ -132,7 +132,9 @@ describe("AppShell — the header's exits walk the same gate as the module tabs"
     expect(screen.getByTestId("path")).toHaveTextContent("/equipment");
     expect(screen.getByText("Unsaved changes")).toBeInTheDocument();
     expect(
-      screen.getByText("The asset form holds unsaved changes. Leave anyway?"),
+      screen.getByText(
+        "The asset form: you have unsaved changes. Leave anyway?",
+      ),
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Leave anyway" }));
@@ -633,7 +635,7 @@ describe("AppShell — the header says the workspace shows one module", () => {
     expect(note.previousElementSibling).toHaveTextContent(/\S/);
   });
 
-  it("leads an admin to Settings -> My modules", () => {
+  it("leads an admin to Settings -> Organization modules", () => {
     authState.role = "admin";
     renderShell();
     const link = screen.getByRole("link", { name: /^You see only/ });

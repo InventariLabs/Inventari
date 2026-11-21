@@ -44,7 +44,7 @@
     "diffUnchanged": "Bez zmian",
     "diffConfig": "Resetuj ustawienia dla",
     "confirmTitle": "Przełączyć na {{name}}?",
-    "confirmMessage": "Moduły zostaną włączone i wyłączone dla Twojej organizacji. Możesz wrócić w każdej chwili.",
+    "confirmMessage": "Moduły zostaną włączone i wyłączone dla Twojej organizacji.",
     "confirmApply": "Przełącz tryb pracy",
     "confirmReapplyTitle": "Ponowić konfigurację {{name}}?",
     "confirmReapplyMessage": "Żaden moduł nie zostanie dodany ani usunięty. Konfiguracja trybu pracy wykona się ponownie: jego ustawienia domyślne wrócą do wartości trybu, a zasiane przez niego nazwy — typy miejsc włącznie — zostaną zapisane w języku tej sesji.",
@@ -53,6 +53,7 @@
     "diffManualKept": "Zostaje (dodane ręcznie)",
     "diffCascadeHint": "Wyłączone, bo wymagają usuwanego modułu",
     "diffConfigHint": "Domyślne wartości trybu pracy nadpiszą bieżące ustawienia",
+    "confirmConfigHint": "Domyślne wartości trybu pracy nadpiszą bieżące ustawienia, a powrót do poprzedniego trybu ich nie przywróci",
     "renumberOffer": "Twoje miejsca zachowują kody i naklejki. Kody półek (A-02-01) nadasz przez Przenumeruj według szablonu w Magazyn → Konfiguracja → Kody, etykiety i kolejność obchodu miejsc; stare naklejki dalej się skanują."
   },
   "activeProfile": {

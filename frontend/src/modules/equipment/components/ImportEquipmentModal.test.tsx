@@ -181,7 +181,7 @@ describe("ImportEquipmentModal — from file to result", () => {
 
     server.use(
       http.post("/api/v1/equipment/import/analyze", () =>
-        HttpResponse.json({}, { status: 503 }),
+        HttpResponse.json({}, { status: 500 }),
       ),
     );
     await user.click(screen.getByRole("button", { name: /Analyze/ }));
