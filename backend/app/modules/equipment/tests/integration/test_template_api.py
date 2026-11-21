@@ -386,3 +386,35 @@ class TestProtocolHtml:
         )
         assert response.status_code == status.HTTP_200_OK
         assert 'CUSTOM' in response.text
+
+
+@pytest.mark.integration
+def test_the_equipment_editor_refuses_a_body_that_does_not_parse(
+    client: TestClient, eq_auth_headers: dict[str, str]
+) -> None:
+    """Create and edit both go through the shared check, and name the line."""
+    body = {
+        'name': 'Handover Protocol',
+        'module': 'equipment',
+        'document_type': 'CHECKOUT',
+    }
+    refused = client.post(
+        '/api/v1/equipment/templates',
+        headers=eq_auth_headers,
+        json={**body, 'body_html': '<p>{{ broken </p>'},
+    )
+    assert refused.status_code == status.HTTP_400_BAD_REQUEST, refused.text
+    assert 'line 1' in refused.text
+
+    made = client.post(
+        '/api/v1/equipment/templates',
+        headers=eq_auth_headers,
+        json={**body, 'body_html': '<p>{{ item_name }}</p>'},
+    )
+    assert made.status_code == status.HTTP_201_CREATED, made.text
+    edited = client.put(
+        f'/api/v1/equipment/templates/{made.json()["id"]}',
+        headers=eq_auth_headers,
+        json={'body_html': '{% if %}'},
+    )
+    assert edited.status_code == status.HTTP_400_BAD_REQUEST, edited.text

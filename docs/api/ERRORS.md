@@ -710,6 +710,7 @@ apart.
 | `TEMPLATE_IMPORT_WRONG_VERSION` | The file was exported in format version {version}; this installation reads version {supported}. |
 | `TEMPLATE_IN_USE_BY_ITEMS` | Cannot delete template: it is used by {count} item(s) |
 | `TEMPLATE_NOT_BUILTIN_COPY` | This template was not copied from a built-in layout |
+| `TEMPLATE_NOT_SAVED_SYNTAX` | The template was not saved: line {line}: {detail} |
 | `TEMPLATE_OTHER_ORGANIZATION` | Template belongs to a different organization |
 | `TOKEN_INVALID` | Invalid authentication token |
 | `TRANSFER_CANNOT_SPLIT_SERIALIZED_RECORD` | A transfer cannot split the serialized record {serial_number}; transfer the whole record. |

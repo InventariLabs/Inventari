@@ -13,6 +13,10 @@ from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import update
+from sqlalchemy.orm import Session
+
+from app.core.template_models import DocumentTemplate
 
 BASE = '/api/v1/warehouse/templates'
 BROKEN = '<p>{% if a &gt; 1 %}x{% endif %}</p>'
@@ -35,14 +39,21 @@ class TestResetToBuiltIn:
         return body
 
     def test_a_broken_copy_becomes_the_built_in_again(
-        self, client: TestClient, doc_auth_headers: dict[str, str]
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        db_session: Session,
     ) -> None:
         copy = self._seeded(client, doc_auth_headers, 'Standard Template')
         built_in = self._built_in_body(client, doc_auth_headers, 'Standard Template')
-        broken = client.put(
-            f'{BASE}/{copy["id"]}', headers=doc_auth_headers, json={'body_html': BROKEN}
+        # Written straight to the row: saving refuses a body that does not
+        # parse, but a copy stored before that check can still be one.
+        db_session.execute(
+            update(DocumentTemplate)
+            .where(DocumentTemplate.id == copy['id'])
+            .values(body_html=BROKEN)
         )
-        assert broken.status_code == 200, broken.text
+        db_session.flush()
         assert (
             client.post(
                 f'{BASE}/preview',

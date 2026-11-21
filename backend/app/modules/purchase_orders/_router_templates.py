@@ -1,3 +1,4 @@
+from pathlib import Path
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, status
@@ -33,6 +34,8 @@ _templates_router = APIRouter(
 )
 
 logger = get_logger(__name__)
+
+_TEMPLATES_DIR = Path(__file__).parent / 'templates'
 
 PO_PLACEHOLDERS: list[PlaceholderInfo] = [
     PlaceholderInfo(key='{{po_number}}', description='PO number (auto-generated)'),
@@ -136,10 +139,7 @@ async def seed_default_templates(
     db: AsyncSession = Depends(get_async_db, scope='function'),
     org_id: UUID = Depends(require_org),
 ) -> list[DocumentTemplateSchema]:
-    from pathlib import Path
-
-    templates_dir = Path(__file__).parent / 'templates'
-    tpl_path = templates_dir / 'po_standard.html'
+    tpl_path = _TEMPLATES_DIR / 'po_standard.html'
     lang = get_current_lang()
     built_ins: list[tuple[str, str, str]] = []
     if tpl_path.exists():
@@ -197,6 +197,7 @@ async def create_template(
         body_html=data.body_html,
         document_type=data.document_type,
         is_default=data.is_default,
+        templates_dir=_TEMPLATES_DIR,
     )
 
 
@@ -218,6 +219,7 @@ async def update_template(
         document_type=data.document_type,
         is_default=data.is_default,
         user_id=current_user.id,
+        templates_dir=_TEMPLATES_DIR,
     )
 
 
