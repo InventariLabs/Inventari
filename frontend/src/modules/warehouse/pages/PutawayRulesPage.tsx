@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { Plus, Pencil, Trash2, ArrowDownToLine } from "lucide-react";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useCanWrite } from "@/hooks/useCanWrite";
@@ -29,6 +30,29 @@ import { SilencedHomeShelves } from "@/modules/warehouse/components/SilencedHome
 import { StorageRequired } from "@/modules/shared/components/StorageRequired";
 import { useLocationOffer } from "@/module-sdk";
 import { toast } from "sonner";
+
+/** Why a shelf of a rule takes no goods; a shelf past the head is named. */
+function shelfHeldLabel(
+  t: TFunction,
+  shelf: NonNullable<PutawayRule["locations"]>[number],
+  isHead: boolean,
+): string {
+  const reasons: Record<string, string> = {
+    archived: t("putaway.status.shelfHeld.archived"),
+    not_internal: t("putaway.status.shelfHeld.not_internal"),
+    receiving: t("putaway.status.shelfHeld.receiving"),
+    quarantine: t("putaway.status.shelfHeld.quarantine"),
+  };
+  const reason =
+    reasons[shelf.unavailable_reason ?? ""] ??
+    t("putaway.status.targetInactive");
+  return isHead
+    ? reason
+    : t("putaway.status.shelfHeldNamed", {
+        name: shelf.location_name ?? "—",
+        reason,
+      });
+}
 
 /**
  * The putaway rules list.
@@ -240,14 +264,30 @@ export default function PutawayRulesPage() {
                         (rule.target_location_id
                           ? `${rule.target_location_id.slice(0, 8)}…`
                           : "—")}
-                      {rule.target_location_active === false && (
-                        <Badge variant="warning" className="ml-2">
-                          {t(
-                            "putaway.status.targetInactive",
-                            "Target inactive",
-                          )}
-                        </Badge>
+                      {/* Each shelf the rule walks past says why: held back
+                          (receiving area, quarantine), archived or virtual.
+                          A rule with an old payload and no list keeps the
+                          generic mark. */}
+                      {(rule.locations ?? []).map((shelf, index) =>
+                        shelf.unavailable_reason ? (
+                          <Badge
+                            key={shelf.location_id}
+                            variant="warning"
+                            className="ml-2"
+                          >
+                            {shelfHeldLabel(t, shelf, index === 0)}
+                          </Badge>
+                        ) : null,
                       )}
+                      {rule.target_location_active === false &&
+                        !rule.locations?.length && (
+                          <Badge variant="warning" className="ml-2">
+                            {t(
+                              "putaway.status.targetInactive",
+                              "Target inactive",
+                            )}
+                          </Badge>
+                        )}
                       {/* A rule walks an ordered list; this row named only
                           its head, so a rule with one shelf and a rule with
                           four read identically. */}
