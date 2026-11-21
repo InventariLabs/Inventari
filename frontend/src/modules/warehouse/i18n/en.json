@@ -1106,8 +1106,8 @@
       "shelfHeld": {
         "archived": "Archived",
         "not_internal": "Virtual location",
-        "receiving": "Receiving area — held back",
-        "quarantine": "Quarantine — held back"
+        "receiving": "Receiving area — skipped",
+        "quarantine": "Quarantine — skipped"
       },
       "shelfHeldNamed": "{{name}}: {{reason}}",
       "moreShelves_one": "+{{count}} more shelf if it is full",

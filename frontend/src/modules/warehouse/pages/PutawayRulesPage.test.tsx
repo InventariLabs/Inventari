@@ -330,9 +330,7 @@ describe("PutawayRulesPage — inactive target mark", () => {
     ];
     await renderWithHeader(<PutawayRulesPage />);
 
-    expect(
-      await screen.findByText("Quarantine — held back"),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("Quarantine — skipped")).toBeInTheDocument();
     expect(screen.getByText("Old Dock: Archived")).toBeInTheDocument();
     expect(screen.queryByText("Target inactive")).not.toBeInTheDocument();
   });
