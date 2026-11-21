@@ -484,6 +484,15 @@ const dist = join(root, "dist");
  * 645; the other screens stand under theirs (login 407.5, launcher 422.5,
  * receive 475.6, issue 588.4, history 613.2, products 630.6, app first paint
  * 402.7, initial 193.9).
+ *
+ * Re-measured 2026-11-21 on the branch that words the persona walk's
+ * findings: the issue screen measures 590.0 KiB gz against its 590 (from
+ * 588.4) and the history screen 615.1 against its 615 (from 613.2). What
+ * the branch adds there is copy in six languages (the Polish catalogue sits
+ * in the language chunk both screens load); no import walked in. Those two
+ * phone budgets move a step of five, to 595 and 620; the other screens stand
+ * under theirs (login 408.9, launcher 424.0, start 642.2, receive 477.2,
+ * products 632.3, app first paint 404.2, initial 193.9).
  */
 const BUDGETS = {
   initial: 245,
