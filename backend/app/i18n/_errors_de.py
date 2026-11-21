@@ -949,6 +949,7 @@ ERRORS_DE: ErrorMessages = {
     'document_undo_posts_nothing': 'Dieses Dokument hält nur Waren fest, die bereits entnommen wurden — es hat keinen Bestand bewegt, es gibt also nichts rückgängig zu machen.',
     'document_undo_blocked': 'Das kann nicht rückgängig gemacht werden: {reason} Verwenden Sie „Korrigieren“, um den Rest zu ändern.',
     'document_undo_stock_used': 'Das kann nicht rückgängig gemacht werden: spätere Bewegungen haben den gebuchten Bestand verbraucht. Verwenden Sie „Korrigieren“, um den Rest zu ändern.',
+    'document_undo_held_goods': 'Das kann nicht rückgängig gemacht werden: Ein Teil des Wareneingangs ist in Quarantäne zurückgehalten. Verwenden Sie „Korrigieren“, um den Bestand im Regal zu ändern, und behandeln Sie die zurückgehaltene Ware gesondert.',
     'document_correction_posts_nothing': 'Dieses Dokument hält nur Waren fest, die bereits entnommen wurden — eine Korrektur kann darüber keinen Bestand bewegen.',
     'document_post_already_posted': 'Dieses Dokument wurde bereits gebucht – ein zweites Mal wurde nichts gebucht.',
     'document_post_cancelled': 'Dieses Dokument wurde storniert und kann nicht gebucht werden.',

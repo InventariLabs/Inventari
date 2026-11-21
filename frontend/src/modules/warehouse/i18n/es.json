@@ -2241,7 +2241,8 @@
     "print": "Imprimir {{number}}",
     "undoHintReceive": "Deshacer vuelve a sacar la mercancía del stock y escribe una corrección de {{number}}. Nada desaparece del historial.",
     "undoHintIssue": "Deshacer devuelve la mercancía al stock y escribe una corrección de {{number}}. Nada desaparece del historial.",
-    "undoHintMove": "Deshacer devuelve la mercancía a su sitio y escribe una devolución de {{number}}. Nada desaparece del historial."
+    "undoHintMove": "Deshacer devuelve la mercancía a su sitio y escribe una devolución de {{number}}. Nada desaparece del historial.",
+    "undoHeldGoods": "Deshacer no está disponible: una parte de esta recepción está retenida en cuarentena. Use Corregir para cambiar lo que hay en la estantería y trate la mercancía retenida por separado."
   },
   "board": {
     "title": "Tablero de trabajo",

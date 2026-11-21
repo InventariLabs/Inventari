@@ -2180,7 +2180,8 @@
     "print": "Imprimir {{number}}",
     "undoHintReceive": "Desfazer tira as mercadorias do estoque novamente e gera uma correção em {{number}}. Nada desaparece do histórico.",
     "undoHintIssue": "Desfazer devolve as mercadorias ao estoque e gera uma correção em {{number}}. Nada desaparece do histórico.",
-    "undoHintMove": "Desfazer move as mercadorias de volta e gera uma devolução em {{number}}. Nada desaparece do histórico."
+    "undoHintMove": "Desfazer move as mercadorias de volta e gera uma devolução em {{number}}. Nada desaparece do histórico.",
+    "undoHeldGoods": "Desfazer não está disponível: parte deste recebimento foi retida em quarentena. Use Corrigir para alterar o que está em estoque e trate à parte as mercadorias retidas."
   },
   "board": {
     "title": "Quadro de trabalho",
