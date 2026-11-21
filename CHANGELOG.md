@@ -289,6 +289,10 @@ says what the release does rather than what changed since them.
 - Counting a location that has sub-locations now offers, in the bar of
   products outside the stock take, a product received onto a sub-location
   after the count started, as counting that sub-location itself does.
+- A production recipe's reference price can no longer be negative. Creating
+  or changing a recipe with one is refused with a message naming the field,
+  instead of being stored and understating the result per unit of every run
+  made after it; zero is still allowed.
 - Saving a print layout whose template code does not parse or render — a
   purchase order, warehouse document or equipment layout — is refused, with
   the line and the complaint, instead of being stored and then breaking every
@@ -593,6 +597,19 @@ says what the release does rather than what changed since them.
   no longer lost: the document opens on the Packing step with them in its
   Shipping fields, so *Complete dispatch* there does not ship without
   tracking.
+- A correction of a receipt that held part of a line back in quarantine
+  offers and accepts only what the shelf can give: the quantity the line's own
+  stock record holds, not the whole quantity received. A correction that cannot
+  be applied is refused before it takes a number, so it stays a draft that can
+  be deleted instead of becoming a numbered correction its author cannot
+  remove, and the refusal names the product in the screen's quantities rather
+  than a record id. A surplus correction is still weighed against everything
+  the line received, the held part included.
+- Saving a BOM's *Process steps* keeps a step that was typed in the add row but
+  never added with *Add step*: it is stored as the last step, with its
+  minutes, instead of vanishing under a success message. Closing the editor
+  with the X while the add row still holds text asks first, and offers to keep
+  editing.
 
 ### Removed
 
