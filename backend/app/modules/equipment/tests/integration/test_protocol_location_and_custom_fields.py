@@ -28,10 +28,11 @@ from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from jinja2.exceptions import SecurityError as JinjaSecurityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from app.core.public_api import core_api
+from app.core.template_models import DocumentTemplate
 from app.core.testing import ModuleTestHelper
 from app.models.category import Category
 from app.models.item import Item
@@ -331,7 +332,7 @@ class TestCategoryCustomFields:
 class TestTheAccessorReachesNoObjects:
     """The generic accessor is a plain dict, and the sandbox keeps it that way."""
 
-    async def test_object_introspection_prints_nothing_and_refuses_to_run(
+    async def test_object_introspection_prints_nothing_and_the_built_in_layout_prints(
         self,
         real_async_db_session: AsyncSession,
         eq_org: Organization,
@@ -371,9 +372,13 @@ class TestTheAccessorReachesNoObjects:
         )
         assert 'dict' not in quiet and 'class' not in quiet and 'object' not in quiet
 
-        # Escaping through the dunder is refused the moment it would run.
-        with pytest.raises(JinjaSecurityError):
-            await _render('<html><body>{{ custom.__class__() }}</body></html>')
+        # Escaping through the dunder is refused the moment it would run: the
+        # sandbox raises, so the probe prints nothing and the protocol prints
+        # its built-in layout.
+        escaped = await _render('<html><body>{{ custom.__class__() }}</body></html>')
+        assert 'Equipment Handover Protocol' in escaped
+        assert 'dict' not in escaped
+        assert 'object' not in escaped
 
         # The probe templates above were never committed — CoreAPI writes
         # flush and the caller owns the commit. End the unit of work here,
@@ -418,3 +423,58 @@ class TestTheAccessorReachesNoObjects:
         assert html.status_code == 200
         # An absent key is empty, not an object, not an error.
         assert '[]' in html.text
+
+
+@pytest.mark.integration
+class TestAStoredLayoutThatDoesNotRender:
+    """A body Jinja cannot parse prints through the built-in protocol."""
+
+    def test_the_protocol_prints_through_the_built_in_layout(
+        self,
+        client: TestClient,
+        db_session: Session,
+        eq_org: Organization,
+        eq_item: Item,
+        eq_user: User,
+        eq_auth_headers: dict[str, str],
+    ) -> None:
+        created = client.post(
+            '/api/v1/equipment/assignments',
+            headers=eq_auth_headers,
+            json={'item_id': str(eq_item.id), 'assigned_to_name': 'Jan Kowalski'},
+        )
+        assert created.status_code == 201, created.text
+        assignment_id = created.json()['id']
+        # Straight into the table: the editor refuses such a body on save, so
+        # only a row stored before that check can be in this state.
+        stored = DocumentTemplate(
+            organization_id=eq_org.id,
+            module='equipment',
+            name='Broken',
+            document_type='CHECKOUT',
+            body_html='<p>{{ broken </p>',
+            is_default=True,
+        )
+        db_session.add(stored)
+        db_session.commit()
+
+        by_default = client.get(
+            f'/api/v1/equipment/assignments/{assignment_id}/protocol/html',
+            headers=eq_auth_headers,
+        )
+        by_id = client.get(
+            f'/api/v1/equipment/assignments/{assignment_id}/protocol/html',
+            headers=eq_auth_headers,
+            params={'template_id': str(stored.id)},
+        )
+        pdf = client.get(
+            f'/api/v1/equipment/assignments/{assignment_id}/protocol/pdf',
+            headers=eq_auth_headers,
+        )
+
+        for response in (by_default, by_id):
+            assert response.status_code == 200, response.text[:300]
+            assert 'Equipment Handover Protocol' in response.text
+            assert 'Jan Kowalski' in response.text
+        assert pdf.status_code == 200, pdf.text[:300]
+        assert pdf.headers['content-type'] == 'application/pdf'
