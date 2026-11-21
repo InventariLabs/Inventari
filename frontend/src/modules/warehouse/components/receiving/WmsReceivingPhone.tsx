@@ -95,13 +95,17 @@ function startingCount(line: WmsReceiveLine): number {
 
 /**
  * The figure the card counts against. A line an order asked for speaks of
- * the order; goods nobody ordered carry the count somebody wrote down, and
- * calling it ordered said something false.
+ * the order, and a line typed on an office receipt of what it expects. A
+ * line nobody expected — added beside an order, or scanned on a receipt with
+ * none — carries only the count the sheet started it at, which is no
+ * expectation: the card names no figure for it, and the stepper shows the
+ * count.
  */
 function expectedFigure(
   t: (key: string, options?: Record<string, unknown>) => string,
   line: WmsReceiveLine,
-): string {
+): string | null {
+  if (!line.from_order && line.expected_is_count) return null;
   const quantity = formatQuantityLocalized(
     t,
     line.expected_quantity,
@@ -112,6 +116,24 @@ function expectedFigure(
     : t("receiving.phone.expected", { quantity });
 }
 
+/** The line under the product's name: its figure, and what was counted. */
+function lineFigures(
+  t: (key: string, options?: Record<string, unknown>) => string,
+  line: WmsReceiveLine,
+): string {
+  const counted =
+    line.received_quantity > 0
+      ? t("receiving.phone.countedSoFar", {
+          quantity: formatQuantityLocalized(
+            t,
+            line.received_quantity,
+            line.uom_symbol,
+          ),
+        })
+      : null;
+  return [expectedFigure(t, line), counted].filter(Boolean).join(" · ");
+}
+
 /** The difference from the order, said under the number while it is set. */
 function differenceNote(
   t: (key: string, options?: Record<string, unknown>) => string,
@@ -120,9 +142,9 @@ function differenceNote(
 ): string | null {
   const gap = line.expected_quantity - quantity;
   if (gap === 0) return null;
-  // A figure somebody typed on the start card is a count, not a promise:
-  // going past it is the true count, nothing to warn about.
-  if (gap < 0 && line.expected_is_count) return null;
+  // A figure the sheet or the start card set is a count, not a promise:
+  // a count above or below it is the true count, nothing to warn about.
+  if (line.expected_is_count) return null;
   const amount = {
     quantity: formatQuantityLocalized(t, Math.abs(gap), line.uom_symbol),
   };
@@ -601,17 +623,11 @@ export default function WmsReceivingPhone({
                 <h3 className="text-xl font-semibold text-on [overflow-wrap:anywhere]">
                   {line.product_name}
                 </h3>
-                <p className="text-sm text-on-secondary">
-                  {expectedFigure(t, line)}
-                  {line.received_quantity > 0 &&
-                    ` · ${t("receiving.phone.countedSoFar", {
-                      quantity: formatQuantityLocalized(
-                        t,
-                        line.received_quantity,
-                        line.uom_symbol,
-                      ),
-                    })}`}
-                </p>
+                {lineFigures(t, line) && (
+                  <p className="text-sm text-on-secondary">
+                    {lineFigures(t, line)}
+                  </p>
+                )}
               </div>
               <CountStepper
                 line={line}

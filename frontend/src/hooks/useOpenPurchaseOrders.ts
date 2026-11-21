@@ -160,8 +160,10 @@ const OPEN_RECEIPT_STATUSES = new Set([
 ]);
 
 /**
- * The order's receipts that are open: drafted, confirmed or waiting for an
- * approval, and not yet posted.
+ * The order's receipts that are open — drafted, confirmed or waiting for an
+ * approval, and not yet posted — and hold goods the order still owes: a
+ * correction, or a draft for a product the order no longer expects, speaks
+ * for none of it (`holds_owed_goods`, read by the server from the lines).
  *
  * Such a receipt already speaks for part of what the order owes. A
  * delivery received beside it, on the receive screen, is weighed against
@@ -183,8 +185,9 @@ export function useOrderOpenReceipts(orderId: string | null) {
   );
   const receipts = useMemo(
     () =>
-      (data ?? []).filter((receipt) =>
-        OPEN_RECEIPT_STATUSES.has(receipt.status),
+      (data ?? []).filter(
+        (receipt) =>
+          OPEN_RECEIPT_STATUSES.has(receipt.status) && receipt.holds_owed_goods,
       ),
     [data],
   );

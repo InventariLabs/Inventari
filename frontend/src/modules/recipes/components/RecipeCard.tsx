@@ -100,7 +100,7 @@ export const RecipeCard = memo(function RecipeCard({
           aria-label={
             selected ? t("recipes:bulk.deselect") : t("recipes:bulk.select")
           }
-          className="absolute top-2 left-2 z-10 p-0.5 text-on-muted hover:text-primary-600 hover:bg-transparent"
+          className="absolute top-2 left-2 z-10 min-h-6 min-w-6 p-0.5 text-on-muted hover:text-primary-600 hover:bg-transparent"
         >
           {selected ? (
             <CheckCircle2 size={16} className="text-primary-600" />

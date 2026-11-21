@@ -90,7 +90,7 @@ export function HistoryRow({
       <span className="flex min-w-0 flex-col items-start gap-0.5">
         <Link
           to={`/warehouse/documents/${doc.id}`}
-          className="break-all text-sm font-medium text-on-primary hover:underline"
+          className="inline-flex min-h-6 items-center break-all text-sm font-medium text-on-primary hover:underline"
         >
           {documentTitle(t, doc)}
         </Link>

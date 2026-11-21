@@ -399,6 +399,11 @@ class LinkedReceiptSchema(BaseModel):
     type: str
     status: str
     created_at: datetime
+    #: A receipt one of whose lines still expects goods on an order line the
+    #: order still owes. Only such a receipt speaks for part of what the
+    #: order expects; a correction, or a draft for a product the order no
+    #: longer expects, does not.
+    holds_owed_goods: bool = False
 
     model_config = ConfigDict(from_attributes=True)
 

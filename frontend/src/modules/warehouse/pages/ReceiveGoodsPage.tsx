@@ -43,6 +43,8 @@ import {
   useCreateDocument,
   usePostNewDocument,
 } from "@/modules/warehouse/hooks/useDocuments";
+import { useAssignWorkItem } from "@/modules/warehouse/hooks/useWorkItems";
+import { useAuthStore } from "@/store/authStore";
 import { useDocumentMetaData } from "@/modules/warehouse/hooks/useDocumentMetaData";
 import { useDraftExtensions } from "@/modules/warehouse/hooks/useDraftExtensions";
 import { useReceiptPlan } from "@/modules/warehouse/hooks/useReceiptPlan";
@@ -715,6 +717,8 @@ function usePhoneDoor(
   const isPhone = useMediaQuery(PHONE_QUERY);
   const [starting, setStarting] = useState(false);
   const confirmReceipt = useConfirmDocument();
+  const userId = useAuthStore((state) => state.user?.id);
+  const assign = useAssignWorkItem();
 
   const openReceiving = useCallback(
     async (id: string) => {
@@ -725,9 +729,21 @@ function usePhoneDoor(
         navigate(`/warehouse/documents/${id}`, { replace: true });
         return;
       }
+      // The receiving starts now, so the delivery becomes the reader's task
+      // now — not on the To do tap that only opened this screen. The receipt
+      // is new and nobody can hold it yet; a failure is reported like any
+      // other refused write.
+      if (userId) {
+        assign.mutate({
+          sourceKind: "document",
+          sourceId: id,
+          assigneeId: userId,
+          onlyIfUnassigned: true,
+        });
+      }
       navigate(`/warehouse/documents/${id}#receive`, { replace: true });
     },
-    [confirmReceipt, navigate, t],
+    [assign, confirmReceipt, navigate, t, userId],
   );
 
   if (!isPhone) return null;
@@ -1272,6 +1288,9 @@ export default function ReceiveGoodsPage() {
     scanRef,
   });
 
+  // While the phone starts, the receipt it is making is open already: the
+  // open-receipts warning is not shown, or it names that very receipt as
+  // one to receive the rest through.
   const phoneDoor = usePhoneDoor(canWrite, finishLater);
 
   useReceiveHeader(result?.document ?? null);
@@ -1337,7 +1356,7 @@ export default function ReceiveGoodsPage() {
         />
       </Card>
 
-      <OrderOpenReceipts order={chosenOrder} />
+      <OrderOpenReceipts order={phoneDoor?.starting ? null : chosenOrder} />
 
       <ReceiveDraftSlot
         partnerId={partnerId}

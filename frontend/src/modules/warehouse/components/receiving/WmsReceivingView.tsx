@@ -340,6 +340,36 @@ function summaryExit(
   };
 }
 
+/**
+ * "The rest did not come" with nothing counted on any line: nothing
+ * arrived, so there is nothing to post. The session is put away the way the
+ * named Cancel does, the receipt stays open for the goods still owed, and
+ * the reader is told so — not "Received 0 lines. The goods are in stock"
+ * over a numbered, completed receipt with nothing on it.
+ */
+function nothingCounted(lines: WmsReceiveLine[]): boolean {
+  return !lines.some((line) => line.received_quantity > 0);
+}
+
+/**
+ * The session put away, then the sheet closed — with a sentence, when the
+ * reader is owed one. A refused cancel leaves the session open server-side:
+ * the sheet and the refusal sentence stay, and closing would wipe both.
+ */
+function putAway(
+  cancelSession: () => Promise<boolean>,
+  refresh: () => void,
+  close: () => void,
+) {
+  return async (said?: string) => {
+    const cancelled = await cancelSession();
+    refresh();
+    if (!cancelled) return;
+    if (said) toast(said);
+    close();
+  };
+}
+
 export default function WmsReceivingView({
   documentId,
   onClose,
@@ -529,15 +559,10 @@ export default function WmsReceivingView({
     if (closed) toast.success(t("receiving.toast.completed"));
   };
 
-  const handleCancel = async () => {
-    const cancelled = await cancelSession();
-    invalidateDocument();
-    // A refused cancel leaves the session open server-side: keep the sheet
-    // and the refusal sentence, and reset() would wipe both.
-    if (!cancelled) return;
+  const handleCancel = putAway(cancelSession, invalidateDocument, () => {
     reset();
     onClose();
-  };
+  });
 
   const handleClose = () => {
     // Closing the sheet is not a decision to put anything back: what was
@@ -650,7 +675,11 @@ export default function WmsReceivingView({
               qty < line.received_quantity,
             )
           }
-          onFinishWithoutRest={() => void finishWithoutRest()}
+          onFinishWithoutRest={() =>
+            void (nothingCounted(state.lines)
+              ? handleCancel(t("receiving.toast.nothing_received"))
+              : finishWithoutRest())
+          }
           onReportHeld={heldFromCard.open}
           onComplete={handleComplete}
           onClose={handleClose}
@@ -669,7 +698,7 @@ export default function WmsReceivingView({
           onShortReceive={(line) => requestShortReceive(line.id)}
           onSkipLine={setSkipAsk}
           onComplete={handleComplete}
-          onCancel={handleCancel}
+          onCancel={() => void handleCancel()}
           onClose={handleClose}
         />
       )}

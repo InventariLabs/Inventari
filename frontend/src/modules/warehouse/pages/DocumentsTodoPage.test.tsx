@@ -328,6 +328,37 @@ describe("DocumentsTodoPage", () => {
     );
   });
 
+  it("opens an order's delivery on a phone without taking it yet", async () => {
+    // The tap opens the receive screen, where nothing has begun and a press
+    // can still be refused for a missing location; the delivery is taken
+    // when its receiving starts, so a refusal leaves nobody holding it.
+    viewport({ phone: true });
+    answer(
+      queue([
+        task({
+          key: "purchase_order:po-1",
+          kind: "expected_delivery",
+          source_kind: "purchase_order",
+          source_id: "po-1",
+          next_action: "receive_delivery",
+          assignee_id: null,
+          document_type: null,
+          document_status: null,
+        }),
+      ]),
+    );
+    render(<DocumentsTodoPage />);
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Receive delivery" }),
+    );
+
+    expect(mutations.assign).not.toHaveBeenCalled();
+    expect(navigateMock).toHaveBeenLastCalledWith(
+      "/warehouse/receive?order=po-1",
+    );
+  });
+
   it("says the task is now the reader's and offers to give it back", async () => {
     viewport({ phone: true });
     answer(queue([task({ assignee_id: null })]));

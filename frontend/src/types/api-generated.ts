@@ -15394,6 +15394,8 @@ export interface components {
             reversed_by_id?: string | null;
             /** Reversed By Number */
             reversed_by_number?: string | null;
+            /** Source Orders */
+            source_orders?: components["schemas"]["SourceOrderRef"][];
             /** Source Location Id */
             source_location_id: string | null;
             /** Target Location Id */
@@ -18028,6 +18030,11 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Holds Owed Goods
+             * @default false
+             */
+            holds_owed_goods: boolean;
         };
         /**
          * ListedElsewhere
@@ -23555,6 +23562,8 @@ export interface components {
             reversed_by_id?: string | null;
             /** Reversed By Number */
             reversed_by_number?: string | null;
+            /** Source Orders */
+            source_orders?: components["schemas"]["SourceOrderRef"][];
             /** Source Location Id */
             source_location_id: string | null;
             /** Target Location Id */
@@ -26440,6 +26449,19 @@ export interface components {
             from_email?: string | null;
             /** From Name */
             from_name?: string;
+        };
+        /**
+         * SourceOrderRef
+         * @description A purchase order a document's lines were received against.
+         */
+        SourceOrderRef: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: string;
         };
         /**
          * StageDefinition

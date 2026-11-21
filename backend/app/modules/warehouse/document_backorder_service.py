@@ -3,7 +3,9 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.contracts import AuditAction, AuditTargetType
 from app.core.logging import get_logger
+from app.core.public_api import core_api
 
 from . import document_types as dt
 from .document_numbering_service import temporary_number
@@ -126,4 +128,26 @@ async def _create_backorder_document(
 
     db.add(backorder)
     await db.flush()
+    # The application writes this draft, not a person, but it is a document
+    # like any other: the log names it, its partner in words, and the receipt
+    # it continues, which the log screen links to.
+    partner = (original.partner_snapshot or {}).get('name')
+    await core_api.audit_log.log_action_async(
+        db,
+        organization_id=org_id,
+        user_id=user_id,
+        action=AuditAction.CREATE,
+        target_type=AuditTargetType.DOCUMENT,
+        target_id=backorder.id,
+        snapshot={
+            'number': backorder.number,
+            'type': backorder.type,
+            'partner_id': str(backorder.partner_id) if backorder.partner_id else None,
+            'partner_name': partner,
+        },
+        meta_data={
+            'document_number': original.number,
+            'source_document_id': str(original.id),
+        },
+    )
     return backorder

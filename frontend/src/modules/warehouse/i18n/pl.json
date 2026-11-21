@@ -59,6 +59,7 @@
     "targetLocation": "Do miejsca",
     "notes": "Uwagi",
     "externalReference": "Referencja / powiązany dokument",
+    "sourceOrder": "Zamówienie",
     "scheduledDate": "Planowana data",
     "documentDate": "Data dokumentu",
     "createdAt": "Utworzono",
@@ -223,6 +224,7 @@
     "cancel": "Anuluj",
     "cancelDocument": "Anuluj dokument",
     "cancelNeedsManager": "Anulowanie zaakceptowanego dokumentu zwalnia zajęty przez niego stan — poproś kogoś, kto zarządza dokumentami.",
+    "deleteNeedsManager": "Ten szkic może usunąć tylko ktoś, kto zarządza dokumentami — poproś go, jeśli to pomyłka. Dopóki go nie zastosujesz, nie zmienia stanu.",
     "delete": "Usuń",
     "edit": "Edytuj",
     "view": "Podgląd",
@@ -1126,6 +1128,8 @@
       "qr_img": "Obraz kodu QR (data URI) — zawiera adres skanowania tego dokumentu albo jego numer, gdy instalacja nie ma adresu publicznego",
       "qr_size_mm": "Bok, z jakim musi się wydrukować kod QR, w milimetrach",
       "return_of_number": "Numer dokumentu, który ten zwrot cofa",
+      "source_order_number": "Numer zamówienia, na które przyjęto pozycje",
+      "printed_reference": "Referencja zewnętrzna, pusta, gdy tylko powtarza numer zamówienia",
       "scrap_reason": "Dlaczego towar został odpisany, w języku wydruku",
       "show_line_status": "Prawda, gdy drukowane są statusy pozycji",
       "show_payment": "Prawda, gdy drukowany jest blok sum i płatności",
@@ -1488,6 +1492,7 @@
       "short_confirmed": "Potwierdzono przyjęcie częściowe",
       "skipped": "Linia pominięta",
       "completed": "Zakończono przyjmowanie",
+      "nothing_received": "Nic nie przyjęto, więc nic nie zaksięgowano. Przyjęcie zostaje otwarte na towar, który wciąż jest oczekiwany.",
       "over_quantity": "Nie można przyjąć więcej niż zaplanowano — już {{qty}}/{{expected}} {{uom}}",
       "shelf_confirmed": "Miejsce {{location}} potwierdzone",
       "shelf_required": "Najpierw zeskanuj miejsce: {{location}}",
@@ -2528,5 +2533,9 @@
       "saveFailed": "Nie udało się zapisać stawki VAT"
     },
     "countryLoadFailed": "Nie udało się wczytać stawek kraju; stawki można nadal dodać ręcznie."
+  },
+  "references": {
+    "stockTake": "Inwentaryzacja",
+    "recipeProduction": "Produkcja z receptury"
   }
 }

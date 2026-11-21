@@ -59,6 +59,7 @@
     "targetLocation": "Emplacement cible",
     "notes": "Notes",
     "externalReference": "Référence / Document lié",
+    "sourceOrder": "Bon de commande",
     "scheduledDate": "Date prévue",
     "documentDate": "Date du document",
     "createdAt": "Créé",
@@ -193,6 +194,7 @@
     "cancel": "Annuler",
     "cancelDocument": "Annuler le document",
     "cancelNeedsManager": "Annuler un document confirmé libère le stock qu’il retient — demandez à quelqu’un qui gère les documents.",
+    "deleteNeedsManager": "Seule une personne qui gère les documents peut supprimer ce brouillon — demandez-lui s’il s’agit d’une erreur. Tant qu’il n’est pas appliqué, il ne modifie aucun stock.",
     "delete": "Supprimer",
     "edit": "Modifier",
     "view": "Voir",
@@ -1036,6 +1038,8 @@
       "qr_img": "Image du code QR (data URI) — porte l'adresse de scan de ce document, ou son numéro si l'installation n'a pas d'adresse publique",
       "qr_size_mm": "Côté auquel le QR doit s'imprimer, en millimètres",
       "return_of_number": "Numéro du document que ce retour annule",
+      "source_order_number": "Numéro du bon de commande au titre duquel les lignes ont été reçues",
+      "printed_reference": "Référence externe, vide lorsqu'elle ne fait que répéter le numéro de commande",
       "scrap_reason": "Pourquoi la marchandise a été mise au rebut, dans la langue d'impression",
       "show_line_status": "Vrai lorsque les statuts par ligne sont imprimés",
       "show_payment": "Vrai lorsque le bloc totaux/paiement est imprimé",
@@ -1368,6 +1372,7 @@
       "short_confirmed": "Réception partielle confirmée",
       "skipped": "Ligne ignorée",
       "completed": "Réception terminée",
+      "nothing_received": "Rien n’a été reçu, donc rien n’a été comptabilisé. La réception reste ouverte pour les marchandises encore attendues.",
       "over_quantity": "Impossible de réceptionner plus que prévu — déjà {{qty}}/{{expected}} {{uom}}",
       "shelf_confirmed": "Emplacement {{location}} confirmé",
       "shelf_required": "Scannez d'abord l'emplacement : {{location}}",
@@ -2344,5 +2349,9 @@
       "saveFailed": "Le taux de TVA n’a pas pu être enregistré"
     },
     "countryLoadFailed": "Les taux du pays n’ont pas pu être chargés ; vous pouvez toujours ajouter des taux à la main."
+  },
+  "references": {
+    "stockTake": "Inventaire",
+    "recipeProduction": "Production de recette"
   }
 }

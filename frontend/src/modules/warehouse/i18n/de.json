@@ -59,6 +59,7 @@
     "targetLocation": "Ziel-Lagerort",
     "notes": "Notizen",
     "externalReference": "Referenz / Zugehöriges Dokument",
+    "sourceOrder": "Bestellung",
     "scheduledDate": "Geplantes Datum",
     "documentDate": "Belegdatum",
     "createdAt": "Erstellt",
@@ -193,6 +194,7 @@
     "cancel": "Abbrechen",
     "cancelDocument": "Beleg stornieren",
     "cancelNeedsManager": "Das Stornieren eines bestätigten Belegs gibt den reservierten Bestand frei — wenden Sie sich an jemanden mit Belegverwaltung.",
+    "deleteNeedsManager": "Diesen Entwurf kann nur jemand mit Belegverwaltung löschen — wenden Sie sich an diese Person, wenn er ein Versehen ist. Solange er nicht angewendet ist, ändert er keinen Bestand.",
     "delete": "Löschen",
     "edit": "Bearbeiten",
     "view": "Anzeigen",
@@ -1036,6 +1038,8 @@
       "qr_img": "QR-Code-Bild (Data-URI) — enthält die Scan-Adresse dieses Belegs oder seine Nummer, wenn die Installation keine öffentliche Adresse hat",
       "qr_size_mm": "Seitenlänge, in der der QR-Code gedruckt werden muss, in Millimetern",
       "return_of_number": "Nummer des Belegs, den diese Rücksendung umkehrt",
+      "source_order_number": "Nummer der Bestellung, gegen die die Positionen angenommen wurden",
+      "printed_reference": "Externe Referenz, leer, wenn sie nur die Bestellnummer wiederholt",
       "scrap_reason": "Warum die Ware ausgebucht wurde, in der Drucksprache",
       "show_line_status": "Wahr, wenn Positionsstatus gedruckt werden",
       "show_payment": "Wahr, wenn der Summen-/Zahlungsblock gedruckt wird",
@@ -1368,6 +1372,7 @@
       "short_confirmed": "Teilzugang bestätigt",
       "skipped": "Zeile übersprungen",
       "completed": "Wareneingang abgeschlossen",
+      "nothing_received": "Es wurde nichts angenommen, also wurde nichts gebucht. Der Wareneingang bleibt für die noch erwartete Ware offen.",
       "over_quantity": "Mehr als geplant kann nicht angenommen werden — bereits {{qty}}/{{expected}} {{uom}}",
       "shelf_confirmed": "Lagerort {{location}} bestätigt",
       "shelf_required": "Zuerst den Lagerort scannen: {{location}}",
@@ -2344,5 +2349,9 @@
       "saveFailed": "Der Steuersatz konnte nicht gespeichert werden"
     },
     "countryLoadFailed": "Die Sätze des Landes konnten nicht geladen werden; Sätze lassen sich weiterhin von Hand hinzufügen."
+  },
+  "references": {
+    "stockTake": "Inventur",
+    "recipeProduction": "Rezeptproduktion"
   }
 }

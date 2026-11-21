@@ -31,6 +31,7 @@ import { unitLabel } from "@/lib/i18nHelpers";
 import { DocumentStatusBadge } from "@/modules/warehouse/components/DocumentStatusBadge";
 import { useShowDocumentValue } from "@/modules/warehouse/hooks/useShowDocumentValue";
 import type { WarehouseDocumentRow } from "@/modules/warehouse/types";
+import { useDocumentReference } from "@/modules/warehouse/lib/documentReference";
 import type { DocumentColumnContributor } from "@/lib/moduleRegistry";
 import {
   toDocumentView,
@@ -293,6 +294,19 @@ function ModuleValues({
  * the document status: the status changes the menu's entries, not the row.
  * Menu markup follows the pattern from PurchaseOrderListItem.
  */
+
+/** The row's reference: as typed, or in words when another module wrote it
+ * (a stock take, a recipe's cooking) — the same reading as the page's. */
+function ReferenceText({ reference }: { reference: string }) {
+  const { t } = useTranslation();
+  const read = useDocumentReference()(reference);
+  return (
+    <span className="truncate">
+      {read.labelKey ? t(read.labelKey) : read.text}
+    </span>
+  );
+}
+
 const DocumentListItem = memo(function DocumentListItem({
   doc,
   columns,
@@ -481,7 +495,7 @@ const DocumentListItem = memo(function DocumentListItem({
               </span>
             )}
             {doc.external_reference && (
-              <span className="truncate">{doc.external_reference}</span>
+              <ReferenceText reference={doc.external_reference} />
             )}
             {doc.notes && (
               <span className="truncate max-w-[200px]">{doc.notes}</span>

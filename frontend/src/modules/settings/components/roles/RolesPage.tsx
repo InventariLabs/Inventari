@@ -308,7 +308,7 @@ export default function RolesPage() {
             <Button
               variant="ghost"
               size="inline"
-              className="text-xs underline"
+              className="min-h-6 text-xs underline"
               onClick={() => setCreating(true)}
             >
               {t("settings.rbac.createRole")}

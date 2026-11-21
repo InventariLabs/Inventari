@@ -186,6 +186,7 @@ export default function UnlinkedIngredientsPage() {
             disabled={!proposal || !canWrite}
             onChange={() => toggleOne(ingredient.id)}
             aria-label={t("linking.select_row", { name: ingredient.name })}
+            touchTarget
           />
         </td>
         <td className="py-2.5 pr-4 align-middle">
@@ -294,6 +295,7 @@ export default function UnlinkedIngredientsPage() {
                           disabled={!canWrite || proposedItems.length === 0}
                           onChange={toggleAll}
                           aria-label={t("linking.select_all")}
+                          touchTarget
                         />
                       </th>
                       <th

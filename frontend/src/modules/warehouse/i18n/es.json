@@ -59,6 +59,7 @@
     "targetLocation": "Ubicación destino",
     "notes": "Notas",
     "externalReference": "Referencia / Documento relacionado",
+    "sourceOrder": "Pedido de compra",
     "scheduledDate": "Fecha programada",
     "documentDate": "Fecha del documento",
     "createdAt": "Creado",
@@ -193,6 +194,7 @@
     "cancel": "Cancelar",
     "cancelDocument": "Cancelar documento",
     "cancelNeedsManager": "Cancelar un documento confirmado libera el stock que retiene: pide ayuda a alguien que gestione documentos.",
+    "deleteNeedsManager": "Solo alguien que gestione documentos puede eliminar este borrador: pídeselo si es un error. Mientras no se aplique, no cambia el stock.",
     "delete": "Eliminar",
     "edit": "Editar",
     "view": "Ver",
@@ -1036,6 +1038,8 @@
       "qr_img": "Imagen del código QR (data URI) — lleva la dirección de escaneo de este documento, o su número si la instalación no tiene dirección pública",
       "qr_size_mm": "Lado al que debe imprimirse el QR, en milímetros",
       "return_of_number": "Número del documento que revierte esta devolución",
+      "source_order_number": "Número del pedido de compra contra el que se recibieron las líneas",
+      "printed_reference": "Referencia externa, vacía cuando solo repite el número de pedido",
       "scrap_reason": "Por qué se dio de baja la mercancía, en el idioma de impresión",
       "show_line_status": "Verdadero cuando se imprimen los estados por línea",
       "show_payment": "Verdadero cuando se imprime el bloque de totales/pago",
@@ -1368,6 +1372,7 @@
       "short_confirmed": "Recepción parcial confirmada",
       "skipped": "Línea omitida",
       "completed": "Recepción completada",
+      "nothing_received": "No se recibió nada, así que no se registró nada. La entrada sigue abierta para la mercancía que aún se espera.",
       "over_quantity": "No se puede recibir más de lo planificado — ya {{qty}}/{{expected}} {{uom}}",
       "shelf_confirmed": "Ubicación {{location}} confirmada",
       "shelf_required": "Escanee primero la ubicación: {{location}}",
@@ -2344,5 +2349,9 @@
       "saveFailed": "No se pudo guardar el tipo de IVA"
     },
     "countryLoadFailed": "No se pudieron cargar los tipos del país; aún puedes añadir tipos a mano."
+  },
+  "references": {
+    "stockTake": "Inventario",
+    "recipeProduction": "Producción de receta"
   }
 }

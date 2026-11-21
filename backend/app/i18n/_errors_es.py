@@ -673,10 +673,10 @@ ERRORS_ES: ErrorMessages = {
         'recibido. Primero cancela los albaranes de recepción correspondientes.'
     ),
     'po_import_not_draft': 'Las líneas solo se pueden importar en una orden de compra en estado borrador',
-    'document_insufficient_stock': 'Stock insuficiente para confirmar: no se pudieron reservar {quantity} de {needed}',
+    'document_insufficient_stock': 'Stock insuficiente para confirmar: {available} de {needed} disponibles, faltan {missing}',
     'document_zone_split_needs_stock_unit': 'La línea de "{item_name}" está escrita en una unidad distinta de la unidad de stock del producto y no puede repartirse entre varias estanterías; escríbala en la unidad de stock o sáquela de una sola estantería',
     'document_record_stands_elsewhere': 'El registro «{item_name}» está en «{record_shelf}», pero el documento retira de «{document_shelf}»: apunte el documento a «{record_shelf}» o mueva primero el registro',
-    'document_insufficient_stock_record_elsewhere': 'Stock insuficiente para confirmar: no se pudieron reservar {quantity} de {needed} en «{document_shelf}»; el registro «{item_name}» está en «{record_shelf}»: apunte el documento a esa ubicación o mueva primero el registro',
+    'document_insufficient_stock_record_elsewhere': 'Stock insuficiente para confirmar: {available} de {needed} disponibles en «{document_shelf}», faltan {missing}; el registro «{item_name}» está en «{record_shelf}»: apunte el documento a esa ubicación o mueva primero el registro',
     'stock_would_go_negative': 'Eso dejaría el stock por debajo de cero. Mientras tanto alguien ha movido esta mercancía: recarga e inténtalo de nuevo.',
     'stock_reserved_over_quantity': 'Eso reservaría más mercancía de la que hay en la estantería. Libera una reserva o vuelve a contar.',
     'document_exceeds_order_line': 'Recibir {quantity} supera la línea del pedido, en la que solo quedan {remaining} — por encima de la tolerancia de sobre-recepción del {tolerance}% se necesita a alguien con permiso para recibir por encima de la tolerancia',

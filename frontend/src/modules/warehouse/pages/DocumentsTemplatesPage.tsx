@@ -191,6 +191,10 @@ const PLACEHOLDER_DESCRIPTIONS = [
     descriptionKey: "templates.placeholders.partner.address",
   },
   {
+    key: "{{printed_reference}}",
+    descriptionKey: "templates.placeholders.printed_reference",
+  },
+  {
     key: "{{print_dates}}",
     descriptionKey: "templates.placeholders.print_dates",
   },
@@ -242,6 +246,10 @@ const PLACEHOLDER_DESCRIPTIONS = [
   {
     key: "{{show_value_columns}}",
     descriptionKey: "templates.placeholders.show_value_columns",
+  },
+  {
+    key: "{{source_order_number}}",
+    descriptionKey: "templates.placeholders.source_order_number",
   },
   {
     key: "{{source_location}}",

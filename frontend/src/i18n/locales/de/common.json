@@ -401,6 +401,7 @@
         "approves": "Genehmigt",
         "archived": "Archiviert",
         "assigned_to": "Zugewiesen an",
+        "assignee_id": "Zugewiesen an",
         "attachment": "Anhang",
         "auto_skipped": "Automatisch übersprungen",
         "barcode": "Strichcode",
