@@ -168,11 +168,9 @@ export const shoppingListsApi = {
   /** The active list to put things on, making one only if there is none.
    *  Nothing calls this while a reader is merely looking: a preview
    *  creates nothing, and this runs when they have chosen to buy. */
-  ensureActiveList: async (): Promise<string> => {
+  ensureActiveList: async (): Promise<ShoppingList> => {
     const active = await shoppingListsApi.getTargets();
-    if (active[0]?.id) return active[0].id;
-    const created = await shoppingListsApi.create({});
-    return created.id;
+    return active[0] ?? (await shoppingListsApi.create({}));
   },
 
   convertToPo: async (

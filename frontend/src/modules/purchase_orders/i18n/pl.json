@@ -338,7 +338,7 @@
     "currency": "Waluta",
     "createdAt": "Utworzono",
     "confirmedAt": "Potwierdzono",
-    "total": "Wartość zamówienia"
+    "total": "Wartość zamówienia (brutto)"
   },
   "columns": {
     "number": "Numer",
@@ -347,7 +347,7 @@
     "lines": "Pozycje",
     "scheduled": "Termin",
     "received": "Przyjęto",
-    "total": "Wartość",
+    "total": "Suma (brutto)",
     "actions": "Akcje"
   },
   "overdue": "Po terminie",
@@ -357,6 +357,7 @@
   "backToList": "Wróć do zamówień",
   "confirmOrderDescriptionApproval": "Potwierdzenie kieruje zamówienie do kolejki akceptacji; przyjęcie będzie możliwe po jego akceptacji. Nadal możesz je później anulować.",
   "noPriceYet": "Jeszcze bez ceny",
+  "grossSuffix": "brutto",
   "confirmOrderUnpriced": "Część pozycji nie ma ceny, więc wartość jest nieznana i zamówienie trafia do akceptacji. Do {{threshold}} nie jest ona potrzebna: najpierw uzupełnij ceny.",
   "confirmOrderDeadEndWaits": "Na etapie „{{stage}}” poczeka na wycofanie wniosku albo na osobę, która może go rozstrzygnąć.",
   "requestApprovalDeadEndWaits": "Zamówienie {{number}} poczeka na etapie „{{stage}}” na wycofanie wniosku albo na osobę, która może go rozstrzygnąć."

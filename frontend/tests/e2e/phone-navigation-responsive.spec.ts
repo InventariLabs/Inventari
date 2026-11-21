@@ -258,9 +258,9 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
       // The start is on screen again, and one more Back leaves for the
       // launcher. The shell pushes the start only once, so the next
       // Back leaves for the launcher, not back to the action.
-      await page.getByRole("button", { name: "Back" }).click();
+      await page.getByRole("button", { name: "Back", exact: true }).click();
       await expect(page).toHaveURL(/\/warehouse\/todo$/);
-      await page.getByRole("button", { name: "Back" }).click();
+      await page.getByRole("button", { name: "Back", exact: true }).click();
       await expect(page).toHaveURL(/\/launcher$/);
     });
   }

@@ -1027,7 +1027,6 @@
     "products": "Productos",
     "replenishAll": "Reabastecer todo",
     "replenishPolicy": "Los productos con existencias en uso en otro lugar no se consideran bajos ni se vuelven a pedir.",
-    "replenishSuccess": "Productos faltantes añadidos a la lista de compras",
     "replenishModalTitle": "Revisar sugerencias",
     "replenishModalDesc": "Seleccione los productos que desea añadir a su lista de compras.",
     "addSelected": "Añadir seleccionados ({{count}})",

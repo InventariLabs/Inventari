@@ -78540,6 +78540,17 @@
             ],
             "title": "Stock Qty"
           },
+          "stock_uom_symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stock Uom Symbol"
+          },
           "last_produced_at": {
             "anyOf": [
               {

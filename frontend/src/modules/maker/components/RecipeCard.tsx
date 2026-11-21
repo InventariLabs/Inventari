@@ -98,7 +98,11 @@ export function RecipeCard({ recipe, onProduce }: RecipeCardProps) {
           <div className="text-on-muted">
             {t("catalog.stock")}:{" "}
             <span className="text-on font-medium tabular-nums">
-              {formatQuantityLocalized(t, recipe.stock_qty, null)}
+              {formatQuantityLocalized(
+                t,
+                recipe.stock_qty,
+                recipe.stock_uom_symbol,
+              )}
             </span>
           </div>
         )}

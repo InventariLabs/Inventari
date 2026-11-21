@@ -1640,6 +1640,9 @@
   },
   "todo": {
     "title": "Zu erledigen",
+    "taken": "Diese Aufgabe gehört jetzt Ihnen.",
+    "giveBack": "Zurückgeben",
+    "giveBackTask": "Zurückgeben: {{task}}",
     "today": "Heute",
     "overdue": "Überfällig seit {{date}}",
     "receive": "Annehmen",
@@ -1900,8 +1903,8 @@
       "title": "Heute im Lager",
       "history": "Gesamter Verlauf",
       "entry": "{{who}}: {{entry}}",
-      "empty": "Heute hat sich noch nichts bewegt.",
-      "emptyWarehouse": "An diesem Lagerort hat sich heute nichts bewegt.",
+      "empty": "Heute wurde noch kein Beleg gebucht.",
+      "emptyWarehouse": "An diesem Lagerort wurde heute kein Beleg gebucht.",
       "error": "Die heutigen Einträge konnten nicht geladen werden."
     }
   },

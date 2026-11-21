@@ -160,3 +160,11 @@ describe("RecipeTable — the result column", () => {
     ).toBeInTheDocument();
   });
 });
+
+describe("RecipeTable — the stock column", () => {
+  it("prints the unit the stock is counted in", () => {
+    renderTable([{ ...baseRecipe, stock_qty: "11.4", stock_uom_symbol: "kg" }]);
+
+    expect(screen.getByText(/11\.4 kg/)).toBeInTheDocument();
+  });
+});

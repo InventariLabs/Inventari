@@ -1027,7 +1027,6 @@
     "products": "Produits",
     "replenishAll": "Réapprovisionner tout",
     "replenishPolicy": "Les produits dont une partie du stock est utilisée ailleurs ne sont ni comptés comme bas ni recommandés.",
-    "replenishSuccess": "Produits manquants ajoutés à la liste de courses",
     "replenishModalTitle": "Examiner les suggestions",
     "replenishModalDesc": "Sélectionnez les produits à ajouter à votre liste de courses.",
     "addSelected": "Ajouter la sélection ({{count}})",

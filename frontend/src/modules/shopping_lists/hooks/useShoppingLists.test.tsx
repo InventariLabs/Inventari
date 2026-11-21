@@ -155,9 +155,10 @@ describe("shoppingListsApi.ensureActiveList", () => {
         return HttpResponse.json(onePage([mockList]));
       }),
     );
-    await expect(shoppingListsApi.ensureActiveList()).resolves.toBe(
-      mockList.id,
-    );
+    await expect(shoppingListsApi.ensureActiveList()).resolves.toMatchObject({
+      id: mockList.id,
+      name: mockList.name,
+    });
     expect(asked?.get("status")).toBe("active");
     expect(asked?.has("active_only")).toBe(false);
   });

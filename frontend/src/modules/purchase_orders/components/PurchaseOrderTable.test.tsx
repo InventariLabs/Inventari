@@ -79,7 +79,7 @@ describe("PurchaseOrderTable", () => {
       "Lines",
       "Scheduled",
       "Received",
-      "Total",
+      "Total (gross)",
       "Actions",
     ]);
     const row = screen.getAllByRole("row")[1];
