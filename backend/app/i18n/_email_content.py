@@ -210,9 +210,9 @@ INVITATION_EMAIL_CONTENT: dict[Language, InvitationEmailContent] = {
         },
     },
     'pl': {
-        'subject': 'Zaproszenie: {organization}',
+        'subject': 'Zaproszenie do organizacji {organization}',
         'greeting': 'Masz zaproszenie!',
-        'body': 'Administrator zaprasza Cię do dołączenia — <b>{organization}</b>.',
+        'body': 'Administrator zaprasza Cię do organizacji <b>{organization}</b> w systemie Inventari.',
         'role_line': 'Twoja rola: <b>{role}</b>',
         'action': 'Kliknij w poniższy przycisk, aby przyjąć zaproszenie:',
         'button': 'Przyjmij zaproszenie',
@@ -229,7 +229,7 @@ INVITATION_EMAIL_CONTENT: dict[Language, InvitationEmailContent] = {
     'de': {
         'subject': 'Sie wurden zu {organization} eingeladen',
         'greeting': 'Sie wurden eingeladen!',
-        'body': 'Ein Administrator lädt Sie in Inventari ein: <b>{organization}</b>.',
+        'body': 'Ein Administrator lädt Sie ein, der Organisation <b>{organization}</b> in Inventari beizutreten.',
         'role_line': 'Ihre Rolle: <b>{role}</b>',
         'action': 'Klicken Sie auf die Schaltfläche unten, um die Einladung anzunehmen:',
         'button': 'Einladung annehmen',
@@ -246,7 +246,7 @@ INVITATION_EMAIL_CONTENT: dict[Language, InvitationEmailContent] = {
     'fr': {
         'subject': 'Vous avez été invité à rejoindre {organization}',
         'greeting': 'Vous avez été invité !',
-        'body': 'Un administrateur vous invite dans Inventari : <b>{organization}</b>.',
+        'body': "Un administrateur vous invite à rejoindre l'organisation <b>{organization}</b> dans Inventari.",
         'role_line': 'Votre rôle : <b>{role}</b>',
         'action': "Cliquez sur le bouton ci-dessous pour accepter l'invitation :",
         'button': "Accepter l'invitation",
