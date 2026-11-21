@@ -567,7 +567,9 @@ says what the release does rather than what changed since them.
   quantity done, so a quantity above it is named under the field and the sheet
   cannot be submitted. A line already returned in full is left out of the
   sheet, and a document with nothing left to return says so instead of
-  listing lines. Quantity fields everywhere no longer keep a leading zero: a
+  listing lines. The quantity fields of the return sheet, stock-take
+  counting, picking, packing, phone receiving, document lines, quick add,
+  shopping-list add and shelf settings no longer keep a leading zero: a
   digit typed after a 0 replaces it.
 - The work board no longer counts what was undone. A dispatch that has been
   undone is not counted in *Orders shipped on the order day* (undoing the
