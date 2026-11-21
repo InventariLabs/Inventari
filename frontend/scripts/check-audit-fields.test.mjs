@@ -346,3 +346,52 @@ describe("check-audit-fields --freshness", () => {
     expect(output).toContain("AUDIT_KEYS_FRESH is not set");
   });
 });
+
+describe("check-audit-fields enum values", () => {
+  // The values half: a stored enum value under an audited field with no word
+  // in `settings.audit.values` reaches the journal as the database's own
+  // spelling (`Type: SUPPLIER`, `Usage: internal`). Measured with a planted
+  // value no baseline holds.
+  const dir = mkdtempSync(join(tmpdir(), "audit-values-"));
+  afterAll(() => rmSync(dir, { recursive: true, force: true }));
+
+  it("falls and names a planted value in every language", () => {
+    const saved = JSON.parse(
+      readFileSync(join(ROOT, "scripts/audit-snapshot-keys.json"), "utf8"),
+    );
+    const artefact = join(dir, "keys.json");
+    writeFileSync(
+      artefact,
+      JSON.stringify({
+        ...saved,
+        values: [...saved.values, "A_PLANTED_VALUE"],
+      }),
+    );
+
+    const { status, stdout, stderr } = spawnSync(
+      "node",
+      ["scripts/check-audit-fields.mjs", "--baseline"],
+      {
+        cwd: ROOT,
+        encoding: "utf8",
+        env: { ...process.env, AUDIT_KEYS: artefact },
+      },
+    );
+    const output = `${stdout}${stderr}`;
+
+    expect(status).toBe(1);
+    expect(output).toContain("en: A_PLANTED_VALUE (values)");
+    expect(output).toContain("es: A_PLANTED_VALUE (values)");
+    expect(output).toContain("settings.audit.values.A_PLANTED_VALUE");
+  });
+
+  it("holds the values the backend writes to the baseline, today", () => {
+    const { status, stdout, stderr } = spawnSync(
+      "node",
+      ["scripts/check-audit-fields.mjs", "--baseline"],
+      { cwd: ROOT, encoding: "utf8" },
+    );
+
+    expect(status, `${stdout}${stderr}`).toBe(0);
+  });
+});

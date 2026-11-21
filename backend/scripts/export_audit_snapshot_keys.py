@@ -62,6 +62,7 @@ from __future__ import annotations
 import argparse
 import ast
 import json
+import re
 import sys
 from pathlib import Path
 from typing import TypedDict
@@ -336,6 +337,45 @@ def annotated_class_fields(tree: ast.AST, module: str) -> dict[str, set[str]]:
     return fields
 
 
+def enum_members(tree: ast.AST, module: str) -> dict[str, set[str]]:
+    """The string members of every enum class in one file, by qualified name.
+
+    A class counts as an enum when one of its bases is named ``…Enum``
+    (``StrEnum``, ``str, Enum``, ``enum.Enum``); its members are the
+    class-body assignments of a string constant.
+    """
+    found: dict[str, set[str]] = {}
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.ClassDef):
+            continue
+        if not any(ast.unparse(base).endswith('Enum') for base in node.bases):
+            continue
+        values = {
+            member.value.value
+            for member in node.body
+            if isinstance(member, ast.Assign)
+            and isinstance(member.value, ast.Constant)
+            and isinstance(member.value.value, str)
+        }
+        found[f'{module}.{node.name}'] = values
+    return found
+
+
+def field_annotations(tree: ast.AST, module: str) -> dict[str, dict[str, str]]:
+    """Each class's annotated fields with the annotation as written."""
+    found: dict[str, dict[str, str]] = {}
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.ClassDef):
+            continue
+        fields = found.setdefault(f'{module}.{node.name}', {})
+        for statement in node.body:
+            if isinstance(statement, ast.AnnAssign) and isinstance(
+                statement.target, ast.Name
+            ):
+                fields[statement.target.id] = ast.unparse(statement.annotation)
+    return found
+
+
 # The artefact's key names carry dashes (they are the JSON contract with the
 # frontend half of the gate), so the functional TypedDict syntax it is.
 CollectedKeys = TypedDict(
@@ -345,6 +385,8 @@ CollectedKeys = TypedDict(
         'declarations-read': int,
         'uncovered-writer-files': list[str],
         'keys': list[str],
+        'target-types': list[str],
+        'values': list[str],
     },
 )
 
@@ -369,11 +411,36 @@ def column_for_field(root: Path) -> dict[str, str]:
     return {}
 
 
+def enum_values_written(
+    schema: str,
+    journalled: set[str],
+    annotations: dict[str, dict[str, str]],
+    enums: dict[str, set[str]],
+    resolve,
+) -> set[str]:
+    """The values of the enum-typed fields a payload writer journals.
+
+    A field is enum-typed when its annotation on the update schema names an
+    enum class (``status: StockTakeStatus | None``). The name resolves in the
+    schema's own module, through its imports, like the declaration's names.
+    """
+    module = schema.rpartition('.')[0]
+    found: set[str] = set()
+    for field, annotation in annotations.get(schema, {}).items():
+        if field not in journalled:
+            continue
+        for name in re.findall(r'[A-Za-z_][A-Za-z0-9_]*', annotation):
+            found.update(enums.get(resolve(f'{module}.{name}'), set()))
+    return found
+
+
 def collect_keys(root: Path) -> CollectedKeys:
     """The artefact payload for one application tree."""
     keys: set[str] = set()
     target_types: set[str] = set()
     class_fields: dict[str, set[str]] = {}
+    enums: dict[str, set[str]] = {}
+    annotations: dict[str, dict[str, str]] = {}
     declarations: list[tuple[str, str]] = []
     funnel_files: list[str] = []
     aliases: dict[str, str] = {}
@@ -406,6 +473,9 @@ def collect_keys(root: Path) -> CollectedKeys:
         target_types.update(audit_target_types(tree))
         for name, fields in annotated_class_fields(tree, module).items():
             class_fields.setdefault(name, set()).update(fields)
+        enums.update(enum_members(tree, module))
+        for name, fields in field_annotations(tree, module).items():
+            annotations.setdefault(name, {}).update(fields)
         declarations.extend(file_declarations)
         if dynamic_funnel_keys:
             funnel_files.append((module, file_declarations))
@@ -435,12 +505,19 @@ def collect_keys(root: Path) -> CollectedKeys:
     # (the model's synonym for it is how a client's name gets there, not a
     # key the journal shows).
     columns = column_for_field(root)
+    values: set[str] = set()
     for schema_name, model_name in declarations:
         schema_keys = {
             columns.get(field, field)
             for field in class_fields.get(resolve(schema_name), set())
         }
-        keys.update(schema_keys & class_fields.get(resolve(model_name), set()))
+        journalled = schema_keys & class_fields.get(resolve(model_name), set())
+        keys.update(journalled)
+        values.update(
+            enum_values_written(
+                resolve(schema_name), journalled, annotations, enums, resolve
+            )
+        )
 
     # A funnel writer with dynamic keys is covered only by a declaration
     # whose two names both resolve to classes the tree defines — a typo in
@@ -467,6 +544,7 @@ def collect_keys(root: Path) -> CollectedKeys:
         'uncovered-writer-files': uncovered,
         'keys': sorted(keys),
         'target-types': sorted(target_types),
+        'values': sorted(values),
     }
 
 
@@ -501,6 +579,10 @@ def artefact_payload(collected: dict) -> dict:
         # a name in settings.audit.targetTypes, so a new target type cannot
         # reach the filter as a raw identifier.
         'target-types': collected['target-types'],
+        # The string values an enum-typed audited field can hold: the journal
+        # prints a stored value, so the frontend half checks each one has a
+        # word in settings.audit.values and no code reaches the reader raw.
+        'values': collected['values'],
     }
 
 

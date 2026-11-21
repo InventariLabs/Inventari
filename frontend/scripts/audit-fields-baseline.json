@@ -1,5 +1,381 @@
 {
   "generatedBy": "node scripts/check-audit-fields.mjs --write-baseline",
-  "note": "Snapshot field names with no translation yet. The goal is an empty file.",
-  "gaps": []
+  "note": "Snapshot field names, target types and enum values with no translation yet. The goal is an empty file.",
+  "gaps": [
+    {
+      "language": "en",
+      "key": "DAMAGED",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "EXPIRED",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "OTHER",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "QUALITY",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "all",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "cancelled",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "category",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "completed",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "daily",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "draft",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "in_progress",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "monthly",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "quarterly",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "weekly",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "zone",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "DAMAGED",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "EXPIRED",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "OTHER",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "QUALITY",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "all",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "cancelled",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "category",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "completed",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "daily",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "draft",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "in_progress",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "monthly",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "quarterly",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "weekly",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "zone",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "DAMAGED",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "EXPIRED",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "OTHER",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "QUALITY",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "all",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "cancelled",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "category",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "completed",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "daily",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "draft",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "in_progress",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "monthly",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "quarterly",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "weekly",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "zone",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "DAMAGED",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "EXPIRED",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "OTHER",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "QUALITY",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "all",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "cancelled",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "category",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "completed",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "daily",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "draft",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "in_progress",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "monthly",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "quarterly",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "weekly",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "zone",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "DAMAGED",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "EXPIRED",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "OTHER",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "QUALITY",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "all",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "cancelled",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "category",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "completed",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "daily",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "draft",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "in_progress",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "monthly",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "quarterly",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "weekly",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "zone",
+      "section": "values"
+    }
+  ]
 }

@@ -308,5 +308,22 @@
     "storage",
     "webhook_endpoint",
     "work_item"
+  ],
+  "values": [
+    "DAMAGED",
+    "EXPIRED",
+    "OTHER",
+    "QUALITY",
+    "all",
+    "cancelled",
+    "category",
+    "completed",
+    "daily",
+    "draft",
+    "in_progress",
+    "monthly",
+    "quarterly",
+    "weekly",
+    "zone"
   ]
 }

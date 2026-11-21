@@ -1,0 +1,24 @@
+# Pydantic error types a write body can still be answered with in the
+# library's own English. Each is a "wrong JSON type" shape: an API client can
+# send it, a screen cannot, because a form hands over the type its field
+# declares. Goal: empty. A constraint type (a bound, a length, a digit count)
+# must never appear here — it reaches a reader typing a correct-looking value.
+bool_type
+date_from_datetime_inexact
+date_type
+datetime_type
+decimal_type
+dict_type
+float_type
+int_type
+list_type
+model_attributes_type
+model_type
+string_type
+url_type
+uuid_type
+# A constraint, still open: a URL longer than the schema's maximum.
+url_too_long
+# A list shorter or longer than its schema allows (storage hierarchy, reprint).
+too_long
+too_short
