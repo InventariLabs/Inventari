@@ -22,6 +22,7 @@ from app.modules.equipment._attestation_email import (
     _build_email_html,
     _get_email_label,
 )
+from app.modules.equipment._status_labels import campaign_status_label
 from app.modules.equipment.models import (
     AuditCampaign,
     AuditResponse,
@@ -338,7 +339,9 @@ async def launch_campaign(
     if not campaign:
         raise ServiceRejectionError('campaign_not_found')
     if campaign.status != 'DRAFT':
-        raise ServiceRejectionError('attestation_not_draft', status=campaign.status)
+        raise ServiceRejectionError(
+            'attestation_not_draft', status=campaign_status_label(campaign.status)
+        )
 
     result = await db.execute(await _build_active_assignments_query(db, campaign))
     assignments = list(result.scalars().all())
@@ -593,7 +596,8 @@ async def complete_campaign(
         raise ServiceRejectionError('campaign_not_found')
     if campaign.status not in ('ACTIVE', 'DRAFT'):
         raise ServiceRejectionError(
-            'attestation_complete_not_allowed', status=campaign.status
+            'attestation_complete_not_allowed',
+            status=campaign_status_label(campaign.status),
         )
     old_status = campaign.status
     campaign.status = 'COMPLETED'

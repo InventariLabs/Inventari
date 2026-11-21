@@ -37,6 +37,12 @@ const WORKSTATIONS = {
   context_tag: "equipment",
   field_definitions: [
     { key: "cpu", label: "Processor", type: "text", visible: true },
+    {
+      key: "serial_number",
+      label: "Serial Number",
+      type: "text",
+      visible: true,
+    },
     // Owned by the purchase card; the category must not draw it twice.
     { key: "warranty_until", label: "Warranty", type: "date", visible: true },
     { key: "secret", label: "Hidden note", type: "text", visible: false },
@@ -149,6 +155,25 @@ describe("AddEquipmentPage — the form around the record", () => {
     // The panel's own Cancel leaves the form for the list.
     await user.click(screen.getByRole("button", { name: "Cancel" }));
     expect(await screen.findByText("the asset list")).toBeInTheDocument();
+  });
+
+  it("offers no shared serial number in batch mode, where every unit has its own", async () => {
+    const user = renderPage();
+    const category = await screen.findByLabelText(/^Category/);
+    await waitFor(() =>
+      expect(
+        screen.getByRole("option", { name: "Workstations" }),
+      ).toBeInTheDocument(),
+    );
+    await user.selectOptions(category, "cat-ws");
+    expect(await screen.findByLabelText("Serial Number")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("tab", { name: /Batch/ }));
+    expect(screen.queryByLabelText("Serial Number")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Processor")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("tab", { name: /Single/ }));
+    expect(await screen.findByLabelText("Serial Number")).toBeInTheDocument();
   });
 
   // The location field searches the server itself and says in its own panel

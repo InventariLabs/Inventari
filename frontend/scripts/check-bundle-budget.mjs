@@ -485,12 +485,20 @@ const dist = join(root, "dist");
  * receive 475.6, issue 588.4, history 613.2, products 630.6, app first paint
  * 402.7, initial 193.9).
  *
+ * Re-measured 2026-11-21 on the branch that makes the equipment screens use
+ * the words and numbers a reader sees: merged with the line, the history
+ * screen measures 615.0 KiB gz against its 615, from 613.2 before it. What
+ * the branch adds there is equipment copy in six languages (the Polish
+ * catalogue sits in the language chunk the screen loads); no import walked
+ * in. That one phone budget moves a step of five, to 620; the other screens
+ * stand under theirs.
+ *
  * Re-measured 2026-11-21 on the branch that closes the catalogue, locations
- * and labels findings: the issue screen measures 590.2 KiB gz against its 590
- * and history 615.3 against its 615, from 589.8 and 614.9 on the line
- * without it. What the branch adds is copy in six languages and a few lines
- * of the shared error text; no import walked in. Those two phone budgets move
- * a step of five, to 595 and 620; the other screens stand under theirs (login
+ * and labels findings: the issue screen measures 590.2 KiB gz against its 590,
+ * from 589.8 on the line without it. What the branch adds is copy in six
+ * languages and a few lines of the shared error text; no import walked in.
+ * That phone budget moves a step of five, to 595 (the history budget is
+ * already at 620 above); the other screens stand under theirs (login
  * 409.1, launcher 424.2, receive 477.4, start 642.6, products 633.0, app
  * first paint 404.3, initial 193.9).
  */

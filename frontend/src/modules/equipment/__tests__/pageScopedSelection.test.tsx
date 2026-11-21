@@ -189,12 +189,31 @@ describe("Asset list — the selection says how far it reaches", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("counts only the rows on other pages as out of reach", async () => {
+  it("does not claim a page is selected while only some of its rows are ticked", async () => {
+    // "Only this page is selected" describes a whole-page selection; with one
+    // row ticked it would say something that was not done.
     server.use(listOf(50, 61));
     renderList();
 
     fireEvent.click(
       (await screen.findAllByLabelText(/select asset laptop 1$/i))[0],
+    );
+
+    expect(await screen.findByText(/1 selected/i)).toBeInTheDocument();
+    expect(
+      screen.queryByText(/only this page is selected/i),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /select all 61/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("counts only the rows on other pages as out of reach, once the page is selected", async () => {
+    server.use(listOf(50, 61));
+    renderList();
+
+    fireEvent.click(
+      await screen.findByRole("button", { name: /select page/i }),
     );
 
     expect(

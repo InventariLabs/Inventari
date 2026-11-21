@@ -29,6 +29,7 @@ import { useEquipmentModels } from "@/modules/equipment/hooks/useEquipment";
 import {
   useEquipmentForm,
   DEDICATED_KEYS,
+  SERIAL_KEY,
 } from "@/modules/equipment/hooks/useEquipmentForm";
 import type { CategoryDTO, FieldDefinition, LabelScanView } from "@/types";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -166,6 +167,27 @@ interface ScanPrefill {
     location_id?: string | null;
     category_id?: string | null;
   };
+}
+
+/**
+ * The category's own fields the form draws. Purchase_date / warranty_until /
+ * notes are owned by the dedicated cards, so category-declared duplicates are
+ * dropped and each field renders exactly once; both the visibility and the
+ * duplicate conditions must survive — taking either side silently kills the
+ * other fix. A batch takes each unit's serial from its own list, so a shared
+ * serial typed on the card would be dropped without a word.
+ */
+function categoryFields(
+  category: CategoryDTO | undefined,
+  batch: boolean,
+): FieldDefinition[] {
+  // The category's field definitions cross the wire as open dicts; the
+  // entries are the shared FieldDefinition shape — narrowed once, here.
+  return filterVisibleFields(
+    (category?.field_definitions ?? []) as FieldDefinition[],
+  ).filter(
+    (f) => !DEDICATED_KEYS.has(f.key) && !(batch && f.key === SERIAL_KEY),
+  );
 }
 
 export default function AddEquipmentPage() {
@@ -307,21 +329,10 @@ export default function AddEquipmentPage() {
     [equipmentCategories, form.category_id],
   );
 
-  // Purchase_date / warranty_until / notes are owned by
-  // the dedicated cards — category-declared duplicates are dropped so the
-  // form renders each field exactly once.
+  const isBatchCreate = !isEditMode && mode === "batch";
   const visibleFields = useMemo(
-    // filters visible+typed fields via filterVisibleFields; drops
-    // category-declared duplicates of the dedicated date/notes cards. Both
-    // conditions must survive: taking either side silently kills the
-    // other fix.
-    () =>
-      // The category's field definitions cross the wire as open dicts; the
-      // entries are the shared FieldDefinition shape — narrowed once, here.
-      filterVisibleFields(
-        (activeCategory?.field_definitions ?? []) as FieldDefinition[],
-      ).filter((f: FieldDefinition) => !DEDICATED_KEYS.has(f.key)),
-    [activeCategory],
+    () => categoryFields(activeCategory, isBatchCreate),
+    [activeCategory, isBatchCreate],
   );
 
   // The form is reachable by address, so hiding the buttons that lead here is
