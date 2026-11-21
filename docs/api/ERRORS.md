@@ -290,6 +290,7 @@ apart.
 | `DOCUMENT_CORRECTION_NOT_DUPLICABLE` | A correction cannot be duplicated: it restates one document. Write a new correction of that document instead. |
 | `DOCUMENT_CORRECTION_NO_LINES` | A correction needs at least one line |
 | `DOCUMENT_CORRECTION_ORIGINAL_NOT_FOUND` | The corrected document {document} was not found. |
+| `DOCUMENT_CORRECTION_POSTS_NOTHING` | This document only records goods another step already took — a correction cannot move stock through it. |
 | `DOCUMENT_CORRECTION_REQUIRES_COMPLETED` | Only a completed document can be corrected |
 | `DOCUMENT_CORRECTION_SIGN_MISMATCH` | A correction must keep the sign of the expected difference: {quantity} against {expected}. |
 | `DOCUMENT_CORRECTION_TYPE_NOT_CORRECTABLE` | Documents of this type cannot be corrected |
@@ -344,6 +345,7 @@ apart.
 | `DOCUMENT_TYPE_REQUIRES_TARGET_LOCATION` | This document type needs a target location |
 | `DOCUMENT_UNDO_BLOCKED` | This cannot be undone: {reason} Use Correct to change what is left instead. |
 | `DOCUMENT_UNDO_NOTHING_LEFT` | Everything this document posted has already been reversed |
+| `DOCUMENT_UNDO_POSTS_NOTHING` | This document only records goods another step already took — it moved no stock, so there is nothing to undo. |
 | `DOCUMENT_UNDO_REQUIRES_COMPLETED` | Only a posted document can be undone |
 | `DOCUMENT_UNDO_STOCK_USED` | This cannot be undone: later movements used the stock it posted. Use Correct to change what is left instead. |
 | `DOCUMENT_UNDO_TYPE_NOT_SUPPORTED` | Only a receipt, an issue or a transfer can be undone |
@@ -484,6 +486,7 @@ apart.
 | `ONLY_IMAGE_FILES_ALLOWED` | Only image files are allowed (jpg, png, gif, webp) |
 | `ORGANIZATION_CURRENCY_MISSING` | Organization currency not configured |
 | `ORGANIZATION_INVITE_INVALID` | This invitation can't be used. Check that you are registering with the e-mail address it was sent to, or ask for a new one. |
+| `ORGANIZATION_NAME_REQUIRED` | Organization name cannot be empty. |
 | `ORGANIZATION_NOT_FOUND` | Organization not found |
 | `ORGANIZATION_REQUIRED` | Organization required |
 | `OVER_RECEIPT_PAST_CEILING` | Receiving {quantity} against {basis} goes past the {ceiling}% over-receipt ceiling — nobody may receive that much |

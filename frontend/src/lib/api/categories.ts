@@ -6,12 +6,14 @@ export const categoriesApi = {
     include_inactive?: boolean,
     exclude_module_contexts?: boolean,
     with_counts?: boolean,
+    count_records?: boolean,
   ): Promise<CategoryDTO[]> => {
     const params: Record<string, unknown> = {};
     if (include_inactive) params.include_inactive = include_inactive;
     if (exclude_module_contexts)
       params.exclude_module_contexts = exclude_module_contexts;
     if (with_counts) params.with_counts = with_counts;
+    if (count_records) params.count_records = count_records;
     return getEveryPage<CategoryDTO>("/categories", params);
   },
 

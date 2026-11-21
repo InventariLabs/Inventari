@@ -29,7 +29,7 @@ import {
 // what differs: the inline panel takes the document type's verb, the WMS
 // session is prefixed "Scan" (see the labels in i18n). A scrap is executed by
 // writing the goods off; nothing is picked for anybody.
-function executeLabelKeyFor(docType: string) {
+export function executeLabelKeyFor(docType: string) {
   if (docType === "IN" || docType === "INTERNAL_IN")
     return "warehouse:actions.executeReceive";
   if (docType === "SCRAP") return "warehouse:actions.executeScrap";
@@ -40,8 +40,14 @@ function executeLabelKeyFor(docType: string) {
  * The one-step verb for a draft: what the action does to the stock, in the
  * warehouse's own words. A type with no verb of its own posts under the
  * neutral label rather than borrowing another type's.
+ *
+ * A document that only records what another step already moved (a recipe's
+ * internal issue, whose goods the picking session took) posts no stock, so
+ * neither "Remove from stock" nor any other movement verb is true of it:
+ * the label says that this is the record being kept.
  */
-function postNowLabelKeyFor(docType: string) {
+function postNowLabelKeyFor(docType: string, stockAlreadyApplied = false) {
+  if (stockAlreadyApplied) return "warehouse:actions.postNowRecordOnly";
   switch (docType) {
     case "IN":
     case "INTERNAL_IN":
@@ -69,6 +75,7 @@ interface DraftActionsProps {
   isCorrection: boolean;
   canManage: boolean;
   docType: string;
+  stockAlreadyApplied?: boolean;
   isPlanned: boolean;
   approvalRequired: boolean;
   isPostNowPending: boolean;
@@ -92,6 +99,7 @@ function DraftActions({
   isCorrection,
   canManage,
   docType,
+  stockAlreadyApplied,
   isPlanned,
   approvalRequired,
   isPostNowPending,
@@ -149,7 +157,7 @@ function DraftActions({
       >
         {approvalRequired
           ? t("warehouse:actions.sendForApproval")
-          : t(postNowLabelKeyFor(docType))}
+          : t(postNowLabelKeyFor(docType, stockAlreadyApplied))}
       </Button>
       {isPlanned && (
         <ActionMenu
@@ -229,6 +237,10 @@ interface DocumentActionButtonsProps {
   isConfirmed: boolean;
   docStatus: string;
   docType: string;
+  /** The document only records a movement another step already made: its
+   * draft action keeps the record and moves no stock, and the button says
+   * so instead of offering one of the stock verbs. */
+  stockAlreadyApplied?: boolean;
   isApplyCorrectionPending: boolean;
   isCompletePending: boolean;
   isPostNowPending?: boolean;
@@ -277,6 +289,7 @@ export function DocumentActionButtons({
   isConfirmed,
   docStatus,
   docType,
+  stockAlreadyApplied,
   isApplyCorrectionPending,
   isCompletePending,
   isPostNowPending = false,
@@ -376,6 +389,7 @@ export function DocumentActionButtons({
           isCorrection={isCorrection}
           canManage={canManage}
           docType={docType}
+          stockAlreadyApplied={stockAlreadyApplied}
           isPlanned={isPlanned}
           approvalRequired={approvalRequired}
           isPostNowPending={isPostNowPending}

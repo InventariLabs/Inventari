@@ -224,15 +224,15 @@ class TestRetrySemantics:
         self, session_factory: SessionFactory, webhook: WebhookEndpoint
     ) -> None:
         """A manually disabled endpoint abandons the delivery, and the row
-        says so as OUR stop: no status code (nobody answered this attempt),
-        no borrowed text, and a reason that names the cause."""
+        says so as OUR stop — a reason that names the cause — while it keeps
+        what the target answered to the last real attempt."""
         async with session_factory() as session:
             wh = await session.get(WebhookEndpoint, webhook.id)
             assert wh is not None
             wh.is_active = False
             await session.commit()
-        # The first attempt's 500 is the receiver's answer to THAT attempt;
-        # the abandonment must not carry it forward as its own.
+        # The first attempt's 500 is a real answer from the receiver; the
+        # abandonment adds our reason next to it and erases nothing.
         log_id = await _add_log(
             session_factory, webhook, status_code=500, error_message='nope'
         )
@@ -254,8 +254,8 @@ class TestRetrySemantics:
         assert called is False
         log = await _fetch_log(session_factory, log_id)
         assert log.delivery_status == _DELIVERY_STATUS_FAILED
-        assert log.status_code is None, 'an abandonment carries no receiver status code'
-        assert log.error_message is None
+        assert log.status_code == 500, "the last attempt's answer survives"
+        assert log.error_message == 'nope'
         assert log.abandon_reason == _ABANDON_WEBHOOK_DISABLED
         assert log.last_attempt_at is not None
         # The claim found the row through next_retry_at; a delivery we
@@ -290,7 +290,8 @@ class TestRetrySemantics:
         log = await _fetch_log(session_factory, log_id)
         assert log.delivery_status == _DELIVERY_STATUS_FAILED
         assert log.abandon_reason == _ABANDON_CIRCUIT_BREAKER
-        assert log.status_code is None
+        assert log.status_code == 500
+        assert log.error_message == 'nope'
 
     async def test_module_switch_off_abandons_with_its_own_reason(
         self, session_factory: SessionFactory, webhook: WebhookEndpoint
@@ -317,7 +318,7 @@ class TestRetrySemantics:
         log = await _fetch_log(session_factory, log_id)
         assert log.delivery_status == _DELIVERY_STATUS_FAILED
         assert log.abandon_reason == _ABANDON_MODULE_DISABLED
-        assert log.status_code is None
+        assert log.status_code == 500
 
 
 @pytest.mark.integration

@@ -869,6 +869,11 @@
               "kind": "KEYWORD_ONLY",
               "name": "with_counts",
               "required": false
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "count_records",
+              "required": false
             }
           ]
         },
@@ -940,6 +945,20 @@
     "email": {
       "class": "CoreEmailAPI",
       "methods": {
+        "can_send_async": {
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            }
+          ]
+        },
         "is_configured": {
           "params": []
         },
@@ -2246,6 +2265,11 @@
             {
               "kind": "KEYWORD_ONLY",
               "name": "move_reference_id",
+              "required": false
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "file_when_emptied",
               "required": false
             }
           ]
@@ -7705,6 +7729,11 @@
             {
               "kind": "POSITIONAL_OR_KEYWORD",
               "name": "reverses_line_id",
+              "required": false
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "reverses_layer_id",
               "required": false
             }
           ]

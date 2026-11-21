@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.contracts import RecordPostDTO
 from app.core.exceptions import ServiceRejectionError
 from app.core.public_api import core_api
+from app.i18n.service import stated_quantity
 
 from . import document_types as dt
 from ._stock_executor_helpers import (
@@ -136,6 +137,68 @@ async def _lock_what_the_lines_change(
         )
 
 
+def _refuse_a_record_left_below_zero(
+    line: DocumentLine, held: Decimal, change: Decimal
+) -> None:
+    """Refuse a correction that takes more off the line's record than it holds.
+
+    Names the product the way the screen does and states the quantities in the
+    screen's own shape; a record id means nothing to the person standing at
+    the goods.
+    """
+    if held + change >= 0:
+        return
+    raise ServiceRejectionError(
+        'document_correction_would_go_negative',
+        item=line.name or line.barcode or f'#{line.line_number}',
+        current=stated_quantity(held),
+        delta=stated_quantity(change),
+        result=stated_quantity(held + change),
+    )
+
+
+async def require_correction_fits_records(db: AsyncSession, doc: Document) -> None:
+    """Refuse, before the correction is numbered, a delta its records cannot take.
+
+    The completion asks the same question of the same records, but by then the
+    document has been confirmed and carries a number its author cannot
+    remove; asking at confirmation means a refused correction is still a
+    draft. Only the plan is known here, so a quantity entered at completion
+    is checked again there.
+    """
+    if not doc.corrects_document_id:
+        return
+    original = (
+        (
+            await db.execute(
+                select(Document).where(
+                    Document.id == doc.corrects_document_id,
+                    Document.organization_id == doc.organization_id,
+                )
+            )
+        )
+        .scalars()
+        .first()
+    )
+    if original is None:
+        return
+    sign = dt.correction_sign(original.type)
+    for line in doc.lines:
+        if not line.item_id or not line.quantity:
+            continue
+        record = await core_api.items.get_async(db, doc.organization_id, line.item_id)
+        if record is None or record.quantity is None:
+            continue
+        change = sign * await core_api.uoms.to_stock_uom_async(
+            db,
+            doc.organization_id,
+            line.product_template_id or record.template_id,
+            line.quantity,
+            line.uom_id,
+        )
+        _refuse_a_record_left_below_zero(line, record.quantity, change)
+
+
 async def execute_correction(
     db: AsyncSession,
     doc: Document,
@@ -253,14 +316,7 @@ async def execute_correction(
         old_qty = await _locked_quantity(db, doc, item.id)
         new_qty = old_qty + effective_delta
 
-        if new_qty < 0:
-            raise ServiceRejectionError(
-                'document_correction_would_go_negative',
-                item=line.item_id,
-                current=old_qty,
-                delta=delta,
-                result=new_qty,
-            )
+        _refuse_a_record_left_below_zero(line, old_qty, effective_delta)
         # The batch the line names — copied from the line it corrects — and
         # without one the record's own: the record holds one batch, and a
         # correction that names none would change the batch-less stock under

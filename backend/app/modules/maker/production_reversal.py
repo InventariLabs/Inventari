@@ -10,7 +10,9 @@ correction per ingredient and shelf by someone who knows where each came from.
 What the run took is read back from the movements it wrote: one per shelf,
 batch, owner and date it drew on, so each ingredient returns to the record it
 left, with its batch and its expiry. The output comes off the record the run
-opened for it. Every movement of the reversal names the run, so the run's own
+opened for it, at the value that run put into it — the layer the run or its
+portion opened, never the product's oldest layer, which may hold the cost of
+an earlier run. Every movement of the reversal names the run, so the run's own
 moves list and the moves register show the way out and the way back together.
 """
 
@@ -174,23 +176,34 @@ async def _take_the_outputs_off(
         )
     ).all()
     entries = (
-        [(portion.item_id, portion.qty, portion.created_at) for portion in portions]
+        [
+            (portion.item_id, portion.qty, portion.created_at, portion.layer_id)
+            for portion in portions
+        ]
         if portions
         else [
             (
                 order.produced_item_id,
                 order.actual_qty or Decimal('0'),
                 order.completed_at or order.created_at,
+                order.output_layer_id,
             )
         ]
     )
-    for item_id, made, since in entries:
+    for item_id, made, since, _layer_id in entries:
         await _check_the_output_is_there(
             db, organization_id, order, item_id=item_id, made=made, since=since
         )
-    for item_id, made, _since in entries:
+    for item_id, made, _since, layer_id in entries:
         await _take_the_output_off(
-            db, organization_id, order, user, history, item_id=item_id, made=made
+            db,
+            organization_id,
+            order,
+            user,
+            history,
+            item_id=item_id,
+            made=made,
+            layer_id=layer_id,
         )
 
 
@@ -244,8 +257,15 @@ async def _take_the_output_off(
     *,
     item_id: UUID | None,
     made: Decimal,
+    layer_id: UUID | None,
 ) -> None:
-    """Take a quantity of the run's output off the record the run opened for it."""
+    """Take a quantity of the run's output off the record the run opened for it.
+
+    *layer_id* is the cost layer that record's goods came in on — the run's
+    own, or the portion's — so the books give up what the run put in and not
+    the product's oldest layer, which may belong to an earlier, differently
+    priced run.
+    """
     produced = (
         await core_api.items.get_for_update_async(db, organization_id, item_id)
         if item_id is not None
@@ -271,6 +291,7 @@ async def _take_the_output_off(
                 item_id=produced.id,
                 new_quantity=(produced.quantity or Decimal('0')) - made,
                 history=history,
+                file_when_emptied=True,
             )
         ],
     )
@@ -280,6 +301,7 @@ async def _take_the_output_off(
         order.output_template_id,
         made,
         item_id=produced.id,
+        reverses_layer_id=layer_id,
     )
 
 

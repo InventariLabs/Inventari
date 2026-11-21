@@ -60,6 +60,7 @@
     "targetResponse": "Respuesta del destinatario",
     "truncated": "abreviado",
     "abandonedByApp": "Abandonado por Inventari — el destino nunca respondió",
+    "abandonedByAppAnswered": "Abandonado por Inventari — dejó de reintentar tras la respuesta del destino",
     "deliveryId": "ID de entrega",
     "abandon": {
       "circuitBreaker": "El cortacircuitos desconectó este endpoint tras fallos repetidos.",
@@ -89,7 +90,7 @@
   },
   "circuitBreakerWarning_one": "Este webhook se ha desactivado automáticamente tras 1 fallo consecutivo — la causa del último intento consta en los registros de entrega.",
   "circuitBreakerWarning_other": "Este webhook se ha desactivado automáticamente tras {{count}} fallos consecutivos — la causa del último intento consta en los registros de entrega.",
-  "eventsWhileOff": "Los eventos que ocurren mientras está desactivado no se entregan, no se ponen en cola ni se registran, y Reactivar no los reproduce.",
+  "eventsWhileOff": "Los eventos que ocurren mientras está desactivado no se entregan, no se ponen en cola ni se registran, y Reactivar no los reproduce. Las entregas que seguían esperando un reintento cuando se desactivó se abandonan igual — quedan en el registro de entregas como fallidas.",
   "settings": {
     "logRetentionDays": "Retención de registros (días)",
     "logRetentionDaysDescription": "Cuánto tiempo conservar los registros de entrega de webhooks.",

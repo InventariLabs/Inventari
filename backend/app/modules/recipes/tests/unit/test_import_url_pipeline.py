@@ -331,6 +331,8 @@ class TestParseImportUrl:
         assert result.ingredients[0].name == 'flour'
         assert result.ingredients[0].uom_id == uom.id
         assert result.ingredients[0].template_id == match.template_id
+        # The name says what it holds, as the recipe form's lookup does.
+        assert result.ingredients[0].allergens == ['gluten']
 
     async def test_no_uom_or_template(self) -> None:
         parsed = _parsed(unit_symbol=None, group_name=None)
@@ -678,6 +680,8 @@ class TestPreviewImportUrl:
         assert result['ingredients'][0]['uom_id'] == str(uom.id)
         assert result['ingredients'][0]['template_id'] == str(match.template_id)
         assert result['ingredients'][0]['template_name'] == 'Flour'
+        # Pre-ticked on the review screen, for the cook to correct.
+        assert result['ingredients'][0]['allergens'] == ['gluten']
 
     async def test_fallback_warning(self) -> None:
         parsed = _parsed()

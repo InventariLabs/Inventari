@@ -100,14 +100,19 @@ describe("BulkActionBar", () => {
     expect(bar?.className).toMatch(/top-\[calc\(3\.5rem\+/);
   });
 
-  it("disables what the selection has nothing for", () => {
+  it("shows only the actions the selection can take", () => {
+    // Only confirmed documents are ticked: there is no draft to confirm or
+    // delete, so those buttons are not there to read as "0 drafts".
     renderBar({ draftCount: 0, printableCount: 0 });
     expect(
       screen.getByRole("button", { name: "Print as one PDF" }),
     ).toBeDisabled();
     expect(
-      screen.getByRole("button", { name: "bulk.confirmDrafts:0" }),
-    ).toBeDisabled();
+      screen.queryByRole("button", { name: /confirmDrafts/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /deleteDrafts/ }),
+    ).not.toBeInTheDocument();
   });
 
   it("leaves a reader only the actions that are not writes", () => {

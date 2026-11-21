@@ -12,6 +12,7 @@ import { InlineQueryError, QueryError } from "@/components/ui/QueryResult";
 import { RecordNotFound } from "@/components/ui/RecordNotFound";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Textarea } from "@/components/ui/Textarea";
+import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { ProductionRunActions } from "@/modules/maker/components/ProductionRunActions";
 import { RunPortions } from "@/modules/maker/components/RunPortions";
 import { RunSteps } from "@/modules/maker/components/RunSteps";
@@ -114,7 +115,7 @@ export default function ProductionDetailPage() {
   // different answers: "failed to load" over a deleted order sends the reader
   // looking for a fault that is not there.
   if (error && !isNotFoundError(error)) {
-    return <QueryError onRetry={() => void refetch()} />;
+    return <QueryError error={error} onRetry={() => void refetch()} />;
   }
 
   if (isLoading) {
@@ -168,6 +169,7 @@ export default function ProductionDetailPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <ReadOnlyNotice module="maker" />
       <div className="flex flex-wrap items-start justify-between gap-4">
         {/* The shell header already names the run by its output product, so
             repeating it here cost two of the first four lines on a phone.

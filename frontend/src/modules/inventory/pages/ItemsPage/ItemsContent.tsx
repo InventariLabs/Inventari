@@ -21,7 +21,8 @@ import type {
 } from "@/types";
 
 interface ItemsContentProps {
-  isError: boolean;
+  /** Set when the list request failed; the error says refusal from failure. */
+  failure?: { error: unknown };
   isLoading: boolean;
   itemsResponse:
     { items: Item[]; total: number; total_capped?: boolean } | undefined;
@@ -75,7 +76,7 @@ interface ItemsContentProps {
 }
 
 export default function ItemsContent({
-  isError,
+  failure,
   isLoading,
   itemsResponse,
   items,
@@ -127,8 +128,8 @@ export default function ItemsContent({
         : null,
     [groupByCategory, items, categories, t],
   );
-  if (isError) {
-    return <QueryError onRetry={onRefetch} />;
+  if (failure) {
+    return <QueryError error={failure.error} onRetry={onRefetch} />;
   }
 
   if (isLoading && !itemsResponse) {

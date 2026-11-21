@@ -229,6 +229,7 @@ export default function CategoriesPage() {
     data: categories,
     isLoading,
     isError,
+    error,
     refetch,
   } = useCategories(true, excludeModuleContexts, true);
 
@@ -279,7 +280,7 @@ export default function CategoriesPage() {
   if (isLoading) return <LoadingSpinner />;
   // Without this the failed request rendered "add your first category" over a
   // dictionary of thirty-eight, and the reader obliged with a duplicate.
-  if (isError) return <QueryError onRetry={refetch} />;
+  if (isError) return <QueryError error={error} onRetry={refetch} />;
 
   return (
     <div className="space-y-6">

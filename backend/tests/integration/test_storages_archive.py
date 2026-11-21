@@ -1,8 +1,9 @@
 """Integration tests for storage archival.
 
 Archiving hides a location from lists, trees and pickers while keeping it
-in history. "Move content and close" relocates items (including those in
-descendant locations) to a chosen target in the same operation.
+in history. "Move content and close" relocates the items standing on the
+archived location itself to a chosen target in the same operation; the
+locations inside stay active and keep their own stock.
 """
 
 import pytest
@@ -95,28 +96,50 @@ class TestStorageArchive:
         ).json()['items']
         assert any(i['id'] == str(item.id) for i in items)
 
-    def test_archive_moves_items_from_descendant_locations(
+    def test_archive_leaves_the_stock_of_a_location_inside_where_it_is(
         self, client, auth_headers, db_session, test_user
     ):
-        """Closing a zone relocates items sitting in its child locations."""
-        site = self._make(db_session, test_user, 'Site')
-        zone = self._make(db_session, test_user, 'Zone', parent_id=site.id)
-        location = self._make(
-            db_session,
-            test_user,
-            'Location',
-            parent_id=zone.id,
-        )
-        target = self._make(db_session, test_user, 'Target')
-        item = self._add_item(db_session, test_user, location.id, 'Widget')
+        """A location inside stays active, so its stock stays with it.
 
-        response = self._archive(client, auth_headers, zone.id, move_items_to=target.id)
+        The parent holds nothing of its own: archiving it asks for no target
+        and moves nothing, and the child keeps the item it holds.
+        """
+        zone = self._make(db_session, test_user, 'Zone')
+        shelf = self._make(db_session, test_user, 'Shelf', parent_id=zone.id)
+        target = self._make(db_session, test_user, 'Target')
+        item = self._add_item(db_session, test_user, shelf.id, 'Widget')
+
+        response = self._archive(client, auth_headers, zone.id)
 
         assert response.status_code == status.HTTP_200_OK
-        items = client.get(
+        assert (
+            client.get(
+                f'/api/v1/locations/{zone.id}/summary', headers=auth_headers
+            ).json()['items_count']
+            == 0
+        )
+        on_shelf = client.get(
+            f'/api/v1/locations/{shelf.id}/items', headers=auth_headers
+        ).json()['items']
+        assert [i['id'] for i in on_shelf] == [str(item.id)]
+
+        # With a target given, the same: only the parent's own stock moves.
+        zone2 = self._make(db_session, test_user, 'Zone 2')
+        shelf2 = self._make(db_session, test_user, 'Shelf 2', parent_id=zone2.id)
+        own = self._add_item(db_session, test_user, zone2.id, 'Own')
+        inner = self._add_item(db_session, test_user, shelf2.id, 'Inner')
+        response = self._archive(
+            client, auth_headers, zone2.id, move_items_to=target.id
+        )
+        assert response.status_code == status.HTTP_200_OK
+        on_target = client.get(
             f'/api/v1/locations/{target.id}/items', headers=auth_headers
         ).json()['items']
-        assert any(i['id'] == str(item.id) for i in items)
+        assert [i['id'] for i in on_target] == [str(own.id)]
+        on_shelf2 = client.get(
+            f'/api/v1/locations/{shelf2.id}/items', headers=auth_headers
+        ).json()['items']
+        assert [i['id'] for i in on_shelf2] == [str(inner.id)]
 
     def test_archive_unknown_target_returns_404(
         self, client, auth_headers, db_session, test_user

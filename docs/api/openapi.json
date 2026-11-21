@@ -3205,6 +3205,18 @@
               "title": "With Counts"
             },
             "description": "Include how many live items each category holds"
+          },
+          {
+            "name": "count_records",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "With counts: count every live record, not distinct products",
+              "default": false,
+              "title": "Count Records"
+            },
+            "description": "With counts: count every live record, not distinct products"
           }
         ],
         "responses": {
@@ -37073,7 +37085,7 @@
           "Warehouse"
         ],
         "summary": "Get Price Hint",
-        "description": "suggested unit price for a product on a document.\n\nChain: partner pricelist (purchase_orders module, when it is there) \u2192\nmost recent priced purchase \u2192 nothing. Enables the \"auto-suggest price\"\nstep of value tracking without making the warehouse module depend on\nthe purchase_orders module being enabled.",
+        "description": "suggested unit price for a product on a document.\n\nChain: partner pricelist (purchase_orders module, when it is there) \u2192\nmost recent priced purchase \u2192 nothing. Enables the \"auto-suggest price\"\nstep of value tracking without making the warehouse module depend on\nthe purchase_orders module being enabled.\n\nBoth prices are what the goods cost: a supplier's offer and what was\nlast paid. A delivery's line price is what the customer pays, and\nnothing here knows that, so a delivery gets the rate of tax alone. A\ndocument that takes goods into its own use (an internal issue) is\nvalued at cost and keeps the chain.",
         "operationId": "get_price_hint_api_v1_warehouse_price_hint_get",
         "security": [
           {
@@ -37136,6 +37148,24 @@
               "title": "Quantity"
             },
             "description": "Line quantity; a volume price it does not reach is not offered"
+          },
+          {
+            "name": "document_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Type of the document the line is on; a delivery to a partner (OUT) is offered the rate of tax and no price",
+              "title": "Document Type"
+            },
+            "description": "Type of the document the line is on; a delivery to a partner (OUT) is offered the rate of tax and no price"
           }
         ],
         "responses": {
@@ -45847,6 +45877,11 @@
               }
             ],
             "title": "Stock On Hand"
+          },
+          "unit_mismatch": {
+            "type": "boolean",
+            "title": "Unit Mismatch",
+            "default": false
           }
         },
         "type": "object",
@@ -53512,6 +53547,11 @@
           "is_opening": {
             "type": "boolean",
             "title": "Is Opening",
+            "default": false
+          },
+          "stock_already_applied": {
+            "type": "boolean",
+            "title": "Stock Already Applied",
             "default": false
           },
           "lines": {
@@ -75712,6 +75752,11 @@
             "title": "Is Opening",
             "default": false
           },
+          "stock_already_applied": {
+            "type": "boolean",
+            "title": "Stock Already Applied",
+            "default": false
+          },
           "lines": {
             "items": {
               "$ref": "#/components/schemas/DocumentLineSchema"
@@ -84120,6 +84165,28 @@
             ],
             "title": "To Location Name"
           },
+          "from_location_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Location Path"
+          },
+          "to_location_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Location Path"
+          },
           "lot_name": {
             "anyOf": [
               {
@@ -86038,7 +86105,7 @@
         },
         "type": "object",
         "title": "StorageArchiveRequest",
-        "description": "\u00abMove content and close\u00bb payload.\n\n``move_items_to`` is required when the location (or any of its\ndescendants) still holds items; the archive then relocates them in the\nsame operation."
+        "description": "\u00abMove content and close\u00bb payload.\n\n``move_items_to`` is required when the location itself still holds\nitems; the archive then relocates them in the same operation. The\nlocations inside stay active and keep their own stock."
       },
       "StorageCodeChange": {
         "properties": {

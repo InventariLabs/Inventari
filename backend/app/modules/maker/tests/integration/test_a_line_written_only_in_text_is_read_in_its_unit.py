@@ -1,11 +1,13 @@
-"""A recipe line with no unit of its own is counted in its ingredient's unit.
+"""A recipe line naming its unit only in text is read in that unit.
 
-The stock move of such a line has always consumed the number in the
-product's unit — it cannot do anything else, a quant carries no unit — while
-the order's consumed lines, the cost breakdown and the availability check
-printed the line's free-text unit beside the same number: "0.082 kg" of
-cinnamon above "0.082 pcs." of cinnamon, one event and two measures. The
-line's number and its label now agree with the move.
+The stock move of such a line can only consume a number — a quant carries no
+unit — so the unit has to be resolved before it gets there. It was not: the
+line's free text was decoration, the number was taken for the stock unit, and
+a line reading "50 g" of a product kept in kilograms took fifty kilograms off
+the shelf. The text now names the unit the way an id does (the catalogue
+resolves symbols and the spellings buyers and older screens wrote), and the
+consumed line, its stock move, the availability answer and the cost breakdown
+all read the same converted quantity in the ingredient's stock unit.
 """
 
 from __future__ import annotations
@@ -60,11 +62,10 @@ def cinnamon_recipe(
     mk_input_loc: StorageLocation,
     async_engine_fixture: AsyncEngine,
 ) -> MakerRecipe:
-    """Plum butter whose cinnamon line says "kg" in text and names no unit."""
-    pcs = _uom(db_session, 'pcs')
+    """Plum butter whose cinnamon line says "50 g" in text and names no unit."""
     kg = _uom(db_session, 'kg')
     output = _template(db_session, mk_org, name='Plum Butter', uom_id=kg.id)
-    cinnamon = _template(db_session, mk_org, name='Ground Cinnamon', uom_id=pcs.id)
+    cinnamon = _template(db_session, mk_org, name='Ground Cinnamon', uom_id=kg.id)
     recipe = MakerRecipe(
         organization_id=mk_org.id,
         output_template_id=output.id,
@@ -80,8 +81,8 @@ def cinnamon_recipe(
             recipe_id=recipe.id,
             parent_template_id=output.id,
             child_template_id=cinnamon.id,
-            qty_per_batch=Decimal('0.05'),
-            unit='kg',
+            qty_per_batch=Decimal('50'),
+            unit='g',
             uom_id=None,
         )
     )
@@ -128,12 +129,14 @@ def test_the_consumed_line_and_its_stock_move_name_one_unit(
 
     [line] = order['lines']
     [consumed] = [m for m in moves if m['product_template_name'] == 'Ground Cinnamon']
+    # 50 g a batch, two batches: a tenth of a kilogram off the shelf.
+    assert Decimal(line['consumed_qty']) == Decimal('0.1')
     assert Decimal(line['consumed_qty']) == Decimal(consumed['quantity'])
-    assert line['unit'] == 'pcs'
-    assert consumed['uom_symbol'] == 'pcs'
+    assert line['unit'] == 'kg'
+    assert consumed['uom_symbol'] == 'kg'
 
 
-def test_availability_names_the_unit_the_line_is_counted_in(
+def test_availability_names_the_unit_the_line_is_written_in(
     client: TestClient,
     mk_auth_headers: dict[str, str],
     cinnamon_recipe: MakerRecipe,
@@ -145,10 +148,11 @@ def test_availability_names_the_unit_the_line_is_counted_in(
 
     assert resp.status_code == 200, resp.text
     [ingredient] = resp.json()['ingredients']
-    assert ingredient['uom_symbol'] == 'pcs'
+    assert ingredient['uom_symbol'] == 'g'
+    assert Decimal(ingredient['needed']) == Decimal('50')
 
 
-def test_the_cost_breakdown_names_the_same_unit(
+def test_the_cost_breakdown_names_the_unit_the_shelf_gives(
     client: TestClient,
     mk_auth_headers: dict[str, str],
     cinnamon_recipe: MakerRecipe,
@@ -160,4 +164,5 @@ def test_the_cost_breakdown_names_the_same_unit(
 
     assert breakdown.status_code == 200, breakdown.text
     [entry] = breakdown.json()['entries']
-    assert entry['unit'] == 'pcs'
+    assert entry['unit'] == 'kg'
+    assert Decimal(entry['consumed_qty']) == Decimal('0.1')

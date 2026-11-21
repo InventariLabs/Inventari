@@ -337,7 +337,7 @@ export default function StockAsOfPage() {
       ) : isError && !isServerRefusal(error) ? (
         // The server failing is not an answer about the date: say so, and
         // let the reader ask again.
-        <QueryError onRetry={() => void refetch()} />
+        <QueryError error={error} onRetry={() => void refetch()} />
       ) : isError ? (
         // The refusal is the answer: it names the day the ledger starts and
         // says that nothing before it is known -- not zero.

@@ -2,6 +2,7 @@ import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { RotateCcw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useCanPurge } from "@/module-sdk";
 import { Badge } from "@/components/ui/Badge";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { formatDate } from "@/utils/helpers";
@@ -35,12 +36,15 @@ export const ArchivedAssetRow = memo(function ArchivedAssetRow({
   // the same dictionary the inventory archive reads, and the raw value ("EXPIRED")
   // is the database's word, not the reader's.
   const { t } = useTranslation(["equipment", "items"]);
+  // Delete Permanently, and the checkbox whose only action it feeds, need the
+  // organization's policy and `items:purge`; without both the row offers Restore.
+  const purgeable = useCanPurge();
 
   return (
     <div
       className={`flex items-center gap-4 py-3 px-1 ${isSelected ? "bg-red-50/50 dark:bg-red-900/10" : ""}`}
     >
-      {selectable && (
+      {selectable && purgeable && (
         <Checkbox
           checked={isSelected}
           onChange={() => onToggleSelect(item.id)}
@@ -75,16 +79,18 @@ export const ArchivedAssetRow = memo(function ArchivedAssetRow({
           >
             <span className="hidden sm:inline">{t("actions.restore")}</span>
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onPurge(item.id)}
-            disabled={isPurgePending}
-            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-            leftIcon={<Trash2 size={14} />}
-          >
-            <span className="hidden sm:inline">{t("actions.purge")}</span>
-          </Button>
+          {purgeable && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onPurge(item.id)}
+              disabled={isPurgePending}
+              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              leftIcon={<Trash2 size={14} />}
+            >
+              <span className="hidden sm:inline">{t("actions.purge")}</span>
+            </Button>
+          )}
         </div>
       )}
     </div>

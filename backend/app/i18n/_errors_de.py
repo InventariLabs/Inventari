@@ -226,7 +226,7 @@ ERRORS_DE: ErrorMessages = {
     'pagination_cursor_invalid': 'Ungültiger oder abgelaufener Paginierungs-Cursor',
     'webhook_url_scheme': 'Für Webhooks sind nur {schemes}-Adressen erlaubt.',
     'webhook_url_no_hostname': 'Die Webhook-Adresse muss einen Hostnamen enthalten, z. B. https://example.com/hook.',
-    'picking_already_picked': '{name} wurde bereits gepickt',
+    'picking_already_picked': '{name} wurde bereits kommissioniert',
     'picking_unit_mismatch': (
         'Einheiten für {name} sind nicht vergleichbar — Rezept und Bestand '
         'verwenden unterschiedliche Maße. Hinterlegen Sie, wie viel eine '
@@ -725,6 +725,7 @@ ERRORS_DE: ErrorMessages = {
     'invalid_country_code': 'Das Land muss ein zweistelliger ISO-3166-1-alpha-2-Code sein (z. B. PL).',
     'invalid_print_page_size': 'Das Papierformat muss A4 oder Letter sein.',
     'invalid_timezone': 'Die Zeitzone muss ein gültiger IANA-Zonenname sein (z. B. Europe/Warsaw).',
+    'organization_name_required': 'Der Name der Organisation darf nicht leer sein.',
     'invalid_currency_code': 'Die Währung muss ein gültiger ISO-4217-Code sein (z. B. PLN).',
     'admin_permissions_required': 'Für diese Aktion sind Administratorrechte erforderlich',
     'invalid_url_missing_host': 'Ungültige URL: Host fehlt',
@@ -945,8 +946,10 @@ ERRORS_DE: ErrorMessages = {
     'document_undo_type_not_supported': 'Nur ein Wareneingang, ein Warenausgang oder eine Umbuchung kann rückgängig gemacht werden',
     'document_undo_requires_completed': 'Nur ein gebuchter Beleg kann rückgängig gemacht werden',
     'document_undo_nothing_left': 'Alles, was dieser Beleg gebucht hat, wurde bereits storniert',
+    'document_undo_posts_nothing': 'Dieses Dokument hält nur Waren fest, die bereits entnommen wurden — es hat keinen Bestand bewegt, es gibt also nichts rückgängig zu machen.',
     'document_undo_blocked': 'Das kann nicht rückgängig gemacht werden: {reason} Verwenden Sie „Korrigieren“, um den Rest zu ändern.',
     'document_undo_stock_used': 'Das kann nicht rückgängig gemacht werden: spätere Bewegungen haben den gebuchten Bestand verbraucht. Verwenden Sie „Korrigieren“, um den Rest zu ändern.',
+    'document_correction_posts_nothing': 'Dieses Dokument hält nur Waren fest, die bereits entnommen wurden — eine Korrektur kann darüber keinen Bestand bewegen.',
     'document_post_already_posted': 'Dieses Dokument wurde bereits gebucht – ein zweites Mal wurde nichts gebucht.',
     'document_post_cancelled': 'Dieses Dokument wurde storniert und kann nicht gebucht werden.',
     'document_filter_unknown': 'Dieser Filter ist nicht verfügbar: Kein aktiviertes Modul bietet ihn an ({name}).',

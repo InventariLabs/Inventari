@@ -11,6 +11,7 @@ from app.core.deps import get_async_db, get_current_user_context, require_org
 from app.core.module_sdk import PaginatedResponse
 from app.core.public_api import core_api
 
+from . import document_types as dt
 from ._order_side import order_side_async
 from ._schemas_work_items import WorkItemState, WorkItemView
 from .document_profile_service import get_profile, resolve_document_tax_rate
@@ -280,6 +281,13 @@ async def get_price_hint(
         gt=0,
         description='Line quantity; a volume price it does not reach is not offered',
     ),
+    document_type: str | None = Query(
+        None,
+        description=(
+            'Type of the document the line is on; a delivery to a partner '
+            '(OUT) is offered the rate of tax and no price'
+        ),
+    ),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     org_id: UUID = Depends(require_org),
@@ -290,6 +298,12 @@ async def get_price_hint(
     most recent priced purchase → nothing. Enables the "auto-suggest price"
     step of value tracking without making the warehouse module depend on
     the purchase_orders module being enabled.
+
+    Both prices are what the goods cost: a supplier's offer and what was
+    last paid. A delivery's line price is what the customer pays, and
+    nothing here knows that, so a delivery gets the rate of tax alone. A
+    document that takes goods into its own use (an internal issue) is
+    valued at cost and keeps the chain.
     """
     profile = await get_profile(db, org_id)
     # The same rate the document itself will apply: the one the product or
@@ -300,6 +314,8 @@ async def get_price_hint(
     )
     if tax_rate is None and profile:
         tax_rate = await resolve_document_tax_rate(db, org_id, profile)
+    if document_type is not None and dt.is_external_out(dt.normalize(document_type)):
+        return PriceHintResponse(tax_rate=tax_rate)
 
     orders = await order_side_async(db, org_id) if partner_id is not None else None
     if partner_id is not None and orders is not None:

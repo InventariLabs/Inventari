@@ -63,6 +63,8 @@ export default function InventoryDashboard() {
   const {
     data: storageTree,
     isError: isTreeError,
+    isPending: isTreePending,
+    error: treeError,
     refetch: refetchTree,
   } = useStoragesTree(undefined, {
     excludeModuleContexts,
@@ -164,6 +166,8 @@ export default function InventoryDashboard() {
         storageZones={storageZones}
         composition={attention.composition}
         loadFailed={isTreeError}
+        loading={isTreePending}
+        loadError={treeError}
         onRetry={() => void refetchTree()}
       />
 

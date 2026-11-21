@@ -11,7 +11,31 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from app.schemas.organization import OrganizationBase, OrganizationUpdate
+from app.schemas.organization import (
+    OrganizationBase,
+    OrganizationCreate,
+    OrganizationUpdate,
+)
+
+
+class TestOrganizationName:
+    @pytest.mark.parametrize('blank', ['', '   ', '\t \n'])
+    def test_update_refuses_a_blank_name(self, blank: str) -> None:
+        with pytest.raises(ValidationError):
+            OrganizationUpdate(name=blank)
+
+    @pytest.mark.parametrize('blank', ['', '   '])
+    def test_create_refuses_a_blank_name(self, blank: str) -> None:
+        with pytest.raises(ValidationError):
+            OrganizationCreate(name=blank)
+
+    def test_name_is_stripped(self) -> None:
+        assert OrganizationUpdate(name='  Cold Storage ').name == 'Cold Storage'
+        assert OrganizationCreate(name=' Cold Storage ').name == 'Cold Storage'
+
+    def test_name_left_out_stays_unset(self) -> None:
+        assert OrganizationUpdate().name is None
+        assert 'name' not in OrganizationUpdate().model_dump(exclude_unset=True)
 
 
 class TestOrganizationTimezone:

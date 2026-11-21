@@ -175,7 +175,8 @@
     "searchPlaceholder": "Szukaj produktów…",
     "noResults": "Żaden produkt bez etykiety nie pasuje.",
     "submit": "Przypnij etykietę",
-    "success": "Etykieta {{code}} przypięta do produktu {{name}}"
+    "success": "Etykieta {{code}} przypięta do produktu {{name}}",
+    "expires": "ważne do {{date}}"
   },
   "productLabel": {
     "action": "Drukuj etykietę",

@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { http, HttpResponse } from "msw";
 import { toast } from "sonner";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { manualCopyStore } from "@/lib/clipboard";
 import { server } from "@/test/mocks/server";
 import ApiKeyCapabilitiesCard from "./ApiKeyCapabilitiesCard";
 
@@ -105,7 +106,10 @@ describe("ApiKeyCapabilitiesCard", () => {
 
     await userEvent.click(await screen.findByRole("button", { name: /copy/i }));
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(manualCopyStore.get()?.text).toContain("/api/v1/items"),
+    );
     expect(toast.success).not.toHaveBeenCalled();
+    manualCopyStore.dismiss();
   });
 });

@@ -131,7 +131,9 @@ export default function EquipmentDashboardPage() {
             linkLabel: t("dashboard.fleet.link"),
             linkHref: "/equipment/assets",
           }}
-          loading={dashboard.isLoading || overdue.isLoading || fleet.isLoading}
+          // Pending, not loading: a query held back while the module list
+          // loads is neither, yet has not answered.
+          loading={dashboard.isPending || overdue.isPending || fleet.isPending}
           unavailable={
             failed
               ? {
@@ -156,7 +158,7 @@ export default function EquipmentDashboardPage() {
 
       <FleetCompositionCard
         rows={rows}
-        isLoading={fleet.isLoading}
+        isLoading={fleet.isPending}
         error={fleet.error}
         onRetry={() => void fleet.refetch()}
       />

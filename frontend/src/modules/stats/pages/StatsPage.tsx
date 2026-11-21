@@ -59,6 +59,14 @@ const STATS_TABS = [
   },
 ];
 
+function StatsSpinner() {
+  return (
+    <div className="flex justify-center items-center py-16">
+      <LoadingSpinner />
+    </div>
+  );
+}
+
 export default function StatsPage() {
   const { t } = useTranslation(["stats", "common"]);
   // Two routes, one page. Only the first is a nav item, and the header is no
@@ -103,6 +111,7 @@ export default function StatsPage() {
     data: headline,
     isLoading: isLoadingHeadline,
     isError: isHeadlineError,
+    error: headlineError,
     refetch: refetchHeadline,
   } = useStatsHeadline(excludeModuleContexts);
 
@@ -236,7 +245,7 @@ export default function StatsPage() {
   // The headline numbers; a failed half leaves the health card unable to say
   // anything true, so neither is allowed to render a zero over it.
   if (isHeadlineError) {
-    return <QueryError onRetry={refetchHeadline} />;
+    return <QueryError error={headlineError} onRetry={refetchHeadline} />;
   }
 
   return (
@@ -308,13 +317,10 @@ export default function StatsPage() {
 
       {activeTab === "reconciliation" && (
         <div className="animate-in fade-in duration-500">
-          {isLoadingReconciliation && (
-            <div className="flex justify-center items-center py-16">
-              <LoadingSpinner />
-            </div>
-          )}
+          {isLoadingReconciliation && <StatsSpinner />}
           {reconciliationError && (
             <QueryError
+              error={reconciliationError}
               message={t("errors.failedToLoadReconciliation")}
               onRetry={() => refetchReconciliation()}
             />
@@ -328,22 +334,20 @@ export default function StatsPage() {
           {(isLoadingRotation ||
             isLoadingAlerts ||
             isLoadingForecastAdvanced ||
-            isLoadingPatterns) && (
-            <div className="flex justify-center items-center py-16">
-              <LoadingSpinner />
-            </div>
-          )}
+            isLoadingPatterns) && <StatsSpinner />}
 
           {/* What failed, and the one action that can change it. These blocks
               name the failure and give the reader something to press. */}
           {rotationError && (
             <QueryError
+              error={rotationError}
               message={t("errors.failedToLoadRotationAnalysis")}
               onRetry={() => refetchRotation()}
             />
           )}
           {alertsError && (
             <QueryError
+              error={alertsError}
               message={t("errors.failedToLoadAlerts")}
               onRetry={() => refetchAlerts()}
             />

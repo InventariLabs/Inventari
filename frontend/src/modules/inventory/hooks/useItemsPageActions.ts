@@ -82,9 +82,21 @@ export function useItemsPageActions({
         : t("items:quickActions.finishedWithReason", {
             reason: t(reasonLabelKey(reason as StockReason)),
           });
-    const consumedMessage = (reason: string, updatedItem: Item) =>
+    // The dialog lets the reader remove any amount, so the confirmation names
+    // the amount that was asked for, not a fixed single unit.
+    const consumedMessage = (
+      reason: string,
+      updatedItem: Item,
+      quantity: number,
+    ) =>
       reason === "USED"
         ? t("items:quickActions.consumedSuccessRemaining", {
+            removed: formatQuantityLocalized(
+              t,
+              quantity,
+              updatedItem.uom?.symbol,
+              updatedItem.uom?.rounding,
+            ),
             remaining: formatQuantityLocalized(
               t,
               updatedItem.quantity,
@@ -94,6 +106,12 @@ export function useItemsPageActions({
           })
         : t("items:quickActions.consumedSuccessWithReason", {
             reason: t(reasonLabelKey(reason as StockReason)),
+            removed: formatQuantityLocalized(
+              t,
+              quantity,
+              updatedItem.uom?.symbol,
+              updatedItem.uom?.rounding,
+            ),
             remaining: formatQuantityLocalized(
               t,
               updatedItem.quantity,
@@ -131,7 +149,7 @@ export function useItemsPageActions({
                   usedUpToastOptions(itemId),
                 );
               } else {
-                toast.success(consumedMessage(reason, updatedItem));
+                toast.success(consumedMessage(reason, updatedItem, quantity));
               }
             },
             onError: (error: unknown) => {
@@ -163,7 +181,7 @@ export function useItemsPageActions({
         } else if ((toAmount(updatedItem.quantity) ?? 0) <= 0) {
           toast.success(finishedMessage(reason), usedUpToastOptions(itemId));
         } else {
-          toast.success(consumedMessage(reason, updatedItem));
+          toast.success(consumedMessage(reason, updatedItem, quantity));
         }
       },
       isPending: consumeItemMutation.isPending || discardItemMutation.isPending,

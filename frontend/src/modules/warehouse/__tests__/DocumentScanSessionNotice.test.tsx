@@ -1,7 +1,8 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { QueryWrapper } from "@/test/queryWrapper";
+import { signInWith, signOut } from "@/test/auth";
 import { DocumentScanSessionNotice } from "../components/DocumentScanSessionNotice";
 import type { DocumentScanSession } from "../hooks/useDocumentScanSession";
 import type { WarehouseDocument } from "../types";
@@ -78,12 +79,49 @@ function renderNotice(
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // Every branch of the notice asks for a write: the reader under test is
+  // the one who can act on it.
+  signInWith(["warehouse:read", "warehouse:write"]);
   read.data = session("receiving");
+});
+
+afterEach(() => {
+  signOut();
 });
 
 describe("DocumentScanSessionNotice", () => {
   it("says nothing when the document has no open session", () => {
     read.data = null;
+    render(
+      <QueryWrapper>
+        <DocumentScanSessionNotice
+          document={{
+            id: "doc-1",
+            status: "CONFIRMED",
+            type: "IN",
+            confirmed_at: null,
+          }}
+          onResumeReceiving={vi.fn()}
+          onResumePicking={vi.fn()}
+          onComplete={vi.fn()}
+          isCompletePending={false}
+        />
+      </QueryWrapper>,
+    );
+
+    expect(
+      screen.queryByTestId("open-scan-session-notice"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("says nothing to a reader who can act on none of it", () => {
+    // Continue, complete and discard are all writes; the read-only notice
+    // above the card is the whole answer for a viewer, and an instruction
+    // to press buttons the page has hidden is not.
+    signOut();
+    signInWith(["warehouse:read"]);
+    read.data = session("receiving");
+
     render(
       <QueryWrapper>
         <DocumentScanSessionNotice

@@ -100,9 +100,9 @@ class WebhookDeliveryLog(Base):
 
     # Why the application itself stopped trying, when it did:
     # 'circuit_breaker' | 'webhook_disabled' | 'webhook_deleted' |
-    # 'module_disabled'. Set only when nobody answered — a receiver's
-    # status code is the receiver's answer, and this row must not dress
-    # our own refusal in their clothes.
+    # 'module_disabled'. The row keeps the status code and body of the
+    # last real attempt next to it: the reason says who stopped, the
+    # answer says what the receiver said before that.
     abandon_reason: Mapped[str | None] = mapped_column(String(40))
 
     # The moment the attempt that produced the row's current status ended.

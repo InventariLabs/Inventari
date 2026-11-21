@@ -529,7 +529,25 @@ describe("DocumentActionButtons one-step posting", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("leaves the confirm step in the menu as 'Plan' for a future date", async () => {
+  it("names a record-only draft's action for the record, not for a stock movement", () => {
+    // A recipe's internal issue was already taken by the picking session,
+    // so "Remove from stock" promised a second movement that never comes.
+    render(
+      <DocumentActionButtons
+        {...baseProps}
+        docType="INTERNAL_OUT"
+        stockAlreadyApplied
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: "Record it — stock already taken" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Remove from stock" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("keeps the confirm step in the menu for a future date, under its own name", async () => {
     const onConfirm = vi.fn();
     render(
       <DocumentActionButtons
@@ -543,8 +561,9 @@ describe("DocumentActionButtons one-step posting", () => {
       screen.getByRole("button", { name: "Receive stock" }),
     ).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "More actions" }));
-    const plan = screen.getByRole("button", { name: "Plan" });
-    await userEvent.click(plan);
+    // The menu, the dialog and the status all call this act "Confirm".
+    const confirm = screen.getByRole("button", { name: "Confirm" });
+    await userEvent.click(confirm);
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 });

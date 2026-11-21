@@ -185,7 +185,7 @@ export default function MealPlanDetailPage() {
   }
 
   if (isError && !isNotFoundError(error)) {
-    return <QueryError onRetry={() => void refetch()} />;
+    return <QueryError error={error} onRetry={() => void refetch()} />;
   }
 
   if (!plan) {

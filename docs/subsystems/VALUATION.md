@@ -46,6 +46,18 @@ reversal and keeps its stated price. Both directions pass the reversed
 line as `reverses_line_id`; the service decides which kind of layer it
 finds behind it.
 
+**A layer can be named without a document line.** A production run opens a
+layer of its own for the output it puts on the shelf, and undoing that run
+takes the goods back off at what the run put in. No document line names
+that layer, so the reversal passes it as `reverses_layer_id`, the
+line-level rule's exact-layer counterpart: that layer is drained first,
+and the queue behind it only covers what it can no longer cover. Draining
+plain FIFO took the product's oldest layer instead — an earlier run at a
+different cost — so undoing a run moved value between the product's lots
+and the warehouse's total stopped matching its own receipts (PLN 0.95 lost
+with every quantity back as before). A run filled in portions keeps one
+layer per portion, and each portion's undo names its own.
+
 ## What a drain locks, and why the shelf cannot narrow it
 
 A drain reads each layer's remainder, subtracts what it takes and writes

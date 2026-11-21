@@ -14,6 +14,13 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- A place for a site of your own beside the application on the production
+  server. Every `*.caddy` file in `caddy-extra/` (or the directory
+  `CADDY_EXTRA_DIR` names) is read as part of the Caddyfile, so a website on
+  the main domain can be served by the same Caddy while the application runs on
+  a subdomain, and survives updates, which an addition in a second compose file
+  would not. The directory ships empty and a stack that does not use it is
+  configured as before.
 - A place for a delivery cost that reached no product. Freight that arrives
   after a receipt is posted can no longer be added to the goods, and the
   refusal now offers a way forward: on a posted receipt the **Costs that
@@ -284,6 +291,57 @@ says what the release does rather than what changed since them.
   the line and the complaint, instead of being stored and then breaking every
   PDF printed with it. A purchase order whose stored layout no longer renders
   prints with the built-in layout rather than failing with "An error occurred".
+- On a slow connection the Inventory and Equipment overviews no longer state
+  something that is not true while they load. *My locations* shows placeholders
+  instead of "No locations yet" and its create button, and the Equipment
+  attention card shows no count ("8 assets need attention", later 9) until every
+  list it adds up has arrived; the fleet by category and the recent check-outs
+  wait for their answer the same way.
+- A member whose role cannot read a module is now told so. A module screen
+  opened without that module's read permission says the account cannot open
+  it and whom to ask, instead of "Your account can read this module", and the
+  product, purchase order, stock take and category lists show the refusal
+  without a *Try again* button that could only be refused again. The role
+  editor also warns, before a role is saved, about a granted module whose own
+  read or whose required modules' reads (stock takes need products and
+  locations) the role does not hold; the role can still be saved as it is.
+
+- After a location is moved physically, **Movements** and a product's
+  *Movements* tab show what happened before the move at the path the location
+  had then, as the move dialog promises. Goods put on a shelf while it stood
+  in one hall no longer read as having gone into the room it was carried to
+  later. The rows the move itself writes name the moved location's whole path
+  before and after, its own name last, instead of only the places it left and
+  reached. A move that only corrects the layout still rewrites nothing: the
+  stock was always where the corrected tree puts it.
+- Archiving a location no longer moves the stock of the locations inside it.
+  Those locations stay active, but their products were relocated to the chosen
+  target and the shelf was left empty while the goods had not moved. Only what
+  stands on the archived location itself is relocated, the archive dialog
+  asks for a target only when that location holds products, and a location
+  that holds nothing of its own archives without one.
+- A BOM line's unit is read against the ingredient's stock unit, and a line
+  that cannot be converted is refused instead of silently drawing the wrong
+  number. A formula line reading "Wheat flour 300 g" on a product kept in
+  pieces used to take 600 pieces for two batches and record "600 pcs"; the
+  line is now refused when it is saved, naming both units, and a run refuses
+  one already stored that way. The Composition tab marks such a line as a
+  unit mismatch until a unit is set, and a line that does convert — 500 g
+  against stock kept in kilograms — draws the converted amount and records
+  it in the shelf's unit.
+- Undoing a production run no longer changes what the stock is worth. The
+  output leaves the books at the value its own run put in, instead of at the
+  product's oldest cost layer, which can belong to an earlier run made at a
+  different cost; each batch of a run filled in portions leaves at its own
+  value too. Undoing a run used to leave every quantity back as it was while
+  the total fell or rose by the difference between the two runs' costs.
+- A recipe imported from JSON or from a web page now carries the allergens its
+  ingredient names suggest, as one typed through **New recipe** does. An
+  imported cheese omelette of eggs, butter and cheddar read "No allergens
+  marked" on its page and in its export; the review screen now shows Eggs and
+  Milk ticked for the cook to correct, and a line that names its own allergens
+  keeps them. Recipes imported earlier get theirs when the instance is
+  upgraded.
 - *Stock on a date* and *Value movement* now cut a day where the organization
   lives, not at midnight UTC. A receipt booked at half past midnight local time
   used to sit in the opening value of its own day, the note about where the
@@ -344,6 +402,15 @@ says what the release does rather than what changed since them.
   kept under its own currency. The supplier price comparison lists the
   organization's currency first instead of sorting different currencies by
   their digits.
+- The last purchase price a receipt suggests is what was last paid for the
+  product. It was the price of whichever document came last, so a product
+  bought at 8.00 and then delivered to a customer at 10.00 was offered at
+  10.00 on the next receipt, and that price went on into the stock value.
+  Only receipts and internal receipts count now; a delivery, a customer's
+  return, a correction, a scrap or a transfer does not. A delivery form is
+  offered the rate of tax alone: neither what was paid nor a supplier's
+  offer is the price a customer is charged. `GET /api/v1/warehouse/price-hint`
+  takes the document's type as `document_type` to tell the two apart.
 
 - The first `make dev-up` on a machine that has no images yet no longer
   fails with a duplicate-type error from a module's migration. The backend's
@@ -493,6 +560,13 @@ says what the release does rather than what changed since them.
   CSV that starts with a byte order mark (Excel's *CSV UTF-8*, comma-separated)
   imports its rows rather than being refused as unreadable, and the add form answers a name of only spaces with its own
   "Name and kcal are required" message instead of a request to the server.
+- A production run no longer offers an account what its server would refuse.
+  An account that may only read sees a run's status and the same notice as the
+  rest of the module, without Edit, Start run, Complete run or Duplicate. An
+  account that may write production but not stock is still offered Edit and
+  Duplicate on a draft, but no Start run, Complete run, Finish run, portion
+  form, Undo run or Cancel of a run in progress, and *New production* opens
+  planning only, without the *Save as made* choice: each of those posts stock.
 
 ### Removed
 

@@ -14,8 +14,8 @@ and sorts it in memory to hand back fifty rows.
 What is measured is the shape of the work, on the statements the service
 actually sends: how many there are, and what plan each page read gets. Both
 fail on the regressions this file exists for — a lost index turns the page
-into a scan and a sort, a name resolved per row turns two statements into
-fifty-two — and neither depends on who else is using the machine.
+into a scan and a sort, a name resolved per row turns three statements into
+fifty-three — and neither depends on who else is using the machine.
 
 The measure is the statements and their plans, not a clock: a wall-clock budget
 goes red on a loaded host whatever the query does, and it passes a deep page
@@ -57,9 +57,11 @@ _RARE_MOVEMENTS = 3
 #: One page as the screen asks for it.
 _PAGE = 50
 
-#: Statements one page read may send: the count and the page itself. A name
-#: resolved per row would add one a row, fifty on a page.
-_STATEMENTS = 2
+#: Statements one page read may send: the count, the page itself, and the
+#: physical moves of a location since the page's oldest movement, which say
+#: whether its rows stood on another path then (none here, so nothing more is
+#: read). A name resolved per row would add one a row, fifty on a page.
+_STATEMENTS = 3
 
 _NOW = datetime(2026, 6, 30, 12, 0, tzinfo=UTC)
 
@@ -411,7 +413,7 @@ class TestAPageReadStaysTheSameShapeAtTenThousand:
         scan and a sort, which is the right plan for the question. The plan
         is therefore not the claim here. The claims are that the end of the
         ledger is really the oldest of it, and that reaching it costs the same
-        two statements as the first page.
+        statements as the first page.
         """
         (rows, _total), read = await _read(
             real_async_db_session,

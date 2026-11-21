@@ -386,6 +386,7 @@
     "ingredientAdded": "Składnik dodany",
     "ingredientRemoved": "Składnik usunięty",
     "emptyLines": "Brak składników — dodaj pierwszy poniżej.",
+    "unitMismatch": "Jednostki tej pozycji nie da się odczytać jako jednostki stanu składnika — ustaw ją przed następną partią.",
     "introduction": "Receptura to lista tego, co wchodzi w jedną partię tego produktu. Z niej liczą się koszty na zakładce „Koszt i wynik”, i z niej schodzi stan magazynowy przy zamykaniu zlecenia produkcyjnego.",
     "removeConfirm": {
       "title": "Usunąć składnik?",

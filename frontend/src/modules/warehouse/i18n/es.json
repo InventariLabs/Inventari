@@ -214,10 +214,11 @@
     "postNowIssue": "Emitir existencias",
     "postNowMove": "Mover existencias",
     "postNowConsume": "Consumir existencias",
+    "postNowRecordOnly": "Registrar — mercancías ya retiradas",
     "postNowScrap": "Dar de baja",
     "postNowAdjust": "Ajustar existencias",
     "postNowDefault": "Registrar documento",
-    "plan": "Planificar",
+    "plan": "Confirmar",
     "sendForApproval": "Enviar para aprobación",
     "undoReceive": "Deshacer la recepción",
     "undoIssue": "Deshacer la salida",
@@ -250,6 +251,7 @@
     "postNowTitle": "¿Registrar el documento?",
     "postNowApprovalTitle": "¿Enviar el documento para aprobación?",
     "postNowMessage": "Esto confirma el documento y contabiliza el movimiento de stock ahora. Si algo no está bien, puedes deshacerlo justo después o corregirlo más tarde. ¿Continuar?",
+    "postNowRecordOnlyMessage": "Las mercancías ya se retiraron del stock durante la preparación. Esto solo registra el movimiento; el stock no cambia. ¿Continuar?",
     "postNowApprovalMessage": "Se confirmará el documento y se enviará para aprobación. Una vez aprobado, se registrará sin otro paso. ¿Continuar?",
     "postNowMessageDeadEndNamed": "El documento irá a aprobación, pero nadie podría resolverla: la etapa «{{stage}}» nombra aprobadores que no pueden ver las aprobaciones. Espera allí hasta que se retire la solicitud o esas personas reciban acceso. ¿Continuar?",
     "postNowMessageDeadEndNoApprover": "El documento irá a aprobación, pero nadie podría resolverla: la etapa «{{stage}}» está abierta a quien tenga el permiso de aprobar, y nadie en esta organización lo tiene. Espera allí hasta que se retire la solicitud o alguien reciba el permiso. ¿Continuar?",
@@ -314,7 +316,10 @@
     "noStockCount_one": "{{count}} línea no encontró existencias que retirar",
     "noStockCount_other": "{{count}} líneas no encontraron existencias que retirar",
     "noStockHint": "No hay nada libre de estos productos en la ubicación de origen. Elige las existencias de cada línea a mano o recibe primero la mercancía; hasta entonces el documento no se puede confirmar.",
-    "chooseSourceFirst": "Elige primero la ubicación de origen: las líneas importadas se retiran de sus existencias."
+    "chooseSourceFirst": "Elige primero la ubicación de origen: las líneas importadas se retiran de sus existencias.",
+    "columnsHint": "La hoja necesita una columna para el producto — nombre, código de barras o SKU — y otra para la cantidad. Marca, unidad, precio unitario, tipo de IVA, número de lote y fecha de caducidad son opcionales.",
+    "pastedText": "Texto pegado",
+    "rowsRead": "Filas leídas"
   },
   "empty": {
     "noResultsTitle": "Ningún documento coincide con el filtro",
@@ -326,7 +331,7 @@
     "description": "Recibe, entrega, mueve y cuenta existencias: los documentos numerados se crean solos.",
     "step1": {
       "title": "Cree su primer documento",
-      "description": "Comience con una recepción (IN) para registrar mercancías entrantes de un socio.",
+      "description": "Comience con una recepción ({{code}}) para registrar mercancías entrantes de un socio.",
       "cta": "Crear su primer documento"
     },
     "step2": {
@@ -377,6 +382,7 @@
     "confirmed": "Documento confirmado — listo para ejecución",
     "pendingApproval": "Documento enviado para aprobación",
     "completed": "Documento completado — stock actualizado",
+    "completedRecordOnly": "Documento completado: registra las mercancías ya retiradas",
     "correctionApplied": "Corrección aplicada — stock ajustado",
     "cancelled": "Documento cancelado",
     "deleted": "Documento eliminado",
@@ -514,7 +520,6 @@
     "snapshotPlanned": "Cant. planificada",
     "snapshotDeltaPlus": "Agregado",
     "snapshotDeltaMinus": "Eliminado",
-    "executionTitle": "Ejecutar documento",
     "executionHelp": "Ajuste la cantidad realmente procesada para cada línea antes de cerrar el documento.",
     "executionMeta": "Planificado {{expected}} {{unit}} · restante {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Planificado {{expected}} · restante {{remaining}} (sin unidad)",
@@ -876,7 +881,7 @@
     "print_list": "Imprimir lista de picking",
     "print_list_failed": "No se pudo crear la lista de picking",
     "summary_title": "Recogida completada",
-    "summary_subtitle": "{{picked}} de {{total}} líneas recogidas",
+    "summary_subtitle": "{{picked}} de {{total}} líneas recogidas por completo",
     "summary_picked": "{{count}} recogidos",
     "summary_short": "{{count}} faltantes",
     "summary_skipped": "{{count}} omitidos",
@@ -1398,7 +1403,7 @@
       "title": "Recepción completada",
       "total": "{{received}} de {{expected}} {{unit}} recibidas",
       "backToDocument": "Completar y registrar el stock",
-      "bookingNote": "Al cerrar este resumen se completa el documento y se contabiliza el stock.",
+      "bookingNote": "«{{action}}» completa el documento y contabiliza el stock. Salir de este resumen de otra forma deja el documento abierto, tal como se recibió.",
       "skippedUndo": "Deshacer omisión",
       "skippedBackorder": "Pedido pendiente",
       "skippedNotComing": "No llegará",
@@ -1598,13 +1603,14 @@
     "intoPackage": "En el paquete {{code}}",
     "intoNewPackage": "En un paquete nuevo",
     "qtyRequired": "Indique cuánto va en el paquete",
-    "qtyOver": "Solo quedan {{amount}} por embalar",
     "scanned": "{{product}} embalado en {{code}}",
     "errors": {
       "writeFailed": "El cambio de embalaje no se guardó",
       "slipFailed": "No se pudo descargar el albarán",
       "labelFailed": "No se pudo descargar la etiqueta"
-    }
+    },
+    "qtyOver_one": "Solo queda {{amount}} por embalar",
+    "qtyOver_other": "Solo quedan {{amount}} por embalar"
   },
   "statusBadge": {
     "todo": "por hacer hoy"

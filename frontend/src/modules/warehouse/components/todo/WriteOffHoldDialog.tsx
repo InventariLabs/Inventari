@@ -20,15 +20,6 @@ import {
 } from "@/modules/warehouse/reasonCodes";
 import type { QuarantineHold } from "@/modules/warehouse/types";
 
-/** The write-off reason a hold's own reason already implies. */
-function suggestedReason(
-  held: string | null | undefined,
-): ScrapReasonCode | "" {
-  if (held === "DAMAGE") return "DAMAGED";
-  if (held === "QUALITY_HOLD") return "QUALITY";
-  return "";
-}
-
 /**
  * Writes a batchless hold off in one step, the way Issue goods does for
  * "Damaged or expired": the reader says why, the write-off document is
@@ -44,9 +35,10 @@ export default function WriteOffHoldDialog({
 }) {
   const { t } = useTranslation("warehouse");
   const post = usePostNewDocument();
-  const [code, setCode] = useState<ScrapReasonCode | "">(
-    suggestedReason(hold.reason),
-  );
+  // No reason is chosen for the reader: the hold's own code explains why
+  // the goods are held, not why they are being scrapped now, and a required
+  // field that already holds an answer is one nobody read.
+  const [code, setCode] = useState<ScrapReasonCode | "">("");
   const [note, setNote] = useState("");
   const [attempted, setAttempted] = useState(false);
   const [error, setError] = useState<string | null>(null);

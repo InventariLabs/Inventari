@@ -19,6 +19,7 @@ export function ModelCatalog({
   models,
   isLoading,
   isError,
+  error,
   onRetry,
   onEdit,
   onClone,
@@ -30,6 +31,8 @@ export function ModelCatalog({
   models: EquipmentModel[];
   isLoading: boolean;
   isError: boolean;
+  /** The rejected read, so a refusal is not offered a retry. */
+  error: unknown;
   onRetry: () => void;
   onEdit: (m: EquipmentModel) => void;
   onClone: (m: EquipmentModel) => void;
@@ -50,7 +53,7 @@ export function ModelCatalog({
       )
     : models;
 
-  if (isError) return <QueryError onRetry={onRetry} />;
+  if (isError) return <QueryError error={error} onRetry={onRetry} />;
   if (isLoading) return <LoadingSpinner />;
   if (models.length === 0) return <ModelsEmptyState />;
 

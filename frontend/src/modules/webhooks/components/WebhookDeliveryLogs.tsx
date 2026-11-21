@@ -134,12 +134,15 @@ function DeliveryRow({ delivery }: { delivery: WebhookDelivery }) {
         <div className="border-t border-border px-4 py-3 space-y-3 bg-surface">
           {delivery.abandon_reason && (
             <div>
-              {/* An abandonment is Inventari's own stop — nobody answered, so
-                  the row carries the translated reason and no status code.
-                  Printing our refusal under "Response from the target" sent
-                  the reader looking for the fault on the receiver's side. */}
+              {/* An abandonment is Inventari's own stop and says so with a
+                  translated reason. What the target answered to the last
+                  attempt stays on the row (status badge, "Response from the
+                  target" below); "never answered" is only true when no
+                  attempt got a status code. */}
               <p className="text-xs font-medium text-red-600 dark:text-red-400 mb-1">
-                {t("delivery.abandonedByApp")}
+                {delivery.status_code
+                  ? t("delivery.abandonedByAppAnswered")
+                  : t("delivery.abandonedByApp")}
               </p>
               <pre className="text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 rounded p-2 overflow-x-auto whitespace-pre-wrap">
                 {abandonReasonText(t, delivery.abandon_reason)}
@@ -227,7 +230,7 @@ export default function WebhookDeliveryLogs({
   const [cursor, setCursor] = useState<string | null>(null);
   const [cursorHistory, setCursorHistory] = useState<(string | null)[]>([null]);
 
-  const { data, isLoading, isError, refetch } = useWebhookDeliveries(
+  const { data, isLoading, isError, error, refetch } = useWebhookDeliveries(
     webhookId,
     cursor,
     PAGE_SIZE,
@@ -266,7 +269,7 @@ export default function WebhookDeliveryLogs({
         </div>
       )}
 
-      {isError && <QueryError onRetry={() => void refetch()} />}
+      {isError && <QueryError error={error} onRetry={() => void refetch()} />}
 
       {!isLoading && !isError && items.length === 0 && (
         <p className="text-sm text-on-secondary dark:text-on-muted py-4 text-center">

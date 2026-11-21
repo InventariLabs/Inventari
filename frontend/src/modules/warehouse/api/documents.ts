@@ -256,15 +256,18 @@ export const documentsApi = {
     return response.data;
   },
 
-  // suggested unit price for a product on a document.
+  // suggested unit price for a product on a document of `document_type`
+  // (a delivery is offered the rate of tax and no price).
   priceHint: async (params: {
     template_id: string;
+    document_type: string;
     partner_id?: string | null;
     quantity?: number | null;
   }): Promise<PriceHint> => {
     const response = await api.get<PriceHint>("/warehouse/price-hint", {
       params: {
         template_id: params.template_id,
+        document_type: params.document_type,
         ...(params.partner_id ? { partner_id: params.partner_id } : {}),
         ...(params.quantity ? { quantity: params.quantity } : {}),
       },

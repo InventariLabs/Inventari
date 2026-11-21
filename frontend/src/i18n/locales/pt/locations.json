@@ -374,6 +374,7 @@
     "emptyDescriptionNone": "Não contém produtos nem locais dentro.",
     "emptyDescription_one": "O produto dele ({{count}}) está na aba Produtos.",
     "emptyDescription_other": "Os {{count}} produtos dele estão na aba Produtos.",
+    "noLocationsInside": "Nenhum local dentro",
     "showProducts": "Mostrar produtos",
     "selected_one": "{{count}} local selecionado",
     "selected_other": "{{count}} locais selecionados",
@@ -388,6 +389,9 @@
   },
   "products": {
     "includeInside": "Incluir locais dentro",
+    "noneHere": "Nenhum registro diretamente aqui",
+    "insideDescription_one": "{{count}} registro está nos locais dentro.",
+    "insideDescription_other": "{{count}} registros estão nos locais dentro.",
     "includingInside_one": "Incluindo 1 local dentro",
     "includingInside_other": "Incluindo {{count}} locais dentro"
   },

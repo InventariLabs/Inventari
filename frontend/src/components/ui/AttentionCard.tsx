@@ -85,7 +85,9 @@ interface AttentionCardProps {
   /**
    * Some request behind the rows has not answered yet. The rows are empty
    * until it does, and an empty list is what the quiet line is drawn from —
-   * so the card holds its tongue instead of announcing a quiet day.
+   * so the card holds its tongue instead of announcing a quiet day. The same
+   * goes for the heading's number: rows that arrived first are only part of
+   * what it adds up, so a card that is still loading shows no count at all.
    */
   loading?: boolean;
   /** An action on the whole set, placed beside the link. */
@@ -121,7 +123,7 @@ export function AttentionCard({
   const rows = showAll ? sorted : sorted.slice(0, maxItems);
   const busy = rows.length > 0;
 
-  if (loading && !busy && !unavailable) {
+  if (loading && !unavailable) {
     return (
       <Card className="p-4 sm:px-5" aria-busy="true">
         <div className="flex items-center gap-3">

@@ -76,12 +76,14 @@ export function StockMoveCards({
           <div className="flex items-center gap-1.5 text-sm text-on-secondary">
             <span>
               {relocation(move)?.from ??
+                move.from_location_path ??
                 placeName(move.from_location_id, move.from_location_name) ??
                 outsideFrom}
             </span>
             <ArrowRight size={14} className="shrink-0" aria-hidden="true" />
             <span>
               {relocation(move)?.to ??
+                move.to_location_path ??
                 placeName(move.to_location_id, move.to_location_name) ??
                 outsideTo}
             </span>

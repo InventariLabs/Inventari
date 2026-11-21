@@ -64,6 +64,7 @@
     "targetResponse": "Odpowiedź odbiorcy",
     "truncated": "skrócono",
     "abandonedByApp": "Porzucone przez Inventari — odbiorca nie odpowiedział",
+    "abandonedByAppAnswered": "Porzucone przez Inventari — przestało ponawiać po odpowiedzi odbiorcy",
     "deliveryId": "Identyfikator doręczenia",
     "abandon": {
       "circuitBreaker": "Bezpiecznik odciął ten endpoint po powtarzających się porażkach.",
@@ -95,7 +96,7 @@
   "circuitBreakerWarning_few": "Ten webhook został automatycznie wyłączony po {{count}} kolejnych błędach — przyczyna ostatniej próby jest zapisana w logach dostarczeń.",
   "circuitBreakerWarning_many": "Ten webhook został automatycznie wyłączony po {{count}} kolejnych błędach — przyczyna ostatniej próby jest zapisana w logach dostarczeń.",
   "circuitBreakerWarning_other": "Ten webhook został automatycznie wyłączony po {{count}} kolejnych błędach — przyczyna ostatniej próby jest zapisana w logach dostarczeń.",
-  "eventsWhileOff": "Zdarzenia, które wystąpią, gdy webhook jest wyłączony, nie są dostarczane, kolejkowane ani zapisywane w logach, Reaktywuj ich nie odtwarza.",
+  "eventsWhileOff": "Zdarzenia, które wystąpią, gdy webhook jest wyłączony, nie są dostarczane, kolejkowane ani zapisywane w logach, Reaktywuj ich nie odtwarza. Dostawy czekające na ponowienie w chwili wyłączenia są porzucane tak samo — zostają w logu dostaw jako nieudane.",
   "settings": {
     "logRetentionDays": "Przechowywanie logów (dni)",
     "logRetentionDaysDescription": "Jak długo przechowywać logi dostaw webhooków.",
