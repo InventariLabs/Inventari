@@ -117,7 +117,9 @@ export function DocumentFormFields({
     );
 
   return (
-    <>
+    // One rhythm for the card: every row starts the same distance under the
+    // one above it, its label included.
+    <div className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {docType !== "INT" &&
           (partnersModuleDisabled ? (
@@ -250,6 +252,6 @@ export function DocumentFormFields({
           onChange={(e) => onNotesChange(e.target.value)}
         />
       )}
-    </>
+    </div>
   );
 }

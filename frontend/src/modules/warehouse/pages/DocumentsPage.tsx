@@ -22,6 +22,7 @@ import { ListPickingSheet } from "@/modules/warehouse/components/picking/ListPic
 import { NewDocumentMenu } from "@/modules/warehouse/components/NewDocumentMenu";
 import { useDocumentBulkActions } from "@/modules/warehouse/hooks/useDocumentBulkActions";
 import { useDocumentsList } from "@/modules/warehouse/hooks/useDocumentsList";
+import { useDocumentProfile } from "@/modules/warehouse/hooks/useDocumentProfile";
 import {
   useDocument,
   useDocumentWorkflow,
@@ -58,6 +59,7 @@ export default function DocumentsPage() {
   } | null>(null);
 
   const list = useDocumentsList();
+  const { data: documentProfile } = useDocumentProfile();
   const {
     documents,
     isLoading,
@@ -202,7 +204,15 @@ export default function DocumentsPage() {
           onRetry={() => void refetch()}
         />
       ) : documents.length === 0 && !isNarrowed ? (
-        <DocumentsGettingStarted onCreateFirst={() => setNewDocType("IN")} />
+        // A viewer can do none of the three steps, so the notice above is
+        // the whole answer: instructions that name buttons they do not have
+        // read as a broken screen.
+        canWrite ? (
+          <DocumentsGettingStarted
+            onCreateFirst={() => setNewDocType("IN")}
+            receiptCode={documentProfile?.type_labels?.IN ?? "IN"}
+          />
+        ) : null
       ) : documents.length === 0 ? (
         // The two empties of a filtered list are different answers. This one
         // never gives the other's answer: the "No documents yet" prompt is for an

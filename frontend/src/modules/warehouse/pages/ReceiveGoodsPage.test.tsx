@@ -2093,6 +2093,32 @@ describe("ReceiveGoodsPage", () => {
       expect(state.confirm).toHaveBeenCalledWith("doc-9");
     });
 
+    it("brings the missing To location into view instead of leaving a dead tap", async () => {
+      // The field sits above the sheet's own button; the error announced
+      // there is off-screen at the thumb, which reads as a tap that did
+      // nothing.
+      const scrolled = vi.spyOn(HTMLElement.prototype, "scrollIntoView");
+      state.locationRequests = serveLocations([
+        { id: "loc-1", name: "Main Warehouse" },
+        { id: "loc-2", name: "Annex" },
+      ]);
+      renderAt("/warehouse/receive");
+      await userEvent.selectOptions(screen.getByLabelText("From"), "partner-1");
+
+      const start = await screen.findByRole("button", {
+        name: "Receive one product at a time",
+      });
+      scrolled.mockClear();
+      await userEvent.click(start);
+
+      expect(
+        await screen.findByText("Choose the location the goods go to."),
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText("To location")).toHaveFocus();
+      expect(scrolled).toHaveBeenCalled();
+      expect(state.createDraft).not.toHaveBeenCalled();
+    });
+
     it("takes the reader to the draft when the receipt cannot be confirmed", async () => {
       const user = userEvent.setup();
       state.confirm.mockReset().mockRejectedValue(new Error("refused"));

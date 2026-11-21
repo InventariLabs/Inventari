@@ -184,7 +184,10 @@ describe("DocumentsTemplatesPage — the built-in layouts' names", () => {
         "Lista kompletacji",
       ],
     ],
-    ["de", ["Standardlayout", "PL-PZ-Layout", "Packliste", "Pickliste"]],
+    [
+      "de",
+      ["Standardlayout", "PL-PZ-Layout", "Packliste", "Kommissionierliste"],
+    ],
     [
       "fr",
       [

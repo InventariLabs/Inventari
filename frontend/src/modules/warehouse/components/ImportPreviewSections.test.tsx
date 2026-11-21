@@ -49,8 +49,8 @@ describe("the import screen's counters", () => {
     await withLanguage("pl", async () => {
       renderPreview(1);
 
-      expect(screen.getByText("1 wiersz")).toBeInTheDocument();
-      expect(screen.queryByText("1 wierszy")).toBeNull();
+      expect(screen.getByText(/1 wiersz$/)).toBeInTheDocument();
+      expect(screen.queryByText(/1 wierszy$/)).toBeNull();
     });
   });
 
@@ -58,7 +58,7 @@ describe("the import screen's counters", () => {
     await withLanguage("pl", async () => {
       renderPreview(4);
 
-      expect(screen.getByText("4 wiersze")).toBeInTheDocument();
+      expect(screen.getByText(/4 wiersze$/)).toBeInTheDocument();
     });
   });
 

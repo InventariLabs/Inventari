@@ -248,7 +248,7 @@
     "postNowScrap": "Zezłomuj",
     "postNowAdjust": "Wyrównaj stan",
     "postNowDefault": "Zaksięguj dokument",
-    "plan": "Zaplanuj",
+    "plan": "Potwierdź",
     "sendForApproval": "Wyślij do akceptacji",
     "undoReceive": "Cofnij przyjęcie",
     "undoIssue": "Cofnij wydanie",
@@ -362,7 +362,10 @@
     "noStockCount_many": "{{count}} linii nie znalazło stanu do pobrania",
     "noStockCount_other": "{{count}} linii nie znalazło stanu do pobrania",
     "noStockHint": "W miejscu źródłowym nie ma wolnego stanu tych produktów. Wybierz dla każdej linii stan ręcznie albo najpierw przyjmij towar — do tego czasu dokumentu nie da się potwierdzić.",
-    "chooseSourceFirst": "Najpierw wybierz miejsce źródłowe — importowane linie pobierają stan właśnie z niego."
+    "chooseSourceFirst": "Najpierw wybierz miejsce źródłowe — importowane linie pobierają stan właśnie z niego.",
+    "columnsHint": "Arkusz potrzebuje kolumny produktu — nazwa, kod kreskowy lub SKU — oraz kolumny ilości. Marka, jednostka, cena jednostkowa, stawka VAT, numer partii i data ważności są opcjonalne.",
+    "pastedText": "Wklejony tekst",
+    "rowsRead": "Odczytane wiersze"
   },
   "empty": {
     "noResultsTitle": "Brak dokumentów dla tego filtra",
@@ -374,7 +377,7 @@
     "description": "Przyjmuj, wydawaj, przenoś i licz towar — numerowane dokumenty powstają same.",
     "step1": {
       "title": "Utwórz pierwszy dokument",
-      "description": "Zacznij od przyjęcia (PZ), aby zarejestrować towary przychodzące od partnera.",
+      "description": "Zacznij od przyjęcia ({{code}}), aby zarejestrować towary przychodzące od partnera.",
       "cta": "Utwórz pierwszy dokument"
     },
     "step2": {
@@ -579,7 +582,6 @@
     "snapshotPlanned": "Plan",
     "snapshotDeltaPlus": "Dodano",
     "snapshotDeltaMinus": "Usunięto",
-    "executionTitle": "Realizacja dokumentu",
     "executionHelp": "Dopasuj faktycznie wykonaną ilość dla każdej pozycji przed zamknięciem dokumentu.",
     "executionMeta": "Plan {{expected}} {{unit}} · pozostało {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Plan {{expected}} · pozostało {{remaining}} (bez jednostki)",
@@ -961,7 +963,7 @@
     "print_list": "Drukuj listę kompletacji",
     "print_list_failed": "Nie udało się utworzyć listy kompletacji",
     "summary_title": "Kompletacja zakończona",
-    "summary_subtitle": "{{picked}} z {{total}} linii zebranych",
+    "summary_subtitle": "{{picked}} z {{total}} linii zebranych w całości",
     "summary_picked": "{{count}} zebranych",
     "summary_short": "{{count}} z niedoborem",
     "summary_skipped": "{{count}} pominiętych",
@@ -1522,7 +1524,7 @@
       "title": "Przyjmowanie zakończone",
       "total": "Przyjęto {{received}} z {{expected}} {{unit}}",
       "backToDocument": "Zakończ i zaksięguj stan",
-      "bookingNote": "Zamknięcie tego podsumowania kończy dokument i księguje stan.",
+      "bookingNote": "„{{action}}” kończy dokument i księguje stan. Wyjście z podsumowania w inny sposób zostawia dokument otwarty, z przyjętym towarem.",
       "skippedUndo": "Cofnij pominięcie",
       "skippedBackorder": "Dostawa uzupełniająca",
       "skippedNotComing": "Nie dojdzie",
@@ -1726,13 +1728,16 @@
     "intoPackage": "Do paczki {{code}}",
     "intoNewPackage": "Do nowej paczki",
     "qtyRequired": "Podaj, ile trafia do paczki",
-    "qtyOver": "Do zapakowania zostało tylko {{amount}}",
     "scanned": "{{product}} zapakowano do {{code}}",
     "errors": {
       "writeFailed": "Nie zapisano zmiany w pakowaniu",
       "slipFailed": "Nie udało się pobrać listu pakowego",
       "labelFailed": "Nie udało się pobrać etykiety"
-    }
+    },
+    "qtyOver_one": "Do zapakowania zostało tylko {{amount}}",
+    "qtyOver_few": "Do zapakowania zostało tylko {{amount}}",
+    "qtyOver_many": "Do zapakowania zostało tylko {{amount}}",
+    "qtyOver_other": "Do zapakowania zostało tylko {{amount}}"
   },
   "statusBadge": {
     "todo": "do zrobienia dziś"

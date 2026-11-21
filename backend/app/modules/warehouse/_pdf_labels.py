@@ -200,7 +200,7 @@ _LABELS_DE: dict[str, str] = {
     'scrap_reason': 'Grund der Verschrottung',
     'scrap_cost': 'Kosten der Ausbuchung',
     'packing_slip': 'Packliste',
-    'pick_list': 'Pickliste',
+    'pick_list': 'Kommissionierliste',
     'shelf': 'Regal',
     'document': 'Dokument',
     'package': 'Paket',

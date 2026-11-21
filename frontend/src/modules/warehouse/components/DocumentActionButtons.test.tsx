@@ -547,7 +547,7 @@ describe("DocumentActionButtons one-step posting", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("leaves the confirm step in the menu as 'Plan' for a future date", async () => {
+  it("keeps the confirm step in the menu for a future date, under its own name", async () => {
     const onConfirm = vi.fn();
     render(
       <DocumentActionButtons
@@ -561,8 +561,9 @@ describe("DocumentActionButtons one-step posting", () => {
       screen.getByRole("button", { name: "Receive stock" }),
     ).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "More actions" }));
-    const plan = screen.getByRole("button", { name: "Plan" });
-    await userEvent.click(plan);
+    // The menu, the dialog and the status all call this act "Confirm".
+    const confirm = screen.getByRole("button", { name: "Confirm" });
+    await userEvent.click(confirm);
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 });

@@ -218,7 +218,7 @@
     "postNowScrap": "Write off stock",
     "postNowAdjust": "Adjust stock",
     "postNowDefault": "Post document",
-    "plan": "Plan",
+    "plan": "Confirm",
     "sendForApproval": "Send for approval",
     "undoReceive": "Undo receipt",
     "undoIssue": "Undo issue",
@@ -316,7 +316,10 @@
     "noStockCount_one": "{{count}} line found no stock to take from",
     "noStockCount_other": "{{count}} lines found no stock to take from",
     "noStockHint": "Nothing of these products is free on the source location. Pick each line from stock by hand, or receive the goods first; the document cannot be confirmed until then.",
-    "chooseSourceFirst": "Choose the source location first — imported lines are taken from the stock there."
+    "chooseSourceFirst": "Choose the source location first — imported lines are taken from the stock there.",
+    "columnsHint": "The sheet needs a column for the product — name, barcode or SKU — and one for the quantity. Brand, unit, unit price, VAT rate, batch number and expiry date are optional.",
+    "pastedText": "Pasted text",
+    "rowsRead": "Rows read"
   },
   "empty": {
     "noResultsTitle": "No documents match the filter",
@@ -328,7 +331,7 @@
     "description": "Receive, issue, move and count stock — the numbered documents follow by themselves.",
     "step1": {
       "title": "Create your first document",
-      "description": "Start with a receipt (IN) to register incoming goods from a partner.",
+      "description": "Start with a receipt ({{code}}) to register incoming goods from a partner.",
       "cta": "Create your first document"
     },
     "step2": {
@@ -517,7 +520,6 @@
     "snapshotPlanned": "Planned qty",
     "snapshotDeltaPlus": "Added",
     "snapshotDeltaMinus": "Removed",
-    "executionTitle": "Execute document",
     "executionHelp": "Adjust the quantity actually processed for each line before closing the document.",
     "executionMeta": "Planned {{expected}} {{unit}} · remaining {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Planned {{expected}} · remaining {{remaining}} (no unit)",
@@ -881,7 +883,7 @@
     "print_list": "Print pick list",
     "print_list_failed": "The pick list could not be created",
     "summary_title": "Picking complete",
-    "summary_subtitle": "{{picked}} of {{total}} lines picked",
+    "summary_subtitle": "{{picked}} of {{total}} lines picked in full",
     "summary_picked": "{{count}} picked",
     "summary_short": "{{count}} short picked",
     "summary_skipped": "{{count}} skipped",
@@ -1406,7 +1408,7 @@
       "title": "Receiving complete",
       "total": "{{received}} of {{expected}} {{unit}} received",
       "backToDocument": "Complete and post stock",
-      "bookingNote": "Closing this summary completes the document and books the stock.",
+      "bookingNote": "“{{action}}” completes the document and books the stock. Leaving this summary any other way keeps the document open, as received.",
       "skippedUndo": "Undo skip",
       "skippedBackorder": "Backorder",
       "skippedNotComing": "Not coming",
@@ -1606,13 +1608,14 @@
     "intoPackage": "Into package {{code}}",
     "intoNewPackage": "Into a new package",
     "qtyRequired": "Enter how much goes into the package",
-    "qtyOver": "Only {{amount}} is left to pack",
     "scanned": "{{product}} packed into {{code}}",
     "errors": {
       "writeFailed": "The packing change was not saved",
       "slipFailed": "The packing slip could not be downloaded",
       "labelFailed": "The label could not be downloaded"
-    }
+    },
+    "qtyOver_one": "Only {{amount}} is left to pack",
+    "qtyOver_other": "Only {{amount}} are left to pack"
   },
   "statusBadge": {
     "todo": "to do today"
