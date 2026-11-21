@@ -8,7 +8,7 @@ import {
   useUpdateItemQuantity,
 } from "@/modules/inventory/hooks/useItemMutations";
 import { downloadBlob } from "@/utils/helpers";
-import { getTodayFilename, toAmount } from "@/utils/formatters";
+import { getTodayFilename } from "@/utils/formatters";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import type { Item, StorageLocationSummary } from "@/types";
 import type { ItemAggregatesParams } from "./useItems";
