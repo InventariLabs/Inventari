@@ -116,7 +116,7 @@ export function BasicInfoSection({
             </label>
             <Link
               to="/equipment/locations"
-              className="flex items-center gap-1 text-xs text-primary-500 hover:text-primary-600 transition-colors"
+              className="flex min-h-6 items-center gap-1 text-xs text-primary-500 hover:text-primary-600 transition-colors"
             >
               <Settings2 size={12} />
               {t("form.manageLocations", "Manage")}

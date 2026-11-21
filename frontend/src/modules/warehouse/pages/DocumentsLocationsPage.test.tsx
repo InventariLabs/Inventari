@@ -357,6 +357,13 @@ describe("DocumentsLocationsPage — the shelves of one warehouse", () => {
     expect(
       screen.getAllByRole("checkbox", { name: /^Select (?!all)/ }),
     ).toHaveLength(101);
+    // Each box is pressed through a 44 px label on a phone: a press beside
+    // the 16 px box still ticks it.
+    expect(
+      screen
+        .getAllByRole("checkbox", { name: /^Select (?!all)/ })[0]
+        .closest("label"),
+    ).toHaveClass("min-h-11");
     expect(screen.queryByText("Bulk shelf 129")).not.toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: "Show more" }));

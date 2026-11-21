@@ -131,7 +131,7 @@ function ReturnOfReference({
       </p>
       <Link
         to={`/warehouse/documents/${doc.return_of_id}`}
-        className="inline-flex items-center gap-1 text-sm text-on-primary hover:underline"
+        className="inline-flex min-h-6 items-center gap-1 text-sm text-on-primary hover:underline"
       >
         {doc.return_of_number ?? doc.return_of_id}
         <ArrowUpRight size={13} />
@@ -158,7 +158,7 @@ function ReversedByReference({
       </p>
       <Link
         to={`/warehouse/documents/${doc.reversed_by_id}`}
-        className="inline-flex items-center gap-1 text-sm text-on-primary hover:underline"
+        className="inline-flex min-h-6 items-center gap-1 text-sm text-on-primary hover:underline"
       >
         {doc.reversed_by_number ?? doc.reversed_by_id}
         <ArrowUpRight size={13} />
@@ -386,7 +386,7 @@ export function DocumentMetadataGrid({
             </p>
             <Link
               to={`/warehouse/documents/${doc.corrects_document_id}`}
-              className="inline-flex items-center gap-1 text-sm text-on-primary hover:underline"
+              className="inline-flex min-h-6 items-center gap-1 text-sm text-on-primary hover:underline"
             >
               {doc.external_reference ?? doc.corrects_document_id}
               <ArrowUpRight size={13} />
@@ -402,7 +402,7 @@ export function DocumentMetadataGrid({
             </p>
             <Link
               to={`/warehouse/documents/${doc.backorder_id}`}
-              className="inline-flex items-center gap-1 text-sm text-on-primary hover:underline"
+              className="inline-flex min-h-6 items-center gap-1 text-sm text-on-primary hover:underline"
             >
               {t("warehouse:backorder.viewOriginal")}
               <ArrowUpRight size={13} />
@@ -418,7 +418,7 @@ export function DocumentMetadataGrid({
             </p>
             <Link
               to={`/warehouse/documents/${doc.generated_backorder_id}`}
-              className="inline-flex items-center gap-1 text-sm text-on-primary hover:underline"
+              className="inline-flex min-h-6 items-center gap-1 text-sm text-on-primary hover:underline"
             >
               {t("warehouse:backorder.viewBackorder")}
               <ArrowUpRight size={13} />

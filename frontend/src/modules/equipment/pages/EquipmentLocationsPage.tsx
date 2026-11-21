@@ -214,7 +214,7 @@ function ArchivedLocationsLink() {
     <div className="flex justify-center">
       <Link
         to="/inventory/locations/archived?module=equipment"
-        className="text-sm text-on-primary hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
+        className="inline-flex min-h-6 items-center text-sm text-on-primary hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
       >
         {t("locations:archived.title")}
       </Link>

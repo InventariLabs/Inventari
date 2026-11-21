@@ -46,7 +46,7 @@ export function ModelSelectCard({
           </CardTitle>
           <Link
             to="/equipment/templates"
-            className="flex shrink-0 items-center gap-1 text-xs text-primary-500 hover:text-primary-600 transition-colors"
+            className="flex min-h-6 shrink-0 items-center gap-1 text-xs text-primary-500 hover:text-primary-600 transition-colors"
           >
             <Plus size={12} />
             {t("models.create", "Create model")}
