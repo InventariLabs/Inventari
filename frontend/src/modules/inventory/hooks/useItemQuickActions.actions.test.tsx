@@ -11,6 +11,7 @@ type MutateOptions = {
 
 const mocks = vi.hoisted(() => ({
   consumeMutate: vi.fn(),
+  consumeMutateAsync: vi.fn(),
   quantityMutate: vi.fn(),
   deleteMutateAsync: vi.fn(),
 }));
@@ -24,7 +25,11 @@ vi.mock("@/utils/logger", () => ({
 }));
 
 vi.mock("./useItemMutations", () => ({
-  useConsumeItem: () => ({ mutate: mocks.consumeMutate, isPending: false }),
+  useConsumeItem: () => ({
+    mutate: mocks.consumeMutate,
+    mutateAsync: mocks.consumeMutateAsync,
+    isPending: false,
+  }),
   useUpdateItemQuantity: () => ({
     mutate: mocks.quantityMutate,
     isPending: false,
@@ -143,6 +148,25 @@ describe("useItemQuickActions — offers, results and the delete dialog", () => 
     lastOptions(mocks.consumeMutate).onSuccess?.({ quantity: "1" });
     expect(toast.success).toHaveBeenLastCalledWith("Removed 1 — 1 left");
     expect(onDone).toHaveBeenCalledTimes(2);
+  });
+
+  it("asks how much on a record holding less than one unit instead of sending a 1 it would refuse", async () => {
+    mocks.consumeMutateAsync.mockResolvedValue({});
+    const record = item({ quantity: "0.5" });
+    const { action, result, onDone } = render(record);
+    act(() => action("consume")!.onClick());
+    expect(mocks.consumeMutate).not.toHaveBeenCalled();
+    expect(result.current.consumeDialog.item).toBe(record);
+
+    await act(() => result.current.consumeDialog.onConfirm(0.5, "USED"));
+    expect(mocks.consumeMutateAsync).toHaveBeenCalledWith({
+      itemId: "item-1",
+      quantity: 0.5,
+      reason: "USED",
+      notes: undefined,
+    });
+    expect(result.current.consumeDialog.item).toBeNull();
+    expect(onDone).toHaveBeenCalledTimes(1);
   });
 
   it("reports a failed consume", () => {

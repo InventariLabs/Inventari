@@ -34,7 +34,13 @@ export function ConsumeDialog({
   // "" is the cleared field, a state every manual entry passes through — the
   // same bargain DefaultServingsField strikes. Bounds are applied where the
   // request is made, not at the typing event.
-  const [quantity, setQuantity] = useState<number | "">(1);
+  // It opens on one unit, or on everything there is when that is less than
+  // one: a 0.5 kg record would otherwise open on "There is only 0.5 kg" with
+  // the button off, before the reader typed anything.
+  const [quantity, setQuantity] = useState<number | "">(() => {
+    const available = Number(item?.quantity);
+    return available > 0 && available < 1 ? available : 1;
+  });
   const [reason, setReason] = useState("USED");
   const [notes, setNotes] = useState("");
   // The unit's own step is the smallest amount that can leave a shelf: 1 for

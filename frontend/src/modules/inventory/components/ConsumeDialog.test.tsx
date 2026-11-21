@@ -236,6 +236,23 @@ describe("ConsumeDialog", () => {
     ).toBeInTheDocument();
   });
 
+  // A record holding less than a unit opened on "1", above what is there:
+  // the error showed and the button was off before anything was typed.
+  it("opens on everything there is when that is less than one unit", () => {
+    render(
+      <ConsumeDialog
+        open
+        item={{ ...item, quantity: "0.5" }}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByLabelText("Quantity to remove")).toHaveValue(0.5);
+    expect(screen.queryByText(/only 0\.5/i)).toBeNull();
+    expect(screen.getByRole("button", { name: /^Remove 0\.5/ })).toBeEnabled();
+  });
+
   // An item counted in kilograms could not give up half of one. The floor
   // was a whole unit for every unit of measure, so 0.5 was raised to 1 and a
   // whole kilogram left the shelf.
