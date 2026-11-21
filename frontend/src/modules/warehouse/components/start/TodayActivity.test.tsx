@@ -57,7 +57,7 @@ describe("Today in the warehouse", () => {
     answer();
     render(<TodayActivity warehouseId="w-north" />);
     expect(
-      screen.getByText("Nothing has moved here today."),
+      screen.getByText("No document has been posted here today."),
     ).toBeInTheDocument();
   });
 

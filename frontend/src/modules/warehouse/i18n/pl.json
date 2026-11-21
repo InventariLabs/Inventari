@@ -1771,6 +1771,9 @@
   },
   "todo": {
     "title": "Do zrobienia",
+    "taken": "To zadanie jest teraz Twoje.",
+    "giveBack": "Oddaj",
+    "giveBackTask": "Oddaj: {{task}}",
     "today": "Dziś",
     "overdue": "Zaległe od {{date}}",
     "receive": "Przyjmij",
@@ -2039,8 +2042,8 @@
       "title": "Dziś w magazynie",
       "history": "Cała historia",
       "entry": "{{who}}: {{entry}}",
-      "empty": "Nic jeszcze dziś nie ruszyło.",
-      "emptyWarehouse": "W tym miejscu nic dziś nie ruszyło.",
+      "empty": "Dziś nie zaksięgowano jeszcze żadnego dokumentu.",
+      "emptyWarehouse": "W tym miejscu nie zaksięgowano dziś żadnego dokumentu.",
       "error": "Nie udało się wczytać dzisiejszych wpisów."
     }
   },

@@ -1025,7 +1025,6 @@
     "products": "Produkte",
     "replenishAll": "Alle auffüllen",
     "replenishPolicy": "Produkte, von denen noch Bestand anderswo in Gebrauch ist, gelten nicht als knapp und werden nicht nachbestellt.",
-    "replenishSuccess": "Fehlende Produkte zur Einkaufsliste hinzugefügt",
     "replenishModalTitle": "Vorschläge prüfen",
     "replenishModalDesc": "Wählen Sie Produkte aus, die Sie zur Einkaufsliste hinzufügen möchten.",
     "addSelected": "Ausgewählte hinzufügen ({{count}})",

@@ -322,7 +322,7 @@
     "currency": "Moneda",
     "createdAt": "Creado",
     "confirmedAt": "Confirmado",
-    "total": "Valor del pedido"
+    "total": "Valor del pedido (bruto)"
   },
   "columns": {
     "number": "Número",
@@ -331,7 +331,7 @@
     "lines": "Líneas",
     "scheduled": "Fecha prevista",
     "received": "Recibido",
-    "total": "Total",
+    "total": "Total (bruto)",
     "actions": "Acciones"
   },
   "overdue": "Vencido",
@@ -341,6 +341,7 @@
   "backToList": "Volver a los pedidos",
   "confirmOrderDescriptionApproval": "La confirmación envía el pedido a la cola de aprobaciones; la recepción estará disponible una vez aprobado. Aún podrás cancelarlo más adelante.",
   "noPriceYet": "Aún sin precio",
+  "grossSuffix": "bruto",
   "confirmOrderUnpriced": "Algunas líneas aún no tienen precio, así que el total no se conoce y el pedido pasa a aprobación. Hasta {{threshold}} no hace falta: añade primero los precios.",
   "confirmOrderDeadEndWaits": "Confirmar envía este pedido a la etapa «{{stage}}», donde espera hasta que se retire la solicitud o alguien pueda resolverla.",
   "requestApprovalDeadEndWaits": "La solicitud envía el pedido {{number}} a la etapa «{{stage}}», donde espera hasta que se retire la solicitud o alguien pueda resolverla."

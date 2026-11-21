@@ -19,6 +19,8 @@ vi.mock("@/modules/shopping_lists/hooks/useShoppingLists", () => ({
   })),
 }));
 
+vi.mock("react-router-dom", () => ({ useNavigate: () => vi.fn() }));
+
 vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));

@@ -1645,6 +1645,9 @@
   },
   "todo": {
     "title": "À faire",
+    "taken": "Cette tâche est désormais la vôtre.",
+    "giveBack": "La rendre",
+    "giveBackTask": "La rendre : {{task}}",
     "today": "Aujourd'hui",
     "overdue": "En retard depuis le {{date}}",
     "receive": "Réceptionner",
@@ -1905,8 +1908,8 @@
       "title": "Aujourd'hui dans l'entrepôt",
       "history": "Tout l'historique",
       "entry": "{{who}} : {{entry}}",
-      "empty": "Rien n'a encore bougé aujourd'hui.",
-      "emptyWarehouse": "Rien n'a bougé à cet emplacement aujourd'hui.",
+      "empty": "Aucun document n'a encore été comptabilisé aujourd'hui.",
+      "emptyWarehouse": "Aucun document n'a été comptabilisé à cet emplacement aujourd'hui.",
       "error": "Les entrées du jour n'ont pas pu être chargées."
     }
   },

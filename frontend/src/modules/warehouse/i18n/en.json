@@ -1645,6 +1645,9 @@
   },
   "todo": {
     "title": "To do",
+    "taken": "This task is now yours.",
+    "giveBack": "Give it back",
+    "giveBackTask": "Give it back: {{task}}",
     "today": "Today",
     "overdue": "Overdue since {{date}}",
     "receive": "Receive",
@@ -1905,8 +1908,8 @@
       "title": "Today's activity",
       "history": "Full history",
       "entry": "{{who}}: {{entry}}",
-      "empty": "Nothing has moved yet today.",
-      "emptyWarehouse": "Nothing has moved here today.",
+      "empty": "No document has been posted yet today.",
+      "emptyWarehouse": "No document has been posted here today.",
       "error": "Today's entries could not be loaded."
     }
   },

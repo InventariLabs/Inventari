@@ -322,7 +322,7 @@
     "currency": "Currency",
     "createdAt": "Created",
     "confirmedAt": "Confirmed",
-    "total": "Order value"
+    "total": "Order value (gross)"
   },
   "columns": {
     "number": "Number",
@@ -331,7 +331,7 @@
     "lines": "Lines",
     "scheduled": "Scheduled",
     "received": "Received",
-    "total": "Total",
+    "total": "Total (gross)",
     "actions": "Actions"
   },
   "overdue": "Overdue",
@@ -341,6 +341,7 @@
   "backToList": "Back to orders",
   "confirmOrderDescriptionApproval": "Confirming sends this order to the approval queue; receiving opens once it is approved. You can still cancel it afterwards.",
   "noPriceYet": "No price yet",
+  "grossSuffix": "gross",
   "confirmOrderUnpriced": "Some lines have no price yet, so the total is not known and the order goes to approval. At {{threshold}} or less it needs none: add the prices first.",
   "confirmOrderDeadEndWaits": "Confirming sends this order to the stage “{{stage}}”, where it waits until the request is withdrawn or someone can decide it.",
   "requestApprovalDeadEndWaits": "Requesting sends order {{number}} to the stage “{{stage}}”, where it waits until the request is withdrawn or someone can decide it."

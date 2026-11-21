@@ -360,6 +360,17 @@ says what the release does rather than what changed since them.
   settings", the equipment form's "Manage" and "Create model" links, a tag's
   colour, a recipe's select and a collection's rename and delete — are at
   least 24 px.
+- Smaller wording and clarity fixes found walking the app on a phone. A
+  recipe's "Output in stock" figure now carries its unit. The warehouse
+  start says "No document has been posted yet today" instead of claiming
+  nothing moved when stock moved without a document. The Equipment launcher
+  tile and overview count "warranties ending soon", as the window they
+  count, and a purchase order's value on the list and on its page says it is
+  gross, as the approval card says net. The product sheet opened from an
+  attention row names the product in its header. Tapping a to-do task on a
+  phone says the task is now yours and offers to give it back. The launcher
+  tile is called "Browse Modules", like the page it opens, and the toast after
+  Replenish names the shopping list it filled and opens it.
 - A production run or batch record whose ingredients carried no purchase
   price no longer shows a cost of zero per unit beside a total that reads
   "—": the per-unit figure is "—" too until some rate is known, so an

@@ -293,6 +293,9 @@ class RecipeCatalogItem(BaseModel):
     # Org-level setting from maker_module_settings (SAVINGS|MARGIN).
     reference_direction: ReferenceDirection | None = None
     stock_qty: Decimal | None = None
+    #: The unit ``stock_qty`` is counted in: the product's own, which a batch
+    #: yield written in another unit does not change.
+    stock_uom_symbol: str | None = None
     last_produced_at: datetime | None = None
 
 

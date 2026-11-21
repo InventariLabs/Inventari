@@ -26,6 +26,9 @@ vi.mock("@/modules/shopping_lists/api/shopping-lists", () => ({
   shoppingListsApi: { ensureActiveList: vi.fn() },
 }));
 
+const navigateMock = vi.hoisted(() => vi.fn());
+vi.mock("react-router-dom", () => ({ useNavigate: () => navigateMock }));
+
 vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
@@ -83,7 +86,10 @@ describe("ReplenishSuggestionsModal — the confirm sends what the reader chose"
       data: { suggestions },
       isLoading: false,
     } as unknown as ReturnType<typeof useShoppingSuggestionsPreview>);
-    vi.mocked(shoppingListsApi.ensureActiveList).mockResolvedValue("list-1");
+    vi.mocked(shoppingListsApi.ensureActiveList).mockResolvedValue({
+      id: "list-1",
+      name: "Shopping List 19 November",
+    } as Awaited<ReturnType<typeof shoppingListsApi.ensureActiveList>>);
   });
 
   it("adds the ticked row with its stepped quantity and urgency, to the active list", async () => {
@@ -121,9 +127,19 @@ describe("ReplenishSuggestionsModal — the confirm sends what the reader chose"
     });
 
     lastOptions().onSuccess?.([{}]);
+    // The list may have been made by this tap: the toast names it and opens it.
     expect(toast.success).toHaveBeenCalledWith(
-      "Added missing products to shopping list",
+      "Added 1 product to “Shopping List 19 November”",
+      expect.objectContaining({
+        action: expect.objectContaining({ label: "Open list" }),
+      }),
     );
+    const { action } = vi.mocked(toast.success).mock
+      .calls[0]![1] as unknown as {
+      action: { onClick: () => void };
+    };
+    action.onClick();
+    expect(navigateMock).toHaveBeenCalledWith("/shopping-lists/list-1");
     expect(onClose).toHaveBeenCalled();
   });
 

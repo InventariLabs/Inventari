@@ -1645,6 +1645,9 @@
   },
   "todo": {
     "title": "Por hacer",
+    "taken": "Esta tarea ahora es suya.",
+    "giveBack": "Devolver",
+    "giveBackTask": "Devolver: {{task}}",
     "today": "Hoy",
     "overdue": "Atrasado desde {{date}}",
     "receive": "Recibir",
@@ -1905,8 +1908,8 @@
       "title": "Hoy en el almacén",
       "history": "Todo el historial",
       "entry": "{{who}}: {{entry}}",
-      "empty": "Hoy todavía no se ha movido nada.",
-      "emptyWarehouse": "Hoy no se ha movido nada en esta ubicación.",
+      "empty": "Hoy todavía no se ha contabilizado ningún documento.",
+      "emptyWarehouse": "Hoy no se ha contabilizado ningún documento en esta ubicación.",
       "error": "No se pudieron cargar las entradas de hoy."
     }
   },

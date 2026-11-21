@@ -980,7 +980,6 @@
     "products": "Produtos",
     "replenishAll": "Repor tudo",
     "replenishPolicy": "Os produtos com stock em uso noutro local não contam como baixos nem são repostos.",
-    "replenishSuccess": "Produtos em falta adicionados à lista de compras",
     "replenishModalTitle": "Revisar sugestões",
     "replenishModalDesc": "Selecione os produtos que você quer adicionar à sua lista de compras.",
     "addSelected": "Adicionar selecionados ({{count}})",
