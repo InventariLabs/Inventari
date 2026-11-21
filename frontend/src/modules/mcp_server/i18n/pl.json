@@ -4,11 +4,13 @@
   "subtitle": "Gdzie agent AI łączy się z tą przestrzenią, jaki klucz API wysyła i na jakich hostach odpowiada endpoint.",
   "endpoint": {
     "label": "Endpoint",
-    "hint": "Wskaż ten adres w kliencie MCP."
+    "hint": "Wskaż ten adres w kliencie MCP.",
+    "protocol": "Mówi rewizją protokołu 2026-07-28, wysyłaną z każdym żądaniem; klient, który zaczyna od uzgadniania initialize, negocjuje 2025-11-25."
   },
   "connect": {
     "title": "Jak podłączyć",
     "createKey": "Utwórz klucz API w sekcji Klucze API i nadaj mu uprawnienie Korzystanie z endpointu MCP.",
+    "createKeyNeedsAdmin": "Poproś administratora swojej organizacji o klucz: powstaje on w sekcji Klucze API, z uprawnieniem Korzystanie z endpointu MCP.",
     "pointClient": "Wyślij klucz w nagłówku X-API-Key (albo jako token Bearer) na adres powyżej.",
     "allowHost": "Jeśli instalacja odpowiada pod publicznym adresem, dodaj jej host do dozwolonych hostów w ustawieniach modułu."
   },

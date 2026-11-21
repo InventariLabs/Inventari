@@ -94,7 +94,7 @@ class TestCorePdfAPI:
         )
         assert (
             core_api.pdf.format_partner_address(address, lang='pl')
-            == 'Main 1, Warsaw, 00-001, Polska'
+            == 'Main 1, 00-001 Warsaw, Polska'
         )
         # follow-up: names come from Babel's CLDR tables, so a real
         # code outside the old curated 40 (e.g. AE) prints a name in every

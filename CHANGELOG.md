@@ -242,6 +242,16 @@ says what the release does rather than what changed since them.
   the shared reader that turns an uploaded CSV or workbook into a frame of
   text cells (tolerant of a BOM, of the locale's codepage and of semicolon or
   tab separators) and the accessor that reads one cell as the text it is.
+- Closing a month says what it would leave behind. The **Close this period**
+  dialog counts the documents dated in the month that are still drafts, waiting
+  for approval, or confirmed and not completed, and links to the first of them,
+  because once the month is locked none of them can be confirmed, completed or
+  changed. The date picker of a document marks the days of a closed month as
+  unavailable and says why.
+- The person who sent a document for approval is told when it is approved, with
+  the approver's note, as they already were when it was rejected. The people
+  picker of a workflow stage marks the members who cannot see approvals, since
+  naming only such people is refused when the stage is saved.
 
 ### Changed
 
@@ -283,9 +293,31 @@ says what the release does rather than what changed since them.
   `"verdict": "integration-only"` with a reason and an owner, and no
   `expires`, and a query-key entry is `by-design` or `to-fold`, the latter
   with an `expiry`.
+- The issuer block of a printout reads as an address block: the tax ID carries
+  its label (NIP: 1234563218 on a Polish printout) and an address in Polish,
+  German, French, Spanish or Portuguese puts the postal code before the town
+  (ul. Magazynowa 5, 90-001 Łódź). The subtitle of the period closure screen
+  describes the screen instead of inviting an action that a read-only account
+  cannot take.
+- The line picker of a delivery, a scrap, a transfer or any other warehouse
+  document now finds stock the way the catalogue picker does: by the product's
+  name, brand, the code on the record or its product card, the label code and
+  the serial number, not by name alone. A one- or two-character fragment
+  matches only the start of a field, so typing `oi` no longer lists
+  `Olive oil` while `Ol` still finds it; a search term of three characters or
+  more still matches anywhere in a field.
 
 ### Fixed
 
+- A production run or batch record whose ingredients carried no purchase
+  price no longer shows a cost of zero per unit beside a total that reads
+  "—": the per-unit figure is "—" too until some rate is known, so an
+  unknown cost is not mistaken for a product that costs nothing to make.
+  `manage.py db doctor` also names the migrations still to be applied when it
+  lists a column whose type differs from the models, so the notice on an
+  upgrade start reads as expected, and *Updating* in `DEPLOYMENT.md` says how
+  a development stack takes the backup and lists the variables a release
+  added.
 - Counting a location that has sub-locations now offers, in the bar of
   products outside the stock take, a product received onto a sub-location
   after the count started, as counting that sub-location itself does.
@@ -601,6 +633,19 @@ says what the release does rather than what changed since them.
   no longer lost: the document opens on the Packing step with them in its
   Shipping fields, so *Complete dispatch* there does not ship without
   tracking.
+- Rejecting a document in the approval queue is written in the document's own
+  journal, with who sent it back and why, as approving it already was; the
+  history of a rejected document no longer ends at "Waiting for approval" while
+  it is a draft again. Changing a draft's date into a closed month is refused at
+  the edit, as creating a document there is.
+- A read-only account no longer meets write controls that do nothing on a
+  product's sheet: the photo tile, the link into the location's settings and
+  the nutrition buttons are gone, and a location's page offers no **Set up
+  location** to an account that cannot change it.
+- The cancel dialog of a document asks its question once, the write-off of a
+  scrap draft names the write-off instead of "Post this document?", and the
+  phone's correction dialog names the document it corrects and wraps a long
+  product name.
 - A correction of a receipt that held part of a line back in quarantine
   offers and accepts only what the shelf can give: the quantity the line's own
   stock record holds, not the whole quantity received. A correction that cannot

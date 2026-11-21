@@ -9,8 +9,11 @@ from fastapi.testclient import TestClient
 from httpx2 import Response
 from sqlalchemy.orm import Session
 
+from app.core.contracts import AuditTargetType
 from app.core.testing import ModuleTestHelper
+from app.models.audit_log import AuditLog
 from app.models.item import Item
+from app.models.notification import Notification
 from app.models.organization import Organization
 from app.models.partner import Partner
 from app.models.storage_location import StorageLocation
@@ -1123,6 +1126,92 @@ class TestDocumentApprovalWorkflow:
             f'/api/v1/warehouse/documents/{doc_id}', headers=doc_auth_headers
         ).json()
         assert doc['status'] == DocumentStatus.DRAFT.value
+
+    def test_rejecting_from_the_queue_is_written_in_the_documents_journal(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_auth_headers: dict[str, str],
+        doc_approval_workflow: ApprovalWorkflow,
+        doc_partner: Partner,
+        doc_target_location: StorageLocation,
+        doc_item: Item,
+    ) -> None:
+        """The document's own history records the way back to a draft.
+
+        Approving writes a row for the document (waiting -> confirmed); a
+        rejection wrote one for the request only, so the journal filtered to
+        the document ended at "Waiting for approval" while it was a draft.
+        """
+        doc_id = self._doc_pending_approval(
+            client, doc_auth_headers, doc_partner, doc_target_location, doc_item
+        )
+        approval = client.get(
+            f'/api/v1/approvals/documents/{doc_id}/approval', headers=doc_auth_headers
+        ).json()
+
+        rejected = client.post(
+            f'/api/v1/approvals/requests/{approval["id"]}/reject',
+            headers=doc_auth_headers,
+            json={'notes': 'Wrong supplier'},
+        )
+        assert rejected.status_code == status.HTTP_200_OK, rejected.text
+
+        rows = (
+            db_session.query(AuditLog)
+            .filter(
+                AuditLog.target_type == AuditTargetType.DOCUMENT,
+                AuditLog.target_id == uuid.UUID(doc_id),
+            )
+            .order_by(AuditLog.created_at.desc())
+            .all()
+        )
+        last = rows[0]
+        assert last.snapshot is not None
+        assert last.snapshot['old_status'] == DocumentStatus.PENDING_APPROVAL.value
+        assert last.snapshot['new_status'] == DocumentStatus.DRAFT.value
+        assert last.reason == 'Wrong supplier'
+        assert last.user_id is not None
+
+    def test_the_requester_is_told_when_the_queue_approves_their_document(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        db_session: Session,
+        doc_org: Organization,
+        doc_auth_headers: dict[str, str],
+        doc_approval_workflow: ApprovalWorkflow,
+        doc_partner: Partner,
+        doc_target_location: StorageLocation,
+        doc_item: Item,
+    ) -> None:
+        """A rejection reaches the requester's bell, and so does an approval."""
+        h.set_module_settings(doc_org, 'approvals', {'allow_admin_self_approve': False})
+        doc_id = self._doc_pending_approval(
+            client, doc_auth_headers, doc_partner, doc_target_location, doc_item
+        )
+        approval = client.get(
+            f'/api/v1/approvals/documents/{doc_id}/approval', headers=doc_auth_headers
+        ).json()
+        approver = h.create_user(doc_org, email='approver3@example.com', role='admin')
+
+        approved = client.post(
+            f'/api/v1/approvals/requests/{approval["id"]}/approve',
+            headers=h.get_auth_headers(approver),
+            json={'notes': 'Budget confirmed'},
+        )
+        assert approved.status_code == status.HTTP_200_OK, approved.text
+
+        told = [
+            n
+            for n in db_session.query(Notification).all()
+            if (n.meta_data or {}).get('kind') == 'approval_approved'
+        ]
+        assert len(told) == 1
+        assert told[0].user_id != approver.id
+        assert 'approved' in told[0].title.lower()
+        assert 'Budget confirmed' in told[0].content
+        assert told[0].link == f'/warehouse/documents/{doc_id}'
 
     def test_cannot_approve_already_completed_document(
         self,

@@ -129,6 +129,7 @@
     "saveFailed": "Nie udało się zapisać przepływu",
     "removeStage": "Usuń etap",
     "addApprover": "Dodaj akceptanta",
+    "cannotApprove": "nie widzi akceptacji",
     "removeApprover": "Usuń akceptanta",
     "selectApprovers": "Wybierz akceptantów",
     "searchUsers": "Szukaj użytkowników…",

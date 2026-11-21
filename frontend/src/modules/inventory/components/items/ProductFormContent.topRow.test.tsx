@@ -140,3 +140,51 @@ describe("ProductFormContent — the row above the sections", () => {
     ).not.toBeInTheDocument();
   });
 });
+
+describe("ProductFormContent — read-only", () => {
+  function renderReadOnly() {
+    return render(
+      <ProductFormContent
+        formData={{ name: "Tape", location_id: "loc-1" }}
+        onChange={vi.fn()}
+        errors={{}}
+        fieldDefinitions={[nameField]}
+        imagePreview={null}
+        setImagePreview={vi.fn()}
+        readOnly
+      />,
+    );
+  }
+
+  it("draws the photo tile without a way to pick a file", () => {
+    const { container } = renderReadOnly();
+
+    expect(container.querySelector('input[type="file"]')).toBeNull();
+  });
+
+  it("leaves out the link into the location's settings", () => {
+    renderReadOnly();
+
+    expect(
+      screen.queryByRole("link", { name: /configure/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("keeps both for a form that may write", () => {
+    const { container } = render(
+      <ProductFormContent
+        formData={{ name: "Tape", location_id: "loc-1" }}
+        onChange={vi.fn()}
+        errors={{}}
+        fieldDefinitions={[nameField]}
+        imagePreview={null}
+        setImagePreview={vi.fn()}
+      />,
+    );
+
+    expect(container.querySelector('input[type="file"]')).not.toBeNull();
+    expect(
+      screen.getByRole("link", { name: /configure/i }),
+    ).toBeInTheDocument();
+  });
+});

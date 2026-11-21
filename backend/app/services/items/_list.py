@@ -82,8 +82,10 @@ async def search_cursor_paginated_async(
     """Cursor (keyset) pagination on Item.created_at for infinite-scroll UIs.
 
     Returns up to *limit* items ordered by created_at DESC, id DESC,
-    optionally filtered by storage_ids, single storage_id, a free-text
-    name search, and a stock floor (strictly above *quantity_above*). The (cursor_ts, cursor_id) pair is the
+    optionally filtered by storage_ids, single storage_id, the text search
+    shared with the other item reads — name, brand, the code on the record or
+    its product card, serial and label code — and a stock floor (strictly
+    above *quantity_above*). The (cursor_ts, cursor_id) pair is the
     keyset tie-breaker: without it, rows sharing a created_at (bulk
     imports) are skipped or returned twice across pages.
     """

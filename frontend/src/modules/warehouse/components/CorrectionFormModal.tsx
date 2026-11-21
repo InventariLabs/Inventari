@@ -134,7 +134,7 @@ export function CorrectionFormModal({
           <h2 className="font-semibold text-on">
             {t("corrections.createTitle")}
           </h2>
-          <p className="text-xs text-on-secondary mt-0.5 hidden sm:block">
+          <p className="text-xs text-on-secondary mt-0.5">
             {t("corrections.createSubtitle", { number: document.number })}
           </p>
         </div>
@@ -171,8 +171,10 @@ export function CorrectionFormModal({
             key={line.original_line_number}
             className="rounded-xl border border-border bg-surface-raised p-3 space-y-2"
           >
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-sm font-medium text-on truncate">
+            {/* On a phone the name takes a row of its own and wraps; beside
+                the two quantities it would be cut. */}
+            <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+              <span className="min-w-0 basis-full break-words text-sm font-medium text-on sm:flex-1 sm:basis-0 sm:truncate">
                 {line.line_name}
               </span>
               <span className="text-xs text-on-secondary shrink-0">

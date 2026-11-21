@@ -1421,3 +1421,39 @@ class TestWorkflowVisibilityScope:
         assert resp.status_code == status.HTTP_200_OK, resp.text
         names = [wf['name'] for wf in resp.json()['items']]
         assert 'Router Test Workflow' in names
+
+
+@pytest.mark.integration
+class TestWhoCanDecideAStage:
+    """``GET /workflows/approvers`` — the picker's marks match the save's test."""
+
+    def test_names_the_members_who_hold_an_approvals_grant(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        router_org: Organization,
+        router_user: User,
+        router_auth: dict[str, str],
+    ) -> None:
+        viewer = h.create_user(router_org, email='viewer@example.com', role='viewer')
+
+        response = client.get(f'{BASE}/workflows/approvers', headers=router_auth)
+
+        assert response.status_code == status.HTTP_200_OK, response.text
+        ids = set(response.json()['user_ids'])
+        assert str(router_user.id) in ids
+        assert str(viewer.id) not in ids
+
+    def test_is_for_whoever_edits_workflows(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        router_org: Organization,
+    ) -> None:
+        viewer = h.create_user(router_org, email='viewer2@example.com', role='viewer')
+
+        response = client.get(
+            f'{BASE}/workflows/approvers', headers=h.get_auth_headers(viewer)
+        )
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN

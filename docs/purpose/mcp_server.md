@@ -8,8 +8,10 @@ The person who issues the API key. The agent is theirs to connect and disconnect
 administrator only decides whether the module is on and which roles may hold `mcp_server:use`.
 
 ## Inside the boundary
-The Model Context Protocol over Streamable HTTP, revision 2026-07-28, at one endpoint
-(`/api/v1/mcp-server/mcp`). A request authenticates with an API key from **API Keys**, acts only in
+The Model Context Protocol over Streamable HTTP, revision 2026-07-28 for a client that sends each
+request in its own envelope, and revision 2025-11-25 for one that opens with the `initialize`
+handshake, at one endpoint (`/api/v1/mcp-server/mcp`). A request authenticates with an API key from
+**API Keys**, acts only in
 the key's organization, and sees what that key's permission list allows: `items:read` for stock,
 batches and expiry, `locations:read` for the location tree, `items:write` for the two writes. The
 seven read tools (`search_items`, `get_item`, `list_locations`, `get_location_tree`,
