@@ -258,13 +258,19 @@ describe("DocumentsPage", () => {
     });
   });
 
-  it("offers a reader no create CTA in the empty state", async () => {
+  it("shows a reader the read-only notice instead of steps they cannot take", async () => {
     signInWith(["warehouse:read"]);
 
     await renderWithHeader(<DocumentsPage />);
 
-    expect(screen.getByText("Get started with documents")).toBeInTheDocument();
-    expect(screen.queryByTestId("getting-started-cta")).not.toBeInTheDocument();
+    // The three steps name buttons this account does not have; the notice
+    // above is the whole answer for an empty organization it may only read.
+    expect(
+      screen.queryByText("Get started with documents"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText("You can view this, not change it"),
+    ).toBeInTheDocument();
   });
 
   it("leaves settings to the module bar instead of repeating it in the start tile", async () => {

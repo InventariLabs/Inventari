@@ -28,6 +28,19 @@ describe.each(Object.entries(CATALOGUES))("%s warehouse wording", (_, cat) => {
   });
 });
 
+describe("German picking words", () => {
+  it("calls the act by one name, not picken beside kommissionieren", () => {
+    // Two vocabularies for one act read as two acts: "Volle Menge picken"
+    // beside "Kommissionierung" and a "Pickliste".
+    const picking = JSON.stringify(de.picking);
+    const templates = JSON.stringify(de.templates);
+    for (const text of [picking, templates]) {
+      expect(text).not.toMatch(/picken|Pickliste|Gepickt/i);
+    }
+    expect(de.picking.title).toBe("Kommissionierung");
+  });
+});
+
 describe("History's subtitle", () => {
   it("does not claim every movement and points to Stock movements", () => {
     expect(en.history.subtitle).not.toMatch(/^Everything that moved goods\./);

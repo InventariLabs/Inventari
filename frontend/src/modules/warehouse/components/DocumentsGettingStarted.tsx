@@ -5,8 +5,12 @@ import { GettingStarted } from "@/components/ui/GettingStarted";
 /** What the register shows before the first document exists. */
 export function DocumentsGettingStarted({
   onCreateFirst,
+  receiptCode,
 }: {
   onCreateFirst: () => void;
+  /** The organization's own label for a receipt (PZ, IN, …), the one its
+   *  numbers use: the step must not name a code the reader never sees. */
+  receiptCode: string;
 }) {
   const { t } = useTranslation("warehouse");
   return (
@@ -17,7 +21,9 @@ export function DocumentsGettingStarted({
       steps={[
         {
           title: t("gettingStarted.step1.title"),
-          description: t("gettingStarted.step1.description"),
+          description: t("gettingStarted.step1.description", {
+            code: receiptCode,
+          }),
           ctaLabel: t("gettingStarted.step1.cta"),
           onCta: onCreateFirst,
         },

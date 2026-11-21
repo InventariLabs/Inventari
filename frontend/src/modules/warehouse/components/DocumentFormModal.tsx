@@ -46,10 +46,7 @@ import type {
 import { useDocumentLineImport } from "@/modules/warehouse/hooks/useDocumentLineImport";
 import { useDocumentProfile } from "@/modules/warehouse/hooks/useDocumentProfile";
 import { useDocumentCurrency } from "@/hooks/useDocumentCurrency";
-import {
-  readLastUsedLocations,
-  rememberLastUsedLocations,
-} from "@/modules/warehouse/lib/lastUsedLocations";
+import { rememberLastUsedLocations } from "@/modules/warehouse/lib/lastUsedLocations";
 import {
   PartnerInlineCreate,
   usePartnerCreateLayer,
@@ -290,8 +287,6 @@ function partnerFieldDoc(
 /** What the prefill reads besides the form it fills. */
 interface DocumentLocationPrefillInput {
   locationsLoaded: boolean;
-  /** The places the form remembers that are still on offer. */
-  offeredIds: ReadonlySet<string>;
   /** The one place there is, when there is exactly one on offer. */
   onlyLocationId: string | null;
   prefilledLocations: MutableRefObject<{ source?: string; target?: string }>;
@@ -322,30 +317,17 @@ function useDocumentLocationPrefill(
   }: DocumentWorkspace,
   {
     locationsLoaded,
-    offeredIds,
     onlyLocationId,
     prefilledLocations,
   }: DocumentLocationPrefillInput,
 ): void {
   useEffect(() => {
     if (isEdit || !locationsLoaded) return;
-    const remembered = readLastUsedLocations()[docType];
-    if (
-      remembered?.source &&
-      !sourceLocationId &&
-      offeredIds.has(remembered.source)
-    ) {
-      setSourceLocationId(remembered.source);
-      prefilledLocations.current.source = remembered.source;
-    }
-    if (
-      remembered?.target &&
-      !targetLocationId &&
-      offeredIds.has(remembered.target)
-    ) {
-      setTargetLocationId(remembered.target);
-      prefilledLocations.current.target = remembered.target;
-    }
+    // A new document starts with both places empty, as it starts with no
+    // partner: a prefilled source read as a choice the form had already made.
+    // Only a place the organization cannot choose between — the one stock
+    // location it has — is put in the field, and it is named in the sentence
+    // the picker shows rather than picked from a list of one.
     if (!onlyLocationId) return;
     if (requiresSource && !requiresTarget && !sourceLocationId) {
       setSourceLocationId(onlyLocationId);
@@ -359,7 +341,6 @@ function useDocumentLocationPrefill(
     isEdit,
     locationsLoaded,
     docType,
-    offeredIds,
     onlyLocationId,
     sourceLocationId,
     targetLocationId,
@@ -666,14 +647,13 @@ export default function DocumentFormModal({
   // moves from or to.
   // What the form needs to know of the places before the reader opens a
   // picker: asked by id and by count, never found in a list of every location.
-  const places = useDocumentPlaces({ isEdit, docType, stockLocationId });
+  const places = useDocumentPlaces({ stockLocationId });
 
-  // prefill source/target with the last used locations for this
-  // document type (new documents only) — and, where there is exactly one
-  // eligible location, with that; only empty fields are filled.
+  // A new document's places stay empty unless the organization has exactly
+  // one it could use, in which case there is no choice to ask for; only
+  // empty fields are filled either way.
   useDocumentLocationPrefill(workspace, {
     locationsLoaded: places.locationsLoaded,
-    offeredIds: places.offeredIds,
     onlyLocationId: places.onlyLocationId,
     prefilledLocations,
   });
