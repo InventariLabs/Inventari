@@ -195,7 +195,7 @@ async def get_workflow_configured(
 @router.get(
     '/workflows/approvers',
     response_model=WorkflowApprovers,
-    dependencies=[_CONFIGURE],
+    dependencies=[_READ],
 )
 async def list_people_who_can_decide(
     db: AsyncSession = Depends(get_async_db, scope='function'),

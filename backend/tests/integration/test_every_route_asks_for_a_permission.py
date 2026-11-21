@@ -165,6 +165,9 @@ _READ_BEHIND_ANOTHER_GRANT = {
     'GET /api/v1/approvals/workflows/{workflow_id}/waiting': (
         'what switching a workflow off would release, asked by its editor'
     ),
+    'GET /api/v1/approvals/workflows/approvers': (
+        'approvals:read or the editor configuring a workflow, as the workflow list'
+    ),
     'GET /api/v1/approvals/workflows/{workflow_id}': (
         'approvals:read or the editor configuring it, as the workflow list'
     ),
