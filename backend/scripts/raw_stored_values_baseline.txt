@@ -2,9 +2,7 @@
 # (scripts/check_raw_stored_values_in_refusals.py). Each line is a site that
 # prints the database's spelling of a status, type or usage where a word
 # belongs. Goal: empty. Refresh only with --write-baseline.
-app/modules/equipment/_attestation_campaigns.py::ServiceRejectionError(status=campaign.status)
 app/modules/equipment/attachment_service.py::ServiceRejectionError(file_type=file_type)
-app/modules/equipment/status_machine.py::ServiceRejectionError(new=new_status)
 app/modules/equipment/status_machine.py::ServiceRejectionError(status=new_status)
 app/modules/maker/production_reversal.py::ServiceRejectionError(status=order.status)
 app/modules/maker/production_service.py::ServiceRejectionError(status=order.status)
