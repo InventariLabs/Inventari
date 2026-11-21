@@ -37,7 +37,12 @@ function shelfHeldLabel(
   shelf: NonNullable<PutawayRule["locations"]>[number],
   isHead: boolean,
 ): string {
-  const reason = t(`putaway.status.shelfHeld.${shelf.unavailable_reason}`);
+  const reason = {
+    archived: t("putaway.status.shelfHeld.archived"),
+    not_internal: t("putaway.status.shelfHeld.not_internal"),
+    receiving: t("putaway.status.shelfHeld.receiving"),
+    quarantine: t("putaway.status.shelfHeld.quarantine"),
+  }[shelf.unavailable_reason ?? "archived"];
   return isHead
     ? reason
     : t("putaway.status.shelfHeldNamed", {
