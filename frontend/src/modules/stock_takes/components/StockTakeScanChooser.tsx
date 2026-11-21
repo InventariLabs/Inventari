@@ -15,8 +15,8 @@ interface Props {
 /**
  * One code, several rows of this count: the same product on two shelves, or
  * in two batches. The scan cannot tell them apart, so the reader picks the
- * one in their hand. A row is told apart by where it stands and when it
- * expires — never by its expected quantity, which blind mode keeps hidden.
+ * one in their hand. A row is told apart by where it stands, its batch and
+ * when it expires — never by its expected quantity, which blind mode keeps hidden.
  */
 export default function StockTakeScanChooser({
   rows,
@@ -57,13 +57,13 @@ export default function StockTakeScanChooser({
               <span className="flex flex-col items-start">
                 <span className="font-medium">{row.item_name}</span>
                 <span className="text-sm text-on-secondary">
-                  {row.shelf_location && <span>{row.shelf_location}</span>}
-                  {expiry && (
-                    <span>
-                      {row.shelf_location && " • "}
-                      {t("scan.expires", { date: formatDate(expiry) })}
-                    </span>
-                  )}
+                  {[
+                    row.shelf_location,
+                    row.lot_name && t("item.lot", { lot: row.lot_name }),
+                    expiry && t("scan.expires", { date: formatDate(expiry) }),
+                  ]
+                    .filter(Boolean)
+                    .join(" • ")}
                 </span>
               </span>
             </Button>

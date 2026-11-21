@@ -505,6 +505,16 @@ export default function DocumentsTemplatesPage() {
               onExport={handleExport}
             />
           ))}
+          {/* One template on the list does not say what the other documents
+              print through; this does, and keeps the way to the built-ins. */}
+          <p className="pt-2 text-sm text-on-secondary">
+            {t("templates.builtInNote")}{" "}
+            {builtIns.length > 0 && (
+              <Button variant="link" onClick={() => setPreviewOpen(true)}>
+                {t("templates.builtInPreviewAction")}
+              </Button>
+            )}
+          </p>
         </div>
       )}
 

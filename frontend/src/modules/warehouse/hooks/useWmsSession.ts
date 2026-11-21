@@ -141,6 +141,9 @@ export function useWmsSession<
   const [errorStatus, setErrorStatus] = useState<number | null>(null);
   const [errorContext, setErrorContext] =
     useState<WmsSessionFailureContext | null>(null);
+  // The line a failed action was about, so its sentence can name it: the
+  // message sits under the list, and another line's row may be next to it.
+  const [errorLineId, setErrorLineId] = useState<string | null>(null);
   // The raw start failure, kept beside its sentence: some refusals carry
   // machine-readable context in the detail envelope (the session id a held
   // document can be released with) that the sentence alone leaves behind.
@@ -159,6 +162,7 @@ export function useWmsSession<
     async <T>(
       context: WmsSessionFailureContext,
       action: (session: TSession) => Promise<T>,
+      lineId: string | null = null,
     ): Promise<T | null> => {
       if (!state.session) return null;
       setIsLoading(true);
@@ -168,6 +172,7 @@ export function useWmsSession<
         return await action(state.session);
       } catch (e: unknown) {
         setErrorContext(context);
+        setErrorLineId(lineId);
         setError(extractApiError(e, "") || null);
         return null;
       } finally {
@@ -214,22 +219,26 @@ export function useWmsSession<
    */
   const skipLine = useCallback(
     async (lineId: string): Promise<boolean> => {
-      const done = await run("skip", async (session) => {
-        await transport.skip(documentId, session.id, lineId);
-        const updated = state.lines.map((ln) =>
-          ln.id === lineId ? transport.clearedLine(ln, "skipped") : ln,
-        );
-        const allResolved =
-          updated.every((ln) => ln.status !== "pending") &&
-          !transport.awaitsMore?.(session, updated);
-        setState({
-          phase: allResolved ? "completed" : "active",
-          session,
-          lines: updated,
-          shortLine: null,
-        });
-        return true;
-      });
+      const done = await run(
+        "skip",
+        async (session) => {
+          await transport.skip(documentId, session.id, lineId);
+          const updated = state.lines.map((ln) =>
+            ln.id === lineId ? transport.clearedLine(ln, "skipped") : ln,
+          );
+          const allResolved =
+            updated.every((ln) => ln.status !== "pending") &&
+            !transport.awaitsMore?.(session, updated);
+          setState({
+            phase: allResolved ? "completed" : "active",
+            session,
+            lines: updated,
+            shortLine: null,
+          });
+          return true;
+        },
+        lineId,
+      );
       return done === true;
     },
     [run, state.lines, documentId, transport],
@@ -300,8 +309,12 @@ export function useWmsSession<
     [state],
   );
 
+  // Backing out of the sheet leaves nothing to report: the failure it carried
+  // was about the attempt the reader has just dropped.
   const cancelShortfall = useCallback(() => {
     setState({ ...state, phase: "active", shortLine: null });
+    setError(null);
+    setErrorContext(null);
   }, [state]);
 
   const reset = useCallback(() => {
@@ -393,6 +406,7 @@ export function useWmsSession<
     errorCode,
     errorStatus,
     errorContext,
+    errorLineId,
     setErrorContext,
     startError,
     heldSession,

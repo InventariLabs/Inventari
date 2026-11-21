@@ -141,6 +141,11 @@ const SIDES = [
         lineQuantity: () => result.current.state.lines[0].picked_quantity,
         pendingCount: () => result.current.pendingCount,
         errorContext: () => result.current.errorContext as string | null,
+        errorLineId: () => result.current.errorLineId,
+        error: () => result.current.error,
+        openShortfall: (lineId: string) =>
+          act(() => result.current.requestShortPick(lineId)),
+        closeShortfall: () => act(() => result.current.cancelShortPick()),
         skip: (lineId: string) => result.current.skipLine(lineId),
         undo: (lineId: string) => result.current.undoLine(lineId),
         complete: () => result.current.completeSession(),
@@ -166,6 +171,11 @@ const SIDES = [
         lineQuantity: () => result.current.state.lines[0].received_quantity,
         pendingCount: () => result.current.pendingCount,
         errorContext: () => result.current.errorContext as string | null,
+        errorLineId: () => result.current.errorLineId,
+        error: () => result.current.error,
+        openShortfall: (lineId: string) =>
+          act(() => result.current.requestShortReceive(lineId)),
+        closeShortfall: () => act(() => result.current.cancelShortReceive()),
         skip: (lineId: string) => result.current.skipLine(lineId),
         undo: (lineId: string) => result.current.undoLine(lineId),
         complete: () => result.current.completeSession(),
@@ -318,6 +328,28 @@ describe.each(SIDES)("useWmsSession through $name", (side) => {
     expect(skipped).toBe(false);
     expect(session.errorContext()).toBe("skip");
     expect(session.lineStatus()).toBe("pending");
+  });
+
+  it("a refused skip remembers which line it was about", async () => {
+    side.api.skip.mockRejectedValue(new Error("boom"));
+    const session = await side.render();
+
+    await act(async () => session.skip("line-1"));
+
+    expect(session.errorLineId()).toBe("line-1");
+  });
+
+  it("backing out of the quantity sheet drops the failure it carried", async () => {
+    side.api.skip.mockRejectedValue(new Error("boom"));
+    const session = await side.render();
+    await act(async () => session.skip("line-1"));
+    expect(session.errorContext()).toBe("skip");
+
+    await session.openShortfall("line-1");
+    await session.closeShortfall();
+
+    expect(session.errorContext()).toBeNull();
+    expect(session.error()).toBeNull();
   });
 
   it("cancelling says whether the server ended the session", async () => {

@@ -30,6 +30,22 @@ import { useEnabledModulesOptional } from "@/contexts/ModulesContext";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { documentScanTarget } from "@/lib/scan/scanSubject";
 import { scanFailure } from "@/lib/scan/toastScanError";
+import type { TFunction } from "i18next";
+
+/** What a reader who may not create products is told about a scan that would
+ * open the form. A code found only in the history belongs to an archived
+ * product, and the bare refusal cannot be told apart from an unknown code. */
+function readOnlyScanRefusal(
+  data: LabelScanView,
+  tScan: TFunction,
+  tCommon: TFunction,
+): string {
+  return data.message_key === "scan:result.foundInHistory"
+    ? tScan("result.archivedReadOnly", {
+        product: data.message_params?.product,
+      })
+    : tCommon("access.readOnly");
+}
 
 /**
  * What a scanned location label opens. It answers "what is on this shelf"
@@ -171,7 +187,7 @@ export default function ScanPage() {
         // is nothing to show a reader who may not create one, so the refusal
         // arrives here rather than after the form has been filled in.
         if (!canWrite) {
-          toast.error(tCommon("access.readOnly"));
+          toast.error(readOnlyScanRefusal(data, tScan, tCommon));
           resumeCamera();
           return;
         }

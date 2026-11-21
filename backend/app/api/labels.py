@@ -512,6 +512,20 @@ async def export_labels_png(
         # nobody has taken yet.
         return StreamingResponse(io.BytesIO(png_data), media_type='image/png')
 
+    if not current_user.has_permission(SystemPermission.ITEMS_WRITE):
+        # Marking a label printed changes its state, and this door is a read:
+        # an account that cannot write takes the file and leaves the pool as
+        # it was.
+        return StreamingResponse(
+            io.BytesIO(png_data),
+            media_type='image/png',
+            headers={
+                'Content-Disposition': (
+                    f'attachment; filename=labels_{len(labels)}pcs.png'
+                )
+            },
+        )
+
     await core_api.labels.mark_as_printed_by_ids_async(
         db, [lbl.id for lbl in labels], org_id
     )

@@ -260,6 +260,7 @@ export function useWmsPicking(documentId: string, documentIds?: string[]) {
     errorCode: session.errorCode,
     errorStatus: session.errorStatus,
     startError: session.startError,
+    errorLineId: session.errorLineId,
     errorContext: (session.errorContext === "shortfall"
       ? "short_pick"
       : session.errorContext) as WmsPickingFailureContext | null,

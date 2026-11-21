@@ -851,6 +851,7 @@
       "deleteTitle": "{{name}} löschen?",
       "editPermissions": "Bearbeiten",
       "editSubtitle": "{{n}} Berechtigungen erteilt",
+      "editSubtitleUnsaved": "{{n}} Berechtigungen ausgewählt, noch nicht gespeichert",
       "editTitle": "Berechtigungen von {{name}}",
       "emptyDescription": "Die integrierten Stufen decken die meisten Fälle ab. Eine eigene Rolle lohnt sich, wenn jemand einen anderen Umfang braucht — etwa jemand im Lager, der zählt, aber keine Belege bestätigt.",
       "emptyTitle": "Noch keine eigenen Rollen",

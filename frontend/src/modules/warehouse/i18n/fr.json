@@ -937,6 +937,7 @@
       "scan_failed": "Impossible d’enregistrer le scan.",
       "short_pick_failed": "Impossible d’enregistrer la quantité prélevée.",
       "skip_failed": "Impossible d’ignorer la ligne.",
+      "skip_failed_named": "Impossible d’ignorer {{product}}.",
       "undo_failed": "Impossible d’annuler la ligne.",
       "complete_failed": "Impossible de terminer la session de préparation.",
       "cancel_failed": "Impossible d’annuler la session de préparation.",
@@ -981,6 +982,7 @@
     "type_pl_pz": "PL PZ (Polonais)",
     "type_packing_slip": "Bordereau de colisage",
     "type_pick_list": "Bon de préparation",
+    "builtInNote": "Un modèle ne remplace la mise en page intégrée que là où il est le modèle par défaut d’un type de document, ou la mise en page d’impression choisie dans les réglages des documents. Tous les autres documents s’impriment toujours avec la mise en page intégrée.",
     "builtInPreviewTitle": "Mise en page intégrée",
     "builtInPreviewAction": "Voir les mises en page intégrées",
     "placeholders": {
@@ -1442,6 +1444,7 @@
       "scan_failed": "Impossible d’enregistrer le scan.",
       "short_receive_failed": "Impossible d’enregistrer la quantité reçue.",
       "skip_failed": "Impossible d’ignorer la ligne.",
+      "skip_failed_named": "Impossible d’ignorer {{product}}.",
       "undo_failed": "Impossible d’annuler la ligne.",
       "complete_failed": "Impossible de terminer la session de réception.",
       "cancel_failed": "Impossible d’annuler la session de réception.",

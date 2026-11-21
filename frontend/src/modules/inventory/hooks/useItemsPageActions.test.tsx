@@ -69,6 +69,8 @@ type ToastOptions = {
   action?: { label: string; onClick: () => void };
 };
 
+const setBulkDeleteIds = vi.fn();
+
 function renderActions() {
   return renderHook(
     () =>
@@ -78,6 +80,7 @@ function renderActions() {
         exportParams: {},
         setConsumeDialogItem: vi.fn(),
         setDeleteReasonItem: vi.fn(),
+        setBulkDeleteIds,
       }),
     {
       wrapper: ({ children }: { children: React.ReactNode }) => (
@@ -206,7 +209,7 @@ describe("useItemsPageActions — the used-up toast leads back to the record", (
   });
 });
 
-describe("useItemsPageActions — the two doors that never ask carry no reason", () => {
+describe("useItemsPageActions — a swipe carries no reason, a bulk delete asks once", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -226,42 +229,53 @@ describe("useItemsPageActions — the two doors that never ask carry no reason",
     expect(variables.itemId).toBe("item-1");
   });
 
-  it("bulk-deletes a selection without naming a reason", async () => {
-    // One confirmation for the whole selection, and it asks how many — not
-    // why. Both doors leave the archive with no reason on file, which the
-    // backend keeps as none instead of inventing "OTHER" for them.
-    const toastSuccess = vi
-      .spyOn(toast, "success")
-      .mockImplementation(() => "");
+  it("hands a selection to the reason dialog instead of deleting it", () => {
     const { result } = renderActions();
 
     act(() => {
       result.current.handleBulkDelete(["item-1", "item-2"]);
     });
-    // The question counts the selection: the singular "this product" over
-    // "Delete 2 selected products?" asked about a different thing.
-    expect(result.current.dialogState.title).toBe(
-      "Delete 2 selected products?",
-    );
-    expect(result.current.dialogState.message).toBe(
-      "The products go to the archive and can be restored.",
-    );
-    await act(async () => {
-      result.current.dialogState.onConfirm();
+
+    expect(setBulkDeleteIds).toHaveBeenCalledWith(["item-1", "item-2"]);
+    expect(mocks.deleteMutateAsync).not.toHaveBeenCalled();
+  });
+
+  it("opens nothing for an empty selection", () => {
+    const { result } = renderActions();
+
+    act(() => {
+      result.current.handleBulkDelete([]);
     });
 
-    expect(mocks.deleteMutateAsync).toHaveBeenCalledTimes(2);
+    expect(setBulkDeleteIds).not.toHaveBeenCalled();
+  });
+
+  it("deletes every row of the batch with the one reason it was given", async () => {
+    const toastSuccess = vi
+      .spyOn(toast, "success")
+      .mockImplementation(() => "");
+    const { result } = renderActions();
+
+    await act(async () => {
+      await result.current.confirmBulkDelete(
+        ["item-1", "item-2"],
+        "EXPIRED",
+        "",
+      );
+    });
+
     const variables = mocks.deleteMutateAsync.mock.calls.map(
-      (call: unknown[]) => (call as [{ itemId: string; reason?: string }])[0],
+      (call: unknown[]) => (call as [unknown])[0],
     );
-    expect(variables).toEqual([{ itemId: "item-1" }, { itemId: "item-2" }]);
+    expect(variables).toEqual([
+      { itemId: "item-1", reason: "EXPIRED", notes: undefined },
+      { itemId: "item-2", reason: "EXPIRED", notes: undefined },
+    ]);
     // A bulk delete names the count, not one product's word for a whole selection.
     expect(toastSuccess).toHaveBeenCalledWith("2 products deleted");
   });
 
   it("hands a refused bulk delete back to the dialog that asked", async () => {
-    // The confirmation shows the reason only if the rejection reaches it;
-    // `showConfirm`'s wrapper passes it on.
     const refusal = new Error("Network Error");
     mocks.deleteMutateAsync.mockRejectedValueOnce(refusal);
     const toastSuccess = vi
@@ -269,26 +283,9 @@ describe("useItemsPageActions — the two doors that never ask carry no reason",
       .mockImplementation(() => "");
     const { result } = renderActions();
 
-    act(() => {
-      result.current.handleBulkDelete(["item-1"]);
-    });
-
-    await expect(result.current.dialogState.onConfirm()).rejects.toBe(refusal);
+    await expect(
+      result.current.confirmBulkDelete(["item-1"], "LOST", "note"),
+    ).rejects.toBe(refusal);
     expect(toastSuccess).not.toHaveBeenCalled();
-  });
-
-  it("bulk-deletes one row in the singular, body included", async () => {
-    // The title already asked about "1 selected product"; the body under it
-    // still said "The products go to the archive".
-    const { result } = renderActions();
-
-    act(() => {
-      result.current.handleBulkDelete(["item-1"]);
-    });
-
-    expect(result.current.dialogState.title).toBe("Delete 1 selected product?");
-    expect(result.current.dialogState.message).toBe(
-      "The product goes to the archive and can be restored.",
-    );
   });
 });

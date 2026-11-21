@@ -13,6 +13,11 @@ import { QueryFailure } from "@/components/ui/QueryResult";
 /** The copyright line of NOTICE; a name and years, not a sentence to translate. */
 const COPYRIGHT = "Copyright © 2026 Jerzy Piątek";
 
+/** The licence is AGPL-3.0 whatever the server says about the version, so its
+ *  link does not wait on that answer; the server's own link replaces it when
+ *  one arrives. */
+const LICENSE_URL = "https://www.gnu.org/licenses/agpl-3.0.html";
+
 const ODBL_URL = "https://opendatacommons.org/licenses/odbl/1-0/";
 
 function OutLink({ href, children }: { href: string; children: ReactNode }) {
@@ -68,11 +73,9 @@ export default function SettingsAboutSection() {
         <CardContent className="space-y-3 text-sm text-on-secondary">
           <p>{t("settings.about.free_software")}</p>
           <p>{t("settings.about.no_warranty")}</p>
-          {info && (
-            <OutLink href={info.license_url}>
-              {t("settings.about.license_link")}
-            </OutLink>
-          )}
+          <OutLink href={info?.license_url ?? LICENSE_URL}>
+            {t("settings.about.license_link")}
+          </OutLink>
         </CardContent>
       </Card>
 

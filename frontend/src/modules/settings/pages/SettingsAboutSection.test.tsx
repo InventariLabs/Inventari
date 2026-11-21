@@ -86,5 +86,10 @@ describe("SettingsAboutSection", () => {
     expect(
       screen.queryByRole("link", { name: /Get the source code/ }),
     ).not.toBeInTheDocument();
+    // The licence does not depend on that call.
+    expect(screen.getByRole("link", { name: /licen[cs]e/i })).toHaveAttribute(
+      "href",
+      "https://www.gnu.org/licenses/agpl-3.0.html",
+    );
   });
 });

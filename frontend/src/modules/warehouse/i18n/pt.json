@@ -960,6 +960,7 @@
     "type_pl_pz": "PL PZ (polonês)",
     "type_packing_slip": "Romaneio de embalagem",
     "type_pick_list": "Lista de separação",
+    "builtInNote": "Um modelo substitui o layout integrado apenas onde é o padrão de um tipo de documento, ou o layout de impressão escolhido nas configurações de documentos. Os demais documentos continuam sendo impressos com o layout integrado.",
     "builtInPreviewTitle": "Layout integrado",
     "builtInPreviewAction": "Ver os layouts integrados",
     "placeholders": {

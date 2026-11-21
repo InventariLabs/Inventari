@@ -1027,6 +1027,7 @@
       "scan_failed": "Nie udało się zapisać skanu.",
       "short_pick_failed": "Nie udało się zapisać pobranej ilości.",
       "skip_failed": "Nie udało się pominąć linii.",
+      "skip_failed_named": "Nie udało się pominąć: {{product}}.",
       "undo_failed": "Nie udało się cofnąć linii.",
       "complete_failed": "Nie udało się zakończyć sesji kompletacji.",
       "cancel_failed": "Nie udało się anulować sesji kompletacji.",
@@ -1071,6 +1072,7 @@
     "type_pl_pz": "PL PZ (Polski)",
     "type_packing_slip": "List pakowy",
     "type_pick_list": "Lista kompletacji",
+    "builtInNote": "Szablon zastępuje wbudowany układ tylko tam, gdzie jest domyślny dla typu dokumentu albo jest układem wydruku wybranym w ustawieniach dokumentów. Pozostałe dokumenty nadal drukują się we wbudowanym układzie.",
     "builtInPreviewTitle": "Wbudowany układ",
     "builtInPreviewAction": "Zobacz wbudowane układy",
     "placeholders": {
@@ -1562,6 +1564,7 @@
       "scan_failed": "Nie udało się zapisać skanu.",
       "short_receive_failed": "Nie udało się zapisać otrzymanej ilości.",
       "skip_failed": "Nie udało się pominąć linii.",
+      "skip_failed_named": "Nie udało się pominąć: {{product}}.",
       "undo_failed": "Nie udało się cofnąć linii.",
       "complete_failed": "Nie udało się zakończyć sesji przyjęcia.",
       "cancel_failed": "Nie udało się anulować sesji przyjęcia.",

@@ -155,6 +155,7 @@
     "createFailed": "No se pudo crear el inventario",
     "deleteFailed": "No se pudo eliminar el inventario",
     "saveFailed": "No se pudo guardar el recuento",
+    "saveFailedFor": "No se pudo guardar el recuento de {{name}}",
     "addItemFailed": "No se pudo añadir el artículo",
     "completeFailed": "No se pudo completar el inventario",
     "cancelFailed": "No se pudo cancelar el inventario",

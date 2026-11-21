@@ -937,6 +937,7 @@
       "scan_failed": "No se pudo registrar el escaneo.",
       "short_pick_failed": "No se pudo registrar la cantidad recogida.",
       "skip_failed": "No se pudo omitir la línea.",
+      "skip_failed_named": "No se pudo omitir {{product}}.",
       "undo_failed": "No se pudo revertir la línea.",
       "complete_failed": "No se pudo completar la sesión de picking.",
       "cancel_failed": "No se pudo cancelar la sesión de picking.",
@@ -981,6 +982,7 @@
     "type_pl_pz": "PL PZ (Polaco)",
     "type_packing_slip": "Lista de embalaje",
     "type_pick_list": "Lista de picking",
+    "builtInNote": "Una plantilla sustituye el diseño integrado solo donde es la predeterminada de un tipo de documento, o el diseño de impresión elegido en los ajustes de documentos. Los demás documentos se siguen imprimiendo con el diseño integrado.",
     "builtInPreviewTitle": "Diseño integrado",
     "builtInPreviewAction": "Ver los diseños integrados",
     "placeholders": {
@@ -1442,6 +1444,7 @@
       "scan_failed": "No se pudo registrar el escaneo.",
       "short_receive_failed": "No se pudo registrar la cantidad recibida.",
       "skip_failed": "No se pudo omitir la línea.",
+      "skip_failed_named": "No se pudo omitir {{product}}.",
       "undo_failed": "No se pudo revertir la línea.",
       "complete_failed": "No se pudo completar la sesión de recepción.",
       "cancel_failed": "No se pudo cancelar la sesión de recepción.",

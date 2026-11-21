@@ -74,6 +74,7 @@ function renderActions(
         exportParams: { search: "fl" },
         setConsumeDialogItem,
         setDeleteReasonItem,
+        setBulkDeleteIds: vi.fn(),
         ...over,
       }),
     {

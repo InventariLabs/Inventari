@@ -11,6 +11,9 @@ import {
 } from "vitest";
 import { signInWith, signOut } from "@/test/auth";
 import userEvent from "@testing-library/user-event";
+import { http, HttpResponse } from "msw";
+import { server } from "@/test/mocks/server";
+import { onePage } from "@/test/mocks/page";
 import { withLanguage } from "@/test/mocks/i18n";
 import { itemsApi } from "@/lib/api/items";
 import QuickActionSheet from "./QuickActionSheet";
@@ -267,6 +270,29 @@ describe("QuickActionSheet", () => {
 
     expect(screen.queryByRole("button", { name: "Edit" })).toBeNull();
     expect(screen.getByText("Product details")).toBeInTheDocument();
+  });
+
+  it("says why a reader's sheet has so few buttons, and where the stock is", async () => {
+    signInWith(["items:read"]);
+    server.use(
+      http.get("*/locations", () =>
+        HttpResponse.json(
+          onePage([
+            { id: "storage-1", name: "Pantry shelf 2", usage: "internal" },
+          ]),
+        ),
+      ),
+    );
+    render(<QuickActionSheet item={mockItem} onClose={() => {}} />);
+
+    expect(await screen.findByText("Pantry shelf 2")).toBeInTheDocument();
+    expect(screen.getByText(/view this, not change it/i)).toBeInTheDocument();
+  });
+
+  it("adds no read-only sentence for an account that may write", () => {
+    render(<QuickActionSheet item={mockItem} onClose={() => {}} />);
+
+    expect(screen.queryByText(/view this, not change it/i)).toBeNull();
   });
 
   /**

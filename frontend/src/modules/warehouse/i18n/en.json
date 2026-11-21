@@ -937,6 +937,7 @@
       "scan_failed": "Failed to record the scan.",
       "short_pick_failed": "Failed to record the picked quantity.",
       "skip_failed": "Failed to skip the line.",
+      "skip_failed_named": "Failed to skip {{product}}.",
       "undo_failed": "Failed to revert the line.",
       "complete_failed": "Failed to complete the picking session.",
       "cancel_failed": "Failed to cancel the picking session.",
@@ -981,6 +982,7 @@
     "type_pl_pz": "PL PZ (Polish)",
     "type_packing_slip": "Packing slip",
     "type_pick_list": "Pick list",
+    "builtInNote": "A template replaces the built-in layout only where it is the default for a document type, or the print layout chosen in the document settings. Every other document still prints with the built-in layout.",
     "builtInPreviewTitle": "Built-in layout",
     "builtInPreviewAction": "See the built-in layouts",
     "placeholders": {
@@ -1442,6 +1444,7 @@
       "scan_failed": "Failed to record the scan.",
       "short_receive_failed": "Failed to record the received quantity.",
       "skip_failed": "Failed to skip the line.",
+      "skip_failed_named": "Failed to skip {{product}}.",
       "undo_failed": "Failed to revert the line.",
       "complete_failed": "Failed to complete the receiving session.",
       "cancel_failed": "Failed to cancel the receiving session.",

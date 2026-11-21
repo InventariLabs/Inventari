@@ -264,4 +264,19 @@ describe("RolesPage", () => {
       await screen.findByRole("dialog", { name: /create role/i }),
     ).toBeInTheDocument();
   });
+
+  it("does not offer a new role beside a roles list that failed to load", async () => {
+    server.use(
+      http.get("*/roles/permission-catalog", () => HttpResponse.json(CATALOG)),
+      http.get("*/roles", () => HttpResponse.json({}, { status: 500 })),
+    );
+    setHeader.mockClear();
+    renderPage();
+
+    await screen.findByRole("button", { name: /try again/i });
+    const lastHeader = setHeader.mock.calls.at(-1)?.[0] as {
+      actions: { props: { disabled?: boolean } };
+    };
+    expect(lastHeader.actions.props.disabled).toBe(true);
+  });
 });

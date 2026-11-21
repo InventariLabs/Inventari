@@ -1,3 +1,4 @@
+import type { TFunction } from "i18next";
 import { useState, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -166,6 +167,21 @@ function useSavesInFlight(
     return saved;
   };
   return { isSavingCounts: inFlight > 0, trackSave };
+}
+
+/** What a refused count says: the server's own sentence, else a generic one
+ * that names the row, because the toast outlives the card the reader is on. */
+function saveFailureMessage(
+  t: TFunction,
+  error: Error,
+  name: string | undefined,
+): string {
+  return extractApiError(
+    error,
+    name
+      ? t("stock_takes:errors.saveFailedFor", { name })
+      : t("stock_takes:errors.saveFailed"),
+  );
 }
 
 /** The distinct first segments of the rows' shelf codes, sorted — the
@@ -350,7 +366,7 @@ export function useStockTakeCounting(id: string | undefined) {
         [itemId]: countedText(line?.counted_quantity),
       }));
       setNotes((prev) => ({ ...prev, [itemId]: line?.notes ?? "" }));
-      toast.error(extractApiError(error, t("stock_takes:errors.saveFailed")));
+      toast.error(saveFailureMessage(t, error, line?.item_name));
     };
 
     const write = async () => {

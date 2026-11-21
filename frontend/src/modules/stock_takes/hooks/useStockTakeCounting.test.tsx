@@ -8,6 +8,7 @@ import { queryKeys } from "@/hooks/queries/keys";
 import { useFormGuardStore } from "@/store/formGuardStore";
 import { server } from "@/test/mocks/server";
 import { http, HttpResponse } from "msw";
+import { toast } from "sonner";
 import { onePage } from "@/test/mocks/page";
 
 vi.mock("sonner", () => ({
@@ -181,6 +182,34 @@ describe("useStockTakeCounting", () => {
 
     await waitFor(() =>
       expect(result.current.countedQuantities["item-1"]).toBe("2.15"),
+    );
+  });
+
+  it("names the row whose count could not be saved", async () => {
+    server.use(
+      http.get("/api/v1/stock-takes/:id", () =>
+        HttpResponse.json({
+          ...mockStockTake,
+          items: [{ ...mockStockTake.items[0], item_name: "Basmati rice" }],
+        }),
+      ),
+      http.patch("/api/v1/stock-takes/:id/items/:itemId/count", () =>
+        HttpResponse.json({}, { status: 500 }),
+      ),
+    );
+
+    const { result } = await renderLoaded();
+    act(() => {
+      result.current.handleQuantityChange("item-1", "7");
+    });
+    act(() => {
+      result.current.handleSaveItem("item-1");
+    });
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Failed to save the count of Basmati rice",
+      ),
     );
   });
 

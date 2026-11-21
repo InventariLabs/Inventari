@@ -20,7 +20,6 @@ import {
 } from "@/modules/inventory/constants/stockReasons";
 import type { Item, StorageLocationSummary } from "@/types";
 import type { ItemAggregatesParams } from "./useItems";
-import { useConfirmDialog } from "@/hooks/useConfirmDialog";
 
 interface UseItemsPageActionsParams {
   items: Item[];
@@ -30,6 +29,7 @@ interface UseItemsPageActionsParams {
   storages?: StorageLocationSummary[];
   setConsumeDialogItem: (item: Item | null) => void;
   setDeleteReasonItem: (item: Item | null) => void;
+  setBulkDeleteIds: (ids: string[] | null) => void;
 }
 
 /**
@@ -44,10 +44,10 @@ export function useItemsPageActions({
   storages,
   setConsumeDialogItem,
   setDeleteReasonItem,
+  setBulkDeleteIds,
 }: UseItemsPageActionsParams) {
   const { t } = useTranslation(["items", "labels", "common"]);
   const navigate = useNavigate();
-  const { dialogState, showConfirm, closeDialog } = useConfirmDialog();
 
   const deleteItemMutation = useDeleteItem();
   const deleteMutation = useMemo(
@@ -219,33 +219,32 @@ export function useItemsPageActions({
     [deleteMutation],
   );
 
-  /** Deleting a whole selection: one confirmation, then the same per-item
-   * delete the row action uses. */
+  /** Deleting a whole selection asks why once, for the batch, in the dialog
+   * the single delete uses: every archived row then carries the reason it was
+   * given instead of none. */
   const handleBulkDelete = useCallback(
-    (ids: string[], onDone?: () => void) => {
-      if (ids.length === 0) return;
-      showConfirm({
-        // The question carries the number: a singular "this product" over
-        // "Delete 4 selected products?" asked about a different thing than
-        // the one the button was about to do. The body carries it too, so it
-        // agrees with the title when one row is selected.
-        title: t("items:messages.confirmBulkDelete", { count: ids.length }),
-        message: t("items:messages.confirmBulkDeleteBody", {
-          count: ids.length,
-        }),
-        confirmText: t("actions.delete"),
-        cancelText: t("actions.cancel"),
-        variant: "danger",
-        onConfirm: async () => {
-          await Promise.all(
-            ids.map((itemId) => deleteItemMutation.mutateAsync({ itemId })),
-          );
-          toast.success(t("items:messages.itemDeleted", { count: ids.length }));
-          onDone?.();
-        },
-      });
+    (ids: string[]) => {
+      if (ids.length > 0) setBulkDeleteIds(ids);
     },
-    [showConfirm, t, deleteItemMutation],
+    [setBulkDeleteIds],
+  );
+
+  /** The batch's delete, run once the reason is chosen. A refusal propagates,
+   * so the dialog stays up with the reason and note as typed. */
+  const confirmBulkDelete = useCallback(
+    async (ids: string[], reason: string, notes: string) => {
+      await Promise.all(
+        ids.map((itemId) =>
+          deleteItemMutation.mutateAsync({
+            itemId,
+            reason,
+            notes: notes || undefined,
+          }),
+        ),
+      );
+      toast.success(t("items:messages.itemDeleted", { count: ids.length }));
+    },
+    [t, deleteItemMutation],
   );
 
   const updateQuantityMutation = useUpdateItemQuantity();
@@ -299,9 +298,6 @@ export function useItemsPageActions({
   }, [storageFilter, storages, t]);
 
   return {
-    dialogState,
-    showConfirm,
-    closeDialog,
     deleteMutation,
     consumeMutation,
     handleConsume,
@@ -309,6 +305,7 @@ export function useItemsPageActions({
     handleDelete,
     handleSwipeDelete,
     handleBulkDelete,
+    confirmBulkDelete,
     handleExport,
   };
 }
