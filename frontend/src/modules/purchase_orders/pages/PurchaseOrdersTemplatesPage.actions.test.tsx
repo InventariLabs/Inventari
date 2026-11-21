@@ -96,7 +96,7 @@ describe("PurchaseOrdersTemplatesPage — editing, deleting and seeding", () => 
     await user.click(
       await within(
         screen.getByRole("banner", { name: "Page header" }),
-      ).findByRole("button", { name: "Add Template" }),
+      ).findByRole("button", { name: "Add template" }),
     );
     const editor = screen.getByRole("dialog", { name: "Template editor" });
     expect(editor).toHaveTextContent("new template");

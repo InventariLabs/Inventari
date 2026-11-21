@@ -12,7 +12,14 @@ import { withoutComments } from "./lib.mjs";
  *
  * It has now been found three times — the shell modules first (with
  * the `useCanWrite` hook written for them), equipment's template screen
- * second, documents third — and each time it was fixed page by page.
+ * second, documents third — and each time it was fixed page by page. The
+ * 2026-11 QA round met it again, the widest time yet: the production run's
+ * Edit / Start / Complete / Duplicate, the approvals Approve and Reject, the
+ * equipment templates' copy and add, the product sheet's photo tile and
+ * settings link, the Documents empty state's three steps, and a read-only
+ * notice that named a module without asking whether the account could read
+ * it. Those screens are the ones this rule now reads, page and component
+ * alike.
  * The class is the same every time: a page reaches for a mutation and nothing
  * anywhere in it names a permission.
  *
@@ -324,7 +331,6 @@ function publicPages(files) {
     ),
   );
 }
-
 
 /**
  * The controls of a component that hand the click to the page above it.

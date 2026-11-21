@@ -560,7 +560,7 @@
       "product_template": "",
       "category": "catégorie",
       "context_tag": "attribut",
-      "location_type": "type d’emplacement"
+      "location_type": "Facultatif — choisir un type"
     },
     "executionSubmit": "Confirmer et terminer",
     "executionInvalidQuantity": "Saisissez une quantité exécutée valide pour chaque ligne.",
@@ -738,6 +738,8 @@
     "confirmCloseMessage": "Les documents datés de {{month}} {{year}} ne pourront plus être créés ni modifiés. La période pourra être rouverte plus tard.",
     "confirmReopen": "Rouvrir cette période ?",
     "confirmReopenMessage": "{{month}} {{year}} acceptera de nouveau des documents.",
+    "closeAction": "Clôturer la période",
+    "reopenAction": "Rouvrir la période",
     "closeSuccess": "Période clôturée",
     "current": "En cours",
     "notStarted": "Pas encore commencée",
@@ -1065,19 +1067,19 @@
       "product_template": "Facultatif — choisir un produit",
       "category": "Facultatif — sélectionnez une catégorie",
       "context_tag": "Facultatif — choisir un groupe de catégories",
-      "location_type": "Facultatif — choisir un type d'emplacement",
+      "location_type": "Facultatif — choisir un type",
       "target_location": "Sélectionner l'emplacement cible"
     },
     "match": {
       "section": "Conditions de correspondance",
-      "any_hint": "La règle s'applique dès qu'une des conditions est remplie — pas seulement si toutes le sont.",
+      "any_hint": "La règle s'applique dès qu'une des conditions est remplie ; il n'en faut pas toutes.",
       "summary_prefix": "Cette règle s'applique quand :",
       "or": "ou",
       "specificity": "Si plusieurs correspondent, la plus spécifique l'emporte : {{winner}}."
     },
     "hints": {
       "priority": "Nombre inférieur = priorité plus élevée",
-      "priority_scope": "La priorité ne départage que les règles de même spécificité.",
+      "priority_scope": "La priorité ne départage que les règles qui correspondent avec la même spécificité.",
       "location_order": "La marchandise va à la première étagère où elle tient ; les étagères pleines passent la ligne à la suivante."
     },
     "actions": {
@@ -1184,6 +1186,8 @@
         "mixingHint": "Cela décide si le rangement peut ajouter un second produit ici.",
         "mixedDescription": "Le rangement peut placer plusieurs produits dans cet emplacement.",
         "singleDescription": "Dès qu’un produit est ici, le rangement en écarte les autres.",
+        "singleCrowded_one": "{{count}} produit est déjà ici. Ils restent ; seul le rangement du neuf se limite à un.",
+        "singleCrowded_other": "{{count}} produits sont déjà ici. Ils restent ; seul le rangement du neuf se limite à un.",
         "limits": "Limites par produit",
         "limitsHint": "Une limite s’applique à un produit, dans sa propre unité. Un produit sans limite est illimité.",
         "product": "1. Produit",
@@ -1216,6 +1220,7 @@
         "renumberConfirm": "Chaque emplacement reçoit le code de sa place dans l'arbre. Les anciennes étiquettes se scannent jusqu'à leur remplacement ; celles qui changent sont listées pour l'impression.",
         "renumbered_one": "{{count}} code modifié",
         "renumbered_other": "{{count}} codes modifiés",
+        "renumberedNone": "Chaque code correspond déjà au modèle — rien à réimprimer.",
         "renumberFailed": "Impossible de renuméroter les emplacements",
         "numbered_one": "{{count}} emplacement a reçu son code d'étagère",
         "numbered_other": "{{count}} emplacements ont reçu leurs codes d'étagère",
@@ -1561,9 +1566,9 @@
   },
   "settings": {
     "overReceiptTolerance": "Tolérance de sur-réception (%)",
-    "overReceiptToleranceDescription": "De combien au-delà de la quantité attendue — ou de ce qui reste sur une ligne de commande — une réception peut aller sans l'autorisation de recevoir au-delà de la tolérance. 0 % n'autorise aucun excédent.",
+    "overReceiptToleranceDescription": "Jusqu'où une réception peut dépasser la quantité attendue — ou le reste d'une ligne de commande — sans la permission de recevoir au-delà de la tolérance. 0 signifie aucune tolérance : chaque surplus exige la permission.",
     "overReceiptCeiling": "Plafond de sur-réception (%)",
-    "overReceiptCeilingDescription": "De combien au-delà de la quantité attendue — ou de ce qui reste sur une ligne de commande — personne ne peut recevoir, pas même une personne autorisée à recevoir au-delà de la tolérance. 0 % ne fixe aucun plafond.",
+    "overReceiptCeilingDescription": "Jusqu'où, au-delà de la même quantité, personne ne peut recevoir, pas même qui peut recevoir au-delà de la tolérance. 0 signifie aucun plafond. Un plafond défini ne peut pas être inférieur à la tolérance.",
     "scanSessionIdleMinutes": "Libérer une session de scan inactive après (minutes)",
     "scanSessionIdleMinutesDescription": "Une session de préparation ou de réception dans laquelle personne n'a scanné depuis ce délai ne bloque plus son document : ce qui a été scanné est conservé, et n'importe qui peut la poursuivre ou terminer le document.",
     "moduleTitle": "Configuration",
@@ -1714,6 +1719,7 @@
         "change": "{{product}} va d'habitude ailleurs. Faire de {{location}} son emplacement habituel ?"
       },
       "yes": "Oui, en faire l'emplacement habituel",
+      "done": "{{location}} est maintenant l'emplacement de {{product}} ; la règle est dans les règles de rangement.",
       "no": "Non",
       "dontAsk": "Ne plus demander pour {{product}}",
       "refused": {
@@ -2033,6 +2039,8 @@
       "withLimit_other": "{{count}} avec limite",
       "full_one": "{{count}} pleins",
       "full_other": "{{count}} pleins",
+      "over_one": "{{count}} au-dessus de la limite",
+      "over_other": "{{count}} au-dessus de la limite",
       "empty_one": "{{count}} vides",
       "empty_other": "{{count}} vides"
     },

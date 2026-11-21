@@ -246,4 +246,23 @@ describe("InventoryPeriodPanel", () => {
     ).toBeGreaterThan(0);
     expect(screen.getByLabelText("Year")).toBeInTheDocument();
   });
+
+  it("tells a read-only account it can view the closures, not change them", () => {
+    signInWith(["warehouse:read"]);
+    render(<InventoryPeriodPanel />);
+
+    expect(screen.getByRole("note")).toHaveTextContent(
+      "You can view this, not change it",
+    );
+    expect(screen.getByRole("note")).not.toHaveTextContent(/reconfigure/);
+  });
+
+  it("tells an account that writes but may not close periods to ask a manager", () => {
+    signInWith(["warehouse:read", "warehouse:write"]);
+    render(<InventoryPeriodPanel />);
+
+    expect(screen.getByRole("note")).toHaveTextContent(
+      /You can use this, not reconfigure it/,
+    );
+  });
 });

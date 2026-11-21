@@ -341,6 +341,7 @@ export default function ReorderRulesPage() {
           alerts={alerts}
           locationName={locationName}
           canWrite={canWrite}
+          rules={rules}
         />
       )}
 

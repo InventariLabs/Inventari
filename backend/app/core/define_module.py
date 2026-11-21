@@ -114,6 +114,7 @@ class _ModuleSpec:
     on_uninstall_hook: Callable[[ModuleContext], None] | None = None
     on_upgrade_hook: Callable[[str, ModuleContext], None] | None = None
     settings_schema: dict[str, Any] | None = None
+    settings_check: Callable[[dict[str, Any]], None] | None = None
     default_settings: dict[str, Any] | None = None
 
 
@@ -218,6 +219,10 @@ class _DeclarativeModule(BaseModule):
     def get_settings_schema(self) -> dict[str, object] | None:
         return self._spec.settings_schema
 
+    def check_settings(self, settings: dict[str, Any]) -> None:
+        if self._spec.settings_check is not None:
+            self._spec.settings_check(settings)
+
     def get_default_settings(self) -> dict[str, object]:
         return dict(self._spec.default_settings or {})
 
@@ -241,6 +246,7 @@ def define_module(
     consumes_stock_quant: bool = False,
     settings_schema: dict[str, Any] | None = None,
     default_settings: dict[str, Any] | None = None,
+    settings_check: Callable[[dict[str, Any]], None] | None = None,
 ) -> BaseModule:
     """Create a ``BaseModule`` instance declaratively.
 
@@ -296,6 +302,12 @@ def define_module(
     default_settings:
         Optional ``get_default_settings()`` values applied when the org has not
         overridden them.
+    settings_check:
+        Optional ``check_settings(settings)`` override: refuses a combination
+        of saved settings that the schema, which judges one value at a time,
+        cannot (a tolerance above the ceiling it is measured against). Called
+        on every write with the settings as they would stand, defaults filled;
+        it raises ``ServiceRejectionError``.
     """
     if router is None and router_factory is None:
         raise OperatorError('Either router or router_factory must be provided')
@@ -329,6 +341,7 @@ def define_module(
             on_uninstall_hook=on_uninstall_hook,
             on_upgrade_hook=on_upgrade_hook,
             settings_schema=settings_schema,
+            settings_check=settings_check,
             default_settings=default_settings,
         )
     )

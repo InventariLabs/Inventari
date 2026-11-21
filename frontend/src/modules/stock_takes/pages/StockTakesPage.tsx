@@ -6,9 +6,6 @@ import {
   Plus,
   Package,
   AlertCircle,
-  CheckCircle,
-  Clock,
-  XCircle,
   ChevronRight,
   ClipboardCheck,
   Trash2,
@@ -171,17 +168,14 @@ export default function StockTakesPage() {
             {
               value: "in_progress",
               label: tDyn("statusFilters.in_progress"),
-              icon: <Clock size={14} />,
             },
             {
               value: "completed",
               label: tDyn("statusFilters.completed"),
-              icon: <CheckCircle size={14} />,
             },
             {
               value: "cancelled",
               label: tDyn("statusFilters.cancelled"),
-              icon: <XCircle size={14} />,
             },
           ],
         }}

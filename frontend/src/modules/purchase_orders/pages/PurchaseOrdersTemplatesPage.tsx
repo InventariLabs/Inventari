@@ -61,6 +61,11 @@ const PLACEHOLDER_DESCRIPTIONS = [
   },
   { key: "{{qr_img}}", descriptionKey: "templates.placeholders.qr_img" },
   { key: "{{currency}}", descriptionKey: "templates.placeholders.currency" },
+  { key: "{{lang}}", descriptionKey: "templates.placeholders.lang" },
+  {
+    key: "{{labels.footer}}",
+    descriptionKey: "templates.placeholders.labels_footer",
+  },
 ];
 
 export default function PurchaseOrdersTemplatesPage() {
@@ -104,7 +109,7 @@ export default function PurchaseOrdersTemplatesPage() {
               setEditorOpen(true);
             }}
           >
-            {t("common:templates.add", "Add Template")}
+            {t("common:templates.add", "Add template")}
           </Button>
         ) : undefined,
     });
@@ -181,6 +186,7 @@ export default function PurchaseOrdersTemplatesPage() {
       {editorOpen && (
         <TemplateEditorModal
           module="purchase-orders"
+          previewSupported
           template={editingTemplate}
           documentTypes={DOCUMENT_TYPES.map((dt) => ({
             value: dt.value,

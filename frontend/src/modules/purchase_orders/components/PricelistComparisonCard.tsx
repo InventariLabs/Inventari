@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useMoney } from "@/hooks/useMoney";
 import { formatDate } from "@/utils/formatters";
+import { unitLabel } from "@/lib/i18nHelpers";
 import { Card, CardContent } from "@/components/ui/Card";
 import { ProductCombobox } from "@/components/ui/ProductCombobox";
 import type { CatalogueSearchResult } from "@/modules/warehouse/moduleApi";
@@ -99,6 +100,12 @@ export function PricelistComparisonCard({
                       </td>
                       <td className="px-4 py-2 font-medium">
                         {money(entry.unit_price, entry.currency)}
+                        {entry.uom_symbol && (
+                          <span className="text-xs font-normal text-on-muted">
+                            {" / "}
+                            {unitLabel(t, entry.uom_symbol)}
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-2 text-on-secondary">
                         {formatDate(entry.valid_from)}

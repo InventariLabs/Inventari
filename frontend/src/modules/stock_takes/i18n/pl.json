@@ -96,7 +96,8 @@
     "placeholder": "Szukaj produktu po nazwie lub kodzie…",
     "here": "W tej inwentaryzacji",
     "elsewhere": "W innych miejscach organizacji",
-    "failed": "Wyszukiwanie się nie powiodło, więc nic tu nie widać. Spróbuj ponownie."
+    "failed": "Wyszukiwanie się nie powiodło, więc nic tu nie widać. Spróbuj ponownie.",
+    "noMatch": "Nic nie pasuje do „{{query}}”. Sprawdź kod lub nazwę albo dodaj nowy produkt poniżej."
   },
   "item": {
     "barcode": "Kod",
@@ -107,7 +108,7 @@
     "increaseCount": "O jeden więcej: {{name}}",
     "saveCount": "Zapisz policzoną ilość: {{name}}",
     "countFor": "Policzona ilość: {{name}}",
-    "countMalformed": "To nie jest liczba. Wpisz cyfry z jednym separatorem dziesiętnym, na przykład 12 lub 1,5.",
+    "countMalformed": "Ilość to zero lub więcej: cyfry z jednym separatorem dziesiętnym, na przykład 12 lub 1,5.",
     "unsaved": "Niezapisane",
     "unsavedNeedsCount": "Niezapisane — wpisz liczbę, aby zapisać",
     "awaitingRecount": "Do przeliczenia",
@@ -142,7 +143,8 @@
     "cancel": {
       "title": "Anuluj inwentaryzację",
       "message": "Czy na pewno chcesz anulować tę inwentaryzację? Wszystkie dane zostaną utracone.",
-      "confirmLabel": "Anuluj inwentaryzację"
+      "confirmLabel": "Anuluj inwentaryzację",
+      "cancelLabel": "Kontynuuj inwentaryzację"
     },
     "overCap": {
       "title": "Policzono znacznie więcej, niż jest w systemie",

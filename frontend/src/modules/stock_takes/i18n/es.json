@@ -90,7 +90,8 @@
     "placeholder": "Buscar artículo por nombre o código de barras…",
     "here": "En este inventario",
     "elsewhere": "En otros lugares de la organización",
-    "failed": "La búsqueda ha fallado, por eso no aparece nada aquí. Inténtalo de nuevo."
+    "failed": "La búsqueda ha fallado, por eso no aparece nada aquí. Inténtalo de nuevo.",
+    "noMatch": "Nada coincide con «{{query}}». Revise el código o el nombre, o añada un producto nuevo abajo."
   },
   "item": {
     "barcode": "Código de barras",
@@ -101,7 +102,7 @@
     "increaseCount": "Uno más: {{name}}",
     "saveCount": "Guardar el recuento: {{name}}",
     "countFor": "Cantidad contada: {{name}}",
-    "countMalformed": "Eso no es un número. Escribe cifras con un solo separador decimal, por ejemplo 12 o 1,5.",
+    "countMalformed": "Una cantidad contada es cero o más: cifras con un solo separador decimal, por ejemplo 12 o 1,5.",
     "unsaved": "Sin guardar",
     "unsavedNeedsCount": "Sin guardar — escriba una cantidad para guardar",
     "awaitingRecount": "Volver a contar",
@@ -132,7 +133,8 @@
     "cancel": {
       "title": "Cancelar inventario",
       "message": "¿Está seguro de que desea cancelar este inventario? Todos los datos se perderán.",
-      "confirmLabel": "Cancelar inventario"
+      "confirmLabel": "Cancelar inventario",
+      "cancelLabel": "Seguir con el inventario"
     },
     "overCap": {
       "title": "Se contó mucho más de lo que hay en el sistema",

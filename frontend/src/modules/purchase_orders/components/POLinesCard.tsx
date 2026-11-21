@@ -165,7 +165,10 @@ function LinesTable({
                   </span>{" "}
                   <span className="text-xs text-on-secondary">
                     {unitLabel(t, line.uom_symbol) ||
-                      t("units", { ns: "purchase_orders" })}
+                      t("units", {
+                        ns: "purchase_orders",
+                        count: Number(line.quantity_ordered),
+                      })}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums whitespace-nowrap">
@@ -234,7 +237,10 @@ function LinesList({
                   <span>{formatQuantityValue(line.quantity_ordered)}</span>{" "}
                   <span>
                     {unitLabel(t, line.uom_symbol) ||
-                      t("units", { ns: "purchase_orders" })}
+                      t("units", {
+                        ns: "purchase_orders",
+                        count: Number(line.quantity_ordered),
+                      })}
                   </span>
                   {line.unit_price && (
                     <> &times; {money(Number(line.unit_price))}</>

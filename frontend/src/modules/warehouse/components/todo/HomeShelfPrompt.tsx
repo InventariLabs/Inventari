@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import type { TFunction } from "i18next";
 import { Button } from "@/components/ui/Button";
 import {
@@ -109,7 +110,14 @@ export function HomeShelfPrompt({
                       productTemplateId: offer.product_template_id,
                       locationId: offer.location_id,
                     },
-                    { onSuccess: onDone },
+                    {
+                      onSuccess: () => {
+                        // The rule is written behind the sheet; saying so
+                        // keeps the worker from wondering whether it took.
+                        toast.success(t("todo.homeShelf.done", params));
+                        onDone();
+                      },
+                    },
                   )
                 }
               >

@@ -90,7 +90,8 @@
     "placeholder": "Rechercher un article par nom ou code-barres…",
     "here": "Dans cet inventaire",
     "elsewhere": "Ailleurs dans l’organisation",
-    "failed": "La recherche a échoué, rien n’est donc affiché ici. Réessayez."
+    "failed": "La recherche a échoué, rien n’est donc affiché ici. Réessayez.",
+    "noMatch": "Rien ne correspond à « {{query}} ». Vérifiez le code ou le nom, ou ajoutez un nouveau produit ci-dessous."
   },
   "item": {
     "barcode": "Code-barres",
@@ -101,7 +102,7 @@
     "increaseCount": "Un de plus : {{name}}",
     "saveCount": "Enregistrer le comptage : {{name}}",
     "countFor": "Quantité comptée : {{name}}",
-    "countMalformed": "Ce n'est pas un nombre. Saisissez des chiffres avec un seul séparateur décimal, par exemple 12 ou 1,5.",
+    "countMalformed": "Une quantité comptée est de zéro ou plus : des chiffres avec un seul séparateur décimal, par exemple 12 ou 1,5.",
     "unsaved": "Non enregistré",
     "unsavedNeedsCount": "Non enregistré — saisissez une quantité pour enregistrer",
     "awaitingRecount": "À recompter",
@@ -132,7 +133,8 @@
     "cancel": {
       "title": "Annuler l'inventaire",
       "message": "Voulez-vous vraiment annuler cet inventaire ? Toutes les données seront perdues.",
-      "confirmLabel": "Annuler l'inventaire"
+      "confirmLabel": "Annuler l'inventaire",
+      "cancelLabel": "Continuer l'inventaire"
     },
     "overCap": {
       "title": "Quantité comptée bien supérieure au système",

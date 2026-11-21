@@ -180,7 +180,8 @@
     "cancelConfirm": {
       "title": "¿Cancelar la orden?",
       "description": "Cancelar marca el borrador como cancelado. Sin movimientos de stock.",
-      "confirm": "Sí, cancelar"
+      "confirm": "Sí, cancelar",
+      "keep": "Conservar la orden"
     },
     "reverseConfirm": {
       "title": "¿Deshacer esta producción?",

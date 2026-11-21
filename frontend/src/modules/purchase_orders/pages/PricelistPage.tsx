@@ -135,7 +135,7 @@ export default function PricelistPage() {
         barcode: null,
         brand: null,
         uom_id: entry.uom_id,
-        uom_symbol: null,
+        uom_symbol: entry.uom_symbol ?? null,
         image_url: null,
         is_stub: false,
       },

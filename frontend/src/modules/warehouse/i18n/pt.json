@@ -556,7 +556,7 @@
       "product_template": "",
       "category": "categoria",
       "context_tag": "tag",
-      "location_type": "tipo de local"
+      "location_type": "Opcional — escolher um tipo"
     },
     "executionSubmit": "Confirmar e concluir",
     "executionInvalidQuantity": "Informe uma quantidade executada válida para cada linha.",
@@ -727,6 +727,8 @@
     "confirmCloseMessage": "Documentos com data em {{month}} de {{year}} não poderão mais ser criados nem editados. Você pode reabrir o período depois.",
     "confirmReopen": "Reabrir este período?",
     "confirmReopenMessage": "{{month}} de {{year}} voltará a aceitar documentos.",
+    "closeAction": "Fechar período",
+    "reopenAction": "Reabrir período",
     "closeSuccess": "Período fechado",
     "current": "Atual",
     "notStarted": "Ainda não iniciado",
@@ -1044,19 +1046,19 @@
       "product_template": "Opcional — selecione o produto",
       "category": "Opcional — selecione a categoria",
       "context_tag": "Opcional — selecione o grupo de categorias",
-      "location_type": "Opcional — selecione o tipo de local",
+      "location_type": "Opcional — escolher um tipo",
       "target_location": "Selecione o local de destino"
     },
     "match": {
       "section": "Condições de correspondência",
-      "any_hint": "A regra é aplicada quando qualquer uma destas corresponde — não quando todas correspondem.",
+      "any_hint": "A regra se aplica quando qualquer uma destas corresponde; não são necessárias todas.",
       "summary_prefix": "Esta regra é aplicada quando:",
       "or": "ou",
       "specificity": "Se mais de uma corresponder, vence a mais específica: {{winner}}."
     },
     "hints": {
       "priority": "Número menor = prioridade maior",
-      "priority_scope": "A prioridade só decide entre regras da mesma especificidade.",
+      "priority_scope": "A prioridade só desempata regras que correspondem com a mesma especificidade.",
       "location_order": "As mercadorias vão para a primeira prateleira em que couberem; prateleiras cheias passam a linha para a seguinte."
     },
     "actions": {
@@ -1163,6 +1165,8 @@
         "mixingHint": "Isto decide se a armazenagem pode adicionar um segundo produto aqui.",
         "mixedDescription": "A armazenagem pode colocar vários produtos neste local.",
         "singleDescription": "Quando um produto está aqui, a armazenagem mantém os outros de fora.",
+        "singleCrowded_one": "Já há {{count}} produto aqui. Eles ficam; só a arrumação nova se limita a um.",
+        "singleCrowded_other": "Já há {{count}} produtos aqui. Eles ficam; só a arrumação nova se limita a um.",
         "limits": "Limites por produto",
         "limitsHint": "Um limite é por produto, na unidade própria do produto. Um produto sem limite é ilimitado.",
         "product": "1. Produto",
@@ -1195,6 +1199,7 @@
         "renumberConfirm": "Cada local recebe o código que a sua posição na árvore determina. As etiquetas antigas continuam sendo lidas até serem substituídas; as que mudaram são listadas para impressão.",
         "renumbered_one": "{{count}} código alterado",
         "renumbered_other": "{{count}} códigos alterados",
+        "renumberedNone": "Todos os códigos já correspondem ao modelo — nada a reimprimir.",
         "renumberFailed": "Não foi possível renumerar os locais",
         "numbered_one": "{{count}} local recebeu o código do modelo",
         "numbered_other": "{{count}} locais receberam os códigos do modelo",
@@ -1522,9 +1527,9 @@
   },
   "settings": {
     "overReceiptTolerance": "Tolerância de recebimento excedente (%)",
-    "overReceiptToleranceDescription": "Até onde, além da quantidade esperada — ou do que resta em uma linha do pedido — um recebimento pode ir sem a permissão de receber acima da tolerância. 0% não permite nenhum excedente além dela.",
+    "overReceiptToleranceDescription": "Quanto um recebimento pode passar da quantidade esperada — ou do que resta numa linha do pedido — sem a permissão de receber acima da tolerância. 0 significa sem tolerância: todo excedente exige a permissão.",
     "overReceiptCeiling": "Teto de recebimento excedente (%)",
-    "overReceiptCeilingDescription": "Até onde, além da quantidade esperada — ou do que resta em uma linha do pedido — ninguém pode receber, nem mesmo quem pode receber acima da tolerância. 0% não define teto.",
+    "overReceiptCeilingDescription": "Quanto acima da mesma quantidade ninguém pode receber, nem quem pode receber acima da tolerância. 0 significa sem limite. Um limite definido não pode ser inferior à tolerância.",
     "scanSessionIdleMinutes": "Liberar uma sessão de escaneamento parada após (minutos)",
     "scanSessionIdleMinutesDescription": "Uma sessão de separação ou recebimento em que ninguém escaneia há esse tempo deixa de reter o documento: o que foi escaneado é mantido, e qualquer pessoa pode continuar ou concluir o documento.",
     "moduleTitle": "Configuração",
@@ -1974,6 +1979,8 @@
       "withLimit_other": "{{count}} com limite",
       "full_one": "{{count}} cheio",
       "full_other": "{{count}} cheios",
+      "over_one": "{{count}} acima do limite",
+      "over_other": "{{count}} acima do limite",
       "empty_one": "{{count}} vazio",
       "empty_other": "{{count}} vazios"
     },
