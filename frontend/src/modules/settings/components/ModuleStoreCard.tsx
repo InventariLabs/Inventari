@@ -296,6 +296,10 @@ export default function ModuleStoreCard({
     moduleRegistry.getModule(module.name)?.launcher?.color ?? "bg-primary-500";
   const isAlwaysOn = module.is_always_on === true;
   const hasOverrides = moduleRegistry.hasOverrides(module.name);
+  const displayName = t(`modules.${module.name}.name`, {
+    ns: "modules",
+    defaultValue: module.display_name,
+  });
 
   return (
     // `h-full` plus a column layout: the grid stretches every card to the
@@ -420,15 +424,11 @@ export default function ModuleStoreCard({
             size="sm"
             isLoading={isBusy}
             onClick={onToggle}
-            aria-label={t(
-              isEnabled ? "appStore.deactivateNamed" : "appStore.activateNamed",
-              {
-                name: t(`modules.${module.name}.name`, {
-                  ns: "modules",
-                  defaultValue: module.display_name,
-                }),
-              },
-            )}
+            aria-label={
+              isEnabled
+                ? t("appStore.deactivateNamed", { name: displayName })
+                : t("appStore.activateNamed", { name: displayName })
+            }
           >
             {isEnabled ? t("appStore.deactivate") : t("appStore.activate")}
           </Button>
