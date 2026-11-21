@@ -99,14 +99,18 @@ class StockLot(Base):
         a state the batch has since left. A stale explanation beside a
         current status is worse than none.
         """
-        history = (self.meta_data or {}).get('status_history') or []
-        if not history:
-            return None
-        last = history[-1]
-        if not isinstance(last, dict) or last.get('status') != self.status:
-            return None
-        reason = last.get('reason')
-        return reason if isinstance(reason, str) else None
+        meta = self.meta_data or {}
+        history = meta.get('status_history') or []
+        last = history[-1] if history else None
+        if isinstance(last, dict) and last.get('status') == self.status:
+            reason = last.get('reason')
+            return reason if isinstance(reason, str) else None
+        # A quarantine placed through the module path leaves its reason in
+        # ``meta_data['quarantine']`` and no history entry.
+        if self.status == LotStatus.QUARANTINED:
+            reason = (meta.get('quarantine') or {}).get('reason')
+            return reason if isinstance(reason, str) else None
+        return None
 
     __table_args__ = (
         UniqueConstraint(

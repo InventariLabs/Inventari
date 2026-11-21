@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft, ChevronRight, Factory } from "lucide-react";
+import { ChevronLeft, ChevronRight, Factory, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -11,6 +12,7 @@ import { formatDateRange } from "@/utils/formatters";
 import { NeedsTable } from "@/modules/maker/components/NeedsTable";
 import { OrderMissingButton } from "@/modules/maker/components/OrderMissingButton";
 import { PlanCalendar } from "@/modules/maker/components/PlanCalendar";
+import { ProductionCreateSheet } from "@/modules/maker/components/ProductionCreateSheet";
 import { useProductionOrders } from "@/modules/maker/hooks/useProduction";
 import {
   useNeeds,
@@ -32,6 +34,8 @@ export default function ProductionPlanPage() {
   const { t } = useTranslation("maker");
   const { setHeader } = useModulePageHeader();
   const canWrite = useCanWrite("maker");
+  const navigate = useNavigate();
+  const [showCreate, setShowCreate] = useState(false);
   const [view, setView] = useState<PlanView>("week");
   const [anchor, setAnchor] = useState(() => new Date());
   const period = useMemo(() => planPeriod(view, anchor), [view, anchor]);
@@ -158,6 +162,17 @@ export default function ProductionPlanPage() {
             icon={Factory}
             title={t("planning.needs.emptyTitle")}
             description={t("planning.needs.emptyDescription")}
+            primaryAction={
+              canWrite ? (
+                <Button
+                  leftIcon={<Plus size={16} />}
+                  onClick={() => setShowCreate(true)}
+                  data-testid="maker-plan-new-production"
+                >
+                  {t("productionList.newProduction")}
+                </Button>
+              ) : undefined
+            }
           />
         ) : (
           needs.data && <NeedsTable view={needs.data} />
@@ -170,6 +185,15 @@ export default function ProductionPlanPage() {
           </p>
         )}
       </section>
+      <ProductionCreateSheet
+        open={showCreate}
+        startAs="planned"
+        onClose={() => setShowCreate(false)}
+        onSuccess={(orderId) => {
+          setShowCreate(false);
+          navigate(`/maker/production/${orderId}`);
+        }}
+      />
     </div>
   );
 }

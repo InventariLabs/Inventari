@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/Button";
 import { QueryError } from "@/components/ui/QueryResult";
 import { RecordNotFound } from "@/components/ui/RecordNotFound";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
-import { extractApiError, isNotFoundError } from "@/lib/errors";
+import {
+  extractApiError,
+  isNotFoundError,
+  isServerRefusal,
+} from "@/lib/errors";
 import { BatchRecordSheet } from "@/modules/maker/components/BatchRecordSheet";
 import { useBatchRecord } from "@/modules/maker/hooks/useBatches";
 
@@ -42,16 +46,17 @@ export default function BatchRecordPage() {
       />
     );
   }
-  if (error) {
-    // A draft has no record yet: the server says so in words worth showing.
+  if (error && isServerRefusal(error)) {
+    // A draft has no record yet: the server says so, and asking again cannot
+    // change the answer, so the sentence stands without a retry.
     return (
-      <div className="space-y-4">
-        <p className="text-sm text-on-secondary">
-          {extractApiError(error, t("record.failed"))}
-        </p>
-        <QueryError error={error} onRetry={() => void refetch()} />
-      </div>
+      <p className="text-sm text-on-secondary" role="status">
+        {extractApiError(error, t("record.failed"))}
+      </p>
     );
+  }
+  if (error) {
+    return <QueryError error={error} onRetry={() => void refetch()} />;
   }
   if (isLoading || !record) {
     return (

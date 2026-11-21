@@ -614,7 +614,9 @@
     "plannedRuleWarning": {
       "archived": "Pasująca reguła wskazuje zarchiwizowane miejsce ({{rule}}) — pominięta; linia trafi do {{location}}",
       "not_internal": "Pasująca reguła wskazuje miejsce wirtualne ({{rule}}) — pominięta; linia trafi do {{location}}",
-      "refused": "Moduł wykluczył dla tego towaru wszystkie miejsca pasującej reguły ({{rule}}) — pominięta; linia trafi do {{location}}"
+      "refused": "Moduł wykluczył dla tego towaru wszystkie miejsca pasującej reguły ({{rule}}) — pominięta; linia trafi do {{location}}",
+      "receiving": "Pasująca reguła wskazuje strefę przyjęć ({{rule}}) — pominięta; linia trafi do {{location}}",
+      "quarantine": "Pasująca reguła wskazuje kwarantannę ({{rule}}) — pominięta; linia trafi do {{location}}"
     },
     "lineTargetLabel": "Miejsce linii",
     "lineTargetFollowPlan": "Zgodnie z planem (reguła / dokument)",
@@ -1191,6 +1193,13 @@
       "active": "Aktywna",
       "inactive": "Nieaktywna",
       "targetInactive": "Cel nieaktywny",
+      "shelfHeld": {
+        "archived": "Zarchiwizowane",
+        "not_internal": "Miejsce wirtualne",
+        "receiving": "Strefa przyjęć — wstrzymane",
+        "quarantine": "Kwarantanna — wstrzymane"
+      },
+      "shelfHeldNamed": "{{name}}: {{reason}}",
       "moreShelves_one": "+{{count}} kolejne miejsce, gdy zabraknie miejsca",
       "moreShelves_few": "+{{count}} kolejne miejsca, gdy zabraknie miejsca",
       "moreShelves_many": "+{{count}} kolejnych miejsc, gdy zabraknie miejsca",
@@ -1494,7 +1503,10 @@
       "plannedByRule": "reguła: {{rule}}",
       "plannedWarning": {
         "archived": "Reguła pominięta — jej miejsce jest zarchiwizowane",
-        "not_internal": "Reguła pominięta — jej miejsce jest wirtualne"
+        "not_internal": "Reguła pominięta — jej miejsce jest wirtualne",
+        "refused": "Reguła pominięta — moduł wykluczył jej miejsca dla tego towaru",
+        "receiving": "Reguła pominięta — jej miejsce jest strefą przyjęć",
+        "quarantine": "Reguła pominięta — jej miejsce to kwarantanna"
       }
     },
     "short": {

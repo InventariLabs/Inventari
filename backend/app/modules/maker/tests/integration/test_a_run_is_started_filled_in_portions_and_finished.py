@@ -26,6 +26,7 @@ from app.models.organization import Organization
 from app.models.product_template import ProductTemplate
 from app.models.stock_lot import StockLot
 from app.models.storage_location import StorageLocation
+from app.models.uom import Uom
 from app.modules.maker.models import BoMLine, MakerRecipe, MakerRecipeCostLine
 from tests.integration._shelf import post_on_shelf
 
@@ -61,6 +62,8 @@ class _Winery:
         self.cellar = cellar
         self.grapes = self._template(org, 'Grapes')
         self.wine = self._template(org, 'Wine')
+        self.wine.uom_id = db.scalars(select(Uom.id).where(Uom.symbol == 'kg')).first()
+        db.commit()
         recipe = MakerRecipe(
             organization_id=org.id,
             output_template_id=self.wine.id,
@@ -455,6 +458,8 @@ def test_a_portion_cannot_take_the_run_above_its_plan(winery: _Winery) -> None:
     refused = winery.post(order_id, 'portions', {'qty': '3'})
 
     assert refused.status_code == 400, refused.text
+    # The plan is stated with its unit, never as a bare number.
+    assert '(2 kg)' in refused.json()['detail']['message']
     assert winery.on_shelf(winery.wine) == Decimal('0')
 
 
@@ -466,6 +471,7 @@ def test_a_run_cannot_finish_with_less_than_its_portions(winery: _Winery) -> Non
     refused = winery.post(order_id, 'finish', {'actual_qty': '2'})
 
     assert refused.status_code == 400, refused.text
+    assert '3 kg' in refused.json()['detail']['message']
     assert winery.on_shelf(winery.wine) == Decimal('3')
 
 

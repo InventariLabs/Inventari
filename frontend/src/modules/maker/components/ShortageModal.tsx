@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
@@ -14,6 +15,8 @@ interface ShortageModalProps {
   hint?: string;
   onConfirm?: () => void;
   onCancel: () => void;
+  /** A way out offered inside the dialog, under the list (ordering what is missing). */
+  action?: ReactNode;
 }
 
 export function ShortageModal({
@@ -25,24 +28,34 @@ export function ShortageModal({
   hint,
   onConfirm,
   onCancel,
+  action,
 }: ShortageModalProps) {
   const { t } = useTranslation("maker");
+  // No quantity is missing when every row is a unit the stock cannot be
+  // compared with: the line's unit is what has to be fixed, so the dialog
+  // says that instead of asking for a restock.
+  const unitMismatchOnly =
+    shortages.length > 0 && shortages.every((s) => s.shortage === null);
 
   return (
     <ConfirmDialog
       open={open}
       variant={variant}
       title={
-        title ??
-        (variant === "danger"
-          ? t("availability.blocked")
-          : t("availability.warnTitle"))
+        unitMismatchOnly
+          ? t("availability.unitMismatchTitle")
+          : (title ??
+            (variant === "danger"
+              ? t("availability.blocked")
+              : t("availability.warnTitle")))
       }
       message={
-        hint ??
-        (variant === "danger"
-          ? t("availability.blockedHint")
-          : t("availability.warnHint"))
+        unitMismatchOnly
+          ? t("availability.unitMismatchHint")
+          : (hint ??
+            (variant === "danger"
+              ? t("availability.blockedHint")
+              : t("availability.warnHint")))
       }
       confirmLabel={t("availability.warnConfirm")}
       cancelLabel={t("create.cancel", { defaultValue: "Cancel" })}
@@ -111,6 +124,7 @@ export function ShortageModal({
           </tbody>
         </table>
       </div>
+      {action}
     </ConfirmDialog>
   );
 }

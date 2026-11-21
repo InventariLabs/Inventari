@@ -252,15 +252,21 @@ function WmsPickingView({
   // document, the dialog offers two ways out: take the session over with the
   // scans already made, or put the holder's scans back. Either way the
   // reader's own session starts next. Without them the refusal is a dead
-  // end — the document waits for a holder who walked away.
-  const handleHeldSession = async (act: () => Promise<unknown>) => {
+  // end — the document waits for a holder who walked away. A take-over opens
+  // the session it took through its own document: the list start that
+  // follows would meet that session as the caller's own and refuse again.
+  const handleHeldSession = async (
+    act: () => Promise<unknown>,
+    resumeFrom?: string,
+  ) => {
     const failure = await act();
     if (failure !== null) {
       toast.error(extractApiError(failure, t("picking.error.start_failed")));
       return;
     }
     invalidateDocument();
-    startSession();
+    if (resumeFrom !== undefined && documentIds) setResumedFrom(resumeFrom);
+    else startSession();
   };
 
   // The last scan the dispatch refused, said beside the scan field.
@@ -400,7 +406,10 @@ function WmsPickingView({
                   onTakeOver: () =>
                     heldSession.own
                       ? setResumedFrom(heldSession.documentId)
-                      : handleHeldSession(takeOverHeldSession),
+                      : handleHeldSession(
+                          takeOverHeldSession,
+                          heldSession.documentId,
+                        ),
                   onRelease: () => handleHeldSession(releaseHeldSession),
                 }
           }

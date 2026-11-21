@@ -126,26 +126,6 @@ async def compute_total_cost(
     return rollup.total
 
 
-async def compute_unit_cost(
-    db: AsyncSession,
-    organization_id: UUID,
-    template_id: UUID,
-    planned_qty: Decimal,
-    recipe_id: UUID | None = None,
-) -> Decimal:
-    """Cost per produced unit, clamped to 0 if the BOM has no rateable inputs.
-
-    Used for forecasts; a production receipt uses consumed FIFO layers.
-    Yields ``Decimal('0')`` when ``planned_qty`` is zero.
-    """
-    if planned_qty <= 0:
-        return Decimal('0')
-    total = await compute_total_cost(
-        db, organization_id, template_id, planned_qty, recipe_id
-    )
-    return total / planned_qty if total > 0 else Decimal('0')
-
-
 def process_minutes(recipe: MakerRecipe) -> Decimal:
     """How long the formula's steps take, in minutes.
 

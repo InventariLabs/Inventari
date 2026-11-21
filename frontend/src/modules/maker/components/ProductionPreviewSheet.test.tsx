@@ -179,6 +179,33 @@ describe("ProductionPreviewSheet", () => {
     expect(tile?.textContent).toContain("—");
   });
 
+  it("lists fixed costs and labour so the parts add up to the total", () => {
+    renderSheet({
+      breakdown: {
+        ...breakdown,
+        total_cost: "25.00",
+        fixed_cost: "5.00",
+        labour_cost: "10.00",
+        entries: [{ ...breakdown.entries[0], percentage_of_total: "40.00" }],
+      },
+    });
+
+    const parts = screen.getByTestId("production-preview-cost-parts");
+    expect(parts.textContent).toContain("Fixed costs");
+    expect(parts.textContent).toContain("Labour");
+    expect(parts.textContent).toMatch(/5[.,]00/);
+    expect(parts.textContent).toMatch(/10[.,]00/);
+    expect(parts.textContent).toContain("20%");
+    expect(parts.textContent).toContain("40%");
+  });
+
+  it("adds no fixed or labour line to a formula that has neither", () => {
+    renderSheet();
+    expect(
+      screen.queryByTestId("production-preview-cost-parts"),
+    ).not.toBeInTheDocument();
+  });
+
   it("counts the ingredients with no rate in words, not as a bare number", () => {
     renderSheet({
       breakdown: {

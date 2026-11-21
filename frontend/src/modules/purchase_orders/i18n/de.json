@@ -299,7 +299,7 @@
     "count_other": "Regeln",
     "overCapacity": "Regel gespeichert. Hinweis: Sie verlangt {{max}} pro Nachschub — mehr als das Regal fasst ({{capacity}}).",
     "madeHere": "Wird selbst hergestellt",
-    "planRun": "Auftrag planen"
+    "planRun": "Produktionslauf planen"
   },
   "productPicker": {
     "search": "Produkt suchen…",

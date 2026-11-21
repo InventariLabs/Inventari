@@ -552,7 +552,9 @@
     "plannedRuleWarning": {
       "archived": "Una regla coincidente apunta a una ubicación archivada ({{rule}}) — no aplicada; la línea irá a {{location}}",
       "not_internal": "Una regla coincidente apunta a una ubicación virtual ({{rule}}) — no aplicada; la línea irá a {{location}}",
-      "refused": "Un módulo ha descartado todas las ubicaciones de una regla coincidente ({{rule}}) para esta mercancía — no aplicada; la línea irá a {{location}}"
+      "refused": "Un módulo ha descartado todas las ubicaciones de una regla coincidente ({{rule}}) para esta mercancía — no aplicada; la línea irá a {{location}}",
+      "receiving": "Una regla coincidente apunta a una zona de recepción ({{rule}}) — no aplicada; la línea irá a {{location}}",
+      "quarantine": "Una regla coincidente apunta a la ubicación de cuarentena ({{rule}}) — no aplicada; la línea irá a {{location}}"
     },
     "lineTargetLabel": "Destino de la línea",
     "lineTargetFollowPlan": "Según el plan (regla / documento)",
@@ -1105,6 +1107,13 @@
       "active": "Activo",
       "inactive": "Inactivo",
       "targetInactive": "Destino inactivo",
+      "shelfHeld": {
+        "archived": "Archivada",
+        "not_internal": "Ubicación virtual",
+        "receiving": "Zona de recepción — retenida",
+        "quarantine": "Cuarentena — retenida"
+      },
+      "shelfHeldNamed": "{{name}}: {{reason}}",
       "moreShelves_one": "+{{count}} ubicación más si se llena",
       "moreShelves_other": "+{{count}} ubicaciones más si se llena"
     },
@@ -1378,7 +1387,10 @@
       "plannedByRule": "regla: {{rule}}",
       "plannedWarning": {
         "archived": "Regla omitida — su ubicación está archivada",
-        "not_internal": "Regla omitida — su ubicación es virtual"
+        "not_internal": "Regla omitida — su ubicación es virtual",
+        "refused": "Regla omitida — un módulo descartó sus ubicaciones para esta mercancía",
+        "receiving": "Regla omitida — su ubicación es una zona de recepción",
+        "quarantine": "Regla omitida — su ubicación es la cuarentena"
       }
     },
     "short": {

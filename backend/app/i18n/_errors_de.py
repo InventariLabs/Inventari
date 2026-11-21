@@ -99,7 +99,7 @@ ERRORS_DE: ErrorMessages = {
     'storage_update_failed': 'Lagerort konnte nicht aktualisiert werden',
     'storage_delete_failed': 'Lagerort konnte nicht gelöscht werden',
     'storage_delete_failed_items': 'Ein Lagerort, in dem Artikel liegen oder an den Artikel ausgegeben sind, kann nicht gelöscht werden. Verschieben, zurückgeben oder löschen Sie die Artikel zuerst.',
-    'storage_delete_blocked_by_production_orders': 'Lagerort kann nicht gelöscht werden: Er wird von Produktionsaufträgen verwendet.',
+    'storage_delete_blocked_by_production_orders': 'Lagerort kann nicht gelöscht werden: Er wird von Produktionsläufen verwendet.',
     'storage_type_not_found': 'Lagerorttyp nicht gefunden',
     'storage_type_create_failed': 'Lagerorttyp konnte nicht erstellt werden',
     'storage_type_update_failed': 'Lagerorttyp konnte nicht aktualisiert werden',
@@ -309,6 +309,7 @@ ERRORS_DE: ErrorMessages = {
     'wms_pick_document_not_confirmed': 'Das Dokument {number} ist nicht bestätigt, daher wurde die Kommissioniersitzung nicht gestartet. Nur bestätigte Dokumente können kommissioniert werden.',
     'wms_pick_document_not_dispatch': 'Das Dokument {number} ist kein Warenausgang, daher wurde die Kommissioniersitzung nicht gestartet. Nur Warenausgänge können gemeinsam kommissioniert werden.',
     'wms_pick_document_in_session': 'Das Dokument {number} wird bereits in einer anderen Sitzung kommissioniert (eröffnet von {owner}), daher wurde die Kommissioniersitzung nicht gestartet.',
+    'wms_pick_document_in_own_session': 'Das Dokument {number} wird bereits in Ihrer eigenen Sitzung kommissioniert, daher wurde die Kommissioniersitzung nicht gestartet.',
     'wms_line_document_closed': 'Das Dokument {number} ist {status}, daher können seine Zeilen in dieser Sitzung nicht mehr geändert werden.',
     'wms_short_below_scanned': 'Die endgültige Menge darf nicht unter der gescannten Menge ({scanned}) liegen; um weniger zu erfassen, muss sie die Scans ersetzen.',
     'wms_short_pick_needs_outcome': 'Eine zu wenig entnommene Zeile braucht einen Grund: „Fehlmenge“ lässt den Rest als Nachlieferung offen, jeder andere Grund schließt die Differenz.',
@@ -465,20 +466,21 @@ ERRORS_DE: ErrorMessages = {
     'template_import_invalid_field': 'Das Feld „{field}“ fehlt oder ist ungültig.',
     'template_import_unknown_placeholders': 'Die Vorlage verweist auf Felder, die nicht existieren: {placeholders}.',
     'template_import_not_renderable': 'Die Vorlage konnte nicht gerendert werden: {detail}',
+    'template_not_saved_syntax': 'Die Vorlage wurde nicht gespeichert: Zeile {line}: {detail}',
     'model_not_found': 'Gerätemodell nicht gefunden',
     'widget_not_found': 'Widget nicht gefunden',
-    'bom_line_not_found': 'Stücklistenposition nicht gefunden',
+    'bom_line_not_found': 'Formelposition nicht gefunden',
     'bom_line_already_exists': (
         'Diese Formel enthält diese Zutat bereits — zwischen den beiden '
-        'Produkten besteht schon eine Stücklistenposition.'
+        'Produkten besteht schon eine Formelposition.'
     ),
     'bom_depth_exceeded': (
-        'Diese Stückliste ist tiefer als {max_depth} Ebenen verschachtelt — '
+        'Diese Formel ist tiefer als {max_depth} Ebenen verschachtelt — '
         'zu tief, um sie aufzulösen.'
     ),
     'cost_line_not_found': 'Kostenposition nicht gefunden',
-    'production_order_not_found': 'Produktionsauftrag nicht gefunden',
-    'production_needs_scope': 'Der Bedarf geplanter Aufträge wird für einen Auftrag oder für beide Enden eines Zeitraums gelesen',
+    'production_order_not_found': 'Produktionslauf nicht gefunden',
+    'production_needs_scope': 'Der Bedarf geplanter Produktionsläufe wird für einen Produktionslauf oder für beide Enden eines Zeitraums gelesen',
     'production_needs_period_reversed': 'Der Zeitraum endet, bevor er beginnt',
     'production_no_recipe': (
         'Keine Formel für dieses Produkt — legen Sie zuerst eine Formel an'
@@ -488,7 +490,7 @@ ERRORS_DE: ErrorMessages = {
     ),
     'production_recipe_product_mismatch': ('Die Formel gehört nicht zu diesem Produkt'),
     'production_complete_not_draft': (
-        'Dieser Produktionsauftrag hat bereits den Status {status} — nur ein '
+        'Dieser Produktionslauf hat bereits den Status {status} — nur ein '
         'Entwurf kann abgeschlossen werden.'
     ),
     'production_reverse_not_completed': (
@@ -497,29 +499,29 @@ ERRORS_DE: ErrorMessages = {
     'production_reverse_output_used': (
         'Dieser Lauf kann nicht rückgängig gemacht werden: Ein Teil seiner Erzeugnisse hat den Lagerplatz bereits verlassen. Erfassen Sie stattdessen eine Bestandskorrektur für den Rest.'
     ),
-    'production_cancel_not_draft': 'Dieser Produktionsauftrag hat bereits den Status {status} — nur ein Entwurf oder ein laufender Auftrag kann storniert werden.',
-    'production_start_not_draft': 'Dieser Produktionsauftrag hat bereits den Status {status} — nur ein Entwurf kann gestartet werden.',
-    'production_run_not_in_progress': 'Dieser Produktionsauftrag hat den Status {status} — nur ein laufender Auftrag kann in Teilmengen gemeldet, abgehakt oder beendet werden.',
-    'production_finish_below_portions': 'Dieser Auftrag hat bereits {made} in Teilmengen ins Lager gebracht und kann daher nicht mit weniger abgeschlossen werden.',
-    'production_portion_above_plan': 'Eine Teilmenge darf den Auftrag nicht über die geplante Menge {planned} hinausheben — Mehrmengen kommen beim Abschließen ins Lager.',
-    'production_cancel_has_portions': 'Dieser Auftrag hat bereits Erzeugnisse in Teilmengen ins Lager gebracht und kann nicht storniert werden — schließen Sie ihn stattdessen ab.',
-    'production_step_not_found': 'Dieser Auftrag hat keinen solchen Schritt.',
+    'production_cancel_not_draft': 'Dieser Produktionslauf hat bereits den Status {status} — nur ein Entwurf oder ein laufender Produktionslauf kann storniert werden.',
+    'production_start_not_draft': 'Dieser Produktionslauf hat bereits den Status {status} — nur ein Entwurf kann gestartet werden.',
+    'production_run_not_in_progress': 'Dieser Produktionslauf hat den Status {status} — nur ein laufender Produktionslauf kann in Teilmengen gemeldet, abgehakt oder beendet werden.',
+    'production_finish_below_portions': 'Dieser Produktionslauf hat bereits {made} in Teilmengen ins Lager gebracht und kann daher nicht mit weniger abgeschlossen werden.',
+    'production_portion_above_plan': 'Eine Teilmenge darf den Produktionslauf nicht über die geplante Menge {planned} hinausheben — Mehrmengen kommen beim Abschließen ins Lager.',
+    'production_cancel_has_portions': 'Dieser Produktionslauf hat bereits Erzeugnisse in Teilmengen ins Lager gebracht und kann nicht storniert werden — schließen Sie ihn stattdessen ab.',
+    'production_step_not_found': 'Dieser Produktionslauf hat keinen solchen Schritt.',
     'production_update_not_draft': (
-        'Dieser Produktionsauftrag hat bereits den Status {status} — nur ein '
+        'Dieser Produktionslauf hat bereits den Status {status} — nur ein '
         'Entwurf kann bearbeitet werden.'
     ),
     'production_actual_qty_must_be_positive': (
         'Die produzierte Menge muss größer als null sein.'
     ),
     'production_overproduction_disabled': (
-        'Überproduktion ist in den Einstellungen deaktiviert — dieser Auftrag '
+        'Überproduktion ist in den Einstellungen deaktiviert — dieser Produktionslauf '
         'kann nicht mehr als geplant produzieren.'
     ),
     'production_ingredient_unmeasurable': (
         'Die Einheit einer Zutat lässt sich nicht mit ihrem Bestand vergleichen, daher ist '
         'unklar, wie viel aus dem Regal zu nehmen ist — korrigieren Sie zuerst die Einheit der Formelzeile.'
     ),
-    'production_short_of_stock': 'Für diesen Produktionsauftrag sind nicht genügend Zutaten auf Lager.',
+    'production_short_of_stock': 'Für diesen Produktionslauf sind nicht genügend Zutaten auf Lager.',
     'production_best_before_before_made': 'Das Mindesthaltbarkeitsdatum {best_before} liegt vor dem Herstellungstag ({made}).',
     'production_batch_not_an_ingredient': '{ingredient} ist keine Zutat dieses Laufs.',
     'production_batch_of_another_product': 'Die Charge {batch} ist keine Charge von {ingredient}.',
@@ -930,6 +932,9 @@ ERRORS_DE: ErrorMessages = {
     'validation_enum': 'Muss einer der folgenden sein: {expected}',
     'validation_int': 'Muss eine ganze Zahl sein',
     'validation_number': 'Muss eine Zahl sein',
+    'validation_decimal_whole_digits': 'Darf höchstens {whole_digits} Stellen vor dem Komma haben',
+    'validation_decimal_max_digits': 'Darf insgesamt höchstens {max_digits} Stellen haben',
+    'validation_decimal_max_places': 'Darf höchstens {decimal_places} Nachkommastellen haben',
     'validation_boolean': 'Muss wahr oder falsch sein',
     'validation_identifier': 'Muss eine gültige Kennung sein',
     'validation_date': 'Muss ein gültiges Datum sein',

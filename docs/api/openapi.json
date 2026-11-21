@@ -45551,6 +45551,11 @@
             ],
             "title": "Material Cost"
           },
+          "uncosted_ingredients": {
+            "type": "integer",
+            "title": "Uncosted Ingredients",
+            "default": 0
+          },
           "total_cost": {
             "anyOf": [
               {
@@ -73648,6 +73653,11 @@
             "type": "array",
             "title": "Lines"
           },
+          "uncosted_ingredients": {
+            "type": "integer",
+            "title": "Uncosted Ingredients",
+            "default": 0
+          },
           "started_on": {
             "anyOf": [
               {
@@ -76930,6 +76940,17 @@
             "type": "boolean",
             "title": "Active",
             "default": true
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
           }
         },
         "type": "object",
@@ -81986,6 +82007,17 @@
             "type": "string",
             "title": "Status"
           },
+          "status_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Reason"
+          },
           "best_before": {
             "anyOf": [
               {
@@ -81997,6 +82029,17 @@
               }
             ],
             "title": "Best Before"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quantity"
           }
         },
         "type": "object",
@@ -93197,7 +93240,8 @@
           "reference_price": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "minimum": 0.0
               },
               {
                 "type": "string"
@@ -93300,7 +93344,8 @@
           "reference_price": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "minimum": 0.0
               },
               {
                 "type": "string"

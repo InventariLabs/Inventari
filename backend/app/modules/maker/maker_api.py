@@ -91,10 +91,17 @@ class MakerAPI:
         template_id: UUID,
         planned_qty: Decimal,
     ) -> Decimal:
-        """Cost per produced unit (zero when no rateable inputs exist)."""
-        return await cost_rollup.compute_unit_cost(
+        """Whole cost per produced unit: ingredients, fixed costs and labour.
+
+        The figure the recipe page and the price calculator quote; zero when
+        ``planned_qty`` is zero or nothing is rateable.
+        """
+        if planned_qty <= 0:
+            return Decimal('0')
+        breakdown = await cost_breakdown.compute_breakdown(
             db, organization_id, template_id, planned_qty
         )
+        return breakdown.unit_cost or Decimal('0')
 
     async def get_breakdown_async(
         self,

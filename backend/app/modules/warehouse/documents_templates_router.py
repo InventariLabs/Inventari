@@ -31,6 +31,7 @@ from app.i18n.service import get_current_lang
 
 from . import _template_transfer as template_transfer
 from .document_pdf_service import (
+    _TEMPLATES_DIR,
     build_pdf_context,
     build_pick_list_context,
     print_lang,
@@ -741,6 +742,8 @@ async def import_template(
         body_html=fields['body_html'],
         document_type=fields['document_type'],
         is_default=fields['is_default'],
+        templates_dir=_TEMPLATES_DIR,
+        check_context=_example_context(),
     )
 
 
@@ -851,6 +854,8 @@ async def create_template(
         body_html=data.body_html,
         document_type=data.document_type,
         is_default=data.is_default,
+        templates_dir=_TEMPLATES_DIR,
+        check_context=_example_context(),
     )
 
 
@@ -872,6 +877,8 @@ async def update_template(
         document_type=data.document_type,
         is_default=data.is_default,
         user_id=current_user.id,
+        templates_dir=_TEMPLATES_DIR,
+        check_context=_example_context(),
     )
 
 

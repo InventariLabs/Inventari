@@ -252,16 +252,16 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
     expect(submit).toBeEnabled();
   });
 
-  it("shows planned output = servings × scale", () => {
+  it("shows planned output = servings × scale, never as a bare number", () => {
     renderModal();
     expect(screen.getByTestId("cook-for-stock-planned-qty").textContent).toBe(
-      "6",
+      "6 pcs.",
     );
     fireEvent.change(screen.getByTestId("cook-for-stock-scale-input"), {
       target: { value: "3" },
     });
     expect(screen.getByTestId("cook-for-stock-planned-qty").textContent).toBe(
-      "18",
+      "18 pcs.",
     );
   });
 
@@ -625,6 +625,6 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
     });
 
     expect(screen.getByTestId("cook-for-stock-planned-qty").tagName).toBe("P");
-    expect(screen.getByText(/6 per batch × 3/)).toBeInTheDocument();
+    expect(screen.getByText(/6 pcs. per batch × 3/)).toBeInTheDocument();
   });
 });

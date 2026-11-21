@@ -222,6 +222,7 @@ class TestPutawayRuleTargetIsAPlaceGoodsAreKept:
         rule = listed.json()['items'][0]
         assert rule['target_location_active'] is False
         assert rule['locations'][0]['active'] is False
+        assert rule['locations'][0]['unavailable_reason'] == 'quarantine'
 
         preview = client.post(
             f'{API}/putaway/preview',
@@ -237,3 +238,33 @@ class TestPutawayRuleTargetIsAPlaceGoodsAreKept:
         planned = preview.json()[0]
         assert planned['planned_location_id'] != str(held.id)
         assert planned['planned_source'] != 'rule'
+        # The plan says why the rule stepped aside, in the same word the
+        # rules list uses for the shelf.
+        assert planned['planned_rule_warning'] == 'quarantine'
+
+    def test_a_receipt_may_name_the_quarantine_and_the_preview_agrees(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        cable: ProductTemplate,
+        held: StorageLocation,
+    ) -> None:
+        """The preview asks a receipt's destination what the booking asks.
+
+        What it fails on: validate the destination as a rule's target in the
+        preview and it answers 400 with a sentence about putaway rules for a
+        destination the document itself accepts.
+        """
+        _name_quarantine(client, doc_auth_headers, held)
+
+        preview = client.post(
+            f'{API}/putaway/preview',
+            headers=doc_auth_headers,
+            json={
+                'target_location_id': str(held.id),
+                'lines': [{'product_template_id': str(cable.id), 'quantity': 2}],
+            },
+        )
+
+        assert preview.status_code == status.HTTP_200_OK, preview.text
+        assert preview.json()[0]['planned_location_id'] == str(held.id)

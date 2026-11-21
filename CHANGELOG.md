@@ -337,6 +337,18 @@ says what the release does rather than what changed since them.
   settings", the equipment form's "Manage" and "Create model" links, a tag's
   colour, a recipe's select and a collection's rename and delete — are at
   least 24 px.
+- Counting a location that has sub-locations now offers, in the bar of
+  products outside the stock take, a product received onto a sub-location
+  after the count started, as counting that sub-location itself does.
+- A production recipe's reference price can no longer be negative. Creating
+  or changing a recipe with one is refused with a message naming the field,
+  instead of being stored and understating the result per unit of every run
+  made after it; zero is still allowed.
+- Saving a print layout whose template code does not parse or render — a
+  purchase order, warehouse document or equipment layout — is refused, with
+  the line and the complaint, instead of being stored and then breaking every
+  PDF printed with it. A purchase order whose stored layout no longer renders
+  prints with the built-in layout rather than failing with "An error occurred".
 - On a slow connection the Inventory and Equipment overviews no longer state
   something that is not true while they load. *My locations* shows placeholders
   instead of "No locations yet" and its create button, and the Equipment
@@ -400,7 +412,9 @@ says what the release does rather than what changed since them.
   ingredients. A batch that cost 25.28 a kilogram was priced from 11.28, so
   the suggested price sat below what the run cost; the calculator now lists
   the three parts under the total, and the production preview's total matches
-  the per-unit figure beside it.
+  the per-unit figure beside it. The preview lists the fixed costs and labour
+  under its ingredients, and each line's percentage and the cost-share chart
+  are shares of that whole total.
 - Counting a location that has sub-locations now tells two records of one
   product apart. The count cards and the scan chooser show the expiry of
   items standing on any depth below the counted location, so a scan no longer
@@ -415,13 +429,17 @@ says what the release does rather than what changed since them.
   one of them is already in a picking session. If the session is your own —
   opened on a phone and left — the dialog says so and offers **Continue that
   session** or **Discard scans**; if a colleague holds it, it offers to take
-  it over or discard their scans, as the document's own page already did.
+  it over, which opens that session at once, or discard their scans, as the
+  document's own page already did.
   **Retry** now appears only after a server failure, never after a refusal
   that would only repeat itself.
 - On a phone, the header's Back arrow on a screen opened by a direct link —
   a document opened from a link or a refreshed page, for one — no longer ends
   on a "Page Not Found" at `/warehouse/documents`. With nothing earlier in the
-  history it climbs to the nearest screen above that exists, the module's start.
+  history it climbs to the nearest screen above that exists, and to the home
+  screen when there is none: from a document or History opened by a link that
+  is the launcher, never the warehouse root that only sends you back, and from
+  a location zone it is the locations list, never "Location not found".
 - The Settings audit log shows the reason a workflow release left on the
   requests it closed in the reader's language ("Workflow deactivated",
   "Workflow deleted") instead of the raw English text.
@@ -613,6 +631,15 @@ says what the release does rather than what changed since them.
   Duplicate on a draft, but no Start run, Complete run, Finish run, portion
   form, Undo run or Cancel of a run in progress, and *New production* opens
   planning only, without the *Save as made* choice: each of those posts stock.
+- The return sheet keeps to what is still left of a line. Its maximum is what
+  earlier returns and corrections have not already taken back, not the full
+  quantity done, so a quantity above it is named under the field and the sheet
+  cannot be submitted. A line already returned in full is left out of the
+  sheet, and a document with nothing left to return says so instead of
+  listing lines. A leading zero no longer sticks in the quantity field of
+  the return and correction sheets, packing, phone receiving, document
+  lines, quick add and shopping-list add: a digit typed after a 0 replaces
+  it.
 - The work board no longer counts what was undone. A dispatch that has been
   undone is not counted in *Orders shipped on the order day* (undoing the
   only dispatch of the week now reads "No orders shipped yet this week"
@@ -623,6 +650,19 @@ says what the release does rather than what changed since them.
   no longer lost: the document opens on the Packing step with them in its
   Shipping fields, so *Complete dispatch* there does not ship without
   tracking.
+- A correction of a receipt that held part of a line back in quarantine
+  offers and accepts only what the shelf can give: the quantity the line's own
+  stock record holds, not the whole quantity received. A correction that cannot
+  be applied is refused before it takes a number, so it stays a draft that can
+  be deleted instead of becoming a numbered correction its author cannot
+  remove, and the refusal names the product in the screen's quantities rather
+  than a record id. A surplus correction is still weighed against everything
+  the line received, the held part included.
+- Saving a BOM's *Process steps* keeps a step that was typed in the add row but
+  never added with *Add step*: it is stored as the last step, with its
+  minutes, instead of vanishing under a success message. Closing the editor
+  with the X while the add row still holds text asks first, and offers to keep
+  editing.
 
 ### Removed
 

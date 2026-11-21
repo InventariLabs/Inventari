@@ -13,7 +13,6 @@ import { toast } from "sonner";
 import { extractApiError } from "@/lib/errors";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/Input";
 import { useCanManage } from "@/hooks/useCanWrite";
 import { UomSelect } from "@/modules/shared/components/UomSelect";
@@ -22,6 +21,7 @@ import {
   useUpdateBomLine,
 } from "@/modules/maker/hooks/useRecipes";
 import { BomTreeEditor } from "@/modules/maker/components/BomTreeEditor";
+import { RemoveIngredientDialog } from "@/modules/maker/components/RemoveIngredientDialog";
 import { BatchYieldEditor } from "@/modules/maker/components/BatchYieldEditor";
 import { RecipeIngredientForm } from "@/modules/maker/components/RecipeIngredientForm";
 import { IngredientPriceEditor } from "@/modules/maker/components/IngredientPriceEditor";
@@ -347,17 +347,9 @@ export function CompositionTab({ recipe }: CompositionTabProps) {
 
       <RecipeProcessSteps recipe={recipe} />
 
-      <ConfirmDialog
-        open={pendingDelete !== null}
-        title={t("composition.removeConfirm.title")}
-        message={t("composition.removeConfirm.description", {
-          name:
-            pendingDelete?.child_template_name ??
-            pendingDelete?.child_template_id ??
-            "",
-        })}
-        variant="danger"
-        confirmLabel={t("composition.removeIngredient")}
+      <RemoveIngredientDialog
+        recipe={recipe}
+        line={pendingDelete}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       />
