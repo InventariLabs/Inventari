@@ -1,10 +1,10 @@
 <div class="info-block">
   <h3>{{ labels.document_details }}</h3>
-  {% if document.external_reference or document.scheduled_date or source_location or target_location %}
-  {% if document.external_reference %}
+  {% if printed_reference or document.scheduled_date or source_location or target_location %}
+  {% if printed_reference %}
   <div class="info-row">
     <span class="info-label">{{ labels.reference }}:</span>
-    <span class="info-value">{{ document.external_reference }}</span>
+    <span class="info-value">{{ printed_reference }}</span>
   </div>
   {% endif %}
   {% if document.scheduled_date %}

@@ -265,6 +265,15 @@ _PLACEHOLDER_META: dict[str, dict[str, Any]] = {
         'possibly_empty': True,
         'document_types': _types(_IN, _OUT, _TRANSFER),
     },
+    'source_order_number': {
+        'description': 'Number of the purchase order the lines were received against',
+        'possibly_empty': True,
+        'document_types': _types(_IN, ['CORRECTION']),
+    },
+    'printed_reference': {
+        'description': 'External reference, left empty when it only repeats the order number',
+        'possibly_empty': True,
+    },
     'doc_type': {
         'description': 'Document type code (IN, OUT, INT, PW, RW, CORRECTION, …)',
         'possibly_empty': False,

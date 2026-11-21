@@ -53499,6 +53499,13 @@
             ],
             "title": "Reversed By Number"
           },
+          "source_orders": {
+            "items": {
+              "$ref": "#/components/schemas/SourceOrderRef"
+            },
+            "type": "array",
+            "title": "Source Orders"
+          },
           "source_location_id": {
             "anyOf": [
               {
@@ -75741,6 +75748,13 @@
             ],
             "title": "Reversed By Number"
           },
+          "source_orders": {
+            "items": {
+              "$ref": "#/components/schemas/SourceOrderRef"
+            },
+            "type": "array",
+            "title": "Source Orders"
+          },
           "source_location_id": {
             "anyOf": [
               {
@@ -83549,6 +83563,26 @@
           "port"
         ],
         "title": "SmtpConfig"
+      },
+      "SourceOrderRef": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number"
+        ],
+        "title": "SourceOrderRef",
+        "description": "A purchase order a document's lines were received against."
       },
       "StageDefinition": {
         "properties": {

@@ -390,6 +390,13 @@ class DocumentLineSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class SourceOrderRef(BaseModel):
+    """A purchase order a document's lines were received against."""
+
+    id: UUID
+    number: str
+
+
 class DocumentSchema(BaseModel):
     id: UUID
     organization_id: UUID
@@ -428,6 +435,11 @@ class DocumentSchema(BaseModel):
     # query service on read, never stored on the model.
     reversed_by_id: UUID | None = None
     reversed_by_number: str | None = None
+    # The purchase orders this document's lines were received against, read
+    # from the lines' ``source_po_line_id`` through the orders module.
+    # Transient — populated by the query service on read; empty when no line
+    # names an order or the orders module is off.
+    source_orders: list[SourceOrderRef] = Field(default_factory=list)
     source_location_id: UUID | None
     target_location_id: UUID | None
     source_location_name: str | None = None

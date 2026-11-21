@@ -310,6 +310,19 @@ def build_pdf_context(
     # from it in the reader's language. ``getattr`` because the placeholders
     # catalog builds a context without a database read behind it.
     return_of_number = getattr(document, 'return_of_number', None)
+    # The orders the lines were received against, read the same way: the
+    # read path attaches them from the lines' order links. A receipt made
+    # from the order's own page keeps the order number as its reference too;
+    # that reference is then not printed a second time.
+    source_order_number = (
+        ', '.join(order['number'] for order in getattr(document, 'source_orders', []))
+        or None
+    )
+    printed_reference = (
+        document.external_reference
+        if document.external_reference != source_order_number
+        else None
+    )
 
     # 5. Resolve the document variant (drives parties/signatures partials).
     doc_type = document.type
@@ -398,6 +411,8 @@ def build_pdf_context(
         'corrected_doc_number': corrected_doc_number,
         'backorder_of_number': backorder_of_number,
         'return_of_number': return_of_number,
+        'source_order_number': source_order_number,
+        'printed_reference': printed_reference,
         'doc_type': doc_type,
         'is_correction': is_correction,
         'is_external_in': is_external_in,
