@@ -44,6 +44,9 @@ class CostBreakdownEntry(BaseModel):
     # average of the layers still on hand — 'avco' is the historical label.)
     unit_cost: Decimal | None = None
     cost: Decimal | None
+    # ``cost`` as a percentage of the response's ``total_cost`` — fixed costs
+    # and labour included, so the ingredients' shares add up to less than 100
+    # when the formula has either.
     percentage_of_total: Decimal | None
     cost_source: str  # 'avco' | 'supplier' (estimates) | 'fifo' (actual) | 'none'
     # Denormalised display name (None when the template was deleted).

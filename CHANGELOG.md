@@ -354,7 +354,9 @@ says what the release does rather than what changed since them.
   ingredients. A batch that cost 25.28 a kilogram was priced from 11.28, so
   the suggested price sat below what the run cost; the calculator now lists
   the three parts under the total, and the production preview's total matches
-  the per-unit figure beside it.
+  the per-unit figure beside it. The preview lists the fixed costs and labour
+  under its ingredients, and each line's percentage and the cost-share chart
+  are shares of that whole total.
 - Counting a location that has sub-locations now tells two records of one
   product apart. The count cards and the scan chooser show the expiry of
   items standing on any depth below the counted location, so a scan no longer
