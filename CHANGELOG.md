@@ -364,7 +364,8 @@ says what the release does rather than what changed since them.
   one of them is already in a picking session. If the session is your own —
   opened on a phone and left — the dialog says so and offers **Continue that
   session** or **Discard scans**; if a colleague holds it, it offers to take
-  it over or discard their scans, as the document's own page already did.
+  it over, which opens that session at once, or discard their scans, as the
+  document's own page already did.
   **Retry** now appears only after a server failure, never after a refusal
   that would only repeat itself.
 - On a phone, the header's Back arrow on a screen opened by a direct link —
