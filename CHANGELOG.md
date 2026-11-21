@@ -286,6 +286,57 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A receipt posted against a purchase order names the order. The receipt's
+  page shows it under **Purchase order**, linked to the order, and both
+  built-in print layouts print its number, so whoever holds the receipt later
+  can reach the order it was received against. A receipt made from the
+  order's own page, which keeps the order number as its reference, does not
+  show or print it twice. Print templates can use `source_order_number` and
+  `printed_reference`.
+- Refusing to issue more than the shelf holds states the figures the right
+  way round: with 8 on the shelf and 99 asked it reads "8 of 99 available,
+  91 missing" instead of "8 of 99 could not be reserved", which named what
+  was there as what was not.
+- On a phone, **The rest did not come — finish** pressed before anything was
+  counted no longer posts an empty receipt reading "Received 0 lines. The
+  goods are in stock". Nothing is posted, the receipt stays open for the
+  goods still expected, and the screen says that nothing was received.
+- Starting phone receiving for the rest of an order no longer warns that the
+  order already has an open receipt when the receipt it names is the one the
+  start is making, or holds nothing the order still owes (a correction, or a
+  draft for a product the order no longer expects).
+- An adjustment posted by a stock take and an issue registered by a recipe's
+  cooking name their source in words ("Stock take", "Recipe production") on
+  their page and in the register instead of an internal reference and id; on
+  the page each links to the stock take's report or the recipe while that
+  module is on. A recipe's issue now refers to the recipe, and its note no
+  longer carries the picking session's id.
+- The audit log records the backorder a short receipt drafts, naming the
+  receipt it continues; a task assignment names the document or the task and
+  the person instead of a raw kind and an id; and a new partner's type reads
+  in words ("Supplier") instead of `SUPPLIER`.
+- The phone receiving card no longer says "Expected 1 pcs." for a product
+  nobody expected — one added beside an order or scanned on a receipt with
+  none — nor "fewer than expected" when its count is lowered.
+- A member who may write documents but not manage them is told what they
+  cannot do: their own draft correction says only a manager can delete it,
+  and a confirmed document says why **Cancel document** is disabled, in a line
+  a phone shows rather than only in a tooltip.
+- On a phone, tapping an order's delivery on **To do** no longer makes it the
+  reader's before anything has begun; it becomes theirs when its receiving
+  starts.
+- Scan document offers the torch only on a camera that has one, and the
+  location wizard keeps a zone name typed on its first step when a zone chip
+  is pressed afterwards.
+- Small controls are easier to press on a phone. Checkboxes in the document
+  register, the approval queue, Codes and labels and the list of ingredients
+  without a product are pressed through a 44 px square, and text links and
+  small icon buttons that stood 15 to 20 px tall — document links on Start,
+  History, a document's page and a lot's page, the audit log's "Show the
+  whole change" and record ids, "In every location", "Create role", "Open
+  settings", the equipment form's "Manage" and "Create model" links, a tag's
+  colour, a recipe's select and a collection's rename and delete — are at
+  least 24 px.
 - On a slow connection the Inventory and Equipment overviews no longer state
   something that is not true while they load. *My locations* shows placeholders
   instead of "No locations yet" and its create button, and the Equipment
