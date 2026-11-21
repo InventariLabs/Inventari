@@ -41,10 +41,10 @@ function readOnlyScanRefusal(
   tCommon: TFunction,
 ): string {
   return data.message_key === "scan:result.foundInHistory"
-    ? tScan("result.archivedReadOnly", {
+    ? tScan("scan:result.archivedReadOnly", {
         product: data.message_params?.product,
       })
-    : tCommon("access.readOnly");
+    : tCommon("common:access.readOnly");
 }
 
 /**

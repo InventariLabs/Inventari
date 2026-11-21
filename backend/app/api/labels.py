@@ -512,10 +512,13 @@ async def export_labels_png(
         # nobody has taken yet.
         return StreamingResponse(io.BytesIO(png_data), media_type='image/png')
 
-    if not current_user.has_permission(SystemPermission.ITEMS_WRITE):
-        # Marking a label printed changes its state, and this door is a read:
-        # an account that cannot write takes the file and leaves the pool as
-        # it was.
+    if current_user.has_permission(
+        SystemPermission.ITEMS_READ
+    ) and not current_user.has_permission(SystemPermission.ITEMS_WRITE):
+        # Marking a label printed changes its state, and for a products reader
+        # this door is a read: it takes the file and leaves the pool as it was.
+        # A module's register reader prints its own register's labels on
+        # purpose, and that printing spends them.
         return StreamingResponse(
             io.BytesIO(png_data),
             media_type='image/png',
