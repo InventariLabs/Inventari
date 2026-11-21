@@ -45,6 +45,7 @@
   "generateModal": {
     "title": "Générer des étiquettes",
     "count": "Nombre d'étiquettes (1–500)",
+    "countTooHigh": "Un lot ne peut contenir que {{max}} étiquettes au maximum.",
     "purpose": "À quoi servent ces étiquettes ?",
     "purposeHelp": "Une étiquette vierge ouvre le formulaire correspondant à ce pour quoi elle a été imprimée.",
     "purposeProduct": "Produits",
@@ -196,7 +197,7 @@
   "history": {
     "label": "Étiquette",
     "previouslyUsedFor": "Précédemment utilisée pour",
-    "title": "Historique du produit"
+    "title": "Étiquette archivée"
   },
   "openScanActions": "Ouvrir les actions de scan",
   "scanNotFound": "Étiquette introuvable",
@@ -205,6 +206,9 @@
   "statusUnassigned": "Non attribuée",
   "viewPool": "Voir le pool d'étiquettes",
   "labelDeleted": "Étiquette supprimée",
+  "deleteOne": "Supprimer l'étiquette {{code}} ? Un autocollant déjà imprimé avec ce code ne sera plus reconnu au scan.",
+  "deleteMany_one": "Supprimer {{count}} étiquette ? Un autocollant déjà imprimé avec son code ne sera plus reconnu au scan.",
+  "deleteMany_other": "Supprimer {{count}} étiquettes ? Les autocollants déjà imprimés avec ces codes ne seront plus reconnus au scan.",
   "printQueue": {
     "send": "Envoyer à l'imprimante",
     "choose": "Choisir une imprimante",

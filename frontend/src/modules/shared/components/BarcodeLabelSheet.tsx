@@ -78,10 +78,16 @@ export function BarcodeLabelSheet({
   const products = "itemIds" in target;
   const maxCopies = batches ? MAX_BATCH_COPIES : MAX_COPIES;
   const count = targetCount(target);
+  const fieldNames = {
+    width_mm: `${t("labels:previewModal.width")} (mm)`,
+    height_mm: `${t("labels:previewModal.height")} (mm)`,
+    copies: t("labels:previewModal.copies"),
+  };
   const preview = useBarcodeLabelPreview(
     target,
     options,
     t("labels:previewModal.previewFailed"),
+    fieldNames,
   );
   const printable = (count - preview.withoutCode) * options.copies;
   // Spelled out, not built: the i18n gate reads the keys a file names.
@@ -104,7 +110,9 @@ export function BarcodeLabelSheet({
       const { blob } = await fetchBarcodeLabels(target, options);
       downloadBlob(blob, fileName);
     } catch (error) {
-      toast.error(extractApiError(error, t("labels:errorDownloading")));
+      toast.error(
+        extractApiError(error, t("labels:errorDownloading"), fieldNames),
+      );
     } finally {
       setDownloading(false);
     }

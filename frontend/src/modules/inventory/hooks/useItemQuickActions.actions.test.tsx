@@ -11,6 +11,8 @@ type MutateOptions = {
 
 const mocks = vi.hoisted(() => ({
   consumeMutate: vi.fn(),
+  consumeMutateAsync: vi.fn(),
+  discardMutateAsync: vi.fn(),
   quantityMutate: vi.fn(),
   deleteMutateAsync: vi.fn(),
 }));
@@ -19,12 +21,23 @@ vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
 
+vi.mock("react-router-dom", () => ({ useNavigate: () => vi.fn() }));
+
 vi.mock("@/utils/logger", () => ({
   logger: { error: vi.fn(), warn: vi.fn(), debug: vi.fn(), info: vi.fn() },
 }));
 
 vi.mock("./useItemMutations", () => ({
-  useConsumeItem: () => ({ mutate: mocks.consumeMutate, isPending: false }),
+  useConsumeItem: () => ({
+    mutate: mocks.consumeMutate,
+    mutateAsync: mocks.consumeMutateAsync,
+    isPending: false,
+  }),
+  useDiscardItem: () => ({
+    mutate: vi.fn(),
+    mutateAsync: mocks.discardMutateAsync,
+    isPending: false,
+  }),
   useUpdateItemQuantity: () => ({
     mutate: mocks.quantityMutate,
     isPending: false,
@@ -143,6 +156,43 @@ describe("useItemQuickActions — offers, results and the delete dialog", () => 
     lastOptions(mocks.consumeMutate).onSuccess?.({ quantity: "1" });
     expect(toast.success).toHaveBeenLastCalledWith("Removed 1 — 1 left");
     expect(onDone).toHaveBeenCalledTimes(2);
+  });
+
+  it("asks how much on a record holding less than one unit instead of sending a 1 it would refuse", async () => {
+    mocks.consumeMutateAsync.mockResolvedValue({ quantity: "0" });
+    const record = item({ quantity: "0.5" });
+    const { action, result, onDone } = render(record);
+    act(() => action("consume")!.onClick());
+    expect(mocks.consumeMutate).not.toHaveBeenCalled();
+    expect(result.current.consumeDialog.item).toBe(record);
+
+    await act(() => result.current.consumeDialog.onConfirm(0.5, "USED"));
+    expect(mocks.consumeMutateAsync).toHaveBeenCalledWith({
+      itemId: "item-1",
+      quantity: 0.5,
+      reason: "USED",
+      notes: undefined,
+    });
+    expect(result.current.consumeDialog.item).toBeNull();
+    expect(onDone).toHaveBeenCalledTimes(1);
+  });
+
+  it("sends a disposal reason picked in the amount dialog to discard, not consume", async () => {
+    mocks.discardMutateAsync.mockResolvedValue({ quantity: "0" });
+    const { action, result, onDone } = render(item({ quantity: "0.5" }));
+    act(() => action("consume")!.onClick());
+
+    await act(() => result.current.consumeDialog.onConfirm(0.5, "DAMAGED"));
+    expect(mocks.discardMutateAsync).toHaveBeenCalledWith({
+      itemId: "item-1",
+      quantity: 0.5,
+      reason: "DAMAGED",
+      notes: undefined,
+    });
+    expect(mocks.consumeMutateAsync).not.toHaveBeenCalled();
+    // The dialog's answer is said back, as the product list does.
+    expect(toast.success).toHaveBeenCalledTimes(1);
+    expect(onDone).toHaveBeenCalledTimes(1);
   });
 
   it("reports a failed consume", () => {

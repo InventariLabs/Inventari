@@ -109,6 +109,7 @@
     "topLevel": "Najwyższy poziom"
   },
   "lot": {
+    "pageTitle": "Partia",
     "notFound": "Ta partia już nie istnieje",
     "backToLots": "Wróć do partii",
     "onHand": "Na stanie",

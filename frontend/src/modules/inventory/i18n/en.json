@@ -103,6 +103,7 @@
     "topLevel": "Top level"
   },
   "lot": {
+    "pageTitle": "Batch",
     "notFound": "This batch no longer exists",
     "backToLots": "Back to batches",
     "onHand": "On hand",

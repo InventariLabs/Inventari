@@ -8,6 +8,7 @@
   "subtitle": "Parcourir et gérer vos produits",
   "addProduct": "Ajouter un produit",
   "exportNeedsProducts": "Rien à exporter : cette liste est vide.",
+  "exportListFailed": "La liste n'a pas pu être chargée, il n'y a donc encore rien à exporter.",
   "searchPlaceholder": "Rechercher des produits…",
   "allPlaces": "Tous les emplacements",
   "allCategories": "Toutes les catégories",
@@ -379,6 +380,7 @@
     "justNow": "À l'instant",
     "actions": {
       "CREATED": "Créé",
+      "UNIT_CHOSEN": "Unité choisie",
       "CREATED_VIA_SCAN": "Créé par scan",
       "UPDATED": "Mis à jour",
       "MOVED": "Déplacé",
@@ -397,6 +399,10 @@
     "corrects": "corrige {{number}}",
     "createdWith_one": "Créé avec la quantité {{amount}}",
     "createdWith_other": "Créé avec la quantité {{amount}}",
+    "unitChosen": {
+      "entered": "Saisi : {{entered}}, conservé comme {{kept}}",
+      "unit": "Saisi en {{chosen_unit}} ; le produit est tenu en {{template_unit}}"
+    },
     "createdViaScan": {
       "label": "Créé en scannant l'étiquette {{code}}",
       "barcode": "Créé en scannant le code-barres {{code}}",
@@ -439,6 +445,7 @@
   "itemVolume": "Volume",
   "backToActiveItems": "Voir les produits actifs",
   "detail": {
+    "pageTitle": "Produit",
     "overviewTab": "Aperçu",
     "useBy": "À consommer avant (après ouverture)",
     "useByClear": "Effacer",

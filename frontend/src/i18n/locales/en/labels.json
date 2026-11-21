@@ -45,6 +45,7 @@
   "generateModal": {
     "title": "Generate Labels",
     "count": "Number of labels (1–500)",
+    "countTooHigh": "At most {{max}} labels fit in one batch.",
     "purpose": "What are these labels for?",
     "purposeHelp": "A blank label opens the add form for whatever it was printed for.",
     "purposeProduct": "Products",
@@ -194,7 +195,7 @@
   "history": {
     "label": "Label",
     "previouslyUsedFor": "Previously used for",
-    "title": "Product history"
+    "title": "Archived label"
   },
   "openScanActions": "Open scan actions",
   "scanNotFound": "Label not found",
@@ -203,6 +204,9 @@
   "statusUnassigned": "Unassigned",
   "viewPool": "View label pool",
   "labelDeleted": "Label deleted",
+  "deleteOne": "Delete label {{code}}? A sticker already printed with this code is no longer recognized when it is scanned.",
+  "deleteMany_one": "Delete {{count}} label? A sticker already printed with its code is no longer recognized when it is scanned.",
+  "deleteMany_other": "Delete {{count}} labels? Stickers already printed with their codes are no longer recognized when they are scanned.",
   "printQueue": {
     "send": "Send to printer",
     "choose": "Choose a printer",

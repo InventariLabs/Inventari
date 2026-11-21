@@ -316,7 +316,7 @@
   "masterDetailSubtitle": "Choisissez un emplacement pour voir son contenu, ses produits et ses réglages.",
   "select": {
     "title": "Choisir un emplacement",
-    "description": "L’arborescence à gauche liste tous les emplacements. Choisissez-en un pour voir son contenu."
+    "description": "Choisissez un emplacement dans l’arborescence à gauche pour voir son contenu."
   },
   "path": {
     "label": "Chemin de l’emplacement",

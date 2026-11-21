@@ -21,6 +21,7 @@ import { Slot } from "@/components/Slot";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { useItemQuickActions } from "@/modules/inventory/hooks/useItemQuickActions";
 import { QuickActionGrid } from "./QuickActionGrid";
+import { ConsumeDialog } from "@/modules/inventory/components/ConsumeDialog";
 import { DeleteReasonDialog } from "./DeleteReasonDialog";
 
 interface Props {
@@ -43,14 +44,15 @@ export default function QuickActionSheet({
   // "Edit" and opened the full form, which the API then refused at Save.
   const canWrite = useCanWrite("items");
   const { byId: places } = useLocationsById([item.location_id]);
-  const { actions, vocabularyNote, deleteDialog } = useItemQuickActions(item, {
-    inVirtualPlace: isVirtualUsage(places.get(item.location_id)?.usage),
-    onDone: onClose,
-    onMove: () => {
-      if (onMove) onMove();
-      else if (onViewDetails) onViewDetails();
-    },
-  });
+  const { actions, vocabularyNote, deleteDialog, consumeDialog } =
+    useItemQuickActions(item, {
+      inVirtualPlace: isVirtualUsage(places.get(item.location_id)?.usage),
+      onDone: onClose,
+      onMove: () => {
+        if (onMove) onMove();
+        else if (onViewDetails) onViewDetails();
+      },
+    });
 
   const expiry = effectiveExpiry(item);
   const expired = isExpired(expiry);
@@ -162,6 +164,14 @@ export default function QuickActionSheet({
           </Button>
         )}
       </div>
+
+      <ConsumeDialog
+        key={consumeDialog.item?.id ?? "closed"}
+        open={consumeDialog.item !== null}
+        item={consumeDialog.item}
+        onConfirm={consumeDialog.onConfirm}
+        onCancel={consumeDialog.onCancel}
+      />
 
       <DeleteReasonDialog
         key={String(deleteDialog.open)}

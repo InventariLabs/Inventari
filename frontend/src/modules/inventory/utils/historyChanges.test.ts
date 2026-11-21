@@ -438,3 +438,37 @@ describe("historyChanges read in the reader's language", () => {
     }
   });
 });
+
+describe("historyChanges unit chosen over the product's own", () => {
+  const tCard = i18n.getFixedT(null, "items");
+
+  it("says what was entered, in which unit, and what the record kept", () => {
+    const line = parseChanges(
+      "CREATED",
+      {
+        reason: "unit_chosen_over_template",
+        template_uom: "kg",
+        chosen_uom: "g",
+        entered_quantity: "1000",
+        kept_quantity: "1",
+      },
+      tCard,
+    );
+
+    expect(line).toBe("Entered 1,000 g, kept as 1 kg");
+  });
+
+  it("names both units when no quantity was typed with the choice", () => {
+    const line = parseChanges(
+      "CREATED",
+      {
+        reason: "unit_chosen_over_template",
+        template_uom: "kg",
+        chosen_uom: "g",
+      },
+      tCard,
+    );
+
+    expect(line).toBe("Entered in g; the product is kept in kg");
+  });
+});

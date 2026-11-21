@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { labelsApi } from "@/lib/api/labels";
+import { extractApiError } from "@/lib/errors";
 
 interface PreviewRequest {
   labelIds: string[];
@@ -11,6 +12,8 @@ interface PreviewRequest {
   copiesPerLabel: number;
   showCode: boolean;
   enabled: boolean;
+  /** The reader's names for the fields a refusal can name, by API key. */
+  fieldNames?: Record<string, string>;
 }
 
 interface SheetPreview {
@@ -18,6 +21,8 @@ interface SheetPreview {
   url: string | null;
   isLoading: boolean;
   failed: boolean;
+  /** The server's own sentence when it refused the request, naming the field. */
+  refusal: string | null;
 }
 
 /**
@@ -41,10 +46,16 @@ export function useLabelSheetPreview({
   copiesPerLabel,
   showCode,
   enabled,
+  fieldNames,
 }: PreviewRequest): SheetPreview {
   const [url, setUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [refusal, setRefusal] = useState<string | null>(null);
+  const fieldNamesRef = useRef(fieldNames);
+  useEffect(() => {
+    fieldNamesRef.current = fieldNames;
+  }, [fieldNames]);
   const currentUrl = useRef<string | null>(null);
   const ids = labelIds.join(",");
 
@@ -54,6 +65,7 @@ export function useLabelSheetPreview({
     let cancelled = false;
     setIsLoading(true);
     setFailed(false);
+    setRefusal(null);
 
     const timer = setTimeout(() => {
       const expanded = ids
@@ -80,8 +92,11 @@ export function useLabelSheetPreview({
           setUrl(currentUrl.current);
           if (previous) URL.revokeObjectURL(previous);
         })
-        .catch(() => {
-          if (!cancelled) setFailed(true);
+        .catch((error: unknown) => {
+          if (cancelled) return;
+          setFailed(true);
+          // A 5xx reads as the empty string, which the window words itself.
+          setRefusal(extractApiError(error, "", fieldNamesRef.current) || null);
         })
         .finally(() => {
           if (!cancelled) setIsLoading(false);
@@ -111,5 +126,5 @@ export function useLabelSheetPreview({
     [],
   );
 
-  return { url, isLoading, failed };
+  return { url, isLoading, failed, refusal };
 }

@@ -256,6 +256,28 @@ describe("ItemDetailPage", () => {
     ).toBeInTheDocument();
   });
 
+  it("keeps the page's name and the way back when the request fails", async () => {
+    server.use(
+      http.get("*/items/item-1", () =>
+        HttpResponse.json({ detail: "boom" }, { status: 500 }),
+      ),
+    );
+    const setHeader = vi.fn();
+
+    render(
+      <PageHeaderContext.Provider value={{ data: {}, setHeader }}>
+        <ItemDetailPage />
+      </PageHeaderContext.Provider>,
+    );
+
+    await waitFor(() =>
+      expect(setHeader).toHaveBeenCalledWith({
+        title: "Product",
+        backTo: "/inventory/items",
+      }),
+    );
+  });
+
   it("points at the archive when the product is there, not nowhere", async () => {
     // A soft-deleted product got "this product no longer exists"
     // from the screen that is one click away from the archive holding it.

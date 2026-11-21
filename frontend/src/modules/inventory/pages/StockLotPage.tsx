@@ -88,6 +88,17 @@ export default function StockLotPage() {
     lot?.locations.map((place) => place.location_id) ?? [],
   );
 
+  const requestFailed = isError && !isNotFoundError(error);
+  // A failed request keeps the page's frame — its name and the way back.
+  useEffect(() => {
+    if (!requestFailed) return;
+    setHeader({
+      title: t("inventory:lot.pageTitle"),
+      backTo: "/inventory/lots",
+    });
+    return () => setHeader({});
+  }, [requestFailed, setHeader, t]);
+
   useEffect(() => {
     if (!lot) return;
     setHeader({
@@ -130,7 +141,7 @@ export default function StockLotPage() {
 
   if (isLoading) return <LoadingSpinner />;
 
-  if (isError && !isNotFoundError(error)) {
+  if (requestFailed) {
     return <QueryError error={error} onRetry={() => void refetch()} />;
   }
 
