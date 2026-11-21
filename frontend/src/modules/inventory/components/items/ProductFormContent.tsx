@@ -73,12 +73,12 @@ function PhotoTile({
   onPreview: (url: string | null) => void;
   onImageSelect?: (file: File) => void | Promise<void>;
 }) {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation(["items", "common"]);
   const photo = preview ? (
     <img
       src={preview}
       className="w-full h-full object-cover"
-      alt={t("a11y.imagePreview")}
+      alt={t("common:a11y.imagePreview")}
       loading="lazy"
     />
   ) : (

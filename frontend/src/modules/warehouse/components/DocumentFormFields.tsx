@@ -98,11 +98,15 @@ export function DocumentFormFields({
 
   // A document cannot be dated in a closed month: the date picker greys those
   // days out and says why, rather than leaving the refusal for the save.
-  const { data: periods } = useInventoryPeriods();
+  const { data: periods, isError, isLoading } = useInventoryPeriods();
+  // Without the list the days are all offered and the save still refuses a
+  // closed month: a missing list marks nothing rather than something wrong.
   const closedMonths = new Set(
-    (periods ?? [])
-      .filter((p) => p.is_closed)
-      .map((p) => `${p.year}-${String(p.month).padStart(2, "0")}`),
+    isError || isLoading
+      ? []
+      : (periods ?? [])
+          .filter((p) => p.is_closed)
+          .map((p) => `${p.year}-${String(p.month).padStart(2, "0")}`),
   );
 
   // What a location picker says when it has nothing to offer. The policy case

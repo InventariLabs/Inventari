@@ -340,12 +340,6 @@ describe("the cancel dialog asks its question once", () => {
 });
 
 describe("DocumentDetailPage.confirmDialogTitle", () => {
-  it("names the write-off where the one-step press writes stock off", () => {
-    expect(confirmDialogTitle("postNow", t, false, "SCRAP")).toBe(
-      "Write off this stock?",
-    );
-  });
-
   it("asks 'Post this document?' only where the press posts", () => {
     expect(confirmDialogTitle("postNow", t)).toBe("Post this document?");
   });

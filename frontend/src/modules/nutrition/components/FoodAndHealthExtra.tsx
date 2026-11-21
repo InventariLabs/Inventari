@@ -47,6 +47,28 @@ interface Props {
   };
 }
 
+/**
+ * Both routes in — the camera and typing the values — write the product, so a
+ * reader who may only look is shown the values, or the plain "no data",
+ * without a button that does nothing.
+ */
+function useRoutesIn() {
+  const { enabledModules } = useModules();
+  const canWrite = useCanWrite("items");
+  return {
+    canWrite,
+    visionEnabled: enabledModules.includes("vision") && canWrite,
+  };
+}
+
+/** The product to type values into: none for a reader who may not write. */
+function writableTemplate(
+  templateId: string | null | undefined,
+  canWrite: boolean,
+) {
+  return canWrite ? templateId : null;
+}
+
 const FoodAndHealthExtra: React.FC<Props> = ({ data }) => {
   const { t } = useTranslation(["nutrition", "common"]);
   const tDyn = makeTDynamic(t);
@@ -60,11 +82,7 @@ const FoodAndHealthExtra: React.FC<Props> = ({ data }) => {
   // Where it is off the camera is a dead end — the request behind it comes
   // back refused — so both entries hide (the same gate applied to
   // quick add).
-  const { enabledModules } = useModules();
-  // Both routes in write the product; a reader who may only look is shown
-  // the values, or the plain "no data", without a button that does nothing.
-  const canWrite = useCanWrite("items");
-  const visionEnabled = enabledModules.includes("vision") && canWrite;
+  const { visionEnabled, canWrite } = useRoutesIn();
 
   if (!item) return null;
 
@@ -153,19 +171,18 @@ const FoodAndHealthExtra: React.FC<Props> = ({ data }) => {
   // The same form in both branches, so the empty state is not a closed loop:
   // typing values in by hand does not first require values, and a camera, a
   // legible label and an AI provider an admin configured are not the only way out.
-  const editForm =
-    item.template_id && canWrite ? (
-      <NutritionEditForm
-        nutritionFields={nutritionFields}
-        nutritionForm={manual.form}
-        showNutritionForm={manual.showForm}
-        isSaving={manual.isSaving}
-        onToggleForm={manual.onToggleForm}
-        onFieldChange={manual.onFieldChange}
-        onSave={manual.onSave}
-        t={t}
-      />
-    ) : null;
+  const editForm = writableTemplate(item.template_id, canWrite) ? (
+    <NutritionEditForm
+      nutritionFields={nutritionFields}
+      nutritionForm={manual.form}
+      showNutritionForm={manual.showForm}
+      isSaving={manual.isSaving}
+      onToggleForm={manual.onToggleForm}
+      onFieldChange={manual.onFieldChange}
+      onSave={manual.onSave}
+      t={t}
+    />
+  ) : null;
 
   if (!hasData) {
     return (
