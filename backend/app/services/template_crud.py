@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import uuid
-from typing import cast
+from pathlib import Path
+from typing import Any, cast
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -121,15 +122,17 @@ async def create_template_async(
     document_type: str = 'DEFAULT',
     is_default: bool = False,
     partials: dict[str, str] | None = None,
+    templates_dir: Path | None = None,
+    check_context: dict[str, Any] | None = None,
 ) -> DocumentTemplate:
     # Stored verbatim: the template is code, not data, and a
     # source-level sanitizer pass would reorder the HTML around Jinja spans
     # (html5lib foster-parenting). Sanitization happens on the rendered
     # output (TemplateEngine.render), where it cannot mangle the template.
-    engine = TemplateEngine()
+    engine = TemplateEngine(templates_dir=templates_dir)
     if partials:
         body_html = engine.inline_includes(body_html, partials)
-    engine.check_renders(body_html)
+    engine.check_renders(body_html, check_context)
 
     if is_default:
         await db.execute(
@@ -171,6 +174,8 @@ async def update_template_async(
     is_default: bool | None = None,
     partials: dict[str, str] | None = None,
     user_id: uuid.UUID | None = None,
+    templates_dir: Path | None = None,
+    check_context: dict[str, Any] | None = None,
 ) -> DocumentTemplate:
     tpl = await get_template_async(db, org_id, template_id, module)
     if not tpl:
@@ -193,10 +198,10 @@ async def update_template_async(
 
     if body_html is not None:
         # Stored verbatim; sanitized at render time (see create_template_async).
-        engine = TemplateEngine()
+        engine = TemplateEngine(templates_dir=templates_dir)
         if partials:
             body_html = engine.inline_includes(body_html, partials)
-        engine.check_renders(body_html)
+        engine.check_renders(body_html, check_context)
         tpl.body_html = body_html
 
     if name is not None:
