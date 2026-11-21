@@ -228,6 +228,7 @@ export default function CountLocationPage() {
             places={places}
             selectedId={selectedId}
             onSelect={setSelectedId}
+            canSelect={canWrite}
             onResume={(id) => navigate(`/inventory/stock-takes/${id}/counting`)}
           />
         )}

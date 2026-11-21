@@ -120,6 +120,9 @@ export default function StockTakeCreateModal({
         <form
           id="stock-take-create-form"
           onSubmit={handleSubmit}
+          // The browser's own bubble would answer a missing name while the
+          // missing location is answered inline; validateForm answers both.
+          noValidate
           className="space-y-4"
         >
           {errors.submit && (

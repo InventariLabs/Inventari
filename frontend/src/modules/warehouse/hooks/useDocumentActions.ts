@@ -12,6 +12,7 @@ import {
 import { downloadDocumentPdf } from "@/modules/warehouse/lib/downloadDocumentPdf";
 import {
   UNDOABLE_DOCUMENT_TYPES,
+  holdsGoodsBack,
   undoLabelKey,
   type DocumentCompletePayload,
   type DocumentTrackingPayload,
@@ -163,7 +164,8 @@ function announceCompletion(
       completed !== undefined &&
       completed.status === "COMPLETED" &&
       UNDOABLE_DOCUMENT_TYPES.has(completed.type) &&
-      !completed.reversed_by_id;
+      !completed.reversed_by_id &&
+      !holdsGoodsBack(completed.lines);
     if (canUndo && completed) {
       toast.success(context.t("toast.completed"), {
         action: {

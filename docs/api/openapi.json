@@ -21460,6 +21460,56 @@
         ]
       }
     },
+    "/api/v1/purchase-orders/templates/preview": {
+      "post": {
+        "tags": [
+          "Purchase Orders"
+        ],
+        "summary": "Preview Template",
+        "description": "What this layout prints, on an order made up for the purpose.\n\nThe same render the PDF goes through, on the context ``build_po_context``\nbuilds, so the preview cannot describe a document the printer would not\nproduce.",
+        "operationId": "preview_template_api_v1_purchase_orders_templates_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PoTemplatePreviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PoTemplatePreviewResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/v1/purchase-orders/templates/seed-defaults": {
       "post": {
         "tags": [
@@ -69305,6 +69355,17 @@
             ],
             "title": "Uom Id"
           },
+          "uom_symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uom Symbol"
+          },
           "min_quantity": {
             "anyOf": [
               {
@@ -70543,6 +70604,34 @@
           "production_date"
         ],
         "title": "PlannedIntermediateRead"
+      },
+      "PoTemplatePreviewRequest": {
+        "properties": {
+          "body_html": {
+            "type": "string",
+            "title": "Body Html"
+          }
+        },
+        "type": "object",
+        "required": [
+          "body_html"
+        ],
+        "title": "PoTemplatePreviewRequest",
+        "description": "A layout to render, as the editor currently has it."
+      },
+      "PoTemplatePreviewResponse": {
+        "properties": {
+          "html": {
+            "type": "string",
+            "title": "Html"
+          }
+        },
+        "type": "object",
+        "required": [
+          "html"
+        ],
+        "title": "PoTemplatePreviewResponse",
+        "description": "The layout rendered onto the example order."
       },
       "PreviewIngredient": {
         "properties": {

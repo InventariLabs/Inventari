@@ -84,6 +84,17 @@ export const UNDOABLE_DOCUMENT_TYPES: ReadonlySet<string> = new Set([
   "SCRAP",
 ]);
 
+/**
+ * Whether a receipt held part of a line back. Those goods lie on the
+ * quarantine shelf under a record the reversal does not reach, so the server
+ * refuses the undo and the screens do not offer it.
+ */
+export function holdsGoodsBack(
+  lines: ReadonlyArray<{ held_quantity?: number | string | null }> | undefined,
+): boolean {
+  return (lines ?? []).some((line) => Number(line.held_quantity ?? 0) > 0);
+}
+
 /** The verb "Undo" wears for a document type, in the warehouse's own words. */
 export function undoLabelKey(type: string): string {
   if (type === "OUT" || type === "INTERNAL_OUT")

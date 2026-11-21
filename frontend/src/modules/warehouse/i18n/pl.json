@@ -622,7 +622,7 @@
       "product_template": "",
       "category": "kategoria",
       "context_tag": "cecha",
-      "location_type": "typ miejsca"
+      "location_type": "Opcjonalnie — wybierz typ"
     },
     "executionSubmit": "Zatwierdź i zamknij",
     "executionInvalidQuantity": "Wprowadź poprawną wykonaną ilość dla każdej pozycji.",
@@ -814,6 +814,8 @@
     "confirmCloseMessage": "Dokumentów z datą {{month}} {{year}} nie będzie można tworzyć ani edytować. Okres można później otworzyć ponownie.",
     "confirmReopen": "Otworzyć ten okres ponownie?",
     "confirmReopenMessage": "{{month}} {{year}} znów przyjmie dokumenty.",
+    "closeAction": "Zamknij okres",
+    "reopenAction": "Otwórz okres ponownie",
     "closeSuccess": "Okres zamknięty",
     "current": "Bieżący",
     "notStarted": "Jeszcze się nie zaczął",
@@ -1151,19 +1153,19 @@
       "product_template": "Opcjonalnie — wybierz produkt",
       "category": "Opcjonalne — wybierz kategorię",
       "context_tag": "Opcjonalnie — wybierz grupę kategorii",
-      "location_type": "Opcjonalnie — wybierz typ miejsca",
+      "location_type": "Opcjonalnie — wybierz typ",
       "target_location": "Wybierz miejsce docelowe"
     },
     "match": {
       "section": "Warunki dopasowania",
-      "any_hint": "Reguła zadziała, gdy spełniony jest którykolwiek z warunków — nie wszystkie naraz.",
+      "any_hint": "Reguła obowiązuje, gdy spełniony jest którykolwiek z warunków; nie muszą być spełnione wszystkie.",
       "summary_prefix": "Ta reguła zadziała, gdy:",
       "or": "lub",
       "specificity": "Gdy pasuje więcej niż jeden warunek, wygrywa najbardziej szczegółowy: {{winner}}."
     },
     "hints": {
       "priority": "Niższy numer = wyższy priorytet",
-      "priority_scope": "Priorytet rozstrzyga tylko między regułami o tej samej szczegółowości.",
+      "priority_scope": "Priorytet rozstrzyga tylko remis między regułami pasującymi tak samo szczegółowo.",
       "location_order": "Towar trafia na pierwszą półkę, gdzie się mieści; pełne półki przekazują linię do następnej."
     },
     "actions": {
@@ -1286,6 +1288,10 @@
         "mixingHint": "To decyduje, czy odłożenie może dodać tu drugi produkt.",
         "mixedDescription": "Odłożenie może umieścić w tym miejscu kilka produktów.",
         "singleDescription": "Gdy stoi tu jeden produkt, odłożenie nie wpuści innych.",
+        "singleCrowded_one": "Stoi tu już {{count}} produkt. Zostają; jednego produktu pilnuje tylko odkładanie nowych towarów.",
+        "singleCrowded_few": "Stoją tu już {{count}} produkty. Zostają; jednego produktu pilnuje tylko odkładanie nowych towarów.",
+        "singleCrowded_many": "Stoi tu już {{count}} produktów. Zostają; jednego produktu pilnuje tylko odkładanie nowych towarów.",
+        "singleCrowded_other": "Stoi tu już {{count}} produktu. Zostają; jednego produktu pilnuje tylko odkładanie nowych towarów.",
         "limits": "Limity na produkt",
         "limitsHint": "Limit dotyczy jednego produktu i jest liczony w jego jednostce. Produkt bez limitu jest nieograniczony.",
         "product": "1. Produkt",
@@ -1320,6 +1326,7 @@
         "renumbered_few": "Zmieniono {{count}} kody",
         "renumbered_many": "Zmieniono {{count}} kodów",
         "renumbered_other": "Zmieniono {{count}} kodu",
+        "renumberedNone": "Każdy kod już zgadza się z szablonem — nic do ponownego wydruku.",
         "renumberFailed": "Nie udało się przenumerować miejsc",
         "numbered_one": "{{count}} miejsce dostało kod półki",
         "numbered_few": "{{count}} miejsca dostały kody półek",
@@ -1679,9 +1686,9 @@
   },
   "settings": {
     "overReceiptTolerance": "Tolerancja nadwyżki przy przyjęciu (%)",
-    "overReceiptToleranceDescription": "O ile ponad oczekiwaną ilość — lub ponad to, co zostało na linii zamówienia — może wejść przyjęcie bez uprawnienia do przyjmowania ponad tolerancję. 0% nie pozwala na żadną nadwyżkę.",
+    "overReceiptToleranceDescription": "O ile ponad oczekiwaną ilość — lub ponad to, co zostało na pozycji zamówienia — można przyjąć bez uprawnienia do przyjęć ponad tolerancję. 0 oznacza brak tolerancji: każda nadwyżka wymaga uprawnienia.",
     "overReceiptCeiling": "Górny limit nadwyżki przy przyjęciu (%)",
-    "overReceiptCeilingDescription": "O ile ponad oczekiwaną ilość — lub ponad to, co zostało na linii zamówienia — nikt nie może przyjąć, nawet osoba z uprawnieniem do przyjmowania ponad tolerancję. 0% oznacza brak limitu.",
+    "overReceiptCeilingDescription": "O ile ponad tę samą ilość nikt nie może przyjąć, nawet osoba z uprawnieniem do przyjęć ponad tolerancję. 0 oznacza brak limitu. Ustawiony limit nie może być niższy niż tolerancja.",
     "scanSessionIdleMinutes": "Zwolnij nieużywaną sesję skanowania po (minutach)",
     "scanSessionIdleMinutesDescription": "Sesja kompletacji lub przyjęcia, w której nikt nie skanował przez ten czas, przestaje blokować dokument: zeskanowane ilości zostają, a każdy może ją kontynuować albo zakończyć dokument.",
     "moduleTitle": "Konfiguracja",
@@ -1838,6 +1845,7 @@
         "change": "{{product}} zwykle trafia gdzie indziej. Ustawić {{location}} jako jego stałe miejsce od teraz?"
       },
       "yes": "Tak, ustaw jako stałe",
+      "done": "{{location}} to teraz dom produktu {{product}}; reguła jest w Regułach odkładania.",
       "no": "Nie",
       "dontAsk": "Nie pytaj więcej o {{product}}",
       "refused": {
@@ -2177,6 +2185,10 @@
       "full_few": "pełne: {{count}}",
       "full_many": "pełne: {{count}}",
       "full_other": "pełne: {{count}}",
+      "over_one": "{{count}} ponad limit",
+      "over_few": "{{count}} ponad limit",
+      "over_many": "{{count}} ponad limit",
+      "over_other": "{{count}} ponad limit",
       "empty_one": "puste: {{count}}",
       "empty_few": "puste: {{count}}",
       "empty_many": "puste: {{count}}",
@@ -2407,7 +2419,8 @@
     "print": "Drukuj {{number}}",
     "undoHintReceive": "Cofnięcie zdejmie towar ze stanu i zapisze korektę do {{number}}. Nic nie znika z historii.",
     "undoHintIssue": "Cofnięcie przywróci towar na stan i zapisze korektę do {{number}}. Nic nie znika z historii.",
-    "undoHintMove": "Cofnięcie przeniesie towar z powrotem i zapisze zwrot do {{number}}. Nic nie znika z historii."
+    "undoHintMove": "Cofnięcie przeniesie towar z powrotem i zapisze zwrot do {{number}}. Nic nie znika z historii.",
+    "undoHeldGoods": "Cofnięcie nie jest dostępne: część tego przyjęcia jest wstrzymana w kwarantannie. Wybierz „Popraw”, aby zmienić to, co leży na półce, a wstrzymany towar załatw osobno."
   },
   "board": {
     "title": "Tablica pracy",

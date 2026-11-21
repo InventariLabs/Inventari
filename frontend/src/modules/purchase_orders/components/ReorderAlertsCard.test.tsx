@@ -7,7 +7,7 @@ import { http, HttpResponse } from "msw";
 import { server } from "@/test/mocks/server";
 import { toast } from "sonner";
 import { ReorderAlertsCard } from "./ReorderAlertsCard";
-import type { ReplenishmentAlert } from "../api/reorder-rules";
+import type { ReorderRule, ReplenishmentAlert } from "../api/reorder-rules";
 
 vi.mock("sonner", () => ({
   toast: {
@@ -63,6 +63,42 @@ const createWrapper = () => {
 };
 
 const locationName = (id: string) => id;
+
+describe("ReorderAlertsCard supplier source", () => {
+  const rule = (preferred: string | null) =>
+    ({
+      id: "rule-1",
+      preferred_partner_id: preferred,
+    }) as unknown as ReorderRule;
+
+  it("says a supplier taken from the price list is not the rule's own", () => {
+    render(
+      <ReorderAlertsCard
+        alerts={[ALERT_WITH_SUPPLIER]}
+        locationName={locationName}
+        rules={[rule(null)]}
+      />,
+      { wrapper: createWrapper() },
+    );
+
+    expect(
+      screen.getByText("supplier ACME (cheapest on the price list)"),
+    ).toBeInTheDocument();
+  });
+
+  it("names the rule's own supplier plainly", () => {
+    render(
+      <ReorderAlertsCard
+        alerts={[ALERT_WITH_SUPPLIER]}
+        locationName={locationName}
+        rules={[rule("p-1")]}
+      />,
+      { wrapper: createWrapper() },
+    );
+
+    expect(screen.getByText("supplier ACME")).toBeInTheDocument();
+  });
+});
 
 describe("ReorderAlertsCard draft-PO action", () => {
   beforeEach(() => {

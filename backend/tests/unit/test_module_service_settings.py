@@ -43,6 +43,9 @@ def _install_stub_module(name: str, schema):
         def get_settings_schema(self):
             return schema
 
+        def check_settings(self, settings):
+            return None
+
     stub = _Stub()
     module_registry.get = lambda n, _stub=stub: _stub if n == name else None  # type: ignore[method-assign]
 

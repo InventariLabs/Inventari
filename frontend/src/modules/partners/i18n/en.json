@@ -69,8 +69,8 @@
     "otherCountry": "Other: {{value}}"
   },
   "form": {
-    "createTitle": "New Partner",
-    "editTitle": "Edit Partner",
+    "createTitle": "New partner",
+    "editTitle": "Edit partner",
     "namePlaceholder": "e.g. ABC Wholesaler",
     "fullNamePlaceholder": "e.g. John Smith",
     "codePlaceholder": "e.g. SUP-001",

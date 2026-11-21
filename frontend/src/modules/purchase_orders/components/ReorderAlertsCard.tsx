@@ -11,19 +11,22 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { formatDecimalQty } from "@/utils/formatters";
-import type { ReplenishmentAlert } from "../api/reorder-rules";
+import type { ReorderRule, ReplenishmentAlert } from "../api/reorder-rules";
 import { useCreateReplenishmentDraftPos } from "../hooks/useReorderRules";
 
 interface ReorderAlertsCardProps {
   alerts: ReplenishmentAlert[];
   locationName: (id: string) => string;
   canWrite?: boolean;
+  /** The rules the alerts come from — they tell which supplier is the rule's own. */
+  rules?: ReorderRule[];
 }
 
 export function ReorderAlertsCard({
   alerts,
   locationName,
   canWrite = false,
+  rules = [],
 }: ReorderAlertsCardProps) {
   const { t } = useTranslation("purchase_orders");
   const navigate = useNavigate();
@@ -135,9 +138,20 @@ export function ReorderAlertsCard({
                 <MakeInsteadAction alert={alert} canWrite={canWrite} />
               ) : alert.preferred_partner_name ? (
                 <span className="text-xs text-on-muted">
-                  {t("reorderRules.alertSupplier", {
-                    supplier: alert.preferred_partner_name,
-                  })}
+                  {/* A rule with no supplier of its own is proposed the
+                      cheapest one on the price list; say so, because the
+                      rules table beside it shows no supplier for the rule. */}
+                  {rules.some(
+                    (rule) =>
+                      rule.id === alert.reorder_rule_id &&
+                      !rule.preferred_partner_id,
+                  )
+                    ? t("reorderRules.alertSupplierPriceList", {
+                        supplier: alert.preferred_partner_name,
+                      })
+                    : t("reorderRules.alertSupplier", {
+                        supplier: alert.preferred_partner_name,
+                      })}
                 </span>
               ) : (
                 <Badge variant="warning">{t("reorderRules.noSupplier")}</Badge>

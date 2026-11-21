@@ -78,7 +78,7 @@ describe("TemplateEditorModal", () => {
 
     await waitFor(() => {
       expect(
-        screen.getAllByText("Create Template").length,
+        screen.getAllByText("Create template").length,
       ).toBeGreaterThanOrEqual(1);
     });
   });
@@ -111,7 +111,7 @@ describe("TemplateEditorModal", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Edit Template")).toBeInTheDocument();
+      expect(screen.getByText("Edit template")).toBeInTheDocument();
     });
   });
 
@@ -202,7 +202,7 @@ describe("TemplateEditorModal", () => {
 
     await waitFor(() => {
       expect(
-        screen.getAllByText("Create Template").length,
+        screen.getAllByText("Create template").length,
       ).toBeGreaterThanOrEqual(1);
     });
 
@@ -231,7 +231,7 @@ describe("TemplateEditorModal", () => {
 
     await waitFor(() => {
       expect(
-        screen.getAllByText("Create Template").length,
+        screen.getAllByText("Create template").length,
       ).toBeGreaterThanOrEqual(1);
     });
 
@@ -241,7 +241,7 @@ describe("TemplateEditorModal", () => {
     await user.type(nameField, "Handover");
     await user.type(screen.getByPlaceholderText("<html>..."), "<p>Hi</p>");
 
-    await user.click(screen.getByRole("button", { name: "Create Template" }));
+    await user.click(screen.getByRole("button", { name: "Create template" }));
 
     // The work survives the rejection and the modal stays open. No message is
     // shown — useCreateTemplate passes no errorFallback to useAppMutation, so

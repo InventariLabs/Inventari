@@ -274,6 +274,24 @@ function shelfSettingsProblems(
   return next;
 }
 
+/**
+ * How many products stand on a shelf now: choosing One product does not move
+ * them, and the panel says so instead of saving without a word. The overview
+ * is the one the occupancy screen already holds.
+ */
+function useProductsOnShelf(locationId: string): number {
+  const { data: overview } = useQuery({
+    queryKey: queryKeys.documents.putawayOccupancyOverview,
+    queryFn: () => putawayCapacityApi.occupancyOverview(),
+    staleTime: 60_000,
+    retry: false,
+  });
+  return (
+    overview?.nodes.find((node) => node.location_id === locationId)?.cell
+      ?.products ?? 0
+  );
+}
+
 /** One Save of the panel, split into the requests it sends. */
 interface ShelfSettingsWrite {
   locationId: string;
@@ -435,6 +453,7 @@ function ShelfSettingsForm({
   const [savedSingleProduct, setSavedSingleProduct] = useState(
     setting.single_product,
   );
+  const productsHere = useProductsOnShelf(location.id);
   const [limits, setLimits] = useState<LimitDraft[]>(() =>
     entries.map((entry) => toDraft(entry, t)),
   );
@@ -688,6 +707,9 @@ function ShelfSettingsForm({
             sequenceError={errors.sequence}
             singleProduct={singleProduct}
             onSingleProductChange={setSingleProduct}
+            crowdedByChoice={
+              singleProduct && !savedSingleProduct ? productsHere : 0
+            }
             canWrite={canWrite}
             canWriteStorages={canWriteStorages}
           />
@@ -749,6 +771,7 @@ function MixingSection({
   sequenceError,
   singleProduct,
   onSingleProductChange,
+  crowdedByChoice,
   canWrite,
   canWriteStorages,
 }: {
@@ -757,6 +780,8 @@ function MixingSection({
   sequenceError?: string;
   singleProduct: boolean;
   onSingleProductChange: (singleProduct: boolean) => void;
+  /** Products already standing here when One product is chosen; 0 when it does not apply. */
+  crowdedByChoice: number;
   canWrite: boolean;
   canWriteStorages: boolean;
 }) {
@@ -793,14 +818,23 @@ function MixingSection({
 
       <section className="space-y-2">
         {canWrite ? (
-          <ChoiceGroup
-            label={t("putaway.locations.panel.mixing")}
-            hint={t("putaway.locations.panel.mixingHint")}
-            options={mixingOptions}
-            value={singleProduct ? "single" : "mixed"}
-            onChange={(id) => onSingleProductChange(id === "single")}
-            layout="grid2"
-          />
+          <>
+            <ChoiceGroup
+              label={t("putaway.locations.panel.mixing")}
+              hint={t("putaway.locations.panel.mixingHint")}
+              options={mixingOptions}
+              value={singleProduct ? "single" : "mixed"}
+              onChange={(id) => onSingleProductChange(id === "single")}
+              layout="grid2"
+            />
+            {crowdedByChoice > 1 && (
+              <p role="status" className="text-xs text-on-warning">
+                {t("putaway.locations.panel.singleCrowded", {
+                  count: crowdedByChoice,
+                })}
+              </p>
+            )}
+          </>
         ) : (
           <div>
             <p className="text-xs font-medium uppercase text-on-muted tracking-wide ml-1">

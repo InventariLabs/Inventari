@@ -42,7 +42,7 @@ interface TemplateEditorModalProps {
   htmlInvalidMessage?: string;
   /**
    * Whether the module can actually serve a server-side render of the draft.
-   * Only documents has a preview endpoint; where it is absent the editor
+   * Whether the module has a preview endpoint; where it is absent the editor
    * must not offer the toggle — a control whose only possible outcome is the
    * same message a failed render gives, for a different reason, is worse
    * than none. Defaults to false.
@@ -238,8 +238,8 @@ export function TemplateEditorModal({
             className="text-lg font-semibold text-on"
           >
             {isEdit
-              ? t("common:templates.edit", "Edit Template")
-              : t("common:templates.create", "Create Template")}
+              ? t("common:templates.edit", "Edit template")
+              : t("common:templates.create", "Create template")}
           </h2>
           <Button
             variant="ghost"
@@ -398,7 +398,7 @@ export function TemplateEditorModal({
               ? t("common:form.saving", "Saving…")
               : isEdit
                 ? t("common:actions.save", "Save")
-                : t("common:templates.create", "Create Template")}
+                : t("common:templates.create", "Create template")}
           </Button>
         </div>
       </>

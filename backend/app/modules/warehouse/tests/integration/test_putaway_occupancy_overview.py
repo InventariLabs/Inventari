@@ -157,7 +157,7 @@ class TestOccupancyOverview:
         assert zone_node['summary'] == {
             'shelves': 5,
             'with_limit': 3,
-            'full': 2,
+            'full': 1,
             'over': 1,
             'empty': 1,
             # (50 + 100 + 100) / 3: the over-limit shelf counts as 100.

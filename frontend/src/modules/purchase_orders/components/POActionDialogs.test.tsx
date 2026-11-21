@@ -368,4 +368,18 @@ describe("POActionDialogs", () => {
       });
     });
   });
+
+  it("cancelling an order dismisses with Keep order, not a second Cancel", () => {
+    renderDialogs(makePo(), "cancel");
+
+    expect(
+      screen.getByRole("button", { name: "Keep order" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Cancel order" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Cancel" }),
+    ).not.toBeInTheDocument();
+  });
 });
