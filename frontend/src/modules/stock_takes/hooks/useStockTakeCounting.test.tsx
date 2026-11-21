@@ -333,6 +333,31 @@ describe("useStockTakeCounting", () => {
     });
   });
 
+  // A parent count claims the whole subtree, so a product received onto a
+  // sub-place after the snapshot is offered like one on the counted place.
+  it("offers a product added on a sub-location after the snapshot", async () => {
+    server.use(
+      http.get("/api/v1/locations/1/items", ({ request }) => {
+        const inside =
+          new URL(request.url).searchParams.get("include_inside") === "true";
+        return HttpResponse.json(
+          onePage([
+            { id: "item-1", name: "Test Item", quantity: 5 },
+            ...(inside
+              ? [{ id: "item-8", name: "On the Dock", quantity: 1 }]
+              : []),
+          ]),
+        );
+      }),
+    );
+    const { result } = renderHook(() => useStockTakeCounting("st-1"), {
+      wrapper: createWrapper().wrapper,
+    });
+    await waitFor(() => {
+      expect(result.current.outsideItems.map((i) => i.id)).toEqual(["item-8"]);
+    });
+  });
+
   // Creating a product on the fly must POST /items in the
   // counted location and then register the surplus — not create a
   // phantom in-memory id.

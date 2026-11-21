@@ -286,6 +286,9 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Counting a location that has sub-locations now offers, in the bar of
+  products outside the stock take, a product received onto a sub-location
+  after the count started, as counting that sub-location itself does.
 - Saving a print layout whose template code does not parse or render — a
   purchase order, warehouse document or equipment layout — is refused, with
   the line and the complaint, instead of being stored and then breaking every
