@@ -466,12 +466,17 @@ describe("WmsPickingView over several dispatches", () => {
       let listStarts = 0;
       const tookOver: string[] = [];
       server.use(
+        // Once the session is the caller's, the list start over a selection
+        // that only partly covers it answers with the own-session refusal.
         http.post(START_PATH, () => {
           listStarts += 1;
           return listStarts === 1
             ? held("SESSION_HELD_BY_OTHER_USER")
-            : HttpResponse.json(buildSession());
+            : held("SESSION_HELD_BY_YOU");
         }),
+        http.post("/api/v1/warehouse/documents/doc-2/picking/start", () =>
+          HttpResponse.json(buildSession()),
+        ),
         http.post(
           "/api/v1/warehouse/documents/doc-2/picking/held-1/take-over",
           () => {
@@ -500,6 +505,9 @@ describe("WmsPickingView over several dispatches", () => {
 
       await screen.findByText("Gadget");
       expect(tookOver).toEqual(["doc-2"]);
+      // The taken-over session opens in the same click: no own-session dialog.
+      expect(listStarts).toBe(1);
+      expect(screen.queryByText(/already open in your own session/)).toBeNull();
     });
   });
 

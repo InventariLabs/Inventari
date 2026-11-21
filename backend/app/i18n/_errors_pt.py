@@ -216,6 +216,7 @@ ERRORS_PT: dict[str, str] = {
     'wms_pick_document_not_confirmed': 'O documento {number} não está confirmado, então a sessão de separação não foi iniciada. Somente documentos confirmados podem ser separados.',
     'wms_pick_document_not_dispatch': 'O documento {number} não é uma expedição, então a sessão de separação não foi iniciada. Somente expedições podem ser separadas em conjunto.',
     'wms_pick_document_in_session': 'O documento {number} já está sendo separado em outra sessão (aberta por {owner}), então a sessão de separação não foi iniciada.',
+    'wms_pick_document_in_own_session': 'O documento {number} já está sendo separado na sua própria sessão, então a sessão de separação não foi iniciada.',
     'wms_line_document_closed': 'O documento {number} está {status}, então as linhas dele nesta sessão não podem mais ser alteradas.',
     'wms_short_below_scanned': 'A quantidade final não pode ser menor que a quantidade escaneada ({scanned}); para registrar menos, informe que a contagem substitui os escaneamentos.',
     'wms_session_not_found': 'A sessão ativa não foi encontrada. Ela pode ter sido concluída ou cancelada.',
