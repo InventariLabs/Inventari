@@ -271,6 +271,45 @@ class TestCostLinesCrud:
         ).json()
         assert [c['label'] for c in detail['cost_lines']] == ['Free']
 
+    def test_a_reference_price_cannot_be_negative(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        db_session: Session,
+    ) -> None:
+        """The reference price is copied into every run and the result per unit
+        is that price minus the unit cost, so a negative one would understate
+        every run after it: create and change both refuse it, naming the
+        field; zero stays allowed."""
+        template = ProductTemplate(organization_id=mk_org.id, name='Bread')
+        db_session.add(template)
+        db_session.commit()
+        db_session.refresh(template)
+        recipe = _create_recipe(client, mk_auth_headers, template.id, name='Rye')
+        url = f'/api/v1/maker/recipes/{recipe["id"]}'
+
+        created = client.post(
+            '/api/v1/maker/recipes',
+            headers=mk_auth_headers,
+            json={
+                'output_template_id': str(template.id),
+                'name': 'Spelt',
+                'reference_price': '-5',
+            },
+        )
+        changed = client.patch(
+            url, headers=mk_auth_headers, json={'reference_price': '-5'}
+        )
+        free = client.patch(url, headers=mk_auth_headers, json={'reference_price': '0'})
+
+        assert created.status_code == 422
+        assert created.json()['detail'][0]['loc'][-1] == 'reference_price'
+        assert changed.status_code == 422
+        assert changed.json()['detail'][0]['loc'][-1] == 'reference_price'
+        assert free.status_code == 200, free.text
+        assert Decimal(free.json()['reference_price']) == 0
+
     def test_create_cost_line_unknown_recipe_returns_404(
         self,
         client: TestClient,
