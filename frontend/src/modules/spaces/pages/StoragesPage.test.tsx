@@ -1094,6 +1094,12 @@ describe("StoragesPage — one screen", () => {
     await userEvent.click(screen.getByRole("button", { name: "Back to list" }));
 
     expect(await screen.findByText("Choose a location")).toBeInTheDocument();
+    // The tree can hide module places, so the hint claims no completeness.
+    expect(
+      screen.getByText(
+        "Pick a location in the tree on the left to see what is inside it.",
+      ),
+    ).toBeInTheDocument();
     expect(screen.queryByText("Location not found")).not.toBeInTheDocument();
   });
 

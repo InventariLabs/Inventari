@@ -22,15 +22,20 @@ interface ComputeContext {
    * Stands in for the category's context while none is chosen, so a scanned
    * jar is treated as food before anybody picks a category. */
   scannedAsFood?: boolean;
+  /** The context the organization's product profile gives a category that
+   * carries none of its own — a category the user made. */
+  profileContext?: string;
 }
 
-// A chosen category speaks for itself, even when it carries no context; only
-// with none chosen does a food scan stand in for the context.
+// A chosen category speaks for itself; one with no context of its own (made
+// by the user) takes the profile's. Only with none chosen does a food scan
+// stand in for the context.
 function contextOf(
   category: CategoryDTO | undefined,
   scannedAsFood: boolean,
+  profileContext: string | undefined,
 ): string | null | undefined {
-  if (category) return category.context_tag;
+  if (category) return category.context_tag ?? profileContext;
   return scannedAsFood ? "food" : undefined;
 }
 
@@ -60,6 +65,7 @@ export function computeFieldDefinitions({
   uomCategoryName,
   showInventoryValue = true,
   scannedAsFood = false,
+  profileContext,
 }: ComputeContext): FieldDefinition[] {
   const definedFields: FieldDefinition[] = [];
   const processedKeys = new Set<string>();
@@ -69,7 +75,11 @@ export function computeFieldDefinitions({
   const categoryFields = (selectedCategory?.field_definitions ??
     []) as FieldDefinition[];
 
-  const categoryContext = contextOf(selectedCategory, scannedAsFood);
+  const categoryContext = contextOf(
+    selectedCategory,
+    scannedAsFood,
+    profileContext,
+  );
 
   // A field set on a level above — a rack, a warehouse — applies here as if
   // the location set it itself: the tracked keys join its own, and the

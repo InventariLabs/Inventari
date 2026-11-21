@@ -5,6 +5,7 @@ import { CheckCircle, Move, Package, Trash2 } from "lucide-react";
 import { extractApiError } from "@/lib/errors";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { useHasPermission } from "@/hooks/useHasPermission";
+import { useStockExit } from "./useStockExit";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import { toAmount } from "@/utils/formatters";
 import { logger } from "@/utils/logger";
@@ -76,15 +77,24 @@ export function useItemQuickActions(
   const [isDeleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
   const consumeItemMutation = useConsumeItem();
+  const stockExit = useStockExit();
   const deleteItemMutation = useDeleteItem();
   const updateQuantityMutation = useUpdateItemQuantity();
 
   // One unit per press, whatever the unit measures. The action is labelled
   // "Remove 1 unit" (the sheet and the product page share this hook), and the
-  // row's amount dialog is where a reader asks for more. Weighed goods used
-  // to go the other way — "Remove 1 unit" on a 2 kg record took both
-  // kilograms, while "Add 1 unit" beside it added exactly one.
-  const consume = () =>
+  // row's amount dialog is where a reader asks for more. A record holding
+  // less than one unit cannot give "1": the amount dialog opens instead, the
+  // way the product list asks, rather than the press ending in a refusal.
+  const [isConsumeDialogOpen, setConsumeDialogOpen] = React.useState(false);
+  const consume = () => {
+    if ((toAmount(item.quantity) ?? 0) < 1) {
+      setConsumeDialogOpen(true);
+      return;
+    }
+    consumeOne();
+  };
+  const consumeOne = () =>
     consumeItemMutation.mutate(
       { itemId: item.id, quantity: 1 },
       {
@@ -122,6 +132,24 @@ export function useItemQuickActions(
         },
       },
     );
+
+  const confirmConsume = async (
+    quantity: number,
+    reason: string,
+    notes?: string,
+  ) => {
+    // Awaited by the dialog, which stays open on a refusal and says why. The
+    // exit routes a disposal reason to discard and says the result back, as
+    // the product list does.
+    try {
+      await stockExit.mutateAsync(item.id, quantity, reason, notes);
+    } catch (error: unknown) {
+      logger.error("Consume error:", error);
+      throw error;
+    }
+    setConsumeDialogOpen(false);
+    onDone();
+  };
 
   const addOne = () =>
     updateQuantityMutation.mutate(
@@ -237,6 +265,11 @@ export function useItemQuickActions(
   return {
     actions,
     vocabularyNote,
+    consumeDialog: {
+      item: isConsumeDialogOpen ? item : null,
+      onConfirm: confirmConsume,
+      onCancel: () => setConsumeDialogOpen(false),
+    },
     deleteDialog: {
       open: isDeleteDialogOpen,
       onConfirm: confirmDelete,

@@ -572,6 +572,10 @@ class TestItRefusesRatherThanGuesses:
         # A household records no movements at all (ADR-004). Handing it
         # today's shelves under last month's date would be a fabrication.
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+        # Whether the module is on is not what the refusal is about: nothing
+        # has moved yet, which is how the movement register words the same
+        # state.
+        assert 'Nothing has moved yet' in str(response.json())
 
 
 class TestWhatItWasWorth:

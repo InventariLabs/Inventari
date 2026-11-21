@@ -10,6 +10,7 @@ import {
   Keyboard,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Sheet, SheetBody, SheetHeader } from "@/components/ui/Sheet";
 import { Input } from "@/components/ui/Input";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { ScannerReadyHint } from "@/components/ui/ScannerReadyHint";
@@ -49,7 +50,14 @@ export interface LookupFailure {
  * the camera is not delivering codes — including the error overlay, which
  * must not cover the only copy of this field and leave a phone user stuck.
  */
-function ManualCodeEntry({ onSubmit }: { onSubmit: (code: string) => void }) {
+function ManualCodeEntry({
+  onSubmit,
+  inSheet = false,
+}: {
+  onSubmit: (code: string) => void;
+  /** Opened on purpose from the running camera: focus the field at once. */
+  inSheet?: boolean;
+}) {
   const { t: tScan } = useTranslation(["scan", "common"]);
   const [value, setValue] = useState("");
   // A USB scanner at a desktop types into the field without a click first; on
@@ -57,8 +65,8 @@ function ManualCodeEntry({ onSubmit }: { onSubmit: (code: string) => void }) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    if (isDesktop) inputRef.current?.focus();
-  }, [isDesktop]);
+    if (isDesktop || inSheet) inputRef.current?.focus();
+  }, [isDesktop, inSheet]);
 
   const submit = () => {
     const code = value.trim();
@@ -68,11 +76,13 @@ function ManualCodeEntry({ onSubmit }: { onSubmit: (code: string) => void }) {
   };
 
   return (
-    <div className="mt-8 w-full max-w-sm">
-      <div className="flex items-center gap-2 mb-3 text-on-muted text-xs font-medium uppercase tracking-widest justify-center">
-        <Keyboard size={14} />
-        {tScan("manualInputLabel")}
-      </div>
+    <div className={inSheet ? "w-full" : "mt-8 w-full max-w-sm"}>
+      {!inSheet && (
+        <div className="flex items-center gap-2 mb-3 text-on-muted text-xs font-medium uppercase tracking-widest justify-center">
+          <Keyboard size={14} />
+          {tScan("manualInputLabel")}
+        </div>
+      )}
       <div className="flex gap-2">
         <Input
           type="text"
@@ -99,6 +109,49 @@ function ManualCodeEntry({ onSubmit }: { onSubmit: (code: string) => void }) {
           needs no field at all. */}
       <ScannerReadyHint className="mt-2 justify-center" />
     </div>
+  );
+}
+
+/**
+ * A code typed while the camera is running: a damaged label does not scan,
+ * and the camera view held no field for it, so the only way out was to stop
+ * the scanner by leaving it.
+ */
+function TypeCodeFromCamera({ onCode }: { onCode: (code: string) => void }) {
+  const { t: tScan } = useTranslation(["scan", "common"]);
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button
+        variant="secondary"
+        onClick={() => setOpen(true)}
+        className="pointer-events-auto rounded-full bg-black/40 backdrop-blur-xl border-white/10 text-white hover:bg-black/60"
+        leftIcon={<Keyboard size={16} />}
+      >
+        {tScan("typeCode")}
+      </Button>
+      {open && (
+        <Sheet
+          open
+          onClose={() => setOpen(false)}
+          aria-label={tScan("typeCode")}
+        >
+          <SheetHeader
+            title={tScan("typeCode")}
+            onClose={() => setOpen(false)}
+          />
+          <SheetBody className="p-5">
+            <ManualCodeEntry
+              inSheet
+              onSubmit={(code) => {
+                setOpen(false);
+                onCode(code);
+              }}
+            />
+          </SheetBody>
+        </Sheet>
+      )}
+    </>
   );
 }
 
@@ -279,6 +332,7 @@ export default function ScanCameraView({
               <Info size={12} />
               {tScan("supportedFormatsHint")}
             </div>
+            {onManualCode && <TypeCodeFromCamera onCode={onManualCode} />}
           </div>
         </div>
       )}

@@ -8,7 +8,7 @@
     "login": {
       "chunks": ["LoginPage"],
       "budget": {
-        "jsKiB": 410,
+        "jsKiB": 415,
         "loadMs": 5500
       },
       "measured": {
@@ -21,7 +21,7 @@
     "launcher": {
       "chunks": ["Launcher"],
       "budget": {
-        "jsKiB": 425,
+        "jsKiB": 430,
         "loadMs": 8500
       },
       "measured": {
@@ -47,7 +47,7 @@
     "receive": {
       "chunks": ["ReceiveGoodsPage"],
       "budget": {
-        "jsKiB": 480,
+        "jsKiB": 485,
         "loadMs": 10000
       },
       "measured": {

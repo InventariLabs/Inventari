@@ -519,6 +519,17 @@ describe("auditChanges", () => {
     expect(changes).toEqual([{ path: "quantity", from: null, to: "2" }]);
   });
 
+  it("leaves out the routing word every created location carries", () => {
+    // A location made by a person is always an internal place: the word
+    // says nothing to the one who named the shelf.
+    const changes = auditChanges(
+      { name: "Shelf 3", parent_name: "Hall B", usage: "internal" },
+      "CREATE",
+    );
+
+    expect(changes.map((change) => change.path)).toEqual(["parent_name"]);
+  });
+
   it("reads a flat snapshot on UPDATE as the record of what happened", () => {
     // An UPDATE row with a flat snapshot printed "—" — the stock
     // take's close carried four counters and the cell showed nothing.

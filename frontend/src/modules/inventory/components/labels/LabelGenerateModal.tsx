@@ -113,11 +113,18 @@ export function LabelGenerateModal({
               onChange={(e) =>
                 setGenData({
                   ...genData,
-                  count: Math.min(
-                    parseInt(e.target.value) || 1,
-                    MAX_LABELS_PER_BATCH,
-                  ),
+                  count: parseInt(e.target.value) || 1,
                 })
+              }
+              // What was typed stays as typed: a number above the limit is
+              // said out loud and the button stops offering it, never
+              // quietly turned into another one.
+              error={
+                genData.count > MAX_LABELS_PER_BATCH
+                  ? t("generateModal.countTooHigh", {
+                      max: MAX_LABELS_PER_BATCH,
+                    })
+                  : undefined
               }
               className="text-center text-xl"
             />
@@ -198,7 +205,9 @@ export function LabelGenerateModal({
             // exception, and it left as a request that came back a 422
             // with no field attached to it.
             disabled={
-              generateMutation.isPending || genData.prefix.trim() === ""
+              generateMutation.isPending ||
+              genData.prefix.trim() === "" ||
+              genData.count > MAX_LABELS_PER_BATCH
             }
           >
             {generateMutation.isPending ? (

@@ -2,6 +2,8 @@ import { extractApiError } from "@/lib/errors";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Plus, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
+import type { LabelPool } from "@/types";
 import { downloadBlob } from "@/utils/helpers";
 import {
   useLabels,
@@ -43,6 +45,17 @@ function usePoolLabels(filterStatus: string, offset: number) {
     limit: PAGE_SIZE,
   });
 }
+
+/** The short code of a pool label, for a sentence that names it. */
+const codeOf = (labels: LabelPool[], id: string) =>
+  labels.find((l) => l.id === id)?.short_code ?? "";
+
+/** Why a download failed — a refused size names its field. */
+const downloadFailure = (error: unknown, fallback: string, t: TFunction) =>
+  extractApiError(error, fallback, {
+    width: `${t("labels:previewModal.width")} (mm)`,
+    height: `${t("labels:previewModal.height")} (mm)`,
+  });
 
 export default function LabelPoolPage() {
   const { t } = useTranslation(["labels", "common"]);
@@ -178,7 +191,7 @@ export default function LabelPoolPage() {
       if (
         await confirm({
           title: t("common:actions.delete"),
-          message: t("common:messages.confirmDelete"),
+          message: t("labels:deleteOne", { code: codeOf(labels, id) }),
           variant: "danger",
           confirmLabel: t("common:actions.delete"),
         })
@@ -191,7 +204,7 @@ export default function LabelPoolPage() {
         });
       }
     },
-    [confirm, deleteMutation, t],
+    [confirm, deleteMutation, labels, t],
   );
 
   const handlePreviewSingle = useCallback((id: string) => {
@@ -224,7 +237,7 @@ export default function LabelPoolPage() {
       downloadBlob(blob, filename);
       setShowPreview(false);
     } catch (error) {
-      toast.error(extractApiError(error, t("errorDownloading")));
+      toast.error(downloadFailure(error, t("errorDownloading"), t));
     }
   };
 
@@ -240,7 +253,7 @@ export default function LabelPoolPage() {
             if (
               await confirm({
                 title: t("common:actions.delete"),
-                message: t("common:messages.confirmDelete"),
+                message: t("labels:deleteMany", { count: selectedIds.length }),
                 variant: "danger",
                 confirmLabel: t("common:actions.delete"),
               })

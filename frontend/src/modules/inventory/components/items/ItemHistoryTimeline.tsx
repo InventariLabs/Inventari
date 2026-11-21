@@ -22,6 +22,7 @@ import { useEnabledModulesOptional } from "@/contexts/ModulesContext";
 import { useHasPermission } from "@/hooks/useHasPermission";
 import {
   parseChanges,
+  UNIT_CHOSEN_REASON,
   type HistoryUnit,
 } from "@/modules/inventory/utils/historyChanges";
 import { useLocationsById } from "@/module-sdk";
@@ -187,6 +188,11 @@ function HistoryEntry({ entry, locationName, unit }: HistoryEntryProps) {
   const { t, i18n } = useTranslation("items");
   const config = getQuantityChangeIcon(entry.action, entry.changes);
   const Icon = config.icon;
+  // The recorded unit choice is a row of its own kind, not a second creation.
+  const labelKey =
+    entry.changes?.reason === UNIT_CHOSEN_REASON
+      ? "history.actions.UNIT_CHOSEN"
+      : config.labelKey;
 
   const changesDesc = parseChanges(
     entry.action,
@@ -215,7 +221,7 @@ function HistoryEntry({ entry, locationName, unit }: HistoryEntryProps) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs font-medium text-on">
-            {t(config.labelKey, { defaultValue: entry.action })}
+            {t(labelKey, { defaultValue: entry.action })}
           </span>
           <span
             className="text-[10px] text-on-muted cursor-help"

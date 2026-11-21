@@ -9,6 +9,8 @@ interface ItemsHeaderActionsProps {
   canWrite: boolean;
   /** Export is offered over rows, so it has nothing to do over none. */
   hasRows: boolean;
+  /** The list's request failed: "no rows" then means "not known", not "empty". */
+  listFailed: boolean;
   onExitSelectionMode: () => void;
   onOpenMobileActions: () => void;
   onImport: () => void;
@@ -32,6 +34,7 @@ export function ItemsHeaderActions({
   selectionMode,
   canWrite,
   hasRows,
+  listFailed,
   onExitSelectionMode,
   onOpenMobileActions,
   onImport,
@@ -39,6 +42,9 @@ export function ItemsHeaderActions({
   onAddProduct,
 }: ItemsHeaderActionsProps) {
   const { t } = useTranslation(["items", "common"]);
+  const disabledReason = t(
+    listFailed ? "items:exportListFailed" : "items:exportNeedsProducts",
+  );
 
   if (selectionMode) {
     // In selection mode the header's only job is to offer the way out.
@@ -76,7 +82,7 @@ export function ItemsHeaderActions({
       {/* A disabled button takes no pointer events, so the reason rides on
           the wrapper. */}
       <span
-        title={hasRows ? undefined : t("items:exportNeedsProducts")}
+        title={hasRows ? undefined : disabledReason}
         className="hidden sm:flex"
       >
         <Button
@@ -90,7 +96,7 @@ export function ItemsHeaderActions({
         </Button>
         {!hasRows && (
           <span id="export-disabled-reason" className="sr-only">
-            {t("items:exportNeedsProducts")}
+            {disabledReason}
           </span>
         )}
       </span>

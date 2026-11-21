@@ -196,6 +196,14 @@ describe("FieldBuilder", () => {
     }
   });
 
+  it("names the button that closes the add-field form", () => {
+    render(<FieldBuilder fields={[]} onChange={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button"));
+    fireEvent.click(screen.getByText("Add custom field"));
+
+    expect(screen.getByRole("button", { name: "Close" })).toBeInTheDocument();
+  });
+
   it("exposes money, select, boolean and multi-select in the type dropdown", () => {
     render(<FieldBuilder fields={[]} onChange={vi.fn()} />);
     fireEvent.click(screen.getByRole("button"));

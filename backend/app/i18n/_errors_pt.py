@@ -644,7 +644,7 @@ ERRORS_PT: dict[str, str] = {
     'removal_strategy_of_shared_product': 'Este produto vem do catálogo compartilhado, então a ordem de saída do estoque dele é a do catálogo e não pode ser alterada para uma única organização.',
     'unit_weight_of_shared_product': 'Este produto vem do catálogo compartilhado, então o peso de uma peça é o do catálogo e não pode ser alterado para uma única organização.',
     'piece_unit_missing_from_catalogue': "O catálogo de unidades desta instalação não tem uma unidade de peça, então 'uma quantidade de quê' fica sem resposta. Indique uma unidade explicitamente ou restaure o catálogo de unidades padrão.",
-    'stock_as_of_no_history': 'Esta organização não registra movimentações de estoque, então não há histórico para consultar. Os níveis de estoque de hoje são a única resposta possível.',
+    'stock_as_of_no_history': 'Nada foi movimentado ainda, então não há histórico para consultar. Os níveis de estoque de hoje são a única resposta possível.',
     'stock_as_of_before_ledger': 'O registro de movimentações começa em {starts_at}. Nada é conhecido antes disso — nem mesmo zero — então um relatório de {as_of} seria um palpite.',
     'stock_as_of_pdf_too_many': 'O relatório tem {total} produtos — mais do que as {limit} linhas que cabem em uma impressão. Exporte-o como planilha ou escolha um local para restringi-lo.',
     'stock_value_period_reversed': (

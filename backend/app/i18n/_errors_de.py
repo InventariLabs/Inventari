@@ -71,9 +71,9 @@ ERRORS_DE: ErrorMessages = {
     ),
     'equipment_bulk_item_failed': ('Dieses Objekt konnte nicht geändert werden.'),
     'stock_as_of_no_history': (
-        'Diese Organisation erfasst keine Lagerbewegungen und hat daher '
-        'keine Historie für einen Bericht. Die einzige verfügbare '
-        'Antwort sind die heutigen Bestände.'
+        'Es hat sich noch nichts bewegt, daher gibt es keine Historie '
+        'für einen Bericht. Die einzige verfügbare Antwort sind die '
+        'heutigen Bestände.'
     ),
     'stock_as_of_before_ledger': (
         'Das Bewegungsjournal beginnt am {starts_at}. Über frühere '

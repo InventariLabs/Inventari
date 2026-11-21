@@ -103,6 +103,7 @@
     "topLevel": "Nível principal"
   },
   "lot": {
+    "pageTitle": "Lote",
     "notFound": "Este lote não existe mais",
     "backToLots": "Voltar aos lotes",
     "onHand": "Em estoque",

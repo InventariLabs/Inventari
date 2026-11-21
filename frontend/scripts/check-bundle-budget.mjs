@@ -493,6 +493,15 @@ const dist = join(root, "dist");
  * in. That one phone budget moves a step of five, to 620; the other screens
  * stand under theirs.
  *
+ * Re-measured 2026-11-21 on the branch that closes the catalogue, locations
+ * and labels findings: the issue screen measures 590.2 KiB gz against its 590,
+ * from 589.8 on the line without it. What the branch adds is copy in six
+ * languages and a few lines of the shared error text; no import walked in.
+ * That phone budget moves a step of five, to 595 (the history budget is
+ * already at 620 above); the other screens stand under theirs (login
+ * 409.1, launcher 424.2, receive 477.4, start 642.6, products 633.0, app
+ * first paint 404.3, initial 193.9).
+ *
  * The branch that finishes the warehouse floor findings of the persona walk
  * takes the history screen to the same 615.0 on its own (614.0 on the line
  * before it), and the same step to 620 covers it. It adds code as well as
@@ -511,6 +520,17 @@ const dist = join(root, "dist");
  * no import walked in. Those two phone budgets move a step of five (issue 595,
  * history 620); the other screens stand under theirs.
  *
+ * Re-measured 2026-11-21 on the branch that closes the catalogue, locations
+ * and labels findings, merged with the line that settled the first-contact and
+ * settings screens: app first paint measures 405.3 KiB gz against its 405,
+ * login 410.1 against 410 and launcher 425.2 against 425. The line alone
+ * measures 404.9, 409.7 and 424.8; the branch adds about 0.4 KiB to each (copy
+ * in six languages and a few lines of the shared error text, in the language
+ * chunk every first paint loads; no import walked in). Those three budgets move
+ * a step of five (first paint 410, login 415, launcher 430); the other screens
+ * stand under theirs (start 643.4, receive 479.0, issue 591.0, history 616.1,
+ * products 634.8, initial 194.0).
+ *
  * Re-measured 2026-11-21 on that warehouse floor branch merged with the line
  * that carries the first-contact one: the line alone measures app first paint
  * at 404.93 KiB gz against its 405, and the branch takes it to 405.11. It is
@@ -520,6 +540,15 @@ const dist = join(root, "dist");
  * a step of five, to 410; the other screens stand under theirs (login 409.9,
  * launcher 425.0, start 643.5, receive 479.8, issue 590.8, history 615.9,
  * products 633.8, initial 193.9).
+ *
+ * Re-measured 2026-11-21 on the branch that closes the catalogue, locations
+ * and labels findings, merged with the line that carries the warehouse floor
+ * branch: the receive screen measures 480.1 KiB gz against its 480. The line
+ * alone measures 479.8; the branch adds about 0.3 KiB of copy in six
+ * languages to the language chunk that screen loads, no import. That phone
+ * budget moves a step of five, to 485; the other screens stand under theirs
+ * (app first paint 405.5, login 410.3, launcher 425.4, start 643.8, issue
+ * 591.2, history 616.3, products 635.0, initial 194.0).
  */
 const BUDGETS = {
   initial: 245,

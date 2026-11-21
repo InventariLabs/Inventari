@@ -800,6 +800,9 @@ function flatFields(
         // in the Target column by its number; printed here it was JSON.
         key !== APPROVAL_TARGET_KEY &&
         !isReferenceLabel(key, snapshot) &&
+        // A location a person makes is always an internal place; the stored
+        // routing word says nothing to whoever named the shelf.
+        !(key === "usage" && value === "internal") &&
         value !== null &&
         value !== undefined &&
         value !== "" &&

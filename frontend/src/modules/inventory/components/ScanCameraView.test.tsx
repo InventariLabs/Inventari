@@ -56,6 +56,30 @@ describe("ScanCameraView — typing a code by hand", () => {
     expect(onManualCode).toHaveBeenCalledWith("5901234123457");
   });
 
+  it("can be typed while the camera is running, for a label that will not scan", () => {
+    const onManualCode = vi.fn();
+    render(
+      <ScanCameraView
+        {...baseProps}
+        isCameraActive
+        onManualCode={onManualCode}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Type a code" }));
+    const input = screen.getByTestId("manual-barcode-input");
+    fireEvent.change(input, { target: { value: "STM-0001" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    expect(onManualCode).toHaveBeenCalledWith("STM-0001");
+  });
+
+  it("offers no way to type a code with the camera running when the caller cannot take one", () => {
+    render(<ScanCameraView {...baseProps} isCameraActive />);
+
+    expect(screen.queryByRole("button", { name: "Type a code" })).toBeNull();
+  });
+
   it("hands over a code a hardware scanner reads, with the camera running", () => {
     const onManualCode = vi.fn();
     render(
