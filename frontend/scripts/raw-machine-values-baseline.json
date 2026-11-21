@@ -130,6 +130,7 @@
     "modules/settings/utils/auditChanges.ts::items:fieldOptions.${leaf}.${value}": 1,
     "modules/settings/utils/auditChanges.ts::modules:fieldBuilder.types.${d.type}": 1,
     "modules/settings/utils/auditChanges.ts::modules:modules.${name}.${name === \"core\" ? \"title\" : \"name\"}": 1,
+    "modules/settings/utils/auditChanges.ts::partners:types.${code}": 1,
     "modules/settings/utils/auditChanges.ts::settings.audit.fields.${segment}": 1,
     "modules/settings/utils/auditChanges.ts::warehouse:profile.${PRINT_LAYOUT_NAMES[code]}": 1,
     "modules/shared/components/BarcodeLabelSheet.tsx::labels:${preset.word}": 1,
