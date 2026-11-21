@@ -283,4 +283,57 @@ describe("PutawayRulesPage — inactive target mark", () => {
       await screen.findByText(/\+2 more shelves if it is full/),
     ).toBeInTheDocument();
   });
+
+  it("names why a shelf of a rule is held back, whichever shelf it is", async () => {
+    // The head sits in quarantine and the rule is still live through its
+    // second shelf: the badge says "held back", not "inactive", and a later
+    // shelf out of use is named because the row names only the head.
+    putawayRulesFixture.data = [
+      {
+        id: "r1",
+        organization_id: "o1",
+        product_template_id: null,
+        category_id: "c1",
+        context_tag: null,
+        location_type_code: null,
+        target_location_id: "loc-1",
+        priority: 10,
+        is_active: true,
+        created_at: "2026-09-15T10:00:00Z",
+        category_name: "Paints",
+        target_location_name: "Quarantine",
+        target_location_active: true,
+        locations: [
+          {
+            location_id: "loc-1",
+            position: 0,
+            location_name: "Quarantine",
+            active: false,
+            unavailable_reason: "quarantine",
+          },
+          {
+            location_id: "loc-2",
+            position: 1,
+            location_name: "Shelf B",
+            active: true,
+            unavailable_reason: null,
+          },
+          {
+            location_id: "loc-3",
+            position: 2,
+            location_name: "Old Dock",
+            active: false,
+            unavailable_reason: "archived",
+          },
+        ],
+      },
+    ];
+    await renderWithHeader(<PutawayRulesPage />);
+
+    expect(
+      await screen.findByText("Quarantine — held back"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Old Dock: Archived")).toBeInTheDocument();
+    expect(screen.queryByText("Target inactive")).not.toBeInTheDocument();
+  });
 });

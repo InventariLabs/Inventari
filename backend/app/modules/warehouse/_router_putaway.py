@@ -122,6 +122,15 @@ async def _validate_target_location(
         raise ServiceRejectionError(_RULE_TARGET_REFUSALS[reason])
 
 
+def _unavailable_reason(loc: Any, held: str | None) -> str | None:
+    """Why a shelf takes no goods — the words the receipt plan uses too."""
+    if (loc.settings or {}).get('archived') is True:
+        return 'archived'
+    if loc.usage != 'internal':
+        return 'not_internal'
+    return held
+
+
 async def _resolve_display_names(
     db: AsyncSession, org_id: UUID, rules: list[PutawayRule]
 ) -> list[PutawayRuleOut]:
@@ -133,7 +142,7 @@ async def _resolve_display_names(
     template_names: dict[UUID, str] = {}
     category_names: dict[UUID, str] = {}
     location_names: dict[UUID, str] = {}
-    location_states: dict[UUID, bool] = {}
+    location_reasons: dict[UUID, str | None] = {}
     held_back = await held_back_locations_async(db, org_id)
 
     for rule in rules:
@@ -155,12 +164,8 @@ async def _resolve_display_names(
                     location_names[lid] = loc.name
                     # A rule stored before a location became a receiving
                     # area or quarantine still names it: the planner steps
-                    # past it, so the list shows it as one that takes none.
-                    location_states[lid] = (
-                        (loc.settings or {}).get('archived') is not True
-                        and loc.usage == 'internal'
-                        and lid not in held_back
-                    )
+                    # past it, so the list says why the shelf takes none.
+                    location_reasons[lid] = _unavailable_reason(loc, held_back.get(lid))
 
     out: list[PutawayRuleOut] = []
     for rule in rules:
@@ -175,7 +180,8 @@ async def _resolve_display_names(
                 location_id=entry.location_id,
                 position=entry.position,
                 location_name=location_names.get(entry.location_id),
-                active=location_states.get(entry.location_id, True),
+                active=location_reasons.get(entry.location_id) is None,
+                unavailable_reason=location_reasons.get(entry.location_id),
             )
             for entry in ordered
         ]
@@ -190,7 +196,7 @@ async def _resolve_display_names(
         # The rule still works while ANY shelf on its list can take goods;
         # it is parked only when the resolver would walk past every one.
         dto.target_location_active = (
-            any(location_states.get(e.location_id, True) for e in ordered)
+            any(location_reasons.get(e.location_id) is None for e in ordered)
             if ordered
             else True
         )
@@ -530,7 +536,10 @@ async def preview_receipt_putaway(
     stand now, exactly as the document read does.
     """
     org_id = require_org(current_user)
-    await _validate_target_location(db, org_id, data.target_location_id)
+    # The receipt's destination is asked what the booking asks, not what a
+    # rule's target is asked: a receipt may name the quarantine, a receiving
+    # area or an archived shelf, and the plan says what becomes of its lines.
+    await validate_location_async(db, org_id, data.target_location_id)
     planner = await ReceiptLocationPlanner.for_target(
         db, org_id, data.target_location_id
     )

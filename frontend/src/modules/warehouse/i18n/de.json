@@ -550,7 +550,9 @@
     "plannedRuleWarning": {
       "archived": "Eine passende Regel zeigt auf einen archivierten Ort ({{rule}}) — nicht angewendet; die Zeile geht an {{location}}",
       "not_internal": "Eine passende Regel zeigt auf einen virtuellen Ort ({{rule}}) — nicht angewendet; die Zeile geht an {{location}}",
-      "refused": "Ein Modul hat jeden Ort einer passenden Regel ({{rule}}) für diese Ware ausgeschlossen — nicht angewendet; die Zeile geht an {{location}}"
+      "refused": "Ein Modul hat jeden Ort einer passenden Regel ({{rule}}) für diese Ware ausgeschlossen — nicht angewendet; die Zeile geht an {{location}}",
+      "receiving": "Eine passende Regel zeigt auf einen Wareneingangsbereich ({{rule}}) — nicht angewendet; die Zeile geht an {{location}}",
+      "quarantine": "Eine passende Regel zeigt auf den Quarantäneort ({{rule}}) — nicht angewendet; die Zeile geht an {{location}}"
     },
     "lineTargetLabel": "Ziellagerort der Position",
     "lineTargetFollowPlan": "Nach Plan (Regel / Dokument)",
@@ -1101,6 +1103,13 @@
       "active": "Aktiv",
       "inactive": "Inaktiv",
       "targetInactive": "Ziel inaktiv",
+      "shelfHeld": {
+        "archived": "Archiviert",
+        "not_internal": "Virtueller Ort",
+        "receiving": "Wareneingangsbereich — zurückgehalten",
+        "quarantine": "Quarantäne — zurückgehalten"
+      },
+      "shelfHeldNamed": "{{name}}: {{reason}}",
       "moreShelves_one": "+{{count}} weiterer Ort, wenn er voll ist",
       "moreShelves_other": "+{{count}} weitere Orte, wenn er voll ist"
     },
