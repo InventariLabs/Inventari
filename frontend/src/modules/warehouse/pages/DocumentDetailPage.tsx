@@ -444,7 +444,6 @@ function formatQuantity(value: number): string {
 
 export default function DocumentDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const location = useLocation();
   const { t } = useTranslation("warehouse");
   const [editOpen, setEditOpen] = useState(false);
   const canWrite = useCanWrite("warehouse");
@@ -611,7 +610,7 @@ export default function DocumentDetailPage() {
   // CTA, a scanned printout's #receive/#pick/#execute) — the effects and
   // their reasons live in the hook, the page stays a render.
   useDocumentDetailHashOpen(
-    location.hash,
+    useLocation().hash,
     doc,
     setEditOpen,
     setReceivingOpen,
