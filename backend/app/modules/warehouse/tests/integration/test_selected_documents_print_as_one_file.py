@@ -13,7 +13,10 @@ from uuid import uuid4
 import pytest
 from fastapi.testclient import TestClient
 from pypdf import PdfReader
+from sqlalchemy.orm import Session
 
+from app.core.template_models import DocumentTemplate
+from app.models.organization import Organization
 from app.models.partner import Partner
 from app.models.product_template import ProductTemplate
 from app.models.storage_location import StorageLocation
@@ -91,6 +94,50 @@ class TestSelectedDocumentsPrintAsOneFile:
         assert len(pages) == 3
         for page, doc in zip(pages, wanted, strict=True):
             assert doc['number'] in page
+
+    def test_a_stored_layout_that_does_not_render_prints_the_built_in_one(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_org: Organization,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_target_location: StorageLocation,
+        doc_template: ProductTemplate,
+    ) -> None:
+        """A layout stored before saves were checked still prints its documents."""
+        doc = _create_document(
+            client,
+            doc_auth_headers,
+            doc_partner,
+            doc_target_location,
+            doc_template,
+            confirm=True,
+        )
+        # Straight into the table: the editor refuses such a body on save, so
+        # only a row stored before that check can be in this state.
+        db_session.add(
+            DocumentTemplate(
+                organization_id=doc_org.id,
+                module='warehouse',
+                name='Broken layout',
+                document_type='IN',
+                body_html='<p>{{ broken </p>',
+                is_default=True,
+            )
+        )
+        db_session.commit()
+
+        resp = client.get(
+            '/api/v1/warehouse/documents/pdf',
+            headers=doc_auth_headers,
+            params={'ids': [doc['id']]},
+        )
+
+        assert resp.status_code == 200, resp.text
+        pages = _page_texts(resp.content)
+        assert len(pages) == 1
+        assert doc['number'] in pages[0]
 
     def test_a_draft_refuses_the_whole_file_and_is_named(
         self,
