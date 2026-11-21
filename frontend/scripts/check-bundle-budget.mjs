@@ -501,10 +501,24 @@ const dist = join(root, "dist");
  * wording itself in the language chunk (login 408.8, launcher 423.9, start
  * 642.5, receive 478.1, issue 589.9, products 632.1, app first paint 404.0,
  * initial 193.9 on that branch).
+ *
+ * Re-measured 2026-11-21 on that warehouse floor branch merged with the line's
+ * next ten commits: the line alone measures the issue screen at 589.96 KiB gz
+ * against its 590 and app first paint at 404.04 against its 405, and the
+ * branch takes them to 590.03 and 404.19. It is copy, not an import: the
+ * refusal, receipt, source-reference and manager-only sentences in the Polish
+ * language chunk every first paint loads (153.84 to 154.03), while the App
+ * chunk stays at 56.3. Merged with the branch that settles the first-contact
+ * and settings screens, which lifts issue to 595 for its own copy, the two
+ * measure app first paint at 405.11, though neither is over alone. Both
+ * budgets move a step of five (issue 595, app first paint 410); on the two
+ * together the other screens stand under theirs (login 409.9, launcher 425.0,
+ * start 643.5, receive 479.8, issue 590.8, history 615.9, products 633.8,
+ * initial 193.9).
  */
 const BUDGETS = {
   initial: 245,
-  appFirstPaint: 405,
+  appFirstPaint: 410,
 };
 
 /**
