@@ -163,7 +163,7 @@ describe("TagManager rename", () => {
     await confirmRename(user);
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Request failed",
+      "Failed to rename the tag",
     );
     expect(screen.getByLabelText("New name")).toHaveValue("supper");
   });
