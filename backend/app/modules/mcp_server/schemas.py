@@ -91,7 +91,9 @@ class SearchItemsResult(BaseModel):
         default_factory=list,
         description=(
             'Catalogue records when no stock row matched — a product with no '
-            'stock, or a barcode looked up directly.'
+            'stock, found by the same text search the stock rows use: name, '
+            'brand, the code on the record or its product card, serial and '
+            'label code.'
         ),
     )
 

@@ -121,6 +121,7 @@
     "saveFailed": "Échec de l'enregistrement du flux",
     "removeStage": "Supprimer l'étape",
     "addApprover": "Ajouter un approbateur",
+    "cannotApprove": "ne voit pas les approbations",
     "removeApprover": "Supprimer l'approbateur",
     "selectApprovers": "Sélectionner les approbateurs",
     "searchUsers": "Rechercher des utilisateurs…",

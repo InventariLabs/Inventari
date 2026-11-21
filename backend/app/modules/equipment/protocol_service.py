@@ -203,27 +203,27 @@ async def render_protocol_html(
         lang=cast(Language, lang),
     )
 
+    doc_type = 'CHECKIN' if assignment.checked_in_at else 'CHECKOUT'
+    built_in = (
+        _DEFAULT_CHECKIN_TEMPLATE
+        if assignment.checked_in_at
+        else _DEFAULT_CHECKOUT_TEMPLATE
+    )
     template_html: str | None = None
+    stored = None
     if template_id:
-        tpl = await core_api.templates.get_async(
+        stored = await core_api.templates.get_async(
             db, org_id, template_id, module='equipment'
         )
-        if tpl:
-            template_html = tpl.body_html
-
+        template_html = stored.body_html if stored else None
     if not template_html:
-        doc_type = 'CHECKIN' if assignment.checked_in_at else 'CHECKOUT'
-        default_tpl = await core_api.templates.get_default_async(
+        stored = await core_api.templates.get_default_async(
             db, org_id, module='equipment', document_type=doc_type
         )
-        if default_tpl:
-            template_html = default_tpl.body_html
-
+        template_html = stored.body_html if stored else None
     if not template_html:
-        if assignment.checked_in_at:
-            template_html = _DEFAULT_CHECKIN_TEMPLATE
-        else:
-            template_html = _DEFAULT_CHECKOUT_TEMPLATE
+        stored = None
+        template_html = built_in
 
     context = await _build_context_async(db, assignment, lang)
     context['L'] = _LABELS.get(lang, _LABELS['en'])
@@ -232,7 +232,21 @@ async def render_protocol_html(
     # out — the same treatment every documents/PO template gets. A
     # sandboxed render alone stops template injection, not markup the
     # template's author wrote on purpose.
-    return core_api.pdf.render_html(template_html, context)
+    if stored is None:
+        return core_api.pdf.render_html(template_html, context)
+    try:
+        return core_api.pdf.render_html(template_html, context)
+    except Exception:
+        # A layout stored before saves were checked can still fail to parse
+        # or render; the protocol prints the built-in one instead of failing
+        # the whole request.
+        logger.warning(
+            'The stored %s protocol layout %s does not render; printing the built-in one',
+            doc_type,
+            stored.id,
+            exc_info=True,
+        )
+        return core_api.pdf.render_html(built_in, context)
 
 
 async def render_protocol_pdf_async(

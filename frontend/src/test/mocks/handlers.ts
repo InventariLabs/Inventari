@@ -1543,6 +1543,12 @@ export const handlers = [
   http.get("/api/v1/users/org-members", () => {
     return HttpResponse.json(onePage([]));
   }),
+  http.get("/api/v1/approvals/workflows/approvers", () => {
+    return HttpResponse.json({ user_ids: [] });
+  }),
+  http.get("/api/v1/warehouse/periods", () => {
+    return HttpResponse.json(onePage([]));
+  }),
   http.get("/api/v1/roles", () => {
     return HttpResponse.json(onePage([]));
   }),

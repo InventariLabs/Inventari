@@ -147,6 +147,24 @@ describe("BatchRecordSheet", () => {
     expect(screen.getByText(/missing from this figure/i)).toBeInTheDocument();
   });
 
+  it("reads the unit cost as unknown while no ingredient carried a rate", () => {
+    render(
+      <BatchRecordSheet
+        record={{
+          ...record,
+          uncosted_ingredients: 1,
+          material_cost: "0.00",
+          total_cost: "0.00",
+          unit_cost: "0.00",
+        }}
+      />,
+    );
+
+    const fact = screen.getByText(/per unit/i).closest("div");
+    expect(fact).toHaveTextContent("—");
+    expect(fact).not.toHaveTextContent("0.00");
+  });
+
   it("is the part of the page that prints", () => {
     render(<BatchRecordSheet record={record} />);
 

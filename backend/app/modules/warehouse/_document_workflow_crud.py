@@ -1007,6 +1007,11 @@ async def update_document(
         await db.refresh(doc, attribute_names=['lines'])
         return doc
 
+    # A draft dated into a closed month could be neither confirmed nor edited
+    # again, so the edit is refused as creating one is.
+    if data.scheduled_date is not None:
+        await check_period_not_closed_async(db, org_id, data.scheduled_date)
+
     await _apply_header_fields_async(db, org_id, doc, data, sent)
 
     if 'lines' in sent:

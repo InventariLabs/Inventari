@@ -107,6 +107,13 @@ interface DateInputProps {
   /** Earliest / latest selectable date, ISO (`yyyy-MM-dd`). */
   min?: string;
   max?: string;
+  /**
+   * Days the field refuses for a reason of its own (a closed month, say):
+   * `test` answers for one ISO date, `note` says why, under the grid of any
+   * month that has such a day — a day greyed out with no word on it reads as
+   * a fault.
+   */
+  unavailable?: Unavailable;
   className?: string;
   /**
    * Classes for the box the field occupies — width, its share of a row, the
@@ -130,6 +137,35 @@ function today(): Date {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
+type Unavailable = { test: (iso: string) => boolean; note: string };
+
+/** Whether the field refuses this day: outside its range, or one it names. */
+function isRefused(
+  iso: string,
+  min?: string,
+  max?: string,
+  unavailable?: Unavailable,
+): boolean {
+  return Boolean(
+    (min && iso < min) || (max && iso > max) || unavailable?.test(iso),
+  );
+}
+
+/** The reason to print under a grid that shows a day the field names. */
+function refusedDayNote(
+  days: Date[],
+  focusedDay: Date,
+  unavailable?: Unavailable,
+): string | null {
+  if (!unavailable) return null;
+  const shown = days.some(
+    (day) =>
+      isSameMonth(day, focusedDay) &&
+      unavailable.test(format(day, VALUE_FORMAT)),
+  );
+  return shown ? unavailable.note : null;
+}
+
 export function DateInput({
   value,
   onChange,
@@ -141,6 +177,7 @@ export function DateInput({
   required,
   min,
   max,
+  unavailable,
   className,
   wrapperClassName,
   id,
@@ -200,10 +237,9 @@ export function DateInput({
     return Array.from({ length: cells }, (_, i) => addDays(gridStart, i));
   }, [focusedDay]);
 
-  const outOfRange = (date: Date) => {
-    const iso = format(date, VALUE_FORMAT);
-    return Boolean((min && iso < min) || (max && iso > max));
-  };
+  const outOfRange = (date: Date) =>
+    isRefused(format(date, VALUE_FORMAT), min, max, unavailable);
+  const refusedNote = refusedDayNote(days, focusedDay, unavailable);
 
   const commit = (date: Date) => {
     if (outOfRange(date)) return;
@@ -330,6 +366,10 @@ export function DateInput({
           })}
         </div>
       </div>
+
+      {refusedNote && (
+        <p className="text-xs text-on-secondary">{refusedNote}</p>
+      )}
 
       {value && (
         <Button

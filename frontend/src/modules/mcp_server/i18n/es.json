@@ -4,11 +4,13 @@
   "subtitle": "Dónde se conecta un agente de IA a este espacio de trabajo, la clave de API que envía y los hosts en los que responde el punto de acceso.",
   "endpoint": {
     "label": "Punto de acceso",
-    "hint": "Indica esta dirección en tu cliente MCP."
+    "hint": "Indica esta dirección en tu cliente MCP.",
+    "protocol": "Habla la revisión de protocolo 2026-07-28, enviada con cada solicitud; un cliente que empieza con el handshake initialize negocia 2025-11-25."
   },
   "connect": {
     "title": "Para conectar",
     "createKey": "Crea una clave API en Claves API y dale el permiso Usar el punto de acceso MCP.",
+    "createKeyNeedsAdmin": "Pide una clave a un administrador de tu organización: se crea en Claves API, con el permiso Usar el punto de acceso MCP.",
     "pointClient": "Envía la clave en la cabecera X-API-Key (o como token Bearer) a la dirección de arriba.",
     "allowHost": "Si la instalación responde en una dirección pública, añade su host a los hosts permitidos en los ajustes del módulo."
   },

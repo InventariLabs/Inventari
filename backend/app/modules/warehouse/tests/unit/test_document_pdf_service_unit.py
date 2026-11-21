@@ -229,13 +229,13 @@ class TestFormatPartnerAddress:
             'country': 'PL',
         }
         assert format_partner_address(addr, lang='de') == (
-            'Main St 1, Warsaw, 00-001, Polen'
+            'Main St 1, 00-001 Warsaw, Polen'
         )
         assert format_partner_address(addr, lang='fr') == (
-            'Main St 1, Warsaw, 00-001, Pologne'
+            'Main St 1, 00-001 Warsaw, Pologne'
         )
         assert format_partner_address(addr, lang='es') == (
-            'Main St 1, Warsaw, 00-001, Polonia'
+            'Main St 1, 00-001 Warsaw, Polonia'
         )
 
     async def test_partial_address(self) -> None:
