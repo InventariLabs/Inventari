@@ -560,7 +560,7 @@
       "product_template": "",
       "category": "category",
       "context_tag": "tag",
-      "location_type": "location type"
+      "location_type": "Optional — pick a type"
     },
     "executionSubmit": "Confirm & complete",
     "executionInvalidQuantity": "Enter a valid executed quantity for every line.",
@@ -738,6 +738,8 @@
     "confirmCloseMessage": "Documents dated {{month}} {{year}} can no longer be created or edited. You can reopen the period later.",
     "confirmReopen": "Reopen this period?",
     "confirmReopenMessage": "{{month}} {{year}} will accept documents again.",
+    "closeAction": "Close period",
+    "reopenAction": "Reopen period",
     "closeSuccess": "Period closed",
     "current": "Current",
     "notStarted": "Not started yet",
@@ -1065,19 +1067,19 @@
       "product_template": "Optional — select product",
       "category": "Optional — select category",
       "context_tag": "Optional — select category group",
-      "location_type": "Optional — select location type",
+      "location_type": "Optional — pick a type",
       "target_location": "Select a location"
     },
     "match": {
       "section": "Match conditions",
-      "any_hint": "The rule fires when any one of these matches — not when all of them do.",
+      "any_hint": "The rule applies when any one of these matches; it does not need all of them.",
       "summary_prefix": "This rule fires when:",
       "or": "or",
       "specificity": "If more than one matches, the most specific wins: {{winner}}."
     },
     "hints": {
       "priority": "Lower number = higher priority",
-      "priority_scope": "Priority only decides between rules of the same specificity.",
+      "priority_scope": "Priority only breaks a tie between rules that match equally specifically.",
       "location_order": "Goods go to the first shelf they fit; full shelves hand the line to the next one."
     },
     "actions": {
@@ -1184,6 +1186,8 @@
         "mixingHint": "This decides whether putaway may add a second product here.",
         "mixedDescription": "Putaway may put several products in this location.",
         "singleDescription": "Once one product stands here, putaway keeps others out.",
+        "singleCrowded_one": "{{count}} product already stands here. They stay put; only putaway of new goods keeps to one.",
+        "singleCrowded_other": "{{count}} products already stand here. They stay put; only putaway of new goods keeps to one.",
         "limits": "Limits per product",
         "limitsHint": "A limit is per product, in that product's own unit. A product without a limit is unlimited.",
         "product": "1. Product",
@@ -1216,6 +1220,7 @@
         "renumberConfirm": "Each location gets the code its position in the tree gives it. Old stickers keep scanning until replaced; the changed ones are listed for printing.",
         "renumbered_one": "{{count}} code changed",
         "renumbered_other": "{{count}} codes changed",
+        "renumberedNone": "Every code already matches the template — nothing to reprint.",
         "renumberFailed": "Could not renumber the locations",
         "numbered_one": "{{count}} location got its template code",
         "numbered_other": "{{count}} locations got their template codes",
@@ -1561,9 +1566,9 @@
   },
   "settings": {
     "overReceiptTolerance": "Over-receipt tolerance (%)",
-    "overReceiptToleranceDescription": "How far past the expected quantity — or past what is left on an order line — a receipt may go without the permission to receive over tolerance. 0% allows no surplus beyond it.",
+    "overReceiptToleranceDescription": "How far past the expected quantity — or past what is left on an order line — a receipt may go without the permission to receive over tolerance. 0 means no tolerance: every surplus needs the permission.",
     "overReceiptCeiling": "Over-receipt ceiling (%)",
-    "overReceiptCeilingDescription": "How far past the expected quantity — or past what is left on an order line — nobody may receive, not even someone who may receive over tolerance. 0% sets no ceiling.",
+    "overReceiptCeilingDescription": "How far past the same quantity nobody may receive, not even someone who may receive over tolerance. 0 means no ceiling. A set ceiling must not be below the tolerance.",
     "scanSessionIdleMinutes": "Release an idle scanning session after (minutes)",
     "scanSessionIdleMinutesDescription": "A picking or receiving session nobody has scanned in for this long stops holding its document: what was scanned is kept, and anyone can continue it or complete the document.",
     "moduleTitle": "Configuration",
@@ -1714,6 +1719,7 @@
         "change": "{{product}} usually goes elsewhere. Make {{location}} its home location from now on?"
       },
       "yes": "Yes, make it the home",
+      "done": "{{location}} is now the home of {{product}}; the rule is under Putaway rules.",
       "no": "No",
       "dontAsk": "Don't ask about {{product}} again",
       "refused": {
@@ -2033,6 +2039,8 @@
       "withLimit_other": "{{count}} with a limit",
       "full_one": "{{count}} full",
       "full_other": "{{count}} full",
+      "over_one": "{{count}} over the limit",
+      "over_other": "{{count}} over the limit",
       "empty_one": "{{count}} empty",
       "empty_other": "{{count}} empty"
     },

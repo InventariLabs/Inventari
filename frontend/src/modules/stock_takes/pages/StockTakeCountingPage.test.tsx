@@ -960,6 +960,25 @@ describe("StockTakeCountingPage — filter, notes and a product that was not lis
     expect(await screen.findByText("Bread")).toBeInTheDocument();
   });
 
+  it("says so when a typed code or name matches nothing", async () => {
+    // A miss must read as a miss, not as a slow answer: the sentence appears
+    // only once the search has answered and found nothing.
+    const user = userEvent.setup();
+    server.use(
+      http.get("/api/v1/items", () => HttpResponse.json(onePage([]))),
+      http.get("/api/v1/scan/resolve", () =>
+        HttpResponse.json({}, { status: 404 }),
+      ),
+    );
+    await renderPage();
+
+    await user.type(screen.getByTestId("stock-take-counting-input"), "zzzzqq");
+
+    expect(
+      await screen.findByText(/Nothing matches “zzzzqq”/),
+    ).toBeInTheDocument();
+  });
+
   it("sends the note typed on a card along with the count", async () => {
     const user = userEvent.setup();
     await renderPage();
@@ -1148,7 +1167,9 @@ describe("StockTakeCountingPage — filter, notes and a product that was not lis
 
     await user.click(screen.getByTestId("stock-take-cancel-btn"));
     const dialog = await screen.findByRole("alertdialog");
-    await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
+    await user.click(
+      within(dialog).getByRole("button", { name: "Keep counting" }),
+    );
 
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
     expect(cancelled).toEqual([]);

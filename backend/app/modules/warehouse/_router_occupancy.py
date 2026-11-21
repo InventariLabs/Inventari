@@ -61,7 +61,9 @@ class _Tally:
         if cell['fill'] is not None:
             self.with_limit += 1
             self.fill_sum += min(cell['fill'], 100)
-        if cell['status'] in (STATUS_NEARLY_FULL, STATUS_OVER):
+        # Full and over are two counts of two shelves: a shelf at 133% is over
+        # its limit, not also one of the full ones.
+        if cell['status'] == STATUS_NEARLY_FULL:
             self.full += 1
         if cell['status'] == STATUS_OVER:
             self.over += 1

@@ -134,7 +134,7 @@ describe("DocumentsTemplatesPage — header and entry points", () => {
     const user = userEvent.setup();
     render(<DocumentsTemplatesPage />);
     render(headerActions());
-    await user.click(screen.getByRole("button", { name: "Add Template" }));
+    await user.click(screen.getByRole("button", { name: "Add template" }));
     expect(m.editor).toBeDefined();
     expect(m.editor?.template).toBeUndefined();
     const close = m.editor?.onClose as Fn;

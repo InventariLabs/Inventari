@@ -63,3 +63,18 @@ describe("the pricelist's validity column", () => {
     });
   });
 });
+
+describe("the pricelist's unit and quantity columns", () => {
+  it("prints the unit the entry stores beside the price and the minimum quantity", () => {
+    renderTable([entry({ uom_symbol: "l", min_quantity: "5.000" })]);
+
+    expect(screen.getByText("/ l")).toBeInTheDocument();
+    expect(screen.getByText("From 5 l")).toBeInTheDocument();
+  });
+
+  it("says an entry with no minimum quantity applies to any quantity", () => {
+    renderTable([entry({ uom_symbol: "l" })]);
+
+    expect(screen.getByText("Any quantity")).toBeInTheDocument();
+  });
+});

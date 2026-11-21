@@ -181,7 +181,8 @@
     "cancelConfirm": {
       "title": "Auftrag stornieren?",
       "description": "Stornierung markiert den Entwurf als storniert. Keine Bestandsänderung.",
-      "confirm": "Ja, stornieren"
+      "confirm": "Ja, stornieren",
+      "keep": "Auftrag behalten"
     },
     "reverseConfirm": {
       "title": "Diesen Produktionslauf zurücknehmen?",

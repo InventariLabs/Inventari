@@ -78,7 +78,11 @@ export function ReorderRulesTable({
       <EmptyState
         icon={RefreshCw}
         title={t("reorderRules.emptyTitle")}
-        description={t("reorderRules.emptyDescription")}
+        description={t(
+          catalogEmpty
+            ? "reorderRules.emptyDescription"
+            : "reorderRules.emptyDescriptionWithProducts",
+        )}
         primaryAction={
           readOnly ? undefined : (
             <Button

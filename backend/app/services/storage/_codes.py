@@ -66,6 +66,26 @@ REPRINT_KEY = 'label_reprint'
 _MAX_SEGMENTS = 6
 _MAX_WIDTH = 6
 
+#: The level names a template written now may use. A name only labels its
+#: segment, so a typo ({foo}) would be accepted and print as a code nobody
+#: asked for; templates already stored are read as they are.
+_LEVEL_NAMES = frozenset(
+    {
+        'zone',
+        'area',
+        'section',
+        'aisle',
+        'row',
+        'rack',
+        'bay',
+        'column',
+        'shelf',
+        'level',
+        'bin',
+        'slot',
+    }
+)
+
 _PLACEHOLDER = re.compile(r'\{([A-Za-z_][A-Za-z0-9_]*)(?::0?([1-9]))?\}')
 _LITERAL = re.compile(r'^[A-Z0-9._/-]*$')
 _PREFIX = re.compile(rf'^[A-Z0-9]{{1,{LABEL_PREFIX_MAX_LENGTH}}}$')
@@ -138,8 +158,12 @@ def _refuse(key: str, **params: Any) -> ValidationException:
     return catalogue_refusal(key, **params, field='code_template')
 
 
-def parse_template(raw: str) -> CodeTemplate:
+def parse_template(raw: str, *, known_names_only: bool = False) -> CodeTemplate:
     """Read a template as a person typed it, or refuse it in their words.
+
+    With *known_names_only* a placeholder must be one of the level names
+    (``zone``, ``rack``, ``level``, …); a template saved earlier is read
+    without that check.
 
     Placeholders are ``{name}`` (letters) and ``{name:02}`` (digits padded to
     two); the text between two of them is the separator and may not be empty,
@@ -158,6 +182,8 @@ def parse_template(raw: str) -> CodeTemplate:
     for index, match in enumerate(found):
         literal = text[cursor : match.start()].upper()
         if not _LITERAL.fullmatch(literal) or (index > 0 and not literal):
+            raise _refuse('storage_code_template_invalid', template=raw)
+        if known_names_only and match.group(1).lower() not in _LEVEL_NAMES:
             raise _refuse('storage_code_template_invalid', template=raw)
         width = int(match.group(2)) if match.group(2) else None
         segments.append(_Segment(literal, width, match.group(1)))
@@ -705,7 +731,7 @@ async def set_template_async(
     if raw is None or not raw.strip():
         settings.pop(TEMPLATE_KEY, None)
     else:
-        settings[TEMPLATE_KEY] = parse_template(raw).raw
+        settings[TEMPLATE_KEY] = parse_template(raw, known_names_only=True).raw
     if settings.get(TEMPLATE_KEY) == before:
         return
     warehouse.settings = settings

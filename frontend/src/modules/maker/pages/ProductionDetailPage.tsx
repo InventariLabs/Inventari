@@ -320,7 +320,9 @@ export default function ProductionDetailPage() {
         confirmLabel={t("detail.cancelConfirm.confirm", {
           defaultValue: "Yes, cancel run",
         })}
-        cancelLabel={t("create.cancel", { defaultValue: "Cancel" })}
+        cancelLabel={t("detail.cancelConfirm.keep", {
+          defaultValue: "Keep run",
+        })}
         errorFallback={t("detail.cancelFailed", {
           defaultValue: "Failed to cancel production",
         })}

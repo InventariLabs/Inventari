@@ -106,6 +106,17 @@ export function ReorderRuleFormModal({
           max: form.maxQuantity,
         })
       : undefined;
+  const locationError = form.locationId
+    ? undefined
+    : t("reorderRules.locationRequired");
+  // The engine fires under the higher of the minimum and the safety stock;
+  // a safety stock above the minimum is allowed, so the form says which
+  // number the rule will act on instead of leaving "reorder at the minimum"
+  // standing beside a rule that fires earlier.
+  const safetyAboveMin =
+    !minQuantityError &&
+    Number.isFinite(Number(form.safetyStock)) &&
+    Number(form.safetyStock) > Number(form.minQuantity);
   const productError =
     !form.id && !form.product ? t("reorderRules.productRequired") : undefined;
 
@@ -113,6 +124,7 @@ export function ReorderRuleFormModal({
     setSubmitted(true);
     if (
       productError ||
+      locationError ||
       minQuantityError ||
       maxQuantityError ||
       maxBelowMinError
@@ -166,6 +178,8 @@ export function ReorderRuleFormModal({
           onChange={(v) => onChange({ ...form, locationId: v })}
           placeholder={t("reorderRules.selectLocation")}
           title={t("reorderRules.location")}
+          required
+          error={submitted ? locationError : undefined}
         />
 
         {/* Each field spans the label, input, description and error rows of one
@@ -202,7 +216,13 @@ export function ReorderRuleFormModal({
           <Input
             wrapperClassName={THRESHOLD_FIELD}
             label={t("reorderRules.safety")}
-            description={t("reorderRules.safetyDescription")}
+            description={
+              safetyAboveMin
+                ? t("reorderRules.safetyAboveMin", {
+                    safety: form.safetyStock,
+                  })
+                : t("reorderRules.safetyDescription")
+            }
             suffix={unit}
             type="number"
             min="0"

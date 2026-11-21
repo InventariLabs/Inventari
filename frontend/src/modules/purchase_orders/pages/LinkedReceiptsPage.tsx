@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { Card } from "@/components/ui/Card";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { QueryError } from "@/components/ui/QueryResult";
@@ -72,6 +73,7 @@ export default function LinkedReceiptsPage() {
 
   return (
     <div className="space-y-6">
+      <ReadOnlyNotice module="purchase_orders" />
       <Card className="p-5">
         <h2 className="text-sm font-medium text-on-secondary mb-4">
           {t("linkedReceipts")} — {po.number}
@@ -142,13 +144,15 @@ export default function LinkedReceiptsPage() {
                     {t("receivedCompleted")}:{" "}
                     {formatQuantityLocale(line.quantity_received)} /{" "}
                     {formatQuantityLocale(line.quantity_ordered)}{" "}
-                    {unitLabel(t, line.uom_symbol) || t("units")}
+                    {unitLabel(t, line.uom_symbol) ||
+                      t("units", { count: Number(line.quantity_ordered) })}
                     {inTransit > 0 && (
                       <span className="text-amber-600">
                         {" · "}
                         {t("receipt.colInTransit")}:{" "}
                         {formatQuantityValue(inTransit)}{" "}
-                        {unitLabel(t, line.uom_symbol) || t("units")}
+                        {unitLabel(t, line.uom_symbol) ||
+                          t("units", { count: inTransit })}
                       </span>
                     )}
                   </div>

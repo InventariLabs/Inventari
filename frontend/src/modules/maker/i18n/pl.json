@@ -183,7 +183,8 @@
     "cancelConfirm": {
       "title": "Anulować zlecenie?",
       "description": "Anulowanie oznacza szkic jako anulowany. Stan magazynu nie zmieni się.",
-      "confirm": "Tak, anuluj zlecenie"
+      "confirm": "Tak, anuluj zlecenie",
+      "keep": "Zachowaj zlecenie"
     },
     "reverseConfirm": {
       "title": "Cofnąć ten przebieg produkcji?",

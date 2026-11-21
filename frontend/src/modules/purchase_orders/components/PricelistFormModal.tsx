@@ -9,6 +9,7 @@ import { Sheet, SheetBody, SheetHeader } from "@/components/ui/Sheet";
 import { CURRENCY_CODES, currencyLabel } from "@/lib/currencies";
 import { todayIso } from "@/utils/formatters";
 import { QUANTITY_STEP } from "@/module-sdk";
+import { unitLabel } from "@/lib/i18nHelpers";
 import type { CatalogueSearchResult } from "@/modules/warehouse/moduleApi";
 
 export interface PricelistFormState {
@@ -77,6 +78,10 @@ export function PricelistFormModal({
   useEffect(() => {
     if (open) setSubmitted(false);
   }, [open]);
+
+  // The unit the entry stores: the price is per this unit, and the minimum
+  // quantity is counted in it.
+  const unit = unitLabel(t, form.product?.uom_symbol) || undefined;
 
   const productError =
     !form.id && !form.product ? t("pricelist.productRequired") : undefined;
@@ -157,6 +162,7 @@ export function PricelistFormModal({
             min="0.01"
             step="0.01"
             value={form.unitPrice}
+            suffix={unit ? `/ ${unit}` : undefined}
             error={submitted ? unitPriceError : undefined}
             onChange={(e) => onChange({ ...form, unitPrice: e.target.value })}
           />
@@ -178,6 +184,7 @@ export function PricelistFormModal({
             min="0"
             step={QUANTITY_STEP}
             value={form.minQuantity}
+            suffix={unit}
             error={submitted ? minQuantityError : undefined}
             onChange={(e) => onChange({ ...form, minQuantity: e.target.value })}
           />

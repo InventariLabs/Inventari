@@ -6035,6 +6035,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/purchase-orders/templates/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview Template
+         * @description What this layout prints, on an order made up for the purpose.
+         *
+         *     The same render the PDF goes through, on the context ``build_po_context``
+         *     builds, so the preview cannot describe a document the printer would not
+         *     produce.
+         */
+        post: operations["preview_template_api_v1_purchase_orders_templates_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/purchase-orders/templates/seed-defaults": {
         parameters: {
             query?: never;
@@ -21312,6 +21336,8 @@ export interface components {
             currency: string;
             /** Uom Id */
             uom_id?: string | null;
+            /** Uom Symbol */
+            uom_symbol?: string | null;
             /** Min Quantity */
             min_quantity?: string | null;
             /**
@@ -21684,6 +21710,22 @@ export interface components {
             planned_qty: string;
             /** Production Date */
             production_date: string | null;
+        };
+        /**
+         * PoTemplatePreviewRequest
+         * @description A layout to render, as the editor currently has it.
+         */
+        PoTemplatePreviewRequest: {
+            /** Body Html */
+            body_html: string;
+        };
+        /**
+         * PoTemplatePreviewResponse
+         * @description The layout rendered onto the example order.
+         */
+        PoTemplatePreviewResponse: {
+            /** Html */
+            html: string;
         };
         /**
          * PreviewIngredient
@@ -41473,6 +41515,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PlaceholderInfo"][];
+                };
+            };
+        };
+    };
+    preview_template_api_v1_purchase_orders_templates_preview_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PoTemplatePreviewRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PoTemplatePreviewResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

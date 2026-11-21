@@ -181,7 +181,8 @@
     "cancelConfirm": {
       "title": "Cancel production run?",
       "description": "Cancelling marks this draft as cancelled. No stock will be moved.",
-      "confirm": "Yes, cancel run"
+      "confirm": "Yes, cancel run",
+      "keep": "Keep run"
     },
     "reverseConfirm": {
       "title": "Undo this production run?",

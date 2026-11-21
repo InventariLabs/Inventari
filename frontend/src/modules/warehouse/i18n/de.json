@@ -560,7 +560,7 @@
       "product_template": "",
       "category": "Kategorie",
       "context_tag": "Merkmal",
-      "location_type": "Lagerorttyp"
+      "location_type": "Optional — Typ wählen"
     },
     "executionSubmit": "Bestätigen & Abschließen",
     "executionInvalidQuantity": "Geben Sie für jede Position eine gültige ausgeführte Menge ein.",
@@ -738,6 +738,8 @@
     "confirmCloseMessage": "Belege mit Datum {{month}} {{year}} können nicht mehr erstellt oder bearbeitet werden. Die Periode lässt sich später wieder öffnen.",
     "confirmReopen": "Diese Periode wieder öffnen?",
     "confirmReopenMessage": "{{month}} {{year}} nimmt wieder Belege an.",
+    "closeAction": "Zeitraum schließen",
+    "reopenAction": "Zeitraum wieder öffnen",
     "closeSuccess": "Periode geschlossen",
     "current": "Aktuell",
     "notStarted": "Noch nicht begonnen",
@@ -1065,19 +1067,19 @@
       "product_template": "Optional — Produkt wählen",
       "category": "Optional — Kategorie wählen",
       "context_tag": "Optional — Kategoriegruppe wählen",
-      "location_type": "Optional — Lagerorttyp wählen",
+      "location_type": "Optional — Typ wählen",
       "target_location": "Ziel-Lagerort wählen"
     },
     "match": {
       "section": "Übereinstimmungsbedingungen",
-      "any_hint": "Die Regel greift, wenn eine der Bedingungen zutrifft — nicht erst, wenn alle zutreffen.",
+      "any_hint": "Die Regel gilt, wenn eine der Bedingungen zutrifft; es müssen nicht alle zutreffen.",
       "summary_prefix": "Diese Regel greift, wenn:",
       "or": "oder",
       "specificity": "Treffen mehrere zu, gewinnt die spezifischste: {{winner}}."
     },
     "hints": {
       "priority": "Niedrigere Zahl = höhere Priorität",
-      "priority_scope": "Die Priorität entscheidet nur zwischen Regeln derselben Spezifität.",
+      "priority_scope": "Die Priorität entscheidet nur zwischen Regeln, die gleich spezifisch zutreffen.",
       "location_order": "Ware geht auf das erste Regal, wo sie passt; volle Regale geben die Position an das nächste weiter."
     },
     "actions": {
@@ -1184,6 +1186,8 @@
         "mixingHint": "Das entscheidet, ob die Einlagerung hier ein zweites Produkt zulässt.",
         "mixedDescription": "Die Einlagerung darf mehrere Produkte an diesen Lagerort stellen.",
         "singleDescription": "Sobald ein Produkt hier steht, hält die Einlagerung andere fern.",
+        "singleCrowded_one": "Hier steht schon {{count}} Produkt. Sie bleiben; nur die Einlagerung neuer Ware bleibt bei einem.",
+        "singleCrowded_other": "Hier stehen schon {{count}} Produkte. Sie bleiben; nur die Einlagerung neuer Ware bleibt bei einem.",
         "limits": "Limits je Produkt",
         "limitsHint": "Ein Limit gilt je Produkt in dessen eigener Einheit. Ein Produkt ohne Limit ist unbegrenzt.",
         "product": "1. Produkt",
@@ -1216,6 +1220,7 @@
         "renumberConfirm": "Jeder Lagerort erhält den Code seiner Stelle im Baum. Alte Etiketten scannen weiter, bis sie ersetzt sind; geänderte werden zum Drucken aufgeführt.",
         "renumbered_one": "{{count}} Code geändert",
         "renumbered_other": "{{count}} Codes geändert",
+        "renumberedNone": "Jeder Code entspricht bereits der Vorlage — nichts neu zu drucken.",
         "renumberFailed": "Die Lagerorte konnten nicht neu nummeriert werden",
         "numbered_one": "{{count}} Lagerort hat seinen Regalcode erhalten",
         "numbered_other": "{{count}} Lagerorte haben ihre Regalcodes erhalten",
@@ -1561,9 +1566,9 @@
   },
   "settings": {
     "overReceiptTolerance": "Überlieferungstoleranz (%)",
-    "overReceiptToleranceDescription": "Wie weit über die erwartete Menge — oder über den Rest der Bestellposition — ein Zugang ohne die Berechtigung zum Übererfassen hinausgehen darf. 0 % lässt keinen Überschuss zu.",
+    "overReceiptToleranceDescription": "Wie weit über die erwartete Menge — oder über den Rest einer Bestellposition — eine Annahme ohne die Berechtigung für Annahmen über der Toleranz gehen darf. 0 heißt keine Toleranz: Jede Mehrmenge braucht die Berechtigung.",
     "overReceiptCeiling": "Obergrenze für Überlieferungen (%)",
-    "overReceiptCeilingDescription": "Wie weit über die erwartete Menge — oder über den Rest der Bestellposition — niemand annehmen darf, auch nicht mit der Berechtigung zum Übererfassen. 0 % setzt keine Obergrenze.",
+    "overReceiptCeilingDescription": "Wie weit über dieselbe Menge hinaus niemand annehmen darf, auch nicht wer über der Toleranz annehmen darf. 0 heißt keine Obergrenze. Eine gesetzte Obergrenze darf nicht unter der Toleranz liegen.",
     "scanSessionIdleMinutes": "Ungenutzte Scan-Sitzung freigeben nach (Minuten)",
     "scanSessionIdleMinutesDescription": "Eine Kommissionier- oder Wareneingangssitzung, in der so lange niemand gescannt hat, blockiert ihr Dokument nicht mehr: Das Gescannte bleibt erhalten, und jeder kann sie fortsetzen oder das Dokument abschließen.",
     "moduleTitle": "Konfiguration",
@@ -1714,6 +1719,7 @@
         "change": "{{product}} kommt sonst woanders hin. {{location}} ab jetzt zum Stammplatz machen?"
       },
       "yes": "Ja, als Stammplatz festlegen",
+      "done": "{{location}} ist jetzt der Platz von {{product}}; die Regel steht unter Einlagerungsregeln.",
       "no": "Nein",
       "dontAsk": "Zu {{product}} nicht mehr fragen",
       "refused": {
@@ -2033,6 +2039,8 @@
       "withLimit_other": "{{count}} mit Limit",
       "full_one": "{{count}} voll",
       "full_other": "{{count}} voll",
+      "over_one": "{{count}} über dem Limit",
+      "over_other": "{{count}} über dem Limit",
       "empty_one": "{{count}} leer",
       "empty_other": "{{count}} leer"
     },

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import {
@@ -165,6 +165,26 @@ describe("ProductionDetailPage — the manager's cancel", () => {
     signInWith(["maker:read", "maker:write", "maker:manage", "items:write"]);
     renderPage();
     expect(screen.getByTestId("maker-detail-cancel-button")).toBeEnabled();
+  });
+});
+
+describe("ProductionDetailPage — the cancel question", () => {
+  it("pairs 'Yes, cancel run' with a dismiss that does not read Cancel", () => {
+    currentOrder = draftOrder;
+    signInWith(["maker:read", "maker:write", "maker:manage", "items:write"]);
+    renderPage();
+    fireEvent.click(screen.getByTestId("maker-detail-cancel-button"));
+
+    const dialog = screen.getByRole("alertdialog");
+    expect(
+      within(dialog).getByRole("button", { name: "Yes, cancel run" }),
+    ).toBeInTheDocument();
+    expect(
+      within(dialog).getByRole("button", { name: "Keep run" }),
+    ).toBeInTheDocument();
+    expect(
+      within(dialog).queryByRole("button", { name: "Cancel" }),
+    ).not.toBeInTheDocument();
   });
 });
 

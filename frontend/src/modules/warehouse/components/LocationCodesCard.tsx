@@ -123,11 +123,15 @@ export function LocationCodesCard({
     // The branch the reader is looking at, not its whole warehouse: a zone
     // renumbered leaves its sibling zones' stickers alone.
     renumber.mutate(locationId, {
+      // "0 codes changed" is an answer too, but it leaves the confirmation's
+      // promise of a list to print hanging; say there is none.
       onSuccess: (result) =>
         toast.success(
-          t("putaway.locations.codes.renumbered", {
-            count: result.changes.length,
-          }),
+          result.changes.length === 0
+            ? t("putaway.locations.codes.renumberedNone")
+            : t("putaway.locations.codes.renumbered", {
+                count: result.changes.length,
+              }),
         ),
     });
   };

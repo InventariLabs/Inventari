@@ -208,6 +208,26 @@ async def assert_under_ceiling_async(
     )
 
 
+def check_tolerance_below_ceiling(settings: dict[str, object]) -> None:
+    """Refuse a tolerance above a ceiling that is set.
+
+    The ceiling stops everyone, so a tolerance past it could never apply;
+    saving it without a word would leave the setting looking in force. A
+    ceiling of 0 means none, and then any tolerance stands.
+    """
+    try:
+        tolerance = Decimal(str(settings.get(TOLERANCE_SETTING_KEY) or 0))
+        ceiling = Decimal(str(settings.get(CEILING_SETTING_KEY) or 0))
+    except InvalidOperation:
+        return
+    if ceiling > 0 and tolerance > ceiling:
+        raise ServiceRejectionError(
+            'over_receipt_tolerance_above_ceiling',
+            tolerance=format(tolerance.normalize(), 'f'),
+            ceiling=format(ceiling.normalize(), 'f'),
+        )
+
+
 def over_receipt_ceiling(basis: Decimal, tolerance_percent: Decimal) -> Decimal:
     """The most may be recorded without the permission: *basis* plus its percent."""
     return basis * (Decimal('1') + tolerance_percent / Decimal('100'))

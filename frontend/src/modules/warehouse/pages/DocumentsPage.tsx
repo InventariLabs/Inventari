@@ -36,6 +36,20 @@ import type {
 } from "@/modules/warehouse/types";
 import { formatDate } from "@/utils/formatters";
 
+/** A cancel confirmation reads "Cancel document" beside "Keep document", never two buttons that begin with Cancel. */
+function confirmButtonLabels(
+  type: string,
+  t: (key: string) => string,
+): { confirmLabel: string; cancelLabel?: string } {
+  if (type === "cancel") {
+    return {
+      confirmLabel: t("confirmDialog.cancelConfirm"),
+      cancelLabel: t("confirmDialog.cancelKeep"),
+    };
+  }
+  return { confirmLabel: t(`actions.${type}`) };
+}
+
 export default function DocumentsPage() {
   const { t } = useTranslation("warehouse");
   const navigate = useNavigate();
@@ -339,7 +353,7 @@ export default function DocumentsPage() {
               ? "danger"
               : "default"
           }
-          confirmLabel={t(`actions.${confirmAction.type}`)}
+          {...confirmButtonLabels(confirmAction.type, t)}
           onConfirm={handleAction}
           onCancel={() => setConfirmAction(null)}
         />

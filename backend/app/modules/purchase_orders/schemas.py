@@ -508,6 +508,9 @@ class PartnerPricelistSchema(BaseModel):
     unit_price: Decimal
     currency: str
     uom_id: UUID | None = None
+    # The symbol of ``uom_id``, so the price and its minimum quantity print
+    # with the unit the entry stores.
+    uom_symbol: str | None = None
     min_quantity: Decimal | None = None
     valid_from: date
     valid_to: date | None = None
@@ -516,6 +519,22 @@ class PartnerPricelistSchema(BaseModel):
     updated_at: datetime | None = None
 
     model_config = ConfigDict(from_attributes=True)
+
+    @model_validator(mode='before')
+    @classmethod
+    def _populate_uom_symbol(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            return data
+        # An entry just created may carry the unit relationship unloaded;
+        # reading it there would start a lazy load the async session refuses.
+        loaded = 'uom' not in sa_inspect(data).unloaded
+        uom = data.uom if loaded else None
+        values = {
+            name: getattr(data, name, field.default)
+            for name, field in cls.model_fields.items()
+            if name != 'uom_symbol'
+        }
+        return {**values, 'uom_symbol': uom.symbol if uom is not None else None}
 
 
 class ReorderRuleCreate(BaseModel):

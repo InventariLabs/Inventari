@@ -178,7 +178,8 @@
     "cancelConfirm": {
       "title": "Cancelar a produção?",
       "description": "Cancelar marca este rascunho como cancelado. Nenhum estoque será movimentado.",
-      "confirm": "Sim, cancelar produção"
+      "confirm": "Sim, cancelar produção",
+      "keep": "Manter produção"
     },
     "reverseConfirm": {
       "title": "Desfazer esta produção?",

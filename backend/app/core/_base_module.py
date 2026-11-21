@@ -622,6 +622,15 @@ class BaseModule(ABC):
         """
         return None
 
+    def check_settings(self, settings: dict[str, Any]) -> None:
+        """Refuse a saved combination of settings that cannot work together.
+
+        Called with the settings as they would stand after a write, defaults
+        filled. The schema checks one value at a time; a rule between two
+        values (a tolerance above the ceiling it is measured against) lives
+        here and raises ``ServiceRejectionError``. The default accepts all.
+        """
+
     def get_default_settings(self) -> dict[str, object]:
         """Return the default settings for this module."""
         return {}

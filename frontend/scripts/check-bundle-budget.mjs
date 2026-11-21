@@ -475,11 +475,15 @@ const dist = join(root, "dist");
  * and the unpicked-products wording) measures the products screen at 630.0
  * KiB gz against its 630; that budget moves a step of five, to 635.
  *
- * The sentences the production screens gained (what a refused dialog says,
- * the held batch and its reason, the unit mismatch notice) are in the Polish
- * catalogue, which is the language this budget is measured in; the start
- * screen measures 640.0 KiB gz against its 640 after them, with the copy
- * already trimmed. That budget moves a step of five, to 645.
+ * Re-measured 2026-11-20 on the branch that tells the reader what warehouse
+ * setup, stock take and purchasing screens do: the start screen measures
+ * 640.3 KiB gz against its 640, from 639.8 before it. What the branch adds
+ * there is copy in six languages (the Polish one sits in the language chunk
+ * the start screen loads) and a few lines of the module bar's active-tab
+ * rule; no import walked in. That one phone budget moves a step of five, to
+ * 645; the other screens stand under theirs (login 407.5, launcher 422.5,
+ * receive 475.6, issue 588.4, history 613.2, products 630.6, app first paint
+ * 402.7, initial 193.9).
  */
 const BUDGETS = {
   initial: 245,

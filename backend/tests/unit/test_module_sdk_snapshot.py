@@ -353,6 +353,7 @@ class TestBuildSnapshot:
             'consumes_stock_quant',
             'settings_schema',
             'default_settings',
+            'settings_check',
         ]
 
     def test_a_registry_singleton_records_the_methods_a_module_calls(self):

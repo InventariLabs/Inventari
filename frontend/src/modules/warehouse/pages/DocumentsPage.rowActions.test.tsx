@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@/test/utils";
+import { render, screen, within } from "@/test/utils";
 import type { PageHeaderData } from "@/hooks/useModulePageHeader";
 import * as documentsHooks from "@/modules/warehouse/hooks/useDocuments";
 import { useDocumentsList } from "@/modules/warehouse/hooks/useDocumentsList";
@@ -226,10 +226,18 @@ describe("DocumentsPage — what a row asks for", () => {
     const user = userEvent.setup();
     render(<DocumentsPage />);
     press("row-doc-1", "onRequestAction", "cancel", draft);
-    await screen.findByRole("alertdialog");
-    // The confirm and the dismiss are both "Cancel" here; Escape is the way
-    // out that cannot be mistaken for the step itself.
-    await user.keyboard("{Escape}");
+    const dialog = await screen.findByRole("alertdialog");
+    // The dismiss never reads like the step it refuses: "Keep document" beside
+    // "Cancel document", not "Cancel" beside "Cancel".
+    expect(
+      within(dialog).getByRole("button", { name: "Cancel document" }),
+    ).toBeInTheDocument();
+    expect(
+      within(dialog).queryByRole("button", { name: "Cancel" }),
+    ).not.toBeInTheDocument();
+    await user.click(
+      within(dialog).getByRole("button", { name: "Keep document" }),
+    );
     expect(m.cancel).not.toHaveBeenCalled();
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
   });
