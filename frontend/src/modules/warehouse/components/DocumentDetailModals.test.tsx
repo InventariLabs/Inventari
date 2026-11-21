@@ -103,6 +103,24 @@ describe("DocumentDetailModals confirm dialog", () => {
     expect(screen.getByRole("button", { name: "Post" })).toBeInTheDocument();
   });
 
+  it("names the write-off of a scrap draft instead of posting a document", () => {
+    const scrap = { ...doc, type: "SCRAP" } as WarehouseDocument;
+    render(
+      <DocumentDetailModals
+        doc={scrap}
+        confirmAction="postNow"
+        {...closed}
+        confirmTitle="Post this document?"
+      />,
+    );
+
+    expect(screen.getByText("Write off this stock?")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Write off stock" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Post this document?")).not.toBeInTheDocument();
+  });
+
   it("leaves the plain Confirm and Cancel on a confirmation", () => {
     render(
       <DocumentDetailModals doc={doc} confirmAction="confirm" {...closed} />,

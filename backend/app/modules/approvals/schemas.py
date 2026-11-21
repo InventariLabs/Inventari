@@ -197,6 +197,12 @@ class WorkflowConfigured(BaseModel):
     configured: bool
 
 
+class WorkflowApprovers(BaseModel):
+    """The members of the organization who could decide a stage naming them."""
+
+    user_ids: list[UUID]
+
+
 class ApprovalDecisionSchema(BaseModel):
     id: UUID
     stage_order: int

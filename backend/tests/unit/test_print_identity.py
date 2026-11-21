@@ -91,4 +91,44 @@ class TestIssuerContext:
             country='PL',
         )
         ctx = IssuerContext.from_organization(org, lang='pl')
-        assert ctx.address == 'Main 1, Warsaw, 00-001, Polska'
+        assert ctx.address == 'Main 1, 00-001 Warsaw, Polska'
+
+
+@pytest.mark.unit
+class TestTheIssuerBlock:
+    @staticmethod
+    def _render(**context: object) -> str:
+        from pathlib import Path
+
+        from jinja2 import Environment, FileSystemLoader
+
+        import app.core.print_identity as identity
+
+        folder = Path(identity.__file__).parent / 'print_templates'
+        env = Environment(loader=FileSystemLoader(folder), autoescape=True)
+        return env.get_template('print_issuer.html').render(**context)
+
+    def test_the_tax_id_carries_its_label(self) -> None:
+        """A bare number under the name reads as nothing; partner blocks label it."""
+        html = self._render(
+            issuer=IssuerContext(name='Acme', tax_id='1234563218'),
+            labels={'tax_id': 'NIP'},
+        )
+        assert 'NIP: 1234563218' in html
+
+    def test_a_context_without_labels_still_names_the_tax_id(self) -> None:
+        html = self._render(issuer=IssuerContext(name='Acme', tax_id='1234563218'))
+        assert 'Tax ID: 1234563218' in html
+
+    def test_a_polish_address_reads_as_an_address(self) -> None:
+        ctx = IssuerContext.from_snapshot(
+            {
+                'address': {
+                    'street': 'ul. Magazynowa 5',
+                    'city': 'Łódź',
+                    'postal_code': '90-001',
+                }
+            },
+            'pl',
+        )
+        assert ctx.address == 'ul. Magazynowa 5, 90-001 Łódź'

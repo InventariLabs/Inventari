@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import type { TFunction } from "i18next";
 import { useCanManage, useCanWrite } from "@/hooks/useCanWrite";
 import { useTranslation } from "react-i18next";
@@ -15,6 +16,7 @@ import {
   useInventoryPeriods,
   useClosePeriod,
   useReopenPeriod,
+  useOpenDocumentsInPeriod,
 } from "@/modules/warehouse/hooks/useInventoryPeriods";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
@@ -75,6 +77,13 @@ export default function InventoryPeriodPanel() {
     error,
     refetch,
   } = useInventoryPeriods(selectedYear);
+  // Closing is asked about what it would strand: the documents of the month
+  // that are not finished stay on Start as work that can only be refused.
+  const openDocs = useOpenDocumentsInPeriod(
+    confirmAction?.year ?? selectedYear,
+    confirmAction?.month ?? 1,
+    confirmAction?.action === "close",
+  );
   const closePeriod = useClosePeriod();
   const reopenPeriod = useReopenPeriod();
 
@@ -315,7 +324,44 @@ export default function InventoryPeriodPanel() {
           }
           onConfirm={handleConfirm}
           onCancel={() => setConfirmAction(null)}
-        />
+        >
+          {confirmAction.action === "close" &&
+            openDocs.data &&
+            openDocs.data.count > 0 && (
+              <div role="note" className="space-y-2 text-sm text-on-secondary">
+                <p className="font-medium text-on">
+                  {t("periods.openDocuments", {
+                    count: openDocs.data.count,
+                    month: formatMonthName(
+                      confirmAction.year,
+                      confirmAction.month,
+                    ),
+                    year: confirmAction.year,
+                  })}
+                </p>
+                <ul className="space-y-1">
+                  {openDocs.data.documents.map((doc) => (
+                    <li key={doc.id}>
+                      <Link
+                        to={`/warehouse/documents/${doc.id}`}
+                        className="text-on-primary underline"
+                      >
+                        {doc.number}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                {openDocs.data.count > openDocs.data.documents.length && (
+                  <p>
+                    {t("periods.openDocumentsMore", {
+                      count:
+                        openDocs.data.count - openDocs.data.documents.length,
+                    })}
+                  </p>
+                )}
+              </div>
+            )}
+        </ConfirmDialog>
       )}
     </div>
   );
