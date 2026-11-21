@@ -567,6 +567,15 @@ says what the release does rather than what changed since them.
   Duplicate on a draft, but no Start run, Complete run, Finish run, portion
   form, Undo run or Cancel of a run in progress, and *New production* opens
   planning only, without the *Save as made* choice: each of those posts stock.
+- The return sheet keeps to what is still left of a line. Its maximum is what
+  earlier returns and corrections have not already taken back, not the full
+  quantity done, so a quantity above it is named under the field and the sheet
+  cannot be submitted. A line already returned in full is left out of the
+  sheet, and a document with nothing left to return says so instead of
+  listing lines. A leading zero no longer sticks in the quantity field of
+  the return and correction sheets, packing, phone receiving, document
+  lines, quick add and shopping-list add: a digit typed after a 0 replaces
+  it.
 - The work board no longer counts what was undone. A dispatch that has been
   undone is not counted in *Orders shipped on the order day* (undoing the
   only dispatch of the week now reads "No orders shipped yet this week"
