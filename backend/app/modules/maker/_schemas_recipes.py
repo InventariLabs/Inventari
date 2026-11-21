@@ -57,7 +57,7 @@ class RecipeCreate(BaseModel):
     #: before steps carried durations keeps working; the service normalises
     #: both to objects before the row is written.
     process_steps: list[ProcessStep | str] | None = None
-    reference_price: Decimal | None = Field(None, max_digits=12, decimal_places=2)
+    reference_price: Decimal | None = Field(None, ge=0, max_digits=12, decimal_places=2)
     is_default: bool = False
     source_recipe_id: UUID | None = None
 
@@ -72,7 +72,7 @@ class RecipeUpdate(BaseModel):
     #: before steps carried durations keeps working; the service normalises
     #: both to objects before the row is written.
     process_steps: list[ProcessStep | str] | None = None
-    reference_price: Decimal | None = Field(None, max_digits=12, decimal_places=2)
+    reference_price: Decimal | None = Field(None, ge=0, max_digits=12, decimal_places=2)
     is_default: bool | None = None
 
 
