@@ -68,9 +68,8 @@ ERRORS_FR: ErrorMessages = {
     'unknown_bulk_action': 'Action groupée inconnue : {action}',
     'equipment_bulk_item_failed': ("Cet équipement n'a pas pu être modifié."),
     'stock_as_of_no_history': (
-        'Cette organisation n’enregistre aucun mouvement de stock et '
-        'n’a donc aucun historique à présenter. La seule réponse '
-        'disponible est le stock du jour.'
+        'Rien n’a encore bougé, il n’y a donc aucun historique à '
+        'présenter. La seule réponse disponible est le stock du jour.'
     ),
     'stock_as_of_before_ledger': (
         'Le journal des mouvements commence le {starts_at}. Rien '

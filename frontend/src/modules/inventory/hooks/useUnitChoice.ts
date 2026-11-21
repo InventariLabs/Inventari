@@ -213,3 +213,45 @@ export function useUnitChoice({
       Boolean(uomId) && Boolean(promptFor(uomId)) && uomId === confirmedUomId,
   };
 }
+
+/**
+ * The save a unit question interrupted, carried on by the answer.
+ *
+ * A save press that raises the question registers it with `rememberQuestion`;
+ * answering that very question — either way — runs `submit` again, which then
+ * finds the unit settled. A question raised by changing the picker is not
+ * registered, so answering it saves nothing.
+ */
+export function useSaveAfterUnitAnswer(
+  pendingUnitChoice: PendingUnitChoice | null,
+  resolveUnitChoice: (confirmed: boolean) => void,
+  submit: () => void,
+) {
+  const questionFromSaveRef = useRef<PendingUnitChoice | null>(null);
+  const [resumeTick, setResumeTick] = useState(0);
+  const resumedTickRef = useRef(0);
+
+  useEffect(() => {
+    if (resumeTick === resumedTickRef.current) return;
+    resumedTickRef.current = resumeTick;
+    submit();
+  }, [resumeTick, submit]);
+
+  const answerUnitChoice = useCallback(
+    (confirmed: boolean) => {
+      const carriesSave =
+        questionFromSaveRef.current !== null &&
+        questionFromSaveRef.current === pendingUnitChoice;
+      questionFromSaveRef.current = null;
+      resolveUnitChoice(confirmed);
+      if (carriesSave) setResumeTick((tick) => tick + 1);
+    },
+    [pendingUnitChoice, resolveUnitChoice],
+  );
+
+  const rememberQuestion = useCallback((question: PendingUnitChoice | null) => {
+    questionFromSaveRef.current = question;
+  }, []);
+
+  return { answerUnitChoice, rememberQuestion };
+}

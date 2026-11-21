@@ -103,6 +103,7 @@
     "topLevel": "Oberste Ebene"
   },
   "lot": {
+    "pageTitle": "Charge",
     "notFound": "Diese Charge existiert nicht mehr",
     "backToLots": "Zurück zu den Chargen",
     "onHand": "Bestand",

@@ -9,6 +9,8 @@ interface ItemsMobileActionsSheetProps {
   /** Whether the account may change products (`items:write`). */
   canWrite: boolean;
   hasRows: boolean;
+  /** The list's request failed: "no rows" then means "not known", not "empty". */
+  listFailed: boolean;
   onClose: () => void;
   onImport: () => void;
   onExport: () => void;
@@ -31,6 +33,7 @@ export function ItemsMobileActionsSheet({
   open,
   canWrite,
   hasRows,
+  listFailed,
   onClose,
   onImport,
   onExport,
@@ -73,7 +76,11 @@ export function ItemsMobileActionsSheet({
         </Button>
         {!hasRows && (
           <p className="text-sm text-on-muted">
-            {t("items:exportNeedsProducts")}
+            {t(
+              listFailed
+                ? "items:exportListFailed"
+                : "items:exportNeedsProducts",
+            )}
           </p>
         )}
         <Button

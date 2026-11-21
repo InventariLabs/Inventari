@@ -122,6 +122,8 @@ export function useBarcodeLabelPreview(
   target: BarcodeLabelTarget,
   options: BarcodeLabelOptions,
   failedText: string,
+  /** The reader's names for the fields a refusal can name, by API key. */
+  fieldNames?: Record<string, string>,
 ): BarcodeLabelPreview {
   const [state, setState] = useState<Omit<BarcodeLabelPreview, "url">>({
     withoutCode: 0,
@@ -132,6 +134,12 @@ export function useBarcodeLabelPreview(
   });
   const [url, setUrl] = useState<string | null>(null);
   const currentUrl = useRef<string | null>(null);
+  // Names a refusal only; the request does not depend on them, so a new
+  // object each render must not re-run it.
+  const fieldNamesRef = useRef(fieldNames);
+  useEffect(() => {
+    fieldNamesRef.current = fieldNames;
+  }, [fieldNames]);
   const kind = targetKind(target);
   const ids = targetIds(target).join(",");
   // A batch prints one label per unit made — up to two hundred of the same
@@ -177,7 +185,7 @@ export function useBarcodeLabelPreview(
             withDetails: null,
             withComposition: s.withComposition,
             isLoading: false,
-            error: extractApiError(error, failedText),
+            error: extractApiError(error, failedText, fieldNamesRef.current),
           }));
         });
     }, 400);

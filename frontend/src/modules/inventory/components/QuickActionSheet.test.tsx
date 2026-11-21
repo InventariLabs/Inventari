@@ -1,5 +1,5 @@
 import { act } from "react";
-import { render, screen, waitFor } from "@/test/utils";
+import { render, screen, waitFor, within } from "@/test/utils";
 import {
   describe,
   it,
@@ -256,6 +256,53 @@ describe("QuickActionSheet", () => {
         "item-1",
         1,
         "USED",
+        undefined,
+      );
+    });
+  });
+
+  /**
+   * A 0.5 kg record cannot give the "1" the button promises: the press ended
+   * in "Not enough stock to perform this action". It asks how much, the way
+   * the product list does, and sends that amount.
+   */
+  it("asks how much on a record holding less than one unit", async () => {
+    const kgUom = {
+      id: "uom-kg",
+      symbol: "kg",
+      name: "Kilograms",
+      category_name: "WEIGHT",
+      rounding: "0.001",
+    };
+    vi.mocked(itemsApi.consume).mockClear();
+    vi.mocked(itemsApi.consume).mockResolvedValue({
+      ...mockItem,
+      quantity: "0",
+      uom: kgUom,
+    } as Item);
+
+    render(
+      <QuickActionSheet
+        item={{ ...mockItem, quantity: "0.5", uom: kgUom }}
+        onClose={() => {}}
+      />,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Remove 1 unit" }),
+    );
+    expect(itemsApi.consume).not.toHaveBeenCalled();
+
+    const dialog = await screen.findByRole("alertdialog");
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: /^remove/i }),
+    );
+
+    await waitFor(() => {
+      expect(itemsApi.consume).toHaveBeenCalledWith(
+        "item-1",
+        expect.closeTo(0.5),
+        expect.any(String),
         undefined,
       );
     });

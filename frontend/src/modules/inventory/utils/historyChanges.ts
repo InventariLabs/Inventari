@@ -235,10 +235,39 @@ function readOpened(
   });
 }
 
+/** The reason a row carries when it records a unit chosen over the product's own. */
+export const UNIT_CHOSEN_REASON = "unit_chosen_over_template";
+
+/**
+ * The choice the unit question promised to record: what was typed, in which
+ * unit, and what the record kept.
+ */
+function readUnitChosen(
+  changes: Record<string, unknown>,
+  { t }: ReadContext,
+): string {
+  const kept = changes.template_uom as string | undefined;
+  const chosen = changes.chosen_uom as string | undefined;
+  const entered = changes.entered_quantity as Amount | undefined;
+  const keptQuantity = changes.kept_quantity as Amount | undefined;
+  if (entered !== undefined && keptQuantity !== undefined) {
+    return t("items:history.unitChosen.entered", {
+      entered: formatQuantityLocalized(t, entered, chosen),
+      kept: formatQuantityLocalized(t, keptQuantity, kept),
+    });
+  }
+  return t("items:history.unitChosen.unit", {
+    chosen_unit: chosen ?? "—",
+    template_unit: kept ?? "—",
+  });
+}
+
 function readCreated(
   changes: Record<string, unknown>,
   ctx: ReadContext,
 ): string {
+  if (changes.reason === UNIT_CHOSEN_REASON)
+    return readUnitChosen(changes, ctx);
   const qty = changes.quantity as number | undefined;
   // `count` still picks the plural form; the number itself is printed with
   // the record's unit, in the reader's format.

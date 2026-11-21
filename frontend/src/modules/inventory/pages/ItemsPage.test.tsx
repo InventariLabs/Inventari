@@ -1606,6 +1606,28 @@ describe("ItemsPage — an account with nothing in it", () => {
     );
   });
 
+  it("does not call a list that failed to load empty", async () => {
+    server.use(
+      http.get("/api/v1/items", () =>
+        HttpResponse.json({ detail: "boom" }, { status: 500 }),
+      ),
+    );
+    renderWithHeader();
+
+    const header = await screen.findByTestId("page-header");
+    await waitFor(
+      () => {
+        expect(
+          within(header).getByRole("button", { name: /export/i }),
+        ).toHaveAccessibleDescription(
+          "The list could not be loaded, so there is nothing to export yet.",
+        );
+      },
+      { timeout: 5000 },
+    );
+    expect(screen.queryByText(/this list is empty/i)).toBeNull();
+  });
+
   it("keeps the controls once there is something to narrow", async () => {
     renderWithHeader();
     await screen.findAllByText(/Test Item/i);

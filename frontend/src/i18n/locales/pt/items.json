@@ -8,6 +8,7 @@
   "subtitle": "Consulte e gerencie seus produtos",
   "addProduct": "Adicionar produto",
   "exportNeedsProducts": "Nada para exportar: esta lista está vazia.",
+  "exportListFailed": "Não foi possível carregar a lista, por isso ainda não há nada para exportar.",
   "searchPlaceholder": "Buscar produtos…",
   "allPlaces": "Todos os locais",
   "allCategories": "Todas as categorias",
@@ -439,6 +440,7 @@
   "itemVolume": "Volume",
   "backToActiveItems": "Ir para os produtos ativos",
   "detail": {
+    "pageTitle": "Produto",
     "overviewTab": "Visão geral",
     "useBy": "Consumir até, após aberto",
     "useByClear": "Limpar",

@@ -322,7 +322,7 @@
   "masterDetailSubtitle": "Elige una ubicación para ver su contenido, sus productos y su configuración.",
   "select": {
     "title": "Elige una ubicación",
-    "description": "El árbol de la izquierda enumera todas las ubicaciones. Elige una para ver su contenido."
+    "description": "Elige una ubicación en el árbol de la izquierda para ver su contenido."
   },
   "path": {
     "label": "Ruta de la ubicación",

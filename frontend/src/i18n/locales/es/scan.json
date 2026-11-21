@@ -40,6 +40,7 @@
   "searchForCode": "Buscar este código",
   "retry": "Reintentar",
   "manualInputLabel": "O introduce el código manualmente",
+  "typeCode": "Introducir un código",
   "manualInputPlaceholder": "Código de barras o de etiqueta…",
   "manualInputSubmit": "Escanear",
   "storageContextTitle": "Ubicación del escaneo",

@@ -45,6 +45,7 @@
   "generateModal": {
     "title": "Generar etiquetas",
     "count": "Cantidad de etiquetas (1–500)",
+    "countTooHigh": "En un lote caben como máximo {{max}} etiquetas.",
     "purpose": "¿Para qué son estas etiquetas?",
     "purposeHelp": "Una etiqueta en blanco abre el formulario de aquello para lo que se imprimió.",
     "purposeProduct": "Productos",
@@ -196,7 +197,7 @@
   "history": {
     "label": "Etiqueta",
     "previouslyUsedFor": "Usada anteriormente para",
-    "title": "Historial del producto"
+    "title": "Etiqueta archivada"
   },
   "openScanActions": "Abrir acciones de escaneo",
   "scanNotFound": "Etiqueta no encontrada",
@@ -205,6 +206,9 @@
   "statusUnassigned": "Sin asignar",
   "viewPool": "Ver grupo de etiquetas",
   "labelDeleted": "Etiqueta eliminada",
+  "deleteOne": "¿Eliminar la etiqueta {{code}}? Una pegatina ya impresa con este código dejará de reconocerse al escanearla.",
+  "deleteMany_one": "¿Eliminar {{count}} etiqueta? Una pegatina ya impresa con su código dejará de reconocerse al escanearla.",
+  "deleteMany_other": "¿Eliminar {{count}} etiquetas? Las pegatinas ya impresas con esos códigos dejarán de reconocerse al escanearlas.",
   "printQueue": {
     "send": "Enviar a la impresora",
     "choose": "Elige una impresora",

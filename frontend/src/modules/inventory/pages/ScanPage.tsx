@@ -7,11 +7,11 @@ import { hasHistoryToPop, useLocationOffer } from "@/module-sdk";
 import type { LabelScanView } from "@/types";
 import type { ItemFormData } from "@/modules/inventory/hooks/useItemForm";
 import {
-  useScanConsume,
   useScanUsePartially,
   useScanUpdateQuantity,
   useScanAddToShoppingList,
 } from "@/modules/inventory/hooks/useScanActions";
+import { useScanStockConsume } from "@/modules/inventory/hooks/useScanStockConsume";
 import QuickAddModal from "@/modules/inventory/components/QuickAddModal";
 import QuickActionSheet from "@/modules/inventory/components/QuickActionSheet";
 import ArchivedItemSheet from "../components/ArchivedItemSheet";
@@ -122,7 +122,6 @@ export default function ScanPage() {
   const canAddToShoppingList =
     useCanWrite("shopping_lists") && shoppingListsEnabled;
 
-  const consumeMutation = useScanConsume();
   const updateQuantityMutation = useScanUpdateQuantity();
   const addToShoppingListMutation = useScanAddToShoppingList();
   // Stable ref for useCallback deps — the mutation result object is
@@ -250,50 +249,8 @@ export default function ScanPage() {
     }
   }, [scannedLabelData, resumeCamera]);
 
-  /**
-   * Taking stock off a scanned label: one unit of the record with the nearest
-   * expiry.
-   *
-   * The button under the list says "Remove 1 (first to expire)", and this is the only entry to
-   * that rule; it takes one unit, not the whole record, so a reader asking for
-   * one kilogram keeps the other. The per-location "−" asks the same question and
-   * answers it the same way.
-   */
-  const handleStockConsume = useCallback(
-    async (itemId?: string) => {
-      let itemToConsumeId = itemId;
-      if (scannedLabelData?.stock_summary?.items?.length) {
-        const items = scannedLabelData.stock_summary.items;
-        if (!itemToConsumeId) {
-          const itemToConsume = [...items].sort((a, b) => {
-            if (!a.expiry_date) return 1;
-            if (!b.expiry_date) return -1;
-            return (
-              new Date(a.expiry_date).getTime() -
-              new Date(b.expiry_date).getTime()
-            );
-          })[0];
-          itemToConsumeId = itemToConsume.id;
-        }
-      }
-
-      if (!itemToConsumeId) return;
-
-      try {
-        await consumeMutation.mutateAsync({
-          itemId: itemToConsumeId,
-          quantity: 1,
-        });
-
-        await refreshStockSheet();
-      } catch (error: unknown) {
-        // "Error while removing from stock" reads as a breakage; a refusal reads as one
-        // too unless the server's own sentence is allowed through.
-        toast.error(extractApiError(error, tScan("errorConsuming")));
-      }
-    },
-    [scannedLabelData, consumeMutation, refreshStockSheet, tScan],
-  );
+  const { consumeFrom: handleStockConsume, consumeDialog } =
+    useScanStockConsume(scannedLabelData, refreshStockSheet);
 
   const handleStockAddOne = useCallback(
     async (itemId: string) => {
@@ -437,6 +394,7 @@ export default function ScanPage() {
           resumeCamera();
         }}
       />
+      {consumeDialog}
       {showStockActions && scannedLabelData && (
         <StockActionSheet
           canWrite={canWrite}

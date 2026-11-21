@@ -264,10 +264,7 @@ export default function ItemsPage() {
   // empty list is a filter's answer, and the controls stay to undo it.
   const isNarrowed = filters.isNarrowed || activeModuleFilters.length > 0;
 
-  const items = useMemo(
-    () => itemsResponse?.items ?? [],
-    [itemsResponse?.items],
-  );
+  const items = useMemo(() => itemsResponse?.items ?? [], [itemsResponse]);
   const rowPlaces = useRowPlaces(items, filters.storageFilter);
   // Footer sums over the whole filtered set — the same params as the list
   // above minus the paging, so the two can never disagree.
@@ -347,6 +344,7 @@ export default function ItemsPage() {
           selectionMode={selectionMode}
           canWrite={canWrite}
           hasRows={total > 0}
+          listFailed={isError}
           onExitSelectionMode={exitSelectionMode}
           onOpenMobileActions={() => setShowMobileActions(true)}
           onImport={() => setShowImportModal(true)}
@@ -362,6 +360,7 @@ export default function ItemsPage() {
     selectionMode,
     exitSelectionMode,
     total,
+    isError,
     canWrite,
   ]);
 
@@ -607,6 +606,7 @@ export default function ItemsPage() {
         open={showMobileActions}
         canWrite={canWrite}
         hasRows={total > 0}
+        listFailed={isError}
         onClose={() => setShowMobileActions(false)}
         onImport={() => setShowImportModal(true)}
         onExport={handleExport}
