@@ -636,8 +636,27 @@ async def create_receipt_from_po(
 async def list_linked_receipts(
     db: AsyncSession, po_id: UUID, org_id: UUID
 ) -> list[Any]:
+    """Every document with a line taken from this order, newest first.
+
+    Each says whether it holds goods the order still owes
+    (``holds_owed_goods``): a receipt with a line that still expects goods
+    on an order line not yet received in full.
+    """
     result = await db.execute(
-        select(PurchaseOrderLine.id).where(PurchaseOrderLine.purchase_order_id == po_id)
+        select(
+            PurchaseOrderLine.id,
+            PurchaseOrderLine.quantity_received < PurchaseOrderLine.quantity_ordered,
+        ).where(PurchaseOrderLine.purchase_order_id == po_id)
     )
-    po_line_ids = list(result.scalars().all())
-    return await warehouse_api.list_by_source_po_line_ids_async(db, org_id, po_line_ids)
+    rows = result.all()
+    owed = {line_id for line_id, still_owed in rows if still_owed}
+    documents = await warehouse_api.list_by_source_po_line_ids_async(
+        db, org_id, [line_id for line_id, _ in rows]
+    )
+    for doc in documents:
+        doc.holds_owed_goods = doc.type == 'IN' and any(
+            line.source_po_line_id in owed
+            and line.expected_quantity > line.done_quantity
+            for line in doc.lines
+        )
+    return documents

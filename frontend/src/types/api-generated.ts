@@ -17953,6 +17953,11 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Holds Owed Goods
+             * @default false
+             */
+            holds_owed_goods: boolean;
         };
         /**
          * ListedElsewhere

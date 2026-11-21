@@ -60958,6 +60958,11 @@
             "type": "string",
             "format": "date-time",
             "title": "Created At"
+          },
+          "holds_owed_goods": {
+            "type": "boolean",
+            "title": "Holds Owed Goods",
+            "default": false
           }
         },
         "type": "object",

@@ -2064,6 +2064,33 @@ describe("ReceiveGoodsPage", () => {
       );
     });
 
+    it("does not warn about the receipt its own start is making", async () => {
+      // The start saves a receipt for the order and confirms it before the
+      // session opens; in between, the order's open receipts include that
+      // very receipt, and the warning named it as one to receive through.
+      let release: (value: unknown) => void = () => undefined;
+      state.confirm
+        .mockReset()
+        .mockReturnValue(new Promise((resolve) => (release = resolve)));
+      const user = userEvent.setup();
+      renderAt("/warehouse/receive?order=po-1");
+
+      await user.click(
+        await screen.findByRole("button", {
+          name: "Receive one product at a time",
+        }),
+      );
+      await waitFor(() => expect(state.confirm).toHaveBeenCalled());
+
+      expect(openReceiptsHook).toHaveBeenLastCalledWith(null);
+      await act(async () => {
+        release({ id: "doc-9", status: "CONFIRMED" });
+      });
+      expect(
+        await screen.findByText("Document doc-9#receive"),
+      ).toBeInTheDocument();
+    });
+
     it("assigns nothing when the start is refused before anything is sent", async () => {
       state.locationRequests = serveLocations([
         { id: "loc-1", name: "Main Warehouse" },

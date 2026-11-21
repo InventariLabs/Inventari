@@ -1291,6 +1291,9 @@ export default function ReceiveGoodsPage() {
     scanRef,
   });
 
+  // While the phone starts, the receipt it is making is open already: the
+  // open-receipts warning is not shown, or it names that very receipt as
+  // one to receive the rest through.
   const phoneDoor = usePhoneDoor(canWrite, finishLater);
 
   useReceiveHeader(result?.document ?? null);
@@ -1356,7 +1359,7 @@ export default function ReceiveGoodsPage() {
         />
       </Card>
 
-      <OrderOpenReceipts order={chosenOrder} />
+      <OrderOpenReceipts order={phoneDoor?.starting ? null : chosenOrder} />
 
       <ReceiveDraftSlot
         partnerId={partnerId}
