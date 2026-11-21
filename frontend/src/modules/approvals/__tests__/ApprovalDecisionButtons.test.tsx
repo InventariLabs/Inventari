@@ -355,8 +355,7 @@ describe("ApprovalDecisionButtons", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("shows error toast when approve fails", async () => {
-    const { toast } = await import("sonner");
+  it("shows the refusal inside the confirmation when approve fails", async () => {
     server.use(
       http.post("/api/v1/approvals/requests/:id/approve", () =>
         HttpResponse.json({ detail: "Already approved" }, { status: 400 }),
@@ -368,8 +367,8 @@ describe("ApprovalDecisionButtons", () => {
     fireEvent.click(screen.getByText("Approve"));
     // approving is irreversible, so it asks first.
     fireEvent.click(await screen.findByText("Approve request"));
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith("Already approved"),
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Already approved",
     );
   });
 
