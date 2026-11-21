@@ -301,9 +301,10 @@ export function PutawayRuleEditorDialog({
   }, [open, rule]);
 
   // The shelves the rule already aims at are named by id; the picker below
-  // searches the rest on the server. Every level is a legal target (the model
-  // points at `storage_locations.id`), warehouses included, so the search is
-  // not narrowed to shelves.
+  // searches the rest on the server. The search is not narrowed to shelves:
+  // warehouses are targets too. A receiving area, the quarantine location or a
+  // location that takes no stock is offered as well; the save refuses it and
+  // says why.
   const { byId: targetPlaces } = useLocationsById(form.location_ids);
   const locationOptions: TargetOption[] = useMemo(() => {
     // A shelf the rule already names carries its own name; one just picked is

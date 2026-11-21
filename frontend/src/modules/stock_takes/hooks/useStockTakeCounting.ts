@@ -197,7 +197,6 @@ export function useStockTakeCounting(id: string | undefined) {
     error,
     refetch,
   } = useStockTake(id);
-  const { data: storageItems } = useStorageItems(stockTake?.location_id || "");
   const itemsInside = useItemsInside(stockTake?.location_id);
 
   // What the reader has typed but not yet saved lives here; everything that
@@ -487,9 +486,9 @@ export function useStockTakeCounting(id: string | undefined) {
       .map((item) => item.item_id)
       .filter((itemId): itemId is string => Boolean(itemId)),
   );
-  // products present in the location but not in the stock take
+  // products present in the location or below it but not in the stock take
   // snapshot — the snapshot is silently silent about them otherwise.
-  const locationItems = itemList(storageItems);
+  const locationItems = itemList(itemsInside);
   const outsideItems = locationItems.filter(
     (item) => !listedItemIds.has(item.id),
   );
