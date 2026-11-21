@@ -805,6 +805,60 @@ describe("WmsReceivingView on a phone", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("finishes without the rest with nothing counted: posts nothing and says so", async () => {
+    // Nothing of the delivery came. Short-receiving every line and posting
+    // the receipt read "Received 0 lines. The goods are in stock" and left a
+    // numbered, completed receipt with nothing on it.
+    serveDocument();
+    let cancelled = false;
+    let completed = false;
+    let shortReceives = 0;
+    server.use(
+      http.post(`${BASE}/start`, () =>
+        HttpResponse.json(
+          session([
+            line("plums", "Damson Plums"),
+            line("gouda", "Gouda Cheese"),
+          ]),
+        ),
+      ),
+      http.post(`${BASE}/session-1/short-receive`, () => {
+        shortReceives += 1;
+        return HttpResponse.json({ status: "short_receive_confirmed" });
+      }),
+      http.post(`${BASE}/session-1/cancel`, () => {
+        cancelled = true;
+        return HttpResponse.json({ status: "cancelled" });
+      }),
+      http.patch(`/api/v1/warehouse/documents/${DOC}/complete`, () => {
+        completed = true;
+        return HttpResponse.json({ id: DOC, status: "COMPLETED", lines: [] });
+      }),
+    );
+    const onClose = vi.fn();
+    const user = userEvent.setup();
+
+    render(<WmsReceivingView documentId={DOC} onClose={onClose} />);
+    await screen.findByRole("region", { name: "Damson Plums" });
+    await user.click(
+      screen.getByRole("button", { name: "The rest did not come — finish" }),
+    );
+    await user.click(
+      within(await screen.findByRole("alertdialog")).getByRole("button", {
+        name: "Finish receiving",
+      }),
+    );
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(cancelled).toBe(true);
+    expect(shortReceives).toBe(0);
+    expect(completed).toBe(false);
+    expect(toast).toHaveBeenCalledWith(
+      "Nothing was received, so nothing was posted. The receipt stays open for the goods still expected.",
+    );
+    expect(screen.queryByText(/Received 0 lines/)).not.toBeInTheDocument();
+  });
+
   it("finishes without the rest: books what came and offers the document and Undo", async () => {
     serveDocument();
     // A line nothing of which arrived is answered as a short receive of

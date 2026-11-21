@@ -1325,6 +1325,7 @@
       "short_confirmed": "Recebimento parcial confirmado",
       "skipped": "Linha ignorada",
       "completed": "Recebimento concluído",
+      "nothing_received": "Nada foi recebido, então nada foi lançado. O recebimento continua aberto para as mercadorias ainda esperadas.",
       "over_quantity": "Não é possível receber mais que o planejado — já são {{qty}}/{{expected}} {{uom}}",
       "shelf_confirmed": "Local {{location}} confirmado",
       "shelf_required": "Escaneie o local primeiro: {{location}}",

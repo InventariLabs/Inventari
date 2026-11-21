@@ -1355,6 +1355,7 @@
       "short_confirmed": "Teilzugang bestätigt",
       "skipped": "Zeile übersprungen",
       "completed": "Wareneingang abgeschlossen",
+      "nothing_received": "Es wurde nichts angenommen, also wurde nichts gebucht. Der Wareneingang bleibt für die noch erwartete Ware offen.",
       "over_quantity": "Mehr als geplant kann nicht angenommen werden — bereits {{qty}}/{{expected}} {{uom}}",
       "shelf_confirmed": "Lagerort {{location}} bestätigt",
       "shelf_required": "Zuerst den Lagerort scannen: {{location}}",

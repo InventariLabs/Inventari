@@ -1355,6 +1355,7 @@
       "short_confirmed": "Short receive confirmed",
       "skipped": "Line skipped",
       "completed": "Receiving completed",
+      "nothing_received": "Nothing was received, so nothing was posted. The receipt stays open for the goods still expected.",
       "over_quantity": "Cannot receive more than planned — already {{qty}}/{{expected}} {{uom}}",
       "shelf_confirmed": "Location {{location}} confirmed",
       "shelf_required": "Scan the location first: {{location}}",

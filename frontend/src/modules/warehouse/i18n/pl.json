@@ -1471,6 +1471,7 @@
       "short_confirmed": "Potwierdzono przyjęcie częściowe",
       "skipped": "Linia pominięta",
       "completed": "Zakończono przyjmowanie",
+      "nothing_received": "Nic nie przyjęto, więc nic nie zaksięgowano. Przyjęcie zostaje otwarte na towar, który wciąż jest oczekiwany.",
       "over_quantity": "Nie można przyjąć więcej niż zaplanowano — już {{qty}}/{{expected}} {{uom}}",
       "shelf_confirmed": "Miejsce {{location}} potwierdzone",
       "shelf_required": "Najpierw zeskanuj miejsce: {{location}}",

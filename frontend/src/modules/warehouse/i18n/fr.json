@@ -1355,6 +1355,7 @@
       "short_confirmed": "Réception partielle confirmée",
       "skipped": "Ligne ignorée",
       "completed": "Réception terminée",
+      "nothing_received": "Rien n’a été reçu, donc rien n’a été comptabilisé. La réception reste ouverte pour les marchandises encore attendues.",
       "over_quantity": "Impossible de réceptionner plus que prévu — déjà {{qty}}/{{expected}} {{uom}}",
       "shelf_confirmed": "Emplacement {{location}} confirmé",
       "shelf_required": "Scannez d'abord l'emplacement : {{location}}",
