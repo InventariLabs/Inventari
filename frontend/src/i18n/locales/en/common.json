@@ -1013,6 +1013,8 @@
     "mg": "mg",
     "cup": "cup",
     "fl oz": "fl oz",
+    "tbsp": "tbsp",
+    "tsp": "tsp",
     "m": "m",
     "cm": "cm",
     "pt": "pint",
@@ -1027,7 +1029,7 @@
   },
   "dashboard": {
     "products": "Products",
-    "replenishAll": "Replenish All",
+    "replenishAll": "Review what to reorder",
     "replenishPolicy": "Products that still have stock in use elsewhere are not counted as low or reordered.",
     "replenishModalTitle": "Review Suggestions",
     "replenishModalDesc": "Select products you want to add to your shopping list.",

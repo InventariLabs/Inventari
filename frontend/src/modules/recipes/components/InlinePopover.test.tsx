@@ -11,6 +11,7 @@ describe("InlinePopover", () => {
         <InlinePopover
           open
           onOpenChange={vi.fn()}
+          label="Details"
           trigger={<button type="button">Open</button>}
         >
           <div>Panel content</div>
@@ -34,6 +35,7 @@ describe("InlinePopover", () => {
         <InlinePopover
           open={open}
           onOpenChange={setOpen}
+          label="Details"
           trigger={<button type="button">Open</button>}
         >
           <div>Panel content</div>
@@ -45,5 +47,19 @@ describe("InlinePopover", () => {
     await user.keyboard("{Escape}");
     expect(screen.queryByText("Panel content")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Open" })).toHaveFocus();
+  });
+
+  it("names the panel it opens", () => {
+    render(
+      <InlinePopover
+        open
+        onOpenChange={vi.fn()}
+        label="Tag colour"
+        trigger={<button type="button">Open</button>}
+      >
+        <div>Panel content</div>
+      </InlinePopover>,
+    );
+    expect(screen.getByRole("dialog", { name: "Tag colour" })).toBeVisible();
   });
 });

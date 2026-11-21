@@ -550,7 +550,7 @@
       "bindInMain": "Vincule em Configurações → Conexões de IA a conexão de IA que alimenta a interpretação de receitas."
     },
     "enableCostCalculation": "Ativar cálculo de custo",
-    "enableCostCalculationDescription": "Mostra o detalhamento de custo por receita na visualização da receita. Desative em uso doméstico, onde o custo da receita não importa.",
+    "enableCostCalculationDescription": "Mostra o detalhamento de custo por receita na visualização da receita. Desative se você não acompanha o preço dos ingredientes.",
     "registerProductionAsDocument": "Registrar a produção como documentos internos de saída",
     "registerProductionAsDocumentDescription": "Cria um documento interno de saída, com trilha de auditoria, para cada sessão de produção concluída. Desativado por padrão — ative para que as produções entrem no registro de documentos."
   },
@@ -681,7 +681,8 @@
     "copy_confirm": "Copiar",
     "copy_error": "Não foi possível copiar o planejamento",
     "rate_title": "Como foi?",
-    "rate_star": "Avaliar com {{value}} estrela(s)",
+    "rate_star_one": "Avaliar com {{count}} estrela",
+    "rate_star_other": "Avaliar com {{count}} estrelas",
     "rate_skip": "Pular",
     "rate_submit": "Avaliar",
     "rate_success": "Avaliação salva",

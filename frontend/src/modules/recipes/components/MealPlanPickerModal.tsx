@@ -156,7 +156,7 @@ export function MealPlanPickerModal({
       reset();
       onClose();
     } catch (error) {
-      toast.error(extractApiError(error, t("errors.save_failed")));
+      toast.error(extractApiError(error, t("errors.add_to_plan_failed")));
     } finally {
       setSubmitting(false);
     }

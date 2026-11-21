@@ -4,6 +4,8 @@ import { cn } from "@/lib/utils";
 interface InlinePopoverProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** What the panel is — its accessible name. */
+  label: string;
   /** The control the panel hangs off. Rendered as the Radix trigger. */
   trigger: React.ReactNode;
   children: React.ReactNode;
@@ -31,6 +33,7 @@ interface InlinePopoverProps {
 export function InlinePopover({
   open,
   onOpenChange,
+  label,
   trigger,
   children,
   align = "end",
@@ -41,6 +44,7 @@ export function InlinePopover({
       <PopoverPrimitive.Trigger asChild>{trigger}</PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
         <PopoverPrimitive.Content
+          aria-label={label}
           align={align}
           sideOffset={4}
           className={cn(

@@ -71,8 +71,9 @@ export function ApprovalDecisionButtons({
   const canDecide = useCanDecideOnApproval(approval);
   const canCancel = canWithdrawApproval(approval, currentUserId);
 
+  // The confirmation dialog awaits this: a refusal rejects, and the dialog
+  // stays open with the reason and the note as typed.
   const handleApprove = async (notes?: string) => {
-    setShowApproveConfirm(false);
     try {
       if (onApprove) {
         setIsOverrideApproving(true);
@@ -80,12 +81,11 @@ export function ApprovalDecisionButtons({
       } else {
         await approveStage.mutateAsync({ id: approval.id, notes });
       }
-      toast.success(t("request.approvedMessage"));
-    } catch (err) {
-      toast.error(extractApiError(err, t("request.approveFailed")));
     } finally {
       setIsOverrideApproving(false);
     }
+    setShowApproveConfirm(false);
+    toast.success(t("request.approvedMessage"));
   };
 
   const handleReject = async () => {

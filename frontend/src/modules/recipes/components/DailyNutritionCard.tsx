@@ -2,7 +2,7 @@ import { format, parseISO } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/Card";
 import type { MealPlan } from "@/modules/recipes/types/mealplans";
-import { dateFnsLocale } from "@/utils/formatters";
+import { dateFnsLocale, formatQuantityValue } from "@/utils/formatters";
 
 interface Props {
   days: MealPlan["daily_nutrition_summary"];
@@ -57,17 +57,23 @@ export function DailyNutritionCard({ days }: Props) {
                   })}
                 </td>
                 <td className="px-2 sm:px-3 py-2 text-right tabular-nums whitespace-nowrap text-on-secondary">
-                  {day.carbs_g != null ? `${day.carbs_g} g` : "–"}
+                  {day.carbs_g != null
+                    ? `${formatQuantityValue(day.carbs_g)} g`
+                    : "–"}
                 </td>
                 <td className="px-2 sm:px-3 py-2 text-right tabular-nums whitespace-nowrap text-on-secondary">
-                  {day.protein_g != null ? `${day.protein_g} g` : "–"}
+                  {day.protein_g != null
+                    ? `${formatQuantityValue(day.protein_g)} g`
+                    : "–"}
                 </td>
                 <td className="px-2 sm:px-3 py-2 text-right tabular-nums whitespace-nowrap text-on-secondary">
-                  {day.fat_g != null ? `${day.fat_g} g` : "–"}
+                  {day.fat_g != null
+                    ? `${formatQuantityValue(day.fat_g)} g`
+                    : "–"}
                 </td>
                 <td className="px-3 sm:px-5 py-2 text-right tabular-nums whitespace-nowrap font-medium text-on">
                   {day.calories_kcal != null
-                    ? `${day.calories_kcal} kcal`
+                    ? `${formatQuantityValue(day.calories_kcal)} kcal`
                     : "–"}
                 </td>
               </tr>

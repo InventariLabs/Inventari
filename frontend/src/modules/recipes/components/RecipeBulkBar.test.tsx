@@ -75,3 +75,33 @@ describe("RecipeBulkBar — add to collection", () => {
     ).not.toBeInTheDocument();
   });
 });
+
+describe("RecipeBulkBar — tag sheet", () => {
+  it("stays open with the refusal and the typed tags when tagging fails", async () => {
+    const onTag = vi.fn().mockRejectedValue(new Error("Bulk operation failed"));
+    render(<RecipeBulkBar {...baseProps} onTag={onTag} />);
+    fireEvent.click(screen.getByRole("button", { name: /Tag/ }));
+    const field = screen.getByPlaceholderText(en.bulk.tag_placeholder);
+    fireEvent.change(field, { target: { value: "Quick, Dinner" } });
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Bulk operation failed",
+    );
+    expect(onTag).toHaveBeenCalledWith(["quick", "dinner"]);
+    expect(screen.getByPlaceholderText(en.bulk.tag_placeholder)).toHaveValue(
+      "Quick, Dinner",
+    );
+  });
+});
+
+describe("RecipeBulkBar — delete", () => {
+  it("says meal plans that use the recipes lose those meals", () => {
+    render(<RecipeBulkBar {...baseProps} />);
+    fireEvent.click(screen.getByRole("button", { name: /Delete/ }));
+
+    expect(screen.getByRole("alertdialog")).toHaveTextContent(
+      "Meal plans that include a deleted recipe lose those meals.",
+    );
+  });
+});
