@@ -243,7 +243,7 @@
     "delete": "Löschen",
     "delete_confirm": "Rezept „{{name}}“ löschen? Dies kann nicht rückgängig gemacht werden.",
     "start_picking": "Aus dem Bestand nehmen",
-    "cook_for_stock_hint": "Erstellt einen Produktionsauftrag für eine Charge im Maker-Modul",
+    "cook_for_stock_hint": "Erstellt einen Produktionslauf für eine Charge im Maker-Modul",
     "add_to_meal_plan_hint": "Plant dieses Rezept im Essenskalender",
     "duplicate": "Duplizieren"
   },
@@ -810,7 +810,7 @@
   "cookForStock": {
     "button": "Für den Vorrat kochen",
     "title": "Für den Vorrat kochen",
-    "subtitle": "Erstellen Sie ein Produktionsrezept aus \"{{name}}\" und starten Sie einen Produktionsauftrag.",
+    "subtitle": "Erstellen Sie ein Produktionsrezept aus \"{{name}}\" und starten Sie einen Produktionslauf.",
     "productLabel": "Ausgangsprodukt",
     "productPlaceholder": "Produkt suchen…",
     "changeProduct": "Ändern",
@@ -825,10 +825,10 @@
     "storagePlaceholder": "Ziel-Lagerort auswählen",
     "storageSearchPlaceholder": "Nach Name oder Pfad suchen…",
     "storageEmpty": "Kein Ort passt dazu",
-    "submit": "Produktionsauftrag erstellen",
+    "submit": "Produktionslauf erstellen",
     "submitting": "Wird erstellt…",
-    "success": "Produktionsauftrag erstellt",
-    "error": "Produktionsauftrag konnte nicht erstellt werden"
+    "success": "Produktionslauf erstellt",
+    "error": "Produktionslauf konnte nicht erstellt werden"
   },
   "page": {
     "title": "Rezepte",

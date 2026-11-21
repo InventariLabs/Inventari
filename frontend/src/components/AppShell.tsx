@@ -7,13 +7,7 @@ import {
   Suspense,
   lazy,
 } from "react";
-import {
-  Outlet,
-  Link,
-  matchPath,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useFormGuardStore } from "@/store/formGuardStore";
@@ -27,6 +21,7 @@ import { useActiveProfile } from "@/hooks/useActiveProfile";
 import { useRoleCheck } from "@/hooks/useHasRole";
 import { useRouteScroll } from "@/hooks/useRouteScroll";
 import { useShellBack } from "@/hooks/useShellBack";
+import { screensOf } from "./shell/screensOf";
 import { moduleRegistry, applyNavOverrides } from "@/lib/moduleRegistry";
 import type { ModuleNavItem } from "@/lib/moduleRegistry";
 import { makeTDynamic } from "@/lib/i18nHelpers";
@@ -60,23 +55,6 @@ function sayWorkWasNotKept(t: (key: string) => string): void {
   toast.error(t("errors.sessionEndedReadUnsaved"), {
     id: "session-ended-unsaved",
   });
-}
-
-/**
- * The screens the enabled modules really draw. A route whose own modules are
- * all switched off draws the not-found page, so it is no screen at all.
- */
-function screensOf(enabledModules: string[]): (path: string) => boolean {
-  const routes = moduleRegistry.getRoutes(enabledModules);
-  return (path) =>
-    routes.some(
-      (route) =>
-        (!route.requiresModules ||
-          route.requiresModules.some((name) =>
-            enabledModules.includes(name),
-          )) &&
-        matchPath({ path: route.path, end: true }, path) !== null,
-    );
 }
 
 const NotificationTray = lazy(
@@ -170,8 +148,8 @@ export default function AppShell() {
   // it does: go back to the screen the person came from. A screen opened by a
   // direct link climbs to the nearest screen above it that exists.
   const routeExists = useMemo(
-    () => screensOf(enabledModules),
-    [enabledModules],
+    () => screensOf(enabledModules, moduleNav),
+    [enabledModules, moduleNav],
   );
   const goBack = useShellBack(moduleNav?.basePath, homePath, routeExists);
 

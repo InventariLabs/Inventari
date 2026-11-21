@@ -31,6 +31,7 @@ from . import (
     planning_service,
     production_reversal,
     production_service,
+    recipe_service,
 )
 from ._router_bom import _attach_child_names
 from ._schemas_production import (
@@ -194,6 +195,7 @@ def _to_read(
     shortage_items: list[ShortageItemRead] | None = None,
     portions: list[ProductionPortion] | None = None,
     plan_coverage: planning_service.PlanCoverage | None = None,
+    uncosted_ingredients: int = 0,
 ) -> ProductionOrderRead:
     line_rows = lines if lines is not None else []
     return ProductionOrderRead(
@@ -243,6 +245,7 @@ def _to_read(
         result_per_unit=order.result_per_unit,
         result_per_batch=order.result_per_batch,
         lines=[ProductionOrderLineRead.model_validate(line) for line in line_rows],
+        uncosted_ingredients=uncosted_ingredients,
         started_on=order.started_on,
         planned_for=order.planned_for,
         material_cost=order.material_cost,
@@ -324,10 +327,16 @@ async def list_production_orders(
         db, org_id, list(orders)
     )
     plan_coverage = await _plan_coverage_of(db, org_id, list(orders))
+    # A closed run's total leaves out an ingredient drawn with no cost; the
+    # card says so beside the figure, as the run's page does.
+    uncosted = await recipe_service.uncosted_line_counts(
+        db, [o.id for o in orders if o.status != 'DRAFT']
+    )
     return ProductionOrderListResponse.from_slice(
         items=[
             _to_read(
                 o,
+                uncosted_ingredients=uncosted.get(o.id, 0),
                 output_uom_symbol=order_uom_symbols.get(o.output_template_id),
                 plan_coverage=plan_coverage.get(o.id),
                 shortage_count=(

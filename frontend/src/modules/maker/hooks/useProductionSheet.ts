@@ -116,13 +116,15 @@ export function useProductionForm(
   /** What the stock picker offers (`useLocationOffer`): how many places, and
    * the first two — enough to take the only one there is. */
   offer: { total: number | undefined; first: { id: string }[] },
-  preselectedProduct?: PreselectedProduct,
+  preselectedProduct: PreselectedProduct | undefined,
+  /** The mode a fresh form opens in: a screen that is about planning opens it as a plan. */
+  startAs: ProductionMode,
 ) {
   const { t } = useTranslation("maker");
   // Recording a run already made posts stock, which only an account that may
   // write items can do; everyone else plans.
   const canRecordMade = useCanWrite("items");
-  const [chosenMode, setMode] = useState<ProductionMode>("made");
+  const [chosenMode, setMode] = useState<ProductionMode>(startAs);
   const mode: ProductionMode = canRecordMade ? chosenMode : "planned";
   const [selected, setSelected] = useState<ProductOption | null>(null);
   const [qty, setQty] = useState("");
@@ -137,14 +139,14 @@ export function useProductionForm(
   useEffect(() => {
     if (open) return;
     setBestBefore(null);
-    setMode("made");
+    setMode(startAs);
     setSelected(null);
     setQty("");
     setStorageId("");
     setProductionDate(todayIso());
     setNotes("");
     setOutputLotName("");
-  }, [open]);
+  }, [open, startAs]);
 
   // The only warehouse location is the answer; asking for it is a chore.
   const onlyStorageId = offer.total === 1 ? offer.first[0].id : null;

@@ -1885,7 +1885,7 @@
     },
     "todo": {
       "count": "{{shown}} von {{total}}",
-      "footnote": "Aufgaben entstehen von selbst aus Bestellungen, Versandbelegen, Fertigungsaufträgen, Genehmigungen und dem Zählplan."
+      "footnote": "Aufgaben entstehen von selbst aus Bestellungen, Versandbelegen, Produktionsläufen, Genehmigungen und dem Zählplan."
     },
     "feed": {
       "title": "Heute im Lager",

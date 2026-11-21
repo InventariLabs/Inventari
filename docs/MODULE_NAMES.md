@@ -52,7 +52,7 @@ and must name each key from this catalog, not from a vocabulary of its own.
 | `warehouse` | Warehouse | Magazyn | Lager | Entrepôt | Almacén | Scan with your phone's camera or a scanner to receive, issue, move and count stock; the numbered documents are written in the background, with putaway rules. |
 | `equipment` | Equipment Tracking | Śledzenie sprzętu | Geräteverfolgung | Suivi des équipements | Seguimiento de equipos | Track IT and physical assets with lifecycle management. |
 | `example_widgets` | Example Widgets | Przykładowe widżety | Beispiel-Widgets | Widgets d'exemple | Widgets de ejemplo | Reference module demonstrating Inventari module patterns: manage simple widgets with a name, color, and quantity. Hidden from the store. |
-| `maker` | Production | Produkcja | Fertigung | Fabrication | Fabricación | Production runs, bills of materials (BOM), and cost rollup. |
+| `maker` | Production | Produkcja | Produktion | Fabrication | Fabricación | Production runs, bills of materials (BOM), and cost rollup. |
 | `mcp_server` | MCP Server | Serwer MCP | MCP-Server | Serveur MCP | Servidor MCP | Let an AI agent work with this workspace over the Model Context Protocol, with a key that sees only what it may. |
 | `nutrition` | Nutrition Info | Wartości odżywcze | Nährwertinformationen | Informations nutritionnelles | Información nutricional | Display nutritional data and ingredients from Open Food Facts. |
 | `partners` (virtual) | Partners | Partnerzy | Partner | Partenaires | Socios | Manage suppliers, customers, and service providers for B2B workflows. |

@@ -27,11 +27,15 @@ interface ListParams {
   limit?: number;
 }
 
-export function useProductionOrders(params?: ListParams) {
+export function useProductionOrders(
+  params?: ListParams,
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: queryKeys.maker.productionList(params),
     queryFn: () => productionApi.list(params),
     placeholderData: (prev) => prev,
+    enabled: options?.enabled ?? true,
   });
 }
 

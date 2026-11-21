@@ -26,6 +26,12 @@ interface ProductionIngredientsTableProps {
    */
   isPlanned?: boolean;
   /**
+   * Whether the run was cancelled after it took its ingredients: the lines
+   * are what it took, and cancelling put them back, so the section is
+   * titled for both.
+   */
+  returned?: boolean;
+  /**
    * The refusal's own list, by template id — the server's answer the banner
    * counts, not a forecast the browser made. Only a draft can have it: the
    * numbers on this list stand next to the shortage they explain, rather than
@@ -151,6 +157,7 @@ export function ProductionIngredientsTable({
   lines,
   planned,
   isPlanned = false,
+  returned = false,
   shortages,
   shortageCount,
 }: ProductionIngredientsTableProps) {
@@ -185,7 +192,11 @@ export function ProductionIngredientsTable({
   return (
     <div className="space-y-3">
       <h2 className="text-xs uppercase tracking-widest text-on-muted font-medium px-1">
-        {isPlanned ? t("detail.plannedIngredients") : t("detail.ingredients")}
+        {isPlanned
+          ? t("detail.plannedIngredients")
+          : returned
+            ? t("detail.ingredientsReturned")
+            : t("detail.ingredients")}
       </h2>
       {isPlanned && rows.length > 0 && (
         <p className="text-xs text-on-muted px-1">

@@ -27,6 +27,7 @@ import type {
 import { formatDate } from "@/utils/helpers";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
 import { formatMoney } from "@/utils/formatters";
+import { CostGapNote } from "@/modules/maker/components/CostFigure";
 import { ProductionCoverageBadge } from "@/modules/maker/components/ProductionCoverageBadge";
 import { ProductionShortageSignal } from "@/modules/maker/components/ProductionShortageSignal";
 import { formatQuantityLocalized, unitLabel } from "@/lib/i18nHelpers";
@@ -85,6 +86,11 @@ function CardCost({
     <div className="text-on-muted text-xs mt-1">
       {inProgress ? t("detail.card.takenSoFar") : t("productionList.card.cost")}
       : {amount == null ? "—" : formatMoney(amount, currency, language)}
+      {/* A total that leaves out an ingredient drawn with no cost says so. */}
+      <CostGapNote
+        priced={Number(amount) > 0 ? 1 : 0}
+        unpriced={inProgress ? 0 : (order.uncosted_ingredients ?? 0)}
+      />
     </div>
   );
 }
@@ -364,7 +370,7 @@ export default function ProductionListPage() {
                         without a number falls back to the short UUID. */}
                     <Link
                       to={`/maker/production/${order.id}`}
-                      className="hover:text-accent focus-visible:text-accent"
+                      className="inline-block max-w-full truncate py-1 align-bottom hover:text-accent focus-visible:text-accent"
                     >
                       {order.output_template_name ?? (
                         <span className="font-mono text-xs text-on-muted">

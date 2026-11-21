@@ -12672,6 +12672,11 @@ export interface components {
             ingredients?: components["schemas"]["BatchRecordIngredient"][];
             /** Material Cost */
             material_cost?: string | null;
+            /**
+             * Uncosted Ingredients
+             * @default 0
+             */
+            uncosted_ingredients: number;
             /** Total Cost */
             total_cost?: string | null;
             /** Estimated Total Cost */
@@ -22731,6 +22736,11 @@ export interface components {
             result_per_batch?: string | null;
             /** Lines */
             lines?: components["schemas"]["ProductionOrderLineRead"][];
+            /**
+             * Uncosted Ingredients
+             * @default 0
+             */
+            uncosted_ingredients: number;
             /** Started On */
             started_on?: string | null;
             /** Planned For */
@@ -25717,8 +25727,12 @@ export interface components {
             lot_name: string;
             /** Status */
             status: string;
+            /** Status Reason */
+            status_reason?: string | null;
             /** Best Before */
             best_before?: string | null;
+            /** Quantity */
+            quantity?: string | null;
         };
         /** SavingsOpportunity */
         SavingsOpportunity: {

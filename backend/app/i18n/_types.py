@@ -707,6 +707,9 @@ class ErrorMessages(TypedDict):
     validation_enum: str
     validation_int: str
     validation_number: str
+    validation_decimal_whole_digits: str
+    validation_decimal_max_digits: str
+    validation_decimal_max_places: str
     validation_boolean: str
     validation_identifier: str
     validation_date: str
@@ -716,6 +719,7 @@ class ErrorMessages(TypedDict):
     wms_pick_document_not_confirmed: str
     wms_pick_document_not_dispatch: str
     wms_pick_document_in_session: str
+    wms_pick_document_in_own_session: str
     wms_line_document_closed: str
     wms_short_below_scanned: str
     wms_short_pick_needs_outcome: str

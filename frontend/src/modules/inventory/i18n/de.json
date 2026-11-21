@@ -132,7 +132,7 @@
     },
     "trace": {
       "heading": "Rückverfolgung für einen Rückruf",
-      "caption": "Wer diese Charge geliefert hat und an wen sie ging, mit Datum und Menge. Umlagerungen zwischen eigenen Orten sind ausgelassen; ein Produktionsauftrag führt zur Charge, die er hergestellt hat.",
+      "caption": "Wer diese Charge geliefert hat und an wen sie ging, mit Datum und Menge. Umlagerungen zwischen eigenen Orten sind ausgelassen; ein Produktionslauf führt zur Charge, die er hergestellt hat.",
       "cameIn": "Eingegangen",
       "wentOut": "Ausgegangen",
       "nothingCameIn": "Unter dieser Charge ist nichts von außen eingegangen.",

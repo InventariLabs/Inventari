@@ -286,6 +286,10 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A production recipe's reference price can no longer be negative. Creating
+  or changing a recipe with one is refused with a message naming the field,
+  instead of being stored and understating the result per unit of every run
+  made after it; zero is still allowed.
 - Saving a print layout whose template code does not parse or render — a
   purchase order, warehouse document or equipment layout — is refused, with
   the line and the complaint, instead of being stored and then breaking every
@@ -369,13 +373,17 @@ says what the release does rather than what changed since them.
   one of them is already in a picking session. If the session is your own —
   opened on a phone and left — the dialog says so and offers **Continue that
   session** or **Discard scans**; if a colleague holds it, it offers to take
-  it over or discard their scans, as the document's own page already did.
+  it over, which opens that session at once, or discard their scans, as the
+  document's own page already did.
   **Retry** now appears only after a server failure, never after a refusal
   that would only repeat itself.
 - On a phone, the header's Back arrow on a screen opened by a direct link —
   a document opened from a link or a refreshed page, for one — no longer ends
   on a "Page Not Found" at `/warehouse/documents`. With nothing earlier in the
-  history it climbs to the nearest screen above that exists, the module's start.
+  history it climbs to the nearest screen above that exists, and to the home
+  screen when there is none: from a document or History opened by a link that
+  is the launcher, never the warehouse root that only sends you back, and from
+  a location zone it is the locations list, never "Location not found".
 - The Settings audit log shows the reason a workflow release left on the
   requests it closed in the reader's language ("Workflow deactivated",
   "Workflow deleted") instead of the raw English text.

@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useCanManage, useCanWrite } from "@/hooks/useCanWrite";
-import { extractApiError } from "@/lib/errors";
 import { useReverseProduction } from "@/modules/maker/hooks/useProduction";
 import type { ProductionOrder } from "@/modules/maker/types/maker";
 
@@ -63,16 +62,14 @@ export function ReverseRunAction({ order }: { order: ProductionOrder }) {
         confirmLabel={t("detail.reverseConfirm.confirm")}
         cancelLabel={t("create.cancel")}
         variant="danger"
-        onConfirm={() => {
+        // The refusal names why — what the run made has been used — and is
+        // shown inside the dialog; the fallback is for a failure without a
+        // sentence of its own.
+        errorFallback={t("detail.reverseFailed")}
+        onConfirm={async () => {
+          await reverse.mutateAsync(order.id);
           setAsking(false);
-          reverse.mutate(order.id, {
-            onSuccess: () => toast.success(t("detail.reverseSuccess")),
-            // The refusal names why — what the run made has been used — in
-            // the reader's language; the fallback is for a failure without
-            // a sentence of its own.
-            onError: (err) =>
-              toast.error(extractApiError(err, t("detail.reverseFailed"))),
-          });
+          toast.success(t("detail.reverseSuccess"));
         }}
         onCancel={() => setAsking(false)}
       />

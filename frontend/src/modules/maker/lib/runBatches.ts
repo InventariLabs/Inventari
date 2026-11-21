@@ -28,3 +28,6 @@ export function runBatchNames(order: ProductionOrder): string {
   if (batches.length === 0) return order.output_lot_name ?? "";
   return batches.map((batch) => batch.lot_name).join(", ");
 }
+
+/** The states a batch is on hold in. */
+export const HELD = new Set(["quarantined", "held"]);
