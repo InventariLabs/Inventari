@@ -10,10 +10,10 @@ import { ModulesProvider } from "@/contexts/ModulesContext";
 import { EquipmentDashboardWidget } from "./EquipmentDashboardWidget";
 
 /**
- * The tile counted in one form and one case for every number: "3 Alerty
- * gwarancyjne" — no inflection, capital mid-sentence, twice wrong. Polish
- * needs "1 alert gwarancyjny", "3 alerty gwarancyjne", "5 alertów
- * gwarancyjnych", and the key now carries all three.
+ * The tile names what it counts — warranties ending soon — and inflects it in
+ * Polish for one ("1 gwarancja kończy się wkrótce"), a few ("3 gwarancje
+ * kończą się wkrótce") and many ("5 gwarancji kończy się wkrótce"), in
+ * lower case mid-sentence.
  */
 const ALERT = {
   item_id: "item-1",
@@ -61,21 +61,21 @@ describe("the dashboard tile's warranty counter", () => {
     await withLanguage("pl", async () => {
       renderWidget(1);
       expect(
-        await screen.findByText("1 alert gwarancyjny"),
+        await screen.findByText("1 gwarancja kończy się wkrótce"),
       ).toBeInTheDocument();
     });
 
     await withLanguage("pl", async () => {
       renderWidget(3);
       expect(
-        await screen.findByText("3 alerty gwarancyjne"),
+        await screen.findByText("3 gwarancje kończą się wkrótce"),
       ).toBeInTheDocument();
     });
 
     await withLanguage("pl", async () => {
       renderWidget(5);
       expect(
-        await screen.findByText("5 alertów gwarancyjnych"),
+        await screen.findByText("5 gwarancji kończy się wkrótce"),
       ).toBeInTheDocument();
     });
   });

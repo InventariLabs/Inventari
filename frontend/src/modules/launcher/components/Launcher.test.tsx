@@ -317,9 +317,11 @@ describe("Launcher (profile-aware)", () => {
     ).not.toContain("Inventory");
   });
 
-  it("renders the Browse Apps tile with a /apps link when user is admin", async () => {
+  it("renders the Browse Modules tile with a /apps link when user is admin", async () => {
     renderLauncher();
-    const links = await screen.findAllByRole("link", { name: /browse apps/i });
+    const links = await screen.findAllByRole("link", {
+      name: /browse modules/i,
+    });
     expect(links.length).toBeGreaterThan(0);
     expect(links[0]).toHaveAttribute("href", "/apps");
   });

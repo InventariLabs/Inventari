@@ -4,8 +4,8 @@
     "description": "Acompanhe equipamentos, atestações e manutenção"
   },
   "statusBadge": {
-    "warrantyAlerts_one": "alerta de garantia",
-    "warrantyAlerts_other": "alertas de garantia"
+    "warrantyAlerts_one": "garantia terminando em breve",
+    "warrantyAlerts_other": "garantias terminando em breve"
   },
   "nav": {
     "overview": "Visão geral",
@@ -45,8 +45,8 @@
     "active_assignments": "Entregues",
     "in_maintenance": "Em manutenção",
     "retired": "Baixados",
-    "warrantyAlertsCount_one": "{{count}} alerta de garantia",
-    "warrantyAlertsCount_other": "{{count}} alertas de garantia",
+    "warrantyAlertsCount_one": "{{count}} garantia terminando em breve",
+    "warrantyAlertsCount_other": "{{count}} garantias terminando em breve",
     "add_asset": "Adicionar equipamento",
     "attention": {
       "heading_one": "{{count}} equipamento precisa de atenção",

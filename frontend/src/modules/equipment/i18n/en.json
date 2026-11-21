@@ -4,8 +4,8 @@
     "description": "Track assets, attestations, and maintenance"
   },
   "statusBadge": {
-    "warrantyAlerts_one": "warranty alert",
-    "warrantyAlerts_other": "warranty alerts"
+    "warrantyAlerts_one": "warranty ending soon",
+    "warrantyAlerts_other": "warranties ending soon"
   },
   "nav": {
     "overview": "Overview",
@@ -45,8 +45,8 @@
     "active_assignments": "Checked Out",
     "in_maintenance": "In Maintenance",
     "retired": "Retired",
-    "warrantyAlertsCount_one": "{{count}} warranty alert",
-    "warrantyAlertsCount_other": "{{count}} warranty alerts",
+    "warrantyAlertsCount_one": "{{count}} warranty ending soon",
+    "warrantyAlertsCount_other": "{{count}} warranties ending soon",
     "add_asset": "Add Asset",
     "attention": {
       "heading_one": "{{count}} asset needs attention",

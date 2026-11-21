@@ -1,14 +1,17 @@
 import { useState, useEffect, useMemo } from "react";
 import { X, Sparkles, Package, Loader2, Minus, Plus, Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import Button from "@/components/ui/Button";
 import { Sheet, SheetActions, SheetFooter } from "@/components/ui/Sheet";
 import { toast } from "sonner";
 import type {
+  ShoppingList,
   ShoppingListItemInput,
   SuggestedItem,
 } from "@/modules/shopping_lists/types/shopping";
 import { toAmount } from "@/utils/formatters";
+import type { TFunction } from "i18next";
 import {
   useAddShoppingItemsToAList,
   useShoppingSuggestionsPreview,
@@ -18,6 +21,25 @@ import { REPLENISH_SUGGESTION_SOURCES } from "../constants/replenishSources";
 import { extractApiError } from "@/lib/errors";
 import { unitLabel } from "@/lib/i18nHelpers";
 import { Checkbox } from "@/module-sdk";
+
+/** The toast after the rows went on a list. The list may have been made by
+ *  this very tap, so the message names it and the toast opens it. */
+function announceAdded(
+  t: TFunction,
+  navigate: (to: string) => void,
+  list: ShoppingList,
+  count: number,
+) {
+  toast.success(
+    t("shopping_lists:toasts.addedToList", { count, name: list.name }),
+    {
+      action: {
+        label: t("shopping_lists:toasts.openList"),
+        onClick: () => navigate(`/shopping-lists/${list.id}`),
+      },
+    },
+  );
+}
 
 interface ReplenishSuggestionsModalProps {
   isOpen: boolean;
@@ -85,6 +107,7 @@ export default function ReplenishSuggestionsModal({
   onClose,
 }: ReplenishSuggestionsModalProps) {
   const { t } = useTranslation(["common", "shopping_lists"]);
+  const navigate = useNavigate();
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [priorities, setPriorities] = useState<Record<string, number>>({});
@@ -178,9 +201,9 @@ export default function ReplenishSuggestionsModal({
     }
 
     void (async () => {
-      let listId: string;
+      let list: ShoppingList;
       try {
-        listId = await shoppingListsApi.ensureActiveList();
+        list = await shoppingListsApi.ensureActiveList();
       } catch (error) {
         toast.error(
           extractApiError(error, t("shopping_lists:toasts.addItemsFailed")),
@@ -188,13 +211,10 @@ export default function ReplenishSuggestionsModal({
         return;
       }
       addItemsMutation.mutate(
-        { listId, items: itemsToAdd },
+        { listId: list.id, items: itemsToAdd },
         {
           onSuccess: (data) => {
-            toast.success(
-              t("dashboard.replenishSuccess") ||
-                `Added ${(data as unknown[]).length} items`,
-            );
+            announceAdded(t, navigate, list, (data as unknown[]).length);
             onClose();
           },
           onError: (error: unknown) => {

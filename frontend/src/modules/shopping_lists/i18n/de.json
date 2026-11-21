@@ -138,6 +138,9 @@
     "forRecipe": "Für Rezept: {{recipe}}"
   },
   "toasts": {
+    "addedToList_one": "{{count}} Produkt zur Liste „{{name}}“ hinzugefügt",
+    "addedToList_other": "{{count}} Produkte zur Liste „{{name}}“ hinzugefügt",
+    "openList": "Liste öffnen",
     "addItemsFailed": "Produkte konnten nicht hinzugefügt werden",
     "shoppingListGone": "Einkaufsliste existiert nicht mehr"
   }

@@ -4,10 +4,10 @@
     "description": "Śledź zasoby, atestacje i konserwację"
   },
   "statusBadge": {
-    "warrantyAlerts_one": "alert gwarancyjny",
-    "warrantyAlerts_few": "alerty gwarancyjne",
-    "warrantyAlerts_many": "alertów gwarancyjnych",
-    "warrantyAlerts_other": "alertów gwarancyjnych"
+    "warrantyAlerts_one": "gwarancja kończy się wkrótce",
+    "warrantyAlerts_few": "gwarancje kończą się wkrótce",
+    "warrantyAlerts_many": "gwarancji kończy się wkrótce",
+    "warrantyAlerts_other": "gwarancji kończy się wkrótce"
   },
   "nav": {
     "overview": "Przegląd",
@@ -47,10 +47,10 @@
     "active_assignments": "Wydane",
     "in_maintenance": "W serwisie",
     "retired": "Wycofane",
-    "warrantyAlertsCount_one": "{{count}} alert gwarancyjny",
-    "warrantyAlertsCount_few": "{{count}} alerty gwarancyjne",
-    "warrantyAlertsCount_many": "{{count}} alertów gwarancyjnych",
-    "warrantyAlertsCount_other": "{{count}} alertów gwarancyjnych",
+    "warrantyAlertsCount_one": "{{count}} gwarancja kończy się wkrótce",
+    "warrantyAlertsCount_few": "{{count}} gwarancje kończą się wkrótce",
+    "warrantyAlertsCount_many": "{{count}} gwarancji kończy się wkrótce",
+    "warrantyAlertsCount_other": "{{count}} gwarancji kończy się wkrótce",
     "add_asset": "Dodaj zasób",
     "attention": {
       "heading_one": "{{count}} zasób wymaga uwagi",

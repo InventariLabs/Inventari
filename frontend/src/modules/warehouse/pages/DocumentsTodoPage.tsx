@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import {
   Boxes,
   Camera,
@@ -275,6 +276,76 @@ function useOffersApprovalsQueue(): boolean {
   return isModuleEnabled("approvals") && canApprove;
 }
 
+/**
+ * A phone takes the work the reader taps: an unassigned task is claimed for
+ * them before its screen opens, so two people on the floor do not both
+ * start the same delivery. The row's assignee is only a hint, and it may be
+ * stale, so the claim asks the server for the task only while nobody holds
+ * it: losing that claim leaves the task with its holder, says so and opens
+ * nothing rather than reassigning somebody else's work. Work already given
+ * to somebody is opened as it is — tapping never takes it away from them.
+ */
+function useTakeOnPhone(
+  userId: string | null,
+  assign: (
+    vars: {
+      sourceKind: string;
+      sourceId: string;
+      assigneeId: string | null;
+      onlyIfUnassigned?: boolean;
+    },
+    options?: { onSuccess?: () => void },
+  ) => void,
+) {
+  const { t } = useTranslation("warehouse");
+  if (!userId) return undefined;
+  return (task: WorkItem, open: () => void) => {
+    if (task.assignee_id) {
+      open();
+      return;
+    }
+    assign(
+      {
+        sourceKind: task.source_kind,
+        sourceId: task.source_id,
+        assigneeId: userId,
+        onlyIfUnassigned: true,
+      },
+      {
+        onSuccess: () => {
+          announceTaken(t, task, assign);
+          open();
+        },
+      },
+    );
+  };
+}
+
+/** Opening a task's screen is not a promise to do the work, and backing out
+ *  leaves the task under the reader's name: the toast says so and gives it
+ *  back in one tap. */
+function announceTaken(
+  t: TranslateFn,
+  task: WorkItem,
+  release: (vars: {
+    sourceKind: string;
+    sourceId: string;
+    assigneeId: null;
+  }) => void,
+) {
+  toast.success(t("todo.taken"), {
+    action: {
+      label: t("todo.giveBack"),
+      onClick: () =>
+        release({
+          sourceKind: task.source_kind,
+          sourceId: task.source_id,
+          assigneeId: null,
+        }),
+    },
+  });
+}
+
 export default function DocumentsTodoPage() {
   const { t } = useTranslation("warehouse");
   const { setHeader } = useModulePageHeader();
@@ -312,31 +383,10 @@ export default function DocumentsTodoPage() {
   const [puttingAway, setPuttingAway] = useState<WorkItem | null>(null);
   const [replenishing, setReplenishing] = useState<WorkItem | null>(null);
 
-  // A phone takes the work the reader taps: an unassigned task is claimed for
-  // them before its screen opens, so two people on the floor do not both
-  // start the same delivery. The row's assignee is only a hint, and it may be
-  // stale, so the claim asks the server for the task only while nobody holds
-  // it: losing that claim leaves the task with its holder, says so and opens
-  // nothing rather than reassigning somebody else's work. Work already given
-  // to somebody is opened as it is — tapping never takes it away from them.
-  const take =
-    isPhone && canWrite && userId
-      ? (task: WorkItem, open: () => void) => {
-          if (task.assignee_id) {
-            open();
-            return;
-          }
-          assign.mutate(
-            {
-              sourceKind: task.source_kind,
-              sourceId: task.source_id,
-              assigneeId: userId,
-              onlyIfUnassigned: true,
-            },
-            { onSuccess: open },
-          );
-        }
-      : undefined;
+  const take = useTakeOnPhone(
+    isPhone && canWrite && userId ? userId : null,
+    assign.mutate,
+  );
 
   // A warehouse is only a choice when the organization keeps more than one;
   // the feed then follows the chosen one's shelves on the server. A failed
@@ -525,6 +575,18 @@ export default function DocumentsTodoPage() {
                         onPutAway={setPuttingAway}
                         onReplenish={setReplenishing}
                         onTake={take}
+                        onGiveBack={
+                          take &&
+                          task.state !== "done" &&
+                          task.assignee_id === userId
+                            ? (row) =>
+                                assign.mutate({
+                                  sourceKind: row.source_kind,
+                                  sourceId: row.source_id,
+                                  assigneeId: null,
+                                })
+                            : undefined
+                        }
                       />
                     ))}
                   </div>

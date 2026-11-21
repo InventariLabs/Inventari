@@ -4,8 +4,8 @@
     "description": "Seguimiento de activos, atestaciones y mantenimiento"
   },
   "statusBadge": {
-    "warrantyAlerts_one": "alerta de garantía",
-    "warrantyAlerts_other": "alertas de garantía"
+    "warrantyAlerts_one": "garantía por vencer",
+    "warrantyAlerts_other": "garantías por vencer"
   },
   "nav": {
     "overview": "Resumen",
@@ -45,8 +45,8 @@
     "active_assignments": "Prestados",
     "in_maintenance": "En mantenimiento",
     "retired": "Retirado",
-    "warrantyAlertsCount_one": "{{count}} alerta de garantía",
-    "warrantyAlertsCount_other": "{{count}} alertas de garantía",
+    "warrantyAlertsCount_one": "{{count}} garantía por vencer",
+    "warrantyAlertsCount_other": "{{count}} garantías por vencer",
     "add_asset": "Agregar activo",
     "attention": {
       "heading_one": "{{count}} activo requiere atención",
