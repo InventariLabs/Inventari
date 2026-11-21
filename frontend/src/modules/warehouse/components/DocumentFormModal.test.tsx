@@ -11,8 +11,6 @@ import type { ComponentProps } from "react";
 import type * as RealEditorModule from "@/modules/warehouse/components/DocumentLinesEditor";
 import * as documentHooks from "@/modules/warehouse/hooks/useDocuments";
 import * as partnerHooks from "@/modules/partners/hooks/usePartners";
-import { http, HttpResponse } from "msw";
-import { server } from "@/test/mocks/server";
 import { serveLocations } from "@/test/serveLocations";
 import { rememberLastUsedLocations } from "@/modules/warehouse/lib/lastUsedLocations";
 import * as itemHooks from "@/modules/inventory/hooks/useItems";
@@ -1583,30 +1581,21 @@ describe("DocumentFormModal — which locations the pickers offer", () => {
     ).toBe(true);
   });
 
-  it("keeps the places it last used when the check that they are still on offer failed", async () => {
+  it("starts a new document with both places empty", async () => {
+    // A place this form was last given is the reader's history, not their
+    // choice: a new document starts as empty as its partner field, and the
+    // source it writes is the one they pick.
     window.localStorage.clear();
     rememberLastUsedLocations("IN", "", "loc-2");
     locationRequests = serveLocations([internalShelf, mainShelf]);
-    server.use(
-      http.get("/api/v1/locations", ({ request }) => {
-        const asked = new URL(request.url).searchParams;
-        return asked.has("ids") && !asked.has("usage")
-          ? HttpResponse.json({ detail: "down" }, { status: 500 })
-          : undefined;
-      }),
-    );
 
     await act(async () => {
       render(<DocumentFormModal initialType="IN" onClose={vi.fn()} />);
     });
     await placesLoaded();
 
-    // The check could not be made, which does not say the place is gone.
-    await waitFor(() =>
-      expect(screen.getByLabelText("Choose where the goods go")).toHaveValue(
-        "loc-2",
-      ),
-    );
+    expect(locationRequests.every((asked) => !asked.has("ids"))).toBe(true);
+    expect(screen.getByLabelText("Choose where the goods go")).toHaveValue("");
     window.localStorage.clear();
   });
 

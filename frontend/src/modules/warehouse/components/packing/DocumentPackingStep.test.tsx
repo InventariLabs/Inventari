@@ -464,7 +464,7 @@ describe("DocumentPackingStep", () => {
     await user.click(within(sheet).getByRole("button", { name: "Pack" }));
 
     expect(
-      within(sheet).getByText("Only 2 pcs. is left to pack"),
+      within(sheet).getByText("Only 2 pcs. are left to pack"),
     ).toBeInTheDocument();
     expect(requests).toEqual([]);
   });

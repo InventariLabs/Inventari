@@ -309,6 +309,19 @@ function useSkipAsk(skipLine: (lineId: string) => Promise<boolean>) {
   return { skipAsk, setSkipAsk, handleSkipLine };
 }
 
+/** One way out of the summary: its button books, every other door only keeps
+ *  the document open. */
+function summaryExit(
+  reset: () => void,
+  onClose: (completed?: boolean) => void,
+  completed: boolean,
+) {
+  return () => {
+    reset();
+    onClose(completed);
+  };
+}
+
 export default function WmsReceivingView({
   documentId,
   onClose,
@@ -572,16 +585,11 @@ export default function WmsReceivingView({
         onAnswerSkip={(line, code) => void confirmShort(line.id, 0, code)}
         isLoading={isLoading}
         error={sessionError}
-        onClose={() => {
-          // Closing the summary is what completes the document and books
-          // the stock, as it is in picking. The last scan does not book on
-          // its own; there is a summary to look at first.
-          reset();
-          onClose(true);
-        }}
-        // Refresh the document the moment the summary appears, not when it is
-        // dismissed: the summary said "received" over a document still
-        // reading "Planned 1 / Done 0" behind it.
+        // The button completes the document and books the stock; leaving any
+        // other way keeps it open, as received, the way picking does.
+        onClose={summaryExit(reset, onClose, true)}
+        onLeave={summaryExit(reset, onClose, false)}
+        // The document behind the summary refreshes as the summary appears.
         onShown={invalidateDocument}
       />
     );

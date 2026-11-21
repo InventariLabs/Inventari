@@ -476,15 +476,21 @@ function receiveHeading(
     : t("receive.success.heading");
 }
 
-/** Put the reader where the refused field is. */
+/** Put the reader where the refused field is, and bring it into view: on a
+ *  phone the field sits above the sheet's own button, and an error announced
+ *  off-screen reads as a tap that did nothing. */
 function focusProblem(issue: ProblemKey | null, scan: HTMLInputElement | null) {
-  if (issue === "noWarehouse") {
-    document.getElementById(TARGET_FIELD_ID)?.focus();
-  } else if (issue === "noPartner") {
-    document.getElementById(PARTNER_FIELD_ID)?.focus();
-  } else if (issue === "noLines" || issue === "noProduct") {
-    scan?.focus();
-  }
+  const field =
+    issue === "noWarehouse"
+      ? document.getElementById(TARGET_FIELD_ID)
+      : issue === "noPartner"
+        ? document.getElementById(PARTNER_FIELD_ID)
+        : issue === "noLines" || issue === "noProduct"
+          ? scan
+          : null;
+  if (!field) return;
+  field.focus();
+  field.scrollIntoView?.({ behavior: "smooth", block: "center" });
 }
 
 /**
