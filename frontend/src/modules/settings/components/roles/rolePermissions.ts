@@ -38,12 +38,6 @@ export interface PermissionGroup {
 export type GroupState = "none" | "some" | "all";
 
 /**
- * Split the catalog into the sections the editor renders.
- *
- * Empty sections are dropped: a module that declares no permission has nothing
- * to offer, and an empty accordion is a promise of content that is not there.
- */
-/**
  * System permissions that belong to a module of their own on every other
  * screen (the first-run choice, the launcher, the module store). The catalog
  * files them under "system" because the core declares them; the editor shows
@@ -60,6 +54,12 @@ function moduleOfSystemPermission(key: string): string | undefined {
   return prefix ? SYSTEM_PERMISSION_MODULES[prefix] : undefined;
 }
 
+/**
+ * Split the catalog into the sections the editor renders.
+ *
+ * Empty sections are dropped: a module that declares no permission has nothing
+ * to offer, and an empty accordion is a promise of content that is not there.
+ */
 export function permissionGroups(
   catalog: PermissionCatalog | undefined,
 ): PermissionGroup[] {

@@ -194,7 +194,7 @@ test.describe.serial("Workspace mode", () => {
       const label = (await item.textContent()) ?? "";
       if (
         !isActive &&
-        !/^(my modules|all modules|settings)$/i.test(label.trim())
+        !/^(my modules|organization modules|all modules|settings)$/i.test(label.trim())
       ) {
         await item.click();
         clicked = true;

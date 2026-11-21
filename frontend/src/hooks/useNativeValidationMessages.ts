@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 
@@ -58,25 +58,25 @@ function messageFor(field: Field, t: TFunction<"common">): string | null {
  */
 export function useNativeValidationMessages(): void {
   const { t } = useTranslation("common");
+  // Fields whose current custom message is ours, so one a screen set itself is
+  // never overwritten or cleared. Kept across a language change: the listeners
+  // are rebuilt for the new `t`, the fields they marked are still ours to release.
+  const ours = useRef(new WeakSet<Field>());
 
   useEffect(() => {
-    // Fields whose current custom message is ours, so one a screen set itself
-    // is never overwritten or cleared.
-    const ours = new WeakSet<Field>();
-
     const onInvalid = (event: Event) => {
       const { target } = event;
       if (!isField(target) || target.validity.customError) return;
       const message = messageFor(target, t);
       if (!message) return;
       target.setCustomValidity(message);
-      ours.add(target);
+      ours.current.add(target);
     };
     const release = (event: Event) => {
       const { target } = event;
-      if (!isField(target) || !ours.has(target)) return;
+      if (!isField(target) || !ours.current.has(target)) return;
       target.setCustomValidity("");
-      ours.delete(target);
+      ours.current.delete(target);
     };
 
     document.addEventListener("invalid", onInvalid, true);

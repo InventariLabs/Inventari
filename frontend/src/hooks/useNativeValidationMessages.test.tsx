@@ -1,5 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { act } from "react";
+import i18n from "i18next";
 import { useNativeValidationMessages } from "./useNativeValidationMessages";
 
 function Form() {
@@ -64,5 +66,21 @@ describe("useNativeValidationMessages", () => {
     fireEvent.input(host, { target: { value: "x" } });
 
     expect(host.validationMessage).toBe("The screen's own sentence");
+  });
+
+  it("releases a field marked before the app language changed", async () => {
+    render(<Form />);
+    const password = screen.getByLabelText("Password") as HTMLInputElement;
+    password.checkValidity();
+
+    await act(() => i18n.changeLanguage("pl"));
+    try {
+      fireEvent.input(password, { target: { value: "long enough" } });
+
+      expect(password.validity.customError).toBe(false);
+      expect(password.checkValidity()).toBe(true);
+    } finally {
+      await act(() => i18n.changeLanguage("en"));
+    }
   });
 });
