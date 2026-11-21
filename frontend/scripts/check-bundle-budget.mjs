@@ -575,6 +575,16 @@ const dist = join(root, "dist");
  * budget moves a step of five, to 485; the other screens stand under theirs
  * (app first paint 405.5, login 410.3, launcher 425.4, start 643.8, issue
  * 591.2, history 616.3, products 635.0, initial 194.0).
+ *
+ * Re-measured 2026-11-21 on the persona walk branch merged with the line that
+ * carries the catalogue, locations and labels branch: the products screen
+ * measures 635.4 KiB gz against its 635. The line alone measures 634.3 to
+ * 635.0 and this branch alone 634.0; together they add about 0.5 KiB of copy
+ * in six languages to the language chunk the screen loads, no import. That
+ * phone budget moves a step of five, to 640; the other screens stand under
+ * theirs (app first paint 405.8 of 410, login 410.6 of 415, launcher 425.7 of
+ * 430, start 644.2 of 645, receive 480.5 of 485, issue 591.5 of 595, history
+ * 616.6 of 620, initial 194.0).
  */
 const BUDGETS = {
   initial: 245,
