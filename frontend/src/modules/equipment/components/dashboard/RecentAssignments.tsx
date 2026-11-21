@@ -16,7 +16,9 @@ const RECENT_ASSIGNMENTS_LIMIT = 5;
  */
 export function RecentAssignments() {
   const { t } = useTranslation("equipment");
-  const { data, isLoading, isError, error, refetch } = useActiveAssignments();
+  // Pending covers a query held back while the module list loads, which
+  // `isLoading` does not: the empty sentence must wait for the answer.
+  const { data, isPending, isError, error, refetch } = useActiveAssignments();
 
   if (isError) {
     return (
@@ -61,7 +63,7 @@ export function RecentAssignments() {
       entries={entries}
       linkLabel={t("dashboard.journal.link")}
       linkHref="/equipment/assets?checked_out=1"
-      loading={isLoading}
+      loading={isPending}
       empty={{ text: t("assignments.no_active") }}
     />
   );

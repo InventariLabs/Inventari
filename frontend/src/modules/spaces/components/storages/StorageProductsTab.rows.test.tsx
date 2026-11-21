@@ -177,7 +177,7 @@ describe("a location's products with the locations inside", () => {
 
     await vi.waitFor(() =>
       expect(toast.success).toHaveBeenCalledWith(
-        "Removed 1 unit — 40 pcs. left",
+        "Removed 1 pcs. — 40 pcs. left",
       ),
     );
   });

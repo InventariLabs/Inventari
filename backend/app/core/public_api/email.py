@@ -14,6 +14,8 @@ from __future__ import annotations
 from typing import Any
 from uuid import UUID
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.public_api._access import reads, writes
 from app.services.email_service import (
     EmailService,
@@ -53,13 +55,30 @@ class CoreEmailAPI:
     @staticmethod
     @reads
     def is_configured() -> bool:
-        """Whether a message sent through ``send_async`` could leave at all.
+        """Whether the installation's own server could send a message at all.
 
-        The production path queues and answers ``True`` once the row is
-        accepted, mail server or not, so its result cannot tell a module that
-        nothing will ever arrive. Ask this first when the reader is owed that.
+        It knows nothing of the server an organization set up in Settings →
+        Email; ask ``can_send_async`` when the mail belongs to one.
         """
         return EmailService.is_configured()
+
+    @staticmethod
+    @reads
+    async def can_send_async(db: AsyncSession, organization_id: UUID) -> bool:
+        """Whether a message ``send_async`` queues for this organization could leave.
+
+        A mail leaves through the server the organization named in Settings →
+        Email and, when it named none, through the installation's own — so
+        both count. The production path queues and answers ``True`` once the
+        row is accepted, mail server or not, so its result cannot tell a
+        module that nothing will ever arrive. Ask this first when the reader
+        is owed that.
+        """
+        from app.services.auth_service import AuthService
+
+        return EmailService.is_configured(
+            await AuthService.get_org_smtp_config_async(db, organization_id)
+        )
 
     @staticmethod
     @writes

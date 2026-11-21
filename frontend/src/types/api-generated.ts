@@ -10033,6 +10033,12 @@ export interface paths {
          *     most recent priced purchase → nothing. Enables the "auto-suggest price"
          *     step of value tracking without making the warehouse module depend on
          *     the purchase_orders module being enabled.
+         *
+         *     Both prices are what the goods cost: a supplier's offer and what was
+         *     last paid. A delivery's line price is what the customer pays, and
+         *     nothing here knows that, so a delivery gets the rate of tax alone. A
+         *     document that takes goods into its own use (an internal issue) is
+         *     valued at cost and keeps the chain.
          */
         get: operations["get_price_hint_api_v1_warehouse_price_hint_get"];
         put?: never;
@@ -12783,6 +12789,11 @@ export interface components {
             typed_unit_price_in_use: boolean;
             /** Stock On Hand */
             stock_on_hand?: string | null;
+            /**
+             * Unit Mismatch
+             * @default false
+             */
+            unit_mismatch: boolean;
         };
         /**
          * BoMLineUpdate
@@ -15307,6 +15318,11 @@ export interface components {
              * @default false
              */
             is_opening: boolean;
+            /**
+             * Stock Already Applied
+             * @default false
+             */
+            stock_already_applied: boolean;
             /** Lines */
             lines: components["schemas"]["DocumentLineSchema"][];
             /**
@@ -23416,6 +23432,11 @@ export interface components {
              * @default false
              */
             is_opening: boolean;
+            /**
+             * Stock Already Applied
+             * @default false
+             */
+            stock_already_applied: boolean;
             /** Lines */
             lines: components["schemas"]["DocumentLineSchema"][];
             /**
@@ -26576,6 +26597,10 @@ export interface components {
             from_location_name?: string | null;
             /** To Location Name */
             to_location_name?: string | null;
+            /** From Location Path */
+            from_location_path?: string | null;
+            /** To Location Path */
+            to_location_path?: string | null;
             /** Lot Name */
             lot_name?: string | null;
             /** User Name */
@@ -27335,9 +27360,9 @@ export interface components {
          * StorageArchiveRequest
          * @description «Move content and close» payload.
          *
-         *     ``move_items_to`` is required when the location (or any of its
-         *     descendants) still holds items; the archive then relocates them in the
-         *     same operation.
+         *     ``move_items_to`` is required when the location itself still holds
+         *     items; the archive then relocates them in the same operation. The
+         *     locations inside stay active and keep their own stock.
          */
         StorageArchiveRequest: {
             /** Move Items To */
@@ -31967,6 +31992,8 @@ export interface operations {
                 exclude_module_contexts?: boolean;
                 /** @description Include how many live items each category holds */
                 with_counts?: boolean;
+                /** @description With counts: count every live record, not distinct products */
+                count_records?: boolean;
             };
             header?: never;
             path?: never;
@@ -49466,6 +49493,8 @@ export interface operations {
                 partner_id?: string | null;
                 /** @description Line quantity; a volume price it does not reach is not offered */
                 quantity?: number | string | null;
+                /** @description Type of the document the line is on; a delivery to a partner (OUT) is offered the rate of tax and no price */
+                document_type?: string | null;
             };
             header?: never;
             path?: never;

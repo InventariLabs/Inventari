@@ -20,6 +20,8 @@ services:
       - ACME_EMAIL=${ACME_EMAIL}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
+      # Extra sites for this installation, imported at the end of the Caddyfile.
+      - ${CADDY_EXTRA_DIR:-./caddy-extra}:/etc/caddy/extra:ro
       - caddy_data:/data
       - caddy_config:/config
     # `edge` is how this Caddy reaches a demo stack on the same host

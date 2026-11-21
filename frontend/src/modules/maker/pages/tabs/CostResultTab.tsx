@@ -49,6 +49,7 @@ export function CostResultTab({ recipe }: CostResultTabProps) {
     data: breakdown,
     isLoading,
     isError,
+    error,
     refetch,
   } = useBomCostEstimate(recipe.output_template_id, {
     recipeId: recipe.id,
@@ -241,7 +242,7 @@ export function CostResultTab({ recipe }: CostResultTabProps) {
         </div>
       ) : isError ? (
         <Card className="p-4">
-          <QueryError onRetry={() => void refetch()} />
+          <QueryError error={error} onRetry={() => void refetch()} />
         </Card>
       ) : breakdown ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

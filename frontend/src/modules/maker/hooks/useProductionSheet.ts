@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useCanWrite } from "@/hooks/useCanWrite";
 import { extractApiError } from "@/lib/errors";
 import { formatQuantityLocalized, unitLabel } from "@/lib/i18nHelpers";
 import { useDebounce } from "@/module-sdk";
@@ -118,7 +119,11 @@ export function useProductionForm(
   preselectedProduct?: PreselectedProduct,
 ) {
   const { t } = useTranslation("maker");
-  const [mode, setMode] = useState<ProductionMode>("made");
+  // Recording a run already made posts stock, which only an account that may
+  // write items can do; everyone else plans.
+  const canRecordMade = useCanWrite("items");
+  const [chosenMode, setMode] = useState<ProductionMode>("made");
+  const mode: ProductionMode = canRecordMade ? chosenMode : "planned";
   const [selected, setSelected] = useState<ProductOption | null>(null);
   const [qty, setQty] = useState("");
   const [storageId, setStorageId] = useState("");
@@ -216,6 +221,7 @@ export function useProductionForm(
   return {
     mode,
     setMode,
+    canRecordMade,
     selected,
     setSelected,
     qty,

@@ -45,15 +45,17 @@ export function ProductionRunFields({
 
   return (
     <div className="space-y-5 min-w-0">
-      <ChoiceGroup
-        label={t("create.mode.label")}
-        options={[
-          { id: "made", label: t("create.mode.made") },
-          { id: "planned", label: t("create.mode.planned") },
-        ]}
-        value={form.mode}
-        onChange={(id) => form.setMode(id as ProductionMode)}
-      />
+      {form.canRecordMade && (
+        <ChoiceGroup
+          label={t("create.mode.label")}
+          options={[
+            { id: "made", label: t("create.mode.made") },
+            { id: "planned", label: t("create.mode.planned") },
+          ]}
+          value={form.mode}
+          onChange={(id) => form.setMode(id as ProductionMode)}
+        />
+      )}
 
       {form.selected ? (
         <SelectedProductCard

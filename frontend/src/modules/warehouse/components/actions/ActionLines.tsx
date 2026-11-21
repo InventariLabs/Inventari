@@ -91,6 +91,7 @@ function DesktopLines({
         }
         currency={currency}
         partnerId={workspace.partnerId}
+        documentType={workspace.docType}
         stockLocationId={stockLocationId}
         needsStockRow={workspace.requiresItemId}
         mergeStockRows={workspace.splitsAcrossRecords}

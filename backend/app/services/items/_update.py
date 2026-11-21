@@ -27,6 +27,10 @@ from app.schemas._common import keyed_by_column
 from app.schemas.item import ItemQuantityUpdate, ItemUpdate, _take_unit_confirmation
 from app.services.audit_service import audit_key, audit_value, log_action_async
 
+from ._consumed_place import (
+    bring_back_from_consumed_async,
+    file_under_consumed_async,
+)
 from ._loaded import settle_category
 from ._module_owner import resolve_module_owner
 from ._product_code import place_edited_product_code_async
@@ -744,7 +748,16 @@ async def update_quantity(
     lot_id: UUID | None = None,
     move_reference_type: str = 'item',
     move_reference_id: UUID | None = None,
+    file_when_emptied: bool = False,
 ) -> Item:
+    """Set a record's quantity, with its movement, history and journal entry.
+
+    *file_when_emptied* is for a door that takes stock out of the record (a
+    pick, a draw, a run's reversal): a record it leaves with nothing is filed
+    under the Consumed place like one used up by hand. A count or an edit
+    that states a quantity leaves the record where it stands. Stock given
+    back to a record in the Consumed place returns it to its shelf.
+    """
     from app.core.period_guard import check_period_not_closed
     from app.services.analytics._common import org_today_async
 
@@ -769,6 +782,10 @@ async def update_quantity(
         # names another keeps it, and the named batch takes only the change.
         item.lot_id = lot_id
 
+    if quantity_update.quantity > 0 and (item.quantity or Decimal('0')) <= 0:
+        # Before the posting: the movement lands on the shelf the stock is on.
+        await bring_back_from_consumed_async(db, item)
+
     old_quantity = await apply_quantity_change_async(
         db,
         item,
@@ -780,6 +797,8 @@ async def update_quantity(
         move_reference_id=move_reference_id,
         user_id=user_id,
     )
+    if file_when_emptied and item.quantity <= 0 and (old_quantity or Decimal('0')) > 0:
+        await file_under_consumed_async(db, item, user_id)
     if current_batch(db) is None:
         # Inside a posting the records are written with the next statement
         # that reads them, or with the end of the posting, as one set.

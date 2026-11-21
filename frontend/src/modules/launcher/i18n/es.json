@@ -14,9 +14,9 @@
     "emptyRecent": "Aún no hay elementos recientes",
     "actionItems": {
       "title": "Por hacer",
-      "subtitle": "{{count}} pendientes en módulos activados",
-      "subtitle_one": "{{count}} pendiente en módulos activados",
-      "subtitle_other": "{{count}} pendientes en módulos activados"
+      "subtitle": "En esta lista: {{count}}",
+      "subtitle_one": "En esta lista: {{count}}",
+      "subtitle_other": "En esta lista: {{count}}"
     }
   },
   "sections": {

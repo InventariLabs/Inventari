@@ -341,6 +341,7 @@
     "emptyDescriptionNone": "Hier sind keine Datensätze und keine Lagerorte darin.",
     "emptyDescription_one": "Sein {{count}} Datensatz ist auf der Registerkarte Produkte.",
     "emptyDescription_other": "Seine {{count}} Datensätze sind auf der Registerkarte Produkte.",
+    "noLocationsInside": "Keine Lagerorte darin",
     "showProducts": "Produkte anzeigen",
     "selected_one": "{{count}} Lagerort ausgewählt",
     "selected_other": "{{count}} Lagerorte ausgewählt",
@@ -355,6 +356,9 @@
   },
   "products": {
     "includeInside": "Lagerorte darin einschließen",
+    "noneHere": "Hier direkt keine Datensätze",
+    "insideDescription_one": "{{count}} Datensatz liegt in den Lagerorten darin.",
+    "insideDescription_other": "{{count}} Datensätze liegen in den Lagerorten darin.",
     "includingInside_one": "Einschließlich 1 Lagerort darin",
     "includingInside_other": "Einschließlich {{count}} Lagerorten darin"
   },

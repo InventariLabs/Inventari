@@ -117,7 +117,7 @@ describe("StorageProductsTab — taking stock off the shelf", () => {
     );
     await waitFor(() =>
       expect(toast.success).toHaveBeenCalledWith(
-        "Removed 1 unit — 2 pcs. left",
+        "Removed 1 pcs. — 2 pcs. left",
       ),
     );
     expect(body).toMatchObject({ quantity: 1, reason: "USED" });

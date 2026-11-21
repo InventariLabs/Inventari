@@ -230,7 +230,8 @@ there too.
 ### Archiving and deleting
 
 - **Archive** takes a location out of use. If it still holds products, you
-  choose where they go first. An archived location comes back with **Restore**
+  choose where they go first. Locations inside it are not archived with it
+  and keep their own products. An archived location comes back with **Restore**
   on the **Archived locations** page, linked under the tree.
 - **Delete** works only on a location that holds nothing and that no recorded
   movement has ever passed through. Otherwise Inventari tells you to archive it.

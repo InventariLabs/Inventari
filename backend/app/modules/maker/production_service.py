@@ -1309,7 +1309,7 @@ async def complete_production(
     )
     _snapshot_financial_result(order, recipe, unit_cost, uncosted=uncosted)
 
-    await _receive_output(
+    _produced_id, output_layer_id = await _receive_output(
         db,
         organization_id,
         order,
@@ -1319,6 +1319,9 @@ async def complete_production(
         run_day=run_day,
         best_before=output_best_before,
     )
+    # The layer this run put on the shelf, kept so undoing the run takes its
+    # output off at what the run put in rather than at the product's oldest.
+    order.output_layer_id = output_layer_id
 
     order.status = 'COMPLETED'
     order.total_cost = total_cost

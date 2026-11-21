@@ -366,6 +366,13 @@ describe("ItemDetailPage", () => {
       http.get("*/items/item-1", () =>
         HttpResponse.json({ ...item, template_id: "tpl-1" }),
       ),
+      http.get("*/items/product-templates/tpl-1/stock", () =>
+        HttpResponse.json({
+          product_template_id: "tpl-1",
+          total_quantity: "1",
+          uom_symbol: null,
+        }),
+      ),
     );
     const user = userEvent.setup();
     render(
@@ -391,6 +398,13 @@ describe("ItemDetailPage", () => {
     server.use(
       http.get("*/items/item-1", () =>
         HttpResponse.json({ ...item, template_id: "tpl-1" }),
+      ),
+      http.get("*/items/product-templates/tpl-1/stock", () =>
+        HttpResponse.json({
+          product_template_id: "tpl-1",
+          total_quantity: "1",
+          uom_symbol: null,
+        }),
       ),
     );
     render(

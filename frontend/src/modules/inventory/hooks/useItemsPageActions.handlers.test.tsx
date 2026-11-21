@@ -163,7 +163,7 @@ describe("useItemsPageActions — row handlers, failures and the export", () => 
       reason: "USED",
       notes: undefined,
     });
-    expect(toast.success).toHaveBeenCalledWith("Removed 1 unit — 1 left");
+    expect(toast.success).toHaveBeenCalledWith("Removed 1 — 1 left");
   });
 
   it("awaits a consume of the last unit with the way back to the record", async () => {

@@ -2,6 +2,7 @@ import { Suspense, lazy } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ModulesProvider } from "./contexts/ModulesContext";
 import AppToaster from "./components/AppToaster";
+import ManualCopyHost from "./components/ManualCopyHost";
 import ErrorBoundary from "./components/ErrorBoundary";
 import LoadingSpinner from "./components/LoadingSpinner";
 import { queryClient } from "./lib/queryClient";
@@ -46,6 +47,7 @@ export default function Root() {
         {/* Both trees report failures this way — the attestation page's
           confirm and dispute are mutations like any other. */}
         <AppToaster />
+        <ManualCopyHost />
       </QueryClientProvider>
     </ErrorBoundary>
   );

@@ -36,6 +36,7 @@ const CATALOG: PermissionCatalog = {
   modules: [
     {
       module: "warehouse",
+      requires: ["items"],
       permissions: [
         {
           key: "warehouse:read",
@@ -273,6 +274,21 @@ describe("RolePermissionsSheet — deleting and renaming", () => {
 });
 
 describe("RolePermissionsSheet", () => {
+  it("warns, before saving, about a read the granted module's screens need", () => {
+    renderSheet(role(["warehouse:read"]));
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      /lists it cannot read: add/,
+    );
+    expect(screen.getByRole("status")).toHaveTextContent("View products");
+  });
+
+  it("stays quiet for a role that holds the reads its modules need", () => {
+    renderSheet(role(["warehouse:read", "items:read"]));
+
+    expect(screen.queryByRole("status")).toBeNull();
+  });
+
   it("spells out what each permission does, not just its name", async () => {
     // The catalog has always carried a description; a column header eight
     // characters wide had nowhere to put it.

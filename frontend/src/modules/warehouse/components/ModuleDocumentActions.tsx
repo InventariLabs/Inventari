@@ -101,6 +101,7 @@ export function DocumentHeaderActions({ doc, ...actions }: HeaderActionsProps) {
         isConfirmed={isConfirmed}
         docStatus={workingStatus(doc)}
         docType={doc.type}
+        stockAlreadyApplied={doc.stock_already_applied}
         isReversed={!!doc.reversed_by_id}
         canStartPicking={canStartPicking}
         canStartReceiving={

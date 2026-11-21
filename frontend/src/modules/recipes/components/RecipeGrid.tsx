@@ -13,6 +13,7 @@ interface RecipeGridProps {
   recipes: RecipeList[];
   isLoading: boolean;
   isError: boolean;
+  error?: unknown;
   page: number;
   pageSize: number;
   /** total number of matching recipes — drives the real last page. */
@@ -54,6 +55,7 @@ export function RecipeGrid({
   recipes,
   isLoading,
   isError,
+  error,
   page,
   pageSize,
   total,
@@ -90,7 +92,7 @@ export function RecipeGrid({
   }
 
   if (isError) {
-    return <QueryError onRetry={onRetry} />;
+    return <QueryError error={error} onRetry={onRetry} />;
   }
 
   if (recipes.length === 0) {

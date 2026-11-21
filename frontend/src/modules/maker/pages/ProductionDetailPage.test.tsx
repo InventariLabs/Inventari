@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
@@ -103,6 +103,12 @@ vi.mock("@/modules/maker/hooks/useCostBreakdown", () => ({
   useCostBreakdown: () => ({ data: currentPlanned }),
 }));
 
+// A run is acted on by an account that may write; the cases about an account
+// that may not sign in as one themselves.
+beforeEach(() => {
+  signInWith(["maker:read", "maker:write", "items:write"]);
+});
+
 function renderPage() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
@@ -128,7 +134,7 @@ describe("ProductionDetailPage — the manager's cancel", () => {
     // cancels. The button stays visible to every member, disabled, with the
     // reason beside it, so nobody is left wondering why it is missing.
     currentOrder = draftOrder;
-    signInWith(["maker:read", "maker:write"]);
+    signInWith(["maker:read", "maker:write", "items:write"]);
     renderPage();
     expect(
       screen.getByTestId("maker-detail-complete-button"),
@@ -143,7 +149,7 @@ describe("ProductionDetailPage — the manager's cancel", () => {
 
   it("offers Cancel to an account holding maker:manage", () => {
     currentOrder = draftOrder;
-    signInWith(["maker:read", "maker:write", "maker:manage"]);
+    signInWith(["maker:read", "maker:write", "maker:manage", "items:write"]);
     renderPage();
     expect(screen.getByTestId("maker-detail-cancel-button")).toBeEnabled();
   });
@@ -238,12 +244,91 @@ describe("ProductionDetailPage — the stock moves did not load", () => {
   it("says so, with a retry, instead of leaving out the table without a word", () => {
     currentOrder = draftOrder;
     stockMovesRead.failed = true;
-    signInWith(["maker:read", "maker:write"]);
+    signInWith(["maker:read", "maker:write", "items:write"]);
     renderPage();
 
     expect(screen.getByRole("alert")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /try again/i }));
     expect(stockMovesRead.refetch).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("ProductionDetailPage — an account that may only read", () => {
+  const ACTIONS = [
+    "maker-detail-edit-button",
+    "maker-detail-start-button",
+    "maker-detail-complete-button",
+    "maker-detail-duplicate-button",
+    "maker-detail-cancel-button",
+  ];
+
+  it("offers a draft none of its actions and says why", () => {
+    currentOrder = draftOrder;
+    signInWith(["maker:read"]);
+    renderPage();
+    for (const id of ACTIONS) {
+      expect(screen.queryByTestId(id)).not.toBeInTheDocument();
+    }
+    expect(
+      screen.getByText(/you can view this, not change it/i),
+    ).toBeInTheDocument();
+  });
+
+  it("offers a completed run no Duplicate and no Undo", () => {
+    currentOrder = { ...draftOrder, status: "COMPLETED" };
+    signInWith(["maker:read"]);
+    renderPage();
+    expect(
+      screen.queryByTestId("maker-detail-duplicate-button"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("maker-detail-reverse-button"),
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe("ProductionDetailPage — an account that may write the module but not stock", () => {
+  // Start, Complete, Finish, a portion, Undo and Cancel of a run in progress
+  // post stock; their endpoints ask for items:write beside the module's key.
+  beforeEach(() => {
+    signInWith(["maker:read", "maker:write", "maker:manage"]);
+  });
+
+  it("offers a draft Edit and Duplicate but not Start or Complete", () => {
+    currentOrder = draftOrder;
+    renderPage();
+    expect(screen.getByTestId("maker-detail-edit-button")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("maker-detail-duplicate-button"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByTestId("maker-detail-start-button"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("maker-detail-complete-button"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("offers a run in progress no Finish, no portion form and no Cancel", () => {
+    currentOrder = { ...draftOrder, status: "IN_PROGRESS" };
+    renderPage();
+    expect(
+      screen.queryByTestId("maker-detail-finish-button"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("maker-detail-cancel-button"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("maker-portion-add-button"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("offers a completed run no Undo", () => {
+    currentOrder = { ...draftOrder, status: "COMPLETED" };
+    renderPage();
+    expect(
+      screen.queryByTestId("maker-detail-reverse-button"),
+    ).not.toBeInTheDocument();
   });
 });
 
@@ -475,7 +560,7 @@ describe("ProductionDetailPage — one quantity convention per screen", () => {
       planned_qty: "10.000",
       output_uom_symbol: "pcs",
     };
-    signInWith(["maker:read", "maker:write"]);
+    signInWith(["maker:read", "maker:write", "items:write"]);
 
     await withLanguage("pl", () => {
       const qc = new QueryClient({
@@ -590,7 +675,7 @@ describe("ProductionDetailPage — undoing a completed run", () => {
     // times the ingredients out of stock with no way back from this page.
     currentOrder = completed;
     reverseMutate.mockClear();
-    signInWith(["maker:read", "maker:write", "maker:manage"]);
+    signInWith(["maker:read", "maker:write", "maker:manage", "items:write"]);
     renderPage();
 
     fireEvent.click(screen.getByRole("button", { name: "Undo run" }));
@@ -605,7 +690,7 @@ describe("ProductionDetailPage — undoing a completed run", () => {
 
   it("tells the floor account why it cannot undo the run", () => {
     currentOrder = completed;
-    signInWith(["maker:read", "maker:write"]);
+    signInWith(["maker:read", "maker:write", "items:write"]);
     renderPage();
     const undo = screen.getByTestId("maker-detail-reverse-button");
     expect(undo).toBeDisabled();
@@ -616,7 +701,7 @@ describe("ProductionDetailPage — undoing a completed run", () => {
   });
 
   it("offers no undo where nothing was posted, or once it is undone", () => {
-    signInWith(["maker:read", "maker:write", "maker:manage"]);
+    signInWith(["maker:read", "maker:write", "maker:manage", "items:write"]);
     for (const status of ["DRAFT", "CANCELLED", "REVERSED"] as const) {
       currentOrder = { ...draftOrder, status };
       const { unmount } = renderPage();

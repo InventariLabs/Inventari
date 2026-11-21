@@ -19,6 +19,7 @@ from ._document_workflow_helpers import (
     build_document_event_payload,
 )
 from ._line_reversals import (
+    correctable_quantities_async,
     reversible_quantities_async,
     stock_the_document_posted_was_used_async,
 )
@@ -53,6 +54,7 @@ UNDOABLE_TYPES: frozenset[str] = frozenset(
 #: They reach the reader as one sentence about an undo, with the way out.
 _UNDO_STOCK_KEYS: frozenset[str] = frozenset(
     {
+        'document_correction_below_zero',
         'document_correction_would_go_negative',
         'document_insufficient_stock',
         'document_insufficient_stock_record_elsewhere',
@@ -122,6 +124,12 @@ async def create_correction(
     # correction would be written, and not at completion, where it would fail
     # after it had already been saved and confirmed.
     dt.correction_sign(original.type)
+    # A document that only records a movement another step made (a recipe's
+    # internal issue, whose goods the picking session took) posted nothing
+    # itself. A correction of it would apply its delta to a shelf the
+    # original never touched, so the same goods would move twice.
+    if original.stock_already_applied:
+        raise ServiceRejectionError('document_correction_posts_nothing')
 
     original_lines_by_number: dict[int, DocumentLine] = {
         line.line_number: line for line in original.lines
@@ -143,9 +151,10 @@ async def create_correction(
     # delivery of ten accepted a correction of minus ten twice over.
     # Positive deltas have no floor to hit; the over-receipt gate below is
     # what bounds them.
-    left_on_line = await reversible_quantities_async(
+    left_on_line = await correctable_quantities_async(
         db,
         org_id,
+        original,
         [
             original_lines_by_number[_line_number_of(delta)]
             for delta in correction_lines
@@ -206,10 +215,15 @@ async def create_correction(
                     may_exceed=may_exceed_over_receipt,
                 )
             else:
+                # What the line received, held part included: the shelf's
+                # share is a floor for removing, not a measure of the receipt.
                 await assert_over_receipt_allowed_async(
                     db,
                     org_id,
-                    quantity=left + qty_delta,
+                    quantity=(
+                        await reversible_quantities_async(db, org_id, [original_line])
+                    )[original_line.id]
+                    + qty_delta,
                     basis=original_line.expected_quantity,
                     may_exceed=may_exceed_over_receipt,
                 )
@@ -454,6 +468,12 @@ async def _undo_document(
         raise ServiceRejectionError('document_undo_type_not_supported')
     if original.status != DocumentStatus.COMPLETED.value:
         raise ServiceRejectionError('document_undo_requires_completed')
+    # Undo reverses what the document posted. A document marked as a record
+    # of a movement another step already made posted nothing — reversing it
+    # would put back goods that step's own movement never took from the
+    # shelf, so the shelf would end up one issue richer than it was.
+    if original.stock_already_applied:
+        raise ServiceRejectionError('document_undo_posts_nothing')
 
     # A transfer is reversed through the return service: the goods themselves
     # have to change shelves, and a transfer correction's two movements state
@@ -511,6 +531,9 @@ async def _undo_document(
             # stock: granting it posts the reversal, as it does for the
             # one-step action.
             complete_on_approval=True,
+            # Completed in this transaction, which asks the records the same
+            # question and takes the number back with a refusal.
+            precheck_correction_records=False,
         )
         # An approval standing in front of the reversal parks it: the stock
         # moves when the approval is granted, and the caller says so.

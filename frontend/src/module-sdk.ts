@@ -63,6 +63,14 @@ export { useCanWrite } from "@/hooks/useCanWrite";
 // a screen offering an approval decision asks `approvals:approve` here.
 export { useHasPermission } from "@/hooks/useHasPermission";
 export { useHasRole } from "@/hooks/useHasRole";
+// Whether archived records may be deleted for good: the organization's policy
+// and the account's `items:purge` right, which a screen offering the button
+// asks together.
+export {
+  resolveAllowPermanentDelete,
+  useAllowPermanentDelete,
+  useCanPurge,
+} from "@/hooks/usePermanentDelete";
 // Whether the signed-in user is the person a record names by e-mail address.
 export { useIsSignedInAs } from "@/hooks/useIsSignedInAs";
 export {

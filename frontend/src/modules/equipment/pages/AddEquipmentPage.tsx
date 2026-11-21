@@ -289,6 +289,7 @@ export default function AddEquipmentPage() {
   const {
     data: allCategories = [],
     isError: categoriesFailed,
+    error: categoriesError,
     refetch: refetchCategories,
   } = useAllCategories();
   const pickersFailed = categoriesFailed;
@@ -365,6 +366,7 @@ export default function AddEquipmentPage() {
       />
     ) : (
       <QueryError
+        error={loadError}
         message={t("form.errors.loadFailed", "Failed to load asset")}
         onRetry={retryLoad}
       />
@@ -426,6 +428,7 @@ export default function AddEquipmentPage() {
       >
         {pickersFailed && (
           <QueryError
+            error={categoriesError}
             message={t("form.pickersFailed")}
             onRetry={() => void refetchCategories()}
           />

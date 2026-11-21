@@ -179,6 +179,13 @@ function pressHeader(prop: string, ...args: unknown[]) {
   });
 }
 
+/** The props the page handed the header's action bar. */
+function headerProps(): Record<string, unknown> {
+  const calls = m.header.mock.calls;
+  const data = calls[calls.length - 1][0] as PageHeaderData;
+  return (data.actions as ReactElement<Record<string, unknown>>).props;
+}
+
 function modals() {
   return seen.props.modals as Record<string, unknown>;
 }
@@ -295,6 +302,20 @@ describe("DocumentDetailPage — header actions open what they name", () => {
     expect(modals().confirmAction).toBe("undo");
     press("modals", "onConfirmAction");
     expect(m.undo).toHaveBeenCalledWith("doc-1", expect.any(Object));
+  });
+
+  it("offers no undo and no new correction on a document that only records another step's movement", () => {
+    // The recipe's picking session took the goods; this document posted
+    // nothing, so there is no stock to take back and no movement of its own
+    // to restate. The page must not offer actions the next click disproves.
+    givenDocument({
+      type: "INTERNAL_OUT",
+      status: "COMPLETED",
+      stock_already_applied: true,
+    });
+    renderPage();
+    expect(headerProps().canUndo).toBe(false);
+    expect(seen.props.corrections).toBeUndefined();
   });
 
   it("opens the return form and closes it", () => {
