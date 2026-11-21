@@ -328,6 +328,37 @@ describe("DocumentsTodoPage", () => {
     );
   });
 
+  it("says the task is now the reader's and offers to give it back", async () => {
+    viewport({ phone: true });
+    answer(queue([task({ assignee_id: null })]));
+    mutations.assign.mockImplementation(
+      (_vars: unknown, options?: { onSuccess?: () => void }) =>
+        options?.onSuccess?.(),
+    );
+    render(<DocumentsTodoPage />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Pick" }));
+
+    expect(toast.success).toHaveBeenCalledWith(
+      "This task is now yours.",
+      expect.objectContaining({
+        action: expect.objectContaining({ label: "Give it back" }),
+      }),
+    );
+    const { action } = vi
+      .mocked(toast.success)
+      .mock.calls.at(-1)![1] as unknown as {
+      action: { onClick: () => void };
+    };
+    mutations.assign.mockClear();
+    action.onClick();
+    expect(mutations.assign).toHaveBeenCalledWith({
+      sourceKind: "document",
+      sourceId: "doc-1",
+      assigneeId: null,
+    });
+  });
+
   it("does not open a task somebody else claimed before the tap", async () => {
     viewport({ phone: true });
     answer(queue([task({ assignee_id: null })]));

@@ -183,7 +183,11 @@ export function RecipeTable({ recipes, sort, onProduce }: RecipeTableProps) {
                       Number(recipe.stock_qty) > 0 && (
                         <span className="block text-xs">
                           {t("catalog.stock")}:{" "}
-                          {formatQuantityLocalized(t, recipe.stock_qty, null)}
+                          {formatQuantityLocalized(
+                            t,
+                            recipe.stock_qty,
+                            recipe.stock_uom_symbol,
+                          )}
                         </span>
                       )}
                   </td>

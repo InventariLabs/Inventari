@@ -72,6 +72,39 @@ describe("ReorderRulesTable", () => {
   });
 });
 
+describe("ReorderRulesTable with no rules yet", () => {
+  const renderEmpty = (catalogEmpty: boolean) =>
+    render(
+      <ReorderRulesTable
+        rules={[]}
+        isLoading={false}
+        alertByRule={new Map()}
+        locationName={() => "Cold Storage"}
+        partnerName={() => "—"}
+        onEdit={vi.fn()}
+        onDelete={vi.fn()}
+        isFiltered={false}
+        onCreate={vi.fn()}
+        catalogEmpty={catalogEmpty}
+      />,
+    );
+
+  it("does not send an organization that has products to add products first", () => {
+    renderEmpty(false);
+
+    expect(screen.queryByText(/Add products in Inventory first/)).toBeNull();
+    expect(screen.getByRole("button", { name: /Add rule/ })).toBeEnabled();
+  });
+
+  it("sends an organization with no products to Inventory", () => {
+    renderEmpty(true);
+
+    expect(
+      screen.getByText(/Add products in Inventory first/),
+    ).toBeInTheDocument();
+  });
+});
+
 describe("ReorderRulesTable on a phone", () => {
   it("lists a rule as a card with every figure and its actions in view", async () => {
     phone.value = true;

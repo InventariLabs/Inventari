@@ -377,6 +377,27 @@ export function aliasFindings(text, name, from, inScope) {
   return findings;
 }
 
+/**
+ * Lines where the unit of a `formatQuantityLocalized` call is a literal
+ * `null` or `undefined`.
+ *
+ * The call is a resolver, so a read of the symbol inside it passes; with
+ * the symbol left out of the call there is no read at all, and a stock
+ * printed as "11.4" instead of "11.4 kg" slipped past every check above.
+ * A quantity that has no unit (a count of batches) is not this call's job:
+ * it goes through `formatQuantityValue`.
+ */
+export function nullUnitCalls(text) {
+  const lines = [];
+  const call =
+    /formatQuantityLocalized\(\s*[^,()]+,\s*[^,()]+,\s*(?:null|undefined)\s*[,)]/g;
+  let match;
+  while ((match = call.exec(text)) !== null) {
+    lines.push(lineOf(text, match.index));
+  }
+  return lines;
+}
+
 /** The raw symbol renders of one file. */
 export function rawUnitsIn(rel, source) {
   const text = blankComments(source);
@@ -416,6 +437,7 @@ export function rawUnitsIn(rel, source) {
       findings.push({ file: rel, line });
     }
   }
+  for (const line of nullUnitCalls(text)) findings.push({ file: rel, line });
   return findings;
 }
 

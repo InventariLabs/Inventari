@@ -1024,7 +1024,6 @@
     "products": "Products",
     "replenishAll": "Replenish All",
     "replenishPolicy": "Products that still have stock in use elsewhere are not counted as low or reordered.",
-    "replenishSuccess": "Added missing products to shopping list",
     "replenishModalTitle": "Review Suggestions",
     "replenishModalDesc": "Select products you want to add to your shopping list.",
     "addSelected": "Add selected ({{count}})",

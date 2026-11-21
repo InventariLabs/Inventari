@@ -24361,6 +24361,8 @@ export interface components {
             reference_direction?: ("SAVINGS" | "MARGIN") | null;
             /** Stock Qty */
             stock_qty?: string | null;
+            /** Stock Uom Symbol */
+            stock_uom_symbol?: string | null;
             /** Last Produced At */
             last_produced_at?: string | null;
         };

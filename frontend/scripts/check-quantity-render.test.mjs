@@ -16,6 +16,28 @@ import {
   rawUnitsIn,
 } from "./check-quantity-render.mjs";
 
+describe("a quantity rendered with its unit passed as null", () => {
+  it("reports an explicit null where the unit belongs", () => {
+    const text = "<b>{formatQuantityLocalized(t, recipe.stock_qty, null)}</b>";
+    expect(rawUnitsIn("a.tsx", text)).toEqual([{ file: "a.tsx", line: 1 }]);
+  });
+
+  it("reports an explicit undefined too", () => {
+    const text = "{formatQuantityLocalized(t, row.qty, undefined)}";
+    expect(rawUnitsIn("a.tsx", text)).toHaveLength(1);
+  });
+
+  it("leaves a call that hands over a symbol alone", () => {
+    const text = "{formatQuantityLocalized(t, row.qty, row.stock_uom_symbol)}";
+    expect(rawUnitsIn("a.tsx", text)).toEqual([]);
+  });
+
+  it("leaves a null that is only a rounding alone", () => {
+    const text = "{formatQuantityLocalized(t, row.qty, unit, null)}";
+    expect(rawUnitsIn("a.tsx", text)).toEqual([]);
+  });
+});
+
 describe("rawUnitsIn", () => {
   it("reports a bare render", () => {
     expect(rawUnitsIn("a.tsx", '<span>{line.uom_symbol ?? ""}</span>')).toEqual(
@@ -167,7 +189,7 @@ describe("rawUnitsIn", () => {
   it("lets a symbol read straight into a component prop through", () => {
     // The same hand-over without a name in between: `uomSymbol={item.uom_symbol}`
     // is a value given to a consumer, not a sentence.
-    const text = '<QuantityInput uomSymbol={item.uom_symbol} />';
+    const text = "<QuantityInput uomSymbol={item.uom_symbol} />";
     expect(rawUnitsIn("a.tsx", text)).toEqual([]);
   });
 
@@ -175,17 +197,14 @@ describe("rawUnitsIn", () => {
     // The prop exclusion is the attribute's own braces and nothing wider:
     // a render in the element body, a template literal inside an attribute
     // and a translator argument keep their red.
-    expect(
-      rawUnitsIn("a.tsx", "<span>{item.uom_symbol}</span>"),
-    ).toHaveLength(1);
+    expect(rawUnitsIn("a.tsx", "<span>{item.uom_symbol}</span>")).toHaveLength(
+      1,
+    );
     expect(
       rawUnitsIn("a.tsx", "<span title={`${item.uom_symbol} each`} />"),
     ).toHaveLength(1);
     expect(
-      rawUnitsIn(
-        "a.tsx",
-        '<Hint label={t("k", { unit: item.uom_symbol })} />',
-      ),
+      rawUnitsIn("a.tsx", '<Hint label={t("k", { unit: item.uom_symbol })} />'),
     ).toHaveLength(1);
   });
 
