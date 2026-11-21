@@ -598,6 +598,11 @@ says what the release does rather than what changed since them.
   remove, and the refusal names the product in the screen's quantities rather
   than a record id. A surplus correction is still weighed against everything
   the line received, the held part included.
+- Saving a BOM's *Process steps* keeps a step that was typed in the add row but
+  never added with *Add step*: it is stored as the last step, with its
+  minutes, instead of vanishing under a success message. Closing the editor
+  with the X while the add row still holds text asks first, and offers to keep
+  editing.
 
 ### Removed
 
