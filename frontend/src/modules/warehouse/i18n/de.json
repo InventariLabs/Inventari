@@ -1382,7 +1382,10 @@
       "plannedByRule": "Regel: {{rule}}",
       "plannedWarning": {
         "archived": "Regel übersprungen — ihr Lagerort ist archiviert",
-        "not_internal": "Regel übersprungen — ihr Lagerort ist virtuell"
+        "not_internal": "Regel übersprungen — ihr Lagerort ist virtuell",
+        "refused": "Regel übersprungen — ein Modul hat ihre Orte für diese Ware ausgeschlossen",
+        "receiving": "Regel übersprungen — ihr Lagerort ist ein Wareneingangsbereich",
+        "quarantine": "Regel übersprungen — ihr Lagerort ist die Quarantäne"
       }
     },
     "short": {

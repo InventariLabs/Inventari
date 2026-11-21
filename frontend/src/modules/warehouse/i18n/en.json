@@ -1382,7 +1382,10 @@
       "plannedByRule": "rule: {{rule}}",
       "plannedWarning": {
         "archived": "Rule skipped — its location is archived",
-        "not_internal": "Rule skipped — its location is virtual"
+        "not_internal": "Rule skipped — its location is virtual",
+        "refused": "Rule skipped — a module ruled out its locations for these goods",
+        "receiving": "Rule skipped — its location is a receiving area",
+        "quarantine": "Rule skipped — its location is the quarantine"
       }
     },
     "short": {

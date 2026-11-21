@@ -1382,7 +1382,10 @@
       "plannedByRule": "règle : {{rule}}",
       "plannedWarning": {
         "archived": "Règle ignorée — son emplacement est archivé",
-        "not_internal": "Règle ignorée — son emplacement est virtuel"
+        "not_internal": "Règle ignorée — son emplacement est virtuel",
+        "refused": "Règle ignorée — un module a exclu ses emplacements pour ces marchandises",
+        "receiving": "Règle ignorée — son emplacement est une zone de réception",
+        "quarantine": "Règle ignorée — son emplacement est la quarantaine"
       }
     },
     "short": {

@@ -1498,7 +1498,10 @@
       "plannedByRule": "reguła: {{rule}}",
       "plannedWarning": {
         "archived": "Reguła pominięta — jej miejsce jest zarchiwizowane",
-        "not_internal": "Reguła pominięta — jej miejsce jest wirtualne"
+        "not_internal": "Reguła pominięta — jej miejsce jest wirtualne",
+        "refused": "Reguła pominięta — moduł wykluczył jej miejsca dla tego towaru",
+        "receiving": "Reguła pominięta — jej miejsce jest strefą przyjęć",
+        "quarantine": "Reguła pominięta — jej miejsce to kwarantanna"
       }
     },
     "short": {

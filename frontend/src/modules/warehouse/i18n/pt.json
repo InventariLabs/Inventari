@@ -1352,7 +1352,10 @@
       "plannedByRule": "regra: {{rule}}",
       "plannedWarning": {
         "archived": "Regra ignorada — o local dela está arquivado",
-        "not_internal": "Regra ignorada — o local dela é virtual"
+        "not_internal": "Regra ignorada — o local dela é virtual",
+        "refused": "Regra ignorada — um módulo excluiu os locais dela para esta mercadoria",
+        "receiving": "Regra ignorada — o local dela é uma área de receção",
+        "quarantine": "Regra ignorada — o local dela é a quarentena"
       }
     },
     "short": {

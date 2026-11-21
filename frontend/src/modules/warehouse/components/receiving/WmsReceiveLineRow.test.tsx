@@ -2,7 +2,13 @@ import { describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { render, screen } from "@/test/utils";
 import { serveLocations } from "@/test/serveLocations";
-import WmsReceiveLineRow from "./WmsReceiveLineRow";
+import WmsReceiveLineRow, { PlannedShelfReason } from "./WmsReceiveLineRow";
+import enWarehouse from "@/modules/warehouse/i18n/en.json";
+import deWarehouse from "@/modules/warehouse/i18n/de.json";
+import esWarehouse from "@/modules/warehouse/i18n/es.json";
+import frWarehouse from "@/modules/warehouse/i18n/fr.json";
+import plWarehouse from "@/modules/warehouse/i18n/pl.json";
+import ptWarehouse from "@/modules/warehouse/i18n/pt.json";
 import type { WmsReceiveLine } from "@/modules/warehouse/api/documents_receiving";
 
 const pendingLine: WmsReceiveLine = {
@@ -498,4 +504,54 @@ describe("WmsReceiveLineRow's shelf label state", () => {
     ).not.toBeInTheDocument();
     expect(screen.queryByText("Location confirmed")).not.toBeInTheDocument();
   });
+});
+
+describe("PlannedShelfReason", () => {
+  const WARNINGS = [
+    "archived",
+    "not_internal",
+    "refused",
+    "receiving",
+    "quarantine",
+  ] as const;
+
+  it.each(WARNINGS)(
+    "words the %s reason a rule was skipped, never a raw key",
+    (warning) => {
+      const { container } = render(
+        <PlannedShelfReason
+          line={{
+            ...pendingLine,
+            planned_location_id: "loc-1",
+            planned_location_name: "Shelf B",
+            planned_source: "document",
+            planned_rule_warning: warning,
+          }}
+        />,
+      );
+      const text = container.textContent ?? "";
+      expect(text).toMatch(/^Rule skipped — /);
+      expect(text).not.toContain("plannedWarning");
+    },
+  );
+
+  it.each([
+    ["en", enWarehouse],
+    ["de", deWarehouse],
+    ["es", esWarehouse],
+    ["fr", frWarehouse],
+    ["pl", plWarehouse],
+    ["pt", ptWarehouse],
+  ])(
+    "%s: the floor's reasons cover every reason the office sentence has",
+    (_lang, bundle) => {
+      const b = bundle as unknown as {
+        detail: { plannedRuleWarning: Record<string, string> };
+        receiving: { line: { plannedWarning: Record<string, string> } };
+      };
+      expect(Object.keys(b.receiving.line.plannedWarning).sort()).toEqual(
+        Object.keys(b.detail.plannedRuleWarning).sort(),
+      );
+    },
+  );
 });
