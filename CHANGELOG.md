@@ -586,6 +586,14 @@ says what the release does rather than what changed since them.
   no longer lost: the document opens on the Packing step with them in its
   Shipping fields, so *Complete dispatch* there does not ship without
   tracking.
+- A correction of a receipt that held part of a line back in quarantine
+  offers and accepts only what the shelf can give: the quantity the line's own
+  stock record holds, not the whole quantity received. A correction that cannot
+  be applied is refused before it takes a number, so it stays a draft that can
+  be deleted instead of becoming a numbered correction its author cannot
+  remove, and the refusal names the product in the screen's quantities rather
+  than a record id. A surplus correction is still weighed against everything
+  the line received, the held part included.
 
 ### Removed
 
