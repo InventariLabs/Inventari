@@ -406,7 +406,8 @@
     "yieldConfirm": {
       "title": "¿Cambiar lo que produce esta fórmula?"
     },
-    "openDraftsChange": "Borradores abiertos que leen esta fórmula y cambian con ella: {{number}}."
+    "openDraftsChange": "Borradores abiertos que leen esta fórmula y cambian con ella: {{number}}.",
+    "openDraftsUnknown": "Los borradores abiertos que leen esta fórmula cambian con ella; no se sabe cuántos son."
   },
   "tree": {
     "title": "Lista de materiales multinivel",
@@ -687,17 +688,17 @@
       "printJarLabels": "Imprimir etiquetas de los tarros",
       "jarLabelsTitle": "Etiquetas de los tarros",
       "record": "Registro del lote",
-      "hold": "Retener",
+      "hold": "Poner en cuarentena",
       "release": "Liberar",
-      "heldToast_one": "El lote está retenido. No se tomará nada de él hasta que se libere.",
-      "heldToast_other": "Los lotes están retenidos. No se tomará nada de ellos hasta que se liberen.",
+      "heldToast_one": "El lote está en cuarentena. No se tomará nada de él hasta que se libere.",
+      "heldToast_other": "Los lotes están en cuarentena. No se tomará nada de ellos hasta que se liberen.",
       "releasedToast_one": "El lote está liberado y puede volver a usarse.",
       "releasedToast_other": "Los lotes están liberados y pueden volver a usarse.",
       "holdFailed": "No se pudo cambiar el estado del lote.",
-      "holdTitle_one": "¿Retener este lote?",
-      "holdTitle_other": "¿Retener estos lotes?",
-      "holdMessage": "Un lote retenido sigue en su estante, pero ninguna producción, preparación ni envío toma de él hasta que se libere.",
-      "holdReason": "¿Por qué se retiene?",
+      "holdTitle_one": "¿Poner este lote en cuarentena?",
+      "holdTitle_other": "¿Poner estos lotes en cuarentena?",
+      "holdMessage": "Un lote en cuarentena sigue en su estante, pero ninguna producción, preparación ni envío toma de él hasta que se libere.",
+      "holdReason": "¿Por qué se pone en cuarentena?",
       "state": {
         "quarantined": "En cuarentena",
         "held": "Retenido"

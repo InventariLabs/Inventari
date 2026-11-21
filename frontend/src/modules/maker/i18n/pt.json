@@ -375,7 +375,8 @@
     "yieldConfirm": {
       "title": "Change what this BOM makes?"
     },
-    "openDraftsChange": "Open drafts that read this BOM and change with it: {{number}}."
+    "openDraftsChange": "Open drafts that read this BOM and change with it: {{number}}.",
+    "openDraftsUnknown": "Any open drafts that read this BOM change with it; how many is not known."
   },
   "tree": {
     "title": "Lista de materiais em vários níveis",

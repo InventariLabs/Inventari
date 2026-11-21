@@ -1,6 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { useOpenDraftsOfRecipe } from "@/modules/maker/hooks/useOpenDraftsOfRecipe";
+import {
+  openDraftsSentence,
+  useOpenDraftsOfRecipe,
+} from "@/modules/maker/hooks/useOpenDraftsOfRecipe";
 import type { BomLine, MakerRecipe } from "@/modules/maker/types/maker";
 
 /**
@@ -24,15 +27,12 @@ export function RemoveIngredientDialog({
   const question = t("composition.removeConfirm.description", {
     name: line?.child_template_name ?? line?.child_template_id ?? "",
   });
+  const drafts = openDraftsSentence(t, openDrafts);
   return (
     <ConfirmDialog
       open={line !== null}
       title={t("composition.removeConfirm.title")}
-      message={
-        openDrafts !== null && openDrafts > 0
-          ? `${question} ${t("composition.openDraftsChange", { number: openDrafts })}`
-          : question
-      }
+      message={drafts ? `${question} ${drafts}` : question}
       variant="danger"
       confirmLabel={t("composition.removeIngredient")}
       onConfirm={onConfirm}

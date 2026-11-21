@@ -37,10 +37,18 @@ vi.mock("@/modules/maker/hooks/useRecipes", () => ({
 
 // The open drafts that read the BOM, asked only while a confirmation that
 // quotes their number is open.
-const drafts = vi.hoisted(() => ({ items: [] as { recipe_id: string }[] }));
+const drafts = vi.hoisted(() => ({
+  items: [] as { recipe_id: string }[],
+  // The read has not answered (or failed): the count is unknown.
+  unknown: false,
+}));
 vi.mock("@/modules/maker/hooks/useProduction", () => ({
   useProductionOrders: (_params: unknown, options?: { enabled?: boolean }) => ({
-    data: options?.enabled === false ? undefined : { items: drafts.items },
+    data:
+      options?.enabled === false || drafts.unknown
+        ? undefined
+        : { items: drafts.items },
+    isError: drafts.unknown,
   }),
 }));
 
@@ -172,6 +180,7 @@ describe("CompositionTab yield editing", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     drafts.items = [];
+    drafts.unknown = false;
     // The tab edits the formula, so the tests render the manager's account.
     signInWith(["maker:read", "maker:write", "maker:manage"]);
   });
@@ -211,6 +220,29 @@ describe("CompositionTab yield editing", () => {
     expect(updateRecipeMutate).not.toHaveBeenCalled();
     expect(screen.getByRole("alertdialog")).toHaveTextContent(
       "Open drafts that read this BOM and change with it: 2",
+    );
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    });
+    expect(updateRecipeMutate).toHaveBeenCalledWith({
+      recipeId: "r-1",
+      data: { batch_yield_qty: "8" },
+    });
+  });
+
+  it("asks before saving when the count of open drafts is not known", async () => {
+    drafts.unknown = true;
+    renderTab();
+
+    fireEvent.click(screen.getByTestId("maker-yield-edit"));
+    fireEvent.change(screen.getByTestId("maker-yield-input"), {
+      target: { value: "8" },
+    });
+    fireEvent.click(screen.getByTestId("maker-yield-save"));
+
+    expect(updateRecipeMutate).not.toHaveBeenCalled();
+    expect(screen.getByRole("alertdialog")).toHaveTextContent(
+      "Any open drafts that read this BOM change with it; how many is not known.",
     );
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Save" }));
@@ -406,6 +438,17 @@ describe("CompositionTab ingredients", () => {
 
     expect(screen.getByRole("alertdialog")).toHaveTextContent(
       "Open drafts that read this BOM and change with it: 1",
+    );
+  });
+
+  it("says the removal may change open drafts when their count is not known", () => {
+    drafts.unknown = true;
+    renderTab({ lines: [line] });
+
+    fireEvent.click(screen.getByTestId("maker-composition-delete-line"));
+
+    expect(screen.getByRole("alertdialog")).toHaveTextContent(
+      "Any open drafts that read this BOM change with it; how many is not known.",
     );
   });
 

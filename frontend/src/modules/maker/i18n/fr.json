@@ -406,7 +406,8 @@
     "yieldConfirm": {
       "title": "Modifier ce que produit cette formule ?"
     },
-    "openDraftsChange": "Brouillons ouverts qui lisent cette formule et changent avec elle : {{number}}."
+    "openDraftsChange": "Brouillons ouverts qui lisent cette formule et changent avec elle : {{number}}.",
+    "openDraftsUnknown": "Les brouillons ouverts qui lisent cette formule changent avec elle ; leur nombre n'est pas connu."
   },
   "tree": {
     "title": "Nomenclature multi-niveaux",
@@ -687,17 +688,17 @@
       "printJarLabels": "Imprimer les étiquettes des bocaux",
       "jarLabelsTitle": "Étiquettes des bocaux",
       "record": "Fiche de lot",
-      "hold": "Bloquer",
+      "hold": "Mettre en quarantaine",
       "release": "Libérer",
-      "heldToast_one": "Le lot est bloqué. Rien n'y sera pris tant qu'il n'est pas libéré.",
-      "heldToast_other": "Les lots sont bloqués. Rien n'y sera pris tant qu'ils ne sont pas libérés.",
+      "heldToast_one": "Le lot est en quarantaine. Rien n'y sera pris tant qu'il n'est pas libéré.",
+      "heldToast_other": "Les lots sont en quarantaine. Rien n'y sera pris tant qu'ils ne sont pas libérés.",
       "releasedToast_one": "Le lot est libéré et peut de nouveau être utilisé.",
       "releasedToast_other": "Les lots sont libérés et peuvent de nouveau être utilisés.",
       "holdFailed": "L'état du lot n'a pas pu être modifié.",
-      "holdTitle_one": "Bloquer ce lot ?",
-      "holdTitle_other": "Bloquer ces lots ?",
-      "holdMessage": "Un lot bloqué reste sur son étagère, mais aucune fabrication, préparation ni expédition n'y prend tant qu'il n'est pas libéré.",
-      "holdReason": "Pourquoi est-il bloqué ?",
+      "holdTitle_one": "Mettre ce lot en quarantaine ?",
+      "holdTitle_other": "Mettre ces lots en quarantaine ?",
+      "holdMessage": "Un lot en quarantaine reste sur son étagère, mais aucune fabrication, préparation ni expédition n'y prend tant qu'il n'est pas libéré.",
+      "holdReason": "Pourquoi est-il en quarantaine ?",
       "state": {
         "quarantined": "En quarantaine",
         "held": "Bloqué"

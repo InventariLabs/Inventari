@@ -97,7 +97,7 @@ describe("OutputBatchCard", () => {
     fireEvent.change(screen.getByTestId("maker-hold-reason"), {
       target: { value: "Cloudy" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Put on hold" }));
+    fireEvent.click(screen.getByRole("button", { name: "Quarantine" }));
 
     expect(mocks.hold).toHaveBeenCalledWith("Cloudy");
     await waitFor(() =>
@@ -113,13 +113,13 @@ describe("OutputBatchCard", () => {
     fireEvent.change(screen.getByTestId("maker-hold-reason"), {
       target: { value: "Cloudy" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Put on hold" }));
+    fireEvent.click(screen.getByRole("button", { name: "Quarantine" }));
 
     expect(await screen.findByRole("alert")).toBeInTheDocument();
     expect(screen.getByTestId("maker-hold-reason")).toHaveValue("Cloudy");
   });
 
-  it("shows the reason a batch was put on hold, beside its state", () => {
+  it("shows the reason a batch was quarantined, beside its state", () => {
     render(
       <OutputBatchCard
         order={
@@ -149,7 +149,7 @@ describe("OutputBatchCard", () => {
 
     fireEvent.click(screen.getByTestId("maker-hold-batch"));
 
-    expect(screen.getByText("Put this batch on hold?")).toBeInTheDocument();
+    expect(screen.getByText("Quarantine this batch?")).toBeInTheDocument();
   });
 
   it("offers a release for a batch on hold, and no second hold", () => {
@@ -257,20 +257,20 @@ describe("OutputBatchCard for a run filled in portions", () => {
 
     fireEvent.click(screen.getByTestId("maker-hold-batch"));
 
-    expect(screen.getByText("Put these batches on hold?")).toBeInTheDocument();
+    expect(screen.getByText("Quarantine these batches?")).toBeInTheDocument();
   });
 
-  it("says the batches are on hold once it is done", async () => {
+  it("says the batches are quarantined once it is done", async () => {
     render(<OutputBatchCard order={filledInPortions} />);
     fireEvent.click(screen.getByTestId("maker-hold-batch"));
     fireEvent.change(screen.getByTestId("maker-hold-reason"), {
       target: { value: "Cloudy" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Put on hold" }));
+    fireEvent.click(screen.getByRole("button", { name: "Quarantine" }));
 
     await waitFor(() =>
       expect(mocks.toastSuccess).toHaveBeenCalledWith(
-        expect.stringMatching(/^The batches are on hold/),
+        expect.stringMatching(/^The batches are quarantined/),
       ),
     );
   });

@@ -6,7 +6,10 @@ import { extractApiError } from "@/lib/errors";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/Input";
-import { useOpenDraftsOfRecipe } from "@/modules/maker/hooks/useOpenDraftsOfRecipe";
+import {
+  openDraftsSentence,
+  useOpenDraftsOfRecipe,
+} from "@/modules/maker/hooks/useOpenDraftsOfRecipe";
 import { useUpdateMakerRecipe } from "@/modules/maker/hooks/useRecipes";
 import { formatDecimalQty } from "@/utils/formatters";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
@@ -47,7 +50,7 @@ export function BatchYieldEditor({ recipe }: BatchYieldEditorProps) {
       toast.error(t("composition.errors.yieldInvalid"));
       return;
     }
-    if (openDrafts !== null && openDrafts > 0) setConfirming(true);
+    if (openDrafts !== 0) setConfirming(true);
     else void saveYield();
   }
 
@@ -134,7 +137,7 @@ export function BatchYieldEditor({ recipe }: BatchYieldEditorProps) {
       <ConfirmDialog
         open={confirming}
         title={t("composition.yieldConfirm.title")}
-        message={t("composition.openDraftsChange", { number: openDrafts })}
+        message={openDraftsSentence(t, openDrafts) ?? ""}
         confirmLabel={t("common:actions.save")}
         onConfirm={() => void saveYield()}
         onCancel={() => setConfirming(false)}

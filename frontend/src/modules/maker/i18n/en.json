@@ -406,7 +406,8 @@
     "yieldConfirm": {
       "title": "Change what this BOM makes?"
     },
-    "openDraftsChange": "Open drafts that read this BOM and change with it: {{number}}."
+    "openDraftsChange": "Open drafts that read this BOM and change with it: {{number}}.",
+    "openDraftsUnknown": "Any open drafts that read this BOM change with it; how many is not known."
   },
   "tree": {
     "title": "Multi-level BOM",
@@ -687,17 +688,17 @@
       "printJarLabels": "Print jar labels",
       "jarLabelsTitle": "Jar labels",
       "record": "Batch record",
-      "hold": "Put on hold",
+      "hold": "Quarantine",
       "release": "Release",
-      "heldToast_one": "The batch is on hold. Nothing takes from it until it is released.",
-      "heldToast_other": "The batches are on hold. Nothing takes from them until they are released.",
+      "heldToast_one": "The batch is quarantined. Nothing takes from it until it is released.",
+      "heldToast_other": "The batches are quarantined. Nothing takes from them until they are released.",
       "releasedToast_one": "The batch is released and can be used again.",
       "releasedToast_other": "The batches are released and can be used again.",
       "holdFailed": "The batch’s state could not be changed.",
-      "holdTitle_one": "Put this batch on hold?",
-      "holdTitle_other": "Put these batches on hold?",
-      "holdMessage": "A batch on hold stays in its location, but no run, pick or dispatch takes from it until it is released.",
-      "holdReason": "Why is it held?",
+      "holdTitle_one": "Quarantine this batch?",
+      "holdTitle_other": "Quarantine these batches?",
+      "holdMessage": "A quarantined batch stays in its location, but no run, pick or dispatch takes from it until it is released.",
+      "holdReason": "Why is it quarantined?",
       "state": {
         "quarantined": "Quarantined",
         "held": "Held"

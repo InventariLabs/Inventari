@@ -14,7 +14,7 @@
     "subtitle": "Geplante und abgeschlossene Produktionsläufe mit Kosten und Ergebnis.",
     "newProduction": "Neue Produktion",
     "searchPlaceholder": "Nach Ausgangsprodukt suchen…",
-    "loading": "Aufträge werden geladen…",
+    "loading": "Produktionsläufe werden geladen…",
     "error": "Produktionsläufe konnten nicht geladen werden",
     "empty": {
       "title": "Noch keine Produktionsläufe",
@@ -84,9 +84,9 @@
     "storageSearchPlaceholder": "Nach Name oder Pfad suchen…",
     "storageEmpty": "Kein passender Lagerort",
     "notesLabel": "Notizen (optional)",
-    "notesPlaceholder": "Interne Notizen zu diesem Auftrag…",
+    "notesPlaceholder": "Interne Notizen zu diesem Produktionslauf…",
     "outputLotLabel": "Charge des Erzeugnisses (optional)",
-    "outputLotHint": "Benennen Sie eine Charge, damit ein Rückruf einer Zutat über diesen Auftrag bis zu den Empfängern des Erzeugnisses reicht. Leer lassen, wenn Sie keine Chargen führen.",
+    "outputLotHint": "Benennen Sie eine Charge, damit ein Rückruf einer Zutat über diesen Produktionslauf bis zu den Empfängern des Erzeugnisses reicht. Leer lassen, wenn Sie keine Chargen führen.",
     "guardName": "Der Produktionslauf",
     "hints": {
       "product": "Wählen Sie ein Ausgabeprodukt aus, um die Vorschau zu aktivieren.",
@@ -99,7 +99,7 @@
     "success": "Produktionslauf erstellt",
     "errors": {
       "missingFields": "Wählen Sie Produkt, Menge und Lagerort.",
-      "create": "Auftrag konnte nicht erstellt werden"
+      "create": "Produktionslauf konnte nicht erstellt werden"
     },
     "hasBom": "Hat eine Formel",
     "mode": {
@@ -165,24 +165,24 @@
     "title": "Produktionslauf",
     "subtitle": "Zutaten, Kosten und Status prüfen.",
     "back": "Zurück zur Liste",
-    "loading": "Auftrag wird geladen…",
-    "complete": "Auftrag abschließen",
-    "cancel": "Auftrag stornieren",
+    "loading": "Produktionslauf wird geladen…",
+    "complete": "Produktionslauf abschließen",
+    "cancel": "Produktionslauf stornieren",
     "completeSuccess": "Produktion abgeschlossen",
     "cancelSuccess": "Produktion storniert",
     "cancelNeedsManager": "Einen Produktionslauf zurückzunehmen ist Sache der Leitung — bitten Sie jemanden, der die Produktion verwalten darf.",
     "completeConfirm": {
-      "title": "Auftrag abschließen?",
+      "title": "Produktionslauf abschließen?",
       "description": "Verbraucht die aufgeführten Zutaten und erzeugt das Produkt. Solange nichts davon verwendet wurde, nimmt „Lauf zurücknehmen“ ihn zurück.",
       "actualQtyLabel": "Tatsächliche Produktionsmenge (optional)",
       "madeOnLabel": "Herstellungstag",
       "actualQtyHint": "Leer lassen für geplante Menge. Weniger für Ausschuss, mehr für Überproduktion. Zutaten werden wie geplant verbraucht, unabhängig von der tatsächlichen Menge."
     },
     "cancelConfirm": {
-      "title": "Auftrag stornieren?",
+      "title": "Produktionslauf stornieren?",
       "description": "Stornierung markiert den Entwurf als storniert. Keine Bestandsänderung.",
       "confirm": "Ja, stornieren",
-      "keep": "Auftrag behalten"
+      "keep": "Produktionslauf behalten"
     },
     "reverseConfirm": {
       "title": "Diesen Produktionslauf zurücknehmen?",
@@ -204,7 +204,7 @@
       "resultPerUnit": "({{amount}} pro {{unit}})",
       "totalCostAfterClosing": "Gesamtkosten nach Abschluss",
       "unitCost": "{{amount}} pro {{unit}}",
-      "unshelvedCost": "{{amount}} der Kosten dieses Auftrags liegen nicht im Lager: Die Ware wurde verkauft oder verbraucht, bevor der Auftrag abgeschlossen wurde.",
+      "unshelvedCost": "{{amount}} der Kosten dieses Produktionslaufs liegen nicht im Lager: Die Ware wurde verkauft oder verbraucht, bevor der Produktionslauf abgeschlossen wurde.",
       "totalCostGap_one": "{{count}} Zutat wurde aus Bestand ohne Kosten entnommen und fehlt daher in dieser Summe: {{names}}. Die Vorschau vor dem Speichern kann einen höheren Wert zeigen, weil sie fehlende Kosten aus anderem Bestand oder Lieferantenangeboten schätzen kann.",
       "totalCostGap_other": "{{count}} Zutaten wurden aus Bestand ohne Kosten entnommen und fehlen daher in dieser Summe: {{names}}. Die Vorschau vor dem Speichern kann einen höheren Wert zeigen, weil sie fehlende Kosten aus anderem Bestand oder Lieferantenangeboten schätzen kann.",
       "estimatedAtCompletion": "Schätzung bei Abschluss",
@@ -247,11 +247,11 @@
     },
     "edit": "Bearbeiten",
     "save": "Speichern",
-    "saveFailed": "Auftrag konnte nicht gespeichert werden",
+    "saveFailed": "Produktionslauf konnte nicht gespeichert werden",
     "cancelEdit": "Änderungen verwerfen",
     "duplicate": "Duplizieren",
-    "duplicated": "Auftrag dupliziert",
-    "duplicateFailed": "Auftrag konnte nicht dupliziert werden",
+    "duplicated": "Produktionslauf dupliziert",
+    "duplicateFailed": "Produktionslauf konnte nicht dupliziert werden",
     "plannedQty": "Geplante Menge",
     "productionDate": "Produktionsdatum",
     "notes": "Notizen",
@@ -317,9 +317,9 @@
       "open": "Produktionslauf öffnen"
     },
     "completeFailed": "Produktion konnte nicht abgeschlossen werden",
-    "emptyBom": "Diese Formel enthält keine Zutaten — der Auftrag würde Ware aus dem Nichts erzeugen. Fügen Sie zuerst Zutaten hinzu.",
+    "emptyBom": "Diese Formel enthält keine Zutaten — der Produktionslauf würde Ware aus dem Nichts erzeugen. Fügen Sie zuerst Zutaten hinzu.",
     "emptyBomAction": "Zutaten hinzufügen",
-    "noBom": "Dieses Produkt hat keine Formel — der Auftrag hat nichts, woraus er ziehen kann. Erstellen Sie zuerst eine Formel.",
+    "noBom": "Dieses Produkt hat keine Formel — der Produktionslauf hat nichts, woraus er ziehen kann. Erstellen Sie zuerst eine Formel.",
     "noBomAction": "Formel erstellen",
     "cancelFailed": "Produktion konnte nicht storniert werden",
     "reverse": "Lauf zurücknehmen",
@@ -360,7 +360,7 @@
     "qtyLabel": "Menge",
     "unitLabel": "Einheit",
     "yieldLabel": "Verlust %",
-    "yieldHint": "Eine Planungsgröße: wie viel zusätzlich reserviert wird, damit die Planung aufgeht. 0 ist ein normaler Wert — der tatsächliche Verlust ergibt sich beim Abschluss des Auftrags aus der Menge, die wirklich herauskam.",
+    "yieldHint": "Eine Planungsgröße: wie viel zusätzlich reserviert wird, damit die Planung aufgeht. 0 ist ein normaler Wert — der tatsächliche Verlust ergibt sich beim Abschluss des Produktionslaufs aus der Menge, die wirklich herauskam.",
     "notesLabel": "Notizen",
     "notesPlaceholder": "Optionale Notizen…",
     "add": "Zeile hinzufügen",
@@ -406,7 +406,8 @@
     "yieldConfirm": {
       "title": "Ändern, was diese Formel ergibt?"
     },
-    "openDraftsChange": "Offene Entwürfe, die diese Formel lesen und sich mit ihr ändern: {{number}}."
+    "openDraftsChange": "Offene Entwürfe, die diese Formel lesen und sich mit ihr ändern: {{number}}.",
+    "openDraftsUnknown": "Offene Entwürfe, die diese Formel lesen, ändern sich mit ihr; wie viele es sind, ist nicht bekannt."
   },
   "tree": {
     "title": "Mehrstufige Formel",
@@ -513,12 +514,12 @@
     "scopeGlobal": "Global",
     "scopePerLocation": "Pro Lagerort",
     "createOnShortageStrategy": "Knappheitsstrategie",
-    "createOnShortageStrategyHint": "Was passiert, wenn ein Auftrag ohne genug Zutaten angelegt wird: erlauben, warnen oder sperren.",
+    "createOnShortageStrategyHint": "Was passiert, wenn ein Produktionslauf ohne genug Zutaten angelegt wird: erlauben, warnen oder sperren.",
     "strategyAllow": "Erlauben",
     "strategyWarn": "Warnen",
     "strategyBlock": "Sperren",
     "subtitle": "Was das Ergebnis bedeutet und wie die Produktion mit Fehlmengen umgeht.",
-    "whereReferenceDirection": "So heißt das Ergebnis auf den Formelkarten, in Aufträgen und in der Monatsübersicht.",
+    "whereReferenceDirection": "So heißt das Ergebnis auf den Formelkarten, in Produktionsläufen und in der Monatsübersicht.",
     "immediateNote": "Jede Auswahl wird sofort gespeichert. Es gibt kein Rückgängig — stellen Sie sie ebenso zurück.",
     "advanced": "Erweitert",
     "advancedHint": "Regeln für Fehlmengen und Überproduktion. Die Standardwerte passen für eine kleine Werkstatt.",
@@ -543,7 +544,7 @@
     "unknown_one": "{{count}} Zutat ist nicht vergleichbar",
     "unknown_other": "{{count}} Zutaten sind nicht vergleichbar",
     "shortUnknown": "unbekannt",
-    "completeShortageHintNever": "Diese Zutaten reichten nie für diesen Lauf — der Auftrag wurde über Bestand angelegt.",
+    "completeShortageHintNever": "Diese Zutaten reichten nie für diesen Lauf — der Produktionslauf wurde über Bestand angelegt.",
     "unitMismatchTitle": "Weiter nicht möglich — eine Einheit passt nicht",
     "unitMismatchHint": "Es fehlt keine Menge: Die Einheit der Zeile lässt sich nicht mit dem Bestand vergleichen. Korrigieren Sie die Einheit in der Formelzeile."
   },
@@ -687,17 +688,17 @@
       "printJarLabels": "Glasetiketten drucken",
       "jarLabelsTitle": "Glasetiketten",
       "record": "Chargenprotokoll",
-      "hold": "Sperren",
+      "hold": "In Quarantäne",
       "release": "Freigeben",
-      "heldToast_one": "Die Charge ist gesperrt. Nichts wird daraus entnommen, bis sie freigegeben ist.",
-      "heldToast_other": "Die Chargen sind gesperrt. Nichts wird daraus entnommen, bis sie freigegeben sind.",
+      "heldToast_one": "Die Charge ist in Quarantäne. Nichts wird daraus entnommen, bis sie freigegeben ist.",
+      "heldToast_other": "Die Chargen sind in Quarantäne. Nichts wird daraus entnommen, bis sie freigegeben sind.",
       "releasedToast_one": "Die Charge ist freigegeben und kann wieder verwendet werden.",
       "releasedToast_other": "Die Chargen sind freigegeben und können wieder verwendet werden.",
       "holdFailed": "Der Zustand der Charge konnte nicht geändert werden.",
-      "holdTitle_one": "Diese Charge sperren?",
-      "holdTitle_other": "Diese Chargen sperren?",
-      "holdMessage": "Eine gesperrte Charge bleibt im Regal, aber kein Lauf, keine Kommissionierung und kein Versand entnimmt daraus, bis sie freigegeben ist.",
-      "holdReason": "Warum wird sie gesperrt?",
+      "holdTitle_one": "Diese Charge in Quarantäne setzen?",
+      "holdTitle_other": "Diese Chargen in Quarantäne setzen?",
+      "holdMessage": "Eine Charge in Quarantäne bleibt im Regal, aber kein Lauf, keine Kommissionierung und kein Versand entnimmt daraus, bis sie freigegeben ist.",
+      "holdReason": "Warum kommt sie in Quarantäne?",
       "state": {
         "quarantined": "In Quarantäne",
         "held": "Gesperrt"
@@ -835,7 +836,7 @@
   },
   "planning": {
     "title": "Produktionsplan",
-    "subtitle": "Geplante Aufträge nach Tag und alles, was sie brauchen, in einer Liste.",
+    "subtitle": "Geplante Produktionsläufe nach Tag und alles, was sie brauchen, in einer Liste.",
     "previous": "Voriger Zeitraum",
     "next": "Nächster Zeitraum",
     "view": {
@@ -851,16 +852,16 @@
       "now": "Derzeit geplant für {{date}}.",
       "save": "Verschieben",
       "cancel": "Abbrechen",
-      "failed": "Der Auftrag konnte nicht verschoben werden."
+      "failed": "Der Produktionslauf konnte nicht verschoben werden."
     },
     "coverage": {
       "title": "Platz im Plan",
-      "coveredNote": "Nach den davor geplanten Aufträgen deckt der Bestand diesen Auftrag noch.",
-      "shortNote": "Nach den davor geplanten Aufträgen reicht der Bestand für diesen Auftrag nicht. Dafür bleibt:",
+      "coveredNote": "Nach den davor geplanten Produktionsläufen deckt der Bestand diesen Produktionslauf noch.",
+      "shortNote": "Nach den davor geplanten Produktionsläufen reicht der Bestand für diesen Produktionslauf nicht. Dafür bleibt:",
       "leftOf": "{{left}} von {{needed}} übrig"
     },
     "needs": {
-      "title": "Was die geplanten Aufträge brauchen",
+      "title": "Was die geplanten Produktionsläufe brauchen",
       "ingredient": "Zutat",
       "needed": "Benötigt",
       "inStock": "Auf Lager",
@@ -869,8 +870,8 @@
       "make": "Herstellen",
       "planned": "Geplant: {{qty}}",
       "noDate": "ohne Datum",
-      "emptyTitle": "In diesem Zeitraum sind keine Aufträge geplant",
-      "emptyDescription": "Planen Sie einen Auftrag mit Tag, dann erscheint hier, was er braucht.",
+      "emptyTitle": "In diesem Zeitraum sind keine Produktionsläufe geplant",
+      "emptyDescription": "Planen Sie einen Produktionslauf mit Tag, dann erscheint hier, was er braucht.",
       "unmeasured": "Nicht gezählt, ihre Einheiten lassen sich nicht mit dem Bestand vergleichen: {{names}}."
     },
     "order": {
@@ -887,10 +888,10 @@
       "failed": "Die Bestellung konnte nicht aufgegeben werden."
     },
     "intermediates": {
-      "button": "Aufträge für Fehlendes planen",
-      "planned_one": "{{count}} Auftrag geplant",
-      "planned_other": "{{count}} Aufträge geplant",
-      "failed": "Die Aufträge konnten nicht geplant werden."
+      "button": "Produktionsläufe für Fehlendes planen",
+      "planned_one": "{{count}} Produktionslauf geplant",
+      "planned_other": "{{count}} Produktionsläufe geplant",
+      "failed": "Die Produktionsläufe konnten nicht geplant werden."
     }
   },
   "overproduction": {
