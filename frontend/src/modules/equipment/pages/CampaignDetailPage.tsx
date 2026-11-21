@@ -211,7 +211,10 @@ function CopyLinkButton({
 function AssetLink({ item }: { item: AuditResponseItemRecord }) {
   if (!item.item_name) return <>{"\u2014"}</>;
   return (
-    <Link to={`/equipment/${item.item_id}`} className="hover:underline">
+    <Link
+      to={`/equipment/${item.item_id}`}
+      className="inline-flex min-h-6 items-center hover:underline"
+    >
       {item.item_name}
     </Link>
   );

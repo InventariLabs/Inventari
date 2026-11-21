@@ -307,8 +307,8 @@ apart.
 | `DOCUMENT_HELD_QUANTITY_NEEDS_CODE` | A held quantity needs the code Damage or Quality hold. |
 | `DOCUMENT_HELD_QUANTITY_NEEDS_RECEIPT` | Only a receipt can hold goods back. |
 | `DOCUMENT_HELD_QUANTITY_NEGATIVE` | The held quantity cannot be negative: {quantity}. |
-| `DOCUMENT_INSUFFICIENT_STOCK` | Insufficient stock to confirm: {quantity} of {needed} could not be reserved |
-| `DOCUMENT_INSUFFICIENT_STOCK_RECORD_ELSEWHERE` | Insufficient stock to confirm: {quantity} of {needed} could not be reserved on "{document_shelf}"; the record "{item_name}" stands on "{record_shelf}" — point the document at that shelf, or move the record first |
+| `DOCUMENT_INSUFFICIENT_STOCK` | Insufficient stock to confirm: {available} of {needed} available, {missing} missing |
+| `DOCUMENT_INSUFFICIENT_STOCK_RECORD_ELSEWHERE` | Insufficient stock to confirm: {available} of {needed} available on "{document_shelf}", {missing} missing; the record "{item_name}" stands on "{record_shelf}" — point the document at that shelf, or move the record first |
 | `DOCUMENT_LINES_NEED_STOCK_ROW` | A document of type {type} takes goods off a shelf, so every line has to name the stock it takes them from — lines {lines} name only a product |
 | `DOCUMENT_LINES_QUANTITY_NOT_POSITIVE` | Lines {lines} have a quantity of zero or less. Correct them before confirming. |
 | `DOCUMENT_LINE_NEEDS_IDENTITY` | The document line must name a record, a product or a name. |

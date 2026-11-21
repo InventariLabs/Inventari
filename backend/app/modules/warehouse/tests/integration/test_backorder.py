@@ -1,13 +1,16 @@
 """Integration tests for automatic backorder generation on partial completion."""
 
 from io import BytesIO
+from uuid import UUID
 
 import pypdf
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.models.audit_log import AuditAction, AuditLog
 from app.models.item import Item
 from app.models.partner import Partner
 from app.models.storage_location import StorageLocation
@@ -117,6 +120,64 @@ class TestBackorderCreation:
         # sentence in one language is shown to every reader.
         assert bo['backorder_id'] == doc_id
         assert bo['notes'] is None
+
+    def test_a_backorder_is_journaled_as_created_from_its_receipt(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_auth_headers: dict[str, str],
+        doc_target_location: StorageLocation,
+        doc_partner: Partner,
+        doc_item: Item,
+    ) -> None:
+        """The draft the application writes has its own entry in the audit log,
+        naming the receipt it continues, like any document a person creates."""
+        doc = client.post(
+            '/api/v1/warehouse/documents',
+            headers=doc_auth_headers,
+            json={
+                'type': 'IN',
+                'partner_id': str(doc_partner.id),
+                'target_location_id': str(doc_target_location.id),
+                'lines': [{'item_id': str(doc_item.id), 'expected_quantity': 10}],
+            },
+        ).json()
+        client.patch(
+            f'/api/v1/warehouse/documents/{doc["id"]}/confirm',
+            headers=doc_auth_headers,
+        )
+        completed = client.patch(
+            f'/api/v1/warehouse/documents/{doc["id"]}/complete',
+            headers=doc_auth_headers,
+            json={
+                'lines': [
+                    {
+                        'line_id': doc['lines'][0]['id'],
+                        'done_quantity': 7,
+                        'discrepancy_code': 'SHORTAGE',
+                    }
+                ]
+            },
+        )
+        assert completed.status_code == status.HTTP_200_OK, completed.text
+        original = completed.json()
+        backorder_id = original['generated_backorder_id']
+        assert backorder_id is not None
+
+        entries = db_session.scalars(
+            select(AuditLog).where(
+                AuditLog.target_id == UUID(backorder_id),
+                AuditLog.action == AuditAction.CREATE,
+            )
+        ).all()
+
+        assert len(entries) == 1
+        snapshot = entries[0].snapshot or {}
+        meta = entries[0].meta_data or {}
+        assert snapshot['type'] == 'IN'
+        assert snapshot['partner_name'] == doc_partner.name
+        assert meta['document_number'] == original['number']
+        assert meta['source_document_id'] == doc['id']
 
     def test_backorder_continues_the_receipts_own_number_series(
         self,

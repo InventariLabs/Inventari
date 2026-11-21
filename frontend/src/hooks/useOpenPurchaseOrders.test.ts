@@ -202,12 +202,13 @@ describe("useOrderSupplier", () => {
 });
 
 describe("useOrderOpenReceipts", () => {
-  const receipt = (id: string, status: string) => ({
+  const receipt = (id: string, status: string, holdsOwedGoods = true) => ({
     id,
     number: `REC/${id}`,
-    type: "RECEIPT",
+    type: "IN",
     status,
     created_at: "2026-10-02T00:00:00Z",
+    holds_owed_goods: holdsOwedGoods,
   });
 
   it("keeps the receipts that still expect goods and drops the posted ones", async () => {
@@ -233,6 +234,27 @@ describe("useOrderOpenReceipts", () => {
 
     await waitFor(() => expect(result.current.receipts).toHaveLength(3));
     expect(result.current.receipts.map((r) => r.id)).toEqual(["a", "c", "e"]);
+  });
+
+  it("names no open receipt that holds nothing the order still owes", async () => {
+    // A draft for a product the order no longer expects, or a correction of
+    // an earlier receipt, is open but speaks for none of what is owed.
+    modules.enabled = true;
+    server.use(
+      http.get("/api/v1/purchase-orders/po-1/linked-receipts", () =>
+        HttpResponse.json({
+          items: [receipt("a", "DRAFT", false), receipt("b", "CONFIRMED")],
+          has_more: false,
+        }),
+      ),
+    );
+
+    const { result } = renderHook(() => useOrderOpenReceipts("po-1"), {
+      wrapper: QueryWrapper,
+    });
+
+    await waitFor(() => expect(result.current.receipts).toHaveLength(1));
+    expect(result.current.receipts.map((r) => r.id)).toEqual(["b"]);
   });
 
   it("reports a failed read instead of passing it off as no open receipts", async () => {

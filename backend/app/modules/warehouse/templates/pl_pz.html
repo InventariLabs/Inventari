@@ -208,6 +208,9 @@
 {% if return_of_number %}
 <div class="correction-ref">Zwrot do: <strong>{{ return_of_number }}</strong></div>
 {% endif %}
+{% if source_order_number %}
+<div class="correction-ref">Zamówienie: <strong>{{ source_order_number }}</strong></div>
+{% endif %}
 {% if scrap_reason %}
 <div class="correction-ref">Powód złomowania: <strong>{{ scrap_reason }}</strong></div>
 {% endif %}
@@ -220,7 +223,7 @@
 <!-- What is specific to this document and not already in the header: the
      header carries the status and the date stamps, so repeating them
      here would print the same fact twice on one page. -->
-{% if not is_correction and (document.scheduled_date or document.external_reference) %}
+{% if not is_correction and (document.scheduled_date or printed_reference) %}
 <div class="meta-bar">
   {% if document.scheduled_date %}
   <div class="meta-item">
@@ -228,10 +231,10 @@
     <span class="meta-value">{{ document.scheduled_date }}</span>
   </div>
   {% endif %}
-  {% if document.external_reference %}
+  {% if printed_reference %}
   <div class="meta-item">
     <span class="meta-label">Referencja</span>
-    <span class="meta-value">{{ document.external_reference }}</span>
+    <span class="meta-value">{{ printed_reference }}</span>
   </div>
   {% endif %}
 </div>

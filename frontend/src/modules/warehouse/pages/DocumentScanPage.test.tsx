@@ -8,8 +8,9 @@ import { server } from "@/test/mocks/server";
 import { http, HttpResponse } from "msw";
 import { scanWithHardwareScanner } from "@/test/scanner";
 
+const torch = vi.hoisted(() => ({ available: false }));
 vi.mock("@/hooks/useScanCamera", () => ({
-  useTorchAvailable: () => false,
+  useTorchAvailable: () => torch.available,
   useScanCamera: vi.fn(),
 }));
 
@@ -105,6 +106,7 @@ const defaultProfile = {
 
 beforeEach(() => {
   mockCamera();
+  torch.available = false;
   navigate.mockReset();
   toastCalls.length = 0;
   vi.mocked(labelsApi.scan).mockReset();
@@ -117,6 +119,21 @@ describe("DocumentScanPage", () => {
   it("shows an empty-state hint when the page loads with no camera and no error", () => {
     render(<DocumentScanPage />);
     expect(screen.getByTestId("scan-empty-state")).toBeInTheDocument();
+  });
+
+  it("offers no torch on a running camera whose track has none", () => {
+    mockCamera({ isCameraActive: true, isCameraRunning: true });
+    render(<DocumentScanPage />);
+    expect(
+      screen.queryByRole("button", { name: /torch/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("offers the torch when the running camera has one", () => {
+    torch.available = true;
+    mockCamera({ isCameraActive: true, isCameraRunning: true });
+    render(<DocumentScanPage />);
+    expect(screen.getByRole("button", { name: /torch/i })).toBeInTheDocument();
   });
 
   it("does NOT show the empty state once the camera is active", () => {

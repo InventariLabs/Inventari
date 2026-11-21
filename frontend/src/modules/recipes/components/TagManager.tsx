@@ -69,17 +69,24 @@ function TagRow({
         align="start"
         className="w-48 flex flex-wrap gap-1.5"
         trigger={
+          // The swatch stays 16 px; the button around it is the 24 px
+          // a finger needs.
           <Button
             size="inline"
             variant="ghost"
-            className={cn(
-              "w-4 h-4 rounded-full border shrink-0 transition hover:scale-110 p-0",
-              tag.color ? "border-border" : "border-dashed border-on-muted",
-            )}
-            style={tag.color ? { backgroundColor: tag.color } : undefined}
+            className="h-6 w-6 shrink-0 rounded-full p-0"
             aria-label={t("tags_manager.set_color")}
             title={t("tags_manager.set_color")}
-          />
+          >
+            <span
+              aria-hidden="true"
+              className={cn(
+                "w-4 h-4 rounded-full border transition hover:scale-110",
+                tag.color ? "border-border" : "border-dashed border-on-muted",
+              )}
+              style={tag.color ? { backgroundColor: tag.color } : undefined}
+            />
+          </Button>
         }
       >
         {PRESET_COLORS.map((c) => (

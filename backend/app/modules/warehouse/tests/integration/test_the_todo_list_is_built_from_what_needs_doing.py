@@ -546,6 +546,56 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
         )
         assert missing.status_code == status.HTTP_404_NOT_FOUND
 
+    def test_an_assignment_is_journaled_in_words(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_org: Organization,
+        doc_user: User,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_target_location: StorageLocation,
+        doc_template: ProductTemplate,
+    ) -> None:
+        """The log names the task by its document's number and the person by
+        name; a raw kind and an id alone answer nobody reading it later."""
+        order = _order(
+            db_session, doc_org, doc_user, doc_partner, doc_template,
+            scheduled=_TODAY,
+        )  # fmt: skip
+        receipt_id = _confirmed_receipt_for(
+            client,
+            doc_auth_headers,
+            order,
+            doc_partner,
+            doc_target_location,
+            doc_template,
+        )
+        number = client.get(
+            f'/api/v1/warehouse/documents/{receipt_id}', headers=doc_auth_headers
+        ).json()['number']
+
+        given = client.put(
+            f'/api/v1/warehouse/work-items/document/{receipt_id}/assignee',
+            headers=doc_auth_headers,
+            json={'assignee_id': str(doc_user.id)},
+        )
+        assert given.status_code == status.HTTP_204_NO_CONTENT, given.text
+
+        entry = (
+            db_session.query(AuditLog)
+            .filter(
+                AuditLog.target_type == 'work_item',
+                AuditLog.target_id == UUID(receipt_id),
+            )
+            .one()
+        )
+        assert entry.snapshot == {
+            'number': number,
+            'assignee_id': str(doc_user.id),
+            'assignee_name': doc_user.full_name,
+        }
+
     def test_a_custom_task_is_claimed_only_while_nobody_holds_it(
         self,
         client: TestClient,
