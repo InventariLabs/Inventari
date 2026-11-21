@@ -490,6 +490,20 @@ class TestTheTemplate:
         else:
             assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    def test_an_unknown_placeholder_is_refused_with_the_names_it_may_use(
+        self, client, auth_headers
+    ):
+        warehouse = _add(client, auth_headers, 'Fourth Warehouse')
+        response = client.put(
+            f'/api/v1/locations/{warehouse["id"]}/code-template',
+            json={'template': '{floor}-{rack:02}'},
+            headers=auth_headers,
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        message = response.json()['detail']['message']
+        for name in ('zone', 'aisle', 'rack', 'level', 'slot'):
+            assert name in message, message
+
     def test_only_a_warehouse_carries_a_template(
         self, client, auth_headers, db_session, test_user
     ):

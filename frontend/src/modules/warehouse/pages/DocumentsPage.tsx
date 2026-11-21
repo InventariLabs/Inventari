@@ -329,7 +329,16 @@ export default function DocumentsPage() {
               ? "danger"
               : "default"
           }
-          confirmLabel={t(`actions.${confirmAction.type}`)}
+          confirmLabel={
+            confirmAction.type === "cancel"
+              ? t("confirmDialog.cancelConfirm")
+              : t(`actions.${confirmAction.type}`)
+          }
+          cancelLabel={
+            confirmAction.type === "cancel"
+              ? t("confirmDialog.cancelKeep")
+              : undefined
+          }
           onConfirm={handleAction}
           onCancel={() => setConfirmAction(null)}
         />

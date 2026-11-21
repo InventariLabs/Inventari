@@ -42,7 +42,7 @@ interface TemplateEditorModalProps {
   htmlInvalidMessage?: string;
   /**
    * Whether the module can actually serve a server-side render of the draft.
-   * Only documents has a preview endpoint; where it is absent the editor
+   * Whether the module has a preview endpoint; where it is absent the editor
    * must not offer the toggle — a control whose only possible outcome is the
    * same message a failed render gives, for a different reason, is worse
    * than none. Defaults to false.

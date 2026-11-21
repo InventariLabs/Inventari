@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { TFunction } from "i18next";
-import { useCanManage } from "@/hooks/useCanWrite";
+import { useCanManage, useCanWrite } from "@/hooks/useCanWrite";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Lock, Unlock } from "lucide-react";
@@ -58,6 +58,7 @@ function periodTrace(
 export default function InventoryPeriodPanel() {
   const { t } = useTranslation("warehouse");
   const canManage = useCanManage("warehouse");
+  const canWrite = useCanWrite("warehouse");
   const [selectedYear, setSelectedYear] = useState(() =>
     new Date().getFullYear(),
   );
@@ -147,7 +148,13 @@ export default function InventoryPeriodPanel() {
 
   return (
     <div className="space-y-6">
-      <ReadOnlyNotice module="warehouse" right="manage" />
+      {/* The list of closures is shown to a reader, so an account that may not
+          write at all is told it can view it; "use, not reconfigure" is for
+          one that writes elsewhere in the module but may not close periods. */}
+      <ReadOnlyNotice
+        module="warehouse"
+        right={canWrite ? "manage" : "write"}
+      />
       <Card className="overflow-hidden">
         <div className="px-4 sm:px-6 py-4">
           <div className="flex items-center gap-3 mb-4">

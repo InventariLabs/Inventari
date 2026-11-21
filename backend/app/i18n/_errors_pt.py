@@ -463,7 +463,7 @@ ERRORS_PT: dict[str, str] = {
     'product_label_too_narrow': 'O código {code} não cabe em uma etiqueta de {width} mm de largura: suas barras precisam de pelo menos {needed} mm. Escolha um tamanho de etiqueta mais largo',
     'product_label_too_short': 'A etiqueta de {height} mm de altura é baixa demais: depois do nome e do texto, sobra pouca altura para as barras do código {code} serem lidas por um leitor. Escolha um tamanho de etiqueta mais alto',
     'product_label_composition_does_not_fit': 'A lista de ingredientes não cabe em uma etiqueta de {width} × {height} mm na menor letra que a lei permite em uma embalagem. Escolha um tamanho de etiqueta maior',
-    'storage_code_template_invalid': "O modelo de código '{template}' não pode ser usado. Escreva marcadores como {{zone}}-{{rack:02}}-{{level:02}}, com um separador entre eles, ou um prefixo de até cinco letras e dígitos, como LOC",
+    'storage_code_template_invalid': "O modelo de código '{template}' não pode ser usado. Escreva marcadores como {{zone}}-{{rack:02}}-{{level:02}}, com um separador entre eles, ou um prefixo de até cinco letras e dígitos, como LOC. Nomes de marcador permitidos: zone, area, section, aisle, row, rack, bay, column, shelf, level, bin, slot",
     'storage_code_template_not_tree': 'Este armazém gera códigos aleatórios: dê a ele um modelo com marcadores, como {zone}-{rack:02}-{level:02}, antes de numerar seus locais',
     'storage_code_parent_not_numbered': 'Este local não pode ser numerado sozinho: os locais acima dele ainda não têm os códigos do modelo, ou ele está mais fundo do que o modelo alcança. Numere primeiro o nível acima',
     'storage_code_number_not_here': 'Somente um local comum pode ser numerado, não um arquivado ou virtual',

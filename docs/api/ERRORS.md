@@ -683,7 +683,7 @@ apart.
 | `STORAGE_ARCHIVE_TARGET_IS_SELF` | Cannot move items into the location being archived. |
 | `STORAGE_CODE_NUMBER_NOT_HERE` | Only an ordinary location can be numbered, not an archived or virtual one |
 | `STORAGE_CODE_PARENT_NOT_NUMBERED` | This location cannot be numbered on its own: the places above it do not carry their template codes yet, or it is deeper than the template goes. Number the level above it first |
-| `STORAGE_CODE_TEMPLATE_INVALID` | The code template '{template}' cannot be used. Write placeholders such as {{zone}}-{{rack:02}}-{{level:02}}, with a separator between them, or a prefix of up to five letters and digits such as LOC |
+| `STORAGE_CODE_TEMPLATE_INVALID` | The code template '{template}' cannot be used. Write placeholders such as {{zone}}-{{rack:02}}-{{level:02}}, with a separator between them, or a prefix of up to five letters and digits such as LOC. The placeholder names are zone, area, section, aisle, row, rack, bay, column, shelf, level, bin, slot |
 | `STORAGE_CODE_TEMPLATE_NOT_TREE` | This warehouse draws random codes: give it a template with placeholders, such as {zone}-{rack:02}-{level:02}, before numbering its locations |
 | `STORAGE_CODE_TEMPLATE_NOT_WAREHOUSE` | A code template belongs to a warehouse, a location at the top of the tree |
 | `STORAGE_DELETE_BLOCKED_BY_CHILD_NAME` | Cannot delete storage location "{location}": its child location "{name}" would end up beside another location with the same name once it moves up a level. Rename one of them first. |

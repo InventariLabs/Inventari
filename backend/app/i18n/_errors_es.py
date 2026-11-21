@@ -597,7 +597,7 @@ ERRORS_ES: ErrorMessages = {
     'product_label_too_narrow': 'El código {code} no cabe en una etiqueta de {width} mm de ancho: sus barras necesitan al menos {needed} mm. Elija una etiqueta más ancha',
     'product_label_too_short': 'La etiqueta de {height} mm de alto es demasiado baja: tras el nombre y el texto, a las barras del código {code} les queda muy poca altura para que un lector las vea. Elija una etiqueta más alta',
     'product_label_composition_does_not_fit': 'La lista de ingredientes no cabe en una etiqueta de {width} × {height} mm con la letra más pequeña que la ley permite en un envase. Elija una etiqueta más grande',
-    'storage_code_template_invalid': 'La plantilla de códigos «{template}» no se puede usar. Escriba campos como {{zone}}-{{rack:02}}-{{level:02}}, con un separador entre ellos, o un prefijo de hasta cinco letras y dígitos como LOC',
+    'storage_code_template_invalid': 'La plantilla de códigos «{template}» no se puede usar. Escriba campos como {{zone}}-{{rack:02}}-{{level:02}}, con un separador entre ellos, o un prefijo de hasta cinco letras y dígitos como LOC. Nombres de campo permitidos: zone, area, section, aisle, row, rack, bay, column, shelf, level, bin, slot',
     'storage_code_template_not_tree': 'Este almacén genera códigos al azar: dele una plantilla con campos, como {zone}-{rack:02}-{level:02}, antes de numerar sus ubicaciones',
     'storage_code_parent_not_numbered': 'Esta ubicación no se puede numerar por sí sola: las de encima aún no llevan los códigos de la plantilla, o está a más profundidad de la que cubre la plantilla. Numere primero el nivel superior',
     'storage_code_number_not_here': 'Solo se puede numerar una ubicación corriente, no una archivada ni virtual',

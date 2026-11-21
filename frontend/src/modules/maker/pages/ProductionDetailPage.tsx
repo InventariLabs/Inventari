@@ -328,7 +328,9 @@ export default function ProductionDetailPage() {
         confirmLabel={t("detail.cancelConfirm.confirm", {
           defaultValue: "Yes, cancel run",
         })}
-        cancelLabel={t("create.cancel", { defaultValue: "Cancel" })}
+        cancelLabel={t("detail.cancelConfirm.keep", {
+          defaultValue: "Keep run",
+        })}
         onConfirm={() => {
           setShowCancelConfirm(false);
           handleCancel();
