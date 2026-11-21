@@ -26,4 +26,23 @@ describe("FleetCompositionCard — an empty fleet is not an empty register", () 
     ).toBeInTheDocument();
     expect(screen.queryByText(/register/i)).not.toBeInTheDocument();
   });
+
+  it("says the assets are retired when some are and none counts in the fleet", () => {
+    render(
+      <FleetCompositionCard
+        rows={[]}
+        isLoading={false}
+        error={null}
+        onRetry={vi.fn()}
+        retiredCount={1}
+      />,
+    );
+
+    expect(
+      screen.getByText(
+        "Every asset on record is retired, so none is in the fleet.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/no assets yet/i)).not.toBeInTheDocument();
+  });
 });

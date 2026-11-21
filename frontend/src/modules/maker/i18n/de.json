@@ -91,6 +91,7 @@
     "hints": {
       "product": "Wählen Sie ein Ausgabeprodukt aus, um die Vorschau zu aktivieren.",
       "quantity": "Geben Sie eine geplante Menge größer als null ein, um die Vorschau zu aktivieren.",
+      "quantityMade": "Geben Sie ein, wie viel entstanden ist (mehr als null), um die Vorschau zu aktivieren.",
       "storage": "Wählen Sie einen Zielort aus, um die Vorschau zu aktivieren."
     },
     "preview": "Kosten anzeigen",
@@ -554,7 +555,7 @@
     "hintSource": "Wird in den Einstellungen des Produktionsmoduls gesetzt",
     "orders_one": "{{count}} Durchlauf",
     "orders_other": "{{count}} Durchläufe",
-    "empty": "Noch keine abgeschlossenen Durchläufe mit Ergebnis.",
+    "empty": "Noch nichts anzuzeigen: ein abgeschlossener Lauf zählt, sobald seine Formel einen Verkaufspreis hat.",
     "overproduced_one": "{{count}} Lauf wurde über dem Plan abgeschlossen; sein Ergebnis zählt die Mehrmenge mit.",
     "overproduced_other": "{{count}} Läufe wurden über dem Plan abgeschlossen; ihr Ergebnis zählt die Mehrmenge mit."
   },

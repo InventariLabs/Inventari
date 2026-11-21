@@ -78,6 +78,7 @@
       "link": "Actifs",
       "uncategorised": "Sans catégorie",
       "empty": "Le parc ne contient encore aucun actif.",
+      "allRetired": "Tous les actifs enregistrés sont retirés, le parc est donc vide.",
       "in_service_one": "{{count}} en maintenance",
       "in_service_many": "{{count}} en maintenance",
       "in_service_other": "{{count}} en maintenance",

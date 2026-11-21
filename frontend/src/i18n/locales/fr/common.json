@@ -234,6 +234,7 @@
       "invitationExpiresAt": "valable jusqu'à {{time}}",
       "requests": {
         "title": "Demandes d'accès",
+        "approveHint": "L'approbation donne à la personne un compte avec sa propre organisation, pas une place dans celle-ci. Pour ajouter quelqu'un ici, invitez-le plutôt.",
         "approve": "Approuver",
         "reject": "Rejeter",
         "approveFor": "Approuver {{name}}",
@@ -578,6 +579,7 @@
         "uom_id": "Unité",
         "uom_symbol": "Unité",
         "url": "URL",
+        "equipment": "Données de l'équipement",
         "usage": "Utilisation",
         "valid_from": "Valable à partir du",
         "valid_to": "Valable jusqu'au",
@@ -777,6 +779,8 @@
         "required": "obligatoire"
       },
       "values": {
+        "CHECKOUT": "Remise",
+        "CHECKIN": "Retour",
         "ALL": "Toutes",
         "STORAGE": "Emplacement",
         "CATEGORY": "Catégorie",
@@ -1331,6 +1335,7 @@
     "statsImported": "Importés",
     "statsFailed": "Échecs",
     "firstErrors": "Premières erreurs",
+    "rowsCountedNote": "Les lignes sont comptées à partir de la première ligne de données ; l'en-tête n'est pas compté, le numéro est donc celui de la feuille moins un.",
     "previewTitle": "Aperçu",
     "previewHint": "Les premières lignes de la source, lues avec le mappage ci-dessus."
   },

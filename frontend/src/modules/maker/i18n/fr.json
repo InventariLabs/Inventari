@@ -91,6 +91,7 @@
     "hints": {
       "product": "Sélectionnez un produit de sortie pour activer l’aperçu.",
       "quantity": "Saisissez une quantité prévue supérieure à zéro pour activer l’aperçu.",
+      "quantityMade": "Saisissez la quantité obtenue, supérieure à zéro, pour activer l’aperçu.",
       "storage": "Sélectionnez un emplacement de destination pour activer l’aperçu."
     },
     "preview": "Aperçu des coûts",
@@ -554,7 +555,7 @@
     "hintSource": "Défini dans les paramètres du module Production",
     "orders_one": "{{count}} opération",
     "orders_other": "{{count}} opérations",
-    "empty": "Aucune opération terminée avec résultat pour l'instant.",
+    "empty": "Rien à afficher pour l'instant : une opération terminée compte dès que sa formule a un prix de vente.",
     "overproduced_one": "{{count}} production a été clôturée au-dessus du plan ; son résultat compte la quantité en plus.",
     "overproduced_other": "{{count}} productions ont été clôturées au-dessus du plan ; leur résultat compte la quantité en plus."
   },

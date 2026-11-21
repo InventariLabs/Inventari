@@ -196,7 +196,9 @@
   "identificationSection": "Identificación del producto",
   "itemWeightNet": "Peso por pieza",
   "itemWeightPerUnit": "Peso / volumen por pieza",
+  "itemWeightPerPackage": "Peso / volumen por envase",
   "weightPerPieceHint": "Ingrese el peso o el volumen de una pieza; el total se calcula automáticamente.",
+  "weightPerPackageHint": "Ingrese el peso o el volumen de un envase; el total se calcula automáticamente.",
   "weightTotalHint": "Total de esta línea: {{total}}",
   "selectStorage": "Seleccionar ubicación…",
   "messages": {

@@ -8,6 +8,9 @@ import plCommon from "@/i18n/locales/pl/common.json";
 import plApprovals from "@/modules/approvals/i18n/pl.json";
 import plEquipment from "@/modules/equipment/i18n/pl.json";
 import plWarehouse from "@/modules/warehouse/i18n/pl.json";
+import plLocations from "@/i18n/locales/pl/locations.json";
+import plItems from "@/i18n/locales/pl/items.json";
+import plModules from "@/i18n/locales/pl/modules.json";
 import plRecipes from "@/modules/recipes/i18n/pl.json";
 import {
   auditChanges,
@@ -301,6 +304,50 @@ describe("auditChanges value dictionaries", () => {
     );
 
     expect(changes).toEqual([{ path: "description", from: "abc", to: "—" }]);
+  });
+});
+
+describe("auditChanges on the persona paths", () => {
+  const screenT = namespacedT({
+    common: plCommon,
+    locations: plLocations,
+    items: plItems,
+    modules: plModules,
+  }) as never;
+
+  it("words a location's usage instead of printing the stored code", () => {
+    const changes = auditChanges(
+      { usage: "internal" },
+      "CREATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toEqual([{ path: "usage", from: null, to: "Zwykłe" }]);
+  });
+
+  it("names an asset's field by the word its form uses", () => {
+    // The page's translator is bound to `common`: a key without a namespace
+    // is read there.
+    const commonT = ((key: string, opts?: { defaultValue?: string }) =>
+      (screenT as unknown as (k: string, o?: unknown) => string)(
+        key.includes(":") ? key : `common:${key}`,
+        opts,
+      )) as unknown as Parameters<typeof auditFieldLabel>[1];
+    expect(auditFieldLabel("meta_data.equipment.manufacturer", commonT)).toBe(
+      "Dane dodatkowe › Dane sprzętu › Producent",
+    );
+  });
+
+  it("words the module and the document type of a copied layout", () => {
+    const changes = auditChanges(
+      { module: "equipment", document_type: "CHECKIN" },
+      "CREATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes.map((c) => c.to)).toEqual(["Śledzenie sprzętu", "Zwrot"]);
   });
 });
 

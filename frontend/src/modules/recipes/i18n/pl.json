@@ -7,7 +7,10 @@
     "recipes": "Przepisy",
     "settings": "Ustawienia",
     "ingredientData": "Ustawienia składników",
-    "unlinkedIngredients": "Składniki bez produktu"
+    "unlinkedIngredients": "Składniki bez produktu",
+    "unlinkedIngredientsShort": "Bez produktu",
+    "ingredientDataShort": "Składniki",
+    "mealPlannerShort": "Planer"
   },
   "filters": {
     "search": "Szukaj przepisów…",
@@ -181,7 +184,7 @@
   "picking": {
     "title": "Pobierz składniki: {{recipe}}",
     "start": "Pobierz ze stanu",
-    "start_hint": "Pobierz składniki ze stanu magazynu",
+    "start_hint": "Pobierz składniki ze swoich zapasów",
     "scan_prompt": "Zeskanuj kod lub dotknij składnika",
     "complete": "Zakończ pobieranie",
     "completeConfirmTitle": "Zakończyć pobieranie?",

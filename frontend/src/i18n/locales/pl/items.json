@@ -59,7 +59,7 @@
     "RETIRED": "Wycofany z użytku",
     "TEST_DATA": "Dane testowe / błędne",
     "OTHER": "Inny",
-    "USED": "Zużyte",
+    "USED": "Zużyty",
     "DISPOSED": "Wyrzucony",
     "ARCHIVED": "Zarchiwizowany"
   },
@@ -72,6 +72,7 @@
   "itemWeight": "Waga",
   "itemVolume": "Objętość",
   "itemWeightPerUnit": "Waga / Objętość (na sztukę)",
+  "itemWeightPerPackage": "Waga / Objętość (na opakowanie)",
   "itemWeightNet": "Waga netto / Pojemność",
   "itemUnit": "Jednostka",
   "itemCategory": "Kategoria",
@@ -229,6 +230,7 @@
     "quantitySmall": "np. 500"
   },
   "weightPerPieceHint": "Podaj wagę lub objętość jednej sztuki; łączną policzymy automatycznie.",
+  "weightPerPackageHint": "Podaj wagę lub objętość jednego opakowania; łączną policzymy automatycznie.",
   "weightTotalHint": "Łącznie w tej pozycji: {{total}}",
   "selectStorage": "Wybierz miejsce…",
   "messages": {
@@ -414,7 +416,7 @@
       "QUANTITY_INCREASED_VIA_SCAN": "Dodano przez skanowanie",
       "CHECKOUT": "Wydano",
       "CHECKIN": "Przyjęto",
-      "USED": "Zużyte",
+      "USED": "Zużyto",
       "DISPOSED": "Wyrzucono",
       "DELETED": "Usunięto",
       "RESTORED": "Przywrócono",

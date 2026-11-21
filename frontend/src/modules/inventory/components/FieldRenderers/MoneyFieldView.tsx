@@ -1,3 +1,4 @@
+import { formatNumberLocale } from "@/utils/formatters";
 import type { ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { makeTDynamic } from "@/lib/i18nHelpers";
@@ -56,7 +57,7 @@ export function MoneyField({
         onChange={handleAmountChange}
         // Named from the same source as the visible label the parent renders.
         aria-label={getLabel(field, tDyn)}
-        placeholder="0.00"
+        placeholder={formatNumberLocale(0, 2)}
         className={`flex-1 ${commonClasses} ${error ? "border-red-300 bg-red-50" : ""}`}
       />
       <span

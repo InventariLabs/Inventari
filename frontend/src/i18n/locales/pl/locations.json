@@ -310,6 +310,7 @@
     "description": "„{{name}}” jest zarchiwizowane i nie trafia na aktywną listę. Otwórz je tutaj albo przywróć z archiwum."
   },
   "usage": {
+    "internal": "Zwykłe",
     "customer": "Zużyte",
     "inventory": "Straty",
     "production": "Produkcja",

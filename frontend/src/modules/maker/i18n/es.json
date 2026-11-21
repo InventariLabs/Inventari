@@ -91,6 +91,7 @@
     "hints": {
       "product": "Selecciona un producto de salida para activar la vista previa.",
       "quantity": "Introduce una cantidad prevista mayor que cero para activar la vista previa.",
+      "quantityMade": "Introduce cuánto salió, más de cero, para activar la vista previa.",
       "storage": "Selecciona una ubicación de destino para activar la vista previa."
     },
     "preview": "Previsualizar coste",
@@ -554,7 +555,7 @@
     "hintSource": "Se configura en los ajustes del módulo Producción",
     "orders_one": "{{count}} producción",
     "orders_other": "{{count}} producciones",
-    "empty": "Aún no hay producciones terminadas con resultado.",
+    "empty": "Aún no hay nada que mostrar: una producción terminada cuenta cuando su fórmula tiene un precio de venta.",
     "overproduced_one": "{{count}} producción se cerró por encima del plan; su resultado cuenta la cantidad extra.",
     "overproduced_other": "{{count}} producciones se cerraron por encima del plan; su resultado cuenta la cantidad extra."
   },

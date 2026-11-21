@@ -9,7 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.contracts import UserContextDTO
+from app.core.contracts import AuditAction, AuditTargetType, UserContextDTO
 from app.core.exceptions import ServiceRejectionError, catalogue_refusal
 from app.core.logging import get_logger
 from app.core.module_registry import module_registry
@@ -26,6 +26,7 @@ from app.core.product_profiles import (
 )
 from app.models.organization import Organization
 from app.models.storage_location import StorageLocation
+from app.services.audit_service import log_action_async
 from app.services.module_lifecycle_service import (
     ModuleLifecycleError,
     enable_modules_async,
@@ -43,6 +44,34 @@ def country_document_preset(country: str | None) -> str | None:
 
     rule = get_country_rule(country)
     return rule.document_preset if rule else None
+
+
+async def _rename_async(
+    db: AsyncSession,
+    org: Organization,
+    name: str,
+    user: UserContextDTO | None,
+) -> None:
+    """Give the organization the name the founder chose, and journal the change.
+
+    Without a line for it the journal's only row about the organization would
+    still read as its first name.
+    """
+    previous_name = org.name
+    org.name = name
+    await log_action_async(
+        db,
+        organization_id=org.id,
+        user_id=user.id if user is not None else None,
+        action=AuditAction.UPDATE,
+        target_type=AuditTargetType.ORGANIZATION,
+        target_id=org.id,
+        snapshot={
+            'name': name,
+            'before': {'name': previous_name},
+            'after': {'name': name},
+        },
+    )
 
 
 async def apply_onboarding_profile_async(
@@ -184,8 +213,8 @@ async def apply_onboarding_profile_async(
     # here cannot put an unreadable zone on the row.
     if timezone:
         org.timezone = timezone
-    if organization_name:
-        org.name = organization_name
+    if organization_name and organization_name != org.name:
+        await _rename_async(db, org, organization_name, user)
     if country:
         org.country = country
     db.add(org)

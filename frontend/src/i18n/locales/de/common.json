@@ -234,6 +234,7 @@
       "invitationExpiresAt": "gültig bis {{time}}",
       "requests": {
         "title": "Zugangsanfragen",
+        "approveHint": "Mit der Freigabe erhält die Person ein Konto mit einer eigenen Organisation, keinen Platz in dieser. Um jemanden hier hinzuzufügen, laden Sie die Person stattdessen ein.",
         "approve": "Genehmigen",
         "reject": "Ablehnen",
         "approveFor": "{{name}} genehmigen",
@@ -578,6 +579,7 @@
         "uom_id": "Einheit",
         "uom_symbol": "Einheit",
         "url": "URL",
+        "equipment": "Gerätedaten",
         "usage": "Verwendung",
         "valid_from": "Gültig ab",
         "valid_to": "Gültig bis",
@@ -777,6 +779,8 @@
         "required": "Pflichtfeld"
       },
       "values": {
+        "CHECKOUT": "Ausgabe",
+        "CHECKIN": "Rückgabe",
         "ALL": "Alle",
         "STORAGE": "Lagerort",
         "CATEGORY": "Kategorie",
@@ -1329,6 +1333,7 @@
     "statsImported": "Importiert",
     "statsFailed": "Fehlgeschlagen",
     "firstErrors": "Erste Fehler",
+    "rowsCountedNote": "Die Zeilen werden ab der ersten Datenzeile gezählt; die Kopfzeile zählt nicht, die Zeilennummer ist also die Tabellenzeile minus eins.",
     "previewTitle": "Vorschau",
     "previewHint": "Die ersten Zeilen der Quelle, gelesen mit der Zuordnung oben."
   },

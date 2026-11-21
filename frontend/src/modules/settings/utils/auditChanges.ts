@@ -348,6 +348,8 @@ const VALUE_RESOLVERS: Record<
 > = {
   profile_id: (t, code) => auditProfileName(t, code, ""),
   focus_module: (t, code) => auditModuleName(t, code, ""),
+  // The module a copied layout belongs to: the name its card carries.
+  module: (t, code) => auditModuleName(t, code, ""),
   equipment_status: (t, code) =>
     t(`equipment:status.${code.toLowerCase()}`, { defaultValue: "" }),
   // The condition an asset came back in: the words the return dialog offers.
@@ -355,6 +357,8 @@ const VALUE_RESOLVERS: Record<
     t(`equipment:assignments.condition_${code.toLowerCase()}`, {
       defaultValue: "",
     }),
+  // What a location is for: the system's own word, not a column value.
+  usage: (t, code) => t(`locations:usage.${code}`, { defaultValue: "" }),
   role: (t, code) =>
     t(`common:settings.organization.memberRoles.${code}`, {
       defaultValue: "",
@@ -870,6 +874,9 @@ export function auditFieldLabel(
         (NAMED_BY_THE_FORM[segment] &&
           t(NAMED_BY_THE_FORM[segment], { defaultValue: "" })) ||
         t(`settings.audit.fields.${segment}`, { defaultValue: "" }) ||
+        // A product field the platform seeds (an asset's manufacturer, asset
+        // tag, RAM) is worded by the form that edits it.
+        t(`items:fields.${segment}`, { defaultValue: "" }) ||
         segment,
     )
     .join(" › ");

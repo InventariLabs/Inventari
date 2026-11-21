@@ -12,6 +12,7 @@
  */
 import { describe, expect, it } from "vitest";
 
+import plAuth from "../locales/pl/auth.json";
 import plLauncher from "../../modules/launcher/i18n/pl.json";
 
 const catalogues = import.meta.glob<Record<string, unknown>>(
@@ -50,5 +51,8 @@ describe("Polish catalogues", () => {
   it("do not repeat the word organization around the default organization name", () => {
     expect(plLauncher.launcher.createdOrganization).not.toMatch(/organizacj/i);
     expect(plLauncher.launcher.joinedOrganization).not.toMatch(/organizacj/i);
+    // The invitation page embeds the name in a sentence of its own.
+    expect(plAuth.inviteContext).not.toMatch(/organizacj/i);
+    expect(plAuth.inviteContextNoInviter).not.toMatch(/organizacj/i);
   });
 });

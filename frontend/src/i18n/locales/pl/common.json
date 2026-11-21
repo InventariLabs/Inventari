@@ -236,6 +236,7 @@
       "invitationExpiresAt": "ważne do {{time}}",
       "requests": {
         "title": "Prośby o dostęp",
+        "approveHint": "Zatwierdzenie daje tej osobie konto z własną organizacją, a nie miejsce w tej organizacji. Aby dodać kogoś tutaj, wyślij zaproszenie.",
         "approve": "Zaakceptuj",
         "reject": "Odrzuć",
         "approveFor": "Zaakceptuj: {{name}}",
@@ -580,6 +581,7 @@
         "uom_id": "Jednostka",
         "uom_symbol": "Jednostka",
         "url": "Adres URL",
+        "equipment": "Dane sprzętu",
         "usage": "Użycie",
         "valid_from": "Obowiązuje od",
         "valid_to": "Obowiązuje do",
@@ -698,8 +700,8 @@
       "showWholeChange": "Pokaż całą zmianę",
       "showLess": "Pokaż mniej",
       "reasons": {
-        "CONSUMED": "Zużyte",
-        "USED": "Zużyte",
+        "CONSUMED": "Zużyty",
+        "USED": "Zużyty",
         "DISPOSED": "Wyrzucony",
         "DISCARDED": "Wyrzucony",
         "RESTORED": "Przywrócono",
@@ -779,6 +781,8 @@
         "required": "wymagane"
       },
       "values": {
+        "CHECKOUT": "Wydanie",
+        "CHECKIN": "Zwrot",
         "ALL": "Wszystkie",
         "STORAGE": "Miejsce",
         "CATEGORY": "Kategoria",
@@ -1375,6 +1379,7 @@
     "statsImported": "Zaimportowane",
     "statsFailed": "Nieudane",
     "firstErrors": "Pierwsze błędy",
+    "rowsCountedNote": "Wiersze liczone są od pierwszego wiersza danych; nagłówek się nie liczy, więc numer wiersza to numer w arkuszu minus jeden.",
     "previewTitle": "Podgląd",
     "previewHint": "Pierwsze wiersze źródła, odczytane według mapowania powyżej."
   },

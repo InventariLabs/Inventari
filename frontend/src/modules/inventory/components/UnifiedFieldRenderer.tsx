@@ -2,7 +2,11 @@ import { useId } from "react";
 import { FieldDefinition, CategoryDTO, Uom } from "@/types";
 import { makeTDynamic, unitLabel } from "@/lib/i18nHelpers";
 import { useTranslation } from "react-i18next";
-import { useUoms } from "@/modules/shared/hooks/useUoms";
+import {
+  getUomCategoryName,
+  isPackageCategory,
+  useUoms,
+} from "@/modules/shared/hooks/useUoms";
 import { UomSelect } from "@/modules/shared/components/UomSelect";
 import { Input } from "@/components/ui/Input";
 import { FIELD_LABEL_CLASS, RequiredStar } from "@/components/ui/fieldLabel";
@@ -91,6 +95,7 @@ export default function UnifiedFieldRenderer({
   const priceUnit = uomCategories
     ?.flatMap((category) => category.uoms ?? [])
     .find((uom) => uom.id === fdUomId);
+  const unitCategoryName = getUomCategoryName(uomCategories, fdUomId);
   const fdQuantity = formData.quantity as string | undefined;
   const fdMetadata = formData.metadata as Record<string, unknown> | undefined;
 
@@ -160,6 +165,7 @@ export default function UnifiedFieldRenderer({
           value={value}
           weightUomId={formData.weight_uom_id as string | undefined}
           quantity={fdQuantity}
+          perPackage={isPackageCategory(unitCategoryName)}
           error={errors[field.key]}
           onChange={handleChange}
           onUomChange={(uomId) => onChange("weight_uom_id", uomId, false)}

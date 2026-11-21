@@ -78,7 +78,13 @@ export function isContinuousUom(
  * They seed one unit per category, so the names are the contract here — the
  * same way `isContinuousUom` names Weight and Volume.
  */
-const COUNTED_UOM_CATEGORIES = ["Unit", "Pack", "Can", "Bottle", "Box", "Bag"];
+const PACKAGE_UOM_CATEGORIES = ["Pack", "Can", "Bottle", "Box", "Bag"];
+const COUNTED_UOM_CATEGORIES = ["Unit", ...PACKAGE_UOM_CATEGORIES];
+
+/** Whether a category name is a bulk package (pack, can, bottle, box, bag). */
+export function isPackageCategory(name: string | null | undefined): boolean {
+  return name != null && PACKAGE_UOM_CATEGORIES.includes(name);
+}
 
 /**
  * Check if a uom_id refers to a counted unit — a piece or a bulk package

@@ -91,6 +91,7 @@
     "hints": {
       "product": "Pick an output product to enable preview.",
       "quantity": "Enter a planned quantity greater than zero to enable preview.",
+      "quantityMade": "Enter how much came out, greater than zero, to enable preview.",
       "storage": "Select a target location to enable preview."
     },
     "preview": "Preview cost",
@@ -554,7 +555,7 @@
     "hintSource": "Set in the Production module's settings",
     "orders_one": "{{count}} run",
     "orders_other": "{{count}} runs",
-    "empty": "No completed runs with a result yet.",
+    "empty": "Nothing to show yet: a completed run counts once its BOM has a sale price.",
     "overproduced_one": "{{count}} run closed above its plan; its result counts the extra output.",
     "overproduced_other": "{{count}} runs closed above their plan; their result counts the extra output."
   },

@@ -452,6 +452,17 @@ describe("ProductionCreateSheet — one action in the footer", () => {
 });
 
 describe("ProductionCreateSheet — remaining preview requirements", () => {
+  it("asks for a planned quantity only when a run is being planned", () => {
+    renderSheet();
+    expect(screen.queryByText(/planned quantity/)).not.toBeInTheDocument();
+    planInstead();
+    expect(
+      screen.getByText(
+        "Enter a planned quantity greater than zero to enable preview.",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("asks only for the location when the product and quantity are ready", () => {
     renderSheet();
     typeQuantity("1");
@@ -463,7 +474,7 @@ describe("ProductionCreateSheet — remaining preview requirements", () => {
     ).not.toBeInTheDocument();
     expect(
       screen.queryByText(
-        "Enter a planned quantity greater than zero to enable preview.",
+        "Enter how much came out, greater than zero, to enable preview.",
       ),
     ).not.toBeInTheDocument();
     expect(screen.getByTestId("maker-create-preview-button")).toBeDisabled();
@@ -475,7 +486,7 @@ describe("ProductionCreateSheet — remaining preview requirements", () => {
     fireEvent.change(quantity, { target: { value: "0" } });
     expect(
       screen.getByText(
-        "Enter a planned quantity greater than zero to enable preview.",
+        "Enter how much came out, greater than zero, to enable preview.",
       ),
     ).toBeInTheDocument();
     expect(
@@ -487,7 +498,7 @@ describe("ProductionCreateSheet — remaining preview requirements", () => {
     ).not.toBeInTheDocument();
     expect(
       screen.getByText(
-        "Enter a planned quantity greater than zero to enable preview.",
+        "Enter how much came out, greater than zero, to enable preview.",
       ),
     ).toBeInTheDocument();
     fireEvent.change(quantity, { target: { value: "2" } });
@@ -496,7 +507,7 @@ describe("ProductionCreateSheet — remaining preview requirements", () => {
     fireEvent.change(quantity, { target: { value: "" } });
     expect(
       screen.getByText(
-        "Enter a planned quantity greater than zero to enable preview.",
+        "Enter how much came out, greater than zero, to enable preview.",
       ),
     ).toBeInTheDocument();
     expect(screen.getByTestId("maker-create-preview-button")).toBeDisabled();
@@ -515,7 +526,7 @@ describe("ProductionCreateSheet — remaining preview requirements", () => {
     ).not.toBeInTheDocument();
     expect(
       screen.queryByText(
-        "Enter a planned quantity greater than zero to enable preview.",
+        "Enter how much came out, greater than zero, to enable preview.",
       ),
     ).not.toBeInTheDocument();
     expect(screen.getByTestId("maker-create-preview-button")).toBeDisabled();

@@ -73,6 +73,7 @@
       "link": "Assets",
       "uncategorised": "No category",
       "empty": "The fleet has no assets yet.",
+      "allRetired": "Every asset on record is retired, so none is in the fleet.",
       "in_service_one": "{{count}} in maintenance",
       "in_service_other": "{{count}} in maintenance",
       "warranty_ending_one": "{{count}} available, warranty ending",

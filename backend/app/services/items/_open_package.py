@@ -250,6 +250,23 @@ async def use_partially_async(
             {'old': str(before), 'new': str(item.quantity)},
             user_id=user.id,
         )
+        # The organization journal gets the same line: the new record's
+        # creation and its use are there, and without this one they add up
+        # to more than the shelf holds.
+        await log_action_async(
+            db,
+            organization_id=item.organization_id,
+            user_id=user.id,
+            action=AuditAction.QUANTITY_CHANGE,
+            target_type=AuditTargetType.ITEM,
+            target_id=item.id,
+            snapshot={
+                'name': item.name,
+                'before': {'quantity': str(before)},
+                'after': {'quantity': str(item.quantity)},
+            },
+            meta_data={'reason': 'package_opened'},
+        )
         await _log_opened(db, target, item, user, left=left, left_unit=left_unit)
 
     if set_use_by:

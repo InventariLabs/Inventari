@@ -317,6 +317,7 @@
     "description": "“{{name}}” está arquivado e fica fora da lista ativa. Abra-o aqui ou restaure-o a partir do arquivo."
   },
   "usage": {
+    "internal": "Comum",
     "customer": "Consumido",
     "inventory": "Perda",
     "production": "Produção",

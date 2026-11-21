@@ -234,6 +234,7 @@
       "invitationExpiresAt": "valid until {{time}}",
       "requests": {
         "title": "Access requests",
+        "approveHint": "Approving gives the person an account with an organization of their own, not membership of this one. To add someone here, invite them instead.",
         "approve": "Approve",
         "reject": "Reject",
         "approveFor": "Approve {{name}}",
@@ -578,6 +579,7 @@
         "uom_id": "Unit",
         "uom_symbol": "Unit",
         "url": "URL",
+        "equipment": "Equipment details",
         "usage": "Usage",
         "valid_from": "Valid from",
         "valid_to": "Valid until",
@@ -777,6 +779,8 @@
         "required": "required"
       },
       "values": {
+        "CHECKOUT": "Hand-out",
+        "CHECKIN": "Return",
         "ALL": "All",
         "STORAGE": "Location",
         "CATEGORY": "Category",
@@ -1329,6 +1333,7 @@
     "statsImported": "Imported",
     "statsFailed": "Failed",
     "firstErrors": "First few errors",
+    "rowsCountedNote": "Rows are counted from the first line of data; the header row is not counted, so a row number is the spreadsheet row minus one.",
     "previewTitle": "Preview",
     "previewHint": "The first rows of the source, read with the mapping above."
   },
