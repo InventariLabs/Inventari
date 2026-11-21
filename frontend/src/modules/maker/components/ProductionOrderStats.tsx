@@ -166,6 +166,19 @@ function RunDayTile({ order }: { order: ProductionOrder }) {
   );
 }
 
+/**
+ * The per-unit cost as text. A total built from nothing but unknown rates is
+ * no answer, so the per-unit figure beside it is none either — a zero would
+ * read as a product that costs nothing to make.
+ */
+function unitCostAmount(
+  unpriced: number,
+  priced: number,
+  formatted: string,
+): string {
+  return unpriced > 0 && priced === 0 ? "—" : formatted;
+}
+
 /** The part of a closed run's cost whose output left the shelf before it closed. */
 function UnshelvedCostNote({ order }: { order: ProductionOrder }) {
   const { t, i18n } = useTranslation("maker");
@@ -217,7 +230,11 @@ export function ProductionOrderStats({ order }: ProductionOrderStatsProps) {
         {order.unit_cost != null && (
           <span className="block">
             {t("detail.card.unitCost", {
-              amount: formatMoney(order.unit_cost, currency, i18n.language),
+              amount: unitCostAmount(
+                unpriced,
+                priced,
+                formatMoney(order.unit_cost, currency, i18n.language),
+              ),
               // The number is the total divided by the run's output, whatever
               // that is counted in: a kilogram run costs so much per kilogram.
               unit: outputUnitName(t, order.output_uom_symbol),
