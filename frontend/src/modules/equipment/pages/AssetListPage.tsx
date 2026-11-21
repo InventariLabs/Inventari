@@ -408,7 +408,11 @@ export default function AssetListPage() {
       {hasSelection && canWrite && (
         <AssetBulkActionsBar
           selectedCount={selectedCount}
-          unreachedMatches={allMatching ? 0 : Math.max(0, total - items.length)}
+          unreachedMatches={
+            allMatching || selectedIds.size < items.length
+              ? 0
+              : Math.max(0, total - items.length)
+          }
           matchingTotal={total}
           allMatching={allMatching}
           onSelectAllMatching={selectAllMatching}

@@ -45255,6 +45255,17 @@
             ],
             "title": "Organization Name"
           },
+          "organization_country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organization Country"
+          },
           "deadline_day": {
             "anyOf": [
               {
@@ -47791,6 +47802,17 @@
               }
             ],
             "title": "Organization Name"
+          },
+          "organization_country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organization Country"
           },
           "deadline_day": {
             "anyOf": [

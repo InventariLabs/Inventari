@@ -7,6 +7,8 @@ Status is stored in meta_data['equipment']['equipment_status'].
 
 from app.core.exceptions import ServiceRejectionError
 
+from ._status_labels import equipment_status_label
+
 _ALLOWED_TRANSITIONS: dict[str, set[str]] = {
     'AVAILABLE': {'DEPLOYED', 'MAINTENANCE', 'RETIRED'},
     'DEPLOYED': {'AVAILABLE', 'MAINTENANCE', 'RETIRED'},
@@ -56,4 +58,8 @@ def validate_transition(old_status: str | None, new_status: str) -> None:
             if previous == 'RETIRED'
             else 'equipment_status_transition_denied'
         )
-        raise ServiceRejectionError(key, old=previous, new=new_status)
+        raise ServiceRejectionError(
+            key,
+            old=equipment_status_label(previous),
+            new=equipment_status_label(new_status),
+        )

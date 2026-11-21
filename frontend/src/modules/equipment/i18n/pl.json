@@ -80,7 +80,8 @@
       "issued_one": "{{count}} wydany",
       "issued_few": "{{count}} wydane",
       "issued_many": "{{count}} wydanych",
-      "issued_other": "{{count}} wydanego"
+      "issued_other": "{{count}} wydanego",
+      "retired_total": "wycofanych: {{n}}"
     },
     "fleet": {
       "title": "Flota wg kategorii",
@@ -193,7 +194,7 @@
     "technician_placeholder": "Imię i nazwisko technika",
     "type_label": "Typ",
     "deleteAriaLabel": "Usuń wpis serwisowy",
-    "confirmDeleteTitle": "Usunąć wpis konserwacji?",
+    "confirmDeleteTitle": "Usunąć wpis serwisowy?",
     "confirmDeleteMessage": "To trwale usunie „{{title}}”.",
     "log_failed": "Nie udało się dodać wpisu serwisowego",
     "type_required": "Wybierz rodzaj wykonanej pracy",
@@ -688,7 +689,7 @@
     "launching": "Uruchamianie…",
     "complete": "Zakończ",
     "viewDetail": "Szczegóły",
-    "progressTitle": "Postęp odpowiedzi",
+    "progressTitle": "Postęp odpowiedzi (liczony wg osób)",
     "responsesTitle": "Odpowiedzi indywidualne",
     "noResponses": "Brak odpowiedzi. Uruchom atestację, aby wygenerować linki.",
     "sendReminders": "Wyślij przypomnienia",
@@ -891,7 +892,8 @@
     "type_other": "Inne",
     "confirmDeleteTitle": "Usunąć załącznik?",
     "confirmDeleteMessage": "To trwale usunie „{{name}}”.",
-    "deleteFile": "Usuń {{name}}"
+    "deleteFile": "Usuń {{name}}",
+    "openFile": "Otwórz {{name}}"
   },
   "mode": {
     "single": "Pojedynczo",
@@ -968,7 +970,8 @@
     "new_status": "Nowy status",
     "target_location": "Do miejsca",
     "select_location": "Wybierz miejsce…",
-    "no_email_warning": "Ta osoba nie ma adresu e-mail w kartotece — wydane zasoby nie pojawią się jej w widoku „Mój sprzęt”."
+    "no_email_warning": "Ta osoba nie ma adresu e-mail w kartotece — wydane zasoby nie pojawią się jej w widoku „Mój sprzęt”.",
+    "return_date_consequence": "Te wydania nie mają daty zwrotu, więc nigdy nie trafią do raportu zaległych zwrotów."
   },
   "my_assets": {
     "title": "Mój sprzęt",

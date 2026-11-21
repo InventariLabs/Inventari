@@ -162,8 +162,59 @@ class TestBulkEditStatus:
         assert error['item_id'] == str(eq_item.id)
         assert error['code'] == 'EQUIPMENT_STATUS_TRANSITION_FROM_RETIRED'
         assert error['error'] == (
-            'Nie można zmienić statusu z RETIRED na DEPLOYED. '
+            'Nie można zmienić statusu z Wycofany na Wydany. '
             'Wycofane zasoby muszą być najpierw jawnie przywrócone.'
+        )
+
+    def test_a_status_the_asset_already_has_is_not_a_failure(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        eq_item: Item,
+        db_session: Session,
+    ) -> None:
+        """Choosing the status an asset is already in succeeds and changes nothing."""
+        _set_equipment_status(eq_item, db_session, 'MAINTENANCE')
+
+        response = client.patch(
+            '/api/v1/equipment/assets/bulk',
+            headers=eq_auth_headers,
+            json={
+                'item_ids': [str(eq_item.id)],
+                'action': 'change_status',
+                'data': {'status': 'MAINTENANCE'},
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {'updated': 1, 'errors': []}
+        db_session.refresh(eq_item)
+        assert eq_item.meta_data is not None
+        assert eq_item.meta_data['equipment']['equipment_status'] == 'MAINTENANCE'
+
+    def test_a_refusal_names_the_statuses_the_screens_use(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        eq_item: Item,
+        db_session: Session,
+    ) -> None:
+        """The sentence says "Retired" and "Checked Out", not the stored enum."""
+        _set_equipment_status(eq_item, db_session, 'RETIRED')
+
+        response = client.patch(
+            '/api/v1/equipment/assets/bulk',
+            headers=eq_auth_headers,
+            json={
+                'item_ids': [str(eq_item.id)],
+                'action': 'change_status',
+                'data': {'status': 'DEPLOYED'},
+            },
+        )
+
+        [error] = response.json()['errors']
+        assert error['error'].startswith(
+            'Cannot change status from Retired to Checked Out.'
         )
 
     # --- Retiring an asset must close its active assignment --------------
@@ -325,6 +376,8 @@ class TestBulkEditStatus:
         assert len(data['errors']) == 1
         assert data['errors'][0]['item_id'] == str(eq_item.id)
         assert data['errors'][0]['code'] == 'EQUIPMENT_STILL_ASSIGNED'
+        # The act is called Return on every screen, so the sentence says so.
+        assert data['errors'][0]['error'].endswith('Return it first.')
 
         # Status must remain unchanged (DEPLOYED), not reset to AVAILABLE.
         db_session.refresh(eq_item)

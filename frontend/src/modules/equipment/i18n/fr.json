@@ -71,7 +71,8 @@
       "assets_other": "{{count}} actifs",
       "issued_one": "{{count}} emprunté",
       "issued_many": "{{count}} empruntés",
-      "issued_other": "{{count}} empruntés"
+      "issued_other": "{{count}} empruntés",
+      "retired_total": "retirés : {{n}}"
     },
     "fleet": {
       "title": "Parc par catégorie",
@@ -182,7 +183,7 @@
     "technician_placeholder": "Nom du technicien",
     "type_label": "Type",
     "deleteAriaLabel": "Supprimer l'entrée de maintenance",
-    "confirmDeleteTitle": "Supprimer le journal de maintenance ?",
+    "confirmDeleteTitle": "Supprimer l'entrée de maintenance ?",
     "confirmDeleteMessage": "Cela supprime définitivement « {{title}} ».",
     "log_failed": "Échec de l'ajout de l'entrée de service",
     "type_required": "Choisissez le type d'intervention",
@@ -635,7 +636,7 @@
     "launching": "Lancement…",
     "complete": "Terminée",
     "viewDetail": "Détails",
-    "progressTitle": "Progression des réponses",
+    "progressTitle": "Progression des réponses (comptée par personne)",
     "responsesTitle": "Réponses individuelles",
     "noResponses": "Aucune réponse pour le moment. Lancez l'attestation pour générer des liens.",
     "sendReminders": "Envoyer des rappels",
@@ -814,7 +815,8 @@
     "type_other": "Autre",
     "confirmDeleteTitle": "Supprimer la pièce jointe ?",
     "confirmDeleteMessage": "Cela supprime définitivement « {{name}} ».",
-    "deleteFile": "Supprimer {{name}}"
+    "deleteFile": "Supprimer {{name}}",
+    "openFile": "Ouvrir {{name}}"
   },
   "mode": {
     "single": "Individuel",
@@ -875,7 +877,8 @@
     "new_status": "Nouveau statut",
     "target_location": "Emplacement cible",
     "select_location": "Sélectionner un emplacement…",
-    "no_email_warning": "Cette personne n'a pas d'adresse e-mail enregistrée — les actifs émis n'apparaîtront pas dans sa vue « Mon matériel »."
+    "no_email_warning": "Cette personne n'a pas d'adresse e-mail enregistrée — les actifs émis n'apparaîtront pas dans sa vue « Mon matériel ».",
+    "return_date_consequence": "Ces remises n'ont pas de date de retour et ne figureront donc jamais dans le rapport des retours en retard."
   },
   "my_assets": {
     "title": "Mon matériel",

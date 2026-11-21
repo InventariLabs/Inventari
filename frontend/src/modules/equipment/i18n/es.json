@@ -71,7 +71,8 @@
       "assets_other": "{{count}} activos",
       "issued_one": "{{count}} prestado",
       "issued_many": "{{count}} prestados",
-      "issued_other": "{{count}} prestados"
+      "issued_other": "{{count}} prestados",
+      "retired_total": "retirados: {{n}}"
     },
     "fleet": {
       "title": "Flota por categoría",
@@ -182,7 +183,7 @@
     "technician_placeholder": "Nombre del técnico",
     "type_label": "Tipo",
     "deleteAriaLabel": "Eliminar entrada de mantenimiento",
-    "confirmDeleteTitle": "¿Eliminar registro de mantenimiento?",
+    "confirmDeleteTitle": "¿Eliminar entrada de mantenimiento?",
     "confirmDeleteMessage": "Esto elimina permanentemente «{{title}}».",
     "log_failed": "No se pudo añadir el registro de servicio",
     "type_required": "Elija el tipo de trabajo realizado",
@@ -635,7 +636,7 @@
     "launching": "Lanzando…",
     "complete": "Completada",
     "viewDetail": "Detalles",
-    "progressTitle": "Progreso de respuestas",
+    "progressTitle": "Progreso de respuestas (contado por persona)",
     "responsesTitle": "Respuestas individuales",
     "noResponses": "Aún no hay respuestas. Lance la atestación para generar enlaces.",
     "sendReminders": "Enviar recordatorios",
@@ -814,7 +815,8 @@
     "type_other": "Otro",
     "confirmDeleteTitle": "¿Eliminar adjunto?",
     "confirmDeleteMessage": "Esto elimina permanentemente «{{name}}».",
-    "deleteFile": "Eliminar {{name}}"
+    "deleteFile": "Eliminar {{name}}",
+    "openFile": "Abrir {{name}}"
   },
   "mode": {
     "single": "Individual",
@@ -875,7 +877,8 @@
     "new_status": "Nuevo estado",
     "target_location": "Ubicación destino",
     "select_location": "Seleccionar ubicación…",
-    "no_email_warning": "Esta persona no tiene correo electrónico registrado — los activos emitidos no aparecerán en su vista «Mi equipo»."
+    "no_email_warning": "Esta persona no tiene correo electrónico registrado — los activos emitidos no aparecerán en su vista «Mi equipo».",
+    "return_date_consequence": "Estas entregas no tienen fecha de devolución, por lo que nunca aparecerán en el informe de devoluciones vencidas."
   },
   "my_assets": {
     "title": "Mi equipo",

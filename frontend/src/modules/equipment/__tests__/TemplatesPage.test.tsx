@@ -52,8 +52,10 @@ vi.mock("@/hooks/useModulePageHeader", () => ({
 
 // The page gates its write actions on this; without a permission context it
 // answers "no", and the actions under test are write actions.
+const permissions = vi.hoisted(() => ({ canWrite: true }));
+
 vi.mock("@/hooks/useCanWrite", () => ({
-  useCanWrite: () => true,
+  useCanWrite: () => permissions.canWrite,
   useCanManage: () => true,
 }));
 
@@ -126,6 +128,7 @@ function switchTab(tabName: RegExp) {
 describe("TemplatesPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    permissions.canWrite = true;
     server.resetHandlers();
     server.use(
       http.get("/api/v1/equipment/templates", () =>
@@ -149,6 +152,31 @@ describe("TemplatesPage", () => {
       },
       { timeout: 5000 },
     );
+  });
+
+  it("offers a viewer no way to add on an empty list, and a writer both", async () => {
+    server.use(
+      http.get("/api/v1/equipment/templates", () =>
+        HttpResponse.json(onePage([])),
+      ),
+    );
+    permissions.canWrite = false;
+    const viewer = render(<TemplatesPage />, { wrapper: createWrapper() });
+    await screen.findByText(/No custom templates yet/i);
+    expect(
+      screen.queryByRole("button", { name: /built-in layouts/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /first template/i }),
+    ).not.toBeInTheDocument();
+    viewer.unmount();
+
+    permissions.canWrite = true;
+    render(<TemplatesPage />, { wrapper: createWrapper() });
+    await screen.findByText(/No custom templates yet/i);
+    expect(
+      screen.getByRole("button", { name: /built-in layouts/i }),
+    ).toBeInTheDocument();
   });
 
   it("switches to models tab and renders model cards", async () => {

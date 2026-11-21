@@ -70,7 +70,13 @@ class TestValidateTransition:
             else 'equipment_status_transition_denied'
         )
         assert refusal.value.key == expected
-        assert f'from {old_status} to {new_status}' in str(refusal.value)
+        names = {
+            'AVAILABLE': 'Available',
+            'DEPLOYED': 'Checked Out',
+            'MAINTENANCE': 'Maintenance',
+            'RETIRED': 'Retired',
+        }
+        assert f'from {names[old_status]} to {names[new_status]}' in str(refusal.value)
 
     def test_retired_hint_included_in_error_message(self) -> None:
         with pytest.raises(ValueError, match='Retired assets must be'):
@@ -120,7 +126,7 @@ class TestValidateTransition:
         finally:
             set_current_lang('en')
         assert str(refusal.value) == (
-            'Nie można zmienić statusu z RETIRED na DEPLOYED. '
+            'Nie można zmienić statusu z Wycofany na Wydany. '
             'Wycofane zasoby muszą być najpierw jawnie przywrócone.'
         )
 

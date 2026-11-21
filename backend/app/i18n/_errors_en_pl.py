@@ -875,7 +875,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
             'The organization does not show what its stock is worth, so there is no statement to export. Turn the stock value on in the statistics settings first.'
         ),
         'equipment_still_assigned': (
-            'The asset is still checked out to someone. Check it in first.'
+            'The asset is still checked out to someone. Return it first.'
         ),
         'equipment_deploy_requires_checkout': (
             'An asset becomes deployed by checking it out to someone. '
