@@ -527,6 +527,13 @@ const dist = join(root, "dist");
  * a step of five, to 410; the other screens stand under theirs (login 409.9,
  * launcher 425.0, start 643.5, receive 479.8, issue 590.8, history 615.9,
  * products 633.8, initial 193.9).
+ *
+ * Re-measured 2026-11-21 on that branch merged with the line that carries the
+ * warehouse floor one: login measures 410.0 KiB gz against its 410 (409.9 on
+ * the line alone) and the launcher 425.1 against its 425. The sentences of the
+ * read-only and error-line branch are copy in the language chunk both load;
+ * no import walked in. Those two phone budgets move a step of five (login 415,
+ * launcher 430); the other screens stand under theirs.
  */
 const BUDGETS = {
   initial: 245,
