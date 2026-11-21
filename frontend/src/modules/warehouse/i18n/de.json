@@ -2323,5 +2323,9 @@
       "saveFailed": "Der Steuersatz konnte nicht gespeichert werden"
     },
     "countryLoadFailed": "Die Sätze des Landes konnten nicht geladen werden; Sätze lassen sich weiterhin von Hand hinzufügen."
+  },
+  "references": {
+    "stockTake": "Inventur",
+    "recipeProduction": "Rezeptproduktion"
   }
 }

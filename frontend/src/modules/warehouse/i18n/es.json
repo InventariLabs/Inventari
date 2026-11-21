@@ -2323,5 +2323,9 @@
       "saveFailed": "No se pudo guardar el tipo de IVA"
     },
     "countryLoadFailed": "No se pudieron cargar los tipos del país; aún puedes añadir tipos a mano."
+  },
+  "references": {
+    "stockTake": "Inventario",
+    "recipeProduction": "Producción de receta"
   }
 }

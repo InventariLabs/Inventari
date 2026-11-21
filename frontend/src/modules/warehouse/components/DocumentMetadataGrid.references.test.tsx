@@ -1,9 +1,15 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DocumentMetadataGrid } from "./DocumentMetadataGrid";
 import type { WarehouseDocument } from "../types";
+
+const modules = vi.hoisted(() => ({ enabled: [] as string[] }));
+vi.mock("@/contexts/ModulesContext", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/contexts/ModulesContext")>()),
+  useEnabledModulesOptional: () => modules.enabled,
+}));
 
 /**
  * What a document points at, read months later from its own page: the
@@ -14,7 +20,11 @@ const t = (key: string) =>
   ({
     "warehouse:fields.sourceOrder": "Purchase order",
     "warehouse:fields.externalReference": "Reference / related document",
+    "warehouse:references.stockTake": "Stock take",
+    "warehouse:references.recipeProduction": "Recipe production",
   })[key] ?? key;
+
+const ID = "3f2b8c1e-5d4a-4b6f-9e7d-1a2b3c4d5e6f";
 
 function receipt(
   overrides: Partial<WarehouseDocument> = {},
@@ -63,6 +73,10 @@ function renderGrid(doc: WarehouseDocument) {
 }
 
 describe("DocumentMetadataGrid references", () => {
+  beforeEach(() => {
+    modules.enabled = ["stock_takes", "recipes"];
+  });
+
   it("names the purchase order a receipt came from and links to it", () => {
     renderGrid(
       receipt({
@@ -94,5 +108,53 @@ describe("DocumentMetadataGrid references", () => {
     renderGrid(receipt());
 
     expect(screen.queryByText("Purchase order")).toBeNull();
+  });
+
+  it("names a stock take's reference in words and links to its report", () => {
+    renderGrid(
+      receipt({ type: "INTERNAL_IN", external_reference: `stock_take:${ID}` }),
+    );
+
+    expect(screen.getByRole("link", { name: /Stock take/ })).toHaveAttribute(
+      "href",
+      `/inventory/stock-takes/${ID}/report`,
+    );
+    expect(screen.queryByText(new RegExp(ID))).toBeNull();
+  });
+
+  it("names a recipe's cooking in words and links to the recipe", () => {
+    renderGrid(
+      receipt({ type: "INTERNAL_OUT", external_reference: `recipe:${ID}` }),
+    );
+
+    expect(
+      screen.getByRole("link", { name: /Recipe production/ }),
+    ).toHaveAttribute("href", `/recipes/${ID}`);
+  });
+
+  it("names a picking session in words, with no page to open", () => {
+    renderGrid(
+      receipt({ type: "INTERNAL_OUT", external_reference: `picking:${ID}` }),
+    );
+
+    expect(screen.getByText("Recipe production")).toBeVisible();
+    expect(screen.queryByRole("link")).toBeNull();
+    expect(screen.queryByText(new RegExp(ID))).toBeNull();
+  });
+
+  it("offers no page while the module that serves it is off", () => {
+    modules.enabled = [];
+    renderGrid(
+      receipt({ type: "INTERNAL_IN", external_reference: `stock_take:${ID}` }),
+    );
+
+    expect(screen.getByText("Stock take")).toBeVisible();
+    expect(screen.queryByRole("link")).toBeNull();
+  });
+
+  it("keeps a typed reference that only looks like one, as typed", () => {
+    renderGrid(receipt({ external_reference: "stock_take:week 4" }));
+
+    expect(screen.getByText("stock_take:week 4")).toBeVisible();
   });
 });

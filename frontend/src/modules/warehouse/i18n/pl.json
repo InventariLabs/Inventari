@@ -2503,5 +2503,9 @@
       "saveFailed": "Nie udało się zapisać stawki VAT"
     },
     "countryLoadFailed": "Nie udało się wczytać stawek kraju; stawki można nadal dodać ręcznie."
+  },
+  "references": {
+    "stockTake": "Inwentaryzacja",
+    "recipeProduction": "Produkcja z receptury"
   }
 }

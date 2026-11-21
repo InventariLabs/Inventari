@@ -2323,5 +2323,9 @@
       "saveFailed": "The tax rate could not be saved"
     },
     "countryLoadFailed": "The country's rates could not be loaded; rates can still be added by hand."
+  },
+  "references": {
+    "stockTake": "Stock take",
+    "recipeProduction": "Recipe production"
   }
 }

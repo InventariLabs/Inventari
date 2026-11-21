@@ -2235,5 +2235,9 @@
   },
   "floorShelf": {
     "choose": "Escolha um local"
+  },
+  "references": {
+    "stockTake": "Inventário",
+    "recipeProduction": "Produção de receita"
   }
 }

@@ -233,6 +233,13 @@ class TestRegisterPickingAsDocument:
         assert result == str(doc.id)
         assert f'document: {doc.id}' in (session.notes or '')
         mock_create.assert_awaited_once()
+        # The document points at the recipe, which has a page, in a form the
+        # screens read as words; the session has no page and its id is no
+        # help to a reader of the note.
+        data = cast(Any, mock_create.call_args.args[2])
+        assert data.external_reference == f'recipe:{recipe.id}'
+        assert str(session.id) not in data.notes
+        assert recipe.name in data.notes
 
     async def test_recipe_relation_missing_falls_back_to_id(
         self,
