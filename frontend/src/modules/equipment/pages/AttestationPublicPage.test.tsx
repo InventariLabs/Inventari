@@ -254,8 +254,8 @@ describe("AttestationPublicPage — the deadline's date format", () => {
   afterEach(() => setOrganizationCountry(null));
 
   it.each([
-    ["PL", "Please answer by 3 Dec 2026"],
-    ["US", "Please answer by Dec 3, 2026"],
+    ["PL", "Please answer by 3 Jan 2026"],
+    ["US", "Please answer by Jan 3, 2026"],
   ])("prints it for an organization in %s", async (country, sentence) => {
     server.use(
       http.get("/public/attestation/tok-ok", () =>
@@ -263,7 +263,7 @@ describe("AttestationPublicPage — the deadline's date format", () => {
           ...pending,
           organization_name: "Acme",
           organization_country: country,
-          deadline_day: "2026-12-03",
+          deadline_day: "2026-01-03",
         }),
       ),
     );
