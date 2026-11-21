@@ -484,6 +484,16 @@ const dist = join(root, "dist");
  * 645; the other screens stand under theirs (login 407.5, launcher 422.5,
  * receive 475.6, issue 588.4, history 613.2, products 630.6, app first paint
  * 402.7, initial 193.9).
+ *
+ * Re-measured 2026-11-21 on the branch that finishes the warehouse floor
+ * findings of the persona walk: with the development line merged, the history
+ * screen measures 615.0 KiB gz against its 615 (614.0 on the line alone). The
+ * branch adds code as well as copy there: `documentReference.ts`, which names
+ * a document's source (stock take, recipe, picking) in words and which the
+ * history rows import, plus the wording itself in the language chunk. That one
+ * phone budget moves a step of five, to 620; the other screens stand under
+ * theirs (login 408.8, launcher 423.9, start 642.5, receive 478.1, issue
+ * 589.9, products 632.1, app first paint 404.0, initial 193.9).
  */
 const BUDGETS = {
   initial: 245,
