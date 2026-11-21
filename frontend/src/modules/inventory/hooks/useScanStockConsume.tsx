@@ -6,6 +6,7 @@ import { extractApiError } from "@/lib/errors";
 import type { Item, LabelScanView } from "@/types";
 import { ConsumeDialog } from "@/modules/inventory/components/ConsumeDialog";
 import { useScanConsume } from "./useScanActions";
+import { useStockExit } from "./useStockExit";
 
 /**
  * Taking stock off a scanned label: one unit of the record with the nearest
@@ -27,6 +28,7 @@ export function useScanStockConsume(
 } {
   const { t } = useTranslation("scan");
   const consumeMutation = useScanConsume();
+  const stockExit = useStockExit();
   const [askingItem, setAskingItem] = useState<Item | null>(null);
 
   const consumeFrom = useCallback(
@@ -70,12 +72,8 @@ export function useScanStockConsume(
       open
       item={askingItem}
       onConfirm={async (quantity, reason, notes) => {
-        await consumeMutation.mutateAsync({
-          itemId: askingItem.id,
-          quantity,
-          reason,
-          notes,
-        });
+        // The dialog's reason picks the endpoint, as on the product list.
+        await stockExit.mutateAsync(askingItem.id, quantity, reason, notes);
         setAskingItem(null);
         await refreshStockSheet();
       }}

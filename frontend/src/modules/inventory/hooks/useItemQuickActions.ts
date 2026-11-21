@@ -5,6 +5,7 @@ import { CheckCircle, Move, Package, Trash2 } from "lucide-react";
 import { extractApiError } from "@/lib/errors";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { useHasPermission } from "@/hooks/useHasPermission";
+import { useStockExit } from "./useStockExit";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import { toAmount } from "@/utils/formatters";
 import { logger } from "@/utils/logger";
@@ -76,6 +77,7 @@ export function useItemQuickActions(
   const [isDeleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
   const consumeItemMutation = useConsumeItem();
+  const stockExit = useStockExit();
   const deleteItemMutation = useDeleteItem();
   const updateQuantityMutation = useUpdateItemQuantity();
 
@@ -136,14 +138,11 @@ export function useItemQuickActions(
     reason: string,
     notes?: string,
   ) => {
-    // Awaited by the dialog, which stays open on a refusal and says why.
+    // Awaited by the dialog, which stays open on a refusal and says why. The
+    // exit routes a disposal reason to discard and says the result back, as
+    // the product list does.
     try {
-      await consumeItemMutation.mutateAsync({
-        itemId: item.id,
-        quantity,
-        reason,
-        notes,
-      });
+      await stockExit.mutateAsync(item.id, quantity, reason, notes);
     } catch (error: unknown) {
       logger.error("Consume error:", error);
       throw error;

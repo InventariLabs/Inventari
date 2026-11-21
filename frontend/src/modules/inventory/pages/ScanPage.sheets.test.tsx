@@ -441,6 +441,26 @@ describe("ScanPage — the sheets a scan opens, and the ways out of them", () =>
       await screen.findByLabelText("Quantity to remove"),
     ).toBeInTheDocument();
     expect(mocks.consume).not.toHaveBeenCalled();
+
+    // A disposal reason picked there goes to discard, as on the product list.
+    let discarded: unknown = null;
+    server.use(
+      http.patch("/api/v1/items/item-1/discard", async ({ request }) => {
+        discarded = await request.json();
+        return HttpResponse.json({
+          id: "item-1",
+          name: "Copper wire",
+          quantity: "0",
+          is_deleted: false,
+        });
+      }),
+    );
+    await user.selectOptions(screen.getByLabelText("Reason"), "DAMAGED");
+    await user.click(screen.getByRole("button", { name: /^Remove/ }));
+    await waitFor(() =>
+      expect(discarded).toMatchObject({ quantity: 0.5, reason: "DAMAGED" }),
+    );
+    expect(mocks.consume).not.toHaveBeenCalled();
   });
 
   it("goes back, starts the camera and drops the scan context from the camera view", async () => {
