@@ -306,7 +306,7 @@
       "labourTime": "{{minutes}} min według stawki godzinowej",
       "labourRateMissing": "Kroki zajmują {{minutes}} min. Ustaw stawkę godzinową w ustawieniach produkcji, aby wycenić ten czas.",
       "labourRateLink": "Ustawienia produkcji",
-      "labourCountedTwice": "Praca z kroków jest już policzona wyżej; pozycja Robocizna dolicza się do niej."
+      "labourCountedTwice": "Praca z kroków jest już policzona wyżej; Robocizna dolicza się do niej."
     },
     "history": {
       "title": "Historia produkcji",
@@ -643,8 +643,8 @@
     "stockSaveFailed": "Nie udało się zapisać zapasu.",
     "stockSavePartial": "Zapisano {{saved}} z {{total}}. Reszta wciąż jest w arkuszu.",
     "locationsFailed": "Nie udało się wczytać miejsc",
-    "titleUnit": "Jednostka w tej recepturze nie pasuje do zapasu",
-    "unitBody": "Niczego nie brakuje: jednostki nie da się porównać z zapasem. Popraw ją w recepturze: {{names}}.",
+    "titleUnit": "Jednostka w recepturze nie pasuje do zapasu",
+    "unitBody": "Niczego nie brakuje: jednostki nie da się porównać z zapasem. Popraw ją: {{names}}.",
     "onOrder": "Brakująca ilość jest zamówiona:"
   },
   "progress": {
@@ -759,7 +759,7 @@
     "byAt": "{{who}}, {{when}}",
     "print": "Drukuj",
     "failed": "Nie udało się odczytać karty partii.",
-    "costBasis": "Składniki wycenia się wg najstarszych warstw kosztu produktu (FIFO), nie wg ceny partii."
+    "costBasis": "Składniki wycenia się wg warstw kosztu produktu (FIFO), nie wg ceny partii."
   },
   "attachments": {
     "title": "Zdjęcia i pliki",
