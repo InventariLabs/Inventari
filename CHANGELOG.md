@@ -623,6 +623,19 @@ says what the release does rather than what changed since them.
   scrap draft names the write-off instead of "Post this document?", and the
   phone's correction dialog names the document it corrects and wraps a long
   product name.
+- A correction of a receipt that held part of a line back in quarantine
+  offers and accepts only what the shelf can give: the quantity the line's own
+  stock record holds, not the whole quantity received. A correction that cannot
+  be applied is refused before it takes a number, so it stays a draft that can
+  be deleted instead of becoming a numbered correction its author cannot
+  remove, and the refusal names the product in the screen's quantities rather
+  than a record id. A surplus correction is still weighed against everything
+  the line received, the held part included.
+- Saving a BOM's *Process steps* keeps a step that was typed in the add row but
+  never added with *Add step*: it is stored as the last step, with its
+  minutes, instead of vanishing under a success message. Closing the editor
+  with the X while the add row still holds text asks first, and offers to keep
+  editing.
 
 ### Removed
 
