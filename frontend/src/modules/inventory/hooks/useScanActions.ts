@@ -23,7 +23,10 @@ export function useScanConsume() {
       quantity: number;
       reason?: string;
       notes?: string;
-    }) => itemsApi.consume(itemId, quantity, reason, notes),
+    }) =>
+      reason === undefined
+        ? itemsApi.consume(itemId, quantity)
+        : itemsApi.consume(itemId, quantity, reason, notes),
     (qc, updatedItem, { quantity }) => {
       invalidation.items(qc);
       toast.success(
