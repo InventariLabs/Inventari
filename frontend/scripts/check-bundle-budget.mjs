@@ -501,10 +501,17 @@ const dist = join(root, "dist");
  * the language chunk every first paint loads, and one document-level listener;
  * no import walked in. Those two phone budgets move a step of five (issue 595,
  * history 620); the other screens stand under theirs.
+ *
+ * Re-measured 2026-11-21 on the branch that gives read-only accounts their
+ * answers and names the rows its error lines are about, merged with the line
+ * above: the app's first paint measures 405.1 KiB gz against its 405. What
+ * the branch adds is copy in six languages, in the catalogue chunk every
+ * first paint loads; no import walked in. That budget moves a step of five,
+ * to 410; the other budgets stand under theirs.
  */
 const BUDGETS = {
   initial: 245,
-  appFirstPaint: 405,
+  appFirstPaint: 410,
 };
 
 /**
