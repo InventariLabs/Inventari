@@ -93158,7 +93158,8 @@
           "reference_price": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "minimum": 0.0
               },
               {
                 "type": "string"
@@ -93261,7 +93262,8 @@
           "reference_price": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "minimum": 0.0
               },
               {
                 "type": "string"
