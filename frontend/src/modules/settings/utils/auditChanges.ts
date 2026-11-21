@@ -59,6 +59,12 @@ const MAX_DEPTH = 4;
 const IDENTITY_KEYS = ["name", "number"] as const;
 
 /**
+ * The key a create's snapshot names the owning module under. It says which
+ * kind of record the Target column shows, so it is not also a change line.
+ */
+const OWNER_MODULE_KEY = "module_name";
+
+/**
  * The key an update's snapshot uses to say which fields moved.
  *
  * The list is written in field names, not values — `fields: ["brand"]` —
@@ -796,6 +802,7 @@ function flatFields(
         !identityKeys.includes(key) &&
         key !== "before" &&
         key !== "after" &&
+        key !== OWNER_MODULE_KEY &&
         // What an approval stands in front of is the entry's target, named
         // in the Target column by its number; printed here it was JSON.
         key !== APPROVAL_TARGET_KEY &&

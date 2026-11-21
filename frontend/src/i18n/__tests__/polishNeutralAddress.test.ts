@@ -54,5 +54,9 @@ describe("Polish catalogues", () => {
     // The invitation page embeds the name in a sentence of its own.
     expect(plAuth.inviteContext).not.toMatch(/organizacj/i);
     expect(plAuth.inviteContextNoInviter).not.toMatch(/organizacj/i);
+    // The inviter is the subject and the name sits in quotes of its own, so
+    // a name that itself holds a colon still reads as one name.
+    expect(plAuth.inviteContext).toMatch(/^\{\{inviter\}\} zaprasza Cię/);
+    expect(plAuth.inviteContext).toContain("„{{organization}}”");
   });
 });

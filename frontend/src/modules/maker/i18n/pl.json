@@ -571,7 +571,7 @@
     "orders_few": "{{count}} zlecenia",
     "orders_many": "{{count}} zleceń",
     "orders_other": "{{count}} zleceń",
-    "empty": "Na razie nic do pokazania: ukończone zlecenie liczy się, gdy jego receptura ma cenę sprzedaży.",
+    "empty": "Na razie nic do pokazania: zlecenie dostaje wynik, gdy kończy się, a jego receptura ma cenę sprzedaży i każdy składnik ma koszt.",
     "overproduced_one": "{{count}} zlecenie zamknięto powyżej planu; jego wynik liczy dodatkową ilość.",
     "overproduced_other": "{{count}} zleceń zamknięto powyżej planu; ich wynik liczy dodatkową ilość.",
     "overproduced_few": "{{count}} zlecenia zamknięto powyżej planu; ich wynik liczy dodatkową ilość.",

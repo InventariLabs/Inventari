@@ -212,7 +212,7 @@ INVITATION_EMAIL_CONTENT: dict[Language, InvitationEmailContent] = {
     'pl': {
         'subject': 'Zaproszenie: {organization}',
         'greeting': 'Masz zaproszenie!',
-        'body': 'Administrator zaprasza Cię do dołączenia w systemie Inventari: <b>{organization}</b>.',
+        'body': 'Administrator zaprasza Cię do dołączenia — <b>{organization}</b>.',
         'role_line': 'Twoja rola: <b>{role}</b>',
         'action': 'Kliknij w poniższy przycisk, aby przyjąć zaproszenie:',
         'button': 'Przyjmij zaproszenie',

@@ -555,7 +555,7 @@
     "hintSource": "Défini dans les paramètres du module Production",
     "orders_one": "{{count}} opération",
     "orders_other": "{{count}} opérations",
-    "empty": "Rien à afficher pour l'instant : une opération terminée compte dès que sa formule a un prix de vente.",
+    "empty": "Rien à afficher pour l'instant : une opération a un résultat lorsqu'elle est terminée alors que sa formule a un prix de vente et que chaque ingrédient a un coût.",
     "overproduced_one": "{{count}} production a été clôturée au-dessus du plan ; son résultat compte la quantité en plus.",
     "overproduced_other": "{{count}} productions ont été clôturées au-dessus du plan ; leur résultat compte la quantité en plus."
   },

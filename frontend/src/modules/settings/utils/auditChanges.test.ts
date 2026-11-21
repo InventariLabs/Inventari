@@ -1553,6 +1553,17 @@ describe("auditChanges category field definitions", () => {
   });
 });
 
+describe("auditChanges on a creation that names its owning module", () => {
+  it("keeps the module out of the change lines: it says what kind of record the row is", () => {
+    const changes = auditChanges(
+      { name: "Laptop", quantity: 1, module_name: "equipment" },
+      "CREATE",
+    );
+
+    expect(changes.map((change) => change.path)).toEqual(["quantity"]);
+  });
+});
+
 describe("auditChanges on a purchase order", () => {
   // The catalogue helper does not interpolate; the real translator does.
   const lookup = namespacedT({ common: plCommon }) as unknown as (

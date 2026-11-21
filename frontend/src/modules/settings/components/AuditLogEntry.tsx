@@ -156,11 +156,13 @@ export function removedCollectionNames(row: AuditLogEntry): string[] {
  * The kind an entry's Target column names. An asset is a record of the
  * product ledger, so its create and edit entries are written as `item`, while
  * its status changes are `equipment_asset`: one record under two words. A
- * product entry that carries the equipment block reads as the asset it is.
+ * product entry that names the equipment module as its owner (a create) or
+ * carries the equipment block (an edit) reads as the asset it is.
  */
 function targetKindOf(row: AuditLogEntry): string {
   if (row.target_type !== "item") return row.target_type;
   const snapshot = row.snapshot as Record<string, unknown> | null | undefined;
+  if (snapshot?.module_name === "equipment") return "equipment_asset";
   const sides = [snapshot, snapshot?.before, snapshot?.after];
   const isAsset = sides.some((side) => {
     const meta = (side as { meta_data?: unknown } | null | undefined)

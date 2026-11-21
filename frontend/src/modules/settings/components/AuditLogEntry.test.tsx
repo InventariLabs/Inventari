@@ -127,6 +127,17 @@ describe("AuditTarget — the record the row is about", () => {
     expect(screen.queryByText("Product")).not.toBeInTheDocument();
   });
 
+  it("calls a creation that names the equipment module an asset", () => {
+    renderTarget({
+      ...quantityRow(null),
+      action: "CREATE",
+      snapshot: { name: "Laptop", quantity: 1, module_name: "equipment" },
+    });
+
+    expect(screen.getByText("Asset")).toBeInTheDocument();
+    expect(screen.queryByText("Product")).not.toBeInTheDocument();
+  });
+
   it("names an invitation by its address and the role's own name", () => {
     // Filed under the invitation, not the organization: "Night Shift" is the
     // name the organization gave a custom role, which no catalogue carries.

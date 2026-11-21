@@ -79,7 +79,7 @@ export function ImportResultSummary({
               {t("import.errors")}
             </span>
           </div>
-          <p className="text-xs text-red-600 mb-2">
+          <p className="text-xs text-on-muted mb-2">
             {t("common:import.rowsCountedNote")}
           </p>
           <div className="space-y-1 max-h-40 overflow-y-auto">

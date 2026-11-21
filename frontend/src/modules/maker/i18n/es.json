@@ -555,7 +555,7 @@
     "hintSource": "Se configura en los ajustes del módulo Producción",
     "orders_one": "{{count}} producción",
     "orders_other": "{{count}} producciones",
-    "empty": "Aún no hay nada que mostrar: una producción terminada cuenta cuando su fórmula tiene un precio de venta.",
+    "empty": "Aún no hay nada que mostrar: una producción tiene resultado cuando se termina con un precio de venta en su fórmula y un coste en cada ingrediente.",
     "overproduced_one": "{{count}} producción se cerró por encima del plan; su resultado cuenta la cantidad extra.",
     "overproduced_other": "{{count}} producciones se cerraron por encima del plan; su resultado cuenta la cantidad extra."
   },
