@@ -10,6 +10,7 @@ import {
   useCostGapSentence,
 } from "@/modules/maker/components/CostFigure";
 import { BreakdownPieChart } from "@/modules/maker/components/BreakdownPieChart";
+import { overheadParts } from "@/modules/maker/components/overheadParts";
 import { EmptyBomNotice } from "@/modules/maker/components/EmptyBomNotice";
 import { MissingRecipeNotice } from "@/modules/maker/components/MissingRecipeNotice";
 import type { ProductOption } from "@/modules/maker/api/products";
@@ -51,6 +52,7 @@ export function ProductionPreviewSheet({
   // tile, directly above its own note that no rates exist.
   const unpriced = breakdown?.missing_cost_lines.length ?? 0;
   const priced = (breakdown?.entries.length ?? 0) - unpriced;
+  const overheads = breakdown ? overheadParts(breakdown) : [];
 
   return (
     <Sheet
@@ -180,6 +182,39 @@ export function ProductionPreviewSheet({
                 </Card>
               ))}
             </div>
+            {overheads.length > 0 && (
+              // What the total holds besides the ingredients above: without
+              // these the list adds up to less than the figure over it.
+              <div
+                className="space-y-2"
+                data-testid="production-preview-cost-parts"
+              >
+                {overheads.map((part) => (
+                  <Card
+                    key={part.kind}
+                    className="p-4 flex items-center justify-between gap-4"
+                  >
+                    <div className="text-sm font-medium">
+                      {t(
+                        part.kind === "fixed"
+                          ? "pricing.fixedCost"
+                          : "pricing.labourCost",
+                      )}
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-sm font-semibold text-on">
+                        {money(part.cost)}
+                      </div>
+                      {part.percentage && (
+                        <div className="text-xs text-on-muted">
+                          {formatQuantityValue(part.percentage)}%
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>
