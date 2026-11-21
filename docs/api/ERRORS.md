@@ -344,6 +344,7 @@ apart.
 | `DOCUMENT_TYPE_REQUIRES_SOURCE_LOCATION` | This document type needs a source location |
 | `DOCUMENT_TYPE_REQUIRES_TARGET_LOCATION` | This document type needs a target location |
 | `DOCUMENT_UNDO_BLOCKED` | This cannot be undone: {reason} Use Correct to change what is left instead. |
+| `DOCUMENT_UNDO_HELD_GOODS` | This cannot be undone: part of the receipt is held back in quarantine. Use Correct to change what is on the shelf, and deal with the held goods separately. |
 | `DOCUMENT_UNDO_NOTHING_LEFT` | Everything this document posted has already been reversed |
 | `DOCUMENT_UNDO_POSTS_NOTHING` | This document only records goods another step already took — it moved no stock, so there is nothing to undo. |
 | `DOCUMENT_UNDO_REQUIRES_COMPLETED` | Only a posted document can be undone |
@@ -490,6 +491,7 @@ apart.
 | `ORGANIZATION_NOT_FOUND` | Organization not found |
 | `ORGANIZATION_REQUIRED` | Organization required |
 | `OVER_RECEIPT_PAST_CEILING` | Receiving {quantity} against {basis} goes past the {ceiling}% over-receipt ceiling — nobody may receive that much |
+| `OVER_RECEIPT_TOLERANCE_ABOVE_CEILING` | The over-receipt tolerance ({tolerance}%) is above the ceiling ({ceiling}%), so it could never apply. Lower the tolerance or raise the ceiling. |
 | `PACKING_DOCUMENT_NOT_OPEN` | Packages can be changed only while the dispatch is confirmed and not yet completed. A completed dispatch keeps its packages as they were shipped. |
 | `PACKING_EXCEEDS_DONE` | {name}: the packages hold {packed}, more than the {done} this dispatch ships. Take the difference out of the packages first, or complete with the quantity they hold. |
 | `PACKING_EXCEEDS_PICKED` | {name}: only {remaining} picked and not yet packed. A package holds what was picked, and nothing that is already in another package. |
@@ -682,7 +684,7 @@ apart.
 | `STORAGE_ARCHIVE_TARGET_IS_SELF` | Cannot move items into the location being archived. |
 | `STORAGE_CODE_NUMBER_NOT_HERE` | Only an ordinary location can be numbered, not an archived or virtual one |
 | `STORAGE_CODE_PARENT_NOT_NUMBERED` | This location cannot be numbered on its own: the places above it do not carry their template codes yet, or it is deeper than the template goes. Number the level above it first |
-| `STORAGE_CODE_TEMPLATE_INVALID` | The code template '{template}' cannot be used. Write placeholders such as {{zone}}-{{rack:02}}-{{level:02}}, with a separator between them, or a prefix of up to five letters and digits such as LOC |
+| `STORAGE_CODE_TEMPLATE_INVALID` | The code template '{template}' cannot be used. Write placeholders such as {{zone}}-{{rack:02}}-{{level:02}}, with a separator between them, or a prefix of up to five letters and digits such as LOC. The placeholder names are zone, area, section, aisle, row, rack, bay, column, shelf, level, bin, slot |
 | `STORAGE_CODE_TEMPLATE_NOT_TREE` | This warehouse draws random codes: give it a template with placeholders, such as {zone}-{rack:02}-{level:02}, before numbering its locations |
 | `STORAGE_CODE_TEMPLATE_NOT_WAREHOUSE` | A code template belongs to a warehouse, a location at the top of the tree |
 | `STORAGE_DELETE_BLOCKED_BY_CHILD_NAME` | Cannot delete storage location "{location}": its child location "{name}" would end up beside another location with the same name once it moves up a level. Rename one of them first. |

@@ -24,6 +24,7 @@ import {
   usePurchaseOrders,
 } from "@/modules/purchase_orders/hooks/usePurchaseOrders";
 import { usePOConfirmMessage } from "@/modules/purchase_orders/hooks/usePOConfirmMessage";
+import { usePOConfirmRefusalToast } from "@/modules/purchase_orders/hooks/usePOConfirmRefusalToast";
 import type {
   POStatus,
   PurchaseOrder,
@@ -133,6 +134,7 @@ export default function PurchaseOrdersPage() {
   const total = data?.total ?? 0;
   const confirmMutation = useConfirmPurchaseOrder();
   const cancelMutation = useCancelPurchaseOrder();
+  const showConfirmRefusal = usePOConfirmRefusalToast();
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
@@ -164,7 +166,8 @@ export default function PurchaseOrdersPage() {
         toast.success(t("cancelSuccess"));
       }
     } catch (err) {
-      toast.error(extractApiError(err, t("unknownError")));
+      if (actionType === "confirm") showConfirmRefusal(err);
+      else toast.error(extractApiError(err, t("unknownError")));
     } finally {
       setActionId(null);
       setActionType(null);
@@ -267,7 +270,11 @@ export default function PurchaseOrdersPage() {
         confirmLabel={
           actionType === "confirm" ? t("confirm") : t("cancelOrderAction")
         }
-        cancelLabel={t("common:form.cancel")}
+        cancelLabel={
+          actionType === "cancel"
+            ? t("keepOrderAction")
+            : t("common:form.cancel")
+        }
         onConfirm={confirmAction}
         onCancel={() => {
           setActionId(null);

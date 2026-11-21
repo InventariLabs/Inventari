@@ -189,6 +189,9 @@ function contentsText(
     if (summary.full > 0) {
       parts.push(t("occupancy.summary.full", { count: summary.full }));
     }
+    if (summary.over > 0) {
+      parts.push(t("occupancy.summary.over", { count: summary.over }));
+    }
     if (summary.empty > 0) {
       parts.push(t("occupancy.summary.empty", { count: summary.empty }));
     }

@@ -373,4 +373,18 @@ describe("StockTakeCreateModal — a count without a name", () => {
     expect(await screen.findByText("Name is required")).toBeInTheDocument();
     expect(submitted).not.toHaveBeenCalled();
   });
+
+  it("answers a missing name and a missing location the same way, inline", async () => {
+    const user = userEvent.setup();
+    serveLocations([
+      { id: "s-1", name: "Fridge" },
+      { id: "s-2", name: "Freezer" },
+    ]);
+    render(<StockTakeCreateModal isOpen onClose={vi.fn()} />);
+
+    await user.click(await screen.findByRole("button", { name: "Create" }));
+
+    expect(await screen.findByText("Name is required")).toBeInTheDocument();
+    expect(screen.getByText("Select location")).toBeInTheDocument();
+  });
 });

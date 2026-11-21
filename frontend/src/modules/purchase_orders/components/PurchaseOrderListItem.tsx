@@ -159,7 +159,13 @@ interface ReceiptUnitProgress {
 export function buildReceiptProgress(
   po: PurchaseOrderRow,
 ): ReceiptUnitProgress[] | null {
-  if (po.status !== "CONFIRMED" || po.line_count === 0) return null;
+  // A completed order keeps its figure: a blank Received cell on a finished
+  // order reads as "nothing arrived".
+  if (
+    (po.status !== "CONFIRMED" && po.status !== "COMPLETED") ||
+    po.line_count === 0
+  )
+    return null;
   // Summed per unit by the server, in the order the lines first name them.
   const groups = po.unit_progress.map((group) => ({
     unit: group.unit,
@@ -193,7 +199,7 @@ export function ReceiptProgress({
         (group) =>
           `${formatQuantityValue(group.received)}/${formatQuantityValue(
             group.ordered,
-          )} ${unitLabel(t, group.unit) || t("units")}`,
+          )} ${unitLabel(t, group.unit) || t("units", { count: group.ordered })}`,
       )
       .join(" · ");
     return (
@@ -237,7 +243,7 @@ export function ReceiptProgress({
           ? label
           : `${formatQuantityValue(single.received)}/${formatQuantityValue(
               single.ordered,
-            )} ${unitLabel(t, single.unit) || t("units")}`}
+            )} ${unitLabel(t, single.unit) || t("units", { count: single.ordered })}`}
       </span>
     </span>
   );

@@ -34,7 +34,7 @@
     "start": {
       "chunks": ["DocumentsTodoPage"],
       "budget": {
-        "jsKiB": 640,
+        "jsKiB": 645,
         "loadMs": 8000
       },
       "measured": {

@@ -318,6 +318,25 @@ describe("DocumentDetailPage — header actions open what they name", () => {
     expect(seen.props.corrections).toBeUndefined();
   });
 
+  it("offers no undo on a receipt that held part of a line back", () => {
+    // The held goods lie on the quarantine shelf, out of the reversal's reach:
+    // the server refuses the undo, so the page does not offer it.
+    givenDocument({
+      type: "IN",
+      status: "COMPLETED",
+      lines: [
+        documentLine({
+          id: "line-1",
+          document_id: "doc-1",
+          held_quantity: "5",
+        }),
+      ],
+    });
+    renderPage();
+    expect(headerProps().canUndo).toBe(false);
+    expect(screen.getByText(/set aside in quarantine/)).toBeInTheDocument();
+  });
+
   it("opens the return form and closes it", () => {
     givenDocument({ status: "COMPLETED" });
     renderPage();

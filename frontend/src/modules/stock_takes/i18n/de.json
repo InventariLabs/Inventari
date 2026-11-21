@@ -90,7 +90,8 @@
     "placeholder": "Artikel nach Name oder Barcode suchen…",
     "here": "In dieser Inventur",
     "elsewhere": "An anderen Orten der Organisation",
-    "failed": "Die Suche ist fehlgeschlagen, daher wird hier nichts angezeigt. Versuchen Sie es erneut."
+    "failed": "Die Suche ist fehlgeschlagen, daher wird hier nichts angezeigt. Versuchen Sie es erneut.",
+    "noMatch": "Nichts passt zu „{{query}}“. Prüfen Sie Code oder Name oder legen Sie unten ein neues Produkt an."
   },
   "item": {
     "barcode": "Barcode",
@@ -101,7 +102,7 @@
     "increaseCount": "Eins mehr: {{name}}",
     "saveCount": "Zählung speichern: {{name}}",
     "countFor": "Gezählte Menge: {{name}}",
-    "countMalformed": "Das ist keine Zahl. Geben Sie Ziffern mit höchstens einem Dezimalzeichen ein, zum Beispiel 12 oder 1,5.",
+    "countMalformed": "Eine Zählmenge ist null oder mehr: Ziffern mit höchstens einem Dezimalzeichen, zum Beispiel 12 oder 1,5.",
     "unsaved": "Nicht gespeichert",
     "unsavedNeedsCount": "Nicht gespeichert — Menge eintragen zum Speichern",
     "awaitingRecount": "Erneut zählen",
@@ -132,7 +133,8 @@
     "cancel": {
       "title": "Inventur abbrechen",
       "message": "Möchten Sie diese Inventur wirklich abbrechen? Alle Daten gehen verloren.",
-      "confirmLabel": "Inventur abbrechen"
+      "confirmLabel": "Inventur abbrechen",
+      "cancelLabel": "Inventur fortsetzen"
     },
     "overCap": {
       "title": "Deutlich mehr gezählt als im System",

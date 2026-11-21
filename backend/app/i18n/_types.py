@@ -452,6 +452,7 @@ class ErrorMessages(TypedDict):
     product_label_too_narrow: str
     product_label_too_short: str
     product_label_composition_does_not_fit: str
+    over_receipt_tolerance_above_ceiling: str
     storage_code_template_invalid: str
     storage_code_template_not_tree: str
     storage_code_parent_not_numbered: str
@@ -782,6 +783,7 @@ class ErrorMessages(TypedDict):
     document_undo_posts_nothing: str
     document_undo_blocked: str
     document_undo_stock_used: str
+    document_undo_held_goods: str
     document_post_already_posted: str
     document_post_cancelled: str
     document_filter_unknown: str

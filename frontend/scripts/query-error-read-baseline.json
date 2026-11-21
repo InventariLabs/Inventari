@@ -1,0 +1,27 @@
+{
+  "generatedBy": "node scripts/check-query-error-read.mjs --write-baseline",
+  "note": "Failed or still-loading reads rendered as answers. One entry per file and site; a plain run fails on any entry the tree no longer holds as well as on a new one, and --write-baseline is the only writer.",
+  "sites": {
+    "modules/announcements/components/NotificationTray.tsx :: NotificationTray :: unreadCount>0": 1,
+    "modules/equipment/pages/EquipmentDashboardPage.tsx :: EquipmentDashboardPage :: attention.length": 1,
+    "modules/equipment/pages/EquipmentLocationsPage.tsx :: EquipmentLocationsPage :: paged list empty state without isPlaceholderData": 1,
+    "modules/inventory/pages/InventoryDashboard.tsx :: InventoryDashboard :: storageZones.length": 1,
+    "modules/inventory/pages/ItemsPage.tsx :: ItemsPage :: total>0": 1,
+    "modules/inventory/pages/LabelPoolPage.tsx :: LabelPoolPage :: previewLabels.length": 1,
+    "modules/inventory/pages/StockMovesPage.tsx :: StockMovesPage :: total===0": 1,
+    "modules/purchase_orders/components/PricelistEntriesTable.tsx :: PricelistEntriesTable :: entries with isLoading but no failure prop": 1,
+    "modules/purchase_orders/components/ReorderRulesTable.tsx :: ReorderRulesTable :: rules with isLoading but no failure prop": 1,
+    "modules/purchase_orders/pages/ReorderRulesPage.tsx :: ReorderRulesPage :: rules.length": 1,
+    "modules/recipes/components/SuggestedRecipes.tsx :: SuggestedRecipes :: suggestions with isLoading but no failure prop": 1,
+    "modules/recipes/pages/RecipesPage.tsx :: RecipesPage :: allTags.length": 1,
+    "modules/recipes/pages/RecipesPage.tsx :: RecipesPage :: total>0": 1,
+    "modules/recipes/pages/UnlinkedIngredientsPage.tsx :: UnlinkedIngredientsPage :: proposedItems.length": 1,
+    "modules/settings/pages/AuditLogPage.tsx :: AuditLogPage :: rows.length": 1,
+    "modules/shared/components/LineItemsEditor/LineItemSearchDropdown.tsx :: LineItemSearchDropdown :: results with isLoading but no failure prop": 1,
+    "modules/shopping_lists/pages/ShoppingListDetailPage.tsx :: ShoppingListDetailPage :: pending.length": 1,
+    "modules/shopping_lists/pages/ShoppingListDetailPage.tsx :: ShoppingListDetailPage :: purchased.length": 1,
+    "modules/shopping_lists/pages/ShoppingListDetailPage.tsx :: ShoppingListDetailPage :: purchasedItems.length": 1,
+    "modules/warehouse/pages/DocumentsLocationsPage.tsx :: DocumentsLocationsPage :: paged list empty state without isPlaceholderData": 1,
+    "modules/warehouse/pages/DocumentsTodoPage.tsx :: DocumentsTodoPage :: pickableIds.length": 1
+  }
+}

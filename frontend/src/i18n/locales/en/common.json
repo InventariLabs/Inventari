@@ -78,9 +78,9 @@
     "discardCancel": "Keep editing"
   },
   "templates": {
-    "add": "Add Template",
-    "edit": "Edit Template",
-    "create": "Create Template",
+    "add": "Add template",
+    "edit": "Edit template",
+    "create": "Create template",
     "create_first": "Add your first template",
     "name": "Name",
     "type": "Type",

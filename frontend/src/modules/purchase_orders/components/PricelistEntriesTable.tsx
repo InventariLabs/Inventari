@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useMoney } from "@/hooks/useMoney";
-import { formatDate } from "@/utils/formatters";
+import { formatDate, formatQuantityValue } from "@/utils/formatters";
+import { unitLabel } from "@/lib/i18nHelpers";
 import { AlertTriangle, Coins, Pencil, Plus, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -118,6 +119,12 @@ export function PricelistEntriesTable({
                   >
                     {money(entry.unit_price, entry.currency)}
                   </span>
+                  {entry.uom_symbol && (
+                    <span className="text-xs text-on-muted">
+                      {" / "}
+                      {unitLabel(t, entry.uom_symbol)}
+                    </span>
+                  )}
                   {/* Two prices for one offer are two answers to one
                       question. Which of them an order reads was invisible. */}
                   {duplicates.effective.has(entry.id) && (
@@ -139,7 +146,12 @@ export function PricelistEntriesTable({
                     : ` → ${t("common:datePicker.empty")}`}
                 </td>
                 <td className="px-4 py-3 text-on-secondary">
-                  {entry.min_quantity ?? "—"}
+                  {entry.min_quantity != null
+                    ? t("pricelist.fromQuantity", {
+                        quantity: formatQuantityValue(entry.min_quantity),
+                        unit: unitLabel(t, entry.uom_symbol),
+                      }).trim()
+                    : t("pricelist.anyQuantity")}
                 </td>
                 <td className="px-4 py-3">
                   {/* Icon-only, so each carries its words as an

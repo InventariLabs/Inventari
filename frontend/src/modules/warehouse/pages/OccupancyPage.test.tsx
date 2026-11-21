@@ -117,7 +117,9 @@ describe("OccupancyPage — the tree", () => {
     const zone = within(rowOf("Cold"));
     expect(zone.getByText("83% avg.")).toBeInTheDocument();
     expect(
-      zone.getByText("4 locations · 3 with a limit · 2 full · 1 empty"),
+      zone.getByText(
+        "4 locations · 3 with a limit · 1 full · 1 over the limit · 1 empty",
+      ),
     ).toBeInTheDocument();
     // A zone with nothing limited has no average to show.
     expect(within(rowOf("Dry")).queryByText(/avg\./)).not.toBeInTheDocument();

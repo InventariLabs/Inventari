@@ -180,7 +180,8 @@
     "cancelConfirm": {
       "title": "Annuler l'ordre ?",
       "description": "L'annulation marque le brouillon comme annulé. Aucun mouvement de stock.",
-      "confirm": "Oui, annuler"
+      "confirm": "Oui, annuler",
+      "keep": "Garder l'ordre"
     },
     "reverseConfirm": {
       "title": "Annuler cette production ?",

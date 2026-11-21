@@ -44,6 +44,34 @@ const milk: CatalogueSearchResult = {
   is_stub: false,
 };
 
+describe("ReorderRuleFormModal location and safety stock", () => {
+  it("flags a missing location inline instead of leaving it to a toast", async () => {
+    const onSave = renderModal({
+      ...emptyForm,
+      product: milk,
+      minQuantity: "5",
+      maxQuantity: "20",
+    });
+    await userEvent.click(saveButton());
+
+    expect(onSave).not.toHaveBeenCalled();
+    expect(screen.getByText("Select a location")).toBeInTheDocument();
+  });
+
+  it("says the rule fires at the safety stock when that stands above the minimum", () => {
+    renderModal({
+      ...emptyForm,
+      minQuantity: "50",
+      maxQuantity: "200",
+      safetyStock: "80",
+    });
+
+    expect(
+      screen.getByText(/the rule fires below 80, the safety stock/),
+    ).toBeInTheDocument();
+  });
+});
+
 describe("ReorderRuleFormModal validation", () => {
   it("blocks save and flags a missing max quantity", async () => {
     const onSave = renderModal();
@@ -108,6 +136,7 @@ describe("ReorderRuleFormModal validation", () => {
     const onSave = renderModal({
       ...emptyForm,
       product: milk,
+      locationId: "loc-1",
       minQuantity: "5",
       maxQuantity: "20",
     });

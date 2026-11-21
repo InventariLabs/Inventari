@@ -68,7 +68,7 @@ export function POActionDialogs({
         message={t("cancelOrderDescription")}
         variant="danger"
         confirmLabel={t("cancelOrderAction")}
-        cancelLabel={t("common:form.cancel")}
+        cancelLabel={t("keepOrderAction")}
         onConfirm={onConfirm}
         onCancel={onCancel}
       />
