@@ -299,6 +299,13 @@ says what the release does rather than what changed since them.
   (ul. Magazynowa 5, 90-001 Łódź). The subtitle of the period closure screen
   describes the screen instead of inviting an action that a read-only account
   cannot take.
+- The line picker of a delivery, a scrap, a transfer or any other warehouse
+  document now finds stock the way the catalogue picker does: by the product's
+  name, brand, the code on the record or its product card, the label code and
+  the serial number, not by name alone. A one- or two-character fragment
+  matches only the start of a field, so typing `oi` no longer lists
+  `Olive oil` while `Ol` still finds it; a search term of three characters or
+  more still matches anywhere in a field.
 
 ### Fixed
 

@@ -151,6 +151,20 @@ describe("WidgetsPage", () => {
     expect(screen.getByText("Color: Red")).toBeInTheDocument();
   });
 
+  it("keeps the colour dot round beside a name that wraps", () => {
+    // A flex child loses width before its text does, so the dot has to say
+    // it keeps its size next to a name long enough to wrap.
+    const name =
+      "Widget 07 with a long name that keeps going to test wrapping in the card header";
+    setupHooks([{ ...mockWidget, name }]);
+    renderPage();
+
+    const header = screen.getByRole("heading", { name }).closest("div.flex");
+    const dot = header?.querySelector(".rounded-full");
+    expect(dot).not.toBeNull();
+    expect(dot!.className).toContain("shrink-0");
+  });
+
   it("offers colors as a closed set instead of free text", () => {
     setupHooks([]);
     renderPage();

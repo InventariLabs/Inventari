@@ -1403,3 +1403,52 @@ class TestStockSearchTellsRowsApart:
             '2026-10-05': Decimal('4'),
             '2027-01-20': Decimal('1'),
         }
+
+
+@pytest.mark.integration
+class TestThePickerFindsAProductByItsCardCode:
+    """A scanned code lives on the product card, and the picker greps the record.
+
+    A stock picker reads through two queries — the per-record cursor page a
+    transfer names its single record from, and the summed stock summary the
+    documents that pull across records read — so a code that reaches only one
+    of them finds nothing in half the dialogs.
+    """
+
+    @pytest.mark.parametrize('merge', ['false', 'true'])
+    def test_a_code_only_on_the_product_card_finds_the_stock_record(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        db_session: Session,
+        async_engine_fixture: AsyncEngine,
+        doc_org: Organization,
+        doc_source_location: StorageLocation,
+        merge: str,
+    ) -> None:
+        template = ProductTemplate(
+            organization_id=doc_org.id,
+            name='Card code only',
+            barcode='5907777000017',
+            sku='CCO-1',
+        )
+        db_session.add(template)
+        db_session.flush()
+        record = _sow(
+            db_session,
+            async_engine_fixture,
+            doc_org,
+            template,
+            doc_source_location.id,
+            Decimal('4'),
+        )
+        # The premise: the picker has to reach the code through the card.
+        assert record.barcode is None
+
+        response = client.get(
+            '/api/v1/warehouse/product-search',
+            headers=doc_auth_headers,
+            params={'q': '5907777000017', 'stock': 'true', 'merge': merge},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert [row['item_id'] for row in response.json()] == [str(record.id)]

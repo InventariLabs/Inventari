@@ -116,14 +116,24 @@ class TestAuthentication:
         mcp_org: Organization,
         mcp_user: User,
     ) -> None:
+        """A valid key that is missing the permission is not a bad credential.
+
+        A 401 with the Bearer challenge reads as "retry the key", and a
+        `mcp_server:use` spelled without the key form's label is a name the
+        reader cannot find in the interface. The refusal is 403 without a
+        challenge, and its sentence names the permission the way the key form
+        prints it.
+        """
         from app.modules.mcp_server.tests.conftest import issue_key
 
         key = issue_key(db_session, mcp_org, mcp_user, permissions=['items:read'])
 
         response = rpc(client, key, 'tools/list')
 
-        assert response.status_code == 401
+        assert response.status_code == 403
+        assert 'www-authenticate' not in response.headers
         assert response.json()['detail']['code'] == 'MCP_PERMISSION_REQUIRED'
+        assert 'Use the MCP endpoint' in response.json()['detail']['message']
 
     def test_a_disabled_module_refuses_every_key(
         self,

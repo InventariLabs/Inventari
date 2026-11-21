@@ -4,11 +4,13 @@
   "subtitle": "Wo sich ein KI-Agent mit diesem Arbeitsbereich verbindet, welchen API-Schlüssel er sendet und auf welchen Hosts der Endpunkt antwortet.",
   "endpoint": {
     "label": "Endpunkt",
-    "hint": "Richten Sie Ihren MCP-Client auf diese Adresse."
+    "hint": "Richten Sie Ihren MCP-Client auf diese Adresse.",
+    "protocol": "Spricht die Protokollrevision 2026-07-28, mit jeder Anfrage gesendet; ein Client, der mit dem initialize-Handshake beginnt, handelt 2025-11-25 aus."
   },
   "connect": {
     "title": "So verbinden Sie",
     "createKey": "Legen Sie unter API-Schlüssel einen Schlüssel an und geben Sie ihm die Berechtigung MCP-Endpunkt verwenden.",
+    "createKeyNeedsAdmin": "Bitten Sie einen Administrator Ihrer Organisation um einen Schlüssel: Er wird unter API-Schlüssel mit der Berechtigung MCP-Endpunkt verwenden angelegt.",
     "pointClient": "Senden Sie den Schlüssel im Header X-API-Key (oder als Bearer-Token) an die Adresse oben.",
     "allowHost": "Antwortet die Installation unter einer öffentlichen Adresse, tragen Sie deren Host bei den erlaubten Hosts in den Moduleinstellungen ein."
   },
