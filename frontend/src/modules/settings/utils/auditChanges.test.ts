@@ -468,12 +468,14 @@ describe("auditChanges scan session journal", () => {
 });
 
 describe("auditChanges lowercase codes", () => {
-  // `usage: internal` is not a capitalised code, so the renderer reads the
-  // catalogue under the field's own name, `usage_internal`.
+  // `usage: production` is not a capitalised code, so the renderer reads the
+  // catalogue under the field's own name, `usage_production`.
   const catalogue = {
     common: {
       settings: {
-        audit: { values: { usage_internal: "Wewnętrzna", internal: "NOPE" } },
+        audit: {
+          values: { usage_production: "Produkcyjna", internal: "NOPE" },
+        },
       },
     },
   };
@@ -481,13 +483,13 @@ describe("auditChanges lowercase codes", () => {
 
   it("words a lowercase value through its field-scoped key", () => {
     const changes = auditChanges(
-      { usage: "internal" },
+      { usage: "production" },
       "CREATE",
       undefined,
       screenT,
     );
 
-    expect(changes).toEqual([{ path: "usage", from: null, to: "Wewnętrzna" }]);
+    expect(changes).toEqual([{ path: "usage", from: null, to: "Produkcyjna" }]);
   });
 
   it("does not read the bare lowercase value, which would reword free text", () => {
