@@ -21,7 +21,8 @@ interface Props {
   searchHere: Item[];
   /** Hits anywhere else in the organization. */
   searchElsewhere: Item[];
-  searchFailed: boolean;
+  /** What the search of the current query came to, once it has answered. */
+  searchNote: "failed" | "missed" | null;
   /** A code entered (Enter), read by a hardware scanner or by the camera. */
   onSubmitCode: (code: string) => void;
   isAddingNewItem: boolean;
@@ -48,7 +49,7 @@ export default function StockTakeSearchSection({
   onSearchChange,
   searchHere,
   searchElsewhere,
-  searchFailed,
+  searchNote,
   onSubmitCode,
   isAddingNewItem,
   onToggleAddNewItem,
@@ -157,7 +158,12 @@ export default function StockTakeSearchSection({
             )}
           </div>
         )}
-      {searchQuery.length >= 2 && searchFailed && (
+      {searchQuery.length >= 2 && searchNote === "missed" && (
+        <p role="status" className="mt-2 text-sm text-on-secondary">
+          {t("search.noMatch", { query: searchQuery.trim() })}
+        </p>
+      )}
+      {searchQuery.length >= 2 && searchNote === "failed" && (
         <p role="alert" className="mt-2 text-sm text-red-600">
           {t("search.failed")}
         </p>

@@ -222,7 +222,7 @@ export function PutawayMatchFields({
             onChange={(id) => set("location_type_code", id)}
             placeholder={t(
               "putaway.placeholders.location_type",
-              "Optional — select storage type",
+              "Optional — pick a type",
             )}
             searchPlaceholder={t("common:actions.search", "Search")}
           />

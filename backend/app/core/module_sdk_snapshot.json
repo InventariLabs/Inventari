@@ -58,6 +58,17 @@
       "init": [],
       "kind": "class",
       "members": {
+        "check_settings": {
+          "abstract": false,
+          "kind": "method",
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "settings",
+              "required": true
+            }
+          ]
+        },
         "enable_preview": {
           "abstract": false,
           "kind": "method",
@@ -2811,6 +2822,11 @@
         {
           "kind": "KEYWORD_ONLY",
           "name": "default_settings",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "settings_check",
           "required": false
         }
       ]

@@ -310,7 +310,7 @@ describe("StockTakeItemCard — identical records of one product", () => {
     const { rerender } = render(withText("1.5"));
     expect(screen.queryByRole("alert")).toBeNull();
     rerender(withText("1.34.13"));
-    expect(screen.getByRole("alert")).toHaveTextContent("not a number");
+    expect(screen.getByRole("alert")).toHaveTextContent("zero or more");
     expect(
       screen.getByRole("textbox", { name: /Counted quantity/ }),
     ).toHaveAttribute("aria-invalid", "true");

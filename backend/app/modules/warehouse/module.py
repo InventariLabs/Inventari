@@ -180,7 +180,8 @@ DOCUMENTS_SETTINGS_SCHEMA: dict[str, Any] = {
             'description': (
                 'How far past the expected quantity — or past what is left '
                 'on an order line — a receipt may go without the permission '
-                'to receive over tolerance. 0% allows no surplus beyond it.'
+                'to receive over tolerance. 0 means no tolerance: every surplus '
+                'needs the permission.'
             ),
         },
         'over_receipt_ceiling_percent': {
@@ -194,7 +195,8 @@ DOCUMENTS_SETTINGS_SCHEMA: dict[str, Any] = {
             'description': (
                 'How far past the expected quantity — or past what is left on '
                 'an order line — nobody may receive, not even someone who may '
-                'receive over tolerance. 0% sets no ceiling.'
+                'receive over tolerance. 0 means no ceiling. A set ceiling must '
+                'not be below the tolerance.'
             ),
         },
         'scan_session_idle_minutes': {
@@ -216,6 +218,13 @@ DOCUMENTS_SETTINGS_SCHEMA: dict[str, Any] = {
 }
 
 
+def _check_settings(settings: dict[str, Any]) -> None:
+    """The rules between this module's settings, checked on every write."""
+    from ._over_receipt import check_tolerance_below_ceiling
+
+    check_tolerance_below_ceiling(settings)
+
+
 module = define_module(
     router_factory=_get_router,
     interceptors=[_purge_blocker_interceptor()],
@@ -224,6 +233,7 @@ module = define_module(
     register_contributions_hook=_register_scan_provider,
     consumes_stock_quant=True,
     settings_schema=DOCUMENTS_SETTINGS_SCHEMA,
+    settings_check=_check_settings,
     default_settings={
         'over_receipt_tolerance_percent': 0,
         'over_receipt_ceiling_percent': 0,

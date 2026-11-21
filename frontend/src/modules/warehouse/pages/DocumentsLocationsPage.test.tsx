@@ -512,6 +512,34 @@ describe("DocumentsLocationsPage — the shelves of one warehouse", () => {
     });
   });
 
+  it("warns, before saving, that choosing One product moves nothing that already stands there", async () => {
+    serveOverview({ settings: [] });
+    server.use(
+      http.get("/api/v1/warehouse/putaway/occupancy", () =>
+        HttpResponse.json({
+          nodes: [
+            {
+              location_id: "shelf-b",
+              cell: { ...occupancy.locations[1], products: 2 },
+            },
+          ],
+          totals: {},
+        }),
+      ),
+    );
+    render(<DocumentsLocationsPage />);
+
+    await userEvent.click(await screen.findByText("Shelf B"));
+    expect(screen.queryByRole("status")).toBeNull();
+    await userEvent.click(
+      await screen.findByRole("radio", { name: /One product/ }),
+    );
+
+    expect(
+      await screen.findByText(/2 products already stand here/),
+    ).toBeInTheDocument();
+  });
+
   it("numbers the selected shelves in the order shown", async () => {
     const updates: unknown[] = [];
     serveOverview({

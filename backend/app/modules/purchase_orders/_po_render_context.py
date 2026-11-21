@@ -12,7 +12,11 @@ PDF helpers go through ``core_api.pdf`` — no direct
 
 from __future__ import annotations
 
+from datetime import datetime
+from decimal import Decimal
+from types import SimpleNamespace
 from typing import Any
+from uuid import UUID
 
 from app.core.datetimes import format_date_for
 from app.core.money import ZERO, amounts_by_rate, line_amounts
@@ -190,3 +194,44 @@ def build_po_context(
         'currency': po.currency or '',
         'organization_name': po.organization.name if po.organization else '',
     }
+
+
+def example_order() -> SimpleNamespace:
+    """A representative order for the template editor's preview.
+
+    Purely in-memory, shaped like the order ``build_po_context`` reads, so a
+    layout previews on the same keys it prints with.
+    """
+    return SimpleNamespace(
+        id=UUID('00000000-0000-0000-0000-000000000001'),
+        number='PO/2026/0001',
+        currency='EUR',
+        status='CONFIRMED',
+        created_at=datetime(2026, 1, 15, 9, 0),
+        scheduled_date=datetime(2026, 1, 22, 9, 0),
+        notes=None,
+        organization=SimpleNamespace(
+            name='Example Company',
+            tax_id='PL1234567890',
+            address={'street': 'Main 1', 'city': 'Warsaw', 'postal_code': '00-001'},
+            country='PL',
+        ),
+        partner=SimpleNamespace(
+            name='Acme Supplies',
+            tax_id='PL9876543210',
+            address={'street': 'Side 2', 'city': 'Kraków', 'postal_code': '30-001'},
+        ),
+        lines=[
+            SimpleNamespace(
+                name='Example Item',
+                product_template=None,
+                uom=None,
+                quantity_ordered=Decimal('10'),
+                quantity_received=Decimal('0'),
+                unit_price=Decimal('4.50'),
+                tax_rate=Decimal('23'),
+                line_number=1,
+                notes=None,
+            )
+        ],
+    )

@@ -7,6 +7,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { Badge } from "@/components/ui/Badge";
 import { STATUS_COLORS } from "@/modules/purchase_orders/lib/statusColors";
 import { InlineQueryError, QueryError } from "@/components/ui/QueryResult";
+import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { RecordNotFound } from "@/components/ui/RecordNotFound";
 import { isNotFoundError } from "@/lib/errors";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
@@ -27,6 +28,7 @@ import {
   usePOApprovalRequests,
   usePOApprovalWorkflowConfigured,
 } from "../hooks/usePurchaseOrders";
+import { usePOConfirmRefusalToast } from "../hooks/usePOConfirmRefusalToast";
 import type { TargetApprovalRequest as ApprovalRequest } from "@/lib/moduleRegistry";
 import { usePartner } from "@/hooks/usePartners";
 import PurchaseOrderFormModal from "../components/PurchaseOrderFormModal";
@@ -153,6 +155,7 @@ export default function PurchaseOrderDetailPage() {
   // answers it nothing.
   const workflowConfigured = usePOApprovalWorkflowConfigured();
   const confirmMutation = useConfirmPurchaseOrder();
+  const showConfirmRefusal = usePOConfirmRefusalToast();
   const cancelMutation = useCancelPurchaseOrder();
   const sendEmailMutation = useSendPoEmail();
   const downloadPdfMutation = useDownloadPoPdf();
@@ -261,17 +264,16 @@ export default function PurchaseOrderDetailPage() {
 
   const handleConfirm = async () => {
     if (!po) return;
-    await runWithToast(
-      async () => {
-        const updated = await confirmMutation.mutateAsync(po.id);
-        toast.success(
-          updated.status === "PENDING_APPROVAL"
-            ? t("sentForApproval")
-            : t("confirmSuccess"),
-        );
-      },
-      { errorFallback: t("unknownError") },
-    );
+    try {
+      const updated = await confirmMutation.mutateAsync(po.id);
+      toast.success(
+        updated.status === "PENDING_APPROVAL"
+          ? t("sentForApproval")
+          : t("confirmSuccess"),
+      );
+    } catch (err) {
+      showConfirmRefusal(err);
+    }
     setActionType(null);
   };
 
@@ -366,6 +368,7 @@ export default function PurchaseOrderDetailPage() {
 
   return (
     <div className="space-y-6">
+      <ReadOnlyNotice module="purchase_orders" />
       {requestsQuery.isError && approvalsEnabled && (
         <InlineQueryError
           error={requestsQuery.error}

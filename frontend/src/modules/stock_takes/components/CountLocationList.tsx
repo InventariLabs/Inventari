@@ -39,11 +39,14 @@ export function CountLocationList({
   selectedId,
   onSelect,
   onResume,
+  canSelect = true,
 }: {
   places: CountablePlace[];
   selectedId: string | null;
   onSelect: (id: string) => void;
   onResume: (stockTakeId: string) => void;
+  /** An account that may not start a count still reads the list and opens a count under way. */
+  canSelect?: boolean;
 }) {
   const { t } = useTranslation("stock_takes");
   return (
@@ -56,6 +59,7 @@ export function CountLocationList({
               variant="ghost"
               size="content"
               aria-pressed={place.stockTakeId ? undefined : selected}
+              disabled={!place.stockTakeId && !canSelect}
               onClick={() =>
                 place.stockTakeId
                   ? onResume(place.stockTakeId)

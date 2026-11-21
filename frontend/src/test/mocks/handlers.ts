@@ -1643,6 +1643,11 @@ handlers.push(
   http.get("/api/v1/warehouse/putaway/receiving-modes", () =>
     HttpResponse.json(onePage([])),
   ),
+  // The shelf settings panel asks how many products stand on a shelf; the
+  // floor is empty until a test says otherwise.
+  http.get("/api/v1/warehouse/putaway/occupancy", () =>
+    HttpResponse.json({ nodes: [], totals: {} }),
+  ),
   // Configuration and a product's edit form read the tax rates; the
   // organization keeps none, and its country offers none, until a test says
   // otherwise.

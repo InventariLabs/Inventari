@@ -121,7 +121,7 @@ export function WarehouseReceivingSection({ canWrite }: { canWrite: boolean }) {
                   aria-label={t("putaway.receiving.modeFor", {
                     location: warehouse.name,
                   })}
-                  wrapperClassName="w-full sm:w-80"
+                  wrapperClassName="w-full sm:w-96"
                   value={twoStep ? "two" : "one"}
                   disabled={!canWrite || modes === undefined}
                   onChange={(e) =>

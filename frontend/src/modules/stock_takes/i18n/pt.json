@@ -90,7 +90,8 @@
     "placeholder": "Pesquisar item por nome ou código de barras…",
     "here": "Nesta contagem",
     "elsewhere": "Em outros pontos da organização",
-    "failed": "A pesquisa falhou, por isso nada é listado aqui. Tente novamente."
+    "failed": "A pesquisa falhou, por isso nada é listado aqui. Tente novamente.",
+    "noMatch": "Nada corresponde a “{{query}}”. Confira o código ou o nome, ou adicione um produto novo abaixo."
   },
   "item": {
     "barcode": "Código de barras",
@@ -101,7 +102,7 @@
     "increaseCount": "Um {{name}} a mais",
     "saveCount": "Salvar a contagem de {{name}}",
     "countFor": "Quantidade contada de {{name}}",
-    "countMalformed": "Isso não é um número. Digite algarismos com um único separador decimal, por exemplo 12 ou 1,5.",
+    "countMalformed": "Uma quantidade contada é zero ou mais: algarismos com um único separador decimal, por exemplo 12 ou 1,5.",
     "unsaved": "Não salvo",
     "unsavedNeedsCount": "Não salvo — digite uma contagem para salvar",
     "awaitingRecount": "Contar novamente",
@@ -132,7 +133,8 @@
     "cancel": {
       "title": "Cancelar contagem de estoque",
       "message": "Tem certeza de que deseja cancelar esta contagem de estoque? Todos os dados serão perdidos.",
-      "confirmLabel": "Cancelar contagem de estoque"
+      "confirmLabel": "Cancelar contagem de estoque",
+      "cancelLabel": "Continuar a contagem"
     },
     "overCap": {
       "title": "Contado muito acima do que o sistema registra",

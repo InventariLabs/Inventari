@@ -199,7 +199,7 @@ describe("ReorderRulesPage — creating and removing rules", () => {
     });
     fireEvent.click(await screen.findByText("Oat milk"));
     await user.click(within(dialog).getByRole("button", { name: "Save" }));
-    expect(toast.error).toHaveBeenCalledWith("Select a location");
+    expect(await within(dialog).findByText("Select a location")).toBeVisible();
     expect(created).toEqual([]);
 
     await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
