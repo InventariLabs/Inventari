@@ -6864,6 +6864,16 @@
               "kind": "POSITIONAL_OR_KEYWORD",
               "name": "partials",
               "required": false
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "templates_dir",
+              "required": false
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "check_context",
+              "required": false
             }
           ]
         },
@@ -7086,6 +7096,16 @@
             {
               "kind": "KEYWORD_ONLY",
               "name": "user_id",
+              "required": false
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "templates_dir",
+              "required": false
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "check_context",
               "required": false
             }
           ]
