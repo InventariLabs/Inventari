@@ -467,7 +467,9 @@ export default function StorageWizard({
       }}
       onParentChip={(name) => {
         setParentId(null);
-        setParentName(name);
+        setParentName(
+          nameAfterChip(parentName, name, filteredParentSuggestions),
+        );
         setLocationName("");
         setSelectedFields(null);
         setStep(2);
