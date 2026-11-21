@@ -16,6 +16,8 @@ import { toast } from "sonner";
 
 import AppShell from "./AppShell";
 import "@/modules/warehouse/module";
+import "@/modules/inventory/module";
+import "@/modules/spaces/module";
 import { useFormGuardStore } from "@/store/formGuardStore";
 import { SessionEndedError, extractApiError } from "@/lib/errors";
 import { http, HttpResponse } from "msw";
@@ -298,14 +300,39 @@ describe("AppShell — header controls are named by the words they show", () => 
     // A phone's receiving sheet opens on `/warehouse/documents/<id>#receive`;
     // its own Back closes onto the document, and the header's is the way out
     // of it. The segment above a document — `/warehouse/documents` — names no
-    // screen, so climbing to it is the "Page Not Found" a thumb met.
+    // screen, and the module root above it only redirects to History, so the
+    // way out is home.
     const user = userEvent.setup();
     useFormGuardStore.getState().setDirtyForm(null);
     modulesState.enabledModules = ["warehouse"];
     renderShell("/warehouse/documents/d1");
     await user.click(screen.getByRole("button", { name: "Back" }));
     await waitFor(() =>
-      expect(screen.getByTestId("path")).toHaveTextContent(/^\/warehouse$/),
+      expect(screen.getByTestId("path")).toHaveTextContent("/launcher"),
+    );
+  });
+
+  it("leads home from History opened by a link instead of into the root that redirects back", async () => {
+    const user = userEvent.setup();
+    useFormGuardStore.getState().setDirtyForm(null);
+    modulesState.enabledModules = ["warehouse"];
+    renderShell("/warehouse/history");
+    await user.click(screen.getByRole("button", { name: "Back" }));
+    await waitFor(() =>
+      expect(screen.getByTestId("path")).toHaveTextContent("/launcher"),
+    );
+  });
+
+  it("climbs from a location zone to the locations list, not to an id called zone", async () => {
+    const user = userEvent.setup();
+    useFormGuardStore.getState().setDirtyForm(null);
+    modulesState.enabledModules = ["inventory", "spaces"];
+    renderShell("/inventory/locations/zone/z1");
+    await user.click(screen.getByRole("button", { name: "Back" }));
+    await waitFor(() =>
+      expect(screen.getByTestId("path")).toHaveTextContent(
+        /^\/inventory\/locations$/,
+      ),
     );
   });
 
