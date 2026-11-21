@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { Card } from "@/components/ui/Card";
 import { formatNumberLocale, formatQuantityValue } from "@/utils/formatters";
+import { overheadParts } from "@/modules/maker/components/overheadParts";
 import type { CostBreakdownResponse } from "@/modules/maker/types/maker";
 import { EmptyState } from "@/components/ui/EmptyState";
 
@@ -50,19 +51,31 @@ export function BreakdownPieChart({ breakdown }: BreakdownPieChartProps) {
   const { t } = useTranslation("maker");
 
   const slices = useMemo(() => {
-    return breakdown.entries
+    const ingredients = breakdown.entries
       .filter((e) => e.cost !== null)
-      .map((e, idx) => ({
+      .map((e) => ({
         name: e.child_template_name ?? shortTemplateId(e.child_template_id),
         fullId: e.child_template_id,
         value: Number(e.cost ?? "0"),
         percentage: e.percentage_of_total,
-        unit: e.unit,
-        qty: e.consumed_qty,
+      }));
+    // The shares are of the whole total, so fixed costs and labour take their
+    // own slices — a chart of the ingredients alone would not fill the circle.
+    const overheads = overheadParts(breakdown).map((part) => ({
+      name: t(
+        part.kind === "fixed" ? "pricing.fixedCost" : "pricing.labourCost",
+      ),
+      fullId: part.kind,
+      value: Number(part.cost),
+      percentage: part.percentage,
+    }));
+    return [...ingredients, ...overheads]
+      .map((slice, idx) => ({
+        ...slice,
         color: PIE_COLORS[idx % PIE_COLORS.length] as string,
       }))
       .sort((a, b) => b.value - a.value);
-  }, [breakdown]);
+  }, [breakdown, t]);
 
   if (slices.length === 0) {
     return <EmptyState variant="compact" title={t("preview.chart.empty")} />;

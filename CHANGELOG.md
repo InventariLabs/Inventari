@@ -369,7 +369,9 @@ says what the release does rather than what changed since them.
   ingredients. A batch that cost 25.28 a kilogram was priced from 11.28, so
   the suggested price sat below what the run cost; the calculator now lists
   the three parts under the total, and the production preview's total matches
-  the per-unit figure beside it.
+  the per-unit figure beside it. The preview lists the fixed costs and labour
+  under its ingredients, and each line's percentage and the cost-share chart
+  are shares of that whole total.
 - Counting a location that has sub-locations now tells two records of one
   product apart. The count cards and the scan chooser show the expiry of
   items standing on any depth below the counted location, so a scan no longer
@@ -605,6 +607,19 @@ says what the release does rather than what changed since them.
   no longer lost: the document opens on the Packing step with them in its
   Shipping fields, so *Complete dispatch* there does not ship without
   tracking.
+- A correction of a receipt that held part of a line back in quarantine
+  offers and accepts only what the shelf can give: the quantity the line's own
+  stock record holds, not the whole quantity received. A correction that cannot
+  be applied is refused before it takes a number, so it stays a draft that can
+  be deleted instead of becoming a numbered correction its author cannot
+  remove, and the refusal names the product in the screen's quantities rather
+  than a record id. A surplus correction is still weighed against everything
+  the line received, the held part included.
+- Saving a BOM's *Process steps* keeps a step that was typed in the add row but
+  never added with *Add step*: it is stored as the last step, with its
+  minutes, instead of vanishing under a success message. Closing the editor
+  with the X while the add row still holds text asks first, and offers to keep
+  editing.
 
 ### Removed
 
