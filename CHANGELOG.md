@@ -569,6 +569,16 @@ says what the release does rather than what changed since them.
   sheet, and a document with nothing left to return says so instead of
   listing lines. Quantity fields everywhere no longer keep a leading zero: a
   digit typed after a 0 replaces it.
+- The work board no longer counts what was undone. A dispatch that has been
+  undone is not counted in *Orders shipped on the order day* (undoing the
+  only dispatch of the week now reads "No orders shipped yet this week"
+  rather than "1 of 1 this week"), and an undone receipt is left out of
+  *From dock to stock*.
+- A dispatch completed from the picking summary keeps its shipment when the
+  completion fails. The carrier and tracking number typed or scanned there are
+  no longer lost: the document opens on the Packing step with them in its
+  Shipping fields, so *Complete dispatch* there does not ship without
+  tracking.
 
 ### Removed
 

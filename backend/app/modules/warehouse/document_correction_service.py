@@ -414,6 +414,18 @@ async def undo_document(
         )
 
 
+def _refuse_an_undo_of_held_goods(original: Document) -> None:
+    """Refuse the undo of a receipt that held part of a line back.
+
+    The held part was booked on the quarantine shelf under a record of its
+    own, and a reversal reaches only the record the line points at. Taking
+    everything back is therefore not on offer: the reader deals with the held
+    goods and corrects the rest.
+    """
+    if any(line.held_quantity for line in original.lines):
+        raise ServiceRejectionError('document_undo_held_goods')
+
+
 async def _undo_document(
     db: AsyncSession,
     org_id: UUID,
@@ -474,6 +486,7 @@ async def _undo_document(
     # shelf, so the shelf would end up one issue richer than it was.
     if original.stock_already_applied:
         raise ServiceRejectionError('document_undo_posts_nothing')
+    _refuse_an_undo_of_held_goods(original)
 
     # A transfer is reversed through the return service: the goods themselves
     # have to change shelves, and a transfer correction's two movements state

@@ -48,6 +48,8 @@ import {
   cancelReleasesStock,
   mayBePlanned,
   UNDOABLE_DOCUMENT_TYPES,
+  holdsGoodsBack,
+  type WarehouseDocument,
 } from "@/modules/warehouse/types";
 import {
   useDocument,
@@ -398,6 +400,7 @@ function offersUndo(
         status: string;
         reversed_by_id?: string | null;
         stock_already_applied?: boolean;
+        lines?: ReadonlyArray<{ held_quantity?: number | string | null }>;
       }
     | undefined,
   corrections: { status: string }[] | undefined,
@@ -408,9 +411,29 @@ function offersUndo(
   // A document that only records another step's movement posted nothing:
   // there is no stock to take back, and the server refuses the undo.
   if (doc.stock_already_applied) return false;
+  // Goods a receipt held back are on the quarantine shelf, out of the
+  // reversal's reach: the server refuses, so the button is not offered.
+  if (holdsGoodsBack(doc.lines)) return false;
   if (doc.reversed_by_id) return false;
   if (correctionsFailed) return false;
   return !(corrections ?? []).some((c) => c.status !== "CANCELLED");
+}
+
+/**
+ * The Undo button is not offered for a receipt that held goods back; the page
+ * says why where the button would have been.
+ */
+function UndoRefusedNote({ doc }: { doc: WarehouseDocument }) {
+  const { t } = useTranslation("warehouse");
+  if (
+    doc.status !== "COMPLETED" ||
+    !UNDOABLE_DOCUMENT_TYPES.has(doc.type) ||
+    doc.reversed_by_id ||
+    !holdsGoodsBack(doc.lines)
+  ) {
+    return null;
+  }
+  return <p className="text-sm text-on-muted">{t("posted.undoHeldGoods")}</p>;
 }
 
 // Line quantities are counted in the interface language: at most three
@@ -421,7 +444,6 @@ function formatQuantity(value: number): string {
 
 export default function DocumentDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const location = useLocation();
   const { t } = useTranslation("warehouse");
   const [editOpen, setEditOpen] = useState(false);
   const canWrite = useCanWrite("warehouse");
@@ -588,7 +610,7 @@ export default function DocumentDetailPage() {
   // CTA, a scanned printout's #receive/#pick/#execute) — the effects and
   // their reasons live in the hook, the page stays a render.
   useDocumentDetailHashOpen(
-    location.hash,
+    useLocation().hash,
     doc,
     setEditOpen,
     setReceivingOpen,
@@ -631,6 +653,7 @@ export default function DocumentDetailPage() {
   return (
     <div className="space-y-6">
       <ReadOnlyNotice module="warehouse" />
+      <UndoRefusedNote doc={doc} />
       {approval && approval.status === "REJECTED" && (
         <DocumentApprovalRejectedBanner
           approval={speakingApproval(approval, doc.status)}
