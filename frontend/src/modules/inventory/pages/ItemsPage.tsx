@@ -264,10 +264,7 @@ export default function ItemsPage() {
   // empty list is a filter's answer, and the controls stay to undo it.
   const isNarrowed = filters.isNarrowed || activeModuleFilters.length > 0;
 
-  const items = useMemo(
-    () => itemsResponse?.items ?? [],
-    [itemsResponse?.items],
-  );
+  const items = useMemo(() => itemsResponse?.items ?? [], [itemsResponse]);
   const rowPlaces = useRowPlaces(items, filters.storageFilter);
   // Footer sums over the whole filtered set — the same params as the list
   // above minus the paging, so the two can never disagree.

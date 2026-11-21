@@ -2,6 +2,8 @@ import { extractApiError } from "@/lib/errors";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Plus, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
+import type { LabelPool } from "@/types";
 import { downloadBlob } from "@/utils/helpers";
 import {
   useLabels,
@@ -43,6 +45,17 @@ function usePoolLabels(filterStatus: string, offset: number) {
     limit: PAGE_SIZE,
   });
 }
+
+/** The short code of a pool label, for a sentence that names it. */
+const codeOf = (labels: LabelPool[], id: string) =>
+  labels.find((l) => l.id === id)?.short_code ?? "";
+
+/** Why a download failed — a refused size names its field. */
+const downloadFailure = (error: unknown, t: TFunction) =>
+  extractApiError(error, t("errorDownloading"), {
+    width: `${t("previewModal.width")} (mm)`,
+    height: `${t("previewModal.height")} (mm)`,
+  });
 
 export default function LabelPoolPage() {
   const { t } = useTranslation(["labels", "common"]);
@@ -175,11 +188,10 @@ export default function LabelPoolPage() {
   const handleDeleteLabel = useCallback(
     async (id: string, e: React.MouseEvent) => {
       e.stopPropagation();
-      const code = labels.find((l) => l.id === id)?.short_code ?? "";
       if (
         await confirm({
           title: t("common:actions.delete"),
-          message: t("labels:deleteOne", { code }),
+          message: t("labels:deleteOne", { code: codeOf(labels, id) }),
           variant: "danger",
           confirmLabel: t("common:actions.delete"),
         })
@@ -225,12 +237,7 @@ export default function LabelPoolPage() {
       downloadBlob(blob, filename);
       setShowPreview(false);
     } catch (error) {
-      toast.error(
-        extractApiError(error, t("errorDownloading"), {
-          width: `${t("previewModal.width")} (mm)`,
-          height: `${t("previewModal.height")} (mm)`,
-        }),
-      );
+      toast.error(downloadFailure(error, t));
     }
   };
 
