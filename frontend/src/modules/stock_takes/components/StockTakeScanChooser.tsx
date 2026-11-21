@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
 import { Sheet, SheetBody, SheetHeader } from "@/components/ui/Sheet";
-import { formatDate } from "@/utils/formatters";
 import type { Item } from "@/types";
 import type { StockTakeItem } from "../types/stock-takes";
+import { recordMarks } from "../recordMarks";
 
 interface Props {
   rows: StockTakeItem[];
@@ -45,7 +45,7 @@ export default function StockTakeScanChooser({
           {t("scan.chooseHint")}
         </p>
         {rows.map((row) => {
-          const expiry = getItemById(row.item_id ?? "")?.effective_expiry_date;
+          const item = getItemById(row.item_id ?? "");
           return (
             <Button
               key={row.id}
@@ -57,11 +57,7 @@ export default function StockTakeScanChooser({
               <span className="flex flex-col items-start">
                 <span className="font-medium">{row.item_name}</span>
                 <span className="text-sm text-on-secondary">
-                  {[
-                    row.shelf_location,
-                    row.lot_name && t("item.lot", { lot: row.lot_name }),
-                    expiry && t("scan.expires", { date: formatDate(expiry) }),
-                  ]
+                  {[row.shelf_location, ...recordMarks(t, item, row)]
                     .filter(Boolean)
                     .join(" • ")}
                 </span>

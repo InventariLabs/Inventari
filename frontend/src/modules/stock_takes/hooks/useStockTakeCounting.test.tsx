@@ -185,12 +185,22 @@ describe("useStockTakeCounting", () => {
     );
   });
 
-  it("names the row whose count could not be saved", async () => {
+  it("names the row whose count could not be saved, not only its product", async () => {
+    const row = { ...mockStockTake.items[0], item_name: "Honey" };
     server.use(
       http.get("/api/v1/stock-takes/:id", () =>
         HttpResponse.json({
           ...mockStockTake,
-          items: [{ ...mockStockTake.items[0], item_name: "Basmati rice" }],
+          items: [
+            { ...row, shelf_location: "A-1-01", lot_name: "LOT-A" },
+            {
+              ...row,
+              id: "sti-2",
+              item_id: "item-2",
+              shelf_location: "B-2-02",
+              lot_name: "LOT-B",
+            },
+          ],
         }),
       ),
       http.patch("/api/v1/stock-takes/:id/items/:itemId/count", () =>
@@ -200,15 +210,15 @@ describe("useStockTakeCounting", () => {
 
     const { result } = await renderLoaded();
     act(() => {
-      result.current.handleQuantityChange("item-1", "7");
+      result.current.handleQuantityChange("item-2", "7");
     });
     act(() => {
-      result.current.handleSaveItem("item-1");
+      result.current.handleSaveItem("item-2");
     });
 
     await waitFor(() =>
       expect(toast.error).toHaveBeenCalledWith(
-        "Failed to save the count of Basmati rice",
+        "Failed to save the count of Honey (B-2-02 • Batch LOT-B)",
       ),
     );
   });

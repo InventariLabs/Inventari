@@ -19,6 +19,7 @@ import type { StockTakeItem } from "@/modules/stock_takes/types/stock-takes";
 import { toast } from "sonner";
 import { useConfirm } from "@/hooks/useConfirm";
 import { reasonIsComplete } from "@/modules/shared/components/ReasonCodeField";
+import { recordMarks } from "@/modules/stock_takes/recordMarks";
 import { useCountingDrafts } from "@/modules/stock_takes/hooks/useCountingDrafts";
 import { useShelfCounting } from "@/modules/stock_takes/hooks/useShelfCounting";
 import {
@@ -170,17 +171,27 @@ function useSavesInFlight(
 }
 
 /** What a refused count says: the server's own sentence, else a generic one
- * that names the row, because the toast outlives the card the reader is on. */
+ * that names the row — its product, then its shelf, batch and expiry, which
+ * tell it from its siblings under one code — because the toast outlives the
+ * card the reader is on. */
 function saveFailureMessage(
   t: TFunction,
   error: Error,
-  name: string | undefined,
+  line: StockTakeItem | undefined,
+  item: Item | undefined,
 ): string {
+  if (!line?.item_name) {
+    return extractApiError(error, t("stock_takes:errors.saveFailed"));
+  }
+  const marks = [line.shelf_location, ...recordMarks(t, item, line)].filter(
+    Boolean,
+  );
+  const name = marks.length
+    ? `${line.item_name} (${marks.join(" • ")})`
+    : line.item_name;
   return extractApiError(
     error,
-    name
-      ? t("stock_takes:errors.saveFailedFor", { name })
-      : t("stock_takes:errors.saveFailed"),
+    t("stock_takes:errors.saveFailedFor", { name }),
   );
 }
 
@@ -366,7 +377,7 @@ export function useStockTakeCounting(id: string | undefined) {
         [itemId]: countedText(line?.counted_quantity),
       }));
       setNotes((prev) => ({ ...prev, [itemId]: line?.notes ?? "" }));
-      toast.error(saveFailureMessage(t, error, line?.item_name));
+      toast.error(saveFailureMessage(t, error, line, getItemById(itemId)));
     };
 
     const write = async () => {
