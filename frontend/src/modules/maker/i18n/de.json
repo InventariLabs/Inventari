@@ -405,7 +405,7 @@
     "yieldConfirm": {
       "title": "Ändern, was diese Formel ergibt?"
     },
-    "openDraftsChange": "Offene Entwürfe, die diese Formel lesen und sich mit ihr ändern: {{count}}."
+    "openDraftsChange": "Offene Entwürfe, die diese Formel lesen und sich mit ihr ändern: {{number}}."
   },
   "tree": {
     "title": "Mehrstufige Formel",

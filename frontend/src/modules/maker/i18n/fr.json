@@ -405,7 +405,7 @@
     "yieldConfirm": {
       "title": "Modifier ce que produit cette formule ?"
     },
-    "openDraftsChange": "Brouillons ouverts qui lisent cette formule et changent avec elle : {{count}}."
+    "openDraftsChange": "Brouillons ouverts qui lisent cette formule et changent avec elle : {{number}}."
   },
   "tree": {
     "title": "Nomenclature multi-niveaux",

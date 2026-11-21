@@ -405,7 +405,7 @@
     "yieldConfirm": {
       "title": "¿Cambiar lo que produce esta fórmula?"
     },
-    "openDraftsChange": "Borradores abiertos que leen esta fórmula y cambian con ella: {{count}}."
+    "openDraftsChange": "Borradores abiertos que leen esta fórmula y cambian con ella: {{number}}."
   },
   "tree": {
     "title": "Lista de materiales multinivel",

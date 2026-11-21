@@ -134,7 +134,7 @@ export function BatchYieldEditor({ recipe }: BatchYieldEditorProps) {
       <ConfirmDialog
         open={confirming}
         title={t("composition.yieldConfirm.title")}
-        message={t("composition.openDraftsChange", { count: openDrafts })}
+        message={t("composition.openDraftsChange", { number: openDrafts })}
         confirmLabel={t("common:actions.save")}
         onConfirm={() => void saveYield()}
         onCancel={() => setConfirming(false)}

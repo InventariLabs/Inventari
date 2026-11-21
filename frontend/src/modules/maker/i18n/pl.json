@@ -411,7 +411,7 @@
     "yieldConfirm": {
       "title": "Zmienić, ile powstaje z tej receptury?"
     },
-    "openDraftsChange": "Otwarte szkice czytające tę recepturę: {{count}}."
+    "openDraftsChange": "Otwarte szkice czytające tę recepturę: {{number}}."
   },
   "tree": {
     "title": "Wielopoziomowy BOM",

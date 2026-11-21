@@ -72,8 +72,8 @@
       "description": "Programmatischer Zugriff über REST-API-Schlüssel."
     },
     "maker": {
-      "name": "Fertigung",
-      "description": "Fertigungs- und Stücklistenverwaltung."
+      "name": "Produktion",
+      "description": "Produktions- und Formelverwaltung."
     },
     "items": {
       "name": "Inventar"

@@ -405,7 +405,7 @@
     "yieldConfirm": {
       "title": "Change what this BOM makes?"
     },
-    "openDraftsChange": "Open drafts that read this BOM and change with it: {{count}}."
+    "openDraftsChange": "Open drafts that read this BOM and change with it: {{number}}."
   },
   "tree": {
     "title": "Multi-level BOM",
