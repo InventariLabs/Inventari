@@ -550,7 +550,9 @@
     "plannedRuleWarning": {
       "archived": "Une règle correspondante vise un emplacement archivé ({{rule}}) — non appliquée ; la ligne ira en {{location}}",
       "not_internal": "Une règle correspondante vise un emplacement virtuel ({{rule}}) — non appliquée ; la ligne ira en {{location}}",
-      "refused": "Un module a exclu chaque emplacement d'une règle correspondante ({{rule}}) pour ces marchandises — non appliquée ; la ligne ira en {{location}}"
+      "refused": "Un module a exclu chaque emplacement d'une règle correspondante ({{rule}}) pour ces marchandises — non appliquée ; la ligne ira en {{location}}",
+      "receiving": "Une règle correspondante vise une zone de réception ({{rule}}) — non appliquée ; la ligne ira en {{location}}",
+      "quarantine": "Une règle correspondante vise l'emplacement de quarantaine ({{rule}}) — non appliquée ; la ligne ira en {{location}}"
     },
     "lineTargetLabel": "Destination de la ligne",
     "lineTargetFollowPlan": "Selon le plan (règle / document)",
@@ -1101,6 +1103,13 @@
       "active": "Actif",
       "inactive": "Inactif",
       "targetInactive": "Cible inactive",
+      "shelfHeld": {
+        "archived": "Archivé",
+        "not_internal": "Emplacement virtuel",
+        "receiving": "Zone de réception — retenu",
+        "quarantine": "Quarantaine — retenu"
+      },
+      "shelfHeldNamed": "{{name}} : {{reason}}",
       "moreShelves_one": "+{{count}} autre emplacement s’il est plein",
       "moreShelves_other": "+{{count}} autres emplacements s’il est plein"
     },
@@ -1373,7 +1382,10 @@
       "plannedByRule": "règle : {{rule}}",
       "plannedWarning": {
         "archived": "Règle ignorée — son emplacement est archivé",
-        "not_internal": "Règle ignorée — son emplacement est virtuel"
+        "not_internal": "Règle ignorée — son emplacement est virtuel",
+        "refused": "Règle ignorée — un module a exclu ses emplacements pour ces marchandises",
+        "receiving": "Règle ignorée — son emplacement est une zone de réception",
+        "quarantine": "Règle ignorée — son emplacement est la quarantaine"
       }
     },
     "short": {

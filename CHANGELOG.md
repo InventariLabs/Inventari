@@ -297,6 +297,9 @@ says what the release does rather than what changed since them.
   phone says the task is now yours and offers to give it back. The launcher
   tile is called "Browse Modules", like the page it opens, and the toast after
   Replenish names the shopping list it filled and opens it.
+- Counting a location that has sub-locations now offers, in the bar of
+  products outside the stock take, a product received onto a sub-location
+  after the count started, as counting that sub-location itself does.
 - A production recipe's reference price can no longer be negative. Creating
   or changing a recipe with one is refused with a message naming the field,
   instead of being stored and understating the result per unit of every run

@@ -23862,6 +23862,8 @@ export interface components {
              * @default true
              */
             active: boolean;
+            /** Unavailable Reason */
+            unavailable_reason?: string | null;
         };
         /** PutawayRuleOut */
         PutawayRuleOut: {

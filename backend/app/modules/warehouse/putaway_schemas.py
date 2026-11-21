@@ -75,6 +75,9 @@ class PutawayRuleLocationOut(BaseModel):
     # False when the shelf cannot take goods right now — archived, or one
     # of the virtual counterparts. The resolver skips such a shelf.
     active: bool = True
+    # Why such a shelf takes none: ``archived``, ``not_internal``,
+    # ``receiving`` or ``quarantine``. ``None`` while it takes goods.
+    unavailable_reason: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
