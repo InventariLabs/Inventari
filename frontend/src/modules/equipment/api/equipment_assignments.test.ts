@@ -39,7 +39,7 @@ describe("fetchProtocolHtml — a refusal through the text transport", () => {
   it("keeps the caller's fallback when the body is not JSON", async () => {
     server.use(
       http.get("*/equipment/assignments/:assignmentId/protocol/html", () =>
-        HttpResponse.text("<html>gateway says no</html>", { status: 502 }),
+        HttpResponse.text("<html>gateway says no</html>", { status: 500 }),
       ),
     );
 
