@@ -29,7 +29,7 @@ export function RemoveIngredientDialog({
       open={line !== null}
       title={t("composition.removeConfirm.title")}
       message={
-        openDrafts > 0
+        openDrafts !== null && openDrafts > 0
           ? `${question} ${t("composition.openDraftsChange", { number: openDrafts })}`
           : question
       }

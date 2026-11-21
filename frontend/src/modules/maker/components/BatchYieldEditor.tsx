@@ -47,7 +47,7 @@ export function BatchYieldEditor({ recipe }: BatchYieldEditorProps) {
       toast.error(t("composition.errors.yieldInvalid"));
       return;
     }
-    if (openDrafts > 0) setConfirming(true);
+    if (openDrafts !== null && openDrafts > 0) setConfirming(true);
     else void saveYield();
   }
 
