@@ -334,6 +334,7 @@ describe("DocumentDetailPage — header actions open what they name", () => {
     });
     renderPage();
     expect(headerProps().canUndo).toBe(false);
+    expect(screen.getByText(/held back in quarantine/)).toBeInTheDocument();
   });
 
   it("opens the return form and closes it", () => {

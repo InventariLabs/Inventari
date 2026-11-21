@@ -145,11 +145,10 @@ export function PostedActionResult({
     requested === "issue" && document.type === "SCRAP" ? "writeOff" : requested;
   const pending = document.status === "PENDING_APPROVAL";
   const count = lineCount ?? document.lines?.length ?? 0;
-  const canUndo =
-    !pending &&
-    !reversal &&
-    UNDOABLE_DOCUMENT_TYPES.has(document.type) &&
-    !holdsGoodsBack(document.lines);
+  const undoable =
+    !pending && !reversal && UNDOABLE_DOCUMENT_TYPES.has(document.type);
+  const heldBack = undoable && holdsGoodsBack(document.lines);
+  const canUndo = undoable && !heldBack;
   // Once the reversal is posted the heading and the sentence under it tell
   // the undo: "Issued 1 line — the goods have left stock" above "Undone"
   // said two opposite things. An undo waiting for approval has moved
@@ -243,6 +242,12 @@ export function PostedActionResult({
         </Button>
         {extraActions}
       </div>
+
+      {heldBack && (
+        <p className="border-t border-border pt-4 text-sm text-on-muted">
+          {t("posted.undoHeldGoods")}
+        </p>
+      )}
 
       {canUndo && (
         <div className="space-y-2 border-t border-border pt-4">

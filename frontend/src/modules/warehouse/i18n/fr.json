@@ -2230,7 +2230,8 @@
     "print": "Imprimer {{number}}",
     "undoHintReceive": "Annuler retire à nouveau la marchandise du stock et écrit une correction de {{number}}. Rien ne disparaît de l'historique.",
     "undoHintIssue": "Annuler remet la marchandise en stock et écrit une correction de {{number}}. Rien ne disparaît de l'historique.",
-    "undoHintMove": "Annuler ramène la marchandise et écrit un retour de {{number}}. Rien ne disparaît de l'historique."
+    "undoHintMove": "Annuler ramène la marchandise et écrit un retour de {{number}}. Rien ne disparaît de l'historique.",
+    "undoHeldGoods": "Annuler n'est pas possible : une partie de cette réception est retenue en quarantaine. Utilisez Corriger pour modifier ce qui est sur l'étagère, et traitez la marchandise retenue séparément."
   },
   "board": {
     "title": "Tableau de travail",

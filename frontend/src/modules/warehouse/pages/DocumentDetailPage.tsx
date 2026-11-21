@@ -418,6 +418,23 @@ function offersUndo(
   return !(corrections ?? []).some((c) => c.status !== "CANCELLED");
 }
 
+/**
+ * The Undo button is not offered for a receipt that held goods back; the page
+ * says why where the button would have been.
+ */
+function UndoRefusedNote({ doc }: { doc: WarehouseDocument }) {
+  const { t } = useTranslation("warehouse");
+  if (
+    doc.status !== "COMPLETED" ||
+    !UNDOABLE_DOCUMENT_TYPES.has(doc.type) ||
+    doc.reversed_by_id ||
+    !holdsGoodsBack(doc.lines)
+  ) {
+    return null;
+  }
+  return <p className="text-sm text-on-muted">{t("posted.undoHeldGoods")}</p>;
+}
+
 // Line quantities are counted in the interface language: at most three
 // decimals, and the mark a reader of that language writes.
 function formatQuantity(value: number): string {
@@ -636,6 +653,7 @@ export default function DocumentDetailPage() {
   return (
     <div className="space-y-6">
       <ReadOnlyNotice module="warehouse" />
+      <UndoRefusedNote doc={doc} />
       {approval && approval.status === "REJECTED" && (
         <DocumentApprovalRejectedBanner
           approval={speakingApproval(approval, doc.status)}
