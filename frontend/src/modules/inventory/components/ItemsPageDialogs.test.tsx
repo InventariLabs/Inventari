@@ -63,6 +63,6 @@ describe("ItemsPageDialogs — the bulk delete", () => {
     chooseReasonAndDelete();
 
     await waitFor(() => expect(onBulkDelete).toHaveBeenCalledTimes(1));
-    expect(onBulkDelete).toHaveBeenCalledWith(["a", "b"], "EXPIRED", "");
+    expect(onBulkDelete).toHaveBeenCalledWith("EXPIRED", "");
   });
 });

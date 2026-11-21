@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -29,7 +29,6 @@ interface UseItemsPageActionsParams {
   storages?: StorageLocationSummary[];
   setConsumeDialogItem: (item: Item | null) => void;
   setDeleteReasonItem: (item: Item | null) => void;
-  setBulkDeleteIds: (ids: string[] | null) => void;
 }
 
 /**
@@ -44,7 +43,6 @@ export function useItemsPageActions({
   storages,
   setConsumeDialogItem,
   setDeleteReasonItem,
-  setBulkDeleteIds,
 }: UseItemsPageActionsParams) {
   const { t } = useTranslation(["items", "labels", "common"]);
   const navigate = useNavigate();
@@ -222,29 +220,38 @@ export function useItemsPageActions({
   /** Deleting a whole selection asks why once, for the batch, in the dialog
    * the single delete uses: every archived row then carries the reason it was
    * given instead of none. */
-  const handleBulkDelete = useCallback(
-    (ids: string[]) => {
-      if (ids.length > 0) setBulkDeleteIds(ids);
-    },
-    [setBulkDeleteIds],
-  );
-
+  const [bulk, setBulk] = useState<{
+    ids: string[];
+    onDone?: () => void;
+  } | null>(null);
+  const handleBulkDelete = useCallback((ids: string[], onDone?: () => void) => {
+    if (ids.length > 0) setBulk({ ids, onDone });
+  }, []);
   /** The batch's delete, run once the reason is chosen. A refusal propagates,
    * so the dialog stays up with the reason and note as typed. */
-  const confirmBulkDelete = useCallback(
-    async (ids: string[], reason: string, notes: string) => {
-      await Promise.all(
-        ids.map((itemId) =>
-          deleteItemMutation.mutateAsync({
-            itemId,
-            reason,
-            notes: notes || undefined,
-          }),
-        ),
-      );
-      toast.success(t("items:messages.itemDeleted", { count: ids.length }));
-    },
-    [t, deleteItemMutation],
+  const bulkDelete = useMemo(
+    () => ({
+      ids: bulk?.ids ?? null,
+      cancel: () => setBulk(null),
+      mutateAsync: async (reason: string, notes: string) => {
+        if (!bulk) return;
+        await Promise.all(
+          bulk.ids.map((itemId) =>
+            deleteItemMutation.mutateAsync({
+              itemId,
+              reason,
+              notes: notes || undefined,
+            }),
+          ),
+        );
+        toast.success(
+          t("items:messages.itemDeleted", { count: bulk.ids.length }),
+        );
+        bulk.onDone?.();
+        setBulk(null);
+      },
+    }),
+    [bulk, t, deleteItemMutation],
   );
 
   const updateQuantityMutation = useUpdateItemQuantity();
@@ -305,7 +312,7 @@ export function useItemsPageActions({
     handleDelete,
     handleSwipeDelete,
     handleBulkDelete,
-    confirmBulkDelete,
+    bulkDelete,
     handleExport,
   };
 }

@@ -69,8 +69,6 @@ type ToastOptions = {
   action?: { label: string; onClick: () => void };
 };
 
-const setBulkDeleteIds = vi.fn();
-
 function renderActions() {
   return renderHook(
     () =>
@@ -80,7 +78,6 @@ function renderActions() {
         exportParams: {},
         setConsumeDialogItem: vi.fn(),
         setDeleteReasonItem: vi.fn(),
-        setBulkDeleteIds,
       }),
     {
       wrapper: ({ children }: { children: React.ReactNode }) => (
@@ -236,7 +233,7 @@ describe("useItemsPageActions — a swipe carries no reason, a bulk delete asks 
       result.current.handleBulkDelete(["item-1", "item-2"]);
     });
 
-    expect(setBulkDeleteIds).toHaveBeenCalledWith(["item-1", "item-2"]);
+    expect(result.current.bulkDelete.ids).toEqual(["item-1", "item-2"]);
     expect(mocks.deleteMutateAsync).not.toHaveBeenCalled();
   });
 
@@ -247,21 +244,21 @@ describe("useItemsPageActions — a swipe carries no reason, a bulk delete asks 
       result.current.handleBulkDelete([]);
     });
 
-    expect(setBulkDeleteIds).not.toHaveBeenCalled();
+    expect(result.current.bulkDelete.ids).toBeNull();
   });
 
   it("deletes every row of the batch with the one reason it was given", async () => {
     const toastSuccess = vi
       .spyOn(toast, "success")
       .mockImplementation(() => "");
+    const onDone = vi.fn();
     const { result } = renderActions();
+    act(() => {
+      result.current.handleBulkDelete(["item-1", "item-2"], onDone);
+    });
 
     await act(async () => {
-      await result.current.confirmBulkDelete(
-        ["item-1", "item-2"],
-        "EXPIRED",
-        "",
-      );
+      await result.current.bulkDelete.mutateAsync("EXPIRED", "");
     });
 
     const variables = mocks.deleteMutateAsync.mock.calls.map(
@@ -273,6 +270,8 @@ describe("useItemsPageActions — a swipe carries no reason, a bulk delete asks 
     ]);
     // A bulk delete names the count, not one product's word for a whole selection.
     expect(toastSuccess).toHaveBeenCalledWith("2 products deleted");
+    expect(onDone).toHaveBeenCalledTimes(1);
+    expect(result.current.bulkDelete.ids).toBeNull();
   });
 
   it("hands a refused bulk delete back to the dialog that asked", async () => {
@@ -282,10 +281,14 @@ describe("useItemsPageActions — a swipe carries no reason, a bulk delete asks 
       .spyOn(toast, "success")
       .mockImplementation(() => "");
     const { result } = renderActions();
+    act(() => {
+      result.current.handleBulkDelete(["item-1"]);
+    });
 
     await expect(
-      result.current.confirmBulkDelete(["item-1"], "LOST", "note"),
+      result.current.bulkDelete.mutateAsync("LOST", "note"),
     ).rejects.toBe(refusal);
     expect(toastSuccess).not.toHaveBeenCalled();
+    expect(result.current.bulkDelete.ids).toEqual(["item-1"]);
   });
 });

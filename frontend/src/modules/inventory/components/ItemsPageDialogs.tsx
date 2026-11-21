@@ -11,7 +11,7 @@ interface Props {
   /** The selection a bulk delete is asking a reason for, or null. */
   bulkDeleteIds: string[] | null;
   /** Returning a promise keeps the dialog open until the delete settles. */
-  onBulkDelete: (ids: string[], reason: string, notes: string) => unknown;
+  onBulkDelete: (reason: string, notes: string) => unknown;
   onBulkDeleteCancel: () => void;
   consumeDialogItem: Item | null;
   onConsume: (
@@ -63,9 +63,7 @@ export function ItemsPageDialogs({
         itemName=""
         title={t("messages.confirmBulkDelete", { count: bulkCount })}
         message={t("messages.confirmBulkDeleteBody", { count: bulkCount })}
-        onConfirm={(reason, notes) =>
-          bulkDeleteIds ? onBulkDelete(bulkDeleteIds, reason, notes) : undefined
-        }
+        onConfirm={onBulkDelete}
         onCancel={onBulkDeleteCancel}
       />
 

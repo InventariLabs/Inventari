@@ -202,7 +202,6 @@ export default function ItemsPage() {
   const [thresholdItem, setThresholdItem] = useState<Item | null>(null);
   const [consumeDialogItem, setConsumeDialogItem] = useState<Item | null>(null);
   const [deleteReasonItem, setDeleteReasonItem] = useState<Item | null>(null);
-  const [bulkDeleteIds, setBulkDeleteIds] = useState<string[] | null>(null);
 
   const filters = useItemFilters();
 
@@ -330,7 +329,7 @@ export default function ItemsPage() {
     handleDelete,
     handleSwipeDelete,
     handleBulkDelete,
-    confirmBulkDelete,
+    bulkDelete,
     handleExport,
   } = useItemsPageActions({
     items,
@@ -339,7 +338,6 @@ export default function ItemsPage() {
     storages: rowPlaces.storages,
     setConsumeDialogItem,
     setDeleteReasonItem,
-    setBulkDeleteIds,
   });
 
   useEffect(() => {
@@ -398,13 +396,9 @@ export default function ItemsPage() {
           setDeleteReasonItem(null);
         }}
         onDeleteCancel={() => setDeleteReasonItem(null)}
-        bulkDeleteIds={bulkDeleteIds}
-        onBulkDelete={async (ids, reason, notes) => {
-          await confirmBulkDelete(ids, reason, notes);
-          setSelectedItemIds([]);
-          setBulkDeleteIds(null);
-        }}
-        onBulkDeleteCancel={() => setBulkDeleteIds(null)}
+        bulkDeleteIds={bulkDelete.ids}
+        onBulkDelete={bulkDelete.mutateAsync}
+        onBulkDeleteCancel={bulkDelete.cancel}
         consumeDialogItem={consumeDialogItem}
         onConsume={async (item, quantity, reason, notes) => {
           await consumeMutation.mutateAsync(item.id, quantity, reason, notes);
@@ -591,7 +585,9 @@ export default function ItemsPage() {
         isPendingDelete={deleteMutation.isPending}
         onClearSelection={() => setSelectedItemIds([])}
         onBulkEdit={() => setShowBulkEdit(true)}
-        onBulkDelete={() => handleBulkDelete(selectedItemIds)}
+        onBulkDelete={() =>
+          handleBulkDelete(selectedItemIds, () => setSelectedItemIds([]))
+        }
       />
 
       <ItemsModalsContainer
