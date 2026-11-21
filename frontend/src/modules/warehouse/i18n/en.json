@@ -2231,7 +2231,7 @@
     "undoHintReceive": "Undo takes the goods off stock again and writes a correction to {{number}}. Nothing disappears from the history.",
     "undoHintIssue": "Undo puts the goods back in stock and writes a correction to {{number}}. Nothing disappears from the history.",
     "undoHintMove": "Undo moves the goods back and writes a return to {{number}}. Nothing disappears from the history.",
-    "undoHeldGoods": "Undo is not available: part of this receipt is held back in quarantine. Use Correct to change what is on the shelf, and deal with the held goods separately."
+    "undoHeldGoods": "Undo is not available: part of this receipt was set aside in quarantine. Use Correct to change what is in stock, and deal with the quarantined goods separately."
   },
   "board": {
     "title": "Work board",

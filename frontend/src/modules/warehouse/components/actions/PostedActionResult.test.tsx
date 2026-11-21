@@ -101,7 +101,7 @@ describe("PostedActionResult", () => {
     expect(
       screen.queryByRole("button", { name: /Undo/ }),
     ).not.toBeInTheDocument();
-    expect(screen.getByText(/held back in quarantine/)).toBeInTheDocument();
+    expect(screen.getByText(/set aside in quarantine/)).toBeInTheDocument();
   });
 
   it("undoes the posting and names the reversal instead of offering undo again", async () => {
