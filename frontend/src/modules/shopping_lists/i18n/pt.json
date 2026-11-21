@@ -77,7 +77,8 @@
     "validation": {
       "nameRequired": "Informe o nome do produto",
       "quantityPositive": "A quantidade deve ser maior que 0",
-      "quantityMax": "Não é possível armazenar quantidade acima de {{max}}"
+      "quantityMax": "Não é possível armazenar quantidade acima de {{max}}",
+      "unitRequired": "Escolha uma unidade"
     }
   },
   "addFromRecipes": {
@@ -137,6 +138,10 @@
   },
   "toasts": {
     "addItemsFailed": "Não foi possível adicionar os produtos",
-    "shoppingListGone": "A lista de compras não existe mais"
-  }
+    "shoppingListGone": "A lista de compras não existe mais",
+    "addedToList_one": "{{count}} produto adicionado a “{{name}}”",
+    "addedToList_other": "{{count}} produtos adicionados a “{{name}}”",
+    "openList": "Abrir lista"
+  },
+  "loadError": "Não foi possível carregar suas listas de compras"
 }

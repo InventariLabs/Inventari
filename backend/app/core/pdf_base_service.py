@@ -49,6 +49,7 @@ class PdfServiceBase:
     labels_de: dict[str, str] = {}
     labels_fr: dict[str, str] = {}
     labels_es: dict[str, str] = {}
+    labels_pt: dict[str, str] = {}
     module_name: str
 
     def __init__(self) -> None:
@@ -72,6 +73,7 @@ class PdfServiceBase:
                 de=self.labels_de,
                 fr=self.labels_fr,
                 es=self.labels_es,
+                pt=self.labels_pt,
             )
         )
 

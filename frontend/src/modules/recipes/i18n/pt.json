@@ -103,7 +103,9 @@
     "linked_success_other": "{{count}} ingredientes vinculados",
     "link_failed": "Não foi possível vincular os ingredientes",
     "empty_title": "Todos os ingredientes estão vinculados",
-    "empty_desc": "Cada ingrediente de receita aponta para um produto — disponibilidade, custo e separação cobrem todo o livro de receitas."
+    "empty_desc": "Cada ingrediente de receita aponta para um produto — disponibilidade, custo e separação cobrem todo o livro de receitas.",
+    "empty_no_ingredients_title": "Ainda não há ingredientes na receita",
+    "empty_no_ingredients_desc": "Adicione ingredientes a uma receita — eles aparecerão aqui até serem vinculados a um produto."
   },
   "form": {
     "create_title": "Nova receita",
@@ -149,7 +151,8 @@
       "name_required": "O nome da receita é obrigatório",
       "servings_min": "Mínimo de 1 porção",
       "prep_time_min": "O tempo de preparo deve ser 0 ou mais",
-      "ingredient_qty_min": "A quantidade deve ser maior que 0"
+      "ingredient_qty_min": "A quantidade deve ser maior que 0",
+      "ingredient_unit_required": "Escolha uma unidade"
     },
     "ingredient_price_per": "Preço por {{unit}}",
     "kcal_per_100g": "kcal/100g",
@@ -327,7 +330,8 @@
     "delete_failed": "Não foi possível excluir a receita",
     "shopping_failed": "Não foi possível adicionar à lista de compras",
     "history_failed": "Não foi possível salvar a anotação",
-    "image_failed": "Não foi possível processar a imagem"
+    "image_failed": "Não foi possível processar a imagem",
+    "load_failed": "Não foi possível abrir a receita"
   },
   "cost": {
     "title": "Custo estimado",
@@ -368,7 +372,8 @@
     "delete_confirm_message": "\"{{name}}\" será removida de todas as receitas que a têm. As receitas permanecem.",
     "delete_success_one": "Excluída: 1 receita atualizada",
     "delete_success_other": "Excluída: {{count}} receitas atualizadas",
-    "delete_failed": "Não foi possível excluir a tag"
+    "delete_failed": "Não foi possível excluir a tag",
+    "rename_failed": "Não foi possível renomear a tag"
   },
   "import_export": {
     "export_json": "Baixar JSON",
@@ -708,7 +713,8 @@
     "back_to_plans": "Voltar aos planejamentos de refeições",
     "cook_now_named": "Cozinhar agora: {{recipe}}",
     "remove_entry_named": "Remover {{recipe}} do planejamento",
-    "drag_to_move_named": "Arraste para mover: {{recipe}}"
+    "drag_to_move_named": "Arraste para mover: {{recipe}}",
+    "needs_meals_hint": "Adicione ao menos uma refeição para gerar uma lista de compras ou copiar este plano."
   },
   "cooking": {
     "rateSession_one": "Avaliar com {{count}} estrela",

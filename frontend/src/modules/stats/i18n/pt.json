@@ -129,7 +129,8 @@
     "subtitle_other": "{{count}} sinais para entender rapidamente o que precisa da sua atenção.",
     "valueUnknown": "Desconhecido",
     "valueUnknownHint": "Nenhum produto tem preço ainda, então não há nada para somar.",
-    "unpricedItems": "Itens sem preço: {{total}}. Este valor está subestimado."
+    "unpricedItems": "Itens sem preço: {{total}}. Este valor está subestimado.",
+    "unvaluedStock": "Recebimentos em estoque lançados sem preço: {{total}}. Este valor é um limite inferior."
   },
   "permissions": {
     "read": "Ver análises",

@@ -372,6 +372,21 @@ COMMON_PDF_LABELS_ES: dict[str, str] = {
     'sig_hint': 'Nombre, fecha, firma',
 }
 
+COMMON_PDF_LABELS_PT: dict[str, str] = {
+    'name': 'Nome',
+    'tax_id': 'CNPJ/CPF',
+    'address': 'Endereço',
+    'unit': 'Unid.',
+    'unit_price': 'Preço unitário',
+    'total_net': 'Total líquido',
+    'total_gross': 'Total bruto',
+    'notes': 'Observações',
+    'sig_prepared': 'Preparado por',
+    'sig_approved': 'Aprovado por',
+    'created': 'Criado em',
+    'sig_hint': 'Nome, data, assinatura',
+}
+
 DOC_STATUS_LABELS_EN: dict[str, str] = {
     'DRAFT': 'Draft',
     'CONFIRMED': 'Confirmed',
@@ -407,6 +422,13 @@ DOC_STATUS_LABELS_ES: dict[str, str] = {
     'CANCELLED': 'Cancelado',
 }
 
+DOC_STATUS_LABELS_PT: dict[str, str] = {
+    'DRAFT': 'Rascunho',
+    'CONFIRMED': 'Confirmado',
+    'COMPLETED': 'Concluído',
+    'CANCELLED': 'Cancelado',
+}
+
 
 def get_doc_status_map(lang: str) -> dict[str, str]:
     return pick_by_lang(
@@ -416,4 +438,5 @@ def get_doc_status_map(lang: str) -> dict[str, str]:
         de=DOC_STATUS_LABELS_DE,
         fr=DOC_STATUS_LABELS_FR,
         es=DOC_STATUS_LABELS_ES,
+        pt=DOC_STATUS_LABELS_PT,
     )

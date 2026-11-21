@@ -18,7 +18,9 @@ SUPPORTED_LANGUAGES: tuple[Language, ...] = cast(
 #: batches, and answers in English for any key it has not got yet — no change
 #: has to translate it. The frontend declares the same split in
 #: `frontend/src/i18n/languages.ts`; a parity gate holds the two together.
-COMMUNITY_LANGUAGES: tuple[Language, ...] = ('pt',)
+#: Empty for now: a community language joins this tuple when one is written by
+#: a speaker of it, and the machinery is here so that it needs no new code.
+COMMUNITY_LANGUAGES: tuple[Language, ...] = ()
 
 #: The languages every change must carry in full: what the gates, the parity
 #: tests next to a module's catalogs and the stock error catalog require.

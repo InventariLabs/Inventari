@@ -1,0 +1,26 @@
+{
+  "navigation": {
+    "widgets": "Widgets"
+  },
+  "page": {
+    "title": "Widgets de exemplo",
+    "description": "Gerencie seus widgets — um módulo de referência para desenvolvedores do Inventari."
+  },
+  "actions": {
+    "add": "Adicionar widget",
+    "edit": "Editar widget",
+    "delete": "Excluir widget",
+    "save": "Salvar",
+    "cancel": "Cancelar"
+  },
+  "fields": {
+    "name": "Nome",
+    "color": "Cor",
+    "quantity": "Quantidade",
+    "created": "Criado"
+  },
+  "messages": {
+    "empty": "Nenhum widget ainda. Crie o primeiro!",
+    "confirmDelete": "Tem certeza de que deseja excluir este widget?"
+  }
+}

@@ -226,7 +226,8 @@
     "undoMove": "Desfazer movimentação",
     "correct": "Corrigir",
     "viewReversal": "Ver estorno",
-    "undoScrap": "Desfazer baixa"
+    "undoScrap": "Desfazer baixa",
+    "postNowRecordOnly": "Registrar — o estoque já foi retirado"
   },
   "confirmDialog": {
     "confirmTitle": "Confirmar documento",
@@ -264,7 +265,8 @@
     "undoTitle": "Desfazer este documento?",
     "undoMessage": "Isto gera uma correção de estorno, devolve o estoque e mantém os dois documentos no histórico. Continuar?",
     "undoConfirm": "Desfazer",
-    "undoKeep": "Manter documento"
+    "undoKeep": "Manter documento",
+    "postNowRecordOnlyMessage": "As mercadorias já foram retiradas do estoque quando foram separadas. Isto registra apenas a movimentação — o estoque não muda. Continuar?"
   },
   "import": {
     "title": "Importar linhas",
@@ -389,7 +391,8 @@
     "pdfDownloaded": "PDF baixado",
     "approvalRequested": "Aprovação solicitada",
     "undone": "Desfeito — o estorno {{number}} está no histórico",
-    "undoPendingApproval": "Desfazer enviado para aprovação — o estorno {{number}} é lançado quando for aprovado"
+    "undoPendingApproval": "Desfazer enviado para aprovação — o estorno {{number}} é lançado quando for aprovado",
+    "completedRecordOnly": "Documento concluído — ele registra o estoque já retirado"
   },
   "approvalQueueLink": "Ver na fila de aprovação",
   "approvalsQueue": {
@@ -471,7 +474,8 @@
     "lineCount_one": "1 item",
     "lineCount_other": "{{count}} itens",
     "newProduct": "Novo produto",
-    "newProductHint": "Ele entra na sua lista de produtos; o restante dos detalhes pode esperar."
+    "newProductHint": "Ele entra na sua lista de produtos; o restante dos detalhes pode esperar.",
+    "noResultsAdHoc": "Fora da sua lista — a linha será mantida como digitada."
   },
   "scan": {
     "open": "Escanear",
@@ -634,7 +638,10 @@
     "totalsTitle": "Totais do documento",
     "totalNet": "Total líquido",
     "totalTax": "Total de impostos",
-    "totalGross": "Total bruto"
+    "totalGross": "Total bruto",
+    "scrapCost": "Custo da baixa",
+    "byRateTitle": "Imposto por alíquota",
+    "byRateRate": "Alíquota"
   },
   "profile": {
     "guardName": "As configurações do perfil de documento",
@@ -718,7 +725,11 @@
     "quarantine": "Quarentena",
     "quarantineHint": "Onde as mercadorias danificadas e as retidas pela qualidade são recebidas quando não trazem um lote próprio para pôr em quarentena. Um recebimento que contém uma linha assim não pode ser concluído até que um local seja indicado.",
     "quarantineLocation": "Local de quarentena",
-    "quarantineLocationNone": "Nenhum local de quarentena"
+    "quarantineLocationNone": "Nenhum local de quarentena",
+    "layoutAuto": "Automático (segue o país)",
+    "layoutAutoRule": "Organizações na Polônia imprimem o formulário PZ polonês; qualquer outro país imprime o layout padrão. Palavras e datas seguem o idioma da impressão.",
+    "issuerEmpty": "O CNPJ/CPF e o endereço da sua organização estão vazios, então as impressões saem sem o bloco do emitente. Preencha-os em Configurações → Emitente do documento.",
+    "issuerEmptyLink": "Abrir configurações"
   },
   "periods": {
     "title": "Fechamento de período",
@@ -829,7 +840,9 @@
     "colDocument": "Documento",
     "colPartner": "Parceiro ou local",
     "colDate": "Data",
-    "colTracking": "Rastreamento"
+    "colTracking": "Rastreamento",
+    "includesScrap": "Documentos de baixa nestes totais: {{total}}, cada um avaliado pelo que a baixa custou.",
+    "documentsWithoutValue": "Documentos lançados sem preço: {{total}}. Eles não têm valor, então os totais são um limite inferior."
   },
   "pickOrderStrategies": {
     "location_sequence": "Ordem dos locais"
@@ -903,7 +916,8 @@
       "lot_too_small": "O lote {{lot}} não tem mais o suficiente para esta linha — escaneie a etiqueta do próximo lote para o restante",
       "shelf_confirmed": "Local {{location}} confirmado",
       "shelf_required": "Escaneie o local primeiro: {{location}}",
-      "wrong_shelf": "Esse não é o local — vá para {{location}}"
+      "wrong_shelf": "Esse não é o local — vá para {{location}}",
+      "already_picked": "{{product}} já separado: {{qty}} de {{expected}} {{uom}}"
     },
     "summary_picked_one": "1 separado",
     "summary_picked_other": "{{count}} separados",
@@ -951,6 +965,13 @@
     "floorShelf": {
       "takeFrom": "Retirar de",
       "takeTo": "Levar as mercadorias para"
+    },
+    "coverage": {
+      "title": "O estoque não cobre todas as expedições",
+      "intro": "A separação voltaria com falta nestas linhas. Comece sem estes documentos ou comece assim mesmo.",
+      "line": "{{product}} — pedido {{ordered}}, disponível {{available}}",
+      "start_anyway": "Começar assim mesmo",
+      "leave_out": "Começar sem estes documentos"
     }
   },
   "templates": {
@@ -1247,7 +1268,9 @@
       "twoStep": "Receber em uma área de recebimento, guardar depois",
       "modeFor": "Como {{location}} recebe",
       "landsIn": "As entregas chegam em {{area}}",
-      "loadFailed": "Não foi possível carregar como cada local recebe."
+      "loadFailed": "Não foi possível carregar como cada local recebe.",
+      "fixedPlaces": "Cada produto tem o próprio local em {{location}}",
+      "fixedPlacesHint": "Guardar mercadorias em outro local que não o sugerido passa então a perguntar se ele é o novo local habitual do produto. Desative se as mercadorias vão para qualquer local livre."
     },
     "targets": {
       "nearlyFull": "quase cheio",
@@ -1260,6 +1283,12 @@
       "noteNext": "Uma entrega maior do que ainda cabe vai para o próximo.",
       "noteLastOpen": "O último não tem limite, então o excedente sempre cabe lá.",
       "noteOnly": "Uma entrega maior do que ainda cabe vai para lá mesmo assim e é marcada como acima do limite."
+    },
+    "silenced": {
+      "title": "Produtos que não são mais perguntados sobre um local habitual",
+      "hint": "A armazenagem não pergunta onde estes produtos ficam. Pergunte de novo para trazer a pergunta de volta.",
+      "askAgain": "Perguntar de novo",
+      "askAgainFor": "Perguntar de novo sobre {{product}}"
     }
   },
   "targetSummary": {
@@ -1344,7 +1373,8 @@
       "over_quantity": "Não é possível receber mais que o planejado — já são {{qty}}/{{expected}} {{uom}}",
       "shelf_confirmed": "Local {{location}} confirmado",
       "shelf_required": "Escaneie o local primeiro: {{location}}",
-      "wrong_shelf": "Esse não é o local — vá para {{location}}"
+      "wrong_shelf": "Esse não é o local — vá para {{location}}",
+      "already_received": "{{product}} já recebido: {{qty}} de {{expected}} {{uom}}"
     },
     "line": {
       "received": "Recebido",
@@ -1476,6 +1506,15 @@
         "WRONG_ITEM": "Produto errado",
         "QUALITY": "Qualidade",
         "NOT_NEEDED": "Não é mais necessário",
+        "OTHER": "Outro"
+      }
+    },
+    "scrap": {
+      "label": "Motivo da baixa",
+      "codes": {
+        "DAMAGED": "Avaria",
+        "EXPIRED": "Vencido",
+        "QUALITY": "Problema de qualidade",
         "OTHER": "Outro"
       }
     }
@@ -1719,6 +1758,30 @@
       "done": "Reposto — {{number}} lançado",
       "awaitingApproval": "{{number}} está aguardando aprovação; as mercadorias são movidas quando for aprovado",
       "failed": "Não foi possível lançar a movimentação."
+    },
+    "taken": "Esta tarefa agora é sua.",
+    "giveBack": "Devolvê-la",
+    "giveBackTask": "Devolver: {{task}}",
+    "stockCover": {
+      "full": "Pode ser emitido por inteiro",
+      "partial": "Pode ser emitido em parte",
+      "none": "Nada a emitir ainda"
+    },
+    "homeShelf": {
+      "title": "Local habitual",
+      "ask": {
+        "set": "{{product}} ainda não tem local habitual. {{location}} é onde ele fica a partir de agora?",
+        "change": "{{product}} costuma ir para outro lugar. Tornar {{location}} o local habitual dele a partir de agora?"
+      },
+      "yes": "Sim, tornar o local habitual",
+      "done": "{{location}} agora é o local habitual de {{product}}; a regra fica em Regras de armazenagem.",
+      "no": "Não",
+      "dontAsk": "Não perguntar sobre {{product}} de novo",
+      "refused": {
+        "receiving": "{{location}} é uma área de recebimento: as mercadorias só esperam lá, então não pode ser o local habitual de {{product}}.",
+        "quarantine": "{{location}} é para mercadorias separadas do estoque, então não pode ser o local habitual de {{product}}.",
+        "not_stock": "{{location}} não guarda estoque, então não pode ser o local habitual de {{product}}."
+      }
     }
   },
   "shipping": {
@@ -2163,7 +2226,8 @@
       "noOrder": "Nada foi pedido: escaneie cada produto que chegou, ou busque pelo nome, e informe quantos vieram. Depois cada um é guardado no local sugerido.",
       "extra": "Chegou algo que não está no pedido? Escaneie ou busque pelo nome e informe quantos vieram; ele é recebido junto com a mercadoria do pedido.",
       "onOrder": "{{product}} está no pedido: conte-o quando o recebimento começar."
-    }
+    },
+    "unpricedLines": "Linhas sem preço: {{total}}. Elas serão lançadas sem valor e ficarão fora dos totais do registro."
   },
   "posted": {
     "pendingTitle": "Enviado para aprovação",
@@ -2259,5 +2323,32 @@
   "references": {
     "stockTake": "Inventário",
     "recipeProduction": "Produção de receita"
+  },
+  "taxRates": {
+    "title": "Alíquotas de imposto",
+    "hint": "As alíquotas que seus documentos e pedidos usam. Um produto ou uma categoria pode indicar uma; as novas linhas deles passam então a usar essa alíquota em vez da padrão acima.",
+    "none": "Nenhuma alíquota ainda.",
+    "name": "Nome",
+    "rate": "Alíquota",
+    "remove": "Remover a alíquota {{rate}}",
+    "add": "Adicionar uma alíquota",
+    "addCountry": "Adicionar as alíquotas do país: {{rates}}",
+    "loadFailed": "Não foi possível carregar as alíquotas de imposto.",
+    "categoriesTitle": "Alíquotas por categoria",
+    "categoriesHint": "Mercadorias de uma categoria usam a alíquota dela, a menos que o produto indique a própria.",
+    "categoriesNone": "Nenhuma categoria indica uma alíquota.",
+    "category": "Categoria",
+    "categoryRate": "Alíquota",
+    "categoryRemove": "Remover a alíquota de {{category}}",
+    "categoryAdd": "Adicionar uma categoria",
+    "product": {
+      "label": "Alíquota de imposto",
+      "hint": "Salva assim que você a escolhe. As novas linhas de documento e de pedido deste produto passam a usá-la.",
+      "fromCategory": "Da categoria: {{rate}}",
+      "fromDefault": "A padrão do documento",
+      "saved": "Alíquota de imposto salva",
+      "saveFailed": "Não foi possível salvar a alíquota de imposto"
+    },
+    "countryLoadFailed": "Não foi possível carregar as alíquotas do país; ainda dá para adicionar alíquotas à mão."
   }
 }
