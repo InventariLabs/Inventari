@@ -14,7 +14,11 @@ const row = (over: Partial<StockTakeItem>): StockTakeItem =>
     ...over,
   }) as StockTakeItem;
 
-const expiring = { effective_expiry_date: "2027-03-01" } as unknown as Item;
+const expiring = {
+  effective_expiry_date: new Date(Date.now() + 90 * 86_400_000)
+    .toISOString()
+    .slice(0, 10),
+} as unknown as Item;
 
 describe("StockTakeScanChooser", () => {
   it("tells two batches of one product apart by the number on the pack", () => {
