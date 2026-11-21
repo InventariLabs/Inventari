@@ -6,6 +6,12 @@ const KEPT_ENTRIES = 60;
 // About two seconds at 60 fps: long enough for a list to fetch and paint,
 // short enough not to fight a reader who has long since moved on.
 const RESTORE_FRAMES = 120;
+// How long the page must keep one height, with the position in reach, before
+// the position counts as restored (about 160 ms). For a frame or two after
+// going back the shell still holds the header of the screen that was left, and
+// when the list's own replaces it at another height, the browser moves the view
+// with the content above it.
+const SETTLED_FRAMES = 10;
 
 type Positions = Record<string, number>;
 
@@ -46,7 +52,8 @@ function remember(entry: string, y: number) {
  * - Going back (POP) returns to where the earlier entry was left. The browser
  *   cannot do it: it restores before the list has been fetched and painted,
  *   clamps to the short page it finds and gives up, so the position is kept
- *   here and applied for as long as the page is still growing to it.
+ *   here and applied for as long as the page is still growing to it, and
+ *   then held until its height stops changing.
  */
 export function useRouteScroll() {
   const location = useLocation();
@@ -103,6 +110,8 @@ export function useRouteScroll() {
     restoring.current = true;
     let frame = 0;
     let handle = 0;
+    let settled = 0;
+    let lastHeight = -1;
     const stop = () => {
       restoring.current = false;
       cancelAnimationFrame(handle);
@@ -111,10 +120,12 @@ export function useRouteScroll() {
       window.removeEventListener("keydown", stop);
     };
     const step = () => {
-      const reachable =
-        document.documentElement.scrollHeight - window.innerHeight;
+      const height = document.documentElement.scrollHeight;
+      const reachable = height - window.innerHeight;
       window.scrollTo(0, Math.min(target, Math.max(reachable, 0)));
-      if (reachable >= target || ++frame >= RESTORE_FRAMES) stop();
+      settled = reachable >= target && height === lastHeight ? settled + 1 : 0;
+      lastHeight = height;
+      if (settled >= SETTLED_FRAMES || ++frame >= RESTORE_FRAMES) stop();
       else handle = requestAnimationFrame(step);
     };
     window.addEventListener("wheel", stop, { passive: true });

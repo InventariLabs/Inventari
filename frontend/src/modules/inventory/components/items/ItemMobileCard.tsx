@@ -577,14 +577,12 @@ export default memo(function ItemMobileCard({
         </button>
 
         {/* Quick Action Buttons — stood down in selection mode, so the two
-            interaction models never share the card. The "⋯" goes with them
-            for a reader only as far as writing goes: its sheet still leads
-            with "Product details", the one door from the list to the
-            product page, so the "⋯" stays and the consume button goes. */}
-        {!selectionMode && (
+            interaction models never share the card, and for a reader, since
+            every action in the sheet writes; the card itself opens the
+            product page for everyone. */}
+        {!selectionMode && canWrite && (
           <ItemCardQuickActions
             item={item}
-            canWrite={canWrite}
             consumingId={consumingId}
             onConsume={onConsume}
             onOpenActions={onOpenActions}
@@ -603,13 +601,11 @@ export default memo(function ItemMobileCard({
  */
 function ItemCardQuickActions({
   item,
-  canWrite,
   consumingId,
   onConsume,
   onOpenActions,
 }: {
   item: Item;
-  canWrite: boolean;
   consumingId: string | null;
   onConsume: (itemId: string) => void;
   onOpenActions: (item: Item) => void;
@@ -625,26 +621,24 @@ function ItemCardQuickActions({
       {/* The words live in a tooltip on hover and on focus, opening to the
           left: the swipe layer clips anything above. On a touch screen the
           row's menu carries these words instead. */}
-      {canWrite && (
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={(e) => {
-            e.stopPropagation();
-            onConsume(item.id);
-          }}
-          disabled={consumingId === item.id}
-          className="relative group/tooltip rounded-xl shadow-none bg-surface-raised text-on-secondary hover:bg-surface-inset hover:text-on"
-          aria-label={consumeLabel}
-        >
-          {consumingId === item.id ? (
-            <span className="text-[10px] font-medium">…</span>
-          ) : (
-            <CheckCircle size={16} />
-          )}
-          <Tooltip label={consumeLabel} side="left" />
-        </Button>
-      )}
+      <Button
+        size="icon"
+        variant="ghost"
+        onClick={(e) => {
+          e.stopPropagation();
+          onConsume(item.id);
+        }}
+        disabled={consumingId === item.id}
+        className="relative group/tooltip rounded-xl shadow-none bg-surface-raised text-on-secondary hover:bg-surface-inset hover:text-on"
+        aria-label={consumeLabel}
+      >
+        {consumingId === item.id ? (
+          <span className="text-[10px] font-medium">…</span>
+        ) : (
+          <CheckCircle size={16} />
+        )}
+        <Tooltip label={consumeLabel} side="left" />
+      </Button>
       <Button
         size="icon"
         variant="ghost"

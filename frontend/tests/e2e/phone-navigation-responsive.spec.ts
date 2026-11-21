@@ -7,10 +7,10 @@ import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
  * goes to the screen the person came from.
  *
  * Unit tests cannot see either — jsdom has no scrolling and no viewport. The
- * defect was a product list scrolled down, a row menu, "Product details": the
- * page opened at the scroll position of the list, with the name and quantity
- * above the screen, and the header Back arrow then left the module for the
- * launcher instead of returning to the list.
+ * path is a product list scrolled down and a tap on a card: the product page
+ * opens at its top, with the name and quantity on the first screen, and the
+ * header Back arrow returns to the list rather than leaving the module for the
+ * launcher.
  */
 
 test.describe("Phone — a new screen opens at its top and Back returns", () => {
@@ -97,8 +97,8 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
       "Product actions: ",
       "",
     );
-    await last.click();
-    await page.getByRole("button", { name: "Product details" }).click();
+    // The card itself opens the product's page.
+    await page.getByRole("heading", { name, level: 3 }).click();
 
     // The product's own name is on the first screen, not above it.
     const heading = page.getByRole("heading", { name, level: 1 });
@@ -145,8 +145,9 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
       .toBeLessThan(createdIds.length);
     await expect(page).toHaveURL(/search=/);
 
-    await menus.first().click();
-    await page.getByRole("button", { name: "Product details" }).click();
+    // The query is the product's whole name: its card, once the list has
+    // narrowed to it, opens the product's page.
+    await page.getByRole("heading", { name: query, level: 3 }).click();
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
     await page.getByRole("button", { name: "Back" }).click();

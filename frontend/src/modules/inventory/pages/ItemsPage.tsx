@@ -209,12 +209,12 @@ export default function ItemsPage() {
     filters.writeParams,
   );
 
-  // A product's name opens the product dialog, the pencil's own — on the
-  // desktop table and on a phone card alike, without a quick-action sheet in
-  // between: no visitor expects that step from a name.
+  // A product's name opens the product's page — on the desktop table and on a
+  // phone card alike, as a click on a record does on every other list. Reading
+  // is what a click asks for; the Edit form is the pencil's, and the page's.
   const openProduct = useCallback(
-    (item: Item) => setEditingItemId(item.id),
-    [setEditingItemId],
+    (item: Item) => navigate(`/inventory/items/${item.id}`),
+    [navigate],
   );
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
   // The one expiry decision, the same one the statistics screens read.

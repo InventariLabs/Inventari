@@ -59,8 +59,11 @@ test.describe("Maker — BoM entry from item view", () => {
       .getByTestId("item-name")
       .filter({ hasText: itemName });
     await expect(itemNameCell).toBeVisible({ timeout: 15000 });
-    // A product's name opens its edit dialog directly.
-    await itemNameCell.click();
+    await page
+      .getByTestId("item-row")
+      .filter({ hasText: itemName })
+      .getByRole("button", { name: "Edit" })
+      .click();
     await expect(page.getByRole("dialog")).toBeVisible({ timeout: 5000 });
 
     const entryLink = page.getByTestId("maker-bom-entry-link");

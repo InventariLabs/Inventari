@@ -175,8 +175,9 @@ describe("ItemsPage", () => {
     });
   });
 
-  it("opens the product dialog when the product's name is clicked", async () => {
+  it("opens the product's page when the product's name is clicked", async () => {
     const user = userEvent.setup();
+    mockNavigate.mockClear();
     render(
       <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
         <ItemsPage />
@@ -185,9 +186,20 @@ describe("ItemsPage", () => {
 
     await user.click(await screen.findByTestId("item-name"));
 
-    // The pencil's own dialog, not a sheet of quick actions in front of it.
-    expect(await screen.findByText(/Edit product/i)).toBeInTheDocument();
-    expect(await screen.findByDisplayValue("Test Item")).toBeInTheDocument();
+    // A click reads the product; editing is the pencil's.
+    expect(mockNavigate).toHaveBeenCalledWith("/inventory/items/1");
+    expect(screen.queryByText(/Edit product/i)).toBeNull();
+  });
+
+  it("offers no second way to the product's page in the row", async () => {
+    render(
+      <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
+        <ItemsPage />
+      </PageHeaderContext.Provider>,
+    );
+    await screen.findByTestId("item-name");
+
+    expect(screen.queryByRole("link", { name: /product details/i })).toBeNull();
   });
 });
 
@@ -1362,8 +1374,9 @@ describe("ItemsPage — mobile actions sheet", () => {
     });
   });
 
-  it("opens the product dialog when a card is tapped", async () => {
+  it("opens the product's page when a card is tapped", async () => {
     const user = userEvent.setup();
+    mockNavigate.mockClear();
     render(
       <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
         <ItemsPage />
@@ -1374,8 +1387,8 @@ describe("ItemsPage — mobile actions sheet", () => {
       await screen.findByRole("heading", { name: "Test Item", level: 3 }),
     );
 
-    expect(await screen.findByText(/Edit product/i)).toBeInTheDocument();
-    expect(await screen.findByDisplayValue("Test Item")).toBeInTheDocument();
+    expect(mockNavigate).toHaveBeenCalledWith("/inventory/items/1");
+    expect(screen.queryByText(/Edit product/i)).toBeNull();
   });
 
   it("opens the sheet from the row and confirms before deleting", async () => {
@@ -1397,11 +1410,10 @@ describe("ItemsPage — mobile actions sheet", () => {
 
     await user.click(screen.getByRole("button", { name: /product actions/i }));
     const sheet = await screen.findByRole("dialog", { name: /test item/i });
-    // The row opens the Edit form, so the sheet is the list's way to the
-    // product page.
+    // The card itself opens the product page; the sheet does not repeat it.
     expect(
-      within(sheet).getByRole("button", { name: /^product details$/i }),
-    ).toBeInTheDocument();
+      within(sheet).queryByRole("button", { name: /^product details$/i }),
+    ).toBeNull();
 
     await user.click(within(sheet).getByRole("button", { name: /^delete$/i }));
 
