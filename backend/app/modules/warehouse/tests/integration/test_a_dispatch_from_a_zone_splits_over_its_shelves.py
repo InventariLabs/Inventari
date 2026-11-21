@@ -265,7 +265,8 @@ class TestADispatchFromAZoneSplitsOverItsShelves:
         doc_target_location: StorageLocation,
         zone_shelves: tuple[StorageLocation, StorageLocation],
     ) -> None:
-        """Eleven on the shelves below, twelve asked: the document stays a draft."""
+        """Eleven on the shelves below, twelve asked: the document stays a draft,
+        and the refusal says eleven are there and one is missing."""
         shelf_a, shelf_b = zone_shelves
         record = _sow(
             db_session, async_engine_fixture, doc_org, doc_template, shelf_a.id, '6'
@@ -286,6 +287,7 @@ class TestADispatchFromAZoneSplitsOverItsShelves:
             f'/api/v1/warehouse/documents/{doc_id}/confirm', headers=doc_auth_headers
         )
         assert confirm.status_code == status.HTTP_400_BAD_REQUEST, confirm.text
+        assert '11 of 12 available, 1 missing' in confirm.json()['detail']['message']
 
         shown = client.get(
             f'/api/v1/warehouse/documents/{doc_id}', headers=doc_auth_headers

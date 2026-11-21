@@ -513,7 +513,7 @@ function ItemTableRowBase({
           <Link
             to={`/inventory/items/${item.id}`}
             aria-label={detailsLabel}
-            className="relative group/tooltip inline-flex h-8 w-8 items-center justify-center rounded-lg text-on-muted hover:text-primary-600 hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="relative group/tooltip inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-on-muted hover:text-primary-600 hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <FileText size={16} />
             <Tooltip label={detailsLabel} />

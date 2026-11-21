@@ -502,6 +502,15 @@ const dist = join(root, "dist");
  * 409.1, launcher 424.2, receive 477.4, start 642.6, products 633.0, app
  * first paint 404.3, initial 193.9).
  *
+ * The branch that finishes the warehouse floor findings of the persona walk
+ * takes the history screen to the same 615.0 on its own (614.0 on the line
+ * before it), and the same step to 620 covers it. It adds code as well as
+ * copy there: `documentReference.ts`, which names a document's source (stock
+ * take, recipe, picking) in words and which the history rows import, plus the
+ * wording itself in the language chunk (login 408.8, launcher 423.9, start
+ * 642.5, receive 478.1, issue 589.9, products 632.1, app first paint 404.0,
+ * initial 193.9 on that branch).
+ *
  * Re-measured 2026-11-21 on the branch that settles the first-contact and
  * settings screens: the issue screen measures 590.4 KiB gz against its 590 and
  * history 615.5 against its 615. What the branch adds there is copy in six
@@ -521,6 +530,16 @@ const dist = join(root, "dist");
  * a step of five (first paint 410, login 415, launcher 430); the other screens
  * stand under theirs (start 643.4, receive 479.0, issue 591.0, history 616.1,
  * products 634.8, initial 194.0).
+ *
+ * Re-measured 2026-11-21 on that warehouse floor branch merged with the line
+ * that carries the first-contact one: the line alone measures app first paint
+ * at 404.93 KiB gz against its 405, and the branch takes it to 405.11. It is
+ * copy, not an import: the refusal, receipt, source-reference and
+ * manager-only sentences in the Polish language chunk every first paint loads
+ * (154.25 to 154.44), while the App chunk stays at 56.7. That one budget moves
+ * a step of five, to 410; the other screens stand under theirs (login 409.9,
+ * launcher 425.0, start 643.5, receive 479.8, issue 590.8, history 615.9,
+ * products 633.8, initial 193.9).
  */
 const BUDGETS = {
   initial: 245,

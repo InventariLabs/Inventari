@@ -549,6 +549,11 @@ describe("DocumentsPage", () => {
 
     // One per row plus the select-all in the header row.
     expect(screen.getAllByRole("checkbox")).toHaveLength(3);
+    // Select all is pressed by a thumb: its label is 44 px tall on a phone,
+    // not the 16 px of the box and its words.
+    expect(
+      screen.getByRole("checkbox", { name: "Select all" }).closest("label"),
+    ).toHaveClass("min-h-11");
     expect(
       screen.queryByRole("button", { name: /^Select$/ }),
     ).not.toBeInTheDocument();

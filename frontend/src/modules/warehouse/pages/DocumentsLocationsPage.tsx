@@ -737,6 +737,7 @@ function RowCheckbox({
       aria-label={t("putaway.locations.selectAria", { name })}
       checked={checked}
       onChange={onToggle}
+      touchTarget
     />
   );
 }
@@ -842,6 +843,7 @@ function LocationsTable({
                   checked={allVisibleSelected}
                   indeterminate={someVisibleSelected}
                   onChange={onToggleAll}
+                  touchTarget
                 />
               )}
             </th>

@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { ScannerReadyHint } from "@/components/ui/ScannerReadyHint";
-import { useScanCamera } from "@/hooks/useScanCamera";
+import { useScanCamera, useTorchAvailable } from "@/hooks/useScanCamera";
 import { useScanResolver } from "@/hooks/useScanResolver";
 import { useScannerInput } from "@/hooks/useScannerInput";
 import {
@@ -98,6 +98,8 @@ export default function DocumentScanPage() {
   } = useScanCamera({
     onCodeScanned: (code) => void resolve(code),
   });
+  // The torch is offered only by a camera whose track has one.
+  const hasTorch = useTorchAvailable();
   // A hardware scanner reads the same codes the camera does. What it typed
   // into the field, if it had the focus, is the scan itself, not a draft.
   useScannerInput((code) => {
@@ -161,7 +163,7 @@ export default function DocumentScanPage() {
         >
           {isCameraRunning ? t("scan.scanning") : t("scan.title")}
         </Button>
-        {isCameraActive && (
+        {isCameraActive && hasTorch && (
           <Button
             variant="outline"
             size="icon"

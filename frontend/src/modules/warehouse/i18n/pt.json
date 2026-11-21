@@ -59,6 +59,7 @@
     "targetLocation": "Local de destino",
     "notes": "Observações",
     "externalReference": "Referência / documento relacionado",
+    "sourceOrder": "Pedido de compra",
     "scheduledDate": "Data programada",
     "documentDate": "Data do documento",
     "createdAt": "Criado em",
@@ -193,6 +194,7 @@
     "cancel": "Cancelar",
     "cancelDocument": "Cancelar documento",
     "cancelNeedsManager": "Cancelar um documento confirmado libera o estoque que ele reserva — peça a alguém que possa gerenciar documentos.",
+    "deleteNeedsManager": "Só alguém que possa gerenciar documentos pode excluir este rascunho — peça a essa pessoa se for um engano. Enquanto não for aplicado, não altera o estoque.",
     "delete": "Excluir",
     "edit": "Editar",
     "view": "Ver",
@@ -1013,6 +1015,8 @@
       "qr_img": "Imagem do QR code (data URI) — traz o endereço de escaneamento deste documento, ou o seu número quando a instalação não tem endereço público",
       "qr_size_mm": "Lado com que o QR deve ser impresso, em milímetros",
       "return_of_number": "Número do documento que esta devolução estorna",
+      "source_order_number": "Número do pedido de compra contra o qual as linhas foram recebidas",
+      "printed_reference": "Referência externa, vazia quando apenas repete o número do pedido",
       "scrap_reason": "Por que a mercadoria foi descartada, no idioma de impressão",
       "show_line_status": "Verdadeiro quando os status por linha são impressos",
       "show_payment": "Verdadeiro quando o bloco de totais/pagamento é impresso",
@@ -1336,6 +1340,7 @@
       "short_confirmed": "Recebimento parcial confirmado",
       "skipped": "Linha ignorada",
       "completed": "Recebimento concluído",
+      "nothing_received": "Nada foi recebido, então nada foi lançado. O recebimento continua aberto para as mercadorias ainda esperadas.",
       "over_quantity": "Não é possível receber mais que o planejado — já são {{qty}}/{{expected}} {{uom}}",
       "shelf_confirmed": "Local {{location}} confirmado",
       "shelf_required": "Escaneie o local primeiro: {{location}}",
@@ -2250,5 +2255,9 @@
   },
   "floorShelf": {
     "choose": "Escolha um local"
+  },
+  "references": {
+    "stockTake": "Inventário",
+    "recipeProduction": "Produção de receita"
   }
 }

@@ -78,7 +78,7 @@ export function TodayActivity({
                 <span className="text-sm text-on">{entryText(doc, t)}</span>
                 <Link
                   to={`/warehouse/documents/${doc.id}`}
-                  className="break-all text-xs font-medium text-on-primary hover:underline"
+                  className="inline-flex min-h-6 items-center break-all text-xs font-medium text-on-primary hover:underline"
                 >
                   {doc.number}
                 </Link>

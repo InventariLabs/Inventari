@@ -189,7 +189,7 @@ export function PurposeBindingSelect({
           })}{" "}
           <Link
             to="/settings/ai"
-            className="font-semibold underline underline-offset-2 hover:no-underline"
+            className="inline-flex min-h-6 items-center font-semibold underline underline-offset-2 hover:no-underline"
           >
             {t("config.noEligibleConnectionsCta")}
           </Link>

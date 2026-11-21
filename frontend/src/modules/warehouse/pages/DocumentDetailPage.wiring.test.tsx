@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { PageHeaderData } from "@/hooks/useModulePageHeader";
 import * as documentHooks from "@/modules/warehouse/hooks/useDocuments";
 import type { WarehouseDocument } from "@/modules/warehouse/types";
@@ -51,9 +51,10 @@ vi.mock("@/hooks/useModulePageHeader", async (importOriginal) => ({
   useModulePageHeader: () => ({ setHeader: m.header }),
 }));
 
+const rights = vi.hoisted(() => ({ manage: true }));
 vi.mock("@/hooks/useCanWrite", () => ({
   useCanWrite: () => true,
-  useCanManage: () => true,
+  useCanManage: () => rights.manage,
 }));
 
 vi.mock("@/contexts/ModulesContext", () => ({
@@ -619,5 +620,41 @@ describe("DocumentDetailPage — corrections, approvals and failures", () => {
     renderPage();
     await userEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(refetch).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("DocumentDetailPage — a member is told what only a manager can do", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    rights.manage = false;
+  });
+  afterEach(() => {
+    rights.manage = true;
+  });
+
+  it("says who can delete their own draft correction", () => {
+    givenDocument({ type: "CORRECTION", status: "DRAFT" });
+    renderPage();
+
+    expect(
+      screen.getByText(/can manage documents can delete this draft/),
+    ).toBeVisible();
+  });
+
+  it("says in words why Cancel is disabled on a confirmed document", () => {
+    givenDocument({ status: "CONFIRMED" });
+    renderPage();
+
+    expect(
+      screen.getByText(/Cancelling a confirmed document releases the stock/),
+    ).toBeVisible();
+  });
+
+  it("says nothing to someone who may manage documents", () => {
+    rights.manage = true;
+    givenDocument({ type: "CORRECTION", status: "DRAFT" });
+    renderPage();
+
+    expect(screen.queryByText(/can manage documents/)).toBeNull();
   });
 });

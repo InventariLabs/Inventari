@@ -665,6 +665,42 @@ class PurchaseOrdersAPI:
         )
         return {line_id: (number, line_number) for line_id, number, line_number in rows}
 
+    async def get_orders_of_lines_async(
+        self,
+        db: AsyncSession,
+        org_id: UUID,
+        po_line_ids: list[UUID],
+    ) -> list[tuple[UUID, str]]:
+        """``[(order id, order number)]`` the given lines belong to, by number.
+
+        How a receipt names the orders it was received against, so its page
+        can lead back to each one. Each order is named once; ids that are
+        unknown, or belong to somebody else, name nothing.
+        """
+        from sqlalchemy import select
+
+        from app.modules.purchase_orders.models import (
+            PurchaseOrder,
+            PurchaseOrderLine,
+        )
+
+        if not po_line_ids:
+            return []
+        rows = await db.execute(
+            select(PurchaseOrder.id, PurchaseOrder.number)
+            .join(
+                PurchaseOrderLine,
+                PurchaseOrderLine.purchase_order_id == PurchaseOrder.id,
+            )
+            .where(
+                PurchaseOrderLine.id.in_(po_line_ids),
+                PurchaseOrder.organization_id == org_id,
+            )
+            .distinct()
+            .order_by(PurchaseOrder.number)
+        )
+        return [(order_id, number) for order_id, number in rows]
+
     async def adopt_line_products_async(
         self,
         db: AsyncSession,

@@ -671,6 +671,16 @@ describe("StorageWizard - building a location through all three steps", () => {
     });
   });
 
+  it("keeps a zone name already typed when a zone chip is pressed, there and after Back", async () => {
+    const user = await openWizard();
+
+    await user.type(screen.getByRole("textbox"), "Main hall");
+    await user.click(screen.getByRole("button", { name: "Pantry" }));
+    await user.click(await screen.findByRole("button", { name: "Back" }));
+
+    expect(await screen.findByRole("textbox")).toHaveValue("Main hall");
+  });
+
   it("goes back from the second step to the first and forgets the place name typed there", async () => {
     const user = await openWizard();
 

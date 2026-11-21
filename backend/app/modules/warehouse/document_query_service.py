@@ -15,6 +15,7 @@ from app.core.public_api import core_api
 
 from . import document_types as dt
 from ._line_reversals import correctable_quantities_async
+from ._order_side import order_side_async
 from .document_register_service import document_date_column
 from .models import Document, DocumentLine, DocumentRelation, DocumentStatus
 from .schemas import (
@@ -214,7 +215,30 @@ async def get_document(
             doc.corrects_document_type = corrected.type  # type: ignore[attr-defined]
         await attach_shipments_async(db, org_id, [doc])
         await _attach_returnable(db, org_id, doc)
+        await _attach_source_orders(db, org_id, doc)
     return doc
+
+
+async def _attach_source_orders(db: AsyncSession, org_id: UUID, doc: Document) -> None:
+    """Populate the transient ``source_orders``: the orders its lines came from.
+
+    A receipt posted against an order keeps the order line on each of its
+    lines (``source_po_line_id``); the order lists its receipts, and this is
+    the way back, for the page and the printout. Without the orders module
+    the lines name no order the warehouse can read, and the list is empty.
+    """
+    po_line_ids = list(
+        {line.source_po_line_id for line in doc.lines if line.source_po_line_id}
+    )
+    orders = await order_side_async(db, org_id) if po_line_ids else None
+    named = (
+        await orders.get_orders_of_lines_async(db, org_id, po_line_ids)
+        if orders is not None
+        else []
+    )
+    doc.source_orders = [  # type: ignore[attr-defined]
+        {'id': order_id, 'number': number} for order_id, number in named
+    ]
 
 
 async def _attach_returnable(db: AsyncSession, org_id: UUID, doc: Document) -> None:

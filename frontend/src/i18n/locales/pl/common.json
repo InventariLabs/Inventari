@@ -403,6 +403,7 @@
         "approves": "Zatwierdza",
         "archived": "Zarchiwizowane",
         "assigned_to": "Przypisane do",
+        "assignee_id": "Przypisane do",
         "attachment": "Załącznik",
         "auto_skipped": "Pominięty automatycznie",
         "barcode": "Kod kreskowy",

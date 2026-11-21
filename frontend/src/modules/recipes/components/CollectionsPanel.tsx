@@ -473,7 +473,7 @@ function CollectionNode({
               }}
               aria-label={t("recipes:collections.rename")}
               title={t("recipes:collections.rename")}
-              className="p-0.5 text-on-muted hover:text-primary-600"
+              className="min-h-6 min-w-6 p-0.5 text-on-muted hover:text-primary-600"
             >
               <Pencil size={16} />
             </Button>
@@ -489,7 +489,7 @@ function CollectionNode({
               }}
               aria-label={t("recipes:collections.delete")}
               title={t("recipes:collections.delete")}
-              className="p-0.5"
+              className="min-h-6 min-w-6 p-0.5"
             >
               <Trash2 size={16} />
             </Button>

@@ -74,6 +74,11 @@ describe("Today in the warehouse", () => {
       "href",
       "/warehouse/documents/doc-1",
     );
+    // A target a thumb can hit: at least 24 px tall, not the 16 px of a line
+    // of small text.
+    expect(screen.getByRole("link", { name: "MM/2026/031" })).toHaveClass(
+      "min-h-6",
+    );
   });
 
   it("counts the lines a receipt received, not the ones it kept at nought", () => {

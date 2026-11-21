@@ -36,6 +36,7 @@ const state = vi.hoisted(() => ({
   postNew: vi.fn(),
   createDraft: vi.fn(),
   confirm: vi.fn(),
+  assign: vi.fn(),
   undo: vi.fn(),
   search: vi.fn(),
   importResult: {} as Record<string, unknown>,
@@ -49,6 +50,20 @@ const rights = vi.hoisted(() => ({ write: true }));
 const ordersHook = vi.hoisted(() => vi.fn());
 const supplierHook = vi.hoisted(() => vi.fn());
 const openReceiptsHook = vi.hoisted(() => vi.fn());
+
+vi.mock("@/modules/warehouse/hooks/useWorkItems", () => ({
+  useAssignWorkItem: () => ({ mutate: state.assign }),
+}));
+
+vi.mock("@/store/authStore", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/store/authStore")>();
+  const signedIn = { user: { id: "user-me" } };
+  return {
+    ...actual,
+    useAuthStore: (selector?: (s: typeof signedIn) => unknown) =>
+      selector ? selector(signedIn) : signedIn,
+  };
+});
 
 vi.mock("@/hooks/useCanWrite", () => ({
   useCanWrite: () => rights.write,
@@ -1972,6 +1987,7 @@ describe("ReceiveGoodsPage", () => {
     beforeEach(() => {
       holdAPhone();
       camera.onCode = null;
+      state.assign.mockReset();
       state.createDraft.mockResolvedValue({ id: "doc-9", status: "DRAFT" });
       state.confirm
         .mockReset()
@@ -2032,6 +2048,64 @@ describe("ReceiveGoodsPage", () => {
       );
       expect(state.confirm).toHaveBeenCalledWith("doc-9");
       expect(state.postNew).not.toHaveBeenCalled();
+      // The delivery becomes the reader's when its receiving starts, after
+      // the receipt is confirmed — not before anything was checked.
+      expect(state.assign).toHaveBeenCalledWith({
+        sourceKind: "document",
+        sourceId: "doc-9",
+        assigneeId: "user-me",
+        onlyIfUnassigned: true,
+      });
+      expect(state.confirm.mock.invocationCallOrder[0]).toBeLessThan(
+        state.assign.mock.invocationCallOrder[0],
+      );
+    });
+
+    it("does not warn about the receipt its own start is making", async () => {
+      // The start saves a receipt for the order and confirms it before the
+      // session opens; in between, the order's open receipts include that
+      // very receipt, and the warning named it as one to receive through.
+      let release: (value: unknown) => void = () => undefined;
+      state.confirm
+        .mockReset()
+        .mockReturnValue(new Promise((resolve) => (release = resolve)));
+      const user = userEvent.setup();
+      renderAt("/warehouse/receive?order=po-1");
+
+      await user.click(
+        await screen.findByRole("button", {
+          name: "Receive one product at a time",
+        }),
+      );
+      await waitFor(() => expect(state.confirm).toHaveBeenCalled());
+
+      expect(openReceiptsHook).toHaveBeenLastCalledWith(null);
+      await act(async () => {
+        release({ id: "doc-9", status: "CONFIRMED" });
+      });
+      expect(
+        await screen.findByText("Document doc-9#receive"),
+      ).toBeInTheDocument();
+    });
+
+    it("assigns nothing when the start is refused before anything is sent", async () => {
+      state.locationRequests = serveLocations([
+        { id: "loc-1", name: "Main Warehouse" },
+        { id: "loc-2", name: "Annex" },
+      ]);
+      renderAt("/warehouse/receive");
+      await userEvent.selectOptions(screen.getByLabelText("From"), "partner-1");
+
+      await userEvent.click(
+        await screen.findByRole("button", {
+          name: "Receive one product at a time",
+        }),
+      );
+
+      expect(
+        await screen.findByText("Choose the location the goods go to."),
+      ).toBeInTheDocument();
+      expect(state.assign).not.toHaveBeenCalled();
     });
 
     it("receives a product the order does not list beside the ordered one", async () => {
