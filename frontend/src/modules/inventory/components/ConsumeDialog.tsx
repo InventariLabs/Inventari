@@ -66,7 +66,11 @@ export function ConsumeDialog({
   const aboveAvailable = Number.isFinite(requested) && requested > maxQuantity;
   const rangeError = aboveAvailable
     ? t("items:consumeDialog.aboveAvailable", {
-        max: formatQuantityValue(maxQuantity, item.uom?.rounding),
+        max: formatQuantity(
+          maxQuantity,
+          unitLabel(t, item.uom?.symbol),
+          item.uom?.rounding,
+        ),
       })
     : "";
   const quantityReady =

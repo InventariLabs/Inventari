@@ -40,6 +40,7 @@
   "searchForCode": "Szukaj tego kodu",
   "retry": "Spróbuj ponownie",
   "manualInputLabel": "Lub wpisz kod ręcznie",
+  "typeCode": "Wpisz kod",
   "manualInputPlaceholder": "Kod kreskowy lub etykiety…",
   "manualInputSubmit": "Skanuj",
   "storageContextTitle": "Miejsce skanowania",

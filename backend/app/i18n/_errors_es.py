@@ -69,9 +69,8 @@ ERRORS_ES: ErrorMessages = {
     'unknown_bulk_action': 'Acción masiva desconocida: {action}',
     'equipment_bulk_item_failed': ('No se pudo modificar este activo.'),
     'stock_as_of_no_history': (
-        'Esta organización no registra movimientos de stock, así que no '
-        'tiene historial del que informar. La única respuesta '
-        'disponible es el stock de hoy.'
+        'Todavía no se ha movido nada, así que no hay historial del que '
+        'informar. La única respuesta disponible es el stock de hoy.'
     ),
     'stock_as_of_before_ledger': (
         'El libro de movimientos empieza el {starts_at}. No se sabe '

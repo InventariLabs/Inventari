@@ -655,7 +655,7 @@ apart.
 | `SMTP_CONFIG_INVALID` | The email server settings are not valid: {reason} |
 | `SMTP_NOT_CONFIGURED` | This organization has no email sending configured |
 | `STOCK_AS_OF_BEFORE_LEDGER` | The movement ledger starts on {starts_at}. Nothing is known before that — not zero — so a report for {as_of} would be a guess. |
-| `STOCK_AS_OF_NO_HISTORY` | This organization records no stock movements, so it has no history to report on. Today’s stock levels are the only answer it can give. |
+| `STOCK_AS_OF_NO_HISTORY` | Nothing has moved yet, so there is no history to report on. Today’s stock levels are the only answer there is. |
 | `STOCK_AS_OF_PDF_TOO_MANY` | This report has {total} products — more than the {limit} rows a printout carries. Export it as a spreadsheet instead, or pick one location to narrow it. |
 | `STOCK_INSUFFICIENT_FOR_TEMPLATE` | Insufficient stock for template {template_id}: requested {requested}, available {available} |
 | `STOCK_INSUFFICIENT_RECORD` | Insufficient stock for "{item}": available {available}, requested {requested}. |

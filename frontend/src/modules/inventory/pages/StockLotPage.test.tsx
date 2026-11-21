@@ -20,6 +20,9 @@ vi.mock("react-router-dom", async () => {
 
 const traceSpy = vi.hoisted(() => vi.fn());
 
+// The status the batch request failed with when `lot` is gone: 404 is a stale
+// link, anything else a failed request.
+let lotErrorStatus = 404;
 let lot: Record<string, unknown> | undefined = {
   id: "lot-1",
   organization_id: "org",
@@ -61,7 +64,7 @@ vi.mock("@/modules/inventory/hooks/useStockLot", () => ({
     isError: lot === undefined,
     // An axios-shaped 404, or `isNotFoundError` reads the gap as a failure
     // and the screen offers "Try again" over a record that is gone.
-    error: { isAxiosError: true, response: { status: 404 } },
+    error: { isAxiosError: true, response: { status: lotErrorStatus } },
     refetch: vi.fn(),
   }),
   // The recall trace has its own tests (LotTrace.test.tsx); here it only has
@@ -319,6 +322,30 @@ describe("StockLotPage — the exit from a stale link", () => {
       expect(navigateSpy).toHaveBeenCalledWith("/inventory/lots");
     } finally {
       lot = full;
+    }
+  });
+});
+
+describe("StockLotPage — a failed request", () => {
+  it("keeps the page's name and the way back to the list", () => {
+    const full = lot;
+    lot = undefined;
+    lotErrorStatus = 500;
+    const setHeader = vi.fn();
+    try {
+      renderWithProviders(
+        <PageHeaderContext.Provider value={{ data: {}, setHeader }}>
+          <StockLotPage />
+        </PageHeaderContext.Provider>,
+      );
+
+      expect(setHeader).toHaveBeenCalledWith({
+        title: "Batch",
+        backTo: "/inventory/lots",
+      });
+    } finally {
+      lot = full;
+      lotErrorStatus = 404;
     }
   });
 });

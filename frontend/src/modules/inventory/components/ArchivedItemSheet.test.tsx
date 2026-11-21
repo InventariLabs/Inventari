@@ -144,7 +144,7 @@ describe("ArchivedItemSheet", () => {
       </QueryClientProvider>,
     );
 
-    expect(screen.getByText("Product history")).toBeInTheDocument();
+    expect(screen.getByText("Archived label")).toBeInTheDocument();
     expect(screen.queryByText("Change history")).not.toBeInTheDocument();
   });
 

@@ -175,10 +175,11 @@ export default function LabelPoolPage() {
   const handleDeleteLabel = useCallback(
     async (id: string, e: React.MouseEvent) => {
       e.stopPropagation();
+      const code = labels.find((l) => l.id === id)?.short_code ?? "";
       if (
         await confirm({
           title: t("common:actions.delete"),
-          message: t("common:messages.confirmDelete"),
+          message: t("labels:deleteOne", { code }),
           variant: "danger",
           confirmLabel: t("common:actions.delete"),
         })
@@ -191,7 +192,7 @@ export default function LabelPoolPage() {
         });
       }
     },
-    [confirm, deleteMutation, t],
+    [confirm, deleteMutation, labels, t],
   );
 
   const handlePreviewSingle = useCallback((id: string) => {
@@ -224,7 +225,12 @@ export default function LabelPoolPage() {
       downloadBlob(blob, filename);
       setShowPreview(false);
     } catch (error) {
-      toast.error(extractApiError(error, t("errorDownloading")));
+      toast.error(
+        extractApiError(error, t("errorDownloading"), {
+          width: `${t("previewModal.width")} (mm)`,
+          height: `${t("previewModal.height")} (mm)`,
+        }),
+      );
     }
   };
 
@@ -240,7 +246,7 @@ export default function LabelPoolPage() {
             if (
               await confirm({
                 title: t("common:actions.delete"),
-                message: t("common:messages.confirmDelete"),
+                message: t("labels:deleteMany", { count: selectedIds.length }),
                 variant: "danger",
                 confirmLabel: t("common:actions.delete"),
               })

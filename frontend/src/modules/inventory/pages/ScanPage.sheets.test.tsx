@@ -2,8 +2,11 @@ import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
+import { http, HttpResponse } from "msw";
+import { server } from "@/test/mocks/server";
 import { signInWith, signOut } from "@/test/auth";
 import { labelsApi } from "@/lib/api/labels";
 import { useScanStore } from "@/store/scanStore";
@@ -181,9 +184,15 @@ function scanAnswers(view: Partial<LabelScanView>) {
 // arrived from another screen has it.
 function renderPage(entries = ["/"], index = 0) {
   return render(
-    <MemoryRouter initialEntries={entries} initialIndex={index}>
-      <ScanPage />
-    </MemoryRouter>,
+    <QueryClientProvider
+      client={
+        new QueryClient({ defaultOptions: { queries: { retry: false } } })
+      }
+    >
+      <MemoryRouter initialEntries={entries} initialIndex={index}>
+        <ScanPage />
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 
@@ -399,6 +408,39 @@ describe("ScanPage — the sheets a scan opens, and the ways out of them", () =>
 
     await user.click(screen.getByRole("button", { name: "close stock" }));
     expect(mocks.camera.resumeCamera).toHaveBeenCalledTimes(1);
+  });
+
+  it("asks how much when the record holds less than one unit", async () => {
+    scanAnswers({
+      action: "show_stock_actions",
+      stock_summary: {
+        template: { name: "Copper wire" },
+        items: [{ id: "item-1", quantity: 0.5, expiry_date: null }],
+      },
+    } as never);
+    server.use(
+      http.get("/api/v1/items/item-1", () =>
+        HttpResponse.json({
+          id: "item-1",
+          name: "Copper wire",
+          quantity: "0.5",
+          location_id: "loc-1",
+          is_deleted: false,
+        }),
+      ),
+    );
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(screen.getByRole("button", { name: "type code" }));
+    await user.click(
+      await screen.findByRole("button", { name: "consume one" }),
+    );
+
+    expect(
+      await screen.findByLabelText("Quantity to remove"),
+    ).toBeInTheDocument();
+    expect(mocks.consume).not.toHaveBeenCalled();
   });
 
   it("goes back, starts the camera and drops the scan context from the camera view", async () => {

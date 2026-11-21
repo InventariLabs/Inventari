@@ -854,9 +854,8 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
             'restore the standard unit catalogue.'
         ),
         'stock_as_of_no_history': (
-            'This organization records no stock movements, so it has no '
-            'history to report on. Today’s stock levels are the only '
-            'answer it can give.'
+            'Nothing has moved yet, so there is no history to report on. '
+            'Today’s stock levels are the only answer there is.'
         ),
         'stock_as_of_before_ledger': (
             'The movement ledger starts on {starts_at}. Nothing is known '
@@ -1936,9 +1935,9 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
             'Zasób jest nadal wydany osobie. Najpierw go przyjmij.'
         ),
         'stock_as_of_no_history': (
-            'Ta organizacja nie zapisuje żadnych ruchów magazynowych, więc '
-            'nie ma historii do raportowania. Jedyna dostępna odpowiedź to '
-            'dzisiejsze stany magazynu.'
+            'Nic jeszcze się nie ruszyło, więc nie ma historii do '
+            'raportowania. Jedyna dostępna odpowiedź to dzisiejsze stany '
+            'magazynu.'
         ),
         'stock_as_of_before_ledger': (
             'Rejestr ruchów zaczyna się {starts_at}. O wcześniejszym czasie '

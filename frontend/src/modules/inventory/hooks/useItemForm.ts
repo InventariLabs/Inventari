@@ -29,7 +29,11 @@ import {
 } from "@/modules/shared/hooks/useUoms";
 import { useModuleValidation } from "@/hooks/useModuleValidation";
 import { useFieldDefinitions } from "./useFieldDefinitions";
-import { useUnitChoice } from "./useUnitChoice";
+import {
+  useSaveAfterUnitAnswer,
+  useUnitChoice,
+  type PendingUnitChoice,
+} from "./useUnitChoice";
 import { makeTDynamic } from "@/lib/i18nHelpers";
 import { getLabel } from "@/modules/inventory/components/FieldRenderers/helpers";
 import type { CoreFormName } from "@/lib/moduleRegistry/moduleInterfaces";
@@ -605,6 +609,9 @@ export function useItemForm({
     [handleInputChange],
   );
 
+  // Set below: the save press registers the unit question it raised.
+  const rememberQuestionRef = useRef<(q: PendingUnitChoice | null) => void>();
+
   const submit = useCallback(
     (e?: React.FormEvent) => {
       if (e) e.preventDefault();
@@ -657,7 +664,8 @@ export function useItemForm({
         isDifferentFromTemplate(chosenUomId) &&
         !isConfirmedChoice(chosenUomId)
       ) {
-        askIfDifferent(chosenUomId);
+        // The answer to the question this press raised carries the save on.
+        rememberQuestionRef.current?.(askIfDifferent(chosenUomId));
         return;
       }
 
@@ -695,6 +703,13 @@ export function useItemForm({
       initialUomId,
     ],
   );
+
+  const { answerUnitChoice, rememberQuestion } = useSaveAfterUnitAnswer(
+    pendingUnitChoice,
+    resolveUnitChoice,
+    submit,
+  );
+  rememberQuestionRef.current = rememberQuestion;
 
   /**
    * Whether anything in the form differs from the record behind it.
@@ -744,6 +759,6 @@ export function useItemForm({
     templateUnit,
     /** A chosen unit the template does not keep, waiting on the reader. */
     pendingUnitChoice,
-    resolveUnitChoice,
+    resolveUnitChoice: answerUnitChoice,
   };
 }

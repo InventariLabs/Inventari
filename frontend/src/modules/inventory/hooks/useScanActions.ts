@@ -13,8 +13,17 @@ export function useScanConsume() {
   const { t } = useTranslation("labels");
 
   return useAppMutation(
-    ({ itemId, quantity }: { itemId: string; quantity: number }) =>
-      itemsApi.consume(itemId, quantity),
+    ({
+      itemId,
+      quantity,
+      reason,
+      notes,
+    }: {
+      itemId: string;
+      quantity: number;
+      reason?: string;
+      notes?: string;
+    }) => itemsApi.consume(itemId, quantity, reason, notes),
     (qc, updatedItem, { quantity }) => {
       invalidation.items(qc);
       toast.success(

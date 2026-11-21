@@ -124,3 +124,44 @@ describe("computeFieldDefinitions — the product code", () => {
     expect(barcodeVisible(fields)).toBe(true);
   });
 });
+
+/**
+ * A category the user made carries no context of its own. In a workspace whose
+ * profile says what kind of things it holds, that profile speaks for it: a
+ * cable is not asked for a freeze date.
+ */
+describe("computeFieldDefinitions — a category with no context takes the profile's", () => {
+  const madeByUser = {
+    id: "cat-cables",
+    name: "Cables",
+    context_tag: null,
+    field_definitions: [],
+  } as unknown as NonNullable<
+    Parameters<typeof computeFieldDefinitions>[0]["selectedCategory"]
+  >;
+  const visible = (
+    fields: ReturnType<typeof computeFieldDefinitions>,
+    key: string,
+  ) => fields.find((f) => f.key === key)?.visible;
+
+  it("hides the food dates under an equipment profile", () => {
+    const fields = computeFieldDefinitions({
+      ...baseContext,
+      selectedCategory: madeByUser,
+      profileContext: "equipment",
+    });
+
+    expect(visible(fields, "freeze_date")).toBe(false);
+    expect(visible(fields, "expiry_date")).toBe(false);
+  });
+
+  it("offers them where the profile names no context", () => {
+    const fields = computeFieldDefinitions({
+      ...baseContext,
+      selectedCategory: madeByUser,
+    });
+
+    expect(visible(fields, "freeze_date")).toBe(true);
+    expect(visible(fields, "expiry_date")).toBe(true);
+  });
+});

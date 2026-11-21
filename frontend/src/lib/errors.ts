@@ -13,7 +13,17 @@ interface ApiErrorDetail {
  * For arrays, returns the first message — callers that need per-field
  * mapping should use parseApiValidationErrors from lib/validationErrors.
  */
-export function extractApiError(error: unknown, fallback: string): string {
+export function extractApiError(
+  error: unknown,
+  fallback: string,
+  /**
+   * The reader's names for the fields a 422 can speak about, by API key. A
+   * refusal such as "Must be greater than or equal to 10" is a sentence
+   * about nothing until it says which field; a caller that knows the form's
+   * labels hands them in and the sentence leads with the one that failed.
+   */
+  fieldNames?: Record<string, string>,
+): string {
   const readable = readableErrorMessage(error);
   if (readable) {
     return readable;
@@ -38,7 +48,12 @@ export function extractApiError(error: unknown, fallback: string): string {
       const first = detail[0];
       if (first && typeof first === "object" && "msg" in first) {
         const msg = (first as { msg: unknown }).msg;
-        if (typeof msg === "string") return msg;
+        if (typeof msg === "string") {
+          const loc = (first as { loc?: unknown }).loc;
+          const key = Array.isArray(loc) ? String(loc[loc.length - 1]) : "";
+          const name = fieldNames?.[key];
+          return name ? `${name}: ${msg}` : msg;
+        }
       }
       return fallback;
     }

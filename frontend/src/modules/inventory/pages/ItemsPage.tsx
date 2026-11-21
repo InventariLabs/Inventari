@@ -348,6 +348,7 @@ export default function ItemsPage() {
           selectionMode={selectionMode}
           canWrite={canWrite}
           hasRows={total > 0}
+          listFailed={isError}
           onExitSelectionMode={exitSelectionMode}
           onOpenMobileActions={() => setShowMobileActions(true)}
           onImport={() => setShowImportModal(true)}
@@ -363,6 +364,7 @@ export default function ItemsPage() {
     selectionMode,
     exitSelectionMode,
     total,
+    isError,
     canWrite,
   ]);
 
@@ -607,6 +609,7 @@ export default function ItemsPage() {
         open={showMobileActions}
         canWrite={canWrite}
         hasRows={total > 0}
+        listFailed={isError}
         onClose={() => setShowMobileActions(false)}
         onImport={() => setShowImportModal(true)}
         onExport={handleExport}

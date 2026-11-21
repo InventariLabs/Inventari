@@ -43,6 +43,19 @@ function renderModal(overrides: Partial<PrintSettings> = {}) {
   );
 }
 
+// jsdom's Blob cannot read itself, which the client needs to unwrap a refusal
+// that arrives as a file; the browser has had the method since 2019.
+if (typeof Blob.prototype.text !== "function") {
+  Blob.prototype.text = function (this: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsText(this);
+    });
+  };
+}
+
 /** Every request the window makes for a rendered sheet. */
 function captureRenders() {
   const asked: URLSearchParams[] = [];
@@ -114,6 +127,35 @@ describe("LabelPreviewModal — the preview is the file", () => {
     expect(
       await screen.findByText(/preview could not be rendered/i),
     ).toBeInTheDocument();
+  });
+
+  it("names the field the server refused, with its sentence", async () => {
+    server.use(
+      http.get("/api/v1/labels/pool/export/png", () =>
+        HttpResponse.json(
+          {
+            detail: [
+              {
+                loc: ["query", "width"],
+                msg: "Input should be greater than or equal to 10",
+                type: "greater_than_equal",
+              },
+            ],
+          },
+          { status: 422 },
+        ),
+      ),
+    );
+
+    renderModal({ width: 5 });
+    await act(() => vi.advanceTimersByTimeAsync(500));
+
+    expect(
+      await screen.findByText(
+        "Width (mm): Input should be greater than or equal to 10",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/preview could not be rendered/i)).toBeNull();
   });
 });
 

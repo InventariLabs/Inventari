@@ -94,6 +94,36 @@ describe("extractApiError", () => {
   });
 });
 
+describe("extractApiError with the reader's names for fields", () => {
+  const refusal = (key: string) => ({
+    isAxiosError: true,
+    response: {
+      status: 422,
+      data: {
+        detail: [
+          {
+            loc: ["query", key],
+            msg: "Must be greater than or equal to 10",
+            type: "greater_than_equal",
+          },
+        ],
+      },
+    },
+  });
+
+  it("puts the reader's name for the field in front of its sentence", () => {
+    expect(
+      extractApiError(refusal("width"), "fallback", { width: "Width (mm)" }),
+    ).toBe("Width (mm): Must be greater than or equal to 10");
+  });
+
+  it("stays the bare sentence for a field the caller has no name for", () => {
+    expect(
+      extractApiError(refusal("other"), "fallback", { width: "Width (mm)" }),
+    ).toBe("Must be greater than or equal to 10");
+  });
+});
+
 describe("isServerRefusal", () => {
   const refusal = (status: number) => {
     const err = new axios.AxiosError();

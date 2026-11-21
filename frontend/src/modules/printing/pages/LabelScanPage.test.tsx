@@ -187,6 +187,31 @@ describe("LabelScanPage", () => {
   });
 });
 
+describe("LabelScanPage — a label whose product was archived", () => {
+  it("is called archived, the word the label pool uses", async () => {
+    queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    server.use(
+      http.get("/api/v1/labels/scan/STM-0001", () =>
+        HttpResponse.json({
+          status: "archived",
+          label_code: "STM-0001",
+          message_key: "scan:result.previously",
+          message_params: { product: "Copper wire" },
+          action: "show_archived_info",
+        }),
+      ),
+    );
+
+    renderPage();
+
+    expect(await screen.findByText("Archived")).toBeInTheDocument();
+    expect(screen.getByText("Previously: Copper wire")).toBeInTheDocument();
+    expect(screen.queryByText("Unassigned")).not.toBeInTheDocument();
+  });
+});
+
 describe("LabelScanPage — a read-only account", () => {
   const serveFreeLabel = () =>
     server.use(

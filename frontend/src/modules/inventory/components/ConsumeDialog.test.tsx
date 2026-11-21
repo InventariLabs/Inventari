@@ -164,6 +164,35 @@ describe("ConsumeDialog", () => {
     expect(onConfirm).not.toHaveBeenCalled();
   });
 
+  it("names the unit of what the shelf holds when the typed amount is too much", async () => {
+    const user = userEvent.setup();
+    render(
+      <ConsumeDialog
+        open
+        item={{
+          ...item,
+          quantity: "1",
+          uom_id: "uom-kg",
+          uom: {
+            id: "uom-kg",
+            name: "Kilogram",
+            symbol: "kg",
+            category_name: "Weight",
+            rounding: "0.001000",
+          },
+        }}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
+      />,
+    );
+    const field = screen.getByLabelText("Quantity to remove");
+
+    await user.clear(field);
+    await user.type(field, "3");
+
+    expect(screen.getByText("There is only 1 kg on the shelf.")).toBeVisible();
+  });
+
   // The button names the amount that will leave — the amount that was
   // typed, because nothing is put in its place any more.
   it("names the amount that was typed, not one of its own", async () => {
