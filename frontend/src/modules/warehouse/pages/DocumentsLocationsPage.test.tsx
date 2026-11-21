@@ -354,9 +354,11 @@ describe("DocumentsLocationsPage — the shelves of one warehouse", () => {
 
     await screen.findByText("Bulk shelf 000");
     // The warehouse and the first hundred below it; the rest waits.
-    expect(
-      screen.getAllByRole("checkbox", { name: /^Select (?!all)/ }),
-    ).toHaveLength(101);
+    const boxes = screen.getAllByRole("checkbox", { name: /^Select (?!all)/ });
+    expect(boxes).toHaveLength(101);
+    // Each box is pressed through a 44 px label on a phone: a press beside
+    // the 16 px box still ticks it.
+    expect(boxes[0].closest("label")).toHaveClass("min-h-11");
     expect(screen.queryByText("Bulk shelf 129")).not.toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: "Show more" }));
@@ -366,7 +368,8 @@ describe("DocumentsLocationsPage — the shelves of one warehouse", () => {
       screen.queryByRole("button", { name: "Show more" }),
     ).not.toBeInTheDocument();
     expect(asked).toEqual([]);
-  });
+    // 130 rows, each with its 44 px label, drawn twice: slow on a loaded runner.
+  }, 30_000);
 
   it("says when stock without a limit is left out of the percentage", async () => {
     // A cap for a product that is not on the shelf reads 0/200 while 28

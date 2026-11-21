@@ -382,6 +382,10 @@ const VALUE_RESOLVERS: Record<
   // act (`requested`, `approved`, `rejected`), not a capitalised code.
   approval: (t, code) =>
     t(`common:settings.audit.values.approval_${code}`, { defaultValue: "" }),
+  // A partner's kind, in the partners screen's own words. A document's type
+  // shares the field name; the partners file has no word for it, and it
+  // falls through to the journal's own values.
+  type: (t, code) => t(`partners:types.${code}`, { defaultValue: "" }),
 };
 
 /**

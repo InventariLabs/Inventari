@@ -456,6 +456,45 @@ async def _journal_async(
     )
 
 
+async def _assignment_snapshot_async(
+    db: AsyncSession,
+    org_id: UUID,
+    *,
+    source_kind: str,
+    source_id: UUID,
+    assignee_id: UUID | None,
+    assignee_name: str | None,
+) -> dict[str, Any]:
+    """What the log keeps of an assignment: the task in words, and the person.
+
+    A document's task is known by the document's number and a task somebody
+    wrote by its title; the person by their name beside their id, which the
+    log reads as the id's label. Tasks of other modules keep no name here.
+    """
+    snapshot: dict[str, Any] = {
+        'assignee_id': str(assignee_id or ''),
+        'assignee_name': assignee_name or '',
+    }
+    if source_kind == 'document':
+        number = await db.scalar(
+            select(Document.number).where(
+                Document.id == source_id, Document.organization_id == org_id
+            )
+        )
+        if number:
+            snapshot['number'] = number
+    elif source_kind == CUSTOM_SOURCE_KIND:
+        title = await db.scalar(
+            select(WorkItemOverlay.title).where(
+                WorkItemOverlay.id == source_id,
+                WorkItemOverlay.organization_id == org_id,
+            )
+        )
+        if title:
+            snapshot['title'] = title
+    return snapshot
+
+
 def _already_taken_error() -> ConflictException:
     """The refusal of a claim: somebody else was given the task first."""
     return ConflictException(
@@ -530,11 +569,21 @@ async def assign_work_item_async(
     its deliberate reassignment, the desktop's choosing of a person.
     """
     lang = get_current_lang()
-    if (
-        assignee_id is not None
-        and await core_api.users.get_async(db, org_id, assignee_id) is None
-    ):
+    assignee = (
+        await core_api.users.get_async(db, org_id, assignee_id)
+        if assignee_id is not None
+        else None
+    )
+    if assignee_id is not None and assignee is None:
         raise NotFoundException('user', lang)
+    snapshot = await _assignment_snapshot_async(
+        db,
+        org_id,
+        source_kind=source_kind,
+        source_id=source_id,
+        assignee_id=assignee_id,
+        assignee_name=(assignee.full_name or assignee.email) if assignee else None,
+    )
     if source_kind == CUSTOM_SOURCE_KIND:
         if only_if_unassigned:
             # A custom task is its own overlay row, so the claim is one
@@ -571,7 +620,7 @@ async def assign_work_item_async(
             user_id,
             AuditAction.UPDATE,
             source_id,
-            {'source_kind': source_kind, 'assignee_id': str(assignee_id or '')},
+            snapshot,
         )
         return
     if only_if_unassigned:
@@ -589,7 +638,7 @@ async def assign_work_item_async(
             user_id,
             AuditAction.UPDATE,
             source_id,
-            {'source_kind': source_kind, 'assignee_id': str(assignee_id or '')},
+            snapshot,
         )
         return
     existing = (
@@ -622,7 +671,7 @@ async def assign_work_item_async(
         user_id,
         AuditAction.UPDATE,
         source_id,
-        {'source_kind': source_kind, 'assignee_id': str(assignee_id or '')},
+        snapshot,
     )
 
 

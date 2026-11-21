@@ -133,7 +133,7 @@ function LocationRow({
           <>
             <Link
               to={`/equipment/assets?location=${placeId ?? item.location_id}`}
-              className="text-on-primary underline-offset-2 hover:underline"
+              className="inline-flex min-h-6 items-center text-on-primary underline-offset-2 hover:underline"
             >
               {whereName}
             </Link>

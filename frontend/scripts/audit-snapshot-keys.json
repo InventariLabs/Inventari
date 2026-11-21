@@ -26,6 +26,7 @@
     "archived",
     "assets",
     "assigned_to",
+    "assignee_id",
     "attachment",
     "auto_skipped",
     "availability_check_scope",

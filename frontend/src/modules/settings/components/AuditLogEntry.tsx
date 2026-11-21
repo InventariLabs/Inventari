@@ -228,7 +228,7 @@ function AuditChanges({
           type="button"
           variant="ghost"
           size="inline"
-          className="text-xs underline"
+          className="min-h-6 text-xs underline"
           onClick={onToggle}
         >
           {t(
@@ -265,7 +265,7 @@ export function AuditTarget({
           variant="ghost"
           size="contentSm"
           onClick={() => onCopy(row.target_id)}
-          className="p-0.5 gap-0.5 font-mono text-on-muted hover:text-on hover:bg-transparent active:bg-transparent"
+          className="min-h-6 p-0.5 gap-0.5 font-mono text-on-muted hover:text-on hover:bg-transparent active:bg-transparent"
           title={row.target_id}
         >
           {shortUuid(row.target_id)}
@@ -387,7 +387,7 @@ function AuditDocumentReference({
       {reachable ? (
         <Link
           to={`/warehouse/documents/${documentId}`}
-          className="text-on-primary hover:underline"
+          className="inline-flex min-h-6 items-center text-on-primary hover:underline"
         >
           {number}
         </Link>

@@ -211,6 +211,8 @@ class TestAHoldFollowsTheRecordTheLineNames:
         assert confirm.status_code == status.HTTP_400_BAD_REQUEST, confirm.text
         assert doc_source_location.name in confirm.text, 'names the shelf it searched'
         assert doc_target_location.name in confirm.text, 'names the record shelf'
+        message = confirm.json()['detail']['message']
+        assert f'0 of 2 available on "{doc_source_location.name}", 2 missing' in message
 
         shown = client.get(
             f'/api/v1/warehouse/documents/{doc_id}', headers=doc_auth_headers

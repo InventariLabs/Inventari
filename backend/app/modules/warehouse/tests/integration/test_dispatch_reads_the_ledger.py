@@ -222,11 +222,8 @@ class TestDispatchReadsTheLedger:
         )
         assert code != status.HTTP_200_OK
         # Refused at confirmation, where the reservation is taken, and the
-        # figure is the ledger's: two of the five asked for could not be
-        # covered, so three are on the shelf. Nothing quotes the quantity of
-        # whichever record the line happened to name.
-        assert 'could not be reserved' in body
-        # The shelf's figure, in the reader's numbers — the database's own
-        # scale ("2.000 of 5.000") was the quantity column's spelling, not
-        # the one every screen uses.
-        assert '2 of 5' in body
+        # figure is the ledger's: three of the five asked for are on the
+        # shelf and two are missing. Nothing quotes the quantity of
+        # whichever record the line happened to name. The numbers are the
+        # reader's — not the database's own scale ("3.000 of 5.000").
+        assert '3 of 5 available, 2 missing' in body

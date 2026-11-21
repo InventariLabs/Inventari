@@ -347,6 +347,36 @@ describe("WmsReceivingView on a phone", () => {
     ).toBeInTheDocument();
   });
 
+  it("names no expected figure for goods only the sheet counted", async () => {
+    // A product added beside an order, or scanned on a receipt with none,
+    // starts at the sheet's own count of one: nobody expected it, and the
+    // card read "Expected 1 pcs.".
+    serveDocument();
+    server.use(
+      http.post(`${BASE}/start`, () =>
+        HttpResponse.json(
+          session([
+            line("yoghurt", "Yoghurt", {
+              expected_quantity: 1,
+              from_order: false,
+              expected_is_count: true,
+            }),
+          ]),
+        ),
+      ),
+    );
+    const user = userEvent.setup();
+
+    render(<WmsReceivingView documentId={DOC} onClose={vi.fn()} />);
+    const card = await screen.findByRole("region", { name: "Yoghurt" });
+
+    expect(within(card).queryByText(/Expected/)).not.toBeInTheDocument();
+    await user.click(within(card).getByRole("button", { name: "Increase" }));
+    await user.click(within(card).getByRole("button", { name: "Decrease" }));
+    await user.click(within(card).getByRole("button", { name: "Decrease" }));
+    expect(within(card).queryByText(/than expected/)).not.toBeInTheDocument();
+  });
+
   it.each([
     { typedCount: true, warns: false },
     { typedCount: false, warns: true },
@@ -773,6 +803,60 @@ describe("WmsReceivingView on a phone", () => {
     expect(
       within(card).queryByText("Follow the plan (rule / document)"),
     ).not.toBeInTheDocument();
+  });
+
+  it("finishes without the rest with nothing counted: posts nothing and says so", async () => {
+    // Nothing of the delivery came. Short-receiving every line and posting
+    // the receipt read "Received 0 lines. The goods are in stock" and left a
+    // numbered, completed receipt with nothing on it.
+    serveDocument();
+    let cancelled = false;
+    let completed = false;
+    let shortReceives = 0;
+    server.use(
+      http.post(`${BASE}/start`, () =>
+        HttpResponse.json(
+          session([
+            line("plums", "Damson Plums"),
+            line("gouda", "Gouda Cheese"),
+          ]),
+        ),
+      ),
+      http.post(`${BASE}/session-1/short-receive`, () => {
+        shortReceives += 1;
+        return HttpResponse.json({ status: "short_receive_confirmed" });
+      }),
+      http.post(`${BASE}/session-1/cancel`, () => {
+        cancelled = true;
+        return HttpResponse.json({ status: "cancelled" });
+      }),
+      http.patch(`/api/v1/warehouse/documents/${DOC}/complete`, () => {
+        completed = true;
+        return HttpResponse.json({ id: DOC, status: "COMPLETED", lines: [] });
+      }),
+    );
+    const onClose = vi.fn();
+    const user = userEvent.setup();
+
+    render(<WmsReceivingView documentId={DOC} onClose={onClose} />);
+    await screen.findByRole("region", { name: "Damson Plums" });
+    await user.click(
+      screen.getByRole("button", { name: "The rest did not come — finish" }),
+    );
+    await user.click(
+      within(await screen.findByRole("alertdialog")).getByRole("button", {
+        name: "Finish receiving",
+      }),
+    );
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(cancelled).toBe(true);
+    expect(shortReceives).toBe(0);
+    expect(completed).toBe(false);
+    expect(toast).toHaveBeenCalledWith(
+      "Nothing was received, so nothing was posted. The receipt stays open for the goods still expected.",
+    );
+    expect(screen.queryByText(/Received 0 lines/)).not.toBeInTheDocument();
   });
 
   it("finishes without the rest: books what came and offers the document and Undo", async () => {

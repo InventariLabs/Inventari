@@ -251,7 +251,7 @@ export default function DocumentsPage() {
               worked with the mode off — two controls of nearly the same name
               for one job. */}
           <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-xs text-on-secondary cursor-pointer select-none">
+            <label className="flex min-h-11 items-center gap-2 text-xs text-on-secondary cursor-pointer select-none md:min-h-0">
               <input
                 type="checkbox"
                 checked={

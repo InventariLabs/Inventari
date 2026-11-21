@@ -402,6 +402,7 @@
         "approves": "Approves",
         "archived": "Archived",
         "assigned_to": "Assigned to",
+        "assignee_id": "Assigned to",
         "attachment": "Attachment",
         "auto_skipped": "Auto-skipped",
         "barcode": "Barcode",

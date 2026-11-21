@@ -355,12 +355,23 @@ test.describe("Receiving on a phone", () => {
       .click();
     await expect(page).toHaveURL(/#receive/);
     const dialog = session(page);
-    // No order to speak of: the count somebody wrote down is "expected".
-    await expect(dialog.getByText("Expected 3 pcs.")).toBeVisible();
+    // No order to speak of: the card starts at the count somebody wrote
+    // down, and nothing calls that count expected.
+    await expect(
+      dialog.getByRole("spinbutton", {
+        name: `How many of ${rice.name} arrived`,
+      }),
+    ).toHaveValue("3");
+    await expect(dialog.getByText(/^Expected /)).toHaveCount(0);
     await expect(dialog.getByText(/^Still due /)).toHaveCount(0);
     await scanShelf(page, shelf.code);
     await dialog.getByRole("button", { name: "Correct, next" }).click();
-    await expect(dialog.getByText("Expected 1 pcs.")).toBeVisible();
+    await expect(
+      dialog.getByRole("spinbutton", {
+        name: `How many of ${beans.name} arrived`,
+      }),
+    ).toHaveValue("1");
+    await expect(dialog.getByText(/^Expected /)).toHaveCount(0);
     await dialog
       .getByRole("button", { name: "Correct, finish receiving" })
       .click();

@@ -855,7 +855,8 @@ class TestDocumentWorkflow:
         assert 'insufficient stock to confirm' in message
         # The screen counts in the same shape as every other quantity: the
         # database's own scale is not the reader's ("5.000 of 10.000").
-        assert '5 of 10 could not be reserved' in message
+        assert '5 of 10 available' in message
+        assert '5 missing' in message
 
     def test_confirm_out_full_stock_succeeds(
         self,

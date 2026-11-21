@@ -199,6 +199,9 @@
 {% if return_of_number %}
 <div class="correction-ref">{{ labels.return_of }}: <strong>{{ return_of_number }}</strong></div>
 {% endif %}
+{% if source_order_number %}
+<div class="correction-ref">{{ labels.source_order }}: <strong>{{ source_order_number }}</strong></div>
+{% endif %}
 {% if scrap_reason %}
 <div class="correction-ref">{{ labels.scrap_reason }}: <strong>{{ scrap_reason }}</strong></div>
 {% endif %}

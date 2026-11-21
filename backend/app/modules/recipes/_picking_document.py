@@ -52,26 +52,11 @@ _SETTING_KEY = 'register_production_as_document'
 # Document notes per request language (fallback: English). Server-generated
 # content must not be hardcoded English — see protocol_service pattern.
 _NOTES_LABELS: dict[str, str] = {
-    'en': (
-        'Recipe production: {recipe} — stock already consumed '
-        'via picking session {session}'
-    ),
-    'pl': (
-        'Produkcja z receptury: {recipe} — stan został już pobrany '
-        'w sesji kompletacji {session}'
-    ),
-    'de': (
-        'Rezeptproduktion: {recipe} — Bestand bereits über '
-        'Kommissioniersitzung {session} entnommen'
-    ),
-    'fr': (
-        'Production de recette : {recipe} — stock déjà consommé '
-        'via la session de prélèvement {session}'
-    ),
-    'es': (
-        'Producción de receta: {recipe} — existencias ya consumidas '
-        'en la sesión de picking {session}'
-    ),
+    'en': 'Recipe production: {recipe} — stock already taken while picking the ingredients',
+    'pl': 'Produkcja z receptury: {recipe} — stan został już pobrany przy kompletacji składników',
+    'de': 'Rezeptproduktion: {recipe} — Bestand bereits beim Kommissionieren der Zutaten entnommen',
+    'fr': 'Production de recette : {recipe} — stock déjà prélevé lors de la préparation des ingrédients',
+    'es': 'Producción de receta: {recipe} — existencias ya retiradas al preparar los ingredientes',
 }
 
 
@@ -158,10 +143,12 @@ async def register_picking_as_document_async(
                 source_location_id=source_location_id,
                 lines=lines,
                 notes=_NOTES_LABELS.get(lang, _NOTES_LABELS['en']).format(
-                    recipe=recipe_name,
-                    session=session.id,
+                    recipe=recipe_name
                 ),
-                external_reference=f'picking:{session.id}',
+                # The recipe, not the session: the recipe has a page (its
+                # cooking history lists this document), the session none.
+                # The screens read the prefix as words and a link.
+                external_reference=f'recipe:{session.recipe_id}',
             ),
             user_id,
         )
