@@ -1,12 +1,13 @@
 {
   "auth_required": "Ce point d'accès exige une clé API : envoyez-la dans l'en-tête 'X-API-Key'.",
-  "permission_required": "Cette clé API ne détient pas la permission mcp_server:use.",
+  "permission_required": "Cette clé API n'a pas une permission : 'Utiliser le point d'accès MCP'.",
   "module_disabled": "Le module Serveur MCP est désactivé pour cette organisation.",
   "organization_required": "Un appel MCP agit dans une organisation, et cette clé n'appartient à aucune.",
   "insufficient_permission": "Cette clé API ne détient pas la permission {permission}.",
   "call_without_identity": "Cet appel d'outil n'a pas d'espace de travail authentifié.",
   "item_not_found": "Aucun enregistrement d'id {item_id} n'existe dans cet espace de travail.",
   "location_not_found": "Aucun emplacement d'id {location_id} n'existe dans cet espace de travail.",
+  "location_required": "Un enregistrement a besoin d'un emplacement : indiquez location_id. list_locations vous en donne un.",
   "lot_not_found": "Aucun lot d'id {lot_id} n'existe dans cet espace de travail.",
   "reason_required": "Une correction exige une raison : indiquez pourquoi la quantité change.",
   "quantity_not_negative": "Une quantité en stock ne peut pas être négative."

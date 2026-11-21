@@ -518,6 +518,20 @@ process and every previously encrypted value (stored API keys) becomes
 unreadable after a restart. The diff in step 3 turns that into a five-second
 check before anything restarts.
 
+A development stack (`docker-compose.yml`, the checkout you run with `make dev`)
+has no `docker-compose.prod.yml` and no `db-backup` service, and its `.env`
+is not made from `.env.production.example`. Two steps read differently there:
+
+- **Step 1** — dump the database yourself and keep the file outside the
+  checkout: `docker compose exec -T db sh -c 'pg_dump -U "$POSTGRES_USER"
+  -Fc "$POSTGRES_DB"' > ~/inventari-before-update.dump`. Put it back with
+  `pg_restore` into an empty database.
+- **Step 3** — compare against `.env.example`, and ask git what the release
+  added instead of diffing about fifty names that were always there:
+  `git diff <tag you came from> <new tag> -- .env.example`. Only the lines
+  that diff adds are variables your `.env` may lack; an empty diff means the
+  release gained none.
+
 Copy any variable step 3 found into the copy of `.env` you keep off the
 server, too. Once the new release has run for a while, remove the copy from
 step 1: `sudo rm -r backups/before-update`.

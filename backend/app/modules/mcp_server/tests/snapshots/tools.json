@@ -1,5 +1,5 @@
 {
-  "module_version": "0.2.1",
+  "module_version": "0.2.2",
   "resources": [
     {
       "_meta": null,
@@ -557,7 +557,7 @@
             "type": "string"
           },
           "records": {
-            "description": "Catalogue records when no stock row matched \u2014 a product with no stock, or a barcode looked up directly.",
+            "description": "Catalogue records when no stock row matched \u2014 a product with no stock, found by the same text search the stock rows use: name, brand, the code on the record or its product card, serial and label code.",
             "items": {
               "$ref": "#/$defs/ItemView"
             },
@@ -2237,7 +2237,7 @@
         "readOnlyHint": null,
         "title": null
       },
-      "description": "Create one stock record and put its quantity on a shelf: a new product, a new batch of one, or a unit of something. The record gets its opening movement and its history row, so it counts as stock from this call on. Name the product with name, or point at an existing product card with template_id to avoid a duplicate. Use correct_stock to change a quantity that already exists; use search_items first when the product may already be on a shelf. Example: create_item(name=\"Olive oil\", quantity=6, location_id=\"<a shelf id>\").",
+      "description": "Create one stock record and put its quantity on a shelf: a new product, a new batch of one, or a unit of something. The record gets its opening movement and its history row, so it counts as stock from this call on. Name the product with name, or point at an existing product card with template_id to avoid a duplicate. Use correct_stock to change a quantity that already exists; use search_items first when the product may already be on a shelf. A location_id is required: call list_locations when you have no shelf id yet. Example: create_item(name=\"Olive oil\", quantity=6, location_id=\"<a shelf id>\").",
       "execution": null,
       "icons": null,
       "inputSchema": {
@@ -2297,10 +2297,18 @@
             "title": "Expiry Date"
           },
           "location_id": {
-            "description": "The shelf the stock stands on.",
-            "format": "uuid",
-            "title": "Location Id",
-            "type": "string"
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The shelf the stock stands on; call list_locations for an id. Required: a record without a shelf is not stock.",
+            "title": "Location Id"
           },
           "metadata": {
             "anyOf": [
@@ -2363,8 +2371,7 @@
           }
         },
         "required": [
-          "name",
-          "location_id"
+          "name"
         ],
         "title": "create_itemArguments",
         "type": "object"

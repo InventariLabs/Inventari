@@ -299,9 +299,25 @@ says what the release does rather than what changed since them.
   (ul. Magazynowa 5, 90-001 Łódź). The subtitle of the period closure screen
   describes the screen instead of inviting an action that a read-only account
   cannot take.
+- The line picker of a delivery, a scrap, a transfer or any other warehouse
+  document now finds stock the way the catalogue picker does: by the product's
+  name, brand, the code on the record or its product card, the label code and
+  the serial number, not by name alone. A one- or two-character fragment
+  matches only the start of a field, so typing `oi` no longer lists
+  `Olive oil` while `Ol` still finds it; a search term of three characters or
+  more still matches anywhere in a field.
 
 ### Fixed
 
+- A production run or batch record whose ingredients carried no purchase
+  price no longer shows a cost of zero per unit beside a total that reads
+  "—": the per-unit figure is "—" too until some rate is known, so an
+  unknown cost is not mistaken for a product that costs nothing to make.
+  `manage.py db doctor` also names the migrations still to be applied when it
+  lists a column whose type differs from the models, so the notice on an
+  upgrade start reads as expected, and *Updating* in `DEPLOYMENT.md` says how
+  a development stack takes the backup and lists the variables a release
+  added.
 - Counting a location that has sub-locations now offers, in the bar of
   products outside the stock take, a product received onto a sub-location
   after the count started, as counting that sub-location itself does.

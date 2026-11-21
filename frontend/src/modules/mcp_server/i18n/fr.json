@@ -4,11 +4,13 @@
   "subtitle": "Où un agent IA se connecte à cet espace de travail, la clé API qu'il envoie et les hôtes sur lesquels le point d'accès répond.",
   "endpoint": {
     "label": "Point d'accès",
-    "hint": "Indiquez cette adresse à votre client MCP."
+    "hint": "Indiquez cette adresse à votre client MCP.",
+    "protocol": "Parle la révision de protocole 2026-07-28, envoyée avec chaque requête ; un client qui commence par la poignée de main initialize négocie 2025-11-25."
   },
   "connect": {
     "title": "Pour connecter",
     "createKey": "Créez une clé API dans Clés API et donnez-lui la permission Utiliser le point d'accès MCP.",
+    "createKeyNeedsAdmin": "Demandez une clé à un administrateur de votre organisation : elle est créée dans Clés API, avec la permission Utiliser le point d'accès MCP.",
     "pointClient": "Envoyez la clé dans l'en-tête X-API-Key (ou comme jeton Bearer) à l'adresse ci-dessus.",
     "allowHost": "Si l'installation répond sur une adresse publique, ajoutez son hôte aux hôtes autorisés dans les paramètres du module."
   },

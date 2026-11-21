@@ -1,12 +1,13 @@
 {
   "auth_required": "Este punto de acceso necesita una clave API: envíela en la cabecera 'X-API-Key'.",
-  "permission_required": "Esta clave API no tiene el permiso mcp_server:use.",
+  "permission_required": "A esta clave API le falta un permiso: 'Usar el punto de acceso MCP'.",
   "module_disabled": "El módulo Servidor MCP está desactivado para esta organización.",
   "organization_required": "Una llamada MCP actúa en una organización, y esta clave no pertenece a ninguna.",
   "insufficient_permission": "Esta clave API no tiene el permiso {permission}.",
   "call_without_identity": "Esta llamada de herramienta no tiene un espacio de trabajo autenticado.",
   "item_not_found": "En este espacio de trabajo no hay ningún registro con id {item_id}.",
   "location_not_found": "En este espacio de trabajo no hay ninguna ubicación con id {location_id}.",
+  "location_required": "Un registro necesita una ubicación: indica location_id. list_locations te da una.",
   "lot_not_found": "En este espacio de trabajo no hay ningún lote con id {lot_id}.",
   "reason_required": "Una corrección necesita un motivo: di por qué cambia la cantidad.",
   "quantity_not_negative": "La cantidad en existencias no puede ser negativa."

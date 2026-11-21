@@ -14,6 +14,8 @@ from app.cli._reset_sweep import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from app.core.migration_doctor import ColumnTypeDrift
 
 db_app = typer.Typer(no_args_is_help=True)
@@ -269,13 +271,26 @@ def _print_unvalidated_constraints(unvalidated: list[tuple[str, str]]) -> None:
         console.print(f'  ALTER TABLE {table_name} VALIDATE CONSTRAINT {name};')
 
 
-def _print_column_type_drift(drift: 'list[ColumnTypeDrift]') -> None:
+def _print_column_type_drift(
+    drift: 'list[ColumnTypeDrift]', pending: 'Sequence[str]' = ()
+) -> None:
     if not drift:
         return
+    if pending:
+        outlook = (
+            f'Not yet applied: {", ".join(pending)}. An upgrade runs them right '
+            'after this check and may fix these columns, so this is expected '
+            'while upgrading; if the list is still there after the next '
+            'start, nothing will fix it:'
+        )
+    else:
+        outlook = (
+            'A pending module migration may be about to fix them; if this '
+            'list survives a restart, nothing will:'
+        )
     console.print(
         f'[yellow]![/] {len(drift)} column(s) in the database differ in type from '
-        'what the models declare. A pending migration may be about to fix them; '
-        'if this list survives a restart, nothing will:'
+        f'what the models declare. {outlook}'
     )
     for entry in drift:
         console.print(
@@ -342,6 +357,7 @@ def doctor():
         column_type_drift,
         diagnose_modules,
         has_drift,
+        pending_core_revisions,
         unvalidated_constraints,
     )
 
@@ -358,6 +374,7 @@ def doctor():
         diagnoses = diagnose_modules(engine)
         unvalidated = unvalidated_constraints(engine)
         type_drift = column_type_drift(engine, skip=rejected)
+        pending_core = pending_core_revisions(engine) if type_drift else []
     except DoctorInfrastructureError as exc:
         # Fail open: an unreachable database is not drift, and the migration
         # running right after this will fail loudly on its own.
@@ -368,7 +385,7 @@ def doctor():
         engine.dispose()
 
     _print_unvalidated_constraints(unvalidated)
-    _print_column_type_drift(type_drift)
+    _print_column_type_drift(type_drift, pending_core)
 
     if not diagnoses:
         console.print('[green]✔ No modules with migrations.[/]')
