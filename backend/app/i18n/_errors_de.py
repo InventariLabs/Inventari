@@ -309,6 +309,7 @@ ERRORS_DE: ErrorMessages = {
     'wms_pick_document_not_confirmed': 'Das Dokument {number} ist nicht bestätigt, daher wurde die Kommissioniersitzung nicht gestartet. Nur bestätigte Dokumente können kommissioniert werden.',
     'wms_pick_document_not_dispatch': 'Das Dokument {number} ist kein Warenausgang, daher wurde die Kommissioniersitzung nicht gestartet. Nur Warenausgänge können gemeinsam kommissioniert werden.',
     'wms_pick_document_in_session': 'Das Dokument {number} wird bereits in einer anderen Sitzung kommissioniert (eröffnet von {owner}), daher wurde die Kommissioniersitzung nicht gestartet.',
+    'wms_pick_document_in_own_session': 'Das Dokument {number} wird bereits in Ihrer eigenen Sitzung kommissioniert, daher wurde die Kommissioniersitzung nicht gestartet.',
     'wms_line_document_closed': 'Das Dokument {number} ist {status}, daher können seine Zeilen in dieser Sitzung nicht mehr geändert werden.',
     'wms_short_below_scanned': 'Die endgültige Menge darf nicht unter der gescannten Menge ({scanned}) liegen; um weniger zu erfassen, muss sie die Scans ersetzen.',
     'wms_short_pick_needs_outcome': 'Eine zu wenig entnommene Zeile braucht einen Grund: „Fehlmenge“ lässt den Rest als Nachlieferung offen, jeder andere Grund schließt die Differenz.',
