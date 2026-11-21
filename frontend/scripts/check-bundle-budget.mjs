@@ -502,19 +502,24 @@ const dist = join(root, "dist");
  * 642.5, receive 478.1, issue 589.9, products 632.1, app first paint 404.0,
  * initial 193.9 on that branch).
  *
- * Re-measured 2026-11-21 on that warehouse floor branch merged with the line's
- * next ten commits: the line alone measures the issue screen at 589.96 KiB gz
- * against its 590 and app first paint at 404.04 against its 405, and the
- * branch takes them to 590.03 and 404.19. It is copy, not an import: the
- * refusal, receipt, source-reference and manager-only sentences in the Polish
- * language chunk every first paint loads (153.84 to 154.03), while the App
- * chunk stays at 56.3. Merged with the branch that settles the first-contact
- * and settings screens, which lifts issue to 595 for its own copy, the two
- * measure app first paint at 405.11, though neither is over alone. Both
- * budgets move a step of five (issue 595, app first paint 410); on the two
- * together the other screens stand under theirs (login 409.9, launcher 425.0,
- * start 643.5, receive 479.8, issue 590.8, history 615.9, products 633.8,
- * initial 193.9).
+ * Re-measured 2026-11-21 on the branch that settles the first-contact and
+ * settings screens: the issue screen measures 590.4 KiB gz against its 590 and
+ * history 615.5 against its 615. What the branch adds there is copy in six
+ * languages (the browser-validation sentences, the unsaved-changes question,
+ * the row-action names, the audit verbs and the settings notes), which sits in
+ * the language chunk every first paint loads, and one document-level listener;
+ * no import walked in. Those two phone budgets move a step of five (issue 595,
+ * history 620); the other screens stand under theirs.
+ *
+ * Re-measured 2026-11-21 on that warehouse floor branch merged with the line
+ * that carries the first-contact one: the line alone measures app first paint
+ * at 404.93 KiB gz against its 405, and the branch takes it to 405.11. It is
+ * copy, not an import: the refusal, receipt, source-reference and
+ * manager-only sentences in the Polish language chunk every first paint loads
+ * (154.25 to 154.44), while the App chunk stays at 56.7. That one budget moves
+ * a step of five, to 410; the other screens stand under theirs (login 409.9,
+ * launcher 425.0, start 643.5, receive 479.8, issue 590.8, history 615.9,
+ * products 633.8, initial 193.9).
  */
 const BUDGETS = {
   initial: 245,

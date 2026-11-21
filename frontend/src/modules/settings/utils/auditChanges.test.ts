@@ -159,7 +159,7 @@ describe("auditChanges value dictionaries", () => {
     );
 
     expect(changes).toEqual([
-      { path: "role", from: "Manager", to: "Użytkownik" },
+      { path: "role", from: "Menedżer", to: "Użytkownik" },
     ]);
   });
 

@@ -1397,7 +1397,7 @@ describe("WorkflowSettingsPage — the nav-leave guard", () => {
     expect(screen.getByText("Unsaved changes")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "The approval path form holds unsaved changes. Leave anyway?",
+        "The approval path form: you have unsaved changes. Leave anyway?",
       ),
     ).toBeInTheDocument();
 

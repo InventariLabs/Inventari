@@ -359,6 +359,10 @@ class AuthService:
                     're-entered in Settings → Email.'
                 )
                 smtp['password'] = ''
+        # No sender name chosen: the mail is from the organization, the name
+        # its invitations and documents already use.
+        if isinstance(smtp, dict) and not smtp.get('from_name'):
+            smtp['from_name'] = org.name
         return smtp
 
     @staticmethod

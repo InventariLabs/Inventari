@@ -88,7 +88,7 @@ function renderPill() {
 }
 
 describe("ActiveProfilePill", () => {
-  it("renders the active profile name with a link to the My modules screen for admins", async () => {
+  it("renders the active profile name with a link to the Organization modules screen for admins", async () => {
     setUpUser("admin");
     mockEndpoints("food_home");
     renderPill();

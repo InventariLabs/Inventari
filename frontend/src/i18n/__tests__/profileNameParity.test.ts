@@ -175,7 +175,7 @@ describe("workspace mode name parity", () => {
   });
 
   it("the launcher's workspace panel in Settings never calls the mode a profile", () => {
-    // Settings → My modules shows this panel under the title "Workspace
+    // Settings → Organization modules shows this panel under the title "Workspace
     // mode"; its loading, empty, hint and confirmation texts once said
     // "profile" in every language.
     const KEYS = [

@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { InlineQueryError, QueryError, QueryResult } from "./QueryResult";
 import type { UseQueryResult } from "@tanstack/react-query";
+import axios from "axios";
 
 describe("QueryResult", () => {
   it("renders loading state with default fallback", () => {
@@ -200,6 +201,15 @@ describe("QueryResult", () => {
       "You do not have access to this",
     );
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.queryByText("An error occurred")).not.toBeInTheDocument();
+  });
+
+  it("says the server could not be reached when a list got no answer", () => {
+    render(<QueryError error={new axios.AxiosError()} onRetry={vi.fn()} />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Cannot reach the server",
+    );
     expect(screen.queryByText("An error occurred")).not.toBeInTheDocument();
   });
 

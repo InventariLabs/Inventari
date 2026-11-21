@@ -420,6 +420,49 @@ describe("RegisterPage", () => {
     );
   });
 
+  it("says up front that a sign-up link is spent, instead of asking for a password first", async () => {
+    server.use(
+      http.get("/api/v1/auth/registration-link/old", () =>
+        HttpResponse.json({ detail: "Not found" }, { status: 404 }),
+      ),
+    );
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={["/register?token=old"]}>
+          <RegisterPage />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    const card = await screen.findByTestId("registration-link-spent");
+    expect(card).toHaveTextContent("This sign-up link no longer works");
+    expect(card).toHaveTextContent(/newer email/);
+    expect(screen.queryByLabelText(/^Password/i)).not.toBeInTheDocument();
+  });
+
+  it.each([429, 500])(
+    "keeps the form when the link check answers %s, which says nothing about the link",
+    async (status) => {
+      server.use(
+        http.get("/api/v1/auth/registration-link/tok1", () =>
+          HttpResponse.json({ detail: "later" }, { status }),
+        ),
+      );
+      render(
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter initialEntries={["/register?token=tok1"]}>
+            <RegisterPage />
+          </MemoryRouter>
+        </QueryClientProvider>,
+      );
+
+      expect(await screen.findByLabelText(/^Password/i)).toBeInTheDocument();
+      expect(
+        screen.queryByTestId("registration-link-spent"),
+      ).not.toBeInTheDocument();
+    },
+  );
+
   it("says whose session continues when a link is opened while another account is signed in", async () => {
     server.use(
       http.get("/api/v1/auth/registration-link/tok1", () =>

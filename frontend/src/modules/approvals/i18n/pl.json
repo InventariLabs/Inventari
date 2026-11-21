@@ -164,7 +164,7 @@
     "roles": {
       "owner": "Właściciel",
       "admin": "Administrator",
-      "manager": "Manager",
+      "manager": "Menedżer",
       "user": "Użytkownik",
       "viewer": "Obserwator"
     },

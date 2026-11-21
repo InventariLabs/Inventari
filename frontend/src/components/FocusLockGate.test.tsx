@@ -47,7 +47,7 @@ describe("FocusLockGate", () => {
     expect(screen.queryByText("Browse apps")).not.toBeInTheDocument();
     expect(screen.getByText("Only one module is showing")).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Open My modules" }),
+      screen.getByRole("link", { name: "Open Organization modules" }),
     ).toHaveAttribute("href", "/settings/my-modules");
   });
 
@@ -65,7 +65,7 @@ describe("FocusLockGate", () => {
       screen.getByText("Could not check which modules are showing"),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Open My modules" }),
+      screen.getByRole("link", { name: "Open Organization modules" }),
     ).toHaveAttribute("href", "/settings/my-modules");
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(refreshFocus).toHaveBeenCalledTimes(1);

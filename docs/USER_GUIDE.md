@@ -91,7 +91,7 @@ recognition, API keys or webhooks. **Get started** applies everything.
 
 Nothing here is final. Modules can be switched at any time (**Settings →
 Modules**), and the whole choice can be changed later in **Settings →
-My modules** (chapter 14).
+Organization modules** (chapter 14).
 
 ### 1.3 Finding your way around
 
@@ -217,7 +217,7 @@ focus mode never leaves the module:
   the image; **Send to printer** goes to the print agent (chapter 5).
 
 **From home to business.** Switching your way of working from *Food & Home*
-to a business mode (**Settings → My modules → Modules you see**, chapter 14) keeps every code,
+to a business mode (**Settings → Organization modules → Modules you see**, chapter 14) keeps every code,
 and every sticker keeps scanning.
 The switch says that renumbering is available; nothing is renumbered until
 you choose **Renumber by template**.
@@ -1815,7 +1815,7 @@ a link to the source code; the rest is for administrators.
   amounts already recorded.
 - **My profile** — your name, the language the app speaks to you and your
   password.
-- **My modules** — the one place that decides which modules the workspace
+- **Organization modules** — the one place that decides which modules the workspace
   shows. Changing the choice made at setup: **What will change** lists the
   modules to be switched on and off before you **Apply**; modules you switched
   on yourself are kept, and existing data is never overwritten. Every module

@@ -91,7 +91,7 @@ export default function ApiKeysPage() {
       });
       setModal({ type: "copy", key: created });
     } catch (err) {
-      toast.error(extractApiError(err, t("form.generate")));
+      toast.error(extractApiError(err, t("generateFailed")));
     }
   };
 
@@ -102,7 +102,7 @@ export default function ApiKeysPage() {
       toast.success(t("revokedToast"));
       setModal({ type: "none" });
     } catch (err) {
-      toast.error(extractApiError(err, t("revoke")));
+      toast.error(extractApiError(err, t("revokeFailed")));
     }
   };
 
@@ -195,6 +195,7 @@ export default function ApiKeysPage() {
                 {canWrite && (
                   <Button
                     data-testid="api-key-revoke-btn"
+                    aria-label={t("revokeNamed", { name: key.name })}
                     variant="ghostDanger"
                     size="sm"
                     leftIcon={<Trash2 size={14} />}
@@ -286,6 +287,7 @@ export default function ApiKeysPage() {
                         {canWrite && (
                           <Button
                             data-testid="api-key-revoke-btn"
+                            aria-label={t("revokeNamed", { name: key.name })}
                             variant="ghostDanger"
                             size="sm"
                             leftIcon={<Trash2 size={14} />}
