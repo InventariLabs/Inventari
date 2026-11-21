@@ -399,6 +399,7 @@
         "approves": "Aprova",
         "archived": "Arquivado",
         "assigned_to": "Atribuído a",
+        "assignee_id": "Atribuído a",
         "attachment": "Anexo",
         "auto_skipped": "Ignorado automaticamente",
         "barcode": "Código de barras",

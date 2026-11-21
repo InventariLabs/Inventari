@@ -59,6 +59,7 @@
     "targetLocation": "To location",
     "notes": "Notes",
     "externalReference": "Reference / related document",
+    "sourceOrder": "Purchase order",
     "scheduledDate": "Scheduled date",
     "documentDate": "Document date",
     "createdAt": "Created",
@@ -193,6 +194,7 @@
     "cancel": "Cancel",
     "cancelDocument": "Cancel document",
     "cancelNeedsManager": "Cancelling a confirmed document releases the stock it holds — ask someone who can manage documents.",
+    "deleteNeedsManager": "Only someone who can manage documents can delete this draft — ask them if it was a mistake. Until it is applied it changes no stock.",
     "delete": "Delete",
     "edit": "Edit",
     "view": "View",
@@ -1034,6 +1036,8 @@
       "qr_img": "QR code image (data URI) — carries the scan address of this document, or its number when the installation has no public address",
       "qr_size_mm": "Side the QR must print at, in millimetres",
       "return_of_number": "Number of the document this return reverses",
+      "source_order_number": "Number of the purchase order the lines were received against",
+      "printed_reference": "External reference, left empty when it only repeats the order number",
       "scrap_reason": "Why the goods were written off, in the print language",
       "show_line_status": "True when per-line statuses are printed",
       "show_payment": "True when the totals/payment block is printed",
@@ -1366,6 +1370,7 @@
       "short_confirmed": "Short receive confirmed",
       "skipped": "Line skipped",
       "completed": "Receiving completed",
+      "nothing_received": "Nothing was received, so nothing was posted. The receipt stays open for the goods still expected.",
       "over_quantity": "Cannot receive more than planned — already {{qty}}/{{expected}} {{uom}}",
       "shelf_confirmed": "Location {{location}} confirmed",
       "shelf_required": "Scan the location first: {{location}}",
@@ -2341,5 +2346,9 @@
       "saveFailed": "The tax rate could not be saved"
     },
     "countryLoadFailed": "The country's rates could not be loaded; rates can still be added by hand."
+  },
+  "references": {
+    "stockTake": "Stock take",
+    "recipeProduction": "Recipe production"
   }
 }

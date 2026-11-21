@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import type { PartnerOption } from "@/hooks/usePartnerPicker";
 import type { StorageLocationSummary } from "@/types";
 import type { WarehouseDocument } from "@/modules/warehouse/types";
+import { useDocumentReference } from "@/modules/warehouse/lib/documentReference";
 import {
   documentApprover,
   documentConfirmation,
@@ -130,7 +131,7 @@ function ReturnOfReference({
       </p>
       <Link
         to={`/warehouse/documents/${doc.return_of_id}`}
-        className="inline-flex items-center gap-1 text-sm text-on-primary hover:underline"
+        className="inline-flex min-h-6 items-center gap-1 text-sm text-on-primary hover:underline"
       >
         {doc.return_of_number ?? doc.return_of_id}
         <ArrowUpRight size={13} />
@@ -157,11 +158,83 @@ function ReversedByReference({
       </p>
       <Link
         to={`/warehouse/documents/${doc.reversed_by_id}`}
-        className="inline-flex items-center gap-1 text-sm text-on-primary hover:underline"
+        className="inline-flex min-h-6 items-center gap-1 text-sm text-on-primary hover:underline"
       >
         {doc.reversed_by_number ?? doc.reversed_by_id}
         <ArrowUpRight size={13} />
       </Link>
+    </div>
+  );
+}
+
+/** The purchase orders the document's lines were received against, each a
+ * link to its order. The order lists its receipts; this is the way back for
+ * whoever holds the receipt later. The server attaches them from the lines'
+ * order links, and none while the orders module is off. */
+function SourceOrderReference({
+  doc,
+  t,
+}: {
+  doc: WarehouseDocument;
+  t: (key: string, options?: Record<string, unknown>) => string;
+}) {
+  const orders = doc.source_orders ?? [];
+  if (orders.length === 0) return null;
+  return (
+    <div>
+      <p className="text-xs text-on-muted mb-0.5">
+        {t("warehouse:fields.sourceOrder")}
+      </p>
+      <div className="flex flex-wrap gap-x-3">
+        {orders.map((order) => (
+          <Link
+            key={order.id}
+            to={`/purchase-orders/${order.id}`}
+            className="inline-flex min-h-6 items-center gap-1 text-sm text-on-primary hover:underline"
+          >
+            {order.number}
+            <ArrowUpRight size={13} />
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** The reference a document carries, unless it only repeats the order it
+ * was received against — a receipt made from the order's own page keeps
+ * the order number as its reference, and the order row already names it.
+ * A reference another module wrote reads as words, linked to its page. */
+function ExternalReference({
+  doc,
+  t,
+}: {
+  doc: WarehouseDocument;
+  t: (key: string, options?: Record<string, unknown>) => string;
+}) {
+  const readReference = useDocumentReference();
+  const reference = doc.external_reference;
+  if (doc.type === "CORRECTION" || !reference) return null;
+  if (doc.source_orders?.some((order) => order.number === reference))
+    return null;
+  const read = readReference(reference);
+  const words = read.labelKey ? t(read.labelKey) : read.text;
+  return (
+    <div>
+      <p className="text-xs text-on-muted mb-0.5">
+        {t("warehouse:fields.externalReference")}
+      </p>
+      {read.path ? (
+        <Link
+          to={read.path}
+          className="inline-flex min-h-6 items-center gap-1 text-sm text-on-primary hover:underline"
+        >
+          {words}
+          <ArrowUpRight size={13} />
+        </Link>
+      ) : (
+        <p className="text-on">{words}</p>
+      )}
     </div>
   );
 }
@@ -313,21 +386,15 @@ export function DocumentMetadataGrid({
             </p>
             <Link
               to={`/warehouse/documents/${doc.corrects_document_id}`}
-              className="inline-flex items-center gap-1 text-sm text-on-primary hover:underline"
+              className="inline-flex min-h-6 items-center gap-1 text-sm text-on-primary hover:underline"
             >
               {doc.external_reference ?? doc.corrects_document_id}
               <ArrowUpRight size={13} />
             </Link>
           </div>
         )}
-        {doc.type !== "CORRECTION" && doc.external_reference && (
-          <div>
-            <p className="text-xs text-on-muted mb-0.5">
-              {t("warehouse:fields.externalReference")}
-            </p>
-            <p className="text-on">{doc.external_reference}</p>
-          </div>
-        )}
+        <SourceOrderReference doc={doc} t={t} />
+        <ExternalReference doc={doc} t={t} />
         {doc.backorder_id && (
           <div>
             <p className="text-xs text-on-muted mb-0.5">
@@ -335,7 +402,7 @@ export function DocumentMetadataGrid({
             </p>
             <Link
               to={`/warehouse/documents/${doc.backorder_id}`}
-              className="inline-flex items-center gap-1 text-sm text-on-primary hover:underline"
+              className="inline-flex min-h-6 items-center gap-1 text-sm text-on-primary hover:underline"
             >
               {t("warehouse:backorder.viewOriginal")}
               <ArrowUpRight size={13} />
@@ -351,7 +418,7 @@ export function DocumentMetadataGrid({
             </p>
             <Link
               to={`/warehouse/documents/${doc.generated_backorder_id}`}
-              className="inline-flex items-center gap-1 text-sm text-on-primary hover:underline"
+              className="inline-flex min-h-6 items-center gap-1 text-sm text-on-primary hover:underline"
             >
               {t("warehouse:backorder.viewBackorder")}
               <ArrowUpRight size={13} />

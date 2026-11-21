@@ -45,7 +45,7 @@ export function HiddenRecordsNotice({
             variant="link"
             size="contentSm"
             onClick={() => navigate("/settings#module-data")}
-            className="px-0 py-0.5 font-medium underline underline-offset-2 text-on-muted hover:text-on"
+            className="min-h-6 px-0 py-0.5 font-medium underline underline-offset-2 text-on-muted hover:text-on"
           >
             {actionLabel}
           </Button>

@@ -1061,11 +1061,9 @@ class TestPickingDocumentRegistration:
         )
         session_id = self._run_complete(client, auth_headers, recipe_id, item_id)
 
-        # RW draft linked to the session via external_reference
+        # RW draft naming the recipe it was cooked from
         doc = db_session.scalars(
-            select(Document).where(
-                Document.external_reference == f'picking:{session_id}'
-            )
+            select(Document).where(Document.external_reference == f'recipe:{recipe_id}')
         ).first()
         assert doc is not None
         assert doc.type == 'INTERNAL_OUT'
@@ -1112,12 +1110,10 @@ class TestPickingDocumentRegistration:
         recipe_id, item_id = self._create_recipe_with_item(
             client, auth_headers, db_session, test_user, test_storage_location
         )
-        session_id = self._run_complete(client, auth_headers, recipe_id, item_id)
+        self._run_complete(client, auth_headers, recipe_id, item_id)
 
         doc = db_session.scalars(
-            select(Document).where(
-                Document.external_reference == f'picking:{session_id}'
-            )
+            select(Document).where(Document.external_reference == f'recipe:{recipe_id}')
         ).first()
         assert doc is None
 
@@ -1148,11 +1144,9 @@ class TestPickingDocumentRegistration:
             client, auth_headers, db_session, test_user, test_storage_location
         )
         # Completion still succeeds with the module disabled
-        session_id = self._run_complete(client, auth_headers, recipe_id, item_id)
+        self._run_complete(client, auth_headers, recipe_id, item_id)
 
         doc = db_session.scalars(
-            select(Document).where(
-                Document.external_reference == f'picking:{session_id}'
-            )
+            select(Document).where(Document.external_reference == f'recipe:{recipe_id}')
         ).first()
         assert doc is None

@@ -8,6 +8,7 @@ import plCommon from "@/i18n/locales/pl/common.json";
 import plApprovals from "@/modules/approvals/i18n/pl.json";
 import plEquipment from "@/modules/equipment/i18n/pl.json";
 import plWarehouse from "@/modules/warehouse/i18n/pl.json";
+import plPartners from "@/modules/partners/i18n/pl.json";
 import plRecipes from "@/modules/recipes/i18n/pl.json";
 import {
   auditChanges,
@@ -146,6 +147,7 @@ describe("auditChanges value dictionaries", () => {
     common: plCommon,
     equipment: plEquipment,
     warehouse: plWarehouse,
+    partners: plPartners,
   }) as never;
 
   it("reads a built-in level the way the roles screen reads it", () => {
@@ -208,6 +210,54 @@ describe("auditChanges value dictionaries", () => {
 
     expect(changes).toEqual([
       { path: "condition", from: "—", to: "Wymaga naprawy" },
+    ]);
+  });
+
+  it("reads a new partner's kind in the partners screen's words", () => {
+    const changes = auditChanges(
+      { name: "Kawa-Hurt", type: "SUPPLIER" },
+      "CREATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toContainEqual({
+      path: "type",
+      from: null,
+      to: plPartners.types.SUPPLIER,
+    });
+    expect(JSON.stringify(changes)).not.toContain("SUPPLIER");
+  });
+
+  it("still reads a document's type through the journal's own words", () => {
+    const changes = auditChanges(
+      { number: "PZ/2026/11/0001", type: "IN" },
+      "CREATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toContainEqual({
+      path: "type",
+      from: null,
+      to: plCommon.settings.audit.values.IN,
+    });
+  });
+
+  it("names the person a task was given to, not their id", () => {
+    const changes = auditChanges(
+      {
+        number: "PZ/2026/11/0001",
+        assignee_id: "6b1f0c2e-0000",
+        assignee_name: "Kamil Nowak",
+      },
+      "UPDATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toEqual([
+      { path: "assignee_id", from: null, to: "Kamil Nowak" },
     ]);
   });
 

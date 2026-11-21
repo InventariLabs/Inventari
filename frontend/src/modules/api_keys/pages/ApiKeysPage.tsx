@@ -317,7 +317,7 @@ export default function ApiKeysPage() {
             {t("table.revokedTrace")}{" "}
             <Link
               to="/settings/audit-log"
-              className="underline hover:text-on-secondary"
+              className="inline-flex min-h-6 items-center underline hover:text-on-secondary"
             >
               {t("table.revokedTraceLink")}
             </Link>

@@ -248,6 +248,19 @@ describe("DocumentListItem content", () => {
     expect(screen.getByText(/1,234\.50/)).toBeInTheDocument();
   });
 
+  it("reads a stock take's reference in words, not as its id", () => {
+    const id = "3f2b8c1e-5d4a-4b6f-9e7d-1a2b3c4d5e6f";
+    const { container } = render(
+      <DocumentListItem
+        doc={buildDocument({ external_reference: `stock_take:${id}` })}
+        {...baseProps}
+      />,
+    );
+
+    expect(screen.getByText("Stock take")).toBeInTheDocument();
+    expect(container.textContent).not.toContain(id);
+  });
+
   it("quotes no amount for a transfer, whatever it holds", () => {
     // A move between shelves asks for no price; a stored value on one is
     // still stored and registered — the row just does not quote it.

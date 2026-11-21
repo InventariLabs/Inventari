@@ -328,18 +328,22 @@ function ApprovalRequestCard({
               one row. The header row spans both columns. */}
           <div className="xl:col-span-12">
             <div className="flex flex-wrap items-center gap-2">
-              <input
-                type="checkbox"
-                checked={selected}
-                onChange={onToggleSelected}
-                /* twenty rows all announced as "Select" told a
-                   screen-reader user nothing about which document they were
-                   about to approve in bulk. */
-                aria-label={t("approvalsQueue.selectDocument", {
-                  number: doc.number,
-                })}
-                className="h-4 w-4 shrink-0 accent-primary-600"
-              />
+              {/* The label is the 44 px target on a phone; the box inside
+                  stays 16 px. */}
+              <label className="-m-3 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center sm:m-0 sm:h-auto sm:w-auto">
+                <input
+                  type="checkbox"
+                  checked={selected}
+                  onChange={onToggleSelected}
+                  /* twenty rows all announced as "Select" told a
+                     screen-reader user nothing about which document they
+                     were about to approve in bulk. */
+                  aria-label={t("approvalsQueue.selectDocument", {
+                    number: doc.number,
+                  })}
+                  className="h-4 w-4 shrink-0 accent-primary-600"
+                />
+              </label>
               <span className="inline-flex items-center rounded-md bg-surface-inset px-2 py-0.5 text-xs font-medium text-on-secondary uppercase tracking-wide">
                 {docTypeLabel}
               </span>

@@ -51,7 +51,10 @@ function Source({ entry }: { entry: LotTraceEntry }) {
         <span className="block text-xs text-on-muted">{kind}</span>
       )}
       {href ? (
-        <Link to={href} className="text-sm text-on-primary hover:underline">
+        <Link
+          to={href}
+          className="inline-flex min-h-6 items-center text-sm text-on-primary hover:underline"
+        >
           {label}
         </Link>
       ) : (
