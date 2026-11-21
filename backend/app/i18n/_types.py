@@ -707,6 +707,9 @@ class ErrorMessages(TypedDict):
     validation_enum: str
     validation_int: str
     validation_number: str
+    validation_decimal_whole_digits: str
+    validation_decimal_max_digits: str
+    validation_decimal_max_places: str
     validation_boolean: str
     validation_identifier: str
     validation_date: str

@@ -1057,7 +1057,7 @@ async def get_last_unit_costs(
     for row in rows:
         latest.setdefault(row.recipe_id, row)
 
-    uncosted = await _uncosted_line_counts(db, [row.id for row in latest.values()])
+    uncosted = await uncosted_line_counts(db, [row.id for row in latest.values()])
 
     costs: dict[UUID, LastProduction] = {}
     for rid, row in latest.items():
@@ -1079,7 +1079,7 @@ async def get_last_unit_costs(
     return costs
 
 
-async def _uncosted_line_counts(
+async def uncosted_line_counts(
     db: AsyncSession, order_ids: list[UUID]
 ) -> dict[UUID, int]:
     """How many ingredients each run consumed without a known cost rate.

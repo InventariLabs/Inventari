@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { signInWith, signOut } from "@/test/auth";
 import { RecipeShortageNotice } from "./RecipeShortageNotice";
 import type { AvailabilityResponse } from "@/modules/maker/types/maker";
@@ -51,13 +52,15 @@ function renderNotice(
   props?: Partial<React.ComponentProps<typeof RecipeShortageNotice>>,
 ) {
   render(
-    <RecipeShortageNotice
-      recipeId="rec-1"
-      availability={availability}
-      canAddStock
-      canOrder
-      {...props}
-    />,
+    <MemoryRouter>
+      <RecipeShortageNotice
+        recipeId="rec-1"
+        availability={availability}
+        canAddStock
+        canOrder
+        {...props}
+      />
+    </MemoryRouter>,
   );
 }
 
@@ -209,5 +212,72 @@ describe("RecipeShortageNotice — a retry and a second order", () => {
         expect.stringMatching(/already on an open purchase order/i),
       ),
     );
+  });
+});
+
+describe("RecipeShortageNotice — a unit that does not match, and an order placed", () => {
+  const mismatch: AvailabilityResponse = {
+    ...availability,
+    ingredients: [
+      {
+        ...availability.ingredients[0],
+        child_template_id: "tpl-flour",
+        child_template_name: "Wheat flour",
+        shortage: null,
+        to_buy: null,
+      },
+    ],
+  };
+
+  beforeEach(() => {
+    orderShortages.mockReset();
+    signInWith(["maker:read", "maker:write", "items:write"]);
+  });
+
+  afterEach(() => {
+    signOut();
+  });
+
+  it("does not call a unit mismatch missing stock, and offers no stock for it", () => {
+    renderNotice({ availability: mismatch });
+
+    expect(
+      screen.getByText("A unit on this BOM does not match the stock"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Not in the records/)).toBeNull();
+    expect(screen.queryByTestId("maker-recipe-add-stock")).toBeNull();
+    expect(screen.queryByTestId("maker-recipe-order-shortage")).toBeNull();
+  });
+
+  it("keeps the ways out for a real shortage that stands beside a mismatch", () => {
+    renderNotice({
+      availability: {
+        ...availability,
+        ingredients: [availability.ingredients[0], mismatch.ingredients[0]],
+      },
+    });
+
+    expect(screen.getByText("Not in the records: Lye.")).toBeInTheDocument();
+    expect(screen.getByTestId("maker-recipe-add-stock")).toBeInTheDocument();
+  });
+
+  it("says the missing quantity is on order, links the order and stops offering it", async () => {
+    orderShortages.mockResolvedValue({
+      purchase_order_id: "po-1",
+      number: "PO/2026/0001",
+      added_count: 1,
+    });
+    renderNotice();
+
+    fireEvent.click(screen.getByTestId("maker-recipe-order-shortage"));
+
+    expect(
+      await screen.findByTestId("maker-recipe-on-order"),
+    ).toHaveTextContent("on order");
+    expect(screen.getByRole("link", { name: "PO/2026/0001" })).toHaveAttribute(
+      "href",
+      "/purchase-orders/po-1",
+    );
+    expect(screen.queryByTestId("maker-recipe-order-shortage")).toBeNull();
   });
 });

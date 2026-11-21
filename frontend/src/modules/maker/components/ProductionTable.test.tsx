@@ -42,6 +42,7 @@ const order: ProductionOrder = {
   result_per_unit: null,
   result_per_batch: null,
   lines: [],
+  uncosted_ingredients: 0,
 };
 
 /**

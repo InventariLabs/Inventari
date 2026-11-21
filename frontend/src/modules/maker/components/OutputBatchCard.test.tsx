@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { act, fireEvent, render, screen } from "@/test/utils";
+import { fireEvent, render, screen, waitFor } from "@/test/utils";
 import {
   OutputBatchCard,
   labelsForRun,
@@ -27,7 +27,7 @@ vi.mock("@/hooks/useCanWrite", () => ({
 }));
 vi.mock("@/modules/maker/hooks/useBatches", () => ({
   useOutputBatchStatus: () => ({
-    hold: { mutate: mocks.hold, isPending: false },
+    hold: { mutateAsync: mocks.hold, isPending: false },
     release: { mutate: mocks.release, isPending: false },
   }),
 }));
@@ -90,16 +90,58 @@ describe("OutputBatchCard", () => {
     expect(screen.getByTestId("label-sheet")).toHaveTextContent("lot-1|12|");
   });
 
-  it("holds the batch with the reason given", () => {
+  it("holds the batch with the reason given", async () => {
     render(<OutputBatchCard order={run} />);
 
     fireEvent.click(screen.getByTestId("maker-hold-batch"));
     fireEvent.change(screen.getByTestId("maker-hold-reason"), {
       target: { value: "Cloudy" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Put on hold" }));
+    fireEvent.click(screen.getByRole("button", { name: "Quarantine" }));
 
-    expect(mocks.hold).toHaveBeenCalledWith("Cloudy", expect.anything());
+    expect(mocks.hold).toHaveBeenCalledWith("Cloudy");
+    await waitFor(() =>
+      expect(screen.queryByTestId("maker-hold-reason")).toBeNull(),
+    );
+  });
+
+  it("keeps the hold dialog open, with the reason typed, when the hold is refused", async () => {
+    mocks.hold.mockRejectedValueOnce(new Error("offline"));
+    render(<OutputBatchCard order={run} />);
+
+    fireEvent.click(screen.getByTestId("maker-hold-batch"));
+    fireEvent.change(screen.getByTestId("maker-hold-reason"), {
+      target: { value: "Cloudy" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Quarantine" }));
+
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+    expect(screen.getByTestId("maker-hold-reason")).toHaveValue("Cloudy");
+  });
+
+  it("shows the reason a batch was quarantined, beside its state", () => {
+    render(
+      <OutputBatchCard
+        order={
+          {
+            ...run,
+            output_batches: [
+              {
+                lot_id: "lot-1",
+                lot_name: "20261102-1",
+                status: "quarantined",
+                status_reason: "Mould on the crust",
+                best_before: "2026-05-01",
+              },
+            ],
+          } as unknown as ProductionOrder
+        }
+      />,
+    );
+
+    expect(screen.getByTestId("maker-batch-hold-note")).toHaveTextContent(
+      "Quarantined: Mould on the crust",
+    );
   });
 
   it("asks about one batch when the run holds one", () => {
@@ -107,7 +149,7 @@ describe("OutputBatchCard", () => {
 
     fireEvent.click(screen.getByTestId("maker-hold-batch"));
 
-    expect(screen.getByText("Put this batch on hold?")).toBeInTheDocument();
+    expect(screen.getByText("Quarantine this batch?")).toBeInTheDocument();
   });
 
   it("offers a release for a batch on hold, and no second hold", () => {
@@ -115,7 +157,8 @@ describe("OutputBatchCard", () => {
       <OutputBatchCard order={{ ...run, output_lot_status: "quarantined" }} />,
     );
 
-    expect(screen.getByText("On hold")).toBeInTheDocument();
+    // The word the Batches list uses for the state.
+    expect(screen.getByText("Quarantined")).toBeInTheDocument();
     expect(screen.queryByTestId("maker-hold-batch")).toBeNull();
     fireEvent.click(screen.getByTestId("maker-release-batch"));
     expect(mocks.release).toHaveBeenCalled();
@@ -214,21 +257,21 @@ describe("OutputBatchCard for a run filled in portions", () => {
 
     fireEvent.click(screen.getByTestId("maker-hold-batch"));
 
-    expect(screen.getByText("Put these batches on hold?")).toBeInTheDocument();
+    expect(screen.getByText("Quarantine these batches?")).toBeInTheDocument();
   });
 
-  it("says the batches are on hold once it is done", () => {
+  it("says the batches are quarantined once it is done", async () => {
     render(<OutputBatchCard order={filledInPortions} />);
     fireEvent.click(screen.getByTestId("maker-hold-batch"));
     fireEvent.change(screen.getByTestId("maker-hold-reason"), {
       target: { value: "Cloudy" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Put on hold" }));
+    fireEvent.click(screen.getByRole("button", { name: "Quarantine" }));
 
-    act(() => mocks.hold.mock.calls[0][1].onSuccess());
-
-    expect(mocks.toastSuccess).toHaveBeenCalledWith(
-      expect.stringMatching(/^The batches are on hold/),
+    await waitFor(() =>
+      expect(mocks.toastSuccess).toHaveBeenCalledWith(
+        expect.stringMatching(/^The batches are quarantined/),
+      ),
     );
   });
 

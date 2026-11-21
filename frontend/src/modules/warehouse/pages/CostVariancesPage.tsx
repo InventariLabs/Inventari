@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/Card";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { Pagination } from "@/module-sdk";
+import { ScrollRow } from "@/components/ui/ScrollRow";
 import { QueryFailure } from "@/components/ui/QueryResult";
 import { useMoney } from "@/hooks/useMoney";
 import { formatDate } from "@/utils/formatters";
@@ -58,7 +59,8 @@ export default function CostVariancesPage() {
         </Card>
       ) : (
         <Card className="p-4 sm:p-5">
-          <div className="overflow-x-auto">
+          {/* On a phone the table is wider than its box: the fade says so. */}
+          <ScrollRow>
             <table className="w-full text-left border-collapse text-sm">
               <thead>
                 <tr className="border-b border-border text-xs font-medium text-on-secondary uppercase tracking-wider">
@@ -91,7 +93,7 @@ export default function CostVariancesPage() {
                     <td className="py-2 px-3">
                       <Link
                         to={`/warehouse/documents/${item.document_id}`}
-                        className="text-on-primary hover:underline"
+                        className="inline-block py-1 text-on-primary hover:underline"
                       >
                         {item.document_number ?? "—"}
                       </Link>
@@ -126,7 +128,7 @@ export default function CostVariancesPage() {
                 ))}
               </tfoot>
             </table>
-          </div>
+          </ScrollRow>
         </Card>
       )}
 

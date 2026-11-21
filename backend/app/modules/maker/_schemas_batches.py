@@ -50,7 +50,12 @@ class RunBatchRead(BaseModel):
     lot_id: UUID
     lot_name: str
     status: str
+    #: Why the batch is on hold, while it is.
+    status_reason: str | None = None
     best_before: date | None = None
+    #: How much of the output the run filed under this batch; set on the
+    #: batch record only.
+    quantity: Decimal | None = None
 
 
 class OutputBatchRead(BaseModel):
@@ -165,6 +170,8 @@ class BatchRecordRead(BaseModel):
     output_location_name: str | None = None
     ingredients: list[BatchRecordIngredient] = Field(default_factory=list)
     material_cost: Decimal | None = None
+    #: Ingredients drawn with no cost, which the totals leave out.
+    uncosted_ingredients: int = 0
     total_cost: Decimal | None = None
     estimated_total_cost: Decimal | None = None
     unit_cost: Decimal | None = None

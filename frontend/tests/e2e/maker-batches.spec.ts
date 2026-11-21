@@ -298,15 +298,15 @@ test.describe("Maker — the batches of a run", () => {
 
     await page.getByTestId("maker-hold-batch").click();
     const dialog = page.getByRole("alertdialog", {
-      name: "Put this batch on hold?",
+      name: "Quarantine this batch?",
     });
     // Nobody puts a batch on hold without saying why.
-    const confirm = dialog.getByRole("button", { name: "Put on hold" });
+    const confirm = dialog.getByRole("button", { name: "Quarantine" });
     await expect(confirm).toBeDisabled();
     await dialog.getByTestId("maker-hold-reason").fill("Lid seal looked loose");
     await confirm.click();
 
-    await expect(card.getByText("On hold", { exact: true })).toBeVisible({
+    await expect(card.getByText("Quarantined", { exact: true })).toBeVisible({
       timeout: 15000,
     });
     await expect(page.getByTestId("maker-hold-batch")).toHaveCount(0);
@@ -315,7 +315,7 @@ test.describe("Maker — the batches of a run", () => {
     ).toBe("quarantined");
 
     await page.getByTestId("maker-release-batch").click();
-    await expect(card.getByText("On hold", { exact: true })).toHaveCount(0, {
+    await expect(card.getByText("Quarantined", { exact: true })).toHaveCount(0, {
       timeout: 15000,
     });
     await expect(page.getByTestId("maker-hold-batch")).toBeVisible();

@@ -210,6 +210,9 @@ class ProductionOrderRead(BaseModel):
     result_per_unit: Decimal | None = None
     result_per_batch: Decimal | None = None
     lines: list[ProductionOrderLineRead] = Field(default_factory=list)
+    #: How many of the ingredients the run drew carried no cost, so its total
+    #: leaves them out. Read on the list, where ``lines`` is not sent.
+    uncosted_ingredients: int = 0
     #: The day a run that is finished later was started, and what its
     #: ingredients cost — its work in progress until it closes. Null on a run
     #: completed in one step.

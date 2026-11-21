@@ -23,7 +23,6 @@ vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
 
-import { toast } from "sonner";
 import { PageHeaderContext } from "@/hooks/useModulePageHeader";
 import { withLanguage } from "@/test/mocks/i18n";
 import { http, HttpResponse } from "msw";
@@ -57,7 +56,13 @@ const draftOrder: ProductionOrder = {
   result_per_unit: null,
   result_per_batch: null,
   lines: [],
+  uncosted_ingredients: 0,
 };
+
+// Ordering what is missing has its own tests; here it is only a button.
+vi.mock("@/modules/maker/components/OrderMissingButton", () => ({
+  OrderMissingButton: () => null,
+}));
 
 let currentOrder: ProductionOrder = draftOrder;
 const stockMovesRead = vi.hoisted(() => ({ failed: false, refetch: vi.fn() }));
@@ -73,13 +78,19 @@ vi.mock("@/modules/maker/hooks/useProduction", () => ({
     mutate: updateMutate,
     isPending: false,
   }),
-  useCompleteProduction: () => ({ mutate: completeMutate, isPending: false }),
-  useCancelProduction: () => ({ mutate: vi.fn(), isPending: false }),
+  useCompleteProduction: () => ({
+    mutateAsync: completeMutate,
+    isPending: false,
+  }),
+  useCancelProduction: () => ({ mutateAsync: vi.fn(), isPending: false }),
   useStartProduction: () => ({ mutate: vi.fn(), isPending: false }),
   useFinishProduction: () => ({ mutate: vi.fn(), isPending: false }),
   useAddPortion: () => ({ mutate: vi.fn(), isPending: false }),
   useTickStep: () => ({ mutate: vi.fn(), isPending: false }),
-  useReverseProduction: () => ({ mutate: reverseMutate, isPending: false }),
+  useReverseProduction: () => ({
+    mutateAsync: reverseMutate,
+    isPending: false,
+  }),
   useDuplicateProductionOrder: () => ({
     mutate: duplicateMutate,
     isPending: false,
@@ -107,6 +118,8 @@ vi.mock("@/modules/maker/hooks/useCostBreakdown", () => ({
 // that may not sign in as one themselves.
 beforeEach(() => {
   signInWith(["maker:read", "maker:write", "items:write"]);
+  completeMutate.mockResolvedValue({});
+  reverseMutate.mockResolvedValue({});
 });
 
 function renderPage() {
@@ -215,16 +228,13 @@ describe("ProductionDetailPage — the refusal says which shortage happened", ()
     // "ran out since the draft was created" sent the reader looking for a
     // theft of wax that never happened.
     currentOrder = draftOrder;
+    completeMutate.mockRejectedValueOnce(shortageError(true));
     renderPage();
     fireEvent.click(screen.getByTestId("maker-detail-complete-button"));
     const confirmButtons = screen.getAllByRole("button", {
       name: "Complete run",
     });
     fireEvent.click(confirmButtons[confirmButtons.length - 1]);
-
-    const [, options] =
-      completeMutate.mock.calls[completeMutate.mock.calls.length - 1];
-    options.onError(shortageError(true));
 
     expect(
       await screen.findByText(/never enough for this run/i),
@@ -236,16 +246,13 @@ describe("ProductionDetailPage — the refusal says which shortage happened", ()
 
   it("keeps the ran-out sentence for a run that was satisfiable at birth", async () => {
     currentOrder = draftOrder;
+    completeMutate.mockRejectedValueOnce(shortageError(false));
     renderPage();
     fireEvent.click(screen.getByTestId("maker-detail-complete-button"));
     const confirmButtons = screen.getAllByRole("button", {
       name: "Complete run",
     });
     fireEvent.click(confirmButtons[confirmButtons.length - 1]);
-
-    const [, options] =
-      completeMutate.mock.calls[completeMutate.mock.calls.length - 1];
-    options.onError(shortageError(false));
 
     expect(
       await screen.findByText(/ran out since the draft was created/i),
@@ -432,14 +439,30 @@ describe("ProductionDetailPage edit + duplicate", () => {
     });
     fireEvent.click(confirmButtons[confirmButtons.length - 1]);
 
-    expect(completeMutate).toHaveBeenCalledWith(
-      { orderId: "ord-1", data: { made_on: todayIso() } },
-      expect.anything(),
-    );
+    expect(completeMutate).toHaveBeenCalledWith({
+      orderId: "ord-1",
+      data: { made_on: todayIso() },
+    });
   });
 
-  it("surfaces the backend detail message when completing fails", () => {
+  it("keeps the dialog open with the backend's message when completing fails", async () => {
     currentOrder = draftOrder;
+    const response: AxiosResponse = {
+      data: { detail: "Overproduction is disabled in settings" },
+      status: 400,
+      statusText: "Bad Request",
+      headers: new AxiosHeaders(),
+      config: {} as InternalAxiosRequestConfig,
+    };
+    completeMutate.mockRejectedValueOnce(
+      new AxiosError(
+        "Request failed with status code 400",
+        AxiosError.ERR_BAD_REQUEST,
+        undefined,
+        undefined,
+        response,
+      ),
+    );
     renderPage();
 
     fireEvent.click(screen.getByTestId("maker-detail-complete-button"));
@@ -451,30 +474,16 @@ describe("ProductionDetailPage edit + duplicate", () => {
     });
     fireEvent.click(confirmButtons[confirmButtons.length - 1]);
 
-    expect(completeMutate).toHaveBeenCalledWith(
-      { orderId: "ord-1", data: { actual_qty: "6", made_on: todayIso() } },
-      expect.objectContaining({ onError: expect.any(Function) }),
-    );
-
-    const [, options] = completeMutate.mock.calls[0];
-    const response: AxiosResponse = {
-      data: { detail: "Overproduction is disabled in settings" },
-      status: 400,
-      statusText: "Bad Request",
-      headers: new AxiosHeaders(),
-      config: {} as InternalAxiosRequestConfig,
-    };
-    const err = new AxiosError(
-      "Request failed with status code 400",
-      AxiosError.ERR_BAD_REQUEST,
-      undefined,
-      undefined,
-      response,
-    );
-    options.onError(err);
-
-    expect(toast.error).toHaveBeenCalledWith(
+    expect(completeMutate).toHaveBeenCalledWith({
+      orderId: "ord-1",
+      data: { actual_qty: "6", made_on: todayIso() },
+    });
+    // The refusal stands inside the dialog, beside what was typed.
+    expect(await screen.findByRole("alert")).toHaveTextContent(
       "Overproduction is disabled in settings",
+    );
+    expect(screen.getByTestId("maker-complete-actual-qty-input")).toHaveValue(
+      6,
     );
   });
 });
@@ -705,7 +714,7 @@ describe("ProductionDetailPage — undoing a completed run", () => {
     ).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Yes, undo run" }));
 
-    expect(reverseMutate).toHaveBeenCalledWith("ord-1", expect.any(Object));
+    expect(reverseMutate).toHaveBeenCalledWith("ord-1");
   });
 
   it("tells the floor account why it cannot undo the run", () => {
@@ -841,18 +850,15 @@ describe("ProductionDetailPage — closing a run dates its batch and names its i
     });
     fireEvent.click(confirmButtons[confirmButtons.length - 1]);
 
-    expect(completeMutate).toHaveBeenCalledWith(
-      {
-        orderId: "ord-1",
-        data: {
-          made_on: todayIso(),
-          best_before: defaultBestBefore(todayIso(), 30),
-          ingredient_lots: [
-            { template_id: "tpl-honey", lot_id: "late", quantity: "6" },
-          ],
-        },
+    expect(completeMutate).toHaveBeenCalledWith({
+      orderId: "ord-1",
+      data: {
+        made_on: todayIso(),
+        best_before: defaultBestBefore(todayIso(), 30),
+        ingredient_lots: [
+          { template_id: "tpl-honey", lot_id: "late", quantity: "6" },
+        ],
       },
-      expect.anything(),
-    );
+    });
   });
 });

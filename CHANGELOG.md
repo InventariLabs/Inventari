@@ -286,6 +286,10 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A production recipe's reference price can no longer be negative. Creating
+  or changing a recipe with one is refused with a message naming the field,
+  instead of being stored and understating the result per unit of every run
+  made after it; zero is still allowed.
 - Saving a print layout whose template code does not parse or render — a
   purchase order, warehouse document or equipment layout — is refused, with
   the line and the complaint, instead of being stored and then breaking every

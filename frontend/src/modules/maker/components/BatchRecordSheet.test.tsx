@@ -16,6 +16,7 @@ const record: BatchRecord = {
   production_date: "2026-11-03",
   best_before: "2026-11-10",
   output_location_name: "Bakery shelf",
+  uncosted_ingredients: 0,
   ingredients: [
     {
       template_id: "flour",
@@ -67,23 +68,31 @@ describe("BatchRecordSheet for a run filled in portions", () => {
               lot_name: "WA",
               status: "active",
               best_before: "2026-11-10",
+              quantity: "4",
             },
             {
               lot_id: "b",
               lot_name: "WB",
-              status: "active",
+              status: "quarantined",
+              status_reason: "Cloudy",
               best_before: "2026-11-09",
+              quantity: "3",
             },
           ],
         }}
       />,
     );
 
-    expect(screen.getByTestId("maker-record-batches")).toHaveTextContent(
-      "WA, WB",
-    );
+    // A recall reader can say how much of which batch exists.
+    const batches = screen.getByTestId("maker-record-batches");
+    expect(batches).toHaveTextContent(/WA — 4/);
+    expect(batches).toHaveTextContent(/WB — 3/);
     // Each batch keeps its own date: WB does not borrow WA's.
-    expect(screen.getAllByText(/WB/)).toHaveLength(2);
+    expect(screen.getAllByText(/WB/).length).toBeGreaterThanOrEqual(2);
+    // The hold and its reason are on the record.
+    expect(screen.getByTestId("maker-batch-hold-note")).toHaveTextContent(
+      "WB — Quarantined: Cloudy",
+    );
   });
 });
 
@@ -100,6 +109,42 @@ describe("BatchRecordSheet", () => {
     expect(within(sheet).getByText("Proofed overnight")).toBeInTheDocument();
     expect(within(sheet).getByText("loaves.jpg")).toBeInTheDocument();
     expect(within(sheet).getAllByText(/Ada Baker/)).toHaveLength(2);
+  });
+
+  it("prints the expiry of a record kept without a batch name", () => {
+    render(
+      <BatchRecordSheet
+        record={{
+          ...record,
+          ingredients: [
+            {
+              ...record.ingredients![0],
+              batches: [
+                {
+                  lot_id: null,
+                  lot_name: null,
+                  expiry_date: "2026-06-01",
+                  quantity: "6",
+                },
+              ],
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(screen.getByText(/no batch — 6/i)).toHaveTextContent(/2026/);
+  });
+
+  it("says a total leaves out an ingredient drawn with no cost", () => {
+    const { rerender } = render(<BatchRecordSheet record={record} />);
+    expect(screen.queryByText(/no rate|no cost/i)).toBeNull();
+
+    rerender(
+      <BatchRecordSheet record={{ ...record, uncosted_ingredients: 1 }} />,
+    );
+
+    expect(screen.getByText(/missing from this figure/i)).toBeInTheDocument();
   });
 
   it("is the part of the page that prints", () => {

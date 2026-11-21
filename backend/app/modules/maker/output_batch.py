@@ -18,6 +18,7 @@ and never reads this table: the dates belong to the batch, not to the card.
 from __future__ import annotations
 
 from datetime import date, timedelta
+from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy import delete, select
@@ -209,14 +210,22 @@ async def lots_of_run_async(
     return list(found.values())
 
 
-def run_batch_reads(lots: list[StockLotDTO]) -> list[RunBatchRead]:
-    """The batches of a run as the screens read them."""
+def run_batch_reads(
+    lots: list[StockLotDTO], made: dict[UUID, Decimal] | None = None
+) -> list[RunBatchRead]:
+    """The batches of a run as the screens read them.
+
+    *made* is the quantity the run filed under each batch, when the caller
+    knows it (the batch record).
+    """
     return [
         RunBatchRead(
             lot_id=lot.id,
             lot_name=lot.name,
             status=lot.status,
+            status_reason=lot.status_reason if lot.status in HELD_STATUSES else None,
             best_before=lot.expiry_date or lot.use_by_date,
+            quantity=(made or {}).get(lot.id),
         )
         for lot in lots
     ]
