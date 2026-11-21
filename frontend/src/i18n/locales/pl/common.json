@@ -495,6 +495,7 @@
         "meta_data": "Dane dodatkowe",
         "min_quantity": "Ilość minimalna",
         "module": "Moduł",
+        "module_name": "Moduł",
         "name": "Nazwa",
         "new_status": "Nowy status",
         "notes": "Notatki",

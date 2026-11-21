@@ -493,6 +493,7 @@
         "meta_data": "Données complémentaires",
         "min_quantity": "Quantité minimale",
         "module": "Module",
+        "module_name": "Module",
         "name": "Nom",
         "new_status": "Nouveau statut",
         "notes": "Notes",
