@@ -83761,7 +83761,7 @@
             "type": "string",
             "maxLength": 255,
             "title": "From Name",
-            "default": "Inventari"
+            "default": ""
           }
         },
         "type": "object",

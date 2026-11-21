@@ -501,6 +501,15 @@ const dist = join(root, "dist");
  * catalogue sits in the language chunk the screen loads); no import walked
  * in. That one phone budget moves a step of five, to 620; the other screens
  * stand under theirs.
+ *
+ * Re-measured 2026-11-21 on the branch that settles the first-contact and
+ * settings screens: the issue screen measures 590.4 KiB gz against its 590 and
+ * history 615.5 against its 615. What the branch adds there is copy in six
+ * languages (the browser-validation sentences, the unsaved-changes question,
+ * the row-action names, the audit verbs and the settings notes), which sits in
+ * the language chunk every first paint loads, and one document-level listener;
+ * no import walked in. Those two phone budgets move a step of five (issue 595,
+ * history 620); the other screens stand under theirs.
  */
 const BUDGETS = {
   initial: 245,

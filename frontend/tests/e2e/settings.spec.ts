@@ -118,7 +118,7 @@ test.describe("Settings — organization & user preferences", () => {
     ).toBeVisible({ timeout: 10000 });
     // Every module card carries its own switch: Deactivate while it is on.
     const toggleSwitch = page
-      .getByRole("button", { name: /^(Deactivate|Activate)$/ })
+      .getByRole("button", { name: /^(Deactivate|Activate) / })
       .first();
     await expect(toggleSwitch).toBeVisible({ timeout: 5000 });
   });

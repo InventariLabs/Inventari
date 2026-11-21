@@ -70,7 +70,7 @@
     "name": "Name",
     "edit": "Bearbeiten",
     "unsavedTitle": "Ungespeicherte Änderungen",
-    "unsavedLeave": "{{form}} enthält ungespeicherte Änderungen. Trotzdem verlassen?",
+    "unsavedLeave": "{{form}}: Sie haben ungespeicherte Änderungen. Trotzdem verlassen?",
     "leaveAnyway": "Trotzdem verlassen",
     "discardTitle": "Eingaben verwerfen?",
     "discardMessage": "Alles, was Sie in dieses Formular eingegeben haben, geht verloren. Das lässt sich nicht rückgängig machen.",
@@ -310,7 +310,7 @@
       "general": "Allgemein",
       "people": "Personen",
       "modules": "Module",
-      "myModules": "Meine Module",
+      "myModules": "Module der Organisation",
       "auditLog": "Auditprotokoll",
       "roles": "Rollen & Rechte",
       "email": "E-Mail",
@@ -387,6 +387,7 @@
       },
       "revoked": "Zurückgezogen",
       "invitationAccepted": "Angenommen",
+      "removed": "Entfernt",
       "profileDefault": "Vorgabe des Arbeitsbereichs",
       "fields": {
         "address": "Adresse",
@@ -951,11 +952,13 @@
       "license_link": "Lizenz lesen",
       "source_title": "Quellcode",
       "source_hint": "Wer diese Installation nutzt, kann den Quellcode der Version erhalten, die sie ausführt.",
+      "source_tag_hint": "Der Link öffnet die Startseite des Repositorys; diese Version ist dort das Tag v{{version}}.",
       "source_link": "Quellcode herunterladen",
       "third_party_title": "Daten Dritter",
       "open_food_facts": "Aus Open Food Facts importierte Produktdaten stehen unter der Open Database License (ODbL) 1.0.",
       "odbl_link": "ODbL lesen",
       "guide_hint": "Wie die App funktioniert, Bildschirm für Bildschirm: Produkte, Lagerorte, Bestände, Belege, Einstellungen. Das Handbuch ist auf Englisch.",
+      "guide_version_hint": "Der Link öffnet das Handbuch der neuesten Version, die neuer sein kann als Version {{version}}.",
       "guide_link": "Benutzerhandbuch öffnen"
     },
     "profile": {
@@ -1108,10 +1111,10 @@
   "unknown": "Unbekannt",
   "focusLock": {
     "title": "Es wird nur ein Modul angezeigt",
-    "body": "Dieser Arbeitsbereich zeigt ein Modul, daher sind der App-Start und die Seite „Module“ beiseitegelegt. Öffnen Sie „Meine Module“, um alle wieder zu zeigen.",
-    "exit": "„Meine Module“ öffnen",
+    "body": "Dieser Arbeitsbereich zeigt ein Modul, daher sind der App-Start und die Seite „Module“ beiseitegelegt. Öffnen Sie „Module der Organisation“, um alle wieder zu zeigen.",
+    "exit": "„Module der Organisation“ öffnen",
     "unknownTitle": "Angezeigte Module konnten nicht geprüft werden",
-    "unknownBody": "Welche Module dieser Arbeitsbereich zeigt, konnte nicht gelesen werden, daher wird der App-Start nicht angezeigt. Versuchen Sie es erneut oder öffnen Sie „Meine Module“.",
+    "unknownBody": "Welche Module dieser Arbeitsbereich zeigt, konnte nicht gelesen werden, daher wird der App-Start nicht angezeigt. Versuchen Sie es erneut oder öffnen Sie „Module der Organisation“.",
     "retry": "Erneut versuchen"
   },
   "focusMarker": {
@@ -1122,6 +1125,7 @@
   },
   "appStore": {
     "activate": "Aktivieren",
+    "activateNamed": "{{name}} aktivieren",
     "activateConfirm": "Einschalten",
     "activateConfirmTitle": "{{name}} einschalten?",
     "alwaysOn": "Immer aktiv",
@@ -1142,6 +1146,7 @@
     "changesUiHint": "Dieses Modul ändert Navigation und Begriffe dieser Organisation.",
     "changesUiHintOff": "Das Aktivieren dieses Moduls ändert Navigation und Begriffe dieser Organisation.",
     "deactivate": "Deaktivieren",
+    "deactivateNamed": "{{name}} deaktivieren",
     "deactivateConfirmTitle": "{{name}} abschalten?",
     "declaredPrefix": "angegeben:",
     "degraded": "Eingeschränkt",
@@ -1347,6 +1352,17 @@
     "count_other": "{{count}} ausgewählt",
     "countOnPage_one": "1 auf dieser Seite ausgewählt, von {{total}}",
     "countOnPage_other": "{{count}} auf dieser Seite ausgewählt, von {{total}}"
+  },
+  "nativeValidation": {
+    "valueMissing": "Füllen Sie dieses Feld aus",
+    "typeMismatchEmail": "Geben Sie eine E-Mail-Adresse ein",
+    "typeMismatchUrl": "Geben Sie eine Webadresse ein",
+    "tooShort": "Mindestens {{min}} Zeichen verwenden",
+    "tooLong": "Höchstens {{max}} Zeichen verwenden",
+    "rangeUnderflow": "Geben Sie einen Wert von mindestens {{min}} ein",
+    "rangeOverflow": "Geben Sie einen Wert von höchstens {{max}} ein",
+    "badInput": "Geben Sie einen gültigen Wert ein",
+    "patternMismatch": "Das verlangte Format verwenden"
   },
   "validation": {
     "nameRequired": "Name ist erforderlich",

@@ -9,7 +9,7 @@ import { makeTDynamic } from "@/lib/i18nHelpers";
 /**
  * Header marker that says the workspace shows one module only and names it.
  * Showing one module belongs to the whole organization, so only an admin gets
- * a way back: the marker leads to Settings → My modules, where the toggle and
+ * a way back: the marker leads to Settings → Organization modules, where the toggle and
  * its confirmation live. Everyone else reads a label.
  *
  * Renders nothing outside that state and while the focus state is unknown —

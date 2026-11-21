@@ -42,7 +42,7 @@
     "diffUnchanged": "Unverändert",
     "diffConfig": "Einstellungen zurücksetzen für",
     "confirmTitle": "Zu {{name}} wechseln?",
-    "confirmMessage": "Module werden für Ihre Organisation aktiviert und deaktiviert. Sie können jederzeit zurückwechseln.",
+    "confirmMessage": "Module werden für Ihre Organisation aktiviert und deaktiviert.",
     "confirmApply": "Arbeitsbereich wechseln",
     "confirmReapplyTitle": "Einrichtung von {{name}} erneut ausführen?",
     "confirmReapplyMessage": "Es werden keine Module hinzugefügt oder entfernt. Die Einrichtung des Arbeitsbereichs läuft erneut: Seine Standardeinstellungen kehren zu den Werten des Arbeitsbereichs zurück, und die von ihm gesäten Namen — einschließlich der Lagerorttypen — werden in der Sprache dieser Sitzung geschrieben.",
@@ -51,6 +51,7 @@
     "diffManualKept": "Bleibt (manuell hinzugefügt)",
     "diffCascadeHint": "Deaktiviert, weil sie ein entferntes Modul benötigen",
     "diffConfigHint": "Die Standardwerte des Arbeitsbereichs überschreiben aktuelle Einstellungen",
+    "confirmConfigHint": "Die Standardwerte des Arbeitsbereichs überschreiben aktuelle Einstellungen, und ein Zurückwechseln stellt sie nicht wieder her",
     "renumberOffer": "Ihre Lagerorte behalten Codes und Etiketten. Regalcodes (A-02-01) vergeben Sie mit Nach Vorlage neu nummerieren unter Lager → Konfiguration → Lagerortcodes, Etiketten und Laufreihenfolge; alte Etiketten scannen weiter."
   },
   "activeProfile": {

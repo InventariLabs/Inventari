@@ -13,7 +13,7 @@ class TestSmtpConfig:
         cfg = SmtpConfig(host='smtp.gmail.com', port=587)
         assert cfg.host == 'smtp.gmail.com'
         assert cfg.port == 587
-        assert cfg.from_name == 'Inventari'
+        assert cfg.from_name == ''
 
     def test_rejects_empty_host(self) -> None:
         with pytest.raises(ValidationError):

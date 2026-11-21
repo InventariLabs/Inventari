@@ -17,6 +17,7 @@ import {
   type ReactNode,
 } from "react";
 import { useDocumentLanguage } from "./hooks/useDocumentLanguage";
+import { useNativeValidationMessages } from "./hooks/useNativeValidationMessages";
 import { useAuthStore } from "./store/authStore";
 import { useModules } from "./contexts/ModulesContext";
 import { FocusLockGate } from "./components/FocusLockGate";
@@ -183,6 +184,7 @@ function App({ initialEntries }: AppProps = {}) {
   // The document's language follows the language on screen from the first
   // route, whatever route it is (see the hook).
   useDocumentLanguage();
+  useNativeValidationMessages();
 
   // Modules register here, not at import time: importing a module.ts drags
   // in that module's registration code and its API layer, and none of it

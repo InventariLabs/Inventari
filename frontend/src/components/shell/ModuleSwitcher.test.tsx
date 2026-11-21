@@ -214,7 +214,9 @@ describe("ModuleSwitcher", () => {
     const user = userEvent.setup();
     renderSwitcher();
     await user.click(screen.getByRole("button", { name: /switch module/i }));
-    await user.click(screen.getByRole("menuitem", { name: /my modules/i }));
+    await user.click(
+      screen.getByRole("menuitem", { name: /organization modules/i }),
+    );
 
     expect(screen.getByTestId("location")).toHaveTextContent(
       "/settings/my-modules",

@@ -24,6 +24,9 @@
     "noPermissions": "Sem permissões"
   },
   "revoke": "Revogar",
+  "revokeNamed": "Revogar {{name}}",
+  "generateFailed": "Não foi possível criar a chave.",
+  "revokeFailed": "Não foi possível revogar a chave.",
   "revokeConfirm": {
     "title": "Revogar chave de API",
     "message": "Tem certeza de que deseja revogar a chave \"{{name}}\"? Ela deixará de funcionar imediatamente.",

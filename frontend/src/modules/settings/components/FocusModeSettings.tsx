@@ -23,7 +23,7 @@ import type { ModuleInfo } from "@/types";
 import type { FocusModeDiff } from "@/lib/api/modules";
 
 /**
- * FocusModeSettings — the "Show only <module>" toggles on the My modules page.
+ * FocusModeSettings — the "Show only <module>" toggles on the Organization modules page.
  *
  * Each module that can be shown on its own gets one toggle worded "Show only
  * <name>". Turning one on fires the preview (POST /modules/focus/preview) and

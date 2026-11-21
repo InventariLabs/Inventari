@@ -121,6 +121,12 @@ async def invitation_preview(
     )
 
 
+async def user_display_name_async(db: AsyncSession, user_id: UUID) -> str | None:
+    """How a person is named to others: their name, else their address."""
+    user = await db.get(User, user_id)
+    return (user.full_name or user.email) if user else None
+
+
 async def invitation_role_label_async(
     db: AsyncSession, invitation: OrganizationInvitation
 ) -> str:

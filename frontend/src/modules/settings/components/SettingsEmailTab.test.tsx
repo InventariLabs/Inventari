@@ -98,6 +98,34 @@ describe("SettingsEmailTab", () => {
   });
 });
 
+describe("SettingsEmailTab — a field reported wrong", () => {
+  it("stops being reported once it is edited", async () => {
+    mockSmtp({ port: 587 });
+    await renderExpanded();
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: /Save Email Settings/ }),
+    );
+    expect(await screen.findByText(/host is required/i)).toBeInTheDocument();
+
+    await userEvent.type(
+      screen.getByLabelText(/SMTP Host/i),
+      "smtp.example.com",
+    );
+
+    expect(screen.queryByText(/host is required/i)).not.toBeInTheDocument();
+  });
+
+  it("offers the organization's name as the sender when none is chosen", async () => {
+    mockSmtp({ host: "smtp.example.com", port: 587 });
+    await renderExpanded();
+
+    const sender = await screen.findByLabelText("Sender Name");
+    expect(sender).toHaveValue("");
+    expect(sender).toHaveAttribute("placeholder", "Test Org");
+  });
+});
+
 describe("SettingsEmailTab — the login", () => {
   it("names the missing password instead of saving half a login", async () => {
     mockSmtp({
