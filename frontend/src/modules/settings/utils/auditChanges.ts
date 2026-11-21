@@ -59,6 +59,12 @@ const MAX_DEPTH = 4;
 const IDENTITY_KEYS = ["name", "number"] as const;
 
 /**
+ * The key a create's snapshot names the owning module under. It says which
+ * kind of record the Target column shows, so it is not also a change line.
+ */
+const OWNER_MODULE_KEY = "module_name";
+
+/**
  * The key an update's snapshot uses to say which fields moved.
  *
  * The list is written in field names, not values — `fields: ["brand"]` —
@@ -348,6 +354,8 @@ const VALUE_RESOLVERS: Record<
 > = {
   profile_id: (t, code) => auditProfileName(t, code, ""),
   focus_module: (t, code) => auditModuleName(t, code, ""),
+  // The module a copied layout belongs to: the name its card carries.
+  module: (t, code) => auditModuleName(t, code, ""),
   equipment_status: (t, code) =>
     t(`equipment:status.${code.toLowerCase()}`, { defaultValue: "" }),
   // The condition an asset came back in: the words the return dialog offers.
@@ -355,6 +363,8 @@ const VALUE_RESOLVERS: Record<
     t(`equipment:assignments.condition_${code.toLowerCase()}`, {
       defaultValue: "",
     }),
+  // What a location is for: the system's own word, not a column value.
+  usage: (t, code) => t(`locations:usage.${code}`, { defaultValue: "" }),
   role: (t, code) =>
     t(`common:settings.organization.memberRoles.${code}`, {
       defaultValue: "",
@@ -796,6 +806,7 @@ function flatFields(
         !identityKeys.includes(key) &&
         key !== "before" &&
         key !== "after" &&
+        key !== OWNER_MODULE_KEY &&
         // What an approval stands in front of is the entry's target, named
         // in the Target column by its number; printed here it was JSON.
         key !== APPROVAL_TARGET_KEY &&
@@ -877,6 +888,9 @@ export function auditFieldLabel(
         (NAMED_BY_THE_FORM[segment] &&
           t(NAMED_BY_THE_FORM[segment], { defaultValue: "" })) ||
         t(`settings.audit.fields.${segment}`, { defaultValue: "" }) ||
+        // A product field the platform seeds (an asset's manufacturer, asset
+        // tag, RAM) is worded by the form that edits it.
+        t(`items:fields.${segment}`, { defaultValue: "" }) ||
         segment,
     )
     .join(" › ");

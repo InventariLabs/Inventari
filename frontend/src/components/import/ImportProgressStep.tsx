@@ -138,6 +138,9 @@ export function ImportProgressStep({
             <AlertCircle size={12} />
             {t("common:import.firstErrors")}
           </p>
+          <p className="text-xs text-on-muted mb-3">
+            {t("common:import.rowsCountedNote")}
+          </p>
           <ul className="space-y-2">
             {importResult.errors.map((err) => (
               <li

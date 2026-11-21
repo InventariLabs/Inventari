@@ -110,6 +110,34 @@ describe("AuditTarget — the record the row is about", () => {
     expect(screen.getByText("IN/2026/003")).toBeInTheDocument();
   });
 
+  it("calls a product entry that carries the equipment block an asset", () => {
+    // An asset's edit is written as a product entry and its status change as
+    // an asset one; the Target column gives both the same word.
+    renderTarget({
+      ...quantityRow(null),
+      action: "UPDATE",
+      snapshot: {
+        name: "Laptop",
+        before: { meta_data: { equipment: { manufacturer: null } } },
+        after: { meta_data: { equipment: { manufacturer: "Dell" } } },
+      },
+    });
+
+    expect(screen.getByText("Asset")).toBeInTheDocument();
+    expect(screen.queryByText("Product")).not.toBeInTheDocument();
+  });
+
+  it("calls a creation that names the equipment module an asset", () => {
+    renderTarget({
+      ...quantityRow(null),
+      action: "CREATE",
+      snapshot: { name: "Laptop", quantity: 1, module_name: "equipment" },
+    });
+
+    expect(screen.getByText("Asset")).toBeInTheDocument();
+    expect(screen.queryByText("Product")).not.toBeInTheDocument();
+  });
+
   it("names an invitation by its address and the role's own name", () => {
     // Filed under the invitation, not the organization: "Night Shift" is the
     // name the organization gave a custom role, which no catalogue carries.

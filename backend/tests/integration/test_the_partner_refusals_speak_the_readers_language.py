@@ -171,7 +171,7 @@ class TestPartnerImportRefusalsSpeakPolish:
         body = _import(client, _polish(auth_headers), _csv(rows))
 
         assert (body['imported'], body['failed']) == (0, 1)
-        assert body['errors'] == [{'row': 2, 'error': 'Brak nazwy kontrahenta'}]
+        assert body['errors'] == [{'row': 1, 'error': 'Brak nazwy kontrahenta'}]
 
     def test_a_row_repeating_another_partner_says_so_in_polish(
         self, client: TestClient, auth_headers: dict
@@ -200,7 +200,7 @@ class TestPartnerImportRefusalsSpeakPolish:
         assert (body['imported'], body['failed']) == (1, 1)
         assert body['errors'] == [
             {
-                'row': 3,
+                'row': 2,
                 'error': (
                     'Duplikat kontrahenta: "Stary dostawca" ma już tę nazwę lub '
                     'ten numer identyfikacji podatkowej'

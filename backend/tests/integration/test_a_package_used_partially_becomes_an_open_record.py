@@ -17,6 +17,7 @@ from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
+from app.models.audit_log import AuditLog
 from app.models.item import Item
 from app.models.item_history import ItemHistory
 from app.models.partner import Partner
@@ -245,6 +246,37 @@ class TestUsePartially:
         records = _records(db_session, item)
         assert sorted(r.quantity for r in records) == [Decimal('1'), Decimal('2')]
         assert _used_moves(db_session, item) == []
+
+    def test_the_sealed_records_lost_unit_reaches_the_organization_journal(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+        test_user: User,
+        test_storage_location: StorageLocation,
+    ) -> None:
+        """The record that gave up a unit has its own quantity entry (3 -> 2).
+
+        Without it the journal reads the opened unit's creation and its use
+        and adds up to more than the shelf holds.
+        """
+        item = _bags(db_session, test_user, test_storage_location, count=3)
+
+        response = _use_partially(client, auth_headers, item, {})
+
+        assert response.status_code == 200, response.text
+        db_session.expire_all()
+        entries = list(
+            db_session.scalars(
+                select(AuditLog).where(
+                    AuditLog.target_id == item.id,
+                    AuditLog.action == 'QUANTITY_CHANGE',
+                )
+            )
+        )
+        assert len(entries) == 1
+        assert entries[0].snapshot['before'] == {'quantity': '3.000'}
+        assert entries[0].snapshot['after'] == {'quantity': '2.000'}
 
     def test_a_single_unit_is_flagged_where_it_stands(
         self,

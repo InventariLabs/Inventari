@@ -234,6 +234,7 @@
       "invitationExpiresAt": "válida hasta {{time}}",
       "requests": {
         "title": "Solicitudes de acceso",
+        "approveHint": "Aprobar da a la persona una cuenta con una organización propia, no un lugar en esta. Para añadir a alguien aquí, invítalo en su lugar.",
         "approve": "Aprobar",
         "reject": "Rechazar",
         "approveFor": "Aprobar a {{name}}",
@@ -494,6 +495,7 @@
         "meta_data": "Datos adicionales",
         "min_quantity": "Cantidad mínima",
         "module": "Módulo",
+        "module_name": "Módulo",
         "name": "Nombre",
         "new_status": "Estado nuevo",
         "notes": "Notas",
@@ -580,6 +582,7 @@
         "uom_id": "Unidad",
         "uom_symbol": "Unidad",
         "url": "URL",
+        "equipment": "Datos del equipo",
         "usage": "Uso",
         "valid_from": "Válido desde",
         "valid_to": "Válido hasta",
@@ -779,6 +782,8 @@
         "required": "obligatorio"
       },
       "values": {
+        "CHECKOUT": "Entrega",
+        "CHECKIN": "Devolución",
         "ALL": "Todos",
         "STORAGE": "Ubicación",
         "CATEGORY": "Categoría",
@@ -1337,6 +1342,7 @@
     "statsImported": "Importados",
     "statsFailed": "Fallidos",
     "firstErrors": "Primeros errores",
+    "rowsCountedNote": "Las filas se cuentan desde la primera fila de datos; el encabezado no cuenta, así que el número es el de la hoja menos uno.",
     "previewTitle": "Vista previa",
     "previewHint": "Las primeras filas del origen, leídas con la asignación de arriba."
   },

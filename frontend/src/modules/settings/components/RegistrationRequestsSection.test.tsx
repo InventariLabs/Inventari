@@ -112,6 +112,21 @@ describe("RegistrationRequestsSection", () => {
     expect(screen.queryByText(/register\?token/)).toBeNull();
   });
 
+  it("tells the approver that Approve gives the person an organization of their own", async () => {
+    server.use(
+      http.get("*/auth/registration-requests", () =>
+        HttpResponse.json(onePage([pendingRequest])),
+      ),
+    );
+    renderSection();
+
+    expect(
+      await screen.findByText(
+        /an organization of their own, not membership of this one/,
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("shows the registration link when no email could be sent", async () => {
     server.use(
       http.get("*/auth/registration-requests", () =>

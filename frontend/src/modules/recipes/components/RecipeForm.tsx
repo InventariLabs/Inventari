@@ -62,7 +62,9 @@ function draftRow(ing: RecipeIngredient, i: number): IngredientDraft {
   return {
     ...ing,
     _key: i,
-    quantity: String(ing.quantity),
+    // The API sends the column's three places ("100.000"); the form shows the
+    // amount.
+    quantity: String(Number(ing.quantity)),
     price: ing.price != null ? String(ing.price) : "",
     picking_skip: ing.picking_skip ?? null,
     allergens: ing.allergens ?? [],

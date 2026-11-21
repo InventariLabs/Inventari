@@ -89,6 +89,10 @@ export default function RegistrationRequestsSection() {
         </p>
       </div>
 
+      <p className="text-xs text-on-secondary">
+        {t("settings.organization.requests.approveHint")}
+      </p>
+
       {isError && (
         <InlineQueryError error={error} onRetry={() => void refetch()} />
       )}

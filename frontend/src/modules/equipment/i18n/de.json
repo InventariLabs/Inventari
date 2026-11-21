@@ -74,6 +74,7 @@
       "link": "Geräte",
       "uncategorised": "Ohne Kategorie",
       "empty": "Die Flotte enthält noch keine Geräte.",
+      "allRetired": "Alle erfassten Geräte sind ausgemustert, die Flotte ist leer.",
       "in_service_one": "{{count}} in Wartung",
       "in_service_other": "{{count}} in Wartung",
       "warranty_ending_one": "{{count}} im Bestand, Garantie läuft aus",

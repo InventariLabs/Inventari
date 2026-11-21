@@ -7,7 +7,10 @@
     "recipes": "Rezepte",
     "settings": "Einstellungen",
     "ingredientData": "Zutaten-Einstellungen",
-    "unlinkedIngredients": "Zutaten ohne Produkt"
+    "unlinkedIngredients": "Zutaten ohne Produkt",
+    "unlinkedIngredientsShort": "Ohne Produkt",
+    "ingredientDataShort": "Zutaten",
+    "mealPlannerShort": "Planer"
   },
   "filters": {
     "search": "Rezepte durchsuchen …",

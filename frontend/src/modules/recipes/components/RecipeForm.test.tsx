@@ -222,6 +222,53 @@ describe("RecipeForm — label consistency", () => {
     }
   });
 
+  it("opens a saved quantity as the amount, without the stored zeros", () => {
+    // The API sends the column's three places ("100.000"); a Polish browser
+    // shows that as "100,000" and an English reader takes it for a hundred
+    // thousand grams.
+    const row = (id: string, name: string, quantity: string) => ({
+      id,
+      recipe_id: "r1",
+      name,
+      template_id: null,
+      ingredient_group_name: null,
+      quantity,
+      uom_id: "uom-g",
+      uom_symbol: "g",
+      is_optional: false,
+      is_spice: false,
+      picking_skip: null,
+      sort_order: 0,
+      calories_kcal_per_100g: null,
+      display_text: null,
+      original_quantity: null,
+      original_unit_text: null,
+      price: null,
+      price_uom_id: null,
+      price_currency: null,
+      allergens: [],
+    });
+    renderForm({
+      initial: {
+        id: "r1",
+        name: "Pudding",
+        servings: 2,
+        ingredients: [
+          row("ing-1", "Rice", "100.000"),
+          row("ing-2", "Milk", "500.000"),
+          row("ing-3", "Cinnamon", "0.250"),
+        ],
+      },
+      onSubmit: vi.fn(),
+      onCancel: vi.fn(),
+    });
+
+    const values = screen
+      .getAllByRole("spinbutton", { name: "Quantity" })
+      .map((input) => (input as HTMLInputElement).value);
+    expect(values).toEqual(["100", "500", "0.25"]);
+  });
+
   it("names the ingredient quantity field the row does not label visibly", () => {
     renderForm({ onSubmit: vi.fn(), onCancel: vi.fn() });
 

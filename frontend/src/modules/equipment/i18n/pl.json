@@ -88,6 +88,7 @@
       "link": "Zasoby",
       "uncategorised": "Bez kategorii",
       "empty": "Flota nie ma jeszcze żadnych zasobów.",
+      "allRetired": "Wszystkie zasoby w rejestrze są wycofane, więc flota jest pusta.",
       "in_service_one": "{{count}} w serwisie",
       "in_service_few": "{{count}} w serwisie",
       "in_service_many": "{{count}} w serwisie",
