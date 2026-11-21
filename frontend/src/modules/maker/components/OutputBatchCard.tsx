@@ -56,7 +56,9 @@ function StatusNote({ status }: { status: string | null | undefined }) {
   if (HELD.has(status))
     return (
       <Badge variant="warning">
-        {t(`batches.card.state.${status}` as const)}
+        {status === "held"
+          ? t("batches.card.state.held")
+          : t("batches.card.state.quarantined")}
       </Badge>
     );
   if (status === "expired")

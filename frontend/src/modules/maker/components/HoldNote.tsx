@@ -16,7 +16,10 @@ export function HoldNote({
 }) {
   const { t } = useTranslation("maker");
   if (!HELD.has(batch.status)) return null;
-  const state = t(`batches.card.state.${batch.status}` as const);
+  const state =
+    batch.status === "held"
+      ? t("batches.card.state.held")
+      : t("batches.card.state.quarantined");
   return (
     <p className={className} data-testid="maker-batch-hold-note">
       {batch.status_reason
