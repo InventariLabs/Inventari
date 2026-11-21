@@ -315,24 +315,30 @@ async def _hold_line_on_shelf(
         require_active_lot=lot_id is None,
     )
     if not result.success:
-        # The numbers enter a translated sentence a person reads beside
-        # the screen's own quantities, so they are stated the way the
-        # screen states them — the store's scale (`2.000`) is not a
-        # number anybody typed.
+        shortfall = _shortfall(needed - result.unreserved_quantity, needed)
         if item is not None and _stands_off_the_shelf(item, shelf):
             raise await _record_stands_elsewhere(
                 db,
                 doc,
                 item,
                 'document_insufficient_stock_record_elsewhere',
-                quantity=stated_quantity(result.unreserved_quantity),
-                needed=stated_quantity(needed),
+                **shortfall,
             )
-        raise ServiceRejectionError(
-            'document_insufficient_stock',
-            quantity=stated_quantity(result.unreserved_quantity),
-            needed=stated_quantity(needed),
-        )
+        raise ServiceRejectionError('document_insufficient_stock', **shortfall)
+
+
+def _shortfall(available: Decimal, needed: Decimal) -> dict[str, Any]:
+    """The figures of a stock refusal: what is there, what was asked, what is missing.
+
+    The numbers enter a translated sentence a person reads beside the
+    screen's own quantities, so they are stated the way the screen states
+    them — the store's scale (`2.000`) is not a number anybody typed.
+    """
+    return {
+        'available': stated_quantity(available),
+        'needed': stated_quantity(needed),
+        'missing': stated_quantity(needed - available),
+    }
 
 
 async def _the_batch_the_door_takes(
@@ -421,9 +427,7 @@ async def _hold_a_zone_line(
     taken = sum((draw.consumed for draw in draws), Decimal('0'))
     if taken < needed:
         raise ServiceRejectionError(
-            'document_insufficient_stock',
-            quantity=stated_quantity(taken),
-            needed=stated_quantity(needed),
+            'document_insufficient_stock', **_shortfall(taken, needed)
         )
     shares: dict[UUID, tuple[UUID, Decimal]] = {}
     for draw in draws:

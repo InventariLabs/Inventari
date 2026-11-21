@@ -673,10 +673,10 @@ ERRORS_DE: ErrorMessages = {
         'empfangen. Stornieren Sie zuerst die zugehörigen Wareneingangsbelege.'
     ),
     'po_import_not_draft': 'Zeilen können nur in eine Bestellung im Entwurfsstatus importiert werden',
-    'document_insufficient_stock': 'Nicht genügend Bestand zum Bestätigen: {quantity} von {needed} konnten nicht reserviert werden',
+    'document_insufficient_stock': 'Nicht genügend Bestand zum Bestätigen: {available} von {needed} verfügbar, {missing} fehlen',
     'document_zone_split_needs_stock_unit': 'Die Position für "{item_name}" ist in einer anderen Einheit als der Lagerbestandseinheit des Produkts geschrieben und lässt sich nicht auf mehrere Regalplätze verteilen; schreiben Sie sie in der Lagerbestandseinheit oder entnehmen Sie sie aus einem einzigen Regalplatz',
     'document_record_stands_elsewhere': 'Der Datensatz „{item_name}“ liegt auf „{record_shelf}“, aber das Dokument nimmt von „{document_shelf}“ — richten Sie das Dokument auf „{record_shelf}“ aus oder verschieben Sie zuerst den Datensatz',
-    'document_insufficient_stock_record_elsewhere': 'Nicht genügend Bestand zum Bestätigen: {quantity} von {needed} konnten auf „{document_shelf}“ nicht reserviert werden; der Datensatz „{item_name}“ liegt auf „{record_shelf}“ — richten Sie das Dokument auf diesen Platz aus oder verschieben Sie zuerst den Datensatz',
+    'document_insufficient_stock_record_elsewhere': 'Nicht genügend Bestand zum Bestätigen: {available} von {needed} auf „{document_shelf}“ verfügbar, {missing} fehlen; der Datensatz „{item_name}“ liegt auf „{record_shelf}“ — richten Sie das Dokument auf diesen Platz aus oder verschieben Sie zuerst den Datensatz',
     'stock_would_go_negative': 'Damit läge der Bestand unter null. Inzwischen hat jemand diese Ware bewegt — neu laden und erneut versuchen.',
     'stock_reserved_over_quantity': 'Damit wäre mehr Ware reserviert, als im Regal liegt. Geben Sie eine Reservierung frei oder zählen Sie erneut.',
     'document_exceeds_order_line': 'Der Zugang von {quantity} überschreitet die Bestellposition, auf der nur noch {remaining} offen sind — jenseits der Überlieferungstoleranz von {tolerance} % wird jemand mit der Berechtigung zum Übererfassen benötigt',

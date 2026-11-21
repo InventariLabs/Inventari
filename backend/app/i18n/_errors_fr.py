@@ -670,10 +670,10 @@ ERRORS_FR: ErrorMessages = {
         'Annulez d’abord les bons de réception concernés.'
     ),
     'po_import_not_draft': 'Les lignes ne peuvent être importées que dans un bon de commande au statut brouillon',
-    'document_insufficient_stock': "Stock insuffisant pour confirmer : {quantity} sur {needed} n'ont pas pu être réservés",
+    'document_insufficient_stock': 'Stock insuffisant pour confirmer : {available} sur {needed} disponibles, {missing} manquants',
     'document_zone_split_needs_stock_unit': "La ligne de « {item_name} » est saisie dans une unité autre que l'unité de stock du produit et ne peut pas être répartie sur plusieurs emplacements ; saisissez-la dans l'unité de stock ou prélevez-la sur un seul emplacement",
     'document_record_stands_elsewhere': "L'enregistrement « {item_name} » est sur « {record_shelf} », mais le document prend sur « {document_shelf} » — visez « {record_shelf} » ou déplacez d'abord l'enregistrement",
-    'document_insufficient_stock_record_elsewhere': "Stock insuffisant pour confirmer : {quantity} sur {needed} n'ont pas pu être réservés sur « {document_shelf} » ; l'enregistrement « {item_name} » est sur « {record_shelf} » — visez cet emplacement ou déplacez d'abord l'enregistrement",
+    'document_insufficient_stock_record_elsewhere': "Stock insuffisant pour confirmer : {available} sur {needed} disponibles sur « {document_shelf} », {missing} manquants ; l'enregistrement « {item_name} » est sur « {record_shelf} » — visez cet emplacement ou déplacez d'abord l'enregistrement",
     'stock_would_go_negative': "Cela ferait passer le stock sous zéro. Quelqu'un a déplacé ces marchandises entre-temps — rechargez et réessayez.",
     'stock_reserved_over_quantity': "Cela réserverait plus de marchandises qu'il n'y en a en rayon. Libérez une réservation ou recomptez.",
     'document_exceeds_order_line': 'Réceptionner {quantity} dépasse la ligne de commande, sur laquelle il ne reste que {remaining} — au-delà de la tolérance de sur-réception de {tolerance} %, il faut une personne autorisée à recevoir au-delà de la tolérance',
