@@ -562,6 +562,12 @@ says what the release does rather than what changed since them.
   Duplicate on a draft, but no Start run, Complete run, Finish run, portion
   form, Undo run or Cancel of a run in progress, and *New production* opens
   planning only, without the *Save as made* choice: each of those posts stock.
+- The return sheet keeps to what is still left of a line. Its maximum is what
+  earlier returns and corrections have not already taken back, not the full
+  quantity done, so a quantity above it is named under the field and the sheet
+  cannot be submitted, and a line already returned in full shows the sheet's
+  own sentence instead of a field. The quantity field no longer keeps a
+  leading zero.
 
 ### Removed
 
