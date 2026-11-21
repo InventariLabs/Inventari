@@ -56,6 +56,7 @@ export function ImportPreviewView({
       <div className="flex items-center justify-between p-3 bg-surface-raised rounded-lg">
         <span className="text-sm font-medium truncate">{sourceLabel}</span>
         <span className="text-xs text-on-muted">
+          {t("warehouse:import.rowsRead")}:{" "}
           {t("warehouse:import.rowCount", { count: totalRows })}
         </span>
       </div>

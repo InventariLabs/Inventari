@@ -94,13 +94,13 @@ export function BulkActionBar({
               : t("warehouse:bulk.print", { count: printableCount })}
           </Button>
         </span>
-        {canWrite && (
+        {canWrite && draftCount > 0 && (
           <Button
             variant="ghost"
             size="sm"
             leftIcon={<CheckCheck size={14} />}
             onClick={onConfirmDrafts}
-            disabled={draftCount === 0 || isConfirming}
+            disabled={isConfirming}
             isLoading={isConfirming}
           >
             {t("warehouse:bulk.confirmDrafts", { count: draftCount })}
@@ -116,13 +116,13 @@ export function BulkActionBar({
             {t("warehouse:bulk.pickSelected", { count: pickableIds.length })}
           </Button>
         )}
-        {canWrite && (
+        {canWrite && draftCount > 0 && (
           <Button
             variant="ghost"
             size="sm"
             leftIcon={<Trash2 size={14} />}
             onClick={onDeleteDrafts}
-            disabled={draftCount === 0 || isDeleting}
+            disabled={isDeleting}
             isLoading={isDeleting}
             className="text-red-600 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20"
           >

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { queryKeys } from "@/hooks/queries/keys";
 import { useAppMutation } from "@/lib/api/mutationFactory";
+import { useCanWrite } from "@/hooks/useCanWrite";
 import { cn } from "@/lib/utils";
 import { documentsReceivingApi } from "@/modules/warehouse/api/documents_receiving";
 import { documentsPickingApi } from "@/modules/warehouse/api/documents_picking";
@@ -63,6 +64,11 @@ export function DocumentScanSessionNotice({
   className,
 }: DocumentScanSessionNoticeProps) {
   const { t } = useTranslation("warehouse");
+  // Every branch of this notice asks the reader to act — continue, complete,
+  // or discard. A viewer can do none of them, so the read-only notice above
+  // is the whole answer: telling them to complete the dispatch in the Packing
+  // step points at buttons the same page hides.
+  const canWrite = useCanWrite("warehouse");
   const [confirmOpen, setConfirmOpen] = useState(false);
   const { id: documentId, status: documentStatus } = document;
   const { data: session } = useDocumentScanSession(documentId, {
@@ -92,6 +98,7 @@ export function DocumentScanSessionNotice({
     { errorFallback: t("scanSession.closeFailed") },
   );
 
+  if (!canWrite) return null;
   if (!session) return null;
   const progress = { done: session.doneLines, total: session.totalLines };
   if (session.status === "finished") {

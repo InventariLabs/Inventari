@@ -449,9 +449,7 @@ export function DocumentImportModal(props: DocumentImportModalProps) {
     sourceMode === "file"
       ? (file?.name ?? "")
       : pasteText
-        ? t("import.rowCount", {
-            count: pasteText.split("\n").filter((l) => l.trim()).length,
-          })
+        ? t("import.pastedText")
         : "";
 
   return (

@@ -773,7 +773,7 @@ describe("WmsReceivingView", () => {
     expect(await screen.findByText("Receiving complete")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Closing this summary completes the document and books the stock.",
+        "\u201cComplete and post stock\u201d completes the document and books the stock. Leaving this summary any other way keeps the document open, as received.",
       ),
     ).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
@@ -782,6 +782,54 @@ describe("WmsReceivingView", () => {
       screen.getByRole("button", { name: "Complete and post stock" }),
     );
     expect(onClose).toHaveBeenCalledExactlyOnceWith(true);
+  });
+
+  it("leaves the summary by Escape with the document still open, as received", async () => {
+    // The button books the stock; every other way out keeps the document
+    // open, as the picking summary does.
+    const finished = buildSession();
+    finished.status = "completed";
+    finished.received_lines = 1;
+    finished.pending_lines = 0;
+    finished.lines = [
+      { ...finished.lines[0], status: "received", received_quantity: 5 },
+    ];
+    server.use(http.post(START_PATH, () => HttpResponse.json(finished)));
+    const onClose = vi.fn();
+
+    render(<WmsReceivingView documentId={DOCUMENT_ID} onClose={onClose} />);
+    expect(await screen.findByText("Receiving complete")).toBeInTheDocument();
+
+    await userEvent.keyboard("{Escape}");
+
+    expect(onClose).toHaveBeenCalledExactlyOnceWith(false);
+  });
+
+  it("quotes the button under the label the button itself carries", async () => {
+    // The note names the button the reader is about to press, so it takes
+    // that label from the button's own key rather than a second copy of it.
+    await act(() => i18n.changeLanguage("es"));
+    try {
+      const finished = buildSession();
+      finished.status = "completed";
+      finished.received_lines = 1;
+      finished.pending_lines = 0;
+      finished.lines = [
+        { ...finished.lines[0], status: "received", received_quantity: 5 },
+      ];
+      server.use(http.post(START_PATH, () => HttpResponse.json(finished)));
+
+      render(<WmsReceivingView documentId={DOCUMENT_ID} onClose={vi.fn()} />);
+
+      const button = await screen.findByRole("button", {
+        name: "Completar y registrar el stock",
+      });
+      expect(
+        screen.getByText(/completa el documento y contabiliza el stock/),
+      ).toHaveTextContent(`«${button.textContent}»`);
+    } finally {
+      await act(() => i18n.changeLanguage("en"));
+    }
   });
 
   it("reopens on the summary of a session that finished without completing the document", async () => {

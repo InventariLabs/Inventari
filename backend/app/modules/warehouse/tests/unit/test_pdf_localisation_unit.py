@@ -9,7 +9,11 @@ from jinja2 import Environment, select_autoescape
 from app.i18n import MAINTAINED_LANGUAGES
 from app.modules.purchase_orders import po_pdf_service
 from app.modules.warehouse import _pdf_labels
-from app.modules.warehouse.document_pdf_service import _svc, build_pdf_context
+from app.modules.warehouse.document_pdf_service import (
+    _svc,
+    build_pdf_context,
+    build_pick_list_context,
+)
 from app.modules.warehouse.models import Document
 from app.services.pdf_utils import register_pdf_filters
 
@@ -91,6 +95,17 @@ class TestLabelSetsAreComplete:
             assert labels[key] != _pdf_labels._LABELS_EN[key], key
         po_labels = getattr(po_pdf_service, f'_LABELS_{lang.upper()}')
         assert po_labels['footer'] != po_pdf_service._LABELS_EN['footer']
+
+
+@pytest.mark.unit
+class TestThePickListSpeaksTheScreensGermanWord:
+    """The screen offers "Kommissionierliste drucken", so the sheet it prints
+    carries the same noun; two words for one act read as two acts."""
+
+    def test_the_printed_title_is_the_word_the_screen_offers(self) -> None:
+        context = build_pick_list_context([], [], 'de', None)
+
+        assert context['print_title'] == 'Kommissionierliste'
 
 
 @pytest.mark.unit

@@ -104,6 +104,46 @@ describe("ExecutionLineCard — held back goods", () => {
     ).toBeInTheDocument();
   });
 
+  it("offers a short dispatch only the reasons its direction can have", () => {
+    render(
+      <ExecutionLineCard
+        {...makeProps()}
+        isReceipt={false}
+        requiresDiscrepancy
+        currentDoneQuantity={3}
+      />,
+    );
+
+    // "Surplus from supplier" and "Count variance" describe a delivery or a
+    // count, not a shelf that held less than the pick asked for.
+    expect(
+      screen.queryByRole("option", { name: /discrepancyCodes.SURPLUS/i }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole("option", {
+        name: /discrepancyCodes.COUNT_VARIANCE/i,
+      }),
+    ).toBeNull();
+    expect(
+      screen.getByRole("option", { name: /discrepancyCodes.SHORTAGE/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps the surplus reason on a receipt", () => {
+    render(
+      <ExecutionLineCard
+        {...makeProps()}
+        isReceipt
+        requiresDiscrepancy
+        currentDoneQuantity={3}
+      />,
+    );
+
+    expect(
+      screen.getByRole("option", { name: /discrepancyCodes.SURPLUS/i }),
+    ).toBeInTheDocument();
+  });
+
   it("does not offer to hold goods back on a dispatch", () => {
     render(<ExecutionLineCard {...makeProps()} isReceipt={false} />);
 
