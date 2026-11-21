@@ -174,6 +174,18 @@ describe("PutawayRuleEditorDialog", () => {
     expect(screen.getByText("Shelf")).toBeInTheDocument();
   });
 
+  it("keeps the storage type placeholder short enough for its half-width field", async () => {
+    renderDialog();
+
+    const picker = await screen.findByRole("combobox", {
+      name: /Location type/i,
+    });
+    const text = picker.textContent ?? "";
+    expect(text).toContain("Optional");
+    // Measured at 1440: 26 characters were cut to "Optional — select locatio…".
+    expect(text.length).toBeLessThanOrEqual(24);
+  });
+
   it("submits the type code the engine matches on, not the display name", async () => {
     const onSubmit = vi.fn();
     const user = userEvent.setup();

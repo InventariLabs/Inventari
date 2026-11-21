@@ -1067,7 +1067,7 @@
       "product_template": "Facultatif — choisir un produit",
       "category": "Facultatif — sélectionnez une catégorie",
       "context_tag": "Facultatif — choisir un groupe de catégories",
-      "location_type": "Facultatif — choisir un type d'emplacement",
+      "location_type": "Facultatif — choisir un type",
       "target_location": "Sélectionner l'emplacement cible"
     },
     "match": {

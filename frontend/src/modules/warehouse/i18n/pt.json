@@ -1046,7 +1046,7 @@
       "product_template": "Opcional — selecione o produto",
       "category": "Opcional — selecione a categoria",
       "context_tag": "Opcional — selecione o grupo de categorias",
-      "location_type": "Opcional — selecione o tipo de local",
+      "location_type": "Opcional — escolher um tipo",
       "target_location": "Selecione o local de destino"
     },
     "match": {

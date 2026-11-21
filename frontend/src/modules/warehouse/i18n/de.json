@@ -1067,7 +1067,7 @@
       "product_template": "Optional — Produkt wählen",
       "category": "Optional — Kategorie wählen",
       "context_tag": "Optional — Kategoriegruppe wählen",
-      "location_type": "Optional — Lagerorttyp wählen",
+      "location_type": "Optional — Typ wählen",
       "target_location": "Ziel-Lagerort wählen"
     },
     "match": {
