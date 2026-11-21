@@ -11,8 +11,11 @@ any non-test module of ``app/`` may not be an f-string of the shape
 (``reference_type`` / ``reference_id``) that the screen turns into a link and
 a word; the free-text Reference carries what a person would write there.
 
-``_OPEN`` names the writers that still do it. The goal is an empty set; a new
-writer fails here.
+``_OPEN`` names the writers that still do it. The document screens read the
+``stock_take:`` and ``recipe:`` prefixes as words and a link
+(``documentReference.ts``), so those two writers no longer reach the reader as
+an id; they stay listed until they move to the typed columns, and a new writer
+of any other kind fails here.
 """
 
 from __future__ import annotations
@@ -28,7 +31,7 @@ _FIELDS = frozenset({'reference', 'external_reference'})
 _OPEN = frozenset(
     {
         'app/modules/mcp_server/tools/_writes.py::reference=f"mcp:{…}"',
-        'app/modules/recipes/_picking_document.py::external_reference=f"picking:{…}"',
+        'app/modules/recipes/_picking_document.py::external_reference=f"recipe:{…}"',
         'app/modules/stock_takes/stock_take_service.py::reference=f"stock_take:{…}"',
     }
 )
