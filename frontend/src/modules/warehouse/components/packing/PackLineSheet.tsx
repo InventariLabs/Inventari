@@ -41,6 +41,7 @@ export function PackLineSheet({
     if (quantity > left) {
       setError(
         t("packing.qtyOver", {
+          count: left,
           amount: formatQuantityLocalized(
             t,
             line.remaining_quantity,

@@ -1305,6 +1305,14 @@ describe("DocumentsTodoPage", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Write off" }));
     const dialog = await screen.findByRole("dialog");
+    // The reason is the reader's to choose; no hold arrives with one set.
+    expect(
+      within(dialog).getByTestId("hold-write-off-reason-code"),
+    ).toHaveValue("");
+    await userEvent.selectOptions(
+      within(dialog).getByTestId("hold-write-off-reason-code"),
+      "DAMAGED",
+    );
     await userEvent.click(
       within(dialog).getByRole("button", { name: "Write off" }),
     );

@@ -96,6 +96,28 @@ describe("DocumentExecutionSection — the summary names what it counted", () =>
     expect(screen.queryByText(/Units 0\/5/)).toBeNull();
   });
 
+  it("keeps the unit with the quantity it names", () => {
+    // "quantity 4/4" beside a line reading "3/5 pcs." left the reader to
+    // guess what the number measured; the unit travels with it.
+    render(
+      <DocumentExecutionSection
+        document={document_([
+          line({
+            expected_quantity: "5",
+            quantity: "5",
+            done_quantity: "3",
+            uom: { id: "u1", symbol: "pcs", name: "pieces", rounding: "1" },
+          }),
+        ])}
+        isCorrection={false}
+      />,
+    );
+
+    expect(
+      screen.getByText("Lines 0/1 done · quantity 3/5 pcs."),
+    ).toBeInTheDocument();
+  });
+
   it("counts a raised typed count as received, not as 6 of 5", () => {
     // One line planned at 4 and received in full, one typed as 1 and raised
     // to 2: the second line planned nothing beyond what came in.

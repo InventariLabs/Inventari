@@ -218,7 +218,7 @@
     "postNowScrap": "Mettre au rebut",
     "postNowAdjust": "Ajuster le stock",
     "postNowDefault": "Comptabiliser le document",
-    "plan": "Planifier",
+    "plan": "Confirmer",
     "sendForApproval": "Envoyer pour approbation",
     "undoReceive": "Annuler la réception",
     "undoIssue": "Annuler la sortie",
@@ -316,7 +316,10 @@
     "noStockCount_one": "{{count}} ligne n’a trouvé aucun stock à prélever",
     "noStockCount_other": "{{count}} lignes n’ont trouvé aucun stock à prélever",
     "noStockHint": "Rien de ces produits n’est disponible dans l’emplacement source. Choisissez le stock de chaque ligne à la main, ou réceptionnez d’abord la marchandise ; d’ici là, le document ne peut pas être confirmé.",
-    "chooseSourceFirst": "Choisissez d’abord l’emplacement source — les lignes importées sont prélevées sur son stock."
+    "chooseSourceFirst": "Choisissez d’abord l’emplacement source — les lignes importées sont prélevées sur son stock.",
+    "columnsHint": "La feuille a besoin d'une colonne pour le produit — nom, code-barres ou SKU — et d'une pour la quantité. Marque, unité, prix unitaire, taux de TVA, numéro de lot et date d'expiration sont facultatifs.",
+    "pastedText": "Texte collé",
+    "rowsRead": "Lignes lues"
   },
   "empty": {
     "noResultsTitle": "Aucun document ne correspond au filtre",
@@ -328,7 +331,7 @@
     "description": "Réceptionnez, sortez, déplacez et comptez le stock — les documents numérotés suivent d'eux-mêmes.",
     "step1": {
       "title": "Créer votre premier document",
-      "description": "Commencez par une réception (IN) pour enregistrer les marchandises entrantes d'un partenaire.",
+      "description": "Commencez par une réception ({{code}}) pour enregistrer les marchandises entrantes d'un partenaire.",
       "cta": "Créer votre premier document"
     },
     "step2": {
@@ -517,7 +520,6 @@
     "snapshotPlanned": "Qté prévue",
     "snapshotDeltaPlus": "Ajouté",
     "snapshotDeltaMinus": "Retiré",
-    "executionTitle": "Exécuter le document",
     "executionHelp": "Ajustez la quantité réellement traitée pour chaque ligne avant de fermer le document.",
     "executionMeta": "Prévu {{expected}} {{unit}} · restant {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Prévu {{expected}} · restant {{remaining}} (sans unité)",
@@ -879,7 +881,7 @@
     "print_list": "Imprimer le bon de préparation",
     "print_list_failed": "Le bon de préparation n'a pas pu être créé",
     "summary_title": "Préparation terminée",
-    "summary_subtitle": "{{picked}} sur {{total}} lignes préparées",
+    "summary_subtitle": "{{picked}} sur {{total}} lignes préparées en totalité",
     "summary_picked": "{{count}} préparés",
     "summary_short": "{{count}} manquants",
     "summary_skipped": "{{count}} sautés",
@@ -1401,7 +1403,7 @@
       "title": "Réception terminée",
       "total": "{{received}} sur {{expected}} {{unit}} reçues",
       "backToDocument": "Terminer et comptabiliser le stock",
-      "bookingNote": "La fermeture de ce récapitulatif termine le document et comptabilise le stock.",
+      "bookingNote": "« {{action}} » termine le document et comptabilise le stock. Quitter ce récapitulatif autrement laisse le document ouvert, tel que réceptionné.",
       "skippedUndo": "Annuler l'omission",
       "skippedBackorder": "Reliquat",
       "skippedNotComing": "Ne viendra pas",
@@ -1601,13 +1603,14 @@
     "intoPackage": "Dans le colis {{code}}",
     "intoNewPackage": "Dans un nouveau colis",
     "qtyRequired": "Indiquez la quantité qui va dans le colis",
-    "qtyOver": "Il ne reste que {{amount}} à emballer",
     "scanned": "{{product}} emballé dans {{code}}",
     "errors": {
       "writeFailed": "La modification de l'emballage n'a pas été enregistrée",
       "slipFailed": "Le bordereau n'a pas pu être téléchargé",
       "labelFailed": "L'étiquette n'a pas pu être téléchargée"
-    }
+    },
+    "qtyOver_one": "Il ne reste que {{amount}} à emballer",
+    "qtyOver_other": "Il ne reste que {{amount}} à emballer"
   },
   "statusBadge": {
     "todo": "à faire aujourd'hui"

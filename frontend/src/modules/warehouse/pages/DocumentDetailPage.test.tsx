@@ -1279,7 +1279,8 @@ describe("DocumentDetailPage", () => {
     // What was scrolled is the panel itself, not some other section of the
     // page that happens to mount at the same time.
     const panel = within(scrolled.mock.instances[0] as HTMLElement);
-    expect(panel.getByText("Execute document")).toBeInTheDocument();
+    // The sheet is named after the button that opens it.
+    expect(panel.getByText("Pick items")).toBeInTheDocument();
   });
 
   it("requires a discrepancy code for partial execution and submits it with an optional note", async () => {
@@ -1313,7 +1314,9 @@ describe("DocumentDetailPage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /Pick items/i }));
 
-    expect(screen.getByText("Execute document")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Pick items" }),
+    ).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText("Executed quantity"), {
       target: { value: "3" },

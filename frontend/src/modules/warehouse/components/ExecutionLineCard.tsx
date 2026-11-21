@@ -7,6 +7,7 @@ import { QuantityInput } from "@/components/ui/QuantityInput";
 import {
   DOCUMENT_DISCREPANCY_CODES,
   DOCUMENT_HELD_CODES,
+  PICK_SHORTAGE_CODES,
 } from "@/modules/warehouse/discrepancyCodes";
 import { getDocumentLineStatusVariant } from "@/modules/warehouse/lineStatus";
 import { unitLabel } from "@/lib/i18nHelpers";
@@ -93,8 +94,15 @@ function LineQuantityControls({
   // line is not short; with none held, only a short line has something to
   // explain.
   const showsCode = requiresDiscrepancy || heldQuantity > 0;
+  // A surplus from the supplier and a count variance describe a delivery or
+  // a stock take, not a dispatch whose shelf held less than the pick asked
+  // for: a delivery offers only the reasons its direction can have.
   const codeChoices =
-    heldQuantity > 0 ? DOCUMENT_HELD_CODES : DOCUMENT_DISCREPANCY_CODES;
+    heldQuantity > 0
+      ? DOCUMENT_HELD_CODES
+      : isReceipt
+        ? DOCUMENT_DISCREPANCY_CODES
+        : PICK_SHORTAGE_CODES;
 
   return (
     <>
