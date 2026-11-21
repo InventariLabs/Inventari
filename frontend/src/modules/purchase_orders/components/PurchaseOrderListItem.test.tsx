@@ -70,6 +70,19 @@ describe("PurchaseOrderListItem", () => {
     expect(screen.getByText("No price yet")).toBeInTheDocument();
   });
 
+  it("says the amount on the card is the gross value", () => {
+    render(
+      <PurchaseOrderListItem
+        purchaseOrder={{
+          ...purchaseOrderRow(draftPO),
+          total_gross: "20664.00",
+        }}
+        {...callbacks}
+      />,
+    );
+    expect(screen.getByText("gross")).toBeInTheDocument();
+  });
+
   it("renders PO number", () => {
     render(
       <PurchaseOrderListItem

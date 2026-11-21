@@ -4,8 +4,8 @@
     "description": "Suivi des actifs, attestations et maintenance"
   },
   "statusBadge": {
-    "warrantyAlerts_one": "alerte de garantie",
-    "warrantyAlerts_other": "alertes de garantie"
+    "warrantyAlerts_one": "garantie bientôt échue",
+    "warrantyAlerts_other": "garanties bientôt échues"
   },
   "nav": {
     "overview": "Aperçu",
@@ -45,8 +45,8 @@
     "active_assignments": "Empruntés",
     "in_maintenance": "En maintenance",
     "retired": "Retiré",
-    "warrantyAlertsCount_one": "{{count}} alerte de garantie",
-    "warrantyAlertsCount_other": "{{count}} alertes de garantie",
+    "warrantyAlertsCount_one": "{{count}} garantie bientôt échue",
+    "warrantyAlertsCount_other": "{{count}} garanties bientôt échues",
     "add_asset": "Ajouter un actif",
     "attention": {
       "heading_one": "{{count}} actif demande votre attention",

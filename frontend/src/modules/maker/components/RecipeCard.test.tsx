@@ -187,15 +187,24 @@ describe("RecipeCard without ingredients", () => {
 describe("RecipeCard stock figure", () => {
   it("writes the stock number the reader's language writes, separator included", async () => {
     // The catalog's stock figure came raw off the decimal column: an
-    // American point in a Polish interface ("1234.5"). The module has no
-    // unit for this field, but the number still follows the one convention.
+    // American point in a Polish interface ("1234.5"); the figure still
+    // follows the one convention, and it carries the product's unit.
     await withLanguage("pl", () => {
-      renderCard({ ...baseRecipe, stock_qty: "1234.5000" });
+      renderCard({
+        ...baseRecipe,
+        stock_qty: "1234.5000",
+        stock_uom_symbol: "kg",
+      });
 
-      expect(screen.getByText("1234,5")).toBeInTheDocument();
-      expect(screen.queryByText("1234.5")).not.toBeInTheDocument();
-      expect(screen.queryByText(/1[\s ]234/)).not.toBeInTheDocument();
+      expect(screen.getByText("1234,5 kg")).toBeInTheDocument();
+      expect(screen.queryByText(/1234\.5/)).not.toBeInTheDocument();
     });
+  });
+
+  it("prints the unit the stock is counted in", () => {
+    renderCard({ ...baseRecipe, stock_qty: "11.4", stock_uom_symbol: "kg" });
+
+    expect(screen.getByText("11.4 kg")).toBeInTheDocument();
   });
 });
 

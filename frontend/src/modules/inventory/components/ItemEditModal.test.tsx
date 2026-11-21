@@ -1,4 +1,4 @@
-import { act, render, screen, fireEvent, waitFor } from "@/test/utils";
+import { act, render, screen, fireEvent, waitFor, within } from "@/test/utils";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { http, HttpResponse } from "msw";
 import { server } from "@/test/mocks/server";
@@ -97,6 +97,17 @@ describe("ItemEditModal", () => {
 
       expect(scrollIntoView).not.toHaveBeenCalled();
     });
+  });
+
+  it("names the product in the header, whatever the sheet is scrolled to", async () => {
+    render(<ItemEditModal itemId="1" onClose={() => {}} openAtExpiry />);
+    await screen.findByDisplayValue(/Test Item/i);
+
+    const dialog = screen.getByRole("dialog");
+    expect(
+      within(dialog).getByRole("heading", { name: /Edit product/i })
+        .parentElement,
+    ).toHaveTextContent("Test Item");
   });
 
   it("should render edit modal with item data", async () => {

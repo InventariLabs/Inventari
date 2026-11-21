@@ -261,6 +261,10 @@ async def list_recipes(
         )
         return uom_symbols.get(uom_id) if uom_id else None
 
+    def _stock_uom_symbol(recipe: MakerRecipe) -> str | None:
+        uom_id = template_uom_ids.get(recipe.output_template_id)
+        return uom_symbols.get(uom_id) if uom_id else None
+
     settings = await recipe_service.get_settings(db, org_id)
     items = []
     for recipe in recipes:
@@ -324,6 +328,7 @@ async def list_recipes(
                 result=result,
                 reference_direction=reference_direction,
                 stock_qty=template_stock.get(recipe.output_template_id),
+                stock_uom_symbol=_stock_uom_symbol(recipe),
                 last_produced_at=last_run.completed_at if last_run else None,
             )
         )

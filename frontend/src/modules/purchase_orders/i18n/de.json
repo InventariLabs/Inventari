@@ -322,7 +322,7 @@
     "currency": "Währung",
     "createdAt": "Erstellt",
     "confirmedAt": "Bestätigt",
-    "total": "Bestellwert"
+    "total": "Bestellwert (brutto)"
   },
   "columns": {
     "number": "Nummer",
@@ -331,7 +331,7 @@
     "lines": "Positionen",
     "scheduled": "Termin",
     "received": "Erhalten",
-    "total": "Summe",
+    "total": "Summe (brutto)",
     "actions": "Aktionen"
   },
   "overdue": "Überfällig",
@@ -341,6 +341,7 @@
   "backToList": "Zurück zu den Bestellungen",
   "confirmOrderDescriptionApproval": "Die Bestätigung schickt die Bestellung in die Genehmigungswarteschlange; der Wareneingang wird möglich, sobald sie genehmigt ist. Sie können sie später trotzdem stornieren.",
   "noPriceYet": "Noch kein Preis",
+  "grossSuffix": "brutto",
   "confirmOrderUnpriced": "Einige Positionen haben noch keinen Preis, daher ist der Wert nicht bekannt und die Bestellung geht zur Genehmigung. Bis {{threshold}} ist keine nötig: Ergänzen Sie zuerst die Preise.",
   "confirmOrderDeadEndWaits": "Die Bestätigung schickt diese Bestellung auf die Stufe „{{stage}}“, wo sie wartet, bis die Anfrage zurückgezogen wird oder jemand sie entscheiden kann.",
   "requestApprovalDeadEndWaits": "Die Anfrage schickt Bestellung {{number}} auf die Stufe „{{stage}}“, wo sie wartet, bis die Anfrage zurückgezogen wird oder jemand sie entscheiden kann."
