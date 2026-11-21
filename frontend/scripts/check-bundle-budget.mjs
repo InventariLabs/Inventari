@@ -474,6 +474,12 @@ const dist = join(root, "dist");
  * The merge with the line's next fifteen commits (the storage products tab
  * and the unpicked-products wording) measures the products screen at 630.0
  * KiB gz against its 630; that budget moves a step of five, to 635.
+ *
+ * The sentences the production screens gained (what a refused dialog says,
+ * the held batch and its reason, the unit mismatch notice) are in the Polish
+ * catalogue, which is the language this budget is measured in; the start
+ * screen measures 640.0 KiB gz against its 640 after them, with the copy
+ * already trimmed. That budget moves a step of five, to 645.
  */
 const BUDGETS = {
   initial: 245,
