@@ -74,7 +74,7 @@
     },
     "src/modules/warehouse/components/DocumentMetadataGrid.tsx": {
       "DocumentMetadataGrid": [
-        31
+        29
       ]
     },
     "src/modules/warehouse/hooks/useDocumentScanner.ts": {
