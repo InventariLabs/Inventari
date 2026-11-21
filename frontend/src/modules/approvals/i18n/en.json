@@ -121,6 +121,7 @@
     "saveFailed": "Failed to save workflow",
     "removeStage": "Remove stage",
     "addApprover": "Add Approver",
+    "cannotApprove": "cannot see approvals",
     "removeApprover": "Remove approver",
     "selectApprovers": "Select Approvers",
     "searchUsers": "Search users…",

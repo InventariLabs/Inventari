@@ -38,6 +38,8 @@ from ._schemas_register import (  # noqa: F401
     DocumentTypeConfigUpdate,
     InventoryPeriodCreate,
     InventoryPeriodSchema,
+    OpenDocumentInPeriod,
+    OpenDocumentsInPeriod,
     RegisterCurrencyTotal,
     RegisterDocumentRow,
     RegisterGroup,

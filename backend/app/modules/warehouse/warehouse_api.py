@@ -704,7 +704,14 @@ class WarehouseAPI:
         await release_after_approval_withdrawn(db, org_id, document_id, module)
 
     async def return_to_draft_async(
-        self, db: AsyncSession, org_id: UUID, document_id: UUID, module: str
+        self,
+        db: AsyncSession,
+        org_id: UUID,
+        document_id: UUID,
+        module: str,
+        *,
+        user_id: UUID | None = None,
+        reason: str | None = None,
     ) -> None:
         """Refuse a document ``module`` holds: it goes back to a draft.
 
@@ -712,10 +719,14 @@ class WarehouseAPI:
         person who submitted it can correct it and submit it again. Telling
         them is the refusing module's business. A confirmed document nothing
         holds can be sent back the same way. The caller's transaction commits it.
+        ``user_id`` and ``reason`` are who sent it back and why; the
+        document's journal carries both.
         """
         from ._document_rework_service import rework_to_draft_after_reject
 
-        await rework_to_draft_after_reject(db, org_id, document_id, module)
+        await rework_to_draft_after_reject(
+            db, org_id, document_id, module, user_id=user_id, reason=reason
+        )
 
     @staticmethod
     def register_pick_order_strategy(

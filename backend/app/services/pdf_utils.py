@@ -245,16 +245,27 @@ def country_name(code: str, lang: str = 'en') -> str:
 _BABEL_LOCALES: dict[str, Any] = {lang: Locale(lang) for lang in SUPPORTED_LANGUAGES}
 
 
+#: Languages whose readers write a postal address as "90-001 Łódź".
+_POSTAL_CODE_FIRST_LANGUAGES = frozenset({'pl', 'de', 'fr', 'es', 'pt'})
+
+
 def format_partner_address(
     address: dict[str, Any] | None, lang: str = 'en'
 ) -> str | None:
     if not address:
         return None
     parts = []
-    for field in ('street', 'city', 'postal_code'):
-        val = address.get(field)
-        if val:
-            parts.append(val)
+    street = address.get('street')
+    if street:
+        parts.append(street)
+    city, postal_code = address.get('city'), address.get('postal_code')
+    if lang[:2] in _POSTAL_CODE_FIRST_LANGUAGES:
+        # "90-001 Łódź": the code and the town are one element of the line.
+        town = ' '.join(str(part) for part in (postal_code, city) if part)
+        if town:
+            parts.append(town)
+    else:
+        parts.extend(str(part) for part in (city, postal_code) if part)
     country = address.get('country')
     if country:
         parts.append(country_name(str(country), lang))

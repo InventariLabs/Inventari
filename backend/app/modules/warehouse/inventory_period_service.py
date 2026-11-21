@@ -9,7 +9,7 @@ from typing import Any
 from uuid import UUID
 
 from babel.dates import format_date
-from sqlalchemy import desc, select
+from sqlalchemy import Date, cast, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import AuditAction, AuditTargetType
@@ -18,7 +18,7 @@ from app.core.exceptions import PeriodClosedError, ServiceRejectionError
 from app.core.public_api import core_api
 from app.i18n.service import get_current_lang, get_error_message
 
-from .models import InventoryPeriod
+from .models import Document, DocumentStatus, InventoryPeriod
 
 # Re-export for intra-module relative imports (router.py, _document_workflow_crud.py).
 # The canonical definition lives in app.core.exceptions so every module can
@@ -151,6 +151,42 @@ async def _log_period_event(
         },
         reason=notes,
     )
+
+
+#: A month is not finished while a document dated in it is still a draft, is
+#: waiting for approval, or is confirmed and not completed: the lock refuses
+#: every act that would end it.
+_OPEN_STATUSES = (
+    DocumentStatus.DRAFT.value,
+    DocumentStatus.PENDING_APPROVAL.value,
+    DocumentStatus.CONFIRMED.value,
+)
+
+
+async def open_documents_in_period(
+    db: AsyncSession, org_id: UUID, year: int, month: int, *, limit: int = 10
+) -> tuple[int, list[Document]]:
+    """How many documents dated in a month are not finished, and the first few.
+
+    The date is the one the period guard reads: the scheduled date, else the
+    day the document was made. Closing the month over these leaves each one
+    unable to be confirmed, completed, edited or cancelled, so the screen
+    that closes asks before it does.
+    """
+    dated = func.coalesce(Document.scheduled_date, cast(Document.created_at, Date))
+    first = date(year, month, 1)
+    after = date(year + (month == 12), month % 12 + 1, 1)
+    where = (
+        Document.organization_id == org_id,
+        Document.status.in_(_OPEN_STATUSES),
+        dated >= first,
+        dated < after,
+    )
+    count = await db.scalar(select(func.count()).select_from(Document).where(*where))
+    rows = await db.scalars(
+        select(Document).where(*where).order_by(dated, Document.number).limit(limit)
+    )
+    return count or 0, list(rows.all())
 
 
 async def close_period(

@@ -98,7 +98,9 @@ export default function DocumentDetailModals({
           ? {
               confirm: postNowSendsForApproval
                 ? t("confirmDialog.postNowApprovalConfirm")
-                : t("confirmDialog.postNowConfirm"),
+                : doc.type === "SCRAP"
+                  ? t("actions.postNowScrap")
+                  : t("confirmDialog.postNowConfirm"),
               keep: t("confirmDialog.postNowKeep"),
             }
           : confirmAction === "undo"
@@ -107,6 +109,11 @@ export default function DocumentDetailModals({
                 keep: t("confirmDialog.undoKeep"),
               }
             : null;
+  // A write-off is not "posting a document": the question names the act.
+  const writesOff =
+    confirmAction === "postNow" &&
+    !postNowSendsForApproval &&
+    doc.type === "SCRAP";
   return (
     <>
       {editOpen && <DocumentFormModal document={doc} onClose={onEditClose} />}
@@ -149,7 +156,9 @@ export default function DocumentDetailModals({
       {confirmAction && (
         <ConfirmDialog
           open={!!confirmAction}
-          title={confirmTitle}
+          title={
+            writesOff ? t("confirmDialog.postNowScrapTitle") : confirmTitle
+          }
           message={confirmMessage}
           variant={confirmVariant}
           // Cancel and delete name what the button does and what the other

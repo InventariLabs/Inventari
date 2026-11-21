@@ -40,6 +40,7 @@ from app.core.logging import get_logger
 from app.core.module_sdk import InterceptorError
 from app.i18n.service import get_current_lang, get_error_message
 
+from ._audit import as_reason
 from .approvals_api import approvals_api
 from .exceptions import ApprovalError, ApprovalRequiredError
 from .target_decisions import TargetDecisionRefusedError
@@ -275,6 +276,17 @@ async def follow_document_decision(db: AsyncSession, decision: TargetDecision) -
             )
         except Exception as exc:
             raise TargetDecisionRefusedError(exc) from exc
+        # A rejection tells the requester; so does the approval, unless they
+        # gave it themselves and need no telling.
+        if decision.decided_by != decision.requester_id:
+            await approvals_api.notify_approval_async(
+                db,
+                org_id=org_id,
+                doc_id=doc_id,
+                request_id=decision.request_id,
+                requester_id=decision.requester_id,
+                notes=as_reason(decision.notes),
+            )
     elif decision.outcome == 'CANCELLED':
         await warehouse.withdraw_hold_async(db, org_id, doc_id, MODULE)
     elif decision.outcome == 'REJECTED':
@@ -282,7 +294,14 @@ async def follow_document_decision(db: AsyncSession, decision: TargetDecision) -
         # that cannot go back (posted in the meantime) refuses the rejection
         # in the reader's words, rather than leave it decided over nothing.
         try:
-            await warehouse.return_to_draft_async(db, org_id, doc_id, MODULE)
+            await warehouse.return_to_draft_async(
+                db,
+                org_id,
+                doc_id,
+                MODULE,
+                user_id=decision.decided_by,
+                reason=as_reason(decision.notes),
+            )
         except Exception as exc:
             raise TargetDecisionRefusedError(exc) from exc
         await approvals_api.notify_rejection_async(

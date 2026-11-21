@@ -82,6 +82,10 @@ export function BatchRecordSheet({ record }: { record: BatchRecord }) {
   const unit = record.output_uom_symbol ?? null;
   const batches = record.output_batches ?? [];
   const uncosted = record.uncosted_ingredients ?? 0;
+  const pricedLines = Math.max(
+    (record.ingredients ?? []).length - uncosted,
+    Number(record.total_cost) > 0 ? 1 : 0,
+  );
   const money = (value: string | number | null | undefined) =>
     value === null || value === undefined
       ? "—"
@@ -188,7 +192,11 @@ export function BatchRecordSheet({ record }: { record: BatchRecord }) {
           <Fact label={t("record.estimatedCost")}>
             {money(record.estimated_total_cost)}
           </Fact>
-          <Fact label={t("record.unitCost")}>{money(record.unit_cost)}</Fact>
+          <Fact label={t("record.unitCost")}>
+            {/* No known rate behind the total means none behind the unit
+                figure either; a zero would read as free to make. */}
+            {uncosted > 0 && pricedLines === 0 ? "—" : money(record.unit_cost)}
+          </Fact>
         </dl>
         {(record.ingredients ?? []).some((line) =>
           (line.batches ?? []).some((batch) => batch.lot_id),
@@ -197,13 +205,7 @@ export function BatchRecordSheet({ record }: { record: BatchRecord }) {
             {t("record.costBasis")}
           </p>
         )}
-        <CostGapNote
-          priced={Math.max(
-            (record.ingredients ?? []).length - uncosted,
-            Number(record.total_cost) > 0 ? 1 : 0,
-          )}
-          unpriced={uncosted}
-        />
+        <CostGapNote priced={pricedLines} unpriced={uncosted} />
       </Section>
 
       <Section title={t("record.whoAndWhen")}>

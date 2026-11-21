@@ -612,6 +612,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/approvals/workflows/approvers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List People Who Can Decide
+         * @description Which members of the organization could decide a stage they are named on.
+         *
+         *     The picker that names approvers reads it, so a person who cannot see
+         *     approvals is marked before the save refuses a stage that names only such
+         *     people. It is the same test the save applies (``deciders_async``).
+         *     Declared above ``/workflows/{workflow_id}`` for the reason the
+         *     ``configured`` route is.
+         */
+        get: operations["list_people_who_can_decide_api_v1_approvals_workflows_approvers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/approvals/workflows/configured": {
         parameters: {
             query?: never;
@@ -9979,6 +10005,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/warehouse/periods/{year}/{month}/open-documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Open Documents In Period
+         * @description The documents closing this month would leave unfinished.
+         */
+        get: operations["list_open_documents_in_period_api_v1_warehouse_periods__year___month__open_documents_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/warehouse/periods/{year}/{month}/reopen": {
         parameters: {
             query?: never;
@@ -19083,6 +19129,30 @@ export interface components {
             /** Use Country Preset */
             use_country_preset?: boolean;
         };
+        /** OpenDocumentInPeriod */
+        OpenDocumentInPeriod: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: string;
+            /** Type */
+            type: string;
+            /** Status */
+            status: string;
+        };
+        /**
+         * OpenDocumentsInPeriod
+         * @description What closing a month would strand: the documents dated in it not finished.
+         */
+        OpenDocumentsInPeriod: {
+            /** Count */
+            count: number;
+            /** Documents */
+            documents: components["schemas"]["OpenDocumentInPeriod"][];
+        };
         /** OpenedSuggestion */
         OpenedSuggestion: {
             /**
@@ -24363,6 +24433,8 @@ export interface components {
             reference_direction?: ("SAVINGS" | "MARGIN") | null;
             /** Stock Qty */
             stock_qty?: string | null;
+            /** Stock Uom Symbol */
+            stock_uom_symbol?: string | null;
             /** Last Produced At */
             last_produced_at?: string | null;
         };
@@ -29700,6 +29772,14 @@ export interface components {
             total: number;
         };
         /**
+         * WorkflowApprovers
+         * @description The members of the organization who could decide a stage naming them.
+         */
+        WorkflowApprovers: {
+            /** User Ids */
+            user_ids: string[];
+        };
+        /**
          * WorkflowConfigured
          * @description Whether a request for this target type would land anywhere.
          *
@@ -31263,6 +31343,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_people_who_can_decide_api_v1_approvals_workflows_approvers_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkflowApprovers"];
                 };
             };
         };
@@ -49460,6 +49560,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["InventoryPeriodSchema"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_open_documents_in_period_api_v1_warehouse_periods__year___month__open_documents_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                year: number;
+                month: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpenDocumentsInPeriod"];
                 };
             };
             /** @description Validation Error */

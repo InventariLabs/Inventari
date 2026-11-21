@@ -23,6 +23,7 @@ from sqlalchemy.orm import Session
 from app.models.audit_log import AuditLog
 from app.models.organization import Organization
 from app.models.product_template import ProductTemplate
+from app.models.uom import Uom, UomCategory
 from app.models.user import User
 
 from .conftest import post_bom_line
@@ -331,6 +332,48 @@ class TestRecipeCatalog:
         assert body['total'] == 2
         names = {item['name'] for item in body['items']}
         assert names == {'Cherry Jam', 'Apple Butter'}
+
+    def test_catalog_names_the_unit_the_stock_is_counted_in(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        db_session: Session,
+    ) -> None:
+        """The on-hand figure carries the product's own unit, which a batch
+        yield stated in another unit does not change."""
+        category = UomCategory(
+            organization_id=None, name=f'Mass {uuid.uuid4().hex[:6]}'
+        )
+        db_session.add(category)
+        db_session.flush()
+        kilogram = Uom(category_id=category.id, name='Kilogram', symbol='kg')
+        gram = Uom(category_id=category.id, name='Gram', symbol='g')
+        db_session.add_all([kilogram, gram])
+        db_session.flush()
+        template = ProductTemplate(
+            organization_id=mk_org.id, name='Plum Butter', uom_id=kilogram.id
+        )
+        db_session.add(template)
+        db_session.commit()
+        db_session.refresh(template)
+        created = client.post(
+            '/api/v1/maker/recipes',
+            headers=mk_auth_headers,
+            json={
+                'output_template_id': str(template.id),
+                'name': 'Plum Butter',
+                'batch_yield_qty': '500',
+                'batch_yield_uom_id': str(gram.id),
+            },
+        )
+        assert created.status_code == 201, created.text
+
+        item = client.get('/api/v1/maker/recipes', headers=mk_auth_headers).json()[
+            'items'
+        ][0]
+        assert item['batch_yield_uom_symbol'] == 'g'
+        assert item['stock_uom_symbol'] == 'kg'
 
     def test_catalog_filters_by_output_template(
         self,

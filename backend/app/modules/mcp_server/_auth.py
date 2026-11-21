@@ -75,14 +75,22 @@ _DEFAULT_ORIGINS = (
 )
 
 
-def _auth_refusal(code: str, key: str, **kwargs: object) -> AppException:
+def _auth_refusal(
+    code: str, key: str, *, status_code: int = 401, **kwargs: object
+) -> AppException:
+    """A refusal answered at *status_code*.
+
+    Only a 401 carries the Bearer challenge: a key that authenticated but does
+    not hold a permission is refused with 403, so a client stops retrying its
+    credentials and reads what the message asks for.
+    """
     return AppException(
-        status_code=401,
+        status_code=status_code,
         code=code,
         message=get_module_error_message(
             MODULE_NAME, key, get_current_lang(), **kwargs
         ),
-        headers=_WWW_AUTHENTICATE,
+        headers=_WWW_AUTHENTICATE if status_code == 401 else None,
     )
 
 
@@ -144,7 +152,9 @@ async def authenticate_api_key(
     if context.organization_id is None:
         raise _auth_refusal('MCP_ORGANIZATION_REQUIRED', 'organization_required')
     if not context.has_permission('mcp_server:use'):
-        raise _auth_refusal('MCP_PERMISSION_REQUIRED', 'permission_required')
+        raise _auth_refusal(
+            'MCP_PERMISSION_REQUIRED', 'permission_required', status_code=403
+        )
     if not await core_api.organizations.is_module_enabled_async(
         db, context.organization_id, MODULE_NAME
     ):

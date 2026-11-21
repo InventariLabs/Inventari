@@ -376,6 +376,12 @@ export default function ItemEditModal({
               >
                 {canWrite ? t("editItem") : t("viewItem")}
               </h2>
+              {/* The sheet can open scrolled to one field (an attention row
+                  lands on the expiry date), where the name field is out of
+                  sight; the header keeps saying whose record this is. */}
+              <p className="max-w-[16rem] truncate text-sm text-on-secondary sm:max-w-md">
+                {item.name}
+              </p>
               {item.label_code && (
                 <div className="flex items-center gap-1 mt-0.5">
                   <span className="text-[10px] font-medium text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded uppercase tracking-tighter border border-primary-100">
@@ -440,6 +446,7 @@ export default function ItemEditModal({
                 }
                 imagePreview={imagePreview}
                 setImagePreview={setImagePreview}
+                readOnly={!canWrite}
               />
 
               <StockThresholdSection

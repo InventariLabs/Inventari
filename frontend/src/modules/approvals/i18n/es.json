@@ -121,6 +121,7 @@
     "saveFailed": "Error al guardar el flujo",
     "removeStage": "Eliminar etapa",
     "addApprover": "Añadir aprobador",
+    "cannotApprove": "no ve las aprobaciones",
     "removeApprover": "Eliminar aprobador",
     "selectApprovers": "Seleccionar aprobadores",
     "searchUsers": "Buscar usuarios…",

@@ -73,7 +73,10 @@ const PurchaseOrderListItem = memo(function PurchaseOrderListItem({
               </Badge>
               {hasAmount && (
                 <span className="font-semibold text-on tabular-nums">
-                  {formatMoney(po.total_gross, po.currency, lang)}
+                  {formatMoney(po.total_gross, po.currency, lang)}{" "}
+                  <span className="text-xs font-normal text-on-muted">
+                    {t("grossSuffix")}
+                  </span>
                 </span>
               )}
               {po.total_gross === null && (

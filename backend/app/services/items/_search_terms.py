@@ -1,9 +1,9 @@
 """What a typed string is matched against when someone searches for a record.
 
-One predicate, four call sites (the items list, its cursor-paginated twin,
-the filtered query behind the screen, and the trash), because the four used
-to hold four copies of the same ``or_`` and a code added to one of them was
-missing from the others.
+One predicate, five call sites: the items list, its cursor-paginated twin and
+the stock summary the warehouse product picker reads, the filtered query
+behind the screen, and the trash — so a field added here is searched by all
+five at once, and none of them can miss a code the others find.
 
 The product code is the reason this file exists. A scanned barcode belongs
 to the *product*, so it is written to the template and the record stays
