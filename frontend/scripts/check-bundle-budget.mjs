@@ -510,10 +510,21 @@ const dist = join(root, "dist");
  * the language chunk every first paint loads, and one document-level listener;
  * no import walked in. Those two phone budgets move a step of five (issue 595,
  * history 620); the other screens stand under theirs.
+ *
+ * Re-measured 2026-11-21 on the branch that closes the catalogue, locations
+ * and labels findings, merged with the line that settled the first-contact and
+ * settings screens: app first paint measures 405.3 KiB gz against its 405,
+ * login 410.1 against 410 and launcher 425.2 against 425. The line alone
+ * measures 404.9, 409.7 and 424.8; the branch adds about 0.4 KiB to each (copy
+ * in six languages and a few lines of the shared error text, in the language
+ * chunk every first paint loads; no import walked in). Those three budgets move
+ * a step of five (first paint 410, login 415, launcher 430); the other screens
+ * stand under theirs (start 643.4, receive 479.0, issue 591.0, history 616.1,
+ * products 634.8, initial 194.0).
  */
 const BUDGETS = {
   initial: 245,
-  appFirstPaint: 405,
+  appFirstPaint: 410,
 };
 
 /**
