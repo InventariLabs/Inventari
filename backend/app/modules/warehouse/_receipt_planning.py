@@ -356,7 +356,7 @@ class ReceiptLocationPlanner:
             return 'archived'
         if target.usage != 'internal':
             return 'not_internal'
-        return None
+        return self._held_back.get(location_id)
 
     async def _load_target(self, location_id: UUID | None) -> None:
         if location_id is not None and location_id not in self._targets:

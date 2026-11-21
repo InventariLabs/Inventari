@@ -547,7 +547,9 @@
     "plannedRuleWarning": {
       "archived": "Uma regra correspondente aponta para um local arquivado ({{rule}}) — não aplicada; a linha vai para {{location}}",
       "not_internal": "Uma regra correspondente aponta para um local virtual ({{rule}}) — não aplicada; a linha vai para {{location}}",
-      "refused": "Um módulo excluiu todos os locais de uma regra correspondente ({{rule}}) para esta mercadoria — não aplicada; a linha vai para {{location}}"
+      "refused": "Um módulo excluiu todos os locais de uma regra correspondente ({{rule}}) para esta mercadoria — não aplicada; a linha vai para {{location}}",
+      "receiving": "Uma regra correspondente aponta para uma área de receção ({{rule}}) — não aplicada; a linha vai para {{location}}",
+      "quarantine": "Uma regra correspondente aponta para o local de quarentena ({{rule}}) — não aplicada; a linha vai para {{location}}"
     },
     "lineTargetLabel": "Local da linha",
     "lineTargetFollowPlan": "Seguir o plano (regra / documento)",
@@ -1086,6 +1088,13 @@
       "active": "Ativa",
       "inactive": "Inativa",
       "targetInactive": "Destino inativo",
+      "shelfHeld": {
+        "archived": "Arquivado",
+        "not_internal": "Local virtual",
+        "receiving": "Área de receção — retido",
+        "quarantine": "Quarentena — retido"
+      },
+      "shelfHeldNamed": "{{name}}: {{reason}}",
       "moreShelves_one": "+{{count}} prateleira a mais se estiver cheia",
       "moreShelves_other": "+{{count}} prateleiras a mais se estiver cheia"
     },
@@ -1349,7 +1358,10 @@
       "plannedByRule": "regra: {{rule}}",
       "plannedWarning": {
         "archived": "Regra ignorada — o local dela está arquivado",
-        "not_internal": "Regra ignorada — o local dela é virtual"
+        "not_internal": "Regra ignorada — o local dela é virtual",
+        "refused": "Regra ignorada — um módulo excluiu os locais dela para esta mercadoria",
+        "receiving": "Regra ignorada — o local dela é uma área de receção",
+        "quarantine": "Regra ignorada — o local dela é a quarentena"
       }
     },
     "short": {

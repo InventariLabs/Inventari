@@ -368,7 +368,7 @@ data / domain exceptions — a consumer does not have to guard every call):
 | `list_template_ids_with_bom_async(db, org_id)` | `list[UUID]` — templates that have at least one BoM line. |
 | `explode_bom_async(db, org_id, template_id, qty)` | `list[(child_template_id, effective_qty, unit)]` — a flat multi-level explosion. |
 | `compute_total_cost_async(db, org_id, template_id, qty)` | Sum of shared estimated stock-unit cost × effective_qty. |
-| `compute_unit_cost_async(db, org_id, template_id, planned_qty)` | Unit cost (0 with no ingredients). |
+| `compute_unit_cost_async(db, org_id, template_id, planned_qty)` | Whole cost per unit — ingredients, fixed costs and labour (0 when nothing is rateable). |
 | `get_breakdown_async(db, org_id, template_id, qty)` | `CostBreakdownResponse` (read-only). |
 | `complete_production_async(db, org_id, order_id, user, actual_qty=None)` | Executes a DRAFT (consumption → production → valuation). |
 | `label_text_async(db, org_id, template_id, lang, lot_id=None)` | `str \| None` — a made product's ingredient list and allergens as a label prints them. A batch (`lot_id`) is read from the recipe of the runs that filed their output under it (`recipe_id`, through `output_lot_id` or a portion's `lot_name`), which need not be the default; a batch no run filled, or no batch, from the default recipe. None for a product nobody makes, for a batch runs of two recipes filled (no single list is its own), and while the module is off. The printing module's product and batch labels print it. |

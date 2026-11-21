@@ -551,7 +551,9 @@
     "plannedRuleWarning": {
       "archived": "A matching rule points at an archived location ({{rule}}) — not applied; the line goes to {{location}}",
       "not_internal": "A matching rule points at a virtual location ({{rule}}) — not applied; the line goes to {{location}}",
-      "refused": "A module ruled out every location of a matching rule ({{rule}}) for these goods — not applied; the line goes to {{location}}"
+      "refused": "A module ruled out every location of a matching rule ({{rule}}) for these goods — not applied; the line goes to {{location}}",
+      "receiving": "A matching rule points at a receiving area ({{rule}}) — not applied; the line goes to {{location}}",
+      "quarantine": "A matching rule points at the quarantine location ({{rule}}) — not applied; the line goes to {{location}}"
     },
     "lineTargetLabel": "Line location",
     "lineTargetFollowPlan": "Follow the plan (rule / document)",
@@ -1107,6 +1109,13 @@
       "active": "Active",
       "inactive": "Inactive",
       "targetInactive": "Target inactive",
+      "shelfHeld": {
+        "archived": "Archived",
+        "not_internal": "Virtual location",
+        "receiving": "Receiving area — skipped",
+        "quarantine": "Quarantine — skipped"
+      },
+      "shelfHeldNamed": "{{name}}: {{reason}}",
       "moreShelves_one": "+{{count}} more shelf if it is full",
       "moreShelves_other": "+{{count}} more shelves if it is full"
     },
@@ -1379,7 +1388,10 @@
       "plannedByRule": "rule: {{rule}}",
       "plannedWarning": {
         "archived": "Rule skipped — its location is archived",
-        "not_internal": "Rule skipped — its location is virtual"
+        "not_internal": "Rule skipped — its location is virtual",
+        "refused": "Rule skipped — a module ruled out its locations for these goods",
+        "receiving": "Rule skipped — its location is a receiving area",
+        "quarantine": "Rule skipped — its location is the quarantine"
       }
     },
     "short": {

@@ -10,12 +10,14 @@ from decimal import Decimal
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import Session
 
 from app.models.organization import Organization
 from app.models.product_template import ProductTemplate
 from app.models.storage_location import StorageLocation
-from tests.integration._shelf import post_on_shelf
+from app.modules.maker.maker_api import maker_api
+from tests.integration._shelf import post_on_shelf, run_in_async_session
 
 pytestmark = pytest.mark.integration
 
@@ -169,3 +171,47 @@ def test_the_run_preview_total_is_the_cost_of_its_unit_cost(
     assert Decimal(body['total_cost']) == TOTAL
     assert Decimal(body['unit_cost']) * 10 == Decimal(body['total_cost'])
     assert Decimal(body['ingredients_cost']) == INGREDIENTS
+
+
+def test_the_breakdown_shares_are_of_the_whole_batch_cost(
+    client: TestClient,
+    mk_auth_headers: dict[str, str],
+    timed_batch_with_a_fixed_cost: tuple[ProductTemplate, str],
+) -> None:
+    """A line's share is its part of ``total_cost``, the figure under which it is listed."""
+    output, _recipe_id = timed_batch_with_a_fixed_cost
+
+    resp = client.get(
+        f'/api/v1/maker/breakdown/{output.id}',
+        headers=mk_auth_headers,
+        params={'qty': '10'},
+    )
+
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert Decimal(body['total_cost']) == TOTAL
+    (entry,) = body['entries']
+    assert Decimal(entry['cost']) == INGREDIENTS
+    # 4.00 of 49.00, not 4.00 of the ingredients' own 4.00.
+    assert Decimal(entry['percentage_of_total']) == Decimal('8.16')
+
+
+def test_the_cross_module_unit_cost_is_the_whole_cost_per_unit(
+    mk_org: Organization,
+    timed_batch_with_a_fixed_cost: tuple[ProductTemplate, str],
+    async_engine_fixture: AsyncEngine,
+) -> None:
+    """``maker_api`` answers what the recipe page quotes, not the ingredients' part."""
+    output, _recipe_id = timed_batch_with_a_fixed_cost
+    answers: list[Decimal] = []
+
+    async def _ask(session: AsyncSession) -> None:
+        answers.append(
+            await maker_api.compute_unit_cost_async(
+                session, mk_org.id, output.id, Decimal('10')
+            )
+        )
+
+    run_in_async_session(async_engine_fixture, _ask)
+
+    assert answers == [UNIT]

@@ -2,7 +2,7 @@
 
 Returns ``CostBreakdownResponse`` with:
   - ``total_cost`` rounded to 2 decimal places
-  - ``entries`` with per-ingredient cost and percentage-of-total
+  - ``entries`` with per-ingredient cost and its share of ``total_cost``
   - ``missing_cost_lines`` (template IDs) for ingredients that have no
     shared estimate (no priced layer or usable supplier offer)
 """
@@ -142,8 +142,11 @@ async def compute_breakdown(
     entries: list[CostBreakdownEntry] = []
     for index, (child_id, child_qty, unit, cost) in enumerate(rows):
         pct: Decimal | None = None
-        if cost is not None and ingredients_cost > 0:
-            pct = quantise_or_none(cost / ingredients_cost * Decimal('100'))
+        # A share of the whole batch cost: the same figure the entries are
+        # listed under, so the shares and the fixed and labour lines beside
+        # them add up to 100.
+        if cost is not None and total_cost > 0:
+            pct = quantise_or_none(cost / total_cost * Decimal('100'))
         entries.append(
             CostBreakdownEntry(
                 child_template_id=child_id,
