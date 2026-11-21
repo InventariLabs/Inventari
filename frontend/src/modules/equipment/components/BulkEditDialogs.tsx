@@ -146,6 +146,12 @@ export function BulkEditDialogs({
                 {t("bulk_edit.no_email_warning")}
               </p>
             )}
+            {/* The single checkout says the same under its empty return date
+                field; the batch issues without one, so the warning stands
+                where the date would be. */}
+            <p className="text-xs text-on-muted">
+              {t("bulk_edit.return_date_consequence")}
+            </p>
           </div>
         )}
 

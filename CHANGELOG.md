@@ -721,6 +721,17 @@ says what the release does rather than what changed since them.
   minutes, instead of vanishing under a success message. Closing the editor
   with the X while the add row still holds text asks first, and offers to keep
   editing.
+- The equipment screens say what they mean. A bulk status change to the status
+  an asset already has succeeds instead of reporting a failure, and the
+  refusals name statuses as the screens do, in the language of the request,
+  not as the stored value. The Columns menu reads *Held by*, the "only this
+  page is selected" offer appears only once the whole page is ticked, and a
+  viewer on an empty Templates page is no longer offered buttons that would
+  be refused. Add Asset in batch mode no longer offers a serial number that
+  would be dropped, bulk Assign says its checkouts have no return date, the
+  attestation progress says it counts people, the overview names the retired
+  assets beside the total, and the public attestation page prints its
+  deadline in the organization's date style.
 
 ### Removed
 

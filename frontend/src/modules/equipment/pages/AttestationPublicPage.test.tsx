@@ -1,8 +1,9 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { afterEach, describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@/test/utils";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { server } from "@/test/mocks/server";
+import { setOrganizationCountry } from "@/utils/formatters";
 
 import AttestationPublicPage from "./AttestationPublicPage";
 
@@ -241,5 +242,33 @@ describe("AttestationPublicPage — the answer it saves", () => {
         screen.getByRole("button", { name: "I have this asset" }),
       ).toBeInTheDocument(),
     );
+  });
+});
+
+/**
+ * The deadline is spelled the way the organization's own screens spell it: a
+ * holder following the emailed link has no session, so the response carries
+ * the organization's country for the page to read dates by.
+ */
+describe("AttestationPublicPage — the deadline's date format", () => {
+  afterEach(() => setOrganizationCountry(null));
+
+  it.each([
+    ["PL", "Please answer by 3 Jan 2026"],
+    ["US", "Please answer by Jan 3, 2026"],
+  ])("prints it for an organization in %s", async (country, sentence) => {
+    server.use(
+      http.get("/public/attestation/tok-ok", () =>
+        HttpResponse.json({
+          ...pending,
+          organization_name: "Acme",
+          organization_country: country,
+          deadline_day: "2026-01-03",
+        }),
+      ),
+    );
+    render(<AttestationPublicPage />);
+
+    expect(await screen.findByText(sentence)).toBeInTheDocument();
   });
 });

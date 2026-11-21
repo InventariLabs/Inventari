@@ -54,10 +54,12 @@ class TestThePublicLinkNamesWhoAsksAndByWhen:
         ).raise_for_status()
         token = db_session.scalars(select(AuditResponse.token)).first()
         org_name = db_session.scalars(select(Organization.name)).first()
+        org_country = db_session.scalars(select(Organization.country)).first()
 
         response = client.get(f'/public/attestation/{token}')
 
         assert response.status_code == status.HTTP_200_OK, response.text
         body: dict[str, Any] = response.json()
         assert body['organization_name'] == org_name
+        assert body['organization_country'] == org_country
         assert body['deadline_day'] == deadline.date().isoformat()

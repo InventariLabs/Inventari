@@ -353,6 +353,7 @@ export default function TemplatesPage() {
                 setEditorOpen(true);
               }}
               isSeedPending={seedMutation.isPending}
+              readOnly={!canWrite}
               seedLabel={t(
                 "common:templates.seed_defaults",
                 "Load built-in templates",

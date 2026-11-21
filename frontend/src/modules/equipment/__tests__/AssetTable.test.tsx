@@ -87,6 +87,23 @@ describe("AssetTable", () => {
     expect(screen.queryByText("SN-001")).not.toBeInTheDocument();
   });
 
+  it("names every column in the picker by its header, never by a key", () => {
+    renderTable([makeItem()]);
+    fireEvent.click(screen.getByText("Columns"));
+    // The holder column's id is "assigned_to"; the picker reads "Held by".
+    const picker = screen.getByText("Columns").closest("details")!;
+    const labels = Array.from(picker.querySelectorAll("label")).map(
+      (label) => label.textContent,
+    );
+    expect(labels).toEqual([
+      "Serial / Tag",
+      "Location",
+      "Held by",
+      "Warranty",
+      "Status",
+    ]);
+  });
+
   it("renders an em-dash for assets without a location or assignee", () => {
     renderTable([makeItem({ location_name: null, holder_name: null })]);
     expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(2);
