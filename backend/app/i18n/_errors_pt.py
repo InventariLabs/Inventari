@@ -717,6 +717,7 @@ ERRORS_PT: dict[str, str] = {
     'document_undo_posts_nothing': 'Este documento apenas registra mercadorias que já foram retiradas — ele não movimentou o estoque, então não há nada a desfazer.',
     'document_undo_blocked': 'Isto não pode ser desfeito: {reason} Use Corrigir para alterar o que restou.',
     'document_undo_stock_used': 'Isto não pode ser desfeito: movimentações posteriores usaram o estoque que ele lançou. Use Corrigir para alterar o que restou.',
+    'document_undo_held_goods': 'Isto não pode ser desfeito: parte do recebimento está retida em quarentena. Use Corrigir para alterar o que está na prateleira e trate à parte as mercadorias retidas.',
     'document_correction_posts_nothing': 'Este documento apenas registra mercadorias que já foram retiradas — uma correção não pode movimentar o estoque por meio dele.',
     'document_post_already_posted': 'Este documento já foi lançado — nada foi lançado uma segunda vez.',
     'document_post_cancelled': 'Este documento foi cancelado, então não pode ser lançado.',

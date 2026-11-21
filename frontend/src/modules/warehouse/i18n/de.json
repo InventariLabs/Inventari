@@ -2241,7 +2241,8 @@
     "print": "{{number}} drucken",
     "undoHintReceive": "Rückgängig nimmt die Ware wieder aus dem Bestand und schreibt eine Korrektur zu {{number}}. Aus dem Verlauf verschwindet nichts.",
     "undoHintIssue": "Rückgängig bucht die Ware zurück in den Bestand und schreibt eine Korrektur zu {{number}}. Aus dem Verlauf verschwindet nichts.",
-    "undoHintMove": "Rückgängig lagert die Ware zurück und schreibt eine Rückgabe zu {{number}}. Aus dem Verlauf verschwindet nichts."
+    "undoHintMove": "Rückgängig lagert die Ware zurück und schreibt eine Rückgabe zu {{number}}. Aus dem Verlauf verschwindet nichts.",
+    "undoHeldGoods": "Rückgängig ist nicht möglich: Ein Teil dieses Wareneingangs ist in Quarantäne zurückgehalten. Mit „Korrigieren“ ändern Sie, was im Regal liegt; die zurückgehaltene Ware klären Sie getrennt."
   },
   "board": {
     "title": "Arbeitsboard",

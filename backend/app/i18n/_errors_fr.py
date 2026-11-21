@@ -951,6 +951,7 @@ ERRORS_FR: ErrorMessages = {
     'document_undo_posts_nothing': "Ce document ne fait qu'enregistrer des marchandises déjà prélevées — il n'a pas modifié le stock : il n'y a rien à annuler.",
     'document_undo_blocked': "Impossible d'annuler : {reason} Utilisez « Corriger » pour modifier ce qui reste.",
     'document_undo_stock_used': "Impossible d'annuler : des mouvements ultérieurs ont consommé le stock comptabilisé. Utilisez « Corriger » pour modifier ce qui reste.",
+    'document_undo_held_goods': "Impossible d'annuler : une partie de la réception est retenue en quarantaine. Utilisez « Corriger » pour modifier ce qui est en rayon et traitez séparément les marchandises retenues.",
     'document_correction_posts_nothing': "Ce document ne fait qu'enregistrer des marchandises déjà prélevées — une correction ne peut pas modifier le stock par son intermédiaire.",
     'document_post_already_posted': "Ce document a déjà été comptabilisé ; rien n'a été comptabilisé une seconde fois.",
     'document_post_cancelled': 'Ce document a été annulé ; il ne peut donc pas être comptabilisé.',

@@ -2419,7 +2419,8 @@
     "print": "Drukuj {{number}}",
     "undoHintReceive": "Cofnięcie zdejmie towar ze stanu i zapisze korektę do {{number}}. Nic nie znika z historii.",
     "undoHintIssue": "Cofnięcie przywróci towar na stan i zapisze korektę do {{number}}. Nic nie znika z historii.",
-    "undoHintMove": "Cofnięcie przeniesie towar z powrotem i zapisze zwrot do {{number}}. Nic nie znika z historii."
+    "undoHintMove": "Cofnięcie przeniesie towar z powrotem i zapisze zwrot do {{number}}. Nic nie znika z historii.",
+    "undoHeldGoods": "Cofnięcie nie jest dostępne: część tego przyjęcia jest wstrzymana w kwarantannie. Wybierz „Popraw”, aby zmienić to, co leży na półce, a wstrzymany towar załatw osobno."
   },
   "board": {
     "title": "Tablica pracy",

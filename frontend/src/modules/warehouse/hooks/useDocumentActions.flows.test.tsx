@@ -241,6 +241,23 @@ describe("useDocumentActions — what a completion leaves behind", () => {
     expect(m.undo).toHaveBeenCalledWith("doc-1", expect.any(Object));
   });
 
+  it("offers no Undo on the toast of a receipt that held goods back", () => {
+    const { m, utils } = setup();
+    act(() => utils.result.current.handleComplete({}));
+    act(() =>
+      m.complete.mock.calls[0][1].onSuccess({
+        id: "doc-1",
+        status: "COMPLETED",
+        type: "IN",
+        reversed_by_id: null,
+        generated_backorder_id: null,
+        lines: [{ id: "l1", held_quantity: "5" }],
+      }),
+    );
+    expect(toast.success).toHaveBeenCalledTimes(1);
+    expect(toastAction(vi.mocked(toast.success))).toBeUndefined();
+  });
+
   it("confirms a correction before completing it, and says when confirming fails", () => {
     const { m, utils } = setup({
       doc: warehouseDocument({

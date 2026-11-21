@@ -344,6 +344,7 @@ apart.
 | `DOCUMENT_TYPE_REQUIRES_SOURCE_LOCATION` | This document type needs a source location |
 | `DOCUMENT_TYPE_REQUIRES_TARGET_LOCATION` | This document type needs a target location |
 | `DOCUMENT_UNDO_BLOCKED` | This cannot be undone: {reason} Use Correct to change what is left instead. |
+| `DOCUMENT_UNDO_HELD_GOODS` | This cannot be undone: part of the receipt is held back in quarantine. Use Correct to change what is on the shelf, and deal with the held goods separately. |
 | `DOCUMENT_UNDO_NOTHING_LEFT` | Everything this document posted has already been reversed |
 | `DOCUMENT_UNDO_POSTS_NOTHING` | This document only records goods another step already took — it moved no stock, so there is nothing to undo. |
 | `DOCUMENT_UNDO_REQUIRES_COMPLETED` | Only a posted document can be undone |

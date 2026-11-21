@@ -1423,3 +1423,30 @@ class TestCorrectingAReceiptWithAHeldPart:
         ).json()
         assert after['status'] == 'DRAFT'
         assert after['number'] == draft['number']
+
+    def test_the_undo_is_refused_for_the_held_part_not_as_used_stock(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_target_location: StorageLocation,
+        doc_quarantine_location: StorageLocation,
+        doc_template: ProductTemplate,
+        held_receipt: dict[str, Any],
+    ) -> None:
+        resp = client.post(
+            f'/api/v1/warehouse/documents/{held_receipt["id"]}/undo',
+            headers=doc_auth_headers,
+        )
+
+        # Nothing moved after the receipt, so the answer must not say the
+        # stock was used; it names the goods held back, and writes nothing.
+        assert resp.status_code == 400, resp.text
+        detail = resp.json()['detail']
+        assert detail['code'] == 'DOCUMENT_UNDO_HELD_GOODS'
+        assert 'quarantine' in detail['message']
+        assert _stock_at(
+            client, doc_auth_headers, doc_template, doc_target_location
+        ) == Decimal('4')
+        assert _stock_at(
+            client, doc_auth_headers, doc_template, doc_quarantine_location
+        ) == Decimal('3')
