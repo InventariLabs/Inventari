@@ -540,6 +540,15 @@ const dist = join(root, "dist");
  * a step of five, to 410; the other screens stand under theirs (login 409.9,
  * launcher 425.0, start 643.5, receive 479.8, issue 590.8, history 615.9,
  * products 633.8, initial 193.9).
+ *
+ * Re-measured 2026-11-21 on the branch that closes the catalogue, locations
+ * and labels findings, merged with the line that carries the warehouse floor
+ * branch: the receive screen measures 480.1 KiB gz against its 480. The line
+ * alone measures 479.8; the branch adds about 0.3 KiB of copy in six
+ * languages to the language chunk that screen loads, no import. That phone
+ * budget moves a step of five, to 485; the other screens stand under theirs
+ * (app first paint 405.5, login 410.3, launcher 425.4, start 643.8, issue
+ * 591.2, history 616.3, products 635.0, initial 194.0).
  */
 const BUDGETS = {
   initial: 245,
