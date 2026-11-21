@@ -300,8 +300,7 @@ function runCli() {
   const onlyNew = process.argv.includes("--baseline");
   const freshness = process.argv.includes("--freshness");
 
-  const { keys, targetTypes, values, declarationsRead, uncovered } =
-    loadKeys();
+  const { keys, targetTypes, values, declarationsRead, uncovered } = loadKeys();
 
   if (freshness) {
     checkFreshness(

@@ -283,6 +283,8 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 	docker compose exec frontend npm run check:quantity-render
 	@echo "$(BLUE)[INFO]$(NC) Checking the form's quantity bounds match the store's constants..."
 	docker compose exec frontend npm run check:quantity-bounds
+	@echo "$(BLUE)[INFO]$(NC) Checking for raw machine values in reader text (baseline)..."
+	docker compose exec frontend npm run check:raw-machine-values
 	@echo "$(BLUE)[INFO]$(NC) Checking the type scale and one job per weight..."
 	docker compose exec frontend npm run check:type-scale
 	@echo "$(BLUE)[INFO]$(NC) Checking every page empty state carries a description..."
