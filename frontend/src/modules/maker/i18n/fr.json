@@ -405,8 +405,7 @@
     "yieldConfirm": {
       "title": "Modifier ce que produit cette formule ?"
     },
-    "openDraftsChange_one": "{{count}} brouillon ouvert lit cette formule et change avec elle à sa clôture.",
-    "openDraftsChange_other": "{{count}} brouillons ouverts lisent cette formule et changent avec elle à leur clôture."
+    "openDraftsChange": "Brouillons ouverts qui lisent cette formule et changent avec elle : {{count}}."
   },
   "tree": {
     "title": "Nomenclature multi-niveaux",
@@ -624,8 +623,7 @@
     "locationsFailed": "Impossible de charger les emplacements",
     "titleUnit": "Une unité de cette formule ne correspond pas au stock",
     "unitBody": "Rien ne manque ici : l'unité de la ligne ne peut pas être comparée au stock, aucun stock ne la fermerait. Corrigez l'unité de la ligne de la formule : {{names}}.",
-    "onOrder": "La quantité manquante est commandée, sur le brouillon de commande",
-    "openOrder": "Ouvrir la commande"
+    "onOrder": "La quantité manquante est commandée, sur le brouillon de commande"
   },
   "progress": {
     "start": "Démarrer l’ordre",

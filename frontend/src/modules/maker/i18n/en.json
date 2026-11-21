@@ -405,8 +405,7 @@
     "yieldConfirm": {
       "title": "Change what this BOM makes?"
     },
-    "openDraftsChange_one": "{{count}} open draft reads this BOM and changes with it when it closes.",
-    "openDraftsChange_other": "{{count}} open drafts read this BOM and change with it when they close."
+    "openDraftsChange": "Open drafts that read this BOM and change with it: {{count}}."
   },
   "tree": {
     "title": "Multi-level BOM",
@@ -624,8 +623,7 @@
     "locationsFailed": "Could not load the locations",
     "titleUnit": "A unit on this BOM does not match the stock",
     "unitBody": "Nothing is missing here: the unit of the line cannot be compared with the stock, so no stock would close it. Fix the unit on the BOM line: {{names}}.",
-    "onOrder": "The missing quantity is on order, on draft purchase order",
-    "openOrder": "Open the order"
+    "onOrder": "The missing quantity is on order, on draft purchase order"
   },
   "progress": {
     "start": "Start run",

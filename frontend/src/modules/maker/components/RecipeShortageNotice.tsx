@@ -168,7 +168,7 @@ export function RecipeShortageNotice({
                       to={`/purchase-orders/${ordered.id}`}
                       className="underline"
                     >
-                      {ordered.number ?? t("shortage.openOrder")}
+                      {ordered.number ?? ordered.id}
                     </Link>
                   </>
                 )}

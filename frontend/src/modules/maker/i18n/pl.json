@@ -306,7 +306,7 @@
       "labourTime": "{{minutes}} min według stawki godzinowej",
       "labourRateMissing": "Kroki zajmują {{minutes}} min. Ustaw stawkę godzinową w ustawieniach produkcji, aby wycenić ten czas.",
       "labourRateLink": "Ustawienia produkcji",
-      "labourCountedTwice": "Praca z kroków procesu jest już policzona wyżej. Pozycja Robocizna dolicza się do niej, więc robocizna może być policzona dwa razy."
+      "labourCountedTwice": "Praca z kroków jest już policzona wyżej; pozycja Robocizna dolicza się do niej."
     },
     "history": {
       "title": "Historia produkcji",
@@ -411,10 +411,7 @@
     "yieldConfirm": {
       "title": "Zmienić, ile powstaje z tej receptury?"
     },
-    "openDraftsChange_one": "{{count}} otwarty szkic czyta tę recepturę i zmieni się razem z nią przy zamknięciu.",
-    "openDraftsChange_few": "{{count}} otwarte szkice czytają tę recepturę i zmienią się razem z nią przy zamknięciu.",
-    "openDraftsChange_many": "{{count}} otwartych szkiców czyta tę recepturę i zmieni się razem z nią przy zamknięciu.",
-    "openDraftsChange_other": "{{count}} otwartego szkicu czyta tę recepturę i zmieni się razem z nią przy zamknięciu."
+    "openDraftsChange": "Otwarte szkice czytające tę recepturę: {{count}}."
   },
   "tree": {
     "title": "Wielopoziomowy BOM",
@@ -561,7 +558,7 @@
     "shortUnknown": "nie wiadomo",
     "completeShortageHintNever": "Te składniki nigdy nie starczyły na to zlecenie — zlecenie powstało ponad stan.",
     "unitMismatchTitle": "Nie można kontynuować — jednostka nie pasuje",
-    "unitMismatchHint": "Żadnej ilości nie brakuje: jednostki pozycji nie da się porównać z zapasem. Popraw jednostkę w pozycji receptury."
+    "unitMismatchHint": "Niczego nie brakuje: jednostki nie da się porównać z zapasem. Popraw ją w recepturze."
   },
   "widget": {
     "title": "{{result}} miesięcznie",
@@ -647,9 +644,8 @@
     "stockSavePartial": "Zapisano {{saved}} z {{total}}. Reszta wciąż jest w arkuszu.",
     "locationsFailed": "Nie udało się wczytać miejsc",
     "titleUnit": "Jednostka w tej recepturze nie pasuje do zapasu",
-    "unitBody": "Niczego tu nie brakuje: jednostki pozycji nie da się porównać z zapasem, więc żaden zapas jej nie domknie. Popraw jednostkę w pozycji receptury: {{names}}.",
-    "onOrder": "Brakująca ilość jest zamówiona, na szkicu zamówienia zakupu",
-    "openOrder": "Otwórz zamówienie"
+    "unitBody": "Niczego nie brakuje: jednostki nie da się porównać z zapasem. Popraw ją w recepturze: {{names}}.",
+    "onOrder": "Brakująca ilość jest zamówiona:"
   },
   "progress": {
     "start": "Rozpocznij zlecenie",
@@ -763,7 +759,7 @@
     "byAt": "{{who}}, {{when}}",
     "print": "Drukuj",
     "failed": "Nie udało się odczytać karty partii.",
-    "costBasis": "Składniki są wyceniane według najstarszych warstw kosztu produktu (FIFO), a nie według ceny partii, z której je pobrano."
+    "costBasis": "Składniki wycenia się wg najstarszych warstw kosztu produktu (FIFO), nie wg ceny partii."
   },
   "attachments": {
     "title": "Zdjęcia i pliki",

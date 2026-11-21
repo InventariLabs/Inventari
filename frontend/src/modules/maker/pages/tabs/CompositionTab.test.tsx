@@ -210,7 +210,7 @@ describe("CompositionTab yield editing", () => {
 
     expect(updateRecipeMutate).not.toHaveBeenCalled();
     expect(screen.getByRole("alertdialog")).toHaveTextContent(
-      "2 open drafts read this BOM",
+      "Open drafts that read this BOM and change with it: 2",
     );
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Save" }));
@@ -405,7 +405,7 @@ describe("CompositionTab ingredients", () => {
     fireEvent.click(screen.getByTestId("maker-composition-delete-line"));
 
     expect(screen.getByRole("alertdialog")).toHaveTextContent(
-      "1 open draft reads this BOM",
+      "Open drafts that read this BOM and change with it: 1",
     );
   });
 

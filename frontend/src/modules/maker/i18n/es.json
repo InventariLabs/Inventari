@@ -405,8 +405,7 @@
     "yieldConfirm": {
       "title": "¿Cambiar lo que produce esta fórmula?"
     },
-    "openDraftsChange_one": "{{count}} borrador abierto lee esta fórmula y cambia con ella al cerrarse.",
-    "openDraftsChange_other": "{{count}} borradores abiertos leen esta fórmula y cambian con ella al cerrarse."
+    "openDraftsChange": "Borradores abiertos que leen esta fórmula y cambian con ella: {{count}}."
   },
   "tree": {
     "title": "Lista de materiales multinivel",
@@ -624,8 +623,7 @@
     "locationsFailed": "No se pudieron cargar las ubicaciones",
     "titleUnit": "Una unidad de esta fórmula no coincide con el stock",
     "unitBody": "Aquí no falta nada: la unidad de la línea no se puede comparar con el stock, ningún stock la cerraría. Corrija la unidad de la línea de la fórmula: {{names}}.",
-    "onOrder": "La cantidad que falta está pedida, en el borrador del pedido de compra",
-    "openOrder": "Abrir el pedido"
+    "onOrder": "La cantidad que falta está pedida, en el borrador del pedido de compra"
   },
   "progress": {
     "start": "Iniciar orden",

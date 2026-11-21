@@ -123,7 +123,7 @@ describe("BatchRecordSheet", () => {
                 {
                   lot_id: null,
                   lot_name: null,
-                  expiry_date: "2027-06-01",
+                  expiry_date: "2026-06-01",
                   quantity: "6",
                 },
               ],
@@ -133,7 +133,7 @@ describe("BatchRecordSheet", () => {
       />,
     );
 
-    expect(screen.getByText(/no batch — 6/i)).toHaveTextContent(/2027/);
+    expect(screen.getByText(/no batch — 6/i)).toHaveTextContent(/2026/);
   });
 
   it("says a total leaves out an ingredient drawn with no cost", () => {

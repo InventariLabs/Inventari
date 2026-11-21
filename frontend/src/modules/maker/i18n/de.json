@@ -405,8 +405,7 @@
     "yieldConfirm": {
       "title": "Ändern, was diese Formel ergibt?"
     },
-    "openDraftsChange_one": "{{count}} offener Entwurf liest diese Formel und ändert sich beim Abschluss mit ihr.",
-    "openDraftsChange_other": "{{count}} offene Entwürfe lesen diese Formel und ändern sich beim Abschluss mit ihr."
+    "openDraftsChange": "Offene Entwürfe, die diese Formel lesen und sich mit ihr ändern: {{count}}."
   },
   "tree": {
     "title": "Mehrstufige Formel",
@@ -624,8 +623,7 @@
     "locationsFailed": "Orte konnten nicht geladen werden",
     "titleUnit": "Eine Einheit in dieser Formel passt nicht zum Bestand",
     "unitBody": "Hier fehlt nichts: Die Einheit der Zeile lässt sich nicht mit dem Bestand vergleichen, kein Bestand würde sie schließen. Korrigieren Sie die Einheit in der Formelzeile: {{names}}.",
-    "onOrder": "Die fehlende Menge ist bestellt, auf dem Entwurf der Bestellung",
-    "openOrder": "Bestellung öffnen"
+    "onOrder": "Die fehlende Menge ist bestellt, auf dem Entwurf der Bestellung"
   },
   "progress": {
     "start": "Lauf starten",
