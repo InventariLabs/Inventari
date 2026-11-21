@@ -319,6 +319,15 @@ export function WorkspaceModeSettings() {
                 hint={t("launcher:workspace.diffCascadeHint")}
               />
             )}
+            {diff.module_config_overwrite.length > 0 && (
+              <DiffRow
+                label={t("launcher:workspace.diffConfig")}
+                items={diff.module_config_overwrite}
+                variant="neutral"
+                describe={describeModule}
+                hint={t("launcher:workspace.confirmConfigHint")}
+              />
+            )}
           </>
         )}
       </ConfirmDialog>

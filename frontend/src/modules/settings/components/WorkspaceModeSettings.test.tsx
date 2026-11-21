@@ -248,7 +248,15 @@ describe("WorkspaceModeSettings", () => {
         const body = (await request.json()) as Record<string, unknown>;
         calls.push(body);
         return HttpResponse.json(
-          body.dry_run ? previewResponse : applyResponse,
+          body.dry_run
+            ? {
+                ...previewResponse,
+                diff: {
+                  ...previewResponse.diff,
+                  module_config_overwrite: ["locations"],
+                },
+              }
+            : applyResponse,
         );
       }),
     );
@@ -263,6 +271,12 @@ describe("WorkspaceModeSettings", () => {
     const dialog = await screen.findByRole("alertdialog");
     expect(dialog).toHaveTextContent("Locations");
     expect(dialog).not.toHaveTextContent("Storage Locations");
+
+    // What the preview card says about the settings it resets, the dialog
+    // says too — and it does not promise that switching back undoes it.
+    expect(dialog).toHaveTextContent("Reset settings for");
+    expect(dialog).toHaveTextContent(/switching back does not bring them back/);
+    expect(dialog).not.toHaveTextContent("You can switch back at any time");
 
     await userEvent.click(
       screen.getByRole("button", { name: /switch workspace mode/i }),

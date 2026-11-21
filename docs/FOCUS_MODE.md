@@ -1,6 +1,6 @@
 # Showing a single module
 
-Settings → My modules (administrators only) offers enabled modules whose frontend
+Settings → Organization modules (administrators only) offers enabled modules whose frontend
 module declares `standalone`, one `Show only <module>` switch each. The preview,
 apply and exit calls are admin endpoints (`backend/app/api/modules.py`). Showing a single
 module enables the module's backend dependency closure,
@@ -45,11 +45,11 @@ are a separate extension of focus mode.
 | `shopping_lists` | Standalone with core | Owns lists, lines and purchased state; keep products, locations and categories for stock suggestions and pantry management. Recipe and order integrations are optional. |
 | `spaces` | Not standalone | Storage components are surfaced by inventory: its four `/inventory/locations` routes render under the inventory shell (`shell: "inventory"`); no backend focus target. |
 | `stats` | Not standalone | Always-on inventory analytics, not a toggleable focus target. |
-| `stock_takes` | Not standalone | An occasional activity over stock that another module manages; focusing on it keeps products, locations, stock and movements, so it narrows almost nothing. An organization already focused on it keeps working: the counting routes render under the inventory shell and My modules shows the focus and lets the admin leave it. |
+| `stock_takes` | Not standalone | An occasional activity over stock that another module manages; focusing on it keeps products, locations, stock and movements, so it narrows almost nothing. An organization already focused on it keeps working: the counting routes render under the inventory shell and Organization modules shows the focus and lets the admin leave it. |
 | `vision` | Not standalone | Photo recognition assists product entry and nutrition scanning; no independent screens. |
 | `webhooks` | Not standalone | Installation integration plumbing; subscriptions need other workflows to produce events. |
 
 The exact eligible list is pinned by
 `frontend/src/lib/moduleRegistry/standaloneGate.test.ts`, using the same registry
-query as My modules. Its tests also check every declaration's core decisions,
+query as Organization modules. Its tests also check every declaration's core decisions,
 valid kept sections, and the stock-take home/counting navigation.

@@ -33,6 +33,7 @@ class InvitationEmailContent(TypedDict):
     subject: str
     greeting: str
     body: str
+    body_named: str
     role_line: str
     action: str
     button: str
@@ -196,6 +197,7 @@ INVITATION_EMAIL_CONTENT: dict[Language, InvitationEmailContent] = {
         'subject': 'You have been invited to {organization}',
         'greeting': 'You have been invited!',
         'body': 'An administrator has invited you to join <b>{organization}</b> in Inventari.',
+        'body_named': '{inviter} has invited you to join <b>{organization}</b> in Inventari.',
         'role_line': 'Your role: <b>{role}</b>',
         'action': 'Click the button below to accept the invitation:',
         'button': 'Accept invitation',
@@ -205,7 +207,7 @@ INVITATION_EMAIL_CONTENT: dict[Language, InvitationEmailContent] = {
         'roles': {
             'admin': 'Administrator',
             'manager': 'Manager',
-            'user': 'User',
+            'user': 'Member',
             'viewer': 'Viewer',
         },
     },
@@ -213,6 +215,7 @@ INVITATION_EMAIL_CONTENT: dict[Language, InvitationEmailContent] = {
         'subject': 'Zaproszenie do organizacji {organization}',
         'greeting': 'Masz zaproszenie!',
         'body': 'Administrator zaprasza Cię do organizacji <b>{organization}</b> w systemie Inventari.',
+        'body_named': '{inviter} zaprasza Cię do organizacji <b>{organization}</b> w systemie Inventari.',
         'role_line': 'Twoja rola: <b>{role}</b>',
         'action': 'Kliknij w poniższy przycisk, aby przyjąć zaproszenie:',
         'button': 'Przyjmij zaproszenie',
@@ -230,6 +233,7 @@ INVITATION_EMAIL_CONTENT: dict[Language, InvitationEmailContent] = {
         'subject': 'Sie wurden zu {organization} eingeladen',
         'greeting': 'Sie wurden eingeladen!',
         'body': 'Ein Administrator lädt Sie ein, der Organisation <b>{organization}</b> in Inventari beizutreten.',
+        'body_named': '{inviter} lädt Sie ein, der Organisation <b>{organization}</b> in Inventari beizutreten.',
         'role_line': 'Ihre Rolle: <b>{role}</b>',
         'action': 'Klicken Sie auf die Schaltfläche unten, um die Einladung anzunehmen:',
         'button': 'Einladung annehmen',
@@ -238,15 +242,16 @@ INVITATION_EMAIL_CONTENT: dict[Language, InvitationEmailContent] = {
         'auto_gen': 'Dies ist eine automatisch generierte Nachricht von Inventari.',
         'roles': {
             'admin': 'Administrator',
-            'manager': 'Manager',
-            'user': 'Benutzer',
-            'viewer': 'Betrachter',
+            'manager': 'Leitung',
+            'user': 'Mitglied',
+            'viewer': 'Lesezugriff',
         },
     },
     'fr': {
         'subject': 'Vous avez été invité à rejoindre {organization}',
         'greeting': 'Vous avez été invité !',
         'body': "Un administrateur vous invite à rejoindre l'organisation <b>{organization}</b> dans Inventari.",
+        'body_named': "{inviter} vous invite à rejoindre l'organisation <b>{organization}</b> dans Inventari.",
         'role_line': 'Votre rôle : <b>{role}</b>',
         'action': "Cliquez sur le bouton ci-dessous pour accepter l'invitation :",
         'button': "Accepter l'invitation",
@@ -255,15 +260,16 @@ INVITATION_EMAIL_CONTENT: dict[Language, InvitationEmailContent] = {
         'auto_gen': 'Ceci est un message généré automatiquement par Inventari.',
         'roles': {
             'admin': 'Administrateur',
-            'manager': 'Gestionnaire',
-            'user': 'Utilisateur',
-            'viewer': 'Observateur',
+            'manager': 'Responsable',
+            'user': 'Membre',
+            'viewer': 'Lecture seule',
         },
     },
     'es': {
         'subject': 'Te han invitado a {organization}',
         'greeting': '¡Te han invitado!',
         'body': 'Un administrador te invita a unirte a <b>{organization}</b> en Inventari.',
+        'body_named': '{inviter} te invita a unirte a <b>{organization}</b> en Inventari.',
         'role_line': 'Tu rol: <b>{role}</b>',
         'action': 'Haz clic en el botón de abajo para aceptar la invitación:',
         'button': 'Aceptar invitación',
@@ -272,15 +278,16 @@ INVITATION_EMAIL_CONTENT: dict[Language, InvitationEmailContent] = {
         'auto_gen': 'Este es un mensaje generado automáticamente por Inventari.',
         'roles': {
             'admin': 'Administrador',
-            'manager': 'Gerente',
-            'user': 'Usuario',
-            'viewer': 'Observador',
+            'manager': 'Responsable',
+            'user': 'Miembro',
+            'viewer': 'Solo lectura',
         },
     },
     'pt': {
         'subject': 'Você foi convidado para {organization}',
         'greeting': 'Você recebeu um convite!',
         'body': 'Um administrador convidou você para participar de <b>{organization}</b> no Inventari.',
+        'body_named': '{inviter} convidou você para participar de <b>{organization}</b> no Inventari.',
         'role_line': 'Sua função: <b>{role}</b>',
         'action': 'Clique no botão abaixo para aceitar o convite:',
         'button': 'Aceitar convite',
@@ -290,7 +297,7 @@ INVITATION_EMAIL_CONTENT: dict[Language, InvitationEmailContent] = {
         'roles': {
             'admin': 'Administrador',
             'manager': 'Gerente',
-            'user': 'Usuário',
+            'user': 'Membro',
             'viewer': 'Visualizador',
         },
     },

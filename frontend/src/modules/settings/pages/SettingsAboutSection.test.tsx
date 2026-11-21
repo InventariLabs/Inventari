@@ -55,6 +55,20 @@ describe("SettingsAboutSection", () => {
     ).toHaveAttribute("href", USER_GUIDE_URL);
   });
 
+  it("says which version the source and the guide links belong to", async () => {
+    serve(ABOUT);
+    renderSection();
+
+    expect(
+      await screen.findByText(/this version is the tag v0\.9\.0 there/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /latest release, which may be newer than version 0\.9\.0/,
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("links the source the installation is configured with, so a fork offers its own", async () => {
     serve(ABOUT);
     renderSection();

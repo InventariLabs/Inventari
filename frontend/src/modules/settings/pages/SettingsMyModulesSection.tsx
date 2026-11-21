@@ -5,7 +5,7 @@ import { WorkspaceModeSettings } from "../components/WorkspaceModeSettings";
 import { FocusModeSettings } from "../components/FocusModeSettings";
 
 /**
- * "My modules" settings section rendered at /settings/my-modules (admin-only).
+ * "Organization modules" settings section rendered at /settings/my-modules (admin-only).
  *
  * The one place that decides which modules the workspace shows: the module set
  * a profile switches on, and the "show only <module>" toggles. The launcher's

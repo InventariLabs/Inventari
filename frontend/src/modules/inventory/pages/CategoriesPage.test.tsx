@@ -231,7 +231,9 @@ describe("CategoriesPage", () => {
 
     renderPage(queryClient);
 
-    expect(await screen.findByText("An error occurred")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Cannot reach the server"),
+    ).toBeInTheDocument();
   });
 
   /**

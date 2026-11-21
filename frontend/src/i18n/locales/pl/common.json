@@ -70,7 +70,7 @@
     "name": "Nazwa",
     "edit": "Edytuj",
     "unsavedTitle": "Niezapisane zmiany",
-    "unsavedLeave": "{{form}} zawiera niezapisane zmiany. Opuścić mimo to?",
+    "unsavedLeave": "{{form}}: masz niezapisane zmiany. Opuścić mimo to?",
     "leaveAnyway": "Opuść mimo to",
     "discardTitle": "Odrzucić wpisane dane?",
     "discardMessage": "Wszystko, co wpisano w tym formularzu, zostanie utracone. Tej operacji nie można cofnąć.",
@@ -209,7 +209,7 @@
       },
       "memberRoles": {
         "admin": "Administrator",
-        "manager": "Manager",
+        "manager": "Menedżer",
         "user": "Użytkownik",
         "viewer": "Obserwator"
       },
@@ -311,7 +311,7 @@
       "general": "Ogólne",
       "people": "Osoby",
       "modules": "Moduły",
-      "myModules": "Moje moduły",
+      "myModules": "Moduły organizacji",
       "auditLog": "Dziennik audytu",
       "roles": "Role i uprawnienia",
       "email": "Poczta",
@@ -388,6 +388,7 @@
       },
       "revoked": "Cofnięte",
       "invitationAccepted": "Przyjęte",
+      "removed": "Usunięte",
       "profileDefault": "Domyślne ustawienie trybu pracy",
       "fields": {
         "address": "Adres",
@@ -949,11 +950,13 @@
       "license_link": "Przeczytaj licencję",
       "source_title": "Kod źródłowy",
       "source_hint": "Każdy, kto korzysta z tej instalacji, może otrzymać kod źródłowy wersji, na której ona działa.",
+      "source_tag_hint": "Odnośnik otwiera stronę główną repozytorium; ta wersja to tam tag v{{version}}.",
       "source_link": "Pobierz kod źródłowy",
       "third_party_title": "Dane zewnętrzne",
       "open_food_facts": "Dane produktów importowane z Open Food Facts są udostępniane na licencji Open Database License (ODbL) 1.0.",
       "odbl_link": "Przeczytaj ODbL",
       "guide_hint": "Jak korzystać z aplikacji, ekran po ekranie: produkty, miejsca, stany, dokumenty, ustawienia. Instrukcja jest po angielsku.",
+      "guide_version_hint": "Odnośnik otwiera instrukcję najnowszego wydania, która może być nowsza niż wersja {{version}}.",
       "guide_link": "Otwórz instrukcję obsługi"
     },
     "profile": {
@@ -1138,10 +1141,10 @@
   "unknown": "Nieznany",
   "focusLock": {
     "title": "Widoczny jest tylko jeden moduł",
-    "body": "Ta przestrzeń pokazuje jeden moduł, więc lista aplikacji i sklep z aplikacjami są schowane. Otwórz „Moje moduły”, żeby pokazać wszystkie.",
-    "exit": "Otwórz „Moje moduły”",
+    "body": "Ta przestrzeń pokazuje jeden moduł, więc lista aplikacji i sklep z aplikacjami są schowane. Otwórz „Moduły organizacji”, żeby pokazać wszystkie.",
+    "exit": "Otwórz „Moduły organizacji”",
     "unknownTitle": "Nie udało się sprawdzić, które moduły są widoczne",
-    "unknownBody": "Nie udało się odczytać, które moduły pokazuje ta przestrzeń, więc lista aplikacji i sklep z aplikacjami nie są wyświetlane. Spróbuj ponownie albo otwórz „Moje moduły”.",
+    "unknownBody": "Nie udało się odczytać, które moduły pokazuje ta przestrzeń, więc lista aplikacji i sklep z aplikacjami nie są wyświetlane. Spróbuj ponownie albo otwórz „Moduły organizacji”.",
     "retry": "Spróbuj ponownie"
   },
   "focusMarker": {
@@ -1152,6 +1155,7 @@
   },
   "appStore": {
     "activate": "Aktywuj",
+    "activateNamed": "Aktywuj {{name}}",
     "activateConfirm": "Włącz",
     "activateConfirmTitle": "Włączyć moduł {{name}}?",
     "alwaysOn": "Zawsze włączony",
@@ -1172,6 +1176,7 @@
     "changesUiHint": "Ten moduł zmienia nawigację i terminologię tej organizacji.",
     "changesUiHintOff": "Włączenie tego modułu zmieni nawigację i terminologię tej organizacji.",
     "deactivate": "Dezaktywuj",
+    "deactivateNamed": "Dezaktywuj {{name}}",
     "deactivateConfirmTitle": "Wyłączyć moduł {{name}}?",
     "declaredPrefix": "deklarowane:",
     "degraded": "Ograniczony",
@@ -1394,6 +1399,17 @@
     "countOnPage_few": "{{count}} zaznaczone na tej stronie z {{total}}",
     "countOnPage_many": "{{count}} zaznaczonych na tej stronie z {{total}}",
     "countOnPage_other": "{{count}} zaznaczonego na tej stronie z {{total}}"
+  },
+  "nativeValidation": {
+    "valueMissing": "Wypełnij to pole",
+    "typeMismatchEmail": "Wpisz adres e-mail",
+    "typeMismatchUrl": "Wpisz adres internetowy",
+    "tooShort": "Minimalna liczba znaków: {{min}}",
+    "tooLong": "Maksymalna liczba znaków: {{max}}",
+    "rangeUnderflow": "Wpisz wartość nie mniejszą niż {{min}}",
+    "rangeOverflow": "Wpisz wartość nie większą niż {{max}}",
+    "badInput": "Wpisz poprawną wartość",
+    "patternMismatch": "Użyj wymaganego formatu"
   },
   "validation": {
     "nameRequired": "Nazwa jest wymagana",

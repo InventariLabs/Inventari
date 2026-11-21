@@ -68,7 +68,7 @@ export const LEGACY_REDIRECTS: LegacyRedirect[] = [
 
 /** Settings addresses that were renamed or folded into another screen. */
 export const LEGACY_SETTINGS_REDIRECTS: LegacyRedirect[] = [
-  // "My modules" is one screen for the module set and the single-module
+  // "Organization modules" is one screen for the module set and the single-module
   // toggles; the two addresses that each hold one half survive so a
   // bookmark still lands on the whole.
   { from: "workspace", to: "/settings/my-modules" },

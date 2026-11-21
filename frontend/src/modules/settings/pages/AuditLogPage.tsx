@@ -83,6 +83,7 @@ const LOGGED_ACTIONS = [
   "RESTORE",
   "SOFT_DELETE",
   "PURGE",
+  "HARD_DELETE",
 ];
 
 type ActionVariant = NonNullable<BadgeProps["variant"]>;
@@ -118,7 +119,29 @@ const TARGET_ACTION_LABELS: Record<
   api_key: {
     SOFT_DELETE: (t) => t("settings.audit.revoked"),
   },
+  // Taking a role, a webhook channel or an AI connection away is an
+  // administrative act on the organization's setup, not a stock "hard delete".
+  role: { HARD_DELETE: (t) => t("settings.audit.removed") },
+  webhook_endpoint: { HARD_DELETE: (t) => t("settings.audit.removed") },
+  ai_connection: { HARD_DELETE: (t) => t("settings.audit.removed") },
 };
+
+/**
+ * Every word the Action column can show: the stock verbs, then the words a
+ * record kind has of its own, so the subtitle lists what the log contains.
+ */
+function loggedActionLabels(t: (key: string) => string): string[] {
+  const own = Object.values(TARGET_ACTION_LABELS).flatMap((byAction) =>
+    Object.values(byAction).map((label) => label(t)),
+  );
+  return [
+    ...new Set([
+      ...LOGGED_ACTIONS.map((action) => actionLabel(action, t)),
+      ...own,
+      t("settings.audit.profileDefault"),
+    ]),
+  ];
+}
 
 function actionLabel(
   action: string,
@@ -241,9 +264,7 @@ export default function AuditLogPage() {
     setHeader({
       title: t("settings.audit.title"),
       subtitle: t("settings.audit.subtitle", {
-        actions: LOGGED_ACTIONS.map((action) => actionLabel(action, t)).join(
-          " · ",
-        ),
+        actions: loggedActionLabels(t).join(" · "),
       }),
     });
   }, [setHeader, t]);
@@ -575,18 +596,22 @@ export default function AuditLogPage() {
         )}
       </Card>
 
-      <Pagination
-        skip={paging.page * PAGE_SIZE}
-        limit={PAGE_SIZE}
-        total={total}
-        totalCapped={totalCapped}
-        keyset={{ rows: rows.length, hasNext: Boolean(data?.next_cursor) }}
-        onPrev={paging.goPrev}
-        // The cursor on screen belongs to the page it came with; while the
-        // next page loads the old rows are still shown, and their cursor must
-        // not be taken for the new page's.
-        onNext={() => !isPlaceholderData && paging.goNext(data?.next_cursor)}
-      />
+      {/* The error card replaces the rows, so a count of rows or a pager
+          over them would describe what is not there. */}
+      {!isError && (
+        <Pagination
+          skip={paging.page * PAGE_SIZE}
+          limit={PAGE_SIZE}
+          total={total}
+          totalCapped={totalCapped}
+          keyset={{ rows: rows.length, hasNext: Boolean(data?.next_cursor) }}
+          onPrev={paging.goPrev}
+          // The cursor on screen belongs to the page it came with; while the
+          // next page loads the old rows are still shown, and their cursor must
+          // not be taken for the new page's.
+          onNext={() => !isPlaceholderData && paging.goNext(data?.next_cursor)}
+        />
+      )}
     </div>
   );
 }
