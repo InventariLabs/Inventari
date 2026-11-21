@@ -27,7 +27,7 @@ from app.models.product_template import ProductTemplate
 from app.models.stock_lot import StockLot
 from app.models.storage_location import StorageLocation
 from app.models.user import User
-from app.modules.maker.models import BoMLine, MakerRecipe
+from app.modules.maker.models import BoMLine, MakerRecipe, ProductionOrderLine
 from tests.integration._shelf import put_on_shelf, run_in_async_session
 
 pytestmark = pytest.mark.integration
@@ -41,8 +41,7 @@ _PNG = bytes.fromhex(
 )
 
 
-@pytest.fixture
-def run_id(
+def _make_run(
     client: TestClient,
     db_session: Session,
     mk_org: Organization,
@@ -51,8 +50,14 @@ def run_id(
     mk_input_loc: StorageLocation,
     mk_output_loc: StorageLocation,
     async_engine_fixture: AsyncEngine,
+    *,
+    batched: bool,
 ) -> str:
-    """Two loaves of rye bread made from flour of batch F-07, recorded as made."""
+    """Two loaves of rye bread made from flour, recorded as made.
+
+    The flour is batch F-07, or, unbatched, a stock record that carries only
+    an expiry date.
+    """
     flour = ProductTemplate(
         organization_id=mk_org.id, name='Rye flour', sku=f'SKU-{uuid.uuid4().hex[:8]}'
     )
@@ -80,16 +85,21 @@ def run_id(
             unit='pcs',
         )
     )
-    lot = StockLot(
-        organization_id=mk_org.id,
-        product_template_id=flour.id,
-        name='F-07',
-        # Still in date whenever the suite runs: an expired batch is not drawn.
-        expiry_date=date.today() + timedelta(days=100),
-    )
-    db_session.add(lot)
-    db_session.commit()
-    lot_id = lot.id
+    # Still in date whenever the suite runs: an expired batch is not drawn.
+    expiry = date.today() + timedelta(days=100)
+    lot_id = None
+    if batched:
+        lot = StockLot(
+            organization_id=mk_org.id,
+            product_template_id=flour.id,
+            name='F-07',
+            expiry_date=expiry,
+        )
+        db_session.add(lot)
+        db_session.commit()
+        lot_id = lot.id
+    else:
+        db_session.commit()
 
     async def _put(session: AsyncSession) -> None:
         await put_on_shelf(
@@ -99,6 +109,7 @@ def run_id(
             mk_input_loc.id,
             10,
             lot_id=lot_id,
+            expiry_date=None if batched else expiry,
             purchase_price='2',
         )
 
@@ -116,6 +127,56 @@ def run_id(
     )
     assert made.status_code == 201, made.text
     return str(made.json()['id'])
+
+
+@pytest.fixture
+def run_id(
+    client: TestClient,
+    db_session: Session,
+    mk_org: Organization,
+    mk_user: User,
+    mk_auth_headers: dict[str, str],
+    mk_input_loc: StorageLocation,
+    mk_output_loc: StorageLocation,
+    async_engine_fixture: AsyncEngine,
+) -> str:
+    """A run made from flour of batch F-07."""
+    return _make_run(
+        client,
+        db_session,
+        mk_org,
+        mk_user,
+        mk_auth_headers,
+        mk_input_loc,
+        mk_output_loc,
+        async_engine_fixture,
+        batched=True,
+    )
+
+
+@pytest.fixture
+def unbatched_run_id(
+    client: TestClient,
+    db_session: Session,
+    mk_org: Organization,
+    mk_user: User,
+    mk_auth_headers: dict[str, str],
+    mk_input_loc: StorageLocation,
+    mk_output_loc: StorageLocation,
+    async_engine_fixture: AsyncEngine,
+) -> str:
+    """A run made from flour kept without a batch, on a record with an expiry."""
+    return _make_run(
+        client,
+        db_session,
+        mk_org,
+        mk_user,
+        mk_auth_headers,
+        mk_input_loc,
+        mk_output_loc,
+        async_engine_fixture,
+        batched=False,
+    )
 
 
 def test_the_record_names_each_ingredient_batch_and_who_made_it(
@@ -141,6 +202,75 @@ def test_the_record_names_each_ingredient_batch_and_who_made_it(
     ]
     assert Decimal(flour['cost']) == Decimal('2.00')
     assert Decimal(record['material_cost']) == Decimal('2.00')
+
+
+def test_a_batchless_ingredient_keeps_the_expiry_of_its_record(
+    client: TestClient, mk_auth_headers: dict[str, str], unbatched_run_id: str
+) -> None:
+    # Fails without the change: the date of stock kept without a batch is lost.
+    record = client.get(
+        f'{ORDERS}/{unbatched_run_id}/record', headers=mk_auth_headers
+    ).json()
+
+    [flour] = record['ingredients']
+    [taken] = flour['batches']
+    assert taken['lot_name'] is None
+    assert taken['expiry_date'] == str(date.today() + timedelta(days=100))
+
+
+def test_the_record_gives_the_quantity_made_under_each_output_batch(
+    client: TestClient, mk_auth_headers: dict[str, str], run_id: str
+) -> None:
+    # Fails without the change: an output batch names no quantity.
+    record = client.get(f'{ORDERS}/{run_id}/record', headers=mk_auth_headers).json()
+
+    assert [
+        (b['lot_name'], Decimal(b['quantity'])) for b in record['output_batches']
+    ] == [('20261103-1', Decimal('2'))]
+
+
+def test_the_record_says_why_a_batch_is_on_hold(
+    client: TestClient, mk_auth_headers: dict[str, str], run_id: str
+) -> None:
+    # Fails without the change: the reason typed at the hold is on no read.
+    held = client.post(
+        f'{ORDERS}/{run_id}/hold',
+        headers=mk_auth_headers,
+        json={'reason': 'Mould found on the crust'},
+    )
+    assert held.status_code == 200, held.text
+
+    record = client.get(f'{ORDERS}/{run_id}/record', headers=mk_auth_headers).json()
+    order = client.get(f'{ORDERS}/{run_id}', headers=mk_auth_headers).json()
+
+    for batches in (record['output_batches'], order['output_batches']):
+        [batch] = batches
+        assert batch['status'] in ('held', 'quarantined')
+        assert batch['status_reason'] == 'Mould found on the crust'
+
+
+def test_the_record_counts_the_ingredients_drawn_with_no_cost(
+    client: TestClient,
+    db_session: Session,
+    mk_auth_headers: dict[str, str],
+    run_id: str,
+) -> None:
+    # Fails without the change: neither read carries such a count.
+    path = f'{ORDERS}/{run_id}/record'
+    assert client.get(path, headers=mk_auth_headers).json()['uncosted_ingredients'] == 0
+
+    for line in db_session.scalars(
+        select(ProductionOrderLine).where(
+            ProductionOrderLine.production_order_id == uuid.UUID(run_id)
+        )
+    ):
+        line.unit_cost_snapshot = None
+    db_session.commit()
+
+    record = client.get(path, headers=mk_auth_headers).json()
+    listed = client.get(ORDERS, headers=mk_auth_headers).json()['items']
+    assert record['uncosted_ingredients'] == 1
+    assert {o['id']: o['uncosted_ingredients'] for o in listed}[run_id] == 1
 
 
 def test_a_draft_has_no_record(

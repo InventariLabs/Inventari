@@ -44,6 +44,7 @@ from app.core.logging import get_logger
 from app.core.money import quantise
 from app.core.public_api import core_api
 from app.i18n import Language
+from app.i18n.service import get_unit_label, stated_quantity
 
 from . import (
     bom_service,
@@ -451,6 +452,23 @@ async def _journal_opened(
         target_id=order.id,
         snapshot=snapshot,
     )
+
+
+async def _stated_with_unit(
+    db: AsyncSession, organization_id: UUID, order: ProductionOrder, qty: Decimal
+) -> str:
+    """*qty* as a refusal says it: in the reader's number format, with the
+    output product's unit, so "7" is never a bare number."""
+    template = await core_api.product_templates.get_async(
+        db, organization_id, order.output_template_id
+    )
+    uom = (
+        await core_api.uoms.get_async(db, template.uom_id, organization_id)
+        if template is not None and template.uom_id is not None
+        else None
+    )
+    stated = stated_quantity(_stored_qty(qty))
+    return f'{stated} {get_unit_label(uom.symbol)}' if uom else stated
 
 
 def _stored_qty(qty: Decimal) -> Decimal:
@@ -1521,7 +1539,10 @@ async def record_portion(
     # cost and answers to the overproduction setting.
     if already + qty > order.planned_qty:
         raise ServiceRejectionError(
-            'production_portion_above_plan', planned=_stored_qty(order.planned_qty)
+            'production_portion_above_plan',
+            planned=await _stated_with_unit(
+                db, organization_id, order, order.planned_qty
+            ),
         )
     # The rate the portion is stored at is the rate its layer is posted at, so
     # the finish adds up the same figure the shelf holds.
@@ -1634,7 +1655,8 @@ async def finish_production(
         raise ServiceRejectionError('production_actual_qty_must_be_positive')
     if total_actual < made:
         raise ServiceRejectionError(
-            'production_finish_below_portions', made=_stored_qty(made)
+            'production_finish_below_portions',
+            made=await _stated_with_unit(db, organization_id, order, made),
         )
     settings = await recipe_service.get_settings(db, organization_id, for_update=True)
     if total_actual > order.planned_qty and not settings.allow_overproduction:

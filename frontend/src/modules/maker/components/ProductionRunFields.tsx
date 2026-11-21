@@ -79,7 +79,10 @@ export function ProductionRunFields({
           form.mode === "made" ? t("create.qtyLabelMade") : t("create.qtyLabel")
         }
         suffix={form.unit ?? undefined}
-        description={form.batchHint}
+        description={
+          form.batchHint ??
+          (form.selected === null ? t("create.qtyNeedsProduct") : undefined)
+        }
         value={form.qty}
         onChange={(e) => form.setQty(e.target.value)}
         data-testid="maker-create-qty-input"

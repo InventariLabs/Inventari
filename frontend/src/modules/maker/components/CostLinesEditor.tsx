@@ -199,6 +199,20 @@ export function CostLinesEditor({
           </div>
         )}
 
+      {/* The computed row already holds the labour of the timed steps; a
+          Labor line typed by hand is added on top of it, so say so while one
+          is being typed or exists. */}
+      {Number(labourCost) > 0 &&
+        (draft?.kind === "LABOR" ||
+          lines.some((line) => line.kind === "LABOR")) && (
+          <p
+            className="text-xs text-on-warning"
+            data-testid="maker-labour-counted-twice"
+          >
+            {t("detail.cost.labourCountedTwice")}
+          </p>
+        )}
+
       {/* Timed steps but no labour line: the rate is zero or unset, and the
           line's absence must not read as "this formula has no labour". Say
           where the rate lives instead of leaving the reader to guess. */}

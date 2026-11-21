@@ -193,7 +193,9 @@ export function CookForStockModal({
 
   const { servingsFit, unitSymbol } = outputUnit(uomCategories, product);
   const yieldText = batchYield ?? (servingsFit ? String(recipe.servings) : "");
-  const unit = unitLabel(t, unitSymbol);
+  // A product with no unit is counted in pieces; the figure never stands bare.
+  const unit =
+    unitLabel(t, unitSymbol) || (servingsFit ? unitLabel(t, "pcs") : "");
   const { yieldNum, validYield, scaleNum, validScale, plannedQty } = planBatch(
     yieldText,
     scale,

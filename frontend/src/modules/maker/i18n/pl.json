@@ -142,7 +142,8 @@
       "added": "Dodano do listy „{{name}}”",
       "alreadyListed": "To już jest na liście zakupów",
       "addFailed": "Nie udało się dodać do listy zakupów"
-    }
+    },
+    "qtyNeedsProduct": "Najpierw wybierz produkt: ilość liczy się w jego jednostce."
   },
   "createRecipe": {
     "title": "Nowa receptura",
@@ -305,7 +306,8 @@
       "labourFromSteps": "Praca z czasu kroków",
       "labourTime": "{{minutes}} min według stawki godzinowej",
       "labourRateMissing": "Kroki zajmują {{minutes}} min. Ustaw stawkę godzinową w ustawieniach produkcji, aby wycenić ten czas.",
-      "labourRateLink": "Ustawienia produkcji"
+      "labourRateLink": "Ustawienia produkcji",
+      "labourCountedTwice": "Praca z kroków jest już policzona wyżej; Robocizna dolicza się do niej."
     },
     "history": {
       "title": "Historia produkcji",
@@ -356,7 +358,8 @@
     "processStepsDiscardTitle": "Odrzucić niedodany krok?",
     "processStepsDiscardMessage": "Wpisany krok nie został dodany do listy. Zamknięcie edytora go usunie.",
     "processStepsDiscardConfirm": "Odrzuć krok",
-    "processStepsDiscardKeep": "Wróć do edycji"
+    "processStepsDiscardKeep": "Wróć do edycji",
+    "ingredientsReturned": "Składniki pobrane i zwrócone"
   },
   "bom": {
     "childLabel": "Składnik",
@@ -405,7 +408,12 @@
     "setPrice": "Ustaw cenę",
     "editPrice": "Zmień cenę",
     "priceSaved": "Cena zapisana",
-    "priceSaveFailed": "Nie udało się zapisać ceny"
+    "priceSaveFailed": "Nie udało się zapisać ceny",
+    "yieldConfirm": {
+      "title": "Zmienić, ile powstaje z tej receptury?"
+    },
+    "openDraftsChange": "Otwarte szkice czytające tę recepturę: {{number}}.",
+    "openDraftsUnknown": "Otwarte szkice czytające tę recepturę zmienią się razem z nią; ile ich jest, nie wiadomo."
   },
   "tree": {
     "title": "Wielopoziomowy BOM",
@@ -550,7 +558,9 @@
     "unknown_many": "{{count}} składników nie da się porównać",
     "unknown_other": "{{count}} składników nie da się porównać",
     "shortUnknown": "nie wiadomo",
-    "completeShortageHintNever": "Te składniki nigdy nie starczyły na to zlecenie — zlecenie powstało ponad stan."
+    "completeShortageHintNever": "Te składniki nigdy nie starczyły na to zlecenie — zlecenie powstało ponad stan.",
+    "unitMismatchTitle": "Nie można kontynuować — jednostka nie pasuje",
+    "unitMismatchHint": "Niczego nie brakuje: jednostki nie da się porównać z zapasem. Popraw ją w recepturze."
   },
   "widget": {
     "title": "{{result}} miesięcznie",
@@ -634,7 +644,10 @@
     "stockSaved": "Zapas zapisany.",
     "stockSaveFailed": "Nie udało się zapisać zapasu.",
     "stockSavePartial": "Zapisano {{saved}} z {{total}}. Reszta wciąż jest w arkuszu.",
-    "locationsFailed": "Nie udało się wczytać miejsc"
+    "locationsFailed": "Nie udało się wczytać miejsc",
+    "titleUnit": "Jednostka w recepturze nie pasuje do zapasu",
+    "unitBody": "Niczego nie brakuje: jednostki nie da się porównać z zapasem. Popraw ją: {{names}}.",
+    "onOrder": "Brakująca ilość jest zamówiona:"
   },
   "progress": {
     "start": "Rozpocznij zlecenie",
@@ -693,30 +706,35 @@
       "titleHome": "Słoiki z tej produkcji",
       "codeHome": "Kod partii {{code}}",
       "madeOn": "Data produkcji",
-      "onHold": "Na wstrzymaniu",
       "expired": "Po terminie",
       "recalled": "Wycofano z obrotu",
       "printLabels": "Drukuj etykiety partii",
       "printJarLabels": "Drukuj etykiety na słoiki",
       "jarLabelsTitle": "Etykiety na słoiki",
       "record": "Karta partii",
-      "hold": "Wstrzymaj",
+      "hold": "Kwarantanna",
       "release": "Zwolnij",
-      "heldToast_one": "Partia jest wstrzymana. Nic z niej nie zostanie pobrane, dopóki jej nie zwolnisz.",
-      "heldToast_few": "Partie są wstrzymane. Nic z nich nie zostanie pobrane, dopóki ich nie zwolnisz.",
-      "heldToast_many": "Partie są wstrzymane. Nic z nich nie zostanie pobrane, dopóki ich nie zwolnisz.",
-      "heldToast_other": "Partie są wstrzymane. Nic z nich nie zostanie pobrane, dopóki ich nie zwolnisz.",
+      "heldToast_one": "Partia jest na kwarantannie. Nic z niej nie zostanie pobrane, dopóki jej nie zwolnisz.",
+      "heldToast_few": "Partie są na kwarantannie. Nic z nich nie zostanie pobrane, dopóki ich nie zwolnisz.",
+      "heldToast_many": "Partie są na kwarantannie. Nic z nich nie zostanie pobrane, dopóki ich nie zwolnisz.",
+      "heldToast_other": "Partie są na kwarantannie. Nic z nich nie zostanie pobrane, dopóki ich nie zwolnisz.",
       "releasedToast_one": "Partia jest zwolniona i znów można z niej korzystać.",
       "releasedToast_few": "Partie są zwolnione i znów można z nich korzystać.",
       "releasedToast_many": "Partie są zwolnione i znów można z nich korzystać.",
       "releasedToast_other": "Partie są zwolnione i znów można z nich korzystać.",
       "holdFailed": "Nie udało się zmienić stanu partii.",
-      "holdTitle_one": "Wstrzymać tę partię?",
-      "holdTitle_few": "Wstrzymać te partie?",
-      "holdTitle_many": "Wstrzymać te partie?",
-      "holdTitle_other": "Wstrzymać te partie?",
-      "holdMessage": "Wstrzymana partia zostaje na półce, ale żadna produkcja, kompletacja ani wydanie nie pobierze z niej, dopóki jej nie zwolnisz.",
-      "holdReason": "Dlaczego jest wstrzymana?"
+      "holdTitle_one": "Objąć tę partię kwarantanną?",
+      "holdTitle_few": "Objąć te partie kwarantanną?",
+      "holdTitle_many": "Objąć te partie kwarantanną?",
+      "holdTitle_other": "Objąć te partie kwarantanną?",
+      "holdMessage": "Partia na kwarantannie zostaje na półce, ale żadna produkcja, kompletacja ani wydanie nie pobierze z niej, dopóki jej nie zwolnisz.",
+      "holdReason": "Dlaczego trafia na kwarantannę?",
+      "state": {
+        "quarantined": "Kwarantanna",
+        "held": "Wstrzymane"
+      },
+      "heldBecause": "{{batch}} — {{state}}: {{reason}}",
+      "heldNoReason": "{{batch}} — {{state}}, bez podania powodu"
     }
   },
   "record": {
@@ -742,7 +760,8 @@
     "completedBy": "Zakończono",
     "byAt": "{{who}}, {{when}}",
     "print": "Drukuj",
-    "failed": "Nie udało się odczytać karty partii."
+    "failed": "Nie udało się odczytać karty partii.",
+    "costBasis": "Składniki wycenia się wg warstw kosztu produktu (FIFO), nie wg ceny partii."
   },
   "attachments": {
     "title": "Zdjęcia i pliki",

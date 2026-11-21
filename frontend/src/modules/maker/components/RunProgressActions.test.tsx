@@ -1,5 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, within } from "@testing-library/react";
+import {
+  act,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { addDays, format } from "date-fns";
 import { MemoryRouter } from "react-router-dom";
 import { FinishRunAction } from "./FinishRunAction";
@@ -32,8 +39,8 @@ vi.mock("@/modules/maker/hooks/useBatchChoice", () => ({
 }));
 
 vi.mock("@/modules/maker/hooks/useProduction", () => ({
-  useStartProduction: () => ({ mutate: mocks.start, isPending: false }),
-  useFinishProduction: () => ({ mutate: mocks.finish, isPending: false }),
+  useStartProduction: () => ({ mutateAsync: mocks.start, isPending: false }),
+  useFinishProduction: () => ({ mutateAsync: mocks.finish, isPending: false }),
 }));
 
 vi.mock("@/hooks/useActiveProfile", () => ({
@@ -52,12 +59,14 @@ const order = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.start.mockResolvedValue({});
+  mocks.finish.mockResolvedValue({});
   mocks.batches.payload = [];
   mocks.batches.short = new Set();
 });
 
 describe("StartRunAction", () => {
-  it("asks for the day, then starts the run on it", () => {
+  it("asks for the day, then starts the run on it", async () => {
     render(
       <MemoryRouter>
         <StartRunAction order={order} onShortage={vi.fn()} />
@@ -65,7 +74,11 @@ describe("StartRunAction", () => {
     );
     fireEvent.click(screen.getByTestId("maker-detail-start-button"));
     const dialog = screen.getByRole("alertdialog");
-    fireEvent.click(within(dialog).getByRole("button", { name: "Start run" }));
+    await act(async () => {
+      fireEvent.click(
+        within(dialog).getByRole("button", { name: "Start run" }),
+      );
+    });
 
     expect(mocks.start.mock.calls[0][0]).toEqual({
       orderId: "ord-1",
@@ -73,7 +86,7 @@ describe("StartRunAction", () => {
     });
   });
 
-  it("starts the run on the batches the person chose", () => {
+  it("starts the run on the batches the person chose", async () => {
     const chosen = { template_id: "t1", lot_id: "lot-9", quantity: "6" };
     mocks.batches.payload = [chosen];
     render(
@@ -82,16 +95,18 @@ describe("StartRunAction", () => {
       </MemoryRouter>,
     );
     fireEvent.click(screen.getByTestId("maker-detail-start-button"));
-    fireEvent.click(
-      within(screen.getByRole("alertdialog")).getByRole("button", {
-        name: "Start run",
-      }),
-    );
+    await act(async () => {
+      fireEvent.click(
+        within(screen.getByRole("alertdialog")).getByRole("button", {
+          name: "Start run",
+        }),
+      );
+    });
 
     expect(mocks.start.mock.calls[0][0].data.ingredient_lots).toEqual([chosen]);
   });
 
-  it("will not start while a chosen batch cannot give what the run needs", () => {
+  it("will not start while a chosen batch cannot give what the run needs", async () => {
     mocks.batches.short = new Set(["t1"]);
     render(
       <MemoryRouter>
@@ -106,18 +121,12 @@ describe("StartRunAction", () => {
     expect((start as HTMLButtonElement).disabled).toBe(true);
   });
 
-  it("hands a shortage refusal to the page's own dialog", () => {
+  it("hands a shortage refusal to the page's own dialog", async () => {
     const onShortage = vi.fn();
     render(
       <MemoryRouter>
         <StartRunAction order={order} onShortage={onShortage} />
       </MemoryRouter>,
-    );
-    fireEvent.click(screen.getByTestId("maker-detail-start-button"));
-    fireEvent.click(
-      within(screen.getByRole("alertdialog")).getByRole("button", {
-        name: "Start run",
-      }),
     );
     const refusal = {
       response: {
@@ -130,27 +139,39 @@ describe("StartRunAction", () => {
         },
       },
     };
-    mocks.start.mock.calls[0][1].onError(refusal);
+    mocks.start.mockRejectedValueOnce(refusal);
+    fireEvent.click(screen.getByTestId("maker-detail-start-button"));
+    await act(async () => {
+      fireEvent.click(
+        within(screen.getByRole("alertdialog")).getByRole("button", {
+          name: "Start run",
+        }),
+      );
+    });
 
-    expect(onShortage).toHaveBeenCalledWith(
-      [{ child_template_id: "t1" }],
-      true,
+    await waitFor(() =>
+      expect(onShortage).toHaveBeenCalledWith(
+        [{ child_template_id: "t1" }],
+        true,
+      ),
     );
   });
 });
 
 describe("FinishRunAction", () => {
-  it("finishes with what the whole run made and the day it closed", () => {
+  it("finishes with what the whole run made and the day it closed", async () => {
     render(<FinishRunAction order={order} />);
     fireEvent.click(screen.getByTestId("maker-detail-finish-button"));
     fireEvent.change(screen.getByTestId("maker-finish-actual-qty-input"), {
       target: { value: "9" },
     });
-    fireEvent.click(
-      within(screen.getByRole("alertdialog")).getByRole("button", {
-        name: "Finish run",
-      }),
-    );
+    await act(async () => {
+      fireEvent.click(
+        within(screen.getByRole("alertdialog")).getByRole("button", {
+          name: "Finish run",
+        }),
+      );
+    });
 
     expect(mocks.finish.mock.calls[0][0]).toEqual({
       orderId: "ord-1",
@@ -163,49 +184,65 @@ describe("FinishRunAction", () => {
     });
   });
 
-  it("dates the closing quantity from the product's shelf life, as the server would", () => {
+  it("dates the closing quantity from the product's shelf life, as the server would", async () => {
     render(
       <FinishRunAction
         order={{ ...order, shelf_life_days: 30 } as ProductionOrder}
       />,
     );
     fireEvent.click(screen.getByTestId("maker-detail-finish-button"));
-    fireEvent.click(
-      within(screen.getByRole("alertdialog")).getByRole("button", {
-        name: "Finish run",
-      }),
-    );
+    await act(async () => {
+      fireEvent.click(
+        within(screen.getByRole("alertdialog")).getByRole("button", {
+          name: "Finish run",
+        }),
+      );
+    });
 
     expect(mocks.finish.mock.calls[0][0].data.best_before).toBe(
       format(addDays(new Date(), 30), "yyyy-MM-dd"),
     );
   });
 
-  it("leaves the quantity out when none is typed, so the server uses the plan", () => {
+  it("leaves the quantity out when none is typed, so the server uses the plan", async () => {
     render(<FinishRunAction order={order} />);
     fireEvent.click(screen.getByTestId("maker-detail-finish-button"));
-    fireEvent.click(
-      within(screen.getByRole("alertdialog")).getByRole("button", {
-        name: "Finish run",
-      }),
-    );
+    await act(async () => {
+      fireEvent.click(
+        within(screen.getByRole("alertdialog")).getByRole("button", {
+          name: "Finish run",
+        }),
+      );
+    });
 
     expect(mocks.finish.mock.calls[0][0].data.actual_qty).toBeUndefined();
   });
 
-  it("opens on empty fields after a refused finish", () => {
+  it("keeps a refused finish open as typed, and opens on empty fields the next time", async () => {
+    mocks.finish.mockRejectedValueOnce(new Error("refused"));
     render(<FinishRunAction order={order} />);
     fireEvent.click(screen.getByTestId("maker-detail-finish-button"));
     fireEvent.change(screen.getByTestId("maker-finish-actual-qty-input"), {
       target: { value: "5" },
     });
+    await act(async () => {
+      fireEvent.click(
+        within(screen.getByRole("alertdialog")).getByRole("button", {
+          name: "Finish run",
+        }),
+      );
+    });
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+    expect(
+      (screen.getByTestId("maker-finish-actual-qty-input") as HTMLInputElement)
+        .value,
+    ).toBe("5");
+
     fireEvent.click(
       within(screen.getByRole("alertdialog")).getByRole("button", {
-        name: "Finish run",
+        name: "Cancel",
       }),
     );
-    mocks.finish.mock.calls[0][1].onError(new Error("refused"));
-
     fireEvent.click(screen.getByTestId("maker-detail-finish-button"));
     expect(
       (screen.getByTestId("maker-finish-actual-qty-input") as HTMLInputElement)
@@ -213,7 +250,7 @@ describe("FinishRunAction", () => {
     ).toBe("");
   });
 
-  it("asks before closing far above the plan, naming the extra quantity", () => {
+  it("asks before closing far above the plan, naming the extra quantity", async () => {
     render(<FinishRunAction order={order} />);
     fireEvent.click(screen.getByTestId("maker-detail-finish-button"));
     fireEvent.change(screen.getByTestId("maker-finish-actual-qty-input"), {
@@ -231,11 +268,13 @@ describe("FinishRunAction", () => {
 
     fireEvent.click(screen.getByTestId("maker-overproduction-confirm"));
     expect(finishButton.disabled).toBe(false);
-    fireEvent.click(finishButton);
+    await act(async () => {
+      fireEvent.click(finishButton);
+    });
     expect(mocks.finish.mock.calls[0][0].data.actual_qty).toBe("59");
   });
 
-  it("does not ask for a quantity within a quarter of the plan", () => {
+  it("does not ask for a quantity within a quarter of the plan", async () => {
     render(<FinishRunAction order={order} />);
     fireEvent.click(screen.getByTestId("maker-detail-finish-button"));
     fireEvent.change(screen.getByTestId("maker-finish-actual-qty-input"), {

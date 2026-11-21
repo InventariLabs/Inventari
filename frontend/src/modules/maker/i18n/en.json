@@ -140,7 +140,8 @@
       "added": "Added to {{name}}",
       "alreadyListed": "Already on the shopping list",
       "addFailed": "Could not add to the shopping list"
-    }
+    },
+    "qtyNeedsProduct": "Pick a product first: the quantity is counted in its unit."
   },
   "createRecipe": {
     "title": "New BOM",
@@ -301,7 +302,8 @@
       "labourFromSteps": "Labour from the process steps",
       "labourTime": "{{minutes}} min at the hourly rate",
       "labourRateMissing": "The steps take {{minutes}} min. Set the hourly rate in production settings to cost that time.",
-      "labourRateLink": "Production settings"
+      "labourRateLink": "Production settings",
+      "labourCountedTwice": "The labour from the process steps is already counted above. A Labor line is added on top of it, so labour can be counted twice."
     },
     "history": {
       "title": "Production history",
@@ -350,7 +352,8 @@
     "processStepsDiscardTitle": "Discard the unadded step?",
     "processStepsDiscardMessage": "The step you typed has not been added to the list. Closing the editor throws it away.",
     "processStepsDiscardConfirm": "Discard step",
-    "processStepsDiscardKeep": "Keep editing"
+    "processStepsDiscardKeep": "Keep editing",
+    "ingredientsReturned": "Ingredients taken and put back"
   },
   "bom": {
     "childLabel": "Ingredient product",
@@ -399,7 +402,12 @@
     "setPrice": "Set price",
     "editPrice": "Edit price",
     "priceSaved": "Price saved",
-    "priceSaveFailed": "Failed to save the price"
+    "priceSaveFailed": "Failed to save the price",
+    "yieldConfirm": {
+      "title": "Change what this BOM makes?"
+    },
+    "openDraftsChange": "Open drafts that read this BOM and change with it: {{number}}.",
+    "openDraftsUnknown": "Any open drafts that read this BOM change with it; how many is not known."
   },
   "tree": {
     "title": "Multi-level BOM",
@@ -536,7 +544,9 @@
     "unknown_one": "{{count}} ingredient cannot be compared",
     "unknown_other": "{{count}} ingredients cannot be compared",
     "shortUnknown": "unknown",
-    "completeShortageHintNever": "These ingredients were never enough for this run — it was created over stock."
+    "completeShortageHintNever": "These ingredients were never enough for this run — it was created over stock.",
+    "unitMismatchTitle": "Cannot continue — a unit does not match",
+    "unitMismatchHint": "No quantity is missing: the unit of the line cannot be compared with the stock. Fix the unit on the BOM line."
   },
   "widget": {
     "title": "{{result}} by month",
@@ -612,7 +622,10 @@
     "stockSaved": "Stock saved.",
     "stockSaveFailed": "Failed to save the stock.",
     "stockSavePartial": "Saved {{saved}} of {{total}}. The rest is still in the sheet.",
-    "locationsFailed": "Could not load the locations"
+    "locationsFailed": "Could not load the locations",
+    "titleUnit": "A unit on this BOM does not match the stock",
+    "unitBody": "Nothing is missing here: the unit of the line cannot be compared with the stock, so no stock would close it. Fix the unit on the BOM line: {{names}}.",
+    "onOrder": "The missing quantity is on order, on draft purchase order"
   },
   "progress": {
     "start": "Start run",
@@ -669,24 +682,29 @@
       "titleHome": "Jars from this run",
       "codeHome": "Batch code {{code}}",
       "madeOn": "Made on",
-      "onHold": "On hold",
       "expired": "Expired",
       "recalled": "Recalled",
       "printLabels": "Print batch labels",
       "printJarLabels": "Print jar labels",
       "jarLabelsTitle": "Jar labels",
       "record": "Batch record",
-      "hold": "Put on hold",
+      "hold": "Quarantine",
       "release": "Release",
-      "heldToast_one": "The batch is on hold. Nothing takes from it until it is released.",
-      "heldToast_other": "The batches are on hold. Nothing takes from them until they are released.",
+      "heldToast_one": "The batch is quarantined. Nothing takes from it until it is released.",
+      "heldToast_other": "The batches are quarantined. Nothing takes from them until they are released.",
       "releasedToast_one": "The batch is released and can be used again.",
       "releasedToast_other": "The batches are released and can be used again.",
       "holdFailed": "The batch’s state could not be changed.",
-      "holdTitle_one": "Put this batch on hold?",
-      "holdTitle_other": "Put these batches on hold?",
-      "holdMessage": "A batch on hold stays in its location, but no run, pick or dispatch takes from it until it is released.",
-      "holdReason": "Why is it held?"
+      "holdTitle_one": "Quarantine this batch?",
+      "holdTitle_other": "Quarantine these batches?",
+      "holdMessage": "A quarantined batch stays in its location, but no run, pick or dispatch takes from it until it is released.",
+      "holdReason": "Why is it quarantined?",
+      "state": {
+        "quarantined": "Quarantined",
+        "held": "Held"
+      },
+      "heldBecause": "{{batch}} — {{state}}: {{reason}}",
+      "heldNoReason": "{{batch}} — {{state}}, no reason given"
     }
   },
   "record": {
@@ -712,7 +730,8 @@
     "completedBy": "Completed",
     "byAt": "{{who}}, {{when}}",
     "print": "Print",
-    "failed": "The batch record could not be read."
+    "failed": "The batch record could not be read.",
+    "costBasis": "Ingredients are costed from the product's oldest cost layers (FIFO), not from the price of the batch an ingredient was taken from."
   },
   "attachments": {
     "title": "Photos and files",

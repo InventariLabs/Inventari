@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { DateInput } from "@/components/ui/DateInput";
 import { Input } from "@/components/ui/Input";
-import { extractApiError } from "@/lib/errors";
-import { formatQuantityLocalized } from "@/lib/i18nHelpers";
+import { formatQuantityLocalized, unitLabel } from "@/lib/i18nHelpers";
 import { QUANTITY_STEP } from "@/module-sdk";
 import { todayIso } from "@/utils/formatters";
 import { BestBeforeField } from "@/modules/maker/components/BestBeforeField";
@@ -42,24 +41,20 @@ export function FinishRunAction({ order }: { order: ProductionOrder }) {
     setAsking(true);
   }
 
-  function confirm() {
+  // The dialog waits for the answer: a refusal stays inside it, with the
+  // fields as typed, instead of closing over a toast.
+  async function confirm() {
+    await finish.mutateAsync({
+      orderId: order.id,
+      data: {
+        actual_qty: qty.trim() || undefined,
+        finished_on: day || undefined,
+        output_lot_name: lot.trim() || undefined,
+        best_before: bestBefore.value || undefined,
+      },
+    });
     setAsking(false);
-    finish.mutate(
-      {
-        orderId: order.id,
-        data: {
-          actual_qty: qty.trim() || undefined,
-          finished_on: day || undefined,
-          output_lot_name: lot.trim() || undefined,
-          best_before: bestBefore.value || undefined,
-        },
-      },
-      {
-        onSuccess: () => toast.success(t("progress.finishSuccess")),
-        onError: (err) =>
-          toast.error(extractApiError(err, t("progress.finishFailed"))),
-      },
-    );
+    toast.success(t("progress.finishSuccess"));
   }
 
   return (
@@ -80,12 +75,14 @@ export function FinishRunAction({ order }: { order: ProductionOrder }) {
         cancelLabel={t("create.cancel")}
         variant="default"
         confirmDisabled={overproduction.blocked}
+        errorFallback={t("progress.finishFailed")}
         onConfirm={confirm}
         onCancel={() => setAsking(false)}
       >
         <div className="space-y-3 py-2">
           <Input
             label={t("progress.finishQty")}
+            suffix={unitLabel(t, order.output_uom_symbol) || undefined}
             type="number"
             step={QUANTITY_STEP}
             min="0"
