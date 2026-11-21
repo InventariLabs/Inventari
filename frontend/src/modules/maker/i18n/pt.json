@@ -88,6 +88,7 @@
     "hints": {
       "product": "Escolha um produto final para habilitar a prévia.",
       "quantity": "Informe uma quantidade planejada maior que zero para habilitar a prévia.",
+      "quantityMade": "Informe quanto saiu, mais que zero, para habilitar a prévia.",
       "storage": "Selecione um local de destino para habilitar a prévia."
     },
     "preview": "Prévia do custo",
@@ -517,7 +518,7 @@
     "hintSource": "Definido nas configurações do módulo Produção",
     "orders_one": "{{count}} produção",
     "orders_other": "{{count}} produções",
-    "empty": "Nenhuma produção concluída com resultado ainda.",
+    "empty": "Nada a mostrar ainda: uma produção tem resultado quando é concluída com preço de venda na fórmula e custo em cada ingrediente.",
     "overproduced_one": "{{count}} produção foi encerrada acima do plano; o seu resultado conta a quantidade a mais.",
     "overproduced_other": "{{count}} produções foram encerradas acima do plano; o seu resultado conta a quantidade a mais."
   },

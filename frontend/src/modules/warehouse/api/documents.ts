@@ -162,6 +162,14 @@ export const documentsApi = {
     return response.data;
   },
 
+  /** The members a task can be given to: those who hold the grant it needs. */
+  workItemAssignees: async (): Promise<string[]> => {
+    const response = await api.get<{ user_ids: string[] }>(
+      "/warehouse/work-items/assignees",
+    );
+    return response.data.user_ids;
+  },
+
   /** Begin the count a schedule asks for; answers with the stock take made. */
   startCount: async (scheduleId: string): Promise<{ id: string }> => {
     const response = await api.post<{ id: string }>(

@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { MapPin, Trash2 } from "lucide-react";
-import { useCanWrite } from "@/hooks/useCanWrite";
 import { Badge, type BadgeProps } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
@@ -10,6 +9,7 @@ import type { TranslateFn } from "@/types/i18n";
 import type { WorkItem } from "@/modules/warehouse/types";
 import {
   canAct,
+  useModuleWrites,
   type Member,
 } from "@/modules/warehouse/components/todo/WorkItemRow";
 import {
@@ -269,14 +269,14 @@ export function BoardCard({
   onStartCount: (item: WorkItem) => void;
 }) {
   const { t } = useTranslation("warehouse");
-  const canWriteOrders = useCanWrite("purchase_orders");
+  const writes = useModuleWrites();
   const sentence = workItemSentence(t, item);
   const verb = actionLabel(t, item);
   const done = item.state === "done";
   const isCustom = item.kind === "custom";
   const assignable = canWrite && canAssign && !done;
   const startsCount = item.kind === "count" && !item.action_href;
-  const showAction = !done && !!verb && canAct(item, canWrite, canWriteOrders);
+  const showAction = !done && !!verb && canAct(item, canWrite, writes);
   const opensRecord = showAction && !startsCount;
 
   return (

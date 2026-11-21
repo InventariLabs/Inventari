@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { DateInput } from "@/components/ui/DateInput";
 import { Textarea } from "@/components/ui/Textarea";
+import { formatNumberLocale } from "@/utils/formatters";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
 import type { EquipmentFormData } from "../pages/AddEquipmentPage";
 
@@ -42,7 +43,7 @@ export function PurchaseNotesSection({
             step="0.01"
             value={form.purchase_price}
             onChange={(e) => onSet("purchase_price", e.target.value)}
-            placeholder="0.00"
+            placeholder={formatNumberLocale(0, 2)}
             aria-describedby="purchase-price-currency"
             rightIcon={
               /* make the currency explicit next to the amount. It is

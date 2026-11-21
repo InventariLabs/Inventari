@@ -11,6 +11,10 @@ import {
 interface DeleteReasonDialogProps {
   open: boolean;
   itemName: string;
+  /** Replaces the single-record title when the dialog asks for a batch. */
+  title?: string;
+  /** Replaces the single-record body when the dialog asks for a batch. */
+  message?: string;
   /**
    * Returning a promise keeps the dialog open until the delete settles, and
    * keeps the reason and note as typed when it fails — see ConfirmDialog.
@@ -22,6 +26,8 @@ interface DeleteReasonDialogProps {
 export function DeleteReasonDialog({
   open,
   itemName,
+  title,
+  message,
   onConfirm,
   onCancel,
 }: DeleteReasonDialogProps) {
@@ -35,8 +41,8 @@ export function DeleteReasonDialog({
   return (
     <ConfirmDialog
       open={open}
-      title={t("items:actions.confirmDelete")}
-      message={t("items:messages.deleteGoesToArchive")}
+      title={title ?? t("items:actions.confirmDelete")}
+      message={message ?? t("items:messages.deleteGoesToArchive")}
       confirmLabel={t("items:actions.delete")}
       cancelLabel={t("common:actions.cancel")}
       variant="danger"
@@ -46,7 +52,9 @@ export function DeleteReasonDialog({
       onCancel={onCancel}
     >
       <div className="space-y-3">
-        <p className="text-sm text-on-secondary font-medium">{itemName}</p>
+        {itemName && (
+          <p className="text-sm text-on-secondary font-medium">{itemName}</p>
+        )}
         <div>
           <NativeSelect
             label={t("items:deletionReason")}

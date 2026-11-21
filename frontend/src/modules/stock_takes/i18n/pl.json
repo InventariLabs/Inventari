@@ -169,6 +169,7 @@
     "createFailed": "Nie udało się utworzyć spisu",
     "deleteFailed": "Nie udało się usunąć spisu",
     "saveFailed": "Nie udało się zapisać liczenia",
+    "saveFailedFor": "Nie udało się zapisać liczenia: {{name}}",
     "addItemFailed": "Nie udało się dodać pozycji",
     "completeFailed": "Nie udało się zakończyć spisu",
     "cancelFailed": "Nie udało się anulować spisu",

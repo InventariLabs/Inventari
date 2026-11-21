@@ -485,6 +485,15 @@ const dist = join(root, "dist");
  * receive 475.6, issue 588.4, history 613.2, products 630.6, app first paint
  * 402.7, initial 193.9).
  *
+ * Re-measured 2026-11-21 on the branch that words the persona walk's
+ * findings: the issue screen measures 590.0 KiB gz against its 590 (from
+ * 588.4) and the history screen 615.1 against its 615 (from 613.2). What
+ * the branch adds there is copy in six languages (the Polish catalogue sits
+ * in the language chunk both screens load); no import walked in. Those two
+ * phone budgets move a step of five, to 595 and 620; the other screens stand
+ * under theirs (login 408.9, launcher 424.0, start 642.2, receive 477.2,
+ * products 632.3, app first paint 404.2, initial 193.9).
+ *
  * Re-measured 2026-11-21 on the branch that makes the equipment screens use
  * the words and numbers a reader sees: merged with the line, the history
  * screen measures 615.0 KiB gz against its 615, from 613.2 before it. What
@@ -520,6 +529,15 @@ const dist = join(root, "dist");
  * no import walked in. Those two phone budgets move a step of five (issue 595,
  * history 620); the other screens stand under theirs.
  *
+ * Re-measured 2026-11-21 on the branch that words the persona walk's
+ * findings, merged with the two changes above: app first paint measures
+ * 405.3 KiB gz against its 405, login 410.0 against 410 and launcher 425.1
+ * against 425. The branches add copy in six languages to the language chunk
+ * every first paint loads; no import walked in. The three budgets move a step
+ * of five (app first paint 410, login 415, launcher 430); the other screens
+ * stand under theirs (start 643.3, receive 478.9, issue 590.9, history 616.0,
+ * products 634.0).
+ *
  * Re-measured 2026-11-21 on the branch that closes the catalogue, locations
  * and labels findings, merged with the line that settled the first-contact and
  * settings screens: app first paint measures 405.3 KiB gz against its 405,
@@ -541,6 +559,14 @@ const dist = join(root, "dist");
  * launcher 425.0, start 643.5, receive 479.8, issue 590.8, history 615.9,
  * products 633.8, initial 193.9).
  *
+ * Re-measured 2026-11-21 on the persona walk branch merged with that warehouse
+ * floor branch: the line measures the receive screen at 479.8 KiB gz against
+ * its 480, and the persona walk's copy takes the product to 480.1. It is
+ * copy in the language chunk the screen loads, not an import. The receive
+ * budget moves a step of five, to 485; the other screens stand under theirs
+ * (app first paint 405.5 of 410, login 410.3 of 415, launcher 425.3 of 430,
+ * start 643.8, issue 591.2, history 616.3, products 634.3).
+ *
  * Re-measured 2026-11-21 on the branch that closes the catalogue, locations
  * and labels findings, merged with the line that carries the warehouse floor
  * branch: the receive screen measures 480.1 KiB gz against its 480. The line
@@ -550,16 +576,25 @@ const dist = join(root, "dist");
  * (app first paint 405.5, login 410.3, launcher 425.4, start 643.8, issue
  * 591.2, history 616.3, products 635.0, initial 194.0).
  *
- * Re-measured 2026-11-21 on the branch that keeps raw machine values out of
- * reader text, merged with the line that carries the catalogue, locations and
- * labels branch: the products screen measures 635.0 KiB gz against its 635.
- * The screen already stood at the edge of its budget (634.8 on the
- * catalogue branch); this branch adds the field-scoped audit value lookup to
- * the shared audit-change renderer, a few lines in a chunk the products screen
- * walks, no new import. That phone budget moves a step of
- * five, to 640; the other screens stand under theirs (app first paint 405.5,
- * login 410.3, launcher 425.3, start 643.8, receive 480.1, issue 591.2,
- * history 616.3, initial 194.0).
+ * Re-measured 2026-11-21 on the branch that gives read-only accounts their
+ * answers and names the rows its error lines are about, merged with the line
+ * that closes the catalogue, locations and labels findings: the products
+ * screen measures 635.3 KiB gz against its 635 (635.0 on the line alone). The
+ * branch adds a batch-delete reason dialog on that page and copy in six
+ * languages; no import walked in. That phone budget moves a step of five, to
+ * 640; the other screens stand under theirs (app first paint 405.7, login
+ * 410.5, launcher 425.5, start 644.3, receive 480.5, issue 591.4, history
+ * 616.5, initial 194.0).
+ *
+ * Re-measured 2026-11-21 on the persona walk branch merged with the line that
+ * carries the catalogue, locations and labels branch: the products screen
+ * measures 635.4 KiB gz against its 635. The line alone measures 634.3 to
+ * 635.0 and this branch alone 634.0; together they add about 0.5 KiB of copy
+ * in six languages to the language chunk the screen loads, no import. That
+ * phone budget moves a step of five, to 640; the other screens stand under
+ * theirs (app first paint 405.8 of 410, login 410.6 of 415, launcher 425.7 of
+ * 430, start 644.2 of 645, receive 480.5 of 485, issue 591.5 of 595, history
+ * 616.6 of 620, initial 194.0).
  */
 const BUDGETS = {
   initial: 245,

@@ -162,3 +162,9 @@ class PutawayDo(BaseModel):
 
     location_id: UUID
     scanned_code: str | None = None
+
+
+class WorkItemAssignees(BaseModel):
+    """The members a task can be given to: those who hold what doing it needs."""
+
+    user_ids: list[UUID]

@@ -71,11 +71,19 @@ function announcePicked(
 // the hook can name, each spelled out so the i18n gate reads the call
 // sites; a hard-coded fallback in the hook was an English sentence on a
 // Polish screen.
-function failureSentence(t: TFunction, context: WmsPickingFailureContext) {
+function failureSentence(
+  t: TFunction,
+  context: WmsPickingFailureContext,
+  product?: string | null,
+) {
   const sentences: Record<WmsPickingFailureContext, string> = {
     scan: t("picking.error.scan_failed"),
     short_pick: t("picking.error.short_pick_failed"),
-    skip: t("picking.error.skip_failed"),
+    // Named when the line is known: the sentence sits under the list, beside
+    // rows it is not about.
+    skip: product
+      ? t("picking.error.skip_failed_named", { product })
+      : t("picking.error.skip_failed"),
     undo: t("picking.error.undo_failed"),
     complete: t("picking.error.complete_failed"),
     cancel: t("picking.error.cancel_failed"),
@@ -192,6 +200,7 @@ function WmsPickingView({
     errorCode,
     errorStatus,
     errorContext,
+    errorLineId,
     heldSession,
     releaseHeldSession,
     takeOverHeldSession,
@@ -208,7 +217,14 @@ function WmsPickingView({
   } = useWmsPicking(sessionDocumentId, sessionDocumentIds);
 
   const sessionError =
-    error ?? (errorContext ? failureSentence(t, errorContext) : null);
+    error ??
+    (errorContext
+      ? failureSentence(
+          t,
+          errorContext,
+          state.lines.find((line) => line.id === errorLineId)?.product_name,
+        )
+      : null);
 
   const queryClient = useQueryClient();
 

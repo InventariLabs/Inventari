@@ -584,6 +584,9 @@ async def create_item_async(
             # product screen says: a seeded category carries its seed's
             # English (`Dairy`) while the app reads it by code (`Nabiał`).
             'category_code': category.code if category is not None else None,
+            # The vertical module whose namespace the record carries — the
+            # journal names an asset an asset, not a product, from it.
+            'module_name': item.module_name,
         },
     )
 

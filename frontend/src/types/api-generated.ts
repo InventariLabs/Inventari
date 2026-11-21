@@ -11063,6 +11063,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/warehouse/work-items/assignees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Work Item Assignees
+         * @description Who a task can be given to: the members who hold the warehouse write
+         *     grant, which every task on the list needs to be done. A viewer is a member
+         *     of the organization and cannot do any of them.
+         */
+        get: operations["list_work_item_assignees_api_v1_warehouse_work_items_assignees_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/warehouse/work-items/custom": {
         parameters: {
             query?: never;
@@ -29653,6 +29675,14 @@ export interface components {
             assignee_id?: string | null;
             /** Only If Unassigned */
             only_if_unassigned?: boolean;
+        };
+        /**
+         * WorkItemAssignees
+         * @description The members a task can be given to: those who hold what doing it needs.
+         */
+        WorkItemAssignees: {
+            /** User Ids */
+            user_ids: string[];
         };
         /**
          * WorkItemCustomCreate
@@ -51664,6 +51694,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_work_item_assignees_api_v1_warehouse_work_items_assignees_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkItemAssignees"];
                 };
             };
         };

@@ -12,6 +12,7 @@ from ._schemas_putaway_done import PutawayDone
 from ._schemas_work_items import (
     PutawayDo,
     WorkItemAssign,
+    WorkItemAssignees,
     WorkItemCustomCreate,
     WorkItemDone,
     WorkItemMeasures,
@@ -21,6 +22,7 @@ from .putaway_work_service import put_away_async
 from .work_board_service import work_measures_async
 from .work_item_service import (
     assign_work_item_async,
+    assignable_user_ids_async,
     create_custom_item_async,
     delete_custom_item_async,
     set_custom_item_done_async,
@@ -42,6 +44,17 @@ async def get_work_measures(
     """The strip above the work board: this week's dock-to-stock time and
     how many dispatches left on the day they were raised."""
     return await work_measures_async(db, org_id)
+
+
+@router.get('/assignees', response_model=WorkItemAssignees)
+async def list_work_item_assignees(
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> WorkItemAssignees:
+    """Who a task can be given to: the members who hold the warehouse write
+    grant, which every task on the list needs to be done. A viewer is a member
+    of the organization and cannot do any of them."""
+    return WorkItemAssignees(user_ids=await assignable_user_ids_async(db, org_id))
 
 
 @router.put(

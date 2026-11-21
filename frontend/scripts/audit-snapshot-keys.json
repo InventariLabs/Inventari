@@ -141,6 +141,7 @@
     "min_quantity",
     "model_name",
     "module",
+    "module_name",
     "name",
     "new_status",
     "new_target_location_id",

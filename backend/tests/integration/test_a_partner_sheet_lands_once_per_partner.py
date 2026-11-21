@@ -99,7 +99,7 @@ class TestAPartnerSheetLandsOncePerPartner:
         assert resp.status_code == 200, resp.text
         body = resp.json()
         assert (body['total'], body['imported'], body['failed']) == (5, 3, 2)
-        assert [e['row'] for e in body['errors']] == [5, 6]
+        assert [e['row'] for e in body['errors']] == [4, 5]
         assert 'Hurtownia ABC' in body['errors'][0]['error']
         assert 'name' in body['errors'][1]['error'].lower()
 

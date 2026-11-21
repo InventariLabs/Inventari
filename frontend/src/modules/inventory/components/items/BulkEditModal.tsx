@@ -1,3 +1,4 @@
+import { formatNumberLocale } from "@/utils/formatters";
 import { useState } from "react";
 import { AlertTriangle, X, Loader2, Save } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -96,7 +97,7 @@ function BulkPriceField({
           aria-label={t("bulkEdit.price")}
           value={value === undefined ? "" : (value ?? "")}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="0.00"
+          placeholder={formatNumberLocale(0, 2)}
         />
       )}
     </div>

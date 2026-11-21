@@ -92,6 +92,9 @@ describe("ImportProgressStep", () => {
     expect(screen.getByText("Error 2")).toBeInTheDocument();
     expect(screen.getByText("#2:")).toBeInTheDocument();
     expect(screen.getByText("#4:")).toBeInTheDocument();
+    // The number counts data rows; the list says so, because the person fixes
+    // the file in a spreadsheet where the header is row 1.
+    expect(screen.getByText(/header row is not counted/)).toBeInTheDocument();
   });
 
   it("displays stats grid from total/imported/failed", () => {

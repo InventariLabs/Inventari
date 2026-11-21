@@ -79,6 +79,42 @@ class TestOnboardingSetupAccess:
         assert response.status_code == status.HTTP_200_OK, response.text
         assert response.json()['name'] == 'Kowalski Bakery'
 
+    async def test_the_name_the_founder_gave_reaches_the_journal(
+        self,
+        real_async_client,
+        real_async_db_session,
+        async_test_user,
+        async_test_household,
+    ):
+        """The journal's row about the organization carries the name it was given."""
+        from sqlalchemy import select
+
+        from app.models.audit_log import AuditLog
+
+        async_test_household.onboarding_completed = False
+        first_name = async_test_household.name
+        await real_async_db_session.commit()
+
+        response = await real_async_client.post(
+            SETUP_URL,
+            json={'profile_id': 'clean_core', 'organization_name': 'Dom Marty'},
+            headers=_auth(async_test_user),
+        )
+        assert response.status_code == status.HTTP_200_OK, response.text
+
+        entries = (
+            await real_async_db_session.scalars(
+                select(AuditLog).where(
+                    AuditLog.target_id == async_test_household.id,
+                    AuditLog.action == 'UPDATE',
+                )
+            )
+        ).all()
+        names = [e.snapshot.get('after', {}).get('name') for e in entries]
+        assert 'Dom Marty' in names
+        renamed = next(e for e in entries if e.snapshot['after'].get('name'))
+        assert renamed.snapshot['before'] == {'name': first_name}
+
     async def test_setup_journals_the_module_set_it_established(
         self,
         real_async_client,

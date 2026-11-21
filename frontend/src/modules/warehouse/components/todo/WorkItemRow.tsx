@@ -21,22 +21,56 @@ export interface Member {
   name: string;
 }
 
+/** The grants beyond the warehouse's own that a task's button can need. */
+export interface ModuleWrites {
+  purchaseOrders: boolean;
+  maker: boolean;
+  stockTakes: boolean;
+}
+
+/** What this account may write in the modules a task can open. */
+export function useModuleWrites(): ModuleWrites {
+  return {
+    purchaseOrders: useCanWrite("purchase_orders"),
+    maker: useCanWrite("maker"),
+    stockTakes: useCanWrite("stock_takes"),
+  };
+}
+
 /** Whether the account may press the task's button. A document's action
- * and a putaway write to documents; the other screens a task opens check their own grant,
- * and reviewing an approval is open to whoever the queue named. */
+ * and a putaway write to documents; every other task opens a screen whose
+ * work is a write in its own module, so the button is offered to an account
+ * that holds that grant — a reader is not sent to a screen that shows it
+ * nothing it may do. Reviewing an approval is open to whoever the queue
+ * named. */
 export function canAct(
   item: WorkItem,
   canWrite: boolean,
-  canWriteOrders: boolean,
+  writes: ModuleWrites,
 ): boolean {
   if (!item.next_action && !item.action_href) return false;
   // Putting away posts a move, which is a write to documents.
   if (item.source_kind === "putaway") return canWrite;
   // Filling a pick face from reserve is a transfer too, and the proposal
   // and the move are the orders module's routes.
-  if (item.source_kind === "replenishment") return canWrite && canWriteOrders;
-  if (item.source_kind !== "document") return true;
-  return item.next_action === "review_approval" || canWrite;
+  if (item.source_kind === "replenishment") {
+    return canWrite && writes.purchaseOrders;
+  }
+  if (item.source_kind === "document") {
+    return item.next_action === "review_approval" || canWrite;
+  }
+  switch (item.next_action) {
+    case "receive_delivery":
+      return canWrite;
+    case "produce":
+      return writes.maker;
+    case "count":
+      return writes.stockTakes;
+    case "review_approval":
+      return true;
+    default:
+      return canWrite;
+  }
 }
 
 function DueText({ item }: { item: WorkItem }) {
@@ -126,7 +160,7 @@ export function WorkItemRow({
 }) {
   const { t } = useTranslation("warehouse");
   const navigate = useNavigate();
-  const canWriteOrders = useCanWrite("purchase_orders");
+  const writes = useModuleWrites();
   const sentence = workItemSentence(t, item);
   const verb = actionLabel(t, item);
   const isCustom = item.kind === "custom";
@@ -228,7 +262,7 @@ export function WorkItemRow({
             {t("todo.giveBack")}
           </Button>
         )}
-        {!done && verb && canAct(item, canWrite, canWriteOrders) && (
+        {!done && verb && canAct(item, canWrite, writes) && (
           <Button
             className="max-sm:w-full"
             onClick={() =>
