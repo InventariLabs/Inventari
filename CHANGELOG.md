@@ -286,6 +286,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Saving a print layout whose template code does not parse or render — a
+  purchase order, warehouse document or equipment layout — is refused, with
+  the line and the complaint, instead of being stored and then breaking every
+  PDF printed with it. A purchase order whose stored layout no longer renders
+  prints with the built-in layout rather than failing with "An error occurred".
 - On a slow connection the Inventory and Equipment overviews no longer state
   something that is not true while they load. *My locations* shows placeholders
   instead of "No locations yet" and its create button, and the Equipment
@@ -364,13 +369,17 @@ says what the release does rather than what changed since them.
   one of them is already in a picking session. If the session is your own —
   opened on a phone and left — the dialog says so and offers **Continue that
   session** or **Discard scans**; if a colleague holds it, it offers to take
-  it over or discard their scans, as the document's own page already did.
+  it over, which opens that session at once, or discard their scans, as the
+  document's own page already did.
   **Retry** now appears only after a server failure, never after a refusal
   that would only repeat itself.
 - On a phone, the header's Back arrow on a screen opened by a direct link —
   a document opened from a link or a refreshed page, for one — no longer ends
   on a "Page Not Found" at `/warehouse/documents`. With nothing earlier in the
-  history it climbs to the nearest screen above that exists, the module's start.
+  history it climbs to the nearest screen above that exists, and to the home
+  screen when there is none: from a document or History opened by a link that
+  is the launcher, never the warehouse root that only sends you back, and from
+  a location zone it is the locations list, never "Location not found".
 - The Settings audit log shows the reason a workflow release left on the
   requests it closed in the reader's language ("Workflow deactivated",
   "Workflow deleted") instead of the raw English text.
@@ -562,6 +571,15 @@ says what the release does rather than what changed since them.
   Duplicate on a draft, but no Start run, Complete run, Finish run, portion
   form, Undo run or Cancel of a run in progress, and *New production* opens
   planning only, without the *Save as made* choice: each of those posts stock.
+- The return sheet keeps to what is still left of a line. Its maximum is what
+  earlier returns and corrections have not already taken back, not the full
+  quantity done, so a quantity above it is named under the field and the sheet
+  cannot be submitted. A line already returned in full is left out of the
+  sheet, and a document with nothing left to return says so instead of
+  listing lines. A leading zero no longer sticks in the quantity field of
+  the return and correction sheets, packing, phone receiving, document
+  lines, quick add and shopping-list add: a digit typed after a 0 replaces
+  it.
 - The work board no longer counts what was undone. A dispatch that has been
   undone is not counted in *Orders shipped on the order day* (undoing the
   only dispatch of the week now reads "No orders shipped yet this week"

@@ -86,6 +86,8 @@ class PdfServiceBase:
     ) -> str | None:
         """Render an organization's own template, or None to fall back to disk.
 
+        None also when the stored template does not render.
+
                Async because its only caller already had an AsyncSession and reached
                this sync code through ``db.run_sync``, which parks a greenlet for the
                duration — connection budget spent to call a sync twin of a query that
@@ -107,7 +109,19 @@ class PdfServiceBase:
 
         engine = TemplateEngine(templates_dir=self.templates_dir)
         logger.debug('Using DB template %s for %s', tpl.id, self.module_name)
-        return engine.render(tpl.body_html, context)
+        try:
+            return engine.render(tpl.body_html, context)
+        except Exception:
+            # A body stored before saves were checked can still fail to
+            # parse or render; the built-in layout prints the document
+            # instead of the whole request failing.
+            logger.warning(
+                'DB template %s for %s does not render; using the built-in layout',
+                tpl.id,
+                self.module_name,
+                exc_info=True,
+            )
+            return None
 
     def render_filesystem_template(
         self, template_name: str, context: dict[str, Any]

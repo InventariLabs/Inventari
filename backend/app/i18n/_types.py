@@ -349,6 +349,7 @@ class ErrorMessages(TypedDict):
     template_import_invalid_field: str
     template_import_unknown_placeholders: str
     template_import_not_renderable: str
+    template_not_saved_syntax: str
     model_not_found: str
     widget_not_found: str
     bom_line_not_found: str
@@ -715,6 +716,7 @@ class ErrorMessages(TypedDict):
     wms_pick_document_not_confirmed: str
     wms_pick_document_not_dispatch: str
     wms_pick_document_in_session: str
+    wms_pick_document_in_own_session: str
     wms_line_document_closed: str
     wms_short_below_scanned: str
     wms_short_pick_needs_outcome: str

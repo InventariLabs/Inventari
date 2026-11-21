@@ -18,10 +18,11 @@ const moduleOf = (path: string) =>
       : "/inventory";
 
 // The screens the app registers: `/warehouse/documents` is not one of them,
-// only a document under it is.
+// only a document under it is, and the module root `/warehouse` only sends
+// the person on to History.
 const SCREENS = [
-  "/warehouse",
   "/warehouse/todo",
+  "/warehouse/history",
   "/warehouse/receive",
   "/inventory/stock",
 ];
@@ -150,16 +151,22 @@ describe("useShellBack", () => {
     expect(at()).toBe("/inventory/stock");
   });
 
-  it("never climbs from a document opened by a direct link to a path no screen answers", () => {
+  it("leads home from a document opened by a direct link, past a path no screen answers", () => {
     // The receiving sheet's way in: the receive page replaces itself with the
     // document, so a phone that opened that link has no entry to pop.
     renderApp(["/warehouse/documents/7"]);
     back();
-    expect(at()).toBe("/warehouse");
+    expect(at()).toBe("/launcher");
+  });
+
+  it("never climbs from History to a root that sends the person straight back", () => {
+    renderApp(["/warehouse/history"]);
+    back();
+    expect(at()).toBe("/launcher");
   });
 
   it("goes home when the module registers no screen above this one", () => {
-    // `/inventory` has a list and a stock screen, but no root of its own: the
+    // In this fixture `/inventory` has a stock screen but no root of its own: the
     // climb runs out of screens and the launcher is the only answer left.
     renderApp(["/inventory/items/42"]);
     back();

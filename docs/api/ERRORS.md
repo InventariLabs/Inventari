@@ -710,6 +710,7 @@ apart.
 | `TEMPLATE_IMPORT_WRONG_VERSION` | The file was exported in format version {version}; this installation reads version {supported}. |
 | `TEMPLATE_IN_USE_BY_ITEMS` | Cannot delete template: it is used by {count} item(s) |
 | `TEMPLATE_NOT_BUILTIN_COPY` | This template was not copied from a built-in layout |
+| `TEMPLATE_NOT_SAVED_SYNTAX` | The template was not saved: line {line}: {detail} |
 | `TEMPLATE_OTHER_ORGANIZATION` | Template belongs to a different organization |
 | `TOKEN_INVALID` | Invalid authentication token |
 | `TRANSFER_CANNOT_SPLIT_SERIALIZED_RECORD` | A transfer cannot split the serialized record {serial_number}; transfer the whole record. |
@@ -751,6 +752,7 @@ apart.
 | `WMS_LINE_NOT_FOUND` | The session line was not found. |
 | `WMS_LINE_NOT_PENDING` | The session line was not found or is no longer pending. |
 | `WMS_NOTHING_TO_UNDO` | This line has nothing recorded to undo. |
+| `WMS_PICK_DOCUMENT_IN_OWN_SESSION` | Document {number} is already being picked in your own session, so the picking session was not started. |
 | `WMS_PICK_DOCUMENT_IN_SESSION` | Document {number} is already being picked in another session (opened by {owner}), so the picking session was not started. |
 | `WMS_PICK_DOCUMENT_NOT_CONFIRMED` | Document {number} is not confirmed, so the picking session was not started. Only confirmed documents can be picked. |
 | `WMS_PICK_DOCUMENT_NOT_DISPATCH` | Document {number} is not a dispatch, so the picking session was not started. Only dispatches can be picked together. |
