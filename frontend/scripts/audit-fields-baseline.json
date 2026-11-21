@@ -93,26 +93,6 @@
       "section": "values"
     },
     {
-      "language": "en",
-      "key": "usage_customer",
-      "section": "values"
-    },
-    {
-      "language": "en",
-      "key": "usage_internal",
-      "section": "values"
-    },
-    {
-      "language": "en",
-      "key": "usage_inventory",
-      "section": "values"
-    },
-    {
-      "language": "en",
-      "key": "usage_production",
-      "section": "values"
-    },
-    {
       "language": "pl",
       "key": "BOTH",
       "section": "values"
@@ -200,26 +180,6 @@
     {
       "language": "pl",
       "key": "old_status_in_progress",
-      "section": "values"
-    },
-    {
-      "language": "pl",
-      "key": "usage_customer",
-      "section": "values"
-    },
-    {
-      "language": "pl",
-      "key": "usage_internal",
-      "section": "values"
-    },
-    {
-      "language": "pl",
-      "key": "usage_inventory",
-      "section": "values"
-    },
-    {
-      "language": "pl",
-      "key": "usage_production",
       "section": "values"
     },
     {
@@ -313,26 +273,6 @@
       "section": "values"
     },
     {
-      "language": "de",
-      "key": "usage_customer",
-      "section": "values"
-    },
-    {
-      "language": "de",
-      "key": "usage_internal",
-      "section": "values"
-    },
-    {
-      "language": "de",
-      "key": "usage_inventory",
-      "section": "values"
-    },
-    {
-      "language": "de",
-      "key": "usage_production",
-      "section": "values"
-    },
-    {
       "language": "fr",
       "key": "BOTH",
       "section": "values"
@@ -423,26 +363,6 @@
       "section": "values"
     },
     {
-      "language": "fr",
-      "key": "usage_customer",
-      "section": "values"
-    },
-    {
-      "language": "fr",
-      "key": "usage_internal",
-      "section": "values"
-    },
-    {
-      "language": "fr",
-      "key": "usage_inventory",
-      "section": "values"
-    },
-    {
-      "language": "fr",
-      "key": "usage_production",
-      "section": "values"
-    },
-    {
       "language": "es",
       "key": "BOTH",
       "section": "values"
@@ -530,26 +450,6 @@
     {
       "language": "es",
       "key": "old_status_in_progress",
-      "section": "values"
-    },
-    {
-      "language": "es",
-      "key": "usage_customer",
-      "section": "values"
-    },
-    {
-      "language": "es",
-      "key": "usage_internal",
-      "section": "values"
-    },
-    {
-      "language": "es",
-      "key": "usage_inventory",
-      "section": "values"
-    },
-    {
-      "language": "es",
-      "key": "usage_production",
       "section": "values"
     }
   ]

@@ -391,7 +391,7 @@ describe("check-audit-fields enum values", () => {
   });
 
   it("names the key the renderer reads for a lowercase value", () => {
-    // `usage: planted` is worded through `usage_planted`; the bare lowercase
+    // `http_method: planted` is worded through `http_method_planted`; the bare lowercase
     // key would change nothing on screen, so it is never the one demanded.
     const saved = JSON.parse(
       readFileSync(join(ROOT, "scripts/audit-snapshot-keys.json"), "utf8"),
@@ -399,7 +399,7 @@ describe("check-audit-fields enum values", () => {
     const artefact = join(dir, "lowercase.json");
     writeFileSync(
       artefact,
-      JSON.stringify({ ...saved, values: [...saved.values, "usage:planted"] }),
+      JSON.stringify({ ...saved, values: [...saved.values, "http_method:planted"] }),
     );
 
     const { status, stdout, stderr } = spawnSync(
@@ -414,7 +414,7 @@ describe("check-audit-fields enum values", () => {
     const output = `${stdout}${stderr}`;
 
     expect(status).toBe(1);
-    expect(output).toContain("en: usage_planted (values)");
+    expect(output).toContain("en: http_method_planted (values)");
     expect(output).not.toContain(": planted (values)");
   });
 
@@ -428,9 +428,15 @@ describe("check-audit-fields enum values", () => {
 
   it("leaves a field the renderer words from another dictionary alone", () => {
     expect(
-      valueKeys(["role:owner", "usage:internal", "type:SUPPLIER"]).sort(),
-    ).toEqual(["SUPPLIER", "usage_internal"]);
+      valueKeys([
+        "role:owner",
+        "usage:internal",
+        "type:SUPPLIER",
+        "http_method:post",
+      ]).sort(),
+    ).toEqual(["SUPPLIER", "http_method_post"]);
     expect(resolverFields().has("role")).toBe(true);
+    expect(resolverFields().has("usage")).toBe(true);
   });
 
   it("holds the values the backend writes to the baseline, today", () => {

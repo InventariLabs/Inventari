@@ -364,6 +364,7 @@ const VALUE_RESOLVERS: Record<
       defaultValue: "",
     }),
   // What a location is for: the system's own word, not a column value.
+  // i18n-keys: internal | customer | inventory | production
   usage: (t, code) => t(`locations:usage.${code}`, { defaultValue: "" }),
   role: (t, code) =>
     t(`common:settings.organization.memberRoles.${code}`, {

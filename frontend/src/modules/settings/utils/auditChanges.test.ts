@@ -515,13 +515,14 @@ describe("auditChanges scan session journal", () => {
 });
 
 describe("auditChanges lowercase codes", () => {
-  // `usage: production` is not a capitalised code, so the renderer reads the
-  // catalogue under the field's own name, `usage_production`.
+  // `http_method: patch` is not a capitalised code, so the renderer reads the
+  // catalogue under the field's own name, `http_method_patch`. A field with a
+  // dictionary of its own (`usage`) keeps that dictionary.
   const catalogue = {
     common: {
       settings: {
         audit: {
-          values: { usage_production: "Produkcyjna", internal: "NOPE" },
+          values: { http_method_patch: "Zmiana częściowa", internal: "NOPE" },
         },
       },
     },
@@ -530,13 +531,26 @@ describe("auditChanges lowercase codes", () => {
 
   it("words a lowercase value through its field-scoped key", () => {
     const changes = auditChanges(
-      { usage: "production" },
+      { http_method: "patch" },
       "CREATE",
       undefined,
       screenT,
     );
 
-    expect(changes).toEqual([{ path: "usage", from: null, to: "Produkcyjna" }]);
+    expect(changes).toEqual([
+      { path: "http_method", from: null, to: "Zmiana częściowa" },
+    ]);
+  });
+
+  it("words a usage through the locations dictionary, not the audit one", () => {
+    const withUsage = namespacedT({
+      ...catalogue,
+      locations: { usage: { production: "Produkcja" } },
+    }) as never;
+
+    expect(
+      auditChanges({ usage: "production" }, "CREATE", undefined, withUsage),
+    ).toEqual([{ path: "usage", from: null, to: "Produkcja" }]);
   });
 
   it("does not read the bare lowercase value, which would reword free text", () => {

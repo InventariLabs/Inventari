@@ -128,6 +128,7 @@
     "modules/settings/utils/auditChanges.ts::equipment:assignments.condition_${code.toLowerCase()}": 1,
     "modules/settings/utils/auditChanges.ts::equipment:status.${code.toLowerCase()}": 1,
     "modules/settings/utils/auditChanges.ts::items:fieldOptions.${leaf}.${value}": 1,
+    "modules/settings/utils/auditChanges.ts::items:fields.${segment}": 1,
     "modules/settings/utils/auditChanges.ts::modules:fieldBuilder.types.${d.type}": 1,
     "modules/settings/utils/auditChanges.ts::modules:modules.${name}.${name === \"core\" ? \"title\" : \"name\"}": 1,
     "modules/settings/utils/auditChanges.ts::partners:types.${code}": 1,
