@@ -115,6 +115,22 @@ function segmentLit(key: string, statusFilter: string, checkedOut: boolean) {
   return statusFilter === key || (key === "DEPLOYED" && checkedOut);
 }
 
+/**
+ * How many matches sit on other pages, said only once the whole page is
+ * selected: "Only this page is selected" describes that selection and nothing
+ * smaller, and one tap on the rest of the page's rows is always available.
+ */
+function pastPage(
+  allMatching: boolean,
+  selected: ReadonlySet<string>,
+  items: readonly unknown[],
+  total: number,
+): number {
+  return allMatching || selected.size < items.length
+    ? 0
+    : Math.max(0, total - items.length);
+}
+
 export default function AssetListPage() {
   const { t } = useTranslation("equipment");
   const { setHeader } = useModulePageHeader();
@@ -408,11 +424,7 @@ export default function AssetListPage() {
       {hasSelection && canWrite && (
         <AssetBulkActionsBar
           selectedCount={selectedCount}
-          unreachedMatches={
-            allMatching || selectedIds.size < items.length
-              ? 0
-              : Math.max(0, total - items.length)
-          }
+          unreachedMatches={pastPage(allMatching, selectedIds, items, total)}
           matchingTotal={total}
           allMatching={allMatching}
           onSelectAllMatching={selectAllMatching}
