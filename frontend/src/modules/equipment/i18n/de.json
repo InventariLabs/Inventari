@@ -66,7 +66,8 @@
       "assets_one": "{{count}} Gerät",
       "assets_other": "{{count}} Geräte",
       "issued_one": "{{count}} ausgeliehen",
-      "issued_other": "{{count}} ausgeliehen"
+      "issued_other": "{{count}} ausgeliehen",
+      "retired_total": "ausgemustert: {{n}}"
     },
     "fleet": {
       "title": "Flotte nach Kategorie",
@@ -176,7 +177,7 @@
     "technician_placeholder": "Name des Technikers",
     "type_label": "Typ",
     "deleteAriaLabel": "Wartungseintrag löschen",
-    "confirmDeleteTitle": "Wartungsprotokoll löschen?",
+    "confirmDeleteTitle": "Wartungseintrag löschen?",
     "confirmDeleteMessage": "„{{title}}“ wird dauerhaft entfernt.",
     "log_failed": "Serviceeintrag konnte nicht hinzugefügt werden",
     "type_required": "Wählen Sie die Art der Arbeit",
@@ -629,7 +630,7 @@
     "launching": "Wird gestartet…",
     "complete": "Abschließen",
     "viewDetail": "Details",
-    "progressTitle": "Antwortfortschritt",
+    "progressTitle": "Antwortfortschritt (nach Personen gezählt)",
     "responsesTitle": "Einzelne Antworten",
     "noResponses": "Noch keine Antworten. Starten Sie die Attestierung, um Links zu generieren.",
     "sendReminders": "Erinnerungen senden",
@@ -808,7 +809,8 @@
     "type_other": "Sonstiges",
     "confirmDeleteTitle": "Anhang löschen?",
     "confirmDeleteMessage": "„{{name}}“ wird dauerhaft entfernt.",
-    "deleteFile": "{{name}} löschen"
+    "deleteFile": "{{name}} löschen",
+    "openFile": "{{name}} öffnen"
   },
   "mode": {
     "single": "Einzeln",
@@ -869,7 +871,8 @@
     "new_status": "Neuer Status",
     "target_location": "Ziel-Lagerort",
     "select_location": "Lagerort auswählen…",
-    "no_email_warning": "Für diese Person ist keine E-Mail-Adresse hinterlegt — die herausgegebenen Geräte erscheinen nicht in ihrer Ansicht „Meine Geräte”."
+    "no_email_warning": "Für diese Person ist keine E-Mail-Adresse hinterlegt — die herausgegebenen Geräte erscheinen nicht in ihrer Ansicht „Meine Geräte”.",
+    "return_date_consequence": "Diese Ausgaben haben kein Rückgabedatum und können daher nie im Bericht über überfällige Rückgaben erscheinen."
   },
   "my_assets": {
     "title": "Meine Geräte",

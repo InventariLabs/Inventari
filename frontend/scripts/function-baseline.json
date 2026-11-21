@@ -9,7 +9,7 @@
     },
     "src/modules/equipment/pages/AssetListPage.tsx": {
       "AssetListPage": [
-        43
+        42
       ]
     },
     "src/modules/inventory/hooks/useItemForm.ts": {

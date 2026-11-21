@@ -113,7 +113,7 @@ test.describe("Equipment — asset list responsive smoke", () => {
       page.getByRole("button", { name: /sort by location/i }),
     ).toBeVisible();
     await expect(
-      page.getByText("Held by", { exact: true }).first(),
+      page.getByRole("columnheader", { name: /held by/i }),
     ).toBeVisible();
 
     // Sorting by name asc puts Alpha Monitor first, while the default

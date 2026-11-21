@@ -27,6 +27,7 @@ import { useAppMutation } from "@/lib/api/mutationFactory";
 import { apiErrorStatus, extractApiError } from "@/lib/errors";
 import type { AuditResponseRecord } from "@/modules/equipment/api/equipment";
 import { formatDate } from "@/utils/helpers";
+import { setOrganizationCountry } from "@/utils/formatters";
 
 // ---------------------------------------------------------------------------
 // Unauthenticated API helpers (no /api/v1 prefix needed for public endpoint)
@@ -297,6 +298,10 @@ export default function AttestationPublicPage() {
   // is a refusal — an answer already given still wins (see StatusDisplay).
   const closedReason = displayResponse.closed_reason ?? null;
   const answering = !isResolved && !closedReason;
+  // A holder following the emailed link has no session, so the app never
+  // learned the organization's country; the page reads dates the way the
+  // organization's own screens print them.
+  setOrganizationCountry(displayResponse.organization_country);
 
   return (
     <div className="min-h-screen bg-surface flex items-center justify-center p-4">

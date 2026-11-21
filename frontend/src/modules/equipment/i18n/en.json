@@ -66,7 +66,8 @@
       "assets_one": "{{count}} asset",
       "assets_other": "{{count}} assets",
       "issued_one": "{{count}} checked out",
-      "issued_other": "{{count}} checked out"
+      "issued_other": "{{count}} checked out",
+      "retired_total": "retired: {{n}}"
     },
     "fleet": {
       "title": "Fleet by category",
@@ -176,7 +177,7 @@
     "technician_placeholder": "Technician name",
     "type_label": "Type",
     "deleteAriaLabel": "Delete maintenance entry",
-    "confirmDeleteTitle": "Delete maintenance log?",
+    "confirmDeleteTitle": "Delete maintenance entry?",
     "confirmDeleteMessage": "This permanently removes \"{{title}}\".",
     "log_failed": "Failed to add the service entry",
     "type_required": "Choose what kind of work this was",
@@ -629,7 +630,7 @@
     "launching": "Launching…",
     "complete": "Complete",
     "viewDetail": "Details",
-    "progressTitle": "Response Progress",
+    "progressTitle": "Response progress (counted by person)",
     "responsesTitle": "Individual Responses",
     "noResponses": "No responses yet. Launch the attestation to generate links.",
     "sendReminders": "Send Reminders",
@@ -808,7 +809,8 @@
     "type_other": "Other",
     "confirmDeleteTitle": "Delete attachment?",
     "confirmDeleteMessage": "This permanently removes \"{{name}}\".",
-    "deleteFile": "Delete {{name}}"
+    "deleteFile": "Delete {{name}}",
+    "openFile": "Open {{name}}"
   },
   "mode": {
     "single": "Single",
@@ -869,7 +871,8 @@
     "new_status": "New Status",
     "target_location": "To location",
     "select_location": "Select location…",
-    "no_email_warning": "No email on record for this person — the issued assets will not appear in their My Assets view."
+    "no_email_warning": "No email on record for this person — the issued assets will not appear in their My Assets view.",
+    "return_date_consequence": "These checkouts have no return date, so they can never appear in the overdue returns report."
   },
   "my_assets": {
     "title": "My Assets",

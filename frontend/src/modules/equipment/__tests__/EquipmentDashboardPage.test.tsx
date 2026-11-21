@@ -343,8 +343,11 @@ describe("the equipment overview", () => {
     expect(
       await screen.findByRole("heading", { name: "Fleet under control" }),
     ).toBeInTheDocument();
-    // Retired assets are out of the fleet in the sentence as in the bars.
-    expect(screen.getByText("2 assets · 1 checked out")).toBeInTheDocument();
+    // Retired assets are out of the fleet in the sentence as in the bars, and
+    // the sentence names them so the "All assets (3)" link beside it adds up.
+    expect(
+      screen.getByText("2 assets · 1 checked out · retired: 1"),
+    ).toBeInTheDocument();
     await settle();
   });
 
@@ -483,7 +486,9 @@ describe("the equipment overview", () => {
     renderPage();
     // Retired assets are out of the fleet in both places. The sentence said
     // 79 while the tile said 80 on the same screen.
-    expect(await screen.findByText(/^79 assets/)).toBeInTheDocument();
+    expect(
+      await screen.findByText("79 assets · 4 checked out · retired: 1"),
+    ).toBeInTheDocument();
     const tile = screen.getByText("In the fleet").previousElementSibling;
     expect(tile).toHaveTextContent("79");
     await settle();

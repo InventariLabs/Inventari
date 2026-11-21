@@ -28,6 +28,7 @@ check-in pin beside it passes either way.
 
 from __future__ import annotations
 
+from types import SimpleNamespace
 from typing import Any
 from uuid import uuid4
 
@@ -395,7 +396,7 @@ def _second_asset(
 
 
 def _retire_in_bulk(
-    client: TestClient, headers: dict[str, str], items: list[Item]
+    client: TestClient, headers: dict[str, str], items: list[Any]
 ) -> Any:
     return client.patch(
         '/api/v1/equipment/assets/bulk',
@@ -436,10 +437,8 @@ class TestARetiredAssetReturnsWhatItWasHolding:
         held = _second_asset(
             db_session, eq_org, eq_storage_location, eq_category, name='ThinkPad X1'
         )
-        refused = _second_asset(
-            db_session, eq_org, eq_storage_location, eq_category, name='Old router'
-        )
-        _retire(refused, db_session)
+        # An id nothing answers to: the batch refuses that row and goes on.
+        refused = SimpleNamespace(id=uuid4())
         issued = _issue_in_bulk(client, eq_auth_headers, held, 'Alice')
         assert issued.status_code == status.HTTP_200_OK, issued.text
         assert issued.json()['updated'] == 1
@@ -462,7 +461,7 @@ class TestARetiredAssetReturnsWhatItWasHolding:
         body = response.json()
         assert body['updated'] == 2
         assert len(body['errors']) == 1, (
-            'the asset that is already retired is refused, and refusing it '
+            'the asset that does not exist is refused, and refusing it '
             'must not stop the two that went through'
         )
         assert [event for event, _ in emitted] == [EquipmentEvent.CHECKIN], (

@@ -95,7 +95,12 @@ export default function EquipmentDashboardPage() {
     ? [
         t("dashboard.summary.assets", { count: fleetSize(d) }),
         t("dashboard.summary.issued", { count: d.active_assignments }),
-      ].join(" · ")
+        // "All assets (n)" beside it counts the retired ones too; the
+        // sentence names them rather than leave two totals unexplained.
+        d.retired > 0 && t("dashboard.summary.retired_total", { n: d.retired }),
+      ]
+        .filter(Boolean)
+        .join(" · ")
     : undefined;
 
   const failed = dashboard.isError || overdue.isError || fleet.isError;
