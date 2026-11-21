@@ -6,6 +6,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  popoverTags,
   isScanned,
   overlayLayerTags,
   sheetTags,
@@ -50,6 +51,33 @@ describe("unnamedIn", () => {
   it("reports each unnamed dialog in a file", () => {
     const text = "<Sheet open>\n<Sheet open>";
     expect(unnamedIn("a.tsx", text)).toEqual(["a.tsx", "a.tsx"]);
+  });
+});
+
+describe("a popover panel", () => {
+  it("reads a multi-line PopoverPrimitive.Content tag", () => {
+    const text = [
+      "<PopoverPrimitive.Content",
+      "  onOpenAutoFocus={(e) => e.preventDefault()}",
+      '  className="p-1"',
+      ">",
+    ].join("\n");
+    expect(popoverTags(text)).toEqual([text]);
+  });
+
+  it("is a dialog with no name until it carries one", () => {
+    expect(
+      unnamedIn("a.tsx", '<PopoverPrimitive.Content className="p-1">'),
+    ).toEqual(["a.tsx"]);
+    expect(
+      unnamedIn("a.tsx", "<PopoverPrimitive.Content aria-label={label}>"),
+    ).toEqual([]);
+  });
+
+  it("is not a dialog when it states another role", () => {
+    expect(
+      unnamedIn("a.tsx", '<PopoverPrimitive.Content role="listbox">'),
+    ).toEqual([]);
   });
 });
 
@@ -273,7 +301,11 @@ describe("undismissibleIn", () => {
   });
 
   it("sees a layer written as a number", () => {
-    for (const z of ['className="fixed inset-0 z-50"', 'className="z-[150]"', 'style={{ zIndex: 400 }}']) {
+    for (const z of [
+      'className="fixed inset-0 z-50"',
+      'className="z-[150]"',
+      "style={{ zIndex: 400 }}",
+    ]) {
       const text = `function S() {\n  return <div role="dialog" ${z} />;\n}`;
       expect(undismissibleIn("a.tsx", text)).toEqual(["a.tsx"]);
     }

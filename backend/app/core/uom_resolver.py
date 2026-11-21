@@ -43,6 +43,14 @@ UOM_ALIASES: dict[str, str] = {
     'fluid ounces': 'fl oz',
     'cup': 'cup',
     'cups': 'cup',
+    'tablespoon': 'tbsp',
+    'tablespoons': 'tbsp',
+    'teaspoon': 'tsp',
+    'teaspoons': 'tsp',
+    'łyżka': 'tbsp',  # PL
+    'łyżki': 'tbsp',  # PL
+    'łyżeczka': 'tsp',  # PL
+    'łyżeczki': 'tsp',  # PL
     'pint': 'pt',
     'pints': 'pt',
     'quart': 'qt',

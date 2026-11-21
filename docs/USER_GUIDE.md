@@ -383,8 +383,8 @@ restores a quantity.
   below the minimum set with **Set stock alert**.
 - **Inventory → Overview** gathers all three in one **needs attention** card,
   which counts them in its heading, each product once, under its most urgent
-  reason. When Shopping Lists is on and something is low, **Replenish All**
-  proposes what to add to your shopping list.
+  reason. When Shopping Lists is on and something is low, **Review what to reorder**
+  opens the proposals to review; tick what to add to your shopping list.
 
 Expiry and low stock are shown on screen and in **Statistics**; they do not
 raise notifications in the bell.

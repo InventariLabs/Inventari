@@ -1018,6 +1018,8 @@
     "mg": "mg",
     "cup": "taza",
     "fl oz": "fl oz",
+    "tbsp": "cda.",
+    "tsp": "cdta.",
     "m": "m",
     "cm": "cm",
     "pt": "pinta",
@@ -1032,7 +1034,7 @@
   },
   "dashboard": {
     "products": "Productos",
-    "replenishAll": "Reabastecer todo",
+    "replenishAll": "Revisar qué reponer",
     "replenishPolicy": "Los productos con existencias en uso en otro lugar no se consideran bajos ni se vuelven a pedir.",
     "replenishModalTitle": "Revisar sugerencias",
     "replenishModalDesc": "Seleccione los productos que desea añadir a su lista de compras.",

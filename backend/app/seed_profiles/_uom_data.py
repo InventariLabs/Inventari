@@ -168,10 +168,10 @@ UOM_UNITS: list[dict[str, Any]] = [
 ]
 
 
-# US kitchen measures — food vertical, not the neutral base. A workspace in
-# the neutral mode picks its default unit between pieces, kilograms
-# and teacups. The food profile's seed adds these; installations that already
-# have the rows keep them (``uoms`` has no owner column and is referenced by
+# US kitchen measures (cups, spoons) — food vertical, not the neutral base. A
+# workspace in the neutral mode picks its default unit between pieces,
+# kilograms and teacups. The food profile's seed adds these; installations
+# that already have the rows keep them (``uoms`` has no owner column and is referenced by
 # items, so nothing is deleted anywhere).
 UOM_UNITS_US_KITCHEN: list[dict[str, Any]] = [
     {
@@ -187,6 +187,22 @@ UOM_UNITS_US_KITCHEN: list[dict[str, Any]] = [
         'name': 'Cup (US)',
         'symbol': 'cup',
         'factor': Decimal('236.588'),
+        'is_reference': False,
+        'rounding': Decimal('0.001'),
+    },
+    {
+        'category': 'Volume',
+        'name': 'Tablespoon',
+        'symbol': 'tbsp',
+        'factor': Decimal('14.7868'),
+        'is_reference': False,
+        'rounding': Decimal('0.001'),
+    },
+    {
+        'category': 'Volume',
+        'name': 'Teaspoon',
+        'symbol': 'tsp',
+        'factor': Decimal('4.92892'),
         'is_reference': False,
         'rounding': Decimal('0.001'),
     },

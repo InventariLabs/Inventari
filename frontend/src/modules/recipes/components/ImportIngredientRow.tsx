@@ -93,6 +93,7 @@ const ImportIngredientRow = memo(function ImportIngredientRow({
         <InlinePopover
           open={linkOpen}
           onOpenChange={setLinkOpen}
+          label={t("recipes:import_export.review_change_template")}
           className="w-64"
           trigger={
             <Button

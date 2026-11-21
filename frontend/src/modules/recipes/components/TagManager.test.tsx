@@ -122,29 +122,68 @@ describe("TagManager colour", () => {
   });
 });
 
+describe("TagManager colour swatches", () => {
+  it("names a swatch by its colour and the picker by what it is", async () => {
+    tags = [tag("dinner")];
+    render(<TagManager />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Set color" }));
+
+    expect(
+      await screen.findByRole("button", { name: "Set color to green" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Set color" })).toBeVisible();
+    expect(screen.queryByRole("button", { name: /#22c55e/ })).toBeNull();
+  });
+});
+
 describe("TagManager rename", () => {
   beforeEach(() => {
     vi.mocked(toast.error).mockClear();
     tags = [tag("dinner")];
   });
 
-  it("calls a failed rename a rename, not a merge", async () => {
+  const openRename = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(screen.getByRole("button", { name: /more actions/i }));
+    await user.click(await screen.findByRole("button", { name: "Rename" }));
+  };
+  const confirmRename = (user: ReturnType<typeof userEvent.setup>) =>
+    user.click(screen.getAllByRole("button", { name: "Rename" }).slice(-1)[0]);
+
+  it("keeps the dialog open with the reason and the typed name when the rename fails", async () => {
     // A rename travels as a merge into a new name, but the reader asked to
     // rename — the failure must not talk about merging tags.
     mergeMutate.mockRejectedValueOnce(new Error("Request failed"));
     const user = userEvent.setup();
     render(<TagManager />);
 
-    await user.click(screen.getByRole("button", { name: /more actions/i }));
-    await user.click(await screen.findByRole("button", { name: "Rename" }));
+    await openRename(user);
     await user.clear(await screen.findByLabelText("New name"));
     await user.type(screen.getByLabelText("New name"), "supper");
-    await user.click(
-      screen.getAllByRole("button", { name: "Rename" }).slice(-1)[0],
-    );
+    await confirmRename(user);
 
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith("Failed to rename the tag"),
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Request failed",
+    );
+    expect(screen.getByLabelText("New name")).toHaveValue("supper");
+  });
+
+  it("says a name another tag has will merge the two", async () => {
+    tags = [tag("quick"), tag("dinner")];
+    const user = userEvent.setup();
+    render(<TagManager />);
+
+    await user.click(
+      screen.getAllByRole("button", { name: /more actions/i })[0],
+    );
+    await user.click(await screen.findByRole("button", { name: "Rename" }));
+    const field = await screen.findByLabelText("New name");
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    await user.clear(field);
+    await user.type(field, "dinner");
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "already exists — renaming merges the two",
     );
   });
 });

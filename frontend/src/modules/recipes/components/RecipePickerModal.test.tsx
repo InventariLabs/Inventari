@@ -126,6 +126,31 @@ describe("RecipePickerModal — an empty picker is not a dead end", () => {
   });
 });
 
+describe("RecipePickerModal — a failed suggestions read", () => {
+  it("says it failed, with a retry, instead of 'No suggestions for this slot'", () => {
+    const refetch = vi.fn();
+    mocks.useMealPlanSuggestions.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: new Error("Request failed with status code 500"),
+      refetch,
+    });
+    mocks.useRecipes.mockReturnValue({
+      data: { items: [], total: 0 },
+      isError: false,
+      refetch: vi.fn(),
+    });
+    renderModal(vi.fn());
+
+    expect(
+      screen.queryByText("No suggestions for this slot"),
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /try again/i }));
+    expect(refetch).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe("RecipePickerModal — one height for both lists", () => {
   function twoLists() {
     mocks.useMealPlanSuggestions.mockReturnValue({

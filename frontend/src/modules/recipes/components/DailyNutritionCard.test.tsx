@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { withLanguage } from "@/test/mocks/i18n";
 import { DailyNutritionCard } from "./DailyNutritionCard";
 
 const day = (generic_values: boolean, date = "2026-11-02") => ({
@@ -36,5 +37,28 @@ describe("DailyNutritionCard — a value stays whole", () => {
       expect(screen.getByText(text)).toHaveClass("whitespace-nowrap");
     }
     expect(screen.getByText("Calories")).toHaveClass("whitespace-nowrap");
+  });
+});
+
+describe("DailyNutritionCard — the reader's decimal mark", () => {
+  it("writes fractional totals with the decimal comma on a Polish screen", async () => {
+    await withLanguage("pl", () => {
+      render(
+        <DailyNutritionCard
+          days={[
+            {
+              ...day(false),
+              carbs_g: 13.8,
+              protein_g: 0.87,
+              fat_g: 4,
+              calories_kcal: 121.99,
+            },
+          ]}
+        />,
+      );
+      for (const text of ["13,8 g", "0,87 g", "4 g", "121,99 kcal"]) {
+        expect(screen.getByText(text)).toBeInTheDocument();
+      }
+    });
   });
 });

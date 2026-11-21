@@ -22,7 +22,7 @@
     "show_less_tags": "Weniger anzeigen",
     "ready_to_cook": "Kochbereit ({{total}})",
     "almost_ready": "Fast vollständig ({{total}})",
-    "sort_newest": "Neueste",
+    "sort_newest": "Zuletzt geändert",
     "sort_name": "Name A-Z",
     "results_one": "Ergebnis",
     "results_other": "Ergebnisse"
@@ -244,7 +244,7 @@
   "actions": {
     "new_recipe": "Neues Rezept",
     "delete": "Löschen",
-    "delete_confirm": "Rezept „{{name}}“ löschen? Dies kann nicht rückgängig gemacht werden.",
+    "delete_confirm": "Rezept „{{name}}“ löschen? Essenspläne, in denen ein gelöschtes Rezept eingeplant ist, verlieren diese Mahlzeiten. Dies kann nicht rückgängig gemacht werden.",
     "start_picking": "Aus dem Bestand nehmen",
     "cook_for_stock_hint": "Erstellt einen Produktionslauf für eine Charge im Maker-Modul",
     "add_to_meal_plan_hint": "Plant dieses Rezept im Essenskalender",
@@ -334,7 +334,9 @@
     "load_failed": "Rezept konnte nicht geöffnet werden",
     "shopping_failed": "Konnte nicht zur Einkaufsliste hinzugefügt werden",
     "history_failed": "Notiz konnte nicht gespeichert werden",
-    "image_failed": "Bild konnte nicht verarbeitet werden"
+    "image_failed": "Bild konnte nicht verarbeitet werden",
+    "add_to_plan_failed": "Das Rezept konnte nicht zum Essensplan hinzugefügt werden",
+    "export_failed": "Das Rezept konnte nicht exportiert werden"
   },
   "cost": {
     "title": "Geschätzte Kosten",
@@ -368,6 +370,7 @@
     "rename": "Umbenennen",
     "rename_title": "Tag umbenennen",
     "rename_label": "Neuer Name",
+    "rename_merges": "Ein Tag „{{name}}“ existiert bereits — beim Umbenennen werden beide zusammengeführt, der alte Name verschwindet.",
     "rename_success_one": "Umbenannt: 1 Rezept aktualisiert",
     "rename_success_other": "Umbenannt: {{count}} Rezepte aktualisiert",
     "rename_failed": "Tag konnte nicht umbenannt werden",
@@ -558,7 +561,7 @@
       "bindInMain": "Ordnen Sie die KI-Verbindung für das Rezept-Parsing in Einstellungen → KI-Verbindungen zu."
     },
     "enableCostCalculation": "Kostenberechnung aktivieren",
-    "enableCostCalculationDescription": "Kostenaufschlüsselung pro Rezept anzeigen. Für private Haushalte deaktivieren.",
+    "enableCostCalculationDescription": "Kostenaufschlüsselung pro Rezept anzeigen. Ausschalten, wenn Sie die Preise der Zutaten nicht erfassen.",
     "registerProductionAsDocument": "Produktion als interne Abgänge registrieren",
     "registerProductionAsDocumentDescription": "Für jede abgeschlossene Produktion einen internen Abgang mit Prüfpfad anlegen. Standardmäßig deaktiviert."
   },
@@ -679,6 +682,7 @@
     "exclusions_count_other": "{{count}} Artikel ausgeschlossen",
     "generate_list_disabled_tooltip": "Zuerst Mahlzeiten hinzufügen",
     "needs_meals_hint": "Mindestens eine Mahlzeit hinzufügen, um eine Einkaufsliste zu erstellen oder den Plan zu kopieren.",
+    "needs_meals_hint_copy_only": "Füge mindestens eine Mahlzeit hinzu, um diesen Plan zu kopieren.",
     "not_cooked": "Nicht gekocht",
     "entry_move_error": "Mahlzeit konnte nicht verschoben werden. Bitte erneut versuchen.",
     "drag_to_move": "Zum Verschieben ziehen",
@@ -690,7 +694,8 @@
     "copy_confirm": "Kopieren",
     "copy_error": "Plan konnte nicht kopiert werden",
     "rate_title": "Wie war es?",
-    "rate_star": "{{value}} Sterne bewerten",
+    "rate_star_one": "Mit {{count}} Stern bewerten",
+    "rate_star_other": "Mit {{count}} Sternen bewerten",
     "rate_skip": "Überspringen",
     "rate_submit": "Bewerten",
     "rate_success": "Bewertung gespeichert",
@@ -770,7 +775,7 @@
     "pick_collection": "Sammlung wählen",
     "add": "Hinzufügen",
     "delete_selected": "Löschen",
-    "delete_confirm": "{{count}} ausgewählte Rezepte löschen? Dies kann nicht rückgängig gemacht werden.",
+    "delete_confirm": "{{count}} ausgewählte Rezepte löschen? Essenspläne, in denen ein gelöschtes Rezept eingeplant ist, verlieren diese Mahlzeiten. Dies kann nicht rückgängig gemacht werden.",
     "tag_title": "{{count}} Rezepte taggen",
     "tag_hint": "Tags mit Kommas trennen",
     "tag_placeholder": "z. B. Abendessen, vegan",
@@ -781,8 +786,8 @@
     "error": "Massenoperation fehlgeschlagen",
     "selected_count_one": "{{count}} ausgewählt",
     "selected_count_other": "{{count}} ausgewählt",
-    "delete_confirm_one": "{{count}} ausgewähltes Rezept löschen? Dies kann nicht rückgängig gemacht werden.",
-    "delete_confirm_other": "{{count}} ausgewählte Rezepte löschen? Dies kann nicht rückgängig gemacht werden.",
+    "delete_confirm_one": "{{count}} ausgewähltes Rezept löschen? Essenspläne, in denen ein gelöschtes Rezept eingeplant ist, verlieren diese Mahlzeiten. Dies kann nicht rückgängig gemacht werden.",
+    "delete_confirm_other": "{{count}} ausgewählte Rezepte löschen? Essenspläne, in denen ein gelöschtes Rezept eingeplant ist, verlieren diese Mahlzeiten. Dies kann nicht rückgängig gemacht werden.",
     "tag_title_one": "{{count}} Rezept taggen",
     "tag_title_other": "{{count}} Rezepte taggen",
     "deleted_one": "{{count}} Rezept gelöscht",
@@ -838,7 +843,16 @@
     "subtitle": "Kochen zu Hause: Ihre Gerichte, ihre Zutaten und was Sie kochen können"
   },
   "tags": {
-    "pick_colour": "Farbe {{colour}} verwenden"
+    "pick_colour": "Farbe {{colour}} verwenden",
+    "colour_red": "Rot",
+    "colour_orange": "Orange",
+    "colour_yellow": "Gelb",
+    "colour_green": "Grün",
+    "colour_cyan": "Türkis",
+    "colour_blue": "Blau",
+    "colour_violet": "Violett",
+    "colour_pink": "Rosa",
+    "colour_gray": "Grau"
   },
   "ai": {
     "purposeLabel": "Rezept aus Text lesen",

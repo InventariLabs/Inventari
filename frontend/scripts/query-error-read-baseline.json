@@ -12,7 +12,6 @@
     "modules/purchase_orders/components/PricelistEntriesTable.tsx :: PricelistEntriesTable :: entries with isLoading but no failure prop": 1,
     "modules/purchase_orders/components/ReorderRulesTable.tsx :: ReorderRulesTable :: rules with isLoading but no failure prop": 1,
     "modules/purchase_orders/pages/ReorderRulesPage.tsx :: ReorderRulesPage :: rules.length": 1,
-    "modules/recipes/components/SuggestedRecipes.tsx :: SuggestedRecipes :: suggestions with isLoading but no failure prop": 1,
     "modules/recipes/pages/RecipesPage.tsx :: RecipesPage :: allTags.length": 1,
     "modules/recipes/pages/RecipesPage.tsx :: RecipesPage :: total>0": 1,
     "modules/recipes/pages/UnlinkedIngredientsPage.tsx :: UnlinkedIngredientsPage :: proposedItems.length": 1,

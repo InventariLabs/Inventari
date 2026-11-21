@@ -70,6 +70,7 @@ export default function IngredientLinkButton({
     <InlinePopover
       open={open}
       onOpenChange={setOpen}
+      label={t("availability.link_to_product")}
       className="w-64"
       trigger={
         <Button
