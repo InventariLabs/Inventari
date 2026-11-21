@@ -36,6 +36,7 @@ const state = vi.hoisted(() => ({
   postNew: vi.fn(),
   createDraft: vi.fn(),
   confirm: vi.fn(),
+  assign: vi.fn(),
   undo: vi.fn(),
   search: vi.fn(),
   importResult: {} as Record<string, unknown>,
@@ -49,6 +50,20 @@ const rights = vi.hoisted(() => ({ write: true }));
 const ordersHook = vi.hoisted(() => vi.fn());
 const supplierHook = vi.hoisted(() => vi.fn());
 const openReceiptsHook = vi.hoisted(() => vi.fn());
+
+vi.mock("@/modules/warehouse/hooks/useWorkItems", () => ({
+  useAssignWorkItem: () => ({ mutate: state.assign }),
+}));
+
+vi.mock("@/store/authStore", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/store/authStore")>();
+  const signedIn = { user: { id: "user-me" } };
+  return {
+    ...actual,
+    useAuthStore: (selector?: (s: typeof signedIn) => unknown) =>
+      selector ? selector(signedIn) : signedIn,
+  };
+});
 
 vi.mock("@/hooks/useCanWrite", () => ({
   useCanWrite: () => rights.write,
@@ -1972,6 +1987,7 @@ describe("ReceiveGoodsPage", () => {
     beforeEach(() => {
       holdAPhone();
       camera.onCode = null;
+      state.assign.mockReset();
       state.createDraft.mockResolvedValue({ id: "doc-9", status: "DRAFT" });
       state.confirm
         .mockReset()
@@ -2032,6 +2048,40 @@ describe("ReceiveGoodsPage", () => {
       );
       expect(state.confirm).toHaveBeenCalledWith("doc-9");
       expect(state.postNew).not.toHaveBeenCalled();
+      // The delivery becomes the reader's when its receiving starts, after
+      // the receipt is confirmed — not before anything was checked.
+      expect(state.assign).toHaveBeenCalledWith(
+        {
+          sourceKind: "document",
+          sourceId: "doc-9",
+          assigneeId: "user-me",
+          onlyIfUnassigned: true,
+        },
+        expect.anything(),
+      );
+      expect(state.confirm.mock.invocationCallOrder[0]).toBeLessThan(
+        state.assign.mock.invocationCallOrder[0],
+      );
+    });
+
+    it("assigns nothing when the start is refused before anything is sent", async () => {
+      state.locationRequests = serveLocations([
+        { id: "loc-1", name: "Main Warehouse" },
+        { id: "loc-2", name: "Annex" },
+      ]);
+      renderAt("/warehouse/receive");
+      await userEvent.selectOptions(screen.getByLabelText("From"), "partner-1");
+
+      await userEvent.click(
+        await screen.findByRole("button", {
+          name: "Receive one product at a time",
+        }),
+      );
+
+      expect(
+        await screen.findByText("Choose the location the goods go to."),
+      ).toBeInTheDocument();
+      expect(state.assign).not.toHaveBeenCalled();
     });
 
     it("receives a product the order does not list beside the ordered one", async () => {

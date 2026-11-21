@@ -319,10 +319,13 @@ export default function DocumentsTodoPage() {
   // it: losing that claim leaves the task with its holder, says so and opens
   // nothing rather than reassigning somebody else's work. Work already given
   // to somebody is opened as it is — tapping never takes it away from them.
+  // An order's delivery opens the receive screen, where nothing has begun
+  // yet and a press can still be refused: it is taken when its receiving
+  // starts there, not on the tap.
   const take =
     isPhone && canWrite && userId
       ? (task: WorkItem, open: () => void) => {
-          if (task.assignee_id) {
+          if (task.assignee_id || task.next_action === "receive_delivery") {
             open();
             return;
           }
