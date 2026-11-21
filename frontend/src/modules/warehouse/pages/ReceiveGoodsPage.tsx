@@ -731,18 +731,15 @@ function usePhoneDoor(
       }
       // The receiving starts now, so the delivery becomes the reader's task
       // now — not on the To do tap that only opened this screen. The receipt
-      // is new and nobody can hold it yet; a refusal would change nothing
-      // the session is not already saying, so it is not reported.
+      // is new and nobody can hold it yet; a failure is reported like any
+      // other refused write.
       if (userId) {
-        assign.mutate(
-          {
-            sourceKind: "document",
-            sourceId: id,
-            assigneeId: userId,
-            onlyIfUnassigned: true,
-          },
-          { onError: () => undefined },
-        );
+        assign.mutate({
+          sourceKind: "document",
+          sourceId: id,
+          assigneeId: userId,
+          onlyIfUnassigned: true,
+        });
       }
       navigate(`/warehouse/documents/${id}#receive`, { replace: true });
     },

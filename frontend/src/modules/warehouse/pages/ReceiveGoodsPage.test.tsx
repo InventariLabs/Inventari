@@ -2050,15 +2050,12 @@ describe("ReceiveGoodsPage", () => {
       expect(state.postNew).not.toHaveBeenCalled();
       // The delivery becomes the reader's when its receiving starts, after
       // the receipt is confirmed — not before anything was checked.
-      expect(state.assign).toHaveBeenCalledWith(
-        {
-          sourceKind: "document",
-          sourceId: "doc-9",
-          assigneeId: "user-me",
-          onlyIfUnassigned: true,
-        },
-        expect.anything(),
-      );
+      expect(state.assign).toHaveBeenCalledWith({
+        sourceKind: "document",
+        sourceId: "doc-9",
+        assigneeId: "user-me",
+        onlyIfUnassigned: true,
+      });
       expect(state.confirm.mock.invocationCallOrder[0]).toBeLessThan(
         state.assign.mock.invocationCallOrder[0],
       );
