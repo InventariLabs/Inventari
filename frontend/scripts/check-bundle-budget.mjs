@@ -549,6 +549,16 @@ const dist = join(root, "dist");
  * budget moves a step of five, to 485; the other screens stand under theirs
  * (app first paint 405.5, login 410.3, launcher 425.4, start 643.8, issue
  * 591.2, history 616.3, products 635.0, initial 194.0).
+ *
+ * Re-measured 2026-11-21 on the branch that gives read-only accounts their
+ * answers and names the rows its error lines are about, merged with the line
+ * that closes the catalogue, locations and labels findings: the products
+ * screen measures 635.3 KiB gz against its 635 (635.0 on the line alone). The
+ * branch adds a batch-delete reason dialog on that page and copy in six
+ * languages; no import walked in. That phone budget moves a step of five, to
+ * 640; the other screens stand under theirs (app first paint 405.7, login
+ * 410.5, launcher 425.5, start 644.3, receive 480.5, issue 591.4, history
+ * 616.5, initial 194.0).
  */
 const BUDGETS = {
   initial: 245,

@@ -381,6 +381,7 @@ export function useWmsReceiving(documentId: string) {
     errorCode: session.errorCode,
     errorStatus: session.errorStatus,
     startError: session.startError,
+    errorLineId: session.errorLineId,
     errorContext: (session.errorContext === "shortfall"
       ? "short_receive"
       : session.errorContext) as WmsReceivingFailureContext | null,

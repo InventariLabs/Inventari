@@ -1208,6 +1208,7 @@ describe("ItemsPage — bulk selection", () => {
     // bulk delete that dropped rows — or deleted the wrong ones — would have
     // passed it.
     const deleted: string[] = [];
+    const reasons: string[] = [];
     server.use(
       http.get("/api/v1/items", () =>
         HttpResponse.json({
@@ -1237,8 +1238,10 @@ describe("ItemsPage — bulk selection", () => {
           total: 3,
         }),
       ),
-      http.delete("/api/v1/items/:id", ({ params }) => {
+      http.delete("/api/v1/items/:id", async ({ params, request }) => {
         deleted.push(String(params.id));
+        const body = (await request.json()) as { reason?: string };
+        reasons.push(String(body.reason));
         return new HttpResponse(null, { status: 204 });
       }),
     );
@@ -1260,15 +1263,20 @@ describe("ItemsPage — bulk selection", () => {
     });
     fireEvent.click(within(bar).getByRole("button", { name: /delete|usuń/i }));
 
-    // The confirm step is a plain overlay, not a role="dialog" — find its
-    // button among the two that now read "Delete".
-    const confirmButtons = await screen.findAllByRole("button", {
+    // The batch asks why once, in the dialog a single delete uses; the
+    // confirm button stays disabled until a reason is chosen.
+    const reason = await screen.findByTestId("deletion-reason");
+    const confirmButtons = screen.getAllByRole("button", {
       name: /^delete$|^usuń$/i,
     });
-    fireEvent.click(confirmButtons[confirmButtons.length - 1]);
+    const confirm = confirmButtons[confirmButtons.length - 1];
+    expect(confirm).toBeDisabled();
+    fireEvent.change(reason, { target: { value: "EXPIRED" } });
+    fireEvent.click(confirm);
 
     await waitFor(() => expect(deleted.length).toBe(2));
     expect(deleted.sort()).toEqual(["a", "b"]);
+    expect(reasons).toEqual(["EXPIRED", "EXPIRED"]);
   });
 
   it("offers actions once rows are selected", async () => {

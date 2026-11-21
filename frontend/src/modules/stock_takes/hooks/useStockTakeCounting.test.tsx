@@ -8,6 +8,7 @@ import { queryKeys } from "@/hooks/queries/keys";
 import { useFormGuardStore } from "@/store/formGuardStore";
 import { server } from "@/test/mocks/server";
 import { http, HttpResponse } from "msw";
+import { toast } from "sonner";
 import { onePage } from "@/test/mocks/page";
 
 vi.mock("sonner", () => ({
@@ -181,6 +182,44 @@ describe("useStockTakeCounting", () => {
 
     await waitFor(() =>
       expect(result.current.countedQuantities["item-1"]).toBe("2.15"),
+    );
+  });
+
+  it("names the row whose count could not be saved, not only its product", async () => {
+    const row = { ...mockStockTake.items[0], item_name: "Honey" };
+    server.use(
+      http.get("/api/v1/stock-takes/:id", () =>
+        HttpResponse.json({
+          ...mockStockTake,
+          items: [
+            { ...row, shelf_location: "A-1-01", lot_name: "LOT-A" },
+            {
+              ...row,
+              id: "sti-2",
+              item_id: "item-2",
+              shelf_location: "B-2-02",
+              lot_name: "LOT-B",
+            },
+          ],
+        }),
+      ),
+      http.patch("/api/v1/stock-takes/:id/items/:itemId/count", () =>
+        HttpResponse.json({}, { status: 500 }),
+      ),
+    );
+
+    const { result } = await renderLoaded();
+    act(() => {
+      result.current.handleQuantityChange("item-2", "7");
+    });
+    act(() => {
+      result.current.handleSaveItem("item-2");
+    });
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Failed to save the count of Honey (B-2-02 • Batch LOT-B)",
+      ),
     );
   });
 

@@ -512,6 +512,23 @@ async def export_labels_png(
         # nobody has taken yet.
         return StreamingResponse(io.BytesIO(png_data), media_type='image/png')
 
+    if current_user.has_permission(
+        SystemPermission.ITEMS_READ
+    ) and not current_user.has_permission(SystemPermission.ITEMS_WRITE):
+        # Marking a label printed changes its state, and for a products reader
+        # this door is a read: it takes the file and leaves the pool as it was.
+        # A module's register reader prints its own register's labels on
+        # purpose, and that printing spends them.
+        return StreamingResponse(
+            io.BytesIO(png_data),
+            media_type='image/png',
+            headers={
+                'Content-Disposition': (
+                    f'attachment; filename=labels_{len(labels)}pcs.png'
+                )
+            },
+        )
+
     await core_api.labels.mark_as_printed_by_ids_async(
         db, [lbl.id for lbl in labels], org_id
     )

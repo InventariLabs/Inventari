@@ -1,3 +1,4 @@
+import type { TFunction } from "i18next";
 import { useState, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +19,7 @@ import type { StockTakeItem } from "@/modules/stock_takes/types/stock-takes";
 import { toast } from "sonner";
 import { useConfirm } from "@/hooks/useConfirm";
 import { reasonIsComplete } from "@/modules/shared/components/ReasonCodeField";
+import { recordMarks } from "@/modules/stock_takes/recordMarks";
 import { useCountingDrafts } from "@/modules/stock_takes/hooks/useCountingDrafts";
 import { useShelfCounting } from "@/modules/stock_takes/hooks/useShelfCounting";
 import {
@@ -166,6 +168,31 @@ function useSavesInFlight(
     return saved;
   };
   return { isSavingCounts: inFlight > 0, trackSave };
+}
+
+/** What a refused count says: the server's own sentence, else a generic one
+ * that names the row — its product, then its shelf, batch and expiry, which
+ * tell it from its siblings under one code — because the toast outlives the
+ * card the reader is on. */
+function saveFailureMessage(
+  t: TFunction,
+  error: Error,
+  line: StockTakeItem | undefined,
+  item: Item | undefined,
+): string {
+  if (!line?.item_name) {
+    return extractApiError(error, t("stock_takes:errors.saveFailed"));
+  }
+  const marks = [line.shelf_location, ...recordMarks(t, item, line)].filter(
+    Boolean,
+  );
+  const name = marks.length
+    ? `${line.item_name} (${marks.join(" • ")})`
+    : line.item_name;
+  return extractApiError(
+    error,
+    t("stock_takes:errors.saveFailedFor", { name }),
+  );
 }
 
 /** The distinct first segments of the rows' shelf codes, sorted — the
@@ -350,7 +377,7 @@ export function useStockTakeCounting(id: string | undefined) {
         [itemId]: countedText(line?.counted_quantity),
       }));
       setNotes((prev) => ({ ...prev, [itemId]: line?.notes ?? "" }));
-      toast.error(extractApiError(error, t("stock_takes:errors.saveFailed")));
+      toast.error(saveFailureMessage(t, error, line, getItemById(itemId)));
     };
 
     const write = async () => {

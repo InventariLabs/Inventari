@@ -144,16 +144,34 @@ function LotExpiryAskDialog({
 function failureSentence(
   t: TFunction,
   context: WmsReceivingFailureContext,
+  product?: string | null,
 ): string {
   const sentences: Record<WmsReceivingFailureContext, string> = {
     scan: t("receiving.error.scan_failed"),
     short_receive: t("receiving.error.short_receive_failed"),
-    skip: t("receiving.error.skip_failed"),
+    // Named when the line is known: the sentence sits under the list, beside
+    // rows it is not about.
+    skip: product
+      ? t("receiving.error.skip_failed_named", { product })
+      : t("receiving.error.skip_failed"),
     undo: t("receiving.error.undo_failed"),
     complete: t("receiving.error.complete_failed"),
     cancel: t("receiving.error.cancel_failed"),
   };
   return sentences[context];
+}
+
+/** The sentence for a failed action the API said nothing about, naming the
+ * line it was about when there was one. */
+function sessionFailure(
+  t: TFunction,
+  context: WmsReceivingFailureContext | null,
+  lines: { id: string; product_name?: string | null }[],
+  lineId: string | null,
+): string | null {
+  if (!context) return null;
+  const product = lines.find((line) => line.id === lineId)?.product_name;
+  return failureSentence(t, context, product);
 }
 
 /**
@@ -366,6 +384,7 @@ export default function WmsReceivingView({
     errorCode,
     errorStatus,
     errorContext,
+    errorLineId,
     heldSession,
     releaseHeldSession,
     takeOverHeldSession,
@@ -385,7 +404,7 @@ export default function WmsReceivingView({
   const isPhone = useMediaQuery(PHONE_QUERY);
 
   const sessionError =
-    error ?? (errorContext ? failureSentence(t, errorContext) : null);
+    error ?? sessionFailure(t, errorContext, state.lines, errorLineId);
 
   // the document page reads its data through React Query and does not
   // refetch when a receiving session ends — invalidate the document detail so

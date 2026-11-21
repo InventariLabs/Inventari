@@ -853,6 +853,7 @@
       "deleteTitle": "¿Eliminar {{name}}?",
       "editPermissions": "Editar",
       "editSubtitle": "{{n}} permisos concedidos",
+      "editSubtitleUnsaved": "{{n}} permisos seleccionados, aún sin guardar",
       "editTitle": "Permisos de {{name}}",
       "emptyDescription": "Los niveles integrados cubren la mayoría de los casos. Crea un rol personalizado cuando alguien necesite otro conjunto: un operario que cuenta existencias pero no confirma documentos, por ejemplo.",
       "emptyTitle": "Aún no hay roles personalizados",

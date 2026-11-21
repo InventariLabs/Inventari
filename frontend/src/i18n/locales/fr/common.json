@@ -853,6 +853,7 @@
       "deleteTitle": "Supprimer {{name}} ?",
       "editPermissions": "Modifier",
       "editSubtitle": "{{n}} autorisations accordées",
+      "editSubtitleUnsaved": "{{n}} autorisations sélectionnées, pas encore enregistrées",
       "editTitle": "Autorisations de {{name}}",
       "emptyDescription": "Les niveaux intégrés suffisent dans la plupart des cas. Créez un rôle personnalisé lorsqu'il faut un autre ensemble — un magasinier qui compte le stock sans confirmer les documents, par exemple.",
       "emptyTitle": "Aucun rôle personnalisé",

@@ -1,6 +1,7 @@
 import { extractApiError } from "@/lib/errors";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import {
   AlertTriangle,
   Info,
@@ -42,6 +43,22 @@ interface RolePermissionsSheetProps {
   role: Role;
   groups: PermissionGroup[];
   onClose: () => void;
+}
+
+/**
+ * What the header says about the permissions. "Granted" is what is stored: a
+ * draft that is not saved yet, or whose save failed, is a selection.
+ */
+function sheetSubtitle(
+  t: TFunction,
+  readOnly: boolean,
+  dirty: boolean,
+  n: number,
+): string {
+  if (readOnly) return t("settings.rbac.systemRole");
+  return dirty
+    ? t("settings.rbac.editSubtitleUnsaved", { n })
+    : t("settings.rbac.editSubtitle", { n });
 }
 
 /**
@@ -180,9 +197,7 @@ export function RolePermissionsSheet({
             {displayName}
           </h2>
           <p className="text-xs text-on-muted mt-0.5">
-            {readOnly
-              ? t("settings.rbac.systemRole")
-              : t("settings.rbac.editSubtitle", { n: granted.size })}
+            {sheetSubtitle(t, readOnly, dirty, granted.size)}
           </p>
         </div>
         {/* Renaming and deleting act on the role, not on this edit, so they

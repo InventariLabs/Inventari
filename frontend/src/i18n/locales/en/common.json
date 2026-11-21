@@ -853,6 +853,7 @@
       "deleteTitle": "Delete {{name}}?",
       "editPermissions": "Edit",
       "editSubtitle": "{{n}} permissions granted",
+      "editSubtitleUnsaved": "{{n}} permissions selected, not saved yet",
       "editTitle": "Permissions of {{name}}",
       "emptyDescription": "Built-in levels cover most cases. Create a custom role when someone needs a different set — a warehouse operator who counts stock but does not confirm documents, for instance.",
       "emptyTitle": "No custom roles yet",

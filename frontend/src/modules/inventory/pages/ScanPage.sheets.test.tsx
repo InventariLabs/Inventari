@@ -312,6 +312,26 @@ describe("ScanPage — the sheets a scan opens, and the ways out of them", () =>
     expect(mocks.camera.resumeCamera).toHaveBeenCalledTimes(1);
   });
 
+  it("says a viewer's code belongs to an archived product, not that it is unknown", async () => {
+    signInWith(["items:read"]);
+    scanAnswers({
+      action: "show_quick_add",
+      status: "unassigned",
+      message_key: "scan:result.foundInHistory",
+      message_params: { product: "Basmati rice" },
+    } as never);
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(screen.getByRole("button", { name: "type code" }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        expect.stringContaining("Basmati rice is archived"),
+      ),
+    );
+  });
+
   const stockView = {
     action: "show_stock_actions",
     stock_summary: {

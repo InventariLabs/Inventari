@@ -258,6 +258,26 @@ describe("DocumentsTemplatesPage — a copy of an older built-in", () => {
     source_builtin: "Standard Template",
   };
 
+  it("says what the other documents print through while one template exists", async () => {
+    server.use(
+      http.get("*/api/v1/warehouse/templates", () =>
+        HttpResponse.json(onePage([{ ...copy, source_outdated: false }])),
+      ),
+      http.get("*/api/v1/warehouse/templates/built-in", () =>
+        HttpResponse.json([builtIn]),
+      ),
+    );
+    render(<DocumentsTemplatesPage />);
+
+    await screen.findByText("Standard Template");
+    expect(
+      screen.getByText(/replaces the built-in layout only where/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /see the built-in layouts/i }),
+    ).toBeInTheDocument();
+  });
+
   it("says nothing while the copy still matches the built-in", async () => {
     server.use(
       http.get("*/api/v1/warehouse/templates", () =>

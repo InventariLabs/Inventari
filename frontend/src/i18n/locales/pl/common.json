@@ -855,6 +855,7 @@
       "deleteTitle": "Usunąć rolę {{name}}?",
       "editPermissions": "Edytuj",
       "editSubtitle": "nadanych uprawnień: {{n}}",
+      "editSubtitleUnsaved": "wybranych uprawnień: {{n}}, jeszcze nie zapisane",
       "editTitle": "Uprawnienia roli {{name}}",
       "emptyDescription": "Poziomy wbudowane wystarczają w większości przypadków. Rolę własną warto utworzyć, gdy ktoś potrzebuje innego zestawu — na przykład magazynier, który liczy stan, ale nie zatwierdza dokumentów.",
       "emptyTitle": "Nie ma jeszcze ról własnych",

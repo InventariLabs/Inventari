@@ -939,6 +939,7 @@
       "scan_failed": "Der Scan konnte nicht erfasst werden.",
       "short_pick_failed": "Die entnommene Menge konnte nicht erfasst werden.",
       "skip_failed": "Die Position konnte nicht übersprungen werden.",
+      "skip_failed_named": "{{product}} konnte nicht übersprungen werden.",
       "undo_failed": "Die Position konnte nicht zurückgesetzt werden.",
       "complete_failed": "Die Kommissionierung konnte nicht abgeschlossen werden.",
       "cancel_failed": "Die Kommissionierung konnte nicht abgebrochen werden.",
@@ -983,6 +984,7 @@
     "type_pl_pz": "PL PZ (Polnisch)",
     "type_packing_slip": "Packliste",
     "type_pick_list": "Kommissionierliste",
+    "builtInNote": "Eine Vorlage ersetzt das eingebaute Layout nur dort, wo sie für einen Dokumenttyp als Standard gilt oder als Druckvorlage in den Dokumenteinstellungen gewählt ist. Alle anderen Dokumente werden weiterhin im eingebauten Layout gedruckt.",
     "builtInPreviewTitle": "Integriertes Layout",
     "builtInPreviewAction": "Integrierte Layouts ansehen",
     "placeholders": {
@@ -1447,6 +1449,7 @@
       "scan_failed": "Der Scan konnte nicht erfasst werden.",
       "short_receive_failed": "Die erhaltene Menge konnte nicht erfasst werden.",
       "skip_failed": "Die Zeile konnte nicht übersprungen werden.",
+      "skip_failed_named": "{{product}} konnte nicht übersprungen werden.",
       "undo_failed": "Die Zeile konnte nicht zurückgesetzt werden.",
       "complete_failed": "Die Wareneingangssitzung konnte nicht abgeschlossen werden.",
       "cancel_failed": "Die Wareneingangssitzung konnte nicht abgebrochen werden.",

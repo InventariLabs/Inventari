@@ -19,10 +19,13 @@ const members = [
   { id: "u-2", email: "bob@example.com", full_name: null, role: "user" },
 ];
 
-function setup() {
+function setup(holders: string[] = ["u-1", "u-2"]) {
   server.use(
     http.get("/api/v1/users/org-members", () =>
       HttpResponse.json(onePage(members)),
+    ),
+    http.get("/api/v1/warehouse/work-items/assignees", () =>
+      HttpResponse.json({ user_ids: holders }),
     ),
   );
   const queryClient = new QueryClient({
@@ -52,6 +55,17 @@ describe("useAssignableMembers shares the members cache entry", () => {
     await waitFor(() => expect(result.current.data).toBeDefined());
     expect(result.current.data).toEqual([
       { id: "u-1", name: "Alice" },
+      { id: "u-2", name: "bob@example.com" },
+    ]);
+  });
+
+  it("offers only the members who hold the grant the tasks need", async () => {
+    const { wrapper } = setup(["u-2"]);
+    const { result } = renderHook(() => useAssignableMembers(true), {
+      wrapper,
+    });
+    await waitFor(() => expect(result.current.data).toBeDefined());
+    expect(result.current.data).toEqual([
       { id: "u-2", name: "bob@example.com" },
     ]);
   });
