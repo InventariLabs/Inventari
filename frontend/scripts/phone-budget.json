@@ -60,7 +60,7 @@
     "issue": {
       "chunks": ["IssueGoodsPage"],
       "budget": {
-        "jsKiB": 590,
+        "jsKiB": 595,
         "loadMs": 11000
       },
       "measured": {
@@ -73,7 +73,7 @@
     "history": {
       "chunks": ["DocumentHistoryPage"],
       "budget": {
-        "jsKiB": 615,
+        "jsKiB": 620,
         "loadMs": 8000
       },
       "measured": {

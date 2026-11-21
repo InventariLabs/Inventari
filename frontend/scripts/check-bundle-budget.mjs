@@ -484,6 +484,15 @@ const dist = join(root, "dist");
  * 645; the other screens stand under theirs (login 407.5, launcher 422.5,
  * receive 475.6, issue 588.4, history 613.2, products 630.6, app first paint
  * 402.7, initial 193.9).
+ *
+ * Re-measured 2026-11-21 on the branch that closes the catalogue, locations
+ * and labels findings: the issue screen measures 590.2 KiB gz against its 590
+ * and history 615.3 against its 615, from 589.8 and 614.9 on the line
+ * without it. What the branch adds is copy in six languages and a few lines
+ * of the shared error text; no import walked in. Those two phone budgets move
+ * a step of five, to 595 and 620; the other screens stand under theirs (login
+ * 409.1, launcher 424.2, receive 477.4, start 642.6, products 633.0, app
+ * first paint 404.3, initial 193.9).
  */
 const BUDGETS = {
   initial: 245,
