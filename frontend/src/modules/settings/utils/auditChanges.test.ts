@@ -417,6 +417,41 @@ describe("auditChanges scan session journal", () => {
   });
 });
 
+describe("auditChanges lowercase codes", () => {
+  // `usage: internal` is not a capitalised code, so the renderer reads the
+  // catalogue under the field's own name, `usage_internal`.
+  const catalogue = {
+    common: {
+      settings: {
+        audit: { values: { usage_internal: "Wewnętrzna", internal: "NOPE" } },
+      },
+    },
+  };
+  const screenT = namespacedT(catalogue) as never;
+
+  it("words a lowercase value through its field-scoped key", () => {
+    const changes = auditChanges(
+      { usage: "internal" },
+      "CREATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toEqual([{ path: "usage", from: null, to: "Wewnętrzna" }]);
+  });
+
+  it("does not read the bare lowercase value, which would reword free text", () => {
+    const changes = auditChanges(
+      { remark: "internal" },
+      "CREATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toEqual([{ path: "remark", from: null, to: "internal" }]);
+  });
+});
+
 describe("auditChanges", () => {
   it("names only the paths that moved inside a dictionary", () => {
     // The whole document is not printed on both sides of the arrow: a

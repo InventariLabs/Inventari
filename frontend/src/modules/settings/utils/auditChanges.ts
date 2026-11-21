@@ -538,12 +538,32 @@ function leafText(
     if (word) return word;
   }
   if (t) {
-    const resolver = VALUE_RESOLVERS[leaf];
-    const code = typeof value === "string" ? value : text;
-    const word = resolver?.(t, code) ?? "";
+    const word = fieldValueWord(leaf, value, text, t);
     if (word) return word;
   }
   return text;
+}
+
+/**
+ * A stored value in the word of the field it sits under: the owning screen's
+ * dictionary (`VALUE_RESOLVERS`), or, for a field with none, the catalogue's
+ * `<field>_<value>`. A lowercase code (`usage: internal`) is not one of the
+ * capitalised codes `formatAuditValue` words, so it is named by its field:
+ * `settings.audit.values.usage_internal`.
+ */
+function fieldValueWord(
+  leaf: string,
+  value: unknown,
+  text: string,
+  t: TranslateFn,
+): string {
+  const resolver = VALUE_RESOLVERS[leaf];
+  const code = typeof value === "string" ? value : text;
+  if (resolver) return resolver(t, code) ?? "";
+  if (typeof value !== "string") return "";
+  return t(`common:settings.audit.values.${leaf}_${value}`, {
+    defaultValue: "",
+  });
 }
 
 /** The `lines` of an order entry worded for the reader, or null when the

@@ -428,6 +428,7 @@ def test_a_new_backend_file_does_not_change_the_saved_artefact() -> None:
         'uncovered-writer-files': [],
         'keys': ['barcode', 'name'],
         'target-types': ['item'],
+        'values': ['status:open'],
     }
 
     before = script.artefact_payload({**declared, 'files-read': 993})
@@ -495,3 +496,92 @@ def test_an_act_named_beside_the_changed_fields_is_read(
 
     assert 'emailed_to' in payload['keys']
     assert 'approval' in payload['keys']
+
+
+def test_the_values_a_journalling_writer_can_show_come_from_every_typing_style(
+    collect_keys, tmp_path: Path
+) -> None:
+    """An enum, a ``Literal`` alias and an allowed-set validator all name values.
+
+    The writer that journals ``before``/``after`` shows a stored value under
+    each journalled field; the values are read from the update schema's
+    annotation or validator and from the model's column.
+    """
+    root = _write_app(
+        tmp_path,
+        {
+            'schemas/thing.py': (
+                'ALLOWED = frozenset({"A", "B"})\n'
+                'UsageLiteral = Literal["internal", "customer"]\n'
+                'class ThingUpdate(BaseModel):\n'
+                '    kind: str | None = None\n'
+                '    usage: UsageLiteral | None = None\n'
+                '    state: ThingState | None = None\n'
+                '    mode: Literal["x", "y"] | None = None\n'
+                '    label: str | None = None\n'
+                '    @field_validator("kind")\n'
+                '    def check(cls, v):\n'
+                '        return v if v in ALLOWED else None\n'
+            ),
+            'models/thing.py': (
+                'class ThingState(str, Enum):\n'
+                '    OPEN = "open"\n'
+                '    SHUT = "shut"\n'
+                'class Thing(Base):\n'
+                '    kind: str\n'
+                '    usage: str\n'
+                '    state: Mapped[ThingState]\n'
+                '    mode: str\n'
+                '    label: str\n'
+            ),
+            'services/thing_writes.py': (
+                'from app.schemas.thing import ThingUpdate\n'
+                'from app.models.thing import Thing, ThingState\n'
+                '\n'
+                'AUDIT_PAYLOAD_SCHEMA = ("ThingUpdate", "Thing")\n'
+                'snapshot = {"before": {}, "after": {}}\n'
+            ),
+        },
+    )
+
+    payload = collect_keys(root)
+
+    assert payload['values'] == [
+        'kind:A',
+        'kind:B',
+        'mode:x',
+        'mode:y',
+        'state:open',
+        'state:shut',
+        'usage:customer',
+        'usage:internal',
+    ]
+
+
+def test_a_writer_that_journals_only_field_names_shows_no_value(
+    collect_keys, tmp_path: Path
+) -> None:
+    """``'fields': changed`` names what moved and prints no stored value, so a
+    status enum on its update schema is not a value the reader meets."""
+    root = _write_app(
+        tmp_path,
+        {
+            'schemas/thing.py': (
+                'class ThingUpdate(BaseModel):\n'
+                '    status: Literal["open", "shut"] | None = None\n'
+            ),
+            'models/thing.py': 'class Thing(Base):\n    status: str\n',
+            'services/thing_writes.py': (
+                'from app.schemas.thing import ThingUpdate\n'
+                'from app.models.thing import Thing\n'
+                '\n'
+                'AUDIT_PAYLOAD_SCHEMA = ("ThingUpdate", "Thing")\n'
+                'snapshot = {"fields": ["status"]}\n'
+            ),
+        },
+    )
+
+    payload = collect_keys(root)
+
+    assert 'status' in payload['keys']
+    assert payload['values'] == []

@@ -29,9 +29,15 @@
  *        (the result is text with the English decimal mark);
  *      - a numeric-looking field (`carbs_g`, `unit_price`, `total_cost`)
  *        interpolated into a template literal that carries other text;
+ *      - a numeric-looking field, or a `.toFixed(` result, handed to `t()`
+ *        as an interpolation parameter (`t(key, { max: line.quantity })`):
+ *        i18next here has no interpolation format, so the number reaches the
+ *        sentence in the English decimal mark;
+ *      - a numeric-looking field beside text in JSX (`{day.carbs_g} g`);
  *      - `Intl.NumberFormat` / `Intl.DateTimeFormat` / `toLocale*String` with
- *        a literal locale (or none, for `toLocale*String()`) — the reader's
- *        language is `i18n.language`, and the app's formatters
+ *        a literal locale, or none (the browser's, not the app's; reading
+ *        the time zone with `.resolvedOptions()` is no format) — the
+ *        reader's language is `i18n.language`, and the app's formatters
  *        (`utils/formatters.ts`) are the one place that turns it into a
  *        format.
  *
@@ -184,6 +190,57 @@ export function missingEnumerated(finding, catalogs) {
 const NUMERIC_FIELD =
   /^[\w$.?]*\.(?:\w+_(?:g|kg|mg|ml|l|qty|quantity|amount|cost|price|pct|percent|total|weight|volume|days|hours|kcal)|(?:price|cost|amount|quantity|qty|weight))$/;
 
+/** The index of the first of `stops` at nesting depth 0, from `from`. */
+function topLevel(text, from, stops) {
+  let depth = 0;
+  for (let i = from; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === "`") i = templateEnd(text, i);
+    else if (ch === '"' || ch === "'") {
+      for (i++; i < text.length && text[i] !== ch; i++)
+        if (text[i] === "\\") i++;
+    } else if ("([{".includes(ch)) depth++;
+    else if (")]}".includes(ch)) {
+      if (depth === 0) return stops.includes(ch) ? i : -1;
+      depth--;
+    } else if (depth === 0 && stops.includes(ch)) return i;
+  }
+  return -1;
+}
+
+/**
+ * The interpolation parameters of the `t(key, { … })` calls: `[index, value]`
+ * for each property whose value is a bare numeric field or a `.toFixed(` text.
+ */
+function numberParams(text) {
+  const found = [];
+  TRANSLATE_CALL.lastIndex = 0;
+  let match;
+  while ((match = TRANSLATE_CALL.exec(text)) !== null) {
+    const comma = topLevel(text, match.index + match[0].length, [",", ")"]);
+    if (comma < 0 || text[comma] !== ",") continue;
+    let at = comma + 1;
+    while (/\s/.test(text[at] ?? "")) at++;
+    if (text[at] !== "{") continue;
+    const close = topLevel(text, at + 1, ["}"]);
+    if (close < 0) continue;
+    let from = at + 1;
+    while (from < close) {
+      let end = topLevel(text, from, [",", "}"]);
+      if (end < 0 || end > close) end = close;
+      const property = text.slice(from, end);
+      const value = property.slice(property.indexOf(":") + 1).trim();
+      if (
+        property.includes(":") &&
+        (NUMERIC_FIELD.test(value) || /\.toFixed\(/.test(value))
+      )
+        found.push(from);
+      from = end + 1;
+    }
+  }
+  return found;
+}
+
 /** Numbers and dates written without the reader's locale. */
 export function rawNumbersIn(source) {
   const text = blankComments(source);
@@ -204,9 +261,19 @@ export function rawNumbersIn(source) {
   }
 
   const literalLocale =
-    /Intl\.(?:NumberFormat|DateTimeFormat)\(\s*["'`]|toLocale(?:Date|Time)?String\(\s*(?:["'`]|\))/g;
+    /Intl\.(?:NumberFormat|DateTimeFormat)\(\s*(?:["'`]|\)(?!\s*\.resolvedOptions)|undefined\b)|toLocale(?:Date|Time)?String\(\s*(?:["'`]|\)|undefined\b)/g;
   while ((match = literalLocale.exec(text)) !== null) {
     add(match.index, "locale");
+  }
+
+  for (const index of numberParams(text)) add(index, "t-param");
+
+  // `{day.carbs_g} g`: a numeric field printed next to text in JSX.
+  const jsxText = />([^<>{}]*)\{\s*([\w$.?]+)\s*\}([^<>{}]*)</g;
+  while ((match = jsxText.exec(text)) !== null) {
+    if (NUMERIC_FIELD.test(match[2]) && (match[1].trim() || match[3].trim()))
+      add(match.index, "jsx-number");
+    jsxText.lastIndex = match.index + 1;
   }
 
   const template = /`/g;

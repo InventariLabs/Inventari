@@ -62,7 +62,6 @@ from __future__ import annotations
 import argparse
 import ast
 import json
-import re
 import sys
 from pathlib import Path
 from typing import TypedDict
@@ -337,42 +336,111 @@ def annotated_class_fields(tree: ast.AST, module: str) -> dict[str, set[str]]:
     return fields
 
 
-def enum_members(tree: ast.AST, module: str) -> dict[str, set[str]]:
-    """The string members of every enum class in one file, by qualified name.
+def _strings(node: ast.AST | None) -> set[str] | None:
+    """The string constants a collection, ``frozenset({…})`` or ``Literal[…]``
+    holds, or None when the node is not such a collection of strings."""
+    if isinstance(node, ast.Call) and node.args:
+        return _strings(node.args[0])
+    if isinstance(node, ast.Subscript) and ast.unparse(node.value).endswith('Literal'):
+        node = node.slice
+    if isinstance(node, ast.Tuple | ast.List | ast.Set):
+        items = node.elts
+    else:
+        items = [node] if node is not None else []
+    values = {
+        item.value
+        for item in items
+        if isinstance(item, ast.Constant) and isinstance(item.value, str)
+    }
+    return values if values and len(values) == len(items) else None
 
-    A class counts as an enum when one of its bases is named ``…Enum``
-    (``StrEnum``, ``str, Enum``, ``enum.Enum``); its members are the
-    class-body assignments of a string constant.
+
+def value_sets(tree: ast.AST, module: str) -> dict[str, set[str]]:
+    """The named sets of string values one file defines, by qualified name.
+
+    Three shapes name the values a field can hold: an enum class (its string
+    members), a ``Literal`` alias (``StorageUsage = Literal['internal', …]``)
+    and a module-level collection of strings (``ALLOWED_TYPES = frozenset({…})``
+    a validator checks against).
     """
     found: dict[str, set[str]] = {}
     for node in ast.walk(tree):
-        if not isinstance(node, ast.ClassDef):
-            continue
-        if not any(ast.unparse(base).endswith('Enum') for base in node.bases):
-            continue
-        values = {
-            member.value.value
-            for member in node.body
-            if isinstance(member, ast.Assign)
-            and isinstance(member.value, ast.Constant)
-            and isinstance(member.value.value, str)
-        }
-        found[f'{module}.{node.name}'] = values
+        if isinstance(node, ast.ClassDef):
+            if any(ast.unparse(base).endswith('Enum') for base in node.bases):
+                found[f'{module}.{node.name}'] = {
+                    member.value.value
+                    for member in node.body
+                    if isinstance(member, ast.Assign)
+                    and isinstance(member.value, ast.Constant)
+                    and isinstance(member.value.value, str)
+                }
+    for node in getattr(tree, 'body', []):
+        target = value = None
+        if isinstance(node, ast.Assign) and len(node.targets) == 1:
+            target, value = node.targets[0], node.value
+        elif isinstance(node, ast.AnnAssign):
+            target, value = node.target, node.value
+        elif isinstance(node, ast.TypeAlias):
+            target, value = node.name, node.value
+        if isinstance(target, ast.Name) and (strings := _strings(value)):
+            found[f'{module}.{target.id}'] = strings
     return found
 
 
-def field_annotations(tree: ast.AST, module: str) -> dict[str, dict[str, str]]:
-    """Each class's annotated fields with the annotation as written."""
-    found: dict[str, dict[str, str]] = {}
+class FieldSource(TypedDict):
+    names: set[str]
+    literals: set[str]
+
+
+def field_value_sources(tree: ast.AST) -> dict[str, dict[str, FieldSource]]:
+    """What names the values of each class's fields, by class name.
+
+    A field's values are named by its annotation (an enum or alias name, or an
+    inline ``Literal[…]``) and by the names its ``field_validator`` reads (the
+    allowed set it checks against). Names are returned as written; the caller
+    resolves them in the class's own module.
+    """
+    found: dict[str, dict[str, FieldSource]] = {}
     for node in ast.walk(tree):
         if not isinstance(node, ast.ClassDef):
             continue
-        fields = found.setdefault(f'{module}.{node.name}', {})
+        fields = found.setdefault(node.name, {})
+
+        def source(field: str, fields=fields) -> FieldSource:
+            return fields.setdefault(field, {'names': set(), 'literals': set()})
+
         for statement in node.body:
             if isinstance(statement, ast.AnnAssign) and isinstance(
                 statement.target, ast.Name
             ):
-                fields[statement.target.id] = ast.unparse(statement.annotation)
+                annotation = statement.annotation
+                if isinstance(annotation, ast.Constant) and isinstance(
+                    annotation.value, str
+                ):
+                    annotation = ast.parse(annotation.value, mode='eval').body
+                entry = source(statement.target.id)
+                for part in ast.walk(annotation):
+                    if isinstance(part, ast.Name):
+                        entry['names'].add(part.id)
+                    elif isinstance(part, ast.Subscript) and (
+                        literal := _strings(part)
+                    ):
+                        entry['literals'].update(literal)
+            elif isinstance(statement, ast.FunctionDef):
+                for decorator in statement.decorator_list:
+                    if isinstance(decorator, ast.Call) and ast.unparse(
+                        decorator.func
+                    ).endswith('field_validator'):
+                        used = {
+                            part.id
+                            for part in ast.walk(statement)
+                            if isinstance(part, ast.Name)
+                        }
+                        for arg in decorator.args:
+                            if isinstance(arg, ast.Constant) and isinstance(
+                                arg.value, str
+                            ):
+                                source(arg.value)['names'].update(used)
     return found
 
 
@@ -411,27 +479,48 @@ def column_for_field(root: Path) -> dict[str, str]:
     return {}
 
 
-def enum_values_written(
-    schema: str,
+def values_written(
+    pair: tuple[str, str],
     journalled: set[str],
-    annotations: dict[str, dict[str, str]],
-    enums: dict[str, set[str]],
+    sources: dict[str, dict[str, FieldSource]],
+    sets: dict[str, set[str]],
     resolve,
 ) -> set[str]:
-    """The values of the enum-typed fields a payload writer journals.
+    """``field:value`` for each value a journalled field can hold.
 
-    A field is enum-typed when its annotation on the update schema names an
-    enum class (``status: StockTakeStatus | None``). The name resolves in the
-    schema's own module, through its imports, like the declaration's names.
+    The schema side and the model side both name them: the update schema may
+    type a field loosely (``type: str`` with an allowed-set validator) where
+    the model's column carries the enum. Only fields the writer journals
+    count, and only a writer that journals values (see ``writes_values``).
     """
-    module = schema.rpartition('.')[0]
     found: set[str] = set()
-    for field, annotation in annotations.get(schema, {}).items():
-        if field not in journalled:
-            continue
-        for name in re.findall(r'[A-Za-z_][A-Za-z0-9_]*', annotation):
-            found.update(enums.get(resolve(f'{module}.{name}'), set()))
+    for qualified in pair:
+        module = qualified.rpartition('.')[0]
+        for field, source in sources.get(qualified, {}).items():
+            if field not in journalled:
+                continue
+            values = set(source['literals'])
+            for local in source['names']:
+                values.update(sets.get(resolve(f'{module}.{local}'), set()))
+            found.update(f'{field}:{value}' for value in values)
     return found
+
+
+def writes_values(tree: ast.AST) -> bool:
+    """Whether this file hands the journal a ``before`` side.
+
+    A payload writer journalling ``'fields': changed`` names what moved and
+    shows no value; only one that writes ``before``/``after`` puts a stored
+    value in front of the reader.
+    """
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Dict) and any(
+            isinstance(key, ast.Constant) and key.value == 'before' for key in node.keys
+        ):
+            return True
+        if isinstance(node, ast.keyword) and node.arg == 'before':
+            return True
+    return False
 
 
 def collect_keys(root: Path) -> CollectedKeys:
@@ -439,8 +528,9 @@ def collect_keys(root: Path) -> CollectedKeys:
     keys: set[str] = set()
     target_types: set[str] = set()
     class_fields: dict[str, set[str]] = {}
-    enums: dict[str, set[str]] = {}
-    annotations: dict[str, dict[str, str]] = {}
+    sets: dict[str, set[str]] = {}
+    sources: dict[str, dict[str, FieldSource]] = {}
+    value_declarations: list[tuple[str, str]] = []
     declarations: list[tuple[str, str]] = []
     funnel_files: list[str] = []
     aliases: dict[str, str] = {}
@@ -473,10 +563,11 @@ def collect_keys(root: Path) -> CollectedKeys:
         target_types.update(audit_target_types(tree))
         for name, fields in annotated_class_fields(tree, module).items():
             class_fields.setdefault(name, set()).update(fields)
-        enums.update(enum_members(tree, module))
-        for name, fields in field_annotations(tree, module).items():
-            annotations.setdefault(name, {}).update(fields)
+        sets.update(value_sets(tree, module))
+        for name, fields in field_value_sources(tree).items():
+            sources.setdefault(f'{module}.{name}', {}).update(fields)
         declarations.extend(file_declarations)
+        value_declarations.extend(file_declarations if writes_values(tree) else [])
         if dynamic_funnel_keys:
             funnel_files.append((module, file_declarations))
         # Every from-import is also a public name of its own module pointing
@@ -495,7 +586,12 @@ def collect_keys(root: Path) -> CollectedKeys:
     # itself may be a module's public alias for one.
     def resolve(name: str) -> str:
         seen: set[str] = set()
-        while name not in class_fields and name in aliases and name not in seen:
+        while (
+            name not in class_fields
+            and name not in sets
+            and name in aliases
+            and name not in seen
+        ):
             seen.add(name)
             name = aliases[name]
         return name
@@ -513,11 +609,16 @@ def collect_keys(root: Path) -> CollectedKeys:
         }
         journalled = schema_keys & class_fields.get(resolve(model_name), set())
         keys.update(journalled)
-        values.update(
-            enum_values_written(
-                resolve(schema_name), journalled, annotations, enums, resolve
+        if (schema_name, model_name) in value_declarations:
+            values.update(
+                values_written(
+                    (resolve(schema_name), resolve(model_name)),
+                    journalled,
+                    sources,
+                    sets,
+                    resolve,
+                )
             )
-        )
 
     # A funnel writer with dynamic keys is covered only by a declaration
     # whose two names both resolve to classes the tree defines — a typo in
@@ -558,7 +659,8 @@ def artefact_payload(collected: dict) -> dict:
             'snapshot keys, the schema/model intersections its payload-driven '
             'writers declare via AUDIT_PAYLOAD_SCHEMA, and the literal key '
             'sets of the journal_config_change funnel; "target-types" is the '
-            'value set of AuditTargetType. Refresh with make '
+            'value set of AuditTargetType; "values" are the field:value pairs '
+            'a writer that journals before/after can show. Refresh with make '
             'sync-audit-fields; do not edit by hand.'
         ),
         # How many files were read is left out: it grows with every new file

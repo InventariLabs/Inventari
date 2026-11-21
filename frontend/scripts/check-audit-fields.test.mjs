@@ -21,7 +21,12 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { catalogKeys, gaps } from "./check-audit-fields.mjs";
+import {
+  catalogKeys,
+  gaps,
+  resolverFields,
+  valueKeys,
+} from "./check-audit-fields.mjs";
 
 const ROOT = join(
   dirname(fileURLToPath(import.meta.url).replace(/^\/@fs/, "")),
@@ -364,7 +369,7 @@ describe("check-audit-fields enum values", () => {
       artefact,
       JSON.stringify({
         ...saved,
-        values: [...saved.values, "A_PLANTED_VALUE"],
+        values: [...saved.values, "type:A_PLANTED_VALUE"],
       }),
     );
 
@@ -383,6 +388,41 @@ describe("check-audit-fields enum values", () => {
     expect(output).toContain("en: A_PLANTED_VALUE (values)");
     expect(output).toContain("es: A_PLANTED_VALUE (values)");
     expect(output).toContain("settings.audit.values.A_PLANTED_VALUE");
+  });
+
+  it("names the key the renderer reads for a lowercase value", () => {
+    // `usage: planted` is worded through `usage_planted`; the bare lowercase
+    // key would change nothing on screen, so it is never the one demanded.
+    const saved = JSON.parse(
+      readFileSync(join(ROOT, "scripts/audit-snapshot-keys.json"), "utf8"),
+    );
+    const artefact = join(dir, "lowercase.json");
+    writeFileSync(
+      artefact,
+      JSON.stringify({ ...saved, values: [...saved.values, "usage:planted"] }),
+    );
+
+    const { status, stdout, stderr } = spawnSync(
+      "node",
+      ["scripts/check-audit-fields.mjs", "--baseline"],
+      {
+        cwd: ROOT,
+        encoding: "utf8",
+        env: { ...process.env, AUDIT_KEYS: artefact },
+      },
+    );
+    const output = `${stdout}${stderr}`;
+
+    expect(status).toBe(1);
+    expect(output).toContain("en: usage_planted (values)");
+    expect(output).not.toContain(": planted (values)");
+  });
+
+  it("leaves a field the renderer words from another dictionary alone", () => {
+    expect(
+      valueKeys(["role:owner", "usage:internal", "type:SUPPLIER"]).sort(),
+    ).toEqual(["SUPPLIER", "usage_internal"]);
+    expect(resolverFields().has("role")).toBe(true);
   });
 
   it("holds the values the backend writes to the baseline, today", () => {

@@ -4,377 +4,352 @@
   "gaps": [
     {
       "language": "en",
-      "key": "DAMAGED",
+      "key": "BOTH",
       "section": "values"
     },
     {
       "language": "en",
-      "key": "EXPIRED",
+      "key": "CUSTOMER",
       "section": "values"
     },
     {
       "language": "en",
-      "key": "OTHER",
+      "key": "EMPLOYEE",
       "section": "values"
     },
     {
       "language": "en",
-      "key": "QUALITY",
+      "key": "FEFO",
       "section": "values"
     },
     {
       "language": "en",
-      "key": "all",
+      "key": "FIFO",
       "section": "values"
     },
     {
       "language": "en",
-      "key": "cancelled",
+      "key": "MANUFACTURER",
       "section": "values"
     },
     {
       "language": "en",
-      "key": "category",
+      "key": "POST",
       "section": "values"
     },
     {
       "language": "en",
-      "key": "completed",
+      "key": "PUT",
       "section": "values"
     },
     {
       "language": "en",
-      "key": "daily",
+      "key": "SERVICE_PROVIDER",
       "section": "values"
     },
     {
       "language": "en",
-      "key": "draft",
+      "key": "SUPPLIER",
       "section": "values"
     },
     {
       "language": "en",
-      "key": "in_progress",
+      "key": "usage_customer",
       "section": "values"
     },
     {
       "language": "en",
-      "key": "monthly",
+      "key": "usage_internal",
       "section": "values"
     },
     {
       "language": "en",
-      "key": "quarterly",
+      "key": "usage_inventory",
       "section": "values"
     },
     {
       "language": "en",
-      "key": "weekly",
-      "section": "values"
-    },
-    {
-      "language": "en",
-      "key": "zone",
+      "key": "usage_production",
       "section": "values"
     },
     {
       "language": "pl",
-      "key": "DAMAGED",
+      "key": "BOTH",
       "section": "values"
     },
     {
       "language": "pl",
-      "key": "EXPIRED",
+      "key": "CUSTOMER",
       "section": "values"
     },
     {
       "language": "pl",
-      "key": "OTHER",
+      "key": "EMPLOYEE",
       "section": "values"
     },
     {
       "language": "pl",
-      "key": "QUALITY",
+      "key": "FEFO",
       "section": "values"
     },
     {
       "language": "pl",
-      "key": "all",
+      "key": "FIFO",
       "section": "values"
     },
     {
       "language": "pl",
-      "key": "cancelled",
+      "key": "MANUFACTURER",
       "section": "values"
     },
     {
       "language": "pl",
-      "key": "category",
+      "key": "POST",
       "section": "values"
     },
     {
       "language": "pl",
-      "key": "completed",
+      "key": "PUT",
       "section": "values"
     },
     {
       "language": "pl",
-      "key": "daily",
+      "key": "SERVICE_PROVIDER",
       "section": "values"
     },
     {
       "language": "pl",
-      "key": "draft",
+      "key": "SUPPLIER",
       "section": "values"
     },
     {
       "language": "pl",
-      "key": "in_progress",
+      "key": "usage_customer",
       "section": "values"
     },
     {
       "language": "pl",
-      "key": "monthly",
+      "key": "usage_internal",
       "section": "values"
     },
     {
       "language": "pl",
-      "key": "quarterly",
+      "key": "usage_inventory",
       "section": "values"
     },
     {
       "language": "pl",
-      "key": "weekly",
-      "section": "values"
-    },
-    {
-      "language": "pl",
-      "key": "zone",
+      "key": "usage_production",
       "section": "values"
     },
     {
       "language": "de",
-      "key": "DAMAGED",
+      "key": "BOTH",
       "section": "values"
     },
     {
       "language": "de",
-      "key": "EXPIRED",
+      "key": "CUSTOMER",
       "section": "values"
     },
     {
       "language": "de",
-      "key": "OTHER",
+      "key": "EMPLOYEE",
       "section": "values"
     },
     {
       "language": "de",
-      "key": "QUALITY",
+      "key": "FEFO",
       "section": "values"
     },
     {
       "language": "de",
-      "key": "all",
+      "key": "FIFO",
       "section": "values"
     },
     {
       "language": "de",
-      "key": "cancelled",
+      "key": "MANUFACTURER",
       "section": "values"
     },
     {
       "language": "de",
-      "key": "category",
+      "key": "POST",
       "section": "values"
     },
     {
       "language": "de",
-      "key": "completed",
+      "key": "PUT",
       "section": "values"
     },
     {
       "language": "de",
-      "key": "daily",
+      "key": "SERVICE_PROVIDER",
       "section": "values"
     },
     {
       "language": "de",
-      "key": "draft",
+      "key": "SUPPLIER",
       "section": "values"
     },
     {
       "language": "de",
-      "key": "in_progress",
+      "key": "usage_customer",
       "section": "values"
     },
     {
       "language": "de",
-      "key": "monthly",
+      "key": "usage_internal",
       "section": "values"
     },
     {
       "language": "de",
-      "key": "quarterly",
+      "key": "usage_inventory",
       "section": "values"
     },
     {
       "language": "de",
-      "key": "weekly",
-      "section": "values"
-    },
-    {
-      "language": "de",
-      "key": "zone",
+      "key": "usage_production",
       "section": "values"
     },
     {
       "language": "fr",
-      "key": "DAMAGED",
+      "key": "BOTH",
       "section": "values"
     },
     {
       "language": "fr",
-      "key": "EXPIRED",
+      "key": "CUSTOMER",
       "section": "values"
     },
     {
       "language": "fr",
-      "key": "OTHER",
+      "key": "EMPLOYEE",
       "section": "values"
     },
     {
       "language": "fr",
-      "key": "QUALITY",
+      "key": "FEFO",
       "section": "values"
     },
     {
       "language": "fr",
-      "key": "all",
+      "key": "FIFO",
       "section": "values"
     },
     {
       "language": "fr",
-      "key": "cancelled",
+      "key": "MANUFACTURER",
       "section": "values"
     },
     {
       "language": "fr",
-      "key": "category",
+      "key": "POST",
       "section": "values"
     },
     {
       "language": "fr",
-      "key": "completed",
+      "key": "PUT",
       "section": "values"
     },
     {
       "language": "fr",
-      "key": "daily",
+      "key": "SERVICE_PROVIDER",
       "section": "values"
     },
     {
       "language": "fr",
-      "key": "draft",
+      "key": "SUPPLIER",
       "section": "values"
     },
     {
       "language": "fr",
-      "key": "in_progress",
+      "key": "usage_customer",
       "section": "values"
     },
     {
       "language": "fr",
-      "key": "monthly",
+      "key": "usage_internal",
       "section": "values"
     },
     {
       "language": "fr",
-      "key": "quarterly",
+      "key": "usage_inventory",
       "section": "values"
     },
     {
       "language": "fr",
-      "key": "weekly",
-      "section": "values"
-    },
-    {
-      "language": "fr",
-      "key": "zone",
+      "key": "usage_production",
       "section": "values"
     },
     {
       "language": "es",
-      "key": "DAMAGED",
+      "key": "BOTH",
       "section": "values"
     },
     {
       "language": "es",
-      "key": "EXPIRED",
+      "key": "CUSTOMER",
       "section": "values"
     },
     {
       "language": "es",
-      "key": "OTHER",
+      "key": "EMPLOYEE",
       "section": "values"
     },
     {
       "language": "es",
-      "key": "QUALITY",
+      "key": "FEFO",
       "section": "values"
     },
     {
       "language": "es",
-      "key": "all",
+      "key": "FIFO",
       "section": "values"
     },
     {
       "language": "es",
-      "key": "cancelled",
+      "key": "MANUFACTURER",
       "section": "values"
     },
     {
       "language": "es",
-      "key": "category",
+      "key": "POST",
       "section": "values"
     },
     {
       "language": "es",
-      "key": "completed",
+      "key": "PUT",
       "section": "values"
     },
     {
       "language": "es",
-      "key": "daily",
+      "key": "SERVICE_PROVIDER",
       "section": "values"
     },
     {
       "language": "es",
-      "key": "draft",
+      "key": "SUPPLIER",
       "section": "values"
     },
     {
       "language": "es",
-      "key": "in_progress",
+      "key": "usage_customer",
       "section": "values"
     },
     {
       "language": "es",
-      "key": "monthly",
+      "key": "usage_internal",
       "section": "values"
     },
     {
       "language": "es",
-      "key": "quarterly",
+      "key": "usage_inventory",
       "section": "values"
     },
     {
       "language": "es",
-      "key": "weekly",
-      "section": "values"
-    },
-    {
-      "language": "es",
-      "key": "zone",
+      "key": "usage_production",
       "section": "values"
     }
   ]

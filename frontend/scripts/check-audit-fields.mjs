@@ -82,6 +82,53 @@ const FIELDS = "fields";
 const TARGET_TYPES = "targetTypes";
 const VALUES = "values";
 
+/** The renderer the journal's values go through, read for the fields it words
+ * on its own (`VALUE_RESOLVERS`). */
+const RENDERER_PATH = resolve(
+  ROOT,
+  "src/modules/settings/utils/auditChanges.ts",
+);
+const CAPITALISED_CODE = /^[A-Z][A-Z0-9_]*$/;
+
+/** The fields `VALUE_RESOLVERS` words from another screen's dictionary. */
+export function resolverFields(source = readFileSync(RENDERER_PATH, "utf8")) {
+  const block = source.match(
+    /const VALUE_RESOLVERS[\s\S]*?\n> = \{([\s\S]*?)\n\};/,
+  );
+  if (!block) {
+    throw new Error(
+      "check-audit-fields: VALUE_RESOLVERS not found in auditChanges.ts",
+    );
+  }
+  return new Set(
+    [...block[1].matchAll(/^ {2}(\w+):/gm)].map((match) => match[1]),
+  );
+}
+
+/**
+ * The catalogue keys the journal reads to word each `field:value` pair.
+ *
+ * `formatAuditValue` looks a capitalised code up under its own name
+ * (`SUPPLIER`); a lowercase value is never a code there, so the renderer reads
+ * `<field>_<value>` (`usage_internal`) for it, the same shape as
+ * `approval_requested`. A field `VALUE_RESOLVERS` words from another
+ * dictionary needs no entry here. Adding the bare lowercase value to the
+ * catalogue would change nothing on screen, which is why the gate names the
+ * key the renderer reads.
+ */
+export function valueKeys(pairs, resolved = resolverFields()) {
+  const keys = new Set();
+  for (const pair of pairs) {
+    const [field, value] = [
+      pair.split(":")[0],
+      pair.slice(pair.indexOf(":") + 1),
+    ];
+    if (CAPITALISED_CODE.test(value)) keys.add(value);
+    else if (!resolved.has(field)) keys.add(`${field}_${value}`);
+  }
+  return [...keys].sort();
+}
+
 export function catalogKeys(languages = LANGUAGES, section = FIELDS) {
   const perLanguage = new Map();
   for (const language of languages) {
@@ -165,7 +212,7 @@ function baseKey(entry) {
 function allGaps(keys, targetTypes, values = []) {
   return [
     ...gaps(keys),
-    ...gaps(values, catalogKeys(LANGUAGES, VALUES)).map((gap) => ({
+    ...gaps(valueKeys(values), catalogKeys(LANGUAGES, VALUES)).map((gap) => ({
       ...gap,
       section: VALUES,
     })),
