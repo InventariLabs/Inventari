@@ -390,7 +390,7 @@ export function aliasFindings(text, name, from, inScope) {
 export function nullUnitCalls(text) {
   const lines = [];
   const call =
-    /formatQuantityLocalized\(\s*[^,()]+,\s*[^,()]+,\s*(?:null|undefined)\s*[,)]/g;
+    /formatQuantityLocalized\(\s*[^,()]+,\s*(?:[^,()]|\([^()]*\))+,\s*(?:null|undefined)\s*[,)]/g;
   let match;
   while ((match = call.exec(text)) !== null) {
     lines.push(lineOf(text, match.index));

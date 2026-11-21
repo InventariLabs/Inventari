@@ -575,6 +575,18 @@ export default function DocumentsTodoPage() {
                         onPutAway={setPuttingAway}
                         onReplenish={setReplenishing}
                         onTake={take}
+                        onGiveBack={
+                          take &&
+                          task.state !== "done" &&
+                          task.assignee_id === userId
+                            ? (row) =>
+                                assign.mutate({
+                                  sourceKind: row.source_kind,
+                                  sourceId: row.source_id,
+                                  assigneeId: null,
+                                })
+                            : undefined
+                        }
                       />
                     ))}
                   </div>

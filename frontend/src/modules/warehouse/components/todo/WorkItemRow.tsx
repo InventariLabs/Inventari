@@ -92,6 +92,7 @@ export function WorkItemRow({
   onPutAway,
   onReplenish,
   onTake,
+  onGiveBack,
 }: {
   item: WorkItem;
   members: Member[];
@@ -117,6 +118,11 @@ export function WorkItemRow({
    * person to the desktop: a tap is the whole gesture.
    */
   onTake?: (item: WorkItem, open: () => void) => void;
+  /**
+   * On a phone, offered on an open task the reader holds: opening a task takes it
+   * for the reader, and backing out leaves it under their name.
+   */
+  onGiveBack?: (item: WorkItem) => void;
 }) {
   const { t } = useTranslation("warehouse");
   const navigate = useNavigate();
@@ -211,6 +217,15 @@ export function WorkItemRow({
               </option>
             ))}
           </NativeSelect>
+        )}
+        {onGiveBack && (
+          <Button
+            variant="secondary"
+            className="max-sm:w-full"
+            onClick={() => onGiveBack(item)}
+          >
+            {t("todo.giveBack")}
+          </Button>
         )}
         {!done && verb && canAct(item, canWrite, canWriteOrders) && (
           <Button

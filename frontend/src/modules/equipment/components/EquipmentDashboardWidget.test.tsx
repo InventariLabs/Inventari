@@ -10,10 +10,10 @@ import { ModulesProvider } from "@/contexts/ModulesContext";
 import { EquipmentDashboardWidget } from "./EquipmentDashboardWidget";
 
 /**
- * The tile counted in one form and one case for every number: "3 Alerty
- * gwarancyjne" — no inflection, capital mid-sentence, twice wrong. Polish
- * needs "1 gwarancja kończy się wkrótce", "3 gwarancje kończą się wkrótce", "5 alertów
- * gwarancyjnych", and the key now carries all three.
+ * The tile names what it counts — warranties ending soon — and inflects it in
+ * Polish for one ("1 gwarancja kończy się wkrótce"), a few ("3 gwarancje
+ * kończą się wkrótce") and many ("5 gwarancji kończy się wkrótce"), in
+ * lower case mid-sentence.
  */
 const ALERT = {
   item_id: "item-1",

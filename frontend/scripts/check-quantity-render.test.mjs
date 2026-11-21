@@ -27,6 +27,11 @@ describe("a quantity rendered with its unit passed as null", () => {
     expect(rawUnitsIn("a.tsx", text)).toHaveLength(1);
   });
 
+  it("reports a null unit after a quantity that is itself a call", () => {
+    const text = "{formatQuantityLocalized(t, Number(row.qty), null)}";
+    expect(rawUnitsIn("a.tsx", text)).toHaveLength(1);
+  });
+
   it("leaves a call that hands over a symbol alone", () => {
     const text = "{formatQuantityLocalized(t, row.qty, row.stock_uom_symbol)}";
     expect(rawUnitsIn("a.tsx", text)).toEqual([]);

@@ -359,6 +359,30 @@ describe("DocumentsTodoPage", () => {
     });
   });
 
+  it("offers to give back a task the reader holds, once the toast is gone", async () => {
+    viewport({ phone: true });
+    answer(queue([task({ assignee_id: "user-me" })]));
+    render(<DocumentsTodoPage />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Give it back" }));
+
+    expect(mutations.assign).toHaveBeenCalledWith({
+      sourceKind: "document",
+      sourceId: "doc-1",
+      assigneeId: null,
+    });
+  });
+
+  it("offers no give-back on a task somebody else holds", () => {
+    viewport({ phone: true });
+    answer(queue([task({ assignee_id: "user-other" })]));
+    render(<DocumentsTodoPage />);
+
+    expect(
+      screen.queryByRole("button", { name: "Give it back" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("does not open a task somebody else claimed before the tap", async () => {
     viewport({ phone: true });
     answer(queue([task({ assignee_id: null })]));
