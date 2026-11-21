@@ -440,6 +440,18 @@ function RecipeFormContent({
     });
   };
 
+  // A field's message leaves as soon as the field is valid again, not at the
+  // next Save.
+  const clearError = (key: string, valid: boolean) => {
+    if (!valid) return;
+    setErrors((prev) => {
+      if (!(key in prev)) return prev;
+      return Object.fromEntries(
+        Object.entries(prev).filter(([k]) => k !== key),
+      );
+    });
+  };
+
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
     if (!name.trim()) errs["name"] = t("form.errors.name_required");
@@ -516,7 +528,10 @@ function RecipeFormContent({
           <Input
             label={t("form.name")}
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              clearError("name", e.target.value.trim() !== "");
+            }}
             placeholder={t("form.name_placeholder")}
             error={errors["name"]}
           />
@@ -599,7 +614,10 @@ function RecipeFormContent({
                 type="number"
                 min={1}
                 value={servings}
-                onChange={(e) => setServings(e.target.value)}
+                onChange={(e) => {
+                  setServings(e.target.value);
+                  clearError("servings", Number(e.target.value) >= 1);
+                }}
                 error={errors["servings"]}
               />
               {Number(servings) > 0 &&
@@ -625,7 +643,13 @@ function RecipeFormContent({
               type="number"
               min={0}
               value={prepTime}
-              onChange={(e) => setPrepTime(e.target.value)}
+              onChange={(e) => {
+                setPrepTime(e.target.value);
+                clearError(
+                  "prep_time_minutes",
+                  e.target.value === "" || Number(e.target.value) >= 0,
+                );
+              }}
               placeholder="—"
               error={errors["prep_time_minutes"]}
             />
