@@ -682,7 +682,7 @@
     "exclusions_count_other": "{{count}} Artikel ausgeschlossen",
     "generate_list_disabled_tooltip": "Zuerst Mahlzeiten hinzufügen",
     "needs_meals_hint": "Mindestens eine Mahlzeit hinzufügen, um eine Einkaufsliste zu erstellen oder den Plan zu kopieren.",
-    "needs_meals_hint_copy_only": "Füge mindestens eine Mahlzeit hinzu, um diesen Plan zu kopieren.",
+    "needs_meals_hint_copy_only": "Mindestens eine Mahlzeit hinzufügen, um diesen Plan zu kopieren.",
     "not_cooked": "Nicht gekocht",
     "entry_move_error": "Mahlzeit konnte nicht verschoben werden. Bitte erneut versuchen.",
     "drag_to_move": "Zum Verschieben ziehen",

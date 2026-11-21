@@ -84,16 +84,17 @@ function readSlotConflicts(error: unknown): SlotConflict[] {
 /** Copying needs a meal to copy; the reason is text, not only a title. */
 function CopyPlanButton({
   hasMeals,
-  offersShoppingList,
   onCopy,
   t,
 }: {
   hasMeals: boolean;
-  /** Whether the screen also offers to generate a shopping list. */
-  offersShoppingList: boolean;
   onCopy: () => void;
   t: (key: string) => string;
 }) {
+  // The hint names only what the screen offers: no Generate without the
+  // shopping lists module.
+  const { isModuleEnabled } = useModules();
+  const offersShoppingList = isModuleEnabled("shopping_lists");
   return (
     <div className="flex flex-col items-end gap-1">
       <Button
@@ -121,7 +122,6 @@ export default function MealPlanDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation("recipes");
-  const { isModuleEnabled } = useModules();
 
   const [pickerState, setPickerState] = useState<PickerState | null>(null);
   const [cookEntry, setCookEntry] = useState<MealPlanEntry | null>(null);
@@ -424,7 +424,6 @@ export default function MealPlanDetailPage() {
       {canWrite && (
         <CopyPlanButton
           hasMeals={plan.entries.length > 0}
-          offersShoppingList={isModuleEnabled("shopping_lists")}
           onCopy={openCopyModal}
           t={t}
         />
