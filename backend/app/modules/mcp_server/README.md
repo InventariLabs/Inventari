@@ -1,11 +1,18 @@
 # MCP Server
 
 Serves an Inventari workspace over the Model Context Protocol (Streamable
-HTTP, revision 2026-07-28) at one endpoint:
+HTTP) at one endpoint:
 
 ```
 POST /api/v1/mcp-server/mcp
 ```
+
+The endpoint speaks two revisions of the protocol. A client that sends each
+request in the 2026-07-28 envelope is answered in 2026-07-28; one that opens
+with the `initialize` handshake negotiates the newest revision that handshake
+has, **2025-11-25**, and the connection runs there. Both answer the same tools
+and resources, so a client that reports 2025-11-25 is not talking to an older
+server.
 
 A client authenticates with an API key from the **API Keys** module. The key
 carries its organization, so every tool acts only in that organization, and its

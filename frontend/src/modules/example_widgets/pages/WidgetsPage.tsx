@@ -237,7 +237,10 @@ function WidgetCard({
           <div
             aria-hidden="true"
             className={cn(
-              "w-6 h-6 rounded-full border border-border",
+              // shrink-0: a flex child gives up its width before the text
+              // does, so a name long enough to wrap would flatten the dot
+              // beside it.
+              "h-6 w-6 shrink-0 rounded-full border border-border",
               known ? SWATCH[widget.color as WidgetColor] : "bg-surface-inset",
             )}
           />

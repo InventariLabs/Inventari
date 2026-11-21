@@ -106,7 +106,8 @@ def register_write_tools(server: MCPServer) -> None:
             'an existing product card with template_id to avoid a duplicate. '
             'Use correct_stock to change a quantity that already exists; use '
             'search_items first when the product may already be on a shelf. '
-            'Example: create_item(name="Olive oil", quantity=6, '
+            'A location_id is required: call list_locations when you have no '
+            'shelf id yet. Example: create_item(name="Olive oil", quantity=6, '
             'location_id="<a shelf id>").'
         ),
         annotations=_CREATE,
@@ -116,8 +117,14 @@ def register_write_tools(server: MCPServer) -> None:
             str, Field(description='What the record is; a product or a unit name.')
         ],
         location_id: Annotated[
-            UUID, Field(description='The shelf the stock stands on.')
-        ],
+            UUID | None,
+            Field(
+                description=(
+                    'The shelf the stock stands on; call list_locations for '
+                    'an id. Required: a record without a shelf is not stock.'
+                )
+            ),
+        ] = None,
         quantity: Annotated[
             Decimal, Field(description='How much arrives (0 or more).')
         ] = Decimal('1'),
@@ -152,6 +159,11 @@ def register_write_tools(server: MCPServer) -> None:
         """Create one stock record, with its opening movement and history."""
         identity = current_identity()
         identity.require('items:write')
+        # Refused by name, not by the parameter check: a client that omits
+        # location_id has to learn which shelf the record needs and which
+        # tool lists one, not read the server library's validation text.
+        if location_id is None:
+            raise refusal('LOCATION_REQUIRED', 'location_required')
         _refuse_a_negative_quantity(quantity)
         call_id = uuid4()
         data = ItemCreateDTO(

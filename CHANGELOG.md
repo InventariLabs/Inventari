@@ -283,6 +283,13 @@ says what the release does rather than what changed since them.
   `"verdict": "integration-only"` with a reason and an owner, and no
   `expires`, and a query-key entry is `by-design` or `to-fold`, the latter
   with an `expiry`.
+- The line picker of a delivery, a scrap, a transfer or any other warehouse
+  document now finds stock the way the catalogue picker does: by the product's
+  name, brand, the code on the record or its product card, the label code and
+  the serial number, not by name alone. A one- or two-character fragment
+  matches only the start of a field, so typing `oi` no longer lists
+  `Olive oil` while `Ol` still finds it; a search term of three characters or
+  more still matches anywhere in a field.
 
 ### Fixed
 
