@@ -34,7 +34,7 @@ export const DEDICATED_KEYS: ReadonlySet<string> = new Set([
  * as the module's own list does. The field still renders from the category
  * declaration; only its destination is the core column.
  */
-const SERIAL_KEY = "serial_number";
+export const SERIAL_KEY = "serial_number";
 const MODEL_KEY = "model_id";
 
 /** Drop category-declared fields that are owned by dedicated form cards. */

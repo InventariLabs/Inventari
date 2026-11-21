@@ -71,6 +71,10 @@ describe("MaintenanceTab — the service entries", () => {
       screen.getByRole("button", { name: "Delete maintenance entry" }),
     );
     let dialog = await screen.findByRole("alertdialog");
+    // The title names the entry, as the button that opened it does.
+    expect(
+      within(dialog).getByText("Delete maintenance entry?"),
+    ).toBeInTheDocument();
     expect(
       within(dialog).getByText('This permanently removes "Replaced fan".'),
     ).toBeInTheDocument();

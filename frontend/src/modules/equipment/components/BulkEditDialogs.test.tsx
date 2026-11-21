@@ -118,6 +118,23 @@ describe("BulkEditDialogs — assign to person", () => {
     expect(screen.queryByText(/no email on record/i)).not.toBeInTheDocument();
   });
 
+  it("says up front that the batch is issued without a return date", async () => {
+    mockDirectories([anna]);
+    render(
+      <BulkEditDialogs
+        action="assign_to"
+        selectedCount={3}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
+        isPending={false}
+      />,
+    );
+
+    expect(
+      await screen.findByText(/no return date, so they can never appear/i),
+    ).toBeInTheDocument();
+  });
+
   it("stays on an empty directory instead of sending a bare partner id", async () => {
     mockDirectories([]);
     const onConfirm = vi.fn();

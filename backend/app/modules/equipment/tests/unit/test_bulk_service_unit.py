@@ -213,7 +213,7 @@ class TestBulkEditItems:
         user_id = uuid4()
         item_id = uuid4()
         item = MagicMock()
-        item.meta_data = {'equipment': {'equipment_status': 'DEPLOYED'}}
+        item.meta_data = {'equipment': {'equipment_status': 'RETIRED'}}
         mock_core.items.get_async = AsyncMock(return_value=item)
         db = _db_mock()
         _scalars_result = MagicMock()

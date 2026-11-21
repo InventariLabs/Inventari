@@ -82,6 +82,13 @@ describe("AssetAttachmentsSection link gate", () => {
       .map((a) => a.getAttribute("href"));
     expect(hrefs).toEqual(["/uploads/a.pdf", "https://cdn.example/b.pdf"]);
   });
+
+  it("names the file each link opens", async () => {
+    await renderWith(["/uploads/a.pdf"]);
+    expect(
+      screen.getByRole("link", { name: "Open file-0.pdf" }),
+    ).toHaveAttribute("href", "/uploads/a.pdf");
+  });
 });
 
 /**

@@ -227,6 +227,9 @@ export function AssetAttachmentsSection({
                       href={attachmentHrefOrNull(att.url)!}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label={t("attachments.openFile", {
+                        name: att.original_name,
+                      })}
                       className="p-1.5 hover:bg-surface rounded"
                     >
                       {isImageContentType(att.content_type) ? (

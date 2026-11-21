@@ -602,7 +602,10 @@ export default function CampaignDetailPage() {
       {/* Stats */}
       <Card className="p-4 mb-4">
         <h2 className="text-sm font-semibold text-on mb-3">
-          {t("attestation.progressTitle", "Response Progress")}
+          {t(
+            "attestation.progressTitle",
+            "Response progress (counted by person)",
+          )}
         </h2>
         <StatsBar {...campaign.stats} />
       </Card>

@@ -47,6 +47,25 @@ const TOGGLEABLE_COLUMNS = [
   "status",
 ] as const;
 
+/** The catalogue spells the column ids its own way: "assigned_to" is "assignedTo". */
+const columnLabel = (
+  t: (key: string) => string,
+  key: (typeof TOGGLEABLE_COLUMNS)[number],
+): string => {
+  switch (key) {
+    case "serial":
+      return t("table.columns.serial");
+    case "location":
+      return t("table.columns.location");
+    case "assigned_to":
+      return t("table.columns.assignedTo");
+    case "warranty":
+      return t("table.columns.warranty");
+    case "status":
+      return t("table.columns.status");
+  }
+};
+
 const SORTABLE_COLUMNS: EquipmentSortKey[] = [
   "name",
   "warranty_until",
@@ -198,7 +217,7 @@ export function AssetTable({
                   onChange={() => toggleColumn(key)}
                   className="rounded border-border"
                 />
-                {t(`table.columns.${key}`)}
+                {columnLabel(t, key)}
               </label>
             ))}
           </div>

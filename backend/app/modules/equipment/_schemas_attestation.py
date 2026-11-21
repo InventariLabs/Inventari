@@ -135,8 +135,11 @@ class AuditResponseSchema(BaseModel):
     # Who is asking and until which day, for the public page: a person who
     # followed an emailed link has no other way to tell. Filled by the public
     # GET only. ``deadline_day`` is a calendar day on the organization's own
-    # clock, never an instant.
+    # clock, never an instant. ``organization_country`` is what the page needs
+    # to spell that day the way the organization's own screens do (English
+    # reads "3 Dec 2026" outside the US, "Dec 3, 2026" in it).
     organization_name: str | None = None
+    organization_country: str | None = None
     deadline_day: date | None = None
 
 
