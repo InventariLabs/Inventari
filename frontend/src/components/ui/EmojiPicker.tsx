@@ -103,6 +103,7 @@ export function EmojiPicker({ value, onChange, className }: EmojiPickerProps) {
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
         <PopoverPrimitive.Content
+          aria-label={t("modal.symbolLabel", { defaultValue: "Symbol" })}
           sideOffset={6}
           align="start"
           className="z-[var(--z-popover)] w-[320px] max-h-[400px] rounded-xl border border-border bg-surface-card shadow-lg flex flex-col overflow-hidden"

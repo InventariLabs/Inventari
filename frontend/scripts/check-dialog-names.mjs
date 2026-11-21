@@ -12,7 +12,10 @@
  *
  * A dialog passes when its opening tag carries `aria-label` or
  * `aria-labelledby`. Radix dialogs (`<DialogContent>` with `<DialogTitle>`)
- * are named by Radix itself and are not scanned here.
+ * are named by Radix itself and are not scanned here. A Radix popover panel
+ * (`<PopoverPrimitive.Content>`) is a `role="dialog"` too and has no title to
+ * borrow a name from: it carries a name of its own unless it states another
+ * role.
  *
  * The second rule exists because the first one was blind: it reads
  * windows that *declared* a role and stopped short of a name, and says
@@ -77,8 +80,21 @@ export function isScanned(rel) {
  * the first `>` would cut the tag in half.
  */
 export function sheetTags(text) {
+  return tagsMatching(text, /<Sheet(?=[\s/>])/g);
+}
+
+/**
+ * The opening `<PopoverPrimitive.Content ...>` tags in a file, as text.
+ *
+ * Radix gives the panel `role="dialog"` unless the tag says another role, so
+ * the panel is a dialog like a `<Sheet>` and owes the same name.
+ */
+export function popoverTags(text) {
+  return tagsMatching(text, /<PopoverPrimitive\.Content(?=[\s/>])/g);
+}
+
+function tagsMatching(text, opener) {
   const tags = [];
-  const opener = /<Sheet(?=[\s/>])/g;
   let match;
   while ((match = opener.exec(text)) !== null) {
     let depth = 0;
@@ -266,9 +282,15 @@ export function undismissibleIn(rel, text) {
 }
 
 export function unnamedIn(rel, text) {
-  return sheetTags(text)
-    .filter((tag) => !/aria-label(ledby)?[=\s]/.test(tag))
-    .map(() => rel);
+  const named = (tag) => /aria-label(ledby)?[=\s]/.test(tag);
+  // A popover that names another role (a menu, a listbox) is that thing, not
+  // a dialog, and the role says what it is.
+  const popovers = popoverTags(text).filter(
+    (tag) => !named(tag) && !/\brole=/.test(tag),
+  );
+  return [...sheetTags(text).filter((tag) => !named(tag)), ...popovers].map(
+    () => rel,
+  );
 }
 
 function main() {

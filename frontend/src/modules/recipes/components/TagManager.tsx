@@ -49,6 +49,19 @@ function TagRow({
 
   const setColorMutation = useSetTagColor();
 
+  // The swatches are named by what the reader sees, not by their hex code.
+  const colourNames: Record<string, string> = {
+    "#ef4444": t("tags.colour_red"),
+    "#f97316": t("tags.colour_orange"),
+    "#eab308": t("tags.colour_yellow"),
+    "#22c55e": t("tags.colour_green"),
+    "#06b6d4": t("tags.colour_cyan"),
+    "#3b82f6": t("tags.colour_blue"),
+    "#8b5cf6": t("tags.colour_violet"),
+    "#ec4899": t("tags.colour_pink"),
+    "#64748b": t("tags.colour_gray"),
+  };
+
   const handleColorPick = async (color: string | null) => {
     try {
       await setColorMutation.mutateAsync({ name: tag.name, color });
@@ -66,6 +79,7 @@ function TagRow({
       <InlinePopover
         open={showPicker}
         onOpenChange={setShowPicker}
+        label={t("tags_manager.set_color")}
         align="start"
         className="w-48 flex flex-wrap gap-1.5"
         trigger={
@@ -88,7 +102,7 @@ function TagRow({
             size="iconSm"
             variant="ghost"
             onClick={() => handleColorPick(c)}
-            aria-label={t("tags.pick_colour", { colour: c })}
+            aria-label={t("tags.pick_colour", { colour: colourNames[c] ?? c })}
             className="rounded-full border border-white hover:scale-110 transition"
             style={{ backgroundColor: c }}
           />
@@ -172,18 +186,17 @@ export default function TagManager({
    *  has done exactly that since the merge endpoint was written; it just had
    *  no way in that said "rename". */
   const handleRename = async (name: string, next: string) => {
+    const result = await mergeMutation.mutateAsync({
+      old_tag: name,
+      new_tag: next,
+    });
     setRenaming(null);
-    try {
-      const result = await mergeMutation.mutateAsync({
-        old_tag: name,
-        new_tag: next,
-      });
-      toast.success(
-        t("tags_manager.rename_success", { count: result.updated_recipes }),
-      );
-    } catch (err) {
-      toast.error(extractApiError(err, t("tags_manager.rename_failed")));
-    }
+    const count = result.updated_recipes;
+    toast.success(
+      tags.some((tag) => tag.name === next)
+        ? t("tags_manager.merge_success", { count })
+        : t("tags_manager.rename_success", { count }),
+    );
   };
 
   const handleDelete = async (name: string) => {
@@ -328,6 +341,7 @@ export default function TagManager({
         name={renaming}
         onCancel={() => setRenaming(null)}
         onConfirm={handleRename}
+        existing={tags.map((tag) => tag.name)}
       />
 
       <ConfirmDialog

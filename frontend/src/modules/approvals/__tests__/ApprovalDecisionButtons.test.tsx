@@ -107,6 +107,29 @@ describe("ApprovalDecisionButtons", () => {
     expect(receivedBody).toEqual({ notes: "Budget confirmed" });
   });
 
+  it("keeps the confirmation open with the refusal and the typed note", async () => {
+    server.use(
+      http.post("/api/v1/approvals/requests/:id/approve", () =>
+        HttpResponse.json({ detail: "Stage already decided" }, { status: 409 }),
+      ),
+    );
+    render(<ApprovalDecisionButtons approval={baseRequest} />, {
+      wrapper: createWrapper(),
+    });
+    fireEvent.click(screen.getByText("Approve"));
+    const input = await screen.findByPlaceholderText(
+      "Add a note for the audit trail (optional)",
+    );
+    fireEvent.change(input, { target: { value: "Budget confirmed" } });
+    fireEvent.click(screen.getByText("Approve request"));
+
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Add a note for the audit trail (optional)"),
+    ).toHaveValue("Budget confirmed");
+    expect(screen.getByText("Approve request")).toBeInTheDocument();
+  });
+
   it("uses the override onApprove adapter when provided", async () => {
     const onApprove = vi.fn().mockResolvedValue(undefined);
     render(

@@ -58,7 +58,15 @@ export function ApprovalWorkflowEditor({
 
   return (
     <div className="space-y-4">
-      <p className="text-xs text-on-muted">{t("workflows.roleApproverHint")}</p>
+      {/* The hint follows the choice made on each stage. */}
+      {stages.some((stage) => !stage.open) && (
+        <p className="text-xs text-on-muted">
+          {t("workflows.roleApproverHint")}
+        </p>
+      )}
+      {hasOpenStage && (
+        <p className="text-xs text-on-muted">{t("workflows.roleOpenHint")}</p>
+      )}
       {rolesKnown && !hasApproveHolder && hasOpenStage && (
         <p className="text-xs text-amber-600" role="note">
           {t("workflows.noApproverInOrganization")}

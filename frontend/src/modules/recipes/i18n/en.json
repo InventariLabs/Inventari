@@ -19,7 +19,7 @@
     "show_less_tags": "Show less",
     "ready_to_cook": "Ready to cook ({{total}})",
     "almost_ready": "Nearly there ({{total}})",
-    "sort_newest": "Newest",
+    "sort_newest": "Recently changed",
     "sort_name": "Name A-Z",
     "results_one": "result",
     "results_other": "results"
@@ -241,7 +241,7 @@
   "actions": {
     "new_recipe": "New recipe",
     "delete": "Delete",
-    "delete_confirm": "Delete recipe \"{{name}}\"? This cannot be undone.",
+    "delete_confirm": "Delete recipe \"{{name}}\"? Meal plans that include a deleted recipe lose those meals. This cannot be undone.",
     "start_picking": "Take from stock",
     "cook_for_stock_hint": "Creates a production order for a batch in the maker module",
     "add_to_meal_plan_hint": "Schedules this recipe in the meal calendar",
@@ -331,7 +331,9 @@
     "load_failed": "Could not open the recipe",
     "shopping_failed": "Failed to add to shopping list",
     "history_failed": "Failed to save note",
-    "image_failed": "Failed to process image"
+    "image_failed": "Failed to process image",
+    "add_to_plan_failed": "Could not add the recipe to the meal plan",
+    "export_failed": "Could not export the recipe"
   },
   "cost": {
     "title": "Estimated cost",
@@ -365,6 +367,7 @@
     "rename": "Rename",
     "rename_title": "Rename tag",
     "rename_label": "New name",
+    "rename_merges": "A tag named “{{name}}” already exists — renaming merges the two, and the old name is gone.",
     "rename_success_one": "Renamed: 1 recipe updated",
     "rename_success_other": "Renamed: {{count}} recipes updated",
     "rename_failed": "Failed to rename the tag",
@@ -555,7 +558,7 @@
       "bindInMain": "Bind the AI Connection that powers Recipe parsing in Settings → AI Connections."
     },
     "enableCostCalculation": "Enable cost calculation",
-    "enableCostCalculationDescription": "Show the per-recipe cost breakdown in the recipe view. Disable for home setups where recipe cost is irrelevant.",
+    "enableCostCalculationDescription": "Show the per-recipe cost breakdown in the recipe view. Turn it off if you do not track what ingredients cost.",
     "registerProductionAsDocument": "Register production as internal issue documents",
     "registerProductionAsDocumentDescription": "Create an audit-trail internal issue document for every completed production session. Off by default — enable it so production runs land in the document register."
   },
@@ -676,6 +679,7 @@
     "exclusions_count_other": "{{count}} items excluded",
     "generate_list_disabled_tooltip": "Add meals first",
     "needs_meals_hint": "Add at least one meal to generate a shopping list or copy this plan.",
+    "needs_meals_hint_copy_only": "Add at least one meal to copy this plan.",
     "not_cooked": "Not cooked",
     "entry_move_error": "Could not move this meal. Please try again.",
     "drag_to_move": "Drag to move",
@@ -687,7 +691,8 @@
     "copy_confirm": "Copy",
     "copy_error": "Could not copy the plan",
     "rate_title": "How was it?",
-    "rate_star": "Rate {{value}} star(s)",
+    "rate_star_one": "Rate {{count}} star",
+    "rate_star_other": "Rate {{count}} stars",
     "rate_skip": "Skip",
     "rate_submit": "Rate",
     "rate_success": "Rating saved",
@@ -767,7 +772,7 @@
     "pick_collection": "Choose a collection",
     "add": "Add",
     "delete_selected": "Delete",
-    "delete_confirm": "Delete {{count}} selected recipes? This cannot be undone.",
+    "delete_confirm": "Delete {{count}} selected recipes? Meal plans that include a deleted recipe lose those meals. This cannot be undone.",
     "tag_title": "Tag {{count}} recipes",
     "tag_hint": "Separate tags with commas",
     "tag_placeholder": "e.g. dinner, vegan",
@@ -778,8 +783,8 @@
     "error": "Bulk operation failed",
     "selected_count_one": "{{count}} selected",
     "selected_count_other": "{{count}} selected",
-    "delete_confirm_one": "Delete {{count}} selected recipe? This cannot be undone.",
-    "delete_confirm_other": "Delete {{count}} selected recipes? This cannot be undone.",
+    "delete_confirm_one": "Delete {{count}} selected recipe? Meal plans that include a deleted recipe lose those meals. This cannot be undone.",
+    "delete_confirm_other": "Delete {{count}} selected recipes? Meal plans that include a deleted recipe lose those meals. This cannot be undone.",
     "tag_title_one": "Tag {{count}} recipe",
     "tag_title_other": "Tag {{count}} recipes",
     "deleted_one": "{{count}} recipe deleted",
@@ -835,7 +840,16 @@
     "subtitle": "Home cooking: your dishes, their ingredients and what to cook from what you have"
   },
   "tags": {
-    "pick_colour": "Use colour {{colour}}"
+    "pick_colour": "Set color to {{colour}}",
+    "colour_red": "red",
+    "colour_orange": "orange",
+    "colour_yellow": "yellow",
+    "colour_green": "green",
+    "colour_cyan": "cyan",
+    "colour_blue": "blue",
+    "colour_violet": "violet",
+    "colour_pink": "pink",
+    "colour_gray": "gray"
   },
   "ai": {
     "purposeLabel": "Read a recipe from text",

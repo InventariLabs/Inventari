@@ -432,6 +432,7 @@ function PhoneMenu({
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
         <PopoverPrimitive.Content
+          aria-label={moreLabel}
           className="z-[var(--z-popover)] w-56 bg-surface-card rounded-xl border border-border shadow-xl p-1 flex flex-col gap-1"
           sideOffset={4}
           collisionPadding={8}

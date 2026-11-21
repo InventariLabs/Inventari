@@ -541,6 +541,7 @@ function RowActionsMenu({ actions }: { actions: RowAction[] }) {
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
         <PopoverPrimitive.Content
+          aria-label={t("actions.moreActions")}
           className="z-[var(--z-popover)] w-56 bg-surface-card rounded-xl border border-border shadow-xl p-1 flex flex-col gap-1"
           sideOffset={4}
         >

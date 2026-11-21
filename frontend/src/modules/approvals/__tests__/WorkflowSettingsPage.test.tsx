@@ -398,6 +398,18 @@ describe("WorkflowSettingsPage", () => {
     ).toBeDisabled();
   });
 
+  it("names the workflow in the Deactivate question", async () => {
+    server.use(
+      http.get("/api/v1/approvals/workflows", () =>
+        HttpResponse.json(onePage([baseWorkflow])),
+      ),
+    );
+    render(<WorkflowSettingsPage />, { wrapper: createWrapper() });
+    fireEvent.click(await screen.findByRole("button", { name: "Deactivate" }));
+    const dialog = await screen.findByRole("alertdialog");
+    expect(dialog).toHaveTextContent("Deactivate “Document Approval”?");
+  });
+
   it("toggles a workflow off via the Deactivate button", async () => {
     let receivedBody: Record<string, unknown> | null = null;
     server.use(

@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useCanWrite } from "@/hooks/useCanWrite";
+import { useModules } from "@/contexts/ModulesContext";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { invalidation } from "@/lib/api/invalidation";
 import {
@@ -83,10 +84,13 @@ function readSlotConflicts(error: unknown): SlotConflict[] {
 /** Copying needs a meal to copy; the reason is text, not only a title. */
 function CopyPlanButton({
   hasMeals,
+  offersShoppingList,
   onCopy,
   t,
 }: {
   hasMeals: boolean;
+  /** Whether the screen also offers to generate a shopping list. */
+  offersShoppingList: boolean;
   onCopy: () => void;
   t: (key: string) => string;
 }) {
@@ -104,7 +108,9 @@ function CopyPlanButton({
       </Button>
       {!hasMeals && (
         <p id="meal-plan-needs-meals" className="text-xs text-on-muted">
-          {t("meal_planner.needs_meals_hint")}
+          {offersShoppingList
+            ? t("meal_planner.needs_meals_hint")
+            : t("meal_planner.needs_meals_hint_copy_only")}
         </p>
       )}
     </div>
@@ -115,6 +121,7 @@ export default function MealPlanDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation("recipes");
+  const { isModuleEnabled } = useModules();
 
   const [pickerState, setPickerState] = useState<PickerState | null>(null);
   const [cookEntry, setCookEntry] = useState<MealPlanEntry | null>(null);
@@ -417,6 +424,7 @@ export default function MealPlanDetailPage() {
       {canWrite && (
         <CopyPlanButton
           hasMeals={plan.entries.length > 0}
+          offersShoppingList={isModuleEnabled("shopping_lists")}
           onCopy={openCopyModal}
           t={t}
         />

@@ -25,6 +25,9 @@ class TestUomAliases:
             ('pc', 'pcs'),
             ('szt', 'pcs'),
             ('opakowanie', 'pack'),
+            ('tablespoons', 'tbsp'),
+            ('Teaspoon', 'tsp'),
+            ('łyżeczka', 'tsp'),
         ],
     )
     def test_alias_normalization(self, alias: str, canonical: str) -> None:
@@ -50,6 +53,8 @@ class TestUomAliases:
             'l',
             'fl oz',
             'cup',
+            'tbsp',
+            'tsp',
             'pt',
             'qt',
             'gal',

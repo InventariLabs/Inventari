@@ -572,15 +572,12 @@ export default function RecipesPage() {
 
   const handleBulkTag = async (tags: string[]) => {
     if (selectedIds.size === 0 || tags.length === 0) return;
-    try {
-      await bulkTagMutation.mutateAsync({
-        recipeIds: Array.from(selectedIds),
-        tags,
-      });
-      toast.success(t("bulk.tagged"));
-    } catch (error) {
-      toast.error(extractApiError(error, t("bulk.error")));
-    }
+    // A refusal goes back to the tag sheet, which stays open and shows it.
+    await bulkTagMutation.mutateAsync({
+      recipeIds: Array.from(selectedIds),
+      tags,
+    });
+    toast.success(t("bulk.tagged"));
   };
 
   // ── Collections ───────────────────────────────────────────────────────────
@@ -763,6 +760,10 @@ export default function RecipesPage() {
               t={t}
             />
 
+            {/* Room under the list for the floating bar below, so the last
+                card is not hidden behind it. */}
+            {selectionMode && <div aria-hidden="true" className="h-36" />}
+
             {/* Batch action bar — multi-select mode */}
             <RecipeBulkBar
               open={selectionMode}
@@ -798,9 +799,9 @@ export default function RecipesPage() {
             <ConfirmDialog
               open={Boolean(deleteConfirmId)}
               title={t("actions.delete")}
-              message={
-                recipes.find((r) => r.id === deleteConfirmId)?.name ?? ""
-              }
+              message={t("actions.delete_confirm", {
+                name: recipes.find((r) => r.id === deleteConfirmId)?.name ?? "",
+              })}
               variant="danger"
               confirmLabel={t("actions.delete")}
               cancelLabel={t("common:form.cancel")}

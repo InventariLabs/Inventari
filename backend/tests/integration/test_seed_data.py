@@ -537,12 +537,20 @@ class TestNeutralSeedHasNoUsKitchenUnits:
     ``seed_uom`` lives in the profile described as "neutral, vertical-agnostic
     defaults", yet it seeded cup/pint/quart/gallon/fl-oz — so a workspace in
     the neutral mode picked its default unit between pieces, kilograms and
-    teacups. Those five units belong to the food profile's seed; existing
+    teacups. Those units, and the spoons, belong to the food profile's seed; existing
     installations keep their rows (``uoms`` has no owner column and is
     referenced by items, so nothing is deleted anywhere).
     """
 
-    _US_KITCHEN = {'Cup (US)', 'Pint (US)', 'Quart (US)', 'Gallon (US)', 'Fluid Ounce'}
+    _US_KITCHEN = {
+        'Cup (US)',
+        'Pint (US)',
+        'Quart (US)',
+        'Gallon (US)',
+        'Fluid Ounce',
+        'Tablespoon',
+        'Teaspoon',
+    }
 
     async def test_base_seed_omits_us_kitchen_units(
         self, real_async_db_session: AsyncSession

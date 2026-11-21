@@ -62,6 +62,11 @@ export const CATCHERS = {
   ConsumeDialog: ["onConfirm"],
   LotStatusDialog: ["onConfirm"],
   WorkflowSwitchOffDialog: ["onConfirm"],
+  // These three hand the promise to a ConfirmDialog or catch it themselves:
+  // the dialog / the tag sheet stays open and shows the refusal inside.
+  ApproveConfirmDialog: ["onConfirm"],
+  TagRenameDialog: ["onConfirm"],
+  RecipeBulkBar: ["onTag"],
   ItemsPageDialogs: ["onDelete", "onConsume"],
   ImportWizardSheet: ["run"],
   WebhookForm: ["onSave"],
