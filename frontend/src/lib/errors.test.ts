@@ -64,8 +64,28 @@ describe("extractApiError", () => {
     );
   });
 
-  it("returns fallback when axios error has no response", () => {
+  it("says the server could not be reached when nothing answered", () => {
+    // Every screen that fails a write gives its own fallback ("An error
+    // occurred", "The action could not be completed."); with the server
+    // stopped they all said the same thing as a 500.
     const err = new axios.AxiosError();
+    expect(extractApiError(err, "fallback")).toBe("Cannot reach the server");
+  });
+
+  it("says so for a proxy's own 502 as well", () => {
+    const err = new axios.AxiosError();
+    err.response = {
+      status: 502,
+      data: "<html>Bad gateway</html>",
+    } as typeof err.response;
+    expect(extractApiError(err, "fallback")).toBe("Cannot reach the server");
+  });
+
+  it("keeps the fallback for a request that was cancelled", () => {
+    const err = new axios.AxiosError(
+      "cancelled",
+      axios.AxiosError.ERR_CANCELED,
+    );
     expect(extractApiError(err, "fallback")).toBe("fallback");
   });
 

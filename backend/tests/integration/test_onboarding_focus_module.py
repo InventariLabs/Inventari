@@ -97,25 +97,36 @@ class TestOnboardingWithAFocusModule:
             json={'profile_id': 'clean_core', 'focus_module': 'recipes'},
             headers=_auth(user),
         )
-        await real_async_client.delete(FOCUS_URL, headers=_auth(user))
 
-        rows = (
-            await real_async_db_session.execute(
-                select(AuditLog).where(
-                    AuditLog.organization_id == user.organization_id,
-                    AuditLog.target_type == AuditTargetType.MODULE,
+        async def switches() -> list[dict]:
+            rows = (
+                await real_async_db_session.execute(
+                    select(AuditLog)
+                    .where(
+                        AuditLog.organization_id == user.organization_id,
+                        AuditLog.target_type == AuditTargetType.MODULE,
+                    )
+                    .order_by(AuditLog.created_at)
                 )
-            )
-        ).scalars()
-        switches = [
-            r.snapshot for r in rows if 'enabled' in (r.snapshot or {}).get('after', {})
-        ]
+            ).scalars()
+            return [
+                r.snapshot
+                for r in rows
+                if 'enabled' in (r.snapshot or {}).get('after', {})
+            ]
+
+        on_entry = await switches()
+        await real_async_client.delete(FOCUS_URL, headers=_auth(user))
+        on_leaving = (await switches())[len(on_entry) :]
+
+        # Entering journals each module it switches off and each it switches on.
+        assert any(s['after'] == {'enabled': False} for s in on_entry)
         # Leaving restores the pre-choice set: the modules focus switched off
         # are switched back on, one entry each, and the chosen one is not
         # among the entries because it stays on.
-        assert switches
-        assert all(s['after'] == {'enabled': True} for s in switches)
-        assert 'recipes' not in {s['name'] for s in switches}
+        assert on_leaving
+        assert all(s['after'] == {'enabled': True} for s in on_leaving)
+        assert 'recipes' not in {s['name'] for s in on_leaving}
 
     async def test_an_unknown_module_is_refused_and_onboarding_stays_open(
         self, real_async_client, real_async_db_session

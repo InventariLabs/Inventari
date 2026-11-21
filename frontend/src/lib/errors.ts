@@ -1,4 +1,5 @@
 import axios from "axios";
+import i18n from "@/i18n/config";
 
 interface ApiErrorDetail {
   code: string;
@@ -27,6 +28,11 @@ export function extractApiError(
   const readable = readableErrorMessage(error);
   if (readable) {
     return readable;
+  }
+  // A request nothing answered is an outage, not the failure the caller's
+  // fallback names: the same sentence the full-page screen and the lists give.
+  if (isUnreachableError(error)) {
+    return i18n.t("common:errors.backendUnavailableTitle");
   }
   if (axios.isAxiosError(error)) {
     // A 5xx `detail` is written for whoever reads the logs — an exception
@@ -164,6 +170,17 @@ export function isUnreachableError(error: unknown): boolean {
 export function isServerRefusal(error: unknown): boolean {
   const status = apiErrorStatus(error);
   return status !== null && status >= 400 && status < 500;
+}
+
+/**
+ * Whether a failed check or save condemns the link it was made with. A 4xx is
+ * the server refusing this token — except a 429, which refuses the pace of
+ * the requests from this address and says nothing about the link: read as a
+ * dead link, it sent a reader holding a perfectly good one off to ask for
+ * another.
+ */
+export function refusesTheLink(error: unknown): boolean {
+  return isServerRefusal(error) && apiErrorStatus(error) !== 429;
 }
 
 /**

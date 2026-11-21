@@ -12,17 +12,7 @@ import { AuthLayout } from "./AuthLayout";
 import { SignedInNotice } from "./SignedInNotice";
 import { PasswordRules } from "./PasswordRules";
 import { firstBrokenRule } from "@/lib/passwordPolicy";
-import { apiErrorStatus, isServerRefusal } from "@/lib/errors";
-
-/**
- * Whether a failed check or save condemns the link. A 4xx is the server
- * refusing this token — except a 429, which refuses the pace of the requests
- * from this address and says nothing about the link: read as a dead link, it
- * sent a reader holding a perfectly good one off to ask for another.
- */
-function refusesTheLink(error: unknown): boolean {
-  return isServerRefusal(error) && apiErrorStatus(error) !== 429;
-}
+import { apiErrorStatus, refusesTheLink } from "@/lib/errors";
 
 export default function ResetPasswordPage() {
   const { t } = useTranslation("auth");

@@ -70,7 +70,7 @@
     "name": "Nom",
     "edit": "Modifier",
     "unsavedTitle": "Modifications non enregistrées",
-    "unsavedLeave": "{{form}} contient des modifications non enregistrées. Quitter quand même ?",
+    "unsavedLeave": "{{form}} : vous avez des modifications non enregistrées. Quitter quand même ?",
     "leaveAnyway": "Quitter quand même",
     "discardTitle": "Abandonner la saisie ?",
     "discardMessage": "Tout ce que vous avez saisi dans ce formulaire sera perdu. Cette action est irréversible.",
@@ -309,7 +309,7 @@
       "general": "Général",
       "people": "Personnes",
       "modules": "Modules",
-      "myModules": "Mes modules",
+      "myModules": "Modules de l'organisation",
       "auditLog": "Journal d'audit",
       "roles": "Rôles et accès",
       "email": "E-mail",
@@ -386,6 +386,7 @@
       },
       "revoked": "Révoquée",
       "invitationAccepted": "Acceptée",
+      "removed": "Supprimé",
       "profileDefault": "Valeur par défaut du mode",
       "fields": {
         "address": "Adresse",
@@ -946,11 +947,13 @@
       "license_link": "Lire la licence",
       "source_title": "Code source",
       "source_hint": "Toute personne qui utilise cette installation peut obtenir le code source de la version qu’elle exécute.",
+      "source_tag_hint": "Le lien ouvre la page d’accueil du dépôt ; cette version y porte l’étiquette v{{version}}.",
       "source_link": "Obtenir le code source",
       "third_party_title": "Données tierces",
       "open_food_facts": "Les données produit importées d’Open Food Facts sont mises à disposition sous l’Open Database License (ODbL) 1.0.",
       "odbl_link": "Lire l’ODbL",
       "guide_hint": "Comment utiliser l'application, écran par écran : produits, emplacements, stocks, documents, paramètres. Le guide est en anglais.",
+      "guide_version_hint": "Le lien ouvre le guide de la dernière version, qui peut être plus récente que la version {{version}}.",
       "guide_link": "Ouvrir le guide d'utilisation"
     },
     "profile": {
@@ -1103,10 +1106,10 @@
   "unknown": "Inconnu",
   "focusLock": {
     "title": "Un seul module s'affiche",
-    "body": "Cet espace de travail affiche un module, donc le lanceur d'apps et la boutique sont mis de côté. Ouvrez « Mes modules » pour tous les réafficher.",
-    "exit": "Ouvrir « Mes modules »",
+    "body": "Cet espace de travail affiche un module, donc le lanceur d'apps et la boutique sont mis de côté. Ouvrez « Modules de l'organisation » pour tous les réafficher.",
+    "exit": "Ouvrir « Modules de l'organisation »",
     "unknownTitle": "Impossible de vérifier les modules affichés",
-    "unknownBody": "Impossible de lire les modules affichés par cet espace de travail ; le lanceur d'apps n'est donc pas affiché. Réessayez ou ouvrez « Mes modules ».",
+    "unknownBody": "Impossible de lire les modules affichés par cet espace de travail ; le lanceur d'apps n'est donc pas affiché. Réessayez ou ouvrez « Modules de l'organisation ».",
     "retry": "Réessayer"
   },
   "focusMarker": {
@@ -1117,6 +1120,7 @@
   },
   "appStore": {
     "activate": "Activer",
+    "activateNamed": "Activer {{name}}",
     "activateConfirm": "Activer",
     "activateConfirmTitle": "Activer {{name}} ?",
     "alwaysOn": "Toujours actif",
@@ -1137,6 +1141,7 @@
     "changesUiHint": "Ce module modifie la navigation et la terminologie de cette organisation.",
     "changesUiHintOff": "Activer ce module modifiera la navigation et la terminologie de cette organisation.",
     "deactivate": "Désactiver",
+    "deactivateNamed": "Désactiver {{name}}",
     "deactivateConfirmTitle": "Désactiver {{name}} ?",
     "declaredPrefix": "déclaré :",
     "degraded": "Limité",
@@ -1343,6 +1348,17 @@
     "count_other": "{{count}} sélectionnés",
     "countOnPage_one": "1 sélectionné sur cette page, sur {{total}}",
     "countOnPage_other": "{{count}} sélectionnés sur cette page, sur {{total}}"
+  },
+  "nativeValidation": {
+    "valueMissing": "Renseignez ce champ",
+    "typeMismatchEmail": "Saisissez une adresse e-mail",
+    "typeMismatchUrl": "Saisissez une adresse web",
+    "tooShort": "Utilisez au moins {{min}} caractères",
+    "tooLong": "Utilisez au plus {{max}} caractères",
+    "rangeUnderflow": "Saisissez une valeur d’au moins {{min}}",
+    "rangeOverflow": "Saisissez une valeur d’au plus {{max}}",
+    "badInput": "Saisissez une valeur valide",
+    "patternMismatch": "Respectez le format demandé"
   },
   "validation": {
     "nameRequired": "Le nom est requis",

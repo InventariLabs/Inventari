@@ -140,7 +140,7 @@ describe("a refusal that arrives as a blob", () => {
     expect(await response.data.text()).toBe("PNG-BYTES");
   });
 
-  it("says nothing about a failure that never reached the server", async () => {
+  it("reads a failure that never reached the server as an outage, not as a refusal", async () => {
     server.use(
       http.get("*/api/v1/locations/:id/print", () => HttpResponse.error()),
     );
@@ -150,6 +150,6 @@ describe("a refusal that arrives as a blob", () => {
     );
 
     expect((error as AxiosError).response).toBeUndefined();
-    expect(extractApiError(error, FALLBACK)).toBe(FALLBACK);
+    expect(extractApiError(error, FALLBACK)).toBe("Cannot reach the server");
   });
 });

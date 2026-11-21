@@ -10,9 +10,11 @@ Covered:
 
 import pytest
 from fastapi import status
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
+from app.models.audit_log import AuditLog
 from app.models.organization import Organization
 from app.models.user import User
 from app.services.token_service import create_access_token, get_password_hash
@@ -132,6 +134,36 @@ class TestEnterFocusMode:
         assert 'items' in food_home_org.enabled_modules
         # The profile itself is untouched.
         assert food_home_org.active_profile_id == 'food_home'
+
+    def test_entering_journals_each_module_it_switches_off(
+        self,
+        client: TestClient,
+        admin_headers: dict[str, str],
+        db_session: Session,
+        food_home_org: Organization,
+    ) -> None:
+        """Read by module, the log shows every module the narrowing disabled."""
+        response = client.post(
+            '/api/v1/modules/focus',
+            json={'module_name': 'equipment'},
+            headers=admin_headers,
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        rows = db_session.execute(
+            select(AuditLog.snapshot).where(
+                AuditLog.organization_id == food_home_org.id,
+                AuditLog.target_type == 'module',
+            )
+        ).scalars()
+        toggles = {
+            row['name']: row['after']['enabled']
+            for row in rows
+            if 'before' in row and 'enabled' in row['before']
+        }
+        assert toggles['recipes'] is False
+        assert toggles['shopping_lists'] is False
+        assert toggles['equipment'] is True
 
     def test_reject_an_always_on_focus(
         self, client: TestClient, admin_headers: dict[str, str]

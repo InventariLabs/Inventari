@@ -259,9 +259,12 @@ describe("DocumentRegisterPage — CSV export", () => {
   });
 
   it("says so when the export fails, since the browser will not", async () => {
-    vi.spyOn(documentsApi, "getRegisterCsv").mockRejectedValue(
-      new AxiosError("Network Error", "ERR_NETWORK"),
-    );
+    const failed = new AxiosError("Request failed", "ERR_BAD_RESPONSE");
+    failed.response = {
+      status: 500,
+      data: {},
+    } as AxiosError["response"];
+    vi.spyOn(documentsApi, "getRegisterCsv").mockRejectedValue(failed);
     const user = userEvent.setup();
     render(<DocumentRegisterPage />);
     await user.click(screen.getByRole("button", { name: "Export CSV" }));
