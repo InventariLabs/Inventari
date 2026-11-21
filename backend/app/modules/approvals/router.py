@@ -18,6 +18,7 @@ from app.core.exceptions import (
     NotFoundException,
 )
 from app.core.modules import require_module
+from app.core.public_api import core_api
 from app.i18n.service import get_current_lang, get_error_message
 from app.schemas.pagination import PaginatedResponse
 
@@ -33,6 +34,7 @@ from .schemas import (
     RejectRequest,
     RequestApproval,
     WaitingOnTarget,
+    WorkflowApprovers,
     WorkflowConfigured,
     WorkflowCreate,
     WorkflowDeletionResult,
@@ -188,6 +190,30 @@ async def get_workflow_configured(
     return WorkflowConfigured(
         configured=workflow is not None and bool(workflow.stages or []),
     )
+
+
+@router.get(
+    '/workflows/approvers',
+    response_model=WorkflowApprovers,
+    dependencies=[_CONFIGURE],
+)
+async def list_people_who_can_decide(
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> WorkflowApprovers:
+    """Which members of the organization could decide a stage they are named on.
+
+    The picker that names approvers reads it, so a person who cannot see
+    approvals is marked before the save refuses a stage that names only such
+    people. It is the same test the save applies (``deciders_async``).
+    Declared above ``/workflows/{workflow_id}`` for the reason the
+    ``configured`` route is.
+    """
+    from ._services_solvability import deciders_async
+
+    members = await core_api.users.list_org_members_async(db, org_id)
+    deciders = await deciders_async(db, org_id, [member.id for member in members])
+    return WorkflowApprovers(user_ids=sorted(deciders, key=str))
 
 
 @router.post(

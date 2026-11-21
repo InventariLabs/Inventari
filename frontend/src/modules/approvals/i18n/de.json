@@ -121,6 +121,7 @@
     "saveFailed": "Workflow konnte nicht gespeichert werden",
     "removeStage": "Stufe entfernen",
     "addApprover": "Genehmiger hinzufügen",
+    "cannotApprove": "kann keine Freigaben sehen",
     "removeApprover": "Genehmiger entfernen",
     "selectApprovers": "Genehmiger auswählen",
     "searchUsers": "Benutzer suchen…",

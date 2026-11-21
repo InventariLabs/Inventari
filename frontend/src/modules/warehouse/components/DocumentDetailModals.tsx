@@ -98,7 +98,9 @@ export default function DocumentDetailModals({
           ? {
               confirm: postNowSendsForApproval
                 ? t("confirmDialog.postNowApprovalConfirm")
-                : t("confirmDialog.postNowConfirm"),
+                : doc.type === "SCRAP"
+                  ? t("actions.postNowScrap")
+                  : t("confirmDialog.postNowConfirm"),
               keep: t("confirmDialog.postNowKeep"),
             }
           : confirmAction === "undo"

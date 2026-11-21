@@ -13,6 +13,7 @@ import { NutritionValuesGrid } from "./NutritionValuesGrid";
 import { productNutrition } from "../productNutrition";
 import { Button } from "@/components/ui/Button";
 import { useModules } from "@/contexts/ModulesContext";
+import { useCanWrite } from "@/module-sdk";
 import type { RegisterBeforeSubmit } from "@/lib/moduleRegistry";
 
 interface FoodNutrition {
@@ -60,7 +61,10 @@ const FoodAndHealthExtra: React.FC<Props> = ({ data }) => {
   // back refused — so both entries hide (the same gate applied to
   // quick add).
   const { enabledModules } = useModules();
-  const visionEnabled = enabledModules.includes("vision");
+  // Both routes in write the product; a reader who may only look is shown
+  // the values, or the plain "no data", without a button that does nothing.
+  const canWrite = useCanWrite("items");
+  const visionEnabled = enabledModules.includes("vision") && canWrite;
 
   if (!item) return null;
 
@@ -149,18 +153,19 @@ const FoodAndHealthExtra: React.FC<Props> = ({ data }) => {
   // The same form in both branches, so the empty state is not a closed loop:
   // typing values in by hand does not first require values, and a camera, a
   // legible label and an AI provider an admin configured are not the only way out.
-  const editForm = item.template_id ? (
-    <NutritionEditForm
-      nutritionFields={nutritionFields}
-      nutritionForm={manual.form}
-      showNutritionForm={manual.showForm}
-      isSaving={manual.isSaving}
-      onToggleForm={manual.onToggleForm}
-      onFieldChange={manual.onFieldChange}
-      onSave={manual.onSave}
-      t={t}
-    />
-  ) : null;
+  const editForm =
+    item.template_id && canWrite ? (
+      <NutritionEditForm
+        nutritionFields={nutritionFields}
+        nutritionForm={manual.form}
+        showNutritionForm={manual.showForm}
+        isSaving={manual.isSaving}
+        onToggleForm={manual.onToggleForm}
+        onFieldChange={manual.onFieldChange}
+        onSave={manual.onSave}
+        t={t}
+      />
+    ) : null;
 
   if (!hasData) {
     return (

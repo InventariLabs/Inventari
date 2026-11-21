@@ -126,6 +126,23 @@ class InventoryPeriodSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class OpenDocumentInPeriod(BaseModel):
+    id: UUID
+    number: str
+    type: str
+    status: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class OpenDocumentsInPeriod(BaseModel):
+    """What closing a month would strand: the documents dated in it not finished."""
+
+    count: int
+    #: The first few, enough for the dialog to name them and link to them.
+    documents: list[OpenDocumentInPeriod]
+
+
 class InventoryPeriodCreate(BaseModel):
     year: int = Field(..., ge=2000, le=2100)
     month: int = Field(..., ge=1, le=12)

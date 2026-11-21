@@ -187,13 +187,15 @@ export function confirmDialogTitle(
   confirmAction: ConfirmAction,
   t: (key: string, options?: Record<string, unknown>) => string,
   sendsForApproval = false,
+  docType?: string,
 ): string {
   if (!confirmAction) return "";
   if (confirmAction === "postNow") {
     // The button said "Send for approval"; the dialog it opens says the same.
-    return sendsForApproval
-      ? t("confirmDialog.postNowApprovalTitle")
-      : t("confirmDialog.postNowTitle");
+    if (sendsForApproval) return t("confirmDialog.postNowApprovalTitle");
+    // A write-off is not "posting a document": the question names the act.
+    if (docType === "SCRAP") return t("confirmDialog.postNowScrapTitle");
+    return t("confirmDialog.postNowTitle");
   }
   if (confirmAction === "undo") {
     return t("confirmDialog.undoTitle");
@@ -851,7 +853,12 @@ export default function DocumentDetailPage() {
           )
         }
         confirmAction={confirmAction}
-        confirmTitle={confirmDialogTitle(confirmAction, t, facts.required)}
+        confirmTitle={confirmDialogTitle(
+          confirmAction,
+          t,
+          facts.required,
+          doc.type,
+        )}
         postNowSendsForApproval={facts.required}
         confirmMessage={confirmDialogMessage(confirmAction, doc, facts, t)}
         confirmVariant={confirmDialogVariant(confirmAction)}

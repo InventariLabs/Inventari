@@ -11,6 +11,19 @@ export function useInventoryPeriods(year?: number) {
   });
 }
 
+/** What closing the month would strand; asked only while the dialog is open. */
+export function useOpenDocumentsInPeriod(
+  year: number,
+  month: number,
+  enabled: boolean,
+) {
+  return useModuleQuery("warehouse", {
+    queryKey: [...queryKeys.documents.periods, "open-documents", year, month],
+    queryFn: () => inventoryPeriodsApi.openDocuments(year, month),
+    extraEnabled: enabled,
+  });
+}
+
 export function useClosePeriod() {
   return useAppMutation(
     ({ year, month, notes }: { year: number; month: number; notes?: string }) =>

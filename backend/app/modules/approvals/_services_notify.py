@@ -13,7 +13,7 @@ which requires an AsyncSession — all approvals callers are async now.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 from html import escape
@@ -478,17 +478,20 @@ _REJECT_OPEN_DOC: dict[str, str] = {
 }
 
 
-async def notify_rejection_async(
+async def _tell_requester_async(
     db: AsyncSession,
     *,
     org_id: UUID,
     doc_id: UUID,
     request_id: UUID,
     requester_id: UUID,
-    reason: str | None,
+    kind: str,
+    notification_type: str,
+    wording: Callable[[str], tuple[str, str]],
 ) -> None:
-    """Notify the requester that their approval request was rejected.
+    """Tell the requester how their request ended: bell, push and e-mail.
 
+    ``wording`` turns the requester's language into the title and the body.
     Best-effort: any failure is logged but never raised. The caller must
     not roll back the request state on notification failure — same
     contract as ``_notify_pending_stage_approvers_async``.
@@ -497,7 +500,8 @@ async def notify_rejection_async(
         requester = await core_api.users.get_full_async(db, org_id, requester_id)
     except Exception as exc:  # noqa: BLE001 — the notice is best-effort
         logger.warning(
-            '[Approvals] notify_rejection: failed to load requester %s: %s',
+            '[Approvals] notify %s: failed to load requester %s: %s',
+            kind,
             requester_id,
             exc,
         )
@@ -507,11 +511,7 @@ async def notify_rejection_async(
         return
 
     lang = requester.preferred_language or 'en'
-    title = _loc(_REJECT_TITLE, lang)
-    if reason:
-        body = _loc(_REJECT_CONTENT, lang).format(reason=reason)
-    else:
-        body = _loc(_REJECT_NO_REASON, lang)
+    title, body = wording(lang)
     link = DOC_OPEN_LINK.format(doc_id=doc_id)
 
     try:
@@ -520,17 +520,18 @@ async def notify_rejection_async(
             user_id=requester_id,
             title=title,
             content=body,
-            notification_type='warning',
+            notification_type=notification_type,
             link=link,
             meta_data={
                 'approval_request_id': str(request_id),
                 'document_id': str(doc_id),
-                'kind': 'approval_rejected',
+                'kind': kind,
             },
         )
     except Exception as exc:  # noqa: BLE001 — the notice is best-effort
         logger.warning(
-            '[Approvals] notify_rejection: create_async failed for %s: %s',
+            '[Approvals] notify %s: create_async failed for %s: %s',
+            kind,
             requester_id,
             exc,
         )
@@ -540,14 +541,12 @@ async def notify_rejection_async(
         try:
             await core_api.notifications.publish_async(db, [dto])
         except Exception as exc:  # noqa: BLE001 — the notice is best-effort
-            logger.warning(
-                '[Approvals] notify_rejection: publish_async failed: %s', exc
-            )
+            logger.warning('[Approvals] notify %s: publish_async failed: %s', kind, exc)
 
     if requester.email:
         try:
             open_label = _loc(_REJECT_OPEN_DOC, lang)
-            # `body` carries the approver's free-text reason; escaped here
+            # `body` can carry the approver's free-text note; escaped here
             # because this is the one channel that renders it as markup.
             html = (
                 '<html><body style="font-family:sans-serif;line-height:1.6;'
@@ -560,10 +559,98 @@ async def notify_rejection_async(
             )
         except Exception as exc:  # noqa: BLE001 — email is best-effort
             logger.warning(
-                '[Approvals] notify_rejection: email to %s failed: %s',
+                '[Approvals] notify %s: email to %s failed: %s',
+                kind,
                 requester.email,
                 exc,
             )
+
+
+async def notify_rejection_async(
+    db: AsyncSession,
+    *,
+    org_id: UUID,
+    doc_id: UUID,
+    request_id: UUID,
+    requester_id: UUID,
+    reason: str | None,
+) -> None:
+    """Notify the requester that their approval request was rejected."""
+
+    def wording(lang: str) -> tuple[str, str]:
+        if reason:
+            body = _loc(_REJECT_CONTENT, lang).format(reason=reason)
+        else:
+            body = _loc(_REJECT_NO_REASON, lang)
+        return _loc(_REJECT_TITLE, lang), body
+
+    await _tell_requester_async(
+        db,
+        org_id=org_id,
+        doc_id=doc_id,
+        request_id=request_id,
+        requester_id=requester_id,
+        kind='approval_rejected',
+        notification_type='warning',
+        wording=wording,
+    )
+
+
+_APPROVE_TITLE: dict[str, str] = {
+    'en': 'Your approval request was approved',
+    'pl': 'Twój wniosek o akceptację został zatwierdzony',
+    'de': 'Ihre Genehmigungsanfrage wurde genehmigt',
+    'fr': "Votre demande d'approbation a été approuvée",
+    'es': 'Su solicitud de aprobación fue aprobada',
+}
+_APPROVE_CONTENT: dict[str, str] = {
+    'en': 'Note: {notes}. Open the document to see where it stands.',
+    'pl': 'Uwaga: {notes}. Otwórz dokument, aby zobaczyć, co dalej.',
+    'de': 'Hinweis: {notes}. Öffnen Sie das Dokument, um den Stand zu sehen.',
+    'fr': 'Remarque : {notes}. Ouvrez le document pour voir où il en est.',
+    'es': 'Nota: {notes}. Abra el documento para ver cómo sigue.',
+}
+_APPROVE_NO_NOTES: dict[str, str] = {
+    'en': 'Open the document to see where it stands.',
+    'pl': 'Otwórz dokument, aby zobaczyć, co dalej.',
+    'de': 'Öffnen Sie das Dokument, um den Stand zu sehen.',
+    'fr': 'Ouvrez le document pour voir où il en est.',
+    'es': 'Abra el documento para ver cómo sigue.',
+}
+
+
+async def notify_approval_async(
+    db: AsyncSession,
+    *,
+    org_id: UUID,
+    doc_id: UUID,
+    request_id: UUID,
+    requester_id: UUID,
+    notes: str | None,
+) -> None:
+    """Notify the requester that their approval request was approved.
+
+    Sent when the last stage settles the request, as a rejection is: the
+    person who sent the document should not have to open it to learn that.
+    """
+
+    def wording(lang: str) -> tuple[str, str]:
+        if notes:
+            body = _loc(_APPROVE_CONTENT, lang).format(notes=notes)
+        else:
+            body = _loc(_APPROVE_NO_NOTES, lang)
+        return _loc(_APPROVE_TITLE, lang), body
+
+    await _tell_requester_async(
+        db,
+        org_id=org_id,
+        doc_id=doc_id,
+        request_id=request_id,
+        requester_id=requester_id,
+        kind='approval_approved',
+        notification_type='success',
+        wording=wording,
+    )
 
 
 # Requester notification when the workflow was switched off under a waiting

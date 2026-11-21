@@ -6,6 +6,7 @@ import { DateInput } from "@/components/ui/DateInput";
 import { Textarea } from "@/components/ui/Textarea";
 import { InlineQueryError } from "@/components/ui/QueryResult";
 import { SearchableCombobox } from "@/components/ui/SearchableCombobox";
+import { useInventoryPeriods } from "@/modules/warehouse/hooks/useInventoryPeriods";
 import { LocationField } from "@/modules/warehouse/components/LocationField";
 import type { LocationPickerEmptyReason } from "@/modules/shared/lib/locationPickerOffer";
 import type { PartnerOption } from "@/hooks/usePartnerPicker";
@@ -94,6 +95,15 @@ export function DocumentFormFields({
   onPartnerCreate,
 }: DocumentFormFieldsProps) {
   const { t } = useTranslation("warehouse");
+
+  // A document cannot be dated in a closed month: the date picker greys those
+  // days out and says why, rather than leaving the refusal for the save.
+  const { data: periods } = useInventoryPeriods();
+  const closedMonths = new Set(
+    (periods ?? [])
+      .filter((p) => p.is_closed)
+      .map((p) => `${p.year}-${String(p.month).padStart(2, "0")}`),
+  );
 
   // What a location picker says when it has nothing to offer. The policy case
   // gets the way out — the switch that reveals the hidden locations, on the
@@ -224,6 +234,10 @@ export function DocumentFormFields({
           label={t("fields.scheduledDate")}
           value={scheduledDate}
           onChange={(e) => onScheduledDateChange(e)}
+          unavailable={{
+            test: (iso) => closedMonths.has(iso.slice(0, 7)),
+            note: t("periods.closedDaysNote"),
+          }}
         />
         <Input
           label={t("fields.externalReference")}
