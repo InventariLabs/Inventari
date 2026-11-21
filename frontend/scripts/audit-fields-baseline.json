@@ -54,6 +54,46 @@
     },
     {
       "language": "en",
+      "key": "new_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "new_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "new_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "new_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "old_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "old_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "old_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "old_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "en",
       "key": "usage_customer",
       "section": "values"
     },
@@ -124,6 +164,46 @@
     },
     {
       "language": "pl",
+      "key": "new_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "new_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "new_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "new_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "old_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "old_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "old_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "old_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "pl",
       "key": "usage_customer",
       "section": "values"
     },
@@ -194,6 +274,46 @@
     },
     {
       "language": "de",
+      "key": "new_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "new_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "new_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "new_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "old_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "old_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "old_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "old_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "de",
       "key": "usage_customer",
       "section": "values"
     },
@@ -264,6 +384,46 @@
     },
     {
       "language": "fr",
+      "key": "new_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "new_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "new_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "new_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "old_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "old_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "old_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "old_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "fr",
       "key": "usage_customer",
       "section": "values"
     },
@@ -330,6 +490,46 @@
     {
       "language": "es",
       "key": "SUPPLIER",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "new_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "new_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "new_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "new_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "old_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "old_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "old_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "old_status_in_progress",
       "section": "values"
     },
     {

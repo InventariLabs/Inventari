@@ -585,3 +585,40 @@ def test_a_writer_that_journals_only_field_names_shows_no_value(
 
     assert 'status' in payload['keys']
     assert payload['values'] == []
+
+
+def test_a_transition_snapshot_shows_the_values_of_the_column_it_moves(
+    collect_keys, tmp_path: Path
+) -> None:
+    """A snapshot literal holding ``old_status`` and ``new_status`` prints a
+    stored value under each key, whatever enum the imported model's column
+    carries; a lone ``old_`` key is not a transition and names no value."""
+    root = _write_app(
+        tmp_path,
+        {
+            'models/thing.py': (
+                'class ThingStatus(str, Enum):\n'
+                '    OPEN = "open"\n'
+                '    SHUT = "shut"\n'
+                '\n'
+                'class Thing(Base):\n'
+                '    status: Mapped[ThingStatus]\n'
+                '    name: str\n'
+            ),
+            'services/thing_writes.py': (
+                'from app.models.thing import Thing\n'
+                '\n'
+                'snapshot = {"old_status": "a", "new_status": "b"}\n'
+                'lone = {"old_name": "a"}\n'
+            ),
+        },
+    )
+
+    payload = collect_keys(root)
+
+    assert payload['values'] == [
+        'new_status:open',
+        'new_status:shut',
+        'old_status:open',
+        'old_status:shut',
+    ]

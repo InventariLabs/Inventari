@@ -418,6 +418,14 @@ describe("check-audit-fields enum values", () => {
     expect(output).not.toContain(": planted (values)");
   });
 
+  it("demands <old_|new_>field_value for a transition's stored status", () => {
+    // The stock-take journal line prints `old_status` / `new_status` raw
+    // ("in_progress"); the renderer reads the key under the line's own field.
+    expect(
+      valueKeys(["old_status:in_progress", "new_status:cancelled"]).sort(),
+    ).toEqual(["new_status_cancelled", "old_status_in_progress"]);
+  });
+
   it("leaves a field the renderer words from another dictionary alone", () => {
     expect(
       valueKeys(["role:owner", "usage:internal", "type:SUPPLIER"]).sort(),

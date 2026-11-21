@@ -3,8 +3,9 @@
 Passes this comes from: the 2026-11 QA round met "Decimal input should have no
 more than 8 digits before the decimal point" in a toast (stock take screen),
 "1 validation error for create_itemArguments" from the MCP ``create_item``
-tool, and a bare English sentence as the 413 body-size refusal. Each was fixed
-where it was found; this file keeps the class at zero.
+tool, and a bare English sentence as the 413 body-size refusal. The route
+refusals are held at the baseline below and a new type outside it fails; the
+413 body-size refusal is not a schema error, so this probe does not reach it.
 
 The rule. Every write route of the assembled application (core and every
 module) has a body schema. For each one this builds bodies that break it —

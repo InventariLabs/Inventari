@@ -523,6 +523,87 @@ def writes_values(tree: ast.AST) -> bool:
     return False
 
 
+def transition_fields(tree: ast.AST) -> set[str]:
+    """The fields a journal line shows as an ``old_<f>``/``new_<f>`` pair.
+
+    A writer that puts both sides of a transition in one snapshot literal
+    (``{'old_status': …, 'new_status': …}``) prints a stored value under each
+    key; the field is the part after the prefix.
+    """
+    found: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Dict):
+            continue
+        names = {
+            key.value
+            for key in node.keys
+            if isinstance(key, ast.Constant) and isinstance(key.value, str)
+        }
+        found.update(
+            name[4:]
+            for name in names
+            if name.startswith('old_') and f'new_{name[4:]}' in names
+        )
+    return found
+
+
+def transition_values(
+    transitions: list[tuple[set[str], dict[str, str]]],
+    sources: dict[str, dict[str, FieldSource]],
+    sets: dict[str, set[str]],
+    resolve,
+) -> set[str]:
+    """``old_<f>:value`` and ``new_<f>:value`` for the values of field ``f`` on
+    the classes the writer's file imports — the model whose column it moves."""
+    found: set[str] = set()
+    for fields, imports in transitions:
+        for qualified in map(resolve, imports.values()):
+            module = qualified.rpartition('.')[0]
+            for field in fields:
+                source = sources.get(qualified, {}).get(field)
+                if source is None:
+                    continue
+                values = set(source['literals'])
+                for local in source['names']:
+                    values.update(sets.get(resolve(f'{module}.{local}'), set()))
+                for value in values:
+                    found.update({f'old_{field}:{value}', f'new_{field}:{value}'})
+    return found
+
+
+def payload_fields(
+    declarations: list[tuple[str, str]],
+    value_declarations: list[tuple[str, str]],
+    columns: dict[str, str],
+    class_fields: dict[str, set[str]],
+    value_sources: tuple[dict[str, dict[str, FieldSource]], dict[str, set[str]]],
+    resolve,
+) -> tuple[set[str], set[str]]:
+    """The fields the payload writers journal, and the values of those a
+    writer that journals before/after can show."""
+    sources, sets = value_sources
+    keys: set[str] = set()
+    values: set[str] = set()
+    for schema_name, model_name in declarations:
+        schema_keys = {
+            columns.get(field, field)
+            for field in class_fields.get(resolve(schema_name), set())
+        }
+        journalled = schema_keys & class_fields.get(resolve(model_name), set())
+        keys.update(journalled)
+        if (schema_name, model_name) in value_declarations:
+            values.update(
+                values_written(
+                    (resolve(schema_name), resolve(model_name)),
+                    journalled,
+                    sources,
+                    sets,
+                    resolve,
+                )
+            )
+    return keys, values
+
+
 def collect_keys(root: Path) -> CollectedKeys:
     """The artefact payload for one application tree."""
     keys: set[str] = set()
@@ -533,6 +614,7 @@ def collect_keys(root: Path) -> CollectedKeys:
     value_declarations: list[tuple[str, str]] = []
     declarations: list[tuple[str, str]] = []
     funnel_files: list[str] = []
+    transitions: list[tuple[set[str], dict[str, str]]] = []
     aliases: dict[str, str] = {}
     files = 0
     for path in sorted(root.rglob('*.py')):
@@ -568,6 +650,7 @@ def collect_keys(root: Path) -> CollectedKeys:
             sources.setdefault(f'{module}.{name}', {}).update(fields)
         declarations.extend(file_declarations)
         value_declarations.extend(file_declarations if writes_values(tree) else [])
+        transitions.append((transition_fields(tree), file_imports))
         if dynamic_funnel_keys:
             funnel_files.append((module, file_declarations))
         # Every from-import is also a public name of its own module pointing
@@ -600,25 +683,16 @@ def collect_keys(root: Path) -> CollectedKeys:
     # names apart from its column reaches the model under the column's name
     # (the model's synonym for it is how a client's name gets there, not a
     # key the journal shows).
-    columns = column_for_field(root)
-    values: set[str] = set()
-    for schema_name, model_name in declarations:
-        schema_keys = {
-            columns.get(field, field)
-            for field in class_fields.get(resolve(schema_name), set())
-        }
-        journalled = schema_keys & class_fields.get(resolve(model_name), set())
-        keys.update(journalled)
-        if (schema_name, model_name) in value_declarations:
-            values.update(
-                values_written(
-                    (resolve(schema_name), resolve(model_name)),
-                    journalled,
-                    sources,
-                    sets,
-                    resolve,
-                )
-            )
+    journalled, values = payload_fields(
+        declarations,
+        value_declarations,
+        column_for_field(root),
+        class_fields,
+        (sources, sets),
+        resolve,
+    )
+    keys.update(journalled)
+    values.update(transition_values(transitions, sources, sets, resolve))
 
     # A funnel writer with dynamic keys is covered only by a declaration
     # whose two names both resolve to classes the tree defines — a typo in
