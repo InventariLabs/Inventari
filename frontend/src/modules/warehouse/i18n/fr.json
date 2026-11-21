@@ -194,6 +194,7 @@
     "cancel": "Annuler",
     "cancelDocument": "Annuler le document",
     "cancelNeedsManager": "Annuler un document confirmé libère le stock qu’il retient — demandez à quelqu’un qui gère les documents.",
+    "deleteNeedsManager": "Seule une personne qui gère les documents peut supprimer ce brouillon — demandez-lui s’il s’agit d’une erreur. Tant qu’il n’est pas appliqué, il ne modifie aucun stock.",
     "delete": "Supprimer",
     "edit": "Modifier",
     "view": "Voir",

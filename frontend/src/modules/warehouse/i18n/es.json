@@ -194,6 +194,7 @@
     "cancel": "Cancelar",
     "cancelDocument": "Cancelar documento",
     "cancelNeedsManager": "Cancelar un documento confirmado libera el stock que retiene: pide ayuda a alguien que gestione documentos.",
+    "deleteNeedsManager": "Solo alguien que gestione documentos puede eliminar este borrador: pídeselo si es un error. Mientras no se aplique, no cambia el stock.",
     "delete": "Eliminar",
     "edit": "Editar",
     "view": "Ver",

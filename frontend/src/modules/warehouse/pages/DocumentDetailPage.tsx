@@ -26,13 +26,14 @@ import { DocumentPackingStep } from "@/modules/warehouse/components/packing/Docu
 import { DocumentShipmentCard } from "@/modules/warehouse/components/shipping/DocumentShipmentCard";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
-import { useCanWrite } from "@/hooks/useCanWrite";
+import { useCanManage, useCanWrite } from "@/hooks/useCanWrite";
 import {
   formatDate,
   formatDateTime,
   formatQuantityLocale,
 } from "@/utils/formatters";
 import { DocumentStatusBadge } from "@/modules/warehouse/components/DocumentStatusBadge";
+import { managerOnlyNoteKey } from "@/modules/warehouse/components/DocumentActionButtons";
 import {
   executionPanelVisible,
   useApprovalGate,
@@ -436,6 +437,30 @@ function UndoRefusedNote({ doc }: { doc: WarehouseDocument }) {
   return <p className="text-sm text-on-muted">{t("posted.undoHeldGoods")}</p>;
 }
 
+/**
+ * What a member who may write but not manage cannot do on this document,
+ * said in words where the actions are read: the Delete they are not
+ * offered on their own draft correction, and the disabled Cancel.
+ */
+function ManagerOnlyNote({ doc }: { doc: WarehouseDocument }) {
+  const { t } = useTranslation("warehouse");
+  const canWrite = useCanWrite("warehouse");
+  const canManage = useCanManage("warehouse");
+  const key = managerOnlyNoteKey(doc.type, doc.status);
+  if (!canWrite || canManage || !key) return null;
+  return <p className="text-sm text-on-muted">{t(key)}</p>;
+}
+
+/** The notes that say why an action is missing or disabled. */
+function DocumentStateNotes({ doc }: { doc: WarehouseDocument }) {
+  return (
+    <>
+      <UndoRefusedNote doc={doc} />
+      <ManagerOnlyNote doc={doc} />
+    </>
+  );
+}
+
 // Line quantities are counted in the interface language: at most three
 // decimals, and the mark a reader of that language writes.
 function formatQuantity(value: number): string {
@@ -653,7 +678,7 @@ export default function DocumentDetailPage() {
   return (
     <div className="space-y-6">
       <ReadOnlyNotice module="warehouse" />
-      <UndoRefusedNote doc={doc} />
+      <DocumentStateNotes doc={doc} />
       {approval && approval.status === "REJECTED" && (
         <DocumentApprovalRejectedBanner
           approval={speakingApproval(approval, doc.status)}

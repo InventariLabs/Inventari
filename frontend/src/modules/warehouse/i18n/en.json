@@ -194,6 +194,7 @@
     "cancel": "Cancel",
     "cancelDocument": "Cancel document",
     "cancelNeedsManager": "Cancelling a confirmed document releases the stock it holds — ask someone who can manage documents.",
+    "deleteNeedsManager": "Only someone who can manage documents can delete this draft — ask them if it was a mistake. Until it is applied it changes no stock.",
     "delete": "Delete",
     "edit": "Edit",
     "view": "View",

@@ -232,6 +232,26 @@ function cancelOffersItself(
   return !isCorrection && (isConfirmed || docStatus === "PENDING_APPROVAL");
 }
 
+/**
+ * What a member who may write but not manage is told they cannot do here,
+ * as an i18n key: discard a draft correction (only a manager deletes it),
+ * or cancel a document the Cancel button offers to managers alone. Null
+ * where nothing on the document is kept from them. The disabled Cancel
+ * explains itself in a title, which a phone never shows, so the page says
+ * it in words as well.
+ */
+export function managerOnlyNoteKey(
+  docType: string,
+  docStatus: string,
+): string | null {
+  const isCorrection = docType === "CORRECTION";
+  if (isCorrection && docStatus === "DRAFT")
+    return "warehouse:actions.deleteNeedsManager";
+  if (cancelOffersItself(isCorrection, docStatus === "CONFIRMED", docStatus))
+    return "warehouse:actions.cancelNeedsManager";
+  return null;
+}
+
 interface DocumentActionButtonsProps {
   isDraft: boolean;
   isConfirmed: boolean;

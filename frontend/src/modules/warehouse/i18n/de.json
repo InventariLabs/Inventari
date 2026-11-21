@@ -194,6 +194,7 @@
     "cancel": "Abbrechen",
     "cancelDocument": "Beleg stornieren",
     "cancelNeedsManager": "Das Stornieren eines bestätigten Belegs gibt den reservierten Bestand frei — wenden Sie sich an jemanden mit Belegverwaltung.",
+    "deleteNeedsManager": "Diesen Entwurf kann nur jemand mit Belegverwaltung löschen — wenden Sie sich an diese Person, wenn er ein Versehen ist. Solange er nicht angewendet ist, ändert er keinen Bestand.",
     "delete": "Löschen",
     "edit": "Bearbeiten",
     "view": "Anzeigen",

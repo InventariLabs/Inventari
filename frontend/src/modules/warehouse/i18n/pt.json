@@ -194,6 +194,7 @@
     "cancel": "Cancelar",
     "cancelDocument": "Cancelar documento",
     "cancelNeedsManager": "Cancelar um documento confirmado libera o estoque que ele reserva — peça a alguém que possa gerenciar documentos.",
+    "deleteNeedsManager": "Só alguém que possa gerenciar documentos pode excluir este rascunho — peça a essa pessoa se for um engano. Enquanto não for aplicado, não altera o estoque.",
     "delete": "Excluir",
     "edit": "Editar",
     "view": "Ver",

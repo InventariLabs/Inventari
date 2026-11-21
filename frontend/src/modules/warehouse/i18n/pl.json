@@ -224,6 +224,7 @@
     "cancel": "Anuluj",
     "cancelDocument": "Anuluj dokument",
     "cancelNeedsManager": "Anulowanie zaakceptowanego dokumentu zwalnia zajęty przez niego stan — poproś kogoś, kto zarządza dokumentami.",
+    "deleteNeedsManager": "Ten szkic może usunąć tylko ktoś, kto zarządza dokumentami — poproś go, jeśli to pomyłka. Dopóki go nie zastosujesz, nie zmienia stanu.",
     "delete": "Usuń",
     "edit": "Edytuj",
     "view": "Podgląd",
