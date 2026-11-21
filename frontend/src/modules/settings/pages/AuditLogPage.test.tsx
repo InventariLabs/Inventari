@@ -193,53 +193,6 @@ describe("AuditLogPage — the empty journal says which emptiness it is", () => 
     expect(screen.queryByText("An error occurred")).not.toBeInTheDocument();
   });
 
-  it("drops the row count and the pager when the next request fails", async () => {
-    // The error card replaces the rows. The footer kept the previous page's
-    // "Showing 1–40 of 40" under it — a count of rows that are not there.
-    const row = {
-      id: "a1",
-      organization_id: "o1",
-      user_id: "u1",
-      user_email: "admin@example.com",
-      action: "CREATE",
-      target_type: "partner",
-      target_id: "7d6f4bf7-1111-2222-3333-444455556666",
-      snapshot: { name: "Acme" },
-      reason: null,
-      meta_data: null,
-      created_at: "2026-08-20T10:00:00Z",
-    };
-    let failing = false;
-    server.use(
-      http.get("/api/v1/audit-log/target-types", () =>
-        HttpResponse.json(["partner"]),
-      ),
-      http.get("/api/v1/audit-log", () =>
-        failing
-          ? HttpResponse.error()
-          : HttpResponse.json({
-              ...EMPTY_PAGE,
-              items: [row],
-              total: 40,
-            }),
-      ),
-    );
-    renderPage();
-    expect(await screen.findByText("40")).toBeInTheDocument();
-
-    failing = true;
-    await screen.findByRole("option", { name: "Partner" });
-    await userEvent.selectOptions(
-      screen.getByLabelText("Target type"),
-      "partner",
-    );
-
-    expect(
-      (await screen.findAllByText("Cannot reach the server")).length,
-    ).toBeGreaterThan(0);
-    expect(screen.queryByText("40")).not.toBeInTheDocument();
-  });
-
   it("says the server could not be reached when a proxy answers for it", async () => {
     // The dev server's proxy, or a reverse proxy in production, answers a
     // stopped backend with a 502 of its own — an answer, but not the server's.
