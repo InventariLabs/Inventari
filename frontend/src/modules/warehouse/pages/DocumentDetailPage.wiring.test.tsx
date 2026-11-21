@@ -324,7 +324,13 @@ describe("DocumentDetailPage — header actions open what they name", () => {
     givenDocument({
       type: "IN",
       status: "COMPLETED",
-      lines: [{ id: "line-1", held_quantity: "5" }],
+      lines: [
+        documentLine({
+          id: "line-1",
+          document_id: "doc-1",
+          held_quantity: "5",
+        }),
+      ],
     });
     renderPage();
     expect(headerProps().canUndo).toBe(false);
