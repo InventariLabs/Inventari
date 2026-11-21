@@ -364,7 +364,9 @@ describe("DocumentsTodoPage", () => {
     answer(queue([task({ assignee_id: "user-me" })]));
     render(<DocumentsTodoPage />);
 
-    await userEvent.click(screen.getByRole("button", { name: "Give it back" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: /^Give it back: / }),
+    );
 
     expect(mutations.assign).toHaveBeenCalledWith({
       sourceKind: "document",
@@ -379,7 +381,7 @@ describe("DocumentsTodoPage", () => {
     render(<DocumentsTodoPage />);
 
     expect(
-      screen.queryByRole("button", { name: "Give it back" }),
+      screen.queryByRole("button", { name: /^Give it back/ }),
     ).not.toBeInTheDocument();
   });
 

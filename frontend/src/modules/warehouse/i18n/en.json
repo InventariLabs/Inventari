@@ -1624,6 +1624,7 @@
     "title": "To do",
     "taken": "This task is now yours.",
     "giveBack": "Give it back",
+    "giveBackTask": "Give it back: {{task}}",
     "today": "Today",
     "overdue": "Overdue since {{date}}",
     "receive": "Receive",

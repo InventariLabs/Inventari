@@ -1624,6 +1624,7 @@
     "title": "À faire",
     "taken": "Cette tâche est désormais la vôtre.",
     "giveBack": "La rendre",
+    "giveBackTask": "La rendre : {{task}}",
     "today": "Aujourd'hui",
     "overdue": "En retard depuis le {{date}}",
     "receive": "Réceptionner",

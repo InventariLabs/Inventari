@@ -1624,6 +1624,7 @@
     "title": "Zu erledigen",
     "taken": "Diese Aufgabe gehört jetzt Ihnen.",
     "giveBack": "Zurückgeben",
+    "giveBackTask": "Zurückgeben: {{task}}",
     "today": "Heute",
     "overdue": "Überfällig seit {{date}}",
     "receive": "Annehmen",

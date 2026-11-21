@@ -1624,6 +1624,7 @@
     "title": "Por hacer",
     "taken": "Esta tarea ahora es suya.",
     "giveBack": "Devolver",
+    "giveBackTask": "Devolver: {{task}}",
     "today": "Hoy",
     "overdue": "Atrasado desde {{date}}",
     "receive": "Recibir",

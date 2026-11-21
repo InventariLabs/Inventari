@@ -1746,6 +1746,7 @@
     "title": "Do zrobienia",
     "taken": "To zadanie jest teraz Twoje.",
     "giveBack": "Oddaj",
+    "giveBackTask": "Oddaj: {{task}}",
     "today": "Dziś",
     "overdue": "Zaległe od {{date}}",
     "receive": "Przyjmij",

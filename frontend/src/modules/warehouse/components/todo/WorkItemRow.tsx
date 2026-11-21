@@ -222,6 +222,7 @@ export function WorkItemRow({
           <Button
             variant="secondary"
             className="max-sm:w-full"
+            aria-label={t("todo.giveBackTask", { task: sentence })}
             onClick={() => onGiveBack(item)}
           >
             {t("todo.giveBack")}
