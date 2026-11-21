@@ -32,6 +32,7 @@ from jinja2.exceptions import SecurityError as JinjaSecurityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.public_api import core_api
+from app.core.template_models import DocumentTemplate
 from app.core.testing import ModuleTestHelper
 from app.models.category import Category
 from app.models.item import Item
@@ -418,3 +419,41 @@ class TestTheAccessorReachesNoObjects:
         assert html.status_code == 200
         # An absent key is empty, not an object, not an error.
         assert '[]' in html.text
+
+
+@pytest.mark.integration
+class TestAStoredLayoutThatDoesNotRender:
+    """A body Jinja cannot parse prints through the built-in protocol."""
+
+    async def test_the_protocol_prints_through_the_built_in_layout(
+        self,
+        real_async_db_session: AsyncSession,
+        eq_org: Organization,
+        eq_item: Item,
+        eq_user: User,
+    ) -> None:
+        db = real_async_db_session
+        assignment = EquipmentAssignment(
+            organization_id=eq_org.id,
+            item_id=eq_item.id,
+            assigned_to_name='Jan Kowalski',
+            checked_out_by=eq_user.id,
+        )
+        stored = DocumentTemplate(
+            organization_id=eq_org.id,
+            module='equipment',
+            name='Broken',
+            document_type='CHECKOUT',
+            body_html='<p>{{ broken </p>',
+            is_default=True,
+        )
+        db.add_all([assignment, stored])
+        await db.commit()
+
+        by_default = await render_protocol_html(db, eq_org.id, assignment.id)
+        by_id = await render_protocol_html(
+            db, eq_org.id, assignment.id, template_id=stored.id
+        )
+
+        assert 'Jan Kowalski' in by_default
+        assert 'Jan Kowalski' in by_id
