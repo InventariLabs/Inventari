@@ -4,8 +4,8 @@
     "description": "Geräte, Attestierungen und Wartung verfolgen"
   },
   "statusBadge": {
-    "warrantyAlerts_one": "Garantiewarnung",
-    "warrantyAlerts_other": "Garantiewarnungen"
+    "warrantyAlerts_one": "Garantie läuft bald ab",
+    "warrantyAlerts_other": "Garantien laufen bald ab"
   },
   "nav": {
     "overview": "Übersicht",
@@ -45,8 +45,8 @@
     "active_assignments": "Ausgeliehen",
     "in_maintenance": "In Wartung",
     "retired": "Ausgemustert",
-    "warrantyAlertsCount_one": "{{count}} Garantiewarnung",
-    "warrantyAlertsCount_other": "{{count}} Garantiewarnungen",
+    "warrantyAlertsCount_one": "{{count}} Garantie läuft bald ab",
+    "warrantyAlertsCount_other": "{{count}} Garantien laufen bald ab",
     "add_asset": "Gerät hinzufügen",
     "attention": {
       "heading_one": "{{count}} Gerät braucht Aufmerksamkeit",

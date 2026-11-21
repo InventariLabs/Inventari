@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMakerRecipeAvailability } from "@/modules/maker/hooks/useRecipes";
-import { formatQuantityLocalized } from "@/lib/i18nHelpers";
+import { formatQuantityValue } from "@/utils/formatters";
 import {
   StockCoverage,
   toneForCoverage,
@@ -42,9 +42,7 @@ export function AvailabilityBadge({
   // The batch count only exists when every ingredient could be measured
   // against the requirement; otherwise there is no bottleneck to report.
   const maxBatches =
-    data.max_batches === null
-      ? null
-      : formatQuantityLocalized(t, data.max_batches, null);
+    data.max_batches === null ? null : formatQuantityValue(data.max_batches);
   const trailer = maxBatches !== null && (
     <span className="text-on-muted font-normal">
       · {t("availability.maxBatches")}: {maxBatches}

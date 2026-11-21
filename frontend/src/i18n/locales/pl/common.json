@@ -1039,7 +1039,6 @@
     "products": "Produkty",
     "replenishAll": "Uzupełnij braki",
     "replenishPolicy": "Produkty, których część jest w użyciu gdzie indziej, nie liczą się jako braki i nie trafiają do zamówienia.",
-    "replenishSuccess": "Dodano brakujące produkty do listy zakupów",
     "replenishModalTitle": "Przegląd propozycji",
     "replenishModalDesc": "Zaznacz produkty, które chcesz dodać do listy zakupów.",
     "addSelected": "Dodaj wybrane ({{count}})",

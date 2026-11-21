@@ -322,7 +322,7 @@
     "currency": "Devise",
     "createdAt": "Créé",
     "confirmedAt": "Confirmé",
-    "total": "Valeur de la commande"
+    "total": "Valeur de la commande (brut)"
   },
   "columns": {
     "number": "Numéro",
@@ -331,7 +331,7 @@
     "lines": "Lignes",
     "scheduled": "Échéance",
     "received": "Reçu",
-    "total": "Total",
+    "total": "Total (brut)",
     "actions": "Actions"
   },
   "overdue": "En retard",
@@ -341,6 +341,7 @@
   "backToList": "Retour aux commandes",
   "confirmOrderDescriptionApproval": "La confirmation envoie la commande dans la file d'approbation ; la réception sera possible une fois qu'elle sera approuvée. Vous pourrez encore l'annuler ensuite.",
   "noPriceYet": "Pas encore de prix",
+  "grossSuffix": "brut",
   "confirmOrderUnpriced": "Certaines lignes n'ont pas encore de prix : le total n'est donc pas connu et la commande part en approbation. Jusqu'à {{threshold}}, aucune n'est nécessaire : renseignez d'abord les prix.",
   "confirmOrderDeadEndWaits": "La confirmation envoie cette commande à l'étape « {{stage}} », où elle attend que la demande soit retirée ou que quelqu'un puisse la trancher.",
   "requestApprovalDeadEndWaits": "La demande envoie la commande {{number}} à l'étape « {{stage}} », où elle attend que la demande soit retirée ou que quelqu'un puisse la trancher."
