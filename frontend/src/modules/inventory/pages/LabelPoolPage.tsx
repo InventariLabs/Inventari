@@ -51,10 +51,10 @@ const codeOf = (labels: LabelPool[], id: string) =>
   labels.find((l) => l.id === id)?.short_code ?? "";
 
 /** Why a download failed — a refused size names its field. */
-const downloadFailure = (error: unknown, t: TFunction) =>
-  extractApiError(error, t("errorDownloading"), {
-    width: `${t("previewModal.width")} (mm)`,
-    height: `${t("previewModal.height")} (mm)`,
+const downloadFailure = (error: unknown, fallback: string, t: TFunction) =>
+  extractApiError(error, fallback, {
+    width: `${t("labels:previewModal.width")} (mm)`,
+    height: `${t("labels:previewModal.height")} (mm)`,
   });
 
 export default function LabelPoolPage() {
@@ -237,7 +237,7 @@ export default function LabelPoolPage() {
       downloadBlob(blob, filename);
       setShowPreview(false);
     } catch (error) {
-      toast.error(downloadFailure(error, t));
+      toast.error(downloadFailure(error, t("errorDownloading"), t));
     }
   };
 
