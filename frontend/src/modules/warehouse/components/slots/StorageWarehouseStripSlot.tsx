@@ -113,9 +113,13 @@ export default function StorageWarehouseStripSlot({
         </span>{" "}
         <span className="text-on-secondary">{parts.join(" · ")}</span>
       </p>
-      <Button variant="outline" size="sm" onClick={() => setPanelOpen(true)}>
-        {t("putaway.locations.strip.setUp")}
-      </Button>
+      {/* The panel's every field is a write; a reader who may change neither
+          the limits nor the place has nothing to set up. */}
+      {(canWrite || canWriteStorages) && (
+        <Button variant="outline" size="sm" onClick={() => setPanelOpen(true)}>
+          {t("putaway.locations.strip.setUp")}
+        </Button>
+      )}
       {panelOpen && (
         <ShelfSettingsSheet
           location={{

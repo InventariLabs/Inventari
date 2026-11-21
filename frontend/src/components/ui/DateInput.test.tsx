@@ -358,4 +358,47 @@ describe("DateInput", () => {
       expect(trigger).toHaveAttribute("aria-controls", dialog.id);
     },
   );
+
+  it("greys out the days the field refuses and says why", () => {
+    answerDesktop();
+    render(
+      <DateInput
+        value=""
+        onChange={vi.fn()}
+        unavailable={{
+          test: (iso) => iso.startsWith("2026-08"),
+          note: "Days of a closed month are not offered.",
+        }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("combobox"));
+
+    const grid = screen.getByRole("grid");
+    const aug20 = within(grid).getByRole("button", { name: /August 20, 2026/ });
+    expect(aug20).toBeDisabled();
+    expect(
+      screen.getByText("Days of a closed month are not offered."),
+    ).toBeInTheDocument();
+  });
+
+  it("says nothing about refused days on a month that has none", () => {
+    answerDesktop();
+    render(
+      <DateInput
+        value="2026-09-08"
+        onChange={vi.fn()}
+        unavailable={{
+          test: (iso) => iso.startsWith("2026-08"),
+          note: "Days of a closed month are not offered.",
+        }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("combobox"));
+
+    expect(
+      screen.queryByText("Days of a closed month are not offered."),
+    ).not.toBeInTheDocument();
+  });
 });

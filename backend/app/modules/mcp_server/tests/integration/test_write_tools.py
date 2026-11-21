@@ -220,6 +220,29 @@ class TestCreateItem:
             is None
         )
 
+    def test_no_location_is_refused_by_name_and_points_at_the_shelf_tools(
+        self,
+        mcp_tool,
+        db_session: Session,
+        mcp_write_key: str,
+    ) -> None:
+        """A record stands on a shelf, and the client learns which tool lists one.
+
+        An omitted argument has to arrive as a named refusal that points at
+        list_locations, not as the server library's validation text with a
+        pydantic link, which tells an agent neither what is missing nor what
+        to call next.
+        """
+        result = mcp_tool(mcp_write_key, 'create_item', {'name': 'MCP Nowhere'})
+
+        refusal = _refusal(result)
+        assert 'LOCATION_REQUIRED' in refusal
+        assert 'list_locations' in refusal
+        assert (
+            db_session.scalars(select(Item).where(Item.name == 'MCP Nowhere')).first()
+            is None
+        )
+
 
 class TestCorrectStock:
     def test_one_adjustment_movement_named_by_the_calls_uuid(

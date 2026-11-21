@@ -142,4 +142,15 @@ describe("the warehouse strip on a location's settings", () => {
     expect(container).toBeEmptyDOMElement();
     expect(asked).toBe(0);
   });
+
+  it("offers no way to set the place up to an account that may change nothing", async () => {
+    signInWith(["warehouse:read"]);
+    serve({ entries: [rice], fill: 23 });
+    render(<StorageWarehouseStripSlot data={data} />);
+
+    await screen.findByText(/walk order 15/i);
+    expect(
+      screen.queryByRole("button", { name: /set up location/i }),
+    ).not.toBeInTheDocument();
+  });
 });

@@ -313,6 +313,32 @@ describe("DocumentDetailPage.confirmDialogMessage", () => {
   });
 });
 
+describe("the cancel dialog asks its question once", () => {
+  const facts = {
+    required: false,
+    workflowConfigured: false,
+    hasThreshold: false,
+    approvalsEnabled: false,
+  };
+
+  it("the message does not repeat the title's question", () => {
+    const title = confirmDialogTitle("cancel", t);
+    for (const status of ["DRAFT", "CONFIRMED"] as DocumentStatus[]) {
+      for (const type of ["IN", "OUT"]) {
+        const message = confirmDialogMessage(
+          "cancel",
+          { type, status },
+          facts,
+          t,
+        );
+        expect(title).toBe("Cancel this document?");
+        expect(message).not.toMatch(/^Cancel this document\?/);
+        expect(message).toMatch(/cannot be undone/i);
+      }
+    }
+  });
+});
+
 describe("DocumentDetailPage.confirmDialogTitle", () => {
   it("asks 'Post this document?' only where the press posts", () => {
     expect(confirmDialogTitle("postNow", t)).toBe("Post this document?");

@@ -305,6 +305,22 @@ describe("ProductionOrderStats", () => {
       expect(screen.getByText(/missing from this total/i)).toBeInTheDocument();
     });
 
+    it("shows no per-unit figure while every ingredient is unpriced", () => {
+      render(
+        <ProductionOrderStats
+          order={{
+            ...closed([unpriced]),
+            total_cost: "0.00",
+            unit_cost: "0.00",
+            output_uom_symbol: "pcs",
+          }}
+        />,
+      );
+      const line = screen.getByText(/per (pcs|unit|piece)/i);
+      expect(line).toHaveTextContent("— per");
+      expect(line).not.toHaveTextContent("0.00");
+    });
+
     it("does not claim the preview estimated the missing cost", () => {
       render(<ProductionOrderStats order={closed([priced, unpriced])} />);
       expect(

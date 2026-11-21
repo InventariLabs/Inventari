@@ -7,6 +7,7 @@ import type {
   DocumentDiscrepancyCode,
   DocumentSummary,
   InventoryPeriod,
+  OpenDocumentsInPeriod,
   WarehouseDocument,
   DocumentCreate,
   DocumentUpdate,
@@ -607,6 +608,17 @@ export const inventoryPeriodsApi = {
       "/warehouse/periods",
       year ? { year } : undefined,
     ),
+
+  /** The documents dated in the month that closing it would leave unfinished. */
+  openDocuments: async (
+    year: number,
+    month: number,
+  ): Promise<OpenDocumentsInPeriod> => {
+    const response = await api.get<OpenDocumentsInPeriod>(
+      `/warehouse/periods/${year}/${month}/open-documents`,
+    );
+    return response.data;
+  },
 
   close: async (
     year: number,

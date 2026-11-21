@@ -16,6 +16,10 @@ afterEach(() => {
 });
 
 const periods = vi.hoisted(() => ({ current: [] as unknown[] }));
+const openDocuments = vi.hoisted(() => ({
+  current: undefined as
+    { count: number; documents: { id: string; number: string }[] } | undefined,
+}));
 
 const mutationFns = vi.hoisted(() => ({
   reopenMutate: vi.fn(),
@@ -23,6 +27,7 @@ const mutationFns = vi.hoisted(() => ({
 
 vi.mock("@/modules/warehouse/hooks/useInventoryPeriods", () => ({
   useInventoryPeriods: () => ({ data: periods.current, isLoading: false }),
+  useOpenDocumentsInPeriod: () => ({ data: openDocuments.current }),
   useClosePeriod: () => ({ mutate: vi.fn(), isPending: false }),
   useReopenPeriod: () => ({
     mutate: mutationFns.reopenMutate,
@@ -32,6 +37,7 @@ vi.mock("@/modules/warehouse/hooks/useInventoryPeriods", () => ({
 
 beforeEach(() => {
   periods.current = [];
+  openDocuments.current = undefined;
 });
 
 /** The tile for a month of the year the panel opens on. */
@@ -218,6 +224,37 @@ describe("InventoryPeriodPanel", () => {
       "Okres 2026-09 nie jest zamknięty.",
     );
     toastError.mockRestore();
+  });
+
+  it("says how many documents closing the month would leave unfinished, and names them", () => {
+    const month = new Date().getMonth() + 1 === 1 ? 2 : 1;
+    openDocuments.current = {
+      count: 3,
+      documents: [
+        { id: "d-1", number: "PZ/2026/10/0001" },
+        { id: "d-2", number: "PZ/2026/10/0002" },
+      ],
+    };
+
+    render(<InventoryPeriodPanel />);
+    fireEvent.click(within(tileFor(month)).getByRole("button"));
+
+    const note = screen.getByRole("note");
+    expect(note).toHaveTextContent(/3 documents dated in/i);
+    expect(
+      within(note).getByRole("link", { name: "PZ/2026/10/0001" }),
+    ).toHaveAttribute("href", "/warehouse/documents/d-1");
+    expect(note).toHaveTextContent(/and 1 more/i);
+  });
+
+  it("asks the plain question when nothing in the month is unfinished", () => {
+    const month = new Date().getMonth() + 1 === 1 ? 2 : 1;
+    openDocuments.current = { count: 0, documents: [] };
+
+    render(<InventoryPeriodPanel />);
+    fireEvent.click(within(tileFor(month)).getByRole("button"));
+
+    expect(screen.queryByText(/not finished/i)).not.toBeInTheDocument();
   });
 
   it("names both padlocks and the year", () => {

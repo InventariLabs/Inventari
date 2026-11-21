@@ -4,11 +4,13 @@
   "subtitle": "Where an AI agent connects to this workspace, the API key it sends, and the hosts the endpoint answers on.",
   "endpoint": {
     "label": "Endpoint",
-    "hint": "Point your MCP client at this address."
+    "hint": "Point your MCP client at this address.",
+    "protocol": "Speaks protocol revision 2026-07-28, sent with every request; a client that opens with the initialize handshake negotiates 2025-11-25."
   },
   "connect": {
     "title": "To connect",
     "createKey": "Create an API key in API Keys and give it the permission Use the MCP endpoint.",
+    "createKeyNeedsAdmin": "Ask an administrator of your organization for a key: it is created in API Keys, with the permission Use the MCP endpoint.",
     "pointClient": "Send the key in the X-API-Key header (or as a Bearer token) to the address above.",
     "allowHost": "If this installation answers on a public address, add its host to the allowed hosts in the module settings."
   },

@@ -1,12 +1,13 @@
 {
   "auth_required": "Dieser Endpunkt braucht einen API-Schlüssel: senden Sie ihn im Header 'X-API-Key'.",
-  "permission_required": "Dieser API-Schlüssel hat die Berechtigung mcp_server:use nicht.",
+  "permission_required": "Diesem API-Schlüssel fehlt eine Berechtigung: 'MCP-Endpunkt verwenden'.",
   "module_disabled": "Das Modul MCP-Server ist für diese Organisation ausgeschaltet.",
   "organization_required": "Ein MCP-Aufruf handelt in einer Organisation, und dieser Schlüssel gehört zu keiner.",
   "insufficient_permission": "Dieser API-Schlüssel hat die Berechtigung {permission} nicht.",
   "call_without_identity": "Dieser Werkzeugaufruf hat keinen authentifizierten Arbeitsbereich.",
   "item_not_found": "In diesem Arbeitsbereich gibt es keinen Eintrag mit der ID {item_id}.",
   "location_not_found": "In diesem Arbeitsbereich gibt es keinen Standort mit der ID {location_id}.",
+  "location_required": "Ein Eintrag braucht einen Standort: geben Sie location_id an. list_locations nennt Ihnen einen.",
   "lot_not_found": "In diesem Arbeitsbereich gibt es keine Charge mit der ID {lot_id}.",
   "reason_required": "Eine Korrektur braucht einen Grund: sagen Sie, warum sich die Menge ändert.",
   "quantity_not_negative": "Eine Lagermenge kann nicht negativ sein."
