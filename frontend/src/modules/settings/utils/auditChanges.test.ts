@@ -367,13 +367,13 @@ describe("auditChanges on the persona paths", () => {
 
   it("words a location's usage instead of printing the stored code", () => {
     const changes = auditChanges(
-      { usage: "internal" },
-      "CREATE",
+      { before: { usage: "customer" }, after: { usage: "internal" } },
+      "UPDATE",
       undefined,
       screenT,
     );
 
-    expect(changes).toEqual([{ path: "usage", from: null, to: "Zwykłe" }]);
+    expect(changes).toEqual([{ path: "usage", from: "Zużyte", to: "Zwykłe" }]);
   });
 
   it("names an asset's field by the word its form uses", () => {
