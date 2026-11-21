@@ -72,25 +72,25 @@ export function StartRunAction({
       });
     } catch (err) {
       const shortage = parseShortageError(err);
-      if (shortage?.error === "insufficient_stock") {
-        setAsking(false);
-        onShortage(shortage.shortages, shortage.shortAtCreate ?? false);
+      const short = shortage?.error === "insufficient_stock" ? shortage : null;
+      const emptyBom = short ? null : parseEmptyBomError(err);
+      if (!short && !emptyBom) throw err;
+      // Both refusals hand the person to something else to act on — the
+      // shortage list, or the BOM to fill — so the dialog gives way to it.
+      setAsking(false);
+      if (short) {
+        onShortage(short.shortages, short.shortAtCreate ?? false);
         return;
       }
-      const emptyBom = parseEmptyBomError(err);
-      if (emptyBom) {
-        setAsking(false);
-        toast.error(t("detail.emptyBom"), {
-          action: emptyBom.recipeId
-            ? {
-                label: t("detail.emptyBomAction"),
-                onClick: () => navigate(`/maker/recipes/${emptyBom.recipeId}`),
-              }
-            : undefined,
-        });
-        return;
-      }
-      throw err;
+      toast.error(t("detail.emptyBom"), {
+        action: emptyBom?.recipeId
+          ? {
+              label: t("detail.emptyBomAction"),
+              onClick: () => navigate(`/maker/recipes/${emptyBom.recipeId}`),
+            }
+          : undefined,
+      });
+      return;
     }
     setAsking(false);
     toast.success(t("progress.startSuccess"));
