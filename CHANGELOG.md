@@ -370,7 +370,10 @@ says what the release does rather than what changed since them.
 - On a phone, the header's Back arrow on a screen opened by a direct link —
   a document opened from a link or a refreshed page, for one — no longer ends
   on a "Page Not Found" at `/warehouse/documents`. With nothing earlier in the
-  history it climbs to the nearest screen above that exists, the module's start.
+  history it climbs to the nearest screen above that exists, and to the home
+  screen when there is none: from a document or History opened by a link that
+  is the launcher, never the warehouse root that only sends you back, and from
+  a location zone it is the locations list, never "Location not found".
 - The Settings audit log shows the reason a workflow release left on the
   requests it closed in the reader's language ("Workflow deactivated",
   "Workflow deleted") instead of the raw English text.
