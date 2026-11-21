@@ -134,6 +134,55 @@ function approvalSlotData<TApproval extends { status?: string }>(
   };
 }
 
+/** The approval card's status and actions. A failed read is not "there is no
+ * request": the card would offer Request Approval over one that is already
+ * waiting, so it shows the failure with a retry instead. */
+function DocumentApprovalSlot({
+  docId,
+  docStatus,
+  isConfirmed,
+  approvalQuery,
+  requestApproval,
+  t,
+}: {
+  docId: string;
+  docStatus: string;
+  isConfirmed: boolean;
+  approvalQuery: ReturnType<typeof useDocumentApproval>;
+  requestApproval: ReturnType<typeof useRequestDocumentApproval>;
+  t: (key: string) => string;
+}) {
+  const approveDocument = useApproveDocument();
+  const rejectDocument = useRejectDocument();
+  if (approvalQuery.isError) {
+    return (
+      <InlineQueryError
+        error={approvalQuery.error}
+        onRetry={() => void approvalQuery.refetch()}
+      />
+    );
+  }
+  return (
+    <TypedSlot
+      name="approval_status_badge"
+      data={{
+        targetType: "document",
+        targetId: docId,
+        ...approvalSlotData(approvalQuery.data, docStatus, isConfirmed, t),
+        onApprove: async (_requestId, notes) => {
+          await approveDocument.mutateAsync({ docId, notes });
+        },
+        onRequest: async () => {
+          await requestApproval.mutateAsync({ docId });
+        },
+        onReject: async (_requestId, notes) => {
+          await rejectDocument.mutateAsync({ docId, notes });
+        },
+      }}
+    />
+  );
+}
+
 /** The sentence the confirm dialog asks with, kept here so the page's render
  * stays a render. Each action names the consequence the server's own rules
  * settle, so the message cannot promise an outcome the server overrules.
@@ -487,22 +536,16 @@ export default function DocumentDetailPage() {
     error,
     refetch,
   } = useDocument(id ?? "");
-  const approveDocument = useApproveDocument();
-  const requestDocumentApproval = useRequestDocumentApproval();
-  const rejectDocument = useRejectDocument();
   // Gate the approval fetch on the module being
   // enabled — fetching approval data for an org without the approvals
   // module is wasted round-trips and (worse) creates QueryClient noise
   // that triggers useModules from children components needlessly.
   const { isModuleEnabled } = useModules();
-  const {
-    data: approval,
-    isError: approvalFailed,
-    error: approvalError,
-    refetch: refetchApproval,
-  } = useDocumentApproval(id, {
+  const requestDocumentApproval = useRequestDocumentApproval();
+  const approvalQuery = useDocumentApproval(id, {
     enabled: isModuleEnabled("approvals"),
   });
+  const approval = approvalQuery.data;
   // The confirm dialog names the consequence the server's own rule settles —
   // the profile's listed types and threshold, and, when the profile names
   // neither, an active approval workflow for documents. The page asks the
@@ -694,34 +737,14 @@ export default function DocumentDetailPage() {
       {showApprovalSlot && isModuleEnabled("approvals") && (
         <DocumentApprovalCard>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            {/* A failed read is not "there is no request": the card would
-                offer Request Approval over one that is already waiting. */}
-            {approvalFailed ? (
-              <InlineQueryError
-                error={approvalError}
-                onRetry={() => void refetchApproval()}
-              />
-            ) : (
-              <TypedSlot
-                name="approval_status_badge"
-                data={{
-                  targetType: "document",
-                  targetId: doc.id,
-                  ...approvalSlotData(approval, doc.status, isConfirmed, t),
-                  onApprove: async (_requestId, notes) => {
-                    await approveDocument.mutateAsync({ docId: doc.id, notes });
-                  },
-                  onRequest: async () => {
-                    await requestDocumentApproval.mutateAsync({
-                      docId: doc.id,
-                    });
-                  },
-                  onReject: async (_requestId, notes) => {
-                    await rejectDocument.mutateAsync({ docId: doc.id, notes });
-                  },
-                }}
-              />
-            )}
+            <DocumentApprovalSlot
+              docId={doc.id}
+              docStatus={doc.status}
+              isConfirmed={isConfirmed}
+              approvalQuery={approvalQuery}
+              requestApproval={requestDocumentApproval}
+              t={t}
+            />
             {doc.status === "PENDING_APPROVAL" && (
               <Link
                 to="/approvals"

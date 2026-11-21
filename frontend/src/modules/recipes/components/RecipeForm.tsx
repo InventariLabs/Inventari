@@ -255,6 +255,33 @@ type ContentProps = Omit<Props, "loading"> & {
   leaveRef: React.MutableRefObject<(() => void) | null>;
 };
 
+/** Whether a field's value passes what Save asks of it. */
+const FIELD_IS_VALID: Record<string, (value: string) => boolean> = {
+  name: (v) => !!v.trim(),
+  servings: (v) => Number(v) >= 1,
+  prep_time_minutes: (v) => v === "" || Number(v) >= 0,
+};
+
+/** An input's change handler: it stores the value and drops the field's
+ *  message as soon as the value is valid again, not at the next Save. */
+function onField(
+  setValue: (value: string) => void,
+  setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>,
+  key: keyof typeof FIELD_IS_VALID,
+) {
+  return (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setValue(value);
+    if (!FIELD_IS_VALID[key]?.(value)) return;
+    setErrors((prev) => {
+      if (!(key in prev)) return prev;
+      return Object.fromEntries(
+        Object.entries(prev).filter(([k]) => k !== key),
+      );
+    });
+  };
+}
+
 function RecipeFormContent({
   initial,
   onSubmit,
@@ -438,18 +465,6 @@ function RecipeFormContent({
     });
   };
 
-  // A field's message leaves as soon as the field is valid again, not at the
-  // next Save.
-  const clearError = (key: string, valid: boolean) => {
-    if (!valid) return;
-    setErrors((prev) => {
-      if (!(key in prev)) return prev;
-      return Object.fromEntries(
-        Object.entries(prev).filter(([k]) => k !== key),
-      );
-    });
-  };
-
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
     if (!name.trim()) errs["name"] = t("form.errors.name_required");
@@ -526,10 +541,7 @@ function RecipeFormContent({
           <Input
             label={t("form.name")}
             value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-              clearError("name", e.target.value.trim() !== "");
-            }}
+            onChange={onField(setName, setErrors, "name")}
             placeholder={t("form.name_placeholder")}
             error={errors["name"]}
           />
@@ -612,10 +624,7 @@ function RecipeFormContent({
                 type="number"
                 min={1}
                 value={servings}
-                onChange={(e) => {
-                  setServings(e.target.value);
-                  clearError("servings", Number(e.target.value) >= 1);
-                }}
+                onChange={onField(setServings, setErrors, "servings")}
                 error={errors["servings"]}
               />
               {Number(servings) > 0 &&
@@ -641,13 +650,7 @@ function RecipeFormContent({
               type="number"
               min={0}
               value={prepTime}
-              onChange={(e) => {
-                setPrepTime(e.target.value);
-                clearError(
-                  "prep_time_minutes",
-                  e.target.value === "" || Number(e.target.value) >= 0,
-                );
-              }}
+              onChange={onField(setPrepTime, setErrors, "prep_time_minutes")}
               placeholder="—"
               error={errors["prep_time_minutes"]}
             />

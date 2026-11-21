@@ -733,8 +733,7 @@ describe("ApprovalActions error handling", () => {
     );
   });
 
-  it("shows error toast when approve fails", async () => {
-    const { toast } = await import("sonner");
+  it("keeps the confirm open with the server's refusal inside when approve fails", async () => {
     server.use(
       http.post("/api/v1/approvals/requests/:id/approve", () =>
         HttpResponse.json({ detail: "Already approved" }, { status: 400 }),
@@ -751,10 +750,10 @@ describe("ApprovalActions error handling", () => {
     fireEvent.click(screen.getByText("Approve"));
     // approving is irreversible, so it asks first.
     fireEvent.click(await screen.findByText("Approve request"));
-    await waitFor(() =>
-      // The server detail ("Already approved") must be surfaced to the user.
-      expect(toast.error).toHaveBeenCalledWith("Already approved"),
-    );
+    // The server detail ("Already approved") is shown inside the dialog, which
+    // stays open instead of closing on the refusal.
+    expect(await screen.findByText("Already approved")).toBeInTheDocument();
+    expect(screen.getByText("Approve request")).toBeInTheDocument();
   });
 });
 
