@@ -245,6 +245,16 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
+- Settings → **My modules** is now **Organization modules** (**Moduły organizacji**
+  and so on in the other languages): every choice on it switches modules on or off
+  for the whole organization, which the old name did not say. The confirmation for
+  a workspace mode now lists the settings it resets and no longer promises that
+  switching back restores them.
+- Mail an organization sends goes out under the organization's name when no sender
+  name is set in **Settings → Email**, as its invitations and documents already
+  name it. A sender name chosen there is kept.
+- The audit log words the removal of a role, a webhook channel or an AI connection
+  as **Removed**, and its subtitle lists every verb the log shows.
 - Rows that have finished their work no longer stay for ever. Once a day an
   instance deletes outbox events published more than 7 days ago, sent and failed
   mail queued more than 120 days ago, read notifications older than 90 days and
@@ -286,6 +296,18 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The first-contact and settings screens read the same everywhere: a sign-up link
+  that a newer one replaced says so on arrival instead of asking for a password
+  first; the validation bubbles a browser shows for a required or too-short field
+  are worded in the app's language; the SMTP host error clears once a host is
+  typed; the invitation email names the person who invited and calls the role by
+  the same name as the join page; a network failure reads "Cannot reach the
+  server" on every screen; the audit log hides its row count and pager when it
+  could not load; entering one-module mode records each module it switches off;
+  the unsaved-changes question agrees with every form name; **Settings → About**
+  says which version its source and guide links belong to; the Partners
+  permissions sit under Partners in a role's permission list; and **Privacy**
+  offers the way back to the app to someone signed in.
 - Counting a location that has sub-locations now offers, in the bar of
   products outside the stock take, a product received onto a sub-location
   after the count started, as counting that sub-location itself does.

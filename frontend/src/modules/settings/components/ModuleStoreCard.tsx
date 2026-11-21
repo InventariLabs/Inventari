@@ -420,6 +420,15 @@ export default function ModuleStoreCard({
             size="sm"
             isLoading={isBusy}
             onClick={onToggle}
+            aria-label={t(
+              isEnabled ? "appStore.deactivateNamed" : "appStore.activateNamed",
+              {
+                name: t(`modules.${module.name}.name`, {
+                  ns: "modules",
+                  defaultValue: module.display_name,
+                }),
+              },
+            )}
           >
             {isEnabled ? t("appStore.deactivate") : t("appStore.activate")}
           </Button>

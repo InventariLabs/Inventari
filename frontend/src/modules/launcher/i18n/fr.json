@@ -42,7 +42,7 @@
     "diffUnchanged": "Inchangé",
     "diffConfig": "Réinitialiser les paramètres pour",
     "confirmTitle": "Passer à {{name}} ?",
-    "confirmMessage": "Des modules seront activés et désactivés pour votre organisation. Vous pouvez revenir en arrière à tout moment.",
+    "confirmMessage": "Des modules seront activés et désactivés pour votre organisation.",
     "confirmApply": "Changer de mode d’espace de travail",
     "confirmReapplyTitle": "Relancer la configuration de {{name}} ?",
     "confirmReapplyMessage": "Aucun module n'est ajouté ni retiré. La configuration du mode d’espace de travail s'exécute à nouveau : ses réglages par défaut reviennent aux valeurs du mode, et les noms qu'il a semés — types d'emplacement inclus — sont réécrits dans la langue de cette session.",
@@ -51,6 +51,7 @@
     "diffManualKept": "Conservés (ajoutés manuellement)",
     "diffCascadeHint": "Désactivés car ils nécessitent un module supprimé",
     "diffConfigHint": "Les valeurs par défaut du mode d’espace de travail écraseront les paramètres actuels",
+    "confirmConfigHint": "Les valeurs par défaut du mode d’espace de travail écraseront les paramètres actuels, et revenir en arrière ne les rétablira pas",
     "renumberOffer": "Vos emplacements gardent codes et étiquettes. Pour des codes d'étagère (A-02-01), choisissez Renuméroter selon le modèle dans Entrepôt → Configuration → Codes, étiquettes et ordre de passage des emplacements ; les anciennes étiquettes se scannent encore."
   },
   "activeProfile": {

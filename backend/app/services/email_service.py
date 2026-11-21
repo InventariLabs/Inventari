@@ -323,8 +323,12 @@ class EmailService:
         lang: str = 'en',
         smtp_config: dict[str, Any] | None = None,
         organization_id: UUID | None = None,
+        inviter_name: str | None = None,
     ) -> bool:
         """Render and queue the organization-invitation email.
+
+        *inviter_name* names the person who issued the invitation, as the join
+        page does; without one the mail says "an administrator".
 
         *role* is either a built-in level, which the template translates, or
         the name of an org-scoped custom role, which is used as it was typed —
@@ -344,10 +348,17 @@ class EmailService:
         # translation to look up. Escaped like the attestation mail next door.
         safe_org = markupsafe.escape(organization_name)
         safe_role = markupsafe.escape(role_label)
+        body = (
+            t['body_named'].format(
+                inviter=markupsafe.escape(inviter_name), organization=safe_org
+            )
+            if inviter_name
+            else t['body'].format(organization=safe_org)
+        )
 
         html = email_shell(
             t['greeting'],
-            f'            <p>{t["body"].format(organization=safe_org)}</p>\n'
+            f'            <p>{body}</p>\n'
             f'            <p>{t["role_line"].format(role=safe_role)}</p>\n'
             f'            <p>{t["action"]}</p>\n'
             + email_button(full_url, t['button'])

@@ -43,12 +43,42 @@ export type GroupState = "none" | "some" | "all";
  * Empty sections are dropped: a module that declares no permission has nothing
  * to offer, and an empty accordion is a promise of content that is not there.
  */
+/**
+ * System permissions that belong to a module of their own on every other
+ * screen (the first-run choice, the launcher, the module store). The catalog
+ * files them under "system" because the core declares them; the editor shows
+ * them under the module's name, where a reader looks for them.
+ */
+const SYSTEM_PERMISSION_MODULES: Record<string, string> = {
+  "partners:": "partners",
+};
+
+function moduleOfSystemPermission(key: string): string | undefined {
+  const prefix = Object.keys(SYSTEM_PERMISSION_MODULES).find((p) =>
+    key.startsWith(p),
+  );
+  return prefix ? SYSTEM_PERMISSION_MODULES[prefix] : undefined;
+}
+
 export function permissionGroups(
   catalog: PermissionCatalog | undefined,
 ): PermissionGroup[] {
   if (!catalog) return [];
+  const general = catalog.system.filter(
+    (p) => !moduleOfSystemPermission(p.key),
+  );
+  const own = Object.values(SYSTEM_PERMISSION_MODULES)
+    .filter((name) => !catalog.modules.some((m) => m.module === name))
+    .map((name) => ({
+      id: name,
+      module: name,
+      permissions: catalog.system.filter(
+        (p) => moduleOfSystemPermission(p.key) === name,
+      ),
+    }));
   return [
-    { id: "system", permissions: catalog.system },
+    { id: "system", permissions: general },
+    ...own,
     ...catalog.modules.map((m) => ({
       id: m.module,
       module: m.module,

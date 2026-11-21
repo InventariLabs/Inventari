@@ -68,7 +68,7 @@
     "name": "Nome",
     "edit": "Editar",
     "unsavedTitle": "Alterações não salvas",
-    "unsavedLeave": "{{form}} tem alterações não salvas. Sair mesmo assim?",
+    "unsavedLeave": "{{form}}: você tem alterações não salvas. Sair mesmo assim?",
     "leaveAnyway": "Sair mesmo assim",
     "discardTitle": "Descartar o que você preencheu?",
     "discardMessage": "Tudo o que você preencheu neste formulário será perdido. Isso não pode ser desfeito.",
@@ -307,7 +307,7 @@
       "general": "Geral",
       "people": "Pessoas",
       "modules": "Módulos",
-      "myModules": "Meus módulos",
+      "myModules": "Módulos da organização",
       "auditLog": "Registro de auditoria",
       "roles": "Acesso e funções",
       "email": "E-mail",
@@ -384,6 +384,7 @@
       },
       "revoked": "Revogado",
       "invitationAccepted": "Aceito",
+      "removed": "Removido",
       "profileDefault": "Padrão do modo de trabalho",
       "fields": {
         "address": "Endereço",
@@ -901,11 +902,13 @@
       "license_link": "Ler a licença",
       "source_title": "Código-fonte",
       "source_hint": "Todas as pessoas que usam esta instalação podem obter o código-fonte da versão que ela executa.",
+      "source_tag_hint": "O link abre a página inicial do repositório; esta versão é lá a tag v{{version}}.",
       "source_link": "Obter o código-fonte",
       "third_party_title": "Dados de terceiros",
       "open_food_facts": "Os dados de produtos importados do Open Food Facts são disponibilizados sob a Open Database License (ODbL) 1.0.",
       "odbl_link": "Ler a ODbL",
       "guide_hint": "Como usar o app, tela por tela: produtos, locais, estoque, documentos, configurações.",
+      "guide_version_hint": "O link abre o guia da versão mais recente, que pode ser mais nova que a versão {{version}}.",
       "guide_link": "Abrir o guia do usuário"
     },
     "profile": {
@@ -1057,10 +1060,10 @@
   "unknown": "Desconhecido",
   "focusLock": {
     "title": "Só um módulo está sendo exibido",
-    "body": "Este espaço de trabalho mostra um módulo, então o menu de aplicativos e a página Módulos ficam de lado. Abra Meus módulos para mostrar todos novamente.",
-    "exit": "Abrir Meus módulos",
+    "body": "Este espaço de trabalho mostra um módulo, então o menu de aplicativos e a página Módulos ficam de lado. Abra Módulos da organização para mostrar todos novamente.",
+    "exit": "Abrir Módulos da organização",
     "unknownTitle": "Não foi possível verificar quais módulos estão sendo exibidos",
-    "unknownBody": "Não foi possível ler quais módulos este espaço de trabalho mostra, então o menu de aplicativos e a página Módulos não são exibidos. Tente novamente ou abra Meus módulos.",
+    "unknownBody": "Não foi possível ler quais módulos este espaço de trabalho mostra, então o menu de aplicativos e a página Módulos não são exibidos. Tente novamente ou abra Módulos da organização.",
     "retry": "Tentar novamente"
   },
   "focusMarker": {
@@ -1071,6 +1074,7 @@
   },
   "appStore": {
     "activate": "Ativar",
+    "activateNamed": "Ativar {{name}}",
     "activateConfirm": "Ativar",
     "activateConfirmTitle": "Ativar {{name}}?",
     "alwaysOn": "Sempre ativo",
@@ -1091,6 +1095,7 @@
     "changesUiHint": "Este módulo altera a navegação e a terminologia desta organização.",
     "changesUiHintOff": "Ativar este módulo altera a navegação e a terminologia desta organização.",
     "deactivate": "Desativar",
+    "deactivateNamed": "Desativar {{name}}",
     "deactivateConfirmTitle": "Desativar {{name}}?",
     "declaredPrefix": "declarado:",
     "degraded": "Limitado",
@@ -1293,6 +1298,17 @@
     "count_other": "{{count}} selecionados",
     "countOnPage_one": "1 selecionado nesta página de {{total}}",
     "countOnPage_other": "{{count}} selecionados nesta página de {{total}}"
+  },
+  "nativeValidation": {
+    "valueMissing": "Preencha este campo",
+    "typeMismatchEmail": "Digite um e-mail",
+    "typeMismatchUrl": "Digite um endereço da web",
+    "tooShort": "Use pelo menos {{min}} caracteres",
+    "tooLong": "Use no máximo {{max}} caracteres",
+    "rangeUnderflow": "Digite um valor de pelo menos {{min}}",
+    "rangeOverflow": "Digite um valor de no máximo {{max}}",
+    "badInput": "Digite um valor válido",
+    "patternMismatch": "Use o formato pedido"
   },
   "validation": {
     "nameRequired": "O nome é obrigatório",

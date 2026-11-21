@@ -42,7 +42,7 @@
     "diffUnchanged": "Sem alteração",
     "diffConfig": "Redefinir configurações de",
     "confirmTitle": "Mudar para {{name}}?",
-    "confirmMessage": "Módulos serão ativados e desativados para a sua organização. Você pode voltar atrás a qualquer momento.",
+    "confirmMessage": "Módulos serão ativados e desativados para a sua organização.",
     "confirmApply": "Mudar de modo de trabalho",
     "confirmReapplyTitle": "Executar a configuração de {{name}} de novo?",
     "confirmReapplyMessage": "Nenhum módulo é adicionado ou removido. A configuração do modo de trabalho é executada novamente: as configurações padrão voltam aos valores do modo, e os nomes que ela criou — inclusive os tipos de local — são reescritos no idioma desta sessão.",
@@ -51,6 +51,7 @@
     "diffManualKept": "Mantidos (adicionados manualmente)",
     "diffCascadeHint": "Desativados porque exigem um módulo removido",
     "diffConfigHint": "Os padrões do modo de trabalho vão sobrescrever as configurações atuais",
+    "confirmConfigHint": "Os padrões do modo de trabalho vão sobrescrever as configurações atuais, e voltar atrás não vai restaurá-las",
     "renumberOffer": "Seus locais mantêm os códigos e as etiquetas. Para códigos no formato A-02-01, escolha Renumerar por modelo em Configuração → Códigos, etiquetas e ordem de percurso dos locais; as etiquetas antigas continuam sendo escaneadas."
   },
   "activeProfile": {

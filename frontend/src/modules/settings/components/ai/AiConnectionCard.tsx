@@ -57,7 +57,9 @@ export function AiConnectionCard({
             variant="ghost"
             size="icon"
             onClick={() => onEdit(connection)}
-            aria-label={t("config.editConnection")}
+            aria-label={t("config.editConnectionNamed", {
+              name: connection.name,
+            })}
           >
             <Pencil size={16} />
           </Button>
@@ -65,7 +67,9 @@ export function AiConnectionCard({
             variant="ghost"
             size="icon"
             onClick={() => onDelete(connection)}
-            aria-label={t("config.deleteConnection")}
+            aria-label={t("config.deleteConnectionNamed", {
+              name: connection.name,
+            })}
             className="text-red-600 hover:text-red-700 hover:bg-red-50"
           >
             <Trash2 size={16} />

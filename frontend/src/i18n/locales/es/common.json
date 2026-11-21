@@ -70,7 +70,7 @@
     "name": "Nombre",
     "edit": "Editar",
     "unsavedTitle": "Cambios sin guardar",
-    "unsavedLeave": "{{form}} contiene cambios sin guardar. ¿Salir de todos modos?",
+    "unsavedLeave": "{{form}}: tienes cambios sin guardar. ¿Salir de todos modos?",
     "leaveAnyway": "Salir de todos modos",
     "discardTitle": "¿Descartar lo introducido?",
     "discardMessage": "Todo lo que introdujo en este formulario se perderá. Esta acción no se puede deshacer.",
@@ -309,7 +309,7 @@
       "general": "General",
       "people": "Personas",
       "modules": "Módulos",
-      "myModules": "Mis módulos",
+      "myModules": "Módulos de la organización",
       "auditLog": "Registro de auditoría",
       "roles": "Roles y accesos",
       "email": "Correo",
@@ -386,6 +386,7 @@
       },
       "revoked": "Revocada",
       "invitationAccepted": "Aceptada",
+      "removed": "Eliminado",
       "profileDefault": "Valor del modo de espacio de trabajo",
       "fields": {
         "address": "Dirección",
@@ -946,11 +947,13 @@
       "license_link": "Leer la licencia",
       "source_title": "Código fuente",
       "source_hint": "Cualquier persona que use esta instalación puede obtener el código fuente de la versión que ejecuta.",
+      "source_tag_hint": "El enlace abre la página principal del repositorio; esta versión es allí la etiqueta v{{version}}.",
       "source_link": "Obtener el código fuente",
       "third_party_title": "Datos de terceros",
       "open_food_facts": "Los datos de productos importados de Open Food Facts están disponibles bajo la Open Database License (ODbL) 1.0.",
       "odbl_link": "Leer la ODbL",
       "guide_hint": "Cómo usar la aplicación, pantalla por pantalla: productos, ubicaciones, existencias, documentos, ajustes. La guía está en inglés.",
+      "guide_version_hint": "El enlace abre la guía de la última versión, que puede ser más reciente que la versión {{version}}.",
       "guide_link": "Abrir la guía de uso"
     },
     "profile": {
@@ -1104,10 +1107,10 @@
   "unknown": "Desconocido",
   "focusLock": {
     "title": "Solo se muestra un módulo",
-    "body": "Este espacio de trabajo muestra un módulo, así que el lanzador de aplicaciones y la tienda quedan apartados. Abre «Mis módulos» para mostrarlos todos de nuevo.",
-    "exit": "Abrir «Mis módulos»",
+    "body": "Este espacio de trabajo muestra un módulo, así que el lanzador de aplicaciones y la tienda quedan apartados. Abre «Módulos de la organización» para mostrarlos todos de nuevo.",
+    "exit": "Abrir «Módulos de la organización»",
     "unknownTitle": "No se pudo comprobar qué módulos se muestran",
-    "unknownBody": "No se pudo leer qué módulos muestra este espacio de trabajo, así que no se muestra el lanzador de aplicaciones. Inténtalo de nuevo o abre «Mis módulos».",
+    "unknownBody": "No se pudo leer qué módulos muestra este espacio de trabajo, así que no se muestra el lanzador de aplicaciones. Inténtalo de nuevo o abre «Módulos de la organización».",
     "retry": "Reintentar"
   },
   "focusMarker": {
@@ -1118,6 +1121,7 @@
   },
   "appStore": {
     "activate": "Activar",
+    "activateNamed": "Activar {{name}}",
     "activateConfirm": "Activar",
     "activateConfirmTitle": "¿Activar {{name}}?",
     "alwaysOn": "Siempre activo",
@@ -1138,6 +1142,7 @@
     "changesUiHint": "Este módulo cambia la navegación y la terminología de esta organización.",
     "changesUiHintOff": "Activar este módulo cambiará la navegación y la terminología de esta organización.",
     "deactivate": "Desactivar",
+    "deactivateNamed": "Desactivar {{name}}",
     "deactivateConfirmTitle": "¿Desactivar {{name}}?",
     "declaredPrefix": "declarado:",
     "degraded": "Limitado",
@@ -1344,6 +1349,17 @@
     "count_other": "{{count}} seleccionados",
     "countOnPage_one": "1 seleccionado en esta página, de {{total}}",
     "countOnPage_other": "{{count}} seleccionados en esta página, de {{total}}"
+  },
+  "nativeValidation": {
+    "valueMissing": "Rellena este campo",
+    "typeMismatchEmail": "Escribe un correo electrónico",
+    "typeMismatchUrl": "Escribe una dirección web",
+    "tooShort": "Usa al menos {{min}} caracteres",
+    "tooLong": "Usa como máximo {{max}} caracteres",
+    "rangeUnderflow": "Escribe un valor de al menos {{min}}",
+    "rangeOverflow": "Escribe un valor de como máximo {{max}}",
+    "badInput": "Escribe un valor válido",
+    "patternMismatch": "Usa el formato pedido"
   },
   "validation": {
     "nameRequired": "El nombre es obligatorio",

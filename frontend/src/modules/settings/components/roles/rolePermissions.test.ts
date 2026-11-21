@@ -46,6 +46,31 @@ describe("permissionGroups", () => {
     ]);
   });
 
+  it("files the partners permissions under Partners, not under the system group", () => {
+    const catalog: PermissionCatalog = {
+      system: [
+        perm("items:read"),
+        perm("partners:read"),
+        perm("partners:write"),
+      ],
+      modules: [{ module: "warehouse", permissions: [perm("warehouse:read")] }],
+    };
+
+    const groups = permissionGroups(catalog);
+
+    expect(groups.map((g) => g.id)).toEqual([
+      "system",
+      "partners",
+      "warehouse",
+    ]);
+    expect(
+      groups.find((g) => g.id === "system")?.permissions.map((p) => p.key),
+    ).toEqual(["items:read"]);
+    expect(groups.find((g) => g.id === "partners")).toMatchObject({
+      module: "partners",
+    });
+  });
+
   it("drops a module that declares no permission", () => {
     // An empty accordion promises content that is not behind it.
     expect(permissionGroups(CATALOG).some((g) => g.id === "vision")).toBe(

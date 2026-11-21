@@ -19,7 +19,9 @@ class SmtpConfig(BaseModel):
     user: str = Field(default='', max_length=255)
     password: str = Field(default='', max_length=1024)
     from_email: EmailStr | None = None
-    from_name: str = Field(default='Inventari', max_length=255)
+    # Blank means "not chosen": mail from an organization then carries the
+    # organization's name, as its invitations and documents already do.
+    from_name: str = Field(default='', max_length=255)
 
 
 __all__ = ['SmtpConfig']

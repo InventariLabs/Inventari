@@ -50,7 +50,10 @@ export function QueryError({ onRetry, message, error }: QueryErrorProps) {
     >
       <AlertTriangle className="w-10 h-10 text-red-400" />
       <p className="text-sm font-medium text-on-secondary">
-        {message ?? t("messages.error")}
+        {message ??
+          (isUnreachableError(error)
+            ? t("errors.backendUnavailableTitle")
+            : t("messages.error"))}
       </p>
       {onRetry && (
         <Button type="button" variant="outline" size="sm" onClick={onRetry}>

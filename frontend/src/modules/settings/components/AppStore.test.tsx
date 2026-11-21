@@ -229,7 +229,7 @@ describe("AppStore trust badges", () => {
     render(<AppStore />, { wrapper: Wrapper });
 
     const deactivate = await screen.findByRole("button", {
-      name: tFor("common")("appStore.deactivate"),
+      name: /^Deactivate /,
     });
     expect(deactivate).toHaveClass("border", "border-border");
   });
@@ -412,6 +412,23 @@ describe("AppStore taxonomy", () => {
     expect(screen.queryByText("Photo Recognition")).not.toBeInTheDocument();
   });
 
+  it("names the module on its switch, so fourteen cards are not fourteen identical buttons", async () => {
+    withCatalog([
+      statsModule,
+      {
+        ...statsModule,
+        name: "other",
+        display_name: "Other",
+        is_always_on: false,
+      },
+    ]);
+    render(<AppStore />, { wrapper: Wrapper });
+
+    expect(
+      await screen.findByRole("button", { name: /^(De)?[Aa]ctivate Other$/ }),
+    ).toBeInTheDocument();
+  });
+
   it("does not offer to switch off a module the server will not switch off", async () => {
     // `Statistics` and `Label Printing` had a Deactivate button that could
     // only ever come back 403, because "required" was read off the launcher
@@ -421,7 +438,7 @@ describe("AppStore taxonomy", () => {
 
     expect(await screen.findByText("Statistics")).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: t("appStore.deactivate") }),
+      screen.queryByRole("button", { name: /^Deactivate/ }),
     ).not.toBeInTheDocument();
     expect(screen.getByText(t("appStore.alwaysOnHint"))).toBeInTheDocument();
   });
@@ -685,7 +702,7 @@ describe("AppStore required modules", () => {
 
     fireEvent.click(
       within(card as HTMLElement).getByRole("button", {
-        name: t("appStore.activate"),
+        name: /^Activate /,
       }),
     );
 

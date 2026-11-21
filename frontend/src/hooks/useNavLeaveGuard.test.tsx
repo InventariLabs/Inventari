@@ -67,7 +67,9 @@ describe("useNavLeaveGuard", () => {
     expect(screen.getByTestId("path")).toHaveTextContent("/here");
     expect(screen.getByText("Unsaved changes")).toBeInTheDocument();
     expect(
-      screen.getByText("The asset form holds unsaved changes. Leave anyway?"),
+      screen.getByText(
+        "The asset form: you have unsaved changes. Leave anyway?",
+      ),
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Leave anyway" }));

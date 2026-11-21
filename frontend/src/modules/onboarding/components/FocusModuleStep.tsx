@@ -17,7 +17,7 @@ interface FocusModuleStepProps {
  * The second step of the one-module choice: which module is the whole app.
  *
  * Only modules whose manifest declares `standalone` are listed — the same
- * list Settings -> My modules offers. A fresh organization has nothing enabled
+ * list Settings -> Organization modules offers. A fresh organization has nothing enabled
  * yet, so the registry is asked against the whole catalogue rather than the
  * enabled set; the backend plans what the choice switches on. The shell
  * registers only enabled modules, so this step registers the catalogue itself —

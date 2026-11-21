@@ -70,7 +70,7 @@
     "name": "Name",
     "edit": "Edit",
     "unsavedTitle": "Unsaved changes",
-    "unsavedLeave": "{{form}} holds unsaved changes. Leave anyway?",
+    "unsavedLeave": "{{form}}: you have unsaved changes. Leave anyway?",
     "leaveAnyway": "Leave anyway",
     "discardTitle": "Discard what you entered?",
     "discardMessage": "Everything you entered in this form will be lost. This cannot be undone.",
@@ -309,7 +309,7 @@
       "general": "General",
       "people": "People",
       "modules": "Modules",
-      "myModules": "My modules",
+      "myModules": "Organization modules",
       "auditLog": "Audit Log",
       "roles": "Access & Roles",
       "email": "Email",
@@ -386,6 +386,7 @@
       },
       "revoked": "Revoked",
       "invitationAccepted": "Accepted",
+      "removed": "Removed",
       "profileDefault": "Workspace mode default",
       "fields": {
         "address": "Address",
@@ -946,11 +947,13 @@
       "license_link": "Read the licence",
       "source_title": "Source code",
       "source_hint": "Everyone who uses this installation may have the source code of the version it runs.",
+      "source_tag_hint": "The link opens the repository's front page; this version is the tag v{{version}} there.",
       "source_link": "Get the source code",
       "third_party_title": "Third-party data",
       "open_food_facts": "Product data imported from Open Food Facts is made available under the Open Database License (ODbL) 1.0.",
       "odbl_link": "Read the ODbL",
       "guide_hint": "How to use the app, screen by screen: products, locations, stock, documents, settings.",
+      "guide_version_hint": "The link opens the guide of the latest release, which may be newer than version {{version}}.",
       "guide_link": "Open the user guide"
     },
     "profile": {
@@ -1104,10 +1107,10 @@
   "unknown": "Unknown",
   "focusLock": {
     "title": "Only one module is showing",
-    "body": "This workspace shows one module, so the app launcher and the Modules page are set aside. Open My modules to show all of them again.",
-    "exit": "Open My modules",
+    "body": "This workspace shows one module, so the app launcher and the Modules page are set aside. Open Organization modules to show all of them again.",
+    "exit": "Open Organization modules",
     "unknownTitle": "Could not check which modules are showing",
-    "unknownBody": "Which modules this workspace shows could not be read, so the app launcher and the Modules page are not shown. Try again, or open My modules.",
+    "unknownBody": "Which modules this workspace shows could not be read, so the app launcher and the Modules page are not shown. Try again, or open Organization modules.",
     "retry": "Try again"
   },
   "focusMarker": {
@@ -1118,6 +1121,7 @@
   },
   "appStore": {
     "activate": "Activate",
+    "activateNamed": "Activate {{name}}",
     "activateConfirm": "Switch on",
     "activateConfirmTitle": "Switch on {{name}}?",
     "alwaysOn": "Always on",
@@ -1138,6 +1142,7 @@
     "changesUiHint": "This module changes the navigation and terminology of this organization.",
     "changesUiHintOff": "Switching this module on changes the navigation and terminology of this organization.",
     "deactivate": "Deactivate",
+    "deactivateNamed": "Deactivate {{name}}",
     "deactivateConfirmTitle": "Switch off {{name}}?",
     "declaredPrefix": "declared:",
     "degraded": "Limited",
@@ -1342,6 +1347,17 @@
     "count_other": "{{count}} selected",
     "countOnPage_one": "1 selected on this page of {{total}}",
     "countOnPage_other": "{{count}} selected on this page of {{total}}"
+  },
+  "nativeValidation": {
+    "valueMissing": "Fill in this field",
+    "typeMismatchEmail": "Enter an email address",
+    "typeMismatchUrl": "Enter a web address",
+    "tooShort": "Use at least {{min}} characters",
+    "tooLong": "Use at most {{max}} characters",
+    "rangeUnderflow": "Enter a value of at least {{min}}",
+    "rangeOverflow": "Enter a value of at most {{max}}",
+    "badInput": "Enter a valid value",
+    "patternMismatch": "Use the requested format"
   },
   "validation": {
     "nameRequired": "Name is required",

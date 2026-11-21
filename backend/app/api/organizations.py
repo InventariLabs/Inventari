@@ -65,6 +65,7 @@ from app.services._org_membership import (
     VALID_MEMBER_ROLES,
     change_member_role_audited,
     invitation_role_label_async,
+    user_display_name_async,
 )
 from app.services._org_membership import (
     create_invitation_code as create_invitation_code_service,
@@ -234,7 +235,12 @@ async def send_test_email(
         current_user.email or '',
         subject,
         html_content,
-        smtp_config=smtp_config.model_dump(exclude_none=True),
+        smtp_config=smtp_config.model_dump(exclude_none=True)
+        | (
+            {}
+            if smtp_config.from_name or not current_user.organization
+            else {'from_name': current_user.organization.name}
+        ),
     )
 
     if not result.ok:
@@ -290,6 +296,7 @@ async def _mail_the_invitation(
             lang=get_current_lang(),
             smtp_config=smtp_config,
             organization_id=current_user.organization_id,
+            inviter_name=await user_display_name_async(db, current_user.id),
         )
     except Exception:  # the invitation stands; mailing it is best-effort
         logger.exception('Invitation created but could not be mailed to its recipient')
