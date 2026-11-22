@@ -373,7 +373,7 @@ moduleRegistry.register({
 | `storage_tree_row_extra` | Location tree — beside each location's name | `storageId` | Active |
 | `storage_warehouse_strip` | Location page → Settings tab — below the location's settings | `storageId`, `storageName`, `fullPath`, `sequence` | Active |
 | `storage_moves` | Location page → Moves tab | `storageId`, `storageTypeCode` (may be undefined) | Active |
-| `document_detail_extra` | Document detail page — below the lines and totals | `documentId`, `documentStatus`, `metaData?`, `saveMetaData?` | Active |
+| `document_detail_extra` | Document detail page — below the lines and totals | `documentId`, `documentStatus`, `stockAlreadyApplied?`, `metaData?`, `saveMetaData?` | Active |
 | `document_detail_line_extra` | Document detail page — under each line, in the table and the phone's cards | `documentId`, `documentStatus`, `line`, `saveMetaData` | Render site only (extension point; `examples/lot_certificates` registers one) |
 | `document_form_extra` | Receive, Issue and the document form — among the document-level fields | `action`, `documentType`, `partnerId`, `lines`, `metaData`, `setMetaData`, `registerBeforeSubmit` | Render site only (extension point) |
 | `document_line_form_extra` | Receive, Issue and the document form — under each line. Receive on the desktop only, in a row of its own below the line's lot and expiry panel (a phone counts its goods on the receiving session instead); Issue and the document form on desktop and phone | `action`, `documentType`, `line`, `setMetaData`, `registerBeforeSubmit` | Render site only (extension point; `examples/lot_certificates` registers one) |
