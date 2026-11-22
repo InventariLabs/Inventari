@@ -14,6 +14,12 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- A link into the demo can name a screen. Opening an in-app address such as
+  `/warehouse/todo` on the demo without a session shows the sign-in page, and
+  **Try the demo** now opens that screen in the visitor's new copy instead of
+  the launcher; an address that leaves the app is ignored, as at a sign-in. On
+  the demo, the form for signing in with an account is folded under *or sign in
+  with an account*, so **Try the demo** is the page's one main action.
 - The tablespoon and the teaspoon. Recipes can now use the spoons the module
   already converted for ingredients, and the recipe import accepts `tbsp` and
   `tsp`. A new Food & Home organization gets them with its kitchen measures;
