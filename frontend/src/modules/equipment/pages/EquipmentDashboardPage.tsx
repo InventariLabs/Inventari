@@ -166,6 +166,12 @@ export default function EquipmentDashboardPage() {
         isLoading={fleet.isPending}
         error={fleet.error}
         onRetry={() => void fleet.refetch()}
+        retiredCount={
+          (fleet.data ?? []).filter(
+            (a) =>
+              a.holder_name == null && getEquipmentMeta(a).status === "RETIRED",
+          ).length
+        }
       />
 
       <div

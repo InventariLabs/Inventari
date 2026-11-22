@@ -53,6 +53,9 @@ interface FleetCompositionCardProps {
   isLoading: boolean;
   error: unknown;
   onRetry: () => void;
+  /** Assets on record that are retired, so out of the fleet. With rows empty
+   *  and some retired, the card says so instead of "no assets yet". */
+  retiredCount?: number;
 }
 
 /** The fleet by category: how big each is and where its assets are. */
@@ -61,6 +64,7 @@ export function FleetCompositionCard({
   isLoading,
   error,
   onRetry,
+  retiredCount = 0,
 }: FleetCompositionCardProps) {
   const { t } = useTranslation("equipment");
   const shown = (rows ?? []).slice(0, MAX_CATEGORIES);
@@ -88,7 +92,9 @@ export function FleetCompositionCard({
         </div>
       ) : shown.length === 0 ? (
         <p className="py-2.5 text-sm text-on-secondary">
-          {t("dashboard.fleet.empty")}
+          {retiredCount > 0
+            ? t("dashboard.fleet.allRetired")
+            : t("dashboard.fleet.empty")}
         </p>
       ) : (
         <>

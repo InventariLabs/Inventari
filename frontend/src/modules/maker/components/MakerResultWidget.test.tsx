@@ -94,7 +94,9 @@ describe("MakerResultWidget", () => {
     try {
       renderWidget();
       expect(
-        screen.getByText("No completed runs with a result yet."),
+        screen.getByText(
+          "Nothing to show yet: a run gets a result when it is completed while its BOM has a sale price and every ingredient has a cost.",
+        ),
       ).toBeTruthy();
       expect(screen.queryByText("$0.00")).toBeNull();
     } finally {

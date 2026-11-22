@@ -136,7 +136,7 @@ export function MobileModuleNav({
               to={item.path}
               onClick={() => setMoreOpen(false)}
               className={cn(
-                "flex flex-col w-full items-center justify-center py-2 rounded-xl transition-colors",
+                "flex flex-col w-full min-w-0 items-center justify-center py-2 rounded-xl transition-colors",
                 active
                   ? // Weight and the heavier icon stroke carry "active";
                     // the label stays on the neutral token — the desktop

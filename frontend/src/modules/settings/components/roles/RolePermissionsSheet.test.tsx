@@ -388,6 +388,37 @@ describe("RolePermissionsSheet", () => {
     expect(screen.queryByText("View products")).toBeNull();
   });
 
+  it("says granted only for what is stored, and selected for a draft", async () => {
+    const user = userEvent.setup();
+    renderSheet(role(["items:read"]));
+
+    expect(await screen.findByText("1 permissions granted")).toBeVisible();
+
+    await user.click(screen.getByRole("checkbox", { name: "General" }));
+
+    expect(screen.queryByText(/permissions granted/i)).toBeNull();
+    expect(
+      screen.getByText("2 permissions selected, not saved yet"),
+    ).toBeVisible();
+  });
+
+  it("keeps calling the draft a selection after a save that failed", async () => {
+    const user = userEvent.setup();
+    server.use(
+      http.put("*/roles/:id/permissions", () =>
+        HttpResponse.json({}, { status: 500 }),
+      ),
+    );
+    renderSheet(role([]));
+
+    await user.click(await screen.findByRole("checkbox", { name: "General" }));
+    await user.click(screen.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalled());
+    expect(screen.queryByText(/permissions granted/i)).toBeNull();
+    expect(screen.getByText(/2 permissions selected/)).toBeVisible();
+  });
+
   it("refuses to save until something changed", async () => {
     renderSheet(role(["items:read"]));
 

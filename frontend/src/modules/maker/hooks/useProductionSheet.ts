@@ -103,6 +103,19 @@ function batchQueryOf(
   };
 }
 
+/** What the form still needs of the quantity, or null when it has a usable one.
+ *  Nothing is planned in "Already made": the question there is how much came out. */
+function missingQuantityHint(
+  t: (key: string) => string,
+  mode: ProductionMode,
+  quantity: number,
+): string | null {
+  if (!Number.isNaN(quantity) && quantity > 0) return null;
+  return t(
+    mode === "made" ? "create.hints.quantityMade" : "create.hints.quantity",
+  );
+}
+
 /**
  * The production sheet's form: what is being recorded, where, how much, and
  * the live preview of what that run takes.
@@ -166,9 +179,7 @@ export function useProductionForm(
   const parsedQty = Number(qty);
   const requirements = [
     selected === null ? t("create.hints.product") : null,
-    Number.isNaN(parsedQty) || parsedQty <= 0
-      ? t("create.hints.quantity")
-      : null,
+    missingQuantityHint(t, mode, parsedQty),
     storageId === "" ? t("create.hints.storage") : null,
   ].filter((requirement) => requirement !== null);
 

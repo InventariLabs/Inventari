@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/Input";
 import { DateInput } from "@/components/ui/DateInput";
 import { Textarea } from "@/components/ui/Textarea";
 import { NativeSelect } from "@/components/ui/NativeSelect";
+import { formatNumberLocale } from "@/utils/formatters";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
 import type { CategoryDTO, FieldDefinition } from "@/types";
 import {
@@ -190,7 +191,7 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
               onChange={(e) =>
                 onChange({ amount: e.target.value, currency: v.currency })
               }
-              placeholder="0.00"
+              placeholder={formatNumberLocale(0, 2)}
               required={field.required}
             />
             <span

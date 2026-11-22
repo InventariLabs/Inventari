@@ -195,3 +195,22 @@ class TestDocumentApprovalDoorsPermissions:
         h.grant_permissions(user, ['warehouse:write'])
         resp = client.get(f'{self.DOORS}/{door}', headers=h.get_auth_headers(user))
         assert resp.status_code == status.HTTP_403_FORBIDDEN, resp.text
+
+
+@pytest.mark.integration
+class TestWhoATaskCanBeGivenTo:
+    def test_a_viewer_is_not_offered_but_an_operator_is(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        operator: User,
+        viewer: User,
+    ) -> None:
+        resp = client.get(
+            f'{MODULE}/work-items/assignees', headers=h.get_auth_headers(operator)
+        )
+
+        assert resp.status_code == status.HTTP_200_OK, resp.text
+        ids = resp.json()['user_ids']
+        assert str(operator.id) in ids
+        assert str(viewer.id) not in ids

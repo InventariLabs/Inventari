@@ -125,7 +125,8 @@ async def import_partners(
     imported = 0
     errors: list[dict[str, Any]] = []
     for index, row in df.iterrows():
-        row_num = int(index) + 2  # header row + 1-based numbering
+        # Data rows from 1, as the preview and every other import number them.
+        row_num = int(index) + 1
         partner_in: PartnerCreate | None = None
         try:
             async with db.begin_nested():

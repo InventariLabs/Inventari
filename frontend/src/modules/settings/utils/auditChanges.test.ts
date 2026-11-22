@@ -9,6 +9,9 @@ import ptCommon from "@/i18n/locales/pt/common.json";
 import plApprovals from "@/modules/approvals/i18n/pl.json";
 import plEquipment from "@/modules/equipment/i18n/pl.json";
 import plWarehouse from "@/modules/warehouse/i18n/pl.json";
+import plLocations from "@/i18n/locales/pl/locations.json";
+import plItems from "@/i18n/locales/pl/items.json";
+import plModules from "@/i18n/locales/pl/modules.json";
 import plPartners from "@/modules/partners/i18n/pl.json";
 import plRecipes from "@/modules/recipes/i18n/pl.json";
 import {
@@ -352,6 +355,50 @@ describe("auditChanges value dictionaries", () => {
     );
 
     expect(changes).toEqual([{ path: "description", from: "abc", to: "—" }]);
+  });
+});
+
+describe("auditChanges on the persona paths", () => {
+  const screenT = namespacedT({
+    common: plCommon,
+    locations: plLocations,
+    items: plItems,
+    modules: plModules,
+  }) as never;
+
+  it("words a location's usage instead of printing the stored code", () => {
+    const changes = auditChanges(
+      { before: { usage: "customer" }, after: { usage: "internal" } },
+      "UPDATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toEqual([{ path: "usage", from: "Zużyte", to: "Zwykłe" }]);
+  });
+
+  it("names an asset's field by the word its form uses", () => {
+    // The page's translator is bound to `common`: a key without a namespace
+    // is read there.
+    const commonT = ((key: string, opts?: { defaultValue?: string }) =>
+      (screenT as unknown as (k: string, o?: unknown) => string)(
+        key.includes(":") ? key : `common:${key}`,
+        opts,
+      )) as unknown as Parameters<typeof auditFieldLabel>[1];
+    expect(auditFieldLabel("meta_data.equipment.manufacturer", commonT)).toBe(
+      "Dane dodatkowe › Dane sprzętu › Producent",
+    );
+  });
+
+  it("words the module and the document type of a copied layout", () => {
+    const changes = auditChanges(
+      { module: "equipment", document_type: "CHECKIN" },
+      "CREATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes.map((c) => c.to)).toEqual(["Śledzenie sprzętu", "Zwrot"]);
   });
 });
 
@@ -1566,6 +1613,17 @@ describe("auditChanges category field definitions", () => {
 
     expect(change.from).toBeNull();
     expect(change.to).toBe("Added field Colour (Text)");
+  });
+});
+
+describe("auditChanges on a creation that names its owning module", () => {
+  it("keeps the module out of the change lines: it says what kind of record the row is", () => {
+    const changes = auditChanges(
+      { name: "Laptop", quantity: 1, module_name: "equipment" },
+      "CREATE",
+    );
+
+    expect(changes.map((change) => change.path)).toEqual(["quantity"]);
   });
 });
 

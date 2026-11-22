@@ -79,12 +79,18 @@ export default function RolesPage() {
       title: t("settings.rbac.title"),
       subtitle: t("settings.rbac.subtitle"),
       actions: (
-        <Button leftIcon={<Plus size={16} />} onClick={() => setCreating(true)}>
+        // A list that failed to load says nothing about which roles exist, so a
+        // new one is not offered beside the failure.
+        <Button
+          leftIcon={<Plus size={16} />}
+          disabled={isError}
+          onClick={() => setCreating(true)}
+        >
           {t("settings.rbac.createRole")}
         </Button>
       ),
     });
-  }, [setHeader, t]);
+  }, [setHeader, t, isError]);
 
   const groups = useMemo(() => permissionGroups(catalog), [catalog]);
 

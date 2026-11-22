@@ -57,6 +57,7 @@
     "newProduct": "Neues Produkt gefunden",
     "notInStock": "Nicht auf Lager: {{product}}",
     "foundInHistory": "In der Historie gefunden: {{product}}",
+    "archivedReadOnly": "{{product}} ist archiviert. Sie können es ansehen, aber nur wer Produkte ändern darf, kann es zurückholen",
     "document": "Dokument: {{number}}"
   },
   "elsewhere": {

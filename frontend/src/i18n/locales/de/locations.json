@@ -284,6 +284,7 @@
     "description": "„{{name}}“ ist archiviert und bleibt aus der aktiven Liste heraus. Hier öffnen oder aus dem Archiv wiederherstellen."
   },
   "usage": {
+    "internal": "Regulär",
     "customer": "Verbraucht",
     "inventory": "Inventarverlust",
     "production": "Produktion",

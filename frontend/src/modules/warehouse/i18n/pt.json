@@ -943,7 +943,8 @@
       "complete_failed": "Falha ao concluir a sessão de separação.",
       "cancel_failed": "Falha ao cancelar a sessão de separação.",
       "session_held": "{{owner}} tem uma sessão de separação ativa neste documento. Assuma-a para continuar de onde os escaneamentos pararam, ou descarte os escaneamentos e comece do zero.",
-      "session_own": "Este documento já está aberto na sua própria sessão — em outro dispositivo ou em outra seleção. Continue essa sessão ou descarte os escaneamentos dela."
+      "session_own": "Este documento já está aberto na sua própria sessão — em outro dispositivo ou em outra seleção. Continue essa sessão ou descarte os escaneamentos dela.",
+      "skip_failed_named": "Não foi possível pular {{product}}."
     },
     "lot": "Lote: {{name}}",
     "expires": "Vence em {{date}}",
@@ -983,6 +984,7 @@
     "type_pl_pz": "PL PZ (polonês)",
     "type_packing_slip": "Romaneio de embalagem",
     "type_pick_list": "Lista de separação",
+    "builtInNote": "Um modelo substitui o layout integrado apenas onde é o padrão de um tipo de documento, ou o layout de impressão escolhido nas configurações de documentos. Os demais documentos continuam sendo impressos com o layout integrado.",
     "builtInPreviewTitle": "Layout integrado",
     "builtInPreviewAction": "Ver os layouts integrados",
     "placeholders": {
@@ -1450,7 +1452,8 @@
       "undo_failed": "Falha ao reverter a linha.",
       "complete_failed": "Falha ao concluir a sessão de recebimento.",
       "cancel_failed": "Falha ao cancelar a sessão de recebimento.",
-      "session_held": "{{owner}} tem uma sessão de recebimento ativa neste documento. Assuma-a para continuar de onde os escaneamentos pararam, ou descarte os escaneamentos e comece do zero."
+      "session_held": "{{owner}} tem uma sessão de recebimento ativa neste documento. Assuma-a para continuar de onde os escaneamentos pararam, ou descarte os escaneamentos e comece do zero.",
+      "skip_failed_named": "Não foi possível pular {{product}}."
     },
     "close": "Fechar",
     "shelf": {

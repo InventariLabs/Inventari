@@ -234,6 +234,7 @@
       "invitationExpiresAt": "válido até {{time}}",
       "requests": {
         "title": "Solicitações de acesso",
+        "approveHint": "Aprovar dá à pessoa uma conta com uma organização própria, não um lugar nesta. Para adicionar alguém aqui, convide-a em vez disso.",
         "approve": "Aprovar",
         "reject": "Rejeitar",
         "approveFor": "Aprovar {{name}}",
@@ -492,6 +493,7 @@
         "meta_data": "Dados adicionais",
         "min_quantity": "Quantidade mínima",
         "module": "Módulo",
+        "module_name": "Módulo",
         "name": "Nome",
         "new_status": "Novo status",
         "notes": "Observações",
@@ -577,6 +579,7 @@
         "uom_id": "Unidade",
         "uom_symbol": "Unidade",
         "url": "URL",
+        "equipment": "Dados do equipamento",
         "usage": "Uso",
         "value_tracking_enabled": "Controle de valor",
         "version": "Versão",
@@ -779,6 +782,8 @@
         "required": "obrigatório"
       },
       "values": {
+        "CHECKOUT": "Entrega",
+        "CHECKIN": "Devolução",
         "ALL": "Todos",
         "STORAGE": "Local",
         "CATEGORY": "Categoria",
@@ -876,7 +881,8 @@
       "systemGroup": "Geral",
       "systemRole": "Função integrada — suas permissões não podem ser alteradas.",
       "systemRoleFooter": "As funções integradas são somente leitura.",
-      "title": "Acesso e funções"
+      "title": "Acesso e funções",
+      "editSubtitleUnsaved": "{{n}} permissões selecionadas, ainda não salvas"
     },
     "data": {
       "exportDesc": "Baixe uma cópia dos seus produtos",
@@ -1334,6 +1340,7 @@
     "statsImported": "Importados",
     "statsFailed": "Com falha",
     "firstErrors": "Primeiros erros",
+    "rowsCountedNote": "As linhas são contadas a partir da primeira linha de dados; o cabeçalho não conta, então o número é o da planilha menos um.",
     "previewTitle": "Prévia",
     "previewHint": "As primeiras linhas da origem, lidas com o mapeamento acima."
   },

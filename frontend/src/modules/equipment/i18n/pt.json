@@ -77,7 +77,8 @@
       "in_service_one": "{{count}} em manutenção",
       "in_service_other": "{{count}} em manutenção",
       "warranty_ending_one": "{{count}} disponível, garantia terminando",
-      "warranty_ending_other": "{{count}} disponíveis, garantia terminando"
+      "warranty_ending_other": "{{count}} disponíveis, garantia terminando",
+      "allRetired": "Todos os equipamentos registrados estão aposentados, então nenhum está na frota."
     },
     "legend": {
       "label": "Legenda",

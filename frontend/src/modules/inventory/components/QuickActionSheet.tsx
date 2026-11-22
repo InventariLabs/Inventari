@@ -13,11 +13,13 @@ import {
   Barcode,
   Edit2,
   FileText,
+  MapPin,
 } from "lucide-react";
 import type { Item } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Sheet } from "@/components/ui/Sheet";
 import { Slot } from "@/components/Slot";
+import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { useItemQuickActions } from "@/modules/inventory/hooks/useItemQuickActions";
 import { QuickActionGrid } from "./QuickActionGrid";
@@ -54,6 +56,7 @@ export default function QuickActionSheet({
       },
     });
 
+  const shelf = places.get(item.location_id)?.name;
   const expiry = effectiveExpiry(item);
   const expired = isExpired(expiry);
   const expiringSoon = isExpiringSoon(expiry);
@@ -103,6 +106,14 @@ export default function QuickActionSheet({
             <Package size={12} />
             {formatQuantityLocalized(t, item.quantity, item.uom?.symbol)}
           </div>
+          {/* The quantity is a quantity of a place: the same product on two
+              shelves is two figures, and "6 pcs." alone says on which. */}
+          {shelf && (
+            <div className="px-3 py-1 bg-surface-raised text-on-secondary rounded-full text-xs font-medium flex items-center gap-1.5">
+              <MapPin size={12} />
+              {shelf}
+            </div>
+          )}
           {item.barcode && (
             <div className="px-3 py-1 bg-surface-raised text-on-secondary rounded-full text-xs font-semibold flex items-center gap-1.5 font-mono">
               <Barcode size={12} />
@@ -128,6 +139,12 @@ export default function QuickActionSheet({
 
         {/* Modular Slot for Nutrition Summary, etc. */}
         <Slot name="quick_action_extra" data={{ item }} className="mb-6" />
+
+        {/* Says why the grid above has one button when the account may only
+            look; it renders nothing for one that may write. */}
+        <div className="mb-3">
+          <ReadOnlyNotice module="items" />
+        </div>
 
         {vocabularyNote && (
           <p className="mb-3 text-sm text-on-muted">{vocabularyNote}</p>
