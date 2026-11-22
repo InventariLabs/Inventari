@@ -56,9 +56,9 @@ after it arrived.
 
 ### Upgrading from 0.12.0
 
-Update as DEPLOYMENT.md's *Updating* says. Five changes break an
-installation, a client or a script, and each says what the affected party
-must do:
+Update as DEPLOYMENT.md's *Updating* says. Six changes break an
+installation, a client, a module or a script, and each says what the
+affected party must do:
 
 **Instance administrators**
 
@@ -87,6 +87,12 @@ must do:
   or of the catalogue reads `step.text`; a writer may still send plain
   strings, which are stored as steps with no duration. Steps stored by 0.12.0
   are rewritten by the module's upgrade, so nothing is entered again.
+- **The cost breakdown.** `GET /api/v1/maker/breakdown/{template_id}` answers
+  the whole batch cost — ingredients, fixed costs and labour — in
+  `total_cost`, and `maker_api.compute_unit_cost_async` the whole cost per
+  unit; both answered the ingredients alone. A client or a module that wanted
+  the ingredients' part reads the new `ingredients_cost`, and each entry's
+  `percentage_of_total` is now a share of the whole.
 - **The ingredient defaults seed.** `POST /api/v1/recipes/ingredient-defaults/seed`
   is gone: it seeded the defaults of every organization on the installation,
   and any member of one organization could call it. A script that called it
@@ -413,6 +419,27 @@ Not marked **Breaking**, but worth a look before you update:
   the shared reader that turns an uploaded CSV or workbook into a frame of
   text cells (tolerant of a BOM, of the locale's codepage and of semicolon or
   tab separators) and the accessor that reads one cell as the text it is.
+- `core_api.categories.list_with_filters_async` takes `count_records`, which
+  with `with_counts` counts every live record filed under a category instead
+  of distinct products.
+- A module can name the places goods only wait or are held in.
+  `register_held_back_locations`, exported by the module SDK, takes a provider
+  that answers, for an organization, the locations goods are not kept in —
+  the places inside them included — each with a short reason (`receiving`,
+  `quarantine`); `core_api.locations.held_back_async` gathers what every
+  provider answers and is empty while none is registered. A flow that puts
+  goods where they are to stay asks it instead of reading another module's
+  settings, and `GET /api/v1/locations` takes `exclude_held_back`
+  (`excludeHeldBack` in the frontend `LocationScope`) to leave those places
+  out of a picker. The warehouse registers its receiving areas and its
+  quarantine location.
+- `core_api.items.update_quantity_async` and
+  `core_api.stock.take_from_the_records_async` take `file_when_emptied`, and
+  `RecordPostDTO` carries it, for a module whose draw uses stock up: a record
+  taken to nothing is filed under Consumed and leaves the products list, as
+  one used up by hand. `core_api.items.find_stock_row_async` takes
+  `emptied_from` to find such a record by the shelf it left, so stock given
+  back to it returns it there. Callers that pass neither are unchanged.
 
 ### Changed
 
@@ -446,6 +473,14 @@ Not marked **Breaking**, but worth a look before you update:
   must read `step.text` instead of the string itself. Steps stored by an
   earlier version are rewritten by the module's upgrade: a sentence becomes a
   step with no duration, so nothing has to be re-entered.
+- **Breaking:** the cost breakdown of a production formula counts the whole
+  batch. `GET /api/v1/maker/breakdown/{template_id}` answers in `total_cost`
+  the ingredients, the fixed costs and the labour of the batch, where it
+  answered the ingredients alone, and adds `ingredients_cost`, `fixed_cost`,
+  `labour_cost` and `unit_cost`; each entry's `percentage_of_total` is a share
+  of that whole. `maker_api.compute_unit_cost_async` likewise answers the
+  whole cost per unit instead of the ingredients' part. A client or a module
+  that wanted the ingredients alone reads `ingredients_cost`.
 - An ingredient that has a BOM of its own is now taken from its own stock first,
   and only the part that stock does not cover is made through its BOM — the
   dough made yesterday is used before flour is taken again. The availability
@@ -540,6 +575,14 @@ Not marked **Breaking**, but worth a look before you update:
   unit mismatch until a unit is set, and a line that does convert — 500 g
   against stock kept in kilograms — draws the converted amount and records
   it in the shelf's unit.
+- A production run's output can no longer be put where goods only wait. The
+  place pickers of a new run, made or planned, of **Cook a batch for stock**
+  and of a formula's **Add stock** sheet leave out the warehouse's receiving
+  areas and quarantine location, and the places inside them, where picking
+  never looks. A run naming one is refused when it is created and again when
+  its output is put on the shelf — completing it, a portion or the finish —
+  so a draft saved before the place was set apart cannot fill it either
+  (`400 PRODUCTION_OUTPUT_RECEIVING` or `PRODUCTION_OUTPUT_QUARANTINE`).
 - Undoing a production run no longer changes what the stock is worth. The
   output leaves the books at the value its own run put in, instead of at the
   product's oldest cost layer, which can belong to an earlier run made at a
@@ -552,8 +595,9 @@ Not marked **Breaking**, but worth a look before you update:
   the suggested price sat below what the run cost; the calculator now lists
   the three parts under the total, and the production preview's total matches
   the per-unit figure beside it. The preview lists the fixed costs and labour
-  under its ingredients, and each line's percentage and the cost-share chart
-  are shares of that whole total.
+  under its ingredients and each line's percentage is a share of that whole
+  total; the cost-share chart, there and on a recipe's *Cost & result* tab,
+  gives fixed costs and labour slices of their own.
 - A production run or batch record whose ingredients carried no purchase
   price no longer shows a cost of zero per unit beside a total that reads
   "—": the per-unit figure is "—" too until some rate is known, so an
@@ -583,11 +627,15 @@ Not marked **Breaking**, but worth a look before you update:
   Duplicate on a draft, but no Start run, Complete run, Finish run, portion
   form, Undo run or Cancel of a run in progress, and *New production* opens
   planning only, without the *Save as made* choice: each of those posts stock.
-- Cooking or taking back a run's output that empties a record now files it as
-  used up, the way using its last unit by hand does. The emptied record leaves
-  the products list and stops counting as needing attention on the overview,
-  instead of staying on the list at 0. Undoing the pick returns the stock to the
-  record on the shelf it left.
+- Cooking a recipe, a production run drawing its ingredients and **Undo run**
+  taking a run's output back now file a record they empty as used up, the
+  way using its last unit by hand does. The emptied record leaves the
+  products list instead of staying on it at 0, and its date no longer counts
+  it as needing attention on the overview; a product that has fallen below
+  its stock alert keeps one row there, the record it was last used up from,
+  so the shortage has a record to open. Undoing the pick or the run, or
+  cancelling a run in progress, returns the stock to that same record on the
+  shelf it left.
 - **Cook a batch for stock** no longer claims a production recipe exists for a
   product after a run was abandoned. When the order was refused (for example
   for a shortage) and the sheet was closed, the production recipe made for the
@@ -603,10 +651,27 @@ Not marked **Breaking**, but worth a look before you update:
   inflated total. Total spent, the monthly trend and the weekly spending
   behind the forecast now add up only what came in from outside. Receipts
   posted before this release cannot be told apart and keep counting.
-- Purchase patterns no longer read a production run's product as a purchase
-  of it. Two runs of a wine used to list the wine as bought twice, at the
-  run's cost; the report now leaves out records a run made. Records made
-  before this release cannot be told apart and keep counting.
+- Purchase patterns count only what was bought. A production run's product,
+  an opened package, the part of a record a transfer leaves behind, a stock
+  take's surplus and an internal receipt each counted as one more purchase:
+  two runs of a wine listed the wine as bought twice, at the run's cost, and
+  opening one bottle of a pack added a purchase of it. The report now counts
+  a receipt and a record entered by hand, imported, scanned or added by an AI
+  agent, and leaves out every other way a record comes onto the shelf; the
+  `price_volatility` the API answers is measured over the same purchases
+  instead of every price the product's name ever had. Opening a package now
+  says so in the record's history (*Package opened*). A product made by a run
+  and a package opened before this release carry no such mark and keep
+  counting.
+- A production run's checks no longer count a batch the run may not take.
+  An ingredient whose only stock stood in a batch on hold, in quarantine,
+  recalled or past its date passed the availability check, the shortage
+  list, the run list's shortage marks and the warning or refusal on a new
+  run, while the run itself refused that batch: completing it ended in a
+  bare stock error instead of the shortage list the dialog shows. The checks
+  now leave out the batches the run leaves out, and
+  `core_api.stock.list_quants_async` takes `drawable_only` for a module that
+  needs the same answer.
 
 #### Recipes, meal plans and shopping lists
 
@@ -617,13 +682,28 @@ Not marked **Breaking**, but worth a look before you update:
   Milk ticked for the cook to correct, and a line that names its own allergens
   keeps them. Recipes imported earlier get theirs when the instance is
   upgraded.
+- The allergens an ingredient's name suggests miss fewer peanuts, tree nuts,
+  milk and fish. "Orzechy ziemne", "Groundnuts" and "Ground-nut oil" suggest
+  peanuts, not tree nuts or nothing; "Nuts", "Mixed nuts" and "Nut butter"
+  suggest tree nuts, while coconut, donut and nutmeg still do not;
+  "Czekolada mleczna" and "Napój mleczny" suggest milk, as "Milk chocolate"
+  did; and "Pstrąg" suggests fish, as "Trout" did. A butter of walnut,
+  pistachio, macadamia, sesame, coconut, sunflower (seed) or apple, one
+  written with a hyphen ("Peanut-butter") and the Polish sesame, coconut and
+  nut butters no longer suggest milk, while "Peanut butter cookies" still
+  does. This is the suggestion a recipe's ingredient line, an imported recipe
+  and a made product's card offer for a person to confirm.
 - A requirement scaled by a ratio that does not divide evenly no longer asks
   for one unit more than it needs: five servings of a three-serving recipe
   that asks for three eggs now ask for five eggs, and planning five of a
-  production recipe that yields three lists five pieces, not six. The
-  production preview's to-buy figure and the line the shortfall writes agree
-  on the quantity, and the add-item dialog of a shopping list writes its
-  quantity ceiling in the reader's decimal mark.
+  production recipe that yields three lists five pieces, not six. With
+  exactly those five pieces on the shelf, the run is no longer short by what
+  the division left over: the preview offers nothing to buy, the run's card
+  and page mark no shortage, creating it no longer asks to confirm a
+  shortage and completing it is not refused. The production preview's to-buy
+  figure and the line the shortfall writes agree on the quantity, and the
+  add-item dialog of a shopping list writes its quantity ceiling in the
+  reader's decimal mark.
 - Recipe picking no longer offers a sealed pack lighter than the card's full
   pack as the open one to cook from: a pack is open when opening it marked it
   so, which is what the picking order and the candidate list already went by.
@@ -691,7 +771,13 @@ Not marked **Breaking**, but worth a look before you update:
   target and the shelf was left empty while the goods had not moved. Only what
   stands on the archived location itself is relocated, the archive dialog
   asks for a target only when that location holds products, and a location
-  that holds nothing of its own archives without one.
+  that holds nothing of its own archives without one. A location inside the
+  archived one can be that target: the dialog offers it and
+  `POST /api/v1/locations/{location_id}/archive` no longer refuses it. The
+  dialog's warning about putaway rules counts only the rules naming the
+  archived location, since a rule naming a place inside keeps working, and
+  the *Equipment Locations* screen offers **Archive** on a place that holds
+  nothing itself, whatever the places inside it hold.
 - Attaching a blank label to an existing product now tells stock rows apart.
   Each row in the **Attach to an existing product** sheet says where it
   stands, when it expires, how much it holds and its serial number, and rows
@@ -732,6 +818,25 @@ Not marked **Breaking**, but worth a look before you update:
   receipts were cut at a thousand, oldest first, before what left was netted
   off them, so the newest stock, the part still on the shelf, dropped out of
   the buckets.
+- The product, label and location screens no longer drop what they were
+  asked. Answering *Enter … in another unit?* on the product form now carries
+  on the save that raised it, instead of closing with nothing saved, and
+  *Change history* records the choice ("Entered 1,000 g, kept as 1 kg")
+  rather than a second bare "Created". **Remove 1 unit** on a record holding
+  less than one unit — on a scanned label's sheet, a product's page or a
+  scanned product code — opens the amount dialog at what is there instead of
+  being refused with "Not enough stock to perform this action", and a
+  Damaged, Expired or Disposed answer is filed as a disposal, as on the
+  products list. The phone scanner offers **Type a code** while the camera
+  runs, for a label that will not scan. A label size the server refuses names
+  its field ("Width (mm): …"), **Generate Labels** keeps a typed 501 and says
+  that 500 fit in one batch instead of quietly changing it, deleting from the
+  label pool names the label and warns that a sticker already printed stops
+  being recognized, and a label whose product was archived reads Archived on
+  the pool, the scan page and the scan sheet alike. A products list, product
+  page or batch page whose request failed no longer calls itself empty or
+  loses its heading and way back, and a category made by hand in an
+  equipment and warehouse workspace no longer asks a cable for a freeze date.
 
 #### Documents, warehouse and approvals
 
@@ -792,6 +897,15 @@ Not marked **Breaking**, but worth a look before you update:
   remove, and the refusal names the product in the screen's quantities rather
   than a record id. A surplus correction is still weighed against everything
   the line received, the held part included.
+- A receipt that held part of a line back in quarantine no longer offers
+  **Undo**, which could only be refused: the held part lies on the
+  quarantine shelf under a record of its own that the reversal cannot reach,
+  and the refusal said "later movements used the stock" though nothing had
+  moved. The receipt's page and the screen that follows receiving say in
+  the button's place that part of the receipt is in quarantine and to use
+  **Correct** for what is in stock, the message on completing it offers no
+  undo, and the API answers `DOCUMENT_UNDO_HELD_GOODS` instead of
+  `DOCUMENT_UNDO_STOCK_USED`.
 - A correction with two lines on the same stock record is weighed as a whole
   when it is confirmed. Each line used to be checked against the record alone,
   so two lines that each fit could pass confirmation and be refused only at
@@ -887,6 +1001,16 @@ Not marked **Breaking**, but worth a look before you update:
   the old country's answer until the page was reloaded; they now follow the
   new country at once. While the country's rates are still loading, or could
   not be loaded, the tax-ID section no longer says that no country is set.
+- `GET /api/v1/items?source_document_id=`, and `GET /api/v1/items/aggregates`
+  with the same filter, answer the products a warehouse document touched.
+  They compared the document with a field nothing ever wrote, so the answer
+  was always empty and a client asking what a receipt brought in could not
+  tell "nothing" from "not recorded". The filter now reads the products'
+  history: a record that a document received, added to, issued, moved or
+  corrected matches.
+- The correction and return dialogs write their "at most" limits with the
+  reader's decimal mark: a Polish reader saw "2.5" two lines below
+  "Executed: 2,5".
 
 #### Equipment
 
@@ -921,6 +1045,11 @@ Not marked **Breaking**, but worth a look before you update:
   attestation progress says it counts people, the overview names the retired
   assets beside the total, and the public attestation page prints its
   deadline in the organization's date style.
+- Equipment → **Categories** counts every asset. Its **Assets** column and
+  the delete confirmation counted distinct catalogue products, so three
+  laptops of one model read as one. `GET /api/v1/categories` takes
+  `count_records`, which with `with_counts` counts every live record instead
+  of distinct products; Inventory's categories still count products.
 - The asset list no longer offers **Export** to an account the export would
   refuse. A role without the permission to view products, such as one that
   holds only the stock-take permissions, used to meet "You do not have
@@ -994,6 +1123,18 @@ Not marked **Breaking**, but worth a look before you update:
   so the limit is met by API clients and by recipe covers fetched from other
   sites. A photograph Vision AI cannot read at all is refused with "This file
   could not be read as an image" instead of an internal error.
+- A refused e-mail address is explained in the reader's language. The
+  validator's English sentence came through on every screen and in every
+  language; the refusal now says which of four things is wrong — a reserved
+  domain such as `name@shop.invalid` that cannot receive mail, a missing `@`
+  or nothing on one side of it, no dot after the `@`, or a character that is
+  not allowed — or, for any other reason, that it is not a valid address.
+  This holds wherever an address is entered: an invitation, a user, a
+  password reset, the mail settings and an asset's checkout.
+- The scanner's stock sheet no longer offers **Add to shopping list** on an
+  organization that has the Shopping lists module off. An administrator,
+  whose role passes every module's permission, saw it there, and pressing it
+  ended in a refusal naming the module's internal key.
 
 #### Running it
 
@@ -1020,6 +1161,11 @@ Not marked **Breaking**, but worth a look before you update:
   words in its name; about two dozen methods were labelled the wrong way
   round. Summaries no longer stop mid-sentence, and types and enum defaults
   print as a caller writes them.
+- A write that sends a value of the wrong JSON type is refused instead of
+  answering 500. A barcode or SKU sent as a number, a boolean in a quantity
+  or a quantity too wide to round reached a shared validator that crashed on
+  it; an API client now gets the field's named 422 or 400 refusal, as for
+  any other invalid value.
 
 #### Smaller corrections
 
@@ -1086,6 +1232,14 @@ Not marked **Breaking**, but worth a look before you update:
 - Scan document offers the torch only on a camera that has one, and the
   location wizard keeps a zone name typed on its first step when a zone chip
   is pressed afterwards.
+- On a phone, the sentence on a BOM's Composition tab that says which units
+  are offered stands under the unit picker it explains, above **Add line**,
+  instead of under the button.
+- The rankings of the cost analysis and the purchase patterns order equal
+  figures by name, as the consumption report's top-ten lists already do: a
+  tie at the last place of *Most expensive categories*, *Savings
+  suggestions*, *Top recurring products* or *Bulk opportunities* no longer
+  changes from one reading of the same data to the next.
 
 ### Removed
 
