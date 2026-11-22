@@ -40,7 +40,7 @@ meal planning and equipment custody share the same core, while the warehouse
 module runs receiving, picking, packing and shipping.
 
 **Alpha release:** best for small teams today, with occasional breaking changes
-between releases — see [Alpha Release v0.12.0](#alpha-release-v0120).
+between releases — see [Alpha Release v0.13.0](#alpha-release-v0130).
 
 **Use Inventari:** [try the demo](https://demo.inventari.app),
 [run it locally](#quick-start) or [deploy it on your server](QUICK_DEPLOY.md).
@@ -732,9 +732,9 @@ application-level rate limiting on the login, AI and vision endpoints.
 
 ---
 
-## Alpha Release v0.12.0
+## Alpha Release v0.13.0
 
-Inventari 0.12.0 is an **alpha** release so that people can get to know the
+Inventari 0.13.0 is an **alpha** release so that people can get to know the
 product. Three parts of the REST API have been stable since 0.11.0, each with
 a guard: every collection is a page (`items`, `total`, `limit`, `offset`,
 `has_more`, or `next_cursor` on the cursor feeds, with the deliberate
@@ -747,9 +747,9 @@ envelope have compatibility guards and are the surfaces to build on.
 The [compatibility policy](docs/subsystems/CONTRACTS_STABILITY.md) lists every
 public surface, its class and the promise that class makes; the
 [error-response contract](docs/api/ERRORS.md) is the one page a client needs
-for the `detail` envelope and its codes. What 0.12.0 changes, and what an
-installation of 0.11.0 has to do about it, is in the
-[changelog](CHANGELOG.md#v0120---2026-11-09).
+for the `detail` envelope and its codes. What 0.13.0 changes, and what an
+installation of 0.12.0 has to do about it, is in the
+[changelog](CHANGELOG.md#v0130---2026-11-23).
 
 **Release rhythm:** a minor release every two weeks, on a Monday. A breaking
 change ships only in a minor release and is marked **Breaking** in the

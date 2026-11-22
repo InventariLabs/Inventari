@@ -12,79 +12,128 @@ says what the release does rather than what changed since them.
 
 ## Unreleased
 
+## v0.13.0 - 2026-11-23
+
+The second release under the two-week rhythm. Most of it is the production
+module, which now follows a small producer's batch from the plan to the
+label and the recall; the rest makes Inventari something an AI agent can
+work with — a module package a coding agent can be handed, and an MCP server
+an agent can read and correct the stock through.
+
+**For people using it**, a production run can take several days — started,
+filled in portions and finished, for wine, cheese, beer or anything else that
+matures — and every run files its output under a dated batch with a
+best-before, labels to print, a one-page batch record and a trace for a
+recall. A BOM writes the product's ingredient list, allergens and nutrition
+for its label, and a formula costs out on the day it is written, labour from
+its steps' minutes included. A new **Plan** screen lays the planned runs out
+by day, lists what they need and orders what is missing. *Value movement*
+states what the stock was worth over a period, a delivery cost that reached
+no product has a place of its own, and closing a month says what it would
+leave behind. Brazilian Portuguese is a sixth maintained language, and every
+page names its browser tab. Many of the fixes come from a pass that walked
+each flow and checked that what a screen reported actually happened: a day
+on *Stock on a date* is the organization's day, a moved location keeps its
+history, corrections and returns keep to what the shelf holds, and screens
+stop offering an account the buttons its server would refuse.
+
+**For instance administrators**, the server's logs go to the host's journal
+and outlive a deploy, with a nightly encrypted copy that leaves the host
+beside the backups; finished rows — published events, old mail, read
+notifications — are deleted on a schedule the installation sets; and a site
+of your own can be served by the same Caddy beside the application. The
+offsite copy's `BACKUP_RCLONE_REMOTE` now names the parent directory: the list
+of what to do on the way from 0.12.0 is below.
+
+**For module authors**, `module new-community` writes an `AGENTS.md` that
+hands an AI coding agent the module rules, and MODULE_QUICKSTART.md says how
+to build a module with one and check what it built. A module can close what
+it opened at shutdown, `make new-module` writes the one file other modules
+may import from, and the module SDK and `core_api` gain what this release's
+modules needed: reading an uploaded sheet, a package's effective expiry, an
+expiry window, the value of work in progress and a cost added to a receipt
+after it arrived.
+
+### Upgrading from 0.12.0
+
+Update as DEPLOYMENT.md's *Updating* says. Five changes break an
+installation, a client or a script, and each says what the affected party
+must do:
+
+**Instance administrators**
+
+- **The offsite copy's destination.** `BACKUP_RCLONE_REMOTE` names the parent
+  of the offsite copy, not the directory the backups land in: the service
+  appends `backups/`, and the server logs go to `logs/` beside it. An
+  installation that has the copy on and sets
+  `<remote>:<bucket>/<path>/backups` sets `<remote>:<bucket>/<path>`, which
+  writes to the same place; one whose backups sit directly at
+  `<remote>:<bucket>/<path>` sets `<remote>:<bucket>`. Until it does, the next
+  sync writes to a new `backups/` below the old value and leaves the files
+  already there unsynced — nothing is deleted. DEPLOYMENT.md, *Upgrading with
+  the copy already on*, has the steps.
+
+**The REST API and its clients**
+
+- **Cook a batch for stock.** `POST /maker/recipes/from-recipe` without
+  `batch_yield_qty`, for an output kept in a weight or volume unit, answers
+  `400 BRIDGE_YIELD_REQUIRED` instead of storing the recipe's servings as the
+  yield (12 servings became a 12 kg yield). A client sends the amount one
+  batch makes; a product counted in pieces still takes the servings. An
+  ingredient line whose unit the ingredient's stock cannot be read in is
+  refused with `400 BOM_LINE_UNIT_NOT_CONVERTIBLE`.
+- **Process steps.** A production formula's `process_steps` are objects,
+  `{text, minutes}`, not bare sentences. A reader of `GET /maker/recipes/{id}`
+  or of the catalogue reads `step.text`; a writer may still send plain
+  strings, which are stored as steps with no duration. Steps stored by 0.12.0
+  are rewritten by the module's upgrade, so nothing is entered again.
+- **The ingredient defaults seed.** `POST /api/v1/recipes/ingredient-defaults/seed`
+  is gone: it seeded the defaults of every organization on the installation,
+  and any member of one organization could call it. A script that called it
+  stops calling it; the recipes module does the same work once at start-up.
+- **Six routes no screen called**, each superseded by one that stays. A script
+  that used one switches to its replacement (*Removed* lists them).
+
+Not marked **Breaking**, but worth a look before you update:
+
+- The production stack's containers write to the host's journal instead of
+  Docker's per-container log, which a recreate deleted. Make the journal
+  persistent and give it a retention and a size cap as DEPLOYMENT.md,
+  *Keeping the server's logs*, says — a journal kept only in memory is gone
+  on a reboot — set `LOG_RETENTION_DAYS` in `.env` to the same period, which
+  the privacy page states, and put `scripts/export-logs.sh` in root's cron for
+  the daily encrypted copy.
+- Once a day the backend deletes finished rows: outbox events published more
+  than 7 days ago, sent and failed mail queued more than 120 days ago, read
+  notifications older than 90 days and unread ones older than a year. An
+  installation that keeps them longer sets `EVENT_OUTBOX_RETENTION_DAYS`,
+  `EMAIL_JOB_RETENTION_DAYS`, `NOTIFICATION_READ_RETENTION_DAYS` or
+  `NOTIFICATION_UNREAD_RETENTION_DAYS` in `.env` before it updates. The first
+  run on an older instance works through the backlog in batches.
+- The upgrade rewrites `ai_usage_logs` as exact numbers and blocks that table
+  while it does, so the migration step takes longer on an installation with a
+  long AI history. A stored cost that was not a usable number becomes
+  unknown.
+- An ingredient that has a BOM of its own is taken from its own stock first,
+  on BOM lines saved before the upgrade too. Mark a line **Always make fresh**
+  to keep making it every time.
+- A BOM line whose unit cannot be read in the ingredient's stock unit — 300 g
+  of a product kept in pieces — is refused when it is saved, and a production
+  run refuses one stored earlier. The Composition tab marks such a line as a
+  unit mismatch until a unit is set.
+- A completed or archived shopping list is no longer written to: adding to it
+  from a recipe or a meal plan is refused until it is reactivated.
+- A picture of more than 60 million pixels is refused as unreadable, as an
+  item's or a recipe's cover and by Vision AI.
+- A print layout whose template code does not parse or render is refused when
+  it is saved; one stored earlier prints with the built-in layout until it is
+  corrected or reset.
+- A location that equipment is or ever was checked out to can no longer be
+  deleted; archive it instead.
+
 ### Added
 
-- A link into the demo can name a screen. Opening an in-app address such as
-  `/warehouse/todo` on the demo without a session shows the sign-in page, and
-  **Try the demo** now opens that screen in the visitor's new copy instead of
-  the launcher; an address that leaves the app is ignored, as at a sign-in. On
-  the demo, the form for signing in with an account is folded under *or sign in
-  with an account*, so **Try the demo** is the page's one main action.
-- The tablespoon and the teaspoon. Recipes can now use the spoons the module
-  already converted for ingredients, and the recipe import accepts `tbsp` and
-  `tsp`. A new Food & Home organization gets them with its kitchen measures;
-  an installation that already has the US cup gets them on the next upgrade.
-- A place for a site of your own beside the application on the production
-  server. Every `*.caddy` file in `caddy-extra/` (or the directory
-  `CADDY_EXTRA_DIR` names) is read as part of the Caddyfile, so a website on
-  the main domain can be served by the same Caddy while the application runs on
-  a subdomain, and survives updates, which an addition in a second compose file
-  would not. The directory ships empty and a stack that does not use it is
-  configured as before.
-- A place for a delivery cost that reached no product. Freight that arrives
-  after a receipt is posted can no longer be added to the goods, and the
-  refusal now offers a way forward: on a posted receipt the **Costs that
-  reached no product** section records the amount with a reason, the cost kind
-  and the day it belongs to. The amounts are listed and added up per currency
-  on a screen of their own, reached from the office panel in History, and each
-  one can be removed again. They are never part of a stock value: *Stock on a
-  date* and *Value movement* do not move when one is recorded, and there is no
-  counter-account or double entry behind them. A currency other than the
-  document's is refused, as it is for a cost added before posting.
-- A statement of what the stock was worth over a period. **Value movement**,
-  reached from *Stock on a date*, takes a first and a last day and gives the
-  value when the period opened, what came in (bought, and produced or returned
-  to stock), what was used, what was thrown away, what was dispatched against a
-  document, every other way stock left, and the value when it closed. The opening and the closing are the figures
-  *Stock on a date* gives for the evening before the first day and for the last
-  one, and the lines add up to the cent; where the two ends differ by something
-  the cost history does not account for (a cost added to a receipt after it
-  arrived, a rounding cent) the statement says so on a line of its own. It
-  downloads as a spreadsheet, an organization that keeps no cost history gets
-  an explanation rather than a page of zeros, and where the profile hides the
-  value of the stock the screen and the file hide it too. It is a statement over the
-  cost history, not a ledger: no chart of accounts, no double entry, no closing
-  of periods.
-- Putting a print layout back as the built-in it came from. A copy of a
-  built-in print layout on the Document templates screen that no longer
-  matches it now carries a **Changed from the built-in** badge and a **Reset
-  to built-in** action. After a confirmation that says everything changed in
-  the template is lost, the copy's body is replaced in place — it keeps its
-  name and whether it prints by default. A template written from scratch is
-  neither marked nor offered the action.
-- Planning several production runs at once. A planned run no longer reads the
-  shelf as if it were the only one on it: the draft runs are counted one after
-  another, by planned day and then by creation, so two runs that each fit on
-  the shelf are not both shown as covered — the run list and a run's page say
-  **covered**, **partly covered** or **short**. A new **Plan** screen in
-  Production shows the planned runs of a week or a month by day (a list by day
-  on a phone), moves a run to another day, and lists everything those runs need
-  in one place: in stock, on order in open purchase orders with their expected
-  dates (the column is absent while purchasing is off), and still missing.
-  **Order what is missing** raises one draft purchase order per supplier and
-  currency from each ingredient's best price in the supplier's own unit (offers
-  in your own currency first, never compared with another currency by their
-  numbers, and a volume price the shortage does not reach is not bought unless
-  the whole order costs less), sends ingredients
-  with no supplier to the shopping list, and proposes an ingredient that has a
-  recipe of its own as a planned run instead of a purchase. A run that uses
-  such an ingredient counts on what the shelf holds of it and on runs of it
-  planned for its day or earlier — never on a run planned after it — and the
-  run list and the needs list say the same about it. What is on order or
-  planned is spent once: a delivery ordered for one week, or a run planned for
-  it, is not counted again by a later one. A product you make that falls below
-  its reorder minimum is now proposed as a production run, in To do and in the
-  reorder alerts, and no longer as a purchase.
+#### For people using it
 
 - A production run can be started, filled in portions and finished on
   different days, for wine, cheese, beer, ferments and anything else that
@@ -112,89 +161,6 @@ says what the release does rather than what changed since them.
   that answers the layer it opened, and `unpriced_stays_unknown` for a caller
   that will state the cost itself later instead of borrowing the older stock's
   rate.
-- A BOM line can be marked **Always make fresh**: an ingredient that has a BOM
-  of its own is then made through it every time and never taken from stock.
-
-- The MCP Server module serves the Model Context Protocol over Streamable HTTP
-  at `/api/v1/mcp-server/mcp`, authenticated with an API key that holds
-  `mcp_server:use` and acts only in the key's organization. Seven read tools
-  and two resources answer from the same CoreAPI calls the screens use, so the
-  stock number and the tenant scope stay in one place. Two guarded write tools
-  complete the loop: `create_item` opens a record through the create service,
-  and `correct_stock` sets a counted quantity through the stock posting rules —
-  a locked group, one write that posts the movement and the cost layer, the
-  register's copy when Warehouse is on, and a required reason in the record's
-  history and the organization journal. Both need `items:write`, and the
-  module's README carries a Claude Code quickstart. The key travels in
-  `X-API-Key`, which the endpoint and the rest of the API both accept; an
-  organization lists the hosts and origins its deployment answers on in the
-  module's settings card, and every other `Host`/`Origin` is refused.
-- On the public demo a visitor can connect an AI agent to their own sandbox.
-  Every sandbox the demo hands out has API Keys and MCP Server switched on and
-  the demo's address allowed, so a visitor issues a key there — read-only, or
-  with **Add products and change stock levels** — and the agent searches a
-  product, reads its stock and posts a correction in that sandbox alone. The
-  demo publishes no key; the nightly rebuild deletes every key with its
-  sandbox. `docs/DEMO.md`, *Connect an AI agent*, walks it in about ten
-  minutes and says what an agent may do there, the limits it meets and that
-  what it reads goes to the model provider the visitor chose.
-- A module can close what it opened: `BaseModule.on_shutdown_async` runs at
-  application shutdown in the reverse of the startup order, so a task group,
-  connection or exit stack started by the module is closed with the app, and
-  `define_module(on_shutdown_async_hook=)` wires it. `app.core.module_sdk`
-  exports `get_current_user`, `audit_actor_scope` and `current_actor` for a
-  module that authenticates its own ASGI transport or names its actor in the
-  journal, and `effective_expiry`, the day a package really stops being fit to
-  use — the batch's date or the use-by an opening wrote, whichever is earlier —
-  so a module reading an expiry window can judge a package by the date the
-  screens and the forecast report, which is also the date the items list's
-  `expiring_days` filter selects on.
-  `core_api.items.list_by_expiry_async` takes `expiry_after` and
-  `expiry_before`, so a caller reading one expiry window filters the query
-  instead of reading a capped list and discarding rows after it. The app-level
-  default rate limit now keys a plain Starlette route as it does a FastAPI
-  endpoint, so a transport served that way is counted per API key.
-- A new community module package can be handed to an AI coding agent.
-  `module new-community` now writes an `AGENTS.md` into the package — what a
-  module may import, the six maintained languages, migrations the package
-  owns, the purpose card, tests and the command that checks the package before
-  install, with links to the full guides at the platform's version — and a
-  `CLAUDE.md` that points at it. MODULE_QUICKSTART.md has a section on
-  building a module with an agent: what to give it, which checks refuse its
-  mistakes and how to check the result before installing it.
-- The audit journal (`GET /audit-log`) counts at most ten thousand entries on
-  its first page, as the product, stock and movement lists do: past that,
-  `total` is where the count stopped and `total_capped` is true, and the
-  settings screen's pager says "more than 10000". The cursor carries both to
-  the later pages.
-- `core_api.audit_log.list_for_org_async` takes `count_up_to`, which stops the
-  count one entry past it, the way `core_api.stock_moves.list_rows_for_org_async`
-  already does.
-- `make new-module` writes an empty `moduleApi.ts` into the new frontend
-  module: the one file `check:boundaries` lets another module import from it,
-  so the first module that depends on it adds a name there instead of
-  importing the module's internals. The dead-code check reads every module's
-  `moduleApi.ts` as published surface, and no longer reports a name in it that
-  nothing in this repository imports.
-- A production formula costs out on the day it is written. An ingredient with
-  no stock and no supplier quote can be given a price per unit on its card;
-  the price belongs to the product and every estimate asks it after the cost
-  layers and the supplier quotes. Each process step carries how long it takes,
-  production settings carry an hourly rate for the organization's own work,
-  and the formula's labour is its steps' time at that rate — shown as a
-  computed line beside the fixed costs, and included in the estimate, the
-  preview and a run's actual cost. A completed run keeps the formula's answer
-  beside what it cost, and each ingredient says whether the difference came
-  from a price or from a quantity. A formula whose ingredients the records do
-  not hold says so at the top of its page, and from there the stock can be
-  entered (quantity and price) or ordered as a draft purchase order when
-  purchasing is on.
-- A batch's trace for a recall: from a batch, the receipts that brought it in
-  and the deliveries that sent it out, each with its partner, address, date and
-  quantity — one step back and one step forward, as food law asks. A production
-  run can name the batch its output goes into, and the trace follows it on to
-  that batch and its own customers. The trace exports as a spreadsheet to hand
-  to an inspector.
 - A production run files its output under a dated batch. A run nobody named a
   batch for names its own from its day and a counter, unique among the
   product's batches. The batch carries the day the run was made and a
@@ -213,12 +179,6 @@ says what the release does rather than what changed since them.
   module draws batch labels (`lot_ids`, `POST /printing/lot-labels/png`, up to
   two hundred copies), and the module SDK exports the upload policy a module
   checks its own attachments with.
-- Every page names its browser tab, bookmark and history entry, in the
-  language on screen: `Products · Inventari` instead of `Inventari` for all of
-  them, and the title follows the page on every navigation. A screen reader
-  announces it when the page changes. The sign-in, registration, password
-  reset, privacy, invitation, set-up and attestation screens have titles of
-  their own.
 - A made product's ingredient list, allergens and nutrition come from its BOM
   and go on its label. A product's card carries, with Production on, the name
   it goes under in an ingredient list (a legal food name, or an INCI name for a
@@ -244,14 +204,72 @@ says what the release does rather than what changed since them.
   New endpoints: `GET/PUT /maker/labelling/products/{template_id}` and
   `GET /maker/labelling/recipes/{recipe_id}`; the module SDK exports
   `pick_by_lang`.
-- For module authors: `core_api.items.update_async` takes an optional `bulk`
-  flag that marks the edit's journal entry as one of a batch, and
-  `core_api.ai_connections.set_binding_async` an optional `user` it names in
-  the entry it writes. Callers that pass neither are unchanged.
-- For module authors: the module SDK exports `read_sheet` and `cell_text` —
-  the shared reader that turns an uploaded CSV or workbook into a frame of
-  text cells (tolerant of a BOM, of the locale's codepage and of semicolon or
-  tab separators) and the accessor that reads one cell as the text it is.
+- A batch's trace for a recall: from a batch, the receipts that brought it in
+  and the deliveries that sent it out, each with its partner, address, date and
+  quantity — one step back and one step forward, as food law asks. A production
+  run can name the batch its output goes into, and the trace follows it on to
+  that batch and its own customers. The trace exports as a spreadsheet to hand
+  to an inspector.
+- Planning several production runs at once. A planned run no longer reads the
+  shelf as if it were the only one on it: the draft runs are counted one after
+  another, by planned day and then by creation, so two runs that each fit on
+  the shelf are not both shown as covered — the run list and a run's page say
+  **covered**, **partly covered** or **short**. A new **Plan** screen in
+  Production shows the planned runs of a week or a month by day (a list by day
+  on a phone), moves a run to another day, and lists everything those runs need
+  in one place: in stock, on order in open purchase orders with their expected
+  dates (the column is absent while purchasing is off), and still missing.
+  **Order what is missing** raises one draft purchase order per supplier and
+  currency from each ingredient's best price in the supplier's own unit (offers
+  in your own currency first, never compared with another currency by their
+  numbers, and a volume price the shortage does not reach is not bought unless
+  the whole order costs less), sends ingredients
+  with no supplier to the shopping list, and proposes an ingredient that has a
+  recipe of its own as a planned run instead of a purchase. A run that uses
+  such an ingredient counts on what the shelf holds of it and on runs of it
+  planned for its day or earlier — never on a run planned after it — and the
+  run list and the needs list say the same about it. What is on order or
+  planned is spent once: a delivery ordered for one week, or a run planned for
+  it, is not counted again by a later one. A product you make that falls below
+  its reorder minimum is now proposed as a production run, in To do and in the
+  reorder alerts, and no longer as a purchase.
+- A production formula costs out on the day it is written. An ingredient with
+  no stock and no supplier quote can be given a price per unit on its card;
+  the price belongs to the product and every estimate asks it after the cost
+  layers and the supplier quotes. Each process step carries how long it takes,
+  production settings carry an hourly rate for the organization's own work,
+  and the formula's labour is its steps' time at that rate — shown as a
+  computed line beside the fixed costs, and included in the estimate, the
+  preview and a run's actual cost. A completed run keeps the formula's answer
+  beside what it cost, and each ingredient says whether the difference came
+  from a price or from a quantity. A formula whose ingredients the records do
+  not hold says so at the top of its page, and from there the stock can be
+  entered (quantity and price) or ordered as a draft purchase order when
+  purchasing is on.
+- A statement of what the stock was worth over a period. **Value movement**,
+  reached from *Stock on a date*, takes a first and a last day and gives the
+  value when the period opened, what came in (bought, and produced or returned
+  to stock), what was used, what was thrown away, what was dispatched against a
+  document, every other way stock left, and the value when it closed. The opening and the closing are the figures
+  *Stock on a date* gives for the evening before the first day and for the last
+  one, and the lines add up to the cent; where the two ends differ by something
+  the cost history does not account for (a cost added to a receipt after it
+  arrived, a rounding cent) the statement says so on a line of its own. It
+  downloads as a spreadsheet, an organization that keeps no cost history gets
+  an explanation rather than a page of zeros, and where the profile hides the
+  value of the stock the screen and the file hide it too. It is a statement over the
+  cost history, not a ledger: no chart of accounts, no double entry, no closing
+  of periods.
+- A place for a delivery cost that reached no product. Freight that arrives
+  after a receipt is posted can no longer be added to the goods, and the
+  refusal now offers a way forward: on a posted receipt the **Costs that
+  reached no product** section records the amount with a reason, the cost kind
+  and the day it belongs to. The amounts are listed and added up per currency
+  on a screen of their own, reached from the office panel in History, and each
+  one can be removed again. They are never part of a stock value: *Stock on a
+  date* and *Value movement* do not move when one is recorded, and there is no
+  counter-account or double entry behind them. A currency other than the
+  document's is refused, as it is for a cost added before posting.
 - Closing a month says what it would leave behind. The **Close this period**
   dialog counts the documents dated in the month that are still drafts, waiting
   for approval, or confirmed and not completed, and links to the first of them,
@@ -262,6 +280,17 @@ says what the release does rather than what changed since them.
   the approver's note, as they already were when it was rejected. The people
   picker of a workflow stage marks the members who cannot see approvals, since
   naming only such people is refused when the stage is saved.
+- Putting a print layout back as the built-in it came from. A copy of a
+  built-in print layout on the Document templates screen that no longer
+  matches it now carries a **Changed from the built-in** badge and a **Reset
+  to built-in** action. After a confirmation that says everything changed in
+  the template is lost, the copy's body is replaced in place — it keeps its
+  name and whether it prints by default. A template written from scratch is
+  neither marked nor offered the action.
+- The tablespoon and the teaspoon. Recipes can now use the spoons the module
+  already converted for ingredients, and the recipe import accepts `tbsp` and
+  `tsp`. A new Food & Home organization gets them with its kitchen measures;
+  an installation that already has the US cup gets them on the next upgrade.
 - Brazilian Portuguese as a sixth maintained language. **Português (Brasil)**
   is complete in the interface, the modules' own catalogs, the server's
   messages and the recipe ingredient defaults. The language menu offers it
@@ -270,6 +299,55 @@ says what the release does rather than what changed since them.
   Spanish: the core coverage gate, the module parity tests, the backend error
   catalog and the module validator. A module written outside this repository
   still needs English only.
+- Every page names its browser tab, bookmark and history entry, in the
+  language on screen: `Products · Inventari` instead of `Inventari` for all of
+  them, and the title follows the page on every navigation. A screen reader
+  announces it when the page changes. The sign-in, registration, password
+  reset, privacy, invitation, set-up and attestation screens have titles of
+  their own.
+- A link into the demo can name a screen. Opening an in-app address such as
+  `/warehouse/todo` on the demo without a session shows the sign-in page, and
+  **Try the demo** now opens that screen in the visitor's new copy instead of
+  the launcher; an address that leaves the app is ignored, as at a sign-in. On
+  the demo, the form for signing in with an account is folded under *or sign in
+  with an account*, so **Try the demo** is the page's one main action.
+
+#### Working with an AI agent
+
+- The MCP Server module serves the Model Context Protocol over Streamable HTTP
+  at `/api/v1/mcp-server/mcp`, authenticated with an API key that holds
+  `mcp_server:use` and acts only in the key's organization. Seven read tools
+  and two resources answer from the same CoreAPI calls the screens use, so the
+  stock number and the tenant scope stay in one place. Two guarded write tools
+  complete the loop: `create_item` opens a record through the create service,
+  and `correct_stock` sets a counted quantity through the stock posting rules —
+  a locked group, one write that posts the movement and the cost layer, the
+  register's copy when Warehouse is on, and a required reason in the record's
+  history and the organization journal. Both need `items:write`, and the
+  module's README carries a Claude Code quickstart. The key travels in
+  `X-API-Key`, which the endpoint and the rest of the API both accept; an
+  organization lists the hosts and origins its deployment answers on in the
+  module's settings card, and every other `Host`/`Origin` is refused.
+- On the public demo a visitor can connect an AI agent to their own sandbox.
+  Every sandbox the demo hands out has API Keys and MCP Server switched on and
+  the demo's address allowed, so a visitor issues a key there — read-only, or
+  with **Add products and change stock levels** — and the agent searches a
+  product, reads its stock and posts a correction in that sandbox alone. The
+  demo publishes no key; the nightly rebuild deletes every key with its
+  sandbox. `docs/DEMO.md`, *Connect an AI agent*, walks it in about ten
+  minutes and says what an agent may do there, the limits it meets and that
+  what it reads goes to the model provider the visitor chose.
+- A new community module package can be handed to an AI coding agent.
+  `module new-community` now writes an `AGENTS.md` into the package — what a
+  module may import, the six maintained languages, migrations the package
+  owns, the purpose card, tests and the command that checks the package before
+  install, with links to the full guides at the platform's version — and a
+  `CLAUDE.md` that points at it. MODULE_QUICKSTART.md has a section on
+  building a module with an agent: what to give it, which checks refuse its
+  mistakes and how to check the result before installing it.
+
+#### For instance administrators
+
 - Server logs that outlive a deploy, and a copy that leaves the host. The
   production stack writes its containers' output to the host journal instead of
   Docker's per-container file, so recreating the containers no longer deletes
@@ -287,6 +365,54 @@ says what the release does rather than what changed since them.
   lifecycle rule that removes the version once the local copy is gone — so a
   file the server deletes stays at the destination through the weeks a break-in
   is found in, and does not outlive the stated period.
+- A place for a site of your own beside the application on the production
+  server. Every `*.caddy` file in `caddy-extra/` (or the directory
+  `CADDY_EXTRA_DIR` names) is read as part of the Caddyfile, so a website on
+  the main domain can be served by the same Caddy while the application runs on
+  a subdomain, and survives updates, which an addition in a second compose file
+  would not. The directory ships empty and a stack that does not use it is
+  configured as before.
+- The audit journal (`GET /audit-log`) counts at most ten thousand entries on
+  its first page, as the product, stock and movement lists do: past that,
+  `total` is where the count stopped and `total_capped` is true, and the
+  settings screen's pager says "more than 10000". The cursor carries both to
+  the later pages.
+
+#### For module authors
+
+- A module can close what it opened: `BaseModule.on_shutdown_async` runs at
+  application shutdown in the reverse of the startup order, so a task group,
+  connection or exit stack started by the module is closed with the app, and
+  `define_module(on_shutdown_async_hook=)` wires it. `app.core.module_sdk`
+  exports `get_current_user`, `audit_actor_scope` and `current_actor` for a
+  module that authenticates its own ASGI transport or names its actor in the
+  journal, and `effective_expiry`, the day a package really stops being fit to
+  use — the batch's date or the use-by an opening wrote, whichever is earlier —
+  so a module reading an expiry window can judge a package by the date the
+  screens and the forecast report, which is also the date the items list's
+  `expiring_days` filter selects on.
+  `core_api.items.list_by_expiry_async` takes `expiry_after` and
+  `expiry_before`, so a caller reading one expiry window filters the query
+  instead of reading a capped list and discarding rows after it. The app-level
+  default rate limit now keys a plain Starlette route as it does a FastAPI
+  endpoint, so a transport served that way is counted per API key.
+- `core_api.audit_log.list_for_org_async` takes `count_up_to`, which stops the
+  count one entry past it, the way `core_api.stock_moves.list_rows_for_org_async`
+  already does.
+- `make new-module` writes an empty `moduleApi.ts` into the new frontend
+  module: the one file `check:boundaries` lets another module import from it,
+  so the first module that depends on it adds a name there instead of
+  importing the module's internals. The dead-code check reads every module's
+  `moduleApi.ts` as published surface, and no longer reports a name in it that
+  nothing in this repository imports.
+- `core_api.items.update_async` takes an optional `bulk`
+  flag that marks the edit's journal entry as one of a batch, and
+  `core_api.ai_connections.set_binding_async` an optional `user` it names in
+  the entry it writes. Callers that pass neither are unchanged.
+- The module SDK exports `read_sheet` and `cell_text` —
+  the shared reader that turns an uploaded CSV or workbook into a frame of
+  text cells (tolerant of a BOM, of the locale's codepage and of semicolon or
+  tab separators) and the accessor that reads one cell as the text it is.
 
 ### Changed
 
@@ -300,45 +426,6 @@ says what the release does rather than what changed since them.
   below the old value and leaves the files already there unsynced — nothing is
   deleted. *Upgrading with the copy already on* in `DEPLOYMENT.md` has the
   steps.
-- The permanent-deletion switch in **Settings** now says it covers archived
-  equipment assets as well as products, and the archived tab of the equipment
-  list tells you, while the switch is off, that an administrator can turn it on
-  in **Settings** and links straight to it.
-- Recipes sorted by **Recently changed** (it always followed the last edit; the
-  label now says so), **Replenish all** on the inventory overview is **Review
-  what to reorder** and its confirmation names the shopping list that took the
-  products, and the hint beside the recipe cost setting no longer says to turn
-  it off for home setups, where it is on by default.
-- Settings → **My modules** is now **Organization modules** (**Moduły organizacji**
-  and so on in the other languages): every choice on it switches modules on or off
-  for the whole organization, which the old name did not say. The confirmation for
-  a workspace mode now lists the settings it resets and no longer promises that
-  switching back restores them.
-- Mail an organization sends goes out under the organization's name when no sender
-  name is set in **Settings → Email**, as its invitations and documents already
-  name it. A sender name chosen there is kept.
-- The audit log words the removal of a role, a webhook channel or an AI connection
-  as **Removed**, and its subtitle lists every verb the log shows.
-- Rows that have finished their work no longer stay for ever. Once a day an
-  instance deletes outbox events published more than 7 days ago, sent and failed
-  mail queued more than 120 days ago, read notifications older than 90 days and
-  unread ones older than a year, so the list of mail that never arrived now goes
-  back 120 days. An administrator changes the windows with
-  `EVENT_OUTBOX_RETENTION_DAYS`, `EMAIL_JOB_RETENTION_DAYS`,
-  `NOTIFICATION_READ_RETENTION_DAYS` and `NOTIFICATION_UNREAD_RETENTION_DAYS`.
-  Sent mail drops its attachment as soon as it has left. The first run on an
-  older instance can take a while and works through the backlog in batches.
-- AI costs are stored as exact numbers, so the totals on the administration
-  screens add up to the cent. The upgrade rewrites `ai_usage_logs` and blocks
-  that table while it does; a stored cost that was not a usable number (not a
-  number, infinite, or a million dollars or more for one call) becomes unknown.
-- An ingredient that has a BOM of its own is now taken from its own stock first,
-  and only the part that stock does not cover is made through its BOM — the
-  dough made yesterday is used before flour is taken again. The availability
-  check, the preview and cost estimate, the shortage list, the shopping and
-  purchase suggestions, the multi-level view and the run itself agree on that
-  split. Existing lines take stock first after the upgrade; mark a line
-  **Always make fresh** to keep the earlier behaviour of making it every time.
 - **Breaking:** "Cook a batch for stock" no longer takes a recipe's number of
   servings for the batch yield of a product kept in a weight or volume unit.
   `POST /maker/recipes/from-recipe` without `batch_yield_qty` for such an
@@ -359,6 +446,59 @@ says what the release does rather than what changed since them.
   must read `step.text` instead of the string itself. Steps stored by an
   earlier version are rewritten by the module's upgrade: a sentence becomes a
   step with no duration, so nothing has to be re-entered.
+- An ingredient that has a BOM of its own is now taken from its own stock first,
+  and only the part that stock does not cover is made through its BOM — the
+  dough made yesterday is used before flour is taken again. The availability
+  check, the preview and cost estimate, the shortage list, the shopping and
+  purchase suggestions, the multi-level view and the run itself agree on that
+  split. Existing lines take stock first after the upgrade. A BOM line marked
+  **Always make fresh** keeps the earlier behaviour: its ingredient is made
+  through its own BOM every time and never taken from stock.
+- Rows that have finished their work no longer stay for ever. Once a day an
+  instance deletes outbox events published more than 7 days ago, sent and failed
+  mail queued more than 120 days ago, read notifications older than 90 days and
+  unread ones older than a year, so the list of mail that never arrived now goes
+  back 120 days. An administrator changes the windows with
+  `EVENT_OUTBOX_RETENTION_DAYS`, `EMAIL_JOB_RETENTION_DAYS`,
+  `NOTIFICATION_READ_RETENTION_DAYS` and `NOTIFICATION_UNREAD_RETENTION_DAYS`.
+  Sent mail drops its attachment as soon as it has left. The first run on an
+  older instance can take a while and works through the backlog in batches.
+- AI costs are stored as exact numbers, so the totals on the administration
+  screens add up to the cent. The upgrade rewrites `ai_usage_logs` and blocks
+  that table while it does; a stored cost that was not a usable number (not a
+  number, infinite, or a million dollars or more for one call) becomes unknown.
+- The line picker of a delivery, a scrap, a transfer or any other warehouse
+  document now finds stock the way the catalogue picker does: by the product's
+  name, brand, the code on the record or its product card, the label code and
+  the serial number, not by name alone. A one- or two-character fragment
+  matches only the start of a field, so typing `oi` no longer lists
+  `Olive oil` while `Ol` still finds it; a search term of three characters or
+  more still matches anywhere in a field.
+- Settings → **My modules** is now **Organization modules** (**Moduły organizacji**
+  and so on in the other languages): every choice on it switches modules on or off
+  for the whole organization, which the old name did not say. The confirmation for
+  a workspace mode now lists the settings it resets and no longer promises that
+  switching back restores them.
+- Mail an organization sends goes out under the organization's name when no sender
+  name is set in **Settings → Email**, as its invitations and documents already
+  name it. A sender name chosen there is kept.
+- The permanent-deletion switch in **Settings** now says it covers archived
+  equipment assets as well as products, and the archived tab of the equipment
+  list tells you, while the switch is off, that an administrator can turn it on
+  in **Settings** and links straight to it.
+- Recipes sorted by **Recently changed** (it always followed the last edit; the
+  label now says so), **Replenish all** on the inventory overview is **Review
+  what to reorder** and its confirmation names the shopping list that took the
+  products, and the hint beside the recipe cost setting no longer says to turn
+  it off for home setups, where it is on by default.
+- The audit log words the removal of a role, a webhook channel or an AI connection
+  as **Removed**, and its subtitle lists every verb the log shows.
+- The issuer block of a printout reads as an address block: the tax ID carries
+  its label (NIP: 1234563218 on a Polish printout) and an address in Polish,
+  German, French, Spanish or Portuguese puts the postal code before the town
+  (ul. Magazynowa 5, 90-001 Łódź). The subtitle of the period closure screen
+  describes the screen instead of inviting an action that a read-only account
+  cannot take.
 - The frontend's exception registers no longer fail `make check-frontend` and
   CI on a calendar day. In `frontend/scripts/integration-only.json` (API
   routes with no screen), `frontend/scripts/suppressions.json` (silenced
@@ -370,82 +510,16 @@ says what the release does rather than what changed since them.
   `"verdict": "integration-only"` with a reason and an owner, and no
   `expires`, and a query-key entry is `by-design` or `to-fold`, the latter
   with an `expiry`.
-- The issuer block of a printout reads as an address block: the tax ID carries
-  its label (NIP: 1234563218 on a Polish printout) and an address in Polish,
-  German, French, Spanish or Portuguese puts the postal code before the town
-  (ul. Magazynowa 5, 90-001 Łódź). The subtitle of the period closure screen
-  describes the screen instead of inviting an action that a read-only account
-  cannot take.
-- The line picker of a delivery, a scrap, a transfer or any other warehouse
-  document now finds stock the way the catalogue picker does: by the product's
-  name, brand, the code on the record or its product card, the label code and
-  the serial number, not by name alone. A one- or two-character fragment
-  matches only the start of a field, so typing `oi` no longer lists
-  `Olive oil` while `Ol` still finds it; a search term of three characters or
-  more still matches anywhere in a field.
 
 ### Fixed
+
+#### Production
 
 - A production run recorded for a past day now says what that day does. The
   Complete, Start, Add portion and Finish dialogs name a day, while *Stock on
   a date* and *Value movement* count the run's movements on the day it is
   recorded; a note under the day field says so once a past day is chosen. The Portuguese "Planned for" label reads
   "Planejado para", as the rest of the Portuguese text does.
-
-- **Cook a batch for stock** no longer claims a production recipe exists for a
-  product after a run was abandoned. When the order was refused (for example
-  for a shortage) and the sheet was closed, the production recipe made for the
-  attempt is discarded, but the next sheet on the same product and recipe kept
-  saying one existed, with the discarded yield, for several minutes; it now
-  starts as a pair with no production recipe. The sentence under the yield
-  field also no longer ends in a doubled full stop after an abbreviated unit
-  such as "pcs." or "szt.".
-- The asset list no longer offers **Export** to an account the export would
-  refuse. A role without the permission to view products, such as one that
-  holds only the stock-take permissions, used to meet "You do not have
-  permission to perform this action" after clicking it; the button is now
-  disabled and says why, as it is on the Products list.
-- A copy button the browser refuses now shows what it was meant to copy. An
-  installation reached over plain `http://` on a local address has no
-  clipboard for the page to use, and the copy buttons (an invitation link, a
-  record id, an API key's capabilities) used to answer with a message about a
-  value the screen did not show. They now open a **Copy by hand** sheet that
-  holds the whole text, selected, ready for Ctrl+C, with **Done** to close it.
-  Closing a sheet that was opened from a row's **⋯** menu returns the focus to
-  that menu's button instead of the top of the page.
-- Attaching a blank label to an existing product now tells stock rows apart.
-  Each row in the **Attach to an existing product** sheet says where it
-  stands, when it expires, how much it holds and its serial number, and rows
-  that would still read the same, such as two receipts of one product into one
-  place, carry the tail of their id. The mark is separated from the quantity
-  for a screen reader, which no longer reads them as one word.
-- A webhook delivery that the circuit breaker, a switch-off of the endpoint or
-  a switch-off of the module gives up on keeps what the target answered to its
-  last attempt: the delivery log shows the HTTP status, the response body and
-  the error text next to the reason for the stop, with the time of that
-  answer instead of the time of the stop, so deliveries abandoned together no
-  longer all read as answered at the same second. The delivery API returns
-  `status_code` on such rows next to `abandon_reason`.
-- A document that only records goods another step already took — a recipe's
-  internal issue, whose goods the picking session removed — can no longer be
-  returned, as it already could not be undone or corrected: a return would have
-  put back goods the document never took. Its page now says where the goods
-  went instead of "its lines have not been executed against stock", and its
-  execution panel says the stock does not change.
-- Dialogs that asked for something and were refused no longer close and lose
-  what was typed. Renaming a tag, tagging several recipes at once and
-  approving a document keep the dialog open with the server's refusal and the
-  input inside it. Renaming a tag to a name another tag already has says so
-  and that the two will be merged. A failed read no longer passes for an empty
-  one: a document whose approval could not be read shows the failure with
-  **Try again** instead of offering **Request approval**, and the meal-plan
-  recipe picker says its suggestions failed to load. Adding a recipe to a meal
-  plan and downloading or copying a recipe name what failed instead of "Failed
-  to save recipe". Deleting a recipe names the plans, days and meals it will
-  empty. The shopping list's **Needed by** date, the daily nutrition figures
-  and the reconciliation's record count follow the reader's language and say
-  what they cover, and the recipe tag colours, rating stars and popovers have
-  names a screen reader can speak.
 - A production run closed far above its plan asks first. **Finish run** and
   **Complete run** name the extra quantity once the figure is more than a
   quarter above the plan, say that the ingredients stay as planned, and keep
@@ -457,11 +531,228 @@ says what the release does rather than what changed since them.
   the month's margin says how many of its runs closed above plan. The API
   gains `last_run_overproduced` on the recipe catalogue item and
   `overproduced_orders` on the monthly result.
+- A BOM line's unit is read against the ingredient's stock unit, and a line
+  that cannot be converted is refused instead of silently drawing the wrong
+  number. A formula line reading "Wheat flour 300 g" on a product kept in
+  pieces used to take 600 pieces for two batches and record "600 pcs"; the
+  line is now refused when it is saved, naming both units, and a run refuses
+  one already stored that way. The Composition tab marks such a line as a
+  unit mismatch until a unit is set, and a line that does convert — 500 g
+  against stock kept in kilograms — draws the converted amount and records
+  it in the shelf's unit.
+- Undoing a production run no longer changes what the stock is worth. The
+  output leaves the books at the value its own run put in, instead of at the
+  product's oldest cost layer, which can belong to an earlier run made at a
+  different cost; each batch of a run filled in portions leaves at its own
+  value too. Undoing a run used to leave every quantity back as it was while
+  the total fell or rose by the difference between the two runs' costs.
+- The sale price calculator and the per-product cost estimate now count the
+  formula's fixed costs and the labour its timed steps take, not only the
+  ingredients. A batch that cost 25.28 a kilogram was priced from 11.28, so
+  the suggested price sat below what the run cost; the calculator now lists
+  the three parts under the total, and the production preview's total matches
+  the per-unit figure beside it. The preview lists the fixed costs and labour
+  under its ingredients, and each line's percentage and the cost-share chart
+  are shares of that whole total.
+- A production run or batch record whose ingredients carried no purchase
+  price no longer shows a cost of zero per unit beside a total that reads
+  "—": the per-unit figure is "—" too until some rate is known, so an
+  unknown cost is not mistaken for a product that costs nothing to make.
+  `manage.py db doctor` also names the migrations still to be applied when it
+  lists a column whose type differs from the models, so the notice on an
+  upgrade start reads as expected, and *Updating* in `DEPLOYMENT.md` says how
+  a development stack takes the backup and lists the variables a release
+  added.
+- A production recipe's reference price can no longer be negative. Creating
+  or changing a recipe with one is refused with a message naming the field,
+  instead of being stored and understating the result per unit of every run
+  made after it; zero is still allowed.
+- A fixed cost line of a production BOM can no longer be saved with a negative
+  amount, which lowered the BOM's unit cost, the run preview and the cost of
+  every run after it. The refusal appears beside the Amount field with what was
+  typed kept; a line saved negative earlier still opens and can be corrected.
+- Saving a BOM's *Process steps* keeps a step that was typed in the add row but
+  never added with *Add step*: it is stored as the last step, with its
+  minutes, instead of vanishing under a success message. Closing the editor
+  with the X while the add row still holds text asks first, and offers to keep
+  editing.
+- A production run no longer offers an account what its server would refuse.
+  An account that may only read sees a run's status and the same notice as the
+  rest of the module, without Edit, Start run, Complete run or Duplicate. An
+  account that may write production but not stock is still offered Edit and
+  Duplicate on a draft, but no Start run, Complete run, Finish run, portion
+  form, Undo run or Cancel of a run in progress, and *New production* opens
+  planning only, without the *Save as made* choice: each of those posts stock.
+- Cooking or taking back a run's output that empties a record now files it as
+  used up, the way using its last unit by hand does. The emptied record leaves
+  the products list and stops counting as needing attention on the overview,
+  instead of staying on the list at 0. Undoing the pick returns the stock to the
+  record on the shelf it left.
+- **Cook a batch for stock** no longer claims a production recipe exists for a
+  product after a run was abandoned. When the order was refused (for example
+  for a shortage) and the sheet was closed, the production recipe made for the
+  attempt is discarded, but the next sheet on the same product and recipe kept
+  saying one existed, with the discarded yield, for several minutes; it now
+  starts as a pair with no production recipe. The sentence under the yield
+  field also no longer ends in a doubled full stop after an abbreviated unit
+  such as "pcs." or "szt.".
+- The cost analysis no longer counts a production run's product, or the
+  ingredients put back when a run is undone, as money spent. They were added
+  to the purchases they came from, so the same grapes were counted when
+  bought and again as wine, and the waste percentage was measured against the
+  inflated total. Total spent, the monthly trend and the weekly spending
+  behind the forecast now add up only what came in from outside. Receipts
+  posted before this release cannot be told apart and keep counting.
+- Purchase patterns no longer read a production run's product as a purchase
+  of it. Two runs of a wine used to list the wine as bought twice, at the
+  run's cost; the report now leaves out records a run made. Records made
+  before this release cannot be told apart and keep counting.
+
+#### Recipes, meal plans and shopping lists
+
+- A recipe imported from JSON or from a web page now carries the allergens its
+  ingredient names suggest, as one typed through **New recipe** does. An
+  imported cheese omelette of eggs, butter and cheddar read "No allergens
+  marked" on its page and in its export; the review screen now shows Eggs and
+  Milk ticked for the cook to correct, and a line that names its own allergens
+  keeps them. Recipes imported earlier get theirs when the instance is
+  upgraded.
+- A requirement scaled by a ratio that does not divide evenly no longer asks
+  for one unit more than it needs: five servings of a three-serving recipe
+  that asks for three eggs now ask for five eggs, and planning five of a
+  production recipe that yields three lists five pieces, not six. The
+  production preview's to-buy figure and the line the shortfall writes agree
+  on the quantity, and the add-item dialog of a shopping list writes its
+  quantity ceiling in the reader's decimal mark.
+- Recipe picking no longer offers a sealed pack lighter than the card's full
+  pack as the open one to cook from: a pack is open when opening it marked it
+  so, which is what the picking order and the candidate list already went by.
+- The ingredient dictionary reads the CSV a spreadsheet actually saves. A
+  file separated by semicolons — the separator in Polish, German, French and
+  Spanish locales — imports its rows instead of being refused as unreadable,
+  as does a comma-separated file that starts with a byte order mark (Excel's
+  *CSV UTF-8*); a file saved in the local codepage (cp1250) keeps its Polish
+  letters instead of storing a replacement character for each one, and a
+  decimal comma such as `368,5` reads as the decimal it names. A name made
+  only of invisible characters (a zero-width space, a byte order mark) is
+  refused instead of being filed under the empty key every blank row shares,
+  and counts as an error on import; the add form answers a name of only
+  spaces with its own "Name and kcal are required" message instead of a
+  request to the server.
+- The recipe list's Next page button shows the next page. With more than
+  fifty recipes the page asked the server for the page start under a name it
+  does not read, so page 2 showed page 1 again; it now sends `offset`.
+- Deleting a recipe collection now leaves a row in the audit journal, as
+  deleting a recipe or a meal plan does. The row names the collection, who
+  deleted it and any sub-collections that went with it, and appears in the
+  journal's filter as "Recipe collection". Renaming or filing recipes under a
+  collection still writes nothing.
+- A completed or archived shopping list is a closed record and is no longer
+  written to. It is no longer offered or preselected as the place for new
+  items — the recipe card, the scan add, the product quick action, the
+  inventory dashboard card and Replenish All all pick the newest active list
+  — and adding to it from a recipe, or refreshing a meal plan's list so that a
+  line of it asks for more, is refused with "Reactivate it first" instead of
+  changing it. `GET /api/v1/shopping-lists` takes a `status` filter
+  (`active`, `completed` or `archived`). The page of a completed or archived
+  list now says so and offers **Reactivate** in place of Add, From recipes and
+  the other changes, and the refusal names no status word, so it reads the
+  same in every language.
+- Clearing the purchased lines of a shopping list keeps what was bought in the
+  list's purchase history, as archiving the list already did.
+- A shopping exclusion made only of spaces, zero-width spaces or a byte order
+  mark is refused instead of being saved as an empty name that excludes
+  nothing, and the next such name no longer answers that the exclusion
+  already exists.
+
+#### Stock, value and locations
+
 - *Stock on a date* cuts a day on the organization's calendar, as *Value
-  movement* does, whatever time zone the reader's browser is set to. Before,
-  the screen and its spreadsheet and PDF were cut at the reader's own midnight,
-  so for a reader abroad a movement near midnight counted on one screen and not
-  on the other, and the two closings for the same day disagreed.
+  movement* does, not at midnight UTC or at the midnight of the reader's
+  browser. A receipt booked at half past midnight local time sat in the
+  opening value of its own day, and for a reader abroad a movement near
+  midnight counted on the screen, its spreadsheet and its PDF but not in the
+  other figure for the same day, so two closings of one day disagreed. The
+  note about where the ledger starts names the right day, and *Value
+  movement* opens on the first day it can report when no first day is
+  picked.
+- After a location is moved physically, **Movements** and a product's
+  *Movements* tab show what happened before the move at the path the location
+  had then, as the move dialog promises. Goods put on a shelf while it stood
+  in one hall no longer read as having gone into the room it was carried to
+  later; filtering **Movements** by a place lists what was made in it as it
+  stood then, and a production run's movements name the path a shelf had when
+  the run touched it. The rows the move itself writes name the moved location's whole path
+  before and after, its own name last, instead of only the places it left and
+  reached. A move that only corrects the layout still rewrites nothing: the
+  stock was always where the corrected tree puts it.
+- Archiving a location no longer moves the stock of the locations inside it.
+  Those locations stay active, but their products were relocated to the chosen
+  target and the shelf was left empty while the goods had not moved. Only what
+  stands on the archived location itself is relocated, the archive dialog
+  asks for a target only when that location holds products, and a location
+  that holds nothing of its own archives without one.
+- Attaching a blank label to an existing product now tells stock rows apart.
+  Each row in the **Attach to an existing product** sheet says where it
+  stands, when it expires, how much it holds and its serial number, and rows
+  that would still read the same, such as two receipts of one product into one
+  place, carry the tail of their id. The mark is separated from the quantity
+  for a screen reader, which no longer reads them as one word.
+- Counting a location that has sub-locations now offers, in the bar of
+  products outside the stock take, a product received onto a sub-location
+  after the count started, as counting that sub-location itself does.
+- Counting a location that has sub-locations now tells two records of one
+  product apart. The count cards and the scan chooser show the expiry of
+  items standing on any depth below the counted location, so a scan no longer
+  adds one to whichever of two identical rows is tapped. The completed report
+  and its CSV export carry the same expiry and record number the counting
+  screen shows.
+- The organization journal adds up to what is on the shelf, and reads in the
+  reader's words. Opening a sealed pack to cook from it records the drop of
+  the sealed record (3 → 2) beside the opened record it creates, and the name
+  a founder sets on the setup screen is journaled as a rename. A location's
+  usage, an asset's manufacturer and equipment fields, the module and document
+  type of a copied print layout and the kind of an asset are printed as the
+  words the screens use, from the entry that creates the asset to its status
+  changes, and an asset's edit and status entries share one **Target** word.
+- The locations list and the location tree answer within their screens'
+  budget in a large warehouse. A page holding a warehouse or the containers
+  above its shelves, and the first levels of the tree, count every record
+  below them, and the filter that leaves out a module's records made the
+  database visit those records one by one: at a hundred thousand products
+  such a page took 0.6 to 0.8 s at the 95th percentile, and now takes about
+  0.2 s, with the same numbers on every screen that prints them.
+- Two deletions of shelves, batches, partners or users that had stock
+  movements over the same products can no longer deadlock on the ledger's
+  per-shelf totals: the database now takes those rows in one order whether a
+  movement is added or taken away.
+- The stock aging of a product with more than a thousand receipts
+  (`core_api.stock_moves.aggregate_aging_buckets_async` and
+  `list_receipts_for_aging_async`) counts the stock still on the shelf. The
+  receipts were cut at a thousand, oldest first, before what left was netted
+  off them, so the newest stock, the part still on the shelf, dropped out of
+  the buckets.
+
+#### Documents, warehouse and approvals
+
+- The last purchase price a receipt suggests is what was last paid for the
+  product. It was the price of whichever document came last, so a product
+  bought at 8.00 and then delivered to a customer at 10.00 was offered at
+  10.00 on the next receipt, and that price went on into the stock value.
+  Only receipts and internal receipts count now; a delivery, a customer's
+  return, a correction, a scrap or a transfer does not. A delivery form is
+  offered the rate of tax alone: neither what was paid nor a supplier's
+  offer is the price a customer is charged. `GET /api/v1/warehouse/price-hint`
+  takes the document's type as `document_type` to tell the two apart.
+- The price a document suggests for a supplier's product is the price that
+  line can get: valid today, from a quantity tier the line's quantity
+  reaches, and in the organization's own currency before any other. It used
+  to be the lowest number on the whole price list, so a 1000-piece price or
+  an expired promotion was suggested for a line of five. A quote in another
+  currency no longer fills the line's price, which the document would have
+  kept under its own currency. The supplier price comparison lists the
+  organization's currency first instead of sorting different currencies by
+  their digits.
 - A receipt posted against a purchase order names the order. The receipt's
   page shows it under **Purchase order**, linked to the order, and both
   built-in print layouts print its number, so whoever holds the receipt later
@@ -481,404 +772,18 @@ says what the release does rather than what changed since them.
   order already has an open receipt when the receipt it names is the one the
   start is making, or holds nothing the order still owes (a correction, or a
   draft for a product the order no longer expects).
-- An adjustment posted by a stock take and an issue registered by a recipe's
-  cooking name their source in words ("Stock take", "Recipe production") on
-  their page and in the register instead of an internal reference and id; on
-  the page each links to the stock take's report or the recipe while that
-  module is on. A recipe's issue now refers to the recipe, and its note no
-  longer carries the picking session's id.
-- The audit log records the backorder a short receipt drafts, naming the
-  receipt it continues; a task assignment names the document or the task and
-  the person instead of a raw kind and an id; and a new partner's type reads
-  in words ("Supplier") instead of `SUPPLIER`.
 - The phone receiving card no longer says "Expected 1 pcs." for a product
   nobody expected — one added beside an order or scanned on a receipt with
   none — nor "fewer than expected" when its count is lowered.
-- A member who may write documents but not manage them is told what they
-  cannot do: their own draft correction says only a manager can delete it,
-  and a confirmed document says why **Cancel document** is disabled, in a line
-  a phone shows rather than only in a tooltip.
 - On a phone, tapping an order's delivery on **To do** no longer makes it the
   reader's before anything has begun; it becomes theirs when its receiving
   starts.
-- Scan document offers the torch only on a camera that has one, and the
-  location wizard keeps a zone name typed on its first step when a zone chip
-  is pressed afterwards.
-- Small controls are easier to press on a phone. Checkboxes in the document
-  register, the approval queue, Codes and labels and the list of ingredients
-  without a product are pressed through a 44 px square, and text links and
-  small icon buttons that stood 15 to 20 px tall — document links on Start,
-  History, a document's page and a lot's page, the audit log's "Show the
-  whole change" and record ids, "In every location", "Create role", "Open
-  settings", the equipment form's "Manage" and "Create model" links, a tag's
-  colour, a recipe's select and a collection's rename and delete — are at
-  least 24 px.
-- The first-contact and settings screens read the same everywhere: a sign-up link
-  that a newer one replaced says so on arrival instead of asking for a password
-  first; the validation bubbles a browser shows for a required or too-short field
-  are worded in the app's language; the SMTP host error clears once a host is
-  typed; the invitation email names the person who invited and calls the role by
-  the same name as the join page; a network failure reads "Cannot reach the
-  server" on every screen; the audit log hides its row count and pager when it
-  could not load; entering one-module mode records each module it switches off;
-  the unsaved-changes question agrees with every form name; **Settings → About**
-  says which version its source and guide links belong to; the Partners
-  permissions sit under Partners in a role's permission list; and **Privacy**
-  offers the way back to the app to someone signed in.
-- Smaller wording and clarity fixes found walking the app on a phone. A
-  recipe's "Output in stock" figure now carries its unit. The warehouse
-  start says "No document has been posted yet today" instead of claiming
-  nothing moved when stock moved without a document. The Equipment launcher
-  tile and overview count "warranties ending soon", as the window they
-  count, and a purchase order's value on the list and on its page says it is
-  gross, as the approval card says net. The product sheet opened from an
-  attention row names the product in its header. Tapping a to-do task on a
-  phone says the task is now yours and offers to give it back. The launcher
-  tile is called "Browse Modules", like the page it opens, and the toast after
-  Replenish names the shopping list it filled and opens it.
-- A production run or batch record whose ingredients carried no purchase
-  price no longer shows a cost of zero per unit beside a total that reads
-  "—": the per-unit figure is "—" too until some rate is known, so an
-  unknown cost is not mistaken for a product that costs nothing to make.
-  `manage.py db doctor` also names the migrations still to be applied when it
-  lists a column whose type differs from the models, so the notice on an
-  upgrade start reads as expected, and *Updating* in `DEPLOYMENT.md` says how
-  a development stack takes the backup and lists the variables a release
-  added.
-- Counting a location that has sub-locations now offers, in the bar of
-  products outside the stock take, a product received onto a sub-location
-  after the count started, as counting that sub-location itself does.
-- A production recipe's reference price can no longer be negative. Creating
-  or changing a recipe with one is refused with a message naming the field,
-  instead of being stored and understating the result per unit of every run
-  made after it; zero is still allowed.
-- Saving a print layout whose template code does not parse or render — a
-  purchase order, warehouse document or equipment layout — is refused, with
-  the line and the complaint, instead of being stored and then breaking every
-  printout made with it. A layout already stored in that state — a purchase
-  order, a warehouse document, the file over several documents, a packing
-  slip, a pick list or an equipment protocol — prints with the built-in
-  layout rather than failing with "An error occurred".
-- On a slow connection the Inventory and Equipment overviews no longer state
-  something that is not true while they load. *My locations* shows placeholders
-  instead of "No locations yet" and its create button, and the Equipment
-  attention card shows no count ("8 assets need attention", later 9) until every
-  list it adds up has arrived; the fleet by category and the recent check-outs
-  wait for their answer the same way.
-- A member whose role cannot read a module is now told so. A module screen
-  opened without that module's read permission says the account cannot open
-  it and whom to ask, instead of "Your account can read this module", and the
-  product, purchase order, stock take and category lists show the refusal
-  without a *Try again* button that could only be refused again. The role
-  editor also warns, before a role is saved, about a granted module whose own
-  read or whose required modules' reads (stock takes need products and
-  locations) the role does not hold; the role can still be saved as it is.
-  The Inventory and Equipment overviews, Warehouse Configuration, the document
-  register, the command palette and the small pickers and cards that read a
-  list on their own say the same instead of "could not be loaded", and offer
-  no retry.
-
-- After a location is moved physically, **Movements** and a product's
-  *Movements* tab show what happened before the move at the path the location
-  had then, as the move dialog promises. Goods put on a shelf while it stood
-  in one hall no longer read as having gone into the room it was carried to
-  later; filtering **Movements** by a place lists what was made in it as it
-  stood then, and a production run's movements name the path a shelf had when
-  the run touched it. The rows the move itself writes name the moved location's whole path
-  before and after, its own name last, instead of only the places it left and
-  reached. A move that only corrects the layout still rewrites nothing: the
-  stock was always where the corrected tree puts it.
-- Archiving a location no longer moves the stock of the locations inside it.
-  Those locations stay active, but their products were relocated to the chosen
-  target and the shelf was left empty while the goods had not moved. Only what
-  stands on the archived location itself is relocated, the archive dialog
-  asks for a target only when that location holds products, and a location
-  that holds nothing of its own archives without one.
-- A BOM line's unit is read against the ingredient's stock unit, and a line
-  that cannot be converted is refused instead of silently drawing the wrong
-  number. A formula line reading "Wheat flour 300 g" on a product kept in
-  pieces used to take 600 pieces for two batches and record "600 pcs"; the
-  line is now refused when it is saved, naming both units, and a run refuses
-  one already stored that way. The Composition tab marks such a line as a
-  unit mismatch until a unit is set, and a line that does convert — 500 g
-  against stock kept in kilograms — draws the converted amount and records
-  it in the shelf's unit.
-- Undoing a production run no longer changes what the stock is worth. The
-  output leaves the books at the value its own run put in, instead of at the
-  product's oldest cost layer, which can belong to an earlier run made at a
-  different cost; each batch of a run filled in portions leaves at its own
-  value too. Undoing a run used to leave every quantity back as it was while
-  the total fell or rose by the difference between the two runs' costs.
-- A recipe imported from JSON or from a web page now carries the allergens its
-  ingredient names suggest, as one typed through **New recipe** does. An
-  imported cheese omelette of eggs, butter and cheddar read "No allergens
-  marked" on its page and in its export; the review screen now shows Eggs and
-  Milk ticked for the cook to correct, and a line that names its own allergens
-  keeps them. Recipes imported earlier get theirs when the instance is
-  upgraded.
-- *Stock on a date* and *Value movement* now cut a day where the organization
-  lives, not at midnight UTC. A receipt booked at half past midnight local time
-  used to sit in the opening value of its own day, the note about where the
-  ledger starts named the wrong day, and a first-month organization saw only a
-  refusal because the page opened on a period starting before its ledger. The
-  statement now opens on the first day it can report when no first day is
-  picked.
-- The sale price calculator and the per-product cost estimate now count the
-  formula's fixed costs and the labour its timed steps take, not only the
-  ingredients. A batch that cost 25.28 a kilogram was priced from 11.28, so
-  the suggested price sat below what the run cost; the calculator now lists
-  the three parts under the total, and the production preview's total matches
-  the per-unit figure beside it. The preview lists the fixed costs and labour
-  under its ingredients, and each line's percentage and the cost-share chart
-  are shares of that whole total.
-- Counting a location that has sub-locations now tells two records of one
-  product apart. The count cards and the scan chooser show the expiry of
-  items standing on any depth below the counted location, so a scan no longer
-  adds one to whichever of two identical rows is tapped. The completed report
-  and its CSV export carry the same expiry and record number the counting
-  screen shows.
-- A fixed cost line of a production BOM can no longer be saved with a negative
-  amount, which lowered the BOM's unit cost, the run preview and the cost of
-  every run after it. The refusal appears beside the Amount field with what was
-  typed kept; a line saved negative earlier still opens and can be corrected.
-- Picking several documents from the list no longer ends in a dead end when
-  one of them is already in a picking session. If the session is your own —
-  opened on a phone and left — the dialog says so and offers **Continue that
-  session** or **Discard scans**; if a colleague holds it, it offers to take
-  it over, which opens that session at once, or discard their scans, as the
-  document's own page already did.
-  **Retry** now appears only after a server failure, never after a refusal
-  that would only repeat itself.
-- On a phone, the header's Back arrow on a screen opened by a direct link —
-  a document opened from a link or a refreshed page, for one — no longer ends
-  on a "Page Not Found" at `/warehouse/documents`. With nothing earlier in the
-  history it climbs to the nearest screen above that exists, and to the home
-  screen when there is none: from a document or History opened by a link that
-  is the launcher, never the warehouse root that only sends you back, and from
-  a location zone it is the locations list, never "Location not found".
-- The Settings audit log shows the reason a workflow release left on the
-  requests it closed in the reader's language ("Workflow deactivated",
-  "Workflow deleted") instead of the raw English text.
-- Importing rows into a document that is not saved yet, when the session has
-  ended, no longer says "this was not saved" over an empty form: the import
-  only reads the rows, so the message is the plain "your session has ended".
-  A form that already holds something the reader typed, and an import that
-  also creates products, keep the longer warning, because signing in again
-  loses that work.
-
-- When the session ends on a request that only reads (picking an import file,
-  looking up a product) while a document form holds unsaved work, the reader
-  is now told that what was entered was not kept, instead of landing on the
-  sign-in page with nothing said. The document form also asks before the page
-  is reloaded or left once something in it has been changed, and says nothing
-  while an opened draft is untouched.
-
-- The price a document suggests for a supplier's product is the price that
-  line can get: valid today, from a quantity tier the line's quantity
-  reaches, and in the organization's own currency before any other. It used
-  to be the lowest number on the whole price list, so a 1000-piece price or
-  an expired promotion was suggested for a line of five. A quote in another
-  currency no longer fills the line's price, which the document would have
-  kept under its own currency. The supplier price comparison lists the
-  organization's currency first instead of sorting different currencies by
-  their digits.
-- The last purchase price a receipt suggests is what was last paid for the
-  product. It was the price of whichever document came last, so a product
-  bought at 8.00 and then delivered to a customer at 10.00 was offered at
-  10.00 on the next receipt, and that price went on into the stock value.
-  Only receipts and internal receipts count now; a delivery, a customer's
-  return, a correction, a scrap or a transfer does not. A delivery form is
-  offered the rate of tax alone: neither what was paid nor a supplier's
-  offer is the price a customer is charged. `GET /api/v1/warehouse/price-hint`
-  takes the document's type as `document_type` to tell the two apart.
-
-- The first `make dev-up` on a machine that has no images yet no longer
-  fails with a duplicate-type error from a module's migration. The backend's
-  first start and the bootstrap's own `db upgrade` migrated the same empty
-  database at the same time, the container restarted and the bootstrap
-  stopped with `Error 137`; `manage.py db upgrade` now waits for the lock the
-  backend takes while it migrates, so the two run one after the other.
-
-- A completed or archived shopping list is a closed record and is no longer
-  written to. It is no longer offered or preselected as the place for new
-  items — the recipe card, the scan add, the product quick action, the
-  inventory dashboard card and Replenish All all pick the newest active list
-  — and adding to it from a recipe, or refreshing a meal plan's list so that a
-  line of it asks for more, is refused with "Reactivate it first" instead of
-  changing it. `GET /api/v1/shopping-lists` takes a `status` filter
-  (`active`, `completed` or `archived`). The page of a completed or archived
-  list now says so and offers **Reactivate** in place of Add, From recipes and
-  the other changes, and the refusal names no status word, so it reads the
-  same in every language.
-- The cost analysis no longer counts a production run's product, or the
-  ingredients put back when a run is undone, as money spent. They were added
-  to the purchases they came from, so the same grapes were counted when
-  bought and again as wine, and the waste percentage was measured against the
-  inflated total. Total spent, the monthly trend and the weekly spending
-  behind the forecast now add up only what came in from outside. Receipts
-  posted before this release cannot be told apart and keep counting.
-- Purchase patterns no longer read a production run's product as a purchase
-  of it. Two runs of a wine used to list the wine as bought twice, at the
-  run's cost; the report now leaves out records a run made. Records made
-  before this release cannot be told apart and keep counting.
-
-- The public attestation page declares the language it is written in
-  (`<html lang>`), as the rest of the application does, so a screen reader
-  pronounces a Polish page in Polish. Choosing a language before signing in no
-  longer tries to save it to an account that does not exist, and no longer logs
-  an error in the console; the choice is still kept for the next sign-in.
-- The locations list and the location tree answer within their screens'
-  budget in a large warehouse. A page holding a warehouse or the containers
-  above its shelves, and the first levels of the tree, count every record
-  below them, and the filter that leaves out a module's records made the
-  database visit those records one by one: at a hundred thousand products
-  such a page took 0.6 to 0.8 s at the 95th percentile, and now takes about
-  0.2 s, with the same numbers on every screen that prints them.
-- A server worker no longer stalls for two or three hundred milliseconds now
-  and then while Python's garbage collector walks everything the application
-  built at startup. Those objects live as long as the worker and are now left
-  out of collection once startup is done, which took the slow tail off the
-  reads that allocate most, the location tree among them.
-- Deleting a recipe collection now leaves a row in the audit journal, as
-  deleting a recipe or a meal plan does. The row names the collection, who
-  deleted it and any sub-collections that went with it, and appears in the
-  journal's filter as "Recipe collection". Renaming or filing recipes under a
-  collection still writes nothing.
-- The recipe list's Next page button shows the next page. With more than
-  fifty recipes the page asked the server for the page start under a name it
-  does not read, so page 2 showed page 1 again; it now sends `offset`.
-- The registration form from an invitation keeps the address typed into it.
-  The invited address used to fill the field whenever the invitation check
-  answered, so an address typed before a slow answer was replaced without a
-  word; the field now takes the invited address only while it is empty.
 - On a phone, the camera of the document and purchase-order line editors opens
   in view. With the Scan switch near the bottom of the form, the camera used to
   open below the edge of the screen, where nothing seemed to happen, and a
   phone's browser may not start a video it cannot see, so no code was read
   until the worker scrolled; the form now brings the switch to the top, with
   the camera right under it.
-- The dead-end notice on an approval request no longer blames the requester for
-  the stage's dead end. A stage listing them beside people who cannot see
-  approvals names only those people, and the access step names only them; an
-  administrator is offered the self-approval setting as another way out. The
-  notification sent for the same case no longer calls a stage naming several
-  people "the person".
-- A requirement scaled by a ratio that does not divide evenly no longer asks
-  for one unit more than it needs: five servings of a three-serving recipe
-  that asks for three eggs now ask for five eggs, and planning five of a
-  production recipe that yields three lists five pieces, not six. The
-  production preview's to-buy figure and the line the shortfall writes agree
-  on the quantity, and the add-item dialog of a shopping list writes its
-  quantity ceiling in the reader's decimal mark.
-
-- The stock aging of a product with more than a thousand receipts
-  (`core_api.stock_moves.aggregate_aging_buckets_async` and
-  `list_receipts_for_aging_async`) counts the stock still on the shelf. The
-  receipts were cut at a thousand, oldest first, before what left was netted
-  off them, so the newest stock, the part still on the shelf, dropped out of
-  the buckets.
-- Recipe picking no longer offers a sealed pack lighter than the card's full
-  pack as the open one to cook from: a pack is open when opening it marked it
-  so, which is what the picking order and the candidate list already went by.
-- Two deletions of shelves, batches, partners or users that had stock
-  movements over the same products can no longer deadlock on the ledger's
-  per-shelf totals: the database now takes those rows in one order whether a
-  movement is added or taken away.
-- The core API reference (`docs/subsystems/CORE_API.md`) labels each method
-  READ or WRITE by what it does, as the method declares it, instead of by
-  words in its name; about two dozen methods were labelled the wrong way
-  round. Summaries no longer stop mid-sentence, and types and enum defaults
-  print as a caller writes them.
-- An uploaded picture is measured before it is decoded. The ten-megabyte
-  limit bounded the file, not what it decodes to: a PNG of a few hundred
-  kilobytes can describe a 12000 × 12000 canvas, which took close to 570 MB
-  of server memory as an item's or a recipe's cover, or as a photograph for
-  Vision AI to read. A picture of more than 60 million pixels — more than a
-  50-megapixel phone photograph — is now refused as unreadable on all three
-  before any of it is decoded. The browser already shrinks what it uploads,
-  so the limit is met by API clients and by recipe covers fetched from other
-  sites. A photograph Vision AI cannot read at all is refused with "This file
-  could not be read as an image" instead of an internal error.
-- The audit journal now records acts it used to miss. Saving the SKU naming
-  schema, binding an AI purpose to a connection, and adding, editing or
-  removing an AI connection each leave an entry (the key itself is never
-  written down); a module that writes its own settings through
-  `core_api.settings.set_bulk_async` leaves the same entry as the settings
-  screen does. A holder who confirms or reports an asset from the attestation
-  link leaves an entry naming the holder. An organization founded by a
-  self-registration starts its journal with the entry that created it. A bulk
-  retire that closes an asset's open checkout records the handover back, and a
-  bulk location move is marked as one of a batch like the other batch edits.
-- Clearing the purchased lines of a shopping list keeps what was bought in the
-  list's purchase history, as archiving the list already did.
-- A location an asset is checked out to can no longer be deleted out from
-  under the checkout. The delete guard counted only the records whose home the
-  location is, so a place an asset stood in answered 204 and left the open
-  checkout naming a location that no longer existed, while the Equipment
-  Locations row offered Delete over a place it counted an asset in. The row
-  and the server now count every record that names the location — the home it
-  belongs to, or the place it is checked out to — and both doors into a delete
-  (the single delete and the reorganization) refuse it.
-- A place that equipment was ever checked out to can no longer be deleted.
-  Deleting it blanked the holder line of that past checkout in the asset's
-  history: the dates stayed, the place the card named was gone. The delete is
-  now refused with a message that points to archiving the place instead, as a
-  place with stock movements already was.
-- The ingredient dictionary reads the CSV a spreadsheet actually saves. A
-  file separated by semicolons — the separator in Polish, German, French and
-  Spanish locales — imports its rows instead of being refused as unreadable,
-  a file saved in the local codepage (cp1250) keeps its Polish letters
-  instead of storing a replacement character for each one, and a decimal
-  comma such as `368,5` reads as the decimal it names.
-- A shopping exclusion made only of spaces, zero-width spaces or a byte order
-  mark is refused instead of being saved as an empty name that excludes
-  nothing, and the next such name no longer answers that the exclusion
-  already exists.
-- The ingredient dictionary refuses a name made only of invisible characters
-  (a zero-width space, a byte order mark) instead of filing it under the empty
-  key every blank row shares, and counts such a row as an error on import. A
-  CSV that starts with a byte order mark (Excel's *CSV UTF-8*, comma-separated)
-  imports its rows rather than being refused as unreadable, and the add form answers a name of only spaces with its own
-  "Name and kcal are required" message instead of a request to the server.
-- A production run no longer offers an account what its server would refuse.
-  An account that may only read sees a run's status and the same notice as the
-  rest of the module, without Edit, Start run, Complete run or Duplicate. An
-  account that may write production but not stock is still offered Edit and
-  Duplicate on a draft, but no Start run, Complete run, Finish run, portion
-  form, Undo run or Cancel of a run in progress, and *New production* opens
-  planning only, without the *Save as made* choice: each of those posts stock.
-- The return sheet keeps to what is still left of a line. Its maximum is what
-  earlier returns and corrections have not already taken back, not the full
-  quantity done, so a quantity above it is named under the field and the sheet
-  cannot be submitted. A line already returned in full is left out of the
-  sheet, and a document with nothing left to return says so instead of
-  listing lines. A leading zero no longer sticks in the quantity field of
-  the return and correction sheets, packing, phone receiving, document
-  lines, quick add and shopping-list add: a digit typed after a 0 replaces
-  it.
-- The work board no longer counts what was undone. A dispatch that has been
-  undone is not counted in *Orders shipped on the order day* (undoing the
-  only dispatch of the week now reads "No orders shipped yet this week"
-  rather than "1 of 1 this week"), and an undone receipt is left out of
-  *From dock to stock*.
-- A dispatch completed from the picking summary keeps its shipment when the
-  completion fails. The carrier and tracking number typed or scanned there are
-  no longer lost: the document opens on the Packing step with them in its
-  Shipping fields, so *Complete dispatch* there does not ship without
-  tracking.
-- Rejecting a document in the approval queue is written in the document's own
-  journal, with who sent it back and why, as approving it already was; the
-  history of a rejected document no longer ends at "Waiting for approval" while
-  it is a draft again. Changing a draft's date into a closed month is refused at
-  the edit, as creating a document there is.
-- A read-only account no longer meets write controls that do nothing on a
-  product's sheet: the photo tile, the link into the location's settings and
-  the nutrition buttons are gone, and a location's page offers no **Set up
-  location** to an account that cannot change it.
-- The cancel dialog of a document asks its question once, the write-off of a
-  scrap draft names the write-off instead of "Post this document?", and the
-  phone's correction dialog names the document it corrects and wraps a long
-  product name.
 - A correction of a receipt that held part of a line back in quarantine
   offers and accepts only what the shelf can give: the quantity the line's own
   stock record holds, not the whole quantity received. A correction that cannot
@@ -892,11 +797,118 @@ says what the release does rather than what changed since them.
   so two lines that each fit could pass confirmation and be refused only at
   completion, after the correction had taken a number; it is now refused while
   it is still a draft.
-- Saving a BOM's *Process steps* keeps a step that was typed in the add row but
-  never added with *Add step*: it is stored as the last step, with its
-  minutes, instead of vanishing under a success message. Closing the editor
-  with the X while the add row still holds text asks first, and offers to keep
-  editing.
+- The return sheet keeps to what is still left of a line. Its maximum is what
+  earlier returns and corrections have not already taken back, not the full
+  quantity done, so a quantity above it is named under the field and the sheet
+  cannot be submitted. A line already returned in full is left out of the
+  sheet, and a document with nothing left to return says so instead of
+  listing lines. A leading zero no longer sticks in the quantity field of
+  the return and correction sheets, packing, phone receiving, document
+  lines, quick add and shopping-list add: a digit typed after a 0 replaces
+  it.
+- A document that only records goods another step already took — a recipe's
+  internal issue, whose goods the picking session removed — can no longer be
+  returned, as it already could not be undone or corrected: a return would have
+  put back goods the document never took. Its page now says where the goods
+  went instead of "its lines have not been executed against stock", and its
+  execution panel says the stock does not change.
+- A dispatch completed from the picking summary keeps its shipment when the
+  completion fails. The carrier and tracking number typed or scanned there are
+  no longer lost: the document opens on the Packing step with them in its
+  Shipping fields, so *Complete dispatch* there does not ship without
+  tracking.
+- The work board no longer counts what was undone. A dispatch that has been
+  undone is not counted in *Orders shipped on the order day* (undoing the
+  only dispatch of the week now reads "No orders shipped yet this week"
+  rather than "1 of 1 this week"), and an undone receipt is left out of
+  *From dock to stock*.
+- Rejecting a document in the approval queue is written in the document's own
+  journal, with who sent it back and why, as approving it already was; the
+  history of a rejected document no longer ends at "Waiting for approval" while
+  it is a draft again. Changing a draft's date into a closed month is refused at
+  the edit, as creating a document there is.
+- A member who may write documents but not manage them is told what they
+  cannot do: their own draft correction says only a manager can delete it,
+  and a confirmed document says why **Cancel document** is disabled, in a line
+  a phone shows rather than only in a tooltip.
+- The cancel dialog of a document asks its question once, the write-off of a
+  scrap draft names the write-off instead of "Post this document?", and the
+  phone's correction dialog names the document it corrects and wraps a long
+  product name.
+- Picking several documents from the list no longer ends in a dead end when
+  one of them is already in a picking session. If the session is your own —
+  opened on a phone and left — the dialog says so and offers **Continue that
+  session** or **Discard scans**; if a colleague holds it, it offers to take
+  it over, which opens that session at once, or discard their scans, as the
+  document's own page already did.
+  **Retry** now appears only after a server failure, never after a refusal
+  that would only repeat itself.
+- Importing rows into a document that is not saved yet, when the session has
+  ended, no longer says "this was not saved" over an empty form: the import
+  only reads the rows, so the message is the plain "your session has ended".
+  A form that already holds something the reader typed, and an import that
+  also creates products, keep the longer warning, because signing in again
+  loses that work.
+- When the session ends on a request that only reads (picking an import file,
+  looking up a product) while a document form holds unsaved work, the reader
+  is now told that what was entered was not kept, instead of landing on the
+  sign-in page with nothing said. The document form also asks before the page
+  is reloaded or left once something in it has been changed, and says nothing
+  while an opened draft is untouched.
+- The dead-end notice on an approval request no longer blames the requester for
+  the stage's dead end. A stage listing them beside people who cannot see
+  approvals names only those people, and the access step names only them; an
+  administrator is offered the self-approval setting as another way out. The
+  notification sent for the same case no longer calls a stage naming several
+  people "the person".
+- The Settings audit log shows the reason a workflow release left on the
+  requests it closed in the reader's language ("Workflow deactivated",
+  "Workflow deleted") instead of the raw English text.
+- The audit log records the backorder a short receipt drafts, naming the
+  receipt it continues; a task assignment names the document or the task and
+  the person instead of a raw kind and an id; and a new partner's type reads
+  in words ("Supplier") instead of `SUPPLIER`.
+- An adjustment posted by a stock take and an issue registered by a recipe's
+  cooking name their source in words ("Stock take", "Recipe production") on
+  their page and in the register instead of an internal reference and id; on
+  the page each links to the stock take's report or the recipe while that
+  module is on. A recipe's issue now refers to the recipe, and its note no
+  longer carries the picking session's id.
+- Saving a print layout whose template code does not parse or render — a
+  purchase order, warehouse document or equipment layout — is refused, with
+  the line and the complaint, instead of being stored and then breaking every
+  printout made with it. A layout already stored in that state — a purchase
+  order, a warehouse document, the file over several documents, a packing
+  slip, a pick list or an equipment protocol — prints with the built-in
+  layout rather than failing with "An error occurred".
+- Warehouse settings follow a change of the organization's country without a
+  reload. After the country was changed in **Settings**, the offer to **Add
+  the country's rates** and the rule for whether a partner needs a tax ID kept
+  the old country's answer until the page was reloaded; they now follow the
+  new country at once. While the country's rates are still loading, or could
+  not be loaded, the tax-ID section no longer says that no country is set.
+
+#### Equipment
+
+- A place that equipment is or ever was checked out to can no longer be
+  deleted. The delete guard counted only the records whose home the location
+  is, so a place an asset stood in answered 204 and left the open checkout
+  naming a location that no longer existed, and deleting the place of a past
+  checkout blanked the holder line of that checkout in the asset's history.
+  The Equipment Locations row and the server now count every record that
+  names the location — the home it belongs to, or the place it is or was
+  checked out to — and both doors into a delete (the single delete and the
+  reorganization) refuse it, with a message that points to archiving the
+  place instead, as a place with stock movements already was.
+- A closed attestation keeps what each item was recorded as. When an asset came
+  back after the campaign closed, its line in the attestation detail stopped
+  reading Confirmed or Disputed and read "already returned" instead, so the
+  record of who confirmed what changed with a later move of the asset. An item
+  now counts as returned only while it is unanswered on a campaign that is
+  still running; an answered item, and every item of a closed campaign, keeps
+  its recorded status. The response badge and the Returned count follow the same
+  rule, so a closed campaign shows an unanswered response as awaiting reply and
+  counts it as pending.
 - The equipment screens say what they mean. A bulk status change to the status
   an asset already has succeeds instead of reporting a failure, and the
   refusals name statuses as the screens do, in the language of the request,
@@ -908,28 +920,155 @@ says what the release does rather than what changed since them.
   attestation progress says it counts people, the overview names the retired
   assets beside the total, and the public attestation page prints its
   deadline in the organization's date style.
-- Cooking or taking back a run's output that empties a record now files it as
-  used up, the way using its last unit by hand does. The emptied record leaves
-  the products list and stops counting as needing attention on the overview,
-  instead of staying on the list at 0. Undoing the pick returns the stock to the
-  record on the shelf it left.
-- A closed attestation keeps what each item was recorded as. When an asset came
-  back after the campaign closed, its line in the attestation detail stopped
-  reading Confirmed or Disputed and read "already returned" instead, so the
-  record of who confirmed what changed with a later move of the asset. An item
-  now counts as returned only while it is unanswered on a campaign that is
-  still running; an answered item, and every item of a closed campaign, keeps
-  its recorded status. The response badge and the Returned count follow the same
-  rule, so a closed campaign shows an unanswered response as awaiting reply and
-  counts it as pending.
-- The organization journal adds up to what is on the shelf, and reads in the
-  reader's words. Opening a sealed pack to cook from it records the drop of
-  the sealed record (3 → 2) beside the opened record it creates, and the name
-  a founder sets on the setup screen is journaled as a rename. A location's
-  usage, an asset's manufacturer and equipment fields, the module and document
-  type of a copied print layout and the kind of an asset are printed as the
-  words the screens use, from the entry that creates the asset to its status
-  changes, and an asset's edit and status entries share one **Target** word.
+- The asset list no longer offers **Export** to an account the export would
+  refuse. A role without the permission to view products, such as one that
+  holds only the stock-take permissions, used to meet "You do not have
+  permission to perform this action" after clicking it; the button is now
+  disabled and says why, as it is on the Products list.
+- The public attestation page declares the language it is written in
+  (`<html lang>`), as the rest of the application does, so a screen reader
+  pronounces a Polish page in Polish. Choosing a language before signing in no
+  longer tries to save it to an account that does not exist, and no longer logs
+  an error in the console; the choice is still kept for the next sign-in.
+
+#### Access, accounts and the journal
+
+- A member whose role cannot read a module is now told so. A module screen
+  opened without that module's read permission says the account cannot open
+  it and whom to ask, instead of "Your account can read this module", and the
+  product, purchase order, stock take and category lists show the refusal
+  without a *Try again* button that could only be refused again. The role
+  editor also warns, before a role is saved, about a granted module whose own
+  read or whose required modules' reads (stock takes need products and
+  locations) the role does not hold; the role can still be saved as it is.
+  The Inventory and Equipment overviews, Warehouse Configuration, the document
+  register, the command palette and the small pickers and cards that read a
+  list on their own say the same instead of "could not be loaded", and offer
+  no retry.
+- A read-only account no longer meets write controls that do nothing on a
+  product's sheet: the photo tile, the link into the location's settings and
+  the nutrition buttons are gone, and a location's page offers no **Set up
+  location** to an account that cannot change it.
+- A copy button the browser refuses now shows what it was meant to copy. An
+  installation reached over plain `http://` on a local address has no
+  clipboard for the page to use, and the copy buttons (an invitation link, a
+  record id, an API key's capabilities) used to answer with a message about a
+  value the screen did not show. They now open a **Copy by hand** sheet that
+  holds the whole text, selected, ready for Ctrl+C, with **Done** to close it.
+  Closing a sheet that was opened from a row's **⋯** menu returns the focus to
+  that menu's button instead of the top of the page.
+- The registration form from an invitation keeps the address typed into it.
+  The invited address used to fill the field whenever the invitation check
+  answered, so an address typed before a slow answer was replaced without a
+  word; the field now takes the invited address only while it is empty.
+- The first-contact and settings screens read the same everywhere: a sign-up link
+  that a newer one replaced says so on arrival instead of asking for a password
+  first; the validation bubbles a browser shows for a required or too-short field
+  are worded in the app's language; the SMTP host error clears once a host is
+  typed; the invitation email names the person who invited and calls the role by
+  the same name as the join page; a network failure reads "Cannot reach the
+  server" on every screen; the audit log hides its row count and pager when it
+  could not load; entering one-module mode records each module it switches off;
+  the unsaved-changes question agrees with every form name; **Settings → About**
+  says which version its source and guide links belong to; the Partners
+  permissions sit under Partners in a role's permission list; and **Privacy**
+  offers the way back to the app to someone signed in.
+- The audit journal now records acts it used to miss. Saving the SKU naming
+  schema, binding an AI purpose to a connection, and adding, editing or
+  removing an AI connection each leave an entry (the key itself is never
+  written down); a module that writes its own settings through
+  `core_api.settings.set_bulk_async` leaves the same entry as the settings
+  screen does. A holder who confirms or reports an asset from the attestation
+  link leaves an entry naming the holder. An organization founded by a
+  self-registration starts its journal with the entry that created it. A bulk
+  retire that closes an asset's open checkout records the handover back, and a
+  bulk location move is marked as one of a batch like the other batch edits.
+- An uploaded picture is measured before it is decoded. The ten-megabyte
+  limit bounded the file, not what it decodes to: a PNG of a few hundred
+  kilobytes can describe a 12000 × 12000 canvas, which took close to 570 MB
+  of server memory as an item's or a recipe's cover, or as a photograph for
+  Vision AI to read. A picture of more than 60 million pixels — more than a
+  50-megapixel phone photograph — is now refused as unreadable on all three
+  before any of it is decoded. The browser already shrinks what it uploads,
+  so the limit is met by API clients and by recipe covers fetched from other
+  sites. A photograph Vision AI cannot read at all is refused with "This file
+  could not be read as an image" instead of an internal error.
+
+#### Running it
+
+- A webhook delivery that the circuit breaker, a switch-off of the endpoint or
+  a switch-off of the module gives up on keeps what the target answered to its
+  last attempt: the delivery log shows the HTTP status, the response body and
+  the error text next to the reason for the stop, with the time of that
+  answer instead of the time of the stop, so deliveries abandoned together no
+  longer all read as answered at the same second. The delivery API returns
+  `status_code` on such rows next to `abandon_reason`.
+- The first `make dev-up` on a machine that has no images yet no longer
+  fails with a duplicate-type error from a module's migration. The backend's
+  first start and the bootstrap's own `db upgrade` migrated the same empty
+  database at the same time, the container restarted and the bootstrap
+  stopped with `Error 137`; `manage.py db upgrade` now waits for the lock the
+  backend takes while it migrates, so the two run one after the other.
+- A server worker no longer stalls for two or three hundred milliseconds now
+  and then while Python's garbage collector walks everything the application
+  built at startup. Those objects live as long as the worker and are now left
+  out of collection once startup is done, which took the slow tail off the
+  reads that allocate most, the location tree among them.
+- The core API reference (`docs/subsystems/CORE_API.md`) labels each method
+  READ or WRITE by what it does, as the method declares it, instead of by
+  words in its name; about two dozen methods were labelled the wrong way
+  round. Summaries no longer stop mid-sentence, and types and enum defaults
+  print as a caller writes them.
+
+#### Smaller corrections
+
+- Dialogs that asked for something and were refused no longer close and lose
+  what was typed. Renaming a tag, tagging several recipes at once and
+  approving a document keep the dialog open with the server's refusal and the
+  input inside it. Renaming a tag to a name another tag already has says so
+  and that the two will be merged. A failed read no longer passes for an empty
+  one: a document whose approval could not be read shows the failure with
+  **Try again** instead of offering **Request approval**, and the meal-plan
+  recipe picker says its suggestions failed to load. Adding a recipe to a meal
+  plan and downloading or copying a recipe name what failed instead of "Failed
+  to save recipe". Deleting a recipe names the plans, days and meals it will
+  empty. The shopping list's **Needed by** date, the daily nutrition figures
+  and the reconciliation's record count follow the reader's language and say
+  what they cover, and the recipe tag colours, rating stars and popovers have
+  names a screen reader can speak.
+- Small controls are easier to press on a phone. Checkboxes in the document
+  register, the approval queue, Codes and labels and the list of ingredients
+  without a product are pressed through a 44 px square, and text links and
+  small icon buttons that stood 15 to 20 px tall — document links on Start,
+  History, a document's page and a lot's page, the audit log's "Show the
+  whole change" and record ids, "In every location", "Create role", "Open
+  settings", the equipment form's "Manage" and "Create model" links, a tag's
+  colour, a recipe's select and a collection's rename and delete — are at
+  least 24 px.
+- On a slow connection the Inventory and Equipment overviews no longer state
+  something that is not true while they load. *My locations* shows placeholders
+  instead of "No locations yet" and its create button, and the Equipment
+  attention card shows no count ("8 assets need attention", later 9) until every
+  list it adds up has arrived; the fleet by category and the recent check-outs
+  wait for their answer the same way.
+- On a phone, the header's Back arrow on a screen opened by a direct link —
+  a document opened from a link or a refreshed page, for one — no longer ends
+  on a "Page Not Found" at `/warehouse/documents`. With nothing earlier in the
+  history it climbs to the nearest screen above that exists, and to the home
+  screen when there is none: from a document or History opened by a link that
+  is the launcher, never the warehouse root that only sends you back, and from
+  a location zone it is the locations list, never "Location not found".
+- Smaller wording and clarity fixes found walking the app on a phone. A
+  recipe's "Output in stock" figure now carries its unit. The warehouse
+  start says "No document has been posted yet today" instead of claiming
+  nothing moved when stock moved without a document. The Equipment launcher
+  tile and overview count "warranties ending soon", as the window they
+  count, and a purchase order's value on the list and on its page says it is
+  gross, as the approval card says net. The product sheet opened from an
+  attention row names the product in its header. Tapping a to-do task on a
+  phone says the task is now yours and offers to give it back. The launcher
+  tile is called "Browse Modules", like the page it opens, and the toast after
+  Replenish names the shopping list it filled and opens it.
 - Wording and layout on the paths a home, a maker or an equipment fleet takes.
   The recipes bar on a phone has short labels that no longer run together; the
   asset form's price placeholder follows the language's decimal mark; a saved
@@ -943,6 +1082,9 @@ says what the release does rather than what changed since them.
   own, an invitation uses one sentence in every language that does not repeat
   the default organization name, and the home cooking dialog no longer says
   "warehouse". Polish removal reasons agree in gender.
+- Scan document offers the torch only on a camera that has one, and the
+  location wizard keeps a zone name typed on its first step when a zone chip
+  is pressed afterwards.
 
 ### Removed
 
@@ -951,7 +1093,6 @@ says what the release does rather than what changed since them.
   installation, and any member of one organization could call it. A script
   that called it needs to do nothing: the recipes module does the same work
   once at start-up.
-
 - **Breaking:** six API routes no screen or client of the app called, each
   superseded by one that stays. A script that used one switches to its
   replacement:
