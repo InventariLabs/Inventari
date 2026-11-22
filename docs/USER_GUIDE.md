@@ -810,7 +810,7 @@ over the useful life — and **Attachments** such as invoices and manuals),
 | **Change status** | Between **Available** and **Maintenance**. It is the way out of maintenance. |
 | **Edit asset** | Opens the form that changes the asset's fields. |
 | **Retire** | The asset stays in the register but can no longer be checked out. Not while it is checked out. |
-| **Archive** | Moves it to **Archived**, from where **Restore** brings it back and **Delete Permanently** removes it. |
+| **Archive** | Moves it to **Archived**, from where **Restore** brings it back and, when permanent deletion is allowed in **Settings**, **Delete Permanently** removes it. |
 
 Give a person's **email** when you check something out to them: it is how the
 asset appears under their **My Assets** and how an attestation reaches them.
@@ -1814,7 +1814,8 @@ a link to the source code; the rest is for administrators.
   their roles, registration requests (the instance's superuser only),
   **Invite User** and issued invitations.
   Also whether products used by modules show in general lists, and whether
-  permanent deletion is allowed. Changing the currency does not convert
+  permanent deletion is allowed — for archived products and for archived
+  equipment assets alike. Changing the currency does not convert
   amounts already recorded.
 - **My profile** — your name, the language the app speaks to you and your
   password.

@@ -192,6 +192,7 @@
     "unknown": "Unbekannt"
   },
   "list": {
+    "export_needs_read": "Ihre Rolle darf die Geräteliste nicht exportieren: Der Export setzt das Recht zum Ansehen von Produkten voraus.",
     "title": "Geräte",
     "search": "Geräte suchen…",
     "select_item": "Gerät {{name}} auswählen",
@@ -213,6 +214,8 @@
     "archived_tab": "Archiviert",
     "no_archived": "Keine archivierten Geräte",
     "no_archived_hint": "Archivierte Geräte erscheinen hier. Archivieren nimmt ein Gerät aus der Liste; Sie können es wiederherstellen.",
+    "purge_off_hint": "Dauerhaftes Löschen ist für diese Organisation ausgeschaltet; ein Administrator kann es in den Einstellungen einschalten.",
+    "purge_off_link": "Einstellungen öffnen",
     "all_locations": "Alle Lagerorte",
     "all_categories": "Alle Kategorien",
     "filter_by_location": "Nach Lagerort filtern",

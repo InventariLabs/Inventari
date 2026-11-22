@@ -199,6 +199,7 @@
     "unknown": "Desconocido"
   },
   "list": {
+    "export_needs_read": "Tu rol no puede exportar la lista de equipos: la exportación requiere permiso para ver productos.",
     "title": "Activos",
     "search": "Buscar activos…",
     "select_item": "Seleccionar activo {{name}}",
@@ -220,6 +221,8 @@
     "archived_tab": "Archivados",
     "no_archived": "Sin activos archivados",
     "no_archived_hint": "Los activos que archive aparecerán aquí. Archivar quita un activo de la lista; puede restaurarlo.",
+    "purge_off_hint": "La eliminación permanente está desactivada en esta organización; un administrador puede activarla en Ajustes.",
+    "purge_off_link": "Abrir ajustes",
     "all_locations": "Todas las ubicaciones",
     "all_categories": "Todas las categorías",
     "filter_by_location": "Filtrar por ubicación",

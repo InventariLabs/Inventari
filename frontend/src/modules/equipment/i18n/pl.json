@@ -210,6 +210,7 @@
     "unknown": "Nieznany"
   },
   "list": {
+    "export_needs_read": "Twoja rola nie może eksportować listy sprzętu: eksport wymaga prawa do przeglądania produktów.",
     "title": "Zasoby",
     "search": "Szukaj zasobów…",
     "select_item": "Zaznacz zasób {{name}}",
@@ -239,6 +240,8 @@
     "archived_tab": "Archiwum",
     "no_archived": "Brak zarchiwizowanych zasobów",
     "no_archived_hint": "Zarchiwizowane zasoby pojawią się tutaj. Archiwizacja zdejmuje zasób z listy; możesz go przywrócić.",
+    "purge_off_hint": "Trwałe usuwanie jest w tej organizacji wyłączone; administrator może je włączyć w Ustawieniach.",
+    "purge_off_link": "Otwórz ustawienia",
     "all_locations": "Wszystkie miejsca",
     "all_categories": "Wszystkie kategorie",
     "filter_by_location": "Filtruj po miejscu",

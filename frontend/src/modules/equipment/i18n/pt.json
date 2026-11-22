@@ -192,6 +192,7 @@
     "unknown": "Desconhecido"
   },
   "list": {
+    "export_needs_read": "A tua função não pode exportar a lista de equipamentos: a exportação exige permissão para ver produtos.",
     "title": "Equipamentos",
     "search": "Pesquisar equipamentos…",
     "select_item": "Selecionar equipamento {{name}}",
@@ -213,6 +214,8 @@
     "archived_tab": "Arquivados",
     "no_archived": "Nenhum equipamento arquivado",
     "no_archived_hint": "Os ativos que arquivar aparecem aqui. Arquivar tira um ativo da lista; pode restaurá-lo.",
+    "purge_off_hint": "A exclusão permanente está desativada nesta organização; um administrador pode ativá-la nas Configurações.",
+    "purge_off_link": "Abrir configurações",
     "all_locations": "Todos os locais",
     "all_categories": "Todas as categorias",
     "filter_by_location": "Filtrar por local",

@@ -192,6 +192,7 @@
     "unknown": "Unknown"
   },
   "list": {
+    "export_needs_read": "Your role cannot export the asset list: the export needs permission to view products.",
     "title": "Assets",
     "search": "Search assets…",
     "select_item": "Select asset {{name}}",
@@ -213,6 +214,8 @@
     "archived_tab": "Archived",
     "no_archived": "No archived assets",
     "no_archived_hint": "Assets you archive appear here. Archiving takes an asset off the list; you can restore it.",
+    "purge_off_hint": "Permanent deletion is switched off for this organization; an administrator can turn it on in Settings.",
+    "purge_off_link": "Open settings",
     "all_locations": "All Locations",
     "all_categories": "All Categories",
     "filter_by_location": "Filter by location",

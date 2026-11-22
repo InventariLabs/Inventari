@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Plus, FileDown, Upload } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import { useHasPermission } from "@/module-sdk";
 
 interface AssetListHeaderActionsProps {
   canWrite: boolean;
@@ -18,7 +19,8 @@ interface AssetListHeaderActionsProps {
  *
  * Export stays for a reader: it downloads what this account is already
  * reading. Import and Add do not: a reader must not fill either one to the end
- * and meet the refusal on submit.
+ * and meet the refusal on submit. Export itself is disabled, with the reason,
+ * for an account the endpoint would refuse.
  */
 export function AssetListHeaderActions({
   canWrite,
@@ -26,12 +28,16 @@ export function AssetListHeaderActions({
   onImport,
 }: AssetListHeaderActionsProps) {
   const { t } = useTranslation("equipment");
+  // The export runs through the Core items export, which checks `items:read`.
+  const canExport = useHasPermission("items:read");
+  const disabledReason = t("list.export_needs_read");
   const tools = [
     {
       id: "export",
       label: t("common:actions.export"),
       icon: <FileDown size={16} className="text-amber-600" />,
       onSelect: onExport,
+      disabled: !canExport,
     },
     ...(canWrite
       ? [
@@ -40,6 +46,7 @@ export function AssetListHeaderActions({
             label: t("import.button", "Import"),
             icon: <Upload size={16} />,
             onSelect: onImport,
+            disabled: false,
           },
         ]
       : []),
@@ -47,19 +54,33 @@ export function AssetListHeaderActions({
 
   return (
     <div className="flex items-center justify-end gap-2 ml-auto min-w-0">
-      {tools.map(({ id, label, icon, onSelect }) => (
-        <Button
+      {tools.map(({ id, label, icon, onSelect, disabled }) => (
+        // A disabled button takes no pointer events, so the reason rides on
+        // the wrapper.
+        <span
           key={id}
-          variant="outline"
-          size="sm"
-          leftIcon={icon}
-          onClick={onSelect}
-          aria-label={label}
-          title={label}
+          title={disabled ? disabledReason : label}
           className="shrink-0"
         >
-          <span className="hidden sm:inline">{label}</span>
-        </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            leftIcon={icon}
+            onClick={onSelect}
+            disabled={disabled}
+            aria-label={label}
+            aria-describedby={
+              disabled ? "asset-export-disabled-reason" : undefined
+            }
+          >
+            <span className="hidden sm:inline">{label}</span>
+          </Button>
+          {disabled && (
+            <span id="asset-export-disabled-reason" className="sr-only">
+              {disabledReason}
+            </span>
+          )}
+        </span>
       ))}
       {canWrite && (
         <Link

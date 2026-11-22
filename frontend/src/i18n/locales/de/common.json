@@ -198,7 +198,7 @@
       "orgName": "Organisationsname",
       "permanentDelete": {
         "title": "Dauerhaftes Löschen",
-        "description": "Erlaubt das dauerhafte Löschen archivierter Produkte. Dies kann nicht rückgängig gemacht werden — in geschäftlichen Arbeitsbereichen mit geprüftem Bestand standardmäßig deaktiviert.",
+        "description": "Erlaubt das dauerhafte Löschen archivierter Produkte und Geräte. Dies kann nicht rückgängig gemacht werden — in geschäftlichen Arbeitsbereichen mit geprüftem Bestand standardmäßig deaktiviert.",
         "label": "Dauerhaftes Löschen erlauben",
         "instantSave": "Wird sofort beim Umschalten gespeichert.",
         "confirmTitle": "Endgültiges Löschen erlauben?",
