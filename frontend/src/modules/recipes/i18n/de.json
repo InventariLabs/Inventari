@@ -820,6 +820,8 @@
     "yieldLabel": "Eine Charge ergibt",
     "yieldHint": "Das Rezept ist für {{servings}} Portionen; ändern Sie den Wert, wenn eine Charge in der Einheit des Produkts eine andere Menge ergibt.",
     "yieldAsk": "Das Rezept ist für {{servings}} Portionen – das ist keine Menge in der Einheit dieses Produkts. Geben Sie an, wie viel eine Charge ergibt.",
+    "yieldStored": "Für dieses Produkt gibt es aus diesem Rezept bereits ein Produktionsrezept, und eine Charge ergibt {{amount}}. Ändern Sie die Menge dort, wenn Sie eine andere kochen möchten.",
+    "yieldStoredDoubtful": "Aus diesem Rezept gibt es für dieses Produkt bereits ein Produktionsrezept, das {{amount}} pro Charge ergibt. Das entspricht der Portionszahl und ist womöglich keine Menge in dieser Einheit; prüfen Sie die Chargenausbeute dieses Produktionsrezepts, bevor Sie kochen.",
     "scaleLabel": "Ansätze",
     "scaleHint": "Wie oft das Rezept gekocht wird",
     "plannedQty": "Geplante Menge",

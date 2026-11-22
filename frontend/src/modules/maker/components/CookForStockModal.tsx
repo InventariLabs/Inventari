@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { toast } from "sonner";
 import { ChefHat } from "lucide-react";
 import { Sheet, SheetBody } from "@/components/ui/Sheet";
@@ -23,11 +25,13 @@ import { parseShortageError } from "../lib/shortageError";
 import { extractApiError } from "@/lib/errors";
 import { QueryFailure } from "@/components/ui/QueryResult";
 import { unitLabel } from "@/lib/i18nHelpers";
+import { queryKeys } from "@/hooks/queries/keys";
 import { findUom, isCountedUom, useUoms } from "@/modules/shared/hooks/useUoms";
 import {
   createMakerRecipeFromCulinary,
   createProductionOrderFromBridge,
   discardBridgeRecipe,
+  findBridgedRecipe,
   type MakerRecipeBridgeResult,
   type MakerRecipeFromCulinary,
 } from "../api/recipeBridge";
@@ -86,6 +90,55 @@ function outputUnit(
     unitSymbol:
       findUom(categories, product?.uom_id)?.symbol ?? product?.uom_symbol,
   };
+}
+
+/**
+ * The unit the yield is written in. A product with no unit is counted in
+ * pieces; the figure never stands bare.
+ */
+function yieldUnit(
+  t: TFunction<"recipes">,
+  symbol: string | null | undefined,
+  servingsFit: boolean,
+): string {
+  return unitLabel(t, symbol) || (servingsFit ? unitLabel(t, "pcs") : "");
+}
+
+/**
+ * What the yield field starts from: the yield the pair's BOM already stores
+ * (the bridge refuses another one), else the servings where they are an amount
+ * in the product's unit, else nothing — the person is asked.
+ */
+function startingYield(
+  storedYield: number | null,
+  servingsFit: boolean,
+  servings: number,
+): string {
+  if (storedYield !== null) return String(storedYield);
+  return servingsFit ? String(servings) : "";
+}
+
+/**
+ * The line under the yield field. A stored measured yield that is just the
+ * servings is a number somebody took for an amount before the sheet asked; it
+ * is named as doubtful, not recommended.
+ */
+function yieldDescription(
+  t: TFunction<"recipes">,
+  storedYield: number | null,
+  servingsFit: boolean,
+  servings: number,
+  unit: string,
+): string {
+  if (storedYield !== null) {
+    const amount = unit ? `${storedYield} ${unit}` : String(storedYield);
+    return !servingsFit && storedYield === servings
+      ? t("cookForStock.yieldStoredDoubtful", { amount })
+      : t("cookForStock.yieldStored", { amount });
+  }
+  return servingsFit
+    ? t("cookForStock.yieldHint", { servings })
+    : t("cookForStock.yieldAsk", { servings });
 }
 
 /**
@@ -192,10 +245,25 @@ export function CookForStockModal({
   const { data: uomCategories } = useUoms();
 
   const { servingsFit, unitSymbol } = outputUnit(uomCategories, product);
-  const yieldText = batchYield ?? (servingsFit ? String(recipe.servings) : "");
-  // A product with no unit is counted in pieces; the figure never stands bare.
-  const unit =
-    unitLabel(t, unitSymbol) || (servingsFit ? unitLabel(t, "pcs") : "");
+  // A pair that was bridged before keeps the yield its BOM stores, and the
+  // bridge refuses another one, so the field starts from it — in its unit.
+  const { data: bridged } = useQuery({
+    queryKey: queryKeys.maker.bridgedRecipe(
+      product?.product_template_id ?? "",
+      recipe.id,
+    ),
+    queryFn: () => findBridgedRecipe(product!.product_template_id, recipe.id),
+    enabled: open && !!product,
+  });
+  const storedYield = bridged ? Number(bridged.batch_yield_qty) : null;
+  const yieldText =
+    batchYield ?? startingYield(storedYield, servingsFit, recipe.servings);
+  const unit = yieldUnit(
+    t,
+    bridged?.batch_yield_uom_symbol ?? unitSymbol,
+    servingsFit,
+  );
+
   const { yieldNum, validYield, scaleNum, validScale, plannedQty } = planBatch(
     yieldText,
     scale,
@@ -310,11 +378,13 @@ export function CookForStockModal({
           <Input
             id="cook-for-stock-yield"
             label={t("cookForStock.yieldLabel")}
-            description={
-              servingsFit
-                ? t("cookForStock.yieldHint", { servings: recipe.servings })
-                : t("cookForStock.yieldAsk", { servings: recipe.servings })
-            }
+            description={yieldDescription(
+              t,
+              storedYield,
+              servingsFit,
+              recipe.servings,
+              unit,
+            )}
             type="number"
             min="0"
             step="any"

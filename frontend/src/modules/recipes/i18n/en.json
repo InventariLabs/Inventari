@@ -820,6 +820,8 @@
     "yieldLabel": "One batch makes",
     "yieldHint": "The recipe serves {{servings}}; change this if a batch makes a different amount in the product's unit.",
     "yieldAsk": "The recipe serves {{servings}}, which is not an amount in this product's unit. Say how much one batch makes.",
+    "yieldStored": "A production recipe made from this recipe already exists for this product, and one batch makes {{amount}}. Change it there to cook a different amount.",
+    "yieldStoredDoubtful": "A production recipe made from this recipe already exists for this product and makes {{amount}} per batch. That is the number of servings, which may not be an amount in this unit; check the batch yield of that production recipe before cooking.",
     "scaleLabel": "Batches",
     "scaleHint": "How many times to cook the recipe",
     "plannedQty": "Planned output",

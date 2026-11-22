@@ -909,6 +909,8 @@
     "yieldLabel": "Ile robi jedna partia",
     "yieldHint": "Przepis jest na {{servings}} porcji; zmień, jeśli partia daje inną ilość w jednostce produktu.",
     "yieldAsk": "Przepis jest na {{servings}} porcji, a to nie jest ilość w jednostce tego produktu. Podaj, ile robi jedna partia.",
+    "yieldStored": "Dla tego produktu istnieje już receptura produkcyjna z tego przepisu, a jedna partia daje {{amount}}. Zmień tę ilość w recepturze, jeśli chcesz ugotować inną.",
+    "yieldStoredDoubtful": "Receptura produkcyjna z tego przepisu już istnieje dla tego produktu i daje {{amount}} na partię. To liczba porcji, która niekoniecznie jest ilością w tej jednostce; sprawdź wydajność partii tej receptury, zanim ugotujesz.",
     "scaleLabel": "Partie",
     "scaleHint": "Ile razy ugotować przepis",
     "plannedQty": "Planowana ilość",

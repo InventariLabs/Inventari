@@ -820,6 +820,8 @@
     "yieldLabel": "Una tanda produce",
     "yieldHint": "La receta es para {{servings}} raciones; cámbialo si una tanda produce otra cantidad en la unidad del producto.",
     "yieldAsk": "La receta es para {{servings}} raciones, que no es una cantidad en la unidad de este producto. Indica cuánto produce una tanda.",
+    "yieldStored": "Ya existe para este producto una receta de producción creada a partir de esta receta, y una tanda produce {{amount}}. Cambia esa cantidad allí si quieres cocinar otra.",
+    "yieldStoredDoubtful": "Ya existe para este producto una receta de producción creada a partir de esta receta, y produce {{amount}} por tanda. Es el número de raciones, que quizá no sea una cantidad en esta unidad; revisa el rendimiento de esa receta de producción antes de cocinar.",
     "scaleLabel": "Lotes",
     "scaleHint": "Cuántas veces cocinar la receta",
     "plannedQty": "Cantidad planificada",

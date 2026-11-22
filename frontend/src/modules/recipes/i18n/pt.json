@@ -820,6 +820,8 @@
     "yieldLabel": "Um lote rende",
     "yieldHint": "A receita é para {{servings}} porções; altere se um lote render outra quantidade na unidade do produto.",
     "yieldAsk": "A receita é para {{servings}} porções, o que não é uma quantidade na unidade deste produto. Indique quanto rende um lote.",
+    "yieldStored": "Já existe para este produto uma receita de produção feita a partir desta receita, e um lote rende {{amount}}. Altere essa quantidade lá se quiser cozinhar outra.",
+    "yieldStoredDoubtful": "Já existe para este produto uma receita de produção feita a partir desta receita, e ela rende {{amount}} por lote. É o número de porções, que talvez não seja uma quantidade nesta unidade; confira o rendimento dessa receita de produção antes de cozinhar.",
     "scaleLabel": "Lotes",
     "scaleHint": "Quantas vezes cozinhar a receita",
     "plannedQty": "Produção planejada",

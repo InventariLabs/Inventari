@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => ({
   createMakerRecipeFromCulinary: vi.fn(),
   createProductionOrderFromBridge: vi.fn(),
   discardBridgeRecipe: vi.fn(),
+  findBridgedRecipe: vi.fn(),
   navigate: vi.fn(),
   productSelect: vi.fn(),
   // What the product search hands back: a product with no unit by default.
@@ -77,6 +78,7 @@ vi.mock("@/modules/maker/api/recipeBridge", () => ({
   createMakerRecipeFromCulinary: mocks.createMakerRecipeFromCulinary,
   createProductionOrderFromBridge: mocks.createProductionOrderFromBridge,
   discardBridgeRecipe: mocks.discardBridgeRecipe,
+  findBridgedRecipe: mocks.findBridgedRecipe,
 }));
 
 vi.mock("react-router-dom", async () => {
@@ -197,9 +199,11 @@ function serveScopedStorages(list: Array<{ id: string; name: string }>) {
 function renderModal(onClose: () => void = vi.fn()) {
   serveScopedStorages([{ id: "loc-1", name: "Output Store" }]);
   return render(
-    <MemoryRouter>
-      <CookForStockModal open onClose={onClose} recipe={recipe} />
-    </MemoryRouter>,
+    <QueryWrapper>
+      <MemoryRouter>
+        <CookForStockModal open onClose={onClose} recipe={recipe} />
+      </MemoryRouter>
+    </QueryWrapper>,
   );
 }
 
@@ -222,6 +226,8 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
       created: true,
     });
     mocks.discardBridgeRecipe.mockResolvedValue(undefined);
+    // No production recipe was made from this pair yet.
+    mocks.findBridgedRecipe.mockResolvedValue(null);
     mocks.createProductionOrderFromBridge.mockResolvedValue({
       id: "order-1",
       status: "DRAFT",
@@ -288,6 +294,40 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
       );
       pickStorage("Output Store");
       expect(screen.getByTestId("cook-for-stock-submit")).toBeDisabled();
+    });
+
+    it("starts a bridged pair from the stored yield, with its unit", async () => {
+      mocks.findBridgedRecipe.mockResolvedValue({
+        batch_yield_qty: "1.5000",
+        batch_yield_uom_symbol: "kg",
+      });
+      renderModal();
+      fireEvent.click(screen.getByTestId("mock-product-option"));
+
+      await waitFor(() =>
+        expect(screen.getByTestId("cook-for-stock-yield-input")).toHaveValue(
+          1.5,
+        ),
+      );
+      expect(screen.getByText(/one batch makes 1\.5 kg/)).toBeInTheDocument();
+      expect(screen.queryByText(/number of servings/)).not.toBeInTheDocument();
+    });
+
+    it("names a stored yield that equals the servings as doubtful", async () => {
+      // The recipe serves 6: a stored "6 kg" is the servings taken for a
+      // weight, not an amount anybody measured.
+      mocks.findBridgedRecipe.mockResolvedValue({
+        batch_yield_qty: "6.0000",
+        batch_yield_uom_symbol: "kg",
+      });
+      renderModal();
+      fireEvent.click(screen.getByTestId("mock-product-option"));
+
+      expect(
+        await screen.findByText(
+          /6 kg per batch\. That is the number of servings/,
+        ),
+      ).toBeInTheDocument();
     });
 
     it("plans the run from what one batch makes, in the product's unit", async () => {
@@ -502,9 +542,11 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
       ]);
 
       render(
-        <MemoryRouter>
-          <CookForStockModal open onClose={vi.fn()} recipe={recipe} />
-        </MemoryRouter>,
+        <QueryWrapper>
+          <MemoryRouter>
+            <CookForStockModal open onClose={vi.fn()} recipe={recipe} />
+          </MemoryRouter>
+        </QueryWrapper>,
       );
 
       expect(mocks.scope).toHaveBeenCalledWith({ purpose: "stock" });
@@ -517,9 +559,11 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
       ]);
 
       render(
-        <MemoryRouter>
-          <CookForStockModal open onClose={vi.fn()} recipe={recipe} />
-        </MemoryRouter>,
+        <QueryWrapper>
+          <MemoryRouter>
+            <CookForStockModal open onClose={vi.fn()} recipe={recipe} />
+          </MemoryRouter>
+        </QueryWrapper>,
       );
 
       expect(storageTrigger()).toHaveTextContent(
@@ -540,9 +584,11 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
       ]);
 
       render(
-        <MemoryRouter>
-          <CookForStockModal open onClose={vi.fn()} recipe={recipe} />
-        </MemoryRouter>,
+        <QueryWrapper>
+          <MemoryRouter>
+            <CookForStockModal open onClose={vi.fn()} recipe={recipe} />
+          </MemoryRouter>
+        </QueryWrapper>,
       );
 
       expect(storageTrigger()).toHaveTextContent("Cold Room");
@@ -585,9 +631,11 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
       mocks.offered = ["loc-1", "loc-2"];
 
       render(
-        <MemoryRouter>
-          <CookForStockModal open onClose={vi.fn()} recipe={recipe} />
-        </MemoryRouter>,
+        <QueryWrapper>
+          <MemoryRouter>
+            <CookForStockModal open onClose={vi.fn()} recipe={recipe} />
+          </MemoryRouter>
+        </QueryWrapper>,
       );
 
       expect(storageTrigger()).toHaveTextContent(
@@ -606,9 +654,11 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
       ]);
 
       render(
-        <MemoryRouter>
-          <CookForStockModal open onClose={vi.fn()} recipe={recipe} />
-        </MemoryRouter>,
+        <QueryWrapper>
+          <MemoryRouter>
+            <CookForStockModal open onClose={vi.fn()} recipe={recipe} />
+          </MemoryRouter>
+        </QueryWrapper>,
       );
 
       expect(storageTrigger()).toHaveTextContent(
