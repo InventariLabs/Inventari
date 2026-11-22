@@ -131,7 +131,9 @@ describe("ItemsPage", () => {
       );
 
       const beta = await openRow("Beta");
-      await user.click(within(beta).getByRole("button", { name: "Delete" }));
+      await user.click(
+        within(beta).getByRole("button", { name: /^Delete Beta/ }),
+      );
 
       const dialog = await screen.findByRole("alertdialog");
       expect(deleted).toEqual([]);
@@ -161,7 +163,9 @@ describe("ItemsPage", () => {
       );
 
       const beta = await openRow("Beta");
-      await user.click(within(beta).getByRole("button", { name: "Edit" }));
+      await user.click(
+        within(beta).getByRole("button", { name: /^Edit Beta/ }),
+      );
 
       expect(await screen.findByText(/Edit product/i)).toBeInTheDocument();
       const name = await screen.findByDisplayValue("Beta");

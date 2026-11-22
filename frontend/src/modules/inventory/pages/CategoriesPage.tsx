@@ -344,7 +344,9 @@ export default function CategoriesPage() {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
             {visibleCategories.map((category) => {
               // One name for each of the card's buttons: the row they act on.
-              const named = { name: category.name };
+              const named = {
+                name: categoryLabel(t, category.code, category.name),
+              };
               return (
                 <article
                   key={category.id}

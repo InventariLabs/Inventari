@@ -574,7 +574,7 @@ describe("ScanPage", () => {
     );
 
     expect(await screen.findByText("4 reserved, 1 available")).toBeTruthy();
-    await userEvent.click(screen.getByRole("button", { name: "Add 1" }));
+    await userEvent.click(screen.getByRole("button", { name: /^Add 1 to / }));
 
     expect(await screen.findByText("4 reserved, 2 available")).toBeTruthy();
   });
