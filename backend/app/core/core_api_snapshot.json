@@ -1571,6 +1571,11 @@
             },
             {
               "kind": "KEYWORD_ONLY",
+              "name": "emptied_from",
+              "required": false
+            },
+            {
+              "kind": "KEYWORD_ONLY",
               "name": "for_update",
               "required": false
             }
@@ -6224,6 +6229,11 @@
             {
               "kind": "KEYWORD_ONLY",
               "name": "reference_id",
+              "required": false
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "file_when_emptied",
               "required": false
             }
           ]

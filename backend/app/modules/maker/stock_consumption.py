@@ -95,6 +95,9 @@ async def consume_across_locations(
             user_id=user_id,
             reference_type='maker_production',
             reference_id=reference_id,
+            # A run uses its ingredient up: the last unit leaves the record
+            # in Consumed, off the products list, as a record used up by hand.
+            file_when_emptied=True,
         )
     ]
 

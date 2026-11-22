@@ -19,6 +19,7 @@ from app.core.txn_memo import records_locked
 from app.models.item import Item
 from app.models.storage_location import StorageLocation
 
+from ._consumed_place import EMPTIED_FROM
 from ._loaded import give_the_card_and_category
 
 
@@ -104,9 +105,15 @@ async def find_stock_row_async(
     storage_location_id: UUID | None = None,
     lot_id: UUID | None = None,
     owner_id: UUID | None = None,
+    emptied_from: UUID | None = None,
     for_update: bool = False,
 ) -> Item | None:
     """Return the record a delivery to this place tops up, or None.
+
+    *emptied_from* names a shelf instead of *storage_location_id*: the record
+    a door used up there and filed under the Consumed place, which gets stock
+    again and returns to that shelf. Both are given only by a door that gives
+    stock back to the record it took it from.
 
     With *for_update* the record comes back under its row lock
     (``FOR NO KEY UPDATE``) and freshly read, the way
@@ -164,7 +171,11 @@ async def find_stock_row_async(
             Item.lot_id.is_not_distinct_from(lot_id),
             Item.owner_id.is_not_distinct_from(owner_id),
         )
-        if storage_location_id is not None:
+        if emptied_from is not None:
+            query = query.where(
+                Item.meta_data[EMPTIED_FROM].astext == str(emptied_from)
+            )
+        elif storage_location_id is not None:
             query = query.where(Item.storage_location_id == storage_location_id)
 
     query = query.order_by(Item.created_at.asc()).limit(1)
