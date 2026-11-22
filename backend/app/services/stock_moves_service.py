@@ -19,6 +19,7 @@ from sqlalchemy import (
     Numeric,
     Row,
     Uuid,
+    and_,
     bindparam,
     case,
     column,
@@ -279,6 +280,42 @@ def _not_a_module_record(organization_id: UUID) -> ColumnElement[bool]:
     )
 
 
+async def _in_location(
+    db: AsyncSession, organization_id: UUID, location_id: UUID
+) -> ColumnElement[bool]:
+    """A movement that began or ended in the location or below it.
+
+    "Below it" is read as the tree stood at the movement's moment: goods put
+    on a shelf before it was physically carried elsewhere were in the
+    building it stood in then, whatever the tree says today.
+    """
+    # Imported here: the relocation writes its movements through this module.
+    from app.services.storage._relocation import subtree_epochs_async
+
+    def touches(ids: list[UUID]) -> ColumnElement[bool]:
+        return or_(
+            in_ids(StockMove.from_location_id, ids),
+            in_ids(StockMove.to_location_id, ids),
+        )
+
+    epochs = await subtree_epochs_async(db, organization_id, location_id)
+    if epochs is None:
+        return touches(
+            [location_id, *await descendant_ids_async(db, organization_id, location_id)]
+        )
+    moment = _moved_at()
+    return or_(
+        *(
+            and_(
+                *([moment >= start] if start is not None else []),
+                *([moment < end] if end is not None else []),
+                touches(ids),
+            )
+            for start, end, ids in epochs
+        )
+    )
+
+
 async def _ledger_conditions(
     db: AsyncSession,
     organization_id: UUID,
@@ -304,16 +341,7 @@ async def _ledger_conditions(
     if product_template_id is not None:
         conditions.append(StockMove.product_template_id == product_template_id)
     if location_id is not None:
-        location_ids = [
-            location_id,
-            *await descendant_ids_async(db, organization_id, location_id),
-        ]
-        conditions.append(
-            or_(
-                in_ids(StockMove.from_location_id, location_ids),
-                in_ids(StockMove.to_location_id, location_ids),
-            )
-        )
+        conditions.append(await _in_location(db, organization_id, location_id))
     if lot_id is not None:
         conditions.append(StockMove.lot_id == lot_id)
     if reference_type is not None:

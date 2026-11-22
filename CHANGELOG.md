@@ -514,7 +514,9 @@ says what the release does rather than what changed since them.
   *Movements* tab show what happened before the move at the path the location
   had then, as the move dialog promises. Goods put on a shelf while it stood
   in one hall no longer read as having gone into the room it was carried to
-  later. The rows the move itself writes name the moved location's whole path
+  later; filtering **Movements** by a place lists what was made in it as it
+  stood then, and a production run's movements name the path a shelf had when
+  the run touched it. The rows the move itself writes name the moved location's whole path
   before and after, its own name last, instead of only the places it left and
   reached. A move that only corrects the layout still rewrites nothing: the
   stock was always where the corrected tree puts it.

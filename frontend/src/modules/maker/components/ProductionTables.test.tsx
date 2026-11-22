@@ -238,6 +238,28 @@ describe("ProductionStockMovesTable", () => {
     ).toBeInTheDocument();
   });
 
+  it("names a shelf by the path it had when the run touched it", async () => {
+    // The shelf was carried under Annex since; the run read it as it stood.
+    serveLocations([
+      {
+        id: "aa11bb22-cccc-dddd-eeee-ff0011223344",
+        name: "Cold Storage",
+        parent_id: "annex",
+      },
+      { id: "annex", name: "Annex", parent_id: null },
+    ]);
+
+    render(
+      <ProductionStockMovesTable
+        stockMoves={[{ ...move, from_location_path: "Cold Storage" }]}
+      />,
+      { wrapper: QueryWrapper },
+    );
+
+    expect(await screen.findByText("← Cold Storage")).toBeInTheDocument();
+    expect(screen.queryByText(/Annex/)).not.toBeInTheDocument();
+  });
+
   it("falls back to a label when a named location's row is gone", () => {
     render(
       <ProductionStockMovesTable
