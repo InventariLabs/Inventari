@@ -535,11 +535,13 @@ def _viewer_can_decide(
     a person named on the stage the request sits at decides through
     *delegation*, with the read grant alone as the floor (they must be able
     to see what they are deciding on). The approve grant decides on every
-    open stage as before. Callers that do not say which grants the viewer
-    holds get the old stage-only verdict; the router says, so the field
-    stays the same verdict the decision service will reach.
+    open stage as before. A viewer named without both grants gets ``None``:
+    the verdict depends on what they hold, so a caller that does not say
+    gets no answer rather than a guess.
     """
     if viewer_id is None:
+        return None
+    if viewer_has_approve_grant is None or viewer_has_read_grant is None:
         return None
     if request.status not in OPEN_STATUSES:
         return False
@@ -550,7 +552,7 @@ def _viewer_can_decide(
     stages = list(workflow.stages or [])
     if not stage_accepts_approver(stages, request.current_stage, viewer_id):
         return False
-    if viewer_has_approve_grant is None or viewer_has_approve_grant:
+    if viewer_has_approve_grant:
         return True
     if not viewer_has_read_grant:
         return False

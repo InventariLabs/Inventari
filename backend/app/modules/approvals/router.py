@@ -142,6 +142,30 @@ async def _require_decision_possible(
         _require_approver_action(user)
 
 
+async def require_decision_possible_on_target(
+    db: AsyncSession,
+    org_id: UUID,
+    target_type: str,
+    target_id: UUID,
+    user: UserContextDTO,
+) -> None:
+    """The decision door of a target admits what the generic door admits.
+
+    A target's own approve and reject doors (a document, a purchase order)
+    ask the same question as ``/requests/{id}/approve``, so the person the
+    queue offers the decision to is not turned away at the door that button
+    posts to. A target with no open request is left to its own refusal, but
+    only for a caller who holds the approve grant.
+    """
+    from .services import find_active_request
+
+    active = await find_active_request(db, org_id, target_type, target_id)
+    if active is None:
+        _require_approver_action(user)
+        return
+    await _require_decision_possible(db, org_id, active.id, user)
+
+
 @router.get('/workflows', response_model=PaginatedResponse[WorkflowSchema])
 async def list_workflows(
     limit: int = Query(50, ge=1, le=200),
