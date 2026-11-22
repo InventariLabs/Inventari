@@ -67,6 +67,36 @@ describe("useCommandPaletteSearch", () => {
     expect(result.current.results).toEqual([]);
   });
 
+  it("tells a refused search from a failed one", async () => {
+    server.use(
+      http.get("/api/v1/items", () =>
+        HttpResponse.json({ detail: "no" }, { status: 403 }),
+      ),
+    );
+    const { result } = renderHook(
+      () => useCommandPaletteSearch("apple", ["inventory"]),
+      { wrapper: createWrapper() },
+    );
+
+    await waitFor(() => expect(result.current.failed).toBe(true));
+    expect(result.current.forbidden).toBe(true);
+  });
+
+  it("does not call a search forbidden when another failure is mixed in", async () => {
+    server.use(
+      http.get("/api/v1/items", () =>
+        HttpResponse.json({ detail: "boom" }, { status: 500 }),
+      ),
+    );
+    const { result } = renderHook(
+      () => useCommandPaletteSearch("apple", ["inventory"]),
+      { wrapper: createWrapper() },
+    );
+
+    await waitFor(() => expect(result.current.failed).toBe(true));
+    expect(result.current.forbidden).toBe(false);
+  });
+
   it("asks again when a failed search is repeated", async () => {
     let calls = 0;
     server.use(

@@ -25,6 +25,7 @@ export function ExclusionToggle({
   const {
     data: exclusions = [],
     isError: exclusionsFailed,
+    error: exclusionsError,
     refetch,
   } = useShoppingExclusions();
   const createExclusion = useCreateShoppingExclusion();
@@ -84,7 +85,11 @@ export function ExclusionToggle({
   if (!canWrite) return null;
 
   return (
-    <ExclusionGate failed={exclusionsFailed} onRetry={() => void refetch()}>
+    <ExclusionGate
+      failed={exclusionsFailed}
+      error={exclusionsError}
+      onRetry={() => void refetch()}
+    >
       <Button
         size="content"
         type="button"

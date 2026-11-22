@@ -51,10 +51,13 @@ function matchesQuery(value: string, query: string): boolean {
 
 function SearchFailedNotice({
   failed,
+  forbidden,
   searching,
   query,
 }: {
   failed: boolean;
+  /** Every source that failed was refused: no "try again", it would repeat. */
+  forbidden: boolean;
   searching: boolean;
   query: string;
 }) {
@@ -65,10 +68,15 @@ function SearchFailedNotice({
       role="alert"
       className="py-4 text-center text-sm text-red-600 dark:text-red-400"
     >
-      {t(
-        "commandPalette.searchFailed",
-        "The search failed, so this list may be incomplete. Try again.",
-      )}
+      {forbidden
+        ? t(
+            "commandPalette.searchForbidden",
+            "Your account cannot search all of this, so the list may be incomplete. Ask an administrator of your organization for access.",
+          )
+        : t(
+            "commandPalette.searchFailed",
+            "The search failed, so this list may be incomplete. Try again.",
+          )}
     </div>
   );
 }
@@ -162,6 +170,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     results: searchResults,
     isLoading: isSearching,
     failed: searchFailed,
+    forbidden: searchForbidden,
   } = useCommandPaletteSearch(deferredSearch, enabledModules);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -340,6 +349,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                 >
                   <SearchFailedNotice
                     failed={searchFailed}
+                    forbidden={searchForbidden}
                     searching={isSearching}
                     query={query}
                   />

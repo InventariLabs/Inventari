@@ -1206,7 +1206,8 @@
     "matchedBySerial": "correspondance par numéro de série : {{value}}",
     "productTotal_one": "{{amount}} dans {{count}} enregistrement",
     "productTotal_other": "{{amount}} dans {{count}} enregistrements",
-    "searchFailed": "La recherche a échoué, la liste peut donc être incomplète. Réessayez."
+    "searchFailed": "La recherche a échoué, la liste peut donc être incomplète. Réessayez.",
+    "searchForbidden": "Votre compte ne peut pas tout rechercher, la liste peut donc être incomplète. Demandez l'accès à un administrateur de votre organisation."
   },
   "profiles": {
     "food_home": {

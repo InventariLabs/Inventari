@@ -138,6 +138,7 @@ const IngredientRow = memo(function IngredientRow({
   const {
     data: exclusions = [],
     isError: exclusionsFailed,
+    error: exclusionsError,
     refetch: refetchExclusions,
   } = useShoppingExclusions();
   const createExclusion = useCreateShoppingExclusion();
@@ -348,6 +349,7 @@ const IngredientRow = memo(function IngredientRow({
       {canWrite && (
         <ExclusionGate
           failed={exclusionsFailed}
+          error={exclusionsError}
           onRetry={() => void refetchExclusions()}
         >
           <Button

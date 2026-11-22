@@ -337,6 +337,16 @@ export function isForbiddenError(error: unknown): boolean {
 }
 
 /**
+ * Every one of these errors is a refusal. A screen that draws one failure
+ * state over several requests offers its retry unless all of them were
+ * refused: one request that failed for another reason is still worth asking
+ * again. An empty list is not a refusal.
+ */
+export function allForbidden(errors: readonly unknown[]): boolean {
+  return errors.length > 0 && errors.every(isForbiddenError);
+}
+
+/**
  * Retry policy for React Query.
  *
  * ``retry: 1`` treated every failure as transient, so a detail screen opened

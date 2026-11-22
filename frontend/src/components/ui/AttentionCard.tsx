@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -79,6 +80,12 @@ interface AttentionCardProps {
     message: string;
     retryLabel: string;
     onRetry: () => void;
+    /**
+     * Every request that failed was refused (403): the card then says the
+     * account may not read this, and offers no retry, because a refusal
+     * repeats itself.
+     */
+    forbidden?: boolean;
     /** Heading without a number: a count built from a failed source is not one. */
     partialLabel?: string;
   };
@@ -118,6 +125,7 @@ export function AttentionCard({
   maxItems = 5,
   showAllLabel,
 }: AttentionCardProps) {
+  const { t } = useTranslation("common");
   const [showAll, setShowAll] = useState(false);
   const sorted = sortBySeverity(items);
   const rows = showAll ? sorted : sorted.slice(0, maxItems);
@@ -181,10 +189,19 @@ export function AttentionCard({
             busy && "mt-3",
           )}
         >
-          <p className="text-sm text-on-warning">{unavailable.message}</p>
-          <Button variant="outline" size="sm" onClick={unavailable.onRetry}>
-            {unavailable.retryLabel}
-          </Button>
+          {unavailable.forbidden ? (
+            <p className="text-sm text-on-warning">
+              <span className="font-medium">{t("access.denied")}.</span>{" "}
+              {t("access.deniedHint")}
+            </p>
+          ) : (
+            <>
+              <p className="text-sm text-on-warning">{unavailable.message}</p>
+              <Button variant="outline" size="sm" onClick={unavailable.onRetry}>
+                {unavailable.retryLabel}
+              </Button>
+            </>
+          )}
         </div>
       )}
       {busy && (

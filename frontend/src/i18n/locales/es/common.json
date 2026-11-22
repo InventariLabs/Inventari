@@ -1206,7 +1206,8 @@
     "matchedBySerial": "coincidencia por número de serie: {{value}}",
     "productTotal_one": "{{amount}} en {{count}} registro",
     "productTotal_other": "{{amount}} en {{count}} registros",
-    "searchFailed": "La búsqueda falló, así que la lista puede estar incompleta. Inténtalo de nuevo."
+    "searchFailed": "La búsqueda falló, así que la lista puede estar incompleta. Inténtalo de nuevo.",
+    "searchForbidden": "Tu cuenta no puede buscar en todo esto, así que la lista puede estar incompleta. Solicita acceso a un administrador de tu organización."
   },
   "profiles": {
     "food_home": {

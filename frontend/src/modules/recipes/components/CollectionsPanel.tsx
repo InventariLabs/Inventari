@@ -3,9 +3,11 @@ import { useCallback, useState } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { Folder, FolderOpen, Pencil, Plus, Trash2 } from "lucide-react";
 import type { TFunction } from "i18next";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { InlineQueryError } from "@/components/ui/QueryResult";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/Input";
 import {
@@ -515,23 +517,22 @@ function CollectionNode({
 /** The collections read failed: the strip is missing, not empty. */
 export function CollectionsLoadFailed({
   failed,
+  error,
   onRetry,
-  t,
 }: {
   failed: boolean;
+  /** The rejected read's error: a refusal is not offered a retry. */
+  error: unknown;
   onRetry: () => void;
-  t: TFunction;
 }) {
+  const { t } = useTranslation(["recipes", "common"]);
   if (!failed) return null;
   return (
-    <div
-      role="alert"
-      className="mb-3 flex items-center gap-3 text-sm text-on-warning"
-    >
-      <span>{t("recipes:collections.load_failed")}</span>
-      <Button variant="outline" size="sm" onClick={onRetry}>
-        {t("common:actions.retry")}
-      </Button>
-    </div>
+    <InlineQueryError
+      error={error}
+      message={t("recipes:collections.load_failed")}
+      onRetry={onRetry}
+      className="mb-3"
+    />
   );
 }

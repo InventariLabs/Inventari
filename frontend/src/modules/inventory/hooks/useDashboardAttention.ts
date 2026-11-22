@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { Item, LowStockProduct, StorageLocationNode } from "@/types";
 import { queryKeys } from "@/hooks/queries/keys";
+import { allForbidden } from "@/lib/errors";
 import { storagesApi } from "@/lib/api/storages";
 import { itemsApi } from "@/lib/api/items";
 import { useItems, type ItemsParams } from "@/modules/inventory/hooks/useItems";
@@ -292,6 +293,10 @@ export function useDashboardAttention({
     locations,
     isLoading: queries.some((q) => q.isLoading),
     isError: failed,
+    /** Every failed request was refused: the account may not read this. */
+    isForbidden: allForbidden(
+      queries.filter((q) => q.isError).map((q) => q.error),
+    ),
     refetch: () => {
       for (const q of queries) if (q.isError) void q.refetch();
     },
