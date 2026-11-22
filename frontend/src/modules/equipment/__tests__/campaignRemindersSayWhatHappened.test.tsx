@@ -328,7 +328,11 @@ describe("an attestation where no email goes out", () => {
     renderPage();
 
     fireEvent.click(
-      (await screen.findAllByRole("button", { name: "Copy link" }))[0],
+      (
+        await screen.findAllByRole("button", {
+          name: "Copy link for Ava Brennan",
+        })
+      )[0],
     );
 
     await waitFor(() =>

@@ -169,6 +169,9 @@ export default function MyAssetsPage() {
                     size="sm"
                     className="flex-shrink-0"
                     leftIcon={<RotateCcw size={14} />}
+                    aria-label={t("my_assets.returnNamed", {
+                      name: asset.item_name,
+                    })}
                     onClick={() =>
                       setReturning({
                         id: asset.assignment_id,

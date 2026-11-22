@@ -391,7 +391,7 @@ describe("CategoriesPage", () => {
     renderPage(queryClient);
     await waitFor(() => expect(screen.getByText("Dairy")).toBeInTheDocument());
 
-    await user.click(screen.getByRole("button", { name: /^delete$/i }));
+    await user.click(screen.getByRole("button", { name: /^delete /i }));
 
     const dialog = screen.getByRole("alertdialog");
     expect(dialog).toHaveTextContent(/5/);
@@ -413,7 +413,7 @@ describe("CategoriesPage", () => {
     renderPage(queryClient);
     await waitFor(() => expect(screen.getByText("Dairy")).toBeInTheDocument());
 
-    await user.click(screen.getByRole("button", { name: /^delete$/i }));
+    await user.click(screen.getByRole("button", { name: /^delete /i }));
 
     const dialog = screen.getByRole("alertdialog");
     expect(
@@ -437,7 +437,7 @@ describe("CategoriesPage", () => {
     renderPage(queryClient);
     await waitFor(() => expect(screen.getByText("Dairy")).toBeInTheDocument());
 
-    await user.click(screen.getByRole("button", { name: /^delete$/i }));
+    await user.click(screen.getByRole("button", { name: /^delete /i }));
 
     const dialog = screen.getByRole("alertdialog");
     expect(
@@ -698,7 +698,7 @@ describe("CategoriesPage — an account that may not change a category", () => {
 
     expect(await screen.findByText("Dairy")).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: /^delete$/i }),
+      screen.queryByRole("button", { name: /^delete /i }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /^edit$/i }),

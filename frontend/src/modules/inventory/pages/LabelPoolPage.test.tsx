@@ -830,7 +830,9 @@ describe("LabelPoolPage", () => {
         expect(await screen.findByText("1 selected")).toBeInTheDocument();
 
         fireEvent.click(
-          within(cards[1]).getByRole("button", { name: "Print Preview" }),
+          within(cards[1]).getByRole("button", {
+            name: /^Print preview of label /,
+          }),
         );
         expect(
           await screen.findByRole("button", { name: /Download 1 label/i }),

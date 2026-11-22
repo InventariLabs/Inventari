@@ -229,7 +229,11 @@
     "addRolePlaceholder": "Wybierz rolę…",
     "roleAddsNobody": "Nikogo nowego do dodania — wszystkie aktywne osoby z rolą „{{role}}” są już wskazane.",
     "roleMembersFailed": "Nie udało się odczytać, kto ma tę rolę.",
-    "waitingUnavailable": "Nie udało się sprawdzić, co czeka na ten przepływ, więc teraz nie można go wyłączyć. Zamknij okno i spróbuj ponownie."
+    "waitingUnavailable": "Nie udało się sprawdzić, co czeka na ten przepływ, więc teraz nie można go wyłączyć. Zamknij okno i spróbuj ponownie.",
+    "editNamed": "Edytuj {{name}}",
+    "deactivateNamed": "Dezaktywuj {{name}}",
+    "activateNamed": "Aktywuj {{name}}",
+    "deleteNamed": "Usuń {{name}}"
   },
   "request": {
     "pending": "Oczekujący",
@@ -296,7 +300,9 @@
     "deadEndStepAskRequesterUnnamed": "Poproś osobę, która złożyła wniosek, o jego wycofanie.",
     "deadEndLinkMembers": "Członkowie i role",
     "deadEndLinkRoles": "Role",
-    "deadEndLinkSettings": "Ustawienia akceptacji"
+    "deadEndLinkSettings": "Ustawienia akceptacji",
+    "approveNamed": "Akceptuj {{name}}",
+    "rejectNamed": "Odrzuć {{name}}"
   },
   "deleteWorkflow": "Usuń przepływ",
   "deleteWorkflowConfirm": "Usunąć ten przepływ? Zniknie z tej listy. Wnioski już w nim złożone zostaną na Pulpicie Zatwierdzeń, z etapami, przez które przeszły.",

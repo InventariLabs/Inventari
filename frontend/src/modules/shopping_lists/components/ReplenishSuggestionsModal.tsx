@@ -102,6 +102,15 @@ function rowsToAdd(
     });
 }
 
+/** The row's three buttons read the same on every row; these say which row. */
+function suggestionActionNames(t: TFunction, name: string) {
+  return {
+    urgent: t("shopping_lists:modal.urgentNamed", { name }),
+    decrease: t("shopping_lists:modal.decreaseNamed", { name }),
+    increase: t("shopping_lists:modal.increaseNamed", { name }),
+  };
+}
+
 export default function ReplenishSuggestionsModal({
   isOpen,
   onClose,
@@ -297,6 +306,7 @@ export default function ReplenishSuggestionsModal({
             const isSelected = selectedKeys.includes(key);
             const currentQty = quantities[key] || item.quantity || 1;
             const isUrgent = priorities[key] === 2;
+            const names = suggestionActionNames(t, item.name);
             return (
               <div
                 key={key}
@@ -355,8 +365,9 @@ export default function ReplenishSuggestionsModal({
                           ? "bg-red-600 text-white shadow-sm ring-2 ring-red-100 hover:bg-red-600 active:bg-red-600"
                           : "bg-surface-raised text-on-muted hover:text-on-secondary"
                       }`}
-                      title={t("a11y.urgent")}
-                      aria-label={t("a11y.urgent")}
+                      title={names.urgent}
+                      aria-label={names.urgent}
+                      aria-pressed={isUrgent}
                     >
                       <Zap
                         size={14}
@@ -373,7 +384,7 @@ export default function ReplenishSuggestionsModal({
                           e.stopPropagation();
                           handleUpdateQuantity(key, -1);
                         }}
-                        aria-label={t("actions.decrease")}
+                        aria-label={names.decrease}
                         className="rounded-md text-on-muted"
                       >
                         <Minus size={14} />
@@ -396,7 +407,7 @@ export default function ReplenishSuggestionsModal({
                           e.stopPropagation();
                           handleUpdateQuantity(key, 1);
                         }}
-                        aria-label={t("actions.increase")}
+                        aria-label={names.increase}
                         className="rounded-md text-on-muted"
                       >
                         <Plus size={14} />

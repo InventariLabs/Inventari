@@ -442,7 +442,7 @@ describe("PickingView — the unlinked notice", () => {
     );
 
     // The row nothing matched carries the linker itself.
-    await user.click(screen.getByTitle("Link to product"));
+    await user.click(screen.getByTitle(/^Link to product/));
 
     expect(mockHook.cancelSession).not.toHaveBeenCalled();
     expect(onClose).not.toHaveBeenCalled();

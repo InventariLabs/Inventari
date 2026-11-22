@@ -17,7 +17,10 @@
     "createSuccess": "List created!",
     "createFailed": "Failed to create list",
     "nameHint": "Leave it empty and the list takes today's date.",
-    "defaultName": "List {{date}}"
+    "defaultName": "List {{date}}",
+    "urgentNamed": "Urgent: {{name}}",
+    "decreaseNamed": "Decrease quantity of {{name}}",
+    "increaseNamed": "Increase quantity of {{name}}"
   },
   "completed": "Done",
   "detail": {

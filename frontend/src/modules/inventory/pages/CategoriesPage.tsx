@@ -342,131 +342,133 @@ export default function CategoriesPage() {
             />
           )}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-            {visibleCategories.map((category) => (
-              <article
-                key={category.id}
-                className={`group relative flex flex-col items-center gap-2 overflow-hidden rounded-2xl border border-border p-4 text-center shadow-sm transition-all hover:shadow-md active:scale-95 ${
-                  category.is_active === false
-                    ? "bg-surface-raised opacity-60 grayscale"
-                    : "bg-surface-card"
-                }`}
-              >
-                <div className="text-2xl transition-transform group-hover:scale-110">
-                  <CategoryAvatar
-                    category={{
-                      ...category,
-                      contextTag: category.context_tag,
-                    }}
-                    size="lg"
-                    shape="circle"
-                  />
-                </div>
-                <div className="min-w-0 w-full">
-                  <h3 className="truncate text-sm font-semibold text-on">
-                    {categoryLabel(t, category.code, category.name)}
-                  </h3>
-                  {category.items_count != null && (
-                    // The count was the only thing on the card that knew where
-                    // its products are, and it was not a way to get to them.
-                    <Link
-                      to={`/inventory/items?category_id=${category.id}`}
-                      className="mt-0.5 inline-flex min-h-11 items-center text-xs text-on-secondary hover:underline md:min-h-0"
-                      aria-label={t("itemsCountAria", {
-                        count: category.items_count,
-                      })}
-                    >
-                      <span className="font-semibold tabular-nums text-on">
-                        {category.items_count}
-                      </span>{" "}
-                      {t("itemsCount", { count: category.items_count })}
-                    </Link>
-                  )}
-                </div>
-                {/* Always reachable: hover is not a thing on a phone, and a
+            {visibleCategories.map((category) => {
+              // One name for each of the card's buttons: the row they act on.
+              const named = {
+                name: categoryLabel(t, category.code, category.name),
+              };
+              return (
+                <article
+                  key={category.id}
+                  className={`group relative flex flex-col items-center gap-2 overflow-hidden rounded-2xl border border-border p-4 text-center shadow-sm transition-all hover:shadow-md active:scale-95 ${
+                    category.is_active === false
+                      ? "bg-surface-raised opacity-60 grayscale"
+                      : "bg-surface-card"
+                  }`}
+                >
+                  <div className="text-2xl transition-transform group-hover:scale-110">
+                    <CategoryAvatar
+                      category={{
+                        ...category,
+                        contextTag: category.context_tag,
+                      }}
+                      size="lg"
+                      shape="circle"
+                    />
+                  </div>
+                  <div className="min-w-0 w-full">
+                    <h3 className="truncate text-sm font-semibold text-on">
+                      {categoryLabel(t, category.code, category.name)}
+                    </h3>
+                    {category.items_count != null && (
+                      // The count was the only thing on the card that knew where
+                      // its products are, and it was not a way to get to them.
+                      <Link
+                        to={`/inventory/items?category_id=${category.id}`}
+                        className="mt-0.5 inline-flex min-h-11 items-center text-xs text-on-secondary hover:underline md:min-h-0"
+                        aria-label={t("itemsCountAria", {
+                          count: category.items_count,
+                        })}
+                      >
+                        <span className="font-semibold tabular-nums text-on">
+                          {category.items_count}
+                        </span>{" "}
+                        {t("itemsCount", { count: category.items_count })}
+                      </Link>
+                    )}
+                  </div>
+                  {/* Always reachable: hover is not a thing on a phone, and a
                   keyboard user needs the buttons the moment they are tabbed
                   to. On a pointer device they still fade in on hover. */}
-                {canWrite && (
-                  <div className="absolute right-1 top-1 flex gap-0.5 transition-opacity focus-within:opacity-100 group-hover:opacity-100 lg:right-2 lg:top-2 lg:opacity-0">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => {
-                        setEditingCategory(category);
-                        setIsModalOpen(true);
-                      }}
-                      className="bg-surface-card/90"
-                      aria-label={t("actions.edit", { ns: "common" })}
-                    >
-                      <Edit2 size={12} />
-                    </Button>
-                    {category.is_active === false ? (
+                  {canWrite && (
+                    <div className="absolute right-1 top-1 flex gap-0.5 transition-opacity focus-within:opacity-100 group-hover:opacity-100 lg:right-2 lg:top-2 lg:opacity-0">
                       <Button
                         size="icon"
                         variant="ghost"
                         onClick={() => {
-                          restoreMutation.mutate(category.id);
+                          setEditingCategory(category);
+                          setIsModalOpen(true);
                         }}
                         className="bg-surface-card/90"
-                        aria-label={t("actions.restore", {
-                          defaultValue: "Restore",
-                        })}
-                        title={t("actions.restore", {
-                          defaultValue: "Restore",
-                        })}
+                        aria-label={t("actions.editNamed", named)}
                       >
-                        <ArchiveRestore size={12} />
+                        <Edit2 size={12} />
                       </Button>
-                    ) : (
-                      <Button
-                        size="icon"
-                        variant="ghostDanger"
-                        onClick={async () => {
-                          // The number stands on the card beside this button, so
-                          // the confirmation is the place to say what it means:
-                          // a used category cannot be deleted at all (the backend
-                          // refuses while any product points here), an empty one
-                          // goes away for good.
-                          const count = category.items_count;
-                          // A non-zero count is the refusal already known: the
-                          // message names the repair, and an active red button
-                          // that could only answer 400 is not offered.
-                          const blocked = count != null && count > 0;
-                          const message =
-                            count == null
-                              ? t("messages.confirmDelete")
-                              : blocked
-                                ? t("messages.confirmDeleteWithCount", {
-                                    count,
-                                  })
-                                : t("messages.confirmDeleteEmpty");
-                          if (
-                            await confirm({
-                              title: t("actions.delete", { ns: "common" }),
-                              message,
-                              variant: "danger",
-                              confirmLabel: t("actions.delete", {
-                                ns: "common",
-                              }),
-                              cancelLabel: blocked
-                                ? t("actions.close", { ns: "common" })
-                                : undefined,
-                              hideConfirm: blocked,
-                            })
-                          ) {
-                            deleteMutation.mutate(category.id);
-                          }
-                        }}
-                        className="bg-surface-card/90"
-                        aria-label={t("actions.delete", { ns: "common" })}
-                        title={t("actions.delete", { ns: "common" })}
-                      >
-                        <Trash2 size={12} />
-                      </Button>
-                    )}
-                  </div>
-                )}
-              </article>
-            ))}
+                      {category.is_active === false ? (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => {
+                            restoreMutation.mutate(category.id);
+                          }}
+                          className="bg-surface-card/90"
+                          aria-label={t("actions.restoreNamed", named)}
+                          title={t("actions.restoreNamed", named)}
+                        >
+                          <ArchiveRestore size={12} />
+                        </Button>
+                      ) : (
+                        <Button
+                          size="icon"
+                          variant="ghostDanger"
+                          onClick={async () => {
+                            // The number stands on the card beside this button, so
+                            // the confirmation is the place to say what it means:
+                            // a used category cannot be deleted at all (the backend
+                            // refuses while any product points here), an empty one
+                            // goes away for good.
+                            const count = category.items_count;
+                            // A non-zero count is the refusal already known: the
+                            // message names the repair, and an active red button
+                            // that could only answer 400 is not offered.
+                            const blocked = count != null && count > 0;
+                            const message =
+                              count == null
+                                ? t("messages.confirmDelete")
+                                : blocked
+                                  ? t("messages.confirmDeleteWithCount", {
+                                      count,
+                                    })
+                                  : t("messages.confirmDeleteEmpty");
+                            if (
+                              await confirm({
+                                title: t("actions.delete", { ns: "common" }),
+                                message,
+                                variant: "danger",
+                                confirmLabel: t("actions.delete", {
+                                  ns: "common",
+                                }),
+                                cancelLabel: blocked
+                                  ? t("actions.close", { ns: "common" })
+                                  : undefined,
+                                hideConfirm: blocked,
+                              })
+                            ) {
+                              deleteMutation.mutate(category.id);
+                            }
+                          }}
+                          className="bg-surface-card/90"
+                          aria-label={t("actions.deleteNamed", named)}
+                          title={t("actions.deleteNamed", named)}
+                        >
+                          <Trash2 size={12} />
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </article>
+              );
+            })}
           </div>
         </>
       ) : (

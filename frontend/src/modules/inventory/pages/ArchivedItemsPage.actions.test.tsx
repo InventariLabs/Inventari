@@ -99,7 +99,7 @@ describe("ArchivedItemsPage — restore and purge go through their dialogs", () 
     const user = userEvent.setup();
     renderPage();
 
-    await user.click(screen.getAllByRole("button", { name: "Restore" })[1]!);
+    await user.click(screen.getAllByRole("button", { name: /^Restore / })[1]!);
     const dialog = await screen.findByRole("alertdialog");
     expect(within(dialog).getByText("Milk")).toBeInTheDocument();
     expect(mocks.restore).not.toHaveBeenCalled();
@@ -117,7 +117,7 @@ describe("ArchivedItemsPage — restore and purge go through their dialogs", () 
     const user = userEvent.setup();
     renderPage();
 
-    await user.click(screen.getAllByRole("button", { name: "Restore" })[0]!);
+    await user.click(screen.getAllByRole("button", { name: /^Restore / })[0]!);
     const dialog = await screen.findByRole("alertdialog");
     await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
 
@@ -130,7 +130,7 @@ describe("ArchivedItemsPage — restore and purge go through their dialogs", () 
     renderPage();
 
     await user.click(
-      screen.getAllByRole("button", { name: "Delete permanently" })[0]!,
+      screen.getAllByRole("button", { name: /^Delete .* permanently$/ })[0]!,
     );
     const dialog = await screen.findByRole("alertdialog");
     await user.type(
@@ -151,7 +151,7 @@ describe("ArchivedItemsPage — restore and purge go through their dialogs", () 
 
     // The next purge starts from an empty reason, not the last one's.
     await user.click(
-      screen.getAllByRole("button", { name: "Delete permanently" })[1]!,
+      screen.getAllByRole("button", { name: /^Delete .* permanently$/ })[1]!,
     );
     expect(
       within(await screen.findByRole("alertdialog")).getByLabelText(
@@ -165,7 +165,7 @@ describe("ArchivedItemsPage — restore and purge go through their dialogs", () 
     renderPage();
 
     await user.click(
-      screen.getAllByRole("button", { name: "Delete permanently" })[0]!,
+      screen.getAllByRole("button", { name: /^Delete .* permanently$/ })[0]!,
     );
     let dialog = await screen.findByRole("alertdialog");
     await user.type(
@@ -175,7 +175,7 @@ describe("ArchivedItemsPage — restore and purge go through their dialogs", () 
     await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
 
     await user.click(
-      screen.getAllByRole("button", { name: "Delete permanently" })[1]!,
+      screen.getAllByRole("button", { name: /^Delete .* permanently$/ })[1]!,
     );
     dialog = await screen.findByRole("alertdialog");
     const reason = within(dialog).getByLabelText(

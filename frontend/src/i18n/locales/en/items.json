@@ -119,7 +119,11 @@
     "selectItems": "Select products",
     "select": "Select {{name}}",
     "addOneUnit": "Add 1 unit",
-    "consume": "Remove"
+    "consume": "Remove",
+    "consume1unitFor": "Remove 1 unit of {{name}}",
+    "addOneUnitFor": "Add 1 unit to {{name}}",
+    "editFor": "Edit {{name}}",
+    "deleteFor": "Delete {{name}}"
   },
   "import": {
     "pleaseWait": "Please wait while we process your products.",
@@ -533,5 +537,7 @@
     "fefoHelp": "FEFO: what expires first leaves first, whenever it came in.",
     "sharedProduct": "This product comes from the shared catalogue, so the order its stock leaves in is the catalogue's and cannot be changed here."
   },
-  "addStorage": "Add new location"
+  "addStorage": "Add new location",
+  "restoreItemNamed": "Restore {{name}}",
+  "purgeItemNamed": "Delete {{name}} permanently"
 }

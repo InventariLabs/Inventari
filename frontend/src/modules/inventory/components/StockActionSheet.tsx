@@ -88,6 +88,14 @@ function StockItemRow({
 }: StockItemRowProps) {
   const { t } = useTranslation(["labels", "common", "items"]);
   const [asking, setAsking] = useState(false);
+  // Records of one product on one shelf differ by batch and expiry, so the
+  // buttons' names end with them after the location.
+  const where = item.location_path || item.location;
+  const apart = [
+    item.lot && t("stockActions.lotLabel", { lot: item.lot }),
+    item.expiry_date && formatDate(item.expiry_date),
+  ].filter(Boolean);
+  const place = apart.length ? `${where} (${apart.join(", ")})` : where;
   return (
     <div className="bg-surface-card px-3 py-2.5 rounded-xl border border-border shadow-sm flex flex-wrap items-center justify-between gap-3">
       <div className="min-w-[12rem] flex-1">
@@ -168,7 +176,7 @@ function StockItemRow({
           <Button
             type="button"
             onClick={() => onConsume(item.id)}
-            aria-label={t("stockActions.consume1Title")}
+            aria-label={t("stockActions.consume1Named", { location: place })}
             variant="ghost"
             size="icon"
             className="rounded-md md:h-11 md:w-11 text-on-muted hover:bg-red-50 hover:text-red-500"
@@ -183,7 +191,7 @@ function StockItemRow({
           <Button
             type="button"
             onClick={() => onAddOne(item.id)}
-            aria-label={t("stockActions.add1Title")}
+            aria-label={t("stockActions.add1Named", { location: place })}
             variant="ghost"
             size="icon"
             className="rounded-md md:h-11 md:w-11 text-on-muted hover:bg-primary-50 hover:text-primary-600"

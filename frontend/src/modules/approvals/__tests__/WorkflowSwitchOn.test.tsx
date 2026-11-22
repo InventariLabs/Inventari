@@ -138,7 +138,7 @@ describe("Switching a workflow on", () => {
     );
     renderPage();
 
-    await user.click(await screen.findByRole("button", { name: "Activate" }));
+    await user.click(await screen.findByRole("button", { name: /^Activate / }));
 
     const dialog = await screen.findByRole("alertdialog");
     expect(
@@ -184,7 +184,7 @@ describe("Switching a workflow on", () => {
       ),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Activate" }));
+    await user.click(screen.getByRole("button", { name: /^Activate / }));
     const dialog = await screen.findByRole("alertdialog");
     expect(
       await within(dialog).findByText(
@@ -220,7 +220,7 @@ describe("Switching a workflow on", () => {
     );
     renderPage();
 
-    await user.click(await screen.findByRole("button", { name: "Activate" }));
+    await user.click(await screen.findByRole("button", { name: /^Activate / }));
     const dialog = await screen.findByRole("alertdialog");
     await within(dialog).findByText(
       "From now on, these will wait for approval: documents of type Goods Issue.",
@@ -255,7 +255,7 @@ describe("Switching a workflow on", () => {
     );
     renderPage();
 
-    await user.click(await screen.findByRole("button", { name: "Activate" }));
+    await user.click(await screen.findByRole("button", { name: /^Activate / }));
     const dialog = await screen.findByRole("alertdialog");
     await user.click(within(dialog).getByRole("button", { name: /cancel/i }));
 

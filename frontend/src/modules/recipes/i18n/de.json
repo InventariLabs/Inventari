@@ -80,7 +80,9 @@
     "unknown_inline_one": "Nicht mit Lager verknüpft: {{count}}",
     "unknown_inline_other": "Nicht mit Lager verknüpft: {{count}}",
     "incomparable": "Nicht vergleichbar",
-    "incomparable_tooltip": "Im Regal, aber die Maßeinheit des Rezepts und die des Lagerbestands passen nicht zusammen — niemand kann sagen, ob es reicht."
+    "incomparable_tooltip": "Im Regal, aber die Maßeinheit des Rezepts und die des Lagerbestands passen nicht zusammen — niemand kann sagen, ob es reicht.",
+    "not_comparable_fix_named": "Gewicht oder Volumen pro Stück eintragen: {{name}}",
+    "link_to_product_for": "Mit Produkt verknüpfen: {{name}}"
   },
   "linking": {
     "title": "Zutaten ohne Produkt",
@@ -351,7 +353,6 @@
   },
   "tags_manager": {
     "title": "Tags",
-    "set_color": "Farbe setzen",
     "clear_color": "Farbe entfernen",
     "merge_title": "Tags zusammenführen",
     "merge_from": "Tag ersetzen",
@@ -382,7 +383,9 @@
     "delete_confirm_message": "„{{name}}“ wird aus jedem Rezept entfernt, das ihn trägt. Die Rezepte bleiben.",
     "delete_success_one": "Gelöscht: 1 Rezept aktualisiert",
     "delete_success_other": "Gelöscht: {{count}} Rezepte aktualisiert",
-    "delete_failed": "Tag konnte nicht gelöscht werden"
+    "delete_failed": "Tag konnte nicht gelöscht werden",
+    "set_color_for": "Farbe setzen für {{name}}",
+    "more_for": "Weitere Aktionen für {{name}}"
   },
   "import_export": {
     "export_json": "JSON herunterladen",
@@ -725,7 +728,8 @@
     "back_to_plans": "Zurück zu den Essensplänen",
     "cook_now_named": "Jetzt kochen: {{recipe}}",
     "remove_entry_named": "{{recipe}} aus dem Plan entfernen",
-    "drag_to_move_named": "Zum Verschieben ziehen: {{recipe}}"
+    "drag_to_move_named": "Zum Verschieben ziehen: {{recipe}}",
+    "delete_plan_for": "Plan {{name}} löschen"
   },
   "cooking": {
     "rateSession_one": "Sitzung mit {{count}} Stern bewerten",
@@ -767,8 +771,6 @@
   },
   "bulk": {
     "select_mode": "Rezepte auswählen",
-    "select": "Auswählen",
-    "deselect": "Abwählen",
     "select_all": "Alle auswählen",
     "deselect_all": "Alle abwählen",
     "selected_count": "{{count}} ausgewählt",
@@ -796,7 +798,9 @@
     "deleted_one": "{{count}} Rezept gelöscht",
     "deleted_other": "{{count}} Rezepte gelöscht",
     "toolbar_label_one": "{{count}} Rezept ausgewählt",
-    "toolbar_label_other": "{{count}} Rezepte ausgewählt"
+    "toolbar_label_other": "{{count}} Rezepte ausgewählt",
+    "select_for": "{{name}} auswählen",
+    "deselect_for": "Auswahl von {{name}} aufheben"
   },
   "collections": {
     "load_failed": "Die Sammlungen konnten nicht geladen werden.",
@@ -816,7 +820,9 @@
     "add_one": "Hinzufügen",
     "added_one": "Hinzugefügt",
     "add_none": "Nichts hinzuzufügen — erstelle zuerst ein Rezept",
-    "add_no_match": "Keine Rezepte entsprechen Ihrer Suche"
+    "add_no_match": "Keine Rezepte entsprechen Ihrer Suche",
+    "rename_for": "{{name}} umbenennen",
+    "delete_for": "Sammlung {{name}} löschen"
   },
   "cookForStock": {
     "button": "Für den Vorrat kochen",
