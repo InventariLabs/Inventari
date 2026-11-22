@@ -10,7 +10,9 @@ import { ean13Modules, qrModules } from '../helpers/barcode';
  * Chromium alone. This replaces `navigator.mediaDevices.getUserMedia` with the
  * `captureStream()` of a canvas, so the same spec runs in every project the
  * config has — the iPhone ones included — and can take the code out of view
- * in the middle of a run.
+ * in the middle of a run. Reads are measured in Chromium only (see
+ * scan-camera.spec.ts): Linux WebKit's video now and then stops after its
+ * first frame on a loaded runner.
  *
  * The page sees a real MediaStream. The fixture counts the streams it handed
  * out and how many of them were released, and the scan lookups the app sent.

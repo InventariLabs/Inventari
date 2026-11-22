@@ -10,6 +10,21 @@ const UNKNOWN_EAN = "5901234123457";
 // the reader's crop is computed for.
 test.use({ viewport: { width: 390, height: 844 } });
 
+/**
+ * A test that waits for the reader to read a code runs in Chromium, at the
+ * phone's viewport above, and not in the `mobile` project. That project's
+ * WebKit is the Linux build, whose media pipeline is not the iPhone's: on a
+ * loaded runner the video the reader plays there stops after its first
+ * frame now and then, the reader never sees the code, and the test waits
+ * out its timeout to pass on a retry. What the reads check — one read per
+ * presence, the camera given back with its panel — is the app's own
+ * script, the same in every engine, and its unit tests cover it too. In
+ * WebKit this file keeps what needs no read: the page fits the screen, the
+ * aiming frame follows a turn, and a blank frame reads nothing.
+ */
+const NO_READS_IN_WEBKIT =
+  "camera reads are measured in Chromium; Linux WebKit stalls the fake camera's video";
+
 async function openCamera(page: import("@playwright/test").Page) {
   // A phone starts the camera by itself; a desktop waits for the button.
   // The page is the first this test loads, so it gets the 15 s every other
@@ -40,7 +55,9 @@ test.describe("Scan — fake camera", () => {
   test("reads an EAN-13 held in front of the camera", async ({
     page,
     camera,
+    browserName,
   }) => {
+    test.skip(browserName === "webkit", NO_READS_IN_WEBKIT);
     await openCamera(page);
     await camera.showEan13(UNKNOWN_EAN);
     await expect
@@ -51,7 +68,9 @@ test.describe("Scan — fake camera", () => {
   test("reads a QR code held in front of the camera", async ({
     page,
     camera,
+    browserName,
   }) => {
+    test.skip(browserName === "webkit", NO_READS_IN_WEBKIT);
     await openCamera(page);
     await camera.showQr(labelShortCode);
     // A QR is a denser matrix than an EAN-13, read by a reader that has only
@@ -110,7 +129,9 @@ test.describe("Scan — fake camera", () => {
   test("leaving the scan page after a read releases the camera", async ({
     page,
     camera,
+    browserName,
   }) => {
+    test.skip(browserName === "webkit", NO_READS_IN_WEBKIT);
     await openCamera(page);
     await camera.showEan13(UNKNOWN_EAN);
     await expect
@@ -137,7 +158,12 @@ test.describe("Scan — fake camera", () => {
     expect(camera.scanRequests()).toEqual([UNKNOWN_EAN]);
   });
 
-  test("a code held in view is looked up once", async ({ page, camera }) => {
+  test("a code held in view is looked up once", async ({
+    page,
+    camera,
+    browserName,
+  }) => {
+    test.skip(browserName === "webkit", NO_READS_IN_WEBKIT);
     await openCamera(page);
     await camera.showEan13(UNKNOWN_EAN);
     await expect
@@ -156,6 +182,8 @@ test.describe("Scan — fake camera", () => {
  * an internal error"). Nothing a user does looks like that.
  */
 test.describe("Scan — fake camera on the document scan page", () => {
+  test.skip(({ browserName }) => browserName === "webkit", NO_READS_IN_WEBKIT);
+
   // `camera` installs the fake before the first navigation.
   test.beforeEach(async ({ page, camera: _camera }) => {
     await page.goto("/warehouse/scan");
@@ -220,6 +248,8 @@ function uniqueEan13(): string {
 const PRODUCT_EAN = uniqueEan13();
 
 test.describe("Scan — one read per presence on the forms", () => {
+  test.skip(({ browserName }) => browserName === "webkit", NO_READS_IN_WEBKIT);
+
   let api: ApiHelper;
   let token: string;
   let storageCode: string;
@@ -495,6 +525,8 @@ test.describe("Scan — one read per presence on the forms", () => {
 });
 
 test.describe("Scan — execution reads one presence", () => {
+  test.skip(({ browserName }) => browserName === "webkit", NO_READS_IN_WEBKIT);
+
   let api: ApiHelper;
   let token: string;
   let locationId: string;
