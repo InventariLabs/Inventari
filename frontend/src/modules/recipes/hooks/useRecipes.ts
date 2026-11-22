@@ -47,12 +47,17 @@ export function useRecipe(id: string | undefined) {
   });
 }
 
-/** The plan meals that hold a recipe — read only while a delete is being asked. */
+/**
+ * The plan meals that hold a recipe — read only while a delete is being asked,
+ * and read again each time: no plan change invalidates it, and a cached
+ * answer would name the meals the recipe held when it was last asked about.
+ */
 export function useRecipePlannedMeals(id: string | undefined, open: boolean) {
   return useQuery({
     queryKey: queryKeys.recipes.planned(id!),
     queryFn: () => recipesApi.getPlannedMeals(id!),
     enabled: !!id && open,
+    staleTime: 0,
   });
 }
 

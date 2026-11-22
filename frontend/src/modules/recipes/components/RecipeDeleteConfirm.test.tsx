@@ -69,6 +69,17 @@ describe("RecipeDeleteConfirm", () => {
     );
   });
 
+  it("does not state an answer that is being re-read as the unplanned one", () => {
+    mocks.useRecipePlannedMeals.mockReturnValue({
+      data: [],
+      isFetching: true,
+    });
+    open();
+    expect(screen.getByRole("alertdialog").textContent).toContain(
+      "Meal plans that include a deleted recipe lose those meals",
+    );
+  });
+
   it("deletes on confirm", () => {
     mocks.useRecipePlannedMeals.mockReturnValue({ data: [] });
     const onConfirm = open();

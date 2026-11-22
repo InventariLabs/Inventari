@@ -35,7 +35,10 @@ export function RecipeDeleteConfirm({
 }: RecipeDeleteConfirmProps) {
   const { t } = useTranslation("recipes");
   const planned = useRecipePlannedMeals(recipeId ?? undefined, !!recipeId);
-  const meals: RecipePlannedMeal[] | undefined = planned.data;
+  // A cached answer is shown only once the re-read it triggers has landed.
+  const meals: RecipePlannedMeal[] | undefined = planned.isFetching
+    ? undefined
+    : planned.data;
 
   const message = !meals
     ? t("actions.delete_confirm", { name })
