@@ -74,6 +74,7 @@ def _bad_strings(node: dict[str, Any]) -> Iterator[Any]:
 def _bad_numbers(node: dict[str, Any]) -> Iterator[Any]:
     yield 'abc'
     yield {}
+    yield True
     for bound, step in (
         ('minimum', -1),
         ('exclusiveMinimum', -1),

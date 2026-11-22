@@ -16,14 +16,17 @@ _SKU_RE = re.compile(r'^[A-Z0-9][A-Z0-9\-_/]{0,49}$')
 
 
 def decimal_from_int_float(v: Any) -> Any:
-    """Convert int/float to Decimal; pass None and str through unchanged.
+    """Convert int/float to Decimal; pass None, str and a bool through unchanged.
+
+    A bool is an ``int`` to Python but not a number in a JSON body: it is
+    handed back so the field's own type check refuses it.
 
     Suitable as a Pydantic ``BeforeValidator`` or inline in a
     ``@field_validator``.
     """
     if v is None:
         return v
-    if isinstance(v, (int, float)):
+    if isinstance(v, (int, float)) and not isinstance(v, bool):
         return Decimal(str(v))
     return v
 
