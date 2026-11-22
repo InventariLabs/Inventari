@@ -48,7 +48,7 @@ describe("ReturnFormModal", () => {
   it("writes the quantity limit with the reader's decimal mark", async () => {
     await act(() => i18n.changeLanguage("pl"));
     const document = buildDocument("OUT");
-    (document.lines[0] as { done_quantity: number }).done_quantity = 2.5;
+    document.lines[0].done_quantity = "2.5";
 
     render(<ReturnFormModal document={document} onClose={vi.fn()} />);
 
