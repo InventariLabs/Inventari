@@ -652,6 +652,58 @@ class TestStorageItems:
             'On the shelf',
         }
 
+    def test_items_search_scoped_to_a_place_can_include_what_is_below_it(
+        self, client, auth_headers, db_session, test_user, test_storage_type
+    ):
+        """GET /items with location_id and include_inside reads the subtree."""
+        from app.models.item import Item
+        from app.models.storage_location import StorageLocation
+
+        def place(name, parent=None):
+            row = StorageLocation(
+                organization_id=test_user.organization_id,
+                created_by=test_user.id,
+                storage_type_id=test_storage_type.id,
+                name=name,
+                parent_id=parent.id if parent else None,
+            )
+            db_session.add(row)
+            db_session.flush()
+            return row
+
+        zone = place('Zone')
+        dock = place('Dock', zone)
+        sibling = place('Sibling zone')
+        for where, name in (
+            (zone, 'Bolt on the zone'),
+            (dock, 'Bolt on the dock'),
+            (sibling, 'Bolt next door'),
+        ):
+            db_session.add(
+                Item(
+                    organization_id=test_user.organization_id,
+                    storage_location_id=where.id,
+                    name=name,
+                    quantity=1,
+                )
+            )
+        db_session.commit()
+
+        own = client.get(
+            f'/api/v1/items?search=Bolt&location_id={zone.id}', headers=auth_headers
+        )
+        inside = client.get(
+            f'/api/v1/items?search=Bolt&location_id={zone.id}&include_inside=true',
+            headers=auth_headers,
+        )
+
+        assert [i['name'] for i in own.json()['items']] == ['Bolt on the zone']
+        assert {i['name'] for i in inside.json()['items']} == {
+            'Bolt on the zone',
+            'Bolt on the dock',
+        }
+        assert inside.json()['total'] == 2
+
     def test_include_inside_pages_in_the_database(
         self, client, auth_headers, db_session, test_user, test_storage_type
     ):
