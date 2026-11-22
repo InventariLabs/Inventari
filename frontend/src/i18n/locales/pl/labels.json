@@ -165,8 +165,8 @@
     "save": "Zapisz",
     "markOpened": "Oznacz jako otwarte",
     "finished": "Skończone",
-    "consume1Named": "Zdejmij 1 z: {{place}}",
-    "add1Named": "Dodaj 1 do: {{place}}"
+    "consume1Named": "Zdejmij 1 z: {{location}}",
+    "add1Named": "Dodaj 1 do: {{location}}"
   },
   "assignLabel": "Przypisz etykietę",
   "attachToItem": {

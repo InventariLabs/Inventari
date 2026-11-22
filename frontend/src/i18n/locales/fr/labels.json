@@ -157,8 +157,8 @@
     "save": "Enregistrer",
     "markOpened": "Marquer comme ouvert",
     "finished": "Terminé",
-    "consume1Named": "Retirer 1 de {{place}}",
-    "add1Named": "Ajouter 1 à {{place}}"
+    "consume1Named": "Retirer 1 de {{location}}",
+    "add1Named": "Ajouter 1 à {{location}}"
   },
   "assignLabel": "Attribuer l'étiquette",
   "attachToItem": {

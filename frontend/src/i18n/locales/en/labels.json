@@ -157,8 +157,8 @@
     "save": "Save",
     "markOpened": "Mark as opened",
     "finished": "Finished",
-    "consume1Named": "Remove 1 from {{place}}",
-    "add1Named": "Add 1 to {{place}}"
+    "consume1Named": "Remove 1 from {{location}}",
+    "add1Named": "Add 1 to {{location}}"
   },
   "assignLabel": "Assign label",
   "attachToItem": {

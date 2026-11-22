@@ -157,8 +157,8 @@
     "save": "Speichern",
     "markOpened": "Als geöffnet markieren",
     "finished": "Aufgebraucht",
-    "consume1Named": "1 aus {{place}} entfernen",
-    "add1Named": "1 zu {{place}} hinzufügen"
+    "consume1Named": "1 aus {{location}} entfernen",
+    "add1Named": "1 zu {{location}} hinzufügen"
   },
   "assignLabel": "Etikett zuweisen",
   "attachToItem": {

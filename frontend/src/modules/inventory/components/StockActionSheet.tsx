@@ -169,7 +169,7 @@ function StockItemRow({
           <Button
             type="button"
             onClick={() => onConsume(item.id)}
-            aria-label={t("stockActions.consume1Named", { place })}
+            aria-label={t("stockActions.consume1Named", { location: place })}
             variant="ghost"
             size="icon"
             className="rounded-md md:h-11 md:w-11 text-on-muted hover:bg-red-50 hover:text-red-500"
@@ -184,7 +184,7 @@ function StockItemRow({
           <Button
             type="button"
             onClick={() => onAddOne(item.id)}
-            aria-label={t("stockActions.add1Named", { place })}
+            aria-label={t("stockActions.add1Named", { location: place })}
             variant="ghost"
             size="icon"
             className="rounded-md md:h-11 md:w-11 text-on-muted hover:bg-primary-50 hover:text-primary-600"
