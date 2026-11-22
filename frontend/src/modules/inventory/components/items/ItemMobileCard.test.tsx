@@ -550,19 +550,20 @@ describe("ItemMobileCard — an account that cannot write", () => {
     expect(screen.getByText("3")).toBeInTheDocument();
   });
 
-  it("still opens the actions sheet, the only way from the list to the product page, and offers no consume", async () => {
+  it("offers no actions sheet and no consume — the card itself opens the product page", async () => {
     const props = baseProps();
     render(<ItemMobileCard item={makeItem()} {...props} canWrite={false} />);
 
     expect(
       screen.queryByRole("button", { name: /consume/i }),
     ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /product actions/i }),
+    ).not.toBeInTheDocument();
     await userEvent.click(
-      screen.getByRole("button", {
-        name: "Product actions: Rack 42U Open Frame",
-      }),
+      screen.getByRole("heading", { name: "Rack 42U Open Frame" }),
     );
-    expect(props.onOpenActions).toHaveBeenCalledTimes(1);
+    expect(props.onItemClick).toHaveBeenCalledTimes(1);
   });
 });
 

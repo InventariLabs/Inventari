@@ -326,16 +326,31 @@ async def _default_period_start(db: AsyncSession, org_id: UUID, date_to: date) -
     first day with a known evening before it: the day after the ledger's
     first movement, on the organization's calendar. An organization in its
     first month is shown a statement at once instead of a refusal to be
-    argued with by hand. A ledger that begins on *date_to* itself leaves no
-    such day; the period then stays one day long and the refusal that
-    follows names the boundary.
+    argued with by hand. A ledger that begins on *date_to* itself, or later,
+    leaves no such day; the refusal then names the ledger's first day and
+    the day the first statement can open on, not an evening nobody asked
+    about.
     """
     first = date_to.replace(day=1)
     starts_at = await ledger_starts_at_async(db, org_id)
     if starts_at is not None:
         zone = await core_api.organizations.timezone_async(db, org_id)
-        first = max(first, starts_at.astimezone(zone).date() + timedelta(days=1))
-    return min(first, date_to)
+        started_on = starts_at.astimezone(zone)
+        first = max(first, started_on.date() + timedelta(days=1))
+        if first > date_to:
+            lang = get_current_lang()
+            organization = await core_api.organizations.get_async(db, org_id)
+            country = organization.country if organization else None
+            raise catalogue_refusal(
+                'stock_value_first_day',
+                starts_at=format_date_for(lang, started_on, country=country),
+                first_day=format_date_for(
+                    lang,
+                    datetime.combine(first, time.min, tzinfo=zone),
+                    country=country,
+                ),
+            )
+    return first
 
 
 async def _build_value_movement(

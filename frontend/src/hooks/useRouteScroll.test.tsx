@@ -128,6 +128,36 @@ describe("useRouteScroll", () => {
     await waitFor(() => expect(scrollTo).toHaveBeenCalledWith(0, 900));
   });
 
+  it("holds the position while the page settles after first reaching it", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={["/list"]}>
+        <Shell />
+      </MemoryRouter>,
+    );
+    setScroll(900);
+    await user.click(screen.getByRole("link", { name: "detail" }));
+    await waitFor(() => expect(scrollTo).toHaveBeenCalledWith(0, 0));
+    setScroll(0);
+
+    await act(async () => {
+      await user.click(screen.getByRole("button", { name: "back" }));
+    });
+    await waitFor(() => expect(scrollTo).toHaveBeenCalledWith(0, 900));
+    scrollTo.mockClear();
+
+    // The screen that was left still had its header in the shell when the
+    // position was reached; the list's own, 52 px lower, replaces it, and the
+    // browser moves the view with the content above it.
+    Object.defineProperty(document.documentElement, "scrollHeight", {
+      value: 4948,
+      configurable: true,
+    });
+    setScroll(848);
+
+    await waitFor(() => expect(scrollTo).toHaveBeenCalledWith(0, 900));
+  });
+
   it("does not pull a reader back once they have touched the page", async () => {
     const user = userEvent.setup();
     render(

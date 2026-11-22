@@ -183,3 +183,23 @@ class TestThePeriodOpensOnADayItCanReport:
             'value_movement_2026-01-10_2026-01-11'
             in response.headers['content-disposition']
         )
+
+    async def test_on_the_ledgers_first_day_the_refusal_names_when_a_statement_can_open(
+        self, real_async_client: AsyncClient, real_async_db_session: AsyncSession
+    ) -> None:
+        _, headers = await _books(real_async_db_session, earlier=False)
+
+        response = await real_async_client.get(
+            '/api/v1/stock-value-movement',
+            params={'date_to': '2026-01-11', 'lang': 'en'},
+            headers=headers,
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
+        message = str(response.json()['detail'])
+        # The ledger began on the 11th, so the first statement can open on
+        # the 12th; the evening before the 11th, which nobody asked for, is
+        # not mentioned.
+        assert 'starts on Jan 11, 2026' in message
+        assert 'start on Jan 12, 2026' in message
+        assert 'Jan 10' not in message

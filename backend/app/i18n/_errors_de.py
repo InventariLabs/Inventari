@@ -85,6 +85,11 @@ ERRORS_DE: ErrorMessages = {
         'die ein Ausdruck fasst. Exportieren Sie ihn als Tabelle oder wählen '
         'Sie einen Lagerort, um ihn einzugrenzen.'
     ),
+    'stock_value_first_day': (
+        'Das Bewegungsjournal beginnt am {starts_at}. Eine Aufstellung '
+        'braucht einen bekannten Abend als Anfang, die erste kann daher '
+        'am {first_day} beginnen.'
+    ),
     'stock_value_period_reversed': (
         'Der Zeitraum endet vor seinem Beginn. Wählen Sie ein Enddatum, das nicht vor dem Startdatum liegt.'
     ),

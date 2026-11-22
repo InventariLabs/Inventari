@@ -2,17 +2,11 @@ import { isVirtualUsage } from "@/modules/shared/lib/storageUsage";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Edit2 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useAllCategories } from "@/modules/shared/hooks/useCategories";
 import { useLocationsById } from "@/module-sdk";
-import { ConsumeDialog } from "@/modules/inventory/components/ConsumeDialog";
-import { DeleteReasonDialog } from "@/modules/inventory/components/DeleteReasonDialog";
-import { MoveItemModal } from "@/modules/inventory/components/MoveItemModal";
-import { QuickActionGrid } from "@/modules/inventory/components/QuickActionGrid";
 import { TypedSlot } from "@/components/Slot";
 import ItemDetailOverview from "@/modules/inventory/components/items/ItemDetailOverview";
 import ItemHistoryTimeline from "@/modules/inventory/components/items/ItemHistoryTimeline";
@@ -20,7 +14,7 @@ import { RecentStockMoves } from "@/modules/inventory/components/moves/RecentSto
 import { recordsMovements } from "@/modules/inventory/constants/movementModules";
 import { useEnabledModulesOptional } from "@/contexts/ModulesContext";
 import ItemEditModal from "@/modules/inventory/components/ItemEditModal";
-import { useItemQuickActions } from "@/modules/inventory/hooks/useItemQuickActions";
+import { ItemDetailActions } from "@/modules/inventory/components/items/ItemDetailActions";
 import type { Item } from "@/types";
 
 type Tab = "overview" | "history" | "moves";
@@ -28,8 +22,8 @@ type Tab = "overview" | "history" | "moves";
 /**
  * The record, once it is known to exist.
  *
- * Split off the page so the quick actions can be a hook: they need an item,
- * and a hook cannot wait for one to load.
+ * Split off the page so the header's actions can be given an item: they need
+ * one, and a hook cannot wait for one to load.
  *
  * Three tabs, the third being the movement ledger. "Stock movements have no
  * source of their own" would hold only if the sole history were this
@@ -51,7 +45,6 @@ export default function ItemDetailContent({ item }: { item: Item }) {
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("overview");
   const [editing, setEditing] = useState(false);
-  const [moving, setMoving] = useState(false);
 
   // Naming reads the record's own place by id, whatever the pickers are
   // scoped to: a record the reader consumed to zero sits in the system's
@@ -69,32 +62,32 @@ export default function ItemDetailContent({ item }: { item: Item }) {
   const showMoves =
     Boolean(item.template_id) && recordsMovements(enabledModules);
   const locationName = places.get(item.location_id)?.name;
+  const inVirtualPlace = isVirtualUsage(places.get(item.location_id)?.usage);
+  // An asset is returned and disposed of, a product topped up and deleted:
+  // the header's words switch with the category, and the note says why —
+  // to an account offered the actions at all.
+  const vocabularyNote =
+    canWrite && item.category?.context_tag === "equipment"
+      ? t("items:quickActions.equipmentNote")
+      : null;
 
-  const { actions, vocabularyNote, deleteDialog, consumeDialog } =
-    useItemQuickActions(item, {
-      onDone: () => {},
-      onMove: () => setMoving(true),
-      // The address stops resolving the moment the record goes.
-      onDeleted: () => navigate("/inventory/items"),
-      inVirtualPlace: isVirtualUsage(places.get(item.location_id)?.usage),
-    });
-
+  // Every action writes, so an account that cannot write is offered none.
   useEffect(() => {
     setHeader({
       title: item.name,
       backTo: "/inventory/items",
       actions: canWrite ? (
-        <Button
-          variant="outline"
-          onClick={() => setEditing(true)}
-          leftIcon={<Edit2 size={16} />}
-        >
-          {t("common:actions.edit")}
-        </Button>
+        <ItemDetailActions
+          item={item}
+          inVirtualPlace={inVirtualPlace}
+          onEdit={() => setEditing(true)}
+          // The address stops resolving the moment the record goes.
+          onDeleted={() => navigate("/inventory/items")}
+        />
       ) : undefined,
     });
     return () => setHeader({});
-  }, [item, setHeader, t, canWrite]);
+  }, [item, setHeader, canWrite, inVirtualPlace, navigate]);
 
   return (
     <div className="space-y-6">
@@ -122,13 +115,9 @@ export default function ItemDetailContent({ item }: { item: Item }) {
             storages={storages}
             categories={categories}
           />
-          {/* The same actions the sheet over the list offers. Without these
-              the shortcut could do more to the record than the record's own
-              address could, and the page's only verb was "Edit". */}
           {vocabularyNote && (
             <p className="text-sm text-on-muted">{vocabularyNote}</p>
           )}
-          <QuickActionGrid actions={actions} layout="inline" />
         </>
       ) : tab === "history" ? (
         <ItemHistoryTimeline itemId={item.id} unit={item.uom} />
@@ -159,30 +148,6 @@ export default function ItemDetailContent({ item }: { item: Item }) {
       {editing && (
         <ItemEditModal itemId={item.id} onClose={() => setEditing(false)} />
       )}
-
-      {moving && (
-        <MoveItemModal
-          item={item}
-          onClose={() => setMoving(false)}
-          onSuccess={() => setMoving(false)}
-        />
-      )}
-
-      <ConsumeDialog
-        key={consumeDialog.item?.id ?? "closed"}
-        open={consumeDialog.item !== null}
-        item={consumeDialog.item}
-        onConfirm={consumeDialog.onConfirm}
-        onCancel={consumeDialog.onCancel}
-      />
-
-      <DeleteReasonDialog
-        key={String(deleteDialog.open)}
-        open={deleteDialog.open}
-        itemName={item.name}
-        onConfirm={deleteDialog.onConfirm}
-        onCancel={deleteDialog.onCancel}
-      />
     </div>
   );
 }

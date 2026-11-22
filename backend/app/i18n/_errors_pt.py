@@ -647,6 +647,11 @@ ERRORS_PT: dict[str, str] = {
     'stock_as_of_no_history': 'Nada foi movimentado ainda, então não há histórico para consultar. Os níveis de estoque de hoje são a única resposta possível.',
     'stock_as_of_before_ledger': 'O registro de movimentações começa em {starts_at}. Nada é conhecido antes disso — nem mesmo zero — então um relatório de {as_of} seria um palpite.',
     'stock_as_of_pdf_too_many': 'O relatório tem {total} produtos — mais do que as {limit} linhas que cabem em uma impressão. Exporte-o como planilha ou escolha um local para restringi-lo.',
+    'stock_value_first_day': (
+        'O registro de movimentações começa em {starts_at}. Uma demonstração precisa '
+        'abrir numa noite conhecida, então a primeira pode começar em '
+        '{first_day}.'
+    ),
     'stock_value_period_reversed': (
         'O período termina antes de começar. Escolha uma data final que não seja anterior à data inicial.'
     ),

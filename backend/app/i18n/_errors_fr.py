@@ -81,6 +81,11 @@ ERRORS_FR: ErrorMessages = {
         'qu’une impression peut contenir. Exportez-le en tableur ou '
         'choisissez un emplacement pour le restreindre.'
     ),
+    'stock_value_first_day': (
+        'Le journal des mouvements commence le {starts_at}. Un état doit '
+        's’ouvrir sur un soir connu, le premier peut donc commencer le '
+        '{first_day}.'
+    ),
     'stock_value_period_reversed': (
         'La période se termine avant de commencer. Choisissez une date de fin qui ne précède pas la date de début.'
     ),

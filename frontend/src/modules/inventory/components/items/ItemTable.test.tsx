@@ -470,20 +470,31 @@ describe("ItemTable — always-visible row actions", () => {
     expect(divider).toHaveAttribute("aria-hidden", "true");
   });
 
-  it("links each row to its product page, for a reader as well as a writer", () => {
+  it("opens the product from its name, for a reader as well as a writer, with no second link beside it", async () => {
+    const onItemClick = vi.fn();
     const { rerender } = render(
-      <ItemTable {...baseProps} items={[makeItem("1")]} />,
+      <ItemTable
+        {...baseProps}
+        onItemClick={onItemClick}
+        items={[makeItem("1")]}
+      />,
     );
     expect(
-      screen.getByRole("link", { name: /^product details$/i }),
-    ).toHaveAttribute("href", "/inventory/items/1");
+      screen.queryByRole("link", { name: /^product details$/i }),
+    ).toBeNull();
 
     rerender(
-      <ItemTable {...baseProps} canWrite={false} items={[makeItem("1")]} />,
+      <ItemTable
+        {...baseProps}
+        onItemClick={onItemClick}
+        canWrite={false}
+        items={[makeItem("1")]}
+      />,
     );
-    expect(
-      screen.getByRole("link", { name: /^product details$/i }),
-    ).toBeInTheDocument();
+    await userEvent.click(screen.getByTestId("item-name"));
+    expect(onItemClick).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "1" }),
+    );
     expect(screen.queryByRole("button", { name: /^edit$/i })).toBeNull();
   });
 

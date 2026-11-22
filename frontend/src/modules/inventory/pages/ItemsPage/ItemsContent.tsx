@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/Card";
 import { useHasPermission } from "@/hooks/useHasPermission";
 import ItemTable from "@/modules/inventory/components/items/ItemTable";
 import ItemMobileCard from "@/modules/inventory/components/items/ItemMobileCard";
-import { useNavigate } from "react-router-dom";
 import ItemActionsSheet from "@/modules/inventory/components/items/ItemActionsSheet";
 import { groupItemsByCategory } from "@/modules/inventory/components/items/groupItemsByCategory";
 import { MoveItemModal } from "@/modules/inventory/components/MoveItemModal";
@@ -116,7 +115,6 @@ export default function ItemsContent({
   // checks the narrower key, and every delete surface the list owns asks it
   // here rather than riding on `canWrite`.
   const canDelete = useHasPermission("items:delete");
-  const navigate = useNavigate();
   // Which item the actions sheet is open for; null = closed. Mobile-only in
   // practice — the desktop table row exposes its actions inline.
   const [actionsItem, setActionsItem] = useState<Item | null>(null);
@@ -280,8 +278,7 @@ export default function ItemsContent({
         onClose={() => setActionsItem(null)}
         onConsume={onConsume}
         onAddOne={onAddOne}
-        onEdit={onItemClick}
-        onViewDetails={(item) => navigate(`/inventory/items/${item.id}`)}
+        onEdit={(item) => onEdit(item.id)}
         onMove={setMovingItem}
         onSetThreshold={onSetThreshold}
         onDelete={onDelete}

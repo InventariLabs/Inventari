@@ -195,6 +195,8 @@ lint: ## Check code style with ruff
 	@python3 backend/scripts/check_internal_ids.py --public-tree
 	@echo "$(BLUE)[INFO]$(NC) Checking tests for dates that the clock will overtake..."
 	@python3 backend/scripts/check_time_bombs.py
+	@echo "$(BLUE)[INFO]$(NC) Checking that refusals do not print a stored status or type (baseline)..."
+	@python3 backend/scripts/check_raw_stored_values_in_refusals.py
 	@echo "$(BLUE)[INFO]$(NC) Checking that backend comments describe the code as it is (baseline)..."
 	@python3 backend/scripts/check_history_comments.py --tree backend
 	@echo "$(BLUE)[INFO]$(NC) Checking the size budget of the agent instruction files..."
@@ -281,6 +283,8 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 	docker compose exec frontend npm run check:quantity-render
 	@echo "$(BLUE)[INFO]$(NC) Checking the form's quantity bounds match the store's constants..."
 	docker compose exec frontend npm run check:quantity-bounds
+	@echo "$(BLUE)[INFO]$(NC) Checking for raw machine values in reader text (baseline)..."
+	docker compose exec frontend npm run check:raw-machine-values
 	@echo "$(BLUE)[INFO]$(NC) Checking the type scale and one job per weight..."
 	docker compose exec frontend npm run check:type-scale
 	@echo "$(BLUE)[INFO]$(NC) Checking every page empty state carries a description..."

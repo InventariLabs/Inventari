@@ -324,9 +324,34 @@ describe("ItemDetailPage", () => {
     expect(screen.getByText("68 kg")).toBeInTheDocument();
   });
 
-  it("offers the actions the sheet over the list offers", async () => {
-    // Before this the page's only verb was "Edit", so the shortcut could do
-    // more to the record than the record's own address could.
+  it("offers the actions the sheet over the list offers, in the header beside Edit", async () => {
+    render(<PageHeaderHost />);
+
+    await screen.findByText("Digitus");
+    const header = await screen.findByTestId("header-actions");
+    // The page's verbs are the app's own buttons, in the order of the
+    // header: the stock actions, Edit, and the destructive one set apart.
+    const names = within(header)
+      .getAllByRole("button")
+      .map((button) => button.textContent?.trim());
+    expect(names).toEqual([
+      "Remove 1 unit",
+      "Add 1 unit",
+      "Move",
+      "Edit",
+      "Delete",
+    ]);
+    const remove = within(header).getByRole("button", {
+      name: "Delete",
+    });
+    expect(remove.previousElementSibling).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+    expect(header.querySelector('[class*="border-l-4"]')).toBeNull();
+  });
+
+  it("leaves no second set of actions in the page body", async () => {
     render(
       <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
         <ItemDetailPage />
@@ -334,14 +359,19 @@ describe("ItemDetailPage", () => {
     );
 
     await screen.findByText("Digitus");
-    expect(
-      screen.getByRole("button", { name: "Remove 1 unit" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Add 1 unit" }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Move" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Delete" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Move" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Delete" })).toBeNull();
+  });
+
+  it("asks before deleting from the header, and leaves for the list after", async () => {
+    const user = userEvent.setup();
+    render(<PageHeaderHost />);
+
+    await screen.findByText("Digitus");
+    const header = await screen.findByTestId("header-actions");
+    await user.click(within(header).getByRole("button", { name: "Delete" }));
+
+    expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
   });
 
   it("hides Edit and every quick action from a read-only account", async () => {

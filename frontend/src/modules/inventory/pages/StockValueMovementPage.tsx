@@ -97,7 +97,10 @@ export default function StockValueMovementPage() {
     error,
     refetch,
   } = useStockValueMovement(query, showInventoryValue);
-  const from = pickedFrom ?? statement?.date_from ?? `${to.slice(0, 8)}01`;
+  // Only a day the server was asked for or answered for: while the statement
+  // loads, or is refused, the field is empty rather than naming a day of its
+  // own.
+  const from = pickedFrom ?? statement?.date_from ?? "";
 
   const download = async () => {
     try {
