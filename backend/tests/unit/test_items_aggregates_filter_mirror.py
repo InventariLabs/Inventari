@@ -44,6 +44,11 @@ DELIBERATELY_EXCLUDED = {
         'are counted as narrowing; the aggregates never pass it, they filter '
         'by only_low_stock itself'
     ),
+    'storage_ids': (
+        'the place and its sub-places, resolved by the list endpoint for '
+        'include_inside; the aggregates never pass it, they filter by '
+        'storage_id itself, which is counted as narrowing'
+    ),
 }
 
 #: The file whose ``narrowing``/``widening`` groups mirror the signature.
