@@ -306,7 +306,18 @@ export function CookForStockModal({
     strandedRecipeId.current = null;
     // Fire and forget: a refusal here means the maker module found the
     // snapshot in use, which is the one case where keeping it is right.
-    if (stranded) void discardBridgeRecipe(stranded).catch(() => undefined);
+    // Either way the production recipe lookup is stale by the time it
+    // settles, so the next sheet on the pair asks again instead of reading
+    // the discarded snapshot's yield from the cache.
+    if (stranded) {
+      void discardBridgeRecipe(stranded)
+        .catch(() => undefined)
+        .then(() =>
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.maker.recipesAll,
+          }),
+        );
+    }
     onClose();
   };
 
@@ -526,9 +537,11 @@ function yieldDescription(
 ): string {
   if (storedYield !== null) {
     const amount = unit ? `${storedYield} ${unit}` : String(storedYield);
+    // The sentence puts its own full stop after the amount, so the stop an
+    // abbreviated unit ("pcs.", "szt.") ends in is left to it.
     return !servingsFit && storedYield === servings
       ? t("cookForStock.yieldStoredDoubtful", { amount })
-      : t("cookForStock.yieldStored", { amount });
+      : t("cookForStock.yieldStored", { amount: amount.replace(/\.$/, "") });
   }
   return servingsFit
     ? t("cookForStock.yieldHint", { servings })

@@ -262,8 +262,6 @@
   "confirmDialog": {
     "confirmTitle": "Potwierdź dokument",
     "confirmMessage": "To oznaczy dokument jako gotowy do realizacji magazynowej. Kontynuować?",
-    "completeTitle": "Zakończ dokument",
-    "completeMessage": "To wykona operacje magazynowe i zamknie dokument. Kontynuować?",
     "cancelTitle": "Anulować dokument?",
     "cancelConfirm": "Anuluj dokument",
     "cancelKeep": "Zachowaj dokument",
@@ -586,7 +584,7 @@
     "snapshotDeltaPlus": "Dodano",
     "snapshotDeltaMinus": "Usunięto",
     "executionHelp": "Dopasuj faktycznie wykonaną ilość dla każdej pozycji przed zamknięciem dokumentu.",
-    "executionHelpRecordOnly": "Towar zszedł już z półki w kroku, który ten dokument zapisuje. Zamknięcie tylko utrwala zapis — stan się nie zmienia.",
+    "executionHelpRecordOnly": "Stan magazynowy został już zmieniony w kroku, który ten dokument zapisuje. Zamknięcie tylko utrwala zapis — stan się nie zmienia.",
     "executionMeta": "Plan {{expected}} {{unit}} · pozostało {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Plan {{expected}} · pozostało {{remaining}} (bez jednostki)",
     "doneQuantityLabel": "Wykonana ilość",

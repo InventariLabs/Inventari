@@ -674,6 +674,7 @@
     "noPortions": "Nic nie trafiło jeszcze na półkę.",
     "portionQty": "Porcja",
     "portionDay": "Dzień",
+    "pastDayNote": "Zestawienia stanu i wartości liczą ruchy zlecenia w dniu zapisu, a nie w tym dniu.",
     "portionLot": "Partia (opcjonalnie)",
     "addPortion": "Dodaj porcję",
     "portionAdded": "Porcja odłożona na półkę",

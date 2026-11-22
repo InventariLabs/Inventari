@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { DateInput } from "@/components/ui/DateInput";
+import { PastDayNote } from "@/modules/maker/components/PastDayNote";
 import { Input } from "@/components/ui/Input";
 import { extractApiError } from "@/lib/errors";
 import { formatQuantityLocalized, unitLabel } from "@/lib/i18nHelpers";
@@ -118,6 +119,7 @@ export function RunPortions({
               data-testid="maker-portion-lot-input"
             />
           </div>
+          <PastDayNote day={day} />
           <div className="sm:max-w-xs">
             <BestBeforeField
               id="maker-portion-best-before"
