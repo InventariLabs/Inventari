@@ -370,4 +370,4 @@ module.
 
 - [`MODULES_GUIDE.md`](../MODULES_GUIDE.md) — the full `manifest.json` reference
 - [`MODULE_CAPABILITIES.md`](MODULE_CAPABILITIES.md) — what `capabilities` may contain
-- [`MODULE_NAMES.md`](MODULE_NAMES.md) — the approved display names, in five languages
+- [`MODULE_NAMES.md`](MODULE_NAMES.md) — the approved display names, in six languages

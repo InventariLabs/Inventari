@@ -89,10 +89,10 @@ reader its catalog.
 ### Languages: English is the only one you must ship
 
 A module must ship `en.json` in its `i18n` folder; every other language is optional. The core
-ships six languages: `en`, `pl`, `de`, `fr`, `es` and `pt` (Português (Brasil), a
-community translation that may lag behind the others). A module may add a catalog
-for any of them — but it cannot add a language the core does not know: the loader
-skips a file such as `it.json` that is not one of the six.
+ships six maintained languages: `en`, `pl`, `de`, `fr`, `es` and `pt` (Português
+(Brasil)). A module may add a catalog for any of them — but it cannot add a
+language the core does not know: the loader skips a file such as `it.json` that is
+not one of the six.
 
 A reader whose language the module does not cover sees the module in English,
 key by key: a missing file and a missing key both fall back to `en.json`. The
@@ -100,8 +100,8 @@ one thing that breaks a module is shipping other catalogs and no English one,
 since there is then nothing to fall back to and the screens show raw keys.
 `module new-community` writes the English catalog only, and
 `module new-community -l pl -l de` writes others beside it. A module that lives
-in this repository (`make new-module`) is held to the five maintained languages,
-`en`, `pl`, `de`, `fr` and `es`.
+in this repository (`make new-module`) is held to all six maintained languages,
+`en`, `pl`, `de`, `fr`, `es` and `pt`.
 
 ---
 

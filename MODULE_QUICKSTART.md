@@ -797,7 +797,7 @@ the package as in [Path B](#1-scaffold-the-package) and start the agent inside
 `modules-workspace/warranty_tracker/`. The scaffold wrote `AGENTS.md` there, and
 `CLAUDE.md`, which only points at it, so an agent that reads either file gets
 the same rules: what a module may import, that every string belongs in the
-catalogs of the five maintained languages (en, pl, de, fr, es), that the
+catalogs of the six maintained languages (en, pl, de, fr, es, pt), that the
 package owns its migrations, that it needs a purpose card, how its tests run
 and which command checks it before install. The paragraph is yours: whose job
 the module serves, what it keeps, what it must never do. Say what it must *not*

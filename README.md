@@ -345,9 +345,9 @@ rather than a narrowed table.
   batch.
 - **Photo recognition** — a product read from a photograph of its label.
 - **Around it** — several organizations on one installation, custom roles,
-  webhooks, API keys, a REST API with OpenAPI docs, five maintained
-  languages (EN · PL · DE · FR · ES) and a Brazilian Portuguese community
-  translation, and a phone-first interface with dark mode.
+  webhooks, API keys, a REST API with OpenAPI docs, six maintained
+  languages (EN · PL · DE · FR · ES · PT), and a phone-first interface with
+  dark mode.
 
 The [User Guide](docs/USER_GUIDE.md) walks through every one of them, screen by
 screen.

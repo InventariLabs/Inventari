@@ -159,7 +159,7 @@ passes in both directions guards only the half it names — say which in its doc
   `ValueError('<sentence>')`. The 422 handler in `app/main.py` finds the exception in pydantic's
   `ctx['error']`, resolves the key in the request language and adds `lang` to that error entry
   (`detail[i].lang`); the frontend keeps reading `detail[i].msg`. Keys live in `app/i18n/_errors_*.py`
-  (one file per language, en and pl sharing one; `pt` is a community language), for module schemas too. Inside `app/core/contracts/` import the exception lazily
+  (one file per language, en and pl sharing one), for module schemas too. Inside `app/core/contracts/` import the exception lazily
   inside the validator, as `_system_dtos.py` does. A plain `ValueError('<sentence>')` in a schema lands in
   the `client-422` group of `value_error_sentences_baseline.txt`, and the ledger generator refuses to add it.
 - **Do not add raw `raise HTTPException(...)`.** A raw exception answers `detail` as a bare string, so the

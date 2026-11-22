@@ -252,6 +252,15 @@ says what the release does rather than what changed since them.
   the approver's note, as they already were when it was rejected. The people
   picker of a workflow stage marks the members who cannot see approvals, since
   naming only such people is refused when the stage is saved.
+- Brazilian Portuguese as a sixth maintained language. **Português (Brasil)**
+  is complete in the interface, the modules' own catalogs, the server's
+  messages and the recipe ingredient defaults, so a Portuguese reader meets no
+  English left over in the place of a string, and the language menu offers it
+  plainly — no mark and no percentage. From now on a change that adds a string
+  brings its Portuguese along, with the same gates that hold German, French and
+  Spanish: the core coverage gate, the module parity tests, the backend error
+  catalog and the module validator. A module written outside this repository
+  still needs English only.
 
 ### Changed
 

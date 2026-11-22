@@ -60,9 +60,8 @@ plus `short_at_create` for `insufficient_stock`) or the recipe (`recipe_id`,
 
 `Accept-Language` selects the language of catalogue messages, including the
 `message` of a coded refusal and a 422 entry that came from a validator. The
-default is the instance's `DEFAULT_LANGUAGE` (English unless configured). `pt`
-is a community language: a catalogue message it has not been given yet is
-answered in English.
+default is the instance's `DEFAULT_LANGUAGE` (English unless configured). Every
+one of the six languages is maintained and holds every catalogue message.
 
 ### Code-specific fields
 
