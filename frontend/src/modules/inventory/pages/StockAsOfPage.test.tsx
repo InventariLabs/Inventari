@@ -11,7 +11,7 @@ import { MemoryRouter, useLocation } from "react-router-dom";
 import { renderWithProviders } from "@/test/utils";
 import { PageHeaderContext } from "@/hooks/useModulePageHeader";
 import { todayIso } from "@/utils/formatters";
-import StockAsOfPage, { endOfDay } from "./StockAsOfPage";
+import StockAsOfPage from "./StockAsOfPage";
 
 const REPORT = {
   as_of: "2026-06-30T23:59:59Z",
@@ -300,47 +300,6 @@ describe("StockAsOfPage — a profile that does not show stock value", () => {
   });
 });
 
-describe("endOfDay — the day ends when the reader's day ends", () => {
-  function inZone(zone: string, body: () => void): void {
-    const original = process.env.TZ;
-    process.env.TZ = zone;
-    try {
-      body();
-    } finally {
-      process.env.TZ = original;
-    }
-  }
-
-  it("a Tokyo reader's September 12th ends at 23:59:59.999 JST", () => {
-    inZone("Asia/Tokyo", () => {
-      expect(endOfDay("2026-09-12")).toBe("2026-09-12T14:59:59.999Z");
-    });
-  });
-
-  it("a movement booked 02:00 on the thirteenth, Tokyo time, falls outside", () => {
-    // The UTC boundary swallowed nine hours of September 13th; the reader's
-    // boundary must not.
-    inZone("Asia/Tokyo", () => {
-      const movement = new Date("2026-09-13T02:00:00+09:00").getTime();
-      expect(movement).toBeGreaterThan(
-        new Date(endOfDay("2026-09-12")).getTime(),
-      );
-    });
-  });
-
-  it("a New York reader's day runs past the UTC midnight", () => {
-    inZone("America/New_York", () => {
-      expect(endOfDay("2026-09-12")).toBe("2026-09-13T03:59:59.999Z");
-    });
-  });
-
-  it("a UTC reader gets the same answer as before", () => {
-    inZone("UTC", () => {
-      expect(endOfDay("2026-09-12")).toBe("2026-09-12T23:59:59.999Z");
-    });
-  });
-});
-
 it("distinguishes equally named shelves by the way to them", async () => {
   locations = [
     { id: "l1", name: "Aisle 1", full_path: "Warehouse A › Aisle 1" },
@@ -393,7 +352,7 @@ describe("StockAsOfPage — the address carries the report", () => {
     renderAt("/inventory/stock/as-of?date=2026-06-30&location=l1");
 
     expect(asked.query).toMatchObject({
-      as_of: endOfDay("2026-06-30"),
+      as_of: "2026-06-30",
       location_id: "l1",
     });
   });
@@ -475,7 +434,21 @@ describe("StockAsOfPage — the address carries the report", () => {
     fireEvent.click(screen.getByRole("button", { name: "Yesterday" }));
 
     expect(screen.getByTestId("here")).toHaveTextContent(`?date=${expected}`);
-    expect(asked.query).toMatchObject({ as_of: endOfDay(expected) });
+    expect(asked.query).toMatchObject({ as_of: expected });
+  });
+
+  it("sends the bare day whatever zone the browser is in", () => {
+    // The organization's calendar cuts the day on the server; an instant
+    // built on the reader's clock would cut it at the reader's midnight.
+    const original = process.env.TZ;
+    process.env.TZ = "Asia/Tokyo";
+    try {
+      renderAt("/inventory/stock/as-of?date=2026-06-30");
+
+      expect(asked.query?.as_of).toBe("2026-06-30");
+    } finally {
+      process.env.TZ = original;
+    }
   });
 
   it("answers for today when the address names no day at all", () => {
@@ -483,7 +456,7 @@ describe("StockAsOfPage — the address carries the report", () => {
     // to a day that does not exist.
     renderAt("/inventory/stock/as-of?date=last-tuesday");
 
-    expect(asked.query).toMatchObject({ as_of: endOfDay(todayIso()) });
+    expect(asked.query).toMatchObject({ as_of: todayIso() });
     expect(screen.getByRole("table")).toBeInTheDocument();
   });
 });

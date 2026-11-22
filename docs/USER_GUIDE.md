@@ -550,7 +550,10 @@ it later leaves existing products as they are.
 
 **Stock on a date** answers "what did we have on the 31st?": pick **As of** and
 optionally a location, then **Export** or **Print**. Values appear where the
-cost history reaches back that far.
+cost history reaches back that far. A day ends at midnight in the
+organization's time zone, not the one of the computer you read it on, so the
+screen, its exports and the closing of **Value movement** for the same day
+always agree.
 
 ### Movements
 
