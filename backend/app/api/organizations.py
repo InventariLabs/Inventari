@@ -642,12 +642,13 @@ async def update_organization(
     if not current_user.organization_id:
         raise NotFoundException('organization', get_current_lang())
 
-    # backend/AGENTS.md §2b: these three columns cannot be NULL, so a named
-    # null is refused here by name instead of reaching the flush as a 500.
+    # backend/AGENTS.md §2b: these columns cannot be NULL, so a named null is
+    # refused here by name. `settings` is a JSON column: SQL NOT NULL does not
+    # see a JSON null, which would silently replace the whole block.
     sent = organization_in.model_fields_set
     nulled = [
         f
-        for f in ('name', 'currency', 'timezone')
+        for f in ('name', 'currency', 'timezone', 'settings')
         if f in sent and getattr(organization_in, f) is None
     ]
     if nulled:

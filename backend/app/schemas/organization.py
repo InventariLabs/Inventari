@@ -53,7 +53,7 @@ def validated_country_code(v: object) -> str | None:
 
 class OrganizationBase(BaseModel):
     name: str = Field(max_length=255)
-    currency: str = 'USD'
+    currency: str = Field('USD', max_length=3)
     timezone: str = 'UTC'
 
     @field_validator('timezone', mode='before')
@@ -88,7 +88,7 @@ class OrganizationAddress(BaseModel):
 
 class OrganizationUpdate(BaseModel):
     name: str | None = Field(None, max_length=255)
-    currency: str | None = None
+    currency: str | None = Field(None, max_length=3)
     timezone: str | None = None
     settings: dict[str, Any] | None = None
     # Issuer identity: the fields already existed on the model but
