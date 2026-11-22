@@ -319,8 +319,6 @@ export default function ItemsPage() {
   );
 
   const {
-    dialogState,
-    closeDialog,
     deleteMutation,
     consumeMutation,
     handleConsume,
@@ -328,6 +326,7 @@ export default function ItemsPage() {
     handleDelete,
     handleSwipeDelete,
     handleBulkDelete,
+    bulkDelete,
     handleExport,
   } = useItemsPageActions({
     items,
@@ -388,8 +387,6 @@ export default function ItemsPage() {
       <Slot name="items_page_header_extra" />
 
       <ItemsPageDialogs
-        dialogState={dialogState}
-        closeDialog={closeDialog}
         deleteReasonItem={deleteReasonItem}
         onDelete={async (item, reason, notes) => {
           // Awaited, so a refused delete leaves the dialog standing with the
@@ -398,6 +395,9 @@ export default function ItemsPage() {
           setDeleteReasonItem(null);
         }}
         onDeleteCancel={() => setDeleteReasonItem(null)}
+        bulkDeleteIds={bulkDelete.ids}
+        onBulkDelete={bulkDelete.mutateAsync}
+        onBulkDeleteCancel={bulkDelete.cancel}
         consumeDialogItem={consumeDialogItem}
         onConsume={async (item, quantity, reason, notes) => {
           await consumeMutation.mutateAsync(item.id, quantity, reason, notes);

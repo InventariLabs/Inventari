@@ -79,6 +79,7 @@
       "link": "Activos",
       "uncategorised": "Sin categoría",
       "empty": "La flota aún no tiene activos.",
+      "allRetired": "Todos los activos registrados están retirados, así que la flota está vacía.",
       "in_service_one": "{{count}} en mantenimiento",
       "in_service_many": "{{count}} en mantenimiento",
       "in_service_other": "{{count}} en mantenimiento",

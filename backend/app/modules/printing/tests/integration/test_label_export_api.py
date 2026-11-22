@@ -190,6 +190,44 @@ class TestLabelExportPng:
         )
         assert all(row.printed_at is None for row in rows)
 
+    async def test_a_read_only_download_leaves_the_pool_as_it_was(
+        self,
+        real_async_client: AsyncClient,
+        real_async_db_session: AsyncSession,
+        print_org: Organization,
+        print_user: User,
+    ) -> None:
+        """An account that cannot write takes the file and marks nothing."""
+        await _make_labels(real_async_db_session, print_org, print_user, 2, 'VIEWER')
+        viewer = await ModuleTestHelper.create_user_async(
+            real_async_db_session,
+            print_org,
+            email=f'viewer_{uuid4().hex[:8]}@test.com',
+            role='viewer',
+        )
+        await real_async_db_session.commit()
+        org_id = print_org.id
+
+        response = await real_async_client.get(
+            '/api/v1/labels/pool/export/png', headers=_auth(viewer)
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.content.startswith(_PNG_MAGIC)
+        assert 'labels_2pcs.png' in response.headers['content-disposition']
+
+        real_async_db_session.expire_all()
+        rows = (
+            (
+                await real_async_db_session.execute(
+                    select(LabelPool).where(LabelPool.organization_id == org_id)
+                )
+            )
+            .scalars()
+            .all()
+        )
+        assert len(rows) == 2
+        assert all(row.printed_at is None for row in rows)
+
     async def test_the_file_is_the_label_at_its_size(
         self,
         real_async_client: AsyncClient,

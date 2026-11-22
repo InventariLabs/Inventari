@@ -290,6 +290,7 @@
     "description": "“{{name}}” is archived and stays off the active list. Open it here, or restore it from the archive."
   },
   "usage": {
+    "internal": "Regular",
     "customer": "Consumed",
     "inventory": "Inventory loss",
     "production": "Production",

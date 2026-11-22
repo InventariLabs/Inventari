@@ -62,7 +62,7 @@ export const CATCHERS = {
   ConsumeDialog: ["onConfirm"],
   LotStatusDialog: ["onConfirm"],
   WorkflowSwitchOffDialog: ["onConfirm"],
-  ItemsPageDialogs: ["onDelete", "onConsume"],
+  ItemsPageDialogs: ["onDelete", "onBulkDelete", "onConsume"],
   ImportWizardSheet: ["run"],
   WebhookForm: ["onSave"],
   // Handed on to the approvals module's buttons, which catch and toast.

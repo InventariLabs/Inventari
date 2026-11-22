@@ -50,9 +50,9 @@ export default function MyAssetsPage() {
     error,
     refetch,
   } = useMyAssets();
-  // The return day is pinned to the organization's calendar, so it prints
-  // in the card's own medium style on the org's clock.
-  const formatReturnDay = useFormatOrgDay("medium");
+  // The return day is pinned to the organization's calendar; it prints in the
+  // same numeric form as the other dates of the card.
+  const formatReturnDay = useFormatOrgDay();
   const {
     data: history = [],
     isLoading: historyLoading,

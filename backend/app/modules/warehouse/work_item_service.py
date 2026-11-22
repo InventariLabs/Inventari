@@ -548,6 +548,14 @@ async def _claim_unassigned_async(
         raise _already_taken_error()
 
 
+async def assignable_user_ids_async(db: AsyncSession, org_id: UUID) -> list[UUID]:
+    """The members who hold ``warehouse:write``, the grant every task needs."""
+    holders = await core_api.roles.holders_of_permission_async(
+        db, organization_id=org_id, permission='warehouse:write'
+    )
+    return sorted(holders, key=str)
+
+
 async def assign_work_item_async(
     db: AsyncSession,
     org_id: UUID,

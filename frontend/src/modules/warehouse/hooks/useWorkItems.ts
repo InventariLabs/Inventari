@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { usersApi } from "@/lib/api/admin";
@@ -142,22 +142,41 @@ export function useOpenReplenishmentLink(
 }
 
 /**
- * The people a task can be given to: the organization's active members.
+ * The people a task can be given to: the organization's active members who
+ * hold the grant the tasks need — a member who can only read is on the list of
+ * members and cannot do any of them.
  *
  * The cache entry holds the full member records, the shape every other reader
  * of this key stores (the approvals pickers, the audit-log filters); the
- * `{ id, name }` view is made in `select`, so no reader sees another's shape.
+ * `{ id, name }` view is made here, so no reader sees another's shape. Until
+ * the holders are known nobody is offered, and a failure of either call is
+ * reported as one.
  */
 export function useAssignableMembers(enabled: boolean) {
-  return useQuery({
+  const members = useQuery({
     queryKey: queryKeys.users.orgMembers,
     queryFn: () => usersApi.getOrgMembers(),
-    select: (members) =>
-      members.map((member) => ({
-        id: member.id,
-        name: member.full_name || member.email,
-      })),
     enabled,
     staleTime: 30_000,
   });
+  const holders = useQuery({
+    queryKey: [...queryKeys.documents.all, "work-item-assignees"],
+    queryFn: documentsApi.workItemAssignees,
+    enabled,
+    staleTime: 30_000,
+  });
+  const data = useMemo(() => {
+    if (!members.data || !holders.data) return undefined;
+    const allowed = new Set(holders.data);
+    return members.data
+      .filter((member) => allowed.has(member.id))
+      .map((member) => ({
+        id: member.id,
+        name: member.full_name || member.email,
+      }));
+  }, [members.data, holders.data]);
+  return {
+    data,
+    isError: members.isError || holders.isError,
+  };
 }

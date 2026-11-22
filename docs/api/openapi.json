@@ -40966,6 +40966,36 @@
         }
       }
     },
+    "/api/v1/warehouse/work-items/assignees": {
+      "get": {
+        "tags": [
+          "Warehouse"
+        ],
+        "summary": "List Work Item Assignees",
+        "description": "Who a task can be given to: the members who hold the warehouse write\ngrant, which every task on the list needs to be done. A viewer is a member\nof the organization and cannot do any of them.",
+        "operationId": "list_work_item_assignees_api_v1_warehouse_work_items_assignees_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkItemAssignees"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/v1/warehouse/work-items/custom": {
       "post": {
         "tags": [
@@ -92201,6 +92231,24 @@
         "type": "object",
         "title": "WorkItemAssign",
         "description": "Who a task is for; ``null`` leaves it with nobody.\n\n``only_if_unassigned`` makes the write a claim: the task is given to\n``assignee_id`` only while nobody holds it, and a task somebody else has\ntaken in the meantime is refused rather than taken from them."
+      },
+      "WorkItemAssignees": {
+        "properties": {
+          "user_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "User Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_ids"
+        ],
+        "title": "WorkItemAssignees",
+        "description": "The members a task can be given to: those who hold what doing it needs."
       },
       "WorkItemCustomCreate": {
         "properties": {

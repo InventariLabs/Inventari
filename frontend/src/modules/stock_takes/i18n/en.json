@@ -155,6 +155,7 @@
     "createFailed": "Failed to create stock take",
     "deleteFailed": "Failed to delete stock take",
     "saveFailed": "Failed to save count",
+    "saveFailedFor": "Failed to save the count of {{name}}",
     "addItemFailed": "Failed to add item",
     "completeFailed": "Failed to complete stock take",
     "cancelFailed": "Failed to cancel stock take",

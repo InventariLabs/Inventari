@@ -1,4 +1,5 @@
 import { SYSTEM_FIELDS } from "@/config/systemFields";
+import { isPackageCategory } from "@/modules/shared/hooks/useUoms";
 import type {
   CategoryDTO,
   FieldDefinition,
@@ -158,7 +159,12 @@ export function computeFieldDefinitions({
             : "items:itemVolume";
       }
     } else if (key === "weight") {
+      // The card describes one counted unit: a piece, or the pack, can, bottle,
+      // box or bag the person chose.
       fieldDef.label = "items:itemWeightPerUnit";
+      if (isPackageCategory(uomCategoryName)) {
+        fieldDef.label = "items:itemWeightPerPackage";
+      }
     }
 
     definedFields.push(fieldDef);

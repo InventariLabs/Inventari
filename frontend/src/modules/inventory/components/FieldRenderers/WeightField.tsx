@@ -20,6 +20,8 @@ interface WeightFieldProps {
   weightUomId?: string;
   /** How many units this line holds — used for the informational total. */
   quantity?: unknown;
+  /** The product is counted in packages, not pieces: the hint says "package". */
+  perPackage?: boolean;
   error?: string;
   onChange: (value: unknown) => void;
   onUomChange: (uomId: string) => void;
@@ -60,6 +62,7 @@ export function WeightField({
   value,
   weightUomId,
   quantity,
+  perPackage = false,
   error,
   onChange,
   onUomChange,
@@ -118,7 +121,11 @@ export function WeightField({
         className="text-xs text-on-muted mt-1.5 flex items-center gap-1.5 font-medium"
       >
         <Info size={12} className="text-primary-400" />
-        {t("items:weightPerPieceHint")}
+        {t(
+          perPackage
+            ? "items:weightPerPackageHint"
+            : "items:weightPerPieceHint",
+        )}
       </p>
 
       {showTotal && (

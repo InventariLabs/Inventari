@@ -155,6 +155,7 @@
     "createFailed": "Impossible de créer l'inventaire",
     "deleteFailed": "Impossible de supprimer l'inventaire",
     "saveFailed": "Impossible d'enregistrer le comptage",
+    "saveFailedFor": "Impossible d'enregistrer le comptage de {{name}}",
     "addItemFailed": "Impossible d'ajouter l'article",
     "completeFailed": "Impossible de terminer l'inventaire",
     "cancelFailed": "Impossible d'annuler l'inventaire",

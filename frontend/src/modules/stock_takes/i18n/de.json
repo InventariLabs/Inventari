@@ -155,6 +155,7 @@
     "createFailed": "Inventur konnte nicht erstellt werden",
     "deleteFailed": "Inventur konnte nicht gelöscht werden",
     "saveFailed": "Zählung konnte nicht gespeichert werden",
+    "saveFailedFor": "Zählung von {{name}} konnte nicht gespeichert werden",
     "addItemFailed": "Position konnte nicht hinzugefügt werden",
     "completeFailed": "Inventur konnte nicht abgeschlossen werden",
     "cancelFailed": "Inventur konnte nicht abgebrochen werden",

@@ -1,3 +1,4 @@
+import { withLanguage } from "@/test/mocks/i18n";
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -38,6 +39,9 @@ const ASSET = {
   image_url: null,
   model_image_url: null,
 };
+
+const daysFromNow = (days: number) =>
+  new Date(Date.now() + days * 86_400_000).toISOString();
 
 const PAST = {
   assignment_id: "as-0",
@@ -114,6 +118,34 @@ describe("MyAssetsPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Hide" }));
     expect(screen.queryByText("Old Phone")).not.toBeInTheDocument();
+  });
+
+  it("prints the handed-out, due and warranty dates of a card in one form", async () => {
+    server.use(
+      http.get("/api/v1/equipment/my-assets", () =>
+        HttpResponse.json(
+          onePage([
+            {
+              ...ASSET,
+              expected_return_at: daysFromNow(7),
+              warranty_until: daysFromNow(365).slice(0, 10),
+            },
+          ]),
+        ),
+      ),
+    );
+    // Polish spells a "medium" date ("26 lis 2026") and prints a plain one
+    // numerically, so a card that mixes the two shows it.
+    await withLanguage("pl", async () => {
+      renderPage();
+      await screen.findByText("ThinkPad T14");
+
+      for (const label of [/Wydano/, /Termin/, /Gwarancja/]) {
+        expect(screen.getByText(label).textContent).toMatch(
+          /\d{2}\.\d{2}\.\d{4}$/,
+        );
+      }
+    });
   });
 
   it("says there is no history yet when the list is empty", async () => {
