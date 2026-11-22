@@ -199,6 +199,7 @@
     "unknown": "Inconnu"
   },
   "list": {
+    "export_needs_read": "Votre rôle ne peut pas exporter la liste du matériel : l'export exige le droit de consulter les produits.",
     "title": "Actifs",
     "search": "Rechercher des actifs…",
     "select_item": "Sélectionner l'actif {{name}}",

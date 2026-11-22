@@ -192,6 +192,7 @@
     "unknown": "Unbekannt"
   },
   "list": {
+    "export_needs_read": "Ihre Rolle darf die Geräteliste nicht exportieren: Der Export setzt das Recht zum Ansehen von Produkten voraus.",
     "title": "Geräte",
     "search": "Geräte suchen…",
     "select_item": "Gerät {{name}} auswählen",

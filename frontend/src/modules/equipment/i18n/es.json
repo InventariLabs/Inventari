@@ -199,6 +199,7 @@
     "unknown": "Desconocido"
   },
   "list": {
+    "export_needs_read": "Tu rol no puede exportar la lista de equipos: la exportación requiere permiso para ver productos.",
     "title": "Activos",
     "search": "Buscar activos…",
     "select_item": "Seleccionar activo {{name}}",
