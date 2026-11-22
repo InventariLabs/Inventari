@@ -91,7 +91,7 @@
       "locationDescription": "Ruch zapisuje się, gdy towar tu trafia, stąd wychodzi albo przez to miejsce przechodzi.",
       "documentTitle": "Ten dokument nic nie ruszył",
       "documentDescription": "Jego pozycje nie zostały wykonane na stanie, więc żaden ruch nie nosi jego numeru.",
-      "documentRecordOnlyDescription": "Towar pobrał krok, który ten dokument zapisuje (sesja kompletacji receptury). Dokument tylko to zapisuje, więc żaden ruch nie nosi jego numeru."
+      "documentRecordOnlyDescription": "Stan zmienił już krok, który ten dokument zapisuje. Dokument tylko to zapisuje, więc żaden ruch nie nosi jego numeru."
     },
     "tab": "Ruchy",
     "itemCaption": "Ruchy tego produktu w miejscu {{location}}. Dwa rekordy tego samego produktu w jednym miejscu mają wspólne wiersze.",

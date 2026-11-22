@@ -132,6 +132,9 @@ describe("DocumentMovesSlot", () => {
       // the goods left with the step this document records.
       expect(screen.queryByText(/have not been executed/i)).toBeNull();
       expect(screen.getByText(/only records it/i)).toBeInTheDocument();
+      // Any writer of the flag lands here — an issue, or a correction that
+      // added stock — so the copy names no module.
+      expect(screen.queryByText(/recipe/i)).toBeNull();
     });
   });
 });

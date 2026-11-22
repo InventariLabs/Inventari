@@ -87,7 +87,7 @@
       "locationDescription": "Movements are recorded when goods are received into, issued from or moved through this location.",
       "documentTitle": "This document moved nothing",
       "documentDescription": "Its lines have not been executed against stock, so no movement carries its name.",
-      "documentRecordOnlyDescription": "The goods were taken by the step this document records (a recipe's picking session). The document only records it, so no movement carries its name."
+      "documentRecordOnlyDescription": "The stock was already changed by the step this document records. The document only records it, so no movement carries its name."
     },
     "tab": "Movements",
     "itemCaption": "Movements of this product in {{location}}. Two records of the same product in one location share these rows.",
