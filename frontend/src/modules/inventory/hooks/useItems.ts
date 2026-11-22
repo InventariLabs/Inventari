@@ -121,8 +121,8 @@ export function useItem(itemId: string) {
 /**
  * Search the organization's products.
  *
- * `storageId` narrows the search to one place before the page is cut. The
- * page is ordered by creation across the whole organization, so a shelf that
+ * `storageId` narrows the search to one place and everything below it before
+ * the page is cut. The page is ordered by creation across the whole organization, so a shelf that
  * holds a matching record can fall off it entirely behind a hundred matches
  * elsewhere; a screen that means "this place first" asks about the place
  * separately instead of reordering the organization's page.
@@ -133,7 +133,7 @@ export function useItemSearch(query: string, storageId?: string) {
     queryFn: () =>
       itemsApi.getAll({
         search: query,
-        ...(storageId ? { location_id: storageId } : {}),
+        ...(storageId ? { location_id: storageId, include_inside: true } : {}),
       }),
     enabled: query.length > 0,
   });

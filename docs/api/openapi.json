@@ -7326,6 +7326,18 @@
             "description": "Filter by location"
           },
           {
+            "name": "include_inside",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "With location_id: also the records of every location below it, at any depth, so a search scoped to a place reaches its sub-places.",
+              "default": false,
+              "title": "Include Inside"
+            },
+            "description": "With location_id: also the records of every location below it, at any depth, so a search scoped to a place reaches its sub-places."
+          },
+          {
             "name": "category_id",
             "in": "query",
             "required": false,

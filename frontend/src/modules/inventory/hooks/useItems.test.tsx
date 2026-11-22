@@ -100,4 +100,20 @@ describe("useItemSearch", () => {
     });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
   });
+
+  it("asks for the place and everything below it when scoped to a place", async () => {
+    let asked: URLSearchParams | undefined;
+    server.use(
+      http.get("*/api/v1/items", ({ request }) => {
+        asked = new URL(request.url).searchParams;
+        return HttpResponse.json({ items: [], total: 0 });
+      }),
+    );
+    const { result } = renderHook(() => useItemSearch("bolt", "loc-1"), {
+      wrapper: createWrapper(),
+    });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(asked?.get("location_id")).toBe("loc-1");
+    expect(asked?.get("include_inside")).toBe("true");
+  });
 });

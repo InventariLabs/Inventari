@@ -78,6 +78,8 @@ export type LabelMatchMode = "add" | "skip" | "overwrite";
 export const itemsApi = {
   getAll: async (params?: {
     location_id?: string;
+    /** With `location_id`: the places below it too, at any depth. */
+    include_inside?: boolean;
     category_id?: string;
     context_tag?: string;
     exclude_module_contexts?: boolean;
