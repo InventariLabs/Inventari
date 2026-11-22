@@ -23,7 +23,10 @@ from ._wms_session_access import (
     _session_held_conflict,
     take_over_session_async,
 )
-from ._wms_session_ops import SessionHeldByOtherUserError
+from ._wms_session_ops import (
+    SessionHeldByOtherUserError,
+    cancel_empty_session_of_given_back_task_async,
+)
 from ._wms_session_release import pause_session_async
 from ._wms_shelf import confirmed_shelf_id, shelf_scan_required
 from .document_query_service import get_document
@@ -445,6 +448,9 @@ async def pause_receiving(
         resource='receiving_session',
     )
     await pause_session_async(db, session, current_user.id)
+    await cancel_empty_session_of_given_back_task_async(
+        db, org_id, document_id, current_user.id
+    )
 
 
 @router.post(

@@ -51,6 +51,31 @@ beforeEach(() => {
 });
 
 describe("ApprovalDecisionButtons", () => {
+  it("names the document on Approve and Reject when several requests share a screen", () => {
+    render(
+      <ApprovalDecisionButtons
+        approval={{
+          ...baseRequest,
+          target_summary: {
+            id: "doc-1",
+            number: "PZ/7/2026",
+            partner_name: null,
+            total_value: null,
+            currency: null,
+            lines_count: 1,
+          },
+        }}
+      />,
+      { wrapper: createWrapper() },
+    );
+    expect(
+      screen.getByRole("button", { name: "Approve PZ/7/2026" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Reject PZ/7/2026" }),
+    ).toBeInTheDocument();
+  });
+
   it("renders Approve and Reject buttons", () => {
     render(<ApprovalDecisionButtons approval={baseRequest} />, {
       wrapper: createWrapper(),

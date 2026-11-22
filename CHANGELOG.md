@@ -14,6 +14,12 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- A link into the demo can name a screen. Opening an in-app address such as
+  `/warehouse/todo` on the demo without a session shows the sign-in page, and
+  **Try the demo** now opens that screen in the visitor's new copy instead of
+  the launcher; an address that leaves the app is ignored, as at a sign-in. On
+  the demo, the form for signing in with an account is folded under *or sign in
+  with an account*, so **Try the demo** is the page's one main action.
 - The tablespoon and the teaspoon. Recipes can now use the spoons the module
   already converted for ingredients, and the recipe import accepts `tbsp` and
   `tsp`. A new Food & Home organization gets them with its kitchen measures;
@@ -902,6 +908,27 @@ says what the release does rather than what changed since them.
   its recorded status. The response badge and the Returned count follow the same
   rule, so a closed campaign shows an unanswered response as awaiting reply and
   counts it as pending.
+- The organization journal adds up to what is on the shelf, and reads in the
+  reader's words. Opening a sealed pack to cook from it records the drop of
+  the sealed record (3 → 2) beside the opened record it creates, and the name
+  a founder sets on the setup screen is journaled as a rename. A location's
+  usage, an asset's manufacturer and equipment fields, the module and document
+  type of a copied print layout and the kind of an asset are printed as the
+  words the screens use, from the entry that creates the asset to its status
+  changes, and an asset's edit and status entries share one **Target** word.
+- Wording and layout on the paths a home, a maker or an equipment fleet takes.
+  The recipes bar on a phone has short labels that no longer run together; the
+  asset form's price placeholder follows the language's decimal mark; a saved
+  recipe amount such as 100.000 opens as 100; the weight field names the
+  package for pack-like units; **Already made** asks how much came out rather
+  than for a planned quantity. The equipment overview tells a fleet that was
+  never used from one whose assets are all retired, a product's margin says
+  when the sale price is missing, import results say their rows are counted
+  without the header, the borrower's card shows one date form, the access
+  request list says that **Approve** gives the person an organization of their
+  own, an invitation uses one sentence in every language that does not repeat
+  the default organization name, and the home cooking dialog no longer says
+  "warehouse". Polish removal reasons agree in gender.
 
 ### Removed
 

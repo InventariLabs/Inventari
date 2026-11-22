@@ -76,6 +76,7 @@ export const ArchivedAssetRow = memo(function ArchivedAssetRow({
             onClick={() => onRestore(item.id)}
             disabled={isRestorePending}
             leftIcon={<RotateCcw size={14} />}
+            aria-label={t("actions.restoreNamed", { name: item.name })}
           >
             <span className="hidden sm:inline">{t("actions.restore")}</span>
           </Button>
@@ -87,6 +88,7 @@ export const ArchivedAssetRow = memo(function ArchivedAssetRow({
               disabled={isPurgePending}
               className="text-red-600 hover:text-red-700 hover:bg-red-50"
               leftIcon={<Trash2 size={14} />}
+              aria-label={t("actions.purgeNamed", { name: item.name })}
             >
               <span className="hidden sm:inline">{t("actions.purge")}</span>
             </Button>

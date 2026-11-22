@@ -358,6 +358,18 @@ describe("LoginPage on the public demo", () => {
     );
   });
 
+  it("folds the account form away until the visitor asks for it", async () => {
+    renderOn(true);
+
+    await screen.findByRole("button", { name: "Try the demo" });
+    expect(screen.queryByLabelText(/Email/i)).toBeNull();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "or sign in with an account" }),
+    );
+    expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
+  });
+
   it("offers no request-access link to a visitor", async () => {
     // A request is stored where only an instance superuser could read it,
     // and a demo has no superuser: the visitor would be told it had been
@@ -518,7 +530,7 @@ describe("LoginPage on the public demo", () => {
       ).toBeInTheDocument();
     });
 
-    it("keeps the demo launcher ahead of the address asked for", async () => {
+    it("opens the address asked for in the new demo copy", async () => {
       const openDemoSandbox = vi.fn().mockImplementation(async () => {
         useAuthStore.setState({ isAuthenticated: true });
       });
@@ -553,7 +565,7 @@ describe("LoginPage on the public demo", () => {
         await screen.findByRole("button", { name: "Try the demo" }),
       );
       expect(
-        await screen.findByText("landed on the launcher"),
+        await screen.findByText("landed on the label"),
       ).toBeInTheDocument();
     });
 

@@ -98,11 +98,15 @@ describe("ReplenishSuggestionsModal — the confirm sends what the reader chose"
 
     const [flourTick] = screen.getAllByRole("checkbox");
     await user.click(flourTick!);
-    const increase = screen.getAllByRole("button", { name: "Increase" })[0]!;
+    const increase = screen.getAllByRole("button", {
+      name: /^Increase quantity of /,
+    })[0]!;
     await user.click(increase);
     await user.click(increase);
-    await user.click(screen.getAllByRole("button", { name: "Decrease" })[0]!);
-    await user.click(screen.getAllByRole("button", { name: "Urgent" })[0]!);
+    await user.click(
+      screen.getAllByRole("button", { name: /^Decrease quantity of / })[0]!,
+    );
+    await user.click(screen.getAllByRole("button", { name: /^Urgent: / })[0]!);
 
     await user.click(screen.getByRole("button", { name: "Add selected (1)" }));
 
@@ -151,7 +155,7 @@ describe("ReplenishSuggestionsModal — the confirm sends what the reader chose"
     await user.click(flourTick!);
     await user.click(sugarTick!);
     await user.click(flourTick!);
-    const urgent = screen.getAllByRole("button", { name: "Urgent" })[1]!;
+    const urgent = screen.getAllByRole("button", { name: /^Urgent: / })[1]!;
     await user.click(urgent);
     await user.click(urgent);
 
@@ -174,7 +178,9 @@ describe("ReplenishSuggestionsModal — the confirm sends what the reader chose"
     open();
 
     await user.click(screen.getAllByRole("checkbox")[1]!);
-    await user.click(screen.getAllByRole("button", { name: "Decrease" })[1]!);
+    await user.click(
+      screen.getAllByRole("button", { name: /^Decrease quantity of / })[1]!,
+    );
     await user.click(screen.getByRole("button", { name: "Add selected (1)" }));
 
     await waitFor(() => expect(mocks.addItems).toHaveBeenCalled());

@@ -219,7 +219,11 @@
     "addRolePlaceholder": "Choisir un rôle…",
     "roleAddsNobody": "Personne de nouveau à ajouter — toutes les personnes actives ayant le rôle « {{role}} » sont déjà désignées.",
     "roleMembersFailed": "Impossible de lire qui détient ce rôle.",
-    "waitingUnavailable": "Impossible de vérifier ce qui attend ce flux, il ne peut donc pas être désactivé pour le moment. Fermez cette fenêtre et réessayez."
+    "waitingUnavailable": "Impossible de vérifier ce qui attend ce flux, il ne peut donc pas être désactivé pour le moment. Fermez cette fenêtre et réessayez.",
+    "editNamed": "Modifier {{name}}",
+    "deactivateNamed": "Désactiver {{name}}",
+    "activateNamed": "Activer {{name}}",
+    "deleteNamed": "Supprimer {{name}}"
   },
   "request": {
     "pending": "En attente",
@@ -286,7 +290,9 @@
     "deadEndStepAskRequesterUnnamed": "Demandez à la personne qui a fait la demande de la retirer.",
     "deadEndLinkMembers": "Membres et rôles",
     "deadEndLinkRoles": "Rôles",
-    "deadEndLinkSettings": "Réglages d'approbation"
+    "deadEndLinkSettings": "Réglages d'approbation",
+    "approveNamed": "Approuver {{name}}",
+    "rejectNamed": "Rejeter {{name}}"
   },
   "deleteWorkflow": "Supprimer le workflow",
   "deleteWorkflowConfirm": "Supprimer ce flux ? Il disparaît de cette liste. Les demandes déjà faites sous lui restent dans le tableau de bord des approbations, avec les étapes qu'elles ont suivies.",

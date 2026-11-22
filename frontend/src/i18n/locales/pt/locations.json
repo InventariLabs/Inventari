@@ -341,7 +341,8 @@
     "restore": "Restaurar",
     "emptyTitle": "Nada arquivado",
     "emptyDescription": "Os locais arquivados aparecem aqui e podem ser restaurados.",
-    "detailNotice": "Este local está arquivado. Restaure-o para guardar produtos aqui novamente."
+    "detailNotice": "Este local está arquivado. Restaure-o para guardar produtos aqui novamente.",
+    "restoreNamed": "Restaurar {{name}}"
   },
   "masterDetailSubtitle": "Escolha um local para ver o que há nele, seus produtos e suas configurações.",
   "select": {

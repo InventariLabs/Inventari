@@ -387,7 +387,7 @@ describe("IngredientRow — link to product", () => {
         recipeId="r1"
       />,
     );
-    const button = screen.getByRole("button", { name: "Link to product" });
+    const button = screen.getByRole("button", { name: /^Link to product/ });
     expect(button).toHaveClass("text-on-muted");
     expect(button).not.toHaveClass("text-primary-600");
   });
@@ -618,9 +618,12 @@ describe("IngredientRow — mobile link button", () => {
       />,
     );
     const button = screen.getByRole("button", {
-      name: "Link to product",
+      name: /^Link to product/,
     });
-    expect(button).toHaveAttribute("aria-label", "Link to product");
+    expect(button).toHaveAttribute(
+      "aria-label",
+      expect.stringMatching(/^Link to product/),
+    );
     const label = button.querySelector("span");
     expect(label).toHaveClass("hidden", "sm:inline");
   });

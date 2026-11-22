@@ -312,7 +312,8 @@
     "restore": "Restaurer",
     "emptyTitle": "Rien d’archivé",
     "emptyDescription": "Les emplacements archivés apparaissent ici et peuvent être restaurés.",
-    "detailNotice": "Cet emplacement est archivé. Restaurez-le pour y stocker à nouveau des produits."
+    "detailNotice": "Cet emplacement est archivé. Restaurez-le pour y stocker à nouveau des produits.",
+    "restoreNamed": "Restaurer {{name}}"
   },
   "masterDetailSubtitle": "Choisissez un emplacement pour voir son contenu, ses produits et ses réglages.",
   "select": {

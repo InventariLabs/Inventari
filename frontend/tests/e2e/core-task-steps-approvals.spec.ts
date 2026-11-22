@@ -93,7 +93,9 @@ defineStepTask({
       .last()
       .getByRole("button", { name: "Review approval" })
       .click();
-    await page.getByRole("button", { name: "Approve", exact: true }).click();
+    await page
+      .getByRole("button", { name: `Approve ${seed.number}`, exact: true })
+      .click();
     await page
       .getByRole("alertdialog", { name: `Approve ${seed.number}?` })
       .getByRole("button", { name: "Approve request" })

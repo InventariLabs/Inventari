@@ -473,8 +473,12 @@ function CollectionNode({
                 e.stopPropagation();
                 onRename(collection);
               }}
-              aria-label={t("recipes:collections.rename")}
-              title={t("recipes:collections.rename")}
+              aria-label={t("recipes:collections.rename_for", {
+                name: collection.name,
+              })}
+              title={t("recipes:collections.rename_for", {
+                name: collection.name,
+              })}
               className="min-h-6 min-w-6 p-0.5 text-on-muted hover:text-primary-600"
             >
               <Pencil size={16} />
@@ -489,8 +493,12 @@ function CollectionNode({
                 e.stopPropagation();
                 onDelete(collection);
               }}
-              aria-label={t("recipes:collections.delete")}
-              title={t("recipes:collections.delete")}
+              aria-label={t("recipes:collections.delete_for", {
+                name: collection.name,
+              })}
+              title={t("recipes:collections.delete_for", {
+                name: collection.name,
+              })}
               className="min-h-6 min-w-6 p-0.5"
             >
               <Trash2 size={16} />

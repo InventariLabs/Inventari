@@ -45,6 +45,7 @@ from ._schemas_work_items import (
     WorkItemState,
     WorkItemView,
 )
+from ._wms_session_ops import cancel_empty_session_holding_async
 from .backorder_cover_service import StockCover, backorder_cover_async
 from .document_todo_service import completed_documents_async, line_tallies_async
 from .models import CUSTOM_SOURCE_KIND, Document, WorkItemOverlay
@@ -673,6 +674,11 @@ async def assign_work_item_async(
             )
         )
     await db.flush()
+    if assignee_id is None and source_kind == 'document':
+        # A sheet opened and left empty has started a session in the reader's
+        # name; giving the task back ends it, or the card would go on naming
+        # the reader as the one picking.
+        await cancel_empty_session_holding_async(db, org_id, source_id, user_id)
     await _journal_async(
         db,
         org_id,

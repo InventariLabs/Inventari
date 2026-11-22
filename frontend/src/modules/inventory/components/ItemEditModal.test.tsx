@@ -39,8 +39,39 @@ describe("ItemEditModal", () => {
 
   describe("opened from a row about a date", () => {
     let scrollIntoView: ReturnType<typeof vi.spyOn>;
+    let bodyScrolls: { el: HTMLElement; top: number }[];
     beforeEach(() => {
+      // Only the sheet's body may scroll; scrollIntoView would move the fixed
+      // overlay too and push the header off the screen.
       scrollIntoView = vi.spyOn(HTMLElement.prototype, "scrollIntoView");
+      bodyScrolls = [];
+      Object.defineProperty(HTMLElement.prototype, "scrollTop", {
+        configurable: true,
+        get: () => 0,
+        set(this: HTMLElement, top: number) {
+          bodyScrolls.push({ el: this, top });
+        },
+      });
+      vi.spyOn(
+        HTMLElement.prototype,
+        "getBoundingClientRect",
+      ).mockImplementation(function (this: HTMLElement) {
+        const field = this.getAttribute("data-field-key") === "expiry_date";
+        return { top: field ? 900 : 100, height: 40 } as DOMRect;
+      });
+      // jsdom loads no stylesheet: the sheet's body is the box that scrolls.
+      vi.spyOn(window, "getComputedStyle").mockImplementation(
+        (el) =>
+          ({
+            overflowY: el.classList.contains("overflow-y-auto")
+              ? "auto"
+              : "visible",
+          }) as CSSStyleDeclaration,
+      );
+      Object.defineProperty(HTMLElement.prototype, "clientHeight", {
+        configurable: true,
+        get: () => 400,
+      });
       // A dated record: the expiry field belongs to a category that keeps dates.
       server.use(
         http.get("/api/v1/items/:id", () =>
@@ -78,24 +109,31 @@ describe("ItemEditModal", () => {
         ),
       );
     });
-    afterEach(() => scrollIntoView.mockRestore());
+    afterEach(() => {
+      vi.restoreAllMocks();
+      for (const key of ["scrollTop", "clientHeight"]) {
+        Reflect.deleteProperty(HTMLElement.prototype, key);
+      }
+    });
 
-    it("brings the expiry date into view, the reason the row was tapped", async () => {
+    it("scrolls the sheet's body, not the page around it, to the expiry date", async () => {
       render(<ItemEditModal itemId="1" onClose={() => {}} openAtExpiry />);
       await screen.findByDisplayValue(/Test Item/i);
 
-      await waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(1));
-      expect(scrollIntoView.mock.contexts[0]).toHaveAttribute(
-        "data-field-key",
-        "expiry_date",
+      await waitFor(() => expect(bodyScrolls).toHaveLength(1));
+      // field 800px below the body's top, centred in a 400px viewport.
+      expect(bodyScrolls[0].top).toBe(800 - (400 - 40) / 2);
+      expect(bodyScrolls[0].el).toContainElement(
+        document.querySelector('[data-field-key="expiry_date"]') as HTMLElement,
       );
+      expect(scrollIntoView).not.toHaveBeenCalled();
     });
 
     it("opens at the top when nothing asked for the date", async () => {
       render(<ItemEditModal itemId="1" onClose={() => {}} />);
       await screen.findByDisplayValue(/Test Item/i);
 
-      expect(scrollIntoView).not.toHaveBeenCalled();
+      expect(bodyScrolls).toHaveLength(0);
     });
   });
 

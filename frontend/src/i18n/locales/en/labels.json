@@ -16,7 +16,8 @@
     "freeLabel": "Free label",
     "freeLabelNamed": "Free label {{code}}",
     "freeLabelConfirm": "Label {{code}} will no longer point at {{name}}. It can be attached to another product or reused.",
-    "freeLabelFailed": "Could not free the label"
+    "freeLabelFailed": "Could not free the label",
+    "previewLabel": "Print preview of label {{code}}"
   },
   "filters": {
     "statusAll": "All Statuses",
@@ -138,8 +139,6 @@
     "firstExpiry": "First expiry: {{date}}",
     "outOfStock": "Out of stock",
     "allUsed": "All units have been removed",
-    "consume1Title": "Remove 1",
-    "add1Title": "Add 1",
     "addToWarehouse": "Add to location",
     "addToShoppingList": "Add to shopping list",
     "usePartially": "Use partially",
@@ -157,7 +156,9 @@
     "useByLabel": "Use by after opening (optional)",
     "save": "Save",
     "markOpened": "Mark as opened",
-    "finished": "Finished"
+    "finished": "Finished",
+    "consume1Named": "Remove 1 from {{location}}",
+    "add1Named": "Add 1 to {{location}}"
   },
   "assignLabel": "Assign label",
   "attachToItem": {

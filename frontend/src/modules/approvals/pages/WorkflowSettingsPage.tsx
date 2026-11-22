@@ -183,6 +183,7 @@ function WorkflowCard({
               size="sm"
               leftIcon={<Pencil size={14} />}
               onClick={() => onEdit(wf)}
+              aria-label={t("workflows.editNamed", { name: wf.name })}
             >
               {t("common:actions.edit")}
             </Button>
@@ -191,6 +192,11 @@ function WorkflowCard({
               size="sm"
               leftIcon={<Power size={14} />}
               onClick={() => onToggleActive(wf)}
+              aria-label={
+                wf.is_active
+                  ? t("workflows.deactivateNamed", { name: wf.name })
+                  : t("workflows.activateNamed", { name: wf.name })
+              }
             >
               {wf.is_active
                 ? t("workflows.deactivate")
@@ -205,6 +211,7 @@ function WorkflowCard({
               size="sm"
               leftIcon={<Trash2 size={14} />}
               onClick={() => onDelete(wf)}
+              aria-label={t("workflows.deleteNamed", { name: wf.name })}
             >
               {t("common:actions.delete")}
             </Button>

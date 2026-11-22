@@ -37,7 +37,9 @@
     "edit": "Editar equipamento",
     "bulk_print_labels": "Imprimir etiquetas",
     "select_page": "Selecionar página",
-    "select_all_matching": "Selecionar todos os {{total}}"
+    "select_all_matching": "Selecionar todos os {{total}}",
+    "restoreNamed": "Restaurar {{name}}",
+    "purgeNamed": "Excluir permanentemente {{name}}"
   },
   "dashboard": {
     "title": "Visão geral dos equipamentos",
@@ -176,7 +178,7 @@
     "description_label": "Descrição",
     "technician_placeholder": "Nome do técnico",
     "type_label": "Tipo",
-    "deleteAriaLabel": "Excluir registro de manutenção",
+    "deleteAriaLabel": "Excluir registro de manutenção {{title}}",
     "confirmDeleteTitle": "Excluir registro de manutenção?",
     "confirmDeleteMessage": "Isto remove \"{{title}}\" permanentemente.",
     "log_failed": "Falha ao adicionar o registro de manutenção",
@@ -326,6 +328,7 @@
     "confirm_unretire_action": "Alterar estado",
     "cannot_maintain_deployed": "Não é possível definir Manutenção — devolva o equipamento primeiro",
     "confirm_purge": "Excluir este equipamento permanentemente?",
+    "confirm_purge_named": "Excluir {{name}} permanentemente?",
     "confirm_purge_msg": "Esta ação não pode ser desfeita. Todos os dados serão removidos permanentemente.",
     "retired": "Baixa registrada",
     "purged": "Equipamento excluído permanentemente",
@@ -794,7 +797,8 @@
       "skipped": "Não consultados, sem endereço de e-mail na entrega: {{names}}.",
       "failed_one": "{{count}} e-mail não pôde ser colocado na fila.",
       "failed_other": "{{count}} e-mails não puderam ser colocados na fila."
-    }
+    },
+    "copyLinkNamed": "Copiar link de {{name}}"
   },
   "attachments": {
     "title": "Anexos",
@@ -891,7 +895,8 @@
     "show_history": "Mostrar",
     "no_history": "Nenhuma atribuição anterior",
     "return": "Devolver",
-    "who_returns": "A devolução é registrada por quem recebe a unidade de volta — peça à pessoa que cuida dos equipamentos para registrá-la ou para informar um defeito."
+    "who_returns": "A devolução é registrada por quem recebe a unidade de volta — peça à pessoa que cuida dos equipamentos para registrá-la ou para informar um defeito.",
+    "returnNamed": "Devolver {{name}}"
   },
   "approvals": {
     "request": "Solicitar aprovação",

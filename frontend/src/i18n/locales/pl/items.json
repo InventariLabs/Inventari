@@ -126,7 +126,11 @@
     "selectItems": "Zaznacz produkty",
     "select": "Zaznacz {{name}}",
     "addOneUnit": "Dodaj 1 jednostkę",
-    "consume": "Zdejmij"
+    "consume": "Zdejmij",
+    "consume1unitFor": "Zdejmij 1 jednostkę: {{name}}",
+    "addOneUnitFor": "Dodaj 1 jednostkę: {{name}}",
+    "editFor": "Edytuj {{name}}",
+    "deleteFor": "Usuń {{name}}"
   },
   "import": {
     "pleaseWait": "Proszę czekać, przetwarzamy produkty.",
@@ -575,5 +579,7 @@
     "fefoHelp": "FEFO: najpierw wychodzi to, czemu najwcześniej kończy się termin, niezależnie od dnia przyjęcia.",
     "sharedProduct": "Ten produkt pochodzi ze wspólnego katalogu, więc kolejność wydawania jego zapasu należy do katalogu i nie da się jej tu zmienić."
   },
-  "addStorage": "Dodaj nowe miejsce"
+  "addStorage": "Dodaj nowe miejsce",
+  "restoreItemNamed": "Przywróć {{name}}",
+  "purgeItemNamed": "Usuń trwale {{name}}"
 }

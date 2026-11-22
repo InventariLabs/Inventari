@@ -4,7 +4,15 @@ import { DemoEntry } from "./DemoEntry";
 
 describe("DemoEntry", () => {
   it("tells the visitor what to keep out of the demo and when it ends", () => {
-    render(<DemoEntry onTry={vi.fn()} isOpening={false} failure={null} />);
+    render(
+      <DemoEntry
+        onTry={vi.fn()}
+        isOpening={false}
+        failure={null}
+        accountFormOpen={false}
+        onToggleAccountForm={vi.fn()}
+      />,
+    );
 
     // The entry screen carries both halves of the deal: the schedule the
     // copy lives on, and the plain instruction to keep real data out.

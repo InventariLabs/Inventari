@@ -171,9 +171,12 @@ function needsHandingOver(
 function CopyLinkButton({
   campaignId,
   responseId,
+  name,
 }: {
   campaignId: string;
   responseId: string;
+  /** Who the link is for: every row's button reads the same. */
+  name: string;
 }) {
   const { t } = useTranslation("equipment");
   const copy = async () => {
@@ -197,6 +200,7 @@ function CopyLinkButton({
       size="sm"
       onClick={() => void copy()}
       leftIcon={<Link2 size={14} />}
+      aria-label={t("attestation.copyLinkNamed", { name })}
     >
       {t("attestation.copyLink")}
     </Button>
@@ -308,7 +312,11 @@ function ResponsesTable({
                 <td className="py-2 pr-4">
                   <ResponseBadge status={responseDisplayStatus(r, live)} />
                   {canHandOver && needsHandingOver(r, canSendEmail) && (
-                    <CopyLinkButton campaignId={campaignId} responseId={r.id} />
+                    <CopyLinkButton
+                      campaignId={campaignId}
+                      responseId={r.id}
+                      name={r.assignee_name}
+                    />
                   )}
                 </td>
                 <td className="py-2 pr-4 text-on-secondary text-sm">
@@ -373,7 +381,11 @@ function ResponsesCards({
             <ResponseBadge status={responseDisplayStatus(r, live)} />
           </div>
           {canHandOver && needsHandingOver(r, canSendEmail) && (
-            <CopyLinkButton campaignId={campaignId} responseId={r.id} />
+            <CopyLinkButton
+              campaignId={campaignId}
+              responseId={r.id}
+              name={r.assignee_name}
+            />
           )}
           <div className="text-sm text-on">
             {r.items.length > 0 ? (

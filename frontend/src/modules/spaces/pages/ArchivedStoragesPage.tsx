@@ -166,6 +166,9 @@ export default function ArchivedStoragesPage() {
                               size="sm"
                               onClick={() => handleRestore(storage)}
                               disabled={restoreMutation.isPending}
+                              aria-label={t("locations:archived.restoreNamed", {
+                                name: storage.name,
+                              })}
                             >
                               <RotateCcw className="h-4 w-4 mr-2" />
                               {t("locations:archived.restore")}

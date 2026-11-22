@@ -174,7 +174,8 @@ describe("ArchivedStoragesPage", () => {
     renderPage();
     await screen.findByText("Fridge");
 
-    await user.click(screen.getByRole("button", { name: /restore/i }));
+    // Every row's button reads "Restore"; the name says which location.
+    await user.click(screen.getByRole("button", { name: "Restore Fridge" }));
 
     await waitFor(() => expect(restored).toEqual(["s-1"]));
   });

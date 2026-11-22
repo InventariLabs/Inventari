@@ -57,6 +57,9 @@ export function ApprovalDecisionButtons({
 }: ApprovalDecisionButtonsProps) {
   const { t } = useTranslation("approvals");
   const currentUserId = useAuthStore((state) => state.user?.id);
+  // Several requests share a screen, each with its own Approve and Reject:
+  // the document's number says which one a press decides.
+  const subject = approval.target_summary?.number;
   const [rejectNotes, setRejectNotes] = useState("");
   const [showRejectInput, setShowRejectInput] = useState(false);
   const [showApproveConfirm, setShowApproveConfirm] = useState(false);
@@ -161,6 +164,9 @@ export function ApprovalDecisionButtons({
             onClick={() => setShowApproveConfirm(true)}
             isLoading={approveStage.isPending || isOverrideApproving}
             className={actionClass}
+            aria-label={
+              subject ? t("request.approveNamed", { name: subject }) : undefined
+            }
           >
             {t("request.approve")}
           </Button>
@@ -172,6 +178,9 @@ export function ApprovalDecisionButtons({
             leftIcon={<XCircle size={16} />}
             onClick={() => setShowRejectInput(true)}
             className={actionClass}
+            aria-label={
+              subject ? t("request.rejectNamed", { name: subject }) : undefined
+            }
           >
             {t("request.reject")}
           </Button>

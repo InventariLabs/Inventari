@@ -230,14 +230,18 @@ describe("ItemsPage — the phone's actions sheet", () => {
     renderWithHeader();
     await screen.findAllByText(/Test Item/i);
 
-    await user.click(screen.getByRole("button", { name: "Remove 1 unit" }));
+    await user.click(
+      screen.getByRole("button", { name: /^Remove 1 unit of / }),
+    );
     let dialog = await screen.findByRole("alertdialog");
     expect(dialog).toHaveTextContent("Remove from stock");
     await user.click(within(dialog).getByRole("button", { name: /cancel/i }));
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
     expect(body).toBeNull();
 
-    await user.click(screen.getByRole("button", { name: "Remove 1 unit" }));
+    await user.click(
+      screen.getByRole("button", { name: /^Remove 1 unit of / }),
+    );
     dialog = await screen.findByRole("alertdialog");
     await user.click(
       within(dialog).getByRole("button", { name: /^remove( 1)?$/i }),

@@ -181,7 +181,9 @@ describe("MyAssetsPage", () => {
     const user = renderPage();
     await screen.findByText("ThinkPad T14");
 
-    await user.click(screen.getByRole("button", { name: /Return/ }));
+    await user.click(
+      screen.getByRole("button", { name: "Return ThinkPad T14" }),
+    );
     const dialog = await screen.findByRole("dialog");
     expect(dialog).toHaveTextContent("ThinkPad T14");
     await user.click(screen.getByText("Cancel", { selector: "button" }));

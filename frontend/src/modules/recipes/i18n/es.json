@@ -80,7 +80,9 @@
     "unknown_inline_one": "Sin vincular al stock: {{count}}",
     "unknown_inline_other": "Sin vincular al stock: {{count}}",
     "incomparable": "No comparable",
-    "incomparable_tooltip": "Está en la estantería, pero la medida de la receta y la del stock no se pueden comparar: nadie puede decir si alcanza."
+    "incomparable_tooltip": "Está en la estantería, pero la medida de la receta y la del stock no se pueden comparar: nadie puede decir si alcanza.",
+    "not_comparable_fix_named": "Anota el peso o volumen por pieza: {{name}}",
+    "link_to_product_for": "Vincular al producto: {{name}}"
   },
   "linking": {
     "title": "Ingredientes sin producto",
@@ -351,7 +353,6 @@
   },
   "tags_manager": {
     "title": "Etiquetas",
-    "set_color": "Establecer color",
     "clear_color": "Quitar color",
     "merge_title": "Fusionar etiquetas",
     "merge_from": "Reemplazar etiqueta",
@@ -382,7 +383,9 @@
     "delete_confirm_message": "«{{name}}» se quitará de todas las recetas que la llevan. Las recetas se mantienen.",
     "delete_success_one": "Eliminada: 1 receta actualizada",
     "delete_success_other": "Eliminada: {{count}} recetas actualizadas",
-    "delete_failed": "No se pudo eliminar la etiqueta"
+    "delete_failed": "No se pudo eliminar la etiqueta",
+    "set_color_for": "Establecer color de {{name}}",
+    "more_for": "Más acciones para {{name}}"
   },
   "import_export": {
     "export_json": "Descargar JSON",
@@ -725,7 +728,8 @@
     "back_to_plans": "Volver a los menús",
     "cook_now_named": "Cocinar ahora: {{recipe}}",
     "remove_entry_named": "Quitar {{recipe}} del plan",
-    "drag_to_move_named": "Arrastra para mover: {{recipe}}"
+    "drag_to_move_named": "Arrastra para mover: {{recipe}}",
+    "delete_plan_for": "Eliminar el plan {{name}}"
   },
   "cooking": {
     "rateSession_one": "Valorar sesión: {{count}} estrella",
@@ -767,8 +771,6 @@
   },
   "bulk": {
     "select_mode": "Seleccionar recetas",
-    "select": "Seleccionar",
-    "deselect": "Deseleccionar",
     "select_all": "Seleccionar todo",
     "deselect_all": "Deseleccionar todo",
     "selected_count": "{{count}} seleccionadas",
@@ -796,7 +798,9 @@
     "deleted_one": "{{count}} receta eliminada",
     "deleted_other": "{{count}} recetas eliminadas",
     "toolbar_label_one": "{{count}} receta seleccionada",
-    "toolbar_label_other": "{{count}} recetas seleccionadas"
+    "toolbar_label_other": "{{count}} recetas seleccionadas",
+    "select_for": "Seleccionar {{name}}",
+    "deselect_for": "Quitar la selección de {{name}}"
   },
   "collections": {
     "load_failed": "No se pudieron cargar las colecciones.",
@@ -816,7 +820,9 @@
     "add_one": "Añadir",
     "added_one": "Añadida",
     "add_none": "No hay nada que añadir: crea primero una receta",
-    "add_no_match": "Ninguna receta coincide con tu búsqueda"
+    "add_no_match": "Ninguna receta coincide con tu búsqueda",
+    "rename_for": "Renombrar {{name}}",
+    "delete_for": "Eliminar colección {{name}}"
   },
   "cookForStock": {
     "button": "Cocinar un lote para el stock",

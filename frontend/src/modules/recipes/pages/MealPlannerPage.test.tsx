@@ -168,7 +168,7 @@ describe("MealPlannerPage — deleting a plan asks first", () => {
 
   it("sends nothing on the click and names the meals that would go", () => {
     renderPage();
-    fireEvent.click(screen.getByRole("button", { name: "Delete plan" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Delete plan / }));
 
     expect(deleteMock.mutateAsync).not.toHaveBeenCalled();
     expect(screen.getByRole("alertdialog")).toHaveTextContent(
@@ -178,7 +178,7 @@ describe("MealPlannerPage — deleting a plan asks first", () => {
 
   it("keeps the plan when the question is cancelled", () => {
     renderPage();
-    fireEvent.click(screen.getByRole("button", { name: "Delete plan" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Delete plan / }));
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
     expect(deleteMock.mutateAsync).not.toHaveBeenCalled();
@@ -187,7 +187,7 @@ describe("MealPlannerPage — deleting a plan asks first", () => {
 
   it("deletes that plan once the question is confirmed", async () => {
     renderPage();
-    fireEvent.click(screen.getByRole("button", { name: "Delete plan" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Delete plan / }));
     const dialog = screen.getByRole("alertdialog");
     fireEvent.click(
       within(dialog).getByRole("button", { name: "Delete plan" }),

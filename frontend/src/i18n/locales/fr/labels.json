@@ -16,7 +16,8 @@
     "freeLabel": "Libérer l’étiquette",
     "freeLabelNamed": "Libérer l’étiquette {{code}}",
     "freeLabelConfirm": "L’étiquette {{code}} ne désignera plus {{name}}. Elle pourra être attachée à un autre produit ou réutilisée.",
-    "freeLabelFailed": "Impossible de libérer l’étiquette"
+    "freeLabelFailed": "Impossible de libérer l’étiquette",
+    "previewLabel": "Aperçu avant impression de l'étiquette {{code}}"
   },
   "filters": {
     "statusAll": "Tous les statuts",
@@ -138,8 +139,6 @@
     "firstExpiry": "Première expiration : {{date}}",
     "outOfStock": "Rupture de stock",
     "allUsed": "Toutes les unités ont été retirées",
-    "consume1Title": "Retirer 1",
-    "add1Title": "Ajouter 1",
     "addToWarehouse": "Ajouter à l'emplacement",
     "addToShoppingList": "Ajouter à la liste de courses",
     "usePartially": "Utiliser en partie",
@@ -157,7 +156,9 @@
     "useByLabel": "À consommer avant (après ouverture, facultatif)",
     "save": "Enregistrer",
     "markOpened": "Marquer comme ouvert",
-    "finished": "Terminé"
+    "finished": "Terminé",
+    "consume1Named": "Retirer 1 de {{location}}",
+    "add1Named": "Ajouter 1 à {{location}}"
   },
   "assignLabel": "Attribuer l'étiquette",
   "attachToItem": {

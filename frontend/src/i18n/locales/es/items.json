@@ -119,7 +119,11 @@
     "selectItems": "Seleccionar productos",
     "select": "Seleccionar {{name}}",
     "addOneUnit": "Añadir 1 unidad",
-    "consume": "Retirar"
+    "consume": "Retirar",
+    "consume1unitFor": "Retirar 1 unidad de {{name}}",
+    "addOneUnitFor": "Añadir 1 unidad a {{name}}",
+    "editFor": "Editar {{name}}",
+    "deleteFor": "Eliminar {{name}}"
   },
   "import": {
     "pleaseWait": "Espere mientras procesamos sus productos.",
@@ -533,5 +537,7 @@
     "fefoHelp": "FEFO: sale primero lo que caduca antes, sin importar cuándo entró.",
     "sharedProduct": "Este producto procede del catálogo compartido, así que el orden en que sale su stock es del catálogo y no se puede cambiar aquí."
   },
-  "addStorage": "Añadir ubicación"
+  "addStorage": "Añadir ubicación",
+  "restoreItemNamed": "Restaurar {{name}}",
+  "purgeItemNamed": "Eliminar {{name}} permanentemente"
 }

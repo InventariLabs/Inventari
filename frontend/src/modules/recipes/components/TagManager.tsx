@@ -79,7 +79,7 @@ function TagRow({
       <InlinePopover
         open={showPicker}
         onOpenChange={setShowPicker}
-        label={t("tags_manager.set_color")}
+        label={t("tags_manager.set_color_for", { name: tag.name })}
         align="start"
         className="w-48 flex flex-wrap gap-1.5"
         trigger={
@@ -89,8 +89,8 @@ function TagRow({
             size="inline"
             variant="ghost"
             className="h-6 w-6 shrink-0 rounded-full p-0"
-            aria-label={t("tags_manager.set_color")}
-            title={t("tags_manager.set_color")}
+            aria-label={t("tags_manager.set_color_for", { name: tag.name })}
+            title={t("tags_manager.set_color_for", { name: tag.name })}
           >
             <span
               aria-hidden="true"
@@ -143,7 +143,7 @@ function TagRow({
       {/* Tags are typed into a comma-separated field, so a typo stays until it is
           fixed here: the panel can colour a tag and merge it into another. */}
       <ActionMenu
-        label={t("common:actions.more")}
+        label={t("recipes:tags_manager.more_for", { name: tag.name })}
         actions={[
           {
             id: "rename",

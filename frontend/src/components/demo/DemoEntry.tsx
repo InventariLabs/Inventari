@@ -1,22 +1,34 @@
 import { useTranslation } from "react-i18next";
-import { Sparkles } from "lucide-react";
+import { ChevronDown, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import type { DemoSandboxFailure } from "@/lib/demoSandboxFailure";
 import { DemoSandboxFailureText } from "./DemoSandboxFailureText";
+
+/** The id of the sign-in form the entry's toggle opens and closes. */
+export const ACCOUNT_FORM_ID = "account-sign-in";
 
 interface DemoEntryProps {
   onTry: () => void;
   isOpening: boolean;
   /** Why the last attempt was refused, said plainly. */
   failure: DemoSandboxFailure | null;
+  accountFormOpen: boolean;
+  onToggleAccountForm: () => void;
 }
 
 /**
  * The public demo's way in: an organization of the visitor's own, one click.
  *
- * Above the sign-in form, which stays for the operator's own account.
+ * Its button is the page's one main action; the sign-in form for the
+ * operator's own account opens from the line beneath it.
  */
-export function DemoEntry({ onTry, isOpening, failure }: DemoEntryProps) {
+export function DemoEntry({
+  onTry,
+  isOpening,
+  failure,
+  accountFormOpen,
+  onToggleAccountForm,
+}: DemoEntryProps) {
   const { t } = useTranslation("auth");
 
   return (
@@ -47,9 +59,20 @@ export function DemoEntry({ onTry, isOpening, failure }: DemoEntryProps) {
           <DemoSandboxFailureText failure={failure} />
         </p>
       )}
-      <p className="pt-3 text-center text-xs font-medium text-on-muted">
+      <button
+        type="button"
+        onClick={onToggleAccountForm}
+        aria-expanded={accountFormOpen}
+        aria-controls={ACCOUNT_FORM_ID}
+        className="mx-auto mt-3 flex min-h-11 items-center gap-1.5 text-xs font-medium text-on-muted hover:text-on md:min-h-0"
+      >
         {t("demo.orSignIn")}
-      </p>
+        <ChevronDown
+          size={18}
+          aria-hidden="true"
+          className={accountFormOpen ? "rotate-180" : undefined}
+        />
+      </button>
     </section>
   );
 }
