@@ -41,9 +41,13 @@ def _milk_and_recipe(
     db: Session,
     user: User,
     shelf: StorageLocation,
+    *,
+    symbol: str = 'l',
+    stock: str = '1',
+    needed: str = '1',
 ) -> tuple[Item, str]:
-    """One litre of milk on a shelf and a recipe that takes all of it."""
-    litre = _uom_id(db, 'l')
+    """``stock`` of milk on a shelf and a recipe that takes ``needed`` of it."""
+    litre = _uom_id(db, symbol)
     template = ProductTemplate(
         id=uuid.uuid4(),
         organization_id=user.organization_id,
@@ -59,7 +63,7 @@ def _milk_and_recipe(
         name='Milk',
         template_id=template.id,
         uom_id=litre,
-        quantity=Decimal('1'),
+        quantity=Decimal(stock),
     )
     db.add(item)
     anchor_pending_records(db)
@@ -74,7 +78,7 @@ def _milk_and_recipe(
                 {
                     'name': 'Milk',
                     'template_id': str(template.id),
-                    'quantity': '1',
+                    'quantity': needed,
                     'uom_id': str(litre),
                     'is_optional': False,
                 }
@@ -138,4 +142,70 @@ class TestAPickThatEmptiesARecordFilesItAsUsedUp:
         quantity, _ = _where(db_session, item.id)
         db_session.refresh(item)
         assert quantity == 1
+        assert item.storage_location_id == test_storage_location.id
+
+    def test_the_last_half_of_an_opened_pack_is_filed_as_used_up(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+        test_user: User,
+        test_storage_location: StorageLocation,
+    ) -> None:
+        """The first pick leaves half a pack; the second takes that last half."""
+        item, recipe_id = _milk_and_recipe(
+            client,
+            auth_headers,
+            db_session,
+            test_user,
+            test_storage_location,
+            symbol='pcs',
+            stock='1.5',
+        )
+
+        def pick() -> dict[str, str]:
+            start = client.post(
+                f'{RECIPE_URL}/{recipe_id}/picking/start',
+                json={'servings': 1},
+                headers=auth_headers,
+            )
+            session_id = start.json()['picking_session_id']
+            scan = client.post(
+                f'{RECIPE_URL}/{recipe_id}/picking/{session_id}/scan',
+                json={'item_id': str(item.id)},
+                headers=auth_headers,
+            )
+            assert scan.status_code == 200, scan.text
+            assert scan.json()['status'] == 'picked'
+            return {'session': session_id, 'ingredient': scan.json()['ingredient_id']}
+
+        first = pick()
+        done = client.post(
+            f'{RECIPE_URL}/{recipe_id}/picking/{first["session"]}/complete',
+            headers=auth_headers,
+        )
+        assert done.status_code == 200, done.text
+        quantity, usage = _where(db_session, item.id)
+        assert quantity == Decimal('0.5')
+        assert usage != LocationUsage.CUSTOMER
+        listed = client.get('/api/v1/items', headers=auth_headers).json()['items']
+        assert str(item.id) in {row['id'] for row in listed}
+
+        second = pick()
+        quantity, usage = _where(db_session, item.id)
+        assert quantity == 0
+        assert usage == LocationUsage.CUSTOMER
+        listed = client.get('/api/v1/items', headers=auth_headers).json()['items']
+        assert str(item.id) not in {row['id'] for row in listed}
+
+        # Taking the second pick back returns the half to the record's shelf.
+        undo = client.post(
+            f'{RECIPE_URL}/{recipe_id}/picking/{second["session"]}/undo',
+            json={'ingredient_id': second['ingredient']},
+            headers=auth_headers,
+        )
+        assert undo.status_code == 200, undo.text
+        quantity, usage = _where(db_session, item.id)
+        db_session.refresh(item)
+        assert quantity == Decimal('0.5')
         assert item.storage_location_id == test_storage_location.id
