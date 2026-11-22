@@ -39,11 +39,6 @@ def register_held_back_locations(module: str, provider: HeldBackProvider) -> Non
     _providers[module] = provider
 
 
-def clear_held_back_locations() -> None:
-    """Reset the registry — test isolation only."""
-    _providers.clear()
-
-
 async def held_back_locations_async(
     db: AsyncSession, organization_id: UUID
 ) -> dict[UUID, str]:
