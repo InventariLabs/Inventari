@@ -124,7 +124,7 @@ vi.mock("@/modules/settings/hooks/useOrganization", () => ({
   useShowModuleData: vi.fn(() => false),
 }));
 
-const purgeLabel = "Delete permanently";
+const purgeLabel = /^Delete .* permanently$/;
 
 /** The archive's two actions are permission-gated, so every test needs an
  *  account that holds them; the ones about denial narrow it themselves. */

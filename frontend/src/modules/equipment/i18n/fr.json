@@ -37,7 +37,9 @@
     "edit": "Modifier l'actif",
     "bulk_print_labels": "Imprimer les étiquettes",
     "select_page": "Sélectionner la page",
-    "select_all_matching": "Tout sélectionner ({{total}})"
+    "select_all_matching": "Tout sélectionner ({{total}})",
+    "restoreNamed": "Restaurer {{name}}",
+    "purgeNamed": "Supprimer {{name}} définitivement"
   },
   "dashboard": {
     "title": "Aperçu de l'équipement",
@@ -183,7 +185,7 @@
     "description_label": "Description",
     "technician_placeholder": "Nom du technicien",
     "type_label": "Type",
-    "deleteAriaLabel": "Supprimer l'entrée de maintenance",
+    "deleteAriaLabel": "Supprimer l'entrée de maintenance {{title}}",
     "confirmDeleteTitle": "Supprimer l'entrée de maintenance ?",
     "confirmDeleteMessage": "Cela supprime définitivement « {{title}} ».",
     "log_failed": "Échec de l'ajout de l'entrée de service",
@@ -801,7 +803,8 @@
       "skipped": "Non sollicités, sans adresse e-mail sur leur affectation : {{names}}.",
       "failed_one": "{{count}} e-mail n’a pas pu être mis en file d’envoi.",
       "failed_other": "{{count}} e-mails n’ont pas pu être mis en file d’envoi."
-    }
+    },
+    "copyLinkNamed": "Copier le lien de {{name}}"
   },
   "attachments": {
     "title": "Pièces jointes",
@@ -898,7 +901,8 @@
     "show_history": "Afficher",
     "no_history": "Aucune affectation passée",
     "return": "Rendre",
-    "who_returns": "Un retour est enregistré par la personne qui reçoit l'actif — demandez au responsable du matériel de le réceptionner ou de signaler une panne."
+    "who_returns": "Un retour est enregistré par la personne qui reçoit l'actif — demandez au responsable du matériel de le réceptionner ou de signaler une panne.",
+    "returnNamed": "Rendre {{name}}"
   },
   "approvals": {
     "request": "Demander une approbation",

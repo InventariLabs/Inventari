@@ -27,6 +27,7 @@ export function MealPlanCard({
   canWrite = true,
   t,
 }: MealPlanCardProps) {
+  const planName = plan.name ?? t("recipes:meal_planner.unnamed_plan");
   return (
     <Card className="p-4 flex flex-col gap-3">
       {/* the whole header + badges area navigates to the plan —
@@ -38,7 +39,7 @@ export function MealPlanCard({
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-sm truncate group-hover:text-primary-600 transition-colors">
-              {plan.name ?? t("recipes:meal_planner.unnamed_plan")}
+              {planName}
             </h3>
             <div className="flex items-center gap-1.5 text-xs text-on-muted mt-1">
               <Calendar size={12} />
@@ -104,8 +105,12 @@ export function MealPlanCard({
             size="sm"
             className="text-on-danger hover:text-on-danger hover:bg-red-50 ml-auto"
             onClick={() => onDelete(plan.id)}
-            aria-label={t("recipes:meal_planner.delete_plan")}
-            title={t("recipes:meal_planner.delete_plan")}
+            aria-label={t("recipes:meal_planner.delete_plan_for", {
+              name: planName,
+            })}
+            title={t("recipes:meal_planner.delete_plan_for", {
+              name: planName,
+            })}
           >
             <Trash2 size={16} aria-hidden="true" />
           </Button>

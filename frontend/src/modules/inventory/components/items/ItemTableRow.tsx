@@ -131,11 +131,13 @@ function AddOneButton({
   item,
   storages,
   label,
+  name,
   onAddOne,
 }: {
   item: Item;
   storages: StorageLocationSummary[] | undefined;
   label: string;
+  name: string;
   onAddOne: (itemId: string) => void;
 }) {
   if (isInVirtualPlace(item.location_id, storages)) return null;
@@ -145,7 +147,7 @@ function AddOneButton({
       variant="ghost"
       onClick={() => onAddOne(item.id)}
       className="relative group/tooltip text-on-muted hover:text-primary-600 hover:bg-primary-50"
-      aria-label={label}
+      aria-label={name}
     >
       <Plus size={16} />
       <Tooltip label={label} />
@@ -268,6 +270,9 @@ function ItemTableRowBase({
   const consumeLabel = t("items:actions.consume1unit");
   const addOneLabel = t("items:actions.addOneUnit");
   const editLabel = t("items:actions.edit");
+  // Every row carries the same three words, so the accessible name adds the
+  // product; it still starts with the tooltip's text (WCAG 2.5.3).
+  const forProduct = { name: item.name };
 
   // A real table, not a stack of cards: hairline row dividers via border-b,
   // no per-row boxes. The border lives on the cells because a `<tr>` cannot
@@ -511,16 +516,16 @@ function ItemTableRowBase({
               {/* Each icon-only button carries its words in a tooltip of the
                 app's own, on hover and on keyboard focus — `title` answers
                 hover only and stacks a second bubble beside this one. The
-                tooltip text and the `aria-label` are the same variable, so
-                "activate Remove 1 unit" cannot land on a control named
-                "Remove" (WCAG 2.5.3). */}
+                `aria-label` begins with the tooltip's words and adds the
+                product, so "activate Remove 1 unit" still lands on the
+                control (WCAG 2.5.3) and each row's buttons tell apart. */}
               <Button
                 size="iconSm"
                 variant="ghost"
                 onClick={() => onConsume(item.id)}
                 disabled={consumingId === item.id}
                 className="relative group/tooltip text-on-muted hover:text-accent-600 hover:bg-accent-50"
-                aria-label={consumeLabel}
+                aria-label={t("items:actions.consume1unitFor", forProduct)}
               >
                 {consumingId === item.id ? (
                   <span className="text-[10px] font-medium">…</span>
@@ -535,6 +540,7 @@ function ItemTableRowBase({
                 item={item}
                 storages={storages}
                 label={addOneLabel}
+                name={t("items:actions.addOneUnitFor", forProduct)}
                 onAddOne={onAddOne}
               />
               <Button
@@ -542,7 +548,7 @@ function ItemTableRowBase({
                 variant="ghost"
                 onClick={() => onEdit(item.id)}
                 className="relative group/tooltip text-on-muted hover:text-primary-600 hover:bg-primary-50"
-                aria-label={editLabel}
+                aria-label={t("items:actions.editFor", forProduct)}
               >
                 <Edit2 size={16} />
                 <Tooltip label={editLabel} />
@@ -550,6 +556,7 @@ function ItemTableRowBase({
               <DeleteAction
                 canDelete={canDelete}
                 label={t("items:actions.delete")}
+                name={t("items:actions.deleteFor", forProduct)}
                 onClick={() => onDelete(item.id)}
               />
             </>
@@ -572,10 +579,12 @@ function ItemTableRowBase({
 function DeleteAction({
   canDelete,
   label,
+  name,
   onClick,
 }: {
   canDelete?: boolean;
   label: string;
+  name: string;
   onClick: () => void;
 }) {
   if (!canDelete) return null;
@@ -587,7 +596,7 @@ function DeleteAction({
         variant="ghostDanger"
         onClick={onClick}
         className="relative group/tooltip"
-        aria-label={label}
+        aria-label={name}
       >
         <Trash2 size={16} />
         <Tooltip label={label} />

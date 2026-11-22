@@ -131,7 +131,9 @@ describe("StockActionSheet", () => {
     );
     // The action is named "Remove" everywhere since; this sheet was the
     // last screen still saying "Consume".
-    const consumeBtn = container.querySelector('button[aria-label="Remove 1"]');
+    const consumeBtn = container.querySelector(
+      'button[aria-label^="Remove 1 from"]',
+    );
     expect(consumeBtn).not.toBeNull();
     fireEvent.click(consumeBtn!);
     expect(onConsume).toHaveBeenCalled();
@@ -261,8 +263,10 @@ describe("StockActionSheet", () => {
 
     it("keeps the plus and minus buttons 44 px wide", () => {
       const { container } = renderOne();
-      for (const label of ["Remove 1", "Add 1"]) {
-        const button = container.querySelector(`button[aria-label="${label}"]`);
+      for (const label of ["Remove 1 from", "Add 1 to"]) {
+        const button = container.querySelector(
+          `button[aria-label^="${label}"]`,
+        );
         expect(button).toHaveClass("h-11", "w-11");
         expect(button).not.toHaveClass("h-8");
       }

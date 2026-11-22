@@ -476,7 +476,7 @@ describe("ApprovalActions with CANCELLED status", () => {
       screen.queryByRole("button", { name: /Approve$/ }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Reject" }),
+      screen.queryByRole("button", { name: /^Reject/ }),
     ).not.toBeInTheDocument();
   });
 

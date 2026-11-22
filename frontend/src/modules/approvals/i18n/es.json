@@ -219,7 +219,11 @@
     "addRolePlaceholder": "Elige un rol…",
     "roleAddsNobody": "No hay nadie nuevo que añadir: todas las personas activas con el rol «{{role}}» ya están designadas.",
     "roleMembersFailed": "No se pudo leer quién tiene ese rol.",
-    "waitingUnavailable": "No se pudo comprobar qué espera a este flujo, así que ahora no se puede desactivar. Cierra esto e inténtalo de nuevo."
+    "waitingUnavailable": "No se pudo comprobar qué espera a este flujo, así que ahora no se puede desactivar. Cierra esto e inténtalo de nuevo.",
+    "editNamed": "Editar {{name}}",
+    "deactivateNamed": "Desactivar {{name}}",
+    "activateNamed": "Activar {{name}}",
+    "deleteNamed": "Eliminar {{name}}"
   },
   "request": {
     "pending": "Pendiente",
@@ -286,7 +290,9 @@
     "deadEndStepAskRequesterUnnamed": "Pide a quien creó la solicitud que la retire.",
     "deadEndLinkMembers": "Miembros y roles",
     "deadEndLinkRoles": "Roles",
-    "deadEndLinkSettings": "Ajustes de aprobaciones"
+    "deadEndLinkSettings": "Ajustes de aprobaciones",
+    "approveNamed": "Aprobar {{name}}",
+    "rejectNamed": "Rechazar {{name}}"
   },
   "deleteWorkflow": "Eliminar flujo de trabajo",
   "deleteWorkflowConfirm": "¿Eliminar este flujo? Desaparece de esta lista. Las solicitudes ya creadas con él se conservan en el panel de Aprobaciones, con las etapas por las que pasaron.",

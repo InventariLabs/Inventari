@@ -18,7 +18,8 @@
     "freeLabel": "Zwolnij etykietę",
     "freeLabelNamed": "Zwolnij etykietę {{code}}",
     "freeLabelConfirm": "Etykieta {{code}} przestanie wskazywać produkt {{name}}. Można ją przypisać do innego produktu lub użyć ponownie.",
-    "freeLabelFailed": "Nie udało się zwolnić etykiety"
+    "freeLabelFailed": "Nie udało się zwolnić etykiety",
+    "previewLabel": "Podgląd wydruku etykiety {{code}}"
   },
   "filters": {
     "statusAll": "Wszystkie statusy",
@@ -146,8 +147,6 @@
     "firstExpiry": "Najkrótsza data: {{date}}",
     "outOfStock": "Brak w magazynie",
     "allUsed": "Wszystkie jednostki zostały zdjęte",
-    "consume1Title": "Zdejmij 1",
-    "add1Title": "Dodaj 1",
     "addToWarehouse": "Dodaj do miejsca",
     "addToShoppingList": "Dodaj do listy zakupów",
     "usePartially": "Zużyj część",
@@ -165,7 +164,9 @@
     "useByLabel": "Zużyć do po otwarciu (opcjonalnie)",
     "save": "Zapisz",
     "markOpened": "Oznacz jako otwarte",
-    "finished": "Skończone"
+    "finished": "Skończone",
+    "consume1Named": "Zdejmij 1 z: {{place}}",
+    "add1Named": "Dodaj 1 do: {{place}}"
   },
   "assignLabel": "Przypisz etykietę",
   "attachToItem": {

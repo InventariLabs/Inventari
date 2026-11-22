@@ -119,7 +119,11 @@
     "selectItems": "Produkte auswählen",
     "select": "{{name}} auswählen",
     "addOneUnit": "1 Einheit hinzufügen",
-    "consume": "Entfernen"
+    "consume": "Entfernen",
+    "consume1unitFor": "1 Einheit von {{name}} entfernen",
+    "addOneUnitFor": "1 Einheit zu {{name}} hinzufügen",
+    "editFor": "{{name}} bearbeiten",
+    "deleteFor": "{{name}} löschen"
   },
   "import": {
     "pleaseWait": "Bitte warten Sie, während Ihre Produkte verarbeitet werden.",
@@ -533,5 +537,7 @@
     "fefoHelp": "FEFO: Was zuerst abläuft, geht zuerst hinaus, egal wann es eingegangen ist.",
     "sharedProduct": "Dieses Produkt stammt aus dem gemeinsamen Katalog, daher gehört die Ausgabereihenfolge seines Bestands dem Katalog und lässt sich hier nicht ändern."
   },
-  "addStorage": "Neuen Lagerort hinzufügen"
+  "addStorage": "Neuen Lagerort hinzufügen",
+  "restoreItemNamed": "{{name}} wiederherstellen",
+  "purgeItemNamed": "{{name}} endgültig löschen"
 }

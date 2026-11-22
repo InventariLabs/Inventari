@@ -16,7 +16,8 @@
     "freeLabel": "Etikett freigeben",
     "freeLabelNamed": "Etikett {{code}} freigeben",
     "freeLabelConfirm": "Das Etikett {{code}} verweist nicht mehr auf {{name}}. Es kann einem anderen Produkt zugewiesen oder wiederverwendet werden.",
-    "freeLabelFailed": "Das Etikett konnte nicht freigegeben werden"
+    "freeLabelFailed": "Das Etikett konnte nicht freigegeben werden",
+    "previewLabel": "Druckvorschau für Etikett {{code}}"
   },
   "filters": {
     "statusAll": "Alle Status",
@@ -138,8 +139,6 @@
     "firstExpiry": "Erstes Ablaufdatum: {{date}}",
     "outOfStock": "Nicht auf Lager",
     "allUsed": "Alle Einheiten wurden entfernt",
-    "consume1Title": "1 entfernen",
-    "add1Title": "1 hinzufügen",
     "addToWarehouse": "Zum Lagerort hinzufügen",
     "addToShoppingList": "Zur Einkaufsliste hinzufügen",
     "usePartially": "Teilweise verbrauchen",
@@ -157,7 +156,9 @@
     "useByLabel": "Verbrauchen bis nach dem Öffnen (optional)",
     "save": "Speichern",
     "markOpened": "Als geöffnet markieren",
-    "finished": "Aufgebraucht"
+    "finished": "Aufgebraucht",
+    "consume1Named": "1 aus {{place}} entfernen",
+    "add1Named": "1 zu {{place}} hinzufügen"
   },
   "assignLabel": "Etikett zuweisen",
   "attachToItem": {

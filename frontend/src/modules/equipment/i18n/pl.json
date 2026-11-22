@@ -39,7 +39,9 @@
     "edit": "Edytuj zasób",
     "bulk_print_labels": "Drukuj etykiety",
     "select_page": "Zaznacz stronę",
-    "select_all_matching": "Zaznacz wszystkie {{total}}"
+    "select_all_matching": "Zaznacz wszystkie {{total}}",
+    "restoreNamed": "Przywróć {{name}}",
+    "purgeNamed": "Usuń trwale {{name}}"
   },
   "dashboard": {
     "title": "Przegląd sprzętu",
@@ -194,7 +196,7 @@
     "description_label": "Opis",
     "technician_placeholder": "Imię i nazwisko technika",
     "type_label": "Typ",
-    "deleteAriaLabel": "Usuń wpis serwisowy",
+    "deleteAriaLabel": "Usuń wpis serwisowy {{title}}",
     "confirmDeleteTitle": "Usunąć wpis serwisowy?",
     "confirmDeleteMessage": "To trwale usunie „{{title}}”.",
     "log_failed": "Nie udało się dodać wpisu serwisowego",
@@ -878,7 +880,8 @@
       "failed_few": "{{count}} e-maili nie udało się przekazać do wysyłki.",
       "failed_many": "{{count}} e-maili nie udało się przekazać do wysyłki.",
       "failed_other": "{{count}} e-maili nie udało się przekazać do wysyłki."
-    }
+    },
+    "copyLinkNamed": "Kopiuj link: {{name}}"
   },
   "attachments": {
     "title": "Załączniki",
@@ -991,7 +994,8 @@
     "show_history": "Pokaż",
     "no_history": "Brak wcześniejszych wydań",
     "return": "Zwróć",
-    "who_returns": "Zwrot zapisuje osoba, która przyjmuje zasób z powrotem — poproś osobę odpowiedzialną za zasób o przyjęcie zwrotu albo o zgłoszenie usterki."
+    "who_returns": "Zwrot zapisuje osoba, która przyjmuje zasób z powrotem — poproś osobę odpowiedzialną za zasób o przyjęcie zwrotu albo o zgłoszenie usterki.",
+    "returnNamed": "Zwróć {{name}}"
   },
   "approvals": {
     "request": "Poproś o zgodę",

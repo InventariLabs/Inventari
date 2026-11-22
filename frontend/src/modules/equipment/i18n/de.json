@@ -37,7 +37,9 @@
     "edit": "Gerät bearbeiten",
     "bulk_print_labels": "Etiketten drucken",
     "select_page": "Seite auswählen",
-    "select_all_matching": "Alle {{total}} auswählen"
+    "select_all_matching": "Alle {{total}} auswählen",
+    "restoreNamed": "{{name}} wiederherstellen",
+    "purgeNamed": "{{name}} endgültig löschen"
   },
   "dashboard": {
     "title": "Ausrüstungsübersicht",
@@ -176,7 +178,7 @@
     "description_label": "Beschreibung",
     "technician_placeholder": "Name des Technikers",
     "type_label": "Typ",
-    "deleteAriaLabel": "Wartungseintrag löschen",
+    "deleteAriaLabel": "Wartungseintrag {{title}} löschen",
     "confirmDeleteTitle": "Wartungseintrag löschen?",
     "confirmDeleteMessage": "„{{title}}“ wird dauerhaft entfernt.",
     "log_failed": "Serviceeintrag konnte nicht hinzugefügt werden",
@@ -794,7 +796,8 @@
       "skipped": "Nicht gefragt, keine E-Mail-Adresse bei der Ausgabe: {{names}}.",
       "failed_one": "{{count}} E-Mail konnte nicht übergeben werden.",
       "failed_other": "{{count}} E-Mails konnten nicht übergeben werden."
-    }
+    },
+    "copyLinkNamed": "Link für {{name}} kopieren"
   },
   "attachments": {
     "title": "Anhänge",
@@ -891,7 +894,8 @@
     "show_history": "Anzeigen",
     "no_history": "Keine vergangenen Zuweisungen",
     "return": "Zurückgeben",
-    "who_returns": "Eine Rückgabe erfasst, wer das Gerät entgegennimmt — bitten Sie die für die Ausstattung zuständige Person um die Rücknahme oder um die Meldung eines Defekts."
+    "who_returns": "Eine Rückgabe erfasst, wer das Gerät entgegennimmt — bitten Sie die für die Ausstattung zuständige Person um die Rücknahme oder um die Meldung eines Defekts.",
+    "returnNamed": "{{name}} zurückgeben"
   },
   "approvals": {
     "request": "Genehmigung anfragen",

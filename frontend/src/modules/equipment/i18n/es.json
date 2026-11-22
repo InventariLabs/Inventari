@@ -37,7 +37,9 @@
     "edit": "Editar activo",
     "bulk_print_labels": "Imprimir etiquetas",
     "select_page": "Seleccionar página",
-    "select_all_matching": "Seleccionar los {{total}}"
+    "select_all_matching": "Seleccionar los {{total}}",
+    "restoreNamed": "Restaurar {{name}}",
+    "purgeNamed": "Eliminar {{name}} permanentemente"
   },
   "dashboard": {
     "title": "Resumen de equipamiento",
@@ -183,7 +185,7 @@
     "description_label": "Descripción",
     "technician_placeholder": "Nombre del técnico",
     "type_label": "Tipo",
-    "deleteAriaLabel": "Eliminar entrada de mantenimiento",
+    "deleteAriaLabel": "Eliminar entrada de mantenimiento {{title}}",
     "confirmDeleteTitle": "¿Eliminar entrada de mantenimiento?",
     "confirmDeleteMessage": "Esto elimina permanentemente «{{title}}».",
     "log_failed": "No se pudo añadir el registro de servicio",
@@ -801,7 +803,8 @@
       "skipped": "Sin consultar, sin dirección de correo en su asignación: {{names}}.",
       "failed_one": "{{count}} correo no se pudo poner en cola.",
       "failed_other": "{{count}} correos no se pudieron poner en cola."
-    }
+    },
+    "copyLinkNamed": "Copiar enlace de {{name}}"
   },
   "attachments": {
     "title": "Adjuntos",
@@ -898,7 +901,8 @@
     "show_history": "Mostrar",
     "no_history": "Sin asignaciones pasadas",
     "return": "Devolver",
-    "who_returns": "La devolución la registra quien recibe el activo — pide a la persona responsable del equipamiento que lo reciba o que registre una avería."
+    "who_returns": "La devolución la registra quien recibe el activo — pide a la persona responsable del equipamiento que lo reciba o que registre una avería.",
+    "returnNamed": "Devolver {{name}}"
   },
   "approvals": {
     "request": "Solicitar aprobación",

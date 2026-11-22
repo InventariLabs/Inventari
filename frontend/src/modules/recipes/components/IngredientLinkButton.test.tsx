@@ -66,7 +66,7 @@ describe("IngredientLinkButton — shared product search", () => {
     const user = userEvent.setup();
     renderButton();
 
-    await user.click(screen.getByRole("button", { name: "Link to product" }));
+    await user.click(screen.getByRole("button", { name: /^Link to product/ }));
 
     // The hand-rolled predecessor was a bare <input> with a hand-rolled list:
     // no combobox role, no listbox to point at, no keyboard.
@@ -87,7 +87,10 @@ describe("IngredientLinkButton — nothing in the catalogue matches", () => {
       onLinked,
     });
 
-    await user.click(screen.getByRole("button", { name: "Link to product" }));
+    // The same words sit on every ingredient; the name says which one.
+    await user.click(
+      screen.getByRole("button", { name: "Link to product: Mąka pszenna" }),
+    );
 
     // The box opens on the ingredient's name and has already asked the
     // catalogue: nothing to type before the empty answer is on screen.
@@ -125,7 +128,7 @@ describe("IngredientLinkButton — nothing in the catalogue matches", () => {
     productSearch.mockResolvedValue([product("Mąka tortowa", "tpl-existing")]);
     renderButton({ ingredientName: "Mąka", uomSymbol: "g" });
 
-    await user.click(screen.getByRole("button", { name: "Link to product" }));
+    await user.click(screen.getByRole("button", { name: /^Link to product/ }));
     await user.click(
       await screen.findByTestId("ingredient-link-search-result"),
     );
@@ -146,7 +149,7 @@ describe("IngredientLinkButton — the create is refused", () => {
     createProduct.mockRejectedValue(new Error("refused"));
     renderButton({ ingredientName: "Mąka", uomSymbol: "g" });
 
-    await user.click(screen.getByRole("button", { name: "Link to product" }));
+    await user.click(screen.getByRole("button", { name: /^Link to product/ }));
     const input = await screen.findByTestId("ingredient-link-search-input");
     await user.clear(input);
     await user.type(input, "Mąka pszenna typ 650 z młyna pod lasem");
@@ -168,7 +171,7 @@ describe("IngredientLinkButton — the create is refused", () => {
     const user = userEvent.setup();
     renderButton({ ingredientName: "Mąka", uomSymbol: "g" });
 
-    await user.click(screen.getByRole("button", { name: "Link to product" }));
+    await user.click(screen.getByRole("button", { name: /^Link to product/ }));
 
     expect(
       await screen.findByTestId("ingredient-link-search-input"),

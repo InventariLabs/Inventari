@@ -37,7 +37,9 @@
     "edit": "Edit asset",
     "bulk_print_labels": "Print labels",
     "select_page": "Select page",
-    "select_all_matching": "Select all {{total}}"
+    "select_all_matching": "Select all {{total}}",
+    "restoreNamed": "Restore {{name}}",
+    "purgeNamed": "Delete {{name}} permanently"
   },
   "dashboard": {
     "title": "Equipment Overview",
@@ -176,7 +178,7 @@
     "description_label": "Description",
     "technician_placeholder": "Technician name",
     "type_label": "Type",
-    "deleteAriaLabel": "Delete maintenance entry",
+    "deleteAriaLabel": "Delete maintenance entry {{title}}",
     "confirmDeleteTitle": "Delete maintenance entry?",
     "confirmDeleteMessage": "This permanently removes \"{{title}}\".",
     "log_failed": "Failed to add the service entry",
@@ -794,7 +796,8 @@
       "skipped": "Not asked, no email address on their checkout: {{names}}.",
       "failed_one": "{{count}} email could not be queued.",
       "failed_other": "{{count}} emails could not be queued."
-    }
+    },
+    "copyLinkNamed": "Copy link for {{name}}"
   },
   "attachments": {
     "title": "Attachments",
@@ -891,7 +894,8 @@
     "show_history": "Show",
     "no_history": "No past assignments",
     "return": "Return",
-    "who_returns": "A return is recorded by whoever receives the unit back — ask the person who looks after equipment to check it in, or to log a fault."
+    "who_returns": "A return is recorded by whoever receives the unit back — ask the person who looks after equipment to check it in, or to log a fault.",
+    "returnNamed": "Return {{name}}"
   },
   "approvals": {
     "request": "Request Approval",

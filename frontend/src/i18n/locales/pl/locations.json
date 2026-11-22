@@ -332,7 +332,8 @@
     "restore": "Przywróć",
     "emptyTitle": "Nic nie jest zarchiwizowane",
     "emptyDescription": "Zarchiwizowane miejsca pojawią się tutaj i można je przywrócić.",
-    "detailNotice": "To miejsce jest zarchiwizowane. Przywróć je, aby znów przechowywać tu produkty."
+    "detailNotice": "To miejsce jest zarchiwizowane. Przywróć je, aby znów przechowywać tu produkty.",
+    "restoreNamed": "Przywróć {{name}}"
   },
   "masterDetailSubtitle": "Wybierz miejsce, aby zobaczyć, co jest w środku, jego produkty i ustawienia.",
   "select": {

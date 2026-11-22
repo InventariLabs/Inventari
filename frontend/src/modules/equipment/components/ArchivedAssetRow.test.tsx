@@ -4,6 +4,13 @@ import { renderWithProviders } from "@/test/utils";
 import type { ArchivedItem } from "@/types";
 import { ArchivedAssetRow } from "./ArchivedAssetRow";
 
+// The delete button needs the organization's policy and `items:purge`; the
+// row's own words are what this file reads.
+vi.mock("@/module-sdk", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/module-sdk")>()),
+  useCanPurge: () => true,
+}));
+
 const asset: ArchivedItem = {
   id: "a-1",
   name: "Desk Lamp",
@@ -34,6 +41,16 @@ function renderRow(overrides: Partial<ArchivedItem> = {}) {
 }
 
 describe("ArchivedAssetRow", () => {
+  it("names the asset on its restore and delete buttons, which lose their text on a phone", () => {
+    renderRow();
+    expect(
+      screen.getByRole("button", { name: "Restore Desk Lamp" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Delete Desk Lamp permanently" }),
+    ).toBeInTheDocument();
+  });
+
   it("speaks the reader's word for the reason, not the database's", () => {
     // The badge printed the raw dictionary value — "EXPIRED",
     // "ARCHIVED" — where the inventory archive, reading the same dictionary,

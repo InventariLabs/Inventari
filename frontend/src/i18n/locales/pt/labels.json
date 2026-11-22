@@ -16,7 +16,8 @@
     "freeLabel": "Liberar a etiqueta",
     "freeLabelNamed": "Liberar a etiqueta {{code}}",
     "freeLabelConfirm": "A etiqueta {{code}} deixará de apontar para {{name}}. Ela pode ser atribuída a outro produto ou reutilizada.",
-    "freeLabelFailed": "Não foi possível liberar a etiqueta"
+    "freeLabelFailed": "Não foi possível liberar a etiqueta",
+    "previewLabel": "Visualizar impressão da etiqueta {{code}}"
   },
   "filters": {
     "statusAll": "Todos os status",
@@ -138,8 +139,6 @@
     "firstExpiry": "Primeira validade: {{date}}",
     "outOfStock": "Sem estoque",
     "allUsed": "Todas as unidades foram retiradas",
-    "consume1Title": "Retirar 1",
-    "add1Title": "Adicionar 1",
     "addToWarehouse": "Adicionar ao local",
     "addToShoppingList": "Adicionar à lista de compras",
     "usePartially": "Usar parcialmente",
@@ -157,7 +156,9 @@
     "useByLabel": "Consumir até, depois de aberto (opcional)",
     "save": "Salvar",
     "markOpened": "Marcar como aberto",
-    "finished": "Acabou"
+    "finished": "Acabou",
+    "consume1Named": "Retirar 1 de {{place}}",
+    "add1Named": "Adicionar 1 a {{place}}"
   },
   "assignLabel": "Atribuir etiqueta",
   "attachToItem": {

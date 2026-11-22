@@ -388,7 +388,9 @@ describe("WorkflowSettingsPage", () => {
       ),
     );
     render(<WorkflowSettingsPage />, { wrapper: createWrapper() });
-    fireEvent.click(await screen.findByRole("button", { name: "Deactivate" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: /^Deactivate / }),
+    );
     const dialog = await screen.findByRole("alertdialog");
     await waitFor(() =>
       expect(dialog).toHaveTextContent("could not be checked"),
@@ -405,7 +407,9 @@ describe("WorkflowSettingsPage", () => {
       ),
     );
     render(<WorkflowSettingsPage />, { wrapper: createWrapper() });
-    fireEvent.click(await screen.findByRole("button", { name: "Deactivate" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: /^Deactivate / }),
+    );
     const dialog = await screen.findByRole("alertdialog");
     expect(dialog).toHaveTextContent("Deactivate “Document Approval”?");
   });
@@ -422,7 +426,9 @@ describe("WorkflowSettingsPage", () => {
       }),
     );
     render(<WorkflowSettingsPage />, { wrapper: createWrapper() });
-    fireEvent.click(await screen.findByRole("button", { name: "Deactivate" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: /^Deactivate / }),
+    );
     // Switching a workflow off asks first; nothing is sent until it is answered.
     const dialog = await screen.findByRole("alertdialog");
     expect(receivedBody).toBeNull();
@@ -453,7 +459,9 @@ describe("WorkflowSettingsPage", () => {
       ),
     );
     render(<WorkflowSettingsPage />, { wrapper: createWrapper() });
-    fireEvent.click(await screen.findByRole("button", { name: "Deactivate" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: /^Deactivate / }),
+    );
     const dialog = await screen.findByRole("alertdialog");
     await waitFor(() =>
       expect(dialog).toHaveTextContent("Document: 2, Purchase Order: 1"),
@@ -482,7 +490,7 @@ describe("WorkflowSettingsPage", () => {
       );
       render(<WorkflowSettingsPage />, { wrapper: createWrapper() });
       fireEvent.click(
-        await screen.findByRole("button", { name: "Deactivate" }),
+        await screen.findByRole("button", { name: /^Deactivate / }),
       );
       const dialog = await screen.findByRole("alertdialog");
       await waitFor(() =>
@@ -502,7 +510,7 @@ describe("WorkflowSettingsPage", () => {
     );
     render(<WorkflowSettingsPage />, { wrapper: createWrapper() });
     fireEvent.click(
-      (await screen.findAllByRole("button", { name: "Delete" }))[0],
+      (await screen.findAllByRole("button", { name: /^Delete / }))[0],
     );
     const dialog = await screen.findByRole("alertdialog");
     await waitFor(() =>
@@ -547,7 +555,7 @@ describe("WorkflowSettingsPage", () => {
     ]);
     expect(onButtons.filter(boxed)).toEqual([]);
     expect(onButtons.map(danger)).toEqual([false, true, true]);
-    const remove = on.getByRole("button", { name: "Delete" });
+    const remove = on.getByRole("button", { name: /^Delete / });
     expect(remove.previousElementSibling).toHaveClass("w-px");
 
     const off = within(screen.getByTestId("workflow-actions-wf-2"));
@@ -969,7 +977,9 @@ describe("WorkflowSettingsPage", () => {
       ),
     );
     render(<WorkflowSettingsPage />, { wrapper: createWrapper() });
-    fireEvent.click(await screen.findByRole("button", { name: "Deactivate" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: /^Deactivate / }),
+    );
     const dialog = await screen.findByRole("alertdialog");
     await waitFor(() =>
       expect(
@@ -1063,7 +1073,7 @@ describe("WorkflowSettingsPage", () => {
     render(<WorkflowSettingsPage />, { wrapper: createWrapper() });
     // Multiple Delete buttons exist (card + dialog). The first one is in the card.
     const deleteButtons = await screen.findAllByRole("button", {
-      name: "Delete",
+      name: /^Delete /,
     });
     fireEvent.click(deleteButtons[0]);
     const dialog = await screen.findByRole("alertdialog");
@@ -1100,7 +1110,7 @@ describe("WorkflowSettingsPage", () => {
 
     const deleteCard = async (index: number) => {
       fireEvent.click(
-        (await screen.findAllByRole("button", { name: "Delete" }))[index],
+        (await screen.findAllByRole("button", { name: /^Delete / }))[index],
       );
       const dialog = await screen.findByRole("alertdialog");
       const confirmBtn = within(dialog).getByRole("button", { name: "Delete" });
@@ -1173,7 +1183,7 @@ describe("WorkflowSettingsPage", () => {
       </QueryClientProvider>,
     );
     fireEvent.click(
-      (await screen.findAllByRole("button", { name: "Delete" }))[0],
+      (await screen.findAllByRole("button", { name: /^Delete / }))[0],
     );
     const dialog = await screen.findByRole("alertdialog");
     const confirmBtn = within(dialog).getByRole("button", { name: "Delete" });
@@ -1213,7 +1223,7 @@ describe("WorkflowSettingsPage", () => {
     const { toast } = await import("sonner");
     render(<WorkflowSettingsPage />, { wrapper: createWrapper() });
     const deleteButtons = await screen.findAllByRole("button", {
-      name: "Delete",
+      name: /^Delete /,
     });
     fireEvent.click(deleteButtons[0]);
     const dialog = await screen.findByRole("alertdialog");
@@ -1262,10 +1272,10 @@ describe("WorkflowSettingsPage without approvals:configure", () => {
     await screen.findByText("Document Approval");
 
     expect(
-      screen.queryByRole("button", { name: "Edit" }),
+      screen.queryByRole("button", { name: /^Edit / }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Delete" }),
+      screen.queryByRole("button", { name: /^Delete / }),
     ).not.toBeInTheDocument();
   });
 
@@ -1484,7 +1494,7 @@ describe("WorkflowSettingsPage — whose submissions a workflow holds", () => {
     render(<WorkflowSettingsPage />, { wrapper: createWrapper() });
     await screen.findByTestId("workflow-requesters-wf-1");
 
-    fireEvent.click(screen.getByRole("button", { name: "Activate" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Activate / }));
 
     const dialog = await screen.findByRole("alertdialog");
     expect(

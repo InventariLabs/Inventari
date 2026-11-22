@@ -259,7 +259,7 @@ describe("AssetListPage — the archive tab", () => {
     await screen.findByText("Old Printer");
 
     await user.click(
-      screen.getByRole("button", { name: /Delete Permanently/ }),
+      screen.getByRole("button", { name: /Delete .*Permanently/i }),
     );
     let dialog = await screen.findByRole("alertdialog");
     await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
@@ -269,7 +269,7 @@ describe("AssetListPage — the archive tab", () => {
     expect(purged).not.toHaveBeenCalled();
 
     await user.click(
-      screen.getByRole("button", { name: /Delete Permanently/ }),
+      screen.getByRole("button", { name: /Delete .*Permanently/i }),
     );
     dialog = await screen.findByRole("alertdialog");
     await user.click(
@@ -306,7 +306,7 @@ describe("AssetListPage — the archive tab without permanent deletion", () => {
 
     expect(screen.getByRole("button", { name: /Restore/ })).toBeVisible();
     expect(
-      screen.queryByRole("button", { name: /Delete Permanently/ }),
+      screen.queryByRole("button", { name: /Delete .*Permanently/i }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("checkbox", { name: /Old Printer/ }),
@@ -324,7 +324,7 @@ describe("AssetListPage — the archive tab without permanent deletion", () => {
 
     expect(screen.getByRole("button", { name: /Restore/ })).toBeVisible();
     expect(
-      screen.queryByRole("button", { name: /Delete Permanently/ }),
+      screen.queryByRole("button", { name: /Delete .*Permanently/i }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("checkbox", { name: /Old Printer/ }),
@@ -337,7 +337,7 @@ describe("AssetListPage — the archive tab without permanent deletion", () => {
     await openArchive(user);
 
     expect(
-      screen.getByRole("button", { name: /Delete Permanently/ }),
+      screen.getByRole("button", { name: /Delete .*Permanently/i }),
     ).toBeVisible();
     await user.click(screen.getByRole("checkbox", { name: /Old Printer/ }));
     expect(

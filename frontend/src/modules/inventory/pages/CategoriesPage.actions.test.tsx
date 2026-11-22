@@ -140,7 +140,7 @@ describe("CategoriesPage — card actions, dialogs and paging", () => {
     renderPage();
     await screen.findByText("Dairy");
 
-    await user.click(screen.getByRole("button", { name: /^delete$/i }));
+    await user.click(screen.getByRole("button", { name: /^delete /i }));
     const dialog = screen.getByRole("alertdialog");
     await user.click(within(dialog).getByRole("button", { name: /^delete$/i }));
 
@@ -160,7 +160,7 @@ describe("CategoriesPage — card actions, dialogs and paging", () => {
     renderPage();
     await screen.findByText("Dairy");
 
-    await user.click(screen.getByRole("button", { name: /^delete$/i }));
+    await user.click(screen.getByRole("button", { name: /^delete /i }));
     await user.click(
       within(screen.getByRole("alertdialog")).getByRole("button", {
         name: /^delete$/i,
@@ -183,7 +183,7 @@ describe("CategoriesPage — card actions, dialogs and paging", () => {
     renderPage();
     await screen.findByText("Retired Snacks");
 
-    await user.click(screen.getByRole("button", { name: "Restore" }));
+    await user.click(screen.getByRole("button", { name: /^Restore / }));
 
     await waitFor(() => expect(body).toEqual({ is_active: true }));
     await waitFor(() =>
@@ -201,7 +201,7 @@ describe("CategoriesPage — card actions, dialogs and paging", () => {
     renderPage();
     await screen.findByText("Retired Snacks");
 
-    await user.click(screen.getByRole("button", { name: "Restore" }));
+    await user.click(screen.getByRole("button", { name: /^Restore / }));
 
     await waitFor(() => expect(toast.error).toHaveBeenCalled());
   });
@@ -211,7 +211,7 @@ describe("CategoriesPage — card actions, dialogs and paging", () => {
     renderPage();
     await screen.findByText("Dairy");
 
-    await user.click(screen.getAllByRole("button", { name: "Edit" })[0]!);
+    await user.click(screen.getAllByRole("button", { name: /^Edit / })[0]!);
     expect(screen.getByText("editing: Dairy")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "close form" }));
     expect(screen.queryByRole("dialog", { name: "category form" })).toBeNull();

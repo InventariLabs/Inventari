@@ -306,7 +306,8 @@
     "restore": "Wiederherstellen",
     "emptyTitle": "Nichts archiviert",
     "emptyDescription": "Archivierte Lagerorte erscheinen hier und lassen sich wiederherstellen.",
-    "detailNotice": "Dieser Lagerort ist archiviert. Stellen Sie ihn wieder her, um hier erneut Produkte zu lagern."
+    "detailNotice": "Dieser Lagerort ist archiviert. Stellen Sie ihn wieder her, um hier erneut Produkte zu lagern.",
+    "restoreNamed": "{{name}} wiederherstellen"
   },
   "masterDetailSubtitle": "Wählen Sie einen Lagerort, um seinen Inhalt, seine Produkte und Einstellungen zu sehen.",
   "select": {

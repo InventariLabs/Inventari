@@ -219,7 +219,11 @@
     "addRolePlaceholder": "Choose a role…",
     "roleAddsNobody": "Nobody new to add — everyone active with the role “{{role}}” is already named.",
     "roleMembersFailed": "Could not read who holds that role.",
-    "waitingUnavailable": "What waits on this workflow could not be checked, so it cannot be switched off right now. Close this and try again."
+    "waitingUnavailable": "What waits on this workflow could not be checked, so it cannot be switched off right now. Close this and try again.",
+    "editNamed": "Edit {{name}}",
+    "deactivateNamed": "Deactivate {{name}}",
+    "activateNamed": "Activate {{name}}",
+    "deleteNamed": "Delete {{name}}"
   },
   "request": {
     "pending": "Pending",
@@ -286,7 +290,9 @@
     "deadEndStepAskRequesterUnnamed": "Ask the person who raised the request to withdraw it.",
     "deadEndLinkMembers": "Members and roles",
     "deadEndLinkRoles": "Roles",
-    "deadEndLinkSettings": "Approval settings"
+    "deadEndLinkSettings": "Approval settings",
+    "approveNamed": "Approve {{name}}",
+    "rejectNamed": "Reject {{name}}"
   },
   "deleteWorkflow": "Delete Workflow",
   "deleteWorkflowConfirm": "Delete this workflow? It leaves this list. Requests already raised under it are kept on the Approvals dashboard, with the stages they went through.",

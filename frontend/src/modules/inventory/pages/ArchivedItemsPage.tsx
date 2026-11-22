@@ -365,8 +365,12 @@ export default function ArchivedItemsPage() {
                                 size="icon"
                                 onClick={() => setRestoreTarget(item.id)}
                                 disabled={restoreMutation.isPending}
-                                aria-label={t("items:restoreItem")}
-                                title={t("items:restoreItem")}
+                                aria-label={t("items:restoreItemNamed", {
+                                  name: item.name,
+                                })}
+                                title={t("items:restoreItemNamed", {
+                                  name: item.name,
+                                })}
                               >
                                 <RotateCcw size={16} />
                               </Button>
@@ -390,8 +394,12 @@ export default function ArchivedItemsPage() {
                                     setPurgeReason("");
                                   }}
                                   disabled={purgeMutation.isPending}
-                                  aria-label={t("items:purgeItem")}
-                                  title={t("items:purgeItem")}
+                                  aria-label={t("items:purgeItemNamed", {
+                                    name: item.name,
+                                  })}
+                                  title={t("items:purgeItemNamed", {
+                                    name: item.name,
+                                  })}
                                 >
                                   <Trash2 size={16} />
                                 </Button>

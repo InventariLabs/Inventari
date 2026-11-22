@@ -135,8 +135,10 @@ export function LabelRow({
               onPreviewSingle();
             }}
             className="text-accent-700 hover:bg-accent-50"
-            title={t("labels:actions.preview")}
-            aria-label={t("labels:actions.preview")}
+            title={t("labels:actions.previewLabel", { code: label.short_code })}
+            aria-label={t("labels:actions.previewLabel", {
+              code: label.short_code,
+            })}
           >
             <Eye size={16} />
           </Button>
