@@ -1,10 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { signInWith, signOut } from "@/test/auth";
 import { AssetListHeaderActions } from "../components/AssetListHeaderActions";
 
-function renderActions(canWrite: boolean) {
+function renderActions(canWrite: boolean, canExport = true) {
+  signInWith(canExport ? ["items:read"] : []);
   const onExport = vi.fn();
   const onImport = vi.fn();
   render(
@@ -20,6 +22,8 @@ function renderActions(canWrite: boolean) {
 }
 
 describe("AssetListHeaderActions", () => {
+  afterEach(signOut);
+
   it("keeps Export and Import named for assistive technology, and Add beside them", async () => {
     const user = userEvent.setup();
     const { onExport, onImport } = renderActions(true);
@@ -45,5 +49,16 @@ describe("AssetListHeaderActions", () => {
     expect(
       screen.queryByRole("link", { name: /Add Asset/ }),
     ).not.toBeInTheDocument();
+  });
+
+  it("disables Export, with the reason, for an account the export would refuse", async () => {
+    const user = userEvent.setup();
+    const { onExport } = renderActions(false, false);
+
+    const button = screen.getByRole("button", { name: "Export" });
+    expect(button).toBeDisabled();
+    expect(button).toHaveAccessibleDescription(/cannot export the asset list/);
+    await user.click(button);
+    expect(onExport).not.toHaveBeenCalled();
   });
 });

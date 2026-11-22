@@ -192,6 +192,7 @@
     "unknown": "Desconhecido"
   },
   "list": {
+    "export_needs_read": "A tua função não pode exportar a lista de equipamentos: a exportação exige permissão para ver produtos.",
     "title": "Equipamentos",
     "search": "Pesquisar equipamentos…",
     "select_item": "Selecionar equipamento {{name}}",

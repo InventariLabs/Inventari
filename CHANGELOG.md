@@ -353,6 +353,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The asset list no longer offers **Export** to an account the export would
+  refuse. A role without the permission to view products, such as one that
+  holds only the stock-take permissions, used to meet "You do not have
+  permission to perform this action" after clicking it; the button is now
+  disabled and says why, as it is on the Products list.
 - Attaching a blank label to an existing product now tells stock rows apart.
   Each row in the **Attach to an existing product** sheet says where it
   stands, when it expires, how much it holds and its serial number, and rows
