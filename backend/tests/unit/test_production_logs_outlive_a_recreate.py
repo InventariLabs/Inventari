@@ -279,6 +279,20 @@ class TestWiring:
         assert 'SystemMaxUse=2G' in guide
         assert 'scripts/export-logs.sh' in guide
 
+    def test_the_bucket_lock_is_shorter_than_the_retention_it_protects(self) -> None:
+        """A 30-day Compliance lock would outlive the 30-day deletion promise.
+
+        A day's journal is uploaded the next day, so the lock has to end before
+        the local file goes; the lifecycle rule removes the noncurrent version
+        once it has.
+        """
+        guide = (_REPO_ROOT / 'DEPLOYMENT.md').read_text(encoding='utf-8')
+
+        assert 'Compliance, 21 days' in guide
+        assert 'NoncurrentVersionExpiration' in guide
+        assert '"NoncurrentDays": 1' in guide
+        assert 'rclone backend cleanup-hidden' in guide
+
     def test_the_example_names_the_retention_the_privacy_page_states(self) -> None:
         example = (_REPO_ROOT / '.env.production.example').read_text(encoding='utf-8')
 

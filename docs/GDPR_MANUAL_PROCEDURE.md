@@ -266,9 +266,12 @@ On a production install the container stdout is not a Docker file that dies
 with the container: it is the host journal, kept for `LOG_RETENTION_DAYS`
 (30 days by default — DEPLOYMENT.md, "Keeping the server's logs"), and the
 daily encrypted copy of that journal is offsite. Where the offsite bucket uses
-Object Lock in Compliance mode, neither this server nor its operator can
-delete a copy before the retention period ends; the copies expire on their
-own.
+Object Lock in Compliance mode (21 days in the documented bucket), neither
+this server nor its operator can delete the bytes before that lock ends; the
+visible copy goes with the local file at 30 days, and the bucket's lifecycle
+rule removes the locked version the day after. Answer a request that asks for
+a copy sooner with what is kept, for how long, and why, rather than with a
+deletion nobody can perform.
 
 **Handling:** before answering the request, remove the application's own file
 (`rm -f "$LOG_DIR"/app.log*`) and restart the backend, so a fresh file is

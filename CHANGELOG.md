@@ -275,8 +275,10 @@ says what the release does rather than what changed since them.
   each with its own sync. The privacy page now states the retention period,
   which an installation sets with `LOG_RETENTION_DAYS`; the demo keeps its
   seven days. The deployment guide also carries the recipe for an OVHcloud S3
-  bucket with versioning and Object Lock in Compliance mode, so a file the
-  server deletes is still there for the retention period.
+  bucket with versioning, Object Lock in Compliance mode for three weeks, and a
+  lifecycle rule that removes the version once the local copy is gone — so a
+  file the server deletes stays at the destination through the weeks a break-in
+  is found in, and does not outlive the stated period.
 
 ### Changed
 

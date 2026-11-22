@@ -8,8 +8,9 @@
 # logs"). This script is the copy that leaves the host: one file per day,
 # gzipped and encrypted with the backup key, in
 # logs/journal-<YYYY-MM-DD>.log.gz.age, pruned after LOG_RETENTION_DAYS.
-# db-backup-offsite sends the *.age files to the offsite bucket, whose Object
-# Lock keeps them for the same period where the destination has it.
+# db-backup-offsite sends the *.age files to the offsite bucket, where Object
+# Lock keeps a copy unchangeable for a stated period and a lifecycle rule
+# removes the version once it has run out (DEPLOYMENT.md, "Copy off the host").
 #
 # Run it once a day as root, from the checkout, with the environment of .env:
 #

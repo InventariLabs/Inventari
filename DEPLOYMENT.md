@@ -927,10 +927,13 @@ region from the server (Gravelines, `GRA`, for a server in Warsaw):
 
 1. In the OVHcloud panel create the bucket with **Object Lock** switched on
    (it can be switched on only when the bucket is created) and **versioning**
-   enabled, in `GRA`. Set a default retention of **Compliance, 30 days** — the
-   period `LOG_RETENTION_DAYS` states. Enable two-factor sign-in on the
-   OVHcloud account itself: it is the one way to reach both the server and the
-   bucket.
+   enabled, in `GRA`. Set a default retention of **Compliance, 21 days**.
+   Three weeks, not the 30 days the logs are kept: a day's journal is uploaded
+   the next day, and its local file goes after 30, so a 30-day lock would keep
+   a copy past the period the privacy page states. Twenty-one days still makes
+   the copies unchangeable through the weeks in which a break-in is often
+   found. Enable two-factor sign-in on the OVHcloud account itself: it is the
+   one way to reach both the server and the bucket.
 2. Create an S3 user for the installation, with access to that bucket, and put
    its keys into `./rclone.conf` on the server — not into a chat, a ticket or
    this repository:
@@ -949,8 +952,41 @@ region from the server (Gravelines, `GRA`, for a server in Warsaw):
    from `--delete-after`: without that, the next application deploy deletes
    the credentials, Docker mounts an empty directory where the file was, and
    the offsite copy stops without a word.
-3. Test the lock with a throwaway object before relying on it — a delete that
-   goes through means the retention is not what the bucket says:
+3. Give the bucket a lifecycle rule that removes a version once its lock has
+   run out. `rclone sync` deletes a file the local rotation removed with a
+   DELETE, which on a versioned bucket only adds a delete marker: the object
+   disappears from the normal listing, and the version it was stays. The rule
+   below deletes a noncurrent version one day after it became noncurrent —
+   for a log, the day after the local file went at 30 days, and past its
+   21-day lock — and removes the delete marker that is then left with no
+   versions. OVHcloud applies a rule within 24 hours:
+
+   ```json
+   {
+     "Rules": [
+       {
+         "ID": "inventari-expire-noncurrent",
+         "Status": "Enabled",
+         "Filter": { "Prefix": "" },
+         "Expiration": { "ExpiredObjectDeleteMarker": true },
+         "NoncurrentVersionExpiration": { "NoncurrentDays": 1 }
+       }
+     ]
+   }
+   ```
+
+   ```bash
+   aws s3api put-bucket-lifecycle-configuration --bucket <bucket> \
+     --lifecycle-configuration file://lifecycle.json
+   ```
+
+   The same rule covers the backups: a dump the local rotation removed becomes
+   a noncurrent version, and goes once its lock has run out. A destination
+   without lifecycle rules can run `rclone backend cleanup-hidden
+   <remote>:<bucket>` daily instead; it has no age filter, so it retries the
+   versions still under lock until their retention ends.
+4. Test the lock with a throwaway object before relying on it — a delete that
+   removes the version means the retention is not what the bucket says:
 
    ```bash
    echo throwaway > /tmp/throwaway
@@ -959,19 +995,19 @@ region from the server (Gravelines, `GRA`, for a server in Warsaw):
    rclone lsjson --versions --config ./rclone.conf ovh:<bucket>/ | grep throwaway
    ```
 
-   The delete either fails or leaves a delete marker, and `--versions` still
-   lists the object. A plain remote (the `gdrive:` example) works as well, but
-   it can delete what it was given; the locked bucket is the one that survives
-   a root on the server.
+   The delete leaves a delete marker, and `--versions` still lists the object.
+   A plain remote (the `gdrive:` example) works as well, but it can delete
+   what it was given; the locked bucket is the one that survives a root on the
+   server.
 
-4. Name the destination in `.env` — the parent path, not one of the two
+5. Name the destination in `.env` — the parent path, not one of the two
    subtrees:
 
    ```bash
    BACKUP_RCLONE_REMOTE=ovh:inventari-prod
    ```
 
-5. Enable the profile in `.env` (`food,offsite` with the food profile), so
+6. Enable the profile in `.env` (`food,offsite` with the food profile), so
    every later command — Updating, Putting a backup back — reaches the service
    too:
 
@@ -979,7 +1015,7 @@ region from the server (Gravelines, `GRA`, for a server in Warsaw):
    COMPOSE_PROFILES=offsite
    ```
 
-6. Start it:
+7. Start it:
 
    ```bash
    docker compose -f docker-compose.prod.yml up -d
@@ -1000,10 +1036,10 @@ docker compose -f docker-compose.prod.yml logs db-backup-offsite
 The two subtrees are synced separately, so neither can delete the other's
 files. Where the destination keeps versions (the locked bucket above), a file
 the local rotation removed is deleted at the remote too, but only as a delete
-marker: the locked version stays until its retention ends. An installation
-that enabled the copy before the subtrees existed keeps its earlier files at
-the remote's root; they are neither re-sent nor deleted — move them under
-`backups/` or let them expire.
+marker: the locked version stays until its lock ends, and the lifecycle rule
+removes it a day later. An installation that enabled the copy before the
+subtrees existed keeps its earlier files at the remote's root; they are
+neither re-sent nor deleted — move them under `backups/` or let them expire.
 
 Keep `rclone.conf` off the server too, with the copy of `.env`: on a new
 server it is what reaches the remote.
@@ -1174,6 +1210,11 @@ rclone copy --config ./rclone.conf ovh:<bucket>/logs /tmp/journal
 age --decrypt -i key.txt /tmp/journal/journal-2026-11-21.log.gz.age | gunzip | less
 ```
 
+A file the local rotation has already removed is behind a delete marker, but
+still there: `rclone --s3-versions ls ovh:<bucket>/logs` lists it under the
+`-v…` name that `rclone copy --s3-versions` reads, until the lifecycle rule
+removes it.
+
 ### Stock consistency
 
 A record (`Item.quantity`, one row per batch and owner) **is** the stock; a
@@ -1338,7 +1379,7 @@ logging everybody out.
 - [ ] Backup rotation working (`make backup-status` — a recent backup, and whether it is encrypted)
 - [ ] Backups encrypted, or consciously left plain (`AGE_RECIPIENT`, `make backup-key`)
 - [ ] If encrypted: private key stored off the server (password manager) and `make backup-verify` has succeeded once
-- [ ] Off-host copy enabled or consciously skipped (`BACKUP_RCLONE_REMOTE` + `offsite` in `COMPOSE_PROFILES`)
+- [ ] Off-host copy enabled or consciously skipped (`BACKUP_RCLONE_REMOTE` + `offsite` in `COMPOSE_PROFILES`), with versioning, Object Lock and the noncurrent-version lifecycle rule where the destination supports them
 - [ ] Journald kept persistent, with the retention and size cap set, and the daily `scripts/export-logs.sh` in root's cron (*Keeping the server's logs*)
 - [ ] `LOG_RETENTION_DAYS` matches the journald retention the privacy page states
 - [ ] Administrator created before the proxy started (see Step 6)
