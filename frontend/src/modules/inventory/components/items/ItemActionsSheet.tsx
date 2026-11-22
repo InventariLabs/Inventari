@@ -1,13 +1,5 @@
 import { useTranslation } from "react-i18next";
-import {
-  Bell,
-  CheckCircle,
-  Edit2,
-  FileText,
-  Move,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { Bell, CheckCircle, Edit2, Move, Plus, Trash2 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { Sheet, SheetBody, SheetHeader } from "@/components/ui/Sheet";
 import { isInVirtualPlace } from "@/modules/shared/lib/storageUsage";
@@ -21,8 +13,6 @@ interface ItemActionsSheetProps {
   onConsume: (itemId: string) => void;
   onAddOne: (itemId: string) => void;
   onEdit: (item: Item) => void;
-  /** Opens the product page — history, movements and Print label live there. */
-  onViewDetails: (item: Item) => void;
   onMove: (item: Item) => void;
   onSetThreshold: (item: Item) => void;
   onDelete?: (itemId: string) => void;
@@ -40,12 +30,11 @@ interface ItemActionsSheetProps {
  * colour (ghostDanger, UI_GUIDELINES §2.13a), and routes through the page's
  * ConfirmDialog rather than deleting on tap.
  *
- * "Product details" leads the sheet: the row itself opens the Edit form, so
- * without this entry the product page (history, movements, labels) has no door
- * from the list. The stock actions have two doors too: the row carries them as
- * icons — check circle, + — whose words live in a tooltip no finger ever
- * sees, so the menu spells the same actions out. Reading what a tap does to
- * the stock is worth a second door.
+ * No "Product details": the card itself opens the product page. The stock
+ * actions have two doors: the row carries them as icons — check circle, + —
+ * whose words live in a tooltip no finger ever sees, so the menu spells the
+ * same actions out. Reading what a tap does to the stock is worth a second
+ * door.
  *
  * "Move" is here because it was nowhere: the sheet that changes an item's
  * location was written, tested and never opened by anything, leaving bulk edit
@@ -58,7 +47,6 @@ export default function ItemActionsSheet({
   onConsume,
   onAddOne,
   onEdit,
-  onViewDetails,
   onMove,
   onSetThreshold,
   onDelete,
@@ -75,17 +63,6 @@ export default function ItemActionsSheet({
           so the sheet says whose it is — the row that opened it. */}
       <SheetHeader title={item.name} onClose={onClose} />
       <SheetBody className="flex flex-col gap-2 p-2">
-        <Button
-          variant="ghost"
-          className="w-full justify-start"
-          leftIcon={<FileText size={16} />}
-          onClick={() => {
-            onClose();
-            onViewDetails(item);
-          }}
-        >
-          {t("items:detail.viewDetails")}
-        </Button>
         {canWrite && (
           <>
             {/* The same words the row's icons carry in their names and

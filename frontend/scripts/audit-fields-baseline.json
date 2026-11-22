@@ -1,5 +1,456 @@
 {
   "generatedBy": "node scripts/check-audit-fields.mjs --write-baseline",
-  "note": "Snapshot field names with no translation yet. The goal is an empty file.",
-  "gaps": []
+  "note": "Snapshot field names, target types and enum values with no translation yet. The goal is an empty file.",
+  "gaps": [
+    {
+      "language": "en",
+      "key": "BOTH",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "CUSTOMER",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "EMPLOYEE",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "FEFO",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "FIFO",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "MANUFACTURER",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "POST",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "PUT",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "SERVICE_PROVIDER",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "SUPPLIER",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "new_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "new_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "new_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "new_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "old_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "old_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "old_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "old_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "BOTH",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "CUSTOMER",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "EMPLOYEE",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "FEFO",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "FIFO",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "MANUFACTURER",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "POST",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "PUT",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "SERVICE_PROVIDER",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "SUPPLIER",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "new_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "new_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "new_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "new_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "old_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "old_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "old_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "old_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "BOTH",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "CUSTOMER",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "EMPLOYEE",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "FEFO",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "FIFO",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "MANUFACTURER",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "POST",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "PUT",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "SERVICE_PROVIDER",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "SUPPLIER",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "new_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "new_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "new_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "new_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "old_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "old_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "old_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "old_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "BOTH",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "CUSTOMER",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "EMPLOYEE",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "FEFO",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "FIFO",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "MANUFACTURER",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "POST",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "PUT",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "SERVICE_PROVIDER",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "SUPPLIER",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "new_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "new_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "new_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "new_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "old_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "old_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "old_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "old_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "BOTH",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "CUSTOMER",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "EMPLOYEE",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "FEFO",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "FIFO",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "MANUFACTURER",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "POST",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "PUT",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "SERVICE_PROVIDER",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "SUPPLIER",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "new_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "new_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "new_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "new_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "old_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "old_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "old_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "old_status_in_progress",
+      "section": "values"
+    }
+  ]
 }

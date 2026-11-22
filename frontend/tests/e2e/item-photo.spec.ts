@@ -83,7 +83,11 @@ test.describe("Product edit — the picked photo", () => {
 
   async function openSheet(page: Page): Promise<Locator> {
     await page.goto("/inventory/items");
-    await page.getByTestId("item-name").filter({ hasText: itemName }).click();
+    await page
+      .getByTestId("item-row")
+      .filter({ hasText: itemName })
+      .getByRole("button", { name: "Edit" })
+      .click();
     const dialog = page.locator('[role="dialog"]').filter({
       has: page.getByRole("heading", { name: "Edit product" }),
     });

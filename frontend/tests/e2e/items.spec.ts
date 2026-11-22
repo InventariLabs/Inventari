@@ -210,6 +210,36 @@ test.describe("Items — CRUD flow", () => {
     await expect(page.locator("body")).not.toContainText(/error|błąd/i);
   });
 
+  test("opens the product's page from its name, with Edit and the actions in its header", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    await page
+      .getByTestId("item-name")
+      .filter({ hasText: lowStockName })
+      .click();
+
+    await expect(page).toHaveURL(/\/inventory\/items\/[0-9a-f-]{36}$/);
+    await expect(
+      page.getByRole("heading", { name: lowStockName, level: 1 }),
+    ).toBeVisible({ timeout: 10000 });
+    await expect(
+      page.getByRole("heading", { name: "Edit product" }),
+    ).toHaveCount(0);
+    for (const action of ["Remove 1 unit", "Add 1 unit", "Move", "Delete"]) {
+      await expect(
+        page.getByRole("button", { name: action, exact: true }),
+      ).toBeVisible();
+    }
+
+    await page.getByRole("button", { name: "Edit", exact: true }).click();
+    await expect(
+      page.locator('[role="dialog"]').filter({
+        has: page.getByRole("heading", { name: "Edit product" }),
+      }),
+    ).toBeVisible({ timeout: 10000 });
+  });
+
   test("edits an item name and quantity", async ({
     page,
     authenticatedPage,
@@ -219,12 +249,13 @@ test.describe("Items — CRUD flow", () => {
     ).toBeVisible({
       timeout: 15000,
     });
+    // The pencil opens the Edit form; the name opens the product's page.
     await page
-      .getByTestId("item-name")
+      .getByTestId("item-row")
       .filter({ hasText: expiringName })
+      .getByRole("button", { name: "Edit" })
       .click();
 
-    // A product's name opens the product dialog itself, the pencil's own.
     const dialog = page.locator('[role="dialog"]').filter({
       has: page.getByRole("heading", { name: "Edit product" }),
     });
@@ -383,9 +414,13 @@ test.describe("Items — modal backdrop guard", () => {
     ).toBeVisible({
       timeout: 15000,
     });
-    await page.getByTestId("item-name").filter({ hasText: itemName }).click();
+    await page
+      .getByTestId("item-row")
+      .filter({ hasText: itemName })
+      .getByRole("button", { name: "Edit" })
+      .click();
 
-    // The name opens the dialog headed "Edit product".
+    // The pencil opens the dialog headed "Edit product".
     const dialog = page.locator('[role="dialog"]').filter({
       has: page.getByRole("heading", { name: "Edit product" }),
     });

@@ -31,6 +31,13 @@
  * `settings.audit.targetTypes`: the journal's filter and its Target column
  * print a type the catalogue does not know as the raw identifier.
  *
+ * And the values an enum-typed audited field can hold (`status: in_progress`,
+ * `frequency: daily`): the journal prints a stored value, so each one needs a
+ * word under `settings.audit.values` in every language, or the reader meets
+ * the database's own spelling. This is the values half of the 2026-11 QA
+ * round's raw-machine-value class (a stored enum inside a journal line:
+ * `Type: SUPPLIER`, `Usage: internal`); the names half above was always held.
+ *
  * Freshness is the caller's half of the gate: this script cannot regenerate the
  * artefact (the writers are Python, and this runs where the frontend does), so
  * `make check-audit-fields-fresh` exports the keys to a file and hands the path
@@ -73,6 +80,54 @@ const CATALOG_POINTER = "/settings/audit/fields/";
 /** The two vocabularies the artefact is read against, and where they live. */
 const FIELDS = "fields";
 const TARGET_TYPES = "targetTypes";
+const VALUES = "values";
+
+/** The renderer the journal's values go through, read for the fields it words
+ * on its own (`VALUE_RESOLVERS`). */
+const RENDERER_PATH = resolve(
+  ROOT,
+  "src/modules/settings/utils/auditChanges.ts",
+);
+const CAPITALISED_CODE = /^[A-Z][A-Z0-9_]*$/;
+
+/** The fields `VALUE_RESOLVERS` words from another screen's dictionary. */
+export function resolverFields(source = readFileSync(RENDERER_PATH, "utf8")) {
+  const block = source.match(
+    /const VALUE_RESOLVERS[\s\S]*?\n> = \{([\s\S]*?)\n\};/,
+  );
+  if (!block) {
+    throw new Error(
+      "check-audit-fields: VALUE_RESOLVERS not found in auditChanges.ts",
+    );
+  }
+  return new Set(
+    [...block[1].matchAll(/^ {2}(\w+):/gm)].map((match) => match[1]),
+  );
+}
+
+/**
+ * The catalogue keys the journal reads to word each `field:value` pair.
+ *
+ * `formatAuditValue` looks a capitalised code up under its own name
+ * (`SUPPLIER`); a lowercase value is never a code there, so the renderer reads
+ * `<field>_<value>` (`usage_internal`) for it, the same shape as
+ * `approval_requested`. A field `VALUE_RESOLVERS` words from another
+ * dictionary needs no entry here. Adding the bare lowercase value to the
+ * catalogue would change nothing on screen, which is why the gate names the
+ * key the renderer reads.
+ */
+export function valueKeys(pairs, resolved = resolverFields()) {
+  const keys = new Set();
+  for (const pair of pairs) {
+    const [field, value] = [
+      pair.split(":")[0],
+      pair.slice(pair.indexOf(":") + 1),
+    ];
+    if (CAPITALISED_CODE.test(value)) keys.add(value);
+    else if (!resolved.has(field)) keys.add(`${field}_${value}`);
+  }
+  return [...keys].sort();
+}
 
 export function catalogKeys(languages = LANGUAGES, section = FIELDS) {
   const perLanguage = new Map();
@@ -116,6 +171,7 @@ function loadKeys() {
   return {
     keys: json.keys ?? [],
     targetTypes: json["target-types"] ?? [],
+    values: json.values ?? [],
     declarationsRead: json["declarations-read"] ?? 0,
     uncovered: json["uncovered-writer-files"] ?? [],
   };
@@ -153,9 +209,13 @@ function baseKey(entry) {
 }
 
 /** Every gap of both kinds, the target-type ones tagged with their section. */
-function allGaps(keys, targetTypes) {
+function allGaps(keys, targetTypes, values = []) {
   return [
     ...gaps(keys),
+    ...gaps(valueKeys(values), catalogKeys(LANGUAGES, VALUES)).map((gap) => ({
+      ...gap,
+      section: VALUES,
+    })),
     ...gaps(targetTypes, catalogKeys(LANGUAGES, TARGET_TYPES)).map((gap) => ({
       ...gap,
       section: TARGET_TYPES,
@@ -175,6 +235,7 @@ function allGaps(keys, targetTypes) {
 function checkFreshness(
   savedKeys,
   savedTargetTypes,
+  savedValues,
   savedDeclarations,
   savedUncovered,
   quiet,
@@ -220,6 +281,19 @@ function checkFreshness(
     for (const type of staleTypes.missing) console.error(`  missing: ${type}`);
     for (const type of staleTypes.extra)
       console.error(`  no longer declared: ${type}`);
+    console.error("Run `make sync-audit-fields`.");
+    process.exit(1);
+  }
+
+  const staleValues = staleKeys(savedValues, fresh.values ?? []);
+  if (staleValues.missing.length > 0 || staleValues.extra.length > 0) {
+    console.error(
+      `check-audit-fields: the audited enum values in ${KEYS_PATH} are not what the backend declares today:`,
+    );
+    for (const value of staleValues.missing)
+      console.error(`  missing: ${value}`);
+    for (const value of staleValues.extra)
+      console.error(`  no longer declared: ${value}`);
     console.error("Run `make sync-audit-fields`.");
     process.exit(1);
   }
@@ -273,10 +347,17 @@ function runCli() {
   const onlyNew = process.argv.includes("--baseline");
   const freshness = process.argv.includes("--freshness");
 
-  const { keys, targetTypes, declarationsRead, uncovered } = loadKeys();
+  const { keys, targetTypes, values, declarationsRead, uncovered } = loadKeys();
 
   if (freshness) {
-    checkFreshness(keys, targetTypes, declarationsRead, uncovered, quiet);
+    checkFreshness(
+      keys,
+      targetTypes,
+      values,
+      declarationsRead,
+      uncovered,
+      quiet,
+    );
   }
 
   // Structural, never grand fathered: the baseline exists for translation
@@ -295,7 +376,7 @@ function runCli() {
     process.exit(1);
   }
 
-  const found = allGaps(keys, targetTypes);
+  const found = allGaps(keys, targetTypes, values);
   const baseline = loadBaseline();
   const baselineSet = new Set(baseline.map(baseKey));
   const reported = onlyNew
@@ -308,7 +389,7 @@ function runCli() {
       JSON.stringify(
         {
           generatedBy: "node scripts/check-audit-fields.mjs --write-baseline",
-          note: "Snapshot field names and target types with no translation yet. The goal is an empty file.",
+          note: "Snapshot field names, target types and enum values with no translation yet. The goal is an empty file.",
           gaps: found,
         },
         null,
@@ -316,7 +397,7 @@ function runCli() {
       ) + "\n",
     );
     console.log(
-      `check-audit-fields: baseline written with ${found.length} gap(s) of ${keys.length} key(s) and ${targetTypes.length} target type(s) × ${LANGUAGES.length} language(s)`,
+      `check-audit-fields: baseline written with ${found.length} gap(s) of ${keys.length} key(s) and ${targetTypes.length} target type(s) and ${values.length} value(s) × ${LANGUAGES.length} language(s)`,
     );
     process.exit(0);
   }

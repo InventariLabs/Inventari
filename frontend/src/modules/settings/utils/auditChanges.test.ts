@@ -515,6 +515,57 @@ describe("auditChanges scan session journal", () => {
   });
 });
 
+describe("auditChanges lowercase codes", () => {
+  // `http_method: patch` is not a capitalised code, so the renderer reads the
+  // catalogue under the field's own name, `http_method_patch`. A field with a
+  // dictionary of its own (`usage`) keeps that dictionary.
+  const catalogue = {
+    common: {
+      settings: {
+        audit: {
+          values: { http_method_patch: "Zmiana częściowa", internal: "NOPE" },
+        },
+      },
+    },
+  };
+  const screenT = namespacedT(catalogue) as never;
+
+  it("words a lowercase value through its field-scoped key", () => {
+    const changes = auditChanges(
+      { http_method: "patch" },
+      "CREATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toEqual([
+      { path: "http_method", from: null, to: "Zmiana częściowa" },
+    ]);
+  });
+
+  it("words a usage through the locations dictionary, not the audit one", () => {
+    const withUsage = namespacedT({
+      ...catalogue,
+      locations: { usage: { production: "Produkcja" } },
+    }) as never;
+
+    expect(
+      auditChanges({ usage: "production" }, "CREATE", undefined, withUsage),
+    ).toEqual([{ path: "usage", from: null, to: "Produkcja" }]);
+  });
+
+  it("does not read the bare lowercase value, which would reword free text", () => {
+    const changes = auditChanges(
+      { remark: "internal" },
+      "CREATE",
+      undefined,
+      screenT,
+    );
+
+    expect(changes).toEqual([{ path: "remark", from: null, to: "internal" }]);
+  });
+});
+
 describe("auditChanges", () => {
   it("names only the paths that moved inside a dictionary", () => {
     // The whole document is not printed on both sides of the arrow: a

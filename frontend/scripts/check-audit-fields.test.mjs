@@ -21,7 +21,12 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { catalogKeys, gaps } from "./check-audit-fields.mjs";
+import {
+  catalogKeys,
+  gaps,
+  resolverFields,
+  valueKeys,
+} from "./check-audit-fields.mjs";
 
 const ROOT = join(
   dirname(fileURLToPath(import.meta.url).replace(/^\/@fs/, "")),
@@ -351,5 +356,103 @@ describe("check-audit-fields --freshness", () => {
 
     expect(status).toBe(2);
     expect(output).toContain("AUDIT_KEYS_FRESH is not set");
+  });
+});
+
+describe("check-audit-fields enum values", () => {
+  // The values half: a stored enum value under an audited field with no word
+  // in `settings.audit.values` reaches the journal as the database's own
+  // spelling (`Type: SUPPLIER`, `Usage: internal`). Measured with a planted
+  // value no baseline holds.
+  const dir = mkdtempSync(join(tmpdir(), "audit-values-"));
+  afterAll(() => rmSync(dir, { recursive: true, force: true }));
+
+  it("falls and names a planted value in every language", () => {
+    const saved = JSON.parse(
+      readFileSync(join(ROOT, "scripts/audit-snapshot-keys.json"), "utf8"),
+    );
+    const artefact = join(dir, "keys.json");
+    writeFileSync(
+      artefact,
+      JSON.stringify({
+        ...saved,
+        values: [...saved.values, "type:A_PLANTED_VALUE"],
+      }),
+    );
+
+    const { status, stdout, stderr } = spawnSync(
+      "node",
+      ["scripts/check-audit-fields.mjs", "--baseline"],
+      {
+        cwd: ROOT,
+        encoding: "utf8",
+        env: { ...process.env, AUDIT_KEYS: artefact },
+      },
+    );
+    const output = `${stdout}${stderr}`;
+
+    expect(status).toBe(1);
+    expect(output).toContain("en: A_PLANTED_VALUE (values)");
+    expect(output).toContain("es: A_PLANTED_VALUE (values)");
+    expect(output).toContain("settings.audit.values.A_PLANTED_VALUE");
+  });
+
+  it("names the key the renderer reads for a lowercase value", () => {
+    // `http_method: planted` is worded through `http_method_planted`; the bare lowercase
+    // key would change nothing on screen, so it is never the one demanded.
+    const saved = JSON.parse(
+      readFileSync(join(ROOT, "scripts/audit-snapshot-keys.json"), "utf8"),
+    );
+    const artefact = join(dir, "lowercase.json");
+    writeFileSync(
+      artefact,
+      JSON.stringify({ ...saved, values: [...saved.values, "http_method:planted"] }),
+    );
+
+    const { status, stdout, stderr } = spawnSync(
+      "node",
+      ["scripts/check-audit-fields.mjs", "--baseline"],
+      {
+        cwd: ROOT,
+        encoding: "utf8",
+        env: { ...process.env, AUDIT_KEYS: artefact },
+      },
+    );
+    const output = `${stdout}${stderr}`;
+
+    expect(status).toBe(1);
+    expect(output).toContain("en: http_method_planted (values)");
+    expect(output).not.toContain(": planted (values)");
+  });
+
+  it("demands <old_|new_>field_value for a transition's stored status", () => {
+    // The stock-take journal line prints `old_status` / `new_status` raw
+    // ("in_progress"); the renderer reads the key under the line's own field.
+    expect(
+      valueKeys(["old_status:in_progress", "new_status:cancelled"]).sort(),
+    ).toEqual(["new_status_cancelled", "old_status_in_progress"]);
+  });
+
+  it("leaves a field the renderer words from another dictionary alone", () => {
+    expect(
+      valueKeys([
+        "role:owner",
+        "usage:internal",
+        "type:SUPPLIER",
+        "http_method:post",
+      ]).sort(),
+    ).toEqual(["SUPPLIER", "http_method_post"]);
+    expect(resolverFields().has("role")).toBe(true);
+    expect(resolverFields().has("usage")).toBe(true);
+  });
+
+  it("holds the values the backend writes to the baseline, today", () => {
+    const { status, stdout, stderr } = spawnSync(
+      "node",
+      ["scripts/check-audit-fields.mjs", "--baseline"],
+      { cwd: ROOT, encoding: "utf8" },
+    );
+
+    expect(status, `${stdout}${stderr}`).toBe(0);
   });
 });

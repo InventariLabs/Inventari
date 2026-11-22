@@ -50,6 +50,8 @@
     "check:category-scope:baseline": "node scripts/check-category-scope.mjs --write-baseline",
     "check:quantity-render": "node scripts/check-quantity-render.mjs --baseline",
     "check:quantity-render:baseline": "node scripts/check-quantity-render.mjs --write-baseline",
+    "check:raw-machine-values": "node scripts/check-raw-machine-values.mjs --baseline",
+    "check:raw-machine-values:baseline": "node scripts/check-raw-machine-values.mjs --write-baseline",
     "check:quantity-bounds": "node scripts/check-quantity-bounds.mjs --quiet",
     "check:type-scale": "node scripts/check-type-scale.mjs --quiet",
     "check:empty-state": "node scripts/check-empty-state.mjs --quiet",

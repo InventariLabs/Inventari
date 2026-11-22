@@ -28,7 +28,6 @@ const baseProps = () => ({
   onConsume: vi.fn(),
   onAddOne: vi.fn(),
   onEdit: vi.fn(),
-  onViewDetails: vi.fn(),
   onMove: vi.fn(),
   onSetThreshold: vi.fn(),
   onDelete: vi.fn(),
@@ -81,7 +80,7 @@ describe("ItemActionsSheet", () => {
     expect(secondProps.onDelete).not.toHaveBeenCalledWith("item-1");
   });
 
-  it("offers Edit, Move, Set stock alert and a separated Delete — and Product details first", () => {
+  it("offers Edit, Move, Set stock alert and a separated Delete — and not the page the card itself opens", () => {
     render(<ItemActionsSheet item={item} {...baseProps()} />);
 
     const sheet = screen.getByRole("dialog", { name: "Rack 42U Open Frame" });
@@ -94,8 +93,8 @@ describe("ItemActionsSheet", () => {
       screen.getByRole("button", { name: /^delete$/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /^product details$/i }),
-    ).toBeInTheDocument();
+      screen.queryByRole("button", { name: /^product details$/i }),
+    ).toBeNull();
     expect(sheet).toBeInTheDocument();
   });
 
@@ -143,18 +142,6 @@ describe("ItemActionsSheet", () => {
 
     await user.click(screen.getByRole("button", { name: /set stock alert/i }));
     expect(props.onSetThreshold).toHaveBeenCalledWith(item);
-  });
-
-  it("opens the product page from Product details, with the item", async () => {
-    const user = userEvent.setup();
-    const props = baseProps();
-    render(<ItemActionsSheet item={item} {...props} />);
-
-    await user.click(
-      screen.getByRole("button", { name: /^product details$/i }),
-    );
-    expect(props.onViewDetails).toHaveBeenCalledWith(item);
-    expect(props.onClose).toHaveBeenCalled();
   });
 
   it("lists the row's stock actions in words, so a finger can read them", async () => {
