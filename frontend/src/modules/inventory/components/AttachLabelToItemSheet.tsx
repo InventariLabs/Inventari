@@ -140,7 +140,12 @@ export function AttachLabelToItemSheet({
                       <span className="truncate">{item.name}</span>
                       <span className="text-sm text-on-secondary">
                         {text}
-                        {twin && <span className="ml-2 font-mono">{twin}</span>}
+                        {twin && (
+                          <>
+                            {" "}
+                            <span className="ml-2 font-mono">{twin}</span>
+                          </>
+                        )}
                       </span>
                     </span>
                   </Button>

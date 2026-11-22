@@ -336,6 +336,12 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Attaching a blank label to an existing product now tells stock rows apart.
+  Each row in the **Attach to an existing product** sheet says where it
+  stands, when it expires, how much it holds and its serial number, and rows
+  that would still read the same, such as two receipts of one product into one
+  place, carry the tail of their id. The mark is separated from the quantity
+  for a screen reader, which no longer reads them as one word.
 - A document that only records goods another step already took — a recipe's
   internal issue, whose goods the picking session removed — can no longer be
   returned, as it already could not be undone or corrected: a return would have
