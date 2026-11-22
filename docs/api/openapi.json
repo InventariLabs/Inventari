@@ -57884,6 +57884,11 @@
               }
             ],
             "title": "Operator Contact"
+          },
+          "log_retention_days": {
+            "type": "integer",
+            "title": "Log Retention Days",
+            "default": 30
           }
         },
         "type": "object",

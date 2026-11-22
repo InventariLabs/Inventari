@@ -574,15 +574,22 @@ done
         (backups / 'shop-1.sql.gz').write_text('plain dump left from before the key')
         (backups / 'shop-1.sql.gz.age').write_text('ciphertext')
         (backups / 'uploads-1.tar.gz.age').write_text('ciphertext')
+        logs = tmp_path / 'logs'
+        logs.mkdir()
+        (logs / 'journal-2026-11-21.log.gz.age').write_text('ciphertext')
+        (logs / 'journal-2026-11-21.log.gz').write_text('plain')
         remote = tmp_path / 'remote'
         # compose passes `$$` through as a literal `$`.
-        command = ' '.join(_compose()['db-backup-offsite']['command']).replace(
-            '$$', '$'
+        command = (
+            ' '.join(_compose()['db-backup-offsite']['command'])
+            .replace('$$', '$')
+            .replace('sync /backups ', f'sync {backups} ')
+            .replace('sync /logs ', f'sync {logs} ')
         )
 
         def run(**env: str) -> subprocess.CompletedProcess[str]:
             return subprocess.run(
-                ['/bin/sh', '-c', command.replace('/backups', str(backups))],
+                ['/bin/sh', '-c', command],
                 env={'PATH': f'{bin_dir}:{os.environ.get("PATH", "")}', **env},
                 capture_output=True,
                 text=True,
@@ -601,9 +608,15 @@ done
 
         encrypted = run(BACKUP_RCLONE_REMOTE=str(remote), AGE_RECIPIENT=_KEY)
         assert encrypted.returncode != 1, encrypted.stderr
-        assert sorted(p.name for p in remote.iterdir()) == [
+        assert sorted(p.name for p in (remote / 'backups').iterdir()) == [
             'shop-1.sql.gz.age',
             'uploads-1.tar.gz.age',
+        ]
+        # The logs are one subtree, not merged into the backups one: each sync
+        # makes its destination match its source, so a shared destination would
+        # let either delete the other's files.
+        assert sorted(p.name for p in (remote / 'logs').iterdir()) == [
+            'journal-2026-11-21.log.gz.age',
         ]
 
     def test_the_healthcheck_counts_a_plain_backup_as_fresh(self) -> None:

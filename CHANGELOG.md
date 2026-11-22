@@ -264,6 +264,19 @@ says what the release does rather than what changed since them.
   Spanish: the core coverage gate, the module parity tests, the backend error
   catalog and the module validator. A module written outside this repository
   still needs English only.
+- Server logs that outlive a deploy, and a copy that leaves the host. The
+  production stack writes its containers' output to the host journal instead of
+  Docker's per-container file, so recreating the containers no longer deletes
+  what came before; the deployment guide sets how long the journal is kept and
+  how much disk it may take (30 days and 2 GB by default). A nightly root job,
+  `scripts/export-logs.sh`, gzips and encrypts each day's journal into `logs/`,
+  pruned after the same period, and the offsite copy sends it to the same
+  destination as the backups — under a `backups/` and a `logs/` subdirectory,
+  each with its own sync. The privacy page now states the retention period,
+  which an installation sets with `LOG_RETENTION_DAYS`; the demo keeps its
+  seven days. The deployment guide also carries the recipe for an OVHcloud S3
+  bucket with versioning and Object Lock in Compliance mode, so a file the
+  server deletes is still there for the retention period.
 
 ### Changed
 

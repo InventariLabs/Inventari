@@ -68,6 +68,11 @@ class InitStatusResponse(BaseModel):
     #: somebody else.
     operator_name: str | None = None
     operator_contact: str | None = None
+    #: How many days this installation keeps its server logs, stated on the
+    #: privacy page. Configuration, because it is the operator's journald
+    #: retention (DEPLOYMENT.md, "Keeping the server's logs"), not a property
+    #: of the application.
+    log_retention_days: int = 30
 
 
 class BulkUpdateResponse(BaseModel):

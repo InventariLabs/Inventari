@@ -424,8 +424,8 @@ one:
   that one is paused for the rewrite and resumed, so pruning never causes a
   second wipe. The demo is down for a few seconds at 04:17, and the script
   starts the containers again even when the rewrite fails. `scripts/demo-prune-logs.sh 3` keeps three days instead;
-  if you change the number, change the sentence on the privacy page too
-  (`privacy.requests.demo` in `frontend/src/i18n/locales/*/auth.json`).
+  if you change the number, change `LOG_RETENTION_DAYS` in `docker-compose.demo.yml`
+  too — the privacy page states that number, and the two must agree.
 
 Seven days is the usual figure and is chosen for a reason: a public demo takes
 uploads and shows an inbox every visitor reads, and a report of abuse that

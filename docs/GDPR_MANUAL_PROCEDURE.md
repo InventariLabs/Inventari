@@ -262,12 +262,23 @@ client IPs: failed-login and lockout lines write the account's address and
 the IP that tried it, the mail lines write the recipient. Erasure never
 writes a log file.
 
-**Handling:** before answering the request, remove the files
+On a production install the container stdout is not a Docker file that dies
+with the container: it is the host journal, kept for `LOG_RETENTION_DAYS`
+(30 days by default — DEPLOYMENT.md, "Keeping the server's logs"), and the
+daily encrypted copy of that journal is offsite. Where the offsite bucket uses
+Object Lock in Compliance mode, neither this server nor its operator can
+delete a copy before the retention period ends; the copies expire on their
+own.
+
+**Handling:** before answering the request, remove the application's own file
 (`rm -f "$LOG_DIR"/app.log*`) and restart the backend, so a fresh file is
 opened — the process keeps writing to the file it has open, and the five
-rotation backups hold the old lines until they go too. Whether old stdout
-still exists is the container runtime's log driver, not this application's
-decision.
+rotation backups hold the old lines until they go too. The journal cannot drop
+one person's lines: `journalctl --rotate` followed by
+`journalctl --vacuum-time=1s` removes every entry it holds, which is the whole
+installation's record rather than one subject's. Security logs are normally
+kept on the legal ground of a legitimate interest, so say in the answer what
+is kept, for how long, and why, instead of deleting the record of an incident.
 
 ## Records the organization owns, and what to do with them
 
