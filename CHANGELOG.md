@@ -807,6 +807,11 @@ says what the release does rather than what changed since them.
   attestation progress says it counts people, the overview names the retired
   assets beside the total, and the public attestation page prints its
   deadline in the organization's date style.
+- Cooking or taking back a run's output that empties a record now files it as
+  used up, the way using its last unit by hand does. The emptied record leaves
+  the products list and stops counting as needing attention on the overview,
+  instead of staying on the list at 0. Undoing the pick returns the stock to the
+  record on the shelf it left.
 
 ### Removed
 
