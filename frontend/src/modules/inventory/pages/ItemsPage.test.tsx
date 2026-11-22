@@ -2016,16 +2016,35 @@ describe("ItemsPage — the ?import=1 deep link", () => {
   });
 
   it("hands the sheet the date a row of the overview linked to", async () => {
-    const scrollIntoView = vi.spyOn(HTMLElement.prototype, "scrollIntoView");
-    renderAt("?open=item-1&at=expiry");
-
-    await screen.findByRole("dialog");
-    await waitFor(() => expect(scrollIntoView).toHaveBeenCalled());
-    expect(scrollIntoView.mock.contexts[0]).toHaveAttribute(
-      "data-field-key",
-      "expiry_date",
+    // jsdom loads no stylesheet: the sheet's body is the box that scrolls.
+    const scrolled: HTMLElement[] = [];
+    Object.defineProperty(HTMLElement.prototype, "scrollTop", {
+      configurable: true,
+      get: () => 0,
+      set(this: HTMLElement) {
+        scrolled.push(this);
+      },
+    });
+    const style = vi.spyOn(window, "getComputedStyle").mockImplementation(
+      (el) =>
+        ({
+          overflowY: el.classList.contains("overflow-y-auto")
+            ? "auto"
+            : "visible",
+        }) as CSSStyleDeclaration,
     );
-    scrollIntoView.mockRestore();
+    try {
+      renderAt("?open=item-1&at=expiry");
+
+      const dialog = await screen.findByRole("dialog");
+      await waitFor(() => expect(scrolled).toHaveLength(1));
+      expect(scrolled[0]).toContainElement(
+        dialog.querySelector('[data-field-key="expiry_date"]') as HTMLElement,
+      );
+    } finally {
+      style.mockRestore();
+      Reflect.deleteProperty(HTMLElement.prototype, "scrollTop");
+    }
   });
 
   it("closes a product dialog that a typed address opened in place", async () => {
