@@ -284,12 +284,12 @@ USB or Bluetooth scanner and as a QR code for a phone camera.
 The same core under an IT desk, a kitchen and a workshop — three of the
 modules the demo seed switches on beside the warehouse.
 
-![The equipment overview: nine assets need attention — warranties ending within weeks and a server in maintenance — above the totals, 77 assets with four checked out, and the fleet by category as bars: laptops, network devices, monitors, peripherals, desktop computers and other equipment, each with how many are checked out or have a warranty ending soon](docs/images/equipment-overview.webp)
+![The equipment overview: ten assets need attention — warranties ending within weeks and a server in maintenance — above the totals, 84 assets with four checked out, and the fleet by category as bars: network devices, laptops, phones and tablets, servers, peripherals and desktop computers, each with how many are checked out or have a warranty ending soon](docs/images/equipment-overview.webp)
 
 **Equipment** — what needs attention first, then the whole fleet by category;
 serials, warranties, maintenance and who signed for what are a click below.
 
-![Shakshuka: its photograph, an estimated cost of $10.73, two servings in 25 minutes and eggs as its allergen; each ingredient with the shelf it is on — eggs in the fridge, the tomatoes and the olive oil on shelves — the onion missing, and a button that puts what is missing on the shopping list](docs/images/recipe.webp)
+![Shakshuka: its photograph, an estimated cost of $10.44, two servings in 25 minutes and eggs as its allergen; each ingredient with the shelf it is on — eggs in the walk-in cooler, the tomatoes and the olive oil on shelves — the onion missing, and a button that puts what is missing on the shopping list](docs/images/recipe.webp)
 
 **A recipe** — which ingredients are in the house and where each one is; the
 missing ones go onto the shopping list.
@@ -306,7 +306,7 @@ touches on the server. What you do not switch on, you do not see: the
 wholesaler above runs the business modules its launcher shows, the demo almost
 all of them.
 
-![The demo's module store: twelve of the fifteen modules switched on — partners, approvals, equipment tracking, production, nutrition info, label printing, purchase orders, recipes, shopping lists, statistics, stock takes and the warehouse — with API keys, photo recognition and webhooks left off; each with its version, where it comes from and what it needs: stored data, files, background tasks or internet access](docs/images/app-store.webp)
+![The demo's module store: thirteen of the fifteen modules switched on — partners, API keys, approvals, equipment tracking, production, nutrition info, label printing, purchase orders, recipes, shopping lists, statistics, stock takes and the warehouse — with photo recognition and webhooks left off; each with its version, where it comes from and what it needs: stored data, files, background tasks or internet access](docs/images/app-store.webp)
 
 ### In the dark
 
