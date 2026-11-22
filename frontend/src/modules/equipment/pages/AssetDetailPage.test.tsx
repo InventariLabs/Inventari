@@ -236,6 +236,9 @@ describe("AssetDetailPage — archive, restore and purge", () => {
         "The asset will be returned to your active assets list.",
       ),
     ).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("alertdialog")).getByText("Restore HP EliteBook"),
+    ).toBeInTheDocument();
     await confirmIn("Restore");
 
     await waitFor(() =>
@@ -261,7 +264,7 @@ describe("AssetDetailPage — archive, restore and purge", () => {
       await screen.findByRole("button", { name: "Delete Permanently" }),
     );
     expect(
-      screen.getByText("Permanently delete this asset?"),
+      screen.getByText("Permanently delete HP EliteBook?"),
     ).toBeInTheDocument();
     await confirmIn("Delete Permanently");
 
