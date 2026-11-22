@@ -31,10 +31,10 @@ from app.core.deps import (
     get_async_db,
     get_current_user_context,
     require_org,
-    require_permission,
 )
 from app.core.exceptions import NotFoundException
 from app.i18n.service import get_current_lang
+from app.modules.approvals.approvals_api import approvals_api
 from app.modules.approvals.schemas import (
     ApprovalRequestSchema,
     ApproveRequest,
@@ -76,7 +76,6 @@ def register_approval_routes(router: APIRouter) -> None:
     @router.post(
         '/{po_id}/approve',
         response_model=ApprovalRequestSchema,
-        dependencies=[require_permission('approvals:approve')],
     )
     async def approve_endpoint(
         po_id: UUID,
@@ -86,6 +85,9 @@ def register_approval_routes(router: APIRouter) -> None:
         org_id: UUID = Depends(require_org),
     ) -> Any:
         po = await _get_po_or_404(db, org_id, po_id)
+        await approvals_api.require_decision_possible_on_target(
+            db, org_id, 'purchase_order', po.id, current_user
+        )
         request_obj = await approve_purchase_order(
             db, org_id, po, current_user.id, body.notes
         )
@@ -94,7 +96,6 @@ def register_approval_routes(router: APIRouter) -> None:
     @router.post(
         '/{po_id}/reject',
         response_model=ApprovalRequestSchema,
-        dependencies=[require_permission('approvals:approve')],
     )
     async def reject_endpoint(
         po_id: UUID,
@@ -104,6 +105,9 @@ def register_approval_routes(router: APIRouter) -> None:
         org_id: UUID = Depends(require_org),
     ) -> Any:
         po = await _get_po_or_404(db, org_id, po_id)
+        await approvals_api.require_decision_possible_on_target(
+            db, org_id, 'purchase_order', po.id, current_user
+        )
         return await reject_purchase_order(db, org_id, po, current_user.id, body.notes)
 
     @router.get(

@@ -19,7 +19,6 @@ from app.core.deps import (
     get_async_db,
     get_current_user_context,
     require_org,
-    require_permission,
     require_read_write,
 )
 from app.core.exceptions import (
@@ -119,7 +118,6 @@ async def request_document_approval(
 @router.post(
     '/{doc_id}/approve',
     response_model=ApprovalRequestSchema,
-    dependencies=[require_permission('approvals:approve')],
 )
 async def approve_document(
     doc_id: UUID,
@@ -130,6 +128,9 @@ async def approve_document(
     """Decide the open stage of the document's request; the last one releases it."""
     org_id = require_org(current_user)
     await _document(db, org_id, doc_id)
+    await approvals_api.require_decision_possible_on_target(
+        db, org_id, 'document', doc_id, current_user
+    )
     active = await approvals_api.find_active_request(db, org_id, 'document', doc_id)
     if active is None:
         raise _no_pending_request()
@@ -146,7 +147,6 @@ async def approve_document(
 @router.post(
     '/{doc_id}/reject',
     response_model=ApprovalRequestSchema,
-    dependencies=[require_permission('approvals:approve')],
 )
 async def reject_document(
     doc_id: UUID,
@@ -162,6 +162,9 @@ async def reject_document(
     """
     org_id = require_org(current_user)
     await _document(db, org_id, doc_id)
+    await approvals_api.require_decision_possible_on_target(
+        db, org_id, 'document', doc_id, current_user
+    )
     active = await approvals_api.find_active_request(db, org_id, 'document', doc_id)
     if active is None:
         raise _no_pending_request()
@@ -199,6 +202,7 @@ async def get_document_approval(
         matching[0].id,
         viewer_id=current_user.id,
         viewer_has_approve_grant=current_user.has_permission('approvals:approve'),
+        viewer_has_read_grant=current_user.has_permission('approvals:read'),
     )
 
 

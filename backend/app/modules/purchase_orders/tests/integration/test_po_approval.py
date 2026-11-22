@@ -446,6 +446,80 @@ class TestPOApprovalFlow:
         assert resp.status_code == 200, resp.text
         assert resp.json()['status'] == 'PENDING_APPROVAL'
 
+    def test_a_named_approver_with_only_the_read_right_is_offered_and_admitted(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        approval_org: Organization,
+        approval_headers: dict[str, str],
+        approval_partner: Any,
+        approval_template: Any,
+    ) -> None:
+        """the queue's verdict and the order's approve door agree.
+
+        A person named on the open stage who holds ``approvals:read`` without
+        ``approvals:approve`` is offered the decision by the approvals read
+        and admitted by the order's door; someone the stage does not name is
+        offered nothing and refused.
+        """
+        peer = h.create_user(approval_org, email='po-peer@example.com', role='user')
+        h.grant_permissions(
+            peer, ['approvals:read', 'purchase_orders:read', 'purchase_orders:write']
+        )
+        outsider = h.create_user(
+            approval_org, email='po-outsider@example.com', role='user'
+        )
+        h.grant_permissions(
+            outsider,
+            ['approvals:read', 'purchase_orders:read', 'purchase_orders:write'],
+        )
+        resp = client.post(
+            '/api/v1/approvals/workflows',
+            headers=approval_headers,
+            json={
+                'target_type': 'purchase_order',
+                'requester_scope': {'everyone': True},
+                'is_active': True,
+                'expected_scope': {'holds': 'nothing'},
+                'name': 'Peer PO approval',
+                'stages': [
+                    {
+                        'order': 1,
+                        'role': 'manager',
+                        'label': 'Peer review',
+                        'approver_user_ids': [str(peer.id)],
+                    },
+                ],
+            },
+        )
+        assert resp.status_code == status.HTTP_201_CREATED, resp.text
+        h.set_module_settings(
+            approval_org, 'approvals', {'allow_admin_self_approve': False}
+        )
+        _set_settings(client, approval_headers, approval_threshold='150.00')
+        po = _create_po(client, approval_headers, approval_partner, approval_template)
+        confirmed = client.post(
+            f'{PO_URL}/{po["id"]}/confirm', headers=approval_headers
+        )
+        assert confirmed.json()['status'] == 'PENDING_APPROVAL'
+
+        offered = _approval_of(client, h.get_auth_headers(peer), po['id'])
+        not_offered = _approval_of(client, h.get_auth_headers(outsider), po['id'])
+        refused = client.post(
+            f'{PO_URL}/{po["id"]}/approve',
+            headers=h.get_auth_headers(outsider),
+            json={},
+        )
+        decided = client.post(
+            f'{PO_URL}/{po["id"]}/approve', headers=h.get_auth_headers(peer), json={}
+        )
+
+        assert offered['viewer_can_decide'] is True
+        assert not_offered['viewer_can_decide'] is False
+        assert refused.status_code == status.HTTP_403_FORBIDDEN, refused.text
+        assert decided.status_code == status.HTTP_200_OK, decided.text
+        assert decided.json()['status'] == 'APPROVED'
+
     def test_below_threshold_confirms_directly(
         self,
         client: TestClient,

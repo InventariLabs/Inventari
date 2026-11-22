@@ -1009,6 +1009,68 @@ class TestDocumentApprovalWorkflow:
         assert decide.status_code == status.HTTP_403_FORBIDDEN
         assert read.json()['viewer_can_decide'] is False
 
+    def test_a_named_approver_with_only_the_read_right_is_offered_and_admitted(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        doc_org: Organization,
+        doc_auth_headers: dict[str, str],
+        doc_approval_workflow: ApprovalWorkflow,
+        doc_partner: Partner,
+        doc_target_location: StorageLocation,
+        doc_item: Item,
+    ) -> None:
+        """the button and the door agree for a person named on the open stage.
+
+        The approval read offers the decision to a named approver who holds
+        ``approvals:read`` alone, so the document's approve door admits them;
+        a reader the stage does not name is offered nothing and refused.
+        """
+        peer = h.create_user(doc_org, email='named-peer@example.com', role='user')
+        h.grant_permissions(
+            peer, ['approvals:read', 'warehouse:read', 'warehouse:write']
+        )
+        outsider = h.create_user(doc_org, email='outsider@example.com', role='user')
+        h.grant_permissions(
+            outsider, ['approvals:read', 'warehouse:read', 'warehouse:write']
+        )
+        named = client.patch(
+            f'/api/v1/approvals/workflows/{doc_approval_workflow.id}',
+            headers=doc_auth_headers,
+            json={
+                'stages': [
+                    {
+                        'order': 1,
+                        'role': 'manager',
+                        'label': 'Peer review',
+                        'approver_user_ids': [str(peer.id)],
+                    }
+                ]
+            },
+        )
+        assert named.status_code == status.HTTP_200_OK, named.text
+        doc_id = self._doc_pending_approval(
+            client, doc_auth_headers, doc_partner, doc_target_location, doc_item
+        )
+        url = f'/api/v1/approvals/documents/{doc_id}'
+
+        offered = client.get(f'{url}/approval', headers=h.get_auth_headers(peer))
+        refused = client.post(
+            f'{url}/approve', headers=h.get_auth_headers(outsider), json={}
+        )
+        not_offered = client.get(
+            f'{url}/approval', headers=h.get_auth_headers(outsider)
+        )
+        decided = client.post(
+            f'{url}/approve', headers=h.get_auth_headers(peer), json={}
+        )
+
+        assert offered.json()['viewer_can_decide'] is True
+        assert not_offered.json()['viewer_can_decide'] is False
+        assert refused.status_code == status.HTTP_403_FORBIDDEN, refused.text
+        assert decided.status_code == status.HTTP_200_OK, decided.text
+        assert decided.json()['status'] == 'APPROVED'
+
     def test_withdrawn_request_can_be_raised_again(
         self,
         client: TestClient,

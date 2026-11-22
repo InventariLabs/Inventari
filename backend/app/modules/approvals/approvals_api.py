@@ -4,6 +4,8 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.contracts.dtos import UserContextDTO
+
 from . import services
 from ._services_requirement import first_stage_verdict_async
 from .approvals_dtos import (
@@ -358,19 +360,42 @@ class ApprovalsAPI:
         request_id: UUID,
         viewer_id: UUID | None = None,
         viewer_has_approve_grant: bool | None = None,
+        viewer_has_read_grant: bool | None = None,
     ) -> dict[str, Any] | None:
         """Return a request with workflow stages, user names and target
         summary already resolved (JSON-compatible dict).
 
-               Pass ``viewer_id`` to have the response carry ``viewer_can_decide``
-        for that person, and ``viewer_has_approve_grant`` so that verdict
-        counts the ``approvals:approve`` right the decision door demands."""
+        Pass ``viewer_id`` to have the response carry ``viewer_can_decide``
+        for that person, together with ``viewer_has_approve_grant`` and
+        ``viewer_has_read_grant`` — the rights the decision door counts. A
+        viewer named without both grants gets the verdict as null."""
         return await services.get_request_enriched(
             db,
             org_id,
             request_id,
             viewer_id=viewer_id,
             viewer_has_approve_grant=viewer_has_approve_grant,
+            viewer_has_read_grant=viewer_has_read_grant,
+        )
+
+    @staticmethod
+    async def require_decision_possible_on_target(
+        db: AsyncSession,
+        org_id: UUID,
+        target_type: str,
+        target_id: UUID,
+        user: UserContextDTO,
+    ) -> None:
+        """Guard for a target's own approve and reject doors.
+
+        Raises the 403 the generic decision door raises, so a person the
+        queue offers the decision to (the approve grant, or named on the open
+        stage with the read grant) is admitted and anyone else is refused.
+        """
+        from .router import require_decision_possible_on_target
+
+        await require_decision_possible_on_target(
+            db, org_id, target_type, target_id, user
         )
 
     @staticmethod
