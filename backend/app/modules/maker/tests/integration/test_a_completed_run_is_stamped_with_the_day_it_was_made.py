@@ -1,4 +1,4 @@
-"""A run closed in one step is stamped with the day it was made, not the plan.
+"""A run closed in one step or in portions is stamped with the day it was made.
 
 A draft is planned for a day, and the plan moves. Completing it books the
 ingredients and the output on the day it really happened: the organization's
@@ -160,3 +160,53 @@ def test_the_person_completing_the_run_names_the_day_it_was_made(
     db_session.expire_all()
     lot = db_session.get(StockLot, UUID(done['output_lot_id']))
     assert lot is not None and lot.production_date == made_on
+
+
+def _start_and_finish(
+    client: TestClient, headers: dict[str, str], run_id: str
+) -> dict[str, Any]:
+    started = client.post(f'{ORDERS}/{run_id}/start', headers=headers)
+    assert started.status_code == 200, started.text
+    portion = client.post(
+        f'{ORDERS}/{run_id}/portions', headers=headers, json={'qty': '1'}
+    )
+    assert portion.status_code == 201, portion.text
+    finished = client.post(
+        f'{ORDERS}/{run_id}/finish', headers=headers, json={'actual_qty': '4'}
+    )
+    assert finished.status_code == 200, finished.text
+    return dict(finished.json())
+
+
+def test_a_run_finished_in_portions_keeps_the_day_it_was_planned_for(
+    client: TestClient,
+    mk_auth_headers: dict[str, str],
+    mk_output_loc: StorageLocation,
+    jam: ProductTemplate,
+) -> None:
+    planned = date.today() + timedelta(days=3)
+    run_id = _draft_planned_for(client, mk_auth_headers, jam, mk_output_loc, planned)
+
+    done = _start_and_finish(client, mk_auth_headers, run_id)
+
+    # Fails without the change: finishing overwrote the planned day and left
+    # no trace of it, so the run read as if it had been planned for today.
+    assert abs(date.fromisoformat(done['production_date']) - date.today()) <= (
+        timedelta(days=1)
+    )
+    assert done['planned_for'] == planned.isoformat()
+
+
+def test_a_run_finished_in_portions_on_its_planned_day_carries_no_separate_plan(
+    client: TestClient,
+    mk_auth_headers: dict[str, str],
+    mk_output_loc: StorageLocation,
+    jam: ProductTemplate,
+) -> None:
+    run_id = _draft_planned_for(
+        client, mk_auth_headers, jam, mk_output_loc, date.today()
+    )
+
+    done = _start_and_finish(client, mk_auth_headers, run_id)
+
+    assert done['planned_for'] is None
