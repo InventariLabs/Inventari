@@ -547,16 +547,53 @@ def transition_fields(tree: ast.AST) -> set[str]:
     return found
 
 
+def transition_literals(tree: ast.AST) -> set[str]:
+    """``old_<f>:code`` / ``new_<f>:code`` for each string literal a writer puts
+    under one side of a transition.
+
+    A status column typed as a plain string carries no declared set for
+    ``transition_values`` to read, so the codes the writers themselves spell
+    out are the only enumeration there is. A name or attribute on either side
+    names no code and adds nothing.
+    """
+    found: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Dict):
+            continue
+        sides = {
+            key.value: value.value
+            for key, value in zip(node.keys, node.values, strict=True)
+            if isinstance(key, ast.Constant)
+            and isinstance(key.value, str)
+            and isinstance(value, ast.Constant)
+            and isinstance(value.value, str)
+        }
+        names = {
+            key.value
+            for key in node.keys
+            if isinstance(key, ast.Constant) and isinstance(key.value, str)
+        }
+        found.update(
+            f'{name}:{code}'
+            for name, code in sides.items()
+            if name.startswith(('old_', 'new_'))
+            and f'{"new_" if name.startswith("old_") else "old_"}{name[4:]}' in names
+        )
+    return found
+
+
 def transition_values(
-    transitions: list[tuple[set[str], dict[str, str]]],
+    transitions: list[tuple[set[str], dict[str, str], set[str]]],
     sources: dict[str, dict[str, FieldSource]],
     sets: dict[str, set[str]],
     resolve,
 ) -> set[str]:
     """``old_<f>:value`` and ``new_<f>:value`` for the values of field ``f`` on
-    the classes the writer's file imports — the model whose column it moves."""
+    the classes the writer's file imports — the model whose column it moves,
+    and the literals the writer itself puts under either side."""
     found: set[str] = set()
-    for fields, imports in transitions:
+    for fields, imports, literals in transitions:
+        found.update(literals)
         for qualified in map(resolve, imports.values()):
             module = qualified.rpartition('.')[0]
             for field in fields:
@@ -614,7 +651,7 @@ def collect_keys(root: Path) -> CollectedKeys:
     value_declarations: list[tuple[str, str]] = []
     declarations: list[tuple[str, str]] = []
     funnel_files: list[str] = []
-    transitions: list[tuple[set[str], dict[str, str]]] = []
+    transitions: list[tuple[set[str], dict[str, str], set[str]]] = []
     aliases: dict[str, str] = {}
     files = 0
     for path in sorted(root.rglob('*.py')):
@@ -650,7 +687,9 @@ def collect_keys(root: Path) -> CollectedKeys:
             sources.setdefault(f'{module}.{name}', {}).update(fields)
         declarations.extend(file_declarations)
         value_declarations.extend(file_declarations if writes_values(tree) else [])
-        transitions.append((transition_fields(tree), file_imports))
+        transitions.append(
+            (transition_fields(tree), file_imports, transition_literals(tree))
+        )
         if dynamic_funnel_keys:
             funnel_files.append((module, file_declarations))
         # Every from-import is also a public name of its own module pointing

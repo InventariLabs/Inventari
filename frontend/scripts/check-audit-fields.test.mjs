@@ -25,6 +25,7 @@ import {
   catalogKeys,
   gaps,
   resolverFields,
+  resolverGaps,
   valueKeys,
 } from "./check-audit-fields.mjs";
 
@@ -376,7 +377,7 @@ describe("check-audit-fields enum values", () => {
       artefact,
       JSON.stringify({
         ...saved,
-        values: [...saved.values, "type:A_PLANTED_VALUE"],
+        values: [...saved.values, "http_method:A_PLANTED_VALUE"],
       }),
     );
 
@@ -441,9 +442,79 @@ describe("check-audit-fields enum values", () => {
         "type:SUPPLIER",
         "http_method:post",
       ]).sort(),
-    ).toEqual(["SUPPLIER", "http_method_post"]);
+    ).toEqual(["http_method_post"]);
     expect(resolverFields().has("role")).toBe(true);
     expect(resolverFields().has("usage")).toBe(true);
+  });
+
+  it("reads a capitalised code of a resolver field from its own catalogue", () => {
+    // The partner type words through partners:types.<CODE>; the code the
+    // journal's own `values` section holds is never the one it reads.
+    expect(valueKeys(["type:SUPPLIER", "type:A_PLANTED_TYPE"])).toEqual([]);
+
+    const found = resolverGaps(["type:SUPPLIER", "type:A_PLANTED_TYPE"]);
+
+    expect(found.map((gap) => gap.key)).toEqual(
+      Array(6).fill("partners:types.A_PLANTED_TYPE"),
+    );
+    expect(found.map((gap) => gap.language).sort()).toEqual(
+      ["de", "en", "es", "fr", "pl", "pt"],
+    );
+  });
+
+  it("falls on a resolver code its catalogue lacks and names the catalogue", () => {
+    const saved = JSON.parse(
+      readFileSync(join(ROOT, "scripts/audit-snapshot-keys.json"), "utf8"),
+    );
+    const artefact = join(dir, "resolver.json");
+    writeFileSync(
+      artefact,
+      JSON.stringify({ ...saved, values: [...saved.values, "type:RESELLER"] }),
+    );
+
+    const { status, stdout, stderr } = spawnSync(
+      "node",
+      ["scripts/check-audit-fields.mjs", "--baseline"],
+      {
+        cwd: ROOT,
+        encoding: "utf8",
+        env: { ...process.env, AUDIT_KEYS: artefact },
+      },
+    );
+    const output = `${stdout}${stderr}`;
+
+    expect(status).toBe(1);
+    expect(output).toContain("en: partners:types.RESELLER (resolver)");
+    expect(output).toContain("the partners catalogue");
+  });
+
+  it("falls on a code a writer spells out under a transition pair", () => {
+    // `{'old_status': x, 'new_status': 'ARCHIVED'}` in a writer reaches the
+    // artefact as `new_status:ARCHIVED`; no catalogue carries ARCHIVED.
+    const saved = JSON.parse(
+      readFileSync(join(ROOT, "scripts/audit-snapshot-keys.json"), "utf8"),
+    );
+    const artefact = join(dir, "transition.json");
+    writeFileSync(
+      artefact,
+      JSON.stringify({
+        ...saved,
+        values: [...saved.values, "new_status:ARCHIVED"],
+      }),
+    );
+
+    const { status, stdout, stderr } = spawnSync(
+      "node",
+      ["scripts/check-audit-fields.mjs", "--baseline"],
+      {
+        cwd: ROOT,
+        encoding: "utf8",
+        env: { ...process.env, AUDIT_KEYS: artefact },
+      },
+    );
+
+    expect(status).toBe(1);
+    expect(`${stdout}${stderr}`).toContain("en: ARCHIVED (values)");
   });
 
   it("holds the values the backend writes to the baseline, today", () => {

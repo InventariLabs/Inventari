@@ -608,7 +608,7 @@ def test_a_transition_snapshot_shows_the_values_of_the_column_it_moves(
             'services/thing_writes.py': (
                 'from app.models.thing import Thing\n'
                 '\n'
-                'snapshot = {"old_status": "a", "new_status": "b"}\n'
+                'snapshot = {"old_status": before, "new_status": after}\n'
                 'lone = {"old_name": "a"}\n'
             ),
         },
@@ -622,3 +622,25 @@ def test_a_transition_snapshot_shows_the_values_of_the_column_it_moves(
         'old_status:open',
         'old_status:shut',
     ]
+
+
+def test_a_literal_written_under_a_transition_pair_is_a_value_the_journal_shows(
+    collect_keys, tmp_path: Path
+) -> None:
+    """A status column typed as a plain string declares no set, so the codes a
+    writer puts under ``old_<f>``/``new_<f>`` are read from its literals; a
+    name or attribute there names no code, and a lone key is no transition."""
+    root = _write_app(
+        tmp_path,
+        {
+            'services/campaign_writes.py': (
+                'snapshot = {"old_status": "DRAFT", "new_status": campaign.status}\n'
+                'closing = {"old_status": previous, "new_status": "ARCHIVED"}\n'
+                'lone = {"new_label": "ignored"}\n'
+            ),
+        },
+    )
+
+    payload = collect_keys(root)
+
+    assert payload['values'] == ['new_status:ARCHIVED', 'old_status:DRAFT']
