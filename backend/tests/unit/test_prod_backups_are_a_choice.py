@@ -663,6 +663,23 @@ done
         assert '/backups/$FROM/uploads-latest.tar.gz.age' in guide
         assert '/backups/$FROM/inventari_db-latest.sql.gz.age' in guide
 
+    def test_the_rebuild_pulls_the_backups_from_where_the_offsite_copy_puts_them(
+        self,
+    ) -> None:
+        """``BACKUP_RCLONE_REMOTE`` names the parent; the backups sit under ``backups/``.
+
+        A rebuild that pulls ``<remote>/last`` finds nothing there and leaves
+        ``backups/restore/`` empty, on the day the off-host copy is all there is.
+        """
+        command = ' '.join(_compose()['db-backup-offsite']['command'])
+        guide = (_REPO_ROOT / 'DEPLOYMENT.md').read_text(encoding='utf-8')
+        pulls = re.findall(r'rclone/rclone:\S+ copy (\S+) /data', guide)
+
+        assert 'rclone sync /backups "$$BACKUP_RCLONE_REMOTE/backups"' in command
+        assert pulls
+        for source in pulls:
+            assert source.endswith('/backups/last'), source
+
     def test_the_commands_are_there_and_the_image_carries_their_scripts(self) -> None:
         makefile = (_REPO_ROOT / 'Makefile').read_text(encoding='utf-8')
         dockerfile = (_BACKUP / 'Dockerfile').read_text(encoding='utf-8')

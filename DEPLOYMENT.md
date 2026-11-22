@@ -1006,7 +1006,7 @@ server in Warsaw.
    ```
 
    The delete leaves a delete marker, and `--versions` still lists the object.
-   A plain remote (the `gdrive:` example) works as well, but it can delete
+   A plain remote (Google Drive, say) works as well, but it can delete
    what it was given; the locked bucket is the one that survives a root on the
    server.
 5. Name the destinations in `.env` — parents, not the subtrees:
@@ -1145,12 +1145,13 @@ profile is imported again ([docs/OFF_DATABASE_SETUP.md](docs/OFF_DATABASE_SETUP.
    ```
 5. **Bring the backup to `backups/restore/`.** From the off-host copy, with the
    kept `rclone.conf` next to the compose file and your `BACKUP_RCLONE_REMOTE`
-   followed by `/last`:
+   followed by `/backups/last` — the service puts the backups under `backups/`
+   of the remote it is given:
    ```bash
    sudo mkdir -p backups/restore
    docker run --rm -e RCLONE_CONFIG=/config/rclone.conf \
      -v "$PWD/rclone.conf":/config/rclone.conf:ro -v "$PWD/backups/restore":/data \
-     rclone/rclone:1.76.0 copy gdrive:Inventari/prod-backups/last /data
+     rclone/rclone:1.76.0 copy ovh:<backups-bucket>/backups/last /data
    ```
    From the old disk, copy its `backups/last/` there instead.
 6. **Follow *Putting a backup back*** above with `FROM=restore`, from step 1.
