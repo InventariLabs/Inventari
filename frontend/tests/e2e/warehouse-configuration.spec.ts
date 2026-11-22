@@ -80,7 +80,9 @@ test.describe("Warehouse — Configuration", () => {
       .getByRole("link", { name: "History" })
       .click();
 
-    await expect(page.getByText(/holds unsaved changes/i)).toBeVisible();
+    await expect(
+      page.getByText("You have unsaved changes", { exact: true }),
+    ).toBeVisible();
     await page.getByRole("button", { name: "Cancel" }).click();
     await expect(page).toHaveURL(/\/warehouse\/settings/);
   });
