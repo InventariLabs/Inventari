@@ -1,4 +1,5 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { server } from "@/test/mocks/server";
@@ -10,6 +11,12 @@ import {
   makeLocationField,
   makeStorageSummary,
 } from "@/test/factories/storage";
+
+// The link to the product's shelves is offered where a module records
+// movements; the tests render outside the shell's provider.
+vi.mock("@/contexts/ModulesContext", () => ({
+  useEnabledModulesOptional: () => ["warehouse"],
+}));
 
 // The one switch every stock-value surface reads.
 const showInventoryValue = vi.hoisted(() => ({ current: true }));
@@ -62,11 +69,13 @@ function renderOverview(props: {
 }) {
   render(
     <QueryWrapper>
-      <ItemDetailOverview
-        item={props.item}
-        storages={props.storages}
-        categories={categories}
-      />
+      <MemoryRouter>
+        <ItemDetailOverview
+          item={props.item}
+          storages={props.storages}
+          categories={categories}
+        />
+      </MemoryRouter>
     </QueryWrapper>,
   );
 }
@@ -323,6 +332,19 @@ describe("ItemDetailOverview — a product held in several records", () => {
 
     expect(await screen.findByText("In all locations")).toBeInTheDocument();
     expect(screen.getByText("2 pcs.")).toBeInTheDocument();
+  });
+
+  it("says where the product is and how much in one row, not two", async () => {
+    serveTotal("2");
+    renderOverview({ item: rice(), storages: [shelf] });
+
+    const total = await screen.findByText("2 pcs.");
+    expect(screen.getAllByText("In all locations")).toHaveLength(1);
+    expect(screen.queryByText("Where it lies")).toBeNull();
+    expect(total.closest("a")).toHaveAttribute(
+      "href",
+      "/inventory/stock?template=tpl-rice",
+    );
   });
 
   it("adds nothing when the record is all there is of the product", async () => {

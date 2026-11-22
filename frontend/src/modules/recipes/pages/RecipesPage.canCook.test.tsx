@@ -151,3 +151,44 @@ describe("RecipesPage — an empty ready list names the near miss", () => {
     });
   });
 });
+
+describe("RecipesPage — the tag chips count the half on screen", () => {
+  it("counts only the ready recipes under Ready, and the near misses under Nearly there", async () => {
+    const dinner = { ...cookable, tags: ["dinner"] };
+    const quick = { ...nearlyThere, tags: ["dinner", "quick"] };
+    server.use(
+      http.get("/api/v1/recipes/tags", () =>
+        HttpResponse.json(
+          onePage([
+            { name: "dinner", count: 2, color: null },
+            { name: "quick", count: 1, color: null },
+          ]),
+        ),
+      ),
+      http.get("/api/v1/recipes/available", () =>
+        HttpResponse.json(onePage([dinner, quick])),
+      ),
+    );
+
+    await openTheCookTab();
+
+    await waitFor(() => {
+      expect(screen.getByText("Scrambled Eggs")).toBeInTheDocument();
+    });
+    // "quick" is carried only by a recipe that is not under this heading, so
+    // pressing it would lead to nothing.
+    expect(screen.queryByRole("button", { name: /^quick/ })).toBeNull();
+    expect(
+      screen.getByRole("button", { name: /^dinner\s*1$/ }),
+    ).toBeInTheDocument();
+
+    await userEvent.click(screen.getByText("Nearly there (1)"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Breakfast Pancakes")).toBeInTheDocument();
+    });
+    expect(
+      screen.getByRole("button", { name: /^quick\s*1$/ }),
+    ).toBeInTheDocument();
+  });
+});
