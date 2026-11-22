@@ -615,8 +615,7 @@ export default function AssetListPage() {
         showBulkRetireConfirm={showBulkRetireConfirm}
         showBulkArchiveConfirm={showBulkArchiveConfirm}
         showBulkPurgeConfirm={showBulkPurgeConfirm}
-        restoreTarget={restoreTarget}
-        purgeTarget={purgeTarget}
+        targets={{ restore: restoreTarget, purge: purgeTarget }}
         archived={equipmentArchived}
         onBulkRetire={handleBulkRetire}
         onBulkArchive={handleBulkArchive}
