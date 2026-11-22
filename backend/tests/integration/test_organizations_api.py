@@ -201,6 +201,49 @@ class TestHouseholdsUpdate:
         kept = client.get('/api/v1/organizations/my', headers=auth_headers).json()
         assert kept['name'] == test_household.name
 
+    @pytest.mark.parametrize('field', ['name', 'currency', 'timezone'])
+    def test_update_refuses_a_named_null_on_a_required_field(
+        self, client, auth_headers, test_household, field
+    ):
+        """A named null on a NOT NULL column is a 400 naming the field, and
+        the stored row stays as it was."""
+        before = client.get('/api/v1/organizations/my', headers=auth_headers).json()
+
+        response = client.put(
+            '/api/v1/organizations', headers=auth_headers, json={field: None}
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert field in response.json()['detail']['message']
+        kept = client.get('/api/v1/organizations/my', headers=auth_headers).json()
+        assert kept[field] == before[field]
+
+    def test_update_refuses_a_name_longer_than_the_column(
+        self, client, auth_headers, test_household
+    ):
+        response = client.put(
+            '/api/v1/organizations', headers=auth_headers, json={'name': 'x' * 300}
+        )
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        kept = client.get('/api/v1/organizations/my', headers=auth_headers).json()
+        assert kept['name'] == test_household.name
+
+    def test_update_leaves_a_required_field_alone_when_the_key_is_absent(
+        self, client, auth_headers, test_household
+    ):
+        """The other half: a key left out is not a null."""
+        before = client.get('/api/v1/organizations/my', headers=auth_headers).json()
+
+        response = client.put(
+            '/api/v1/organizations', headers=auth_headers, json={'tax_id': 'PL123'}
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['name'] == before['name']
+        assert response.json()['currency'] == before['currency']
+        assert response.json()['timezone'] == before['timezone']
+
     def test_update_stores_the_name_stripped(
         self, client, auth_headers, test_household
     ):

@@ -64438,6 +64438,7 @@
         "properties": {
           "name": {
             "type": "string",
+            "maxLength": 255,
             "title": "Name"
           },
           "currency": {
@@ -64646,6 +64647,7 @@
         "properties": {
           "name": {
             "type": "string",
+            "maxLength": 255,
             "title": "Name"
           },
           "currency": {
@@ -64948,7 +64950,8 @@
           "name": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 255
               },
               {
                 "type": "null"
