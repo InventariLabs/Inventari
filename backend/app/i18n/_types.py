@@ -680,6 +680,7 @@ class ErrorMessages(TypedDict):
     stock_as_of_no_history: str
     stock_as_of_before_ledger: str
     stock_as_of_pdf_too_many: str
+    stock_value_first_day: str
     stock_value_period_reversed: str
     stock_value_hidden: str
     validation_missing: str

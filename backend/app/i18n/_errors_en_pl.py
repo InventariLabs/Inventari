@@ -867,6 +867,11 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
             'a printout carries. Export it as a spreadsheet instead, or pick '
             'one location to narrow it.'
         ),
+        'stock_value_first_day': (
+            'The movement ledger starts on {starts_at}. A statement needs a '
+            'known evening to open on, so the first one can start on '
+            '{first_day}.'
+        ),
         'stock_value_period_reversed': (
             'The period ends before it starts. Pick an end date on or after the start date.'
         ),
@@ -1948,6 +1953,11 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
             'Pozycji w raporcie: {total} — wydruk mieści najwyżej {limit}. '
             'Wyeksportuj raport jako arkusz albo wybierz jedno miejsce, aby '
             'go zawęzić.'
+        ),
+        'stock_value_first_day': (
+            'Rejestr ruchów zaczyna się {starts_at}. Zestawienie musi się '
+            'otwierać na znanym wieczorze, więc pierwsze może zacząć się '
+            '{first_day}.'
         ),
         'stock_value_period_reversed': (
             'Okres kończy się przed swoim początkiem. Wybierz datę końca nie wcześniejszą niż data początku.'

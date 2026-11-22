@@ -675,6 +675,7 @@ apart.
 | `STOCK_TAKE_STATUS_UNCHANGEABLE` | Cannot change status from {current} to {new}. |
 | `STOCK_TAKE_TOLERANCE_NOT_ALLOWED` | Accepting a difference beyond the tolerance needs the stock take approval permission. |
 | `STOCK_TAKE_UNCOUNTED_ITEMS` | {count} uncounted items remaining |
+| `STOCK_VALUE_FIRST_DAY` | The movement ledger starts on {starts_at}. A statement needs a known evening to open on, so the first one can start on {first_day}. |
 | `STOCK_VALUE_HIDDEN` | The organization does not show what its stock is worth, so there is no statement to export. Turn the stock value on in the statistics settings first. |
 | `STOCK_VALUE_PERIOD_REVERSED` | The period ends before it starts. Pick an end date on or after the start date. |
 | `STORAGE_ARCHIVED` | This location is archived. Restore it before storing products here. |
