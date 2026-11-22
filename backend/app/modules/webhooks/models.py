@@ -105,7 +105,8 @@ class WebhookDeliveryLog(Base):
     # answer says what the receiver said before that.
     abandon_reason: Mapped[str | None] = mapped_column(String(40))
 
-    # The moment the attempt that produced the row's current status ended.
+    # The moment the last real attempt ended — the time of the answer the row
+    # shows. An abandonment does not move it.
     # created_at is the enqueue time and drifts away from the outcome by
     # the whole backoff; the history shows this one when it has it.
     last_attempt_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

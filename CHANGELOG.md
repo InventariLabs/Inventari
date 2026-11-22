@@ -349,6 +349,13 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A webhook delivery that the circuit breaker, a switch-off of the endpoint or
+  a switch-off of the module gives up on keeps what the target answered to its
+  last attempt: the delivery log shows the HTTP status, the response body and
+  the error text next to the reason for the stop, with the time of that
+  answer instead of the time of the stop, so deliveries abandoned together no
+  longer all read as answered at the same second. The delivery API returns
+  `status_code` on such rows next to `abandon_reason`.
 - A document that only records goods another step already took — a recipe's
   internal issue, whose goods the picking session removed — can no longer be
   returned, as it already could not be undone or corrected: a return would have
