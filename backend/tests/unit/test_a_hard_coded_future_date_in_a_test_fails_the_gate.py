@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 from datetime import date
 from pathlib import Path
 from types import ModuleType
@@ -152,3 +153,26 @@ def test_every_root_a_test_runner_collects_from_is_scanned(
 )
 def test_production_code_is_not_scanned(gate: ModuleType, path: str) -> None:
     assert not (gate._BACKEND_TEST.match(path) or gate._FRONTEND_TEST.match(path))
+
+
+def _recipe(makefile: str, target: str) -> str:
+    """The recipe lines of one Makefile target, up to the next target."""
+    lines = makefile.splitlines()
+    start = next(i for i, line in enumerate(lines) if line.startswith(f'{target}:'))
+    body: list[str] = []
+    for line in lines[start + 1 :]:
+        if line and not line.startswith(('\t', ' ', '#')):
+            break
+        body.append(line)
+    return '\n'.join(body)
+
+
+def test_a_frontend_only_branch_runs_the_gate_before_its_push() -> None:
+    """The gate scans frontend tests, and the pre-push gate asks ``make
+    check-frontend`` (not ``make lint``) of a branch that touches only
+    ``frontend/``: the target runs the script too."""
+    root = Path(
+        os.environ.get('INVENTARI_REPO_ROOT') or Path(__file__).resolve().parents[3]
+    )
+    makefile = (root / 'Makefile').read_text(encoding='utf-8')
+    assert 'check_time_bombs.py' in _recipe(makefile, 'check-frontend')
