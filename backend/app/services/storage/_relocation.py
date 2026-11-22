@@ -14,7 +14,8 @@ The stock on a past date reads the documents back
 (:func:`parents_as_of_async`): a subtree counts in the warehouse it stood in
 on that date, not in the one the tree names today. The movement register
 reads them the same way (:func:`paths_then_async`): a movement names the
-path its shelf had when the goods moved.
+path its shelf had when the goods moved, and a filter by a location lists the
+movements made in it as it was then (:func:`subtree_epochs_async`).
 """
 
 from __future__ import annotations
@@ -302,3 +303,51 @@ async def paths_then_async(
         if ends != (None, None):
             paths[move.id] = ends
     return paths
+
+
+async def subtree_epochs_async(
+    db: AsyncSession, organization_id: UUID, location_id: UUID
+) -> list[tuple[datetime | None, datetime | None, list[UUID]]] | None:
+    """What stood in and below *location_id* over time, or None for always today's.
+
+    Each entry is ``(start, end, ids)``: the location and everything below it
+    from *start* (inclusive, None for the beginning) to *end* (exclusive,
+    None for now), as the tree stood between two physical moves. Neighbouring
+    stretches with the same members are one. None means no physical move
+    changed the members, which is every location of an organization that
+    never moved one physically.
+    """
+    moves = (
+        await db.execute(
+            select(
+                LocationRelocation.location_id,
+                LocationRelocation.from_parent_id,
+                LocationRelocation.moved_at,
+            )
+            .where(
+                LocationRelocation.organization_id == organization_id,
+                LocationRelocation.location_id.is_not(None),
+            )
+            .order_by(LocationRelocation.moved_at.desc(), LocationRelocation.id.desc())
+        )
+    ).all()
+    if not moves:
+        return None
+    _names, parents = await _tree_async(db, organization_id)
+    epochs: list[tuple[datetime | None, datetime | None, list[UUID]]] = []
+    end: datetime | None = None
+    for move in moves:
+        members = subtree_of(parents, location_id)
+        if epochs and set(epochs[-1][2]) == set(members):
+            epochs[-1] = (move.moved_at, epochs[-1][1], epochs[-1][2])
+        else:
+            epochs.append((move.moved_at, end, members))
+        # Undone, the tree is what it was before this move.
+        parents[move.location_id] = move.from_parent_id
+        end = move.moved_at
+    members = subtree_of(parents, location_id)
+    if epochs and set(epochs[-1][2]) == set(members):
+        epochs[-1] = (None, epochs[-1][1], epochs[-1][2])
+    else:
+        epochs.append((None, end, members))
+    return None if len(epochs) == 1 else epochs

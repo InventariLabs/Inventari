@@ -52,7 +52,7 @@ def validated_country_code(v: object) -> str | None:
 
 
 class OrganizationBase(BaseModel):
-    name: str
+    name: str = Field(max_length=255)
     currency: str = 'USD'
     timezone: str = 'UTC'
 
@@ -87,7 +87,7 @@ class OrganizationAddress(BaseModel):
 
 
 class OrganizationUpdate(BaseModel):
-    name: str | None = None
+    name: str | None = Field(None, max_length=255)
     currency: str | None = None
     timezone: str | None = None
     settings: dict[str, Any] | None = None

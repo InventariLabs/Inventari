@@ -453,3 +453,78 @@ def test_the_single_edit_corrects_the_layout_without_a_movement(
 
     assert response.status_code == status.HTTP_200_OK, response.text
     assert _relocation_moves(db_session) == []
+
+
+def _filtered_ledger(client, auth_headers, product, location) -> list[dict]:
+    """The product's movements in *location*, without those a move wrote."""
+    response = client.get(
+        '/api/v1/stock-moves',
+        headers=auth_headers,
+        params={
+            'product_template_id': str(product.id),
+            'location_id': str(location.id),
+        },
+    )
+    assert response.status_code == status.HTTP_200_OK, response.text
+    return [
+        row
+        for row in response.json()['items']
+        if row['reference_type'] != 'location_relocation'
+    ]
+
+
+def test_filtering_by_a_location_reads_the_tree_each_movement_stood_in(
+    client, auth_headers, db_session, warehouses
+):
+    """A movement belongs to the warehouse its shelf stood in when it happened."""
+    _reorg(
+        client,
+        auth_headers,
+        [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
+    )
+    # A month ago the shelf stood under Main Warehouse, not under Pantry.
+    assert (
+        len(
+            _filtered_ledger(
+                client, auth_headers, warehouses['flour'], warehouses['main']
+            )
+        )
+        == 1
+    )
+    assert (
+        _filtered_ledger(
+            client, auth_headers, warehouses['flour'], warehouses['pantry']
+        )
+        == []
+    )
+
+    # Goods put on the shelf after the move belong to Pantry, not to Main.
+    post_on_shelf(client, auth_headers, warehouses['flour'], warehouses['shelf'].id, 1)
+    (after,) = _filtered_ledger(
+        client, auth_headers, warehouses['flour'], warehouses['pantry']
+    )
+    assert after['to_location_id'] == str(warehouses['shelf'].id)
+    assert (
+        len(
+            _filtered_ledger(
+                client, auth_headers, warehouses['flour'], warehouses['main']
+            )
+        )
+        == 1
+    )
+
+
+def test_filtering_by_a_location_that_moved_keeps_its_old_contents(
+    client, auth_headers, db_session, warehouses
+):
+    """The moved location itself, and its shelf, list their whole history."""
+    _reorg(
+        client,
+        auth_headers,
+        [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
+    )
+    post_on_shelf(client, auth_headers, warehouses['flour'], warehouses['shelf'].id, 1)
+    for place in (warehouses['cold'], warehouses['shelf']):
+        assert (
+            len(_filtered_ledger(client, auth_headers, warehouses['flour'], place)) == 2
+        )

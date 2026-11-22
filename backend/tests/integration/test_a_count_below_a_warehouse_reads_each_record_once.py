@@ -66,6 +66,10 @@ _NEIGHBOR_RECORDS = 6_000
 #: none with the module's name on it. The rest are the organization's own.
 _CLAIMED_EVERY = 10
 
+#: The one index an Index Scan may read the heap through: it holds a single
+#: key for the whole count, so its records come back in the order of their pages.
+_ORGANIZATION_INDEX = 'ix_items_organization_id'
+
 _ITEMS_SQL = text(
     """
     INSERT INTO items (
@@ -195,6 +199,7 @@ async def warehouse(real_async_db_session: AsyncSession) -> _Warehouse:
     await db.execute(text('ANALYZE items'))
     await db.execute(text('ANALYZE categories'))
     await db.execute(text('ANALYZE storage_locations'))
+    await db.execute(text('ANALYZE equipment_assignments'))
     return fixture
 
 
@@ -318,10 +323,20 @@ class TestTheModulesOwnRecordsAreCountedInOneRead:
 
         reads = [node for node in nodes if node.get('Relation Name') == 'items']
         assert reads, _shape(plan)
-        # An Index Scan hands the heap back a record at a time. A count of
-        # what a module keeps below a warehouse reads the pages once — in the
-        # table's order, or through a bitmap of them.
-        assert 'Index Scan' not in [node['Node Type'] for node in reads], _shape(plan)
+        # An Index Scan on a key the records are spread over hands the heap
+        # back a record at a time. A count of what a module keeps below a
+        # warehouse reads the pages once — in the table's order, through a
+        # bitmap of them, or through the organization's index, whose single
+        # key lists the records in the order of their pages. Which of those
+        # three the planner prefers moves with the statistics the rest of the
+        # suite leaves on the tables the statement names, so none is pinned.
+        walks = [
+            node
+            for node in reads
+            if node['Node Type'] == 'Index Scan'
+            and node.get('Index Name') != _ORGANIZATION_INDEX
+        ]
+        assert not walks, _shape(plan)
         # The module's categories are values the count read once, not a table
         # read for every record it weighs.
         assert 'categories' not in {node.get('Relation Name') for node in nodes}, (

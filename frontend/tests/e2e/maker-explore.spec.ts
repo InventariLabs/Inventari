@@ -131,7 +131,7 @@ test.describe.serial("Maker exploratory", () => {
           recipe_id: recipeId,
           child_template_id: child.id,
           qty_per_batch: "1",
-          unit: "kg",
+          unit: "pcs",
         });
       }
     });

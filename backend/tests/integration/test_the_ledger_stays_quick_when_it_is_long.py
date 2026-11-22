@@ -352,8 +352,9 @@ class TestAPageReadStaysTheSameShapeAtTenThousand:
 
         assert total > 0
         assert len(rows) == _PAGE
-        # A place stands for itself and everything under it, resolved once.
-        assert len(read.statements) == _STATEMENTS + 1, read.statements
+        # A place stands for itself and everything under it, resolved once,
+        # after asking whether a physical move ever changed what stood in it.
+        assert len(read.statements) == _STATEMENTS + 2, read.statements
         _assert_served_by_the_ordering_index(read.page_plan())
 
     async def test_the_page_filtered_by_document(

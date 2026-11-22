@@ -61,7 +61,7 @@ test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
     parent_template_id: output.id,
     child_template_id: ingredient.id,
     qty_per_batch: "1",
-    unit: "kg",
+    unit: "pcs",
   });
 
   // Plan 2 jars → complete them: 2 kg fruit at 2.50 → unit cost 2.50,
