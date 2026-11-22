@@ -17,6 +17,10 @@
  *        // i18n-keys: name | serial | assignedTo
  *        t(`table.columns.${key}`)
  *
+ *    The key may be held in a variable first (`const key = \`a.${id}\`;
+ *    t(key)`): the call is a finding all the same, and the enumeration goes on
+ *    the line above the call.
+ *
  *    Each listed value is expanded into the key and must exist in every
  *    maintained language's catalogue, so an enumeration that names
  *    `assigned_to` fails the way the menu failed.
@@ -122,6 +126,25 @@ function templateEnd(text, start) {
 const TRANSLATE_CALL = /(?<![\w$.])(?:i18n\.)?(?:t|tDyn|tDynamic)\(\s*/g;
 const ENUMERATION = /\/\/\s*i18n-keys:\s*(.+)\s*$/;
 
+/**
+ * The template literal a local `const`/`let` named `name` was last given
+ * before `before` — one with a hole in it — or `null`.
+ */
+function heldTemplate(text, name, before) {
+  const declaration = new RegExp(
+    `(?<![\\w$.])(?:const|let)\\s+${name.replace(/\$/g, "\\$")}\\s*(?::[^=]+)?=\\s*\``,
+    "g",
+  );
+  let held = null;
+  let match;
+  while ((match = declaration.exec(text)) !== null && match.index < before) {
+    const open = match.index + match[0].length - 1;
+    const body = text.slice(open + 1, templateEnd(text, open));
+    held = body.includes("${") ? body : null;
+  }
+  return held;
+}
+
 /** Template or concatenated keys in the first argument of a translate call. */
 export function dynamicKeysIn(source) {
   const text = blankComments(source);
@@ -141,6 +164,11 @@ export function dynamicKeysIn(source) {
         .slice(at)
         .match(/^(["'][\w:.-]*["']\s*\+\s*[\w$.?!]+)/);
       if (concat) template = concat[1].replace(/["']\s*\+\s*/, "${") + "}";
+    }
+    if (template === null) {
+      // A key built into a variable first: `const key = \`a.${id}\`; t(key)`.
+      const name = text.slice(at).match(/^([A-Za-z_$][\w$]*)\s*[,)]/);
+      template = name ? heldTemplate(text, name[1], match.index) : null;
     }
     if (template === null) continue;
     const line = lineOf(text, match.index);

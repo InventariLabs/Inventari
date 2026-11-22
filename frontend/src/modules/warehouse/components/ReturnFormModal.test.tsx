@@ -1,5 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test/utils";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render, screen } from "@/test/utils";
+import i18n from "@/i18n/config";
 import userEvent from "@testing-library/user-event";
 
 import { ReturnFormModal } from "./ReturnFormModal";
@@ -40,6 +41,20 @@ function buildDocument(type: string): WarehouseDocument {
 }
 
 describe("ReturnFormModal", () => {
+  afterEach(async () => {
+    await act(() => i18n.changeLanguage("en"));
+  });
+
+  it("writes the quantity limit with the reader's decimal mark", async () => {
+    await act(() => i18n.changeLanguage("pl"));
+    const document = buildDocument("OUT");
+    (document.lines[0] as { done_quantity: number }).done_quantity = 2.5;
+
+    render(<ReturnFormModal document={document} onClose={vi.fn()} />);
+
+    expect(screen.getByText("Maks: 2,5")).toBeInTheDocument();
+  });
+
   it("names the document type the return will actually create", () => {
     // The warning was a fixed sentence promising a receipt (IN). A return of
     // an internal transfer creates another INT, so the sentence was only ever
