@@ -618,6 +618,35 @@ describe("AppShell — work mode narrows the header's identity", () => {
   });
 });
 
+describe("AppShell — the phone Back in a workspace that shows one module", () => {
+  beforeEach(() => {
+    useFormGuardStore.getState().setDirtyForm(null);
+    modulesState.enabledModules = ["equipment"];
+    modulesState.focusModule = "equipment";
+    modulesState.focusStatus = "ready";
+  });
+
+  afterEach(() => {
+    modulesState.focusModule = null;
+  });
+
+  it("offers no Back at the module's root, where home is that same screen", () => {
+    renderShell("/equipment");
+    expect(
+      screen.queryByRole("button", { name: "Back" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("keeps Back one level down, and it leads to the root", async () => {
+    const user = userEvent.setup();
+    renderShell("/equipment/assets");
+    await user.click(screen.getByRole("button", { name: "Back" }));
+    await waitFor(() =>
+      expect(screen.getByTestId("path")).toHaveTextContent("/"),
+    );
+  });
+});
+
 describe("AppShell — the header says the workspace shows one module", () => {
   beforeEach(() => {
     modulesState.enabledModules = [];
