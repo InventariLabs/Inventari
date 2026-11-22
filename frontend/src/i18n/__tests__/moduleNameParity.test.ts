@@ -15,7 +15,7 @@ import { MAINTAINED_LANGUAGES } from "@/test/languageClasses";
  *
  * 1. Every backend-registered module (dir with manifest.json) plus the
  *    virtual `partners` module has `modules.<name>.name` and
- *    `modules.<name>.description` in ALL five modules.json catalogs, and no
+ *    `modules.<name>.description` in ALL six modules.json catalogs, and no
  *    catalog carries a key that no module claims (the `statistics` vs `stats`
  *    typo class — five translations sat dead for months).
  * 2. A module whose frontend registration defines `launcher.displayName`
@@ -133,7 +133,7 @@ function resolveKey(reference: string, lang: Lang): string | undefined {
 }
 
 describe("module name parity", () => {
-  it("every marketplace module has name+description in all five locales", () => {
+  it("every marketplace module has name+description in all six locales", () => {
     const problems: string[] = [];
     for (const name of marketplaceModules) {
       for (const lang of MAINTAINED_LANGUAGES) {
@@ -153,7 +153,7 @@ describe("module name parity", () => {
     expect(problems).toEqual([]);
   });
 
-  it("the always-on core entry has a title in all five locales", () => {
+  it("the always-on core entry has a title in all six locales", () => {
     const problems: string[] = [];
     for (const lang of MAINTAINED_LANGUAGES) {
       const entry = modulesCatalogs[lang][CORE_KEY];
@@ -169,7 +169,7 @@ describe("module name parity", () => {
     expect(problems).toEqual([]);
   });
 
-  it("a name-only built-in feature has a name in all five locales", () => {
+  it("a name-only built-in feature has a name in all six locales", () => {
     const problems: string[] = [];
     for (const feature of NAME_ONLY_FEATURES) {
       for (const lang of MAINTAINED_LANGUAGES) {
@@ -288,7 +288,7 @@ describe("module name parity", () => {
     // The document is the decision record and the catalogs carry it out, so
     // the two have to say the same thing. Nothing compared them, and nine
     // description cells had drifted from the English catalog unnoticed. Each
-    // row names the module in the five maintained languages, exactly as its
+    // row names the module in the six maintained languages, exactly as its
     // catalog does (`core` by its title), and its description opens with the
     // English catalog's; the row may add a note after it.
     const doc = fs.readFileSync(

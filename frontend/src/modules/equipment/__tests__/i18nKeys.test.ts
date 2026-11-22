@@ -1,6 +1,6 @@
 /*
  * Equipment i18n parity: restore-dialog copy, checkout-modal placeholders
- * and the models empty-state hint, present and honest in all 5 languages.
+ * and the models empty-state hint, present and honest in all 6 languages.
  */
 
 import { describe, expect, it } from "vitest";
@@ -36,7 +36,7 @@ function pathGet(node: unknown, dottedKey: string): unknown {
   return cur;
 }
 
-describe("equipment i18n keys (parity across 5 languages)", () => {
+describe("equipment i18n keys (parity across 6 languages)", () => {
   it.each(Object.entries(catalogs))(
     "%s has detail.confirm_restore_msg",
     (_lang, catalog) => {

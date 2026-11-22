@@ -14,8 +14,9 @@ import en from "../i18n/en.json";
 import es from "../i18n/es.json";
 import fr from "../i18n/fr.json";
 import pl from "../i18n/pl.json";
+import pt from "../i18n/pt.json";
 
-const LOCALES = { en, pl, de, fr, es } as const;
+const LOCALES = { en, pl, de, fr, es, pt } as const;
 
 /** How the same permission is labelled on the roles screen, per language. */
 const PERMISSION_LABEL: Record<keyof typeof LOCALES, string> = {
@@ -24,6 +25,7 @@ const PERMISSION_LABEL: Record<keyof typeof LOCALES, string> = {
   de: "Anträge genehmigen",
   fr: "Approuver les demandes",
   es: "Aprobar solicitudes",
+  pt: "Aprovar solicitações",
 };
 
 describe("approval workflow hint", () => {

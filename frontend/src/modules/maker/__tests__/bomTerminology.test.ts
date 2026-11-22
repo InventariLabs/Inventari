@@ -8,6 +8,7 @@ import pl from "@/modules/maker/i18n/pl.json";
 import de from "@/modules/maker/i18n/de.json";
 import fr from "@/modules/maker/i18n/fr.json";
 import es from "@/modules/maker/i18n/es.json";
+import pt from "@/modules/maker/i18n/pt.json";
 
 /**
  * glossary in docs/MODULE_NAMES.md: the maker module's production
@@ -30,7 +31,7 @@ import es from "@/modules/maker/i18n/es.json";
  * server message whose key the maker module raises.
  */
 
-const CATALOGS = { en, pl, de, fr, es } as const;
+const CATALOGS = { en, pl, de, fr, es, pt } as const;
 
 type Leaf = [path: string, value: string];
 
@@ -215,6 +216,7 @@ const LOSS_WORD: Record<keyof typeof CATALOGS, RegExp> = {
   de: /verlust/i,
   fr: /perte/i,
   es: /p[ée]rdida/i,
+  pt: /perda/i,
 };
 
 describe("maker yield-loss labels", () => {

@@ -1767,7 +1767,7 @@ describe("AuditLogPage — on a phone", () => {
     expect(within(card).getByText("inv_live_b3be8b5830a")).toBeInTheDocument();
     expect(within(card).getByText("API key")).toBeInTheDocument();
     // The key's kind is labelled, not printed as the machine's own word for
-    // itself — `api_key` is a value in the column, not a word in five
+    // itself — `api_key` is a value in the column, not a word in six
     // languages.
     expect(within(card).queryByText("api_key")).toBeNull();
   });

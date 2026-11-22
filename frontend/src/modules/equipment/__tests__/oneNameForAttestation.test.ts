@@ -5,6 +5,7 @@ import pl from "../i18n/pl.json";
 import de from "../i18n/de.json";
 import fr from "../i18n/fr.json";
 import es from "../i18n/es.json";
+import pt from "../i18n/pt.json";
 
 /**
  * One thing, one name.
@@ -18,7 +19,7 @@ import es from "../i18n/es.json";
  * The route and the API keep saying `campaigns`. Those are identifiers;
  * nobody reads them. This guard is about the words on the screen.
  */
-const CATALOGS = { en, pl, de, fr, es } as Record<
+const CATALOGS = { en, pl, de, fr, es, pt } as Record<
   string,
   Record<string, unknown>
 >;
@@ -30,6 +31,7 @@ const ATTESTATION = {
   de: /attestierung/i,
   fr: /attestation/i,
   es: /atestaci/i,
+  pt: /atestaç/i,
 };
 
 /** How each language spells the campaign status the API returns. */
@@ -39,6 +41,7 @@ const ACTIVE = {
   de: /^aktiv$/i,
   fr: /^active$/i,
   es: /^activa$/i,
+  pt: /^ativa$/i,
 };
 
 /** What it must no longer be called. */
@@ -48,6 +51,7 @@ const FORBIDDEN = {
   de: /kampagne/i,
   fr: /campagne/i,
   es: /campañ/i,
+  pt: /campanha|auditoria/i,
 };
 
 function leaves(node: unknown, prefix: string[] = []): Array<[string, string]> {

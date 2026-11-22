@@ -782,8 +782,8 @@ def smoke(  # noqa: PLR0915 - existing complexity/size
     check('AST safety', not safety_errors, '; '.join(safety_errors[:3]))
 
     # One source of truth for i18n completeness (module_validator.validate_i18n):
-    # a flat five-language list would fail community modules for
-    # missing pl/de/fr/es, which is an error only for core and official ones.
+    # a flat maintained-language list would fail community modules for
+    # missing pl/de/fr/es/pt, which is an error only for core and official ones.
     i18n_findings = validate_i18n(module_dir)
     if not i18n_findings:
         check('i18n complete', True)

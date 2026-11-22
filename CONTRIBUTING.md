@@ -371,8 +371,6 @@ error catalog is a plain `dict[str, str]` that may hold fewer keys than
 declarations, moving its error catalog from `COMMUNITY_ERRORS` to a row in
 `_CATALOGS` (a complete `ErrorMessages`) and declaring `100` in
 `translation-coverage.json`, once it is complete and someone will keep it so.
-That is the road Portuguese took: it was the first community language and is
-now the sixth maintained one.
 
 The list of supported languages lives in exactly two places — one per side of
 the wire — and a parity gate holds them to each other:

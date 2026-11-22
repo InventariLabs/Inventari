@@ -13,7 +13,7 @@ import { MAINTAINED_LANGUAGES } from "@/test/languageClasses";
  * (src/i18n/locales/<lang>/<ns>.json):
  *
  * 1. Key presence — every static `t("key")` literal used in module code
- *    must resolve in all five language catalogs (through the i18next
+ *    must resolve in all six language catalogs (through the i18next
  *    fallback namespace chain). Catches keys missing from ALL locales
  *    at once (rendered as raw keys), which catalog↔catalog parity tests
  *    cannot see.

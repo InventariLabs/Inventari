@@ -1,8 +1,8 @@
 /**
  * A catalogue string is words. A check mark or a warning sign typed into one
  * is drawn by the font, not by the design system: it takes the text colour,
- * is announced (or skipped) differently by each screen reader, and the five
- * languages end up with five copies of an icon that belongs in the component.
+ * is announced (or skipped) differently by each screen reader, and each
+ * language ends up with a copy of an icon that belongs in the component.
  * The icon goes in the markup; the catalogue keeps the sentence.
  */
 import { describe, expect, it } from "vitest";

@@ -1,6 +1,6 @@
 /**
  * The gate that compares what the backend writes into audit snapshots with
- * what the five catalogues can say about it.
+ * what the six catalogues can say about it.
  *
  * Two things it has to get right, and both are the reason the forty English
  * fields went unnoticed for so long: it has to see a gap at all, and it has

@@ -411,7 +411,7 @@ export function useEquipmentForm(
         navigate(`/equipment/${created.id}`, { replace: true });
       }
     } catch (err) {
-      // The `{{msg}}` placeholder is in none of the five translations, so a
+      // The `{{msg}}` placeholder is in none of the translations, so a
       // reason interpolated there would be dropped. The server's
       // sentence replaces the generic one instead of decorating it.
       toast.error(extractApiError(err, t("form.errors.saveFailed")));

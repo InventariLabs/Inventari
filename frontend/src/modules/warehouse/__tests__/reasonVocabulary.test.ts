@@ -5,6 +5,7 @@ import pl from "../i18n/pl.json";
 import de from "../i18n/de.json";
 import fr from "../i18n/fr.json";
 import es from "../i18n/es.json";
+import pt from "../i18n/pt.json";
 
 /**
  * One concept, one word.
@@ -19,9 +20,9 @@ import es from "../i18n/es.json";
  *
  * The enums stay distinct: `WRONG_PRODUCT` and `WRONG_ITEM` are the backend's
  * codes and the reports count them. What a reader meets is one word per
- * concept, in all five languages (§14.3: the stocked record is a Product).
+ * concept, in all six languages (§14.3: the stocked record is a Product).
  */
-const CATALOGUES: Record<string, unknown> = { en, pl, de, fr, es };
+const CATALOGUES: Record<string, unknown> = { en, pl, de, fr, es, pt };
 
 type CorrectionCatalogue = {
   reasons: {

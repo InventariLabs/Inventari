@@ -249,11 +249,11 @@ reload, and it is on the list — the module working end to end.
 ### 5. Add translations
 
 The scaffold already wrote `frontend/src/modules/warranty_tracker/i18n/en.json`
-and the matching `pl`, `de`, `fr`, `es` files with placeholders. A module built
-into this repository owes all five, so fill all five. (A package you distribute,
-Path B below, owes English only: a reader in a language it does not ship sees it
-in English, key by key.) The page above reads two keys the scaffold did not
-write, `empty` and `emptyHint`; add them to every file.
+and the matching `pl`, `de`, `fr`, `es` and `pt` files with placeholders. A
+module built into this repository owes all six, so fill all six. (A package you
+distribute, Path B below, owes English only: a reader in a language it does not
+ship sees it in English, key by key.) The page above reads two keys the scaffold
+did not write, `empty` and `emptyHint`; add them to every file.
 
 Edit `frontend/src/modules/warranty_tracker/i18n/en.json`:
 

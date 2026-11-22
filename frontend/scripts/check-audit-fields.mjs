@@ -16,7 +16,7 @@
  *     `scripts/audit-snapshot-keys.json` (refresh: `make sync-audit-fields`)
  *
  *   this file
- *     compares that set with `settings.audit.fields` in all five catalogs.
+ *     compares that set with `settings.audit.fields` in all six catalogs.
  *
  * Modes:
  *   node check-audit-fields.mjs                  # exit 1 on any gap

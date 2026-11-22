@@ -2,7 +2,7 @@ import { test, expect } from "./fixtures/auth";
 
 /**
  * The demo bar stays short on a phone and on one line on a desktop, in each
- * of the five languages.
+ * of the six languages.
  *
  * A phone shows a one-sentence notice (`demo.noticeShort`) and the three
  * actions — the inbox link, the label sheet, "Start over" — beside it, so the

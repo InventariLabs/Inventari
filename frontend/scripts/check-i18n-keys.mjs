@@ -283,7 +283,7 @@ const DYNAMIC_ALLOWLIST = [
   { ns: "categories", prefix: "modal.namePlaceholderProfiles" },
   // ColorSwatchPicker: t(`modal.colors.${key}`) — one name per palette key
   // the picker can render (PALETTE_KEYS). The gate that keeps this complete
-  // is the component's own test, which walks the palette against all five
+  // is the component's own test, which walks the palette against all six
   // catalogues; this entry only says the consumption is dynamic.
   { ns: "categories", prefix: "modal.colors" },
   // LoginPage: t(loginFailureKey(error)) — one sentence per cause a failed
@@ -525,7 +525,7 @@ const BACKEND_MODULES = resolve(
 // in a settings schema (`'title_key': 'equipment:settings.x'`) and a keyword
 // argument (`register_purpose(label_key='recipes:ai.purposeLabel')`). Reading
 // only the first is how four AI-purpose keys shipped without a translation in
-// any of the five catalogs — the gate existed, and was looking the other way.
+// any of the six catalogs — the gate existed, and was looking the other way.
 const BACKEND_KEY_RE =
   /['"]?\b\w*(?:_key|Key)['"]?\s*[:=]\s*['"]([A-Za-z0-9_]+:[A-Za-z0-9_.]+)['"]/g;
 const BACKEND_DECL_FILES = [
@@ -1362,12 +1362,12 @@ function recordCall(rel, call) {
   // `fallbackNS` is configured, and this installation does not configure it.
   // Reading the list as a search order is how three keys reached the screen as
   // their own names — `toasts.archivedLabelFreed` in a toast, `torchOn` on a
-  // button — each with a complete set of five translations sitting one
+  // button — each with a complete set of translations sitting one
   // namespace away.
   // `t("templates.confirm_delete", `Delete template "${tpl.name}"?`)` reads
   // as an author asking for the record's name and getting the placeholder
   // instead: the second argument is a default value, the key exists in all
-  // five catalogs so the default never runs, and nothing was passed to fill
+  // six catalogs so the default never runs, and nothing was passed to fill
   // `{{name}}`. Three delete dialogs shipped asking to confirm the removal of
   // a record called `{{name}}`. The tell is structural -- a value with a
   // placeholder reached by a call whose only other argument is a literal --
@@ -1608,7 +1608,7 @@ sweepUnitNounFidelity();
 // ---------------------------------------------------------------------------
 //
 // Everything above passes a screen title nobody translated. The key exists in
-// all five catalogs (parity holds), it is a string (the plural rules look
+// all six catalogs (parity holds), it is a string (the plural rules look
 // elsewhere), and it is referenced by code (so it is not an orphan). Only the
 // pair is a finding: the value identical to English while the other siblings
 // catalogs say something of their own. "Picking" in pl.json sat beside
@@ -2155,7 +2155,7 @@ console.log(
 
 if (effectiveViolations.length > 0) {
   console.error(
-    `\n✗ ${effectiveViolations.length} new violations — add the keys to the catalogues (×5 languages) or fix the t() call.`,
+    `\n✗ ${effectiveViolations.length} new violations — add the keys to the catalogues (×6 languages) or fix the t() call.`,
   );
   process.exit(1);
 }
