@@ -39,6 +39,8 @@ from sqlalchemy.orm import Session
 
 from app.models.item import Item
 from app.models.organization import Organization
+from app.models.product_template import ProductTemplate
+from app.models.stock_lot import StockLot
 from app.models.stock_move import StockMove, StockMoveReferenceType
 from app.models.stock_valuation_layer import StockValuationLayer
 from app.models.storage_location import StorageLocation
@@ -481,15 +483,41 @@ class TestTheWorkshopHasAWeekToShow:
             (text, minutes) for text, minutes in MAKER_STEPS
         ]
 
-    def test_the_product_has_a_name_for_its_label(
+    def test_the_label_is_declared_not_left_unchecked(
         self, db_session: Session, seeded: uuid.UUID
     ) -> None:
-        facts = (
-            db_session.query(MakerLabelFacts)
-            .filter(MakerLabelFacts.organization_id == seeded)
+        """Every ingredient is checked for allergens and carries its figures."""
+        recipe = (
+            db_session.query(MakerRecipe)
+            .filter(
+                MakerRecipe.organization_id == seeded, MakerRecipe.is_default.is_(True)
+            )
             .one()
         )
-        assert facts.label_name
+        children = [
+            child
+            for (child,) in db_session.query(BoMLine.child_template_id).filter(
+                BoMLine.recipe_id == recipe.id
+            )
+        ]
+        facts = {
+            row.product_template_id: row
+            for row in db_session.query(MakerLabelFacts).filter(
+                MakerLabelFacts.organization_id == seeded
+            )
+        }
+        assert facts[recipe.output_template_id].label_name
+        assert all(facts[child].allergens == [] for child in children)
+        for child in children:
+            template = db_session.get(ProductTemplate, child)
+            assert template.meta_data['nutrition']['calories_kcal'] > 0
+
+    def test_a_batch_carries_a_best_before_from_the_shelf_life(
+        self, db_session: Session, seeded: uuid.UUID
+    ) -> None:
+        (run,) = self._runs(db_session, seeded, 'COMPLETED')
+        lot = db_session.get(StockLot, run.output_lot_id)
+        assert lot is not None and lot.expiry_date is not None
 
 
 class TestTheShelvesFilledOverTime:

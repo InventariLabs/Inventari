@@ -47,6 +47,7 @@ from app.modules.maker.models import (
     BoMLine,
     MakerLabelFacts,
     MakerRecipe,
+    MakerShelfLife,
     ProductionOrder,
 )
 from app.modules.purchase_orders.models import PurchaseOrder, PurchaseOrderLine
@@ -3453,6 +3454,44 @@ MAKER_PLANNED_RUNS = [
 
 #: What the product's label says beyond its recipe.
 MAKER_LABEL_NAME = 'Damson plum butter'
+#: Jars keep for a year and a half; every batch's best-before follows from it.
+MAKER_SHELF_LIFE_DAYS = 548
+
+#: Packed in a kitchen that also handles nuts.
+MAKER_LABEL_MAY_CONTAIN = ('nuts',)
+
+#: Per 100 g on each ingredient's card, in the card's own names: calories,
+#: fat, saturated fat, carbohydrate, sugar, protein, salt. With them the
+#: Label tab declares the product's nutrition instead of saying nobody has.
+MAKER_NUTRITION = {
+    'Damson Plums': {
+        'calories_kcal': 46,
+        'fat_g': 0.3,
+        'saturated_fat_g': 0,
+        'carbs_g': 11.4,
+        'sugar_g': 9.9,
+        'protein_g': 0.7,
+        'salt_g': 0,
+    },
+    'White Sugar': {
+        'calories_kcal': 400,
+        'fat_g': 0,
+        'saturated_fat_g': 0,
+        'carbs_g': 100,
+        'sugar_g': 100,
+        'protein_g': 0,
+        'salt_g': 0,
+    },
+    'Cassia Cinnamon': {
+        'calories_kcal': 247,
+        'fat_g': 1.2,
+        'saturated_fat_g': 0.3,
+        'carbs_g': 80.6,
+        'sugar_g': 2.2,
+        'protein_g': 4,
+        'salt_g': 0.03,
+    },
+}
 
 
 def _seed_line_measure(
@@ -3551,7 +3590,8 @@ def _create_maker_demo(db, org_id) -> dict[str, uuid.UUID]:
             weight_value=1000.0,
             weight_uom_id=uom_gram,
             removal_strategy='FIFO',
-            meta_data={'maker_demo': True},
+            meta_data={'maker_demo': True}
+            | ({'nutrition': MAKER_NUTRITION[name]} if name in MAKER_NUTRITION else {}),
         )
         db.add(template)
         ids[name] = template.id
@@ -3618,16 +3658,39 @@ def _create_maker_demo(db, org_id) -> dict[str, uuid.UUID]:
         db.add(line)
         bom_count += 1
 
-    if (
-        not db.query(MakerLabelFacts)
+    if not (
+        db.query(MakerShelfLife)
         .filter_by(organization_id=org_id, product_template_id=parent_id)
         .first()
     ):
         db.add(
-            MakerLabelFacts(
+            MakerShelfLife(
                 organization_id=org_id,
                 product_template_id=parent_id,
-                label_name=MAKER_LABEL_NAME,
+                shelf_life_days=MAKER_SHELF_LIFE_DAYS,
+            )
+        )
+
+    # The product's label name and what its kitchen may carry, and, for each
+    # ingredient, that someone checked its card for allergens and found none.
+    facts = {
+        parent_id: (MAKER_LABEL_NAME, None, list(MAKER_LABEL_MAY_CONTAIN)),
+        **{ids[name]: (None, [], []) for name in MAKER_NUTRITION},
+    }
+    for template_id, (label_name, allergens, may_contain) in facts.items():
+        if (
+            db.query(MakerLabelFacts)
+            .filter_by(organization_id=org_id, product_template_id=template_id)
+            .first()
+        ):
+            continue
+        db.add(
+            MakerLabelFacts(
+                organization_id=org_id,
+                product_template_id=template_id,
+                label_name=label_name,
+                allergens=allergens,
+                may_contain=may_contain,
             )
         )
 
