@@ -253,6 +253,11 @@ class ProductionStockMoveRead(BaseModel):
     # from a shelf into the run, receipt arrives out of it).
     from_location_name: str | None = None
     to_location_name: str | None = None
+    # The path an end had when the run touched it, set only where it is not
+    # the path today because the shelf, or a place above it, physically moved
+    # since. None means today's path is the one it had.
+    from_location_path: str | None = None
+    to_location_path: str | None = None
     quantity: Decimal
     lot_id: UUID | None = None
     lot_code: str | None = None

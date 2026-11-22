@@ -828,63 +828,29 @@ async def get_production_stock_moves(
     traceability. Products, lots and locations come back named, since a truncated
     UUID identifies nothing to the person reading the table.
     """
-    total = await core_api.stock_moves.count_by_reference_async(
-        db, org_id, 'maker_production', order_id
+    moves, total = await core_api.stock_moves.list_rows_for_org_async(
+        db,
+        org_id,
+        reference_type='maker_production',
+        reference_id=order_id,
+        limit=limit,
+        offset=offset,
     )
-    moves = await core_api.stock_moves.list_by_reference_async(
-        db, org_id, 'maker_production', order_id, limit=limit, offset=offset
-    )
-    if not moves:
-        return PaginatedResponse.from_slice([], offset, limit, total)
-
-    templates = await core_api.product_templates.list_for_org_async(
-        db, org_id, limit=10_000
-    )
-    template_map = {t.id: t for t in templates}
-    template_names = {t.id: t.name for t in templates}
-    uom_symbols = {
-        uom.id: uom.symbol for uom in await core_api.uoms.list_for_org_async(db, org_id)
-    }
-
-    lot_names: dict[UUID, str] = {}
-    lot_template_ids = {m.product_template_id for m in moves if m.lot_id is not None}
-    for template_id in lot_template_ids:
-        for lot in await core_api.stock.list_lots_async(db, org_id, template_id):
-            lot_names[lot.id] = lot.name
-
-    location_names: dict[UUID, str] = {}
-    for location_id in {
-        *(m.from_location_id for m in moves if m.from_location_id is not None),
-        *(m.to_location_id for m in moves if m.to_location_id is not None),
-    }:
-        location = await core_api.locations.get_async(db, org_id, location_id)
-        if location is not None:
-            location_names[location_id] = location.name
-
     rows = [
         ProductionStockMoveRead(
             id=move.id,
             product_template_id=move.product_template_id,
-            product_template_name=template_names.get(move.product_template_id),
+            product_template_name=move.product_name,
             from_location_id=move.from_location_id,
             to_location_id=move.to_location_id,
-            from_location_name=(
-                location_names.get(move.from_location_id)
-                if move.from_location_id
-                else None
-            ),
-            to_location_name=(
-                location_names.get(move.to_location_id) if move.to_location_id else None
-            ),
+            from_location_name=move.from_location_name,
+            to_location_name=move.to_location_name,
+            from_location_path=move.from_location_path,
+            to_location_path=move.to_location_path,
             quantity=move.quantity,
-            uom_symbol=(
-                uom_symbols.get(template.uom_id)
-                if (template := template_map.get(move.product_template_id))
-                and template.uom_id
-                else None
-            ),
+            uom_symbol=move.uom_symbol,
             lot_id=move.lot_id,
-            lot_code=lot_names.get(move.lot_id) if move.lot_id else None,
+            lot_code=move.lot_name,
             created_at=move.created_at,
         )
         for move in moves
