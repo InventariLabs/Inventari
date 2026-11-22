@@ -836,6 +836,15 @@ says what the release does rather than what changed since them.
   the products list and stops counting as needing attention on the overview,
   instead of staying on the list at 0. Undoing the pick returns the stock to the
   record on the shelf it left.
+- A closed attestation keeps what each item was recorded as. When an asset came
+  back after the campaign closed, its line in the attestation detail stopped
+  reading Confirmed or Disputed and read "already returned" instead, so the
+  record of who confirmed what changed with a later move of the asset. An item
+  now counts as returned only while it is unanswered on a campaign that is
+  still running; an answered item, and every item of a closed campaign, keeps
+  its recorded status. The response badge and the Returned count follow the same
+  rule, so a closed campaign shows an unanswered response as awaiting reply and
+  counts it as pending.
 
 ### Removed
 
