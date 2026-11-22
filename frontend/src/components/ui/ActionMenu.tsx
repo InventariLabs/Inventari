@@ -3,6 +3,7 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Z_TIER_TO_VAR, type SheetZTier } from "@/components/ui/Sheet";
+import { setSheetFocusReturn } from "@/components/ui/overlayStack";
 import { cn } from "@/lib/utils";
 
 /**
@@ -79,6 +80,7 @@ export function ActionMenu({
 }: ActionMenuProps) {
   const [open, setOpen] = React.useState(false);
   const close = React.useCallback(() => setOpen(false), []);
+  const trigger = React.useRef<HTMLButtonElement>(null);
 
   // Every surface this menu opens on — `Sheet`, `ItemEditModal` — closes
   // itself on Escape from its own `document` listener, registered when the
@@ -109,6 +111,7 @@ export function ActionMenu({
     <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
       <PopoverPrimitive.Trigger asChild>
         <Button
+          ref={trigger}
           variant="ghost"
           size="icon"
           aria-label={label}
@@ -127,10 +130,22 @@ export function ActionMenu({
           // Closing returns the focus to the trigger in a step of its own. An
           // action that opened a window has put the focus there by then, and
           // taking it back would leave that window's field unreachable by
-          // keyboard.
+          // keyboard. The window is told where to hand the focus back when it
+          // closes: the item that opened it is gone with the menu.
           onCloseAutoFocus={(event) => {
             const active = document.activeElement;
-            if (active && active !== document.body) event.preventDefault();
+            if (active && active !== document.body) {
+              event.preventDefault();
+              const panel = active.closest<HTMLElement>('[role="dialog"]');
+              // A sheet the menu itself sits in is not one it opened.
+              if (
+                panel &&
+                trigger.current &&
+                !panel.contains(trigger.current)
+              ) {
+                setSheetFocusReturn(panel, trigger.current);
+              }
+            }
           }}
           className={cn(
             "w-56 bg-surface-card rounded-xl border border-border shadow-xl p-1 flex flex-col gap-1",

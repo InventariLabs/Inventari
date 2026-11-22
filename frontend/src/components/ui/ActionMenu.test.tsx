@@ -1,6 +1,8 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { useState } from "react";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { ActionMenu } from "@/components/ui/ActionMenu";
+import { Sheet } from "@/components/ui/Sheet";
 
 const openMenu = () =>
   fireEvent.click(screen.getByRole("button", { name: "More actions" }));
@@ -100,5 +102,39 @@ describe("ActionMenu", () => {
 
       expect(surfaceListener).toHaveBeenCalledOnce();
     });
+  });
+
+  /**
+   * The item that opened a sheet unmounts with the menu, so the sheet has no
+   * element of the page to give the focus back to when it closes.
+   */
+  it("hands the focus back to its button when a sheet it opened closes", async () => {
+    function Page() {
+      const [open, setOpen] = useState(false);
+      return (
+        <>
+          <ActionMenu
+            label="More actions"
+            actions={[
+              { id: "view", label: "View", onSelect: () => setOpen(true) },
+            ]}
+          />
+          <Sheet open={open} onClose={() => setOpen(false)} aria-label="Detail">
+            <button onClick={() => setOpen(false)}>Done</button>
+          </Sheet>
+        </>
+      );
+    }
+    render(<Page />);
+    const trigger = screen.getByRole("button", { name: "More actions" });
+    openMenu();
+    fireEvent.click(screen.getByRole("button", { name: "View" }));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Done" })).toHaveFocus(),
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Done" }));
+
+    await waitFor(() => expect(trigger).toHaveFocus());
   });
 });

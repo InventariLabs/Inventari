@@ -79,6 +79,24 @@ export function getTopmostOverlaySheetPanel(): HTMLElement | null {
   return null;
 }
 
+const focusReturns = new WeakMap<HTMLElement, HTMLElement>();
+
+/**
+ * Where focus goes when `panel` closes and the element it came from is gone.
+ *
+ * A menu item that opens a sheet is that element: it unmounts with the menu
+ * before the sheet mounts, so the sheet finds nothing to save. The menu knows
+ * its own trigger, and tells the sheet it opened.
+ */
+export function setSheetFocusReturn(panel: HTMLElement, target: HTMLElement) {
+  focusReturns.set(panel, target);
+}
+
+export function getSheetFocusReturn(panel: HTMLElement): HTMLElement | null {
+  const target = focusReturns.get(panel);
+  return target?.isConnected ? target : null;
+}
+
 /**
  * Whether a Radix popper layer — a popover, a combobox, a select — is open.
  *
