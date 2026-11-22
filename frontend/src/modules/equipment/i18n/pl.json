@@ -376,6 +376,7 @@
     "confirm_unretire_action": "Zmień status",
     "cannot_maintain_deployed": "Nie można ustawić konserwacji — najpierw przyjmij zasób",
     "confirm_purge": "Trwale usunąć ten zasób?",
+    "confirm_purge_named": "Trwale usunąć {{name}}?",
     "confirm_purge_msg": "Ta operacja jest nieodwracalna. Wszystkie dane zostaną trwale usunięte.",
     "retired": "Zasób wycofany",
     "purged": "Zasób trwale usunięty",

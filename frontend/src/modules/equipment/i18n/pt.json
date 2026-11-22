@@ -39,7 +39,7 @@
     "select_page": "Selecionar página",
     "select_all_matching": "Selecionar todos os {{total}}",
     "restoreNamed": "Restaurar {{name}}",
-    "purgeNamed": "Excluir {{name}} permanentemente"
+    "purgeNamed": "Excluir permanentemente {{name}}"
   },
   "dashboard": {
     "title": "Visão geral dos equipamentos",
@@ -328,6 +328,7 @@
     "confirm_unretire_action": "Alterar estado",
     "cannot_maintain_deployed": "Não é possível definir Manutenção — devolva o equipamento primeiro",
     "confirm_purge": "Excluir este equipamento permanentemente?",
+    "confirm_purge_named": "Excluir {{name}} permanentemente?",
     "confirm_purge_msg": "Esta ação não pode ser desfeita. Todos os dados serão removidos permanentemente.",
     "retired": "Baixa registrada",
     "purged": "Equipamento excluído permanentemente",

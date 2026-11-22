@@ -39,7 +39,7 @@
     "select_page": "Select page",
     "select_all_matching": "Select all {{total}}",
     "restoreNamed": "Restore {{name}}",
-    "purgeNamed": "Delete {{name}} permanently"
+    "purgeNamed": "Delete Permanently {{name}}"
   },
   "dashboard": {
     "title": "Equipment Overview",
@@ -328,6 +328,7 @@
     "confirm_unretire_action": "Change status",
     "cannot_maintain_deployed": "Cannot set Maintenance — return the asset first",
     "confirm_purge": "Permanently delete this asset?",
+    "confirm_purge_named": "Permanently delete {{name}}?",
     "confirm_purge_msg": "This action cannot be undone. All data will be permanently removed.",
     "retired": "Asset retired",
     "purged": "Asset permanently deleted",

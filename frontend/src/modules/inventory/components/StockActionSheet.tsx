@@ -88,7 +88,14 @@ function StockItemRow({
 }: StockItemRowProps) {
   const { t } = useTranslation(["labels", "common", "items"]);
   const [asking, setAsking] = useState(false);
-  const place = item.location_path || item.location;
+  // Records of one product on one shelf differ by batch and expiry, so the
+  // buttons' names end with them after the location.
+  const where = item.location_path || item.location;
+  const apart = [
+    item.lot && t("stockActions.lotLabel", { lot: item.lot }),
+    item.expiry_date && formatDate(item.expiry_date),
+  ].filter(Boolean);
+  const place = apart.length ? `${where} (${apart.join(", ")})` : where;
   return (
     <div className="bg-surface-card px-3 py-2.5 rounded-xl border border-border shadow-sm flex flex-wrap items-center justify-between gap-3">
       <div className="min-w-[12rem] flex-1">

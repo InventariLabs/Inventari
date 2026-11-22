@@ -327,7 +327,11 @@ export default function AssetDetailPage() {
 
       <ConfirmDialog
         open={showPurgeConfirm}
-        title={t("detail.confirm_purge")}
+        title={
+          item?.name
+            ? t("detail.confirm_purge_named", { name: item.name })
+            : t("detail.confirm_purge")
+        }
         message={t("detail.confirm_purge_msg")}
         confirmLabel={t("actions.purge")}
         cancelLabel={t("common:actions.cancel", "Cancel")}
@@ -339,7 +343,11 @@ export default function AssetDetailPage() {
 
       <ConfirmDialog
         open={showRestoreConfirm}
-        title={t("actions.restore")}
+        title={
+          item?.name
+            ? t("actions.restoreNamed", { name: item.name })
+            : t("actions.restore")
+        }
         message={t("detail.confirm_restore_msg")}
         confirmLabel={t("actions.restore")}
         cancelLabel={t("common:actions.cancel", "Cancel")}

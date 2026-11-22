@@ -39,7 +39,7 @@
     "select_page": "Seleccionar página",
     "select_all_matching": "Seleccionar los {{total}}",
     "restoreNamed": "Restaurar {{name}}",
-    "purgeNamed": "Eliminar {{name}} permanentemente"
+    "purgeNamed": "Eliminar permanentemente {{name}}"
   },
   "dashboard": {
     "title": "Resumen de equipamiento",
@@ -334,6 +334,7 @@
     "confirm_unretire_action": "Cambiar estado",
     "cannot_maintain_deployed": "No se puede poner en mantenimiento — devuelva el activo primero",
     "confirm_purge": "¿Eliminar permanentemente este activo?",
+    "confirm_purge_named": "¿Eliminar permanentemente {{name}}?",
     "confirm_purge_msg": "Esta acción no se puede deshacer. Todos los datos se eliminarán permanentemente.",
     "retired": "Activo retirado",
     "purged": "Activo eliminado permanentemente",

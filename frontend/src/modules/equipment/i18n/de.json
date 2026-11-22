@@ -38,8 +38,8 @@
     "bulk_print_labels": "Etiketten drucken",
     "select_page": "Seite auswählen",
     "select_all_matching": "Alle {{total}} auswählen",
-    "restoreNamed": "{{name}} wiederherstellen",
-    "purgeNamed": "{{name}} endgültig löschen"
+    "restoreNamed": "Wiederherstellen {{name}}",
+    "purgeNamed": "Endgültig löschen {{name}}"
   },
   "dashboard": {
     "title": "Ausrüstungsübersicht",
@@ -327,6 +327,7 @@
     "confirm_unretire_action": "Status ändern",
     "cannot_maintain_deployed": "Wartung nicht möglich — geben Sie das Gerät zuerst zurück",
     "confirm_purge": "Dieses Gerät endgültig löschen?",
+    "confirm_purge_named": "{{name}} endgültig löschen?",
     "confirm_purge_msg": "Diese Aktion kann nicht rückgängig gemacht werden. Alle Daten werden endgültig entfernt.",
     "retired": "Gerät ausgemustert",
     "purged": "Gerät endgültig gelöscht",

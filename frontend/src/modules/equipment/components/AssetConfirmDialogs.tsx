@@ -8,6 +8,9 @@ interface AssetConfirmDialogsProps {
   showBulkPurgeConfirm: boolean;
   restoreTarget: string | null;
   purgeTarget: string | null;
+  /** Names of the two targets, so each dialog says which asset it acts on. */
+  restoreName?: string;
+  purgeName?: string;
   // `unknown`, not `void`: each of these returns the promise the dialog awaits
   // before deciding whether to close (see ConfirmDialog's `onConfirm`).
   onBulkRetire: () => unknown;
@@ -30,6 +33,8 @@ export function AssetConfirmDialogs({
   showBulkPurgeConfirm,
   restoreTarget,
   purgeTarget,
+  restoreName,
+  purgeName,
   onBulkRetire,
   onBulkArchive,
   onBulkPurge,
@@ -81,7 +86,11 @@ export function AssetConfirmDialogs({
 
       <ConfirmDialog
         open={restoreTarget !== null}
-        title={t("actions.restore")}
+        title={
+          restoreName
+            ? t("actions.restoreNamed", { name: restoreName })
+            : t("actions.restore")
+        }
         message={t("detail.confirm_restore_msg")}
         confirmLabel={t("actions.restore")}
         cancelLabel={t("common:actions.cancel", "Cancel")}
@@ -92,7 +101,11 @@ export function AssetConfirmDialogs({
 
       <ConfirmDialog
         open={purgeTarget !== null}
-        title={t("detail.confirm_purge")}
+        title={
+          purgeName
+            ? t("detail.confirm_purge_named", { name: purgeName })
+            : t("detail.confirm_purge")
+        }
         message={t("detail.confirm_purge_msg")}
         confirmLabel={t("actions.purge")}
         cancelLabel={t("common:actions.cancel", "Cancel")}

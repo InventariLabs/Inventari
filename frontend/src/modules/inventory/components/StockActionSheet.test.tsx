@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import StockActionSheet from "./StockActionSheet";
 import type { LabelScanView } from "@/types";
 import { formatDateTime } from "@/utils/formatters";
+import { formatDate } from "@/utils/helpers";
 import i18n from "i18next";
 
 vi.mock("@/components/Slot", () => ({ Slot: () => null }));
@@ -259,6 +260,15 @@ describe("StockActionSheet", () => {
       renderOne();
       fireEvent.click(screen.getByText("View all details"));
       expect(navigate).toHaveBeenCalledWith("/inventory/items/item-9");
+    });
+
+    it("tells records on one shelf apart by their batch and expiry", () => {
+      renderOne();
+      expect(
+        screen.getByRole("button", {
+          name: `Remove 1 from Warehouse → Rack 4 → Shelf 2 (Batch LOT-77, ${formatDate("2026-12-31")})`,
+        }),
+      ).toBeInTheDocument();
     });
 
     it("keeps the plus and minus buttons 44 px wide", () => {

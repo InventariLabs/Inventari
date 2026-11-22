@@ -39,7 +39,7 @@
     "select_page": "Sélectionner la page",
     "select_all_matching": "Tout sélectionner ({{total}})",
     "restoreNamed": "Restaurer {{name}}",
-    "purgeNamed": "Supprimer {{name}} définitivement"
+    "purgeNamed": "Supprimer définitivement {{name}}"
   },
   "dashboard": {
     "title": "Aperçu de l'équipement",
@@ -334,6 +334,7 @@
     "confirm_unretire_action": "Modifier le statut",
     "cannot_maintain_deployed": "Impossible de passer en maintenance — retournez d'abord l'actif",
     "confirm_purge": "Supprimer définitivement cet actif ?",
+    "confirm_purge_named": "Supprimer définitivement {{name}} ?",
     "confirm_purge_msg": "Cette action est irréversible. Toutes les données seront définitivement supprimées.",
     "retired": "Actif retiré",
     "purged": "Actif supprimé définitivement",

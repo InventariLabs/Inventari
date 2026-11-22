@@ -47,7 +47,7 @@ describe("ArchivedAssetRow", () => {
       screen.getByRole("button", { name: "Restore Desk Lamp" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Delete Desk Lamp permanently" }),
+      screen.getByRole("button", { name: "Delete Permanently Desk Lamp" }),
     ).toBeInTheDocument();
   });
 
