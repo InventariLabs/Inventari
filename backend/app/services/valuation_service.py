@@ -604,6 +604,7 @@ class ValuationService:
         item_id: UUID | None = None,
         reverses_line_id: UUID | None = None,
         reverses_layer_id: UUID | None = None,
+        document_date: date | None = None,
     ) -> DeliveryPosting:
         """Async: record delivery by template_id (Public API helper).
 
@@ -631,6 +632,7 @@ class ValuationService:
             item_id=item_id,
             reverses_line_id=reverses_line_id,
             reverses_layer_id=reverses_layer_id,
+            document_date=document_date,
         )
 
     @staticmethod
@@ -762,6 +764,7 @@ class ValuationService:
         item_id: UUID | None = None,
         reverses_line_id: UUID | None = None,
         reverses_layer_id: UUID | None = None,
+        document_date: date | None = None,
     ) -> DeliveryPosting:
         """Take *quantity* off the receipt layers and post what it was worth.
 
@@ -789,6 +792,10 @@ class ValuationService:
         what the run put in, not at whichever layer of the product is
         oldest; the two differ as soon as the product was made more than
         once at different costs.
+
+        *document_date* is the day the outflow belongs to, for goods that left
+        on a day already past: the stock reports cut the outgoing layer there,
+        beside the receipts they drain. Left out it is dated by its write time.
 
         It is not posted at the average of the layers still on hand, read
         before the drain: the drain is FIFO, so one move carries two
@@ -928,6 +935,7 @@ class ValuationService:
             # ``cost_basis`` says the cost is unknown.
             currency=house,
             cost_basis=CostBasis.FIFO if covered else CostBasis.UNKNOWN,
+            document_date=document_date,
         )
         batch = current_batch(db)
         if batch is not None:

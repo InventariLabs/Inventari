@@ -10,6 +10,7 @@ order with.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from decimal import Decimal
 from typing import Any, cast
 from uuid import UUID
@@ -42,6 +43,7 @@ async def consume_across_locations(
     reference_id: UUID,
     location_id: UUID | None = None,
     lot_id: UUID | None = None,
+    completed_at: datetime | None = None,
 ) -> list[ConsumptionRecord]:
     """Consume ``quantity`` of a template from available stock.
 
@@ -69,6 +71,9 @@ async def consume_across_locations(
     is what let the mirror go: it summed the draw per shelf and reached for
     the shelf's records, so two records of one batch left the run wrong
     about which of them it ate.
+
+    *completed_at* dates the movements off each shelf, for a run recorded for
+    a day already past; left out they are written now.
     """
     # The carrier in hand is usually a DTO that does not carry the strategy;
     # asking Core to resolve it here would send the default down as an
@@ -98,6 +103,7 @@ async def consume_across_locations(
             # A run uses its ingredient up: the last unit leaves the record
             # in Consumed, off the products list, as a record used up by hand.
             file_when_emptied=True,
+            completed_at=completed_at,
         )
     ]
 
