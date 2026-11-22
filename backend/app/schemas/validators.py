@@ -5,7 +5,7 @@ to avoid copy-pasting the same field_validator / field_serializer bodies.
 """
 
 import re
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 from typing import Annotated, Any, Literal
 
 from pydantic import AfterValidator
@@ -54,10 +54,18 @@ def quantize_quantity(v: Any) -> Any:
     Pydantic passes 1.0005 through and Postgres rounds it silently; an
     explicit quantize at entry makes the stored number the one the client
     was told about. Use as a Pydantic ``AfterValidator`` on quantity fields.
+
+    A value too wide for the decimal context to quantize is past every
+    column: it is returned as it came, for the ceiling of whoever writes it
+    to refuse, rather than raising ``InvalidOperation`` out of validation.
     """
     if v is None:
         return v
-    return Decimal(v).quantize(QUANTITY_STEP, rounding=ROUND_HALF_UP)
+    number = Decimal(v)
+    try:
+        return number.quantize(QUANTITY_STEP, rounding=ROUND_HALF_UP)
+    except InvalidOperation:
+        return number
 
 
 def empty_string_to_none(v: Any) -> Any:
@@ -68,10 +76,14 @@ def empty_string_to_none(v: Any) -> Any:
 
 
 def normalize_barcode(v: Any) -> Any:
-    """Normalize barcode value using the core barcode utility."""
+    """Normalize barcode value using the core barcode utility.
+
+    A value that is not a string goes back as it came: the field's own type
+    check refuses it, where ``.strip()`` on it would be a 500.
+    """
     from app.core.barcode import normalize_barcode as _normalize
 
-    return _normalize(v)
+    return _normalize(v) if isinstance(v, str) else v
 
 
 def normalize_sku(v: Any) -> Any:
@@ -80,8 +92,8 @@ def normalize_sku(v: Any) -> Any:
     Raises the translated ``sku_format_invalid`` refusal for a value outside
     the shape the ``sku`` column and the product-template door accept.
     """
-    if v is None:
-        return None
+    if not isinstance(v, str):
+        return v
     from app.core.exceptions import ServiceRejectionError
 
     v = v.strip().upper() or None
