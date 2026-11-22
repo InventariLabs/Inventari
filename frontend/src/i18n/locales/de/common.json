@@ -1204,7 +1204,8 @@
     "matchedBySerial": "Treffer über Seriennummer: {{value}}",
     "productTotal_one": "{{amount}} in {{count}} Datensatz",
     "productTotal_other": "{{amount}} in {{count}} Datensätzen",
-    "searchFailed": "Die Suche ist fehlgeschlagen, daher kann die Liste unvollständig sein. Versuchen Sie es erneut."
+    "searchFailed": "Die Suche ist fehlgeschlagen, daher kann die Liste unvollständig sein. Versuchen Sie es erneut.",
+    "searchForbidden": "Ihr Konto kann nicht alles durchsuchen, daher kann die Liste unvollständig sein. Bitten Sie eine Administratorin oder einen Administrator Ihrer Organisation um Zugriff."
   },
   "profiles": {
     "food_home": {

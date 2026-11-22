@@ -11710,6 +11710,18 @@
             "description": "Only locations that set product fields of their own: what the import dialog offers as columns."
           },
           {
+            "name": "exclude_held_back",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Hide the locations goods are not kept in (a receiving area, a quarantine location, and everything inside them): what a picker offers for goods that are to stay where they are put.",
+              "default": false,
+              "title": "Exclude Held Back"
+            },
+            "description": "Hide the locations goods are not kept in (a receiving area, a quarantine location, and everything inside them): what a picker offers for goods that are to stay where they are put."
+          },
+          {
             "name": "counts",
             "in": "query",
             "required": false,
@@ -57896,6 +57908,11 @@
               }
             ],
             "title": "Operator Contact"
+          },
+          "log_retention_days": {
+            "type": "integer",
+            "title": "Log Retention Days",
+            "default": 30
           }
         },
         "type": "object",

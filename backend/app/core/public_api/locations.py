@@ -273,6 +273,22 @@ class CoreStoragesAPI:
         return await descendant_ids_async(db, organization_id, storage_id)
 
     @reads
+    async def held_back_async(
+        self, db: AsyncSession, organization_id: UUID
+    ) -> dict[UUID, str]:
+        """Every location goods are not kept in, with why: a receiving area
+        or a quarantine location a module set apart, and everything inside it.
+
+        The reason is a short code (``receiving``, ``quarantine``). A flow that
+        takes a destination for goods it means to keep there asks this and
+        refuses what it names; the answer is empty when no module sets places
+        apart.
+        """
+        from app.core.held_back_locations import held_back_locations_async
+
+        return await held_back_locations_async(db, organization_id)
+
+    @reads
     async def list_holding_stock_with_ancestors_async(
         self, db: AsyncSession, organization_id: UUID, *, usage: str = 'internal'
     ) -> list[StorageDTO]:

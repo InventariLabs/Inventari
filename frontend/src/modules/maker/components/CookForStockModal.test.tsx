@@ -588,7 +588,10 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
         </QueryWrapper>,
       );
 
-      expect(mocks.scope).toHaveBeenCalledWith({ purpose: "stock" });
+      expect(mocks.scope).toHaveBeenCalledWith({
+        purpose: "stock",
+        excludeHeldBack: true,
+      });
     });
 
     it("asks when there is a real choice to make", () => {

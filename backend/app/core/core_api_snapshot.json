@@ -3091,6 +3091,20 @@
             }
           ]
         },
+        "held_back_async": {
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            }
+          ]
+        },
         "item_counts_by_location_async": {
           "params": [
             {

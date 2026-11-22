@@ -147,9 +147,11 @@ Before the instance goes public, fill in two more: `OPERATOR_NAME` and
 `OPERATOR_CONTACT` — who runs it and how people reach you about their data.
 The public privacy page (`/privacy`) shows them and tells visitors to ask you
 for a copy of their data or its deletion; left empty, it says the operator
-has published no contact. If you run a modified version, also point
-`SOURCE_CODE_URL` at your own source: AGPL-3.0 §13 requires it, and the About
-screen links it.
+has published no contact. That page also states how long the server keeps its
+logs: `LOG_RETENTION_DAYS` (30 by default) must match the journald retention
+set later in *Keeping the server's logs*. If you run a modified version, also
+point `SOURCE_CODE_URL` at your own source: AGPL-3.0 §13 requires it, and the
+About screen links it.
 
 `DEFAULT_LANGUAGE` (`en` unless set; `pl`, `de`, `fr` or `es`) is the language
 an account created without one starts in — the administrator of Step 6 too,
@@ -905,39 +907,162 @@ sudo rm -r backups/$FROM
 
 ### Copy off the host
 
-Encryption stops a leaked directory; it does not survive losing the host. The
-`db-backup-offsite` service mirrors `./backups` to an
-[rclone](https://rclone.org) remote, so set one up if you care about that
-loss. It needs encryption on: with `AGE_RECIPIENT` empty it refuses to start,
-and it only ever sends `*.age` files, so a plain dump never leaves the host. It
-sits behind the `offsite` compose profile, because it needs credentials only
-you can provide:
+Encryption stops a leaked directory; it does not survive losing the host, and
+neither — the reason production keeps its logs in the host journal — does a
+root who erases them. The `db-backup-offsite` service mirrors `./backups` and
+`./logs` to [rclone](https://rclone.org) remotes, under `backups/` and `logs/`,
+so set one up if you care about that loss. It needs encryption on: with
+`AGE_RECIPIENT` empty it refuses to start, and it only ever sends `*.age`
+files, so a plain dump and a plain journal never leave the host. It sits
+behind the `offsite` compose profile, because it needs credentials only you can
+provide.
 
-```bash
-# 1. Create ./rclone.conf next to the compose file (it is gitignored):
-rclone config            # e.g. remote named gdrive, then gdrive:Inventari/prod-backups
+#### A destination that keeps what it is given
 
-# 2. Name the destination in .env:
-BACKUP_RCLONE_REMOTE=gdrive:Inventari/prod-backups
+A copy the same root can delete is not a copy against that root. Prefer a
+destination the server may add to but not delete from: buckets with
+**versioning** and **Object Lock** in Compliance mode. OVHcloud S3 Object
+Storage is one. Give the backups and the logs a bucket each, because their
+promises differ: a day's journal is deleted 30 days after the day it holds, so
+its lock cannot be longer than that, while a backup follows its own rotation
+(7 days, 4 weeks, 6 months) and may be locked for longer. Use a region that
+survives the loss of a data centre — Paris is 3-AZ (`eu-west-par`, endpoint
+`s3.eu-west-par.io.cloud.ovh.net`) — or Gravelines (`GRA`,
+`s3.gra.io.cloud.ovh.net`) where that is offered; either is another site from a
+server in Warsaw.
 
-# 3. Enable the profile in .env (food,offsite with the food profile), so every
-#    later command — Updating, Putting a backup back — reaches the service too:
-COMPOSE_PROFILES=offsite
+1. In the OVHcloud panel create two buckets, each with **Object Lock** switched
+   on (it can be switched on only when the bucket is created) and
+   **versioning** enabled:
+   - `<logs-bucket>` with a default retention of **Compliance, 21 days**.
+     Three weeks, not the 30 the logs are kept: a day's journal is uploaded
+     the next day, and its local file goes after 30, so a 30-day lock would
+     keep a copy past the period the privacy page states.
+   - `<backups-bucket>` with **Compliance, 30 days** — no deletion promise
+     binds a backup; its own rotation decides when it goes.
 
-# 4. Start it:
-docker compose -f docker-compose.prod.yml up -d
-```
+   Enable two-factor sign-in on the OVHcloud account itself: it is the one way
+   to reach both the server and the buckets.
+2. Create one S3 user for the installation, with access to both buckets, and
+   put its keys into `./rclone.conf` on the server — not into a chat, a ticket
+   or this repository:
 
-The remote receives the same `.age` files — the dumps and the archives of the
-uploaded files, already encrypted, so a plain remote is enough and rclone crypt
-would only encrypt them twice. Each is sent once: the `-latest` names in
-`last/` are links to the newest pair, and the copy skips links rather than
-uploading the pair a second time under those names. The service re-syncs hourly and logs each pass
-at INFO; check the first one with:
+   ```ini
+   [ovh]
+   type = s3
+   provider = Other
+   access_key_id = <the access key>
+   secret_access_key = <the secret key>
+   endpoint = s3.gra.io.cloud.ovh.net
+   region = gra
+   ```
+
+   (The endpoint and region follow the one you chose: `s3.eu-west-par.io.cloud.ovh.net`
+   and `eu-west-par` for Paris.) Then `chmod 600 rclone.conf`. The deploy
+   script excludes it (and `logs/`) from `--delete-after`: without that, the
+   next application deploy deletes the credentials, Docker mounts an empty
+   directory where the file was, and the offsite copy stops without a word.
+3. Give both buckets a lifecycle rule that removes a version once its lock has
+   run out. `rclone sync` deletes a file the local rotation removed with a
+   DELETE, which on a versioned bucket only adds a delete marker: the object
+   disappears from the normal listing, and the version it was stays. The rule
+   below deletes a noncurrent version one day after it became noncurrent and
+   removes the delete marker that is then left with no versions. For the logs
+   that is the day after the local file went at 30, past its 21-day lock; for
+   a backup, the day after its rotation removed it, past its 30-day lock.
+   OVHcloud applies a rule within 24 hours:
+
+   ```json
+   {
+     "Rules": [
+       {
+         "ID": "inventari-expire-noncurrent",
+         "Status": "Enabled",
+         "Filter": { "Prefix": "" },
+         "Expiration": { "ExpiredObjectDeleteMarker": true },
+         "NoncurrentVersionExpiration": { "NoncurrentDays": 1 }
+       }
+     ]
+   }
+   ```
+
+   ```bash
+   aws s3api put-bucket-lifecycle-configuration --bucket <bucket> \
+     --lifecycle-configuration file://lifecycle.json
+   ```
+
+   A destination without lifecycle rules can run
+   `rclone backend cleanup-hidden <remote>:<bucket>` daily instead; it has no
+   age filter, so it retries the versions still under lock until their
+   retention ends.
+4. Test the lock with a throwaway object before relying on it — a delete that
+   removes the version means the retention is not what the bucket says:
+
+   ```bash
+   echo throwaway > /tmp/throwaway
+   rclone copyto --config ./rclone.conf /tmp/throwaway ovh:<logs-bucket>/throwaway
+   rclone deletefile --config ./rclone.conf ovh:<logs-bucket>/throwaway
+   rclone lsjson --versions --config ./rclone.conf ovh:<logs-bucket>/ | grep throwaway
+   ```
+
+   The delete leaves a delete marker, and `--versions` still lists the object.
+   A plain remote (the `gdrive:` example) works as well, but it can delete
+   what it was given; the locked bucket is the one that survives a root on the
+   server.
+5. Name the destinations in `.env` — parents, not the subtrees:
+
+   ```bash
+   BACKUP_RCLONE_REMOTE=ovh:<backups-bucket>
+   LOGS_RCLONE_REMOTE=ovh:<logs-bucket>
+   ```
+
+   One bucket works too. Give it the logs' **Compliance, 21 days** (it then
+   covers the backups as well, and a backup the local rotation removed is gone
+   after 21 days plus the lifecycle day) and leave `LOGS_RCLONE_REMOTE` empty:
+   the logs then go under `BACKUP_RCLONE_REMOTE/logs`, beside the
+   `BACKUP_RCLONE_REMOTE/backups` subtree.
+6. Enable the profile in `.env` (`food,offsite` with the food profile), so
+   every later command — Updating, Putting a backup back — reaches the service
+   too:
+
+   ```bash
+   COMPOSE_PROFILES=offsite
+   ```
+
+7. Start it:
+
+   ```bash
+   docker compose -f docker-compose.prod.yml up -d
+   ```
+
+The destinations receive the same `.age` files — the dumps and the archives of
+the uploaded files, and the encrypted journal from `scripts/export-logs.sh`.
+Each is already encrypted, so a plain remote is enough and rclone crypt would
+only encrypt it twice. Each file is sent once: the `-latest` names in `last/`
+are links to the newest pair, and the copy skips links rather than uploading
+the pair a second time under those names. The service re-syncs hourly and logs
+each pass at INFO; check the first one with:
 
 ```bash
 docker compose -f docker-compose.prod.yml logs db-backup-offsite
 ```
+
+The two subtrees are synced separately, so neither can delete the other's
+files. Where the destination keeps versions (the locked buckets above), a file
+the local rotation removed is deleted at the remote too, but only as a delete
+marker: the locked version stays until its lock ends, and the lifecycle rule
+removes it a day later.
+
+**Upgrading with the copy already on.** `BACKUP_RCLONE_REMOTE` used to name the
+directory the backups landed in; it now names that directory's *parent*, and
+the service appends `backups/`. An installation whose backups are at
+`<remote>:<bucket>/<path>/backups` today sets
+`BACKUP_RCLONE_REMOTE=<remote>:<bucket>/<path>` and the next sync writes to
+the same place. One whose backups sit directly at `<remote>:<bucket>/<path>`
+sets `BACKUP_RCLONE_REMOTE=<remote>:<bucket>` and either moves `<path>` under
+`<bucket>/backups/` or leaves it as history: nothing at the old path is
+resent or deleted, and `LOGS_RCLONE_REMOTE` (empty unless the logs have a
+bucket of their own) puts the journal beside it under `<bucket>/logs/`.
 
 Keep `rclone.conf` off the server too, with the copy of `.env`: on a new
 server it is what reaches the remote.
@@ -1050,6 +1175,69 @@ docker compose -f docker-compose.prod.yml ps
 # Resource usage
 docker stats
 ```
+
+### Keeping the server's logs
+
+The containers do not write to Docker's `json-file` log. Docker deletes that
+file with the container, and every deploy recreates the containers, so the
+requests an incident is investigated through were gone by the next release.
+They write to the host's journal instead (`docker-compose.prod.yml`), which
+survives a recreate. Two settings on the host decide how long it is kept and
+how much disk it may take; neither can be expressed per container:
+
+```bash
+sudo mkdir -p /var/log/journal /etc/systemd/journald.conf.d
+sudo tee /etc/systemd/journald.conf.d/inventari.conf >/dev/null <<'EOF'
+[Journal]
+Storage=persistent
+MaxRetentionSec=30day
+SystemMaxUse=2G
+EOF
+sudo systemctl restart systemd-journald
+```
+
+`Storage=persistent` keeps the journal under `/var/log/journal` across a
+reboot; `MaxRetentionSec=30day` is the stated period; `SystemMaxUse=2G` is the
+size cap, so a flood cannot fill the disk (journald also rate-limits a writer
+that floods). `LOG_RETENTION_DAYS` in `.env` is the same period for the privacy
+page — when you change one, change the other. A service's lines:
+
+```bash
+journalctl -t inventari-backend-1 --since today   # the tag is the container's name
+journalctl -u docker --since -1h                  # everything the containers wrote
+```
+
+The journal is on the server, so root can erase it. The daily encrypted copy
+is what a break-in cannot reach: `scripts/export-logs.sh` writes each day's
+journal — the whole journal, sshd and the rest of the host included — to
+`logs/journal-<YYYY-MM-DD>.log.gz.age`, under the same `AGE_RECIPIENT` as the
+backups, and deletes the files older than `LOG_RETENTION_DAYS`. Run it daily
+as root; it backfills the days the journal still holds and skips the ones
+already written:
+
+```bash
+sudo apt-get install -y age      # once: Ubuntu's age package
+sudo crontab -e
+# 17 4 * * * cd /opt/inventari && set -a && . ./.env && set +a && ./scripts/export-logs.sh
+```
+
+It refuses to run without `AGE_RECIPIENT`: the journal holds visitors' network
+addresses, so the copy leaves the host encrypted or not at all.
+`db-backup-offsite` sends `logs/` with the backups (*Copy off the host*, under
+Database Backups); where that destination has Object Lock, the copies stay
+even if the server deletes them. To read one back, decrypt it with the
+backup's private key:
+
+```bash
+rclone copy --config ./rclone.conf ovh:<logs-bucket> /tmp/journal
+age --decrypt -i key.txt /tmp/journal/journal-2026-11-21.log.gz.age | gunzip | less
+```
+
+With one bucket, the journal is under `<bucket>/<path>/logs` instead; a file
+the local rotation has already removed is behind a delete marker, but still
+there: `rclone --s3-versions ls ovh:<logs-bucket>` lists it under the `-v…`
+name that `rclone copy --s3-versions` reads, until the lifecycle rule removes
+it.
 
 ### Stock consistency
 
@@ -1215,7 +1403,9 @@ logging everybody out.
 - [ ] Backup rotation working (`make backup-status` — a recent backup, and whether it is encrypted)
 - [ ] Backups encrypted, or consciously left plain (`AGE_RECIPIENT`, `make backup-key`)
 - [ ] If encrypted: private key stored off the server (password manager) and `make backup-verify` has succeeded once
-- [ ] Off-host copy enabled or consciously skipped (`BACKUP_RCLONE_REMOTE` + `offsite` in `COMPOSE_PROFILES`)
+- [ ] Off-host copy enabled or consciously skipped (`BACKUP_RCLONE_REMOTE` + `offsite` in `COMPOSE_PROFILES`), with versioning, Object Lock and the noncurrent-version lifecycle rule where the destination supports them
+- [ ] Journald kept persistent, with the retention and size cap set, and the daily `scripts/export-logs.sh` in root's cron (*Keeping the server's logs*)
+- [ ] `LOG_RETENTION_DAYS` matches the journald retention the privacy page states
 - [ ] Administrator created before the proxy started (see Step 6)
 
 ### Disable SSH password authentication

@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   render,
@@ -352,18 +353,29 @@ describe("CollectionDialogs", () => {
 describe("CollectionsLoadFailed", () => {
   it("says nothing while the read worked", () => {
     const { container } = render(
-      <CollectionsLoadFailed failed={false} onRetry={vi.fn()} t={t} />,
+      <CollectionsLoadFailed failed={false} error={null} onRetry={vi.fn()} />,
     );
     expect(container).toBeEmptyDOMElement();
   });
 
   it("says the strip is missing and retries on request", () => {
     const onRetry = vi.fn();
-    render(<CollectionsLoadFailed failed onRetry={onRetry} t={t} />);
+    render(<CollectionsLoadFailed failed error={null} onRetry={onRetry} />);
     expect(screen.getByRole("alert")).toHaveTextContent(
       "Collections could not be loaded.",
     );
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it("says the account may not read them, with no retry, on a refusal", () => {
+    const refusal = new AxiosError("no", "ERR_BAD_REQUEST", undefined, {}, {
+      status: 403,
+    } as never);
+    render(<CollectionsLoadFailed failed error={refusal} onRetry={vi.fn()} />);
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "You do not have access to this",
+    );
+    expect(screen.queryByRole("button", { name: "Try again" })).toBeNull();
   });
 });

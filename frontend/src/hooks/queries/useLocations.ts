@@ -33,6 +33,9 @@ export interface LocationScope {
   usage?: string;
   /** Archived places too — for a screen that names where records stood. */
   includeArchived?: boolean;
+  /** Not the places goods are held back in (a receiving area, a quarantine
+   *  location): for a flow that puts goods where they are to be kept. */
+  excludeHeldBack?: boolean;
 }
 
 /** The endpoint's ask for a scope, once the organization's policy is known. */
@@ -50,6 +53,7 @@ export function locationScopeParams(
   }
   if (scope.usage) params.usage = scope.usage;
   if (scope.includeArchived) params.include_archived = true;
+  if (scope.excludeHeldBack) params.exclude_held_back = true;
   return params;
 }
 
@@ -130,16 +134,24 @@ export function useLocationsById(
  */
 export function useOfferedLocations(
   ids: ReadonlyArray<string | null | undefined>,
-  options?: { enabled?: boolean },
+  options?: { enabled?: boolean; excludeHeldBack?: boolean },
 ) {
   const showModuleData = useShowModuleData();
   const wanted = [...new Set(ids.filter((id): id is string => !!id))].sort();
   return useQuery({
-    queryKey: [...queryKeys.storages.all, "offered", wanted.join(",")],
+    queryKey: [
+      ...queryKeys.storages.all,
+      "offered",
+      wanted.join(","),
+      options?.excludeHeldBack ?? false,
+    ],
     queryFn: async () =>
       (
         await storagesApi.getPage({
-          ...locationScopeParams({ purpose: "stock" }, showModuleData),
+          ...locationScopeParams(
+            { purpose: "stock", excludeHeldBack: options?.excludeHeldBack },
+            showModuleData,
+          ),
           ids: wanted,
           limit: Math.max(wanted.length, 1),
         })

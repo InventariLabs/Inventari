@@ -4,6 +4,7 @@ import { Package, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { cn } from "@/lib/utils";
+import { isForbiddenError } from "@/lib/errors";
 import { useDebounce } from "@/hooks/useDebounce";
 import { SEARCH_MAX_LENGTH } from "@/lib/productSearch";
 import { readableSku } from "@/lib/readableSku";
@@ -176,6 +177,7 @@ interface ProductComboboxProps<T extends ProductComboboxOption> {
 function ProductComboboxMessage<T extends ProductComboboxOption>({
   showLoading,
   failed,
+  refused,
   onRetry,
   query,
   renderNoResults,
@@ -185,6 +187,8 @@ function ProductComboboxMessage<T extends ProductComboboxOption>({
   showLoading: boolean;
   /** The search itself was refused or never ran — not an empty answer. */
   failed: boolean;
+  /** ...because the account may not search products: no retry is offered. */
+  refused: boolean;
   /** Asks again with the text that failed. */
   onRetry: () => void;
   query: string;
@@ -211,10 +215,12 @@ function ProductComboboxMessage<T extends ProductComboboxOption>({
         role="alert"
         className="flex flex-wrap items-center gap-2 p-3 text-sm text-on-danger"
       >
-        <span>{t("combobox.searchFailed")}</span>
-        <Button type="button" variant="ghost" size="sm" onClick={onRetry}>
-          {t("actions.retry")}
-        </Button>
+        <span>{refused ? t("access.denied") : t("combobox.searchFailed")}</span>
+        {!refused && (
+          <Button type="button" variant="ghost" size="sm" onClick={onRetry}>
+            {t("actions.retry")}
+          </Button>
+        )}
       </div>
     );
   }
@@ -439,6 +445,8 @@ export function ProductCombobox<T extends ProductComboboxOption>({
   const [selectedIndex, setSelectedIndex] = useState(-1);
   // The search for `searchedQuery` threw: its empty `results` are no answer.
   const [searchFailed, setSearchFailed] = useState(false);
+  // ...and it was refused (403), which asking again will not change.
+  const [searchRefused, setSearchRefused] = useState(false);
   // Pressing "Try again" asks for the same text once more: the effect below
   // runs on the text alone, which has not changed.
   const [retryCount, setRetryCount] = useState(0);
@@ -455,6 +463,7 @@ export function ProductCombobox<T extends ProductComboboxOption>({
       setResults([]);
       setSearchedQuery("");
       setSearchFailed(false);
+      setSearchRefused(false);
       setIsLoading(false);
     }
   }, [trimmedQuery, queryLongEnough]);
@@ -470,11 +479,13 @@ export function ProductCombobox<T extends ProductComboboxOption>({
         if (cancelled || seq !== requestSeq.current) return;
         setResults(data);
         setSearchFailed(false);
+        setSearchRefused(false);
         setSearchedQuery(settledQuery);
-      } catch {
+      } catch (error) {
         if (cancelled || seq !== requestSeq.current) return;
         setResults([]);
         setSearchFailed(true);
+        setSearchRefused(isForbiddenError(error));
         setSearchedQuery(settledQuery);
       } finally {
         if (!cancelled && seq === requestSeq.current) setIsLoading(false);
@@ -730,6 +741,7 @@ export function ProductCombobox<T extends ProductComboboxOption>({
                 <ProductComboboxMessage
                   showLoading={showLoading}
                   failed={searchFailed}
+                  refused={searchRefused}
                   onRetry={() => {
                     setRetryCount((n) => n + 1);
                     // The button unmounts with the alert; without this the

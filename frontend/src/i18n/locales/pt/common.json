@@ -1204,7 +1204,8 @@
     "matchedBySerial": "encontrado pelo número de série: {{value}}",
     "productTotal_one": "{{amount}} em {{count}} registro",
     "productTotal_other": "{{amount}} em {{count}} registros",
-    "searchFailed": "A busca falhou, então esta lista pode estar incompleta. Tente novamente."
+    "searchFailed": "A busca falhou, então esta lista pode estar incompleta. Tente novamente.",
+    "searchForbidden": "Sua conta não pode pesquisar tudo isto, então esta lista pode estar incompleta. Peça acesso a um administrador da sua organização."
   },
   "profiles": {
     "food_home": {

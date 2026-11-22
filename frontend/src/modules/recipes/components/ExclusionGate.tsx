@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Lock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
+import { isForbiddenError } from "@/lib/errors";
 
 /**
  * Stands in for the "at home" toggle when the exclusions did not load. The
@@ -12,15 +13,30 @@ import { Button } from "@/components/ui/Button";
  */
 export function ExclusionGate({
   failed,
+  error,
   onRetry,
   children,
 }: {
   failed: boolean;
+  /** The rejected read's error: a refusal shows no retry, it would repeat. */
+  error: unknown;
   onRetry: () => void;
   children: ReactNode;
 }) {
   const { t } = useTranslation("common");
   if (!failed) return <>{children}</>;
+  if (isForbiddenError(error)) {
+    return (
+      <span
+        role="img"
+        className="inline-flex shrink-0 text-on-muted"
+        aria-label={t("access.denied")}
+        title={t("access.denied")}
+      >
+        <Lock size={16} aria-hidden="true" />
+      </span>
+    );
+  }
   return (
     <Button
       type="button"

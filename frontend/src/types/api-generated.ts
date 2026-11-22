@@ -16956,6 +16956,11 @@ export interface components {
             operator_name?: string | null;
             /** Operator Contact */
             operator_contact?: string | null;
+            /**
+             * Log Retention Days
+             * @default 30
+             */
+            log_retention_days: number;
         };
         /** InventoryPeriodCreate */
         InventoryPeriodCreate: {
@@ -36464,6 +36469,8 @@ export interface operations {
                 type_ids?: string[] | null;
                 /** @description Only locations that set product fields of their own: what the import dialog offers as columns. */
                 with_fields?: boolean;
+                /** @description Hide the locations goods are not kept in (a receiving area, a quarantine location, and everything inside them): what a picker offers for goods that are to stay where they are put. */
+                exclude_held_back?: boolean;
                 /** @description Count the records in each location. A picker offering places passes false: the counts are an aggregate over the records and no row of it prints one. The counts then read zero. */
                 counts?: boolean;
                 limit?: number;

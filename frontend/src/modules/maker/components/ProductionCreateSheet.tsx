@@ -7,6 +7,7 @@ import { QueryFailure } from "@/components/ui/QueryResult";
 import { StorageRequired } from "@/modules/shared/components/StorageRequired";
 import { useLocationOffer } from "@/module-sdk";
 import { LocationCombobox } from "@/module-sdk";
+import { OUTPUT_LOCATION_SCOPE } from "../lib/outputLocationScope";
 import {
   useProductionForm,
   useProductionSave,
@@ -51,7 +52,7 @@ export function ProductionCreateSheet({
   // What may hold stock, never a place a module owns — asked with the
   // flow's own purpose at the query, or an empty picker here would still
   // blame the module-data switch, which reveals nothing in a stock flow.
-  const locations = useLocationOffer({ purpose: "stock" });
+  const locations = useLocationOffer(OUTPUT_LOCATION_SCOPE);
   const form = useProductionForm(open, locations, preselectedProduct, startAs);
   const { save, isSaving, shortageState, setShortageState } = useProductionSave(
     form,
@@ -233,7 +234,7 @@ function LocationField({
         <LocationCombobox
           id="maker-create-storage"
           label={t("create.storageLabel")}
-          scope={{ purpose: "stock" }}
+          scope={OUTPUT_LOCATION_SCOPE}
           value={value}
           onChange={onChange}
           title={t("create.storageLabel")}

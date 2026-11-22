@@ -186,6 +186,13 @@ class Settings(BaseSettings):
     OPERATOR_NAME: str = ''
     OPERATOR_CONTACT: str = ''
 
+    # How many days this installation keeps its server logs. The public privacy
+    # page states it (GDPR art. 13 asks for a storage period), and the operator
+    # sets it to match the host's journald retention (DEPLOYMENT.md, "Keeping
+    # the server's logs"). The default is the documented 30 days; the demo sets
+    # it to 7 to match its nightly pruner.
+    LOG_RETENTION_DAYS: int = 30
+
     # App
     DEBUG: bool = False
     TESTING: bool = False

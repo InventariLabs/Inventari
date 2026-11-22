@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { InlineQueryError } from "@/components/ui/QueryResult";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { NativeSelect } from "@/components/ui/NativeSelect";
@@ -236,14 +237,11 @@ export function TaxRatesSection() {
           title={t("taxRates.title")}
           hint={t("taxRates.hint")}
         />
-        <div className="flex items-center gap-3">
-          <p className="text-sm text-on-secondary">
-            {t("taxRates.loadFailed")}
-          </p>
-          <Button variant="outline" size="sm" onClick={d.refetch}>
-            {t("common:actions.retry")}
-          </Button>
-        </div>
+        <InlineQueryError
+          error={d.error}
+          message={t("taxRates.loadFailed")}
+          onRetry={d.refetch}
+        />
       </section>
     );
   }

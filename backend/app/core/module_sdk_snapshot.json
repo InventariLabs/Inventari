@@ -3589,6 +3589,11 @@
           "kind": "POSITIONAL_OR_KEYWORD",
           "name": "es",
           "required": false
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "pt",
+          "required": false
         }
       ]
     },
@@ -3633,6 +3638,21 @@
         {
           "kind": "POSITIONAL_OR_KEYWORD",
           "name": "permissions",
+          "required": true
+        }
+      ]
+    },
+    "register_held_back_locations": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "module",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "provider",
           "required": true
         }
       ]

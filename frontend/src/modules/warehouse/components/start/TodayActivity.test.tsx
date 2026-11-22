@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test/utils";
 import userEvent from "@testing-library/user-event";
+import { AxiosError } from "axios";
 import { TodayActivity } from "./TodayActivity";
 import { useTodayActivity } from "@/modules/warehouse/hooks/useTodayActivity";
 import type { WarehouseDocumentRow } from "@/modules/warehouse/types";
@@ -116,5 +117,20 @@ describe("Today in the warehouse", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(refetch).toHaveBeenCalled();
+  });
+
+  it("tells a refused read from a failed one and offers no retry", () => {
+    const refusal = new AxiosError("no", "ERR_BAD_REQUEST", undefined, {}, {
+      status: 403,
+    } as never);
+    answer({ isError: true, error: refusal } as Partial<
+      ReturnType<typeof useTodayActivity>
+    >);
+    render(<TodayActivity warehouseId={null} />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "You do not have access to this",
+    );
+    expect(screen.queryByRole("button", { name: "Try again" })).toBeNull();
   });
 });

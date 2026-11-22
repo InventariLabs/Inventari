@@ -48,7 +48,7 @@ export function LocationCombobox({
       // panel says it failed and offers a retry, not "no results".
       emptyMessage={
         picker.error ? (
-          <LocationSearchFailed onRetry={picker.retry} />
+          <LocationSearchFailed error={picker.error} onRetry={picker.retry} />
         ) : (
           rest.emptyMessage
         )

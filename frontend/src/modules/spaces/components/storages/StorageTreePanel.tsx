@@ -101,13 +101,16 @@ export function StorageTreePanel({
           anywhere in a long tree, and the word has to be where the eye is. */}
       {!typed && tree.error && (
         <p className="px-2 text-sm text-on-muted">
-          <LocationSearchFailed onRetry={tree.retry} />
+          <LocationSearchFailed error={tree.error} onRetry={tree.retry} />
         </p>
       )}
       <div className="max-h-[calc(100vh-22rem)] overflow-y-auto pr-1">
         {typed && found.isError ? (
           <p className="px-2 py-3 text-sm text-on-muted">
-            <LocationSearchFailed onRetry={() => void found.refetch()} />
+            <LocationSearchFailed
+              error={found.error}
+              onRetry={() => void found.refetch()}
+            />
           </p>
         ) : typed ? (
           <SearchResults

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { describe, it, expect } from "vitest";
 import {
+  allForbidden,
   extractApiError,
   isNotFoundError,
   isServerRefusal,
@@ -278,5 +279,29 @@ describe("isUnreachableError", () => {
       isUnreachableError(answered(503, { detail: "No AI provider" })),
     ).toBe(false);
     expect(isUnreachableError(answered(500, "oops"))).toBe(false);
+  });
+});
+
+describe("allForbidden", () => {
+  const refusal = new axios.AxiosError("no", "ERR_BAD_REQUEST", undefined, {}, {
+    status: 403,
+  } as never);
+  const outage = new axios.AxiosError(
+    "boom",
+    "ERR_BAD_RESPONSE",
+    undefined,
+    {},
+    {
+      status: 500,
+    } as never,
+  );
+
+  it("is true only when every error is a refusal", () => {
+    expect(allForbidden([refusal, refusal])).toBe(true);
+    expect(allForbidden([refusal, outage])).toBe(false);
+  });
+
+  it("is false for no errors at all", () => {
+    expect(allForbidden([])).toBe(false);
   });
 });

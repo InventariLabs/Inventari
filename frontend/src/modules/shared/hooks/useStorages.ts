@@ -12,6 +12,9 @@ export function useStorages(
   contextTag?: string,
   options?: {
     excludeModuleContexts?: boolean;
+    /** Not the places goods are held back in (a receiving area, a
+     *  quarantine location): for a picker of where goods are to be kept. */
+    excludeHeldBack?: boolean;
     enabled?: boolean;
     /**
      * Usage filter passed to the backend verbatim. The endpoint defaults to
@@ -51,6 +54,7 @@ export function useStorages(
       // to the same endpoint — they must not share a cache entry.
       ...(usage ? ["usage", usage] : []),
       ...(includeArchived ? ["archived"] : []),
+      ...(options?.excludeHeldBack ? ["kept"] : []),
     ],
     queryFn: () => {
       const params: NonNullable<Parameters<typeof storagesApi.getAll>[0]> = {};
@@ -60,6 +64,7 @@ export function useStorages(
         params.exclude_module_contexts = true;
       if (usage) params.usage = usage;
       if (includeArchived) params.include_archived = true;
+      if (options?.excludeHeldBack) params.exclude_held_back = true;
       return storagesApi.getAll(
         Object.keys(params).length > 0 ? params : undefined,
       );

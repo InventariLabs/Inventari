@@ -354,7 +354,10 @@ describe("ProductionCreateSheet — nowhere to put the batch", () => {
       </QueryWrapper>,
     );
 
-    expect(mocks.scope).toHaveBeenCalledWith({ purpose: "stock" });
+    expect(mocks.scope).toHaveBeenCalledWith({
+      purpose: "stock",
+      excludeHeldBack: true,
+    });
     expect(
       screen.getByRole("combobox", { name: "To location" }),
     ).toBeInTheDocument();
@@ -395,7 +398,10 @@ describe("ProductionCreateSheet — target location picker", () => {
 
     renderSheet();
 
-    expect(mocks.scope).toHaveBeenCalledWith({ purpose: "stock" });
+    expect(mocks.scope).toHaveBeenCalledWith({
+      purpose: "stock",
+      excludeHeldBack: true,
+    });
   });
 
   it("takes the only warehouse location without asking", () => {

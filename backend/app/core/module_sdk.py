@@ -107,6 +107,7 @@ from app.core.file_reference import (
     served_url,
     stored_reference,
 )
+from app.core.held_back_locations import register_held_back_locations
 from app.core.import_sheet import cell_text, read_sheet
 from app.core.interceptors import InterceptorPipeline, interceptor_pipeline
 from app.core.location_path import join_location_path
@@ -233,6 +234,7 @@ __all__ = [
     'pick_by_lang',
     'record_settings',
     'register_api_key_scope',
+    'register_held_back_locations',
     'register_lot_trace_source',
     'read_sheet',
     'register_work_in_progress_provider',

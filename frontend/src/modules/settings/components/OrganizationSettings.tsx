@@ -10,7 +10,7 @@ import { useFormGuard } from "@/hooks/useFormGuard";
 import { CURRENCY_CODES, currencyLabel } from "@/lib/currencies";
 import { COUNTRY_CODES, countryLabel } from "@/lib/countries";
 import { TIMEZONE_CODES, timezoneLabel } from "@/lib/timezones";
-import { extractApiError } from "@/lib/errors";
+import { extractApiError, isForbiddenError } from "@/lib/errors";
 import InvitationsSection from "./InvitationsSection";
 import OrganizationMembers from "./OrganizationMembers";
 import RegistrationRequestsSection from "./RegistrationRequestsSection";
@@ -61,6 +61,7 @@ export default function OrganizationSettings() {
   const {
     data: org,
     isError,
+    error,
     errorUpdateCount,
     isFetching,
     refetch,
@@ -77,15 +78,22 @@ export default function OrganizationSettings() {
             <EmptyState
               icon={Settings}
               title={t("settings.organization.loadFailed")}
-              description={t("settings.organization.loadFailedHint")}
+              description={
+                isForbiddenError(error)
+                  ? t("access.deniedHint")
+                  : t("settings.organization.loadFailedHint")
+              }
               primaryAction={
-                <Button
-                  variant="outline"
-                  isLoading={isFetching}
-                  onClick={() => refetch()}
-                >
-                  {t("actions.retry")}
-                </Button>
+                // A refusal repeats itself: nothing to retry.
+                isForbiddenError(error) ? undefined : (
+                  <Button
+                    variant="outline"
+                    isLoading={isFetching}
+                    onClick={() => refetch()}
+                  >
+                    {t("actions.retry")}
+                  </Button>
+                )
               }
             />
           </Card>

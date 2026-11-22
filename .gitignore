@@ -116,6 +116,10 @@ backend/community_modules.json
 # Backups
 backups/
 
+# Encrypted journal exported by scripts/export-logs.sh; deployment state, sent
+# offsite by db-backup-offsite, never part of the checkout.
+logs/
+
 # Temporary files
 *.tmp
 *.bak

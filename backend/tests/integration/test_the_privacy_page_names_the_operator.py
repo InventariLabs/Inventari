@@ -7,6 +7,10 @@ self-hosted copy claim to be somebody else's. It travels over
 ``GET /auth/init-status``, the unauthenticated call the SPA already makes on
 every boot. Unset means ``None``, and the page says the operator has not
 published a contact instead of rendering an empty one.
+
+The same call carries how long the installation keeps its server logs: the
+period is the operator's journald retention, so the page states what is
+configured rather than a number of its own.
 """
 
 from __future__ import annotations
@@ -39,3 +43,28 @@ class TestTheInitStatusNamesTheOperator:
         assert response.status_code == 200
         assert response.json()['operator_name'] is None
         assert response.json()['operator_contact'] is None
+
+
+class TestTheInitStatusStatesTheLogRetention:
+    """GDPR art. 13 asks for the storage period; the page cannot know it alone.
+
+    The number is the operator's journald retention, configured on the host
+    (DEPLOYMENT.md, "Keeping the server's logs"), so it comes from the server
+    with the rest of the privacy page's configuration.
+    """
+
+    def test_a_configured_install_serves_its_retention(self, client, monkeypatch):
+        monkeypatch.setattr(settings, 'LOG_RETENTION_DAYS', 30)
+
+        response = client.get('/api/v1/auth/init-status')
+
+        assert response.status_code == 200
+        assert response.json()['log_retention_days'] == 30
+
+    def test_the_documented_default_is_thirty_days(self, client):
+        """The default matches DEPLOYMENT.md and the privacy page's wording."""
+        assert settings.LOG_RETENTION_DAYS == 30
+
+        response = client.get('/api/v1/auth/init-status')
+
+        assert response.json()['log_retention_days'] == 30

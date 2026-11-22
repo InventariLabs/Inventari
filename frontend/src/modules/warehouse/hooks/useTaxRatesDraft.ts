@@ -168,6 +168,8 @@ export function useTaxRatesDraft() {
     setRates,
     setCategories,
     isError: ratesQuery.isError || categoriesQuery.isError,
+    /** What the failed read said; a refusal is not offered a retry. */
+    error: ratesQuery.error ?? categoriesQuery.error,
     refetch: () => {
       void ratesQuery.refetch();
       void categoriesQuery.refetch();

@@ -264,6 +264,23 @@ says what the release does rather than what changed since them.
   Spanish: the core coverage gate, the module parity tests, the backend error
   catalog and the module validator. A module written outside this repository
   still needs English only.
+- Server logs that outlive a deploy, and a copy that leaves the host. The
+  production stack writes its containers' output to the host journal instead of
+  Docker's per-container file, so recreating the containers no longer deletes
+  what came before; the deployment guide sets how long the journal is kept and
+  how much disk it may take (30 days and 2 GB by default). A nightly root job,
+  `scripts/export-logs.sh`, gzips and encrypts each day's journal into `logs/`,
+  pruned after the same period, and the offsite copy sends it to the same
+  destination as the backups — under a `backups/` and a `logs/` subdirectory,
+  each with its own sync, or to a bucket of its own when
+  `LOGS_RCLONE_REMOTE` names one, because the logs' lock is shorter. The
+  privacy page now states the retention period,
+  which an installation sets with `LOG_RETENTION_DAYS`; the demo keeps its
+  seven days. The deployment guide also carries the recipe for an OVHcloud S3
+  bucket with versioning, Object Lock in Compliance mode for three weeks, and a
+  lifecycle rule that removes the version once the local copy is gone — so a
+  file the server deletes stays at the destination through the weeks a break-in
+  is found in, and does not outlive the stated period.
 
 ### Changed
 
@@ -526,6 +543,10 @@ says what the release does rather than what changed since them.
   editor also warns, before a role is saved, about a granted module whose own
   read or whose required modules' reads (stock takes need products and
   locations) the role does not hold; the role can still be saved as it is.
+  The Inventory and Equipment overviews, Warehouse Configuration, the document
+  register, the command palette and the small pickers and cards that read a
+  list on their own say the same instead of "could not be loaded", and offer
+  no retry.
 
 - After a location is moved physically, **Movements** and a product's
   *Movements* tab show what happened before the move at the path the location

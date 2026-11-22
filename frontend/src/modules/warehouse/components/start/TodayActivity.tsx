@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/Button";
+import { InlineQueryError } from "@/components/ui/QueryResult";
 import { CardLink } from "@/components/ui/CardLink";
 import { Card } from "@/components/ui/Card";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -38,7 +38,8 @@ export function TodayActivity({
   className?: string;
 }) {
   const { t } = useTranslation("warehouse");
-  const { data, isLoading, isError, refetch } = useTodayActivity(warehouseId);
+  const { data, isLoading, isError, error, refetch } =
+    useTodayActivity(warehouseId);
   const entries = data?.items ?? [];
 
   return (
@@ -57,12 +58,12 @@ export function TodayActivity({
           <LoadingSpinner />
         </div>
       ) : isError ? (
-        <p className="px-4 py-3 text-sm text-on-secondary">
-          {t("start.feed.error")}{" "}
-          <Button variant="link" size="inline" onClick={() => void refetch()}>
-            {t("common:actions.retry")}
-          </Button>
-        </p>
+        <InlineQueryError
+          error={error}
+          message={t("start.feed.error")}
+          onRetry={() => void refetch()}
+          className="px-4 py-3"
+        />
       ) : entries.length === 0 ? (
         <p className="px-4 py-3 text-sm text-on-secondary">
           {t(warehouseId ? "start.feed.emptyWarehouse" : "start.feed.empty")}
