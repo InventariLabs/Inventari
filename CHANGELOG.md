@@ -386,6 +386,12 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A production run recorded for a past day now says what that day does. The
+  Complete, Start, Add portion and Finish dialogs name a day, while *Stock on
+  a date* and *Value movement* count the run's movements on the day it is
+  recorded; a note under the day field says so once a past day is chosen. The Portuguese "Planned for" label reads
+  "Planejado para", as the rest of the Portuguese text does.
+
 - **Cook a batch for stock** no longer claims a production recipe exists for a
   product after a run was abandoned. When the order was refused (for example
   for a shortage) and the sheet was closed, the production recipe made for the
