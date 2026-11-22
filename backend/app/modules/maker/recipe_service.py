@@ -1039,6 +1039,7 @@ async def get_last_unit_costs(
             ProductionOrder.total_cost,
             ProductionOrder.planned_qty,
             ProductionOrder.actual_qty,
+            ProductionOrder.overproduced,
             ProductionOrder.completed_at,
         )
         .where(
@@ -1073,8 +1074,7 @@ async def get_last_unit_costs(
             unit_cost=unit_cost,
             completed_at=row.completed_at,
             uncosted_ingredients=uncosted.get(row.id, 0),
-            overproduced=row.actual_qty is not None
-            and row.actual_qty > row.planned_qty,
+            overproduced=row.overproduced,
         )
     return costs
 

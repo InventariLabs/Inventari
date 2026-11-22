@@ -203,6 +203,7 @@ async def monthly_result(
             ProductionOrder.result_per_unit,
             ProductionOrder.actual_qty,
             ProductionOrder.planned_qty,
+            ProductionOrder.overproduced,
         ).where(
             ProductionOrder.organization_id == organization_id,
             ProductionOrder.status == 'COMPLETED',
@@ -232,7 +233,7 @@ async def monthly_result(
         if effective_qty and effective_qty > 0:
             bucket.result += row.result_per_unit * effective_qty
         bucket.orders += 1
-        if row.actual_qty is not None and row.actual_qty > row.planned_qty:
+        if row.overproduced:
             bucket.overproduced_orders += 1
 
     return [
