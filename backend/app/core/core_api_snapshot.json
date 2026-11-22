@@ -5910,11 +5910,6 @@
               "kind": "KEYWORD_ONLY",
               "name": "records",
               "required": false
-            },
-            {
-              "kind": "KEYWORD_ONLY",
-              "name": "completed_at",
-              "required": false
             }
           ]
         },
@@ -6253,11 +6248,6 @@
             {
               "kind": "KEYWORD_ONLY",
               "name": "file_when_emptied",
-              "required": false
-            },
-            {
-              "kind": "KEYWORD_ONLY",
-              "name": "completed_at",
               "required": false
             }
           ]
@@ -7788,11 +7778,6 @@
             {
               "kind": "POSITIONAL_OR_KEYWORD",
               "name": "reverses_layer_id",
-              "required": false
-            },
-            {
-              "kind": "POSITIONAL_OR_KEYWORD",
-              "name": "document_date",
               "required": false
             }
           ]

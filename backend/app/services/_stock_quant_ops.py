@@ -23,7 +23,7 @@ from __future__ import annotations
 from collections.abc import AsyncIterator, Iterable, Sequence
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -510,7 +510,6 @@ async def take_from_the_records_async(
     reference_type: str | None = None,
     reference_id: UUID | None = None,
     file_when_emptied: bool = False,
-    completed_at: datetime | None = None,
 ) -> list[QuantConsumption]:
     """Take ``quantity`` off the records the draw plan names, one write each.
 
@@ -541,9 +540,6 @@ async def take_from_the_records_async(
     (``lot_id``) takes that batch and no other, on ``require_active_lot``
     terms: a dispatch may not consume a held batch, a scrap of the batch the
     operator confirmed is how the recall leaves the building.
-
-    *completed_at* is the instant the movements off the shelf belong to, for a
-    door that books a day already past; left out they are written now.
 
     *file_when_emptied* is for a door that uses stock up (a production run):
     a record the draw takes to nothing is filed under the Consumed place and
@@ -620,7 +616,6 @@ async def take_from_the_records_async(
         user_id=user_id,
         reference_type=reference_type,
         reference_id=reference_id,
-        completed_at=completed_at,
     )
 
 
@@ -633,7 +628,6 @@ async def _move_off_the_shelves_async(
     user_id: UUID | None,
     reference_type: str | None,
     reference_id: UUID | None,
-    completed_at: datetime | None = None,
 ) -> list[QuantConsumption]:
     """One movement off the shelf per shelf, batch and owner the records gave up, in the order first drawn on.
 
@@ -666,7 +660,6 @@ async def _move_off_the_shelves_async(
             reference_type=reference_type,
             reference_id=reference_id,
             created_by=user_id,
-            completed_at=completed_at,
         )
     # A batch's date is the batch's, so its grain stays one entry; goods with
     # no batch are told apart by the date they were received with.
@@ -833,7 +826,6 @@ async def post_movement_async(
     reference_id: UUID,
     created_by: UUID | None = None,
     records: Sequence[RecordPostDTO] = (),
-    completed_at: datetime | None = None,
 ) -> list[QuantConsumption]:
     """State the records handed over and write the movement — one pass.
 
@@ -860,9 +852,7 @@ async def post_movement_async(
 
     Valuation is not written here: what a movement costs differs by who
     moves it (a receipt's price, a run's cost, a transfer's nothing) and
-    stays with the caller. Returns what was posted. *completed_at* is the
-    instant the movement belongs to, for a door that books a day already past;
-    left out it is written now.
+    stays with the caller. Returns what was posted.
     """
     if from_location_id is None and to_location_id is None:
         # A call without either end is the caller's bug, not a refusal a
@@ -910,7 +900,6 @@ async def post_movement_async(
         reference_type=reference_type,
         reference_id=reference_id,
         created_by=created_by,
-        completed_at=completed_at,
     )
     return [
         QuantConsumption(

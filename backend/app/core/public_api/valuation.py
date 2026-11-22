@@ -235,7 +235,6 @@ class CoreValuationAPI:
         item_id: UUID | None = None,
         reverses_line_id: UUID | None = None,
         reverses_layer_id: UUID | None = None,
-        document_date: date | None = None,
     ) -> Decimal | None:
         """Take stock off the receipt layers and post what it was worth.
 
@@ -259,10 +258,6 @@ class CoreValuationAPI:
         does — the layer a production run opened for the output being undone.
         The goods leave at what that layer cost, not at whatever layer of the
         product is oldest.
-
-        *document_date* is the day the goods left, where that is a day already
-        past (a production run recorded afterwards): the stock-on-a-date and
-        value reports cut the outflow there. Left out, the day it is written.
         """
         from app.services.valuation_service import ValuationService
 
@@ -276,7 +271,6 @@ class CoreValuationAPI:
             item_id=item_id,
             reverses_line_id=reverses_line_id,
             reverses_layer_id=reverses_layer_id,
-            document_date=document_date,
         )
         return posting.cost
 

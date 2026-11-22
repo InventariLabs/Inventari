@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator, Collection, Iterable, Sequence
 from contextlib import asynccontextmanager
-from datetime import date, datetime
+from datetime import date
 from decimal import Decimal
 from typing import Any, cast
 from uuid import UUID
@@ -49,7 +49,6 @@ class CoreStockAPI:
         reference_type: str | None = None,
         reference_id: UUID | None = None,
         file_when_emptied: bool = False,
-        completed_at: datetime | None = None,
     ) -> list[QuantConsumptionDTO]:
         """Take ``quantity`` off the records the draw plan names, one write each.
 
@@ -85,10 +84,6 @@ class CoreStockAPI:
         *file_when_emptied* is for a door that uses stock up (a production
         run): a record the draw takes to nothing is filed under the Consumed
         place and leaves the products list, like one used up by hand.
-
-        *completed_at* is the instant the movements belong to, for a door that
-        books a day already past (a production run recorded afterwards); left
-        out they are written now.
         """
         from app.services._stock_quant_ops import take_from_the_records_async
 
@@ -109,7 +104,6 @@ class CoreStockAPI:
             reference_type=reference_type,
             reference_id=reference_id,
             file_when_emptied=file_when_emptied,
-            completed_at=completed_at,
         )
         return [
             QuantConsumptionDTO(
@@ -288,7 +282,6 @@ class CoreStockAPI:
         reference_id: UUID,
         created_by: UUID | None = None,
         records: Sequence[RecordPostDTO] = (),
-        completed_at: datetime | None = None,
     ) -> list[QuantConsumptionDTO]:
         """State the records a movement is and write the movement, together.
 
@@ -306,9 +299,6 @@ class CoreStockAPI:
         (a ``ValueError``) when what leaves would leave the grain's
         reservations uncovered — the caller's transaction then takes it all
         back — and ``TypeError`` when neither location is given.
-
-        *completed_at* is the instant the movement belongs to, for a door that
-        books a day already past; left out it is written now.
         """
         from app.services._stock_quant_ops import post_movement_async
 
@@ -326,7 +316,6 @@ class CoreStockAPI:
             reference_id=reference_id,
             created_by=created_by,
             records=records,
-            completed_at=completed_at,
         )
         return [
             QuantConsumptionDTO(

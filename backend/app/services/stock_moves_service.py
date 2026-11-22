@@ -122,15 +122,13 @@ async def record_async(
     reference_type: str | None = None,
     reference_id: UUID | None = None,
     created_by: UUID | None = None,
-    completed_at: datetime | None = None,
 ) -> None:
     """Write one movement of the ledger and hand nothing back.
 
     ``create_async`` for a caller that has no use for the row it wrote, so
     there is no read of it back: inside a posting the movement waits with the
     posting's other appended rows and is written with them, one statement for
-    the lot. ``completed_at`` is the instant the movement belongs to, as in
-    ``create_async``; left out it is now.
+    the lot.
     """
     if from_location_id is None and to_location_id is None:
         raise ContractViolationError(
@@ -151,7 +149,7 @@ async def record_async(
         reference_type=reference_type,
         reference_id=reference_id,
         created_by=created_by,
-        completed_at=completed_at or datetime.now(UTC),
+        completed_at=datetime.now(UTC),
     )
     batch = current_batch(db)
     if batch is not None:

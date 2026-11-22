@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { DateInput } from "@/components/ui/DateInput";
+import { PastDayNote } from "@/modules/maker/components/PastDayNote";
 import { Input } from "@/components/ui/Input";
 import { formatQuantityLocalized, unitLabel } from "@/lib/i18nHelpers";
 import { QUANTITY_STEP } from "@/module-sdk";
@@ -95,6 +96,7 @@ export function CompleteRunDialog({
           onChange={run.setMadeOn}
           id="maker-complete-made-on"
         />
+        <PastDayNote day={run.madeOn} />
         <BestBeforeField
           id="maker-complete-best-before"
           value={run.bestBefore}

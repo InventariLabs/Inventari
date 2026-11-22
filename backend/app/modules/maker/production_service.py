@@ -20,7 +20,7 @@ any raise rolls back the entire production.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import UTC, date, datetime, time
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 from uuid import UUID
@@ -830,7 +830,6 @@ async def _consume_ingredients(
     location_id: UUID | None = None,
     record_shortfall: bool = False,
     chosen: ingredient_batches.ChosenParts | None = None,
-    run_day: date | None = None,
 ) -> Consumption:
     """Take every exploded ingredient out of stock and off the books.
 
@@ -848,13 +847,8 @@ async def _consume_ingredients(
     *chosen* holds the batches the person chose, checked already
     (``ingredient_batches.resolve_choices``): an ingredient in it is taken
     from those batches and no other; the rest go by the removal order.
-
-    *run_day* is the day the ingredients left, where the run is recorded for
-    one already past: their movements and the outflow on the cost ledger are
-    dated by it (:func:`_dated_for`), not by the instant of recording.
     """
     chosen = chosen or {}
-    document_date, moved_at = await _dated_for(db, organization_id, run_day)
     outcome = Consumption()
     consumed_per_child = outcome.records
     cost_sums: dict[UUID, Decimal] = {}
@@ -933,7 +927,6 @@ async def _consume_ingredients(
                 reference_id=order.id,
                 location_id=location_id,
                 lot_id=lot_id,
-                completed_at=moved_at,
             )
             consumed_per_child[child_template_id].extend(records)
             # And off the cost ledger. The draw above does not touch
@@ -949,7 +942,6 @@ async def _consume_ingredients(
                 child_template_id,
                 consumed_qty,
                 reason=ItemAction.USED.value,
-                document_date=document_date,
             )
             outcome.cost += cost or Decimal('0')
             if cost is not None:
@@ -1000,7 +992,6 @@ async def _receive_output(
     await _refuse_a_held_back_output(
         db, organization_id, order.output_storage_location_id
     )
-    document_date, moved_at = await _dated_for(db, organization_id, run_day)
     template = await core_api.product_templates.get_async(
         db, organization_id, order.output_template_id
     )
@@ -1094,7 +1085,6 @@ async def _receive_output(
         reference_type='maker_production',
         reference_id=order.id,
         created_by=user.id,
-        completed_at=moved_at,
     )
 
     # A run whose inputs carry no price still puts goods on the shelf, so it
@@ -1112,7 +1102,6 @@ async def _receive_output(
         unit_cost=unit_cost if unit_cost > 0 or a_zero_cost_is_stated else None,
         unpriced_stays_unknown=cost_comes_at_the_finish,
         internal=True,
-        document_date=document_date,
     )
     return produced_item.id, layer_id
 
@@ -1210,7 +1199,6 @@ async def _take_for_run(
     estimate_qty: Decimal,
     record_shortfall: bool,
     ingredient_lots: list[IngredientLotChoice] | None = None,
-    run_day: date,
 ) -> _Taken:
     """Take a run's ingredients off the records and write its lines.
 
@@ -1276,7 +1264,6 @@ async def _take_for_run(
         location_id=check_location_id,
         record_shortfall=record_shortfall,
         chosen=chosen,
-        run_day=run_day,
     )
     _write_order_lines(db, order, flat, consumption, line_estimates)
     return _Taken(flat, consumption, estimated_material_cost)
@@ -1296,27 +1283,6 @@ async def _run_day(db: AsyncSession, organization_id: UUID, day: date | None) ->
     run_day = day or await core_api.organizations.today_async(db, organization_id)
     await core_api.periods.check_not_closed_async(db, organization_id, run_day)
     return run_day
-
-
-async def _dated_for(
-    db: AsyncSession, organization_id: UUID, run_day: date | None
-) -> tuple[date | None, datetime | None]:
-    """What dates a run's postings: the cost ledger's day and the moves' instant.
-
-    A step recorded for a day already past posts its goods on that day, not on
-    the day it is written: the batch carries it (``production_date``), and the
-    stock and value reports cut the movements and layers on it too, so a date
-    never holds a batch whose record says it was made later. The instant is
-    noon on that day in the organization's own zone. A step booked for today
-    (or for no day) names nothing and is dated by the instant of recording,
-    as every posting is.
-    """
-    if run_day is None:
-        return None, None
-    if run_day >= await core_api.organizations.today_async(db, organization_id):
-        return None, None
-    zone = await core_api.organizations.timezone_async(db, organization_id)
-    return run_day, datetime.combine(run_day, time(12), tzinfo=zone)
 
 
 async def complete_production(
@@ -1373,7 +1339,6 @@ async def complete_production(
         estimate_qty=actual_qty,
         record_shortfall=record_shortfall,
         ingredient_lots=ingredient_lots,
-        run_day=run_day,
     )
     total_material_cost = taken.consumption.cost
     total_fixed_cost, total_labour_cost, recipe = await _batch_overheads_and_recipe(
@@ -1509,7 +1474,6 @@ async def start_production(
         estimate_qty=order.planned_qty,
         record_shortfall=False,
         ingredient_lots=ingredient_lots,
-        run_day=day,
     )
     recipe = await _recipe_for_order(db, organization_id, order)
     order.status = 'IN_PROGRESS'
