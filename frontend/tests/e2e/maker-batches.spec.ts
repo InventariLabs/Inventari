@@ -1,6 +1,7 @@
 import { test, expect } from "./fixtures/auth";
 import type { APIRequestContext } from "@playwright/test";
 import { ApiHelper } from "./helpers/api";
+import { sendToPrinter } from "./helpers/label-decode";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
 
 /**
@@ -279,7 +280,7 @@ test.describe("Maker — the batches of a run", () => {
       (request) =>
         request.method() === "POST" && request.url().endsWith("/printing/jobs"),
     );
-    await sheet.getByRole("button", { name: "Send to printer" }).click();
+    await sendToPrinter(page, sheet, "E2E-Batch-Printer");
     const job = (await queued).postDataJSON();
     expect(job.lot_ids).toEqual([jamBatch.id]);
     expect(job.composition).toBe(true);

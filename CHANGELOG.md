@@ -904,11 +904,12 @@ Not marked **Breaking**, but worth a look before you update:
   back after the campaign closed, its line in the attestation detail stopped
   reading Confirmed or Disputed and read "already returned" instead, so the
   record of who confirmed what changed with a later move of the asset. An item
-  now counts as returned only while it is unanswered on a campaign that is
-  still running; an answered item, and every item of a closed campaign, keeps
-  its recorded status. The response badge and the Returned count follow the same
-  rule, so a closed campaign shows an unanswered response as awaiting reply and
-  counts it as pending.
+  now counts as returned only when it is unanswered and came back before the
+  campaign closed (or while it still runs); an answered item keeps its answer,
+  and a return after the close changes nothing. The response badge and the
+  Returned count follow the same rule, so an asset returned before the close
+  still reads as returned on the closed record, and one returned afterwards
+  leaves its response awaiting reply and pending.
 - The equipment screens say what they mean. A bulk status change to the status
   an asset already has succeeds instead of reporting a failure, and the
   refusals name statuses as the screens do, in the language of the request,

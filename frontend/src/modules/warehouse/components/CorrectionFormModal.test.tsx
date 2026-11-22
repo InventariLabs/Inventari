@@ -1,5 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test/utils";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render, screen } from "@/test/utils";
+import i18n from "@/i18n/config";
 import userEvent from "@testing-library/user-event";
 import { CorrectionFormModal } from "./CorrectionFormModal";
 import type { WarehouseDocument } from "@/modules/warehouse/types";
@@ -70,6 +71,20 @@ function makeDocument(
 }
 
 describe("CorrectionFormModal", () => {
+  afterEach(async () => {
+    await act(() => i18n.changeLanguage("en"));
+  });
+
+  it("writes the quantity limit with the reader's decimal mark", async () => {
+    await act(() => i18n.changeLanguage("pl"));
+    const document = makeDocument();
+    document.lines[0].done_quantity = "2.5";
+
+    render(<CorrectionFormModal document={document} onClose={vi.fn()} />);
+
+    expect(screen.getByText("Możesz odjąć najwyżej 2,5")).toBeInTheDocument();
+  });
+
   it("clamps a negative delta to the executed quantity", async () => {
     render(<CorrectionFormModal document={makeDocument()} onClose={vi.fn()} />);
 
