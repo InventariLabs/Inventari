@@ -74,7 +74,7 @@ export default function PermanentDeleteSettings() {
     // Same class as the module-data card: the row is the label, so the words
     // toggle the switch and the hit area grows without the square doing it.
     <>
-      <Card className="p-0">
+      <Card id="permanent-delete" className="p-0">
         <label className="flex items-center justify-between gap-4 p-4 cursor-pointer">
           <div className="min-w-0">
             <p className="text-sm font-medium text-on">

@@ -198,7 +198,7 @@
       "orgName": "Nom de l'organisation",
       "permanentDelete": {
         "title": "Suppression définitive",
-        "description": "Permet de supprimer définitivement les produits archivés. Action irréversible — désactivé par défaut dans les modes d’espace de travail d'entreprise avec inventaire audité.",
+        "description": "Permet de supprimer définitivement les produits et actifs archivés. Action irréversible — désactivé par défaut dans les modes d’espace de travail d'entreprise avec inventaire audité.",
         "label": "Autoriser la suppression définitive",
         "instantSave": "Enregistré dès que vous basculez l'option.",
         "confirmTitle": "Autoriser la suppression définitive ?",

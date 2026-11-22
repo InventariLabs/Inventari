@@ -198,7 +198,7 @@
       "orgName": "Nombre de la organización",
       "permanentDelete": {
         "title": "Eliminación permanente",
-        "description": "Permite eliminar permanentemente productos archivados. No se puede deshacer — desactivado por defecto en modos de espacio de trabajo de empresa con inventario auditado.",
+        "description": "Permite eliminar permanentemente productos y activos archivados. No se puede deshacer — desactivado por defecto en modos de espacio de trabajo de empresa con inventario auditado.",
         "label": "Permitir eliminación permanente",
         "instantSave": "Se guarda en cuanto lo cambias.",
         "confirmTitle": "¿Permitir el borrado definitivo?",

@@ -198,7 +198,7 @@
       "orgName": "Organization name",
       "permanentDelete": {
         "title": "Permanent deletion",
-        "description": "Allows permanently deleting archived products. This cannot be undone — off by default in business workspace modes with audited inventory.",
+        "description": "Allows permanently deleting archived products and equipment assets. This cannot be undone — off by default in business workspace modes with audited inventory.",
         "label": "Allow permanent deletion",
         "instantSave": "Saved as soon as you switch it.",
         "confirmTitle": "Allow permanent deletion?",

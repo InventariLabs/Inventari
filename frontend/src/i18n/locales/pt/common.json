@@ -198,7 +198,7 @@
       "orgName": "Nome da organização",
       "permanentDelete": {
         "title": "Exclusão permanente",
-        "description": "Permite excluir permanentemente produtos arquivados. Isso não pode ser desfeito — desativado por padrão em modos de trabalho empresariais com estoque auditado.",
+        "description": "Permite excluir permanentemente produtos e ativos arquivados. Isso não pode ser desfeito — desativado por padrão em modos de trabalho empresariais com estoque auditado.",
         "label": "Permitir exclusão permanente",
         "instantSave": "Salvo assim que você alterna.",
         "confirmTitle": "Permitir exclusão permanente?",

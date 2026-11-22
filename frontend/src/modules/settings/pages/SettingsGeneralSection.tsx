@@ -21,9 +21,15 @@ export default function SettingsGeneralSection() {
   // The screens that keep module-owned data out of their lists deep-link
   // here: "/settings#module-data" must land on the switch, not on the top of
   // a page where it sits below the fold. The sidebar's "People" entry is the
-  // same kind of link, to the members and invitations.
+  // same kind of link, to the members and invitations, and the archive of
+  // equipment points at the permanent-deletion switch the same way.
   useEffect(() => {
-    if (hash !== "#module-data" && hash !== "#people") return;
+    if (
+      hash !== "#module-data" &&
+      hash !== "#people" &&
+      hash !== "#permanent-delete"
+    )
+      return;
     document
       .getElementById(hash.slice(1))
       ?.scrollIntoView({ behavior: "smooth", block: "center" });
