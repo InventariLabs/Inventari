@@ -220,10 +220,31 @@ test.describe("Accessibility — axe scan of the first screens", () => {
       await scan(page, "phone-item-form", { wcag22: true });
     });
 
-    test("label pool at 390", async ({ page, authenticatedPage }) => {
-      await page.goto("/inventory/labels");
-      await settle(page);
-      await scan(page, "phone-label-pool", { wcag22: true });
+    test("label pool at 390", async ({
+      page,
+      authenticatedPage,
+      request,
+    }) => {
+      // The pool draws its select-all checkbox only once it holds a label,
+      // and the E2E seed creates none: seed a few so the scan reads it.
+      const api = new ApiHelper(request);
+      const { access_token: token } = await api.login(
+        ADMIN_EMAIL,
+        ADMIN_PASSWORD,
+      );
+      const labels = await api.generateLabels(token, 3, "AXE");
+      try {
+        await page.goto("/inventory/labels");
+        await settle(page);
+        await expect(
+          page.getByRole("checkbox", { name: "Select all" }),
+        ).toBeVisible({ timeout: 15000 });
+        await scan(page, "phone-label-pool", { wcag22: true });
+      } finally {
+        await Promise.all(
+          labels.map((l) => api.deleteLabel(token, l.id).catch(() => {})),
+        );
+      }
     });
 
     test("audit log at 390", async ({ page, authenticatedPage }) => {
