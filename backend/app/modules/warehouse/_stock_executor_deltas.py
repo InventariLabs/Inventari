@@ -164,7 +164,9 @@ async def require_correction_fits_records(db: AsyncSession, doc: Document) -> No
     document has been confirmed and carries a number its author cannot
     remove; asking at confirmation means a refused correction is still a
     draft. Only the plan is known here, so a quantity entered at completion
-    is checked again there.
+    is checked again there. The lines are weighed together, record by record:
+    two lines that restate the same record each fit it alone and together
+    may not.
     """
     if not doc.corrects_document_id:
         return
@@ -183,6 +185,7 @@ async def require_correction_fits_records(db: AsyncSession, doc: Document) -> No
     if original is None:
         return
     sign = dt.correction_sign(original.type)
+    held_by_record: dict[UUID, Decimal] = {}
     for line in doc.lines:
         if not line.item_id or not line.quantity:
             continue
@@ -196,7 +199,9 @@ async def require_correction_fits_records(db: AsyncSession, doc: Document) -> No
             line.quantity,
             line.uom_id,
         )
-        _refuse_a_record_left_below_zero(line, record.quantity, change)
+        held = held_by_record.get(line.item_id, record.quantity)
+        _refuse_a_record_left_below_zero(line, held, change)
+        held_by_record[line.item_id] = held + change
 
 
 async def execute_correction(
