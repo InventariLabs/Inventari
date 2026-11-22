@@ -147,8 +147,8 @@
   },
   "reconciliation": {
     "title": "Rapprochement des stocks",
-    "subtitle_one": "Mesuré à l'ouverture de cet écran, sur {{count}} fiche produit.",
-    "subtitle_other": "Mesuré à l'ouverture de cet écran, sur {{count}} fiches produit.",
+    "subtitle_one": "Mesuré à l'ouverture de cet écran, sur {{count}} fiche. Chaque fiche compte ici, y compris celles de modules comme l'équipement ; la Vue d'ensemble ne compte que les fiches produit.",
+    "subtitle_other": "Mesuré à l'ouverture de cet écran, sur {{count}} fiches. Chaque fiche compte ici, y compris celles de modules comme l'équipement ; la Vue d'ensemble ne compte que les fiches produit.",
     "tableCaption": "Les deux comparaisons de paires et ce qu’elles ont trouvé",
     "expectedGap": "Un écart permanent est ici voulu ; celui qui inquiète est celui qui grandit.",
     "columns": {

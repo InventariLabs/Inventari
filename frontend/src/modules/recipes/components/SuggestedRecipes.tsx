@@ -1,6 +1,7 @@
 import { AlertTriangle, Clock, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { QueryFailure } from "@/components/ui/QueryResult";
 import { EmptyState } from "@/components/ui/EmptyState";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import {
@@ -12,6 +13,8 @@ import type { SuggestedRecipe } from "@/modules/recipes/types/mealplans";
 interface SuggestedRecipesProps {
   suggestions: SuggestedRecipe[];
   isLoading: boolean;
+  /** The suggestions read failed: say so, never "no suggestions". */
+  failure?: { error: unknown; onRetry: () => void };
   onSelect: (recipe: SuggestedRecipe) => void;
   t: (key: string, opts?: Record<string, unknown>) => string;
 }
@@ -69,11 +72,16 @@ function ExpiryBadge({ score, label }: { score: number; label: string }) {
 export function SuggestedRecipes({
   suggestions,
   isLoading,
+  failure,
   onSelect,
   t,
 }: SuggestedRecipesProps) {
   if (isLoading) {
     return <LoadingSpinner />;
+  }
+
+  if (failure) {
+    return <QueryFailure error={failure.error} onRetry={failure.onRetry} />;
   }
 
   if (suggestions.length === 0) {

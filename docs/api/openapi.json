@@ -26694,6 +26694,81 @@
         }
       }
     },
+    "/api/v1/recipes/{recipe_id}/planned": {
+      "get": {
+        "tags": [
+          "Recipes"
+        ],
+        "summary": "List Recipe Planned Meals Endpoint",
+        "description": "The plan meals that hold this recipe, which deleting it would empty.",
+        "operationId": "list_recipe_planned_meals_endpoint_api_v1_recipes__recipe_id__planned_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "recipe_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Recipe Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_RecipePlannedMeal_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/roles": {
       "get": {
         "tags": [
@@ -67669,6 +67744,47 @@
         ],
         "title": "PaginatedResponse[RecipeList]"
       },
+      "PaginatedResponse_RecipePlannedMeal_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RecipePlannedMeal"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
+          "total_capped": {
+            "type": "boolean",
+            "title": "Total Capped",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset",
+          "has_more"
+        ],
+        "title": "PaginatedResponse[RecipePlannedMeal]"
+      },
       "PaginatedResponse_RecipeTagItem_": {
         "properties": {
           "items": {
@@ -79871,6 +79987,42 @@
           "missing_nutrition"
         ],
         "title": "RecipeNutrition"
+      },
+      "RecipePlannedMeal": {
+        "properties": {
+          "plan_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Plan Id"
+          },
+          "plan_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Name"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "slot": {
+            "$ref": "#/components/schemas/MealSlot"
+          }
+        },
+        "type": "object",
+        "required": [
+          "plan_id",
+          "date",
+          "slot"
+        ],
+        "title": "RecipePlannedMeal",
+        "description": "One meal of one plan that holds a recipe \u2014 what deleting it would empty."
       },
       "RecipePreview": {
         "properties": {

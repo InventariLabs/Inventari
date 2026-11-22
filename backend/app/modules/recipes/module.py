@@ -153,10 +153,10 @@ class RecipesModule(BaseModule):
                 # belongs to the AI Connections registry, where the
                 # administrator rotates and tests it, and the screen a cook
                 # opens must not ask them what a reader or a rate limit is.
-                # Controls whether the recipe cost
-                # calculator is enabled. Home users may not care about the
-                # EUR/USD price on each recipe; business kitchens do. Profiles
-                # override the default via `ProductProfile.module_config`.
+                # Controls whether the recipe cost calculator is enabled. It
+                # is on for every profile, the household one included; whoever
+                # keeps no ingredient prices turns it off. Profiles override
+                # the default via `ProductProfile.module_config`.
                 'enable_cost_calculation': {
                     'type': 'boolean',
                     'default': True,
@@ -165,7 +165,7 @@ class RecipesModule(BaseModule):
                     'description_key': 'recipes:settings.enableCostCalculationDescription',
                     'description': (
                         'Show the per-recipe cost breakdown in the recipe view. '
-                        'Disable for home setups where recipe cost is irrelevant.'
+                        'Turn it off if you do not track what ingredients cost.'
                     ),
                 },
                 # Audit-trail RW document for completed picking sessions.

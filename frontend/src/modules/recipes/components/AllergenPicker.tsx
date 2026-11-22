@@ -30,6 +30,7 @@ export function AllergenPicker({ value, onChange }: AllergenPickerProps) {
     <InlinePopover
       open={isOpen}
       onOpenChange={setIsOpen}
+      label={t("allergens.title")}
       align="start"
       className="w-64 max-w-[calc(100vw-2rem)] p-3"
       trigger={

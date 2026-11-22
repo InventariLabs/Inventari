@@ -8,8 +8,7 @@ import type {
 } from "@/modules/shopping_lists/types/shopping";
 import Button from "@/components/ui/Button";
 import { useMoney } from "@/hooks/useMoney";
-import { format, parseISO } from "date-fns";
-import { dateFnsLocale, formatQuantityValue } from "@/utils/formatters";
+import { formatDateMedium, formatQuantityValue } from "@/utils/formatters";
 import { useFlatUoms } from "@/modules/shared/hooks/useUoms";
 import { unitLabel } from "@/lib/i18nHelpers";
 
@@ -74,9 +73,7 @@ function noteParts(
   if (data.needed_by) {
     parts.push(
       t("shopping_lists:notes.neededBy", {
-        date: format(parseISO(data.needed_by), "P", {
-          locale: dateFnsLocale(),
-        }),
+        date: formatDateMedium(data.needed_by),
       }),
     );
   }

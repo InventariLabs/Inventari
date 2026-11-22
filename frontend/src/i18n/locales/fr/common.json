@@ -1018,6 +1018,8 @@
     "mg": "mg",
     "cup": "tasse",
     "fl oz": "fl oz",
+    "tbsp": "c. à soupe",
+    "tsp": "c. à café",
     "m": "m",
     "cm": "cm",
     "pt": "pinte",
@@ -1032,7 +1034,7 @@
   },
   "dashboard": {
     "products": "Produits",
-    "replenishAll": "Réapprovisionner tout",
+    "replenishAll": "Voir quoi racheter",
     "replenishPolicy": "Les produits dont une partie du stock est utilisée ailleurs ne sont ni comptés comme bas ni recommandés.",
     "replenishModalTitle": "Examiner les suggestions",
     "replenishModalDesc": "Sélectionnez les produits à ajouter à votre liste de courses.",

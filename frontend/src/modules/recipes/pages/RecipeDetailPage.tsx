@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ChefHat, ExternalLink } from "lucide-react";
@@ -17,6 +16,7 @@ import {
   useRecipeCost,
 } from "../hooks/useRecipes";
 import RecipeForm from "../components/RecipeForm";
+import { RecipeDeleteConfirm } from "../components/RecipeDeleteConfirm";
 import { RecipeDetailActions } from "../components/RecipeDetailActions";
 import { NUTRITION_COMPLETE_COVERAGE } from "../components/NutritionCard";
 import RecipeNutritionSection from "../components/RecipeNutritionSection";
@@ -370,13 +370,9 @@ export default function RecipeDetailPage() {
           onCookingClose={() => setShowCooking(false)}
         />
 
-        <ConfirmDialog
-          open={showDeleteConfirm}
-          variant="danger"
-          title={t("actions.delete")}
-          message={t("actions.delete_confirm", { name: recipe.name })}
-          confirmLabel={t("actions.delete")}
-          cancelLabel={t("common:form.cancel")}
+        <RecipeDeleteConfirm
+          recipeId={showDeleteConfirm ? recipe.id : null}
+          name={recipe.name}
           onCancel={() => setShowDeleteConfirm(false)}
           onConfirm={handleDelete}
         />

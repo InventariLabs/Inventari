@@ -136,7 +136,7 @@
     },
     "src/modules/recipes/pages/RecipesPage.tsx": {
       "RecipesPage": [
-        494
+        487
       ]
     },
     "src/modules/recipes/pages/UnitConversionsPage.tsx": {
@@ -151,7 +151,7 @@
     },
     "src/modules/warehouse/pages/DocumentDetailPage.tsx": {
       "DocumentDetailPage": [
-        366
+        356
       ]
     }
   }

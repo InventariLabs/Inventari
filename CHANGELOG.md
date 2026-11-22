@@ -14,6 +14,10 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- The tablespoon and the teaspoon. Recipes can now use the spoons the module
+  already converted for ingredients, and the recipe import accepts `tbsp` and
+  `tsp`. A new Food & Home organization gets them with its kitchen measures;
+  an installation that already has the US cup gets them on the next upgrade.
 - A place for a site of your own beside the application on the production
   server. Every `*.caddy` file in `caddy-extra/` (or the directory
   `CADDY_EXTRA_DIR` names) is read as part of the Caddyfile, so a website on
@@ -263,6 +267,11 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
+- Recipes sorted by **Recently changed** (it always followed the last edit; the
+  label now says so), **Replenish all** on the inventory overview is **Review
+  what to reorder** and its confirmation names the shopping list that took the
+  products, and the hint beside the recipe cost setting no longer says to turn
+  it off for home setups, where it is on by default.
 - Settings → **My modules** is now **Organization modules** (**Moduły organizacji**
   and so on in the other languages): every choice on it switches modules on or off
   for the whole organization, which the old name did not say. The confirmation for
@@ -333,6 +342,20 @@ says what the release does rather than what changed since them.
   put back goods the document never took. Its page now says where the goods
   went instead of "its lines have not been executed against stock", and its
   execution panel says the stock does not change.
+- Dialogs that asked for something and were refused no longer close and lose
+  what was typed. Renaming a tag, tagging several recipes at once and
+  approving a document keep the dialog open with the server's refusal and the
+  input inside it. Renaming a tag to a name another tag already has says so
+  and that the two will be merged. A failed read no longer passes for an empty
+  one: a document whose approval could not be read shows the failure with
+  **Try again** instead of offering **Request approval**, and the meal-plan
+  recipe picker says its suggestions failed to load. Adding a recipe to a meal
+  plan and downloading or copying a recipe name what failed instead of "Failed
+  to save recipe". Deleting a recipe names the plans, days and meals it will
+  empty. The shopping list's **Needed by** date, the daily nutrition figures
+  and the reconciliation's record count follow the reader's language and say
+  what they cover, and the recipe tag colours, rating stars and popovers have
+  names a screen reader can speak.
 - *Stock on a date* cuts a day on the organization's calendar, as *Value
   movement* does, whatever time zone the reader's browser is set to. Before,
   the screen and its spreadsheet and PDF were cut at the reader's own midnight,

@@ -15,6 +15,7 @@ from app.core.exceptions import catalogue_status_refusal
 from app.core.module_sdk import PaginatedResponse
 from app.core.modules import require_module
 
+from ._meal_plan import list_recipe_planned_meals_async
 from ._router_collections import register_collection_routes
 from ._router_crud import register_crud_routes
 from ._router_extras import register_extras_routes
@@ -26,6 +27,7 @@ from .schemas import (
     Recipe as RecipeSchema,
 )
 from .schemas import (
+    RecipePlannedMeal,
     RecipeTagItem,
     RecipeUpdate,
     TagColorRequest,
@@ -218,6 +220,22 @@ async def update_recipe_endpoint(
     if result is None:
         raise catalogue_status_refusal('recipe_not_found', status.HTTP_404_NOT_FOUND)
     return result
+
+
+@router.get('/{recipe_id}/planned', response_model=PaginatedResponse[RecipePlannedMeal])
+async def list_recipe_planned_meals_endpoint(
+    recipe_id: UUID,
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> Any:
+    """The plan meals that hold this recipe, which deleting it would empty."""
+    if not await get_recipe(db, recipe_id, org_id):
+        raise catalogue_status_refusal('recipe_not_found', status.HTTP_404_NOT_FOUND)
+    meals = await list_recipe_planned_meals_async(db, recipe_id, org_id)
+    return PaginatedResponse.from_full_list(meals, offset=offset, limit=limit)
 
 
 @router.delete('/{recipe_id}', status_code=status.HTTP_204_NO_CONTENT)

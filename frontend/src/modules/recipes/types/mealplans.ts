@@ -48,3 +48,6 @@ export type ShoppingExclusion =
 
 export type ShoppingExclusionCreate =
   components["schemas"]["ShoppingExclusionCreate"];
+
+/** One meal of one plan that holds a recipe — what deleting the recipe empties. */
+export type RecipePlannedMeal = components["schemas"]["RecipePlannedMeal"];

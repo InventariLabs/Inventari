@@ -146,6 +146,33 @@ describe("MealPlanPickerModal", () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it("says the recipe could not be added to the plan when the server refuses", async () => {
+    mocks.useAddMealPlanEntry.mockReturnValue({
+      mutateAsync: vi.fn().mockRejectedValue(new Error("boom")),
+      isPending: false,
+    });
+    const onClose = vi.fn();
+    renderModal(onClose);
+
+    fireEvent.change(screen.getByTestId("meal-plan-picker-plan"), {
+      target: { value: "p1" },
+    });
+    fireEvent.change(screen.getByTestId("meal-plan-picker-day"), {
+      target: { value: "2026-08-12" },
+    });
+    fireEvent.change(screen.getByTestId("meal-plan-picker-slot"), {
+      target: { value: "DINNER" },
+    });
+    fireEvent.click(screen.getByTestId("meal-plan-picker-submit"));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Could not add the recipe to the meal plan",
+      ),
+    );
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it("disables submit until plan, day and slot are chosen", () => {
     renderModal();
     const submit = screen.getByTestId("meal-plan-picker-submit");

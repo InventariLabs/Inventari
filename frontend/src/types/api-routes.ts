@@ -351,6 +351,7 @@ export const API_ROUTES = [
   "/api/v1/recipes/{recipe_id}/picking/{session_id}/complete",
   "/api/v1/recipes/{recipe_id}/picking/{session_id}/scan",
   "/api/v1/recipes/{recipe_id}/picking/{session_id}/undo",
+  "/api/v1/recipes/{recipe_id}/planned",
   "/api/v1/roles",
   "/api/v1/roles/permission-catalog",
   "/api/v1/roles/{role_id}",

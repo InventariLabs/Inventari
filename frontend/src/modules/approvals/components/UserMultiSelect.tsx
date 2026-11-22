@@ -166,6 +166,7 @@ export function UserMultiSelect({
         </PopoverPrimitive.Trigger>
         <PopoverPrimitive.Portal>
           <PopoverPrimitive.Content
+            aria-label={words.title}
             className="z-[var(--z-modal)] w-[320px] max-h-[85vh] bg-surface-card rounded-xl shadow-xl border border-border p-1 animate-in fade-in-0 zoom-in-95 duration-200"
             sideOffset={4}
           >

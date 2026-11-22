@@ -120,6 +120,7 @@ export function ActionMenu({
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
         <PopoverPrimitive.Content
+          aria-label={label}
           align={align}
           sideOffset={4}
           style={{ zIndex: LAYER_TO_VAR[layer] }}
