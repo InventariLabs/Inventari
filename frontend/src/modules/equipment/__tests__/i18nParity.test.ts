@@ -6,14 +6,14 @@ import { SUPPORTED_LANGUAGES } from "@/i18n/languages";
 import { MAINTAINED_LANGUAGES } from "@/test/languageClasses";
 
 /**
- * Five-language i18n parity contract for the equipment module.
+ * Six-language i18n parity contract for the equipment module.
  *
  * A partial translation must not ship: every key
  * added to ``en.json`` (including nested children) must also appear in
- * ``pl``, ``de``, ``fr`` and ``es`` so the FE never falls back to English
+ * ``pl``, ``de``, ``fr``, ``es`` and ``pt`` so the FE never falls back to English
  * during a localized session. The native ``react-i18next`` lookup would
  * silently substitute the English key, masking the gap. This test walks
- * every nested key in all five catalogs and asserts (a) flat keys, (b)
+ * every nested key in all six catalogs and asserts (a) flat keys, (b)
  * children keys, and (c) no empty / whitespace-only leaf values.
  *
  * The catalogs come from the module's own i18n directory rather than a
@@ -104,7 +104,7 @@ describe("equipment i18n parity", () => {
     },
   );
 
-  it("en/pl/de/fr/es expose the same top-level key set", () => {
+  it("en/pl/de/fr/es/pt expose the same top-level key set", () => {
     const enKeys = Object.keys(catalogs.en).sort();
     for (const [lang, catalog] of maintainedCatalogs) {
       if (lang === "en") continue;
@@ -136,7 +136,7 @@ describe("equipment i18n parity", () => {
 
 /**
  * Key-usage scan (slice 1b): the parity tests above compare catalogs
- * against each other, so a key missing in ALL five locales passes
+ * against each other, so a key missing in ALL six locales passes
  * unnoticed — exactly what happened with `list.select_item`, which the
  * UI rendered as a raw key in the a11y tree. This scan extracts every
  * static ``t("...")`` literal from the module source and asserts the

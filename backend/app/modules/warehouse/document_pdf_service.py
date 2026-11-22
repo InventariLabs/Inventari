@@ -40,11 +40,13 @@ from ._pdf_labels import (  # noqa: F401
     _DEFAULT_TYPE_TITLES_ES,
     _DEFAULT_TYPE_TITLES_FR,
     _DEFAULT_TYPE_TITLES_PL,
+    _DEFAULT_TYPE_TITLES_PT,
     _LABELS_DE,
     _LABELS_EN,
     _LABELS_ES,
     _LABELS_FR,
     _LABELS_PL,
+    _LABELS_PT,
     _LINE_STATUS_LABELS_EN,
     _LINE_STATUS_LABELS_PL,
     _get_discrepancy_map,
@@ -102,6 +104,7 @@ class _DocumentPdfService(PdfServiceBase):
     labels_de = _LABELS_DE
     labels_fr = _LABELS_FR
     labels_es = _LABELS_ES
+    labels_pt = _LABELS_PT
     module_name = 'warehouse'
 
 
@@ -318,6 +321,7 @@ def build_pdf_context(
         de=_DEFAULT_TYPE_TITLES_DE,
         fr=_DEFAULT_TYPE_TITLES_FR,
         es=_DEFAULT_TYPE_TITLES_ES,
+        pt=_DEFAULT_TYPE_TITLES_PT,
     )
     doc_subtitle = _subtitle_defaults.get(document.type, '')
 

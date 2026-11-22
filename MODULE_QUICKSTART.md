@@ -249,11 +249,11 @@ reload, and it is on the list — the module working end to end.
 ### 5. Add translations
 
 The scaffold already wrote `frontend/src/modules/warranty_tracker/i18n/en.json`
-and the matching `pl`, `de`, `fr`, `es` files with placeholders. A module built
-into this repository owes all five, so fill all five. (A package you distribute,
-Path B below, owes English only: a reader in a language it does not ship sees it
-in English, key by key.) The page above reads two keys the scaffold did not
-write, `empty` and `emptyHint`; add them to every file.
+and the matching `pl`, `de`, `fr`, `es` and `pt` files with placeholders. A
+module built into this repository owes all six, so fill all six. (A package you
+distribute, Path B below, owes English only: a reader in a language it does not
+ship sees it in English, key by key.) The page above reads two keys the scaffold
+did not write, `empty` and `emptyHint`; add them to every file.
 
 Edit `frontend/src/modules/warranty_tracker/i18n/en.json`:
 
@@ -797,7 +797,7 @@ the package as in [Path B](#1-scaffold-the-package) and start the agent inside
 `modules-workspace/warranty_tracker/`. The scaffold wrote `AGENTS.md` there, and
 `CLAUDE.md`, which only points at it, so an agent that reads either file gets
 the same rules: what a module may import, that every string belongs in the
-catalogs of the five maintained languages (en, pl, de, fr, es), that the
+catalogs of the six maintained languages (en, pl, de, fr, es, pt), that the
 package owns its migrations, that it needs a purpose card, how its tests run
 and which command checks it before install. The paragraph is yours: whose job
 the module serves, what it keeps, what it must never do. Say what it must *not*

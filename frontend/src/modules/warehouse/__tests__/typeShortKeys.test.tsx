@@ -80,7 +80,7 @@ function FiltersHarness({ typeFilter }: { typeFilter: DocumentTypeFilter }) {
   );
 }
 
-describe("documents — the type labels the screens read are present in all 5 languages", () => {
+describe("documents — the type labels the screens read are present in all 6 languages", () => {
   for (const [lang, catalog] of Object.entries(catalogs)) {
     it(`${lang} defines types.${TYPES_SHORT.join(", types.")} and typesShort.${TYPES_SHORT.join(", typesShort.")}`, () => {
       const keys = new Set(flatKeys(catalog));

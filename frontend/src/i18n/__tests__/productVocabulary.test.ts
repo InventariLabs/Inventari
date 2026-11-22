@@ -63,7 +63,7 @@ const BANNED: Record<string, RegExp> = {
 };
 
 /**
- * "Where do you keep your things?" opens the storage wizard in all five
+ * "Where do you keep your things?" opens the storage wizard in all six
  * languages before the interface has named anything — a conversational
  * question, not a second name for the record.
  */

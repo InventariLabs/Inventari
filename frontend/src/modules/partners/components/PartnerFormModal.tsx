@@ -94,7 +94,7 @@ export default function PartnerFormModal({ partner, onClose }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // The browser's own validation speaks the operating system's language and
-    // cannot be translated or styled, so an app shipping five languages must
+    // cannot be translated or styled, so an app shipping six languages must
     // not delegate to it (the form carries noValidate for the same reason).
     // Each refusal sits on its field, and the first of them takes the focus;
     // a toast alone names nothing on the form and is gone before it is read.

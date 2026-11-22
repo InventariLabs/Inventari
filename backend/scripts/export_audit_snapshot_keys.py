@@ -10,7 +10,7 @@ manifests declare.
 This script is the backend half: it reads the writers that *declare* their
 keys and writes them to `frontend/scripts/audit-snapshot-keys.json`. The
 frontend half (`frontend/scripts/check-audit-fields.mjs`) compares that file
-with the five catalogues.
+with the six catalogues.
 
 What it reads, and what it deliberately does not
 ------------------------------------------------

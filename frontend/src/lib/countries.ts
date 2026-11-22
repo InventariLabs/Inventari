@@ -1,7 +1,7 @@
 // ISO 3166-1 alpha-2 country codes offered in address forms.
 //
 // Kept as a plain code list; human-readable labels are resolved at render time
-// via `Intl.DisplayNames`, so the list stays localised in all five UI
+// via `Intl.DisplayNames`, so the list stays localised in all six UI
 // languages without duplicating a translation table per language.
 
 export const COUNTRY_CODES = [

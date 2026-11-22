@@ -199,7 +199,7 @@ describe("t() in a file that does not own its translator", () => {
  * The scanner used to read a call's arguments as "anything up to the first
  * `)`". In `t("a", { unit: x ?? t("b") })` that parenthesis belongs to the
  * inner call, so the scan resumed past it and `b` was never looked at — a key
- * missing from all five catalogs rendered as its own name on screen while the
+ * missing from all six catalogs rendered as its own name on screen while the
  * gate reported nothing.
  */
 describe("a key passed to an enclosing t() call", () => {
@@ -227,7 +227,7 @@ describe("a key passed to an enclosing t() call", () => {
     // below tells the reader what to do — both in the language of the tree.
     expect(out).toMatch(/MISSING common:nested\.fixture\.oneLine.*missing in /);
     expect(out).toContain(
-      "new violations — add the keys to the catalogues (×5 languages) or fix the t() call.",
+      "new violations — add the keys to the catalogues (×6 languages) or fix the t() call.",
     );
     expect(out).toMatch(/check-i18n-keys: \d+ t\(\) calls \| \d+ missing keys/);
     expect(code).toBe(1);
@@ -651,7 +651,13 @@ describe("three dots in a catalogue string", () => {
 
 describe("a screen name left in English", () => {
   const MODULE_DIR = resolve(SANDBOX, "modules/__i18n_title_fixture__");
-  const VALUES = { en: "Summary", de: "Zusammenfassung", fr: "Résumé", es: "Resumen" };
+  const VALUES = {
+    en: "Summary",
+    de: "Zusammenfassung",
+    fr: "Résumé",
+    es: "Resumen",
+    pt: "Resumo",
+  };
 
   function writeCatalogs(key, pl) {
     for (const [lang, value] of Object.entries({ ...VALUES, pl })) {
@@ -716,7 +722,7 @@ describe("a screen name left in English", () => {
 describe("a module's seeded category codes", () => {
   // A module's `CategoryDeclaration(code=...)` reaches the screen through
   // `categoryLabel` as `categories:codes.<code>`, so the shared catalogue has
-  // to carry a name for it in all five languages. The fixture backend and
+  // to carry a name for it in all six languages. The fixture backend and
   // snapshot are pointed at the gate with the two env overrides, the same way
   // the plural snapshot is.
   const BACKEND_DIR = resolve(SANDBOX, "__i18n_backend_modules__");

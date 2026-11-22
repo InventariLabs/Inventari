@@ -493,7 +493,7 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 
 | Method | Signature | R/W | Description |
 |---|---|---|---|
-| `common_labels` | `(lang: str) -> dict[str, str]` | READ | Shared PDF labels (i18n-lite): 5 languages, English fallback. |
+| `common_labels` | `(lang: str) -> dict[str, str]` | READ | Shared PDF labels (i18n-lite): every shipped language, English fallback. |
 | `format_partner_address` | `(address: dict[str, Any] \| None, lang: str='en') -> str \| None` | READ | Format a partner address dict as a single-line string. |
 | `generate_code128_base64` | `(value: str) -> str` | READ | Code128 barcode as a data-URI image at the standard print geometry. |
 | `generate_qr_base64` | `(value: str) -> str` | READ | QR code as a data-URI PNG at the standard print geometry. |

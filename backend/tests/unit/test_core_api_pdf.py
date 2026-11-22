@@ -120,10 +120,12 @@ class TestCorePdfAPI:
         assert core_api.pdf.get_doc_status_map('de')['DRAFT'] == 'Entwurf'
         assert core_api.pdf.get_doc_status_map('fr')['DRAFT'] == 'Brouillon'
         assert core_api.pdf.get_doc_status_map('es')['DRAFT'] == 'Borrador'
+        assert core_api.pdf.get_doc_status_map('pt')['DRAFT'] == 'Rascunho'
 
     def test_common_labels_language_switch(self):
         assert core_api.pdf.common_labels('en')['name'] == 'Name'
         assert core_api.pdf.common_labels('pl')['name'] == 'Nazwa'
+        assert core_api.pdf.common_labels('pt')['name'] == 'Nome'
         # returns a copy — mutation must not leak into the shared constant
         labels = core_api.pdf.common_labels('en')
         labels['name'] = 'MUTATED'

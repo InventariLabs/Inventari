@@ -112,7 +112,7 @@ class CorePdfAPI:
 
     @reads
     def common_labels(self, lang: str) -> dict[str, str]:
-        """Shared PDF labels (i18n-lite): 5 languages, English fallback."""
+        """Shared PDF labels (i18n-lite): every shipped language, English fallback."""
         from app.services import pdf_utils
 
         return dict(
@@ -123,6 +123,7 @@ class CorePdfAPI:
                 de=pdf_utils.COMMON_PDF_LABELS_DE,
                 fr=pdf_utils.COMMON_PDF_LABELS_FR,
                 es=pdf_utils.COMMON_PDF_LABELS_ES,
+                pt=pdf_utils.COMMON_PDF_LABELS_PT,
             )
         )
 

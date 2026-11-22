@@ -4,6 +4,7 @@ import pl from "@/modules/maker/i18n/pl.json";
 import de from "@/modules/maker/i18n/de.json";
 import fr from "@/modules/maker/i18n/fr.json";
 import es from "@/modules/maker/i18n/es.json";
+import pt from "@/modules/maker/i18n/pt.json";
 
 /**
  * The column header names a property of the row; the cell answers whether the
@@ -14,7 +15,7 @@ import es from "@/modules/maker/i18n/es.json";
  * by closed orders. The cell now carries an icon and an action label instead,
  * so there is no noun left in it to misread.
  */
-const CATALOGS = { en, pl, de, fr, es } as const;
+const CATALOGS = { en, pl, de, fr, es, pt } as const;
 
 describe("the formula column header is not the badge text", () => {
   it.each(Object.entries(CATALOGS))(

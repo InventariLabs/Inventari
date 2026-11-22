@@ -1,6 +1,6 @@
 /**
  * The gate that compares what the backend writes into audit snapshots with
- * what the five catalogues can say about it.
+ * what the six catalogues can say about it.
  *
  * Two things it has to get right, and both are the reason the forty English
  * fields went unnoticed for so long: it has to see a gap at all, and it has
@@ -79,7 +79,14 @@ describe("check-audit-fields", () => {
   it("reads the tree's own catalogues", () => {
     const perLanguage = catalogKeys();
 
-    expect([...perLanguage.keys()]).toEqual(["en", "pl", "de", "fr", "es"]);
+    expect([...perLanguage.keys()]).toEqual([
+      "en",
+      "pl",
+      "de",
+      "fr",
+      "es",
+      "pt",
+    ]);
     // The catalogs the journal reads are the ones the app ships, so a
     // renamed namespace fails here rather than in production.
     expect(perLanguage.get("pl").size).toBeGreaterThan(100);
@@ -134,7 +141,7 @@ describe("check-audit-fields label gaps", () => {
   afterAll(() => rmSync(dir, { recursive: true, force: true }));
 
   it("falls and names the field when one catalogue key is removed", () => {
-    for (const language of ["en", "pl", "de", "fr", "es"]) {
+    for (const language of ["en", "pl", "de", "fr", "es", "pt"]) {
       mkdirSync(join(dir, language), { recursive: true });
       const json = JSON.parse(
         readFileSync(
@@ -171,7 +178,7 @@ describe("check-audit-fields target-type gaps", () => {
   afterAll(() => rmSync(dir, { recursive: true, force: true }));
 
   it("falls and names the type when one catalogue entry is removed", () => {
-    for (const language of ["en", "pl", "de", "fr", "es"]) {
+    for (const language of ["en", "pl", "de", "fr", "es", "pt"]) {
       mkdirSync(join(dir, language), { recursive: true });
       const json = JSON.parse(
         readFileSync(

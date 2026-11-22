@@ -1,4 +1,4 @@
-"""Translations for transactional email content (5 languages).
+"""Translations for transactional email content, in every shipped language.
 
 Keys:
 - subject: email subject line

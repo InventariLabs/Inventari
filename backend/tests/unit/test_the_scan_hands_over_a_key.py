@@ -15,7 +15,7 @@ documents both ship one):
 2. ``message_key`` is a namespaced catalogue key, not a phrase — the shape
    the check is about, not a list of the phrases that were there before.
 
-The third half — that each of those keys actually resolves in all five
+The third half — that each of those keys actually resolves in all six
 catalogues — lives on the side that owns the catalogues:
 ``frontend/src/i18n/scanServerKeys.test.ts`` reads these same construction
 sites and resolves every literal key. It has to: a container running this

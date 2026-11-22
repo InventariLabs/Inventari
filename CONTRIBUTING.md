@@ -338,20 +338,20 @@ Languages come in two classes, declared in one place per side of the wire
 `backend/app/i18n/_types.py`, `COMMUNITY_LANGUAGES`) and held to each other by
 the wire parity gate.
 
-- **Maintained languages** (`en`, `pl`, `de`, `fr`, `es`): every change brings
-  all of them, and the gates require the full set — the core coverage gate
-  (which reads `common`, `items`, `labels` and `locations`),
+- **Maintained languages** (`en`, `pl`, `de`, `fr`, `es`, `pt`): every change
+  brings all of them, and the gates require the full set — the core coverage
+  gate (which reads every namespace under `frontend/src/i18n/locales/en`),
   the parity tests next to the modules, the backend error catalog and the
   module validator (`manage.py module validate`).
-- **Community languages** (`pt`, Brazilian Portuguese, is the first): they
-  ship at whatever coverage they have and no change has to translate them. A
-  string a community language has not got yet is read in English — per key in
-  the frontend (i18next `fallbackLng`) and per key in the backend error
-  catalog and in a module's server-side messages. The language menu marks
-  them as community translations with the share of the interface they hold,
-  declared in `frontend/scripts/translation-coverage.json`. They catch up in
-  batches: a person who speaks the language edits the JSON files (the core
-  catalogs under `frontend/src/i18n/locales/<lang>/`, a module's
+- **Community languages** (none today): they ship at whatever coverage they
+  have and no change has to translate them. A string a community language has
+  not got yet is read in English — per key in the frontend (i18next
+  `fallbackLng`) and per key in the backend error catalog and in a module's
+  server-side messages. The language menu marks them as community
+  translations with the share of the interface they hold, declared in
+  `frontend/scripts/translation-coverage.json`. They catch up in batches: a
+  person who speaks the language edits the JSON files (the core catalogs under
+  `frontend/src/i18n/locales/<lang>/`, a module's
   `frontend/src/modules/<name>/i18n/<lang>.json` and
   `backend/app/modules/<name>/i18n/<lang>.json`, and
   `backend/app/i18n/_errors_<lang>.py`) and opens a pull request, or an agent
@@ -413,7 +413,7 @@ frontend/src/i18n/locales/
 ├── de/
 ├── fr/
 ├── es/
-└── pt/          (community language)
+└── pt/
 ```
 
 Each locale directory contains:
@@ -435,8 +435,9 @@ languages listed in `SUPPORTED_LANGUAGES`.
 
 To add a new language (for example, Italian), walk this list top to bottom —
 eight steps, three of which (2, 4 and 6) are writing translations rather than
-finding places. A community language skips what it has no catalogs for yet (a partial
-step 2 and 4 and a partial step 6 are allowed); step 3 declares what it has.
+finding places. A language added as a community one skips what it has no
+catalogs for yet (a partial step 2 and 4 and a partial step 6 are allowed);
+step 3 declares what it has.
 
 1. `frontend/src/i18n/languages.ts` — one entry in `LANGUAGES`: the code,
    the short name the button shows, the full name the menu shows, the flag.
@@ -457,7 +458,7 @@ step 2 and 4 and a partial step 6 are allowed); step 3 declares what it has.
 5. `backend/app/i18n/_types.py` — the code in the `Language` literal. That
    entry is the backend's whole list: `SUPPORTED_LANGUAGES` and every place
    that iterates languages follow it. A community language is also listed
-   in `COMMUNITY_LANGUAGES` beside it
+   in `COMMUNITY_LANGUAGES` beside it; a maintained one is not
 6. A new `backend/app/i18n/_errors_<lang>.py` translating every key of the
    `ErrorMessages` type (English and Polish share `_errors_en_pl.py`; the
    other languages have a file each). For a community language the file is

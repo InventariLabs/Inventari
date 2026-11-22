@@ -72,7 +72,7 @@ class TestSeedDataStability:
     dependency was swapped for ``anyascii``.
     """
 
-    @pytest.mark.parametrize('lang', ['pl', 'en', 'de', 'fr', 'es'])
+    @pytest.mark.parametrize('lang', ['pl', 'en', 'de', 'fr', 'es', 'pt'])
     def test_every_seeded_name_folds_to_ascii_and_is_stable(self, lang: str) -> None:
         entries = json.loads(
             (DATA_DIR / f'defaults_{lang}.json').read_text(encoding='utf-8')

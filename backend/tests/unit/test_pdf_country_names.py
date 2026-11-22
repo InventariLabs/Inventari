@@ -1,4 +1,4 @@
-"""Every country code the API accepts must print as a name, in five languages.
+"""Every country code the API accepts must print as a name, in every language.
 
 The printed name comes from Babel's CLDR territory tables, and the guarantee is
 pinned here: the API validates against the full ISO 3166-1 set, so every code it

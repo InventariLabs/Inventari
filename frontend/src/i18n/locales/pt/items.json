@@ -394,7 +394,8 @@
       "DISPOSED": "Descartado",
       "DELETED": "Excluído",
       "RESTORED": "Restaurado",
-      "OPENED": "Aberto"
+      "OPENED": "Aberto",
+      "UNIT_CHOSEN": "Unidade escolhida"
     },
     "linkedDocument": "Documento vinculado",
     "corrects": "corrige {{number}}",
@@ -416,7 +417,11 @@
     "daysAgo_other": "há {{count}} dias",
     "restoredFromArchive": "Restaurado do arquivo",
     "openedLeft": "restam {{amount}}",
-    "openedNothingLeft": "Não resta nada"
+    "openedNothingLeft": "Não resta nada",
+    "unitChosen": {
+      "entered": "Informado {{entered}}, mantido como {{kept}}",
+      "unit": "Informado em {{chosen_unit}}; o produto é mantido em {{template_unit}}"
+    }
   },
   "setStockAlert": "Definir alerta de estoque",
   "setStockAlertForItem": "Definir alerta de estoque para {{name}}",

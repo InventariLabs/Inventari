@@ -6,7 +6,8 @@
   "navigation": {
     "production": "Produções",
     "catalog": "Listas",
-    "settings": "Configurações"
+    "settings": "Configurações",
+    "plan": "Planejar"
   },
   "productionList": {
     "title": "Produções",
@@ -29,7 +30,8 @@
       "cost": "Custo",
       "resultPerUnit": "({{amount}} por {{unit}})",
       "shortage_one": "Falta estoque: {{count}} ingrediente. A conclusão será recusada.",
-      "shortage_other": "Falta estoque: {{count}} ingredientes. A conclusão será recusada."
+      "shortage_other": "Falta estoque: {{count}} ingredientes. A conclusão será recusada.",
+      "batch": "Lote {{batch}}"
     },
     "sortLabel": "Ordenar",
     "sort": {
@@ -45,7 +47,8 @@
       "draft": "Rascunho",
       "completed": "Concluída",
       "cancelled": "Cancelada",
-      "reversed": "Desfeita"
+      "reversed": "Desfeita",
+      "in_progress": "Em andamento"
     },
     "duplicate": "Duplicar",
     "viewRecipe": "Ver lista",
@@ -139,7 +142,7 @@
       "alreadyListed": "Já está na lista de compras",
       "addFailed": "Não foi possível adicionar à lista de compras"
     },
-    "qtyNeedsProduct": "Pick a product first: the quantity is counted in its unit."
+    "qtyNeedsProduct": "Escolha primeiro um produto: a quantidade é contada na unidade dele."
   },
   "createRecipe": {
     "title": "Nova lista de materiais",
@@ -204,7 +207,10 @@
       "unitCost": "{{amount}} por {{unit}}",
       "unshelvedCost": "{{amount}} do custo desta ordem não está no estoque: a produção foi vendida ou usada antes de a ordem ser encerrada.",
       "totalCostGap_one": "{{count}} ingrediente saiu de estoque sem custo, então fica fora deste total: {{names}}. A prévia antes de salvar pode mostrar um valor maior, porque pode estimar um custo ausente a partir de outro estoque ou de ofertas de fornecedores.",
-      "totalCostGap_other": "{{count}} ingredientes saíram de estoque sem custo, então ficam fora deste total: {{names}}. A prévia antes de salvar pode mostrar um valor maior, porque pode estimar um custo ausente a partir de outro estoque ou de ofertas de fornecedores."
+      "totalCostGap_other": "{{count}} ingredientes saíram de estoque sem custo, então ficam fora deste total: {{names}}. A prévia antes de salvar pode mostrar um valor maior, porque pode estimar um custo ausente a partir de outro estoque ou de ofertas de fornecedores.",
+      "estimatedAtCompletion": "Estimativa na conclusão",
+      "estimatedDifference": "Diferença real: {{amount}}",
+      "takenSoFar": "Retirado até agora"
     },
     "ingredients": "Ingredientes consumidos",
     "emptyLines": "Nenhum ingrediente foi registrado nesta produção.",
@@ -235,7 +241,10 @@
       "saveFailed": "Não foi possível atualizar a linha",
       "shortLabel": "faltam",
       "unmeasurableShort": "faltam — as unidades não podem ser comparadas com o estoque",
-      "shortfall": "{{quantity}} fora dos registros — pendente de contagem"
+      "shortfall": "{{quantity}} fora dos registros — pendente de contagem",
+      "estimated": "Est. {{amount}}",
+      "priceEffect": "do preço {{amount}}",
+      "qtyEffect": "da quantidade {{amount}}"
     },
     "edit": "Editar",
     "save": "Salvar",
@@ -250,7 +259,8 @@
     "tabs": {
       "composition": "Composição",
       "cost": "Custo e resultado",
-      "history": "Histórico"
+      "history": "Histórico",
+      "label": "Etiqueta"
     },
     "sourceRecipe": "Baseada em uma receita (cópia de {{date}})",
     "setAsDefault": "Definir como padrão",
@@ -290,7 +300,11 @@
         "title": "Excluir linha de custo?",
         "description": "Remover \"{{label}}\" dos custos fixos?"
       },
-      "labourCountedTwice": "The labour from the process steps is already counted above. A Labor line is added on top of it, so labour can be counted twice."
+      "labourCountedTwice": "A mão de obra das etapas do processo já está contada acima. Uma linha de Mão de obra é somada por cima, então a mão de obra pode ser contada duas vezes.",
+      "labourFromSteps": "Mão de obra das etapas do processo",
+      "labourTime": "{{minutes}} min pelo valor da hora",
+      "labourRateMissing": "As etapas levam {{minutes}} min. Defina o valor da hora nas configurações de produção para custear esse tempo.",
+      "labourRateLink": "Configurações de produção"
     },
     "history": {
       "title": "Histórico de produção",
@@ -331,7 +345,16 @@
     "notFound": "Ordem de produção não encontrada",
     "plannedShortageHint_one": "O consumo planejado excede o estoque — falta {{count}} ingrediente. A conclusão desta produção será recusada.",
     "plannedShortageHint_other": "O consumo planejado excede o estoque — faltam {{count}} ingredientes. A conclusão desta produção será recusada.",
-    "ingredientsReturned": "Ingredients taken and put back"
+    "ingredientsReturned": "Ingredientes retirados e devolvidos",
+    "processStepMinutes": "{{minutes}} min",
+    "processStepMinutesLabel": "Minutos da etapa {{number}}",
+    "minutesShort": "min",
+    "minutesPlaceholder": "min",
+    "processStepsGuard": "As etapas do processo",
+    "processStepsDiscardTitle": "Descartar a etapa não adicionada?",
+    "processStepsDiscardMessage": "A etapa que você digitou não foi adicionada à lista. Fechar o editor a descarta.",
+    "processStepsDiscardConfirm": "Descartar etapa",
+    "processStepsDiscardKeep": "Continuar editando"
   },
   "bom": {
     "childLabel": "Produto ingrediente",
@@ -374,10 +397,18 @@
       "yieldInvalid": "A quantidade que a lista produz deve ser maior que zero."
     },
     "yieldConfirm": {
-      "title": "Change what this BOM makes?"
+      "title": "Alterar o que esta lista de materiais produz?"
     },
-    "openDraftsChange": "Open drafts that read this BOM and change with it: {{number}}.",
-    "openDraftsUnknown": "Any open drafts that read this BOM change with it; how many is not known."
+    "openDraftsChange": "Rascunhos abertos que leem esta lista de materiais e mudam com ela: {{number}}.",
+    "openDraftsUnknown": "Qualquer rascunho aberto que leia esta lista de materiais muda com ela; quantos são não se sabe.",
+    "unitMismatch": "A unidade desta linha não pode ser lida como a unidade de estoque do ingrediente — defina uma antes da próxima produção.",
+    "typedPrice": "Preço informado",
+    "typedPriceUnused": "não usado — um custo de estoque ou um preço de fornecedor responde primeiro",
+    "typedPriceHint": "Usado quando não há custo de estoque nem preço de fornecedor. Fica salvo com o produto, então toda lista de materiais que o usa o custeia do mesmo jeito.",
+    "setPrice": "Definir preço",
+    "editPrice": "Editar preço",
+    "priceSaved": "Preço salvo",
+    "priceSaveFailed": "Não foi possível salvar o preço"
   },
   "tree": {
     "title": "Lista de materiais em vários níveis",
@@ -387,7 +418,11 @@
     "error": "Não foi possível carregar a árvore",
     "moved": "Linha movida",
     "moveError": "Não foi possível mover",
-    "dropHint": "Arraste para mover"
+    "dropHint": "Arraste para mover",
+    "onHand": "{{qty}} em estoque",
+    "makeFresh": "Sempre fabricar na hora",
+    "makeFreshHint": "Uma produção fabrica este ingrediente a partir da própria lista de materiais toda vez, em vez de consumir primeiro o que está em estoque.",
+    "makeFreshFailed": "Não foi possível alterar a linha"
   },
   "pricing": {
     "title": "Calculadora de preço de venda",
@@ -488,7 +523,9 @@
     "whereReferenceDirection": "O resultado recebe esse nome nos cartões de listas, nas ordens de produção e no resumo mensal.",
     "immediateNote": "Cada escolha é salva na hora. Não há como desfazer — volte a configuração do mesmo jeito.",
     "advanced": "Avançado",
-    "advancedHint": "Regras para faltas e superprodução. Os padrões servem para uma oficina pequena."
+    "advancedHint": "Regras para faltas e superprodução. Os padrões servem para uma oficina pequena.",
+    "laborHourlyRate": "Valor da hora do trabalho próprio",
+    "laborHourlyRateHint": "A mão de obra de uma lista de materiais são suas etapas cronometradas a esse valor. Zero significa que a mão de obra não custa nada nas estimativas."
   },
   "availability": {
     "maxBatches": "Máx. de lotes com o estoque",
@@ -509,8 +546,8 @@
     "unknown_other": "{{count}} ingredientes não podem ser comparados",
     "shortUnknown": "desconhecido",
     "completeShortageHintNever": "Esses ingredientes nunca foram suficientes para esta produção — ela foi criada acima do estoque.",
-    "unitMismatchTitle": "Cannot continue — a unit does not match",
-    "unitMismatchHint": "No quantity is missing: the unit of the line cannot be compared with the stock. Fix the unit on the BOM line."
+    "unitMismatchTitle": "Não é possível continuar — uma unidade não corresponde",
+    "unitMismatchHint": "Não falta quantidade: a unidade da linha não pode ser comparada com o estoque. Corrija a unidade na linha da lista de materiais."
   },
   "widget": {
     "title": "{{result}} por mês",
@@ -569,19 +606,297 @@
   "batches": {
     "card": {
       "state": {
-        "quarantined": "Quarantined",
-        "held": "Held"
+        "quarantined": "Em quarentena",
+        "held": "Retido"
       },
       "heldBecause": "{{batch}} — {{state}}: {{reason}}",
-      "heldNoReason": "{{batch}} — {{state}}, no reason given"
-    }
+      "heldNoReason": "{{batch}} — {{state}}, sem motivo informado",
+      "title": "Lote produzido",
+      "titleHome": "Potes desta produção",
+      "codeHome": "Código do lote {{code}}",
+      "madeOn": "Fabricado em",
+      "expired": "Vencido",
+      "recalled": "Recolhido",
+      "printLabels": "Imprimir etiquetas de lote",
+      "printJarLabels": "Imprimir etiquetas dos potes",
+      "jarLabelsTitle": "Etiquetas dos potes",
+      "record": "Registro do lote",
+      "hold": "Quarentena",
+      "release": "Liberar",
+      "heldToast_one": "O lote está em quarentena. Nada é retirado dele até ser liberado.",
+      "heldToast_other": "Os lotes estão em quarentena. Nada é retirado deles até serem liberados.",
+      "releasedToast_one": "O lote foi liberado e pode ser usado de novo.",
+      "releasedToast_other": "Os lotes foram liberados e podem ser usados de novo.",
+      "holdFailed": "Não foi possível alterar o estado do lote.",
+      "holdTitle_one": "Colocar este lote em quarentena?",
+      "holdTitle_other": "Colocar estes lotes em quarentena?",
+      "holdMessage": "Um lote em quarentena fica no seu local, mas nenhuma produção, separação ou expedição retira dele até ser liberado.",
+      "holdReason": "Por que está em quarentena?"
+    },
+    "heading": "Lotes dos ingredientes",
+    "hint": "Cada ingrediente é retirado do lote com a validade mais próxima, a menos que você escolha outro. Escaneie a etiqueta de um lote para escolhê-lo.",
+    "scanLabel": "Escaneie a etiqueta de um lote",
+    "scanPlaceholder": "Código do lote",
+    "scanMiss": "Nenhum ingrediente desta produção tem um lote {{code}} de onde retirar.",
+    "notBatched": "Mantidos sem lotes: {{names}}",
+    "noBatch": "sem lote",
+    "ingredientLabel": "{{name}} — {{qty}}",
+    "chosenShort": "Este lote tem menos livre do que a produção precisa.",
+    "defaultOrder": "Validade mais próxima primeiro: {{draw}}",
+    "option": "{{batch}} · validade {{date}} · {{qty}} livres",
+    "bestBeforeLabel": "Validade",
+    "bestBeforeFromShelfLife_one": "Proposta a partir da validade de {{count}} dia do produto.",
+    "bestBeforeFromShelfLife_other": "Proposta a partir da validade de {{count}} dias do produto.",
+    "bestBeforeNoShelfLife": "O produto não tem validade no cadastro, então nada é proposto. Deixe vazio para um lote sem data.",
+    "bestBeforeNoShelfLifeHome": "Defina na ficha do produto por quantos dias ele se conserva e, da próxima vez, a data se preenche sozinha."
   },
   "record": {
-    "costBasis": "Ingredients are costed from the product's oldest cost layers (FIFO), not from the price of the batch an ingredient was taken from."
+    "costBasis": "Os ingredientes são custeados pelas camadas de custo mais antigas do produto (FIFO), não pelo preço do lote de onde o ingrediente foi retirado.",
+    "title": "Registro do lote",
+    "subtitle": "Lote {{batch}}",
+    "kicker": "Registro do lote · produção {{number}}",
+    "recipe": "Lista de materiais",
+    "batch": "Lote",
+    "planned": "Planejado",
+    "actual": "Produzido",
+    "location": "Guardado em",
+    "ingredients": "Ingredientes e seus lotes",
+    "noBatchTaken": "Nada foi retirado do estoque.",
+    "batchLine": "{{batch}} — {{qty}} (validade {{date}})",
+    "shortfall": "Foi usado {{qty}} a mais do que os registros tinham.",
+    "costs": "Custos",
+    "materialCost": "Ingredientes",
+    "totalCost": "Total",
+    "estimatedCost": "Estimativa da lista",
+    "unitCost": "Por unidade",
+    "whoAndWhen": "Quem e quando",
+    "plannedBy": "Planejado por",
+    "completedBy": "Concluído por",
+    "byAt": "{{who}}, {{when}}",
+    "print": "Imprimir",
+    "failed": "Não foi possível ler o registro do lote."
   },
   "shortage": {
-    "titleUnit": "A unit on this BOM does not match the stock",
-    "unitBody": "Nothing is missing here: the unit of the line cannot be compared with the stock, so no stock would close it. Fix the unit on the BOM line: {{names}}.",
-    "onOrder": "The missing quantity is on order, on draft purchase order"
+    "titleUnit": "A unidade de uma linha desta lista não corresponde ao estoque",
+    "unitBody": "Aqui não falta nada: a unidade da linha não pode ser comparada com o estoque, então nenhum estoque a fecharia. Corrija a unidade na linha da lista de materiais: {{names}}.",
+    "onOrder": "A quantidade que falta está encomendada, em ordem de compra em rascunho",
+    "title": "Esta lista de materiais precisa de ingredientes que os registros não têm",
+    "body": "Fora dos registros: {{names}}.",
+    "unmeasurable": "unidades não podem ser comparadas com o estoque",
+    "missing": "faltam {{quantity}}",
+    "addStock": "Adicionar estoque",
+    "order": "Encomendar o que falta",
+    "nothingToOrder": "Tudo está em estoque — nada foi encomendado.",
+    "alreadyOrdered": "Tudo o que falta já está em uma ordem de compra aberta — nada novo foi encomendado.",
+    "ordered": "Ordem de compra em rascunho {{number}} criada com {{lines}} linhas.",
+    "orderFailed": "Não foi possível criar a ordem de compra",
+    "addStockTitle": "Adicionar o estoque que você tem",
+    "addStockHint": "Uma entrada por ingrediente: a quantidade e quanto custou. Cada uma abre um registro de estoque a esse preço.",
+    "location": "Local",
+    "noLocations": "Nenhum local disponível",
+    "needs": "precisa de {{quantity}}",
+    "quantity": "Quantidade",
+    "price": "Preço por unidade",
+    "priceHint": "Opcional — abre uma camada de custo.",
+    "stockFallbackName": "Ingrediente",
+    "addStockSave": "Adicionar estoque ({{saved}})",
+    "stockSaved": "Estoque salvo.",
+    "stockSaveFailed": "Não foi possível salvar o estoque.",
+    "stockSavePartial": "Salvos {{saved}} de {{total}}. O restante continua na planilha.",
+    "locationsFailed": "Não foi possível carregar os locais"
+  },
+  "progress": {
+    "start": "Iniciar produção",
+    "startConfirm": {
+      "title": "Iniciar esta produção?",
+      "description": "Os ingredientes saem do seu estoque hoje, mas a produção continua aberta. Você pode adicionar o que ela rendeu em partes e concluí-la em outro dia."
+    },
+    "startDay": "Dia em que começou",
+    "startSuccess": "Produção iniciada — os ingredientes foram retirados",
+    "startFailed": "Não foi possível iniciar a produção",
+    "startedOn": "Iniciada",
+    "finish": "Concluir produção",
+    "finishConfirm": {
+      "title": "Concluir esta produção?",
+      "description": "O que ainda falta sair da produção entra no estoque agora, e a produção fecha com o custo que teve."
+    },
+    "finishQty": "Quantidade total produzida (opcional)",
+    "finishQtyHint": "As partes já adicionadas contam. Deixe vazio para usar a quantidade planejada.",
+    "finishDay": "Dia em que terminou",
+    "finishSuccess": "Produção concluída",
+    "finishFailed": "Não foi possível concluir a produção",
+    "portions": "Rendimento até agora",
+    "noPortions": "Nenhum rendimento foi adicionado ainda.",
+    "portionQty": "Parte",
+    "portionDay": "Dia",
+    "portionLot": "Lote (opcional)",
+    "addPortion": "Adicionar parte",
+    "portionAdded": "Parte adicionada ao estoque",
+    "portionFailed": "Não foi possível adicionar a parte",
+    "steps": "Etapas",
+    "stepDay": "Dia em que “{{step}}” foi feita",
+    "stepFailed": "Não foi possível salvar a etapa",
+    "cancelConfirm": "Cancelar devolve aos seus estoques os ingredientes que esta produção retirou, nos lotes de onde vieram. Uma produção que já adicionou rendimento em partes é concluída em vez disso."
+  },
+  "attachments": {
+    "title": "Fotos e arquivos",
+    "upload": "Adicionar um arquivo",
+    "uploaded": "Arquivo adicionado",
+    "uploadFailed": "Não foi possível adicionar o arquivo.",
+    "empty": "Nenhuma foto ou arquivo ainda.",
+    "delete": "Remover",
+    "deleted": "Arquivo removido",
+    "deleteFailed": "Não foi possível remover o arquivo.",
+    "deleteFile": "Remover {{name}}",
+    "confirmDeleteTitle": "Remover este arquivo?",
+    "confirmDeleteMessage": "{{name}} será excluído da produção."
+  },
+  "shelfLife": {
+    "label": "Validade",
+    "hint": "Por quanto tempo o produto se conserva depois de fabricado. Uma produção data o lote com validade a partir do dia dela mais este prazo.",
+    "hintHome": "Por quantos dias ele se conserva depois de fabricado. Os potes tiram a validade daí.",
+    "days": "dias",
+    "saved": "Validade salva",
+    "saveFailed": "Não foi possível salvar a validade.",
+    "invalid": "Digite um número inteiro de dias, 1 ou mais."
+  },
+  "labelling": {
+    "contains": "Contém",
+    "mayContain": "Pode conter",
+    "from": "de {{names}}",
+    "declaredOnProduct": "declarado no produto",
+    "computedNote": "Calculado a partir da lista de materiais e das fichas dos ingredientes. Cabe a você conferir antes de ir para a etiqueta.",
+    "allergens": {
+      "gluten": "Glúten",
+      "crustaceans": "Crustáceos",
+      "eggs": "Ovos",
+      "fish": "Peixes",
+      "peanuts": "Amendoim",
+      "soy": "Soja",
+      "milk": "Leite",
+      "nuts": "Castanhas",
+      "celery": "Aipo",
+      "mustard": "Mostarda",
+      "sesame": "Gergelim",
+      "sulphites": "Sulfitos",
+      "lupin": "Tremoço",
+      "molluscs": "Moluscos"
+    },
+    "card": {
+      "title": "Na etiqueta",
+      "labelName": "Nome em uma lista de ingredientes",
+      "labelNameHint": "Um nome alimentar legal, ou um nome INCI para um cosmético. Em branco, a lista usa o próprio nome do produto.",
+      "unchecked": "Alérgenos ainda não conferidos.",
+      "suggested": "O nome sugere: {{allergens}}.",
+      "confirmSuggestion": "Confirmar a sugestão",
+      "containsNone": "Não contém nenhum",
+      "choose": "Escolher alérgenos",
+      "change": "Alterar alérgenos",
+      "done": "Pronto",
+      "none": "Nenhum",
+      "ownAllergens": "Declarado neste produto",
+      "fromRecipe": "Da lista de materiais padrão",
+      "saved": "Etiqueta salva",
+      "saveFailed": "Não foi possível salvar a etiqueta"
+    },
+    "tab": {
+      "ingredients": "Ingredientes, do mais pesado ao mais leve",
+      "noIngredients": "Esta lista de materiais ainda não tem ingredientes.",
+      "noAllergens": "Nenhuma ficha de ingrediente indica um alérgeno.",
+      "unchecked": "Ainda não conferidos quanto a alérgenos:",
+      "uncheckedSuggests": "{{name}} (o nome sugere {{allergens}})",
+      "unweighed": "Nada diz quanto pesam, então a lista os coloca no fim: {{names}}. Informe na ficha o peso de uma unidade, ou escreva a linha em peso.",
+      "nutrition": "Nutrição por 100 g",
+      "nutritionNone": "A ficha de nenhum ingrediente traz valores nutricionais, então ainda não há declaração.",
+      "perYield": "Por 100 g dos {{weight}} g que um lote rende.",
+      "yieldUnknown": "Não se sabe quanto pesa um lote: informe o rendimento da lista de materiais em peso, ou o peso por unidade do produto.",
+      "notKnown": "não conhecido",
+      "missing": "Não contados como zero, então um valor fica desconhecido:",
+      "missingLine": "{{name}} não tem valor para {{nutrients}}",
+      "missingAll": "{{name}} não tem valores"
+    },
+    "nutrients": {
+      "energy": "Energia",
+      "fat": "Gorduras",
+      "saturates": "das quais saturadas",
+      "carbohydrate": "Carboidratos",
+      "sugars": "dos quais açúcares",
+      "protein": "Proteínas",
+      "salt": "Sal"
+    },
+    "figures": {
+      "energy": "energia",
+      "fat": "gorduras",
+      "saturates": "saturadas",
+      "carbohydrate": "carboidratos",
+      "sugars": "açúcares",
+      "protein": "proteínas",
+      "salt": "sal"
+    }
+  },
+  "coverage": {
+    "covered": "Coberto",
+    "partial": "Parcialmente coberto",
+    "short": "Insuficiente"
+  },
+  "planning": {
+    "title": "Plano de produção",
+    "subtitle": "Produções planejadas por dia, e tudo o que elas precisam em uma lista.",
+    "previous": "Período anterior",
+    "next": "Próximo período",
+    "view": {
+      "label": "Período",
+      "week": "Semana",
+      "month": "Mês"
+    },
+    "move": {
+      "button": "Mover",
+      "aria": "Mover {{name}} para outro dia",
+      "title": "Mover {{name}}",
+      "day": "Novo dia",
+      "now": "Agora planejada para {{date}}.",
+      "save": "Mover",
+      "cancel": "Cancelar",
+      "failed": "Não foi possível mover a produção."
+    },
+    "coverage": {
+      "title": "Posição no plano",
+      "coveredNote": "Depois das produções planejadas antes dela, o estoque ainda cobre esta produção.",
+      "shortNote": "Depois das produções planejadas antes dela, o estoque não cobre esta produção. O que sobra para ela:",
+      "leftOf": "{{left}} de {{needed}}"
+    },
+    "needs": {
+      "title": "O que as produções planejadas precisam",
+      "ingredient": "Ingrediente",
+      "needed": "Necessário",
+      "inStock": "Em estoque",
+      "onOrder": "Encomendado",
+      "missing": "Faltando",
+      "make": "Fabricar",
+      "planned": "Planejado: {{qty}}",
+      "noDate": "sem data",
+      "emptyTitle": "Nenhuma produção planejada neste período",
+      "emptyDescription": "Planeje uma produção com um dia e o que ela precisa aparece aqui.",
+      "unmeasured": "Não contados, pois suas unidades não podem ser comparadas com o estoque: {{names}}."
+    },
+    "order": {
+      "button": "Encomendar o que falta",
+      "created_one": "{{count}} ordem em rascunho criada",
+      "created_other": "{{count}} ordens em rascunho criadas",
+      "listed_one": "{{count}} ingrediente colocado na lista de compras",
+      "listed_other": "{{count}} ingredientes colocados na lista de compras",
+      "toMake_one": "{{count}} ingrediente para fabricar, não comprar",
+      "toMake_other": "{{count}} ingredientes para fabricar, não comprar",
+      "unplaced_one": "{{count}} ingrediente não tem fornecedor nem lista",
+      "unplaced_other": "{{count}} ingredientes não têm fornecedor nem lista",
+      "nothing": "Nada para encomendar.",
+      "failed": "Não foi possível fazer o pedido."
+    },
+    "intermediates": {
+      "button": "Planejar produções do que falta",
+      "planned_one": "{{count}} produção planejada",
+      "planned_other": "{{count}} produções planejadas",
+      "failed": "Não foi possível planejar as produções."
+    }
   }
 }

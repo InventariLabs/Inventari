@@ -131,7 +131,7 @@ writes it and the reviewer checks it.
   call site a report names; add no abstraction, option or file without a second caller. This never
   overrides the rules that keep data correct and the product usable: organization scoping,
   transaction ownership and the stock posting rules (`backend/AGENTS.md`), TDD and a test that
-  fails without the fix, the five maintained languages, accessibility, and the coverage floors.
+  fails without the fix, the six maintained languages, accessibility, and the coverage floors.
 
 ### The Mandatory Gate (the pre-push gate — once per branch, before it leaves)
 

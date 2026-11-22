@@ -48,7 +48,7 @@ class TestTheScaffoldWritesInstructionsForAnAgent:
             'app.core.contracts',
             'app.core.public_api',
             'app.models',
-            'en, pl, de, fr, es',
+            'en, pl, de, fr, es and pt',
             'ModuleModelBase',
             'backend/migrations',
             'purpose card',

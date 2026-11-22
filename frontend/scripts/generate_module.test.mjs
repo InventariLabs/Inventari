@@ -158,7 +158,7 @@ describe("generate_module", () => {
     expect(keys.length).toBeGreaterThan(0);
 
     const files = Object.fromEntries(generate("warranty_tracker"));
-    for (const lang of ["en", "pl", "de", "fr", "es"]) {
+    for (const lang of ["en", "pl", "de", "fr", "es", "pt"]) {
       const catalog = JSON.parse(files[`i18n/${lang}.json`]);
       for (const key of keys) {
         const value = key.split(".").reduce((node, part) => node?.[part], catalog);
@@ -178,7 +178,7 @@ describe("generate_module", () => {
       (m) => m[1],
     );
     expect(keys).toHaveLength(2);
-    for (const lang of ["en", "pl", "de", "fr", "es"]) {
+    for (const lang of ["en", "pl", "de", "fr", "es", "pt"]) {
       const catalog = JSON.parse(files[`i18n/${lang}.json`]);
       for (const key of keys) {
         const value = key.split(".").reduce((node, part) => node?.[part], catalog);

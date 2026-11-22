@@ -16,7 +16,7 @@ import { MAINTAINED_LANGUAGES } from "@/test/languageClasses";
  *
  * The invariants:
  *
- * 1. Every category is named in ALL five catalogs, on both screens.
+ * 1. Every category is named in ALL six catalogs, on both screens.
  * 2. The two screens use the same word for the same category, per language.
  * 3. The English label carries no architecture vocabulary ("core") — the same
  *    rule `profileNameParity.test.ts` applies one storey up, and for the same
@@ -61,7 +61,7 @@ function storeKey(category: string): string {
 }
 
 describe("module category labels", () => {
-  it("names every category on both screens, in all five languages", () => {
+  it("names every category on both screens, in all six languages", () => {
     const missing: string[] = [];
     for (const lang of MAINTAINED_LANGUAGES) {
       const launcher = launcherLabels(lang);

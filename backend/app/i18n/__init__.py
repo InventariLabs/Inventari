@@ -41,6 +41,7 @@ _CATALOGS: dict[Language, ErrorMessages] = {
     'de': ERRORS_DE,
     'fr': ERRORS_FR,
     'es': ERRORS_ES,
+    'pt': ERRORS_PT,
 }
 
 ERRORS: dict[Language, ErrorMessages] = {
@@ -49,8 +50,9 @@ ERRORS: dict[Language, ErrorMessages] = {
 
 #: The community languages' catalogs: whatever keys they hold so far. A key
 #: that is missing is answered in English by `app.i18n.service` (the way the
-#: frontend falls back per key), so no change has to translate these.
-COMMUNITY_ERRORS: dict[Language, Mapping[str, str]] = {'pt': ERRORS_PT}
+#: frontend falls back per key), so no change has to translate these. Empty
+#: while no language is a community one; a language joins it when it is.
+COMMUNITY_ERRORS: dict[Language, Mapping[str, str]] = {}
 
 __all__ = [
     'COMMUNITY_ERRORS',

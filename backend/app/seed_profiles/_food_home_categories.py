@@ -11,7 +11,7 @@ The persistence loop stays here.
 
 ``group_label`` is seeded as a code — ``FRIDGE``, ``FREEZER``, ``PANTRY`` —
 and not as a readable name, on purpose. The interface has a word for each of
-them in all five languages (``categories:groups.*``), so a code is the one
+them in all six languages (``categories:groups.*``), so a code is the one
 value that reads correctly in every one; a name seeded in English would be
 English on a Polish screen for good, because a label the organisation owns is
 not something later releases may rewrite. Anything an organisation types

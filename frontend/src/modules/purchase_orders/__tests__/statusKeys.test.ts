@@ -5,6 +5,7 @@ import pl from "../i18n/pl.json";
 import de from "../i18n/de.json";
 import fr from "../i18n/fr.json";
 import es from "../i18n/es.json";
+import pt from "../i18n/pt.json";
 
 /**
  * Regression guard.
@@ -33,6 +34,7 @@ const catalogs: Record<string, Catalog> = {
   de: de as unknown as Catalog,
   fr: fr as unknown as Catalog,
   es: es as unknown as Catalog,
+  pt: pt as unknown as Catalog,
 };
 
 function flatKeys(node: unknown, prefix: string[] = []): string[] {
@@ -46,7 +48,7 @@ function flatKeys(node: unknown, prefix: string[] = []): string[] {
   return [];
 }
 
-describe("purchase_orders — PO status labels present in all 5 languages", () => {
+describe("purchase_orders — PO status labels present in every language", () => {
   for (const [lang, catalog] of Object.entries(catalogs)) {
     it(`${lang} defines status.${PO_STATUSES.join(", status.")}`, () => {
       const keys = new Set(flatKeys(catalog));

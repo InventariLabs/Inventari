@@ -10,7 +10,7 @@ import { useLocationsById } from "@/module-sdk";
  * does not know keep the name the API sent.
  *
  * This does not translate the name: a seeded location is written to
- * the database in English and read by people working in five languages. It is
+ * the database in English and read by people working in six languages. It is
  * written in the reader's language now — see
  * `StorageLocationDeclaration.translations` — so there is nothing left to
  * translate here, and the path under a picker, the printed label and every

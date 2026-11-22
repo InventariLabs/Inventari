@@ -82,7 +82,7 @@ describe("the reasons a thing leaves the inventory", () => {
   // vocabulary in the log.
   it("names every reason in the journal's catalogue too", () => {
     const written = [...Object.values(STOCK_REASONS)];
-    for (const language of ["en", "pl", "de", "fr", "es"]) {
+    for (const language of ["en", "pl", "de", "fr", "es", "pt"]) {
       const tJournal = i18n.getFixedT(language, "common");
       for (const reason of written) {
         expect(

@@ -67,7 +67,7 @@ import {
 
 /**
  * The stage a new workflow starts with. Its label is a suggestion the user
- * edits, so it belongs in their language: it is translated in all five.
+ * edits, so it belongs in their language: it is translated in all six.
  */
 function emptyStages(t: TFunction): StageDraft[] {
   return [

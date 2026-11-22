@@ -122,7 +122,8 @@
     "addedOne": "Adicionado 1 × {{name}}",
     "quantityPositive": "A quantidade deve ser maior que 0",
     "scheduledDatePast": "A data planejada não pode estar no passado.",
-    "lineNameRequired": "O nome do produto é obrigatório"
+    "lineNameRequired": "O nome do produto é obrigatório",
+    "noResultsAdHoc": "Fora da sua lista — a linha será mantida como digitada."
   },
   "templates": {
     "title": "Modelos de pedido de compra",
@@ -296,7 +297,9 @@
     "minPositive": "O mínimo deve ser maior que 0 — é o limite que faz a regra disparar",
     "count_one": "regra",
     "count_other": "regras",
-    "overCapacity": "Regra salva. Atenção: ela pede {{max}} por reposição — mais do que a prateleira comporta ({{capacity}})."
+    "overCapacity": "Regra salva. Atenção: ela pede {{max}} por reposição — mais do que a prateleira comporta ({{capacity}}).",
+    "madeHere": "Fabricado aqui",
+    "planRun": "Planejar uma produção"
   },
   "productPicker": {
     "search": "Buscar produto…",
@@ -340,5 +343,6 @@
   "noPriceYet": "Ainda sem preço",
   "confirmOrderUnpriced": "Algumas linhas ainda não têm preço, por isso o total não é conhecido e o pedido vai para aprovação. Até {{threshold}} não é necessária: adicione primeiro os preços.",
   "confirmOrderDeadEndWaits": "Confirmar envia este pedido para a etapa “{{stage}}”, onde espera até que a solicitação seja retirada ou alguém possa decidi-la.",
-  "requestApprovalDeadEndWaits": "A solicitação envia o pedido {{number}} para a etapa “{{stage}}”, onde espera até que a solicitação seja retirada ou alguém possa decidi-la."
+  "requestApprovalDeadEndWaits": "A solicitação envia o pedido {{number}} para a etapa “{{stage}}”, onde espera até que a solicitação seja retirada ou alguém possa decidi-la.",
+  "grossSuffix": "bruto"
 }

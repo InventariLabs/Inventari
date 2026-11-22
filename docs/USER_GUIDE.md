@@ -113,7 +113,7 @@ Organization modules** (chapter 14).
   it, one you have read goes after 90 days and one you have not after a year.
 - **The screen icon** switches between **Light**, **Dark** and **Follow system**.
   The choice is kept by this browser.
-- **The language selector** (EN, PL, DE, FR, ES, and PT, a community translation that may still show English in places) is saved to your account.
+- **The language selector** (EN, PL, DE, FR, ES and PT — Português (Brasil)) is saved to your account.
 - **Your avatar** opens **My profile**, **About**, the **User guide** and
   **Log out**.
 
