@@ -356,7 +356,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'recipe_collection_name_taken': 'A recipe collection named "{name}" already exists in this organisation.',
         'recipe_name_taken': 'A BOM with this name already exists for this product.',
         'bridge_yield_differs': 'A BOM made from this source already exists for this product and makes {qty} per batch; enter that amount, or change the batch yield of that BOM first.',
-        'bridge_yield_required': "This product is counted in {unit}, so the recipe's servings cannot stand for the batch yield; enter how much one batch makes in {unit}.",
+        'bridge_yield_required': 'This product is counted in {unit}, so the number of servings cannot stand for the batch yield; enter how much one batch makes in {unit}.',
         'recipe_not_found': 'Recipe not found',
         'picking_active_recipe_locked': 'Ingredients cannot be edited while a picking session is active. Cancel or complete the session first.',
         'meal_plan_dates_exclude_entries': 'Remove the entries on the excluded dates first.',

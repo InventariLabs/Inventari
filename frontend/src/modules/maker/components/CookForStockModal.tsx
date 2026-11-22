@@ -119,29 +119,6 @@ function startingYield(
 }
 
 /**
- * The line under the yield field. A stored measured yield that is just the
- * servings is a number somebody took for an amount before the sheet asked; it
- * is named as doubtful, not recommended.
- */
-function yieldDescription(
-  t: TFunction<"recipes">,
-  storedYield: number | null,
-  servingsFit: boolean,
-  servings: number,
-  unit: string,
-): string {
-  if (storedYield !== null) {
-    const amount = unit ? `${storedYield} ${unit}` : String(storedYield);
-    return !servingsFit && storedYield === servings
-      ? t("cookForStock.yieldStoredDoubtful", { amount })
-      : t("cookForStock.yieldStored", { amount });
-  }
-  return servingsFit
-    ? t("cookForStock.yieldHint", { servings })
-    : t("cookForStock.yieldAsk", { servings });
-}
-
-/**
  * What a run comes to: the amount one batch makes times the number of
  * batches, or null while either is missing. Rounded to the four places the
  * backend keeps, which also hides binary noise (1.1 × 3).
@@ -518,4 +495,28 @@ export default function CookForStockSlot({
       recipe={data.recipe}
     />
   );
+}
+
+/**
+ * The line under the yield field (below the component: the key scan reads a
+ * `t(` call in the namespace of the hook above it). A stored measured yield that is just the
+ * servings is a number somebody took for an amount before the sheet asked; it
+ * is named as doubtful, not recommended.
+ */
+function yieldDescription(
+  t: TFunction<"recipes">,
+  storedYield: number | null,
+  servingsFit: boolean,
+  servings: number,
+  unit: string,
+): string {
+  if (storedYield !== null) {
+    const amount = unit ? `${storedYield} ${unit}` : String(storedYield);
+    return !servingsFit && storedYield === servings
+      ? t("cookForStock.yieldStoredDoubtful", { amount })
+      : t("cookForStock.yieldStored", { amount });
+  }
+  return servingsFit
+    ? t("cookForStock.yieldHint", { servings })
+    : t("cookForStock.yieldAsk", { servings });
 }
