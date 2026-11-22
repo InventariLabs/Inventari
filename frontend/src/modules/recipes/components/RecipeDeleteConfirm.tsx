@@ -7,6 +7,13 @@ import type { RecipePlannedMeal } from "../types/mealplans";
 /** Meals named in the sentence before the rest are counted. */
 const MEALS_NAMED = 5;
 
+const SLOT_LABEL = {
+  BREAKFAST: "meal_planner.slots.breakfast",
+  LUNCH: "meal_planner.slots.lunch",
+  DINNER: "meal_planner.slots.dinner",
+  SNACK: "meal_planner.slots.snack",
+} as const;
+
 interface RecipeDeleteConfirmProps {
   /** The recipe asked about; the dialog is closed while it is null. */
   recipeId: string | null;
@@ -43,7 +50,7 @@ export function RecipeDeleteConfirm({
                 [
                   meal.plan_name,
                   formatDateMedium(meal.date),
-                  t(`meal_planner.slots.${meal.slot.toLowerCase()}`),
+                  t(SLOT_LABEL[meal.slot]),
                 ]
                   .filter(Boolean)
                   .join(", "),
