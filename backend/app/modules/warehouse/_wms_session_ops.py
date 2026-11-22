@@ -61,6 +61,7 @@ from .models import (
     WmsPickLine,
     WmsPickSession,
     WmsPickSessionDocument,
+    WorkItemOverlay,
 )
 from .packing_service import (
     assert_packed_within_quantity_async,
@@ -617,10 +618,12 @@ async def cancel_empty_session_holding_async(
     task given back with nothing scanned has no work to keep, so the session
     ends with it and the task does not go on naming the reader. A session
     with scans, or one that also holds another document, is somebody's work
-    and stays. Returns whether a session was cancelled.
+    and stays; so does an ``active`` one, which a sheet is open in right now
+    (it is cancelled by :func:`cancel_empty_session_of_given_back_task_async`
+    when that sheet closes). Returns whether a session was cancelled.
     """
     session = await open_session_holding_async(db, org_id, document_id)
-    if session is None:
+    if session is None or session.status == 'active':
         return False
     other_document = await db.scalar(
         select(WmsPickSessionDocument.document_id).where(
@@ -645,6 +648,31 @@ async def cancel_empty_session_holding_async(
         db, RECEIVING if inbound else PICKING, session.id, org_id, user_id
     )
     return True
+
+
+async def cancel_empty_session_of_given_back_task_async(
+    db: AsyncSession,
+    org_id: UUID,
+    document_id: UUID,
+    user_id: UUID | None = None,
+) -> bool:
+    """End the empty session a closing sheet leaves on a task given back to nobody.
+
+    Giving a task back while its sheet is open leaves that sheet's session
+    alone; closing the sheet pauses it, and with nothing scanned and nobody
+    assigned it has nothing left to hold the document for.
+    """
+    given_back = await db.scalar(
+        select(WorkItemOverlay.id).where(
+            WorkItemOverlay.organization_id == org_id,
+            WorkItemOverlay.source_kind == 'document',
+            WorkItemOverlay.source_id == document_id,
+            WorkItemOverlay.assignee_id.is_(None),
+        )
+    )
+    if given_back is None:
+        return False
+    return await cancel_empty_session_holding_async(db, org_id, document_id, user_id)
 
 
 async def get_session_async(

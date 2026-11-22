@@ -343,6 +343,53 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
         db_session.refresh(session)
         assert session.status == 'cancelled'
 
+    def test_giving_a_task_back_leaves_the_session_an_open_sheet_holds_and_closing_ends_it(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_org: Organization,
+        doc_user: User,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_template: ProductTemplate,
+        doc_target_location: StorageLocation,
+    ) -> None:
+        order = _order(
+            db_session, doc_org, doc_user, doc_partner, doc_template,
+            scheduled=_TODAY,
+        )  # fmt: skip
+        receipt_id = _confirmed_receipt_for(
+            client, doc_auth_headers, order, doc_partner, doc_target_location,
+            doc_template,
+        )  # fmt: skip
+        session = WmsPickSession(
+            organization_id=doc_org.id,
+            document_id=UUID(receipt_id),
+            assigned_to=doc_user.id,
+            status='active',
+            started_at=datetime.now(),
+        )
+        db_session.add(session)
+        db_session.commit()
+        path = f'/api/v1/warehouse/work-items/document/{receipt_id}/assignee'
+        held = client.put(
+            path, headers=doc_auth_headers, json={'assignee_id': str(doc_user.id)}
+        )
+        assert held.status_code == status.HTTP_204_NO_CONTENT, held.text
+
+        given_back = client.put(path, headers=doc_auth_headers, json={})
+        assert given_back.status_code == status.HTTP_204_NO_CONTENT, given_back.text
+        db_session.refresh(session)
+        assert session.status == 'active'
+
+        closed = client.post(
+            f'/api/v1/warehouse/documents/{receipt_id}/receiving/{session.id}/pause',
+            headers=doc_auth_headers,
+        )
+        assert closed.status_code == status.HTTP_204_NO_CONTENT, closed.text
+        db_session.refresh(session)
+        assert session.status == 'cancelled'
+
     def test_giving_a_task_back_keeps_a_session_with_scans_in_it(
         self,
         client: TestClient,

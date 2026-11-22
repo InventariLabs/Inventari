@@ -2033,15 +2033,18 @@ describe("ItemsPage — the ?import=1 deep link", () => {
             : "visible",
         }) as CSSStyleDeclaration,
     );
-    renderAt("?open=item-1&at=expiry");
+    try {
+      renderAt("?open=item-1&at=expiry");
 
-    const dialog = await screen.findByRole("dialog");
-    await waitFor(() => expect(scrolled).toHaveLength(1));
-    expect(scrolled[0]).toContainElement(
-      dialog.querySelector('[data-field-key="expiry_date"]') as HTMLElement,
-    );
-    style.mockRestore();
-    Reflect.deleteProperty(HTMLElement.prototype, "scrollTop");
+      const dialog = await screen.findByRole("dialog");
+      await waitFor(() => expect(scrolled).toHaveLength(1));
+      expect(scrolled[0]).toContainElement(
+        dialog.querySelector('[data-field-key="expiry_date"]') as HTMLElement,
+      );
+    } finally {
+      style.mockRestore();
+      Reflect.deleteProperty(HTMLElement.prototype, "scrollTop");
+    }
   });
 
   it("closes a product dialog that a typed address opened in place", async () => {

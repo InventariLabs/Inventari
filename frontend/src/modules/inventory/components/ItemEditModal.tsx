@@ -1,4 +1,3 @@
-import { centerInScrollBody } from "../utils/centerInScrollBody";
 import { useCallback, useRef, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { X, Trash2, Package, AlertCircle } from "lucide-react";
@@ -38,6 +37,7 @@ import {
   useUpdateItem,
   useDeleteItem,
 } from "@/modules/inventory/hooks/useItemMutations";
+import { centerInScrollBody } from "../utils/centerInScrollBody";
 
 /** The product a record is a card of, read for the valuation section. */
 /** The sheet opened with the picture the record had then; one changed since,
