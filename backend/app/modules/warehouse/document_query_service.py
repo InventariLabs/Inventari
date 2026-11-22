@@ -5,7 +5,7 @@ from decimal import Decimal
 from typing import Any, Literal
 from uuid import UUID
 
-from sqlalchemy import ColumnElement, false, func, literal_column, or_, select
+from sqlalchemy import ColumnElement, and_, false, func, literal_column, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, load_only, noload, selectinload
 
@@ -420,6 +420,41 @@ def not_undone_conditions() -> list[ColumnElement[bool]]:
     return [Document.id.not_in(undone), Document.id.not_in(reversals)]
 
 
+def _in_locations(
+    location_ids: list[UUID],
+    location_epochs: list[tuple[datetime | None, datetime | None, list[UUID]]] | None,
+) -> ColumnElement[bool]:
+    """A document whose source or target is one of the places.
+
+    An open document is work still to do, so it reads *location_ids*, the
+    tree as it stands. With *location_epochs* a completed one reads the
+    stretch of the tree it was done in.
+    """
+
+    def touches(ids: list[UUID]) -> ColumnElement[bool]:
+        return or_(
+            in_ids(Document.source_location_id, ids),
+            in_ids(Document.target_location_id, ids),
+        )
+
+    if location_epochs is None:
+        return touches(location_ids)
+    done = Document.status == DocumentStatus.COMPLETED.value
+    done_at = func.coalesce(Document.completed_at, Document.created_at)
+    return or_(
+        and_(~done, touches(location_ids)),
+        *(
+            and_(
+                done,
+                *([done_at >= start] if start is not None else []),
+                *([done_at < end] if end is not None else []),
+                touches(ids),
+            )
+            for start, end, ids in location_epochs
+        ),
+    )
+
+
 async def list_documents(
     db: AsyncSession,
     org_id: UUID,
@@ -434,6 +469,8 @@ async def list_documents(
     completed_from: datetime | None = None,
     completed_to: datetime | None = None,
     location_ids: list[UUID] | None = None,
+    location_epochs: list[tuple[datetime | None, datetime | None, list[UUID]]]
+    | None = None,
     target_ids: list[UUID] | None = None,
     module_filters: list[tuple[str, DocumentFilterDTO]] | None = None,
     backorder_only: bool = False,
@@ -445,6 +482,11 @@ async def list_documents(
     lines: Literal['all', 'rows', 'none'] = 'all',
 ) -> tuple[list[Document], int]:
     """A page of documents, filtered and ordered as asked.
+
+    ``location_epochs`` (``core_api.locations.subtree_epochs_async``) makes a
+    completed document list under the places its shelf stood in when it was
+    done; ``location_ids`` stays what an open document is read against, the
+    tree as it is.
 
     ``lines`` is how much of the lines comes with them: ``all`` of each
     line; ``rows``, only what ``document_list_row`` and the work stage read;
@@ -540,12 +582,7 @@ async def list_documents(
         # A document names the place its goods came from or went to; a
         # warehouse is that place or one of the shelves below it, and either
         # side of the document may stand there.
-        conditions.append(
-            or_(
-                in_ids(Document.source_location_id, location_ids),
-                in_ids(Document.target_location_id, location_ids),
-            )
-        )
+        conditions.append(_in_locations(location_ids, location_epochs))
     conditions += extra_conditions
     if backorder_only:
         # The drafts the application raises on a short completion, told

@@ -528,3 +528,103 @@ def test_filtering_by_a_location_that_moved_keeps_its_old_contents(
         assert (
             len(_filtered_ledger(client, auth_headers, warehouses['flour'], place)) == 2
         )
+
+
+def _relocation_rows_in(client, auth_headers, product, location) -> list[dict]:
+    response = client.get(
+        '/api/v1/stock-moves',
+        headers=auth_headers,
+        params={
+            'product_template_id': str(product.id),
+            'location_id': str(location.id),
+            'reference_type': 'location_relocation',
+        },
+    )
+    assert response.status_code == status.HTTP_200_OK, response.text
+    return response.json()['items']
+
+
+def test_the_row_a_physical_move_wrote_is_listed_under_both_places(
+    client, auth_headers, db_session, warehouses
+):
+    """The move lists under the place the location left and the one it reached.
+
+    Read under the old warehouse the goods came in and never went out unless
+    the move's own row, naming the shelf in both places, is among them.
+    """
+    _reorg(
+        client,
+        auth_headers,
+        [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
+    )
+    for place in (warehouses['main'], warehouses['pantry'], warehouses['cold']):
+        rows = _relocation_rows_in(client, auth_headers, warehouses['flour'], place)
+        assert len(rows) == 1, place.name
+    # A place the location never stood in does not list it.
+    assert (
+        _relocation_rows_in(
+            client, auth_headers, warehouses['flour'], warehouses['empty']
+        )
+        == []
+    )
+
+
+def _document_into(db_session, user, shelf, number, *, status, completed_at=None):
+    from app.modules.warehouse.models.document import Document
+
+    document = Document(
+        organization_id=user.organization_id,
+        type='IN',
+        number=number,
+        status=status,
+        target_location_id=shelf.id,
+        completed_at=completed_at,
+        created_by=user.id,
+    )
+    db_session.add(document)
+    db_session.flush()
+    return document
+
+
+def _documents_in(client, auth_headers, location) -> set[str]:
+    response = client.get(
+        '/api/v1/warehouse/documents',
+        headers=auth_headers,
+        params={'location_id': str(location.id), 'limit': 100},
+    )
+    assert response.status_code == status.HTTP_200_OK, response.text
+    return {row['number'] for row in response.json()['items']}
+
+
+def test_a_completed_document_lists_under_the_place_its_shelf_stood_in(
+    client, auth_headers, db_session, test_user, warehouses
+):
+    """A completed document belongs to where its shelf stood when it was done.
+
+    An open document is work still to do, so it reads the tree as it is today.
+    """
+    done = _document_into(
+        db_session,
+        test_user,
+        warehouses['shelf'],
+        'IN/2026/901',
+        status='COMPLETED',
+        completed_at=_A_MONTH_AGO,
+    )
+    planned = _document_into(
+        db_session, test_user, warehouses['shelf'], 'IN/2026/902', status='DRAFT'
+    )
+    db_session.commit()
+    _reorg(
+        client,
+        auth_headers,
+        [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
+    )
+
+    assert _documents_in(client, auth_headers, warehouses['main']) == {done.number}
+    assert _documents_in(client, auth_headers, warehouses['pantry']) == {planned.number}
+    # The moved place itself keeps both.
+    assert _documents_in(client, auth_headers, warehouses['cold']) == {
+        done.number,
+        planned.number,
+    }

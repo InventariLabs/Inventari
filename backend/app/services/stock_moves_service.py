@@ -304,16 +304,25 @@ async def _in_location(
             [location_id, *await descendant_ids_async(db, organization_id, location_id)]
         )
     moment = _moved_at()
-    return or_(
-        *(
-            and_(
-                *([moment >= start] if start is not None else []),
-                *([moment < end] if end is not None else []),
-                touches(ids),
-            )
-            for start, end, ids in epochs
-        )
+    is_a_relocation = (
+        StockMove.reference_type == StockMoveReferenceType.LOCATION_RELOCATION
     )
+
+    def within(start: datetime | None, end: datetime | None) -> ColumnElement[bool]:
+        # A stretch ends at the move that closes it, and the row that move
+        # wrote is stamped with that very moment: it belongs to the place
+        # the location left as well as to the one it reached.
+        before_end = (
+            or_(moment < end, and_(is_a_relocation, moment == end))
+            if end is not None
+            else None
+        )
+        return and_(
+            *([moment >= start] if start is not None else []),
+            *([before_end] if before_end is not None else []),
+        )
+
+    return or_(*(and_(within(start, end), touches(ids)) for start, end, ids in epochs))
 
 
 async def _ledger_conditions(

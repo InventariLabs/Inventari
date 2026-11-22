@@ -246,18 +246,31 @@ describe("ProductionStockMovesTable", () => {
         name: "Cold Storage",
         parent_id: "annex",
       },
+      { id: "pantry", name: "Pantry", parent_id: "annex" },
       { id: "annex", name: "Annex", parent_id: null },
     ]);
 
     render(
       <ProductionStockMovesTable
-        stockMoves={[{ ...move, from_location_path: "Cold Storage" }]}
+        stockMoves={[
+          { ...move, from_location_path: "Cold Storage" },
+          {
+            ...move,
+            id: "move-2",
+            from_location_id: "pantry",
+            from_location_name: "Pantry",
+          },
+        ]}
       />,
       { wrapper: QueryWrapper },
     );
 
-    expect(await screen.findByText("← Cold Storage")).toBeInTheDocument();
-    expect(screen.queryByText(/Annex/)).not.toBeInTheDocument();
+    // The second row's shelf never moved, so it reads the tree: once it says
+    // "Annex › Pantry" the locations have arrived, and the first row is
+    // being judged against them rather than before they loaded.
+    expect(await screen.findByText("← Annex › Pantry")).toBeInTheDocument();
+    expect(screen.getByText("← Cold Storage")).toBeInTheDocument();
+    expect(screen.queryByText(/Annex › Cold Storage/)).not.toBeInTheDocument();
   });
 
   it("falls back to a label when a named location's row is gone", () => {
