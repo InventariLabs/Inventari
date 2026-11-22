@@ -82,6 +82,11 @@ ERRORS_ES: ErrorMessages = {
         'caben en una impresión. Expórtalo como hoja de cálculo o elige una '
         'ubicación para acotarlo.'
     ),
+    'stock_value_first_day': (
+        'El libro de movimientos empieza el {starts_at}. Un estado necesita '
+        'una tarde conocida con la que abrir, así que el primero puede '
+        'empezar el {first_day}.'
+    ),
     'stock_value_period_reversed': (
         'El periodo termina antes de empezar. Elige una fecha final que no sea anterior a la fecha inicial.'
     ),
