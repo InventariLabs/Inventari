@@ -24,6 +24,10 @@ name: inventari-demo
 # keeps those without limit. This caps the size of every container's log so a
 # flood cannot fill the disk; the time limit Docker cannot express is
 # scripts/demo-prune-logs.sh, run daily on the host (docs/DEMO.md, "Logs").
+# The production file sends the containers to the host journal instead
+# (docker-compose.prod.yml); the demo keeps json-file, whose files the pruner
+# rewrites in place, and every service here replaces that driver with this
+# bounded one.
 x-demo-logging: &demo-logging
   driver: json-file
   options:
@@ -102,6 +106,10 @@ services:
       # ask. The defaults are the application's own.
       DEMO_SANDBOX_DAILY_CAP: ${DEMO_SANDBOX_DAILY_CAP:-100}
       DEMO_SANDBOX_RATE_LIMIT: ${DEMO_SANDBOX_RATE_LIMIT:-10/hour}
+      # The demo's own retention, stated on the privacy page. It must match
+      # what scripts/demo-prune-logs.sh leaves on the host: the nightly run
+      # keeps seven days (docs/DEMO.md, "Logs").
+      LOG_RETENTION_DAYS: "7"
     logging: *demo-logging
 
   demo-reset:

@@ -26,7 +26,11 @@ describe("PrivacyPage", () => {
   const serveStatus = (status: Partial<InitStatus>) =>
     server.use(
       http.get("/api/v1/auth/init-status", () =>
-        HttpResponse.json({ is_initialized: true, ...status }),
+        HttpResponse.json({
+          is_initialized: true,
+          log_retention_days: 30,
+          ...status,
+        }),
       ),
     );
 
@@ -143,6 +147,11 @@ describe("PrivacyPage", () => {
     expect(
       await screen.findByText(/for a copy of the data held about you/),
     ).toBeInTheDocument();
+    // GDPR art. 13 asks for the storage period, and it is the operator's
+    // configured one, not a number written into the page.
+    expect(
+      screen.getByText(/kept for 30 days and then deleted/),
+    ).toBeInTheDocument();
     // Deletion rewrites the account, not what was written about it before:
     // the page says so rather than promising an anonymous history.
     expect(
@@ -161,7 +170,7 @@ describe("PrivacyPage", () => {
   });
 
   it("tells a demo visitor what the nightly wipe deletes and how long the server's logs are kept", async () => {
-    serveStatus({ is_demo: true });
+    serveStatus({ is_demo: true, log_retention_days: 7 });
 
     renderPage();
 
@@ -176,11 +185,16 @@ describe("PrivacyPage", () => {
       within(demo as HTMLElement).getByText(/one inbox that every visitor/),
     ).toBeInTheDocument();
     expect(screen.getByText(/a second cookie/)).toBeInTheDocument();
+    // The retention is the demo's own seven days, from the server, not the
+    // production default.
     expect(
-      screen.getByText(
-        /technical logs are not part of that wipe; they are kept for seven days/,
-      ),
+      screen.getByText(/kept for 7 days and then deleted/),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        /technical logs are not part of that wipe; they are kept/,
+      ),
+    ).not.toBeInTheDocument();
     // The way to the operator stays open for ordinary requests.
     expect(
       screen.getByText(/for a copy of the data held about you/),

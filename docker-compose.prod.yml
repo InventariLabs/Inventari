@@ -5,10 +5,30 @@
 # rely on that).
 name: inventari
 
+# Every container writes to the host's journal, not to the json-file Docker
+# keeps beside it. A container's json-file log is deleted with the container,
+# and every deploy recreates the containers (`up -d --build --force-recreate`),
+# so the requests an incident is investigated through were gone by the next
+# release. journald keeps them on the host across a recreate; how long and how
+# much is one host setting (`MaxRetentionSec`, `SystemMaxUse`) rather than a
+# per-container limit, and DEPLOYMENT.md ("Keeping the server's logs") sets
+# both, with the daily encrypted copy that leaves the host.
+#
+# The tag names the container in every line, so an entry can be traced to the
+# service that wrote it: `journalctl -t inventari-backend-1`.
+# The demo keeps Docker's json-file driver and its own seven-day pruner
+# (docker-compose.demo.yml, scripts/demo-prune-logs.sh): it is a public demo
+# with a different retention, and the overlay replaces this logging block.
+x-logging: &prod-logging
+  driver: journald
+  options:
+    tag: "{{.Name}}"
+
 services:
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
+    logging: *prod-logging
     ports:
       - "80:80"
       - "443:443"
@@ -33,6 +53,7 @@ services:
   db:
     image: postgres:17-alpine
     restart: unless-stopped
+    logging: *prod-logging
     # What the database may use on this host: DB_MEM_LIMIT, with
     # DB_SHARED_BUFFERS and DB_EFFECTIVE_CACHE_SIZE set to match
     # (DEPLOYMENT.md, "Sizing the services to the host"). The defaults are
@@ -89,6 +110,7 @@ services:
   db-app-role:
     image: postgres:17-alpine
     restart: "no"
+    logging: *prod-logging
     environment:
       PGHOST: db
       PGUSER: ${DB_USER:-inventari_user}
@@ -123,6 +145,7 @@ services:
       context: ./docker/backup
       dockerfile: Dockerfile
     restart: unless-stopped
+    logging: *prod-logging
     environment:
       POSTGRES_HOST: db
       POSTGRES_DB: ${DB_NAME:-inventari_db}
@@ -153,25 +176,38 @@ services:
       start_period: 5m
 
   # Optional off-host copy. It syncs the already-encrypted dumps and file
-  # archives in ./backups to an rclone remote, so losing the host does not lose the
-  # backups; a plain remote is enough, because the payload is ciphertext
-  # (rclone crypt would encrypt it twice). Only `*.age` files ever leave the
-  # host: it refuses to run without AGE_RECIPIENT, and the filter keeps a
-  # plain dump left from before the key out of the copy too. --skip-links: the
-  # -latest names in last/ are links to the newest pair, which is sent once
-  # under its own names, not a second time under those. Enable it with
-  # `offsite` in COMPOSE_PROFILES and set up rclone.conf + BACKUP_RCLONE_REMOTE as
-  # described in DEPLOYMENT.md.
+  # archives in ./backups and the encrypted journal exported by
+  # scripts/export-logs.sh into ./logs to rclone remotes, under backups/ and
+  # logs/ respectively, so losing the host — or someone who got root on it —
+  # does not take the record with it. A plain remote is enough, because the
+  # payload is ciphertext (rclone crypt would encrypt it twice). Only `*.age`
+  # files ever leave the host: it refuses to run without AGE_RECIPIENT, and
+  # the filter keeps a plain dump left from before the key out of the copy too.
+  # --skip-links: the -latest names in last/ are links to the newest pair, which
+  # is sent once under its own names, not a second time under those. The
+  # destination is made with versioning and Object Lock where it can be (the
+  # S3 recipe in DEPLOYMENT.md): a sync that deletes a rotated-out file only
+  # adds a delete marker there, and a lifecycle rule removes the version once
+  # its lock has run out. LOGS_RCLONE_REMOTE names a separate bucket for the
+  # journal when the destination gives backups and logs different retention;
+  # left empty, the logs go under BACKUP_RCLONE_REMOTE/logs as the backups'
+  # sibling. Enable it with `offsite` in COMPOSE_PROFILES, set up rclone.conf,
+  # BACKUP_RCLONE_REMOTE and (optionally) LOGS_RCLONE_REMOTE as described in
+  # DEPLOYMENT.md, and run scripts/export-logs.sh from cron so there are logs
+  # to send.
   db-backup-offsite:
     image: rclone/rclone:1.76.0
     profiles: ["offsite"]
     restart: unless-stopped
+    logging: *prod-logging
     environment:
       RCLONE_CONFIG: /config/rclone.conf
       BACKUP_RCLONE_REMOTE: ${BACKUP_RCLONE_REMOTE:-}
+      LOGS_RCLONE_REMOTE: ${LOGS_RCLONE_REMOTE:-}
       AGE_RECIPIENT: ${AGE_RECIPIENT:-}
     volumes:
       - ./backups:/backups:ro
+      - ./logs:/logs:ro
       - ./rclone.conf:/config/rclone.conf:ro
     entrypoint: ["/bin/sh", "-c"]
     command:
@@ -184,14 +220,17 @@ services:
           echo "AGE_RECIPIENT is empty — the backups are not encrypted, and only encrypted ones leave the host. Run 'make backup-key' (see DEPLOYMENT.md)" >&2;
           exit 1;
         fi;
+        logs_remote="$${LOGS_RCLONE_REMOTE:-$$BACKUP_RCLONE_REMOTE/logs}";
         while :; do
-          rclone sync /backups "$$BACKUP_RCLONE_REMOTE" --include "*.age" --skip-links --log-level INFO;
+          rclone sync /backups "$$BACKUP_RCLONE_REMOTE/backups" --include "*.age" --skip-links --log-level INFO;
+          rclone sync /logs "$$logs_remote" --include "*.age" --skip-links --log-level INFO;
           sleep 3600;
         done
 
   products-db:
     image: postgres:17-alpine
     restart: unless-stopped
+    logging: *prod-logging
     mem_limit: 1g
     profiles: ["food"]
     command: >
@@ -241,6 +280,7 @@ services:
   products-app-role:
     image: postgres:17-alpine
     restart: "no"
+    logging: *prod-logging
     profiles: ["food"]
     environment:
       PGHOST: products-db
@@ -265,6 +305,7 @@ services:
   redis:
     image: valkey/valkey:9.1.3-alpine
     restart: unless-stopped
+    logging: *prod-logging
     mem_limit: 512m
     # These instances hold the JWT blacklist and the rate-limit
     # counters. They have no published ports, but network isolation was the
@@ -298,6 +339,7 @@ services:
   redis-critical:
     image: valkey/valkey:9.1.3-alpine
     restart: unless-stopped
+    logging: *prod-logging
     mem_limit: 96m
     command: >
       valkey-server
@@ -321,6 +363,7 @@ services:
   pgbouncer-main:
     image: edoburu/pgbouncer:v1.26.1-p0
     restart: unless-stopped
+    logging: *prod-logging
     environment:
       DB_USER: "${DB_APP_USER:-inventari_app}"
       DB_PASSWORD: "${DB_APP_PASSWORD}"
@@ -357,6 +400,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     restart: unless-stopped
+    logging: *prod-logging
     # BACKEND_MEM_LIMIT is what the workers share. A worker that has grown
     # BACKEND_WORKER_MAX_GROWTH_MB past its start-up size, or sits idle
     # BACKEND_WORKER_IDLE_RECYCLE_SECONDS more than a quarter over it, is
@@ -464,6 +508,11 @@ services:
       # published a contact.
       OPERATOR_NAME: ${OPERATOR_NAME:-}
       OPERATOR_CONTACT: ${OPERATOR_CONTACT:-}
+      # How long the server keeps its logs, as the privacy page states it.
+      # The operator sets it to the journald retention configured on the host
+      # (DEPLOYMENT.md, "Keeping the server's logs"); the default matches the
+      # documented 30 days.
+      LOG_RETENTION_DAYS: ${LOG_RETENTION_DAYS:-30}
       # The language an account created without one starts in, and the one
       # a request naming no language is answered in (.env.example).
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-en}
@@ -518,6 +567,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     restart: unless-stopped
+    logging: *prod-logging
     mem_limit: 128m
     depends_on:
       - backend

@@ -119,6 +119,7 @@ async def get_init_status(
         'demo_inbox_url': settings.DEMO_INBOX_URL or None,
         'operator_name': settings.OPERATOR_NAME.strip() or None,
         'operator_contact': settings.OPERATOR_CONTACT.strip() or None,
+        'log_retention_days': settings.LOG_RETENTION_DAYS,
     }
 
 

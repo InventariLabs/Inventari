@@ -16956,6 +16956,11 @@ export interface components {
             operator_name?: string | null;
             /** Operator Contact */
             operator_contact?: string | null;
+            /**
+             * Log Retention Days
+             * @default 30
+             */
+            log_retention_days: number;
         };
         /** InventoryPeriodCreate */
         InventoryPeriodCreate: {

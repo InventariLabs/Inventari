@@ -6,6 +6,7 @@ import { QueryResult } from "@/components/ui/QueryResult";
 import { useInitStatus } from "@/hooks/useInitStatus";
 import { useAuthStore } from "@/store/authStore";
 import type { InitStatus } from "@/lib/api/auth";
+import { formatNumberLocale } from "@/utils/formatters";
 import { AuthLayout } from "./AuthLayout";
 
 const LINK_CLASS =
@@ -71,7 +72,11 @@ function PrivacyNotice({ status }: { status: InitStatus }) {
         <p>{t("privacy.stored.account")}</p>
         <p>{t("privacy.stored.activity")}</p>
         <p>{t("privacy.stored.organization")}</p>
-        <p>{t("privacy.stored.logs")}</p>
+        <p>
+          {t("privacy.stored.logs", {
+            days: formatNumberLocale(status.log_retention_days, 0),
+          })}
+        </p>
         <p>{t("privacy.stored.outside")}</p>
       </Section>
       <Section title={t("privacy.cookies.heading")}>
