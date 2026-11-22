@@ -38,13 +38,12 @@ describe("ItemEditModal", () => {
   });
 
   describe("opened from a row about a date", () => {
-    let scrollIntoView: ReturnType<typeof vi.fn>;
+    let scrollIntoView: ReturnType<typeof vi.spyOn>;
     let bodyScrolls: { el: HTMLElement; top: number }[];
     beforeEach(() => {
       // Only the sheet's body may scroll; scrollIntoView would move the fixed
       // overlay too and push the header off the screen.
-      scrollIntoView = vi.fn();
-      HTMLElement.prototype.scrollIntoView = scrollIntoView;
+      scrollIntoView = vi.spyOn(HTMLElement.prototype, "scrollIntoView");
       bodyScrolls = [];
       Object.defineProperty(HTMLElement.prototype, "scrollTop", {
         configurable: true,
@@ -112,7 +111,7 @@ describe("ItemEditModal", () => {
     });
     afterEach(() => {
       vi.restoreAllMocks();
-      for (const key of ["scrollIntoView", "scrollTop", "clientHeight"]) {
+      for (const key of ["scrollTop", "clientHeight"]) {
         Reflect.deleteProperty(HTMLElement.prototype, key);
       }
     });
