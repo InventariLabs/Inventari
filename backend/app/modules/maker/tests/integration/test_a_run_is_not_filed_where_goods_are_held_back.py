@@ -20,8 +20,9 @@ from app.models.organization import Organization
 from app.models.storage_location import StorageLocation
 from app.models.storage_type import StorageType
 from app.models.user import User
+from tests.integration._shelf import post_on_shelf
 
-from .conftest import _make_template
+from .conftest import _make_template, post_bom_line
 
 pytestmark = pytest.mark.integration
 
@@ -225,3 +226,57 @@ class TestThePickerListIsKeptClean:
         assert 'Shelf' in kept
         assert 'Quarantine' not in kept
         assert len(everything - kept) == 2
+
+
+class TestADraftThatPredatesTheSetting:
+    def test_completing_it_is_refused_before_anything_moves(
+        self,
+        client: TestClient,
+        headers: dict[str, str],
+        db_session: Session,
+        org: Organization,
+        shelf: StorageLocation,
+        warehouse: StorageLocation,
+    ) -> None:
+        ingredient = _make_template(db_session, org, name='Flour')
+        output = _make_template(db_session, org, name='Bread')
+        added = post_bom_line(
+            client,
+            headers,
+            db_session,
+            org.id,
+            {
+                'parent_template_id': str(output.id),
+                'child_template_id': str(ingredient.id),
+                'qty_per_batch': '1',
+                'unit': 'pcs',
+            },
+        )
+        assert added.status_code == 201, added.text
+        post_on_shelf(client, headers, ingredient, shelf.id, '2')
+        draft = client.post(
+            ORDERS,
+            headers=headers,
+            json={
+                'output_template_id': str(output.id),
+                'planned_qty': '1',
+                'output_location_id': str(shelf.id),
+            },
+        )
+        assert draft.status_code == 201, draft.text
+        # The shelf the draft names becomes the quarantine location afterwards.
+        named = client.put(
+            f'{WAREHOUSE_API}/profile',
+            headers=headers,
+            json={'quarantine_location_id': str(shelf.id)},
+        )
+        assert named.status_code == 200, named.text
+
+        completed = client.post(
+            f'{ORDERS}/{draft.json()["id"]}/complete', headers=headers
+        )
+
+        assert completed.status_code == 400, completed.text
+        assert completed.json()['detail']['message'].startswith(
+            'A quarantine location cannot take what a production run makes'
+        )
