@@ -903,11 +903,12 @@ says what the release does rather than what changed since them.
   back after the campaign closed, its line in the attestation detail stopped
   reading Confirmed or Disputed and read "already returned" instead, so the
   record of who confirmed what changed with a later move of the asset. An item
-  now counts as returned only while it is unanswered on a campaign that is
-  still running; an answered item, and every item of a closed campaign, keeps
-  its recorded status. The response badge and the Returned count follow the same
-  rule, so a closed campaign shows an unanswered response as awaiting reply and
-  counts it as pending.
+  now counts as returned only when it is unanswered and came back before the
+  campaign closed (or while it still runs); an answered item keeps its answer,
+  and a return after the close changes nothing. The response badge and the
+  Returned count follow the same rule, so an asset returned before the close
+  still reads as returned on the closed record, and one returned afterwards
+  leaves its response awaiting reply and pending.
 - The organization journal adds up to what is on the shelf, and reads in the
   reader's words. Opening a sealed pack to cook from it records the drop of
   the sealed record (3 → 2) beside the opened record it creates, and the name
