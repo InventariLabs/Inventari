@@ -1,3 +1,4 @@
+import { centerInScrollBody } from "../utils/centerInScrollBody";
 import { useCallback, useRef, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { X, Trash2, Package, AlertCircle } from "lucide-react";
@@ -304,7 +305,7 @@ export default function ItemEditModal({
     );
     if (!field) return;
     broughtExpiry.current = true;
-    field.scrollIntoView({ block: "center" });
+    centerInScrollBody(field);
   }, [openAtExpiry, isLoadingItem, fieldDefinitions, modalRef]);
 
   const { requestLeave, requestClose } = useLeaveGuard(

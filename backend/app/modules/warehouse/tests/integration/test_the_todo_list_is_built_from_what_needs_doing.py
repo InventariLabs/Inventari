@@ -44,6 +44,7 @@ from app.modules.stock_takes.models import (
 from app.modules.warehouse.models import (
     CUSTOM_SOURCE_KIND,
     Document,
+    WmsPickLine,
     WmsPickSession,
     WorkItemOverlay,
 )
@@ -295,6 +296,106 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
         assert started['state'] == 'in_progress'
         assert started['next_action'] == 'resume'
         assert started['stage_holder_name'] == doc_user.full_name
+
+    def test_giving_a_task_back_ends_a_session_nobody_scanned_in(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_org: Organization,
+        doc_user: User,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_template: ProductTemplate,
+        doc_target_location: StorageLocation,
+    ) -> None:
+        order = _order(
+            db_session, doc_org, doc_user, doc_partner, doc_template,
+            scheduled=_TODAY,
+        )  # fmt: skip
+        receipt_id = _confirmed_receipt_for(
+            client, doc_auth_headers, order, doc_partner, doc_target_location,
+            doc_template,
+        )  # fmt: skip
+        key = f'document:{receipt_id}:receive'
+        path = f'/api/v1/warehouse/work-items/document/{receipt_id}/assignee'
+        session = WmsPickSession(
+            organization_id=doc_org.id,
+            document_id=UUID(receipt_id),
+            assigned_to=doc_user.id,
+            status='paused',
+            started_at=datetime.now(),
+        )
+        db_session.add(session)
+        db_session.commit()
+        held = client.put(
+            path, headers=doc_auth_headers, json={'assignee_id': str(doc_user.id)}
+        )
+        assert held.status_code == status.HTTP_204_NO_CONTENT, held.text
+
+        given_back = client.put(path, headers=doc_auth_headers, json={})
+        assert given_back.status_code == status.HTTP_204_NO_CONTENT, given_back.text
+
+        task = _task(_work_items(client, doc_auth_headers), key)
+        assert task is not None
+        assert task['state'] == 'todo'
+        assert task['next_action'] == 'receive'
+        assert task['stage_holder_name'] is None
+        db_session.refresh(session)
+        assert session.status == 'cancelled'
+
+    def test_giving_a_task_back_keeps_a_session_with_scans_in_it(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_org: Organization,
+        doc_user: User,
+        doc_auth_headers: dict[str, str],
+        doc_partner: Partner,
+        doc_template: ProductTemplate,
+        doc_target_location: StorageLocation,
+    ) -> None:
+        order = _order(
+            db_session, doc_org, doc_user, doc_partner, doc_template,
+            scheduled=_TODAY,
+        )  # fmt: skip
+        receipt_id = _confirmed_receipt_for(
+            client, doc_auth_headers, order, doc_partner, doc_target_location,
+            doc_template,
+        )  # fmt: skip
+        document = db_session.get(Document, UUID(receipt_id))
+        assert document is not None
+        session = WmsPickSession(
+            organization_id=doc_org.id,
+            document_id=document.id,
+            assigned_to=doc_user.id,
+            status='paused',
+            started_at=datetime.now(),
+        )
+        db_session.add(session)
+        db_session.flush()
+        db_session.add(
+            WmsPickLine(
+                session_id=session.id,
+                document_line_id=document.lines[0].id,
+                status='pending',
+                picked_quantity=Decimal('1'),
+                expected_quantity=Decimal('1'),
+            )
+        )
+        db_session.commit()
+
+        path = f'/api/v1/warehouse/work-items/document/{receipt_id}/assignee'
+        given_back = client.put(path, headers=doc_auth_headers, json={})
+        assert given_back.status_code == status.HTTP_204_NO_CONTENT, given_back.text
+
+        task = _task(
+            _work_items(client, doc_auth_headers), f'document:{receipt_id}:receive'
+        )
+        assert task is not None
+        assert task['state'] == 'in_progress'
+        assert task['stage_holder_name'] == doc_user.full_name
+        db_session.refresh(session)
+        assert session.status == 'paused'
 
     def test_a_cancelled_order_or_a_finished_run_is_no_longer_a_task(
         self,

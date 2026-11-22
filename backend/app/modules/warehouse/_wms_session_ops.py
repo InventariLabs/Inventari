@@ -605,6 +605,48 @@ async def cancel_session_async(
     )
 
 
+async def cancel_empty_session_holding_async(
+    db: AsyncSession,
+    org_id: UUID,
+    document_id: UUID,
+    user_id: UUID | None = None,
+) -> bool:
+    """Let go of the open session that holds *document_id* when nothing is in it.
+
+    Opening a pick or receive sheet starts a session in the reader's name; a
+    task given back with nothing scanned has no work to keep, so the session
+    ends with it and the task does not go on naming the reader. A session
+    with scans, or one that also holds another document, is somebody's work
+    and stays. Returns whether a session was cancelled.
+    """
+    session = await open_session_holding_async(db, org_id, document_id)
+    if session is None:
+        return False
+    other_document = await db.scalar(
+        select(WmsPickSessionDocument.document_id).where(
+            WmsPickSessionDocument.session_id == session.id,
+            WmsPickSessionDocument.document_id != document_id,
+        )
+    )
+    if other_document is not None or session.document_id != document_id:
+        return False
+    scanned = await db.scalar(
+        select(WmsPickLine.id)
+        .where(
+            WmsPickLine.session_id == session.id,
+            or_(WmsPickLine.status != 'pending', WmsPickLine.picked_quantity > 0),
+        )
+        .limit(1)
+    )
+    if scanned is not None:
+        return False
+    inbound = (session.meta_data or {}).get('direction') == 'inbound'
+    await cancel_session_async(
+        db, RECEIVING if inbound else PICKING, session.id, org_id, user_id
+    )
+    return True
+
+
 async def get_session_async(
     db: AsyncSession,
     session_id: UUID,
