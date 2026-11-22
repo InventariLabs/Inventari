@@ -227,6 +227,10 @@ class AuditCampaign(Base):
 
     # Status: DRAFT | ACTIVE | COMPLETED | CANCELLED
     status: Mapped[str] = mapped_column(String(20), default='DRAFT')
+    # When the campaign was completed or cancelled. It dates the record: an
+    # asset returned up to this moment is part of what the campaign recorded,
+    # one returned afterwards is a later custody move.
+    closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     # Custom email content
     email_subject: Mapped[str | None] = mapped_column(String(255))
@@ -247,6 +251,20 @@ class AuditCampaign(Base):
     responses: Mapped[list['AuditResponse']] = relationship(
         back_populates='campaign', cascade='all, delete-orphan', lazy='selectin'
     )
+
+    def counts_return(self, checked_in_at: datetime | None) -> bool:
+        """Whether a return at ``checked_in_at`` belongs to this campaign's record.
+
+        On a live campaign every return does. A closed one keeps the record as
+        it was when it closed: a return before the close counts, one after it
+        does not. A closed campaign with no close time (closed before the time
+        was kept) counts none, so its record does not move.
+        """
+        if checked_in_at is None:
+            return False
+        if self.status == 'ACTIVE':
+            return True
+        return self.closed_at is not None and checked_in_at <= self.closed_at
 
 
 class AuditResponse(Base):
@@ -329,9 +347,19 @@ class AuditResponse(Base):
         Nothing is left to attest, whichever door the return came through
         (a check-in, a bulk return): the question is closed by the assets, not
         by the person, so it is read here rather than written by each of them.
+        A closed campaign counts only the returns made before it closed.
         """
         assignments = [item.assignment for item in self.items] or [self.assignment]
-        return all(a is not None and a.checked_in_at is not None for a in assignments)
+        campaign = self.campaign
+        return all(
+            a is not None
+            and (
+                a.checked_in_at is not None
+                if campaign is None
+                else campaign.counts_return(a.checked_in_at)
+            )
+            for a in assignments
+        )
 
     @property
     def serial_number(self) -> str | None:
@@ -393,16 +421,16 @@ class AuditResponseItem(Base):
 
     @property
     def returned(self) -> bool:
-        """The asset came back before it was answered, on a live campaign.
+        """The asset came back before it was answered.
 
         An answered item keeps its answer, and a closed campaign keeps the
-        record as it was when it closed: a return afterwards is a custody
-        move, not a change to who confirmed what.
+        record as it was when it closed: a return before the close counts, a
+        return afterwards is a custody move, not a change to who confirmed what.
         """
+        campaign = self.response.campaign
         return (
             self.status == 'PENDING'
-            and self.response.campaign is not None
-            and self.response.campaign.status == 'ACTIVE'
+            and campaign is not None
             and self.assignment is not None
-            and self.assignment.checked_in_at is not None
+            and campaign.counts_return(self.assignment.checked_in_at)
         )
