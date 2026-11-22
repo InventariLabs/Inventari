@@ -889,7 +889,6 @@ class ErrorMessages(TypedDict):
     storage_vanished_during_batch: str
     storage_archive_blocked_by_items: str
     storage_archive_target_is_self: str
-    storage_archive_target_is_descendant: str
     storage_archive_target_archived: str
     storage_restore_parent_archived: str
     storage_delete_blocked_by_references: str

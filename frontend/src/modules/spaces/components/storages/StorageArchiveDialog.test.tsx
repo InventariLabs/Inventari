@@ -115,14 +115,14 @@ describe("StorageArchiveDialog — sub-locations", () => {
 describe("StorageArchiveDialog — putaway rules warning", () => {
   it("names the count of active rules pointing at the location", async () => {
     mockSummary(0, 0);
-    // One active rule on the location itself, one on a descendant shelf
-    // (hidden together with it), one outside the subtree, one inactive —
-    // the last two do not count.
+    // Two active rules on the location itself count. One on a place inside
+    // (which stays active), one elsewhere and one inactive do not.
     mockPutawayRules([
       { id: "r1", is_active: true, target_location_id: "zone-1" },
-      { id: "r2", is_active: true, target_location_id: "loc-1" },
-      { id: "r3", is_active: true, target_location_id: "loc-9" },
-      { id: "r4", is_active: false, target_location_id: "zone-1" },
+      { id: "r2", is_active: true, target_location_id: "zone-1" },
+      { id: "r3", is_active: true, target_location_id: "loc-1" },
+      { id: "r4", is_active: true, target_location_id: "loc-9" },
+      { id: "r5", is_active: false, target_location_id: "zone-1" },
     ]);
     renderDialog();
 
@@ -131,33 +131,22 @@ describe("StorageArchiveDialog — putaway rules warning", () => {
     ).toBeInTheDocument();
   });
 
-  it("says nothing of the rules when the places inside could not be read", async () => {
+  it("says nothing of a rule that names only a place inside, which stays active", async () => {
     mockSummary(0, 0);
     mockPutawayRules([
-      { id: "r1", is_active: true, target_location_id: "zone-1" },
-      { id: "r2", is_active: true, target_location_id: "loc-1" },
+      { id: "r1", is_active: true, target_location_id: "loc-1" },
     ]);
     renderDialog();
-    const treeAsked = vi.fn();
-    server.use(
-      http.get("*/api/v1/locations/tree", () => {
-        treeAsked();
-        return HttpResponse.json({ detail: "down" }, { status: 500 });
-      }),
-    );
 
-    await waitFor(() => expect(treeAsked).toHaveBeenCalled());
     await waitFor(() => expect(confirmButton()).toBeEnabled());
-    // Let the rules arrive: counted without the places inside, they would
-    // read "1 putaway rule points here" and be wrong.
     await new Promise((resolve) => setTimeout(resolve, 100));
     expect(screen.queryByText(/putaway rule/)).not.toBeInTheDocument();
   });
 
   it("counts a rule that names the location second on its list, not first", async () => {
     mockSummary(0, 0);
-    // Both rules send goods into the subtree; neither leads with it. Counting
-    // by `target_location_id` — the head of the list — finds nothing here and
+    // Both rules send goods here; neither leads with it. Counting by
+    // `target_location_id` — the head of the list — finds nothing here and
     // the person archiving is told nothing stops pointing where it pointed.
     mockPutawayRules([
       {
@@ -175,7 +164,7 @@ describe("StorageArchiveDialog — putaway rules warning", () => {
         target_location_id: "loc-9",
         locations: [
           { location_id: "loc-9", position: 0 },
-          { location_id: "loc-1", position: 1 },
+          { location_id: "zone-1", position: 1 },
         ],
       },
     ]);
@@ -248,7 +237,7 @@ describe("StorageArchiveDialog", () => {
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
   });
 
-  it("excludes the archived node and its descendants from the targets", async () => {
+  it("excludes the archived node itself from the targets but offers the places inside it", async () => {
     mockSummary(3, 3);
     renderDialog();
     await userEvent.click(await screen.findByRole("combobox"));
@@ -256,8 +245,11 @@ describe("StorageArchiveDialog", () => {
     expect(
       await screen.findByRole("button", { name: /Shelf B/ }),
     ).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Fridge A/ })).toBeNull();
-    expect(screen.queryByRole("button", { name: /Cold Storage/ })).toBeNull();
+    // The places inside stay active, so one of them can take the stock.
+    expect(
+      screen.getByRole("button", { name: /Fridge A/ }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^Cold Storage/ })).toBeNull();
   });
 
   it("offers a place with places inside it, since records may live in any place", async () => {
