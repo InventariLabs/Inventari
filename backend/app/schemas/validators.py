@@ -61,8 +61,9 @@ def quantize_quantity(v: Any) -> Any:
     """
     if v is None:
         return v
+    number = Decimal(v)
     try:
-        return Decimal(v).quantize(QUANTITY_STEP, rounding=ROUND_HALF_UP)
+        return number.quantize(QUANTITY_STEP, rounding=ROUND_HALF_UP)
     except InvalidOperation:
         return v
 
