@@ -547,6 +547,11 @@ def transition_fields(tree: ast.AST) -> set[str]:
     return found
 
 
+Transitions = tuple[
+    set[str], dict[str, str], set[str], str, set[str], dict[str, set[str]]
+]
+
+
 def transition_literals(tree: ast.AST) -> set[str]:
     """``old_<f>:code`` / ``new_<f>:code`` for each string literal a writer puts
     under one side of a transition.
@@ -582,18 +587,158 @@ def transition_literals(tree: ast.AST) -> set[str]:
     return found
 
 
+def before_after_fields(tree: ast.AST) -> set[str]:
+    """The fields a journal line shows as a ``before``/``after`` pair: the
+    literal keys of the dict a writer hands under either name."""
+    found: set[str] = set()
+    for node in ast.walk(tree):
+        pairs: list[tuple[object, ast.AST]] = []
+        if isinstance(node, ast.keyword):
+            pairs.append((node.arg, node.value))
+        elif isinstance(node, ast.Dict):
+            pairs.extend(
+                (key.value if isinstance(key, ast.Constant) else None, value)
+                for key, value in zip(node.keys, node.values, strict=True)
+            )
+        for name, value in pairs:
+            if name in ('before', 'after') and isinstance(value, ast.Dict):
+                found.update(
+                    key.value
+                    for key in value.keys
+                    if isinstance(key, ast.Constant) and isinstance(key.value, str)
+                )
+    return found
+
+
+def _string_constants(node: ast.AST) -> set[str]:
+    """The string literals a node is, or a tuple/list/set of them holds."""
+    parts = node.elts if isinstance(node, ast.Tuple | ast.List | ast.Set) else [node]
+    return {
+        part.value
+        for part in parts
+        if isinstance(part, ast.Constant) and isinstance(part.value, str)
+    }
+
+
+def codes_spelled(tree: ast.AST) -> dict[str, set[str]]:
+    """The string codes a file spells for each field name: assigned to
+    ``x.<f>``, compared with it, passed as ``<f>=…`` or put under a dict key
+    ``<f>`` (``old_<f>``/``new_<f>`` count for ``<f>``)."""
+    found: dict[str, set[str]] = {}
+
+    def add(name: str | None, node: ast.AST) -> None:
+        if name:
+            field = name.removeprefix('old_').removeprefix('new_')
+            found.setdefault(field, set()).update(_string_constants(node))
+
+    def named(node: ast.AST) -> str | None:
+        if isinstance(node, ast.Attribute):
+            return node.attr
+        return node.id if isinstance(node, ast.Name) else None
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                add(named(target), node.value)
+        elif isinstance(node, ast.Compare):
+            for comparator in node.comparators:
+                add(named(node.left), comparator)
+        elif isinstance(node, ast.keyword):
+            add(node.arg, node.value)
+        elif isinstance(node, ast.Dict):
+            for key, value in zip(node.keys, node.values, strict=True):
+                if isinstance(key, ast.Constant) and isinstance(key.value, str):
+                    add(key.value, value)
+    return found
+
+
+def package_values(
+    field: str,
+    package: str,
+    anchor: set[str],
+    sources: dict[str, dict[str, FieldSource]],
+    sets,
+    resolve,
+) -> set[str]:
+    """The codes the classes beside a writer declare for ``field``.
+
+    A status column typed as a plain string declares no set, and a writer that
+    journals ``obj.status`` through a variable names no code; the set its own
+    package declares for the field (a ``Literal`` alias or enum on its
+    schemas) is the enumeration there is. A package may declare several sets
+    for one field name, so only the one the writer's file spells the most codes
+    of is the writer's own.
+    """
+    candidates: list[set[str]] = []
+    for qualified, fields in sources.items():
+        module = qualified.rpartition('.')[0]
+        if module.rpartition('.')[0] != package or field not in fields:
+            continue
+        declared = [set(fields[field]['literals'])] + [
+            sets.get(resolve(f'{module}.{local}'), set())
+            for local in fields[field]['names']
+        ]
+        candidates.extend(values for values in declared if values & anchor)
+    best = max((len(values & anchor) for values in candidates), default=0)
+    return set().union(*(v for v in candidates if len(v & anchor) == best))
+
+
+def declares_no_set(
+    field: str,
+    imports: dict[str, str],
+    sources: dict[str, dict[str, FieldSource]],
+    sets: dict[str, set[str]],
+    resolve,
+) -> bool:
+    """Whether the writer imports a class with ``field`` and none of those
+    classes names the values it can hold — the plain-string column."""
+    owners = [
+        qualified
+        for qualified in map(resolve, imports.values())
+        if field in sources.get(qualified, {})
+    ]
+    for qualified in owners:
+        source = sources[qualified][field]
+        module = qualified.rpartition('.')[0]
+        if source['literals'] or any(
+            sets.get(resolve(f'{module}.{local}')) for local in source['names']
+        ):
+            return False
+    return bool(owners)
+
+
 def transition_values(
-    transitions: list[tuple[set[str], dict[str, str], set[str]]],
+    transitions: list[Transitions],
     sources: dict[str, dict[str, FieldSource]],
     sets: dict[str, set[str]],
     resolve,
 ) -> set[str]:
-    """``old_<f>:value`` and ``new_<f>:value`` for the values of field ``f`` on
-    the classes the writer's file imports — the model whose column it moves,
-    and the literals the writer itself puts under either side."""
+    """``old_<f>:value``, ``new_<f>:value`` and ``<f>:value`` for the values of
+    field ``f``: those of the classes the writer's file imports (the model
+    whose column it moves), the set its own package declares for the field, and
+    the literals the writer itself puts under either side."""
     found: set[str] = set()
-    for fields, imports, literals in transitions:
+    for fields, imports, literals, package, shown, spelled in transitions:
         found.update(literals)
+        for field in shown:
+            if declares_no_set(field, imports, sources, sets, resolve):
+                found.update(
+                    f'{field}:{value}'
+                    for value in package_values(
+                        field,
+                        package,
+                        spelled.get(field, set()),
+                        sources,
+                        sets,
+                        resolve,
+                    )
+                )
+        for field in fields:
+            if declares_no_set(field, imports, sources, sets, resolve):
+                for value in package_values(
+                    field, package, spelled.get(field, set()), sources, sets, resolve
+                ):
+                    found.update({f'old_{field}:{value}', f'new_{field}:{value}'})
         for qualified in map(resolve, imports.values()):
             module = qualified.rpartition('.')[0]
             for field in fields:
@@ -651,7 +796,7 @@ def collect_keys(root: Path) -> CollectedKeys:
     value_declarations: list[tuple[str, str]] = []
     declarations: list[tuple[str, str]] = []
     funnel_files: list[str] = []
-    transitions: list[tuple[set[str], dict[str, str], set[str]]] = []
+    transitions: list[Transitions] = []
     aliases: dict[str, str] = {}
     files = 0
     for path in sorted(root.rglob('*.py')):
@@ -688,7 +833,14 @@ def collect_keys(root: Path) -> CollectedKeys:
         declarations.extend(file_declarations)
         value_declarations.extend(file_declarations if writes_values(tree) else [])
         transitions.append(
-            (transition_fields(tree), file_imports, transition_literals(tree))
+            (
+                transition_fields(tree),
+                file_imports,
+                transition_literals(tree),
+                package,
+                before_after_fields(tree),
+                codes_spelled(tree),
+            )
         )
         if dynamic_funnel_keys:
             funnel_files.append((module, file_declarations))

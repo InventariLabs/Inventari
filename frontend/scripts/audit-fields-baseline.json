@@ -44,6 +44,26 @@
     },
     {
       "language": "en",
+      "key": "new_status_pending",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "new_status_received",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "new_status_short",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "new_status_skipped",
+      "section": "values"
+    },
+    {
+      "language": "en",
       "key": "old_status_cancelled",
       "section": "values"
     },
@@ -63,6 +83,26 @@
       "section": "values"
     },
     {
+      "language": "en",
+      "key": "old_status_pending",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "old_status_received",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "old_status_short",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "old_status_skipped",
+      "section": "values"
+    },
+    {
       "language": "pl",
       "key": "FEFO",
       "section": "values"
@@ -104,6 +144,26 @@
     },
     {
       "language": "pl",
+      "key": "new_status_pending",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "new_status_received",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "new_status_short",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "new_status_skipped",
+      "section": "values"
+    },
+    {
+      "language": "pl",
       "key": "old_status_cancelled",
       "section": "values"
     },
@@ -123,6 +183,26 @@
       "section": "values"
     },
     {
+      "language": "pl",
+      "key": "old_status_pending",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "old_status_received",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "old_status_short",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "old_status_skipped",
+      "section": "values"
+    },
+    {
       "language": "de",
       "key": "FEFO",
       "section": "values"
@@ -164,6 +244,26 @@
     },
     {
       "language": "de",
+      "key": "new_status_pending",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "new_status_received",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "new_status_short",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "new_status_skipped",
+      "section": "values"
+    },
+    {
+      "language": "de",
       "key": "old_status_cancelled",
       "section": "values"
     },
@@ -180,6 +280,26 @@
     {
       "language": "de",
       "key": "old_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "old_status_pending",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "old_status_received",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "old_status_short",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "old_status_skipped",
       "section": "values"
     },
     {
@@ -224,6 +344,26 @@
     },
     {
       "language": "fr",
+      "key": "new_status_pending",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "new_status_received",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "new_status_short",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "new_status_skipped",
+      "section": "values"
+    },
+    {
+      "language": "fr",
       "key": "old_status_cancelled",
       "section": "values"
     },
@@ -240,6 +380,26 @@
     {
       "language": "fr",
       "key": "old_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "old_status_pending",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "old_status_received",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "old_status_short",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "old_status_skipped",
       "section": "values"
     },
     {
@@ -284,6 +444,26 @@
     },
     {
       "language": "es",
+      "key": "new_status_pending",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "new_status_received",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "new_status_short",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "new_status_skipped",
+      "section": "values"
+    },
+    {
+      "language": "es",
       "key": "old_status_cancelled",
       "section": "values"
     },
@@ -300,6 +480,26 @@
     {
       "language": "es",
       "key": "old_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "old_status_pending",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "old_status_received",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "old_status_short",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "old_status_skipped",
       "section": "values"
     },
     {
@@ -344,6 +544,26 @@
     },
     {
       "language": "pt",
+      "key": "new_status_pending",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "new_status_received",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "new_status_short",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "new_status_skipped",
+      "section": "values"
+    },
+    {
+      "language": "pt",
       "key": "old_status_cancelled",
       "section": "values"
     },
@@ -360,6 +580,26 @@
     {
       "language": "pt",
       "key": "old_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "old_status_pending",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "old_status_received",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "old_status_short",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "old_status_skipped",
       "section": "values"
     }
   ]

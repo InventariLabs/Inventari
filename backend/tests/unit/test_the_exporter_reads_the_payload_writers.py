@@ -644,3 +644,53 @@ def test_a_literal_written_under_a_transition_pair_is_a_value_the_journal_shows(
     payload = collect_keys(root)
 
     assert payload['values'] == ['new_status:ARCHIVED', 'old_status:DRAFT']
+
+
+def test_a_code_in_the_status_set_of_the_writers_package_is_a_value_it_can_journal(
+    collect_keys, tmp_path: Path
+) -> None:
+    """A writer that journals the status a column holds through a variable
+    names no code itself; the field's set is the one its own package declares
+    for it, so a code added there is enumerated for both shapes of snapshot
+    (``old_``/``new_`` and ``before``/``after``). A set in another package, a
+    set of the same package the writer spells no code of, and a field the
+    writer does not journal as a value, add nothing."""
+    root = _write_app(
+        tmp_path,
+        {
+            'modules/shop/_schemas.py': (
+                'ShopStatus = Literal["DRAFT", "ACTIVE", "ARCHIVED"]\n'
+                '\n'
+                'class ShopOut(BaseModel):\n'
+                '    status: ShopStatus\n'
+                '    label: Literal["not-journalled"]\n'
+            ),
+            'modules/shop/models.py': ('class Shop(Base):\n    status: Mapped[str]\n'),
+            'modules/shop/_gauge.py': (
+                'class GaugeOut(BaseModel):\n    status: Literal["ok", "over"]\n'
+            ),
+            'modules/shop/_writes.py': (
+                'from app.modules.shop.models import Shop\n'
+                '\n'
+                'snapshot = {"old_status": "DRAFT", "new_status": shop.status}\n'
+                'act(before={"status": previous}, after={"status": shop.status})\n'
+            ),
+            'modules/other/_schemas.py': (
+                'class OtherOut(BaseModel):\n    status: Literal["ELSEWHERE"]\n'
+            ),
+        },
+    )
+
+    payload = collect_keys(root)
+
+    assert payload['values'] == [
+        'new_status:ACTIVE',
+        'new_status:ARCHIVED',
+        'new_status:DRAFT',
+        'old_status:ACTIVE',
+        'old_status:ARCHIVED',
+        'old_status:DRAFT',
+        'status:ACTIVE',
+        'status:ARCHIVED',
+        'status:DRAFT',
+    ]
