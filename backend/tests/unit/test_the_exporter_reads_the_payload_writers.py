@@ -694,3 +694,63 @@ def test_a_code_in_the_status_set_of_the_writers_package_is_a_value_it_can_journ
         'status:ARCHIVED',
         'status:DRAFT',
     ]
+
+
+def test_a_code_in_a_status_set_the_writer_imports_is_a_value_it_can_journal(
+    collect_keys, tmp_path: Path
+) -> None:
+    """A writer that journals a status through a variable gets the set from its
+    own application module: the enum named for the model it imports, or else
+    the key set of the transition table / collection it checks against. A set
+    named for another model, a lone sentinel constant, an enum of the core
+    contracts and the set of another module add nothing, whatever codes the
+    writer's file spells."""
+    root = _write_app(
+        tmp_path,
+        {
+            'modules/shop/models.py': (
+                'class DocStatus(StrEnum):\n'
+                '    DRAFT = "DRAFT"\n'
+                '    ARCHIVED = "ARCHIVED"\n'
+                '\n'
+                'class DocLineStatus(StrEnum):\n'
+                '    LINE_OPEN = "LINE_OPEN"\n'
+                '\n'
+                'class Doc(Base):\n'
+                '    status: Mapped[str]\n'
+            ),
+            'modules/shop/_writes.py': (
+                'from .models import Doc\n'
+                '\n'
+                'doc.status = "pending"\n'
+                'snapshot = {"old_status": old, "new_status": doc.status}\n'
+            ),
+            'modules/gear/_machine.py': (
+                '_MOVES = {"AVAILABLE": {"GONE"}, "GONE": {"AVAILABLE"}}\n'
+                'VALID_STATUSES = set(_MOVES.keys())\n'
+                'UNKNOWN_STATUS = "UNKNOWN"\n'
+                'def previous(value): return value\n'
+            ),
+            'modules/gear/_writes.py': (
+                'from ._machine import previous\n'
+                'from app.core.contracts import LotStatus\n'
+                '\n'
+                'snapshot = {"old_status": previous(x), "new_status": item.status}\n'
+            ),
+            'core/contracts.py': 'class LotStatus(StrEnum):\n    HELD = "held"\n    OK = "ok"\n',
+            'modules/other/_status.py': 'OTHER_STATUSES = {"ELSEWHERE", "NOWHERE"}\n',
+        },
+    )
+
+    payload = collect_keys(root)
+
+    assert payload['values'] == [
+        'new_status:ARCHIVED',
+        'new_status:AVAILABLE',
+        'new_status:DRAFT',
+        'new_status:GONE',
+        'old_status:ARCHIVED',
+        'old_status:AVAILABLE',
+        'old_status:DRAFT',
+        'old_status:GONE',
+    ]

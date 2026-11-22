@@ -4,12 +4,27 @@
   "gaps": [
     {
       "language": "en",
+      "key": "DONE",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "EXCEPTION",
+      "section": "values"
+    },
+    {
+      "language": "en",
       "key": "FEFO",
       "section": "values"
     },
     {
       "language": "en",
       "key": "FIFO",
+      "section": "values"
+    },
+    {
+      "language": "en",
+      "key": "PARTIAL",
       "section": "values"
     },
     {
@@ -44,26 +59,6 @@
     },
     {
       "language": "en",
-      "key": "new_status_pending",
-      "section": "values"
-    },
-    {
-      "language": "en",
-      "key": "new_status_received",
-      "section": "values"
-    },
-    {
-      "language": "en",
-      "key": "new_status_short",
-      "section": "values"
-    },
-    {
-      "language": "en",
-      "key": "new_status_skipped",
-      "section": "values"
-    },
-    {
-      "language": "en",
       "key": "old_status_cancelled",
       "section": "values"
     },
@@ -83,23 +78,13 @@
       "section": "values"
     },
     {
-      "language": "en",
-      "key": "old_status_pending",
+      "language": "pl",
+      "key": "DONE",
       "section": "values"
     },
     {
-      "language": "en",
-      "key": "old_status_received",
-      "section": "values"
-    },
-    {
-      "language": "en",
-      "key": "old_status_short",
-      "section": "values"
-    },
-    {
-      "language": "en",
-      "key": "old_status_skipped",
+      "language": "pl",
+      "key": "EXCEPTION",
       "section": "values"
     },
     {
@@ -110,6 +95,11 @@
     {
       "language": "pl",
       "key": "FIFO",
+      "section": "values"
+    },
+    {
+      "language": "pl",
+      "key": "PARTIAL",
       "section": "values"
     },
     {
@@ -144,26 +134,6 @@
     },
     {
       "language": "pl",
-      "key": "new_status_pending",
-      "section": "values"
-    },
-    {
-      "language": "pl",
-      "key": "new_status_received",
-      "section": "values"
-    },
-    {
-      "language": "pl",
-      "key": "new_status_short",
-      "section": "values"
-    },
-    {
-      "language": "pl",
-      "key": "new_status_skipped",
-      "section": "values"
-    },
-    {
-      "language": "pl",
       "key": "old_status_cancelled",
       "section": "values"
     },
@@ -183,23 +153,13 @@
       "section": "values"
     },
     {
-      "language": "pl",
-      "key": "old_status_pending",
+      "language": "de",
+      "key": "DONE",
       "section": "values"
     },
     {
-      "language": "pl",
-      "key": "old_status_received",
-      "section": "values"
-    },
-    {
-      "language": "pl",
-      "key": "old_status_short",
-      "section": "values"
-    },
-    {
-      "language": "pl",
-      "key": "old_status_skipped",
+      "language": "de",
+      "key": "EXCEPTION",
       "section": "values"
     },
     {
@@ -210,6 +170,11 @@
     {
       "language": "de",
       "key": "FIFO",
+      "section": "values"
+    },
+    {
+      "language": "de",
+      "key": "PARTIAL",
       "section": "values"
     },
     {
@@ -244,26 +209,6 @@
     },
     {
       "language": "de",
-      "key": "new_status_pending",
-      "section": "values"
-    },
-    {
-      "language": "de",
-      "key": "new_status_received",
-      "section": "values"
-    },
-    {
-      "language": "de",
-      "key": "new_status_short",
-      "section": "values"
-    },
-    {
-      "language": "de",
-      "key": "new_status_skipped",
-      "section": "values"
-    },
-    {
-      "language": "de",
       "key": "old_status_cancelled",
       "section": "values"
     },
@@ -283,23 +228,13 @@
       "section": "values"
     },
     {
-      "language": "de",
-      "key": "old_status_pending",
+      "language": "fr",
+      "key": "DONE",
       "section": "values"
     },
     {
-      "language": "de",
-      "key": "old_status_received",
-      "section": "values"
-    },
-    {
-      "language": "de",
-      "key": "old_status_short",
-      "section": "values"
-    },
-    {
-      "language": "de",
-      "key": "old_status_skipped",
+      "language": "fr",
+      "key": "EXCEPTION",
       "section": "values"
     },
     {
@@ -310,6 +245,11 @@
     {
       "language": "fr",
       "key": "FIFO",
+      "section": "values"
+    },
+    {
+      "language": "fr",
+      "key": "PARTIAL",
       "section": "values"
     },
     {
@@ -344,26 +284,6 @@
     },
     {
       "language": "fr",
-      "key": "new_status_pending",
-      "section": "values"
-    },
-    {
-      "language": "fr",
-      "key": "new_status_received",
-      "section": "values"
-    },
-    {
-      "language": "fr",
-      "key": "new_status_short",
-      "section": "values"
-    },
-    {
-      "language": "fr",
-      "key": "new_status_skipped",
-      "section": "values"
-    },
-    {
-      "language": "fr",
       "key": "old_status_cancelled",
       "section": "values"
     },
@@ -383,23 +303,13 @@
       "section": "values"
     },
     {
-      "language": "fr",
-      "key": "old_status_pending",
+      "language": "es",
+      "key": "DONE",
       "section": "values"
     },
     {
-      "language": "fr",
-      "key": "old_status_received",
-      "section": "values"
-    },
-    {
-      "language": "fr",
-      "key": "old_status_short",
-      "section": "values"
-    },
-    {
-      "language": "fr",
-      "key": "old_status_skipped",
+      "language": "es",
+      "key": "EXCEPTION",
       "section": "values"
     },
     {
@@ -410,6 +320,11 @@
     {
       "language": "es",
       "key": "FIFO",
+      "section": "values"
+    },
+    {
+      "language": "es",
+      "key": "PARTIAL",
       "section": "values"
     },
     {
@@ -444,26 +359,6 @@
     },
     {
       "language": "es",
-      "key": "new_status_pending",
-      "section": "values"
-    },
-    {
-      "language": "es",
-      "key": "new_status_received",
-      "section": "values"
-    },
-    {
-      "language": "es",
-      "key": "new_status_short",
-      "section": "values"
-    },
-    {
-      "language": "es",
-      "key": "new_status_skipped",
-      "section": "values"
-    },
-    {
-      "language": "es",
       "key": "old_status_cancelled",
       "section": "values"
     },
@@ -483,23 +378,13 @@
       "section": "values"
     },
     {
-      "language": "es",
-      "key": "old_status_pending",
+      "language": "pt",
+      "key": "DONE",
       "section": "values"
     },
     {
-      "language": "es",
-      "key": "old_status_received",
-      "section": "values"
-    },
-    {
-      "language": "es",
-      "key": "old_status_short",
-      "section": "values"
-    },
-    {
-      "language": "es",
-      "key": "old_status_skipped",
+      "language": "pt",
+      "key": "EXCEPTION",
       "section": "values"
     },
     {
@@ -510,6 +395,11 @@
     {
       "language": "pt",
       "key": "FIFO",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "PARTIAL",
       "section": "values"
     },
     {
@@ -544,26 +434,6 @@
     },
     {
       "language": "pt",
-      "key": "new_status_pending",
-      "section": "values"
-    },
-    {
-      "language": "pt",
-      "key": "new_status_received",
-      "section": "values"
-    },
-    {
-      "language": "pt",
-      "key": "new_status_short",
-      "section": "values"
-    },
-    {
-      "language": "pt",
-      "key": "new_status_skipped",
-      "section": "values"
-    },
-    {
-      "language": "pt",
       "key": "old_status_cancelled",
       "section": "values"
     },
@@ -580,26 +450,6 @@
     {
       "language": "pt",
       "key": "old_status_in_progress",
-      "section": "values"
-    },
-    {
-      "language": "pt",
-      "key": "old_status_pending",
-      "section": "values"
-    },
-    {
-      "language": "pt",
-      "key": "old_status_received",
-      "section": "values"
-    },
-    {
-      "language": "pt",
-      "key": "old_status_short",
-      "section": "values"
-    },
-    {
-      "language": "pt",
-      "key": "old_status_skipped",
       "section": "values"
     }
   ]

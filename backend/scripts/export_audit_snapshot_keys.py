@@ -384,7 +384,51 @@ def value_sets(tree: ast.AST, module: str) -> dict[str, set[str]]:
             target, value = node.name, node.value
         if isinstance(target, ast.Name) and (strings := _strings(value)):
             found[f'{module}.{target.id}'] = strings
+    for node in getattr(tree, 'body', []):
+        if (
+            isinstance(node, ast.Assign)
+            and len(node.targets) == 1
+            and isinstance(node.targets[0], ast.Name)
+            and (keys := _dict_keys_of(node.value, tree))
+        ):
+            found[f'{module}.{node.targets[0].id}'] = keys
     return found
+
+
+def _dict_keys_of(node: ast.AST, tree: ast.AST) -> set[str] | None:
+    """The string keys of the module-level dict a ``set(D)``, ``set(D.keys())``
+    or ``frozenset(D)`` names — the status set a transition table implies."""
+    if not (
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id in ('set', 'frozenset')
+        and len(node.args) == 1
+    ):
+        return None
+    arg = node.args[0]
+    if (
+        isinstance(arg, ast.Call)
+        and isinstance(arg.func, ast.Attribute)
+        and arg.func.attr == 'keys'
+    ):
+        arg = arg.func.value
+    if not isinstance(arg, ast.Name):
+        return None
+    for statement in getattr(tree, 'body', []):
+        target = value = None
+        if isinstance(statement, ast.Assign) and len(statement.targets) == 1:
+            target, value = statement.targets[0], statement.value
+        elif isinstance(statement, ast.AnnAssign):
+            target, value = statement.target, statement.value
+        if isinstance(target, ast.Name) and target.id == arg.id:
+            if isinstance(value, ast.Dict):
+                keys = {
+                    key.value
+                    for key in value.keys
+                    if isinstance(key, ast.Constant) and isinstance(key.value, str)
+                }
+                return keys or None
+    return None
 
 
 class FieldSource(TypedDict):
@@ -683,6 +727,48 @@ def package_values(
     return set().union(*(v for v in candidates if len(v & anchor) == best))
 
 
+def module_values(
+    field: str,
+    package: str,
+    imports: dict[str, str],
+    sets: dict[str, set[str]],
+    resolve,
+) -> set[str]:
+    """The codes of the status set a writer's own application module declares
+    for the classes and names it imports.
+
+    A writer journals ``doc.status`` through a variable; the set of the
+    ``Document`` it imports is the enum named for it (``DocumentStatus``) in
+    the module that declares the class. Failing that, a collection named for
+    a status (``VALID_STATUSES``, ``OPEN_STATUSES``) in a module it imports
+    from. Only a status field is read this way, only inside the writer's own
+    application module, and a lone constant (a sentinel) is no set.
+    """
+    if field != 'status' and not field.endswith('_status'):
+        return set()
+    own = '.'.join(package.split('.')[:3])
+    imported = {
+        qualified
+        for qualified in map(resolve, imports.values())
+        if qualified.rpartition('.')[0] == own
+        or qualified.rpartition('.')[0].startswith(f'{own}.')
+    }
+    named = {f'{qualified}Status' for qualified in imported}
+    found = set().union(*(sets.get(name, set()) for name in named))
+    if found:
+        return found
+    modules = {qualified.rpartition('.')[0] for qualified in imported}
+    for qualified, values in sets.items():
+        module, _, local = qualified.rpartition('.')
+        if (
+            module in modules
+            and local.lower().endswith(('status', 'statuses'))
+            and len(values) > 1
+        ):
+            found.update(values)
+    return found
+
+
 def declares_no_set(
     field: str,
     imports: dict[str, str],
@@ -707,6 +793,27 @@ def declares_no_set(
     return bool(owners)
 
 
+def declared_values(
+    field: str,
+    imports: dict[str, str],
+    package: str,
+    spelled: dict[str, set[str]],
+    sources: dict[str, dict[str, FieldSource]],
+    sets: dict[str, set[str]],
+    resolve,
+) -> set[str]:
+    """The set a writer's journalled ``field`` can hold: the one declared in
+    the modules it imports from; failing that, for a plain-string column, the
+    one its own package's schemas declare."""
+    if values := module_values(field, package, imports, sets, resolve):
+        return values
+    if declares_no_set(field, imports, sources, sets, resolve):
+        return package_values(
+            field, package, spelled.get(field, set()), sources, sets, resolve
+        )
+    return set()
+
+
 def transition_values(
     transitions: list[Transitions],
     sources: dict[str, dict[str, FieldSource]],
@@ -721,24 +828,17 @@ def transition_values(
     for fields, imports, literals, package, shown, spelled in transitions:
         found.update(literals)
         for field in shown:
-            if declares_no_set(field, imports, sources, sets, resolve):
-                found.update(
-                    f'{field}:{value}'
-                    for value in package_values(
-                        field,
-                        package,
-                        spelled.get(field, set()),
-                        sources,
-                        sets,
-                        resolve,
-                    )
+            found.update(
+                f'{field}:{value}'
+                for value in declared_values(
+                    field, imports, package, spelled, sources, sets, resolve
                 )
+            )
         for field in fields:
-            if declares_no_set(field, imports, sources, sets, resolve):
-                for value in package_values(
-                    field, package, spelled.get(field, set()), sources, sets, resolve
-                ):
-                    found.update({f'old_{field}:{value}', f'new_{field}:{value}'})
+            for value in declared_values(
+                field, imports, package, spelled, sources, sets, resolve
+            ):
+                found.update({f'old_{field}:{value}', f'new_{field}:{value}'})
         for qualified in map(resolve, imports.values()):
             module = qualified.rpartition('.')[0]
             for field in fields:
