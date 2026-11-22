@@ -1,8 +1,8 @@
 /**
  * The language menu offers every language the app ships as an equal: each
- * arrives with its own name and nothing else. A community translation used to
- * carry a mark and the share of the interface it held; no language is one
- * today, and Portuguese is maintained like the other five.
+ * arrives with its own name and nothing else. A language the community class
+ * marks carries the share of the interface it holds; none does, so Portuguese
+ * stands beside the other five with no mark and no percentage.
  */
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
