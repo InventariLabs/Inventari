@@ -227,7 +227,7 @@ function OverflowMenu({
       });
       downloadBlob(blob, `recipe-${recipe.id}.json`);
     } catch (error) {
-      toast.error(extractApiError(error, t("recipes:errors.save_failed")));
+      toast.error(extractApiError(error, t("recipes:errors.export_failed")));
     }
   };
 
@@ -243,7 +243,7 @@ function OverflowMenu({
       );
       if (copied) toast.success(t("recipes:import_export.export_copied"));
     } catch (error) {
-      toast.error(extractApiError(error, t("recipes:errors.save_failed")));
+      toast.error(extractApiError(error, t("recipes:errors.export_failed")));
     }
   };
 

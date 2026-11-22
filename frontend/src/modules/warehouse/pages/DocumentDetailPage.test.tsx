@@ -526,6 +526,32 @@ describe("DocumentDetailPage", () => {
     expect(props.data.approval).toEqual(documentRequest);
   });
 
+  it("shows the failed approval read with a retry, not a card that offers a request", async () => {
+    // A failed read is not "there is no request": the card would offer Request
+    // Approval over a document that is already waiting.
+    const refetch = vi.fn();
+    vi.mocked(documentApprovalHooks.useDocumentApproval).mockReturnValue({
+      data: undefined,
+      isError: true,
+      error: new Error("Request failed with status code 500"),
+      refetch,
+    } as unknown as ReturnType<
+      typeof documentApprovalHooks.useDocumentApproval
+    >);
+    vi.mocked(documentHooks.useDocument).mockReturnValue({
+      data: buildDocument({ status: "PENDING_APPROVAL" }),
+      isLoading: false,
+    } as unknown as ReturnType<typeof documentHooks.useDocument>);
+
+    await renderWithRoute();
+
+    expect(
+      screen.queryByTestId("slot-approval_status_badge"),
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /try again/i }));
+    expect(refetch).toHaveBeenCalledTimes(1);
+  });
+
   it("keeps the rejection off a document reworked and confirmed again", async () => {
     // The rejection left a draft; the reader edited it, brought the value
     // under the threshold and confirmed again — no approval was needed, so

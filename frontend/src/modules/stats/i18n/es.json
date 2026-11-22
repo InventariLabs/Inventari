@@ -147,8 +147,8 @@
   },
   "reconciliation": {
     "title": "Conciliación de existencias",
-    "subtitle_one": "Medido al abrir esta pantalla, sobre {{count}} registro de producto.",
-    "subtitle_other": "Medido al abrir esta pantalla, sobre {{count}} registros de producto.",
+    "subtitle_one": "Medido al abrir esta pantalla, sobre {{count}} registro. Aquí cuenta cada registro, incluidos los de módulos como el equipamiento; el Resumen solo cuenta registros de producto.",
+    "subtitle_other": "Medido al abrir esta pantalla, sobre {{count}} registros. Aquí cuenta cada registro, incluidos los de módulos como el equipamiento; el Resumen solo cuenta registros de producto.",
     "tableCaption": "Las dos comparaciones de pares y lo que encontró cada una",
     "expectedGap": "Una diferencia estable aquí es por diseño; la que preocupa es la que crece.",
     "columns": {

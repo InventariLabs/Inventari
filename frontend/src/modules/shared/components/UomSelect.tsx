@@ -69,6 +69,8 @@ const RARE_ORDER = [
   "oz",
   "lb",
   "cup",
+  "tbsp",
+  "tsp",
   "fl oz",
   "pt",
   "qt",
@@ -411,6 +413,7 @@ export const UomSelect: React.FC<UomSelectProps> = ({
         <PopoverPrimitive.Trigger asChild>{trigger}</PopoverPrimitive.Trigger>
         <PopoverPrimitive.Portal>
           <PopoverPrimitive.Content
+            aria-label={t("items:itemUnit", { defaultValue: "Unit" })}
             className="z-[var(--z-popover)] w-72 max-w-[calc(100vw-2rem)] bg-surface-card rounded-2xl border border-border shadow-xl animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-80 overflow-hidden"
             sideOffset={4}
           >

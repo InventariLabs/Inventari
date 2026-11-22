@@ -4,7 +4,7 @@ Food & Home seed profile.
 Contains:
   - Food-oriented storage types: FREEZER, FRIDGE, PANTRY, MEDICINE_CABINET
   - Food product categories (frozen, fridge, pantry) with context_tag set
-  - US kitchen units of measure (cup, pint, quart, gallon, fluid ounce)
+  - US kitchen units of measure (cup, tablespoon, teaspoon, pint, quart, gallon, fluid ounce)
   - One universal "Other" category
 
 This profile should be applied when the user selects the "Food & Home"
@@ -35,7 +35,7 @@ def seed_food_home(
        ``organization_id`` owns the seeded categories and storage types alike —
     a profile is chosen by one tenant. Units of measure stay
        installation-wide; they have no owner column. The US kitchen measures
-    (cup, pint, quart, gallon, fluid ounce) come in here, not with the
+    (cup, tablespoon, teaspoon, pint, quart, gallon, fluid ounce) come in here, not with the
     neutral base — a workspace in the neutral mode has no use for them.
     """
     seed_base_all(

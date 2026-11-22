@@ -51,6 +51,7 @@ from .schemas import (
     MealPlanEntryUpdate,
     MealPlanSchema,
     MealPlanUpdate,
+    RecipePlannedMeal,
 )
 
 # ── CRUD ───────────────────────────────────────────────────────────────────────
@@ -100,6 +101,32 @@ async def get_meal_plan_async(
     if plan is None:
         return None
     return await _plan_to_schema_async(plan, db, org_id)
+
+
+async def list_recipe_planned_meals_async(
+    db: AsyncSession, recipe_id: UUID, org_id: UUID
+) -> list[RecipePlannedMeal]:
+    """The meals of this organization's plans that hold *recipe_id*, in time order.
+
+    Deleting a recipe removes these entries with it; the delete confirmation
+    names them.
+    """
+    rows = (
+        await db.execute(
+            select(MealPlan.id, MealPlan.name, MealPlanEntry.date, MealPlanEntry.slot)
+            .join(MealPlanEntry, MealPlanEntry.meal_plan_id == MealPlan.id)
+            .where(
+                MealPlanEntry.recipe_id == recipe_id,
+                MealPlan.organization_id == org_id,
+            )
+        )
+    ).all()
+    slot_order = {slot: n for n, slot in enumerate(MealSlot)}
+    rows = sorted(rows, key=lambda r: (r.date, slot_order[r.slot], r.name or ''))
+    return [
+        RecipePlannedMeal(plan_id=r.id, plan_name=r.name, date=r.date, slot=r.slot)
+        for r in rows
+    ]
 
 
 def _plans_in_window(

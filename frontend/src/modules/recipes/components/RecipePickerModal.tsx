@@ -53,6 +53,8 @@ export function RecipePickerModal({
     data: suggestions = [],
     isLoading: loadingSuggestions,
     isError: suggestionsFailed,
+    error: suggestionsError,
+    refetch: refetchSuggestions,
   } = useMealPlanSuggestions({
     date,
     slot,
@@ -135,6 +137,14 @@ export function RecipePickerModal({
               <SuggestedRecipes
                 suggestions={suggestions}
                 isLoading={loadingSuggestions}
+                failure={
+                  suggestionsFailed
+                    ? {
+                        error: suggestionsError,
+                        onRetry: () => void refetchSuggestions(),
+                      }
+                    : undefined
+                }
                 onSelect={handleSuggestionSelect}
                 t={t}
               />

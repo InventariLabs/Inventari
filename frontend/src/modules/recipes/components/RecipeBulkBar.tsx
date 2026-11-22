@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CheckSquare, FolderPlus, Tag, X } from "lucide-react";
 import type { TFunction } from "i18next";
 import { Button } from "@/components/ui/Button";
+import { extractApiError } from "@/lib/errors";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/Input";
 import {
@@ -21,7 +22,8 @@ interface RecipeBulkBarProps {
   isBusy: boolean;
   collections: RecipeCollection[];
   onSelectAll: () => void;
-  onTag: (tags: string[]) => void;
+  /** Rejects with the refusal; the tag sheet then stays open with it shown. */
+  onTag: (tags: string[]) => Promise<void>;
   onDelete: () => void;
   onAddToCollection: (collectionId: string) => Promise<void>;
   onClear: () => void;
@@ -51,6 +53,7 @@ export function RecipeBulkBar({
 }: RecipeBulkBarProps) {
   const [tagModalOpen, setTagModalOpen] = useState(false);
   const [tagInput, setTagInput] = useState("");
+  const [tagError, setTagError] = useState<string | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [collectionPickerOpen, setCollectionPickerOpen] = useState(false);
   const [pickedCollectionId, setPickedCollectionId] = useState<string | null>(
@@ -59,15 +62,26 @@ export function RecipeBulkBar({
 
   if (!open) return null;
 
-  const applyTags = () => {
+  const closeTagModal = () => {
+    setTagModalOpen(false);
+    setTagError(null);
+  };
+
+  const applyTags = async () => {
     const tags = tagInput
       .split(",")
       .map((tag) => tag.trim().toLowerCase())
       .filter(Boolean);
     if (tags.length === 0) return;
-    onTag(tags);
+    setTagError(null);
+    try {
+      await onTag(tags);
+    } catch (error) {
+      setTagError(extractApiError(error, t("recipes:bulk.error")));
+      return;
+    }
     setTagInput("");
-    setTagModalOpen(false);
+    closeTagModal();
   };
 
   const applyAddToCollection = async () => {
@@ -221,7 +235,7 @@ export function RecipeBulkBar({
       {tagModalOpen && (
         <Sheet
           open
-          onClose={() => setTagModalOpen(false)}
+          onClose={closeTagModal}
           zIndex="confirm"
           maxWidth="md"
           aria-label={t("recipes:bulk.tag_title", { count: selectedCount })}
@@ -236,22 +250,36 @@ export function RecipeBulkBar({
             <Input
               aria-label={t("recipes:bulk.tag_placeholder")}
               value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
+              onChange={(e) => {
+                setTagInput(e.target.value);
+                setTagError(null);
+              }}
               placeholder={t("recipes:bulk.tag_placeholder")}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
-                  applyTags();
+                  void applyTags();
                 }
               }}
             />
+            {tagError && (
+              <p
+                role="alert"
+                className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-sm text-on-danger"
+              >
+                {tagError}
+              </p>
+            )}
           </SheetBody>
           <SheetFooter>
             <SheetActions>
-              <Button variant="outline" onClick={() => setTagModalOpen(false)}>
+              <Button variant="outline" onClick={closeTagModal}>
                 {t("common:form.cancel")}
               </Button>
-              <Button onClick={applyTags} disabled={isBusy || !tagInput.trim()}>
+              <Button
+                onClick={() => void applyTags()}
+                disabled={isBusy || !tagInput.trim()}
+              >
                 {t("recipes:bulk.apply")}
               </Button>
             </SheetActions>

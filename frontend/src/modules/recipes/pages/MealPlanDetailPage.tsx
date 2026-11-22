@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useCanWrite } from "@/hooks/useCanWrite";
+import { useModules } from "@/contexts/ModulesContext";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { invalidation } from "@/lib/api/invalidation";
 import {
@@ -90,6 +91,10 @@ function CopyPlanButton({
   onCopy: () => void;
   t: (key: string) => string;
 }) {
+  // The hint names only what the screen offers: no Generate without the
+  // shopping lists module.
+  const { isModuleEnabled } = useModules();
+  const offersShoppingList = isModuleEnabled("shopping_lists");
   return (
     <div className="flex flex-col items-end gap-1">
       <Button
@@ -104,7 +109,9 @@ function CopyPlanButton({
       </Button>
       {!hasMeals && (
         <p id="meal-plan-needs-meals" className="text-xs text-on-muted">
-          {t("meal_planner.needs_meals_hint")}
+          {offersShoppingList
+            ? t("meal_planner.needs_meals_hint")
+            : t("meal_planner.needs_meals_hint_copy_only")}
         </p>
       )}
     </div>

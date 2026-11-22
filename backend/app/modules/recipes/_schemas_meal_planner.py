@@ -82,6 +82,15 @@ class MealPlanEntrySchema(BaseModel):
     picking_session_id: UUID | None = None
 
 
+class RecipePlannedMeal(BaseModel):
+    """One meal of one plan that holds a recipe — what deleting it would empty."""
+
+    plan_id: UUID
+    plan_name: str | None = None
+    date: datetime.date
+    slot: MealSlot
+
+
 class DailyNutritionSummary(BaseModel):
     date: datetime.date
     calories_kcal: float | None = None

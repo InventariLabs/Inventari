@@ -1018,6 +1018,8 @@
     "mg": "mg",
     "cup": "Tasse",
     "fl oz": "fl oz",
+    "tbsp": "EL",
+    "tsp": "TL",
     "m": "m",
     "cm": "cm",
     "pt": "Pinte",
@@ -1032,7 +1034,7 @@
   },
   "dashboard": {
     "products": "Produkte",
-    "replenishAll": "Alle auffüllen",
+    "replenishAll": "Nachkauf-Vorschläge ansehen",
     "replenishPolicy": "Produkte, von denen noch Bestand anderswo in Gebrauch ist, gelten nicht als knapp und werden nicht nachbestellt.",
     "replenishModalTitle": "Vorschläge prüfen",
     "replenishModalDesc": "Wählen Sie Produkte aus, die Sie zur Einkaufsliste hinzufügen möchten.",

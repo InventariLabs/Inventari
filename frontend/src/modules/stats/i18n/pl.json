@@ -161,10 +161,10 @@
   },
   "reconciliation": {
     "title": "Uzgodnienie stanu",
-    "subtitle_one": "Zmierzone przy otwarciu tego ekranu, na {{count}} rekordzie produktu.",
-    "subtitle_few": "Zmierzone przy otwarciu tego ekranu, na {{count}} rekordach produktów.",
-    "subtitle_many": "Zmierzone przy otwarciu tego ekranu, na {{count}} rekordach produktów.",
-    "subtitle_other": "Zmierzone przy otwarciu tego ekranu, na {{count}} rekordach produktów.",
+    "subtitle_one": "Zmierzone przy otwarciu tego ekranu, na {{count}} rekordzie. Liczy się tu każdy rekord, także rekordy modułów, np. wyposażenia; Przegląd liczy tylko rekordy produktów.",
+    "subtitle_few": "Zmierzone przy otwarciu tego ekranu, na {{count}} rekordach. Liczy się tu każdy rekord, także rekordy modułów, np. wyposażenia; Przegląd liczy tylko rekordy produktów.",
+    "subtitle_many": "Zmierzone przy otwarciu tego ekranu, na {{count}} rekordach. Liczy się tu każdy rekord, także rekordy modułów, np. wyposażenia; Przegląd liczy tylko rekordy produktów.",
+    "subtitle_other": "Zmierzone przy otwarciu tego ekranu, na {{count}} rekordach. Liczy się tu każdy rekord, także rekordy modułów, np. wyposażenia; Przegląd liczy tylko rekordy produktów.",
     "tableCaption": "Dwa porównania par i co każde z nich znalazło",
     "expectedGap": "Stała różnica jest tu z założenia; niepokoi ta, która rośnie.",
     "columns": {

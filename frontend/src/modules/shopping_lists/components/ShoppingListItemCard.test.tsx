@@ -121,6 +121,15 @@ describe("ShoppingListItemCard — the service-composed note", () => {
     ).toBeInTheDocument();
   });
 
+  it("writes the needed-by date the way every other date of the app reads", () => {
+    renderCard({
+      ...baseItem,
+      note_data: { needed_by: "2026-09-01" },
+    });
+
+    expect(screen.getByText("Needed by: Sep 1, 2026")).toBeInTheDocument();
+  });
+
   it("names the purchase order a line went to in the reader's language, beside the line's own note", async () => {
     await withLanguage("pl", () => {
       renderCard({

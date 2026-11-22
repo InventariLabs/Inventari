@@ -61,7 +61,7 @@ describe("the replenish door", () => {
     const onOpen = renderDoor();
 
     await userEvent.click(
-      await screen.findByRole("button", { name: /replenish all/i }),
+      await screen.findByRole("button", { name: /review what to reorder/i }),
     );
     expect(onOpen).toHaveBeenCalledTimes(1);
   });
@@ -75,7 +75,7 @@ describe("the replenish door", () => {
 
     await settle();
     expect(
-      screen.queryByRole("button", { name: /replenish all/i }),
+      screen.queryByRole("button", { name: /review what to reorder/i }),
     ).not.toBeInTheDocument();
   });
 
@@ -85,13 +85,13 @@ describe("the replenish door", () => {
     // out of the proposals — already on a list, stock in transit, outside an
     // internal location — and expired goods are thrown out, not reordered.
     // Gated on the shortage row instead, the button stood open over an empty
-    // modal; the measured path was "Replenish All, add, come back".
+    // modal; the measured path was "Review what to reorder, add, come back".
     serve([]);
     renderDoor();
 
     await settle();
     expect(
-      screen.queryByRole("button", { name: /replenish all/i }),
+      screen.queryByRole("button", { name: /review what to reorder/i }),
     ).not.toBeInTheDocument();
   });
 
@@ -117,7 +117,7 @@ describe("the replenish door", () => {
   it("says nothing of the policy while the door is open", async () => {
     serve([peas]);
     renderDoor();
-    await screen.findByRole("button", { name: /replenish all/i });
+    await screen.findByRole("button", { name: /review what to reorder/i });
     expect(
       screen.queryByText(/stock in use elsewhere/i),
     ).not.toBeInTheDocument();

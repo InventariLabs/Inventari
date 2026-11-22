@@ -85,7 +85,9 @@ export function WorkflowSwitchOffDialog({
     <ConfirmDialog
       open={workflow !== null}
       title={
-        mode === "delete" ? t("deleteWorkflow") : t("workflows.deactivateTitle")
+        mode === "delete"
+          ? t("deleteWorkflow")
+          : t("workflows.deactivateTitle", { name: workflow?.name ?? "" })
       }
       message={
         isLoading
