@@ -1748,6 +1748,9 @@ async def finish_production(
     order.scrap_qty = order.planned_qty - total_actual
     order.completed_at = datetime.now(tz=UTC)
     order.completed_by = user.id
+    # The plan's day stays on the run when it was finished on another.
+    if order.production_date != day:
+        order.planned_for = order.production_date
     order.production_date = day
     await _journal_closed(
         db, organization_id, order, user, 'IN_PROGRESS', total_actual, total_cost
