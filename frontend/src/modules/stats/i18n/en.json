@@ -145,8 +145,8 @@
   },
   "reconciliation": {
     "title": "Stock reconciliation",
-    "subtitle_one": "Measured on opening this screen, over {{count}} product record. Every record counts here, module records such as equipment included; the Overview counts product records only.",
-    "subtitle_other": "Measured on opening this screen, over {{count}} product records. Every record counts here, module records such as equipment included; the Overview counts product records only.",
+    "subtitle_one": "Measured on opening this screen, over {{count}} record. Every record counts here, module records such as equipment included; the Overview counts product records only.",
+    "subtitle_other": "Measured on opening this screen, over {{count}} records. Every record counts here, module records such as equipment included; the Overview counts product records only.",
     "tableCaption": "The two pair comparisons and what each found",
     "expectedGap": "A standing gap here is by design; the figure to watch is one that grows.",
     "columns": {

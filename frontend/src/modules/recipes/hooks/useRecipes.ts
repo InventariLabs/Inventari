@@ -47,6 +47,15 @@ export function useRecipe(id: string | undefined) {
   });
 }
 
+/** The plan meals that hold a recipe — read only while a delete is being asked. */
+export function useRecipePlannedMeals(id: string | undefined, open: boolean) {
+  return useQuery({
+    queryKey: queryKeys.recipes.planned(id!),
+    queryFn: () => recipesApi.getPlannedMeals(id!),
+    enabled: !!id && open,
+  });
+}
+
 export function useRecipeAvailability(
   id: string | undefined,
   servings?: number,

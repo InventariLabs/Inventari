@@ -11,6 +11,7 @@ import type {
   PickingScanResponse,
   UndoPickResponse,
 } from "@/modules/recipes/types/core";
+import type { RecipePlannedMeal } from "@/modules/recipes/types/mealplans";
 import type {
   RecipeNutrition,
   CookingHistoryItem,
@@ -105,6 +106,9 @@ export const recipesCoreApi = {
   delete: async (id: string): Promise<void> => {
     await api.delete(`/recipes/${id}`);
   },
+
+  getPlannedMeals: async (id: string): Promise<RecipePlannedMeal[]> =>
+    getEveryPage<RecipePlannedMeal>(`/recipes/${id}/planned`),
 
   getAvailability: async (
     id: string,

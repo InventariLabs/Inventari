@@ -192,6 +192,7 @@ export const queryKeys = {
     nutrition: (id: string, servings: number) =>
       ["recipes", "detail", id, "nutrition", servings] as const,
     history: (id: string) => ["recipes", "detail", id, "history"] as const,
+    planned: (id: string) => ["recipes", "detail", id, "planned"] as const,
     cost: (id: string, servings?: number) =>
       ["recipes", "detail", id, "cost", servings] as const,
     tags: ["recipe-tags"] as const,

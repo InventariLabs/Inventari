@@ -27,8 +27,8 @@ import {
 } from "../hooks/useRecipes";
 import RecipeEditForm from "../components/RecipeEditForm";
 import RecipeForm from "../components/RecipeForm";
+import { RecipeDeleteConfirm } from "../components/RecipeDeleteConfirm";
 import { TagFilterChips } from "../components/TagFilterChips";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { InlineQueryError } from "@/components/ui/QueryResult";
 import { TagsPanel } from "../components/TagsPanel";
 import { RecipeGrid } from "../components/RecipeGrid";
@@ -796,15 +796,9 @@ export default function RecipesPage() {
               />
             )}
 
-            <ConfirmDialog
-              open={Boolean(deleteConfirmId)}
-              title={t("actions.delete")}
-              message={t("actions.delete_confirm", {
-                name: recipes.find((r) => r.id === deleteConfirmId)?.name ?? "",
-              })}
-              variant="danger"
-              confirmLabel={t("actions.delete")}
-              cancelLabel={t("common:form.cancel")}
+            <RecipeDeleteConfirm
+              recipeId={deleteConfirmId}
+              name={recipes.find((r) => r.id === deleteConfirmId)?.name ?? ""}
               onConfirm={() => deleteConfirmId && handleDelete(deleteConfirmId)}
               onCancel={() => setDeleteConfirmId(null)}
             />

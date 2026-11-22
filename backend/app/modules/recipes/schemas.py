@@ -61,6 +61,7 @@ from ._schemas_meal_planner import (  # noqa: F401
     MealPlanListItem,
     MealPlanSchema,
     MealPlanUpdate,
+    RecipePlannedMeal,
     ShoppingExclusionCreate,
     ShoppingExclusionSchema,
     ShoppingListGenerationResult,
