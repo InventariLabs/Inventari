@@ -26,7 +26,7 @@ import { ClearableFilterBadge } from "@/modules/equipment/components/ClearableFi
 import { useAssetImage } from "@/modules/equipment/hooks/useAssetImage";
 import { useLocationLabel } from "@/modules/equipment/hooks/useLocationLabel";
 import { AssetTable } from "@/modules/equipment/components/AssetTable";
-import { ArchivedAssetRow } from "@/modules/equipment/components/ArchivedAssetRow";
+import { ArchivedAssetList } from "@/modules/equipment/components/ArchivedAssetList";
 import { ArchivedPurgeHint } from "@/modules/equipment/components/ArchivedPurgeHint";
 import { ArchivedEmptyState } from "@/modules/equipment/components/ArchivedEmptyState";
 import { AssetConfirmDialogs } from "@/modules/equipment/components/AssetConfirmDialogs";
@@ -581,21 +581,16 @@ export default function AssetListPage() {
           ) : equipmentArchived.length === 0 ? (
             <ArchivedEmptyState search={search} />
           ) : (
-            <div className="divide-y divide-border">
-              {equipmentArchived.map((item) => (
-                <ArchivedAssetRow
-                  key={item.id}
-                  item={item}
-                  selectable={canWrite}
-                  isSelected={selectedIds.has(item.id)}
-                  isRestorePending={restoreMutation.isPending}
-                  isPurgePending={bulkPurgeMutation.isPending}
-                  onToggleSelect={toggleSelect}
-                  onRestore={(id) => setRestoreTarget(id)}
-                  onPurge={(id) => setPurgeTarget(id)}
-                />
-              ))}
-            </div>
+            <ArchivedAssetList
+              items={equipmentArchived}
+              selectable={canWrite}
+              selectedIds={selectedIds}
+              isRestorePending={restoreMutation.isPending}
+              isPurgePending={bulkPurgeMutation.isPending}
+              onToggleSelect={toggleSelect}
+              onRestore={(id) => setRestoreTarget(id)}
+              onPurge={(id) => setPurgeTarget(id)}
+            />
           )}
           <Pagination {...archivedPagination} />
         </>
