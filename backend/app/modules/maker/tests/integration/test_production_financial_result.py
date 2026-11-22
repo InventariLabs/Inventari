@@ -114,12 +114,15 @@ def _insert_order_row(
     result_per_unit: str | None = None,
     result_per_batch: str | None = None,
 ) -> ProductionOrder:
+    actual = Decimal(actual_qty) if actual_qty else None
     order = ProductionOrder(
         organization_id=org_id,
         output_template_id=output_template_id,
         recipe_id=recipe_id,
         planned_qty=Decimal(planned_qty),
-        actual_qty=Decimal(actual_qty) if actual_qty else None,
+        actual_qty=actual,
+        # Closing a run stores the flag; a row standing for a closed run does too.
+        overproduced=actual is not None and actual > Decimal(planned_qty),
         output_storage_location_id=output_location_id,
         status=status,
         completed_at=completed_at,

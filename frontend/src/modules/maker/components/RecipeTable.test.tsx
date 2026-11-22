@@ -168,3 +168,14 @@ describe("RecipeTable — the stock column", () => {
     expect(screen.getByText(/11\.4 kg/)).toBeInTheDocument();
   });
 });
+
+describe("RecipeTable — the overproduction note", () => {
+  it("wraps inside the unit-cost cell instead of widening it", () => {
+    renderTable([{ ...baseRecipe, last_run_overproduced: true }]);
+
+    const note = screen.getByTestId("maker-recipe-unit-cost-overproduced");
+    // The cell never wraps; the note has to, within a narrow box.
+    expect(note).toHaveClass("whitespace-normal");
+    expect(note.className).toMatch(/max-w-/);
+  });
+});

@@ -319,6 +319,17 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A production run closed far above its plan asks first. **Finish run** and
+  **Complete run** name the extra quantity once the figure is more than a
+  quarter above the plan, say that the ingredients stay as planned, and keep
+  the button disabled until the box for that very quantity is ticked; typing
+  another number asks again, and a dialog opened afresh starts with an empty
+  quantity. The recipe catalogue marks a unit cost that comes from a run which
+  made more than it planned, as the cost is spread over output the ingredients
+  did not grow with (in the list view the note wraps inside its column), and
+  the month's margin says how many of its runs closed above plan. The API
+  gains `last_run_overproduced` on the recipe catalogue item and
+  `overproduced_orders` on the monthly result.
 - A receipt posted against a purchase order names the order. The receipt's
   page shows it under **Purchase order**, linked to the order, and both
   built-in print layouts print its number, so whoever holds the receipt later
