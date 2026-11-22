@@ -165,17 +165,21 @@ class TestStorageArchive:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_archive_descendant_target_returns_400(
+    def test_archive_accepts_a_location_inside_as_the_target(
         self, client, auth_headers, db_session, test_user
     ):
-        """Moving items into a descendant of the archived node is rejected."""
+        """A location inside stays active, so it can take the parent's own stock."""
         zone = self._make(db_session, test_user, 'Zone')
         child = self._make(db_session, test_user, 'Child shelf', parent_id=zone.id)
-        self._add_item(db_session, test_user, zone.id, 'Milk')
+        item = self._add_item(db_session, test_user, zone.id, 'Milk')
 
         response = self._archive(client, auth_headers, zone.id, move_items_to=child.id)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_200_OK
+        on_child = client.get(
+            f'/api/v1/locations/{child.id}/items', headers=auth_headers
+        ).json()['items']
+        assert [i['id'] for i in on_child] == [str(item.id)]
 
     def test_archived_storage_still_reachable_in_detail(
         self, client, auth_headers, db_session, test_user

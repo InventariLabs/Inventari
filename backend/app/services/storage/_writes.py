@@ -541,26 +541,21 @@ async def archive_storage(
     column). Items standing on the location itself are moved to
     *move_items_to* when given; without a target, a location that still
     holds items is rejected. The locations inside are not archived with it —
-    they stay active, so the stock on them stays where it is.
+    they stay active, so the stock on them stays where it is, and one of them
+    is a valid target for the stock of the archived location.
     """
     from app.models.item import Item
     from app.schemas.item import ItemMove
     from app.services.items import get_by_id_for_update_async, move_item
-    from app.services.storage._queries import (
-        descendant_ids_async,
-        get_storage_async,
-    )
+    from app.services.storage._queries import get_storage_async
 
     if user.organization_id is None:
         raise ServiceRejectionError('organization_required')
     org_id: UUID = user.organization_id
-    descendant_ids = await descendant_ids_async(db, org_id, storage.id)
     target = None
     if data.move_items_to is not None:
         if data.move_items_to == storage.id:
             raise ServiceRejectionError('storage_archive_target_is_self')
-        if data.move_items_to in descendant_ids:
-            raise ServiceRejectionError('storage_archive_target_is_descendant')
         target = await get_storage_async(db, org_id, data.move_items_to)
         if target is None:
             raise NotFoundException('storage')

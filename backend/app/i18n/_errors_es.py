@@ -1055,7 +1055,6 @@ ERRORS_ES: ErrorMessages = {
     'storage_vanished_during_batch': 'La ubicación de almacenamiento {location} desapareció durante el lote.',
     'storage_archive_blocked_by_items': 'No se puede archivar: aún hay {count} artículo(s) almacenados aquí. Muévelos primero o archiva indicando una ubicación de destino.',
     'storage_archive_target_is_self': 'No se pueden mover artículos a la ubicación que se está archivando.',
-    'storage_archive_target_is_descendant': 'No se pueden mover artículos a una ubicación subordinada de la que se está archivando.',
     'storage_archive_target_archived': 'No se pueden mover artículos a una ubicación archivada.',
     'storage_restore_parent_archived': 'No se puede restaurar dentro de una ubicación superior archivada. Restaura primero la superior.',
     'storage_delete_blocked_by_references': 'No se puede eliminar la ubicación: otros registros aún hacen referencia a ella (restricción «{constraint}»). Archívala en su lugar.',
