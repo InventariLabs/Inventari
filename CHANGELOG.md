@@ -804,6 +804,11 @@ says what the release does rather than what changed since them.
   remove, and the refusal names the product in the screen's quantities rather
   than a record id. A surplus correction is still weighed against everything
   the line received, the held part included.
+- A correction with two lines on the same stock record is weighed as a whole
+  when it is confirmed. Each line used to be checked against the record alone,
+  so two lines that each fit could pass confirmation and be refused only at
+  completion, after the correction had taken a number; it is now refused while
+  it is still a draft.
 - Saving a BOM's *Process steps* keeps a step that was typed in the add row but
   never added with *Add step*: it is stored as the last step, with its
   minutes, instead of vanishing under a success message. Closing the editor
