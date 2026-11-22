@@ -262,6 +262,7 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | `find_by_scanned_code_async` | `(db: AsyncSession, organization_id: UUID, code: str) -> StorageDTO \| None` | READ | The location a scanned code names (its own code or its label's), or ``None``. |
 | `get_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> StorageDTO \| None` | READ | — |
 | `get_with_type_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> StorageDTO \| None` | READ | Return a storage location with eager-loaded storage_type, or ``None``. |
+| `held_back_async` | `(db: AsyncSession, organization_id: UUID) -> dict[UUID, str]` | READ | Every location goods are not kept in, with why: a receiving area or a quarantine location a module set apart, and everything inside it. |
 | `item_counts_by_location_async` | `(db: AsyncSession, organization_id: UUID, storage_ids: list[UUID]) -> dict[UUID, int]` | READ | Return {storage_id: count} for non-deleted items in those storages. |
 | `item_counts_naming_locations_async` | `(db: AsyncSession, organization_id: UUID, storage_ids: list[UUID]) -> dict[UUID, int]` | READ | Return {storage_id: count} for the records that name that location. |
 | `label_caption` | `(storage: StorageDTO) -> str \| None` | READ | The text under the QR code of this location's label. |
@@ -598,9 +599,9 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 
 ## Statistics
 
-- **Total methods:** 315
+- **Total methods:** 316
 - **Namespaces:** 33
-- **Documented methods:** 315 (100%)
-- **READ methods:** 220 (70%)
+- **Documented methods:** 316 (100%)
+- **READ methods:** 221 (70%)
 - **WRITE methods:** 95 (30%)
 

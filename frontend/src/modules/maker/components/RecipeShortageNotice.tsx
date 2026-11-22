@@ -245,7 +245,10 @@ function AddIngredientStockSheet({
     data: locations = [],
     isLoading: locationsLoading,
     isError: locationsFailed,
-  } = useStorages(undefined, { excludeModuleContexts: true });
+  } = useStorages(undefined, {
+    excludeModuleContexts: true,
+    excludeHeldBack: true,
+  });
   const addStock = useAddIngredientStock();
   const [locationId, setLocationId] = useState("");
   const [rows, setRows] = useState<Record<string, StockRow>>({});

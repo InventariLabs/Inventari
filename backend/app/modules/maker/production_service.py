@@ -323,6 +323,32 @@ def _refuse_by_the_strategy(
         raise ShortageWarningError(shortages)
 
 
+#: The refusal each reason is answered with, named in full so the catalogue
+#: of refusal codes can read them.
+_HELD_BACK_OUTPUT_REFUSALS = {
+    'receiving': 'production_output_receiving',
+    'quarantine': 'production_output_quarantine',
+}
+
+
+async def _refuse_a_held_back_output(
+    db: AsyncSession, organization_id: UUID, location_id: UUID
+) -> None:
+    """Refuse an output location goods are not kept in.
+
+    A receiving area is where goods wait and a quarantine location is where
+    they are held back; stock a run made there would sit where picking does
+    not look. Core names such places (``core_api.locations.held_back_async``)
+    and the module that sets them apart says why — the reasons are the home
+    shelf's.
+    """
+    reason = (await core_api.locations.held_back_async(db, organization_id)).get(
+        location_id
+    )
+    if reason in _HELD_BACK_OUTPUT_REFUSALS:
+        raise ServiceRejectionError(_HELD_BACK_OUTPUT_REFUSALS[reason])
+
+
 async def create_order(
     db: AsyncSession,
     organization_id: UUID,
@@ -346,6 +372,7 @@ async def create_order(
     *ask_the_strategy* is ``False`` only for :func:`record_made`: a run that
     already happened is not a plan the strategy has a say over.
     """
+    await _refuse_a_held_back_output(db, organization_id, data.output_location_id)
     # Resolve recipe.
     if data.recipe_id is not None:
         # Validate the provided recipe_id belongs to this org + template.
@@ -962,6 +989,9 @@ async def _receive_output(
     posted at a stated zero, not as "nobody named a price", which Core would
     answer with the rate of the older stock.
     """
+    await _refuse_a_held_back_output(
+        db, organization_id, order.output_storage_location_id
+    )
     template = await core_api.product_templates.get_async(
         db, organization_id, order.output_template_id
     )

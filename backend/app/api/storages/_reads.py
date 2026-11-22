@@ -135,6 +135,12 @@ async def get_storages(
         description='Only locations that set product fields of their own: '
         'what the import dialog offers as columns.',
     ),
+    exclude_held_back: bool = Query(
+        False,
+        description='Hide the locations goods are not kept in (a receiving '
+        'area, a quarantine location, and everything inside them): what a '
+        'picker offers for goods that are to stay where they are put.',
+    ),
     counts: bool = Query(
         True,
         description='Count the records in each location. A picker offering '
@@ -155,6 +161,11 @@ async def get_storages(
     """
     assert current_user.organization_id is not None, 'Organization required'
     claimed_tags = _resolve_claimed_tags(exclude_module_contexts)
+    held_back = (
+        set(await core_api.locations.held_back_async(db, current_user.organization_id))
+        if exclude_held_back
+        else None
+    )
     storages, total = await list_storages_with_counts_async(
         db,
         current_user.organization_id,
@@ -171,6 +182,7 @@ async def get_storages(
         type_ids=type_ids,
         with_fields=with_fields,
         with_counts=counts,
+        exclude_ids=held_back,
         offset=offset,
         limit=limit,
     )

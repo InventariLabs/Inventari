@@ -485,6 +485,8 @@ ERRORS_ES: ErrorMessages = {
     'production_order_not_found': 'Orden de producción no encontrada',
     'production_needs_scope': 'Las necesidades de las órdenes planificadas se leen para una orden, o para los dos extremos de un periodo',
     'production_needs_period_reversed': 'El periodo termina antes de empezar',
+    'production_output_receiving': 'Una zona de recepción no puede recibir lo que produce una orden: la mercancía solo espera allí. Elija la ubicación donde se guardará.',
+    'production_output_quarantine': 'Una ubicación de cuarentena no puede recibir lo que produce una orden: la mercancía retenida no se guarda allí. Elija la ubicación donde se guardará.',
     'production_no_recipe': (
         'No hay fórmula para este producto — cree primero una fórmula'
     ),

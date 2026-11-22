@@ -560,6 +560,8 @@ apart.
 | `PRODUCTION_NEEDS_SCOPE` | The needs of planned runs are read for one run, or for both ends of a period |
 | `PRODUCTION_NO_RECIPE` | No BOM for this product — create a BOM first |
 | `PRODUCTION_OUTPUT_BATCH_MISSING` | This run put its output in no batch, so there is no batch to hold or release. |
+| `PRODUCTION_OUTPUT_QUARANTINE` | A quarantine location cannot take what a production run makes: goods held back are not kept there. Choose the location they will be kept in. |
+| `PRODUCTION_OUTPUT_RECEIVING` | A receiving area cannot take what a production run makes: goods only wait there. Choose the location they will be kept in. |
 | `PRODUCTION_OVERPRODUCTION_DISABLED` | Overproduction is disabled in settings — this order cannot produce more than planned. |
 | `PRODUCTION_PORTION_ABOVE_PLAN` | A portion cannot take the run above its plan ({planned}) — what comes out beyond it is put on the shelf when the run finishes. |
 | `PRODUCTION_RECIPE_NOT_FOUND` | BOM {recipe_id} not found in this organization |

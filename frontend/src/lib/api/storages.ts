@@ -32,6 +32,9 @@ export type StorageNumberResponse =
 export interface StoragePageParams {
   context_tag?: string;
   exclude_module_contexts?: boolean;
+  /** Leaves out the places goods are not kept in: a receiving area, a
+   *  quarantine location, and everything inside them. */
+  exclude_held_back?: boolean;
   module_scope?: string;
   usage?: string;
   include_archived?: boolean;
@@ -76,6 +79,7 @@ export const storagesApi = {
   getAll: async (params?: {
     context_tag?: string;
     exclude_module_contexts?: boolean;
+    exclude_held_back?: boolean;
     module_scope?: string;
     usage?: string;
     include_archived?: boolean;

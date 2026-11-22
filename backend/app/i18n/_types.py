@@ -360,6 +360,8 @@ class ErrorMessages(TypedDict):
     bom_depth_exceeded: str
     cost_line_not_found: str
     production_order_not_found: str
+    production_output_receiving: str
+    production_output_quarantine: str
     production_no_recipe: str
     production_needs_scope: str
     production_needs_period_reversed: str

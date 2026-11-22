@@ -16,12 +16,8 @@ vi.mock("@/modules/maker/hooks/useRecipes", () => ({
   useAddIngredientStock: () => ({ mutateAsync: addStock, isPending: false }),
 }));
 
-vi.mock("@/modules/shared/hooks/useStorages", () => ({
-  useStorages: () => ({
-    data: [{ id: "loc-1", name: "Pantry" }],
-    isLoading: false,
-  }),
-}));
+const useStorages = vi.hoisted(() => vi.fn());
+vi.mock("@/modules/shared/hooks/useStorages", () => ({ useStorages }));
 
 const toastSuccess = vi.hoisted(() => vi.fn());
 const toastError = vi.hoisted(() => vi.fn());
@@ -68,6 +64,11 @@ describe("RecipeShortageNotice", () => {
   beforeEach(() => {
     orderShortages.mockReset();
     addStock.mockReset();
+    useStorages.mockReset();
+    useStorages.mockReturnValue({
+      data: [{ id: "loc-1", name: "Pantry" }],
+      isLoading: false,
+    });
     toastSuccess.mockReset();
     toastError.mockReset();
     signInWith([
@@ -157,6 +158,16 @@ describe("RecipeShortageNotice — a retry and a second order", () => {
 
   afterEach(() => {
     signOut();
+  });
+
+  it("offers no place goods are held back in for the stock it adds", () => {
+    renderNotice({ availability });
+    fireEvent.click(screen.getByTestId("maker-recipe-add-stock"));
+
+    expect(useStorages).toHaveBeenCalledWith(undefined, {
+      excludeModuleContexts: true,
+      excludeHeldBack: true,
+    });
   });
 
   it("keeps only the rows that did not save when a later one fails", async () => {
