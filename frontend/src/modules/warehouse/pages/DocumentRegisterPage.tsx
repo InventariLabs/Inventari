@@ -104,7 +104,7 @@ function CurrencyTotalRow({
       <span className="min-w-[4rem] text-right text-on-secondary tabular-nums">
         {fmt(total.total_tax, total.currency ?? undefined, lang)}
       </span>
-      <span className="min-w-[6rem] text-right font-semibold text-accent-600 tabular-nums">
+      <span className="min-w-[6rem] text-right font-semibold text-accent-700 tabular-nums">
         {fmt(total.total_gross, total.currency ?? undefined, lang)}
       </span>
     </div>
@@ -382,7 +382,7 @@ function GroupRow({
               <span className="min-w-[4rem] text-right text-on-secondary tabular-nums">
                 {fmt(groupAmount("total_tax"), groupCurrency, i18n.language)}
               </span>
-              <span className="min-w-[6rem] text-right font-semibold text-accent-600 tabular-nums">
+              <span className="min-w-[6rem] text-right font-semibold text-accent-700 tabular-nums">
                 {fmt(groupAmount("total_gross"), groupCurrency, i18n.language)}
               </span>
             </div>
@@ -654,7 +654,7 @@ function GroupTableBody({
             {fmt(groupAmount("total_tax"), groupCurrency, i18n.language)}
           </td>
           <td
-            className={`${cell} ${MONEY_COL.gross} text-xs font-medium text-accent-600`}
+            className={`${cell} ${MONEY_COL.gross} text-xs font-medium text-accent-700`}
           >
             {fmt(groupAmount("total_gross"), groupCurrency, i18n.language)}
           </td>
@@ -682,7 +682,7 @@ function GroupTableBody({
               {fmt(total.total_tax, total.currency ?? undefined, i18n.language)}
             </td>
             <td
-              className={`${cell} ${MONEY_COL.gross} text-xs font-medium text-accent-600`}
+              className={`${cell} ${MONEY_COL.gross} text-xs font-medium text-accent-700`}
             >
               {fmt(
                 total.total_gross,
@@ -950,7 +950,7 @@ export default function DocumentRegisterPage() {
             <p className="text-xs text-on-secondary mb-1">
               {t("register.totalGross")}
             </p>
-            <p className="text-xl font-semibold text-accent-600 tabular-nums">
+            <p className="text-xl font-semibold text-accent-700 tabular-nums">
               {renderTotal(data.summary.total_gross, "total_gross")}
             </p>
           </Card>
