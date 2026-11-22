@@ -775,6 +775,7 @@ class ErrorMessages(TypedDict):
     home_shelf_not_stock: str
     document_return_requires_completed: str
     document_return_type_not_eligible: str
+    document_return_posts_nothing: str
     document_return_no_lines: str
     document_original_line_missing: str
     document_return_quantity_not_positive: str

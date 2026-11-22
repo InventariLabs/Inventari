@@ -524,6 +524,7 @@
     "snapshotDeltaPlus": "Ajouté",
     "snapshotDeltaMinus": "Retiré",
     "executionHelp": "Ajustez la quantité réellement traitée pour chaque ligne avant de fermer le document.",
+    "executionHelpRecordOnly": "Les marchandises ont déjà quitté l'étagère lors de l'étape que ce document enregistre. La clôture ne fait que garder la trace — le stock ne change pas.",
     "executionMeta": "Prévu {{expected}} {{unit}} · restant {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Prévu {{expected}} · restant {{remaining}} (sans unité)",
     "doneQuantityLabel": "Quantité exécutée",

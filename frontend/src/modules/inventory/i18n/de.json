@@ -86,7 +86,8 @@
       "locationTitle": "Hier ist nichts durchgelaufen",
       "locationDescription": "Bewegungen entstehen, wenn Ware hier eingeht, ausgegeben oder umgelagert wird.",
       "documentTitle": "Dieses Dokument hat nichts bewegt",
-      "documentDescription": "Seine Positionen wurden nicht auf den Bestand gebucht, also trägt keine Bewegung seinen Namen."
+      "documentDescription": "Seine Positionen wurden nicht auf den Bestand gebucht, also trägt keine Bewegung seinen Namen.",
+      "documentRecordOnlyDescription": "Der Bestand wurde bereits in dem Schritt geändert, den dieses Dokument festhält. Das Dokument hält ihn nur fest, also trägt keine Bewegung seinen Namen."
     },
     "tab": "Bewegungen",
     "itemCaption": "Bewegungen dieses Produkts in {{location}}. Zwei Datensätze desselben Produkts an einem Lagerort teilen sich diese Zeilen.",

@@ -819,7 +819,7 @@ What the warehouse's document screens give each of its four slots:
 | `document_form_extra` | Receive, Issue and the document form, among the document-level fields | `action`, `documentType`, `partnerId`, the draft's `lines`, `metaData`, `setMetaData`, `registerBeforeSubmit` |
 | `document_line_form_extra` | Under each line of Receive (desktop only: a phone counts its goods on the receiving session instead), Issue and the document form (desktop and phone) | `action`, `documentType`, the `line` (with its `metaData`), `setMetaData`, `registerBeforeSubmit` |
 | `document_detail_line_extra` | The document page, under each line | `documentId`, `documentStatus`, the `line` (with its `metaData`), `saveMetaData` |
-| `document_detail_extra` | The document page, below lines and totals | `documentId`, `documentStatus`, `metaData`, `saveMetaData` |
+| `document_detail_extra` | The document page, below lines and totals | `documentId`, `documentStatus`, `stockAlreadyApplied`, `metaData`, `saveMetaData` |
 
 Four behaviours to rely on:
 

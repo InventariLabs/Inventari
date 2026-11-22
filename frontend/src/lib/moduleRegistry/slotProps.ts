@@ -233,6 +233,12 @@ export interface SlotDataMap {
     documentId: string;
     documentStatus: string;
     /**
+     * The document only records a movement another step already made, so it
+     * carries no movement of its own. Optional: a caller that does not know
+     * leaves it off, and the document reads as an ordinary one.
+     */
+    stockAlreadyApplied?: boolean;
+    /**
      * What modules keep on the document, each under its own name. Optional
      * because the slot predates it; the warehouse's page always passes it.
      */

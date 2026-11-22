@@ -326,6 +326,7 @@ apart.
 | `DOCUMENT_RECEIPT_LINES_NEED_PRODUCT` | Lines {lines} name no product from your list, and a receipt puts only products into stock — pick each one from the list or add it as a new product |
 | `DOCUMENT_RECORD_STANDS_ELSEWHERE` | The record "{item_name}" stands on "{record_shelf}", but the document takes from "{document_shelf}" — point the document at the shelf the record stands on, or move the record first |
 | `DOCUMENT_RETURN_NO_LINES` | A return needs at least one line |
+| `DOCUMENT_RETURN_POSTS_NOTHING` | This document only records goods another step already took — it moved no stock, so it cannot be returned. |
 | `DOCUMENT_RETURN_QUANTITY_EXCEEDS_LEFT` | A return of {quantity} is more than what is left of line {line} ({left} of {done}) |
 | `DOCUMENT_RETURN_QUANTITY_NOT_POSITIVE` | The quantity returned on line {line} must be greater than zero |
 | `DOCUMENT_RETURN_REQUIRES_COMPLETED` | A return can only be made against a completed document |

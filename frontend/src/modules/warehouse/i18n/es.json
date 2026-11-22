@@ -524,6 +524,7 @@
     "snapshotDeltaPlus": "Agregado",
     "snapshotDeltaMinus": "Eliminado",
     "executionHelp": "Ajuste la cantidad realmente procesada para cada línea antes de cerrar el documento.",
+    "executionHelpRecordOnly": "Las mercancías ya salieron del estante en el paso que este documento registra. Cerrarlo solo conserva el registro; el stock no cambia.",
     "executionMeta": "Planificado {{expected}} {{unit}} · restante {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Planificado {{expected}} · restante {{remaining}} (sin unidad)",
     "doneQuantityLabel": "Cantidad ejecutada",

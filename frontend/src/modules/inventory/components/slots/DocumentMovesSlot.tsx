@@ -32,7 +32,11 @@ export default function DocumentMovesSlot({ data }: Props) {
         filters={{ reference_type: "document", reference_id: data.documentId }}
         caption={t("inventory:moves.documentCaption")}
         emptyTitle={t("inventory:moves.empty.documentTitle")}
-        emptyDescription={t("inventory:moves.empty.documentDescription")}
+        emptyDescription={t(
+          data.stockAlreadyApplied
+            ? "inventory:moves.empty.documentRecordOnlyDescription"
+            : "inventory:moves.empty.documentDescription",
+        )}
       />
     </section>
   );

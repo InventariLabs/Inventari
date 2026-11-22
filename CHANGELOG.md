@@ -336,6 +336,12 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A document that only records goods another step already took — a recipe's
+  internal issue, whose goods the picking session removed — can no longer be
+  returned, as it already could not be undone or corrected: a return would have
+  put back goods the document never took. Its page now says where the goods
+  went instead of "its lines have not been executed against stock", and its
+  execution panel says the stock does not change.
 - Dialogs that asked for something and were refused no longer close and lose
   what was typed. Renaming a tag, tagging several recipes at once and
   approving a document keep the dialog open with the server's refusal and the

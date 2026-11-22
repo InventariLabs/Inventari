@@ -93,6 +93,22 @@ function pickedDispatch(): WarehouseDocument {
 }
 
 describe("DocumentExecutionPanel", () => {
+  it("tells the reader the stock does not change on a document that only records another step", () => {
+    const panel = (doc: WarehouseDocument) => (
+      <DocumentExecutionPanel
+        document={doc}
+        isPending={false}
+        onCancel={vi.fn()}
+        onSubmit={vi.fn()}
+      />
+    );
+    const { rerender } = render(panel(buildDocument()));
+    expect(screen.queryByText(/stock does not change/i)).toBeNull();
+
+    rerender(panel(buildDocument({ stock_already_applied: true })));
+    expect(screen.getByText(/stock does not change/i)).toBeInTheDocument();
+  });
+
   it("applies a scanned barcode to the matching line quantity", async () => {
     render(
       <DocumentExecutionPanel

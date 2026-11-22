@@ -86,7 +86,8 @@
       "locationTitle": "Rien n'est passé par ici",
       "locationDescription": "Un mouvement est enregistré quand des marchandises entrent, sortent ou transitent par cet emplacement.",
       "documentTitle": "Ce document n'a rien déplacé",
-      "documentDescription": "Ses lignes n'ont pas été exécutées sur le stock, donc aucun mouvement ne porte son nom."
+      "documentDescription": "Ses lignes n'ont pas été exécutées sur le stock, donc aucun mouvement ne porte son nom.",
+      "documentRecordOnlyDescription": "Le stock a déjà été modifié lors de l'étape que ce document enregistre. Le document ne fait que l'enregistrer, donc aucun mouvement ne porte son nom."
     },
     "tab": "Mouvements",
     "itemCaption": "Mouvements de ce produit dans {{location}}. Deux enregistrements du même produit au même emplacement partagent ces lignes.",

@@ -941,6 +941,7 @@ ERRORS_ES: ErrorMessages = {
     'validation_date': 'Debe ser una fecha válida',
     'document_return_requires_completed': 'Solo se puede crear una devolución a partir de un documento completado',
     'document_return_type_not_eligible': 'Solo se pueden crear devoluciones de entradas, salidas y traslados',
+    'document_return_posts_nothing': 'Este documento solo registra mercancías que ya se retiraron: no movió existencias, así que no se puede devolver.',
     'document_return_no_lines': 'Una devolución necesita al menos una línea',
     'document_original_line_missing': 'La línea {line} no existe en el documento {number}',
     'document_return_quantity_not_positive': 'La cantidad devuelta en la línea {line} debe ser mayor que cero',

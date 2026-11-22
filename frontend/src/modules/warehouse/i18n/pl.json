@@ -586,6 +586,7 @@
     "snapshotDeltaPlus": "Dodano",
     "snapshotDeltaMinus": "Usunięto",
     "executionHelp": "Dopasuj faktycznie wykonaną ilość dla każdej pozycji przed zamknięciem dokumentu.",
+    "executionHelpRecordOnly": "Towar zszedł już z półki w kroku, który ten dokument zapisuje. Zamknięcie tylko utrwala zapis — stan się nie zmienia.",
     "executionMeta": "Plan {{expected}} {{unit}} · pozostało {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Plan {{expected}} · pozostało {{remaining}} (bez jednostki)",
     "doneQuantityLabel": "Wykonana ilość",

@@ -143,7 +143,13 @@ export function DocumentExecutionPanel({
         <h2 className="text-base font-semibold text-on">
           {t(executeLabelKeyFor(document.type))}
         </h2>
-        <p className="text-sm text-on-secondary">{t("detail.executionHelp")}</p>
+        <p className="text-sm text-on-secondary">
+          {t(
+            document.stock_already_applied
+              ? "detail.executionHelpRecordOnly"
+              : "detail.executionHelp",
+          )}
+        </p>
       </div>
 
       <ScanModeSection
