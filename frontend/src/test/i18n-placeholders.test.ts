@@ -82,7 +82,7 @@ describe("i18n catalogues — placeholders", () => {
  * The key paths an object in *text* names twice. `JSON.parse` keeps the last
  * of two equal keys without a word, so an edit to the first copy would be
  * silently ignored — the documents catalogues carried their whole `posted`
- * section twice in all five languages.
+ * section twice in every language.
  */
 function duplicateKeys(text: string): string[] {
   const found: string[] = [];

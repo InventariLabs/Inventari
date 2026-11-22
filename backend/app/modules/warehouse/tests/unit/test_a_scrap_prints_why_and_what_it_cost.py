@@ -14,6 +14,7 @@ from uuid import UUID
 
 import pytest
 
+from app.i18n import MAINTAINED_LANGUAGES
 from app.modules.warehouse.document_pdf_service import _svc, build_pdf_context
 from app.modules.warehouse.models import Document
 
@@ -76,7 +77,7 @@ class TestTheScrapPrintout:
 
         assert 'Koszt odpisu'.lower() not in text.lower()
 
-    @pytest.mark.parametrize('lang', ['en', 'pl', 'de', 'fr', 'es'])
+    @pytest.mark.parametrize('lang', MAINTAINED_LANGUAGES)
     def test_the_title_names_the_document_not_the_type_code(self, lang: str) -> None:
         context = build_pdf_context(_scrap(), None, lang=lang)
 

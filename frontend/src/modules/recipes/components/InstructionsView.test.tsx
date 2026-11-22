@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { parseInstructions } from "./InstructionsView";
 
-describe("parseInstructions across the five shipped languages", () => {
+describe("parseInstructions across the six shipped languages", () => {
   // The recipe's language has nothing to do with the interface language: the
   // text is whatever the author typed. Matching only Polish and English left
   // German, French and Spanish recipes rendering as one undifferentiated block.

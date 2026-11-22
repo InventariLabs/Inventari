@@ -20,12 +20,14 @@ import documentsPl from "@/modules/warehouse/i18n/pl.json";
 import documentsDe from "@/modules/warehouse/i18n/de.json";
 import documentsFr from "@/modules/warehouse/i18n/fr.json";
 import documentsEs from "@/modules/warehouse/i18n/es.json";
+import documentsPt from "@/modules/warehouse/i18n/pt.json";
 
 import recipesEn from "@/modules/recipes/i18n/en.json";
 import recipesPl from "@/modules/recipes/i18n/pl.json";
 import recipesDe from "@/modules/recipes/i18n/de.json";
 import recipesFr from "@/modules/recipes/i18n/fr.json";
 import recipesEs from "@/modules/recipes/i18n/es.json";
+import recipesPt from "@/modules/recipes/i18n/pt.json";
 
 interface Catalogue {
   profile: Record<string, string>;
@@ -38,6 +40,7 @@ const CATALOGUES: Record<string, Catalogue> = {
   de: documentsDe as unknown as Catalogue,
   fr: documentsFr as unknown as Catalogue,
   es: documentsEs as unknown as Catalogue,
+  pt: documentsPt as unknown as Catalogue,
 };
 
 // Languages whose typesShort carries bare names: a help in these languages
@@ -76,7 +79,7 @@ const capsTokens = (value: string): string[] =>
  * had already dropped — the fourth place a profile shortcut leaked into a
  * help. Unlike the numbering hints, these two keys have no
  * formatting placeholders to excuse a code, and the type has a name in every
- * language ("internal issue", "rozchód wewnętrzny"), so all five languages
+ * language ("internal issue", "rozchód wewnętrzny"), so all six languages
  * are held to it — Polish included.
  */
 const recipesSettings = (catalogue: unknown): Record<string, string> =>
@@ -88,6 +91,7 @@ const RECIPES_CATALOGUES: Record<string, unknown> = {
   de: recipesDe,
   fr: recipesFr,
   es: recipesEs,
+  pt: recipesPt,
 };
 
 const PAPERWORK_CODES = /\b(PZ|WZ|MM|PW|RW|KOR)\b/;

@@ -12,8 +12,11 @@ import declaredCoverage from "../../scripts/translation-coverage.json";
  *
  * One entry per language, carrying the picker's display metadata alongside
  * the code: `Language`, `SUPPORTED_LANGUAGES`, `LANGUAGE_NAMES` and the
- * picker's menu are all this array, so there is no second list a sixth
- * language can be added to and forgotten.
+ * picker's menu are all this array, so there is no second list a seventh
+ * language can be added to and forgotten. Every language in it is
+ * maintained: complete, and kept complete by every change. The community
+ * class remains for a translation written by a speaker of a language that
+ * has not joined them yet (see `community` below, and CONTRIBUTING.md).
  */
 export const LANGUAGES = [
   { code: "en", name: "EN", fullName: "English", flag: "🇬🇧" },
@@ -21,13 +24,7 @@ export const LANGUAGES = [
   { code: "de", name: "DE", fullName: "Deutsch", flag: "🇩🇪" },
   { code: "fr", name: "FR", fullName: "Français", flag: "🇫🇷" },
   { code: "es", name: "ES", fullName: "Español", flag: "🇪🇸" },
-  {
-    code: "pt",
-    name: "PT",
-    fullName: "Português (Brasil)",
-    flag: "🇧🇷",
-    community: true,
-  },
+  { code: "pt", name: "PT", fullName: "Português (Brasil)", flag: "🇧🇷" },
 ] as const satisfies readonly {
   code: string;
   name: string;
@@ -35,7 +32,9 @@ export const LANGUAGES = [
   flag: string;
   /** Ships below full coverage: no change has to translate it, and a key it
    *  has not got yet is read in English. Every other language is maintained —
-   *  a change brings all of them and the gates require the full set. */
+   *  a change brings all of them and the gates require the full set. No
+   *  language carries the flag today; it stays for a community translation
+   *  that joins the list before it is complete. */
   community?: true;
 }[];
 

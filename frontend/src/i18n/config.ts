@@ -13,7 +13,7 @@ import {
  * The translations, one language at a time.
  *
  * These are loaded one language at a time, not as fifty static imports plus an
- * eager glob over every module's bundle: that would put all five languages of
+ * eager glob over every module's bundle: that would put all six languages of
  * all of it in the entry chunk, downloaded by everyone including a visitor with
  * no account. Measured: 1.3 MB of raw JSON
  * of which a reader uses a fifth, and the module half is the larger one

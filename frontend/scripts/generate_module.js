@@ -12,7 +12,7 @@
  *     pages/IndexPage.tsx
  *     components/  (empty, .gitkeep)
  *     hooks/       (empty, .gitkeep)
- *     i18n/en.json, pl.json, de.json, fr.json, es.json
+ *     i18n/en.json, pl.json, de.json, fr.json, es.json, pt.json
  *     types/       (empty, .gitkeep - the quickstart's step 4 writes index.ts)
  */
 
@@ -222,6 +222,17 @@ const esJson = makeI18nJson({
     writeDesc: `Puede crear, editar y eliminar registros de ${humanName}`,
   },
 });
+const ptJson = makeI18nJson({
+  title: humanName,
+  description: `Módulo ${humanName} — adicione a descrição aqui.`,
+  navigation: { title: humanName },
+  permissions: {
+    read: `Ver ${humanName}`,
+    readDesc: `Pode abrir ${humanName} e ler seus registros`,
+    write: `Gerenciar ${humanName}`,
+    writeDesc: `Pode criar, editar e excluir registros de ${humanName}`,
+  },
+});
 
 // ---------------------------------------------------------------------------
 // Generate files
@@ -239,6 +250,7 @@ write("i18n/pl.json", plJson);
 write("i18n/de.json", deJson);
 write("i18n/fr.json", frJson);
 write("i18n/es.json", esJson);
+write("i18n/pt.json", ptJson);
 touch("types/.gitkeep");
 
 console.log(`

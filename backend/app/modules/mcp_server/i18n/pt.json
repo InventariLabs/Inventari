@@ -1,0 +1,14 @@
+{
+  "auth_required": "Este endpoint precisa de uma chave de API: envie-a no cabeçalho 'X-API-Key'.",
+  "permission_required": "Esta chave de API não tem uma permissão: 'Usar o endpoint MCP'.",
+  "module_disabled": "O módulo Servidor MCP está desligado para esta organização.",
+  "organization_required": "Uma chamada MCP age em uma organização, e esta chave não pertence a nenhuma.",
+  "insufficient_permission": "Esta chave de API não possui a permissão {permission}.",
+  "call_without_identity": "Esta chamada de ferramenta não tem um espaço de trabalho autenticado.",
+  "item_not_found": "Nenhum registro com id {item_id} existe neste espaço de trabalho.",
+  "location_not_found": "Nenhum local com id {location_id} existe neste espaço de trabalho.",
+  "location_required": "Um registro precisa de uma prateleira: informe location_id. Chame list_locations para encontrar uma.",
+  "lot_not_found": "Nenhum lote com id {lot_id} existe neste espaço de trabalho.",
+  "reason_required": "Uma correção precisa de um motivo: diga por que a quantidade muda.",
+  "quantity_not_negative": "Uma quantidade de estoque não pode ser negativa."
+}

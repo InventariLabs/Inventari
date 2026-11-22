@@ -1,7 +1,7 @@
 // ISO 4217 currency codes offered when a form asks for a currency.
 //
 // Kept as a plain code list; human-readable labels are resolved at render
-// time via `Intl.DisplayNames`, so the list stays localised in all five UI
+// time via `Intl.DisplayNames`, so the list stays localised in all six UI
 // languages without duplicating a translation table per language. The same
 // set is mirrored in the backend purchase_orders schemas, which reject any
 // code outside it.

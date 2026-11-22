@@ -299,7 +299,9 @@
   },
   "counts": {
     "inSublocations_one": "{{count}} em sublocais",
-    "inSublocations_other": "{{count}} em sublocais"
+    "inSublocations_other": "{{count}} em sublocais",
+    "recordsInside_one": "{{count}} registro aqui e nos sublocais",
+    "recordsInside_other": "{{count}} registros aqui e nos sublocais"
   },
   "stats": {},
   "storageNotFound": "Local não encontrado",

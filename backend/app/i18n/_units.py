@@ -103,7 +103,7 @@ UNIT_LABELS: dict[Language, UnitLabels] = {
         'can': 'lata',
         'bottle': 'garrafa',
         'box': 'caixa',
-        'bag': 'sacola',
+        'bag': 'saco',
         'oz': 'oz',
         'lb': 'lb',
         'mg': 'mg',

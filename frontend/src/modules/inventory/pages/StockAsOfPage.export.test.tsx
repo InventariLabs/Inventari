@@ -111,7 +111,7 @@ describe("StockAsOfPage — exports, paging and the retry", () => {
     );
     const query = vi.mocked(stockAsOfApi.exportXlsx).mock.calls[0]?.[0];
     expect(query).toMatchObject({ location_id: undefined });
-    expect(query?.as_of).toEqual(expect.any(String));
+    expect(query?.as_of).toBe(todayIso());
     expect(toast.success).toHaveBeenCalledWith("Export complete", {
       id: "as-of-export",
     });

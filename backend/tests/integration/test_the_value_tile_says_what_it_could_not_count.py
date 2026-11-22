@@ -4,7 +4,7 @@ The overview screen showed "$0.00 -- approximate total value across all
 items" over sixty priced products. The domain layer had it right: prices in
 a currency that is not the organization's are dropped, because two
 currencies do not add, and it returned the count of what it dropped beside
-the figure. The front end already had the warning text, in five languages.
+the figure. The front end already had the warning text, in every language.
 
 The number never reached the browser. ``OverviewStats`` -- the endpoint's
 response model -- declared neither ``excluded_other_currency_count`` nor

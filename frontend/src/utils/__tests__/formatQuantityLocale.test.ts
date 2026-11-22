@@ -36,7 +36,7 @@ describe("formatQuantityLocale", () => {
   });
 
   it("writes the number the way the reader's language does", async () => {
-    // Four of the five supported languages put a comma where JavaScript's
+    // Five of the six supported languages put a comma where JavaScript's
     // own `String(Number(...))` puts a point, and none of them ever saw one.
     await i18n.changeLanguage("pl");
     expect(formatQuantityLocale("1234.5")).toBe("1234,5");

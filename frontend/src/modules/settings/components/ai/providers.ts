@@ -60,7 +60,7 @@ interface ProviderDescriptor {
  * The catalog key describing what a provider is good for.
  *
  * The descriptions are catalog keys, not English literals in this file: sixteen
- * of them, on a screen translated into five languages.
+ * of them, on a screen translated into six languages.
  */
 export const providerDescriptionKey = (id: LlmProvider): string =>
   `config.providerDescription.${id}`;
@@ -278,7 +278,7 @@ export const PROVIDERS: ReadonlyArray<ProviderDescriptor> = [
   {
     id: "custom",
     name: "Custom OpenAI-compatible",
-    // Not a brand, so it is not the same string in five languages.
+    // Not a brand, so it is not the same string in six languages.
     nameKey: "config.providerName.custom",
     group: "custom",
     icon: "Settings",

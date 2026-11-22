@@ -5,11 +5,12 @@ import pl from "../i18n/pl.json";
 import de from "../i18n/de.json";
 import fr from "../i18n/fr.json";
 import es from "../i18n/es.json";
+import pt from "../i18n/pt.json";
 
 /**
  * Guard test for the ``warehouse`` module locale catalog. Mirrors the
  * purchase_orders / equipment parity tests and ``coreLocaleParity`` so a
- * missing PL/DE/FR/ES key is caught at test time instead of silently
+ * missing PL/DE/FR/ES/PT key is caught at test time instead of silently
  * falling back to English in production.
  */
 
@@ -21,6 +22,7 @@ const catalogs: Record<string, Catalog> = {
   de: de as unknown as Catalog,
   fr: fr as unknown as Catalog,
   es: es as unknown as Catalog,
+  pt: pt as unknown as Catalog,
 };
 
 function flatKeys(node: unknown, prefix: string[] = []): string[] {
@@ -37,9 +39,9 @@ function flatKeys(node: unknown, prefix: string[] = []): string[] {
   return [];
 }
 
-const LANGUAGES = ["pl", "de", "fr", "es"] as const;
+const LANGUAGES = ["pl", "de", "fr", "es", "pt"] as const;
 
-describe("documents — 5-language key parity", () => {
+describe("documents — 6-language key parity", () => {
   const enKeys = new Set(flatKeys(catalogs.en));
 
   for (const lang of LANGUAGES) {

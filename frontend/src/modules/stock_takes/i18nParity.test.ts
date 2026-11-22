@@ -15,6 +15,7 @@ import pl from "./i18n/pl.json";
 import de from "./i18n/de.json";
 import fr from "./i18n/fr.json";
 import es from "./i18n/es.json";
+import pt from "./i18n/pt.json";
 
 type Catalog = Record<string, unknown>;
 
@@ -24,6 +25,7 @@ const catalogs: Record<string, Catalog> = {
   de: de as unknown as Catalog,
   fr: fr as unknown as Catalog,
   es: es as unknown as Catalog,
+  pt: pt as unknown as Catalog,
 };
 
 const STATUSES = ["draft", "in_progress", "completed", "cancelled"] as const;
@@ -41,7 +43,7 @@ function pathGet(node: unknown, dottedKey: string): unknown {
   return cur;
 }
 
-describe(" i18n parity (5 languages)", () => {
+describe(" i18n parity (every shipped language)", () => {
   it.each(Object.entries(catalogs))(
     "%s has translated statuses without raw key prefixes",
     (_lang, catalog) => {

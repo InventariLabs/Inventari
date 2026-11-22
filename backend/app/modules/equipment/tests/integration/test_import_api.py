@@ -351,6 +351,12 @@ class TestAnalyzeSuggestions:
         b'Laptop,SN-PL,HP,EliteBook,Laptop,Server Room A,1000,2024-01-01,2026-01-01\n'
     )
 
+    _PORTUGUESE_CSV = (
+        b'Nome,N\xc3\xbamero de s\xc3\xa9rie,Fabricante,Modelo,Categoria,Local,'
+        b'Pre\xc3\xa7o de compra,Data de compra,Garantia at\xc3\xa9\n'
+        b'Laptop,SN-PT,HP,EliteBook,Laptop,Sala de servidores,1000,2024-01-01,2026-01-01\n'
+    )
+
     def test_analyze_suggests_polish_headers(
         self, client: TestClient, eq_auth_headers: dict[str, str]
     ) -> None:
@@ -373,6 +379,26 @@ class TestAnalyzeSuggestions:
         assert suggestions['purchase_price'] == 'Cena zakupu'
         assert suggestions['purchase_date'] == 'Data zakupu'
         assert suggestions['warranty_until'] == 'Gwarancja do'
+
+    def test_analyze_suggests_portuguese_headers(
+        self, client: TestClient, eq_auth_headers: dict[str, str]
+    ) -> None:
+        resp = client.post(
+            '/api/v1/equipment/import/analyze',
+            headers=eq_auth_headers,
+            files={'file': ('assets.csv', self._PORTUGUESE_CSV, 'text/csv')},
+        )
+        assert resp.status_code == status.HTTP_200_OK, resp.text
+        suggestions = resp.json()['suggested_mapping']
+        assert suggestions['name'] == 'Nome'
+        assert suggestions['serial_number'] == 'Número de série'
+        assert suggestions['brand'] == 'Fabricante'
+        assert suggestions['model'] == 'Modelo'
+        assert suggestions['category'] == 'Categoria'
+        assert suggestions['location'] == 'Local'
+        assert suggestions['purchase_price'] == 'Preço de compra'
+        assert suggestions['purchase_date'] == 'Data de compra'
+        assert suggestions['warranty_until'] == 'Garantia até'
 
 
 @pytest.mark.integration

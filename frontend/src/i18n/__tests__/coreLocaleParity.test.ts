@@ -26,7 +26,7 @@ import {
  * and not be one.
  *
  * Two classes of language, declared in `languages.ts`. A maintained language
- * (pl, de, fr, es) is complete by rule: every English key, always, and its
+ * (pl, de, fr, es, pt) is complete by rule: every English key, always, and its
  * declaration must say 100. A community language gets partial credit, per
  * the dead-code gates' baseline pattern (knip, check:i18n:unused, vulture):
  * it declares its coverage in `frontend/scripts/translation-coverage.json`,

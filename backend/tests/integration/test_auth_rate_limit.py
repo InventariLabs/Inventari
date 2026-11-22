@@ -37,6 +37,7 @@ from app.config import settings
 from app.core.contracts import API_KEY_PREFIX
 from app.core.limiter import limiter
 from app.database import get_async_db, get_db
+from app.i18n import MAINTAINED_LANGUAGES
 from app.i18n.service import get_error_message
 from app.main import app
 from app.modules.api_keys.models import ApiKey
@@ -494,9 +495,9 @@ class TestLimitsOnRoutesWithAPathParameter:
         assert statuses[:3] == [401, 401, 401] and statuses[3] == 429, statuses
 
 
-#: The five maintained languages: each has a catalogue row of its own for the
-#: refusal, so a sentence answered in the wrong one cannot match by accident.
-_MAINTAINED_LANGUAGES = ('en', 'pl', 'de', 'fr', 'es')
+#: Every maintained language has a catalogue row of its own for the refusal, so
+#: a sentence answered in the wrong one cannot match by accident.
+_MAINTAINED_LANGUAGES = MAINTAINED_LANGUAGES
 
 
 @pytest.mark.integration

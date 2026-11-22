@@ -27,6 +27,8 @@ HOUSEHOLD_WORDS: dict[str, tuple[str, ...]] = {
     'de': ('haushalt',),
     'fr': ('ménage', 'foyer'),
     'es': ('hogar',),
+    # agregado familiar / núcleo familiar — the tenant called a household.
+    'pt': ('agregado familiar', 'núcleo familiar'),
 }
 
 
@@ -61,9 +63,11 @@ class TestTheCoreNamesTheTenantNeutral:
                 )
             },
             'en': {'organization_not_found': 'Household not found'},
+            'pt': {'organization_not_found': 'Agregado familiar não encontrado'},
         }
 
         assert households_in(pre_fix) == [
             'en:organization_not_found',
             'pl:organization_invite_invalid',
+            'pt:organization_not_found',
         ]

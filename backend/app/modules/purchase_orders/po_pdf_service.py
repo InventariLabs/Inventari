@@ -138,11 +138,35 @@ _PO_SPECIFIC_ES: dict[str, str] = {
     'footer': 'Documento generado por el sistema Inventari.',
 }
 
+_PO_SPECIFIC_PT: dict[str, str] = {
+    'document': 'Pedido de compra',
+    'number': 'Número',
+    'date': 'Data',
+    'partner': 'Fornecedor',
+    'line_items': 'Linhas do pedido',
+    'product': 'Produto',
+    'sku': 'SKU',
+    'quantity': 'Qtd. pedida',
+    'received': 'Qtd. recebida',
+    'net_value': 'Valor líquido',
+    'vat': 'Imposto',
+    'gross_value': 'Valor bruto',
+    'currency': 'Moeda',
+    'total_vat': 'Total de impostos',
+    'status_draft': 'Rascunho',
+    'status_confirmed': 'Confirmado',
+    'status_completed': 'Concluído',
+    'status_cancelled': 'Cancelado',
+    'no_price_yet': 'Ainda sem preço',
+    'footer': 'Documento gerado pelo sistema Inventari.',
+}
+
 _LABELS_EN: dict[str, str] = {**core_api.pdf.common_labels('en'), **_PO_SPECIFIC_EN}
 _LABELS_PL: dict[str, str] = {**core_api.pdf.common_labels('pl'), **_PO_SPECIFIC_PL}
 _LABELS_DE: dict[str, str] = {**core_api.pdf.common_labels('de'), **_PO_SPECIFIC_DE}
 _LABELS_FR: dict[str, str] = {**core_api.pdf.common_labels('fr'), **_PO_SPECIFIC_FR}
 _LABELS_ES: dict[str, str] = {**core_api.pdf.common_labels('es'), **_PO_SPECIFIC_ES}
+_LABELS_PT: dict[str, str] = {**core_api.pdf.common_labels('pt'), **_PO_SPECIFIC_PT}
 
 
 class _PoPdfService(PdfServiceBase):
@@ -152,6 +176,7 @@ class _PoPdfService(PdfServiceBase):
     labels_de = _LABELS_DE
     labels_fr = _LABELS_FR
     labels_es = _LABELS_ES
+    labels_pt = _LABELS_PT
     module_name = 'purchase_orders'
 
 

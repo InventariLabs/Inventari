@@ -451,6 +451,96 @@
       "language": "es",
       "key": "old_status_in_progress",
       "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "BOTH",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "CUSTOMER",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "EMPLOYEE",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "FEFO",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "FIFO",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "MANUFACTURER",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "POST",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "PUT",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "SERVICE_PROVIDER",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "SUPPLIER",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "new_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "new_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "new_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "new_status_in_progress",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "old_status_cancelled",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "old_status_completed",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "old_status_draft",
+      "section": "values"
+    },
+    {
+      "language": "pt",
+      "key": "old_status_in_progress",
+      "section": "values"
     }
   ]
 }

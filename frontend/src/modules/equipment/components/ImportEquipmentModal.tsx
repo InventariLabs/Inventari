@@ -173,7 +173,7 @@ export default function ImportEquipmentModal({
     try {
       const result = await equipmentApi.analyzeImport(file);
       setAnalyzeResult(result);
-      // the backend suggests mappings via aliases in all five
+      // the backend suggests mappings via aliases in all six
       // module languages — the frontend heuristics are not needed.
       setMapping(result.suggested_mapping ?? {});
       setStep("mapping");

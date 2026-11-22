@@ -7,7 +7,7 @@
  * and matching only the interface language would leave that text as one
  * undifferentiated block. Every list is matched, always.
  *
- * The plan asked for i18n resources here. Reading five catalogues to parse text
+ * The plan asked for i18n resources here. Reading six catalogues to parse text
  * that has no relationship to the interface language would tie the parser to
  * i18n init for no gain — the deviation is on purpose.
  */

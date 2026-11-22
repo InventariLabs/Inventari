@@ -32,7 +32,7 @@ from .status_machine import validate_transition
 
 logger = get_logger(__name__)
 
-# Header aliases across the module's five languages plus
+# Header aliases across the module's maintained languages plus
 # common English variants. Matching is case-, diacritics- and space-insensitive.
 _FIELD_ALIASES: dict[str, list[str]] = {
     'name': [
@@ -43,6 +43,8 @@ _FIELD_ALIASES: dict[str, list[str]] = {
         'bezeichnung',
         'nom',
         'nombre',
+        'nome',
+        'nome do equipamento',
     ],
     'serial_number': [
         'serial number',
@@ -54,6 +56,8 @@ _FIELD_ALIASES: dict[str, list[str]] = {
         'numéro de série',
         'numero de serie',
         'n.º de serie',
+        'número de série',
+        'n.º de série',
     ],
     'asset_tag': [
         'asset tag',
@@ -63,6 +67,7 @@ _FIELD_ALIASES: dict[str, list[str]] = {
         'inventarnummer',
         'étiquette',
         'etiqueta',
+        'etiqueta do equipamento',
     ],
     # Brand and manufacturer name the same thing about an asset, and the
     # detail screen shows one field. A file may head that column either way.
@@ -87,6 +92,7 @@ _FIELD_ALIASES: dict[str, list[str]] = {
         'emplacement',
         'ubicación',
         'ubicacion',
+        'local',
     ],
     'category': [
         'category',
@@ -103,6 +109,7 @@ _FIELD_ALIASES: dict[str, list[str]] = {
         'kaufpreis',
         "prix d'achat",
         'precio de compra',
+        'preço de compra',
     ],
     'purchase_date': [
         'purchase date',
@@ -110,6 +117,7 @@ _FIELD_ALIASES: dict[str, list[str]] = {
         'kaufdatum',
         "date d'achat",
         'fecha de compra',
+        'data de compra',
     ],
     'warranty_until': [
         'warranty until',
@@ -118,7 +126,7 @@ _FIELD_ALIASES: dict[str, list[str]] = {
         'garantie bis',
         "garantie jusqu'à",
         'garantía hasta',
-        'garantia hasta',
+        'garantia até',
     ],
     'notes': ['notes', 'notatki', 'notizen', 'remarques', 'notas'],
     'equipment_status': [
@@ -126,6 +134,7 @@ _FIELD_ALIASES: dict[str, list[str]] = {
         'equipment status',
         'état de l’équipement',
         'estado del equipo',
+        'estado do equipamento',
         'gerätestatus',
     ],
 }

@@ -308,12 +308,12 @@ REQUIRED_LANGUAGES = [lang for lang in MAINTAINED_LANGUAGES if lang != 'en']
 
 
 def is_strict_i18n(module_dir: Path) -> bool:
-    """True when this module owes all five languages, not just ``en``.
+    """True when this module owes every maintained language, not just ``en``.
 
     Core and official modules ship with the product, so an untranslated string
     there is a product defect. A community module is written by someone who may
-    speak one language, and demanding four placeholder catalogs only ever
-    produced empty files.
+    speak one language, and demanding a placeholder catalog per language only
+    ever produced empty files.
     """
     try:
         module_type = ModuleManifest.load(module_dir).module_type
@@ -334,10 +334,10 @@ def validate_i18n(module_dir: Path) -> list[tuple[str, str]]:
 
     Severity rules:
     - ``en.json`` is always required (error).
-    - Other maintained languages (pl, de, fr, es) are required for *core* and *official*
+    - Other maintained languages (pl, de, fr, es, pt) are required for *core* and *official*
       modules (error) and not reported at all for *community* modules: English
       is the only language a package owes, and a warning per language it
-      chose not to ship reads as four problems above "validation passed".
+      chose not to ship reads as a problem per language above "validation passed".
     - A missing ``i18n/`` directory is reported at the appropriate severity.
     """
     results: list[tuple[str, str]] = []

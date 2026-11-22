@@ -20,7 +20,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.testing import ModuleTestHelper
-from app.i18n import Language
+from app.i18n import MAINTAINED_LANGUAGES, Language
 from app.i18n.service import set_current_lang
 from app.models.organization import Organization
 from app.models.storage_location import StorageLocation
@@ -537,7 +537,7 @@ class TestCreateReturn:
         assert lines[0].quantity == Decimal('5')
 
     @pytest.mark.asyncio
-    @pytest.mark.parametrize('lang', ['en', 'pl', 'de', 'fr', 'es'])
+    @pytest.mark.parametrize('lang', MAINTAINED_LANGUAGES)
     async def test_return_without_a_note_stores_no_note(
         self,
         lang: Language,

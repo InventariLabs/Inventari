@@ -61,9 +61,10 @@ _OVERWRITABLE_TEXT = ('brand', 'barcode', 'serial_number')
 #: as opposed to one of the fixed system columns above.
 _FIELD_PREFIX = 'field:'
 
-#: How a sheet says yes or no to a yes/no field, in the five languages.
-_YES = frozenset({'1', 'true', 'yes', 'y', 'x', 'tak', 'ja', 'oui', 'si', 'sí'})
-_NO = frozenset({'0', 'false', 'no', 'n', 'nie', 'nein', 'non'})
+#: How a sheet says yes or no to a yes/no field, in every maintained language.
+#: The accented and unaccented Portuguese spellings both appear in sheets.
+_YES = frozenset({'1', 'true', 'yes', 'y', 'x', 'tak', 'ja', 'oui', 'si', 'sí', 'sim'})
+_NO = frozenset({'0', 'false', 'no', 'n', 'nie', 'nein', 'non', 'não', 'nao'})
 
 
 #: Rows imported between two progress reports.

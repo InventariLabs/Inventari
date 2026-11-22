@@ -113,7 +113,7 @@ Organization modules** (chapter 14).
   it, one you have read goes after 90 days and one you have not after a year.
 - **The screen icon** switches between **Light**, **Dark** and **Follow system**.
   The choice is kept by this browser.
-- **The language selector** (EN, PL, DE, FR, ES, and PT, a community translation that may still show English in places) is saved to your account.
+- **The language selector** (EN, PL, DE, FR, ES and PT — Português (Brasil)) is saved to your account.
 - **Your avatar** opens **My profile**, **About**, the **User guide** and
   **Log out**.
 
@@ -550,7 +550,10 @@ it later leaves existing products as they are.
 
 **Stock on a date** answers "what did we have on the 31st?": pick **As of** and
 optionally a location, then **Export** or **Print**. Values appear where the
-cost history reaches back that far.
+cost history reaches back that far. A day ends at midnight in the
+organization's time zone, not the one of the computer you read it on, so the
+screen, its exports and the closing of **Value movement** for the same day
+always agree.
 
 ### Movements
 

@@ -15,9 +15,9 @@ import { MAINTAINED_LANGUAGES } from "@/test/languageClasses";
  * three screens. This test enforces the same rules one storey up:
  *
  * 1. Every shipped profile has `profiles.<id>.name` and
- *    `profiles.<id>.description` in ALL five common.json catalogs.
+ *    `profiles.<id>.description` in ALL six common.json catalogs.
  * 2. Outside `en`, neither text is byte-identical to the English one — the
- *    signature of a placeholder pasted across the five files.
+ *    signature of a placeholder pasted across the six files.
  * 3. No component renders `profile.name` / `profile.description` directly;
  *    every label goes through `useProfileLabels`. A raw read is invisible to
  *    invariants 1 and 2 — the catalog can be perfect while the screen still
@@ -80,7 +80,7 @@ function sourceFiles(dir: string): string[] {
 }
 
 describe("workspace mode name parity", () => {
-  it("every shipped profile has name+description in all five locales", () => {
+  it("every shipped profile has name+description in all six locales", () => {
     const problems: string[] = [];
     for (const id of PROFILE_IDS) {
       for (const lang of MAINTAINED_LANGUAGES) {
