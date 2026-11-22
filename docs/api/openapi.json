@@ -64681,6 +64681,7 @@
           },
           "currency": {
             "type": "string",
+            "maxLength": 3,
             "title": "Currency",
             "default": "USD"
           },
@@ -64991,7 +64992,8 @@
           "currency": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 3
               },
               {
                 "type": "null"
