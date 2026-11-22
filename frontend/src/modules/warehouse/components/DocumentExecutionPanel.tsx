@@ -51,8 +51,9 @@ export function DocumentExecutionPanel({
   // takes stock off the shelf and a correction restates it.
   const isReceipt = document.type === "IN" || document.type === "INTERNAL_IN";
   // A dispatch leaves with a carrier, and this panel is one of the doors it
-  // is completed through; every other type completes as it always did.
-  const ships = isPackedType(document.type);
+  // is completed through; every other type completes as it always did. An
+  // internal issue stays inside the company, so it has no carrier to name.
+  const ships = isPackedType(document.type) && document.type !== "INTERNAL_OUT";
   const [shipment, setShipment] = useState(EMPTY_SHIPMENT);
   const [shipmentFault, setShipmentFault] = useState<string>();
 

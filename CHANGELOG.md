@@ -392,6 +392,14 @@ says what the release does rather than what changed since them.
   recorded; a note under the day field says so once a past day is chosen. The Portuguese "Planned for" label reads
   "Planejado para", as the rest of the Portuguese text does.
 
+- **Cook a batch for stock** no longer claims a production recipe exists for a
+  product after a run was abandoned. When the order was refused (for example
+  for a shortage) and the sheet was closed, the production recipe made for the
+  attempt is discarded, but the next sheet on the same product and recipe kept
+  saying one existed, with the discarded yield, for several minutes; it now
+  starts as a pair with no production recipe. The sentence under the yield
+  field also no longer ends in a doubled full stop after an abbreviated unit
+  such as "pcs." or "szt.".
 - The asset list no longer offers **Export** to an account the export would
   refuse. A role without the permission to view products, such as one that
   holds only the stock-take permissions, used to meet "You do not have
