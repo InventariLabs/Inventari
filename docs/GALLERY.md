@@ -28,7 +28,7 @@ picking, packing and shipping them.
 
 ## Getting started
 
-![The launcher: "Welcome, Olivia", the profile Equipment & Warehouse, and the wholesaler's modules grouped into essentials — inventory with one product running low — and business: equipment tracking, approvals, purchase orders, the warehouse with five things to do today and partners, above settings and the module store](images/launcher.webp)
+![The launcher: "Welcome, Olivia", the profile Equipment & Warehouse, and the wholesaler's modules grouped into essentials — inventory with one thing needing attention — and business: equipment tracking, approvals, purchase orders, the warehouse with five things to do today and partners, above settings and the module store](images/launcher.webp)
 
 **The launcher** — where signing in opens, unless the organization has
 narrowed itself to a single module or you were sent to the sign-in page from
@@ -94,7 +94,7 @@ it, and hear back about what is broken.
 **Recipes** — "I can cook" means every ingredient is on the shelf; the near
 misses say what they are short of.
 
-![This week's meal plan: breakfast and dinner over seven days, the meals still to cook marked Cook Now, and under the week each day's carbohydrates, protein, fat and calories for all the servings planned that day](images/meal-plan.webp)
+![This week's meal plan: breakfast and dinner over seven days, the meal still to cook marked Cook Now, and under the week each day's carbohydrates, protein, fat and calories for one serving of each planned meal](images/meal-plan.webp)
 
 **Meal planner** — a week of meals cooked from stock, with what each day adds
 up to.

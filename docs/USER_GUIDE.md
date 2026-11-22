@@ -117,7 +117,7 @@ Organization modules** (chapter 14).
 - **Your avatar** opens **My profile**, **About**, the **User guide** and
   **Log out**.
 
-![The launcher: "Welcome, Olivia", the profile Equipment & Warehouse, and the wholesaler's modules grouped into essentials — inventory with one product running low — and business: equipment tracking, approvals, purchase orders, the warehouse with five things to do today and partners, above settings and the module store](images/launcher.webp)
+![The launcher: "Welcome, Olivia", the profile Equipment & Warehouse, and the wholesaler's modules grouped into essentials — inventory with one thing needing attention — and business: equipment tracking, approvals, purchase orders, the warehouse with five things to do today and partners, above settings and the module store](images/launcher.webp)
 
 On a phone, the top bar keeps search, the bell and the avatar; settings, the
 theme and the language move into the avatar menu (**Settings**,
@@ -125,7 +125,7 @@ theme and the language move into the avatar menu (**Settings**,
 **Overview**, **Scan** and **More** — the last one holds the rest of the tabs
 and links to the other modules.
 
-![The launcher on a phone: "Welcome, Olivia", the profile Equipment & Warehouse and the modules of a business as tiles — inventory with one product running low, equipment tracking, approvals, purchase orders, warehouse with five things to do today, partners and settings](images/mobile-launcher.webp)
+![The launcher on a phone: "Welcome, Olivia", the profile Equipment & Warehouse and the modules of a business as tiles — inventory with one thing needing attention, equipment tracking, approvals, purchase orders, warehouse with five things to do today, partners and settings](images/mobile-launcher.webp)
 
 ---
 
@@ -717,14 +717,14 @@ products cost you, and **Cooking history**.
 > the label of each product used. Whoever enters the data and serves or sells
 > the food is responsible for it; Inventari gives no dietary or medical advice.
 
-![A chicken curry recipe on a phone: its photograph, estimated cost, servings, cooking time and allergen, and the first ingredients — chicken breast fillet in the walk-in cooler](images/mobile-recipe.webp)
+![A chicken curry recipe on a phone: its photograph, estimated cost of $11.34, four servings in 40 minutes and the note that no allergens are marked, and the first ingredient — 600 g of chicken breast fillet on its shelf in Fridge A](images/mobile-recipe.webp)
 
 ### 8.3 Meal planner
 
 **Recipes → Meal Planner → New Plan**: a name, start and end dates, the meal
 slots you use (breakfast, lunch, dinner, snack) and servings per meal.
 
-![This week's meal plan: breakfast and dinner over seven days, the meals still to cook, from today on, marked Cook Now, and under the week each day's carbohydrates, protein, fat and calories for the servings planned that day, with a note on the days whose ingredients have nutrition data only in part](images/meal-plan.webp)
+![This week's meal plan: breakfast and dinner over seven days, the meal still to cook, from today on, marked Cook Now, and under the week each day's carbohydrates, protein, fat and calories for one serving of each planned meal, with a note on the days whose ingredients have nutrition data only in part](images/meal-plan.webp)
 
 - Click an empty slot to **Pick a recipe**. The **Suggested** tab favours
   recipes you can cook now, that use up what expires soon, that you have not
@@ -1647,7 +1647,7 @@ uses the product's default BOM). Enter the quantity and where the output goes.
 *What are you recording?* — **Already made**, saved with **Save as made**, or
 **Planning to make**, written with **Plan the run**.
 
-![The list of production runs: a completed batch of plum butter planned at 12 kg, with its cost of $95.36 and a margin of $109.90](images/production-runs.webp)
+![The list of production runs as cards: four planned runs of plum butter, three covered and one partly covered, one run in progress with $79.47 taken so far in the batch DAMSON-A, and one completed run of 12 kg with its cost of $95.36 and a margin of $109.90](images/production-runs.webp)
 
 **Production → Plan** shows the planned runs of a week or a month by day (a list
 by day on a phone). **Move** puts a run on another day. Each run says whether
@@ -1658,7 +1658,7 @@ missing. **Order what is missing** raises the purchase orders for it.
 
 ![The production plan for 23–29 November: three runs of plum butter, 8, 12 and 10 kg, planned for the 23rd, 24th and 25th and marked Covered, and a run of 12 kg on the 27th marked Partly covered, above the list of what the planned runs need — 13.23 kg of sugar against 10.07 kg in stock, 3.16 kg missing — with the Order what is missing button](images/production-plan.webp)
 
-![The production plan on a phone: the planned plum butter runs of the week listed by day, each with its coverage, and under them what the runs need and what is missing](images/production-plan-phone.webp)
+![The production plan on a phone: the planned plum butter runs of the week listed by day, each with its coverage, above the heading of what the runs need and the Order what is missing button](images/production-plan-phone.webp)
 
 **Complete run** takes the materials off the shelves and puts the product into
 stock at the target location. You may enter the quantity actually produced; the

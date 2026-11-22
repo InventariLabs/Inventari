@@ -310,7 +310,7 @@ all of them.
 
 ### In the dark
 
-![The warehouse Start in dark mode: four actions — receive, issue, move, count — above today's to-do list: Sam Okafor's card to wrap the pallet for Northside Grocers, the order for Northside Grocers to pick, the two orders Priya Nair is picking and the delivery from Ortolana Imports to receive, each with who it is assigned to; beside it today's activity, the two receipts at 08:01 and 08:33 and the two shipped orders at 10:03 and 10:11; below them a field for a new task](docs/images/warehouse-start-dark.webp)
+![The warehouse Start in dark mode: four actions — receive, issue, move, count — above today's to-do list: Sam Okafor's card to wrap the pallet for Northside Grocers, the order for Northside Grocers to pick, the two orders Priya Nair is picking and the delivery from Ortolana Imports to receive, each with a selector for who it is assigned to; beside it today's activity, the two receipts at 08:01 and 08:33 and the two shipped orders at 10:03 and 10:11; below them a field for a new task](docs/images/warehouse-start-dark.webp)
 
 ### A phone that is not an afterthought
 
@@ -319,7 +319,7 @@ rather than a narrowed table.
 
 | | | |
 |---|---|---|
-| ![The warehouse Start on a phone: "Hello, Sam", the four actions as large tiles and today's work in order, beginning with Sam's card to wrap the pallet for Northside Grocers and the order for Northside Grocers assigned to Sam, above the bottom bar of Start, Scan, History and More](docs/images/mobile-start.webp) | ![A picking session over two orders on a phone: a progress chip for each — OUT/2026/003 one of four lines picked, OUT/2026/004 two of three — the next line to take, ten packs of Arborio rice from shelf B-01-03, the scan field with the note that a barcode scanner can be used, and the lines already picked with their shelf and best-before date](docs/images/picking-several.webp) | ![The launcher on a phone: "Welcome, Olivia", the profile Equipment & Warehouse and the modules of a business as tiles — inventory with one product running low, equipment tracking, approvals, purchase orders, warehouse with five things to do today, partners and settings](docs/images/mobile-launcher.webp) |
+| ![The warehouse Start on a phone: "Hello, Sam", the four actions as large tiles and today's work in order, beginning with Sam's card to wrap the pallet for Northside Grocers and the delivery order for Laneway Espresso Bar, above the bottom bar of Start, Scan, History and More](docs/images/mobile-start.webp) | ![A picking session over two orders on a phone: a progress chip for each — OUT/2026/003 one of four lines picked, OUT/2026/004 two of three — the next line to take, ten packs of Arborio rice from shelf B-01-03, the scan field with the note that a barcode scanner can be used, and the lines already picked with their shelf and best-before date](docs/images/picking-several.webp) | ![The launcher on a phone: "Welcome, Olivia", the profile Equipment & Warehouse and the modules of a business as tiles — inventory with one thing needing attention, equipment tracking, approvals, purchase orders, warehouse with five things to do today, partners and settings](docs/images/mobile-launcher.webp) |
 | **Start** — the day's work for the person holding the phone. | **Picking several orders at once** — one walk in the warehouse's order, every line naming the order it is for. | **The launcher** — the modules this business runs, with what waits in each. |
 
 ---

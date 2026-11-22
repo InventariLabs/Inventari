@@ -3876,18 +3876,18 @@ def _create_maintenance_demo(db, org_id, created_by) -> int:
 
 
 def _create_production_demo(db, org_id, created_by, maker_ids) -> int:
-    """One finished production run, so the module reports a result.
+    """The workshop's production runs: one finished, one under way, four planned.
 
     "Monthly result" on the overview reads from completed runs, and a demo
     with none said "No completed runs with a result yet" on an instance whose
     whole point is to show the feature working.
 
-    The run used to be one row written here with a total typed in by hand: no
-    ingredient on it ("No ingredients were recorded for this run"), nothing
-    taken off a shelf and nothing put on one. It is now made the way the
-    application makes one — a draft order, then the completion that draws the
-    ingredients ``_stock_the_workshop`` put on the shelves, prices them off
-    their cost layers and puts the jars on a shelf.
+    The finished run is made the way the application makes one — a draft
+    order, then the completion that draws the ingredients
+    ``_stock_the_workshop`` put on the shelves, prices them off their cost
+    layers and puts the jars on a shelf. The run under way was started some
+    days ago with a portion already made, and the planned runs are drafts
+    with a day each, so the plan and the run list have something to show.
     """
     parent_id = maker_ids.get('Plum Butter') if maker_ids else None
     if parent_id is None:
