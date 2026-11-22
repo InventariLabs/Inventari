@@ -619,6 +619,20 @@ done
             'journal-2026-11-21.log.gz.age',
         ]
 
+        # A bucket of its own for the logs, because its lock is shorter.
+        shutil.rmtree(remote / 'logs')
+        logs_bucket = tmp_path / 'logs-bucket'
+        separate = run(
+            BACKUP_RCLONE_REMOTE=str(remote),
+            LOGS_RCLONE_REMOTE=str(logs_bucket),
+            AGE_RECIPIENT=_KEY,
+        )
+        assert separate.returncode != 1, separate.stderr
+        assert sorted(p.name for p in logs_bucket.iterdir()) == [
+            'journal-2026-11-21.log.gz.age',
+        ]
+        assert not (remote / 'logs').exists()
+
     def test_the_healthcheck_counts_a_plain_backup_as_fresh(self) -> None:
         test = _compose()['db-backup']['healthcheck']['test'][1]
 

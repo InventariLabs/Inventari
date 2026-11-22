@@ -262,7 +262,11 @@ class TestWiring:
 
         assert './logs:/logs:ro' in service['volumes']
         assert '"$$BACKUP_RCLONE_REMOTE/backups"' in command
-        assert '"$$BACKUP_RCLONE_REMOTE/logs"' in command
+        # One bucket: the logs fall in beside the backups. A different
+        # retention for logs and backups means a second bucket, and then
+        # LOGS_RCLONE_REMOTE names it.
+        assert '"$${LOGS_RCLONE_REMOTE:-$$BACKUP_RCLONE_REMOTE/logs}"' in command
+        assert 'LOGS_RCLONE_REMOTE' in service['environment']
         assert command.count('--include "*.age"') == 2
 
     def test_the_exported_logs_are_not_sent_into_the_backups_sync(self) -> None:
@@ -270,7 +274,7 @@ class TestWiring:
         command = ' '.join(_compose()['db-backup-offsite']['command'])
 
         assert 'rclone sync /backups "$$BACKUP_RCLONE_REMOTE/backups"' in command
-        assert 'rclone sync /logs "$$BACKUP_RCLONE_REMOTE/logs"' in command
+        assert 'rclone sync /logs "$$logs_remote"' in command
 
     def test_the_guide_sets_the_retention_and_the_size_cap_on_the_host(self) -> None:
         guide = (_REPO_ROOT / 'DEPLOYMENT.md').read_text(encoding='utf-8')
@@ -284,19 +288,28 @@ class TestWiring:
 
         A day's journal is uploaded the next day, so the lock has to end before
         the local file goes; the lifecycle rule removes the noncurrent version
-        once it has.
+        once it has. The backups have no such promise and get the longer lock.
         """
         guide = (_REPO_ROOT / 'DEPLOYMENT.md').read_text(encoding='utf-8')
 
         assert 'Compliance, 21 days' in guide
+        assert 'Compliance, 30 days' in guide
         assert 'NoncurrentVersionExpiration' in guide
         assert '"NoncurrentDays": 1' in guide
-        assert 'rclone backend cleanup-hidden' in guide
+        assert 'cleanup-hidden' in guide
+
+    def test_the_logs_can_have_their_own_destination(self) -> None:
+        guide = (_REPO_ROOT / 'DEPLOYMENT.md').read_text(encoding='utf-8')
+
+        assert 'LOGS_RCLONE_REMOTE' in guide
+        assert 'BACKUP_RCLONE_REMOTE/logs' in guide
 
     def test_the_example_names_the_retention_the_privacy_page_states(self) -> None:
         example = (_REPO_ROOT / '.env.production.example').read_text(encoding='utf-8')
 
         assert 'LOG_RETENTION_DAYS=30' in example
+        assert 'BACKUP_RCLONE_REMOTE=' in example
+        assert 'LOGS_RCLONE_REMOTE=' in example
 
     def test_the_exported_logs_never_enter_the_checkout(self) -> None:
         ignore = (_REPO_ROOT / '.gitignore').read_text(encoding='utf-8')

@@ -177,7 +177,7 @@ services:
 
   # Optional off-host copy. It syncs the already-encrypted dumps and file
   # archives in ./backups and the encrypted journal exported by
-  # scripts/export-logs.sh into ./logs to one rclone remote, under backups/ and
+  # scripts/export-logs.sh into ./logs to rclone remotes, under backups/ and
   # logs/ respectively, so losing the host — or someone who got root on it —
   # does not take the record with it. A plain remote is enough, because the
   # payload is ciphertext (rclone crypt would encrypt it twice). Only `*.age`
@@ -186,11 +186,15 @@ services:
   # --skip-links: the -latest names in last/ are links to the newest pair, which
   # is sent once under its own names, not a second time under those. The
   # destination is made with versioning and Object Lock where it can be (the
-  # OVH S3 recipe in DEPLOYMENT.md): a sync that deletes a rotated-out file
-  # only adds a delete marker there, and the version stays for its retention.
-  # Enable it with `offsite` in COMPOSE_PROFILES, set up rclone.conf +
-  # BACKUP_RCLONE_REMOTE as described in DEPLOYMENT.md, and run
-  # scripts/export-logs.sh from cron so there are logs to send.
+  # S3 recipe in DEPLOYMENT.md): a sync that deletes a rotated-out file only
+  # adds a delete marker there, and a lifecycle rule removes the version once
+  # its lock has run out. LOGS_RCLONE_REMOTE names a separate bucket for the
+  # journal when the destination gives backups and logs different retention;
+  # left empty, the logs go under BACKUP_RCLONE_REMOTE/logs as the backups'
+  # sibling. Enable it with `offsite` in COMPOSE_PROFILES, set up rclone.conf,
+  # BACKUP_RCLONE_REMOTE and (optionally) LOGS_RCLONE_REMOTE as described in
+  # DEPLOYMENT.md, and run scripts/export-logs.sh from cron so there are logs
+  # to send.
   db-backup-offsite:
     image: rclone/rclone:1.76.0
     profiles: ["offsite"]
@@ -199,6 +203,7 @@ services:
     environment:
       RCLONE_CONFIG: /config/rclone.conf
       BACKUP_RCLONE_REMOTE: ${BACKUP_RCLONE_REMOTE:-}
+      LOGS_RCLONE_REMOTE: ${LOGS_RCLONE_REMOTE:-}
       AGE_RECIPIENT: ${AGE_RECIPIENT:-}
     volumes:
       - ./backups:/backups:ro
@@ -215,9 +220,10 @@ services:
           echo "AGE_RECIPIENT is empty — the backups are not encrypted, and only encrypted ones leave the host. Run 'make backup-key' (see DEPLOYMENT.md)" >&2;
           exit 1;
         fi;
+        logs_remote="$${LOGS_RCLONE_REMOTE:-$$BACKUP_RCLONE_REMOTE/logs}";
         while :; do
           rclone sync /backups "$$BACKUP_RCLONE_REMOTE/backups" --include "*.age" --skip-links --log-level INFO;
-          rclone sync /logs "$$BACKUP_RCLONE_REMOTE/logs" --include "*.age" --skip-links --log-level INFO;
+          rclone sync /logs "$$logs_remote" --include "*.age" --skip-links --log-level INFO;
           sleep 3600;
         done
 

@@ -272,7 +272,9 @@ says what the release does rather than what changed since them.
   `scripts/export-logs.sh`, gzips and encrypts each day's journal into `logs/`,
   pruned after the same period, and the offsite copy sends it to the same
   destination as the backups — under a `backups/` and a `logs/` subdirectory,
-  each with its own sync. The privacy page now states the retention period,
+  each with its own sync, or to a bucket of its own when
+  `LOGS_RCLONE_REMOTE` names one, because the logs' lock is shorter. The
+  privacy page now states the retention period,
   which an installation sets with `LOG_RETENTION_DAYS`; the demo keeps its
   seven days. The deployment guide also carries the recipe for an OVHcloud S3
   bucket with versioning, Object Lock in Compliance mode for three weeks, and a
