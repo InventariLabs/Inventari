@@ -37,16 +37,10 @@ import type { TranslateFn } from "@/types/i18n";
 import { useStockAsOf } from "../hooks/useStockAsOf";
 
 /**
- * The last instant of the chosen day on the reader's own clock — the day
- * belongs to the report, and the clock that names the reader's days is
- * theirs, not UTC's. A `Z` here made a Tokyo reader's "September 12th"
- * answer for movements booked until 08:59 on the thirteenth.
+ * Whether the address names a calendar day the report can close. The day goes
+ * to the server as it is: the organization's calendar, not the browser's,
+ * decides where it ends, as it does for the value statement.
  */
-export function endOfDay(day: string): string {
-  return new Date(`${day}T23:59:59.999`).toISOString();
-}
-
-/** Whether the address names a calendar day `endOfDay` can close. */
 function isDay(value: string): boolean {
   return (
     /^\d{4}-\d{2}-\d{2}$/.test(value) &&
@@ -234,7 +228,7 @@ export default function StockAsOfPage() {
   }, [setHeader, t, showInventoryValue]);
 
   const query = {
-    as_of: endOfDay(day),
+    as_of: day,
     location_id: locationId || undefined,
     search: filters.search.trim() || undefined,
   };

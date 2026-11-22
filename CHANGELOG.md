@@ -350,6 +350,11 @@ says what the release does rather than what changed since them.
   and the reconciliation's record count follow the reader's language and say
   what they cover, and the recipe tag colours, rating stars and popovers have
   names a screen reader can speak.
+- *Stock on a date* cuts a day on the organization's calendar, as *Value
+  movement* does, whatever time zone the reader's browser is set to. Before,
+  the screen and its spreadsheet and PDF were cut at the reader's own midnight,
+  so for a reader abroad a movement near midnight counted on one screen and not
+  on the other, and the two closings for the same day disagreed.
 - A receipt posted against a purchase order names the order. The receipt's
   page shows it under **Purchase order**, linked to the order, and both
   built-in print layouts print its number, so whoever holds the receipt later
