@@ -196,6 +196,48 @@ function RecordLocation({
   );
 }
 
+/**
+ * Where the product is, and how much of it there is in all.
+ *
+ * The shelves say where the product is, in every place that holds it and out
+ * of which batch; that link is only offered where an organization keeps the
+ * record at all (ADR-004). A product held in several records has one row for
+ * both answers: its total, which is the link to those shelves.
+ */
+function ProductStockRow({
+  item,
+  productTotal,
+}: {
+  item: Item;
+  productTotal: { total_quantity: string; uom_symbol?: string | null } | null;
+}) {
+  const { t } = useTranslation(["items", "inventory"]);
+  const enabledModules = useEnabledModulesOptional();
+  const totalText = productTotal
+    ? formatQuantityLocalized(
+        t,
+        productTotal.total_quantity,
+        productTotal.uom_symbol,
+      )
+    : null;
+  const label = productTotal
+    ? t("items:detail.productTotal")
+    : t("inventory:stock.whereItLies");
+  if (!item.template_id || !recordsMovements(enabledModules)) {
+    return <Field label={label}>{totalText}</Field>;
+  }
+  return (
+    <Field label={label}>
+      <Link
+        to={`/inventory/stock?template=${item.template_id}`}
+        className="inline-flex min-h-6 items-center text-on-primary hover:underline"
+      >
+        {totalText ?? t("inventory:stock.seeForProduct")}
+      </Link>
+    </Field>
+  );
+}
+
 export default function ItemDetailOverview({
   item,
   storages,
@@ -208,7 +250,6 @@ export default function ItemDetailOverview({
     "locations",
     "inventory",
   ]);
-  const enabledModules = useEnabledModulesOptional();
   const money = useMoney();
   const partial = usePartialPackage()(item);
   const showInventoryValue = useShowInventoryValue();
@@ -244,29 +285,7 @@ export default function ItemDetailOverview({
         <Field label={t("items:itemQuantity")}>
           {quantityText(t, item, partial)}
         </Field>
-        {/* The row above says where this record is; the shelves say where
-            the product is, in every place that holds it and out of which
-            batch. Only offered where an organization keeps that record at
-            all (ADR-004). */}
-        <Field label={t("inventory:stock.whereItLies")}>
-          {item.template_id && recordsMovements(enabledModules) ? (
-            <Link
-              to={`/inventory/stock?template=${item.template_id}`}
-              className="inline-flex min-h-6 items-center text-on-primary hover:underline"
-            >
-              {t("inventory:stock.seeForProduct")}
-            </Link>
-          ) : null}
-        </Field>
-        <Field label={t("items:detail.productTotal")}>
-          {productTotal
-            ? formatQuantityLocalized(
-                t,
-                productTotal.total_quantity,
-                productTotal.uom_symbol,
-              )
-            : null}
-        </Field>
+        <ProductStockRow item={item} productTotal={productTotal} />
         <Field label={t("items:itemStorage")}>
           <RecordLocation
             storage={storage}

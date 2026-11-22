@@ -245,8 +245,9 @@ function tagScopeFor(state: {
   };
 }
 
-/** In the availability tab the whole matching list is on the client, so the
- *  chips count it; the server cannot match stock and would count strangers. */
+/** In the availability tab the half of the list on screen is on the client,
+ *  so the chips count exactly it; the server cannot match stock and would
+ *  count strangers, and the other half is not under the chips. */
 function tagsForView(
   tags: RecipeTagItem[],
   tab: FilterTab,
@@ -394,7 +395,7 @@ export default function RecipesPage() {
   const allTags = tagsForView(
     tagsQuery.data ?? [],
     tab,
-    availableRecipes,
+    cookScope === "ready" ? readyRecipes : almostRecipes,
     selectedTags,
   );
   const tagColorMap = new Map(allTags.map((tg) => [tg.name, tg.color ?? null]));
