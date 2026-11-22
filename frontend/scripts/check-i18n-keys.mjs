@@ -346,8 +346,6 @@ const DYNAMIC_ALLOWLIST = [
   // into findings.
   { ns: "warehouse", prefix: "confirmDialog.confirmTitle" },
   { ns: "warehouse", prefix: "confirmDialog.confirmMessage" },
-  { ns: "warehouse", prefix: "confirmDialog.completeTitle" },
-  { ns: "warehouse", prefix: "confirmDialog.completeMessage" },
   { ns: "warehouse", prefix: "confirmDialog.cancelTitle" },
   { ns: "warehouse", prefix: "confirmDialog.cancelMessage" },
   { ns: "warehouse", prefix: "confirmDialog.deleteTitle" },

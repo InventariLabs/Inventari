@@ -232,8 +232,6 @@
   "confirmDialog": {
     "confirmTitle": "Confirmar documento",
     "confirmMessage": "Isto marcará o documento como pronto para execução no armazém. Continuar?",
-    "completeTitle": "Concluir documento",
-    "completeMessage": "Isto executará as operações de estoque e encerrará o documento. Continuar?",
     "cancelTitle": "Cancelar este documento?",
     "cancelConfirm": "Cancelar documento",
     "cancelKeep": "Manter documento",
@@ -524,7 +522,7 @@
     "snapshotDeltaPlus": "Adicionado",
     "snapshotDeltaMinus": "Removido",
     "executionHelp": "Ajuste a quantidade realmente processada em cada linha antes de encerrar o documento.",
-    "executionHelpRecordOnly": "As mercadorias já saíram da prateleira na etapa que este documento registra. Encerrá-lo apenas mantém o registro — o estoque não muda.",
+    "executionHelpRecordOnly": "O estoque já foi alterado na etapa que este documento registra. Encerrá-lo apenas mantém o registro — o estoque não muda.",
     "executionMeta": "Planejado {{expected}} {{unit}} · restante {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Planejado {{expected}} · restante {{remaining}} (sem unidade)",
     "doneQuantityLabel": "Quantidade executada",
