@@ -1,6 +1,9 @@
 import { useEffect, useRef } from "react";
 
-import { getTopmostOverlaySheetPanel } from "@/components/ui/overlayStack";
+import {
+  getSheetFocusReturn,
+  getTopmostOverlaySheetPanel,
+} from "@/components/ui/overlayStack";
 
 const FOCUSABLE_SELECTORS = [
   "a[href]",
@@ -70,6 +73,11 @@ export function useFocusTrap<T extends HTMLElement = HTMLDivElement>(
         previous.isConnected
       ) {
         previous.focus();
+        return;
+      }
+      const opener = getSheetFocusReturn(container);
+      if (opener) {
+        opener.focus();
         return;
       }
       // Whatever had the focus when this layer opened is gone (a list the

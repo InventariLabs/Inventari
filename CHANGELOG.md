@@ -349,6 +349,14 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A copy button the browser refuses now shows what it was meant to copy. An
+  installation reached over plain `http://` on a local address has no
+  clipboard for the page to use, and the copy buttons (an invitation link, a
+  record id, an API key's capabilities) used to answer with a message about a
+  value the screen did not show. They now open a **Copy by hand** sheet that
+  holds the whole text, selected, ready for Ctrl+C, with **Done** to close it.
+  Closing a sheet that was opened from a row's **⋯** menu returns the focus to
+  that menu's button instead of the top of the page.
 - Attaching a blank label to an existing product now tells stock rows apart.
   Each row in the **Attach to an existing product** sheet says where it
   stands, when it expires, how much it holds and its serial number, and rows
