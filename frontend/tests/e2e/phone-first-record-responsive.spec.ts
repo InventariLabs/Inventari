@@ -404,7 +404,7 @@ test.describe("Phone lists — the first record is above the fold", () => {
       parent_template_id: parent.id,
       child_template_id: fruit.id,
       qty_per_batch: "1",
-      unit: "kg",
+      unit: "pcs",
     });
     const closed = await api.createProductionOrder(token, {
       output_template_id: parent.id,

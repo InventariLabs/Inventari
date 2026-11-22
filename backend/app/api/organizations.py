@@ -642,6 +642,17 @@ async def update_organization(
     if not current_user.organization_id:
         raise NotFoundException('organization', get_current_lang())
 
+    # backend/AGENTS.md §2b: these three columns cannot be NULL, so a named
+    # null is refused here by name instead of reaching the flush as a 500.
+    sent = organization_in.model_fields_set
+    nulled = [
+        f
+        for f in ('name', 'currency', 'timezone')
+        if f in sent and getattr(organization_in, f) is None
+    ]
+    if nulled:
+        raise catalogue_refusal('field_cannot_be_cleared', fields=', '.join(nulled))
+
     organization_model = await update_organization_audited(
         db,
         current_user.organization_id,

@@ -37,13 +37,16 @@ export function ProductionStockMovesTable({
             // A side without an id never had a location to name: the
             // consumption goes from a shelf into the run, the receipt
             // arrives out of it. A side with an id whose name is gone
-            // still answers — as the label, not the identifier.
+            // still answers — as the label, not the identifier. A shelf
+            // carried elsewhere since the run keeps the path it had then.
             const fromName = move.from_location_id
-              ? (placeName(move.from_location_id, move.from_location_name) ??
+              ? (move.from_location_path ??
+                placeName(move.from_location_id, move.from_location_name) ??
                 t("detail.line.unknownLocation"))
               : null;
             const toName = move.to_location_id
-              ? (placeName(move.to_location_id, move.to_location_name) ??
+              ? (move.to_location_path ??
+                placeName(move.to_location_id, move.to_location_name) ??
                 t("detail.line.unknownLocation"))
               : null;
             const trace =

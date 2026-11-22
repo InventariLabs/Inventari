@@ -233,8 +233,13 @@ class TestRetrySemantics:
             await session.commit()
         # The first attempt's 500 is a real answer from the receiver; the
         # abandonment adds our reason next to it and erases nothing.
+        answered_at = datetime.now(UTC) - timedelta(minutes=7)
         log_id = await _add_log(
-            session_factory, webhook, status_code=500, error_message='nope'
+            session_factory,
+            webhook,
+            status_code=500,
+            error_message='nope',
+            last_attempt_at=answered_at,
         )
 
         called = False
@@ -257,7 +262,10 @@ class TestRetrySemantics:
         assert log.status_code == 500, "the last attempt's answer survives"
         assert log.error_message == 'nope'
         assert log.abandon_reason == _ABANDON_WEBHOOK_DISABLED
-        assert log.last_attempt_at is not None
+        assert log.last_attempt_at == answered_at, (
+            'the row keeps the moment the target gave the answer it shows, '
+            'not the moment of the abandonment'
+        )
         # The claim found the row through next_retry_at; a delivery we
         # stopped promising to retry must not keep telling API readers one
         # is scheduled (our own view hides it behind the status, the raw

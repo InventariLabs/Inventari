@@ -23085,6 +23085,10 @@ export interface components {
             from_location_name?: string | null;
             /** To Location Name */
             to_location_name?: string | null;
+            /** From Location Path */
+            from_location_path?: string | null;
+            /** To Location Path */
+            to_location_path?: string | null;
             /** Quantity */
             quantity: string;
             /** Lot Id */

@@ -359,6 +359,13 @@ says what the release does rather than what changed since them.
   that would still read the same, such as two receipts of one product into one
   place, carry the tail of their id. The mark is separated from the quantity
   for a screen reader, which no longer reads them as one word.
+- A webhook delivery that the circuit breaker, a switch-off of the endpoint or
+  a switch-off of the module gives up on keeps what the target answered to its
+  last attempt: the delivery log shows the HTTP status, the response body and
+  the error text next to the reason for the stop, with the time of that
+  answer instead of the time of the stop, so deliveries abandoned together no
+  longer all read as answered at the same second. The delivery API returns
+  `status_code` on such rows next to `abandon_reason`.
 - A document that only records goods another step already took — a recipe's
   internal issue, whose goods the picking session removed — can no longer be
   returned, as it already could not be undone or corrected: a return would have
@@ -511,7 +518,9 @@ says what the release does rather than what changed since them.
   *Movements* tab show what happened before the move at the path the location
   had then, as the move dialog promises. Goods put on a shelf while it stood
   in one hall no longer read as having gone into the room it was carried to
-  later. The rows the move itself writes name the moved location's whole path
+  later; filtering **Movements** by a place lists what was made in it as it
+  stood then, and a production run's movements name the path a shelf had when
+  the run touched it. The rows the move itself writes name the moved location's whole path
   before and after, its own name last, instead of only the places it left and
   reached. A move that only corrects the layout still rewrites nothing: the
   stock was always where the corrected tree puts it.

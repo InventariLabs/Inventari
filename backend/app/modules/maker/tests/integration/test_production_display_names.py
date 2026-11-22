@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 from app.models.organization import Organization
 from app.models.product_template import ProductTemplate
 from app.models.storage_location import StorageLocation
+from app.models.user import User
 from app.modules.maker.models import BoMLine, MakerRecipe
 from tests.integration._shelf import post_on_shelf
 
@@ -189,3 +190,77 @@ class TestOrderDisplayNames:
         received = by_product['Jam']
         assert received['from_location_name'] is None
         assert received['to_location_name'] == 'Output Store'
+
+
+class TestRunMovementsAfterAPhysicalMove:
+    """A run's movements name the path a shelf had when the run touched it."""
+
+    def test_a_run_before_the_move_names_the_old_path(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        db_session: Session,
+        mk_org: Organization,
+        mk_input_loc: StorageLocation,
+        mk_output_loc: StorageLocation,
+        mk_user: User,
+    ) -> None:
+        output = _template(db_session, mk_org, name='Jam')
+        ingredient = _template(db_session, mk_org, name='Strawberries')
+        _recipe_with_line(
+            db_session, mk_org, output_id=output.id, ingredient_id=ingredient.id
+        )
+        post_on_shelf(client, mk_auth_headers, ingredient, mk_input_loc.id, 40)
+        order = client.post(
+            '/api/v1/maker/production/orders',
+            headers=mk_auth_headers,
+            json={
+                'output_template_id': str(output.id),
+                'planned_qty': '3',
+                'output_location_id': str(mk_output_loc.id),
+            },
+        ).json()
+        done = client.post(
+            f'/api/v1/maker/production/orders/{order["id"]}/complete',
+            headers=mk_auth_headers,
+        )
+        assert done.status_code == 200, done.text
+
+        annex = StorageLocation(
+            organization_id=mk_org.id,
+            created_by=mk_user.id,
+            name='Annex',
+            usage='internal',
+        )
+        db_session.add(annex)
+        db_session.commit()
+        moved = client.post(
+            '/api/v1/locations/reorg',
+            headers=mk_auth_headers,
+            json={
+                'operations': [
+                    {
+                        'op': 'move',
+                        'id': str(mk_input_loc.id),
+                        'parent_id': str(annex.id),
+                        'relocation': 'physical',
+                    }
+                ]
+            },
+        )
+        assert moved.status_code == 200, moved.text
+
+        resp = client.get(
+            f'/api/v1/maker/production/orders/{order["id"]}/stock-moves',
+            headers=mk_auth_headers,
+        )
+
+        assert resp.status_code == 200, resp.text
+        by_product = {
+            move['product_template_name']: move for move in resp.json()['items']
+        }
+        consumed = by_product['Strawberries']
+        assert consumed['from_location_name'] == 'Ingredient Store'
+        assert consumed['from_location_path'] == 'Ingredient Store'
+        # The shelf that never moved keeps today's path, which is its name.
+        assert by_product['Jam']['to_location_path'] is None
