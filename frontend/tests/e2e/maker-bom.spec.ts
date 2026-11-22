@@ -459,7 +459,7 @@ test.describe("Maker — BoM: backend invariants (API)", () => {
       data: {
         child_template_id: childA.id,
         qty_per_batch: "2",
-        unit: "kg",
+        unit: "pcs",
       },
     });
     // 409, not the 400 the removed adapter returned: a duplicate ingredient

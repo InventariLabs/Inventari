@@ -44,7 +44,7 @@ test.describe("Maker — pricing calculator (UI)", () => {
       parent_template_id: parent.id,
       child_template_id: ingredient.id,
       qty_per_batch: "1",
-      unit: "kg",
+      unit: "pcs",
     });
   });
 

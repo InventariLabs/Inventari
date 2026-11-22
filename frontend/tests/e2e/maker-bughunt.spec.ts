@@ -256,7 +256,7 @@ test.describe("Maker — bug hunt: concurrency & ordering", () => {
       recipe_id: recipeId,
       child_template_id: child.id,
       qty_per_batch: "1",
-      unit: "kg",
+      unit: "pcs",
     });
     bomLineId = line.id;
   });
@@ -305,7 +305,7 @@ test.describe("Maker — bug hunt: concurrency & ordering", () => {
             data: {
               child_template_id: child.id,
               qty_per_batch: "1",
-              unit: "kg",
+              unit: "pcs",
             },
           }),
         ),
@@ -478,7 +478,7 @@ test.describe("Maker — bug hunt: response schema invariants", () => {
       parent_template_id: parent.id,
       child_template_id: child.id,
       qty_per_batch: "1.5",
-      unit: "kg",
+      unit: "pcs",
       yield_loss_pct: "0",
     });
     const listing = await api.listBomLines(token, parent.id);
