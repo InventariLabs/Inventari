@@ -176,15 +176,13 @@ def write_body_schemas() -> dict[str, Any]:
 def _errors_of(adapter: TypeAdapter, body: Any) -> list[Any]:
     """The pydantic errors a body raises; none when it validates.
 
-    A before-validator that crashes on a wrong type raises something else — a
-    500, a different defect, not a sentence — and yields no errors here.
+    Anything but a ``ValidationError`` escapes: a validator that crashes on a
+    wrong type is a 500 on the route, so the probe fails on it.
     """
     try:
         adapter.validate_python(body)
     except ValidationError as exc:
         return list(exc.errors())
-    except (AttributeError, TypeError, KeyError, ArithmeticError):
-        return []
     return []
 
 

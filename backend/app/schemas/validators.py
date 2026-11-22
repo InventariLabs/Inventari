@@ -5,7 +5,7 @@ to avoid copy-pasting the same field_validator / field_serializer bodies.
 """
 
 import re
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 from typing import Annotated, Any, Literal
 
 from pydantic import AfterValidator
@@ -54,10 +54,17 @@ def quantize_quantity(v: Any) -> Any:
     Pydantic passes 1.0005 through and Postgres rounds it silently; an
     explicit quantize at entry makes the stored number the one the client
     was told about. Use as a Pydantic ``AfterValidator`` on quantity fields.
+
+    A value too wide to quantize (more digits than the decimal context
+    holds) is returned as it is: it is past every column's ceiling, which the
+    field's bound or the writer refuses with a named answer.
     """
     if v is None:
         return v
-    return Decimal(v).quantize(QUANTITY_STEP, rounding=ROUND_HALF_UP)
+    try:
+        return Decimal(v).quantize(QUANTITY_STEP, rounding=ROUND_HALF_UP)
+    except InvalidOperation:
+        return v
 
 
 def empty_string_to_none(v: Any) -> Any:
@@ -68,7 +75,13 @@ def empty_string_to_none(v: Any) -> Any:
 
 
 def normalize_barcode(v: Any) -> Any:
-    """Normalize barcode value using the core barcode utility."""
+    """Normalize barcode value using the core barcode utility.
+
+    A value that is not a string passes through, so the field's own type
+    check refuses it with a keyed 422.
+    """
+    if v is not None and not isinstance(v, str):
+        return v
     from app.core.barcode import normalize_barcode as _normalize
 
     return _normalize(v)
@@ -79,9 +92,13 @@ def normalize_sku(v: Any) -> Any:
 
     Raises the translated ``sku_format_invalid`` refusal for a value outside
     the shape the ``sku`` column and the product-template door accept.
+    A value that is not a string passes through for the field's own type
+    check to refuse.
     """
     if v is None:
         return None
+    if not isinstance(v, str):
+        return v
     from app.core.exceptions import ServiceRejectionError
 
     v = v.strip().upper() or None
