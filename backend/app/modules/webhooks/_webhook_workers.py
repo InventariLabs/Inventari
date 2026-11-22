@@ -41,14 +41,15 @@ def _abandon_delivery(log: WebhookDeliveryLog, reason: str) -> None:
     What the target answered to the last real attempt (status code, body,
     error text) stays on the row: it is the only record of why the delivery
     never succeeded, and the reason travels next to it as a stable value the
-    history view translates. The scheduled retry goes with it — a delivery we stopped must not keep promising a next attempt
-    to readers of the delivery API (our own view hides the field behind the
+    history view translates. ``last_attempt_at`` stays too: it is the time of
+    that answer, and rows abandoned by one stop must not all read as answered
+    at the same second. The scheduled retry goes with it — a delivery we
+    stopped must not keep promising a next attempt to readers of the delivery API (our own view hides the field behind the
     status; the raw API does not).
     """
     log.delivery_status = _DELIVERY_STATUS_FAILED
     log.next_retry_at = None
     log.abandon_reason = reason
-    log.last_attempt_at = datetime.now(UTC)
 
 
 # Orphaned first attempts (status 'pending') are requeued after this
