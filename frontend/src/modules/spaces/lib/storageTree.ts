@@ -12,9 +12,7 @@ import type { StorageLocationNode } from "@/types";
  */
 
 /** Every node of the tree, depth first — roots and everything below. */
-export function flattenTree(
-  nodes: StorageLocationNode[],
-): StorageLocationNode[] {
+function flattenTree(nodes: StorageLocationNode[]): StorageLocationNode[] {
   return nodes.flatMap((node) => [node, ...flattenTree(node.children ?? [])]);
 }
 
