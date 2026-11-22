@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { queryKeys } from "@/hooks/queries/keys";
 import { CookForStockModal } from "./CookForStockModal";
 import { QueryWrapper } from "@/test/queryWrapper";
 
@@ -328,6 +330,43 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
           /6 kg per batch\. That is the number of servings/,
         ),
       ).toBeInTheDocument();
+      // Not offered as the amount to enter: the field is empty and a run
+      // cannot be created until somebody types a yield.
+      expect(screen.getByTestId("cook-for-stock-yield-input")).toHaveValue(
+        null,
+      );
+      expect(screen.getByTestId("cook-for-stock-planned-qty").textContent).toBe(
+        "—",
+      );
+      pickStorage("Output Store");
+      expect(screen.getByTestId("cook-for-stock-submit")).toBeDisabled();
+    });
+
+    it("forgets the cached 'no BOM yet' answer once the bridge has made one", async () => {
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false, staleTime: 300_000 } },
+      });
+      const invalidate = vi.spyOn(queryClient, "invalidateQueries");
+      serveScopedStorages([{ id: "loc-1", name: "Output Store" }]);
+      render(
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter>
+            <CookForStockModal open onClose={vi.fn()} recipe={recipe} />
+          </MemoryRouter>
+        </QueryClientProvider>,
+      );
+      fireEvent.click(screen.getByTestId("mock-product-option"));
+      fireEvent.change(screen.getByTestId("cook-for-stock-yield-input"), {
+        target: { value: "1.1" },
+      });
+      pickStorage("Output Store");
+      fireEvent.click(screen.getByTestId("cook-for-stock-submit"));
+
+      await waitFor(() =>
+        expect(invalidate).toHaveBeenCalledWith({
+          queryKey: queryKeys.maker.recipesAll,
+        }),
+      );
     });
 
     it("plans the run from what one batch makes, in the product's unit", async () => {

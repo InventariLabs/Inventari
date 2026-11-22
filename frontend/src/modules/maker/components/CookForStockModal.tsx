@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
@@ -107,14 +107,19 @@ function yieldUnit(
 /**
  * What the yield field starts from: the yield the pair's BOM already stores
  * (the bridge refuses another one), else the servings where they are an amount
- * in the product's unit, else nothing — the person is asked.
+ * in the product's unit, else nothing — the person is asked. A stored
+ * weight or volume yield that is just the servings is a number taken for an
+ * amount before the sheet asked, so it is not offered either; the line under
+ * the field names it.
  */
 function startingYield(
   storedYield: number | null,
   servingsFit: boolean,
   servings: number,
 ): string {
-  if (storedYield !== null) return String(storedYield);
+  if (storedYield !== null) {
+    return !servingsFit && storedYield === servings ? "" : String(storedYield);
+  }
   return servingsFit ? String(servings) : "";
 }
 
@@ -163,6 +168,7 @@ export function CookForStockModal({
   // kitchen word out of this module's own catalogue.
   const { t } = useTranslation("recipes");
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   // Where a batch lands is a stock-flow question: the output picker offers
   // what may hold stock, never a place a module owns. Scoped at the query,
   // so the remembered and single-location defaults below cannot land on a
@@ -262,6 +268,11 @@ export function CookForStockModal({
       const makerRecipe: MakerRecipeBridgeResult =
         await createMakerRecipeFromCulinary(payload);
       if (makerRecipe.created) strandedRecipeId.current = makerRecipe.id;
+      // The pair has a BOM now: the next sheet on it starts from its yield,
+      // not from a cached "no BOM yet" answer.
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.maker.recipesAll,
+      });
       const order = await createProductionOrderFromBridge({
         output_template_id: product.product_template_id,
         recipe_id: makerRecipe.id,
