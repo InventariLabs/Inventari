@@ -45,7 +45,7 @@ async function seedLifecycleContext(
     parent_template_id: output.id,
     child_template_id: ingredient.id,
     qty_per_batch: "2",
-    unit: "kg",
+    unit: "pcs",
   });
 
   return {
@@ -154,7 +154,7 @@ test.describe("Maker — completion lifecycle", () => {
       parent_template_id: output.id,
       child_template_id: deficitIng.id,
       qty_per_batch: "2",
-      unit: "kg",
+      unit: "pcs",
     });
 
     const stock = await api.seedStock(token, {

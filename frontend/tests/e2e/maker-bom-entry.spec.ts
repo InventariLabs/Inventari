@@ -117,7 +117,7 @@ test.describe("Maker — BoM entry from item view", () => {
       recipe_id: recipe.id,
       child_template_id: child.id,
       qty_per_batch: "1",
-      unit: "kg",
+      unit: "pcs",
     });
 
     await clickEntryLink(page, name);

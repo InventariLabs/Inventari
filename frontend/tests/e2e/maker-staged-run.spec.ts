@@ -62,13 +62,13 @@ test.describe("Maker — a started run chooses its batches", () => {
       parent_template_id: syrup.id,
       child_template_id: sugar.id,
       qty_per_batch: "2",
-      unit: "kg",
+      unit: "pcs",
     });
     const jamLine = await api.createBomLine(token, {
       parent_template_id: jam.id,
       child_template_id: syrup.id,
       qty_per_batch: "2",
-      unit: "kg",
+      unit: "pcs",
     });
 
     // Two batches of syrup, each enough for the whole jam run.

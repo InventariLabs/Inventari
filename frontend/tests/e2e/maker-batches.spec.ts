@@ -87,13 +87,13 @@ test.describe("Maker — the batches of a run", () => {
       parent_template_id: syrup.id,
       child_template_id: sugar.id,
       qty_per_batch: "2",
-      unit: "kg",
+      unit: "pcs",
     });
     const jamLine = await api.createBomLine(token, {
       parent_template_id: jam.id,
       child_template_id: syrup.id,
       qty_per_batch: String(SYRUP_PER_JAM),
-      unit: "kg",
+      unit: "pcs",
     });
     recipeId = await api.resolveDefaultRecipeId(token, jam.id);
 
@@ -372,7 +372,7 @@ test.describe("Maker — the batches of a run", () => {
       parent_template_id: syrupId,
       child_template_id: sugarId,
       qty_per_batch: "2",
-      unit: "kg",
+      unit: "pcs",
     });
     cleanup.push(() => api.deleteBomLine(token, again.id));
 

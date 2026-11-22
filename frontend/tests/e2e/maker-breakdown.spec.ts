@@ -58,7 +58,7 @@ test.describe("Maker — cost breakdown", () => {
       parent_template_id: parent.id,
       child_template_id: childA.id,
       qty_per_batch: "2",
-      unit: "kg",
+      unit: "pcs",
     });
     lineIdsToCleanup.push(lineA.id);
 
@@ -66,7 +66,7 @@ test.describe("Maker — cost breakdown", () => {
       parent_template_id: parent.id,
       child_template_id: childB.id,
       qty_per_batch: "0.5",
-      unit: "kg",
+      unit: "pcs",
     });
     lineIdsToCleanup.push(lineB.id);
 
@@ -94,7 +94,7 @@ test.describe("Maker — cost breakdown", () => {
         parent_template_id: parent.id,
         child_template_id: childA.id,
         qty_per_batch: "3",
-        unit: "kg",
+        unit: "pcs",
       })
       .catch(() => {
         // UNIQUE(parent, child) — already present from a previous run.
@@ -115,7 +115,7 @@ test.describe("Maker — cost breakdown", () => {
         parent_template_id: parent.id,
         child_template_id: childA.id,
         qty_per_batch: "3",
-        unit: "kg",
+        unit: "pcs",
       });
       lineIdsToCleanup.push(created.id);
     } else if (!aLine) {
@@ -123,7 +123,7 @@ test.describe("Maker — cost breakdown", () => {
         parent_template_id: parent.id,
         child_template_id: childA.id,
         qty_per_batch: "3",
-        unit: "kg",
+        unit: "pcs",
       });
       lineIdsToCleanup.push(created.id);
     }
@@ -133,7 +133,7 @@ test.describe("Maker — cost breakdown", () => {
       parent_template_id: childA.id,
       child_template_id: grandChild.id,
       qty_per_batch: "1",
-      unit: "kg",
+      unit: "pcs",
     });
     lineIdsToCleanup.push(lineAC.id);
 
@@ -176,7 +176,7 @@ test.describe("Maker — cost breakdown", () => {
       parent_template_id: fresh.id,
       child_template_id: ing.id,
       qty_per_batch: "10",
-      unit: "kg",
+      unit: "pcs",
       yield_loss_pct: "20",
     });
     lineIdsToCleanup.push(line.id);
