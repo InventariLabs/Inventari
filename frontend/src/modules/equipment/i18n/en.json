@@ -192,6 +192,7 @@
     "unknown": "Unknown"
   },
   "list": {
+    "export_needs_read": "Your role cannot export the asset list: the export needs permission to view products.",
     "title": "Assets",
     "search": "Search assets…",
     "select_item": "Select asset {{name}}",
