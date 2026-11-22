@@ -1,5 +1,5 @@
 import { fileURLToPath } from "node:url";
-import { type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 
 /** The decoder the app's own camera screens use, run on a downloaded label. */
 const DECODER = fileURLToPath(
@@ -88,6 +88,27 @@ export async function decodeLabel(
     },
     { base64: png.toString("base64"), kind, aim },
   );
+}
+
+/**
+ * Presses a label sheet's "Send to printer" and, when the button asks which
+ * printer, picks `printer`. Specs announce printers of their own in the one
+ * organization they share, so how many it knows depends on what ran before:
+ * with one the button sends at once, with several it lists them.
+ */
+export async function sendToPrinter(
+  page: Page,
+  sheet: Locator,
+  printer: string,
+) {
+  await sheet.getByRole("button", { name: "Send to printer" }).click();
+  const chooser = page.getByRole("dialog", { name: "Choose a printer" });
+  // The toast of a job already queued, online ("Sent to") or not.
+  const queued = page.getByText(new RegExp(`^(Sent to|Queued for) ${printer}`));
+  await expect(chooser.or(queued).first()).toBeVisible();
+  if (await chooser.isVisible()) {
+    await chooser.getByRole("button", { name: printer }).click();
+  }
 }
 
 export async function download(page: Page, button: () => Promise<void>) {

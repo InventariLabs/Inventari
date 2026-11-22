@@ -82,7 +82,7 @@ test.describe("Documents — receiving reaches the stock ledger", () => {
     // which opens the barcode session.
     await page.getByRole("button", { name: "Receive stock" }).click();
     await expect(
-      page.getByRole("heading", { name: "Execute document" }),
+      page.getByRole("heading", { name: "Receive stock" }),
     ).toBeVisible();
 
     // The quantity that actually arrived. Typing it is the path a worker

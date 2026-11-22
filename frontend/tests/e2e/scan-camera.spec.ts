@@ -550,7 +550,7 @@ test.describe("Scan — execution reads one presence", () => {
     await page.goto(`/warehouse/documents/${doc.id}`);
     await page.getByRole("button", { name: "Pick items" }).click();
     await expect(
-      page.getByRole("heading", { name: "Execute document" }),
+      page.getByRole("heading", { name: "Pick items" }),
     ).toBeVisible({ timeout: 15000 });
     await page.getByRole("button", { name: "Scan mode", exact: true }).click();
     await page
