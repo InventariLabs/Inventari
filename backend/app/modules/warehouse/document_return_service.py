@@ -107,6 +107,11 @@ async def create_return(
     if not dt.is_return_eligible(original.type):
         raise ServiceRejectionError('document_return_type_not_eligible')
 
+    # A document that only records a movement another step made posted
+    # nothing itself; its return would move goods the original never did.
+    if original.stock_already_applied:
+        raise ServiceRejectionError('document_return_posts_nothing')
+
     if not lines:
         raise ServiceRejectionError('document_return_no_lines')
 

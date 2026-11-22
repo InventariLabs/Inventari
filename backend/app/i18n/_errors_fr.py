@@ -943,6 +943,7 @@ ERRORS_FR: ErrorMessages = {
     'validation_date': 'Doit être une date valide',
     'document_return_requires_completed': "Un retour ne peut être créé qu'à partir d'un document terminé",
     'document_return_type_not_eligible': 'Un retour ne peut être créé que pour une réception, une sortie ou un transfert',
+    'document_return_posts_nothing': "Ce document ne fait qu'enregistrer des marchandises déjà prélevées — il n'a pas modifié le stock : il ne peut pas faire l'objet d'un retour.",
     'document_return_no_lines': 'Un retour doit comporter au moins une ligne',
     'document_original_line_missing': "La ligne {line} n'existe pas dans le document {number}",
     'document_return_quantity_not_positive': 'La quantité retournée à la ligne {line} doit être supérieure à zéro',

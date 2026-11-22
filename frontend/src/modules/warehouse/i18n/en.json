@@ -524,6 +524,7 @@
     "snapshotDeltaPlus": "Added",
     "snapshotDeltaMinus": "Removed",
     "executionHelp": "Adjust the quantity actually processed for each line before closing the document.",
+    "executionHelpRecordOnly": "The goods already left the shelf in the step this document records. Closing it only keeps the record — the stock does not change.",
     "executionMeta": "Planned {{expected}} {{unit}} · remaining {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Planned {{expected}} · remaining {{remaining}} (no unit)",
     "doneQuantityLabel": "Executed quantity",

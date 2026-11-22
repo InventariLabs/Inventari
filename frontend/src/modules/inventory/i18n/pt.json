@@ -86,7 +86,8 @@
       "locationTitle": "Nada passou por aqui",
       "locationDescription": "As movimentações são registradas quando mercadorias são recebidas, saem ou passam por este local.",
       "documentTitle": "Este documento não movimentou nada",
-      "documentDescription": "Suas linhas ainda não foram executadas no estoque, então nenhuma movimentação leva o nome dele."
+      "documentDescription": "Suas linhas ainda não foram executadas no estoque, então nenhuma movimentação leva o nome dele.",
+      "documentRecordOnlyDescription": "As mercadorias foram retiradas na etapa que este documento registra (a separação de uma receita). O documento apenas a registra, então nenhuma movimentação leva o nome dele."
     },
     "tab": "Movimentações",
     "itemCaption": "Movimentações deste produto em {{location}}. Dois registros do mesmo produto em um local compartilham estas linhas.",

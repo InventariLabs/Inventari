@@ -86,7 +86,8 @@
       "locationTitle": "Nada ha pasado por aquí",
       "locationDescription": "Un movimiento se registra cuando la mercancía entra, sale o pasa por esta ubicación.",
       "documentTitle": "Este documento no movió nada",
-      "documentDescription": "Sus líneas no se han ejecutado contra el stock, así que ningún movimiento lleva su nombre."
+      "documentDescription": "Sus líneas no se han ejecutado contra el stock, así que ningún movimiento lleva su nombre.",
+      "documentRecordOnlyDescription": "Las mercancías se retiraron en el paso que este documento registra (la preparación de una receta). El documento solo lo registra, así que ningún movimiento lleva su nombre."
     },
     "tab": "Movimientos",
     "itemCaption": "Movimientos de este producto en {{location}}. Dos registros del mismo producto en una ubicación comparten estas filas.",

@@ -10,36 +10,39 @@ vi.mock("@/contexts/ModulesContext", async () => {
 });
 
 const listSpy = vi.fn();
+let noMoves = false;
 vi.mock("@/modules/inventory/hooks/useStockMoves", () => ({
   useStockMoves: (filters: unknown) => {
     listSpy(filters);
     return {
       data: {
-        items: [
-          {
-            id: "m1",
-            organization_id: "org",
-            product_template_id: "p1",
-            from_location_id: "l1",
-            to_location_id: null,
-            quantity: "8.000",
-            lot_id: "lot-1",
-            state: "done",
-            reference_type: "document",
-            reference_id: "doc-1",
-            created_by: "u1",
-            created_at: "2026-06-20T10:00:00Z",
-            updated_at: null,
-            completed_at: "2026-06-20T10:00:00Z",
-            product_name: "Rye flour",
-            uom_symbol: "kg",
-            from_location_name: "Aisle 1",
-            to_location_name: null,
-            lot_name: "L-2026-04",
-            user_name: "Hanna Kowal",
-          },
-        ],
-        total: 1,
+        items: noMoves
+          ? []
+          : [
+              {
+                id: "m1",
+                organization_id: "org",
+                product_template_id: "p1",
+                from_location_id: "l1",
+                to_location_id: null,
+                quantity: "8.000",
+                lot_id: "lot-1",
+                state: "done",
+                reference_type: "document",
+                reference_id: "doc-1",
+                created_by: "u1",
+                created_at: "2026-06-20T10:00:00Z",
+                updated_at: null,
+                completed_at: "2026-06-20T10:00:00Z",
+                product_name: "Rye flour",
+                uom_symbol: "kg",
+                from_location_name: "Aisle 1",
+                to_location_name: null,
+                lot_name: "L-2026-04",
+                user_name: "Hanna Kowal",
+              },
+            ],
+        total: noMoves ? 0 : 1,
         limit: 20,
         offset: 0,
         has_more: false,
@@ -52,9 +55,11 @@ vi.mock("@/modules/inventory/hooks/useStockMoves", () => ({
   },
 }));
 
-function renderSlot(documentStatus: string) {
+function renderSlot(documentStatus: string, stockAlreadyApplied?: boolean) {
   return renderWithProviders(
-    <DocumentMovesSlot data={{ documentId: "doc-1", documentStatus }} />,
+    <DocumentMovesSlot
+      data={{ documentId: "doc-1", documentStatus, stockAlreadyApplied }}
+    />,
   );
 }
 
@@ -103,5 +108,30 @@ describe("DocumentMovesSlot", () => {
     const { container } = renderSlot("COMPLETED");
 
     expect(container).toBeEmptyDOMElement();
+  });
+
+  describe("with no movement under the document's name", () => {
+    it("says the lines were not executed against stock on an ordinary document", () => {
+      enabledModules = ["warehouse"];
+      noMoves = true;
+
+      renderSlot("COMPLETED");
+      noMoves = false;
+
+      expect(screen.getByText(/have not been executed/i)).toBeInTheDocument();
+    });
+
+    it("says another step took the goods on a document that only records it", () => {
+      enabledModules = ["warehouse"];
+      noMoves = true;
+
+      renderSlot("COMPLETED", true);
+      noMoves = false;
+
+      // Beside an execution summary reading "done", "not executed" is untrue:
+      // the goods left with the step this document records.
+      expect(screen.queryByText(/have not been executed/i)).toBeNull();
+      expect(screen.getByText(/only records it/i)).toBeInTheDocument();
+    });
   });
 });

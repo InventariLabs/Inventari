@@ -62,6 +62,7 @@ export function DocumentDetailExtra({
       data={{
         documentId: document.id,
         documentStatus: document.status,
+        stockAlreadyApplied: document.stock_already_applied,
         metaData: document.meta_data ?? {},
         saveMetaData,
       }}

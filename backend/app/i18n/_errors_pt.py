@@ -740,6 +740,7 @@ ERRORS_PT: ErrorMessages = {
     'validation_date': 'Deve ser uma data válida',
     'document_return_requires_completed': 'Uma devolução só pode ser feita contra um documento concluído',
     'document_return_type_not_eligible': 'Devoluções só podem ser feitas contra recebimentos, saídas e transferências',
+    'document_return_posts_nothing': 'Este documento apenas registra mercadorias que já foram retiradas — ele não movimentou o estoque, então não pode ser devolvido.',
     'document_return_no_lines': 'Uma devolução precisa de pelo menos uma linha',
     'document_original_line_missing': 'A linha {line} não existe no documento {number}',
     'document_return_quantity_not_positive': 'A quantidade devolvida na linha {line} deve ser maior que zero',

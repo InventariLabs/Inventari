@@ -524,6 +524,7 @@
     "snapshotDeltaPlus": "Hinzugefügt",
     "snapshotDeltaMinus": "Entfernt",
     "executionHelp": "Passen Sie die tatsächlich verarbeitete Menge für jede Position an, bevor Sie das Dokument schließen.",
+    "executionHelpRecordOnly": "Die Ware hat das Regal bereits in dem Schritt verlassen, den dieses Dokument festhält. Das Schließen hält nur den Eintrag fest — der Bestand ändert sich nicht.",
     "executionMeta": "Geplant {{expected}} {{unit}} · verbleibend {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Geplant {{expected}} · verbleibend {{remaining}} (ohne Einheit)",
     "doneQuantityLabel": "Ausgeführte Menge",

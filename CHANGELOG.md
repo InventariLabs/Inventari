@@ -327,6 +327,12 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A document that only records goods another step already took — a recipe's
+  internal issue, whose goods the picking session removed — can no longer be
+  returned, as it already could not be undone or corrected: a return would have
+  put back goods the document never took. Its page now says where the goods
+  went instead of "its lines have not been executed against stock", and its
+  execution panel says the stock does not change.
 - *Stock on a date* cuts a day on the organization's calendar, as *Value
   movement* does, whatever time zone the reader's browser is set to. Before,
   the screen and its spreadsheet and PDF were cut at the reader's own midnight,

@@ -945,6 +945,7 @@ ERRORS_DE: ErrorMessages = {
     'validation_date': 'Muss ein gültiges Datum sein',
     'document_return_requires_completed': 'Eine Rücksendung ist nur zu einem abgeschlossenen Dokument möglich',
     'document_return_type_not_eligible': 'Rücksendungen sind nur zu Wareneingängen, Warenausgängen und Umlagerungen möglich',
+    'document_return_posts_nothing': 'Dieses Dokument hält nur Waren fest, die bereits entnommen wurden — es hat keinen Bestand bewegt, daher kann dazu keine Rücksendung erfasst werden.',
     'document_return_no_lines': 'Eine Rücksendung braucht mindestens eine Position',
     'document_original_line_missing': 'Position {line} gibt es im Dokument {number} nicht',
     'document_return_quantity_not_positive': 'Die Rücksendemenge in Position {line} muss größer als null sein',

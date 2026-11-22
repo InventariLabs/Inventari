@@ -752,6 +752,7 @@ def _a_picking_session_document(
     source: StorageLocation,
     record: Item,
     taken: Decimal = Decimal('1'),
+    doc_type: str = 'INTERNAL_OUT',
 ) -> dict[str, Any]:
     """A recipe's internal issue, posted: the goods left the shelf as they were picked.
 
@@ -774,7 +775,7 @@ def _a_picking_session_document(
             session,
             org.id,
             DocumentCreate(
-                type='INTERNAL_OUT',
+                type=doc_type,
                 source_location_id=source.id,
                 lines=[DocumentLineCreate(item_id=record.id, expected_quantity=taken)],
                 external_reference='picking:session',
@@ -901,6 +902,61 @@ class TestADocumentThatOnlyRecordsAnotherStepsMovement:
             db_session.scalars(
                 select(Document).where(
                     Document.corrects_document_id == uuid.UUID(posted['id'])
+                )
+            ).all()
+            == []
+        )
+
+    def test_a_return_is_refused_for_the_same_reason(
+        self,
+        client: TestClient,
+        db_session: Session,
+        async_engine_fixture: AsyncEngine,
+        doc_org: Organization,
+        doc_user: User,
+        doc_auth_headers: dict[str, str],
+        doc_source_location: StorageLocation,
+        doc_stock_item: Item,
+    ) -> None:
+        """A return of a record-only delivery would put back goods it never took.
+
+        The document is a return-eligible type (an issue), so only the flag
+        stands between it and a receipt of one on a shelf that already holds
+        what the picking session left.
+        """
+        posted = _a_picking_session_document(
+            client,
+            doc_auth_headers,
+            async_engine_fixture,
+            db_session,
+            org=doc_org,
+            user=doc_user,
+            source=doc_source_location,
+            record=doc_stock_item,
+            doc_type='OUT',
+        )
+        assert posted['stock_already_applied'] is True
+
+        returned = client.post(
+            f'/api/v1/warehouse/documents/{posted["id"]}/return',
+            headers=doc_auth_headers,
+            json={
+                'reason_code': 'DAMAGED',
+                'lines': [{'original_line_number': 1, 'return_quantity': 1}],
+            },
+        )
+        assert returned.status_code == status.HTTP_400_BAD_REQUEST, returned.text
+        assert 'cannot be returned' in returned.json()['detail']['message']
+
+        db_session.expire_all()
+        record = db_session.get(Item, doc_stock_item.id)
+        assert record is not None
+        assert record.quantity == Decimal('99')
+        assert (
+            db_session.scalars(
+                select(Document).where(
+                    Document.id != uuid.UUID(posted['id']),
+                    Document.organization_id == doc_org.id,
                 )
             ).all()
             == []
