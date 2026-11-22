@@ -74,6 +74,7 @@ def _bad_strings(node: dict[str, Any]) -> Iterator[Any]:
 def _bad_numbers(node: dict[str, Any]) -> Iterator[Any]:
     yield 'abc'
     yield {}
+    yield True
     for bound, step in (
         ('minimum', -1),
         ('exclusiveMinimum', -1),
@@ -176,8 +177,8 @@ def write_body_schemas() -> dict[str, Any]:
 def _errors_of(adapter: TypeAdapter, body: Any) -> list[Any]:
     """The pydantic errors a body raises; none when it validates.
 
-    Anything but a ``ValidationError`` escapes: a validator that crashes on a
-    wrong type is a 500 on the route, so the probe fails on it.
+    A validator that crashes on a wrong type raises something other than a
+    ``ValidationError`` — a 500 — and propagates, failing the probe.
     """
     try:
         adapter.validate_python(body)

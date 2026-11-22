@@ -232,8 +232,6 @@
   "confirmDialog": {
     "confirmTitle": "Dokument bestätigen",
     "confirmMessage": "Dadurch wird das Dokument zur Lagerausführung freigegeben. Fortfahren?",
-    "completeTitle": "Dokument abschließen",
-    "completeMessage": "Dadurch werden Bestandsoperationen ausgeführt und das Dokument geschlossen. Fortfahren?",
     "cancelTitle": "Dokument stornieren?",
     "cancelConfirm": "Dokument stornieren",
     "cancelKeep": "Dokument behalten",
@@ -524,7 +522,7 @@
     "snapshotDeltaPlus": "Hinzugefügt",
     "snapshotDeltaMinus": "Entfernt",
     "executionHelp": "Passen Sie die tatsächlich verarbeitete Menge für jede Position an, bevor Sie das Dokument schließen.",
-    "executionHelpRecordOnly": "Die Ware hat das Regal bereits in dem Schritt verlassen, den dieses Dokument festhält. Das Schließen hält nur den Eintrag fest — der Bestand ändert sich nicht.",
+    "executionHelpRecordOnly": "Der Bestand wurde bereits in dem Schritt geändert, den dieses Dokument festhält. Das Schließen hält nur den Eintrag fest — der Bestand ändert sich nicht.",
     "executionMeta": "Geplant {{expected}} {{unit}} · verbleibend {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Geplant {{expected}} · verbleibend {{remaining}} (ohne Einheit)",
     "doneQuantityLabel": "Ausgeführte Menge",

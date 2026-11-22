@@ -16,14 +16,17 @@ _SKU_RE = re.compile(r'^[A-Z0-9][A-Z0-9\-_/]{0,49}$')
 
 
 def decimal_from_int_float(v: Any) -> Any:
-    """Convert int/float to Decimal; pass None and str through unchanged.
+    """Convert int/float to Decimal; pass None, str and a bool through unchanged.
+
+    A bool is an ``int`` to Python but not a number in a JSON body: it is
+    handed back so the field's own type check refuses it.
 
     Suitable as a Pydantic ``BeforeValidator`` or inline in a
     ``@field_validator``.
     """
     if v is None:
         return v
-    if isinstance(v, (int, float)):
+    if isinstance(v, (int, float)) and not isinstance(v, bool):
         return Decimal(str(v))
     return v
 
@@ -55,9 +58,9 @@ def quantize_quantity(v: Any) -> Any:
     explicit quantize at entry makes the stored number the one the client
     was told about. Use as a Pydantic ``AfterValidator`` on quantity fields.
 
-    A value too wide to quantize (more digits than the decimal context
-    holds) is returned as it is: it is past every column's ceiling, which the
-    field's bound or the writer refuses with a named answer.
+    A value too wide for the decimal context to quantize is past every
+    column: it is returned as it came, for the ceiling of whoever writes it
+    to refuse, rather than raising ``InvalidOperation`` out of validation.
     """
     if v is None:
         return v
@@ -65,7 +68,7 @@ def quantize_quantity(v: Any) -> Any:
     try:
         return number.quantize(QUANTITY_STEP, rounding=ROUND_HALF_UP)
     except InvalidOperation:
-        return v
+        return number
 
 
 def empty_string_to_none(v: Any) -> Any:
@@ -78,14 +81,12 @@ def empty_string_to_none(v: Any) -> Any:
 def normalize_barcode(v: Any) -> Any:
     """Normalize barcode value using the core barcode utility.
 
-    A value that is not a string passes through, so the field's own type
-    check refuses it with a keyed 422.
+    A value that is not a string goes back as it came: the field's own type
+    check refuses it, where ``.strip()`` on it would be a 500.
     """
-    if v is not None and not isinstance(v, str):
-        return v
     from app.core.barcode import normalize_barcode as _normalize
 
-    return _normalize(v)
+    return _normalize(v) if isinstance(v, str) else v
 
 
 def normalize_sku(v: Any) -> Any:
@@ -93,11 +94,7 @@ def normalize_sku(v: Any) -> Any:
 
     Raises the translated ``sku_format_invalid`` refusal for a value outside
     the shape the ``sku`` column and the product-template door accept.
-    A value that is not a string passes through for the field's own type
-    check to refuse.
     """
-    if v is None:
-        return None
     if not isinstance(v, str):
         return v
     from app.core.exceptions import ServiceRejectionError
