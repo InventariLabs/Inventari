@@ -617,10 +617,7 @@ export default function AssetListPage() {
         showBulkPurgeConfirm={showBulkPurgeConfirm}
         restoreTarget={restoreTarget}
         purgeTarget={purgeTarget}
-        restoreName={
-          equipmentArchived.find((a) => a.id === restoreTarget)?.name
-        }
-        purgeName={equipmentArchived.find((a) => a.id === purgeTarget)?.name}
+        archived={equipmentArchived}
         onBulkRetire={handleBulkRetire}
         onBulkArchive={handleBulkArchive}
         onBulkPurge={handleBulkPurge}

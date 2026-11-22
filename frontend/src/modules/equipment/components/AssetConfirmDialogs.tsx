@@ -8,9 +8,8 @@ interface AssetConfirmDialogsProps {
   showBulkPurgeConfirm: boolean;
   restoreTarget: string | null;
   purgeTarget: string | null;
-  /** Names of the two targets, so each dialog says which asset it acts on. */
-  restoreName?: string;
-  purgeName?: string;
+  /** The archive the targets come from, so each dialog names its asset. */
+  archived?: { id: string; name: string }[];
   // `unknown`, not `void`: each of these returns the promise the dialog awaits
   // before deciding whether to close (see ConfirmDialog's `onConfirm`).
   onBulkRetire: () => unknown;
@@ -33,8 +32,7 @@ export function AssetConfirmDialogs({
   showBulkPurgeConfirm,
   restoreTarget,
   purgeTarget,
-  restoreName,
-  purgeName,
+  archived = [],
   onBulkRetire,
   onBulkArchive,
   onBulkPurge,
@@ -47,6 +45,8 @@ export function AssetConfirmDialogs({
   onCancelPurge,
 }: AssetConfirmDialogsProps) {
   const { t } = useTranslation("equipment");
+  const restoreName = archived.find((a) => a.id === restoreTarget)?.name;
+  const purgeName = archived.find((a) => a.id === purgeTarget)?.name;
 
   return (
     <>
