@@ -22,10 +22,16 @@ import { useRoleCheck } from "@/hooks/useHasRole";
 import { useRouteScroll } from "@/hooks/useRouteScroll";
 import { useShellBack } from "@/hooks/useShellBack";
 import { screensOf } from "./shell/screensOf";
-import { moduleRegistry, applyNavOverrides } from "@/lib/moduleRegistry";
+import {
+  moduleRegistry,
+  applyNavOverrides,
+  resolveModuleTarget,
+} from "@/lib/moduleRegistry";
 import type { ModuleNavItem } from "@/lib/moduleRegistry";
 import { makeTDynamic } from "@/lib/i18nHelpers";
 // How long the shell waits for a caller to toast the session end itself.
+const trimPath = (path: string) => path.replace(/\/+$/, "") || "/";
+
 const SESSION_END_GRACE_MS = 300;
 // The three sentences the API client gives a request that met the ended session.
 const SESSION_END_KEYS = [
@@ -33,6 +39,18 @@ const SESSION_END_KEYS = [
   "errors.sessionEndedRead",
   "errors.sessionEndedReadUnsaved",
 ] as const;
+
+/**
+ * Whether `pathname` is the start screen of the module the workspace is
+ * narrowed to — the screen `/` redirects to, and so the one a Back to home
+ * cannot leave.
+ */
+function isFocusHome(focusModule: string | null, pathname: string): boolean {
+  const focused = focusModule ? moduleRegistry.getModule(focusModule) : null;
+  return (
+    !!focused && trimPath(pathname) === trimPath(resolveModuleTarget(focused))
+  );
+}
 
 /**
  * A request that shows no toast of its own (a picker's search, a background
@@ -152,6 +170,9 @@ export default function AppShell() {
     [enabledModules, moduleNav],
   );
   const goBack = useShellBack(moduleNav?.basePath, homePath, routeExists);
+  // With just one module shown, home is that module's own start screen: Back
+  // from it would land on it again, so the arrow is left off there.
+  const atFocusHome = isFocusHome(focusModule, location.pathname);
 
   useRouteScroll();
 
@@ -296,15 +317,17 @@ export default function AppShell() {
         <div className="flex items-center gap-1.5 min-w-0 flex-1 md:flex-none">
           {activeModule?.launcher ? (
             <>
-              <Button
-                onClick={() => guardNavigate(goBack)}
-                variant="ghost"
-                size="icon"
-                className="md:hidden -ml-1 shrink-0 text-on-muted hover:text-on"
-                aria-label={t("actions.back", "Back")}
-              >
-                <ChevronLeft size={18} />
-              </Button>
+              {!atFocusHome && (
+                <Button
+                  onClick={() => guardNavigate(goBack)}
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden -ml-1 shrink-0 text-on-muted hover:text-on"
+                  aria-label={t("actions.back", "Back")}
+                >
+                  <ChevronLeft size={18} />
+                </Button>
+              )}
 
               {/* `py-2.5` is the hit area, not the wordmark: on a phone
                   the bare link around the logo measured 151x24 — the wordmark's own
