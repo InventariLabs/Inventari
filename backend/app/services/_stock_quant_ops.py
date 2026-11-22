@@ -455,6 +455,7 @@ async def _write_the_planned_records_async(
     user_id: UUID | None,
     source_document_id: UUID | None,
     history_changes: dict[str, Any] | None,
+    file_when_emptied: bool = False,
 ) -> None:
     """Write each record of the plan down to its new number, one update each.
 
@@ -464,7 +465,8 @@ async def _write_the_planned_records_async(
     (``post_the_change=False``) — the movements are written once, per shelf
     and batch, by the draw, not once per record on the way — and so does the
     valuation: what a draw costs is the caller's to post, and a document
-    prices its own delivery.
+    prices its own delivery. A record the draw leaves with nothing is filed
+    under Consumed when *file_when_emptied* says so.
     """
     from app.schemas.item import ItemQuantityUpdate
     from app.services.items import get_by_id_for_update_async, update_quantity
@@ -486,6 +488,7 @@ async def _write_the_planned_records_async(
             history_changes=history_changes,
             sync_valuation=False,
             post_the_change=False,
+            file_when_emptied=file_when_emptied,
         )
 
 
@@ -506,6 +509,7 @@ async def take_from_the_records_async(
     history_changes: dict[str, Any] | None = None,
     reference_type: str | None = None,
     reference_id: UUID | None = None,
+    file_when_emptied: bool = False,
 ) -> list[QuantConsumption]:
     """Take ``quantity`` off the records the draw plan names, one write each.
 
@@ -536,6 +540,10 @@ async def take_from_the_records_async(
     (``lot_id``) takes that batch and no other, on ``require_active_lot``
     terms: a dispatch may not consume a held batch, a scrap of the batch the
     operator confirmed is how the recall leaves the building.
+
+    *file_when_emptied* is for a door that uses stock up (a production run):
+    a record the draw takes to nothing is filed under the Consumed place and
+    leaves the products list, like one used up by hand.
     """
     if storage_location_id is None and quantity <= 0:
         return []
@@ -598,6 +606,7 @@ async def take_from_the_records_async(
         user_id=user_id,
         source_document_id=source_document_id,
         history_changes=history_changes,
+        file_when_emptied=file_when_emptied,
     )
     return await _move_off_the_shelves_async(
         db,
