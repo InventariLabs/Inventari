@@ -417,6 +417,41 @@ class TestTheIngredientList:
         assert label['ingredients'][2]['weight_g'] is None
         assert _names(label['unweighed']) == ['Vanilla pod']
 
+    def test_a_line_that_names_its_unit_only_in_text_is_read_in_that_unit(
+        self,
+        client: TestClient,
+        db_session: Session,
+        mk_org: Organization,
+        mk_auth_headers: dict[str, str],
+    ) -> None:
+        g, kg = _uom(db_session, 'g'), _uom(db_session, 'kg')
+        cinnamon = _product(db_session, mk_org, 'Cinnamon', uom=kg)
+        sugar = _product(db_session, mk_org, 'Sugar', uom=g)
+        roll = _product(db_session, mk_org, 'Roll', uom=g)
+        recipe = _recipe(
+            db_session,
+            mk_org,
+            roll,
+            [(sugar, '100', g, '0'), (cinnamon, '50', g, '0')],
+            yield_qty='150',
+            yield_uom=g,
+        )
+        # The shape the recipes bridge writes: the unit only as text.
+        line = db_session.scalars(
+            select(BoMLine).where(
+                BoMLine.recipe_id == recipe.id,
+                BoMLine.child_template_id == cinnamon.id,
+            )
+        ).one()
+        line.uom_id = None
+        db_session.commit()
+
+        label = _label(client, mk_auth_headers, recipe)
+
+        # 50 g of a product kept in kg is 50 g, not 50 kg.
+        assert _names(label['ingredients']) == ['Sugar', 'Cinnamon']
+        assert [i['weight_g'] for i in label['ingredients']] == ['100.00', '50.00']
+
 
 class TestTheNutritionDeclaration:
     def test_per_100_g_of_what_the_batch_yields(
