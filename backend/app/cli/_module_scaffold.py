@@ -396,9 +396,9 @@ ones agents break first; the full documents are linked at the end.
 
 Nothing the user reads is written into code. Every string goes through a
 catalog: `frontend/i18n/<lang>.json` and `backend/i18n/<lang>.json`. The
-platform maintains five languages: en, pl, de, fr, es. English is the one a
-package must ship; keep every catalog the package has complete, and add the
-others (`module new-community --help` lists the flag) before you offer the
+platform maintains six languages: en, pl, de, fr, es and pt. English is the
+one a package must ship; keep every catalog the package has complete, and add
+the others (`module new-community --help` lists the flag) before you offer the
 module to users in those languages.
 
 ## Migrations belong to this package

@@ -74,7 +74,14 @@ describe("check-audit-fields", () => {
   it("reads the tree's own catalogues", () => {
     const perLanguage = catalogKeys();
 
-    expect([...perLanguage.keys()]).toEqual(["en", "pl", "de", "fr", "es"]);
+    expect([...perLanguage.keys()]).toEqual([
+      "en",
+      "pl",
+      "de",
+      "fr",
+      "es",
+      "pt",
+    ]);
     // The catalogs the journal reads are the ones the app ships, so a
     // renamed namespace fails here rather than in production.
     expect(perLanguage.get("pl").size).toBeGreaterThan(100);
@@ -129,7 +136,7 @@ describe("check-audit-fields label gaps", () => {
   afterAll(() => rmSync(dir, { recursive: true, force: true }));
 
   it("falls and names the field when one catalogue key is removed", () => {
-    for (const language of ["en", "pl", "de", "fr", "es"]) {
+    for (const language of ["en", "pl", "de", "fr", "es", "pt"]) {
       mkdirSync(join(dir, language), { recursive: true });
       const json = JSON.parse(
         readFileSync(
@@ -166,7 +173,7 @@ describe("check-audit-fields target-type gaps", () => {
   afterAll(() => rmSync(dir, { recursive: true, force: true }));
 
   it("falls and names the type when one catalogue entry is removed", () => {
-    for (const language of ["en", "pl", "de", "fr", "es"]) {
+    for (const language of ["en", "pl", "de", "fr", "es", "pt"]) {
       mkdirSync(join(dir, language), { recursive: true });
       const json = JSON.parse(
         readFileSync(

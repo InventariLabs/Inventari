@@ -255,7 +255,7 @@ def _reset_manifest_identity(dst_dir: Path, title: str) -> None:
 def _reset_module_catalogs(dst_dir: Path) -> None:
     """Replace the copied translation catalogs with empty ones.
 
-    The reference's catalogs describe widgets in five languages, and only the
+    The reference's catalogs describe widgets in every maintained language, and only the
     two English strings carrying the words 'Example Widgets' were substituted —
     the Polish page title stayed 'Widgety'. Nothing reads these values anyway:
     a module's user-facing text lives in its frontend catalog, and the backend

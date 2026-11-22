@@ -99,7 +99,7 @@ class ImportAnalyzeResult(BaseModel):
     preview_rows: list[dict[str, object]]
     total_rows: int
     # canonical field name → matched header (aliases across the
-    # module's five languages). Empty dict when nothing matched.
+    # module's maintained languages). Empty dict when nothing matched.
     suggested_mapping: dict[str, str] = Field(default_factory=dict)
 
 

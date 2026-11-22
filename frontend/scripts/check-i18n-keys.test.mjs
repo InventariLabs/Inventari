@@ -651,7 +651,13 @@ describe("three dots in a catalogue string", () => {
 
 describe("a screen name left in English", () => {
   const MODULE_DIR = resolve(SANDBOX, "modules/__i18n_title_fixture__");
-  const VALUES = { en: "Summary", de: "Zusammenfassung", fr: "Résumé", es: "Resumen" };
+  const VALUES = {
+    en: "Summary",
+    de: "Zusammenfassung",
+    fr: "Résumé",
+    es: "Resumen",
+    pt: "Resumo",
+  };
 
   function writeCatalogs(key, pl) {
     for (const [lang, value] of Object.entries({ ...VALUES, pl })) {

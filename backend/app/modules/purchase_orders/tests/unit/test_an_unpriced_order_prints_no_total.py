@@ -29,6 +29,7 @@ NO_PRICE_YET = {
     'de': 'Noch kein Preis',
     'fr': 'Pas encore de prix',
     'es': 'Aún sin precio',
+    'pt': 'Ainda sem preço',
 }
 
 

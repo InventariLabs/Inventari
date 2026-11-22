@@ -5,6 +5,7 @@ import enCommon from "@/i18n/locales/en/common.json";
 import esCommon from "@/i18n/locales/es/common.json";
 import frCommon from "@/i18n/locales/fr/common.json";
 import plCommon from "@/i18n/locales/pl/common.json";
+import ptCommon from "@/i18n/locales/pt/common.json";
 import plApprovals from "@/modules/approvals/i18n/pl.json";
 import plEquipment from "@/modules/equipment/i18n/pl.json";
 import plWarehouse from "@/modules/warehouse/i18n/pl.json";
@@ -1170,7 +1171,7 @@ describe("the labels the recipe journal prints", () => {
   // The keys the maker recipe journal writes into its snapshots (see
   // recipe_service's log_recipe_change calls). A key the catalogue does not
   // name is now printed as the record wrote it — `ingredient_added` — which
-  // is the same word in all five languages, so the guard stands: the journal
+  // is the same word in every language, so the guard stands: the journal
   // has to name these itself.
   const recipeJournalKeys = [
     "ingredient_added",
@@ -1312,13 +1313,14 @@ describe("formatAuditValue booleans", () => {
     expect(formatAuditValue(true)).toBe("true");
   });
 
-  it("every catalogue carries the pair in all five languages", () => {
+  it("every catalogue carries the pair in every language", () => {
     for (const [language, common] of Object.entries({
       en: enCommon,
       pl: plCommon,
       de: deCommon,
       es: esCommon,
       fr: frCommon,
+      pt: ptCommon,
     })) {
       const values = (
         common as { settings: { audit: { values: Record<string, string> } } }

@@ -28,7 +28,7 @@ def _write_i18n(module_dir, langs: list[str]) -> None:
 
 @pytest.mark.unit
 def test_core_module_all_languages_no_errors(tmp_path):
-    """Core module with all 5 languages produces no results."""
+    """Core module with every shipped language produces no results."""
     mod = tmp_path / 'test_mod'
     mod.mkdir()
     (mod / 'manifest.json').write_text(_manifest('core'), encoding='utf-8')
@@ -45,7 +45,7 @@ def test_core_module_missing_fr_returns_error(tmp_path):
     mod = tmp_path / 'test_mod'
     mod.mkdir()
     (mod / 'manifest.json').write_text(_manifest('core'), encoding='utf-8')
-    _write_i18n(mod, ['en', 'pl', 'de', 'es'])  # fr missing
+    _write_i18n(mod, ['en', 'pl', 'de', 'es', 'pt'])  # fr missing
 
     results = validate_i18n(mod)
 
@@ -149,7 +149,7 @@ def test_official_module_missing_lang_returns_error(tmp_path):
     mod = tmp_path / 'test_mod'
     mod.mkdir()
     (mod / 'manifest.json').write_text(_manifest('official'), encoding='utf-8')
-    _write_i18n(mod, ['en', 'pl', 'de', 'es'])  # fr missing
+    _write_i18n(mod, ['en', 'pl', 'de', 'es', 'pt'])  # fr missing
 
     results = validate_i18n(mod)
 

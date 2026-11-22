@@ -1270,7 +1270,7 @@ describe("AuditLogPage", () => {
     // a key the code writes when stock moves on its own. Only the deletion
     // reasons had labels, so every entry a document or a cooking session
     // wrote showed its key -- `recipe_picking`, `document_execution` -- in
-    // all five languages.
+    // every language.
     server.use(
       http.get("/api/v1/audit-log", () =>
         HttpResponse.json({

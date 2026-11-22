@@ -25,7 +25,7 @@
  *      additionally fails when Polish has only `_other` — the
  *      "1 pozycje" bug class (missing _one/_few paucal forms).
  *   4. It then sweeps every catalog for `{{count}}` values missing their CLDR
- *      variants, in all five languages, plus hand-rolled shorthands like
+ *      variants, in every language the app ships, plus hand-rolled shorthands like
  *      "1 line(s)" / "1 Dokument(e)". This is the only mechanism for that
  *      class: `countPluralContract.test.ts` used to own it, blocking but
  *      reading three module catalogs it imported by hand, while this file saw
@@ -46,7 +46,7 @@
  *      other check stays green by design, because the key exists, is used and
  *      is not a raw string.
  *   8. Fails when a screen's own name (`*.title` / `*.subtitle` / `*.heading`)
- *      is byte-identical to English in pl.json while de, fr AND es all
+ *      is byte-identical to English in pl.json while de, fr, es AND pt all
  *      translated it — the one shape a title left in English takes. Scoped to
  *      names because Polish borrows field labels wholesale (Model, VAT, Email)
  *      and a rule over every key would fire seventeen times to catch one.
@@ -564,7 +564,7 @@ function collectJsonKeys(node, out) {
  * namespace carries every module's codes so a picker in the core shell can
  * name them. Registering each seeded code as the key the frontend will look
  * up is what makes a module that seeds a category no catalogue can translate
- * fail this gate, in all five languages.
+ * fail this gate, in every language the app ships.
  */
 function categoryCodesIn(text) {
   const codes = [];
@@ -1432,6 +1432,7 @@ const REQUIRED_PLURAL_FORMS = {
   de: ["_one", "_other"],
   fr: ["_one", "_other"],
   es: ["_one", "_other"],
+  pt: ["_one", "_other"],
   pl: ["_one", "_few", "_many", "_other"],
 };
 
@@ -1441,7 +1442,7 @@ const REQUIRED_PLURAL_FORMS = {
  * This used to be two mechanisms with one blind spot each. The call-site
  * check above sees every namespace but only Polish, and only keys a static
  * `t(..., { count })` reaches — a key handed to a generic renderer is
- * invisible to it. `countPluralContract.test.ts` saw all five languages and
+ * invisible to it. `countPluralContract.test.ts` saw every language and
  * whole catalogs, but imported three module catalogs by hand, which is how
  * `launcher.actionItems.subtitle` shipped with a bare `{{count}}`. One sweep,
  * both breadths, and the file-by-file import list is gone.
@@ -1609,7 +1610,7 @@ sweepUnitNounFidelity();
 // Everything above passes a screen title nobody translated. The key exists in
 // all five catalogs (parity holds), it is a string (the plural rules look
 // elsewhere), and it is referenced by code (so it is not an orphan). Only the
-// pair is a finding: the value identical to English while the four sibling
+// pair is a finding: the value identical to English while the other siblings
 // catalogs say something of their own. "Picking" in pl.json sat beside
 // "Kommissionierung", "Préparation" and "Recogida", and the screen whose own
 // action reads "Skompletuj pozycje" announced itself in English to a Polish
@@ -1651,7 +1652,7 @@ function sweepThreeDots() {
 const threeDots = sweepThreeDots();
 
 const TITLE_SUFFIXES = ["title", "subtitle", "heading"];
-const SIBLING_LANGS = ["de", "fr", "es"];
+const SIBLING_LANGS = ["de", "fr", "es", "pt"];
 
 // A screen's name is not always the whole last segment: `summary_title`,
 // `page_title` and `modalTitle` name a heading just as `title` does, and the

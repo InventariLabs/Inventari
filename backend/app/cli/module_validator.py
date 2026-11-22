@@ -308,7 +308,7 @@ REQUIRED_LANGUAGES = [lang for lang in MAINTAINED_LANGUAGES if lang != 'en']
 
 
 def is_strict_i18n(module_dir: Path) -> bool:
-    """True when this module owes all five languages, not just ``en``.
+    """True when this module owes every maintained language, not just ``en``.
 
     Core and official modules ship with the product, so an untranslated string
     there is a product defect. A community module is written by someone who may
