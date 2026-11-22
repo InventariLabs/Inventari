@@ -147,8 +147,8 @@
   },
   "reconciliation": {
     "title": "Conciliação de estoque",
-    "subtitle_one": "Medido sobre {{count}} registro de produto.",
-    "subtitle_other": "Medido sobre {{count}} registros de produtos.",
+    "subtitle_one": "Medido ao abrir esta tela, sobre {{count}} registro. Aqui conta cada registro, inclusive os de módulos como equipamentos; a Visão geral conta só registros de produto.",
+    "subtitle_other": "Medido ao abrir esta tela, sobre {{count}} registros. Aqui conta cada registro, inclusive os de módulos como equipamentos; a Visão geral conta só registros de produto.",
     "tableCaption": "As duas comparações em pares e o que cada uma encontrou",
     "expectedGap": "Uma diferença permanente aqui é intencional; o número a observar é aquele que cresce.",
     "columns": {
