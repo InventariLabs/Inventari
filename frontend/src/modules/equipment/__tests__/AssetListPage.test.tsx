@@ -342,3 +342,50 @@ describe("AssetListPage — narrowed by the location you came from", () => {
     expect(assetsQuery).not.toContain("loc-1");
   });
 });
+
+describe("AssetListPage — the archive says where permanent deletion is switched on", () => {
+  const emptyPage = {
+    items: [],
+    total: 0,
+    offset: 0,
+    limit: 50,
+    has_more: false,
+  };
+  const org = (settings: Record<string, unknown>) => ({
+    id: "org-1",
+    name: "Test Org",
+    currency: "PLN",
+    created_at: "2026-01-01T00:00:00Z",
+    created_by: null,
+    enabled_modules: ["core", "items", "equipment"],
+    active_profile_id: "equipment_wms",
+    settings,
+  });
+
+  const openArchive = (settings: Record<string, unknown>) => {
+    server.use(
+      http.get("*/organizations/my", () => HttpResponse.json(org(settings))),
+      http.get("/api/v1/equipment/assets", () => HttpResponse.json(emptyPage)),
+      http.get("/api/v1/items/archived", () => HttpResponse.json(emptyPage)),
+    );
+    render(<AssetListPage />, {
+      wrapper: createWrapper(["/equipment/assets?tab=archived"]),
+    });
+  };
+
+  it("points to the Settings switch while permanent deletion is off", async () => {
+    openArchive({ allow_permanent_delete: false });
+    const hint = await screen.findByTestId("archived-purge-hint");
+    expect(hint).toHaveTextContent(/switched off/i);
+    expect(screen.getByRole("link", { name: "Open settings" })).toHaveAttribute(
+      "href",
+      "/settings#permanent-delete",
+    );
+  });
+
+  it("stays quiet once the switch is on", async () => {
+    openArchive({ allow_permanent_delete: true });
+    await screen.findByText("No archived assets");
+    expect(screen.queryByTestId("archived-purge-hint")).not.toBeInTheDocument();
+  });
+});

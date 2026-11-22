@@ -74,6 +74,16 @@ describe("PermanentDeleteSettings", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("names every kind of record it governs and carries the anchor the archive links to", async () => {
+    mockOrg({ allow_permanent_delete: false });
+    const { container } = renderSettings();
+
+    expect(
+      await screen.findByText(/archived products and equipment assets/i),
+    ).toBeInTheDocument();
+    expect(container.querySelector("#permanent-delete")).not.toBeNull();
+  });
+
   it("writes the flag for an administrator", async () => {
     mockOrg({ show_module_data: true });
 

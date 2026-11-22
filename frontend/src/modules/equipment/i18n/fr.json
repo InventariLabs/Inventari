@@ -220,6 +220,8 @@
     "archived_tab": "Archivés",
     "no_archived": "Aucun actif archivé",
     "no_archived_hint": "Les actifs que vous archivez apparaîtront ici. Archiver retire un actif de la liste ; vous pouvez le restaurer.",
+    "purge_off_hint": "La suppression définitive est désactivée pour cette organisation ; un administrateur peut l’activer dans les paramètres.",
+    "purge_off_link": "Ouvrir les paramètres",
     "all_locations": "Tous les emplacements",
     "all_categories": "Toutes les catégories",
     "filter_by_location": "Filtrer par emplacement",

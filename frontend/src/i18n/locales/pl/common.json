@@ -200,7 +200,7 @@
       "orgName": "Nazwa organizacji",
       "permanentDelete": {
         "title": "Trwałe usuwanie",
-        "description": "Pozwala trwale usuwać zarchiwizowane produkty. Tej operacji nie można cofnąć — domyślnie wyłączone w trybach pracy dla firm z audytowanym stanem magazynowym.",
+        "description": "Pozwala trwale usuwać zarchiwizowane produkty i zasoby sprzętowe. Tej operacji nie można cofnąć — domyślnie wyłączone w trybach pracy dla firm z audytowanym stanem magazynowym.",
         "label": "Zezwól na trwałe usuwanie",
         "instantSave": "Zapisuje się od razu po przełączeniu.",
         "confirmTitle": "Zezwolić na trwałe usuwanie?",

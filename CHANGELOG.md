@@ -267,6 +267,10 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
+- The permanent-deletion switch in **Settings** now says it covers archived
+  equipment assets as well as products, and the archived tab of the equipment
+  list tells you, while the switch is off, that an administrator can turn it on
+  in **Settings** and links straight to it.
 - Recipes sorted by **Recently changed** (it always followed the last edit; the
   label now says so), **Replenish all** on the inventory overview is **Review
   what to reorder** and its confirmation names the shopping list that took the
