@@ -62,6 +62,13 @@ router.include_router(images_router)
 @router.get('', response_model=ItemListResponse)
 async def get_items(
     location_id: UUID | None = Query(None, description='Filter by location'),
+    include_inside: bool = Query(
+        False,
+        description=(
+            'With location_id: also the records of every location below it, '
+            'at any depth, so a search scoped to a place reaches its sub-places.'
+        ),
+    ),
     category_id: UUID | None = Query(None, description='Filter by category'),
     context_tag: str | None = Query(
         None, description='Filter by category context_tag (e.g. equipment)'
@@ -139,6 +146,16 @@ async def get_items(
     if location_id is not None and location_usage == 'internal':
         location_usage = None
 
+    inside_ids: list[UUID] | None = None
+    if (
+        location_id is not None
+        and include_inside
+        and current_user.organization_id is not None
+    ):
+        inside_ids = [location_id] + await core_api.locations.descendant_ids_async(
+            db, current_user.organization_id, location_id
+        )
+
     # Expiry filters cut on the organization's day, not the server's.
     today = (
         await core_api.organizations.today_async(db, current_user.organization_id)
@@ -150,7 +167,8 @@ async def get_items(
         lambda s: get_items_service(
             db=s,
             user=current_user,
-            storage_id=location_id,
+            storage_id=None if inside_ids else location_id,
+            storage_ids=inside_ids,
             category_id=category_id,
             context_tag=context_tag,
             claimed_tags=claimed_tags or None,

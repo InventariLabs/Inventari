@@ -1192,14 +1192,23 @@ sudo tee /etc/systemd/journald.conf.d/inventari.conf >/dev/null <<'EOF'
 Storage=persistent
 MaxRetentionSec=30day
 SystemMaxUse=2G
+RateLimitIntervalSec=30s
+RateLimitBurst=10000
 EOF
 sudo systemctl restart systemd-journald
 ```
 
 `Storage=persistent` keeps the journal under `/var/log/journal` across a
 reboot; `MaxRetentionSec=30day` is the stated period; `SystemMaxUse=2G` is the
-size cap, so a flood cannot fill the disk (journald also rate-limits a writer
-that floods). `LOG_RETENTION_DAYS` in `.env` is the same period for the privacy
+size cap, so a flood cannot fill the disk. `RateLimitIntervalSec` and
+`RateLimitBurst` are journald's own defaults, written down on purpose: every
+container writes through `docker.service`, which journald sees as one writer,
+so a container that floods past 10 000 lines in 30 seconds makes journald drop
+the rest of that interval for *all* containers, and what it drops is missing
+from the exported copy as well. Raise `RateLimitBurst` (or set
+`RateLimitIntervalSec=0` to switch the limit off and rely on `SystemMaxUse`
+alone) if losing lines in a flood matters more to you than the disk a flood
+can then fill. `LOG_RETENTION_DAYS` in `.env` is the same period for the privacy
 page — when you change one, change the other. A service's lines:
 
 ```bash

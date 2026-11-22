@@ -68,6 +68,7 @@ def _apply_item_filters(  # noqa: C901 - the filter list is the list's contract
     location_usage: str | None = 'internal',
     include_empty: bool = False,
     storage_id: UUID | None = None,
+    storage_ids: list[UUID] | None = None,
     category_id: UUID | None = None,
     context_tag: str | None = None,
     claimed_tags: set[str] | None = None,
@@ -170,6 +171,8 @@ def _apply_item_filters(  # noqa: C901 - the filter list is the list's contract
 
     if storage_id:
         query = query.where(Item.storage_location_id == storage_id)
+    if storage_ids:
+        query = query.where(in_ids(Item.storage_location_id, storage_ids))
     if category_id:
         query = query.where(Item.category_id == category_id)
 
@@ -332,6 +335,7 @@ def get_items(
     db: Session,
     user: UserContextDTO | None = None,
     storage_id: UUID | None = None,
+    storage_ids: list[UUID] | None = None,
     category_id: UUID | None = None,
     context_tag: str | None = None,
     claimed_tags: set[str] | None = None,
@@ -434,6 +438,7 @@ def get_items(
         location_usage=location_usage,
         include_empty=include_empty,
         storage_id=storage_id,
+        storage_ids=storage_ids,
         category_id=category_id,
         context_tag=context_tag,
         claimed_tags=claimed_tags,

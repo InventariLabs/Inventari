@@ -34568,6 +34568,8 @@ export interface operations {
             query?: {
                 /** @description Filter by location */
                 location_id?: string | null;
+                /** @description With location_id: also the records of every location below it, at any depth, so a search scoped to a place reaches its sub-places. */
+                include_inside?: boolean;
                 /** @description Filter by category */
                 category_id?: string | null;
                 /** @description Filter by category context_tag (e.g. equipment) */

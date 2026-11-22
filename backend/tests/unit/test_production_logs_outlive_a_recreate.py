@@ -281,6 +281,7 @@ class TestWiring:
 
         assert 'MaxRetentionSec=30day' in guide
         assert 'SystemMaxUse=2G' in guide
+        assert 'RateLimitBurst=' in guide
         assert 'scripts/export-logs.sh' in guide
 
     def test_the_bucket_lock_is_shorter_than_the_retention_it_protects(self) -> None:
@@ -314,7 +315,8 @@ class TestWiring:
     def test_the_exported_logs_never_enter_the_checkout(self) -> None:
         ignore = (_REPO_ROOT / '.gitignore').read_text(encoding='utf-8')
 
-        assert 'logs/' in ignore.splitlines()
+        assert '/logs/' in ignore.splitlines()
+        assert 'logs/' not in ignore.splitlines()
 
     def test_the_demo_states_the_period_its_pruner_keeps(self) -> None:
         """The page and the host must say the same number."""

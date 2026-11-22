@@ -23,6 +23,73 @@ const a11yBaselineFiles = Object.keys(
   ).files,
 );
 
+// ─── Local rule: an icon-only button needs a name ────────────────────────
+// `recommended` has no rule that asks a button for a name, and the plugin's
+// control-has-associated-label treats any capitalised child (`<X />`) as
+// possibly carrying a label, so a button holding nothing but an icon passes
+// it. This rule reads the markup the way a screen reader meets it: a
+// <button> / <Button> whose children are only self-closing elements (icons)
+// needs an aria-label, aria-labelledby or title. Text, an expression, a
+// nested element with children (an sr-only span) or a props spread may carry
+// the name, so any of those ends the check. It lives in the jsx-a11y
+// namespace, so scripts/check-a11y-baseline.mjs freezes its findings with the
+// plugin's own.
+const BUTTON_ELEMENTS = new Set(["button", "Button"]);
+const NAME_ATTRIBUTES = new Set(["aria-label", "aria-labelledby", "title"]);
+
+const iconOnlyControlName = {
+  meta: {
+    type: "problem",
+    docs: {
+      description: "a button whose children are only icons needs an accessible name",
+    },
+    schema: [],
+    messages: {
+      unnamed:
+        "This button holds only an icon, so a screen reader announces just \"button\". Give it aria-label={t(...)} (UI_GUIDELINES: icon buttons).",
+    },
+  },
+  create(context) {
+    const hasOnlyIcons = (children) =>
+      children.length > 0 &&
+      children.every(
+        (child) =>
+          (child.type === "JSXText" && child.value.trim() === "") ||
+          (child.type === "JSXElement" && child.openingElement.selfClosing),
+      ) &&
+      children.some((child) => child.type === "JSXElement");
+
+    return {
+      JSXElement(node) {
+        const opening = node.openingElement;
+        if (
+          opening.name.type !== "JSXIdentifier" ||
+          !BUTTON_ELEMENTS.has(opening.name.name)
+        ) {
+          return;
+        }
+        if (!hasOnlyIcons(node.children)) return;
+        const mayBeNamed = opening.attributes.some(
+          (attr) =>
+            attr.type === "JSXSpreadAttribute" ||
+            (attr.name.type === "JSXIdentifier" && NAME_ATTRIBUTES.has(attr.name.name)),
+        );
+        if (!mayBeNamed) context.report({ node: opening, messageId: "unnamed" });
+      },
+    };
+  },
+};
+
+const jsxA11yWithLocalRules = {
+  ...jsxA11y,
+  rules: { ...jsxA11y.rules, "icon-only-control-name": iconOnlyControlName },
+};
+
+const a11yRules = {
+  ...jsxA11y.flatConfigs.recommended.rules,
+  "jsx-a11y/icon-only-control-name": "error",
+};
+
 const timersInEffects = {
   meta: {
     type: "problem",
@@ -260,8 +327,8 @@ export default tseslint.config(
     name: "a11y:jsx-a11y",
     files: ["src/**/*.tsx"],
     ignores: ["src/**/*.test.*", "src/test/**", "src/__mocks__/**"],
-    plugins: { "jsx-a11y": jsxA11y },
-    rules: jsxA11y.flatConfigs.recommended.rules,
+    plugins: { "jsx-a11y": jsxA11yWithLocalRules },
+    rules: a11yRules,
   },
 
   // ─── Baseline: grandfathered files for jsx-a11y ────────────────────────
@@ -277,7 +344,7 @@ export default tseslint.config(
           name: "baseline:jsx-a11y-ratchet",
           files: a11yBaselineFiles,
           rules: Object.fromEntries(
-            Object.keys(jsxA11y.flatConfigs.recommended.rules).map((rule) => [
+            Object.keys(a11yRules).map((rule) => [
               rule,
               "off",
             ]),

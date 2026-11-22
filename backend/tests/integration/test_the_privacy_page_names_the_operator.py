@@ -68,3 +68,18 @@ class TestTheInitStatusStatesTheLogRetention:
         response = client.get('/api/v1/auth/init-status')
 
         assert response.json()['log_retention_days'] == 30
+
+
+class TestTheInitStatusServesTheConfiguredLogRetention:
+    def test_the_configured_period_is_served_not_the_default(self, client, monkeypatch):
+        """The privacy page states the period the installation sets.
+
+        7 is not the schema default (30), so a response that stops reading
+        the setting cannot pass by coincidence.
+        """
+        monkeypatch.setattr(settings, 'LOG_RETENTION_DAYS', 7)
+
+        response = client.get('/api/v1/auth/init-status')
+
+        assert response.status_code == 200
+        assert response.json()['log_retention_days'] == 7
