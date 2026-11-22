@@ -265,6 +265,9 @@ class _Tree:
     facts: dict[UUID, LabelFacts]
     units: _Units
     recipes: dict[UUID, MakerRecipe | None]
+    #: The unit each recipe line is written in, by line id: its own unit, else
+    #: the one its free text names (``bom_service.line_unit_id``), as a run reads it.
+    line_units: dict[UUID, UUID | None]
 
     def node(
         self,
@@ -302,7 +305,7 @@ class _Tree:
                     self.units.grams(
                         line.qty_per_batch
                         * (Decimal('1') + line.yield_loss_pct / Decimal('100')),
-                        line.uom_id,
+                        self.line_units.get(line.id, line.uom_id),
                         self.templates.get(line.child_template_id),
                     ),
                     self.recipes.get(line.child_template_id),
@@ -497,7 +500,16 @@ async def compose_async(
         db, organization_id, list(ids)
     )
     facts = await facts_async(db, organization_id, ids)
-    tree = _Tree(templates, facts, await _units_async(db, organization_id), recipes)
+    resolver = bom_service.UomResolverAsync(db, organization_id)
+    line_units = {
+        line.id: await bom_service.line_unit_id(line.uom_id, line.unit, resolver)
+        for each in [recipe, *recipes.values()]
+        if each is not None
+        for line in each.lines
+    }
+    tree = _Tree(
+        templates, facts, await _units_async(db, organization_id), recipes, line_units
+    )
     product = tree.node(recipe.output_template_id, None, recipe, 0, frozenset())
     own = product.facts.allergens or ()
     allergens = _collected(product, 'allergens', own, set())
