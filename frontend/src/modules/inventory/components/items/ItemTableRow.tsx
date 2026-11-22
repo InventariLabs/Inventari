@@ -7,7 +7,6 @@ import {
   Barcode,
   CheckCircle,
   Edit2,
-  FileText,
   Trash2,
   Hash,
   Plus,
@@ -269,7 +268,6 @@ function ItemTableRowBase({
   const consumeLabel = t("items:actions.consume1unit");
   const addOneLabel = t("items:actions.addOneUnit");
   const editLabel = t("items:actions.edit");
-  const detailsLabel = t("items:detail.viewDetails");
 
   // A real table, not a stack of cards: hairline row dividers via border-b,
   // no per-row boxes. The border lives on the cells because a `<tr>` cannot
@@ -508,16 +506,6 @@ function ItemTableRowBase({
  touch screen (UI_GUIDELINES §2.9). */}
       <td className={lastCell}>
         <div className="flex items-center justify-end gap-1">
-          {/* The page — history, movements, labels — is a read; a viewer
-              reaches it too, so it sits outside the write gate. */}
-          <Link
-            to={`/inventory/items/${item.id}`}
-            aria-label={detailsLabel}
-            className="relative group/tooltip inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-on-muted hover:text-primary-600 hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <FileText size={16} />
-            <Tooltip label={detailsLabel} />
-          </Link>
           {canWrite && (
             <>
               {/* Each icon-only button carries its words in a tooltip of the

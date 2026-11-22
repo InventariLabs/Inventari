@@ -16,13 +16,6 @@ interface QuickAction {
 
 interface QuickActionGridProps {
   actions: QuickAction[];
-  /**
-   * `stack` (default): one full-width bar per action, for the narrow sheet over
-   * the list. `inline`: for a page, where full-width bars would run the length
-   * of the screen — content-wide buttons that wrap, the destructive action in
-   * its own group at the far end. Below `sm` both are the same stack.
-   */
-  layout?: "stack" | "inline";
 }
 
 function ActionButton({
@@ -57,42 +50,20 @@ function ActionButton({
   );
 }
 
-export function QuickActionGrid({
-  actions,
-  layout = "stack",
-}: QuickActionGridProps) {
-  if (layout === "stack") {
-    return (
-      <div className="grid grid-cols-1 gap-3">
-        {actions.map((action) => (
-          <ActionButton
-            key={action.id}
-            action={action}
-            className="w-full justify-start py-4 px-4"
-          />
-        ))}
-      </div>
-    );
-  }
-
-  const regular = actions.filter((action) => !action.danger);
-  const destructive = actions.filter((action) => action.danger);
-  const group = "flex flex-col gap-3 sm:flex-row sm:flex-wrap";
-  const button = "w-full sm:w-auto justify-start py-3 px-4";
+/**
+ * One full-width bar per action, for the narrow sheet over the list. A page
+ * shows the same actions as ordinary buttons in its header (ItemDetailActions).
+ */
+export function QuickActionGrid({ actions }: QuickActionGridProps) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-      <div className={group}>
-        {regular.map((action) => (
-          <ActionButton key={action.id} action={action} className={button} />
-        ))}
-      </div>
-      {destructive.length > 0 && (
-        <div className={group}>
-          {destructive.map((action) => (
-            <ActionButton key={action.id} action={action} className={button} />
-          ))}
-        </div>
-      )}
+    <div className="grid grid-cols-1 gap-3">
+      {actions.map((action) => (
+        <ActionButton
+          key={action.id}
+          action={action}
+          className="w-full justify-start py-4 px-4"
+        />
+      ))}
     </div>
   );
 }
