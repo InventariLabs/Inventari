@@ -169,6 +169,9 @@ describe("AttachLabelToItemSheet — a scanned free label, a product that exists
     const cables = screen.getAllByRole("button", { name: /QA Cable/ });
     expect(cables[0]).toHaveTextContent("#aaa111");
     expect(cables[1]).toHaveTextContent("#bbb222");
+    // The mark is a word of its own in the accessible name, not glued to the
+    // quantity ("1 pcs.#aaa111").
+    expect(cables[0].textContent).toMatch(/\s#aaa111$/);
     // A lone row carries no mark.
     expect(
       screen.getByRole("button", { name: /QA Cord/ }),
