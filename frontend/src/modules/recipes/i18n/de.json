@@ -247,7 +247,7 @@
     "delete_confirm": "Rezept „{{name}}“ löschen? Essenspläne, in denen ein gelöschtes Rezept eingeplant ist, verlieren diese Mahlzeiten. Dies kann nicht rückgängig gemacht werden.",
     "delete_confirm_unplanned": "Rezept „{{name}}“ löschen? Dies kann nicht rückgängig gemacht werden.",
     "delete_confirm_planned": "Rezept „{{name}}“ löschen? Es ist eingeplant in {{meals}}; diese Mahlzeiten werden geleert. Dies kann nicht rückgängig gemacht werden.",
-    "delete_planned_more": "und {{count}} weitere",
+    "delete_planned_more": "und {{rest}} weitere",
     "start_picking": "Aus dem Bestand nehmen",
     "cook_for_stock_hint": "Erstellt einen Produktionslauf für eine Charge im Maker-Modul",
     "add_to_meal_plan_hint": "Plant dieses Rezept im Essenskalender",

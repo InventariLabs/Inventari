@@ -272,7 +272,7 @@
     "delete_confirm": "Usunąć przepis „{{name}}”? Plany posiłków, w których był usunięty przepis, tracą te posiłki. Tej operacji nie można cofnąć.",
     "delete_confirm_unplanned": "Usunąć przepis „{{name}}”? Tej operacji nie można cofnąć.",
     "delete_confirm_planned": "Usunąć przepis „{{name}}”? Jest zaplanowany w: {{meals}} — te posiłki zostaną opróżnione. Tej operacji nie można cofnąć.",
-    "delete_planned_more": "jeszcze {{count}}",
+    "delete_planned_more": "jeszcze {{rest}}",
     "start_picking": "Pobierz ze stanu",
     "cook_for_stock_hint": "Tworzy zlecenie produkcyjne na partię w module maker",
     "add_to_meal_plan_hint": "Planuje przepis w kalendarzu posiłków",

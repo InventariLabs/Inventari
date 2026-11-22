@@ -51,7 +51,7 @@ export function RecipeDeleteConfirm({
             ...(meals.length > MEALS_NAMED
               ? [
                   t("actions.delete_planned_more", {
-                    count: meals.length - MEALS_NAMED,
+                    rest: meals.length - MEALS_NAMED,
                   }),
                 ]
               : []),

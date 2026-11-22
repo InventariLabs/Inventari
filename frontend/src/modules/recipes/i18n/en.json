@@ -247,7 +247,7 @@
     "delete_confirm": "Delete recipe \"{{name}}\"? Meal plans that include a deleted recipe lose those meals. This cannot be undone.",
     "delete_confirm_unplanned": "Delete recipe “{{name}}”? This cannot be undone.",
     "delete_confirm_planned": "Delete recipe “{{name}}”? It is planned in {{meals}}, and those meals will be emptied. This cannot be undone.",
-    "delete_planned_more": "+{{count}} more",
+    "delete_planned_more": "+{{rest}} more",
     "start_picking": "Take from stock",
     "cook_for_stock_hint": "Creates a production order for a batch in the maker module",
     "add_to_meal_plan_hint": "Schedules this recipe in the meal calendar",
