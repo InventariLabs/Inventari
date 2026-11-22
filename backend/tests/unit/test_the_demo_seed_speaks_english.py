@@ -38,8 +38,13 @@ from seed_demo_data import (
     FOOD_HIERARCHY,
     FOOD_TEMPLATES,
     MAKER_BOM,
+    MAKER_LABEL_NAME,
+    MAKER_PLANNED_RUNS,
     MAKER_RUN_NOTES,
+    MAKER_RUN_UNDER_WAY_FIRST_JARS_BATCH,
+    MAKER_RUN_UNDER_WAY_NOTES,
     MAKER_SKUS,
+    MAKER_STEPS,
     MAKER_TEMPLATES,
     SEED_PREFIX,
 )
@@ -145,7 +150,14 @@ def _corpus() -> dict[str, list[str]]:
         'DEMO_SHIPMENT': [DEMO_SHIPMENT_CARRIER] + [DEMO_SHIPMENT_TRACKING_NUMBER],
         'DEMO_STOCK_TAKE': [f'{SEED_PREFIX}{DEMO_STOCK_TAKE_TITLE}']
         + [DEMO_STOCK_TAKE_DESCRIPTION],
-        'MAKER_RUN': [MAKER_RUN_NOTES],
+        'MAKER_RUN': [
+            MAKER_RUN_NOTES,
+            MAKER_RUN_UNDER_WAY_NOTES,
+            MAKER_RUN_UNDER_WAY_FIRST_JARS_BATCH,
+            MAKER_LABEL_NAME,
+        ]
+        + [row[2] for row in MAKER_PLANNED_RUNS]
+        + [text for text, _minutes in MAKER_STEPS],
         # What only the public demo writes (``seed_demo_showcase``): the
         # organization's name on every page and PDF, the colleagues on the
         # approvals, the notes on the orders and the attestation campaign.
