@@ -431,9 +431,14 @@ class CoreItemsReadMixin:
         storage_location_id: UUID | None = None,
         lot_id: UUID | None = None,
         owner_id: UUID | None = None,
+        emptied_from: UUID | None = None,
         for_update: bool = False,
     ) -> ItemDTO | None:
         """Return the record a delivery to this place tops up.
+
+        ``emptied_from`` asks for the record a draw used up on that shelf and
+        filed under Consumed, in place of one standing on a shelf: giving
+        stock back to it returns it to the shelf it left.
 
         ``for_update=True`` returns it under its row lock (``FOR NO KEY
         UPDATE``), freshly read — for a delivery that is about to write the
@@ -455,6 +460,7 @@ class CoreItemsReadMixin:
             storage_location_id=storage_location_id,
             lot_id=lot_id,
             owner_id=owner_id,
+            emptied_from=emptied_from,
             for_update=for_update,
         )
         if item is None:

@@ -1,5 +1,10 @@
 import { api } from "@/lib/api/client";
-import type { ProductionOrder, ProductionOrderCreate } from "../types/maker";
+import type {
+  ProductionOrder,
+  ProductionOrderCreate,
+  RecipeCatalogItem,
+  RecipeCatalogResponse,
+} from "../types/maker";
 
 /**
  * The bridge from a culinary recipe to production.
@@ -50,6 +55,25 @@ export async function createMakerRecipeFromCulinary(
     data,
   );
   return response.data;
+}
+
+/**
+ * The production recipe already made from this culinary recipe for this
+ * product, or null. The catalogue narrows to the product's formulas (a product
+ * carries a handful), and the one stamped with the source is the pair's.
+ */
+export async function findBridgedRecipe(
+  outputTemplateId: string,
+  sourceRecipeId: string,
+): Promise<RecipeCatalogItem | null> {
+  const response = await api.get<RecipeCatalogResponse>("/maker/recipes", {
+    params: { output_template_id: outputTemplateId, limit: 200 },
+  });
+  return (
+    response.data.items.find(
+      (item) => item.source_recipe_id === sourceRecipeId,
+    ) ?? null
+  );
 }
 
 /**

@@ -29,6 +29,7 @@ from app.core.contracts import (
     AuditAction,
     AuditTargetType,
     ItemCreateDTO,
+    ItemDTO,
     RecordPostDTO,
     StockMoveDTO,
     UserContextDTO,
@@ -319,6 +320,40 @@ async def _ingredient_rates(
     return {line.child_template_id: line.unit_cost_snapshot for line in lines}
 
 
+async def _find_the_record_it_left(
+    db: AsyncSession,
+    organization_id: UUID,
+    move: StockMoveDTO,
+    shelf: UUID,
+) -> ItemDTO | None:
+    """The record a draw took from *shelf*, standing there or filed as used up."""
+    for on_shelf, emptied_from in ((shelf, None), (None, shelf)):
+        record = await core_api.items.find_stock_row_async(
+            db,
+            organization_id,
+            template_id=move.product_template_id,
+            expiry_date=move.expiry_date,
+            storage_location_id=on_shelf,
+            emptied_from=emptied_from,
+            lot_id=move.lot_id,
+            owner_id=move.owner_id,
+        )
+        if record is None and move.lot_id is not None and move.expiry_date is not None:
+            # A batch keeps its date on the batch; its records may carry none.
+            record = await core_api.items.find_stock_row_async(
+                db,
+                organization_id,
+                template_id=move.product_template_id,
+                storage_location_id=on_shelf,
+                emptied_from=emptied_from,
+                lot_id=move.lot_id,
+                owner_id=move.owner_id,
+            )
+        if record is not None:
+            return record
+    return None
+
+
 async def _put_the_ingredient_back(
     db: AsyncSession,
     organization_id: UUID,
@@ -330,33 +365,17 @@ async def _put_the_ingredient_back(
 ) -> None:
     """Return one draw of the run to the shelf, batch and date it came from.
 
-    The record it left is still there, at what the run left of it, unless
-    somebody removed it since; then the goods come back as a record of
-    their own with the same batch and date. A batch the run took from may
+    The record it left is still there, at what the run left of it — on the
+    shelf, or in the Consumed place when the run used it up, from where
+    the goods return it to the shelf — unless somebody removed it since;
+    then the goods come back as a record of their own with the same batch
+    and date. A batch the run took from may
     have been put on hold since — the goods still go back into it, held.
     """
     shelf = move.from_location_id
     if shelf is None:
         return
-    record = await core_api.items.find_stock_row_async(
-        db,
-        organization_id,
-        template_id=move.product_template_id,
-        expiry_date=move.expiry_date,
-        storage_location_id=shelf,
-        lot_id=move.lot_id,
-        owner_id=move.owner_id,
-    )
-    if record is None and move.lot_id is not None and move.expiry_date is not None:
-        # A batch keeps its date on the batch; its records may carry none.
-        record = await core_api.items.find_stock_row_async(
-            db,
-            organization_id,
-            template_id=move.product_template_id,
-            storage_location_id=shelf,
-            lot_id=move.lot_id,
-            owner_id=move.owner_id,
-        )
+    record = await _find_the_record_it_left(db, organization_id, move, shelf)
     posts: list[RecordPostDTO] = []
     if record is not None:
         locked = await core_api.items.get_for_update_async(

@@ -83,15 +83,9 @@ async def _output_uom_symbol(
 
     The recipe may state its own; otherwise the output product's applies.
     """
-    uom_id = recipe.batch_yield_uom_id
-    if uom_id is None:
-        template = await core_api.product_templates.get_async(
-            db, org_id, recipe.output_template_id
-        )
-        uom_id = template.uom_id if template else None
-    if uom_id is None:
-        return None
-    uom = await core_api.uoms.get_async(db, uom_id, org_id)
+    uom = await recipe_service.batch_yield_uom(
+        db, org_id, recipe.output_template_id, recipe.batch_yield_uom_id
+    )
     return uom.symbol if uom else None
 
 
@@ -317,6 +311,7 @@ async def list_recipes(
                 ),
                 batch_yield_qty=recipe.batch_yield_qty,
                 batch_yield_uom_symbol=_yield_uom_symbol(recipe),
+                source_recipe_id=recipe.source_recipe_id,
                 is_default=recipe.is_default,
                 ingredient_count=ingredient_counts.get(recipe.id, 0),
                 unit_cost=unit_cost,
@@ -533,6 +528,9 @@ async def create_recipe_from_culinary(
 
     await db.refresh(recipe)
     name = await _enrich_recipe_name(db, org_id, recipe)
+    # The same flag the recipe read attaches: a line the stock cannot be read
+    # in says so in this answer too.
+    await _attach_unit_mismatch(db, org_id, list(recipe.lines))
     return RecipeBridgeRead(
         **{k: v for k, v in recipe.__dict__.items() if not k.startswith('_')},
         output_template_name=name,

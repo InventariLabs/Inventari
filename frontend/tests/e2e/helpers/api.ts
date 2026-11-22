@@ -299,6 +299,19 @@ export class ApiHelper {
     return (await response.json()).items;
   }
 
+  /** The id of a seeded unit, by its symbol. */
+  async getUomId(token: string, symbol: string): Promise<string> {
+    const uoms = await this.request.get("/api/v1/uoms?limit=200", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const uom = ((await uoms.json()).items as Array<{
+      id: string;
+      symbol: string;
+    }>).find((u) => u.symbol === symbol);
+    if (!uom) throw new Error(`The unit ${symbol} is not seeded`);
+    return uom.id;
+  }
+
   /**
    * Creates a recipe. The endpoint refuses an ingredient line without a unit,
    * as the form does, so a line that names none gets grams — the unit a
@@ -311,19 +324,10 @@ export class ApiHelper {
     const lines = (data.ingredients ?? []) as Array<Record<string, unknown>>;
     let body = data;
     if (lines.some((line) => line.uom_id === undefined)) {
-      const uoms = await this.request.get("/api/v1/uoms?limit=200", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const grams = (
-        (await uoms.json()).items as Array<{
-          id: string;
-          symbol: string;
-        }>
-      ).find((uom) => uom.symbol === "g");
-      if (!grams) throw new Error("The unit g is not seeded");
+      const gramsId = await this.getUomId(token, "g");
       body = {
         ...data,
-        ingredients: lines.map((line) => ({ uom_id: grams.id, ...line })),
+        ingredients: lines.map((line) => ({ uom_id: gramsId, ...line })),
       };
     }
     const response = await this.request.post("/api/v1/recipes", {
@@ -2459,7 +2463,7 @@ export class ApiHelper {
    */
   async createProductTemplate(
     token: string,
-    data: { name: string; sku?: string; barcode?: string },
+    data: { name: string; sku?: string; barcode?: string; uom_id?: string },
   ): Promise<{ id: string }> {
     const response = await this.request.post(
       "/api/v1/items/product-templates",

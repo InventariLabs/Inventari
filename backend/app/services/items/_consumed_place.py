@@ -25,7 +25,7 @@ from app.models.storage_location import LocationUsage, StorageLocation
 
 from ._stock_relocation import lock_shelf_change_async
 
-_EMPTIED_FROM = 'emptied_from'
+EMPTIED_FROM = 'emptied_from'
 
 
 async def file_under_consumed_async(
@@ -55,7 +55,7 @@ async def file_under_consumed_async(
     shelf = item.storage_location_id
     await lock_shelf_change_async(db, [item], virtual_loc.id)
     item.storage_location_id = virtual_loc.id
-    item.meta_data = {**(item.meta_data or {}), _EMPTIED_FROM: str(shelf)}
+    item.meta_data = {**(item.meta_data or {}), EMPTIED_FROM: str(shelf)}
     return shelf
 
 
@@ -72,7 +72,7 @@ async def bring_back_from_consumed_async(db: AsyncSession, item: Item) -> None:
     ):
         return
     meta: dict[str, Any] = dict(item.meta_data or {})
-    shelf_id = meta.get(_EMPTIED_FROM)
+    shelf_id = meta.get(EMPTIED_FROM)
     if not shelf_id:
         return
     shelf = await db.get(StorageLocation, UUID(str(shelf_id)))
@@ -84,5 +84,5 @@ async def bring_back_from_consumed_async(db: AsyncSession, item: Item) -> None:
         return
     await lock_shelf_change_async(db, [item], shelf.id)
     item.storage_location_id = shelf.id
-    meta.pop(_EMPTIED_FROM)
+    meta.pop(EMPTIED_FROM)
     item.meta_data = meta or None

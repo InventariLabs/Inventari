@@ -62,6 +62,34 @@ def _make_uom(db: Session, symbol: str, name: str = '') -> Uom:
     return uom
 
 
+def _make_unit_pair(
+    db: Session, category_name: str, reference: str, other: str, factor: float
+) -> tuple[Uom, Uom]:
+    """A category with a reference unit and a larger one (g and kg, ml and l)."""
+    category = UomCategory(name=category_name)
+    db.add(category)
+    db.flush()
+    small = Uom(
+        category_id=category.id,
+        name=reference,
+        symbol=reference,
+        factor=1.0,
+        is_reference=True,
+        is_system=False,
+    )
+    large = Uom(
+        category_id=category.id,
+        name=other,
+        symbol=other,
+        factor=factor,
+        is_reference=False,
+        is_system=False,
+    )
+    db.add_all([small, large])
+    db.commit()
+    return small, large
+
+
 def _make_culinary_recipe(
     db: Session,
     org: Organization,
@@ -321,6 +349,241 @@ class TestFromRecipeEndpoint:
         recipe = db_session.get(MakerRecipe, uuid.UUID(first.json()['id']))
         assert recipe is not None
         assert recipe.batch_yield_qty == Decimal('12')
+
+    @pytest.mark.parametrize(
+        ('category', 'small', 'large'),
+        [('Weight', 'g', 'kg'), ('Volume', 'ml', 'l')],
+    )
+    def test_from_recipe_without_a_yield_asks_for_one_when_the_output_is_measured(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        mk_user: User,
+        db_session: Session,
+        category: str,
+        small: str,
+        large: str,
+    ) -> None:
+        """Servings are a count of portions, never an amount of kilograms or litres.
+
+        A caller that names no yield for a product kept in a weight or volume
+        unit is asked for one; nothing is stored. Naming the yield is accepted.
+        """
+        _, large_uom = _make_unit_pair(db_session, category, small, large, 1000.0)
+        output = _make_template(db_session, mk_org, 'Shortbread')
+        output.uom_id = large_uom.id
+        db_session.commit()
+        culinary = _make_culinary_recipe(
+            db_session, mk_org, servings=12, created_by=mk_user.id
+        )
+        payload = {
+            'source_recipe_id': str(culinary.id),
+            'output_template_id': str(output.id),
+        }
+
+        refused = client.post(
+            '/api/v1/maker/recipes/from-recipe', headers=mk_auth_headers, json=payload
+        )
+        assert refused.status_code == 400, refused.text
+        assert 'yield' in refused.text.lower()
+        assert large in refused.text
+        assert (
+            db_session.query(MakerRecipe)
+            .filter(MakerRecipe.output_template_id == output.id)
+            .count()
+            == 0
+        )
+
+        named = client.post(
+            '/api/v1/maker/recipes/from-recipe',
+            headers=mk_auth_headers,
+            json={**payload, 'batch_yield_qty': '1.5'},
+        )
+        assert named.status_code == 201, named.text
+        assert named.json()['batch_yield_qty'] == '1.5000'
+
+    def test_from_recipe_without_a_yield_takes_servings_for_a_counted_output(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        mk_user: User,
+        db_session: Session,
+    ) -> None:
+        """A piece or a pack is counted like servings, so the number stands."""
+        category = UomCategory(name='Unit')
+        db_session.add(category)
+        db_session.flush()
+        piece = Uom(
+            category_id=category.id,
+            name='Piece',
+            symbol='pcs',
+            factor=1.0,
+            is_reference=True,
+            is_system=False,
+        )
+        db_session.add(piece)
+        db_session.commit()
+        output = _make_template(db_session, mk_org, 'Cookie')
+        output.uom_id = piece.id
+        db_session.commit()
+        culinary = _make_culinary_recipe(
+            db_session, mk_org, servings=12, created_by=mk_user.id
+        )
+
+        resp = client.post(
+            '/api/v1/maker/recipes/from-recipe',
+            headers=mk_auth_headers,
+            json={
+                'source_recipe_id': str(culinary.id),
+                'output_template_id': str(output.id),
+            },
+        )
+        assert resp.status_code == 201, resp.text
+        assert resp.json()['batch_yield_qty'] == '12.0000'
+
+    def test_from_recipe_names_the_unit_of_the_stored_yield_it_refuses_to_change(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        mk_user: User,
+        db_session: Session,
+    ) -> None:
+        """The refusal says "12 kg", not a bare "12"."""
+        _, kg = _make_unit_pair(db_session, 'Weight', 'g', 'kg', 1000.0)
+        output = _make_template(db_session, mk_org, 'Granola')
+        output.uom_id = kg.id
+        db_session.commit()
+        culinary = _make_culinary_recipe(
+            db_session, mk_org, servings=12, created_by=mk_user.id
+        )
+        payload = {
+            'source_recipe_id': str(culinary.id),
+            'output_template_id': str(output.id),
+            'batch_yield_qty': '12',
+        }
+        first = client.post(
+            '/api/v1/maker/recipes/from-recipe', headers=mk_auth_headers, json=payload
+        )
+        assert first.status_code == 201, first.text
+
+        differs = client.post(
+            '/api/v1/maker/recipes/from-recipe',
+            headers=mk_auth_headers,
+            json={**payload, 'batch_yield_qty': '1.1'},
+        )
+        assert differs.status_code == 400, differs.text
+        assert '12 kg' in differs.text
+
+        # The catalogue names the culinary recipe a formula came from, so a
+        # caller holding the pair can read the stored yield and its unit.
+        catalogue = client.get(
+            f'/api/v1/maker/recipes?output_template_id={output.id}',
+            headers=mk_auth_headers,
+        )
+        assert catalogue.status_code == 200, catalogue.text
+        (item,) = catalogue.json()['items']
+        assert item['source_recipe_id'] == str(culinary.id)
+        assert item['batch_yield_qty'] == '12.0000'
+        assert item['batch_yield_uom_symbol'] == 'kg'
+
+    def test_from_recipe_refuses_an_ingredient_its_stock_cannot_be_read_in(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        mk_user: User,
+        db_session: Session,
+    ) -> None:
+        """300 g of a product stocked in pieces is refused, as a BOM line is."""
+        grams, _ = _make_unit_pair(db_session, 'Weight', 'g', 'kg', 1000.0)
+        piece = _make_uom(db_session, 'pcs')
+        flour = _make_template(db_session, mk_org, 'Flour')
+        flour.uom_id = piece.id
+        output = _make_template(db_session, mk_org, 'Bread')
+        db_session.commit()
+        culinary = _make_culinary_recipe(
+            db_session,
+            mk_org,
+            ingredients=[
+                RecipeIngredient(
+                    name='flour',
+                    template_id=flour.id,
+                    quantity=Decimal('300'),
+                    uom_id=grams.id,
+                )
+            ],
+            created_by=mk_user.id,
+        )
+
+        resp = client.post(
+            '/api/v1/maker/recipes/from-recipe',
+            headers=mk_auth_headers,
+            json={
+                'source_recipe_id': str(culinary.id),
+                'output_template_id': str(output.id),
+            },
+        )
+        assert resp.status_code == 400, resp.text
+        assert (
+            db_session.query(MakerRecipe)
+            .filter(MakerRecipe.output_template_id == output.id)
+            .count()
+            == 0
+        )
+
+    def test_from_recipe_answer_carries_the_real_unit_mismatch_of_each_line(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        mk_user: User,
+        db_session: Session,
+    ) -> None:
+        """The bridge answer flags a line the same way the recipe read does."""
+        grams, _ = _make_unit_pair(db_session, 'Weight', 'g', 'kg', 1000.0)
+        flour = _make_template(db_session, mk_org, 'Flour')
+        flour.uom_id = grams.id
+        output = _make_template(db_session, mk_org, 'Bread')
+        db_session.commit()
+        culinary = _make_culinary_recipe(
+            db_session,
+            mk_org,
+            ingredients=[
+                RecipeIngredient(
+                    name='flour',
+                    template_id=flour.id,
+                    quantity=Decimal('300'),
+                    uom_id=grams.id,
+                )
+            ],
+            created_by=mk_user.id,
+        )
+        payload = {
+            'source_recipe_id': str(culinary.id),
+            'output_template_id': str(output.id),
+        }
+        first = client.post(
+            '/api/v1/maker/recipes/from-recipe', headers=mk_auth_headers, json=payload
+        )
+        assert first.status_code == 201, first.text
+        assert first.json()['lines'][0]['unit_mismatch'] is False
+
+        # The ingredient's stock unit changes afterwards; the snapshot stays.
+        flour.uom_id = _make_uom(db_session, 'pcs').id
+        db_session.commit()
+
+        again = client.post(
+            '/api/v1/maker/recipes/from-recipe', headers=mk_auth_headers, json=payload
+        )
+        assert again.status_code == 201, again.text
+        detail = client.get(
+            f'/api/v1/maker/recipes/{first.json()["id"]}', headers=mk_auth_headers
+        )
+        assert detail.json()['lines'][0]['unit_mismatch'] is True
+        assert again.json()['lines'][0]['unit_mismatch'] is True
 
     def test_from_recipe_missing_culinary_recipe_returns_404(
         self,

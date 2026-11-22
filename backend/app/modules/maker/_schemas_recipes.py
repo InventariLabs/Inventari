@@ -268,6 +268,8 @@ class RecipeCatalogItem(BaseModel):
     output_template_image_url: str | None = None
     batch_yield_qty: Decimal
     batch_yield_uom_symbol: str | None = None
+    #: The culinary recipe this formula is a snapshot of, when it is one.
+    source_recipe_id: UUID | None = None
     is_default: bool
     ingredient_count: int
     unit_cost: Decimal | None = None  # last_unit_cost from last completed order

@@ -17,7 +17,7 @@ from sqlalchemy import func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.contracts import AuditAction, AuditTargetType, UserContextDTO
+from app.core.contracts import AuditAction, AuditTargetType, UomDTO, UserContextDTO
 from app.core.db_utils import acquire_advisory_lock, escape_ilike, paginate_async
 from app.core.exceptions import EntityNotFoundError, ServiceRejectionError
 from app.core.module_sdk import UomResolverAsync
@@ -275,6 +275,42 @@ async def create_recipe(
     return recipe
 
 
+#: UoM categories whose quantity is a measure, not a count. A recipe's servings
+#: are a count of portions, so they cannot stand for a yield in one of these.
+_MEASURED_UOM_CATEGORIES = frozenset({'Weight', 'Volume'})
+
+
+async def batch_yield_uom(
+    db: AsyncSession,
+    organization_id: UUID,
+    output_template_id: UUID,
+    uom_id: UUID | None,
+) -> UomDTO | None:
+    """The unit a batch yield is counted in.
+
+    The recipe may state its own; otherwise the output product's applies.
+    """
+    if uom_id is None:
+        template = await core_api.product_templates.get_async(
+            db, organization_id, output_template_id
+        )
+        uom_id = template.uom_id if template else None
+    if uom_id is None:
+        return None
+    return await core_api.uoms.get_async(db, uom_id, organization_id)
+
+
+async def _is_measured_unit(
+    db: AsyncSession, organization_id: UUID, uom: UomDTO
+) -> bool:
+    """Whether *uom* belongs to a weight or volume category."""
+    categories = await core_api.uoms.list_categories_for_org_async(db, organization_id)
+    return any(
+        category.id == uom.category_id and category.name in _MEASURED_UOM_CATEGORIES
+        for category in categories
+    )
+
+
 async def create_recipe_from_culinary(
     db: AsyncSession,
     organization_id: UUID,
@@ -334,8 +370,16 @@ async def create_recipe_from_culinary(
             data.batch_yield_qty is not None
             and data.batch_yield_qty != recipe.batch_yield_qty
         ):
+            stored_uom = await batch_yield_uom(
+                db,
+                organization_id,
+                recipe.output_template_id,
+                recipe.batch_yield_uom_id,
+            )
+            amount = f'{recipe.batch_yield_qty.normalize():f}'
             raise ServiceRejectionError(
-                'bridge_yield_differs', qty=f'{recipe.batch_yield_qty.normalize():f}'
+                'bridge_yield_differs',
+                qty=f'{amount} {stored_uom.symbol}' if stored_uom else amount,
             )
         return recipe, False
 
@@ -344,6 +388,18 @@ async def create_recipe_from_culinary(
     )
     if snapshot is None:
         raise EntityNotFoundError('maker_recipe', 'Source recipe not found')
+
+    # Servings are portions. They stand for the yield only where the output is
+    # counted; for a product kept in a weight or volume unit the caller says
+    # how much one batch makes, or is asked to.
+    if data.batch_yield_qty is None:
+        output_uom = await batch_yield_uom(
+            db, organization_id, data.output_template_id, data.batch_yield_uom_id
+        )
+        if output_uom is not None and await _is_measured_unit(
+            db, organization_id, output_uom
+        ):
+            raise ServiceRejectionError('bridge_yield_required', unit=output_uom.symbol)
 
     # Only the first snapshot for this output becomes default — a second
     # culinary recipe bridged to the same product would otherwise hit the
@@ -358,6 +414,15 @@ async def create_recipe_from_culinary(
             )
         )
     ) is not None
+
+    # A line whose unit the ingredient's stock cannot be read in is refused as
+    # a BOM line saved by hand is: the formula would be written, and the run
+    # that uses it refused later.
+    for ing in snapshot.ingredients:
+        if ing.template_id is not None:
+            await _refuse_unconvertible_unit(
+                db, organization_id, ing.template_id, ing.uom_id, ing.uom_symbol
+            )
 
     recipe = MakerRecipe(
         organization_id=organization_id,

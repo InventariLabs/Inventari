@@ -75,7 +75,7 @@ def test_two_runs_of_a_wine_are_not_two_purchases_of_it(
     )
     assert line.status_code == 201, line.text
     for _ in range(2):
-        post_on_shelf(client, headers, grapes, cellar.id, '12', purchase_price='2.50')
+        post_on_shelf(client, headers, grapes, cellar.id, '20', purchase_price='2.50')
     for _ in range(2):
         made = client.post(
             '/api/v1/maker/production/orders/made',

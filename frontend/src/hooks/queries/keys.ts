@@ -600,6 +600,9 @@ export const queryKeys = {
     recipeDetail: (id: string | undefined) =>
       ["maker", "recipes", "detail", id] as const,
     recipeSettings: ["maker", "recipes", "settings"] as const,
+    /** The production recipe already made from a culinary recipe for a product. */
+    bridgedRecipe: (templateId: string, sourceRecipeId: string) =>
+      ["maker", "recipes", "bridged", templateId, sourceRecipeId] as const,
     recipeAvailability: (
       id: string | undefined,
       batches: string | undefined,

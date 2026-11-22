@@ -418,6 +418,7 @@ ERRORS_FR: ErrorMessages = {
     'recipe_collection_name_taken': 'Une collection de recettes nommée « {name} » existe déjà dans cette organisation.',
     'recipe_name_taken': 'Une formule portant ce nom existe déjà pour ce produit.',
     'bridge_yield_differs': 'Une formule issue de cette source existe déjà pour ce produit et donne {qty} par lot ; saisissez cette quantité, ou modifiez d’abord le rendement du lot de la formule.',
+    'bridge_yield_required': 'Ce produit est suivi en {unit} : le nombre de portions ne peut pas tenir lieu de rendement du lot ; indiquez ce que donne un lot en {unit}.',
     'recipe_not_found': 'Recette introuvable',
     'picking_active_recipe_locked': "Les ingrédients ne peuvent pas être modifiés tant qu'une session de prélèvement est active. Annulez ou terminez d'abord la session.",
     'meal_plan_dates_exclude_entries': "Supprimez d'abord les entrées des dates exclues.",

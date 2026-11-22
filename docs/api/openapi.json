@@ -78656,6 +78656,18 @@
             ],
             "title": "Batch Yield Uom Symbol"
           },
+          "source_recipe_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Recipe Id"
+          },
           "is_default": {
             "type": "boolean",
             "title": "Is Default"

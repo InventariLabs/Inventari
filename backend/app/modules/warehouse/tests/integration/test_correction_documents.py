@@ -1224,3 +1224,86 @@ class TestCorrectionPrintout:
         flat = ' '.join(_pdf_text(pdf.content).split())
         assert 'Korekta dokumentu' in flat, flat
         assert original['number'] in flat, flat
+
+
+@pytest.mark.integration
+class TestTwoLinesOfACorrectionOnOneRecord:
+    """Confirmation weighs the lines of a correction together, record by record."""
+
+    def test_lines_that_each_fit_but_not_together_are_refused_at_confirmation(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_org: Any,
+        doc_target_location: StorageLocation,
+        doc_template: ProductTemplate,
+        doc_partner: Partner,
+        db_session: Session,
+    ) -> None:
+        created = client.post(
+            '/api/v1/warehouse/documents',
+            headers=doc_auth_headers,
+            json={
+                'type': 'IN',
+                'partner_id': str(doc_partner.id),
+                'target_location_id': str(doc_target_location.id),
+                'lines': [
+                    {
+                        'product_template_id': str(doc_template.id),
+                        'expected_quantity': 5,
+                        'done_quantity': 5,
+                    }
+                    for _ in range(2)
+                ],
+            },
+        )
+        assert created.status_code == status.HTTP_201_CREATED, created.text
+        original_id = created.json()['id']
+        assert (
+            client.patch(
+                f'/api/v1/warehouse/documents/{original_id}/confirm',
+                headers=doc_auth_headers,
+            ).status_code
+            == status.HTTP_200_OK
+        )
+        done = client.patch(
+            f'/api/v1/warehouse/documents/{original_id}/complete',
+            headers=doc_auth_headers,
+            json={'complete_as_planned': True},
+        )
+        assert done.status_code == status.HTTP_200_OK, done.text
+        lines = done.json()['lines']
+        assert lines[0]['item_id'] == lines[1]['item_id']
+
+        drafted = client.post(
+            '/api/v1/warehouse/corrections',
+            headers=doc_auth_headers,
+            json={
+                'corrects_document_id': original_id,
+                'reason_code': 'DATA_ENTRY_ERROR',
+                'lines': [
+                    {'original_line_number': line['line_number'], 'quantity_delta': -4}
+                    for line in lines
+                ],
+            },
+        )
+        assert drafted.status_code == status.HTTP_201_CREATED, drafted.text
+        draft = drafted.json()
+        # Each line takes four off a record that holds six: each fits alone,
+        # the two do not.
+        db_session.execute(
+            text('UPDATE items SET quantity = 6 WHERE id = :id'),
+            {'id': lines[0]['item_id']},
+        )
+        db_session.commit()
+
+        resp = client.patch(
+            f'/api/v1/warehouse/documents/{draft["id"]}/confirm',
+            headers=doc_auth_headers,
+        )
+
+        assert resp.status_code == status.HTTP_400_BAD_REQUEST, resp.text
+        after = client.get(
+            f'/api/v1/warehouse/documents/{draft["id"]}', headers=doc_auth_headers
+        ).json()
+        assert after['status'] == 'DRAFT'

@@ -48,6 +48,7 @@ class CoreStockAPI:
         history_changes: dict[str, Any] | None = None,
         reference_type: str | None = None,
         reference_id: UUID | None = None,
+        file_when_emptied: bool = False,
     ) -> list[QuantConsumptionDTO]:
         """Take ``quantity`` off the records the draw plan names, one write each.
 
@@ -79,6 +80,10 @@ class CoreStockAPI:
         shelf, batch and owner taken, naming ``reference_type`` and
         ``reference_id``; a caller writes none of its own. Returns what was
         taken, grain by grain — the shelf, the batch and the owner.
+
+        *file_when_emptied* is for a door that uses stock up (a production
+        run): a record the draw takes to nothing is filed under the Consumed
+        place and leaves the products list, like one used up by hand.
         """
         from app.services._stock_quant_ops import take_from_the_records_async
 
@@ -98,6 +103,7 @@ class CoreStockAPI:
             history_changes=history_changes,
             reference_type=reference_type,
             reference_id=reference_id,
+            file_when_emptied=file_when_emptied,
         )
         return [
             QuantConsumptionDTO(
