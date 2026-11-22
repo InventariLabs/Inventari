@@ -652,7 +652,7 @@
     "noPortions": "Todavía no se ha puesto nada en el almacén.",
     "portionQty": "Porción",
     "portionDay": "Día",
-    "pastDayNote": "El lote lleva este día. Los informes de existencias y valor cuentan los movimientos de la orden el día en que se registra.",
+    "pastDayNote": "Los informes de existencias y valor cuentan los movimientos de la orden el día en que se registra, no este día.",
     "portionLot": "Lote (opcional)",
     "addPortion": "Añadir porción",
     "portionAdded": "Porción puesta en el almacén",

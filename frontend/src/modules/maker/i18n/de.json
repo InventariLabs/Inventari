@@ -652,7 +652,7 @@
     "noPortions": "Es wurde noch nichts eingelagert.",
     "portionQty": "Teilmenge",
     "portionDay": "Tag",
-    "pastDayNote": "Die Charge trägt diesen Tag. Bestands- und Wertauswertungen zählen die Bewegungen des Auftrags an dem Tag, an dem er erfasst wird.",
+    "pastDayNote": "Bestands- und Wertauswertungen zählen die Bewegungen des Auftrags an dem Tag, an dem er erfasst wird, nicht an diesem Tag.",
     "portionLot": "Charge (optional)",
     "addPortion": "Teilmenge hinzufügen",
     "portionAdded": "Teilmenge eingelagert",

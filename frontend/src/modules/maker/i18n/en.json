@@ -652,7 +652,7 @@
     "noPortions": "No output has been added yet.",
     "portionQty": "Portion",
     "portionDay": "Day",
-    "pastDayNote": "The batch carries this day. Stock and value statements count the run's movements on the day it is recorded.",
+    "pastDayNote": "Stock and value statements count the run's movements on the day it is recorded, not on this day.",
     "portionLot": "Batch (optional)",
     "addPortion": "Add portion",
     "portionAdded": "Portion added to stock",

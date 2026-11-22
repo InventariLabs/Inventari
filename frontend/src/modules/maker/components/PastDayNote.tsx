@@ -3,8 +3,8 @@ import { todayIso } from "@/utils/formatters";
 
 /**
  * The line under a run's day field once it names a day already past: the
- * batch carries that day, but the stock and value statements count the
- * run's movements on the day they are recorded.
+ * stock and value statements count the run's movements on the day they are
+ * recorded, not on the named day.
  */
 export function PastDayNote({ day }: { day: string }) {
   const { t } = useTranslation("maker");

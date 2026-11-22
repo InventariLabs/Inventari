@@ -652,7 +652,7 @@
     "noPortions": "Rien n’a encore été mis en stock.",
     "portionQty": "Portion",
     "portionDay": "Jour",
-    "pastDayNote": "Le lot porte ce jour. Les états de stock et de valeur comptent les mouvements de l'ordre le jour de son enregistrement.",
+    "pastDayNote": "Les états de stock et de valeur comptent les mouvements de l'ordre le jour de son enregistrement, pas ce jour-là.",
     "portionLot": "Lot (facultatif)",
     "addPortion": "Ajouter une portion",
     "portionAdded": "Portion mise en stock",

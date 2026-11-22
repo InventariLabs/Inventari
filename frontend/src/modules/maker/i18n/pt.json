@@ -729,7 +729,7 @@
     "noPortions": "Nenhum rendimento foi adicionado ainda.",
     "portionQty": "Parte",
     "portionDay": "Dia",
-    "pastDayNote": "O lote leva este dia. Os relatórios de estoque e valor contam os movimentos da ordem no dia em que é registrada.",
+    "pastDayNote": "Os relatórios de estoque e valor contam os movimentos da ordem no dia em que é registrada, não neste dia.",
     "portionLot": "Lote (opcional)",
     "addPortion": "Adicionar parte",
     "portionAdded": "Parte adicionada ao estoque",
