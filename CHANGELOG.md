@@ -302,6 +302,19 @@ says what the release does rather than what changed since them.
   purchase suggestions, the multi-level view and the run itself agree on that
   split. Existing lines take stock first after the upgrade; mark a line
   **Always make fresh** to keep the earlier behaviour of making it every time.
+- **Breaking:** "Cook a batch for stock" no longer takes a recipe's number of
+  servings for the batch yield of a product kept in a weight or volume unit.
+  `POST /maker/recipes/from-recipe` without `batch_yield_qty` for such an
+  output answers `400 BRIDGE_YIELD_REQUIRED` (it used to store, say, 12 servings
+  as a 12 kg yield); send the amount one batch makes. A product counted in
+  pieces still takes the servings. The refusal of a different yield for a pair
+  that is already bridged names the stored amount with its unit ("12 kg"), the
+  bridge refuses an ingredient line whose unit its stock cannot be read in
+  (`400 BOM_LINE_UNIT_NOT_CONVERTIBLE`, as a BOM line saved by hand is) and its
+  answer carries the real `unit_mismatch` of each line. The sheet asks for the
+  yield of such a product, and starts a pair that is already bridged from the
+  yield its BOM stores, with the unit; the recipe catalogue items carry
+  `source_recipe_id`.
 - **Breaking:** a production formula's `process_steps` are objects
   (`{text, minutes}`) rather than bare sentences, so a step can carry its
   duration. Writers may still send plain strings, which are stored as steps

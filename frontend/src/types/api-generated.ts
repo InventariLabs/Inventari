@@ -24475,6 +24475,8 @@ export interface components {
             batch_yield_qty: string;
             /** Batch Yield Uom Symbol */
             batch_yield_uom_symbol?: string | null;
+            /** Source Recipe Id */
+            source_recipe_id?: string | null;
             /** Is Default */
             is_default: boolean;
             /** Ingredient Count */

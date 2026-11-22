@@ -43,12 +43,17 @@ test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
     name: `${stamp}-Jam`,
   });
   outputTemplateId = output.id;
+  // The ingredients are stocked in grams, as the recipe's lines are: the bridge
+  // refuses a line whose unit the ingredient's stock cannot be read in.
+  const gramsId = await api.getUomId(token, "g");
   const fruit = await api.createProductTemplate(token, {
     name: `${stamp}-Fruit`,
+    uom_id: gramsId,
   });
   fruitTemplateId = fruit.id;
   const sugar = await api.createProductTemplate(token, {
     name: `${stamp}-Sugar`,
+    uom_id: gramsId,
   });
   const sIn = await api.createStorage(token, { name: `${stamp}-In` });
   const sOut = await api.createStorage(token, { name: `${stamp}-Out` });
@@ -110,7 +115,7 @@ test.describe("Maker — recipes → maker bridge (Phase D)", () => {
     // Scale 2 × servings (6) → planned output 12.
     await dialog.getByTestId("cook-for-stock-scale-input").fill("2");
     await expect(dialog.getByTestId("cook-for-stock-planned-qty")).toHaveText(
-      "12",
+      /^12(\s|$)/,
     );
     // The plain <select> became a SearchableCombobox: a trigger button plus
     // a portalled popover, so the options are not descendants of the dialog.

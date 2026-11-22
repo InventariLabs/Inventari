@@ -828,6 +828,8 @@
     "yieldLabel": "Une fournée donne",
     "yieldHint": "La recette est pour {{servings}} portions ; modifiez la valeur si une fournée donne une autre quantité dans l'unité du produit.",
     "yieldAsk": "La recette est pour {{servings}} portions, ce qui n'est pas une quantité dans l'unité de ce produit. Indiquez ce que donne une fournée.",
+    "yieldStored": "Une recette de production issue de cette recette existe déjà pour ce produit, et une fournée donne {{amount}}. Modifiez cette quantité dans la recette de production pour cuisiner une autre quantité.",
+    "yieldStoredDoubtful": "Une recette de production issue de cette recette existe déjà pour ce produit et donne {{amount}} par fournée. C'est le nombre de portions, pas forcément une quantité dans cette unité ; vérifiez le rendement de cette recette de production avant de cuisiner.",
     "scaleLabel": "Lots",
     "scaleHint": "Combien de fois cuisiner la recette",
     "plannedQty": "Quantité prévue",

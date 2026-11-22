@@ -251,6 +251,7 @@ apart.
 | `BOM_LINE_SELF_REFERENCE` | A BOM line cannot reference the product itself — it would make the product an ingredient of its own BOM. |
 | `BOM_LINE_UNIT_NOT_CONVERTIBLE` | This ingredient is kept in {stock_unit}, and {line_unit} cannot be read as {stock_unit}. Use a unit of the same kind, or record what one {stock_unit} weighs or holds on the product. |
 | `BRIDGE_YIELD_DIFFERS` | A BOM made from this source already exists for this product and makes {qty} per batch; enter that amount, or change the batch yield of that BOM first. |
+| `BRIDGE_YIELD_REQUIRED` | This product is kept in {unit}, so the number of servings cannot stand for the batch yield; enter how much one batch makes in {unit}. |
 | `CAMPAIGN_CLOSED` | This attestation campaign has been closed — your confirmation can no longer be recorded. If you still hold the equipment, please contact your organisation. |
 | `CAMPAIGN_DEADLINE_PAST` | Campaign deadline must be today or later |
 | `CAMPAIGN_NOT_FOUND` | Campaign not found |
