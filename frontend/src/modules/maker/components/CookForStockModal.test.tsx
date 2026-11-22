@@ -315,6 +315,20 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
       expect(screen.queryByText(/number of servings/)).not.toBeInTheDocument();
     });
 
+    it("ends the stored-yield sentence once after an abbreviated unit", async () => {
+      mocks.findBridgedRecipe.mockResolvedValue({
+        batch_yield_qty: "10.0000",
+        batch_yield_uom_symbol: "pcs.",
+      });
+      renderModal();
+      fireEvent.click(screen.getByTestId("mock-product-option"));
+
+      expect(
+        await screen.findByText(/one batch makes 10 pcs\. Change it there/),
+      ).toBeInTheDocument();
+      expect(screen.queryByText(/pcs\.\./)).not.toBeInTheDocument();
+    });
+
     it("names a stored yield that equals the servings as doubtful", async () => {
       // The recipe serves 6: a stored "6 kg" is the servings taken for a
       // weight, not an amount anybody measured.
@@ -535,6 +549,43 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
         );
       });
       expect(onClose).toHaveBeenCalled();
+    });
+
+    it("forgets the production recipe lookup once the snapshot is gone", async () => {
+      // The sheet's own lookup found the snapshot it created; once that is
+      // discarded the cached answer would tell the next sheet on the pair
+      // that a production recipe still exists.
+      const client = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+      const invalidate = vi.spyOn(client, "invalidateQueries");
+      mocks.createProductionOrderFromBridge.mockRejectedValue(shortageWarning);
+      serveScopedStorages([{ id: "loc-1", name: "Output Store" }]);
+      render(
+        <QueryClientProvider client={client}>
+          <MemoryRouter>
+            <CookForStockModal open onClose={vi.fn()} recipe={recipe} />
+          </MemoryRouter>
+        </QueryClientProvider>,
+      );
+      fireEvent.click(screen.getByTestId("mock-product-option"));
+      pickStorage("Output Store");
+      fireEvent.click(screen.getByTestId("cook-for-stock-submit"));
+      await waitFor(() => {
+        expect(screen.getByTestId("shortage-modal")).toBeTruthy();
+      });
+      // Once for the snapshot made, not yet for the one thrown away.
+      expect(invalidate).toHaveBeenCalledTimes(1);
+
+      fireEvent.click(screen.getByText("cancel"));
+      fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+      await waitFor(() => {
+        expect(invalidate).toHaveBeenCalledTimes(2);
+      });
+      expect(invalidate).toHaveBeenLastCalledWith({
+        queryKey: queryKeys.maker.recipesAll,
+      });
     });
 
     it("keeps a snapshot that was already there", async () => {

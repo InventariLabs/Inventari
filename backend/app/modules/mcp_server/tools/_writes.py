@@ -298,28 +298,14 @@ def register_write_tools(server: MCPServer) -> None:
                     db, identity.organization_id, keys=new_groups
                 )
 
-            updated = await core_api.items.update_quantity_async(
-                db,
-                identity.organization_id,
-                item_id,
-                quantity,
-                user_id=identity.user_id,
-                history_changes={
-                    'reason': 'mcp_correction',
-                    'reason_text': reason,
-                    'mcp_request_id': str(call_id),
-                },
-                move_reference_type='adjustment',
-                move_reference_id=call_id,
-            )
-            if updated is None:
-                raise refusal('ITEM_NOT_FOUND', 'item_not_found', item_id=str(item_id))
-
             previous = item.quantity if item.quantity is not None else Decimal('0')
             delta = quantity - previous
             # The register's copy is written in the same transaction as the
-            # stock; a module that is off answers None and the stock still
-            # moves. A correction that changes nothing leaves no document.
+            # stock, before it, so the movement can name the document as its
+            # reference the way a stock take's do and the document's page
+            # lists it. A module that is off answers None and the stock still
+            # moves, under the call's id. A correction that changes nothing
+            # leaves no document.
             recorded = None
             if delta != 0:
                 batch_number = None
@@ -348,6 +334,23 @@ def register_write_tools(server: MCPServer) -> None:
                     reference=f'mcp:{call_id}',
                     notes=reason,
                 )
+
+            updated = await core_api.items.update_quantity_async(
+                db,
+                identity.organization_id,
+                item_id,
+                quantity,
+                user_id=identity.user_id,
+                history_changes={
+                    'reason': 'mcp_correction',
+                    'reason_text': reason,
+                    'mcp_request_id': str(call_id),
+                },
+                move_reference_type='document' if recorded else 'adjustment',
+                move_reference_id=recorded[0] if recorded else call_id,
+            )
+            if updated is None:
+                raise refusal('ITEM_NOT_FOUND', 'item_not_found', item_id=str(item_id))
 
             await _journal_the_call_async(
                 db,

@@ -359,6 +359,34 @@ class TestCorrectStock:
         assert Decimal(str(lines[0].quantity)) == Decimal('-1')
         assert lines[0].notes == 'Counted four'
 
+    def test_the_movement_names_the_register_document_as_its_reference(
+        self,
+        mcp_tool,
+        db_session: Session,
+        mcp_org: Organization,
+        mcp_write_key: str,
+        item: Item,
+    ) -> None:
+        """The document's page lists what it moved, as a stock take's does."""
+        mcp_org.enabled_modules = [*(mcp_org.enabled_modules or []), 'warehouse']
+        db_session.commit()
+
+        result = mcp_tool(
+            mcp_write_key,
+            'correct_stock',
+            {'item_id': str(item.id), 'quantity': 4, 'reason': 'Counted four'},
+        )
+
+        payload = _structured(result)
+        document_id = UUID(payload['register_document_id'])
+        db_session.expire_all()
+        moves = db_session.scalars(
+            select(StockMove).where(StockMove.reference_id == document_id)
+        ).all()
+        assert len(moves) == 1
+        assert moves[0].reference_type == 'document'
+        assert Decimal(str(moves[0].quantity)) == Decimal('1')
+
     def test_a_missing_reason_is_refused_and_changes_nothing(
         self,
         mcp_tool,
@@ -534,7 +562,7 @@ class TestCorrectStock:
         db_session.expire_all()
         moves = db_session.scalars(
             select(StockMove).where(
-                StockMove.reference_id == UUID(payload['reference'])
+                StockMove.reference_id == UUID(payload['register_document_id'])
             )
         ).all()
         assert len(moves) == 1
