@@ -118,7 +118,7 @@ backups/
 
 # Encrypted journal exported by scripts/export-logs.sh; deployment state, sent
 # offsite by db-backup-offsite, never part of the checkout.
-logs/
+/logs/
 
 # Temporary files
 *.tmp

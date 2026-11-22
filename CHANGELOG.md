@@ -284,6 +284,16 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
+- **Breaking:** `BACKUP_RCLONE_REMOTE` names the parent of the offsite copy,
+  not the directory the backups land in: the service appends `backups/` (and
+  the logs go to `logs/` beside it). An installation that has the offsite copy
+  on and sets `BACKUP_RCLONE_REMOTE=<remote>:<bucket>/<path>/backups` must now
+  set `<remote>:<bucket>/<path>`, which writes to the same place; one whose
+  backups sit directly at `<remote>:<bucket>/<path>` sets
+  `<remote>:<bucket>`. Until it does, the next sync writes to a new `backups/`
+  below the old value and leaves the files already there unsynced — nothing is
+  deleted. *Upgrading with the copy already on* in `DEPLOYMENT.md` has the
+  steps.
 - The permanent-deletion switch in **Settings** now says it covers archived
   equipment assets as well as products, and the archived tab of the equipment
   list tells you, while the switch is off, that an administrator can turn it on
