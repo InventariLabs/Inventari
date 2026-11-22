@@ -484,6 +484,8 @@ ERRORS_FR: ErrorMessages = {
     'production_order_not_found': 'Ordre de production introuvable',
     'production_needs_scope': "Les besoins des ordres planifiés se lisent pour un ordre, ou pour les deux bornes d'une période",
     'production_needs_period_reversed': 'La période se termine avant de commencer',
+    'production_output_receiving': "Une zone de réception ne peut pas recevoir ce qu'un ordre produit : la marchandise n'y fait qu'attendre. Choisissez l'emplacement où elle sera rangée.",
+    'production_output_quarantine': "Un emplacement de quarantaine ne peut pas recevoir ce qu'un ordre produit : la marchandise retenue n'y est pas rangée. Choisissez l'emplacement où elle sera rangée.",
     'production_no_recipe': (
         "Aucune formule pour ce produit — créez d'abord une formule"
     ),

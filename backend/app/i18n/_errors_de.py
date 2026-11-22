@@ -488,6 +488,8 @@ ERRORS_DE: ErrorMessages = {
     'production_order_not_found': 'Produktionslauf nicht gefunden',
     'production_needs_scope': 'Der Bedarf geplanter Produktionsläufe wird für einen Produktionslauf oder für beide Enden eines Zeitraums gelesen',
     'production_needs_period_reversed': 'Der Zeitraum endet, bevor er beginnt',
+    'production_output_receiving': 'Ein Wareneingangsbereich kann nicht aufnehmen, was ein Produktionslauf herstellt: Die Ware wartet dort nur. Wählen Sie den Lagerort, an dem sie aufbewahrt wird.',
+    'production_output_quarantine': 'Ein Quarantäne-Lagerort kann nicht aufnehmen, was ein Produktionslauf herstellt: Zurückgehaltene Ware wird dort nicht aufbewahrt. Wählen Sie den Lagerort, an dem sie aufbewahrt wird.',
     'production_no_recipe': (
         'Keine Formel für dieses Produkt — legen Sie zuerst eine Formel an'
     ),

@@ -413,6 +413,7 @@ async def list_storages_with_counts_async(
     type_ids: list[UUID] | None = None,
     with_fields: bool = False,
     with_counts: bool = True,
+    exclude_ids: set[UUID] | None = None,
     offset: int = 0,
     limit: int | None = None,
 ) -> tuple[list[StorageLocationSummary], int]:
@@ -429,6 +430,9 @@ async def list_storages_with_counts_async(
     aggregate over the records: a picker offering places does not print a
     number beside them, and a root's subtree count is a scan of everything in
     the warehouse.
+
+    ``exclude_ids`` takes those locations off the listing, as a filter does:
+    a picker that must not offer places goods are held back in names them here.
     """
     # One read answers both what the listing matches and the organization's
     # whole tree, because the children a delete lifts are a number no listing
@@ -468,7 +472,11 @@ async def list_storages_with_counts_async(
             ).where(StorageLocation.organization_id == organization_id)
         )
     ).all()
-    listed = [row for row in tree_rows if row.listed]
+    listed = [
+        row
+        for row in tree_rows
+        if row.listed and (not exclude_ids or row.id not in exclude_ids)
+    ]
     all_parents: dict[UUID, UUID | None] = {row.id: row.parent_id for row in tree_rows}
     tree_by_id = {row.id: row for row in tree_rows}
     id_to_name: dict[UUID, str] = {row.id: row.name for row in tree_rows}

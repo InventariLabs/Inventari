@@ -72,6 +72,28 @@ describe("useLocationOffer", () => {
     expect(requests[0].get("exclude_module_contexts")).toBe("true");
   });
 
+  it("leaves out the places goods are held back in when the flow keeps goods", async () => {
+    const requests = serveLocations(FLOOR);
+    const { result } = renderHook(
+      () => useLocationOffer({ purpose: "stock", excludeHeldBack: true }),
+      { wrapper: QueryWrapper },
+    );
+
+    await waitFor(() => expect(result.current.total).toBe(401));
+    expect(requests[0].get("exclude_held_back")).toBe("true");
+  });
+
+  it("does not ask for the exclusion unless the flow does", async () => {
+    const requests = serveLocations(FLOOR);
+    const { result } = renderHook(
+      () => useLocationOffer({ purpose: "stock" }),
+      { wrapper: QueryWrapper },
+    );
+
+    await waitFor(() => expect(result.current.total).toBe(401));
+    expect(requests[0].has("exclude_held_back")).toBe(false);
+  });
+
   it("says nothing is on offer when the organization has no place", async () => {
     serveLocations([]);
     const { result } = renderHook(

@@ -421,6 +421,8 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'production_order_not_found': 'Production order not found',
         'production_needs_scope': 'The needs of planned runs are read for one run, or for both ends of a period',
         'production_needs_period_reversed': 'The period ends before it starts',
+        'production_output_receiving': 'A receiving area cannot take what a production run makes: goods only wait there. Choose the location they will be kept in.',
+        'production_output_quarantine': 'A quarantine location cannot take what a production run makes: goods held back are not kept there. Choose the location they will be kept in.',
         'production_no_recipe': ('No BOM for this product — create a BOM first'),
         'production_recipe_not_found': (
             'BOM {recipe_id} not found in this organization'
@@ -1514,6 +1516,8 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'production_order_not_found': 'Zlecenie produkcyjne nie zostało znalezione',
         'production_needs_scope': 'Potrzeby zaplanowanych zleceń czyta się dla jednego zlecenia albo dla obu końców okresu',
         'production_needs_period_reversed': 'Okres kończy się przed swoim początkiem',
+        'production_output_receiving': 'Strefa przyjęć nie może przyjąć tego, co powstaje w zleceniu produkcji: towar tylko tam czeka. Wskaż miejsce, w którym będzie trzymany.',
+        'production_output_quarantine': 'Miejsce kwarantanny nie może przyjąć tego, co powstaje w zleceniu produkcji: wstrzymany towar nie jest tam trzymany. Wskaż miejsce, w którym będzie trzymany.',
         'production_no_recipe': (
             'Brak receptury dla tego produktu — najpierw utwórz recepturę'
         ),

@@ -40,6 +40,22 @@ def _register_lot_trace_source() -> None:
 _register_lot_trace_source()
 
 
+def _register_held_back_locations() -> None:
+    """Name the receiving areas and the quarantine location to Core.
+
+    A flow that keeps goods somewhere (a production run's output, stock added
+    by hand) asks Core which locations goods are not kept in; Core must not
+    read the document profile to answer. At import, like the guard above.
+    """
+    from app.core.module_sdk import register_held_back_locations
+    from app.modules.warehouse.home_shelf_service import held_back_locations_async
+
+    register_held_back_locations('warehouse', held_back_locations_async)
+
+
+_register_held_back_locations()
+
+
 def _approvals_installed() -> bool:
     """Whether the approvals package ships with this installation.
 

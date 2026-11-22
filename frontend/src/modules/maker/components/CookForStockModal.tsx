@@ -22,6 +22,7 @@ import type { UomCategory } from "@/types";
 import { ProductSearchInput } from "./ProductSearchInput";
 import { ShortageModal } from "./ShortageModal";
 import { parseShortageError } from "../lib/shortageError";
+import { OUTPUT_LOCATION_SCOPE } from "../lib/outputLocationScope";
 import { extractApiError } from "@/lib/errors";
 import { QueryFailure } from "@/components/ui/QueryResult";
 import { unitLabel } from "@/lib/i18nHelpers";
@@ -179,12 +180,14 @@ export function CookForStockModal({
     isError: storagesFailed,
     error: storagesError,
     refetch: refetchStorages,
-  } = useLocationOffer({ purpose: "stock" });
+  } = useLocationOffer(OUTPUT_LOCATION_SCOPE);
   // The remembered place is asked of the same scope: the places on offer are
   // a search, not a list this modal holds, and a place that still exists may
   // have been archived or given to a module since the last batch.
   const remembered = readLastOutputLocation();
-  const rememberedOffered = useOfferedLocations(open ? [remembered] : []);
+  const rememberedOffered = useOfferedLocations(open ? [remembered] : [], {
+    excludeHeldBack: true,
+  });
 
   const [product, setProduct] = useState<SelectedProduct | null>(null);
   const [scale, setScale] = useState("1");
@@ -445,7 +448,7 @@ export function CookForStockModal({
               id="cook-for-stock-storage"
               label={t("cookForStock.storageLabel")}
               title={t("cookForStock.storageLabel")}
-              scope={{ purpose: "stock" }}
+              scope={OUTPUT_LOCATION_SCOPE}
               value={storageId}
               onChange={setStorageId}
               placeholder={t("cookForStock.storagePlaceholder")}
