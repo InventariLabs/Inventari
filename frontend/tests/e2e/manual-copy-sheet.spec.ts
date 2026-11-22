@@ -11,17 +11,23 @@ import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
  * the first place an administrator meets it.
  */
 test.describe("Copy by hand — an invitation link with no clipboard", () => {
-  const email = `copy-by-hand-${randomUUID().slice(0, 8)}@example.com`;
+  let email: string;
   let code: string;
 
-  test.beforeAll(async ({ playwright, baseURL }) => {
+  // Each test invites an address of its own, just before it opens the list.
+  // The suite runs fully parallel, so a worker can take this file's tests in
+  // several groups and runs a beforeAll once per group: one address drawn
+  // per file is then invited twice, and its row's menu button names two
+  // rows. Inviting last also keeps the row inside the newest twenty the
+  // list shows while other specs invite in parallel.
+  test.beforeEach(async ({ page, playwright, baseURL, authenticatedPage }) => {
     const ctx = await playwright.request.newContext({ baseURL });
     const api = new ApiHelper(ctx);
     const { access_token } = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
+    email = `copy-by-hand-${randomUUID().slice(0, 8)}@example.com`;
     code = (await api.createInvite(access_token, email)).invite_code;
-  });
+    await ctx.dispose();
 
-  test.beforeEach(async ({ page, authenticatedPage }) => {
     // What an insecure context looks like to the page.
     await page.addInitScript(() => {
       Object.defineProperty(navigator, "clipboard", {
