@@ -384,7 +384,51 @@ def value_sets(tree: ast.AST, module: str) -> dict[str, set[str]]:
             target, value = node.name, node.value
         if isinstance(target, ast.Name) and (strings := _strings(value)):
             found[f'{module}.{target.id}'] = strings
+    for node in getattr(tree, 'body', []):
+        if (
+            isinstance(node, ast.Assign)
+            and len(node.targets) == 1
+            and isinstance(node.targets[0], ast.Name)
+            and (keys := _dict_keys_of(node.value, tree))
+        ):
+            found[f'{module}.{node.targets[0].id}'] = keys
     return found
+
+
+def _dict_keys_of(node: ast.AST, tree: ast.AST) -> set[str] | None:
+    """The string keys of the module-level dict a ``set(D)``, ``set(D.keys())``
+    or ``frozenset(D)`` names — the status set a transition table implies."""
+    if not (
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id in ('set', 'frozenset')
+        and len(node.args) == 1
+    ):
+        return None
+    arg = node.args[0]
+    if (
+        isinstance(arg, ast.Call)
+        and isinstance(arg.func, ast.Attribute)
+        and arg.func.attr == 'keys'
+    ):
+        arg = arg.func.value
+    if not isinstance(arg, ast.Name):
+        return None
+    for statement in getattr(tree, 'body', []):
+        target = value = None
+        if isinstance(statement, ast.Assign) and len(statement.targets) == 1:
+            target, value = statement.targets[0], statement.value
+        elif isinstance(statement, ast.AnnAssign):
+            target, value = statement.target, statement.value
+        if isinstance(target, ast.Name) and target.id == arg.id:
+            if isinstance(value, ast.Dict):
+                keys = {
+                    key.value
+                    for key in value.keys
+                    if isinstance(key, ast.Constant) and isinstance(key.value, str)
+                }
+                return keys or None
+    return None
 
 
 class FieldSource(TypedDict):
@@ -547,16 +591,254 @@ def transition_fields(tree: ast.AST) -> set[str]:
     return found
 
 
-def transition_values(
-    transitions: list[tuple[set[str], dict[str, str]]],
+Transitions = tuple[
+    set[str], dict[str, str], set[str], str, set[str], dict[str, set[str]]
+]
+
+
+def transition_literals(tree: ast.AST) -> set[str]:
+    """``old_<f>:code`` / ``new_<f>:code`` for each string literal a writer puts
+    under one side of a transition.
+
+    A status column typed as a plain string carries no declared set for
+    ``transition_values`` to read, so the codes the writers themselves spell
+    out are the only enumeration there is. A name or attribute on either side
+    names no code and adds nothing.
+    """
+    found: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Dict):
+            continue
+        sides = {
+            key.value: value.value
+            for key, value in zip(node.keys, node.values, strict=True)
+            if isinstance(key, ast.Constant)
+            and isinstance(key.value, str)
+            and isinstance(value, ast.Constant)
+            and isinstance(value.value, str)
+        }
+        names = {
+            key.value
+            for key in node.keys
+            if isinstance(key, ast.Constant) and isinstance(key.value, str)
+        }
+        found.update(
+            f'{name}:{code}'
+            for name, code in sides.items()
+            if name.startswith(('old_', 'new_'))
+            and f'{"new_" if name.startswith("old_") else "old_"}{name[4:]}' in names
+        )
+    return found
+
+
+def before_after_fields(tree: ast.AST) -> set[str]:
+    """The fields a journal line shows as a ``before``/``after`` pair: the
+    literal keys of the dict a writer hands under either name."""
+    found: set[str] = set()
+    for node in ast.walk(tree):
+        pairs: list[tuple[object, ast.AST]] = []
+        if isinstance(node, ast.keyword):
+            pairs.append((node.arg, node.value))
+        elif isinstance(node, ast.Dict):
+            pairs.extend(
+                (key.value if isinstance(key, ast.Constant) else None, value)
+                for key, value in zip(node.keys, node.values, strict=True)
+            )
+        for name, value in pairs:
+            if name in ('before', 'after') and isinstance(value, ast.Dict):
+                found.update(
+                    key.value
+                    for key in value.keys
+                    if isinstance(key, ast.Constant) and isinstance(key.value, str)
+                )
+    return found
+
+
+def _string_constants(node: ast.AST) -> set[str]:
+    """The string literals a node is, or a tuple/list/set of them holds."""
+    parts = node.elts if isinstance(node, ast.Tuple | ast.List | ast.Set) else [node]
+    return {
+        part.value
+        for part in parts
+        if isinstance(part, ast.Constant) and isinstance(part.value, str)
+    }
+
+
+def codes_spelled(tree: ast.AST) -> dict[str, set[str]]:
+    """The string codes a file spells for each field name: assigned to
+    ``x.<f>``, compared with it, passed as ``<f>=…`` or put under a dict key
+    ``<f>`` (``old_<f>``/``new_<f>`` count for ``<f>``)."""
+    found: dict[str, set[str]] = {}
+
+    def add(name: str | None, node: ast.AST) -> None:
+        if name:
+            field = name.removeprefix('old_').removeprefix('new_')
+            found.setdefault(field, set()).update(_string_constants(node))
+
+    def named(node: ast.AST) -> str | None:
+        if isinstance(node, ast.Attribute):
+            return node.attr
+        return node.id if isinstance(node, ast.Name) else None
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                add(named(target), node.value)
+        elif isinstance(node, ast.Compare):
+            for comparator in node.comparators:
+                add(named(node.left), comparator)
+        elif isinstance(node, ast.keyword):
+            add(node.arg, node.value)
+        elif isinstance(node, ast.Dict):
+            for key, value in zip(node.keys, node.values, strict=True):
+                if isinstance(key, ast.Constant) and isinstance(key.value, str):
+                    add(key.value, value)
+    return found
+
+
+def package_values(
+    field: str,
+    package: str,
+    anchor: set[str],
+    sources: dict[str, dict[str, FieldSource]],
+    sets,
+    resolve,
+) -> set[str]:
+    """The codes the classes beside a writer declare for ``field``.
+
+    A status column typed as a plain string declares no set, and a writer that
+    journals ``obj.status`` through a variable names no code; the set its own
+    package declares for the field (a ``Literal`` alias or enum on its
+    schemas) is the enumeration there is. A package may declare several sets
+    for one field name, so only the one the writer's file spells the most codes
+    of is the writer's own.
+    """
+    candidates: list[set[str]] = []
+    for qualified, fields in sources.items():
+        module = qualified.rpartition('.')[0]
+        if module.rpartition('.')[0] != package or field not in fields:
+            continue
+        declared = [set(fields[field]['literals'])] + [
+            sets.get(resolve(f'{module}.{local}'), set())
+            for local in fields[field]['names']
+        ]
+        candidates.extend(values for values in declared if values & anchor)
+    best = max((len(values & anchor) for values in candidates), default=0)
+    return set().union(*(v for v in candidates if len(v & anchor) == best))
+
+
+def module_values(
+    field: str,
+    package: str,
+    imports: dict[str, str],
+    sets: dict[str, set[str]],
+    resolve,
+) -> set[str]:
+    """The codes of the status set a writer's own application module declares
+    for the classes and names it imports.
+
+    A writer journals ``doc.status`` through a variable; the set of the
+    ``Document`` it imports is the enum named for it (``DocumentStatus``) in
+    the module that declares the class. Failing that, a collection named for
+    a status (``VALID_STATUSES``, ``OPEN_STATUSES``) in a module it imports
+    from. Only a status field is read this way, only inside the writer's own
+    application module, and a lone constant (a sentinel) is no set.
+    """
+    if field != 'status' and not field.endswith('_status'):
+        return set()
+    own = '.'.join(package.split('.')[:3])
+    imported = {
+        qualified
+        for qualified in map(resolve, imports.values())
+        if qualified.rpartition('.')[0] == own
+        or qualified.rpartition('.')[0].startswith(f'{own}.')
+    }
+    named = {f'{qualified}Status' for qualified in imported}
+    found = set().union(*(sets.get(name, set()) for name in named))
+    if found:
+        return found
+    modules = {qualified.rpartition('.')[0] for qualified in imported}
+    for qualified, values in sets.items():
+        module, _, local = qualified.rpartition('.')
+        if (
+            module in modules
+            and local.lower().endswith(('status', 'statuses'))
+            and len(values) > 1
+        ):
+            found.update(values)
+    return found
+
+
+def declares_no_set(
+    field: str,
+    imports: dict[str, str],
+    sources: dict[str, dict[str, FieldSource]],
+    sets: dict[str, set[str]],
+    resolve,
+) -> bool:
+    """Whether the writer imports a class with ``field`` and none of those
+    classes names the values it can hold — the plain-string column."""
+    owners = [
+        qualified
+        for qualified in map(resolve, imports.values())
+        if field in sources.get(qualified, {})
+    ]
+    for qualified in owners:
+        source = sources[qualified][field]
+        module = qualified.rpartition('.')[0]
+        if source['literals'] or any(
+            sets.get(resolve(f'{module}.{local}')) for local in source['names']
+        ):
+            return False
+    return bool(owners)
+
+
+def declared_values(
+    field: str,
+    imports: dict[str, str],
+    package: str,
+    spelled: dict[str, set[str]],
     sources: dict[str, dict[str, FieldSource]],
     sets: dict[str, set[str]],
     resolve,
 ) -> set[str]:
-    """``old_<f>:value`` and ``new_<f>:value`` for the values of field ``f`` on
-    the classes the writer's file imports — the model whose column it moves."""
+    """The set a writer's journalled ``field`` can hold: the one declared in
+    the modules it imports from; failing that, for a plain-string column, the
+    one its own package's schemas declare."""
+    if values := module_values(field, package, imports, sets, resolve):
+        return values
+    if declares_no_set(field, imports, sources, sets, resolve):
+        return package_values(
+            field, package, spelled.get(field, set()), sources, sets, resolve
+        )
+    return set()
+
+
+def transition_values(
+    transitions: list[Transitions],
+    sources: dict[str, dict[str, FieldSource]],
+    sets: dict[str, set[str]],
+    resolve,
+) -> set[str]:
+    """``old_<f>:value``, ``new_<f>:value`` and ``<f>:value`` for the values of
+    field ``f``: those of the classes the writer's file imports (the model
+    whose column it moves), the set its own package declares for the field, and
+    the literals the writer itself puts under either side."""
     found: set[str] = set()
-    for fields, imports in transitions:
+    for fields, imports, literals, package, shown, spelled in transitions:
+        found.update(literals)
+        for field in shown:
+            found.update(
+                f'{field}:{value}'
+                for value in declared_values(
+                    field, imports, package, spelled, sources, sets, resolve
+                )
+            )
+        for field in fields:
+            for value in declared_values(
+                field, imports, package, spelled, sources, sets, resolve
+            ):
+                found.update({f'old_{field}:{value}', f'new_{field}:{value}'})
         for qualified in map(resolve, imports.values()):
             module = qualified.rpartition('.')[0]
             for field in fields:
@@ -614,7 +896,7 @@ def collect_keys(root: Path) -> CollectedKeys:
     value_declarations: list[tuple[str, str]] = []
     declarations: list[tuple[str, str]] = []
     funnel_files: list[str] = []
-    transitions: list[tuple[set[str], dict[str, str]]] = []
+    transitions: list[Transitions] = []
     aliases: dict[str, str] = {}
     files = 0
     for path in sorted(root.rglob('*.py')):
@@ -650,7 +932,16 @@ def collect_keys(root: Path) -> CollectedKeys:
             sources.setdefault(f'{module}.{name}', {}).update(fields)
         declarations.extend(file_declarations)
         value_declarations.extend(file_declarations if writes_values(tree) else [])
-        transitions.append((transition_fields(tree), file_imports))
+        transitions.append(
+            (
+                transition_fields(tree),
+                file_imports,
+                transition_literals(tree),
+                package,
+                before_after_fields(tree),
+                codes_spelled(tree),
+            )
+        )
         if dynamic_funnel_keys:
             funnel_files.append((module, file_declarations))
         # Every from-import is also a public name of its own module pointing
