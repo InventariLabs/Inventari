@@ -1,8 +1,7 @@
 # Module Names — Single Source of Truth
 
-This document is the agreed table of **user-visible names** in the five maintained
-languages (Portuguese (Brazil) is a community translation: it is not in the tables, and a key
-it lacks reads in English). It exists so that a name can be checked against something authoritative instead
+This document is the agreed table of **user-visible names** in the six maintained
+languages. It exists so that a name can be checked against something authoritative instead
 of being guessed per pull request. Naming disputes are settled here, not in code.
 
 It covers three layers of names: **modules** (the marketplace/launcher entries, below),
@@ -40,30 +39,30 @@ Every key of the `modules` catalog has a row: the fifteen shipped module directo
 description — because the audit journal prints the module list an organization starts with
 and must name each key from this catalog, not from a vocabulary of its own.
 
-| Technical name | en | pl | de | fr | es | One-sentence description |
-|---|---|---|---|---|---|---|
-| `core` (virtual) | Home & Kitchen | Dom i Kuchnia | Haus & Küche | Maison & Cuisine | Hogar y cocina | Fridge, Pantry, and basic products. Always on; not a marketplace module. |
-| `items` (always-on) | Inventory | Inwentarz | Inventar | Inventaire | Inventario | The products domain behind the inventory screens; always on, named by the inventory launcher card. |
-| `locations` (always-on) | Locations | Miejsca | Lagerorte | Emplacements | Ubicaciones | Where stock lives; named by the journal only, no store card. |
-| `categories` (always-on) | Categories | Kategorie | Kategorien | Catégories | Categorías | How products are grouped; named by the journal only, no store card. |
-| `announcements` (always-on) | Announcements | Ogłoszenia | Ankündigungen | Annonces | Anuncios | Notices to members; named by the journal only, no store card. |
-| `api_keys` | API Keys | Klucze API | API-Schlüssel | Clés API | Claves API | Programmatic access via REST API keys. |
-| `approvals` | Approvals | Zatwierdzenia | Genehmigungen | Approbations | Aprobaciones | Multi-stage approval workflows for critical operations. |
-| `warehouse` | Warehouse | Magazyn | Lager | Entrepôt | Almacén | Scan with your phone's camera or a scanner to receive, issue, move and count stock; the numbered documents are written in the background, with putaway rules. |
-| `equipment` | Equipment Tracking | Śledzenie sprzętu | Geräteverfolgung | Suivi des équipements | Seguimiento de equipos | Track IT and physical assets with lifecycle management. |
-| `example_widgets` | Example Widgets | Przykładowe widżety | Beispiel-Widgets | Widgets d'exemple | Widgets de ejemplo | Reference module demonstrating Inventari module patterns: manage simple widgets with a name, color, and quantity. Hidden from the store. |
-| `maker` | Production | Produkcja | Produktion | Fabrication | Fabricación | Production runs, bills of materials (BOM), and cost rollup. |
-| `mcp_server` | MCP Server | Serwer MCP | MCP-Server | Serveur MCP | Servidor MCP | Let an AI agent work with this workspace over the Model Context Protocol, with a key that sees only what it may. |
-| `nutrition` | Nutrition Info | Wartości odżywcze | Nährwertinformationen | Informations nutritionnelles | Información nutricional | Display nutritional data and ingredients from Open Food Facts. |
-| `partners` (virtual) | Partners | Partnerzy | Partner | Partenaires | Socios | Manage suppliers, customers, and service providers for B2B workflows. |
-| `printing` | Label Printing | Druk etykiet | Etikettendruck | Impression d'étiquettes | Impresión de etiquetas | Generate and print labels for products and locations. |
-| `purchase_orders` | Purchase Orders | Zamówienia zakupu | Einkaufsbestellungen | Bons de commande | Órdenes de compra | Create and track purchase orders with suppliers. |
-| `recipes` | Recipes | Przepisy | Rezepte | Recettes | Recetas | Create and manage recipes with ingredient tracking. |
-| `shopping_lists` | Shopping Lists | Listy zakupów | Einkaufslisten | Listes de courses | Listas de compras | Create and manage shopping lists with automatic suggestions. |
-| `stats` | Statistics | Statystyki | Statistiken | Statistiques | Estadísticas | Advanced consumption analysis and waste tracking. |
-| `stock_takes` | Stock Takes | Inwentaryzacja | Bestandsaufnahmen | Inventaires | Conteos de inventario | Periodic inventory checks to verify stock accuracy. |
-| `vision` | Photo Recognition | Rozpoznawanie ze zdjęć | Fotoerkennung | Reconnaissance photo | Reconocimiento fotográfico | Reads a product's name, brand and expiry date off a photo of its label. Switched off, adding a product loses its photo tab and nutrition tables have to be typed in. |
-| `webhooks` | Webhooks | Webhooki | Webhooks | Webhooks | Webhooks | Outbound HTTP notifications about events in your workspace. |
+| Technical name | en | pl | de | fr | es | pt | One-sentence description |
+|---|---|---|---|---|---|---|---|
+| `core` (virtual) | Home & Kitchen | Dom i Kuchnia | Haus & Küche | Maison & Cuisine | Hogar y cocina | Casa e cozinha | Fridge, Pantry, and basic products. Always on; not a marketplace module. |
+| `items` (always-on) | Inventory | Inwentarz | Inventar | Inventaire | Inventario | Estoque | The products domain behind the inventory screens; always on, named by the inventory launcher card. |
+| `locations` (always-on) | Locations | Miejsca | Lagerorte | Emplacements | Ubicaciones | Locais | Where stock lives; named by the journal only, no store card. |
+| `categories` (always-on) | Categories | Kategorie | Kategorien | Catégories | Categorías | Categorias | How products are grouped; named by the journal only, no store card. |
+| `announcements` (always-on) | Announcements | Ogłoszenia | Ankündigungen | Annonces | Anuncios | Avisos | Notices to members; named by the journal only, no store card. |
+| `api_keys` | API Keys | Klucze API | API-Schlüssel | Clés API | Claves API | Chaves de API | Programmatic access via REST API keys. |
+| `approvals` | Approvals | Zatwierdzenia | Genehmigungen | Approbations | Aprobaciones | Aprovações | Multi-stage approval workflows for critical operations. |
+| `warehouse` | Warehouse | Magazyn | Lager | Entrepôt | Almacén | Armazém | Scan with your phone's camera or a scanner to receive, issue, move and count stock; the numbered documents are written in the background, with putaway rules. |
+| `equipment` | Equipment Tracking | Śledzenie sprzętu | Geräteverfolgung | Suivi des équipements | Seguimiento de equipos | Controle de equipamentos | Track IT and physical assets with lifecycle management. |
+| `example_widgets` | Example Widgets | Przykładowe widżety | Beispiel-Widgets | Widgets d'exemple | Widgets de ejemplo | Widgets de exemplo | Reference module demonstrating Inventari module patterns: manage simple widgets with a name, color, and quantity. Hidden from the store. |
+| `maker` | Production | Produkcja | Produktion | Fabrication | Fabricación | Produção | Production runs, bills of materials (BOM), and cost rollup. |
+| `mcp_server` | MCP Server | Serwer MCP | MCP-Server | Serveur MCP | Servidor MCP | Servidor MCP | Let an AI agent work with this workspace over the Model Context Protocol, with a key that sees only what it may. |
+| `nutrition` | Nutrition Info | Wartości odżywcze | Nährwertinformationen | Informations nutritionnelles | Información nutricional | Informações nutricionais | Display nutritional data and ingredients from Open Food Facts. |
+| `partners` (virtual) | Partners | Partnerzy | Partner | Partenaires | Socios | Parceiros | Manage suppliers, customers, and service providers for B2B workflows. |
+| `printing` | Label Printing | Druk etykiet | Etikettendruck | Impression d'étiquettes | Impresión de etiquetas | Impressão de etiquetas | Generate and print labels for products and locations. |
+| `purchase_orders` | Purchase Orders | Zamówienia zakupu | Einkaufsbestellungen | Bons de commande | Órdenes de compra | Pedidos de compra | Create and track purchase orders with suppliers. |
+| `recipes` | Recipes | Przepisy | Rezepte | Recettes | Recetas | Receitas | Create and manage recipes with ingredient tracking. |
+| `shopping_lists` | Shopping Lists | Listy zakupów | Einkaufslisten | Listes de courses | Listas de compras | Listas de compras | Create and manage shopping lists with automatic suggestions. |
+| `stats` | Statistics | Statystyki | Statistiken | Statistiques | Estadísticas | Estatísticas | Advanced consumption analysis and waste tracking. |
+| `stock_takes` | Stock Takes | Inwentaryzacja | Bestandsaufnahmen | Inventaires | Conteos de inventario | Contagens de estoque | Periodic inventory checks to verify stock accuracy. |
+| `vision` | Photo Recognition | Rozpoznawanie ze zdjęć | Fotoerkennung | Reconnaissance photo | Reconocimiento fotográfico | Reconhecimento por foto | Reads a product's name, brand and expiry date off a photo of its label. Switched off, adding a product loses its photo tab and nutrition tables have to be typed in. |
+| `webhooks` | Webhooks | Webhooki | Webhooks | Webhooks | Webhooks | Webhooks | Outbound HTTP notifications about events in your workspace. |
 
 ### What these names are NOT
 
@@ -80,7 +79,7 @@ and must name each key from this catalog, not from a vocabulary of its own.
   tab for per-location settings is "Codes and labels" ("Kody i etykiety"), not
   "Locations", so that the word names one place in the app only; Configuration › Putaway
   links to the same screen.
-- `maker` is **not** "Maker" — that is the code name. Four of five languages had already
+- `maker` is **not** "Maker" — that is the code name. Every other language had already
   translated it away; English "Production" completes the set. Not "Manufacturing" (factory-scale connotation), not
   "Production & BOM" (redundant, breaks narrow tiles).
 - `vision` is **not** "OCR Scanning" — the module recognizes products in photos with a
@@ -117,13 +116,13 @@ profile registry:
 
 ### Mode table
 
-| Profile id | en | pl | de | fr | es |
-|---|---|---|---|---|---|
-| `food_home` | Food & Home | Dom i jedzenie | Essen & Zuhause | Alimentation & Maison | Alimentación y hogar |
-| `equipment_wms` | Equipment & Warehouse | Sprzęt i magazyn | Geräte & Lager | Équipements & entrepôt | Equipos y almacén |
-| `clean_core` | Custom | Własny | Benutzerdefiniert | Personnalisé | Personalizado |
+| Profile id | en | pl | de | fr | es | pt |
+|---|---|---|---|---|---|---|
+| `food_home` | Food & Home | Dom i jedzenie | Essen & Zuhause | Alimentation & Maison | Alimentación y hogar | Alimentos e casa |
+| `equipment_wms` | Equipment & Warehouse | Sprzęt i magazyn | Geräte & Lager | Équipements & entrepôt | Equipos y almacén | Equipamentos e armazém |
+| `clean_core` | Custom | Własny | Benutzerdefiniert | Personnalisé | Personalizado | Personalizado |
 
-One-sentence description per mode (English row; the other four languages translate it):
+One-sentence description per mode (English row; every other language translates it):
 
 | Profile id | Description (en) |
 |---|---|
@@ -202,25 +201,26 @@ Rules:
    or changed English string and holds the strings that already used one in
    `frontend/scripts/vocabulary-baseline.json`; an entry shields only the exact text it holds.
    A word list does not carry across languages (Polish "magazyn" is retired as a place, yet it is
-   the name of the Warehouse module and stays in "stan magazynowy"), so de/fr/es/pl are held to
-   this table by review and by the per-concept tests named in the last column.
+   the name of the Warehouse module and stays in "stan magazynowy"), so the other five
+   languages are held to this table by review and by the per-concept tests named in the last
+   column.
 4. **Identifiers do not follow.** `Item`, `zone`, `/inventory/items`, the `items` namespace
    and `consume`-named keys stay; the visible word is the table's.
 
-| Concept | en | pl | de | fr | es | Retires | Why |
-|---|---|---|---|---|---|---|---|
-| A place stock is kept — the top level a user opens (`Cold Storage`, `Receiving`) and every node inside it (`Shelf A - Top`, `Bay 3`) | **Location** | Miejsce | Lagerort | Emplacement | Ubicación | storage (as a name for it), place, room, zone, spot, warehouse, shelf (outside shelf life and named shelves); fr stockage; pl magazyn, lokalizacja, miejsce przechowywania; de Standort | The app had five words for one thing — Storages, storage location, target location, Locations (equipment) and Warehouse. The tree already treats the levels alike; the word does too. "Warehouse" became the name of the module that moves stock. |
-| The thing that is stocked | **Product** | Produkt | Produkt | Produit | Producto | item, article, przedmiot | The sidebar said Items over a subtitle that said products (§14.3). |
-| A product's stock row in a location, counted across modules | **Record** | Rekord | Datensatz | Enregistrement | Registro | entry, row (in prose) | Boundary with *asset* written down in "asset vs equipment vs record". |
-| The physical quantity | **On hand** | Na stanie | Bestand | En stock | En existencia | in hand, current stock (as a column) | It is the figure the ledger posts against (ADR-022). |
-| Quantity set aside for something | **Reserved** | Zarezerwowane | Reserviert | Réservé | Reservado | spoken for, promised, committed, held | "Spoken for" appeared nowhere else, and "reserved" is the column header beside it. |
-| What may still be given away | **Available** | Dostępne | Verfügbar | Disponible | Disponible | free, spare, left (as a column) | Always on hand minus reserved. |
-| Taking quantity off stock (any reason) | **Remove** (from stock) | Zdejmij (ze stanu) | Entfernen | Retirer | Retirar | consume, take off, deduct, abbuchen, quitar | The dialog asks a reason, so the act is wider than "consumed". |
-| The reason or the resulting status when it was used up | **Consumed** | Zużyte | Verbraucht | Consommé | Consumido | used up, spent | It is one reason among several (used, expired, damaged), and the ledger's own code. |
-| Putting a product somewhere else | **Move** | Przenieś | Verschieben | Déplacer | Mover | relocate, shift, transfer (as a verb) | One action, one name (§14.4). |
-| One line of the register of what moved | **Movement** | Ruch | Bewegung | Mouvement | Movimiento | transaction, transfer (as a noun) | The register is "Stock movements". |
-| The internal-transfer *document* | **Transfer** | Przesunięcie (MM) | Umlagerung | Transfert | Transferencia | — | A document type of the `warehouse` module, not a verb: the exempt use of the word. |
-| The product-profile a user picks | **Workspace mode** | Tryb pracy | Arbeitsbereich | Mode d’espace de travail | Modo de espacio de trabajo | profile (in the UI) | Settled above, under "Workspace mode names". |
+| Concept | en | pl | de | fr | es | pt | Retires | Why |
+|---|---|---|---|---|---|---|---|---|
+| A place stock is kept — the top level a user opens (`Cold Storage`, `Receiving`) and every node inside it (`Shelf A - Top`, `Bay 3`) | **Location** | Miejsce | Lagerort | Emplacement | Ubicación | Local | storage (as a name for it), place, room, zone, spot, warehouse, shelf (outside shelf life and named shelves); fr stockage; pl magazyn, lokalizacja, miejsce przechowywania; de Standort | The app had five words for one thing — Storages, storage location, target location, Locations (equipment) and Warehouse. The tree already treats the levels alike; the word does too. "Warehouse" became the name of the module that moves stock. |
+| The thing that is stocked | **Product** | Produkt | Produkt | Produit | Producto | Produto | item, article, przedmiot | The sidebar said Items over a subtitle that said products (§14.3). |
+| A product's stock row in a location, counted across modules | **Record** | Rekord | Datensatz | Enregistrement | Registro | Registro | entry, row (in prose) | Boundary with *asset* written down in "asset vs equipment vs record". |
+| The physical quantity | **On hand** | Na stanie | Bestand | En stock | En existencia | Em estoque | in hand, current stock (as a column) | It is the figure the ledger posts against (ADR-022). |
+| Quantity set aside for something | **Reserved** | Zarezerwowane | Reserviert | Réservé | Reservado | Reservado | spoken for, promised, committed, held | "Spoken for" appeared nowhere else, and "reserved" is the column header beside it. |
+| What may still be given away | **Available** | Dostępne | Verfügbar | Disponible | Disponible | Disponível | free, spare, left (as a column) | Always on hand minus reserved. |
+| Taking quantity off stock (any reason) | **Remove** (from stock) | Zdejmij (ze stanu) | Entfernen | Retirer | Retirar | Remover (do estoque) | consume, take off, deduct, abbuchen, quitar | The dialog asks a reason, so the act is wider than "consumed". |
+| The reason or the resulting status when it was used up | **Consumed** | Zużyte | Verbraucht | Consommé | Consumido | Consumido | used up, spent | It is one reason among several (used, expired, damaged), and the ledger's own code. |
+| Putting a product somewhere else | **Move** | Przenieś | Verschieben | Déplacer | Mover | Mover | relocate, shift, transfer (as a verb) | One action, one name (§14.4). |
+| One line of the register of what moved | **Movement** | Ruch | Bewegung | Mouvement | Movimiento | Movimentação | transaction, transfer (as a noun) | The register is "Stock movements". |
+| The internal-transfer *document* | **Transfer** | Przesunięcie (MM) | Umlagerung | Transfert | Transferencia | Transferência (MM) | — | A document type of the `warehouse` module, not a verb: the exempt use of the word. |
+| The product-profile a user picks | **Workspace mode** | Tryb pracy | Arbeitsbereich | Mode d’espace de travail | Modo de espacio de trabajo | Modo de trabalho | profile (in the UI) | Settled above, under "Workspace mode names". |
 
 What the table does not claim:
 
@@ -330,10 +330,11 @@ Rules:
   action, not an exception: it links into the module's **own** filtered list, so it speaks
   the module's individual word — the counts next to it speak "records".
 - **Frozen feature names are not vocabulary**: the My-Assets screen is My Assets / Mój
-  sprzęt / Meine Geräte / Mon matériel / Mi equipo, and stays so — four of five languages
-  chose the domain word for the screen a holder sees (German a plural, as its other screens
-  are), and a feature name is a name, not a set reference. Strings that *reference* the screen must use its real name in that
-  language (pl „Mój sprzęt”, de „Meine Geräte“, fr « Mon matériel », es «Mi equipo») — not a
+  sprzęt / Meine Geräte / Mon matériel / Mi equipo / Meus equipamentos, and stays so — every
+  other language chose the domain word for the screen a holder sees (German a plural, as
+  its other screens are), and a feature name is a name, not a set reference. Strings that
+  *reference* the screen must use its real name in that language (pl „Mój sprzęt”, de
+  „Meine Geräte“, fr « Mon matériel », es «Mi equipo», pt „Meus equipamentos”) — not a
   back-translation of the English one.
 - **Kind names are exempt**: `categories.codes.*` ("Urządzenie sieciowe", "Inny sprzęt",
   "Other Equipment") name kinds of things, not sets, and keep their natural words. The
@@ -363,7 +364,7 @@ The route stays `/maker/production`.
 ### A domain word
 
 1. Edit the row in the vocabulary table, with the retired words, and get it reviewed.
-2. Change every visible occurrence in all five `locales/*/` and `modules/*/i18n/*.json`
+2. Change every visible occurrence in all six `locales/*/` and `modules/*/i18n/*.json`
    catalogs of the screens the concept appears on. Where a per-concept test pins the word
    (`storageVocabulary`, `productVocabulary`, `movementDirectionVocabulary`), it follows.
 3. Add the new losers to `RULES` in `frontend/scripts/check-vocabulary.mjs`, with a test line
@@ -373,7 +374,7 @@ The route stays `/maker/production`.
 ### A module name
 
 1. Edit the row in the module table and get it reviewed (this file is the decision record).
-2. Update `modules.<name>.name` / `.description` (`core`: `title` only) in all five `modules.json` files and the
+2. Update `modules.<name>.name` / `.description` (`core`: `title` only) in all six `modules.json` files and the
    module's own `launcher.title` (where it has one) in `frontend/src/modules/<module>/i18n/*.json`.
 3. Update `display_name`/description in `backend/app/modules/<module>/manifest.json`
    (fallback only — keep it aligned with the English row).
@@ -383,7 +384,7 @@ The route stays `/maker/production`.
 ### A workspace mode name
 
 1. Edit the row in the mode table and get it reviewed.
-2. Update `profiles.<id>.name` / `.description` in all five `common.json` files.
+2. Update `profiles.<id>.name` / `.description` in all six `common.json` files.
 3. Update `name`/`description` on the profile in `backend/app/core/product_profiles.py`
    (fallback only — keep it aligned with the English row).
 4. Leave the profile id alone. Renaming it is a data migration, not naming work.

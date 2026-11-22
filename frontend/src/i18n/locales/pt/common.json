@@ -6,7 +6,9 @@
     "noReadHint": "Seu perfil não inclui a permissão para ler este módulo. Peça a um administrador da sua organização que a adicione.",
     "hiddenRecordsAdminOnly": "Só um administrador pode ativar isto — peça a um.",
     "denied": "Você não tem acesso a isto",
-    "deniedHint": "Sua conta não pode ler estes dados. Peça acesso a um administrador da sua organização."
+    "deniedHint": "Sua conta não pode ler estes dados. Peça acesso a um administrador da sua organização.",
+    "manageOnly": "Você pode usar isto, mas não reconfigurá-lo",
+    "manageOnlyHint": "Sua conta pode usar este módulo, mas não alterar como ele se comporta. Peça a alguém que possa gerenciá-lo na sua organização."
   },
   "actions": {
     "add": "Adicionar",
@@ -656,7 +658,45 @@
         "approval": "Aprovação",
         "body_html": "Conteúdo do modelo",
         "reset_to_builtin": "Reposto no modelo integrado",
-        "occurred_on": "Dia a que pertence"
+        "occurred_on": "Dia a que pertence",
+        "preferred_partner_id": "Fornecedor preferido",
+        "safety_stock": "Estoque de segurança",
+        "unit_price": "Preço unitário",
+        "valid_from": "Válido a partir de",
+        "valid_to": "Válido até",
+        "reason_text": "Texto do motivo",
+        "tax_rate": "Taxa de imposto (%)",
+        "labor_hourly_rate": "Valor da hora de trabalho",
+        "shelf_life_days_before": "Validade antes (dias)",
+        "shelf_life_days_after": "Validade depois (dias)",
+        "typed_unit_price_before": "Preço informado antes",
+        "typed_unit_price_after": "Preço informado depois",
+        "done_on": "Feito em",
+        "make_fresh": "Sempre fabricar na hora",
+        "material_cost": "Custo dos materiais retirados",
+        "started_on": "Iniciado em",
+        "step": "Etapa",
+        "label_name": "Nome em uma lista de ingredientes",
+        "allergens": "Alérgenos",
+        "may_contain": "Pode conter",
+        "answer": "Resposta",
+        "api_base_url": "URL base",
+        "approved_by_id": "Aprovado por",
+        "approved_by_email": "E-mail do aprovador",
+        "api_key": "Chave de API",
+        "dispute_type": "Tipo de relato",
+        "assets": "Patrimônios",
+        "capabilities": "Capacidades",
+        "closed_by": "Fechado por",
+        "connection_id": "Conexão",
+        "holder": "Responsável",
+        "holder_email": "E-mail do responsável",
+        "model_name": "Modelo",
+        "provider": "Provedor",
+        "purpose": "Finalidade",
+        "registration": "Registro",
+        "response_id": "Resposta",
+        "sku_schema": "Formato de SKU"
       },
       "showWholeChange": "Mostrar a alteração completa",
       "showLess": "Mostrar menos",
@@ -721,7 +761,8 @@
         "cycle_count_schedule": "Agendamento de contagem cíclica",
         "work_item": "Tarefa",
         "partner": "Parceiro",
-        "label": "Etiqueta"
+        "label": "Etiqueta",
+        "ai_connection": "Conexão de IA"
       },
       "columns": {
         "timestamp": "Quando",
@@ -780,7 +821,11 @@
         "QUALITY_HOLD": "Retenção de qualidade",
         "approval_requested": "Solicitada",
         "approval_approved": "Aprovada",
-        "approval_rejected": "Rejeitada"
+        "approval_rejected": "Rejeitada",
+        "DISPUTED": "Relatou um problema",
+        "MISSING": "Faltando",
+        "WRONG_ITEM": "Equipamento errado",
+        "FIRST_ACCOUNT": "Primeira conta da instalação"
       },
       "reactivatedAfterBreaker": "Reativado depois que o disjuntor o cortou",
       "removedCollections": "Subcoleções removidas: {{names}}",
@@ -836,7 +881,8 @@
       "systemGroup": "Geral",
       "systemRole": "Função integrada — suas permissões não podem ser alteradas.",
       "systemRoleFooter": "As funções integradas são somente leitura.",
-      "title": "Acesso e funções"
+      "title": "Acesso e funções",
+      "editSubtitleUnsaved": "{{n}} permissões selecionadas, ainda não salvas"
     },
     "data": {
       "exportDesc": "Baixe uma cópia dos seus produtos",
@@ -1056,7 +1102,9 @@
       "summaryInAll": "No total: {{summary}}",
       "showAll_one": "Mostrar todos os {{count}}",
       "showAll_other": "Mostrar todos os {{count}}"
-    }
+    },
+    "recordCountMore_one": "mais de {{count}} registro",
+    "recordCountMore_other": "mais de {{count}} registros"
   },
   "search": "Buscar",
   "noResults": "Nenhum resultado",
@@ -1248,7 +1296,9 @@
     "page": "Página",
     "rowsPerPage": "Linhas por página",
     "rows_one": "{{count}} linha",
-    "rows_other": "{{count}} linhas"
+    "rows_other": "{{count}} linhas",
+    "moreThan_one": "mais de {{count}}",
+    "moreThan_other": "mais de {{count}}"
   },
   "notFound": {
     "title": "Página não encontrada",

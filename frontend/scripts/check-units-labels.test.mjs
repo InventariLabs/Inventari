@@ -97,7 +97,7 @@ describe("check-units-labels", () => {
 
     const run = (screenLabel, args) => {
       repo = makeRepo();
-      const languages = ["en", "pl", "de", "es", "fr"];
+      const languages = ["en", "pl", "de", "es", "fr", "pt"];
       const mirror = languages
         .map((l) => `    '${l}': {\n        'kg': 'kg',\n    },`)
         .join("\n");

@@ -86,6 +86,10 @@
     },
     "announcements": {
       "name": "Avisos"
+    },
+    "mcp_server": {
+      "name": "Servidor MCP",
+      "description": "Permita que um agente de IA trabalhe com este espaço por meio do Model Context Protocol, com uma chave que só vê o que pode."
     }
   },
   "config": {

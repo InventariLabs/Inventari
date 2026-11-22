@@ -51,7 +51,7 @@ check from the repository and its issue tracker:
 3. **Test lines against source lines** — a ratio, not a count. Absolute numbers
    only say how big the module is.
 4. **A complete wrapper** — permissions declared in the manifest, migrations
-   the module owns, a five-language catalogue.
+   the module owns, a six-language catalogue.
 
 Roughly, that gives:
 
@@ -112,8 +112,8 @@ How each signal was read, so it can be repeated:
   `frontend/tests/e2e/` are not in the ratio. The module's migrations are left out
   of the source lines.
 - **Wrapper** — permissions declared in `manifest.json`, migrations the module
-  owns, and the five-language catalogue under its `i18n/`. Every module has the
-  five backend languages (de, en, es, fr, pl); some also carry pt.
+  owns, and the six-language catalogue under its `i18n/`. Every module has all
+  six backend languages (de, en, es, fr, pt, pl).
 
 What changed since 17 October. The ledgers shrank where the debt was paid down:
 the refusal ledger has no entries at all, where October counted refusals in
@@ -370,4 +370,4 @@ module.
 
 - [`MODULES_GUIDE.md`](../MODULES_GUIDE.md) — the full `manifest.json` reference
 - [`MODULE_CAPABILITIES.md`](MODULE_CAPABILITIES.md) — what `capabilities` may contain
-- [`MODULE_NAMES.md`](MODULE_NAMES.md) — the approved display names, in five languages
+- [`MODULE_NAMES.md`](MODULE_NAMES.md) — the approved display names, in six languages

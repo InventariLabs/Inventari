@@ -146,7 +146,7 @@ says what the release does rather than what changed since them.
   endpoint, so a transport served that way is counted per API key.
 - A new community module package can be handed to an AI coding agent.
   `module new-community` now writes an `AGENTS.md` into the package — what a
-  module may import, the five maintained languages, migrations the package
+  module may import, the six maintained languages, migrations the package
   owns, the purpose card, tests and the command that checks the package before
   install, with links to the full guides at the platform's version — and a
   `CLAUDE.md` that points at it. MODULE_QUICKSTART.md has a section on
@@ -252,6 +252,14 @@ says what the release does rather than what changed since them.
   the approver's note, as they already were when it was rejected. The people
   picker of a workflow stage marks the members who cannot see approvals, since
   naming only such people is refused when the stage is saved.
+- Brazilian Portuguese as a sixth maintained language. **Português (Brasil)**
+  is complete in the interface, the modules' own catalogs, the server's
+  messages and the recipe ingredient defaults. The language menu offers it
+  plainly — no mark and no percentage. From now on a change that adds a string
+  brings its Portuguese along, with the same gates that hold German, French and
+  Spanish: the core coverage gate, the module parity tests, the backend error
+  catalog and the module validator. A module written outside this repository
+  still needs English only.
 
 ### Changed
 

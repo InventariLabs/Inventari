@@ -344,6 +344,71 @@ _LABELS_ES: dict[str, str] = {
     'footer': 'Documento interno de almacén — no es una factura ni un documento contable.',
 }
 
+_LABELS_PT: dict[str, str] = {
+    'document_details': 'Detalhes do documento',
+    'reference': 'Referência',
+    'scheduled': 'Agendado',
+    'document_date': 'Data do documento',
+    'from_location': 'De',
+    'to_location': 'Para',
+    'partner': 'Parceiro',
+    'name': 'Nome',
+    'tax_id': 'CNPJ/CPF',
+    'address': 'Endereço',
+    'line_items': 'Itens',
+    'item': 'Item',
+    'expected': 'Previsto',
+    'done': 'Feito',
+    'delta': 'Diferença',
+    'unit': 'Unidade',
+    'unit_price': 'Preço unitário',
+    'line_gross': 'Bruto',
+    'vat': 'Imposto %',
+    'status': 'Status',
+    'batch': 'Lote',
+    'expiry': 'Val.',
+    'total_net': 'Total líquido',
+    'total_tax': 'Total de impostos',
+    'total_gross': 'Total bruto',
+    'tax_by_rate': 'Imposto por alíquota',
+    'total_due': 'Valor a pagar',
+    'notes': 'Observações',
+    'sig_prepared': 'Preparado por',
+    'sig_checked': 'Conferido por',
+    'sig_approved': 'Aprovado por',
+    'sig_received': 'Recebido por',
+    'sig_issued': 'Emitido por',
+    'sig_carrier': 'Transportadora / Motorista',
+    'sig_hint': 'Nome, data, assinatura',
+    'created': 'Criado em',
+    'confirmed': 'Confirmado',
+    'completed': 'Concluído',
+    'correction_of': 'Correção do documento',
+    'backorder_of': 'Pendente de',
+    'return_of': 'Devolução de',
+    'source_order': 'Pedido de compra',
+    'corrected_document': 'Documento corrigido',
+    'responsible': 'Pessoa responsável',
+    'supplier': 'Fornecedor',
+    'customer': 'Cliente',
+    'warehouse': 'Armazém',
+    'location_from': 'Local de origem',
+    'location_to': 'Local de destino',
+    'financial_impact': 'Impacto financeiro',
+    'scrap_reason': 'Motivo da baixa',
+    'scrap_cost': 'Custo da baixa',
+    'packing_slip': 'Romaneio de embalagem',
+    'pick_list': 'Lista de separação',
+    'shelf': 'Prateleira',
+    'document': 'Documento',
+    'package': 'Volume',
+    'package_of': 'de',
+    'weight': 'Peso',
+    'quantity': 'Quantidade',
+    'package_contents': 'Conteúdo',
+    'footer': 'Documento interno de armazém — não é uma nota fiscal nem um documento contábil.',
+}
+
 
 # ---------------------------------------------------------------------------
 # Status display labels
@@ -385,6 +450,13 @@ _LINE_STATUS_LABELS_ES: dict[str, str] = {
     'PENDING': 'Pendiente',
 }
 
+_LINE_STATUS_LABELS_PT: dict[str, str] = {
+    'DONE': 'Feito',
+    'PARTIAL': 'Parcial',
+    'EXCEPTION': 'Exceção',
+    'PENDING': 'Pendente',
+}
+
 
 def _get_line_status_map(lang: str) -> dict[str, str]:
     return pick_by_lang(
@@ -394,6 +466,7 @@ def _get_line_status_map(lang: str) -> dict[str, str]:
         de=_LINE_STATUS_LABELS_DE,
         fr=_LINE_STATUS_LABELS_FR,
         es=_LINE_STATUS_LABELS_ES,
+        pt=_LINE_STATUS_LABELS_PT,
     )
 
 
@@ -469,6 +542,21 @@ _DEFAULT_TYPE_TITLES_ES: dict[str, str] = {
 }
 
 
+_DEFAULT_TYPE_TITLES_PT = {
+    'IN': 'Nota de recebimento de mercadorias',
+    'OUT': 'Nota de expedição de mercadorias',
+    'INT': 'Transferência interna',
+    'INTERNAL_IN': 'Recebimento interno de produção',
+    'INTERNAL_OUT': 'Nota de consumo interno',
+    'CORRECTION': 'Correção',
+    'SCRAP': 'Nota de baixa',
+    # Legacy
+    'PZ': 'Nota de recebimento de mercadorias',
+    'WZ': 'Nota de expedição de mercadorias',
+    'MM': 'Transferência interna',
+}
+
+
 def _resolve_doc_title(
     doc_type: str,
     profile: DocumentProfile | None,
@@ -490,6 +578,7 @@ def _resolve_doc_title(
         de=_DEFAULT_TYPE_TITLES_DE,
         fr=_DEFAULT_TYPE_TITLES_FR,
         es=_DEFAULT_TYPE_TITLES_ES,
+        pt=_DEFAULT_TYPE_TITLES_PT,
     )
     return cast(str, defaults.get(doc_type, doc_type))
 
@@ -547,6 +636,15 @@ _DISCREPANCY_LABELS_ES: dict[str, str] = {
     'OTHER': 'Otro',
 }
 
+_DISCREPANCY_LABELS_PT: dict[str, str] = {
+    'SHORTAGE': 'Falta',
+    'DAMAGE': 'Avaria',
+    'QUALITY_HOLD': 'Retenção de qualidade',
+    'COUNT_VARIANCE': 'Divergência de contagem',
+    'SURPLUS': 'Excedente do fornecedor',
+    'OTHER': 'Outro',
+}
+
 
 def _get_discrepancy_map(lang: str) -> dict[str, str]:
     """Discrepancy code -> label a reader of the printout can act on."""
@@ -557,6 +655,7 @@ def _get_discrepancy_map(lang: str) -> dict[str, str]:
         de=_DISCREPANCY_LABELS_DE,
         fr=_DISCREPANCY_LABELS_FR,
         es=_DISCREPANCY_LABELS_ES,
+        pt=_DISCREPANCY_LABELS_PT,
     )
 
 
@@ -602,6 +701,13 @@ _SCRAP_REASON_LABELS_ES: dict[str, str] = {
     'OTHER': 'Otro',
 }
 
+_SCRAP_REASON_LABELS_PT: dict[str, str] = {
+    'DAMAGED': 'Avaria',
+    'EXPIRED': 'Vencido',
+    'QUALITY': 'Problema de qualidade',
+    'OTHER': 'Outro',
+}
+
 
 def _get_scrap_reason_map(lang: str) -> dict[str, str]:
     """Scrap reason code -> the label the document page shows for it."""
@@ -612,4 +718,5 @@ def _get_scrap_reason_map(lang: str) -> dict[str, str]:
         de=_SCRAP_REASON_LABELS_DE,
         fr=_SCRAP_REASON_LABELS_FR,
         es=_SCRAP_REASON_LABELS_ES,
+        pt=_SCRAP_REASON_LABELS_PT,
     )

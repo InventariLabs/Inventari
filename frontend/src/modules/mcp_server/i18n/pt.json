@@ -1,0 +1,34 @@
+{
+  "title": "Servidor MCP",
+  "description": "Conecte um agente de IA a este espaço de trabalho com uma chave de API, por meio do Model Context Protocol.",
+  "subtitle": "Onde um agente de IA se conecta a este espaço de trabalho, a chave de API que ele envia e os hosts em que o endpoint responde.",
+  "endpoint": {
+    "label": "Endpoint",
+    "hint": "Aponte seu cliente MCP para este endereço.",
+    "protocol": "Fala a revisão de protocolo 2026-07-28, enviada em cada requisição; um cliente que abre com o handshake initialize negocia a 2025-11-25."
+  },
+  "connect": {
+    "title": "Para conectar",
+    "createKey": "Crie uma chave de API em Chaves de API e dê a ela a permissão Usar o endpoint MCP.",
+    "createKeyNeedsAdmin": "Peça uma chave a um administrador da sua organização: ela é criada em Chaves de API, com a permissão Usar o endpoint MCP.",
+    "pointClient": "Envie a chave no cabeçalho X-API-Key (ou como token Bearer) para o endereço acima.",
+    "allowHost": "Se esta instalação responde em um endereço público, adicione o host dela aos hosts permitidos nas configurações do módulo."
+  },
+  "links": {
+    "apiKeys": "Chaves de API"
+  },
+  "navigation": {
+    "title": "Servidor MCP"
+  },
+  "permissions": {
+    "use": "Usar o endpoint MCP",
+    "useDesc": "Uma chave sem esta permissão não alcança o endpoint MCP nem lista as ferramentas dele"
+  },
+  "settings": {
+    "allowedHosts": "Hosts permitidos",
+    "allowedHostsDesc": "Cabeçalhos Host que o endpoint MCP aceita, além de localhost. Um valor por linha.",
+    "allowedOrigins": "Origens permitidas",
+    "allowedOriginsDesc": "Cabeçalhos Origin que o endpoint MCP aceita, além de localhost. Um valor por linha.",
+    "open": "Configurações do Servidor MCP"
+  }
+}

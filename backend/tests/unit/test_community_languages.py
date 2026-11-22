@@ -1,9 +1,13 @@
-"""A community language ships below full coverage and costs no change a translation.
+"""The two language classes, and the per-key English fallback of a community one.
 
-The backend declares which languages are community in ``app.i18n._types``.
-A maintained language holds every key of ``ErrorMessages``; a community one
-holds what it has so far and answers the rest in English, key by key, the way
-the interface does.
+``app.i18n._types`` declares which languages are community translations: ones
+written by whoever speaks the language, which may lag behind and answer in
+English for a key they have not got yet. No language is a community one today
+— every shipped language is maintained, and a maintained one holds every key
+of ``ErrorMessages``. The class stays for the translation that joins before it
+is complete, so the machinery is exercised here against a language declared a
+community one inside the test: a mechanism that only runs on a tree nobody has
+today is a mechanism nothing holds.
 """
 
 import json
@@ -19,7 +23,7 @@ from app.i18n import (
     MAINTAINED_LANGUAGES,
     SUPPORTED_LANGUAGES,
 )
-from app.i18n._types import COMMUNITY_LANGUAGES, ErrorMessages
+from app.i18n._types import COMMUNITY_LANGUAGES, ErrorMessages, Language
 from app.i18n.service import get_error_message, load_module_translations
 from app.i18n.service import get_module_error_message as module_message
 
@@ -62,46 +66,61 @@ def test_a_community_message_keeps_the_placeholders_of_the_english_one() -> None
             ), (language, key)
 
 
-@pytest.mark.parametrize('language', COMMUNITY_LANGUAGES)
 def test_a_missing_key_answers_in_english(
-    language: str, monkeypatch: pytest.MonkeyPatch
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """The fallback per key, shown on Portuguese held as a community catalog."""
+    language: Language = 'pt'
+    catalogue = dict(ERRORS[language])
     key = 'item_not_found'
-    catalog = dict(COMMUNITY_ERRORS[language])
-    assert key in catalog, 'the community catalog is expected to hold this key'
-    translated = get_error_message(key, language)  # type: ignore[arg-type]
-    assert translated == catalog[key]
+    assert key in catalogue, 'the catalogue is expected to hold this key'
+
+    translated = get_error_message(key, language)
+    assert translated == catalogue[key]
     assert translated != ERRORS['en'][key]
 
-    del catalog[key]
-    monkeypatch.setitem(COMMUNITY_ERRORS, language, catalog)  # type: ignore[arg-type]
+    del catalogue[key]
+    with monkeypatch.context() as patch:
+        patch.delitem(ERRORS, language)
+        patch.setitem(COMMUNITY_ERRORS, language, catalogue)
 
-    assert get_error_message(key, language) == ERRORS['en'][key]  # type: ignore[arg-type]
+        assert get_error_message(key, language) == ERRORS['en'][key]
 
 
 def test_a_key_added_to_the_maintained_languages_alone_is_served_in_english(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """The change that adds a string brings the maintained languages only."""
+    given = dict(ERRORS['pt'])
     for language in MAINTAINED_LANGUAGES:
-        monkeypatch.setitem(ERRORS[language], 'a_brand_new_refusal', f'new {language}')  # type: ignore[literal-required]
+        monkeypatch.setitem(ERRORS[language], 'a_brand_new_refusal', f'new {language}')
 
-    for language in COMMUNITY_LANGUAGES:
-        assert get_error_message('a_brand_new_refusal', language) == 'new en'
+    with monkeypatch.context() as patch:
+        patch.delitem(ERRORS, 'pt')
+        patch.setitem(COMMUNITY_ERRORS, 'pt', given)
+
+        assert get_error_message('a_brand_new_refusal', 'pt') == 'new en'
 
 
-def test_a_community_language_answers_interpolation_in_its_own_words() -> None:
-    message = get_error_message(
-        'item_quantity_above_ceiling',
-        'pt',
-        quantity='9',
-        ceiling='5',
-    )
+def test_a_community_language_answers_interpolation_in_its_own_words(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    given = dict(ERRORS['pt'])
+    with monkeypatch.context() as patch:
+        patch.delitem(ERRORS, 'pt')
+        patch.setitem(COMMUNITY_ERRORS, 'pt', given)
 
-    assert '9' in message and '5' in message
-    assert message != get_error_message(
-        'item_quantity_above_ceiling', 'en', quantity='9', ceiling='5'
-    )
+        message = get_error_message(
+            'item_quantity_above_ceiling',
+            'pt',
+            quantity='9',
+            ceiling='5',
+        )
+
+        assert '9' in message and '5' in message
+        assert message != get_error_message(
+            'item_quantity_above_ceiling', 'en', quantity='9', ceiling='5'
+        )
 
 
 def test_a_module_message_falls_back_to_its_english_before_the_core_one(

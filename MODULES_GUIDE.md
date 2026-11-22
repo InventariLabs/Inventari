@@ -951,11 +951,10 @@ revision before it.
 ## 🌍 Internationalization (i18n)
 
 Inventari ships six languages — `en`, `pl`, `de`, `fr`, `es` and `pt`
-(Português, Brasil). Five are maintained: a change brings all of them. `pt` is
-a community language: it may lag behind, and a key it lacks is read in English.
-A module you publish from outside this repository must ship **English** and may
-ship any of the other five; a module built into the repository ships the five
-maintained languages.
+(Português, Brasil) — and all six are maintained: a change brings every one of
+them. A module you publish from outside this repository must ship **English**
+and may ship any of the other five; a module built into the repository ships
+all six maintained languages.
 
 - A module cannot add a language the core does not know: the loaders skip a
   file such as `it.json`.
@@ -1285,7 +1284,7 @@ by HTTP method, as `equipment` does.
 
 > **`module_type` trust levels:** the field is what the store shows for a module this repository ships; every other module is shown as `community` whatever its manifest says, and a module from outside the repository that claims `core`, `official` or `cloud` is refused at discovery. So the field can keep a module from loading but cannot raise its trust, and it does **not** change the import rules. How far the AST safety scan relaxes for a given module is decided by name-keyed tables in `backend/app/core/module_safety.py`: `TRUSTED_SHIPPED_MODULES` (the trusted names that have a directory in this repository) lifts the `app.`-internal import bans, `REPO_SHIPPED_MODULES` exempts the modules this repository ships from the module import-surface rule, and `CORE_EXEMPTIONS` grants named modules specific imports the scan would otherwise refuse (today Core model paths for `equipment`, `approvals` and `maker`), which the trusted list alone never allows. Two more things shape the scan: the capabilities a module declares, and a `requires` entry that names a module this repository ships. Files under a `tests/` directory are not scanned. A module can sit on one table, on several, or on none: `equipment`, `approvals` and `maker` carry named exemptions without being on the trusted list, and every module outside the tables meets the full vocabulary whatever its `module_type`. Populating `module_type` honestly is the author's job today — the field is not yet verified against a signature (ADR-019).
 
-> **`module_type` and the three trust levels (ADR-019) name different things, and nothing maps one onto the other.** ADR-019 names *who certified* a module — Core (shipped in this repository), Certified (reviewed and signed for the catalog), Foreign (installed from anywhere else) — and that certification is a signature plus identity fields in the tracking file, not a manifest value. The four `module_type` spellings are a label its author writes and the store card prints; the readers in the codebase that decide something from it are the i18n validator (`app/cli/module_validator.py`), where `core` and `official` owe all five languages and the other two owe `en`; the discovery refusal of a module from outside the repository that claims `core`, `official` or `cloud` (`app/core/_registry_class.py`); and the store and `module list` displays (`app/api/modules.py`, `app/cli/commands_module.py`). No level is spelled by this field, and a module's trust does not rise when its author retypes it.
+> **`module_type` and the three trust levels (ADR-019) name different things, and nothing maps one onto the other.** ADR-019 names *who certified* a module — Core (shipped in this repository), Certified (reviewed and signed for the catalog), Foreign (installed from anywhere else) — and that certification is a signature plus identity fields in the tracking file, not a manifest value. The four `module_type` spellings are a label its author writes and the store card prints; the readers in the codebase that decide something from it are the i18n validator (`app/cli/module_validator.py`), where `core` and `official` owe all six maintained languages and the other two owe `en`; the discovery refusal of a module from outside the repository that claims `core`, `official` or `cloud` (`app/core/_registry_class.py`); and the store and `module list` displays (`app/api/modules.py`, `app/cli/commands_module.py`). No level is spelled by this field, and a module's trust does not rise when its author retypes it.
 
 ---
 

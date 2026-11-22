@@ -19,7 +19,7 @@ vi.mock("@/modules/partners/hooks/usePartners", () => ({
  * The email and website fields leaned on the browser's own validation, which
  * speaks the operating system's language and cannot be styled or translated:
  * with the interface in English a Polish user got a Polish sentence, and an
- * app that ships five languages was handing its validation to the browser.
+ * app that ships six languages was handing its validation to the browser.
  */
 describe("PartnerFormModal native validation", () => {
   beforeEach(() => {

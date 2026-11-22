@@ -17,7 +17,7 @@ from app.modules.warehouse.document_pdf_service import (
 from app.modules.warehouse.models import Document
 from app.services.pdf_utils import register_pdf_filters
 
-_LANGS = ('en', 'pl', 'de', 'fr', 'es')
+_LANGS = MAINTAINED_LANGUAGES
 # Words that really are spelt like the English one in that language.
 _SAME_WORD_IN_ENGLISH = {('de', 'name'), ('fr', 'CORRECTION')}
 # Printed words spelt the same as the English one in that language.
@@ -26,6 +26,7 @@ _GENUINE_COGNATES = {
     'de': {'Status', 'Name:'},
     'fr': {'Correction'},
     'es': set(),
+    'pt': {'Status', 'Item'},
 }
 _ADDRESS = 'Main Road 5, Springfield, 1111'
 
@@ -86,7 +87,7 @@ class TestLabelSetsAreComplete:
         labels = getattr(po_pdf_service, f'_LABELS_{lang.upper()}')
         assert english - set(labels) == set()
 
-    @pytest.mark.parametrize('lang', ('pl', 'de', 'fr', 'es'))
+    @pytest.mark.parametrize('lang', [x for x in MAINTAINED_LANGUAGES if x != 'en'])
     async def test_fixed_texts_are_not_english(self, lang: str) -> None:
         labels = getattr(_pdf_labels, f'_LABELS_{lang.upper()}')
         for key in ('footer', 'financial_impact', 'notes', 'name', 'address'):
@@ -113,7 +114,7 @@ class TestTypeTitlesAreTranslated:
     """The print subtitle comes from these tables, so an English entry would
     print English under a translated title."""
 
-    @pytest.mark.parametrize('lang', ('pl', 'de', 'fr', 'es'))
+    @pytest.mark.parametrize('lang', [x for x in MAINTAINED_LANGUAGES if x != 'en'])
     async def test_no_title_falls_back_to_english(self, lang: str) -> None:
         english = _pdf_labels._DEFAULT_TYPE_TITLES_EN
         titles = getattr(_pdf_labels, f'_DEFAULT_TYPE_TITLES_{lang.upper()}')

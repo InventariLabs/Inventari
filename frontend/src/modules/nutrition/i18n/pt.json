@@ -68,5 +68,8 @@
     "learnMore": "Saiba mais →",
     "visionCapture": "Lido do rótulo",
     "communityNote": "Do Open Food Facts, uma base de dados comunitária, por isso os valores são uma estimativa. Compare com o rótulo."
+  },
+  "productPage": {
+    "title": "Nutrição por 100 g"
   }
 }

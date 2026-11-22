@@ -14,6 +14,7 @@ def pick_by_lang[T](
     de: T | None = None,
     fr: T | None = None,
     es: T | None = None,
+    pt: T | None = None,
 ) -> T:
     """Pick the *lang* variant of a value, falling back to English.
 
@@ -28,7 +29,13 @@ def pick_by_lang[T](
     must get English back rather than an empty dict. Call sites that only
     have an EN/PL pair simply leave the rest unset.
     """
-    for prefix, variant in (('pl', pl), ('de', de), ('fr', fr), ('es', es)):
+    for prefix, variant in (
+        ('pl', pl),
+        ('de', de),
+        ('fr', fr),
+        ('es', es),
+        ('pt', pt),
+    ):
         if lang.startswith(prefix):
             return variant if variant else en
     return en

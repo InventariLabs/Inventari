@@ -91,7 +91,14 @@ class TestScaffoldedCatalogs:
         requires one per language."""
         written = sorted(p.name for p in (scaffold / 'i18n').glob('*.json'))
 
-        assert written == ['de.json', 'en.json', 'es.json', 'fr.json', 'pl.json']
+        assert written == [
+            'de.json',
+            'en.json',
+            'es.json',
+            'fr.json',
+            'pl.json',
+            'pt.json',
+        ]
 
     def test_the_catalogs_are_valid_and_empty(self, scaffold):
         for catalog in (scaffold / 'i18n').glob('*.json'):

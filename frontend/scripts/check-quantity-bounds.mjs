@@ -27,6 +27,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { maintainedLanguages } from "./maintained-languages.mjs";
+
 const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
 const BACKEND_VALIDATORS = resolve(
   ROOT,
@@ -37,9 +39,13 @@ const FRONTEND_MAX = resolve(
   "src/modules/shopping_lists/quantityBounds.ts",
 );
 const FRONTEND_STEP = resolve(ROOT, "src/hooks/useUomPrecision.ts");
-const CATALOGS = ["en", "pl", "de", "es", "fr"].map((lang) =>
-  resolve(ROOT, `src/modules/shopping_lists/i18n/${lang}.json`),
-);
+// Read where the gate runs, not where it is imported: the test imports this
+// module for its pure functions, and resolving the locales there would read a
+// tree the importing process does not have.
+const catalogs = () =>
+  maintainedLanguages(ROOT).map((lang) =>
+    resolve(ROOT, `src/modules/shopping_lists/i18n/${lang}.json`),
+  );
 // The backend's refusals live in Python catalogues (en and pl share a file).
 const ERROR_CATALOGS = ["en_pl", "de", "es", "fr", "pt"].map((lang) =>
   resolve(ROOT, `../backend/app/i18n/_errors_${lang}.py`),
@@ -189,7 +195,7 @@ function main() {
 
   findings.push(
     ...ceilingSentenceFindings(
-      CATALOGS.map((path) => ({ path, text: readFileSync(path, "utf8") })),
+      catalogs().map((path) => ({ path, text: readFileSync(path, "utf8") })),
     ),
   );
 

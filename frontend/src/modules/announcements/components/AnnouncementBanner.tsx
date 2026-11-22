@@ -96,7 +96,7 @@ const AnnouncementBanner: React.FC = () => {
                 className={`text-[10px] font-medium uppercase tracking-[0.15em] ${theme.color} hidden sm:inline`}
               >
                 {/* The type is translated: a raw code such as `warning` or `downtime`
-                    would show in English on a screen with five catalogs. */}
+                    would show in English on a screen with six catalogs. */}
                 {t(`types.${a.type}` as "types.info", {
                   defaultValue: a.type,
                 })}

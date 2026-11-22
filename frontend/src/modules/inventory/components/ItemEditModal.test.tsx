@@ -125,7 +125,7 @@ describe("ItemEditModal", () => {
    * The item form takes its labels and placeholders from key strings held in
    * SYSTEM_FIELDS, not from t() call sites, so a dead-code cleanup once deleted
    * the whole vocabulary as "orphans" and every label rendered as its own key
-   * ("itemBrand", "fields.purchase_price") in all five languages.
+   * ("itemBrand", "fields.purchase_price") in all six languages.
    *
    * Asserting the actual strings — rather than merely the absence of raw keys
    * — is what makes this a regression test: a deleted key now surfaces as the

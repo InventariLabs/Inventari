@@ -23,8 +23,8 @@ The rest of the file is reference: you do not need it end to end.
    with `<ListControlBar>` (§2.7).
 6. **A modal or sheet is `<Sheet>`** with `SheetHeader`, `SheetBody`, `SheetFooter` + `SheetActions`
    (§4.3); one Escape closes one layer.
-7. **Every user-visible string** is an i18n key in the five maintained languages — en, pl, de, fr,
-   es — (`frontend/AGENTS.md` §4); the community `pt` catalogue may lag and reads English meanwhile.
+7. **Every user-visible string** is an i18n key in the six maintained languages — en, pl, de, fr,
+   es, pt — (`frontend/AGENTS.md` §4).
 8. **A settings page** has one save model, named sections with navigation, and its links to other screens
    set apart from the fields (§11.9).
 
@@ -1631,13 +1631,14 @@ A place stock is kept has one word, at every level of the tree:
 | de       | **Lagerort** | `Kühllager`, `Wareneingang`, `Regal A - oben`    |
 | fr       | **Emplacement** | `Chambre froide`, `Réception`, `Rayon A`      |
 | es       | **Ubicación** | `Cámara frigorífica`, `Recepción`, `Estante A`  |
+| pt       | **Local**    | `Câmara fria`, `Recebimento`, `Prateleira A`     |
 
 "Storage", "place", "room", "zone", "spot" and "shelf" (as a generic noun) are not
 synonyms to reach for — one concept, one word. In Polish, "magazyn" and "lokalizacja" are
 retired for a place as well: "Magazyn" is the name of the warehouse module.
 
 Applies to page titles, section headings, counters, empty states, toasts and search
-placeholders, in all five languages. Internal identifiers (`zone` in component and
+placeholders, in all six languages. Internal identifiers (`zone` in component and
 prop names, the `storages` module and route) may lag behind; user-visible strings may
 not.
 
@@ -1655,7 +1656,7 @@ two windows to the wording the warehouse documents already use (`fields.targetLo
 
 ### 14.3 The record is a Product
 
-The thing on a shelf is a **Product**, in every user-visible string and all five
+The thing on a shelf is a **Product**, in every user-visible string and all six
 languages — never "item" beside it.
 
 Guarded by `src/i18n/__tests__/productVocabulary.test.ts` over the core catalogues

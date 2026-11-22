@@ -253,8 +253,8 @@ describe("WeightField", () => {
 
   /**
    * The hint under the field must name the unit the label above it offers, and it
-   * says so in five languages, which
-   * is five places for the promise to come apart again.
+   * says so in six languages, which
+   * is six places for the promise to come apart again.
    */
   it.each([
     ["en", enItems, /volume/i],

@@ -8,7 +8,7 @@ A developer writing their first module. No end user has any business here.
 
 ## Inside the boundary
 The smallest complete module that still demonstrates every pattern that matters: its own table and
-migration, a gated router, permissions with defaults, a frontend page, translations in all five
+migration, a gated router, permissions with defaults, a frontend page, translations in all six
 languages, and two contributions to another area's screens: a bulk action on the inventory list
 (copying the selected IDs) and a validation rule on the new-item form (refusing a name made only
 of digits, which is usually a mis-scan).
