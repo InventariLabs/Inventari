@@ -680,7 +680,6 @@ apart.
 | `STORAGE_ARCHIVED` | This location is archived. Restore it before storing products here. |
 | `STORAGE_ARCHIVE_BLOCKED_BY_ITEMS` | Cannot archive: {count} item(s) are still stored here. Move them first or archive with a target location. |
 | `STORAGE_ARCHIVE_TARGET_ARCHIVED` | Cannot move items into an archived location. |
-| `STORAGE_ARCHIVE_TARGET_IS_DESCENDANT` | Cannot move items into a descendant of the location being archived. |
 | `STORAGE_ARCHIVE_TARGET_IS_SELF` | Cannot move items into the location being archived. |
 | `STORAGE_CODE_NUMBER_NOT_HERE` | Only an ordinary location can be numbered, not an archived or virtual one |
 | `STORAGE_CODE_PARENT_NOT_NUMBERED` | This location cannot be numbered on its own: the places above it do not carry their template codes yet, or it is deeper than the template goes. Number the level above it first |
