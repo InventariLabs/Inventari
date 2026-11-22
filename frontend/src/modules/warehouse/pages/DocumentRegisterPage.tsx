@@ -31,7 +31,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { DateInput } from "@/components/ui/DateInput";
 import { Badge } from "@/components/ui/Badge";
-import { InlineQueryError } from "@/components/ui/QueryResult";
+import { InlineQueryError, QueryError } from "@/components/ui/QueryResult";
 import { formatMoney, formatDate, todayIso } from "@/utils/formatters";
 import type {
   RegisterCurrencyTotal,
@@ -765,7 +765,8 @@ export default function DocumentRegisterPage() {
     [dateFrom, dateTo, typeFilter, groupBy],
   );
 
-  const { data, isLoading, isError } = useDocumentRegister(params);
+  const { data, isLoading, isError, error, refetch } =
+    useDocumentRegister(params);
   const shipping = Boolean(data?.summary.has_shipments);
   const summarySole = soleValuedBucket(data?.summary.totals_by_currency);
   // the summary is signed by the currency of the documents it sums.
@@ -965,9 +966,11 @@ export default function DocumentRegisterPage() {
         </p>
       )}
       {isError && (
-        <p className="text-sm text-red-500 text-center py-8">
-          {t("register.error")}
-        </p>
+        <QueryError
+          error={error}
+          message={t("register.error")}
+          onRetry={() => void refetch()}
+        />
       )}
       {data && data.groups.length === 0 && (
         <Card className="p-8 text-center space-y-3">

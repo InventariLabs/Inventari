@@ -138,6 +138,7 @@ export default function InventoryDashboard() {
                 message: t("common:dashboard.attention.unavailable"),
                 retryLabel: t("common:actions.retry"),
                 onRetry: attention.refetch,
+                forbidden: attention.isForbidden,
                 partialLabel: t("common:dashboard.attention.partial"),
               }
             : undefined

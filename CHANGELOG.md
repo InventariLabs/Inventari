@@ -543,6 +543,10 @@ says what the release does rather than what changed since them.
   editor also warns, before a role is saved, about a granted module whose own
   read or whose required modules' reads (stock takes need products and
   locations) the role does not hold; the role can still be saved as it is.
+  The Inventory and Equipment overviews, Warehouse Configuration, the document
+  register, the command palette and the small pickers and cards that read a
+  list on their own say the same instead of "could not be loaded", and offer
+  no retry.
 
 - After a location is moved physically, **Movements** and a product's
   *Movements* tab show what happened before the move at the path the location

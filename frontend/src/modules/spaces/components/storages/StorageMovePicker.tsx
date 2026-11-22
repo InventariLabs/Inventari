@@ -185,6 +185,7 @@ export function StorageMovePicker({
             {searchFailed && (
               <li className="px-2 py-3 text-sm text-on-muted">
                 <LocationSearchFailed
+                  error={found.error ?? moving.error}
                   onRetry={() => {
                     void found.refetch();
                     void moving.refetch();
@@ -216,7 +217,7 @@ export function StorageMovePicker({
             />
             {tree.error ? (
               <p className="py-4 text-center text-sm text-on-muted">
-                <LocationSearchFailed onRetry={tree.retry} />
+                <LocationSearchFailed error={tree.error} onRetry={tree.retry} />
               </p>
             ) : (
               targets.length === 0 && (

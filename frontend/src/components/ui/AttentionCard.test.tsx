@@ -256,6 +256,26 @@ describe("AttentionCard when the answer did not arrive", () => {
   });
 });
 
+describe("AttentionCard when the reads were refused", () => {
+  it("says the account cannot see this, with no retry", () => {
+    renderCard({
+      items: [],
+      unavailable: {
+        message: "The numbers could not be loaded.",
+        retryLabel: "Try again",
+        onRetry: vi.fn(),
+        forbidden: true,
+      },
+    });
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("You do not have access to this");
+    expect(alert).toHaveTextContent("Ask an administrator");
+    expect(alert).not.toHaveTextContent("could not be loaded");
+    expect(screen.queryByRole("button", { name: "Try again" })).toBeNull();
+    expect(screen.queryByText("All under control")).toBeNull();
+  });
+});
+
 describe("AttentionCard heading beside a failed source", () => {
   it("drops the count it cannot vouch for", () => {
     renderCard({

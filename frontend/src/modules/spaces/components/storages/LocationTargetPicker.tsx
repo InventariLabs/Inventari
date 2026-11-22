@@ -97,6 +97,7 @@ export function LocationTargetPicker({
       emptyMessage={
         failed ? (
           <LocationSearchFailed
+            error={list.error ?? excluded.error}
             onRetry={() => {
               void list.refetch();
               void excluded.refetch();

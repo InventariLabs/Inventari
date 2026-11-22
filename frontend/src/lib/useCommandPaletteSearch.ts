@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { itemsApi } from "@/lib/api/items";
 import { productTemplatesApi } from "@/lib/api/productTemplates";
 import { queryKeys } from "@/hooks/queries/keys";
+import { allForbidden } from "@/lib/errors";
 import { categoryLabel, unitLabel } from "@/lib/i18nHelpers";
 import { productCode } from "@/types/inventory";
 import { formatQuantityLocale } from "@/utils/formatters";
@@ -281,6 +282,8 @@ interface SearchHits {
   others: SearchResult[];
   /** A source that threw is not a source with nothing to say. */
   failed: boolean;
+  /** Every source that threw was refused (403), not broken. */
+  forbidden: boolean;
 }
 
 const NO_HITS: SearchHits = {
@@ -288,6 +291,7 @@ const NO_HITS: SearchHits = {
   totals: new Map(),
   others: [],
   failed: false,
+  forbidden: false,
 };
 
 /** The window the ranking chooses from: five is what fits the list, but a
@@ -303,13 +307,13 @@ async function searchAll(
   const trimmed = query.trim();
   if (trimmed.length < 2) return NO_HITS;
 
-  let failed = false;
+  const errors: unknown[] = [];
   const items = enabledModules.includes("inventory")
     ? itemsApi
         .search(trimmed, RANKING_WINDOW)
         .then((found) => topProducts(rankItemsByRelevance(found, trimmed)))
-        .catch((): Item[] => {
-          failed = true;
+        .catch((error: unknown): Item[] => {
+          errors.push(error);
           return [];
         })
     : Promise.resolve<Item[]>([]);
@@ -317,8 +321,8 @@ async function searchAll(
   const providers = moduleRegistry.getSearchProviders(enabledModules);
   const others = Promise.all(
     providers.map((provider) =>
-      provider(trimmed).catch((): SearchResult[] => {
-        failed = true;
+      provider(trimmed).catch((error: unknown): SearchResult[] => {
+        errors.push(error);
         return [];
       }),
     ),
@@ -329,7 +333,8 @@ async function searchAll(
     items: foundItems,
     totals: await totalsOfProducts(foundItems),
     others: groups.flat(),
-    failed,
+    failed: errors.length > 0,
+    forbidden: allForbidden(errors),
   };
 }
 
@@ -378,7 +383,12 @@ async function totalsOfProducts(
 export function useCommandPaletteSearch(
   query: string,
   enabledModules: string[],
-): { results: SearchResult[]; isLoading: boolean; failed: boolean } {
+): {
+  results: SearchResult[];
+  isLoading: boolean;
+  failed: boolean;
+  forbidden: boolean;
+} {
   const { t } = useTranslation();
   const { data = NO_HITS, isFetching } = useQuery({
     queryKey: queryKeys.commandPalette.search(query, enabledModules),
@@ -397,5 +407,10 @@ export function useCommandPaletteSearch(
     [data, t, query],
   );
 
-  return { results, isLoading: isFetching, failed: data.failed };
+  return {
+    results,
+    isLoading: isFetching,
+    failed: data.failed,
+    forbidden: data.forbidden,
+  };
 }

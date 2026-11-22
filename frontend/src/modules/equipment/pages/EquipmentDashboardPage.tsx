@@ -7,6 +7,7 @@ import { useCanWrite } from "@/hooks/useCanWrite";
 import { AttentionCard, useHasRole } from "@/module-sdk";
 import { buttonVariants } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import { allForbidden } from "@/lib/errors";
 import { EquipmentDashboardWidget } from "@/modules/equipment/components/EquipmentDashboardWidget";
 import { FleetValuationWidget } from "@/modules/equipment/components/FleetValuationWidget";
 import { FleetCompositionCard } from "@/modules/equipment/components/dashboard/FleetCompositionCard";
@@ -145,6 +146,11 @@ export default function EquipmentDashboardPage() {
                   message: t("dashboard.attention.unavailable"),
                   retryLabel: t("common:actions.retry"),
                   partialLabel: t("common:dashboard.attention.partial"),
+                  forbidden: allForbidden(
+                    [dashboard, overdue, fleet]
+                      .filter((q) => q.isError)
+                      .map((q) => q.error),
+                  ),
                   onRetry: () => {
                     if (dashboard.isError) void dashboard.refetch();
                     if (overdue.isError) void overdue.refetch();

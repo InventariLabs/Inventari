@@ -643,8 +643,8 @@ export default function RecipesPage() {
         {/* Chips sit ABOVE the flex row: as a flex child they collapsed the grid. */}
         <CollectionsLoadFailed
           failed={collectionsQuery.isError}
+          error={collectionsQuery.error}
           onRetry={() => void collectionsQuery.refetch()}
-          t={t}
         />
         <CollectionsChips
           collections={collections}

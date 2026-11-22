@@ -1204,7 +1204,8 @@
     "matchedBySerial": "matched on serial number: {{value}}",
     "productTotal_one": "{{amount}} in {{count}} record",
     "productTotal_other": "{{amount}} in {{count}} records",
-    "searchFailed": "The search failed, so this list may be incomplete. Try again."
+    "searchFailed": "The search failed, so this list may be incomplete. Try again.",
+    "searchForbidden": "Your account cannot search all of this, so the list may be incomplete. Ask an administrator of your organization for access."
   },
   "profiles": {
     "food_home": {

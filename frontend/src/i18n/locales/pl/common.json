@@ -1244,7 +1244,8 @@
     "productTotal_few": "{{amount}} w {{count}} rekordach",
     "productTotal_many": "{{amount}} w {{count}} rekordach",
     "productTotal_other": "{{amount}} w {{count}} rekordu",
-    "searchFailed": "Wyszukiwanie nie powiodło się, więc lista może być niepełna. Spróbuj ponownie."
+    "searchFailed": "Wyszukiwanie nie powiodło się, więc lista może być niepełna. Spróbuj ponownie.",
+    "searchForbidden": "Twoje konto nie może przeszukać wszystkiego, więc lista może być niepełna. Poproś o dostęp administratora organizacji."
   },
   "profiles": {
     "food_home": {

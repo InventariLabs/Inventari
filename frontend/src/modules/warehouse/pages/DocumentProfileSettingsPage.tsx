@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
-import { Button } from "@/components/ui/Button";
+import { QueryError } from "@/components/ui/QueryResult";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
@@ -66,9 +66,14 @@ const SECTION_OF_PART: Record<string, Section> = {
 /** The screen when the profile did not load. The receiving tolerance is its
  * own query: the profile failing says nothing about it, so it stays where it
  * was. */
-function ProfileLoadFailed({ onRetry }: { onRetry: () => void }) {
+function ProfileLoadFailed({
+  error,
+  onRetry,
+}: {
+  error: unknown;
+  onRetry: () => void;
+}) {
   const { t } = useTranslation("warehouse");
-  const { t: ct } = useTranslation("common");
   return (
     <div className="space-y-8">
       <ReceivingSettingsSection />
@@ -77,33 +82,13 @@ function ProfileLoadFailed({ onRetry }: { onRetry: () => void }) {
         successMessage={t("profile.saveSuccess")}
         failureMessage={t("profile.saveFailed")}
       />
-      <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="28"
-            height="28"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-        </div>
-        <p className="text-sm text-on-secondary max-w-md text-center">
-          {t("profile.loadFailed", {
-            defaultValue: "Failed to load profile settings. Please try again.",
-          })}
-        </p>
-        <Button variant="outline" size="sm" onClick={onRetry}>
-          {ct("actions.retry", { defaultValue: "Retry" })}
-        </Button>
-      </div>
+      <QueryError
+        error={error}
+        message={t("profile.loadFailed", {
+          defaultValue: "Failed to load profile settings. Please try again.",
+        })}
+        onRetry={onRetry}
+      />
     </div>
   );
 }
@@ -131,7 +116,13 @@ function ConfigurationPage() {
     ? (asked as Section)
     : "receiving";
 
-  const { data: profile, isLoading, isError, refetch } = useDocumentProfile();
+  const {
+    data: profile,
+    isLoading,
+    isError,
+    error: profileError,
+    refetch,
+  } = useDocumentProfile();
   const {
     data: presets = [],
     isError: presetsFailed,
@@ -207,7 +198,8 @@ function ConfigurationPage() {
     );
   }
 
-  if (isError) return <ProfileLoadFailed onRetry={() => refetch()} />;
+  if (isError)
+    return <ProfileLoadFailed error={profileError} onRetry={() => refetch()} />;
 
   // Static keys, so the catalogue check can see each one is read.
   const labels: Record<Section, string> = {
