@@ -256,7 +256,7 @@ class TestProfileTheme:
             ('food_home', {'500': '16 185 129', '600': '5 150 105', '950': '2 44 34'}),
             (
                 'equipment_wms',
-                {'500': '59 130 246', '600': '37 99 235', '950': '23 37 84'},
+                {'500': '20 184 166', '600': '13 148 136', '950': '4 47 46'},
             ),
             ('clean_core', {'500': '245 158 11', '600': '217 119 6', '950': '69 26 3'}),
         ):
@@ -305,7 +305,7 @@ class TestProfileTheme:
 
         for profile_id, hue in (
             ('food_home', '16 185 129'),  # emerald
-            ('equipment_wms', '59 130 246'),  # blue
+            ('equipment_wms', '20 184 166'),  # teal
             ('clean_core', '245 158 11'),  # amber
         ):
             profile = get_profile(profile_id)
