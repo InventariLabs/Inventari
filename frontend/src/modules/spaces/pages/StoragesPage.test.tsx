@@ -1171,7 +1171,9 @@ describe("StoragesPage — one screen", () => {
     );
     // The row is chosen by the same press, so the open location's own Move
     // button is on screen too; the menu's is the one inside its popover.
-    const menu = await screen.findByRole("dialog", { name: "" });
+    const menu = await screen.findByRole("dialog", {
+      name: "Actions for Freezer",
+    });
     await userEvent.click(
       within(menu).getByRole("button", { name: "Move to…" }),
     );

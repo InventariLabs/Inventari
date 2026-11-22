@@ -22,7 +22,7 @@
     "show_less_tags": "Afficher moins",
     "ready_to_cook": "Prêtes à cuisiner ({{total}})",
     "almost_ready": "Presque prêtes ({{total}})",
-    "sort_newest": "Plus récents",
+    "sort_newest": "Modifiées récemment",
     "sort_name": "Nom A-Z",
     "results_one": "résultat",
     "results_other": "résultats"
@@ -244,7 +244,10 @@
   "actions": {
     "new_recipe": "Nouvelle recette",
     "delete": "Supprimer",
-    "delete_confirm": "Supprimer la recette « {{name}} » ? Cette action est irréversible.",
+    "delete_confirm": "Supprimer la recette « {{name}} » ? Les plans de repas qui contiennent une recette supprimée perdent ces repas. Cette action est irréversible.",
+    "delete_confirm_unplanned": "Supprimer la recette « {{name}} » ? Cette action est irréversible.",
+    "delete_confirm_planned": "Supprimer la recette « {{name}} » ? Elle est prévue dans {{meals}} ; ces repas seront vidés. Cette action est irréversible.",
+    "delete_planned_more": "+{{rest}} autres",
     "start_picking": "Prendre dans le stock",
     "cook_for_stock_hint": "Crée un ordre de production pour un lot dans le module maker",
     "add_to_meal_plan_hint": "Planifie cette recette dans le calendrier des repas",
@@ -334,7 +337,9 @@
     "load_failed": "Impossible d'ouvrir la recette",
     "shopping_failed": "Échec de l'ajout à la liste de courses",
     "history_failed": "Échec de l'enregistrement de la note",
-    "image_failed": "Échec du traitement de l'image"
+    "image_failed": "Échec du traitement de l'image",
+    "add_to_plan_failed": "Impossible d’ajouter la recette au plan de repas",
+    "export_failed": "Impossible d’exporter la recette"
   },
   "cost": {
     "title": "Coût estimé",
@@ -368,6 +373,7 @@
     "rename": "Renommer",
     "rename_title": "Renommer l'étiquette",
     "rename_label": "Nouveau nom",
+    "rename_merges": "Un tag « {{name}} » existe déjà — renommer fusionne les deux, et l’ancien nom disparaît.",
     "rename_success_one": "Renommée : 1 recette mise à jour",
     "rename_success_other": "Renommée : {{count}} recettes mises à jour",
     "rename_failed": "Impossible de renommer l'étiquette",
@@ -558,7 +564,7 @@
       "bindInMain": "Associez la connexion IA pour l'analyse des recettes dans Paramètres → Connexions IA."
     },
     "enableCostCalculation": "Activer le calcul des coûts",
-    "enableCostCalculationDescription": "Afficher la décomposition des coûts dans la vue recette. Désactiver pour un usage domestique.",
+    "enableCostCalculationDescription": "Afficher la décomposition des coûts dans la vue recette. À désactiver si vous ne suivez pas le prix des ingrédients.",
     "registerProductionAsDocument": "Enregistrer la production comme sorties internes",
     "registerProductionAsDocumentDescription": "Créer une sortie interne avec piste d'audit pour chaque session de production terminée. Désactivé par défaut."
   },
@@ -679,6 +685,7 @@
     "exclusions_count_other": "{{count}} articles exclus",
     "generate_list_disabled_tooltip": "Ajoutez d'abord des repas",
     "needs_meals_hint": "Ajoutez au moins un repas pour générer une liste de courses ou copier ce plan.",
+    "needs_meals_hint_copy_only": "Ajoutez au moins un repas pour copier ce plan.",
     "not_cooked": "Non cuisiné",
     "entry_move_error": "Impossible de déplacer ce repas. Veuillez réessayer.",
     "drag_to_move": "Glisser pour déplacer",
@@ -690,7 +697,8 @@
     "copy_confirm": "Copier",
     "copy_error": "Impossible de copier le plan",
     "rate_title": "Comment était-ce ?",
-    "rate_star": "Noter {{value}} étoile(s)",
+    "rate_star_one": "Noter {{count}} étoile",
+    "rate_star_other": "Noter {{count}} étoiles",
     "rate_skip": "Passer",
     "rate_submit": "Noter",
     "rate_success": "Note enregistrée",
@@ -770,7 +778,7 @@
     "pick_collection": "Choisir une collection",
     "add": "Ajouter",
     "delete_selected": "Supprimer",
-    "delete_confirm": "Supprimer {{count}} recettes sélectionnées ? Cette action est irréversible.",
+    "delete_confirm": "Supprimer {{count}} recettes sélectionnées ? Les plans de repas qui contiennent une recette supprimée perdent ces repas. Cette action est irréversible.",
     "tag_title": "Étiqueter {{count}} recettes",
     "tag_hint": "Séparez les étiquettes par des virgules",
     "tag_placeholder": "p. ex. dîner, végétalien",
@@ -781,8 +789,8 @@
     "error": "L'opération groupée a échoué",
     "selected_count_one": "{{count}} sélectionné",
     "selected_count_other": "{{count}} sélectionnés",
-    "delete_confirm_one": "Supprimer {{count}} recette sélectionnée ? Cette action est irréversible.",
-    "delete_confirm_other": "Supprimer {{count}} recettes sélectionnées ? Cette action est irréversible.",
+    "delete_confirm_one": "Supprimer {{count}} recette sélectionnée ? Les plans de repas qui contiennent une recette supprimée perdent ces repas. Cette action est irréversible.",
+    "delete_confirm_other": "Supprimer {{count}} recettes sélectionnées ? Les plans de repas qui contiennent une recette supprimée perdent ces repas. Cette action est irréversible.",
     "tag_title_one": "Étiqueter {{count}} recette",
     "tag_title_other": "Étiqueter {{count}} recettes",
     "deleted_one": "{{count}} recette supprimée",
@@ -840,7 +848,16 @@
     "subtitle": "Cuisine maison : vos plats, leurs ingrédients et ce que vous pouvez cuisiner"
   },
   "tags": {
-    "pick_colour": "Utiliser la couleur {{colour}}"
+    "pick_colour": "Utiliser la couleur {{colour}}",
+    "colour_red": "rouge",
+    "colour_orange": "orange",
+    "colour_yellow": "jaune",
+    "colour_green": "vert",
+    "colour_cyan": "turquoise",
+    "colour_blue": "bleu",
+    "colour_violet": "violet",
+    "colour_pink": "rose",
+    "colour_gray": "gris"
   },
   "ai": {
     "purposeLabel": "Lire une recette depuis un texte",

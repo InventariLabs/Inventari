@@ -23,7 +23,9 @@ const setup = (over: Partial<Parameters<typeof RatingPrompt>[0]> = {}) => {
 };
 
 const star = (n: number) =>
-  screen.getByRole("button", { name: `Rate ${n} star(s)` });
+  screen.getByRole("button", {
+    name: n === 1 ? "Rate 1 star" : `Rate ${n} stars`,
+  });
 
 /**
  * The rating sheet asked right after cooking: nothing is sent until a star is
@@ -41,6 +43,15 @@ describe("RatingPrompt", () => {
     expect(submit).toBeDisabled();
     fireEvent.click(submit);
     expect(onRate).not.toHaveBeenCalled();
+  });
+
+  it("marks the chosen star as pressed, and only that one", () => {
+    setup();
+    fireEvent.click(star(4));
+    expect(star(4)).toHaveAttribute("aria-pressed", "true");
+    expect(star(3)).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(star(2));
+    expect(star(4)).toHaveAttribute("aria-pressed", "false");
   });
 
   it("sends the chosen star count", () => {

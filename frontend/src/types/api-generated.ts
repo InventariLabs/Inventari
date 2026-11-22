@@ -7279,6 +7279,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/recipes/{recipe_id}/planned": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Recipe Planned Meals Endpoint
+         * @description The plan meals that hold this recipe, which deleting it would empty.
+         */
+        get: operations["list_recipe_planned_meals_endpoint_api_v1_recipes__recipe_id__planned_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/roles": {
         parameters: {
             query?: never;
@@ -20644,6 +20664,24 @@ export interface components {
              */
             total_capped: boolean;
         };
+        /** PaginatedResponse[RecipePlannedMeal] */
+        PaginatedResponse_RecipePlannedMeal_: {
+            /** Items */
+            items: components["schemas"]["RecipePlannedMeal"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Has More */
+            has_more: boolean;
+            /**
+             * Total Capped
+             * @default false
+             */
+            total_capped: boolean;
+        };
         /** PaginatedResponse[RecipeTagItem] */
         PaginatedResponse_RecipeTagItem_: {
             /** Items */
@@ -24909,6 +24947,25 @@ export interface components {
              * @default false
              */
             generic_values: boolean;
+        };
+        /**
+         * RecipePlannedMeal
+         * @description One meal of one plan that holds a recipe — what deleting it would empty.
+         */
+        RecipePlannedMeal: {
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+            /** Plan Name */
+            plan_name?: string | null;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            slot: components["schemas"]["MealSlot"];
         };
         /**
          * RecipePreview
@@ -44498,6 +44555,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UndoPickResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_recipe_planned_meals_endpoint_api_v1_recipes__recipe_id__planned_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                recipe_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedResponse_RecipePlannedMeal_"];
                 };
             };
             /** @description Validation Error */

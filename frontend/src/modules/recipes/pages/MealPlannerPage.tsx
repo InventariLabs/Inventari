@@ -192,7 +192,7 @@ export default function MealPlannerPage() {
       toast.success(t("meal_planner.added_to_plan"));
       return true;
     } catch (error) {
-      toast.error(extractApiError(error, t("errors.save_failed")));
+      toast.error(extractApiError(error, t("errors.add_to_plan_failed")));
       return false;
     }
   }

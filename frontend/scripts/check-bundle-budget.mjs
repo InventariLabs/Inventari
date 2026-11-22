@@ -595,6 +595,17 @@ const dist = join(root, "dist");
  * theirs (app first paint 405.8 of 410, login 410.6 of 415, launcher 425.7 of
  * 430, start 644.2 of 645, receive 480.5 of 485, issue 591.5 of 595, history
  * 616.6 of 620, initial 194.0).
+ *
+ * Re-measured 2026-11-22 on the branch that closes the home, kitchen,
+ * approvals and statistics findings, merged with the development line: the
+ * start screen measures 645.0 KiB gz against its 645 (the line alone
+ * measures 644.6). The branch adds sentences in six languages (recipe delete
+ * and tag dialogs, failed-read lines, approvals, statistics) to the language
+ * chunk every first paint loads; no import walked in. That phone budget moves
+ * a step of five, to 650; the other screens stand under theirs (app first
+ * paint 406.4 of 410, login 411.2 of 415, launcher 426.3 of 430, receive
+ * 481.2 of 485, issue 592.1 of 595, history 617.2 of 620, products 635.9 of
+ * 640, initial 194.0).
  */
 const BUDGETS = {
   initial: 245,

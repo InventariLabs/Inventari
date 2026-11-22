@@ -231,6 +231,7 @@ export default function IngredientTemplateCombobox({
         <PopoverPrimitive.Portal>
           <PopoverPrimitive.Content
             ref={listRef}
+            aria-label={t("form.ingredient_name")}
             className="z-[var(--z-popover)] max-h-56 overflow-y-auto rounded-xl border border-border bg-surface-card shadow-xl p-1"
             sideOffset={4}
             // The typed name is the value here; the list is a suggestion on

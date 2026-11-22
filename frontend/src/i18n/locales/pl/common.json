@@ -1028,6 +1028,8 @@
     "mg": "mg",
     "cup": "filiżanka",
     "fl oz": "fl oz",
+    "tbsp": "łyżka",
+    "tsp": "łyżeczka",
     "m": "m",
     "cm": "cm",
     "pt": "pinta",
@@ -1042,7 +1044,7 @@
   },
   "dashboard": {
     "products": "Produkty",
-    "replenishAll": "Uzupełnij braki",
+    "replenishAll": "Przejrzyj, co dokupić",
     "replenishPolicy": "Produkty, których część jest w użyciu gdzie indziej, nie liczą się jako braki i nie trafiają do zamówienia.",
     "replenishModalTitle": "Przegląd propozycji",
     "replenishModalDesc": "Zaznacz produkty, które chcesz dodać do listy zakupów.",

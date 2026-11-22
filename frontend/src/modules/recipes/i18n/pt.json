@@ -22,7 +22,7 @@
     "show_less_tags": "Mostrar menos",
     "ready_to_cook": "Prontas para cozinhar ({{total}})",
     "almost_ready": "Quase lá ({{total}})",
-    "sort_newest": "Mais recentes",
+    "sort_newest": "Alteradas recentemente",
     "sort_name": "Nome A-Z",
     "results_one": "resultado",
     "results_other": "resultados"
@@ -244,7 +244,10 @@
   "actions": {
     "new_recipe": "Nova receita",
     "delete": "Excluir",
-    "delete_confirm": "Excluir a receita \"{{name}}\"? Esta ação não pode ser desfeita.",
+    "delete_confirm": "Excluir a receita \"{{name}}\"? Os planos de refeições que incluem uma receita excluída perdem essas refeições. Esta ação não pode ser desfeita.",
+    "delete_confirm_unplanned": "Excluir a receita “{{name}}”? Esta ação não pode ser desfeita.",
+    "delete_confirm_planned": "Excluir a receita “{{name}}”? Ela está planejada em {{meals}}, e essas refeições ficarão vazias. Esta ação não pode ser desfeita.",
+    "delete_planned_more": "+{{rest}} mais",
     "start_picking": "Retirar do estoque",
     "cook_for_stock_hint": "Cria uma ordem de produção de um lote no módulo de produção",
     "add_to_meal_plan_hint": "Agenda esta receita no calendário de refeições",
@@ -334,6 +337,8 @@
     "shopping_failed": "Não foi possível adicionar à lista de compras",
     "history_failed": "Não foi possível salvar a anotação",
     "image_failed": "Não foi possível processar a imagem",
+    "add_to_plan_failed": "Não foi possível adicionar a receita ao plano de refeições",
+    "export_failed": "Não foi possível exportar a receita",
     "load_failed": "Não foi possível abrir a receita"
   },
   "cost": {
@@ -368,6 +373,7 @@
     "rename": "Renomear",
     "rename_title": "Renomear tag",
     "rename_label": "Novo nome",
+    "rename_merges": "Já existe uma etiqueta “{{name}}” — renomear junta as duas, e o nome antigo deixa de existir.",
     "rename_success_one": "Renomeado: 1 receita atualizada",
     "rename_success_other": "Renomeado: {{count}} receitas atualizadas",
     "delete": "Excluir",
@@ -558,7 +564,7 @@
       "bindInMain": "Vincule em Configurações → Conexões de IA a conexão de IA que alimenta a interpretação de receitas."
     },
     "enableCostCalculation": "Ativar cálculo de custo",
-    "enableCostCalculationDescription": "Mostra o detalhamento de custo por receita na visualização da receita. Desative em uso doméstico, onde o custo da receita não importa.",
+    "enableCostCalculationDescription": "Mostra o detalhamento de custo por receita na visualização da receita. Desative se você não acompanha o preço dos ingredientes.",
     "registerProductionAsDocument": "Registrar a produção como documentos internos de saída",
     "registerProductionAsDocumentDescription": "Cria um documento interno de saída, com trilha de auditoria, para cada sessão de produção concluída. Desativado por padrão — ative para que as produções entrem no registro de documentos."
   },
@@ -689,7 +695,8 @@
     "copy_confirm": "Copiar",
     "copy_error": "Não foi possível copiar o planejamento",
     "rate_title": "Como foi?",
-    "rate_star": "Avaliar com {{value}} estrela(s)",
+    "rate_star_one": "Avaliar com {{count}} estrela",
+    "rate_star_other": "Avaliar com {{count}} estrelas",
     "rate_skip": "Pular",
     "rate_submit": "Avaliar",
     "rate_success": "Avaliação salva",
@@ -717,7 +724,8 @@
     "cook_now_named": "Cozinhar agora: {{recipe}}",
     "remove_entry_named": "Remover {{recipe}} do planejamento",
     "drag_to_move_named": "Arraste para mover: {{recipe}}",
-    "needs_meals_hint": "Adicione ao menos uma refeição para gerar uma lista de compras ou copiar este plano."
+    "needs_meals_hint": "Adicione ao menos uma refeição para gerar uma lista de compras ou copiar este plano.",
+    "needs_meals_hint_copy_only": "Adicione pelo menos uma refeição para copiar este plano."
   },
   "cooking": {
     "rateSession_one": "Avaliar com {{count}} estrela",
@@ -770,7 +778,7 @@
     "pick_collection": "Escolha uma coleção",
     "add": "Adicionar",
     "delete_selected": "Excluir",
-    "delete_confirm": "Excluir as {{count}} receitas selecionadas? Esta ação não pode ser desfeita.",
+    "delete_confirm": "Excluir as {{count}} receitas selecionadas? Os planos de refeições que incluem uma receita excluída perdem essas refeições. Esta ação não pode ser desfeita.",
     "tag_title": "Aplicar tag a {{count}} receitas",
     "tag_hint": "Separe as tags com vírgulas",
     "tag_placeholder": "ex.: jantar, vegana",
@@ -781,8 +789,8 @@
     "error": "Falha na operação em lote",
     "selected_count_one": "{{count}} selecionada",
     "selected_count_other": "{{count}} selecionadas",
-    "delete_confirm_one": "Excluir {{count}} receita selecionada? Esta ação não pode ser desfeita.",
-    "delete_confirm_other": "Excluir as {{count}} receitas selecionadas? Esta ação não pode ser desfeita.",
+    "delete_confirm_one": "Excluir {{count}} receita selecionada? Os planos de refeições que incluem uma receita excluída perdem essas refeições. Esta ação não pode ser desfeita.",
+    "delete_confirm_other": "Excluir as {{count}} receitas selecionadas? Os planos de refeições que incluem uma receita excluída perdem essas refeições. Esta ação não pode ser desfeita.",
     "tag_title_one": "Aplicar tag a {{count}} receita",
     "tag_title_other": "Aplicar tag a {{count}} receitas",
     "deleted_one": "{{count}} receita excluída",
@@ -840,7 +848,16 @@
     "subtitle": "Cozinha de casa: seus pratos, os ingredientes deles e o que cozinhar com o que você tem"
   },
   "tags": {
-    "pick_colour": "Usar a cor {{colour}}"
+    "pick_colour": "Definir a cor como {{colour}}",
+    "colour_red": "vermelho",
+    "colour_orange": "laranja",
+    "colour_yellow": "amarelo",
+    "colour_green": "verde",
+    "colour_cyan": "ciano",
+    "colour_blue": "azul",
+    "colour_violet": "violeta",
+    "colour_pink": "rosa",
+    "colour_gray": "cinza"
   },
   "ai": {
     "purposeLabel": "Ler uma receita a partir de texto",

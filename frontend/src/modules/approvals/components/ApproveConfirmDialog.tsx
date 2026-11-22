@@ -10,7 +10,8 @@ import { stageName } from "@/modules/approvals/workflowStages";
 interface ApproveConfirmDialogProps {
   open: boolean;
   approval: ApprovalRequest;
-  onConfirm: (notes?: string) => void;
+  /** Rejects when the server refuses; the dialog then stays open with the reason. */
+  onConfirm: (notes?: string) => Promise<unknown>;
   onCancel: () => void;
 }
 
@@ -101,6 +102,7 @@ export function ApproveConfirmDialog({
       message={consequence}
       confirmLabel={t("request.approveConfirmLabel")}
       cancelLabel={t("common:actions.cancel")}
+      errorFallback={t("request.approveFailed")}
       onConfirm={() => onConfirm(note.trim() || undefined)}
       onCancel={onCancel}
     >

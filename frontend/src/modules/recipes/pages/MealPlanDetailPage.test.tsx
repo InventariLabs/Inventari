@@ -22,10 +22,13 @@ vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
 
+const moduleState = vi.hoisted(() => ({ shoppingLists: true }));
+
 vi.mock("@/contexts/ModulesContext", () => ({
   useModules: () => ({
     enabledModules: ["recipes", "shopping_lists"],
-    isModuleEnabled: (name: string) => name === "shopping_lists",
+    isModuleEnabled: (name: string) =>
+      name === "shopping_lists" && moduleState.shoppingLists,
     isLoading: false,
     refreshModules: vi.fn(),
   }),
@@ -303,6 +306,20 @@ describe("MealPlanDetailPage slot conflict dialog", () => {
         "Add at least one meal to generate a shopping list or copy this plan.",
       );
       expect(copy).toHaveAccessibleDescription(hint.textContent ?? "");
+    });
+
+    it("names only the copy when the organization has no shopping lists", () => {
+      moduleState.shoppingLists = false;
+      try {
+        renderPage();
+
+        expect(
+          screen.getByText("Add at least one meal to copy this plan."),
+        ).toBeInTheDocument();
+        expect(screen.queryByText(/shopping list/)).not.toBeInTheDocument();
+      } finally {
+        moduleState.shoppingLists = true;
+      }
     });
   });
 });

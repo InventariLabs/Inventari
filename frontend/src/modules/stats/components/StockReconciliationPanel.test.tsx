@@ -63,7 +63,7 @@ describe("StockReconciliationPanel", () => {
 
   it("says how much was read to reach the figures", () => {
     renderPanel({ items_scanned: 11 });
-    expect(screen.getByText(/11 product records/)).toBeInTheDocument();
+    expect(screen.getByText(/over 11 records/)).toBeInTheDocument();
   });
 
   it("prints a dash for a pair the server did not measure", () => {

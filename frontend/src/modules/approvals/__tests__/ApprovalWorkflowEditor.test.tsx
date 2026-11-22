@@ -208,6 +208,23 @@ describe("ApprovalWorkflowEditor", () => {
     });
   });
 
+  it("words the hint after what each stage chose", () => {
+    const named_hint = /only need access to approvals/;
+    const open_hint = /left to anyone who may approve/;
+
+    const { unmount } = render(
+      <ApprovalWorkflowEditor stages={[open()]} onChange={vi.fn()} />,
+      { wrapper: createWrapper() },
+    );
+    expect(screen.queryByText(named_hint)).not.toBeInTheDocument();
+    expect(screen.getByText(open_hint)).toBeInTheDocument();
+    unmount();
+
+    renderEditor([named({ approver_user_ids: ["u1"] })]);
+    expect(screen.getByText(named_hint)).toBeInTheDocument();
+    expect(screen.queryByText(open_hint)).not.toBeInTheDocument();
+  });
+
   it("a stage that names nobody yet says so", () => {
     renderEditor([named({ approver_user_ids: [] })]);
     expect(

@@ -1018,6 +1018,8 @@
     "mg": "mg",
     "cup": "xícara",
     "fl oz": "fl oz",
+    "tbsp": "colher de sopa",
+    "tsp": "colher de chá",
     "m": "m",
     "cm": "cm",
     "pt": "pinta",
@@ -1032,7 +1034,7 @@
   },
   "dashboard": {
     "products": "Produtos",
-    "replenishAll": "Repor tudo",
+    "replenishAll": "Rever o que repor",
     "replenishPolicy": "Os produtos com stock em uso noutro local não contam como baixos nem são repostos.",
     "replenishModalTitle": "Revisar sugestões",
     "replenishModalDesc": "Selecione os produtos que você quer adicionar à sua lista de compras.",

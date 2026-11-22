@@ -26,7 +26,7 @@ const renderDialog = (approval: ApprovalRequest) =>
     <ApproveConfirmDialog
       open
       approval={approval}
-      onConfirm={() => {}}
+      onConfirm={() => Promise.resolve()}
       onCancel={() => {}}
     />,
   );

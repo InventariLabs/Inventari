@@ -62,7 +62,8 @@ export function RatingPrompt({
               onClick={() => setRating(star)}
               onMouseEnter={() => setHover(star)}
               onMouseLeave={() => setHover(0)}
-              aria-label={t("recipes:meal_planner.rate_star", { value: star })}
+              aria-label={t("recipes:meal_planner.rate_star", { count: star })}
+              aria-pressed={rating === star}
               // Kept without a hover surface on purpose: pointing at
               // the third star fills the first three, so a grey square under
               // one of them would contradict what the row is showing. The

@@ -145,8 +145,8 @@
   },
   "reconciliation": {
     "title": "Bestandsabgleich",
-    "subtitle_one": "Beim Öffnen dieser Ansicht gemessen, über {{count}} Produktdatensatz.",
-    "subtitle_other": "Beim Öffnen dieser Ansicht gemessen, über {{count}} Produktdatensätze.",
+    "subtitle_one": "Beim Öffnen dieser Ansicht gemessen, über {{count}} Datensatz. Hier zählt jeder Datensatz, auch die von Modulen wie Ausrüstung; die Übersicht zählt nur Produktdatensätze.",
+    "subtitle_other": "Beim Öffnen dieser Ansicht gemessen, über {{count}} Datensätze. Hier zählt jeder Datensatz, auch die von Modulen wie Ausrüstung; die Übersicht zählt nur Produktdatensätze.",
     "tableCaption": "Die zwei Paarvergleiche und was sie ergeben haben",
     "expectedGap": "Eine dauerhafte Lücke ist hier beabsichtigt; auffällig ist eine, die wächst.",
     "columns": {
