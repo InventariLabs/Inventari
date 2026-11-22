@@ -1060,7 +1060,6 @@ ERRORS_DE: ErrorMessages = {
     'storage_vanished_during_batch': 'Der Lagerort {location} ist während des Stapels verschwunden.',
     'storage_archive_blocked_by_items': 'Archivieren nicht möglich: Hier lagern noch {count} Artikel. Verschieben Sie sie zuerst oder archivieren Sie mit einem Zielort.',
     'storage_archive_target_is_self': 'Artikel können nicht in den Lagerort verschoben werden, der gerade archiviert wird.',
-    'storage_archive_target_is_descendant': 'Artikel können nicht in einen untergeordneten Lagerort des archivierten Lagerorts verschoben werden.',
     'storage_archive_target_archived': 'Artikel können nicht in einen archivierten Lagerort verschoben werden.',
     'storage_restore_parent_archived': 'Die Wiederherstellung in einen archivierten übergeordneten Lagerort ist nicht möglich. Stellen Sie zuerst den übergeordneten Lagerort wieder her.',
     'storage_delete_blocked_by_references': 'Der Lagerort kann nicht gelöscht werden: Andere Datensätze verweisen noch darauf (Constraint „{constraint}“). Archivieren Sie ihn stattdessen.',

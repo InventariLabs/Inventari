@@ -95,7 +95,7 @@ _ALLERGEN_NAME_MAP: dict[str, set[str]] = {
     'mackerel': {'fish'},
     'sardynk': {'fish'},
     'sardine': {'fish'},
-    'pstrąg': {'fish'},
+    'pstrag': {'fish'},
     'trout': {'fish'},
     'anchois': {'fish'},
     'anchov': {'fish'},

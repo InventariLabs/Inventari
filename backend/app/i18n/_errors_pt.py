@@ -856,7 +856,6 @@ ERRORS_PT: ErrorMessages = {
     'storage_vanished_during_batch': 'O local de armazenamento {location} desapareceu durante o lote.',
     'storage_archive_blocked_by_items': 'Não é possível arquivar: {count} item(ns) ainda estão armazenados aqui. Mova-os primeiro ou arquive indicando um local de destino.',
     'storage_archive_target_is_self': 'Não é possível mover itens para o próprio local que está sendo arquivado.',
-    'storage_archive_target_is_descendant': 'Não é possível mover itens para um descendente do local que está sendo arquivado.',
     'storage_archive_target_archived': 'Não é possível mover itens para um local arquivado.',
     'storage_restore_parent_archived': 'Não é possível restaurar dentro de um local pai arquivado. Restaure primeiro o local pai.',
     'storage_delete_blocked_by_references': 'Não é possível excluir o local de armazenamento: ele ainda é referenciado por outros registros (restrição "{constraint}"). Arquive-o.',

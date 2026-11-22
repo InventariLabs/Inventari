@@ -7,15 +7,13 @@
  * made, so the trigger sits in the header's `ActionMenu` and the question it
  * asks moved into a confirm dialog — the same place deleting already asked it.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useEnabledModulesOptional } from "@/contexts/ModulesContext";
 import { getEveryPage } from "@/lib/api/client";
 import { storagesApi } from "@/lib/api/storages";
-import { useStoragesTree } from "@/hooks/queries/useStoragesTree";
-import { flattenTree } from "@/modules/spaces/lib/storageTree";
 import { LocationTargetPicker } from "./LocationTargetPicker";
 
 interface Props {
@@ -56,20 +54,6 @@ export function StorageArchiveDialog({
   const [targetId, setTargetId] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
-  // Active putaway rules naming this location or anything under it are
-  // counted below, which needs the ids standing inside: read when the dialog
-  // is open and the warehouse module is there to have rules.
-  const inside = useStoragesTree(undefined, {
-    parentId: storageId,
-    depth: 20,
-    counts: false,
-    enabled: open && hasDocuments,
-  });
-  const subtree = useMemo(
-    () =>
-      new Set([storageId, ...flattenTree(inside.data ?? []).map((n) => n.id)]),
-    [storageId, inside.data],
-  );
   type PutawayRule = {
     is_active: boolean;
     target_location_id: string | null;
@@ -126,16 +110,12 @@ export function StorageArchiveDialog({
       : r.target_location_id
         ? [r.target_location_id]
         : [];
-  // The warning is made only from a subtree that was read: with the places
-  // inside missing it would count the rules naming this location alone and
-  // call that the answer. Unknown says nothing, as it does when the rules
-  // themselves could not be read.
-  const putawayRulesCount =
-    rules && !inside.isLoading && !inside.isError
-      ? rules.filter(
-          (r) => r.is_active && shelvesOf(r).some((id) => subtree.has(id)),
-        ).length
-      : null;
+  // Only rules naming this very location are counted: the places inside stay
+  // active, so a rule naming one of them keeps working. Unknown says nothing.
+  const putawayRulesCount = rules
+    ? rules.filter((r) => r.is_active && shelvesOf(r).includes(storageId))
+        .length
+    : null;
 
   const isUnknown = summary === "unknown";
   const needsTarget = typeof summary === "number" && summary > 0;
@@ -200,7 +180,7 @@ export function StorageArchiveDialog({
           label={t("locations:edit.archiveTargetLabel")}
           value={targetId ?? ""}
           onChange={(id) => setTargetId(id || null)}
-          excludeSubtreeOf={[storageId]}
+          excludePlaces={[storageId]}
           clearable
           clearLabel={t("locations:edit.archiveTargetNone")}
           placeholder={t("locations:edit.archiveTargetNone")}

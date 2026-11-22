@@ -1058,7 +1058,6 @@ ERRORS_FR: ErrorMessages = {
     'storage_vanished_during_batch': "L'emplacement de stockage {location} a disparu pendant le lot.",
     'storage_archive_blocked_by_items': "Archivage impossible : {count} article(s) sont encore stockés ici. Déplacez-les d'abord ou archivez avec un emplacement cible.",
     'storage_archive_target_is_self': "Impossible de déplacer les articles vers l'emplacement en cours d'archivage.",
-    'storage_archive_target_is_descendant': "Impossible de déplacer les articles vers un emplacement enfant de celui qu'on archive.",
     'storage_archive_target_archived': 'Impossible de déplacer les articles vers un emplacement archivé.',
     'storage_restore_parent_archived': "Impossible de restaurer dans un emplacement parent archivé. Restaurez d'abord le parent.",
     'storage_delete_blocked_by_references': "Impossible de supprimer l'emplacement : d'autres enregistrements y font encore référence (contrainte « {constraint} »). Archivez-le plutôt.",

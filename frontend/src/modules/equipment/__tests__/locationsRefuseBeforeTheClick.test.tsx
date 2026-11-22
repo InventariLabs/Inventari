@@ -406,19 +406,16 @@ describe("archiving the place the delete will refuse", () => {
     await waitFor(() => expect(archived).toEqual(["loc-history"]));
   });
 
-  it("offers no archive over a place with records below it", async () => {
-    // Archiving relocates the whole subtree's records and the server refuses
-    // without a target, so the verb is not offered where it would be refused.
+  it("offers archive over a place whose own spot is empty although records stand below it", async () => {
+    // Archiving moves only what stands on the place itself; the places inside
+    // stay active with their records, so the server does not refuse.
     renderPage();
     await waitFor(() => {
       expect(screen.getByText("Floor Two")).toBeInTheDocument();
     });
 
     expect(
-      screen.queryByRole("button", { name: "Archive Floor Two" }),
-    ).toBeNull();
-    expect(
-      screen.getByRole("button", { name: "Archive Review Room" }),
+      screen.getByRole("button", { name: "Archive Floor Two" }),
     ).toBeEnabled();
   });
 
