@@ -2,7 +2,7 @@ import { type Page } from "@playwright/test";
 import { test, expect } from "./fixtures/auth";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
 import { ApiHelper } from "./helpers/api";
-import { decodeLabel, download } from "./helpers/label-decode";
+import { decodeLabel, download, sendToPrinter } from "./helpers/label-decode";
 import { pickLocationSettingsPlace } from "./helpers/location-settings";
 
 /**
@@ -547,7 +547,7 @@ test.describe.serial("Warehouse — from home to business", () => {
           request.method() === "POST" &&
           request.url().endsWith("/printing/jobs"),
       );
-      await sheet.getByRole("button", { name: "Send to printer" }).click();
+      await sendToPrinter(page, sheet, "E2E-Label-Printer");
       const body = (await queued).postDataJSON();
       expect(body.location_ids).toEqual([near.id]);
       expect(body.qr).toBe(true);
