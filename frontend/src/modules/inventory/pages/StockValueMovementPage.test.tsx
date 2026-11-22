@@ -207,6 +207,27 @@ describe("StockValueMovementPage", () => {
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
   });
 
+  it("shows no first day it was not asked for while the statement is refused or loading", () => {
+    // Nothing picked and nothing answered: the field must not make up the
+    // first of the month the server was never asked about.
+    mocks.state.data = undefined;
+    mocks.state.isError = true;
+    mocks.state.error = {
+      isAxiosError: true,
+      response: {
+        status: 400,
+        data: { detail: { code: "X", message: "Nothing before 12 March." } },
+      },
+    };
+    renderPage();
+
+    const from = screen.getByRole("combobox", { name: "From" });
+    expect(from).not.toHaveTextContent(
+      formatDate(`${todayIso().slice(0, 8)}01`),
+    );
+    expect(from).toHaveTextContent("No date");
+  });
+
   it("exports the period on screen as a spreadsheet named after it", async () => {
     const blob = new Blob(["x"]);
     vi.mocked(stockValueMovementApi.exportXlsx).mockResolvedValue(blob);
