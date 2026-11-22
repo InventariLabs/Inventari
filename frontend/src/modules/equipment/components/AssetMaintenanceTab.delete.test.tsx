@@ -68,7 +68,7 @@ describe("MaintenanceTab — the service entries", () => {
     await screen.findByText("Replaced fan");
 
     await user.click(
-      screen.getByRole("button", { name: "Delete maintenance entry" }),
+      screen.getByRole("button", { name: /^Delete maintenance entry / }),
     );
     let dialog = await screen.findByRole("alertdialog");
     // The title names the entry, as the button that opened it does.
@@ -85,7 +85,7 @@ describe("MaintenanceTab — the service entries", () => {
     expect(deleted).not.toHaveBeenCalled();
 
     await user.click(
-      screen.getByRole("button", { name: "Delete maintenance entry" }),
+      screen.getByRole("button", { name: /^Delete maintenance entry / }),
     );
     dialog = await screen.findByRole("alertdialog");
     await user.click(within(dialog).getByRole("button", { name: "Delete" }));

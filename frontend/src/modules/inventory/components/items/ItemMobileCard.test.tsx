@@ -145,7 +145,9 @@ describe("ItemMobileCard — quick actions keep their own touch targets", () => 
   it("gives each action a 44 px box and spaces them instead of overlapping them", () => {
     render(<ItemMobileCard item={makeItem()} {...baseProps()} />);
 
-    const remove = screen.getByRole("button", { name: "Remove 1 unit" });
+    const remove = screen.getByRole("button", {
+      name: "Remove 1 unit of Rack 42U Open Frame",
+    });
     const more = screen.getByRole("button", {
       name: "Product actions: Rack 42U Open Frame",
     });
@@ -491,7 +493,7 @@ describe("ItemMobileCard — quick actions carry their words", () => {
   // The tooltip carries the visible words; the accessible name may add to
   // them (here the product), and must start with them (WCAG 2.5.3).
   const NAMES = [
-    ["Remove 1 unit", "Remove 1 unit"],
+    ["Remove 1 unit of Rack 42U Open Frame", "Remove 1 unit"],
     ["Product actions: Rack 42U Open Frame", "Product actions"],
   ];
 

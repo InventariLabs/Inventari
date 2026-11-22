@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import StockActionSheet from "./StockActionSheet";
 import type { LabelScanView } from "@/types";
 import { formatDateTime } from "@/utils/formatters";
+import { formatDate } from "@/utils/helpers";
 import i18n from "i18next";
 
 vi.mock("@/components/Slot", () => ({ Slot: () => null }));
@@ -131,7 +132,9 @@ describe("StockActionSheet", () => {
     );
     // The action is named "Remove" everywhere since; this sheet was the
     // last screen still saying "Consume".
-    const consumeBtn = container.querySelector('button[aria-label="Remove 1"]');
+    const consumeBtn = container.querySelector(
+      'button[aria-label^="Remove 1 from"]',
+    );
     expect(consumeBtn).not.toBeNull();
     fireEvent.click(consumeBtn!);
     expect(onConsume).toHaveBeenCalled();
@@ -259,10 +262,21 @@ describe("StockActionSheet", () => {
       expect(navigate).toHaveBeenCalledWith("/inventory/items/item-9");
     });
 
+    it("tells records on one shelf apart by their batch and expiry", () => {
+      renderOne();
+      expect(
+        screen.getByRole("button", {
+          name: `Remove 1 from Warehouse → Rack 4 → Shelf 2 (Batch LOT-77, ${formatDate("2026-12-31")})`,
+        }),
+      ).toBeInTheDocument();
+    });
+
     it("keeps the plus and minus buttons 44 px wide", () => {
       const { container } = renderOne();
-      for (const label of ["Remove 1", "Add 1"]) {
-        const button = container.querySelector(`button[aria-label="${label}"]`);
+      for (const label of ["Remove 1 from", "Add 1 to"]) {
+        const button = container.querySelector(
+          `button[aria-label^="${label}"]`,
+        );
         expect(button).toHaveClass("h-11", "w-11");
         expect(button).not.toHaveClass("h-8");
       }

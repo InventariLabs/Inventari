@@ -121,7 +121,9 @@
   "newCategory": "Nueva categoría",
   "createCategory": "Crear categoría",
   "actions": {
-    "restore": "Restaurar"
+    "editNamed": "Editar {{name}}",
+    "deleteNamed": "Eliminar {{name}}",
+    "restoreNamed": "Restaurar {{name}}"
   },
   "addCategory": "Añadir categoría",
   "itemsCount_one": "producto",

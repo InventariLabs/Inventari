@@ -155,7 +155,7 @@ test.describe("Phone lists — nothing sits beyond the screen edge", () => {
       // bottom bar -- and its box is kept in page coordinates.
       const buttons = page
         .getByRole("button", {
-          name: /^(Remove 1 unit|Product actions(: .+)?)$/,
+          name: /^(Remove 1 unit( of .+)?|Product actions(: .+)?)$/,
         })
         .filter({ visible: true });
       await expect(buttons).toHaveCount(names.length * 2);

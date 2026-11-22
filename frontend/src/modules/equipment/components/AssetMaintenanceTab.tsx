@@ -234,7 +234,9 @@ export function MaintenanceTab({
                     size="iconSm"
                     onClick={() => void handleDelete(log)}
                     className="text-on-muted hover:text-red-500 transition-colors"
-                    aria-label={t("maintenance.deleteAriaLabel")}
+                    aria-label={t("maintenance.deleteAriaLabel", {
+                      title: log.title,
+                    })}
                     disabled={deleteMutation.isPending}
                   >
                     <Trash2 size={14} />

@@ -261,10 +261,10 @@ describe("CollectionsSidebar", () => {
 
   it("renames and deletes without also selecting the row", () => {
     const { onSelect, m } = renderSidebar();
-    fireEvent.click(screen.getAllByRole("button", { name: "Rename" })[0]);
+    fireEvent.click(screen.getAllByRole("button", { name: /^Rename / })[0]);
     expect(m.openRename).toHaveBeenCalledWith(week);
     fireEvent.click(
-      screen.getAllByRole("button", { name: "Delete collection" })[0],
+      screen.getAllByRole("button", { name: /^Delete collection / })[0],
     );
     expect(m.setDeleteTarget).toHaveBeenCalledWith(week);
     expect(onSelect).not.toHaveBeenCalled();
@@ -279,10 +279,10 @@ describe("CollectionsSidebar", () => {
   it("offers a reader no rename, delete or create", () => {
     renderSidebar({ canWrite: false });
     expect(
-      screen.queryByRole("button", { name: "Rename" }),
+      screen.queryByRole("button", { name: /^Rename / }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Delete collection" }),
+      screen.queryByRole("button", { name: /^Delete collection / }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "New collection" }),

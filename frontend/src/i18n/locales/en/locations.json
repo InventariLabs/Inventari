@@ -312,7 +312,8 @@
     "restore": "Restore",
     "emptyTitle": "Nothing archived",
     "emptyDescription": "Archived locations appear here and can be restored.",
-    "detailNotice": "This location is archived. Restore it to store products here again."
+    "detailNotice": "This location is archived. Restore it to store products here again.",
+    "restoreNamed": "Restore {{name}}"
   },
   "masterDetailSubtitle": "Pick a location to see what is inside it, its products and its settings.",
   "select": {

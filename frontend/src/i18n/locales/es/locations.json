@@ -318,7 +318,8 @@
     "restore": "Restaurar",
     "emptyTitle": "No hay nada archivado",
     "emptyDescription": "Las ubicaciones archivadas aparecen aquí y se pueden restaurar.",
-    "detailNotice": "Esta ubicación está archivada. Restáurala para volver a guardar productos aquí."
+    "detailNotice": "Esta ubicación está archivada. Restáurala para volver a guardar productos aquí.",
+    "restoreNamed": "Restaurar {{name}}"
   },
   "masterDetailSubtitle": "Elige una ubicación para ver su contenido, sus productos y su configuración.",
   "select": {

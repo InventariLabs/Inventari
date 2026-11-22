@@ -219,7 +219,11 @@
     "addRolePlaceholder": "Escolha um perfil…",
     "roleAddsNobody": "Ninguém novo para adicionar — todos os usuários ativos com o perfil “{{role}}” já estão indicados.",
     "roleMembersFailed": "Não foi possível ler quem tem esse perfil.",
-    "waitingUnavailable": "Não foi possível verificar o que está aguardando neste fluxo, então ele não pode ser desativado agora. Feche esta janela e tente de novo."
+    "waitingUnavailable": "Não foi possível verificar o que está aguardando neste fluxo, então ele não pode ser desativado agora. Feche esta janela e tente de novo.",
+    "editNamed": "Editar {{name}}",
+    "deactivateNamed": "Desativar {{name}}",
+    "activateNamed": "Ativar {{name}}",
+    "deleteNamed": "Excluir {{name}}"
   },
   "request": {
     "pending": "Pendente",
@@ -286,7 +290,9 @@
     "deadEndStepAskRequesterUnnamed": "Peça a quem fez a solicitação que a retire.",
     "deadEndLinkMembers": "Membros e perfis",
     "deadEndLinkRoles": "Perfis",
-    "deadEndLinkSettings": "Configurações de aprovação"
+    "deadEndLinkSettings": "Configurações de aprovação",
+    "approveNamed": "Aprovar {{name}}",
+    "rejectNamed": "Rejeitar {{name}}"
   },
   "deleteWorkflow": "Excluir fluxo",
   "deleteWorkflowConfirm": "Excluir este fluxo? Ele sai desta lista. As solicitações já feitas nele são mantidas no painel de Aprovações, com as etapas por que passaram.",

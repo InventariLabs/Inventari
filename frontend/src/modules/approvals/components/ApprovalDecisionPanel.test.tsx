@@ -69,7 +69,7 @@ describe("ApprovalDecisionPanel", () => {
     );
     expect(screen.getByText("Decision")).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Approve" }),
+      screen.queryByRole("button", { name: /^Approve/ }),
     ).not.toBeInTheDocument();
   });
 
@@ -145,10 +145,10 @@ describe("ApprovalDecisionPanel", () => {
     );
 
     expect(
-      screen.queryByRole("button", { name: "Approve" }),
+      screen.queryByRole("button", { name: /^Approve/ }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Reject" }),
+      screen.queryByRole("button", { name: /^Reject/ }),
     ).not.toBeInTheDocument();
     // Withdrawing is not a decision — the requester keeps it.
     expect(

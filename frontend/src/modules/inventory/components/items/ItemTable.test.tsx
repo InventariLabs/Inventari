@@ -453,7 +453,7 @@ describe("ItemTable — always-visible row actions", () => {
   it("never hides the actions behind hover opacity", () => {
     render(<ItemTable {...baseProps} items={[makeItem("1")]} />);
 
-    const deleteButton = screen.getByRole("button", { name: /^delete$/i });
+    const deleteButton = screen.getByRole("button", { name: /^delete item /i });
     const container = deleteButton.parentElement as HTMLElement;
     expect(container.className).not.toMatch(/opacity-40/);
     expect(container.className).not.toMatch(/group-hover/);
@@ -462,7 +462,7 @@ describe("ItemTable — always-visible row actions", () => {
   it("separates Delete and marks it danger at rest", () => {
     render(<ItemTable {...baseProps} items={[makeItem("1")]} />);
 
-    const deleteButton = screen.getByRole("button", { name: /^delete$/i });
+    const deleteButton = screen.getByRole("button", { name: /^delete item /i });
     expect(deleteButton.className).toMatch(/text-on-danger/);
 
     const divider = deleteButton.previousElementSibling;
@@ -495,7 +495,7 @@ describe("ItemTable — always-visible row actions", () => {
     expect(onItemClick).toHaveBeenCalledWith(
       expect.objectContaining({ id: "1" }),
     );
-    expect(screen.queryByRole("button", { name: /^edit$/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^edit item /i })).toBeNull();
   });
 
   it("hides Delete from a writer without items:delete, and keeps the rest", () => {
@@ -503,8 +503,10 @@ describe("ItemTable — always-visible row actions", () => {
       <ItemTable {...baseProps} canDelete={false} items={[makeItem("1")]} />,
     );
 
-    expect(screen.getByRole("button", { name: /^edit$/i })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /^delete$/i })).toBeNull();
+    expect(
+      screen.getByRole("button", { name: /^edit item /i }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^delete item /i })).toBeNull();
   });
 });
 
@@ -549,9 +551,11 @@ describe("ItemTable — symmetric quantity actions", () => {
     );
 
     expect(
-      screen.getByRole("button", { name: "Remove 1 unit" }),
+      screen.getByRole("button", { name: /^Remove 1 unit of Item / }),
     ).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: "Add 1 unit" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: /^Add 1 unit to / }),
+    );
 
     expect(onAddOne).toHaveBeenCalledWith("1");
   });
@@ -690,7 +694,7 @@ describe("ItemTable — the storage cell is one click target", () => {
       renderUsedUp();
 
       expect(
-        screen.queryByRole("button", { name: "Add 1 unit" }),
+        screen.queryByRole("button", { name: /^Add 1 unit to / }),
       ).not.toBeInTheDocument();
     });
   });
@@ -851,23 +855,33 @@ describe("ItemTable — the product code is read where it is written", () => {
  * `pointer-events-none`).
  */
 describe("ItemTable — row actions carry their words", () => {
-  const NAMES = ["Remove 1 unit", "Add 1 unit", "Edit", "Delete"];
+  // The tooltip carries the visible words; the accessible name starts with
+  // them and adds the product, so each row's buttons tell apart (WCAG 2.5.3).
+  const NAMES: [words: string, name: RegExp][] = [
+    ["Remove 1 unit", /^Remove 1 unit of Item 1$/],
+    ["Add 1 unit", /^Add 1 unit to Item 1$/],
+    ["Edit", /^Edit Item 1$/],
+    ["Delete", /^Delete Item 1$/],
+  ];
 
   it("shows every icon action's words in a tooltip, the same words as its name", () => {
     render(<ItemTable {...baseProps} items={[makeItem("1")]} />);
 
-    for (const name of NAMES) {
+    for (const [words, name] of NAMES) {
       const button = screen.getByRole("button", { name });
       const tip = within(button).getByRole("tooltip");
-      expect(tip).toHaveTextContent(name);
-      expect(button.getAttribute("aria-label")).toBe(tip.textContent);
+      expect(tip).toHaveTextContent(words);
+      expect(button.getAttribute("aria-label")).toMatch(name);
+      expect(button.getAttribute("aria-label")).toContain(
+        tip.textContent ?? "",
+      );
     }
   });
 
   it("reveals the tooltip on hover and on focus — jsdom has no layout, so this pins the classes that do", () => {
     render(<ItemTable {...baseProps} items={[makeItem("1")]} />);
 
-    for (const name of NAMES) {
+    for (const [, name] of NAMES) {
       const button = screen.getByRole("button", { name });
       const tip = within(button).getByRole("tooltip");
       expect(button.className).toContain("group/tooltip");
@@ -887,7 +901,7 @@ describe("ItemTable — row actions carry their words", () => {
     // first. The words live in one place now — here and in the name.
     render(<ItemTable {...baseProps} items={[makeItem("1")]} />);
 
-    for (const name of NAMES) {
+    for (const [, name] of NAMES) {
       const button = screen.getByRole("button", { name });
       expect(button).not.toHaveAttribute("title");
     }

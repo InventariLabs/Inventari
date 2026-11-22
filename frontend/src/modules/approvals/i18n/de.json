@@ -219,7 +219,11 @@
     "addRolePlaceholder": "Rolle wählen…",
     "roleAddsNobody": "Niemand Neues hinzuzufügen — alle aktiven Personen mit der Rolle „{{role}}“ sind bereits benannt.",
     "roleMembersFailed": "Es konnte nicht gelesen werden, wer diese Rolle hat.",
-    "waitingUnavailable": "Es konnte nicht geprüft werden, was auf diesen Ablauf wartet, daher lässt er sich jetzt nicht ausschalten. Schließen Sie dieses Fenster und versuchen Sie es erneut."
+    "waitingUnavailable": "Es konnte nicht geprüft werden, was auf diesen Ablauf wartet, daher lässt er sich jetzt nicht ausschalten. Schließen Sie dieses Fenster und versuchen Sie es erneut.",
+    "editNamed": "{{name}} bearbeiten",
+    "deactivateNamed": "{{name}} deaktivieren",
+    "activateNamed": "{{name}} aktivieren",
+    "deleteNamed": "{{name}} löschen"
   },
   "request": {
     "pending": "Ausstehend",
@@ -286,7 +290,9 @@
     "deadEndStepAskRequesterUnnamed": "Bitten Sie die Person, die die Anfrage gestellt hat, sie zurückzuziehen.",
     "deadEndLinkMembers": "Mitglieder und Rollen",
     "deadEndLinkRoles": "Rollen",
-    "deadEndLinkSettings": "Genehmigungseinstellungen"
+    "deadEndLinkSettings": "Genehmigungseinstellungen",
+    "approveNamed": "{{name}} genehmigen",
+    "rejectNamed": "{{name}} ablehnen"
   },
   "deleteWorkflow": "Workflow löschen",
   "deleteWorkflowConfirm": "Diesen Workflow löschen? Er verschwindet aus dieser Liste. Bereits gestellte Anfragen bleiben in der Genehmigungsübersicht erhalten, mit den Stufen, die sie durchlaufen haben.",

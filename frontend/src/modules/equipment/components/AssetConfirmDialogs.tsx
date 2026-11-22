@@ -6,8 +6,10 @@ interface AssetConfirmDialogsProps {
   showBulkRetireConfirm: boolean;
   showBulkArchiveConfirm: boolean;
   showBulkPurgeConfirm: boolean;
-  restoreTarget: string | null;
-  purgeTarget: string | null;
+  /** The archived asset a pending restore or permanent delete is about. */
+  targets: { restore: string | null; purge: string | null };
+  /** The archive the targets come from, so each dialog names its asset. */
+  archived?: { id: string; name: string }[];
   // `unknown`, not `void`: each of these returns the promise the dialog awaits
   // before deciding whether to close (see ConfirmDialog's `onConfirm`).
   onBulkRetire: () => unknown;
@@ -28,8 +30,8 @@ export function AssetConfirmDialogs({
   showBulkRetireConfirm,
   showBulkArchiveConfirm,
   showBulkPurgeConfirm,
-  restoreTarget,
-  purgeTarget,
+  targets,
+  archived = [],
   onBulkRetire,
   onBulkArchive,
   onBulkPurge,
@@ -42,6 +44,8 @@ export function AssetConfirmDialogs({
   onCancelPurge,
 }: AssetConfirmDialogsProps) {
   const { t } = useTranslation("equipment");
+  const restoreName = archived.find((a) => a.id === targets.restore)?.name;
+  const purgeName = archived.find((a) => a.id === targets.purge)?.name;
 
   return (
     <>
@@ -80,25 +84,33 @@ export function AssetConfirmDialogs({
       />
 
       <ConfirmDialog
-        open={restoreTarget !== null}
-        title={t("actions.restore")}
+        open={targets.restore !== null}
+        title={
+          restoreName
+            ? t("actions.restoreNamed", { name: restoreName })
+            : t("actions.restore")
+        }
         message={t("detail.confirm_restore_msg")}
         confirmLabel={t("actions.restore")}
         cancelLabel={t("common:actions.cancel", "Cancel")}
         variant="default"
-        onConfirm={() => restoreTarget && onRestore(restoreTarget)}
+        onConfirm={() => targets.restore && onRestore(targets.restore)}
         onCancel={onCancelRestore}
       />
 
       <ConfirmDialog
-        open={purgeTarget !== null}
-        title={t("detail.confirm_purge")}
+        open={targets.purge !== null}
+        title={
+          purgeName
+            ? t("detail.confirm_purge_named", { name: purgeName })
+            : t("detail.confirm_purge")
+        }
         message={t("detail.confirm_purge_msg")}
         confirmLabel={t("actions.purge")}
         cancelLabel={t("common:actions.cancel", "Cancel")}
         variant="danger"
         errorFallback={t("list.purge_failed")}
-        onConfirm={() => purgeTarget && onSinglePurge(purgeTarget)}
+        onConfirm={() => targets.purge && onSinglePurge(targets.purge)}
         onCancel={onCancelPurge}
       />
     </>

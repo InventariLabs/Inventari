@@ -71,7 +71,7 @@ test("a visitor confirms an order without prices and sees it through", async ({
   // The demo's workflow has two stages, and the visitor decides each.
   for (const stage of ["Team lead", "Finance"]) {
     await page
-      .getByRole("button", { name: /^approve$/i })
+      .getByRole("button", { name: /^approve( .+)?$/i })
       .first()
       .click();
     const decide = page.getByRole("alertdialog");

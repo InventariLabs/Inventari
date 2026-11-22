@@ -199,7 +199,7 @@ describe("maintenance total cost", () => {
       screen.queryByRole("button", { name: "Add Entry" }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Delete maintenance entry" }),
+      screen.queryByRole("button", { name: /^Delete maintenance entry / }),
     ).not.toBeInTheDocument();
   });
 
