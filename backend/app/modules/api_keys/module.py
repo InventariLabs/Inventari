@@ -9,6 +9,7 @@ from app.core.api_key_auth import (
     register_api_key_resolver,
     register_issued_api_keys,
 )
+from app.core.contracts import API_KEY_WITHHELD_PERMISSIONS
 from app.core.define_module import define_module
 
 from .api_key_service import explain_refusal_async, issued_key_check_async
@@ -46,10 +47,15 @@ async def _resolve_api_key(db: AsyncSession, raw_key: str) -> ApiKeyIdentity | N
         return None
     # SQLAlchemy types these attributes as Column[...]; at runtime they are
     # the values.
+    # The withheld list is applied where the key acts, not only where it is
+    # issued: a permission on it stops working for the keys already carrying
+    # it, and a key row holding ``admin:access`` does not pass the
+    # administrator gate.
+    withheld = {permission.value for permission in API_KEY_WITHHELD_PERMISSIONS}
     return ApiKeyIdentity(
         user_id=cast('UUID', api_key.user_id),
         key_prefix=cast('str', api_key.key_prefix),
-        permissions=frozenset(cast('list[str]', api_key.permissions)),
+        permissions=frozenset(cast('list[str]', api_key.permissions)) - withheld,
         scopes=tuple(cast('list[str]', api_key.scope_names)),
     )
 

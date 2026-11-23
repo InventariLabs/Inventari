@@ -142,9 +142,9 @@ export function useOpenReplenishmentLink(
 }
 
 /**
- * The people a task can be given to: the organization's active members who
- * hold the grant the tasks need — a member who can only read is on the list of
- * members and cannot do any of them.
+ * The people a task can be given to, by the grant its action needs — a member
+ * who can only read is on the list of members and cannot do any of them, and
+ * a count is not offered to someone who writes only the warehouse.
  *
  * The cache entry holds the full member records, the shape every other reader
  * of this key stores (the approvals pickers, the audit-log filters); the
@@ -165,18 +165,37 @@ export function useAssignableMembers(enabled: boolean) {
     enabled,
     staleTime: 30_000,
   });
+  const named = useMemo(() => {
+    if (!members.data) return undefined;
+    const byId = new Map(
+      members.data.map((member) => [
+        member.id,
+        member.full_name || member.email,
+      ]),
+    );
+    return byId;
+  }, [members.data]);
+  const byPermission = useMemo(() => {
+    if (!named || !holders.data) return undefined;
+    return Object.fromEntries(
+      Object.entries(holders.data.byPermission).map(([grant, ids]) => [
+        grant,
+        ids
+          .filter((id) => named.has(id))
+          .map((id) => ({ id, name: named.get(id) ?? id })),
+      ]),
+    );
+  }, [named, holders.data]);
   const data = useMemo(() => {
-    if (!members.data || !holders.data) return undefined;
-    const allowed = new Set(holders.data);
-    return members.data
-      .filter((member) => allowed.has(member.id))
-      .map((member) => ({
-        id: member.id,
-        name: member.full_name || member.email,
-      }));
-  }, [members.data, holders.data]);
+    if (!named || !holders.data) return undefined;
+    const allowed = new Set(holders.data.userIds);
+    return [...named.entries()]
+      .filter(([id]) => allowed.has(id))
+      .map(([id, name]) => ({ id, name }));
+  }, [named, holders.data]);
   return {
     data,
+    byPermission,
     isError: members.isError || holders.isError,
   };
 }

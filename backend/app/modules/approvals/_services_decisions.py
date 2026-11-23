@@ -82,12 +82,21 @@ def stage_accepts_approver(
 async def _may_decide_on_own_request(
     db: AsyncSession, org_id: UUID, approver_id: UUID
 ) -> bool:
-    """True when this organization lets admins act on their own requests."""
+    """True when this organization lets its administrators decide their own.
+
+    "Administrators" is the authority ``get_current_admin_user`` and every
+    "for the administrators" notice use: the built-in level, and a custom role
+    carrying ``admin:access`` or ``system:config:write``. The hatch follows
+    that authority, so an organization that built its own administration role
+    gets it too.
+    """
     settings = await core_api.settings.get_async(db, org_id, 'approvals') or {}
     if not settings.get(SELF_APPROVE_SETTING, False):
         return False
-    approver = await core_api.users.get_async(db, org_id, approver_id)
-    return bool(approver and approver.role == 'admin')
+    administrators = await core_api.roles.administrators_async(
+        db, organization_id=org_id
+    )
+    return approver_id in administrators
 
 
 async def approve_stage(

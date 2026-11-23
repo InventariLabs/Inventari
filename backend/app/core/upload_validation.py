@@ -19,11 +19,12 @@ from __future__ import annotations
 
 import io
 import os
+import threading
 import zipfile
 from dataclasses import dataclass
 
 from fastapi import HTTPException, UploadFile
-from PIL import Image
+from PIL import Image, ImageFile
 
 from app.core.exceptions import ServiceRejectionError
 from app.core.file_signature import resolve_mime, validate_signature
@@ -192,6 +193,12 @@ class ImageUnreadableError(ServiceRejectionError):
         super().__init__('image_unreadable')
 
 
+#: Serialises the one process-wide switch :func:`decode_image` has to hold
+#: still while a picture is read. Two uploads read at once must not restore
+#: each other's value.
+_DECODE_LOCK = threading.Lock()
+
+
 def decode_image(content: bytes) -> Image.Image:
     """The picture in *content*, decoded, once its canvas is known to fit.
 
@@ -200,13 +207,32 @@ def decode_image(content: bytes) -> Image.Image:
     refuse. Pillow reports a file that is not a picture, or not a whole one,
     in several classes; each is raised here as :class:`ImageUnreadableError`,
     which is all a caller needs to catch.
+
+    ``ImageFile.LOAD_TRUNCATED_IMAGES`` is a process-wide switch, and
+    importing WeasyPrint — which the backend does for PDFs — turns it on so a
+    truncated image in a template does not stop a render. With it on, a picture
+    cut off half-way decodes with its missing pixels filled in, so acceptance
+    must not depend on what was imported first. It is held off for the read
+    and put back afterwards: the file itself says whether it is whole.
     """
     try:
-        picture = Image.open(io.BytesIO(content))
-        width, height = picture.size
-        if width * height > MAX_UPLOAD_IMAGE_PIXELS:
-            raise ImageUnreadableError
-        picture.load()
+        with _DECODE_LOCK:
+            was_truncating = ImageFile.LOAD_TRUNCATED_IMAGES
+            ImageFile.LOAD_TRUNCATED_IMAGES = False
+            try:
+                picture = Image.open(io.BytesIO(content))
+                width, height = picture.size
+                if width * height > MAX_UPLOAD_IMAGE_PIXELS:
+                    raise ImageUnreadableError
+                # PngImageFile.verify checks its chunks and CRCs; formats
+                # whose verify is a no-op are caught by the strict decode
+                # below. ``verify`` leaves the picture unusable, so it is
+                # opened again for the pixels.
+                picture.verify()
+                picture = Image.open(io.BytesIO(content))
+                picture.load()
+            finally:
+                ImageFile.LOAD_TRUNCATED_IMAGES = was_truncating
     except ImageUnreadableError:
         raise
     except (OSError, SyntaxError, ValueError, Image.DecompressionBombError) as exc:

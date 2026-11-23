@@ -79,7 +79,11 @@ export function BoMEntrySlot({ data }: BoMEntrySlotProps) {
         onClick={() => (data?.requestLeave ? data.requestLeave(go) : go())}
       >
         <ClipboardList size={16} />
-        {recipeId ? t("bomEntry.editRecipe") : t("bomEntry.createRecipe")}
+        {recipeId
+          ? canManage
+            ? t("bomEntry.editRecipe")
+            : t("bomEntry.openRecipe")
+          : t("bomEntry.createRecipe")}
       </Button>
     </div>
   );

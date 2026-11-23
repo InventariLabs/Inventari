@@ -29,10 +29,10 @@ export function useCanWrite(moduleName: string): boolean {
 /**
  * True when the account may change how *moduleName* behaves.
  *
- * Only for modules that declare a `:manage` key of their own — `warehouse`
- * and `purchase_orders` do, and their backends check exactly that key.
- * Asking it of a module without one denies everybody but an administrator,
- * which is a different rule than the module wrote down.
+ * Only for modules that declare a `:manage` key of their own — `maker`,
+ * `warehouse` and `purchase_orders` do, and their backends check exactly
+ * that key. Asking it of a module without one denies everybody but an
+ * administrator, which is a different rule than the module wrote down.
  */
 export function useCanManage(moduleName: string): boolean {
   return useHasPermission(`${moduleName}:manage`);

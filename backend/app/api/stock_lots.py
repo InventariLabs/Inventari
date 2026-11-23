@@ -166,7 +166,11 @@ async def _trace_or_404(
     return trace
 
 
-@router.get('/stock-lots/{lot_id}/trace', response_model=LotTraceDTO)
+@router.get(
+    '/stock-lots/{lot_id}/trace',
+    response_model=LotTraceDTO,
+    dependencies=[require_permission(SystemPermission.PARTNERS_READ)],
+)
 async def trace_stock_lot(
     lot_id: UUID,
     _: object = require_permission(SystemPermission.ITEMS_READ),
@@ -183,7 +187,11 @@ async def trace_stock_lot(
     return await _trace_or_404(db, current_user, lot_id)
 
 
-@router.get('/stock-lots/{lot_id}/trace/export/xlsx', response_model=None)
+@router.get(
+    '/stock-lots/{lot_id}/trace/export/xlsx',
+    response_model=None,
+    dependencies=[require_permission(SystemPermission.PARTNERS_READ)],
+)
 async def export_stock_lot_trace_xlsx(
     lot_id: UUID,
     tz: str | None = Query(

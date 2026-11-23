@@ -46,15 +46,25 @@ from .schemas import (
 )
 
 #: The doors moved here from the warehouse router and keep its guard: reading a
-#: document's approval needs ``warehouse:read``, raising or deciding one holds
-#: or releases the document and needs ``warehouse:write`` — a decision needs
-#: ``approvals:approve`` on top.
+#: document's approval needs ``warehouse:read``, and raising one holds the
+#: document and needs ``warehouse:write``.
 router = APIRouter(
     prefix='/documents',
     dependencies=[
         Depends(require_module('warehouse')),
         require_read_write('warehouse:read', 'warehouse:write'),
     ],
+)
+
+#: The decision doors answer to the approvals engine, not to the document's
+#: read or write grant. A person the queue names on the open stage decides
+#: through delegation with ``approvals:read``, and the document is released by
+#: the decision listener; reading or editing the document is a different act.
+#: Kept apart from ``router`` because a guard on the parent would refuse that
+#: person before the handler's own check ran.
+decision_router = APIRouter(
+    prefix='/documents',
+    dependencies=[Depends(require_module('warehouse'))],
 )
 
 
@@ -115,7 +125,7 @@ async def request_document_approval(
     return request
 
 
-@router.post(
+@decision_router.post(
     '/{doc_id}/approve',
     response_model=ApprovalRequestSchema,
 )
@@ -144,7 +154,7 @@ async def approve_document(
         ) from exc
 
 
-@router.post(
+@decision_router.post(
     '/{doc_id}/reject',
     response_model=ApprovalRequestSchema,
 )

@@ -8565,6 +8565,11 @@ export interface paths {
         /**
          * List Org Members
          * @description List members of the current user's organization.
+         *
+         *     ``admin:access`` opens it beside ``org:read``: an administrator with a
+         *     custom role reads the audit log, and its member filter names the people
+         *     in it, so asking that screen for ``org:read`` refused a lookup of the
+         *     same names the log already shows.
          */
         get: operations["list_org_members_api_v1_users_org_members_get"];
         put?: never;
@@ -11092,9 +11097,12 @@ export interface paths {
         };
         /**
          * List Work Item Assignees
-         * @description Who a task can be given to: the members who hold the warehouse write
-         *     grant, which every task on the list needs to be done. A viewer is a member
-         *     of the organization and cannot do any of them.
+         * @description Who a task can be given to, by the grant each kind of task needs.
+         *
+         *     A document, a putaway or a hand-typed task is ``warehouse:write`` work; a
+         *     count, a production run and a replenishment open another module's screen
+         *     and need that module's write. The picker in the screen offers, row by
+         *     row, the people who hold everything that row's action needs.
          */
         get: operations["list_work_item_assignees_api_v1_warehouse_work_items_assignees_get"];
         put?: never;
@@ -29747,10 +29755,20 @@ export interface components {
         /**
          * WorkItemAssignees
          * @description The members a task can be given to: those who hold what doing it needs.
+         *
+         *     ``user_ids`` is everyone who could do a task of some kind. The kinds differ
+         *     in what they need — a count is ``stock_takes:write``, a run ``maker:write``,
+         *     a replenishment both the warehouse's and the orders' — so
+         *     ``by_permission`` names the holders of each, and a picker offers the people
+         *     who hold everything its row needs.
          */
         WorkItemAssignees: {
             /** User Ids */
             user_ids: string[];
+            /** By Permission */
+            by_permission: {
+                [key: string]: string[];
+            };
         };
         /**
          * WorkItemCustomCreate

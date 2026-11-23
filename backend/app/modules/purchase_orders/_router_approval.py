@@ -33,6 +33,7 @@ from app.core.deps import (
     require_org,
 )
 from app.core.exceptions import NotFoundException
+from app.core.modules import require_module
 from app.i18n.service import get_current_lang
 from app.modules.approvals.approvals_api import approvals_api
 from app.modules.approvals.schemas import (
@@ -59,6 +60,15 @@ async def _get_po_or_404(db: AsyncSession, org_id: UUID, po_id: UUID) -> Any:
     return po
 
 
+#: The order's decision doors answer to the approvals engine, not to the
+#: order's read or write grant. A person the queue names on the open stage
+#: decides through delegation with ``approvals:read``, and the decision
+#: listener moves the order; reading or editing it is a different act. Kept
+#: apart from the module's write-guarded router because that guard would
+#: refuse the named approver before the handler's own check ran.
+decision_router = APIRouter(dependencies=[Depends(require_module('purchase_orders'))])
+
+
 def register_approval_routes(router: APIRouter) -> None:
     @router.post('/{po_id}/request-approval', response_model=ApprovalRequestSchema)
     async def request_approval_endpoint(
@@ -73,7 +83,24 @@ def register_approval_routes(router: APIRouter) -> None:
             db, org_id, po, current_user.id, body.notes
         )
 
-    @router.post(
+    @router.get(
+        '/{po_id}/approval-requirement',
+        response_model=PurchaseOrderApprovalRequirement,
+    )
+    async def get_approval_requirement_endpoint(
+        po_id: UUID,
+        current_user: UserContextDTO = Depends(get_current_user_context),
+        db: AsyncSession = Depends(get_async_db, scope='function'),
+        org_id: UUID = Depends(require_org),
+    ) -> PurchaseOrderApprovalRequirement:
+        po = await _get_po_or_404(db, org_id, po_id)
+        return await confirm_approval_requirement(db, org_id, po, current_user.id)
+
+
+def register_decision_routes() -> None:
+    """Register the approve and reject doors on ``decision_router``."""
+
+    @decision_router.post(
         '/{po_id}/approve',
         response_model=ApprovalRequestSchema,
     )
@@ -93,7 +120,7 @@ def register_approval_routes(router: APIRouter) -> None:
         )
         return request_obj
 
-    @router.post(
+    @decision_router.post(
         '/{po_id}/reject',
         response_model=ApprovalRequestSchema,
     )
@@ -109,16 +136,3 @@ def register_approval_routes(router: APIRouter) -> None:
             db, org_id, 'purchase_order', po.id, current_user
         )
         return await reject_purchase_order(db, org_id, po, current_user.id, body.notes)
-
-    @router.get(
-        '/{po_id}/approval-requirement',
-        response_model=PurchaseOrderApprovalRequirement,
-    )
-    async def get_approval_requirement_endpoint(
-        po_id: UUID,
-        current_user: UserContextDTO = Depends(get_current_user_context),
-        db: AsyncSession = Depends(get_async_db, scope='function'),
-        org_id: UUID = Depends(require_org),
-    ) -> PurchaseOrderApprovalRequirement:
-        po = await _get_po_or_404(db, org_id, po_id)
-        return await confirm_approval_requirement(db, org_id, po, current_user.id)

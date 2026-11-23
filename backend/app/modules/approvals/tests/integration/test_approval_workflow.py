@@ -709,6 +709,67 @@ class TestSelfApprovalGuard:
         )
         assert result.status == 'APPROVED'
 
+    async def test_a_custom_administration_role_can_approve_its_own_request(
+        self,
+        real_async_db_session: AsyncSession,
+        async_approval_org: Organization,
+        async_make_user: Any,
+        single_stage_workflow_payload: dict[str, Any],
+    ) -> None:
+        """The hatch follows the authority, not the literal ``role`` column.
+
+        An organization that built a custom administration role instead of
+        handing out the built-in level gives it ``admin:access``, which
+        ``get_current_admin_user`` and every "for the administrators" notice
+        admit — and the self-approval setting admits its holder too.
+        """
+        from app.core.public_api import core_api
+        from app.models.role import Role, UserRole
+        from app.modules.approvals._settings import SELF_APPROVE_SETTING
+
+        administrator = await async_make_user(
+            email=f'custom-admin_{uuid.uuid4().hex[:8]}@example.com', role='user'
+        )
+        role = Role(
+            name=f'custom_administrator_{uuid.uuid4().hex[:8]}',
+            permissions=['admin:access'],
+            organization_id=async_approval_org.id,
+        )
+        real_async_db_session.add(role)
+        await real_async_db_session.flush()
+        real_async_db_session.add(UserRole(user_id=administrator.id, role_id=role.id))
+        await real_async_db_session.commit()
+        await core_api.settings.set_bulk_async(
+            real_async_db_session,
+            async_approval_org.id,
+            'approvals',
+            {SELF_APPROVE_SETTING: True},
+        )
+        await create_workflow(
+            real_async_db_session,
+            async_approval_org.id,
+            single_stage_workflow_payload['target_type'],
+            single_stage_workflow_payload['name'],
+            single_stage_workflow_payload['stages'],
+            is_active=True,
+        )
+        req = await request_approval(
+            real_async_db_session,
+            async_approval_org.id,
+            'document',
+            uuid.uuid4(),
+            administrator.id,
+        )
+
+        result = await approve_stage(
+            real_async_db_session,
+            async_approval_org.id,
+            req.id,
+            administrator.id,
+        )
+
+        assert result.status == 'APPROVED'
+
     async def test_cannot_reject_own_request(
         self,
         real_async_db_session: AsyncSession,

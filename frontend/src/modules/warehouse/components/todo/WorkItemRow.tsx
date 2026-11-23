@@ -37,6 +37,49 @@ export function useModuleWrites(): ModuleWrites {
   };
 }
 
+/** The grants a task's own button can need, keyed as the picker answers.
+ *
+ * A document's action and a putaway write to documents; a count, a production
+ * run and a replenishment open another module's screen and need that module's
+ * write. Reviewing an approval is open to whoever the queue named, which the
+ * picker cannot enumerate, so its holders are the approve grant's. */
+export function itemActionGrants(item: WorkItem): string[] {
+  if (item.source_kind === "replenishment") {
+    return ["warehouse:write", "purchase_orders:write"];
+  }
+  if (item.source_kind === "putaway") return ["warehouse:write"];
+  if (item.source_kind === "document") {
+    return item.next_action === "review_approval"
+      ? ["approvals:approve"]
+      : ["warehouse:write"];
+  }
+  switch (item.next_action) {
+    case "produce":
+      return ["maker:write"];
+    case "count":
+      return ["stock_takes:write"];
+    case "review_approval":
+      return ["approvals:approve"];
+    default:
+      return ["warehouse:write"];
+  }
+}
+
+/** The people who hold everything the task's own action needs. */
+export function assignableMembers(
+  item: WorkItem,
+  byPermission: Record<string, Member[]>,
+): Member[] {
+  const grants = itemActionGrants(item);
+  const [first, ...rest] = grants;
+  const base = byPermission[first] ?? [];
+  return base.filter((member) =>
+    rest.every((grant) =>
+      (byPermission[grant] ?? []).some((holder) => holder.id === member.id),
+    ),
+  );
+}
+
 /** Whether the account may press the task's button. A document's action
  * and a putaway write to documents; every other task opens a screen whose
  * work is a write in its own module, so the button is offered to an account
@@ -114,7 +157,7 @@ function StockCoverBadge({ cover }: { cover: WorkItem["stock_cover"] }) {
  */
 export function WorkItemRow({
   item,
-  members,
+  byPermission,
   canWrite,
   canAssign,
   selected,
@@ -129,7 +172,8 @@ export function WorkItemRow({
   onGiveBack,
 }: {
   item: WorkItem;
-  members: Member[];
+  /** The holders of each grant, so a row offers only people who can do it. */
+  byPermission: Record<string, Member[]>;
   canWrite: boolean;
   /** Whether the people to give a task to were loaded. */
   canAssign: boolean;
@@ -245,7 +289,7 @@ export function WorkItemRow({
             onChange={(e) => onAssign(item, e.target.value || null)}
           >
             <option value="">{t("todo.unassigned")}</option>
-            {members.map((member) => (
+            {assignableMembers(item, byPermission).map((member) => (
               <option key={member.id} value={member.id}>
                 {member.name}
               </option>

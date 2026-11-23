@@ -5,7 +5,11 @@ from fastapi import APIRouter, Depends
 from app.core.deps import require_read_write
 from app.core.modules import require_module
 
-from ._router_approval import register_approval_routes
+from ._router_approval import (
+    decision_router,
+    register_approval_routes,
+    register_decision_routes,
+)
 from ._router_import import register_import_routes
 from ._router_po import register_po_routes
 from ._router_pricelist import register_pricelist_routes
@@ -35,3 +39,10 @@ register_po_routes(router)
 register_import_routes(router)
 register_pricelist_routes(router)
 register_approval_routes(router)
+register_decision_routes()
+
+# The order's decision doors answer to the approvals engine and the order's
+# read, not to the order's write key (``_router_approval``). Their routes
+# carry that guard already; joining the module's routes here puts them under
+# the same mount without the write guard this router applies to its own.
+router.routes.extend(decision_router.routes)

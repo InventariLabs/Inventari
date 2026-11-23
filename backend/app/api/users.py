@@ -9,8 +9,8 @@ from app.core.contracts import SystemPermission, UserContextDTO
 from app.core.deps import (
     get_async_db,
     get_current_user_context,
+    require_any_permission,
     require_org,
-    require_permission,
 )
 from app.core.exceptions import NotFoundException
 from app.core.public_api import core_api
@@ -38,9 +38,17 @@ async def list_org_members(
     offset: int = Query(0, ge=0),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
-    _: object = require_permission(SystemPermission.ORG_READ),
+    _: object = require_any_permission(
+        SystemPermission.ORG_READ, SystemPermission.ADMIN_ACCESS
+    ),
 ) -> Any:
-    """List members of the current user's organization."""
+    """List members of the current user's organization.
+
+    ``admin:access`` opens it beside ``org:read``: an administrator with a
+    custom role reads the audit log, and its member filter names the people
+    in it, so asking that screen for ``org:read`` refused a lookup of the
+    same names the log already shows.
+    """
     org_id = require_org(current_user)
     members = await core_api.users.list_org_members_async(db, org_id)
     return PaginatedResponse.from_full_list(members, offset=offset, limit=limit)

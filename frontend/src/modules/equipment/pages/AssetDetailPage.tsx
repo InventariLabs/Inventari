@@ -60,9 +60,11 @@ export default function AssetDetailPage() {
   const restoreMutation = useRestoreEquipment();
   const { changeStatus: handleChangeStatus, isPending: isBulkEditing } =
     useChangeAssetStatus(id);
-  // Both reads are keyed by an asset id: an id the item read did not accept
-  // would only draw a validation error behind the not-found card.
-  const knownId = item ? (id ?? "") : "";
+  // Both reads are keyed by an asset id: an id the item read did not accept,
+  // or one the register does not list, would only draw a validation error
+  // behind the not-found card.
+  const knownId =
+    item && item.category?.context_tag === "equipment" ? (id ?? "") : "";
   const { data: approvalStatus } = useApprovalStatus(knownId);
   const { data: assignments } = useItemAssignmentHistory(knownId);
   const activeAssignment = assignments?.find((a) => !a.checked_in_at) ?? null;
@@ -208,7 +210,12 @@ export default function AssetDetailPage() {
     return <QueryError error={error} onRetry={() => void refetch()} />;
   }
 
-  if (!item) {
+  // The register's records are the categories its module claims. This card
+  // reads Core items, so a product whose category no module claims is a
+  // record the register does not list — the same "Asset not found" an
+  // equipment-only reader gets, instead of a product dressed as an asset
+  // with actions that then refuse.
+  if (!item || item.category?.context_tag !== "equipment") {
     return (
       <RecordNotFound
         title={t("detail.not_found")}

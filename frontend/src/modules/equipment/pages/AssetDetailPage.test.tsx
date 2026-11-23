@@ -37,6 +37,7 @@ function assetWith(overrides: {
     category_id: "cat-1",
     location_id: "loc-1",
     context_tag: "equipment",
+    category: { id: "cat-1", name: "Laptops", context_tag: "equipment" },
     quantity: 1,
     is_deleted: overrides.is_deleted ?? false,
     added_date: "2024-01-01T00:00:00Z",
@@ -548,6 +549,23 @@ describe("AssetDetailPage — an archived card", () => {
     expect(
       screen.queryByRole("button", { name: "Upload" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("shows not found for a product the register does not list", async () => {
+    // A product in an ordinary category, opened at /equipment/<id> by a
+    // reader who holds items:read. The register's screens must not dress it
+    // as an asset with actions the API then refuses.
+    server.use(
+      http.get(`/api/v1/items/${ITEM_ID}`, () =>
+        HttpResponse.json({
+          ...assetWith({}),
+          category: { id: "cat-2", name: "Groceries", context_tag: null },
+        }),
+      ),
+    );
+    renderDetail();
+
+    expect(await screen.findByText("Asset not found")).toBeInTheDocument();
   });
 
   it("asks for approval status and assignments only of an asset it found", async () => {

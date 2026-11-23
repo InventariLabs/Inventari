@@ -549,12 +549,36 @@ async def _claim_unassigned_async(
         raise _already_taken_error()
 
 
-async def assignable_user_ids_async(db: AsyncSession, org_id: UUID) -> list[UUID]:
-    """The members who hold ``warehouse:write``, the grant every task needs."""
-    holders = await core_api.roles.holders_of_permission_async(
-        db, organization_id=org_id, permission='warehouse:write'
-    )
-    return sorted(holders, key=str)
+#: The grants a task's next action can need. A document or a putaway is the
+#: warehouse's; a count, a production run and a replenishment open another
+#: module's screen and write there; reviewing an approval is the approver's.
+WORK_ITEM_ACTION_GRANTS = (
+    'warehouse:write',
+    'stock_takes:write',
+    'maker:write',
+    'purchase_orders:write',
+    'approvals:approve',
+)
+
+
+async def assignable_user_ids_async(
+    db: AsyncSession, org_id: UUID
+) -> dict[str, list[UUID]]:
+    """The members who hold each grant a task can need, by grant.
+
+    A count, a production run and a replenishment each open another module's
+    screen, so one grant is not the answer for every row. The screen asks per
+    row for the grants that row's action needs.
+    """
+    return {
+        permission: sorted(
+            await core_api.roles.holders_of_permission_async(
+                db, organization_id=org_id, permission=permission
+            ),
+            key=str,
+        )
+        for permission in WORK_ITEM_ACTION_GRANTS
+    }
 
 
 async def assign_work_item_async(
