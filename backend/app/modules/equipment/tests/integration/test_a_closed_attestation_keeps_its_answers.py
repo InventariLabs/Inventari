@@ -3,7 +3,8 @@
 A return after the campaign closed is a custody move, not a new answer: the
 detail of a completed campaign still carries what was confirmed or reported.
 On a live campaign an asset returned before it was answered is flagged as
-returned, while one already answered keeps its answer.
+returned, while one already answered keeps its answer. An asset returned
+before the campaign closed stays returned in the closed record.
 """
 
 from __future__ import annotations
@@ -164,3 +165,29 @@ class TestAClosedAttestationKeepsItsAnswers:
 
         assert item['status'] == 'CONFIRMED'
         assert item['returned'] is False
+
+    @pytest.mark.parametrize('closing', ['complete', 'cancel'])
+    def test_a_return_before_the_close_stays_returned_after_it(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        eq_item: Item,
+        db_session: Session,
+        closing: str,
+    ) -> None:
+        _, campaign_id = _launched(client, eq_auth_headers, db_session, eq_item)
+        _return_asset(db_session, eq_item)
+        client.post(
+            f'/api/v1/equipment/campaigns/{campaign_id}/{closing}',
+            headers=eq_auth_headers,
+        ).raise_for_status()
+
+        detail = client.get(
+            f'/api/v1/equipment/campaigns/{campaign_id}', headers=eq_auth_headers
+        ).json()
+        (row,) = detail['responses']
+
+        assert row['items'][0]['returned'] is True
+        assert row['assets_returned'] is True
+        assert detail['stats']['returned'] == 1
+        assert detail['stats']['pending'] == 0

@@ -1630,12 +1630,29 @@ batch yields. The first BOM of a product becomes its **Default**.
   **Multi-level view** shows BOMs used inside other BOMs, and for an ingredient
   that has a BOM of its own it says how much is on the shelf; tick **Always make
   fresh** on it to make it every time instead of using that stock (see 12.2).
-  **Process steps** describe the work.
+  **Process steps** describe the work, and each can say how many minutes it
+  takes (see *Labour from the steps* below).
+- **Price of an ingredient with no stock and no quote** — an ingredient made an
+  hour ago has no cost yet, so the formula would read as free. On its line,
+  **Set price** takes a price per unit. The price belongs to the product, so
+  every BOM that uses the ingredient costs it the same, and it is used only
+  when there is no stock cost and no supplier price: those answer first, and
+  the line says *not used* while they do. Leave the field empty to remove it.
 - **Cost & result** — the materials at what they cost you now, fixed costs per
-  batch (labour, packaging, overhead), and a **reference price** to compare
+  batch (packaging, overhead, other), the **labour from the steps**, and a **reference price** to compare
   with: a shop price (*Savings vs shop price*) or your selling price (*Margin*), as set in
   **Settings**.
 - **History** — the runs made from it.
+
+**Labour from the steps.** Give each process step the minutes it takes, and set
+the **Hourly rate for own work** in the Production settings. The BOM's labour is
+then its steps' minutes at that rate, shown as its own line beside the fixed
+costs and counted in the estimate, the preview and a run's actual cost. With no
+rate set — or a rate of zero — labour costs nothing in the estimates, and the
+BOM says how many minutes its steps take and links to the settings. Nobody
+clocks hours against a run: the time is the one written on the step. A **Labor**
+fixed-cost line is added on top of the computed labour, so keep only one of the
+two or the BOM says the labour may be counted twice.
 
 ![The cost of a plum butter BOM: $7.95 a unit against a reference price of $18.00, a margin of $10.05, and each ingredient's share of the cost](images/production-recipe-cost.webp)
 
@@ -1659,6 +1676,13 @@ missing. **Order what is missing** raises the purchase orders for it.
 ![The production plan for 23–29 November: three runs of plum butter, 8, 12 and 10 kg, planned for the 23rd, 24th and 25th and marked Covered, and a run of 12 kg on the 27th marked Partly covered, above the list of what the planned runs need — 13.23 kg of sugar against 10.07 kg in stock, 3.16 kg missing — with the Order what is missing button](images/production-plan.webp)
 
 ![The production plan on a phone: the planned plum butter runs of the week listed by day, each with its coverage, above the heading of what the runs need and the Order what is missing button](images/production-plan-phone.webp)
+
+A run that is planned reads the shelf honestly: the planned runs are counted
+one after another, by planned day and then by creation, so two runs that each
+fit on the shelf are not both shown as fine. The run list and a run's page say
+**Covered**, **Partly covered** or **Short** (see 12.5), and *Position in the plan* on the
+run says how much would be left of an ingredient after the runs planned before
+it. 12.5 describes the screen that shows all planned runs together.
 
 **Complete run** takes the materials off the shelves and puts the product into
 stock at the target location. You may enter the quantity actually produced; the
@@ -1786,6 +1810,55 @@ the default; a batch two BOMs went into gets no list, since neither is its
 own. It is never printed smaller than the letter the EU regulation allows
 on a small package; a label too small for it is refused and asks for a larger
 size.
+
+### 12.5 Planning runs ahead
+
+A run planned with **Plan the run** and a production day shows on
+**Production → Plan**.
+
+- **The period** — **Week** or **Month**, with arrows for the previous and the
+  next one. The planned runs stand under their days (a list by day on a phone).
+  A run with no day does not appear here.
+- **Moving a run** — **Move** on a run asks for a new day and saves it. Moving
+  it changes what the runs planned before it leave on the shelf, so the
+  coverage of the others can change too.
+- **What the planned runs need** — one list of everything the runs of the period
+  take, ingredient by ingredient, with **Needed** and three columns that answer
+  *do I have it?*:
+  - **In stock** — what is left on the shelf for this period, after the runs
+    planned before it have taken their share: a kilo on the shelf is not
+    offered to two runs.
+  - **On order** — what open purchase orders will bring, with their expected
+    dates. The column is absent while purchasing is off. A delivery ordered
+    for one run is not counted again for a later one.
+  - **Missing** — what is needed less what is in stock and on order.
+
+  Each run reads **Covered** when every ingredient it needs is there,
+  **Partly covered** when some of what it needs is there, and **Short** when
+  none of it is.
+
+  An ingredient with a BOM of its own counts on what the shelf holds of it and
+  on runs of it planned for the same day or earlier — never on a run planned
+  after it. An ingredient whose unit cannot be compared with stock is named
+  under the list and not counted.
+
+**Order what is missing** turns the missing quantities into action:
+
+- **One draft purchase order per supplier and currency**, from each
+  ingredient's best price in the supplier's own unit. Offers in your own
+  currency come first, and prices in different currencies are never compared by
+  their numbers. A volume price the shortage does not reach is not bought,
+  unless the whole order costs less that way. The orders are drafts: check and
+  send them from Purchasing.
+- **An ingredient with no supplier** goes to the shopping list instead.
+- **An ingredient you make yourself** — it has a BOM of its own — is not bought:
+  **Plan runs of what is missing** proposes it as a planned run for its day.
+
+The message after the click says how many draft orders were created, how many
+ingredients went to the shopping list and how many are to be made; an
+ingredient with neither a supplier nor a list is counted as left over. A product
+you make that falls below its reorder minimum is proposed as a production run
+in To do and in the reorder alerts, not as a purchase.
 
 ---
 

@@ -80,8 +80,14 @@ test.describe("Warehouse — Configuration", () => {
       .getByRole("link", { name: "History" })
       .click();
 
-    await expect(page.getByText(/holds unsaved changes/i)).toBeVisible();
-    await page.getByRole("button", { name: "Cancel" }).click();
+    // The page's save bar says "You have unsaved changes" from the first
+    // edit on, so the question is looked for inside the guard's own dialog.
+    const leave = page.getByRole("alertdialog", { name: "Unsaved changes" });
+    await expect(leave).toContainText(
+      /you have unsaved changes\. Leave anyway\?/,
+    );
+    await leave.getByRole("button", { name: "Cancel" }).click();
+    await expect(leave).toBeHidden();
     await expect(page).toHaveURL(/\/warehouse\/settings/);
   });
 });

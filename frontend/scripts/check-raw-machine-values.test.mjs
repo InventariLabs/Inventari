@@ -51,6 +51,29 @@ describe("a translation key built from an id", () => {
     expect(dynamicKeysIn('t("table.columns.name")')).toEqual([]);
   });
 
+  it("is found when the key is held in a variable first", () => {
+    const found = dynamicKeysIn(
+      "const key = `items:fields.${field.key}`;\nconst out = tDyn(key);",
+    );
+
+    expect(found).toEqual([
+      { line: 2, template: "items:fields.${field.key}", enumerated: null },
+    ]);
+  });
+
+  it("reads the enumeration above the call that uses a held key", () => {
+    const [found] = dynamicKeysIn(
+      "const key = `table.columns.${id}`;\n// i18n-keys: name\nt(key);",
+    );
+
+    expect(found.enumerated).toEqual(["name"]);
+  });
+
+  it("leaves a variable that holds a literal key alone", () => {
+    expect(dynamicKeysIn('const key = `table.name`;\nt(key);')).toEqual([]);
+    expect(dynamicKeysIn("t(key);")).toEqual([]);
+  });
+
   it("fails an enumeration that names a key one catalogue lacks", () => {
     const [found] = dynamicKeysIn(
       "// i18n-keys: name | assigned_to\nt(`table.columns.${key}`)",

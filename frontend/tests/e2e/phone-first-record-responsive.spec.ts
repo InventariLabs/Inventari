@@ -48,9 +48,13 @@ const css =
   (selector: string): RecordOf =>
   (page) =>
     page.locator(selector).first();
-/** A document number such as INT/2026/004, or MM/2026/11/0006 when the format carries the month. */
-const documentNumber: RecordOf = (page) =>
-  page.getByText(/^[A-Z]+\/\d{4}(?:\/\d{2})?\/\d+$/).first();
+/**
+ * The register's first document, numbered or a draft that has no number yet:
+ * each one's tick box is named after it ("Select INT/2026/004",
+ * "Select Transfer – draft 112E"). A draft dated ahead sorts above them all.
+ */
+const firstDocument: RecordOf = (page) =>
+  page.getByRole("checkbox", { name: /^Select (?!all$)/ }).first();
 
 // Every list of the main navigation and of the overview cards. The
 // approvals screens need a workflow that holds every document of the
@@ -121,7 +125,7 @@ const ROUTES: ListRoute[] = [
   {
     name: "warehouse documents",
     path: "/warehouse/all",
-    record: documentNumber,
+    record: firstDocument,
   },
   {
     name: "warehouse codes and labels",
