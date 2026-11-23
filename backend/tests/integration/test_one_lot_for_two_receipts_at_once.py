@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import asyncio
 import time
-from datetime import date
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -59,8 +59,9 @@ async def test_two_receipts_of_one_new_batch_write_it_once(
     template_id = template.id
 
     engine = db.bind
-    first_expiry = date(2030, 1, 1)
-    second_expiry = date(2031, 2, 2)
+    today = datetime.now(UTC).date()
+    first_expiry = today + timedelta(days=365)
+    second_expiry = today + timedelta(days=730)
     async with (
         AsyncSession(bind=engine, expire_on_commit=False) as first,
         AsyncSession(bind=engine, expire_on_commit=False) as second,
