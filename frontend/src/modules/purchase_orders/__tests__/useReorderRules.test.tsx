@@ -59,6 +59,7 @@ const mockAlert = {
   suggested_reorder_quantity: 17,
   reserve_available_quantity: 0,
   proposed_move_quantity: 0,
+  on_its_way_quantity: 0,
   remaining_to_buy: 17,
 };
 

@@ -41,10 +41,31 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
-- The Equipment & Warehouse profile is teal instead of blue: the application's
-  own colour, so the demo, the README and a new installation look alike. An
-  organization on that profile sees its buttons, links and tabs in teal after
-  the upgrade; Food & Home stays emerald and Custom amber.
+- A reorder alert no longer proposes again what is already on its way. What
+  open purchase orders still expect of a bought product, drafts included, and
+  what unfinished production runs will still make of a made one now cover the
+  shortage after reserve: *Create draft POs* orders only the rest, so pressing
+  it twice no longer writes two orders, and the To do production task asks
+  only for what nobody planned. The alert says how much is already ordered or
+  planned (`on_its_way_quantity` in the API; `remaining_to_buy` nets it), and
+  a rule covered by orders is skipped as `already_on_order`.
+- Purchase patterns count what each purchase brought in. Opening a unit,
+  using some of it or moving part of it to another shelf no longer lowers
+  *Total spent* and the average price, and a purchase used up to nothing
+  still counts. A record whose journal names no quantity at its birth is read
+  at what it holds. The *Seasonal patterns* card shows the five most seasonal
+  products, ranked, instead of the first five the database returned.
+- A back-dated stock aging report leaves out the receipts made after its date,
+  as it already left out the issues.
+- The archived products stop counting at 10,000, as the product list and the
+  journals do, and say "of more than" past it.
+- The freight, duty and insurance of a receipt, and the unit costs they lead
+  to, are shown in the receipt's currency rather than the organization's.
+- Changing a purchase order's currency clears a line price that was proposed
+  from the product's last cost; a price typed on the line stays.
+- *Order what is missing* names the product's stock unit on the order line
+  when the supplier's price names no unit of its own: 5 kg of oats is ordered
+  and received as kilograms, not as "units".
 
 ## v0.13.0 - 2026-11-23
 
@@ -474,6 +495,10 @@ Not marked **Breaking**, but worth a look before you update:
   one used up by hand. `core_api.items.find_stock_row_async` takes
   `emptied_from` to find such a record by the shelf it left, so stock given
   back to it returns it there. Callers that pass neither are unchanged.
+- `core_api.locations.subtree_epochs_async` says what stood in and below a
+  location between its physical moves, as `(start, end, ids)` stretches, or
+  None when no move changed it, so a module can read a dated record against
+  the tree it was made in.
 
 ### Changed
 
@@ -579,6 +604,10 @@ Not marked **Breaking**, but worth a look before you update:
   `"verdict": "integration-only"` with a reason and an owner, and no
   `expires`, and a query-key entry is `by-design` or `to-fold`, the latter
   with an `expiry`.
+- The Equipment & Warehouse profile is teal instead of blue: the application's
+  own colour, so the demo, the README and a new installation look alike. An
+  organization on that profile sees its buttons, links and tabs in teal after
+  the upgrade; Food & Home stays emerald and Custom amber.
 
 ### Fixed
 
@@ -798,8 +827,12 @@ Not marked **Breaking**, but worth a look before you update:
   stood then, and a production run's movements name the path a shelf had when
   the run touched it. The rows the move itself writes name the moved location's whole path
   before and after, its own name last, instead of only the places it left and
-  reached. A move that only corrects the layout still rewrites nothing: the
-  stock was always where the corrected tree puts it.
+  reached, and they are listed under both places: filtered by the hall a shelf
+  left, **Movements** shows its goods going away. Filtering the warehouse
+  documents by a location reads a completed document against the tree on the
+  day it was done, and one still open against today's. A move that only
+  corrects the layout still rewrites nothing: the stock was always where the
+  corrected tree puts it.
 - Archiving a location no longer moves the stock of the locations inside it.
   Those locations stay active, but their products were relocated to the chosen
   target and the shelf was left empty while the goods had not moved. Only what

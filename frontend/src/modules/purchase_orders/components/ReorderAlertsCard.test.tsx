@@ -32,6 +32,7 @@ const ALERT_WITH_SUPPLIER: ReplenishmentAlert = {
   suggested_reorder_quantity: 18,
   reserve_available_quantity: 40,
   proposed_move_quantity: 18,
+  on_its_way_quantity: 0,
   remaining_to_buy: 0,
   preferred_partner_id: "p-1",
   preferred_partner_name: "ACME",
@@ -237,8 +238,48 @@ describe("ReorderAlertsCard draft-PO action", () => {
       expect(toast.success).toHaveBeenCalledWith("1 draft PO created"),
     );
     expect(toast.info).toHaveBeenCalledWith(
-      "1 alert skipped (covered by reserve, no supplier, or no shortage)",
+      "1 alert skipped (covered by reserve or orders, no supplier, or no shortage)",
     );
+  });
+
+  it("says what is already on order instead of crediting the reserve", () => {
+    render(
+      <ReorderAlertsCard
+        alerts={[
+          {
+            ...ALERT_WITHOUT_SUPPLIER,
+            on_its_way_quantity: 18,
+            remaining_to_buy: 0,
+          },
+        ]}
+        locationName={locationName}
+      />,
+      { wrapper: createWrapper() },
+    );
+
+    expect(screen.getByText("Already on order: 18")).toBeInTheDocument();
+    expect(
+      screen.queryByText("Reserve covers the whole shortage"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("says how much of a made product is already planned", () => {
+    render(
+      <ReorderAlertsCard
+        alerts={[
+          {
+            ...ALERT_WITHOUT_SUPPLIER,
+            make_instead: true,
+            on_its_way_quantity: 5,
+            remaining_to_buy: 15,
+          },
+        ]}
+        locationName={locationName}
+      />,
+      { wrapper: createWrapper() },
+    );
+
+    expect(screen.getByText("Already planned: 5")).toBeInTheDocument();
   });
 
   it("says a made product is produced, with no supplier and no draft order", () => {

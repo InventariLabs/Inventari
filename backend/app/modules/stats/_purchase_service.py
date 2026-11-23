@@ -21,8 +21,9 @@ from app.models.item import Item
 from app.models.item_history import ItemAction, ItemHistory
 from app.models.organization import Organization
 from app.services.analytics._common import (
-    get_internal_storage_ids_async,
+    off_hidden_places,
     org_window_start_async,
+    quantity_born_with,
 )
 
 from ._purchase_analysis import (
@@ -139,20 +140,16 @@ async def get_purchase_patterns_async(
 ) -> dict[str, Any]:
     date_from = await org_window_start_async(db, organization_id, 180)
 
-    # The same rows the cost analysis counts. Summed over every row of the
-    # tenant instead, this read reported one product as having cost more than
-    # the organization spent in total — a whole smaller than one of its parts.
     # A vertical module's records and places stay out with it, unless the
     # organization shows module data.
     hidden = await hidden_module_tags_async(db, organization_id)
-    storage_ids = await get_internal_storage_ids_async(db, organization_id, hidden)
     org_currency = await db.scalar(
         select(Organization.currency).where(Organization.id == organization_id)
     )
 
     purchase_filters: list[ColumnElement[bool]] = [
         Item.organization_id == organization_id,
-        Item.storage_location_id.in_(storage_ids),
+        off_hidden_places(organization_id, hidden),
         Item.is_deleted.is_(False),
         Item.created_at >= date_from,
         _born_as_a_purchase(organization_id),
@@ -163,6 +160,7 @@ async def get_purchase_patterns_async(
         ),
     ]
 
+    bought = quantity_born_with(organization_id)
     product_rows = (
         await db.execute(
             select(
@@ -171,12 +169,11 @@ async def get_purchase_patterns_async(
                 func.coalesce(Category.name, 'Other').label('category'),
                 Category.code.label('category_code'),
                 func.count(Item.id).label('purchase_count'),
-                func.sum(func.coalesce(Item.quantity, 0)).label('total_quantity'),
+                func.sum(bought).label('total_quantity'),
                 # The price is per unit, so what was spent is price × quantity.
-                func.sum(
-                    func.coalesce(Item.purchase_price, 0)
-                    * func.coalesce(Item.quantity, 0)
-                ).label('total_price'),
+                func.sum(func.coalesce(Item.purchase_price, 0) * bought).label(
+                    'total_price'
+                ),
                 func.array_agg(Item.created_at).label('purchase_dates'),
             )
             .outerjoin(Category, Item.category_id == Category.id)
