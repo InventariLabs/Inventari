@@ -754,6 +754,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/audit-log/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Audit Log Members
+         * @description The people a journal row can name.
+         *
+         *     The filter is part of the journal's screen, so it asks the journal's own
+         *     authority rather than the organization read a team list needs: a custom
+         *     administration role opens the log, and its member filter answers.
+         */
+        get: operations["list_audit_log_members_api_v1_audit_log_members_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/audit-log/target-types": {
         parameters: {
             query?: never;
@@ -8565,11 +8589,6 @@ export interface paths {
         /**
          * List Org Members
          * @description List members of the current user's organization.
-         *
-         *     ``admin:access`` opens it beside ``org:read``: an administrator with a
-         *     custom role reads the audit log, and its member filter names the people
-         *     in it, so asking that screen for ``org:read`` refused a lookup of the
-         *     same names the log already shows.
          */
         get: operations["list_org_members_api_v1_users_org_members_get"];
         put?: never;
@@ -12563,6 +12582,21 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /**
+         * AuditLogMember
+         * @description One person the journal can name, as its filter offers them.
+         */
+        AuditLogMember: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name?: string | null;
+            /** Email */
+            email: string;
         };
         /** AuditResponseItemSchema */
         AuditResponseItemSchema: {
@@ -31737,6 +31771,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_audit_log_members_api_v1_audit_log_members_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditLogMember"][];
                 };
             };
         };

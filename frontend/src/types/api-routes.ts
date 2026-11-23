@@ -37,6 +37,7 @@ export const API_ROUTES = [
   "/api/v1/approvals/workflows/{workflow_id}/waiting",
   "/api/v1/attachments/{attachment_id}",
   "/api/v1/audit-log",
+  "/api/v1/audit-log/members",
   "/api/v1/audit-log/target-types",
   "/api/v1/auth/init-status",
   "/api/v1/auth/login",

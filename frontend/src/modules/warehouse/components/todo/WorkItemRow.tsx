@@ -43,7 +43,7 @@ export function useModuleWrites(): ModuleWrites {
  * run and a replenishment open another module's screen and need that module's
  * write. Reviewing an approval is open to whoever the queue named, which the
  * picker cannot enumerate, so its holders are the approve grant's. */
-export function itemActionGrants(item: WorkItem): string[] {
+function itemActionGrants(item: WorkItem): string[] {
   if (item.source_kind === "replenishment") {
     return ["warehouse:write", "purchase_orders:write"];
   }

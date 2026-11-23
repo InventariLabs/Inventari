@@ -363,14 +363,12 @@ class TestACustomAdministratorReadsTheJournal:
             '/api/v1/audit-log', headers=_auth(administrator)
         )
         members = await real_async_client.get(
-            '/api/v1/users/org-members', headers=_auth(administrator)
+            '/api/v1/audit-log/members', headers=_auth(administrator)
         )
 
         assert journal.status_code == 200, journal.text
         assert members.status_code == 200, members.text
-        assert str(administrator.id) in {
-            member['id'] for member in members.json()['items']
-        }
+        assert str(administrator.id) in {member['id'] for member in members.json()}
 
 
 # ---------------------------------------------------------------------------

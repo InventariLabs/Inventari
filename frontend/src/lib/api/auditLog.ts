@@ -24,6 +24,12 @@ export interface AuditLogFilters {
   cursor?: string;
 }
 
+export interface AuditLogMember {
+  id: string;
+  name: string | null;
+  email: string;
+}
+
 export const auditLogApi = {
   list: async (
     filters: AuditLogFilters = {},
@@ -53,6 +59,17 @@ export const auditLogApi = {
    */
   targetTypes: async (): Promise<string[]> => {
     const response = await api.get<string[]>("/audit-log/target-types");
+    return response.data;
+  },
+
+  /**
+   * The people a journal row can name, for the screen's own member filter.
+   *
+   * The journal's read opens it, not the organization read a team list
+   * needs: a custom administration role opens the log, and this answers.
+   */
+  members: async (): Promise<AuditLogMember[]> => {
+    const response = await api.get<AuditLogMember[]>("/audit-log/members");
     return response.data;
   },
 };

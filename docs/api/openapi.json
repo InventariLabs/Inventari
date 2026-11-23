@@ -2388,6 +2388,40 @@
         }
       }
     },
+    "/api/v1/audit-log/members": {
+      "get": {
+        "tags": [
+          "Audit Log"
+        ],
+        "summary": "List Audit Log Members",
+        "description": "The people a journal row can name.\n\nThe filter is part of the journal's screen, so it asks the journal's own\nauthority rather than the organization read a team list needs: a custom\nadministration role opens the log, and its member filter answers.",
+        "operationId": "list_audit_log_members_api_v1_audit_log_members_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AuditLogMember"
+                  },
+                  "type": "array",
+                  "title": "Response List Audit Log Members Api V1 Audit Log Members Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/v1/audit-log/target-types": {
       "get": {
         "tags": [
@@ -31837,7 +31871,7 @@
           "Users"
         ],
         "summary": "List Org Members",
-        "description": "List members of the current user's organization.\n\n``admin:access`` opens it beside ``org:read``: an administrator with a\ncustom role reads the audit log, and its member filter names the people\nin it, so asking that screen for ``org:read`` refused a lookup of the\nsame names the log already shows.",
+        "description": "List members of the current user's organization.",
         "operationId": "list_org_members_api_v1_users_org_members_get",
         "security": [
           {
@@ -45155,6 +45189,37 @@
         ],
         "title": "AuditLogDTO",
         "description": "Immutable audit-trail entry (SOX / GDPR compliance)."
+      },
+      "AuditLogMember": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email"
+        ],
+        "title": "AuditLogMember",
+        "description": "One person the journal can name, as its filter offers them."
       },
       "AuditResponseItemSchema": {
         "properties": {

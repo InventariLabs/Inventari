@@ -7,6 +7,7 @@ export const queryKeys = {
   auditLog: {
     list: (filters: unknown) => ["audit-log", filters] as const,
     targetTypes: ["audit-log", "target-types"] as const,
+    members: ["audit-log", "members"] as const,
   },
   stockMoves: {
     /** The ledger prefix — what every writer of stock invalidates. */
