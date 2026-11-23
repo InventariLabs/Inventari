@@ -1,4 +1,5 @@
 import { api } from "./client";
+import type { components } from "@/types/api-generated";
 import type { AuditLogListResponse } from "@/types/core";
 
 /**
@@ -24,11 +25,8 @@ export interface AuditLogFilters {
   cursor?: string;
 }
 
-export interface AuditLogMember {
-  id: string;
-  name: string | null;
-  email: string;
-}
+/** One person the journal can name, as its filter offers them. */
+export type AuditLogMember = components["schemas"]["AuditLogMember"];
 
 export const auditLogApi = {
   list: async (
