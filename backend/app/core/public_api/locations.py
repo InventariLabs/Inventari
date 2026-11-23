@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -271,6 +272,23 @@ class CoreStoragesAPI:
         from app.services.storage._queries import descendant_ids_async
 
         return await descendant_ids_async(db, organization_id, storage_id)
+
+    @reads
+    async def subtree_epochs_async(
+        self, db: AsyncSession, organization_id: UUID, storage_id: UUID
+    ) -> list[tuple[datetime | None, datetime | None, list[UUID]]] | None:
+        """What stood in and below *storage_id* over time, or None for always today's.
+
+        Each entry is ``(start, end, ids)``: the location and everything below
+        it from *start* (inclusive, None for the beginning) to *end*
+        (exclusive, None for now), as the tree stood between two physical
+        moves. A shelf carried elsewhere keeps its id, so a record dated
+        before the move has to be read against the stretch it was made in.
+        None means no physical move changed the members.
+        """
+        from app.services.storage._relocation import subtree_epochs_async
+
+        return await subtree_epochs_async(db, organization_id, storage_id)
 
     @reads
     async def held_back_async(

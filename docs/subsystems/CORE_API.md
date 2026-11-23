@@ -273,6 +273,7 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 | `list_storage_ids_async` | `(db: AsyncSession, organization_id: UUID) -> list[UUID]` | READ | Return just the IDs of storage locations for *organization_id*. |
 | `scannable_code_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> str \| None` | READ | The code that names *storage_id* when scanned — its own, or its label's. |
 | `subtree_and_ancestors_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> tuple[list[StorageDTO], list[StorageDTO]]` | READ | ``(subtree, ancestors)`` of a location, without reading the rest of the tree. |
+| `subtree_epochs_async` | `(db: AsyncSession, organization_id: UUID, storage_id: UUID) -> list[tuple[datetime \| None, datetime \| None, list[UUID]]] \| None` | READ | What stood in and below *storage_id* over time, or None for always today's. |
 
 ---
 
@@ -599,9 +600,9 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 
 ## Statistics
 
-- **Total methods:** 316
+- **Total methods:** 317
 - **Namespaces:** 33
-- **Documented methods:** 316 (100%)
-- **READ methods:** 221 (70%)
+- **Documented methods:** 317 (100%)
+- **READ methods:** 222 (70%)
 - **WRITE methods:** 95 (30%)
 
