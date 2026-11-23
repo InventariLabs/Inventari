@@ -149,6 +149,7 @@ describe("replenishment rules — one half failing does not speak for the whole"
       suggested_reorder_quantity: 38,
       reserve_available_quantity: 38,
       proposed_move_quantity: 38,
+      on_its_way_quantity: 0,
       remaining_to_buy: 0,
     },
   ];

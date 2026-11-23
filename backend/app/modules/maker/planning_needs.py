@@ -353,7 +353,13 @@ def _best_offer(
     for entry in prices:
         offer_uom = uoms.get(entry.uom_id) if entry.uom_id else None
         if offer_uom is None or stock_uom is None or offer_uom.id == stock_uom.id:
-            quantity, per_stock, unit_uom = missing, entry.unit_price, entry.uom_id
+            # A price that names no unit of its own is a price per the stock
+            # unit, and the order line says which unit that is.
+            quantity, per_stock, unit_uom = (
+                missing,
+                entry.unit_price,
+                entry.uom_id or template.uom_id,
+            )
         else:
             converted, ok = core_api.uoms.convert_quantity(
                 missing, stock_uom, offer_uom

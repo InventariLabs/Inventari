@@ -96,7 +96,7 @@ export function DocumentExtraCostsSection({
               </span>
               <span className="flex items-center gap-3">
                 <span className="tabular-nums text-on">
-                  {money(Number(cost.amount))}
+                  {money(Number(cost.amount), data.currency)}
                 </span>
                 {data.editable && (
                   <Button
@@ -198,17 +198,17 @@ export function DocumentExtraCostsSection({
                   </td>
                   <td className="py-2 px-3 text-right tabular-nums text-on-secondary">
                     {line.unit_price != null
-                      ? money(Number(line.unit_price))
+                      ? money(Number(line.unit_price), data.currency)
                       : "—"}
                   </td>
                   <td className="py-2 px-3 text-right tabular-nums text-on-secondary">
                     {Number(line.surcharge) > 0
-                      ? money(Number(line.surcharge))
+                      ? money(Number(line.surcharge), data.currency)
                       : "—"}
                   </td>
                   <td className="py-2 pl-3 text-right tabular-nums font-medium text-on">
                     {line.unit_cost_after != null
-                      ? money(Number(line.unit_cost_after))
+                      ? money(Number(line.unit_cost_after), data.currency)
                       : "—"}
                   </td>
                 </tr>

@@ -197,6 +197,56 @@ class TestTheAgingBucketsTieBackToTheShelf:
         # day the ten were still there.
         assert _total(buckets) == Decimal('10')
 
+    async def test_a_back_dated_report_does_not_see_a_later_receipt(
+        self,
+        real_async_db_session,
+        async_test_household,
+        async_test_storage_location,
+    ):
+        db = real_async_db_session
+        template = await self._template(db, async_test_household.id)
+
+        await _move(
+            db,
+            async_test_household.id,
+            template.id,
+            quantity=Decimal('10'),
+            at=AS_OF - timedelta(days=40),
+            to_location_id=async_test_storage_location.id,
+        )
+        # Received a few hours after the cutoff: less than a day, so its age
+        # would read 0 days and land in the youngest bucket.
+        await _move(
+            db,
+            async_test_household.id,
+            template.id,
+            quantity=Decimal('3'),
+            at=AS_OF + timedelta(hours=5),
+            to_location_id=async_test_storage_location.id,
+        )
+        await db.commit()
+
+        entries = await core_api.stock_moves.list_receipts_for_aging_async(
+            db,
+            organization_id=async_test_household.id,
+            product_template_id=template.id,
+            as_of=AS_OF,
+        )
+        buckets = {
+            b.label: b.quantity
+            for b in await core_api.stock_moves.aggregate_aging_buckets_async(
+                db,
+                organization_id=async_test_household.id,
+                product_template_id=template.id,
+                as_of=AS_OF,
+            )
+        }
+
+        assert [entry.quantity for entry in entries] == [Decimal('10')]
+        assert buckets['0-30'] == Decimal('0')
+        assert buckets['31-60'] == Decimal('10')
+        assert sum(buckets.values(), Decimal('0')) == Decimal('10')
+
     async def test_a_product_with_more_receipts_than_a_page_still_ties_back(
         self,
         real_async_db_session,

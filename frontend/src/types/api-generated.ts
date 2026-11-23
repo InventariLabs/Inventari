@@ -25591,6 +25591,11 @@ export interface components {
              * @default 0
              */
             proposed_move_quantity: number;
+            /**
+             * On Its Way Quantity
+             * @default 0
+             */
+            on_its_way_quantity: number;
             /** Remaining To Buy */
             remaining_to_buy?: number | null;
             /** Preferred Partner Id */
@@ -25633,9 +25638,11 @@ export interface components {
          *     ``not_found`` (no such rule in this org), ``not_alerting`` (stock is
          *     at or above the minimum right now), ``covered_by_reserve`` (the
          *     proposed internal move covers the whole shortage, so there is nothing
-         *     to buy), ``no_supplier`` (neither the rule nor the price list names
-         *     a supplier; reported, never turned into an empty order), ``made_here``
-         *     (the product has a recipe: it is produced, not bought).
+         *     to buy), ``already_on_order`` (open purchase orders already expect
+         *     what reserve does not cover), ``no_supplier`` (neither the rule nor the
+         *     price list names a supplier; reported, never turned into an empty
+         *     order), ``made_here`` (the product has a recipe: it is produced, not
+         *     bought).
          */
         ReplenishmentDraftSkipped: {
             /**

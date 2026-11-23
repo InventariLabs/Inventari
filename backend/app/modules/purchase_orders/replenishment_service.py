@@ -379,6 +379,60 @@ async def _templates_made_here_async(
     return template_ids & with_recipe
 
 
+async def _on_its_way_async(
+    db: AsyncSession, org_id: UUID, template_ids: set[UUID], made_here: set[UUID]
+) -> dict[UUID, Decimal]:
+    """What is already on its way of each product, in its stock unit.
+
+    A bought product is on its way in the open orders that still expect it —
+    a draft among them, since the drafts this module writes are orders too.
+    A made product is on its way in the runs not finished yet; it is asked
+    of production through its public API, which is on whenever *made_here*
+    names anything.
+    """
+    from app.modules.purchase_orders.purchase_orders_api import purchase_orders_api
+
+    bought = sorted(template_ids - made_here, key=str)
+    on_its_way = await purchase_orders_api.outstanding_ordered_quantities_async(
+        db, org_id, bought
+    )
+    if made_here:
+        from app.modules.maker.maker_api import maker_api
+
+        on_its_way.update(
+            await maker_api.planned_output_quantities_async(
+                db, org_id, sorted(made_here, key=str)
+            )
+        )
+    return on_its_way
+
+
+def _on_its_way_shares(
+    shortages: list[_Shortage],
+    reserve_shares: dict[UUID, Decimal],
+    on_its_way: dict[UUID, Decimal],
+) -> dict[UUID, Decimal]:
+    """Share what is on its way of each product among the rules short of it.
+
+    An order or a run names no shelf, so what it brings is one pool per
+    product. It covers what reserve does not, and the rules take turns in
+    the order the caller read them, as they do for reserve: a unit already
+    coming is counted for one rule, never bought again for another.
+    """
+    pools = dict(on_its_way)
+    shares: dict[UUID, Decimal] = {}
+    for shortage in shortages:
+        template_id = shortage.rule.product_template_id
+        need = max(
+            shortage.suggested - reserve_shares.get(shortage.rule.id, Decimal('0')),
+            Decimal('0'),
+        )
+        share = min(pools.get(template_id, Decimal('0')), need)
+        shares[shortage.rule.id] = share
+        pools[template_id] = pools.get(template_id, Decimal('0')) - share
+    return shares
+
+
 async def _compute_alerts_for_rules(
     db: AsyncSession,
     org_id: UUID,
@@ -387,6 +441,22 @@ async def _compute_alerts_for_rules(
     """Alert rows for *rules* whose available stock is below minimum."""
     shortages, _, _ = await _shortages_async(db, org_id, rules)
     shares = _reserve_shares(shortages)
+    short_of = {s.rule.product_template_id for s in shortages}
+    made_here = await _templates_made_here_async(db, org_id, short_of)
+    # What is already ordered or planned is not proposed a second time: the
+    # same proposal acted on twice ordered twice.
+    coming = _on_its_way_shares(
+        shortages, shares, await _on_its_way_async(db, org_id, short_of, made_here)
+    )
+
+    def remaining_of(shortage: _Shortage) -> Decimal:
+        rule_id = shortage.rule.id
+        return max(
+            shortage.suggested
+            - shares.get(rule_id, Decimal('0'))
+            - coming.get(rule_id, Decimal('0')),
+            Decimal('0'),
+        )
 
     # A rule with no preferred supplier still has a supplier when the price
     # list names one: the cheapest current offer is proposed, so the alert
@@ -395,10 +465,7 @@ async def _compute_alerts_for_rules(
     # The supplier is chosen against what this rule will really order, so a
     # volume price counts only for the rule whose order reaches it.
     wanted = {
-        (
-            s.rule.product_template_id,
-            max(s.suggested - shares.get(s.rule.id, Decimal('0')), Decimal('0')),
-        )
+        (s.rule.product_template_id, remaining_of(s))
         for s in shortages
         if not s.rule.preferred_partner_id
     }
@@ -413,9 +480,6 @@ async def _compute_alerts_for_rules(
         else {}
     )
 
-    made_here = await _templates_made_here_async(
-        db, org_id, {s.rule.product_template_id for s in shortages}
-    )
     alerts: list[ReplenishmentAlertDTO] = []
     for shortage in shortages:
         rule = shortage.rule
@@ -428,7 +492,7 @@ async def _compute_alerts_for_rules(
         proposed = (
             min(share, by_location[richest]) if richest is not None else Decimal('0')
         )
-        remaining = max(shortage.suggested - share, Decimal('0'))
+        remaining = remaining_of(shortage)
         product = rule.product_template
         supplier = rule.preferred_partner
         make_instead = rule.product_template_id in made_here
@@ -456,6 +520,7 @@ async def _compute_alerts_for_rules(
                     sum(by_location.values(), Decimal('0'))
                 ),
                 proposed_move_quantity=float(proposed),
+                on_its_way_quantity=float(coming.get(rule.id, Decimal('0'))),
                 remaining_to_buy=float(remaining),
                 # A product the organization makes is produced, not bought:
                 # no supplier is proposed even when the rule names one.
@@ -755,7 +820,11 @@ async def create_draft_pos_from_alerts_async(
                 ReplenishmentDraftSkipped(
                     reorder_rule_id=rule.id,
                     product_name=rule.product_name,
-                    reason='covered_by_reserve',
+                    reason=(
+                        'already_on_order'
+                        if alert.on_its_way_quantity > 0
+                        else 'covered_by_reserve'
+                    ),
                 )
             )
             continue

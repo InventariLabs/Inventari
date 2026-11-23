@@ -892,6 +892,10 @@ async def list_receipts_for_aging_async(
             StockMove.product_template_id == product_template_id,
             StockMove.from_location_id.is_(None),
             StockMove.state == 'done',
+            # A report about a past day sees the receipts of that day and
+            # before, as it sees the issues: a later one would read 0 days
+            # old and change the report as the warehouse kept receiving.
+            business_date <= as_of,
         )
         .subquery('receipts')
     )

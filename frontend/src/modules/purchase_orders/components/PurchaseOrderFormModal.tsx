@@ -187,6 +187,21 @@ export default function PurchaseOrderFormModal({
   const createMutation = useCreatePurchaseOrder();
   const updateMutation = useUpdatePurchaseOrder();
 
+  // A price a product pick proposed is what the product last cost in the
+  // organization's currency; under another currency the same figure would be
+  // a different price, so it goes with the change. A typed price stays.
+  const changeCurrency = (next: string | null) => {
+    setCurrencyChosen(true);
+    setCurrency(next);
+    setLines((prev) =>
+      prev.map((line) =>
+        line.proposed_price && line.unit_price === line.proposed_price
+          ? { ...line, unit_price: "", proposed_price: "" }
+          : line,
+      ),
+    );
+  };
+
   const addLine = () => setLines((prev) => [...prev, emptyLine()]);
 
   const removeLine = (id: string) =>
@@ -360,10 +375,7 @@ export default function PurchaseOrderFormModal({
         <NativeSelect
           label={t("form.currency")}
           value={currency ?? ""}
-          onChange={(e) => {
-            setCurrencyChosen(true);
-            setCurrency(e.target.value || null);
-          }}
+          onChange={(e) => changeCurrency(e.target.value || null)}
           wrapperClassName="w-full sm:w-64"
         >
           <option value="">{t("form.currencyPlaceholder")}</option>
