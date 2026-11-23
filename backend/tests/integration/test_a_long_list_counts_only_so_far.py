@@ -202,6 +202,24 @@ class TestTheArchive:
         seen = [i['id'] for page in (first, second, third) for i in page['items']]
         assert len(set(seen)) == _ROWS
 
+    def test_the_count_is_limited_to_the_window_and_one_row(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        statements: list[tuple[str, Any]],
+    ) -> None:
+        _page(client, auth_headers, '/api/v1/items/archived', limit=2)
+
+        counts = [
+            (sql, params)
+            for sql, params in statements
+            if 'count(*)' in sql.lower() and 'FROM (' in sql
+        ]
+        assert counts, 'the archive took no count at all'
+        for sql, params in counts:
+            assert 'LIMIT' in sql, sql
+            assert _CAP + 1 in tuple(params), (_CAP + 1, params)
+
 
 @pytest.fixture
 def five_journal_entries(
