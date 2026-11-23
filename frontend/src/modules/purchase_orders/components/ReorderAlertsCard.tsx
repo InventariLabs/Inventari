@@ -164,6 +164,7 @@ export function ReorderAlertsCard({
 function ShortageCoverage({ alert }: { alert: ReplenishmentAlert }) {
   const { t } = useTranslation("purchase_orders");
   const onItsWay = alert.on_its_way_quantity;
+  const coming = { quantity: formatDecimalQty(onItsWay) };
   const remaining = alert.remaining_to_buy;
   let toBuy: string | null = null;
   if (!alert.make_instead && remaining != null) {
@@ -179,12 +180,9 @@ function ShortageCoverage({ alert }: { alert: ReplenishmentAlert }) {
     <>
       {onItsWay > 0 && (
         <span className="text-xs text-on-secondary">
-          {t(
-            alert.make_instead
-              ? "reorderRules.alreadyPlanned"
-              : "reorderRules.alreadyOrdered",
-            { quantity: formatDecimalQty(onItsWay) },
-          )}
+          {alert.make_instead
+            ? t("reorderRules.alreadyPlanned", coming)
+            : t("reorderRules.alreadyOrdered", coming)}
         </span>
       )}
       {toBuy && <span className="text-xs text-on-secondary">{toBuy}</span>}
