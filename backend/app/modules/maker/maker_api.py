@@ -58,6 +58,50 @@ class MakerAPI:
         parents = await bom_service.list_parents(db, organization_id)
         return [template_id for template_id, _count in parents]
 
+    async def planned_output_quantities_async(
+        self,
+        db: AsyncSession,
+        organization_id: UUID,
+        template_ids: list[UUID],
+    ) -> dict[UUID, Decimal]:
+        """What the runs not yet finished will still make of each product.
+
+        A draft run and a started one put their output on the shelf as they
+        finish, so what they plan and have not put there yet is on its way: a
+        caller computing a shortage must not plan it a second time. A portion
+        already on the shelf is stock and is taken off; a cancelled, reversed
+        or completed run answers nothing. In the unit the run plans in, the
+        product's stock unit.
+        """
+        from sqlalchemy import func, select
+
+        from .models import ProductionPortion
+
+        if not template_ids:
+            return {}
+        made = (
+            select(func.coalesce(func.sum(ProductionPortion.qty), 0))
+            .where(ProductionPortion.production_order_id == ProductionOrder.id)
+            .scalar_subquery()
+        )
+        rows = await db.execute(
+            select(
+                ProductionOrder.output_template_id, ProductionOrder.planned_qty, made
+            )
+            .where(
+                ProductionOrder.organization_id == organization_id,
+                ProductionOrder.status.in_(('DRAFT', 'IN_PROGRESS')),
+                ProductionOrder.output_template_id.in_(template_ids),
+            )
+            .order_by(ProductionOrder.id)
+        )
+        planned: dict[UUID, Decimal] = {}
+        for template_id, planned_qty, made_qty in rows.all():
+            rest = Decimal(str(planned_qty)) - Decimal(str(made_qty or 0))
+            if rest > 0:
+                planned[template_id] = planned.get(template_id, Decimal('0')) + rest
+        return planned
+
     async def explode_bom_async(
         self,
         db: AsyncSession,

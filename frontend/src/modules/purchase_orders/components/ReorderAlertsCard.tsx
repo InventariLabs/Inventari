@@ -110,16 +110,7 @@ export function ReorderAlertsCard({
                   quantity: formatDecimalQty(alert.reserve_available_quantity),
                 })}
               </span>
-              <span className="text-xs text-on-secondary">
-                {alert.make_instead
-                  ? null
-                  : alert.remaining_to_buy === 0
-                    ? t("reorderRules.coveredByReserve")
-                    : alert.remaining_to_buy != null &&
-                      t("reorderRules.remainingToBuy", {
-                        quantity: formatDecimalQty(alert.remaining_to_buy),
-                      })}
-              </span>
+              <ShortageCoverage alert={alert} />
               {alert.proposed_move_quantity > 0 && canWrite && (
                 <Button
                   size="sm"
@@ -161,6 +152,43 @@ export function ReorderAlertsCard({
         </ul>
       </CardContent>
     </Card>
+  );
+}
+
+/**
+ * What already covers the shortage and what is left to buy. What is on its
+ * way — ordered, or planned for a product made here — is not proposed again,
+ * so the alert says how much of it there is; a shortage it covers whole is
+ * not "covered by reserve".
+ */
+function ShortageCoverage({ alert }: { alert: ReplenishmentAlert }) {
+  const { t } = useTranslation("purchase_orders");
+  const onItsWay = alert.on_its_way_quantity;
+  const remaining = alert.remaining_to_buy;
+  let toBuy: string | null = null;
+  if (!alert.make_instead && remaining != null) {
+    if (remaining > 0) {
+      toBuy = t("reorderRules.remainingToBuy", {
+        quantity: formatDecimalQty(remaining),
+      });
+    } else if (onItsWay <= 0) {
+      toBuy = t("reorderRules.coveredByReserve");
+    }
+  }
+  return (
+    <>
+      {onItsWay > 0 && (
+        <span className="text-xs text-on-secondary">
+          {t(
+            alert.make_instead
+              ? "reorderRules.alreadyPlanned"
+              : "reorderRules.alreadyOrdered",
+            { quantity: formatDecimalQty(onItsWay) },
+          )}
+        </span>
+      )}
+      {toBuy && <span className="text-xs text-on-secondary">{toBuy}</span>}
+    </>
   );
 }
 
