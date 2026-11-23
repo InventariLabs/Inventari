@@ -25,7 +25,7 @@ from app.core.exceptions import (
     catalogue_refusal,
 )
 from app.core.logging import get_logger
-from app.core.module_sdk import paginate_async
+from app.core.module_sdk import get_context_tags_of, paginate_async
 from app.core.public_api import core_api
 from app.core.utils import pick_by_lang
 from app.i18n.service import get_current_lang, get_error_message
@@ -185,7 +185,13 @@ async def _pool_entries_async(
     label_ids: list[UUID],
     short_codes: list[str],
     module_scopes: frozenset[str] | None,
-) -> list[dict[str, Any]]:
+) -> tuple[list[dict[str, Any]], set[str]]:
+    """The label rows to print, and the context tags their products claim.
+
+    The tags are what bounds who may later list or resend the job: a label
+    assigned to an asset prints an asset's name, and a label nobody assigned
+    belongs to the organization rather than to any module.
+    """
     if label_ids:
         found = await core_api.labels.list_in_ids_async(
             db, label_ids, organization_id, module_scopes=module_scopes
@@ -198,7 +204,7 @@ async def _pool_entries_async(
         )
         by_code = {lbl.short_code: lbl for lbl in found}
         ordered = [by_code[c] for c in short_codes if c in by_code]
-    return [
+    entries = [
         {
             'label_id': str(lbl.id),
             'short_code': lbl.short_code,
@@ -207,6 +213,12 @@ async def _pool_entries_async(
         }
         for lbl in ordered
     ]
+    tags = {
+        tag
+        for lbl in ordered
+        if (tag := getattr(lbl, 'assigned_item_context_tag', None))
+    }
+    return entries, tags
 
 
 async def _storage_entries_async(
@@ -563,6 +575,29 @@ async def _lot_entries_async(
     ]
 
 
+def _reads_of_what_is_printed(
+    read_permissions: Sequence[str], printed_tags: set[str]
+) -> list[str]:
+    """The job's reads, without the module reads none of its labels answers to.
+
+    A pool job starts with the reads of every screen that may send a pool
+    label — the Core ``items:read`` and the register's ``equipment:read``.
+    Only the module reads whose records the printed labels belong to are
+    kept, so a job of a product's label or one nobody assigned does not
+    answer to the register's read.
+    """
+    kept: list[str] = []
+    for permission in read_permissions:
+        module = permission.partition(':')[0]
+        if module == 'items':
+            kept.append(permission)
+            continue
+        tags = get_context_tags_of(module)
+        if not tags or tags & printed_tags:
+            kept.append(permission)
+    return kept
+
+
 async def queue_job_async(
     db: AsyncSession,
     organization_id: UUID,
@@ -647,9 +682,10 @@ async def queue_job_async(
         if storage_ids:
             entries = await _storage_entries_async(db, organization_id, storage_ids)
         else:
-            entries = await _pool_entries_async(
+            entries, printed_tags = await _pool_entries_async(
                 db, organization_id, label_ids or [], short_codes or [], module_scopes
             )
+            read_permissions = _reads_of_what_is_printed(read_permissions, printed_tags)
         if not entries:
             raise catalogue_refusal('print_job_nothing_to_print')
         entries = _with_options(

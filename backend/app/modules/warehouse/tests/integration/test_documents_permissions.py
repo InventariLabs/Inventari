@@ -162,25 +162,25 @@ class TestDocumentApprovalDoorsPermissions:
     Under ``/warehouse/documents`` they sat behind the warehouse guard; moved
     to ``/approvals/documents`` they carried only the module check, and a
     reader of the warehouse could hold a document by asking for its approval.
-    The guard went with them: reading a document's approval needs
-    ``warehouse:read``, acting on it ``warehouse:write`` — and a decision
-    still ``approvals:approve`` on top. A document nobody has is enough: the
-    guard answers before the handler looks for it.
+    The guard went with them: reading a document's approval and raising one
+    need ``warehouse:read`` and ``warehouse:write``; the decision doors answer
+    to the approvals engine instead, so a person the queue names with
+    ``approvals:read`` decides without the document's write key.
     """
 
     DOORS = '/api/v1/approvals/documents/00000000-0000-0000-0000-000000000000'
 
-    @pytest.mark.parametrize('door', ['request-approval', 'approve', 'reject'])
-    def test_a_reader_cannot_act_on_a_document_approval(
+    def test_a_reader_cannot_raise_a_document_approval(
         self,
         client: TestClient,
         h: ModuleTestHelper,
         doc_org: Organization,
-        door: str,
     ) -> None:
         user = h.create_user(doc_org, email='reader@example.com', role='user')
         h.grant_permissions(user, ['warehouse:read', 'approvals:approve'])
-        resp = client.post(f'{self.DOORS}/{door}', headers=h.get_auth_headers(user))
+        resp = client.post(
+            f'{self.DOORS}/request-approval', headers=h.get_auth_headers(user)
+        )
         assert resp.status_code == status.HTTP_403_FORBIDDEN, resp.text
 
     @pytest.mark.parametrize('door', ['approval', 'approval-requirement'])
@@ -214,3 +214,38 @@ class TestWhoATaskCanBeGivenTo:
         ids = resp.json()['user_ids']
         assert str(operator.id) in ids
         assert str(viewer.id) not in ids
+
+    def test_each_task_kind_offers_the_holders_of_its_own_grant(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        doc_org: Organization,
+        operator: User,
+        viewer: User,
+    ) -> None:
+        """A count is not offered to a warehouse operator who cannot count.
+
+        Each row is offered the holders of the grants its action needs: a
+        custom role with only ``warehouse:write`` holds no count, run or
+        replenishment button, so it is not offered those tasks.
+        """
+        warehouse_only = h.create_user(
+            doc_org, email='warehouse-only@example.com', role='user'
+        )
+        h.grant_permissions(warehouse_only, ['warehouse:write'])
+        counter = h.create_user(doc_org, email='counter@example.com', role='user')
+        h.grant_permissions(counter, ['stock_takes:write'])
+
+        resp = client.get(
+            f'{MODULE}/work-items/assignees', headers=h.get_auth_headers(operator)
+        )
+
+        assert resp.status_code == status.HTTP_200_OK, resp.text
+        by_permission = resp.json()['by_permission']
+        assert str(warehouse_only.id) in by_permission['warehouse:write']
+        assert str(warehouse_only.id) not in by_permission['stock_takes:write']
+        assert str(counter.id) in by_permission['stock_takes:write']
+        assert str(counter.id) not in by_permission['warehouse:write']
+        assert str(viewer.id) not in {
+            user_id for holders in by_permission.values() for user_id in holders
+        }

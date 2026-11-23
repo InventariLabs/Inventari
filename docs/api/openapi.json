@@ -2388,6 +2388,40 @@
         }
       }
     },
+    "/api/v1/audit-log/members": {
+      "get": {
+        "tags": [
+          "Audit Log"
+        ],
+        "summary": "List Audit Log Members",
+        "description": "The people a journal row can name.\n\nThe filter is part of the journal's screen, so it asks the journal's own\nauthority rather than the organization read a team list needs: a custom\nadministration role opens the log, and its member filter answers.",
+        "operationId": "list_audit_log_members_api_v1_audit_log_members_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AuditLogMember"
+                  },
+                  "type": "array",
+                  "title": "Response List Audit Log Members Api V1 Audit Log Members Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/v1/audit-log/target-types": {
       "get": {
         "tags": [
@@ -41071,7 +41105,7 @@
           "Warehouse"
         ],
         "summary": "List Work Item Assignees",
-        "description": "Who a task can be given to: the members who hold the warehouse write\ngrant, which every task on the list needs to be done. A viewer is a member\nof the organization and cannot do any of them.",
+        "description": "Who a task can be given to, by the grant each kind of task needs.\n\nA document, a putaway or a hand-typed task is ``warehouse:write`` work; a\ncount, a production run and a replenishment open another module's screen\nand need that module's write. The picker in the screen offers, row by\nrow, the people who hold everything that row's action needs.",
         "operationId": "list_work_item_assignees_api_v1_warehouse_work_items_assignees_get",
         "responses": {
           "200": {
@@ -45155,6 +45189,37 @@
         ],
         "title": "AuditLogDTO",
         "description": "Immutable audit-trail entry (SOX / GDPR compliance)."
+      },
+      "AuditLogMember": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email"
+        ],
+        "title": "AuditLogMember",
+        "description": "One person the journal can name, as its filter offers them."
       },
       "AuditResponseItemSchema": {
         "properties": {
@@ -92466,14 +92531,26 @@
             },
             "type": "array",
             "title": "User Ids"
+          },
+          "by_permission": {
+            "additionalProperties": {
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "By Permission"
           }
         },
         "type": "object",
         "required": [
-          "user_ids"
+          "user_ids",
+          "by_permission"
         ],
         "title": "WorkItemAssignees",
-        "description": "The members a task can be given to: those who hold what doing it needs."
+        "description": "The members a task can be given to: those who hold what doing it needs.\n\n``user_ids`` is everyone who could do a task of some kind. The kinds differ\nin what they need \u2014 a count is ``stock_takes:write``, a run ``maker:write``,\na replenishment both the warehouse's and the orders' \u2014 so\n``by_permission`` names the holders of each, and a picker offers the people\nwho hold everything its row needs."
       },
       "WorkItemCustomCreate": {
         "properties": {

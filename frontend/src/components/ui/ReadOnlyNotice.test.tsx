@@ -49,6 +49,16 @@ describe("ReadOnlyNotice", () => {
     );
   });
 
+  it("uses the read-only words when the reader cannot write either", () => {
+    rights.write = false;
+    rights.manage = false;
+    render(<ReadOnlyNotice module="maker" right="manage" />);
+
+    const note = screen.getByRole("note");
+    expect(note).toHaveTextContent("You can view this, not change it");
+    expect(note).not.toHaveTextContent(/can use this module/i);
+  });
+
   it("says the module cannot be read to an account without the read permission", () => {
     rights.write = false;
     rights.read = false;

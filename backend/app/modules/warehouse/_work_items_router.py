@@ -51,10 +51,16 @@ async def list_work_item_assignees(
     db: AsyncSession = Depends(get_async_db, scope='function'),
     org_id: UUID = Depends(require_org),
 ) -> WorkItemAssignees:
-    """Who a task can be given to: the members who hold the warehouse write
-    grant, which every task on the list needs to be done. A viewer is a member
-    of the organization and cannot do any of them."""
-    return WorkItemAssignees(user_ids=await assignable_user_ids_async(db, org_id))
+    """Who a task can be given to, by the grant each kind of task needs.
+
+    A document, a putaway or a hand-typed task is ``warehouse:write`` work; a
+    count, a production run and a replenishment open another module's screen
+    and need that module's write. The picker in the screen offers, row by
+    row, the people who hold everything that row's action needs.
+    """
+    holders = await assignable_user_ids_async(db, org_id)
+    everyone = sorted({user_id for ids in holders.values() for user_id in ids}, key=str)
+    return WorkItemAssignees(user_ids=everyone, by_permission=holders)
 
 
 @router.put(

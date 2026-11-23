@@ -1023,17 +1023,14 @@ class TestDocumentApprovalWorkflow:
         """the button and the door agree for a person named on the open stage.
 
         The approval read offers the decision to a named approver who holds
-        ``approvals:read`` alone, so the document's approve door admits them;
-        a reader the stage does not name is offered nothing and refused.
+        ``approvals:read`` and the document's read, so the document's approve
+        door admits them without the document's write key; a reader the stage
+        does not name is offered nothing and refused.
         """
         peer = h.create_user(doc_org, email='named-peer@example.com', role='user')
-        h.grant_permissions(
-            peer, ['approvals:read', 'warehouse:read', 'warehouse:write']
-        )
+        h.grant_permissions(peer, ['approvals:read', 'warehouse:read'])
         outsider = h.create_user(doc_org, email='outsider@example.com', role='user')
-        h.grant_permissions(
-            outsider, ['approvals:read', 'warehouse:read', 'warehouse:write']
-        )
+        h.grant_permissions(outsider, ['approvals:read', 'warehouse:read'])
         named = client.patch(
             f'/api/v1/approvals/workflows/{doc_approval_workflow.id}',
             headers=doc_auth_headers,

@@ -377,7 +377,7 @@ export default function DocumentsTodoPage() {
     view: filter,
     locationId: warehouseId ?? undefined,
   });
-  const { data: members = [], isError: membersFailed } =
+  const { byPermission = {}, isError: membersFailed } =
     useAssignableMembers(canWrite);
   const assign = useAssignWorkItem();
   const setDone = useSetCustomWorkItemDone();
@@ -547,7 +547,7 @@ export default function DocumentsTodoPage() {
                       <WorkItemRow
                         key={task.key}
                         item={task}
-                        members={members}
+                        byPermission={byPermission}
                         canWrite={canWrite}
                         canAssign={!membersFailed}
                         selected={selectedIds.has(task.source_id)}

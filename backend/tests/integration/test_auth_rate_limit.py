@@ -139,6 +139,25 @@ class TestAuthRateLimitEnforced:
         )
         assert response.status_code == 429, response.text
 
+    def test_a_429_to_a_bearer_key_carries_the_deprecation_header(
+        self, rate_limited_client
+    ):
+        """The limiter answers before any route, and that answer is marked too.
+
+        Every answer to a key sent as ``Authorization: Bearer`` carries
+        ``Deprecation``, the refusals included — and the limiter, outside
+        every route, refuses with a 429 of its own.
+        """
+        login = {'username': 'nosuch@example.com', 'password': 'wrong'}
+        headers = {'Authorization': 'Bearer inv_live_rate_limited_key'}
+        answers = [
+            rate_limited_client.post('/api/v1/auth/login', data=login, headers=headers)
+            for _ in range(6)
+        ]
+
+        assert [answer.status_code for answer in answers] == [401] * 5 + [429]
+        assert answers[-1].headers['deprecation'] == '@1792713600'
+
     def test_a_burned_bucket_is_nobody_else(self, rate_limited_client, monkeypatch):
         """The isolation above is real, not decorative — and here is its tooth.
 

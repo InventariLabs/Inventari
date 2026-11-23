@@ -33,7 +33,15 @@ vi.mock("@/modules/warehouse/hooks/useDocumentsTodo", () => ({
   MAX_TASKS: 1000,
 }));
 vi.mock("@/modules/warehouse/hooks/useWorkItems", () => ({
-  useAssignableMembers: () => ({ data: [{ id: "user-anna", name: "Anna" }] }),
+  useAssignableMembers: () => ({
+    data: [{ id: "user-anna", name: "Anna" }],
+    byPermission: {
+      "warehouse:write": [{ id: "user-anna", name: "Anna" }],
+      "stock_takes:write": [{ id: "user-anna", name: "Anna" }],
+      "maker:write": [{ id: "user-anna", name: "Anna" }],
+      "approvals:approve": [{ id: "user-anna", name: "Anna" }],
+    },
+  }),
   useAssignWorkItem: () => ({ mutate: m.assign }),
   useSetCustomWorkItemDone: () => ({ mutate: m.done }),
   useDeleteCustomWorkItem: () => ({ mutate: m.remove }),

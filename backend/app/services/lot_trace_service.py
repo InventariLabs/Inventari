@@ -51,6 +51,29 @@ MAX_TRACED_LOTS = 50
 _IN = 'in'
 _OUT = 'out'
 
+#: What the export's Source column says, in the words the stock ledger's
+#: screen uses. The sheet is handed to an inspector, so it says "Production",
+#: not the ledger's ``maker_production``; a source this build does not name
+#: prints as the ledger wrote it rather than as a blank cell.
+_SOURCE_WORDS = {
+    'document': 'Document',
+    'item': 'By hand',
+    'adjustment': 'Stock take',
+    'maker_production': 'Production',
+    'recipe_picking': 'Cooking',
+    'item_history': 'Historical record',
+    'opening_balance': 'Opening balance',
+    'location_relocation': 'Moved with location',
+}
+
+
+def source_words(reference_type: str | None) -> str | None:
+    """The Source column's text for a movement's reference kind."""
+    if reference_type is None:
+        return None
+    return _SOURCE_WORDS.get(reference_type, reference_type)
+
+
 #: A key for one source of movements: (reference_type, reference_id).
 _Ref = tuple[str | None, UUID | None]
 
@@ -362,7 +385,7 @@ def trace_to_export_frame(trace: LotTraceDTO, tz: Any) -> Any:
                     else None,
                     'Direction': 'In' if entry.direction == _IN else 'Out',
                     'Date': entry.moved_at.astimezone(tz).replace(tzinfo=None),
-                    'Source': entry.reference_type,
+                    'Source': source_words(entry.reference_type),
                     'Document': entry.label,
                     'Partner': entry.partner_name,
                     'Partner address': entry.partner_address,

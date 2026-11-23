@@ -18,7 +18,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { extractApiError, isUnreachableError } from "@/lib/errors";
 import { downloadCsv, toCsv } from "@/lib/csv";
-import { useQuery } from "@tanstack/react-query";
 import { Download, History, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -33,6 +32,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import {
   useAuditLog,
+  useAuditMembers,
   useAuditTargetTypes,
 } from "@/modules/settings/hooks/useAuditLog";
 import {
@@ -41,11 +41,9 @@ import {
   snapshotIdentity,
   type AuditChange,
 } from "@/modules/settings/utils/auditChanges";
-import { usersApi } from "@/lib/api/admin";
 import { useOrganization } from "@/modules/settings/hooks/useOrganization";
 import { referenceTargetType } from "@/modules/settings/utils/auditChanges";
 import { getTodayFilename } from "@/utils/formatters";
-import { queryKeys } from "@/hooks/queries/keys";
 import { toast } from "sonner";
 import { copyTextOrExplain } from "@/lib/clipboard";
 import type { AuditLogEntry } from "@/types/core";
@@ -231,11 +229,7 @@ function auditLogCsv(rows: AuditLogEntry[]): string {
  */
 function useAuditFilterLookups() {
   const targetTypesQuery = useAuditTargetTypes();
-  const membersQuery = useQuery({
-    queryKey: queryKeys.users.orgMembers,
-    queryFn: () => usersApi.getOrgMembers(),
-    staleTime: 60_000,
-  });
+  const membersQuery = useAuditMembers();
   const failed = targetTypesQuery.isError ? targetTypesQuery : membersQuery;
   return {
     targetTypes: targetTypesQuery.data ?? [],

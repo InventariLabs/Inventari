@@ -1,4 +1,5 @@
 import { api } from "./client";
+import type { components } from "@/types/api-generated";
 import type { AuditLogListResponse } from "@/types/core";
 
 /**
@@ -23,6 +24,9 @@ export interface AuditLogFilters {
    */
   cursor?: string;
 }
+
+/** One person the journal can name, as its filter offers them. */
+export type AuditLogMember = components["schemas"]["AuditLogMember"];
 
 export const auditLogApi = {
   list: async (
@@ -53,6 +57,17 @@ export const auditLogApi = {
    */
   targetTypes: async (): Promise<string[]> => {
     const response = await api.get<string[]>("/audit-log/target-types");
+    return response.data;
+  },
+
+  /**
+   * The people a journal row can name, for the screen's own member filter.
+   *
+   * The journal's read opens it, not the organization read a team list
+   * needs: a custom administration role opens the log, and this answers.
+   */
+  members: async (): Promise<AuditLogMember[]> => {
+    const response = await api.get<AuditLogMember[]>("/audit-log/members");
     return response.data;
   },
 };

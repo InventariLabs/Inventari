@@ -323,6 +323,54 @@ class TestAuditLogRouter:
         assert response.status_code == 403
 
 
+class TestACustomAdministratorReadsTheJournal:
+    async def test_the_user_filter_is_not_denied_to_an_audit_reader(
+        self,
+        real_async_client,
+        real_async_db_session,
+        async_test_household,
+    ):
+        """The journal's member filter asks the same authority the journal does.
+
+        A custom role carrying ``admin:access`` opens the log and reads the
+        names in it, so its member lookup answers too.
+        """
+        from app.models.role import Role, UserRole
+        from app.models.user import User
+        from app.services.token_service import get_password_hash
+
+        administrator = User(
+            email=f'audit_admin_{uuid4().hex[:8]}@example.com',
+            hashed_password=get_password_hash('adminpass'),
+            full_name='Custom Administrator',
+            organization_id=async_test_household.id,
+            role='user',
+            is_active=True,
+        )
+        real_async_db_session.add(administrator)
+        await real_async_db_session.flush()
+        role = Role(
+            name=f'audit_reader_{uuid4().hex[:8]}',
+            permissions=['admin:access'],
+            organization_id=async_test_household.id,
+        )
+        real_async_db_session.add(role)
+        await real_async_db_session.flush()
+        real_async_db_session.add(UserRole(user_id=administrator.id, role_id=role.id))
+        await real_async_db_session.commit()
+
+        journal = await real_async_client.get(
+            '/api/v1/audit-log', headers=_auth(administrator)
+        )
+        members = await real_async_client.get(
+            '/api/v1/audit-log/members', headers=_auth(administrator)
+        )
+
+        assert journal.status_code == 200, journal.text
+        assert members.status_code == 200, members.text
+        assert str(administrator.id) in {member['id'] for member in members.json()}
+
+
 # ---------------------------------------------------------------------------
 # Instrument item mutation services with audit logs.
 #

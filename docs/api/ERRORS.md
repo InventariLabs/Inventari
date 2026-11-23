@@ -188,9 +188,6 @@ apart.
 | `AI_USAGE_LIMIT_EXCEEDED_SCANS` | The organization has used {used} of {limit} label scans allowed for {period}. Contact your administrator to raise the limit. |
 | `ANNOUNCEMENT_TYPE_INVALID` | Invalid announcement type. Allowed: {allowed} |
 | `API_KEYS_LIMIT_REACHED` | The organization already has {count} active API keys, which is the maximum. Revoke one to create another. |
-| `API_KEY_CANNOT_CREATE` | API keys cannot create other API keys |
-| `API_KEY_CANNOT_MANAGE` | API keys cannot manage other API keys |
-| `API_KEY_CANNOT_REVOKE` | API keys cannot revoke other API keys |
 | `API_KEY_PERMISSION_NOT_GRANTABLE` | An API key cannot be given {permission}: you do not hold it, or no key carries it |
 | `API_KEY_PERMISSION_OUTSIDE_SCOPE` | The permission {permission} is not part of the scopes chosen for this key |
 | `API_KEY_SCOPE_UNKNOWN` | There is no API key scope called "{scope}" |

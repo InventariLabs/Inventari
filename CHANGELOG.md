@@ -14,6 +14,33 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Permissions now hold across the screens and doors that only half reached
+  them. A completed shopping list refuses ticks, line edits and deletions from
+  a stale tab, and a finished batch trace and its spreadsheet ask for the
+  partner read that the supplier and customer names on them need; the sheet's
+  Source column says "Production" rather than the ledger's `maker_production`.
+  A print job is listed and resent to a module reader only when its labels are
+  assigned to that module's records, an equipment address opened on an
+  ordinary product answers "Asset not found", and the work board's assignee
+  picker offers, row by row, only the people who hold the grant that task's
+  action needs. A permission withheld from API keys after a key was issued
+  stops working for that key, and the rate-limit refusal to a key sent as
+  `Authorization: Bearer` carries the `Deprecation` header like every other
+  answer. The approval door admits the person named on the open stage with the
+  approvals read alone, the self-approval setting admits a custom
+  administration role as it does the built-in administrator, and the
+  audit log's member filter answers for that administrator too. A truncated
+  picture upload is refused whatever the process imported first, and read-only
+  screens say what they are: a formula opens rather than offering "Edit BOM"
+  to an account that cannot manage it, and a viewer of module settings reads
+  the read-only sentence rather than "you can use this".
+
+### Changed
+
+- The Equipment & Warehouse profile is teal instead of blue: the application's
+  own colour, so the demo, the README and a new installation look alike. An
+  organization on that profile sees its buttons, links and tabs in teal after
+  the upgrade; Food & Home stays emerald and Custom amber.
 - A reorder alert no longer proposes again what is already on its way. What
   open purchase orders still expect of a bought product, drafts included, and
   what unfinished production runs will still make of a made one now cover the

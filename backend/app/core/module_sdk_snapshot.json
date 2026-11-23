@@ -2860,6 +2860,16 @@
       "kind": "function",
       "params": []
     },
+    "get_context_tags_of": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "module_name",
+          "required": true
+        }
+      ]
+    },
     "get_current_lang": {
       "kind": "function",
       "params": []

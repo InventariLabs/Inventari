@@ -754,6 +754,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/audit-log/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Audit Log Members
+         * @description The people a journal row can name.
+         *
+         *     The filter is part of the journal's screen, so it asks the journal's own
+         *     authority rather than the organization read a team list needs: a custom
+         *     administration role opens the log, and its member filter answers.
+         */
+        get: operations["list_audit_log_members_api_v1_audit_log_members_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/audit-log/target-types": {
         parameters: {
             query?: never;
@@ -11092,9 +11116,12 @@ export interface paths {
         };
         /**
          * List Work Item Assignees
-         * @description Who a task can be given to: the members who hold the warehouse write
-         *     grant, which every task on the list needs to be done. A viewer is a member
-         *     of the organization and cannot do any of them.
+         * @description Who a task can be given to, by the grant each kind of task needs.
+         *
+         *     A document, a putaway or a hand-typed task is ``warehouse:write`` work; a
+         *     count, a production run and a replenishment open another module's screen
+         *     and need that module's write. The picker in the screen offers, row by
+         *     row, the people who hold everything that row's action needs.
          */
         get: operations["list_work_item_assignees_api_v1_warehouse_work_items_assignees_get"];
         put?: never;
@@ -12555,6 +12582,21 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /**
+         * AuditLogMember
+         * @description One person the journal can name, as its filter offers them.
+         */
+        AuditLogMember: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name?: string | null;
+            /** Email */
+            email: string;
         };
         /** AuditResponseItemSchema */
         AuditResponseItemSchema: {
@@ -29754,10 +29796,20 @@ export interface components {
         /**
          * WorkItemAssignees
          * @description The members a task can be given to: those who hold what doing it needs.
+         *
+         *     ``user_ids`` is everyone who could do a task of some kind. The kinds differ
+         *     in what they need — a count is ``stock_takes:write``, a run ``maker:write``,
+         *     a replenishment both the warehouse's and the orders' — so
+         *     ``by_permission`` names the holders of each, and a picker offers the people
+         *     who hold everything its row needs.
          */
         WorkItemAssignees: {
             /** User Ids */
             user_ids: string[];
+            /** By Permission */
+            by_permission: {
+                [key: string]: string[];
+            };
         };
         /**
          * WorkItemCustomCreate
@@ -31726,6 +31778,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_audit_log_members_api_v1_audit_log_members_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditLogMember"][];
                 };
             };
         };

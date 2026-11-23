@@ -3,7 +3,7 @@
 from typing import cast
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.api_key_auth import api_key_scopes
@@ -22,7 +22,7 @@ from app.core.deps import (
     require_org,
     require_permission,
 )
-from app.core.exceptions import catalogue_status_refusal, map_service_errors
+from app.core.exceptions import map_service_errors
 from app.core.module_sdk import PaginatedResponse
 from app.core.modules import require_module
 from app.core.public_api import core_api
@@ -117,11 +117,6 @@ async def list_keys(
     org_id: UUID = Depends(require_org),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> PaginatedResponse[schemas.ApiKeyResponse]:
-    # API keys themselves cannot manage API keys
-    if current_user.role == 'api_key':
-        raise catalogue_status_refusal(
-            'api_key_cannot_manage', status.HTTP_403_FORBIDDEN
-        )
     keys, total = await list_api_keys(db, org_id, offset=offset, limit=limit)
     return PaginatedResponse.from_slice(
         [schemas.ApiKeyResponse.from_orm_with_email(k) for k in keys],
@@ -138,11 +133,6 @@ async def create_key(
     org_id: UUID = Depends(require_org),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> schemas.ApiKeyCreatedResponse:
-    # API keys themselves cannot create new API keys
-    if current_user.role == 'api_key':
-        raise catalogue_status_refusal(
-            'api_key_cannot_create', status.HTTP_403_FORBIDDEN
-        )
     _, grantable = await _grantable_async(db, org_id, current_user)
     permissions = resolve_key_permissions(
         grantable=grantable, permissions=payload.permissions, scopes=payload.scopes
@@ -195,10 +185,6 @@ async def revoke_key(
     org_id: UUID = Depends(require_org),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> None:
-    if current_user.role == 'api_key':
-        raise catalogue_status_refusal(
-            'api_key_cannot_revoke', status.HTTP_403_FORBIDDEN
-        )
     api_key = await revoke_api_key(db, org_id, key_id)
     # The row leaves the list on revocation, so "who revoked this key" had no
     # answer on any screen. This entry is it.

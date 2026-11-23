@@ -19,6 +19,7 @@ from typing import Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_current_admin_user
@@ -112,6 +113,37 @@ async def list_audit_log(
         next_cursor=next_cursor,
         total_capped=total_capped,
     )
+
+
+class AuditLogMember(BaseModel):
+    """One person the journal can name, as its filter offers them."""
+
+    id: UUID
+    name: str | None = None
+    email: str
+
+
+@router.get(
+    '/audit-log/members',
+    # list-envelope-exception: a vocabulary, one entry per member in the log
+    response_model=list[AuditLogMember],
+)
+async def list_audit_log_members(
+    current_user: UserContextDTO = Depends(get_current_admin_user),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> list[AuditLogMember]:
+    """The people a journal row can name.
+
+    The filter is part of the journal's screen, so it asks the journal's own
+    authority rather than the organization read a team list needs: a custom
+    administration role opens the log, and its member filter answers.
+    """
+    org_id = require_org(current_user)
+    members = await core_api.users.list_org_members_async(db, org_id)
+    return [
+        AuditLogMember(id=member.id, name=member.full_name, email=member.email)
+        for member in members
+    ]
 
 
 @router.get(
