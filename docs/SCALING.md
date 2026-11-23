@@ -25,8 +25,12 @@ Before scaling `backend` beyond one replica, verify every item:
 
 ### 1.2 Database migrations — single runner
 - `backend/entrypoint.sh` wraps `alembic upgrade heads` + module migrations
-  in a PostgreSQL advisory lock (`pg_advisory_lock(727301)`), so concurrent
-  replica starts cannot race migrations. This is a **stop-gap**.
+  in a PostgreSQL advisory lock (key 727301), so concurrent replica starts
+  cannot race migrations. This is a **stop-gap**. A replica, or a `db upgrade`
+  run beside it, waits by trying the lock once a second
+  (`pg_try_advisory_lock`) rather than blocking in `pg_advisory_lock`: a
+  blocked statement is a transaction that `CREATE INDEX CONCURRENTLY` in the
+  holder's migration would wait for, while the holder waits for the build.
 - The same lock is taken by a database rebuild (`demo reset`, `db reset`) for
   the whole drop-and-seed, so a backend starting beside one waits for it
   instead of migrating into a schema that is being dropped. The reset's
@@ -140,7 +144,7 @@ until 1.4 is done.
 | Transactional events | emit after commit → crash loses event | `event_outbox` + relay; `emit_transactional` rides the business transaction (at-least-once) |
 | Emails | thread-pool SMTP, no retry | `email_jobs` table + claim/send/retry worker, FAILED after max attempts |
 | Redis eviction | blacklist/limiter on allkeys-lru | dedicated `noeviction` instance |
-| Migrations on multi-replica start | race possible | `pg_advisory_lock` in entrypoint (stop-gap) |
+| Migrations on multi-replica start | race possible | advisory lock in entrypoint (stop-gap) |
 
 ### Event delivery: at-least-once, and what that costs
 
