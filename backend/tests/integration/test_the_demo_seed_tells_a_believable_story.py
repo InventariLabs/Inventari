@@ -39,16 +39,21 @@ from sqlalchemy.orm import Session
 
 from app.models.item import Item
 from app.models.organization import Organization
+from app.models.product_template import ProductTemplate
+from app.models.stock_lot import StockLot
 from app.models.stock_move import StockMove, StockMoveReferenceType
 from app.models.stock_valuation_layer import StockValuationLayer
 from app.models.storage_location import StorageLocation
 from app.modules.equipment.models import EquipmentMaintenanceLog
 from app.modules.maker.models import (
     BoMLine,
+    MakerLabelFacts,
     MakerRecipe,
     ProductionOrder,
     ProductionOrderLine,
+    ProductionPortion,
 )
+from app.modules.maker.planning_service import coverage_for_drafts
 from app.modules.purchase_orders.models import PurchaseOrder, PurchaseOrderLine
 from app.modules.recipes.models.meal_plan import MealPlan, MealPlanEntry
 from app.modules.recipes.models.recipe import Recipe, RecipeIngredient
@@ -58,12 +63,15 @@ from seed_demo_data import (
     DEMO_STORY_EXPIRED,
     FOOD_TEMPLATES,
     FOOD_ZONE_BY_CATEGORY,
+    MAKER_PLANNED_RUNS,
+    MAKER_STEPS,
     SEED_PREFIX,
     TODAY,
     _org_tax_rates,
     clean_seed_data,
 )
 from tests.integration._demo_world import ids, seeded_organization
+from tests.integration._shelf import run_in_async_session
 
 pytestmark = pytest.mark.integration
 
@@ -405,6 +413,111 @@ class TestTheWorkshopRanWhatItReports:
         assert set(children) == priced, (
             f'{len(set(children) - priced)} ingredient(s) have no stock with a price'
         )
+
+
+class TestTheWorkshopHasAWeekToShow:
+    """The Plan screen, a run under way and the label are not empty in the demo."""
+
+    def _runs(
+        self, db: Session, org_id: uuid.UUID, status: str
+    ) -> list[ProductionOrder]:
+        return (
+            db.query(ProductionOrder)
+            .filter(
+                ProductionOrder.organization_id == org_id,
+                ProductionOrder.status == status,
+            )
+            .order_by(ProductionOrder.production_date)
+            .all()
+        )
+
+    def test_planned_runs_lie_on_different_days_ahead(
+        self, db_session: Session, seeded: uuid.UUID
+    ) -> None:
+        drafts = self._runs(db_session, seeded, 'DRAFT')
+        days = [run.production_date for run in drafts]
+        assert len(drafts) == len(MAKER_PLANNED_RUNS)
+        assert len(set(days)) == len(days)
+        assert all(day > TODAY for day in days)
+        assert max(days) - min(days) >= timedelta(days=3)
+
+    def test_the_plan_calls_exactly_the_last_run_short_of_sugar(
+        self, db_session: Session, seeded: uuid.UUID, async_engine_fixture
+    ) -> None:
+        db_session.commit()
+        coverage = run_in_async_session(
+            async_engine_fixture, lambda adb: coverage_for_drafts(adb, seeded)
+        )
+        drafts = self._runs(db_session, seeded, 'DRAFT')
+        states = [coverage[run.id].status for run in drafts]
+        assert states == ['covered'] * (len(drafts) - 1) + ['partial']
+        short = coverage[drafts[-1].id].items
+        assert [item.child_template_name for item in short] == ['White Sugar']
+
+    def test_a_run_is_under_way_with_steps_ticked_and_a_portion_on_the_shelf(
+        self, db_session: Session, seeded: uuid.UUID
+    ) -> None:
+        (run,) = self._runs(db_session, seeded, 'IN_PROGRESS')
+        assert run.started_on is not None and run.started_on < TODAY
+        done = [step for step in run.steps if step.get('done_on')]
+        assert 0 < len(done) < len(run.steps)
+        portions = (
+            db_session.query(ProductionPortion)
+            .filter(ProductionPortion.production_order_id == run.id)
+            .all()
+        )
+        assert len(portions) == 1
+        assert portions[0].lot_name and portions[0].item_id is not None
+
+    def test_the_recipe_says_how_long_each_step_takes(
+        self, db_session: Session, seeded: uuid.UUID
+    ) -> None:
+        recipe = (
+            db_session.query(MakerRecipe)
+            .filter(
+                MakerRecipe.organization_id == seeded, MakerRecipe.is_default.is_(True)
+            )
+            .one()
+        )
+        assert [(s['text'], s['minutes']) for s in recipe.process_steps] == [
+            (text, minutes) for text, minutes in MAKER_STEPS
+        ]
+
+    def test_the_label_is_declared_not_left_unchecked(
+        self, db_session: Session, seeded: uuid.UUID
+    ) -> None:
+        """Every ingredient is checked for allergens and carries its figures."""
+        recipe = (
+            db_session.query(MakerRecipe)
+            .filter(
+                MakerRecipe.organization_id == seeded, MakerRecipe.is_default.is_(True)
+            )
+            .one()
+        )
+        children = [
+            child
+            for (child,) in db_session.query(BoMLine.child_template_id).filter(
+                BoMLine.recipe_id == recipe.id
+            )
+        ]
+        facts = {
+            row.product_template_id: row
+            for row in db_session.query(MakerLabelFacts).filter(
+                MakerLabelFacts.organization_id == seeded
+            )
+        }
+        assert facts[recipe.output_template_id].label_name
+        assert all(facts[child].allergens == [] for child in children)
+        for child in children:
+            template = db_session.get(ProductTemplate, child)
+            assert template.meta_data['nutrition']['calories_kcal'] > 0
+
+    def test_a_batch_carries_a_best_before_from_the_shelf_life(
+        self, db_session: Session, seeded: uuid.UUID
+    ) -> None:
+        (run,) = self._runs(db_session, seeded, 'COMPLETED')
+        lot = db_session.get(StockLot, run.output_lot_id)
+        assert lot is not None and lot.expiry_date is not None
 
 
 class TestTheShelvesFilledOverTime:

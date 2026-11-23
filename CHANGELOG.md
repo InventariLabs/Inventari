@@ -290,6 +290,10 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
+- The Equipment & Warehouse profile is teal instead of blue: the application's
+  own colour, so the demo, the README and a new installation look alike. An
+  organization on that profile sees its buttons, links and tabs in teal after
+  the upgrade; Food & Home stays emerald and Custom amber.
 - **Breaking:** `BACKUP_RCLONE_REMOTE` names the parent of the offsite copy,
   not the directory the backups land in: the service appends `backups/` (and
   the logs go to `logs/` beside it). An installation that has the offsite copy

@@ -114,12 +114,12 @@ DEMO_SUPPLIER_PRICES = [
     ('ITD-002', 'ThinkPad T14s Gen 4', Decimal('5650.00')),
 ]
 
-#: (ingredient, minimum, maximum, safety stock). The production run leaves
-#: 13.6 kg of plums against a minimum of 20, so the replenishment screen has
-#: a suggestion to make; sugar and cinnamon are well above theirs. Each is
-#: bought from the supplier whose price list names it.
+#: (ingredient, minimum, maximum, safety stock). The runs leave 101.6 kg of
+#: plums against a minimum of 120, so the replenishment screen has a
+#: suggestion to make; sugar and cinnamon are above theirs. Each is bought from
+#: the supplier whose price list names it.
 DEMO_REORDER_POINTS = [
-    ('Damson Plums', Decimal('20'), Decimal('40'), Decimal('10')),
+    ('Damson Plums', Decimal('120'), Decimal('200'), Decimal('20')),
     ('White Sugar', Decimal('5'), Decimal('25'), Decimal('2')),
     ('Cassia Cinnamon', Decimal('0.1'), Decimal('0.5'), Decimal('0.1')),
 ]

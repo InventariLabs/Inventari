@@ -43,7 +43,13 @@ from app.models.partner import Partner
 from app.models.product_template import ProductTemplate
 from app.models.storage_location import LocationUsage, StorageLocation
 from app.models.user import User
-from app.modules.maker.models import BoMLine, MakerRecipe, ProductionOrder
+from app.modules.maker.models import (
+    BoMLine,
+    MakerLabelFacts,
+    MakerRecipe,
+    MakerShelfLife,
+    ProductionOrder,
+)
 from app.modules.purchase_orders.models import PurchaseOrder, PurchaseOrderLine
 from app.modules.stock_takes.models import (
     StockTakeItem,  # resolve Item.stock_take_items
@@ -3410,8 +3416,8 @@ MAKER_BOM = [
 #: said it could not work out what a batch costs, and the run that was
 #: supposed to show the module working had consumed nothing.
 MAKER_STOCK = [
-    ('Damson Plums', Decimal('40'), Decimal('3.40'), 'Cold Storage', 3),
-    ('White Sugar', Decimal('25'), Decimal('1.10'), 'Dry Goods', 20),
+    ('Damson Plums', Decimal('150'), Decimal('3.40'), 'Cold Storage', 3),
+    ('White Sugar', Decimal('17'), Decimal('1.10'), 'Dry Goods', 20),
     ('Cassia Cinnamon', Decimal('0.5'), Decimal('24.00'), 'Dry Goods', 34),
 ]
 
@@ -3419,6 +3425,73 @@ MAKER_STOCK = [
 MAKER_RUN_PLANNED = Decimal('12')
 MAKER_RUN_MADE = Decimal('11.4')
 MAKER_RUN_NOTES = 'Autumn batch, first of the season.'
+
+#: How plum butter is made: (step, minutes). Timed, so the recipe says how long
+#: a batch takes; the labour rate stays at zero, so no cost moves with them.
+MAKER_STEPS = [
+    ('Wash and stone the plums', 25),
+    ('Cook the plums down slowly, stirring', 90),
+    ('Stir in the sugar and cinnamon and test the set', 20),
+    ('Pour into warm jars and seal', 30),
+]
+
+#: The run under way: started two days ago, the first jars filled yesterday.
+MAKER_RUN_STARTED_DAYS_AGO = 2
+MAKER_RUN_UNDER_WAY_PLANNED = Decimal('10')
+MAKER_RUN_UNDER_WAY_NOTES = 'Second batch, slow-cooked over two days.'
+MAKER_RUN_UNDER_WAY_FIRST_JARS = Decimal('4')
+MAKER_RUN_UNDER_WAY_FIRST_JARS_BATCH = 'DAMSON-A'
+
+#: Runs planned for the days ahead: (days from today, kg, notes). Sugar is
+#: stocked to cover the first three and fall short of the fourth, so the plan
+#: has a run it calls short and the needs list something to order.
+MAKER_PLANNED_RUNS = [
+    (1, Decimal('8'), 'Small batch for the Saturday market.'),
+    (2, Decimal('12'), 'Full batch, jars for the farm shop.'),
+    (3, Decimal('10'), 'Batch for the Christmas gift boxes.'),
+    (5, Decimal('12'), 'Weekend batch, waiting for sugar.'),
+]
+
+#: What the product's label says beyond its recipe.
+MAKER_LABEL_NAME = 'Damson plum butter'
+#: Jars keep for a year and a half; every batch's best-before follows from it.
+MAKER_SHELF_LIFE_DAYS = 548
+
+#: Packed in a kitchen that also handles nuts.
+MAKER_LABEL_MAY_CONTAIN = ('nuts',)
+
+#: Per 100 g on each ingredient's card, in the card's own names: calories,
+#: fat, saturated fat, carbohydrate, sugar, protein, salt. With them the
+#: Label tab declares the product's nutrition instead of saying nobody has.
+MAKER_NUTRITION = {
+    'Damson Plums': {
+        'calories_kcal': 46,
+        'fat_g': 0.3,
+        'saturated_fat_g': 0,
+        'carbs_g': 11.4,
+        'sugar_g': 9.9,
+        'protein_g': 0.7,
+        'salt_g': 0,
+    },
+    'White Sugar': {
+        'calories_kcal': 400,
+        'fat_g': 0,
+        'saturated_fat_g': 0,
+        'carbs_g': 100,
+        'sugar_g': 100,
+        'protein_g': 0,
+        'salt_g': 0,
+    },
+    'Cassia Cinnamon': {
+        'calories_kcal': 247,
+        'fat_g': 1.2,
+        'saturated_fat_g': 0.3,
+        'carbs_g': 80.6,
+        'sugar_g': 2.2,
+        'protein_g': 4,
+        'salt_g': 0.03,
+    },
+}
 
 
 def _seed_line_measure(
@@ -3517,7 +3590,8 @@ def _create_maker_demo(db, org_id) -> dict[str, uuid.UUID]:
             weight_value=1000.0,
             weight_uom_id=uom_gram,
             removal_strategy='FIFO',
-            meta_data={'maker_demo': True},
+            meta_data={'maker_demo': True}
+            | ({'nutrition': MAKER_NUTRITION[name]} if name in MAKER_NUTRITION else {}),
         )
         db.add(template)
         ids[name] = template.id
@@ -3547,6 +3621,9 @@ def _create_maker_demo(db, org_id) -> dict[str, uuid.UUID]:
             # Store reference price (per kg jar) — powers the
             # savings/margin result on the catalog card and dashboard.
             reference_price=Decimal('18.00'),
+            process_steps=[
+                {'text': text, 'minutes': minutes} for text, minutes in MAKER_STEPS
+            ],
             is_default=True,
         )
         db.add(recipe)
@@ -3580,6 +3657,42 @@ def _create_maker_demo(db, org_id) -> dict[str, uuid.UUID]:
         )
         db.add(line)
         bom_count += 1
+
+    if not (
+        db.query(MakerShelfLife)
+        .filter_by(organization_id=org_id, product_template_id=parent_id)
+        .first()
+    ):
+        db.add(
+            MakerShelfLife(
+                organization_id=org_id,
+                product_template_id=parent_id,
+                shelf_life_days=MAKER_SHELF_LIFE_DAYS,
+            )
+        )
+
+    # The product's label name and what its kitchen may carry, and, for each
+    # ingredient, that someone checked its card for allergens and found none.
+    facts = {
+        parent_id: (MAKER_LABEL_NAME, None, list(MAKER_LABEL_MAY_CONTAIN)),
+        **{ids[name]: (None, [], []) for name in MAKER_NUTRITION},
+    }
+    for template_id, (label_name, allergens, may_contain) in facts.items():
+        if (
+            db.query(MakerLabelFacts)
+            .filter_by(organization_id=org_id, product_template_id=template_id)
+            .first()
+        ):
+            continue
+        db.add(
+            MakerLabelFacts(
+                organization_id=org_id,
+                product_template_id=template_id,
+                label_name=label_name,
+                allergens=allergens,
+                may_contain=may_contain,
+            )
+        )
 
     db.flush()
     print(
@@ -3763,18 +3876,18 @@ def _create_maintenance_demo(db, org_id, created_by) -> int:
 
 
 def _create_production_demo(db, org_id, created_by, maker_ids) -> int:
-    """One finished production run, so the module reports a result.
+    """The workshop's production runs: one finished, one under way, four planned.
 
     "Monthly result" on the overview reads from completed runs, and a demo
     with none said "No completed runs with a result yet" on an instance whose
     whole point is to show the feature working.
 
-    The run used to be one row written here with a total typed in by hand: no
-    ingredient on it ("No ingredients were recorded for this run"), nothing
-    taken off a shelf and nothing put on one. It is now made the way the
-    application makes one — a draft order, then the completion that draws the
-    ingredients ``_stock_the_workshop`` put on the shelves, prices them off
-    their cost layers and puts the jars on a shelf.
+    The finished run is made the way the application makes one — a draft
+    order, then the completion that draws the ingredients
+    ``_stock_the_workshop`` put on the shelves, prices them off their cost
+    layers and puts the jars on a shelf. The run under way was started some
+    days ago with a portion already made, and the planned runs are drafts
+    with a day each, so the plan and the run list have something to show.
     """
     parent_id = maker_ids.get('Plum Butter') if maker_ids else None
     if parent_id is None:
@@ -3825,7 +3938,60 @@ def _create_production_demo(db, org_id, created_by, maker_ids) -> int:
             adb, org_id, order.id, context, actual_qty=MAKER_RUN_MADE
         )
         await adb.commit()
-        return 1
+        count = 1
+
+        # The run under way: its ingredients are off the shelves, two of the
+        # four steps are done and the first jars are on a shelf in a batch of
+        # their own.
+        under_way = await production_service.create_order(
+            adb,
+            org_id,
+            ProductionOrderCreate(
+                output_template_id=parent_id,
+                planned_qty=MAKER_RUN_UNDER_WAY_PLANNED,
+                output_location_id=shelf.id,
+                notes=MAKER_RUN_UNDER_WAY_NOTES,
+                confirm_shortage=True,
+            ),
+            context,
+        )
+        started = TODAY - timedelta(days=MAKER_RUN_STARTED_DAYS_AGO)
+        await production_service.start_production(
+            adb, org_id, under_way.id, context, started_on=started
+        )
+        for index in (0, 1):
+            await production_service.tick_step(
+                adb, org_id, under_way.id, index, started, context
+            )
+        await production_service.record_portion(
+            adb,
+            org_id,
+            under_way.id,
+            context,
+            qty=MAKER_RUN_UNDER_WAY_FIRST_JARS,
+            made_on=TODAY - timedelta(days=1),
+            lot_name=MAKER_RUN_UNDER_WAY_FIRST_JARS_BATCH,
+        )
+        count += 1
+
+        # The days ahead, each a draft with a planned day.
+        for days_ahead, kilos, notes in MAKER_PLANNED_RUNS:
+            await production_service.create_order(
+                adb,
+                org_id,
+                ProductionOrderCreate(
+                    output_template_id=parent_id,
+                    planned_qty=kilos,
+                    output_location_id=shelf.id,
+                    production_date=TODAY + timedelta(days=days_ahead),
+                    notes=notes,
+                    confirm_shortage=True,
+                ),
+                context,
+            )
+            count += 1
+        await adb.commit()
+        return count
 
     return _run_on_own_engine(_produce)
 

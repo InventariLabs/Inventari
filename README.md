@@ -284,12 +284,12 @@ USB or Bluetooth scanner and as a QR code for a phone camera.
 The same core under an IT desk, a kitchen and a workshop — three of the
 modules the demo seed switches on beside the warehouse.
 
-![The equipment overview: nine assets need attention — warranties ending within weeks and a server in maintenance — above the totals, 77 assets with four checked out, and the fleet by category as bars: laptops, network devices, monitors, peripherals, desktop computers and other equipment, each with how many are checked out or have a warranty ending soon](docs/images/equipment-overview.webp)
+![The equipment overview: ten assets need attention — warranties ending within weeks and a server in maintenance — above the totals, 84 assets with four checked out, and the fleet by category as bars: network devices, laptops, phones and tablets, servers, peripherals and desktop computers, each with how many are checked out or have a warranty ending soon](docs/images/equipment-overview.webp)
 
 **Equipment** — what needs attention first, then the whole fleet by category;
 serials, warranties, maintenance and who signed for what are a click below.
 
-![Shakshuka: its photograph, an estimated cost of $10.73, two servings in 25 minutes and eggs as its allergen; each ingredient with the shelf it is on — eggs in the fridge, the tomatoes and the olive oil on shelves — the onion missing, and a button that puts what is missing on the shopping list](docs/images/recipe.webp)
+![Shakshuka: its photograph, an estimated cost of $10.44, two servings in 25 minutes and eggs as its allergen; each ingredient with the shelf it is on — eggs in the walk-in cooler, the tomatoes and the olive oil on shelves — the onion missing, and a button that puts what is missing on the shopping list](docs/images/recipe.webp)
 
 **A recipe** — which ingredients are in the house and where each one is; the
 missing ones go onto the shopping list.
@@ -306,11 +306,11 @@ touches on the server. What you do not switch on, you do not see: the
 wholesaler above runs the business modules its launcher shows, the demo almost
 all of them.
 
-![The demo's module store: twelve of the fifteen modules switched on — partners, approvals, equipment tracking, production, nutrition info, label printing, purchase orders, recipes, shopping lists, statistics, stock takes and the warehouse — with API keys, photo recognition and webhooks left off; each with its version, where it comes from and what it needs: stored data, files, background tasks or internet access](docs/images/app-store.webp)
+![The demo's module store: thirteen of the fifteen modules switched on — partners, API keys, approvals, equipment tracking, production, nutrition info, label printing, purchase orders, recipes, shopping lists, statistics, stock takes and the warehouse — with photo recognition and webhooks left off; each with its version, where it comes from and what it needs: stored data, files, background tasks or internet access](docs/images/app-store.webp)
 
 ### In the dark
 
-![The warehouse Start in dark mode: four actions — receive, issue, move, count — above today's to-do list: Sam Okafor's card to wrap the pallet for Northside Grocers, the order for Northside Grocers to pick, the two orders Priya Nair is picking and the delivery from Ortolana Imports to receive, each with who it is assigned to; beside it today's activity, the two receipts at 08:01 and 08:33 and the two shipped orders at 10:03 and 10:11; below them a field for a new task](docs/images/warehouse-start-dark.webp)
+![The warehouse Start in dark mode: four actions — receive, issue, move, count — above today's to-do list: Sam Okafor's card to wrap the pallet for Northside Grocers, the order for Northside Grocers to pick, the two orders Priya Nair is picking and the delivery from Ortolana Imports to receive, each with a selector for who it is assigned to; beside it today's activity, the two receipts at 08:01 and 08:33 and the two shipped orders at 10:03 and 10:11; below them a field for a new task](docs/images/warehouse-start-dark.webp)
 
 ### A phone that is not an afterthought
 
@@ -319,7 +319,7 @@ rather than a narrowed table.
 
 | | | |
 |---|---|---|
-| ![The warehouse Start on a phone: "Hello, Sam", the four actions as large tiles and today's work in order, beginning with Sam's card to wrap the pallet for Northside Grocers and the order for Northside Grocers assigned to Sam, above the bottom bar of Start, Scan, History and More](docs/images/mobile-start.webp) | ![A picking session over two orders on a phone: a progress chip for each — OUT/2026/003 one of four lines picked, OUT/2026/004 two of three — the next line to take, ten packs of Arborio rice from shelf B-01-03, the scan field with the note that a barcode scanner can be used, and the lines already picked with their shelf and best-before date](docs/images/picking-several.webp) | ![The launcher on a phone: "Welcome, Olivia", the profile Equipment & Warehouse and the modules of a business as tiles — inventory with one product running low, equipment tracking, approvals, purchase orders, warehouse with five things to do today, partners and settings](docs/images/mobile-launcher.webp) |
+| ![The warehouse Start on a phone: "Hello, Sam", the four actions as large tiles and today's work in order, beginning with Sam's card to wrap the pallet for Northside Grocers and the delivery order for Laneway Espresso Bar, above the bottom bar of Start, Scan, History and More](docs/images/mobile-start.webp) | ![A picking session over two orders on a phone: a progress chip for each — OUT/2026/003 one of four lines picked, OUT/2026/004 two of three — the next line to take, ten packs of Arborio rice from shelf B-01-03, the scan field with the note that a barcode scanner can be used, and the lines already picked with their shelf and best-before date](docs/images/picking-several.webp) | ![The launcher on a phone: "Welcome, Olivia", the profile Equipment & Warehouse and the modules of a business as tiles — inventory with one thing needing attention, equipment tracking, approvals, purchase orders, warehouse with five things to do today, partners and settings](docs/images/mobile-launcher.webp) |
 | **Start** — the day's work for the person holding the phone. | **Picking several orders at once** — one walk in the warehouse's order, every line naming the order it is for. | **The launcher** — the modules this business runs, with what waits in each. |
 
 ---
