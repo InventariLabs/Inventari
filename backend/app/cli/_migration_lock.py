@@ -20,12 +20,21 @@ The name the lock session carries is also what tells the sweep which session
 it may not terminate. A backend waiting for this lock is not one of "every
 other session of the role"; ending it is the crash the lock exists to
 prevent, so the sweep spares the name while the rebuild holds the key.
+
+A waiter polls the lock rather than blocking in ``pg_advisory_lock``. The
+holder may be a migration that builds an index with ``CREATE INDEX
+CONCURRENTLY``, which waits for every transaction already running in the
+database to end; a statement blocked on the lock is one, and it ends only
+when the holder lets go. PostgreSQL cannot see that the build and the lock
+belong to one process, so it reports no deadlock and both wait for ever.
+Between two tries the waiter runs no statement at all.
 """
 
 from __future__ import annotations
 
 import os
-from collections.abc import Iterator
+import time
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 
 from app.core.schema_rebuild import MIGRATION_LOCK_KEY
@@ -34,6 +43,23 @@ from app.core.schema_rebuild import MIGRATION_LOCK_KEY
 #: ``pg_stat_activity``. The reset sweep spares it, so it must be the one name
 #: the entrypoint and ``hold_migration_lock`` both connect with.
 MIGRATION_LOCK_APPLICATION_NAME = 'inventari-migration'
+
+#: How long a waiter sleeps between two tries of the lock.
+LOCK_POLL_SECONDS = 1.0
+
+
+def wait_for_the_migration_lock(
+    try_lock: Callable[[], bool], sleep: Callable[[float], None] = time.sleep
+) -> None:
+    """Return once ``try_lock`` has taken the lock, trying again every second.
+
+    ``try_lock`` runs ``SELECT pg_try_advisory_lock(MIGRATION_LOCK_KEY)`` on
+    the session that is to hold the lock and answers its result. The
+    entrypoint and ``hold_migration_lock`` both wait through here, so neither
+    keeps a statement running that an index built concurrently would wait for.
+    """
+    while not try_lock():
+        sleep(LOCK_POLL_SECONDS)
 
 
 def migration_database_url() -> str | None:
@@ -77,8 +103,13 @@ def hold_migration_lock() -> Iterator[None]:
     try:
         with engine.connect() as connection:
             connection = connection.execution_options(isolation_level='AUTOCOMMIT')
-            connection.execute(
-                text('SELECT pg_advisory_lock(:key)'), {'key': MIGRATION_LOCK_KEY}
+            wait_for_the_migration_lock(
+                lambda: bool(
+                    connection.execute(
+                        text('SELECT pg_try_advisory_lock(:key)'),
+                        {'key': MIGRATION_LOCK_KEY},
+                    ).scalar()
+                )
             )
             try:
                 yield

@@ -1150,7 +1150,12 @@ Not marked **Breaking**, but worth a look before you update:
   first start and the bootstrap's own `db upgrade` migrated the same empty
   database at the same time, the container restarted and the bootstrap
   stopped with `Error 137`; `manage.py db upgrade` now waits for the lock the
-  backend takes while it migrates, so the two run one after the other.
+  backend takes while it migrates, so the two run one after the other. Both
+  wait by trying the lock once a second, not inside the database: a waiter
+  blocked there is a transaction that a migration building an index
+  concurrently waits for, so `db upgrade` run beside a starting backend, as
+  DEPLOYMENT.md's *Updating* does, or a second backend replica starting beside
+  the first, would hang the update with nothing in the logs.
 - A server worker no longer stalls for two or three hundred milliseconds now
   and then while Python's garbage collector walks everything the application
   built at startup. Those objects live as long as the worker and are now left
