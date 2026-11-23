@@ -1,7 +1,7 @@
 """A list that grows with the organization counts only so far.
 
-The product list, the stock list, the movement journal and the audit journal
-counted every row
+The product list, the stock list, the movement journal, the audit journal and
+the archived products counted every row
 of the answer on every first page: at a hundred thousand products that count
 was most of the page, and it grew with the warehouse. They now stop counting
 one row past ``LIST_COUNT_CAP`` and say so — ``total`` is where the count
@@ -30,6 +30,7 @@ from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
+import app.api._items_queries as items_queries_api
 import app.api.audit_log as audit_log_api
 import app.api.items as items_api
 import app.api.stock_moves as stock_moves_api
@@ -163,6 +164,42 @@ class TestTheJournal:
         assert _envelope(second) == (_CAP, True, True, 2)
         assert (third['has_more'], len(third['items'])) == (False, 1)
         seen = [m['id'] for page in (first, second, third) for m in page['items']]
+        assert len(set(seen)) == _ROWS
+
+
+@pytest.fixture
+def five_archived_products(
+    client: TestClient,
+    auth_headers: dict[str, str],
+    five_products: None,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The five products, archived: the archive only grows."""
+    monkeypatch.setattr(items_queries_api, 'LIST_COUNT_CAP', _CAP)
+    listed = _page(client, auth_headers, '/api/v1/items', limit=_ROWS)
+    for item in listed['items']:
+        response = client.delete(f'/api/v1/items/{item["id"]}', headers=auth_headers)
+        assert response.status_code == status.HTTP_204_NO_CONTENT, response.text
+
+
+@pytest.mark.usefixtures('five_archived_products')
+class TestTheArchive:
+    """The archived products counted every archived record of the
+    organization on their first page; they stop at the cap as the journals
+    do, and the cursor carries where the count stopped."""
+
+    def test_the_count_stops_at_the_cap_and_rides_the_cursor(
+        self, client: TestClient, auth_headers: dict[str, str]
+    ) -> None:
+        path = '/api/v1/items/archived'
+        first = _page(client, auth_headers, path, limit=2)
+        second = _page(client, auth_headers, path, limit=2, cursor=first['next_cursor'])
+        third = _page(client, auth_headers, path, limit=2, cursor=second['next_cursor'])
+
+        assert _envelope(first) == (_CAP, True, True, 2)
+        assert _envelope(second) == (_CAP, True, True, 2)
+        assert (third['has_more'], len(third['items'])) == (False, 1)
+        seen = [i['id'] for page in (first, second, third) for i in page['items']]
         assert len(set(seen)) == _ROWS
 
 
