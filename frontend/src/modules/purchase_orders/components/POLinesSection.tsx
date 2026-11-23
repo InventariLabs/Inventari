@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useTorchAvailable } from "@/hooks/useScanCamera";
 import {
@@ -26,6 +26,11 @@ export interface POLineInput {
   unit_price: string;
   tax_rate: string;
   uom_id: string | null;
+  /**
+   * The price the last product pick proposed (what the product last cost, in
+   * the organization's currency), to tell it from one the reader typed.
+   */
+  proposed_price?: string;
 }
 
 interface POLinesSectionProps {
@@ -94,9 +99,6 @@ export function POLinesSection({
   const { i18n } = useTranslation(["purchase_orders", "common", "scan"]);
   const hasTorch = useTorchAvailable();
   const dateLang = i18n.language?.substring(0, 2) ?? "en";
-  // The price each line was last given by a product pick, to tell it from one
-  // the user typed.
-  const proposedPrices = useRef(new Map<string, string>());
   // A recorded price is in the organization's currency; there is no conversion,
   // so an order in another currency proposes nothing rather than the same
   // figure under the wrong currency.
@@ -194,21 +196,21 @@ export function POLinesSection({
   };
 
   const handleSelectProduct = (key: string, product: LineItemProduct) => {
-    const current = lineItems.find((line) => line.key === key);
+    const current = lines.find((line) => line.id === key);
     // A price typed on the line stays. One the app proposed from the previous
     // product (still untouched) or an empty one starts from what this product
     // last cost, or from nothing when it has no price.
-    const proposed = proposedPrices.current.get(key);
     const currentPrice = current?.unit_price ?? "";
-    const typedByUser = currentPrice !== "" && currentPrice !== proposed;
+    const typedByUser =
+      currentPrice !== "" && currentPrice !== current?.proposed_price;
     const price =
       recordedPriceApplies && product.purchase_price != null
         ? String(product.purchase_price)
         : "";
     let startingPrice: Partial<POLineInput> = {};
     if (!typedByUser) {
-      proposedPrices.current.set(key, price);
-      if (price !== currentPrice) startingPrice = { unit_price: price };
+      startingPrice = { proposed_price: price };
+      if (price !== currentPrice) startingPrice.unit_price = price;
     }
     onUpdateData(key, {
       ...startingPrice,
