@@ -13,6 +13,7 @@ from app.api._items_params import parse_template_ids
 from app.api.dependencies import get_user_storage_ids
 from app.core.contracts import SystemPermission, UserContextDTO
 from app.core.cursor import decode_keyset_cursor, encode_keyset_cursor
+from app.core.db_utils import LIST_COUNT_CAP, count_window
 from app.core.deps import (
     get_async_db,
     get_current_user_context,
@@ -278,6 +279,9 @@ async def get_archived_items(
 
     position = decode_keyset_cursor(cursor) if cursor else None
     served_before = position.offset if position else offset
+    # The first page counts only so far (``LIST_COUNT_CAP``), as the journals
+    # do: nothing deletes an archived record, so the archive only grows.
+    window = count_window(served_before, limit, LIST_COUNT_CAP)
     # One row more than asked: whether it exists is the whole of "is there a
     # next page", and no count has to be right for that to be so.
     rows, total = await get_archived_items_async(
@@ -288,11 +292,14 @@ async def get_archived_items(
         limit=limit + 1,
         after=(position.sort_value, position.row_id) if position else None,
         known_total=position.total if position else None,
+        count_up_to=window,
         context_tag=context_tag,
         claimed_tags=claimed_tags or None,
         module_scope=module_scope,
         search=search,
     )
+    total_capped = position.total_capped if position else total > window
+    total = min(total, window)
     items = rows[:limit]
     next_cursor = None
     if len(rows) > limit:
@@ -302,6 +309,7 @@ async def get_archived_items(
             last.id,
             total=total,
             offset=served_before + len(items),
+            total_capped=total_capped,
         )
     notes = await get_deletion_notes_async(db, [item.id for item in items])
     result = []
@@ -339,4 +347,5 @@ async def get_archived_items(
         limit=limit,
         total=total,
         next_cursor=next_cursor,
+        total_capped=total_capped,
     )

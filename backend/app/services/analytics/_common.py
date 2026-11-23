@@ -13,7 +13,8 @@ from typing import Any, cast
 from uuid import UUID
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from sqlalchemy import ColumnElement, func, or_, select
+from sqlalchemy import ColumnElement, Numeric, func, or_, select, true
+from sqlalchemy import cast as sql_cast
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db_utils import in_ids
@@ -23,6 +24,7 @@ from app.core.module_ownership import general_rows, outside_module_products
 from app.core.money import quantise
 from app.core.work_in_progress import work_in_progress_value_async
 from app.models import Item, Organization, StorageLocation
+from app.models.audit_log import AuditAction, AuditLog, AuditTargetType
 
 logger = get_logger(__name__)
 
@@ -67,6 +69,52 @@ async def get_internal_storage_ids_async(
         )
     result = await db.execute(query)
     return [r[0] for r in result.all()]
+
+
+def off_hidden_places(
+    org_id: UUID, hidden_tags: set[str] | None
+) -> ColumnElement[bool]:
+    """Records that stand on no place a hidden vertical module owns.
+
+    The counterpart of :func:`get_internal_storage_ids_async` for a report
+    about what was bought rather than what stands on the shelves: where a
+    purchase stands now says nothing about whether it was bought, and a
+    record used up is filed under the virtual Consumed place. Only a
+    module's own places (an equipment rack) leave with the module.
+    """
+    if not hidden_tags:
+        return true()
+    return Item.storage_location_id.notin_(
+        select(StorageLocation.id).where(
+            StorageLocation.organization_id == org_id,
+            StorageLocation.context_tag.in_(hidden_tags),
+        )
+    )
+
+
+def quantity_born_with(org_id: UUID) -> ColumnElement[Any]:
+    """The quantity a record was born with: what its purchase brought in.
+
+    A record's own quantity says what it holds now — less once a unit of it
+    is opened, some of it is used or part of it moves to another shelf, and
+    nothing once it is used up. Every record is born through one door
+    (``services/items/_create.py``), whose journal entry names the quantity
+    it came into the world with; a record whose entry names none is read at
+    what it holds.
+    """
+    born_with = (
+        select(sql_cast(AuditLog.snapshot['quantity'].as_string(), Numeric))
+        .where(
+            AuditLog.organization_id == org_id,
+            AuditLog.target_type == AuditTargetType.ITEM.value,
+            AuditLog.target_id == Item.id,
+            AuditLog.action == AuditAction.CREATE.value,
+        )
+        .order_by(AuditLog.created_at)
+        .limit(1)
+        .scalar_subquery()
+    )
+    return func.coalesce(born_with, Item.quantity, 0)
 
 
 async def get_org_currency_async(db: AsyncSession, org_id: UUID) -> str:

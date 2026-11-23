@@ -118,6 +118,8 @@ function useArchivePage(search: string, excludeModuleContexts: boolean) {
       skip: paging.page * PAGE_SIZE,
       limit: PAGE_SIZE,
       total: page?.total ?? 0,
+      // The archive only grows, so its first page counts only so far.
+      totalCapped: page?.total_capped ?? false,
       keyset: {
         rows: page?.items?.length ?? 0,
         hasNext: Boolean(page?.next_cursor),

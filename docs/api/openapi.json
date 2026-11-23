@@ -81667,6 +81667,11 @@
             "title": "Proposed Move Quantity",
             "default": 0
           },
+          "on_its_way_quantity": {
+            "type": "number",
+            "title": "On Its Way Quantity",
+            "default": 0
+          },
           "remaining_to_buy": {
             "anyOf": [
               {
@@ -81791,7 +81796,7 @@
           "reason"
         ],
         "title": "ReplenishmentDraftSkipped",
-        "description": "A requested rule that did not become a PO line, with the reason.\n\n``reason`` is a stable machine code the UI translates:\n``not_found`` (no such rule in this org), ``not_alerting`` (stock is\nat or above the minimum right now), ``covered_by_reserve`` (the\nproposed internal move covers the whole shortage, so there is nothing\nto buy), ``no_supplier`` (neither the rule nor the price list names\na supplier; reported, never turned into an empty order), ``made_here``\n(the product has a recipe: it is produced, not bought)."
+        "description": "A requested rule that did not become a PO line, with the reason.\n\n``reason`` is a stable machine code the UI translates:\n``not_found`` (no such rule in this org), ``not_alerting`` (stock is\nat or above the minimum right now), ``covered_by_reserve`` (the\nproposed internal move covers the whole shortage, so there is nothing\nto buy), ``already_on_order`` (open purchase orders already expect\nwhat reserve does not cover), ``no_supplier`` (neither the rule nor the\nprice list names a supplier; reported, never turned into an empty\norder), ``made_here`` (the product has a recipe: it is produced, not\nbought)."
       },
       "ReplenishmentMoveLineDTO": {
         "properties": {

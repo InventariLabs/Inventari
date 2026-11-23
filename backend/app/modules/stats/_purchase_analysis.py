@@ -99,7 +99,19 @@ def analyze_seasonality(
                     }
                 )
 
-    return seasonal[:5]
+    # Ranked before the cut, because the products arrive in the order the
+    # database grouped them, which is none: the most seasonal first, a season
+    # with no off-season to measure against (no score) last, and a tie in the
+    # order of the names, as the report's other rankings settle one.
+    return sorted(
+        seasonal,
+        key=lambda x: (
+            x['seasonality_score'] is None,
+            -(x['seasonality_score'] or 0),
+            x['name'].casefold(),
+            x['name'],
+        ),
+    )[:5]
 
 
 def find_bulk_opportunities(

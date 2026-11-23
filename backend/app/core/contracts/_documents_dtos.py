@@ -129,8 +129,14 @@ class ReplenishmentAlertDTO(BaseModel):
     #: warehouse's reserve (shared with the product's other alerts), and at
     #: most what that one shelf holds.
     proposed_move_quantity: float = 0
-    #: The part of ``suggested_reorder_quantity`` this rule's share of
-    #: reserve cannot cover — the quantity a draft purchase order is for.
+    #: The part of the shortage already on its way: what open purchase
+    #: orders still expect of a bought product, what unfinished runs will
+    #: still make of a made one. Orders and runs name no shelf, so this is
+    #: the rule's share of what the product has coming, after reserve.
+    on_its_way_quantity: float = 0
+    #: The part of ``suggested_reorder_quantity`` that neither this rule's
+    #: share of reserve nor what is on its way covers — the quantity a draft
+    #: purchase order (or, for a made product, a run) is for.
     remaining_to_buy: float | None = None
     # The rule's preferred supplier, when set — the alerts view marks an
     # alert without one as "no supplier" instead of offering a draft PO.

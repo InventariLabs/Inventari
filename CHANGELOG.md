@@ -12,6 +12,34 @@ says what the release does rather than what changed since them.
 
 ## Unreleased
 
+### Fixed
+
+- A reorder alert no longer proposes again what is already on its way. What
+  open purchase orders still expect of a bought product, drafts included, and
+  what unfinished production runs will still make of a made one now cover the
+  shortage after reserve: *Create draft POs* orders only the rest, so pressing
+  it twice no longer writes two orders, and the To do production task asks
+  only for what nobody planned. The alert says how much is already ordered or
+  planned (`on_its_way_quantity` in the API; `remaining_to_buy` nets it), and
+  a rule covered by orders is skipped as `already_on_order`.
+- Purchase patterns count what each purchase brought in. Opening a unit,
+  using some of it or moving part of it to another shelf no longer lowers
+  *Total spent* and the average price, and a purchase used up to nothing
+  still counts. A record whose journal names no quantity at its birth is read
+  at what it holds. The *Seasonal patterns* card shows the five most seasonal
+  products, ranked, instead of the first five the database returned.
+- A back-dated stock aging report leaves out the receipts made after its date,
+  as it already left out the issues.
+- The archived products stop counting at 10,000, as the product list and the
+  journals do, and say "of more than" past it.
+- The freight, duty and insurance of a receipt, and the unit costs they lead
+  to, are shown in the receipt's currency rather than the organization's.
+- Changing a purchase order's currency clears a line price that was proposed
+  from the product's last cost; a price typed on the line stays.
+- *Order what is missing* names the product's stock unit on the order line
+  when the supplier's price names no unit of its own: 5 kg of oats is ordered
+  and received as kilograms, not as "units".
+
 ## v0.13.0 - 2026-11-23
 
 The second release under the two-week rhythm. Most of it is the production
