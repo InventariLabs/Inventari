@@ -1,4 +1,4 @@
-"""Two receipts naming one new batch write it once.
+"""Two receipts of one new batch share its row.
 
 A batch is unique per organization and product name, and the receipt path
 looks it up before writing it. Two receipts of different documents that carry
