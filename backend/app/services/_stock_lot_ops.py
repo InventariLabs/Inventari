@@ -15,6 +15,7 @@ from typing import Any, cast
 from uuid import UUID
 
 from sqlalchemy import func, select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import (
@@ -54,17 +55,35 @@ async def get_or_create_lot_async(
     if lot:
         return lot
 
-    lot = StockLot(
-        organization_id=organization_id,
-        product_template_id=product_template_id,
-        name=name,
-        is_serial=is_serial,
-        expiry_date=expiry_date,
-        production_date=production_date,
-        use_by_date=use_by_date,
+    # Two receipts posting one new batch at once both read nothing above; the
+    # insert settles it. A plain add made the second meet the unique key and
+    # answer 500. ON CONFLICT DO NOTHING waits for the other transaction and
+    # leaves its row alone, and the read after it returns whichever row
+    # stands — with the first writer's dates.
+    await db.execute(
+        pg_insert(StockLot)
+        .values(
+            organization_id=organization_id,
+            product_template_id=product_template_id,
+            name=name,
+            is_serial=is_serial,
+            expiry_date=expiry_date,
+            production_date=production_date,
+            use_by_date=use_by_date,
+        )
+        .on_conflict_do_nothing(constraint='uq_lot_org_product_name')
     )
-    db.add(lot)
-    await db.flush()
+    lot = (
+        await db.scalars(
+            select(StockLot).where(
+                StockLot.organization_id == organization_id,
+                StockLot.product_template_id == product_template_id,
+                StockLot.name == name,
+            )
+        )
+    ).first()
+    if lot is None:
+        raise RuntimeError(f'stock lot {name!r} vanished after its insert')
     return lot
 
 

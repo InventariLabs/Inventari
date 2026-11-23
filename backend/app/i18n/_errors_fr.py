@@ -296,6 +296,7 @@ ERRORS_FR: ErrorMessages = {
     'period_already_closed': 'La période {period} est déjà fermée.',
     'period_closed_for_date': 'La période {period} est fermée : rien ne peut y être daté. Changez la date du document ou demandez à une personne autorisée de rouvrir la période.',
     'period_closed_for_stock_change': 'La période {period} est fermée : aucun mouvement de stock ne peut y être enregistré. Demandez à une personne autorisée de rouvrir la période.',
+    'period_closed_for_correction': 'La période {period} est fermée : la correction ne peut pas être appliquée. Demandez à une personne autorisée de rouvrir la période.',
     'transfer_more_than_the_record_holds': "L'enregistrement « {item_name} » contient {available} et la ligne en déplace {requested}. Réduisez la quantité de la ligne ou déplacez le reste depuis un autre enregistrement.",
     'transfer_cannot_split_serialized_record': 'Le transfert ne peut pas diviser un enregistrement sérialisé ({serial_number}) : transférez le relevé entier.',
     'use_partially_more_than_left': "L'enregistrement « {item_name} » contient {available} de cet emballage et il a été indiqué qu'il en reste {requested}. Indiquez ce qu'il reste, sans dépasser ce qu'il y a.",

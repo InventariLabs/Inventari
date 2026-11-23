@@ -73,6 +73,9 @@ async def _take_the_line_off_the_records(
                 old_qty - executed_quantity,
                 user_id,
                 _base_history(doc),
+                # A delivery or a write-off uses the stock up; the record it
+                # leaves with nothing is filed, not left on a shelf at 0.
+                file_when_emptied=True,
             )
         return []
 
@@ -109,6 +112,10 @@ async def _take_the_line_off_the_records(
         # a core model. The value is StockMoveReferenceType.DOCUMENT's.
         reference_type='document',
         reference_id=doc.id,
+        # The goods leave for good: a record the draw empties is filed under
+        # the Consumed place, like one used up by hand, instead of standing
+        # on the shelf at 0 pcs.
+        file_when_emptied=True,
     )
 
 

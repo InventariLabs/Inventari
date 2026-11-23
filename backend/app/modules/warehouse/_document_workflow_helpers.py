@@ -23,7 +23,10 @@ from ._over_receipt import (
 )
 from ._wms_line_utils import _resolve_uom_symbol
 from .document_profile_service import resolve_document_tax_rate
-from .inventory_period_service import check_period_not_closed_async
+from .inventory_period_service import (
+    check_period_for_a_correction_async,
+    check_period_not_closed_async,
+)
 from .models import QUARANTINE_CODES, Document, DocumentLine, TaxHandling
 from .schemas import DocumentComplete
 from .tax_rate_assignment_service import product_tax_rates_async
@@ -108,10 +111,17 @@ async def _check_document_period_open(
     org_id: UUID,
     doc: Document,
 ) -> None:
-    """The month a document belongs to has to be open to act on it."""
-    await check_period_not_closed_async(
-        db, org_id, doc.scheduled_date or doc.created_at.date()
-    )
+    """The month a document belongs to has to be open to act on it.
+
+    A correction's date is not editable — its screen offers no field for it —
+    so its refusal names the only way out there is, reopening the month, and
+    never a document date the reader cannot change.
+    """
+    on = doc.scheduled_date or doc.created_at.date()
+    if doc.type == dt.CORRECTION:
+        await check_period_for_a_correction_async(db, org_id, on)
+    else:
+        await check_period_not_closed_async(db, org_id, on)
 
 
 def _build_partner_snapshot(partner: PartnerDTO) -> dict[str, Any]:

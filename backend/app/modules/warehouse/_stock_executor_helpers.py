@@ -147,11 +147,15 @@ async def _apply_qty_change(
     new_qty: Decimal,
     user_id: UUID,
     history: dict[str, str],
+    *,
+    file_when_emptied: bool = False,
 ) -> ItemDTO:
     """Call update_quantity with standard kwargs; raise if item vanishes.
 
     *new_qty* is absolute: derive it from ``_locked_quantity``, never from a
-    record read without the lock.
+    record read without the lock. *file_when_emptied* is for a door that uses
+    the stock up: the record it leaves with nothing is filed under the
+    Consumed place instead of standing on a real shelf at 0.
     """
     updated = await core_api.items.update_quantity_async(
         db,
@@ -162,6 +166,7 @@ async def _apply_qty_change(
         source_document_id=doc.id,
         history_changes=history,
         post_the_change=False,
+        file_when_emptied=file_when_emptied,
     )
     if updated is None:
         raise ServiceRejectionError('stock_record_not_found', item=item_id)

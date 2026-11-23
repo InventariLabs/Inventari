@@ -84,6 +84,16 @@ async def _shelf_receiving(
     )
     db.add(org)
     await db.flush()
+    # A real organization owns the neutral storage types from the moment it
+    # exists; without the SYSTEM one, an emptied record has nowhere to be
+    # filed and the door that empties it cannot finish.
+    from app.seed_profiles.base import seed_neutral_storage_types
+
+    await db.run_sync(
+        lambda session: seed_neutral_storage_types(
+            session, organization_id=org.id, commit=False
+        )
+    )
     user = await ModuleTestHelper.create_user_async(
         db, org, email=f'undo-batches-{uuid4().hex[:8]}@test.com'
     )

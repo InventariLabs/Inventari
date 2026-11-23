@@ -169,6 +169,39 @@ class TestProductClone:
         assert error['type'] == 'string_too_long'
         assert error['ctx']['max_length'] == 255
 
+    async def test_clone_onto_a_code_another_card_holds_is_refused(
+        self,
+        real_async_client,
+        real_async_db_session,
+        async_test_user,
+        async_test_household,
+    ):
+        """A taken barcode answers the create path's refusal, not a 500."""
+        db = real_async_db_session
+        held = ProductTemplate(
+            organization_id=async_test_household.id,
+            name='Holds The Code',
+            barcode='2000000009018',
+            sku='HOLDS-001',
+        )
+        original = ProductTemplate(
+            organization_id=async_test_household.id,
+            name='Plum Butter',
+            barcode='2000000009034',
+            sku='PLUM-001',
+        )
+        db.add_all([held, original])
+        await db.commit()
+
+        response = await real_async_client.post(
+            f'/api/v1/items/product-templates/{original.id}/clone',
+            headers=_auth(async_test_user),
+            json={'name': 'Plum Butter Copy', 'barcode': '2000000009018'},
+        )
+
+        assert response.status_code == 400, response.text
+        assert response.json()['detail']['code'] == 'BARCODE_ALREADY_EXISTS'
+
     async def test_clone_template_not_found(
         self, real_async_client, real_async_db_session, async_test_user
     ):

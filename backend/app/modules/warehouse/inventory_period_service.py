@@ -25,6 +25,7 @@ from .models import Document, DocumentStatus, InventoryPeriod
 # import it without a cross-module dependency on the warehouse module.
 __all__ = [
     'PeriodClosedError',
+    'check_period_for_a_correction_async',
     'check_period_not_closed_async',
     'check_stock_change_period_open_async',
     'is_period_closed',
@@ -270,6 +271,21 @@ async def check_period_not_closed_async(
 ) -> None:
     """Async guard for async lifecycle functions."""
     await _refuse_a_closed_period_async(db, org_id, doc_date, 'period_closed_for_date')
+
+
+async def check_period_for_a_correction_async(
+    db: AsyncSession,
+    org_id: UUID,
+    on: date,
+) -> None:
+    """The guard a correction asks, at creation and before it is applied.
+
+    A correction carries no date of its own to edit: its period is the day it
+    was written, and the screen offers no field to move it. The refusal
+    therefore sends the reader to whoever may reopen the period, never to a
+    document date the correction does not have.
+    """
+    await _refuse_a_closed_period_async(db, org_id, on, 'period_closed_for_correction')
 
 
 async def check_stock_change_period_open_async(

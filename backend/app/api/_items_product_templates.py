@@ -26,6 +26,7 @@ from app.core.deps import (
 )
 from app.core.exceptions import (
     NotFoundException,
+    ServiceRejectionError,
     catalogue_refusal,
 )
 from app.core.product_template_metadata import get_template_nutrition
@@ -383,8 +384,14 @@ async def clone_product_template(
             organization_id=org_id,
             user_id=current_user.id,
         )
-    except ValueError as exc:
-        raise NotFoundException('product_template') from exc
+    except ServiceRejectionError as exc:
+        # Only the answers about the source's own existence are a 404. A code
+        # another card holds is a refusal of its own and must reach the reader
+        # as one — ``ServiceRejectionError`` is a ``ValueError``, so a blanket
+        # catch here turned that refusal into "not found".
+        if exc.key in ('product_template_not_found', 'template_other_organization'):
+            raise NotFoundException('product_template') from exc
+        raise
 
 
 @router.get(
