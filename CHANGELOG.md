@@ -27,8 +27,8 @@ says what the release does rather than what changed since them.
   stops working for that key, and the rate-limit refusal to a key sent as
   `Authorization: Bearer` carries the `Deprecation` header like every other
   answer. The approval door admits the person named on the open stage with the
-  approvals read and the target's read, the self-approval setting admits a
-  custom administration role as it does the built-in administrator, and the
+  approvals read alone, the self-approval setting admits a custom
+  administration role as it does the built-in administrator, and the
   audit log's member filter answers for that administrator too. A truncated
   picture upload is refused whatever the process imported first, and read-only
   screens say what they are: a formula opens rather than offering "Edit BOM"
