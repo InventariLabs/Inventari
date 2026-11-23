@@ -470,6 +470,10 @@ Not marked **Breaking**, but worth a look before you update:
   one used up by hand. `core_api.items.find_stock_row_async` takes
   `emptied_from` to find such a record by the shelf it left, so stock given
   back to it returns it there. Callers that pass neither are unchanged.
+- `core_api.locations.subtree_epochs_async` says what stood in and below a
+  location between its physical moves, as `(start, end, ids)` stretches, or
+  None when no move changed it, so a module can read a dated record against
+  the tree it was made in.
 
 ### Changed
 
@@ -575,6 +579,10 @@ Not marked **Breaking**, but worth a look before you update:
   `"verdict": "integration-only"` with a reason and an owner, and no
   `expires`, and a query-key entry is `by-design` or `to-fold`, the latter
   with an `expiry`.
+- The Equipment & Warehouse profile is teal instead of blue: the application's
+  own colour, so the demo, the README and a new installation look alike. An
+  organization on that profile sees its buttons, links and tabs in teal after
+  the upgrade; Food & Home stays emerald and Custom amber.
 
 ### Fixed
 
@@ -794,8 +802,12 @@ Not marked **Breaking**, but worth a look before you update:
   stood then, and a production run's movements name the path a shelf had when
   the run touched it. The rows the move itself writes name the moved location's whole path
   before and after, its own name last, instead of only the places it left and
-  reached. A move that only corrects the layout still rewrites nothing: the
-  stock was always where the corrected tree puts it.
+  reached, and they are listed under both places: filtered by the hall a shelf
+  left, **Movements** shows its goods going away. Filtering the warehouse
+  documents by a location reads a completed document against the tree on the
+  day it was done, and one still open against today's. A move that only
+  corrects the layout still rewrites nothing: the stock was always where the
+  corrected tree puts it.
 - Archiving a location no longer moves the stock of the locations inside it.
   Those locations stay active, but their products were relocated to the chosen
   target and the shelf was left empty while the goods had not moved. Only what
