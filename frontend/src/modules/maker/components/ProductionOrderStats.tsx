@@ -111,12 +111,11 @@ function EstimatedCostTile({ order }: { order: ProductionOrder }) {
   // Said in words, which way: a bare amount does not tell a cost above its
   // estimate from one below it.
   const differenceSentence = (amount: number): string => {
-    const money = formatMoney(Math.abs(amount), currency, i18n.language);
     if (Math.abs(amount) < 0.005) return t("detail.card.estimatedOnTarget");
-    return t(
-      amount > 0 ? "detail.card.estimatedOver" : "detail.card.estimatedUnder",
-      { amount: money },
-    );
+    const money = formatMoney(Math.abs(amount), currency, i18n.language);
+    return amount > 0
+      ? t("detail.card.estimatedOver", { amount: money })
+      : t("detail.card.estimatedUnder", { amount: money });
   };
   return (
     <StatTile
