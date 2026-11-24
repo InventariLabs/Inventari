@@ -36,7 +36,10 @@ from app.modules.stock_takes.models import (
 )
 from tests.integration._shelf import post_on_shelf
 
-_TODAY = date.today()
+
+def _today() -> date:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return date.today()
 
 
 class _Shop:
@@ -137,7 +140,7 @@ class _Shop:
         response = client.get(
             '/api/v1/warehouse/todo',
             headers=self.headers,
-            params={'date_to': _TODAY.isoformat(), 'limit': 50, **params},
+            params={'date_to': _today().isoformat(), 'limit': 50, **params},
         )
         assert response.status_code == status.HTTP_200_OK, response.text
         items = cast(list[dict[str, Any]], response.json()['work_items']['items'])
@@ -188,7 +191,7 @@ class TestALocationFallsDueForACount:
         assert task['state'] == 'todo'
         assert task['next_action'] == 'count'
         assert Decimal(task['count']) == 62
-        assert task['due_date'] == (_TODAY - timedelta(days=32)).isoformat()
+        assert task['due_date'] == (_today() - timedelta(days=32)).isoformat()
         assert task['action_href'] == (
             f'/inventory/stock-takes/count?location={shop.shelf_a.id}'
         )
@@ -241,7 +244,7 @@ class TestALocationFallsDueForACount:
         # The bare shelf and the pantry itself hold nothing of their own.
         assert set(tasks) == {'Pantry › Shelf A', 'Pantry › Shelf B'}
         assert tasks['Pantry › Shelf B']['count'] is None
-        assert tasks['Pantry › Shelf B']['due_date'] == _TODAY.isoformat()
+        assert tasks['Pantry › Shelf B']['due_date'] == _today().isoformat()
 
     def test_a_module_owned_location_waits_for_the_organizations_say_so(
         self, client: TestClient, shop: _Shop

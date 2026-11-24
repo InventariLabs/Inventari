@@ -38,9 +38,17 @@ from ._shelf import post_on_shelf
 
 pytestmark = pytest.mark.integration
 
-_A_MONTH_AGO = datetime.now(UTC) - timedelta(days=30)
-_A_WEEK_AGO = datetime.now(UTC) - timedelta(days=7)
-_TWO_WEEKS_AGO = datetime.now(UTC) - timedelta(days=14)
+
+def _a_month_ago() -> datetime:
+    return datetime.now(UTC) - timedelta(days=30)
+
+
+def _a_week_ago() -> datetime:
+    return datetime.now(UTC) - timedelta(days=7)
+
+
+def _two_weeks_ago() -> datetime:
+    return datetime.now(UTC) - timedelta(days=14)
 
 
 def _location(db_session, user, name, parent=None) -> StorageLocation:
@@ -84,7 +92,7 @@ def warehouses(client, auth_headers, db_session, test_user):
     db_session.execute(
         update(StockMove)
         .where(StockMove.organization_id == test_user.organization_id)
-        .values(completed_at=_A_MONTH_AGO)
+        .values(completed_at=_a_month_ago())
     )
     db_session.commit()
     return {
@@ -309,15 +317,15 @@ def test_a_location_moved_twice_names_where_it_stood_at_each_movement(
         auth_headers,
         [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
     )
-    _date_the_relocations(db_session, _TWO_WEEKS_AGO)
+    _date_the_relocations(db_session, _two_weeks_ago())
     post_on_shelf(client, auth_headers, warehouses['flour'], warehouses['shelf'].id, 1)
     db_session.execute(
         update(StockMove)
         .where(
             StockMove.product_template_id == warehouses['flour'].id,
-            StockMove.completed_at > _A_WEEK_AGO,
+            StockMove.completed_at > _a_week_ago(),
         )
-        .values(completed_at=_A_WEEK_AGO)
+        .values(completed_at=_a_week_ago())
     )
     db_session.commit()
     _reorg(
@@ -341,7 +349,7 @@ def test_a_movement_on_a_location_that_never_moved_keeps_todays_path(
     db_session.execute(
         update(StockMove)
         .where(StockMove.product_template_id == rice.id)
-        .values(completed_at=_A_MONTH_AGO)
+        .values(completed_at=_a_month_ago())
     )
     db_session.commit()
     _reorg(
@@ -362,15 +370,15 @@ def test_the_stock_on_a_date_stands_where_the_location_stood_then(
         auth_headers,
         [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
     )
-    _date_the_relocations(db_session, _A_WEEK_AGO)
+    _date_the_relocations(db_session, _a_week_ago())
     now = datetime.now(UTC)
 
     before = {'Flour': Decimal('3'), 'Sugar': Decimal('5')}
-    assert _stock_as_of(client, auth_headers, _TWO_WEEKS_AGO, warehouses['main']) == (
+    assert _stock_as_of(client, auth_headers, _two_weeks_ago(), warehouses['main']) == (
         before
     )
     assert (
-        _stock_as_of(client, auth_headers, _TWO_WEEKS_AGO, warehouses['pantry']) == {}
+        _stock_as_of(client, auth_headers, _two_weeks_ago(), warehouses['pantry']) == {}
     )
     assert _stock_as_of(client, auth_headers, now, warehouses['main']) == {}
     assert _stock_as_of(client, auth_headers, now, warehouses['pantry']) == before
@@ -386,7 +394,9 @@ def test_a_layout_correction_moves_the_past_with_it(
         [_move(warehouses['cold'], warehouses['pantry'], 'correction')],
     )
 
-    assert _stock_as_of(client, auth_headers, _TWO_WEEKS_AGO, warehouses['pantry']) == {
+    assert _stock_as_of(
+        client, auth_headers, _two_weeks_ago(), warehouses['pantry']
+    ) == {
         'Flour': Decimal('3'),
         'Sugar': Decimal('5'),
     }
@@ -609,7 +619,7 @@ def test_a_completed_document_lists_under_the_place_its_shelf_stood_in(
         warehouses['shelf'],
         'IN/2026/901',
         status='COMPLETED',
-        completed_at=_A_MONTH_AGO,
+        completed_at=_a_month_ago(),
     )
     planned = _document_into(
         db_session, test_user, warehouses['shelf'], 'IN/2026/902', status='DRAFT'

@@ -34,7 +34,11 @@ from app.models.user import User
 from app.modules.warehouse.models import WmsPickLine, WmsPickSession
 from app.modules.warehouse.tests.integration._records import sow
 
-_TODAY = date.today().isoformat()
+
+def _today() -> str:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return date.today().isoformat()
+
 
 pytestmark = pytest.mark.integration
 
@@ -145,7 +149,7 @@ def picking(
             'partner_id': str(doc_partner.id),
             'source_location_id': str(doc_source_location.id),
             'target_location_id': str(doc_target_location.id),
-            'scheduled_date': _TODAY,
+            'scheduled_date': _today(),
             'lines': [
                 {
                     'item_id': str(doc_item.id),
@@ -170,7 +174,7 @@ def _task(picking: _Picking) -> dict[str, Any]:
     response = picking.client.get(
         '/api/v1/warehouse/todo',
         headers=picking.headers,
-        params={'date_to': _TODAY},
+        params={'date_to': _today()},
     )
     assert response.status_code == status.HTTP_200_OK, response.text
     for item in response.json()['work_items']['items']:

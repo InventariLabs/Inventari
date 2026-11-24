@@ -118,6 +118,40 @@ def test_an_entry_for_a_date_that_passed_is_a_note_not_a_failure(
     assert stale == ['backend/tests/t.py 1999-01-01']
 
 
+@pytest.mark.parametrize(
+    'source',
+    [
+        'import datetime\nTODAY = datetime.date.today()\n',
+        'from datetime import UTC, datetime\nSTAMP = datetime.now(UTC)\n',
+        'DAY = (date.today() + timedelta(days=30)).isoformat()\n',
+        'class TestX:\n    DAY = date.today()\n',
+        "@pytest.mark.parametrize('d', [date.today()])\ndef test_x(d): ...\n",
+        'def test_x(day=date.today()): ...\n',
+    ],
+)
+def test_a_clock_read_at_import_time_fails(gate: ModuleType, source: str) -> None:
+    reads = gate.check_clock({'backend/tests/unit/test_t.py': source})
+    assert len(reads) == 1
+
+
+@pytest.mark.parametrize(
+    'source',
+    [
+        'def _today():\n    return date.today()\n',
+        'class TestX:\n    def test_x(self):\n        assert date.today()\n',
+        'FIXED = date(2001, 2, 3)\nSORT = sorted(items, key=lambda x: x.now())\n',
+    ],
+)
+def test_a_clock_read_inside_a_function_passes(gate: ModuleType, source: str) -> None:
+    assert gate.check_clock({'backend/tests/unit/test_t.py': source}) == []
+
+
+def test_the_clock_rule_reads_backend_python_tests_only(gate: ModuleType) -> None:
+    source = 'TODAY = date.today()\n'
+    assert gate.check_clock({'backend/app/modules/x/service.py': source}) == []
+    assert gate.check_clock({'frontend/src/a.test.tsx': source}) == []
+
+
 def test_the_committed_allowlist_is_well_formed(gate: ModuleType) -> None:
     raw = (_SCRIPT.with_name('time-bomb-allowlist.json')).read_text(encoding='utf-8')
     _, problems = gate.load_allowlist(raw)
