@@ -568,6 +568,34 @@ describe("AssetDetailPage — an archived card", () => {
     expect(await screen.findByText("Asset not found")).toBeInTheDocument();
   });
 
+  it("opens an asset filed under no category whose metadata holds the equipment namespace", async () => {
+    // The register also lists a record with no category when the module's
+    // namespace is on it; the Add-asset screen writes exactly that.
+    server.use(
+      http.get(`/api/v1/items/${ITEM_ID}`, () =>
+        HttpResponse.json({
+          ...assetWith({}),
+          category_id: null,
+          category: null,
+          metadata: { equipment: {} },
+        }),
+      ),
+      http.get(`/api/v1/equipment/${ITEM_ID}/approval-status`, () =>
+        HttpResponse.json({
+          request_id: null,
+          has_workflow: false,
+          status: null,
+        }),
+      ),
+    );
+    renderDetail();
+
+    expect(
+      await screen.findByRole("tab", { name: "Assignments" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Asset not found")).not.toBeInTheDocument();
+  });
+
   it("asks for approval status and assignments only of an asset it found", async () => {
     // `/equipment/models` is no asset: the item read refuses the id, and the
     // two reads that take the same id would only add validation errors.

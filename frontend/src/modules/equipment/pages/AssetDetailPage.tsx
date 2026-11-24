@@ -35,7 +35,10 @@ import { useApprovalStatus } from "@/modules/equipment/hooks/useMyAssets";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
-import { getEquipmentMeta } from "@/modules/equipment/components/assetUtils";
+import {
+  getEquipmentMeta,
+  isEquipmentRecord,
+} from "@/modules/equipment/components/assetUtils";
 import type { EquipmentAssignment } from "@/modules/equipment/api/equipment";
 
 type Tab = "timeline" | "info" | "assignments" | "maintenance";
@@ -63,8 +66,7 @@ export default function AssetDetailPage() {
   // Both reads are keyed by an asset id: an id the item read did not accept,
   // or one the register does not list, would only draw a validation error
   // behind the not-found card.
-  const knownId =
-    item && item.category?.context_tag === "equipment" ? (id ?? "") : "";
+  const knownId = item && isEquipmentRecord(item) ? (id ?? "") : "";
   const { data: approvalStatus } = useApprovalStatus(knownId);
   const { data: assignments } = useItemAssignmentHistory(knownId);
   const activeAssignment = assignments?.find((a) => !a.checked_in_at) ?? null;
@@ -210,12 +212,13 @@ export default function AssetDetailPage() {
     return <QueryError error={error} onRetry={() => void refetch()} />;
   }
 
-  // The register's records are the categories its module claims. This card
-  // reads Core items, so a product whose category no module claims is a
-  // record the register does not list — the same "Asset not found" an
+  // The register's records are the categories its module claims, plus
+  // uncategorized records carrying its namespace. This card reads Core
+  // items, so a product filed under an unclaimed category is a record the
+  // register does not list — the same "Asset not found" an
   // equipment-only reader gets, instead of a product dressed as an asset
   // with actions that then refuse.
-  if (!item || item.category?.context_tag !== "equipment") {
+  if (!item || !isEquipmentRecord(item)) {
     return (
       <RecordNotFound
         title={t("detail.not_found")}
