@@ -12,8 +12,11 @@
 #
 # The backend keeps no checkout's module trees mounted: a community module
 # installs by rebuilding the frontend image, which this install does not do.
-# An installation that wants community modules builds from source
-# (docker-compose.prod.yml alone; DEPLOYMENT.md, "Community modules").
+# An installation that wants community modules builds from source: remove the
+# COMPOSE_FILE line from .env, then
+# `docker compose -f docker-compose.prod.yml up -d --build`
+# (DEPLOYMENT.md, "Community modules"). Naming docker-compose.prod.yml alone
+# while the line stays leaves the next bare command on these images.
 services:
   backend:
     image: ghcr.io/inventarilabs/inventari-backend:${INVENTARI_VERSION:?set INVENTARI_VERSION in .env — the release to run, see QUICK_DEPLOY.md}
