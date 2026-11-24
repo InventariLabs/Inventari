@@ -53,11 +53,9 @@ import { fileURLToPath } from "node:url";
 import resolveConfig from "tailwindcss/resolveConfig.js";
 import tailwindConfig from "../tailwind.config.js";
 
-// `new URL(...).pathname`, not fileURLToPath: under vitest `import.meta.url`
-// carries a `/@fs/` prefix that fileURLToPath refuses outright — and the
-// prefix has to come off before resolve(), or the CLI-only walk below tries
-// to scandir a path that was never on disk.
-const HERE = new URL(".", import.meta.url).pathname.replace(/^\/@fs/, ""); // scripts/
+// `import.meta.dirname` is the real directory under node and under vitest
+// alike; the `import.meta.url` pathname is not.
+const HERE = import.meta.dirname; // scripts/
 const ROOT = resolve(HERE, ".."); // frontend/
 const SRC = resolve(ROOT, "src");
 

@@ -20,7 +20,7 @@
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const E2E = resolve(ROOT, "tests/e2e");
 const BASELINE = resolve(ROOT, "scripts/e2e-wait-for-timeout-baseline.json");
 

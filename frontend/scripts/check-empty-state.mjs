@@ -30,7 +30,7 @@ import { resolve, relative, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import ts from "typescript";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const QUIET = process.argv.includes("--quiet");
 
 /** A module's page file, relative to `src/`. Panels and tabs are not pages. */

@@ -31,7 +31,7 @@ import { fileURLToPath } from "node:url";
 
 import { ESLint } from "eslint";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const BASELINE_PATH = resolve(ROOT, "scripts/function-baseline.json");
 
 /**

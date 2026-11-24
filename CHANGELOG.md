@@ -25,6 +25,9 @@ says what the release does rather than what changed since them.
   rebuild, still need the build from source — `module install` and `module
   upgrade` on the images say so instead of writing into a container that
   forgets it, and DEPLOYMENT.md says how to leave the images for the build.
+  `make deploy`, `make backup-verify` and `make backup-status` follow the same
+  line: on the images they pull and recreate, and run the downloaded backup
+  image, instead of building it on the server.
 - `scripts/init-env.sh` writes the production `.env` in one command: it asks
   for the domain and the e-mail address, generates the five secrets and the
   encryption key, and never overwrites an existing file. The guides use it
