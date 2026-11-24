@@ -110,6 +110,28 @@ class TestTheBuiltInLayout:
         assert '123.00' in html
         assert 'No price yet' not in html
 
+    @pytest.mark.parametrize('prices', [('10.00',), (None,)])
+    async def test_the_totals_box_stays_compact_at_the_right(
+        self, prices: tuple[str | None, ...]
+    ) -> None:
+        from weasyprint import HTML
+
+        html = await _printed(_order(*prices), 'en')
+        page = HTML(string=html).render().pages[0]
+
+        def tables(box: Any) -> Any:
+            # A table is a wrapper box around the table box; measure the table.
+            if type(box).__name__ == 'TableBox' and (
+                'totals-table' in (box.element.get('class') or '')
+            ):
+                yield box
+            for child in getattr(box, 'children', ()):
+                yield from tables(child)
+
+        (totals,) = list(tables(page._page_box))
+        # A box that grows to its words is far narrower than the sheet.
+        assert totals.width < page._page_box.width / 2
+
     def test_an_order_priced_at_zero_is_a_total_of_zero(self) -> None:
         assert build_po_context(_order('0'), 'en')['total_gross'] == Decimal('0')
 
