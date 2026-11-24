@@ -542,6 +542,52 @@ describe("useStockTakeCounting", () => {
     await waitFor(() => expect(result.current.isSavingCounts).toBe(false));
   });
 
+  // Closing a shelf writes 0 into what nobody counted on it: while that
+  // request is out, Complete stays disabled too.
+  it("reports a save in flight while a shelf is being closed", async () => {
+    let release: () => void = () => {};
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    server.use(
+      http.post(
+        "/api/v1/stock-takes/:id/locations/:locationId/close",
+        async ({ params }) => {
+          await gate;
+          return HttpResponse.json({
+            location_id: String(params.locationId),
+            path: "Kitchen / A",
+            empty: true,
+            counted_as_zero: 0,
+            closed_by_name: "Ann Counter",
+            closed_at: new Date().toISOString(),
+          });
+        },
+      ),
+    );
+
+    const { result } = await renderLoaded();
+    act(() => {
+      result.current.shelfCounting.setShelf({
+        id: "shelf-1",
+        path: "Kitchen / A",
+      } as never);
+    });
+    act(() => {
+      void result.current.shelfCounting.closeShelf();
+    });
+    await waitFor(() =>
+      expect(result.current.confirmDialogProps.open).toBe(true),
+    );
+    expect(result.current.isSavingCounts).toBe(false);
+
+    act(() => result.current.confirmDialogProps.onConfirm());
+    await waitFor(() => expect(result.current.isSavingCounts).toBe(true));
+
+    release();
+    await waitFor(() => expect(result.current.isSavingCounts).toBe(false));
+  });
+
   // A number typed into the box is one button press away from being a count,
   // and walking off the screen throws it away. Everything that summarises the
   // stock take therefore reads what the server holds.

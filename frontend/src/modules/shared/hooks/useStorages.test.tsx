@@ -85,6 +85,30 @@ describe("useStorages", () => {
     expect(result.current.data).toBeUndefined();
   });
 
+  it("asks for the places goods are kept in, apart from the full list", async () => {
+    const asked: string[] = [];
+    server.use(
+      http.get("/api/v1/locations", ({ request }) => {
+        asked.push(new URL(request.url).search);
+        return HttpResponse.json(onePage(mockStorages));
+      }),
+    );
+    const wrapper = createWrapper();
+
+    const kept = renderHook(
+      () => useStorages(undefined, { excludeHeldBack: true }),
+      { wrapper },
+    );
+    await waitFor(() => expect(kept.result.current.isSuccess).toBe(true));
+    // The same client: a held-back answer must not stand in for the full one.
+    const all = renderHook(() => useStorages(), { wrapper });
+    await waitFor(() => expect(all.result.current.isSuccess).toBe(true));
+
+    expect(asked).toHaveLength(2);
+    expect(new URLSearchParams(asked[0]).get("exclude_held_back")).toBe("true");
+    expect(new URLSearchParams(asked[1]).has("exclude_held_back")).toBe(false);
+  });
+
   it("starts in loading state", () => {
     const { result } = renderHook(() => useStorages(), {
       wrapper: createWrapper(),

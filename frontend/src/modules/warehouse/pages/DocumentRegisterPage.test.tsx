@@ -816,6 +816,15 @@ describe("DocumentRegisterPage — the desktop branch is a table", () => {
 });
 
 describe("DocumentRegisterPage — what the totals leave out or fold in", () => {
+  // No document profile is set up: the totals read the same without one, and
+  // the describe does not lean on a profile an earlier one left on the mock.
+  beforeEach(() => {
+    vi.mocked(profileHooks.useDocumentProfile).mockReturnValue({
+      data: null,
+      isLoading: false,
+    } as unknown as ReturnType<typeof profileHooks.useDocumentProfile>);
+  });
+
   function windowWith(summary: {
     scrap_documents: number;
     documents_without_value: number;

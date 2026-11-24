@@ -98,6 +98,28 @@ describe("LabelPoolPage", () => {
     });
   });
 
+  /**
+   * Answers the PNG export and records the labels it was asked for. The print
+   * preview renders its sheet from that export a moment after it opens, so a
+   * test that opens the preview waits for the request: left unanswered, it
+   * fires after the test's own handlers are gone and fails the run as an
+   * unmocked request.
+   */
+  const captureExport = () => {
+    window.URL.createObjectURL = vi.fn(() => "blob:label-sheet");
+    window.URL.revokeObjectURL = vi.fn();
+    const exported: string[] = [];
+    server.use(
+      http.get("/api/v1/labels/pool/export/png", ({ request }) => {
+        exported.push(...new URL(request.url).searchParams.getAll("label_ids"));
+        return new HttpResponse(new Blob(["png"]), {
+          headers: { "Content-Type": "image/png" },
+        });
+      }),
+    );
+    return exported;
+  };
+
   it("should render label pool with data", async () => {
     render(
       <PageHeaderContext.Provider
@@ -137,6 +159,7 @@ describe("LabelPoolPage", () => {
   });
 
   it("should handle download selected labels", async () => {
+    const exported = captureExport();
     render(
       <PageHeaderContext.Provider
         value={{ data: {}, setHeader: mockSetHeader }}
@@ -159,6 +182,7 @@ describe("LabelPoolPage", () => {
     // Should show preview modal - check for multiple instances if needed, or specific role
     const previewTitles = await screen.findAllByText(/Print Preview/i);
     expect(previewTitles.length).toBeGreaterThan(0);
+    await waitFor(() => expect(exported).toEqual(["1"]));
   });
 
   /**
@@ -272,21 +296,6 @@ describe("LabelPoolPage", () => {
           </QueryClientProvider>
         </PageHeaderContext.Provider>,
       );
-
-    const captureExport = () => {
-      const exported: string[] = [];
-      server.use(
-        http.get("/api/v1/labels/pool/export/png", ({ request }) => {
-          exported.push(
-            ...new URL(request.url).searchParams.getAll("label_ids"),
-          );
-          return new HttpResponse(new Blob(["png"]), {
-            headers: { "Content-Type": "image/png" },
-          });
-        }),
-      );
-      return exported;
-    };
 
     beforeEach(() => {
       window.URL.createObjectURL = vi.fn(() => "blob:label-batch");
@@ -689,6 +698,31 @@ describe("LabelPoolPage", () => {
       expect(toast.success).toHaveBeenCalledWith("Label deleted");
     });
 
+    it("asks before deleting: one label by its code, several by their count, and a printed sticker stops scanning", async () => {
+      servePool(2, [poolItem("1", "STM-0001"), poolItem("2", "STM-0002")]);
+      renderPage();
+      await screen.findByText(/STM-0001/i);
+
+      fireEvent.click(
+        screen.getByRole("button", { name: "Delete label STM-0002" }),
+      );
+      const one = await screen.findByRole("alertdialog");
+      expect(one).toHaveTextContent(
+        "Delete label STM-0002? A sticker already printed with this code is no longer recognized when it is scanned.",
+      );
+      fireEvent.click(within(one).getByRole("button", { name: "Cancel" }));
+      await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
+
+      fireEvent.click(screen.getByRole("checkbox", { name: "Select all" }));
+      const toolbar = await screen.findByRole("toolbar");
+      fireEvent.click(
+        within(toolbar).getByRole("button", { name: /Delete Selected/i }),
+      );
+      expect(await screen.findByRole("alertdialog")).toHaveTextContent(
+        "Delete 2 labels? Stickers already printed with their codes are no longer recognized when they are scanned.",
+      );
+    });
+
     it("sends nothing when the bulk delete is not confirmed", async () => {
       servePool(1);
       const deleted: string[] = [];
@@ -735,6 +769,7 @@ describe("LabelPoolPage", () => {
     });
 
     it("prints the short code when a label has no description to print", async () => {
+      const exported = captureExport();
       renderPage();
       await screen.findByText(/STM-0001/i);
 
@@ -749,6 +784,7 @@ describe("LabelPoolPage", () => {
           name: "Description and short code",
         }),
       ).toHaveAttribute("aria-checked", "true");
+      await waitFor(() => expect(exported).toEqual(["1"]));
     });
 
     it("closes the print preview from its own close button", async () => {
@@ -809,21 +845,7 @@ describe("LabelPoolPage", () => {
       };
 
       it("selects a card by clicking it and opens its preview from the eye", async () => {
-        // The preview renders its sheet from the PNG export; answer it and
-        // wait for it, or the request outlives the test's own handlers.
-        const exported: string[] = [];
-        server.use(
-          http.get("/api/v1/labels/pool/export/png", ({ request }) => {
-            exported.push(
-              ...new URL(request.url).searchParams.getAll("label_ids"),
-            );
-            return new HttpResponse(new Blob(["png"]), {
-              headers: { "Content-Type": "image/png" },
-            });
-          }),
-        );
-        window.URL.createObjectURL = vi.fn(() => "blob:preview");
-        window.URL.revokeObjectURL = vi.fn();
+        const exported = captureExport();
         const cards = await openGrid();
 
         fireEvent.click(cards[0]);
