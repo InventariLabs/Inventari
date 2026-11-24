@@ -482,6 +482,45 @@ function ownedBy(block, scopeFunction) {
 }
 
 /**
+ * Whether the function `fn` is an event handler: held in a `handle…`/`on…`
+ * variable (directly or through `useCallback`), or the value of an `on…` JSX
+ * attribute. It runs after a user act, not while the screen draws. An effect
+ * is not one: `setHeader(<Actions hasRows={rows.length > 0} />)` in an effect
+ * draws the header the failed read leaves behind. Neither is a render helper
+ * held in a variable.
+ */
+function isEventHandler(fn) {
+  let node = fn;
+  const call = fn.parent;
+  if (call && ts.isCallExpression(call) && call.arguments[0] === fn) {
+    if (!/^(?:React\.)?useCallback$/.test(call.expression.getText())) {
+      return false;
+    }
+    node = call;
+  }
+  const parent = node.parent;
+  if (parent && ts.isVariableDeclaration(parent)) {
+    return /^(?:handle|on)[A-Z]/.test(parent.name.getText());
+  }
+  return Boolean(
+    parent &&
+    ts.isJsxExpression(parent) &&
+    parent.parent &&
+    ts.isJsxAttribute(parent.parent) &&
+    /^on[A-Z]/.test(parent.parent.name.getText()),
+  );
+}
+
+/** Whether the claim at `at` sits in an event handler of the component. */
+function inEventHandler(tree, scopeFunction, at) {
+  for (let node = nodeAt(tree, at); node && node !== scopeFunction;) {
+    if (ts.isFunctionLike(node) && isEventHandler(node)) return true;
+    node = node.parent;
+  }
+  return false;
+}
+
+/**
  * Whether the claim at `at` cannot render before the read has an answer.
  *
  * Two shapes answer for it, and both have to be in the component's own
@@ -541,6 +580,7 @@ function claimFindings(
   reads,
   lineOf,
   answersEarly,
+  bareData = null,
 ) {
   const out = [];
   if (derived.length === 0) return out;
@@ -572,6 +612,18 @@ function claimFindings(
       text
         .slice(Math.max(0, text.lastIndexOf("return", at)), at + 400)
         .split(";")[0];
+    // While the read has not answered, a data value with no empty default is
+    // `undefined`, and `undefined === 0` / `<= 0` is false: the screen shows
+    // the loaded state, not an empty one, so it does not claim emptiness.
+    if (
+      comparison &&
+      bareData !== null &&
+      new RegExp(
+        String.raw`^${bareData.replace(/\$/g, "\\$")}(?:===?|<=?)`,
+      ).test(plain)
+    ) {
+      continue;
+    }
     if (readsFlag(expression, reads)) continue;
     if (answersEarly(scope, at, reads)) continue;
     const before = text.slice(Math.max(0, at - 80), at);
@@ -615,7 +667,10 @@ export function unguardedClaimsIn(rel, source) {
     if (!scopes.has(scope.start)) {
       scopes.set(scope.start, scopeFunctionAt(tree, scope.start));
     }
-    return earlyOutcome(tree, scopes.get(scope.start), at, reads);
+    return (
+      inEventHandler(tree, scopes.get(scope.start), at) ||
+      earlyOutcome(tree, scopes.get(scope.start), at, reads)
+    );
   };
   const pattern = /\bconst\s*\{/g;
   let match;
@@ -647,6 +702,7 @@ export function unguardedClaimsIn(rel, source) {
         { outcomes, queries: [] },
         lineOf,
         answersEarly,
+        data.defaulted ? null : data.alias,
       ),
     );
   }
