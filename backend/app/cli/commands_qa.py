@@ -401,6 +401,23 @@ async def wipe_organization_async(db: Any, organization_id: Any) -> dict[str, in
     )
 
     removed: dict[str, int] = {}
+
+    # Two walls the walk below cannot see. The organization points at the user
+    # who made it, and the users are deleted before the organization row.
+    # `user_roles` has no `organization_id` of its own, so the walk skips it,
+    # and the foreign keys it holds on the users and on the roles would refuse
+    # both deletes.
+    org.created_by = None
+    from app.models.role import UserRole
+    from app.models.user import User
+
+    members = select(User.id).where(User.organization_id == organization_id)
+    assignments = await db.execute(
+        delete(UserRole).where(UserRole.user_id.in_(members))
+    )
+    if assignments.rowcount:
+        removed['user_roles'] = assignments.rowcount
+
     for table in reversed(Base.metadata.sorted_tables):
         if table.name in _WIPE_SKIP_TABLES:
             continue
