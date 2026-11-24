@@ -6,6 +6,15 @@
 # Docker configuration
 DOCKER_COMPOSE := docker compose
 
+# The production stack, by the route the installation runs. A `.env` that names
+# COMPOSE_FILE (the published images: docker-compose.prod.yml plus
+# docker-compose.images.yml) already says which files make the stack, and
+# `-f docker-compose.prod.yml` would override it with the build file alone —
+# these targets would then build the images on the server. Without the line the
+# installation builds from source and the flag names the one file.
+PROD_ON_IMAGES := $(shell grep -qs '^COMPOSE_FILE=' .env && echo yes)
+PROD_COMPOSE := docker compose $(if $(PROD_ON_IMAGES),,-f docker-compose.prod.yml)
+
 # One source of truth for the development admin account. `dev-up`, the isolated
 # dev2 stack and the E2E suite all read it, and the password must satisfy the
 # same policy the API enforces — an account the CLI can create but the login
@@ -113,20 +122,24 @@ up: ## Start all containers (dev mode)
 down: ## Stop all containers
 	$(DOCKER_COMPOSE) down
 
-deploy: ## Deploy to production (build + recreate containers)
+deploy: ## Deploy to production (build, or pull the published images, and recreate containers)
 	@echo "$(BLUE)[INFO]$(NC) Deploying to production..."
-	@docker compose -f docker-compose.prod.yml build --parallel
-	@docker compose -f docker-compose.prod.yml up -d --force-recreate --no-build
+ifeq ($(PROD_ON_IMAGES),yes)
+	@$(PROD_COMPOSE) pull
+else
+	@$(PROD_COMPOSE) build --parallel
+endif
+	@$(PROD_COMPOSE) up -d --force-recreate --no-build
 	@echo "$(GREEN)[OK]$(NC) Deployment complete."
 
 backup-key: ## Make the key pair that encrypts prod backups (prints the private key once; keep it off the server)
 	@sh scripts/backup-key.sh
 
 backup-verify: ## Prove the newest prod backup restores (encrypted: pipe the private key in on stdin)
-	@docker compose -f docker-compose.prod.yml run --rm $$([ -t 0 ] || echo -T) --entrypoint verify.sh db-backup
+	@$(PROD_COMPOSE) run --rm $$([ -t 0 ] || echo -T) --entrypoint verify.sh db-backup
 
 backup-status: ## Prod backups: encryption on/off, newest backup, when a restore was last proven
-	@docker compose -f docker-compose.prod.yml run --rm -T --no-deps --entrypoint status.sh db-backup
+	@$(PROD_COMPOSE) run --rm -T --no-deps --entrypoint status.sh db-backup
 
 status: ## Show container status and recent logs
 	@echo "$(BLUE)[INFO]$(NC) Container status:"
