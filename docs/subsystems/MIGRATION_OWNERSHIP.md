@@ -261,29 +261,40 @@ archived `smvmoved01` (`migrations/versions_archive/`) and in `auditidx03`.
 whole table is one transaction: it locks every row it touches until the end,
 and bloats the table by the size of the table. Update a bounded slice per
 statement instead, each committed on its own, and select the rows still to do
-by the same predicate that keeps a finished row out — that is what ends the
-loop, and what makes an interrupted run resume where it stopped:
+by the same predicate that keeps a finished row out — that is what makes an
+interrupted run resume where it stopped — and walk the key forward from where
+the last batch ended, so a batch never reads the rows already finished. The
+predicate alone would read every finished row again on each batch, and a
+backfill would cost the square of the table; the predicate also has to leave
+out the rows the update cannot change (here a row with no `name`), or the loop
+never ends:
 
 ```python
 _BATCH = 5000
+_FIRST_ID = '00000000-0000-0000-0000-000000000000'
 
 
 def upgrade() -> None:
     with op.get_context().autocommit_block():
         conn = op.get_bind()
+        last = _FIRST_ID
         while True:
             moved = conn.exec_driver_sql(
-                'UPDATE widgets SET label = lower(name) WHERE id IN ('
-                'SELECT id FROM widgets WHERE label IS NULL ORDER BY id LIMIT %s)',
-                (_BATCH,),
-            ).rowcount
+                'WITH batch AS (SELECT id FROM widgets WHERE id > %s '
+                'AND label IS NULL AND name IS NOT NULL ORDER BY id LIMIT %s) '
+                'UPDATE widgets SET label = lower(name) FROM batch '
+                'WHERE widgets.id = batch.id RETURNING widgets.id',
+                (last, _BATCH),
+            ).fetchall()
             if not moved:
                 break
+            last = max(row[0] for row in moved)
 ```
 
 A backfill whose rows cannot be told apart from finished ones by a predicate
-(it rewrites a value to another valid value) gets a marker column, or walks the
-key in order (`WHERE id > :last ORDER BY id LIMIT n`). A revision that must see
+(it rewrites a value to another valid value) gets a marker column, or drops the
+predicate and relies on the key walk alone — then an interrupted run starts
+from the beginning. A revision that must see
 one consistent snapshot, as `ledgertotals02` does under `LOCK TABLE ... SHARE`,
 cannot be batched; it says so in its docstring and is announced in the release
 notes as a revision that blocks writes for as long as it takes. There is no
@@ -308,11 +319,15 @@ the revisions are listed by what they would hold up there.
   (catalog-only changes or tables that stay small), `locnames01` (touches only the
   duplicate names), `fieldwords01` (`categories`), `itemimportjob01`,
   `ledgertotals01`, `ledgertotals03` (replaces a trigger function).
-- *Module chains:* `doc_register_pagination01` (`documents`) and
-  `doc_list_reads01` (`document_lines`) index tables that grow with every
-  document, and `doc_line_unit_backfill01` rewrites `document_lines` in one
-  `UPDATE`; `recipes/003` and `006` (ingredients, picking items) are one `UPDATE`
-  each. They shipped in 0.11.0 and ran on empty or demo-sized databases; they
+- *Module chains:* `doc_register_pagination01`, `doc_post_key01_add_column`
+  (`documents`), `doc_list_reads01` and `doc_corrects_line01_add_column`
+  (`document_lines`) build a plain index on tables that grow with every
+  document; `doc_line_unit_backfill01` rewrites `document_lines`, and
+  `doc_pending_approval_fix01_data`, `doc_held_by02_data` and
+  `doc_neutral_type_codes01_data` rewrite `documents`, each in one `UPDATE`
+  statement per table; `equipment/005_serial_number_to_column` and
+  `006_reconcile_equipment_status` do the same to `items`; `recipes/003` and
+  `006` (ingredients, picking items) are one `UPDATE` each. They shipped in 0.11.0 and ran on empty or demo-sized databases; they
   are the ones to rewrite in this form before they could run against a large
   one, and a revision added from now on follows the section above.
 

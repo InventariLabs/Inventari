@@ -66,6 +66,8 @@ touches none of them: see *Records the organization owns*.
 | `partners` | `name`, `email`, `phone`, `contact_person`, `address` (JSON), `tax_id`, `notes` — of suppliers, customers and employees; a natural person when `type = 'EMPLOYEE'`, when `is_consumer` is set, or a sole trader | yes, by query under *Records the organization owns* | **not touched** — belongs to the organization |
 | `equipment_assignments` | `assigned_to_name`, `assigned_to_email` — free text, so a person without an account can hold an asset; `checkout_notes`, `checkin_notes` | yes, by query | **not touched** — organization record, matched to a person by address |
 | `audit_responses` (equipment attestation campaigns) | `assignee_name`, `assignee_email`, and from the person's answer on the public link `response_ip`, `response_user_agent`, `dispute_reason` | yes, by query | **not touched** — organization record |
+| `audit_response_items` (one row per asset in an attestation answer) | `dispute_reason` — the holder's own words when they dispute one asset on the public link; the row has no address of its own and belongs to a person through its `audit_responses` row | yes, by query (through `response_id`) | **not touched** — organization record, scrubbed with its `audit_responses` row |
+| `equipment_maintenance_logs` | `performed_by` — who did the maintenance, typed by hand, so it can be a technician or an employee without an account | yes, by query (by name) | **not touched** — organization record of the asset's maintenance |
 | `organizations` | `name`, `address`, `tax_id` — the organization's own business details; a sole trader's identify a person | no | **not touched** — edited by the organization |
 | Refresh/access tokens | JWT in HttpOnly cookie / memory | n/a | revoked by erasure (the token blacklist) |
 | Technical logs — `LOG_DIR/app.log` (10 MB × 5 backups) and the container stdout | addresses and client IPs: failed-login and lockout lines write the account's address and the IP that tried it (`app.services.auth_service`), the mail lines write the recipient (`app.services.email_service`) | no | **kept** — erasure never writes a log file; see *Records that keep the address* |
@@ -290,7 +292,10 @@ account for: `equipment_assignments.assigned_to_name` and `assigned_to_email`
 are free text (`my_assets` matches a signed-in user to their assets by that
 address). An attestation campaign sends each holder a link and keeps their name,
 address, and — from the answer on the public page — IP address and browser
-string in `audit_responses`. A partner (`partners`) can be a customer who is a
+string in `audit_responses`; what the holder wrote about one asset they
+dispute is in `audit_response_items.dispute_reason`. A maintenance entry
+names who did the work in `equipment_maintenance_logs.performed_by`, typed
+by hand. A partner (`partners`) can be a customer who is a
 private person, an employee, or a supplier's named contact. These are the
 organization's records, written by its members, and the application neither
 exports nor scrubs them on request. The operator does it, in agreement with the
@@ -326,6 +331,19 @@ FROM audit_responses
 WHERE lower(assignee_email) = lower('<EMAIL>')
    OR lower(assignee_name) = lower('<FULL NAME>');
 
+-- The holder's words about each asset they disputed
+SELECT i.id, i.response_id, i.item_name, i.serial_number, i.status,
+       i.dispute_type, i.dispute_reason, i.responded_at
+FROM audit_response_items i
+JOIN audit_responses r ON r.id = i.response_id
+WHERE lower(r.assignee_email) = lower('<EMAIL>')
+   OR lower(r.assignee_name) = lower('<FULL NAME>');
+
+-- Maintenance a named person carried out
+SELECT id, item_id, maintenance_type, title, performed_at, performed_by
+FROM equipment_maintenance_logs
+WHERE lower(performed_by) = lower('<FULL NAME>');
+
 SELECT id, name, type, is_consumer, email, phone, contact_person, address,
        tax_id, notes, created_at
 FROM partners
@@ -358,6 +376,13 @@ SET assigned_to_name = 'Deleted holder', assigned_to_email = NULL,
     checkout_notes = NULL, checkin_notes = NULL
 WHERE lower(assigned_to_email) = lower('<EMAIL>');
 
+-- Before the next statement: it matches rows through audit_responses.
+UPDATE audit_response_items
+SET dispute_reason = NULL
+WHERE response_id IN (
+    SELECT id FROM audit_responses WHERE lower(assignee_email) = lower('<EMAIL>')
+);
+
 UPDATE audit_responses
 SET assignee_name = 'Deleted holder', assignee_email = 'deleted@anonymized.invalid',
     response_ip = NULL, response_user_agent = NULL, dispute_reason = NULL,
@@ -365,7 +390,13 @@ SET assignee_name = 'Deleted holder', assignee_email = 'deleted@anonymized.inval
 WHERE lower(assignee_email) = lower('<EMAIL>');
 ```
 
-`token_expires_at = now()` closes the link the person was mailed. A `partners`
+`token_expires_at = now()` closes the link the person was mailed. The item
+update runs first because it finds its rows through the address the
+`audit_responses` update replaces. A maintenance entry that names the person
+is the organization's record of who serviced an asset: where it must go,
+`UPDATE equipment_maintenance_logs SET performed_by = 'Deleted person' WHERE
+lower(performed_by) = lower('<FULL NAME>')`, after checking each hit is the
+same person. A `partners`
 row is edited or deleted in the application itself, not by SQL. The holder's
 name in `item_history` and `notifications` is history of what happened and
 stays unless you decide otherwise. The journal entries found above follow the
