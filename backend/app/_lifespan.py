@@ -122,6 +122,31 @@ async def _wire_token_blacklist_and_cache(logger: Logger, settings, event_bus) -
     logger.info('[Startup] Cache connected to Redis.')
 
 
+async def _wire_token_blacklist_under_testing(logger: Logger, settings) -> None:
+    """Give the blacklist its Redis in TESTING, without the listeners and seeding.
+
+    Without it the blacklist fails open (TESTING is not production), so a spent
+    reset link, a signed-out session and a replayed refresh token all stay
+    valid and no browser spec can tell single-use from reusable. A Redis that
+    does not answer leaves the blacklist as it was, with a warning.
+    """
+    from app.core.token_blacklist import token_blacklist
+
+    try:
+        import redis.asyncio as aioredis
+
+        redis = aioredis.from_url(settings.REDIS_URL, decode_responses=True)
+        await asyncio.wait_for(redis.ping(), timeout=5)
+    except Exception as exc:  # noqa: BLE001 — Redis is optional here, as elsewhere
+        logger.warning(
+            '[Startup] TokenBlacklist stays fail-open in TESTING: Redis unavailable (%s)',
+            exc,
+        )
+        return
+    token_blacklist.set_redis(redis)
+    logger.info('[Startup] TokenBlacklist connected to Redis in TESTING mode.')
+
+
 async def _seed_and_bootstrap(logger: Logger, settings) -> None:
     """Seed system data, then backfill org short_ids and promote the superuser.
 
@@ -311,6 +336,8 @@ async def _start_services(
 
     if settings.TESTING:
         logger.info('[Startup] Skipping Redis listeners and seeding in TESTING mode')
+        if settings.TESTING_TOKEN_REVOCATION:
+            await _wire_token_blacklist_under_testing(logger, settings)
         return None, []
 
     hub_task = await _connect_redis_services(
