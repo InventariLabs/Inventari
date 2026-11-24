@@ -27,10 +27,12 @@ got the same plan: the planner walked the warehouse record by record to find
 the module's few. It now reads the claimed categories once and names them in
 the statement, so the count reads the records rather than weighing every one
 of them. A module's records are a minority spread through the warehouse, so
-there the assertion is the shape of the read — an Index Scan hands the heap
-back one record at a time, a bitmap or a sequential scan reads its pages
-once — and not the number of blocks, which both plans touch when every page
-holds a record of the module.
+there the assertion is the shape of the read — an Index Scan through any
+index but the organization's hands the heap back one record at a time, while
+a bitmap or a sequential scan reads its pages once, and so does an Index Scan
+through the organization's index, which holds a single key for the whole
+count and lists its records in page order — and not the number of blocks,
+which those plans touch when every page holds a record of the module.
 
 The fixture is one warehouse of four zones and forty shelves, and two
 neighbors on the same table, at a size where the per-record walk is the
@@ -307,10 +309,11 @@ class TestTheModulesOwnRecordsAreCountedInOneRead:
 
     Its filter is the mirror of the general one — "is this record ours" — and
     does not ask the category question correlated with every record. The
-    planner would price that per record and walk the warehouse through the
-    organization index, visiting a record at a time; named as the values they
-    are, the claimed categories let it read the records in the table's own
-    order.
+    planner would price that per record and walk the warehouse through a
+    location or category index, visiting a record at a time; named as the
+    values they are, the claimed categories let it read the records by page —
+    in the table's own order, through a bitmap, or through the organization's
+    index, which lists them in page order.
     """
 
     async def test_each_record_is_read_from_its_page_not_visited_on_its_own(

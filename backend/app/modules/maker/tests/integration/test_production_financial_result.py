@@ -113,7 +113,14 @@ def _insert_order_row(
     reference_price_snapshot: str | None = None,
     result_per_unit: str | None = None,
     result_per_batch: str | None = None,
+    overproduced: bool | None = None,
 ) -> ProductionOrder:
+    """Insert one order row; *overproduced* says what the flag stored on it is.
+
+    Left out, it is what closing a run stores: whether the run made more than
+    planned. A test that must tell a read of the stored flag from a comparison
+    of the quantities passes the flag against the quantities.
+    """
     actual = Decimal(actual_qty) if actual_qty else None
     order = ProductionOrder(
         organization_id=org_id,
@@ -121,8 +128,11 @@ def _insert_order_row(
         recipe_id=recipe_id,
         planned_qty=Decimal(planned_qty),
         actual_qty=actual,
-        # Closing a run stores the flag; a row standing for a closed run does too.
-        overproduced=actual is not None and actual > Decimal(planned_qty),
+        overproduced=(
+            actual is not None and actual > Decimal(planned_qty)
+            if overproduced is None
+            else overproduced
+        ),
         output_storage_location_id=output_location_id,
         status=status,
         completed_at=completed_at,
@@ -547,10 +557,18 @@ class TestMonthlyResult:
         mk_output_loc: StorageLocation,
         db_session: Session,
     ) -> None:
-        """A month says how many of its runs closed above their plan."""
+        """A month counts the runs whose stored flag says they closed above plan.
+
+        The flag, not the quantities: the rows below disagree with their own
+        quantities, so a count that compared them would answer differently.
+        """
         output = _template(db_session, mk_org, name='Jam')
         now = datetime.now(tz=UTC)
-        for planned, actual in (('10.000', '59.000'), ('10.000', '9.000')):
+        for planned, actual, flagged in (
+            ('10.000', '59.000', True),
+            ('10.000', '12.000', False),
+            ('10.000', '15.000', False),
+        ):
             _insert_order_row(
                 db_session,
                 org_id=mk_org.id,
@@ -558,6 +576,7 @@ class TestMonthlyResult:
                 output_location_id=mk_output_loc.id,
                 planned_qty=planned,
                 actual_qty=actual,
+                overproduced=flagged,
                 completed_at=now,
                 result_per_unit='1.00',
             )
@@ -567,7 +586,7 @@ class TestMonthlyResult:
         )
         assert resp.status_code == 200
         latest = resp.json()[-1]
-        assert latest['orders'] == 2
+        assert latest['orders'] == 3
         assert latest['overproduced_orders'] == 1
 
     def test_the_catalogue_says_when_the_last_run_made_more_than_planned(
@@ -598,6 +617,36 @@ class TestMonthlyResult:
         assert resp.status_code == 200
         item = next(i for i in resp.json()['items'] if i['id'] == str(recipe.id))
         assert item['last_run_overproduced'] is True
+
+    def test_the_catalogue_reads_the_stored_flag_of_the_last_run(
+        self,
+        client: TestClient,
+        mk_auth_headers: dict[str, str],
+        mk_org: Organization,
+        mk_output_loc: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """The flag on the run is what the catalogue shows, not the quantities."""
+        output = _template(db_session, mk_org, name='Jam')
+        recipe = _recipe(db_session, mk_org, output.id, reference_price='5.00')
+        _insert_order_row(
+            db_session,
+            org_id=mk_org.id,
+            output_template_id=output.id,
+            output_location_id=mk_output_loc.id,
+            recipe_id=recipe.id,
+            planned_qty='10.000',
+            actual_qty='59.000',
+            overproduced=False,
+            completed_at=datetime.now(tz=UTC),
+            unit_cost_snapshot='4.25',
+            result_per_unit='0.75',
+        )
+
+        resp = client.get('/api/v1/maker/recipes', headers=mk_auth_headers)
+        assert resp.status_code == 200
+        item = next(i for i in resp.json()['items'] if i['id'] == str(recipe.id))
+        assert item['last_run_overproduced'] is False
 
     def test_ignores_drafts_cancelled_and_snapshotless(
         self,

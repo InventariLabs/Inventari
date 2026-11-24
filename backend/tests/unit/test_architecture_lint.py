@@ -331,37 +331,31 @@ def test_api_layer_import_violations_skip_test_files(tmp_path):
     assert new[0].file_path.name == 'users.py'
 
 
-def test_api_layer_import_violations_allow_safe_imports(tmp_path):
+@pytest.mark.parametrize(
+    'source',
+    [
+        pytest.param(
+            'from app.core.public_api import core_api\n'
+            'from app.core.contracts import UserDTO\n',
+            id='public-contracts',
+        ),
+        # Imports inside `if TYPE_CHECKING:` blocks are type hints only.
+        pytest.param(
+            'from __future__ import annotations\n'
+            'from typing import TYPE_CHECKING\n'
+            'if TYPE_CHECKING:\n'
+            '    from app.models.user import User\n'
+            '\n'
+            'def get_user() -> "User | None":\n'
+            '    return None\n',
+            id='type-checking-block',
+        ),
+    ],
+)
+def test_api_layer_import_violations_allow_safe_imports(tmp_path, source):
     api_root = tmp_path / 'api'
     api_root.mkdir()
-
-    (api_root / 'safe.py').write_text(
-        'from app.core.public_api import core_api\n'
-        'from app.core.contracts import UserDTO\n',
-        encoding='utf-8',
-    )
-
-    new, baselined = find_api_layer_import_violations(api_root, baseline_file=None)
-
-    assert new == []
-    assert baselined == []
-
-
-def test_api_layer_import_violations_skip_type_checking(tmp_path):
-    """Imports inside `if TYPE_CHECKING:` blocks are allowed (type hints only)."""
-    api_root = tmp_path / 'api'
-    api_root.mkdir()
-
-    (api_root / 'typed.py').write_text(
-        'from __future__ import annotations\n'
-        'from typing import TYPE_CHECKING\n'
-        'if TYPE_CHECKING:\n'
-        '    from app.models.user import User\n'
-        '\n'
-        'def get_user() -> "User | None":\n'
-        '    return None\n',
-        encoding='utf-8',
-    )
+    (api_root / 'safe.py').write_text(source, encoding='utf-8')
 
     new, baselined = find_api_layer_import_violations(api_root, baseline_file=None)
 
@@ -921,35 +915,75 @@ def test_migration_check_skips_underscore_directories(tmp_path):
 # ---------------------------------------------------------------------------
 
 
-def test_extract_tablenames_returns_empty_for_no_tables(tmp_path):
-    """_extract_tablenames returns empty set when no __tablename__ present."""
-    f = tmp_path / 'models.py'
-    f.write_text('class C:\n    pass\n', encoding='utf-8')
-
-    assert _extract_tablenames(f) == set()
-
-
-def test_extract_tablenames_finds_multiple(tmp_path):
-    """_extract_tablenames finds all __tablename__ assignments."""
-    f = tmp_path / 'models.py'
-    f.write_text(
+_EXTRACT_TABLENAMES_CASES = {
+    'no_tables': ('class C:\n    pass\n', set()),
+    'several_tables': (
         "class A:\n    __tablename__ = 'table_a'\n"
         "class B:\n    __tablename__ = 'table_b'\n",
-        encoding='utf-8',
-    )
-
-    assert _extract_tablenames(f) == {'table_a', 'table_b'}
-
-
-def test_extract_tablenames_skips_dynamic_assignment(tmp_path):
-    """_extract_tablenames only matches literal string assignments."""
-    f = tmp_path / 'models.py'
-    f.write_text(
+        {'table_a', 'table_b'},
+    ),
+    # Only a literal string assignment names a table.
+    'dynamic_assignment': (
         'class A:\n    __tablename__ = get_name()  # dynamic, not a literal\n',
-        encoding='utf-8',
-    )
+        set(),
+    ),
+    # Core Alembic does not track a non-Core base, and a community module may
+    # not import app.database, so every model of one sits on a base of its
+    # own: a walk that skipped those would be blind to every community module.
+    # The exclusion for a genuinely separate database lives at the module
+    # level, keyed on the database seam the module imports, not on the base.
+    'own_declarative_base': (
+        'from sqlalchemy.orm import DeclarativeBase\n'
+        'class OFFBase(DeclarativeBase):\n'
+        '    pass\n'
+        'class OFFProductLocal(OFFBase):\n'
+        "    __tablename__ = 'off_products_local'\n",
+        {'off_products_local'},
+    ),
+    'core_base_subclass': (
+        'from app.database import Base\n'
+        'class Widget(Base):\n'
+        "    __tablename__ = 'widgets'\n",
+        {'widgets'},
+    ),
+    'core_base_alias': (
+        'from app.database import Base as CoreBase\n'
+        'class Widget(CoreBase):\n'
+        "    __tablename__ = 'widgets'\n",
+        {'widgets'},
+    ),
+    # The walk is blind to which base the model inherits.
+    'core_and_own_base': (
+        'from app.database import Base\n'
+        'from sqlalchemy.orm import DeclarativeBase\n'
+        'class MyOwn(DeclarativeBase):\n'
+        '    pass\n'
+        'class Widget(Base):\n'
+        "    __tablename__ = 'widgets'\n"
+        'class External(MyOwn):\n'
+        "    __tablename__ = 'external_table'\n",
+        {'widgets', 'external_table'},
+    ),
+    'core_db_facade_source': (
+        'from app.core.db_facade import Base\n'
+        'class Thing(Base):\n'
+        "    __tablename__ = 'things'\n",
+        {'things'},
+    ),
+}
 
-    assert _extract_tablenames(f) == set()
+
+@pytest.mark.parametrize(
+    ('source', 'expected'),
+    list(_EXTRACT_TABLENAMES_CASES.values()),
+    ids=list(_EXTRACT_TABLENAMES_CASES),
+)
+def test_extract_tablenames(tmp_path, source, expected):
+    """_extract_tablenames names the literal ``__tablename__`` of every class."""
+    f = tmp_path / 'models.py'
+    f.write_text(source, encoding='utf-8')
+
+    assert _extract_tablenames(f) == expected
 
 
 def test_collect_module_tablenames_from_package(tmp_path):
@@ -1006,30 +1040,6 @@ def test_list_version_files_empty_when_no_dir(tmp_path):
 # ── Non-Core DeclarativeBase detection (nutrition/OFFBase pattern) ──────────
 
 
-def test_extract_tablenames_counts_own_declarative_base(tmp_path):
-    """Own-DeclarativeBase tables count at the file level now.
-
-    The walk includes them. Core Alembic does not track non-Core bases, and a
-    community module may not import app.database, so every one of its models
-    sits on a base of its own; a walk that skipped them would be blind to every
-    community module. The exclusion for
-    genuinely separate-database models (nutrition's products db) lives at
-    the module level now, keyed on the database seam the module imports,
-    not on the base.
-    """
-    f = tmp_path / 'models.py'
-    f.write_text(
-        'from sqlalchemy.orm import DeclarativeBase\n'
-        'class OFFBase(DeclarativeBase):\n'
-        '    pass\n'
-        'class OFFProductLocal(OFFBase):\n'
-        "    __tablename__ = 'off_products_local'\n",
-        encoding='utf-8',
-    )
-
-    assert _extract_tablenames(f) == {'off_products_local'}
-
-
 def test_collect_excludes_own_base_when_the_module_targets_separate_db(
     tmp_path,
 ):
@@ -1055,64 +1065,6 @@ def test_collect_excludes_own_base_when_the_module_targets_separate_db(
     )
 
     assert _collect_module_tablenames(module) == set()
-
-
-def test_extract_tablenames_includes_core_base_subclass(tmp_path):
-    """Tables on classes inheriting from Core Base are included."""
-    f = tmp_path / 'models.py'
-    f.write_text(
-        'from app.database import Base\n'
-        'class Widget(Base):\n'
-        "    __tablename__ = 'widgets'\n",
-        encoding='utf-8',
-    )
-
-    assert _extract_tablenames(f) == {'widgets'}
-
-
-def test_extract_tablenames_includes_core_base_alias(tmp_path):
-    """Core Base imported under an alias is still detected."""
-    f = tmp_path / 'models.py'
-    f.write_text(
-        'from app.database import Base as CoreBase\n'
-        'class Widget(CoreBase):\n'
-        "    __tablename__ = 'widgets'\n",
-        encoding='utf-8',
-    )
-
-    assert _extract_tablenames(f) == {'widgets'}
-
-
-def test_extract_tablenames_mixed_core_and_own_base(tmp_path):
-    """The walk counts a table on the Core ``Base`` and one on a base of the
-    module's own: it is blind to which base the model inherits."""
-    f = tmp_path / 'models.py'
-    f.write_text(
-        'from app.database import Base\n'
-        'from sqlalchemy.orm import DeclarativeBase\n'
-        'class MyOwn(DeclarativeBase):\n'
-        '    pass\n'
-        'class Widget(Base):\n'
-        "    __tablename__ = 'widgets'\n"
-        'class External(MyOwn):\n'
-        "    __tablename__ = 'external_table'\n",
-        encoding='utf-8',
-    )
-
-    assert _extract_tablenames(f) == {'widgets', 'external_table'}
-
-
-def test_extract_tablenames_core_db_facade_source(tmp_path):
-    """Core Base imported from app.core.db_facade is detected."""
-    f = tmp_path / 'models.py'
-    f.write_text(
-        'from app.core.db_facade import Base\n'
-        'class Thing(Base):\n'
-        "    __tablename__ = 'things'\n",
-        encoding='utf-8',
-    )
-
-    assert _extract_tablenames(f) == {'things'}
 
 
 # ── Guardrail 1: sync/async function twins ──────────────────────────────────
@@ -2408,35 +2360,32 @@ class TestRawHttpExceptionRatchet:
 
         assert [entry.startswith('::error') for entry in entries] == [False, True]
 
-    def test_a_typed_app_exception_is_not_a_finding(self, tmp_path):
+    @pytest.mark.parametrize(
+        'source',
+        [
+            pytest.param(
+                'from app.core.exceptions import ForbiddenException\n'
+                '\n'
+                'def open_the_door():\n'
+                '    raise ForbiddenException(message="no")\n',
+                id='typed-app-exception',
+            ),
+            # Only the AST counts: a raw raise named in a docstring is not one.
+            pytest.param(
+                'def open_the_door():\n'
+                '    """Always use HTTPException, never raise HTTPException(403)."""\n'
+                '    return 1\n',
+                id='prose-in-a-docstring',
+            ),
+        ],
+    )
+    def test_what_is_not_a_raw_raise_is_not_a_finding(self, tmp_path, source):
         from app.core.architecture_lint._quality_checks_raw_http_exception import (
             _check_raw_http_exceptions,
         )
 
         root = self._tree(tmp_path)
-        (root / 'door.py').write_text(
-            'from app.core.exceptions import ForbiddenException\n'
-            '\n'
-            'def open_the_door():\n'
-            '    raise ForbiddenException(message="no")\n',
-            encoding='utf-8',
-        )
-
-        assert _check_raw_http_exceptions([root]) == []
-
-    def test_prose_and_comments_do_not_count(self, tmp_path):
-        """Only the AST counts: a raw raise named in a docstring is not one."""
-        from app.core.architecture_lint._quality_checks_raw_http_exception import (
-            _check_raw_http_exceptions,
-        )
-
-        root = self._tree(tmp_path)
-        (root / 'door.py').write_text(
-            'def open_the_door():\n'
-            '    """Always use HTTPException, never raise HTTPException(403)."""\n'
-            '    return 1\n',
-            encoding='utf-8',
-        )
+        (root / 'door.py').write_text(source, encoding='utf-8')
 
         assert _check_raw_http_exceptions([root]) == []
 

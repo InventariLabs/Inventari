@@ -83,6 +83,7 @@ def _build(db: Session, world: Path, build: Callable[[Session], Any]) -> None:
     stored_before = set(_storage_files())
     payload = build(db)
     db.commit()
+    _forget_the_app_pool_connections()
     tables = hygiene.dirty_tables(db.connection())
 
     staging = world.with_name(world.name + '.partial')
@@ -244,7 +245,10 @@ DEMO_ADDRESS = 'https://demo.example.org'
 
 
 def _forget_the_app_pool_connections() -> None:
-    """Drop the connections the build left in the application's own async pool.
+    """Drop the connections a world build left in the application's own async pool.
+
+    Every world is built through ``_build``, which calls this once the build
+    ends.
 
     Module seeders open ``global_session()`` on the application's engine, and
     ``run_in_async_session`` runs them on a loop of its own that closes when
@@ -292,7 +296,6 @@ def pooled_sandboxes(async_engine: Any) -> Callable[[Session], list[list[str]]]:
                     ),
                 )
                 opened.append([str(org_id), str(user_id)])
-        _forget_the_app_pool_connections()
         return opened
 
     return build

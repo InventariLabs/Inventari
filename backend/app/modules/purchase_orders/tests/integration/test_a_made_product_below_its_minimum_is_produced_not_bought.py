@@ -25,7 +25,9 @@ from tests.integration._shelf import post_on_shelf
 
 pytestmark = pytest.mark.integration
 
-_LATER = (date.today() + timedelta(days=365)).isoformat()
+
+def _later() -> str:
+    return (date.today() + timedelta(days=365)).isoformat()
 
 
 def _world(
@@ -150,7 +152,7 @@ class TestAMadeProductBelowItsMinimum:
         response = client.get(
             '/api/v1/warehouse/todo',
             headers=headers,
-            params={'date_to': _LATER, 'limit': 50},
+            params={'date_to': _later(), 'limit': 50},
         )
 
         assert response.status_code == status.HTTP_200_OK, response.text
@@ -180,7 +182,7 @@ class TestAMadeProductBelowItsMinimum:
         todo = client.get(
             '/api/v1/warehouse/todo',
             headers=headers,
-            params={'date_to': _LATER, 'limit': 50},
+            params={'date_to': _later(), 'limit': 50},
         ).json()
 
         assert alert['make_instead'] is False
