@@ -34671,7 +34671,7 @@ export interface operations {
                 needs_attention?: boolean;
                 /** @description Threshold for low stock */
                 low_stock_threshold?: number;
-                /** @description Filter by source document (e.g. PZ that created the item) */
+                /** @description Only products whose history names this document: any receipt, issue, transfer or count that touched the product, not only the one that created it */
                 source_document_id?: string | null;
                 /** @description Comma-separated product template UUIDs. Narrows the list to items built on those templates; a module supplies the set (e.g. the templates that have a formula). Empty means no filter. */
                 template_ids?: string;
@@ -34765,7 +34765,7 @@ export interface operations {
                 only_low_stock?: boolean;
                 /** @description Records that need attention: expired, expiring within the expiry horizon, or of a product at its low-stock threshold — the records behind GET /items/attention-counts */
                 needs_attention?: boolean;
-                /** @description Filter by source document (e.g. PZ that created the item) */
+                /** @description Only products whose history names this document: any receipt, issue, transfer or count that touched the product, not only the one that created it */
                 source_document_id?: string | null;
                 /** @description Comma-separated product template UUIDs; empty means no filter. */
                 template_ids?: string;

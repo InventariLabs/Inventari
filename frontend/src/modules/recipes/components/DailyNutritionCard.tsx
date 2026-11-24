@@ -2,7 +2,7 @@ import { format, parseISO } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/Card";
 import type { MealPlan } from "@/modules/recipes/types/mealplans";
-import { dateFnsLocale, formatQuantityValue } from "@/utils/formatters";
+import { dateFnsLocale, formatNumberLocale } from "@/utils/formatters";
 
 interface Props {
   days: MealPlan["daily_nutrition_summary"];
@@ -10,6 +10,8 @@ interface Props {
 
 /**
  * Per-day macro totals of a plan, one serving of each planned meal; a day built from partly measured recipes says so.
+ * Grams carry one decimal and calories none, as on a recipe's own card: the
+ * figures are estimates, and two decimals widen the table past a phone.
  * Unlike a recipe's own card there is no "complete enough" threshold: a day sums
  * several dishes, so 90% of its ingredients can still leave a whole dish out.
  */
@@ -58,22 +60,22 @@ export function DailyNutritionCard({ days }: Props) {
                 </td>
                 <td className="px-2 sm:px-3 py-2 text-right tabular-nums whitespace-nowrap text-on-secondary">
                   {day.carbs_g != null
-                    ? `${formatQuantityValue(day.carbs_g)} g`
+                    ? `${formatNumberLocale(day.carbs_g, 1)} g`
                     : "–"}
                 </td>
                 <td className="px-2 sm:px-3 py-2 text-right tabular-nums whitespace-nowrap text-on-secondary">
                   {day.protein_g != null
-                    ? `${formatQuantityValue(day.protein_g)} g`
+                    ? `${formatNumberLocale(day.protein_g, 1)} g`
                     : "–"}
                 </td>
                 <td className="px-2 sm:px-3 py-2 text-right tabular-nums whitespace-nowrap text-on-secondary">
                   {day.fat_g != null
-                    ? `${formatQuantityValue(day.fat_g)} g`
+                    ? `${formatNumberLocale(day.fat_g, 1)} g`
                     : "–"}
                 </td>
                 <td className="px-3 sm:px-5 py-2 text-right tabular-nums whitespace-nowrap font-medium text-on">
                   {day.calories_kcal != null
-                    ? `${formatQuantityValue(day.calories_kcal)} kcal`
+                    ? `${formatNumberLocale(day.calories_kcal, 0)} kcal`
                     : "–"}
                 </td>
               </tr>

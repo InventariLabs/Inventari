@@ -58,6 +58,11 @@ says what the release does rather than what changed since them.
 - Concurrent changes of an organization's default tax rate take their locks
   in one order, so two saves no longer deadlock and wait for the retry
   middleware.
+- The meal plan's daily nutrition table adds up one serving of each planned
+  meal, as its note says, so a dish planned for eight no longer reads as one
+  person's day, and `daily_nutrition_summary` carries the same totals. Grams
+  show one decimal and calories none, as on a recipe's own card, so the
+  Calories column stays on a phone screen.
 
 ### Changed
 
@@ -90,6 +95,9 @@ says what the release does rather than what changed since them.
 - *Order what is missing* names the product's stock unit on the order line
   when the supplier's price names no unit of its own: 5 kg of oats is ordered
   and received as kilograms, not as "units".
+- The application answers `/robots.txt` with a file that disallows every
+  crawler, instead of its own HTML page, so a search engine is told to stay
+  away from an instance and the sign-in behind it.
 
 ## v0.13.0 - 2026-11-23
 

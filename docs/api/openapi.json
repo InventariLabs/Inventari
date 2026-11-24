@@ -7549,10 +7549,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Filter by source document (e.g. PZ that created the item)",
+              "description": "Only products whose history names this document: any receipt, issue, transfer or count that touched the product, not only the one that created it",
               "title": "Source Document Id"
             },
-            "description": "Filter by source document (e.g. PZ that created the item)"
+            "description": "Only products whose history names this document: any receipt, issue, transfer or count that touched the product, not only the one that created it"
           },
           {
             "name": "template_ids",
@@ -7893,10 +7893,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Filter by source document (e.g. PZ that created the item)",
+              "description": "Only products whose history names this document: any receipt, issue, transfer or count that touched the product, not only the one that created it",
               "title": "Source Document Id"
             },
-            "description": "Filter by source document (e.g. PZ that created the item)"
+            "description": "Only products whose history names this document: any receipt, issue, transfer or count that touched the product, not only the one that created it"
           },
           {
             "name": "template_ids",
