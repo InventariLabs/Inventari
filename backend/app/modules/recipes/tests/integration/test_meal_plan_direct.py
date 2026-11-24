@@ -49,7 +49,10 @@ from app.modules.recipes.schemas import (
     MealPlanUpdate,
 )
 
-_TODAY = date.today()
+
+def _today() -> date:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return date.today()
 
 
 def _detail(exc: AppException) -> dict[str, Any]:
@@ -201,8 +204,8 @@ class TestCreateMealPlan:
             real_async_db_session,
             MealPlanCreate(
                 name='Test Week',
-                start_date=_TODAY,
-                end_date=_TODAY + timedelta(days=6),
+                start_date=_today(),
+                end_date=_today() + timedelta(days=6),
                 enabled_slots=[MealSlot.LUNCH, MealSlot.DINNER],
                 default_servings=2,
             ),
@@ -211,8 +214,8 @@ class TestCreateMealPlan:
         )
 
         assert schema.name == 'Test Week'
-        assert schema.start_date == _TODAY
-        assert schema.end_date == _TODAY + timedelta(days=6)
+        assert schema.start_date == _today()
+        assert schema.end_date == _today() + timedelta(days=6)
         assert schema.enabled_slots == [MealSlot.LUNCH, MealSlot.DINNER]
         assert schema.default_servings == 2
         assert schema.entries == []
@@ -228,8 +231,8 @@ class TestCreateMealPlan:
             real_async_db_session,
             MealPlanCreate(
                 name=None,
-                start_date=_TODAY,
-                end_date=_TODAY + timedelta(days=1),
+                start_date=_today(),
+                end_date=_today() + timedelta(days=1),
                 enabled_slots=[MealSlot.LUNCH],
             ),
             meal_org.id,
@@ -252,8 +255,8 @@ class TestCreateMealPlan:
             await create_meal_plan_async(
                 real_async_db_session,
                 MealPlanCreate(
-                    start_date=_TODAY,
-                    end_date=_TODAY - timedelta(days=1),
+                    start_date=_today(),
+                    end_date=_today() - timedelta(days=1),
                     enabled_slots=[MealSlot.LUNCH],
                 ),
                 meal_org.id,
@@ -271,8 +274,8 @@ class TestCreateMealPlan:
             await create_meal_plan_async(
                 real_async_db_session,
                 MealPlanCreate(
-                    start_date=_TODAY,
-                    end_date=_TODAY + timedelta(days=15),
+                    start_date=_today(),
+                    end_date=_today() + timedelta(days=15),
                     enabled_slots=[MealSlot.LUNCH],
                 ),
                 meal_org.id,
@@ -290,8 +293,8 @@ class TestCreateMealPlan:
             await create_meal_plan_async(
                 real_async_db_session,
                 MealPlanCreate(
-                    start_date=_TODAY,
-                    end_date=_TODAY + timedelta(days=1),
+                    start_date=_today(),
+                    end_date=_today() + timedelta(days=1),
                     enabled_slots=[],
                 ),
                 meal_org.id,
@@ -312,8 +315,8 @@ class TestGetMealPlan:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
             name='Week',
         )
@@ -358,8 +361,8 @@ class TestListMealPlans:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
             default_servings=None,
         )
@@ -367,22 +370,22 @@ class TestListMealPlans:
             real_async_db_session,
             plan_a,
             recipe,
-            on=_TODAY,
+            on=_today(),
             slot=MealSlot.LUNCH,
         )
         await _entry(
             real_async_db_session,
             plan_a,
             recipe,
-            on=_TODAY + timedelta(days=1),
+            on=_today() + timedelta(days=1),
             slot=MealSlot.LUNCH,
         )
         await _plan(
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY + timedelta(days=7),
-            end=_TODAY + timedelta(days=13),
+            start=_today() + timedelta(days=7),
+            end=_today() + timedelta(days=13),
             slots=[MealSlot.LUNCH],
             default_servings=3,
         )
@@ -408,30 +411,30 @@ class TestListMealPlans:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
         late = await _plan(
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY + timedelta(days=14),
-            end=_TODAY + timedelta(days=20),
+            start=_today() + timedelta(days=14),
+            end=_today() + timedelta(days=20),
             slots=[MealSlot.LUNCH],
         )
 
         from_mid = await list_meal_plans_async(
             real_async_db_session,
             meal_org.id,
-            start_date=_TODAY + timedelta(days=10),
+            start_date=_today() + timedelta(days=10),
         )
         assert [row['id'] for row in from_mid] == [late.id]
 
         until_next_week = await list_meal_plans_async(
             real_async_db_session,
             meal_org.id,
-            end_date=_TODAY + timedelta(days=7),
+            end_date=_today() + timedelta(days=7),
         )
         assert [row['id'] for row in until_next_week] == [early.id]
 
@@ -446,24 +449,24 @@ class TestListMealPlans:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY,
+            start=_today(),
+            end=_today(),
             slots=[MealSlot.LUNCH],
         )
         second = await _plan(
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY + timedelta(days=1),
-            end=_TODAY + timedelta(days=1),
+            start=_today() + timedelta(days=1),
+            end=_today() + timedelta(days=1),
             slots=[MealSlot.LUNCH],
         )
         third = await _plan(
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY + timedelta(days=2),
-            end=_TODAY + timedelta(days=2),
+            start=_today() + timedelta(days=2),
+            end=_today() + timedelta(days=2),
             slots=[MealSlot.LUNCH],
         )
 
@@ -504,13 +507,13 @@ class TestUpdateMealPlan:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
 
-        new_start = _TODAY + timedelta(days=1)
-        new_end = _TODAY + timedelta(days=5)
+        new_start = _today() + timedelta(days=1)
+        new_end = _today() + timedelta(days=5)
         schema = await update_meal_plan_async(
             real_async_db_session,
             plan.id,
@@ -541,8 +544,8 @@ class TestUpdateMealPlan:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
 
@@ -565,8 +568,8 @@ class TestUpdateMealPlan:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH, MealSlot.DINNER, MealSlot.SNACK],
         )
 
@@ -590,17 +593,17 @@ class TestUpdateMealPlan:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH, MealSlot.DINNER],
-            entry_date=_TODAY,
+            entry_date=_today(),
             entry_slot=MealSlot.DINNER,
         )
         await _entry(
             real_async_db_session,
             plan,
             recipe,
-            on=_TODAY + timedelta(days=1),
+            on=_today() + timedelta(days=1),
             slot=MealSlot.DINNER,
         )
 
@@ -626,24 +629,24 @@ class TestUpdateMealPlan:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH, MealSlot.DINNER],
-            entry_date=_TODAY,
+            entry_date=_today(),
             entry_slot=MealSlot.LUNCH,
         )
         await _entry(
             real_async_db_session,
             plan,
             recipe,
-            on=_TODAY,
+            on=_today(),
             slot=MealSlot.DINNER,
         )
         await _entry(
             real_async_db_session,
             plan,
             recipe,
-            on=_TODAY + timedelta(days=1),
+            on=_today() + timedelta(days=1),
             slot=MealSlot.DINNER,
         )
 
@@ -672,8 +675,8 @@ class TestUpdateMealPlan:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
 
@@ -684,8 +687,8 @@ class TestUpdateMealPlan:
                 real_async_db_session,
                 plan.id,
                 MealPlanUpdate(
-                    start_date=_TODAY + timedelta(days=5),
-                    end_date=_TODAY,
+                    start_date=_today() + timedelta(days=5),
+                    end_date=_today(),
                 ),
                 meal_org.id,
             )
@@ -701,8 +704,8 @@ class TestUpdateMealPlan:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
 
@@ -711,8 +714,8 @@ class TestUpdateMealPlan:
                 real_async_db_session,
                 plan.id,
                 MealPlanUpdate(
-                    start_date=_TODAY,
-                    end_date=_TODAY + timedelta(days=15),
+                    start_date=_today(),
+                    end_date=_today() + timedelta(days=15),
                 ),
                 meal_org.id,
             )
@@ -728,10 +731,10 @@ class TestUpdateMealPlan:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
-            entry_date=_TODAY,
+            entry_date=_today(),
             entry_slot=MealSlot.LUNCH,
         )
 
@@ -739,7 +742,7 @@ class TestUpdateMealPlan:
             await update_meal_plan_async(
                 real_async_db_session,
                 plan.id,
-                MealPlanUpdate(start_date=_TODAY + timedelta(days=1)),
+                MealPlanUpdate(start_date=_today() + timedelta(days=1)),
                 meal_org.id,
             )
         assert _detail(exc_info.value)['code'] == 'MEAL_PLAN_DATE_CONFLICT'
@@ -758,8 +761,8 @@ class TestDeleteMealPlan:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
 
@@ -793,8 +796,8 @@ class TestAddEntry:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
         recipe = await _recipe(real_async_db_session, meal_org, meal_user)
@@ -803,7 +806,7 @@ class TestAddEntry:
             real_async_db_session,
             plan.id,
             MealPlanEntryCreate(
-                date=_TODAY,
+                date=_today(),
                 slot=MealSlot.LUNCH,
                 recipe_id=recipe.id,
                 servings=3,
@@ -832,7 +835,7 @@ class TestAddEntry:
                 real_async_db_session,
                 uuid.uuid4(),
                 MealPlanEntryCreate(
-                    date=_TODAY,
+                    date=_today(),
                     slot=MealSlot.LUNCH,
                     recipe_id=recipe.id,
                 ),
@@ -851,8 +854,8 @@ class TestAddEntry:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
         recipe = await _recipe(real_async_db_session, meal_org, meal_user)
@@ -862,7 +865,7 @@ class TestAddEntry:
                 real_async_db_session,
                 plan.id,
                 MealPlanEntryCreate(
-                    date=_TODAY + timedelta(days=30),
+                    date=_today() + timedelta(days=30),
                     slot=MealSlot.LUNCH,
                     recipe_id=recipe.id,
                 ),
@@ -881,8 +884,8 @@ class TestAddEntry:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
         recipe = await _recipe(real_async_db_session, meal_org, meal_user)
@@ -892,7 +895,7 @@ class TestAddEntry:
                 real_async_db_session,
                 plan.id,
                 MealPlanEntryCreate(
-                    date=_TODAY,
+                    date=_today(),
                     slot=MealSlot.DINNER,
                     recipe_id=recipe.id,
                 ),
@@ -911,8 +914,8 @@ class TestAddEntry:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
 
@@ -921,7 +924,7 @@ class TestAddEntry:
                 real_async_db_session,
                 plan.id,
                 MealPlanEntryCreate(
-                    date=_TODAY,
+                    date=_today(),
                     slot=MealSlot.LUNCH,
                     recipe_id=uuid.uuid4(),
                 ),
@@ -943,10 +946,10 @@ class TestUpdateEntry:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
-            entry_date=_TODAY,
+            entry_date=_today(),
             entry_slot=MealSlot.LUNCH,
         )
 
@@ -961,7 +964,7 @@ class TestUpdateEntry:
         assert updated.servings == 4
         assert updated.notes == 'Less salt'
         assert updated.order == 2
-        assert updated.date == _TODAY
+        assert updated.date == _today()
         assert updated.slot == MealSlot.LUNCH
 
     @pytest.mark.asyncio
@@ -975,8 +978,8 @@ class TestUpdateEntry:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
 
@@ -1001,10 +1004,10 @@ class TestUpdateEntry:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
-            entry_date=_TODAY,
+            entry_date=_today(),
             entry_slot=MealSlot.LUNCH,
         )
 
@@ -1029,10 +1032,10 @@ class TestUpdateEntry:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
-            entry_date=_TODAY,
+            entry_date=_today(),
             entry_slot=MealSlot.LUNCH,
             recipe_name='Original',
         )
@@ -1064,14 +1067,14 @@ class TestUpdateEntry:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH, MealSlot.DINNER],
-            entry_date=_TODAY,
+            entry_date=_today(),
             entry_slot=MealSlot.LUNCH,
         )
 
-        tomorrow = _TODAY + timedelta(days=1)
+        tomorrow = _today() + timedelta(days=1)
         updated = await update_entry_async(
             real_async_db_session,
             plan.id,
@@ -1095,10 +1098,10 @@ class TestUpdateEntry:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
-            entry_date=_TODAY,
+            entry_date=_today(),
             entry_slot=MealSlot.LUNCH,
         )
 
@@ -1106,11 +1109,11 @@ class TestUpdateEntry:
             real_async_db_session,
             plan.id,
             entry.id,
-            MealPlanEntryUpdate(date=_TODAY, slot=MealSlot.LUNCH, notes='Stayed'),
+            MealPlanEntryUpdate(date=_today(), slot=MealSlot.LUNCH, notes='Stayed'),
             meal_org.id,
         )
 
-        assert updated.date == _TODAY
+        assert updated.date == _today()
         assert updated.slot == MealSlot.LUNCH
         assert updated.order == 0
         assert updated.notes == 'Stayed'
@@ -1126,13 +1129,13 @@ class TestUpdateEntry:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
-            entry_date=_TODAY,
+            entry_date=_today(),
             entry_slot=MealSlot.LUNCH,
         )
-        tomorrow = _TODAY + timedelta(days=1)
+        tomorrow = _today() + timedelta(days=1)
         await _entry(
             real_async_db_session,
             plan,
@@ -1165,10 +1168,10 @@ class TestUpdateEntry:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
-            entry_date=_TODAY,
+            entry_date=_today(),
             entry_slot=MealSlot.LUNCH,
         )
 
@@ -1177,7 +1180,7 @@ class TestUpdateEntry:
                 real_async_db_session,
                 plan.id,
                 entry.id,
-                MealPlanEntryUpdate(date=_TODAY + timedelta(days=30)),
+                MealPlanEntryUpdate(date=_today() + timedelta(days=30)),
                 meal_org.id,
             )
         assert _detail(exc_info.value)['code'] == 'ENTRY_DATE_OUT_OF_RANGE'
@@ -1193,10 +1196,10 @@ class TestUpdateEntry:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
-            entry_date=_TODAY,
+            entry_date=_today(),
             entry_slot=MealSlot.LUNCH,
         )
 
@@ -1224,10 +1227,10 @@ class TestDeleteEntry:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
-            entry_date=_TODAY,
+            entry_date=_today(),
             entry_slot=MealSlot.LUNCH,
         )
 
@@ -1249,8 +1252,8 @@ class TestDeleteEntry:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
 
@@ -1272,10 +1275,10 @@ class TestBulkSaveEntries:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH, MealSlot.DINNER],
-            entry_date=_TODAY,
+            entry_date=_today(),
             entry_slot=MealSlot.LUNCH,
             recipe_name='Old',
         )
@@ -1289,13 +1292,13 @@ class TestBulkSaveEntries:
             BulkEntriesSave(
                 entries=[
                     MealPlanEntryCreate(
-                        date=_TODAY,
+                        date=_today(),
                         slot=MealSlot.LUNCH,
                         recipe_id=new_recipe.id,
                         order=0,
                     ),
                     MealPlanEntryCreate(
-                        date=_TODAY,
+                        date=_today(),
                         slot=MealSlot.DINNER,
                         recipe_id=new_recipe.id,
                         order=1,
@@ -1330,10 +1333,10 @@ class TestBulkSaveEntries:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
-            entry_date=_TODAY,
+            entry_date=_today(),
             entry_slot=MealSlot.LUNCH,
         )
 
@@ -1364,7 +1367,7 @@ class TestBulkSaveEntries:
                 BulkEntriesSave(
                     entries=[
                         MealPlanEntryCreate(
-                            date=_TODAY,
+                            date=_today(),
                             slot=MealSlot.LUNCH,
                             recipe_id=recipe.id,
                         )
@@ -1384,8 +1387,8 @@ class TestBulkSaveEntries:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
         recipe = await _recipe(real_async_db_session, meal_org, meal_user)
@@ -1397,7 +1400,7 @@ class TestBulkSaveEntries:
                 BulkEntriesSave(
                     entries=[
                         MealPlanEntryCreate(
-                            date=_TODAY + timedelta(days=30),
+                            date=_today() + timedelta(days=30),
                             slot=MealSlot.LUNCH,
                             recipe_id=recipe.id,
                         )
@@ -1418,8 +1421,8 @@ class TestBulkSaveEntries:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
 
@@ -1430,7 +1433,7 @@ class TestBulkSaveEntries:
                 BulkEntriesSave(
                     entries=[
                         MealPlanEntryCreate(
-                            date=_TODAY,
+                            date=_today(),
                             slot=MealSlot.LUNCH,
                             recipe_id=uuid.uuid4(),
                         )
@@ -1454,22 +1457,22 @@ class TestCopyPlanToWeek:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH, MealSlot.DINNER],
-            entry_date=_TODAY,
+            entry_date=_today(),
             entry_slot=MealSlot.LUNCH,
         )
         await _entry(
             real_async_db_session,
             plan,
             recipe,
-            on=_TODAY + timedelta(days=1),
+            on=_today() + timedelta(days=1),
             slot=MealSlot.DINNER,
         )
 
-        target_start = _TODAY + timedelta(days=7)
-        target_end = _TODAY + timedelta(days=13)
+        target_start = _today() + timedelta(days=7)
+        target_end = _today() + timedelta(days=13)
         schema, copied, skipped = await copy_plan_to_week_async(
             real_async_db_session,
             plan.id,
@@ -1501,21 +1504,21 @@ class TestCopyPlanToWeek:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
-            entry_date=_TODAY,
+            entry_date=_today(),
             entry_slot=MealSlot.LUNCH,
         )
         await _entry(
             real_async_db_session,
             plan,
             recipe,
-            on=_TODAY + timedelta(days=6),
+            on=_today() + timedelta(days=6),
             slot=MealSlot.LUNCH,
         )
 
-        target_start = _TODAY + timedelta(days=7)
+        target_start = _today() + timedelta(days=7)
         schema, copied, skipped = await copy_plan_to_week_async(
             real_async_db_session,
             plan.id,
@@ -1539,12 +1542,12 @@ class TestCopyPlanToWeek:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
 
-        target_start = _TODAY + timedelta(days=7)
+        target_start = _today() + timedelta(days=7)
         schema, copied, skipped = await copy_plan_to_week_async(
             real_async_db_session,
             plan.id,
@@ -1568,7 +1571,7 @@ class TestCopyPlanToWeek:
             await copy_plan_to_week_async(
                 real_async_db_session,
                 uuid.uuid4(),
-                CopyPlanRequest(start_date=_TODAY, end_date=_TODAY),
+                CopyPlanRequest(start_date=_today(), end_date=_today()),
                 meal_org.id,
                 meal_user.id,
             )
@@ -1584,8 +1587,8 @@ class TestCopyPlanToWeek:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
 
@@ -1596,8 +1599,8 @@ class TestCopyPlanToWeek:
                 real_async_db_session,
                 plan.id,
                 CopyPlanRequest(
-                    start_date=_TODAY + timedelta(days=1),
-                    end_date=_TODAY,
+                    start_date=_today() + timedelta(days=1),
+                    end_date=_today(),
                 ),
                 meal_org.id,
                 meal_user.id,
@@ -1614,8 +1617,8 @@ class TestCopyPlanToWeek:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
 
@@ -1624,8 +1627,8 @@ class TestCopyPlanToWeek:
                 real_async_db_session,
                 plan.id,
                 CopyPlanRequest(
-                    start_date=_TODAY,
-                    end_date=_TODAY + timedelta(days=15),
+                    start_date=_today(),
+                    end_date=_today() + timedelta(days=15),
                 ),
                 meal_org.id,
                 meal_user.id,
@@ -1642,8 +1645,8 @@ class TestCopyPlanToWeek:
             real_async_db_session,
             meal_org,
             meal_user,
-            start=_TODAY,
-            end=_TODAY + timedelta(days=6),
+            start=_today(),
+            end=_today() + timedelta(days=6),
             slots=[MealSlot.LUNCH],
         )
 
@@ -1654,8 +1657,8 @@ class TestCopyPlanToWeek:
                 real_async_db_session,
                 plan.id,
                 CopyPlanRequest(
-                    start_date=_TODAY - timedelta(days=1),
-                    end_date=_TODAY,
+                    start_date=_today() - timedelta(days=1),
+                    end_date=_today(),
                 ),
                 meal_org.id,
                 meal_user.id,

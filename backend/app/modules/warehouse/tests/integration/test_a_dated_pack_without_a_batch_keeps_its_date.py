@@ -36,9 +36,18 @@ from app.modules.warehouse.tests.integration.test_wms_picking import (
     _confirm_document,
 )
 
-_TODAY = datetime.now(UTC).date()
-_SOON = _TODAY + timedelta(days=10)
-_LATER = _TODAY + timedelta(days=30)
+
+def _today() -> date:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return datetime.now(UTC).date()
+
+
+def _soon() -> date:
+    return _today() + timedelta(days=10)
+
+
+def _later() -> date:
+    return _today() + timedelta(days=30)
 
 
 class _Floor:
@@ -178,18 +187,18 @@ class TestThePickingRowShowsTheDateToTake:
     ) -> None:
         # Received first, expires last: FEFO still reaches the later pack
         # second, and the row says which date it reaches first.
-        built = floor([(5, _LATER, False), (5, _SOON, False)], quantity=4)
+        built = floor([(5, _later(), False), (5, _soon(), False)], quantity=4)
 
         assert built.start_line['lot_id'] is None
-        assert built.start_line['expiry_date'] == _SOON.isoformat()
+        assert built.start_line['expiry_date'] == _soon().isoformat()
 
     def test_a_batch_shows_the_date_of_the_batch(
         self, floor: Callable[..., _Floor]
     ) -> None:
-        built = floor([(5, _LATER, True), (5, _SOON, True)], quantity=4)
+        built = floor([(5, _later(), True), (5, _soon(), True)], quantity=4)
 
-        assert built.start_line['lot_name'] == f'LOT-5-{_SOON}'
-        assert built.start_line['expiry_date'] == _SOON.isoformat()
+        assert built.start_line['lot_name'] == f'LOT-5-{_soon()}'
+        assert built.start_line['expiry_date'] == _soon().isoformat()
 
     def test_undated_stock_shows_no_date(self, floor: Callable[..., _Floor]) -> None:
         built = floor([(5, None, False)], quantity=4)
@@ -202,36 +211,38 @@ class TestTheCompletedDispatchRecordsTheDateThatLeft:
     def test_the_line_and_the_move_carry_the_date_of_the_record_taken(
         self, floor: Callable[..., _Floor], doc_template: ProductTemplate
     ) -> None:
-        built = floor([(5, _LATER, False), (5, _SOON, False)], quantity=4)
+        built = floor([(5, _later(), False), (5, _soon(), False)], quantity=4)
         _complete(built, doc_template.barcode, 4)
 
-        assert [ln.expiry_date for ln in _lines(built)] == [_SOON]
-        assert [(m.expiry_date, int(m.quantity)) for m in _moves(built)] == [(_SOON, 4)]
+        assert [ln.expiry_date for ln in _lines(built)] == [_soon()]
+        assert [(m.expiry_date, int(m.quantity)) for m in _moves(built)] == [
+            (_soon(), 4)
+        ]
 
     def test_a_line_that_crossed_dates_is_split_per_date(
         self, floor: Callable[..., _Floor], doc_template: ProductTemplate
     ) -> None:
-        built = floor([(5, _LATER, False), (5, _SOON, False)], quantity=8)
+        built = floor([(5, _later(), False), (5, _soon(), False)], quantity=8)
         _complete(built, doc_template.barcode, 8)
 
         assert [(ln.expiry_date, int(ln.done_quantity)) for ln in _lines(built)] == [
-            (_SOON, 5),
-            (_LATER, 3),
+            (_soon(), 5),
+            (_later(), 3),
         ]
         assert sorted((m.expiry_date, int(m.quantity)) for m in _moves(built)) == [
-            (_SOON, 5),
-            (_LATER, 3),
+            (_soon(), 5),
+            (_later(), 3),
         ]
 
     def test_a_batch_line_carries_the_date_of_the_batch_that_left(
         self, floor: Callable[..., _Floor], doc_template: ProductTemplate
     ) -> None:
-        built = floor([(5, _LATER, True), (5, _SOON, True)], quantity=4)
+        built = floor([(5, _later(), True), (5, _soon(), True)], quantity=4)
         _complete(built, doc_template.barcode, 4)
 
-        assert [m.expiry_date for m in _moves(built)] == [_SOON]
+        assert [m.expiry_date for m in _moves(built)] == [_soon()]
         assert [(ln.batch_number, ln.expiry_date) for ln in _lines(built)] == [
-            (f'LOT-5-{_SOON}', _SOON)
+            (f'LOT-5-{_soon()}', _soon())
         ]
 
     def test_undated_stock_leaves_the_line_and_the_move_undated(
@@ -278,7 +289,7 @@ class TestADateSplitKeepsTheShelfOfAZoneDispatch:
             doc_template,
             shelf.id,
             '5',
-            expiry_date=_LATER,
+            expiry_date=_later(),
         )
         _sow(
             db_session,
@@ -287,7 +298,7 @@ class TestADateSplitKeepsTheShelfOfAZoneDispatch:
             doc_template,
             shelf.id,
             '5',
-            expiry_date=_SOON,
+            expiry_date=_soon(),
         )
         created = client.post(
             '/api/v1/warehouse/documents',
@@ -326,8 +337,8 @@ class TestADateSplitKeepsTheShelfOfAZoneDispatch:
             .order_by(DocumentLine.line_number)
         ).all()
         assert [(ln.expiry_date, ln.executed_location_id) for ln in lines] == [
-            (_SOON, shelf.id),
-            (_LATER, shelf.id),
+            (_soon(), shelf.id),
+            (_later(), shelf.id),
         ]
 
 
@@ -350,8 +361,8 @@ def _dispatch_two_dated_packs(
     Answers the document and the two records, the nearer date first.
     """
     template.removal_strategy = 'FEFO'
-    later = _sow(db, engine, org, template, source.id, '5', expiry_date=_LATER)
-    sooner = _sow(db, engine, org, template, source.id, '5', expiry_date=_SOON)
+    later = _sow(db, engine, org, template, source.id, '5', expiry_date=_later())
+    sooner = _sow(db, engine, org, template, source.id, '5', expiry_date=_soon())
     line: dict[str, Any] = {
         'item_id': str(later.id),
         'product_template_id': str(template.id),
@@ -423,8 +434,8 @@ class TestADateSplitStandsForTheRecordsItTook:
 
         lines = _document_lines(db_session, doc_id)
         assert [(ln.expiry_date, int(ln.done_quantity)) for ln in lines] == [
-            (_SOON, 5000),
-            (_LATER, 3000),
+            (_soon(), 5000),
+            (_later(), 3000),
         ]
         assert all(ln.uom_id == gram.id for ln in lines)
 
@@ -540,7 +551,7 @@ class TestADateSplitStandsForTheRecordsItTook:
             organization_id=doc_org.id,
             product_template_id=doc_template.id,
             name='MIXED-BATCH',
-            expiry_date=_LATER,
+            expiry_date=_later(),
         )
         db_session.add(lot)
         db_session.flush()
@@ -560,7 +571,7 @@ class TestADateSplitStandsForTheRecordsItTook:
             doc_template,
             doc_source_location.id,
             '5',
-            expiry_date=_SOON,
+            expiry_date=_soon(),
         )
         created = client.post(
             '/api/v1/warehouse/documents',
@@ -596,7 +607,7 @@ class TestADateSplitStandsForTheRecordsItTook:
         assert [
             (ln.batch_number, ln.expiry_date, int(ln.done_quantity))
             for ln in _document_lines(db_session, doc_id)
-        ] == [(None, _SOON, 5), ('MIXED-BATCH', _LATER, 3)]
+        ] == [(None, _soon(), 5), ('MIXED-BATCH', _later(), 3)]
 
         # The batched part stands for the batch's own record, so a correction
         # of it gives the kilogram back to the batch, not to the dated pack.
@@ -635,7 +646,7 @@ class TestAScanThatNamesAnotherBatchMovesTheDate:
     def test_the_row_answers_with_the_date_of_the_batch_scanned(
         self, floor: Callable[..., _Floor], doc_template: ProductTemplate
     ) -> None:
-        built = floor([(5, _LATER, True), (5, _SOON, True)], quantity=4)
+        built = floor([(5, _later(), True), (5, _soon(), True)], quantity=4)
 
         scanned = built.client.post(
             f'/api/v1/warehouse/documents/{built.doc_id}/picking/{built.session_id}/scan',
@@ -643,9 +654,9 @@ class TestAScanThatNamesAnotherBatchMovesTheDate:
             json={
                 'barcode': doc_template.barcode,
                 'quantity': 4,
-                'lot_name': f'LOT-5-{_LATER}',
+                'lot_name': f'LOT-5-{_later()}',
             },
         )
 
         assert scanned.status_code == status.HTTP_200_OK, scanned.text
-        assert scanned.json()['expiry_date'] == _LATER.isoformat()
+        assert scanned.json()['expiry_date'] == _later().isoformat()

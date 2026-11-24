@@ -34,7 +34,7 @@ import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { resolve, relative, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const SRC = resolve(ROOT, "src");
 const ROUTES_FILE = resolve(SRC, "types/api-routes.ts");
 const REGISTER_FILE = resolve(ROOT, "scripts/integration-only.json");

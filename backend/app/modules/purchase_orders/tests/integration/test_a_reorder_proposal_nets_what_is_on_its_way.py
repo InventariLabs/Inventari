@@ -28,7 +28,10 @@ pytestmark = pytest.mark.integration
 
 ALERTS = '/api/v1/purchase-orders/replenishment/alerts'
 DRAFTS = '/api/v1/purchase-orders/replenishment/draft-pos'
-_LATER = (date.today() + timedelta(days=365)).isoformat()
+
+
+def _later() -> str:
+    return (date.today() + timedelta(days=365)).isoformat()
 
 
 def _rule(
@@ -185,7 +188,7 @@ def _to_make(client: TestClient, headers: dict[str, str]) -> list[Decimal]:
     response = client.get(
         '/api/v1/warehouse/todo',
         headers=headers,
-        params={'date_to': _LATER, 'limit': 50},
+        params={'date_to': _later(), 'limit': 50},
     )
     assert response.status_code == status.HTTP_200_OK, response.text
     return [

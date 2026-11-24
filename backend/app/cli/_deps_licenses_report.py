@@ -61,13 +61,17 @@ ASSET_COMPONENTS: tuple[Dependency, ...] = (
     Dependency(
         name='frontend/public/logos',
         version='bundled',
-        licence='Trademark',
+        licence='CC0-1.0 / Trademark',
         verdict='review',
         ecosystem='asset',
-        note='brand marks of the AI providers named by the file names (OpenAI, '
-        'Google, Anthropic, Mistral AI, xAI, Groq and others) — trademarks of '
-        'their respective owners, used only to name the provider in the AI '
-        'connections screen',
+        note='nine of the twelve files are icons of Simple Icons (CC0-1.0): '
+        'eight identical to 16.36.0, `openai` identical to 15.5.0 (dropped '
+        'upstream in 16.0.0); the other three (Groq, Together AI, GLM) are '
+        'plain shapes with no upstream source '
+        '(`frontend/public/logos/README.md`). The marks are trademarks of '
+        'their respective owners, the AI providers named by the file names '
+        '(OpenAI, Google, Anthropic, Mistral AI, xAI, Groq and others), used '
+        'only to name the provider in the AI connections screen',
     ),
 )
 
@@ -194,7 +198,7 @@ and the static assets the frontend serves.
   carries them under `/usr/share/doc`.
 * The libraries compiled into the `psycopg2-binary` wheel (libpq, OpenSSL and
   their dependencies), which have licences of their own beside the wheel's.
-* The eight recipe photographs under `backend/seed_assets`, used by the demo
+* The nine recipe photographs under `backend/seed_assets`, used by the demo
   only. They are CC0; `sources.json` beside them names the page, author and
   licence of each.
 * The print agent in `print-agent/`, which is part of this repository and
@@ -244,10 +248,13 @@ def render_markdown(result: ScanResult) -> str:
     sections.append('## Data')
     sections.append('')
     sections.append(
-        'Open Food Facts product data is **not** bundled. The importer fetches '
-        'it on request and the data is ODbL-1.0; a deployment that imports it '
-        'takes on the share-alike obligation for the resulting database. See '
-        '`NOTICE`.'
+        'Open Food Facts product data is **not** bundled as a database. The '
+        'importer fetches it on request and the data is ODbL-1.0; a deployment '
+        'that imports it takes on the share-alike obligation for the '
+        'resulting database. The one excerpt in the repository is '
+        '`backend/scripts/vision_matrix_corpus.json`: 14 barcodes with product '
+        'names and brands (ODbL), and no photographs — those are fetched at '
+        'run time and are CC-BY-SA. See `NOTICE`.'
     )
     sections.append('')
     return '\n'.join(sections)

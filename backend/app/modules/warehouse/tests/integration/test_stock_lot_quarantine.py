@@ -22,8 +22,10 @@ from app.models.product_template import ProductTemplate
 from app.models.stock_lot import LotStatus, StockLot
 from app.models.storage_location import StorageLocation
 
+
 # Far enough ahead that the lot is never expired whenever the suite runs.
-_BEST_BEFORE = (date.today() + timedelta(days=400)).isoformat()
+def _best_before() -> str:
+    return (date.today() + timedelta(days=400)).isoformat()
 
 
 def _receive_via_document(
@@ -35,7 +37,7 @@ def _receive_via_document(
     template_id: uuid.UUID,
     quantity: int,
     batch_number: str,
-    expiry_date: str = _BEST_BEFORE,
+    expiry_date: str = _best_before(),
 ) -> str:
     """Create + confirm + complete an IN document. Returns the doc id."""
     resp = client.post(

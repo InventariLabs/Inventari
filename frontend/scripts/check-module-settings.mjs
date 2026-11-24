@@ -24,7 +24,7 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const SNAPSHOT_PATH = resolve(ROOT, "scripts/module-settings.json");
 const BACKEND_MODULES = resolve(ROOT, "../backend/app/modules");
 

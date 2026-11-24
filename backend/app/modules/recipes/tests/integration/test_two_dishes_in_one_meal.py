@@ -35,7 +35,10 @@ from app.modules.recipes.schemas import (
 
 pytestmark = [pytest.mark.integration, pytest.mark.asyncio]
 
-_TODAY = date.today()
+
+def _today() -> date:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return date.today()
 
 
 @pytest.fixture
@@ -65,8 +68,8 @@ async def plan(
     meal_plan = MealPlan(
         organization_id=org.id,
         name='This week',
-        start_date=_TODAY,
-        end_date=_TODAY + timedelta(days=6),
+        start_date=_today(),
+        end_date=_today() + timedelta(days=6),
         enabled_slots=[MealSlot.LUNCH.value, MealSlot.DINNER.value],
         created_by=user.id,
     )
@@ -96,7 +99,7 @@ async def _add(
         db,
         plan.id,
         MealPlanEntryCreate(
-            date=when or _TODAY,
+            date=when or _today(),
             slot=slot,
             recipe_id=recipe.id,
             order=order,
@@ -112,7 +115,7 @@ async def _orders_in_cell(
         select(MealPlanEntry.order)
         .where(
             MealPlanEntry.meal_plan_id == plan.id,
-            MealPlanEntry.date == _TODAY,
+            MealPlanEntry.date == _today(),
             MealPlanEntry.slot == slot,
         )
         .order_by(MealPlanEntry.order)

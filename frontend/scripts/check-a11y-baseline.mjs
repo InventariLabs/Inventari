@@ -29,7 +29,7 @@ import { fileURLToPath } from "node:url";
 
 import { ESLint } from "eslint";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const BASELINE_PATH = resolve(ROOT, "scripts/a11y-baseline.json");
 const BLOCK_NAME = "baseline:jsx-a11y-ratchet";
 

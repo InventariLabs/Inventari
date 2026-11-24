@@ -14,9 +14,10 @@ vi.mock("@/lib/api/client", () => ({
   api: { post: (...a: unknown[]) => post(...a) },
 }));
 
-vi.mock("sonner", () => ({
-  toast: { success: vi.fn(), warning: vi.fn(), error: vi.fn() },
-}));
+// No `vi.mock("sonner")` here: the size gate the modal calls was loaded by the
+// test setup before a mock in this file could reach it, so a mocked toast would
+// never see the gate's own. The real toast is what both the gate and the modal
+// call, and it is the one spied on below.
 
 /** The mapping grid is a Radix Select per field; what this spec needs from it
  *  is one mapped column, so it says so directly. */
@@ -99,9 +100,9 @@ const DOCSTUBS_USER: User = {
 describe("DocumentImportModal", () => {
   beforeEach(() => {
     post.mockReset();
-    vi.mocked(toast.success).mockClear();
-    vi.mocked(toast.warning).mockClear();
-    vi.mocked(toast.error).mockClear();
+    vi.spyOn(toast, "success").mockImplementation(() => "");
+    vi.spyOn(toast, "warning").mockImplementation(() => "");
+    vi.spyOn(toast, "error").mockImplementation(() => "");
   });
 
   afterEach(() => {
@@ -401,6 +402,25 @@ describe("DocumentImportModal", () => {
     expect(invalidate).not.toHaveBeenCalledWith({
       queryKey: queryKeys.documents.detail(DOC_ID),
     });
+  });
+
+  it("refuses a sheet above the limit with one toast and sends nothing", async () => {
+    renderModal();
+    const input = document.getElementById(
+      "document-import-file-input",
+    ) as HTMLInputElement;
+    const huge = new File(["x"], "linie.csv");
+    Object.defineProperty(huge, "size", { value: 11 * 1024 * 1024 });
+
+    fireEvent.change(input, { target: { files: [huge] } });
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "File too large. Maximum size: 10 MB",
+      ),
+    );
+    expect(toast.error).toHaveBeenCalledTimes(1);
+    expect(post).not.toHaveBeenCalled();
   });
 
   it("goes back to the drop zone when the file could not be read", async () => {

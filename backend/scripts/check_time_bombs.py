@@ -28,6 +28,14 @@ The better fix is nearly always to write the date relative to the clock
 (``date.today() + timedelta(days=30)``, ``addDays(new Date(), 30)``); the
 allowlist is for the few places where a fixed date is the point.
 
+A second rule covers the clock itself. A backend test file may not read it at
+import time — ``_TODAY = date.today()`` or ``datetime.now(UTC)`` in a module
+(or class) body, a decorator or a default argument. Python imports a test
+module at collection; the app stamps and judges by the clock when the request
+arrives. On a run that crosses midnight UTC the two disagree by a day and the
+test fails for no reason in the code. Read the clock inside the test or a
+helper function, where the call and the request are moments apart.
+
 Standard library only: it runs on the host, where ``make lint`` lives.
 
     python3 backend/scripts/check_time_bombs.py [--today YYYY-MM-DD]
@@ -36,6 +44,7 @@ Standard library only: it runs on the host, where ``make lint`` lives.
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import re
 import subprocess
@@ -68,6 +77,16 @@ _CALL = re.compile(
 )
 
 
+_CLOCK_READS = frozenset({'today', 'now', 'utcnow'})
+_DEFS = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+
+
+class ClockRead(NamedTuple):
+    path: str
+    line: int
+    call: str
+
+
 class Hit(NamedTuple):
     path: str
     line: int
@@ -98,6 +117,50 @@ def scan_text(path: str, text: str) -> list[Hit]:
             if day:
                 hits.append(Hit(path, number, match.group(0), day))
     return hits
+
+
+def _import_time_nodes(body: list[ast.stmt]) -> list[ast.AST]:
+    """The nodes Python evaluates while it imports a module with this body.
+
+    A function body waits for a call; its decorators and defaults do not. A
+    class body runs at once, so its statements count and are read the same way.
+    """
+    nodes: list[ast.AST] = []
+    for stmt in body:
+        if isinstance(stmt, _DEFS):
+            nodes.extend(stmt.decorator_list)
+            if isinstance(stmt, ast.ClassDef):
+                nodes.extend(stmt.bases)
+                nodes.extend(_import_time_nodes(stmt.body))
+            else:
+                args = stmt.args
+                nodes.extend(args.defaults)
+                nodes.extend(d for d in args.kw_defaults if d is not None)
+        else:
+            nodes.append(stmt)
+    return nodes
+
+
+def scan_clock(path: str, text: str) -> list[ClockRead]:
+    """Every clock read a Python test module performs while it is imported."""
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return []
+    reads: list[ClockRead] = []
+    pending = _import_time_nodes(tree.body)
+    while pending:
+        node = pending.pop()
+        if isinstance(node, ast.Lambda):
+            continue  # its body waits for a call
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr in _CLOCK_READS
+        ):
+            reads.append(ClockRead(path, node.lineno, f'.{node.func.attr}()'))
+        pending.extend(ast.iter_child_nodes(node))
+    return sorted(set(reads))
 
 
 def load_allowlist(raw: str) -> tuple[dict[tuple[str, str], str], list[str]]:
@@ -133,6 +196,16 @@ def check(
                 unlisted.append(hit)
     stale = [f'{p} {lit}' for p, lit in sorted(set(allowed) - used)]
     return unlisted, problems, stale
+
+
+def check_clock(files: dict[str, str]) -> list[ClockRead]:
+    """Import-time clock reads in the backend's Python test files."""
+    return [
+        read
+        for path, text in sorted(files.items())
+        if _BACKEND_TEST.match(path)
+        for read in scan_clock(path, text)
+    ]
 
 
 def _tracked_test_files() -> dict[str, str]:
@@ -174,7 +247,14 @@ def main() -> int:
             f'{args.today} — write it relative to the clock, or allowlist it '
             f'with a reason in backend/scripts/{_ALLOWLIST.name}'
         )
-    if unlisted or problems:
+    clock_reads = check_clock(files)
+    for read in clock_reads:
+        print(
+            f'FAIL: {read.path}:{read.line}: {read.call} is read when the module '
+            'is imported — read the clock inside the test or a helper function, '
+            'so a run that crosses midnight UTC cannot split the day'
+        )
+    if unlisted or problems or clock_reads:
         return 1
     print(f'time bombs: {len(files)} test files, none unlisted')
     return 0
