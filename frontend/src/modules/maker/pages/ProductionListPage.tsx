@@ -354,7 +354,6 @@ export default function ProductionListPage() {
         (viewMode === "list" ? (
           <ProductionTable
             orders={filteredOrders}
-            sort={sort}
             onDuplicate={canWrite ? duplicate : undefined}
             isDuplicating={isDuplicating}
           />
