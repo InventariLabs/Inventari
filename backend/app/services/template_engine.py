@@ -403,6 +403,10 @@ _MissingValue = type(
 )
 
 
+def _print_none_as_empty(value: Any) -> Any:
+    return '' if value is None else value
+
+
 class TemplateEngine:
     """Shared Jinja2 sandboxed template engine for user-authored document templates."""
 
@@ -420,6 +424,9 @@ class TemplateEngine:
         self._env = sandbox.SandboxedEnvironment(
             loader=loader,
             autoescape=True,
+            # An empty value prints nothing, not the word "None": a partner
+            # without a tax id, an order without a supplier.
+            finalize=_print_none_as_empty,
         )
         register_pdf_filters(self._env)
 

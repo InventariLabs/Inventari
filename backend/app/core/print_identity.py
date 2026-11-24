@@ -10,7 +10,7 @@ first.
 from __future__ import annotations
 
 import base64
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
@@ -47,6 +47,10 @@ class IssuerContext:
     tax_id: str | None = None
     address: str | None = None
     logo: str | None = None  # data URI, read server-side from org storage
+    # What the block was worded from, kept so it can be worded again when the
+    # layout that ends up printing declares another language than the one the
+    # block was built in. Not a placeholder: the catalogue skips the underscore.
+    _snapshot: dict[str, Any] | None = field(default=None, repr=False, compare=False)
 
     @classmethod
     def from_organization(cls, organization: Any, lang: str = 'en') -> IssuerContext:
@@ -72,7 +76,16 @@ class IssuerContext:
             name=snapshot.get('name'),
             tax_id=snapshot.get('tax_id'),
             address=format_partner_address(snapshot.get('address') or None, lang),
+            _snapshot=snapshot,
         )
+
+    def in_language(self, lang: str) -> IssuerContext:
+        """The same block, its address worded in ``lang``; the logo is kept."""
+        if self._snapshot is None:
+            return self
+        reworded = IssuerContext.from_snapshot(self._snapshot, lang)
+        reworded.logo = self.logo
+        return reworded
 
 
 def issuer_snapshot(organization: Any) -> dict[str, Any]:

@@ -110,6 +110,28 @@ class TestTheBuiltInLayout:
         assert '123.00' in html
         assert 'No price yet' not in html
 
+    @pytest.mark.parametrize('prices', [('10.00',), (None,)])
+    async def test_the_totals_box_stays_compact_at_the_right(
+        self, prices: tuple[str | None, ...]
+    ) -> None:
+        from weasyprint import HTML
+
+        html = await _printed(_order(*prices), 'en')
+        page = HTML(string=html).render().pages[0]
+
+        def tables(box: Any) -> Any:
+            # A table is a wrapper box around the table box; measure the table.
+            if type(box).__name__ == 'TableBox' and (
+                'totals-table' in (box.element.get('class') or '')
+            ):
+                yield box
+            for child in getattr(box, 'children', ()):
+                yield from tables(child)
+
+        (totals,) = list(tables(page._page_box))
+        # A box that grows to its words is far narrower than the sheet.
+        assert totals.width < page._page_box.width / 2
+
     def test_an_order_priced_at_zero_is_a_total_of_zero(self) -> None:
         assert build_po_context(_order('0'), 'en')['total_gross'] == Decimal('0')
 
@@ -162,6 +184,19 @@ class TestAnOrganizationsOwnTemplate:
 
     def test_a_known_total_stays_a_number_to_calculate_with(self) -> None:
         assert self._render('{{ total_gross + 1 }}', '10.00') == '124.00'
+
+    def test_the_totals_print_as_the_orders_rounded_amounts(self) -> None:
+        # 10 x 0.3333 at 23%: the lines add up to 3.333 net and 0.76659 tax.
+        printed = self._render(
+            '{{ total_net }}|{{ total_tax }}|{{ total_gross }}', '0.3333'
+        )
+
+        assert printed == '3.33|0.77|4.10'
+
+    def test_a_supplier_without_a_tax_id_prints_nothing_for_it(self) -> None:
+        printed = self._render('[{{ vendor_tax_id }}][{{ vendor_address }}]', '1.00')
+
+        assert 'None' not in printed
 
     def test_a_seeded_copy_of_the_layout_prints_the_words(self) -> None:
         path = _svc.templates_dir / 'po_standard.html'

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { QueryError } from "@/components/ui/QueryResult";
 import { useConfirm } from "@/hooks/useConfirm";
+import { useConfirmedTemplateReset } from "@/modules/shared/hooks/useConfirmedTemplateReset";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import {
@@ -142,6 +143,10 @@ export default function TemplatesPage() {
     refetch: refetchModels,
   } = useEquipmentModels();
   const { confirm, confirmDialogProps } = useConfirm();
+  const { handleReset, isResetPending } = useConfirmedTemplateReset(
+    "equipment",
+    confirm,
+  );
 
   const createModelMutation = useCreateEquipmentModel();
   const updateModelMutation = useUpdateEquipmentModel();
@@ -375,6 +380,8 @@ export default function TemplatesPage() {
                   defaultLabel={t("common:templates.default", "Default")}
                   onRefreshCopy={handleRefreshCopy}
                   isRefreshPending={refreshCopyMutation.isPending}
+                  onReset={handleReset}
+                  isResetPending={isResetPending}
                   readOnly={!canWrite}
                 />
               ))}

@@ -364,27 +364,32 @@ class TestTheAccessorReachesNoObjects:
                 db, eq_org.id, assignment.id, template_id=probe.id, lang='en'
             )
 
-        # Reading the object behind the dict prints nothing at all — not
-        # its class, not a repr, not an error text.
-        quiet = await _render(
-            '<html><body>[{{ custom.__class__ }}|'
-            "{{ custom|attr('__init__') }}]</body></html>"
-        )
-        assert 'dict' not in quiet and 'class' not in quiet and 'object' not in quiet
+        # The probe templates are never committed — CoreAPI writes flush and
+        # the caller owns the commit. The unit of work ends here whatever the
+        # assertions do: a failure that left it open would hold the locks the
+        # sync-session fixture teardown waits on, and hang the worker.
+        try:
+            # Reading the object behind the dict prints nothing at all — not
+            # its class, not a repr, not an error text.
+            quiet = await _render(
+                '<html><body>[{{ custom.__class__ }}|'
+                "{{ custom|attr('__init__') }}]</body></html>"
+            )
+            assert (
+                'dict' not in quiet and 'class' not in quiet and 'object' not in quiet
+            )
 
-        # Escaping through the dunder is refused the moment it would run: the
-        # sandbox raises, so the probe prints nothing and the protocol prints
-        # its built-in layout.
-        escaped = await _render('<html><body>{{ custom.__class__() }}</body></html>')
-        assert 'Equipment Handover Protocol' in escaped
-        assert 'dict' not in escaped
-        assert 'object' not in escaped
-
-        # The probe templates above were never committed — CoreAPI writes
-        # flush and the caller owns the commit. End the unit of work here,
-        # before the sync-session fixture teardown (set up before this one)
-        # waits on their locks.
-        await db.rollback()
+            # Escaping through the dunder is refused the moment it would run: the
+            # sandbox raises, so the probe prints nothing and the protocol prints
+            # its built-in layout.
+            escaped = await _render(
+                '<html><body>{{ custom.__class__() }}</body></html>'
+            )
+            assert 'Equipment Handover Protocol' in escaped
+            assert 'dict' not in escaped
+            assert 'object' not in escaped
+        finally:
+            await db.rollback()
 
     def test_a_key_nobody_wrote_prints_nothing(
         self,

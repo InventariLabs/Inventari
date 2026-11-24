@@ -58,9 +58,27 @@ says what the release does rather than what changed since them.
 - Concurrent changes of an organization's default tax rate take their locks
   in one order, so two saves no longer deadlock and wait for the retry
   middleware.
+- Printouts and print templates say what they mean. An organization's own
+  template prints nothing, not the word "None", where a value is empty (a
+  supplier without a tax id, an order without a supplier), and the purchase
+  order totals it prints are the order's rounded amounts. On the order's own
+  layout an unpriced order's totals box now grows to hold "No price yet" on
+  one line. The adjustment document a stock count posts prints under its own
+  title in the reader's language, without the count's internal key as a
+  reference and without the receipt's supplier box and driver signature. A
+  print whose stored layout does not render now words the issuer's address in
+  the language of the layout that prints instead.
+
+### Added
+
+- An equipment protocol copy that no longer matches its built-in layout can be
+  reset to it from the Templates screen, as a warehouse document template
+  already could.
 
 ### Changed
 
+- The purchase order template editor's placeholder list says *Supplier name*,
+  *Supplier tax ID* and *Supplier address*, as the rest of the screens do.
 - The Equipment & Warehouse profile is teal instead of blue: the application's
   own colour, so the demo, the README and a new installation look alike. An
   organization on that profile sees its buttons, links and tabs in teal after

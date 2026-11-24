@@ -87,7 +87,7 @@ export const getExpiryState = (
  */
 /**
  * Builds a full location path from storage name and optional shelf location.
- * Example: "Fridge" or with shelf: "Fridge → Second shelf"
+ * Example: "Fridge" or with shelf: "Fridge › Second shelf"
  */
 interface LocationPathOptions {
   name: string;
@@ -97,7 +97,7 @@ interface LocationPathOptions {
 }
 
 const buildLocationPath = (options: LocationPathOptions): string => {
-  const { name, shelfLocation, separator = " → " } = options;
+  const { name, shelfLocation, separator = LOCATION_PATH_SEPARATOR } = options;
 
   if (shelfLocation) {
     return `${name}${separator}${shelfLocation}`;

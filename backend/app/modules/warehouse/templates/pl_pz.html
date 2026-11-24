@@ -170,7 +170,7 @@
     .sig-section {
       margin-top: 10mm;
       display: grid;
-      grid-template-columns: {% if doc_variant == 'correction' %}1fr{% else %}1fr 1fr 1fr{% endif %};
+      grid-template-columns: {% if doc_variant == 'correction' %}1fr{% elif doc_variant == 'adjustment' %}1fr 1fr{% else %}1fr 1fr 1fr{% endif %};
       gap: 20px;
     }
     .sig-field {
