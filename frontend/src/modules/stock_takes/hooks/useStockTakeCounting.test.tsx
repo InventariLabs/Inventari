@@ -62,6 +62,14 @@ const renderLoaded = async () => {
   await waitFor(() =>
     expect(rendered.result.current.stockTake?.location_id).toBeTruthy(),
   );
+  // The drafts are seeded a tick after the rows arrive: a test that types or
+  // saves before then writes into drafts the seed is about to replace.
+  await waitFor(() => {
+    const { stockTake, countedQuantities } = rendered.result.current;
+    for (const line of stockTake?.items ?? []) {
+      if (line.item_id) expect(countedQuantities).toHaveProperty(line.item_id);
+    }
+  });
   return rendered;
 };
 
@@ -658,6 +666,11 @@ describe("useStockTakeCounting", () => {
         wrapper: createWrapper().wrapper,
       });
       await waitFor(() => expect(result.current.countedCount).toBe(1));
+      // The drafts are seeded a tick after the server rows arrive; the first
+      // line reads as saved once its count has been seeded.
+      await waitFor(() =>
+        expect(result.current.isUnsaved("item-1")).toBe(false),
+      );
       expect(result.current.unsavedCount).toBe(0);
 
       act(() => {
