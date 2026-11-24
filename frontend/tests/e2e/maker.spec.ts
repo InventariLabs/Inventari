@@ -117,18 +117,45 @@ test.describe("Maker — production list page", () => {
     page,
     authenticatedPage,
   }) => {
-    for (const label of ["All", "Draft", "Completed", "Cancelled"]) {
+    for (const label of [
+      "All",
+      "Draft",
+      "In progress",
+      "Completed",
+      "Cancelled",
+    ]) {
       await expect(
         page.getByRole("tab", { name: new RegExp(`^${label}$`, "i") }),
       ).toBeVisible({ timeout: 10000 });
     }
   });
 
+  test("the In progress tab lists what it asked for", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    // The tab asks the endpoint for status=IN_PROGRESS; an answer it refuses
+    // leaves the list saying it failed to load instead of showing the runs
+    // being filled.
+    const answered = page.waitForResponse(
+      (response) =>
+        response.url().includes("/maker/production/orders?") &&
+        response.url().includes("status=IN_PROGRESS"),
+    );
+    const tab = page.getByRole("tab", { name: /^In progress$/i });
+    await tab.click();
+    await expect(tab).toHaveAttribute("aria-selected", "true");
+    expect((await answered).status()).toBe(200);
+    await expect(page.getByText(/failed to load production orders/i)).toHaveCount(
+      0,
+    );
+  });
+
   test("filters the list by status", async ({ page, authenticatedPage }) => {
     // Switch to "Draft" — should show seeded drafts
     // We don't assert card count strictly since other tests may create orders;
     // the selected tab proves the tabs work.
-    for (const label of ["draft", "cancelled", "all"]) {
+    for (const label of ["draft", "in progress", "cancelled", "all"]) {
       const tab = page.getByRole("tab", {
         name: new RegExp(`^${label}$`, "i"),
       });
