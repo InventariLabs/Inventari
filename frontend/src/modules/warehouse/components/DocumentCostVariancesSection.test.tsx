@@ -26,10 +26,12 @@ vi.mock("@/components/ui/DateInput", () => ({
   DateInput: (props: {
     label: string;
     value: string;
+    max?: string;
     onChange: (value: string) => void;
   }) => (
     <input
       aria-label={props.label}
+      max={props.max}
       value={props.value}
       onChange={(event) => props.onChange(event.target.value)}
     />
@@ -83,8 +85,8 @@ describe("DocumentCostVariancesSection", () => {
     const user = userEvent.setup();
     renderWithProviders(<DocumentCostVariancesSection documentId="doc-1" />);
 
-    await user.type(screen.getByLabelText("Amount"), "50");
-    await user.type(screen.getByLabelText("Reason"), "Late invoice");
+    await user.type(screen.getByLabelText(/^Amount/), "50");
+    await user.type(screen.getByLabelText(/^Reason/), "Late invoice");
     await user.click(
       screen.getByRole("button", { name: /record as variance/i }),
     );
@@ -104,8 +106,8 @@ describe("DocumentCostVariancesSection", () => {
     const user = userEvent.setup();
     renderWithProviders(<DocumentCostVariancesSection documentId="doc-1" />);
 
-    await user.type(screen.getByLabelText("Amount"), "50");
-    await user.type(screen.getByLabelText("Reason"), "Freight bill");
+    await user.type(screen.getByLabelText(/^Amount/), "50");
+    await user.type(screen.getByLabelText(/^Reason/), "Freight bill");
     const day = screen.getByLabelText("Day it belongs to");
     await user.clear(day);
     await user.type(day, "2026-11-10");
@@ -119,11 +121,65 @@ describe("DocumentCostVariancesSection", () => {
     );
   });
 
+  it("returns the day to today once a variance is recorded", async () => {
+    addMutate.mockImplementation((_data, options) => options.onSuccess());
+    const user = userEvent.setup();
+    renderWithProviders(<DocumentCostVariancesSection documentId="doc-1" />);
+
+    await user.type(screen.getByLabelText(/^Amount/), "50");
+    await user.type(screen.getByLabelText(/^Reason/), "Freight bill");
+    const day = screen.getByLabelText("Day it belongs to");
+    await user.clear(day);
+    await user.type(day, "2026-11-10");
+    await user.click(
+      screen.getByRole("button", { name: /record as variance/i }),
+    );
+
+    expect(day).toHaveValue("2026-11-12");
+    expect(screen.getByLabelText(/^Amount/)).toHaveValue("");
+    expect(screen.getByLabelText(/^Reason/)).toHaveValue("");
+  });
+
+  it("will not record while the day is cleared", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<DocumentCostVariancesSection documentId="doc-1" />);
+
+    await user.type(screen.getByLabelText(/^Amount/), "50");
+    await user.type(screen.getByLabelText(/^Reason/), "Freight bill");
+    const record = screen.getByRole("button", { name: /record as variance/i });
+    expect(record).toBeEnabled();
+    await user.clear(screen.getByLabelText("Day it belongs to"));
+
+    expect(record).toBeDisabled();
+  });
+
+  it("marks the two fields the button waits for as required", () => {
+    renderWithProviders(<DocumentCostVariancesSection documentId="doc-1" />);
+
+    expect(screen.getByLabelText(/^Amount/)).toHaveAttribute(
+      "aria-required",
+      "true",
+    );
+    expect(screen.getByLabelText(/^Reason/)).toHaveAttribute(
+      "aria-required",
+      "true",
+    );
+  });
+
+  it("does not offer a day after today", () => {
+    renderWithProviders(<DocumentCostVariancesSection documentId="doc-1" />);
+
+    expect(screen.getByLabelText("Day it belongs to")).toHaveAttribute(
+      "max",
+      "2026-11-12",
+    );
+  });
+
   it("will not send an amount without a reason", async () => {
     const user = userEvent.setup();
     renderWithProviders(<DocumentCostVariancesSection documentId="doc-1" />);
 
-    await user.type(screen.getByLabelText("Amount"), "50");
+    await user.type(screen.getByLabelText(/^Amount/), "50");
 
     expect(
       screen.getByRole("button", { name: /record as variance/i }),
@@ -146,7 +202,7 @@ describe("DocumentCostVariancesSection", () => {
     renderWithProviders(<DocumentCostVariancesSection documentId="doc-1" />);
 
     expect(screen.getByText(/Invoiced after posting/)).toBeInTheDocument();
-    expect(screen.queryByLabelText("Reason")).toBeNull();
+    expect(screen.queryByLabelText(/^Reason/)).toBeNull();
     expect(screen.queryByRole("button", { name: /remove/i })).toBeNull();
   });
 
