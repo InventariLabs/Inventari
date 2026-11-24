@@ -1,11 +1,11 @@
 """`scripts/init-env.sh` writes a production `.env` an installer can start from.
 
-The guide used to have the reader run `openssl rand -hex 32` six times and paste
-each value; one missed paste is a stack that starts with a blank secret or does
-not start at all. The command asks for the two things only the installer knows
-(the domain and the e-mail address), generates every secret, and refuses to
-touch an `.env` that already exists, because an overwritten `FERNET_SALT` or
-`ENCRYPTION_KEY` leaves every stored secret unreadable for good.
+Pasting six `openssl rand` values by hand risks a stack that starts with a
+blank secret or does not start at all. The command asks for the two things
+only the installer knows (the domain and the e-mail address), generates every
+secret, and refuses to touch an `.env` that already exists, because an
+overwritten `FERNET_SALT` or `ENCRYPTION_KEY` leaves every stored secret
+unreadable for good.
 """
 
 from __future__ import annotations
