@@ -28,8 +28,12 @@ domain=""
 email=""
 while [ $# -gt 0 ]; do
     case "$1" in
-        --domain) domain="${2-}"; shift 2 || shift ;;
-        --email) email="${2-}"; shift 2 || shift ;;
+        --domain|--email)
+            # Under dash a failed `shift 2` ends the shell before any `|| shift`
+            # runs, so the missing value is checked for instead.
+            [ $# -ge 2 ] || { echo "$1 needs a value." >&2; exit 2; }
+            if [ "$1" = "--domain" ]; then domain="$2"; else email="$2"; fi
+            shift 2 ;;
         -h|--help) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "unknown option: $1" >&2; exit 2 ;;
     esac
@@ -68,9 +72,13 @@ version="$(sed -n 's/^version = "\(.*\)"$/\1/p' "$here/backend/pyproject.toml" 2
 # umask first: the file must never exist with wider rights than 0600, not even
 # for the moment between its creation and a chmod.
 umask 077
-DOMAIN="$domain" ACME_EMAIL="$email" INVENTARI_VERSION="$version" \
-DB_PASSWORD="$(secret)" DB_APP_PASSWORD="$(secret)" REDIS_PASSWORD="$(secret)" \
-SECRET_KEY="$(secret)" FERNET_SALT="$(secret)" ENCRYPTION_KEY="$(secret)" \
+# noclobber makes the write itself the check: a file that appeared after the one
+# at the top is refused by the shell instead of truncated.
+set -C
+DOMAIN="$domain" ACME_EMAIL="$email" INVENTARI_VERSION="$version"
+DB_PASSWORD="$(secret)" DB_APP_PASSWORD="$(secret)" REDIS_PASSWORD="$(secret)"
+SECRET_KEY="$(secret)" FERNET_SALT="$(secret)" ENCRYPTION_KEY="$(secret)"
+export DOMAIN ACME_EMAIL INVENTARI_VERSION DB_PASSWORD DB_APP_PASSWORD REDIS_PASSWORD SECRET_KEY FERNET_SALT ENCRYPTION_KEY
 awk '
     BEGIN {
         n = split("DOMAIN ACME_EMAIL DB_PASSWORD DB_APP_PASSWORD REDIS_PASSWORD SECRET_KEY FERNET_SALT ENCRYPTION_KEY", names, " ")
@@ -88,7 +96,11 @@ awk '
         print "# scripts/init-env.sh; an installation that builds from source ignores it)."
         print "INVENTARI_VERSION=" ENVIRON["INVENTARI_VERSION"]
     }
-' "$example" > "$target"
+' "$example" > "$target" || {
+    echo "$target appeared while this ran; it was left as it is." >&2
+    exit 1
+}
+set +C
 
 cat >&2 <<MSG
 Wrote $target (mode 600): domain, e-mail and six generated secrets.
