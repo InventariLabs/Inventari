@@ -19,7 +19,7 @@ import { extractApiError } from "@/lib/errors";
 import { QueryFailure } from "@/components/ui/QueryResult";
 import WebhookForm from "../components/WebhookForm";
 import WebhookDeliveryLogs from "../components/WebhookDeliveryLogs";
-import { WebhookCard } from "../components/WebhookCard";
+import { TEST_HINT_ID, WebhookCard } from "../components/WebhookCard";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useHasPermission } from "@/hooks/useHasPermission";
 import type {
@@ -113,6 +113,14 @@ export default function WebhooksPage() {
             </Button>
           )}
         </Card>
+      )}
+
+      {/* One visible line instead of a tooltip on every Test button: a
+          touch screen has no hover and a tooltip is not a control. */}
+      {isAdmin && webhooks.length > 0 && (
+        <p id={TEST_HINT_ID} className="text-sm text-on-secondary">
+          {t("testHint")}
+        </p>
       )}
 
       {/* Webhook list */}
