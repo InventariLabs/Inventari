@@ -19,19 +19,24 @@ const PRIMARY = 44;
 /**
  * What must be on screen before the boxes are read: both screens fill in
  * after their queries answer, and a read taken on the skeleton measures
- * nothing. `primary` names the controls that carry the 44px floor.
+ * nothing. Each entry of `ready` is waited for on its own, so a screen whose
+ * links arrive before its switches (or the reverse) is not read half-drawn.
+ * `primary` names the controls that carry the 44px floor, in both dimensions.
  */
 const SCREENS = [
   {
     name: "Settings",
     path: "/settings",
-    ready: "main a[href^='/settings/'], main [role=switch]",
+    ready: [
+      "main a[href^='/settings/']",
+      "main input[type=checkbox], main [role=switch]",
+    ],
     primary: "",
   },
   {
     name: "App store",
     path: "/apps",
-    ready: "main nav[aria-label='Filter modules'] button, main button",
+    ready: ["main nav[aria-label='Filter modules'] button", "main button"],
     primary: "main button:not(nav button)",
   },
 ] as const;
@@ -50,11 +55,11 @@ for (const screen of SCREENS) {
       await expect(page.locator("main h1, main h2").first()).toBeVisible({
         timeout: 15000,
       });
-      await expect(
-        page.locator(screen.ready).filter({ visible: true }).first(),
-      ).toBeVisible({
-        timeout: 15000,
-      });
+      for (const selector of screen.ready) {
+        await expect(
+          page.locator(selector).filter({ visible: true }).first(),
+        ).toBeVisible({ timeout: 15000 });
+      }
 
       // Measure at rest. A box read while an animation or a transition is
       // still running is caught mid-way: the settings checkbox is 24px by CSS
@@ -92,9 +97,17 @@ for (const screen of SCREENS) {
             if (!el.closest("main")) continue;
             const box = el.getBoundingClientRect();
             if (!box.width || !box.height) continue;
+            // A primary action keeps its floor in both dimensions: held to 44
+            // tall and only 24 wide, a 30 px wide button passed.
             const needs =
               primarySelector && el.matches(primarySelector) ? primary : floor;
-            if (box.width < floor || box.height < needs) {
+            // Rounded as the report prints it: a layout box of 23.88 px is a
+            // 24 px control by its CSS, and "24x24" must never be the reason
+            // a check fails.
+            if (
+              Math.round(box.width) < needs ||
+              Math.round(box.height) < needs
+            ) {
               const name = (
                 el.getAttribute("aria-label") ||
                 el.textContent ||
