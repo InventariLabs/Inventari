@@ -33,8 +33,6 @@ export type StockTakeCreateInput = WithServerDefaults<
   "blind_mode" | "require_full_count"
 >;
 
-export type StockTakeUpdate = components["schemas"]["StockTakeUpdate"];
-
 export type StockTakeReport = components["schemas"]["StockTakeReport"];
 
 /** When a location was last counted, and the count open on it now. */
