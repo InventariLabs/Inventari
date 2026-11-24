@@ -21,7 +21,7 @@ const MARK_LABEL_KEYS: Record<LineChoiceMark, string> = {
 };
 
 /** Documents whose lines land goods somewhere: receipts. */
-const RECEIPT_TYPES: string[] = ["IN", "INTERNAL_IN"];
+export const RECEIPT_TYPES: string[] = ["IN", "INTERNAL_IN"];
 
 /** Statuses in which a line's shelf can still be named. */
 const OPEN_STATUSES: string[] = ["DRAFT", "CONFIRMED"];

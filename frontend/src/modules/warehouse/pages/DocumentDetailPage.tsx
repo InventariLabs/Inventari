@@ -69,6 +69,8 @@ import {
 } from "@/modules/warehouse/hooks/useDocumentApproval";
 import { DocumentApprovalRejectedBanner } from "@/modules/warehouse/components/DocumentApprovalRejectedBanner";
 import { useDocumentActions } from "@/modules/warehouse/hooks/useDocumentActions";
+import { HomeShelvesAfterPosting } from "@/modules/warehouse/components/todo/ReceiptHomeShelves";
+import { RECEIPT_TYPES } from "@/modules/warehouse/components/LineTargetPicker";
 import { useDocumentProfile } from "@/modules/warehouse/hooks/useDocumentProfile";
 import { useDocumentDetailHashOpen } from "@/modules/warehouse/hooks/useDocumentDetailHashOpen";
 import type { ConfirmAction } from "@/modules/warehouse/hooks/useDocumentActions";
@@ -882,6 +884,10 @@ export default function DocumentDetailPage() {
           canWrite={canWrite}
           formatDate={formatDateTime}
         />
+      )}
+
+      {RECEIPT_TYPES.includes(doc.type) && (
+        <HomeShelvesAfterPosting documentId={doc.id} status={doc.status} />
       )}
 
       <DocumentDetailModals

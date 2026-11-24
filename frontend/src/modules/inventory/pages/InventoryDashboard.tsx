@@ -10,6 +10,7 @@ import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { cn } from "@/lib/utils";
 import { useStoragesTree } from "@/modules/shared/hooks/useStorages";
+import { useStorageLocationLabels } from "@/modules/shared/hooks/useStorageLocationLabels";
 import { useModules } from "@/contexts/ModulesContext";
 import { moduleRegistry } from "@/lib/moduleRegistry";
 import { useItems } from "@/modules/inventory/hooks/useItems";
@@ -87,6 +88,9 @@ export default function InventoryDashboard() {
     excludeModuleContexts,
     zones: storageZones,
   });
+  const placeLabel = useStorageLocationLabels(
+    attention.groups.map((group) => group.items[0].location_id),
+  );
   const [isReplenishOpen, setIsReplenishOpen] = useState(false);
 
   // A count that did not arrive is left out of the sentence, never read as
@@ -114,7 +118,8 @@ export default function InventoryDashboard() {
       <AttentionCard
         items={toAttentionItems(
           attention.groups,
-          attention.locations,
+          (id) =>
+            placeLabel(id, attention.locations.get(id)?.name) ?? undefined,
           attention.lowProducts,
           t,
           partialOf,

@@ -438,6 +438,7 @@ export const API_ROUTES = [
   "/api/v1/warehouse/documents/{doc_id}/duplicate",
   "/api/v1/warehouse/documents/{doc_id}/extra-costs",
   "/api/v1/warehouse/documents/{doc_id}/extra-costs/{cost_id}",
+  "/api/v1/warehouse/documents/{doc_id}/home-shelf-offers",
   "/api/v1/warehouse/documents/{doc_id}/import-lines",
   "/api/v1/warehouse/documents/{doc_id}/import-paste",
   "/api/v1/warehouse/documents/{doc_id}/lines/{line_id}",
