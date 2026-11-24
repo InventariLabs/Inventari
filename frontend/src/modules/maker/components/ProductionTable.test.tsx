@@ -121,7 +121,7 @@ describe("ProductionTable — the day under a run", () => {
   const renderRows = (orders: ProductionOrder[]) =>
     render(
       <MemoryRouter>
-        <ProductionTable orders={orders} />
+        <ProductionTable orders={orders} sort="newest" isDuplicating={false} />
       </MemoryRouter>,
     );
 
