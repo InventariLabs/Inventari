@@ -8,6 +8,10 @@ import "./mocks/reactQuery";
 import "./mocks/lucide";
 import "./mocks/browser";
 
+// What these registrations import is evaluated here, before any test file's
+// `vi.mock`, so a module in that graph that calls `toast` (today
+// `utils/fileValidation.ts`) is bound to the real sonner: a test that mocks
+// "sonner" never sees its toasts. Spy on the real `toast` for those.
 import "../modules/shopping_lists/module";
 import "../modules/stats/module";
 import "../modules/stock_takes/module";
