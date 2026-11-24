@@ -44,8 +44,12 @@ def test_compose_mounts_the_extra_directory_read_only_with_a_default() -> None:
 
 
 def test_the_extra_directory_ships_with_its_readme_only() -> None:
-    shipped = sorted(p.name for p in (_REPO_ROOT / 'caddy-extra').iterdir())
-    assert shipped == ['README.md']
+    # The directory itself may hold a site someone is trying out; what the
+    # repository ships is whatever the ignore file lets through.
+    assert (_REPO_ROOT / 'caddy-extra' / 'README.md').is_file()
     ignore = (_REPO_ROOT / '.gitignore').read_text(encoding='utf-8')
     assert '/caddy-extra/*' in ignore
-    assert '!/caddy-extra/README.md' in ignore
+    exceptions = [
+        line for line in ignore.splitlines() if line.startswith('!/caddy-extra/')
+    ]
+    assert exceptions == ['!/caddy-extra/README.md']

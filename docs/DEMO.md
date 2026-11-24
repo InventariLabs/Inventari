@@ -91,7 +91,8 @@ stack's Caddy is the front door for both names:
 
 1. Create a DNS A record for `demo.<domain>` pointing at the server.
 2. In the **production** stack's `.env`, set `DEMO_DOMAIN=demo.<domain>` and
-   `docker compose up -d caddy`. Caddy orders a certificate for that name,
+   `docker compose -f docker-compose.prod.yml up -d caddy` (run in the
+   production checkout). Caddy orders a certificate for that name,
    sends HSTS and forwards the traffic to the demo stack.
 3. Start the demo as above, from its own checkout or directory with its own
    `.env`, where `DOMAIN=demo.<domain>`, adding `docker-compose.demo-shared.yml`
