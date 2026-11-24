@@ -124,6 +124,51 @@ def test_it_never_overwrites_an_existing_env(checkout: Path):
     assert env.read_text(encoding='utf-8') == 'FERNET_SALT=keep-me\n'
 
 
+@pytest.mark.parametrize('option', ['--domain', '--email'])
+def test_an_option_given_last_without_a_value_gets_the_scripts_own_message(
+    checkout: Path, option: str
+):
+    result = _run(checkout, option)
+
+    assert result.returncode != 0
+    assert f'{option} needs a value' in result.stderr
+    assert not (checkout / '.env').exists()
+
+
+def test_an_env_that_appears_before_the_write_is_not_replaced(
+    checkout: Path, tmp_path_factory: pytest.TempPathFactory
+):
+    # The existence check at the top and the write are two steps. An od (the secrets are
+    # drawn through it) that drops a file in between stands for a second run that got there first:
+    # the write must fail, not truncate it.
+    real_od = shutil.which('od')
+    shim_dir = tmp_path_factory.mktemp('shim')
+    shim = shim_dir / 'od'
+    shim.write_text(
+        f'#!/bin/sh\necho FERNET_SALT=keep-me > "{checkout}/.env"\nexec {real_od} "$@"\n',
+        encoding='utf-8',
+    )
+    shim.chmod(0o755)
+
+    result = subprocess.run(
+        [
+            _SH,
+            str(checkout / 'scripts/init-env.sh'),
+            '--domain',
+            'inv.example.com',
+            '--email',
+            'me@example.com',
+        ],
+        cwd=checkout,
+        capture_output=True,
+        text=True,
+        env={**os.environ, 'PATH': f'{shim_dir}:{os.environ["PATH"]}'},
+    )
+
+    assert result.returncode != 0
+    assert (checkout / '.env').read_text(encoding='utf-8') == 'FERNET_SALT=keep-me\n'
+
+
 def test_it_asks_for_what_it_was_not_given(checkout: Path):
     result = _run(checkout, stdin='inv.example.com\nme@example.com\n')
 

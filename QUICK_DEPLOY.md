@@ -130,11 +130,15 @@ release also publishes them, for amd64 and arm64 (a Raspberry Pi included), so
 the first start can download instead:
 
 ```bash
-docker compose -f docker-compose.prod.yml -f docker-compose.images.yml up -d --scale caddy=0
+echo 'COMPOSE_FILE=docker-compose.prod.yml:docker-compose.images.yml' >> .env
+docker compose up -d --scale caddy=0
 ```
 
-Choose one, and give the same `-f` files to every later `docker compose`
-command in this guide. The published images carry the release as it is: an
+Choose one. The commands below are written for the build. On the published
+images, `.env` names the files (the first line above), so **type every later
+`docker compose` command without its `-f docker-compose.prod.yml`** — with the
+flag Compose reads the build file alone, and `up` or `run` would build all
+three images here and recreate the services on them. The published images carry the release as it is: an
 installation that adds community modules builds from source
 ([DEPLOYMENT.md](DEPLOYMENT.md#pulling-the-published-images-instead-of-building)).
 
@@ -148,7 +152,8 @@ until docker compose -f docker-compose.prod.yml exec -T backend \
 The first command starts every service except Caddy, the proxy
 that puts the installation on the internet; the second returns once the
 backend has migrated the database and answers. Nothing outside the server
-can reach it yet.
+can reach it yet. (On the published images each of these commands is the
+same without `-f docker-compose.prod.yml`.)
 
 ## Step 5: Create the administrator — before the proxy starts
 
@@ -178,6 +183,10 @@ docker compose -f docker-compose.prod.yml up -d
 docker compose -f docker-compose.prod.yml logs -f caddy
 ```
 
+On the published images, the same two commands without
+`-f docker-compose.prod.yml` — typed as printed, the first one would build the
+three images.
+
 Without `--scale`, `up -d` starts Caddy and leaves the services already
 running as they are. Wait 1–2 minutes for Let's Encrypt to issue the
 certificate. Then open `https://inventari.example.com`, sign in, choose the
@@ -198,6 +207,9 @@ cd /opt/inventari
 docker compose -f docker-compose.prod.yml run --rm -e BACKUP_ONCE=true db-backup
 sudo cp -a backups/last backups/before-update
 ```
+
+On the published images, leave `-f docker-compose.prod.yml` off that first
+command: with it, `run` builds the backup image on this machine.
 
 Everything after it — the release's section in the changelog, the next tag,
 the variables the example gained, the build, the recreate and the migrations
