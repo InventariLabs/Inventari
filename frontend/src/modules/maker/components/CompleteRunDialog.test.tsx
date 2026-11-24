@@ -111,4 +111,39 @@ describe("CompleteRunDialog overproduction", () => {
     ).toBe("");
     expect(screen.queryByTestId("maker-overproduction-notice")).toBeNull();
   });
+
+  it("reopens with an empty quantity and no question after a refusal", async () => {
+    // A refusal closes the dialog without the Cancel handler, so only the
+    // clearing done at every opening can leave the quantity empty.
+    mocks.complete.mockRejectedValueOnce({
+      response: {
+        data: { detail: { error: "insufficient_stock", shortages: [] } },
+      },
+    });
+    openDialog();
+    fireEvent.change(screen.getByTestId("maker-complete-actual-qty-input"), {
+      target: { value: "59" },
+    });
+    fireEvent.click(screen.getByTestId("maker-overproduction-confirm"));
+    await act(async () => {
+      fireEvent.click(
+        within(screen.getByRole("alertdialog")).getByRole("button", {
+          name: "Complete run",
+        }),
+      );
+    });
+    expect(mocks.complete).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+
+    fireEvent.click(screen.getByText("open"));
+
+    expect(
+      (
+        screen.getByTestId(
+          "maker-complete-actual-qty-input",
+        ) as HTMLInputElement
+      ).value,
+    ).toBe("");
+    expect(screen.queryByTestId("maker-overproduction-notice")).toBeNull();
+  });
 });
