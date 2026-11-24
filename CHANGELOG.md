@@ -34,6 +34,12 @@ says what the release does rather than what changed since them.
   screens say what they are: a formula opens rather than offering "Edit BOM"
   to an account that cannot manage it, and a viewer of module settings reads
   the read-only sentence rather than "you can use this".
+- A record the equipment register lists under no category — one carrying the
+  equipment namespace in its metadata — opens on the asset's own page, and the
+  product's page offers it Return and Dispose instead of Remove 1 unit and
+  Delete. Both screens and the register read one predicate, in the register's
+  order: the category first, then whether the namespace is present, a JSON
+  null counted as present.
 - A delivery or a write-off that takes the last unit of a record no longer
   leaves it standing on its shelf at zero: the emptied record is filed under
   the Consumed place, as one used up by hand is, and a correction of that

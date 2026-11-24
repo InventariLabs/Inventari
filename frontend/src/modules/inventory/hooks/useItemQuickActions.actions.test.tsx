@@ -131,6 +131,40 @@ describe("useItemQuickActions — offers, results and the delete dialog", () => 
     expect(result.current.vocabularyNote).toEqual(expect.any(String));
   });
 
+  it("speaks an asset's vocabulary for an uncategorized record the register lists by its namespace", () => {
+    // The register lists an uncategorized record carrying the equipment
+    // namespace, JSON null included. The sheet's verbs follow the register,
+    // so the record is offered the asset's, never the product's.
+    const { result } = render(
+      item({ metadata: { equipment: null } } as unknown as Partial<Item>),
+    );
+    expect(result.current.actions.map((a) => a.id)).toEqual([
+      "add_one",
+      "move",
+      "discard",
+    ]);
+    expect(result.current.vocabularyNote).toEqual(expect.any(String));
+  });
+
+  it("keeps product vocabulary on a record filed under an ordinary category", () => {
+    // The category speaks first, as it does in the register: filing the
+    // record under an ordinary category makes it a product whatever its
+    // metadata still carries.
+    const { result } = render(
+      item({
+        category: { context_tag: null },
+        metadata: { equipment: { equipment_status: "AVAILABLE" } },
+      } as unknown as Partial<Item>),
+    );
+    expect(result.current.actions.map((a) => a.id)).toEqual([
+      "consume",
+      "add_one",
+      "move",
+      "discard",
+    ]);
+    expect(result.current.vocabularyNote).toBeNull();
+  });
+
   it("keeps the note about the actions from an account offered none", () => {
     signInWith(["items:read"]);
     const { result } = render(
