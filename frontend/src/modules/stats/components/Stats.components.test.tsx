@@ -1,7 +1,13 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import {
+  render as renderPlain,
+  screen,
+  fireEvent,
+} from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
+import { serveLocations } from "@/test/serveLocations";
 
 import { StatsOverviewCards } from "@/modules/stats/components/StatsOverviewCards";
 import { StatsHealthCard } from "@/modules/stats/components/StatsHealthCard";
@@ -44,6 +50,22 @@ vi.mock("@/hooks/useOrganizationCurrency", () => ({
 const t = tFor("stats");
 
 const wrap = (el: React.ReactElement) => <MemoryRouter>{el}</MemoryRouter>;
+
+// The distribution names its places by looking their ids up, which needs a
+// client; every render in this file gets one.
+const render = (ui: React.ReactElement) => {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  const inClient = (el: React.ReactElement) => (
+    <QueryClientProvider client={client}>{el}</QueryClientProvider>
+  );
+  const result = renderPlain(inClient(ui));
+  return {
+    ...result,
+    rerender: (next: React.ReactElement) => result.rerender(inClient(next)),
+  };
+};
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
 
@@ -638,6 +660,20 @@ describe("StatsDistributionGrid", () => {
       expect(className).not.toContain("tracking-tight");
       expect(className).toContain("[word-spacing:0.15em]");
     }
+  });
+
+  it("names a place by its path, so two shelves of one name tell apart", async () => {
+    serveLocations([
+      { id: "room", name: "Kitchen" },
+      { id: "loc-1", name: "Fridge", parent_id: "room" },
+    ]);
+    render(
+      <StatsDistributionGrid
+        {...props}
+        storageStats={[{ ...storageStats[0], location_id: "loc-1" }]}
+      />,
+    );
+    expect(await screen.findByText(/Kitchen.*Fridge/)).toBeInTheDocument();
   });
 
   it("renders category names", () => {
