@@ -317,6 +317,8 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 	@python3 backend/scripts/check_history_comments.py --tree frontend
 	@echo "$(BLUE)[INFO]$(NC) Checking frontend tests for dates that the clock will overtake..."
 	@python3 backend/scripts/check_time_bombs.py
+	@echo "$(BLUE)[INFO]$(NC) Checking for identifiers that point at private material..."
+	@python3 backend/scripts/check_internal_ids.py --public-tree
 	@echo "$(BLUE)[INFO]$(NC) Checking no accessibility finding was added to a relaxed file (jsx-a11y baseline)..."
 	docker compose exec frontend npm run check:a11y-baseline
 	@echo "$(BLUE)[INFO]$(NC) Checking module settings snapshot..."

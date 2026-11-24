@@ -541,3 +541,18 @@ class TestTheRepositoryItself:
         keys, _ = load_baseline()
         found = new_findings(_REPO_SCAN_ROOTS, keys)
         assert not found, '\n'.join(f'{p}:{n}: {line}' for p, n, _, line in found)
+
+    def test_a_frontend_only_branch_meets_the_scan_before_its_push(self) -> None:
+        """The scan reads ``frontend/`` too, and the pre-push gate asks
+        ``make check-frontend`` (not ``make lint``) of a branch that touches
+        only that tree, so that target runs it as well."""
+        lines = (_REPO_ROOT / 'Makefile').read_text(encoding='utf-8').splitlines()
+        start = next(
+            i for i, ln in enumerate(lines) if ln.startswith('check-frontend:')
+        )
+        recipe: list[str] = []
+        for line in lines[start + 1 :]:
+            if line and not line.startswith(('\t', ' ', '#')):
+                break
+            recipe.append(line)
+        assert any('check_internal_ids.py --public-tree' in ln for ln in recipe)
