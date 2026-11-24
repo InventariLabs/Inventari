@@ -15,7 +15,7 @@ notice does not become merely "expired" when its date passes.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from uuid import uuid4
 
@@ -34,9 +34,18 @@ from app.models.user import User
 from app.services.token_service import create_access_token
 from tests.integration._shelf import put_on_shelf
 
-_TODAY = datetime.now(UTC).date()
-_LAST_MONTH = _TODAY - timedelta(days=30)
-_NEXT_MONTH = _TODAY + timedelta(days=30)
+
+def _today() -> date:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return datetime.now(UTC).date()
+
+
+def _last_month() -> date:
+    return _today() - timedelta(days=30)
+
+
+def _next_month() -> date:
+    return _today() + timedelta(days=30)
 
 
 def _auth(user: User) -> dict[str, str]:
@@ -97,19 +106,19 @@ async def dated(real_async_db_session: AsyncSession) -> _Dated:
         organization_id=fixture.org.id,
         product_template_id=fixture.flour.id,
         name='L-STALE',
-        expiry_date=_LAST_MONTH,
+        expiry_date=_last_month(),
     )
     fixture.fresh = StockLot(
         organization_id=fixture.org.id,
         product_template_id=fixture.flour.id,
         name='L-FRESH',
-        expiry_date=_NEXT_MONTH,
+        expiry_date=_next_month(),
     )
     fixture.recalled_and_stale = StockLot(
         organization_id=fixture.org.id,
         product_template_id=fixture.flour.id,
         name='L-RECALLED',
-        expiry_date=_LAST_MONTH,
+        expiry_date=_last_month(),
     )
     db.add_all([fixture.stale, fixture.fresh, fixture.recalled_and_stale])
     await db.flush()

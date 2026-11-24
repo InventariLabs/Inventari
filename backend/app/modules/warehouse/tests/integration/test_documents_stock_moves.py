@@ -46,16 +46,19 @@ from app.modules.warehouse.tests.integration._records import (
     sow,
 )
 
+
 # The batches these tests order have to be batches the warehouse would still
 # release: stock past its date is held back now, and fixed calendar dates
 # quietly walked into the past — every one of these was in the future when
 # it was typed. Relative dates keep the subject FEFO ordering rather than
 # how long ago the file was written.
-_TODAY = datetime.now(UTC).date()
+def _today() -> date:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return datetime.now(UTC).date()
 
 
 def _in_months(months: int) -> date:
-    return _TODAY + timedelta(days=30 * months)
+    return _today() + timedelta(days=30 * months)
 
 
 def _create_in(

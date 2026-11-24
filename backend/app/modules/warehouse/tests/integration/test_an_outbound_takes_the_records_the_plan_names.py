@@ -35,11 +35,14 @@ from app.modules.warehouse.tests.integration._records import (
     sow,
 )
 
-_TODAY = datetime.now(UTC).date()
+
+def _today() -> date:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return datetime.now(UTC).date()
 
 
 def _in_months(months: int) -> date:
-    return _TODAY + timedelta(days=30 * months)
+    return _today() + timedelta(days=30 * months)
 
 
 def _make_lot(

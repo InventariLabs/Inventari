@@ -9,7 +9,7 @@ for another document in between.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from uuid import UUID, uuid4
 
@@ -28,7 +28,10 @@ from app.models.stock_reservation import StockReservation
 from app.models.storage_location import StorageLocation
 from app.modules.warehouse.tests.integration._records import shelf_record, sow
 
-_TODAY = datetime.now(UTC).date()
+
+def _today() -> date:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return datetime.now(UTC).date()
 
 
 def _lot(
@@ -38,7 +41,7 @@ def _lot(
         organization_id=org_id,
         product_template_id=template_id,
         name=name,
-        use_by_date=_TODAY + timedelta(days=30 * months),
+        use_by_date=_today() + timedelta(days=30 * months),
     )
     db.add(lot)
     db.flush()
