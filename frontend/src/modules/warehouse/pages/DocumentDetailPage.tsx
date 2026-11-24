@@ -69,7 +69,6 @@ import {
 } from "@/modules/warehouse/hooks/useDocumentApproval";
 import { DocumentApprovalRejectedBanner } from "@/modules/warehouse/components/DocumentApprovalRejectedBanner";
 import { useDocumentActions } from "@/modules/warehouse/hooks/useDocumentActions";
-import { HomeShelvesAfterPosting } from "@/modules/warehouse/components/todo/ReceiptHomeShelves";
 import { useDocumentProfile } from "@/modules/warehouse/hooks/useDocumentProfile";
 import { useDocumentDetailHashOpen } from "@/modules/warehouse/hooks/useDocumentDetailHashOpen";
 import type { ConfirmAction } from "@/modules/warehouse/hooks/useDocumentActions";
@@ -884,12 +883,6 @@ export default function DocumentDetailPage() {
           formatDate={formatDateTime}
         />
       )}
-
-      <HomeShelvesAfterPosting
-        documentId={doc.id}
-        type={doc.type}
-        status={doc.status}
-      />
 
       <DocumentDetailModals
         doc={doc}
