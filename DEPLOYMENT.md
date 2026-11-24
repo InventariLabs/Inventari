@@ -65,30 +65,27 @@ ping inventari.example.com
 ## Step 4: Configure Environment
 
 ```bash
-cp .env.production.example .env
-chmod 600 .env
-nano .env
+./scripts/init-env.sh
 ```
+
+It asks for the domain and the e-mail address the certificate is issued for,
+and writes `.env` from `.env.production.example` with every secret generated:
+`DB_PASSWORD`, `DB_APP_PASSWORD`, `REDIS_PASSWORD`, `SECRET_KEY`,
+`ENCRYPTION_KEY` and `FERNET_SALT`, each 64 hex characters from the kernel's
+random source (`--domain` and `--email` answer the questions on the command
+line). It never overwrites an existing `.env`: replacing `FERNET_SALT` or
+`ENCRYPTION_KEY` would leave every stored secret unreadable, so a file that is
+already there is yours to edit by hand.
 
 `.env` holds every secret the installation has, so only the account that runs
-Compose should read it. Keep it at mode 600 — `chmod 600 .env` after you create
-it, and again after any tool that rewrites the file; `ls -l .env` shows
-`-rw-------`.
-
-Generate secure secrets:
-
-```bash
-echo "DB_PASSWORD=$(openssl rand -hex 32)"
-echo "DB_APP_PASSWORD=$(openssl rand -hex 32)"
-echo "REDIS_PASSWORD=$(openssl rand -hex 32)"
-echo "SECRET_KEY=$(openssl rand -hex 32)"
-echo "ENCRYPTION_KEY=$(openssl rand -hex 32)"
-echo "FERNET_SALT=$(openssl rand -hex 32)"
-```
+Compose should read it. The script creates it at mode 600; keep it there,
+and again after any tool that rewrites the file (`ls -l .env` shows
+`-rw-------`).
 
 `DB_APP_PASSWORD` and `REDIS_PASSWORD` are interpolated into connection URLs
 verbatim, so they must be hex — base64's `+ / =` characters would corrupt the
-URLs rather than fail loudly. Hex is right for the other four as well.
+URLs rather than fail loudly. Hex is right for the other four as well, which is
+why the script writes hex only; a value you set by hand has to be hex too.
 
 `SECRET_KEY` signs login tokens; `ENCRYPTION_KEY` encrypts what organizations
 store as secrets. Set both now, on the first install. `ENCRYPTION_KEY` may be
@@ -128,18 +125,8 @@ the key is generated as a pair, `make backup-key` prints the private half once
 and saves it nowhere, and that half must be kept off the server, because an
 encrypted backup nobody can decrypt is worth less than a plain one.
 
-Set at minimum in `.env`:
-
-```env
-DOMAIN=inventari.example.com
-ACME_EMAIL=you@example.com
-DB_PASSWORD=<generated above>
-DB_APP_PASSWORD=<generated above>
-REDIS_PASSWORD=<generated above>
-SECRET_KEY=<generated above>
-ENCRYPTION_KEY=<generated above>
-FERNET_SALT=<generated above>
-```
+The eight values the stack needs — the domain, the e-mail address and the six
+secrets — are the ones the script filled in.
 
 `DB_APP_PASSWORD`, `REDIS_PASSWORD` and `FERNET_SALT` are enforced by the
 compose file — an empty value stops `docker compose up` before anything is
@@ -346,6 +333,33 @@ until docker compose -f docker-compose.prod.yml exec -T backend \
 Nothing outside the server can reach the installation yet — create the
 administrator first.
 
+### Pulling the published images instead of building
+
+Every release tag publishes the three images this file builds — backend,
+frontend and the backup sidecar — to `ghcr.io/inventarilabs/inventari-backend`,
+`-frontend` and `-backup`, for `linux/amd64` and `linux/arm64`, tagged with the
+version (`0.13.0`) and, for a release that is not a pre-release, `latest`. A
+second compose file swaps the build for them, so the first start downloads
+instead of compiling — minutes on a small server, and the way a Raspberry Pi
+or another ARM machine gets the stack without building it:
+
+```bash
+docker compose -f docker-compose.prod.yml -f docker-compose.images.yml \
+  up -d --scale caddy=0
+```
+
+The release comes from `INVENTARI_VERSION` in `.env`, which
+`./scripts/init-env.sh` sets to the version of the files it was run in; Compose
+refuses to start with it empty, so a stack never pulls a tag it was not told
+to. Give both `-f` files to every later `docker compose` command in this
+guide, in place of `-f docker-compose.prod.yml` alone — `.env` can say it once
+with `COMPOSE_FILE=docker-compose.prod.yml:docker-compose.images.yml`, but only
+for commands that carry no `-f` of their own.
+
+The images carry the application as released, so the two community-module
+trees of the checkout are not mounted: *Community modules* below needs the
+build from source.
+
 ## Step 6: Create the administrator, then start the proxy
 
 Nothing seeds an administrator. Create it from the server:
@@ -520,6 +534,16 @@ docker compose -f docker-compose.prod.yml exec -T backend \
 until docker compose -f docker-compose.prod.yml exec -T backend \
     curl -sf http://localhost:8000/health/ready >/dev/null; do sleep 5; done
 ```
+
+**Pulling the published images.** An installation that runs them
+(*Pulling the published images instead of building*) changes three steps: in
+step 3, set `INVENTARI_VERSION` in `.env` to the new tag without its `v`; in
+step 4, `pull` replaces `build` (`docker compose -f docker-compose.prod.yml -f
+docker-compose.images.yml pull`); in step 5, `up -d --force-recreate` runs
+without `--no-build`, since there is no build to skip. Every command keeps
+both `-f` files. A new tag publishes its images when the release is cut, so a
+`pull` that finds none means the release is still being built: wait for the
+workflow run named for the tag.
 
 Step 4b applies once, and only to a database created from the development
 line before v0.11.0 was tagged — the project's own installations, or one built

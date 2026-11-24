@@ -12,6 +12,20 @@ says what the release does rather than what changed since them.
 
 ## Unreleased
 
+### Added
+
+- Every release now publishes its container images — the backend, the
+  frontend and the backup sidecar — to the GitHub Container Registry, for amd64
+  and arm64, so a server or a Raspberry Pi can download the stack instead of
+  building it: add `-f docker-compose.images.yml` to the production commands
+  (QUICK_DEPLOY.md, DEPLOYMENT.md). The images carry the release as shipped, so
+  community modules, which are installed by a rebuild, still need the build
+  from source.
+- `scripts/init-env.sh` writes the production `.env` in one command: it asks
+  for the domain and the e-mail address, generates the five secrets and the
+  encryption key, and never overwrites an existing file. The guides use it
+  instead of six `openssl` commands to paste by hand.
+
 ### Fixed
 
 - Permissions now hold across the screens and doors that only half reached

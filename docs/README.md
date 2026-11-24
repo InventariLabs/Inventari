@@ -16,6 +16,7 @@ ships with the repository, not a guide.
 | [Live demo](https://demo.inventari.app) | Try the app in the browser: an organization of your own, wiped every night — not for real data |
 | [Getting started](../README.md#quick-start) | Install and run your own instance, first login |
 | [USER_GUIDE.md](USER_GUIDE.md) | The end-user guide, illustrated with screens of the demo: locations, products, scanning, documents, reports |
+| [HOME_SERVER_STORES.md](HOME_SERVER_STORES.md) | What the home-server app stores (Unraid, CasaOS, Umbrel, YunoHost, TrueNAS) ask of an application, quoted and dated |
 | [GALLERY.md](GALLERY.md) | Screens of the running application, module by module |
 | [FOCUS_MODE.md](FOCUS_MODE.md) | Showing a single module (Settings → Organization modules) |
 
