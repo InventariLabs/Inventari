@@ -144,7 +144,7 @@ export const WebhookCard = memo(function WebhookCard({
                     variant="link"
                     size="contentSm"
                     onClick={onLogs}
-                    className="underline font-medium px-0.5 min-h-11 md:min-h-0 min-w-11 md:min-w-0"
+                    className="text-inherit underline font-medium px-0.5 min-h-11 md:min-h-0 min-w-11 md:min-w-0"
                   >
                     {t("logs")}
                   </Button>{" "}

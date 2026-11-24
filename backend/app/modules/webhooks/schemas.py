@@ -4,9 +4,11 @@ from datetime import datetime
 from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, Field, HttpUrl, field_validator
+from pydantic import BaseModel, Field, HttpUrl, field_validator, model_validator
 
 from app.core.events import SystemEvent
+
+from ._webhook_delivery import failure_cause
 
 #: Names in ``SystemEvent`` and the payload registry that nothing emits:
 #: they stand in the core contract, and a webhook subscribed to one never
@@ -155,6 +157,14 @@ class WebhookDeliveryResponse(BaseModel):
     next_retry_at: datetime | None = None
     created_at: datetime
     last_attempt_at: datetime | None = None
+    #: Why the delivery got no answer, as a code the screen words itself in
+    #: the reader's language; filled from the stored sentence on every read.
+    error_cause: str | None = None
+
+    @model_validator(mode='after')
+    def _name_the_cause(self) -> 'WebhookDeliveryResponse':
+        self.error_cause = failure_cause(self.status_code, self.error_message)
+        return self
 
 
 class AvailableEventResponse(BaseModel):
@@ -173,3 +183,10 @@ class TestWebhookResponse(BaseModel):
     status_code: int | None
     error: str | None
     delivery_id: UUID
+    #: Why the test got no answer, as a code the screen words itself.
+    error_cause: str | None = None
+
+    @model_validator(mode='after')
+    def _name_the_cause(self) -> 'TestWebhookResponse':
+        self.error_cause = failure_cause(self.status_code, self.error)
+        return self

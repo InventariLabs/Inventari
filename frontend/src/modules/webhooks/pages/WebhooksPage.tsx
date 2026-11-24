@@ -18,7 +18,9 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { extractApiError } from "@/lib/errors";
 import { QueryFailure } from "@/components/ui/QueryResult";
 import WebhookForm from "../components/WebhookForm";
-import WebhookDeliveryLogs from "../components/WebhookDeliveryLogs";
+import WebhookDeliveryLogs, {
+  causeText,
+} from "../components/WebhookDeliveryLogs";
 import { TEST_HINT_ID, WebhookCard } from "../components/WebhookCard";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useHasPermission } from "@/hooks/useHasPermission";
@@ -165,7 +167,10 @@ export default function WebhooksPage() {
                             status: result.status_code,
                           })
                         : t("testResult.failure", {
-                            error: result.error ?? t("unknownError"),
+                            error:
+                              causeText(t, result.error_cause) ??
+                              result.error ??
+                              t("unknownError"),
                           }),
                     );
                   }

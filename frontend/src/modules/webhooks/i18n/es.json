@@ -67,6 +67,14 @@
       "webhookDisabled": "Un administrador desactivó el endpoint.",
       "webhookDeleted": "El endpoint fue eliminado.",
       "moduleDisabled": "El módulo de webhooks está desactivado para esta organización."
+    },
+    "cause": {
+      "signingUnreadable": "No se puede leer el secreto de firma: se escribió con otra clave (rotación) o se editó en la tabla. Vuelve a introducirlo en los ajustes del endpoint; la entrega se rechaza en lugar de enviarse sin firma.",
+      "timeout": "El destino no respondió dentro del tiempo límite del endpoint.",
+      "connectFailed": "No se pudo conectar con el destino. La dirección puede ser incorrecta, un cortafuegos puede bloquearla o el receptor puede estar caído.",
+      "tlsRefused": "La conexión fue rechazada por TLS: no se pudo verificar el certificado del receptor.",
+      "connectionBroken": "La conexión se interrumpió antes de que el receptor respondiera.",
+      "emptyAnswer": "El destino respondió HTTP {{status}} sin cuerpo, así que no dio ningún motivo. Revisa el registro del propio receptor."
     }
   },
   "testResult": {

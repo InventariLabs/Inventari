@@ -89227,6 +89227,17 @@
             "type": "string",
             "format": "uuid",
             "title": "Delivery Id"
+          },
+          "error_cause": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Cause"
           }
         },
         "type": "object",
@@ -90630,6 +90641,17 @@
               }
             ],
             "title": "Last Attempt At"
+          },
+          "error_cause": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Cause"
           }
         },
         "type": "object",

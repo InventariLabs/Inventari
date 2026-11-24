@@ -67,6 +67,14 @@
       "webhookDisabled": "Le endpoint a été désactivé par un administrateur.",
       "webhookDeleted": "Le endpoint a été supprimé.",
       "moduleDisabled": "Le module webhooks est désactivé pour cette organisation."
+    },
+    "cause": {
+      "signingUnreadable": "Le secret de signature est illisible — il a été écrit sous une autre clé (rotation) ou modifié dans la table. Saisissez-le de nouveau dans les réglages du point de terminaison ; la livraison est refusée plutôt qu'envoyée sans signature.",
+      "timeout": "La cible n'a pas répondu dans le délai du point de terminaison.",
+      "connectFailed": "Connexion à la cible impossible. L'adresse est peut-être erronée, un pare-feu la bloque ou le destinataire est hors service.",
+      "tlsRefused": "La connexion a été refusée en TLS : le certificat du destinataire n'a pas pu être vérifié.",
+      "connectionBroken": "La connexion s'est interrompue avant que le destinataire ne réponde.",
+      "emptyAnswer": "La cible a répondu HTTP {{status}} sans corps, donc sans motif. Consultez le journal du destinataire."
     }
   },
   "testResult": {

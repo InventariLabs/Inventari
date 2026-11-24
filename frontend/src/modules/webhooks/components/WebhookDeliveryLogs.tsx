@@ -94,9 +94,50 @@ function abandonReasonText(t: (key: string) => string, reason: string): string {
   }
 }
 
+/**
+ * The reason a delivery got no answer, in the reader's language. The stored
+ * sentence is English; the API names its cause as a code. A code this build
+ * does not know leaves the stored sentence on screen.
+ */
+export function causeText(
+  t: (key: string) => string,
+  cause: string | null | undefined,
+): string | undefined {
+  // Inline keys, not a composed one: the i18n gates read the literals here.
+  switch (cause) {
+    case "signing_unreadable":
+      return t("delivery.cause.signingUnreadable");
+    case "timeout":
+      return t("delivery.cause.timeout");
+    case "connect_failed":
+      return t("delivery.cause.connectFailed");
+    case "tls_refused":
+      return t("delivery.cause.tlsRefused");
+    case "connection_broken":
+      return t("delivery.cause.connectionBroken");
+    default:
+      return undefined;
+  }
+}
+
 function DeliveryRow({ delivery }: { delivery: WebhookDelivery }) {
   const { t } = useTranslation("webhooks");
   const [expanded, setExpanded] = useState(false);
+  // What the expanded row says about a failure: our own cause in the reader's
+  // language, else what the target sent back, else — a refusal whose body was
+  // empty — the fact that it gave no reason, so the row is never silent.
+  const translatedCause = causeText(t, delivery.error_cause);
+  const answeredEmpty =
+    delivery.status_code != null &&
+    (delivery.status_code < 200 || delivery.status_code >= 300) &&
+    !delivery.error_message;
+  const reason =
+    translatedCause ??
+    (delivery.error_message
+      ? shorten(delivery.error_message)
+      : answeredEmpty
+        ? t("delivery.cause.emptyAnswer", { status: delivery.status_code })
+        : undefined);
 
   const ts = formatDateTimePrecise(
     delivery.last_attempt_at ?? delivery.created_at,
@@ -155,7 +196,7 @@ function DeliveryRow({ delivery }: { delivery: WebhookDelivery }) {
               <span className="font-mono">{delivery.delivery_id}</span>
             </p>
           )}
-          {delivery.error_message && (
+          {reason && (
             <div>
               {/* A status code means the target answered — what follows is its
                   reply, not our failure. Labelling a 405 page "Error" sent the
@@ -180,13 +221,14 @@ function DeliveryRow({ delivery }: { delivery: WebhookDelivery }) {
                     : "text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20",
                 )}
               >
-                {shorten(delivery.error_message)}
+                {reason}
               </pre>
-              {delivery.error_message.length > MAX_BODY_CHARS && (
-                <p className="text-[10px] text-on-muted mt-1">
-                  {t("delivery.truncated")}
-                </p>
-              )}
+              {!translatedCause &&
+                (delivery.error_message?.length ?? 0) > MAX_BODY_CHARS && (
+                  <p className="text-[10px] text-on-muted mt-1">
+                    {t("delivery.truncated")}
+                  </p>
+                )}
             </div>
           )}
           {delivery.next_retry_at &&
