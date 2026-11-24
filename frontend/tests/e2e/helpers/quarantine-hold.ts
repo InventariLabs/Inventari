@@ -16,7 +16,7 @@ export interface HeldGoods {
   receiptNumber: string;
 }
 
-export const DELIVERED = 20;
+const DELIVERED = 20;
 export const HELD = 2;
 
 export async function receiveWithDamagedGoods(
