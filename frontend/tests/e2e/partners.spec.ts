@@ -34,19 +34,25 @@ test.describe("Partners — CRUD flow", () => {
 
   test.beforeEach(async ({ page, authenticatedPage }) => {
     await page.goto("/partners");
-    await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
+    await page
+      .waitForLoadState("networkidle", { timeout: 15000 })
+      .catch(() => {});
   });
 
   test("displays partners page heading", async ({
     page,
     authenticatedPage,
   }) => {
-    await expect(page.locator("h1, h2").first()).toBeVisible({ timeout: 15000 });
+    await expect(page.locator("h1, h2").first()).toBeVisible({
+      timeout: 15000,
+    });
   });
 
   test("has add partner button", async ({ page, authenticatedPage }) => {
     const createBtn = page
-      .getByRole("button", { name: /partner created|add partner|new partner|create|dodaj/i })
+      .getByRole("button", {
+        name: /partner created|add partner|new partner|create|dodaj/i,
+      })
       .first();
     await expect(createBtn).toBeVisible({ timeout: 10000 });
   });
@@ -63,16 +69,20 @@ test.describe("Partners — CRUD flow", () => {
   test("lists partner entries", async ({ page, authenticatedPage }) => {
     // Reload to ensure fresh data from API is rendered
     await page.reload();
-    await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
-    const partnerEntries = page
-      .getByText(/E2E-Partner-Seed/i)
-      .first();
+    await page
+      .waitForLoadState("networkidle", { timeout: 15000 })
+      .catch(() => {});
+    const partnerEntries = page.getByText(/E2E-Partner-Seed/i).first();
     await expect(partnerEntries).toBeVisible({ timeout: 15000 });
   });
 
   test("deactivates a partner", async ({ page, authenticatedPage }) => {
     const delName = `E2E-Partner-Del-${crypto.randomUUID()}`;
-    const partner = await api.createPartner(token, { name: delName, type: "supplier", email: "del@example.com" });
+    const partner = await api.createPartner(token, {
+      name: delName,
+      type: "supplier",
+      email: "del@example.com",
+    });
 
     await page.goto("/partners");
     await page
@@ -83,29 +93,27 @@ test.describe("Partners — CRUD flow", () => {
       await expect(page.getByText(delName).first()).toBeVisible({
         timeout: 10000,
       });
-    } catch (error) {
+
+      await page
+        .getByRole("row")
+        .filter({ hasText: delName })
+        .getByRole("button", { name: /deactivate/i })
+        .click();
+      await page
+        .getByRole("alertdialog")
+        .getByRole("button", { name: /deactivate/i })
+        .click();
+
+      // The register lists active partners, so the one just switched off
+      // leaves it; the server holds the same answer.
+      await expect(page.getByText(delName)).toHaveCount(0, { timeout: 10000 });
+      await expect
+        .poll(async () => (await api.getPartner(token, partner.id)).is_active)
+        .toBe(false);
+    } finally {
       // The partner this test made does not outlive a failing check.
-      await api.deletePartner(token, partner.id).catch(() => {});
-      throw error;
+      await api.deletePartner(token, partner.id);
     }
-
-    const partnerRow = page
-      .locator('tr, li, [role="row"], div')
-      .filter({ hasText: delName })
-      .first();
-    const deactivateBtn = partnerRow
-      .locator("button")
-      .filter({ hasText: /deactivate/i })
-      .first();
-
-    if (await deactivateBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await deactivateBtn.click();
-      await expect(page.getByText(delName))
-        .toHaveCount(0, { timeout: 10000 })
-        .catch(() => {});
-    }
-
-    await api.deletePartner(token, partner.id).catch(() => {});
   });
 });
 
@@ -130,7 +138,8 @@ test.describe("Partners — extended actions (API)", () => {
   });
 
   test.afterAll(async () => {
-    if (token && partnerId) await api.deletePartner(token, partnerId).catch(() => {});
+    if (token && partnerId)
+      await api.deletePartner(token, partnerId).catch(() => {});
   });
 
   test("GET /{id} returns partner detail", async () => {
@@ -142,21 +151,29 @@ test.describe("Partners — extended actions (API)", () => {
 
   test("PUT /{id} updates partner name", async () => {
     const newName = `E2E-Partner-Renamed-${Date.now()}`;
-    const updated = await api.updatePartner(token, partnerId, { name: newName });
+    const updated = await api.updatePartner(token, partnerId, {
+      name: newName,
+    });
     expect(updated.name).toBe(newName);
   });
 
   test("PATCH /{id}/activate activates partner", async () => {
     // Deactivate first
-    const deactivateResp = await api.request.patch(`/api/v1/partners/${partnerId}/deactivate`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    });
+    const deactivateResp = await api.request.patch(
+      `/api/v1/partners/${partnerId}/deactivate`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
     expect(deactivateResp.ok()).toBe(true);
 
     // Then reactivate
-    const activateResp = await api.request.patch(`/api/v1/partners/${partnerId}/activate`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    });
+    const activateResp = await api.request.patch(
+      `/api/v1/partners/${partnerId}/activate`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
     expect(activateResp.ok()).toBe(true);
     const activated = await activateResp.json();
     expect(activated.is_active).toBe(true);

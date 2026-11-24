@@ -153,20 +153,38 @@ test.describe("Documents Exploratory — Full User Workflow", () => {
     page,
     authenticatedPage,
   }) => {
-    await page.goto("/warehouse");
-    await page
-      .waitForLoadState("networkidle", { timeout: 15000 })
-      .catch(() => {});
+    // The stack holds as few documents as the specs before this one left, so
+    // the answer's count is raised to two pages' worth and the list is asked
+    // for what the pager then offers. What is under test is the pager and the
+    // request it makes, not how many documents a stack happens to have.
+    const asked: { offset: number; limit: number }[] = [];
+    await page.route(
+      (url) => url.pathname === "/api/v1/warehouse/documents",
+      async (route) => {
+        const params = new URL(route.request().url()).searchParams;
+        asked.push({
+          offset: Number(params.get("offset") ?? 0),
+          limit: Number(params.get("limit")),
+        });
+        const response = await route.fetch();
+        const body = await response.json();
+        await route.fulfill({ response, json: { ...body, total: 60 } });
+      },
+    );
+    await page.goto("/warehouse/all");
 
-    // Check if pagination controls exist
-    const hasNext = await page
-      .getByRole("button", { name: /next|następna|›/i })
-      .first()
-      .isVisible({ timeout: 3000 })
-      .catch(() => false);
+    const next = page.getByRole("button", { name: "Next page", exact: true });
+    await expect(next).toBeEnabled({ timeout: 15000 });
+    const { limit } = asked[0];
+    await expect(
+      page.getByText(new RegExp(`1–${limit}\\s+of\\s+60`)),
+    ).toBeVisible();
 
-    // Either pagination exists or there are few documents
-    expect(true).toBeTruthy();
+    await next.click();
+    await expect(
+      page.getByText(new RegExp(`${limit + 1}–60\\s+of\\s+60`)),
+    ).toBeVisible();
+    expect(asked.at(-1)).toEqual({ offset: limit, limit });
   });
 });
 
@@ -475,13 +493,17 @@ test.describe("Documents Exploratory — Error Recovery", () => {
     page,
     authenticatedPage,
   }) => {
-    await page.goto("/warehouse/documents/00000000-0000-0000-0000-000000000000");
+    await page.goto(
+      "/warehouse/documents/00000000-0000-0000-0000-000000000000",
+    );
     await page
       .waitForLoadState("networkidle", { timeout: 15000 })
       .catch(() => {});
 
     // Should not crash — should show some error or redirect
-    await expect.poll(async () => (await page.locator("body").innerText()).length).toBeGreaterThan(0);
+    await expect
+      .poll(async () => (await page.locator("body").innerText()).length)
+      .toBeGreaterThan(0);
     const bodyText = await page.locator("body").innerText();
     expect(bodyText.length).toBeGreaterThan(0);
   });
