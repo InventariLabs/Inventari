@@ -19,7 +19,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("./client", () => ({
   api: { post: vi.fn() },
 }));
-vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
 import { toast } from "sonner";
 import { api } from "./client";
@@ -93,6 +92,10 @@ describe("a phone photo above the cap", () => {
  * toasted too would put a second toast on the caller's. The callers' own
  * tests count that toast: the quick add's photo, the logo in the organization
  * settings and the cover on the recipe page.
+ *
+ * The gate's module is loaded by the test setup, before a `vi.mock("sonner")`
+ * in a test file could reach it, so a mocked toast would not see the gate's
+ * own: the real `toast.error` the gate calls is the one watched here.
  */
 describe("an oversized image is refused with the limit as its error, and no toast of the gate's own", () => {
   const uploads = {
@@ -103,15 +106,18 @@ describe("an oversized image is refused with the limit as its error, and no toas
 
   for (const [name, upload] of Object.entries(uploads)) {
     it(name, async () => {
-      vi.mocked(toast.error).mockClear();
+      const shown = vi.spyOn(toast, "error").mockImplementation(() => "");
+      try {
+        const refusal = await upload().catch((error: unknown) => error);
 
-      const refusal = await upload().catch((error: unknown) => error);
-
-      expect(extractApiError(refusal, "Failed to upload file")).toBe(
-        "File too large. Maximum size: 10 MB",
-      );
-      expect(toast.error).not.toHaveBeenCalled();
-      expect(api.post).not.toHaveBeenCalled();
+        expect(extractApiError(refusal, "Failed to upload file")).toBe(
+          "File too large. Maximum size: 10 MB",
+        );
+        expect(shown).not.toHaveBeenCalled();
+        expect(api.post).not.toHaveBeenCalled();
+      } finally {
+        shown.mockRestore();
+      }
     });
   }
 });
