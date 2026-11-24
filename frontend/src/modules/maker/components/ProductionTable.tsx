@@ -1,3 +1,4 @@
+import { RunDayText } from "@/modules/maker/components/RunDayText";
 import { useId } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -9,7 +10,6 @@ import { ProductionShortageSignal } from "@/modules/maker/components/ProductionS
 import { ProductionStatusBadge } from "@/modules/maker/components/ProductionStatusBadge";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
 import { formatMoney } from "@/utils/formatters";
-import { formatDate } from "@/utils/helpers";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import type { ProductionOrder } from "@/modules/maker/types/maker";
 import { useResultTerms } from "@/modules/maker/hooks/useResultTerms";
@@ -155,7 +155,7 @@ export function ProductionTable({
                       : formatMoney(result, currency, i18n.language)}
                   </td>
                   <td className="px-3 py-2.5 text-on-muted whitespace-nowrap">
-                    {formatDate(order.created_at)}
+                    <RunDayText order={order} />
                   </td>
                   <td className="px-3 py-2.5 text-right whitespace-nowrap">
                     {/* Pre-0a orders carry no recipe reference — the same

@@ -34,6 +34,19 @@ says what the release does rather than what changed since them.
   screens say what they are: a formula opens rather than offering "Edit BOM"
   to an account that cannot manage it, and a viewer of module settings reads
   the read-only sentence rather than "you can use this".
+- Production costs read the same everywhere. `maker_api.compute_total_cost_async`
+  answers the whole batch cost, as `compute_unit_cost_async` already answers
+  the whole cost per unit, so a module that multiplies one by the quantity gets
+  the other; a formula's estimated cost includes its fixed cost lines as well
+  as the ingredients and the labour. The production preview heads the fixed
+  costs and labour under their own heading, so they no longer read as two more
+  ingredients. A run that cost more or less than its estimate says which way
+  in words, the hourly rate in production settings names its currency and "per
+  hour", and the card of a cancelled run no longer explains a total it does not
+  have. Run cards and rows show the day a draft is planned for and the day a
+  run in progress was started, not the day it was created.
+  *Cook a batch for stock*, opened again after an abandoned attempt, no longer
+  draws the discarded production recipe while its lookup is still answering.
 
 ### Changed
 

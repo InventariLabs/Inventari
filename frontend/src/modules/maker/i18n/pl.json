@@ -33,7 +33,9 @@
       "shortage_few": "Brak zapasu: {{count}} składniki. Zamknięcie zostanie odrzucone.",
       "shortage_many": "Brak zapasu: {{count}} składników. Zamknięcie zostanie odrzucone.",
       "shortage_other": "Brak zapasu: {{count}} składników. Zamknięcie zostanie odrzucone.",
-      "batch": "Partia {{batch}}"
+      "batch": "Partia {{batch}}",
+      "plannedFor": "Zaplanowano na {{date}}",
+      "startedOn": "Rozpoczęto {{date}}"
     },
     "sortLabel": "Sortuj",
     "sort": {
@@ -57,7 +59,7 @@
     "table": {
       "product": "Produkt",
       "status": "Status",
-      "date": "Utworzono",
+      "date": "Data",
       "actions": "Akcje"
     }
   },
@@ -69,6 +71,7 @@
     "unitCostHint": "Ilość",
     "missingTitle": "Składniki bez ceny",
     "ingredients": "Składniki",
+    "otherCosts": "Poza składnikami",
     "chart": {
       "title": "Udział w kosztach",
       "empty": "Żaden składnik nie ma jeszcze ceny — nie ma czego pokazać na wykresie."
@@ -213,7 +216,9 @@
       "totalCostGap_many": "{{count}} składników zeszło z zapasu bez kosztu, więc nie ma ich w tej kwocie: {{names}}. Podgląd przed zapisem może pokazać wyższą kwotę, bo brakujący koszt potrafi oszacować z innego zapasu lub ofert dostawców.",
       "totalCostGap_other": "{{count}} składnika zeszło z zapasu bez kosztu, więc nie ma go w tej kwocie: {{names}}. Podgląd przed zapisem może pokazać wyższą kwotę, bo brakujący koszt potrafi oszacować z innego zapasu lub ofert dostawców.",
       "estimatedAtCompletion": "Szacunek przy zamknięciu",
-      "estimatedDifference": "Różnica rzeczywista: {{amount}}",
+      "estimatedOver": "Koszt rzeczywisty: {{amount}} powyżej szacunku",
+      "estimatedUnder": "Koszt rzeczywisty: {{amount}} poniżej szacunku",
+      "estimatedOnTarget": "Koszt rzeczywisty zgadza się z szacunkiem",
       "takenSoFar": "Pobrane dotąd"
     },
     "ingredients": "Zużyte składniki",
@@ -537,6 +542,7 @@
     "advanced": "Zaawansowane",
     "advancedHint": "Zasady dla braków i nadprodukcji. Ustawienia domyślne pasują do małej pracowni.",
     "laborHourlyRate": "Stawka godzinowa własnej pracy",
+    "laborHourlyRateUnit": "{{currency}} / godz.",
     "laborHourlyRateHint": "Praca przy recepturze to czas jej kroków według tej stawki. Zero oznacza, że praca nie kosztuje w szacunkach."
   },
   "availability": {

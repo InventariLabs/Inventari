@@ -31,7 +31,9 @@
       "resultPerUnit": "({{amount}} pro {{unit}})",
       "shortage_one": "Kein Bestand: {{count}} Zutat fehlt. Abschluss wird abgelehnt.",
       "shortage_other": "Kein Bestand: {{count}} Zutaten fehlen. Abschluss wird abgelehnt.",
-      "batch": "Charge {{batch}}"
+      "batch": "Charge {{batch}}",
+      "plannedFor": "Geplant für {{date}}",
+      "startedOn": "Gestartet am {{date}}"
     },
     "sortLabel": "Sortieren",
     "sort": {
@@ -55,7 +57,7 @@
     "table": {
       "product": "Produkt",
       "status": "Status",
-      "date": "Erstellt",
+      "date": "Datum",
       "actions": "Aktionen"
     }
   },
@@ -67,6 +69,7 @@
     "unitCostHint": "Menge",
     "missingTitle": "Zutaten ohne Preis",
     "ingredients": "Zutaten",
+    "otherCosts": "Neben den Zutaten",
     "chart": {
       "title": "Kostenanteil",
       "empty": "Noch keine Zutat hat einen Preis — es gibt nichts darzustellen."
@@ -209,7 +212,9 @@
       "totalCostGap_one": "{{count}} Zutat wurde aus Bestand ohne Kosten entnommen und fehlt daher in dieser Summe: {{names}}. Die Vorschau vor dem Speichern kann einen höheren Wert zeigen, weil sie fehlende Kosten aus anderem Bestand oder Lieferantenangeboten schätzen kann.",
       "totalCostGap_other": "{{count}} Zutaten wurden aus Bestand ohne Kosten entnommen und fehlen daher in dieser Summe: {{names}}. Die Vorschau vor dem Speichern kann einen höheren Wert zeigen, weil sie fehlende Kosten aus anderem Bestand oder Lieferantenangeboten schätzen kann.",
       "estimatedAtCompletion": "Schätzung bei Abschluss",
-      "estimatedDifference": "Tatsächliche Abweichung: {{amount}}",
+      "estimatedOver": "Tatsächliche Kosten: {{amount}} über der Schätzung",
+      "estimatedUnder": "Tatsächliche Kosten: {{amount}} unter der Schätzung",
+      "estimatedOnTarget": "Tatsächliche Kosten entsprechen der Schätzung",
       "takenSoFar": "Bisher entnommen"
     },
     "ingredients": "Verbrauchte Zutaten",
@@ -525,6 +530,7 @@
     "advanced": "Erweitert",
     "advancedHint": "Regeln für Fehlmengen und Überproduktion. Die Standardwerte passen für eine kleine Werkstatt.",
     "laborHourlyRate": "Stundensatz für eigene Arbeit",
+    "laborHourlyRateUnit": "{{currency}} / Std.",
     "laborHourlyRateHint": "Die Arbeit einer Formel ist die Zeit ihrer Schritte zu diesem Satz. Null heißt, Arbeit kostet in Schätzungen nichts."
   },
   "availability": {

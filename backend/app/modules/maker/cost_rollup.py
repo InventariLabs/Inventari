@@ -110,22 +110,6 @@ def _rollup_from_flat(
     )
 
 
-async def compute_total_cost(
-    db: AsyncSession,
-    organization_id: UUID,
-    template_id: UUID,
-    qty: Decimal,
-    recipe_id: UUID | None = None,
-) -> Decimal:
-    """Sum shared estimated stock-unit costs over the exploded BOM.
-
-    Ingredients with no valuation rate (``None``) contribute zero — they
-    show up in ``cost_breakdown.missing_cost_lines`` for the caller.
-    """
-    rollup = await compute_cost_rollup(db, organization_id, template_id, qty, recipe_id)
-    return rollup.total
-
-
 def process_minutes(recipe: MakerRecipe) -> Decimal:
     """How long the formula's steps take, in minutes.
 

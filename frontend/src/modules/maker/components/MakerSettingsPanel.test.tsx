@@ -7,6 +7,10 @@ import { server } from "@/test/mocks/server";
 import { signInWith, signOut } from "@/test/auth";
 import { MakerSettingsPanel } from "./MakerSettingsPanel";
 
+vi.mock("@/hooks/useOrganizationCurrency", () => ({
+  useOrganizationCurrency: () => "PLN",
+}));
+
 vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
@@ -214,6 +218,7 @@ describe("MakerSettingsPanel — the rate the timed steps cost", () => {
 
     const rate = await screen.findByTestId("maker-settings-labor-rate");
     expect(rate).toBeVisible();
+    expect(screen.getByText("PLN / hour")).toBeInTheDocument();
     expect(
       screen.queryByTestId("maker-settings-labor-rate-save"),
     ).not.toBeInTheDocument();

@@ -108,20 +108,23 @@ function EstimatedCostTile({ order }: { order: ProductionOrder }) {
     order.total_cost === null || order.total_cost === undefined
       ? null
       : Number(order.total_cost) - Number(order.estimated_total_cost);
+  // Said in words, which way: a bare amount does not tell a cost above its
+  // estimate from one below it.
+  const differenceSentence = (amount: number): string => {
+    const money = formatMoney(Math.abs(amount), currency, i18n.language);
+    if (Math.abs(amount) < 0.005) return t("detail.card.estimatedOnTarget");
+    return t(
+      amount > 0 ? "detail.card.estimatedOver" : "detail.card.estimatedUnder",
+      { amount: money },
+    );
+  };
   return (
     <StatTile
       label={t("detail.card.estimatedAtCompletion", {
         defaultValue: "Estimated at completion",
       })}
       icon={<Target size={18} />}
-      note={
-        difference === null
-          ? undefined
-          : t("detail.card.estimatedDifference", {
-              defaultValue: "Actual difference: {{amount}}",
-              amount: formatMoney(difference, currency, i18n.language),
-            })
-      }
+      note={difference === null ? undefined : differenceSentence(difference)}
     >
       {formatMoney(order.estimated_total_cost, currency, i18n.language)}
     </StatTile>
