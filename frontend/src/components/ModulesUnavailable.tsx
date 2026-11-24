@@ -17,8 +17,11 @@ import { Button } from "./ui/Button";
  */
 export default function ModulesUnavailable({
   onRetry,
+  reason = "list",
 }: {
   onRetry: () => Promise<void>;
+  /** `chunks`: the list was read, but the code of a module on it did not load. */
+  reason?: "list" | "chunks";
 }) {
   const { t } = useTranslation("common");
   const [isRetrying, setIsRetrying] = useState(false);
@@ -32,10 +35,18 @@ export default function ModulesUnavailable({
         <LayoutGrid className="w-9 h-9" />
       </div>
       <h1 className="text-2xl font-semibold text-on mb-2">
-        {t("errors.modulesUnavailableTitle")}
+        {t(
+          reason === "chunks"
+            ? "errors.modulesNotLoadedTitle"
+            : "errors.modulesUnavailableTitle",
+        )}
       </h1>
       <p className="text-on-secondary mb-8 max-w-md">
-        {t("errors.modulesUnavailableBody")}
+        {t(
+          reason === "chunks"
+            ? "errors.modulesNotLoadedBody"
+            : "errors.modulesUnavailableBody",
+        )}
       </p>
       <Button
         onClick={async () => {

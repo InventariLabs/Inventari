@@ -1258,7 +1258,9 @@
     "sessionEndedReadUnsaved": "Sua sessão terminou, então o que você digitou nesta tela não foi mantido. Entre novamente e comece de novo.",
     "imageFormatUnsupported": "Este formato de imagem não é compatível. Use uma imagem JPG, PNG, GIF ou WebP.",
     "modulesUnavailableTitle": "Não foi possível ler a lista de módulos",
-    "modulesUnavailableBody": "A lista de módulos ativados da sua organização não pôde ser lida, então os espaços de trabalho não podem ser nomeados. Nada foi perdido — tente de novo em instantes; se continuar falhando, fale com quem administra esta instalação."
+    "modulesUnavailableBody": "A lista de módulos ativados da sua organização não pôde ser lida, então os espaços de trabalho não podem ser nomeados. Nada foi perdido — tente de novo em instantes; se continuar falhando, fale com quem administra esta instalação.",
+    "modulesNotLoadedTitle": "Uma parte do aplicativo não carregou",
+    "modulesNotLoadedBody": "Um módulo usado pela sua organização não pôde ser carregado, o que costuma acontecer logo após uma atualização. Nada foi perdido — recarregue a página; se continuar falhando, fale com quem administra esta instalação."
   },
   "a11y": {
     "skipToContent": "Pular para o conteúdo",

@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 import { moduleRegistry } from "./registry";
 import { registerModules } from "./moduleLoaders";
@@ -20,6 +20,12 @@ import { registerModules } from "./moduleLoaders";
 // transitively imports their `module.ts`.
 const IMPORTED = "recipes";
 const NOT_IMPORTED = "webhooks";
+const BROKEN = "api_keys";
+
+// A chunk that is gone after a deploy: the import itself rejects.
+vi.mock("../../modules/api_keys/module.ts", () => {
+  throw new TypeError("Failed to fetch dynamically imported module");
+});
 
 describe("registerModules", () => {
   it("imports the module it is given — a module it is not given stays out", async () => {
@@ -34,7 +40,7 @@ describe("registerModules", () => {
     // `module.ts` under src/modules/ — core surfaces, not modules.
     await expect(
       registerModules(["core", "items", "locations", IMPORTED]),
-    ).resolves.toBeUndefined();
+    ).resolves.toEqual([]);
 
     expect(moduleRegistry.getModule(IMPORTED)).toBeDefined();
   });
@@ -49,5 +55,19 @@ describe("registerModules", () => {
     expect(
       moduleRegistry.getAllRegisteredModules().filter((n) => n === IMPORTED),
     ).toHaveLength(1);
+  });
+
+  it("names the modules whose chunk did not load, and still registers the rest", async () => {
+    const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+    const failed = await registerModules([BROKEN, IMPORTED]);
+
+    expect(errors).toHaveBeenCalled();
+    expect(failed).toEqual([BROKEN]);
+    expect(moduleRegistry.getModule(BROKEN)).toBeUndefined();
+    expect(moduleRegistry.getModule(IMPORTED)).toBeDefined();
+  });
+
+  it("reports nothing failed when every chunk loads", async () => {
+    await expect(registerModules([IMPORTED])).resolves.toEqual([]);
   });
 });
