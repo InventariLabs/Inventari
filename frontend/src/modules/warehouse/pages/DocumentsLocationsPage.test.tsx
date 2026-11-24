@@ -371,6 +371,26 @@ describe("DocumentsLocationsPage — the shelves of one warehouse", () => {
     // 130 rows, each with its 44 px label, drawn twice: slow on a loaded runner.
   }, 30_000);
 
+  it("opens on the first top-level place, asked as one row without record counts", async () => {
+    const probes: URLSearchParams[] = [];
+    const listen = ({ request }: { request: Request }) => {
+      const params = new URL(request.url).searchParams;
+      if (params.get("top_level")) probes.push(params);
+    };
+    serveOverview();
+    server.events.on("request:start", listen);
+    try {
+      render(<DocumentsLocationsPage />);
+
+      expect(await screen.findByText("Shelf A")).toBeInTheDocument();
+      expect(probes).toHaveLength(1);
+      expect(probes[0].get("limit")).toBe("1");
+      expect(probes[0].get("counts")).toBe("false");
+    } finally {
+      server.events.removeListener("request:start", listen);
+    }
+  });
+
   it("says when stock without a limit is left out of the percentage", async () => {
     // A cap for a product that is not on the shelf reads 0/200 while 28
     // other records stand there uncapped. The percentage counts only the

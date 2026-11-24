@@ -133,6 +133,23 @@ const ROWS_PAGE = 100;
 const SEARCH_DEBOUNCE_MS = 300;
 
 /**
+ * Where the table starts when the reader has not chosen: the first top-level
+ * place, asked as a one-row page without record counts.
+ */
+function useFirstTopLevelPlace() {
+  return useQuery({
+    queryKey: [...queryKeys.storages.all, "shelf-settings", "first"],
+    queryFn: () =>
+      storagesApi.getPage({
+        top_level: true,
+        exclude_module_contexts: true,
+        counts: false,
+        limit: 1,
+      }),
+  });
+}
+
+/**
  * The places of one warehouse, a page at a time.
  *
  * The warehouse itself comes by id and what stands below it from the
@@ -330,24 +347,13 @@ export default function DocumentsLocationsPage() {
   const queryClient = useQueryClient();
   const { confirm, confirmDialogProps } = useConfirm();
 
-  // Where the table starts when the reader has not chosen: the first
-  // top-level place, asked as a one-row page.
   const {
     data: firstTopLevel,
     isLoading: topLevelLoading,
     isError: topLevelError,
     error: topLevelFailure,
     refetch: refetchTopLevel,
-  } = useQuery({
-    queryKey: [...queryKeys.storages.all, "shelf-settings", "first"],
-    queryFn: () =>
-      storagesApi.getPage({
-        top_level: true,
-        exclude_module_contexts: true,
-        counts: false,
-        limit: 1,
-      }),
-  });
+  } = useFirstTopLevelPlace();
 
   const {
     data: capacity,
