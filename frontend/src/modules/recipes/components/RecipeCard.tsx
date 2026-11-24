@@ -115,7 +115,11 @@ export const RecipeCard = memo(function RecipeCard({
         to={linkTo}
         ref={setNodeRef}
         style={dragStyle}
-        {...(dragEnabled ? { ...attributes, ...listeners } : {})}
+        // The drag attributes say `role="button"`; the card is a link with
+        // buttons of its own inside, and a button may hold no other control.
+        {...(dragEnabled
+          ? { ...attributes, ...listeners, role: undefined }
+          : {})}
         className={cn(
           "flex flex-1 flex-col",
           dragEnabled && "cursor-grab active:cursor-grabbing",
