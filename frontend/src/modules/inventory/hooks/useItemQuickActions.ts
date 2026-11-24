@@ -9,6 +9,7 @@ import { useStockExit } from "./useStockExit";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import { toAmount } from "@/utils/formatters";
 import { logger } from "@/utils/logger";
+import { isEquipmentRecord } from "@/modules/shared/lib/equipmentRecord";
 import type { Item } from "@/types";
 import {
   useConsumeItem,
@@ -73,7 +74,7 @@ export function useItemQuickActions(
   const { t } = useTranslation(["labels", "common", "items", "equipment"]);
   const canWrite = useCanWrite("items");
   const canDelete = useHasPermission("items:delete");
-  const isEquipmentItem = item.category?.context_tag === "equipment";
+  const isEquipmentItem = isEquipmentRecord(item);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
   const consumeItemMutation = useConsumeItem();

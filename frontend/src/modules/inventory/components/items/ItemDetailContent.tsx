@@ -1,4 +1,5 @@
 import { isVirtualUsage } from "@/modules/shared/lib/storageUsage";
+import { isEquipmentRecord } from "@/modules/shared/lib/equipmentRecord";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -64,10 +65,10 @@ export default function ItemDetailContent({ item }: { item: Item }) {
   const locationName = places.get(item.location_id)?.name;
   const inVirtualPlace = isVirtualUsage(places.get(item.location_id)?.usage);
   // An asset is returned and disposed of, a product topped up and deleted:
-  // the header's words switch with the category, and the note says why —
-  // to an account offered the actions at all.
+  // the header's words switch with the record's ownership, and the note says
+  // why — to an account offered the actions at all.
   const vocabularyNote =
-    canWrite && item.category?.context_tag === "equipment"
+    canWrite && isEquipmentRecord(item)
       ? t("items:quickActions.equipmentNote")
       : null;
 
