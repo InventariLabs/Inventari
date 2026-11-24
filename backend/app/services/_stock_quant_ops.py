@@ -282,6 +282,28 @@ async def _lock_many_anchors_async(
     return {(tpl, shelf) for tpl, shelf in locked.all()}
 
 
+async def _consumed_place_id_async(
+    db: AsyncSession, organization_id: UUID
+) -> UUID | None:
+    """The place an emptied record is filed under, or None while there is none.
+
+    Read once per transaction when there is one: it is asked for by every
+    lock of a product, and the answer does not change once the place exists.
+    """
+    from app.models.storage_location import LocationUsage
+    from app.services.storage._defaults import get_virtual_location_async
+
+    known = transaction_memo(db, 'consumed_place', dict[UUID, UUID])
+    if organization_id not in known:
+        place = await get_virtual_location_async(
+            db, str(organization_id), LocationUsage.CUSTOMER
+        )
+        if place is None:
+            return None
+        known[organization_id] = place.id
+    return known[organization_id]
+
+
 async def lock_stock_async(
     db: AsyncSession,
     organization_id: UUID,
@@ -320,7 +342,10 @@ async def lock_stock_async(
     """
     keys = list(keys)
     templates = sorted({tpl for tpl, loc in keys if loc is None})
-    shelves = sorted({(tpl, loc) for tpl, loc in keys if loc is not None})
+    named = {(tpl, loc) for tpl, loc in keys if loc is not None}
+    if templates and (place := await _consumed_place_id_async(db, organization_id)):
+        named |= {(tpl, place) for tpl in templates}
+    shelves = sorted(named)
     held_templates, held_pairs = _held_locks(db)
     # What this transaction already holds is not asked for again: a document
     # posting line by line names the same groups from every layer it passes
@@ -411,6 +436,7 @@ async def _plan_under_the_anchors_async(
     any_owner: bool = False,
     lot_id: UUID | None = None,
     require_active_lot: bool = True,
+    file_when_emptied: bool = False,
 ) -> DrawPlan:
     """Lock the groups a draw may take from, then plan it from their records.
 
@@ -421,11 +447,16 @@ async def _plan_under_the_anchors_async(
     shelves the plan drew on that the transaction does not hold are locked
     by name and the plan read again, until it names none it does not hold.
     Anchors already held cost nothing; a new one is a key taken late, which
-    ``lock_stock_async`` allows at the price it names.
+    ``lock_stock_async`` allows at the price it names. A draw that files the
+    records it empties locks the Consumed place with its shelf, not when the
+    first record is filed.
     """
-    held = await lock_stock_async(
-        db, organization_id, keys=[(product_template_id, storage_location_id)]
-    )
+    keys: list[tuple[UUID, UUID | None]] = [(product_template_id, storage_location_id)]
+    if file_when_emptied and (
+        place := await _consumed_place_id_async(db, organization_id)
+    ):
+        keys.append((product_template_id, place))
+    held = await lock_stock_async(db, organization_id, keys=keys)
     while True:
         plan = await plan_draw_async(
             db,
@@ -569,6 +600,7 @@ async def take_from_the_records_async(
         any_owner=any_owner,
         lot_id=lot_id,
         require_active_lot=require_active_lot,
+        file_when_emptied=file_when_emptied,
     )
     if storage_location_id is None:
         if plan.free < quantity:
