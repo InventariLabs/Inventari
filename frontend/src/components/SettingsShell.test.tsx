@@ -242,8 +242,8 @@ describe("SettingsShell access", () => {
   });
 
   it("names a module's settings page in the phone picker, not General", () => {
-    // /settings/modules/:name is no entry of the list, so the bar used to fall
-    // back to its first one and read "General" above a card about webhooks.
+    // /settings/modules/:name is no entry of the list: the bar names the page
+    // by its own header, and never claims the first entry, General.
     renderAt("/settings/modules/webhooks", "admin", ["admin:access"]);
 
     const picker = screen.getByRole("button", { name: "Webhooks" });
