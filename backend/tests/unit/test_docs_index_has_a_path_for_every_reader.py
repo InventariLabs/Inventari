@@ -51,6 +51,7 @@ _GUIDES = {
     ),
     'Running and maintaining it': (
         '../QUICK_DEPLOY.md',
+        'HOME_INSTALL.md',
         '../DEPLOYMENT.md',
         '../SECURITY.md',
         'SCALING.md',

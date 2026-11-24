@@ -42,7 +42,7 @@ It uses Core for shared inventory operations and exposes public extension
 points for a module with rules of its own, such as
 [Lot certificates](../examples/lot_certificates/README.md).
 
-![The documents list: two receipts from Highland Roasters and Olivar Groves and five deliveries to cafés, delis and grocers, each with its number, status, date, partner, location, the customer's order or the supplier's delivery note, its value and its lines; the two orders Priya Nair is picking show her name and their progress](images/documents.webp)
+![The documents list: two receipts from Highland Roasters and Olivar Groves and five deliveries to cafés, delis and grocers, each with its number, status, date, partner, location, the customer's order or the supplier's invoice or delivery note, its value and its lines; the two orders Priya Nair is picking show her name and their progress](images/documents.webp)
 
 **Documents** — every receipt and delivery as a numbered document, with where
 each one stands.
@@ -94,7 +94,7 @@ it, and hear back about what is broken.
 **Recipes** — "I can cook" means every ingredient is on the shelf; the near
 misses say what they are short of.
 
-![This week's meal plan: breakfast and dinner over seven days, the meal still to cook marked Cook Now, and under the week each day's carbohydrates, protein, fat and calories for one serving of each planned meal](images/meal-plan.webp)
+![This week's meal plan: breakfast and dinner over seven days, the meal still to cook, from today on, marked Cook Now, and under the week each day's carbohydrates, protein, fat and calories for one serving of each planned meal, with a note on the days whose ingredients have nutrition data only in part](images/meal-plan.webp)
 
 **Meal planner** — a week of meals cooked from stock, with what each day adds
 up to.

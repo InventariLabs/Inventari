@@ -39,16 +39,6 @@ export function getCategoryLabel(
   return key ? translate(t, key, category.name) : category.name;
 }
 
-/**
- * Whether the register lists this record: filed under a category carrying the
- * equipment context tag, or — under no category — holding the module's
- * namespace in its metadata (the mirror of the backend's ownership predicate).
- */
-export function isEquipmentRecord(item: Item): boolean {
-  if (item.category) return item.category.context_tag === "equipment";
-  return item.metadata?.equipment != null;
-}
-
 export function getEquipmentMeta(item: Item) {
   const meta = item.metadata?.equipment as Record<string, unknown> | undefined;
   return {

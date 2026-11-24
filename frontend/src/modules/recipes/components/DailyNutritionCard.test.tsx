@@ -33,14 +33,14 @@ describe("DailyNutritionCard — where the totals come from", () => {
 describe("DailyNutritionCard — a value stays whole", () => {
   it("keeps every number with its unit on one line", () => {
     render(<DailyNutritionCard days={[day(false)]} />);
-    for (const text of ["130 g", "24 g", "10 g", "700 kcal"]) {
+    for (const text of ["130.0 g", "24.0 g", "10.0 g", "700 kcal"]) {
       expect(screen.getByText(text)).toHaveClass("whitespace-nowrap");
     }
     expect(screen.getByText("Calories")).toHaveClass("whitespace-nowrap");
   });
 });
 
-describe("DailyNutritionCard — the reader's decimal mark", () => {
+describe("DailyNutritionCard — the reader's decimal mark and an estimate's precision", () => {
   it("writes fractional totals with the decimal comma on a Polish screen", async () => {
     await withLanguage("pl", () => {
       render(
@@ -56,7 +56,7 @@ describe("DailyNutritionCard — the reader's decimal mark", () => {
           ]}
         />,
       );
-      for (const text of ["13,8 g", "0,87 g", "4 g", "121,99 kcal"]) {
+      for (const text of ["13,8 g", "0,9 g", "4,0 g", "122 kcal"]) {
         expect(screen.getByText(text)).toBeInTheDocument();
       }
     });

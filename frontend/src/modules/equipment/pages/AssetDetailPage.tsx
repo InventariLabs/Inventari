@@ -35,10 +35,8 @@ import { useApprovalStatus } from "@/modules/equipment/hooks/useMyAssets";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
-import {
-  getEquipmentMeta,
-  isEquipmentRecord,
-} from "@/modules/equipment/components/assetUtils";
+import { getEquipmentMeta } from "@/modules/equipment/components/assetUtils";
+import { isEquipmentRecord } from "@/modules/shared/lib/equipmentRecord";
 import type { EquipmentAssignment } from "@/modules/equipment/api/equipment";
 
 type Tab = "timeline" | "info" | "assignments" | "maintenance";

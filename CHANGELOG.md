@@ -34,6 +34,12 @@ says what the release does rather than what changed since them.
   screens say what they are: a formula opens rather than offering "Edit BOM"
   to an account that cannot manage it, and a viewer of module settings reads
   the read-only sentence rather than "you can use this".
+- A record the equipment register lists under no category — one carrying the
+  equipment namespace in its metadata — opens on the asset's own page, and the
+  product's page offers it Return and Dispose instead of Remove 1 unit and
+  Delete. Both screens and the register read one predicate, in the register's
+  order: the category first, then whether the namespace is present, a JSON
+  null counted as present.
 - A delivery or a write-off that takes the last unit of a record no longer
   leaves it standing on its shelf at zero: the emptied record is filed under
   the Consumed place, as one used up by hand is, and a correction of that
@@ -58,6 +64,11 @@ says what the release does rather than what changed since them.
 - Concurrent changes of an organization's default tax rate take their locks
   in one order, so two saves no longer deadlock and wait for the retry
   middleware.
+- The meal plan's daily nutrition table adds up one serving of each planned
+  meal, as its note says, so a dish planned for eight no longer reads as one
+  person's day, and `daily_nutrition_summary` carries the same totals. Grams
+  show one decimal and calories none, as on a recipe's own card, so the
+  Calories column stays on a phone screen.
 - Printouts and print templates say what they mean. An organization's own
   template prints nothing, not the word "None", where a value is empty (a
   supplier without a tax id, an order without a supplier), and the purchase
@@ -121,6 +132,9 @@ says what the release does rather than what changed since them.
 - *Order what is missing* names the product's stock unit on the order line
   when the supplier's price names no unit of its own: 5 kg of oats is ordered
   and received as kilograms, not as "units".
+- The application answers `/robots.txt` with a file that disallows every
+  crawler, instead of its own HTML page, so a search engine is told to stay
+  away from an instance and the sign-in behind it.
 
 ## v0.13.0 - 2026-11-23
 

@@ -24,6 +24,7 @@ ships with the repository, not a guide.
 | Document | Topic |
 |---|---|
 | [QUICK_DEPLOY.md](../QUICK_DEPLOY.md) | Deploy to a VPS with automatic HTTPS in six steps |
+| [HOME_INSTALL.md](HOME_INSTALL.md) | Install on a computer at home with no domain: a name on the home network, a certificate from Caddy's own authority, trusting it on phones |
 | [DEPLOYMENT.md](../DEPLOYMENT.md) | Full deployment guide — [updating](../DEPLOYMENT.md#updating), [database backups](../DEPLOYMENT.md#database-backups), [putting a backup back](../DEPLOYMENT.md#putting-a-backup-back), [rebuilding on a new server](../DEPLOYMENT.md#rebuilding-on-a-new-server), [troubleshooting](../DEPLOYMENT.md#troubleshooting) |
 | [SECURITY.md](../SECURITY.md) | Reporting a vulnerability, supported versions, responsible disclosure |
 | [SCALING.md](SCALING.md) | Running more than one backend replica |
