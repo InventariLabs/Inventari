@@ -11,9 +11,9 @@
  * without recording anything has not used the thread, and the dinner it was
  * picked for is still waiting to be cooked.
  */
+import { useState } from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { useState } from "react";
 import { RecipeCookingFlow } from "./RecipeCookingFlow";
 
 const seen = vi.hoisted(() => ({ sessionIds: [] as (string | undefined)[] }));
