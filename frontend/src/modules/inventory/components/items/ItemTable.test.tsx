@@ -548,7 +548,7 @@ describe("ItemTable — symmetric quantity actions", () => {
     render(
       <ItemTable
         {...baseProps}
-        items={[makeItem("1", { quantity: 0 }), makeItem("2")]}
+        items={[makeItem("1", { quantity: "0" }), makeItem("2")]}
       />,
     );
 

@@ -897,7 +897,8 @@ describe("decodeAtCameraResolution", () => {
     const { canvas, draw, context } = setup();
     const video = document.createElement("video");
     // A torn-down video reports no picture: sizes that are not numbers.
-    for (const size of [undefined, Number.NaN, 0]) {
+    const sizes = [undefined, Number.NaN, 0] as unknown as number[];
+    for (const size of sizes) {
       expect(() =>
         context.drawImage(video, 0, 0, size, size, 0, 0, 288, 173),
       ).not.toThrow();
