@@ -330,11 +330,13 @@ test.describe("Phone lists — the first record is above the fold", () => {
       metadata: { equipment: { equipment_status: "AVAILABLE" } },
     });
     cleanup.push(() => api.deleteItem(token, asset.id));
-    await api.checkoutAsset(token, {
+    const assignment = await api.checkoutAsset(token, {
       item_id: asset.id,
       assigned_to_name: "Admin",
       assigned_to_email: ADMIN_EMAIL,
     });
+    // Run before the delete above: an asset still checked out is refused.
+    cleanup.push(() => api.checkinAsset(token, assignment.id));
     const model = await api.createModel(token, { name: `${tag} model` });
     cleanup.push(() => api.deleteModel(token, model.id));
     const campaign = await api.createCampaign(token, {
@@ -487,6 +489,8 @@ test.describe("Phone lists — the first record is above the fold", () => {
 
   test.afterAll(async () => {
     // Last created, first removed: the storage goes after what lies in it.
+    // A step that fails must not stop the ones after it: each removes its own
+    // rows, and the E2E sweep takes what a failure leaves.
     for (const undo of cleanup.reverse()) await undo().catch(() => {});
   });
 

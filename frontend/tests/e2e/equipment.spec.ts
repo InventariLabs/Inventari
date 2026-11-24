@@ -136,17 +136,28 @@ test.describe("Equipment — assets & seeding", () => {
     authenticatedPage,
   }) => {
     await page.goto("/equipment/assets");
-    const row = page.getByText("E2E-Test-Laptop");
-    const rowVisible = await row
-      .isVisible({ timeout: 5000 })
-      .catch(() => false);
-    if (rowVisible) {
-      await row.click();
-      await page.waitForURL(/.*equipment\/[a-f0-9-]+/, { timeout: 10000 });
-      await expect(page.getByRole("heading").first()).toBeVisible({
-        timeout: 10000,
-      });
-    }
+    await page.getByPlaceholder(/search assets/i).fill("E2E-Test-Laptop");
+    await page.getByText("E2E-Test-Laptop").first().click({ timeout: 15000 });
+    await page.waitForURL(/.*equipment\/[a-f0-9-]+/, { timeout: 10000 });
+    await expect(page.getByRole("heading").first()).toBeVisible({
+      timeout: 10000,
+    });
+  });
+
+  test("edit equipment page loads (seeded asset)", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    expect(
+      assetId,
+      "assetId set by the beforeAll of this describe",
+    ).toBeTruthy();
+    await page.goto(`/equipment/${assetId}`);
+    await page.getByRole("link", { name: "Edit asset" }).click({
+      timeout: 15000,
+    });
+    await expect(page).toHaveURL(new RegExp(`/equipment/${assetId}/edit$`));
+    await expect(page.locator("form").first()).toBeVisible({ timeout: 10000 });
   });
 
   test("equipment detail page loads by ID", async ({
@@ -170,40 +181,6 @@ test.describe("Equipment — sub-pages", () => {
       .locator('h1, h2, form, [role="main"], main')
       .first();
     await expect(anyContent).toBeVisible({ timeout: 15000 });
-  });
-
-  test("edit equipment page loads (seeded asset)", async ({
-    page,
-    authenticatedPage,
-  }) => {
-    // This depends on the seeded 'E2E-Test-Laptop' from the assets describe block,
-    // but that runs in a different describe context. We navigate by URL pattern.
-    await page.goto("/equipment/assets");
-    const detailLink = page.getByText("E2E-Test-Laptop").first();
-    if (await detailLink.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await detailLink.click();
-      await page
-        .getByRole("button", { name: /edit|edytuj/i })
-        .first()
-        .waitFor({ state: "visible", timeout: 3000 })
-        .catch(() => {});
-      // Look for an edit button and click it
-      const editBtn = page
-        .getByRole("button", { name: /edit|edytuj/i })
-        .first();
-      if (await editBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-        await editBtn.click();
-        await page
-          .locator('[role="dialog"], input[type="text"], form')
-          .first()
-          .waitFor({ state: "visible", timeout: 3000 })
-          .catch(() => {});
-        const formOrDialog = page
-          .locator('[role="dialog"], input[type="text"], form')
-          .first();
-        await expect(formOrDialog).toBeVisible({ timeout: 5000 });
-      }
-    }
   });
 
   test("equipment categories page loads", async ({
@@ -549,7 +526,12 @@ test.describe("Equipment — checkout from detail header", () => {
 
   test.afterAll(async () => {
     if (token && assetId) {
-      await api.deleteItem(token, assetId).catch(() => {});
+      // The test checks the asset out in the browser; it goes back in before
+      // the delete, which an asset on loan refuses.
+      for (const a of await api.listItemAssignments(token, assetId)) {
+        if (!a.checked_in_at) await api.checkinAsset(token, a.id);
+      }
+      await api.deleteItem(token, assetId);
     }
   });
 
@@ -721,13 +703,12 @@ test.describe("Equipment — models CRUD", () => {
 
   test("clones model via API", async () => {
     expect(modelId, "modelId set by an earlier step of this spec").toBeTruthy();
+    const cloned = await api.cloneModel(token, modelId);
     try {
-      const cloned = await api.cloneModel(token, modelId);
       expect(cloned.id).toBeTruthy();
       expect(cloned.id).not.toBe(modelId);
-      await api.deleteModel(token, cloned.id).catch(() => {});
-    } catch {
-      // Clone endpoint may not be available — not a blocker
+    } finally {
+      await api.deleteModel(token, cloned.id);
     }
   });
 
@@ -751,16 +732,51 @@ test.describe("Equipment — campaigns", () => {
   let api: ApiHelper;
   let token: string;
   let campaignId: string;
+  let launched = false;
+  let assetId = "";
+  let assignmentId = "";
+  let categoryId = "";
 
   test.beforeAll(async ({ playwright, baseURL }) => {
     const requestContext = await playwright.request.newContext({ baseURL });
     api = new ApiHelper(requestContext);
     const authData = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
     token = authData.access_token;
+
+    // A campaign needs an asset somebody holds. A category of its own keeps
+    // it to this one, whatever other specs have checked out.
+    const storages = await api.listStorages(token);
+    const storageId = process.env.E2E_STORAGE_ID || storages[0]?.id || "";
+    const category = await api.createCategoryIdempotent(token, {
+      name: `E2E-Campaign-Category-${Date.now()}`,
+      context_tag: "equipment",
+    });
+    categoryId = category.id;
+    const item = await api.createEquipmentItem(token, {
+      name: "E2E-Campaign-Asset",
+      quantity: 1,
+      location_id: storageId,
+      category_id: categoryId,
+    });
+    assetId = item.id;
+    const assignment = await api.checkoutAsset(token, {
+      item_id: assetId,
+      assigned_to_name: "E2E Campaign Holder",
+      assigned_to_email: `e2e-campaign-${Date.now()}@example.com`,
+    });
+    assignmentId = assignment.id;
   });
 
   test.afterAll(async () => {
-    // Campaigns can't be easily deleted — leave as-is
+    // A launched campaign is called off (a delete is refused), a draft is
+    // deleted; the asset is checked in before it goes, or it is refused too.
+    if (campaignId) {
+      if (launched) await api.cancelCampaign(token, campaignId);
+      else await api.deleteCampaign(token, campaignId);
+    }
+    if (assignmentId) await api.checkinAsset(token, assignmentId);
+    if (assetId) await api.removeItemForGood(token, assetId);
+    if (categoryId) await api.deleteCategory(token, categoryId);
   });
 
   test("creates a campaign via API", async () => {
@@ -769,7 +785,8 @@ test.describe("Equipment — campaigns", () => {
     const campaign = await api.createCampaign(token, {
       name: `E2E-Campaign-${Date.now()}`,
       description: "E2E audit campaign",
-      scope_type: "ALL",
+      scope_type: "CATEGORY",
+      scope_filter_id: categoryId,
       deadline: deadline.toISOString(),
     });
     campaignId = campaign.id;
@@ -779,6 +796,7 @@ test.describe("Equipment — campaigns", () => {
   test("lists campaigns", async () => {
     const campaigns = await api.listCampaigns(token);
     expect(Array.isArray(campaigns)).toBe(true);
+    expect(campaigns.map((c) => c.id)).toContain(campaignId);
   });
 
   test("launches campaign via API", async () => {
@@ -786,12 +804,11 @@ test.describe("Equipment — campaigns", () => {
       campaignId,
       "campaignId set by an earlier step of this spec",
     ).toBeTruthy();
-    try {
-      const result = await api.launchCampaign(token, campaignId);
-      expect(result).toBeTruthy();
-    } catch {
-      // Launch may fail if no assets — acceptable
-    }
+    const result = await api.launchCampaign(token, campaignId);
+    launched = true;
+    expect(result).toBeTruthy();
+    const { responses } = await api.getCampaign(token, campaignId);
+    expect(responses).toHaveLength(1);
   });
 
   test("campaigns page loads", async ({ page, authenticatedPage }) => {
