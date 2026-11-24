@@ -52,7 +52,11 @@ from app.core.contracts import LotStatus, UserContextDTO
 from app.core.public_api import core_api
 
 from . import document_types as dt
-from .document_query_service import list_documents, not_undone_conditions
+from .document_query_service import (
+    LocationEpochs,
+    list_documents,
+    not_undone_conditions,
+)
 from .models import (
     Document,
     DocumentLine,
@@ -370,11 +374,14 @@ async def completed_documents_async(
     since: datetime,
     limit: int,
     location_ids: list[UUID] | None = None,
+    location_epochs: LocationEpochs | None = None,
 ) -> tuple[list[Document], int]:
     """Receipts and dispatches posted since ``since``, newest first.
 
     The work that was done, for the part of To do that shows it: nothing here
-    is asked of anybody any more.
+    is asked of anybody any more. With ``location_epochs`` a document stands
+    in the place its shelf was in when it was done, however far the shelf has
+    been carried since.
     """
     return await list_documents(
         db,
@@ -383,6 +390,7 @@ async def completed_documents_async(
         status=DocumentStatus.COMPLETED.value,
         completed_from=since,
         location_ids=location_ids,
+        location_epochs=location_epochs,
         limit=limit,
         # Newest posted first, by the time the card prints: ordered by when
         # it was typed in, an order written last week and dispatched a minute

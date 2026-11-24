@@ -47,6 +47,7 @@ from ._schemas_work_items import (
 )
 from ._wms_session_ops import cancel_empty_session_holding_async
 from .backorder_cover_service import StockCover, backorder_cover_async
+from .document_query_service import LocationEpochs
 from .document_todo_service import completed_documents_async, line_tallies_async
 from .models import CUSTOM_SOURCE_KIND, Document, WorkItemOverlay
 from .putaway_work_service import putaway_items_async
@@ -314,6 +315,7 @@ async def assemble_work_items_async(
     approvals: list[Document],
     documents_total: int,
     location_ids: list[UUID] | None = None,
+    location_epochs: LocationEpochs | None = None,
 ) -> WorkItemsSection:
     """Every task the reader can see, soonest first.
 
@@ -332,7 +334,8 @@ async def assemble_work_items_async(
     the open tasks; ``done_since`` shortens that to the reader's own day.
     ``location_ids`` (a warehouse and the places under it) keeps the putaway
     and posted-document tasks that stand in them; the sources the caller read
-    were narrowed the same way.
+    were narrowed the same way. ``location_epochs`` makes a posted document
+    stand in the place its shelf was in when it was done, not where it is now.
     """
     window_start = datetime.now(UTC) - _DONE_WINDOW
     if done_since is not None:
@@ -398,6 +401,7 @@ async def assemble_work_items_async(
             since=done_since,
             limit=reach or limit,
             location_ids=location_ids,
+            location_epochs=location_epochs,
         )
         tallies = await line_tallies_async(db, [doc.id for doc in posted])
         items += [
