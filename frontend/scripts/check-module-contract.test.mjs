@@ -2,7 +2,9 @@ import { describe, it, expect } from "vitest";
 import {
   breakingChanges,
   contractFromSources,
+  fieldFindings,
   guideFindings,
+  readFieldTable,
   readGuideTable,
 } from "./check-module-contract.mjs";
 
@@ -95,6 +97,21 @@ const GUIDE = `# Guide
 > **Status semantics — what does "Active" vs "Extension point" mean for you?**
 `;
 
+const FIELDS = `# Guide
+
+## \`FrontendModule\` Interface Reference
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| \`name\` | \`string\` | Yes | Unique identifier. |
+| \`routes\` | \`ModuleRoute[]\` | Yes | Routes. |
+| \`slots\` | \`SlotContribution[]\` | No | Slot contributions. |
+| \`theme\` | \`{ cssVariables: Record<string, string> }\` | No | Variables. |
+| \`searchProvider\` | \`SearchProvider\` | No | Search. |
+
+---
+`;
+
 // Every case builds one to three TypeScript programs, and each program parses
 // the standard library from disk: about a second of CPU a case on an idle
 // host, and 15 s when another full suite shares the machine. The budget
@@ -145,15 +162,18 @@ describe("check-module-contract", { timeout: 60_000 }, () => {
       type: "string",
     });
     expect(recorded.slotContribution.props.priority.optional).toBe(true);
-    expect(
-      recorded.frontendModule.props.searchProvider.type.fn.params,
-    ).toEqual([{ name: "query", optional: false, type: "string" }]);
+    expect(recorded.frontendModule.props.searchProvider.type.fn.params).toEqual(
+      [{ name: "query", optional: false, type: "string" }],
+    );
   });
 
   it("passes an added slot, an added prop and a required -> optional change", () => {
     const before = contract();
     const after = contract({
-      interfaces: INTERFACES.replace("component: unknown", "component?: unknown"),
+      interfaces: INTERFACES.replace(
+        "component: unknown",
+        "component?: unknown",
+      ),
       slots: SLOTS.replace(
         "    storageType?: string;",
         "    storageType?: string;\n    categoryContextTag?: string;",
@@ -260,7 +280,10 @@ describe("check-module-contract", { timeout: 60_000 }, () => {
     // interface it names changes.
     const before = contract();
     const after = contract({
-      types: TYPES.replace("  name: string;\n  barcode?", "  name: number;\n  barcode?"),
+      types: TYPES.replace(
+        "  name: string;\n  barcode?",
+        "  name: number;\n  barcode?",
+      ),
     });
 
     expect(breakingChanges(before, after)).toEqual([
@@ -299,7 +322,10 @@ describe("check-module-contract", { timeout: 60_000 }, () => {
   it("fails a new required field at any depth — only optional fields may be added", () => {
     const before = contract();
     const after = contract({
-      types: TYPES.replace("  quantity: string;", "  quantity: string;\n  sku: string;"),
+      types: TYPES.replace(
+        "  quantity: string;",
+        "  quantity: string;\n  sku: string;",
+      ),
     });
 
     expect(breakingChanges(before, after)).toEqual([
@@ -454,10 +480,65 @@ describe("check-module-contract", { timeout: 60_000 }, () => {
       guideFindings(
         slots,
         rows,
-        new Set(["item_edit_extra", "stock_action_extra", "global_notifications"]),
+        new Set([
+          "item_edit_extra",
+          "stock_action_extra",
+          "global_notifications",
+        ]),
       ),
     ).toEqual([
       'GUIDE STATUS  global_notifications — table says "Render site only (extension point)", an in-tree module contributes to it',
+    ]);
+  });
+
+  it("passes a field table that matches FrontendModule", () => {
+    const fields = contract().frontendModule.props;
+
+    expect(readFieldTable(FIELDS).map((row) => row.name)).toEqual([
+      "name",
+      "routes",
+      "slots",
+      "theme",
+      "searchProvider",
+    ]);
+    expect(fieldFindings(fields, readFieldTable(FIELDS))).toEqual([]);
+  });
+
+  it("fails a field with no row, a row for no field and a duplicated row", () => {
+    const fields = contract().frontendModule.props;
+    const rows = readFieldTable(
+      FIELDS.replace(
+        "| \`slots\` | \`SlotContribution[]\` | No | Slot contributions. |\n",
+        "",
+      ).replace(
+        "\n---",
+        "| \`ghost\` | \`string\` | No | Not a field. |\n" +
+          "| \`name\` | \`string\` | Yes | Again. |\n---",
+      ),
+    );
+
+    expect(fieldFindings(fields, rows)).toEqual([
+      "GUIDE FIELD UNKNOWN  ghost — not a FrontendModule field",
+      "GUIDE FIELD DUPLICATE  name",
+      "GUIDE FIELD MISSING  slots",
+    ]);
+  });
+
+  it("fails a field whose requiredness the row gets the wrong way round", () => {
+    const fields = contract().frontendModule.props;
+    const rows = readFieldTable(
+      FIELDS.replace(
+        "\`routes\` | \`ModuleRoute[]\` | Yes",
+        "\`routes\` | \`ModuleRoute[]\` | No",
+      ).replace(
+        "\`theme\` | \`{ cssVariables: Record<string, string> }\` | No",
+        "\`theme\` | \`{ cssVariables: Record<string, string> }\` | Yes",
+      ),
+    );
+
+    expect(fieldFindings(fields, rows)).toEqual([
+      "GUIDE FIELD REQUIRED  routes — the row says optional, the type says required",
+      "GUIDE FIELD REQUIRED  theme — the row says required, the type says optional",
     ]);
   });
 });
