@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { HomeShelfOffer } from "@/modules/warehouse/api/putaway";
 import { useReceiptHomeShelfOffers } from "@/modules/warehouse/hooks/usePutawayRules";
+import { RECEIPT_TYPES } from "../LineTargetPicker";
 import { HomeShelvesSheet } from "./HomeShelvesSheet";
 
 const PHONE_QUERY = "(max-width: 639px)";
@@ -39,9 +40,11 @@ export function ReceiptHomeShelves({ documentId }: { documentId: string }) {
  */
 export function HomeShelvesAfterPosting({
   documentId,
+  type,
   status,
 }: {
   documentId: string;
+  type: string;
   status: string;
 }) {
   const before = useRef(status);
@@ -51,5 +54,7 @@ export function HomeShelvesAfterPosting({
       setPosted(true);
     before.current = status;
   }, [status]);
-  return posted ? <ReceiptHomeShelves documentId={documentId} /> : null;
+  return posted && RECEIPT_TYPES.includes(type) ? (
+    <ReceiptHomeShelves documentId={documentId} />
+  ) : null;
 }

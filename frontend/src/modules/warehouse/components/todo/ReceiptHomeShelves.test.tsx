@@ -66,11 +66,21 @@ describe("HomeShelvesAfterPosting", () => {
   it("asks when the page watches the receipt turn completed", async () => {
     serveOffers([offer]);
     const { rerender } = render(
-      <HomeShelvesAfterPosting documentId="doc-1" status="CONFIRMED" />,
+      <HomeShelvesAfterPosting
+        documentId="doc-1"
+        type="IN"
+        status="CONFIRMED"
+      />,
     );
     expect(screen.queryByRole("dialog")).toBeNull();
 
-    rerender(<HomeShelvesAfterPosting documentId="doc-1" status="COMPLETED" />);
+    rerender(
+      <HomeShelvesAfterPosting
+        documentId="doc-1"
+        type="IN"
+        status="COMPLETED"
+      />,
+    );
 
     expect(
       await screen.findByText(/Flour has no home location yet/),
@@ -79,7 +89,13 @@ describe("HomeShelvesAfterPosting", () => {
 
   it("does not ask about a receipt that was completed before the page opened", async () => {
     const asked = serveOffers([offer]);
-    render(<HomeShelvesAfterPosting documentId="doc-1" status="COMPLETED" />);
+    render(
+      <HomeShelvesAfterPosting
+        documentId="doc-1"
+        type="IN"
+        status="COMPLETED"
+      />,
+    );
 
     await act(() => new Promise((resolve) => setTimeout(resolve, 100)));
     expect(asked()).toBe(0);
