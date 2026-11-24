@@ -61,8 +61,9 @@ def upgrade_module(
     force: bool = False,
 ) -> None:
     """Upgrade an already installed community module from *source*."""
-    from .module_packaging import resolve_source
+    from .module_packaging import _refuse_on_an_image_only_install, resolve_source
 
+    _refuse_on_an_image_only_install('upgraded')
     source_dir, is_tmp, commit = resolve_source(source, rev)
     try:
         _do_upgrade(

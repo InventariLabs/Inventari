@@ -15,7 +15,8 @@ same database roles, the same nightly backups.
 ## What you need
 
 - A 64-bit Linux machine that stays on, with 4 GB of memory or more, Docker
-  Engine and Docker Compose v2 (`curl -fsSL https://get.docker.com | sh`, then
+  Engine and Docker Compose v2.24.4 or newer, which the published-images
+  file needs (`curl -fsSL https://get.docker.com | sh`, then
   `sudo usermod -aG docker $USER` and log in again). Ports 80 and 443 free.
 - A name the *household's devices* can resolve to the machine, because a
   certificate is issued for a name and a phone that types a bare IP address
