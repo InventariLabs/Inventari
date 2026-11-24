@@ -182,10 +182,8 @@ test.describe("Password reset flow", () => {
 
     // The page asks before it shows a form, so nobody types a password the
     // link can never save. The server gives a spent, an expired and a forged
-    // token one and the same refusal (the API tests hold it to that), so a
-    // forged token stands in for the spent one here: this backend runs with
-    // TESTING=true, which starts without the Redis store that remembers a
-    // spent token, and a spent one would still be accepted.
+    // token one and the same refusal (the API tests hold it to that); a
+    // forged one is the case here, the spent one has its own test below.
     await page.goto("/reset-password/forged.invalid.token");
     const refusal = page.getByTestId("reset-invalid-link");
     await expect(refusal).toBeVisible({ timeout: 10000 });
@@ -202,5 +200,50 @@ test.describe("Password reset flow", () => {
     const after = await api.login(dedicatedEmail(), INITIAL_PASSWORD);
     expect(after.access_token).toBeTruthy();
     await ctx.dispose();
+  });
+
+  test("a link that was already used is refused, and cannot set the password again", async ({
+    playwright,
+    baseURL,
+    page,
+  }) => {
+    const ctx = await playwright.request.newContext({ baseURL });
+    try {
+      const api = new ApiHelper(ctx);
+      const issue = await ctx.post("/api/v1/auth/password-reset/_dev_token", {
+        data: { email: dedicatedEmail() },
+      });
+      expect(
+        issue.status(),
+        "_dev_token route unavailable — the backend must run with TESTING=true (make test-e2e does it)",
+      ).toBe(200);
+      const { token } = await issue.json();
+
+      // The first use is the one that counts: it sets the password.
+      const first = await ctx.post("/api/v1/auth/password-reset/confirm", {
+        data: { token, new_password: NEW_PASSWORD },
+      });
+      expect(first.status()).toBe(200);
+
+      // The link is spent: the page says so before it shows a form, and the
+      // server refuses a second use. A backend without its revocation store
+      // would answer 204 here.
+      await page.goto(`/reset-password/${token}`);
+      await expect(page.getByTestId("reset-invalid-link")).toBeVisible({
+        timeout: 10000,
+      });
+      await expect(page.locator('input[type="password"]')).toHaveCount(0);
+
+      const second = await ctx.post("/api/v1/auth/password-reset/confirm", {
+        data: { token, new_password: "ResetMe123!Again!" },
+      });
+      expect(second.status()).toBe(400);
+
+      // The password the first use set is the one that stands.
+      const login = await api.login(dedicatedEmail(), NEW_PASSWORD);
+      expect(login.access_token).toBeTruthy();
+    } finally {
+      await ctx.dispose();
+    }
   });
 });
