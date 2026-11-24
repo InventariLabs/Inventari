@@ -1783,6 +1783,12 @@ def _ensure_module_catalogues(org_id):
     The same executor onboarding runs: it copies the declared catalogue,
     grants the module's default permissions and then runs the module's own
     ``on_enable``, as every enable path does.
+
+    No user is passed, so the module's declared default storage locations are
+    not seeded (the module logs that it skipped them): the seed builds its own
+    hierarchy, whose ``Main Warehouse`` is the room the module would have
+    declared, and a second one would only duplicate it. The run says so on
+    its own output as well.
     """
     import asyncio
 
@@ -1808,6 +1814,10 @@ def _ensure_module_catalogues(org_id):
 
     asyncio.run(_seed())
     print(f'  Module catalogues: {", ".join(m.metadata.name for m in modules)}')
+    print(
+        '  Module default storage locations: not seeded — the seed builds its own '
+        'hierarchy (Main Warehouse and its rooms).'
+    )
 
 
 def _require_categories(cat_ids, codes, *, what):
