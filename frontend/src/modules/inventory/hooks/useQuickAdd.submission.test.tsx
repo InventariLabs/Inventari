@@ -150,6 +150,35 @@ describe("useQuickAdd — around the save", () => {
     expect(toast.error).toHaveBeenCalledTimes(1);
   });
 
+  it("names the size limit of a photo above it in one toast, and still finishes the save", async () => {
+    server.use(
+      http.post("/api/v1/items", () =>
+        HttpResponse.json(
+          { id: "new-item", name: "Jam", quantity: 1, metadata: null },
+          { status: 201 },
+        ),
+      ),
+    );
+    const onSuccess = vi.fn();
+    const { result } = renderHook(() => useQuickAdd({ onSuccess }), {
+      wrapper: createWrapper(),
+    });
+    const photo = new File(["gif"], "big.gif", { type: "image/gif" });
+    Object.defineProperty(photo, "size", { value: 11 * 1024 * 1024 });
+
+    act(() => result.current.handleImageSelect(photo));
+    fillIn(result);
+    await act(async () => {
+      await result.current.submit();
+    });
+
+    await waitFor(() => expect(onSuccess).toHaveBeenCalled());
+    expect(toast.error).toHaveBeenCalledTimes(1);
+    expect(toast.error).toHaveBeenCalledWith(
+      "File too large. Maximum size: 10 MB",
+    );
+  });
+
   it("keeps the form open with a message when the create is refused", async () => {
     server.use(
       http.post("/api/v1/items", () =>
