@@ -48,23 +48,17 @@ git checkout v0.13.0                                # the one you install
 ## Step 2: Configure
 
 ```bash
-cp .env.production.example .env
-chmod 600 .env
-nano .env
+./scripts/init-env.sh --domain inventari.home.arpa --email home@inventari.home.arpa
 ```
 
-Fill the same fields as in *Step 3* of [QUICK_DEPLOY.md](../QUICK_DEPLOY.md),
-with two differences:
+It writes `.env` with all six secrets generated (the same command as *Step 3* of
+[QUICK_DEPLOY.md](../QUICK_DEPLOY.md)), with two differences from a server with a
+domain: the name is the one from above, and the e-mail address is not used at
+home, but must not be empty.
 
-```env
-DOMAIN=inventari.home.arpa                  # the name from above
-ACME_EMAIL=home@inventari.home.arpa         # not used at home, but must not be empty
-```
-
-Generate the five secrets with `openssl rand -hex 32` as there, and keep a copy
-of the finished `.env` off the machine: no backup contains it, and without its
-`ENCRYPTION_KEY` and `FERNET_SALT` a restored database cannot read the secrets
-stored in it.
+Keep a copy of the finished `.env` off the machine: no backup contains it, and
+without its `ENCRYPTION_KEY` and `FERNET_SALT` a restored database cannot read
+the secrets stored in it.
 
 ## Step 3: Start the stack and create the administrator
 
@@ -78,7 +72,10 @@ docker compose -f docker-compose.prod.yml exec backend \
 docker compose -f docker-compose.prod.yml up -d
 ```
 
-The first build takes several minutes. The password needs at least 8
+The first build takes several minutes; on a small machine or a Raspberry Pi,
+add `-f docker-compose.images.yml` after `-f docker-compose.prod.yml` in each
+command to download the published images (amd64 and arm64) instead of building
+them. The password needs at least 8
 characters with a lowercase letter, an uppercase letter and a digit. The proxy
 starts last, as in QUICK_DEPLOY.md, so nobody can register before the
 administrator exists. In `docker compose -f docker-compose.prod.yml logs caddy`
