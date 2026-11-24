@@ -90,6 +90,7 @@ EQUIPMENT_WMS_STORAGE_TYPES: list[_StorageTypeData] = [
             'de': {'name': 'Werkzeugraum'},
             'fr': {'name': "Salle d'outils"},
             'es': {'name': 'Sala de herramientas'},
+            'pt': {'name': 'Sala de ferramentas'},
         },
     },
     {
@@ -105,6 +106,7 @@ EQUIPMENT_WMS_STORAGE_TYPES: list[_StorageTypeData] = [
             'de': {'name': 'Wartungsbereich'},
             'fr': {'name': 'Atelier de maintenance'},
             'es': {'name': 'Zona de mantenimiento'},
+            'pt': {'name': 'Área de manutenção'},
         },
     },
 ]
