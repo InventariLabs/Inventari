@@ -71,7 +71,7 @@ test.describe("Camera field entry — the product code", () => {
     await expect(
       page.getByRole("textbox", { name: "Product code" }),
     ).toHaveValue("");
-    await page.waitForTimeout(500);
+    await camera.runFrames(15);
     expect(canvasErrors).toEqual([]);
   });
 
