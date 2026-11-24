@@ -37,7 +37,8 @@
  * A regular-expression literal is skipped as one token: a quote or backtick
  * inside it (`/["]/`, `/'([^']+)'/g`) is not the start of a string. A slash is
  * a regex opener only in expression position — after `( , = : [ ! & | ? { ;`,
- * after `return`/`typeof`/`case`, or at the start of the text; after an
+ * after `=>`, after `return`/`typeof`/`case`/`void`/`delete`/`in`/`of`, or at
+ * the start of the text; after an
  * identifier, a number, `)` or `]` it is a division. `}` is left out because
  * JSX text (`{a} / {b}`) makes it ambiguous, and a regex that does not close
  * on its own line is read as a division instead.
@@ -60,7 +61,7 @@ export function blankComments(text) {
   let prev = "";
   const REGEX_AFTER = "(,=:[!&|?{;";
   const regexAllowed = () => {
-    if (prev === "") return true;
+    if (prev === "" || prev === "=>") return true;
     if (REGEX_AFTER.includes(prev)) return true;
     return /(?:^|[^\w$.])(?:return|typeof|case|void|delete|in|of)\s*$/.test(
       text.slice(Math.max(0, i - 8), i),
@@ -73,8 +74,8 @@ export function blankComments(text) {
     while (j < n && text[j] !== "\n") {
       const ch = text[j];
       if (ch === "\\") j += 2;
-      else if (ch === "[") (inClass = true), j++;
-      else if (ch === "]") (inClass = false), j++;
+      else if (ch === "[") ((inClass = true), j++);
+      else if (ch === "]") ((inClass = false), j++);
       else if (ch === "/" && !inClass) {
         j++;
         while (j < n && /[a-z]/i.test(text[j])) j++;
@@ -134,7 +135,7 @@ export function blankComments(text) {
         continue;
       }
     }
-    if (!/\s/.test(c)) prev = c;
+    if (!/\s/.test(c)) prev = c === ">" && prev === "=" ? "=>" : c;
     if (typeof ctx === "object") {
       if (c === "{") ctx.depth++;
       else if (c === "}") {

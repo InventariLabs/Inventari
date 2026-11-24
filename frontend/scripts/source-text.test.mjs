@@ -78,7 +78,8 @@ describe("blankComments", () => {
     );
     // The outer hole resumes after the inner template: braces and a comment
     // inside it are still read as code, and the text after it as a string.
-    const resumes = "const a = `${f(`${g({ k: 1 })}`) /* c */} /* kept */`;\n// gone\n";
+    const resumes =
+      "const a = `${f(`${g({ k: 1 })}`) /* c */} /* kept */`;\n// gone\n";
     expect(blankComments(resumes)).toBe(
       resumes.replace("/* c */", "       ").replace("// gone", "       "),
     );
@@ -102,9 +103,19 @@ describe("blankComments", () => {
   });
 
   it("reads a slash after an operand as a division, not a regex", () => {
-    const text = 'const a = b / 2; const s = "x"; // c "\nconst d = e / 3; /* z */';
+    const text =
+      'const a = b / 2; const s = "x"; // c "\nconst d = e / 3; /* z */';
     const [first, second] = blankComments(text).split("\n");
     expect(first.trimEnd()).toBe('const a = b / 2; const s = "x";');
     expect(second.trimEnd()).toBe("const d = e / 3;");
+  });
+
+  it("reads a slash after an arrow as a regex opener", () => {
+    for (const arrow of ['(s) => /"/.test(s)', "(s) =>\n  /'/.test(s)"]) {
+      const text = `const f = ${arrow};\n/* c */ x;\n`;
+      expect(blankComments(text), arrow).toBe(
+        text.replace("/* c */", "       "),
+      );
+    }
   });
 });
