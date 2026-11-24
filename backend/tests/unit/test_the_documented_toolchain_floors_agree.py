@@ -32,7 +32,7 @@ _REPO_ROOT = Path(
 #: Every file that states a floor, and the pattern each states it with.
 _NODE_SOURCES = {
     'frontend/Dockerfile': r'^FROM (?:--platform=\S+ )?node:(\d+)',
-    'frontend/Dockerfile.dev': r'^FROM node:(\d+)',
+    'frontend/Dockerfile.dev': r'^FROM (?:--platform=\S+ )?node:(\d+)',
     '.github/workflows': r"node-version: '(\d+)'",
     'CONTRIBUTING.md': r'Node\.js (\d+)\+',
 }
