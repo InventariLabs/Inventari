@@ -58,6 +58,7 @@ _NOTIFY_TITLE: dict[str, str] = {
     'de': 'Neue Genehmigungsanfrage',
     'fr': "Nouvelle demande d'approbation",
     'es': 'Nueva solicitud de aprobación',
+    'pt': 'Nova solicitação de aprovação',
 }
 _NOTIFY_CONTENT: dict[str, str] = {
     'en': 'An approval request is waiting for your decision.',
@@ -65,6 +66,7 @@ _NOTIFY_CONTENT: dict[str, str] = {
     'de': 'Eine Genehmigungsanfrage wartet auf Ihre Entscheidung.',
     'fr': "Une demande d'approbation attend votre décision.",
     'es': 'Una solicitud de aprobación espera su decisión.',
+    'pt': 'Uma solicitação de aprovação aguarda a sua decisão.',
 }
 # Who asks and about what. Two requests from one person read alike without it,
 # and the recipient had to open the queue to tell them apart.
@@ -74,6 +76,7 @@ _NOTIFY_TITLE_NAMED: dict[str, str] = {
     'de': 'Neue Genehmigungsanfrage: {number}',
     'fr': "Nouvelle demande d'approbation : {number}",
     'es': 'Nueva solicitud de aprobación: {number}',
+    'pt': 'Nova solicitação de aprovação: {number}',
 }
 _NOTIFY_CONTENT_NAMED: dict[str, str] = {
     'en': 'Request from {requester}: {target}. It is waiting for your decision.',
@@ -81,6 +84,7 @@ _NOTIFY_CONTENT_NAMED: dict[str, str] = {
     'de': 'Anfrage von {requester}: {target}. Sie wartet auf Ihre Entscheidung.',
     'fr': 'Demande de {requester} : {target}. Elle attend votre décision.',
     'es': 'Solicitud de {requester}: {target}. Espera su decisión.',
+    'pt': 'Solicitação de {requester}: {target}. Aguarda a sua decisão.',
 }
 # The amount a summary reports is net, the side the approval threshold is on.
 _NET_AMOUNT: dict[str, str] = {
@@ -89,6 +93,7 @@ _NET_AMOUNT: dict[str, str] = {
     'de': '{amount} netto',
     'fr': '{amount} HT',
     'es': '{amount} neto',
+    'pt': '{amount} líquido',
 }
 _OPEN_QUEUE: dict[str, str] = {
     'en': 'Open the approval queue',
@@ -96,6 +101,7 @@ _OPEN_QUEUE: dict[str, str] = {
     'de': 'Genehmigungswarteschlange öffnen',
     'fr': 'Ouvrir la file approbation',
     'es': 'Abrir la cola de aprobaciones',
+    'pt': 'Abrir a fila de aprovações',
 }
 
 
@@ -161,6 +167,7 @@ _DEAD_END_TITLE: dict[str, str] = {
     'de': 'Genehmigungsanfrage hängt fest',
     'fr': "Demande d'approbation bloquée",
     'es': 'Solicitud de aprobación bloqueada',
+    'pt': 'Solicitação de aprovação travada',
 }
 # The way out, in words the recipient can act on: the stage that holds the
 # request and the two moves that end the wait — give the person who should
@@ -194,6 +201,11 @@ _DEAD_END_NAMED_CONTENT: dict[str, str] = {
         'indicadas puede decidirla. Para desbloquearla, concede acceso a aprobaciones a una '
         'de ellas, o retira la solicitud.'
     ),
+    'pt': (
+        'A solicitação aguarda na etapa \u201c{stage}\u201d, mas nenhuma das pessoas '
+        'indicadas pode decidi-la. Para destravá-la, dê a uma delas acesso às '
+        'aprovações ou retire a solicitação.'
+    ),
 }
 _DEAD_END_OPEN_CONTENT: dict[str, str] = {
     'en': (
@@ -220,6 +232,11 @@ _DEAD_END_OPEN_CONTENT: dict[str, str] = {
         'La solicitud espera en la etapa \u00ab{stage}\u00bb, pero nadie puede '
         'decidirla. Para desbloquearla, concede a alguien acceso a '
         'aprobaciones, o retira la solicitud.'
+    ),
+    'pt': (
+        'A solicitação aguarda na etapa \u201c{stage}\u201d, mas ninguém pode '
+        'decidi-la. Para destravá-la, dê a alguém acesso às aprovações ou '
+        'retire a solicitação.'
     ),
 }
 
@@ -454,6 +471,7 @@ _REJECT_TITLE: dict[str, str] = {
     'de': 'Ihre Genehmigungsanfrage wurde abgelehnt',
     'fr': "Votre demande d'approbation a été rejetée",
     'es': 'Su solicitud de aprobación fue rechazada',
+    'pt': 'Sua solicitação de aprovação foi rejeitada',
 }
 _REJECT_CONTENT: dict[str, str] = {
     'en': 'Reason: {reason}. Open the document to fix and re-submit.',
@@ -461,6 +479,7 @@ _REJECT_CONTENT: dict[str, str] = {
     'de': 'Grund: {reason}. Öffnen Sie das Dokument, um es zu korrigieren und erneut einzureichen.',
     'fr': 'Motif : {reason}. Ouvrez le document pour le corriger et le renvoyer.',
     'es': 'Motivo: {reason}. Abra el documento para corregirlo y reenviarlo.',
+    'pt': 'Motivo: {reason}. Abra o documento para corrigi-lo e reenviá-lo.',
 }
 _REJECT_NO_REASON: dict[str, str] = {
     'en': 'No reason provided. Open the document to fix and re-submit.',
@@ -468,6 +487,7 @@ _REJECT_NO_REASON: dict[str, str] = {
     'de': 'Kein Grund angegeben. Öffnen Sie das Dokument, um es zu korrigieren und erneut einzureichen.',
     'fr': 'Aucun motif fourni. Ouvrez le document pour le corriger et le renvoyer.',
     'es': 'No se proporcionó motivo. Abra el documento para corregirlo y reenviarlo.',
+    'pt': 'Nenhum motivo informado. Abra o documento para corrigi-lo e reenviá-lo.',
 }
 _REJECT_OPEN_DOC: dict[str, str] = {
     'en': 'Open document',
@@ -475,6 +495,7 @@ _REJECT_OPEN_DOC: dict[str, str] = {
     'de': 'Dokument öffnen',
     'fr': 'Ouvrir le document',
     'es': 'Abrir documento',
+    'pt': 'Abrir documento',
 }
 
 
@@ -602,6 +623,7 @@ _APPROVE_TITLE: dict[str, str] = {
     'de': 'Ihre Genehmigungsanfrage wurde genehmigt',
     'fr': "Votre demande d'approbation a été approuvée",
     'es': 'Su solicitud de aprobación fue aprobada',
+    'pt': 'Sua solicitação de aprovação foi aprovada',
 }
 _APPROVE_CONTENT: dict[str, str] = {
     'en': 'Note: {notes}. Open the document to see where it stands.',
@@ -609,6 +631,7 @@ _APPROVE_CONTENT: dict[str, str] = {
     'de': 'Hinweis: {notes}. Öffnen Sie das Dokument, um den Stand zu sehen.',
     'fr': 'Remarque : {notes}. Ouvrez le document pour voir où il en est.',
     'es': 'Nota: {notes}. Abra el documento para ver cómo sigue.',
+    'pt': 'Observação: {notes}. Abra o documento para ver o andamento.',
 }
 _APPROVE_NO_NOTES: dict[str, str] = {
     'en': 'Open the document to see where it stands.',
@@ -616,6 +639,7 @@ _APPROVE_NO_NOTES: dict[str, str] = {
     'de': 'Öffnen Sie das Dokument, um den Stand zu sehen.',
     'fr': 'Ouvrez le document pour voir où il en est.',
     'es': 'Abra el documento para ver cómo sigue.',
+    'pt': 'Abra o documento para ver o andamento.',
 }
 
 
@@ -663,6 +687,7 @@ _CLOSED_TITLE: dict[str, str] = {
     'de': 'Ihre Genehmigungsanfrage wurde geschlossen',
     'fr': "Votre demande d'approbation a été clôturée",
     'es': 'Su solicitud de aprobación fue cerrada',
+    'pt': 'Sua solicitação de aprovação foi encerrada',
 }
 _CLOSURE_CONTENT: dict[str, dict[str, str]] = {
     'workflow deactivated': {
@@ -671,6 +696,7 @@ _CLOSURE_CONTENT: dict[str, dict[str, str]] = {
         'de': 'Der Genehmigungsablauf wurde deaktiviert, es wartet nichts mehr auf eine Entscheidung.',
         'fr': "Le circuit d'approbation a été désactivé : plus rien n'attend de décision.",
         'es': 'El flujo de aprobación se desactivó, así que nada espera una decisión.',
+        'pt': 'O fluxo de aprovação foi desativado, então nada mais aguarda uma decisão.',
     },
     'workflow deleted': {
         'en': 'The approval workflow was deleted, so nothing is waiting for a decision any more.',
@@ -678,6 +704,7 @@ _CLOSURE_CONTENT: dict[str, dict[str, str]] = {
         'de': 'Der Genehmigungsablauf wurde gelöscht, es wartet nichts mehr auf eine Entscheidung.',
         'fr': "Le circuit d'approbation a été supprimé : plus rien n'attend de décision.",
         'es': 'El flujo de aprobación se eliminó, así que nada espera una decisión.',
+        'pt': 'O fluxo de aprovação foi excluído, então nada mais aguarda uma decisão.',
     },
 }
 
@@ -689,6 +716,7 @@ _GOES_ON_CONTENT: dict[str, str] = {
     'de': 'Der Vorgang geht ohne Genehmigung weiter.',
     'fr': "L'élément poursuit sans approbation.",
     'es': 'El elemento sigue sin aprobación.',
+    'pt': 'O item segue adiante sem aprovação.',
 }
 
 # The consequence when the target's own module still demands an approval of
@@ -725,6 +753,11 @@ _STILL_REQUIRED_CONTENT: dict[str, str] = {
         'completarse hasta que se borre ese ajuste o vuelva a haber un flujo '
         'activo.'
     ),
+    'pt': (
+        'Sua solicitação foi encerrada, mas isso não é uma aprovação. Ainda '
+        'exigem aprovação: {settings}. O item para na conclusão até que essa '
+        'configuração seja limpa ou volte a haver um fluxo ativo.'
+    ),
 }
 
 # The setting names the scope gives, in the recipient's language — the same
@@ -751,6 +784,10 @@ _SETTING_NAMES: dict[str, dict[str, str]] = {
     'es': {
         'approval_threshold': 'el umbral de aprobación',
         'approval_required_for_types': 'la lista de tipos de documento que requieren aprobación',
+    },
+    'pt': {
+        'approval_threshold': 'o limite de aprovação',
+        'approval_required_for_types': 'a lista de tipos de documento que exigem aprovação',
     },
 }
 

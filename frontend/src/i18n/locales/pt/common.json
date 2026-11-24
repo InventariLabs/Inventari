@@ -459,7 +459,7 @@
         "product_name": "Produto",
         "use_by": "Consumir até, após aberto",
         "user": "Nome de usuário",
-        "field_definitions": "Definições de campos",
+        "field_definitions": "Configuração de campos",
         "fields": "Campos",
         "focus_module": "Módulo em foco",
         "freeze_date": "Data de congelamento",
@@ -942,7 +942,7 @@
       "reason": "Motivo: {{reason}}",
       "reasons": {
         "notConfigured": "O SMTP ainda não está configurado",
-        "halfLogin": "O utilizador e a palavra-passe do SMTP têm de ser preenchidos os dois ou deixados os dois vazios",
+        "halfLogin": "O usuário e a senha do SMTP precisam ser preenchidos os dois ou deixados os dois vazios",
         "unreported": "O servidor de correio não indicou nenhum motivo"
       }
     },

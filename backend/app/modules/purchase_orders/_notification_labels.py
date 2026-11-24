@@ -15,6 +15,7 @@ RECEIPT_CREATED_TITLE: dict[str, str] = {
     'de': 'Wareneingang {receipt} erstellt',
     'fr': 'Réception {receipt} créée',
     'es': 'Recepción {receipt} creada',
+    'pt': 'Recebimento {receipt} criado',
 }
 RECEIPT_CREATED_CONTENT: dict[str, str] = {
     'en': 'Receipt {receipt} has been created from purchase order {po}.',
@@ -22,6 +23,7 @@ RECEIPT_CREATED_CONTENT: dict[str, str] = {
     'de': 'Wareneingang {receipt} wurde aus Bestellung {po} erstellt.',
     'fr': 'La réception {receipt} a été créée à partir de la commande {po}.',
     'es': 'La recepción {receipt} se ha creado a partir del pedido {po}.',
+    'pt': 'O recebimento {receipt} foi criado a partir do pedido de compra {po}.',
 }
 
 PO_REJECTED_TITLE: dict[str, str] = {
@@ -30,6 +32,7 @@ PO_REJECTED_TITLE: dict[str, str] = {
     'de': 'Bestellung {po} abgelehnt',
     'fr': 'Commande {po} refusée',
     'es': 'Pedido {po} rechazado',
+    'pt': 'Pedido de compra {po} rejeitado',
 }
 PO_REJECTED_CONTENT: dict[str, str] = {
     'en': 'Purchase order {po} was rejected.{reason}',
@@ -37,6 +40,7 @@ PO_REJECTED_CONTENT: dict[str, str] = {
     'de': 'Bestellung {po} wurde abgelehnt.{reason}',
     'fr': 'La commande {po} a été refusée.{reason}',
     'es': 'El pedido {po} ha sido rechazado.{reason}',
+    'pt': 'O pedido de compra {po} foi rejeitado.{reason}',
 }
 PO_REJECTED_REASON: dict[str, str] = {
     'en': ' Reason: {notes}',
@@ -44,6 +48,7 @@ PO_REJECTED_REASON: dict[str, str] = {
     'de': ' Grund: {notes}',
     'fr': ' Motif : {notes}',
     'es': ' Motivo: {notes}',
+    'pt': ' Motivo: {notes}',
 }
 
 PO_COMPLETED_TITLE: dict[str, str] = {
@@ -52,6 +57,7 @@ PO_COMPLETED_TITLE: dict[str, str] = {
     'de': 'Bestellung {po} abgeschlossen',
     'fr': 'Commande {po} terminée',
     'es': 'Pedido {po} completado',
+    'pt': 'Pedido de compra {po} concluído',
 }
 PO_COMPLETED_CONTENT: dict[str, str] = {
     'en': 'Purchase order {po} has been fully received.',
@@ -59,6 +65,7 @@ PO_COMPLETED_CONTENT: dict[str, str] = {
     'de': 'Bestellung {po} wurde vollständig vereinnahmt.',
     'fr': 'La commande {po} a été entièrement réceptionnée.',
     'es': 'El pedido {po} se ha recibido por completo.',
+    'pt': 'O pedido de compra {po} foi recebido por completo.',
 }
 PO_COMPLETED_OWN_TITLE: dict[str, str] = {
     'en': 'Your purchase order {po} is complete',
@@ -66,6 +73,7 @@ PO_COMPLETED_OWN_TITLE: dict[str, str] = {
     'de': 'Ihre Bestellung {po} ist abgeschlossen',
     'fr': 'Votre commande {po} est terminée',
     'es': 'Tu pedido {po} está completo',
+    'pt': 'Seu pedido de compra {po} está concluído',
 }
 PO_COMPLETED_OWN_CONTENT: dict[str, str] = {
     'en': 'All items for purchase order {po} have been received.',
@@ -73,6 +81,7 @@ PO_COMPLETED_OWN_CONTENT: dict[str, str] = {
     'de': 'Alle Positionen der Bestellung {po} wurden vereinnahmt.',
     'fr': 'Tous les articles de la commande {po} ont été réceptionnés.',
     'es': 'Se han recibido todos los artículos del pedido {po}.',
+    'pt': 'Todos os itens do pedido de compra {po} foram recebidos.',
 }
 
 RECALC_FAILED_TITLE: dict[str, str] = {
@@ -81,6 +90,7 @@ RECALC_FAILED_TITLE: dict[str, str] = {
     'de': 'Neuberechnung der Bestellmengen fehlgeschlagen',
     'fr': 'Échec du recalcul des quantités de la commande',
     'es': 'Error al recalcular las cantidades del pedido',
+    'pt': 'Falha ao recalcular as quantidades do pedido de compra',
 }
 RECALC_FAILED_CONTENT: dict[str, str] = {
     'en': (
@@ -107,5 +117,10 @@ RECALC_FAILED_CONTENT: dict[str, str] = {
         'No se pudieron recalcular las cantidades del pedido tras anular una '
         'recepción ({lines} línea(s) afectada(s)). La cantidad recibida puede '
         'estar desactualizada: compruébela.'
+    ),
+    'pt': (
+        'Não foi possível recalcular as quantidades do pedido de compra após o '
+        'cancelamento de um recebimento ({lines} linha(s) afetada(s)). A '
+        'quantidade recebida pode estar desatualizada — confira-a.'
     ),
 }
