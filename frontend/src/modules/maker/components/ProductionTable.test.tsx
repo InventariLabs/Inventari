@@ -126,7 +126,7 @@ describe("ProductionTable — the day under a run", () => {
     );
 
   it("reads the planned day of a draft, not the day it was created", () => {
-    renderRows([{ ...order, production_date: "2026-11-27" }]);
+    renderRows([{ ...order, production_date: "2026-03-27" }]);
 
     expect(screen.getByText(/Planned for/)).toHaveTextContent(/27/);
     expect(screen.queryByText(/Jan/)).not.toBeInTheDocument();
@@ -140,7 +140,7 @@ describe("ProductionTable — the day under a run", () => {
   });
 
   it("reads the day a run in progress was started", () => {
-    renderRows([{ ...order, status: "IN_PROGRESS", started_on: "2026-11-24" }]);
+    renderRows([{ ...order, status: "IN_PROGRESS", started_on: "2026-03-24" }]);
 
     expect(screen.getByText(/Started/)).toHaveTextContent(/24/);
   });

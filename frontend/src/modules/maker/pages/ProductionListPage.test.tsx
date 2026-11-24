@@ -357,7 +357,7 @@ describe("ProductionListPage run card day and cost note", () => {
   };
 
   it("shows a draft's planned day on its card", () => {
-    showing({ ...order, production_date: "2026-11-27" });
+    showing({ ...order, production_date: "2026-03-27" });
 
     expect(screen.getByText(/Planned for/)).toHaveTextContent(/27/);
   });
