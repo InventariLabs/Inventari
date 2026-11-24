@@ -178,6 +178,7 @@ def test_the_discovery_finds_the_known_maps() -> None:
     names = {label for label, _ in _DISCOVERED}
     assert 'app.modules.webhooks._notification_labels.AUTO_DISABLED_TITLE' in names
     assert 'app.modules.recipes._meal_plan_shopping._NOTES_LABELS' in names
+    assert 'app.modules.purchase_orders._service_email._PO_EMAIL_CONTENT' in names
 
 
 @pytest.mark.parametrize('lang', MAINTAINED_LANGUAGES)

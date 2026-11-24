@@ -391,7 +391,7 @@ ERRORS_PT: ErrorMessages = {
     'bom_depth_exceeded': 'Esta lista de materiais está aninhada em mais de {max_depth} níveis — profunda demais para ser resolvida.',
     'cost_line_not_found': 'Linha de custo não encontrada',
     'production_order_not_found': 'Ordem de produção não encontrada',
-    'production_needs_scope': 'As necessidades das ordens planeadas leem-se para uma ordem ou para os dois extremos de um período',
+    'production_needs_scope': 'As necessidades das ordens planejadas são lidas para uma ordem ou para os dois extremos de um período',
     'production_needs_period_reversed': 'O período termina antes de começar',
     'production_output_receiving': 'Uma área de recebimento não pode receber o que uma ordem produz: as mercadorias só esperam lá. Escolha o local onde ficarão guardadas.',
     'production_output_quarantine': 'Um local de quarentena não pode receber o que uma ordem produz: as mercadorias retidas não ficam lá. Escolha o local onde ficarão guardadas.',

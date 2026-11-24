@@ -46,7 +46,7 @@ _THE_JOURNAL_NAMED: dict[str, str] = {
     'de': 'Zustellprotokoll',
     'fr': 'journaux de livraison',
     'es': 'registros de entrega',
-    'pt': 'log de entregas',
+    'pt': 'log de entrega',
 }
 
 

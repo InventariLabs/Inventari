@@ -48,6 +48,6 @@ AUTO_DISABLED_CONTENT: dict[str, str] = {
     'pt': (
         'Após {failures} entregas malsucedidas seguidas, o webhook "{name}" foi '
         'desativado. A causa da última tentativa está registrada no log de '
-        'entregas.'
+        'entrega.'
     ),
 }
