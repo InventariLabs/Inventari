@@ -165,6 +165,7 @@ def install_module(
     allow_unsigned: bool = False,
 ) -> None:
     """Install a community module from *source* (local path or git URL)."""
+    _refuse_on_an_image_only_install()
     source_dir, is_tmp, commit = resolve_source(source, rev)
     try:
         _do_install(
@@ -178,6 +179,29 @@ def install_module(
     finally:
         if is_tmp:
             shutil.rmtree(source_dir, ignore_errors=True)
+
+
+def _refuse_on_an_image_only_install() -> None:
+    """Stop before anything is fetched when the module trees are not mounted.
+
+    ``docker-compose.images.yml`` runs the published images and mounts neither
+    module tree, so what an install writes lands in the container's own layer
+    and is gone at the next recreate, while the frontend half has nowhere to
+    go at all. A production backend with no frontend tree is that stack.
+    """
+    if not uses_production_compose() or FRONTEND_MODULES_DIR.exists():
+        return
+    console.print(
+        '[red]✗ This installation runs the published images, which carry no '
+        'module trees: a module installed here would vanish at the next '
+        'restart.[/]'
+    )
+    console.print(
+        '  Community modules need the build from source — start the stack '
+        'from docker-compose.prod.yml alone (DEPLOYMENT.md, "Community '
+        'modules"), then run the command again.'
+    )
+    raise SystemExit(1)
 
 
 def _check_install_guards(

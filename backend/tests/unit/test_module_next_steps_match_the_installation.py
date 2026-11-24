@@ -66,6 +66,54 @@ class TestTheDeploymentGivesTheInstallerItsTrees:
         assert _module_meta.module_tree_permissions_command() in text
 
 
+class TestAnInstallOnThePublishedImagesIsRefused:
+    """The images file mounts no module tree, so an install would write into
+    the container layer and keep only half a module. The refusal comes before
+    the source is even fetched, and names the way that works."""
+
+    def test_a_production_backend_without_the_frontend_tree_refuses(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        monkeypatch.setenv('INVENTARI_DEPLOYMENT', 'production')
+        monkeypatch.setattr(module_packaging, 'FRONTEND_MODULES_DIR', tmp_path / 'none')
+        fetched: list[str] = []
+        monkeypatch.setattr(
+            module_packaging,
+            'resolve_source',
+            lambda *a, **k: fetched.append('x'),
+        )
+
+        with pytest.raises(SystemExit) as refusal:
+            module_packaging.install_module('https://example.com/m.git', 'v1')
+
+        assert refusal.value.code == 1
+        assert fetched == []
+
+    def test_the_mounted_frontend_tree_is_not_refused(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        monkeypatch.setenv('INVENTARI_DEPLOYMENT', 'production')
+        monkeypatch.setattr(module_packaging, 'FRONTEND_MODULES_DIR', tmp_path)
+
+        module_packaging._refuse_on_an_image_only_install()
+
+    def test_a_development_stack_is_not_refused(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        monkeypatch.delenv('INVENTARI_DEPLOYMENT', raising=False)
+        monkeypatch.setattr(module_packaging, 'FRONTEND_MODULES_DIR', tmp_path / 'none')
+
+        module_packaging._refuse_on_an_image_only_install()
+
+    def test_the_images_file_mounts_no_module_tree(self) -> None:
+        # What the refusal reads as "the images route": a change that mounted
+        # a tree there would make the refusal wrong.
+        compose = (_REPO_ROOT / 'docker-compose.images.yml').read_text(encoding='utf-8')
+
+        assert '/app/app/modules' not in compose
+        assert '/frontend-modules' not in compose
+
+
 class TestTheWriteAccessCommand:
     def test_production_grants_the_containers_group_not_a_host_uid(
         self, monkeypatch: pytest.MonkeyPatch
