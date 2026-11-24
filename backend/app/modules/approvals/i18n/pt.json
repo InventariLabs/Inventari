@@ -43,6 +43,6 @@
     "approve": "Aprovar solicitações",
     "approveDesc": "Aprovar ou rejeitar solicitações de aprovação pendentes",
     "configure": "Configurar fluxos de trabalho",
-    "configureDesc": "Criar e modificar definições de fluxos de aprovação"
+    "configureDesc": "Criar e modificar configurações de fluxos de aprovação"
   }
 }

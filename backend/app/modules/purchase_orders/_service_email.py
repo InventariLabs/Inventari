@@ -11,6 +11,41 @@ from ._service_crud import get_purchase_order
 
 logger = get_logger(__name__)
 
+# Subject, body and footer of the purchase-order e-mail, one entry per
+# maintained language. {number} and {org} arrive already HTML-escaped.
+_PO_EMAIL_CONTENT: dict[str, dict[str, str]] = {
+    'pl': {
+        'subject': 'Zamówienie {number} od {org}',
+        'body': 'W załączniku przesyłamy zamówienie zakupowe <b>{number}</b> od firmy {org}.',
+        'footer': 'Wiadomość wygenerowana automatycznie przez system Inventari.',
+    },
+    'en': {
+        'subject': 'Purchase Order {number} from {org}',
+        'body': 'Please find attached Purchase Order <b>{number}</b> from {org}.',
+        'footer': 'This is an automatically generated message from Inventari.',
+    },
+    'de': {
+        'subject': 'Bestellung {number} von {org}',
+        'body': 'Anbei senden wir Ihnen die Bestellung <b>{number}</b> von {org}.',
+        'footer': 'Diese Nachricht wurde automatisch von Inventari erstellt.',
+    },
+    'fr': {
+        'subject': 'Commande {number} de {org}',
+        'body': 'Veuillez trouver ci-joint la commande <b>{number}</b> de {org}.',
+        'footer': 'Ce message a été généré automatiquement par Inventari.',
+    },
+    'es': {
+        'subject': 'Pedido {number} de {org}',
+        'body': 'Adjunto encontrará el pedido <b>{number}</b> de {org}.',
+        'footer': 'Este mensaje ha sido generado automáticamente por Inventari.',
+    },
+    'pt': {
+        'subject': 'Pedido de compra {number} de {org}',
+        'body': 'Segue em anexo o pedido de compra <b>{number}</b> de {org}.',
+        'footer': 'Esta mensagem foi gerada automaticamente pelo Inventari.',
+    },
+}
+
 
 async def send_po_email(
     db: AsyncSession, po_id: UUID, org_id: UUID, lang: str = 'en'
@@ -42,35 +77,10 @@ async def send_po_email(
     safe_number = html.escape(po.number)
     pdf_bytes = await generate_po_pdf(po, lang=lang, db=db, org_id=org_id)
 
-    content = {
-        'pl': {
-            'subject': f'Zamówienie {safe_number} od {safe_org}',
-            'body': f'W załączniku przesyłamy zamówienie zakupowe <b>{safe_number}</b> od firmy {safe_org}.',
-            'footer': 'Wiadomość wygenerowana automatycznie przez system Inventari.',
-        },
-        'en': {
-            'subject': f'Purchase Order {safe_number} from {safe_org}',
-            'body': f'Please find attached Purchase Order <b>{safe_number}</b> from {safe_org}.',
-            'footer': 'This is an automatically generated message from Inventari.',
-        },
-        'de': {
-            'subject': f'Bestellung {safe_number} von {safe_org}',
-            'body': f'Anbei senden wir Ihnen die Bestellung <b>{safe_number}</b> von {safe_org}.',
-            'footer': 'Diese Nachricht wurde automatisch von Inventari erstellt.',
-        },
-        'fr': {
-            'subject': f'Commande {safe_number} de {safe_org}',
-            'body': f'Veuillez trouver ci-joint la commande <b>{safe_number}</b> de {safe_org}.',
-            'footer': 'Ce message a été généré automatiquement par Inventari.',
-        },
-        'es': {
-            'subject': f'Pedido {safe_number} de {safe_org}',
-            'body': f'Adjunto encontrará el pedido <b>{safe_number}</b> de {safe_org}.',
-            'footer': 'Este mensaje ha sido generado automáticamente por Inventari.',
-        },
+    t = {
+        key: text.format(number=safe_number, org=safe_org)
+        for key, text in _PO_EMAIL_CONTENT.get(lang, _PO_EMAIL_CONTENT['en']).items()
     }
-
-    t = content.get(lang, content['en'])
 
     html_content = f"""
     <html>

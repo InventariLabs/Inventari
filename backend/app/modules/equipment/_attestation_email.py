@@ -90,6 +90,22 @@ _EMAIL_LABELS: dict[str, dict[str, str]] = {
         'subject': 'Atestación de equipo requerida',
         'reminder_prefix': '[Recordatorio] ',
     },
+    'pt': {
+        'heading': 'Atestação de equipamento — Ação necessária',
+        'greeting': 'Olá',
+        'default_body': (
+            'Confirme que você ainda está com <b>{item}</b> em sua posse. '
+            'Esta confirmação é necessária até <b>{deadline}</b>.'
+        ),
+        'multiple_items_body': (
+            'Confirme que você ainda está com os seguintes itens em sua posse:'
+        ),
+        'button': 'Confirmar / Relatar problema',
+        'fallback': 'Se o botão não funcionar, copie este link:',
+        'footer': 'Esta é uma mensagem automática do Inventari.',
+        'subject': 'Atestação de equipamento necessária',
+        'reminder_prefix': '[Lembrete] ',
+    },
 }
 
 _DEFAULT_LANG = 'en'

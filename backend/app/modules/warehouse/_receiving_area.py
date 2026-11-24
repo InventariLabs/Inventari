@@ -35,6 +35,7 @@ _AREA_NAMES = {
     'de': 'Wareneingang',
     'fr': 'Zone de réception',
     'es': 'Zona de recepción',
+    'pt': 'Área de recebimento',
 }
 
 #: Deeper than any real tree; a cycle in bad data must not loop forever.

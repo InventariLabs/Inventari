@@ -92,6 +92,14 @@ says what the release does rather than what changed since them.
   run in progress was started, not the day it was created.
   *Cook a batch for stock*, opened again after an abandoned attempt, no longer
   draws the discarded production recipe while its lookup is still answering.
+- Brazilian Portuguese reads as Brazilian and is Portuguese all the way
+  through. Jar labels, the print queue, approval, equipment, purchase-order
+  and webhook notices, the purchase-order e-mail, the meal-plan shopping list,
+  the seeded receiving area and storage types, and printed dates no longer
+  fall back to English, and the catalogs say "recebimento", "configurações"
+  and "registros" instead of the European forms. The putaway rule editor's
+  pickers sit in one column, so their French and Portuguese placeholders are
+  no longer clipped.
 
 ### Added
 

@@ -341,6 +341,7 @@ def build_equipment_metadata() -> ModuleMetadata:
                     'de': LocalizedText(name='Serverraum'),
                     'fr': LocalizedText(name='Salle des serveurs'),
                     'es': LocalizedText(name='Sala de servidores'),
+                    'pt': LocalizedText(name='Sala de servidores'),
                 },
             ),
             StorageTypeDeclaration(
@@ -359,6 +360,7 @@ def build_equipment_metadata() -> ModuleMetadata:
                     'de': LocalizedText(name='IT-Lager'),
                     'fr': LocalizedText(name='Stockage informatique'),
                     'es': LocalizedText(name='Almacén informático'),
+                    'pt': LocalizedText(name='Depósito de TI'),
                 },
             ),
         ],
@@ -392,6 +394,10 @@ def build_equipment_metadata() -> ModuleMetadata:
                         name='Almacén principal',
                         description='Recepción y envío — compartido por todos los módulos',
                     ),
+                    'pt': LocalizedText(
+                        name='Armazém principal',
+                        description='Recebimento e expedição — compartilhado por todos os módulos',
+                    ),
                 },
             ),
             StorageLocationDeclaration(
@@ -417,6 +423,10 @@ def build_equipment_metadata() -> ModuleMetadata:
                         name='Sala de servidores',
                         description='Sala de servidores principal / centro de datos',
                     ),
+                    'pt': LocalizedText(
+                        name='Sala de servidores',
+                        description='Sala de servidores principal / data center',
+                    ),
                 },
             ),
             StorageLocationDeclaration(
@@ -441,6 +451,10 @@ def build_equipment_metadata() -> ModuleMetadata:
                     'es': LocalizedText(
                         name='Almacén de TI',
                         description='Almacén de equipos de TI y logística',
+                    ),
+                    'pt': LocalizedText(
+                        name='Depósito de TI',
+                        description='Depósito de equipamentos de TI e logística',
                     ),
                 },
             ),

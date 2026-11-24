@@ -157,6 +157,9 @@ describe("PutawayRuleEditorDialog", () => {
     const grid = picker.closest(".grid");
     expect(grid).not.toBeNull();
     expect(grid).toHaveClass("grid-cols-1");
+    // Side by side, each picker had ~170 px of text room and cut its
+    // "Optional — …" placeholder in French and Portuguese.
+    expect(grid?.className).not.toMatch(/(^|\s)(sm|md|lg):grid-cols-2/);
   });
 
   it("names storage types and never shows the word code", async () => {
@@ -172,18 +175,6 @@ describe("PutawayRuleEditorDialog", () => {
 
     expect(await screen.findByText("Freezer")).toBeInTheDocument();
     expect(screen.getByText("Shelf")).toBeInTheDocument();
-  });
-
-  it("keeps the storage type placeholder short enough for its half-width field", async () => {
-    renderDialog();
-
-    const picker = await screen.findByRole("combobox", {
-      name: /Location type/i,
-    });
-    const text = picker.textContent ?? "";
-    expect(text).toContain("Optional");
-    // Measured at 1440: 26 characters were cut to "Optional — select locatio…".
-    expect(text.length).toBeLessThanOrEqual(24);
   });
 
   it("submits the type code the engine matches on, not the display name", async () => {

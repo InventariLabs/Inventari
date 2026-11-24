@@ -74,6 +74,7 @@ async def ensure_virtual_locations_async(
                 'de': LocalizedText(name='Verbraucht (virtuell)'),
                 'fr': LocalizedText(name='Consommé (virtuel)'),
                 'es': LocalizedText(name='Consumido (virtual)'),
+                'pt': LocalizedText(name='Consumido (virtual)'),
             },
         },
         {
@@ -86,6 +87,7 @@ async def ensure_virtual_locations_async(
                 'de': LocalizedText(name='Inventarverlust (virtuell)'),
                 'fr': LocalizedText(name='Perte (virtuel)'),
                 'es': LocalizedText(name='Pérdida (virtual)'),
+                'pt': LocalizedText(name='Perda (virtual)'),
             },
         },
         {
@@ -98,6 +100,7 @@ async def ensure_virtual_locations_async(
                 'de': LocalizedText(name='Produktion (virtuell)'),
                 'fr': LocalizedText(name='Production (virtuel)'),
                 'es': LocalizedText(name='Producción (virtual)'),
+                'pt': LocalizedText(name='Produção (virtual)'),
             },
         },
     ]
