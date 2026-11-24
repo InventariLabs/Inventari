@@ -128,7 +128,7 @@ test.describe("Maker — cost breakdown", () => {
       lineIdsToCleanup.push(created.id);
     }
 
-    // Now attach grandChild under childA (1 kg per kg of childA).
+    // Now attach grandChild under childA (1 pcs per pcs of childA).
     const lineAC = await api.createBomLine(token, {
       parent_template_id: childA.id,
       child_template_id: grandChild.id,
@@ -152,8 +152,8 @@ test.describe("Maker — cost breakdown", () => {
     aLine = existing.items.find((l) => l.child_template_id === childA.id);
     const aQty = parseFloat(aLine!.qty_per_batch);
 
-    // With 2 parent units × qty_per_batch kg of A
-    // ⇒ A exploded = 2 × aQty kg ⇒ grandChild = 2 × aQty × 1 kg
+    // With 2 parent units × qty_per_batch pcs of A
+    // ⇒ A exploded = 2 × aQty pcs ⇒ grandChild = 2 × aQty × 1 pcs
     const gc = breakdown.entries.find(
       (e) => e.child_template_id === grandChild.id,
     );
@@ -164,7 +164,7 @@ test.describe("Maker — cost breakdown", () => {
   test("yield_loss_pct scales qty upward (linear: 1 + pct/100)", async () => {
     // Mirrors the project's documented semantics:
     // effective_qty = qty * qty_per_batch * (1 + yield_loss_pct / 100).
-    // 10 kg qty_per_batch × 20% loss ⇒ 1 × 10 × 1.20 = 12.
+    // 10 pcs qty_per_batch × 20% loss ⇒ 1 × 10 × 1.20 = 12.
     const fresh = await api.createProductTemplate(token, {
       name: `E2E-BD-YieldParent-${Date.now()}`,
     });
