@@ -34,6 +34,30 @@ says what the release does rather than what changed since them.
   screens say what they are: a formula opens rather than offering "Edit BOM"
   to an account that cannot manage it, and a viewer of module settings reads
   the read-only sentence rather than "you can use this".
+- A delivery or a write-off that takes the last unit of a record no longer
+  leaves it standing on its shelf at zero: the emptied record is filed under
+  the Consumed place, as one used up by hand is, and a correction of that
+  document brings it back to the shelf it left.
+- Two receipts that post the same new batch of a product at the same time
+  both answer with the batch that stands, instead of one of them failing with
+  a server error.
+- A correction cannot be created in a closed month, and a correction whose
+  month has closed since it was written is refused with a sentence that says
+  to reopen the month, not to change a date its screen does not offer.
+- A write-off waiting for approval reaches the approver with the amount its
+  cost layers say it is worth, in the approval card and in the notice, the
+  same figure the approval threshold weighed.
+- Cloning a product onto a code another card already holds answers the same
+  refusal as creating it does, and a new product whose SKU is taken is
+  refused rather than answered with a server error.
+- Editing a global storage type joins the organization's fork that every
+  other reader resolves the type code to, whichever row the heap returns
+  first; module seed locations and their language alignment answer a name a
+  hand-made place already holds with the sibling-name refusal, not a server
+  error.
+- Concurrent changes of an organization's default tax rate take their locks
+  in one order, so two saves no longer deadlock and wait for the retry
+  middleware.
 
 ### Changed
 

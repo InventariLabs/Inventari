@@ -146,7 +146,9 @@ async def _flush_new_template_async(
     Two requests that met the same new code both looked, found nothing and
     wrote: the second hits the organization's unique code. The savepoint
     keeps the surrounding transaction usable, and the answer is the one a
-    request arriving a moment later gets from the look — not a 500.
+    request arriving a moment later gets from the look — not a 500. Both
+    codes answer the same way: the barcode and the SKU are each unique per
+    organization, and the door in front of either is the refusal.
     """
     try:
         async with db.begin_nested():
@@ -157,6 +159,8 @@ async def _flush_new_template_async(
             raise ServiceRejectionError(
                 'barcode_already_exists', barcode=barcode
             ) from exc
+        if tpl.sku and 'uq_templates_org_sku' in str(exc.orig):
+            raise ServiceRejectionError('sku_in_use', sku=tpl.sku) from exc
         raise
 
 
@@ -249,8 +253,7 @@ async def clone_template(
         min_quantity=original.min_quantity,
         meta_data=original.meta_data,
     )
-    db.add(cloned)
-    await db.flush()
+    await _flush_new_template_async(db, cloned, new_barcode)
     await db.refresh(cloned)
     await _log_template_async(
         db,

@@ -31,6 +31,7 @@ router = APIRouter(dependencies=[Depends(require_module('warehouse'))])
 @router.post(
     '/corrections', response_model=DocumentSchema, status_code=status.HTTP_201_CREATED
 )
+@map_service_errors
 async def create_correction_document(
     data: CorrectionCreate,
     current_user: UserContextDTO = Depends(get_current_user_context),

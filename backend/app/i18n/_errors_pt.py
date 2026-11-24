@@ -213,6 +213,7 @@ ERRORS_PT: ErrorMessages = {
     'period_already_closed': 'O período {period} já está fechado.',
     'period_closed_for_date': 'O período {period} está fechado, então nada pode ser datado nele. Altere a data do documento ou peça a alguém que possa reabrir o período.',
     'period_closed_for_stock_change': 'O período {period} está fechado, então nenhum movimento de estoque pode ser registrado nele. Peça a alguém que possa reabrir o período.',
+    'period_closed_for_correction': 'O período {period} está fechado, então a correção não pode ser aplicada. Peça a alguém que possa reabrir o período.',
     'transfer_more_than_the_record_holds': 'O registro "{item_name}" contém {available} e a linha movimenta {requested}. Reduza a linha ou movimente o restante de outro registro.',
     'transfer_cannot_split_serialized_record': 'Uma transferência não pode dividir o registro serializado {serial_number}; transfira o registro inteiro.',
     'use_partially_more_than_left': 'O registro "{item_name}" contém {available} desta embalagem e foram informados {requested} como restante. Diga quanto resta, o que não pode ser mais do que existe.',

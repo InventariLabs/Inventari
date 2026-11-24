@@ -1298,10 +1298,10 @@ reason.
   at 001. Numbers already issued are never rewritten.
 - **Periods.** Close a month to freeze it: in a closed month no document can be
   created, edited, confirmed, completed or cancelled, and stock takes cannot be
-  completed. A correction is the exception at the start: it can be created in
-  a closed month, and is refused when it is confirmed or completed, against
-  its own date. A month can be reopened; both are recorded with who and when.
-  How these records stand up to an audit is set out in 10.11.
+  completed. A correction is no exception: it is refused when it would be
+  created in a closed month, and refused when confirmed or completed there,
+  against the day it was written. A month can be reopened; both are recorded
+  with who and when. How these records stand up to an audit is set out in 10.11.
 
 ![The wholesaler's documents on a phone: each with its number, status, date, partner, location and value, the orders being picked with their progress, above the warehouse's bottom bar of Start, Scan, History and More](images/mobile-documents.webp)
 
@@ -1485,14 +1485,15 @@ with a signed quantity, and moves stock by the difference when it is
 completed. Only quantities can be corrected, and a correction cannot take
 more off a line than is still there. The original stays exactly as it was;
 the two are read together. A correction is subject to the same period check
-as any document when it is confirmed or completed; creating one
-in a closed month is not refused, but it cannot go further until the month
-is reopened.
+as any document: one cannot be created in a closed month, and one whose month
+has closed since it was written cannot be confirmed or completed until the
+month is reopened. A correction has no date of its own to change, so the
+period that decides is the day it was written.
 
 **Closing a period.** **Period closure** closes a calendar month
 (10.8). In a closed month no document can be created, edited, confirmed,
-completed or cancelled (a correction may be created, but not confirmed or
-completed), and no stock take can be completed. Closing and
+completed or cancelled — a correction included — and no stock take can be
+completed. Closing and
 reopening are each recorded with who did it, when, and the note typed at the
 time, and the change appears in the audit log. Reopening is allowed because a
 real mistake sometimes needs it; the record of it is what makes it safe, so

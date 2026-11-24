@@ -30,6 +30,7 @@ from .document_profile_service import get_or_create_profile, resolve_document_cu
 from .document_type_config_service import get_type_config
 from .document_value_service import recompute_document_values
 from .events import DocumentEvent
+from .inventory_period_service import check_period_for_a_correction_async
 from .models import (
     CorrectionReasonCode,
     Document,
@@ -108,6 +109,11 @@ async def create_correction(
     may_exceed_over_receipt: bool = False,
     relation_type: str = 'corrects',
 ) -> Document:
+    # A correction's date is the day it is written and its screen offers no
+    # field to move it, so one born into a closed month could never be
+    # applied, edited or cancelled. The guard stands at the door, where the
+    # message can still be acted on — by reopening the month.
+    await check_period_for_a_correction_async(db, org_id, datetime.now(UTC).date())
     await acquire_advisory_lock(db, f'document_correction:{corrects_document_id}')
     result = await db.execute(
         select(Document).where(
@@ -230,12 +236,10 @@ async def create_correction(
 
     # A correction is a draft like any other: it carries an identifier until
     # confirmation draws its number (see document_numbering_service).
-    number = temporary_number()
-
     correction = Document(
         organization_id=org_id,
         type=DocumentType.CORRECTION.value,
-        number=number,
+        number=temporary_number(),
         status=DocumentStatus.DRAFT.value,
         corrects_document_id=corrects_document_id,
         partner_id=original.partner_id,

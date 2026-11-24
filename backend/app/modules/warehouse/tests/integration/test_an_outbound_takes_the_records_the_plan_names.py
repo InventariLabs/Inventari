@@ -537,3 +537,99 @@ def test_each_record_the_plan_names_is_written_once(
     assert sorted(written) == sorted([b_record.id, c_record.id])
     assert _record_quantity(db_session, b_record.id) == Decimal('0')
     assert _record_quantity(db_session, c_record.id) == Decimal('3')
+
+
+def _place_of(db: Session, record_id: UUID) -> tuple[StorageLocation, dict[str, Any]]:
+    db.expire_all()
+    record = db.get(Item, record_id)
+    assert record is not None
+    place = db.get(StorageLocation, record.storage_location_id)
+    assert place is not None
+    return place, dict(record.meta_data or {})
+
+
+def _assert_filed_under_consumed(db: Session, record_id: UUID, shelf_id: UUID) -> None:
+    """The record the door emptied left its shelf for the Consumed place.
+
+    A record at 0 standing on a real shelf is a product the list shows at
+    0 pcs in a place it no longer occupies. Filing it is what every other door
+    that uses stock up does, and what keeps the shelf reading the goods that
+    are actually there.
+    """
+    place, meta = _place_of(db, record_id)
+    assert (place.settings or {}).get('seed', {}).get('code') == 'CONSUMED_VIRTUAL'
+    assert meta.get('emptied_from') == str(shelf_id)
+
+
+def test_a_dispatch_that_takes_the_last_unit_files_the_record(
+    client: TestClient,
+    doc_auth_headers: dict[str, str],
+    doc_source_location: StorageLocation,
+    doc_target_location: StorageLocation,
+    doc_partner: Partner,
+    db_session: Session,
+    async_engine_fixture: AsyncEngine,
+    doc_org: Organization,
+) -> None:
+    """A delivery of the whole record leaves no 0-pcs record on the shelf."""
+    from app.core.testing import ModuleTestHelper
+
+    h = ModuleTestHelper(db_session)
+    template = h.create_template(doc_org, name=f'Last Unit Out {uuid4().hex[:6]}')
+    record = sow(
+        db_session,
+        async_engine_fixture,
+        doc_org,
+        template,
+        doc_source_location.id,
+        Decimal('3'),
+    )
+
+    _run_out(
+        client,
+        doc_auth_headers,
+        partner_id=doc_partner.id,
+        source_location_id=doc_source_location.id,
+        target_location_id=doc_target_location.id,
+        item_id=record.id,
+        template_id=template.id,
+        quantity=3,
+    )
+
+    assert _record_quantity(db_session, record.id) == Decimal('0')
+    _assert_filed_under_consumed(db_session, record.id, doc_source_location.id)
+
+
+def test_a_scrap_that_takes_the_last_unit_files_the_record(
+    client: TestClient,
+    doc_auth_headers: dict[str, str],
+    doc_source_location: StorageLocation,
+    db_session: Session,
+    async_engine_fixture: AsyncEngine,
+    doc_org: Organization,
+) -> None:
+    """A write-off of the whole record leaves no 0-pcs record on the shelf."""
+    from app.core.testing import ModuleTestHelper
+
+    h = ModuleTestHelper(db_session)
+    template = h.create_template(doc_org, name=f'Last Unit Scrap {uuid4().hex[:6]}')
+    record = sow(
+        db_session,
+        async_engine_fixture,
+        doc_org,
+        template,
+        doc_source_location.id,
+        Decimal('2'),
+    )
+
+    _run_scrap(
+        client,
+        doc_auth_headers,
+        source_location_id=doc_source_location.id,
+        item_id=record.id,
+        template_id=template.id,
+        quantity=2,
+    )
+
+    assert _record_quantity(db_session, record.id) == Decimal('0')
+    _assert_filed_under_consumed(db_session, record.id, doc_source_location.id)

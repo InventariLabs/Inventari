@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, Any, cast
+from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,6 +9,10 @@ from app.core.logging import get_logger
 from app.i18n.service import get_current_lang
 from app.models.storage_location import LocationUsage, StorageLocation
 from app.models.storage_type import STORAGE_TYPE_ORDER, StorageType
+from app.services.storage._names import (
+    check_name_unique_async,
+    flush_under_the_name_rule,
+)
 
 if TYPE_CHECKING:
     from app.core.product_profiles import ProfileStorageLocation
@@ -113,12 +118,19 @@ async def ensure_virtual_locations_async(
                 seed.get('code') == v_code and seed.get('name') == existing.name
             ) or existing.name == v['name']
             if untouched and existing.name != target:
+                # A parentless name is unique, and a hand-made place may
+                # already carry the one this row is joining.
+                await check_name_unique_async(
+                    db, UUID(str(organization_id)), target, exclude_id=existing.id
+                )
                 existing.name = target
                 existing.settings = {
                     **(existing.settings or {}),
                     'seed': {'code': v_code, 'name': target},
                 }
+                await flush_under_the_name_rule(db, target)
             continue
+        await check_name_unique_async(db, UUID(str(organization_id)), target)
         loc = StorageLocation(
             organization_id=organization_id,
             storage_type_id=system_type.id,
@@ -129,6 +141,9 @@ async def ensure_virtual_locations_async(
             settings={'seed': {'code': v_code, 'name': target}},
         )
         db.add(loc)
+        # The read above keeps two requests from writing one name; the
+        # savepoint is what settles them when they raced anyway.
+        await flush_under_the_name_rule(db, target)
 
     await db.flush()
 
@@ -281,6 +296,9 @@ async def _seed_location_async(
             and seed.get('name') == existing.name
         ) or existing.name in (default.name, *default.former_names)
         if untouched and existing.name != target:
+            await check_name_unique_async(
+                db, UUID(str(organization_id)), target, exclude_id=existing.id
+            )
             existing.name = target
             existing.settings = {
                 **(existing.settings or {}),
@@ -289,8 +307,10 @@ async def _seed_location_async(
                     'name': target,
                 },
             }
+            await flush_under_the_name_rule(db, target)
         return None
 
+    await check_name_unique_async(db, UUID(str(organization_id)), target)
     loc = StorageLocation(
         organization_id=organization_id,
         storage_type_id=st_type.id,
@@ -301,6 +321,7 @@ async def _seed_location_async(
         ),
     )
     db.add(loc)
+    await flush_under_the_name_rule(db, target)
     return loc
 
 

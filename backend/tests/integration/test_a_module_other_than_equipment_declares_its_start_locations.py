@@ -184,3 +184,78 @@ class TestAModuleWithNoTiesToEquipment:
 
         await real_async_db_session.refresh(proving)
         assert proving.name == 'Our proving cabinet'
+
+
+class TestAModuleSeedMeetsANameAlreadyTaken:
+    """A hand-made place may hold a declaration's name; the seed says so.
+
+    A parentless place's name is unique. Before, the module seed inserted
+    straight through the model, so such a place turned enabling the module
+    into a 500 from the unique index; a row joining the reader's language
+    met the same index on its rename.
+    """
+
+    async def test_an_insert_meeting_a_taken_name_is_a_refusal(
+        self,
+        real_async_db_session: AsyncSession,
+        seed_org: Organization,
+        seed_user: User,
+    ) -> None:
+        from app.core.exceptions import ConflictException
+
+        db = real_async_db_session
+        # Archived: it never offers itself as the untagged place the seed
+        # would otherwise accept, but it still owns its name.
+        db.add(
+            StorageLocation(
+                organization_id=seed_org.id,
+                created_by=seed_user.id,
+                name='Bakery Dock',
+                usage='internal',
+                settings={'archived': 'true'},
+            )
+        )
+        await db.commit()
+
+        with pytest.raises(ConflictException) as refused:
+            await _enable(db, seed_org, seed_user, 'en')
+
+        assert refused.value.detail['code'] == 'STORAGE_CONFLICT'
+        assert 'Bakery Dock' in refused.value.detail['message']
+
+    async def test_a_rename_joining_the_language_meets_a_taken_name(
+        self,
+        real_async_db_session: AsyncSession,
+        seed_org: Organization,
+        seed_user: User,
+    ) -> None:
+        from app.core.exceptions import ConflictException
+
+        db = real_async_db_session
+        # The module's untouched row, still carrying the English literal.
+        db.add(
+            StorageLocation(
+                organization_id=seed_org.id,
+                created_by=seed_user.id,
+                name='Proving Room',
+                usage='internal',
+                context_tag='bakery_probe',
+                settings={'seed': {'code': 'PROVING_ROOM', 'name': 'Proving Room'}},
+            )
+        )
+        db.add(
+            StorageLocation(
+                organization_id=seed_org.id,
+                created_by=seed_user.id,
+                name='Garowanie',
+                usage='internal',
+                settings={'archived': 'true'},
+            )
+        )
+        await db.commit()
+
+        with pytest.raises(ConflictException) as refused:
+            await _enable(db, seed_org, seed_user, 'pl')
+
+        assert refused.value.detail['code'] == 'STORAGE_CONFLICT'
+        assert 'Garowanie' in refused.value.detail['message']

@@ -239,6 +239,7 @@ class ErrorMessages(TypedDict):
     period_already_closed: str
     period_closed_for_date: str
     period_closed_for_stock_change: str
+    period_closed_for_correction: str
     transfer_more_than_the_record_holds: str
     transfer_cannot_split_serialized_record: str
     use_partially_more_than_left: str

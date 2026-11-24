@@ -74,3 +74,21 @@ class TestACodeColumnAndAStubRace:
         monkeypatch.undo()
         # The savepoint left the transaction usable.
         await create_stub_template_async(db, org_id, 'Third', '2000000000022')
+
+    async def test_a_card_whose_sku_another_holds_is_refused_not_500ed(
+        self, real_async_db_session: AsyncSession, async_test_user
+    ):
+        """The organization's SKU key answers the refusal a later request
+        gets, not the constraint's own error, and the transaction survives."""
+        db = real_async_db_session
+        org_id = async_test_user.organization_id
+        await create_product_template_async(db, org_id, 'Holds The SKU', sku='DUP-1')
+
+        with pytest.raises(ServiceRejectionError) as refused:
+            await create_product_template_async(
+                db, org_id, 'Wants The SKU', sku='DUP-1'
+            )
+
+        assert refused.value.key == 'sku_in_use'
+        # The savepoint left the transaction usable for the next save.
+        await create_product_template_async(db, org_id, 'Takes Another', sku='DUP-2')

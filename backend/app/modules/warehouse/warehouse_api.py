@@ -1032,7 +1032,14 @@ class WarehouseAPI:
         lines_count) plus per-location core_api lookups for source/target
         names — bounded by the working set (max 2 locations per doc,
         typically < 20 docs on the approvals dashboard → < 40 calls).
-        No ``selectinload(Document.lines)``; no N+1 on the lines count.
+        No ``selectinload(Document.lines)`` for the rows' own columns; a
+        write-off with no price is read with its lines separately, because
+        what it is worth is what its cost layers carry.
+
+        The value is the one the approval threshold weighs
+        (``weighed_value_async``): a write-off asks for no price, and a
+        summary reporting nothing left the approver deciding an amount nobody
+        had shown — while the threshold itself knew it.
         """
         # Also collect source/target location
         # names so the approvals card can render a meaningful fallback
@@ -1040,9 +1047,12 @@ class WarehouseAPI:
         # locations are Core entities; resolved via core_api to keep
         # the architecture boundary clean (one batched get_by_ids).
         from sqlalchemy import func
+        from sqlalchemy.orm import selectinload
 
         from app.core.public_api import core_api
 
+        from . import document_types as dt
+        from .approval_service import weighed_value_async
         from .models import Document, DocumentLine
         from .schemas import DocumentTargetSummaryDTO
 
@@ -1078,6 +1088,28 @@ class WarehouseAPI:
             )
         )
         rows_list = rows.all()
+
+        # A write-off carries no price until it is posted, so its value is
+        # what the layers it draws are worth — the same figure the threshold
+        # weighs. Only those rows load their lines; the rest need none.
+        weighed: dict[UUID, Decimal | None] = {}
+        unpriced_scraps = [
+            row.id
+            for row in rows_list
+            if row.total_net is None and dt.is_scrap(row.type)
+        ]
+        if unpriced_scraps:
+            for doc in (
+                await db.scalars(
+                    select(Document)
+                    .options(selectinload(Document.lines))
+                    .where(
+                        Document.id.in_(unpriced_scraps),
+                        Document.organization_id == org_id,
+                    )
+                )
+            ).all():
+                weighed[doc.id] = await weighed_value_async(db, doc)
 
         # Resolve location names via core_api (Core entity, no direct
         # DB access). Per-location get_async — N is bounded (max 2 per
@@ -1119,8 +1151,11 @@ class WarehouseAPI:
                 type=row.type,
                 partner_name=row.partner_name,
                 # Net: the figure the approval threshold is set against, and
-                # the one a purchase order's summary reports.
-                total_value=row.total_net,
+                # the one a purchase order's summary reports. A write-off's
+                # is what its layers are worth, since it names no price.
+                total_value=(
+                    row.total_net if row.total_net is not None else weighed.get(row.id)
+                ),
                 currency=row.currency,
                 lines_count=int(row.lines_count or 0),
                 source_location_name=src_name,
