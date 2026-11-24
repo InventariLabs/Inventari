@@ -42,6 +42,9 @@ settings.TESTING = True
 # acknowledgement — otherwise every worker dies importing app.config.
 os.environ['TESTING_ACK_UNSAFE'] = 'true'
 settings.TESTING_ACK_UNSAFE = True
+# The lifespan would otherwise connect the process-wide token blacklist to a
+# real Redis for good, and every later test would revoke into it.
+settings.TESTING_TOKEN_REVOCATION = False
 
 
 @pytest.fixture(autouse=True)

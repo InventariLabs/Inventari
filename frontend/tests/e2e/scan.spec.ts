@@ -89,14 +89,9 @@ test.describe("Scan — API scan flow", () => {
     expect(result.action).toBeTruthy();
   });
 
-  test("GET /labels/scan/{code} returns result for unknown barcode", async () => {
-    try {
-      const result = await api.scanCode(token, "UNKNOWN-BARCODE-12345");
-      expect(result).toBeTruthy();
-      expect(result.status).toBeTruthy();
-    } catch {
-      // 404 or 200 with not_found status is acceptable
-      expect(true).toBeTruthy();
-    }
+  test("GET /labels/scan/{code} refuses an unknown barcode as unrecognized", async () => {
+    await expect(api.scanCode(token, "UNKNOWN-BARCODE-12345")).rejects.toThrow(
+      /SCAN_UNRECOGNIZED/,
+    );
   });
 });
