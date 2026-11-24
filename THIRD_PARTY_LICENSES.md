@@ -34,7 +34,7 @@ and the static assets the frontend serves.
   carries them under `/usr/share/doc`.
 * The libraries compiled into the `psycopg2-binary` wheel (libpq, OpenSSL and
   their dependencies), which have licences of their own beside the wheel's.
-* The eight recipe photographs under `backend/seed_assets`, used by the demo
+* The nine recipe photographs under `backend/seed_assets`, used by the demo
   only. They are CC0; `sources.json` beside them names the page, author and
   licence of each.
 * The print agent in `print-agent/`, which is part of this repository and
