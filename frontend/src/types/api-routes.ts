@@ -101,6 +101,7 @@ export const API_ROUTES = [
   "/api/v1/equipment/templates/seed-defaults",
   "/api/v1/equipment/templates/{template_id}",
   "/api/v1/equipment/templates/{template_id}/refresh-copy",
+  "/api/v1/equipment/templates/{template_id}/reset",
   "/api/v1/equipment/valuation",
   "/api/v1/equipment/warranty-alerts",
   "/api/v1/equipment/{item_id}/approval-status",

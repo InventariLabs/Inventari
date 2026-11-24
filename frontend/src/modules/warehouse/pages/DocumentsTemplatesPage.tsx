@@ -9,6 +9,7 @@ import { TemplateEditorModal } from "@/modules/shared/components/TemplateEditorM
 import { TemplateCard } from "@/modules/shared/components/TemplateCard";
 import { TemplatesEmptyState } from "@/modules/shared/components/TemplatesEmptyState";
 import { useConfirm } from "@/hooks/useConfirm";
+import { useConfirmedTemplateReset } from "@/modules/shared/hooks/useConfirmedTemplateReset";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { InlineQueryError, QueryFailure } from "@/components/ui/QueryResult";
@@ -19,7 +20,6 @@ import {
   useExportTemplate,
   useImportTemplate,
   useRefreshTemplateCopy,
-  useResetTemplateToBuiltIn,
   useSeedDefaultTemplates,
 } from "@/modules/shared/hooks/useDocumentTemplates";
 import { BuiltInTemplatePreview } from "@/modules/shared/components/BuiltInTemplatePreview";
@@ -295,7 +295,6 @@ export default function DocumentsTemplatesPage() {
   const deleteMutation = useDeleteTemplate("warehouse");
   const seedMutation = useSeedDefaultTemplates("warehouse");
   const refreshCopyMutation = useRefreshTemplateCopy("warehouse");
-  const resetMutation = useResetTemplateToBuiltIn("warehouse");
   const exportMutation = useExportTemplate("warehouse");
   const importMutation = useImportTemplate("warehouse");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -311,6 +310,10 @@ export default function DocumentsTemplatesPage() {
   const seedMutate = seedMutation.mutate;
   const seedIsPending = seedMutation.isPending;
   const { confirm, confirmDialogProps } = useConfirm();
+  const { handleReset, isResetPending } = useConfirmedTemplateReset(
+    "warehouse",
+    confirm,
+  );
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<
     DocumentTemplate | undefined
@@ -390,23 +393,6 @@ export default function DocumentsTemplatesPage() {
           t("common:templates.refreshedCopy", { name: created.name }),
         ),
     });
-  };
-
-  // The one action here that throws the organization's own work away, so it
-  // says so before it does.
-  const handleReset = async (tpl: DocumentTemplate) => {
-    const ok = await confirm({
-      title: t("common:templates.resetTitle", { name: tpl.name }),
-      message: t("common:templates.resetMessage"),
-      variant: "danger",
-      confirmLabel: t("common:templates.resetConfirm"),
-    });
-    if (ok) {
-      resetMutation.mutate(tpl.id, {
-        onSuccess: (reset) =>
-          toast.success(t("common:templates.resetDone", { name: reset.name })),
-      });
-    }
   };
 
   // A template leaves under its own name; the file itself is the message,
@@ -509,7 +495,7 @@ export default function DocumentsTemplatesPage() {
               onRefreshCopy={handleRefreshCopy}
               isRefreshPending={refreshCopyMutation.isPending}
               onReset={handleReset}
-              isResetPending={resetMutation.isPending}
+              isResetPending={isResetPending}
               onExport={handleExport}
             />
           ))}

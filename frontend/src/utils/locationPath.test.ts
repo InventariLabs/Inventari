@@ -39,6 +39,13 @@ describe("the location path is written one way", () => {
     );
   });
 
+  it("writes the last fallback, a name and a shelf, with the same separator", () => {
+    // No full_path and no list to walk: the name and the shelf are all there is.
+    expect(
+      getStorageLocationPath({ id: "s", name: "Fridge" }, "Second shelf"),
+    ).toBe("Fridge › Second shelf");
+  });
+
   it("says nothing under a root whose path is its own name", () => {
     expect(
       locationPathBelowName({

@@ -13,6 +13,7 @@ from types import SimpleNamespace
 import pytest
 from pypdf import PdfReader
 
+from app.core.print_identity import build_issuer_context
 from app.modules.warehouse.document_pdf_service import (
     generate_merged_pdf_async,
     generate_packing_slip_pdf_async,
@@ -91,3 +92,47 @@ class TestAStoredLayoutThatDoesNotRenderStillPrints:
         text = _page_text(pdf)
         assert doc_draft_pz.number in text
         assert 'Package 1 of 1' in text
+
+
+class TestTheFallbackPrintsTheIssuerInTheLanguageOfTheLayoutThatPrints:
+    """A Polish organization's fallback WZ says Polska, as with no stored layout."""
+
+    _ORGANIZATION = SimpleNamespace(
+        name='Piekarnia',
+        tax_id='PL5260001246',
+        address={'street': 'Prosta 1', 'city': 'Warszawa', 'postal_code': '00-001'},
+        country='PL',
+        logo_url=None,
+    )
+
+    def _profile(self) -> DocumentProfile:
+        profile = DocumentProfile(name='Auto')
+        profile.print_template = 'auto'
+        return profile
+
+    async def test_a_document(self, doc_draft_pz: Document) -> None:
+        issuer = await build_issuer_context(self._ORGANIZATION, 'en')
+
+        html = render_document_html(
+            doc_draft_pz,
+            self._profile(),
+            lang='en',
+            issuer=issuer,
+            user_template_html=_BROKEN,
+            country='PL',
+        )
+
+        assert 'Polska' in html
+        assert 'Poland' not in html
+
+    async def test_the_merged_file(self, doc_draft_pz: Document) -> None:
+        pdf = await generate_merged_pdf_async(
+            [(doc_draft_pz, _BROKEN)],
+            self._profile(),
+            lang='en',
+            organization=self._ORGANIZATION,
+        )
+
+        text = _page_text(pdf)
+        assert 'Polska' in text
+        assert 'Poland' not in text
