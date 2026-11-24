@@ -53,6 +53,23 @@ into connection URLs verbatim, where base64's `+ / =` characters would corrupt
 them. It never overwrites an existing `.env`; if one is there, it stops.
 `--domain` and `--email` answer its two questions on the command line.
 
+```env
+DOMAIN=inventari.example.com
+ACME_EMAIL=you@example.com
+DB_PASSWORD=<generated>
+DB_APP_PASSWORD=<generated>
+REDIS_PASSWORD=<generated>
+SECRET_KEY=<generated>
+ENCRYPTION_KEY=<generated>
+FERNET_SALT=<generated>
+INVENTARI_VERSION=0.13.0
+```
+
+Those are the values it writes into the file; the other fields of
+`.env.production.example` stay as they were. `INVENTARI_VERSION` is the
+release of the files it was run in, read only by the published-images route
+of Step 4.
+
 `ENCRYPTION_KEY` encrypts the secrets organizations store; without it
 `SECRET_KEY` does that too, and rotating `SECRET_KEY` means re-encrypting them
 all (*Rotating the encryption key* in [DEPLOYMENT.md](DEPLOYMENT.md)). Never

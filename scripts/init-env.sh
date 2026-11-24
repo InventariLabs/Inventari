@@ -10,6 +10,10 @@
 # ENCRYPTION_KEY. Hex, because two of them are interpolated into connection
 # URLs verbatim, where base64's + / = would corrupt them.
 #
+# It also appends INVENTARI_VERSION, the version of the files it was run in,
+# which docker-compose.images.yml reads to name the release whose images to
+# pull; an installation that builds from source ignores it.
+#
 # It never overwrites an existing .env: replacing FERNET_SALT or ENCRYPTION_KEY
 # leaves every secret already stored unreadable for good. Nothing but sh, awk
 # and the kernel's random source is needed, so it runs on a server that has no
@@ -26,7 +30,7 @@ while [ $# -gt 0 ]; do
     case "$1" in
         --domain) domain="${2-}"; shift 2 || shift ;;
         --email) email="${2-}"; shift 2 || shift ;;
-        -h|--help) sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -h|--help) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "unknown option: $1" >&2; exit 2 ;;
     esac
 done
@@ -69,7 +73,7 @@ DB_PASSWORD="$(secret)" DB_APP_PASSWORD="$(secret)" REDIS_PASSWORD="$(secret)" \
 SECRET_KEY="$(secret)" FERNET_SALT="$(secret)" ENCRYPTION_KEY="$(secret)" \
 awk '
     BEGIN {
-        n = split("DOMAIN ACME_EMAIL INVENTARI_VERSION DB_PASSWORD DB_APP_PASSWORD REDIS_PASSWORD SECRET_KEY FERNET_SALT ENCRYPTION_KEY", names, " ")
+        n = split("DOMAIN ACME_EMAIL DB_PASSWORD DB_APP_PASSWORD REDIS_PASSWORD SECRET_KEY FERNET_SALT ENCRYPTION_KEY", names, " ")
         for (i = 1; i <= n; i++) fill[names[i]] = ENVIRON[names[i]]
     }
     {
@@ -77,6 +81,12 @@ awk '
         key = eq ? substr($0, 1, eq - 1) : ""
         if (key in fill && substr($0, eq + 1) == "") print key "=" fill[key]
         else print
+    }
+    END {
+        print ""
+        print "# The release whose images docker-compose.images.yml pulls (written by"
+        print "# scripts/init-env.sh; an installation that builds from source ignores it)."
+        print "INVENTARI_VERSION=" ENVIRON["INVENTARI_VERSION"]
     }
 ' "$example" > "$target"
 

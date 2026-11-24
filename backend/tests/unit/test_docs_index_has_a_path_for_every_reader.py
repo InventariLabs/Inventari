@@ -77,7 +77,10 @@ _GUIDES = {
         'api/openapi.json',
         'api/ERRORS.md',
     ),
-    'Contributing to Inventari': ('../CONTRIBUTING.md',),
+    'Contributing to Inventari': (
+        '../CONTRIBUTING.md',
+        'HOME_SERVER_STORES.md',
+    ),
 }
 
 #: The deployment sections the operator path links by anchor.

@@ -16,7 +16,6 @@ ships with the repository, not a guide.
 | [Live demo](https://demo.inventari.app) | Try the app in the browser: an organization of your own, wiped every night — not for real data |
 | [Getting started](../README.md#quick-start) | Install and run your own instance, first login |
 | [USER_GUIDE.md](USER_GUIDE.md) | The end-user guide, illustrated with screens of the demo: locations, products, scanning, documents, reports |
-| [HOME_SERVER_STORES.md](HOME_SERVER_STORES.md) | What the home-server app stores (Unraid, CasaOS, Umbrel, YunoHost, TrueNAS) ask of an application, quoted and dated |
 | [GALLERY.md](GALLERY.md) | Screens of the running application, module by module |
 | [FOCUS_MODE.md](FOCUS_MODE.md) | Showing a single module (Settings → Organization modules) |
 
@@ -62,7 +61,10 @@ existing workflow through its public extension points.
 
 [CONTRIBUTING.md](../CONTRIBUTING.md) covers the development environment,
 repository workflow, coding standards and pull requests for changes to the
-platform and its included modules.
+platform and its included modules. Packaging Inventari for a home-server app
+store (Unraid, CasaOS, Umbrel, YunoHost, TrueNAS) starts from
+[HOME_SERVER_STORES.md](HOME_SERVER_STORES.md): what each store's current
+submission rules ask for, quoted and dated.
 
 ## Technical reference
 

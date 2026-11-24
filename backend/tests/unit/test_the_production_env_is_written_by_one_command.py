@@ -97,18 +97,13 @@ def test_it_leaves_the_rest_of_the_example_as_it_is(checkout: Path):
 
     example = (checkout / '.env.production.example').read_text().splitlines()
     written = (checkout / '.env').read_text().splitlines()
-    assert len(example) == len(written)
+    assert written[len(example) :][-1].startswith('INVENTARI_VERSION=')
     changed = {
         line.split('=', 1)[0]
-        for old, line in zip(example, written, strict=True)
+        for old, line in zip(example, written, strict=False)
         if old != line
     }
-    assert changed == {
-        'DOMAIN',
-        'ACME_EMAIL',
-        'INVENTARI_VERSION',
-        *_SECRETS,
-    }
+    assert changed == {'DOMAIN', 'ACME_EMAIL', *_SECRETS}
 
 
 def test_the_file_is_private_to_its_owner(checkout: Path):
