@@ -14432,7 +14432,7 @@
               "anyOf": [
                 {
                   "type": "string",
-                  "pattern": "^(DRAFT|COMPLETED|CANCELLED|REVERSED)$"
+                  "pattern": "^(DRAFT|IN_PROGRESS|COMPLETED|CANCELLED|REVERSED)$"
                 },
                 {
                   "type": "null"

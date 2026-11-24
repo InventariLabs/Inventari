@@ -92,6 +92,10 @@ says what the release does rather than what changed since them.
   run in progress was started, not the day it was created.
   *Cook a batch for stock*, opened again after an abandoned attempt, no longer
   draws the discarded production recipe while its lookup is still answering.
+- The production runs list shows a run under way. Its *In progress* tab asked
+  for a status the endpoint did not accept and answered "Failed to load
+  production orders"; the filter accepts every status a run holds, so the tab
+  lists the runs being filled.
 
 ### Added
 

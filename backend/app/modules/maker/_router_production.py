@@ -291,7 +291,9 @@ async def _attach_source_location_names(
 )
 async def list_production_orders(
     output_template_id: UUID | None = Query(None),
-    status: str | None = Query(None, pattern='^(DRAFT|COMPLETED|CANCELLED|REVERSED)$'),
+    status: str | None = Query(
+        None, pattern='^(DRAFT|IN_PROGRESS|COMPLETED|CANCELLED|REVERSED)$'
+    ),
     sort: str = Query('newest', pattern='^(newest|oldest|cost_desc)$'),
     date_from: date_type | None = Query(None),
     date_to: date_type | None = Query(None),
