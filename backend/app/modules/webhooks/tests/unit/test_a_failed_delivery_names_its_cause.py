@@ -17,7 +17,6 @@ from app.modules.webhooks import schemas
 from app.modules.webhooks._webhook_delivery import (
     _UNREADABLE_SIGNING_VALUE,
     _request_failure_sentence,
-    failure_cause,
 )
 from app.modules.webhooks.models import WebhookEndpoint
 
@@ -48,18 +47,20 @@ def test_every_connection_sentence_is_recognised(
 ) -> None:
     sentence = _request_failure_sentence(exc, _endpoint())
 
-    assert failure_cause(None, sentence) == code
+    assert schemas.failure_cause(None, sentence) == code
 
 
 def test_the_timeout_and_the_unreadable_signing_value_are_recognised() -> None:
-    assert failure_cause(None, 'Timeout after 5s') == 'timeout'
-    assert failure_cause(None, _UNREADABLE_SIGNING_VALUE) == 'signing_unreadable'
+    assert schemas.failure_cause(None, 'Timeout after 5s') == 'timeout'
+    assert (
+        schemas.failure_cause(None, _UNREADABLE_SIGNING_VALUE) == 'signing_unreadable'
+    )
 
 
 def test_a_receivers_own_reply_is_never_classified() -> None:
-    assert failure_cause(500, 'Timeout after 5s') is None
-    assert failure_cause(None, None) is None
-    assert failure_cause(None, 'Something nobody wrote') is None
+    assert schemas.failure_cause(500, 'Timeout after 5s') is None
+    assert schemas.failure_cause(None, None) is None
+    assert schemas.failure_cause(None, 'Something nobody wrote') is None
 
 
 def _delivery(**overrides: Any) -> dict[str, Any]:

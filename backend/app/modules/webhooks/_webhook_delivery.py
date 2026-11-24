@@ -32,7 +32,7 @@ _UNREADABLE_SIGNING_VALUE = (
 #: The causes a failed delivery can carry without the target answering, as
 #: the codes the API reports beside the stored sentence. The sentence is
 #: English and stays in the log; the code is what lets the screen say it in
-#: the reader's language. ``failure_cause`` recognises each sentence by the
+#: the reader's language. ``schemas.failure_cause`` recognises each sentence by the
 #: constants below, which the sentence builders use too, so a reworded
 #: sentence cannot stop being recognised without a test saying so.
 _TIMEOUT_PREFIX = 'Timeout after '
@@ -40,29 +40,6 @@ _CONNECT_FAILED_PREFIX = 'Could not connect to '
 _TLS_REFUSED_INFIX = ' was refused over TLS'
 _CONNECTION_BROKEN_INFIX = ' broke before the receiver answered'
 _CONNECTION_PREFIX = 'The connection to '
-
-
-def failure_cause(status_code: int | None, error_message: str | None) -> str | None:
-    """The code of the cause behind a delivery that got no answer, or ``None``.
-
-    A delivery the target answered carries the target's own reply as its
-    error, and that text is never classified: a receiver whose page starts
-    with "Timeout after" is not a timeout of ours.
-    """
-    if not error_message or status_code is not None:
-        return None
-    if error_message == _UNREADABLE_SIGNING_VALUE:
-        return 'signing_unreadable'
-    if error_message.startswith(_TIMEOUT_PREFIX):
-        return 'timeout'
-    if error_message.startswith(_CONNECT_FAILED_PREFIX):
-        return 'connect_failed'
-    if error_message.startswith(_CONNECTION_PREFIX):
-        if _TLS_REFUSED_INFIX in error_message:
-            return 'tls_refused'
-        if _CONNECTION_BROKEN_INFIX in error_message:
-            return 'connection_broken'
-    return None
 
 
 async def _attempt_delivery(
