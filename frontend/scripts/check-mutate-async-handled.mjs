@@ -46,7 +46,7 @@ import { resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const SRC = resolve(ROOT, "src");
 const BASELINE_PATH = resolve(ROOT, "scripts/mutate-async-baseline.json");
 

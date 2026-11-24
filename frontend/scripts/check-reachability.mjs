@@ -29,7 +29,7 @@ import { readFileSync, readdirSync, writeFileSync, existsSync } from "node:fs";
 import { resolve, dirname, relative, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const SRC = resolve(ROOT, "src");
 const BASELINE_PATH = resolve(ROOT, "scripts/reachability-baseline.json");
 

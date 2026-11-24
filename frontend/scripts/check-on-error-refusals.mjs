@@ -42,8 +42,7 @@ const ROOT = resolve_src();
 const QUIET = process.argv.includes("--quiet");
 
 function resolve_src() {
-  const here = new URL(".", import.meta.url).pathname;
-  return join(here, "..", "src");
+  return join(import.meta.dirname, "..", "src");
 }
 
 function walk(dir, out = []) {
