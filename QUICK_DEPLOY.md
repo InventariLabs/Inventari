@@ -7,8 +7,8 @@ domain is [docs/HOME_INSTALL.md](docs/HOME_INSTALL.md).
 
 - VPS with Ubuntu 26.04 LTS or Debian 13. The steps below are tested on
   Ubuntu 26.04 LTS, and Debian 13 takes the same commands. Another current
-  64-bit Linux with Docker Engine and Docker Compose v2 should work too, but
-  may need small adjustments (on Fedora or RHEL, for example, SELinux can
+  64-bit Linux with Docker Engine and Docker Compose v2.24.4 or newer (the published-images file uses the
+  `!reset` and `!override` tags) should work too, but may need small adjustments (on Fedora or RHEL, for example, SELinux can
   refuse the containers access to the files mounted from the host).
 - A domain name with an A record pointing to your VPS IP
 
@@ -139,7 +139,9 @@ images, `.env` names the files (the first line above), so **type every later
 `docker compose` command without its `-f docker-compose.prod.yml`** — with the
 flag Compose reads the build file alone, and `up` or `run` would build all
 three images here and recreate the services on them. The published images carry the release as it is: an
-installation that adds community modules builds from source
+installation that adds community modules builds from source, and leaves the
+images by removing the `COMPOSE_FILE` line from `.env` and running `docker
+compose -f docker-compose.prod.yml up -d --build`
 ([DEPLOYMENT.md](DEPLOYMENT.md#pulling-the-published-images-instead-of-building)).
 
 Then wait for the backend:

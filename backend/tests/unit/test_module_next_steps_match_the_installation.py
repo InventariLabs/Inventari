@@ -89,6 +89,42 @@ class TestAnInstallOnThePublishedImagesIsRefused:
         assert refusal.value.code == 1
         assert fetched == []
 
+    def test_the_refusal_names_the_step_that_leaves_the_images_route(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        monkeypatch.setenv('INVENTARI_DEPLOYMENT', 'production')
+        monkeypatch.setattr(module_packaging, 'FRONTEND_MODULES_DIR', tmp_path / 'none')
+
+        with pytest.raises(SystemExit):
+            module_packaging._refuse_on_an_image_only_install()
+
+        out = ' '.join(capsys.readouterr().out.split())
+        # Starting from the build file alone leaves COMPOSE_FILE in place, and
+        # the next bare `docker compose up` returns to the images.
+        assert 'COMPOSE_FILE' in out
+        assert 'up -d --build' in out
+
+    def test_an_upgrade_is_refused_before_anything_is_fetched(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        monkeypatch.setenv('INVENTARI_DEPLOYMENT', 'production')
+        monkeypatch.setattr(module_packaging, 'FRONTEND_MODULES_DIR', tmp_path / 'none')
+        fetched: list[str] = []
+        monkeypatch.setattr(
+            module_packaging,
+            'resolve_source',
+            lambda *a, **k: fetched.append('x'),
+        )
+
+        with pytest.raises(SystemExit) as refusal:
+            _module_upgrade.upgrade_module('https://example.com/m.git', 'v2')
+
+        assert refusal.value.code == 1
+        assert fetched == []
+
     def test_the_mounted_frontend_tree_is_not_refused(
         self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
     ) -> None:

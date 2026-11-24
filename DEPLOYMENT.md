@@ -365,6 +365,19 @@ The images carry the application as released, so the two community-module
 trees of the checkout are not mounted: *Community modules* below needs the
 build from source.
 
+**Going back to the build.** Remove the `COMPOSE_FILE` line from `.env`, then
+build and recreate on this machine:
+
+```bash
+sed -i '/^COMPOSE_FILE=/d' .env
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+Starting from `-f docker-compose.prod.yml` alone, with the line still in
+`.env`, is not enough: the next bare `docker compose up` reads the line again
+and returns to the images. From here on the commands of this guide carry the
+`-f docker-compose.prod.yml` flag again.
+
 ## Step 6: Create the administrator, then start the proxy
 
 Nothing seeds an administrator. Create it from the server:
@@ -641,6 +654,10 @@ docker compose pull
 ```
 
 ## Community modules
+
+Community modules need the build from source: on the published images
+(*Going back to the build* above says how to leave them) `module install` and
+`module upgrade` refuse before they fetch anything.
 
 Community modules are installed, upgraded and uninstalled by the backend
 container's own CLI. That container is the one process with both the database
@@ -1226,9 +1243,17 @@ profile is imported again ([docs/OFF_DATABASE_SETUP.md](docs/OFF_DATABASE_SETUP.
    ```bash
    docker compose -f docker-compose.prod.yml build --parallel
    ```
-   On the published images, the kept `.env` already carries `COMPOSE_FILE`;
-   download them instead, without `-f docker-compose.prod.yml`, as everywhere
-   on that route (community modules need the build, so step 3 does not apply):
+   On the published images, download them instead, without `-f
+   docker-compose.prod.yml`, as everywhere on that route (community modules
+   need the build, so step 3 does not apply). A `.env` kept from a server that
+   ran the published images already carries the `COMPOSE_FILE` line; one kept
+   from a server that built its images does not — a move onto the images, to a
+   Raspberry Pi say — so add the line from *Pulling the published images
+   instead of building* first:
+   ```bash
+   grep -q '^COMPOSE_FILE=' .env ||
+     echo 'COMPOSE_FILE=docker-compose.prod.yml:docker-compose.images.yml' >> .env
+   ```
    ```bash
    docker compose pull
    ```
