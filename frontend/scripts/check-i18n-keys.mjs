@@ -89,7 +89,7 @@ import { resolve, relative, join, basename } from "node:path";
 import { shorthandPermissionKeys } from "./manifest-permission-keys.mjs";
 import { maintainedLanguages } from "./maintained-languages.mjs";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const SRC = resolve(ROOT, "src");
 /**
  * A second tree shaped like `src/` — source files anywhere in it, module

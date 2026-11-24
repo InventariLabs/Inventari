@@ -23,9 +23,9 @@ import { readFileSync, readdirSync } from "node:fs";
 import { resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// `new URL(...).pathname`, not fileURLToPath: under vitest `import.meta.url`
-// carries a `/@fs/` prefix that fileURLToPath refuses outright.
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+// `import.meta.dirname` is the real directory under node and under vitest
+// alike; the `import.meta.url` pathname is not (a URL on vitest's jsdom).
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const SRC = resolve(ROOT, "src");
 
 function walk(dir, out = []) {

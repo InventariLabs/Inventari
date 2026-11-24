@@ -77,7 +77,7 @@ import ts from "typescript";
 
 import { blankComments } from "./source-text.mjs";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const SRC = resolve(ROOT, "src");
 const BASELINE_PATH = resolve(ROOT, "scripts/query-error-read-baseline.json");
 
