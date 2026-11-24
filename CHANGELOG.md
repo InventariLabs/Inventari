@@ -32,6 +32,10 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The production list reads a cancelled run on the day it was planned for, or
+  started, rather than the day it was created, and its Date column no longer
+  announces a newest-first or oldest-first order that the days it shows do not
+  follow.
 - The form that records a delivery cost as a variance on a posted receipt marks
   the amount and the reason as required, as it already did the day, and no
   longer accepts a day after today. A recipe card that can be dragged stays a

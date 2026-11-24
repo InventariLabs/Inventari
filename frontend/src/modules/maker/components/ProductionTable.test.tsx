@@ -153,6 +153,20 @@ describe("ProductionTable — the day under a run", () => {
     expect(screen.queryByText(/Jan/)).not.toBeInTheDocument();
   });
 
+  it("reads a cancelled run with no planned day on the day it was started", () => {
+    renderRows([
+      {
+        ...order,
+        status: "CANCELLED",
+        production_date: null,
+        started_on: "2026-03-24",
+      },
+    ]);
+
+    expect(screen.getByText(/24/)).toBeInTheDocument();
+    expect(screen.queryByText(/Jan/)).not.toBeInTheDocument();
+  });
+
   it("does not announce a sort the shown days do not follow", () => {
     renderRows([{ ...order, production_date: "2026-03-27" }]);
 
