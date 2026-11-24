@@ -544,6 +544,22 @@ describe("ItemTable — row density", () => {
 });
 
 describe("ItemTable — symmetric quantity actions", () => {
+  it("offers no Remove 1 unit on a product used up to zero", () => {
+    render(
+      <ItemTable
+        {...baseProps}
+        items={[makeItem("1", { quantity: 0 }), makeItem("2")]}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Remove 1 unit of Item 1" }),
+    ).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Remove 1 unit of Item 2" }),
+    ).toBeEnabled();
+  });
+
   it("offers +1 beside the button that removes 1", async () => {
     const onAddOne = vi.fn();
     render(

@@ -229,6 +229,11 @@ function StockAlertTrigger({
 }
 
 /** A single virtualizable item row in the desktop table. */
+/** Remove 1 unit has nothing to take at zero, and waits for a press in flight. */
+function removeOneBlocked(inFlight: boolean, quantity: number): boolean {
+  return inFlight || quantity <= 0;
+}
+
 function ItemTableRowBase({
   item,
   isSelected,
@@ -523,7 +528,7 @@ function ItemTableRowBase({
                 size="iconSm"
                 variant="ghost"
                 onClick={() => onConsume(item.id)}
-                disabled={consumingId === item.id}
+                disabled={removeOneBlocked(consumingId === item.id, qty)}
                 className="relative group/tooltip text-on-muted hover:text-accent-600 hover:bg-accent-50"
                 aria-label={t("items:actions.consume1unitFor", forProduct)}
               >

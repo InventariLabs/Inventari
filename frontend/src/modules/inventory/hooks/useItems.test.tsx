@@ -116,4 +116,33 @@ describe("useItemSearch", () => {
     expect(asked?.get("location_id")).toBe("loc-1");
     expect(asked?.get("include_inside")).toBe("true");
   });
+
+  it("reads every page of a place's matches, not the first cut", async () => {
+    const row = (n: number) => ({ id: `item-${n}`, name: `Bolt ${n}` });
+    const offsets: string[] = [];
+    server.use(
+      http.get("*/api/v1/items", ({ request }) => {
+        const params = new URL(request.url).searchParams;
+        const offset = Number(params.get("offset") ?? 0);
+        offsets.push(String(offset));
+        const all = Array.from({ length: 250 }, (_, n) => row(n));
+        const limit = Number(params.get("limit") ?? 100);
+        const items = all.slice(offset, offset + limit);
+        return HttpResponse.json({
+          items,
+          total: all.length,
+          limit,
+          offset,
+          has_more: offset + items.length < all.length,
+          total_capped: false,
+        });
+      }),
+    );
+    const { result } = renderHook(() => useItemSearch("bolt", "loc-1"), {
+      wrapper: createWrapper(),
+    });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data?.items).toHaveLength(250);
+    expect(offsets.length).toBeGreaterThan(1);
+  });
 });

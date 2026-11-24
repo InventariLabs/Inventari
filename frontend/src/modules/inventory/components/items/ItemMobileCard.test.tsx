@@ -142,6 +142,18 @@ describe("ItemMobileCard — quick actions keep their own touch targets", () => 
   // grows a hit area past its box (a pseudo-element inset, a negative margin).
   // Measured in a browser at 390, 360 and 320 px: 44x44 each, no overlap
   // between the buttons of a row or of neighbouring rows.
+  it("offers no Remove 1 unit on a product used up to zero", () => {
+    render(
+      <ItemMobileCard item={makeItem({ quantity: 0 })} {...baseProps()} />,
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "Remove 1 unit of Rack 42U Open Frame",
+      }),
+    ).toBeDisabled();
+  });
+
   it("gives each action a 44 px box and spaces them instead of overlapping them", () => {
     render(<ItemMobileCard item={makeItem()} {...baseProps()} />);
 
