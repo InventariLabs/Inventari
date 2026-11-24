@@ -35,6 +35,7 @@ _THE_ADDRESS_INSTRUCTION: dict[str, str] = {
     'de': 'Korrigieren Sie die Zieladresse',
     'fr': "Corrigez l'adresse cible",
     'es': 'Corrija la dirección de destino',
+    'pt': 'Corrija o endereço de destino',
 }
 
 #: Where the card says the cause lives — the notification must name the same
@@ -45,6 +46,7 @@ _THE_JOURNAL_NAMED: dict[str, str] = {
     'de': 'Zustellprotokoll',
     'fr': 'journaux de livraison',
     'es': 'registros de entrega',
+    'pt': 'log de entregas',
 }
 
 

@@ -71,7 +71,7 @@ ERRORS_PT: ErrorMessages = {
     'smtp_not_configured': 'Esta organização não tem o envio de e-mail configurado',
     'demo_smtp_settings_locked': 'Esta é a demonstração pública, então o servidor de e-mail é fixo: toda mensagem que o aplicativo enviaria é capturada na caixa de entrada da demonstração. As configurações de e-mail não podem ser alteradas aqui.',
     'demo_credentials_locked': 'Esta é a demonstração pública, onde todo e-mail chega a uma caixa de entrada pública. As senhas não podem ser alteradas nem redefinidas aqui, e os visitantes não precisam de conta.',
-    'demo_registration_locked': 'Esta é a demonstração pública, onde os visitantes não precisam de conta. A solicitação de acesso não está disponível aqui — use "Experimente a demonstração" para explorar.',
+    'demo_registration_locked': 'Esta é a demonstração pública, onde os visitantes não precisam de conta. A solicitação de acesso não está disponível aqui — use "Experimentar a demonstração" para explorar.',
     'role_in_use': 'Esta função ainda está atribuída a alguém. Altere a função dessa pessoa primeiro e depois exclua esta.',
     'role_name_taken': 'Já existe uma função chamada "{name}" nesta organização.',
     'invitation_not_found': 'Convite não encontrado',

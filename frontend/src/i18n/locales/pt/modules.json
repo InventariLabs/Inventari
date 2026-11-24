@@ -195,7 +195,7 @@
     "connectionFailedCapability": "{{names}} não está nesta lista: falhou no teste de {{capability}}."
   },
   "fieldBuilder": {
-    "title": "Configurações de campos personalizados",
+    "title": "Definições de campos personalizados",
     "fieldsCount": "{{count}} campos definidos",
     "fieldsCount_one": "{{count}} campo definido",
     "fieldsCount_other": "{{count}} campos definidos",

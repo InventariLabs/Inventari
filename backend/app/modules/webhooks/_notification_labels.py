@@ -13,6 +13,7 @@ AUTO_DISABLED_TITLE: dict[str, str] = {
     'de': 'Webhook „{name}“ abgeschaltet',
     'fr': 'Webhook « {name} » désactivé',
     'es': 'Webhook «{name}» desactivado',
+    'pt': 'Webhook "{name}" desativado',
 }
 AUTO_DISABLED_CONTENT: dict[str, str] = {
     # The diagnosis names where the cause lives, with the card's own words —
@@ -43,5 +44,10 @@ AUTO_DISABLED_CONTENT: dict[str, str] = {
         'Tras {failures} entregas fallidas seguidas, el webhook «{name}» se ha '
         'desactivado. La causa del último intento consta en los registros de '
         'entrega.'
+    ),
+    'pt': (
+        'Após {failures} entregas malsucedidas seguidas, o webhook "{name}" foi '
+        'desativado. A causa da última tentativa está registrada no log de '
+        'entregas.'
     ),
 }

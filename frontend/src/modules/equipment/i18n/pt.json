@@ -583,7 +583,7 @@
     "deleteTitle": "Excluir categoria",
     "confirmDelete": "Excluir a categoria \"{{name}}\"?",
     "confirmDeleteFields_one": "Isto remove permanentemente a sua {{count}} definição de campo.",
-    "confirmDeleteFields_other": "Isto remove permanentemente os seus {{count}} campos personalizados.",
+    "confirmDeleteFields_other": "Isto remove permanentemente as suas {{count}} definições de campo.",
     "confirmDeleteBlocked_one": "{{count}} ativo está nela, então ela não pode ser excluída até que seja movido para outra categoria.",
     "confirmDeleteBlocked_other": "{{count}} ativos estão nela, então ela não pode ser excluída até que sejam movidos para outra categoria.",
     "add": "Adicionar categoria",

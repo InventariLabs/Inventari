@@ -341,7 +341,7 @@
     },
     "step3": {
       "title": "Configure perfis de documento",
-      "description": "Configure padrões para tipos de documento e parceiros recorrentes."
+      "description": "Configure predefinições para tipos de documento e parceiros recorrentes."
     }
   },
   "errors": {

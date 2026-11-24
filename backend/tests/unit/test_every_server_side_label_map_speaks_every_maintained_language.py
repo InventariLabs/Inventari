@@ -8,11 +8,14 @@ printed jar label or in a location name seeded for a new organization.
 
 from __future__ import annotations
 
+import importlib
+import pkgutil
 from datetime import date
 from typing import Any
 
 import pytest
 
+import app as app_package
 from app.core.datetimes import format_date_for
 from app.core.product_profiles import MAIN_STORAGE_LOCATION, PRODUCT_PROFILES
 from app.i18n import MAINTAINED_LANGUAGES
@@ -23,6 +26,7 @@ from app.modules.maker import labelling
 from app.modules.printing.services import print_queue_service
 from app.modules.purchase_orders import _notification_labels as po_labels
 from app.modules.recipes import _shopping_from_recipes as shopping
+from app.seed_profiles._storage_type_catalogue import seeded_storage_type_names
 
 _FLAT_MAPS: list[tuple[str, dict[str, str]]] = [
     *(
@@ -136,3 +140,59 @@ def test_a_seeded_location_is_named_in_the_language(
 def test_a_portuguese_document_writes_its_dates_day_first() -> None:
     assert format_date_for('pt', date(2026, 11, 4)) == '04/11/2026'
     assert format_date_for('pt-BR', date(2026, 11, 4)) == '04/11/2026'
+
+
+def _is_label_map(value: object) -> bool:
+    """A table keyed by language that already speaks a language beyond Polish.
+
+    A table with English and Polish only is the owner-facing kind (a report in
+    the owner's language) and is out of this rule; one that carries any of the
+    other maintained languages has declared itself a reader-facing table.
+    """
+    if not isinstance(value, dict) or 'en' not in value:
+        return False
+    keys = set(value)
+    return keys <= {*MAINTAINED_LANGUAGES, 'pt-BR'} and bool(
+        keys & {'de', 'fr', 'es', 'pt'}
+    )
+
+
+def _discover_label_maps() -> list[tuple[str, dict[str, Any]]]:
+    found: list[tuple[str, dict[str, Any]]] = []
+    for info in pkgutil.walk_packages(app_package.__path__, 'app.'):
+        # Tests mirror the maps they check, and a migration needs a live
+        # Alembic context to import.
+        if '.tests.' in info.name or '.migrations' in info.name:
+            continue
+        module = importlib.import_module(info.name)
+        for name, value in vars(module).items():
+            if _is_label_map(value):
+                found.append((f'{info.name}.{name}', value))
+    return found
+
+
+_DISCOVERED = _discover_label_maps()
+
+
+def test_the_discovery_finds_the_known_maps() -> None:
+    names = {label for label, _ in _DISCOVERED}
+    assert 'app.modules.webhooks._notification_labels.AUTO_DISABLED_TITLE' in names
+    assert 'app.modules.recipes._meal_plan_shopping._NOTES_LABELS' in names
+
+
+@pytest.mark.parametrize('lang', MAINTAINED_LANGUAGES)
+@pytest.mark.parametrize(
+    ('label', 'table'), _DISCOVERED, ids=[label for label, _ in _DISCOVERED]
+)
+def test_every_discovered_label_map_has_the_language(
+    label: str, table: dict[str, Any], lang: str
+) -> None:
+    assert table.get(lang), f'{label} has no {lang} entry'
+
+
+@pytest.mark.parametrize('lang', MAINTAINED_LANGUAGES)
+def test_every_seeded_storage_type_is_named_in_the_language(lang: str) -> None:
+    missing = [
+        code for code, names in seeded_storage_type_names().items() if lang not in names
+    ]
+    assert not missing, f'no {lang} name for storage types {missing}'
