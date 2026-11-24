@@ -17,10 +17,13 @@ says what the release does rather than what changed since them.
 - Every release now publishes its container images — the backend, the
   frontend and the backup sidecar — to the GitHub Container Registry, for amd64
   and arm64, so a server or a Raspberry Pi can download the stack instead of
-  building it: add `-f docker-compose.images.yml` to the production commands
-  (QUICK_DEPLOY.md, DEPLOYMENT.md). The images carry the release as shipped, so
-  community modules, which are installed by a rebuild, still need the build
-  from source.
+  building it: one line in `.env` (`COMPOSE_FILE`) switches the production
+  commands to them (QUICK_DEPLOY.md, DEPLOYMENT.md), and the guides give that
+  route its own steps for an update, the way back from a failed one and a move
+  to a new server. It needs Docker Compose 2.24.4 or newer. The images carry
+  the release as shipped, so community modules, which are installed by a
+  rebuild, still need the build from source — `module install` on the images
+  says so instead of installing into a container that forgets it.
 - `scripts/init-env.sh` writes the production `.env` in one command: it asks
   for the domain and the e-mail address, generates the five secrets and the
   encryption key, and never overwrites an existing file. The guides use it

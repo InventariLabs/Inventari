@@ -73,9 +73,11 @@ docker compose -f docker-compose.prod.yml up -d
 ```
 
 The first build takes several minutes; on a small machine or a Raspberry Pi,
-add `-f docker-compose.images.yml` after `-f docker-compose.prod.yml` in each
-command to download the published images (amd64 and arm64) instead of building
-them. The password needs at least 8
+download the published images (amd64 and arm64) instead: run
+`echo 'COMPOSE_FILE=docker-compose.prod.yml:docker-compose.images.yml' >> .env`
+once, and type every `docker compose` command of this guide without its
+`-f docker-compose.prod.yml` — with the flag, Compose reads the build file
+alone and builds the images after all. The password needs at least 8
 characters with a lowercase letter, an uppercase letter and a digit. The proxy
 starts last, as in QUICK_DEPLOY.md, so nobody can register before the
 administrator exists. In `docker compose -f docker-compose.prod.yml logs caddy`

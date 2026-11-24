@@ -6,8 +6,10 @@ This guide covers deploying Inventari on a VPS with automatic HTTPS via **Caddy*
 
 - VPS with Ubuntu 26.04 LTS or Debian 13. The steps below are tested on
   Ubuntu 26.04 LTS, and Debian 13 takes the same commands. Another current
-  64-bit Linux with Docker Engine and Docker Compose v2.20 or newer (the
-  compose file uses `depends_on` with `required: false`) should work too, but
+  64-bit Linux with Docker Engine and Docker Compose v2.24.4 or newer (the
+  compose file uses `depends_on` with `required: false`, and the file that
+  pulls the published images uses the `!reset` and `!override` tags) should
+  work too, but
   may need small adjustments (on Fedora or RHEL, for example, SELinux can
   refuse the containers access to the files mounted from the host).
 - A domain name with an A record pointing to your VPS IP
@@ -344,17 +346,20 @@ instead of compiling — minutes on a small server, and the way a Raspberry Pi
 or another ARM machine gets the stack without building it:
 
 ```bash
-docker compose -f docker-compose.prod.yml -f docker-compose.images.yml \
-  up -d --scale caddy=0
+echo 'COMPOSE_FILE=docker-compose.prod.yml:docker-compose.images.yml' >> .env
+docker compose up -d --scale caddy=0
 ```
+
+The first line says once, for this installation, which files make the stack;
+from here on **every `docker compose -f docker-compose.prod.yml …` command in
+this guide is typed without its `-f docker-compose.prod.yml`**. A command that
+keeps that flag reads the build file alone: `up` and `run` would then build all
+three images on this machine and recreate the services on them.
 
 The release comes from `INVENTARI_VERSION` in `.env`, which
 `./scripts/init-env.sh` sets to the version of the files it was run in; Compose
 refuses to start with it empty, so a stack never pulls a tag it was not told
-to. Give both `-f` files to every later `docker compose` command in this
-guide, in place of `-f docker-compose.prod.yml` alone — `.env` can say it once
-with `COMPOSE_FILE=docker-compose.prod.yml:docker-compose.images.yml`, but only
-for commands that carry no `-f` of their own.
+to.
 
 The images carry the application as released, so the two community-module
 trees of the checkout are not mounted: *Community modules* below needs the
@@ -538,10 +543,10 @@ until docker compose -f docker-compose.prod.yml exec -T backend \
 **Pulling the published images.** An installation that runs them
 (*Pulling the published images instead of building*) changes three steps: in
 step 3, set `INVENTARI_VERSION` in `.env` to the new tag without its `v`; in
-step 4, `pull` replaces `build` (`docker compose -f docker-compose.prod.yml -f
-docker-compose.images.yml pull`); in step 5, `up -d --force-recreate` runs
-without `--no-build`, since there is no build to skip. Every command keeps
-both `-f` files. A new tag publishes its images when the release is cut, so a
+step 4, `pull` replaces `build` (`docker compose pull`); in step 5,
+`up -d --force-recreate` runs without `--no-build`, since there is no build to
+skip. Every command, step 1 included, is typed without `-f
+docker-compose.prod.yml` (`COMPOSE_FILE` in `.env` names the files). A new tag publishes its images when the release is cut, so a
 `pull` that finds none means the release is still being built: wait for the
 workflow run named for the tag.
 
@@ -620,6 +625,19 @@ tag you came from, rebuild, and follow *Putting a backup back* below with
 # this update, not the one the update moved to.
 git checkout <the tag you came from>
 docker compose -f docker-compose.prod.yml build --parallel
+```
+
+On the published images (*Pulling the published images instead of building*)
+there is nothing to build, and the release is not the checkout's: after the
+checkout above, set
+`INVENTARI_VERSION` in `.env` back to the tag you came from, without its `v`,
+and `docker compose pull` instead of the build. Without that line the restored
+database would start under the newer images and be migrated forward again. The
+commands carry no `-f docker-compose.prod.yml`, as everywhere on this route.
+
+```bash
+sed -i 's/^INVENTARI_VERSION=.*/INVENTARI_VERSION=<the version you came from>/' .env
+docker compose pull
 ```
 
 ## Community modules
@@ -1191,7 +1209,10 @@ profile is imported again ([docs/OFF_DATABASE_SETUP.md](docs/OFF_DATABASE_SETUP.
    server ran, or a newer one — the backend migrates an older database forward
    when it starts; never an older one. Point the DNS record at the new address.
 2. **Put the kept `.env` in place** instead of Step 4 — do not generate new
-   secrets. Change `DOMAIN` only if the address changed.
+   secrets. Change `DOMAIN` only if the address changed. On the published
+   images, check its `INVENTARI_VERSION` line too: it names the release the
+   stack pulls, and it must be the one checked out in step 1 — the kept file
+   still says the release the old server ran, which may be older.
 3. **Community modules only: put their code back,** before the images are built,
    because the frontend image is built from the checkout. The archive also
    holds the project's own modules, which the checkout already has at the right
@@ -1204,6 +1225,12 @@ profile is imported again ([docs/OFF_DATABASE_SETUP.md](docs/OFF_DATABASE_SETUP.
 4. **Build the images:**
    ```bash
    docker compose -f docker-compose.prod.yml build --parallel
+   ```
+   On the published images, the kept `.env` already carries `COMPOSE_FILE`;
+   download them instead, without `-f docker-compose.prod.yml`, as everywhere
+   on that route (community modules need the build, so step 3 does not apply):
+   ```bash
+   docker compose pull
    ```
    Then put the tracking record back into its volume (community modules only):
    ```bash

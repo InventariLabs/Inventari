@@ -50,10 +50,10 @@ jobs:
             exit 1
           fi
 
-      - uses: docker/setup-qemu-action@v3
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
 
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         if: github.ref_type == 'tag'
         with:
           registry: ghcr.io
@@ -64,7 +64,7 @@ jobs:
       # holds), and `latest` unless the tag is a pre-release. The registry
       # path is lower-cased by the action, as the registry requires.
       - id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ghcr.io/${{ github.repository_owner }}/inventari-${{ matrix.image }}
           tags: |
@@ -73,7 +73,7 @@ jobs:
           labels: |
             org.opencontainers.image.licenses=AGPL-3.0-only
 
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         with:
           context: ${{ matrix.context }}
           platforms: linux/amd64,linux/arm64
