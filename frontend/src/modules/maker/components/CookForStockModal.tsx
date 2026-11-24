@@ -305,12 +305,18 @@ export function CookForStockModal({
     const stranded = strandedRecipeId.current;
     strandedRecipeId.current = null;
     // Fire and forget: a refusal here means the maker module found the
-    // snapshot in use, which is the one case where keeping it is right.
-    // Either way the production recipe lookup is stale by the time it
-    // settles, so the next sheet on the pair asks again instead of reading
-    // the discarded snapshot's yield from the cache.
-    if (stranded) {
+    // snapshot in use, which is the one case where keeping it is right (the
+    // cached lookup then still names it). Once it is discarded the answer is
+    // known — there is no production recipe — so the next sheet on the pair
+    // starts from that, not from the snapshot's yield while the lookup asks
+    // again.
+    if (stranded && product) {
+      const lookup = queryKeys.maker.bridgedRecipe(
+        product.product_template_id,
+        recipe.id,
+      );
       void discardBridgeRecipe(stranded)
+        .then(() => queryClient.setQueryData(lookup, null))
         .catch(() => undefined)
         .then(() =>
           queryClient.invalidateQueries({

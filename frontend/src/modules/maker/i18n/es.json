@@ -31,7 +31,9 @@
       "resultPerUnit": "({{amount}} por {{unit}})",
       "shortage_one": "Falta stock: {{count}} ingrediente. La finalización será rechazada.",
       "shortage_other": "Falta stock: {{count}} ingredientes. La finalización será rechazada.",
-      "batch": "Lote {{batch}}"
+      "batch": "Lote {{batch}}",
+      "plannedFor": "Planificada para {{date}}",
+      "startedOn": "Iniciada el {{date}}"
     },
     "sortLabel": "Ordenar",
     "sort": {
@@ -55,7 +57,7 @@
     "table": {
       "product": "Producto",
       "status": "Estado",
-      "date": "Creado",
+      "date": "Fecha",
       "actions": "Acciones"
     }
   },
@@ -67,6 +69,7 @@
     "unitCostHint": "Cantidad",
     "missingTitle": "Ingredientes sin precio",
     "ingredients": "Ingredientes",
+    "otherCosts": "Además de los ingredientes",
     "chart": {
       "title": "Participación en el coste",
       "empty": "Ningún ingrediente tiene precio todavía, así que no hay nada que graficar."
@@ -209,7 +212,9 @@
       "totalCostGap_one": "{{count}} ingrediente salió de un stock sin coste, por lo que falta en este total: {{names}}. La vista previa antes de guardar puede mostrar una cifra mayor, porque puede estimar un coste que falta a partir de otro stock u ofertas de proveedores.",
       "totalCostGap_other": "{{count}} ingredientes salieron de un stock sin coste, por lo que faltan en este total: {{names}}. La vista previa antes de guardar puede mostrar una cifra mayor, porque puede estimar un coste que falta a partir de otro stock u ofertas de proveedores.",
       "estimatedAtCompletion": "Estimado al cerrar",
-      "estimatedDifference": "Diferencia real: {{amount}}",
+      "estimatedOver": "Coste real: {{amount}} por encima de la estimación",
+      "estimatedUnder": "Coste real: {{amount}} por debajo de la estimación",
+      "estimatedOnTarget": "El coste real coincide con la estimación",
       "takenSoFar": "Retirado hasta ahora"
     },
     "ingredients": "Ingredientes consumidos",
@@ -525,6 +530,7 @@
     "advanced": "Avanzado",
     "advancedHint": "Reglas para faltantes y sobreproducción. Los valores por defecto sirven para un taller pequeño.",
     "laborHourlyRate": "Tarifa por hora del trabajo propio",
+    "laborHourlyRateUnit": "{{currency}} / hora",
     "laborHourlyRateHint": "La mano de obra de una fórmula es el tiempo de sus pasos a esta tarifa. Cero significa que la mano de obra no cuesta nada en las estimaciones."
   },
   "availability": {
