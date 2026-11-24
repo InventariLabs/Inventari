@@ -26,6 +26,7 @@ test("a partial report leaves the link open for the rest, and the campaign names
   const { access_token: token } = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
   const tag = `E2E-Attest-${testInfo.project.name}-${Date.now()}`;
   const cleanup: Array<() => Promise<unknown>> = [];
+  const failures: string[] = [];
 
   try {
     const storage = (await api.listStorages(token))[0];
@@ -48,12 +49,14 @@ test("a partial report leaves the link open for the rest, and the campaign names
         category_id: category.id,
         metadata: { equipment: { equipment_status: "AVAILABLE" } },
       });
-      cleanup.push(() => api.deleteItem(token, item.id));
-      await api.checkoutAsset(token, {
+      cleanup.push(() => api.removeItemForGood(token, item.id));
+      const assignment = await api.checkoutAsset(token, {
         item_id: item.id,
         assigned_to_name: "Pat Holder",
         assigned_to_email: holder,
       });
+      // Run before the delete above: an asset still checked out is refused.
+      cleanup.push(() => api.checkinAsset(token, assignment.id));
     }
 
     const campaign = await api.createCampaign(token, {
@@ -62,7 +65,8 @@ test("a partial report leaves the link open for the rest, and the campaign names
       scope_filter_id: category.id,
       deadline: new Date(Date.now() + 7 * 86_400_000).toISOString(),
     });
-    cleanup.push(() => api.deleteCampaign(token, campaign.id));
+    // A launched campaign cannot be deleted, only called off.
+    cleanup.push(() => api.cancelCampaign(token, campaign.id));
     await api.launchCampaign(token, campaign.id);
 
     const { responses } = await api.getCampaign(token, campaign.id);
@@ -137,6 +141,11 @@ test("a partial report leaves the link open for the rest, and the campaign names
     await expect(note).toContainText("Damaged");
     await expect(note).toContainText("Cracked casing");
   } finally {
-    for (const undo of cleanup.reverse()) await undo().catch(() => {});
+    // Every step runs even when one fails, so a failure leaves one row, not
+    // all of them; the failures are reported below, not swallowed.
+    for (const undo of cleanup.reverse()) {
+      await undo().catch((error: unknown) => failures.push(String(error)));
+    }
   }
+  expect(failures, "cleanup left rows behind").toEqual([]);
 });
