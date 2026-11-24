@@ -1,6 +1,7 @@
 # Quick Deploy — Inventari
 
-Deploy to a VPS with automatic HTTPS in 6 steps.
+Deploy to a VPS with automatic HTTPS in 6 steps. A computer at home with no
+domain is [docs/HOME_INSTALL.md](docs/HOME_INSTALL.md).
 
 ## Requirements
 
@@ -41,6 +42,7 @@ the next.
 
 ```bash
 cp .env.production.example .env
+chmod 600 .env   # it holds every secret of the installation
 nano .env
 ```
 

@@ -43,7 +43,8 @@ module runs receiving, picking, packing and shipping.
 between releases — see [Alpha Release v0.13.0](#alpha-release-v0130).
 
 **Use Inventari:** [try the demo](https://demo.inventari.app),
-[run it locally](#quick-start) or [deploy it on your server](QUICK_DEPLOY.md).
+[run it locally](#quick-start), [deploy it on your server](QUICK_DEPLOY.md)
+or [install it on a home network](docs/HOME_INSTALL.md), no domain needed.
 
 **Build on Inventari:** [see what a module can do](#build-on-inventari),
 [create your first module](MODULE_QUICKSTART.md) or
@@ -140,9 +141,11 @@ translation catalogs. You develop the process your users need in that
 package and install it into Inventari.
 
 You can build that package with an AI coding agent: the package carries the
-module rules the agent needs, and Inventari itself is built that way behind
-the same gates, which refuse an agent's mistakes before anything is
-installed. [How to do it](MODULE_QUICKSTART.md#building-a-module-with-an-ai-coding-agent).
+module rules the agent needs, and a package is checked before anything is
+installed — `module validate` (what it may import, the capabilities it
+declares, its English catalog), its own tests and the signature check. That is
+what a module package is held to; it is not the project's own review process.
+[How to do it](MODULE_QUICKSTART.md#building-a-module-with-an-ai-coding-agent).
 
 [Create your first module](MODULE_QUICKSTART.md) ·
 [Explore the module API](MODULES_GUIDE.md) ·
@@ -284,7 +287,7 @@ USB or Bluetooth scanner and as a QR code for a phone camera.
 The same core under an IT desk, a kitchen and a workshop — three of the
 modules the demo seed switches on beside the warehouse.
 
-![The equipment overview: ten assets need attention — warranties ending within weeks and a server in maintenance — above the totals, 84 assets with four checked out, and the fleet by category as bars: network devices, laptops, phones and tablets, servers, peripherals and desktop computers, each with how many are checked out or have a warranty ending soon](docs/images/equipment-overview.webp)
+![The equipment overview: ten assets need attention — warranties ending within weeks and a server in maintenance — above the totals, 84 assets with four checked out, and the fleet by category as bars: network devices, laptops, phones and tablets, servers, peripherals and desktop computers, each with its size and, in colour, the share that is checked out or has a warranty ending soon](docs/images/equipment-overview.webp)
 
 **Equipment** — what needs attention first, then the whole fleet by category;
 serials, warranties, maintenance and who signed for what are a click below.

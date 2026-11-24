@@ -66,8 +66,14 @@ ping inventari.example.com
 
 ```bash
 cp .env.production.example .env
+chmod 600 .env
 nano .env
 ```
+
+`.env` holds every secret the installation has, so only the account that runs
+Compose should read it. Keep it at mode 600 — `chmod 600 .env` after you create
+it, and again after any tool that rewrites the file; `ls -l .env` shows
+`-rw-------`.
 
 Generate secure secrets:
 
@@ -301,7 +307,13 @@ own, so the import cannot take down the application's workers.
 > registration e-mail, is built from it) and put the site's Caddy block in a
 > `*.caddy` file in `caddy-extra/`. The Caddyfile reads every such file, the
 > directory ships empty, and a stack without one configures what it always
-> did; `CADDY_EXTRA_DIR` in `.env` points it elsewhere. Reload with
+> did; `CADDY_EXTRA_DIR` in `.env` points it elsewhere. The Caddy container
+> sees only that directory (as `/etc/caddy/extra`), so the site's own files go
+> inside it too — `root * /etc/caddy/extra/site` serves `caddy-extra/site/` —
+> or the block uses `reverse_proxy` to a container on a network Caddy joins;
+> a path of the host, such as `/var/www/site`, serves nothing. Back the
+> directory up with the rest of the installation's state (*What the nightly
+> backup does not cover*). Reload with
 > `docker compose -f docker-compose.prod.yml exec -T caddy caddy reload --config /etc/caddy/Caddyfile`
 > after changing a file, and recreate Caddy
 > (`docker compose -f docker-compose.prod.yml up -d caddy`) the first time, for
@@ -408,9 +420,29 @@ one it has. The sign-in screen says the same when it finds no mail to send.
 
 Invitations, purchase orders and notifications go out through the SMTP server
 an organization sets in **Settings → Email**, where **Send Test Email** proves
-it. Nothing in `.env` configures mail on a production install. Without it the
+it. Nothing in `.env` configures mail on a production install:
+`docker-compose.prod.yml` lists the backend's environment explicitly and
+forwards no `SMTP_*` variable, so the installation has no mail server of its
+own — only the organizations' (the `SMTP_*` lines in `.env.example` belong to a
+development checkout, where they point at Mailhog). Without a server the
 application still works: an invitation is created all the same, and you pass
 its link on yourself — but nothing reaches anyone by mail.
+
+Password reset follows the same rule. The request is always accepted
+(`202`), whether or not the address has an account, and the reset link goes out
+through the mail server of that account's organization. When no organization on
+the installation has saved a working server, the response says so
+(`email_delivery_configured: false`) and the screen reads *This installation
+does not send email* instead of *Check your inbox*; the administrator then sets
+the password with `python manage.py user create-admin` against the existing
+address (*Locked out: the administrator forgot the password*). Once any organization saves a
+server in **Settings → Email**, the screen promises mail.
+
+The same applies to the rest of the backend's tuning settings that
+`.env.example` marks *Ignored under Docker* (for example `LOG_LEVEL`,
+`RATE_LIMIT_PER_IP`, `MAX_REQUEST_BODY_SIZE`, `REFRESH_TOKEN_EXPIRE_DAYS`,
+`DB_RETRY_*`): the production containers run on the defaults shown there, and
+adding the line to `.env` changes nothing.
 
 ---
 
@@ -520,7 +552,7 @@ process and every previously encrypted value (stored API keys) becomes
 unreadable after a restart. The diff in step 3 turns that into a five-second
 check before anything restarts.
 
-A development stack (`docker-compose.yml`, the checkout you run with `make dev`)
+A development stack (`docker-compose.yml`, the checkout you start with `make dev-up`)
 has no `docker-compose.prod.yml` and no `db-backup` service, and its `.env`
 is not made from `.env.production.example`. Two steps read differently there:
 
@@ -643,7 +675,8 @@ and its `.env`:
 
 A backup that has to bring the installation back therefore covers `./backups/`,
 `.env`, the age private key and `inventari_module_data` — and, when community
-modules are installed, their code in the checkout; the rest is cache or
+modules are installed, their code in the checkout, and, when an extra site is
+served (*Step 4*), the files in `caddy-extra/`; the rest is cache or
 reproducible. The demo (`docker-compose.demo.yml`) runs as its own project,
 `inventari-demo`, so its volumes never overlap with these.
 
@@ -671,7 +704,7 @@ docker compose -f docker-compose.prod.yml exec backend du -sh /app/uploads
 ### What the nightly backup does not cover
 
 The service reaches the database and — through a read-only mount — the
-`uploads_data` volume. Four things an installation keeps are outside it, and
+`uploads_data` volume. Five things an installation keeps are outside it, and
 covering each is your own decision:
 
 - **The files stored in S3** (`FILE_STORAGE_BACKEND=s3`). Photographs and
@@ -688,6 +721,9 @@ covering each is your own decision:
   `frontend/src/modules` hold the installed modules themselves. They are
   untracked files in the checkout: git never carries them, and the service
   never sees them.
+- **The extra sites in `caddy-extra/`** (or the directory `CADDY_EXTRA_DIR`
+  names) — the `*.caddy` blocks and the files they serve. Git ignores them,
+  so a checkout made again on a new server comes back without the site.
 - **The TLS certificates in `inventari_caddy_data`.** Leaving them out
   costs a certificate, not the installation: Caddy orders new ones when the
   stack starts, inside the certificate authority's rate limits. Keep them
@@ -717,6 +753,11 @@ docker compose -f docker-compose.prod.yml exec -T caddy \
 # The module trees — run from the checkout this guide has you work in.
 tar -czf "/opt/inventari-archives/module-code-$(date -u +%Y%m%d-%H%M%S).tgz" \
   backend/app/modules frontend/src/modules
+
+# The extra Caddy sites — only if you serve one; use the directory
+# CADDY_EXTRA_DIR names when you set it.
+tar -czf "/opt/inventari-archives/caddy-extra-$(date -u +%Y%m%d-%H%M%S).tgz" \
+  caddy-extra
 ```
 
 Whether the nightly backups are encrypted is up to you, and
@@ -1114,7 +1155,9 @@ A lost server comes back from what was kept off it:
 - the backups — from the off-host copy, or the `backups/` folder of the old
   disk if it survived — and `rclone.conf` to reach the remote;
 - when community modules were installed, the `module-data-…` and
-  `module-code-…` archives from *What the nightly backup does not cover*.
+  `module-code-…` archives from *What the nightly backup does not cover*;
+- when an extra Caddy site was served, its `caddy-extra-…` archive from the
+  same place.
 
 Two things are in no backup and need none: the Valkey cache and token store
 start empty and fill themselves, and the Open Food Facts database of the `food`
@@ -1395,6 +1438,8 @@ logging everybody out.
 
 ## Security Checklist
 
+- [ ] `.env` is mode 600 (`ls -l .env` shows `-rw-------`) and owned by the
+      account that runs Compose
 - [ ] Strong random `SECRET_KEY` (`openssl rand -hex 32`)
 - [ ] Its own `ENCRYPTION_KEY` (`openssl rand -hex 32`) — encrypts org secrets,
       so `SECRET_KEY` rotates without touching them

@@ -107,7 +107,12 @@ async def get_items(
     ),
     low_stock_threshold: float = Query(1.0, description='Threshold for low stock'),
     source_document_id: UUID | None = Query(
-        None, description='Filter by source document (e.g. PZ that created the item)'
+        None,
+        description=(
+            'Only products whose history names this document: any receipt, '
+            'issue, transfer or count that touched the product, not only the '
+            'one that created it'
+        ),
     ),
     template_ids: str = Query(
         '',
