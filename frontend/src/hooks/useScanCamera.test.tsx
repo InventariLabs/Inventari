@@ -893,6 +893,20 @@ describe("decodeAtCameraResolution", () => {
     expect(draw).toHaveBeenCalledWith(video, 10, 20, 648, 389, 0, 0, 648, 389);
   });
 
+  it("leaves a frame from a closing reader alone instead of reading it back", () => {
+    const { canvas, draw, context } = setup();
+    const video = document.createElement("video");
+    // A torn-down video reports no picture: sizes that are not numbers.
+    for (const size of [undefined, Number.NaN, 0]) {
+      expect(() =>
+        context.drawImage(video, 0, 0, size, size, 0, 0, 288, 173),
+      ).not.toThrow();
+    }
+
+    expect(draw).toHaveBeenCalledTimes(3);
+    expect([canvas.width, canvas.height]).toEqual([288, 173]);
+  });
+
   it("caps the longest edge of a very large camera picture", () => {
     const { canvas, context } = setup();
     context.drawImage(
