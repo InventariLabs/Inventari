@@ -92,6 +92,16 @@ says what the release does rather than what changed since them.
   run in progress was started, not the day it was created.
   *Cook a batch for stock*, opened again after an abandoned attempt, no longer
   draws the discarded production recipe while its lookup is still answering.
+- An instance hosting organizations of very different sizes — a demo beside a
+  warehouse of a hundred thousand products, or several companies on one
+  server — no longer reads the lists of its largest organization in 9 to 40
+  seconds. Behind PgBouncer, which shares one prepared statement among every
+  organization asking the same list, PostgreSQL planned that statement once
+  for any organization, sized for the average one. The database now plans
+  each read for the organization that asks (`plan_cache_mode` in the
+  database's command in `docker-compose.prod.yml`), and the same lists answer
+  in tens to hundreds of milliseconds. The upgrade restarts the database once,
+  as any change to its command does; there is nothing to do by hand.
 
 ### Added
 
