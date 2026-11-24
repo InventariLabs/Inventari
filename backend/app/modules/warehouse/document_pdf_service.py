@@ -257,6 +257,23 @@ def _issuer_and_places(
     return issuer, frozen.get('source_location'), frozen.get('target_location')
 
 
+def _document_variant(doc_type: str) -> str:
+    """The name of the parties and signatures partials a document type prints."""
+    if doc_type == 'CORRECTION':
+        return 'correction'
+    if doc_type == 'ADJUSTMENT':
+        return 'adjustment'
+    if doc_type in ('INT', 'MM'):
+        return 'transfer'
+    if doc_type == 'INTERNAL_IN':
+        return 'internal_in'
+    if doc_type == 'INTERNAL_OUT':
+        return 'internal_out'
+    if doc_type in ('OUT', 'WZ'):
+        return 'external_out'
+    return 'external_in'
+
+
 def build_pdf_context(
     document: Document,
     profile: DocumentProfile | None,
@@ -349,9 +366,12 @@ def build_pdf_context(
         ', '.join(order['number'] for order in getattr(document, 'source_orders', []))
         or None
     )
+    # A count's adjustment carries the count's machine key as its reference;
+    # nobody reading the paper can use it, and the count's name is the note.
+    is_adjustment = document.type == 'ADJUSTMENT'
     printed_reference = (
         document.external_reference
-        if document.external_reference != source_order_number
+        if document.external_reference != source_order_number and not is_adjustment
         else None
     )
 
@@ -376,20 +396,7 @@ def build_pdf_context(
     show_line_status = not is_correction
     show_payment = is_external
 
-    if is_correction:
-        doc_variant = 'correction'
-    elif is_external_in:
-        doc_variant = 'external_in'
-    elif is_external_out:
-        doc_variant = 'external_out'
-    elif is_transfer:
-        doc_variant = 'transfer'
-    elif is_internal_in:
-        doc_variant = 'internal_in'
-    elif is_internal_out:
-        doc_variant = 'internal_out'
-    else:
-        doc_variant = 'external_in'
+    doc_variant = _document_variant(doc_type)
 
     # 6. The shared header: every print family reads these names, so
     #    the identity, the number, the status, the dates and the codes look
@@ -446,6 +453,7 @@ def build_pdf_context(
         'printed_reference': printed_reference,
         'doc_type': doc_type,
         'is_correction': is_correction,
+        'is_adjustment': is_adjustment,
         'is_external_in': is_external_in,
         'is_external_out': is_external_out,
         'is_internal_in': is_internal_in,
@@ -504,6 +512,9 @@ def render_document_html(
         lang = print_lang(user_template_html, lang)
     else:
         template_name, lang = _resolve_template_and_lang(profile, lang, country)
+    # The issuer was built before this layout was known to print in ``lang``
+    # (a stored layout that fell back to a built-in declaring its own).
+    issuer = issuer.in_language(lang) if issuer else None
 
     # 2-6. Build the Jinja2 context.
     context = build_pdf_context(document, profile, lang, issuer, country=country)

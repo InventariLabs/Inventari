@@ -201,6 +201,18 @@ class TestTemplateEngine:
         result = engine.render('', {})
         assert result == ''
 
+    def test_an_empty_value_prints_nothing_not_the_word_none(self):
+        engine = TemplateEngine()
+        result = engine.render(
+            '<p>[{{ tax_id }}][{{ partner.address }}][{{ missing.x }}]</p>',
+            {'tax_id': None, 'partner': {'address': None}, 'missing': {}},
+        )
+        assert result == '<p>[][][]</p>'
+
+    def test_a_falsy_value_that_is_not_none_still_prints(self):
+        engine = TemplateEngine()
+        assert engine.render('{{ a }}|{{ b }}', {'a': 0, 'b': False}) == '0|False'
+
     def test_render_uses_autoescape(self):
         engine = TemplateEngine()
         result = engine.render(

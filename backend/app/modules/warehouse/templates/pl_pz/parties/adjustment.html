@@ -1,0 +1,8 @@
+<div class="party-box">
+  <h3>Miejsce spisu</h3>
+  {% if target_location or source_location %}
+  <div class="party-name">{{ target_location or source_location }}</div>
+  {% else %}
+  <div style="color:#aaa; font-style:italic;">—</div>
+  {% endif %}
+</div>

@@ -166,7 +166,7 @@
     .signatures {
       margin-top: 10mm;
       display: grid;
-      {% if doc_variant == 'correction' %}grid-template-columns: 1fr;{% else %}grid-template-columns: 1fr 1fr 1fr;{% endif %}
+      {% if doc_variant == 'correction' %}grid-template-columns: 1fr;{% elif doc_variant == 'adjustment' %}grid-template-columns: 1fr 1fr;{% else %}grid-template-columns: 1fr 1fr 1fr;{% endif %}
       gap: 20px;
     }
     .sig-box {

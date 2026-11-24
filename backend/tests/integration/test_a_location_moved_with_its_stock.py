@@ -628,3 +628,54 @@ def test_a_completed_document_lists_under_the_place_its_shelf_stood_in(
         done.number,
         planned.number,
     }
+
+
+def _todo_keys(client, auth_headers, location) -> set[str]:
+    response = client.get(
+        '/api/v1/warehouse/todo',
+        headers=auth_headers,
+        params={
+            'location_id': str(location.id),
+            'done_since': (datetime.now(UTC) - timedelta(hours=2)).isoformat(),
+            'date_to': (datetime.now(UTC) + timedelta(days=7)).date().isoformat(),
+            'limit': 100,
+        },
+    )
+    assert response.status_code == status.HTTP_200_OK, response.text
+    return {item['key'] for item in response.json()['work_items']['items']}
+
+
+def test_the_done_part_of_the_todo_reads_the_place_a_shelf_stood_in(
+    client, auth_headers, db_session, test_user, warehouses
+):
+    """A document done before its shelf was carried stays under the old place.
+
+    The queue filtered by a place lists the document under the place its shelf
+    stood in when it was done; the work still open reads the tree as it is.
+    """
+    done = _document_into(
+        db_session,
+        test_user,
+        warehouses['shelf'],
+        'IN/2026/911',
+        status='COMPLETED',
+        completed_at=datetime.now(UTC) - timedelta(hours=1),
+    )
+    planned = _document_into(
+        db_session, test_user, warehouses['shelf'], 'IN/2026/912', status='CONFIRMED'
+    )
+    db_session.commit()
+    _reorg(
+        client,
+        auth_headers,
+        [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
+    )
+    done_key = f'document:{done.id}:receive'
+    planned_key = f'document:{planned.id}:receive'
+
+    main = _todo_keys(client, auth_headers, warehouses['main'])
+    assert done_key in main
+    assert planned_key not in main
+    pantry = _todo_keys(client, auth_headers, warehouses['pantry'])
+    assert done_key not in pantry
+    assert planned_key in pantry

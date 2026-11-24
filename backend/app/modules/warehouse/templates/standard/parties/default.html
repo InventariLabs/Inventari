@@ -30,6 +30,8 @@
   {% endif %}
 </div>
 
+{# A count has no counterparty: the block above already names its place. #}
+{% if not is_adjustment %}
 <div class="info-block">
   {% if is_external_in %}
   <h3>{{ labels.supplier }}</h3>
@@ -61,3 +63,4 @@
   <div style="color:#aaa; font-style:italic;">—</div>
   {% endif %}
 </div>
+{% endif %}
