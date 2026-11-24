@@ -9,7 +9,6 @@ thousand shelves, not assumed.
 
 from __future__ import annotations
 
-import time
 from decimal import Decimal
 from typing import Any
 from uuid import uuid4
@@ -289,8 +288,9 @@ class TestOccupancyOverview:
         doc_user: User,
     ) -> None:
         """Two thousand shelves, a third of them limited and stocked: the
-        answer takes the same handful of statements it takes for ten, and
-        arrives fast enough that the screen can ask for all of it at once."""
+        answer takes the same handful of statements it takes for ten. The cost
+        is counted in statements, not seconds: a wall-clock bound measures the
+        runner as much as the code, and a loaded one fails it with no slowdown."""
         from app.core.testing import ModuleTestHelper
 
         tag = uuid4().hex[:6]
@@ -399,11 +399,8 @@ class TestOccupancyOverview:
             )
         db_session.commit()
 
-        started = time.perf_counter()
         large = statements()
-        elapsed = time.perf_counter() - started
 
         assert large == small, (small, large)
-        assert elapsed < 5, elapsed
         body = client.get(URL, headers=doc_auth_headers).json()
         assert body['totals']['shelves'] >= 2000

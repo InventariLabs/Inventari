@@ -388,6 +388,71 @@ describe("unguardedClaimsIn", () => {
     ]);
   });
 
+  it("does not let a mutation's flag in the claim's own expression answer for the read", () => {
+    const source = [
+      "function List() {",
+      "  const { data: rows = [], isError } = useThings();",
+      "  const save = useSave();",
+      "  const total = rows.length;",
+      "  return (",
+      "    <div>",
+      "      {isError && <QueryFailure />}",
+      "      {save.isPending ? <Spinner /> : <ListHeader hasRows={total > 0} />}",
+      "    </div>",
+      "  );",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toMatchObject([
+      { site: "List :: total>0" },
+    ]);
+  });
+
+  it("does not let a mutation's flag in a disabled test answer for the read", () => {
+    const source = [
+      "function List() {",
+      "  const { data: rows = [], isError } = useThings();",
+      "  const exporting = useExport();",
+      "  const total = rows.length;",
+      "  return (",
+      "    <div>",
+      "      {isError && <QueryFailure />}",
+      "      <Button disabled={total === 0 || exporting.isPending}>Export</Button>",
+      "    </div>",
+      "  );",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toMatchObject([
+      { site: "List :: total===0" },
+    ]);
+  });
+
+  it("does not let a mutation's flag in an early-return test answer for the read", () => {
+    const source = [
+      "function List() {",
+      "  const { data: rows = [], isError } = useThings();",
+      "  const save = useSave();",
+      "  if (save.isPending) return <Spinner />;",
+      "  const total = rows.length;",
+      "  return <ListHeader hasRows={total > 0} />;",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toMatchObject([
+      { site: "List :: total>0" },
+    ]);
+  });
+
+  it("still takes a field of the read's own query variable for its outcome", () => {
+    const source = [
+      "function List() {",
+      "  const listQuery = useThings();",
+      "  const rows = listQuery.data ?? [];",
+      "  const save = useSave();",
+      "  return listQuery.isPending ? <Spinner /> : <ListHeader hasRows={rows.length > 0} />;",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toEqual([]);
+  });
+
   it("does not accept a guard inside a handler or an effect", () => {
     const source = [
       "function List() {",

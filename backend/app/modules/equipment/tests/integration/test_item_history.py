@@ -129,7 +129,7 @@ class TestItemHistoryMaintenance:
         assert changes['title'] == 'Screen replacement'
         assert changes['cost'] == 450.0
 
-    @pytest.mark.parametrize('day', ['2020-01-01', date.today().isoformat()])
+    @pytest.mark.parametrize('day', ['2020-01-01', 'today'])
     def test_recording_service_does_not_change_the_chosen_status(
         self,
         client: TestClient,
@@ -145,7 +145,7 @@ class TestItemHistoryMaintenance:
                 'item_id': str(eq_item.id),
                 'maintenance_type': 'CLEANING',
                 'title': 'Cleaning',
-                'performed_at': day,
+                'performed_at': date.today().isoformat() if day == 'today' else day,
             },
         )
         assert response.status_code == 201, response.text

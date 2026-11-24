@@ -42,7 +42,10 @@ from tests.integration._shelf import (
     shelf_keeper,
 )
 
-_TODAY = date.today().isoformat()
+
+def _today() -> str:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return date.today().isoformat()
 
 
 @pytest.fixture
@@ -177,7 +180,7 @@ def _task(
     response = client.get(
         '/api/v1/warehouse/todo',
         headers=headers,
-        params={'date_to': _TODAY, 'limit': 50},
+        params={'date_to': _today(), 'limit': 50},
     )
     assert response.status_code == status.HTTP_200_OK, response.text
     for item in response.json()['work_items']['items']:
@@ -206,7 +209,7 @@ def _document(
         headers=headers,
         json={
             'type': doc_type,
-            'scheduled_date': _TODAY,
+            'scheduled_date': _today(),
             **{f'{name}_location_id': str(place.id) for name, place in places.items()},
             'lines': [
                 {

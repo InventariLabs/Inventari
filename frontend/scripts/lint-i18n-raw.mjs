@@ -77,7 +77,7 @@ import { resolve, relative, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import ts from "typescript";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname);
+const ROOT = resolve(import.meta.dirname, "..");
 const SEARCH_DIRS = ["src/modules", "src/components", "src/pages", "src/app"];
 const SKIP_PATH_PARTS = ["__tests__", "__mocks__", "/test/", "/tests/"];
 const SKIP_FILES = new Set(["setup.ts"]);

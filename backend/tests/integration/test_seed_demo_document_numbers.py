@@ -25,7 +25,9 @@ from seed_demo_data import highest_document_seq
 
 pytestmark = pytest.mark.integration
 
-YEAR = datetime.now(UTC).year
+
+def _year() -> int:
+    return datetime.now(UTC).year
 
 
 @pytest.fixture
@@ -76,38 +78,38 @@ class TestHighestDocumentSeq:
     def test_an_untouched_pattern_starts_the_caller_at_one(
         self, db_session: Session, seed_org: uuid.UUID
     ) -> None:
-        assert highest_document_seq(db_session, seed_org, 'IN', YEAR) == 0
+        assert highest_document_seq(db_session, seed_org, 'IN', _year()) == 0
 
     def test_it_clears_the_highest_number_already_taken(
         self, db_session: Session, seed_org: uuid.UUID
     ) -> None:
-        db_session.add(_document(seed_org, f'IN/{YEAR}/001'))
-        db_session.add(_document(seed_org, f'IN/{YEAR}/007'))
-        db_session.add(_document(seed_org, f'IN/{YEAR}/003'))
+        db_session.add(_document(seed_org, f'IN/{_year()}/001'))
+        db_session.add(_document(seed_org, f'IN/{_year()}/007'))
+        db_session.add(_document(seed_org, f'IN/{_year()}/003'))
         db_session.commit()
 
-        assert highest_document_seq(db_session, seed_org, 'IN', YEAR) == 7
+        assert highest_document_seq(db_session, seed_org, 'IN', _year()) == 7
 
     def test_each_type_and_year_counts_on_its_own(
         self, db_session: Session, seed_org: uuid.UUID
     ) -> None:
-        db_session.add(_document(seed_org, f'IN/{YEAR}/009'))
-        db_session.add(_document(seed_org, f'OUT/{YEAR}/002'))
-        db_session.add(_document(seed_org, f'IN/{YEAR - 1}/044'))
+        db_session.add(_document(seed_org, f'IN/{_year()}/009'))
+        db_session.add(_document(seed_org, f'OUT/{_year()}/002'))
+        db_session.add(_document(seed_org, f'IN/{_year() - 1}/044'))
         db_session.commit()
 
-        assert highest_document_seq(db_session, seed_org, 'IN', YEAR) == 9
-        assert highest_document_seq(db_session, seed_org, 'OUT', YEAR) == 2
-        assert highest_document_seq(db_session, seed_org, 'INT', YEAR) == 0
+        assert highest_document_seq(db_session, seed_org, 'IN', _year()) == 9
+        assert highest_document_seq(db_session, seed_org, 'OUT', _year()) == 2
+        assert highest_document_seq(db_session, seed_org, 'INT', _year()) == 0
 
     def test_a_number_the_seeder_does_not_own_still_counts(
         self, db_session: Session, seed_org: uuid.UUID
     ) -> None:
         """The collision that started this: no marker, and still in the way."""
-        db_session.add(_document(seed_org, f'IN/{YEAR}/012', ref=None))
+        db_session.add(_document(seed_org, f'IN/{_year()}/012', ref=None))
         db_session.commit()
 
-        assert highest_document_seq(db_session, seed_org, 'IN', YEAR) == 12
+        assert highest_document_seq(db_session, seed_org, 'IN', _year()) == 12
 
     def test_a_custom_format_is_left_alone(
         self, db_session: Session, seed_org: uuid.UUID
@@ -116,11 +118,11 @@ class TestHighestDocumentSeq:
 
         Only the pattern the seeder writes can collide with the seeder.
         """
-        db_session.add(_document(seed_org, f'IN-{YEAR}-0099'))
-        db_session.add(_document(seed_org, f'IN/{YEAR}/FV-1'))
+        db_session.add(_document(seed_org, f'IN-{_year()}-0099'))
+        db_session.add(_document(seed_org, f'IN/{_year()}/FV-1'))
         db_session.commit()
 
-        assert highest_document_seq(db_session, seed_org, 'IN', YEAR) == 0
+        assert highest_document_seq(db_session, seed_org, 'IN', _year()) == 0
 
     def test_another_organization_does_not_shift_this_one(
         self, db_session: Session, seed_org: uuid.UUID
@@ -138,10 +140,10 @@ class TestHighestDocumentSeq:
         db_session.add(neighbour)
         db_session.commit()
         _AUTHOR[other.id] = neighbour.id
-        db_session.add(_document(other.id, f'IN/{YEAR}/050'))
+        db_session.add(_document(other.id, f'IN/{_year()}/050'))
         db_session.commit()
 
-        assert highest_document_seq(db_session, seed_org, 'IN', YEAR) == 0
+        assert highest_document_seq(db_session, seed_org, 'IN', _year()) == 0
 
         db_session.query(Document).filter(Document.organization_id == other.id).delete(
             synchronize_session=False

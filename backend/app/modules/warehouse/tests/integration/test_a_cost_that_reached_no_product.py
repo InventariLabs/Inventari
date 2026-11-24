@@ -22,7 +22,10 @@ from app.models.product_template import ProductTemplate
 from app.models.storage_location import StorageLocation
 from app.modules.warehouse.models import Document
 
-_TODAY = date.today()
+
+def _today() -> date:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return date.today()
 
 
 def _posted_receipt(
@@ -78,7 +81,7 @@ def _variance(
 
 def _stock_figures(client: TestClient, headers: dict[str, str]) -> dict[str, Any]:
     on_a_date = client.get(
-        '/api/v1/stock-as-of', params={'as_of': _TODAY.isoformat()}, headers=headers
+        '/api/v1/stock-as-of', params={'as_of': _today().isoformat()}, headers=headers
     )
     assert on_a_date.status_code == 200, on_a_date.text
     return {'as_of': on_a_date.json()}
@@ -96,7 +99,7 @@ class TestRecordingAVariance:
         doc_id = _posted_receipt(
             client, doc_auth_headers, doc_target_location, doc_partner, doc_template
         )
-        on = (_TODAY - timedelta(days=2)).isoformat()
+        on = (_today() - timedelta(days=2)).isoformat()
 
         response = _variance(
             client, doc_auth_headers, doc_id, currency=None, occurred_on=on
@@ -140,7 +143,7 @@ class TestRecordingAVariance:
             client, doc_auth_headers, doc_target_location, doc_partner, doc_template
         )
         body = _variance(client, doc_auth_headers, doc_id).json()
-        assert body['variances'][0]['occurred_on'] == _TODAY.isoformat()
+        assert body['variances'][0]['occurred_on'] == _today().isoformat()
 
     def test_a_reason_is_required(
         self,
@@ -247,7 +250,7 @@ class TestWhereItIsListed:
             doc_id,
             amount='50.50',
             kind='duty',
-            occurred_on=(_TODAY - timedelta(days=30)).isoformat(),
+            occurred_on=(_today() - timedelta(days=30)).isoformat(),
         )
 
         everything = client.get(
@@ -262,7 +265,7 @@ class TestWhereItIsListed:
 
         lately = client.get(
             '/api/v1/warehouse/cost-variances',
-            params={'date_from': (_TODAY - timedelta(days=7)).isoformat()},
+            params={'date_from': (_today() - timedelta(days=7)).isoformat()},
             headers=doc_auth_headers,
         ).json()
         assert [Decimal(item['amount']) for item in lately['items']] == [

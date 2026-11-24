@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import uuid
 from collections.abc import Callable
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Any, cast
 
 import pytest
@@ -32,7 +32,10 @@ from app.modules.warehouse.tests.integration.test_wms_picking import (
     _confirm_document,
 )
 
-_TODAY = datetime.now(UTC).date()
+
+def _today() -> date:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return datetime.now(UTC).date()
 
 
 class _Floor:
@@ -89,13 +92,13 @@ def floor(
             organization_id=doc_org.id,
             product_template_id=template_id,
             name='LOT-FIRST',
-            expiry_date=_TODAY + timedelta(days=300),
+            expiry_date=_today() + timedelta(days=300),
         )
         second = StockLot(
             organization_id=doc_org.id,
             product_template_id=template_id,
             name='LOT-SECOND',
-            expiry_date=_TODAY + timedelta(days=30),
+            expiry_date=_today() + timedelta(days=30),
         )
         db_session.add_all([first, second])
         db_session.flush()

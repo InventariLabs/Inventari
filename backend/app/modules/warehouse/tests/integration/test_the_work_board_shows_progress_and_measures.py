@@ -29,7 +29,10 @@ from app.modules.warehouse.models import (
     WorkItemOverlay,
 )
 
-_TODAY = date.today()
+
+def _today() -> date:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return date.today()
 
 
 def _document(
@@ -50,7 +53,7 @@ def _document(
         type=doc_type,
         number=f'{doc_type}/{uuid4().hex[:8]}',
         status=status_word,
-        scheduled_date=_TODAY,
+        scheduled_date=_today(),
         created_by=user.id,
         completed_at=completed_at,
     )
@@ -96,7 +99,7 @@ def _todo(client: TestClient, headers: dict[str, str], **params: Any) -> dict[st
     response = client.get(
         '/api/v1/warehouse/todo',
         headers=headers,
-        params={'date_to': _TODAY.isoformat(), 'limit': 50, **params},
+        params={'date_to': _today().isoformat(), 'limit': 50, **params},
     )
     assert response.status_code == status.HTTP_200_OK, response.text
     return cast(dict[str, Any], response.json()['work_items'])
@@ -402,7 +405,7 @@ class TestEveryColumnLooksThroughTheWholeSet:
                 source_kind='custom',
                 title=f'Card {number}',
                 created_by=doc_user.id,
-                due_date=_TODAY - timedelta(days=10 - number),
+                due_date=_today() - timedelta(days=10 - number),
                 assignee_id=doc_user.id if number == 9 else None,
             )
             for number in range(10)
@@ -494,7 +497,7 @@ class TestEveryColumnLooksThroughTheWholeSet:
                 type='OUT',
                 number=f'OUT/BULK/{number:04d}',
                 status='CONFIRMED',
-                scheduled_date=_TODAY - timedelta(days=2 if number < 1000 else 1),
+                scheduled_date=_today() - timedelta(days=2 if number < 1000 else 1),
                 created_by=doc_user.id,
             )
             for number in range(1001)

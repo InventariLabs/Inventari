@@ -77,7 +77,7 @@ import ts from "typescript";
 
 import { blankComments } from "./source-text.mjs";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const SRC = resolve(ROOT, "src");
 const BASELINE_PATH = resolve(ROOT, "scripts/query-error-read-baseline.json");
 
@@ -386,8 +386,8 @@ function renderedExpression(text, index) {
   return null;
 }
 
-const OUTCOME =
-  /\b(?:isError|error|isLoadingError|status|isLoading|isPending|isFetching|isPlaceholderData|failed)\b/;
+const OUTCOME_FIELDS =
+  "isError|error|isLoadingError|status|isLoading|isPending|isFetching|isPlaceholderData|failed";
 
 /** `name` as a whole word in `text`; the names are identifiers. */
 function mentions(text, name) {
@@ -395,17 +395,29 @@ function mentions(text, name) {
 }
 
 /**
+ * Whether `text` reads the outcome of this read: a name it bound
+ * (`isTreeLoading`, `locationsFailed`) in `reads.outcomes`, or a field of its
+ * own query variable (`listQuery.isError`) in `reads.queries`. A flag of
+ * anything else — `save.isPending`, a mutation's — answers for a different
+ * request, and `isPending` beside a failed read says nothing about it.
+ */
+function readsFlag(text, reads) {
+  if (reads.outcomes.some((name) => mentions(text, name))) return true;
+  return reads.queries.some((name) =>
+    new RegExp(
+      String.raw`\b${name.replace(/\$/g, "\\$")}\s*\??\.\s*(?:${OUTCOME_FIELDS})\b`,
+    ).test(text),
+  );
+}
+
+/**
  * A test read positively. `if (!isError) return <List />` returns on
  * success and leaves the claim below it to render while the read failed, so
- * a negated flag answers for nothing. `outcomes` holds the names the read
- * bound its outcome to — `isTreeLoading`, `locationsFailed` — which the
- * fixed list of field names does not spell.
+ * a negated flag answers for nothing. `reads.outcomes` holds the names the
+ * read bound its outcome to — `isTreeLoading`, `locationsFailed`.
  */
-function readsOutcome(test, outcomes) {
-  const positive = test.replace(/!\s*[\w$]+(?:\.[\w$]+)*/g, "");
-  return (
-    OUTCOME.test(positive) || outcomes.some((name) => mentions(positive, name))
-  );
+function readsOutcome(test, reads) {
+  return readsFlag(test.replace(/!\s*[\w$]+(?:\.[\w$]+)*/g, ""), reads);
 }
 
 /** Whether a statement cannot complete: it returns or throws, itself or last. */
@@ -481,7 +493,7 @@ function ownedBy(block, scopeFunction) {
  * in the JSX does not either: `{isError ? <QueryFailure /> : null}` beside
  * `hasRows={total > 0}` draws the claim while the read failed.
  */
-function earlyOutcome(tree, scopeFunction, at, outcomes) {
+function earlyOutcome(tree, scopeFunction, at, reads) {
   const leaf = nodeAt(tree, at);
   let node = leaf;
   while (node && node !== scopeFunction) {
@@ -492,7 +504,7 @@ function earlyOutcome(tree, scopeFunction, at, outcomes) {
       if (
         at >= alternate.getStart(tree) &&
         at < alternate.end &&
-        readsOutcome(parent.condition.getText(tree), outcomes)
+        readsOutcome(parent.condition.getText(tree), reads)
       ) {
         return true;
       }
@@ -503,7 +515,7 @@ function earlyOutcome(tree, scopeFunction, at, outcomes) {
         if (
           ts.isIfStatement(statement) &&
           alwaysExits(statement.thenStatement) &&
-          readsOutcome(statement.expression.getText(tree), outcomes)
+          readsOutcome(statement.expression.getText(tree), reads)
         ) {
           return true;
         }
@@ -517,7 +529,7 @@ function earlyOutcome(tree, scopeFunction, at, outcomes) {
 /**
  * Findings for the claims `derived` makes in one scope: a length or a
  * zero-comparison that decides an empty state or a disabled action.
- * `outcomes` are the names the read bound its outcome to; `answersEarly`
+ * `reads` names what the read's outcome is spelled as (see `readsFlag`); `answersEarly`
  * says whether the component has already answered with that outcome above
  * the claim.
  */
@@ -526,7 +538,7 @@ function claimFindings(
   text,
   scope,
   derived,
-  outcomes,
+  reads,
   lineOf,
   answersEarly,
 ) {
@@ -560,13 +572,8 @@ function claimFindings(
       text
         .slice(Math.max(0, text.lastIndexOf("return", at)), at + 400)
         .split(";")[0];
-    if (
-      OUTCOME.test(expression) ||
-      outcomes.some((name) => mentions(expression, name))
-    ) {
-      continue;
-    }
-    if (answersEarly(scope, at, outcomes)) continue;
+    if (readsFlag(expression, reads)) continue;
+    if (answersEarly(scope, at, reads)) continue;
     const before = text.slice(Math.max(0, at - 80), at);
     // The claims that lie are the ones deciding emptiness, a disabled action,
     // or a count in a sentence: an ordinary ".length" in a list header says
@@ -597,7 +604,7 @@ export function unguardedClaimsIn(rel, source) {
   // scan narrows the file to the few places that ask a question about data.
   let tree = null;
   const scopes = new Map();
-  const answersEarly = (scope, at, outcomes) => {
+  const answersEarly = (scope, at, reads) => {
     tree ??= ts.createSourceFile(
       rel,
       text,
@@ -608,7 +615,7 @@ export function unguardedClaimsIn(rel, source) {
     if (!scopes.has(scope.start)) {
       scopes.set(scope.start, scopeFunctionAt(tree, scope.start));
     }
-    return earlyOutcome(tree, scopes.get(scope.start), at, outcomes);
+    return earlyOutcome(tree, scopes.get(scope.start), at, reads);
   };
   const pattern = /\bconst\s*\{/g;
   let match;
@@ -637,7 +644,7 @@ export function unguardedClaimsIn(rel, source) {
         text,
         scope,
         derivedNames(text, scope, seeds),
-        outcomes,
+        { outcomes, queries: [] },
         lineOf,
         answersEarly,
       ),
@@ -660,7 +667,15 @@ export function unguardedClaimsIn(rel, source) {
     if (!readsQuery) continue;
     const derived = derivedNames(text, scope, [name]);
     out.push(
-      ...claimFindings(rel, text, scope, derived, [], lineOf, answersEarly),
+      ...claimFindings(
+        rel,
+        text,
+        scope,
+        derived,
+        { outcomes: [], queries: [name] },
+        lineOf,
+        answersEarly,
+      ),
     );
   }
   return out;

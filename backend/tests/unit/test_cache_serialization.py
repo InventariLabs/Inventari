@@ -53,7 +53,7 @@ class TestSerializer:
         'value',
         [
             {'id': uuid.uuid4()},
-            {'at': datetime.now(UTC)},
+            {'at': datetime(2001, 2, 3, 4, 5, tzinfo=UTC)},
             [{'nested': {'id': uuid.uuid4()}}],
         ],
     )

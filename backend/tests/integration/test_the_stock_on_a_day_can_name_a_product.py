@@ -27,7 +27,9 @@ from ._shelf import post_on_shelf
 
 pytestmark = pytest.mark.integration
 
-_A_MONTH_AGO = datetime.now(UTC) - timedelta(days=30)
+
+def _a_month_ago() -> datetime:
+    return datetime.now(UTC) - timedelta(days=30)
 
 
 @pytest.fixture
@@ -55,7 +57,7 @@ def shelf_of_three(client, auth_headers, db_session, test_user):
     db_session.execute(
         update(StockMove)
         .where(StockMove.organization_id == test_user.organization_id)
-        .values(completed_at=_A_MONTH_AGO)
+        .values(completed_at=_a_month_ago())
     )
     db_session.commit()
     return products
