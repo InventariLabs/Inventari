@@ -236,6 +236,8 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 	docker compose exec frontend npm run lint
 	@echo "$(BLUE)[INFO]$(NC) Checking frontend formatting with prettier (the pre-commit hook's copy)..."
 	docker compose exec frontend npm run format:check
+	@echo "$(BLUE)[INFO]$(NC) Auditing the npm lock for known vulnerabilities (ci.yml's copy)..."
+	docker compose exec frontend npm audit --package-lock-only
 	@echo "$(BLUE)[INFO]$(NC) Running frontend typecheck + production build..."
 	docker compose exec frontend npm run build:check
 	@echo "$(BLUE)[INFO]$(NC) Checking i18n key usage against catalogs..."
@@ -340,7 +342,7 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 	@$(MAKE) --no-print-directory perf-phone
 
 # ─── frontend/package.json targets NO make target calls ───────────────────
-# Measured: 52 scripts, 31 called above/here, the rest are deliberate and
+# Measured: 85 scripts, 52 called above/here, the rest are deliberate and
 # each of these has a reason to stay out of the automated gates:
 #   dev / preview                    — interactive sessions, not gates.
 #   test / test:run                  — the Makefile drives vitest inside the
@@ -353,8 +355,6 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 #                                      the suite used to run without it and
 #                                      enforced nothing, which is how the
 #                                      63/49/73/63 floor went missing locally.
-#   format:check                     — the pre-commit hook checks formatting on commit;
-#                                      this is the whole-tree re-check.
 #   build                            — `vite build` alone; `build:check` (tsc, the
 #                                      build and the bundle budget) is the one
 #                                      wired in above.
@@ -392,6 +392,23 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 #   scan:ui                          — advisory reports, no verdict to gate
 #                                      on (their findings are tracked as
 #                                      follow-up work).
+#   check:a11y-baseline:write /
+#   check:api-types-mirror:baseline /
+#   check:e2e-waits:baseline /
+#   check:raw-machine-values:baseline /
+#   check:title-case:baseline /
+#   check:vocabulary:baseline /
+#   check:modules:contract:write /
+#   test:console-baseline /
+#   test:e2e:steps:write-baseline    — WRITERS of the baselines the gates above
+#                                      (or the test run) read, like the ones
+#                                      before them.
+#   check:modules:contract           — `make check-frontend` runs the script
+#                                      itself, not through npm.
+#   test:e2e:steps                   — a Playwright spec run (it writes to the
+#                                      database it runs against), not a gate.
+#   perf:phone                       — `make perf-phone` runs the script
+#                                      itself, with the stack's API address.
 
 lint-architecture: ## Check architecture boundaries for backend modules
 	@echo "$(BLUE)[INFO]$(NC) Checking architecture boundaries..."
