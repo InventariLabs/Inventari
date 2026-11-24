@@ -78,7 +78,7 @@ export default defineConfig({
       // removes organization-wide rows (the built-in templates) that a second
       // project running it side by side would pull from under it.
       testIgnore:
-        /((warehouse-location-)?workspace-mode|maker-module-gate|approvals(-integration)?|announcement-publish|example-module|warehouse-office-output|warehouse-reduced-rates|inventory-value-movement|phone-first-record-responsive)\.spec\.ts/,
+        /((warehouse-location-)?workspace-mode|maker-module-gate|approvals(-integration)?|announcement-publish|example-module|warehouse-office-output|warehouse-reduced-rates|inventory-value-movement|warehouse-configuration|phone-first-record-responsive)\.spec\.ts/,
     },
     {
       // Opt-in by file name: a spec whose name ends in `responsive` runs on
@@ -186,11 +186,14 @@ export default defineConfig({
       // price column and the unpriced-lines notice, and the totals count what
       // they would not. So it runs once the specs that read those screens
       // have finished, and not alongside an approval workflow that would hold
-      // its posts.
+      // its posts. The configuration spec joins it: it saves the same value
+      // tracking switch and the shelf-scan confirmation, and a receiving spec
+      // in another worker that meets either one mid-change waits for a
+      // "Received" that never comes.
       name: "value-tracking",
       use: { ...devices["Desktop Chrome"] },
       testMatch:
-        /(warehouse-office-output|warehouse-reduced-rates|inventory-value-movement)\.spec\.ts/,
+        /(warehouse-office-output|warehouse-reduced-rates|inventory-value-movement|warehouse-configuration)\.spec\.ts/,
       dependencies: [
         "chromium",
         "mobile",
