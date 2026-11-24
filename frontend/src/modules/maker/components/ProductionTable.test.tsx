@@ -116,3 +116,32 @@ describe("ProductionTable — the result column", () => {
     );
   });
 });
+
+describe("ProductionTable — the day under a run", () => {
+  const renderRows = (orders: ProductionOrder[]) =>
+    render(
+      <MemoryRouter>
+        <ProductionTable orders={orders} sort="newest" isDuplicating={false} />
+      </MemoryRouter>,
+    );
+
+  it("reads the planned day of a draft, not the day it was created", () => {
+    renderRows([{ ...order, production_date: "2026-03-27" }]);
+
+    expect(screen.getByText(/Planned for/)).toHaveTextContent(/27/);
+    expect(screen.queryByText(/Jan/)).not.toBeInTheDocument();
+  });
+
+  it("keeps the creation day of a draft nobody dated", () => {
+    renderRows([order]);
+
+    expect(screen.queryByText(/Planned for/)).not.toBeInTheDocument();
+    expect(screen.getByText(/Jan/)).toBeInTheDocument();
+  });
+
+  it("reads the day a run in progress was started", () => {
+    renderRows([{ ...order, status: "IN_PROGRESS", started_on: "2026-03-24" }]);
+
+    expect(screen.getByText(/Started/)).toHaveTextContent(/24/);
+  });
+});

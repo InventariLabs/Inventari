@@ -215,3 +215,24 @@ def test_the_cross_module_unit_cost_is_the_whole_cost_per_unit(
     run_in_async_session(async_engine_fixture, _ask)
 
     assert answers == [UNIT]
+
+
+def test_maker_api_total_cost_is_the_whole_batch(
+    mk_org: Organization,
+    timed_batch_with_a_fixed_cost: tuple[ProductTemplate, str],
+    async_engine_fixture: AsyncEngine,
+) -> None:
+    """The total ``maker_api`` answers is the unit cost times the quantity."""
+    output, _recipe_id = timed_batch_with_a_fixed_cost
+    answers: list[Decimal] = []
+
+    async def _ask(session: AsyncSession) -> None:
+        answers.append(
+            await maker_api.compute_total_cost_async(
+                session, mk_org.id, output.id, Decimal('10')
+            )
+        )
+
+    run_in_async_session(async_engine_fixture, _ask)
+
+    assert answers == [TOTAL]

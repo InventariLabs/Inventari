@@ -360,7 +360,41 @@ describe("ProductionOrderStats — the estimate beside the actual", () => {
     );
     expect(screen.getByText("Estimated at completion")).toBeInTheDocument();
     expect(screen.getByText("PLN 48.20")).toBeInTheDocument();
-    expect(screen.getByText("Actual difference: PLN 1.80")).toBeInTheDocument();
+    expect(
+      screen.getByText("Actual cost: PLN 1.80 above the estimate"),
+    ).toBeInTheDocument();
+  });
+
+  it("says a run that cost less than its estimate came in below it", () => {
+    render(
+      <ProductionOrderStats
+        order={order({
+          status: "COMPLETED",
+          actual_qty: "10",
+          total_cost: "47.00",
+          estimated_total_cost: "48.00",
+        })}
+      />,
+    );
+    expect(
+      screen.getByText("Actual cost: PLN 1.00 below the estimate"),
+    ).toBeInTheDocument();
+  });
+
+  it("says so when the run cost what it was estimated at", () => {
+    render(
+      <ProductionOrderStats
+        order={order({
+          status: "COMPLETED",
+          actual_qty: "10",
+          total_cost: "48.00",
+          estimated_total_cost: "48.00",
+        })}
+      />,
+    );
+    expect(
+      screen.getByText("Actual cost matches the estimate"),
+    ).toBeInTheDocument();
   });
 
   it("shows no estimate on a run that closed before one was kept", () => {

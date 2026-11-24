@@ -588,6 +588,53 @@ describe("CookForStockModal (cooking-to-stock bridge)", () => {
       });
     });
 
+    it("opens the next sheet on the pair without the discarded recipe, even before the lookup answers", async () => {
+      const client = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+      const snapshot = {
+        id: "maker-recipe-1",
+        batch_yield_qty: "10",
+        batch_yield_uom_symbol: null,
+      };
+      // The sheet's own lookup found the snapshot it created.
+      mocks.findBridgedRecipe.mockResolvedValue(snapshot);
+      mocks.createProductionOrderFromBridge.mockRejectedValue(shortageWarning);
+      serveScopedStorages([{ id: "loc-1", name: "Output Store" }]);
+      const sheet = (open: boolean) => (
+        <QueryClientProvider client={client}>
+          <MemoryRouter>
+            <CookForStockModal
+              open={open}
+              onClose={() => view.rerender(sheet(false))}
+              recipe={recipe}
+            />
+          </MemoryRouter>
+        </QueryClientProvider>
+      );
+      const view = render(sheet(true));
+      fireEvent.click(screen.getByTestId("mock-product-option"));
+      pickStorage("Output Store");
+      fireEvent.click(screen.getByTestId("cook-for-stock-submit"));
+      await waitFor(() => {
+        expect(screen.getByTestId("shortage-modal")).toBeTruthy();
+      });
+      fireEvent.click(screen.getByText("cancel"));
+      fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+      await waitFor(() => {
+        expect(mocks.discardBridgeRecipe).toHaveBeenCalled();
+      });
+      // What the next sheet on the pair reads before its own lookup answers.
+      await waitFor(() => {
+        expect(
+          client.getQueryData(
+            queryKeys.maker.bridgedRecipe("tpl-jam", recipe.id),
+          ),
+        ).toBeNull();
+      });
+    });
+
     it("keeps a snapshot that was already there", async () => {
       // The endpoint is idempotent: a second attempt on the same pair hands
       // back the first snapshot, which this attempt did not create and has

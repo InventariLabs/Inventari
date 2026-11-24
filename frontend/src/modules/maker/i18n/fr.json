@@ -31,7 +31,9 @@
       "resultPerUnit": "({{amount}} / {{unit}})",
       "shortage_one": "Stock insuffisant : {{count}} ingrédient manquant. La clôture sera refusée.",
       "shortage_other": "Stock insuffisant : {{count}} ingrédients manquants. La clôture sera refusée.",
-      "batch": "Lot {{batch}}"
+      "batch": "Lot {{batch}}",
+      "plannedFor": "Prévue pour le {{date}}",
+      "startedOn": "Démarrée le {{date}}"
     },
     "sortLabel": "Trier",
     "sort": {
@@ -55,7 +57,7 @@
     "table": {
       "product": "Produit",
       "status": "Statut",
-      "date": "Créé le",
+      "date": "Date",
       "actions": "Actions"
     }
   },
@@ -67,6 +69,7 @@
     "unitCostHint": "Quantité",
     "missingTitle": "Ingrédients sans prix",
     "ingredients": "Ingrédients",
+    "otherCosts": "En plus des ingrédients",
     "chart": {
       "title": "Part du coût",
       "empty": "Aucun ingrédient n'a encore de prix — rien à représenter."
@@ -209,7 +212,9 @@
       "totalCostGap_one": "{{count}} ingrédient a été prélevé sur un stock sans coût, il manque donc dans ce total : {{names}}. L'aperçu avant l'enregistrement peut afficher un montant plus élevé, car il peut estimer un coût manquant d'après un autre stock ou des offres de fournisseurs.",
       "totalCostGap_other": "{{count}} ingrédients ont été prélevés sur un stock sans coût, ils manquent donc dans ce total : {{names}}. L'aperçu avant l'enregistrement peut afficher un montant plus élevé, car il peut estimer un coût manquant d'après un autre stock ou des offres de fournisseurs.",
       "estimatedAtCompletion": "Estimation à la clôture",
-      "estimatedDifference": "Écart réel : {{amount}}",
+      "estimatedOver": "Coût réel : {{amount}} au-dessus de l'estimation",
+      "estimatedUnder": "Coût réel : {{amount}} en dessous de l'estimation",
+      "estimatedOnTarget": "Le coût réel correspond à l'estimation",
       "takenSoFar": "Prélevé jusqu’ici"
     },
     "ingredients": "Ingrédients consommés",
@@ -525,6 +530,7 @@
     "advanced": "Avancé",
     "advancedHint": "Règles pour les manques et la surproduction. Les valeurs par défaut conviennent à un petit atelier.",
     "laborHourlyRate": "Taux horaire de votre travail",
+    "laborHourlyRateUnit": "{{currency}} / heure",
     "laborHourlyRateHint": "La main-d'œuvre d'une formule est le temps de ses étapes à ce taux. Zéro signifie que la main-d'œuvre ne coûte rien dans les estimations."
   },
   "availability": {

@@ -17,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.contracts import UserContextDTO, WorkItemDTO, WorkItemQueryDTO
 from app.core.public_api import core_api
 
-from . import bom_service, cost_breakdown, cost_rollup, labelling, production_service
+from . import bom_service, cost_breakdown, labelling, production_service
 from ._schemas_breakdown import CostBreakdownResponse
 from .models import BoMLine, ProductionOrder, ProductionOrderLine
 
@@ -119,14 +119,17 @@ class MakerAPI:
         template_id: UUID,
         qty: Decimal,
     ) -> Decimal:
-        """Sum of layer-average rate × effective_qty across the multi-level BOM.
+        """Whole cost of making ``qty`` units: ingredients, fixed costs and labour.
 
-        Stock value is FIFO; the rate is the average cost of the layers
-        still on hand (the ``avco`` label in source fields is historical).
+        The same figure :meth:`compute_unit_cost_async` divides by the quantity,
+        so a unit cost times ``qty`` is this total. An ingredient with no rate
+        adds nothing (``get_breakdown_async`` lists it); zero when nothing is
+        rateable.
         """
-        return await cost_rollup.compute_total_cost(
+        breakdown = await cost_breakdown.compute_breakdown(
             db, organization_id, template_id, qty
         )
+        return breakdown.total_cost
 
     async def compute_unit_cost_async(
         self,

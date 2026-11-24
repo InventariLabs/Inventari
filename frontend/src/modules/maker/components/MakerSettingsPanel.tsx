@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { QueryFailure } from "@/components/ui/QueryResult";
 import { useCanManage } from "@/hooks/useCanWrite";
+import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
 import {
   useMakerSettings,
   useUpdateMakerSettings,
@@ -89,6 +90,7 @@ export function MakerSettingsPanel() {
   const [scope, setScope] = useState<AvailabilityCheckScope>("GLOBAL");
   const [strategy, setStrategy] = useState<CreateOnShortageStrategy>("ALLOW");
   const [hourlyRate, setHourlyRate] = useState("0");
+  const currency = useOrganizationCurrency();
   const [initialized, setInitialized] = useState(false);
 
   // Sync local state when settings load.
@@ -234,10 +236,14 @@ export function MakerSettingsPanel() {
           {t("settings.laborHourlyRateHint")}
         </p>
         <Input
-          wrapperClassName="w-32"
+          wrapperClassName="w-48"
+          className="pr-24"
           type="number"
           min="0"
           step="0.01"
+          suffix={t("settings.laborHourlyRateUnit", {
+            currency: currency ?? "",
+          })}
           value={hourlyRate}
           onChange={(e) => setHourlyRate(e.target.value)}
           onBlur={(e) => saveRate(e.target.value)}

@@ -189,6 +189,9 @@ export function ProductionPreviewSheet({
                 className="space-y-2"
                 data-testid="production-preview-cost-parts"
               >
+                <h3 className="text-xs uppercase tracking-widest text-on-muted font-medium px-1">
+                  {t("preview.otherCosts")}
+                </h3>
                 {overheads.map((part) => (
                   <Card
                     key={part.kind}

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { ProductionPreviewSheet } from "./ProductionPreviewSheet";
 import { QueryWrapper } from "@/test/queryWrapper";
@@ -191,6 +191,9 @@ describe("ProductionPreviewSheet", () => {
     });
 
     const parts = screen.getByTestId("production-preview-cost-parts");
+    expect(
+      within(parts).getByRole("heading", { name: "Besides the ingredients" }),
+    ).toBeInTheDocument();
     expect(parts.textContent).toContain("Fixed costs");
     expect(parts.textContent).toContain("Labour");
     expect(parts.textContent).toMatch(/5[.,]00/);

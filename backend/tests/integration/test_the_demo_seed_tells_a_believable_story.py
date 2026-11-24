@@ -35,6 +35,7 @@ from decimal import Decimal
 
 import pytest
 from sqlalchemy import func
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import Session
 
 from app.models.item import Item
@@ -43,7 +44,8 @@ from app.models.product_template import ProductTemplate
 from app.models.stock_lot import StockLot
 from app.models.stock_move import StockMove, StockMoveReferenceType
 from app.models.stock_valuation_layer import StockValuationLayer
-from app.models.storage_location import StorageLocation
+from app.models.storage_location import LocationUsage, StorageLocation
+from app.models.user import User
 from app.modules.equipment.models import EquipmentMaintenanceLog
 from app.modules.maker.models import (
     BoMLine,
@@ -59,6 +61,8 @@ from app.modules.recipes.models.meal_plan import MealPlan, MealPlanEntry
 from app.modules.recipes.models.recipe import Recipe, RecipeIngredient
 from app.modules.shopping_lists.models import ShoppingListItem
 from app.modules.warehouse.models import Document, DocumentLine
+from app.schemas.item import ItemQuantityUpdate
+from app.services.items import update_quantity
 from seed_demo_data import (
     DEMO_STORY_EXPIRED,
     FOOD_TEMPLATES,
@@ -92,6 +96,39 @@ def _zone_of(db: Session, location_id: uuid.UUID) -> str:
             return node.name
         node = parent
     return node.name
+
+
+def _misplaced_food_records(
+    db: Session, org_id: uuid.UUID
+) -> tuple[int, list[tuple[str, str, str]]]:
+    """Food records whose shelf is outside their category's zone, and the count read.
+
+    Only a record standing on a real shelf has a zone to be checked against:
+    a record a dispatch left with nothing stands in the virtual Consumed
+    place, which holds no stock and belongs to no zone.
+    """
+    zone_by_name = {
+        row[0]: FOOD_ZONE_BY_CATEGORY.get(row[3], 'Dry Goods') for row in FOOD_TEMPLATES
+    }
+    rows = (
+        db.query(Item.name, Item.storage_location_id)
+        .join(StorageLocation, StorageLocation.id == Item.storage_location_id)
+        .filter(
+            Item.organization_id == org_id,
+            Item.module_name.is_(None),
+            StorageLocation.usage == LocationUsage.INTERNAL,
+        )
+        .all()
+    )
+    misplaced = []
+    for name, location_id in rows:
+        expected = zone_by_name.get(name)
+        if expected is None:
+            continue
+        actual = _zone_of(db, location_id)
+        if actual != expected:
+            misplaced.append((name, actual, expected))
+    return len(rows), misplaced
 
 
 class TestTheSeedChargesTheTaxOfTheOrganizationsCountry:
@@ -159,24 +196,64 @@ class TestFoodSitsWhereItIsKept:
     def test_every_product_is_in_the_zone_its_category_belongs_to(
         self, db_session: Session, seeded: uuid.UUID
     ) -> None:
-        zone_by_name = {
-            row[0]: FOOD_ZONE_BY_CATEGORY.get(row[3], 'Dry Goods')
-            for row in FOOD_TEMPLATES
-        }
-        misplaced = []
-        rows = (
-            db_session.query(Item.name, Item.storage_location_id)
-            .filter(Item.organization_id == seeded, Item.module_name.is_(None))
-            .all()
+        checked, misplaced = _misplaced_food_records(db_session, seeded)
+        assert checked, 'the seed wrote no records — nothing was checked'
+        assert not misplaced, f'{len(misplaced)} misplaced, e.g. {misplaced[:5]}'
+
+    def test_a_record_a_dispatch_emptied_is_not_misplaced(
+        self, db_session: Session, seeded: uuid.UUID, async_engine_fixture: AsyncEngine
+    ) -> None:
+        """A record a dispatch leaves with nothing stands in Consumed, which
+        is no zone: the zone check reads it as used up, not as a product kept
+        in the wrong place. Which record a draw drains is random, so one is
+        used up here on purpose, through the door a dispatch writes with."""
+        record = (
+            db_session.query(Item)
+            .join(StorageLocation, StorageLocation.id == Item.storage_location_id)
+            .filter(
+                Item.organization_id == seeded,
+                Item.name == 'Natural Yoghurt 400g',
+                Item.quantity > 0,
+                StorageLocation.usage == LocationUsage.INTERNAL,
+            )
+            .order_by(Item.quantity.desc(), Item.id)
+            .first()
         )
-        for name, location_id in rows:
-            expected = zone_by_name.get(name)
-            if expected is None:
-                continue
-            actual = _zone_of(db_session, location_id)
-            if actual != expected:
-                misplaced.append((name, actual, expected))
-        assert rows
+        assert record is not None, 'the seed wrote no yoghurt to use up'
+        record_id = record.id
+        user_id = (
+            db_session.query(User.id)
+            .filter(User.organization_id == seeded)
+            .order_by(User.id)
+            .scalar()
+        )
+        assert user_id is not None, 'the seed wrote no user to act as'
+        db_session.commit()
+
+        async def _use_it_up(adb: AsyncSession) -> None:
+            item = await adb.get(Item, record_id)
+            await update_quantity(
+                adb,
+                item,
+                ItemQuantityUpdate(quantity=Decimal('0')),
+                user_id=user_id,
+                file_when_emptied=True,
+            )
+
+        run_in_async_session(async_engine_fixture, _use_it_up)
+        db_session.expire_all()
+
+        consumed = (
+            db_session.query(StorageLocation)
+            .filter(
+                StorageLocation.organization_id == seeded,
+                StorageLocation.usage == LocationUsage.CUSTOMER,
+            )
+            .one()
+        )
+        assert db_session.get(Item, record_id).storage_location_id == consumed.id
+        checked, misplaced = _misplaced_food_records(db_session, seeded)
+        assert checked
         assert not misplaced, f'{len(misplaced)} misplaced, e.g. {misplaced[:5]}'
 
     def test_what_has_gone_off_is_something_that_can(
