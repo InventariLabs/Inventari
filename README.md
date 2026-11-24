@@ -45,6 +45,8 @@ between releases — see [Alpha Release v0.13.0](#alpha-release-v0130).
 **Use Inventari:** [try the demo](https://demo.inventari.app),
 [run it locally](#quick-start), [deploy it on your server](QUICK_DEPLOY.md)
 or [install it on a home network](docs/HOME_INSTALL.md), no domain needed.
+Each release publishes ready-made container images for amd64 and arm64, so a
+server or a Raspberry Pi downloads the stack instead of building it.
 
 **Build on Inventari:** [see what a module can do](#build-on-inventari),
 [create your first module](MODULE_QUICKSTART.md) or
@@ -539,9 +541,9 @@ it reports success. Run `make help` to see all available commands.
 > refused outside debug mode, and so is a known weak or short `SECRET_KEY`;
 > set `DEBUG=true` too, or the backend starts in production mode and refuses
 > to boot. For a real
-> deployment do exactly that, from
-> [`.env.production.example`](.env.production.example) — see
-> [QUICK_DEPLOY.md](QUICK_DEPLOY.md).
+> deployment run `scripts/init-env.sh` instead: it writes the file from
+> [`.env.production.example`](.env.production.example) with every secret
+> generated — see [QUICK_DEPLOY.md](QUICK_DEPLOY.md).
 
 **Optional — AI label scanning.** Put the API key of your AI provider
 into `.env` as `LLM_API_KEY=...` and run `docker compose up -d backend`.

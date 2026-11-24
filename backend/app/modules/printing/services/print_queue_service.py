@@ -305,23 +305,39 @@ async def _location_entries_async(
 
 
 #: The words before the lot and the expiry date on a product label.
-_LOT_WORD = {'en': 'Lot', 'pl': 'Partia', 'de': 'Charge', 'fr': 'Lot', 'es': 'Lote'}
+_LOT_WORD = {
+    'en': 'Lot',
+    'pl': 'Partia',
+    'de': 'Charge',
+    'fr': 'Lot',
+    'es': 'Lote',
+    'pt': 'Lote',
+}
 _EXPIRY_WORD = {
     'en': 'Exp.',
     'pl': 'Termin',
     'de': 'Verfällt',
     'fr': 'Exp.',
     'es': 'Cad.',
+    'pt': 'Val.',
 }
 
 
-_MADE_WORD = {'en': 'Made', 'pl': 'Prod.', 'de': 'Herg.', 'fr': 'Fab.', 'es': 'Fab.'}
+_MADE_WORD = {
+    'en': 'Made',
+    'pl': 'Prod.',
+    'de': 'Herg.',
+    'fr': 'Fab.',
+    'es': 'Fab.',
+    'pt': 'Fab.',
+}
 _BEST_BEFORE_WORD = {
     'en': 'Best before',
     'pl': 'Najlepiej przed',
     'de': 'MHD',
     'fr': 'DDM',
     'es': 'Cons. pref.',
+    'pt': 'Cons. pref.',
 }
 
 

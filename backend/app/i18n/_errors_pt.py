@@ -11,7 +11,7 @@ ERRORS_PT: ErrorMessages = {
     'insufficient_permissions': 'Você não tem permissão para realizar esta ação',
     'import_create_forbidden': 'Esta conta não possui {permissions}, então a importação não pode criar em seu nome os locais ou categorias que faltam. Desative as opções correspondentes na janela de importação ou peça a permissão',
     'import_create_forbidden_one': 'Esta conta não possui {permissions}, então a importação não pode criar em seu nome os locais ou categorias que faltam. Desative as opções correspondentes na janela de importação ou peça a permissão',
-    'import_stubs_forbidden': 'Esta conta não possui {permissions}, então a importação não pode criar em seu nome produtos temporários para códigos de barras sem correspondência. Desmarque a opção "Create product stubs for unmatched barcodes" na janela de importação ou peça a permissão',
+    'import_stubs_forbidden': 'Esta conta não possui {permissions}, então a importação não pode criar em seu nome produtos temporários para códigos de barras sem correspondência. Desmarque a opção "Criar produtos provisórios para códigos de barras sem correspondência" na janela de importação ou peça a permissão',
     'user_blocked': 'Sua conta foi bloqueada. Motivo: {reason}',
     'user_blocked_no_reason': 'não informado',
     'uom_not_found': 'Unidade não encontrada',
@@ -71,7 +71,7 @@ ERRORS_PT: ErrorMessages = {
     'smtp_not_configured': 'Esta organização não tem o envio de e-mail configurado',
     'demo_smtp_settings_locked': 'Esta é a demonstração pública, então o servidor de e-mail é fixo: toda mensagem que o aplicativo enviaria é capturada na caixa de entrada da demonstração. As configurações de e-mail não podem ser alteradas aqui.',
     'demo_credentials_locked': 'Esta é a demonstração pública, onde todo e-mail chega a uma caixa de entrada pública. As senhas não podem ser alteradas nem redefinidas aqui, e os visitantes não precisam de conta.',
-    'demo_registration_locked': 'Esta é a demonstração pública, onde os visitantes não precisam de conta. A solicitação de acesso não está disponível aqui — use "Try the demo" para explorar.',
+    'demo_registration_locked': 'Esta é a demonstração pública, onde os visitantes não precisam de conta. A solicitação de acesso não está disponível aqui — use "Experimentar a demonstração" para explorar.',
     'role_in_use': 'Esta função ainda está atribuída a alguém. Altere a função dessa pessoa primeiro e depois exclua esta.',
     'role_name_taken': 'Já existe uma função chamada "{name}" nesta organização.',
     'invitation_not_found': 'Convite não encontrado',
@@ -391,9 +391,9 @@ ERRORS_PT: ErrorMessages = {
     'bom_depth_exceeded': 'Esta lista de materiais está aninhada em mais de {max_depth} níveis — profunda demais para ser resolvida.',
     'cost_line_not_found': 'Linha de custo não encontrada',
     'production_order_not_found': 'Ordem de produção não encontrada',
-    'production_needs_scope': 'As necessidades das ordens planeadas leem-se para uma ordem ou para os dois extremos de um período',
+    'production_needs_scope': 'As necessidades das ordens planejadas são lidas para uma ordem ou para os dois extremos de um período',
     'production_needs_period_reversed': 'O período termina antes de começar',
-    'production_output_receiving': 'Uma área de receção não pode receber o que uma ordem produz: as mercadorias só esperam lá. Escolha o local onde ficarão guardadas.',
+    'production_output_receiving': 'Uma área de recebimento não pode receber o que uma ordem produz: as mercadorias só esperam lá. Escolha o local onde ficarão guardadas.',
     'production_output_quarantine': 'Um local de quarentena não pode receber o que uma ordem produz: as mercadorias retidas não ficam lá. Escolha o local onde ficarão guardadas.',
     'production_no_recipe': 'Não há lista de materiais para este produto — crie uma lista de materiais primeiro',
     'production_recipe_not_found': 'Lista de materiais {recipe_id} não encontrada nesta organização',
@@ -690,7 +690,7 @@ ERRORS_PT: ErrorMessages = {
         'O período termina antes de começar. Escolha uma data final que não seja anterior à data inicial.'
     ),
     'stock_value_hidden': (
-        'A organização não mostra o valor do seu stock, por isso não há demonstração para exportar. Ative primeiro o valor do stock nas definições de estatísticas.'
+        'A organização não mostra o valor do seu stock, por isso não há demonstração para exportar. Ative primeiro o valor do stock nas configurações de estatísticas.'
     ),
     'equipment_still_assigned': 'O ativo ainda está retirado por alguém. Faça a devolução primeiro.',
     'equipment_deploy_requires_checkout': 'Um ativo passa a ser implantado ao ser retirado por alguém. Faça a retirada em vez de definir o status.',
@@ -775,7 +775,7 @@ ERRORS_PT: ErrorMessages = {
     'putaway_capacity_not_found': 'Entrada de capacidade não encontrada',
     'no_fields_to_update': 'Nenhum campo para atualizar',
     'putaway_rule_needs_location': 'Uma regra de armazenagem precisa de pelo menos um local.',
-    'putaway_rule_target_receiving': 'Uma área de receção não pode ser o destino de uma regra de armazenagem: a mercadoria apenas aguarda ali.',
+    'putaway_rule_target_receiving': 'Uma área de recebimento não pode ser o destino de uma regra de armazenagem: a mercadoria apenas aguarda ali.',
     'putaway_rule_target_quarantine': 'Um local de quarentena não pode ser o destino de uma regra de armazenagem: a mercadoria retida é mantida ali à parte.',
     'putaway_rule_needs_match_key': 'Uma regra de armazenagem precisa de pelo menos uma condição — um produto, uma categoria, uma etiqueta de contexto ou um tipo de armazenamento.',
     'document_template_wrong_module': 'Um modelo de documento pertence ao módulo de armazém',

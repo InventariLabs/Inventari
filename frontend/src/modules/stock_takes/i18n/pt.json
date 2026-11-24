@@ -48,7 +48,7 @@
     "startedAt": "Iniciada em",
     "completedAt": "Concluída em",
     "startedBy": "Iniciada por",
-    "record": "Lote e registo",
+    "record": "Lote e registro",
     "closedLocations": "Locais encerrados",
     "closedEmpty": "Vazio",
     "closedCounted": "Encerrado",
@@ -113,7 +113,7 @@
     "decreaseCountInUnit": "Um {{unit}} a menos de {{name}}",
     "increaseCountInUnit": "Um {{unit}} a mais de {{name}}",
     "lot": "Lote {{lot}}",
-    "record": "Registo {{position}} de {{of}}",
+    "record": "Registro {{position}} de {{of}}",
     "added": "adicionado em {{date}}"
   },
   "actions": {

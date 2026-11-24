@@ -189,10 +189,13 @@ export function PutawayMatchFields({
               the user looking for a value the organization has not defined
               yet. Both fields stay away until there is something to pick —
               and a failed storage-type list says so instead of vanishing. */}
-      {/* `grid-cols-1` is `minmax(0, 1fr)`: the bare implicit column is
-          `auto`, which a selected group's list of category names stretched to
-          its full line (849 px in a 334 px form on a phone). */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 items-end">
+      {/* One column at every width. `grid-cols-1` is `minmax(0, 1fr)`: the
+          bare implicit column is `auto`, which a selected group's list of
+          category names stretched to its full line (849 px in a 334 px form
+          on a phone). Two half-width pickers side by side left ~170 px of
+          text room, which cut the "Optional — …" placeholders in French,
+          Portuguese and, for the category group, every language. */}
+      <div className="grid grid-cols-1 gap-3">
         {contextTagOptions.length > 0 && (
           <SearchableCombobox
             label={t("putaway.fields.context_tag", "Category group")}

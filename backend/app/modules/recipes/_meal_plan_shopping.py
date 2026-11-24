@@ -59,6 +59,7 @@ _NOTES_LABELS: dict[str, str] = {
     'de': 'Benötigt bis: {date}',
     'fr': 'Nécessaire avant le : {date}',
     'es': 'Necesario para: {date}',
+    'pt': 'Necessário até: {date}',
 }
 
 _LIST_NAME_LABELS: dict[str, str] = {
@@ -67,6 +68,7 @@ _LIST_NAME_LABELS: dict[str, str] = {
     'de': 'Einkaufsliste \u2014 {plan}',
     'fr': 'Liste de courses \u2014 {plan}',
     'es': 'Lista de la compra \u2014 {plan}',
+    'pt': 'Lista de compras \u2014 {plan}',
 }
 
 
@@ -81,6 +83,7 @@ _CHECK_STOCK_LABELS: dict[str, str] = {
     'de': 'Bestand prüfen: {available} vorhanden, Rezept braucht {required}',
     'fr': 'Vérifier le stock : {available} en stock, la recette demande {required}',
     'es': 'Comprobar existencias: {available} en stock, la receta necesita {required}',
+    'pt': 'Verificar estoque: {available} em estoque, a receita precisa de {required}',
 }
 
 # Emitted when the line was deducted against a product carrying a different
@@ -91,6 +94,7 @@ _APPROX_MATCH_LABELS: dict[str, str] = {
     'de': 'Über den Namen "{product}" zugeordnet',
     'fr': 'Rapproché par le nom de « {product} »',
     'es': 'Emparejado por nombre con «{product}»',
+    'pt': 'Associado pelo nome a "{product}"',
 }
 
 

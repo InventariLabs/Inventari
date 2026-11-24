@@ -13,6 +13,7 @@ WARRANTY_TITLE: dict[str, str] = {
     'de': 'Garantie läuft ab: {item}',
     'fr': 'Garantie bientôt expirée : {item}',
     'es': 'La garantía caduca: {item}',
+    'pt': 'Garantia prestes a vencer: {item}',
 }
 WARRANTY_CONTENT: dict[str, str] = {
     'en': (
@@ -34,6 +35,10 @@ WARRANTY_CONTENT: dict[str, str] = {
         'La garantía de {item} (número de serie {serial}) caduca en {days} '
         'día(s), el {date}.'
     ),
+    'pt': (
+        'A garantia de {item} (número de série {serial}) vence em {days} '
+        'dia(s), em {date}.'
+    ),
 }
 
 OVERDUE_TITLE: dict[str, str] = {
@@ -42,6 +47,7 @@ OVERDUE_TITLE: dict[str, str] = {
     'de': 'Überfällige Rückgabe: {item}',
     'fr': 'Retour en retard : {item}',
     'es': 'Devolución vencida: {item}',
+    'pt': 'Devolução atrasada: {item}',
 }
 OVERDUE_CONTENT: dict[str, str] = {
     'en': '{item}, assigned to {holder}, was due back {days} day(s) ago.',
@@ -49,6 +55,7 @@ OVERDUE_CONTENT: dict[str, str] = {
     'de': '{item}, zugewiesen an {holder}, war vor {days} Tag(en) fällig.',
     'fr': '{item}, attribué à {holder}, devait revenir il y a {days} jour(s).',
     'es': '{item}, asignado a {holder}, debía volver hace {days} día(s).',
+    'pt': '{item}, atribuído a {holder}, deveria ter sido devolvido há {days} dia(s).',
 }
 #: A deployment's overdue sentence: the holder is a place, and "assigned to"
 #: would claim a person the record does not have.
@@ -58,6 +65,7 @@ OVERDUE_CONTENT_LOCATION: dict[str, str] = {
     'de': '{item}, stehend in {holder}, war vor {days} Tag(en) fällig.',
     'fr': '{item}, se trouvant dans {holder}, devait revenir il y a {days} jour(s).',
     'es': '{item}, situado en {holder}, debía volver hace {days} día(s).',
+    'pt': '{item}, que está em {holder}, deveria ter sido devolvido há {days} dia(s).',
 }
 
 MAINTENANCE_TITLE: dict[str, str] = {
@@ -66,6 +74,7 @@ MAINTENANCE_TITLE: dict[str, str] = {
     'de': 'Wartung fällig: {item}',
     'fr': 'Maintenance à prévoir : {item}',
     'es': 'Mantenimiento pendiente: {item}',
+    'pt': 'Manutenção a fazer: {item}',
 }
 MAINTENANCE_CONTENT: dict[str, str] = {
     'en': '{item} has {kind} scheduled in {days} day(s), on {date}.',
@@ -73,6 +82,7 @@ MAINTENANCE_CONTENT: dict[str, str] = {
     'de': 'Für {item} ist {kind} in {days} Tag(en) geplant, am {date}.',
     'fr': 'Pour {item}, {kind} est prévu dans {days} jour(s), le {date}.',
     'es': 'Para {item} hay {kind} programado en {days} día(s), el {date}.',
+    'pt': '{item} tem {kind} programado para daqui a {days} dia(s), em {date}.',
 }
 
 #: When the asset carries no serial number.
@@ -82,6 +92,7 @@ NO_SERIAL: dict[str, str] = {
     'de': 'keine',
     'fr': 'aucun',
     'es': 'ninguno',
+    'pt': 'nenhum',
 }
 
 #: When the assignment or the log points at an item that is no longer there.
@@ -91,6 +102,7 @@ UNKNOWN_ITEM: dict[str, str] = {
     'de': 'Unbekanntes Gerät',
     'fr': 'Équipement inconnu',
     'es': 'Equipo desconocido',
+    'pt': 'Equipamento desconhecido',
 }
 
 #: When a legacy row names neither a person nor a place. Current paths
@@ -102,6 +114,7 @@ UNKNOWN_HOLDER: dict[str, str] = {
     'de': 'ein unbenannter Halter',
     'fr': 'un détenteur inconnu',
     'es': 'un poseedor desconocido',
+    'pt': 'um responsável desconhecido',
 }
 
 #: An attestation answered with a problem. The problem is stored on the
@@ -112,6 +125,7 @@ DISPUTE_TITLE: dict[str, str] = {
     'de': 'Problem gemeldet: {item}',
     'fr': 'Problème signalé : {item}',
     'es': 'Problema notificado: {item}',
+    'pt': 'Problema informado: {item}',
 }
 DISPUTE_CONTENT: dict[str, str] = {
     'en': '{holder} answered the attestation “{campaign}” about {item}: {reason}',
@@ -119,4 +133,5 @@ DISPUTE_CONTENT: dict[str, str] = {
     'de': '{holder} hat in der Attestierung „{campaign}“ zu {item} geantwortet: {reason}',
     'fr': '{holder} a répondu à l’attestation « {campaign} » au sujet de {item} : {reason}',
     'es': '{holder} respondió a la atestación «{campaign}» sobre {item}: {reason}',
+    'pt': '{holder} respondeu à atestação “{campaign}” sobre {item}: {reason}',
 }

@@ -42,6 +42,7 @@ _SHOPPING_NOTE_LABELS: dict[str, str] = {
     'de': 'Für Rezept: {name}',
     'fr': 'Pour la recette : {name}',
     'es': 'Para la receta: {name}',
+    'pt': 'Para a receita: {name}',
 }
 
 # The name of the list the recipe screen makes when the organization has
@@ -53,6 +54,7 @@ _DEFAULT_LIST_NAME_LABELS: dict[str, str] = {
     'de': 'Einkaufsliste',
     'fr': 'Liste de courses',
     'es': 'Lista de la compra',
+    'pt': 'Lista de compras',
 }
 
 

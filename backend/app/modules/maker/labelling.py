@@ -608,6 +608,7 @@ _INGREDIENTS_WORD = {
     'de': 'Zutaten',
     'fr': 'Ingrédients',
     'es': 'Ingredientes',
+    'pt': 'Ingredientes',
 }
 _CONTAINS_WORD = {
     'en': 'Contains',
@@ -615,6 +616,7 @@ _CONTAINS_WORD = {
     'de': 'Enthält',
     'fr': 'Contient',
     'es': 'Contiene',
+    'pt': 'Contém',
 }
 _MAY_CONTAIN_WORD = {
     'en': 'May contain',
@@ -622,6 +624,7 @@ _MAY_CONTAIN_WORD = {
     'de': 'Kann enthalten',
     'fr': 'Peut contenir',
     'es': 'Puede contener',
+    'pt': 'Pode conter',
 }
 #: The allergens' names as the regulation's annex gives them, in a sentence.
 _ALLERGEN_NAMES: dict[str, dict[str, str]] = {
@@ -631,6 +634,7 @@ _ALLERGEN_NAMES: dict[str, dict[str, str]] = {
         'de': 'Gluten',
         'fr': 'gluten',
         'es': 'gluten',
+        'pt': 'glúten',
     },
     'crustaceans': {
         'en': 'crustaceans',
@@ -638,14 +642,23 @@ _ALLERGEN_NAMES: dict[str, dict[str, str]] = {
         'de': 'Krebstiere',
         'fr': 'crustacés',
         'es': 'crustáceos',
+        'pt': 'crustáceos',
     },
-    'eggs': {'en': 'eggs', 'pl': 'jaja', 'de': 'Eier', 'fr': 'œufs', 'es': 'huevos'},
+    'eggs': {
+        'en': 'eggs',
+        'pl': 'jaja',
+        'de': 'Eier',
+        'fr': 'œufs',
+        'es': 'huevos',
+        'pt': 'ovos',
+    },
     'fish': {
         'en': 'fish',
         'pl': 'ryby',
         'de': 'Fisch',
         'fr': 'poisson',
         'es': 'pescado',
+        'pt': 'peixes',
     },
     'peanuts': {
         'en': 'peanuts',
@@ -653,15 +666,31 @@ _ALLERGEN_NAMES: dict[str, dict[str, str]] = {
         'de': 'Erdnüsse',
         'fr': 'arachides',
         'es': 'cacahuetes',
+        'pt': 'amendoim',
     },
-    'soy': {'en': 'soya', 'pl': 'soja', 'de': 'Soja', 'fr': 'soja', 'es': 'soja'},
-    'milk': {'en': 'milk', 'pl': 'mleko', 'de': 'Milch', 'fr': 'lait', 'es': 'leche'},
+    'soy': {
+        'en': 'soya',
+        'pl': 'soja',
+        'de': 'Soja',
+        'fr': 'soja',
+        'es': 'soja',
+        'pt': 'soja',
+    },
+    'milk': {
+        'en': 'milk',
+        'pl': 'mleko',
+        'de': 'Milch',
+        'fr': 'lait',
+        'es': 'leche',
+        'pt': 'leite',
+    },
     'nuts': {
         'en': 'nuts',
         'pl': 'orzechy',
         'de': 'Schalenfrüchte',
         'fr': 'fruits à coque',
         'es': 'frutos de cáscara',
+        'pt': 'castanhas',
     },
     'celery': {
         'en': 'celery',
@@ -669,6 +698,7 @@ _ALLERGEN_NAMES: dict[str, dict[str, str]] = {
         'de': 'Sellerie',
         'fr': 'céleri',
         'es': 'apio',
+        'pt': 'aipo',
     },
     'mustard': {
         'en': 'mustard',
@@ -676,6 +706,7 @@ _ALLERGEN_NAMES: dict[str, dict[str, str]] = {
         'de': 'Senf',
         'fr': 'moutarde',
         'es': 'mostaza',
+        'pt': 'mostarda',
     },
     'sesame': {
         'en': 'sesame',
@@ -683,6 +714,7 @@ _ALLERGEN_NAMES: dict[str, dict[str, str]] = {
         'de': 'Sesam',
         'fr': 'sésame',
         'es': 'sésamo',
+        'pt': 'gergelim',
     },
     'sulphites': {
         'en': 'sulphites',
@@ -690,6 +722,7 @@ _ALLERGEN_NAMES: dict[str, dict[str, str]] = {
         'de': 'Sulfite',
         'fr': 'sulfites',
         'es': 'sulfitos',
+        'pt': 'sulfitos',
     },
     'lupin': {
         'en': 'lupin',
@@ -697,6 +730,7 @@ _ALLERGEN_NAMES: dict[str, dict[str, str]] = {
         'de': 'Lupinen',
         'fr': 'lupin',
         'es': 'altramuces',
+        'pt': 'tremoço',
     },
     'molluscs': {
         'en': 'molluscs',
@@ -704,6 +738,7 @@ _ALLERGEN_NAMES: dict[str, dict[str, str]] = {
         'de': 'Weichtiere',
         'fr': 'mollusques',
         'es': 'moluscos',
+        'pt': 'moluscos',
     },
 }
 
