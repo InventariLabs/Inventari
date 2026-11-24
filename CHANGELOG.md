@@ -121,6 +121,11 @@ says what the release does rather than what changed since them.
   and "registros" instead of the European forms. The putaway rule editor's
   pickers sit in one column, so their French and Portuguese placeholders are
   no longer clipped.
+- A sheet that opens on a field to type in puts the cursor in that field, not
+  on its Close button: Type a code over the running scanner, and the forms
+  whose first field takes the typing at once — attaching a label to a
+  product, a stock threshold, a new category. On a phone the keyboard comes
+  up without a second tap.
 
 ### Added
 

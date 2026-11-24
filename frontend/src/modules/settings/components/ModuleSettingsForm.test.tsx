@@ -1,6 +1,6 @@
+import type { ReactElement } from "react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import type { ReactElement } from "react";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
 import { QueryWrapper } from "@/test/queryWrapper";

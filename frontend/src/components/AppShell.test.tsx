@@ -642,7 +642,7 @@ describe("AppShell — the phone Back in a workspace that shows one module", () 
     renderShell("/equipment/assets");
     await user.click(screen.getByRole("button", { name: "Back" }));
     await waitFor(() =>
-      expect(screen.getByTestId("path")).toHaveTextContent("/"),
+      expect(screen.getByTestId("path")).toHaveTextContent(/^\/equipment$/),
     );
   });
 });

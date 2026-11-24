@@ -11,6 +11,7 @@ import {
   type PageHeaderData,
 } from "@/hooks/useModulePageHeader";
 import RecipeDetailPage from "./RecipeDetailPage";
+import { recipesApi } from "@/modules/recipes/api/recipes";
 
 import { toast } from "sonner";
 import { formatNumberLocale } from "@/utils/formatters";
@@ -31,6 +32,11 @@ const axiosRefusal = Object.assign(
   },
 );
 
+/** The cover upload the page awaits: the server refuses it unless a test says otherwise. */
+const uploadCover = vi.fn<
+  (vars: { id: string; file: File }) => Promise<{ image_url: string }>
+>(() => Promise.reject(axiosRefusal));
+
 vi.mock("@/modules/recipes/hooks/useRecipes", async (importOriginal) => {
   const actual =
     await importOriginal<typeof import("@/modules/recipes/hooks/useRecipes")>();
@@ -41,7 +47,7 @@ vi.mock("@/modules/recipes/hooks/useRecipes", async (importOriginal) => {
     // the page's refusal handling, not the transport.
     useUploadRecipeImage: () => ({
       isPending: false,
-      mutateAsync: vi.fn().mockRejectedValue(axiosRefusal),
+      mutateAsync: uploadCover,
     }),
     useDeleteRecipeImage: () => ({ isPending: false, mutateAsync: vi.fn() }),
   };
@@ -154,6 +160,30 @@ describe("RecipeDetailPage", () => {
         expect.stringContaining("Image too large (max 5 MB)"),
       );
     });
+  });
+
+  it("names the limit in one toast when the cover is above it", async () => {
+    // The real upload this time: its size gate refuses before any request.
+    uploadCover.mockImplementationOnce(({ id, file }) =>
+      recipesApi.uploadImage(id, file),
+    );
+    render(<RecipeDetailPage />, { wrapper: createWrapper() });
+    await screen.findByText("Pasta Carbonara");
+    // A GIF is not shrunk on the way, so its size reaches the gate as is.
+    const cover = new File(["gif"], "cover.gif", { type: "image/gif" });
+    Object.defineProperty(cover, "size", { value: 11 * 1024 * 1024 });
+
+    fireEvent.change(
+      document.body.querySelector('input[type="file"]') as HTMLInputElement,
+      { target: { files: [cover] } },
+    );
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "File too large. Maximum size: 10 MB",
+      ),
+    );
+    expect(toast.error).toHaveBeenCalledTimes(1);
   });
 
   it("renders recipe name after loading", async () => {

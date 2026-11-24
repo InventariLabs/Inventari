@@ -236,6 +236,28 @@ describe("OrganizationSettings — refusals arrive in the server's words", () =>
     );
   });
 
+  it("names the limit in one toast when the logo is above it", async () => {
+    // The real upload this time: its size gate refuses before any request.
+    const actual = await vi.importActual<
+      typeof import("@/lib/api/organizations")
+    >("@/lib/api/organizations");
+    vi.mocked(organizationsApi.uploadLogo).mockImplementationOnce(
+      actual.organizationsApi.uploadLogo,
+    );
+    // A GIF is not shrunk on the way, so its size reaches the gate as is.
+    const logo = new File(["gif"], "big.gif", { type: "image/gif" });
+    Object.defineProperty(logo, "size", { value: 11 * 1024 * 1024 });
+
+    await pickLogo(logo);
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "File too large. Maximum size: 10 MB",
+      ),
+    );
+    expect(toast.error).toHaveBeenCalledTimes(1);
+  });
+
   it("shows what the server objected to when saving the issuer block", async () => {
     server.use(
       http.put("*/organizations", () =>

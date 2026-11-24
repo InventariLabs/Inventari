@@ -2,7 +2,6 @@ import { api, getEveryPage } from "@/lib/api/client";
 import type {
   StockTake,
   StockTakeCreateInput,
-  StockTakeUpdate,
   StockTakeItem,
   StockTakeReport,
   StockTakeListResponse,
@@ -31,11 +30,6 @@ export const stockTakesApi = {
 
   create: async (data: StockTakeCreateInput): Promise<StockTake> => {
     const response = await api.post<StockTake>("/stock-takes", data);
-    return response.data;
-  },
-
-  update: async (id: string, data: StockTakeUpdate): Promise<StockTake> => {
-    const response = await api.put<StockTake>(`/stock-takes/${id}`, data);
     return response.data;
   },
 

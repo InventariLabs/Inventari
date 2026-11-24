@@ -32,6 +32,21 @@ describe("useFocusTrap", () => {
     expect(document.activeElement?.textContent).toBe("First");
   });
 
+  it("leaves the focus on a control inside that took it as it mounted", () => {
+    function TrapWithField() {
+      const ref = useFocusTrap(true);
+      return (
+        <div ref={ref as React.RefObject<HTMLDivElement>}>
+          <button>Close</button>
+          <input aria-label="Code" autoFocus />
+        </div>
+      );
+    }
+    render(<TrapWithField />);
+
+    expect(screen.getByRole("textbox", { name: "Code" })).toHaveFocus();
+  });
+
   it("does not auto-focus when inactive", () => {
     const previousFocus = document.body;
     render(<TrapContainer isActive={false} />);

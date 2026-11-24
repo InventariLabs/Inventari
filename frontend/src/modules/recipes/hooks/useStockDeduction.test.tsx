@@ -4,8 +4,8 @@
  * it trusts the server's answer on every row: what the server refused stays
  * untaken, whatever the loop wished it had taken.
  */
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { ReactNode } from "react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useStockDeduction } from "./useStockDeduction";
