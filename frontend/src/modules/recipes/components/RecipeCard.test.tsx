@@ -285,3 +285,24 @@ describe("RecipeCard ingredient coverage", () => {
     expect(screen.queryByText(/in stock/)).toBeNull();
   });
 });
+
+describe("RecipeCard when it can be dragged", () => {
+  it("stays a link around its own buttons, not a button holding them", () => {
+    render(
+      <MemoryRouter>
+        <RecipeCard
+          {...baseProps}
+          dragEnabled
+          canWrite
+          recipe={makeRecipe({ tags: ["vegan"] })}
+        />
+      </MemoryRouter>,
+    );
+
+    const card = screen.getByRole("link", { name: /Recipe 1/ });
+    expect(card).not.toHaveAttribute("role");
+    expect(card).toContainElement(
+      screen.getByRole("button", { name: "vegan" }),
+    );
+  });
+});

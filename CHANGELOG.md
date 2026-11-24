@@ -32,6 +32,11 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The form that records a delivery cost as a variance on a posted receipt marks
+  the amount and the reason as required, as it already did the day, and no
+  longer accepts a day after today. A recipe card that can be dragged stays a
+  link for a screen reader instead of announcing itself as a button that holds
+  other buttons.
 - Permissions now hold across the screens and doors that only half reached
   them. A completed shopping list refuses ticks, line edits and deletions from
   a stale tab, and a finished batch trace and its spreadsheet ask for the
