@@ -905,8 +905,11 @@ files check:    uploads-20261002-020000.tar.gz.age read back at 2026-10-02T09:30
 Until the check has succeeded once, the last two lines read `never`. Run it after
 turning encryption on, and again from time to time: it is the only proof that
 the key you kept is the key the backups were made for. Both commands run in the
-`db-backup` image, which step 4 of *Updating* rebuilds; after any other kind of
-update run `make deploy` first to rebuild it.
+`db-backup` image, which step 4 of *Updating* rebuilds (on the published images,
+`docker compose pull` replaces it); after any other kind of update run `make
+deploy` first to rebuild it — on the published images it pulls the images and
+recreates the services instead. Both commands read `COMPOSE_FILE` from `.env`,
+so they run the stack the installation runs.
 
 ### Manual backup
 
@@ -1243,13 +1246,20 @@ profile is imported again ([docs/OFF_DATABASE_SETUP.md](docs/OFF_DATABASE_SETUP.
    ```bash
    docker compose -f docker-compose.prod.yml build --parallel
    ```
-   On the published images, download them instead, without `-f
-   docker-compose.prod.yml`, as everywhere on that route (community modules
-   need the build, so step 3 does not apply). A `.env` kept from a server that
-   ran the published images already carries the `COMPOSE_FILE` line; one kept
-   from a server that built its images does not — a move onto the images, to a
-   Raspberry Pi say — so add the line from *Pulling the published images
-   instead of building* first:
+   Then put the tracking record back into its volume (community modules only,
+   so the build route only):
+   ```bash
+   docker compose -f docker-compose.prod.yml run --rm -T --no-deps \
+     --entrypoint tar backend -xzf - -C /app/data < module-data-<stamp>.tgz
+   ```
+
+   **On the published images,** download them instead, without `-f
+   docker-compose.prod.yml`, as everywhere on that route (step 3 and the
+   tracking record above do not apply: community modules need the build). A
+   `.env` kept from a server that ran the published images already carries the
+   `COMPOSE_FILE` line; one kept from a server that built its images does not —
+   a move onto the images, to a Raspberry Pi say — so add the line from
+   *Pulling the published images instead of building* first:
    ```bash
    grep -q '^COMPOSE_FILE=' .env ||
      echo 'COMPOSE_FILE=docker-compose.prod.yml:docker-compose.images.yml' >> .env
@@ -1257,11 +1267,10 @@ profile is imported again ([docs/OFF_DATABASE_SETUP.md](docs/OFF_DATABASE_SETUP.
    ```bash
    docker compose pull
    ```
-   Then put the tracking record back into its volume (community modules only):
-   ```bash
-   docker compose -f docker-compose.prod.yml run --rm -T --no-deps \
-     --entrypoint tar backend -xzf - -C /app/data < module-data-<stamp>.tgz
-   ```
+   A build-route server **with community modules cannot move onto the
+   images:** its database keeps the modules' tables, while the images carry no
+   module code, so the backend would start against tables it has no code for.
+   Rebuild such a server from source, as above.
 5. **Bring the backup to `backups/restore/`.** From the off-host copy, with the
    kept `rclone.conf` next to the compose file and your `BACKUP_RCLONE_REMOTE`
    followed by `/last`:
