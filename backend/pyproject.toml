@@ -37,7 +37,6 @@ dependencies = [
     "typer[all]>=0.27.1",
     "rich>=15.0.0",  # the CLI's own output; typer pulls it in only as a requirement
     "anyascii>=0.3.2",  # ISC; replaces GPL-licensed unidecode
-    "beautifulsoup4>=4.12.0",
     "pyyaml>=6.0.0",
     "weasyprint>=70.0",
     "jinja2>=3.1.6",
