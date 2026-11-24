@@ -27,6 +27,10 @@ from .schemas import (
 )
 from .shipment_service import attach_shipments_async
 
+#: What ``core_api.locations.subtree_epochs_async`` returns: a place's members
+#: as ``(start, end, ids)`` stretches between two physical moves.
+LocationEpochs = list[tuple[datetime | None, datetime | None, list[UUID]]]
+
 
 def number_matches(term: str, document: Any = Document) -> ColumnElement[bool]:
     """Match *term* inside a document number.
@@ -422,7 +426,7 @@ def not_undone_conditions() -> list[ColumnElement[bool]]:
 
 def _in_locations(
     location_ids: list[UUID],
-    location_epochs: list[tuple[datetime | None, datetime | None, list[UUID]]] | None,
+    location_epochs: LocationEpochs | None,
 ) -> ColumnElement[bool]:
     """A document whose source or target is one of the places.
 
@@ -469,8 +473,7 @@ async def list_documents(
     completed_from: datetime | None = None,
     completed_to: datetime | None = None,
     location_ids: list[UUID] | None = None,
-    location_epochs: list[tuple[datetime | None, datetime | None, list[UUID]]]
-    | None = None,
+    location_epochs: LocationEpochs | None = None,
     target_ids: list[UUID] | None = None,
     module_filters: list[tuple[str, DocumentFilterDTO]] | None = None,
     backorder_only: bool = False,
