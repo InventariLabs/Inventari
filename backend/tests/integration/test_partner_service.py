@@ -130,6 +130,35 @@ class TestPartnerCreateLostRace:
         assert refused.value.key == 'partner_name_exists'
 
     @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        ('lang', 'word'),
+        [('en', 'Supplier'), ('pl', 'Dostawca'), ('de', 'Lieferant')],
+    )
+    async def test_a_lost_race_names_the_type_in_the_readers_language(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_user: User,
+        async_test_household: Organization,
+        lang: str,
+        word: str,
+    ):
+        org_id = async_test_household.id
+        data = _make_create(name='Racers')
+        await partner_service.create_async(
+            real_async_db_session, org_id, data, async_test_user.id
+        )
+        set_current_lang(lang)  # type: ignore[arg-type]
+        try:
+            with pytest.raises(ServiceRejectionError) as refused:
+                await partner_service.create_async(
+                    real_async_db_session, org_id, data, async_test_user.id
+                )
+        finally:
+            set_current_lang(None)
+        assert f'"{word}"' in str(refused.value) or f'« {word} »' in str(refused.value)
+        assert 'SUPPLIER' not in str(refused.value)
+
+    @pytest.mark.asyncio
     async def test_a_lost_race_for_a_code_is_the_ordinary_refusal(
         self,
         real_async_db_session: AsyncSession,
