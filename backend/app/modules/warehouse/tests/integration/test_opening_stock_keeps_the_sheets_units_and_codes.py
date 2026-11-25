@@ -1,11 +1,10 @@
 """Opening stock keeps what the sheet says: its units and its codes.
 
-A row in cartons or litres used to found a product kept in pieces while its
-line stayed in the sheet's unit, so the draft could not be opened. The row
-now founds a product kept in the unit it was written in, a row that names a
-unit an existing product cannot take is refused by row, the codes the sheet
-carries become the product's own, and the answer counts what was found
-apart from what was founded.
+A row in cartons or litres founds a product kept in the unit it is written
+in, so its line converts and the draft opens. A row that names a unit an
+existing product cannot take is refused by row, the codes the sheet carries
+become the product's own, and the answer counts what was found apart from
+what was founded.
 """
 
 from __future__ import annotations
