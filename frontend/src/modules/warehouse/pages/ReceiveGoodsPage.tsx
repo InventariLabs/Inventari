@@ -142,6 +142,22 @@ function postLabel(t: TFunction, source: ReceiveSource): string {
   }
 }
 
+/**
+ * A supplier that arrives after a refusal answers it: an order link names its
+ * supplier a moment after the sheet opens, and a press in between left
+ * "Choose the supplier." on a field that by then showed one.
+ */
+function useSupplierAnswersRefusal(
+  partnerId: string,
+  setProblem: Dispatch<SetStateAction<ProblemKey | null>>,
+) {
+  useEffect(() => {
+    if (partnerId) {
+      setProblem((current) => (current === "noPartner" ? null : current));
+    }
+  }, [partnerId, setProblem]);
+}
+
 /** What an empty sheet can do: only a delivery may wait on an order. */
 function emptyHint(t: TFunction, source: ReceiveSource): string {
   return source === "supplier"
@@ -1080,8 +1096,7 @@ export default function ReceiveGoodsPage() {
   const { t } = useTranslation("warehouse");
   const navigate = useNavigate();
   const canWrite = useCanWrite("warehouse");
-  const { isModuleEnabled } = useModules();
-  const partnersEnabled = isModuleEnabled("partners");
+  const partnersEnabled = useModules().isModuleEnabled("partners");
 
   // A receipt puts goods down: it is offered what may hold stock, never a
   // place another module claims, whatever the general lists mix.
@@ -1110,6 +1125,7 @@ export default function ReceiveGoodsPage() {
   const [lines, setLines] = useState<ReceiveDraftLine[]>([]);
   const [focusLineKey, setFocusLineKey] = useState<string | null>(null);
   const [problem, setProblem] = useState<ProblemKey | null>(null);
+  useSupplierAnswersRefusal(partnerId, setProblem);
   const { postError, setPostError, postErrorFix } = usePostError(partnerId, t);
   const undated = useUndatedRows(lines, setPostError, t);
   const [importOpen, setImportOpen] = useState(false);
@@ -1193,8 +1209,7 @@ export default function ReceiveGoodsPage() {
   // belonged to the previous one. Rows the reader typed stay — the goods in
   // their hands did not change — while rows from the supplier's order go,
   // because only a delivery may credit that order. Pressing the answer
-  // already chosen is not another answer: the choice group reports it too,
-  // and clearing here would throw away the receipt being counted.
+  // already chosen is not another: clearing would lose the receipt counted.
   const changeSource = useCallback(
     (next: ReceiveSource) => {
       if (next === source) return;

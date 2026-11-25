@@ -150,6 +150,11 @@ export const RecipeCard = memo(function RecipeCard({
               {canWrite && (
                 <Button
                   onClick={(e) => {
+                    // The button sits inside the card's link: stopping the
+                    // event keeps the link's own handler away, but only
+                    // preventing the default keeps the browser from
+                    // following the link as well.
+                    e.preventDefault();
                     e.stopPropagation();
                     onToggleFavorite(recipe);
                   }}
@@ -237,6 +242,7 @@ export const RecipeCard = memo(function RecipeCard({
                       : "bg-surface-raised border-border text-on-secondary hover:border-primary-200 hover:text-on",
                   )}
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     onTagClick(tag);
                   }}
