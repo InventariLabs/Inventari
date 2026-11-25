@@ -29,7 +29,11 @@ from app.core.contracts import UserContextDTO
 from app.core.events import SystemEvent, TenantEventPayload, event_bus
 from app.core.exceptions import ServiceRejectionError
 from app.core.interceptors import interceptor_pipeline
-from app.i18n.service import get_current_lang, get_error_message
+from app.i18n.service import (
+    get_current_lang,
+    get_error_message,
+    get_plural_error_message,
+)
 from app.models.audit_log import AuditAction, AuditTargetType
 from app.models.stock_move import StockMove
 from app.models.storage_location import LocationUsage, StorageLocation
@@ -395,8 +399,9 @@ async def _check_delete_guards(
                 plan,
                 delete_index,
                 op,
-                get_error_message(
+                get_plural_error_message(
                     'storage_delete_blocked_by_movements',
+                    move_total,
                     get_current_lang(),
                     count=move_total,
                 ),

@@ -141,7 +141,7 @@ class TestPartnerServiceRefusalsSpeakPolish:
 
         assert resp.status_code == 409, resp.text
         assert _message(resp) == (
-            'Nie można usunąć kontrahenta: 1 otwartych zamówień zakupowych '
+            'Nie można usunąć kontrahenta: 1 otwarte zamówienie zakupowe '
             'odwołuje się do tego kontrahenta'
         )
 

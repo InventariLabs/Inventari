@@ -297,7 +297,7 @@ describe("useDocumentActions backorder toast", () => {
     });
 
     expect(toast.success).toHaveBeenCalledWith(
-      "Document completed — it records the stock already taken",
+      "Document completed — it records stock that was already changed",
     );
     expect(toast.success).not.toHaveBeenCalledWith(
       "Document completed — stock updated",

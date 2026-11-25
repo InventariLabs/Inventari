@@ -190,7 +190,7 @@
       "linkNotFoundDesc": "Ten link zapraszający jest nieprawidłowy lub już wygasł.",
       "linkNotFoundNext": "Poproś o nowy link osobę, która wysłała Ci zaproszenie — tę, która zarządza Twoją organizacją.",
       "linkOtherAddress": "Ten link jest dla innego adresu",
-      "linkOtherAddressDesc": "Jesteś zalogowany na konto, którego adres e-mail nie jest tym, na który wystawiono to zaproszenie. Wyloguj się i otwórz link ponownie jako zaproszona osoba.",
+      "linkOtherAddressDesc": "Ta sesja dotyczy konta, którego adres e-mail nie jest tym, na który wystawiono to zaproszenie. Wyloguj się i otwórz link ponownie jako zaproszona osoba.",
       "moduleData": {
         "title": "Dane modułów na ogólnych listach",
         "description": "Dane, które moduł prowadzi na własnym koncie — na przykład sprzęt — nie trafiają na ogólne listy produktów i miejsc. Włącz, żeby widzieć wszystko na jednej liście; to też jedyna droga do danych po module, który został wyłączony.",
@@ -913,7 +913,7 @@
       "secretStored": "Klucz jest zapisany — zostaw puste, aby go zachować",
       "secretUnset": "Brak zapisanego klucza",
       "unknownModule": "Nie ma modułu o tej nazwie",
-      "unknownModuleHint": "Adres wskazuje moduł, którego ta instalacja nie ma. Sprawdź odnośnik albo wybierz moduł ze sklepu.",
+      "unknownModuleHint": "Adres wskazuje moduł, którego ta instalacja nie ma. Sprawdź odnośnik albo wybierz moduł na stronie Moduły.",
       "open": "Ustawienia modułu",
       "saved": "Zapisano ustawienia",
       "guardName": "Ustawienia modułu",
@@ -1149,10 +1149,10 @@
   "unknown": "Nieznany",
   "focusLock": {
     "title": "Widoczny jest tylko jeden moduł",
-    "body": "Ta przestrzeń pokazuje jeden moduł, więc lista aplikacji i sklep z aplikacjami są schowane. Otwórz „Moduły organizacji”, żeby pokazać wszystkie.",
+    "body": "Ta przestrzeń pokazuje jeden moduł, więc lista aplikacji i strona Moduły są schowane. Otwórz „Moduły organizacji”, żeby pokazać wszystkie.",
     "exit": "Otwórz „Moduły organizacji”",
     "unknownTitle": "Nie udało się sprawdzić, które moduły są widoczne",
-    "unknownBody": "Nie udało się odczytać, które moduły pokazuje ta przestrzeń, więc lista aplikacji i sklep z aplikacjami nie są wyświetlane. Spróbuj ponownie albo otwórz „Moduły organizacji”.",
+    "unknownBody": "Nie udało się odczytać, które moduły pokazuje ta przestrzeń, więc lista aplikacji i strona Moduły nie są wyświetlane. Spróbuj ponownie albo otwórz „Moduły organizacji”.",
     "retry": "Spróbuj ponownie"
   },
   "focusMarker": {
@@ -1260,7 +1260,7 @@
     },
     "clean_core": {
       "name": "Własny",
-      "description": "Bez profilu branżowego — neutralna baza, którą kształtujesz po swojemu."
+      "description": "Bez gotowego zestawu branżowego — neutralna baza, którą kształtujesz po swojemu."
     }
   },
   "notifications": {

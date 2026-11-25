@@ -7,6 +7,7 @@ import type { TFunction } from "i18next";
 
 import { RecipeImportManager } from "./RecipeImportManager";
 import type { AiPurpose } from "@/types/ai";
+import en from "@/modules/recipes/i18n/en.json";
 
 const previewMock = vi.fn();
 
@@ -46,7 +47,8 @@ const t = ((key: string, opts?: Record<string, unknown>) => {
     "recipes:import_export.review_parsing": "Parsing…",
     "recipes:import_export.invalid_url": "Invalid URL",
     "recipes:import_export.invalid_json": "Not valid JSON",
-    "recipes:import_export.import_error": "Import failed: {{error}}",
+    // The catalogue's own sentence, so the test reads what the reader reads.
+    "recipes:import_export.import_error": en.import_export.import_error,
     "recipes:import_export.import_error_unknown": "the server gave no reason",
     "recipes:import_export.ai_connection_required":
       "Reading a page needs an AI connection — “{{purpose}}” is not configured yet.",
@@ -186,6 +188,28 @@ describe("RecipeImportManager — the import modal knows what the AI registry kn
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent("Import failed: “Read a recipe from text”");
     expect(alert).not.toHaveTextContent("recipes.text_parse");
+  });
+
+  it("says a refused import saved nothing, and why", async () => {
+    const user = userEvent.setup();
+    previewMock.mockRejectedValue(
+      new axios.AxiosError("bad", undefined, undefined, undefined, {
+        status: 422,
+        statusText: "Unprocessable Entity",
+        headers: {},
+        config: undefined,
+        data: { detail: "The recipe has no name" },
+      } as never),
+    );
+    renderManager();
+    await user.click(screen.getByRole("tab", { name: "Import from JSON" }));
+    fireEvent.change(screen.getByPlaceholderText("paste"), {
+      target: { value: '{"servings": 2}' },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Import" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Import failed, nothing was saved: The recipe has no name",
+    );
   });
 
   it("keeps the pasted-JSON path outside the AI gate", async () => {

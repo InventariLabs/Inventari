@@ -8,10 +8,10 @@ import { ExecutionLineCard } from "./ExecutionLineCard";
 import { executeLabelKeyFor } from "./DocumentActionButtons";
 import { ExecutionActions } from "./ExecutionActions";
 import { ScanModeSection } from "./ScanModeSection";
-import { isPackedType } from "./packing/DocumentPackingStep";
 import { ShipmentFields } from "./shipping/ShipmentFields";
 import {
   EMPTY_SHIPMENT,
+  leavesWithCarrier,
   shipmentError,
   shipmentPayload,
 } from "./shipping/shipmentDraft";
@@ -51,9 +51,8 @@ export function DocumentExecutionPanel({
   // takes stock off the shelf and a correction restates it.
   const isReceipt = document.type === "IN" || document.type === "INTERNAL_IN";
   // A dispatch leaves with a carrier, and this panel is one of the doors it
-  // is completed through; every other type completes as it always did. An
-  // internal issue stays inside the company, so it has no carrier to name.
-  const ships = isPackedType(document.type) && document.type !== "INTERNAL_OUT";
+  // is completed through; every other type completes as it always did.
+  const ships = leavesWithCarrier(document.type);
   const [shipment, setShipment] = useState(EMPTY_SHIPMENT);
   const [shipmentFault, setShipmentFault] = useState<string>();
 
@@ -237,7 +236,7 @@ export function DocumentExecutionPanel({
         onCancel={onCancel}
         onSubmit={exec.handleSubmit}
         cancelText={t("common:form.cancel")}
-        submitText={t("detail.executionSubmit")}
+        submitText={t(executeLabelKeyFor(document.type))}
         floating={!exec.cameraOpen}
       />
     </Card>

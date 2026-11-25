@@ -18,6 +18,7 @@ import { BulkActionBar } from "@/modules/warehouse/components/BulkActionBar";
 import { DocumentListItem } from "@/modules/warehouse/components/DocumentListItem";
 import { DocumentsGettingStarted } from "@/modules/warehouse/components/DocumentsGettingStarted";
 import { DocumentsFilters } from "@/modules/warehouse/components/DocumentsFilters";
+import { allWithoutCarrier } from "@/modules/warehouse/components/shipping/shipmentDraft";
 import { ListPickingSheet } from "@/modules/warehouse/components/picking/ListPickingSheet";
 import { NewDocumentMenu } from "@/modules/warehouse/components/NewDocumentMenu";
 import { useDocumentBulkActions } from "@/modules/warehouse/hooks/useDocumentBulkActions";
@@ -335,6 +336,11 @@ export default function DocumentsPage() {
       {pickingIds && (
         <ListPickingSheet
           documentIds={pickingIds}
+          withoutCarrier={allWithoutCarrier(
+            documents
+              .filter((doc) => pickingIds.includes(doc.id))
+              .map((doc) => doc.type),
+          )}
           onLeave={() => {
             setPickingIds(null);
             bulk.clearSelection();

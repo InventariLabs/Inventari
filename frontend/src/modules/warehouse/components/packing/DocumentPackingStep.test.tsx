@@ -594,6 +594,20 @@ describe("DocumentPackingStep", () => {
     });
   });
 
+  it("asks an internal issue for no carrier when it completes", async () => {
+    const user = userEvent.setup();
+    const onComplete = vi.fn();
+    packingServer();
+    renderStep({ ...pickedDispatch(), type: "INTERNAL_OUT" }, { onComplete });
+
+    await user.click(
+      await screen.findByRole("button", { name: "Complete dispatch" }),
+    );
+
+    expect(screen.queryByLabelText("Carrier")).toBeNull();
+    expect(onComplete).toHaveBeenCalledWith(undefined);
+  });
+
   it("starts with the carrier the picking summary already took", async () => {
     const user = userEvent.setup();
     const onComplete = vi.fn();
