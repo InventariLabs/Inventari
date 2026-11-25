@@ -181,6 +181,10 @@ class ErrorMessages(TypedDict):
     file_empty: str
     file_not_webp: str
     import_too_many_rows: str
+    grocy_file_unreadable: str
+    grocy_file_not_grocy: str
+    grocy_import_forbidden: str
+    grocy_import_forbidden_one: NotRequired[str]
     storage_location_ambiguous: str
     pagination_cursor_invalid: str
     webhook_url_scheme: str

@@ -121,6 +121,8 @@ export const API_ROUTES = [
   "/api/v1/items/history",
   "/api/v1/items/import",
   "/api/v1/items/import/analyze",
+  "/api/v1/items/import/grocy",
+  "/api/v1/items/import/grocy/analyze",
   "/api/v1/items/import/jobs/{job_id}",
   "/api/v1/items/product-templates",
   "/api/v1/items/product-templates/count",

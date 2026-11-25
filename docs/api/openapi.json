@@ -8772,6 +8772,116 @@
         ]
       }
     },
+    "/api/v1/items/import/grocy": {
+      "post": {
+        "tags": [
+          "Items"
+        ],
+        "summary": "Import Grocy File",
+        "description": "Move a Grocy household in: its locations, groups, stores, products and stock.\n\nThe founding the file asks for \u2014 a location, a category, a supplier the\norganization does not have \u2014 is the work the front doors gate by\npermission, so an account short of one is refused before anything is\nwritten, with every missing key named. A file of more than\n``INLINE_ROW_LIMIT`` steps (batches, and products without stock) is\nanswered with ``202`` and a job, as a long sheet is.",
+        "operationId": "import_grocy_file_api_v1_items_import_grocy_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_import_grocy_file_api_v1_items_import_grocy_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemImportResponse"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemImportJobResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/v1/items/import/grocy/analyze": {
+      "post": {
+        "tags": [
+          "Items"
+        ],
+        "summary": "Analyze Grocy File",
+        "description": "What Grocy's database file (``data/grocy.db``) holds, before the move.\n\nGrocy writes no export, so a move reads its file. Nothing is written\nhere: the step before the move shows what comes across, what would be\nfounded, what an earlier run already brought, and what stays behind.",
+        "operationId": "analyze_grocy_file_api_v1_items_import_grocy_analyze_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_analyze_grocy_file_api_v1_items_import_grocy_analyze_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrocyFileAnalysis"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/v1/items/import/jobs/{job_id}": {
       "get": {
         "tags": [
@@ -46527,6 +46637,20 @@
         ],
         "title": "Body_analyze_equipment_import_endpoint_api_v1_equipment_import_analyze_post"
       },
+      "Body_analyze_grocy_file_api_v1_items_import_grocy_analyze_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_analyze_grocy_file_api_v1_items_import_grocy_analyze_post"
+      },
       "Body_analyze_import_api_v1_purchase_orders_import_analyze_post": {
         "properties": {
           "file": {
@@ -46695,6 +46819,20 @@
           "mapping_json"
         ],
         "title": "Body_import_document_lines_api_v1_warehouse_documents__doc_id__import_lines_post"
+      },
+      "Body_import_grocy_file_api_v1_items_import_grocy_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_import_grocy_file_api_v1_items_import_grocy_post"
       },
       "Body_import_ingredient_defaults_api_v1_recipes_ingredient_defaults_import_post": {
         "properties": {
@@ -56486,6 +56624,99 @@
         "title": "GeneratedProductCode",
         "description": "An internal EAN-13 for a product without a manufacturer's code."
       },
+      "GrocyFileAnalysis": {
+        "properties": {
+          "products": {
+            "type": "integer",
+            "title": "Products"
+          },
+          "stock_entries": {
+            "type": "integer",
+            "title": "Stock Entries"
+          },
+          "already_imported": {
+            "type": "integer",
+            "title": "Already Imported"
+          },
+          "locations": {
+            "type": "integer",
+            "title": "Locations"
+          },
+          "product_groups": {
+            "type": "integer",
+            "title": "Product Groups"
+          },
+          "stores": {
+            "type": "integer",
+            "title": "Stores"
+          },
+          "shopping_list_entries": {
+            "type": "integer",
+            "title": "Shopping List Entries"
+          },
+          "new_locations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "New Locations"
+          },
+          "new_categories": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "New Categories"
+          },
+          "new_suppliers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "New Suppliers"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "steps": {
+            "type": "integer",
+            "title": "Steps"
+          },
+          "left_behind": {
+            "items": {
+              "$ref": "#/components/schemas/ImportLeftBehind"
+            },
+            "type": "array",
+            "title": "Left Behind"
+          }
+        },
+        "type": "object",
+        "required": [
+          "products",
+          "stock_entries",
+          "already_imported",
+          "locations",
+          "product_groups",
+          "stores",
+          "shopping_list_entries",
+          "new_locations",
+          "new_categories",
+          "new_suppliers",
+          "currency",
+          "steps",
+          "left_behind"
+        ],
+        "title": "GrocyFileAnalysis",
+        "description": "What a Grocy database file holds, read before anything is written.\n\nThe step before the move shows it: how much comes across, which\nlocations, categories and suppliers the move would found, what an earlier\nrun already brought, and what stays behind. ``currency`` is the\norganization's: Grocy keeps its own outside the file, so prices are read\nin this one. ``steps`` is what the move's progress counts \u2014 every batch,\nand every product without stock."
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -56770,6 +57001,49 @@
           "failed"
         ],
         "title": "ImportExecuteResult"
+      },
+      "ImportLeftBehind": {
+        "properties": {
+          "what": {
+            "type": "string",
+            "enum": [
+              "inactive_products",
+              "extra_barcodes",
+              "unit_conversions",
+              "units_as_pieces",
+              "default_best_before_days",
+              "pictures",
+              "parent_products",
+              "own_field_values",
+              "recipes",
+              "meal_plan",
+              "chores",
+              "batteries",
+              "tasks",
+              "equipment"
+            ],
+            "title": "What"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "names": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Names",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "what",
+          "count"
+        ],
+        "title": "ImportLeftBehind",
+        "description": "One kind of record the file holds and the move did not bring."
       },
       "ImportPasteRequest": {
         "properties": {
@@ -59620,6 +59894,22 @@
             "type": "array",
             "title": "Created Categories",
             "default": []
+          },
+          "created_suppliers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Created Suppliers",
+            "default": []
+          },
+          "left_behind": {
+            "items": {
+              "$ref": "#/components/schemas/ImportLeftBehind"
+            },
+            "type": "array",
+            "title": "Left Behind",
+            "default": []
           }
         },
         "type": "object",
@@ -59629,7 +59919,7 @@
           "failed"
         ],
         "title": "ItemImportResponse",
-        "description": "What one import did \u2014 including the org data it founded on the way.\n\nA sheet may name locations and categories the organization does not\nhave yet; with auto-create on, the importer founds them. Their names\ntravel back so the reader learns what the file added beside the\nproducts, instead of finding new tiles in the storage tree later.\n\n``updated`` and ``skipped`` count the rows whose Label Code named a\nproduct the organization already had, under the update mode the reader\nchose; both stay zero when the import only adds.\n\n``joined_existing`` counts the imported rows filed under a product that\nalready existed \u2014 by its barcode, or by its name and brand \u2014 and so added\nstock to it rather than making a new product. A product two rows of one\nsheet make together counts its second row here."
+        "description": "What one import did \u2014 including the org data it founded on the way.\n\nA sheet may name locations and categories the organization does not\nhave yet; with auto-create on, the importer founds them. Their names\ntravel back so the reader learns what the file added beside the\nproducts, instead of finding new tiles in the storage tree later.\n\n``updated`` and ``skipped`` count the rows whose Label Code named a\nproduct the organization already had, under the update mode the reader\nchose; both stay zero when the import only adds.\n\n``joined_existing`` counts the imported rows filed under a product that\nalready existed \u2014 by its barcode, or by its name and brand \u2014 and so added\nstock to it rather than making a new product. A product two rows of one\nsheet make together counts its second row here.\n\nA Grocy database file answers in the same shape, its products and\nbatches standing for rows: ``skipped`` then counts what an earlier run of\nthe file already brought, ``created_suppliers`` the stores it founded,\nand ``left_behind`` what the file holds that the move did not bring. A\nsheet leaves both empty."
       },
       "ItemListResponse": {
         "properties": {

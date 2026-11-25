@@ -2496,6 +2496,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/items/import/grocy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import Grocy File
+         * @description Move a Grocy household in: its locations, groups, stores, products and stock.
+         *
+         *     The founding the file asks for — a location, a category, a supplier the
+         *     organization does not have — is the work the front doors gate by
+         *     permission, so an account short of one is refused before anything is
+         *     written, with every missing key named. A file of more than
+         *     ``INLINE_ROW_LIMIT`` steps (batches, and products without stock) is
+         *     answered with ``202`` and a job, as a long sheet is.
+         */
+        post: operations["import_grocy_file_api_v1_items_import_grocy_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/items/import/grocy/analyze": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Analyze Grocy File
+         * @description What Grocy's database file (``data/grocy.db``) holds, before the move.
+         *
+         *     Grocy writes no export, so a move reads its file. Nothing is written
+         *     here: the step before the move shows what comes across, what would be
+         *     founded, what an earlier run already brought, and what stays behind.
+         */
+        post: operations["analyze_grocy_file_api_v1_items_import_grocy_analyze_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/items/import/jobs/{job_id}": {
         parameters: {
             query?: never;
@@ -13061,6 +13112,11 @@ export interface components {
             /** File */
             file: string;
         };
+        /** Body_analyze_grocy_file_api_v1_items_import_grocy_analyze_post */
+        Body_analyze_grocy_file_api_v1_items_import_grocy_analyze_post: {
+            /** File */
+            file: string;
+        };
         /** Body_analyze_import_api_v1_purchase_orders_import_analyze_post */
         Body_analyze_import_api_v1_purchase_orders_import_analyze_post: {
             /** File */
@@ -13121,6 +13177,11 @@ export interface components {
             mapping_json: string;
             /** Create Stubs For Unmatched */
             create_stubs_for_unmatched?: boolean;
+        };
+        /** Body_import_grocy_file_api_v1_items_import_grocy_post */
+        Body_import_grocy_file_api_v1_items_import_grocy_post: {
+            /** File */
+            file: string;
         };
         /** Body_import_ingredient_defaults_api_v1_recipes_ingredient_defaults_import_post */
         Body_import_ingredient_defaults_api_v1_recipes_ingredient_defaults_import_post: {
@@ -16402,6 +16463,45 @@ export interface components {
             /** Barcode */
             barcode: string;
         };
+        /**
+         * GrocyFileAnalysis
+         * @description What a Grocy database file holds, read before anything is written.
+         *
+         *     The step before the move shows it: how much comes across, which
+         *     locations, categories and suppliers the move would found, what an earlier
+         *     run already brought, and what stays behind. ``currency`` is the
+         *     organization's: Grocy keeps its own outside the file, so prices are read
+         *     in this one. ``steps`` is what the move's progress counts — every batch,
+         *     and every product without stock.
+         */
+        GrocyFileAnalysis: {
+            /** Products */
+            products: number;
+            /** Stock Entries */
+            stock_entries: number;
+            /** Already Imported */
+            already_imported: number;
+            /** Locations */
+            locations: number;
+            /** Product Groups */
+            product_groups: number;
+            /** Stores */
+            stores: number;
+            /** Shopping List Entries */
+            shopping_list_entries: number;
+            /** New Locations */
+            new_locations: string[];
+            /** New Categories */
+            new_categories: string[];
+            /** New Suppliers */
+            new_suppliers: string[];
+            /** Currency */
+            currency: string | null;
+            /** Steps */
+            steps: number;
+            /** Left Behind */
+            left_behind: components["schemas"]["ImportLeftBehind"][];
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -16554,6 +16654,24 @@ export interface components {
              * @default []
              */
             skipped_serials: string[];
+        };
+        /**
+         * ImportLeftBehind
+         * @description One kind of record the file holds and the move did not bring.
+         */
+        ImportLeftBehind: {
+            /**
+             * What
+             * @enum {string}
+             */
+            what: "inactive_products" | "extra_barcodes" | "unit_conversions" | "units_as_pieces" | "default_best_before_days" | "pictures" | "parent_products" | "own_field_values" | "recipes" | "meal_plan" | "chores" | "batteries" | "tasks" | "equipment";
+            /** Count */
+            count: number;
+            /**
+             * Names
+             * @default []
+             */
+            names: string[];
         };
         /**
          * ImportPasteRequest
@@ -17534,6 +17652,12 @@ export interface components {
          *     already existed — by its barcode, or by its name and brand — and so added
          *     stock to it rather than making a new product. A product two rows of one
          *     sheet make together counts its second row here.
+         *
+         *     A Grocy database file answers in the same shape, its products and
+         *     batches standing for rows: ``skipped`` then counts what an earlier run of
+         *     the file already brought, ``created_suppliers`` the stores it founded,
+         *     and ``left_behind`` what the file holds that the move did not bring. A
+         *     sheet leaves both empty.
          */
         ItemImportResponse: {
             /** Total */
@@ -17574,6 +17698,16 @@ export interface components {
              * @default []
              */
             created_categories: string[];
+            /**
+             * Created Suppliers
+             * @default []
+             */
+            created_suppliers: string[];
+            /**
+             * Left Behind
+             * @default []
+             */
+            left_behind: components["schemas"]["ImportLeftBehind"][];
         };
         /**
          * ItemListResponse
@@ -35202,6 +35336,81 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SheetAnalysisResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_grocy_file_api_v1_items_import_grocy_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_import_grocy_file_api_v1_items_import_grocy_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemImportResponse"];
+                };
+            };
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemImportJobResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    analyze_grocy_file_api_v1_items_import_grocy_analyze_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_analyze_grocy_file_api_v1_items_import_grocy_analyze_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GrocyFileAnalysis"];
                 };
             };
             /** @description Validation Error */

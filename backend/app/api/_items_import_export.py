@@ -1,4 +1,5 @@
 import json
+from collections.abc import Awaitable, Callable
 from typing import Any
 from uuid import UUID
 
@@ -20,6 +21,7 @@ from app.core.contracts import SystemPermission, UserContextDTO
 from app.core.deps import (
     get_async_db,
     get_current_user_context,
+    require_org,
     require_permission,
 )
 from app.core.exceptions import (
@@ -28,13 +30,24 @@ from app.core.exceptions import (
     refusal_exception,
 )
 from app.core.file_import import analyze_import_file as analyze_sheet
+from app.core.grocy_file import GrocyFile, read_grocy_file
 from app.core.import_sheet import read_rows
-from app.core.upload_validation import read_import_file
+from app.core.upload_validation import read_capped_upload, read_import_file
 from app.i18n.service import get_current_lang, get_plural_error_message
 from app.schemas._common import SheetAnalysisResponse
-from app.schemas.item import ItemImportJobResponse, ItemImportResponse
+from app.schemas.item import (
+    GrocyFileAnalysis,
+    ItemImportJobResponse,
+    ItemImportResponse,
+)
 from app.services.items import _import_job as import_jobs
 from app.services.items import import_items as import_items_service
+from app.services.items._grocy_import import (
+    analyze_grocy_file_async,
+    grocy_import_steps,
+    import_grocy_file_async,
+    plan_grocy_import_async,
+)
 from app.services.items._import import LabelMatch
 from app.services.items.export_service import export_items_to_xlsx
 
@@ -167,6 +180,109 @@ async def import_items(
         create_missing_categories=create_missing_categories,
         on_label_match=on_label_match,
     )
+    return JSONResponse(
+        status_code=202,
+        content=ItemImportJobResponse.model_validate(
+            job, from_attributes=True
+        ).model_dump(mode='json'),
+    )
+
+
+async def _read_grocy_upload(file: UploadFile) -> GrocyFile:
+    """The uploaded Grocy database, read; a refusal when it is not one.
+
+    No extension is asked for: a copy of ``grocy.db`` keeps its bytes under
+    any name, and the file's own header says what it is.
+    """
+    content = await read_capped_upload(file)
+    try:
+        return read_grocy_file(content)
+    except ValueError as exc:
+        raise refusal_exception(exc) from exc
+
+
+@router.post('/import/grocy/analyze', response_model=GrocyFileAnalysis)
+async def analyze_grocy_file(
+    file: UploadFile = File(...),
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    _: object = require_permission(SystemPermission.ITEMS_WRITE),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
+    """What Grocy's database file (``data/grocy.db``) holds, before the move.
+
+    Grocy writes no export, so a move reads its file. Nothing is written
+    here: the step before the move shows what comes across, what would be
+    founded, what an earlier run already brought, and what stays behind.
+    """
+    require_org(current_user)
+    grocy = await _read_grocy_upload(file)
+    return await analyze_grocy_file_async(db, current_user, grocy)
+
+
+@router.post(
+    '/import/grocy',
+    response_model=ItemImportResponse,
+    responses={202: {'model': ItemImportJobResponse}},
+)
+async def import_grocy_file(
+    file: UploadFile = File(...),
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    _: object = require_permission(SystemPermission.ITEMS_WRITE),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
+    """Move a Grocy household in: its locations, groups, stores, products and stock.
+
+    The founding the file asks for — a location, a category, a supplier the
+    organization does not have — is the work the front doors gate by
+    permission, so an account short of one is refused before anything is
+    written, with every missing key named. A file of more than
+    ``INLINE_ROW_LIMIT`` steps (batches, and products without stock) is
+    answered with ``202`` and a job, as a long sheet is.
+    """
+    require_org(current_user)
+    grocy = await _read_grocy_upload(file)
+    plan = await plan_grocy_import_async(db, current_user, grocy)
+    missing = [
+        key
+        for founds, permission, key in (
+            (plan.new_locations, SystemPermission.STORAGES_WRITE, 'locations:write'),
+            (
+                plan.new_categories,
+                SystemPermission.CATEGORIES_WRITE,
+                'categories:write',
+            ),
+            (plan.new_suppliers, SystemPermission.PARTNERS_WRITE, 'partners:write'),
+        )
+        if founds and not current_user.has_permission(permission)
+    ]
+    if missing:
+        raise ForbiddenException(
+            message=get_plural_error_message(
+                'grocy_import_forbidden',
+                len(missing),
+                get_current_lang(),
+                permissions=', '.join(missing),
+            )
+        )
+
+    steps = grocy_import_steps(grocy)
+    if steps <= import_jobs.INLINE_ROW_LIMIT:
+        return await import_grocy_file_async(db, grocy, current_user)
+
+    job = await import_jobs.start_job_async(
+        db, current_user, file.filename or 'grocy.db', steps
+    )
+    # Committed before the task starts: it reads the job from its own session.
+    await db.commit()
+
+    async def work(
+        session: AsyncSession, on_batch: Callable[[int], Awaitable[None]]
+    ) -> dict[str, Any]:
+        return await import_grocy_file_async(
+            session, grocy, current_user, on_batch=on_batch
+        )
+
+    import_jobs.spawn(job.id, db_facade.AsyncSessionLocal, work=work)
     return JSONResponse(
         status_code=202,
         content=ItemImportJobResponse.model_validate(
