@@ -339,7 +339,7 @@ export default function StockActionSheet({
                 {t("stockActions.inStock")}
               </span>
               <span className="text-2xl font-semibold text-primary-600">
-                {realTotal}{" "}
+                {formatQuantityValue(realTotal)}{" "}
                 <span className="text-sm font-medium text-on-muted">
                   {unitLabel(t, unit, realTotal)}
                 </span>

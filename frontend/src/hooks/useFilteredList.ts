@@ -203,7 +203,7 @@ export function useFilteredList<T extends FilterDefinitions>(
     if (!stillToCome) unrendered.current = [];
   }, [rendered]);
   const writeParams = useCallback(
-    (edit: (next: URLSearchParams) => void) => {
+    (edit: (next: URLSearchParams) => void, write?: { push?: boolean }) => {
       setSearchParams(
         (current) => {
           const next = new URLSearchParams(
@@ -213,7 +213,7 @@ export function useFilteredList<T extends FilterDefinitions>(
           unrendered.current.push(next.toString());
           return next;
         },
-        { replace: true },
+        { replace: !write?.push },
       );
     },
     [setSearchParams],
@@ -319,7 +319,9 @@ export function useFilteredList<T extends FilterDefinitions>(
      * Edit the address through the same queue the filters write through, for
      * a control of the screen's own that keeps its state in the address too
      * — the sort, say. A write past it starts from the address on screen and
-     * drops a filter written in the same moment.
+     * drops a filter written in the same moment. The write replaces the
+     * entry on screen; `{ push: true }` adds one, for a state Back should
+     * leave (a dialog).
      */
     writeParams,
   };
