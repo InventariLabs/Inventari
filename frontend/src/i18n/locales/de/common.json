@@ -696,7 +696,8 @@
         "sku_schema": "SKU-Schema",
         "body_html": "Vorlageninhalt",
         "reset_to_builtin": "Auf eingebaute Vorlage zurückgesetzt",
-        "occurred_on": "Zugehöriger Tag"
+        "occurred_on": "Zugehöriger Tag",
+        "order_lines": "Positionen"
       },
       "showWholeChange": "Ganze Änderung anzeigen",
       "showLess": "Weniger anzeigen",
@@ -779,7 +780,8 @@
         "added": "Feld {{field}} hinzugefügt",
         "removed": "Feld {{field}} entfernt",
         "changed": "Feld {{field}} geändert",
-        "required": "Pflichtfeld"
+        "required": "Pflichtfeld",
+        "reordered": "Reihenfolge der Felder geändert"
       },
       "values": {
         "CHECKOUT": "Ausgabe",
@@ -793,8 +795,6 @@
         "PENDING_APPROVAL": "Genehmigung ausstehend",
         "CONFIRMED": "Bestätigt",
         "DISPUTED": "Problem gemeldet",
-        "MISSING": "Fehlt",
-        "WRONG_ITEM": "Falsches Gerät",
         "FIRST_ACCOUNT": "Erstes Konto der Installation",
         "COMPLETED": "Abgeschlossen",
         "CANCELLED": "Storniert",
@@ -835,6 +835,11 @@
         "reorderRule": "Nachbestellregel: {{location}}",
         "reorderRuleUnnamed": "aus einer Nachbestellregel",
         "note": "Notiz: {{text}}"
+      },
+      "subjects": {
+        "pricelist": "Lieferantenpreis",
+        "reorderRule": "Nachbestellregel",
+        "workflow": "Freigabe-Workflow: {{target}}"
       }
     },
     "shell": {

@@ -387,7 +387,43 @@ const VALUE_RESOLVERS: Record<
   // shares the field name; the partners file has no word for it, and it
   // falls through to the journal's own values.
   type: (t, code) => t(`partners:types.${code}`, { defaultValue: "" }),
+  // What kind of maintenance was done: the words the maintenance form offers.
+  // i18n-keys: repair | cleaning | upgrade | inspection | other
+  maintenance_type: (t, code) =>
+    t(`equipment:maintenance.type_${code.toLowerCase()}`, { defaultValue: "" }),
+  // What a person reported on an attestation: the attestation screen's words.
+  // i18n-keys: MISSING | DAMAGED | WRONG_ITEM | OTHER
+  dispute_type: (t, code) =>
+    t(`equipment:attestation.disputeType.${code}`, { defaultValue: "" }),
+  // What a module row is about: the configuration it changed, in words.
+  subject: (t, code) => subjectWord(t, code),
 };
+
+/**
+ * The configuration a module's journal row is about, as the writer coded it:
+ * `reorder-rule`, `pricelist`, `workflow:<target type>`. A subject the reader
+ * has no word for stays as it was written.
+ */
+function subjectWord(t: TranslateFn, code: string): string {
+  if (code === "reorder-rule") {
+    return t("common:settings.audit.subjects.reorderRule", {
+      defaultValue: "",
+    });
+  }
+  if (code === "pricelist") {
+    return t("common:settings.audit.subjects.pricelist", { defaultValue: "" });
+  }
+  if (code.startsWith("workflow:")) {
+    const target = code.slice("workflow:".length);
+    return t("common:settings.audit.subjects.workflow", {
+      target: t(`approvals:workflows.targetType_${target}`, {
+        defaultValue: target,
+      }),
+      defaultValue: "",
+    });
+  }
+  return "";
+}
 
 /**
  * An order line as the journal writes it: the parts, not a sentence.
@@ -605,7 +641,13 @@ type Definition = Record<string, unknown>;
 
 /** A definition as a person names it: "Thread size (Dropdown, required)". */
 function fieldDefinitionText(d: Definition, t: TranslateFn): string {
-  const label = String(d.label || d.key || "—");
+  // A system field is stored under the catalogue's English word; the field
+  // builder names it from `items:fields.<key>`, and so does the journal.
+  const stored = String(d.label || d.key || "—");
+  const label =
+    d.is_system === true && typeof d.key === "string"
+      ? t(`items:fields.${d.key}`, { defaultValue: stored })
+      : stored;
   const details = [
     d.type && t(`modules:fieldBuilder.types.${d.type}`, { defaultValue: "" }),
     d.required === true && t("common:settings.audit.fieldDefinitions.required"),
@@ -650,6 +692,11 @@ function fieldDefinitionChange(
     }),
     ...was.filter((d) => !isBy.has(keyOf(d))).map((d) => say("removed", d)),
   ];
+  // The same fields with the same content in another order: say so, rather
+  // than falling through to the lists printed as JSON.
+  if (!lines.length && was.map(keyOf).join("\n") !== is.map(keyOf).join("\n")) {
+    lines.push(t("common:settings.audit.fieldDefinitions.reordered"));
+  }
   return lines.length
     ? { path: FIELD_DEFINITIONS_KEY, from: null, to: lines.join("; ") }
     : null;
@@ -807,6 +854,26 @@ function sessionStatusWord(
   );
 }
 
+/** The key an AI binding's entry writes its purpose's label key under. */
+const PURPOSE_LABEL_KEY = "purpose_label_key";
+
+/**
+ * An AI binding's purpose in the words its module gave it ("Read a product
+ * from a photo"), from the label key the entry carries beside `vision.extract`.
+ * Null when the entry has none (an older one) or the catalogue has no word.
+ */
+function purposeWord(
+  snapshot: Record<string, unknown>,
+  key: string,
+  t?: TranslateFn,
+): string | null {
+  const labelKey = snapshot[PURPOSE_LABEL_KEY];
+  if (!t || key !== "purpose" || typeof labelKey !== "string" || !labelKey) {
+    return null;
+  }
+  return t(labelKey, { defaultValue: "" }) || null;
+}
+
 /**
  * The snapshot's own fields, minus its identity and minus the two sides.
  *
@@ -828,6 +895,9 @@ function flatFields(
         key !== "before" &&
         key !== "after" &&
         key !== OWNER_MODULE_KEY &&
+        // The purpose's own word, written beside its key: it is how
+        // `purpose` reads, not a field of the record.
+        key !== PURPOSE_LABEL_KEY &&
         // What an approval stands in front of is the entry's target, named
         // in the Target column by its number; printed here it was JSON.
         key !== APPROVAL_TARGET_KEY &&
@@ -845,6 +915,7 @@ function flatFields(
       from: null,
       to:
         referenceNameOf(snapshot, key, t) ??
+        purposeWord(snapshot, key, t) ??
         (key === FIELD_DEFINITIONS_KEY
           ? fieldDefinitionNames(value, t)
           : undefined) ??
@@ -930,7 +1001,21 @@ export function auditFieldLabel(
 export function auditFieldTitles(
   targetType: string,
   moduleTitles?: Record<string, string>,
+  snapshot?: unknown,
 ): Record<string, string> | undefined {
   if (targetType === "maker_recipe") return moduleTitles;
-  return { lines: "settings.audit.fields.line_count", ...moduleTitles };
+  // A purchase order's edit holds the lines themselves; a document's count
+  // holds a number. The value says which, so the label does not call a list
+  // "Number of lines".
+  const lines = holdsLineList(snapshot)
+    ? "settings.audit.fields.order_lines"
+    : "settings.audit.fields.line_count";
+  return { lines, ...moduleTitles };
+}
+
+function holdsLineList(snapshot: unknown): boolean {
+  if (!isPlainObject(snapshot)) return false;
+  return [snapshot, snapshot.before, snapshot.after].some(
+    (side) => isPlainObject(side) && Array.isArray(side.lines),
+  );
 }

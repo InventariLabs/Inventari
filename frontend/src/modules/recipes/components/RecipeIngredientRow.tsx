@@ -21,7 +21,7 @@ import {
 import type { IngredientStockUnit } from "@/modules/recipes/hooks/useIngredientStockUnits";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
-import { formatMoney } from "@/utils/formatters";
+import { formatMoney, formatNumberLocale } from "@/utils/formatters";
 import IngredientTemplateCombobox from "./IngredientTemplateCombobox";
 import { AllergenPicker } from "./AllergenPicker";
 import { ExclusionToggle } from "./ExclusionToggle";
@@ -398,7 +398,7 @@ export default function RecipeIngredientRow({
                     if (e.key === "Enter" || e.key === "Escape")
                       stopPriceEdit(ing._key);
                   }}
-                  placeholder={t("form.ingredient_price_placeholder")}
+                  placeholder={formatNumberLocale(0, 2)}
                   wrapperClassName="w-20 shrink-0"
                   className="w-full px-2 py-1.5 text-xs"
                 />

@@ -304,6 +304,14 @@ describe("historyChanges OPENED", () => {
       parseChanges("OPENED", { left: "1.500", left_unit: "kg" }, tOpened),
     ).toBe("1.5 kg left");
   });
+
+  it("reads an amount that came without its unit in the record's own", () => {
+    expect(
+      parseChanges("OPENED", { left: "0.5" }, tOpened, undefined, {
+        symbol: "pcs",
+      }),
+    ).toBe("0.5 pcs left");
+  });
 });
 
 describe("ItemAction ↔ READERS contract", () => {

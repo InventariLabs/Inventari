@@ -696,7 +696,8 @@
         "sku_schema": "Schéma de SKU",
         "body_html": "Contenu du modèle",
         "reset_to_builtin": "Rétabli au modèle intégré",
-        "occurred_on": "Jour concerné"
+        "occurred_on": "Jour concerné",
+        "order_lines": "Lignes"
       },
       "showWholeChange": "Afficher toute la modification",
       "showLess": "Afficher moins",
@@ -779,7 +780,8 @@
         "added": "Champ {{field}} ajouté",
         "removed": "Champ {{field}} supprimé",
         "changed": "Champ {{field}} modifié",
-        "required": "obligatoire"
+        "required": "obligatoire",
+        "reordered": "Ordre des champs modifié"
       },
       "values": {
         "CHECKOUT": "Remise",
@@ -793,8 +795,6 @@
         "PENDING_APPROVAL": "En attente d'approbation",
         "CONFIRMED": "Confirmé",
         "DISPUTED": "Problème signalé",
-        "MISSING": "Manquant",
-        "WRONG_ITEM": "Mauvais équipement",
         "FIRST_ACCOUNT": "Premier compte de l'installation",
         "COMPLETED": "Terminé",
         "CANCELLED": "Annulé",
@@ -835,6 +835,11 @@
         "reorderRule": "règle de réapprovisionnement : {{location}}",
         "reorderRuleUnnamed": "d’une règle de réapprovisionnement",
         "note": "note : {{text}}"
+      },
+      "subjects": {
+        "pricelist": "Prix fournisseur",
+        "reorderRule": "Règle de réapprovisionnement",
+        "workflow": "Flux de travail d'approbation : {{target}}"
       }
     },
     "shell": {
