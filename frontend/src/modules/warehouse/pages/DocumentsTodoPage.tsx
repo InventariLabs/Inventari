@@ -34,6 +34,7 @@ import { PutawaySheet } from "@/modules/warehouse/components/todo/PutawaySheet";
 import { ReplenishSheet } from "@/modules/warehouse/components/todo/ReplenishSheet";
 import { QuarantineBlock } from "@/modules/warehouse/components/todo/QuarantineBlock";
 import { WorkItemRow } from "@/modules/warehouse/components/todo/WorkItemRow";
+import { allWithoutCarrier } from "@/modules/warehouse/components/shipping/shipmentDraft";
 import { ListPickingSheet } from "@/modules/warehouse/components/picking/ListPickingSheet";
 import {
   MAX_TASKS,
@@ -74,6 +75,15 @@ function isPickableTask(item: WorkItem): boolean {
     item.kind !== "approve" &&
     item.next_action !== "request_approval" &&
     isPickable({ type: item.document_type, status: item.document_status })
+  );
+}
+
+/** Whether every task the picking sheet opened over is an internal issue. */
+function pickedWithoutCarrier(tasks: WorkItem[], ids: string[]): boolean {
+  return allWithoutCarrier(
+    tasks
+      .filter((task) => ids.includes(task.source_id))
+      .map((task) => task.document_type ?? ""),
   );
 }
 
@@ -660,6 +670,7 @@ export default function DocumentsTodoPage() {
       {pickingIds && (
         <ListPickingSheet
           documentIds={pickingIds}
+          withoutCarrier={pickedWithoutCarrier(tasks, pickingIds)}
           onLeave={() => {
             setPickingIds(null);
             setSelectedIds(new Set());

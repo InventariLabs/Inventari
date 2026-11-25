@@ -1602,7 +1602,7 @@
   },
   "unitMismatch": {
     "title": "Einheiten passen nicht zusammen",
-    "message": "„{{product}}” wird in {{templateUnit}} geführt, dieser Datensatz würde in {{chosenUnit}} gespeichert. Mit der Bestätigung werden Datensatz und diese Lieferung in {{templateUnit}} umgerechnet; die Entscheidung landet in der Historie des Datensatzes. Sollen die Einheiten unterschiedlich bleiben, ändere zuerst die Einheit des Datensatzes auf seiner Seite im Inventar.",
+    "message": "„{{product}}” wird in {{templateUnit}} geführt, dieser Datensatz würde in {{chosenUnit}} gespeichert. Mit der Bestätigung werden Datensatz und diese Lieferung in {{templateUnit}} umgerechnet; die Entscheidung landet in der Historie des Datensatzes. Sollen die Einheiten unterschiedlich bleiben, ändern Sie zuerst die Einheit des Datensatzes auf seiner Seite im Inventar.",
     "confirm": "Bestätigen und abschließen",
     "cancel": "Nicht jetzt"
   },

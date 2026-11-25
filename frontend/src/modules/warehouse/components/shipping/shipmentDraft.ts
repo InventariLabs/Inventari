@@ -21,6 +21,13 @@ export const leavesWithCarrier = (type: string) =>
   type === "OUT" || type === "WZ";
 
 /**
+ * Every dispatch of a picking sheet is internal: none of it asks for a
+ * carrier. Types that could not be found ask, as before.
+ */
+export const allWithoutCarrier = (types: string[]) =>
+  types.length > 0 && types.every((type) => !leavesWithCarrier(type));
+
+/**
  * The shipment a completion carries — none when no carrier was named, so a
  * dispatch completed with both fields empty sends what it always sent.
  */

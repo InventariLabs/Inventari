@@ -70,7 +70,8 @@ const INFORMAL_IMPERATIVES = new RegExp(
   `(^|[.:;—–!?]\\s+)(${IMPERATIVES.join("|")})\\b`,
 );
 const EMBEDDED_IMPERATIVES = new RegExp(
-  `(?<!\\b[Ii]ch )\\b(${LOWERCASE_ONLY_COMMANDS.join("|")})\\b`,
+  `(?<![\\p{L}])(?<!\\b[Ii]ch )(${LOWERCASE_ONLY_COMMANDS.join("|")})(?![\\p{L}])`,
+  "u",
 );
 
 function* strings(value: unknown, path: string): Generator<[string, string]> {
