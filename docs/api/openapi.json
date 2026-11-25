@@ -89342,6 +89342,20 @@
               }
             ],
             "title": "Error Cause"
+          },
+          "error_cause_values": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Cause Values"
           }
         },
         "type": "object",
@@ -90756,6 +90770,20 @@
               }
             ],
             "title": "Error Cause"
+          },
+          "error_cause_values": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Cause Values"
           }
         },
         "type": "object",
