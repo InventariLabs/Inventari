@@ -49,6 +49,13 @@ function StatusDot({
   );
 }
 
+/**
+ * The id of the line on the page that says what a test does; every Test
+ * button points at it with `aria-describedby`, so the warning reaches a
+ * keyboard and a screen reader reader as well as the eye.
+ */
+export const TEST_HINT_ID = "webhook-test-hint";
+
 export const WebhookCard = memo(function WebhookCard({
   webhook,
   onEdit,
@@ -137,7 +144,7 @@ export const WebhookCard = memo(function WebhookCard({
                     variant="link"
                     size="contentSm"
                     onClick={onLogs}
-                    className="underline font-medium px-0.5 min-h-11 md:min-h-0 min-w-11 md:min-w-0"
+                    className="text-inherit underline font-medium px-0.5 min-h-11 md:min-h-0 min-w-11 md:min-w-0"
                   >
                     {t("logs")}
                   </Button>{" "}
@@ -263,8 +270,9 @@ export const WebhookCard = memo(function WebhookCard({
                 size="sm"
                 variant="ghost"
                 onClick={onTest}
-                title={t("testHint")}
+                title={t("test")}
                 aria-label={`${t("test")} ${webhook.name}`}
+                aria-describedby={TEST_HINT_ID}
               >
                 <Send className="w-4 h-4" />
                 <span className="md:hidden ml-1.5">{t("test")}</span>

@@ -1258,7 +1258,9 @@
     "sessionEndedReadUnsaved": "Your session has ended, so what you entered on this screen was not kept. Sign in again and start over.",
     "imageFormatUnsupported": "This picture format is not supported. Use a JPG, PNG, GIF or WebP picture.",
     "modulesUnavailableTitle": "The module list could not be read",
-    "modulesUnavailableBody": "Your organization's list of enabled modules could not be read, so the workspaces cannot be named. Nothing was lost — ask again in a moment; if it keeps failing, ask whoever runs this installation."
+    "modulesUnavailableBody": "Your organization's list of enabled modules could not be read, so the workspaces cannot be named. Nothing was lost — ask again in a moment; if it keeps failing, ask whoever runs this installation.",
+    "modulesNotLoadedTitle": "Part of the application did not load",
+    "modulesNotLoadedBody": "A module your organization uses could not be loaded, which usually happens right after an update. Nothing was lost — reload the page; if it keeps failing, ask whoever runs this installation."
   },
   "a11y": {
     "skipToContent": "Skip to content",

@@ -219,6 +219,12 @@ export const homeShelfApi = {
     });
   },
 
+  /** What a posted receipt in one step asks: a product, a shelf it was put on. */
+  receiptOffers: async (documentId: string): Promise<HomeShelfOffer[]> =>
+    getEveryPage<HomeShelfOffer>(
+      `/warehouse/documents/${documentId}/home-shelf-offers`,
+    ),
+
   listSilenced: async (): Promise<HomeShelfSilenced[]> =>
     getEveryPage<HomeShelfSilenced>("/warehouse/putaway/home-shelf/silenced"),
 

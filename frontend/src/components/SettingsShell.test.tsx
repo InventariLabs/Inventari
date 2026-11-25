@@ -4,6 +4,8 @@ import { useFormGuardStore } from "@/store/formGuardStore";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import SettingsShell from "./SettingsShell";
+import { useModulePageHeader } from "@/hooks/useModulePageHeader";
+import { useEffect } from "react";
 
 // Registering the two modules whose settings screens belong in the sidebar:
 // it builds its module entries from the manifests' settingsSections.
@@ -41,6 +43,15 @@ vi.mock("@/contexts/ModulesContext", () => ({
   }),
 }));
 
+/** A module's settings page: it names itself through the shell's header. */
+function NamedModulePage() {
+  const { setHeader } = useModulePageHeader();
+  useEffect(() => {
+    setHeader({ title: "Webhooks" });
+  }, [setHeader]);
+  return <div>module settings body</div>;
+}
+
 function renderAt(path: string, role: string, permissions: string[] = []) {
   authState.user = { role, is_superuser: false, permissions };
   return render(
@@ -52,10 +63,7 @@ function renderAt(path: string, role: string, permissions: string[] = []) {
           <Route path="ai" element={<div>ai connections body</div>} />
           <Route path="roles" element={<div>roles body</div>} />
           <Route path="api-keys" element={<div>api keys body</div>} />
-          <Route
-            path="modules/:name"
-            element={<div>module settings body</div>}
-          />
+          <Route path="modules/:name" element={<NamedModulePage />} />
         </Route>
       </Routes>
     </MemoryRouter>,
@@ -231,6 +239,19 @@ describe("SettingsShell access", () => {
 
     expect(picker).toHaveTextContent("General");
     expect(picker).not.toHaveAttribute("aria-label");
+  });
+
+  it("names a module's settings page in the phone picker, not General", () => {
+    // /settings/modules/:name is no entry of the list: the bar names the page
+    // by its own header, and never claims the first entry, General.
+    renderAt("/settings/modules/webhooks", "admin", ["admin:access"]);
+
+    const picker = screen.getByRole("button", { name: "Webhooks" });
+
+    expect(picker).toHaveTextContent("Webhooks");
+    expect(
+      screen.queryByRole("button", { name: "General" }),
+    ).not.toBeInTheDocument();
   });
 
   it("gives the mobile header's back control a 44px target", () => {

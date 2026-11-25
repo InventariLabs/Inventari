@@ -131,26 +131,24 @@ export function WarehouseReceivingSection({ canWrite }: { canWrite: boolean }) {
                   <option value="one">{t("putaway.receiving.oneStep")}</option>
                   <option value="two">{t("putaway.receiving.twoStep")}</option>
                 </NativeSelect>
-                {twoStep && (
-                  <div className="w-full">
-                    <Checkbox
-                      id={`fixed-places-${warehouse.id}`}
-                      label={t("putaway.receiving.fixedPlaces", {
-                        location: warehouse.name,
-                      })}
-                      checked={!freePlacement}
-                      disabled={!canWrite || modes === undefined}
-                      onChange={(e) =>
-                        choose(warehouse.id, {
-                          freePlacement: !e.target.checked,
-                        })
-                      }
-                    />
-                    <p className="ml-6 text-xs text-on-secondary">
-                      {t("putaway.receiving.fixedPlacesHint")}
-                    </p>
-                  </div>
-                )}
+                <div className="w-full">
+                  <Checkbox
+                    id={`fixed-places-${warehouse.id}`}
+                    label={t("putaway.receiving.fixedPlaces", {
+                      location: warehouse.name,
+                    })}
+                    checked={!freePlacement}
+                    disabled={!canWrite || modes === undefined}
+                    onChange={(e) =>
+                      choose(warehouse.id, {
+                        freePlacement: !e.target.checked,
+                      })
+                    }
+                  />
+                  <p className="ml-6 text-xs text-on-secondary">
+                    {t("putaway.receiving.fixedPlacesHint")}
+                  </p>
+                </div>
               </li>
             );
           })}

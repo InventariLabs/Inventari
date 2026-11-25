@@ -9105,6 +9105,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/warehouse/documents/{doc_id}/home-shelf-offers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Receipt Home Shelf Offers
+         * @description Which shelves a posted receipt in one step offers as a product's home.
+         *
+         *     One entry for each product whose line was put on a shelf other than the
+         *     suggested one; empty when the warehouse keeps no fixed places, receives in
+         *     two steps (the put-away asks) or the product's question was silenced.
+         */
+        get: operations["list_receipt_home_shelf_offers_api_v1_warehouse_documents__doc_id__home_shelf_offers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/warehouse/documents/{doc_id}/import-lines": {
         parameters: {
             query?: never;
@@ -20213,6 +20237,24 @@ export interface components {
              */
             total_capped: boolean;
         };
+        /** PaginatedResponse[HomeShelfOffer] */
+        PaginatedResponse_HomeShelfOffer_: {
+            /** Items */
+            items: components["schemas"]["HomeShelfOffer"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Has More */
+            has_more: boolean;
+            /**
+             * Total Capped
+             * @default false
+             */
+            total_capped: boolean;
+        };
         /** PaginatedResponse[HomeShelfSilencedOut] */
         PaginatedResponse_HomeShelfSilencedOut_: {
             /** Items */
@@ -28548,6 +28590,8 @@ export interface components {
              * Format: uuid
              */
             delivery_id: string;
+            /** Error Cause */
+            error_cause?: string | null;
         };
         /**
          * Token
@@ -29163,6 +29207,8 @@ export interface components {
             created_at: string;
             /** Last Attempt At */
             last_attempt_at?: string | null;
+            /** Error Cause */
+            error_cause?: string | null;
         };
         /** WebhookEndpointCreate */
         WebhookEndpointCreate: {
@@ -48088,6 +48134,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ExtraCostsView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_receipt_home_shelf_offers_api_v1_warehouse_documents__doc_id__home_shelf_offers_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedResponse_HomeShelfOffer_"];
                 };
             };
             /** @description Validation Error */

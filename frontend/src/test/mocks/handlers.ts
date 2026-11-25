@@ -1652,6 +1652,11 @@ handlers.push(
   http.get("/api/v1/warehouse/putaway/receiving-modes", () =>
     HttpResponse.json(onePage([])),
   ),
+  // A posted receipt asks which home shelves it offers; none until a test
+  // says otherwise.
+  http.get("/api/v1/warehouse/documents/:id/home-shelf-offers", () =>
+    HttpResponse.json(onePage([])),
+  ),
   // The shelf settings panel asks how many products stand on a shelf; the
   // floor is empty until a test says otherwise.
   http.get("/api/v1/warehouse/putaway/occupancy", () =>

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render as renderPlain, screen } from "@testing-library/react";
+import type { ReactElement } from "react";
 import { ProductionIngredientsTable } from "./ProductionIngredientsTable";
 import { ProductionStockMovesTable } from "./ProductionStockMovesTable";
 import { withLanguage } from "@/test/mocks/i18n";
@@ -15,6 +16,13 @@ import type {
 vi.mock("@/hooks/useOrganizationCurrency", () => ({
   useOrganizationCurrency: () => "PLN",
 }));
+
+// The ingredients table names its places by looking their ids up, so every
+// render here carries a client.
+const render = (
+  ui: ReactElement,
+  options?: { wrapper?: typeof QueryWrapper },
+) => renderPlain(ui, { wrapper: QueryWrapper, ...options });
 
 const line: ProductionOrderLine = {
   id: "line-1",

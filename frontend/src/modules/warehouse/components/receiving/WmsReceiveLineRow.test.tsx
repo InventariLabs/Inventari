@@ -100,6 +100,26 @@ describe("WmsReceiveLineRow", () => {
     ).toBeInTheDocument();
   });
 
+  it("prints a raised typed count as what arrived, not as 2/1", () => {
+    render(
+      <WmsReceiveLineRow
+        line={{
+          ...pendingLine,
+          expected_is_count: true,
+          received_quantity: 2,
+          expected_quantity: 1,
+        }}
+        onUndo={vi.fn()}
+        onShortReceive={vi.fn()}
+        onSkip={vi.fn()}
+        onFullReceive={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText(/2\/1/)).not.toBeInTheDocument();
+    expect(screen.getByText(/^2\s/)).toBeInTheDocument();
+  });
+
   it("offers only undo once the line is resolved", () => {
     render(
       <WmsReceiveLineRow

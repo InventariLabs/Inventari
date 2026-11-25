@@ -10,17 +10,19 @@ import type { AttentionGroup } from "@/modules/inventory/hooks/useDashboardAtten
 /**
  * The attention card's rows for the inventory overview. A row opens its
  * record in the products list, the same drawer the list itself opens.
+ * `placeOf` names the place a dated record stands in, by its path: two
+ * shelves with one name are two rows the reader must tell apart.
  */
 export function toAttentionItems(
   groups: readonly AttentionGroup[],
-  locations: ReadonlyMap<string, { name: string }>,
+  placeOf: (locationId: string) => string | undefined,
   lowProducts: readonly LowStockProduct[],
   t: TFunction,
   partialOf: (item: Item) => PartialPackage | null,
 ): AttentionItem[] {
   const dated = groups.map((group) => {
     const first = group.items[0];
-    const where = locations.get(first.location_id)?.name;
+    const where = placeOf(first.location_id);
     // The date is why the row is here, and on a phone it sits far down the
     // sheet, so the link asks for it.
     const href = `/inventory/items?open=${first.id}&at=expiry`;

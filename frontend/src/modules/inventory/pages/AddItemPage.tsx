@@ -71,6 +71,7 @@ export default function AddItemPage() {
     isStoragesError,
     storagesError,
     refetchStorages,
+    templateUnit,
     pendingUnitChoice,
     resolveUnitChoice,
   } = useQuickAdd({
@@ -183,6 +184,7 @@ export default function AddItemPage() {
                 onClearCarriedOver={clearCarriedOver}
                 storageGate={storageGate}
                 onAddStorage={setNewStorageName}
+                templateUnit={templateUnit}
               />
             )}
           </div>
