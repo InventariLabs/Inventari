@@ -26,11 +26,21 @@ from uuid import UUID
 
 from sqlalchemy import select
 
+from app.core.public_api import core_api
+
 from ._name_matching import match_key
 from .models import ShoppingExclusion
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from sqlalchemy.ext.asyncio import AsyncSession
+
+    from app.core.contracts import UomDTO
+
+#: The goods a shopping line asks for: its lower-cased name and what its unit
+#: measures (see ``goods_key``).
+GoodsKey = tuple[str, UUID | None]
 
 
 @dataclass(frozen=True)
@@ -78,3 +88,37 @@ def quantity_to_buy(
         return required
     shortfall = required - available
     return shortfall if shortfall > 0 else None
+
+
+def goods_key(
+    name: str, uom_id: UUID | None, uoms_by_id: Mapping[UUID, UomDTO]
+) -> GoodsKey:
+    """The goods a line asks for: its name and what its unit measures.
+
+    Units of one category convert into each other, so 300 g and 1 kg of flour
+    are the same goods and one line; pieces and grams are not. A unit the
+    organization's table does not hold answers for itself alone.
+    """
+    uom = uoms_by_id.get(uom_id) if uom_id else None
+    return (name.strip().lower(), uom.category_id if uom else uom_id)
+
+
+def in_unit(
+    qty: Decimal,
+    source_id: UUID | None,
+    target_id: UUID | None,
+    uoms_by_id: Mapping[UUID, UomDTO],
+) -> Decimal:
+    """*qty*, stated in *source_id*, restated in *target_id*.
+
+    For two lines of one ``goods_key`` the conversion always holds; a pair it
+    refuses keeps the number as stated.
+    """
+    if source_id == target_id:
+        return qty
+    converted, convertible = core_api.uoms.convert_quantity(
+        qty,
+        uoms_by_id.get(source_id) if source_id else None,
+        uoms_by_id.get(target_id) if target_id else None,
+    )
+    return converted if convertible else qty

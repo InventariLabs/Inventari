@@ -810,6 +810,8 @@
     "rename": "Renommer",
     "delete": "Supprimer la collection",
     "delete_confirm": "Supprimer la collection « {{name}} » ? Les recettes sont conservées.",
+    "delete_confirm_nested_one": "Supprimer la collection « {{name}} » ? Elle contient {{count}} sous-collection, supprimée avec elle. Les recettes sont conservées.",
+    "delete_confirm_nested_other": "Supprimer la collection « {{name}} » ? Elle contient {{count}} sous-collections, supprimées avec elle. Les recettes sont conservées.",
     "name_placeholder": "Nom de la collection",
     "created": "Collection créée",
     "updated": "Collection mise à jour",

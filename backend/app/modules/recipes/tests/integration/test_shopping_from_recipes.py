@@ -939,6 +939,119 @@ class TestRecipesSharingGoodsNetTheShelfOnce:
         assert _flour_line(client, auth_headers, list_id) == Decimal('650')
 
 
+class TestTheSameGoodsInTwoUnitsAreOneLine:
+    """Grams and kilograms of one goods are one line, netted against one shelf.
+
+    Bread asks 200 g of flour and Cake 0.3 kg: 500 g together, of which the
+    250 g on the shelf cover half. Two lines, one per unit, each netted
+    against the whole shelf, asked for 50 g where 250 g are short.
+    """
+
+    def _bread_and_cake(
+        self, client: TestClient, auth_headers: dict[str, str], db_session: Session
+    ) -> tuple[str, str]:
+        bread = _recipe(
+            client,
+            auth_headers,
+            'Bread',
+            [
+                {
+                    'name': 'Flour',
+                    'quantity': '200',
+                    'uom_id': str(_uom_id(db_session, 'g')),
+                }
+            ],
+        )
+        cake = _recipe(
+            client,
+            auth_headers,
+            'Cake',
+            [
+                {
+                    'name': 'Flour',
+                    'quantity': '0.3',
+                    'uom_id': str(_uom_id(db_session, 'kg')),
+                }
+            ],
+        )
+        return bread, cake
+
+    def _lines(
+        self, client: TestClient, auth_headers: dict[str, str], list_id: str
+    ) -> list[tuple[Decimal, str]]:
+        items = client.get(
+            f'/api/v1/shopping-lists/{list_id}/items', headers=auth_headers
+        ).json()['items']
+        return [(Decimal(str(line['quantity'])), line['uom_id']) for line in items]
+
+    def test_one_press_nets_the_shelf_once_against_both_units(
+        self,
+        client: TestClient,
+        auth_headers: dict[str, str],
+        db_session: Session,
+        test_user: User,
+        test_storage_location: StorageLocation,
+        async_engine_fixture: AsyncEngine,
+    ) -> None:
+        _shelve_grams(
+            db_session,
+            async_engine_fixture,
+            test_user,
+            test_storage_location,
+            'Flour',
+            Decimal('250'),
+        )
+        bread, cake = self._bread_and_cake(client, auth_headers, db_session)
+
+        response = client.post(
+            ADD_URL,
+            json={'recipe_ids': [bread, cake], 'servings': 1},
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200, response.text
+        body = response.json()
+        assert body['added_count'] == 1
+        # The line keeps the unit of the first recipe that asked for it.
+        assert self._lines(client, auth_headers, body['shopping_list_id']) == [
+            (Decimal('250'), str(_uom_id(db_session, 'g')))
+        ]
+
+    def test_a_press_in_the_other_unit_raises_the_line_already_listed(
+        self, client: TestClient, auth_headers: dict[str, str], db_session: Session
+    ) -> None:
+        """Cake listed 0.3 kg; Bread's 200 g raise that line to 0.5 kg."""
+        bread, cake = self._bread_and_cake(client, auth_headers, db_session)
+        list_id = client.post(
+            f'{RECIPE_URL}/{cake}/add-to-shopping-list',
+            json={'servings': 1},
+            headers=auth_headers,
+        ).json()['shopping_list_id']
+
+        body = client.post(
+            f'{RECIPE_URL}/{bread}/add-to-shopping-list',
+            json={'servings': 1, 'shopping_list_id': list_id},
+            headers=auth_headers,
+        ).json()
+
+        assert (body['added_count'], body['raised_count']) == (0, 1)
+        assert self._lines(client, auth_headers, list_id) == [
+            (Decimal('0.5'), str(_uom_id(db_session, 'kg')))
+        ]
+        # Pressed again, both are covered by the line as it stands.
+        again = client.post(
+            ADD_URL,
+            json={
+                'recipe_ids': [bread, cake],
+                'servings': 1,
+                'shopping_list_id': list_id,
+            },
+            headers=auth_headers,
+        ).json()
+        assert (again['added_count'], again['raised_count']) == (0, 0)
+        assert again['already_listed_count'] == 1
+
+
 class TestALineFromBeforeTheNeedsWereKept:
     def test_its_recipe_stays_covered_and_another_gets_a_line_of_its_own(
         self,

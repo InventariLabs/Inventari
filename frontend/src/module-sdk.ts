@@ -44,6 +44,9 @@ export { copyTextOrExplain } from "@/lib/clipboard";
 // A value a screen remembers in the browser between visits, read and written
 // as JSON, with a fallback when it is missing or unreadable.
 export { readJson, writeJson } from "@/lib/localStorage";
+// The same remembered value as state a screen renders: `useState` kept in step
+// with the stored copy.
+export { useLocalStorage } from "@/hooks/useLocalStorage";
 // The sentence to show for a failed request: the server's own message, in the
 // reader's language, or the fallback the caller passes when there is none.
 export { extractApiError } from "@/lib/errors";
