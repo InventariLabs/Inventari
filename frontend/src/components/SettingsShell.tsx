@@ -275,17 +275,21 @@ export default function SettingsShell() {
       {/* Mobile top bar — shows current section + opens nav sheet */}
       {(() => {
         const allItems = groups.flatMap((g) => g.items);
-        const active =
-          allItems.find((item) =>
-            isCurrent(
-              item,
-              item.exact
-                ? location.pathname === item.to
-                : location.pathname.startsWith(item.to) &&
-                    item.to !== "/settings",
-              location,
-            ),
-          ) ?? allItems[0];
+        const active = allItems.find((item) =>
+          isCurrent(
+            item,
+            item.exact
+              ? location.pathname === item.to
+              : location.pathname.startsWith(item.to) &&
+                  item.to !== "/settings",
+            location,
+          ),
+        );
+        // A page the list does not name — a module's generic settings at
+        // `/settings/modules/:name` — is not General: the bar says what the
+        // page calls itself, and "Settings" until it has said so.
+        const activeLabel =
+          active?.label ?? headerData.title ?? t("settings.title");
         const ActiveIcon = active?.icon ?? Settings;
 
         return (
@@ -314,7 +318,7 @@ export default function SettingsShell() {
               >
                 <ActiveIcon size={15} className="shrink-0 text-primary-600" />
                 <span className="text-sm font-semibold text-on truncate flex-1 text-left">
-                  {active?.label ?? t("settings.title")}
+                  {activeLabel}
                 </span>
                 <ChevronDown size={14} className="shrink-0 text-on-muted" />
               </Button>

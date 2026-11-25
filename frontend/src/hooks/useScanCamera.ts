@@ -108,6 +108,11 @@ export function decodeAtCameraResolution(canvas: HTMLCanvasElement) {
     if (args.length !== 9 || !(source instanceof HTMLVideoElement)) {
       return draw(...args);
     }
+    // A reader being closed hands over a video with no picture left: sizes
+    // that are not numbers cannot size the canvas or be read back from it.
+    if (!(sw > 0 && sh > 0 && Number.isFinite(sw) && Number.isFinite(sh))) {
+      return draw(...args);
+    }
     const fit = Math.min(1, MAX_DECODE_EDGE / Math.max(sw, sh));
     // Assigning a size clears the bitmap, so only when it changes.
     const width = Math.max(1, Math.round(sw * fit));

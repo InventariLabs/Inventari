@@ -5,6 +5,7 @@ import type { StorageStats, CategoryStats } from "@/types";
 import { TranslateFn } from "@/types/i18n";
 import { categoryLabel } from "@/lib/i18nHelpers";
 import { useMoney } from "@/hooks/useMoney";
+import { useStorageLocationLabels } from "@/modules/shared/hooks/useStorageLocationLabels";
 
 /**
  * A location's or a category's name, as its owner typed it. This font's narrow
@@ -36,6 +37,11 @@ export function StatsDistributionGrid({
   showInventoryValue = true,
 }: Props) {
   const money = useMoney();
+  // A place by its path: two shelves of one name in different rooms are two
+  // bars, and the bare name made them read as one place.
+  const placeName = useStorageLocationLabels(
+    storageStats.map((stat) => stat.location_id),
+  );
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
@@ -57,7 +63,9 @@ export function StatsDistributionGrid({
                   }
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className={NAME_TEXT}>{stat.location_name}</span>
+                    <span className={NAME_TEXT}>
+                      {placeName(stat.location_id, stat.location_name)}
+                    </span>
                     <Badge variant="secondary">
                       {t("stats:recordCount", { count: stat.items_count })}
                     </Badge>

@@ -32,6 +32,13 @@ says what the release does rather than what changed since them.
   for the domain and the e-mail address, generates the five secrets and the
   encryption key, and never overwrites an existing file. The guides use it
   instead of six `openssl` commands to paste by hand.
+- A warehouse that receives in one step now asks the home-location question
+  too. When a receipt is posted, one sheet lists each product whose line was
+  put on a location other than the suggested one and offers to make it the
+  product's home, with the same refusals and *Don't ask about this product
+  again* as a put-away. The *Each product has its own location* setting shows
+  for every warehouse, so one that keeps no fixed places can turn the question
+  off.
 
 ### Fixed
 
@@ -43,6 +50,31 @@ says what the release does rather than what changed since them.
   started, rather than the day it was created, and its Date column no longer
   announces a newest-first or oldest-first order that the days it shows do not
   follow.
+- An enabled module whose code fails to load after an update no longer answers
+  every one of its addresses with "Page not found": the application says that
+  part of it did not load and offers a reload.
+- A module's translation overrides take effect only in the namespace named
+  after the module; a key of another namespace needs the module to list it in
+  the new optional `adoptedI18nKeys` field (MODULES_GUIDE.md), and the
+  development console names an ignored key and a key two modules both override.
+- A failed webhook delivery explains itself in the reader's language — an
+  unreadable signing secret, a timeout, a refused or broken connection — and an
+  answer with an empty body says that it gave no reason. The two links in the
+  circuit-breaker banner share one colour.
+- The warning that a failed Test counts toward the circuit breaker is a line on
+  the Webhooks page, not a tooltip, so a phone and a keyboard see it.
+- On a phone, a module's settings page is named in the section picker instead
+  of reading "General".
+- A receiving session's line and completion summary read a typed count that
+  was raised as "2/1 pcs." and "2 of 1 received"; they now print what arrived,
+  as the closed receipt does. The all-locations total on a product page
+  follows a stock press without a reload, a product used up to zero no longer
+  offers *Remove 1 unit*, and the full Add Item page says where a catalogue
+  unit it fills in comes from. A scan's remembered location that has since
+  been deleted is dropped from the add form instead of leaving an empty-looking
+  field, and the counting search reads every page of a counted location.
+  Attention rows and a production order's ingredients name a shelf by its
+  path.
 - The form that records a delivery cost as a variance on a posted receipt marks
   the amount and the reason as required, as it already did the day, and no
   longer accepts a day after today. A recipe card that can be dragged stays a

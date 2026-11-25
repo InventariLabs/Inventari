@@ -67,6 +67,14 @@
       "webhookDisabled": "Der Endpunkt wurde von einem Administrator deaktiviert.",
       "webhookDeleted": "Der Endpunkt wurde gelöscht.",
       "moduleDisabled": "Das Webhooks-Modul ist für diese Organisation deaktiviert."
+    },
+    "cause": {
+      "signingUnreadable": "Das Signaturgeheimnis kann nicht gelesen werden — es wurde unter einem anderen Schlüssel (Rotation) geschrieben oder in der Tabelle geändert. Geben Sie es in den Endpunkt-Einstellungen neu ein; die Zustellung wird abgelehnt, statt unsigniert gesendet zu werden.",
+      "timeout": "Das Ziel hat innerhalb des Zeitlimits des Endpunkts nicht geantwortet.",
+      "connectFailed": "Es konnte keine Verbindung zum Ziel hergestellt werden. Die Adresse ist vielleicht falsch, eine Firewall blockiert sie oder der Empfänger ist nicht erreichbar.",
+      "tlsRefused": "Die Verbindung wurde über TLS abgelehnt: Das Zertifikat des Empfängers konnte nicht überprüft werden.",
+      "connectionBroken": "Die Verbindung brach ab, bevor der Empfänger antwortete.",
+      "emptyAnswer": "Das Ziel antwortete mit HTTP {{status}} ohne Inhalt und nannte daher keinen Grund. Prüfen Sie das eigene Protokoll des Empfängers."
     }
   },
   "testResult": {

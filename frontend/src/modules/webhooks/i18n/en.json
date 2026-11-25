@@ -67,6 +67,14 @@
       "webhookDisabled": "The endpoint was switched off by an administrator.",
       "webhookDeleted": "The endpoint was deleted.",
       "moduleDisabled": "The webhooks module is switched off for this organization."
+    },
+    "cause": {
+      "signingUnreadable": "The signing secret cannot be read — it was written under a different key (a rotation) or edited in the table. Re-enter it in the endpoint settings; the delivery is refused rather than sent unsigned.",
+      "timeout": "The target did not answer within the endpoint's timeout.",
+      "connectFailed": "Could not connect to the target. The address may be wrong, a firewall may be blocking it, or the receiver may be down.",
+      "tlsRefused": "The connection was refused over TLS: the receiver's certificate could not be verified.",
+      "connectionBroken": "The connection broke before the receiver answered.",
+      "emptyAnswer": "The target answered HTTP {{status}} with no body, so it gave no reason. Check the receiver's own log."
     }
   },
   "testResult": {

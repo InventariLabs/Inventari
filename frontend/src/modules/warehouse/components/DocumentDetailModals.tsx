@@ -5,6 +5,7 @@ import DocumentFormModal from "@/modules/warehouse/components/DocumentFormModal"
 import { CorrectionFormModal } from "@/modules/warehouse/components/CorrectionFormModal";
 import { ReturnFormModal } from "@/modules/warehouse/components/ReturnFormModal";
 import WmsPickingView from "@/modules/warehouse/components/picking/WmsPickingView";
+import { HomeShelvesAfterPosting } from "@/modules/warehouse/components/todo/ReceiptHomeShelves";
 import WmsReceivingView from "@/modules/warehouse/components/receiving/WmsReceivingView";
 import WmsLotExpiryDialog from "@/modules/warehouse/components/receiving/WmsLotExpiryDialog";
 import { isPackedType } from "@/modules/warehouse/components/packing/DocumentPackingStep";
@@ -116,6 +117,12 @@ export default function DocumentDetailModals({
     doc.type === "SCRAP";
   return (
     <>
+      <HomeShelvesAfterPosting
+        documentId={doc.id}
+        type={doc.type}
+        status={doc.status}
+      />
+
       {editOpen && <DocumentFormModal document={doc} onClose={onEditClose} />}
 
       {correctionOpen && (

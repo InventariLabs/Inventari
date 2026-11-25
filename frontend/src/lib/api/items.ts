@@ -1,7 +1,7 @@
 import { prepareImageUpload } from "@/lib/imageUtils";
 import i18next from "i18next";
 import { ReadableError } from "@/lib/errors";
-import { api, type Page } from "./client";
+import { api, getEveryPage, type Page } from "./client";
 import {
   IMAGE_UPLOAD_MAX_BYTES,
   assertFileSize,
@@ -99,6 +99,26 @@ export const itemsApi = {
   }): Promise<ItemListResponse> => {
     const response = await api.get<ItemListResponse>("/items", { params });
     return response.data;
+  },
+
+  /** Every page of one place's search, as one answer: a place that holds
+   * more matches than a page would otherwise lose the ones past the cut. */
+  searchInside: async (params: {
+    search: string;
+    location_id: string;
+  }): Promise<ItemListResponse> => {
+    const items = await getEveryPage<Item>("/items", {
+      ...params,
+      include_inside: true,
+    });
+    return {
+      items,
+      total: items.length,
+      limit: items.length,
+      offset: 0,
+      has_more: false,
+      total_capped: false,
+    };
   },
 
   /** Totals over the whole filtered set — the same params as `getAll`,

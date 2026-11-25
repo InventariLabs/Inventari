@@ -111,7 +111,8 @@ export function FocusModeSettings() {
   // interface language, English as fallback. Nothing renders for a module
   // that declares no overrides.
   const renameRows = useMemo(() => {
-    const overrides = pendingModule?.i18nOverrides;
+    const overrides =
+      pendingModule && moduleRegistry.effectiveI18nOverrides(pendingModule);
     if (!overrides) return [];
     const bundle = overrides[i18n.language] ?? overrides.en ?? {};
     return Object.entries(bundle).map(([key, next]) => ({

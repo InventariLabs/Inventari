@@ -516,8 +516,20 @@ export interface FrontendModule {
    * must be one a reader actually passes to t() — the i18nOverridesGate test
    * rejects keys missing from the shipped bundles or read by nobody.
    * Originals are restored when the module is disabled.
+   *
+   * Only keys in the module's own namespace (named after the module) take
+   * effect. A key of another namespace — "inventory:nav.items" — is ignored
+   * unless it is listed in {@link FrontendModule.adoptedI18nKeys}.
    */
   i18nOverrides?: Record<string, Record<string, string>>;
+  /**
+   * The keys of `i18nOverrides` that belong to another namespace and that
+   * this module is meant to rename — written exactly as in `i18nOverrides`
+   * ("inventory:nav.items"). Anything outside the module's own namespace that
+   * is not listed here is ignored, so a module cannot rewrite shared
+   * vocabulary by accident.
+   */
+  adoptedI18nKeys?: string[];
   /**
    * CSS variable overrides applied to <html> when this module is enabled.
    * Allows modules to re-skin brand colors (primary/accent palette).

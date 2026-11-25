@@ -89,6 +89,39 @@ describe("WebhookDeliveryLogs", () => {
       screen.queryByText("Response from the target"),
     ).not.toBeInTheDocument();
   });
+  it("words a cause of ours from its code, not from the stored English sentence", async () => {
+    mockDelivery({
+      status_code: null,
+      error_message: "Timeout after 5s",
+      error_cause: "timeout",
+    });
+    renderLogs();
+
+    // not-an-i18n-key
+    fireEvent.click(await screen.findByText(/^item\.created$/));
+
+    expect(
+      screen.getByText(
+        "The target did not answer within the endpoint's timeout.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Timeout after 5s")).not.toBeInTheDocument();
+  });
+
+  it("gives a reason when the target refused with an empty body", async () => {
+    // The row carried only "Failed - HTTP 500" and the payload: the Error block
+    // is drawn from the stored text, and an empty body stored none.
+    mockDelivery({ status_code: 500, error_message: null });
+    renderLogs();
+
+    // not-an-i18n-key
+    fireEvent.click(await screen.findByText(/^item\.created$/));
+
+    expect(
+      screen.getByText(/The target answered HTTP 500 with no body/),
+    ).toBeInTheDocument();
+  });
+
   it("announces that a row opens, and that it has", async () => {
     // The only sign a row was clickable was that it is a button; the state
     // it toggles is now spoken too, for readers who do not see the chevron.

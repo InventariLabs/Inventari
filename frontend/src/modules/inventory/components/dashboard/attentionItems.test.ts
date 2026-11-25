@@ -35,18 +35,36 @@ describe("toAttentionItems — dated records", () => {
     } as unknown as Item;
     const [row] = toAttentionItems(
       [{ key: "g-1", kind: "expired", items: [record] }] as AttentionGroup[],
-      new Map(),
+      () => undefined,
       [],
       t,
       none,
     );
     expect(row.href).toBe("/inventory/items?open=i-7&at=expiry");
   });
+
+  it("names the place the way the place is read elsewhere, by its path", () => {
+    const record = {
+      id: "i-7",
+      name: "Cottage Cheese",
+      location_id: "l-1",
+      expiry_date: "2026-10-29",
+      quantity: 10,
+    } as unknown as Item;
+    const [row] = toAttentionItems(
+      [{ key: "g-1", kind: "expired", items: [record] }] as AttentionGroup[],
+      (id) => (id === "l-1" ? "Kitchen → Fridge B" : undefined),
+      [],
+      t,
+      none,
+    );
+    expect(row.where).toBe("Kitchen → Fridge B");
+  });
 });
 
 describe("toAttentionItems — short products", () => {
   it("says a used-up product has none left, against its minimum", () => {
-    const [row] = toAttentionItems([], new Map(), [product({})], t, none);
+    const [row] = toAttentionItems([], () => undefined, [product({})], t, none);
     expect(row).toMatchObject({
       id: "low:t-1",
       severity: "low",
@@ -62,7 +80,7 @@ describe("toAttentionItems — short products", () => {
   it("gives what is on the shelf against the minimum for a product in stock", () => {
     const [row] = toAttentionItems(
       [],
-      new Map(),
+      () => undefined,
       [product({ on_hand: 3, minimum: 10, name: "Rice" })],
       t,
       none,
@@ -75,7 +93,7 @@ describe("toAttentionItems — short products", () => {
   it("opens the product's own page, used up or not", () => {
     const [row] = toAttentionItems(
       [],
-      new Map(),
+      () => undefined,
       [product({ on_hand: 0, item_id: "i-9" })],
       t,
       none,
@@ -86,7 +104,7 @@ describe("toAttentionItems — short products", () => {
   it("falls back to the list for a product with no record", () => {
     const [row] = toAttentionItems(
       [],
-      new Map(),
+      () => undefined,
       [product({ item_id: null })],
       t,
       none,
@@ -123,7 +141,7 @@ describe("toAttentionItems — a product held as two records", () => {
   it("tells the two rows apart, the half carton as the list reads it", () => {
     const rows = toAttentionItems(
       [group(record("a", "2.0000")), group(record("b", "0.5000"))],
-      new Map(),
+      () => undefined,
       [],
       t,
       litre,
