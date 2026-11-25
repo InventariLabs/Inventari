@@ -338,6 +338,38 @@ const PRINT_LAYOUT_NAMES: Record<string, string> = {
   pl_pz: "layoutPlPz",
 };
 
+const MAINTENANCE_TYPE_KEYS: Record<string, string> = {
+  REPAIR: "equipment:maintenance.type_repair",
+  CLEANING: "equipment:maintenance.type_cleaning",
+  UPGRADE: "equipment:maintenance.type_upgrade",
+  INSPECTION: "equipment:maintenance.type_inspection",
+  OTHER: "equipment:maintenance.type_other",
+};
+
+const DISPUTE_TYPE_KEYS: Record<string, string> = {
+  MISSING: "equipment:attestation.disputeType.MISSING",
+  DAMAGED: "equipment:attestation.disputeType.DAMAGED",
+  WRONG_ITEM: "equipment:attestation.disputeType.WRONG_ITEM",
+  OTHER: "equipment:attestation.disputeType.OTHER",
+};
+
+/** The kinds of record an approval workflow stands in front of. */
+const WORKFLOW_TARGET_KEYS: Record<string, string> = {
+  document: "approvals:workflows.targetType_document",
+  equipment_checkout: "approvals:workflows.targetType_equipment_checkout",
+  purchase_order: "approvals:workflows.targetType_purchase_order",
+};
+
+/** The word for a code listed in *keys*; empty for a code nobody listed. */
+function mappedWord(
+  t: TranslateFn,
+  keys: Record<string, string>,
+  code: string,
+): string {
+  const key = keys[code];
+  return key ? t(key, { defaultValue: "" }) : "";
+}
+
 /**
  * The value dictionaries the reader shares with the screens that own them.
  *
@@ -388,13 +420,9 @@ const VALUE_RESOLVERS: Record<
   // falls through to the journal's own values.
   type: (t, code) => t(`partners:types.${code}`, { defaultValue: "" }),
   // What kind of maintenance was done: the words the maintenance form offers.
-  // i18n-keys: repair | cleaning | upgrade | inspection | other
-  maintenance_type: (t, code) =>
-    t(`equipment:maintenance.type_${code.toLowerCase()}`, { defaultValue: "" }),
+  maintenance_type: (t, code) => mappedWord(t, MAINTENANCE_TYPE_KEYS, code),
   // What a person reported on an attestation: the attestation screen's words.
-  // i18n-keys: MISSING | DAMAGED | WRONG_ITEM | OTHER
-  dispute_type: (t, code) =>
-    t(`equipment:attestation.disputeType.${code}`, { defaultValue: "" }),
+  dispute_type: (t, code) => mappedWord(t, DISPUTE_TYPE_KEYS, code),
   // What a module row is about: the configuration it changed, in words.
   subject: (t, code) => subjectWord(t, code),
 };
@@ -416,9 +444,7 @@ function subjectWord(t: TranslateFn, code: string): string {
   if (code.startsWith("workflow:")) {
     const target = code.slice("workflow:".length);
     return t("common:settings.audit.subjects.workflow", {
-      target: t(`approvals:workflows.targetType_${target}`, {
-        defaultValue: target,
-      }),
+      target: mappedWord(t, WORKFLOW_TARGET_KEYS, target) || target,
       defaultValue: "",
     });
   }
@@ -645,9 +671,10 @@ function fieldDefinitionText(d: Definition, t: TranslateFn): string {
   // builder names it from `items:fields.<key>`, and so does the journal.
   const stored = String(d.label || d.key || "—");
   const label =
-    d.is_system === true && typeof d.key === "string"
-      ? t(`items:fields.${d.key}`, { defaultValue: stored })
-      : stored;
+    (d.is_system === true &&
+      typeof d.key === "string" &&
+      seededFieldWord(d.key, t)) ||
+    stored;
   const details = [
     d.type && t(`modules:fieldBuilder.types.${d.type}`, { defaultValue: "" }),
     d.required === true && t("common:settings.audit.fieldDefinitions.required"),
@@ -963,6 +990,14 @@ const NAMED_BY_THE_FORM: Record<string, string> = {
   shelf_location: "items:itemShelfLocation",
 };
 
+/**
+ * A product field the platform seeds (an asset's manufacturer, asset tag,
+ * RAM), worded by the form that edits it; empty for any other key.
+ */
+function seededFieldWord(segment: string, t: TranslateFn): string {
+  return t(`items:fields.${segment}`, { defaultValue: "" });
+}
+
 export function auditFieldLabel(
   path: string,
   t: TranslateFn,
@@ -980,9 +1015,7 @@ export function auditFieldLabel(
         (NAMED_BY_THE_FORM[segment] &&
           t(NAMED_BY_THE_FORM[segment], { defaultValue: "" })) ||
         t(`settings.audit.fields.${segment}`, { defaultValue: "" }) ||
-        // A product field the platform seeds (an asset's manufacturer, asset
-        // tag, RAM) is worded by the form that edits it.
-        t(`items:fields.${segment}`, { defaultValue: "" }) ||
+        seededFieldWord(segment, t) ||
         segment,
     )
     .join(" › ");

@@ -375,5 +375,5 @@ async def test_freeing_a_label_twice_at_once_journals_one_freeing(
     await _one_after_the_other(db, _free, _free)
 
     (entry,) = await _snapshots(db, AuditTargetType.LABEL, label_id)
-    assert entry['before'] == {'item_id': str(item_id)}
+    assert entry['before'] == {'item_id': str(item_id), 'item_name': 'Drill'}
     assert entry['after'] == {'item_id': None}
