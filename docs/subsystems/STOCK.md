@@ -276,7 +276,9 @@ template's `uom_id` is the reference**.
   is converted to the template's unit before it lands, and a line unit that
   cannot be read as it is refused with `uom_conversion_unavailable`
   (`app/services/uom_service.py`). A recipe's BoM line in such a unit is refused
-  with `bom_line_unit_not_convertible` (`app/modules/maker/recipe_service.py`).
+  with `bom_line_unit_not_convertible` (`app/modules/maker/recipe_service.py`);
+  the bridge from a culinary recipe, which writes every line at once, refuses
+  with `bridge_line_unit_not_convertible`, which names the ingredient.
 - A record (`Item`) may be entered in a different unit as an
   **explicit, confirmed choice**: `POST /items` and the item update take
   `unit_confirmed_over_template: true` alongside the unit, and without it a

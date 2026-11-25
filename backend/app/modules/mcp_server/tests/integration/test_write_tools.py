@@ -185,7 +185,12 @@ class TestCreateItem:
             {'name': 'MCP No Write', 'quantity': 1, 'location_id': str(shelf.id)},
         )
 
-        assert 'PERMISSION_REQUIRED' in _refusal(result)
+        refusal = _refusal(result)
+        assert refusal.startswith('PERMISSION_REQUIRED: ')
+        # Named the way the key form names it, so the reader knows which box
+        # to tick on the key; the raw key is the form's internal name.
+        assert "'Add products and change stock levels'" in refusal
+        assert 'items:write' not in refusal
         assert (
             db_session.scalars(select(Item).where(Item.name == 'MCP No Write')).first()
             is None

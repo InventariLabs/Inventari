@@ -1,0 +1,6567 @@
+{
+  "tier": "1 019 locations",
+  "started": "2026-11-23T23:32:36.345804+00:00",
+  "machine": {
+    "cores": 4,
+    "memory_gib": 7.6
+  },
+  "load_before": [
+    0.8,
+    0.8,
+    0.8
+  ],
+  "runs": 20,
+  "reads": {
+    "items: first page": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=0&sort_by=created_at&sort_order=desc",
+      "status": 200,
+      "runs": 20,
+      "p50": 60.7,
+      "p95": 68.6,
+      "max": 70.7,
+      "bytes": 130910
+    },
+    "items: search, common word": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=0&search=bolt",
+      "status": 200,
+      "runs": 20,
+      "p50": 463.1,
+      "p95": 488.4,
+      "max": 514.6,
+      "bytes": 130515
+    },
+    "items: search, one barcode": {
+      "class": "lookup",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=0&search=2900000333338",
+      "status": 200,
+      "runs": 20,
+      "p50": 335.5,
+      "p95": 359.4,
+      "max": 367.8,
+      "bytes": 10519
+    },
+    "items: filter by category": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=0&category_id=cbed3796-eea1-ab16-c624-c370dacf4ab8",
+      "status": 200,
+      "runs": 20,
+      "p50": 83.3,
+      "p95": 88.5,
+      "max": 154.1,
+      "bytes": 129421
+    },
+    "items: filter by shelf": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=0&location_id=d049a11a-bc38-b377-8eee-1df7676206a7",
+      "status": 200,
+      "runs": 20,
+      "p50": 51.7,
+      "p95": 63.1,
+      "max": 73.1,
+      "bytes": 131040
+    },
+    "items: sort by name": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=0&sort_by=name&sort_order=asc",
+      "status": 200,
+      "runs": 20,
+      "p50": 57.1,
+      "p95": 63.3,
+      "max": 64.0,
+      "bytes": 130549
+    },
+    "items: deep page (last counted)": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=9950&sort_by=created_at&sort_order=desc",
+      "status": 200,
+      "runs": 20,
+      "p50": 84.1,
+      "p95": 97.8,
+      "max": 104.6,
+      "bytes": 131436
+    },
+    "items: expiring in 30 days": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=0&expiring_days=30",
+      "status": 200,
+      "runs": 20,
+      "p50": 386.9,
+      "p95": 419.5,
+      "max": 441.1,
+      "bytes": 132078
+    },
+    "items: low stock": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=0&only_low_stock=true",
+      "status": 200,
+      "runs": 20,
+      "p50": 251.0,
+      "p95": 337.9,
+      "max": 356.8,
+      "bytes": 130987
+    },
+    "items: aggregates": {
+      "class": "report",
+      "path": "/api/v1/items/aggregates?exclude_module_contexts=true&only_expired=false",
+      "status": 200,
+      "runs": 20,
+      "p50": 2681.8,
+      "p95": 2782.2,
+      "max": 2794.2,
+      "bytes": 224
+    },
+    "scan: product barcode": {
+      "class": "lookup",
+      "path": "/api/v1/labels/scan/2900000333338",
+      "status": 200,
+      "runs": 20,
+      "p50": 64.0,
+      "p95": 84.6,
+      "max": 100.4,
+      "bytes": 2498
+    },
+    "scan: shelf label": {
+      "class": "lookup",
+      "path": "/api/v1/labels/scan/A05-002-3",
+      "status": 200,
+      "runs": 20,
+      "p50": 18.8,
+      "p95": 23.2,
+      "max": 23.4,
+      "bytes": 397
+    },
+    "product lookup by barcode": {
+      "class": "lookup",
+      "path": "/api/v1/items/product-templates/lookup?barcode=2900000333338",
+      "status": 200,
+      "runs": 20,
+      "p50": 23.1,
+      "p95": 29.8,
+      "max": 32.2,
+      "bytes": 321
+    },
+    "product card: stock": {
+      "class": "lookup",
+      "path": "/api/v1/items/product-templates/5fc17411-235e-60ca-b922-3b31db70a823/stock",
+      "status": 200,
+      "runs": 20,
+      "p50": 21.9,
+      "p95": 26.3,
+      "max": 26.7,
+      "bytes": 108
+    },
+    "record card": {
+      "class": "lookup",
+      "path": "/api/v1/items/8f1d04d7-8306-f182-7789-fb55dcf05a0e",
+      "status": 200,
+      "runs": 20,
+      "p50": 34.9,
+      "p95": 41.3,
+      "max": 50.3,
+      "bytes": 2690
+    },
+    "shelf: its records": {
+      "class": "list",
+      "path": "/api/v1/locations/d049a11a-bc38-b377-8eee-1df7676206a7/items?limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 48.5,
+      "p95": 54.6,
+      "max": 55.2,
+      "bytes": 103070
+    },
+    "shelf: its stock": {
+      "class": "list",
+      "path": "/api/v1/stock-quants?location_id=d049a11a-bc38-b377-8eee-1df7676206a7&limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 57.8,
+      "p95": 71.3,
+      "max": 80.0,
+      "bytes": 20954
+    },
+    "zone: its stock": {
+      "class": "list",
+      "path": "/api/v1/stock-quants?location_id=e45992de-9c53-558b-91c2-5c9c733e9c47&limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 70.9,
+      "p95": 81.3,
+      "max": 92.5,
+      "bytes": 20731
+    },
+    "stock: first page": {
+      "class": "list",
+      "path": "/api/v1/stock-quants?limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 37.4,
+      "p95": 48.7,
+      "max": 48.9,
+      "bytes": 20983
+    },
+    "batches: first page": {
+      "class": "list",
+      "path": "/api/v1/stock-lots?limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 64.4,
+      "p95": 74.9,
+      "max": 86.4,
+      "bytes": 25906
+    },
+    "location tree": {
+      "class": "list",
+      "path": "/api/v1/locations/tree?exclude_module_contexts=true",
+      "status": 200,
+      "runs": 20,
+      "p50": 153.7,
+      "p95": 417.9,
+      "max": 419.1,
+      "bytes": 334407
+    },
+    "locations: first page": {
+      "class": "list",
+      "path": "/api/v1/locations?limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 192.1,
+      "p95": 232.0,
+      "max": 301.0,
+      "bytes": 190774
+    },
+    "occupancy heat map": {
+      "class": "report",
+      "path": "/api/v1/warehouse/putaway/occupancy",
+      "status": 200,
+      "runs": 20,
+      "p50": 704.8,
+      "p95": 895.4,
+      "max": 943.0,
+      "bytes": 480820
+    },
+    "occupancy of a zone": {
+      "class": "report",
+      "path": "/api/v1/warehouse/putaway/occupancy/e45992de-9c53-558b-91c2-5c9c733e9c47",
+      "status": 200,
+      "runs": 20,
+      "p50": 1349.4,
+      "p95": 1481.3,
+      "max": 1507.1,
+      "bytes": 5497483
+    },
+    "To do": {
+      "class": "list",
+      "path": "/api/v1/warehouse/todo?date_to=2026-11-23&limit=100&work_limit=100&view=all",
+      "status": 200,
+      "runs": 20,
+      "p50": 145.5,
+      "p95": 171.0,
+      "max": 173.1,
+      "bytes": 225
+    },
+    "documents: first page": {
+      "class": "list",
+      "path": "/api/v1/warehouse/documents?limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 184.0,
+      "p95": 197.3,
+      "max": 303.6,
+      "bytes": 65382
+    },
+    "documents: search by number": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/documents?limit=50&offset=0&search=OUT/2026/051104",
+      "status": 200,
+      "runs": 20,
+      "p50": 75.7,
+      "p95": 87.4,
+      "max": 88.1,
+      "bytes": 1443
+    },
+    "documents: completed dispatches": {
+      "class": "list",
+      "path": "/api/v1/warehouse/documents?type=OUT&status=COMPLETED&limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 248.8,
+      "p95": 337.4,
+      "max": 378.1,
+      "bytes": 67648
+    },
+    "document card": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c",
+      "status": 200,
+      "runs": 20,
+      "p50": 93.8,
+      "p95": 111.5,
+      "max": 118.1,
+      "bytes": 19314
+    },
+    "purchase orders: first page": {
+      "class": "list",
+      "path": "/api/v1/purchase-orders?limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 43.7,
+      "p95": 49.3,
+      "max": 53.4,
+      "bytes": 40538
+    },
+    "journal: first page": {
+      "class": "list",
+      "path": "/api/v1/stock-moves?limit=50",
+      "status": 200,
+      "runs": 20,
+      "p50": 75.4,
+      "p95": 90.4,
+      "max": 119.5,
+      "bytes": 45650
+    },
+    "journal: one product": {
+      "class": "list",
+      "path": "/api/v1/stock-moves?product_template_id=5fc17411-235e-60ca-b922-3b31db70a823&limit=50",
+      "status": 200,
+      "runs": 20,
+      "p50": 25.0,
+      "p95": 40.3,
+      "max": 42.7,
+      "bytes": 10827
+    },
+    "journal: one shelf": {
+      "class": "list",
+      "path": "/api/v1/stock-moves?location_id=d049a11a-bc38-b377-8eee-1df7676206a7&limit=50",
+      "status": 200,
+      "runs": 20,
+      "p50": 285.5,
+      "p95": 311.7,
+      "max": 366.0,
+      "bytes": 45832
+    },
+    "journal: last 30 days": {
+      "class": "list",
+      "path": "/api/v1/stock-moves?since=2026-10-24&limit=50",
+      "status": 200,
+      "runs": 20,
+      "p50": 109.3,
+      "p95": 149.8,
+      "max": 152.2,
+      "bytes": 45650
+    },
+    "stock as of 90 days ago": {
+      "class": "report",
+      "path": "/api/v1/stock-as-of?as_of=2026-08-25",
+      "status": 200,
+      "runs": 5,
+      "p50": 2711.9,
+      "p95": 2822.5,
+      "max": 2822.5,
+      "bytes": 8554
+    },
+    "stock as of 90 days ago, one zone": {
+      "class": "report",
+      "path": "/api/v1/stock-as-of?as_of=2026-08-25&location_id=e45992de-9c53-558b-91c2-5c9c733e9c47",
+      "status": 200,
+      "runs": 20,
+      "p50": 639.0,
+      "p95": 665.6,
+      "max": 675.1,
+      "bytes": 8329
+    },
+    "valuation today (stock as of today)": {
+      "class": "report",
+      "path": "/api/v1/stock-as-of?as_of=2026-11-23",
+      "status": 200,
+      "runs": 5,
+      "p50": 2655.2,
+      "p95": 2710.5,
+      "max": 2710.5,
+      "bytes": 8554
+    },
+    "equipment valuation": {
+      "class": "report",
+      "path": "/api/v1/equipment/valuation",
+      "status": 200,
+      "runs": 20,
+      "p50": 17.8,
+      "p95": 19.0,
+      "max": 20.2,
+      "bytes": 201
+    },
+    "stats: overview": {
+      "class": "report",
+      "path": "/api/v1/stats/overview",
+      "status": 200,
+      "runs": 20,
+      "p50": 19.3,
+      "p95": 23.7,
+      "max": 24.9,
+      "bytes": 313
+    },
+    "stats: by-category": {
+      "class": "report",
+      "path": "/api/v1/stats/by-category",
+      "status": 200,
+      "runs": 20,
+      "p50": 301.7,
+      "p95": 315.9,
+      "max": 317.9,
+      "bytes": 9125
+    },
+    "stats: by-location": {
+      "class": "report",
+      "path": "/api/v1/stats/by-location",
+      "status": 200,
+      "runs": 20,
+      "p50": 208.2,
+      "p95": 347.6,
+      "max": 378.5,
+      "bytes": 7451
+    },
+    "stats: expiry-forecast": {
+      "class": "report",
+      "path": "/api/v1/stats/expiry-forecast",
+      "status": 200,
+      "runs": 20,
+      "p50": 275.1,
+      "p95": 290.2,
+      "max": 407.3,
+      "bytes": 211
+    },
+    "stats: low-stock": {
+      "class": "report",
+      "path": "/api/v1/stats/low-stock",
+      "status": 200,
+      "runs": 20,
+      "p50": 420.9,
+      "p95": 433.6,
+      "max": 440.8,
+      "bytes": 9359
+    },
+    "stats: consumption": {
+      "class": "report",
+      "path": "/api/v1/stats/consumption",
+      "status": 200,
+      "runs": 20,
+      "p50": 38.7,
+      "p95": 43.9,
+      "max": 50.0,
+      "bytes": 141
+    },
+    "stats: cost-analysis": {
+      "class": "report",
+      "path": "/api/v1/stats/cost-analysis",
+      "status": 200,
+      "runs": 20,
+      "p50": 970.5,
+      "p95": 1035.8,
+      "max": 1038.7,
+      "bytes": 1346
+    },
+    "stats: rotation-analysis": {
+      "class": "report",
+      "path": "/api/v1/stats/rotation-analysis",
+      "status": 200,
+      "runs": 20,
+      "p50": 25.0,
+      "p95": 36.1,
+      "max": 36.4,
+      "bytes": 124793
+    },
+    "stats: smart-alerts": {
+      "class": "report",
+      "path": "/api/v1/stats/smart-alerts",
+      "status": 200,
+      "runs": 20,
+      "p50": 1698.1,
+      "p95": 1808.4,
+      "max": 1812.4,
+      "bytes": 524100
+    },
+    "stats: purchase-patterns": {
+      "class": "report",
+      "path": "/api/v1/stats/purchase-patterns",
+      "status": 200,
+      "runs": 20,
+      "p50": 107.5,
+      "p95": 129.2,
+      "max": 256.8,
+      "bytes": 3374
+    },
+    "stats: expense-forecast": {
+      "class": "report",
+      "path": "/api/v1/stats/expense-forecast",
+      "status": 200,
+      "runs": 20,
+      "p50": 18.9,
+      "p95": 24.3,
+      "max": 25.6,
+      "bytes": 1138
+    },
+    "stats: activity": {
+      "class": "report",
+      "path": "/api/v1/stats/activity",
+      "status": 200,
+      "runs": 20,
+      "p50": 21.8,
+      "p95": 28.5,
+      "max": 30.5,
+      "bytes": 2
+    },
+    "stats: reconciliation": {
+      "class": "report",
+      "path": "/api/v1/stats/reconciliation",
+      "status": 200,
+      "runs": 5,
+      "p50": 2277.3,
+      "p95": 2348.1,
+      "max": 2348.1,
+      "bytes": 162
+    },
+    "picker: \"h\"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=h&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 72.6,
+      "p95": 79.3,
+      "max": 93.6,
+      "bytes": 4222
+    },
+    "picker: \"he\"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=he&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 54.8,
+      "p95": 70.9,
+      "max": 78.4,
+      "bytes": 4242
+    },
+    "picker: \"hex\"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=hex&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 46.2,
+      "p95": 54.0,
+      "max": 56.4,
+      "bytes": 4209
+    },
+    "picker: \"hex \"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=hex%20&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 46.1,
+      "p95": 54.8,
+      "max": 63.1,
+      "bytes": 4209
+    },
+    "picker: \"hex b\"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=hex%20b&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 47.6,
+      "p95": 54.3,
+      "max": 59.8,
+      "bytes": 4209
+    },
+    "picker: \"hex bo\"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=hex%20bo&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 48.2,
+      "p95": 56.8,
+      "max": 56.9,
+      "bytes": 4209
+    },
+    "picker: \"hex bol\"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=hex%20bol&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 47.6,
+      "p95": 55.3,
+      "max": 59.4,
+      "bytes": 4209
+    },
+    "picker: \"hex bolt\"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=hex%20bolt&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 54.0,
+      "p95": 76.0,
+      "max": 78.3,
+      "bytes": 4209
+    },
+    "picker in stock: \"hex bolt\"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=hex%20bolt&limit=10&stock=true",
+      "status": 200,
+      "runs": 20,
+      "p50": 123.7,
+      "p95": 130.8,
+      "max": 139.6,
+      "bytes": 4580
+    },
+    "picker: by SKU": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=SKU-0033333&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 41.4,
+      "p95": 48.2,
+      "max": 55.8,
+      "bytes": 424
+    }
+  },
+  "screens": {
+    "launcher": {
+      "path": "/",
+      "heading": "Welcome back, Scale",
+      "usableMs": 6785,
+      "headingMs": 6053,
+      "runs": [
+        6874,
+        6681,
+        6785
+      ],
+      "apiKiB": 9.5,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 275,
+          "startedMs": 3130
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 179,
+          "startedMs": 3405
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 162,
+          "startedMs": 3587,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 236,
+          "startedMs": 3588,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 478,
+          "startedMs": 5183
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 588,
+          "startedMs": 5183,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 649,
+          "startedMs": 5183,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 550,
+          "startedMs": 5340,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 411,
+          "startedMs": 5482,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/items/attention-counts?exclude_module_contexts=true",
+          "status": 200,
+          "bytes": 71,
+          "ms": 1015,
+          "startedMs": 5771,
+          "server": {
+            "p50": 749.1,
+            "p95": 791.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/equipment/warranty-alerts?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 162,
+          "startedMs": 5822,
+          "server": {
+            "p50": 31.3,
+            "p95": 42.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/approvals/requests?status=PENDING,IN_PROGRESS",
+          "status": 200,
+          "bytes": 83,
+          "ms": 198,
+          "startedMs": 5823,
+          "server": {
+            "p50": 19.7,
+            "p95": 24.3
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stock-takes?status_filter=in_progress&limit=5",
+          "status": 200,
+          "bytes": 81,
+          "ms": 203,
+          "startedMs": 5823,
+          "server": {
+            "p50": 21.3,
+            "p95": 22.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/todo?date_to=2026-11-23&limit=1",
+          "status": 200,
+          "bytes": 225,
+          "ms": 346,
+          "startedMs": 5823,
+          "server": {
+            "p50": 144.4,
+            "p95": 166.5
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8500
+    },
+    "products": {
+      "path": "/inventory/items",
+      "heading": "Products",
+      "usableMs": 9842,
+      "headingMs": 5569,
+      "runs": [
+        9842,
+        9624,
+        10355
+      ],
+      "apiKiB": 269.6,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 262,
+          "startedMs": 3197
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 176,
+          "startedMs": 3458
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 161,
+          "startedMs": 3635,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 194,
+          "startedMs": 3638,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 1697,
+          "startedMs": 5345
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 1701,
+          "startedMs": 5349,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 1859,
+          "startedMs": 5349,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 1730,
+          "startedMs": 5427,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 1640,
+          "startedMs": 5618,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/uoms?limit=200&offset=0",
+          "status": 200,
+          "bytes": 5301,
+          "ms": 181,
+          "startedMs": 7382,
+          "server": {
+            "p50": 14.2,
+            "p95": 16.3
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/overview",
+          "status": 200,
+          "bytes": 313,
+          "ms": 168,
+          "startedMs": 7404,
+          "server": {
+            "p50": 18.4,
+            "p95": 23.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/location-types?limit=200&offset=0",
+          "status": 200,
+          "bytes": 2120,
+          "ms": 196,
+          "startedMs": 7404,
+          "server": {
+            "p50": 16.3,
+            "p95": 20.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/categories?exclude_module_contexts=true&limit=200&offset=0",
+          "status": 200,
+          "bytes": 29713,
+          "ms": 624,
+          "startedMs": 7404,
+          "server": {
+            "p50": 18.4,
+            "p95": 26.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/categories?limit=200&offset=0",
+          "status": 200,
+          "bytes": 44825,
+          "ms": 764,
+          "startedMs": 7404,
+          "server": {
+            "p50": 19.6,
+            "p95": 28.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&offset=0&limit=50&sort_by=created_at&sort_order=desc",
+          "status": 200,
+          "bytes": 130910,
+          "ms": 1184,
+          "startedMs": 7405,
+          "server": {
+            "p50": 70.4,
+            "p95": 86.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/items/aggregates?exclude_module_contexts=true&only_expired=false",
+          "status": 200,
+          "bytes": 224,
+          "ms": 2438,
+          "startedMs": 7405,
+          "server": {
+            "p50": 2646.7,
+            "p95": 2742.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/uoms/categories?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6133,
+          "ms": 311,
+          "startedMs": 9109,
+          "server": {
+            "p50": 14.4,
+            "p95": 17.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/config",
+          "status": 200,
+          "bytes": 53,
+          "ms": 166,
+          "startedMs": 9115,
+          "server": {
+            "p50": 21.3,
+            "p95": 30.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/items?exclude_module_contexts=false&limit=1",
+          "status": 200,
+          "bytes": 2662,
+          "ms": 207,
+          "startedMs": 9116,
+          "server": {
+            "p50": 41.3,
+            "p95": 49.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?ids=023594a5-60a0-410a-82f1-1e59798bd4d7&ids=092f3303-d921-ca74-04da-8572b6f0192a&ids=0ad38f97-5549-3594-d0f7-57f7dcf385d3&ids=0f41b6c5-a3a3-3193-9632-67686009a2a2&ids=1b437508-45c1-46eb-f72d-6f718672ca22&ids=2d70827c-c4d4-4897-bd8a-1b5bf11adb2a&ids=3d1a4185-84a4-2cb6-4efb-49cba9cde7f7&ids=3fcf4d71-1f32-cb6c-21e9-b2ed91c215a7&ids=45573b64-1f27-4bf9-2d02-d2a6dc55781c&ids=4581ae3a-1bc8-2b99-f33d-ab747210bfe3&ids=47b36ca5-d250-8e54-cb0e-4b52f628cc76&ids=4a43a2f1-e498-4deb-4b59-2384d40a5285&ids=528f9424-f0e9-2f81-fbcf-8380206bf9d2&ids=5544028e-407a-f94c-9b62-04acf14250a2&ids=56b38d59-d72c-c46b-3adf-6c8f53f68c75&ids=56ef910e-0cbb-5462-3fd0-f35875db91e9&ids=5877717f-90cc-4438-7cad-cb3c3a708077&ids=5938831e-49d7-c876-465e-005fb0dbdfb5&ids=5de49ceb-3e55-24f8-1bbe-090c9b4fdb2d&ids=5eda9e55-88d8-2f66-6d49-ff6b8798cba9&ids=6f0a0549-880b-f9fb-af3e-a5908404c0bf&ids=71cf9984-cef4-5766-6d4c-be5435d15b55&ids=73e2777f-88f5-e2cd-96a8-d52fb548a21c&ids=741701fa-6ce0-ee9a-e1db-da6057057082&ids=75b2d447-f710-835f-4ae3-4be5cad45d99&ids=76763098-f219-1da5-ecf8-481be7d9715c&ids=7a944b7b-a9b4-ede3-e443-a9c30b81a257&ids=7b78aa1a-f535-24cb-d2c7-f515ac74b47c&ids=7fe09be8-999e-76f9-6e39-fb1d3d06fac0&ids=81ff8ec9-f9ce-0a15-a53e-9de2578dd220&ids=89a96801-ec97-a5f0-0311-55ca08686003&ids=8cdc518d-777c-ec83-89a6-cd888b65cd47&ids=9992d99d-cafc-c637-c93c-a34237fb5711&ids=9a13c6e6-fa73-69ca-f306-0cc0e58f7731&ids=9c0cb8ac-e246-0baa-ebd9-976483dc8930&ids=9cb2c976-53e6-4480-246f-369803b6bd1e&ids=9d343526-fb32-de2a-5606-fe97a1d6a5a1&ids=a435023c-a5ac-c29c-f61a-e8803d985654&ids=a7134a77-e8b5-af08-c69c-1f953332f718&ids=aedc593b-e431-ded3-8104-ea809cbbc965&ids=b849753c-0d88-b1f3-e3af-4556ff020a17&ids=d1bec720-3be7-84b8-2129-efa16adf02b8&ids=d8211ea1-0b8e-43bf-3951-187c0ffe9f9b&ids=e58f735f-f191-7432-b325-cb5a69772f15&ids=ecbf2465-a1db-44b9-c885-196a2b7baf38&ids=f651ed0d-1c1f-4cb7-9a2d-1e80a29a7cf9&ids=fcc6c0b1-79c9-5aec-8045-63f5c3a64462&usage=all&include_archived=true&counts=false&limit=100",
+          "status": 200,
+          "bytes": 44629,
+          "ms": 430,
+          "startedMs": 9116,
+          "server": {
+            "p50": 44.0,
+            "p95": 49.0
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 7500
+    },
+    "stock": {
+      "path": "/inventory/stock",
+      "heading": "Stock levels",
+      "usableMs": 7166,
+      "headingMs": 5617,
+      "runs": [
+        6933,
+        7166,
+        7362
+      ],
+      "apiKiB": 30.4,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 253,
+          "startedMs": 3238
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 223,
+          "startedMs": 3492
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 183,
+          "startedMs": 3716,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 280,
+          "startedMs": 3718,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 502,
+          "bytes": 5,
+          "ms": 523,
+          "startedMs": 5457
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 729,
+          "startedMs": 5457,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 802,
+          "startedMs": 5457,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 588,
+          "startedMs": 5565,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 434,
+          "startedMs": 5723,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stock-quants?limit=50&offset=0",
+          "status": 200,
+          "bytes": 20983,
+          "ms": 331,
+          "startedMs": 6026,
+          "server": {
+            "p50": 35.1,
+            "p95": 37.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?ids=741701fa-6ce0-ee9a-e1db-da6057057082&usage=all&include_archived=true&counts=false&limit=100",
+          "status": 200,
+          "bytes": 1028,
+          "ms": 193,
+          "startedMs": 6475,
+          "server": {
+            "p50": 38.1,
+            "p95": 42.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 183,
+          "startedMs": 6984
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "batches": {
+      "path": "/inventory/lots",
+      "heading": "Batches",
+      "usableMs": 7254,
+      "headingMs": 6158,
+      "runs": [
+        7035,
+        7345,
+        7254
+      ],
+      "apiKiB": 34.2,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 285,
+          "startedMs": 3246
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 183,
+          "startedMs": 3531
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 163,
+          "startedMs": 3716,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 209,
+          "startedMs": 3719,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 502,
+          "bytes": 5,
+          "ms": 660,
+          "startedMs": 5419
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 866,
+          "startedMs": 5419,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 917,
+          "startedMs": 5421,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 806,
+          "startedMs": 5492,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 628,
+          "startedMs": 5687,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stock-lots?limit=50&offset=0",
+          "status": 200,
+          "bytes": 25906,
+          "ms": 695,
+          "startedMs": 5914,
+          "server": {
+            "p50": 74.7,
+            "p95": 85.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 170,
+          "startedMs": 7087
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "location tree": {
+      "path": "/inventory/locations",
+      "heading": "Locations",
+      "usableMs": 10623,
+      "headingMs": 5687,
+      "runs": [
+        10617,
+        10623,
+        10900
+      ],
+      "apiKiB": 492.2,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 361,
+          "startedMs": 3279
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 321,
+          "startedMs": 3643
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 176,
+          "startedMs": 3967,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 269,
+          "startedMs": 3970,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 1223,
+          "startedMs": 5683
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 1259,
+          "startedMs": 5683,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 1324,
+          "startedMs": 5683,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 1251,
+          "startedMs": 5782,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 1078,
+          "startedMs": 5959,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/tree?exclude_module_contexts=true&depth=1",
+          "status": 200,
+          "bytes": 838,
+          "ms": 345,
+          "startedMs": 6797,
+          "server": {
+            "p50": 390.8,
+            "p95": 453.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?counts=false&exclude_module_contexts=true&limit=2",
+          "status": 200,
+          "bytes": 1974,
+          "ms": 177,
+          "startedMs": 7251,
+          "server": {
+            "p50": 43.4,
+            "p95": 58.3
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?counts=false&exclude_module_contexts=true&top_level=true&limit=1",
+          "status": 200,
+          "bytes": 671,
+          "ms": 164,
+          "startedMs": 7255,
+          "server": {
+            "p50": 38.0,
+            "p95": 42.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?usage=all&include_archived=true&counts=false&top_level=true&limit=200",
+          "status": 200,
+          "bytes": 6340,
+          "ms": 206,
+          "startedMs": 7255,
+          "server": {
+            "p50": 39.4,
+            "p95": 59.1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/location-types?limit=200&offset=0",
+          "status": 200,
+          "bytes": 2120,
+          "ms": 286,
+          "startedMs": 7256,
+          "server": {
+            "p50": 16.3,
+            "p95": 20.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?exclude_module_contexts=true&counts=false&limit=1",
+          "status": 200,
+          "bytes": 1028,
+          "ms": 290,
+          "startedMs": 7256,
+          "server": {
+            "p50": 43.6,
+            "p95": 54.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?counts=false&limit=1",
+          "status": 200,
+          "bytes": 1028,
+          "ms": 352,
+          "startedMs": 7256,
+          "server": {
+            "p50": 41.9,
+            "p95": 45.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/putaway/occupancy",
+          "status": 200,
+          "bytes": 480820,
+          "ms": 3267,
+          "startedMs": 7357,
+          "server": {
+            "p50": 690.2,
+            "p95": 1004.7
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "a shelf": {
+      "path": "/inventory/locations/d049a11a-bc38-b377-8eee-1df7676206a7",
+      "heading": "Locations",
+      "usableMs": 15340,
+      "headingMs": 6666,
+      "runs": [
+        15340,
+        15641,
+        14592
+      ],
+      "apiKiB": 1211,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 262,
+          "startedMs": 3243
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 178,
+          "startedMs": 3503
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 166,
+          "startedMs": 3685,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 231,
+          "startedMs": 3693,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 1123,
+          "startedMs": 5457
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 1122,
+          "startedMs": 5458,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 1645,
+          "startedMs": 5458,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 1561,
+          "startedMs": 5515,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 1479,
+          "startedMs": 5712,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/tree?exclude_module_contexts=true&depth=1",
+          "status": 200,
+          "bytes": 838,
+          "ms": 1036,
+          "startedMs": 6542,
+          "server": {
+            "p50": 390.8,
+            "p95": 453.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/d049a11a-bc38-b377-8eee-1df7676206a7",
+          "status": 200,
+          "bytes": 826,
+          "ms": 576,
+          "startedMs": 6577,
+          "server": {
+            "p50": 16.0,
+            "p95": 19.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?ids=d049a11a-bc38-b377-8eee-1df7676206a7&exclude_module_contexts=true&limit=1",
+          "status": 200,
+          "bytes": 1036,
+          "ms": 627,
+          "startedMs": 6577,
+          "server": {
+            "p50": 87.2,
+            "p95": 102.1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/d049a11a-bc38-b377-8eee-1df7676206a7/breadcrumb",
+          "status": 200,
+          "bytes": 271,
+          "ms": 160,
+          "startedMs": 7213,
+          "server": {
+            "p50": 25.0,
+            "p95": 31.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/printing/agents?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 2580,
+          "startedMs": 7838,
+          "server": {
+            "p50": 17.9,
+            "p95": 21.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/d049a11a-bc38-b377-8eee-1df7676206a7/items?exclude_module_contexts=true&limit=200&offset=0",
+          "status": 200,
+          "bytes": 408755,
+          "ms": 3329,
+          "startedMs": 7838,
+          "server": {
+            "p50": 90.3,
+            "p95": 112.1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?usage=all&include_archived=true&counts=false&top_level=true&limit=200",
+          "status": 200,
+          "bytes": 6340,
+          "ms": 288,
+          "startedMs": 7839,
+          "server": {
+            "p50": 39.4,
+            "p95": 59.1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?counts=false&exclude_module_contexts=true&limit=2",
+          "status": 200,
+          "bytes": 1974,
+          "ms": 2535,
+          "startedMs": 7839,
+          "server": {
+            "p50": 43.4,
+            "p95": 58.3
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/location-types?limit=200&offset=0",
+          "status": 200,
+          "bytes": 2120,
+          "ms": 2547,
+          "startedMs": 7839,
+          "server": {
+            "p50": 16.3,
+            "p95": 20.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?counts=false&exclude_module_contexts=true&top_level=true&limit=1",
+          "status": 200,
+          "bytes": 671,
+          "ms": 2568,
+          "startedMs": 7839,
+          "server": {
+            "p50": 38.0,
+            "p95": 42.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?exclude_module_contexts=true&counts=false&limit=1",
+          "status": 502,
+          "bytes": 5,
+          "ms": 2709,
+          "startedMs": 7839
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?counts=false&limit=1",
+          "status": 200,
+          "bytes": 1028,
+          "ms": 2743,
+          "startedMs": 7839,
+          "server": {
+            "p50": 41.9,
+            "p95": 45.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/categories?limit=200&offset=0",
+          "status": 200,
+          "bytes": 44825,
+          "ms": 3001,
+          "startedMs": 7839,
+          "server": {
+            "p50": 19.6,
+            "p95": 28.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/tree?exclude_module_contexts=true&parent_id=04314e9a-14d6-2d29-4736-79a74ed54e8c&depth=1",
+          "status": 200,
+          "bytes": 2681,
+          "ms": 3089,
+          "startedMs": 7839,
+          "server": {
+            "p50": 84.5,
+            "p95": 242.3
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/tree?exclude_module_contexts=true&parent_id=e45992de-9c53-558b-91c2-5c9c733e9c47&depth=1",
+          "status": 200,
+          "bytes": 3257,
+          "ms": 3069,
+          "startedMs": 7840,
+          "server": {
+            "p50": 112.5,
+            "p95": 139.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/tree?exclude_module_contexts=true&parent_id=8da2450e-a2fa-0f13-f2e6-ff8498a1fcf1&depth=1",
+          "status": 200,
+          "bytes": 3192,
+          "ms": 3099,
+          "startedMs": 7840,
+          "server": {
+            "p50": 391.7,
+            "p95": 407.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/putaway/occupancy",
+          "status": 200,
+          "bytes": 480820,
+          "ms": 7492,
+          "startedMs": 7848,
+          "server": {
+            "p50": 690.2,
+            "p95": 1004.7
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/d049a11a-bc38-b377-8eee-1df7676206a7/items?exclude_module_contexts=true&limit=200&offset=200",
+          "status": 200,
+          "bytes": 271152,
+          "ms": 2496,
+          "startedMs": 11168,
+          "server": {
+            "p50": 90.3,
+            "p95": 112.1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?exclude_module_contexts=true&counts=false&limit=1",
+          "status": 200,
+          "bytes": 1028,
+          "ms": 1393,
+          "startedMs": 11552,
+          "server": {
+            "p50": 43.6,
+            "p95": 54.9
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "a zone": {
+      "path": "/inventory/locations/zone/e45992de-9c53-558b-91c2-5c9c733e9c47",
+      "heading": "Locations",
+      "usableMs": 10815,
+      "headingMs": 6695,
+      "runs": [
+        10569,
+        10949,
+        10815
+      ],
+      "apiKiB": 506.4,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 239,
+          "startedMs": 3292
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 192,
+          "startedMs": 3531
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 174,
+          "startedMs": 3723,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 220,
+          "startedMs": 3723,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 1076,
+          "startedMs": 5468
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 1094,
+          "startedMs": 5470,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 1172,
+          "startedMs": 5473,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 1097,
+          "startedMs": 5550,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 958,
+          "startedMs": 5746,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/tree?exclude_module_contexts=true&depth=1",
+          "status": 200,
+          "bytes": 838,
+          "ms": 570,
+          "startedMs": 6648,
+          "server": {
+            "p50": 390.8,
+            "p95": 453.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?ids=e45992de-9c53-558b-91c2-5c9c733e9c47&exclude_module_contexts=true&limit=1",
+          "status": 200,
+          "bytes": 668,
+          "ms": 330,
+          "startedMs": 6685,
+          "server": {
+            "p50": 138.0,
+            "p95": 165.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/e45992de-9c53-558b-91c2-5c9c733e9c47",
+          "status": 200,
+          "bytes": 458,
+          "ms": 159,
+          "startedMs": 6686,
+          "server": {
+            "p50": 16.4,
+            "p95": 22.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/e45992de-9c53-558b-91c2-5c9c733e9c47/breadcrumb",
+          "status": 200,
+          "bytes": 132,
+          "ms": 360,
+          "startedMs": 7025,
+          "server": {
+            "p50": 19.7,
+            "p95": 22.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/printing/agents?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 153,
+          "startedMs": 7375,
+          "server": {
+            "p50": 17.9,
+            "p95": 21.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?counts=false&exclude_module_contexts=true&limit=2",
+          "status": 200,
+          "bytes": 1974,
+          "ms": 160,
+          "startedMs": 7375,
+          "server": {
+            "p50": 43.4,
+            "p95": 58.3
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?counts=false&exclude_module_contexts=true&top_level=true&limit=1",
+          "status": 200,
+          "bytes": 671,
+          "ms": 190,
+          "startedMs": 7375,
+          "server": {
+            "p50": 38.0,
+            "p95": 42.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/location-types?limit=200&offset=0",
+          "status": 200,
+          "bytes": 2120,
+          "ms": 269,
+          "startedMs": 7375,
+          "server": {
+            "p50": 16.3,
+            "p95": 20.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?usage=all&include_archived=true&counts=false&top_level=true&limit=200",
+          "status": 200,
+          "bytes": 6340,
+          "ms": 291,
+          "startedMs": 7375,
+          "server": {
+            "p50": 39.4,
+            "p95": 59.1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?exclude_module_contexts=true&counts=false&limit=1",
+          "status": 200,
+          "bytes": 1028,
+          "ms": 318,
+          "startedMs": 7375,
+          "server": {
+            "p50": 43.6,
+            "p95": 54.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?counts=false&limit=1",
+          "status": 200,
+          "bytes": 1028,
+          "ms": 382,
+          "startedMs": 7375,
+          "server": {
+            "p50": 41.9,
+            "p95": 45.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?parent_id=e45992de-9c53-558b-91c2-5c9c733e9c47&exclude_module_contexts=true&limit=50&offset=0",
+          "status": 200,
+          "bytes": 6781,
+          "ms": 407,
+          "startedMs": 7375,
+          "server": {
+            "p50": 140.9,
+            "p95": 154.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/tree?exclude_module_contexts=true&parent_id=8da2450e-a2fa-0f13-f2e6-ff8498a1fcf1&depth=1",
+          "status": 200,
+          "bytes": 3192,
+          "ms": 426,
+          "startedMs": 7418,
+          "server": {
+            "p50": 391.7,
+            "p95": 407.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/putaway/occupancy",
+          "status": 200,
+          "bytes": 480820,
+          "ms": 3365,
+          "startedMs": 7451,
+          "server": {
+            "p50": 690.2,
+            "p95": 1004.7
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/tree?exclude_module_contexts=true&parent_id=e45992de-9c53-558b-91c2-5c9c733e9c47&depth=1",
+          "status": 200,
+          "bytes": 3257,
+          "ms": 242,
+          "startedMs": 7912,
+          "server": {
+            "p50": 112.5,
+            "p95": 139.9
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "occupancy": {
+      "path": "/warehouse/occupancy",
+      "heading": "Occupancy",
+      "usableMs": 9526,
+      "headingMs": 5647,
+      "runs": [
+        9526,
+        9545,
+        9314
+      ],
+      "apiKiB": 478.6,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 324,
+          "startedMs": 3258
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 216,
+          "startedMs": 3582
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 182,
+          "startedMs": 3801,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 281,
+          "startedMs": 3801,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 657,
+          "startedMs": 5571
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/awaiting-my-approval?offset=0&limit=50",
+          "status": 200,
+          "bytes": 82,
+          "ms": 667,
+          "startedMs": 5572,
+          "server": {
+            "p50": 22.5,
+            "p95": 29.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 765,
+          "startedMs": 5572,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 871,
+          "startedMs": 5573,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 803,
+          "startedMs": 5611,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 670,
+          "startedMs": 5802,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/putaway/occupancy",
+          "status": 200,
+          "bytes": 480820,
+          "ms": 3323,
+          "startedMs": 6204,
+          "server": {
+            "p50": 690.2,
+            "p95": 1004.7
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "todo": {
+      "path": "/warehouse/todo",
+      "heading": "Hello, Scale",
+      "usableMs": 8967,
+      "headingMs": 5623,
+      "runs": [
+        8781,
+        8967,
+        9556
+      ],
+      "apiKiB": 76.8,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 279,
+          "startedMs": 3295
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 226,
+          "startedMs": 3573
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 176,
+          "startedMs": 3801,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 281,
+          "startedMs": 3801,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 1982,
+          "startedMs": 5575
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/awaiting-my-approval?offset=0&limit=50",
+          "status": 200,
+          "bytes": 82,
+          "ms": 2198,
+          "startedMs": 5579,
+          "server": {
+            "p50": 22.5,
+            "p95": 29.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 2081,
+          "startedMs": 5583,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 2125,
+          "startedMs": 5583,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 2070,
+          "startedMs": 5615,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 1986,
+          "startedMs": 5792,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/tree?exclude_module_contexts=true&depth=1&counts=false",
+          "status": 200,
+          "bytes": 833,
+          "ms": 274,
+          "startedMs": 7486,
+          "server": {
+            "p50": 60.4,
+            "p95": 91.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/users/org-members?limit=200&offset=0",
+          "status": 200,
+          "bytes": 420,
+          "ms": 319,
+          "startedMs": 7522,
+          "server": {
+            "p50": 17.1,
+            "p95": 21.3
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/work-items/assignees",
+          "status": 200,
+          "bytes": 53,
+          "ms": 345,
+          "startedMs": 7522,
+          "server": {
+            "p50": 27.5,
+            "p95": 32.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/todo?date_to=2026-11-23&limit=100&work_limit=100&view=all",
+          "status": 200,
+          "bytes": 225,
+          "ms": 355,
+          "startedMs": 7522,
+          "server": {
+            "p50": 142.5,
+            "p95": 160.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/documents?status=COMPLETED&completed_from=2026-11-22T23:00:00.000Z&completed_to=2026-11-23T23:00:00.000Z&sort_by=completed_at&sort_order=desc&limit=50",
+          "status": 200,
+          "bytes": 67851,
+          "ms": 1014,
+          "startedMs": 7954,
+          "server": {
+            "p50": 156.2,
+            "p95": 191.2
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "board": {
+      "path": "/warehouse/board",
+      "heading": "Hello, Scale",
+      "usableMs": 9524,
+      "headingMs": 5643,
+      "runs": [
+        11234,
+        9524,
+        9162
+      ],
+      "apiKiB": 144.2,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 279,
+          "startedMs": 3288
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 218,
+          "startedMs": 3566
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 178,
+          "startedMs": 3790,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 271,
+          "startedMs": 3791,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 502,
+          "bytes": 5,
+          "ms": 532,
+          "startedMs": 5533
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/awaiting-my-approval?offset=0&limit=50",
+          "status": 200,
+          "bytes": 82,
+          "ms": 623,
+          "startedMs": 5533,
+          "server": {
+            "p50": 22.5,
+            "p95": 29.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 628,
+          "startedMs": 5533,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 731,
+          "startedMs": 5534,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 638,
+          "startedMs": 5586,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 462,
+          "startedMs": 5771,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/todo?date_to=2026-11-23&limit=100&work_limit=100&view=all&state=todo",
+          "status": 200,
+          "bytes": 225,
+          "ms": 459,
+          "startedMs": 6066,
+          "server": {
+            "p50": 152.4,
+            "p95": 174.1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/todo?date_to=2026-11-23&limit=100&work_limit=100&view=all&state=in_progress",
+          "status": 200,
+          "bytes": 225,
+          "ms": 1825,
+          "startedMs": 6148,
+          "server": {
+            "p50": 150.8,
+            "p95": 169.1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/todo?date_to=2026-11-23&limit=100&work_limit=100&view=all&state=done&done_since=2026-11-22T23:00:00.000Z",
+          "status": 200,
+          "bytes": 68276,
+          "ms": 2711,
+          "startedMs": 6149,
+          "server": {
+            "p50": 251.9,
+            "p95": 276.1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/work-items/measures",
+          "status": 200,
+          "bytes": 96,
+          "ms": 1810,
+          "startedMs": 6150,
+          "server": {
+            "p50": 47.0,
+            "p95": 49.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/todo?date_to=2026-11-23&limit=1&work_limit=1&view=overdue",
+          "status": 200,
+          "bytes": 225,
+          "ms": 1909,
+          "startedMs": 6150,
+          "server": {
+            "p50": 144.4,
+            "p95": 158.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/users/org-members?limit=200&offset=0",
+          "status": 200,
+          "bytes": 420,
+          "ms": 1737,
+          "startedMs": 6151,
+          "server": {
+            "p50": 17.1,
+            "p95": 21.3
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/work-items/assignees",
+          "status": 200,
+          "bytes": 53,
+          "ms": 1745,
+          "startedMs": 6151,
+          "server": {
+            "p50": 27.5,
+            "p95": 32.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 1001,
+          "startedMs": 7068
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/tree?exclude_module_contexts=true&depth=1&counts=false",
+          "status": 200,
+          "bytes": 833,
+          "ms": 351,
+          "startedMs": 7807,
+          "server": {
+            "p50": 60.4,
+            "p95": 91.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/todo?date_to=2026-11-23&limit=100&work_limit=100&view=all",
+          "status": 200,
+          "bytes": 225,
+          "ms": 851,
+          "startedMs": 7830,
+          "server": {
+            "p50": 142.5,
+            "p95": 160.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/documents?status=COMPLETED&completed_from=2026-11-22T23:00:00.000Z&completed_to=2026-11-23T23:00:00.000Z&sort_by=completed_at&sort_order=desc&limit=50",
+          "status": 200,
+          "bytes": 67851,
+          "ms": 734,
+          "startedMs": 8790,
+          "server": {
+            "p50": 156.2,
+            "p95": 191.2
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "receive": {
+      "path": "/warehouse/receive",
+      "heading": "Receive goods",
+      "usableMs": 7305,
+      "headingMs": 7114,
+      "runs": [
+        7153,
+        7317,
+        7305
+      ],
+      "apiKiB": 70.1,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 216,
+          "startedMs": 3240
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 221,
+          "startedMs": 3455
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 186,
+          "startedMs": 3678,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 261,
+          "startedMs": 3679,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 1036,
+          "startedMs": 5439
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/awaiting-my-approval?offset=0&limit=50",
+          "status": 200,
+          "bytes": 82,
+          "ms": 1088,
+          "startedMs": 5439,
+          "server": {
+            "p50": 22.5,
+            "p95": 29.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 1099,
+          "startedMs": 5440,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 1222,
+          "startedMs": 5441,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 1147,
+          "startedMs": 5490,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 1069,
+          "startedMs": 5665,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?counts=false&exclude_module_contexts=true&limit=30",
+          "status": 200,
+          "bytes": 28483,
+          "ms": 435,
+          "startedMs": 6820,
+          "server": {
+            "p50": 45.9,
+            "p95": 57.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/profile",
+          "status": 200,
+          "bytes": 764,
+          "ms": 183,
+          "startedMs": 6852,
+          "server": {
+            "p50": 22.0,
+            "p95": 25.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?counts=false&exclude_module_contexts=true&limit=2",
+          "status": 200,
+          "bytes": 1974,
+          "ms": 220,
+          "startedMs": 6852,
+          "server": {
+            "p50": 43.4,
+            "p95": 58.3
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/partners?types=SUPPLIER&types=BOTH&types=MANUFACTURER&is_active=true&limit=50",
+          "status": 200,
+          "bytes": 31327,
+          "ms": 454,
+          "startedMs": 6852,
+          "server": {
+            "p50": 36.1,
+            "p95": 41.9
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 10000
+    },
+    "issue": {
+      "path": "/warehouse/issue",
+      "heading": "Issue goods",
+      "usableMs": 7771,
+      "headingMs": 7651,
+      "runs": [
+        7681,
+        7828,
+        7771
+      ],
+      "apiKiB": 68.3,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 226,
+          "startedMs": 3261
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 221,
+          "startedMs": 3487
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 183,
+          "startedMs": 3711,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 283,
+          "startedMs": 3711,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 1240,
+          "startedMs": 5530
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/awaiting-my-approval?offset=0&limit=50",
+          "status": 200,
+          "bytes": 82,
+          "ms": 1325,
+          "startedMs": 5537,
+          "server": {
+            "p50": 22.5,
+            "p95": 29.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 1342,
+          "startedMs": 5538,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 1397,
+          "startedMs": 5538,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 1416,
+          "startedMs": 5565,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 1219,
+          "startedMs": 5744,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?counts=false&exclude_module_contexts=true&limit=30",
+          "status": 200,
+          "bytes": 28483,
+          "ms": 478,
+          "startedMs": 7164,
+          "server": {
+            "p50": 45.9,
+            "p95": 57.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/tree?exclude_module_contexts=true&depth=1&counts=false",
+          "status": 200,
+          "bytes": 833,
+          "ms": 360,
+          "startedMs": 7226,
+          "server": {
+            "p50": 60.4,
+            "p95": 91.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/partners?types=CUSTOMER&types=BOTH&is_active=true&limit=50",
+          "status": 200,
+          "bytes": 31388,
+          "ms": 546,
+          "startedMs": 7226,
+          "server": {
+            "p50": 33.4,
+            "p95": 38.3
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 11000
+    },
+    "move": {
+      "path": "/warehouse/move",
+      "heading": "Move goods",
+      "usableMs": 7655,
+      "headingMs": 7188,
+      "runs": [
+        7901,
+        7655,
+        7519
+      ],
+      "apiKiB": 68.2,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 310,
+          "startedMs": 3272
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 189,
+          "startedMs": 3584
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 169,
+          "startedMs": 3774,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 237,
+          "startedMs": 3774,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 1240,
+          "startedMs": 5511
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/awaiting-my-approval?offset=0&limit=50",
+          "status": 200,
+          "bytes": 82,
+          "ms": 1348,
+          "startedMs": 5511,
+          "server": {
+            "p50": 22.5,
+            "p95": 29.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 1302,
+          "startedMs": 5512,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 1353,
+          "startedMs": 5512,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 1301,
+          "startedMs": 5590,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 1152,
+          "startedMs": 5763,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?counts=false&exclude_module_contexts=true&limit=30",
+          "status": 200,
+          "bytes": 28483,
+          "ms": 486,
+          "startedMs": 7136,
+          "server": {
+            "p50": 45.9,
+            "p95": 57.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations/tree?exclude_module_contexts=true&depth=1&counts=false",
+          "status": 200,
+          "bytes": 833,
+          "ms": 308,
+          "startedMs": 7168,
+          "server": {
+            "p50": 60.4,
+            "p95": 91.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/partners?types=SUPPLIER&types=BOTH&types=MANUFACTURER&is_active=true&limit=50",
+          "status": 200,
+          "bytes": 31327,
+          "ms": 487,
+          "startedMs": 7169,
+          "server": {
+            "p50": 36.1,
+            "p95": 41.9
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "history": {
+      "path": "/warehouse/history",
+      "heading": "History",
+      "usableMs": 8230,
+      "headingMs": 5588,
+      "runs": [
+        7935,
+        8373,
+        8230
+      ],
+      "apiKiB": 76,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 260,
+          "startedMs": 3190
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 524,
+          "startedMs": 3451
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 188,
+          "startedMs": 3976,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 284,
+          "startedMs": 3978,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 1641,
+          "startedMs": 5712
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/awaiting-my-approval?offset=0&limit=50",
+          "status": 200,
+          "bytes": 82,
+          "ms": 1664,
+          "startedMs": 5712,
+          "server": {
+            "p50": 22.5,
+            "p95": 29.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 1685,
+          "startedMs": 5713,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 1761,
+          "startedMs": 5713,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 1770,
+          "startedMs": 5774,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 1582,
+          "startedMs": 5969,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/profile",
+          "status": 200,
+          "bytes": 764,
+          "ms": 175,
+          "startedMs": 7470,
+          "server": {
+            "p50": 22.0,
+            "p95": 25.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/documents?status=COMPLETED&limit=50&offset=0&sort_by=completed_at&sort_order=desc",
+          "status": 200,
+          "bytes": 67847,
+          "ms": 757,
+          "startedMs": 7473,
+          "server": {
+            "p50": 190.9,
+            "p95": 205.2
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "register": {
+      "path": "/warehouse/register",
+      "heading": "Document register",
+      "usableMs": 7184,
+      "headingMs": 6594,
+      "runs": [
+        7557,
+        7184,
+        7101
+      ],
+      "apiKiB": 10.9,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 165,
+          "startedMs": 3201
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 298,
+          "startedMs": 3366
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 233,
+          "startedMs": 3668,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 375,
+          "startedMs": 3670,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 502,
+          "bytes": 5,
+          "ms": 628,
+          "startedMs": 5392
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/awaiting-my-approval?offset=0&limit=50",
+          "status": 200,
+          "bytes": 82,
+          "ms": 737,
+          "startedMs": 5392,
+          "server": {
+            "p50": 22.5,
+            "p95": 29.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 747,
+          "startedMs": 5392,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 839,
+          "startedMs": 5392,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 840,
+          "startedMs": 5499,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 652,
+          "startedMs": 5687,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/profile",
+          "status": 200,
+          "bytes": 764,
+          "ms": 249,
+          "startedMs": 6050,
+          "server": {
+            "p50": 22.0,
+            "p95": 25.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/register/summary?date_from=2026-11-01&date_to=2026-11-23&status=COMPLETED&group_by=type",
+          "status": 200,
+          "bytes": 1164,
+          "ms": 285,
+          "startedMs": 6126,
+          "server": {
+            "p50": 68.2,
+            "p95": 73.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 159,
+          "startedMs": 7026
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "a document": {
+      "path": "/warehouse/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c",
+      "heading": "OUT/2026/051104",
+      "usableMs": 9374,
+      "headingMs": 8852,
+      "runs": [
+        11425,
+        9309,
+        9374
+      ],
+      "apiKiB": 117.2,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 170,
+          "startedMs": 3299
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 182,
+          "startedMs": 3470
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 169,
+          "startedMs": 3654,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 216,
+          "startedMs": 3657,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 2217,
+          "startedMs": 5412
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 2320,
+          "startedMs": 5413,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 2355,
+          "startedMs": 5413,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/awaiting-my-approval?offset=0&limit=50",
+          "status": 200,
+          "bytes": 82,
+          "ms": 2417,
+          "startedMs": 5413,
+          "server": {
+            "p50": 22.5,
+            "p95": 29.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 2383,
+          "startedMs": 5458,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 2189,
+          "startedMs": 5657,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c",
+          "status": 200,
+          "bytes": 19314,
+          "ms": 486,
+          "startedMs": 7652,
+          "server": {
+            "p50": 88.2,
+            "p95": 102.1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/approvals/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c/approval",
+          "status": 200,
+          "bytes": 4,
+          "ms": 264,
+          "startedMs": 7670,
+          "server": {
+            "p50": 68.2,
+            "p95": 77.1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/profile",
+          "status": 200,
+          "bytes": 764,
+          "ms": 373,
+          "startedMs": 7670,
+          "server": {
+            "p50": 22.0,
+            "p95": 25.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/approvals/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c/approval-requirement",
+          "status": 200,
+          "bytes": 131,
+          "ms": 668,
+          "startedMs": 7670,
+          "server": {
+            "p50": 130.9,
+            "p95": 143.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/partners?types=SUPPLIER&types=BOTH&types=MANUFACTURER&is_active=true&limit=50",
+          "status": 200,
+          "bytes": 31327,
+          "ms": 661,
+          "startedMs": 7671,
+          "server": {
+            "p50": 36.1,
+            "p95": 41.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c/corrections?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 184,
+          "startedMs": 8405,
+          "server": {
+            "p50": 23.1,
+            "p95": 35.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/partners/866e5378-547e-5878-6ff4-44eb151dcf92",
+          "status": 200,
+          "bytes": 477,
+          "ms": 220,
+          "startedMs": 8405,
+          "server": {
+            "p50": 16.9,
+            "p95": 21.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?ids=8da2450e-a2fa-0f13-f2e6-ff8498a1fcf1&usage=all&include_archived=true&counts=false&limit=100",
+          "status": 200,
+          "bytes": 946,
+          "ms": 369,
+          "startedMs": 8405,
+          "server": {
+            "p50": 36.9,
+            "p95": 42.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c/packages",
+          "status": 200,
+          "bytes": 2649,
+          "ms": 417,
+          "startedMs": 8405,
+          "server": {
+            "p50": 70.7,
+            "p95": 80.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/partners?types=CUSTOMER&types=BOTH&is_active=true&limit=50",
+          "status": 200,
+          "bytes": 31388,
+          "ms": 489,
+          "startedMs": 8405,
+          "server": {
+            "p50": 33.4,
+            "p95": 38.3
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stock-moves?reference_type=document&reference_id=735ff1ce-c690-17e6-d2e9-daf3253bfb2c&limit=20",
+          "status": 200,
+          "bytes": 10795,
+          "ms": 511,
+          "startedMs": 8497,
+          "server": {
+            "p50": 24.3,
+            "p95": 26.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?ids=061e1dd2-c038-aa85-85b7-6ae64f7221ec&ids=49c6b2bf-6c05-e066-0ffb-2364bedac87a&ids=64a444bc-7aaf-23ce-2cf9-bc7c5ca14ca2&ids=6fb2ac7b-5aa0-7a44-4afd-1a84f24660e6&ids=7fe09be8-999e-76f9-6e39-fb1d3d06fac0&ids=872a490e-29dc-0f43-e347-b3605b64b512&ids=96e9c197-9450-09c2-74dc-8671588fa7ff&ids=9e1c49bf-4489-336e-7ce4-cc75ca3edd46&ids=a0fa610f-6a29-9d93-319d-1aa54fba56f5&ids=b24c4ed0-48d2-0a7d-398e-dcd21e1763b5&ids=ba099cfd-2110-a36e-1cfc-a9970d99452d&ids=c9e675a9-2169-7084-aca1-d48c9b63dc1f&usage=all&include_archived=true&counts=false&limit=100",
+          "status": 200,
+          "bytes": 11455,
+          "ms": 278,
+          "startedMs": 9046,
+          "server": {
+            "p50": 39.8,
+            "p95": 44.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/documents?ids=735ff1ce-c690-17e6-d2e9-daf3253bfb2c&limit=100",
+          "status": 200,
+          "bytes": 1444,
+          "ms": 327,
+          "startedMs": 9048,
+          "server": {
+            "p50": 54.5,
+            "p95": 60.1
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "journal": {
+      "path": "/inventory/moves",
+      "heading": "Stock movements",
+      "usableMs": 10838,
+      "headingMs": 5678,
+      "runs": [
+        9080,
+        10838,
+        11371
+      ],
+      "apiKiB": 155.9,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 274,
+          "startedMs": 3286
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 215,
+          "startedMs": 3563
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 159,
+          "startedMs": 3782,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 260,
+          "startedMs": 3782,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 1024,
+          "startedMs": 5498
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 1123,
+          "startedMs": 5500,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 1065,
+          "startedMs": 5501,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 968,
+          "startedMs": 5569,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 877,
+          "startedMs": 5751,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stock-moves?exclude_module_contexts=true&limit=50",
+          "status": 200,
+          "bytes": 45650,
+          "ms": 2317,
+          "startedMs": 6202,
+          "server": {
+            "p50": 1130.0,
+            "p95": 1173.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?ids=005761e4-f67e-edb9-d7ef-fb12eef71aa4&ids=04531fe8-b5a2-5972-a6de-36ed581021b7&ids=061e1dd2-c038-aa85-85b7-6ae64f7221ec&ids=0647a466-0476-b8f0-df05-ad63b8ffd6c6&ids=0897cbf3-8d46-bdd6-9482-252462006b0f&ids=18a0a375-3902-49c2-b127-1f7ebd2d9282&ids=1b437508-45c1-46eb-f72d-6f718672ca22&ids=2ee3e64e-8a1a-aa70-6930-8e9553160932&ids=45b2a052-a8e3-b0c1-7498-a176f887e4b8&ids=49c6b2bf-6c05-e066-0ffb-2364bedac87a&ids=4a2287a1-c5b9-45bf-79eb-7784452943a8&ids=4b038257-bc6d-8b36-137c-f928e4b118e3&ids=4b51be8e-010d-2a52-f3f8-2101883c7202&ids=545bbfad-be51-f4e1-e54c-4d0f72a148a6&ids=56ef910e-0cbb-5462-3fd0-f35875db91e9&ids=5e58d636-a734-8e77-3206-53ceb7413d99&ids=5ef632b5-24ac-6741-59f5-43b620e998e3&ids=64a444bc-7aaf-23ce-2cf9-bc7c5ca14ca2&ids=6f0a0549-880b-f9fb-af3e-a5908404c0bf&ids=6fb2ac7b-5aa0-7a44-4afd-1a84f24660e6&ids=705ebd93-107c-f04a-0182-353e735e58aa&ids=71cf9984-cef4-5766-6d4c-be5435d15b55&ids=73e2777f-88f5-e2cd-96a8-d52fb548a21c&ids=78181885-f19c-ff2e-6f07-f3dabfa8c1f4&ids=78347322-e1a1-334a-24c6-f11623c7c154&ids=7b78aa1a-f535-24cb-d2c7-f515ac74b47c&ids=7f52edf6-a764-ecdb-8f7c-0d2179bf3958&ids=7fe09be8-999e-76f9-6e39-fb1d3d06fac0&ids=80c583bb-9466-41e0-480a-39d19d272898&ids=82cb8792-a1d9-f3ce-41c4-44be35811534&ids=85917638-212a-3114-5344-a718e5e64a2f&ids=85974d4d-f98c-fd76-aa1b-d994b9f6534d&ids=8cdc518d-777c-ec83-89a6-cd888b65cd47&ids=8e347485-56d0-86aa-1302-0c4600d054ac&ids=91ba8bc1-b9f2-3f93-b01e-c2994fe3479f&ids=93a0e899-1774-1d41-e606-6c734815d57e&ids=984a6ae4-4896-828c-91fa-07d672869f5c&ids=9992d99d-cafc-c637-c93c-a34237fb5711&ids=9a084d7f-da73-a436-0644-7d969db7fc18&ids=9e1c49bf-4489-336e-7ce4-cc75ca3edd46&ids=a8b8d8fa-aa47-5123-7363-92abfd675ee2&ids=a93ba596-c370-cf14-1794-087e01e7154d&ids=b849753c-0d88-b1f3-e3af-4556ff020a17&ids=caadb0ed-ab04-33a2-cdaf-01fdb40e8858&ids=dcb1e6ad-dddc-8305-6d51-9e9528b55e17&ids=dd8cdb41-0659-02f4-e54d-be366f0658c3&ids=ecbf2465-a1db-44b9-c885-196a2b7baf38&ids=f9b49808-007c-fd50-3481-4fe5ea18faa2&ids=fe544011-60af-3424-c857-24f789bcdd70&usage=all&include_archived=true&counts=false&limit=100",
+          "status": 200,
+          "bytes": 46527,
+          "ms": 1194,
+          "startedMs": 8720,
+          "server": {
+            "p50": 43.7,
+            "p95": 46.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/warehouse/documents?ids=0582abaa-3f89-a5db-1c9a-d17ef253acc2&ids=0d8e4dd1-b7cc-1838-9697-068fb6a70780&ids=0f3e2675-1dd2-6362-833b-722256ccccf5&ids=14a4a3c1-7893-ed43-60a0-7845d0edb70b&ids=207f53c1-bff3-777a-5edd-d2cf7ec45879&ids=22af81ec-4975-c263-f504-5b2d84a49848&ids=26127ab2-fd70-c754-94d6-b8475fef8579&ids=392cef6e-ae45-0ecd-c98c-7b0d7a16523f&ids=3bee512f-17f6-f8c2-485c-dd815c34432d&ids=3e25a575-3a10-6f6a-8171-0e30ca1a7a60&ids=409752da-b07b-433a-e3d3-89c0e9079467&ids=442fbb9e-c29d-bbe1-5d33-ec3ca405f422&ids=45ed82ce-f8eb-8984-1de4-b4cd421a4cd2&ids=53d1c526-27e0-92ae-b370-031bfa200778&ids=5dd6f24a-1af8-e5a9-b8b9-1ae1aa646912&ids=63adb36d-d5de-c983-4bd7-20d970b4536d&ids=655fdd9a-2899-b030-fafc-04b510149660&ids=6c8d62ad-2b60-d9f3-a277-75dd5f1a300e&ids=734c06c6-fd69-6ae8-f0f9-cfe81f609d9d&ids=735ff1ce-c690-17e6-d2e9-daf3253bfb2c&ids=7c7bc1da-d143-4242-9cf6-071c7bcbc29f&ids=7ed954fc-f7c1-a6ef-260c-61238e59d051&ids=80bc0c35-f528-3438-f2b4-c738e94789b4&ids=81060af1-d966-e115-5095-5d347705f519&ids=88033b73-dac7-3584-5b45-18e9bf280f44&ids=9a897fe1-2df1-1c7d-0224-370dd6b697d4&ids=9c57f1cf-7cc7-b672-5783-5ae334cdb3da&ids=9e3e6f25-cb61-65d1-4a80-78d9fe032977&ids=9e7bb5db-b29c-e825-35c7-d45e91c3cd23&ids=a12f03bc-1449-3c01-4801-d6b7eb9ab4fd&ids=a4cfe7cf-8536-d7a1-935e-e28deb6e01af&ids=a5efc4f3-f727-0a32-767b-975ce0c07e9d&ids=a64b4553-2e7f-179d-320f-d5fe6d47ddc4&ids=adfca9e2-da6b-309b-866f-fa035a21d04e&ids=b3840558-9a11-2895-9a96-f28e17d5c2fa&ids=c8d6567e-3a23-6146-4ef1-fe702ddb735f&ids=dbf104b7-9392-39d2-7373-33e54a7b30bf&ids=dfc3ddae-f921-1642-1436-13a28e4c2584&ids=f25b8011-0e5c-c976-e72f-69eb5387d494&ids=fb01fe65-6903-2a28-f0df-e941c9183c1f&ids=fb65c744-4802-8be7-3b53-62bf66a031f2&ids=fbeeefe8-af70-ad86-989f-a64e6c45a028&ids=ff26cc92-60ab-a795-ba23-ae2d81ebfb1f&limit=100",
+          "status": 200,
+          "bytes": 58308,
+          "ms": 2117,
+          "startedMs": 8722,
+          "server": {
+            "p50": 102.2,
+            "p95": 119.4
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "stock as of": {
+      "path": "/inventory/stock/as-of",
+      "heading": "Stock on a date",
+      "usableMs": 9575,
+      "headingMs": 6697,
+      "runs": [
+        9575,
+        10121,
+        9447
+      ],
+      "apiKiB": 45.2,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 291,
+          "startedMs": 3227
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 322,
+          "startedMs": 3519
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 165,
+          "startedMs": 3842,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 203,
+          "startedMs": 3843,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 643,
+          "startedMs": 5526
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 803,
+          "startedMs": 5527,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 847,
+          "startedMs": 5527,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 726,
+          "startedMs": 5605,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 989,
+          "startedMs": 5803,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?counts=false&exclude_module_contexts=true&limit=30",
+          "status": 200,
+          "bytes": 28483,
+          "ms": 849,
+          "startedMs": 6287,
+          "server": {
+            "p50": 45.9,
+            "p95": 57.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/config",
+          "status": 200,
+          "bytes": 53,
+          "ms": 679,
+          "startedMs": 6322,
+          "server": {
+            "p50": 21.3,
+            "p95": 30.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stock-as-of?as_of=2026-11-24&limit=50&offset=0",
+          "status": 200,
+          "bytes": 8554,
+          "ms": 2976,
+          "startedMs": 6322,
+          "server": {
+            "p50": 2576.3,
+            "p95": 2702.5
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "statistics": {
+      "path": "/inventory/stats",
+      "heading": "Statistics",
+      "usableMs": 9062,
+      "headingMs": 5608,
+      "runs": [
+        10281,
+        9062,
+        9001
+      ],
+      "apiKiB": 152,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 246,
+          "startedMs": 3270
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 208,
+          "startedMs": 3515
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 193,
+          "startedMs": 3722,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 292,
+          "startedMs": 3722,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 502,
+          "bytes": 5,
+          "ms": 562,
+          "startedMs": 5432
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 629,
+          "startedMs": 5436,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 667,
+          "startedMs": 5436,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 550,
+          "startedMs": 5537,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 564,
+          "startedMs": 5706,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/config",
+          "status": 200,
+          "bytes": 53,
+          "ms": 265,
+          "startedMs": 6010,
+          "server": {
+            "p50": 21.3,
+            "p95": 30.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/overview",
+          "status": 200,
+          "bytes": 313,
+          "ms": 261,
+          "startedMs": 6021,
+          "server": {
+            "p50": 18.4,
+            "p95": 23.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/location-types?limit=200&offset=0",
+          "status": 200,
+          "bytes": 2120,
+          "ms": 426,
+          "startedMs": 6022,
+          "server": {
+            "p50": 16.3,
+            "p95": 20.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-location?limit=200&offset=0",
+          "status": 200,
+          "bytes": 29802,
+          "ms": 656,
+          "startedMs": 6022,
+          "server": {
+            "p50": 189.1,
+            "p95": 348.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/expiry-forecast",
+          "status": 200,
+          "bytes": 211,
+          "ms": 666,
+          "startedMs": 6022,
+          "server": {
+            "p50": 274.1,
+            "p95": 290.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-category?limit=200&offset=0",
+          "status": 200,
+          "bytes": 9126,
+          "ms": 710,
+          "startedMs": 6022,
+          "server": {
+            "p50": 304.3,
+            "p95": 326.1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/items/attention-counts?exclude_module_contexts=true",
+          "status": 200,
+          "bytes": 71,
+          "ms": 1174,
+          "startedMs": 6022,
+          "server": {
+            "p50": 749.1,
+            "p95": 791.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/cost-analysis?period=month",
+          "status": 200,
+          "bytes": 1346,
+          "ms": 1192,
+          "startedMs": 6022,
+          "server": {
+            "p50": 1028.9,
+            "p95": 1067.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-location?limit=200&offset=200",
+          "status": 200,
+          "bytes": 29885,
+          "ms": 507,
+          "startedMs": 6678,
+          "server": {
+            "p50": 189.1,
+            "p95": 348.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 193,
+          "startedMs": 6996
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-location?limit=200&offset=400",
+          "status": 200,
+          "bytes": 29885,
+          "ms": 557,
+          "startedMs": 7185,
+          "server": {
+            "p50": 189.1,
+            "p95": 348.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-location?limit=200&offset=600",
+          "status": 200,
+          "bytes": 29885,
+          "ms": 615,
+          "startedMs": 7741,
+          "server": {
+            "p50": 189.1,
+            "p95": 348.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-location?limit=200&offset=800",
+          "status": 200,
+          "bytes": 13794,
+          "ms": 705,
+          "startedMs": 8357,
+          "server": {
+            "p50": 189.1,
+            "p95": 348.2
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "analytics": {
+      "path": "/inventory/stats/analytics",
+      "heading": "Statistics",
+      "usableMs": 11455,
+      "headingMs": 6085,
+      "runs": [
+        11486,
+        11316,
+        11455
+      ],
+      "apiKiB": 790.1,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 263,
+          "startedMs": 3229
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 172,
+          "startedMs": 3492
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 157,
+          "startedMs": 3665,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 224,
+          "startedMs": 3668,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 709,
+          "startedMs": 5339
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 743,
+          "startedMs": 5340,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 817,
+          "startedMs": 5340,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 735,
+          "startedMs": 5468,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 522,
+          "startedMs": 5626,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/config",
+          "status": 200,
+          "bytes": 53,
+          "ms": 290,
+          "startedMs": 5963,
+          "server": {
+            "p50": 21.3,
+            "p95": 30.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/overview",
+          "status": 200,
+          "bytes": 313,
+          "ms": 239,
+          "startedMs": 5981,
+          "server": {
+            "p50": 18.4,
+            "p95": 23.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-category?limit=200&offset=0",
+          "status": 200,
+          "bytes": 9126,
+          "ms": 523,
+          "startedMs": 5981,
+          "server": {
+            "p50": 304.3,
+            "p95": 326.1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/expiry-forecast",
+          "status": 200,
+          "bytes": 211,
+          "ms": 1003,
+          "startedMs": 5981,
+          "server": {
+            "p50": 274.1,
+            "p95": 290.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/expense-forecast?period=month",
+          "status": 200,
+          "bytes": 1138,
+          "ms": 1193,
+          "startedMs": 5981,
+          "server": {
+            "p50": 19.2,
+            "p95": 27.3
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-location?limit=200&offset=0",
+          "status": 200,
+          "bytes": 29802,
+          "ms": 1203,
+          "startedMs": 5981,
+          "server": {
+            "p50": 189.1,
+            "p95": 348.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/rotation-analysis",
+          "status": 200,
+          "bytes": 124793,
+          "ms": 1369,
+          "startedMs": 5981,
+          "server": {
+            "p50": 24.7,
+            "p95": 27.1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/items/attention-counts?exclude_module_contexts=true",
+          "status": 200,
+          "bytes": 71,
+          "ms": 1395,
+          "startedMs": 5981,
+          "server": {
+            "p50": 749.1,
+            "p95": 791.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/cost-analysis?period=month",
+          "status": 200,
+          "bytes": 1346,
+          "ms": 1923,
+          "startedMs": 5981,
+          "server": {
+            "p50": 1028.9,
+            "p95": 1067.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/smart-alerts",
+          "status": 200,
+          "bytes": 524144,
+          "ms": 5475,
+          "startedMs": 5981,
+          "server": {
+            "p50": 1645.4,
+            "p95": 1918.7
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/purchase-patterns",
+          "status": 200,
+          "bytes": 3374,
+          "ms": 1507,
+          "startedMs": 5983,
+          "server": {
+            "p50": 113.9,
+            "p95": 131.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/location-types?limit=200&offset=0",
+          "status": 200,
+          "bytes": 2120,
+          "ms": 1406,
+          "startedMs": 5984,
+          "server": {
+            "p50": 16.3,
+            "p95": 20.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-location?limit=200&offset=200",
+          "status": 200,
+          "bytes": 29885,
+          "ms": 865,
+          "startedMs": 7188,
+          "server": {
+            "p50": 189.1,
+            "p95": 348.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-location?limit=200&offset=400",
+          "status": 200,
+          "bytes": 29885,
+          "ms": 532,
+          "startedMs": 8053,
+          "server": {
+            "p50": 189.1,
+            "p95": 348.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-location?limit=200&offset=600",
+          "status": 200,
+          "bytes": 29885,
+          "ms": 1466,
+          "startedMs": 8586,
+          "server": {
+            "p50": 189.1,
+            "p95": 348.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-location?limit=200&offset=800",
+          "status": 200,
+          "bytes": 13794,
+          "ms": 432,
+          "startedMs": 10054,
+          "server": {
+            "p50": 189.1,
+            "p95": 348.2
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "reconciliation": {
+      "path": "/inventory/stats/reconciliation",
+      "heading": "Statistics",
+      "usableMs": 10280,
+      "headingMs": 6639,
+      "runs": [
+        10280,
+        9575,
+        11096
+      ],
+      "apiKiB": 152.2,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 230,
+          "startedMs": 3246
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 178,
+          "startedMs": 3477
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 157,
+          "startedMs": 3655,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 220,
+          "startedMs": 3655,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 591,
+          "startedMs": 5336
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 725,
+          "startedMs": 5337,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 754,
+          "startedMs": 5337,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 627,
+          "startedMs": 5411,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 522,
+          "startedMs": 5606,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/config",
+          "status": 200,
+          "bytes": 53,
+          "ms": 232,
+          "startedMs": 5897,
+          "server": {
+            "p50": 21.3,
+            "p95": 30.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/overview",
+          "status": 200,
+          "bytes": 313,
+          "ms": 172,
+          "startedMs": 5919,
+          "server": {
+            "p50": 18.4,
+            "p95": 23.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/items/attention-counts?exclude_module_contexts=true",
+          "status": 200,
+          "bytes": 71,
+          "ms": 1331,
+          "startedMs": 5920,
+          "server": {
+            "p50": 749.1,
+            "p95": 791.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/expiry-forecast",
+          "status": 200,
+          "bytes": 211,
+          "ms": 613,
+          "startedMs": 5921,
+          "server": {
+            "p50": 274.1,
+            "p95": 290.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/cost-analysis?period=month",
+          "status": 200,
+          "bytes": 1346,
+          "ms": 1165,
+          "startedMs": 5921,
+          "server": {
+            "p50": 1028.9,
+            "p95": 1067.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-category?limit=200&offset=0",
+          "status": 200,
+          "bytes": 9126,
+          "ms": 1236,
+          "startedMs": 5921,
+          "server": {
+            "p50": 304.3,
+            "p95": 326.1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-location?limit=200&offset=0",
+          "status": 200,
+          "bytes": 29802,
+          "ms": 1266,
+          "startedMs": 5921,
+          "server": {
+            "p50": 189.1,
+            "p95": 348.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/location-types?limit=200&offset=0",
+          "status": 200,
+          "bytes": 2120,
+          "ms": 827,
+          "startedMs": 5922,
+          "server": {
+            "p50": 16.3,
+            "p95": 20.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/reconciliation",
+          "status": 200,
+          "bytes": 162,
+          "ms": 3280,
+          "startedMs": 5922,
+          "server": {
+            "p50": 2225.9,
+            "p95": 2481.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-location?limit=200&offset=200",
+          "status": 200,
+          "bytes": 29885,
+          "ms": 522,
+          "startedMs": 7188,
+          "server": {
+            "p50": 189.1,
+            "p95": 348.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-location?limit=200&offset=400",
+          "status": 200,
+          "bytes": 29885,
+          "ms": 816,
+          "startedMs": 7711,
+          "server": {
+            "p50": 189.1,
+            "p95": 348.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-location?limit=200&offset=600",
+          "status": 200,
+          "bytes": 29885,
+          "ms": 838,
+          "startedMs": 8530,
+          "server": {
+            "p50": 189.1,
+            "p95": 348.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stats/by-location?limit=200&offset=800",
+          "status": 200,
+          "bytes": 13794,
+          "ms": 908,
+          "startedMs": 9373,
+          "server": {
+            "p50": 189.1,
+            "p95": 348.2
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "stock takes": {
+      "path": "/inventory/stock-takes",
+      "heading": "Stock Takes",
+      "usableMs": 7059,
+      "headingMs": 5609,
+      "runs": [
+        7386,
+        7059,
+        6445
+      ],
+      "apiKiB": 11,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 236,
+          "startedMs": 3243
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 180,
+          "startedMs": 3479
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 158,
+          "startedMs": 3660,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 230,
+          "startedMs": 3660,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 502,
+          "bytes": 5,
+          "ms": 563,
+          "startedMs": 5313
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 718,
+          "startedMs": 5314,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 883,
+          "startedMs": 5314,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 642,
+          "startedMs": 5414,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 541,
+          "startedMs": 5602,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/stock-takes?offset=0&limit=50",
+          "status": 200,
+          "bytes": 82,
+          "ms": 256,
+          "startedMs": 5901,
+          "server": {
+            "p50": 22.0,
+            "p95": 24.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/locations?counts=false&exclude_module_contexts=true&limit=2",
+          "status": 200,
+          "bytes": 1974,
+          "ms": 165,
+          "startedMs": 6198,
+          "server": {
+            "p50": 43.4,
+            "p95": 58.3
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 182,
+          "startedMs": 6878
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "purchase orders": {
+      "path": "/purchase-orders",
+      "heading": "Purchase Orders",
+      "usableMs": 7792,
+      "headingMs": 6098,
+      "runs": [
+        7687,
+        7792,
+        7859
+      ],
+      "apiKiB": 48.8,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 759,
+          "startedMs": 3203
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 179,
+          "startedMs": 3961
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 161,
+          "startedMs": 4144,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 325,
+          "startedMs": 4146,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 1272,
+          "startedMs": 5822
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 1283,
+          "startedMs": 5825,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 1388,
+          "startedMs": 5825,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 1315,
+          "startedMs": 5922,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 1142,
+          "startedMs": 6095,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/purchase-orders/settings",
+          "status": 200,
+          "bytes": 240,
+          "ms": 162,
+          "startedMs": 7324,
+          "server": {
+            "p50": 19.1,
+            "p95": 22.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/purchase-orders?limit=50&offset=0",
+          "status": 200,
+          "bytes": 40538,
+          "ms": 438,
+          "startedMs": 7355,
+          "server": {
+            "p50": 43.9,
+            "p95": 50.2
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    },
+    "a purchase order": {
+      "path": "/purchase-orders/6535dcf5-e217-cecd-9a8d-abe304ca2357",
+      "heading": "PO/2026/002339",
+      "usableMs": 7477,
+      "headingMs": 7123,
+      "runs": [
+        7477,
+        7480,
+        7277
+      ],
+      "apiKiB": 16.9,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/refresh",
+          "status": 200,
+          "bytes": 310,
+          "ms": 336,
+          "startedMs": 3212
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/me",
+          "status": 200,
+          "bytes": 1205,
+          "ms": 269,
+          "startedMs": 3554
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/my",
+          "status": 200,
+          "bytes": 207,
+          "ms": 161,
+          "startedMs": 3828,
+          "server": {
+            "p50": 14.1,
+            "p95": 20.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/modules/focus",
+          "status": 200,
+          "bytes": 223,
+          "ms": 216,
+          "startedMs": 3829,
+          "server": {
+            "p50": 15.6,
+            "p95": 18.9
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/auth/init-status",
+          "status": 200,
+          "bytes": 224,
+          "ms": 1486,
+          "startedMs": 5493
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/organizations/my",
+          "status": 200,
+          "bytes": 606,
+          "ms": 1526,
+          "startedMs": 5493,
+          "server": {
+            "p50": 16.1,
+            "p95": 18.6
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/profiles?limit=200&offset=0",
+          "status": 200,
+          "bytes": 6218,
+          "ms": 1553,
+          "startedMs": 5493,
+          "server": {
+            "p50": 14.9,
+            "p95": 17.0
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/notifications?unread_only=false",
+          "status": 200,
+          "bytes": 82,
+          "ms": 1444,
+          "startedMs": 5601,
+          "server": {
+            "p50": 17.8,
+            "p95": 20.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/announcements/active?limit=200&offset=0",
+          "status": 200,
+          "bytes": 83,
+          "ms": 1266,
+          "startedMs": 5788,
+          "server": {
+            "p50": 16.4,
+            "p95": 17.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/purchase-orders/6535dcf5-e217-cecd-9a8d-abe304ca2357",
+          "status": 200,
+          "bytes": 7052,
+          "ms": 252,
+          "startedMs": 6869,
+          "server": {
+            "p50": 32.5,
+            "p95": 40.4
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/approvals/requests?target_type=purchase_order",
+          "status": 200,
+          "bytes": 83,
+          "ms": 354,
+          "startedMs": 6894,
+          "server": {
+            "p50": 19.6,
+            "p95": 23.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/approvals/workflows/configured?target_type=purchase_order",
+          "status": 200,
+          "bytes": 20,
+          "ms": 353,
+          "startedMs": 6895,
+          "server": {
+            "p50": 17.6,
+            "p95": 20.2
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/purchase-orders/6535dcf5-e217-cecd-9a8d-abe304ca2357/linked-receipts?limit=200&offset=0",
+          "status": 200,
+          "bytes": 254,
+          "ms": 394,
+          "startedMs": 6896,
+          "server": {
+            "p50": 58.9,
+            "p95": 74.8
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/purchase-orders/settings",
+          "status": 200,
+          "bytes": 240,
+          "ms": 156,
+          "startedMs": 7286,
+          "server": {
+            "p50": 19.1,
+            "p95": 22.5
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/partners/7fba7487-4566-97c1-1057-ce1db223f89e",
+          "status": 200,
+          "bytes": 474,
+          "ms": 157,
+          "startedMs": 7321,
+          "server": {
+            "p50": 16.4,
+            "p95": 19.1
+          }
+        }
+      ],
+      "errors": [],
+      "budgetMs": 8000
+    }
+  },
+  "screen_requests": {
+    "/api/v1/modules/my": {
+      "class": "list",
+      "path": "/api/v1/modules/my",
+      "status": 200,
+      "runs": 20,
+      "p50": 14.1,
+      "p95": 20.0,
+      "max": 20.2,
+      "bytes": 207
+    },
+    "/api/v1/modules/focus": {
+      "class": "list",
+      "path": "/api/v1/modules/focus",
+      "status": 200,
+      "runs": 20,
+      "p50": 15.6,
+      "p95": 18.9,
+      "max": 19.3,
+      "bytes": 223
+    },
+    "/api/v1/organizations/my": {
+      "class": "list",
+      "path": "/api/v1/organizations/my",
+      "status": 200,
+      "runs": 20,
+      "p50": 16.1,
+      "p95": 18.6,
+      "max": 27.0,
+      "bytes": 606
+    },
+    "/api/v1/profiles?limit=200&offset=N": {
+      "class": "list",
+      "path": "/api/v1/profiles?limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 14.9,
+      "p95": 17.0,
+      "max": 17.9,
+      "bytes": 6218
+    },
+    "/api/v1/notifications?unread_only=false": {
+      "class": "list",
+      "path": "/api/v1/notifications?unread_only=false",
+      "status": 200,
+      "runs": 20,
+      "p50": 17.8,
+      "p95": 20.4,
+      "max": 25.8,
+      "bytes": 82
+    },
+    "/api/v1/announcements/active?limit=200&offset=N": {
+      "class": "list",
+      "path": "/api/v1/announcements/active?limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 16.4,
+      "p95": 17.5,
+      "max": 18.5,
+      "bytes": 83
+    },
+    "/api/v1/items/attention-counts?exclude_module_contexts=true": {
+      "class": "list",
+      "path": "/api/v1/items/attention-counts?exclude_module_contexts=true",
+      "status": 200,
+      "runs": 20,
+      "p50": 749.1,
+      "p95": 791.5,
+      "max": 791.6,
+      "bytes": 71
+    },
+    "/api/v1/equipment/warranty-alerts?limit=200&offset=N": {
+      "class": "list",
+      "path": "/api/v1/equipment/warranty-alerts?limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 31.3,
+      "p95": 42.5,
+      "max": 45.5,
+      "bytes": 83
+    },
+    "/api/v1/approvals/requests?status=PENDING,IN_PROGRESS": {
+      "class": "list",
+      "path": "/api/v1/approvals/requests?status=PENDING,IN_PROGRESS",
+      "status": 200,
+      "runs": 20,
+      "p50": 19.7,
+      "p95": 24.3,
+      "max": 27.0,
+      "bytes": 83
+    },
+    "/api/v1/stock-takes?status_filter=in_progress&limit=5": {
+      "class": "list",
+      "path": "/api/v1/stock-takes?status_filter=in_progress&limit=5",
+      "status": 200,
+      "runs": 20,
+      "p50": 21.3,
+      "p95": 22.8,
+      "max": 22.9,
+      "bytes": 81
+    },
+    "/api/v1/warehouse/todo?date_to=2026-11-23&limit=1": {
+      "class": "list",
+      "path": "/api/v1/warehouse/todo?date_to=2026-11-23&limit=1",
+      "status": 200,
+      "runs": 20,
+      "p50": 144.4,
+      "p95": 166.5,
+      "max": 176.5,
+      "bytes": 225
+    },
+    "/api/v1/uoms?limit=200&offset=N": {
+      "class": "list",
+      "path": "/api/v1/uoms?limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 14.2,
+      "p95": 16.3,
+      "max": 16.4,
+      "bytes": 5301
+    },
+    "/api/v1/stats/overview": {
+      "class": "report",
+      "path": "/api/v1/stats/overview",
+      "status": 200,
+      "runs": 20,
+      "p50": 18.4,
+      "p95": 23.6,
+      "max": 25.3,
+      "bytes": 313
+    },
+    "/api/v1/location-types?limit=200&offset=N": {
+      "class": "list",
+      "path": "/api/v1/location-types?limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 16.3,
+      "p95": 20.2,
+      "max": 20.7,
+      "bytes": 2120
+    },
+    "/api/v1/categories?exclude_module_contexts=true&limit=200&offset=N": {
+      "class": "list",
+      "path": "/api/v1/categories?exclude_module_contexts=true&limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 18.4,
+      "p95": 26.0,
+      "max": 26.9,
+      "bytes": 29713
+    },
+    "/api/v1/categories?limit=200&offset=N": {
+      "class": "list",
+      "path": "/api/v1/categories?limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 19.6,
+      "p95": 28.8,
+      "max": 33.8,
+      "bytes": 44825
+    },
+    "/api/v1/items?exclude_module_contexts=true&only_expired=false&offset=N&limit=50&sort_by=created_at&sort_order=desc": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&offset=0&limit=50&sort_by=created_at&sort_order=desc",
+      "status": 200,
+      "runs": 20,
+      "p50": 70.4,
+      "p95": 86.9,
+      "max": 96.6,
+      "bytes": 130910
+    },
+    "/api/v1/items/aggregates?exclude_module_contexts=true&only_expired=false": {
+      "class": "report",
+      "path": "/api/v1/items/aggregates?exclude_module_contexts=true&only_expired=false",
+      "status": 200,
+      "runs": 20,
+      "p50": 2646.7,
+      "p95": 2742.6,
+      "max": 2802.5,
+      "bytes": 224
+    },
+    "/api/v1/uoms/categories?limit=200&offset=N": {
+      "class": "list",
+      "path": "/api/v1/uoms/categories?limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 14.4,
+      "p95": 17.6,
+      "max": 19.3,
+      "bytes": 6133
+    },
+    "/api/v1/stats/config": {
+      "class": "report",
+      "path": "/api/v1/stats/config",
+      "status": 200,
+      "runs": 20,
+      "p50": 21.3,
+      "p95": 30.8,
+      "max": 31.6,
+      "bytes": 53
+    },
+    "/api/v1/items?exclude_module_contexts=false&limit=1": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=false&limit=1",
+      "status": 200,
+      "runs": 20,
+      "p50": 41.3,
+      "p95": 49.2,
+      "max": 54.0,
+      "bytes": 2662
+    },
+    "/api/v1/locations?ids=023594a5-60a0-410a-82f1-1e59798bd4d7&ids=092f3303-d921-ca74-04da-8572b6f0192a&ids=0ad38f97-5549-3594-d0f7-57f7dcf385d3&ids=0f41b6c5-a3a3-3193-9632-67686009a2a2&ids=1b437508-45c1-46eb-f72d-6f718672ca22&ids=2d70827c-c4d4-4897-bd8a-1b5bf11adb2a&ids=3d1a4185-84a4-2cb6-4efb-49cba9cde7f7&ids=3fcf4d71-1f32-cb6c-21e9-b2ed91c215a7&ids=45573b64-1f27-4bf9-2d02-d2a6dc55781c&ids=4581ae3a-1bc8-2b99-f33d-ab747210bfe3&ids=47b36ca5-d250-8e54-cb0e-4b52f628cc76&ids=4a43a2f1-e498-4deb-4b59-2384d40a5285&ids=528f9424-f0e9-2f81-fbcf-8380206bf9d2&ids=5544028e-407a-f94c-9b62-04acf14250a2&ids=56b38d59-d72c-c46b-3adf-6c8f53f68c75&ids=56ef910e-0cbb-5462-3fd0-f35875db91e9&ids=5877717f-90cc-4438-7cad-cb3c3a708077&ids=5938831e-49d7-c876-465e-005fb0dbdfb5&ids=5de49ceb-3e55-24f8-1bbe-090c9b4fdb2d&ids=5eda9e55-88d8-2f66-6d49-ff6b8798cba9&ids=6f0a0549-880b-f9fb-af3e-a5908404c0bf&ids=71cf9984-cef4-5766-6d4c-be5435d15b55&ids=73e2777f-88f5-e2cd-96a8-d52fb548a21c&ids=741701fa-6ce0-ee9a-e1db-da6057057082&ids=75b2d447-f710-835f-4ae3-4be5cad45d99&ids=76763098-f219-1da5-ecf8-481be7d9715c&ids=7a944b7b-a9b4-ede3-e443-a9c30b81a257&ids=7b78aa1a-f535-24cb-d2c7-f515ac74b47c&ids=7fe09be8-999e-76f9-6e39-fb1d3d06fac0&ids=81ff8ec9-f9ce-0a15-a53e-9de2578dd220&ids=89a96801-ec97-a5f0-0311-55ca08686003&ids=8cdc518d-777c-ec83-89a6-cd888b65cd47&ids=9992d99d-cafc-c637-c93c-a34237fb5711&ids=9a13c6e6-fa73-69ca-f306-0cc0e58f7731&ids=9c0cb8ac-e246-0baa-ebd9-976483dc8930&ids=9cb2c976-53e6-4480-246f-369803b6bd1e&ids=9d343526-fb32-de2a-5606-fe97a1d6a5a1&ids=a435023c-a5ac-c29c-f61a-e8803d985654&ids=a7134a77-e8b5-af08-c69c-1f953332f718&ids=aedc593b-e431-ded3-8104-ea809cbbc965&ids=b849753c-0d88-b1f3-e3af-4556ff020a17&ids=d1bec720-3be7-84b8-2129-efa16adf02b8&ids=d8211ea1-0b8e-43bf-3951-187c0ffe9f9b&ids=e58f735f-f191-7432-b325-cb5a69772f15&ids=ecbf2465-a1db-44b9-c885-196a2b7baf38&ids=f651ed0d-1c1f-4cb7-9a2d-1e80a29a7cf9&ids=fcc6c0b1-79c9-5aec-8045-63f5c3a64462&usage=all&include_archived=true&counts=false&limit=100": {
+      "class": "list",
+      "path": "/api/v1/locations?ids=023594a5-60a0-410a-82f1-1e59798bd4d7&ids=092f3303-d921-ca74-04da-8572b6f0192a&ids=0ad38f97-5549-3594-d0f7-57f7dcf385d3&ids=0f41b6c5-a3a3-3193-9632-67686009a2a2&ids=1b437508-45c1-46eb-f72d-6f718672ca22&ids=2d70827c-c4d4-4897-bd8a-1b5bf11adb2a&ids=3d1a4185-84a4-2cb6-4efb-49cba9cde7f7&ids=3fcf4d71-1f32-cb6c-21e9-b2ed91c215a7&ids=45573b64-1f27-4bf9-2d02-d2a6dc55781c&ids=4581ae3a-1bc8-2b99-f33d-ab747210bfe3&ids=47b36ca5-d250-8e54-cb0e-4b52f628cc76&ids=4a43a2f1-e498-4deb-4b59-2384d40a5285&ids=528f9424-f0e9-2f81-fbcf-8380206bf9d2&ids=5544028e-407a-f94c-9b62-04acf14250a2&ids=56b38d59-d72c-c46b-3adf-6c8f53f68c75&ids=56ef910e-0cbb-5462-3fd0-f35875db91e9&ids=5877717f-90cc-4438-7cad-cb3c3a708077&ids=5938831e-49d7-c876-465e-005fb0dbdfb5&ids=5de49ceb-3e55-24f8-1bbe-090c9b4fdb2d&ids=5eda9e55-88d8-2f66-6d49-ff6b8798cba9&ids=6f0a0549-880b-f9fb-af3e-a5908404c0bf&ids=71cf9984-cef4-5766-6d4c-be5435d15b55&ids=73e2777f-88f5-e2cd-96a8-d52fb548a21c&ids=741701fa-6ce0-ee9a-e1db-da6057057082&ids=75b2d447-f710-835f-4ae3-4be5cad45d99&ids=76763098-f219-1da5-ecf8-481be7d9715c&ids=7a944b7b-a9b4-ede3-e443-a9c30b81a257&ids=7b78aa1a-f535-24cb-d2c7-f515ac74b47c&ids=7fe09be8-999e-76f9-6e39-fb1d3d06fac0&ids=81ff8ec9-f9ce-0a15-a53e-9de2578dd220&ids=89a96801-ec97-a5f0-0311-55ca08686003&ids=8cdc518d-777c-ec83-89a6-cd888b65cd47&ids=9992d99d-cafc-c637-c93c-a34237fb5711&ids=9a13c6e6-fa73-69ca-f306-0cc0e58f7731&ids=9c0cb8ac-e246-0baa-ebd9-976483dc8930&ids=9cb2c976-53e6-4480-246f-369803b6bd1e&ids=9d343526-fb32-de2a-5606-fe97a1d6a5a1&ids=a435023c-a5ac-c29c-f61a-e8803d985654&ids=a7134a77-e8b5-af08-c69c-1f953332f718&ids=aedc593b-e431-ded3-8104-ea809cbbc965&ids=b849753c-0d88-b1f3-e3af-4556ff020a17&ids=d1bec720-3be7-84b8-2129-efa16adf02b8&ids=d8211ea1-0b8e-43bf-3951-187c0ffe9f9b&ids=e58f735f-f191-7432-b325-cb5a69772f15&ids=ecbf2465-a1db-44b9-c885-196a2b7baf38&ids=f651ed0d-1c1f-4cb7-9a2d-1e80a29a7cf9&ids=fcc6c0b1-79c9-5aec-8045-63f5c3a64462&usage=all&include_archived=true&counts=false&limit=100",
+      "status": 200,
+      "runs": 20,
+      "p50": 44.0,
+      "p95": 49.0,
+      "max": 50.7,
+      "bytes": 44629
+    },
+    "/api/v1/stock-quants?limit=50&offset=N": {
+      "class": "list",
+      "path": "/api/v1/stock-quants?limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 35.1,
+      "p95": 37.6,
+      "max": 38.5,
+      "bytes": 20983
+    },
+    "/api/v1/locations?ids=741701fa-6ce0-ee9a-e1db-da6057057082&usage=all&include_archived=true&counts=false&limit=100": {
+      "class": "list",
+      "path": "/api/v1/locations?ids=741701fa-6ce0-ee9a-e1db-da6057057082&usage=all&include_archived=true&counts=false&limit=100",
+      "status": 200,
+      "runs": 20,
+      "p50": 38.1,
+      "p95": 42.5,
+      "max": 44.0,
+      "bytes": 1028
+    },
+    "/api/v1/stock-lots?limit=50&offset=N": {
+      "class": "list",
+      "path": "/api/v1/stock-lots?limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 74.7,
+      "p95": 85.5,
+      "max": 90.3,
+      "bytes": 25906
+    },
+    "/api/v1/locations/tree?exclude_module_contexts=true&depth=1": {
+      "class": "list",
+      "path": "/api/v1/locations/tree?exclude_module_contexts=true&depth=1",
+      "status": 200,
+      "runs": 20,
+      "p50": 390.8,
+      "p95": 453.5,
+      "max": 561.0,
+      "bytes": 838
+    },
+    "/api/v1/locations?counts=false&exclude_module_contexts=true&limit=2": {
+      "class": "list",
+      "path": "/api/v1/locations?counts=false&exclude_module_contexts=true&limit=2",
+      "status": 200,
+      "runs": 20,
+      "p50": 43.4,
+      "p95": 58.3,
+      "max": 59.9,
+      "bytes": 1974
+    },
+    "/api/v1/locations?counts=false&exclude_module_contexts=true&top_level=true&limit=1": {
+      "class": "list",
+      "path": "/api/v1/locations?counts=false&exclude_module_contexts=true&top_level=true&limit=1",
+      "status": 200,
+      "runs": 20,
+      "p50": 38.0,
+      "p95": 42.9,
+      "max": 45.1,
+      "bytes": 671
+    },
+    "/api/v1/locations?usage=all&include_archived=true&counts=false&top_level=true&limit=200": {
+      "class": "list",
+      "path": "/api/v1/locations?usage=all&include_archived=true&counts=false&top_level=true&limit=200",
+      "status": 200,
+      "runs": 20,
+      "p50": 39.4,
+      "p95": 59.1,
+      "max": 62.7,
+      "bytes": 6340
+    },
+    "/api/v1/locations?exclude_module_contexts=true&counts=false&limit=1": {
+      "class": "list",
+      "path": "/api/v1/locations?exclude_module_contexts=true&counts=false&limit=1",
+      "status": 200,
+      "runs": 20,
+      "p50": 43.6,
+      "p95": 54.9,
+      "max": 61.9,
+      "bytes": 1028
+    },
+    "/api/v1/locations?counts=false&limit=1": {
+      "class": "list",
+      "path": "/api/v1/locations?counts=false&limit=1",
+      "status": 200,
+      "runs": 20,
+      "p50": 41.9,
+      "p95": 45.2,
+      "max": 45.7,
+      "bytes": 1028
+    },
+    "/api/v1/warehouse/putaway/occupancy": {
+      "class": "report",
+      "path": "/api/v1/warehouse/putaway/occupancy",
+      "status": 200,
+      "runs": 20,
+      "p50": 690.2,
+      "p95": 1004.7,
+      "max": 1011.0,
+      "bytes": 480820
+    },
+    "/api/v1/locations/d049a11a-bc38-b377-8eee-1df7676206a7": {
+      "class": "list",
+      "path": "/api/v1/locations/d049a11a-bc38-b377-8eee-1df7676206a7",
+      "status": 200,
+      "runs": 20,
+      "p50": 16.0,
+      "p95": 19.6,
+      "max": 19.7,
+      "bytes": 826
+    },
+    "/api/v1/locations?ids=d049a11a-bc38-b377-8eee-1df7676206a7&exclude_module_contexts=true&limit=1": {
+      "class": "list",
+      "path": "/api/v1/locations?ids=d049a11a-bc38-b377-8eee-1df7676206a7&exclude_module_contexts=true&limit=1",
+      "status": 200,
+      "runs": 20,
+      "p50": 87.2,
+      "p95": 102.1,
+      "max": 106.8,
+      "bytes": 1036
+    },
+    "/api/v1/locations/d049a11a-bc38-b377-8eee-1df7676206a7/breadcrumb": {
+      "class": "list",
+      "path": "/api/v1/locations/d049a11a-bc38-b377-8eee-1df7676206a7/breadcrumb",
+      "status": 200,
+      "runs": 20,
+      "p50": 25.0,
+      "p95": 31.0,
+      "max": 31.3,
+      "bytes": 271
+    },
+    "/api/v1/printing/agents?limit=200&offset=N": {
+      "class": "list",
+      "path": "/api/v1/printing/agents?limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 17.9,
+      "p95": 21.0,
+      "max": 23.4,
+      "bytes": 83
+    },
+    "/api/v1/locations/d049a11a-bc38-b377-8eee-1df7676206a7/items?exclude_module_contexts=true&limit=200&offset=N": {
+      "class": "list",
+      "path": "/api/v1/locations/d049a11a-bc38-b377-8eee-1df7676206a7/items?exclude_module_contexts=true&limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 90.3,
+      "p95": 112.1,
+      "max": 330.0,
+      "bytes": 408755
+    },
+    "/api/v1/locations/tree?exclude_module_contexts=true&parent_id=04314e9a-14d6-2d29-4736-79a74ed54e8c&depth=1": {
+      "class": "list",
+      "path": "/api/v1/locations/tree?exclude_module_contexts=true&parent_id=04314e9a-14d6-2d29-4736-79a74ed54e8c&depth=1",
+      "status": 200,
+      "runs": 20,
+      "p50": 84.5,
+      "p95": 242.3,
+      "max": 265.4,
+      "bytes": 2681
+    },
+    "/api/v1/locations/tree?exclude_module_contexts=true&parent_id=e45992de-9c53-558b-91c2-5c9c733e9c47&depth=1": {
+      "class": "list",
+      "path": "/api/v1/locations/tree?exclude_module_contexts=true&parent_id=e45992de-9c53-558b-91c2-5c9c733e9c47&depth=1",
+      "status": 200,
+      "runs": 20,
+      "p50": 112.5,
+      "p95": 139.9,
+      "max": 267.5,
+      "bytes": 3257
+    },
+    "/api/v1/locations/tree?exclude_module_contexts=true&parent_id=8da2450e-a2fa-0f13-f2e6-ff8498a1fcf1&depth=1": {
+      "class": "list",
+      "path": "/api/v1/locations/tree?exclude_module_contexts=true&parent_id=8da2450e-a2fa-0f13-f2e6-ff8498a1fcf1&depth=1",
+      "status": 200,
+      "runs": 20,
+      "p50": 391.7,
+      "p95": 407.6,
+      "max": 565.8,
+      "bytes": 3192
+    },
+    "/api/v1/locations?ids=e45992de-9c53-558b-91c2-5c9c733e9c47&exclude_module_contexts=true&limit=1": {
+      "class": "list",
+      "path": "/api/v1/locations?ids=e45992de-9c53-558b-91c2-5c9c733e9c47&exclude_module_contexts=true&limit=1",
+      "status": 200,
+      "runs": 20,
+      "p50": 138.0,
+      "p95": 165.4,
+      "max": 294.2,
+      "bytes": 668
+    },
+    "/api/v1/locations/e45992de-9c53-558b-91c2-5c9c733e9c47": {
+      "class": "list",
+      "path": "/api/v1/locations/e45992de-9c53-558b-91c2-5c9c733e9c47",
+      "status": 200,
+      "runs": 20,
+      "p50": 16.4,
+      "p95": 22.4,
+      "max": 22.9,
+      "bytes": 458
+    },
+    "/api/v1/locations/e45992de-9c53-558b-91c2-5c9c733e9c47/breadcrumb": {
+      "class": "list",
+      "path": "/api/v1/locations/e45992de-9c53-558b-91c2-5c9c733e9c47/breadcrumb",
+      "status": 200,
+      "runs": 20,
+      "p50": 19.7,
+      "p95": 22.9,
+      "max": 25.7,
+      "bytes": 132
+    },
+    "/api/v1/locations?parent_id=e45992de-9c53-558b-91c2-5c9c733e9c47&exclude_module_contexts=true&limit=50&offset=N": {
+      "class": "list",
+      "path": "/api/v1/locations?parent_id=e45992de-9c53-558b-91c2-5c9c733e9c47&exclude_module_contexts=true&limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 140.9,
+      "p95": 154.4,
+      "max": 162.1,
+      "bytes": 6781
+    },
+    "/api/v1/warehouse/awaiting-my-approval?offset=N&limit=50": {
+      "class": "list",
+      "path": "/api/v1/warehouse/awaiting-my-approval?offset=0&limit=50",
+      "status": 200,
+      "runs": 20,
+      "p50": 22.5,
+      "p95": 29.6,
+      "max": 31.8,
+      "bytes": 82
+    },
+    "/api/v1/locations/tree?exclude_module_contexts=true&depth=1&counts=false": {
+      "class": "list",
+      "path": "/api/v1/locations/tree?exclude_module_contexts=true&depth=1&counts=false",
+      "status": 200,
+      "runs": 20,
+      "p50": 60.4,
+      "p95": 91.8,
+      "max": 219.3,
+      "bytes": 833
+    },
+    "/api/v1/users/org-members?limit=200&offset=N": {
+      "class": "list",
+      "path": "/api/v1/users/org-members?limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 17.1,
+      "p95": 21.3,
+      "max": 24.9,
+      "bytes": 420
+    },
+    "/api/v1/warehouse/work-items/assignees": {
+      "class": "list",
+      "path": "/api/v1/warehouse/work-items/assignees",
+      "status": 200,
+      "runs": 20,
+      "p50": 27.5,
+      "p95": 32.2,
+      "max": 32.3,
+      "bytes": 53
+    },
+    "/api/v1/warehouse/todo?date_to=2026-11-23&limit=100&work_limit=100&view=all": {
+      "class": "list",
+      "path": "/api/v1/warehouse/todo?date_to=2026-11-23&limit=100&work_limit=100&view=all",
+      "status": 200,
+      "runs": 20,
+      "p50": 142.5,
+      "p95": 160.8,
+      "max": 162.3,
+      "bytes": 225
+    },
+    "/api/v1/warehouse/documents?status=COMPLETED&completed_from=2026-11-22T23:00:00.000Z&completed_to=2026-11-23T23:00:00.000Z&sort_by=completed_at&sort_order=desc&limit=50": {
+      "class": "list",
+      "path": "/api/v1/warehouse/documents?status=COMPLETED&completed_from=2026-11-22T23:00:00.000Z&completed_to=2026-11-23T23:00:00.000Z&sort_by=completed_at&sort_order=desc&limit=50",
+      "status": 200,
+      "runs": 20,
+      "p50": 156.2,
+      "p95": 191.2,
+      "max": 352.3,
+      "bytes": 67851
+    },
+    "/api/v1/warehouse/todo?date_to=2026-11-23&limit=100&work_limit=100&view=all&state=todo": {
+      "class": "list",
+      "path": "/api/v1/warehouse/todo?date_to=2026-11-23&limit=100&work_limit=100&view=all&state=todo",
+      "status": 200,
+      "runs": 20,
+      "p50": 152.4,
+      "p95": 174.1,
+      "max": 176.9,
+      "bytes": 225
+    },
+    "/api/v1/warehouse/todo?date_to=2026-11-23&limit=100&work_limit=100&view=all&state=in_progress": {
+      "class": "list",
+      "path": "/api/v1/warehouse/todo?date_to=2026-11-23&limit=100&work_limit=100&view=all&state=in_progress",
+      "status": 200,
+      "runs": 20,
+      "p50": 150.8,
+      "p95": 169.1,
+      "max": 320.5,
+      "bytes": 225
+    },
+    "/api/v1/warehouse/todo?date_to=2026-11-23&limit=100&work_limit=100&view=all&state=done&done_since=2026-11-22T23:00:00.000Z": {
+      "class": "list",
+      "path": "/api/v1/warehouse/todo?date_to=2026-11-23&limit=100&work_limit=100&view=all&state=done&done_since=2026-11-22T23:00:00.000Z",
+      "status": 200,
+      "runs": 20,
+      "p50": 251.9,
+      "p95": 276.1,
+      "max": 276.4,
+      "bytes": 68276
+    },
+    "/api/v1/warehouse/work-items/measures": {
+      "class": "list",
+      "path": "/api/v1/warehouse/work-items/measures",
+      "status": 200,
+      "runs": 20,
+      "p50": 47.0,
+      "p95": 49.2,
+      "max": 54.7,
+      "bytes": 96
+    },
+    "/api/v1/warehouse/todo?date_to=2026-11-23&limit=1&work_limit=1&view=overdue": {
+      "class": "list",
+      "path": "/api/v1/warehouse/todo?date_to=2026-11-23&limit=1&work_limit=1&view=overdue",
+      "status": 200,
+      "runs": 20,
+      "p50": 144.4,
+      "p95": 158.2,
+      "max": 158.5,
+      "bytes": 225
+    },
+    "/api/v1/locations?counts=false&exclude_module_contexts=true&limit=30": {
+      "class": "list",
+      "path": "/api/v1/locations?counts=false&exclude_module_contexts=true&limit=30",
+      "status": 200,
+      "runs": 20,
+      "p50": 45.9,
+      "p95": 57.4,
+      "max": 77.3,
+      "bytes": 28483
+    },
+    "/api/v1/warehouse/profile": {
+      "class": "list",
+      "path": "/api/v1/warehouse/profile",
+      "status": 200,
+      "runs": 20,
+      "p50": 22.0,
+      "p95": 25.0,
+      "max": 25.6,
+      "bytes": 764
+    },
+    "/api/v1/partners?types=SUPPLIER&types=BOTH&types=MANUFACTURER&is_active=true&limit=50": {
+      "class": "list",
+      "path": "/api/v1/partners?types=SUPPLIER&types=BOTH&types=MANUFACTURER&is_active=true&limit=50",
+      "status": 200,
+      "runs": 20,
+      "p50": 36.1,
+      "p95": 41.9,
+      "max": 43.9,
+      "bytes": 31327
+    },
+    "/api/v1/partners?types=CUSTOMER&types=BOTH&is_active=true&limit=50": {
+      "class": "list",
+      "path": "/api/v1/partners?types=CUSTOMER&types=BOTH&is_active=true&limit=50",
+      "status": 200,
+      "runs": 20,
+      "p50": 33.4,
+      "p95": 38.3,
+      "max": 47.0,
+      "bytes": 31388
+    },
+    "/api/v1/warehouse/documents?status=COMPLETED&limit=50&offset=N&sort_by=completed_at&sort_order=desc": {
+      "class": "list",
+      "path": "/api/v1/warehouse/documents?status=COMPLETED&limit=50&offset=0&sort_by=completed_at&sort_order=desc",
+      "status": 200,
+      "runs": 20,
+      "p50": 190.9,
+      "p95": 205.2,
+      "max": 357.6,
+      "bytes": 67847
+    },
+    "/api/v1/warehouse/register/summary?date_from=2026-11-01&date_to=2026-11-23&status=COMPLETED&group_by=type": {
+      "class": "list",
+      "path": "/api/v1/warehouse/register/summary?date_from=2026-11-01&date_to=2026-11-23&status=COMPLETED&group_by=type",
+      "status": 200,
+      "runs": 20,
+      "p50": 68.2,
+      "p95": 73.0,
+      "max": 73.1,
+      "bytes": 1164
+    },
+    "/api/v1/warehouse/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c": {
+      "class": "list",
+      "path": "/api/v1/warehouse/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c",
+      "status": 200,
+      "runs": 20,
+      "p50": 88.2,
+      "p95": 102.1,
+      "max": 102.8,
+      "bytes": 19314
+    },
+    "/api/v1/approvals/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c/approval": {
+      "class": "list",
+      "path": "/api/v1/approvals/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c/approval",
+      "status": 200,
+      "runs": 20,
+      "p50": 68.2,
+      "p95": 77.1,
+      "max": 231.4,
+      "bytes": 4
+    },
+    "/api/v1/approvals/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c/approval-requirement": {
+      "class": "list",
+      "path": "/api/v1/approvals/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c/approval-requirement",
+      "status": 200,
+      "runs": 20,
+      "p50": 130.9,
+      "p95": 143.2,
+      "max": 148.8,
+      "bytes": 131
+    },
+    "/api/v1/warehouse/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c/corrections?limit=200&offset=N": {
+      "class": "list",
+      "path": "/api/v1/warehouse/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c/corrections?limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 23.1,
+      "p95": 35.4,
+      "max": 37.3,
+      "bytes": 83
+    },
+    "/api/v1/partners/866e5378-547e-5878-6ff4-44eb151dcf92": {
+      "class": "list",
+      "path": "/api/v1/partners/866e5378-547e-5878-6ff4-44eb151dcf92",
+      "status": 200,
+      "runs": 20,
+      "p50": 16.9,
+      "p95": 21.5,
+      "max": 24.2,
+      "bytes": 477
+    },
+    "/api/v1/locations?ids=8da2450e-a2fa-0f13-f2e6-ff8498a1fcf1&usage=all&include_archived=true&counts=false&limit=100": {
+      "class": "list",
+      "path": "/api/v1/locations?ids=8da2450e-a2fa-0f13-f2e6-ff8498a1fcf1&usage=all&include_archived=true&counts=false&limit=100",
+      "status": 200,
+      "runs": 20,
+      "p50": 36.9,
+      "p95": 42.5,
+      "max": 53.2,
+      "bytes": 946
+    },
+    "/api/v1/warehouse/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c/packages": {
+      "class": "list",
+      "path": "/api/v1/warehouse/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c/packages",
+      "status": 200,
+      "runs": 20,
+      "p50": 70.7,
+      "p95": 80.6,
+      "max": 92.2,
+      "bytes": 2649
+    },
+    "/api/v1/stock-moves?reference_type=document&reference_id=735ff1ce-c690-17e6-d2e9-daf3253bfb2c&limit=20": {
+      "class": "list",
+      "path": "/api/v1/stock-moves?reference_type=document&reference_id=735ff1ce-c690-17e6-d2e9-daf3253bfb2c&limit=20",
+      "status": 200,
+      "runs": 20,
+      "p50": 24.3,
+      "p95": 26.8,
+      "max": 28.3,
+      "bytes": 10795
+    },
+    "/api/v1/locations?ids=061e1dd2-c038-aa85-85b7-6ae64f7221ec&ids=49c6b2bf-6c05-e066-0ffb-2364bedac87a&ids=64a444bc-7aaf-23ce-2cf9-bc7c5ca14ca2&ids=6fb2ac7b-5aa0-7a44-4afd-1a84f24660e6&ids=7fe09be8-999e-76f9-6e39-fb1d3d06fac0&ids=872a490e-29dc-0f43-e347-b3605b64b512&ids=96e9c197-9450-09c2-74dc-8671588fa7ff&ids=9e1c49bf-4489-336e-7ce4-cc75ca3edd46&ids=a0fa610f-6a29-9d93-319d-1aa54fba56f5&ids=b24c4ed0-48d2-0a7d-398e-dcd21e1763b5&ids=ba099cfd-2110-a36e-1cfc-a9970d99452d&ids=c9e675a9-2169-7084-aca1-d48c9b63dc1f&usage=all&include_archived=true&counts=false&limit=100": {
+      "class": "list",
+      "path": "/api/v1/locations?ids=061e1dd2-c038-aa85-85b7-6ae64f7221ec&ids=49c6b2bf-6c05-e066-0ffb-2364bedac87a&ids=64a444bc-7aaf-23ce-2cf9-bc7c5ca14ca2&ids=6fb2ac7b-5aa0-7a44-4afd-1a84f24660e6&ids=7fe09be8-999e-76f9-6e39-fb1d3d06fac0&ids=872a490e-29dc-0f43-e347-b3605b64b512&ids=96e9c197-9450-09c2-74dc-8671588fa7ff&ids=9e1c49bf-4489-336e-7ce4-cc75ca3edd46&ids=a0fa610f-6a29-9d93-319d-1aa54fba56f5&ids=b24c4ed0-48d2-0a7d-398e-dcd21e1763b5&ids=ba099cfd-2110-a36e-1cfc-a9970d99452d&ids=c9e675a9-2169-7084-aca1-d48c9b63dc1f&usage=all&include_archived=true&counts=false&limit=100",
+      "status": 200,
+      "runs": 20,
+      "p50": 39.8,
+      "p95": 44.2,
+      "max": 45.7,
+      "bytes": 11455
+    },
+    "/api/v1/warehouse/documents?ids=735ff1ce-c690-17e6-d2e9-daf3253bfb2c&limit=100": {
+      "class": "list",
+      "path": "/api/v1/warehouse/documents?ids=735ff1ce-c690-17e6-d2e9-daf3253bfb2c&limit=100",
+      "status": 200,
+      "runs": 20,
+      "p50": 54.5,
+      "p95": 60.1,
+      "max": 65.8,
+      "bytes": 1444
+    },
+    "/api/v1/stock-moves?exclude_module_contexts=true&limit=50": {
+      "class": "list",
+      "path": "/api/v1/stock-moves?exclude_module_contexts=true&limit=50",
+      "status": 200,
+      "runs": 20,
+      "p50": 1130.0,
+      "p95": 1173.0,
+      "max": 1175.1,
+      "bytes": 45650
+    },
+    "/api/v1/locations?ids=005761e4-f67e-edb9-d7ef-fb12eef71aa4&ids=04531fe8-b5a2-5972-a6de-36ed581021b7&ids=061e1dd2-c038-aa85-85b7-6ae64f7221ec&ids=0647a466-0476-b8f0-df05-ad63b8ffd6c6&ids=0897cbf3-8d46-bdd6-9482-252462006b0f&ids=18a0a375-3902-49c2-b127-1f7ebd2d9282&ids=1b437508-45c1-46eb-f72d-6f718672ca22&ids=2ee3e64e-8a1a-aa70-6930-8e9553160932&ids=45b2a052-a8e3-b0c1-7498-a176f887e4b8&ids=49c6b2bf-6c05-e066-0ffb-2364bedac87a&ids=4a2287a1-c5b9-45bf-79eb-7784452943a8&ids=4b038257-bc6d-8b36-137c-f928e4b118e3&ids=4b51be8e-010d-2a52-f3f8-2101883c7202&ids=545bbfad-be51-f4e1-e54c-4d0f72a148a6&ids=56ef910e-0cbb-5462-3fd0-f35875db91e9&ids=5e58d636-a734-8e77-3206-53ceb7413d99&ids=5ef632b5-24ac-6741-59f5-43b620e998e3&ids=64a444bc-7aaf-23ce-2cf9-bc7c5ca14ca2&ids=6f0a0549-880b-f9fb-af3e-a5908404c0bf&ids=6fb2ac7b-5aa0-7a44-4afd-1a84f24660e6&ids=705ebd93-107c-f04a-0182-353e735e58aa&ids=71cf9984-cef4-5766-6d4c-be5435d15b55&ids=73e2777f-88f5-e2cd-96a8-d52fb548a21c&ids=78181885-f19c-ff2e-6f07-f3dabfa8c1f4&ids=78347322-e1a1-334a-24c6-f11623c7c154&ids=7b78aa1a-f535-24cb-d2c7-f515ac74b47c&ids=7f52edf6-a764-ecdb-8f7c-0d2179bf3958&ids=7fe09be8-999e-76f9-6e39-fb1d3d06fac0&ids=80c583bb-9466-41e0-480a-39d19d272898&ids=82cb8792-a1d9-f3ce-41c4-44be35811534&ids=85917638-212a-3114-5344-a718e5e64a2f&ids=85974d4d-f98c-fd76-aa1b-d994b9f6534d&ids=8cdc518d-777c-ec83-89a6-cd888b65cd47&ids=8e347485-56d0-86aa-1302-0c4600d054ac&ids=91ba8bc1-b9f2-3f93-b01e-c2994fe3479f&ids=93a0e899-1774-1d41-e606-6c734815d57e&ids=984a6ae4-4896-828c-91fa-07d672869f5c&ids=9992d99d-cafc-c637-c93c-a34237fb5711&ids=9a084d7f-da73-a436-0644-7d969db7fc18&ids=9e1c49bf-4489-336e-7ce4-cc75ca3edd46&ids=a8b8d8fa-aa47-5123-7363-92abfd675ee2&ids=a93ba596-c370-cf14-1794-087e01e7154d&ids=b849753c-0d88-b1f3-e3af-4556ff020a17&ids=caadb0ed-ab04-33a2-cdaf-01fdb40e8858&ids=dcb1e6ad-dddc-8305-6d51-9e9528b55e17&ids=dd8cdb41-0659-02f4-e54d-be366f0658c3&ids=ecbf2465-a1db-44b9-c885-196a2b7baf38&ids=f9b49808-007c-fd50-3481-4fe5ea18faa2&ids=fe544011-60af-3424-c857-24f789bcdd70&usage=all&include_archived=true&counts=false&limit=100": {
+      "class": "list",
+      "path": "/api/v1/locations?ids=005761e4-f67e-edb9-d7ef-fb12eef71aa4&ids=04531fe8-b5a2-5972-a6de-36ed581021b7&ids=061e1dd2-c038-aa85-85b7-6ae64f7221ec&ids=0647a466-0476-b8f0-df05-ad63b8ffd6c6&ids=0897cbf3-8d46-bdd6-9482-252462006b0f&ids=18a0a375-3902-49c2-b127-1f7ebd2d9282&ids=1b437508-45c1-46eb-f72d-6f718672ca22&ids=2ee3e64e-8a1a-aa70-6930-8e9553160932&ids=45b2a052-a8e3-b0c1-7498-a176f887e4b8&ids=49c6b2bf-6c05-e066-0ffb-2364bedac87a&ids=4a2287a1-c5b9-45bf-79eb-7784452943a8&ids=4b038257-bc6d-8b36-137c-f928e4b118e3&ids=4b51be8e-010d-2a52-f3f8-2101883c7202&ids=545bbfad-be51-f4e1-e54c-4d0f72a148a6&ids=56ef910e-0cbb-5462-3fd0-f35875db91e9&ids=5e58d636-a734-8e77-3206-53ceb7413d99&ids=5ef632b5-24ac-6741-59f5-43b620e998e3&ids=64a444bc-7aaf-23ce-2cf9-bc7c5ca14ca2&ids=6f0a0549-880b-f9fb-af3e-a5908404c0bf&ids=6fb2ac7b-5aa0-7a44-4afd-1a84f24660e6&ids=705ebd93-107c-f04a-0182-353e735e58aa&ids=71cf9984-cef4-5766-6d4c-be5435d15b55&ids=73e2777f-88f5-e2cd-96a8-d52fb548a21c&ids=78181885-f19c-ff2e-6f07-f3dabfa8c1f4&ids=78347322-e1a1-334a-24c6-f11623c7c154&ids=7b78aa1a-f535-24cb-d2c7-f515ac74b47c&ids=7f52edf6-a764-ecdb-8f7c-0d2179bf3958&ids=7fe09be8-999e-76f9-6e39-fb1d3d06fac0&ids=80c583bb-9466-41e0-480a-39d19d272898&ids=82cb8792-a1d9-f3ce-41c4-44be35811534&ids=85917638-212a-3114-5344-a718e5e64a2f&ids=85974d4d-f98c-fd76-aa1b-d994b9f6534d&ids=8cdc518d-777c-ec83-89a6-cd888b65cd47&ids=8e347485-56d0-86aa-1302-0c4600d054ac&ids=91ba8bc1-b9f2-3f93-b01e-c2994fe3479f&ids=93a0e899-1774-1d41-e606-6c734815d57e&ids=984a6ae4-4896-828c-91fa-07d672869f5c&ids=9992d99d-cafc-c637-c93c-a34237fb5711&ids=9a084d7f-da73-a436-0644-7d969db7fc18&ids=9e1c49bf-4489-336e-7ce4-cc75ca3edd46&ids=a8b8d8fa-aa47-5123-7363-92abfd675ee2&ids=a93ba596-c370-cf14-1794-087e01e7154d&ids=b849753c-0d88-b1f3-e3af-4556ff020a17&ids=caadb0ed-ab04-33a2-cdaf-01fdb40e8858&ids=dcb1e6ad-dddc-8305-6d51-9e9528b55e17&ids=dd8cdb41-0659-02f4-e54d-be366f0658c3&ids=ecbf2465-a1db-44b9-c885-196a2b7baf38&ids=f9b49808-007c-fd50-3481-4fe5ea18faa2&ids=fe544011-60af-3424-c857-24f789bcdd70&usage=all&include_archived=true&counts=false&limit=100",
+      "status": 200,
+      "runs": 20,
+      "p50": 43.7,
+      "p95": 46.8,
+      "max": 50.5,
+      "bytes": 46527
+    },
+    "/api/v1/warehouse/documents?ids=0582abaa-3f89-a5db-1c9a-d17ef253acc2&ids=0d8e4dd1-b7cc-1838-9697-068fb6a70780&ids=0f3e2675-1dd2-6362-833b-722256ccccf5&ids=14a4a3c1-7893-ed43-60a0-7845d0edb70b&ids=207f53c1-bff3-777a-5edd-d2cf7ec45879&ids=22af81ec-4975-c263-f504-5b2d84a49848&ids=26127ab2-fd70-c754-94d6-b8475fef8579&ids=392cef6e-ae45-0ecd-c98c-7b0d7a16523f&ids=3bee512f-17f6-f8c2-485c-dd815c34432d&ids=3e25a575-3a10-6f6a-8171-0e30ca1a7a60&ids=409752da-b07b-433a-e3d3-89c0e9079467&ids=442fbb9e-c29d-bbe1-5d33-ec3ca405f422&ids=45ed82ce-f8eb-8984-1de4-b4cd421a4cd2&ids=53d1c526-27e0-92ae-b370-031bfa200778&ids=5dd6f24a-1af8-e5a9-b8b9-1ae1aa646912&ids=63adb36d-d5de-c983-4bd7-20d970b4536d&ids=655fdd9a-2899-b030-fafc-04b510149660&ids=6c8d62ad-2b60-d9f3-a277-75dd5f1a300e&ids=734c06c6-fd69-6ae8-f0f9-cfe81f609d9d&ids=735ff1ce-c690-17e6-d2e9-daf3253bfb2c&ids=7c7bc1da-d143-4242-9cf6-071c7bcbc29f&ids=7ed954fc-f7c1-a6ef-260c-61238e59d051&ids=80bc0c35-f528-3438-f2b4-c738e94789b4&ids=81060af1-d966-e115-5095-5d347705f519&ids=88033b73-dac7-3584-5b45-18e9bf280f44&ids=9a897fe1-2df1-1c7d-0224-370dd6b697d4&ids=9c57f1cf-7cc7-b672-5783-5ae334cdb3da&ids=9e3e6f25-cb61-65d1-4a80-78d9fe032977&ids=9e7bb5db-b29c-e825-35c7-d45e91c3cd23&ids=a12f03bc-1449-3c01-4801-d6b7eb9ab4fd&ids=a4cfe7cf-8536-d7a1-935e-e28deb6e01af&ids=a5efc4f3-f727-0a32-767b-975ce0c07e9d&ids=a64b4553-2e7f-179d-320f-d5fe6d47ddc4&ids=adfca9e2-da6b-309b-866f-fa035a21d04e&ids=b3840558-9a11-2895-9a96-f28e17d5c2fa&ids=c8d6567e-3a23-6146-4ef1-fe702ddb735f&ids=dbf104b7-9392-39d2-7373-33e54a7b30bf&ids=dfc3ddae-f921-1642-1436-13a28e4c2584&ids=f25b8011-0e5c-c976-e72f-69eb5387d494&ids=fb01fe65-6903-2a28-f0df-e941c9183c1f&ids=fb65c744-4802-8be7-3b53-62bf66a031f2&ids=fbeeefe8-af70-ad86-989f-a64e6c45a028&ids=ff26cc92-60ab-a795-ba23-ae2d81ebfb1f&limit=100": {
+      "class": "list",
+      "path": "/api/v1/warehouse/documents?ids=0582abaa-3f89-a5db-1c9a-d17ef253acc2&ids=0d8e4dd1-b7cc-1838-9697-068fb6a70780&ids=0f3e2675-1dd2-6362-833b-722256ccccf5&ids=14a4a3c1-7893-ed43-60a0-7845d0edb70b&ids=207f53c1-bff3-777a-5edd-d2cf7ec45879&ids=22af81ec-4975-c263-f504-5b2d84a49848&ids=26127ab2-fd70-c754-94d6-b8475fef8579&ids=392cef6e-ae45-0ecd-c98c-7b0d7a16523f&ids=3bee512f-17f6-f8c2-485c-dd815c34432d&ids=3e25a575-3a10-6f6a-8171-0e30ca1a7a60&ids=409752da-b07b-433a-e3d3-89c0e9079467&ids=442fbb9e-c29d-bbe1-5d33-ec3ca405f422&ids=45ed82ce-f8eb-8984-1de4-b4cd421a4cd2&ids=53d1c526-27e0-92ae-b370-031bfa200778&ids=5dd6f24a-1af8-e5a9-b8b9-1ae1aa646912&ids=63adb36d-d5de-c983-4bd7-20d970b4536d&ids=655fdd9a-2899-b030-fafc-04b510149660&ids=6c8d62ad-2b60-d9f3-a277-75dd5f1a300e&ids=734c06c6-fd69-6ae8-f0f9-cfe81f609d9d&ids=735ff1ce-c690-17e6-d2e9-daf3253bfb2c&ids=7c7bc1da-d143-4242-9cf6-071c7bcbc29f&ids=7ed954fc-f7c1-a6ef-260c-61238e59d051&ids=80bc0c35-f528-3438-f2b4-c738e94789b4&ids=81060af1-d966-e115-5095-5d347705f519&ids=88033b73-dac7-3584-5b45-18e9bf280f44&ids=9a897fe1-2df1-1c7d-0224-370dd6b697d4&ids=9c57f1cf-7cc7-b672-5783-5ae334cdb3da&ids=9e3e6f25-cb61-65d1-4a80-78d9fe032977&ids=9e7bb5db-b29c-e825-35c7-d45e91c3cd23&ids=a12f03bc-1449-3c01-4801-d6b7eb9ab4fd&ids=a4cfe7cf-8536-d7a1-935e-e28deb6e01af&ids=a5efc4f3-f727-0a32-767b-975ce0c07e9d&ids=a64b4553-2e7f-179d-320f-d5fe6d47ddc4&ids=adfca9e2-da6b-309b-866f-fa035a21d04e&ids=b3840558-9a11-2895-9a96-f28e17d5c2fa&ids=c8d6567e-3a23-6146-4ef1-fe702ddb735f&ids=dbf104b7-9392-39d2-7373-33e54a7b30bf&ids=dfc3ddae-f921-1642-1436-13a28e4c2584&ids=f25b8011-0e5c-c976-e72f-69eb5387d494&ids=fb01fe65-6903-2a28-f0df-e941c9183c1f&ids=fb65c744-4802-8be7-3b53-62bf66a031f2&ids=fbeeefe8-af70-ad86-989f-a64e6c45a028&ids=ff26cc92-60ab-a795-ba23-ae2d81ebfb1f&limit=100",
+      "status": 200,
+      "runs": 20,
+      "p50": 102.2,
+      "p95": 119.4,
+      "max": 291.7,
+      "bytes": 58308
+    },
+    "/api/v1/stock-as-of?as_of=2026-11-24&limit=50&offset=N": {
+      "class": "report",
+      "path": "/api/v1/stock-as-of?as_of=2026-11-24&limit=50&offset=0",
+      "status": 200,
+      "runs": 5,
+      "p50": 2576.3,
+      "p95": 2702.5,
+      "max": 2702.5,
+      "bytes": 8554
+    },
+    "/api/v1/stats/by-location?limit=200&offset=N": {
+      "class": "report",
+      "path": "/api/v1/stats/by-location?limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 189.1,
+      "p95": 348.2,
+      "max": 352.2,
+      "bytes": 29802
+    },
+    "/api/v1/stats/expiry-forecast": {
+      "class": "report",
+      "path": "/api/v1/stats/expiry-forecast",
+      "status": 200,
+      "runs": 20,
+      "p50": 274.1,
+      "p95": 290.6,
+      "max": 296.6,
+      "bytes": 211
+    },
+    "/api/v1/stats/by-category?limit=200&offset=N": {
+      "class": "report",
+      "path": "/api/v1/stats/by-category?limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 304.3,
+      "p95": 326.1,
+      "max": 347.9,
+      "bytes": 9126
+    },
+    "/api/v1/stats/cost-analysis?period=month": {
+      "class": "report",
+      "path": "/api/v1/stats/cost-analysis?period=month",
+      "status": 200,
+      "runs": 20,
+      "p50": 1028.9,
+      "p95": 1067.8,
+      "max": 1111.9,
+      "bytes": 1346
+    },
+    "/api/v1/stats/expense-forecast?period=month": {
+      "class": "report",
+      "path": "/api/v1/stats/expense-forecast?period=month",
+      "status": 200,
+      "runs": 20,
+      "p50": 19.2,
+      "p95": 27.3,
+      "max": 27.8,
+      "bytes": 1138
+    },
+    "/api/v1/stats/rotation-analysis": {
+      "class": "report",
+      "path": "/api/v1/stats/rotation-analysis",
+      "status": 200,
+      "runs": 20,
+      "p50": 24.7,
+      "p95": 27.1,
+      "max": 31.7,
+      "bytes": 124793
+    },
+    "/api/v1/stats/smart-alerts": {
+      "class": "report",
+      "path": "/api/v1/stats/smart-alerts",
+      "status": 200,
+      "runs": 20,
+      "p50": 1645.4,
+      "p95": 1918.7,
+      "max": 1980.7,
+      "bytes": 524100
+    },
+    "/api/v1/stats/purchase-patterns": {
+      "class": "report",
+      "path": "/api/v1/stats/purchase-patterns",
+      "status": 200,
+      "runs": 20,
+      "p50": 113.9,
+      "p95": 131.4,
+      "max": 136.9,
+      "bytes": 3374
+    },
+    "/api/v1/stats/reconciliation": {
+      "class": "report",
+      "path": "/api/v1/stats/reconciliation",
+      "status": 200,
+      "runs": 5,
+      "p50": 2225.9,
+      "p95": 2481.0,
+      "max": 2481.0,
+      "bytes": 162
+    },
+    "/api/v1/stock-takes?offset=N&limit=50": {
+      "class": "list",
+      "path": "/api/v1/stock-takes?offset=0&limit=50",
+      "status": 200,
+      "runs": 20,
+      "p50": 22.0,
+      "p95": 24.8,
+      "max": 25.9,
+      "bytes": 82
+    },
+    "/api/v1/purchase-orders/settings": {
+      "class": "list",
+      "path": "/api/v1/purchase-orders/settings",
+      "status": 200,
+      "runs": 20,
+      "p50": 19.1,
+      "p95": 22.5,
+      "max": 23.9,
+      "bytes": 240
+    },
+    "/api/v1/purchase-orders?limit=50&offset=N": {
+      "class": "list",
+      "path": "/api/v1/purchase-orders?limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 43.9,
+      "p95": 50.2,
+      "max": 53.0,
+      "bytes": 40538
+    },
+    "/api/v1/purchase-orders/6535dcf5-e217-cecd-9a8d-abe304ca2357": {
+      "class": "list",
+      "path": "/api/v1/purchase-orders/6535dcf5-e217-cecd-9a8d-abe304ca2357",
+      "status": 200,
+      "runs": 20,
+      "p50": 32.5,
+      "p95": 40.4,
+      "max": 44.6,
+      "bytes": 7052
+    },
+    "/api/v1/approvals/requests?target_type=purchase_order": {
+      "class": "list",
+      "path": "/api/v1/approvals/requests?target_type=purchase_order",
+      "status": 200,
+      "runs": 20,
+      "p50": 19.6,
+      "p95": 23.8,
+      "max": 25.3,
+      "bytes": 83
+    },
+    "/api/v1/approvals/workflows/configured?target_type=purchase_order": {
+      "class": "list",
+      "path": "/api/v1/approvals/workflows/configured?target_type=purchase_order",
+      "status": 200,
+      "runs": 20,
+      "p50": 17.6,
+      "p95": 20.2,
+      "max": 20.3,
+      "bytes": 20
+    },
+    "/api/v1/purchase-orders/6535dcf5-e217-cecd-9a8d-abe304ca2357/linked-receipts?limit=200&offset=N": {
+      "class": "list",
+      "path": "/api/v1/purchase-orders/6535dcf5-e217-cecd-9a8d-abe304ca2357/linked-receipts?limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 58.9,
+      "p95": 74.8,
+      "max": 88.1,
+      "bytes": 254
+    },
+    "/api/v1/partners/7fba7487-4566-97c1-1057-ce1db223f89e": {
+      "class": "list",
+      "path": "/api/v1/partners/7fba7487-4566-97c1-1057-ce1db223f89e",
+      "status": 200,
+      "runs": 20,
+      "p50": 16.4,
+      "p95": 19.1,
+      "max": 20.7,
+      "bytes": 474
+    }
+  },
+  "browser_machine": {
+    "cores": 24,
+    "memory_gib": 61.0
+  },
+  "fixtures": {
+    "org": "60692dbe-4586-470b-9280-1716f97612eb",
+    "products": 100000,
+    "shelf": "d049a11a-bc38-b377-8eee-1df7676206a7",
+    "shelf_code": "A05-002-3",
+    "rack": "04314e9a-14d6-2d29-4736-79a74ed54e8c",
+    "zone": "e45992de-9c53-558b-91c2-5c9c733e9c47",
+    "warehouse": "8da2450e-a2fa-0f13-f2e6-ff8498a1fcf1",
+    "barcode": "2900000333338",
+    "template": "5fc17411-235e-60ca-b922-3b31db70a823",
+    "sku": "SKU-0033333",
+    "record": "8f1d04d7-8306-f182-7789-fb55dcf05a0e",
+    "category": "cbed3796-eea1-ab16-c624-c370dacf4ab8",
+    "po": "6535dcf5-e217-cecd-9a8d-abe304ca2357",
+    "document": "735ff1ce-c690-17e6-d2e9-daf3253bfb2c",
+    "document_number": "OUT/2026/051104"
+  },
+  "load_after_reads": [
+    0.7,
+    0.8,
+    0.8
+  ],
+  "load_after_screens": [
+    0.7,
+    0.8,
+    0.8
+  ],
+  "writes": {
+    "purchase order: create, 200 lines": {
+      "class": "write",
+      "ms": 1484.0,
+      "status": 201,
+      "bytes": 77736
+    },
+    "purchase order: confirm": {
+      "class": "write",
+      "ms": 114.2,
+      "status": 200,
+      "bytes": 77799
+    },
+    "receipt from the order, 200 lines": {
+      "class": "write",
+      "ms": 1250.4,
+      "status": 201,
+      "bytes": 88618
+    },
+    "receipt: confirm": {
+      "class": "write",
+      "ms": 117.8,
+      "status": 200,
+      "bytes": 271009
+    },
+    "receipt: post (complete), 200 lines": {
+      "class": "write",
+      "ms": 4463.4,
+      "status": 200,
+      "bytes": 286740
+    },
+    "receipt: undo, 200 lines": {
+      "class": "write",
+      "ms": 3081.2,
+      "status": 200,
+      "bytes": 278200
+    },
+    "dispatch 1: create, 8 lines": {
+      "class": "write",
+      "ms": 488.8,
+      "status": 201,
+      "bytes": 12078
+    },
+    "dispatch 1: confirm": {
+      "class": "write",
+      "ms": 1463.5,
+      "status": 200,
+      "bytes": 12642
+    },
+    "dispatch 2: create, 8 lines": {
+      "class": "write",
+      "ms": 536.8,
+      "status": 201,
+      "bytes": 12088
+    },
+    "dispatch 2: confirm": {
+      "class": "write",
+      "ms": 1240.0,
+      "status": 200,
+      "bytes": 12653
+    },
+    "dispatch 3: create, 8 lines": {
+      "class": "write",
+      "ms": 463.4,
+      "status": 201,
+      "bytes": 12108
+    },
+    "dispatch 3: confirm": {
+      "class": "write",
+      "ms": 1564.9,
+      "status": 200,
+      "bytes": 12674
+    },
+    "dispatch 4: create, 8 lines": {
+      "class": "write",
+      "ms": 533.4,
+      "status": 201,
+      "bytes": 12094
+    },
+    "dispatch 4: confirm": {
+      "class": "write",
+      "ms": 2151.9,
+      "status": 200,
+      "bytes": 12659
+    },
+    "dispatch 5: create, 8 lines": {
+      "class": "write",
+      "ms": 486.4,
+      "status": 201,
+      "bytes": 12095
+    },
+    "dispatch 5: confirm": {
+      "class": "write",
+      "ms": 1681.5,
+      "status": 200,
+      "bytes": 12661
+    },
+    "picking: start 5 dispatches together": {
+      "class": "write",
+      "ms": 2903.4,
+      "status": 201,
+      "bytes": 26338
+    },
+    "picking: the pick list": {
+      "class": "lookup",
+      "ms": 192.0,
+      "status": 200,
+      "bytes": 26420
+    },
+    "picking: cancel": {
+      "class": "write",
+      "ms": 53.1,
+      "status": 204,
+      "bytes": 0
+    },
+    "dispatch 1: cancel": {
+      "class": "write",
+      "ms": 471.6,
+      "status": 200,
+      "bytes": 12328
+    },
+    "dispatch 2: cancel": {
+      "class": "write",
+      "ms": 512.3,
+      "status": 200,
+      "bytes": 12339
+    },
+    "dispatch 3: cancel": {
+      "class": "write",
+      "ms": 718.8,
+      "status": 200,
+      "bytes": 12360
+    },
+    "dispatch 4: cancel": {
+      "class": "write",
+      "ms": 632.5,
+      "status": 200,
+      "bytes": 12345
+    },
+    "dispatch 5: cancel": {
+      "class": "write",
+      "ms": 605.3,
+      "status": 200,
+      "bytes": 12347
+    },
+    "stock take of a shelf: create": {
+      "class": "write",
+      "ms": 426.7,
+      "status": 201,
+      "bytes": 589
+    },
+    "stock take: count 50 records": {
+      "class": "write",
+      "ms": 357.4,
+      "status": 200,
+      "bytes": 40177
+    },
+    "stock take: complete": {
+      "class": "write",
+      "ms": 117.5,
+      "status": 400,
+      "bytes": 102,
+      "error": "{'detail': {'code': 'STOCK_TAKE_UNCOUNTED_ITEMS', 'message': '483 uncounted items remaining', 'lang': 'en'}}"
+    },
+    "export: one zone (xlsx)": {
+      "class": "report",
+      "ms": 79.9,
+      "status": 200,
+      "bytes": 6006
+    },
+    "export: every record (xlsx)": {
+      "class": "bulk",
+      "ms": 238301.3,
+      "status": 200,
+      "bytes": 31657065
+    },
+    "import: 10,000 rows in all, until the job was done": {
+      "class": "bulk",
+      "ms": 555634.9,
+      "status": 200,
+      "bytes": 0,
+      "rows_per_s": 18.0
+    }
+  },
+  "finished": "2026-11-23T23:36:59.574404+00:00",
+  "load_after": [
+    1.2,
+    1.0,
+    0.9
+  ],
+  "halves": {
+    "reads": {
+      "measured": "2026-11-23",
+      "tree": "6252f2d (v0.13.0)",
+      "machine": {
+        "cores": 4,
+        "memory_gib": 7.6
+      }
+    },
+    "screens": {
+      "measured": "2026-11-23",
+      "tree": "6252f2d (v0.13.0)",
+      "machine": {
+        "cores": 24,
+        "memory_gib": 61.0
+      },
+      "note": "the workstation was under load (load average 26-44), so the phone times are pessimistic"
+    },
+    "writes": {
+      "measured": "2026-11-24 00:00 UTC",
+      "tree": "6252f2d (v0.13.0)",
+      "note": "run again with samplers that read a shelf past its first page; the 10 000-row import entry is from the earlier pass of 23:37-23:46 UTC (timed until its job was done), the 00:00 pass imported 1 000 rows and did not wait"
+    }
+  }
+}

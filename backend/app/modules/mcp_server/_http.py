@@ -21,8 +21,13 @@ from typing import Any
 
 from mcp.server.caching import CacheHint
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError, UnexpectedToolError
 from mcp.server.transport_security import TransportSecuritySettings
+from pydantic import ValidationError
 
+from app.core.module_sdk import get_current_lang, get_module_error_message
+
+from ._identity import MODULE_NAME
 from .resources import register_resources
 from .tools import register_tools
 
@@ -38,9 +43,91 @@ to; a tool refuses when the key does not hold the permission it needs.
 """
 
 
+def _expected(prop: dict[str, Any], schema: dict[str, Any]) -> str:
+    """The type an argument takes, in the words of its published schema.
+
+    ``string (uuid)``, ``integer``, ``"active" | "expired"``: the vocabulary of
+    JSON Schema, which the agent reads in ``tools/list`` beside it, and which
+    no reader's language translates.
+    """
+    kinds: list[str] = []
+    for option in prop.get('anyOf') or [prop]:
+        ref = option.get('$ref', '')
+        if ref.startswith('#/$defs/'):
+            option = schema.get('$defs', {}).get(ref.removeprefix('#/$defs/'), {})
+        if 'enum' in option:
+            kinds.append(' | '.join(json.dumps(value) for value in option['enum']))
+        elif option.get('type') not in (None, 'null'):
+            kind = str(option['type'])
+            kinds.append(f'{kind} ({option["format"]})' if 'format' in option else kind)
+    return ' or '.join(kinds) or 'object'
+
+
+def _argument_refusal(schema: dict[str, Any], error: ValidationError) -> ToolError:
+    """One named refusal for arguments that break a tool's input schema.
+
+    Each argument at fault is named once, with what its schema says it is;
+    the values the caller sent stay out of the answer and out of the log.
+    """
+    properties = schema.get('properties', {})
+    lang = get_current_lang()
+    codes: list[str] = []
+    sentences: list[str] = []
+    named: set[str] = set()
+    for problem in error.errors():
+        argument = str(problem['loc'][0]) if problem['loc'] else 'arguments'
+        # A union type fails once per member; the argument is named once.
+        if argument in named:
+            continue
+        named.add(argument)
+        prop = properties.get(argument, {})
+        missing = problem['type'] == 'missing'
+        codes.append('ARGUMENT_REQUIRED' if missing else 'ARGUMENT_INVALID')
+        sentences.append(
+            get_module_error_message(
+                MODULE_NAME,
+                'argument_required' if missing else 'argument_invalid',
+                lang,
+                argument=argument,
+                expected=_expected(prop, schema),
+                description=prop.get('description', ''),
+            ).strip()
+        )
+    return ToolError(f'{codes[0]}: {" ".join(sentences)}')
+
+
+class _InventariServer(MCPServer):
+    """The SDK's server, with every refusal worded by this module.
+
+    The SDK answers arguments that break a tool's input schema with pydantic's
+    own text ("1 validation error for get_itemArguments ... errors.pydantic.dev"),
+    and puts "Error executing tool <name>: " in front of every refusal a tool
+    raises. An agent can act on neither. Here an argument failure is one named
+    refusal from the module's catalog, worded from the schema the agent was
+    given, and a tool's own refusal reaches the agent as the tool wrote it.
+    """
+
+    async def call_tool(
+        self, name: str, arguments: dict[str, Any], context: Any = None
+    ) -> Any:
+        try:
+            return await super().call_tool(name, arguments, context)
+        except UnexpectedToolError:
+            raise
+        except ToolError as exc:
+            cause = exc.__cause__
+            if isinstance(cause, ValidationError):
+                tools = await self.list_tools()
+                schema = next((t.input_schema for t in tools if t.name == name), {})
+                raise _argument_refusal(schema, cause) from cause
+            if isinstance(cause, ToolError):
+                raise cause from cause.__cause__
+            raise
+
+
 def build_server() -> MCPServer:
     """Build one MCP server with the module's tools, resources and cache hints."""
-    server: MCPServer = MCPServer(
+    server: MCPServer = _InventariServer(
         name='inventari',
         title='Inventari',
         description=_MANIFEST['description'],

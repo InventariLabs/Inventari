@@ -173,6 +173,8 @@ class ErrorMessages(TypedDict):
     insufficient_quantity: str
     file_type_not_allowed: str
     file_signature_mismatch: str
+    request_body_too_large: str
+    file_too_large_limit: str
     file_too_large: str
     file_type_not_allowed_list: str
     file_content_type_missing: str
@@ -557,6 +559,7 @@ class ErrorMessages(TypedDict):
     document_correction_not_duplicable: str
     field_cannot_be_cleared: str
     ingredient_defaults_unreadable_file: str
+    name_has_no_latin_form: str
     ingredient_default_name_has_no_key: str
     onboarding_modules_not_offered: str
     location_chain_step_incomplete: str
@@ -662,6 +665,7 @@ class ErrorMessages(TypedDict):
     equipment_status_transition_from_retired: str
     equipment_bulk_item_failed: str
     unknown_bulk_action: str
+    bridge_line_unit_not_convertible: str
     bom_line_unit_not_convertible: str
     bom_line_self_reference: str
     bom_line_cycle: str

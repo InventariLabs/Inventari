@@ -18,6 +18,14 @@
  *              bytes of its answer and how long it took over the phone's
  *              network. A screen that fetches the whole catalogue shows here
  *              as one answer the size of the catalogue.
+ *   documentLoads — how many times the browser loaded a document while
+ *              opening the screen: one when the application boots once, two
+ *              when it booted again (it reloads once when a chunk of its code
+ *              cannot be fetched, `src/lib/staleChunk.ts`), with the files that
+ *              failed to load beside it in `failedFiles`. The router's own
+ *              same-address `history.replaceState` at start-up is not a load.
+ *   blocked  — for a screen that never became usable, what was still missing:
+ *              no heading, a request in flight, or a loader on the page.
  *
  * The screens come from a JSON file the Python half writes (a name and a path
  * each, the ids in the path chosen from the seeded organization), and the
@@ -31,7 +39,13 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "@playwright/test";
-import { login, median, PHONE_CONTEXT, serve, throttle } from "./phone-profile.mjs";
+import {
+  login,
+  median,
+  PHONE_CONTEXT,
+  serve,
+  throttle,
+} from "./phone-profile.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
@@ -49,15 +63,36 @@ const LOADERS = '.animate-spin, .animate-pulse, [aria-busy="true"]';
 const TIMEOUT_MS = 120_000;
 
 if (!SCREENS_FILE || !OUT) {
-  console.error("measure-scale-screens: set SCALE_SCREENS (input) and SCALE_OUT (output).");
+  console.error(
+    "measure-scale-screens: set SCALE_SCREENS (input) and SCALE_OUT (output).",
+  );
   process.exit(2);
 }
 if (!existsSync(join(dist, "index.html"))) {
-  console.error("measure-scale-screens: dist/index.html not found — run `npm run build` first.");
+  console.error(
+    "measure-scale-screens: dist/index.html not found — run `npm run build` first.",
+  );
   process.exit(2);
 }
 
 const screens = JSON.parse(readFileSync(SCREENS_FILE, "utf8"));
+
+/** Why a screen did not become usable: the heading, a request, a loader. */
+async function whatIsMissing(page, headingMs, inFlight) {
+  const loaders = await page
+    .locator(LOADERS)
+    .evaluateAll(
+      (nodes) => nodes.filter((n) => n.getClientRects().length > 0).length,
+    )
+    .catch(() => 0);
+  return {
+    heading: headingMs !== null,
+    requestsInFlight: [...inFlight.keys()]
+      .slice(0, 5)
+      .map((r) => new URL(r.url()).pathname),
+    loadersShowing: loaders,
+  };
+}
 
 async function measureOnce(context, origin, screen) {
   const page = await context.newPage();
@@ -67,9 +102,11 @@ async function measureOnce(context, origin, screen) {
   const inFlight = new Map();
   const api = [];
   let lastNetworkAt = started;
-  const isApi = (request) => new URL(request.url()).pathname.startsWith("/api/");
+  const isApi = (request) =>
+    new URL(request.url()).pathname.startsWith("/api/");
   // A stream stays open for as long as the screen does; it is never "done".
-  const isStream = (request) => ["eventsource", "websocket"].includes(request.resourceType());
+  const isStream = (request) =>
+    ["eventsource", "websocket"].includes(request.resourceType());
 
   page.on("request", (request) => {
     if (isStream(request)) return;
@@ -98,11 +135,33 @@ async function measureOnce(context, origin, screen) {
   page.on("requestfailed", (request) => settle(request, true));
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
+  // A second document load is the application booting again; the files that
+  // failed to load say why.
+  let documentLoads = 0;
+  const failedFiles = [];
+  page.on("load", () => documentLoads++);
+  page.on("response", (response) => {
+    const url = new URL(response.url());
+    if (!url.pathname.startsWith("/api/") && response.status() >= 400) {
+      failedFiles.push(`${response.status()} ${url.pathname}`);
+    }
+  });
+  page.on("requestfailed", (request) => {
+    const url = new URL(request.url());
+    if (!isApi(request) && !isStream(request)) {
+      failedFiles.push(
+        `${request.failure()?.errorText ?? "failed"} ${url.pathname}`,
+      );
+    }
+  });
 
   await page.goto(`${origin}${screen.path}`, { waitUntil: "commit" });
   let headingMs = null;
   try {
-    await page.locator("h1").first().waitFor({ timeout: TIMEOUT_MS });
+    // A heading the reader can see: a page may keep a second one in a hidden
+    // part of the tree (a screen waiting on a chunk is hidden, not removed),
+    // and the first in the document is not necessarily that one.
+    await page.locator("h1:visible").first().waitFor({ timeout: TIMEOUT_MS });
     headingMs = Date.now() - started;
   } catch {
     // Recorded as a screen with no heading; the requests still say what it did.
@@ -114,7 +173,9 @@ async function measureOnce(context, origin, screen) {
     if (inFlight.size === 0 && Date.now() - lastNetworkAt >= QUIET_MS) {
       const loading = await page
         .locator(LOADERS)
-        .evaluateAll((nodes) => nodes.some((n) => n.getClientRects().length > 0))
+        .evaluateAll((nodes) =>
+          nodes.some((n) => n.getClientRects().length > 0),
+        )
         .catch(() => false);
       if (!loading) {
         settled = true;
@@ -125,11 +186,32 @@ async function measureOnce(context, origin, screen) {
     await page.waitForTimeout(100);
   }
   const quietSince = lastNetworkAt - started;
+  const blocked =
+    settled && headingMs !== null
+      ? null
+      : await whatIsMissing(page, headingMs, inFlight);
   const usableMs =
-    headingMs === null || !settled ? null : Math.max(headingMs, quietSince, loaderGoneMs);
-  const shown = await page.locator("h1").first().innerText().catch(() => "");
+    headingMs === null || !settled
+      ? null
+      : Math.max(headingMs, quietSince, loaderGoneMs);
+  const shown = await page
+    .locator("h1")
+    .first()
+    .innerText()
+    .catch(() => "");
   await page.close();
-  return { usableMs, headingMs, settled, heading: shown.trim(), api, errors, pending: inFlight.size };
+  return {
+    usableMs,
+    headingMs,
+    settled,
+    heading: shown.trim(),
+    api,
+    errors,
+    pending: inFlight.size,
+    documentLoads,
+    failedFiles,
+    blocked,
+  };
 }
 
 const server = await serve(dist, API);
@@ -139,7 +221,12 @@ const results = {};
 
 try {
   const context = await browser.newContext(PHONE_CONTEXT);
-  const { cookie } = await login({ api: API, origin, email: EMAIL, password: PASSWORD });
+  const { cookie } = await login({
+    api: API,
+    origin,
+    email: EMAIL,
+    password: PASSWORD,
+  });
   await context.addCookies([cookie]);
   for (const screen of screens) {
     const runs = [];
@@ -152,25 +239,38 @@ try {
     const timed = runs.filter((r) => r.usableMs !== null);
     // The requests of the median run, so the bytes and the time are one run's.
     const middle = timed.length
-      ? [...timed].sort((a, b) => a.usableMs - b.usableMs)[Math.floor(timed.length / 2)]
+      ? [...timed].sort((a, b) => a.usableMs - b.usableMs)[
+          Math.floor(timed.length / 2)
+        ]
       : runs[0];
     results[screen.name] = {
       path: screen.path,
       heading: middle.heading,
       // A run that never settled counts as the slowest, not as missing.
-      usableMs: timed.length * 2 > runs.length ? median(runs.map((r) => r.usableMs ?? Infinity)) : null,
+      usableMs:
+        timed.length * 2 > runs.length
+          ? median(runs.map((r) => r.usableMs ?? Infinity))
+          : null,
       headingMs: timed.length ? median(timed.map((r) => r.headingMs)) : null,
       runs: runs.map((r) => r.usableMs),
-      apiKiB: Number((middle.api.reduce((a, r) => a + r.bytes, 0) / 1024).toFixed(1)),
+      apiKiB: Number(
+        (middle.api.reduce((a, r) => a + r.bytes, 0) / 1024).toFixed(1),
+      ),
       api: middle.api.sort((a, b) => a.startedMs - b.startedMs),
       errors: [...new Set(runs.flatMap((r) => r.errors))],
+      documentLoads: middle.documentLoads,
+      failedFiles: [...new Set(runs.flatMap((r) => r.failedFiles))],
+      blocked: runs.find((r) => r.blocked)?.blocked ?? null,
     };
     const r = results[screen.name];
     const largest = Math.max(0, ...r.api.map((a) => a.bytes)) / 1024;
     console.log(
       `  ${screen.name.padEnd(24)} ${String(r.usableMs ?? "never").padStart(7)} ms usable  ` +
         `${String(r.api.length).padStart(3)} requests  ${r.apiKiB.toFixed(1).padStart(8)} KiB` +
-        `  (largest ${largest.toFixed(1)} KiB)${r.heading ? "" : "  NO HEADING"}`,
+        `  (largest ${largest.toFixed(1)} KiB)${r.heading ? "" : "  NO HEADING"}` +
+        `${r.documentLoads > 1 ? `  ${r.documentLoads} DOCUMENT LOADS` : ""}` +
+        `${r.failedFiles.length ? `  FAILED ${r.failedFiles.join(", ")}` : ""}` +
+        `${r.blocked ? `  BLOCKED ${JSON.stringify(r.blocked)}` : ""}`,
       // "never": not settled within TIMEOUT_MS — still loading, or no heading.
     );
   }

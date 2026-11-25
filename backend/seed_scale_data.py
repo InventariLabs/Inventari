@@ -11,7 +11,7 @@ script builds that organization, in the shape the posting rules produce:
   product is named and no outside catalogue is ever asked), a SKU and a unit;
 - categories whose custom fields the records fill in;
 - one warehouse four levels deep — zones, racks, shelves (``--shelves``,
-  2 000 by default, however large the catalogue) — plus a receiving zone of
+  880 by default, however large the catalogue) — plus a receiving zone of
   dock lanes;
 - about three records per product spread across the shelves, a third of the
   products batch-tracked with an expiry date on most batches, every group of
@@ -46,6 +46,7 @@ import argparse
 import json
 import math
 import os
+import re
 import sys
 import time
 from datetime import UTC, datetime
@@ -289,6 +290,9 @@ def _say(message: str) -> None:
     print(message, flush=True)
 
 
+_INSERT_TARGET = re.compile(r'\s*INSERT\s+INTO\s+(\w+)', re.IGNORECASE)
+
+
 class _Steps:
     """Runs the seed's statements one step at a time and says how long each took."""
 
@@ -299,22 +303,39 @@ class _Steps:
 
     def run(self, label: str, *statements: tuple[str, dict] | str) -> int:
         began = time.monotonic()
-        rows = 0
+        written: dict[str, int] = {}
+        staged = 0
         for statement in statements:
             sql, params = statement if isinstance(statement, tuple) else (statement, {})
             result = self.conn.execute(text(sql), params)
-            rows += max(result.rowcount or 0, 0)
+            count = max(result.rowcount or 0, 0)
+            inserted = _INSERT_TARGET.match(sql)
+            if inserted:
+                table = inserted.group(1)
+                written[table] = written.get(table, 0) + count
+            else:
+                staged += count
+        # A step names the tables it fills: the rows of its INSERTs, one line
+        # per table, not the temporary staging tables built on the way. A step
+        # that only stages (the records' staging) counts what it staged.
         took = time.monotonic() - began
         self.timings[label] = round(took, 1)
-        _say(f'  {label:<34} {rows:>11,} rows  {took:7.1f} s')
-        return rows
+        if len(written) > 1:
+            _say(f'  {label:<34} {"":>11}       {took:7.1f} s')
+            for table, count in written.items():
+                _say(f'    {table:<32} {count:>11,} rows')
+        else:
+            rows = sum(written.values()) if written else staged
+            _say(f'  {label:<34} {rows:>11,} rows  {took:7.1f} s')
+        return sum(written.values()) if written else staged
 
 
-#: Shelves of the one warehouse, whatever the size of the catalogue. A small
-#: or medium business has hundreds to a few thousand places to put things,
-#: and a shelf of small parts holds hundreds of products: the catalogue grows,
-#: the building does not.
-DEFAULT_SHELVES = 2_000
+#: Shelves of the one warehouse, whatever the size of the catalogue: 10 zones
+#: of 11 racks of 8 levels, about 1 000 locations with the racks, zones and
+#: dock lanes. A small business has hundreds of places to put things, and a
+#: shelf of small parts holds hundreds of products: the catalogue grows, the
+#: building does not.
+DEFAULT_SHELVES = 880
 
 
 def _sizes(products: int, shelves: int = DEFAULT_SHELVES) -> dict[str, int]:

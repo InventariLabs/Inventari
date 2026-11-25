@@ -315,7 +315,8 @@ class TestTemplates:
             },
         )
 
-        _refused_in_polish(resp, 'Szablon dokumentu należy do modułu dokumentów')
+        # The module is called what its launcher tile calls it.
+        _refused_in_polish(resp, 'Szablon dokumentu należy do modułu Magazyn')
 
 
 class TestTaxRates:

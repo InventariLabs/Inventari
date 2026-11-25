@@ -12,7 +12,8 @@
     "createKey": "Utwórz klucz API w sekcji Klucze API i nadaj mu uprawnienie Korzystanie z endpointu MCP.",
     "createKeyNeedsAdmin": "Poproś administratora swojej organizacji o klucz: powstaje on w sekcji Klucze API, z uprawnieniem Korzystanie z endpointu MCP.",
     "pointClient": "Wyślij klucz w nagłówku X-API-Key (albo jako token Bearer) na adres powyżej.",
-    "allowHost": "Jeśli instalacja odpowiada pod publicznym adresem, dodaj jej host do dozwolonych hostów w ustawieniach modułu."
+    "allowHost": "Jeśli instalacja odpowiada pod publicznym adresem, dodaj jej host do dozwolonych hostów w ustawieniach modułu.",
+    "allowHostNeedsAdmin": "Jeśli instalacja odpowiada pod publicznym adresem, poproś administratora o dodanie jej hosta do dozwolonych hostów w ustawieniach modułu."
   },
   "links": {
     "apiKeys": "Klucze API"
