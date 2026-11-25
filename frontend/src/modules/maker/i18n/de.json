@@ -389,7 +389,7 @@
     "removeIngredient": "Entfernen",
     "ingredientAdded": "Zutat hinzugefügt",
     "ingredientRemoved": "Zutat entfernt",
-    "emptyLines": "Noch keine Zutaten — füge unten die erste hinzu.",
+    "emptyLines": "Noch keine Zutaten — fügen Sie unten die erste hinzu.",
     "unitMismatch": "Die Einheit dieser Zeile lässt sich nicht als Bestandseinheit der Zutat lesen — legen Sie sie vor der nächsten Charge fest.",
     "introduction": "Eine Formel ist die Liste dessen, was in einen Ansatz dieses Produkts geht. Daraus summieren sich die Kosten auf dem Tab „Kosten & Ergebnis“, und daraus wird beim Abschluss eines Produktionslaufs Bestand entnommen.",
     "removeConfirm": {

@@ -71,14 +71,18 @@ export function PageHeader({
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               {title && (
-                <h1 className="text-lg md:text-xl font-semibold text-on tracking-tight text-balance">
+                // A name with no space in it (a recipe or a product takes
+                // 200 characters) has nowhere to wrap: the heading and the
+                // line under it break inside the word instead of running past
+                // the edge over the actions.
+                <h1 className="min-w-0 break-words text-lg md:text-xl font-semibold text-on tracking-tight text-balance">
                   {title}
                 </h1>
               )}
               {statusBadge}
             </div>
             {subtitle && (
-              <p className="text-sm text-on-muted mt-0.5 hidden sm:block">
+              <p className="text-sm text-on-muted mt-0.5 hidden sm:block break-words">
                 {subtitle}
               </p>
             )}

@@ -116,7 +116,7 @@ describe("AddItemPage", () => {
     // does not paint a second one under the list's header.
     // Both tabs should be present
     expect(
-      await screen.findByRole("tab", { name: /Vision AI/i }),
+      await screen.findByRole("tab", { name: /^From photo$/i }),
     ).toBeInTheDocument();
     expect(
       await screen.findByRole("tab", { name: /Manual/i }),
@@ -414,7 +414,7 @@ describe("AddItemPage — a label reading that found nothing", () => {
       </PageHeaderContext.Provider>,
     );
 
-    await user.click(await screen.findByRole("tab", { name: /Vision AI/i }));
+    await user.click(await screen.findByRole("tab", { name: /^From photo$/i }));
     const camera = screen.getByRole("button", { name: /take product photo/i });
     await waitFor(() => expect(camera).toBeEnabled());
     await user.click(camera);
@@ -473,7 +473,7 @@ describe("AddItemPage — a label reading that found nothing", () => {
       </PageHeaderContext.Provider>,
     );
 
-    await user.click(await screen.findByRole("tab", { name: /Vision AI/i }));
+    await user.click(await screen.findByRole("tab", { name: /^From photo$/i }));
     const camera = screen.getByRole("button", { name: /take product photo/i });
     await waitFor(() => expect(camera).toBeEnabled());
     await user.click(camera);

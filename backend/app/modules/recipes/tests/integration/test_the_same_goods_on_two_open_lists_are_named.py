@@ -173,3 +173,71 @@ class TestOverlapIsReported:
             )
             assert response.status_code == 200, response.text
             assert response.json()['on_other_lists'] == []
+
+
+class TestTheSameGoodsInAnotherUnitAreNamed:
+    """A line in kilograms names a list carrying the goods in grams.
+
+    Grams and kilograms measure one thing, so 300 g of flour on one list and
+    1 kg on another are the same goods on two lists. A unit of another
+    measure -- pieces against grams -- is not the same line.
+    """
+
+    def _uom(self, db: Session, symbol: str) -> str:
+        row = db.execute(
+            text('SELECT id FROM uoms WHERE symbol = :s'), {'s': symbol}
+        ).fetchone()
+        assert row is not None, f'UOM {symbol!r} is not seeded'
+        return str(row[0])
+
+    def _list_of(
+        self,
+        client: TestClient,
+        headers: dict[str, str],
+        name: str,
+        ingredients: list[dict[str, str]],
+    ) -> dict[str, Any]:
+        recipe = client.post(
+            RECIPE_URL,
+            json={'name': name, 'servings': 1, 'ingredients': ingredients},
+            headers=headers,
+        )
+        assert recipe.status_code == 201, recipe.text
+        added = client.post(
+            f'{RECIPE_URL}/{recipe.json()["id"]}/add-to-shopping-list',
+            json={'servings': 1},
+            headers=headers,
+        )
+        assert added.status_code == 200, added.text
+        body: dict[str, Any] = added.json()
+        return body
+
+    def test_kilograms_name_the_list_holding_grams(
+        self, client: TestClient, auth_headers: dict[str, str], db_session: Session
+    ) -> None:
+        grams, kilos = self._uom(db_session, 'g'), self._uom(db_session, 'kg')
+        pieces = self._uom(db_session, 'pcs')
+        first = self._list_of(
+            client,
+            auth_headers,
+            'Pancakes',
+            [
+                {'name': 'Flour', 'quantity': '300', 'uom_id': grams},
+                {'name': 'Eggs', 'quantity': '120', 'uom_id': grams},
+            ],
+        )
+
+        second = self._list_of(
+            client,
+            auth_headers,
+            'Bread',
+            [
+                {'name': 'Flour', 'quantity': '1', 'uom_id': kilos},
+                {'name': 'Eggs', 'quantity': '2', 'uom_id': pieces},
+            ],
+        )
+
+        assert second['shopping_list_id'] != first['shopping_list_id']
+        assert [
+            (line['name'], line['list_id']) for line in second['on_other_lists']
+        ] == [('Flour', first['shopping_list_id'])]

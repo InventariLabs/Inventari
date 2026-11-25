@@ -6,6 +6,8 @@ interface Props {
   documentIds: string[];
   /** The sheet is gone: the list clears what opened it. */
   onLeave: () => void;
+  /** Every dispatch opened is internal, so no screen of it asks for a carrier. */
+  withoutCarrier?: boolean;
 }
 
 /**
@@ -13,7 +15,11 @@ interface Props {
  * hands it to that document's page to be packed or completed; one over
  * several leaves each picked and open (`usePickingHandOff`).
  */
-export function ListPickingSheet({ documentIds, onLeave }: Props) {
+export function ListPickingSheet({
+  documentIds,
+  onLeave,
+  withoutCarrier,
+}: Props) {
   const handOff = usePickingHandOff(onLeave);
   return (
     <WmsPickingView
@@ -21,6 +27,7 @@ export function ListPickingSheet({ documentIds, onLeave }: Props) {
       documentIds={documentIds}
       onClose={handOff.onClose}
       onPack={handOff.onPack}
+      withoutCarrier={withoutCarrier}
     />
   );
 }

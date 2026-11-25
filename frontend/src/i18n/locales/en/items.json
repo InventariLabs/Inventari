@@ -396,9 +396,9 @@
       "QUANTITY_CHANGED": "Quantity changed",
       "QUANTITY_INCREASED_VIA_SCAN": "Stock added via scan",
       "CHECKOUT": "Checked out",
-      "CHECKIN": "Checked in",
+      "CHECKIN": "Returned",
       "USED": "Consumed",
-      "DISPOSED": "Discarded",
+      "DISPOSED": "Disposed",
       "DELETED": "Deleted",
       "RESTORED": "Restored",
       "OPENED": "Opened"
@@ -409,7 +409,7 @@
     "createdWith_other": "Created with quantity {{amount}}",
     "unitChosen": {
       "entered": "Entered {{entered}}, kept as {{kept}}",
-      "unit": "Entered in {{chosen_unit}}; the product is kept in {{template_unit}}"
+      "unit": "Entered in {{chosen_unit}} — the product is kept in {{template_unit}}"
     },
     "createdViaScan": {
       "label": "Created by scanning label {{code}}",
@@ -525,7 +525,7 @@
   },
   "unitChoice": {
     "title": "Enter {{product}} in another unit?",
-    "message": "{{product}} is kept in {{template_unit}}. A quantity entered in {{chosen_unit}} is converted into {{template_unit}} when saved, and the choice is recorded in the product history.",
+    "message": "{{product}} is kept in {{template_unit}} — a quantity entered in {{chosen_unit}} is converted into {{template_unit}} when saved, and the choice is recorded in the product history.",
     "keepChosen": "Enter in {{unit}}",
     "keepTemplate": "Keep {{unit}}"
   },

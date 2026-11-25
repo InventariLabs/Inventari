@@ -365,7 +365,7 @@
     "childLabel": "Ingrédient",
     "qtyLabel": "Qté",
     "unitLabel": "Unité",
-    "yieldLabel": "Perte %",
+    "yieldLabel": "Perte de rendement %",
     "yieldHint": "Une valeur de planification : combien réserver en plus pour que le plan tienne. Laisser 0 est normal — la perte réelle se mesure à la clôture de l'ordre, en saisissant la quantité réellement obtenue.",
     "notesLabel": "Notes",
     "notesPlaceholder": "Notes optionnelles…",

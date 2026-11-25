@@ -892,7 +892,7 @@
     "title": "Mon matériel",
     "subtitle": "Actifs actuellement attribués",
     "empty": "Aucun actif attribué",
-    "empty_hint": "Les actifs qui vous sont empruntés apparaîtront ici.",
+    "empty_hint": "Les actifs que vous avez empruntés apparaîtront ici.",
     "checked_out": "Emprunté",
     "overdue": "En retard",
     "due": "Échéance",

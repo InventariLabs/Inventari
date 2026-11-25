@@ -91,7 +91,10 @@ test.describe("Documents — receiving reaches the stock ledger", () => {
     const quantityField = page.getByLabel("Executed quantity");
     await quantityField.fill(String(RECEIVED));
 
-    await page.getByRole("button", { name: "Confirm & complete" }).click();
+    await page
+      .getByTestId("document-execution-actions")
+      .getByRole("button", { name: "Receive stock" })
+      .click();
     await expect(
       page.getByText("Document completed — stock updated"),
     ).toBeVisible({ timeout: 15000 });
@@ -141,7 +144,10 @@ test.describe("Documents — receiving reaches the stock ledger", () => {
       .getByLabel("Discrepancy code")
       .selectOption({ label: "Shortage" });
 
-    await page.getByRole("button", { name: "Confirm & complete" }).click();
+    await page
+      .getByTestId("document-execution-actions")
+      .getByRole("button", { name: "Receive stock" })
+      .click();
     await expect(page.getByText("Document completed")).toBeVisible({
       timeout: 15000,
     });

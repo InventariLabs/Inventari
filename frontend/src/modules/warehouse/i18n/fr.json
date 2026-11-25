@@ -216,7 +216,7 @@
     "postNowIssue": "Sortir le stock",
     "postNowMove": "Déplacer le stock",
     "postNowConsume": "Consommer le stock",
-    "postNowRecordOnly": "Enregistrer — marchandises déjà prélevées",
+    "postNowRecordOnly": "Enregistrer — stock déjà modifié",
     "postNowScrap": "Mettre au rebut",
     "postNowAdjust": "Ajuster le stock",
     "postNowDefault": "Comptabiliser le document",
@@ -251,7 +251,7 @@
     "postNowTitle": "Comptabiliser le document ?",
     "postNowApprovalTitle": "Envoyer le document pour approbation ?",
     "postNowMessage": "Cela confirme le document et comptabilise immédiatement le mouvement de stock. En cas d’erreur, annulez-le juste après ou corrigez-le plus tard. Continuer ?",
-    "postNowRecordOnlyMessage": "Les marchandises ont déjà été prélevées du stock lors de la préparation. Ceci ne fait qu’enregistrer le mouvement — le stock ne change pas. Continuer ?",
+    "postNowRecordOnlyMessage": "Le stock a déjà été modifié lors de l’étape que ce document enregistre. Ceci ne fait que garder la trace — le stock ne change pas. Continuer ?",
     "postNowApprovalMessage": "Le document sera confirmé et envoyé pour approbation. Une fois approuvé, il sera comptabilisé sans autre étape. Continuer ?",
     "postNowMessageDeadEndNamed": "Le document part en approbation, mais personne ne pourrait la trancher : l'étape « {{stage}} » nomme des approbateurs qui n'ont pas accès aux approbations. Il y attend que la demande soit retirée ou que ces personnes reçoivent l'accès. Continuer ?",
     "postNowMessageDeadEndNoApprover": "Le document part en approbation, mais personne ne pourrait la trancher : l'étape « {{stage}} » est ouverte à quiconque détient le droit d'approuver, et personne dans cette organisation ne l'a. Il y attend que la demande soit retirée ou que quelqu'un reçoive ce droit. Continuer ?",
@@ -383,7 +383,7 @@
     "confirmed": "Document confirmé — prêt pour exécution",
     "pendingApproval": "Document envoyé pour approbation",
     "completed": "Document terminé — stock mis à jour",
-    "completedRecordOnly": "Document clôturé — il enregistre les marchandises déjà prélevées",
+    "completedRecordOnly": "Document clôturé — il enregistre une modification de stock déjà faite",
     "correctionApplied": "Correction appliquée — stock ajusté",
     "cancelled": "Document annulé",
     "deleted": "Document supprimé",
@@ -422,7 +422,7 @@
   "navigation": {
     "documents": "Documents",
     "approvalsQueue": "À approuver",
-    "scan": "Scan document",
+    "scan": "Scanner un document",
     "history": "Historique",
     "start": "Démarrer",
     "board": "Tableau",
@@ -566,7 +566,6 @@
       "context_tag": "attribut",
       "location_type": "Facultatif — choisir un type"
     },
-    "executionSubmit": "Confirmer et terminer",
     "executionInvalidQuantity": "Saisissez une quantité exécutée valide pour chaque ligne.",
     "executionTooHigh": "La quantité exécutée ne peut pas dépasser la quantité prévue.",
     "executionCodeRequired": "Sélectionnez un code d'écart lorsque la quantité exécutée est inférieure à la quantité prévue.",
@@ -1005,7 +1004,7 @@
         "notes": "Notes libres enregistrées sur le document",
         "lines": "Les lignes, pour {% for line in document.lines %} — chacune porte name, quantity, done_quantity, uom et les colonnes de valeur"
       },
-      "documents": "Liste de prélèvement uniquement : les expéditions de la feuille — numéro et son Code128 (code128_img, code128_width_mm, code128_height_mm)",
+      "documents": "Bon de préparation uniquement : les expéditions de la feuille — numéro et son Code128 (code128_img, code128_width_mm, code128_height_mm)",
       "is_correction": "Vrai lorsque le document est une correction",
       "is_external": "Vrai pour les documents avec un partenaire (IN, PZ, OUT, WZ)",
       "is_external_in": "Vrai pour les réceptions (IN, PZ)",
@@ -1028,7 +1027,7 @@
         "tax_id": "Numéro fiscal du partenaire (n° de TVA)",
         "address": "Adresse du partenaire, nom du pays traduit"
       },
-      "pick_lines": "Liste de prélèvement uniquement : les lignes dans l'ordre de parcours — shelf_code, shelf_name, quantity, unit, name, sku, lot et document_number",
+      "pick_lines": "Bon de préparation uniquement : les lignes dans l'ordre de parcours — shelf_code, shelf_name, quantity, unit, name, sku, lot et document_number",
       "print_dates": "Dates à imprimer, sous la forme [{label, value}] — une date qui répète la précédente est omise",
       "print_number": "Le numéro du document, tel que l'en-tête commun l'imprime",
       "print_status": "Statut traduit, tel que l'en-tête commun l'imprime",
@@ -1603,7 +1602,7 @@
   },
   "unitMismatch": {
     "title": "Les unités ne correspondent pas",
-    "message": "« {{product}} » est suivi en {{templateUnit}}, et cet enregistrement serait enregistré en {{chosenUnit}}. Confirmez pour convertir l'enregistrement et cette réception en {{templateUnit}} — le choix reste dans l'historique de l'enregistrement. Pour garder des unités différentes, changez d'abord l'unité de l'enregistrement sur sa page Inventaire.",
+    "message": "« {{product}} » est suivi en {{templateUnit}} (cet enregistrement serait enregistré en {{chosenUnit}}). Confirmez pour convertir l'enregistrement et cette réception en {{templateUnit}} — le choix reste dans l'historique de l'enregistrement. Pour garder des unités différentes, changez d'abord l'unité de l'enregistrement sur sa page Inventaire.",
     "confirm": "Confirmer et terminer",
     "cancel": "Pas maintenant"
   },

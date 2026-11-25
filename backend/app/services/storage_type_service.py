@@ -186,7 +186,9 @@ class StorageTypeService:
         )
 
         if (usage_count or 0) > 0:
-            raise ServiceRejectionError('storage_type_in_use', count=usage_count)
+            raise ServiceRejectionError(
+                'storage_type_in_use', plural=usage_count, count=usage_count
+            )
 
         await db.delete(storage_type)
         await db.flush()

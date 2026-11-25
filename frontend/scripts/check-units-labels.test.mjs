@@ -77,6 +77,37 @@ describe("check-units-labels", () => {
       ]);
     });
 
+    it("catches a reading or a conversion's unit the same way", () => {
+      const files = {
+        "/a.json": JSON.stringify({
+          a: "recipe needs {{required}}.",
+          b: "stock holds {{available}}, and",
+          c: "kept in {{template_unit}}. Entered in {{chosenUnit}};",
+          d: "Short by {{quantity}}. Left {{remaining}}.",
+        }),
+      };
+
+      expect(punctuationAfterUnit(Object.keys(files), reader(files))).toEqual([
+        "/a.json: a",
+        "/a.json: b",
+        "/a.json: c",
+        "/a.json: d",
+      ]);
+    });
+
+    it("lets a reading stand inside a bracket or before a word", () => {
+      const files = {
+        "/a.json": JSON.stringify({
+          a: "Cannot compare (needs {{required}} against {{available}} in stock).",
+          b: "Kept in {{template_unit}} — entered in {{chosen_unit}}",
+        }),
+      };
+
+      expect(punctuationAfterUnit(Object.keys(files), reader(files))).toEqual(
+        [],
+      );
+    });
+
     it("says nothing when the unit does not end the clause", () => {
       const files = {
         "/a.json": JSON.stringify({

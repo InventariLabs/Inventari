@@ -2846,6 +2846,31 @@
         }
       ]
     },
+    "format_date_for": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "lang",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "value",
+          "required": true
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "missing",
+          "required": false
+        },
+        {
+          "kind": "KEYWORD_ONLY",
+          "name": "country",
+          "required": false
+        }
+      ]
+    },
     "general_rows": {
       "kind": "function",
       "params": [

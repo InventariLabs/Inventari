@@ -626,6 +626,17 @@ const dist = join(root, "dist");
  * suggestion panel's placement and Tab handling in the product picker, and
  * their module SDK exports, which both screens load. Those two phone budgets
  * move a step of five, to 600 and 625; the other screens stand under theirs.
+ *
+ * Re-measured 2026-11-25 on the branch that closes the recipes and shopping
+ * list findings, merged with the development line after that step: the
+ * receive screen measures 485.4 KiB gz against its 490. The branch adds a
+ * sentence in six languages (a collection's delete naming its
+ * sub-collections) to the language chunk every first paint loads, and the
+ * module SDK's useLocalStorage to the barrel the receive screen loads; no
+ * import walked into the screen and no budget moves (app first paint 408.6
+ * of 410, login 413.5 of 415, launcher 428.5 of 430, start 648.2 of 650,
+ * issue 594.7 of 595, history 619.8 of 620, products 638.8 of 640, initial
+ * 194.2).
  */
 const BUDGETS = {
   initial: 245,

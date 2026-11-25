@@ -12,6 +12,7 @@ import type { WarehouseDocument } from "@/modules/warehouse/types";
 import { ShipmentFields } from "../shipping/ShipmentFields";
 import {
   EMPTY_SHIPMENT,
+  leavesWithCarrier,
   type ShipmentDraft,
   shipmentError,
   shipmentPayload,
@@ -73,15 +74,17 @@ export function PackingFooter({
     setSlipPending(false);
   };
 
+  const asksCarrier = leavesWithCarrier(document.type);
+
   const complete = () => {
-    const fault = shipmentError(shipment, t);
+    const fault = asksCarrier ? shipmentError(shipment, t) : undefined;
     setShipmentFault(fault);
-    if (!fault) onComplete(shipmentPayload(shipment));
+    if (!fault) onComplete(asksCarrier ? shipmentPayload(shipment) : undefined);
   };
 
   return (
     <div className="space-y-4 border-t border-border pt-4">
-      {canComplete && (
+      {canComplete && asksCarrier && (
         <ShipmentFields
           value={shipment}
           onChange={setShipment}

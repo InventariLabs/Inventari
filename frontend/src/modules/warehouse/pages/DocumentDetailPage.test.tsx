@@ -1306,7 +1306,9 @@ describe("DocumentDetailPage", () => {
     // page that happens to mount at the same time.
     const panel = within(scrolled.mock.instances[0] as HTMLElement);
     // The sheet is named after the button that opens it.
-    expect(panel.getByText("Pick items")).toBeInTheDocument();
+    expect(
+      panel.getByRole("heading", { name: "Pick items" }),
+    ).toBeInTheDocument();
   });
 
   it("requires a discrepancy code for partial execution and submits it with an optional note", async () => {
@@ -1349,7 +1351,10 @@ describe("DocumentDetailPage", () => {
     });
 
     fireEvent.click(
-      screen.getByRole("button", { name: /Confirm & complete/i }),
+      within(screen.getByTestId("document-execution-actions")).getByRole(
+        "button",
+        { name: "Pick items" },
+      ),
     );
 
     // The message appears both globally and next to the field.
@@ -1369,7 +1374,10 @@ describe("DocumentDetailPage", () => {
       target: { value: "Supplier short shipped 5 pcs" },
     });
     fireEvent.click(
-      screen.getByRole("button", { name: /Confirm & complete/i }),
+      within(screen.getByTestId("document-execution-actions")).getByRole(
+        "button",
+        { name: "Pick items" },
+      ),
     );
 
     expect(workflowMutations.complete).toHaveBeenCalledWith(

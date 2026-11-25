@@ -126,7 +126,7 @@
     "productSearchFailed": "Produktsuche fehlgeschlagen",
     "noLocationsFound": "Keine Lagerorte gefunden",
     "noLocationsAllClaimed": "Alle Lagerorte gehören zu einem Modul, daher wird keiner angeboten. Aktivieren Sie \"Moduldaten anzeigen\" in den Einstellungen oder legen Sie einen Lagerort ohne Modul an.",
-    "noOfferableLocations": "Es gibt hier keinen Lagerort, der Bestand aufnehmen kann — lege zuerst einen an.",
+    "noOfferableLocations": "Es gibt hier keinen Lagerort, der Bestand aufnehmen kann — legen Sie zuerst einen an.",
     "openModuleDataSettings": "Einstellungen öffnen",
     "createNewPartner": "+ Neuen Partner erstellen",
     "enablePartnersNotice": "Aktivieren Sie das Partners-Modul, um einen Lieferanten oder Kunden zuzuweisen.",
@@ -216,7 +216,7 @@
     "postNowIssue": "Bestand ausbuchen",
     "postNowMove": "Bestand umlagern",
     "postNowConsume": "Bestand verbrauchen",
-    "postNowRecordOnly": "Beleg festhalten — Ware bereits entnommen",
+    "postNowRecordOnly": "Beleg festhalten — Bestand bereits geändert",
     "postNowScrap": "Bestand abschreiben",
     "postNowAdjust": "Bestand anpassen",
     "postNowDefault": "Beleg buchen",
@@ -251,7 +251,7 @@
     "postNowTitle": "Beleg buchen?",
     "postNowApprovalTitle": "Beleg zur Genehmigung senden?",
     "postNowMessage": "Das bestätigt den Beleg und bucht die Bestandsbewegung sofort. Stimmt etwas nicht, lässt er sich gleich danach rückgängig machen oder später korrigieren. Fortfahren?",
-    "postNowRecordOnlyMessage": "Die Ware wurde beim Kommissionieren bereits vom Bestand entnommen. Dies hält nur die Bewegung fest — der Bestand ändert sich nicht. Fortfahren?",
+    "postNowRecordOnlyMessage": "Der Bestand wurde bereits in dem Schritt geändert, den dieser Beleg festhält. Dies hält nur den Eintrag fest — der Bestand ändert sich nicht. Fortfahren?",
     "postNowApprovalMessage": "Dadurch wird der Beleg bestätigt und zur Genehmigung gesendet. Nach der Genehmigung wird er ohne weiteren Schritt gebucht. Fortfahren?",
     "postNowMessageDeadEndNamed": "Der Beleg geht zur Genehmigung, aber niemand könnte sie entscheiden: Die Stufe „{{stage}}“ nennt Personen ohne Zugriff auf Genehmigungen. Er wartet dort, bis die Anfrage zurückgezogen wird oder diese Personen Zugriff erhalten. Fortfahren?",
     "postNowMessageDeadEndNoApprover": "Der Beleg geht zur Genehmigung, aber niemand könnte sie entscheiden: Die Stufe „{{stage}}“ steht allen mit dem Genehmigungsrecht offen, und niemand in dieser Organisation hat es. Er wartet dort, bis die Anfrage zurückgezogen wird oder jemand das Recht erhält. Fortfahren?",
@@ -383,7 +383,7 @@
     "confirmed": "Dokument bestätigt — bereit zur Ausführung",
     "pendingApproval": "Dokument zur Genehmigung gesendet",
     "completed": "Dokument abgeschlossen — Bestand aktualisiert",
-    "completedRecordOnly": "Beleg abgeschlossen — hält die bereits entnommene Ware fest",
+    "completedRecordOnly": "Beleg abgeschlossen — hält eine bereits erfolgte Bestandsänderung fest",
     "correctionApplied": "Korrektur angewendet — Bestand angepasst",
     "cancelled": "Dokument storniert",
     "deleted": "Dokument gelöscht",
@@ -566,7 +566,6 @@
       "context_tag": "Merkmal",
       "location_type": "Optional — Typ wählen"
     },
-    "executionSubmit": "Bestätigen & Abschließen",
     "executionInvalidQuantity": "Geben Sie für jede Position eine gültige ausgeführte Menge ein.",
     "executionTooHigh": "Die ausgeführte Menge darf die geplante Menge nicht überschreiten.",
     "executionCodeRequired": "Wählen Sie einen Differenzcode, wenn die ausgeführte Menge niedriger als geplant ist.",
@@ -1021,7 +1020,7 @@
         "address": "Adresse der ausstellenden Organisation, Ländername übersetzt",
         "logo": "Logo der ausstellenden Organisation (eingebettete Data-URI)"
       },
-      "packages": "Nur Packschein: die gedruckten Packstücke, je eines pro Blatt — number, count, code, code128_img, weight_kg und lines",
+      "packages": "Nur Packliste: die gedruckten Packstücke, je eines pro Blatt — number, count, code, code128_img, weight_kg und lines",
       "partner": {
         "name": "Name des Geschäftspartners (Lieferant/Kunde)",
         "code": "Code des Geschäftspartners",
@@ -1603,7 +1602,7 @@
   },
   "unitMismatch": {
     "title": "Einheiten passen nicht zusammen",
-    "message": "„{{product}}” wird in {{templateUnit}} geführt, dieser Datensatz würde in {{chosenUnit}} gespeichert. Mit der Bestätigung werden Datensatz und diese Lieferung in {{templateUnit}} umgerechnet; die Entscheidung landet in der Historie des Datensatzes. Sollen die Einheiten unterschiedlich bleiben, ändere zuerst die Einheit des Datensatzes auf seiner Seite im Inventar.",
+    "message": "„{{product}}” wird in {{templateUnit}} geführt, dieser Datensatz würde in {{chosenUnit}} gespeichert. Mit der Bestätigung werden Datensatz und diese Lieferung in {{templateUnit}} umgerechnet; die Entscheidung landet in der Historie des Datensatzes. Sollen die Einheiten unterschiedlich bleiben, ändern Sie zuerst die Einheit des Datensatzes auf seiner Seite im Inventar.",
     "confirm": "Bestätigen und abschließen",
     "cancel": "Nicht jetzt"
   },
@@ -2227,7 +2226,7 @@
       "starting": "Wareneingang wird geöffnet…",
       "noOrder": "Nichts wurde bestellt: Scannen Sie jedes eingetroffene Produkt oder suchen Sie es nach Namen und stellen Sie ein, wie viel gekommen ist. Danach wird jedes am vorgeschlagenen Platz eingelagert.",
       "extra": "Ist etwas gekommen, das nicht in der Bestellung steht? Scannen Sie es oder suchen Sie es nach Namen und stellen Sie ein, wie viel gekommen ist; es wird mit der bestellten Ware angenommen.",
-      "onOrder": "{{product}} steht in der Bestellung: Zähle es, sobald die Annahme beginnt."
+      "onOrder": "{{product}} steht in der Bestellung: Zählen Sie es, sobald die Annahme beginnt."
     },
     "unpricedLines": "Positionen ohne Preis: {{total}}. Sie werden ohne Wert gebucht und fehlen in den Summen des Belegregisters."
   },

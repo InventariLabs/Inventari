@@ -348,6 +348,48 @@ describe("CollectionDialogs", () => {
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(m.setDeleteTarget).toHaveBeenCalledWith(null);
   });
+
+  it("counts every sub-collection the delete takes, at any depth", () => {
+    const dinners: RecipeCollection = {
+      ...leaf("d1", "Dinners"),
+      children: [
+        {
+          ...leaf("d2", "Pasta"),
+          parent_id: "d1",
+          children: [{ ...leaf("d3", "Carbonara"), parent_id: "d2" }],
+        },
+      ],
+    };
+    render(
+      <CollectionDialogs
+        manager={{ ...base(), deleteTarget: dinners }}
+        t={t}
+      />,
+    );
+    expect(
+      screen.getByText(
+        'Delete collection "Dinners"? It holds 2 sub-collections, which go with it. Recipes themselves are kept.',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("says one sub-collection goes, and nothing of the kind for a leaf", () => {
+    const { unmount } = render(
+      <CollectionDialogs manager={{ ...base(), deleteTarget: week }} t={t} />,
+    );
+    expect(
+      screen.getByText(/It holds 1 sub-collection, which goes with it\./),
+    ).toBeInTheDocument();
+    unmount();
+    render(
+      <CollectionDialogs manager={{ ...base(), deleteTarget: soups }} t={t} />,
+    );
+    expect(
+      screen.getByText(
+        'Delete collection "Soups"? Recipes themselves are kept.',
+      ),
+    ).toBeInTheDocument();
+  });
 });
 
 describe("CollectionsLoadFailed", () => {

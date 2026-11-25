@@ -11,7 +11,7 @@
   },
   "navigation": {
     "dashboard": "Übersicht",
-    "workflows": "Arbeitsabläufe",
+    "workflows": "Workflows",
     "settings": "Genehmigungen"
   },
   "dashboard": {
@@ -139,8 +139,8 @@
     "deactivateConfirm": "Nach dem Deaktivieren wartet nichts mehr auf diese Genehmigung. Sie können ihn jederzeit wieder aktivieren.",
     "waitingItem": "{{target}}: {{number}}",
     "waitingRelease": "Es warten jetzt darauf: {{list}}. Sie werden freigegeben und gehen ohne Genehmigung weiter; jeder Antragsteller erfährt, warum der Antrag geschlossen wurde.",
-    "demandWarningDocuments": "Weiterhin genehmigungspflichtig laut: {{settings}}. Freigegebene Dokumente bleiben beim Abschluss stehen, bis diese Einstellung gelöscht ist oder wieder ein Ablauf aktiv ist.",
-    "demandWarningOrders": "Weiterhin genehmigungspflichtig laut: {{settings}}. Freigegebene Bestellungen gelten weiter als bestätigt; solange die Einstellung ohne aktiven Ablauf gilt, lassen sich neue Bestellungen nicht bestätigen.",
+    "demandWarningDocuments": "Weiterhin genehmigungspflichtig laut: {{settings}}. Freigegebene Dokumente bleiben beim Abschluss stehen, bis diese Einstellung gelöscht ist oder wieder ein Workflow aktiv ist.",
+    "demandWarningOrders": "Weiterhin genehmigungspflichtig laut: {{settings}}. Freigegebene Bestellungen gelten weiter als bestätigt; solange die Einstellung ohne aktiven Workflow gilt, lassen sich neue Bestellungen nicht bestätigen.",
     "demandSetting_approval_required_for_types": "die genehmigungspflichtigen Dokumenttypen",
     "demandSetting_approval_threshold": "der Genehmigungsschwellenwert",
     "demandSetting_approval_required": "Genehmigung für jede Bestellung",
@@ -219,7 +219,7 @@
     "addRolePlaceholder": "Rolle wählen…",
     "roleAddsNobody": "Niemand Neues hinzuzufügen — alle aktiven Personen mit der Rolle „{{role}}“ sind bereits benannt.",
     "roleMembersFailed": "Es konnte nicht gelesen werden, wer diese Rolle hat.",
-    "waitingUnavailable": "Es konnte nicht geprüft werden, was auf diesen Ablauf wartet, daher lässt er sich jetzt nicht ausschalten. Schließen Sie dieses Fenster und versuchen Sie es erneut.",
+    "waitingUnavailable": "Es konnte nicht geprüft werden, was auf diesen Workflow wartet, daher lässt er sich jetzt nicht ausschalten. Schließen Sie dieses Fenster und versuchen Sie es erneut.",
     "editNamed": "{{name}} bearbeiten",
     "deactivateNamed": "{{name}} deaktivieren",
     "activateNamed": "{{name}} aktivieren",
@@ -308,7 +308,7 @@
   },
   "settings": {
     "allowAdminSelfApprove": "Administratoren dürfen eigene Anträge genehmigen",
-    "allowAdminSelfApproveDescription": "Standardmäßig aus: Ein Genehmigungsschritt existiert, damit eine zweite Person über die Entscheidung mitbestimmt. Aktivieren Sie ihn, wenn der Administrator der einzige Genehmiger ist und der Ablauf sonst stecken bliebe."
+    "allowAdminSelfApproveDescription": "Standardmäßig aus: Ein Genehmigungsschritt existiert, damit eine zweite Person über die Entscheidung mitbestimmt. Aktivieren Sie ihn, wenn der Administrator der einzige Genehmiger ist und der Workflow sonst stecken bliebe."
   },
   "documentQueue": {
     "parkedTitle": "Abgestellt — niemand kann entscheiden",

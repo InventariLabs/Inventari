@@ -59,6 +59,26 @@ function renderBack(entries: string[], index: number, backTo = "/orders") {
   );
 }
 
+/**
+ * A name with no space in it -- 200 characters a recipe or a product
+ * accepts -- has no place to wrap. The heading and the line under it break
+ * inside the word, so the name stays within the page and off the actions.
+ */
+describe("PageHeader long names", () => {
+  it("lets the heading and the subtitle break inside a word", () => {
+    const long = "A".repeat(200);
+    render(
+      <MemoryRouter>
+        <PageHeader title={long} subtitle={`${long}B`} />
+      </MemoryRouter>,
+    );
+    const heading = screen.getByRole("heading", { level: 1 });
+    expect(heading.className).toContain("min-w-0");
+    expect(heading.className).toContain("break-words");
+    expect(screen.getByText(`${long}B`).className).toContain("break-words");
+  });
+});
+
 describe("PageHeader back arrow", () => {
   afterEach(() => act(() => useFormGuardStore.getState().setDirtyForm(null)));
 

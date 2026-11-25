@@ -228,6 +228,25 @@ describe("ActionItemsFeed", () => {
     expect(screen.queryByText(/Waiting in this list/)).not.toBeInTheDocument();
   });
 
+  it("lets a row's sentence wrap to two lines instead of cutting it at the card edge", async () => {
+    const row: ActionItem = {
+      id: "unavailable",
+      labelKey: "inventory:actions.stockTakesUnavailable",
+      icon: Bell,
+      severity: "error",
+      linkTo: "/inventory/stock-takes",
+    };
+    moduleRegistry.getActionItemProviders = vi.fn(() => [
+      { moduleName: "stock_takes", hook: () => [row] },
+    ]);
+
+    renderFeed();
+
+    const label = await screen.findByText(/could not be/i);
+    expect(label).toHaveClass("line-clamp-2");
+    expect(label).not.toHaveClass("truncate");
+  });
+
   /**
    * The collectors are the only thing that knows whether there is anything to
    * show. Hiding the card must not unmount them, or the card can never come

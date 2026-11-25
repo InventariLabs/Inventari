@@ -282,6 +282,26 @@ export function CollectionsSidebar({
   );
 }
 
+/** Every collection under *collection*, at any depth. */
+function countDescendants(collection: RecipeCollection): number {
+  return collection.children.reduce(
+    (sum, child) => sum + 1 + countDescendants(child),
+    0,
+  );
+}
+
+/**
+ * The delete confirmation. The sub-collections go with the collection (the
+ * backend cascades), so a collection that has some says how many.
+ */
+function deleteMessage(target: RecipeCollection | null, t: TFunction): string {
+  const name = target?.name ?? "";
+  const count = target ? countDescendants(target) : 0;
+  return count > 0
+    ? t("recipes:collections.delete_confirm_nested", { name, count })
+    : t("recipes:collections.delete_confirm", { name });
+}
+
 /**
  * Shared create/rename/delete dialogs for both collection surfaces.
  * Rendered once at page level; the Sheet and ConfirmDialog escape their
@@ -300,9 +320,7 @@ export function CollectionDialogs({
       <ConfirmDialog
         open={Boolean(manager.deleteTarget)}
         title={t("recipes:collections.delete")}
-        message={t("recipes:collections.delete_confirm", {
-          name: manager.deleteTarget?.name ?? "",
-        })}
+        message={deleteMessage(manager.deleteTarget, t)}
         variant="danger"
         confirmLabel={t("recipes:collections.delete")}
         cancelLabel={t("common:form.cancel")}

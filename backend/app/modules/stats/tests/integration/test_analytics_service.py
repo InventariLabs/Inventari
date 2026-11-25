@@ -15,6 +15,8 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.public_api import core_api
+from app.i18n import Language
+from app.i18n.service import set_current_lang
 from app.models.category import Category
 from app.models.item import Item
 from app.models.item_history import ItemHistory
@@ -410,6 +412,45 @@ class TestStatsAnalyticsService:
         # The expiring milk is still its own alert, and not counted twice.
         soon = [a for a in result['alerts'] if a['type'] == 'EXPIRING_SOON']
         assert [a['item_name'] for a in soon] == ['Milk']
+
+    @pytest.mark.parametrize(
+        ('lang', 'pattern'), [('pl', '%d.%m.%Y'), ('fr', '%d/%m/%Y')]
+    )
+    async def test_an_alert_writes_its_date_the_way_the_reader_does(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_household: Organization,
+        async_test_storage_location: StorageLocation,
+        async_test_category: Category,
+        lang: Language,
+        pattern: str,
+    ) -> None:
+        """The date an alert's sentence carries follows the reader's language."""
+        today = await core_api.organizations.today_async(
+            real_async_db_session, async_test_household.id
+        )
+        expiry = today + timedelta(days=3)
+        real_async_db_session.add(
+            Item(
+                organization_id=async_test_household.id,
+                storage_location_id=async_test_storage_location.id,
+                category_id=async_test_category.id,
+                name='Cheddar',
+                quantity=Decimal('1'),
+                expiry_date=expiry,
+            )
+        )
+        await real_async_db_session.flush()
+        set_current_lang(lang)
+        try:
+            result = await get_smart_alerts_async(
+                real_async_db_session, async_test_household.id
+            )
+        finally:
+            set_current_lang('en')
+
+        alert = next(a for a in result['alerts'] if a['item_name'] == 'Cheddar')
+        assert alert['message_params']['date'] == expiry.strftime(pattern)
 
     async def test_two_alerts_of_one_product_on_one_date_say_where_each_one_is(
         self,

@@ -141,6 +141,25 @@ describe("WmsPickingSummary", () => {
     });
   });
 
+  it("asks an internal issue for no carrier, and still offers to pack it", async () => {
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    render(
+      <WmsPickingSummary
+        session={session}
+        lines={[picked]}
+        onClose={onClose}
+        onPack={vi.fn()}
+        withoutCarrier
+      />,
+    );
+
+    expect(screen.queryByLabelText("Carrier")).toBeNull();
+    expect(screen.getByRole("button", { name: "Pack" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Close" }));
+    expect(onClose).toHaveBeenCalledWith(undefined);
+  });
+
   it("opens without raising the keyboard on the optional carrier", () => {
     render(
       <WmsPickingSummary

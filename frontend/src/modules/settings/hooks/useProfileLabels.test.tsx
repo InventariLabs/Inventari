@@ -30,7 +30,7 @@ describe("useProfileLabels", () => {
       unmount();
       expect(labels.name).toBe("Własny");
       expect(labels.description).toBe(
-        "Bez profilu branżowego — neutralna baza, którą kształtujesz po swojemu.",
+        "Bez gotowego zestawu branżowego — neutralna baza, którą kształtujesz po swojemu.",
       );
     });
   });
