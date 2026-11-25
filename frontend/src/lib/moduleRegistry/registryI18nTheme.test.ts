@@ -10,11 +10,13 @@ import { applyI18nOverrides, noteCatalogLanded } from "./registryI18nTheme";
  * exercise the same key resolution the sidebar uses, not a stand-in.
  */
 
+/** A module that has listed every key it overrides as adopted. */
 function makeModule(
   name: string,
   i18nOverrides: Record<string, Record<string, string>>,
+  adoptedI18nKeys: string[] = Object.values(i18nOverrides).flatMap(Object.keys),
 ): FrontendModule {
-  return { name, routes: [], i18nOverrides };
+  return { name, routes: [], i18nOverrides, adoptedI18nKeys };
 }
 
 function harness(...modules: FrontendModule[]) {
@@ -166,5 +168,67 @@ describe("an override key that matches nothing", () => {
 
     expect(warn).toHaveBeenCalledTimes(1);
     expect(String(warn.mock.calls[0][0])).toContain("latens:titel");
+  });
+});
+
+describe("overrides outside the module's own namespace", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("a key of another namespace that is not adopted changes nothing, and is named", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const mod = makeModule(
+      "test-i18n-stranger",
+      { en: { "inventory:nav.items": "Assets" } },
+      [],
+    );
+    const h = harness(mod);
+
+    applyI18nOverrides([mod.name], h.modules, h.applied, h.saved);
+
+    expect(i18n.t("inventory:nav.items")).toBe("Products");
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(String(warn.mock.calls[0][0])).toContain('"test-i18n-stranger"');
+    expect(String(warn.mock.calls[0][0])).toContain("inventory:nav.items");
+    applyI18nOverrides([], h.modules, h.applied, h.saved);
+  });
+
+  it("a key of the module's own namespace needs no listing", () => {
+    // The namespace is the module's name; the catalog for it is not loaded
+    // in this suite, so the override is read back from the store.
+    const mod = makeModule("ownns", { en: { "ownns:title": "Mine" } }, []);
+    const h = harness(mod);
+
+    applyI18nOverrides([mod.name], h.modules, h.applied, h.saved);
+
+    expect(i18n.t("ownns:title")).toBe("Mine");
+    applyI18nOverrides([], h.modules, h.applied, h.saved);
+  });
+
+  it("two modules overriding one key are named together in development", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const first = makeModule("test-i18n-clash-a", {
+      en: { "inventory:nav.items": "Assets" },
+    });
+    const second = makeModule("test-i18n-clash-b", {
+      en: { "inventory:nav.items": "Goods" },
+    });
+    const h = harness(first, second);
+
+    applyI18nOverrides(
+      [first.name, second.name],
+      h.modules,
+      h.applied,
+      h.saved,
+    );
+
+    const said = warn.mock.calls.map((call) => String(call[0]));
+    const clash = said.filter((line) => line.includes("both override"));
+    expect(clash).toHaveLength(1);
+    expect(clash[0]).toContain('"test-i18n-clash-a"');
+    expect(clash[0]).toContain('"test-i18n-clash-b"');
+    expect(clash[0]).toContain("inventory:nav.items");
+    applyI18nOverrides([], h.modules, h.applied, h.saved);
   });
 });

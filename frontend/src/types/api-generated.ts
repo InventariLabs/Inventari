@@ -28548,6 +28548,8 @@ export interface components {
              * Format: uuid
              */
             delivery_id: string;
+            /** Error Cause */
+            error_cause?: string | null;
         };
         /**
          * Token
@@ -29163,6 +29165,8 @@ export interface components {
             created_at: string;
             /** Last Attempt At */
             last_attempt_at?: string | null;
+            /** Error Cause */
+            error_cause?: string | null;
         };
         /** WebhookEndpointCreate */
         WebhookEndpointCreate: {

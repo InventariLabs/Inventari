@@ -39,6 +39,21 @@ says what the release does rather than what changed since them.
   started, rather than the day it was created, and its Date column no longer
   announces a newest-first or oldest-first order that the days it shows do not
   follow.
+- An enabled module whose code fails to load after an update no longer answers
+  every one of its addresses with "Page not found": the application says that
+  part of it did not load and offers a reload.
+- A module's translation overrides take effect only in the namespace named
+  after the module; a key of another namespace needs the module to list it in
+  the new optional `adoptedI18nKeys` field (MODULES_GUIDE.md), and the
+  development console names an ignored key and a key two modules both override.
+- A failed webhook delivery explains itself in the reader's language — an
+  unreadable signing secret, a timeout, a refused or broken connection — and an
+  answer with an empty body says that it gave no reason. The two links in the
+  circuit-breaker banner share one colour.
+- The warning that a failed Test counts toward the circuit breaker is a line on
+  the Webhooks page, not a tooltip, so a phone and a keyboard see it.
+- On a phone, a module's settings page is named in the section picker instead
+  of reading "General".
 - The form that records a delivery cost as a variance on a posted receipt marks
   the amount and the reason as required, as it already did the day, and no
   longer accepts a day after today. A recipe card that can be dragged stays a
