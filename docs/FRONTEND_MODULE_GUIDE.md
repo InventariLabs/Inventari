@@ -247,7 +247,8 @@ const { data, isLoading } = useQuery<MyItem[]>({
 | `navOverrides` | `NavOverride[]` | No | Replace/hide navigation items per organization. |
 | `standalone` | `StandaloneDeclaration` | No | Declares how the module can run as the single focus module. |
 | `backgroundFeatures` | `Record<string, ComponentType>` | No | Route-free surfaces offered to focused modules. |
-| `i18nOverrides` | `Record<lang, Record<key, string>>` | No | Override core translations at runtime (keys as `ns:path`; see the gate test). |
+| `i18nOverrides` | `Record<lang, Record<key, string>>` | No | Override translations at runtime (keys as `ns:path`; see the gate test). Only the module's own namespace takes effect unless the key is in `adoptedI18nKeys`. |
+| `adoptedI18nKeys` | `string[]` | No | The keys of `i18nOverrides` that belong to another namespace, written as in `i18nOverrides`; an unlisted foreign key is ignored. |
 | `theme` | `{ cssVariables: Record<string, string> }` | No | Organization-scoped CSS variables. |
 | `labelPurpose` | `LabelPurposeConfig` | No | Offers a module-owned purpose for generated and scanned labels. |
 | `bulkActions` | `Omit<BulkAction, "moduleName">[]` | No | Actions shown when multiple items are selected (rendered by `ItemsBulkActionBar.tsx`). |
@@ -611,6 +612,9 @@ moduleRegistry.register({
 moduleRegistry.register({
   name: "library",
   routes: [],
+  // Keys outside the module's own namespace (`library`) take effect only
+  // when they are listed here.
+  adoptedI18nKeys: ["inventory:nav.items", "items:title"],
   i18nOverrides: {
     en: {
       "inventory:nav.items": "Catalogue",
@@ -632,6 +636,13 @@ must name the key the reader actually calls `t()` with — the sidebar reads
 `inventory:nav.items`, not `common:navigation.items`. The
 `i18nOverridesGate` test fails the build when an override targets a key that
 is missing from the shipped bundles or that nothing in `src/` reads.
+
+**Only your own namespace is yours.** A key in the namespace named after your
+module needs nothing more. A key of any other namespace — core vocabulary or
+a neighbour's — is applied only when you list it in `adoptedI18nKeys`;
+otherwise it is ignored and, in development, the console names it. When two
+enabled modules override the same key the one enabled last wins, and the
+console names both modules.
 
 **A rename carries the page it opens.** Renaming a navigation tab without the
 page title that tab leads to puts one concept under two names — the reader

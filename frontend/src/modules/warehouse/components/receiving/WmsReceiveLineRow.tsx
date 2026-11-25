@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { unitLabel } from "@/lib/i18nHelpers";
 import type { WmsReceiveLine } from "@/modules/warehouse/api/documents_receiving";
 import { floorPutaway } from "@/modules/warehouse/landedLocation";
+import { isRaisedTypedCount } from "@/modules/warehouse/lineStatus";
 import { ShelfSelect } from "@/modules/warehouse/components/LineTargetPicker";
 import { cn } from "@/lib/utils";
 import ShelfConfirmation, {
@@ -242,7 +243,13 @@ export default function WmsReceiveLineRow({
             taking over an interrupted session sees what was already counted. */}
         <span className="text-xs text-on-secondary">
           {line.received_quantity > 0
-            ? `${formatQuantityValue(line.received_quantity)}/${formatQuantityValue(line.expected_quantity)}`
+            ? isRaisedTypedCount(
+                line,
+                line.received_quantity,
+                line.expected_quantity,
+              )
+              ? formatQuantityValue(line.received_quantity)
+              : `${formatQuantityValue(line.received_quantity)}/${formatQuantityValue(line.expected_quantity)}`
             : formatQuantityValue(line.expected_quantity)}{" "}
           {unitLabel(t, line.uom_symbol)}
         </span>

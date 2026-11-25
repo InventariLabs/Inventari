@@ -2,6 +2,7 @@ import { onCatalogLoaded } from "@/i18n/config";
 import { logger } from "@/utils/logger";
 import { CORE_SECTION_NAV } from "./coreSections";
 import {
+  acceptedI18nOverrides,
   applyI18nOverrides,
   applyThemeOverrides,
   noteCatalogLanded,
@@ -206,6 +207,11 @@ class ModuleRegistry {
 
   getActionItemProviders(enabledModules: string[]) {
     return this.queries.getActionItemProviders(enabledModules);
+  }
+
+  /** The translation overrides of `module` that take effect (see {@link acceptedI18nOverrides}). */
+  effectiveI18nOverrides(module: FrontendModule) {
+    return acceptedI18nOverrides(module);
   }
 
   applyI18nOverrides(enabledModules: string[]) {

@@ -92,6 +92,34 @@ describe("WmsReceivingSummary — the list accounts for every expected unit", ()
     expect(screen.getByText("18 of 30 pcs. received")).toBeInTheDocument();
   });
 
+  it("prints a raised typed count as what arrived, never as X of Y expected", () => {
+    renderSummary([
+      {
+        ...lines[2],
+        expected_is_count: true,
+        expected_quantity: 1,
+        received_quantity: 2,
+      },
+    ]);
+
+    expect(screen.getByText("2 of 2 pcs. received")).toBeInTheDocument();
+    expect(screen.getByText("2 pcs.")).toBeInTheDocument();
+    expect(screen.queryByText("2/1 pcs.")).not.toBeInTheDocument();
+  });
+
+  it("keeps the pair for a typed count that was not raised", () => {
+    renderSummary([
+      {
+        ...lines[2],
+        expected_is_count: true,
+        expected_quantity: 10,
+        received_quantity: 8,
+      },
+    ]);
+
+    expect(screen.getByText("8/10 pcs.")).toBeInTheDocument();
+  });
+
   it("counts each unit on its own when the lines disagree on the unit", () => {
     const mixed: WmsReceiveLine[] = [
       { ...lines[0], uom_symbol: "pcs" },

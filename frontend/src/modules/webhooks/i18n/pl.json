@@ -71,6 +71,14 @@
       "webhookDisabled": "Endpoint został wyłączony ręcznie przez administratora.",
       "webhookDeleted": "Endpoint został usunięty.",
       "moduleDisabled": "Moduł webhooks jest wyłączony dla tej organizacji."
+    },
+    "cause": {
+      "signingUnreadable": "Nie można odczytać sekretu podpisu — zapisano go pod innym kluczem (rotacja) albo zmieniono w tabeli. Wpisz go ponownie w ustawieniach endpointu; wysyłka jest odrzucana, a nie wysyłana bez podpisu.",
+      "timeout": "Cel nie odpowiedział w czasie limitu endpointu.",
+      "connectFailed": "Nie udało się połączyć z celem. Adres może być błędny, zapora może go blokować albo odbiorca może nie działać.",
+      "tlsRefused": "Połączenie odrzucone przez TLS: nie udało się zweryfikować certyfikatu odbiorcy.",
+      "connectionBroken": "Połączenie zerwało się, zanim odbiorca odpowiedział.",
+      "emptyAnswer": "Cel odpowiedział HTTP {{status}} bez treści, więc nie podał powodu. Sprawdź własny log odbiorcy."
     }
   },
   "testResult": {

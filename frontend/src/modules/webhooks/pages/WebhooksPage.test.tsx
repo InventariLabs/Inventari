@@ -277,6 +277,50 @@ describe("WebhooksPage", () => {
     expect(screen.getByText("item.created")).toBeInTheDocument();
   });
 
+  it("says on the page, not in a tooltip, that a failed test counts toward the breaker", async () => {
+    server.use(
+      http.get("/api/v1/webhooks/endpoints", () =>
+        HttpResponse.json(
+          onePage([
+            {
+              id: "abc-123",
+              name: "Test Webhook",
+              url: "https://example.com/hook",
+              has_secret: false,
+              http_method: "POST",
+              event_types: ["item.created"],
+              max_retries: 3,
+              timeout_seconds: 10,
+              is_active: true,
+              last_triggered_at: null,
+              last_status_code: null,
+              consecutive_failures: 0,
+              created_at: new Date().toISOString(),
+            },
+          ]),
+        ),
+      ),
+    );
+
+    render(<WebhooksPage />, { wrapper: Wrapper });
+    const test = await screen.findByRole("button", {
+      name: /Test Test Webhook/i,
+    });
+
+    // A visible sentence a phone shows before the tap, and the button
+    // describes itself by it for a keyboard and a screen reader.
+    expect(
+      screen.getByText(/A failed test counts toward the circuit breaker/),
+    ).toBeVisible();
+    expect(test).toHaveAccessibleDescription(
+      /A failed test counts toward the circuit breaker/,
+    );
+    expect(test).not.toHaveAttribute(
+      "title",
+      expect.stringContaining("breaker"),
+    );
+  });
+
   it("names the status a test ping was refused with, not the page that came back", async () => {
     // The toast names the receiver's status, not its whole HTML body.
     server.use(

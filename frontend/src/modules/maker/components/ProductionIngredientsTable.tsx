@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useStorageLocationLabels } from "@/modules/shared/hooks/useStorageLocationLabels";
 import { TriangleAlert } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
@@ -178,6 +179,14 @@ export function ProductionIngredientsTable({
   const rows: Row[] = isPlanned
     ? (planned ?? []).map(fromEntry)
     : lines.map(fromLine);
+  // Places read by path: two shelves of one name in different rooms are two
+  // places, and the "←" under a line is how a reader tells them apart.
+  const placeName = useStorageLocationLabels(
+    rows.flatMap((row) => [
+      row.locationId,
+      ...(row.plannedDraws?.map((draw) => draw.location_id) ?? []),
+    ]),
+  );
   const shortCount = shortageCount ?? shortages?.size ?? 0;
   // The consumption a closed run wrote is recorded twice: on the line at
   // numeric(12,4) and in the moves ledger at numeric(12,3). The moves table
@@ -289,7 +298,9 @@ export function ProductionIngredientsTable({
                         className="text-xs text-on-muted mt-0.5 break-words sm:truncate"
                         title={row.locationId}
                       >
-                        ← {row.locationName ?? t("detail.line.unknownLocation")}
+                        ←{" "}
+                        {placeName(row.locationId, row.locationName) ??
+                          t("detail.line.unknownLocation")}
                       </div>
                     )}
                     {/* The draft's own forecast of that line: which shelves
@@ -303,7 +314,8 @@ export function ProductionIngredientsTable({
                         title={draw.location_id}
                       >
                         ←{" "}
-                        {draw.location_name ?? t("detail.line.unknownLocation")}{" "}
+                        {placeName(draw.location_id, draw.location_name) ??
+                          t("detail.line.unknownLocation")}{" "}
                         · {formatQuantityLocalized(t, draw.quantity, row.unit)}
                       </div>
                     ))}

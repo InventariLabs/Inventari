@@ -1260,7 +1260,9 @@
     "sessionEndedReadUnsaved": "Votre session a pris fin, donc ce que vous avez saisi sur cet écran n'a pas été conservé. Reconnectez-vous et recommencez.",
     "imageFormatUnsupported": "Ce format d'image n'est pas pris en charge. Utilisez une image JPG, PNG, GIF ou WebP.",
     "modulesUnavailableTitle": "La liste des modules n'a pas pu être lue",
-    "modulesUnavailableBody": "La liste des modules activés de votre organisation n'a pas pu être lue, les espaces de travail ne peuvent donc pas être nommés. Rien n'est perdu — réessayez dans un instant ; si l'erreur persiste, prévenez l'administrateur de cette installation."
+    "modulesUnavailableBody": "La liste des modules activés de votre organisation n'a pas pu être lue, les espaces de travail ne peuvent donc pas être nommés. Rien n'est perdu — réessayez dans un instant ; si l'erreur persiste, prévenez l'administrateur de cette installation.",
+    "modulesNotLoadedTitle": "Une partie de l'application ne s'est pas chargée",
+    "modulesNotLoadedBody": "Un module utilisé par votre organisation n'a pas pu être chargé, ce qui arrive souvent juste après une mise à jour. Rien n'est perdu — rechargez la page ; si l'erreur persiste, prévenez l'administrateur de cette installation."
   },
   "a11y": {
     "skipToContent": "Aller au contenu",
