@@ -617,6 +617,15 @@ const dist = join(root, "dist");
  * first paint 408.5 of 410, login 413.5 of 415, launcher 428.4 of 430, start
  * 647.9 of 650, issue 594.4 of 595, history 619.5 of 620, products 638.5 of
  * 640, initial 194.2).
+ *
+ * Re-measured 2026-11-25 on the branch that keeps the focus, Back and the
+ * touch targets right on the phone screens, merged with the development line:
+ * the issue screen measures 595.1 KiB gz against its 595 and history 620.1
+ * against its 620 (the line alone 594.4 and 619.5). This one is code, not
+ * copy: the Back-to-start hook the posted result shares with the header, the
+ * suggestion panel's placement and Tab handling in the product picker, and
+ * their module SDK exports, which both screens load. Those two phone budgets
+ * move a step of five, to 600 and 625; the other screens stand under theirs.
  */
 const BUDGETS = {
   initial: 245,
