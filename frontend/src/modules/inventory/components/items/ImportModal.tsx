@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import { itemsApi } from "@/lib/api/items";
 import { getEveryPage } from "@/module-sdk";
 import { queryKeys } from "@/hooks/queries/keys";
 import type { ItemImportOutcome } from "@/components/import/types";
-import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { ChoiceGroup } from "@/components/ui/ChoiceGroup";
 import { InlineQueryError } from "@/components/ui/QueryResult";
@@ -22,11 +20,9 @@ import type {
   FieldDefinition,
   StorageLocationSummary,
 } from "@/types";
-import {
-  applyGrocyPreset,
-  locationFieldKey,
-  suggestMapping,
-} from "./importMapping";
+import { locationFieldKey, suggestMapping } from "./importMapping";
+import { GrocyImportSheet } from "./GrocyImportSheet";
+import { ImportFoundedList } from "./ImportFoundedList";
 
 interface Props {
   onClose: () => void;
@@ -115,6 +111,9 @@ export default function ImportModal({ onClose }: Props) {
   const [createCategories, setCreateCategories] = useState(true);
   const [createLocations, setCreateLocations] = useState(true);
   const [onLabelMatch, setOnLabelMatch] = useState<LabelMatchMode>("add");
+  // Grocy writes no export: its tile opens a move that reads Grocy's own
+  // database file instead of a sheet's columns.
+  const [fromGrocy, setFromGrocy] = useState(false);
 
   // The price feeds the stock value; where that value is not shown, the
   // item form drops the field, and the import neither offers the column nor
@@ -183,6 +182,9 @@ export default function ImportModal({ onClose }: Props) {
       : t("items:import.added", { count: 0 });
   };
 
+  if (fromGrocy)
+    return <GrocyImportSheet onClose={onClose} summary={summary} />;
+
   return (
     <ImportWizardSheet<ItemImportOutcome>
       onClose={onClose}
@@ -225,20 +227,8 @@ export default function ImportModal({ onClose }: Props) {
       secondaryUpload={{
         label: t("items:import.grocy"),
         hint: t("items:import.grocyHint"),
+        onSelect: () => setFromGrocy(true),
       }}
-      mappingHeaderExtras={({ headers, mapping, setMapping }) => (
-        <Button
-          size="content"
-          variant="ghost"
-          onClick={() => {
-            setMapping(applyGrocyPreset(headers, mapping));
-            toast.success(t("inventory:toasts.importGrocyMappingApplied"));
-          }}
-          className="text-[10px] font-medium text-primary-600 hover:text-primary-700 uppercase tracking-wider bg-primary-50 px-3 py-1.5 rounded-lg border border-primary-100"
-        >
-          {t("items:import.applyGrocyPreset")}
-        </Button>
-      )}
       mappingExtras={({ mapping, filledCounts }) => (
         <>
           {/* Without the answer the columns the locations add are missing
@@ -351,34 +341,18 @@ export default function ImportModal({ onClose }: Props) {
                 {t("items:import.matchedSkipped", { count: result.skipped })}
               </p>
             )}
-            {result.created_locations.length > 0 && (
-              <div>
-                <p className="text-[10px] font-medium text-on-muted uppercase tracking-widest mb-1">
-                  {t("items:import.foundedLocations", {
-                    count: result.created_locations.length,
-                  })}
-                </p>
-                <ul className="text-xs text-on space-y-0.5">
-                  {result.created_locations.map((path) => (
-                    <li key={path}>{path}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {result.created_categories.length > 0 && (
-              <div>
-                <p className="text-[10px] font-medium text-on-muted uppercase tracking-widest mb-1">
-                  {t("items:import.foundedCategories", {
-                    count: result.created_categories.length,
-                  })}
-                </p>
-                <ul className="text-xs text-on space-y-0.5">
-                  {result.created_categories.map((name) => (
-                    <li key={name}>{name}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            <ImportFoundedList
+              heading={t("items:import.foundedLocations", {
+                count: result.created_locations.length,
+              })}
+              names={result.created_locations}
+            />
+            <ImportFoundedList
+              heading={t("items:import.foundedCategories", {
+                count: result.created_categories.length,
+              })}
+              names={result.created_categories}
+            />
           </div>
         ) : null
       }

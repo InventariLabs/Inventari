@@ -2515,6 +2515,10 @@ export interface paths {
          *     written, with every missing key named. A file of more than
          *     ``INLINE_ROW_LIMIT`` steps (batches, and products without stock) is
          *     answered with ``202`` and a job, as a long sheet is.
+         *
+         *     ``category_matches_json`` maps a Grocy group's name to a category the
+         *     reader's screen recognised by the name it shows — a seeded category is
+         *     stored in English and shown in the reader's language.
          */
         post: operations["import_grocy_file_api_v1_items_import_grocy_post"];
         delete?: never;
@@ -13182,6 +13186,8 @@ export interface components {
         Body_import_grocy_file_api_v1_items_import_grocy_post: {
             /** File */
             file: string;
+            /** Category Matches Json */
+            category_matches_json?: string;
         };
         /** Body_import_ingredient_defaults_api_v1_recipes_ingredient_defaults_import_post */
         Body_import_ingredient_defaults_api_v1_recipes_ingredient_defaults_import_post: {
@@ -16664,7 +16670,7 @@ export interface components {
              * What
              * @enum {string}
              */
-            what: "inactive_products" | "extra_barcodes" | "unit_conversions" | "units_as_pieces" | "default_best_before_days" | "pictures" | "parent_products" | "own_field_values" | "recipes" | "meal_plan" | "chores" | "batteries" | "tasks" | "equipment";
+            what: "inactive_products" | "extra_barcodes" | "unit_conversions" | "units_as_pieces" | "prices_below_a_cent" | "default_best_before_days" | "pictures" | "parent_products" | "own_field_values" | "recipes" | "meal_plan" | "chores" | "batteries" | "tasks" | "equipment";
             /** Count */
             count: number;
             /**

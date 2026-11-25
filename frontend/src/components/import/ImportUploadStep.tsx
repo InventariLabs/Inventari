@@ -3,10 +3,18 @@ import { useTranslation } from "react-i18next";
 import { Upload, Database, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
+export interface SecondaryUpload {
+  label: string;
+  hint: string;
+  onSelect?: () => void;
+}
+
 interface ImportUploadStepProps {
   onFileSelect: (file: File) => void;
-  /** A second tile naming a known source (Grocy, say); opens the same picker. */
-  secondaryUpload?: { label: string; hint: string };
+  /** A second tile naming a known source (Grocy, say). It opens the same
+   *  picker, or — given `onSelect` — hands the reader to the source's own
+   *  flow, for a source that is not a sheet (Grocy's database file). */
+  secondaryUpload?: SecondaryUpload;
 }
 
 export function ImportUploadStep({
@@ -50,7 +58,7 @@ export function ImportUploadStep({
           <Button
             size="content"
             variant="outline"
-            onClick={openFilePicker}
+            onClick={secondaryUpload.onSelect ?? openFilePicker}
             className="p-8 border border-dashed border-primary-100 flex-col items-center gap-4"
           >
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center transition-all bg-primary-50 text-primary-400 group-hover:bg-primary-600 group-hover:text-white">

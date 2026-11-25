@@ -334,6 +334,7 @@ LeftBehindKind = Literal[
     'extra_barcodes',
     'unit_conversions',
     'units_as_pieces',
+    'prices_below_a_cent',
     'default_best_before_days',
     'pictures',
     'parent_products',

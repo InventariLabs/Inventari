@@ -21,6 +21,7 @@ vi.mock("@/lib/api/items", () => ({
 
 vi.mock("@/modules/inventory/hooks/useItemMutations", () => ({
   useImportItems: () => ({ mutateAsync }),
+  useImportGrocy: () => ({ mutateAsync: vi.fn() }),
 }));
 
 // Which keys the account holds, set per test; both by default, as for the
@@ -147,10 +148,9 @@ describe("ImportModal (products)", () => {
     expect(mapping.name).toBe("Name");
   });
 
-  it("keeps the Grocy preset and the create-missing option on the mapping step", async () => {
-    // The preset is not gated on a `grocy_importer` module, which this product
-    // does not have, so a column mapping computed entirely in the browser is
-    // reachable for everyone.
+  it("keeps the create-missing options on the mapping step, and no Grocy column preset", async () => {
+    // Grocy writes no sheet, so a preset for Grocy's columns mapped a file
+    // nobody can produce; its tile opens a move that reads Grocy's database.
     analyzeImport.mockResolvedValue({
       headers: ["name", "amount", "location"],
       preview_rows: [],
@@ -160,8 +160,8 @@ describe("ImportModal (products)", () => {
     await reachMappingStep();
 
     expect(
-      screen.getByRole("button", { name: "Apply Grocy preset" }),
-    ).toBeInTheDocument();
+      screen.queryByRole("button", { name: /Grocy/ }),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole("checkbox", {
         name: "Create missing locations automatically",
@@ -175,6 +175,18 @@ describe("ImportModal (products)", () => {
     expect(
       screen.getByText(/Every row becomes a new product/),
     ).toBeInTheDocument();
+  });
+
+  it("opens the move from Grocy's database file from the Grocy tile", async () => {
+    serveLocations(storages.list);
+    render(<ImportModal onClose={vi.fn()} />);
+
+    fireEvent.click(screen.getByText("Import from Grocy"));
+
+    expect(
+      await screen.findByRole("heading", { name: "Move in from Grocy" }),
+    ).toBeInTheDocument();
+    expect(analyzeImport).not.toHaveBeenCalled();
   });
 
   it("warns when the match mode has not one code in the file, and not when codes sit below the preview", async () => {

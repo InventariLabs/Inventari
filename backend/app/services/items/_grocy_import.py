@@ -72,6 +72,7 @@ _LEFT_BEHIND_ORDER = (
     'extra_barcodes',
     'unit_conversions',
     'units_as_pieces',
+    'prices_below_a_cent',
     'default_best_before_days',
     'pictures',
     'parent_products',
@@ -139,6 +140,12 @@ def left_behind(grocy: GrocyFile, units_as_pieces: list[str]) -> list[dict[str, 
         'pictures': sum(1 for p in products if p.has_picture),
         'parent_products': sum(1 for p in products if p.has_parent),
         'units_as_pieces': len(units_as_pieces),
+        'prices_below_a_cent': sum(
+            1
+            for p in products
+            for e in _stock_of(grocy).get(p.id, [])
+            if _price_held(e.price) is None and e.price is not None and e.price > 0
+        ),
         **grocy.left_behind,
     }
     return [
@@ -150,6 +157,23 @@ def left_behind(grocy: GrocyFile, units_as_pieces: list[str]) -> list[dict[str, 
         for kind in _LEFT_BEHIND_ORDER
         if counts.get(kind, 0) > 0
     ]
+
+
+#: The smallest price a record holds: its price is kept to the cent.
+_CENT = Decimal('0.01')
+
+
+def _price_held(price: Decimal | None) -> Decimal | None:
+    """A batch's price as a record keeps it, or ``None`` when it cannot.
+
+    A record keeps its unit price to the cent, and Grocy prices a product
+    counted in grams per gram: 0.0035 would be kept as 0.00, a price of
+    nothing. Such a price is left behind and counted, not written as zero.
+    """
+    if price is None or price <= 0:
+        return None
+    held = price.quantize(_CENT)
+    return held if held > 0 else None
 
 
 def _min_quantity(product: GrocyProduct) -> float | None:
@@ -177,11 +201,27 @@ class GrocyPlan:
     units_as_pieces: list[str]
     #: The units here that hold whole numbers only (a piece, a pack).
     whole_units: set[UUID] = field(default_factory=set)
+    #: A Grocy group's name (lower case) → the category here it is, when the
+    #: reader's screen matched it by the name it shows (see
+    #: :func:`plan_grocy_import_async`).
+    category_matches: dict[str, UUID] = field(default_factory=dict)
 
 
 async def plan_grocy_import_async(
-    db: AsyncSession, user: UserContextDTO, grocy: GrocyFile
+    db: AsyncSession,
+    user: UserContextDTO,
+    grocy: GrocyFile,
+    category_matches: dict[str, UUID] | None = None,
 ) -> GrocyPlan:
+    """What the move would found, read before anything is written.
+
+    A category the platform seeded is stored under its English name and
+    shown under its code's translation, so "Nabiał" in a Polish Grocy is
+    the seeded "Dairy" only by the name the screen shows. The screen knows
+    those names; ``category_matches`` is what it matched (a Grocy group's
+    name → a category id), and an id that is not this organization's is
+    ignored.
+    """
     org_id = _org_of(user)
     locations = {
         _name_key(n)
@@ -193,14 +233,17 @@ async def plan_grocy_import_async(
             )
         ).all()
     }
-    categories = {
-        _name_key(n)
-        for (n,) in (
-            await db.execute(
-                select(Category.name).where(Category.organization_id == org_id)
-            )
-        ).all()
+    category_rows = (
+        await db.execute(
+            select(Category.id, Category.name).where(Category.organization_id == org_id)
+        )
+    ).all()
+    matches = {
+        _name_key(name): category_id
+        for name, category_id in (category_matches or {}).items()
+        if category_id in {row_id for row_id, _ in category_rows}
     }
+    categories = {_name_key(n) for _, n in category_rows} | set(matches)
     suppliers = {
         _name_key(n)
         for (n,) in (
@@ -218,6 +261,7 @@ async def plan_grocy_import_async(
         unit_ids=unit_ids,
         units_as_pieces=[grocy.units[u].name for u in unknown if u in used_units],
         whole_units=whole_units,
+        category_matches=matches,
     )
 
 
@@ -397,6 +441,8 @@ class _Run:
             )
         )
         by_name = {_name_key(name): cat_id for cat_id, name in rows.all()}
+        for key, category_id in self.plan.category_matches.items():
+            by_name.setdefault(key, category_id)
         for group in self.grocy.groups.values():
             if not group.active:
                 continue
@@ -662,9 +708,7 @@ class _Run:
             if product.barcodes and template_id is None
             else None,
             expiry_date=entry.best_before,
-            purchase_price=entry.price
-            if entry.price is not None and entry.price > 0
-            else None,
+            purchase_price=_price_held(entry.price),
             added_date=entry.purchased,
             description=entry.note or product.description,
             min_quantity=_min_quantity(product),
@@ -705,6 +749,7 @@ async def import_grocy_file_async(
     grocy: GrocyFile,
     user: UserContextDTO,
     on_batch: Callable[[int], Awaitable[None]] | None = None,
+    category_matches: dict[str, UUID] | None = None,
 ) -> dict[str, Any]:
     """File the Grocy database into the organization; the summary of what it did.
 
@@ -726,7 +771,7 @@ async def import_grocy_file_async(
         user=user,
         org_id=org_id,
         grocy=grocy,
-        plan=await plan_grocy_import_async(db, user, grocy),
+        plan=await plan_grocy_import_async(db, user, grocy, category_matches),
         today=today,
         templates=await imported_product_ids_async(db, org_id),
         imported_stock=await _imported_stock_ids_async(db, org_id),

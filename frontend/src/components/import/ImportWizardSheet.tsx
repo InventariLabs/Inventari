@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { extractApiError } from "@/lib/errors";
 import { Button } from "@/components/ui/Button";
 import { Sheet, SheetActions, SheetFooter } from "@/components/ui/Sheet";
-import { ImportUploadStep } from "./ImportUploadStep";
+import { ImportUploadStep, type SecondaryUpload } from "./ImportUploadStep";
 import { ImportMappingStep } from "./ImportMappingStep";
 import { ImportProgressStep } from "./ImportProgressStep";
 import type {
@@ -60,7 +60,7 @@ export interface ImportWizardSheetProps<R extends ImportOutcome> {
     summary?: (result: R) => string;
     closeAndView: string;
   };
-  secondaryUpload?: { label: string; hint: string };
+  secondaryUpload?: SecondaryUpload;
   /** Beside the analyzed file name; a preset button, say. */
   mappingHeaderExtras?: (ctx: MappingStepContext) => ReactNode;
   /** Under the mapping grid: the entity's notes and options. */

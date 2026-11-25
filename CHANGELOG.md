@@ -39,9 +39,23 @@ says what the release does rather than what changed since them.
   again* as a put-away. The *Each product has its own location* setting shows
   for every warehouse, so one that keeps no fixed places can turn the question
   off.
+- A Grocy household moves in from Grocy's own database file. Grocy writes no
+  export, so **Import from Grocy** in the products' import dialog takes
+  `grocy.db` from Grocy's data folder. Before anything is written it shows
+  what the file holds, which locations, categories and suppliers it would
+  create, and what stays in Grocy. The move turns Grocy's locations, product
+  groups and stores into locations, categories and suppliers, reusing ones
+  with the same name — a Polish "Nabiał" goes to the seeded *Dairy* — and
+  every batch of stock into a record with its best-before date, price,
+  purchase date, shelf, store and opened mark; half of an opened piece is an
+  opened piece used down to the half. A unit Grocy names in any of the six
+  languages is recognised; one that is not counts pieces and is named.
+  Running the same file again adds only batches that are new.
 
 ### Fixed
 
+- The products' import dialog no longer offers a Grocy CSV preset: Grocy has
+  no CSV export, so the preset mapped columns of a file nobody could produce.
 - Polish wording and the shape of numbers read right. A refusal that counts
   things names them in the right form for one, two to four and five or more
   (a location type used by 1 location, a template used by 3 products, a stock

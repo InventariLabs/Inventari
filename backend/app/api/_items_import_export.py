@@ -201,6 +201,17 @@ async def _read_grocy_upload(file: UploadFile) -> GrocyFile:
         raise refusal_exception(exc) from exc
 
 
+def _category_matches(text: str) -> dict[str, UUID]:
+    """``{"<Grocy group>": "<category id>"}``, read; a refusal when it is not."""
+    try:
+        parsed = json.loads(text or '{}')
+        if not isinstance(parsed, dict):
+            raise TypeError(type(parsed).__name__)
+        return {str(name): UUID(str(value)) for name, value in parsed.items()}
+    except (json.JSONDecodeError, TypeError, ValueError) as e:
+        raise catalogue_refusal('invalid_mapping_json') from e
+
+
 @router.post('/import/grocy/analyze', response_model=GrocyFileAnalysis)
 async def analyze_grocy_file(
     file: UploadFile = File(...),
@@ -226,6 +237,7 @@ async def analyze_grocy_file(
 )
 async def import_grocy_file(
     file: UploadFile = File(...),
+    category_matches_json: str = Form('{}'),
     current_user: UserContextDTO = Depends(get_current_user_context),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
     db: AsyncSession = Depends(get_async_db, scope='function'),
@@ -238,10 +250,15 @@ async def import_grocy_file(
     written, with every missing key named. A file of more than
     ``INLINE_ROW_LIMIT`` steps (batches, and products without stock) is
     answered with ``202`` and a job, as a long sheet is.
+
+    ``category_matches_json`` maps a Grocy group's name to a category the
+    reader's screen recognised by the name it shows — a seeded category is
+    stored in English and shown in the reader's language.
     """
     require_org(current_user)
+    category_matches = _category_matches(category_matches_json)
     grocy = await _read_grocy_upload(file)
-    plan = await plan_grocy_import_async(db, current_user, grocy)
+    plan = await plan_grocy_import_async(db, current_user, grocy, category_matches)
     missing = [
         key
         for founds, permission, key in (
@@ -267,7 +284,9 @@ async def import_grocy_file(
 
     steps = grocy_import_steps(grocy)
     if steps <= import_jobs.INLINE_ROW_LIMIT:
-        return await import_grocy_file_async(db, grocy, current_user)
+        return await import_grocy_file_async(
+            db, grocy, current_user, category_matches=category_matches
+        )
 
     job = await import_jobs.start_job_async(
         db, current_user, file.filename or 'grocy.db', steps
@@ -279,7 +298,11 @@ async def import_grocy_file(
         session: AsyncSession, on_batch: Callable[[int], Awaitable[None]]
     ) -> dict[str, Any]:
         return await import_grocy_file_async(
-            session, grocy, current_user, on_batch=on_batch
+            session,
+            grocy,
+            current_user,
+            on_batch=on_batch,
+            category_matches=category_matches,
         )
 
     import_jobs.spawn(job.id, db_facade.AsyncSessionLocal, work=work)

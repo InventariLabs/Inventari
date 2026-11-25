@@ -380,6 +380,22 @@ class TestTheDoor:
         assert answer.status_code == 400
         assert answer.json()['detail']['code'] == 'GROCY_FILE_UNREADABLE'
 
+    def test_matches_that_are_not_a_map_of_ids_are_refused(
+        self, client: TestClient, auth_headers: dict
+    ) -> None:
+        g, _ = _household()
+        files = {'file': ('grocy.db', g.content(), 'application/octet-stream')}
+
+        answer = client.post(
+            '/api/v1/items/import/grocy',
+            files=files,
+            data={'category_matches_json': '{"Nabiał": "not an id"}'},
+            headers=auth_headers,
+        )
+
+        assert answer.status_code == 400
+        assert answer.json()['detail']['code'] == 'INVALID_MAPPING_JSON'
+
     def test_a_long_file_is_moved_by_a_job(
         self,
         client: TestClient,
@@ -445,3 +461,62 @@ class TestAnOpenedPackage:
             Decimal('0.5'),
             '2026-11-10',
         )
+
+
+class TestACategoryTheScreenRecognised:
+    async def test_a_group_the_screen_matched_files_under_that_category(
+        self, real_async_db_session, async_test_user, async_test_storage_location
+    ) -> None:
+        db = real_async_db_session
+        org = async_test_user.organization_id
+        # A seeded category: stored in English, shown by its code's translation.
+        dairy = Category(name='Dairy', code='dairy', organization_id=org)
+        foreign = Category(name='Elsewhere', code='dairy')
+        db.add_all([dairy, foreign])
+        await db.flush()
+        g = GrocyDb()
+        shelf = g.location('Lodówka')
+        piece = g.unit('Sztuka')
+        milk_group = g.group('Nabiał')
+        cheese_group = g.group('Sery')
+        milk = g.product('Mleko', location=shelf, unit=piece, group=milk_group)
+        g.stock(milk, 2, location=shelf)
+        cheese = g.product('Gouda', location=shelf, unit=piece, group=cheese_group)
+        g.stock(cheese, 1, location=shelf)
+
+        result = await import_grocy_file_async(
+            db,
+            read_grocy_file(g.content()),
+            _ctx(async_test_user),
+            category_matches={'Nabiał': dairy.id, 'Sery': foreign.id},
+        )
+
+        # Another organization's category is no match: the group is founded.
+        assert result['created_categories'] == ['Sery']
+        (record,) = await _records(db, 'Mleko')
+        assert record.category_id == dairy.id
+
+
+class TestAPriceARecordCannotHold:
+    async def test_a_price_per_gram_under_a_cent_is_left_behind_not_written_as_zero(
+        self, real_async_db_session, async_test_user, async_test_storage_location
+    ) -> None:
+        db = real_async_db_session
+        g = GrocyDb()
+        shelf = g.location('Grocy pantry')
+        gram = g.unit('Gram', 'Grams')
+        flour = g.product('Grocy rye flour', location=shelf, unit=gram)
+        g.stock(flour, 850, price=0.0035, location=shelf)
+        g.stock(flour, 500, price=0.012, location=shelf)
+
+        result = await import_grocy_file_async(
+            db, read_grocy_file(g.content()), _ctx(async_test_user)
+        )
+
+        assert sorted(
+            (r.quantity, r.purchase_price)
+            for r in await _records(db, 'Grocy rye flour')
+        ) == [(Decimal('500'), Decimal('0.01')), (Decimal('850'), None)]
+        assert {'what': 'prices_below_a_cent', 'count': 1, 'names': []} in result[
+            'left_behind'
+        ]

@@ -4,7 +4,7 @@ import { describe, it, expect, vi } from "vitest";
 import { withLanguage } from "@/test/mocks/i18n";
 import { ImportUploadStep } from "./ImportUploadStep";
 
-const grocy = { label: "Import from Grocy", hint: "Use your Grocy CSV export" };
+const grocy = { label: "Import from Grocy", hint: "Your Grocy database file" };
 
 describe("ImportUploadStep", () => {
   it("renders the generic tile and the named source when given one", () => {
@@ -68,6 +68,24 @@ describe("ImportUploadStep", () => {
       expect(opened).toHaveBeenCalledTimes(1);
     },
   );
+
+  it("hands a source with a flow of its own to that flow, not to the picker", async () => {
+    const onSelect = vi.fn();
+    render(
+      <ImportUploadStep
+        onFileSelect={vi.fn()}
+        secondaryUpload={{ ...grocy, onSelect }}
+      />,
+    );
+    const fileInput = document.getElementById("import-file") as HTMLElement;
+    const opened = vi.fn((e: Event) => e.preventDefault());
+    fileInput.addEventListener("click", opened);
+
+    await userEvent.click(screen.getByText("Import from Grocy"));
+
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(opened).not.toHaveBeenCalled();
+  });
 
   it("hands the chosen file to the wizard", async () => {
     const onFileSelect = vi.fn();
