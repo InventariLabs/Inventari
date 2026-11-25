@@ -27,7 +27,12 @@ from app.core.template_schemas import (
     DocumentTemplateUpdate,
     PlaceholderInfo,
 )
-from app.i18n.service import get_current_lang, get_error_message
+from app.i18n.service import (
+    SUPPORTED_LANGUAGES,
+    Language,
+    get_current_lang,
+    get_error_message,
+)
 
 _templates_router = APIRouter(
     dependencies=[Depends(require_module('purchase_orders'))],
@@ -62,6 +67,31 @@ PO_PLACEHOLDERS: list[PlaceholderInfo] = [
 ]
 
 
+def _built_ins(lang: Language) -> list[tuple[str, str, str]]:
+    """The layouts a purchase order PDF falls back to, named in one language."""
+    tpl_path = _TEMPLATES_DIR / 'po_standard.html'
+    if not tpl_path.exists():
+        return []
+    return [
+        (
+            get_error_message('purchase_order_standard_template', lang),
+            'STANDARD',
+            tpl_path.read_text(encoding='utf-8'),
+        )
+    ]
+
+
+def _built_ins_under_every_name() -> list[tuple[str, str, str]]:
+    """The same layouts under each name they could have been seeded with.
+
+    A copy is matched to its built-in by the name it was made under, and the
+    built-in is named in the seeding language, so a copy made in Polish and
+    read in English would match nothing. Same body under every name; whichever
+    one the copy carries, the checksum compared is the right one.
+    """
+    return [entry for lang in SUPPORTED_LANGUAGES for entry in _built_ins(lang)]
+
+
 @_templates_router.get('', response_model=PaginatedResponse[DocumentTemplateSchema])
 async def list_templates(
     limit: int = Query(50, ge=1, le=200),
@@ -70,8 +100,13 @@ async def list_templates(
     db: AsyncSession = Depends(get_async_db, scope='function'),
     org_id: UUID = Depends(require_org),
 ) -> PaginatedResponse[DocumentTemplateSchema]:
+    # Without the built-ins `source_modified` and `source_outdated` are never
+    # computed, so a copy that no longer matches its layout would not say so.
     templates = await core_api.templates.list_async(
-        db, org_id, module='purchase_orders'
+        db,
+        org_id,
+        module='purchase_orders',
+        built_ins=_built_ins_under_every_name(),
     )
     return PaginatedResponse.from_full_list(templates, offset=offset, limit=limit)
 
@@ -139,24 +174,62 @@ async def seed_default_templates(
     db: AsyncSession = Depends(get_async_db, scope='function'),
     org_id: UUID = Depends(require_org),
 ) -> list[DocumentTemplateSchema]:
-    tpl_path = _TEMPLATES_DIR / 'po_standard.html'
-    lang = get_current_lang()
-    built_ins: list[tuple[str, str, str]] = []
-    if tpl_path.exists():
-        built_ins.append(
-            (
-                get_error_message('purchase_order_standard_template', lang),
-                'STANDARD',
-                tpl_path.read_text(encoding='utf-8'),
-            )
-        )
-
     return await core_api.templates.seed_defaults_async(
         db=db,
         organization_id=org_id,
         module='purchase_orders',
         user_id=current_user.id,
-        built_ins=built_ins,
+        built_ins=_built_ins(get_current_lang()),
+    )
+
+
+@_templates_router.post(
+    '/{template_id}/refresh-copy',
+    response_model=DocumentTemplateSchema,
+    status_code=status.HTTP_201_CREATED,
+)
+async def refresh_builtin_copy(
+    template_id: UUID,
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> DocumentTemplateSchema:
+    """Copy the current built-in next to an organization's older copy.
+
+    Alongside, not over: whatever the organization has edited into its own
+    template stays, the new copy does not become the default, and which of
+    the two prints remains a decision somebody makes.
+    """
+    return await core_api.templates.copy_builtin_alongside_async(
+        db=db,
+        organization_id=org_id,
+        module='purchase_orders',
+        user_id=current_user.id,
+        template_id=template_id,
+        built_ins=_built_ins(get_current_lang()),
+    )
+
+
+@_templates_router.post('/{template_id}/reset', response_model=DocumentTemplateSchema)
+async def reset_template_to_built_in(
+    template_id: UUID,
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+    org_id: UUID = Depends(require_org),
+) -> DocumentTemplateSchema:
+    """Put a copy back as the built-in it came from, in place.
+
+    Whatever was written into the copy is gone; its name, its place among
+    the defaults and everything that points at it stay. A template that was
+    not copied from a built-in has nothing to go back to: 404.
+    """
+    return await core_api.templates.reset_to_builtin_async(
+        db=db,
+        organization_id=org_id,
+        module='purchase_orders',
+        user=current_user,
+        template_id=template_id,
+        built_ins=_built_ins_under_every_name(),
     )
 
 
