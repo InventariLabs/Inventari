@@ -17,8 +17,13 @@ services:
     #   POSTGRES_FSYNC=off POSTGRES_SYNCHRONOUS_COMMIT=off POSTGRES_FULL_PAGE_WRITES=off
     # A server started that way can lose or corrupt data if the host dies
     # mid-write, so it is strictly for databases you can recreate.
+    #
+    # `plan_cache_mode=force_custom_plan` is production's: every execution of
+    # a prepared statement is planned for its own values
+    # (docker-compose.prod.yml says why).
     command: >
       postgres
+      -c plan_cache_mode=force_custom_plan
       -c max_connections=200
       -c max_locks_per_transaction=256
       -c shared_buffers=${POSTGRES_SHARED_BUFFERS:-256MB}

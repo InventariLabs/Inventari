@@ -78,6 +78,11 @@ def init_async_engine() -> None:
         pool_timeout=30,
         pool_recycle=300,
         pool_pre_ping=True,
+        # The cache off keeps no statement the pooler may have moved to
+        # another server connection. It does not stop PgBouncer from sharing
+        # one prepared statement among every client that prepares the same
+        # text; the database's plan_cache_mode is what keeps such a statement
+        # planned for each organization (docker-compose.prod.yml).
         connect_args={
             'prepared_statement_cache_size': 0,
         },
