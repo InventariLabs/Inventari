@@ -33782,6 +33782,58 @@
         }
       }
     },
+    "/api/v1/warehouse/documents/{doc_id}/home-shelf-offers": {
+      "get": {
+        "tags": [
+          "Warehouse"
+        ],
+        "summary": "List Receipt Home Shelf Offers",
+        "description": "Which shelves a posted receipt in one step offers as a product's home.\n\nOne entry for each product whose line was put on a shelf other than the\nsuggested one; empty when the warehouse keeps no fixed places, receives in\ntwo steps (the put-away asks) or the product's question was silenced.",
+        "operationId": "list_receipt_home_shelf_offers_api_v1_warehouse_documents__doc_id__home_shelf_offers_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_HomeShelfOffer_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/warehouse/documents/{doc_id}/import-lines": {
       "post": {
         "tags": [
@@ -66705,6 +66757,47 @@
           "has_more"
         ],
         "title": "PaginatedResponse[FailedEmailSummary]"
+      },
+      "PaginatedResponse_HomeShelfOffer_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/HomeShelfOffer"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
+          "total_capped": {
+            "type": "boolean",
+            "title": "Total Capped",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset",
+          "has_more"
+        ],
+        "title": "PaginatedResponse[HomeShelfOffer]"
       },
       "PaginatedResponse_HomeShelfSilencedOut_": {
         "properties": {

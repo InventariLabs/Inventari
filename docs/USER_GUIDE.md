@@ -1248,10 +1248,15 @@ quarantine location or a location that does not take stock is never offered as
 a home; the sheet says why instead. Nothing is asked when you were forced off
 the suggestion because it was full or could not take the goods.
 
+A warehouse that receives in one step has no put-away, so the same question is
+asked when the receipt is posted: for each product whose line you put on a
+location other than the suggested one (a shelf chosen on the line), one sheet
+lists the products, each with *Yes*, *No* and *Don't ask about this product
+again*. A line left on the suggestion asks nothing.
+
 The question belongs to warehouses that keep a place per product. In
 Configuration → *Putaway*, the checkbox *Each product has its own location in …*
-is on by default (it appears for a warehouse that receives into its receiving
-area); switch it off for a warehouse that stores goods wherever there is room
+is on by default and appears for every warehouse; switch it off for a warehouse that stores goods wherever there is room
 (pallet stores, logistics) and its put-away never asks, leaving the suggestion
 to the rules alone.
 

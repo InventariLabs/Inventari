@@ -122,19 +122,19 @@ export function useItem(itemId: string) {
  * Search the organization's products.
  *
  * `storageId` narrows the search to one place and everything below it before
- * the page is cut. The page is ordered by creation across the whole organization, so a shelf that
- * holds a matching record can fall off it entirely behind a hundred matches
- * elsewhere; a screen that means "this place first" asks about the place
- * separately instead of reordering the organization's page.
+ * the page is cut, and reads every page of it: a counted parent can hold more
+ * matches than one page. The organization's page is ordered by creation, so a
+ * shelf that holds a matching record can fall off it entirely behind a
+ * hundred matches elsewhere; a screen that means "this place first" asks about
+ * the place separately instead of reordering the organization's page.
  */
 export function useItemSearch(query: string, storageId?: string) {
   return useQuery<ItemListResponse>({
     queryKey: queryKeys.items.search(query, storageId),
     queryFn: () =>
-      itemsApi.getAll({
-        search: query,
-        ...(storageId ? { location_id: storageId, include_inside: true } : {}),
-      }),
+      storageId
+        ? itemsApi.searchInside({ search: query, location_id: storageId })
+        : itemsApi.getAll({ search: query }),
     enabled: query.length > 0,
   });
 }

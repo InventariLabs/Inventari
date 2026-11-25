@@ -1,5 +1,13 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import type { ReactElement } from "react";
+import {
+  render as renderPlain,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { serveLocations } from "@/test/serveLocations";
 import type {
   CostBreakdownEntry,
   ShortageEntry,
@@ -64,6 +72,20 @@ vi.mock("react-i18next", () => ({
 vi.mock("@/hooks/useOrganizationCurrency", () => ({
   useOrganizationCurrency: () => "USD",
 }));
+
+// The places are named by looking their ids up, so the table needs a client.
+// The mocked translator above stands in for the whole i18n provider, which is
+// why this does not use the shared render.
+const render = (ui: ReactElement) =>
+  renderPlain(
+    <QueryClientProvider
+      client={
+        new QueryClient({ defaultOptions: { queries: { retry: false } } })
+      }
+    >
+      {ui}
+    </QueryClientProvider>,
+  );
 
 const UNIT_HEADER = "detail.line.unitCost";
 const LINE_HEADER = "detail.line.lineCost";
@@ -310,5 +332,49 @@ describe("ProductionIngredientsTable — the estimate beside each ingredient", (
   it("shows no estimate on a run that closed before one was kept", () => {
     render(<ProductionIngredientsTable lines={[line]} />);
     expect(screen.queryByTestId("maker-line-estimate")).not.toBeInTheDocument();
+  });
+});
+
+describe("ProductionIngredientsTable — where an ingredient came from", () => {
+  it("names the shelf by its path, so two shelves of one name tell apart", async () => {
+    serveLocations([
+      { id: "room-a", name: "Workshop" },
+      { id: "shelf-a", name: "Shelf 1", parent_id: "room-a" },
+    ]);
+    const located = {
+      ...line,
+      source_location_id: "shelf-a",
+      source_location_name: "Shelf 1",
+    } as ProductionOrderLine;
+    render(<ProductionIngredientsTable lines={[located]} isPlanned={false} />);
+
+    await waitFor(() =>
+      expect(screen.getByText(/Workshop.*Shelf 1/)).toBeInTheDocument(),
+    );
+  });
+
+  it("names a draft's planned draws by path too", async () => {
+    serveLocations([
+      { id: "room-a", name: "Workshop" },
+      { id: "shelf-a", name: "Shelf 1", parent_id: "room-a" },
+    ]);
+    const drafted: CostBreakdownEntry = {
+      ...entry,
+      planned_draws: [
+        { location_id: "shelf-a", location_name: "Shelf 1", quantity: "5" },
+      ],
+    } as unknown as CostBreakdownEntry;
+    render(
+      <ProductionIngredientsTable
+        lines={[]}
+        isPlanned
+        planned={[drafted]}
+        shortages={new Map()}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByText(/Workshop.*Shelf 1/)).toBeInTheDocument(),
+    );
   });
 });

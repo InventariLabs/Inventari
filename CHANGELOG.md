@@ -32,6 +32,13 @@ says what the release does rather than what changed since them.
   for the domain and the e-mail address, generates the five secrets and the
   encryption key, and never overwrites an existing file. The guides use it
   instead of six `openssl` commands to paste by hand.
+- A warehouse that receives in one step now asks the home-location question
+  too. When a receipt is posted, one sheet lists each product whose line was
+  put on a location other than the suggested one and offers to make it the
+  product's home, with the same refusals and *Don't ask about this product
+  again* as a put-away. The *Each product has its own location* setting shows
+  for every warehouse, so one that keeps no fixed places can turn the question
+  off.
 
 ### Fixed
 
@@ -54,6 +61,16 @@ says what the release does rather than what changed since them.
   the Webhooks page, not a tooltip, so a phone and a keyboard see it.
 - On a phone, a module's settings page is named in the section picker instead
   of reading "General".
+- A receiving session's line and completion summary read a typed count that
+  was raised as "2/1 pcs." and "2 of 1 received"; they now print what arrived,
+  as the closed receipt does. The all-locations total on a product page
+  follows a stock press without a reload, a product used up to zero no longer
+  offers *Remove 1 unit*, and the full Add Item page says where a catalogue
+  unit it fills in comes from. A scan's remembered location that has since
+  been deleted is dropped from the add form instead of leaving an empty-looking
+  field, and the counting search reads every page of a counted location.
+  Attention rows and a production order's ingredients name a shelf by its
+  path.
 - The form that records a delivery cost as a variance on a posted receipt marks
   the amount and the reason as required, as it already did the day, and no
   longer accepts a day after today. A recipe card that can be dragged stays a

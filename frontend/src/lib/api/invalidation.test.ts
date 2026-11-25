@@ -43,6 +43,26 @@ describe("invalidation helpers", () => {
       }
     });
 
+    it("marks every product's all-locations total stale, and nothing else under the template root", () => {
+      const qc = new QueryClient();
+      qc.setQueryData(queryKeys.productTemplates.stock("t-1"), {});
+      qc.setQueryData(queryKeys.productTemplates.stock("t-2"), {});
+      qc.setQueryData(queryKeys.productTemplates.search("flour"), []);
+      invalidation.items(qc);
+      expect(
+        qc.getQueryState(queryKeys.productTemplates.stock("t-1"))
+          ?.isInvalidated,
+      ).toBe(true);
+      expect(
+        qc.getQueryState(queryKeys.productTemplates.stock("t-2"))
+          ?.isInvalidated,
+      ).toBe(true);
+      expect(
+        qc.getQueryState(queryKeys.productTemplates.search("flour"))
+          ?.isInvalidated,
+      ).toBe(false);
+    });
+
     it("also invalidates storage-items when storageId provided", () => {
       const qc = makeClient();
       invalidation.items(qc, "s-1");
