@@ -79,6 +79,25 @@ describe("PageHeader back arrow", () => {
     expect(screen.getByTestId("where")).toHaveTextContent(/^\/orders$/);
   });
 
+  it("goes to the parent screen when a redirect replaced the only entry", async () => {
+    // A replace hands the first entry a fresh key, but the browser still
+    // counts one entry, so there is nothing to pop.
+    window.history.replaceState({ idx: 0 }, "");
+    render(
+      <MemoryRouter
+        initialEntries={[{ pathname: "/orders/42", key: "after-redirect" }]}
+      >
+        <PageHeader title="Order 42" backTo="/orders" />
+        <Where />
+      </MemoryRouter>,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "Back" }));
+
+    expect(screen.getByTestId("where")).toHaveTextContent(/^\/orders$/);
+    window.history.replaceState(null, "");
+  });
+
   it("asks before leaving a form with unsaved work, and stays put on Cancel", async () => {
     renderBack(["/orders/42"], 0);
     act(() => useFormGuardStore.getState().setDirtyForm("The order form"));

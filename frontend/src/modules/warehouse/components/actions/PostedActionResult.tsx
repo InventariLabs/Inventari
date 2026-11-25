@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useBackToScreen } from "@/module-sdk";
 import { useTranslation } from "react-i18next";
 import { CircleCheck, Hourglass, Printer, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -134,7 +135,7 @@ export function PostedActionResult({
   onAnother,
 }: PostedActionResultProps) {
   const { t } = useTranslation(["warehouse", "common"]);
-  const navigate = useNavigate();
+  const backToStart = useBackToScreen("/warehouse/todo");
   const undo = useUndoDocument();
   const [reversal, setReversal] = useState<WarehouseDocument | null>(null);
   const [undoError, setUndoError] = useState<string | null>(null);
@@ -229,7 +230,7 @@ export function PostedActionResult({
 
       <div className="flex flex-wrap gap-2">
         <Button onClick={onAnother}>{another(t, action)}</Button>
-        <Button variant="outline" onClick={() => navigate("/warehouse/todo")}>
+        <Button variant="outline" onClick={backToStart}>
           {t("posted.backToStart")}
         </Button>
         <Button

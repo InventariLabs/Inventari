@@ -8,7 +8,7 @@ import {
   useLocation,
   type InitialEntry,
 } from "react-router-dom";
-import { useShellBack } from "./useShellBack";
+import { useBackToScreen, useShellBack } from "./useShellBack";
 
 const moduleOf = (path: string) =>
   path.startsWith("/purchase-orders")
@@ -41,6 +41,12 @@ function Shell() {
   );
 }
 
+/** The posted result's "Back to start" button. */
+function BackToStart() {
+  const toStartScreen = useBackToScreen("/warehouse/todo");
+  return <button onClick={toStartScreen}>Back to start</button>;
+}
+
 const toStart = { backTo: "/warehouse/todo" };
 
 function renderApp(entries: InitialEntry[], index?: number) {
@@ -65,8 +71,15 @@ function renderApp(entries: InitialEntry[], index?: number) {
             </>
           }
         />
-        <Route path="/warehouse/move" element={<p>move</p>} />
-        <Route path="/inventory/stock" element={<p>stock</p>} />
+        <Route path="/warehouse/move" element={<BackToStart />} />
+        <Route
+          path="/inventory/stock"
+          element={
+            <Link to="/warehouse/move" state={toStart}>
+              move from stock
+            </Link>
+          }
+        />
         <Route
           path="/purchase-orders"
           element={<Link to="/purchase-orders/7">order</Link>}
@@ -134,21 +147,38 @@ describe("useShellBack", () => {
     expect(at()).toBe("/launcher");
   });
 
-  it("puts the named screen in place of this one when the entry before is another", () => {
-    // A reload or a direct link: the shell never saw the entry before.
+  it("pops to the screen it came from when a reload hid the entry before", () => {
+    // After a reload the shell never saw the entry before, but the browser
+    // counts one: replacing would show the start twice in a row.
     renderApp(
       [
         "/launcher",
-        "/inventory/stock",
+        "/warehouse/todo",
         { pathname: "/warehouse/move", state: toStart },
       ],
       2,
     );
     back();
     expect(at()).toBe("/warehouse/todo");
+    back();
+    expect(at()).toBe("/launcher");
+  });
+
+  it("puts the named screen in place of this one when the entry before is another", () => {
+    renderApp(["/launcher", "/inventory/stock"], 1);
+    link("move from stock");
+    expect(at()).toBe("/warehouse/move");
+    back();
+    expect(at()).toBe("/warehouse/todo");
     // The move screen is gone from the history, not buried under the start.
     back();
     expect(at()).toBe("/inventory/stock");
+  });
+
+  it("puts the named screen in place of this one when nothing is left to pop", () => {
+    renderApp([{ pathname: "/warehouse/move", state: toStart }]);
+    back();
+    expect(at()).toBe("/warehouse/todo");
   });
 
   it("leads home from a document opened by a direct link, past a path no screen answers", () => {
@@ -169,6 +199,17 @@ describe("useShellBack", () => {
     // In this fixture `/inventory` has a stock screen but no root of its own: the
     // climb runs out of screens and the launcher is the only answer left.
     renderApp(["/inventory/items/42"]);
+    back();
+    expect(at()).toBe("/launcher");
+  });
+
+  it("leaves a posted result for the start without a second copy of it", () => {
+    renderApp(["/launcher"]);
+    link("go");
+    link("move");
+    click("button", "Back to start");
+    expect(at()).toBe("/warehouse/todo");
+    // The form the reader finished is not behind the start any more.
     back();
     expect(at()).toBe("/launcher");
   });

@@ -4,6 +4,7 @@ import {
   useNavigate,
   useNavigationType,
   type Location,
+  type NavigateFunction,
 } from "react-router-dom";
 import { useReturnTarget } from "@/hooks/useReturnTarget";
 
@@ -48,6 +49,35 @@ export function hasHistoryToPop(location: Location): boolean {
 }
 
 /**
+ * Where `target` is, relative to this entry, when a screen sends the reader
+ * to it: by popping when the entry just before is that screen — or when the
+ * shell never saw the entry before (a reload) and the browser counts an
+ * earlier one, which is then the screen the reader came from — so the history
+ * does not grow a second copy of it; by replacing this entry otherwise.
+ */
+function goTo(
+  navigate: NavigateFunction,
+  location: Location,
+  target: string,
+  before: string | undefined,
+): void {
+  const targetPath = trimmed(target.split(/[?#]/)[0]);
+  const popsToIt =
+    before === undefined
+      ? hasHistoryToPop(location)
+      : trimmed(before) === targetPath;
+  if (popsToIt) navigate(-1);
+  else navigate(target, { replace: true });
+}
+
+/**
+ * The path of the entry right before the current one, while the shell knows
+ * it. The shell header and the screens under it both ask, so it lives at
+ * module level: there is one shell per tab.
+ */
+let entryBefore: string | undefined;
+
+/**
  * What the phone header's Back arrow does. A label that says Back promises
  * the previous screen, so:
  *
@@ -77,24 +107,23 @@ export function useShellBack(
   // pop (a browser button, a reload) says nothing about it.
   const current = useRef({ key: location.key, path: location.pathname });
   const before = useRef<string | undefined>(undefined);
+  useEffect(
+    () => () => {
+      entryBefore = undefined;
+    },
+    [],
+  );
   useEffect(() => {
     if (current.current.key === location.key) return;
     if (navigationType === "PUSH") before.current = current.current.path;
     else if (navigationType === "POP") before.current = undefined;
+    entryBefore = before.current;
     current.current = { key: location.key, path: location.pathname };
   }, [location, navigationType]);
 
   return () => {
     if (returnTarget) {
-      const targetPath = trimmed(returnTarget.split(/[?#]/)[0]);
-      if (
-        before.current !== undefined &&
-        trimmed(before.current) === targetPath
-      ) {
-        navigate(-1);
-      } else {
-        navigate(returnTarget, { replace: true });
-      }
+      goTo(navigate, location, returnTarget, before.current);
     } else if (!basePath || trimmed(location.pathname) === trimmed(basePath)) {
       navigate(homePath);
     } else if (hasHistoryToPop(location)) {
@@ -109,4 +138,16 @@ export function useShellBack(
       );
     }
   };
+}
+
+/**
+ * A button that leads back to a named screen the reader came from — "Back to
+ * start" on a posted result. It pops when that screen is the entry before,
+ * and puts it in place of this one otherwise, so Back from the start never
+ * returns to the form that was just finished.
+ */
+export function useBackToScreen(target: string): () => void {
+  const navigate = useNavigate();
+  const location = useLocation();
+  return () => goTo(navigate, location, target, entryBefore);
 }
