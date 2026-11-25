@@ -6,6 +6,11 @@ and the reason for each refusal. What differs per entity is what a row
 becomes; what is here is how a row is read and how a refusal is worded.
 """
 
+import re
+from collections import Counter
+from collections.abc import Iterable
+from datetime import date, datetime
+from decimal import Decimal
 from io import BytesIO
 from math import isnan
 from typing import Any
@@ -13,12 +18,14 @@ from unicodedata import category
 from zipfile import BadZipFile
 
 import pandas as pd
+from babel.numbers import list_currencies
 from pydantic import ValidationError
 
 from app.core.exceptions import AppException, QuotaExceededError, ServiceRejectionError
 from app.core.logging import get_logger
 from app.core.upload_validation import MAX_IMPORT_ROWS
 from app.i18n._validation import translate_validation_error
+from app.i18n.service import get_current_lang, writes_decimal_comma
 
 logger = get_logger(__name__)
 
@@ -360,3 +367,233 @@ def explain(exc: Exception, mapping: dict[str, Any]) -> str:
         return str(exc)
     logger.exception('Import row failed')
     return str(ServiceRejectionError('import_row_failed'))
+
+
+# ---------------------------------------------------------------------------
+# Numbers and dates as a sheet's country writes them
+# ---------------------------------------------------------------------------
+
+
+class UnreadableCellError(ValueError):
+    """A cell that is not the number or the date its column promises.
+
+    The door that met it words the refusal; this carries only the cell.
+    """
+
+
+#: What may stand beside a price without being part of the number: ISO codes
+#: ("PLN", "eur") and the short words a till writes ("zł", "Kč", "kr").
+_CURRENCY_WORDS = frozenset(code.lower() for code in list_currencies()) | {
+    'zł',
+    'zl',
+    'kč',
+    'kc',
+    'kr',
+    'ft',
+    'lei',
+    'fr',
+}
+
+_LEADING_WORD = re.compile(r'^([^\W\d_]+)\.?\s*(.*)$', re.DOTALL)
+_TRAILING_WORD = re.compile(r'^(.*?)\s*([^\W\d_]+)\.?$', re.DOTALL)
+
+#: Digit groups a typographer separates with a space, a no-break space, a
+#: narrow no-break space or an apostrophe ("1 289,00", "1'289.50").
+_SPACE_GROUPS = re.compile(r"^\d{1,3}(?:[ \u00a0\u202f'\u2019]\d{3})+(?=[.,]\d*$|$)")
+
+#: A float as Python and Excel write it when the cell holds a number
+#: ("1e-05"): digits, a dot, an exponent — never a locale's separators.
+_FLOAT_TEXT = re.compile(r'^[+-]?\d+(?:\.\d+)?[eE][+-]?\d+$')
+
+
+def _strip_currency(text: str) -> str:
+    """The text without a currency symbol, code or word at either end."""
+    text = ''.join(ch for ch in text if category(ch) != 'Sc').strip()
+    lead = _LEADING_WORD.match(text)
+    if lead and lead.group(1).lower() in _CURRENCY_WORDS:
+        text = lead.group(2).strip()
+    tail = _TRAILING_WORD.match(text)
+    if tail and tail.group(2).lower() in _CURRENCY_WORDS:
+        text = tail.group(1).strip()
+    return text
+
+
+def parse_sheet_number(raw: Any) -> Decimal:
+    """A number cell as a ``Decimal``, read the way the sheet's country writes it.
+
+    Raises ``UnreadableCellError`` (a ``ValueError``) when the cell is not a number. Currency symbols
+    and codes, spaces (no-break and narrow no-break included) and an
+    apostrophe between digit groups are not part of the number. A value
+    carrying both separators says which is the decimal mark — the last one
+    ("1.234,50", "1,234.50"); the same separator repeated is a thousands
+    separator ("1.234.567"); a lone comma is a decimal mark ("12,5"), except
+    that exactly three digits after it read as a thousands group for a
+    language that writes the decimal mark as a dot ("1,250" in English is
+    1250). A lone dot is always the decimal mark, as it is in the text a
+    workbook gives for a number cell.
+    """
+    text = cell_text(raw)
+    if text is None:
+        raise UnreadableCellError(raw)
+    if _FLOAT_TEXT.match(text):
+        return Decimal(text)
+    text = _strip_currency(text)
+    sign = ''
+    if text.startswith(('+', '-', '\u2212')):
+        sign = '-' if text[0] in '-\u2212' else ''
+        text = text[1:].lstrip()
+    groups = _SPACE_GROUPS.match(text)
+    if groups:
+        head = re.sub(r"[ \u00a0\u202f'\u2019]", '', groups.group(0))
+        text = head + text[groups.end() :]
+    if not re.fullmatch(r'[\d.,]*\d[\d.,]*', text):
+        raise UnreadableCellError(raw)
+    return Decimal(sign + _normalize_separators(text))
+
+
+def _normalize_separators(text: str) -> str:
+    """Digits with at most one dot: the sheet's separators resolved."""
+    has_dot, has_comma = '.' in text, ',' in text
+    if has_dot and has_comma:
+        decimal = '.' if text.rfind('.') > text.rfind(',') else ','
+        thousands = ',' if decimal == '.' else '.'
+        whole, _, fraction = text.rpartition(decimal)
+        if decimal in whole or not _is_grouped(whole, thousands):
+            raise UnreadableCellError(text)
+        return whole.replace(thousands, '') + '.' + fraction
+    if not has_dot and not has_comma:
+        return text
+    mark = '.' if has_dot else ','
+    if text.count(mark) > 1:
+        if not _is_grouped(text, mark):
+            raise UnreadableCellError(text)
+        return text.replace(mark, '')
+    whole, _, fraction = text.partition(mark)
+    if (
+        mark == ','
+        and not writes_decimal_comma(get_current_lang())
+        and len(fraction) == 3
+        and 1 <= len(whole) <= 3
+        and not whole.startswith('0')
+    ):
+        return whole + fraction
+    return f'{whole or "0"}.{fraction or "0"}'
+
+
+def _is_grouped(text: str, separator: str) -> bool:
+    """Whether *text* is digit groups of three after a first of one to three."""
+    return (
+        re.fullmatch(rf'\d{{1,3}}(?:{re.escape(separator)}\d{{3}})*', text) is not None
+    )
+
+
+_TIME_TAIL = r'(?:[T ]\d{1,2}:\d{2}(?::\d{2}(?:[.,]\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)?'
+_YEAR_FIRST = re.compile(rf'^(\d{{4}})[-./ ](\d{{1,2}})[-./ ](\d{{1,2}}){_TIME_TAIL}$')
+_YEAR_LAST = re.compile(
+    rf'^(\d{{1,2}})[-./ ](\d{{1,2}})[-./ ](\d{{4}}|\d{{2}}){_TIME_TAIL}$'
+)
+
+
+def looks_like_numeric_date(text: str) -> bool:
+    """Whether *text* is written as three numeric parts with a year, e.g. ``05.11.2026``."""
+    return bool(_YEAR_FIRST.match(text) or _YEAR_LAST.match(text))
+
+
+def _two_digit_year(year: str) -> int:
+    return int(year) if len(year) == 4 else 2000 + int(year)
+
+
+def _day_month_pair(text: str) -> tuple[int, int] | None:
+    """The first two parts of a ``a.b.year`` date, or None for any other shape."""
+    match = _YEAR_LAST.match(text)
+    return (int(match.group(1)), int(match.group(2))) if match else None
+
+
+def column_day_first(values: Iterable[Any]) -> bool:
+    """Whether a column of dates writes the day first, decided from all of it.
+
+    A value whose first part is above 12 settles day-first, one whose
+    second part is above 12 settles month-first; the order most such values
+    settle is the column's. A column of values that are all ambiguous
+    follows the language of the person importing: month-first for English,
+    day-first for every other maintained language.
+    """
+    evidence: Counter[bool] = Counter()
+    for raw in values:
+        text = cell_text(raw)
+        pair = _day_month_pair(text) if text else None
+        if pair is None:
+            continue
+        if pair[0] > 12 >= pair[1]:
+            evidence[True] += 1
+        elif pair[1] > 12 >= pair[0]:
+            evidence[False] += 1
+    if evidence:
+        return evidence[True] >= evidence[False]
+    return get_current_lang() != 'en'
+
+
+class DateColumns:
+    """The day-first decision of every date column of one sheet.
+
+    Built from the whole frame, so a row is read by what its column says:
+    the one row of a file that reads "05.11.2026" follows the "28.02.2027"
+    below it. Each column is decided once, on first use.
+    """
+
+    def __init__(self, df: pd.DataFrame) -> None:
+        self._df = df
+        self._decided: dict[str, bool] = {}
+
+    def day_first(self, column: str | None) -> bool:
+        if not column or column not in self._df.columns:
+            return column_day_first(())
+        if column not in self._decided:
+            self._decided[column] = column_day_first(self._df[column])
+        return self._decided[column]
+
+    def parse(self, raw: Any, column: str | None) -> date:
+        """The cell as a date, or ``UnreadableCellError`` (a ``ValueError``) when it is not one."""
+        return parse_sheet_date(raw, self.day_first(column))
+
+
+def parse_sheet_date(raw: Any, day_first: bool) -> date:
+    """A date cell as a ``date``; ``UnreadableCellError`` (a ``ValueError``) when it is not one.
+
+    A cell the workbook typed as a date arrives as a date or a datetime and
+    is taken as it is. A year-first text ("2026-11-05") is read as written.
+    A text of three numeric parts with the year last is read day-first or
+    month-first by *day_first* unless one of its own parts settles it (a
+    day above 12). Anything else ("5 Nov 2026") goes to pandas, which reads
+    English month names; "end of March" is refused.
+    """
+    if isinstance(raw, pd.Timestamp):
+        if pd.isna(raw):
+            raise UnreadableCellError(raw)
+        return date(raw.year, raw.month, raw.day)
+    if isinstance(raw, datetime):
+        return raw.date()
+    if isinstance(raw, date):
+        return raw
+    text = cell_text(raw)
+    if text is None:
+        raise UnreadableCellError(raw)
+    match = _YEAR_FIRST.match(text)
+    if match:
+        year, month, day = (int(part) for part in match.groups()[:3])
+        return date(year, month, day)
+    match = _YEAR_LAST.match(text)
+    if match:
+        first, second = int(match.group(1)), int(match.group(2))
+        year = _two_digit_year(match.group(3))
+        if first > 12:
+            day, month = first, second
+        elif second > 12:
+            month, day = first, second
+        else:
+            day, month = (first, second) if day_first else (second, first)
+        return date(year, month, day)
+    parsed = pd.to_datetime(text)
+    if pd.isna(parsed):
+        raise UnreadableCellError(text)
+    return date(parsed.year, parsed.month, parsed.day)

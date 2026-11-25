@@ -17,6 +17,7 @@ from app.core.exceptions import (
 from app.core.file_import import PREVIEW_ROWS
 from app.core.import_sheet import (
     PASTE_DELIMITERS,
+    DateColumns,
     read_csv_sheet,
     read_rows,
     refuse_beyond_row_cap,
@@ -270,6 +271,7 @@ async def _lines_from_rows(
     are only read back, for a form that has no document yet.
     """
     uom_resolver = UomResolverAsync(db, org_id)
+    dates = DateColumns(df)
     needs_stock_row = dt.requires_stock_row(doc_type)
     imported = 0
     matched = 0
@@ -291,6 +293,7 @@ async def _lines_from_rows(
                 line_number,
                 column_mapping,
                 uom_resolver,
+                dates,
                 allow_negative_quantity=dt.allows_negative_quantity(doc_type),
             )
             if doc_id is not None:

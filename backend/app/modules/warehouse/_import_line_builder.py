@@ -11,8 +11,7 @@ They are re-imported by ``document_import_service`` and consumed by
 
 from __future__ import annotations
 
-from datetime import datetime
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -20,7 +19,7 @@ import pandas as pd
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ServiceRejectionError
-from app.core.import_sheet import cell_text
+from app.core.import_sheet import DateColumns, cell_text, parse_sheet_number
 from app.core.logging import get_logger
 from app.core.public_api import core_api
 from app.core.uom_resolver import UomResolverAsync
@@ -58,33 +57,40 @@ def _extract_decimal(
     number in the reader's language, and the rest of the line stays in that
     language too.
     """
-    if not col_name or row.get(col_name) is None:
+    if not col_name:
         return default
-    raw = row[col_name]
-    if isinstance(raw, float) and raw != raw:  # NaN: a blank in a numeric column
+    text = cell_text(row.get(col_name))  # None for a blank, NaN included
+    if text is None:
         return default
     try:
-        return Decimal(str(raw).strip())
-    except (InvalidOperation, ValueError, TypeError) as exc:
+        return parse_sheet_number(text)
+    except ValueError as exc:
         raise ServiceRejectionError(
-            'import_column_not_a_number', column=col_name, value=raw
+            'import_column_not_a_number', column=col_name, value=text
         ) from exc
 
 
-def _extract_date(row: pd.Series, col_name: str | None) -> Any:
-    """Read a date column value; accepts datetime, date string, or anything pd.to_datetime handles."""
+def _extract_date(row: pd.Series, col_name: str | None, dates: DateColumns) -> Any:
+    """Read a date column value the way its column writes dates, or refuse the cell.
+
+    A blank cell is no date; a cell that holds something else than a date
+    refuses the row and names the column and the cell, as the product
+    import does — an expiry term that vanished would leave the row imported
+    with no expiry and nobody told.
+    """
     if not col_name:
         return None
     val = row.get(col_name)
-    if val is None or pd.isna(val):
+    text = cell_text(val)
+    if text is None:
         return None
-    if isinstance(val, datetime):
-        return val.date()
     try:
-        return pd.to_datetime(str(val)).date()
-    except (ValueError, TypeError):
-        logger.debug('Invalid %s value: %s', col_name, row.get(col_name))
-        return None
+        return dates.parse(val, col_name)
+    except (ValueError, TypeError, OSError) as exc:
+        logger.debug('Invalid %s value: %s', col_name, text)
+        raise ServiceRejectionError(
+            'import_date_invalid', column=col_name, value=text
+        ) from exc
 
 
 async def _resolve_template_for_barcode(
@@ -186,6 +192,7 @@ async def _build_document_line(
     line_number: int,
     column_mapping: dict[str, Any],
     uom_resolver: UomResolverAsync,
+    dates: DateColumns,
     *,
     allow_negative_quantity: bool = False,
 ) -> tuple[DocumentLine, bool]:
@@ -230,7 +237,7 @@ async def _build_document_line(
     unit_price = _extract_decimal(row, column_mapping.get('unit_price'))
     tax_rate = _extract_decimal(row, column_mapping.get('tax_rate'))
     batch_number = _extract_string(row, column_mapping.get('batch_number'))
-    expiry_date = _extract_date(row, column_mapping.get('expiry_date'))
+    expiry_date = _extract_date(row, column_mapping.get('expiry_date'), dates)
 
     (
         product_template_id,

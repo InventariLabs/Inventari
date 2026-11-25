@@ -4,12 +4,20 @@ from typing import Any
 from uuid import UUID
 
 import pandas as pd
+from babel.dates import format_skeleton
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ServiceRejectionError
-from app.core.import_sheet import read_sheet, row_text
+from app.core.import_sheet import (
+    DateColumns,
+    cell_text,
+    looks_like_numeric_date,
+    read_sheet,
+    row_text,
+)
 from app.core.location_path import join_location_path
 from app.core.logging import get_logger
+from app.i18n.service import get_current_lang
 
 logger = get_logger(__name__)
 
@@ -33,6 +41,38 @@ def _filled_counts(df: pd.DataFrame) -> dict[str, int]:
     return counts
 
 
+def _dates_as_stored(full_df: pd.DataFrame, preview: pd.DataFrame) -> pd.DataFrame:
+    """The preview with every date column written as the import will store it.
+
+    A column whose every filled cell is a numeric date ("05.11.2026") is read
+    the way the import will read it — day-first or month-first, decided from
+    the whole column — and each preview cell shows that day in words in the
+    reader's language ("5 lis 2026"), so a day swapped with its month is seen
+    before the rows are written, not after.
+    """
+    shown = preview.copy()
+    dates = DateColumns(full_df)
+    for column in full_df.columns:
+        filled = [text for text in map(cell_text, full_df[column]) if text]
+        if not filled or not all(looks_like_numeric_date(text) for text in filled):
+            continue
+        shown[column] = [
+            _stored_date(value, column, dates) for value in preview[column]
+        ]
+    return shown
+
+
+def _stored_date(value: Any, column: str, dates: DateColumns) -> Any:
+    """One preview cell as the stored day in words; the cell itself when unreadable."""
+    if cell_text(value) is None:
+        return value
+    try:
+        day = dates.parse(value, column)
+    except ValueError:
+        return value
+    return format_skeleton('yMMMd', day, locale=get_current_lang())
+
+
 async def analyze_import_file(file_content: bytes, filename: str) -> dict[str, Any]:
     """Return headers, a short preview, the total row count and per-column
     filled counts.
@@ -48,6 +88,7 @@ async def analyze_import_file(file_content: bytes, filename: str) -> dict[str, A
 
     preview = full_df.head(PREVIEW_ROWS)
     preview = preview.where(pd.notnull(preview), None)
+    preview = _dates_as_stored(full_df, preview)
 
     return {
         'headers': list(full_df.columns),

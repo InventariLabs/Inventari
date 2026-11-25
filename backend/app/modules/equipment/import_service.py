@@ -6,7 +6,6 @@ from decimal import Decimal, InvalidOperation
 from typing import Any
 from uuid import UUID
 
-import pandas as pd
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -22,7 +21,12 @@ from app.core.file_import import (
     resolve_category_async,
     resolve_storage_location_async,
 )
-from app.core.import_sheet import read_rows, row_text
+from app.core.import_sheet import (
+    DateColumns,
+    parse_sheet_number,
+    read_rows,
+    row_text,
+)
 from app.core.interceptors import InterceptorError
 from app.core.logging import get_logger
 
@@ -205,7 +209,7 @@ def _sheet_status(row: Any, column: str | None) -> str | None:
     return _STATUS_INDEX.get(_normalize_header(text), text)
 
 
-def _sheet_date(row: Any, column: str | None) -> str | None:
+def _sheet_date(row: Any, column: str | None, dates: DateColumns) -> str | None:
     """A date column as a date, or a refusal naming the cell.
 
     A date column is stored as a date or refused. Text such as "kiedys w maju"
@@ -218,7 +222,7 @@ def _sheet_date(row: Any, column: str | None) -> str | None:
     if not text:
         return None
     try:
-        return str(pd.to_datetime(text).date().strftime(DATE_FORMAT))
+        return dates.parse(text, column).strftime(DATE_FORMAT)
     except (ValueError, TypeError, OSError) as exc:
         raise ServiceRejectionError(
             'import_date_invalid', column=column, value=text
@@ -236,8 +240,8 @@ def _sheet_price(row: Any, column: str | None) -> Decimal | None:
     if not text:
         return None
     try:
-        return Decimal(text.replace(',', '.'))
-    except InvalidOperation as exc:
+        return parse_sheet_number(text)
+    except ValueError as exc:
         raise ServiceRejectionError(
             'import_price_invalid', column=column, value=text
         ) from exc
@@ -277,6 +281,7 @@ async def execute_equipment_import(
 ) -> dict[str, Any]:
     """Import equipment items from a file with column mapping."""
     df = read_rows(content, filename)
+    dates = DateColumns(df)
 
     imported = 0
     failed = 0
@@ -301,6 +306,7 @@ async def execute_equipment_import(
                 db=db,
                 row=row,
                 mapping=mapping,
+                dates=dates,
                 org_id=org_id,
                 user=user,
                 default_location_id=default_location_id,
@@ -378,6 +384,7 @@ async def _process_row(
     db: AsyncSession,
     row: Any,
     mapping: dict[str, Any],
+    dates: DateColumns,
     org_id: UUID,
     user: UserContextDTO,
     default_location_id: str | None,
@@ -417,7 +424,7 @@ async def _process_row(
             equipment_meta[field] = val
 
     for field in ('purchase_date', 'warranty_until'):
-        parsed = _sheet_date(row, mapping.get(field))
+        parsed = _sheet_date(row, mapping.get(field), dates)
         if parsed:
             equipment_meta[field] = parsed
 
