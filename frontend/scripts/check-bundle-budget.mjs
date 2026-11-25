@@ -606,6 +606,17 @@ const dist = join(root, "dist");
  * paint 406.4 of 410, login 411.2 of 415, launcher 426.3 of 430, receive
  * 481.2 of 485, issue 592.1 of 595, history 617.2 of 620, products 635.9 of
  * 640, initial 194.0).
+ *
+ * Re-measured 2026-11-25 on the branch that closes the recipes and shopping
+ * list findings: the receive screen measures 485.3 KiB gz against its 485,
+ * and the development line alone measures 485.0. The branch adds a sentence
+ * in six languages (a collection's delete naming its sub-collections) to the
+ * language chunk every first paint loads, and the module SDK's
+ * useLocalStorage to the barrel the receive screen loads; no import walked
+ * into the screen. That phone budget moves a step of five, to 490; the other
+ * screens stand under theirs (app first paint 408.5 of 410, login 413.5 of
+ * 415, launcher 428.4 of 430, start 648.2 of 650, issue 594.6 of 595,
+ * history 619.7 of 620, products 638.7 of 640, initial 194.2).
  */
 const BUDGETS = {
   initial: 245,
