@@ -27,20 +27,9 @@ test.describe("Onboarding — setup wizard", () => {
 
     await expect(page).toHaveURL(/\/onboarding/);
 
-    const hasHeading = await page
-      .locator("h1, h2")
-      .first()
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    const hasWizard = await page
-      .locator(
-        '[role="dialog"], form, div[class*="wizard"], div[class*="onboarding"]',
-      )
-      .first()
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-
-    expect(hasHeading || hasWizard).toBeTruthy();
+    await expect(
+      page.getByRole("heading", { name: "Choose your workspace mode" }),
+    ).toBeVisible({ timeout: 10000 });
   });
 
   test("onboarding page has next/start action", async ({
@@ -60,22 +49,8 @@ test.describe("Onboarding — setup wizard", () => {
 
     await expect(page).toHaveURL(/\/onboarding/);
 
-    const actionBtn = page
-      .getByRole("button", {
-        name: /next|start|begin|dalej|zacznij|rozpocznij/i,
-      })
-      .first();
-    const skipOrClose = page
-      .getByRole("button", { name: /skip|pomiń|close|zamknij/i })
-      .first();
-
-    const hasAction = await actionBtn
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    const hasSkip = await skipOrClose
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-
-    expect(hasAction || hasSkip).toBeTruthy();
+    await expect(page.getByRole("button", { name: "Get started" })).toBeVisible(
+      { timeout: 10000 },
+    );
   });
 });

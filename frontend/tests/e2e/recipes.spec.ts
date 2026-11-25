@@ -281,21 +281,7 @@ test.describe("Recipes — nutrition & conversions", () => {
     const newBtn = page.getByRole("button", { name: /^new recipe$/i }).first();
     await expect(newBtn).toBeVisible({ timeout: 10000 });
     await newBtn.click();
-    await page
-      .locator('[role="dialog"]')
-      .or(page.getByRole("heading", { name: /new recipe|create/i }))
-      .first()
-      .waitFor({ state: "visible", timeout: 5000 })
-      .catch(() => {});
-    const hasDialog = await page
-      .locator('[role="dialog"]')
-      .isVisible({ timeout: 3000 })
-      .catch(() => false);
-    const hasHeading = await page
-      .getByRole("heading", { name: /new recipe|create/i })
-      .isVisible({ timeout: 3000 })
-      .catch(() => false);
-    expect(hasDialog || hasHeading).toBeTruthy();
+    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 5000 });
   });
 });
 

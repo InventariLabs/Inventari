@@ -35,22 +35,9 @@ test.describe("Equipment — dashboard", () => {
     await page
       .waitForLoadState("networkidle", { timeout: 15000 })
       .catch(() => {});
-    const link = page
-      .getByRole("link", { name: /^assets$/i })
-      .or(page.getByRole("link", { name: /nav\.assets/i }))
-      .first();
-    const linkVisible = await link
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!linkVisible) {
-      await page.goto("/equipment/assets");
-      await page
-        .waitForLoadState("networkidle", { timeout: 15000 })
-        .catch(() => {});
-    } else {
-      await link.click();
-      await page.waitForURL("**/equipment/assets", { timeout: 10000 });
-    }
+    const nav = page.getByRole("navigation", { name: /module navigation/i });
+    await nav.getByRole("link", { name: "Assets", exact: true }).click();
+    await page.waitForURL("**/equipment/assets", { timeout: 10000 });
     await expect(page.getByRole("heading").first()).toBeVisible({
       timeout: 10000,
     });
@@ -251,22 +238,9 @@ test.describe("Equipment — maintenance & templates nav", () => {
     page,
     authenticatedPage,
   }) => {
-    const assetsLink = page
-      .getByRole("link", { name: /^assets$/i })
-      .or(page.getByRole("link", { name: /nav\.assets/i }))
-      .first();
-    const linkVisible = await assetsLink
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!linkVisible) {
-      await page.goto("/equipment/assets");
-      await page
-        .waitForLoadState("networkidle", { timeout: 15000 })
-        .catch(() => {});
-    } else {
-      await assetsLink.click();
-      await page.waitForURL("**/equipment/assets", { timeout: 10000 });
-    }
+    const nav = page.getByRole("navigation", { name: /module navigation/i });
+    await nav.getByRole("link", { name: "Assets", exact: true }).click();
+    await page.waitForURL("**/equipment/assets", { timeout: 10000 });
     await expect(page.getByRole("heading").first()).toBeVisible({
       timeout: 10000,
     });
@@ -276,23 +250,9 @@ test.describe("Equipment — maintenance & templates nav", () => {
     page,
     authenticatedPage,
   }) => {
-    const campaignsLink = page
-      .getByRole("link", { name: /attestations|campaigns/i })
-      .first();
-    const linkVisible = await campaignsLink
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!linkVisible) {
-      await page.goto("/equipment/campaigns");
-      await page
-        .waitForLoadState("networkidle", { timeout: 15000 })
-        .catch(() => {});
-    } else {
-      await campaignsLink.click();
-      await page
-        .waitForLoadState("networkidle", { timeout: 10000 })
-        .catch(() => {});
-    }
+    const nav = page.getByRole("navigation", { name: /module navigation/i });
+    await nav.getByRole("link", { name: "Attestations", exact: true }).click();
+    await page.waitForURL("**/equipment/campaigns", { timeout: 10000 });
     await expect(page.getByRole("heading").first()).toBeVisible({
       timeout: 10000,
     });

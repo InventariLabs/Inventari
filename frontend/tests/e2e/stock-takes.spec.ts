@@ -80,15 +80,9 @@ test.describe("Stock Takes — inventory counting flow", () => {
     page,
     authenticatedPage,
   }) => {
-    const listContent = page
-      .locator('table, ul, [role="list"], [class*="rounded-xl"]')
-      .first();
     const emptyOrContent = page.locator("h1, h2, button, a").first();
     await expect(emptyOrContent).toBeVisible({ timeout: 15000 });
-    const contentVisible = await listContent
-      .isVisible({ timeout: 5000 })
-      .catch(() => false);
-    expect(contentVisible || true).toBeTruthy();
+    await expect(page.getByRole("tab", { name: "All" })).toBeVisible();
   });
 
   test("starts a new stock take via create button", async ({
@@ -103,17 +97,7 @@ test.describe("Stock Takes — inventory counting flow", () => {
     await expect(createBtn).toBeVisible({ timeout: 10000 });
     await createBtn.click();
 
-    await page
-      .locator('[role="dialog"], form, input[type="text"]')
-      .first()
-      .waitFor({ state: "visible", timeout: 5000 })
-      .catch(() => {});
-    const modalOrNavigate = page
-      .locator('[role="dialog"], form, input[type="text"]')
-      .first();
-    if (await modalOrNavigate.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await expect(modalOrNavigate).toBeVisible();
-    }
+    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 5000 });
   });
 
   test("counting page loads with search UI", async ({
@@ -167,15 +151,10 @@ test.describe("Stock Takes — inventory counting flow", () => {
     await page
       .waitForLoadState("networkidle", { timeout: 15000 })
       .catch(() => {});
-    const anyTabOrBtn = page
-      .locator('[role="tab"], button, a')
-      .filter({ hasText: /all|in progress|draft|completed|wszystkie|w toku/i })
-      .first();
-    const tabVisible = await anyTabOrBtn
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!tabVisible) {
-      await expect(page.locator("body")).not.toContainText(/error|błąd/i);
+    for (const name of ["All", "In progress", "Completed", "Cancelled"]) {
+      await expect(page.getByRole("tab", { name })).toBeVisible({
+        timeout: 10000,
+      });
     }
   });
 });

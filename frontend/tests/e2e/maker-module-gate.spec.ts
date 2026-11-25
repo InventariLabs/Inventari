@@ -58,11 +58,14 @@ test.describe("Maker — module gate", () => {
       await page
         .waitForLoadState("networkidle", { timeout: 15000 })
         .catch(() => {});
-      const launcherCard = page.getByText(/^Maker$/i).first();
-      const present = await launcherCard
-        .isVisible({ timeout: 3000 })
-        .catch(() => false);
-      expect(present).toBe(false);
+      // The launcher has drawn its cards (Inventory is always on) before the
+      // absence of Maker's means anything.
+      await expect(page.getByRole("link", { name: /^Inventory / })).toBeVisible(
+        {
+          timeout: 10000,
+        },
+      );
+      await expect(page.getByText(/^Maker$/i)).toHaveCount(0);
     } finally {
       await api.toggleModule(token, "maker", true);
     }
