@@ -190,9 +190,10 @@ class ProductionOrderRead(BaseModel):
     # for orders past the draft: their consumption already happened — and
     # for drafts without a recipe: there is nothing to forecast from.
     shortage_count: int | None = None
-    # The rows behind the count, on the detail read: the same list the 422
-    # refusal carries, so the page that names the blocker can name every
-    # ingredient it comes from.
+    # The rows behind the count, on every single-order answer of a draft --
+    # create, update, duplicate and the read; the list carries the count
+    # alone: the same list the 422 refusal carries, so the page that names
+    # the blocker can name every ingredient it comes from.
     shortage_items: list[ShortageItemRead] | None = None
     # Drafts only: how far the shelf covers the run once the runs planned
     # before it (by planned day, then creation) have taken their share —
