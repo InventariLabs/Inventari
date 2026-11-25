@@ -72,11 +72,18 @@ export function useRouteScroll() {
     } catch {
       // Not every environment lets it be set.
     }
-    const onScroll = () => {
+    const record = () => {
       if (!restoring.current) remember(current.current, window.scrollY);
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("scroll", record, { passive: true });
+    // A scroll is reported with the next frame, so a tap on a busy phone can
+    // arrive first. The position is read at the tap too, in the capture phase:
+    // before the screen it opens replaces this one.
+    window.addEventListener("click", record, true);
+    return () => {
+      window.removeEventListener("scroll", record);
+      window.removeEventListener("click", record, true);
+    };
   }, []);
 
   // Before the new screen paints (and before the browser reports the scroll it

@@ -42,6 +42,9 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Back returns a list to where it stood when you tapped away from it, also
+  when the tap came right after a scroll on a busy phone; it could return to
+  an earlier position, several hundred pixels off.
 - On a phone, the *Type a code* sheet over the running scanner answers to
   touch: its field, *Scan*, *Close* and the backdrop take a press, where only
   a keyboard reached them before. The *⋯* menu of a warehouse document and of
