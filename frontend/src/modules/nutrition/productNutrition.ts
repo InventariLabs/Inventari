@@ -48,6 +48,33 @@ const groupOf = (
 };
 
 /**
+ * The names a product's own figure may be stored under, its own first — the
+ * table the recipe nutrition reads a product with (`_MACRO_ALIASES` in the
+ * recipes module): a product created with Open Food Facts' names, or the older
+ * `calories`, carries the figure all the same.
+ */
+const PRODUCT_NAMES: Record<NutrientKey, readonly string[]> =
+  Object.fromEntries(
+    NUTRIENT_FIELDS.map(({ key }) => [
+      key,
+      key === "calories_kcal"
+        ? [key, "calories", RECORD_NAMES[key]]
+        : [key, RECORD_NAMES[key]],
+    ]),
+  ) as Record<NutrientKey, readonly string[]>;
+
+const firstOf = (
+  group: Record<string, unknown>,
+  names: readonly string[],
+): number | null => {
+  for (const name of names) {
+    const value = asNumber(group[name]);
+    if (value !== null) return value;
+  }
+  return null;
+};
+
+/**
  * The product's nutrition per 100 g, or null when nothing is known.
  *
  * A value typed in by hand is saved to the product, not to the record, and the
@@ -61,7 +88,9 @@ export function productNutrition(
   const record = groupOf(item.metadata);
   const values: ProductTemplateNutritionInfo = {};
   for (const { key } of NUTRIENT_FIELDS) {
-    const value = asNumber(product[key]) ?? asNumber(record[RECORD_NAMES[key]]);
+    const value =
+      firstOf(product, PRODUCT_NAMES[key]) ??
+      asNumber(record[RECORD_NAMES[key]]);
     if (value !== null) values[key] = value;
   }
   return Object.keys(values).length > 0 ? values : null;
