@@ -30,7 +30,8 @@
  * So this gate now answers three questions, not one:
  *   1. does the backend's mirror match the screen, word for word;
  *   2. is there a second catalogue of unit words anywhere in the locales;
- *   3. does any sentence put a full stop straight after a unit — because
+ *   3. does any sentence put punctuation straight after a placeholder that
+ *      ends in a unit label (a unit, or a quantity or reading built from one) — because
  *      the Polish symbol for a piece is "szt." and it carries its own, so
  *      "Plan 3 szt.." was on the execution panel of every document.
  * The renderer's side of (2) — a screen printing the raw symbol instead of
@@ -122,13 +123,34 @@ export function rivalCatalogues(files, read = (f) => readFileSync(f, "utf8")) {
   return found;
 }
 
+/**
+ * The placeholders a unit label ends up in: the label itself (`unit`, `uom`,
+ * the template's and the chosen unit of a conversion) and the readings built
+ * from one (`quantity`, `remaining`, `required`, `available`). "szt." carries
+ * its own full stop, so none of them may be followed by punctuation.
+ */
+export const UNIT_ENDING_PLACEHOLDERS = [
+  "unit",
+  "uom",
+  "quantity",
+  "remaining",
+  "required",
+  "available",
+  "template_unit",
+  "chosen_unit",
+  "templateUnit",
+  "chosenUnit",
+];
+
 /** A sentence that punctuates straight after a unit: "Plan 3 szt..". */
 export function punctuationAfterUnit(
   files,
   read = (f) => readFileSync(f, "utf8"),
 ) {
   const found = [];
-  const offends = /\{\{(?:unit|uom)\}\}\s*[.,;]/;
+  const offends = new RegExp(
+    `\\{\\{(?:${UNIT_ENDING_PLACEHOLDERS.join("|")})\\}\\}\\s*[.,;]`,
+  );
   for (const file of files) {
     let data;
     try {

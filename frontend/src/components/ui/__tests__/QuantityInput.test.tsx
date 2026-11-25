@@ -183,6 +183,28 @@ describe("QuantityInput (min/step per UoM)", () => {
     expect(screen.queryByText(/whole numbers only/i)).not.toBeInTheDocument();
   });
 
+  it("keeps no leading zero in a field whose caller stores the raw text", () => {
+    // A field showing 0 takes the next digit: "04" is 4, whoever keeps the
+    // value.
+    function Raw() {
+      const [value, setValue] = useState<string>("0");
+      return (
+        <QuantityInput
+          uomId="uom-1"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          label="Qty"
+        />
+      );
+    }
+
+    render(<Raw />);
+    fireEvent.change(getInput(), { target: { value: "04" } });
+
+    expect(getInput()).toHaveValue(4);
+    expect((getInput() as HTMLInputElement).value).toBe("4");
+  });
+
   it("drops the sentence when a button, not the keyboard, sets the value", () => {
     // The execution panel changes the field from outside: Clear writes 0,
     // +1 steps, "Fill to plan" jumps to the planned quantity. None of them

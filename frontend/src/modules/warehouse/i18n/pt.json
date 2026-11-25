@@ -1603,7 +1603,7 @@
   },
   "unitMismatch": {
     "title": "As unidades não coincidem",
-    "message": "{{product}} é mantido em {{templateUnit}}, e este registro seria salvo em {{chosenUnit}}. Confirme para converter o registro e esta entrega para {{templateUnit}} — a escolha fica no histórico do registro. Para manter as unidades separadas, altere primeiro a unidade do registro na página dele em Estoque.",
+    "message": "{{product}} é mantido em {{templateUnit}} (este registro seria salvo em {{chosenUnit}}). Confirme para converter o registro e esta entrega para {{templateUnit}} — a escolha fica no histórico do registro. Para manter as unidades separadas, altere primeiro a unidade do registro na página dele em Estoque.",
     "confirm": "Confirmar e concluir",
     "cancel": "Agora não"
   },

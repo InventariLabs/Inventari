@@ -426,7 +426,7 @@
     "openedNothingLeft": "Não resta nada",
     "unitChosen": {
       "entered": "Informado {{entered}}, mantido como {{kept}}",
-      "unit": "Informado em {{chosen_unit}}; o produto é mantido em {{template_unit}}"
+      "unit": "Informado em {{chosen_unit}} — o produto é mantido em {{template_unit}}"
     }
   },
   "setStockAlert": "Definir alerta de estoque",
@@ -525,7 +525,7 @@
   },
   "unitChoice": {
     "title": "Informar {{product}} em outra unidade?",
-    "message": "{{product}} é mantido em {{template_unit}}. Uma quantidade informada em {{chosen_unit}} é convertida para {{template_unit}} ao salvar, e a escolha fica registrada no histórico do produto.",
+    "message": "{{product}} é mantido em {{template_unit}} — uma quantidade informada em {{chosen_unit}} é convertida para {{template_unit}} ao salvar, e a escolha fica registrada no histórico do produto.",
     "keepChosen": "Informar em {{unit}}",
     "keepTemplate": "Manter {{unit}}"
   },

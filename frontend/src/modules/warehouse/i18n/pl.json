@@ -1727,7 +1727,7 @@
   },
   "unitMismatch": {
     "title": "Jednostki się rozjeżdżają",
-    "message": "„{{product}}” prowadzona jest w {{templateUnit}}, a ten zapis trafiłby do {{chosenUnit}}. Potwierdź, a rekord i ta dostawa zostaną przeliczone na {{templateUnit}}, a wybór trafi do historii rekordu. Jeśli jednostki mają zostać różne, najpierw zmień jednostkę rekordu na jego stronie w Inwentarzu.",
+    "message": "„{{product}}” prowadzona jest w {{templateUnit}} (ten zapis trafiłby do {{chosenUnit}}). Potwierdź, a rekord i ta dostawa zostaną przeliczone na {{templateUnit}} — wybór trafi do historii rekordu. Jeśli jednostki mają zostać różne, najpierw zmień jednostkę rekordu na jego stronie w Inwentarzu.",
     "confirm": "Potwierdź i zakończ",
     "cancel": "Nie teraz"
   },

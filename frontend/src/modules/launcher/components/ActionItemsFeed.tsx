@@ -160,7 +160,7 @@ export function ActionItemsFeed() {
                       <Icon size={18} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-on truncate">
+                      <p className="text-sm font-medium text-on line-clamp-2 break-words">
                         {t(item.labelKey, item.labelValues)}
                       </p>
                       <p className="text-xs text-on-muted truncate uppercase tracking-wide">

@@ -438,7 +438,7 @@
     "createdWith_other": "Utworzono z ilością {{amount}}",
     "unitChosen": {
       "entered": "Wpisano {{entered}}, zapisano jako {{kept}}",
-      "unit": "Wpisano w {{chosen_unit}}; produkt jest liczony w {{template_unit}}"
+      "unit": "Wpisano w {{chosen_unit}} — produkt jest liczony w {{template_unit}}"
     },
     "createdViaScan": {
       "label": "Utworzono przez zeskanowanie etykiety {{code}}",
@@ -567,7 +567,7 @@
   },
   "unitChoice": {
     "title": "Wpisać {{product}} w innej jednostce?",
-    "message": "{{product}} jest prowadzony w {{template_unit}}. Ilość wpisana w {{chosen_unit}} zostanie przy zapisie przeliczona na {{template_unit}}, a wybór trafi do historii produktu.",
+    "message": "{{product}} jest prowadzony w {{template_unit}} — ilość wpisana w {{chosen_unit}} zostanie przy zapisie przeliczona na {{template_unit}} — wybór trafi do historii produktu.",
     "keepChosen": "Wpisz w {{unit}}",
     "keepTemplate": "Zostaw {{unit}}"
   },

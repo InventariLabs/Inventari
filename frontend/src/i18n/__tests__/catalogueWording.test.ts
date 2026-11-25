@@ -7,6 +7,8 @@
  */
 import { describe, expect, it } from "vitest";
 
+import plAuth from "../locales/pl/auth.json";
+import plCommon from "../locales/pl/common.json";
 import plLabels from "../locales/pl/labels.json";
 import deCommon from "../locales/de/common.json";
 import frCommon from "../locales/fr/common.json";
@@ -18,6 +20,17 @@ import deEquipment from "../../modules/equipment/i18n/de.json";
 import esLauncher from "../../modules/launcher/i18n/es.json";
 
 describe("catalogue wording", () => {
+  it("tells a Polish reader they are signed in without a gendered form", () => {
+    // "Jesteś zalogowany" assumes a masculine reader; the participle form
+    // "Zalogowano" says the same to everyone.
+    const lines = [
+      plAuth.signedInElsewhere,
+      plAuth.signedInHere,
+      plCommon.settings.organization.linkOtherAddressDesc,
+    ];
+    for (const line of lines) expect(line).not.toMatch(/zalogowany/i);
+  });
+
   it("names the Polish vision tab after what it does, not after label scanning", () => {
     expect(plLabels.quickAdd.tabVision).not.toMatch(/etykiet/i);
     expect(plLabels.quickAdd.tabVision).toMatch(/zdj/i);

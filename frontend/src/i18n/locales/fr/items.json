@@ -409,7 +409,7 @@
     "createdWith_other": "Créé avec la quantité {{amount}}",
     "unitChosen": {
       "entered": "Saisi : {{entered}}, conservé comme {{kept}}",
-      "unit": "Saisi en {{chosen_unit}} ; le produit est tenu en {{template_unit}}"
+      "unit": "Saisi en {{chosen_unit}} — le produit est tenu en {{template_unit}}"
     },
     "createdViaScan": {
       "label": "Créé en scannant l'étiquette {{code}}",
@@ -525,7 +525,7 @@
   },
   "unitChoice": {
     "title": "Saisir {{product}} dans une autre unité ?",
-    "message": "{{product}} est suivi en {{template_unit}}. Une quantité saisie en {{chosen_unit}} est convertie en {{template_unit}} à l'enregistrement, et le choix est consigné dans l'historique du produit.",
+    "message": "{{product}} est suivi en {{template_unit}} — une quantité saisie en {{chosen_unit}} est convertie en {{template_unit}} à l'enregistrement, et le choix est consigné dans l'historique du produit.",
     "keepChosen": "Saisir en {{unit}}",
     "keepTemplate": "Garder {{unit}}"
   },
