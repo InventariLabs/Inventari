@@ -163,8 +163,9 @@ make seed-scale PRODUCTS=100000          # or 500000, 1000000
 The rows are written by `INSERT ... SELECT` over `generate_series` inside the
 database, never through the API: on the 4-core server of the report 100 000 products
 seed in 12 minutes and a million in under three hours. The log gives each step the
-rows it wrote to the table it names (a step that only stages rows, the records'
-staging, counts those). Every value is a hash of the
+rows it wrote to the table it names, a line per table for a step that fills several
+(documents with their purchase orders, open work); a step that only stages rows, the
+records' staging, counts those. Every value is a hash of the
 row's number and `--seed`: the same arguments write the same organization. The run
 ends with the stock reconciliation over what it wrote (`/stats/reconciliation`), and
 any drift between the shelves, the journal and the cost layers fails it. At a million

@@ -160,6 +160,10 @@ before, 2 279 locations
 ([`100k-2279-locations.json`](../load_tests/scale/results/100k-2279-locations.json)),
 and the same reads with `plan_cache_mode` forced to custom plans
 ([`100k-1000-locations-custom-plan.json`](../load_tests/scale/results/100k-1000-locations-custom-plan.json)).
+The forced-custom-plan run came after the 10 000-row import of the writes
+pass (23:37–23:46 UTC) had added its products, so it read 110 000 products,
+not 100 000; the as-shipped reads ran on 100 000. Its figures are for
+comparing plans, not for comparing sizes.
 The earlier October runs are in
 [`100k.json`](../load_tests/scale/results/100k.json); their causes are in
 *October 2026: what was over budget, and why*.
@@ -168,14 +172,16 @@ The reads, the phone screens and the retiming of their requests were run
 once; the writes were run again at 00:00 UTC, because the samplers of the
 first pass read only the first 50 records of a shelf, all of which carried an
 expiry date on this building (880 shelves of about 300 records), and found no
-order line to receive. The stock take is the one write whose completion is not
-measured: the script counted 50 of the shelf's 483 records and the completion
-was refused for the uncounted ones, a defect of the script that is fixed and
+order line to receive. The import of 10 000 rows (9 min 16 s) is from the
+earlier pass of 23:37–23:46 UTC, which waited for its job; the 00:00 pass
+imported 1 000 rows and did not wait. The stock take is the one write whose completion is not
+measured: the script counted 50 of the shelf's 533 records and the completion
+was refused for the 483 left uncounted, a defect of the script that is fixed and
 has not been run again.
 
 ### Reads (server time)
 
-| Path | Class | 2 279 locations p50 / p95 ms | 1 019 locations p50 / p95 ms | 1 019 locations, forced custom plan p50 / p95 ms |
+| Path | Class | 2 279 locations p50 / p95 ms | 1 019 locations p50 / p95 ms | 1 019 locations, forced custom plan, 110 000 products p50 / p95 ms |
 |---|---|---|---|---|
 | items: first page | list | 754 / 837 **over** | 61 / 69 | 56 / 66 |
 | items: search, common word | list | 180 / 209 | 463 / 488 **over** | 256 / 308 **over** |
@@ -433,8 +439,8 @@ last as its shelf fills; the run was stopped after 40 000 of its 100 000 rows.
 
 **A stock take refused** any location past the first 2 000 of the
 organization: the stock-take module read the location list with a cap of
-2 000 and looked the counted location up in it. A business with 2 000 shelves
-has 2 279 locations. (Fixed since: a stock take reads the counted location's
+2 000 and looked the counted location up in it. An organization of that size
+has 2 279 locations, more than the roughly 1 000 the measured building has. (Fixed since: a stock take reads the counted location's
 subtree and ancestors and never the whole list, `5639c292f`.)
 
 **The backend's memory**, described above with the machine.

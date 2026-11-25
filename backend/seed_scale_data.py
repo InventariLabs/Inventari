@@ -46,6 +46,7 @@ import argparse
 import json
 import math
 import os
+import re
 import sys
 import time
 from datetime import UTC, datetime
@@ -289,6 +290,9 @@ def _say(message: str) -> None:
     print(message, flush=True)
 
 
+_INSERT_TARGET = re.compile(r'\s*INSERT\s+INTO\s+(\w+)', re.IGNORECASE)
+
+
 class _Steps:
     """Runs the seed's statements one step at a time and says how long each took."""
 
@@ -299,26 +303,31 @@ class _Steps:
 
     def run(self, label: str, *statements: tuple[str, dict] | str) -> int:
         began = time.monotonic()
-        written = 0
+        written: dict[str, int] = {}
         staged = 0
-        inserts = False
         for statement in statements:
             sql, params = statement if isinstance(statement, tuple) else (statement, {})
             result = self.conn.execute(text(sql), params)
             count = max(result.rowcount or 0, 0)
-            if sql.lstrip().upper().startswith('INSERT'):
-                inserts = True
-                written += count
+            inserted = _INSERT_TARGET.match(sql)
+            if inserted:
+                table = inserted.group(1)
+                written[table] = written.get(table, 0) + count
             else:
                 staged += count
-        # A step names the table it fills: the rows of its INSERTs, not the
-        # temporary staging tables built on the way. A step that only stages
-        # (the records' staging) counts what it staged.
-        rows = written if inserts else staged
+        # A step names the tables it fills: the rows of its INSERTs, one line
+        # per table, not the temporary staging tables built on the way. A step
+        # that only stages (the records' staging) counts what it staged.
         took = time.monotonic() - began
         self.timings[label] = round(took, 1)
-        _say(f'  {label:<34} {rows:>11,} rows  {took:7.1f} s')
-        return rows
+        if len(written) > 1:
+            _say(f'  {label:<34} {"":>11}       {took:7.1f} s')
+            for table, count in written.items():
+                _say(f'    {table:<32} {count:>11,} rows')
+        else:
+            rows = sum(written.values()) if written else staged
+            _say(f'  {label:<34} {rows:>11,} rows  {took:7.1f} s')
+        return sum(written.values()) if written else staged
 
 
 #: Shelves of the one warehouse, whatever the size of the catalogue: 10 zones
