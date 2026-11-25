@@ -4256,6 +4256,16 @@
               "kind": "POSITIONAL_OR_KEYWORD",
               "name": "user_id",
               "required": false
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "sku",
+              "required": false
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "uom_id",
+              "required": false
             }
           ]
         },

@@ -15068,6 +15068,8 @@ export interface components {
             planned_capacity_max?: string | null;
             /** Planned Shelf Fill */
             planned_shelf_fill?: number | null;
+            /** Unit Conversion Error */
+            unit_conversion_error?: string | null;
             /** Unit Price */
             unit_price: string | null;
             /** Tax Rate */

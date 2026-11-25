@@ -433,7 +433,7 @@ The **CoreAPI** (`core_api`, imported with `from app.core.public_api import core
 |---|---|---|---|
 | `count_for_org_async` | `(db: AsyncSession, org_id: UUID) -> int` | READ | Count templates the org can pick from (org-scoped + global). |
 | `create_async` | `(db: AsyncSession, org_id: UUID, name: str, brand: str \| None=None, barcode: str \| None=None, sku: str \| None=None, description: str \| None=None, image_url: str \| None=None, meta_data: dict[str, Any] \| None=None, user_id: UUID \| None=None) -> ProductTemplateDTO` | WRITE | — |
-| `create_stub_async` | `(db: AsyncSession, org_id: UUID, name: str, barcode: str \| None=None, user_id: UUID \| None=None) -> ProductTemplateDTO` | WRITE | — |
+| `create_stub_async` | `(db: AsyncSession, org_id: UUID, name: str, barcode: str \| None=None, user_id: UUID \| None=None, *, sku: str \| None=None, uom_id: UUID \| None=None) -> ProductTemplateDTO` | WRITE | — |
 | `delete_async` | `(db: AsyncSession, template_id: UUID, org_id: UUID, user_id: UUID \| None=None) -> None` | WRITE | — |
 | `exists_for_org_async` | `(db: AsyncSession, org_id: UUID, template_id: UUID) -> bool` | READ | — |
 | `get_async` | `(db: AsyncSession, org_id: UUID, template_id: UUID) -> ProductTemplateDTO \| None` | READ | — |
