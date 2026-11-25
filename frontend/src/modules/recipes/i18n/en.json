@@ -204,7 +204,7 @@
       "candidate_opened": "Opened",
       "candidate_opened_on": "Opened {{date}}",
       "open_versus_sealed_hint": "An open pack and a sealed one that expires earlier — the earlier date is suggested, the choice is yours.",
-      "unit_mismatch": "Units do not match for {{ingredient}}: the recipe asks for {{required}} while the shelf holds {{available}} (nothing was taken).",
+      "unit_mismatch": "Units do not match for {{ingredient}}: the recipe asks for {{required}} while the stock holds {{available}} (nothing was taken).",
       "unit_mismatch_hint": "Record what one unit of stock weighs or holds on the product, then scan again."
     },
     "opened_suggestion": {
@@ -600,7 +600,7 @@
     "deduct_done_other": "{{count}} ingredients taken",
     "deduct_not_taken_heading": "Not taken:",
     "deduct_reason_missing": "nothing on the shelf",
-    "deduct_reason_unit_mismatch": "units do not match (the recipe asks for {{required}} while the shelf holds {{available}})",
+    "deduct_reason_unit_mismatch": "units do not match (the recipe asks for {{required}} while the stock holds {{available}})",
     "deduct_reason_not_in_recipe": "that item does not belong to this recipe",
     "deduct_reason_already_picked": "already taken",
     "deduct_reason_refused": "the shelf refused this row",

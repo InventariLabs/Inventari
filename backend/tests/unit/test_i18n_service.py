@@ -281,8 +281,8 @@ class TestGetPluralErrorMessage:
 class TestPolishCountedRefusalsAgreeWithTheirCount:
     """A Polish refusal that counts things inflects the noun for every count.
 
-    "przez 1 miejsc" is the one sentence these keys used to carry; Polish needs
-    a form for one, for two to four and for the rest.
+    "przez 1 miejsc" is wrong: Polish needs a form for one, for two to four and
+    for the rest, so each key carries all three.
     """
 
     @pytest.mark.parametrize(
