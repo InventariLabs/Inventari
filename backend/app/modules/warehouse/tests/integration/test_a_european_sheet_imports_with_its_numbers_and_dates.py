@@ -132,3 +132,50 @@ class TestAEuropeanSheetImportsWithItsNumbersAndDates:
         assert Decimal(lines['Mleko']['expected_quantity']) == Decimal('12.5')
         assert lines['Mleko']['expiry_date'] == '2026-11-05'
         assert lines['Ser']['expiry_date'] == '2025-12-03'
+
+    def test_a_pasted_column_reads_its_dot_groups_like_a_file_column(
+        self, client: TestClient, doc_auth_headers: dict[str, str]
+    ) -> None:
+        text = 'Produkt\tIlość\nA\t1.250\nB\t1.234\nC\t12.345'
+
+        resp = client.post(
+            '/api/v1/warehouse/import/lines/paste',
+            json={
+                'text': text,
+                'mapping_json': {'name': 'Produkt', 'quantity': 'Ilość'},
+                'type': 'IN',
+            },
+            headers={**doc_auth_headers, 'Accept-Language': 'de'},
+        )
+
+        assert resp.status_code == 200, resp.text
+        quantities = [Decimal(line['quantity']) for line in resp.json()['lines']]
+        assert quantities == [Decimal('1250'), Decimal('1234'), Decimal('12345')]
+
+    def test_a_comma_separated_column_with_a_decimal_dot_keeps_it(
+        self, client: TestClient, doc_auth_headers: dict[str, str]
+    ) -> None:
+        sheet = 'Produkt,Ilość\nA,2.5\nB,1.255\nC,0.125\nD,12.375\n'.encode()
+
+        body = _read_lines(client, doc_auth_headers, sheet, 'de')
+
+        assert (body['imported'], body['failed']) == (4, 0), body['errors']
+        assert [Decimal(line['quantity']) for line in body['lines']] == [
+            Decimal('2.5'),
+            Decimal('1.255'),
+            Decimal('0.125'),
+            Decimal('12.375'),
+        ]
+
+    def test_the_pasted_preview_shows_each_date_as_it_will_be_stored(
+        self, client: TestClient, doc_auth_headers: dict[str, str]
+    ) -> None:
+        resp = client.post(
+            '/api/v1/warehouse/import/parse-paste',
+            json={'text': 'Produkt\tWażne do\nA\t05.11.2026\nB\t28.02.2027'},
+            headers={**doc_auth_headers, 'Accept-Language': 'pl'},
+        )
+
+        assert resp.status_code == 200, resp.text
+        shown = [row['Ważne do'] for row in resp.json()['preview_rows']]
+        assert shown == ['5 lis 2026', '28 lut 2027']

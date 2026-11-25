@@ -22,8 +22,7 @@ from app.core.file_import import (
     resolve_storage_location_async,
 )
 from app.core.import_sheet import (
-    DateColumns,
-    parse_sheet_number,
+    SheetColumns,
     read_rows,
     row_text,
 )
@@ -209,7 +208,7 @@ def _sheet_status(row: Any, column: str | None) -> str | None:
     return _STATUS_INDEX.get(_normalize_header(text), text)
 
 
-def _sheet_date(row: Any, column: str | None, dates: DateColumns) -> str | None:
+def _sheet_date(row: Any, column: str | None, sheet: SheetColumns) -> str | None:
     """A date column as a date, or a refusal naming the cell.
 
     A date column is stored as a date or refused. Text such as "kiedys w maju"
@@ -222,14 +221,14 @@ def _sheet_date(row: Any, column: str | None, dates: DateColumns) -> str | None:
     if not text:
         return None
     try:
-        return dates.parse(text, column).strftime(DATE_FORMAT)
+        return sheet.date(text, column).strftime(DATE_FORMAT)
     except (ValueError, TypeError, OSError) as exc:
         raise ServiceRejectionError(
             'import_date_invalid', column=column, value=text
         ) from exc
 
 
-def _sheet_price(row: Any, column: str | None) -> Decimal | None:
+def _sheet_price(row: Any, column: str | None, sheet: SheetColumns) -> Decimal | None:
     """A price column as a number, or a refusal naming the cell.
 
     A value that does not parse is refused with its cell named. It must not be
@@ -240,7 +239,7 @@ def _sheet_price(row: Any, column: str | None) -> Decimal | None:
     if not text:
         return None
     try:
-        return parse_sheet_number(text)
+        return sheet.number(text, column)
     except ValueError as exc:
         raise ServiceRejectionError(
             'import_price_invalid', column=column, value=text
@@ -281,7 +280,7 @@ async def execute_equipment_import(
 ) -> dict[str, Any]:
     """Import equipment items from a file with column mapping."""
     df = read_rows(content, filename)
-    dates = DateColumns(df)
+    sheet = SheetColumns(df)
 
     imported = 0
     failed = 0
@@ -306,7 +305,7 @@ async def execute_equipment_import(
                 db=db,
                 row=row,
                 mapping=mapping,
-                dates=dates,
+                sheet=sheet,
                 org_id=org_id,
                 user=user,
                 default_location_id=default_location_id,
@@ -384,7 +383,7 @@ async def _process_row(
     db: AsyncSession,
     row: Any,
     mapping: dict[str, Any],
-    dates: DateColumns,
+    sheet: SheetColumns,
     org_id: UUID,
     user: UserContextDTO,
     default_location_id: str | None,
@@ -424,7 +423,7 @@ async def _process_row(
             equipment_meta[field] = val
 
     for field in ('purchase_date', 'warranty_until'):
-        parsed = _sheet_date(row, mapping.get(field), dates)
+        parsed = _sheet_date(row, mapping.get(field), sheet)
         if parsed:
             equipment_meta[field] = parsed
 
@@ -437,7 +436,7 @@ async def _process_row(
         validate_transition(None, status)
         equipment_meta['equipment_status'] = status
 
-    purchase_price = _sheet_price(row, mapping.get('purchase_price'))
+    purchase_price = _sheet_price(row, mapping.get('purchase_price'), sheet)
 
     # 'manufacturer' was a separate target until the two were merged; a
     # mapping saved before that still means the same column.

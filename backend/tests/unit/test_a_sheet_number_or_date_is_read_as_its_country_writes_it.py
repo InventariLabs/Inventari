@@ -10,11 +10,11 @@ import alike.
 from datetime import date
 from decimal import Decimal
 
+import pandas as pd
 import pytest
 
 from app.core.import_sheet import (
-    DateColumns,
-    _sheet_is_csv,
+    SheetColumns,
     column_day_first,
     parse_sheet_date,
     parse_sheet_number,
@@ -28,9 +28,7 @@ pytestmark = pytest.mark.unit
 @pytest.fixture(autouse=True)
 def _polish_reader():
     set_current_lang('pl')
-    token = _sheet_is_csv.set(False)
     yield
-    _sheet_is_csv.reset(token)
     set_current_lang('en')
 
 
@@ -92,20 +90,51 @@ class TestNumbers:
             ('1.5', '1.5'),
         ],
     )
-    def test_a_csv_dot_before_three_digits_is_thousands_whatever_they_are(
+    def test_a_csv_column_of_dot_groups_reads_every_one_as_thousands(
         self, lang: str, cell: str, expected: str
     ) -> None:
         set_current_lang(lang)
-        read_rows(b'a;b\nx;1\n', 'sheet.csv')
-        assert parse_sheet_number(cell) == Decimal(expected)
+        sheet = SheetColumns(read_rows(b'a;qty\nx;1.250\ny;1.234\n', 'sheet.csv'))
+        assert sheet.number(cell, 'qty') == Decimal(expected)
 
-    def test_a_workbook_number_cell_keeps_its_decimal_dot(self) -> None:
+    @pytest.mark.parametrize('lang', ['de', 'es', 'pl', 'fr', 'pt'])
+    def test_a_decimal_dot_in_the_column_settles_the_dot_as_decimal(
+        self, lang: str
+    ) -> None:
+        set_current_lang(lang)
+        sheet = SheetColumns(
+            read_rows(b'a,qty\nx,2.5\ny,1.255\nz,0.125\nw,12.375\n', 'sheet.csv')
+        )
+        assert [
+            sheet.number(v, 'qty') for v in ('2.5', '1.255', '0.125', '12.375')
+        ] == [Decimal('2.5'), Decimal('1.255'), Decimal('0.125'), Decimal('12.375')]
+
+    @pytest.mark.parametrize('lang', ['en', 'de'])
+    def test_a_decimal_comma_in_the_column_settles_the_dot_as_thousands(
+        self, lang: str
+    ) -> None:
+        set_current_lang(lang)
+        sheet = SheetColumns(
+            read_rows(b'a;qty\nx;2,5\ny;1.250\nz;1.234\n', 'sheet.csv')
+        )
+        assert sheet.number('1.250', 'qty') == Decimal('1250')
+        assert sheet.number('1.234', 'qty') == Decimal('1234')
+        assert sheet.number('2,5', 'qty') == Decimal('2.5')
+
+    def test_a_pasted_column_is_typed_text_like_a_file_column(self) -> None:
+        from app.modules.warehouse.document_import_service import parse_pasted_text
+
         set_current_lang('de')
-        read_rows(b'a;b\nx;1\n', 'sheet.csv')
-        assert parse_sheet_number('1.234') == Decimal('1234')
-        _sheet_is_csv.set(False)
-        assert parse_sheet_number('1.234') == Decimal('1.234')
-        assert parse_sheet_number('1.200') == Decimal('1200')
+        sheet = SheetColumns(parse_pasted_text('Name\tQty\nA\t1.250\nB\t1.234\n'))
+        assert sheet.number('1.250', 'Qty') == Decimal('1250')
+        assert sheet.number('1.234', 'Qty') == Decimal('1234')
+
+    def test_a_workbook_column_keeps_its_decimal_dot(self) -> None:
+        set_current_lang('de')
+        frame = pd.DataFrame({'qty': ['2.125', '3.375', '1.200']})
+        sheet = SheetColumns(frame)
+        assert sheet.number('2.125', 'qty') == Decimal('2.125')
+        assert sheet.number('1.200', 'qty') == Decimal('1200')
 
     @pytest.mark.parametrize(
         'cell',
@@ -169,8 +198,8 @@ class TestDates:
     def test_a_row_is_read_by_what_its_column_says(self) -> None:
         sheet = read_rows(b'name;expiry\nA;05.11.2026\nB;28.02.2025\n', 'sheet.csv')
         set_current_lang('en')
-        dates = DateColumns(sheet)
-        assert dates.parse('05.11.2026', 'expiry') == date(2026, 11, 5)
+        dates = SheetColumns(sheet)
+        assert dates.date('05.11.2026', 'expiry') == date(2026, 11, 5)
 
 
 class TestThePreviewShowsTheDateAsItWillBeStored:

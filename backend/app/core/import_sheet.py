@@ -9,7 +9,6 @@ becomes; what is here is how a row is read and how a refusal is worded.
 import re
 from collections import Counter
 from collections.abc import Iterable
-from contextvars import ContextVar
 from datetime import date, datetime
 from decimal import Decimal
 from io import BytesIO
@@ -149,6 +148,12 @@ def _header_is_text(header_line: str) -> bool:
     return all(ch in ('\t', '\r') or category(ch) != 'Cc' for ch in header_line)
 
 
+#: The ``attrs`` key of a frame read from delimited text: every value in it
+#: is the text as typed. A workbook's number cell arrives as a float's text
+#: instead, which reading a number has to tell apart from typed text.
+_TEXT_SHEET = 'typed_text'
+
+
 def read_csv_sheet(
     content: bytes, delimiters: tuple[str, ...] = _CSV_DELIMITERS, **kwargs: Any
 ) -> pd.DataFrame:
@@ -217,25 +222,21 @@ def read_csv_sheet(
                 )
             continue
         try:
-            return pd.read_csv(
+            frame = pd.read_csv(
                 BytesIO(content),
                 sep=_pick_delimiter(probe, delimiters),
                 encoding=encoding,
                 dtype=str,
                 **kwargs,
             )
+            frame.attrs[_TEXT_SHEET] = True
+            return frame
         except UnicodeDecodeError as e:
             # The header decoded but a later row did not: the next rung
             # names the file.
             last_decode_error = e
     assert last_decode_error is not None
     raise last_decode_error
-
-
-#: Whether the sheet read last in this request was a CSV, where every value
-#: is the text as typed. A workbook's number cell arrives as a float's text
-#: instead, which parsing a number has to tell apart from typed text.
-_sheet_is_csv: ContextVar[bool] = ContextVar('sheet_is_csv', default=False)
 
 
 class RowError(ValueError):
@@ -265,10 +266,8 @@ def read_sheet(content: bytes, filename: str, **kwargs: Any) -> pd.DataFrame:
     carry both answers, so a row whose only name is 'NA' is refused at the door as missing —
     loudly, at import time — rather than imported as the string.
     """
-    is_csv = filename.lower().endswith('.csv')
-    _sheet_is_csv.set(is_csv)
     try:
-        if is_csv:
+        if filename.lower().endswith('.csv'):
             return read_csv_sheet(content)
         return pd.read_excel(BytesIO(content), dtype=str, **kwargs)
     except (BadZipFile, pd.errors.ParserError, ValueError, OSError) as e:
@@ -432,7 +431,7 @@ def _strip_currency(text: str) -> str:
     return text
 
 
-def parse_sheet_number(raw: Any) -> Decimal:
+def parse_sheet_number(raw: Any, dot_thousands: bool | None = None) -> Decimal:
     """A number cell as a ``Decimal``, read the way the sheet's country writes it.
 
     Raises ``UnreadableCellError`` (a ``ValueError``) when the cell is not a number. Currency symbols
@@ -443,16 +442,27 @@ def parse_sheet_number(raw: Any) -> Decimal:
     separator ("1.234.567"); a lone comma is a decimal mark ("12,5"), except
     that exactly three digits after it read as a thousands group for a
     language that writes the decimal mark as a dot ("1,250" in English is
-    1250). A lone dot is the decimal mark, as it is in the text a workbook
-    gives for a number cell, except that for a language that writes a decimal
-    comma three digits after it are a thousands group in a CSV ("1.234"),
-    and in a workbook when they end in 0 ("1.200").
+    1250).
+
+    A lone dot before exactly three digits ("1.234") is the one cell no
+    value settles: *dot_thousands* says what its column decided
+    (:meth:`SheetColumns.number`). Without a decision it is the decimal mark
+    a workbook's number cell writes ("2.125"), except that for a language
+    that writes a decimal comma a group ending in 0 ("1.200") is thousands —
+    a float's text never ends in 0 after the dot. Any other lone dot is a
+    decimal mark.
     """
     text = cell_text(raw)
     if text is None:
         raise UnreadableCellError(raw)
     if _FLOAT_TEXT.match(text):
         return Decimal(text)
+    sign, text = _signed_digits(text, raw)
+    return Decimal(sign + _normalize_separators(text, dot_thousands))
+
+
+def _signed_digits(text: str, raw: Any) -> tuple[str, str]:
+    """A number cell's sign and its digits with separators, no symbol or space groups."""
     text = _strip_currency(text)
     sign = ''
     if text.startswith(('+', '-', '\u2212')):
@@ -464,10 +474,24 @@ def parse_sheet_number(raw: Any) -> Decimal:
         text = head + text[groups.end() :]
     if not re.fullmatch(r'[\d.,]*\d[\d.,]*', text):
         raise UnreadableCellError(raw)
-    return Decimal(sign + _normalize_separators(text))
+    return sign, text
 
 
-def _normalize_separators(text: str) -> str:
+def _lone_group(text: str, mark: str) -> tuple[str, str] | None:
+    """The two parts of ``1.234`` / ``12,345`` — one mark before exactly three digits.
+
+    None for any other shape: more than one mark, a fraction of another
+    length, or a whole that cannot be a thousands group ("0.125", "1234.567").
+    """
+    if text.count(mark) != 1:
+        return None
+    whole, _, fraction = text.partition(mark)
+    if len(fraction) == 3 and 1 <= len(whole) <= 3 and not whole.startswith('0'):
+        return whole, fraction
+    return None
+
+
+def _normalize_separators(text: str, dot_thousands: bool | None) -> str:
     """Digits with at most one dot: the sheet's separators resolved."""
     has_dot, has_comma = '.' in text, ',' in text
     if has_dot and has_comma:
@@ -484,31 +508,28 @@ def _normalize_separators(text: str) -> str:
         if not _is_grouped(text, mark):
             raise UnreadableCellError(text)
         return text.replace(mark, '')
+    group = _lone_group(text, mark)
+    if group and _is_thousands_group(mark, group[1], dot_thousands):
+        return group[0] + group[1]
     whole, _, fraction = text.partition(mark)
-    if (
-        len(fraction) == 3
-        and 1 <= len(whole) <= 3
-        and not whole.startswith('0')
-        and _is_thousands_group(mark, fraction)
-    ):
-        return whole + fraction
     return f'{whole or "0"}.{fraction or "0"}'
 
 
-def _is_thousands_group(mark: str, fraction: str) -> bool:
+def _is_thousands_group(mark: str, fraction: str, dot_thousands: bool | None) -> bool:
     """Whether one separator before exactly three digits is a thousands mark.
 
     A comma is for a language that writes its decimal mark as a dot ("1,250"
-    in English). A dot is for a language that writes a decimal comma
-    ("1.234 kg" in German). Every CSV value is text as typed, so the group
-    is thousands there. A workbook number cell reaches the reader as a
-    float's text, which never ends in 0 after the dot ("2.125" is a decimal
-    there): only "1.200" or "12.000" is a typed thousands group.
+    in English). A dot follows *dot_thousands* when the column decided it;
+    undecided, it is for a language that writes a decimal comma ("1.200 kg"
+    in German) when the group ends in 0, the only ending a workbook's float
+    text cannot have.
     """
     comma_decimal = writes_decimal_comma(get_current_lang())
     if mark == ',':
         return not comma_decimal
-    return comma_decimal and (_sheet_is_csv.get() or fraction.endswith('0'))
+    if dot_thousands is not None:
+        return dot_thousands
+    return comma_decimal and fraction.endswith('0')
 
 
 def _is_grouped(text: str, separator: str) -> bool:
@@ -516,6 +537,38 @@ def _is_grouped(text: str, separator: str) -> bool:
     return (
         re.fullmatch(rf'\d{{1,3}}(?:{re.escape(separator)}\d{{3}})*', text) is not None
     )
+
+
+def _dot_evidence(raw: Any) -> bool | None:
+    """What one value says about the dot of its column.
+
+    True when the value writes its decimals with a comma ("12,5",
+    "1.234,50"), or groups with repeated dots ("1.234.567"): the dot is a
+    thousands mark. False when it writes a decimal dot ("2.5", "1289.00",
+    "0.125", "1,234.50", "1e-05"). None for a value that says nothing about
+    it, the lone group "1.234" included.
+    """
+    text = cell_text(raw)
+    if text is None:
+        return None
+    if _FLOAT_TEXT.match(text):
+        return False
+    try:
+        _, text = _signed_digits(text, raw)
+    except UnreadableCellError:
+        return None
+    has_dot, has_comma = '.' in text, ',' in text
+    if has_dot and has_comma:
+        return text.rfind(',') > text.rfind('.')
+    if has_comma:
+        if text.count(',') > 1:
+            return False if _is_grouped(text, ',') else None
+        return None if _lone_group(text, ',') else True
+    if not has_dot:
+        return None
+    if text.count('.') > 1:
+        return True if _is_grouped(text, '.') else None
+    return None if _lone_group(text, '.') else False
 
 
 _TIME_TAIL = r'(?:[T ]\d{1,2}:\d{2}(?::\d{2}(?:[.,]\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)?'
@@ -564,28 +617,66 @@ def column_day_first(values: Iterable[Any]) -> bool:
     return get_current_lang() != 'en'
 
 
-class DateColumns:
-    """The day-first decision of every date column of one sheet.
+class SheetColumns:
+    """What each column of one sheet decides, from the whole of it.
 
     Built from the whole frame, so a row is read by what its column says:
     the one row of a file that reads "05.11.2026" follows the "28.02.2027"
-    below it. Each column is decided once, on first use.
+    below it, and a "1.234" follows the "2,5" or the "1.289,00" beside it.
+    Each column is decided once, on first use.
     """
 
     def __init__(self, df: pd.DataFrame) -> None:
         self._df = df
-        self._decided: dict[str, bool] = {}
+        self._day_first: dict[str, bool] = {}
+        self._dot_thousands: dict[str, bool | None] = {}
+
+    def _known(self, column: str | None) -> bool:
+        return bool(column) and column in self._df.columns
 
     def day_first(self, column: str | None) -> bool:
-        if not column or column not in self._df.columns:
+        if not self._known(column):
             return column_day_first(())
-        if column not in self._decided:
-            self._decided[column] = column_day_first(self._df[column])
-        return self._decided[column]
+        assert column is not None
+        if column not in self._day_first:
+            self._day_first[column] = column_day_first(self._df[column])
+        return self._day_first[column]
 
-    def parse(self, raw: Any, column: str | None) -> date:
+    def date(self, raw: Any, column: str | None) -> date:
         """The cell as a date, or ``UnreadableCellError`` (a ``ValueError``) when it is not one."""
         return parse_sheet_date(raw, self.day_first(column))
+
+    def dot_thousands(self, column: str | None) -> bool | None:
+        """Whether the column's lone dot before three digits is a thousands mark.
+
+        A value with a decimal comma, or a dot repeated, settles it as
+        thousands; one with a decimal dot ("2.5", "1289.00") settles it as
+        the decimal mark; the side with more values wins. A column with no
+        such value is decided by the file: delimited text is typed as it is
+        read, so for a language that writes a decimal comma the dot is
+        thousands there; a workbook's number cell reads as float text, which
+        no value of this column can settle, and is left to
+        :func:`parse_sheet_number`.
+        """
+        if not self._known(column):
+            return None
+        assert column is not None
+        if column not in self._dot_thousands:
+            votes = Counter(_dot_evidence(raw) for raw in self._df[column])
+            if votes[True] != votes[False]:
+                decided: bool | None = votes[True] > votes[False]
+            elif self._df.attrs.get(_TEXT_SHEET) and writes_decimal_comma(
+                get_current_lang()
+            ):
+                decided = True
+            else:
+                decided = None
+            self._dot_thousands[column] = decided
+        return self._dot_thousands[column]
+
+    def number(self, raw: Any, column: str | None) -> Decimal:
+        """The cell as a number, or ``UnreadableCellError`` (a ``ValueError``) when it is not one."""
+        return parse_sheet_number(raw, self.dot_thousands(column))
 
 
 def parse_sheet_date(raw: Any, day_first: bool) -> date:

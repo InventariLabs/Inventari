@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ServiceRejectionError
 from app.core.import_sheet import (
-    DateColumns,
+    SheetColumns,
     cell_text,
     looks_like_numeric_date,
     read_sheet,
@@ -41,7 +41,7 @@ def _filled_counts(df: pd.DataFrame) -> dict[str, int]:
     return counts
 
 
-def _dates_as_stored(full_df: pd.DataFrame, preview: pd.DataFrame) -> pd.DataFrame:
+def dates_as_stored(full_df: pd.DataFrame, preview: pd.DataFrame) -> pd.DataFrame:
     """The preview with every date column written as the import will store it.
 
     A column whose every filled cell is a numeric date ("05.11.2026") is read
@@ -51,23 +51,23 @@ def _dates_as_stored(full_df: pd.DataFrame, preview: pd.DataFrame) -> pd.DataFra
     before the rows are written, not after.
     """
     shown = preview.copy()
-    dates = DateColumns(full_df)
+    sheet = SheetColumns(full_df)
     for column in full_df.columns:
         filled = [text for text in map(cell_text, full_df[column]) if text]
         if not filled or not all(looks_like_numeric_date(text) for text in filled):
             continue
         shown[column] = [
-            _stored_date(value, column, dates) for value in preview[column]
+            _stored_date(value, column, sheet) for value in preview[column]
         ]
     return shown
 
 
-def _stored_date(value: Any, column: str, dates: DateColumns) -> Any:
+def _stored_date(value: Any, column: str, sheet: SheetColumns) -> Any:
     """One preview cell as the stored day in words; the cell itself when unreadable."""
     if cell_text(value) is None:
         return value
     try:
-        day = dates.parse(value, column)
+        day = sheet.date(value, column)
     except ValueError:
         return value
     return format_skeleton('yMMMd', day, locale=get_current_lang())
@@ -88,7 +88,7 @@ async def analyze_import_file(file_content: bytes, filename: str) -> dict[str, A
 
     preview = full_df.head(PREVIEW_ROWS)
     preview = preview.where(pd.notnull(preview), None)
-    preview = _dates_as_stored(full_df, preview)
+    preview = dates_as_stored(full_df, preview)
 
     return {
         'headers': list(full_df.columns),

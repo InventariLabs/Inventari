@@ -19,7 +19,7 @@ import pandas as pd
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ServiceRejectionError
-from app.core.import_sheet import DateColumns, cell_text, parse_sheet_number
+from app.core.import_sheet import SheetColumns, cell_text
 from app.core.logging import get_logger
 from app.core.public_api import core_api
 from app.core.uom_resolver import UomResolverAsync
@@ -43,7 +43,11 @@ def _extract_string(row: pd.Series, col_name: str | None) -> str | None:
 
 
 def _extract_decimal(
-    row: pd.Series, col_name: str | None, *, default: Decimal | None = None
+    row: pd.Series,
+    col_name: str | None,
+    sheet: SheetColumns,
+    *,
+    default: Decimal | None = None,
 ) -> Decimal | None:
     """Read a decimal column value, or ``default`` when the cell is blank.
 
@@ -63,14 +67,14 @@ def _extract_decimal(
     if text is None:
         return default
     try:
-        return parse_sheet_number(text)
+        return sheet.number(text, col_name)
     except ValueError as exc:
         raise ServiceRejectionError(
             'import_column_not_a_number', column=col_name, value=text
         ) from exc
 
 
-def _extract_date(row: pd.Series, col_name: str | None, dates: DateColumns) -> Any:
+def _extract_date(row: pd.Series, col_name: str | None, sheet: SheetColumns) -> Any:
     """Read a date column value the way its column writes dates, or refuse the cell.
 
     A blank cell is no date; a cell that holds something else than a date
@@ -85,7 +89,7 @@ def _extract_date(row: pd.Series, col_name: str | None, dates: DateColumns) -> A
     if text is None:
         return None
     try:
-        return dates.parse(val, col_name)
+        return sheet.date(val, col_name)
     except (ValueError, TypeError, OSError) as exc:
         logger.debug('Invalid %s value: %s', col_name, text)
         raise ServiceRejectionError(
@@ -192,7 +196,7 @@ async def _build_document_line(
     line_number: int,
     column_mapping: dict[str, Any],
     uom_resolver: UomResolverAsync,
-    dates: DateColumns,
+    sheet: SheetColumns,
     *,
     allow_negative_quantity: bool = False,
 ) -> tuple[DocumentLine, bool]:
@@ -214,7 +218,7 @@ async def _build_document_line(
 
     brand = _extract_string(row, column_mapping.get('brand'))
     quantity = _extract_decimal(
-        row, column_mapping.get('quantity'), default=Decimal('1')
+        row, column_mapping.get('quantity'), sheet, default=Decimal('1')
     )
     # The same question the form's own field asks. ``DocumentLineCreate``
     # declares ``expected_quantity`` as ``Field(gt=0)``, and the field on
@@ -234,10 +238,10 @@ async def _build_document_line(
     uom_id = await uom_resolver.resolve(
         _extract_string(row, column_mapping.get('uom_symbol'))
     )
-    unit_price = _extract_decimal(row, column_mapping.get('unit_price'))
-    tax_rate = _extract_decimal(row, column_mapping.get('tax_rate'))
+    unit_price = _extract_decimal(row, column_mapping.get('unit_price'), sheet)
+    tax_rate = _extract_decimal(row, column_mapping.get('tax_rate'), sheet)
     batch_number = _extract_string(row, column_mapping.get('batch_number'))
-    expiry_date = _extract_date(row, column_mapping.get('expiry_date'), dates)
+    expiry_date = _extract_date(row, column_mapping.get('expiry_date'), sheet)
 
     (
         product_template_id,
