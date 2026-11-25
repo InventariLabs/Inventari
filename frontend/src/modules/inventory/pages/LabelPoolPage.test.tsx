@@ -991,7 +991,11 @@ describe("LabelPoolPage", () => {
       // The header's Generate Labels button lives outside the page's tree.
       const { actions } = mockSetHeader.mock.calls.at(-1)![0];
       render(actions);
-      fireEvent.click(screen.getByRole("button", { name: /generate labels/i }));
+      // A press focuses the button, as it does for a reader; the sheet hands
+      // the focus back to it on close, not to the tab that held it before.
+      await userEvent.click(
+        screen.getByRole("button", { name: /generate labels/i }),
+      );
       fireEvent.click(await screen.findByTestId("export-labels-btn"));
 
       expect(await screen.findByText("NEW-0010")).toBeInTheDocument();

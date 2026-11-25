@@ -1,6 +1,5 @@
 import { documentTitle } from "@/modules/warehouse/lib/documentTitle";
-import { memo, useState } from "react";
-import * as PopoverPrimitive from "@radix-ui/react-popover";
+import { memo } from "react";
 import {
   ArrowLeftRight,
   ArrowDownToLine,
@@ -11,7 +10,6 @@ import {
   CheckCircle,
   Copy,
   MapPin,
-  MoreHorizontal,
   PackageMinus,
   PackagePlus,
   Pencil,
@@ -22,6 +20,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { ActionMenu } from "@/components/ui/ActionMenu";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
@@ -533,56 +532,25 @@ const DocumentListItem = memo(function DocumentListItem({
  * Single "⋯" overflow menu holding every row action, at every viewport.
  * The trigger never moves and never disappears based on status, so the
  * row's right edge is stable and actions are reachable identically on
- * 390 px and 1440 px.
+ * 390 px and 1440 px. `ActionMenu` keeps the focus in a sheet an action
+ * opens and hands it back to the "⋯" button when that sheet closes.
  */
 function RowActionsMenu({ actions }: { actions: RowAction[] }) {
   const { t } = useTranslation("warehouse");
-  const [open, setOpen] = useState(false);
 
   return (
-    <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
-      <PopoverPrimitive.Trigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={t("actions.moreActions")}
-          title={t("actions.moreActions")}
-          onClick={(e) => e.stopPropagation()}
-          className="relative z-10 shrink-0"
-        >
-          <MoreHorizontal size={18} />
-        </Button>
-      </PopoverPrimitive.Trigger>
-      <PopoverPrimitive.Portal>
-        <PopoverPrimitive.Content
-          aria-label={t("actions.moreActions")}
-          className="z-[var(--z-popover)] w-56 bg-surface-card rounded-xl border border-border shadow-xl p-1 flex flex-col gap-1"
-          sideOffset={4}
-        >
-          {actions.map((action) => (
-            <Button
-              key={action.key}
-              variant="ghost"
-              size="sm"
-              disabled={action.disabled}
-              className={
-                action.danger
-                  ? "w-full justify-start gap-2 text-red-600"
-                  : "w-full justify-start gap-2"
-              }
-              onClick={(e) => {
-                e.stopPropagation();
-                setOpen(false);
-                action.onClick();
-              }}
-            >
-              <action.icon size={16} />
-              {action.label}
-            </Button>
-          ))}
-        </PopoverPrimitive.Content>
-      </PopoverPrimitive.Portal>
-    </PopoverPrimitive.Root>
+    <ActionMenu
+      label={t("actions.moreActions")}
+      triggerClassName="relative z-10 shrink-0"
+      actions={actions.map((action) => ({
+        id: action.key,
+        label: action.label,
+        icon: <action.icon size={16} />,
+        onSelect: action.onClick,
+        disabled: action.disabled,
+        destructive: action.danger,
+      }))}
+    />
   );
 }
 

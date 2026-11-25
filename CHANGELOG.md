@@ -42,6 +42,20 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Phone, focus and Back. Back arrows (the page header's and the label
+  scanner's) work on a screen entered through a redirect or the sign-in
+  return, instead of doing nothing. After a reload on an action screen Back
+  shows the module start once, and the posted result's *Back to start* no
+  longer leaves the finished form behind it. A product opened from the list
+  adds a history entry, so Back closes its dialog and leaves the list as it
+  was; the scan sheet's total follows the decimal comma. In the product
+  picker the focus stays on the field after a pick, Tab reaches *Add as
+  new*, and a list that opens upward no longer covers its own input. The
+  row menu of a warehouse document keeps and returns the focus around the
+  sheet it opens, as does any sheet whose field takes the focus as it opens.
+  Community homepage links and *Free label* meet the phone touch-target
+  size, and the tab keeps naming the not-found sentence after a language
+  switch.
 - Refusals speak the reader's language and name what the reader knows. An
   upload over the server's size limit is answered in the interface language,
   with the limit, in the same envelope as every other refusal (code

@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { Package, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { placeListPanel, type ListPanelPlace } from "@/module-sdk";
 import { Button } from "@/components/ui/Button";
 import type { LineItemProduct, LineItemSearchScope } from "./types";
 import { formatDate, formatQuantityValue } from "@/utils/formatters";
@@ -98,12 +99,7 @@ export function LineItemSearchDropdown({
   const dropdownRef = useRef<HTMLDivElement>(null);
   // Where the input stood when the panel was last placed against it.
   const placedAt = useRef<{ top: number; left: number } | null>(null);
-  const [pos, setPos] = useState<{
-    top: number;
-    left: number;
-    width: number;
-    maxHeight: number;
-  } | null>(null);
+  const [pos, setPos] = useState<ListPanelPlace | null>(null);
 
   const hasList = results.length > 0;
   const hasNoResults =
@@ -120,22 +116,19 @@ export function LineItemSearchDropdown({
     const update = () => {
       const rect = anchor.getBoundingClientRect();
       placedAt.current = { top: rect.top, left: rect.left };
-      const gap = 4;
       const itemCount = Math.max(results.length, 1);
       const estimatedHeight = Math.min(240, Math.max(48, itemCount * 44));
       // What the person can see, not what the window measures: an on-screen
       // keyboard shrinks the visual viewport and leaves the window as it was.
-      const visibleBottom = window.visualViewport?.height ?? window.innerHeight;
-      const spaceBelow = visibleBottom - rect.bottom - gap;
-      const up = spaceBelow < estimatedHeight && rect.top > spaceBelow;
-      setPos({
-        left: rect.left,
-        width: rect.width,
-        top: up
-          ? Math.max(8, rect.top - estimatedHeight - gap)
-          : rect.bottom + gap,
-        maxHeight: up ? Math.max(96, rect.top - 16) : Math.min(240, spaceBelow),
-      });
+      const visibleHeight = window.visualViewport?.height ?? window.innerHeight;
+      setPos(
+        placeListPanel(
+          rect,
+          estimatedHeight,
+          visibleHeight,
+          document.documentElement.clientHeight || window.innerHeight,
+        ),
+      );
     };
     update();
     window.addEventListener("resize", update);
@@ -304,7 +297,7 @@ export function LineItemSearchDropdown({
               onCreate();
               onRequestClose?.();
             }}
-            leftIcon={<Plus size={16} />}
+            leftIcon={<Plus size={16} className="shrink-0" />}
             // The same offer `ProductQuickCreateSearch` makes elsewhere.
             className="w-full justify-start rounded-lg border border-dashed border-accent/40 bg-accent/10 px-3 py-2.5 text-left text-sm text-accent-700 hover:bg-accent/20 dark:text-accent-300"
             data-testid="line-item-create-product"
@@ -358,6 +351,7 @@ export function LineItemSearchDropdown({
         style={{
           position: "fixed",
           top: pos.top,
+          bottom: pos.bottom,
           left: pos.left,
           width: pos.width,
           maxHeight: pos.maxHeight,

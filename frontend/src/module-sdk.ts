@@ -85,6 +85,7 @@ export type { VisitedRecord } from "@/hooks/useRecordVisit";
 // Whether the history holds an earlier screen of the app to go back to, for a
 // dialog that closes by going back to the link that opened it.
 export { hasHistoryToPop, useBackToScreen } from "@/hooks/useShellBack";
+export { placeListPanel, type ListPanelPlace } from "@/lib/listPanelPlacement";
 // The product profile the organization runs, for wording that follows it.
 export { useActiveProfile } from "@/hooks/useActiveProfile";
 // A form holding typed work asks before a tab or the palette leaves it.
