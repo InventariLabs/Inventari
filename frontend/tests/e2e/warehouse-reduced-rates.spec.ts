@@ -265,7 +265,9 @@ test("Settings shows the tax-ID rule confirmation applies, inherited or set", as
   const shelf = await seed.shelf("Shelf");
   const hammer = await seed.product("Hammer");
   // A supplier with no tax ID, and a draft receipt from it.
-  const supplier = await seed.partner("Supplier", "SUPPLIER");
+  const supplier = await seed.partner("Supplier", "SUPPLIER", {
+    withTaxId: false,
+  });
   const receipt = await seed.api.createDocument(seed.token, {
     type: "IN",
     partner_id: supplier.id,
