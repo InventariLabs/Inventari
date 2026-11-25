@@ -97,3 +97,52 @@ def test_the_test_ping_reports_the_cause_too() -> None:
     )
 
     assert result.error_cause == 'signing_unreadable'
+
+
+@pytest.mark.parametrize(
+    ('url', 'code'),
+    [
+        ('http://localhost/hook', 'url_loopback'),
+        ('http://10.0.0.5/hook', 'url_private'),
+        ('ftp://93.184.216.34/hook', 'url_scheme'),
+        ('http:///hook', 'url_no_hostname'),
+    ],
+)
+@pytest.mark.parametrize('request_lang', ['en', 'pl', 'de'])
+@pytest.mark.asyncio
+async def test_a_url_refusal_is_stored_in_english_and_recognised(
+    url: str, code: str, request_lang: str
+) -> None:
+    """The stored sentence does not follow the language of whoever pressed Test."""
+    from app.i18n.service import set_current_lang
+    from app.modules.webhooks._webhook_delivery import _attempt_delivery
+
+    set_current_lang(request_lang)  # type: ignore[arg-type]
+    endpoint = _endpoint()
+    endpoint.url = url
+    try:
+        ok, status_code, _body, error = await _attempt_delivery(
+            endpoint, b'{}', {'event': 'item.created'}, delivery_id='d1'
+        )
+    finally:
+        set_current_lang('en')
+
+    assert ok is False
+    assert status_code is None
+    assert error is not None
+    assert schemas.failure_cause(None, error) == code
+
+
+def test_an_unresolved_name_and_a_rebinding_name_are_recognised() -> None:
+    from app.core.ssrf_guard import WebhookUrlRejectedError
+    from app.modules.webhooks._webhook_delivery import _url_refusal_sentence
+
+    for reason, code in (
+        ('unresolved', 'url_unresolved'),
+        ('rebinding', 'url_rebinding'),
+    ):
+        sentence = _url_refusal_sentence(
+            WebhookUrlRejectedError(reason, host='hook.example', resolved='10.0.0.9')
+        )
+        assert 'hook.example' in sentence
+        assert schemas.failure_cause(None, sentence) == code

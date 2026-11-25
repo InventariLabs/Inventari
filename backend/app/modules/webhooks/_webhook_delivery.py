@@ -1,4 +1,6 @@
+import re
 from datetime import UTC, datetime, timedelta
+from functools import cache
 from typing import Any
 from uuid import UUID
 
@@ -6,7 +8,9 @@ import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db_retry import mark_external_effect
+from app.core.exceptions import ServiceRejectionError
 from app.core.logging import get_logger
+from app.core.ssrf_guard import WebhookUrlRejectedError
 from app.modules.webhooks.models import WebhookEndpoint
 from app.modules.webhooks.signing import compute_signature
 from app.modules.webhooks.ssrf_guard import validate_webhook_url
@@ -40,6 +44,50 @@ _CONNECT_FAILED_PREFIX = 'Could not connect to '
 _TLS_REFUSED_INFIX = ' was refused over TLS'
 _CONNECTION_BROKEN_INFIX = ' broke before the receiver answered'
 _CONNECTION_PREFIX = 'The connection to '
+
+#: The refusals of the URL guard, as the codes the API reports: the tail of
+#: each ``webhook_url_<reason>`` catalogue key. The stored sentence is the
+#: English catalogue text whatever language the request that triggered the
+#: delivery was in, so one set of patterns recognises it.
+_URL_REFUSAL_REASONS = ('loopback', 'private', 'unresolved', 'rebinding')
+_PLACEHOLDER = '\x00'
+
+
+def _url_refusal_sentence(exc: ValueError) -> str:
+    """The guard's refusal in English, the language every stored cause is in."""
+    if isinstance(exc, WebhookUrlRejectedError | ServiceRejectionError):
+        return exc.sentence('en')
+    return str(exc)
+
+
+@cache
+def _url_refusal_patterns() -> tuple[tuple[str, re.Pattern[str]], ...]:
+    """One pattern per refusal: the English template with its slots as wildcards."""
+    refusals: dict[str, WebhookUrlRejectedError | ServiceRejectionError] = {
+        f'url_{reason}': WebhookUrlRejectedError(
+            reason, host=_PLACEHOLDER, resolved=_PLACEHOLDER
+        )
+        for reason in _URL_REFUSAL_REASONS
+    }
+    refusals['url_malformed'] = ServiceRejectionError('webhook_url_malformed')
+    refusals['url_scheme'] = ServiceRejectionError(
+        'webhook_url_scheme', schemes=_PLACEHOLDER
+    )
+    refusals['url_no_hostname'] = ServiceRejectionError('webhook_url_no_hostname')
+    patterns = []
+    for code, refusal in refusals.items():
+        template = refusal.sentence('en')
+        body = '.+'.join(re.escape(part) for part in template.split(_PLACEHOLDER))
+        patterns.append((code, re.compile(body, re.DOTALL)))
+    return tuple(patterns)
+
+
+def url_refusal_code(error_message: str) -> str | None:
+    """The code of the URL-guard refusal that *error_message* is, or ``None``."""
+    for code, pattern in _url_refusal_patterns():
+        if pattern.fullmatch(error_message):
+            return code
+    return None
 
 
 async def _attempt_delivery(
@@ -97,7 +145,7 @@ async def _attempt_delivery(
         # validate_webhook_url's resolution and httpx's own resolution.
         pinned_ip = validate_webhook_url(str(webhook.url), allow_private=allow_private)
     except ValueError as exc:
-        return False, None, None, str(exc)
+        return False, None, None, _url_refusal_sentence(exc)
 
     try:
         from urllib.parse import urlparse

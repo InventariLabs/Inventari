@@ -15,6 +15,7 @@ from ._webhook_delivery import (
     _TIMEOUT_PREFIX,
     _TLS_REFUSED_INFIX,
     _UNREADABLE_SIGNING_VALUE,
+    url_refusal_code,
 )
 
 #: Names in ``SystemEvent`` and the payload registry that nothing emits:
@@ -77,7 +78,7 @@ def failure_cause(status_code: int | None, error_message: str | None) -> str | N
             return 'tls_refused'
         if _CONNECTION_BROKEN_INFIX in error_message:
             return 'connection_broken'
-    return None
+    return url_refusal_code(error_message)
 
 
 class WebhookEndpointCreate(BaseModel):

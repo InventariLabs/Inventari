@@ -74,7 +74,14 @@
       "connectFailed": "Es konnte keine Verbindung zum Ziel hergestellt werden. Die Adresse ist vielleicht falsch, eine Firewall blockiert sie oder der Empfänger ist nicht erreichbar.",
       "tlsRefused": "Die Verbindung wurde über TLS abgelehnt: Das Zertifikat des Empfängers konnte nicht überprüft werden.",
       "connectionBroken": "Die Verbindung brach ab, bevor der Empfänger antwortete.",
-      "emptyAnswer": "Das Ziel antwortete mit HTTP {{status}} ohne Inhalt und nannte daher keinen Grund. Prüfen Sie das eigene Protokoll des Empfängers."
+      "emptyAnswer": "Das Ziel antwortete mit HTTP {{status}} ohne Inhalt und nannte daher keinen Grund. Prüfen Sie das eigene Protokoll des Empfängers.",
+      "urlLoopback": "Diese Adresse zeigt auf den Server selbst, der Webhook würde den Rechner also nie verlassen. Verwende eine aus dem Internet erreichbare Adresse oder bitte die Person, die diese Installation betreibt, lokale Adressen zuzulassen.",
+      "urlPrivate": "Diese Adresse ist nicht öffentlich routbar oder für Protokollinfrastruktur reserviert, deshalb weigert sich der Server, sie aufzurufen. Verwende eine aus dem Internet erreichbare Adresse oder bitte die Person, die diese Installation betreibt, lokale Adressen zuzulassen.",
+      "urlUnresolved": "Der Hostname konnte nicht aufgelöst werden, daher lässt sich die Adresse nicht prüfen. Verwende einen öffentlich auflösbaren Namen oder bitte die Person, die diese Installation betreibt, lokale Adressen zuzulassen.",
+      "urlRebinding": "Der Hostname löst zu einer Adresse auf, die nicht öffentlich routbar oder für Protokollinfrastruktur reserviert ist. Verwende eine aus dem Internet erreichbare Adresse oder bitte die Person, die diese Installation betreibt, lokale Adressen zuzulassen.",
+      "urlMalformed": "Das ist keine gültige Webadresse. Gib eine vollständige Adresse an, zum Beispiel https://example.com/hook.",
+      "urlScheme": "Für Webhooks sind nur http- und https-Adressen erlaubt.",
+      "urlNoHostname": "Die Webhook-Adresse muss einen Hostnamen enthalten, zum Beispiel https://example.com/hook."
     }
   },
   "testResult": {
