@@ -409,7 +409,7 @@ describe("FinishedScreen — the shelf learns about the dinner", () => {
     expect(screen.getByText("1 ingredient taken")).toBeVisible();
     expect(
       screen.getByText(
-        "Milk — units do not match (the recipe asks for 0.5 l, the shelf holds 2 pcs)",
+        "Milk — units do not match (the recipe asks for 0.5 l while the stock holds 2 pcs)",
       ),
     ).toBeVisible();
     // The session still completes — one dinner, partly off the shelf — and

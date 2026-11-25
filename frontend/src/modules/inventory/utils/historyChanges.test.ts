@@ -469,6 +469,6 @@ describe("historyChanges unit chosen over the product's own", () => {
       tCard,
     );
 
-    expect(line).toBe("Entered in g; the product is kept in kg");
+    expect(line).toBe("Entered in g — the product is kept in kg");
   });
 });
