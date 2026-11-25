@@ -97,12 +97,16 @@ function abandonReasonText(t: (key: string) => string, reason: string): string {
 /**
  * The reason a delivery got no answer, in the reader's language. The stored
  * sentence is English; the API names its cause as a code. A code this build
- * does not know leaves the stored sentence on screen.
+ * does not know leaves the stored sentence on screen. *values* carry what the
+ * stored sentence named (the host, the address it resolved to) for the
+ * sentences that show it.
  */
 export function causeText(
-  t: (key: string) => string,
+  t: (key: string, values?: Record<string, string>) => string,
   cause: string | null | undefined,
+  values?: Record<string, string> | null,
 ): string | undefined {
+  const slots = values ?? {};
   // Inline keys, not a composed one: the i18n gates read the literals here.
   switch (cause) {
     case "signing_unreadable":
@@ -116,13 +120,13 @@ export function causeText(
     case "connection_broken":
       return t("delivery.cause.connectionBroken");
     case "url_loopback":
-      return t("delivery.cause.urlLoopback");
+      return t("delivery.cause.urlLoopback", slots);
     case "url_private":
-      return t("delivery.cause.urlPrivate");
+      return t("delivery.cause.urlPrivate", slots);
     case "url_unresolved":
-      return t("delivery.cause.urlUnresolved");
+      return t("delivery.cause.urlUnresolved", slots);
     case "url_rebinding":
-      return t("delivery.cause.urlRebinding");
+      return t("delivery.cause.urlRebinding", slots);
     case "url_malformed":
       return t("delivery.cause.urlMalformed");
     case "url_scheme":
@@ -140,7 +144,11 @@ function DeliveryRow({ delivery }: { delivery: WebhookDelivery }) {
   // What the expanded row says about a failure: our own cause in the reader's
   // language, else what the target sent back, else — a refusal whose body was
   // empty — the fact that it gave no reason, so the row is never silent.
-  const translatedCause = causeText(t, delivery.error_cause);
+  const translatedCause = causeText(
+    t,
+    delivery.error_cause,
+    delivery.error_cause_values,
+  );
   const answeredEmpty =
     delivery.status_code != null &&
     (delivery.status_code < 200 || delivery.status_code >= 300) &&

@@ -128,9 +128,11 @@ says what the release does rather than what changed since them.
   the new optional `adoptedI18nKeys` field (MODULES_GUIDE.md), and the
   development console names an ignored key and a key two modules both override.
 - A failed webhook delivery explains itself in the reader's language — an
-  unreadable signing secret, a timeout, a refused or broken connection — and an
-  answer with an empty body says that it gave no reason. The two links in the
-  circuit-breaker banner share one colour.
+  unreadable signing secret, a timeout, a refused or broken connection, an
+  address the server will not call (it names the host, the address it resolved
+  to and the setting that allows local addresses) — and an answer with an empty
+  body says that it gave no reason. The two links in the circuit-breaker banner
+  share one colour.
 - The warning that a failed Test counts toward the circuit breaker is a line on
   the Webhooks page, not a tooltip, so a phone and a keyboard see it.
 - On a phone, a module's settings page is named in the section picker instead

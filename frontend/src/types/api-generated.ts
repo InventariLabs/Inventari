@@ -28594,6 +28594,10 @@ export interface components {
             delivery_id: string;
             /** Error Cause */
             error_cause?: string | null;
+            /** Error Cause Values */
+            error_cause_values?: {
+                [key: string]: string;
+            } | null;
         };
         /**
          * Token
@@ -29211,6 +29215,10 @@ export interface components {
             last_attempt_at?: string | null;
             /** Error Cause */
             error_cause?: string | null;
+            /** Error Cause Values */
+            error_cause_values?: {
+                [key: string]: string;
+            } | null;
         };
         /** WebhookEndpointCreate */
         WebhookEndpointCreate: {

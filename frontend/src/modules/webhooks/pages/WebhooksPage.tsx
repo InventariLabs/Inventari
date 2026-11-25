@@ -168,7 +168,11 @@ export default function WebhooksPage() {
                           })
                         : t("testResult.failure", {
                             error:
-                              causeText(t, result.error_cause) ??
+                              causeText(
+                                t,
+                                result.error_cause,
+                                result.error_cause_values,
+                              ) ??
                               result.error ??
                               t("unknownError"),
                           }),
