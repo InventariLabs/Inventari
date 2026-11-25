@@ -42,6 +42,20 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Polish wording and the shape of numbers read right. A refusal that counts
+  things names them in the right form for one, two to four and five or more
+  (a location type used by 1 location, a template used by 3 products, a stock
+  take with 2 uncounted lines); the sign-in and invitation texts no longer
+  assume a masculine reader; and a quotation in three refusals closes with a
+  curly quote. A unit that carries its own full stop no longer gets a second
+  one in the recipe availability sentence, the unit-choice dialogs or the
+  item history. The occupancy map names a unit in the reader's language, the
+  correction dialog writes the typed change with the reader's decimal mark,
+  and the quantity field of the scan-receiving screen drops a leading zero.
+  On a phone a long launcher label ("Zatwierdzenia") stays in one piece, a
+  To-do row's sentence wraps instead of being cut at the card edge, and the
+  webhook form's event rows wrap inside their list. The date in an expiry
+  alert follows the reader's language.
 - Refusals speak the reader's language and name what the reader knows. An
   upload over the server's size limit is answered in the interface language,
   with the limit, in the same envelope as every other refusal (code

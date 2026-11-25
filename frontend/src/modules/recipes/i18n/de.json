@@ -59,7 +59,7 @@
     "link_failed": "Verknüpfung fehlgeschlagen",
     "match_exact": "Exakte Übereinstimmung",
     "match_fuzzy": "Über den Namen zugeordnet",
-    "not_comparable": "Nicht vergleichbar: {{available}} vorhanden, das Rezept braucht {{required}}.",
+    "not_comparable": "Nicht vergleichbar (das Rezept braucht {{required}} bei {{available}} im Bestand).",
     "not_comparable_status": "Nicht vergleichbar",
     "not_comparable_fix": "Gewicht oder Volumen pro Stück eintragen",
     "insufficient": "Zu wenig",
@@ -204,7 +204,7 @@
       "candidate_opened": "Geöffnet",
       "candidate_opened_on": "Geöffnet am {{date}}",
       "open_versus_sealed_hint": "Eine geöffnete Packung und eine verschlossene mit früherem Datum – vorgeschlagen wird das frühere Datum, die Wahl liegt bei Ihnen.",
-      "unit_mismatch": "Einheiten passen nicht für {{ingredient}}: Das Rezept verlangt {{required}}, im Bestand sind {{available}}. Es wurde nichts entnommen.",
+      "unit_mismatch": "Einheiten passen nicht für {{ingredient}}: Das Rezept verlangt {{required}} bei {{available}} im Bestand (es wurde nichts entnommen).",
       "unit_mismatch_hint": "Hinterlegen Sie am Produkt, wie viel eine Bestandseinheit wiegt oder fasst, und scannen Sie erneut."
     },
     "opened_suggestion": {
@@ -600,7 +600,7 @@
     "deduct_done_other": "{{count}} Zutaten genommen",
     "deduct_not_taken_heading": "Nicht genommen:",
     "deduct_reason_missing": "nichts im Regal",
-    "deduct_reason_unit_mismatch": "Einheiten passen nicht (das Rezept verlangt {{required}}, im Regal liegen {{available}})",
+    "deduct_reason_unit_mismatch": "Einheiten passen nicht (das Rezept verlangt {{required}} bei {{available}} im Regal)",
     "deduct_reason_not_in_recipe": "dieser Artikel gehört nicht zu diesem Rezept",
     "deduct_reason_already_picked": "schon genommen",
     "deduct_reason_refused": "das Regal hat diese Zeile abgelehnt",

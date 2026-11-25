@@ -189,7 +189,7 @@ def _plural_category(lang: Language, count: int) -> str:
 
 
 def get_plural_error_message(
-    key: str, count: int, lang: Language | None = None, **kwargs
+    key: str, count: int, /, lang: Language | None = None, **kwargs
 ) -> str:
     """Get a translated error message whose counted noun agrees with *count*.
 
@@ -198,7 +198,8 @@ def get_plural_error_message(
     for 2–4 in Polish, the base key for every category a language carries no
     row for. A language whose counted noun does not inflect therefore keeps a
     single sentence. *count* only picks the row; the sentence interpolates
-    *kwargs* as usual (``{min_length}``, not ``{count}``).
+    *kwargs* as usual; *key* and *count* are positional-only, so a sentence may
+    carry a ``{count}`` placeholder of its own.
     """
     if lang is None:
         lang = get_default_language()

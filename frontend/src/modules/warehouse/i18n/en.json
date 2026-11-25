@@ -1603,7 +1603,7 @@
   },
   "unitMismatch": {
     "title": "Units disagree",
-    "message": "{{product}} is kept in {{templateUnit}}, and this record would be saved in {{chosenUnit}}. Confirm to restate the record and this delivery into {{templateUnit}} — the choice lands in the record's history. To keep the units apart, change the record's unit on its page in Inventory first.",
+    "message": "{{product}} is kept in {{templateUnit}} (this record would be saved in {{chosenUnit}}). Confirm to restate the record and this delivery into {{templateUnit}} — the choice lands in the record's history. To keep the units apart, change the record's unit on its page in Inventory first.",
     "confirm": "Confirm and complete",
     "cancel": "Not now"
   },

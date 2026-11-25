@@ -510,7 +510,9 @@ async def archive_storage(
     )
     if item_ids and target is None:
         raise ServiceRejectionError(
-            'storage_archive_blocked_by_items', count=len(item_ids)
+            'storage_archive_blocked_by_items',
+            plural=len(item_ids),
+            count=len(item_ids),
         )
     for item_id in item_ids:
         assert target is not None  # guaranteed: items exist ⇒ target required
@@ -665,7 +667,9 @@ async def delete_storage(
     )
     if move_count and move_count > 0:
         raise ServiceRejectionError(
-            'storage_delete_blocked_by_movements', count=move_count
+            'storage_delete_blocked_by_movements',
+            plural=move_count,
+            count=move_count,
         )
 
     # And the stock the register holds here. A live record on the location,

@@ -59,7 +59,7 @@
     "link_failed": "Impossible de lier l'ingrédient",
     "match_exact": "Correspondance exacte",
     "match_fuzzy": "Rapproché par le nom",
-    "not_comparable": "Comparaison impossible : {{available}} en stock, la recette demande {{required}}.",
+    "not_comparable": "Comparaison impossible (la recette demande {{required}} pour {{available}} en stock).",
     "not_comparable_status": "Comparaison impossible",
     "not_comparable_fix": "Indiquer le poids ou le volume par pièce",
     "insufficient": "Pas assez",
@@ -204,7 +204,7 @@
       "candidate_opened": "Ouvert",
       "candidate_opened_on": "Ouvert le {{date}}",
       "open_versus_sealed_hint": "Un emballage ouvert et un emballage fermé qui expire plus tôt : la date la plus proche est proposée, le choix vous appartient.",
-      "unit_mismatch": "Unités incompatibles pour {{ingredient}} : la recette demande {{required}}, le stock contient {{available}}. Rien n’a été prélevé.",
+      "unit_mismatch": "Unités incompatibles pour {{ingredient}} : la recette demande {{required}} pour {{available}} en stock (rien n’a été prélevé).",
       "unit_mismatch_hint": "Renseignez sur le produit le poids ou le contenu d’une unité de stock, puis scannez à nouveau."
     },
     "opened_suggestion": {
@@ -600,7 +600,7 @@
     "deduct_done_other": "{{count}} ingrédients retirés",
     "deduct_not_taken_heading": "Non retirés :",
     "deduct_reason_missing": "rien sur l'étagère",
-    "deduct_reason_unit_mismatch": "les unités ne correspondent pas (la recette demande {{required}}, le rayon contient {{available}})",
+    "deduct_reason_unit_mismatch": "les unités ne correspondent pas (la recette demande {{required}} pour {{available}} au rayon)",
     "deduct_reason_not_in_recipe": "cet article ne fait pas partie de cette recette",
     "deduct_reason_already_picked": "déjà retiré",
     "deduct_reason_refused": "le rayon a refusé cette ligne",

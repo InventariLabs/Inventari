@@ -59,7 +59,7 @@
     "link_failed": "No se pudo vincular el ingrediente",
     "match_exact": "Coincidencia exacta",
     "match_fuzzy": "Emparejado por nombre",
-    "not_comparable": "No se pueden comparar: {{available}} en stock, la receta necesita {{required}}.",
+    "not_comparable": "No se pueden comparar (la receta necesita {{required}} con {{available}} en stock).",
     "not_comparable_status": "No se pueden comparar",
     "not_comparable_fix": "Anota el peso o volumen por pieza",
     "insufficient": "No alcanza",
@@ -204,7 +204,7 @@
       "candidate_opened": "Abierto",
       "candidate_opened_on": "Abierto el {{date}}",
       "open_versus_sealed_hint": "Hay un envase abierto y uno cerrado que caduca antes: se sugiere la fecha más próxima, la decisión es suya.",
-      "unit_mismatch": "Unidades incompatibles para {{ingredient}}: la receta pide {{required}} y en existencias hay {{available}}. No se retiró nada.",
+      "unit_mismatch": "Unidades incompatibles para {{ingredient}}: la receta pide {{required}} y en existencias hay {{available}} (no se retiró nada).",
       "unit_mismatch_hint": "Registre en el producto cuánto pesa o contiene una unidad de existencias y vuelva a escanear."
     },
     "opened_suggestion": {
@@ -600,7 +600,7 @@
     "deduct_done_other": "{{count}} ingredientes retirados",
     "deduct_not_taken_heading": "No retirados:",
     "deduct_reason_missing": "nada en la estantería",
-    "deduct_reason_unit_mismatch": "las unidades no coinciden (la receta pide {{required}}, la estantería tiene {{available}})",
+    "deduct_reason_unit_mismatch": "las unidades no coinciden (la receta pide {{required}} y la estantería tiene {{available}})",
     "deduct_reason_not_in_recipe": "ese artículo no pertenece a esta receta",
     "deduct_reason_already_picked": "ya retirado",
     "deduct_reason_refused": "la estantería rechazó esta fila",

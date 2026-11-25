@@ -75,14 +75,18 @@ function EventRow({
   const { t } = useTranslation("webhooks");
   const moduleLabels = useModuleLabels();
   return (
-    <label className="flex min-h-11 items-center gap-2 cursor-pointer hover:bg-surface px-2 py-1 rounded md:min-h-0">
-      <Checkbox checked={checked} onChange={() => onToggle(event.event_type)} />
-      <span className="text-xs font-mono text-on-secondary dark:text-on-muted">
+    <label className="flex min-h-11 flex-wrap items-center gap-x-2 gap-y-1 cursor-pointer hover:bg-surface px-2 py-1 rounded md:min-h-0">
+      <Checkbox
+        className="shrink-0"
+        checked={checked}
+        onChange={() => onToggle(event.event_type)}
+      />
+      <span className="min-w-0 break-all text-xs font-mono text-on-secondary dark:text-on-muted">
         {event.event_type}
       </span>
       {/* The catalogue is translated here; the API's English sentence is the
           fallback for an event added after this locale. */}
-      <span className="text-xs text-on-muted dark:text-on-secondary">
+      <span className="min-w-0 text-xs text-on-muted dark:text-on-secondary">
         {`— ${t(`events.${event.event_type}`, {
           defaultValue: event.description,
         })}`}

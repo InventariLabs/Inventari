@@ -76,7 +76,7 @@ from app.core.contributions import (
     contribution_registry,
 )
 from app.core.csv_export import rows_to_csv
-from app.core.datetimes import utc_now
+from app.core.datetimes import format_date_for, utc_now
 from app.core.db_utils import hit_constraint, paginate_async
 from app.core.define_module import ModuleScheduledTask, define_module
 from app.core.deps import (
@@ -218,6 +218,7 @@ __all__ = [
     'create_table_if_absent',
     'define_module',
     'effective_expiry',
+    'format_date_for',
     'general_rows',
     'get_async_db',
     'get_context_tags_of',

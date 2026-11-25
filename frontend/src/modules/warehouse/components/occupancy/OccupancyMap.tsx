@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { InlineQueryError } from "@/components/ui/QueryResult";
+import { unitLabel } from "@/lib/i18nHelpers";
 import { cn } from "@/lib/utils";
 import { formatQuantityLocale } from "@/utils/formatters";
 import type { LookupFailure } from "@/modules/warehouse/hooks/useOccupancyLookups";
@@ -303,7 +304,7 @@ function PickedShelf({
   onClose: () => void;
   onOpenSettings: (node: OccupancyNode) => void;
 }) {
-  const { t } = useTranslation("warehouse");
+  const { t } = useTranslation(["warehouse", "common"]);
   const cell = node.cell!;
   // Until the shelf's own read answers, the overview's part of the list —
   // its limited products — is what there is to show.
@@ -357,11 +358,11 @@ function PickedShelf({
               <span>{entry.product_template_name}</span>
               <span className="tabular-nums text-on-secondary">
                 {entry.max_quantity === null
-                  ? `${formatQuantityLocale(entry.quantity)} ${entry.product_unit_symbol ?? ""}`
+                  ? `${formatQuantityLocale(entry.quantity)} ${unitLabel(t, entry.product_unit_symbol)}`.trimEnd()
                   : `${t("occupancy.quantityOfLimit", {
                       quantity: formatQuantityLocale(entry.quantity),
                       limit: formatQuantityLocale(entry.max_quantity),
-                      unit: entry.product_unit_symbol ?? "",
+                      unit: unitLabel(t, entry.product_unit_symbol),
                     })} · ${t("occupancy.percent", { fill: entry.share ?? 0 })}`}
               </span>
             </li>

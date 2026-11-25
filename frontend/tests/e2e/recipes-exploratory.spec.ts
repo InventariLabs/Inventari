@@ -1074,7 +1074,7 @@ test.describe("Recipes — follow-ups", () => {
     await suggestion.click();
 
     // The shelf holds pieces, and a unitless line cannot be read against it
-    // ("Cannot compare: 10 pcs. in stock, recipe needs 1") — give it the unit.
+    // ("Cannot compare (recipe needs 1 against 10 pcs. in stock)") — give it the unit.
     // The linked ingredient is the first row; the one under it is the blank
     // row the dialog opens with.
     await dialog

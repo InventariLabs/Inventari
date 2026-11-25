@@ -190,7 +190,7 @@
       "linkNotFoundDesc": "Ten link zapraszający jest nieprawidłowy lub już wygasł.",
       "linkNotFoundNext": "Poproś o nowy link osobę, która wysłała Ci zaproszenie — tę, która zarządza Twoją organizacją.",
       "linkOtherAddress": "Ten link jest dla innego adresu",
-      "linkOtherAddressDesc": "Jesteś zalogowany na konto, którego adres e-mail nie jest tym, na który wystawiono to zaproszenie. Wyloguj się i otwórz link ponownie jako zaproszona osoba.",
+      "linkOtherAddressDesc": "Ta sesja dotyczy konta, którego adres e-mail nie jest tym, na który wystawiono to zaproszenie. Wyloguj się i otwórz link ponownie jako zaproszona osoba.",
       "moduleData": {
         "title": "Dane modułów na ogólnych listach",
         "description": "Dane, które moduł prowadzi na własnym koncie — na przykład sprzęt — nie trafiają na ogólne listy produktów i miejsc. Włącz, żeby widzieć wszystko na jednej liście; to też jedyna droga do danych po module, który został wyłączony.",

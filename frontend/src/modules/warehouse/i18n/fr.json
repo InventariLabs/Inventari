@@ -1603,7 +1603,7 @@
   },
   "unitMismatch": {
     "title": "Les unités ne correspondent pas",
-    "message": "« {{product}} » est suivi en {{templateUnit}}, et cet enregistrement serait enregistré en {{chosenUnit}}. Confirmez pour convertir l'enregistrement et cette réception en {{templateUnit}} — le choix reste dans l'historique de l'enregistrement. Pour garder des unités différentes, changez d'abord l'unité de l'enregistrement sur sa page Inventaire.",
+    "message": "« {{product}} » est suivi en {{templateUnit}} (cet enregistrement serait enregistré en {{chosenUnit}}). Confirmez pour convertir l'enregistrement et cette réception en {{templateUnit}} — le choix reste dans l'historique de l'enregistrement. Pour garder des unités différentes, changez d'abord l'unité de l'enregistrement sur sa page Inventaire.",
     "confirm": "Confirmer et terminer",
     "cancel": "Pas maintenant"
   },
