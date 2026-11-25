@@ -221,18 +221,24 @@ describe("a returned asset is not a person who has not answered", () => {
 });
 
 describe("a closed campaign keeps the answers it recorded", () => {
-  it("reads an unanswered response as awaiting even once its assets came back", async () => {
-    server.use(
-      http.get(`/api/v1/equipment/campaigns/${CAMPAIGN_ID}`, () =>
-        HttpResponse.json({
-          ...campaign([response({ assets_returned: true })], {
-            total: 1,
-            pending: 1,
-          }),
-          status: "COMPLETED",
-        }),
-      ),
+  const closed = (assetsReturned: boolean, stats: Record<string, number>) =>
+    http.get(`/api/v1/equipment/campaigns/${CAMPAIGN_ID}`, () =>
+      HttpResponse.json({
+        ...campaign([response({ assets_returned: assetsReturned })], stats),
+        status: "COMPLETED",
+      }),
     );
+
+  it("reads a response whose assets came back before the close as returned", async () => {
+    server.use(closed(true, { total: 1, returned: 1 }));
+    renderPage();
+
+    expect((await screen.findAllByText("Returned")).length).toBeGreaterThan(0);
+    expect(screen.queryByText("Awaiting reply")).not.toBeInTheDocument();
+  });
+
+  it("reads an unanswered response as awaiting when the server saw no return before the close", async () => {
+    server.use(closed(false, { total: 1, pending: 1 }));
     renderPage();
 
     expect(
@@ -328,7 +334,11 @@ describe("an attestation where no email goes out", () => {
     renderPage();
 
     fireEvent.click(
-      (await screen.findAllByRole("button", { name: "Copy link" }))[0],
+      (
+        await screen.findAllByRole("button", {
+          name: "Copy link for Ava Brennan",
+        })
+      )[0],
     );
 
     await waitFor(() =>

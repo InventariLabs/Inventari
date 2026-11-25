@@ -46,11 +46,14 @@ from tests.integration._shelf import put_on_shelf
 
 pytestmark = pytest.mark.integration
 
-_TODAY = datetime.now(UTC).replace(hour=12, minute=0, second=0, microsecond=0)
+
+def _today() -> datetime:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return datetime.now(UTC).replace(hour=12, minute=0, second=0, microsecond=0)
 
 
 def _days_ago(days: int) -> datetime:
-    return _TODAY - timedelta(days=days)
+    return _today() - timedelta(days=days)
 
 
 #: The period under test, and the dates around it.
@@ -326,7 +329,7 @@ class TestThePeriodStatement:
         self, real_async_client: AsyncClient, books: _Books
     ) -> None:
         # Today one sugar was used; a period ending today takes it in.
-        body = (await _period(real_async_client, books, date_to=_TODAY.date())).json()
+        body = (await _period(real_async_client, books, date_to=_today().date())).json()
 
         assert Decimal(body['used']) == Decimal('-12.00')
         assert Decimal(body['closing_value']) == Decimal('24.00')

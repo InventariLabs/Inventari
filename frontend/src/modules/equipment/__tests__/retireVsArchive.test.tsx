@@ -47,8 +47,7 @@ describe(" retire vs archive", () => {
         showBulkRetireConfirm
         showBulkArchiveConfirm={false}
         showBulkPurgeConfirm={false}
-        restoreTarget={null}
-        purgeTarget={null}
+        targets={{ restore: null, purge: null }}
         onBulkRetire={vi.fn()}
         onBulkArchive={vi.fn()}
         onBulkPurge={vi.fn()}
@@ -77,8 +76,7 @@ describe(" retire vs archive", () => {
         showBulkRetireConfirm={false}
         showBulkArchiveConfirm
         showBulkPurgeConfirm={false}
-        restoreTarget={null}
-        purgeTarget={null}
+        targets={{ restore: null, purge: null }}
         onBulkRetire={vi.fn()}
         onBulkArchive={vi.fn()}
         onBulkPurge={vi.fn()}
@@ -93,5 +91,57 @@ describe(" retire vs archive", () => {
     );
 
     expect(screen.getByText(/moved to the archive/)).toBeInTheDocument();
+  });
+
+  it("restore and delete-permanently confirmations name the asset", () => {
+    const { rerender } = render(
+      <AssetConfirmDialogs
+        selectedCount={0}
+        showBulkRetireConfirm={false}
+        showBulkArchiveConfirm={false}
+        showBulkPurgeConfirm={false}
+        targets={{ restore: "a-1", purge: null }}
+        archived={[{ id: "a-1", name: "Desk Lamp" }]}
+        onBulkRetire={vi.fn()}
+        onBulkArchive={vi.fn()}
+        onBulkPurge={vi.fn()}
+        onRestore={vi.fn()}
+        onSinglePurge={vi.fn()}
+        onCancelBulkRetire={vi.fn()}
+        onCancelBulkArchive={vi.fn()}
+        onCancelBulkPurge={vi.fn()}
+        onCancelRestore={vi.fn()}
+        onCancelPurge={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole("alertdialog", { name: "Restore Desk Lamp" }),
+    ).toBeInTheDocument();
+
+    rerender(
+      <AssetConfirmDialogs
+        selectedCount={0}
+        showBulkRetireConfirm={false}
+        showBulkArchiveConfirm={false}
+        showBulkPurgeConfirm={false}
+        targets={{ restore: null, purge: "a-1" }}
+        archived={[{ id: "a-1", name: "Desk Lamp" }]}
+        onBulkRetire={vi.fn()}
+        onBulkArchive={vi.fn()}
+        onBulkPurge={vi.fn()}
+        onRestore={vi.fn()}
+        onSinglePurge={vi.fn()}
+        onCancelBulkRetire={vi.fn()}
+        onCancelBulkArchive={vi.fn()}
+        onCancelBulkPurge={vi.fn()}
+        onCancelRestore={vi.fn()}
+        onCancelPurge={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole("alertdialog", {
+        name: "Permanently delete Desk Lamp?",
+      }),
+    ).toBeInTheDocument();
   });
 });

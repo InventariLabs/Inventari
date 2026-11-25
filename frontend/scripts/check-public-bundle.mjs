@@ -23,7 +23,7 @@ import { join, resolve, relative } from "node:path";
 
 import { specifiersOf, resolveSpecifier } from "./check-reachability.mjs";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname);
+const ROOT = resolve(import.meta.dirname, "..");
 const SRC = resolve(ROOT, "src");
 
 /** Where the anonymous tree starts. */

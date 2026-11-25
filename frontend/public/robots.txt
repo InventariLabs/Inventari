@@ -1,0 +1,3 @@
+# Inventari is an application behind a sign-in, not a site to index.
+User-agent: *
+Disallow: /

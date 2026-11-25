@@ -151,3 +151,8 @@ decides what the camera sees: `camera.showEan13(code)`, `camera.showQr(text)`,
 Codes are drawn from `tests/e2e/helpers/barcode.ts`, not from images. Use a phone viewport:
 the reader's crop is computed for the viewfinder, and on a wide screen it squashes
 the image so a QR code no longer decodes.
+
+A test that waits for a read runs in Chromium and is skipped in the `mobile` project:
+the Linux build of WebKit there now and then stops the fake camera's video after its
+first frame on a loaded runner, so the reader never sees the code. Layout checks of the
+scanner (it fits the screen, the aiming frame follows a turn) still run in WebKit.

@@ -367,7 +367,7 @@ data / domain exceptions — a consumer does not have to guard every call):
 | `list_bom_lines_async(db, org_id, template_id)` | `list[BoMLine]` — the ingredients of the template's default recipe. |
 | `list_template_ids_with_bom_async(db, org_id)` | `list[UUID]` — templates that have at least one BoM line. |
 | `explode_bom_async(db, org_id, template_id, qty)` | `list[(child_template_id, effective_qty, unit)]` — a flat multi-level explosion. |
-| `compute_total_cost_async(db, org_id, template_id, qty)` | Sum of shared estimated stock-unit cost × effective_qty. |
+| `compute_total_cost_async(db, org_id, template_id, qty)` | Whole cost of making `qty` units — ingredients, fixed costs and labour; `compute_unit_cost_async` × `qty`. |
 | `compute_unit_cost_async(db, org_id, template_id, planned_qty)` | Whole cost per unit — ingredients, fixed costs and labour (0 when nothing is rateable). |
 | `get_breakdown_async(db, org_id, template_id, qty)` | `CostBreakdownResponse` (read-only). |
 | `complete_production_async(db, org_id, order_id, user, actual_qty=None)` | Executes a DRAFT (consumption → production → valuation). |

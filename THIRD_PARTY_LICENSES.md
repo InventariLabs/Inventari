@@ -34,13 +34,13 @@ and the static assets the frontend serves.
   carries them under `/usr/share/doc`.
 * The libraries compiled into the `psycopg2-binary` wheel (libpq, OpenSSL and
   their dependencies), which have licences of their own beside the wheel's.
-* The eight recipe photographs under `backend/seed_assets`, used by the demo
+* The nine recipe photographs under `backend/seed_assets`, used by the demo
   only. They are CC0; `sources.json` beside them names the page, author and
   licence of each.
 * The print agent in `print-agent/`, which is part of this repository and
   carries its own `LICENSE`.
 
-## Backend runtime (114 packages)
+## Backend runtime (112 packages)
 
 | Package | Version | Licence | Note |
 |---|---|---|---|
@@ -60,7 +60,6 @@ and the static assets the frontend serves.
 | `attrs` | 26.1.0 | MIT |  |
 | `babel` | 2.18.0 | BSD |  |
 | `bcrypt` | 5.0.0 | Apache-2.0 |  |
-| `beautifulsoup4` | 4.15.0 | MIT |  |
 | `boto3` | 1.40.61 | Apache-2.0 |  |
 | `botocore` | 1.40.61 | Apache-2.0 |  |
 | `brotli` | 1.2.1 | MIT |  |
@@ -137,7 +136,6 @@ and the static assets the frontend serves.
 | `six` | 1.17.0 | MIT |  |
 | `slowapi` | 0.1.10 | MIT |  |
 | `sniffio` | 1.3.1 | MIT OR Apache-2.0 |  |
-| `soupsieve` | 4.1 | MIT |  |
 | `SQLAlchemy` | 2.0.51 | MIT |  |
 | `sse-starlette` | 3.7.0 | BSD-3-Clause |  |
 | `starlette` | 1.10.0 | BSD-3-Clause |  |

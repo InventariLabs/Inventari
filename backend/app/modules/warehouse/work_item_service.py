@@ -45,7 +45,9 @@ from ._schemas_work_items import (
     WorkItemState,
     WorkItemView,
 )
+from ._wms_session_ops import cancel_empty_session_holding_async
 from .backorder_cover_service import StockCover, backorder_cover_async
+from .document_query_service import LocationEpochs
 from .document_todo_service import completed_documents_async, line_tallies_async
 from .models import CUSTOM_SOURCE_KIND, Document, WorkItemOverlay
 from .putaway_work_service import putaway_items_async
@@ -313,6 +315,7 @@ async def assemble_work_items_async(
     approvals: list[Document],
     documents_total: int,
     location_ids: list[UUID] | None = None,
+    location_epochs: LocationEpochs | None = None,
 ) -> WorkItemsSection:
     """Every task the reader can see, soonest first.
 
@@ -331,7 +334,8 @@ async def assemble_work_items_async(
     the open tasks; ``done_since`` shortens that to the reader's own day.
     ``location_ids`` (a warehouse and the places under it) keeps the putaway
     and posted-document tasks that stand in them; the sources the caller read
-    were narrowed the same way.
+    were narrowed the same way. ``location_epochs`` makes a posted document
+    stand in the place its shelf was in when it was done, not where it is now.
     """
     window_start = datetime.now(UTC) - _DONE_WINDOW
     if done_since is not None:
@@ -397,6 +401,7 @@ async def assemble_work_items_async(
             since=done_since,
             limit=reach or limit,
             location_ids=location_ids,
+            location_epochs=location_epochs,
         )
         tallies = await line_tallies_async(db, [doc.id for doc in posted])
         items += [
@@ -548,12 +553,36 @@ async def _claim_unassigned_async(
         raise _already_taken_error()
 
 
-async def assignable_user_ids_async(db: AsyncSession, org_id: UUID) -> list[UUID]:
-    """The members who hold ``warehouse:write``, the grant every task needs."""
-    holders = await core_api.roles.holders_of_permission_async(
-        db, organization_id=org_id, permission='warehouse:write'
-    )
-    return sorted(holders, key=str)
+#: The grants a task's next action can need. A document or a putaway is the
+#: warehouse's; a count, a production run and a replenishment open another
+#: module's screen and write there; reviewing an approval is the approver's.
+WORK_ITEM_ACTION_GRANTS = (
+    'warehouse:write',
+    'stock_takes:write',
+    'maker:write',
+    'purchase_orders:write',
+    'approvals:approve',
+)
+
+
+async def assignable_user_ids_async(
+    db: AsyncSession, org_id: UUID
+) -> dict[str, list[UUID]]:
+    """The members who hold each grant a task can need, by grant.
+
+    A count, a production run and a replenishment each open another module's
+    screen, so one grant is not the answer for every row. The screen asks per
+    row for the grants that row's action needs.
+    """
+    return {
+        permission: sorted(
+            await core_api.roles.holders_of_permission_async(
+                db, organization_id=org_id, permission=permission
+            ),
+            key=str,
+        )
+        for permission in WORK_ITEM_ACTION_GRANTS
+    }
 
 
 async def assign_work_item_async(
@@ -673,6 +702,11 @@ async def assign_work_item_async(
             )
         )
     await db.flush()
+    if assignee_id is None and source_kind == 'document':
+        # A sheet opened and left empty has started a session in the reader's
+        # name; giving the task back ends it, or the card would go on naming
+        # the reader as the one picking.
+        await cancel_empty_session_holding_async(db, org_id, source_id, user_id)
     await _journal_async(
         db,
         org_id,

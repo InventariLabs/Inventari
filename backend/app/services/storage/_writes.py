@@ -1,10 +1,7 @@
-from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
 from typing import cast
 from uuid import UUID
 
 from sqlalchemy import and_, or_, select, true, update
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm.attributes import flag_modified
@@ -14,7 +11,6 @@ from app.core.contracts import UserContextDTO
 from app.core.db_utils import (
     acquire_advisory_lock,
     constraint_name_of,
-    hit_constraint,
 )
 from app.core.events import SystemEvent, TenantEventPayload, event_bus
 from app.core.exceptions import (
@@ -37,6 +33,15 @@ from app.schemas.storage_location import (
 )
 from app.services.audit_service import audit_key, audit_value, log_action_async
 from app.services.storage._codes import code_for_new_location_async
+from app.services.storage._names import (
+    check_name_unique_async as _check_name_unique,
+)
+from app.services.storage._names import (
+    flush_under_the_name_rule as _flush_under_the_name_rule,
+)
+from app.services.storage._names import (
+    name_rule_held_by_the_database as _name_rule_held_by_the_database,
+)
 from app.services.storage._queries import (
     is_descendant_async,
     item_counts_naming_locations_async,
@@ -129,76 +134,6 @@ async def _storage_type_name(
         return None
     storage_type = await db.get(StorageType, storage_type_id)
     return storage_type.name if storage_type is not None else None
-
-
-#: The two unique indexes behind the sibling-name rule (the model declares
-#: them): one for the places under a parent, one for the top level.
-_NAME_INDEXES = (
-    'uq_storage_locations_org_parent_name',
-    'uq_storage_locations_org_root_name',
-)
-
-
-def _name_taken(name: str) -> ConflictException:
-    return ConflictException(
-        code='STORAGE_CONFLICT',
-        message=get_error_message(
-            'storage_name_collision', get_current_lang(), name=name
-        ),
-    )
-
-
-@asynccontextmanager
-async def _name_rule_held_by_the_database(
-    db: AsyncSession, name: str
-) -> AsyncIterator[None]:
-    """Answer a sibling-name index violation the way the read answers it.
-
-    ``_check_name_unique`` reads before the write, so two requests that both
-    read before either wrote each saw a free name; the second insert then
-    meets the unique index. That is the same 409 the read gives, not a 500.
-    The savepoint keeps the failed statement from poisoning the caller's
-    transaction. Any other integrity error is re-raised untouched.
-    """
-    try:
-        async with db.begin_nested():
-            yield
-    except IntegrityError as exc:
-        if hit_constraint(exc, *_NAME_INDEXES):
-            raise _name_taken(name) from exc
-        raise
-
-
-async def _flush_under_the_name_rule(db: AsyncSession, name: str) -> None:
-    async with _name_rule_held_by_the_database(db, name):
-        await db.flush()
-
-
-async def _check_name_unique(
-    db: AsyncSession,
-    organization_id: UUID | None,
-    name: str,
-    parent_id: UUID | None = None,
-    exclude_id: UUID | None = None,
-) -> None:
-    """Raise 409 if a sibling with the same name already exists.
-
-    Typed here rather than left to the endpoint, so every caller sees the same
-    collision as the same error. Each endpoint mapping one bare ``ValueError``
-    its own way would leave a client telling "bad name" from "name taken" to
-    read the English sentence, which the copy gate forbids.
-    """
-    query = select(StorageLocation).where(
-        StorageLocation.organization_id == organization_id,
-        StorageLocation.name == name,
-        StorageLocation.parent_id == parent_id,
-    )
-    if exclude_id is not None:
-        query = query.where(StorageLocation.id != exclude_id)
-    result = await db.scalars(query)
-    existing = result.first()
-    if existing:
-        raise _name_taken(name)
 
 
 async def _check_short_code_unique(

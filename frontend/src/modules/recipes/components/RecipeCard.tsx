@@ -98,7 +98,9 @@ export const RecipeCard = memo(function RecipeCard({
             onToggleSelect(recipe.id);
           }}
           aria-label={
-            selected ? t("recipes:bulk.deselect") : t("recipes:bulk.select")
+            selected
+              ? t("recipes:bulk.deselect_for", { name: recipe.name })
+              : t("recipes:bulk.select_for", { name: recipe.name })
           }
           className="absolute top-2 left-2 z-10 min-h-6 min-w-6 p-0.5 text-on-muted hover:text-primary-600 hover:bg-transparent"
         >
@@ -113,7 +115,11 @@ export const RecipeCard = memo(function RecipeCard({
         to={linkTo}
         ref={setNodeRef}
         style={dragStyle}
-        {...(dragEnabled ? { ...attributes, ...listeners } : {})}
+        // The drag attributes say `role="button"`; the card is a link with
+        // buttons of its own inside, and a button may hold no other control.
+        {...(dragEnabled
+          ? { ...attributes, ...listeners, role: undefined }
+          : {})}
         className={cn(
           "flex flex-1 flex-col",
           dragEnabled && "cursor-grab active:cursor-grabbing",

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
 import { useState } from "react";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import i18n from "@/i18n/config";
 import type { IngredientDefaultCreate } from "@/modules/recipes/types/nutrition-defaults";

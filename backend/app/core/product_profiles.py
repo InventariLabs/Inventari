@@ -90,6 +90,7 @@ MAIN_STORAGE_LOCATION = ProfileStorageLocation(
         'de': LocalizedText(name='Hauptlager'),
         'fr': LocalizedText(name='Stockage principal'),
         'es': LocalizedText(name='Almacén principal'),
+        'pt': LocalizedText(name='Armazém principal'),
     },
 )
 
@@ -286,6 +287,7 @@ PRODUCT_PROFILES: dict[str, ProductProfile] = {
                     'de': LocalizedText(name='Kühlschrank'),
                     'fr': LocalizedText(name='Réfrigérateur'),
                     'es': LocalizedText(name='Nevera'),
+                    'pt': LocalizedText(name='Geladeira'),
                 },
             ),
             ProfileStorageLocation(
@@ -298,6 +300,7 @@ PRODUCT_PROFILES: dict[str, ProductProfile] = {
                     'de': LocalizedText(name='Regal A'),
                     'fr': LocalizedText(name='Étagère A'),
                     'es': LocalizedText(name='Estantería A'),
+                    'pt': LocalizedText(name='Prateleira A'),
                 },
             ),
             ProfileStorageLocation(
@@ -311,6 +314,7 @@ PRODUCT_PROFILES: dict[str, ProductProfile] = {
                     'de': LocalizedText(name='Tiefkühllager'),
                     'fr': LocalizedText(name='Chambre froide'),
                     'es': LocalizedText(name='Cámara fría'),
+                    'pt': LocalizedText(name='Câmara fria'),
                 },
             ),
         ],
@@ -368,33 +372,33 @@ PRODUCT_PROFILES: dict[str, ProductProfile] = {
             'approvals': 'business',
             'stats': 'analytics',
         },
-        # Blue palette — moved 1:1 from the equipment module theme so
-        # the profile is the single source of truth. Home = equipment
-        # assets. The primary ramp mirrors accent
-        # (see the food_home comment for the rationale and light-mode
-        # tuning caveat).
+        # Teal palette — the application's own primary ramp, which is what
+        # the shell shows when no profile paints it. The accent ramp mirrors
+        # primary here (the default accent is emerald, which `food_home`
+        # already declares). Home = equipment assets. See the food_home
+        # comment for the rationale and the light-mode tuning caveat.
         theme={
-            '--color-accent-50': '239 246 255',
-            '--color-accent-100': '219 234 254',
-            '--color-accent-200': '191 219 254',
-            '--color-accent-300': '147 197 253',
-            '--color-accent-400': '96 165 250',
-            '--color-accent-500': '59 130 246',
-            '--color-accent-600': '37 99 235',
-            '--color-accent-700': '29 78 216',
-            '--color-accent-800': '30 64 175',
-            '--color-accent-900': '30 58 138',
-            '--color-primary-50': '239 246 255',
-            '--color-primary-100': '219 234 254',
-            '--color-primary-200': '191 219 254',
-            '--color-primary-300': '147 197 253',
-            '--color-primary-400': '96 165 250',
-            '--color-primary-500': '59 130 246',
-            '--color-primary-600': '37 99 235',
-            '--color-primary-700': '29 78 216',
-            '--color-primary-800': '30 64 175',
-            '--color-primary-900': '30 58 138',
-            '--color-primary-950': '23 37 84',
+            '--color-accent-50': '240 253 250',
+            '--color-accent-100': '204 251 241',
+            '--color-accent-200': '153 246 228',
+            '--color-accent-300': '94 234 212',
+            '--color-accent-400': '45 212 191',
+            '--color-accent-500': '20 184 166',
+            '--color-accent-600': '13 148 136',
+            '--color-accent-700': '15 118 110',
+            '--color-accent-800': '17 94 89',
+            '--color-accent-900': '19 78 74',
+            '--color-primary-50': '240 253 250',
+            '--color-primary-100': '204 251 241',
+            '--color-primary-200': '153 246 228',
+            '--color-primary-300': '94 234 212',
+            '--color-primary-400': '45 212 191',
+            '--color-primary-500': '20 184 166',
+            '--color-primary-600': '13 148 136',
+            '--color-primary-700': '15 118 110',
+            '--color-primary-800': '17 94 89',
+            '--color-primary-900': '19 78 74',
+            '--color-primary-950': '4 47 46',
         },
         branding={'subtitle_key': 'profiles.equipment_wms.subtitle'},
         # One location, and it is the shelf this profile's own receipts need:
@@ -418,6 +422,7 @@ PRODUCT_PROFILES: dict[str, ProductProfile] = {
                     'de': LocalizedText(name='Quarantäne'),
                     'fr': LocalizedText(name='Quarantaine'),
                     'es': LocalizedText(name='Cuarentena'),
+                    'pt': LocalizedText(name='Quarentena'),
                 },
             ),
         ],

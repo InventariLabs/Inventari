@@ -36,7 +36,11 @@ from tests.integration._shelf import post_on_shelf
 
 pytestmark = pytest.mark.integration
 
-_MONDAY = date.today() + timedelta(days=30)
+
+def _monday() -> date:
+    return date.today() + timedelta(days=30)
+
+
 _API = '/api/v1/maker/production'
 
 
@@ -190,8 +194,8 @@ def _week(client: TestClient, headers: dict[str, str]) -> dict[str, Any]:
         f'{_API}/needs',
         headers=headers,
         params={
-            'date_from': _MONDAY.isoformat(),
-            'date_to': (_MONDAY + timedelta(days=6)).isoformat(),
+            'date_from': _monday().isoformat(),
+            'date_to': (_monday() + timedelta(days=6)).isoformat(),
         },
     )
     assert response.status_code == 200, response.text
@@ -213,8 +217,8 @@ class TestTheCombinedList:
         bread = _template(db, org, 'Bread')
         _recipe(db, org, bread, flour)
         post_on_shelf(client, headers, flour, shelf.id, '4')
-        _run(client, headers, bread, shelf, '6', _MONDAY)
-        _run(client, headers, bread, shelf, '6', _MONDAY + timedelta(days=2))
+        _run(client, headers, bread, shelf, '6', _monday())
+        _run(client, headers, bread, shelf, '6', _monday() + timedelta(days=2))
         return flour, bread
 
     def test_it_adds_up_the_runs_and_subtracts_stock_and_what_is_on_order(
@@ -227,7 +231,7 @@ class TestTheCombinedList:
         db_session: Session,
     ) -> None:
         flour, _bread = self._world(client, headers, org, shelf, db_session)
-        due = _MONDAY + timedelta(days=1)
+        due = _monday() + timedelta(days=1)
         _on_order(db_session, org, user, flour, '3', due)
 
         body = _week(client, headers)
@@ -254,7 +258,7 @@ class TestTheCombinedList:
         db_session: Session,
     ) -> None:
         flour, bread = self._world(client, headers, org, shelf, db_session)
-        _run(client, headers, bread, shelf, '3', _MONDAY - timedelta(days=7))
+        _run(client, headers, bread, shelf, '3', _monday() - timedelta(days=7))
 
         body = _week(client, headers)
 
@@ -290,8 +294,8 @@ class TestTheCombinedList:
             f'{_API}/needs/order',
             headers=headers,
             json={
-                'date_from': _MONDAY.isoformat(),
-                'date_to': (_MONDAY + timedelta(days=6)).isoformat(),
+                'date_from': _monday().isoformat(),
+                'date_to': (_monday() + timedelta(days=6)).isoformat(),
             },
         )
         assert ordered.status_code in (403, 404), ordered.text
@@ -312,17 +316,17 @@ class TestTheCombinedList:
         flour = _template(db_session, org, 'Flour', uom=kg)
         bread = _template(db_session, org, 'Bread')
         _recipe(db_session, org, bread, flour)
-        _run(client, headers, bread, shelf, '5', _MONDAY)
-        _run(client, headers, bread, shelf, '3', _MONDAY + timedelta(days=7))
-        _on_order(db_session, org, user, flour, '5', _MONDAY)
+        _run(client, headers, bread, shelf, '5', _monday())
+        _run(client, headers, bread, shelf, '3', _monday() + timedelta(days=7))
+        _on_order(db_session, org, user, flour, '5', _monday())
 
         first = _week(client, headers)
         second = client.get(
             f'{_API}/needs',
             headers=headers,
             params={
-                'date_from': (_MONDAY + timedelta(days=7)).isoformat(),
-                'date_to': (_MONDAY + timedelta(days=13)).isoformat(),
+                'date_from': (_monday() + timedelta(days=7)).isoformat(),
+                'date_to': (_monday() + timedelta(days=13)).isoformat(),
             },
         ).json()
 
@@ -349,10 +353,10 @@ class TestTheCombinedList:
         _recipe(db_session, org, dough, flour)
         _recipe(db_session, org, bread, dough)
         post_on_shelf(client, headers, flour, shelf.id, '5')
-        _run(client, headers, bread, shelf, '5', _MONDAY)
+        _run(client, headers, bread, shelf, '5', _monday())
         scope = {
-            'date_from': _MONDAY.isoformat(),
-            'date_to': (_MONDAY + timedelta(days=6)).isoformat(),
+            'date_from': _monday().isoformat(),
+            'date_to': (_monday() + timedelta(days=6)).isoformat(),
         }
 
         planned = client.post(
@@ -387,8 +391,8 @@ class TestTheCombinedList:
         _recipe(db_session, org, dough, flour)
         _recipe(db_session, org, bread, dough)
         post_on_shelf(client, headers, flour, shelf.id, '5')
-        bread_run = _run(client, headers, bread, shelf, '5', _MONDAY)
-        dough_run = _run(client, headers, dough, shelf, '5', _MONDAY)
+        bread_run = _run(client, headers, bread, shelf, '5', _monday())
+        dough_run = _run(client, headers, dough, shelf, '5', _monday())
 
         listed = client.get(f'{_API}/orders', headers=headers).json()['items']
         coverage = {row['id']: row['coverage'] for row in listed}
@@ -413,8 +417,8 @@ class TestTheCombinedList:
         bread = _template(db_session, org, 'Bread')
         _recipe(db_session, org, dough, flour)
         _recipe(db_session, org, bread, dough)
-        bread_run = _run(client, headers, bread, shelf, '5', _MONDAY)
-        _run(client, headers, dough, shelf, '5', _MONDAY + timedelta(days=3))
+        bread_run = _run(client, headers, bread, shelf, '5', _monday())
+        _run(client, headers, dough, shelf, '5', _monday() + timedelta(days=3))
 
         listed = client.get(f'{_API}/orders', headers=headers).json()['items']
         coverage = {row['id']: row['coverage'] for row in listed}
@@ -440,8 +444,8 @@ class TestTheCombinedList:
         bread = _template(db_session, org, 'Bread')
         _recipe(db_session, org, dough, flour)
         _recipe(db_session, org, bread, dough)
-        bread_run = _run(client, headers, bread, shelf, '5', _MONDAY)
-        _run(client, headers, dough, shelf, '5', _MONDAY)
+        bread_run = _run(client, headers, bread, shelf, '5', _monday())
+        _run(client, headers, dough, shelf, '5', _monday())
 
         one_run = client.get(
             f'{_API}/needs', headers=headers, params={'order_id': bread_run['id']}
@@ -474,9 +478,9 @@ class TestTheCombinedList:
         _recipe(db_session, org, dough, flour)
         _recipe(db_session, org, bread, dough)
         post_on_shelf(client, headers, flour, shelf.id, '10')
-        bread_run = _run(client, headers, bread, shelf, '5', _MONDAY)
+        bread_run = _run(client, headers, bread, shelf, '5', _monday())
         dough_run = _run(
-            client, headers, dough, shelf, '5', _MONDAY + timedelta(days=3)
+            client, headers, dough, shelf, '5', _monday() + timedelta(days=3)
         )
 
         listed = {
@@ -513,13 +517,13 @@ class TestTheCombinedList:
         _recipe(db_session, org, dough, flour)
         _recipe(db_session, org, bread, dough)
         post_on_shelf(client, headers, flour, shelf.id, '20')
-        week_before = _MONDAY - timedelta(days=7)
+        week_before = _monday() - timedelta(days=7)
         _run(client, headers, dough, shelf, '5', week_before)
         _run(client, headers, bread, shelf, '5', week_before)
-        _run(client, headers, bread, shelf, '5', _MONDAY)
+        _run(client, headers, bread, shelf, '5', _monday())
         scope = {
-            'date_from': _MONDAY.isoformat(),
-            'date_to': (_MONDAY + timedelta(days=6)).isoformat(),
+            'date_from': _monday().isoformat(),
+            'date_to': (_monday() + timedelta(days=6)).isoformat(),
         }
 
         before = {r['name']: r for r in _week(client, headers)['rows']}
@@ -566,7 +570,7 @@ class TestTheCombinedList:
         db_session.commit()
         post_on_shelf(client, headers, flour, shelf.id, '10')
         post_on_shelf(client, headers, dough, shelf.id, '5')
-        bread_run = _run(client, headers, bread, shelf, '5', _MONDAY)
+        bread_run = _run(client, headers, bread, shelf, '5', _monday())
 
         listed = {
             row['id']: row
@@ -583,8 +587,8 @@ class TestTheCombinedList:
 class TestOrderingWhatIsMissing:
     def _scope(self) -> dict[str, str]:
         return {
-            'date_from': _MONDAY.isoformat(),
-            'date_to': (_MONDAY + timedelta(days=6)).isoformat(),
+            'date_from': _monday().isoformat(),
+            'date_to': (_monday() + timedelta(days=6)).isoformat(),
         }
 
     def _offer(
@@ -645,7 +649,7 @@ class TestOrderingWhatIsMissing:
         self._offer(db_session, org, shop, flour, '1.50')
         # Sugar is only sold by the shop.
         self._offer(db_session, org, shop, sugar, '2.00')
-        _run(client, headers, cake, shelf, '10', _MONDAY)
+        _run(client, headers, cake, shelf, '10', _monday())
 
         response = client.post(
             f'{_API}/needs/order', headers=headers, json=self._scope()
@@ -690,7 +694,7 @@ class TestOrderingWhatIsMissing:
         mill = h.create_partner(org, user, name='Mill')
         self._offer(db_session, org, mill, oats, '3.00')
         self._offer(db_session, org, mill, oats, '2.00', min_quantity='1000')
-        _run(client, headers, porridge, shelf, '5', _MONDAY)
+        _run(client, headers, porridge, shelf, '5', _monday())
 
         response = client.post(
             f'{_API}/needs/order', headers=headers, json=self._scope()
@@ -703,6 +707,37 @@ class TestOrderingWhatIsMissing:
             select(PurchaseOrder).where(PurchaseOrder.id == placed['purchase_order_id'])
         ).scalar_one()
         assert order.lines[0].unit_price == Decimal('3.00')
+
+    def test_a_price_with_no_unit_of_its_own_orders_in_the_stock_unit(
+        self,
+        client: TestClient,
+        h: ModuleTestHelper,
+        headers: dict[str, str],
+        org: Organization,
+        user: User,
+        shelf: StorageLocation,
+        db_session: Session,
+    ) -> None:
+        """A price per the product's stock unit names no unit: 5 kg, not 5 units."""
+        kg, _bag = _kg_and_bag(db_session, org)
+        oats = _template(db_session, org, 'Oats', uom=kg)
+        porridge = _template(db_session, org, 'Porridge')
+        _recipe(db_session, org, porridge, oats)
+        mill = h.create_partner(org, user, name='Mill')
+        self._offer(db_session, org, mill, oats, '3.00')
+        _run(client, headers, porridge, shelf, '5', _monday())
+
+        response = client.post(
+            f'{_API}/needs/order', headers=headers, json=self._scope()
+        )
+
+        assert response.status_code == 200, response.text
+        (placed,) = response.json()['purchase_orders']
+        assert placed['lines'][0]['uom_symbol'] == 'kg'
+        order = db_session.execute(
+            select(PurchaseOrder).where(PurchaseOrder.id == placed['purchase_order_id'])
+        ).scalar_one()
+        assert order.lines[0].uom_id == kg.id
 
     def test_a_volume_price_is_taken_when_the_whole_order_costs_less(
         self,
@@ -722,7 +757,7 @@ class TestOrderingWhatIsMissing:
         mill = h.create_partner(org, user, name='Mill')
         self._offer(db_session, org, mill, oats, '3.00')
         self._offer(db_session, org, mill, oats, '2.00', min_quantity='10')
-        _run(client, headers, porridge, shelf, '9', _MONDAY)
+        _run(client, headers, porridge, shelf, '9', _monday())
 
         response = client.post(
             f'{_API}/needs/order', headers=headers, json=self._scope()
@@ -762,7 +797,7 @@ class TestOrderingWhatIsMissing:
         trader = h.create_partner(org, user, name='Trader')
         self._offer(db_session, org, trader, flour, '2.00')
         self._offer(db_session, org, trader, seeds, '7.00', currency='EUR')
-        _run(client, headers, bread, shelf, '5', _MONDAY)
+        _run(client, headers, bread, shelf, '5', _monday())
 
         response = client.post(
             f'{_API}/needs/order', headers=headers, json=self._scope()
@@ -806,7 +841,7 @@ class TestOrderingWhatIsMissing:
         local = h.create_partner(org, user, name='Local')
         self._offer(db_session, org, abroad, flour, '4.00', currency='EUR')
         self._offer(db_session, org, local, flour, '5.00')
-        _run(client, headers, bread, shelf, '5', _MONDAY)
+        _run(client, headers, bread, shelf, '5', _monday())
 
         response = client.post(
             f'{_API}/needs/order', headers=headers, json=self._scope()
@@ -841,7 +876,7 @@ class TestOrderingWhatIsMissing:
         euros = h.create_partner(org, user, name='Euros')
         self._offer(db_session, org, dollars, flour, '1.00', currency='USD')
         self._offer(db_session, org, euros, flour, '9.00', currency='EUR')
-        _run(client, headers, bread, shelf, '5', _MONDAY)
+        _run(client, headers, bread, shelf, '5', _monday())
 
         response = client.post(
             f'{_API}/needs/order', headers=headers, json=self._scope()
@@ -872,7 +907,7 @@ class TestOrderingWhatIsMissing:
         self._offer(
             db_session, org, h.create_partner(org, user, name='Mill'), flour, '1.00'
         )
-        _run(client, headers, bread, shelf, '5', _MONDAY)
+        _run(client, headers, bread, shelf, '5', _monday())
 
         first = client.post(f'{_API}/needs/order', headers=headers, json=self._scope())
         second = client.post(f'{_API}/needs/order', headers=headers, json=self._scope())
@@ -892,7 +927,7 @@ class TestOrderingWhatIsMissing:
         flour = _template(db_session, org, 'Flour', uom=kg)
         bread = _template(db_session, org, 'Bread')
         _recipe(db_session, org, bread, flour)
-        _run(client, headers, bread, shelf, '5', _MONDAY)
+        _run(client, headers, bread, shelf, '5', _monday())
 
         body = client.post(
             f'{_API}/needs/order', headers=headers, json=self._scope()
@@ -922,7 +957,7 @@ class TestOrderingWhatIsMissing:
         self._offer(
             db_session, org, h.create_partner(org, user, name='Mill'), dough, '1.00'
         )
-        _run(client, headers, bread, shelf, '5', _MONDAY)
+        _run(client, headers, bread, shelf, '5', _monday())
 
         body = client.post(
             f'{_API}/needs/order', headers=headers, json=self._scope()
@@ -941,7 +976,7 @@ class TestOrderingWhatIsMissing:
         (run,) = planned.json()['runs']
         assert run['name'] == 'Dough'
         assert Decimal(run['planned_qty']) == Decimal('5')
-        assert run['production_date'] == _MONDAY.isoformat()
+        assert run['production_date'] == _monday().isoformat()
 
 
 class TestTheScopeOfARequest:
@@ -958,7 +993,7 @@ class TestTheScopeOfARequest:
         response = client.get(
             f'{_API}/needs',
             headers=headers,
-            params={'date_from': _MONDAY.isoformat()},
+            params={'date_from': _monday().isoformat()},
         )
 
         assert response.status_code == 400, response.text
@@ -970,8 +1005,8 @@ class TestTheScopeOfARequest:
             f'{_API}/needs',
             headers=headers,
             params={
-                'date_from': _MONDAY.isoformat(),
-                'date_to': (_MONDAY - timedelta(days=1)).isoformat(),
+                'date_from': _monday().isoformat(),
+                'date_to': (_monday() - timedelta(days=1)).isoformat(),
             },
         )
 

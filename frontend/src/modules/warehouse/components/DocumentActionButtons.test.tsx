@@ -450,6 +450,20 @@ describe("DocumentActionButtons naming", () => {
     expect(screen.queryByText("Create return")).not.toBeInTheDocument();
   });
 
+  it("offers no return on a completed document that only records another step", () => {
+    // It moved no stock itself, so the server refuses a return of it.
+    render(
+      <DocumentActionButtons
+        {...baseProps}
+        isDraft={false}
+        docStatus="COMPLETED"
+        docType="OUT"
+        stockAlreadyApplied
+      />,
+    );
+    expect(screen.queryByText("Create return")).not.toBeInTheDocument();
+  });
+
   it("marks the scanner path as scanning, in outline", () => {
     // ...and the WMS session takes a Scan prefix, so the two names carry
     // their difference instead of colliding.

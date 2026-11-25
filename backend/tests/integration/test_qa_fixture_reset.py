@@ -101,6 +101,37 @@ class TestWipeOrganization:
         assert await db.get(Organization, neighbour_id) is not None
         assert await db.get(User, neighbour_admin_id) is not None
 
+    async def test_wipe_survives_the_organization_pointing_at_its_own_users(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_household: Organization,
+        async_test_user: User,
+    ) -> None:
+        """The organization's creator and the roles its users hold go with it.
+
+        The provisioner sets ``organizations.created_by`` to the admin, and a
+        user may hold a role of the organization; deleting the users first runs
+        into the foreign key of each, so the wipe has to let go of both.
+        """
+        from app.cli.commands_qa import wipe_organization_async
+        from app.models.role import Role, UserRole
+
+        db = real_async_db_session
+        org_id = async_test_household.id
+        role = Role(organization_id=org_id, name='Picker', permissions=[])
+        db.add(role)
+        await db.flush()
+        db.add(UserRole(user_id=async_test_user.id, role_id=role.id))
+        async_test_household.created_by = async_test_user.id
+        await db.commit()
+
+        removed = await wipe_organization_async(db, org_id)
+        await db.commit()
+
+        assert await db.get(Organization, org_id) is None
+        assert removed['roles'] == 1
+        assert removed['user_roles'] == 1
+
     async def test_wipe_survives_rows_that_point_at_a_shelf(
         self,
         real_async_db_session: AsyncSession,

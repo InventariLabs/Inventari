@@ -7,6 +7,10 @@ import { server } from "@/test/mocks/server";
 import { signInWith, signOut } from "@/test/auth";
 import { MakerSettingsPanel } from "./MakerSettingsPanel";
 
+vi.mock("@/hooks/useOrganizationCurrency", () => ({
+  useOrganizationCurrency: () => "PLN",
+}));
+
 vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
@@ -59,16 +63,17 @@ afterEach(() => {
 });
 
 describe("MakerSettingsPanel", () => {
-  it("shows a reader the refusal instead of switches it cannot move", async () => {
+  it("tells a reader it can only view, not that it can use, the module", async () => {
     signInWith(["maker:read"]);
     renderPanel();
 
-    // Nothing is shown read-only, so the page must not claim it can be viewed.
+    // A viewer cannot write in the module either, so "you can use this, not
+    // reconfigure it" promises more than the account holds.
     expect(
-      await screen.findByText(/you can use this, not reconfigure it/i),
+      await screen.findByText(/you can view this, not change it/i),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText(/you can view this, not change it/i),
+      screen.queryByText(/you can use this, not reconfigure it/i),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /margin/i }),
@@ -213,6 +218,7 @@ describe("MakerSettingsPanel — the rate the timed steps cost", () => {
 
     const rate = await screen.findByTestId("maker-settings-labor-rate");
     expect(rate).toBeVisible();
+    expect(screen.getByText("PLN / hour")).toBeInTheDocument();
     expect(
       screen.queryByTestId("maker-settings-labor-rate-save"),
     ).not.toBeInTheDocument();

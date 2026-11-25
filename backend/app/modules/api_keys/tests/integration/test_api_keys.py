@@ -503,6 +503,39 @@ class TestApiKeyAuthentication:
         assert resp.status_code == status.HTTP_401_UNAUTHORIZED
         assert 'has expired' in resp.json()['detail']['message']
 
+    async def test_a_permission_withheld_after_issue_stops_working(
+        self,
+        real_async_client: AsyncClient,
+        real_async_db_session: AsyncSession,
+        org_admin: Organization,
+        admin_user: User,
+    ) -> None:
+        """The withheld list gates the key when it acts, not only when issued.
+
+        A key row carrying ``org:settings:write`` — stored before the
+        permission joined the withheld list — does not read or change the
+        organization's settings, while its ordinary reads keep working.
+        """
+        from app.modules.api_keys.api_key_service import create_api_key_async
+
+        key, raw_key = await create_api_key_async(
+            real_async_db_session,
+            org_admin.id,
+            admin_user.id,
+            'A key from before the list',
+            permissions=['org:settings:write', 'items:read'],
+        )
+        await real_async_db_session.commit()
+
+        api_key_headers = {'X-API-Key': raw_key}
+        withheld = await real_async_client.get(API_KEYS_URL, headers=api_key_headers)
+        still_reads = await real_async_client.get(
+            '/api/v1/items', headers=api_key_headers
+        )
+
+        assert withheld.status_code == status.HTTP_403_FORBIDDEN, withheld.text
+        assert still_reads.status_code == status.HTTP_200_OK, still_reads.text
+
     async def test_api_key_cannot_create_other_api_keys(
         self,
         real_async_client: AsyncClient,

@@ -14,9 +14,12 @@ async def quick_create_stub_async(
     name: str,
     barcode: str | None = None,
     user_id: UUID | None = None,
+    *,
+    sku: str | None = None,
+    uom_id: UUID | None = None,
 ) -> Any:
     dto = await core_api.product_templates.create_stub_async(
-        db, org_id, name, barcode, user_id
+        db, org_id, name, barcode, user_id, sku=sku, uom_id=uom_id
     )
     # No commit here: the stub rides the caller's transaction, so an import
     # that founds several stubs and then fails takes none of them back to

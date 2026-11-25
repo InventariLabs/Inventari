@@ -29,7 +29,7 @@ from app.modules.maker.models import ProductionOrder, ProductionOrderLine
 from app.modules.purchase_orders.models import PurchaseOrder
 from app.modules.warehouse.models import Document
 from app.services.token_service import get_password_hash
-from seed_demo_data import seed_organization
+from seed_demo_data import MAKER_PLANNED_RUNS, seed_organization
 
 pytestmark = pytest.mark.integration
 
@@ -94,9 +94,12 @@ class TestTheSeedFollowsTheModules:
             db_session, org_id, user_id, items=3, modules={'maker'}
         )
 
-        assert first['production_runs'] == 1
-        run = db_session.query(ProductionOrder).filter_by(organization_id=org_id).one()
-        assert run.status == 'COMPLETED'
+        assert first['production_runs'] == 2 + len(MAKER_PLANNED_RUNS)
+        run = (
+            db_session.query(ProductionOrder)
+            .filter_by(organization_id=org_id, status='COMPLETED')
+            .one()
+        )
         assert (
             db_session.query(ProductionOrderLine)
             .filter_by(production_order_id=run.id)

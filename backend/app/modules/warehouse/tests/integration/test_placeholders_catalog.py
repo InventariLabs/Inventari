@@ -42,7 +42,11 @@ class TestPlaceholdersCatalog:
             f'{parent}.{attr}'
             for parent, attrs in _NESTED_PLACEHOLDERS.items()
             for attr in attrs
-        } | {f'issuer.{field.name}' for field in fields(IssuerContext)}
+        } | {
+            f'issuer.{field.name}'
+            for field in fields(IssuerContext)
+            if not field.name.startswith('_')
+        }
         flat_keys = {
             key
             for key in context

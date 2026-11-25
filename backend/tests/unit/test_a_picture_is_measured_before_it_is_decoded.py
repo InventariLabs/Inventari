@@ -90,6 +90,12 @@ def _noise_png() -> bytes:
     return buffer.getvalue()
 
 
+def _noise_jpeg() -> bytes:
+    buffer = io.BytesIO()
+    Image.effect_noise((64, 64), 64).save(buffer, format='JPEG')
+    return buffer.getvalue()
+
+
 def _with_its_pixels_split_and_the_second_half_mislabelled(content: bytes) -> bytes:
     """The header reads; the decoder meets a chunk whose kind is not a word."""
     at = content.index(b'IDAT') - 4
@@ -113,7 +119,8 @@ def _with_its_pixels_split_and_the_second_half_mislabelled(content: bytes) -> by
         # Refused when opened: nothing after the signature reads as a header.
         pytest.param(b'\x89PNG\r\n\x1a\n and then plain text', id='no-header'),
         # Opened, then cut off half-way through its pixels.
-        pytest.param(_noise_png()[:2048], id='cut-short'),
+        pytest.param(_noise_png()[:2048], id='cut-short-png'),
+        pytest.param(_noise_jpeg()[: len(_noise_jpeg()) // 2], id='cut-short-jpeg'),
         # Opened, then a broken chunk on the way through the pixels — Pillow
         # says that one with a SyntaxError, which the recipe cover let through
         # as a server error.
@@ -127,10 +134,22 @@ def test_a_file_that_is_no_picture_is_refused_the_same_way(
     content: bytes, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Pillow says so in more than one class; every caller is given one."""
-    # Pillow's default. Importing WeasyPrint turns it on for the whole
-    # process, and with it on the last two files decode with their missing
-    # pixels filled in, so the outcome would depend on what was imported first.
-    monkeypatch.setattr(ImageFile, 'LOAD_TRUNCATED_IMAGES', False)
+    # The state the running backend is in: importing WeasyPrint turns this on
+    # for the whole process, and with it on the last two files decode with
+    # their missing pixels filled in. The upload check must reach the same
+    # answer whatever was imported first, so it reads the file itself.
+    monkeypatch.setattr(ImageFile, 'LOAD_TRUNCATED_IMAGES', True)
 
     with pytest.raises(ImageUnreadableError):
         decode_image(content)
+
+
+def test_the_read_leaves_the_process_wide_switch_as_it_found_it(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The strict read waits for its picture only, then the process goes on."""
+    monkeypatch.setattr(ImageFile, 'LOAD_TRUNCATED_IMAGES', True)
+
+    decode_image(_noise_png())
+
+    assert ImageFile.LOAD_TRUNCATED_IMAGES is True

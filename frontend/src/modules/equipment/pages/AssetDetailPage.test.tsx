@@ -37,6 +37,7 @@ function assetWith(overrides: {
     category_id: "cat-1",
     location_id: "loc-1",
     context_tag: "equipment",
+    category: { id: "cat-1", name: "Laptops", context_tag: "equipment" },
     quantity: 1,
     is_deleted: overrides.is_deleted ?? false,
     added_date: "2024-01-01T00:00:00Z",
@@ -236,6 +237,9 @@ describe("AssetDetailPage — archive, restore and purge", () => {
         "The asset will be returned to your active assets list.",
       ),
     ).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("alertdialog")).getByText("Restore HP EliteBook"),
+    ).toBeInTheDocument();
     await confirmIn("Restore");
 
     await waitFor(() =>
@@ -261,7 +265,7 @@ describe("AssetDetailPage — archive, restore and purge", () => {
       await screen.findByRole("button", { name: "Delete Permanently" }),
     );
     expect(
-      screen.getByText("Permanently delete this asset?"),
+      screen.getByText("Permanently delete HP EliteBook?"),
     ).toBeInTheDocument();
     await confirmIn("Delete Permanently");
 
@@ -545,6 +549,51 @@ describe("AssetDetailPage — an archived card", () => {
     expect(
       screen.queryByRole("button", { name: "Upload" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("shows not found for a product the register does not list", async () => {
+    // A product in an ordinary category, opened at /equipment/<id> by a
+    // reader who holds items:read. The register's screens must not dress it
+    // as an asset with actions the API then refuses.
+    server.use(
+      http.get(`/api/v1/items/${ITEM_ID}`, () =>
+        HttpResponse.json({
+          ...assetWith({}),
+          category: { id: "cat-2", name: "Groceries", context_tag: null },
+        }),
+      ),
+    );
+    renderDetail();
+
+    expect(await screen.findByText("Asset not found")).toBeInTheDocument();
+  });
+
+  it("opens an asset filed under no category whose metadata holds the equipment namespace", async () => {
+    // The register also lists a record with no category when the module's
+    // namespace is on it; the Add-asset screen writes exactly that.
+    server.use(
+      http.get(`/api/v1/items/${ITEM_ID}`, () =>
+        HttpResponse.json({
+          ...assetWith({}),
+          category_id: null,
+          category: null,
+          metadata: { equipment: {} },
+        }),
+      ),
+      http.get(`/api/v1/equipment/${ITEM_ID}/approval-status`, () =>
+        HttpResponse.json({
+          request_id: null,
+          has_workflow: false,
+          status: null,
+        }),
+      ),
+    );
+    renderDetail();
+
+    expect(
+      await screen.findByRole("tab", { name: "Assignments" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Asset not found")).not.toBeInTheDocument();
   });
 
   it("asks for approval status and assignments only of an asset it found", async () => {

@@ -40,10 +40,13 @@ meal planning and equipment custody share the same core, while the warehouse
 module runs receiving, picking, packing and shipping.
 
 **Alpha release:** best for small teams today, with occasional breaking changes
-between releases — see [Alpha Release v0.12.0](#alpha-release-v0120).
+between releases — see [Alpha Release v0.13.0](#alpha-release-v0130).
 
 **Use Inventari:** [try the demo](https://demo.inventari.app),
-[run it locally](#quick-start) or [deploy it on your server](QUICK_DEPLOY.md).
+[run it locally](#quick-start), [deploy it on your server](QUICK_DEPLOY.md)
+or [install it on a home network](docs/HOME_INSTALL.md), no domain needed.
+Each release publishes ready-made container images for amd64 and arm64, so a
+server or a Raspberry Pi downloads the stack instead of building it.
 
 **Build on Inventari:** [see what a module can do](#build-on-inventari),
 [create your first module](MODULE_QUICKSTART.md) or
@@ -140,9 +143,11 @@ translation catalogs. You develop the process your users need in that
 package and install it into Inventari.
 
 You can build that package with an AI coding agent: the package carries the
-module rules the agent needs, and Inventari itself is built that way behind
-the same gates, which refuse an agent's mistakes before anything is
-installed. [How to do it](MODULE_QUICKSTART.md#building-a-module-with-an-ai-coding-agent).
+module rules the agent needs, and a package is checked before anything is
+installed — `module validate` (what it may import, the capabilities it
+declares, its English catalog), its own tests and the signature check. That is
+what a module package is held to; it is not the project's own review process.
+[How to do it](MODULE_QUICKSTART.md#building-a-module-with-an-ai-coding-agent).
 
 [Create your first module](MODULE_QUICKSTART.md) ·
 [Explore the module API](MODULES_GUIDE.md) ·
@@ -284,12 +289,12 @@ USB or Bluetooth scanner and as a QR code for a phone camera.
 The same core under an IT desk, a kitchen and a workshop — three of the
 modules the demo seed switches on beside the warehouse.
 
-![The equipment overview: nine assets need attention — warranties ending within weeks and a server in maintenance — above the totals, 77 assets with four checked out, and the fleet by category as bars: laptops, network devices, monitors, peripherals, desktop computers and other equipment, each with how many are checked out or have a warranty ending soon](docs/images/equipment-overview.webp)
+![The equipment overview: ten assets need attention — warranties ending within weeks and a server in maintenance — above the totals, 84 assets with four checked out, and the fleet by category as bars: network devices, laptops, phones and tablets, servers, peripherals and desktop computers, each with its size and, in colour, the share that is checked out or has a warranty ending soon](docs/images/equipment-overview.webp)
 
 **Equipment** — what needs attention first, then the whole fleet by category;
 serials, warranties, maintenance and who signed for what are a click below.
 
-![Shakshuka: its photograph, an estimated cost of $10.73, two servings in 25 minutes and eggs as its allergen; each ingredient with the shelf it is on — eggs in the fridge, the tomatoes and the olive oil on shelves — the onion missing, and a button that puts what is missing on the shopping list](docs/images/recipe.webp)
+![Shakshuka: its photograph, an estimated cost of $10.44, two servings in 25 minutes and eggs as its allergen; each ingredient with the shelf it is on — eggs in the walk-in cooler, the tomatoes and the olive oil on shelves — the onion missing, and a button that puts what is missing on the shopping list](docs/images/recipe.webp)
 
 **A recipe** — which ingredients are in the house and where each one is; the
 missing ones go onto the shopping list.
@@ -306,11 +311,11 @@ touches on the server. What you do not switch on, you do not see: the
 wholesaler above runs the business modules its launcher shows, the demo almost
 all of them.
 
-![The demo's module store: twelve of the fifteen modules switched on — partners, approvals, equipment tracking, production, nutrition info, label printing, purchase orders, recipes, shopping lists, statistics, stock takes and the warehouse — with API keys, photo recognition and webhooks left off; each with its version, where it comes from and what it needs: stored data, files, background tasks or internet access](docs/images/app-store.webp)
+![The demo's module store: thirteen of the fifteen modules switched on — partners, API keys, approvals, equipment tracking, production, nutrition info, label printing, purchase orders, recipes, shopping lists, statistics, stock takes and the warehouse — with photo recognition and webhooks left off; each with its version, where it comes from and what it needs: stored data, files, background tasks or internet access](docs/images/app-store.webp)
 
 ### In the dark
 
-![The warehouse Start in dark mode: four actions — receive, issue, move, count — above today's to-do list: Sam Okafor's card to wrap the pallet for Northside Grocers, the order for Northside Grocers to pick, the two orders Priya Nair is picking and the delivery from Ortolana Imports to receive, each with who it is assigned to; beside it today's activity, the two receipts at 08:01 and 08:33 and the two shipped orders at 10:03 and 10:11; below them a field for a new task](docs/images/warehouse-start-dark.webp)
+![The warehouse Start in dark mode: four actions — receive, issue, move, count — above today's to-do list: Sam Okafor's card to wrap the pallet for Northside Grocers, the order for Northside Grocers to pick, the two orders Priya Nair is picking and the delivery from Ortolana Imports to receive, each with a selector for who it is assigned to; beside it today's activity, the two receipts at 08:01 and 08:33 and the two shipped orders at 10:03 and 10:11; below them a field for a new task](docs/images/warehouse-start-dark.webp)
 
 ### A phone that is not an afterthought
 
@@ -319,7 +324,7 @@ rather than a narrowed table.
 
 | | | |
 |---|---|---|
-| ![The warehouse Start on a phone: "Hello, Sam", the four actions as large tiles and today's work in order, beginning with Sam's card to wrap the pallet for Northside Grocers and the order for Northside Grocers assigned to Sam, above the bottom bar of Start, Scan, History and More](docs/images/mobile-start.webp) | ![A picking session over two orders on a phone: a progress chip for each — OUT/2026/003 one of four lines picked, OUT/2026/004 two of three — the next line to take, ten packs of Arborio rice from shelf B-01-03, the scan field with the note that a barcode scanner can be used, and the lines already picked with their shelf and best-before date](docs/images/picking-several.webp) | ![The launcher on a phone: "Welcome, Olivia", the profile Equipment & Warehouse and the modules of a business as tiles — inventory with one product running low, equipment tracking, approvals, purchase orders, warehouse with five things to do today, partners and settings](docs/images/mobile-launcher.webp) |
+| ![The warehouse Start on a phone: "Hello, Sam", the four actions as large tiles and today's work in order, beginning with Sam's card to wrap the pallet for Northside Grocers and the delivery order for Laneway Espresso Bar, above the bottom bar of Start, Scan, History and More](docs/images/mobile-start.webp) | ![A picking session over two orders on a phone: a progress chip for each — OUT/2026/003 one of four lines picked, OUT/2026/004 two of three — the next line to take, ten packs of Arborio rice from shelf B-01-03, the scan field with the note that a barcode scanner can be used, and the lines already picked with their shelf and best-before date](docs/images/picking-several.webp) | ![The launcher on a phone: "Welcome, Olivia", the profile Equipment & Warehouse and the modules of a business as tiles — inventory with one thing needing attention, equipment tracking, approvals, purchase orders, warehouse with five things to do today, partners and settings](docs/images/mobile-launcher.webp) |
 | **Start** — the day's work for the person holding the phone. | **Picking several orders at once** — one walk in the warehouse's order, every line naming the order it is for. | **The launcher** — the modules this business runs, with what waits in each. |
 
 ---
@@ -536,9 +541,9 @@ it reports success. Run `make help` to see all available commands.
 > refused outside debug mode, and so is a known weak or short `SECRET_KEY`;
 > set `DEBUG=true` too, or the backend starts in production mode and refuses
 > to boot. For a real
-> deployment do exactly that, from
-> [`.env.production.example`](.env.production.example) — see
-> [QUICK_DEPLOY.md](QUICK_DEPLOY.md).
+> deployment run `scripts/init-env.sh` instead: it writes the file from
+> [`.env.production.example`](.env.production.example) with every secret
+> generated — see [QUICK_DEPLOY.md](QUICK_DEPLOY.md).
 
 **Optional — AI label scanning.** Put the API key of your AI provider
 into `.env` as `LLM_API_KEY=...` and run `docker compose up -d backend`.
@@ -732,9 +737,9 @@ application-level rate limiting on the login, AI and vision endpoints.
 
 ---
 
-## Alpha Release v0.12.0
+## Alpha Release v0.13.0
 
-Inventari 0.12.0 is an **alpha** release so that people can get to know the
+Inventari 0.13.0 is an **alpha** release so that people can get to know the
 product. Three parts of the REST API have been stable since 0.11.0, each with
 a guard: every collection is a page (`items`, `total`, `limit`, `offset`,
 `has_more`, or `next_cursor` on the cursor feeds, with the deliberate
@@ -747,9 +752,9 @@ envelope have compatibility guards and are the surfaces to build on.
 The [compatibility policy](docs/subsystems/CONTRACTS_STABILITY.md) lists every
 public surface, its class and the promise that class makes; the
 [error-response contract](docs/api/ERRORS.md) is the one page a client needs
-for the `detail` envelope and its codes. What 0.12.0 changes, and what an
-installation of 0.11.0 has to do about it, is in the
-[changelog](CHANGELOG.md#v0120---2026-11-09).
+for the `detail` envelope and its codes. What 0.13.0 changes, and what an
+installation of 0.12.0 has to do about it, is in the
+[changelog](CHANGELOG.md#v0130---2026-11-23).
 
 **Release rhythm:** a minor release every two weeks, on a Monday. A breaking
 change ships only in a minor release and is marked **Breaking** in the

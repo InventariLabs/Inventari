@@ -232,8 +232,6 @@
   "confirmDialog": {
     "confirmTitle": "Confirmar documento",
     "confirmMessage": "Isto marcará o documento como pronto para execução no armazém. Continuar?",
-    "completeTitle": "Concluir documento",
-    "completeMessage": "Isto executará as operações de estoque e encerrará o documento. Continuar?",
     "cancelTitle": "Cancelar este documento?",
     "cancelConfirm": "Cancelar documento",
     "cancelKeep": "Manter documento",
@@ -524,7 +522,7 @@
     "snapshotDeltaPlus": "Adicionado",
     "snapshotDeltaMinus": "Removido",
     "executionHelp": "Ajuste a quantidade realmente processada em cada linha antes de encerrar o documento.",
-    "executionHelpRecordOnly": "As mercadorias já saíram da prateleira na etapa que este documento registra. Encerrá-lo apenas mantém o registro — o estoque não muda.",
+    "executionHelpRecordOnly": "O estoque já foi alterado na etapa que este documento registra. Encerrá-lo apenas mantém o registro — o estoque não muda.",
     "executionMeta": "Planejado {{expected}} {{unit}} · restante {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Planejado {{expected}} · restante {{remaining}} (sem unidade)",
     "doneQuantityLabel": "Quantidade executada",
@@ -555,7 +553,7 @@
       "archived": "Uma regra correspondente aponta para um local arquivado ({{rule}}) — não aplicada; a linha vai para {{location}}",
       "not_internal": "Uma regra correspondente aponta para um local virtual ({{rule}}) — não aplicada; a linha vai para {{location}}",
       "refused": "Um módulo excluiu todos os locais de uma regra correspondente ({{rule}}) para esta mercadoria — não aplicada; a linha vai para {{location}}",
-      "receiving": "Uma regra correspondente aponta para uma área de receção ({{rule}}) — não aplicada; a linha vai para {{location}}",
+      "receiving": "Uma regra correspondente aponta para uma área de recebimento ({{rule}}) — não aplicada; a linha vai para {{location}}",
       "quarantine": "Uma regra correspondente aponta para o local de quarentena ({{rule}}) — não aplicada; a linha vai para {{location}}"
     },
     "lineTargetLabel": "Local da linha",
@@ -1119,7 +1117,7 @@
       "shelfHeld": {
         "archived": "Arquivado",
         "not_internal": "Local virtual",
-        "receiving": "Área de receção — retido",
+        "receiving": "Área de recebimento — retido",
         "quarantine": "Quarentena — retido"
       },
       "shelfHeldNamed": "{{name}}: {{reason}}",
@@ -1398,7 +1396,7 @@
         "archived": "Regra ignorada — o local dela está arquivado",
         "not_internal": "Regra ignorada — o local dela é virtual",
         "refused": "Regra ignorada — um módulo excluiu os locais dela para esta mercadoria",
-        "receiving": "Regra ignorada — o local dela é uma área de receção",
+        "receiving": "Regra ignorada — o local dela é uma área de recebimento",
         "quarantine": "Regra ignorada — o local dela é a quarentena"
       }
     },

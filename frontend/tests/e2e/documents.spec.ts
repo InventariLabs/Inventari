@@ -272,7 +272,7 @@ test.describe("Documents — state transitions via UI", () => {
   }) => {
     await page.goto(`/warehouse/documents/${plannedDocId}`);
     await page.getByRole("button", { name: "More actions" }).click();
-    await page.getByRole("button", { name: "Plan", exact: true }).click();
+    await page.getByRole("button", { name: "Confirm", exact: true }).click();
 
     const dialog = page.getByRole("alertdialog").or(page.getByRole("dialog"));
     await dialog.getByRole("button", { name: /^confirm$/i }).click();

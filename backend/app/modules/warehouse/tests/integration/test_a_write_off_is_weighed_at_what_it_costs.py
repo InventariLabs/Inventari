@@ -299,3 +299,49 @@ class TestAWriteOffIsWeighedAtWhatItCosts:
         assert applied.status_code == status.HTTP_200_OK, applied.text
         assert applied.json()['status'] == 'CONFIRMED'
         assert _requests(db_session, correction_id) == []
+
+
+def _notices_about_approvals(db: Session) -> list[Any]:
+    from app.models.notification import Notification
+
+    db.expire_all()
+    return list(
+        db.scalars(select(Notification).where(Notification.link.like('/approvals%')))
+    )
+
+
+@pytest.mark.integration
+class TestTheApproverSeesTheWriteOffsAmount:
+    def test_the_queue_and_the_notice_carry_what_the_layers_say(
+        self,
+        client: TestClient,
+        db_session: Session,
+        doc_auth_headers: dict[str, str],
+        doc_target_location: StorageLocation,
+        stock_at_twelve_fifty: Item,
+    ) -> None:
+        doc_id = _write_off_draft(
+            client,
+            doc_auth_headers,
+            doc_target_location,
+            stock_at_twelve_fifty,
+            quantity=9,
+        )
+        confirm = client.patch(
+            f'{API}/documents/{doc_id}/confirm', headers=doc_auth_headers
+        )
+        assert confirm.json()['status'] == 'PENDING_APPROVAL', confirm.text
+
+        approval = client.get(
+            f'/api/v1/approvals/documents/{doc_id}/approval',
+            headers=doc_auth_headers,
+        )
+        assert approval.status_code == status.HTTP_200_OK, approval.text
+        summary = approval.json()['target_summary']
+        # Nine pieces at 12.50 a piece: the threshold raised the request on
+        # exactly this figure, so the approver is shown the same one.
+        assert summary['total_value'] == '112.50'
+
+        notices = _notices_about_approvals(db_session)
+        assert len(notices) == 1
+        assert '112.50' in notices[0].content

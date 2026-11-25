@@ -19,7 +19,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("./client", () => ({
   api: { post: vi.fn() },
 }));
-vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
 import { toast } from "sonner";
 import { api } from "./client";
@@ -87,14 +86,18 @@ describe("a phone photo above the cap", () => {
 });
 
 /**
- * The gate toasts its sentence and does not throw a bare "File too large",
- * which every caller's catch would turn into its own generic toast on top: two
- * toasts, and the one with the limit hidden under the one without. The
- * refusal now travels as the error itself, so the caller's single toast —
- * `extractApiError(error, fallback)`, the way each of them reads a failure —
- * is the one that says the limit.
+ * The gate shows no toast of its own: its sentence travels as the error, so
+ * the caller's single toast — `extractApiError(error, fallback)`, the way
+ * each of them reads a failure — is the one that says the limit. A gate that
+ * toasted too would put a second toast on the caller's. The callers' own
+ * tests count that toast: the quick add's photo, the logo in the organization
+ * settings and the cover on the recipe page.
+ *
+ * The gate's module is loaded by the test setup, before a `vi.mock("sonner")`
+ * in a test file could reach it, so a mocked toast would not see the gate's
+ * own: the real `toast.error` the gate calls is the one watched here.
  */
-describe("an oversized image is refused in one toast, the one with the limit", () => {
+describe("an oversized image is refused with the limit as its error, and no toast of the gate's own", () => {
   const uploads = {
     "the product photo": () => itemsApi.uploadImage("id-1", fileOfMB(11)),
     "the logo": () => organizationsApi.uploadLogo(fileOfMB(11)),
@@ -103,17 +106,18 @@ describe("an oversized image is refused in one toast, the one with the limit", (
 
   for (const [name, upload] of Object.entries(uploads)) {
     it(name, async () => {
-      vi.mocked(toast.error).mockClear();
+      const shown = vi.spyOn(toast, "error").mockImplementation(() => "");
       try {
-        await upload();
-      } catch (error) {
-        toast.error(extractApiError(error, "Failed to upload file"));
+        const refusal = await upload().catch((error: unknown) => error);
+
+        expect(extractApiError(refusal, "Failed to upload file")).toBe(
+          "File too large. Maximum size: 10 MB",
+        );
+        expect(shown).not.toHaveBeenCalled();
+        expect(api.post).not.toHaveBeenCalled();
+      } finally {
+        shown.mockRestore();
       }
-      expect(toast.error).toHaveBeenCalledTimes(1);
-      expect(toast.error).toHaveBeenCalledWith(
-        "File too large. Maximum size: 10 MB",
-      );
-      expect(api.post).not.toHaveBeenCalled();
     });
   }
 });

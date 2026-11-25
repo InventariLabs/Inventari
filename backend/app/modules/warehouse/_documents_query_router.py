@@ -153,6 +153,13 @@ async def get_documents_todo(
         if location_id is not None
         else None
     )
+    # A document done in the window stays with the place its shelf stood in
+    # when it was done; the open work reads the tree as it stands.
+    location_epochs = (
+        await core_api.locations.subtree_epochs_async(db, org_id, location_id)
+        if location_id is not None
+        else None
+    )
     # A filter has to look through the sources, not only their first page.
     narrowed = view != 'all' or state is not None or assignee is not None
     reach = _EVERY_ROW if narrowed else page
@@ -207,6 +214,7 @@ async def get_documents_todo(
             inbound_total + outbound_total + backorders_total + approvals_total
         ),
         location_ids=location_ids,
+        location_epochs=location_epochs,
     )
     return DocumentsTodoResponse(
         inbound=DocumentsTodoSection(

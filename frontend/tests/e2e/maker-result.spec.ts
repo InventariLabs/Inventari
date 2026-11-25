@@ -39,7 +39,7 @@ test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
   const sIn = await api.createStorage(token, { name: `${stamp}-In` });
   const sOut = await api.createStorage(token, { name: `${stamp}-Out` });
 
-  // Stock: 10 kg fruit at the input location, bought at 2.50 a kilo. Without a
+  // Stock: 10 pcs fruit at the input location, bought at 2.50 a piece. Without a
   // price the run would state no result at all: its cost would leave the fruit
   // out, and a margin against that cost would be overstated by exactly it.
   await api.seedStock(token, {
@@ -50,7 +50,7 @@ test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
     purchase_price: "2.50",
   });
 
-  // Formula with a reference (store) price of 12.50; 1 kg fruit per batch.
+  // Formula with a reference (store) price of 12.50; 1 pcs fruit per batch.
   await api.createMakerRecipe(token, {
     output_template_id: output.id,
     name: `${stamp}-Formula`,
@@ -64,7 +64,7 @@ test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
     unit: "pcs",
   });
 
-  // Plan 2 jars → complete them: 2 kg fruit at 2.50 → unit cost 2.50,
+  // Plan 2 jars → complete them: 2 pcs fruit at 2.50 → unit cost 2.50,
   // result per unit 12.50 − 2.50 = 10.00.
   const order = await api.createProductionOrder(token, {
     output_template_id: output.id,

@@ -1,3 +1,4 @@
+import { RunDayText } from "@/modules/maker/components/RunDayText";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Calendar, Hammer, Plus } from "lucide-react";
@@ -24,7 +25,6 @@ import type {
   ProductionOrder,
   ProductionStatus,
 } from "@/modules/maker/types/maker";
-import { formatDate } from "@/utils/helpers";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
 import { formatMoney } from "@/utils/formatters";
 import { CostGapNote } from "@/modules/maker/components/CostFigure";
@@ -86,10 +86,13 @@ function CardCost({
     <div className="text-on-muted text-xs mt-1">
       {inProgress ? t("detail.card.takenSoFar") : t("productionList.card.cost")}
       : {amount == null ? "—" : formatMoney(amount, currency, language)}
-      {/* A total that leaves out an ingredient drawn with no cost says so. */}
+      {/* A total that leaves out an ingredient drawn with no cost says so; a
+          run with no total (cancelled, a draft) has no figure to explain. */}
       <CostGapNote
         priced={Number(amount) > 0 ? 1 : 0}
-        unpriced={inProgress ? 0 : (order.uncosted_ingredients ?? 0)}
+        unpriced={
+          inProgress || amount == null ? 0 : (order.uncosted_ingredients ?? 0)
+        }
       />
     </div>
   );
@@ -351,7 +354,6 @@ export default function ProductionListPage() {
         (viewMode === "list" ? (
           <ProductionTable
             orders={filteredOrders}
-            sort={sort}
             onDuplicate={canWrite ? duplicate : undefined}
             isDuplicating={isDuplicating}
           />
@@ -422,7 +424,7 @@ export default function ProductionListPage() {
                   )}
                   <div className="text-on-muted text-xs mt-1 flex items-center gap-1">
                     <Calendar size={12} />
-                    {formatDate(order.created_at)}
+                    <RunDayText order={order} />
                   </div>
                 </div>
                 <div className="mt-2 flex justify-end gap-2">

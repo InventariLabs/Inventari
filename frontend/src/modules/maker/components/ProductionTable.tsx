@@ -1,3 +1,4 @@
+import { RunDayText } from "@/modules/maker/components/RunDayText";
 import { useId } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -9,15 +10,12 @@ import { ProductionShortageSignal } from "@/modules/maker/components/ProductionS
 import { ProductionStatusBadge } from "@/modules/maker/components/ProductionStatusBadge";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
 import { formatMoney } from "@/utils/formatters";
-import { formatDate } from "@/utils/helpers";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import type { ProductionOrder } from "@/modules/maker/types/maker";
 import { useResultTerms } from "@/modules/maker/hooks/useResultTerms";
 
 interface ProductionTableProps {
   orders: ProductionOrder[];
-  /** Ordering the list is in — reflected as `aria-sort` on the date column. */
-  sort: string;
   /** Absent for an account that may not write — the action is then not offered. */
   onDuplicate?: (orderId: string, event: React.MouseEvent) => void;
   isDuplicating: boolean;
@@ -32,7 +30,6 @@ interface ProductionTableProps {
  */
 export function ProductionTable({
   orders,
-  sort,
   onDuplicate,
   isDuplicating,
 }: ProductionTableProps) {
@@ -71,17 +68,7 @@ export function ProductionTable({
               >
                 {resultTerm.label}
               </th>
-              <th
-                scope="col"
-                className={headerClass}
-                aria-sort={
-                  sort === "newest"
-                    ? "descending"
-                    : sort === "oldest"
-                      ? "ascending"
-                      : undefined
-                }
-              >
+              <th scope="col" className={headerClass}>
                 {t("productionList.table.date")}
               </th>
               <th scope="col" className="px-3 py-2.5">
@@ -155,7 +142,7 @@ export function ProductionTable({
                       : formatMoney(result, currency, i18n.language)}
                   </td>
                   <td className="px-3 py-2.5 text-on-muted whitespace-nowrap">
-                    {formatDate(order.created_at)}
+                    <RunDayText order={order} />
                   </td>
                   <td className="px-3 py-2.5 text-right whitespace-nowrap">
                     {/* Pre-0a orders carry no recipe reference — the same

@@ -4,14 +4,13 @@ import { useThemeStore } from "@/store/themeStore";
 import { applyThemeVariables } from "@/lib/moduleRegistry/registryI18nTheme";
 
 /**
- * profile palettes declare light-mode ramps. Applied inline on
- * `<html>` they beat the `.dark` token overrides in index.css, so in dark
- * mode the fix was bypassed — e.g. the active nav tab in the
- * equipment profile (blue-700 on surface-card) measured 2.22:1. In dark
- * mode the tint steps are remapped the same way index.css remaps the
- * default palette: low tints take the ramp's dark end, and the text step
- * 700 takes 400 (hue-safe — blue-400 ≈ 5.9:1 on surface-card, whereas
- * blue-500 would be ≈ 4.0:1, below WCAG AA). Steps without a counterpart
+ * Profile palettes declare light-mode ramps. Applied inline on `<html>` they
+ * beat the `.dark` token overrides in index.css, so a profile's text step 700
+ * on surface-card would keep its light-mode contrast in dark mode. In dark
+ * mode the tint steps are therefore remapped the way index.css remaps the
+ * default palette: low tints take the ramp's dark end, and the text step 700
+ * takes 400 (hue-safe — in the blue ramp 400 gives ≈ 5.9:1 on surface-card,
+ * where 500 would give ≈ 4.0:1, below WCAG AA). Steps without a counterpart
  * in the profile's own ramp pass through unchanged.
  */
 const DARK_STEP_MAP: Record<string, string> = {
@@ -46,7 +45,7 @@ export function resolveProfileThemeForMode(
     resolved[varName] = value;
   });
   // Brand text (`text-on-primary`) takes the ramp's light 300, read from the
-  // profile's own declaration before the remap: the remapped 700 (blue-400)
+  // profile's own declaration before the remap: the remapped 700 (its 400)
   // is only 4.1:1 on surface-raised. The default dark value is a teal that
   // would clash with the profile's hue. Without a 300 it falls back to the
   // remapped 700.

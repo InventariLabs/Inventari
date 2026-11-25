@@ -80,7 +80,9 @@
     "unknown_inline_one": "Not linked to stock: {{count}}",
     "unknown_inline_other": "Not linked to stock: {{count}}",
     "incomparable": "Uncountable",
-    "incomparable_tooltip": "On the shelf, but the recipe's measure and the shelf's cannot be put on one scale — nobody can say whether it covers the recipe."
+    "incomparable_tooltip": "On the shelf, but the recipe's measure and the shelf's cannot be put on one scale — nobody can say whether it covers the recipe.",
+    "not_comparable_fix_named": "Record the weight or volume per piece: {{name}}",
+    "link_to_product_for": "Link to product: {{name}}"
   },
   "linking": {
     "title": "Ingredients without a product",
@@ -351,7 +353,6 @@
   },
   "tags_manager": {
     "title": "Tags",
-    "set_color": "Set color",
     "clear_color": "Clear color",
     "merge_title": "Merge tags",
     "merge_from": "Replace tag",
@@ -382,7 +383,9 @@
     "delete_confirm_message": "\"{{name}}\" will be removed from every recipe that carries it. The recipes stay.",
     "delete_success_one": "Deleted: 1 recipe updated",
     "delete_success_other": "Deleted: {{count}} recipes updated",
-    "delete_failed": "Failed to delete the tag"
+    "delete_failed": "Failed to delete the tag",
+    "set_color_for": "Set color for {{name}}",
+    "more_for": "More actions for {{name}}"
   },
   "import_export": {
     "export_json": "Download JSON",
@@ -725,7 +728,8 @@
     "back_to_plans": "Back to meal plans",
     "cook_now_named": "Cook Now: {{recipe}}",
     "remove_entry_named": "Remove {{recipe}} from plan",
-    "drag_to_move_named": "Drag to move: {{recipe}}"
+    "drag_to_move_named": "Drag to move: {{recipe}}",
+    "delete_plan_for": "Delete plan {{name}}"
   },
   "cooking": {
     "rateSession_one": "Rate {{count}} star",
@@ -767,8 +771,6 @@
   },
   "bulk": {
     "select_mode": "Select recipes",
-    "select": "Select",
-    "deselect": "Deselect",
     "select_all": "Select all",
     "deselect_all": "Deselect all",
     "selected_count": "{{count}} selected",
@@ -796,7 +798,9 @@
     "deleted_one": "{{count}} recipe deleted",
     "deleted_other": "{{count}} recipes deleted",
     "toolbar_label_one": "{{count}} recipe selected",
-    "toolbar_label_other": "{{count}} recipes selected"
+    "toolbar_label_other": "{{count}} recipes selected",
+    "select_for": "Select {{name}}",
+    "deselect_for": "Deselect {{name}}"
   },
   "collections": {
     "load_failed": "Collections could not be loaded.",
@@ -816,7 +820,9 @@
     "add_one": "Add",
     "added_one": "Added",
     "add_none": "No recipes to add — create one first",
-    "add_no_match": "No recipes match your search"
+    "add_no_match": "No recipes match your search",
+    "rename_for": "Rename {{name}}",
+    "delete_for": "Delete collection {{name}}"
   },
   "cookForStock": {
     "button": "Cook a batch for stock",

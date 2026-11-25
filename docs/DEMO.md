@@ -91,7 +91,8 @@ stack's Caddy is the front door for both names:
 
 1. Create a DNS A record for `demo.<domain>` pointing at the server.
 2. In the **production** stack's `.env`, set `DEMO_DOMAIN=demo.<domain>` and
-   `docker compose up -d caddy`. Caddy orders a certificate for that name,
+   `docker compose -f docker-compose.prod.yml up -d caddy` (run in the
+   production checkout). Caddy orders a certificate for that name,
    sends HSTS and forwards the traffic to the demo stack.
 3. Start the demo as above, from its own checkout or directory with its own
    `.env`, where `DOMAIN=demo.<domain>`, adding `docker-compose.demo-shared.yml`
@@ -272,8 +273,11 @@ Visitors do not share a login. On a demo the sign-in page offers **Try the
 demo**: one click gives the visitor an organization of their own, seeded and
 dressed exactly like the operator's, with a temporary administrator account in
 it — an organization admin, never a superuser — and lands them on the
-launcher. What one visitor types into the application, nobody else sees — mail
-is the exception, because every message lands in the
+launcher, or on the screen a link into the demo named (an in-app path such
+as `/warehouse/todo`, followed once the copy exists). The form for signing
+in with an account stays folded under *or sign in with an account*. What one
+visitor types into the application, nobody else sees — mail is the exception,
+because every message lands in the
 [public inbox](#no-email-leaves-the-demo) that all visitors read, so an
 address typed into a document is visible to them all; a visitor who spoils
 their copy spoils only theirs; and "reset on demand" is simply another

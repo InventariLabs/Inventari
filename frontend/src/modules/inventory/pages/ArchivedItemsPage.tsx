@@ -118,6 +118,8 @@ function useArchivePage(search: string, excludeModuleContexts: boolean) {
       skip: paging.page * PAGE_SIZE,
       limit: PAGE_SIZE,
       total: page?.total ?? 0,
+      // The archive only grows, so its first page counts only so far.
+      totalCapped: page?.total_capped ?? false,
       keyset: {
         rows: page?.items?.length ?? 0,
         hasNext: Boolean(page?.next_cursor),
@@ -365,8 +367,12 @@ export default function ArchivedItemsPage() {
                                 size="icon"
                                 onClick={() => setRestoreTarget(item.id)}
                                 disabled={restoreMutation.isPending}
-                                aria-label={t("items:restoreItem")}
-                                title={t("items:restoreItem")}
+                                aria-label={t("items:restoreItemNamed", {
+                                  name: item.name,
+                                })}
+                                title={t("items:restoreItemNamed", {
+                                  name: item.name,
+                                })}
                               >
                                 <RotateCcw size={16} />
                               </Button>
@@ -390,8 +396,12 @@ export default function ArchivedItemsPage() {
                                     setPurgeReason("");
                                   }}
                                   disabled={purgeMutation.isPending}
-                                  aria-label={t("items:purgeItem")}
-                                  title={t("items:purgeItem")}
+                                  aria-label={t("items:purgeItemNamed", {
+                                    name: item.name,
+                                  })}
+                                  title={t("items:purgeItemNamed", {
+                                    name: item.name,
+                                  })}
                                 >
                                   <Trash2 size={16} />
                                 </Button>

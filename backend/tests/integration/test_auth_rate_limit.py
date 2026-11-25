@@ -139,6 +139,25 @@ class TestAuthRateLimitEnforced:
         )
         assert response.status_code == 429, response.text
 
+    def test_a_429_to_a_bearer_key_carries_the_deprecation_header(
+        self, rate_limited_client
+    ):
+        """The limiter answers before any route, and that answer is marked too.
+
+        Every answer to a key sent as ``Authorization: Bearer`` carries
+        ``Deprecation``, the refusals included — and the limiter, outside
+        every route, refuses with a 429 of its own.
+        """
+        login = {'username': 'nosuch@example.com', 'password': 'wrong'}
+        headers = {'Authorization': 'Bearer inv_live_rate_limited_key'}
+        answers = [
+            rate_limited_client.post('/api/v1/auth/login', data=login, headers=headers)
+            for _ in range(6)
+        ]
+
+        assert [answer.status_code for answer in answers] == [401] * 5 + [429]
+        assert answers[-1].headers['deprecation'] == '@1792713600'
+
     def test_a_burned_bucket_is_nobody_else(self, rate_limited_client, monkeypatch):
         """The isolation above is real, not decorative — and here is its tooth.
 
@@ -476,6 +495,39 @@ class TestLimitsOnRoutesWithAPathParameter:
         ]
 
         assert [n for n, code in enumerate(statuses) if code == 429] == [30], statuses
+
+    def test_attestation_tokens_share_the_read_ceiling(self, rate_limited_client):
+        """``GET /public/attestation/{token}`` allows 30 reads a minute per client.
+
+        A token is guessed one value at a time, so each request names a
+        different one.
+        """
+        statuses = [
+            rate_limited_client.get(f'/public/attestation/guess-{n}').status_code
+            for n in range(31)
+        ]
+
+        assert statuses[:30] == [404] * 30 and statuses[30] == 429, statuses
+
+    @pytest.mark.parametrize(
+        ('action', 'payload'),
+        [
+            ('confirm', None),
+            ('dispute', {'dispute_type': 'MISSING', 'reason': 'Not handed over'}),
+        ],
+    )
+    def test_attestation_answers_share_the_write_ceiling(
+        self, rate_limited_client, action, payload
+    ):
+        """Confirming and disputing allow 10 answers a minute per client."""
+        statuses = [
+            rate_limited_client.post(
+                f'/public/attestation/guess-{n}/{action}', json=payload
+            ).status_code
+            for n in range(11)
+        ]
+
+        assert statuses[:10] == [404] * 10 and statuses[10] == 429, statuses
 
     def test_the_default_limit_counts_across_the_values_of_a_path_parameter(
         self, rate_limited_client, monkeypatch

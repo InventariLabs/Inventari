@@ -273,7 +273,7 @@ describe("ReplenishSuggestionsModal — the wire's quantity is a string", () => 
 
     render(<ReplenishSuggestionsModal isOpen={true} onClose={onClose} />);
 
-    fireEvent.click(screen.getByLabelText("Increase"));
+    fireEvent.click(screen.getByLabelText(/^Increase quantity of /));
     expect(screen.getByText("2")).toBeInTheDocument();
     expect(screen.queryByText("11")).not.toBeInTheDocument();
   });

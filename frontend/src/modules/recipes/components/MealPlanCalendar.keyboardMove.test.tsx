@@ -12,10 +12,10 @@
  * puts focus back on the entry that moved, and a drop that moves nothing
  * leaves focus exactly where the reader had it.
  */
+import type { ReactNode } from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import type { DragEndEvent } from "@dnd-kit/core";
-import type { ReactNode } from "react";
 import { addDays, format } from "date-fns";
 
 import type {

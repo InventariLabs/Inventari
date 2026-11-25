@@ -1053,13 +1053,15 @@ navOverrides that match no navigation item`).
 
 ### `i18nOverrides` — Replace Terms at Runtime
 
-A module can inject its own translations over the core's, overriding key terms (e.g. "Products" → "Animals"). A key names the namespace it targets — `"inventory:nav.items"` is the `nav.items` entry of the `inventory` namespace — and a key without a prefix targets `common`. A key no catalog has changes nothing; in development the console names it (`[ModuleRegistry] … overrides … translation keys no catalog has`), so take the key from the screen's own catalog. **Original translations are remembered and automatically restored when the module is disabled.**
+A module can inject its own translations over the core's, overriding key terms (e.g. "Products" → "Animals"). A key names the namespace it targets — `"inventory:nav.items"` is the `nav.items` entry of the `inventory` namespace — and a key without a prefix targets `common`. A key no catalog has changes nothing; in development the console names it (`[ModuleRegistry] … overrides … translation keys no catalog has`), so take the key from the screen's own catalog. A module renames strings of its own namespace freely; a key of another namespace takes effect only when the module lists it in `adoptedI18nKeys`, and two modules overriding one key are named together in the development console. **Original translations are remembered and automatically restored when the module is disabled.**
 
 ```typescript
 moduleRegistry.register({
   name: "livestock",
   routes: [],
   moduleNav: undefined,
+  // A key outside the module's own namespace is ignored unless it is listed.
+  adoptedI18nKeys: ["inventory:nav.items"],
   i18nOverrides: {
     en: {
       "inventory:nav.items": "Animals",
@@ -1995,7 +1997,7 @@ Run `python manage.py module schema` to export the full JSON Schema for `manifes
 
 ## 📌 Versioning & CoreAPI Stability
 
-The single source of truth for the platform version is the **README release section** (currently **Alpha v0.12.0**). `backend/pyproject.toml` and `frontend/package.json` mirror that version. A release carries the same number into `backend/uv.lock`, `frontend/package-lock.json`, `docs/api/openapi.json` and the README release section, so bump all of them together.
+The single source of truth for the platform version is the **README release section** (currently **Alpha v0.13.0**). `backend/pyproject.toml` and `frontend/package.json` mirror that version. A release carries the same number into `backend/uv.lock`, `frontend/package-lock.json`, `docs/api/openapi.json` and the README release section, so bump all of them together.
 
 - **From 0.11:** contract DTOs, stable `core_api` namespaces, the manifest and webhook envelope have compatible-evolution promises. Stable surfaces follow the additive-only rule and a two-minor-release deprecation window; experimental surfaces may change in a minor release with release notes and migration instructions, without a window.
 - The REST list and pagination envelopes, the error shape and refusal codes, and API keys are **stable from 0.11.0**; the rest of the REST API and the frontend module interface are **experimental in 0.11**. See the [Contracts Stability Policy](docs/subsystems/CONTRACTS_STABILITY.md) for the full surface map, namespace exceptions and guards. Backend facade stability does not imply frontend or HTTP stability.

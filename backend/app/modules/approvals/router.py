@@ -22,6 +22,7 @@ from app.core.public_api import core_api
 from app.i18n.service import get_current_lang, get_error_message
 from app.schemas.pagination import PaginatedResponse
 
+from ._documents_router import decision_router as documents_decision_router
 from ._documents_router import router as documents_router
 from ._error_mapping import map_approval_errors
 from ._services_request import require_target_exists
@@ -568,3 +569,4 @@ async def cancel_request_endpoint(
 # through ``warehouse_api``, imported when a request arrives, and answer only
 # where the warehouse is on.
 router.include_router(documents_router)
+router.include_router(documents_decision_router)

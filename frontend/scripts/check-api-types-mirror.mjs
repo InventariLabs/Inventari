@@ -50,9 +50,9 @@ import { fileURLToPath } from "node:url";
 
 import { blankComments } from "./source-text.mjs";
 
-// `new URL(...).pathname`, not fileURLToPath: under vitest `import.meta.url`
-// carries a `/@fs/` prefix that fileURLToPath refuses outright.
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+// `import.meta.dirname` is the real directory under node and under vitest
+// alike; the `import.meta.url` pathname is not (a URL on vitest's jsdom).
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const SRC = resolve(ROOT, "src");
 const GENERATED = resolve(SRC, "types/api-generated.ts");
 const BASELINE_PATH = resolve(ROOT, "scripts/api-types-mirror-baseline.txt");

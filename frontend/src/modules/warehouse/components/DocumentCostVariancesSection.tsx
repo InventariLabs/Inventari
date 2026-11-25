@@ -151,6 +151,7 @@ export function DocumentCostVariancesSection({
             label={t("warehouse:extraCosts.amountLabel")}
             wrapperClassName="w-full sm:w-32"
             inputMode="decimal"
+            aria-required
             value={amount}
             onChange={(event) => setAmount(event.target.value)}
           />
@@ -158,14 +159,17 @@ export function DocumentCostVariancesSection({
             label={t("warehouse:costVariances.reasonLabel")}
             wrapperClassName="w-full sm:flex-1 sm:min-w-56"
             maxLength={255}
+            aria-required
             value={reason}
             onChange={(event) => setReason(event.target.value)}
           />
           <DateInput
             label={t("warehouse:costVariances.dayLabel")}
-            wrapperClassName="w-full sm:w-44"
+            wrapperClassName="w-full sm:w-56"
             value={day}
             onChange={setDay}
+            // A cost that has not happened yet is not a variance to record.
+            max={todayIso()}
             required
           />
           <Button

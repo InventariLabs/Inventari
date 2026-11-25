@@ -119,7 +119,11 @@
     "selectItems": "Selecionar produtos",
     "select": "Selecionar {{name}}",
     "addOneUnit": "Adicionar 1 unidade",
-    "consume": "Retirar"
+    "consume": "Retirar",
+    "consume1unitFor": "Retirar 1 unidade de {{name}}",
+    "addOneUnitFor": "Adicionar 1 unidade a {{name}}",
+    "editFor": "Editar {{name}}",
+    "deleteFor": "Excluir {{name}}"
   },
   "import": {
     "pleaseWait": "Aguarde enquanto processamos seus produtos.",
@@ -496,7 +500,7 @@
     "discardFailed": "Não foi possível retirar do estoque",
     "recordLeftList": "O registro saiu da lista de produtos.",
     "openRecord": "Abrir registro",
-    "equipmentNote": "Categoria de equipamentos: este registro é devolvido e descartado, em vez de consumido e excluído."
+    "equipmentNote": "Este registro é devolvido e descartado, em vez de consumido e excluído."
   },
   "noArchivedItemsDescRestoreOnly": "Os produtos que você excluir aparecerão aqui, e você pode trazê-los de volta. A remoção definitiva está desativada para esta organização.",
   "noArchivedItemsDescViewOnly": "Os produtos que você excluir aparecerão aqui. Trazer um de volta exige uma permissão que esta conta não tem.",
@@ -533,5 +537,7 @@
     "fefoHelp": "PVPS (FEFO): o que vence primeiro sai primeiro, não importa quando entrou.",
     "sharedProduct": "Este produto vem do catálogo compartilhado, então a ordem de saída do estoque dele é a do catálogo e não pode ser alterada aqui."
   },
-  "addStorage": "Adicionar novo local"
+  "addStorage": "Adicionar novo local",
+  "restoreItemNamed": "Restaurar {{name}}",
+  "purgeItemNamed": "Excluir {{name}} permanentemente"
 }

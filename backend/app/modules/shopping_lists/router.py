@@ -277,9 +277,10 @@ async def update_list_item(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> ShoppingListItemModel:
-    return await update_shopping_list_item(
-        db, list_id, item_id, require_org(current_user), data, get_current_lang()
-    )
+    lang = get_current_lang()
+    org_id = require_org(current_user)
+    await _require_writable_list(db, list_id, org_id, lang)
+    return await update_shopping_list_item(db, list_id, item_id, org_id, data, lang)
 
 
 @router.patch(
@@ -291,14 +292,10 @@ async def mark_item_as_purchased(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> ShoppingListItemModel:
-    return await set_item_purchased(
-        db,
-        list_id,
-        item_id,
-        require_org(current_user),
-        current_user.id,
-        get_current_lang(),
-    )
+    lang = get_current_lang()
+    org_id = require_org(current_user)
+    await _require_writable_list(db, list_id, org_id, lang)
+    return await set_item_purchased(db, list_id, item_id, org_id, current_user.id, lang)
 
 
 @router.post(
@@ -341,9 +338,10 @@ async def unmark_item(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> ShoppingListItemModel:
-    return await set_item_unpurchased(
-        db, list_id, item_id, require_org(current_user), get_current_lang()
-    )
+    lang = get_current_lang()
+    org_id = require_org(current_user)
+    await _require_writable_list(db, list_id, org_id, lang)
+    return await set_item_unpurchased(db, list_id, item_id, org_id, lang)
 
 
 @router.delete('/{list_id}/items/purchased', status_code=status.HTTP_204_NO_CONTENT)
@@ -352,9 +350,10 @@ async def clear_purchased_items(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> None:
-    await clear_purchased_from_list(
-        db, list_id, require_org(current_user), get_current_lang()
-    )
+    lang = get_current_lang()
+    org_id = require_org(current_user)
+    await _require_writable_list(db, list_id, org_id, lang)
+    await clear_purchased_from_list(db, list_id, org_id, lang)
 
 
 @router.delete('/{list_id}/items/{item_id}', status_code=status.HTTP_204_NO_CONTENT)
@@ -364,9 +363,10 @@ async def delete_item_from_list(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> None:
-    await delete_shopping_list_item(
-        db, list_id, item_id, require_org(current_user), get_current_lang()
-    )
+    lang = get_current_lang()
+    org_id = require_org(current_user)
+    await _require_writable_list(db, list_id, org_id, lang)
+    await delete_shopping_list_item(db, list_id, item_id, org_id, lang)
 
 
 @router.post(
@@ -414,8 +414,11 @@ async def add_all_suggestions_to_list(
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> ShoppingSuggestionResponse:
+    lang = get_current_lang()
+    org_id = require_org(current_user)
+    await _require_writable_list(db, list_id, org_id, lang)
     existing_items_data, unique_suggestions = await get_suggestions_for_list(
-        list_id, require_org(current_user), db
+        list_id, org_id, db
     )
 
     added_count, added_items = await add_suggestions_to_list(

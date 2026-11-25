@@ -71,14 +71,19 @@ export function ReadOnlyNotice({
       : canWrite;
   if (granted && !cannotRead) return null;
 
+  // "You can use this, not reconfigure it" is false for an account that
+  // cannot write in the module either — a viewer may open the screen and
+  // nothing more. The manage sentence is for someone with the records but
+  // not the settings.
+  const manageOnly = right === "manage" && canWrite;
   const title = cannotRead
     ? t("access.noRead")
-    : right === "manage"
+    : manageOnly
       ? t("access.manageOnly")
       : t("access.readOnly");
   const hint = cannotRead
     ? t("access.noReadHint")
-    : right === "manage"
+    : manageOnly
       ? t("access.manageOnlyHint")
       : t("access.readOnlyHint");
 

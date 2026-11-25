@@ -332,7 +332,7 @@ test.describe("Items — CRUD flow", () => {
     await page
       .getByTestId("item-row")
       .filter({ hasText: expiredName })
-      .getByRole("button", { name: "Delete", exact: true })
+      .getByRole("button", { name: `Delete ${expiredName}`, exact: true })
       .click();
 
     // Deleting a record asks for its reason first (DeleteReasonDialog): the

@@ -610,11 +610,20 @@ test.describe("Recipes — exploratory: filter tabs", () => {
     api = new ApiHelper(requestContext);
     const authData = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
     token = authData.access_token;
+
+    // The tabs are drawn only over a list that has a recipe in it, so this
+    // describe makes the one it needs instead of relying on another spec's.
+    const recipe = await api.createRecipe(token, {
+      name: `E2E-Tabs-${Date.now()}`,
+      servings: 1,
+      ingredients: [],
+    });
+    cleanupIds.push(recipe.id);
   });
 
   test.afterAll(async () => {
     for (const id of cleanupIds) {
-      await api.deleteRecipe(token, id).catch(() => {});
+      await api.deleteRecipe(token, id);
     }
   });
 
@@ -644,6 +653,11 @@ test.describe("Recipes — exploratory: filter tabs", () => {
     const cookTab = page.getByRole("tab", { name: /i can cook/i });
     await expect(cookTab).toBeVisible({ timeout: 10000 });
     await cookTab.click();
+    await expect(cookTab).toHaveAttribute("data-state", "active");
+    await expect(page.getByRole("tab", { name: /^all$/i })).toHaveAttribute(
+      "data-state",
+      "inactive",
+    );
   });
 });
 

@@ -22,7 +22,7 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { resolve, relative, join } from "node:path";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname);
+const ROOT = resolve(import.meta.dirname, "..");
 const SEARCH_DIR = join(ROOT, "src");
 const LIST_ONLY = process.argv.includes("--list");
 

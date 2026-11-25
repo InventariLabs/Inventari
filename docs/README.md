@@ -24,6 +24,7 @@ ships with the repository, not a guide.
 | Document | Topic |
 |---|---|
 | [QUICK_DEPLOY.md](../QUICK_DEPLOY.md) | Deploy to a VPS with automatic HTTPS in six steps |
+| [HOME_INSTALL.md](HOME_INSTALL.md) | Install on a computer at home with no domain: a name on the home network, a certificate from Caddy's own authority, trusting it on phones |
 | [DEPLOYMENT.md](../DEPLOYMENT.md) | Full deployment guide — [updating](../DEPLOYMENT.md#updating), [database backups](../DEPLOYMENT.md#database-backups), [putting a backup back](../DEPLOYMENT.md#putting-a-backup-back), [rebuilding on a new server](../DEPLOYMENT.md#rebuilding-on-a-new-server), [troubleshooting](../DEPLOYMENT.md#troubleshooting) |
 | [SECURITY.md](../SECURITY.md) | Reporting a vulnerability, supported versions, responsible disclosure |
 | [SCALING.md](SCALING.md) | Running more than one backend replica |
@@ -60,7 +61,10 @@ existing workflow through its public extension points.
 
 [CONTRIBUTING.md](../CONTRIBUTING.md) covers the development environment,
 repository workflow, coding standards and pull requests for changes to the
-platform and its included modules.
+platform and its included modules. Packaging Inventari for a home-server app
+store (Unraid, CasaOS, Umbrel, YunoHost, TrueNAS) starts from
+[HOME_SERVER_STORES.md](HOME_SERVER_STORES.md): what each store's current
+submission rules ask for, quoted and dated.
 
 ## Technical reference
 

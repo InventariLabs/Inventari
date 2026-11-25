@@ -120,6 +120,7 @@ from app.core.migration_helpers import (
     relation_exists,
 )
 from app.core.module_ownership import general_rows, hidden_module_tags_async
+from app.core.module_scope import get_context_tags_of
 from app.core.open_package import effective_expiry
 from app.core.scan_registry import ScanProvider, scan_registry
 from app.core.settings_diff import journal_config_change, record_settings
@@ -219,6 +220,7 @@ __all__ = [
     'effective_expiry',
     'general_rows',
     'get_async_db',
+    'get_context_tags_of',
     'get_current_lang',
     'get_current_user',
     'get_current_user_context',

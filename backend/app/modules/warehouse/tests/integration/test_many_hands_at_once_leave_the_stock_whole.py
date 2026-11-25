@@ -126,9 +126,26 @@ async def _warehouse(db: AsyncSession) -> _Warehouse:
     )
     db.add(org)
     await db.flush()
+    # A real organization owns the neutral storage types from the moment it
+    # exists; without the SYSTEM one, an emptied record has nowhere to be
+    # filed and the door that empties it cannot finish.
+    from app.seed_profiles.base import seed_neutral_storage_types
+
+    await db.run_sync(
+        lambda session: seed_neutral_storage_types(
+            session, organization_id=org.id, commit=False
+        )
+    )
     user = await ModuleTestHelper.create_user_async(
         db, org, email=f'hands_{uuid.uuid4().hex[:8]}@test.com', role='admin'
     )
+    # So does it own the virtual places (Consumed among them): seeding makes
+    # them with the organization, and a door that empties a record files it
+    # there. Left to the first door that needs one, fifty sessions would race
+    # to create it, which no real organization ever does.
+    from app.services.storage._defaults import ensure_virtual_locations_async
+
+    await ensure_virtual_locations_async(db, str(org.id), str(user.id))
     shelves: list[uuid.UUID] = []
     for name in ('Home shelf', 'Overflow shelf'):
         location = StorageLocation(

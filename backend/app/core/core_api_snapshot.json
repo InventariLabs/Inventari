@@ -3314,6 +3314,25 @@
               "required": true
             }
           ]
+        },
+        "subtree_epochs_async": {
+          "params": [
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "db",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "organization_id",
+              "required": true
+            },
+            {
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "storage_id",
+              "required": true
+            }
+          ]
         }
       }
     },
@@ -4236,6 +4255,16 @@
             {
               "kind": "POSITIONAL_OR_KEYWORD",
               "name": "user_id",
+              "required": false
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "sku",
+              "required": false
+            },
+            {
+              "kind": "KEYWORD_ONLY",
+              "name": "uom_id",
               "required": false
             }
           ]

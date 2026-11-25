@@ -165,6 +165,14 @@ class PutawayDo(BaseModel):
 
 
 class WorkItemAssignees(BaseModel):
-    """The members a task can be given to: those who hold what doing it needs."""
+    """The members a task can be given to: those who hold what doing it needs.
+
+    ``user_ids`` is everyone who could do a task of some kind. The kinds differ
+    in what they need — a count is ``stock_takes:write``, a run ``maker:write``,
+    a replenishment both the warehouse's and the orders' — so
+    ``by_permission`` names the holders of each, and a picker offers the people
+    who hold everything its row needs.
+    """
 
     user_ids: list[UUID]
+    by_permission: dict[str, list[UUID]]

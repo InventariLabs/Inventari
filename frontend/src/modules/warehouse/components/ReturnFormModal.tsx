@@ -216,7 +216,9 @@ export function ReturnFormModal({ document, onClose }: ReturnFormModalProps) {
                 {line.line_name}
               </span>
               <span className="text-xs text-on-secondary shrink-0">
-                {t("returns.maxQuantity", { max: line.max_quantity })}
+                {t("returns.maxQuantity", {
+                  max: formatQuantityValue(line.max_quantity),
+                })}
               </span>
             </div>
 

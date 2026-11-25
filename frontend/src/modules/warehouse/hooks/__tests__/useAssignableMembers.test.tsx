@@ -19,13 +19,18 @@ const members = [
   { id: "u-2", email: "bob@example.com", full_name: null, role: "user" },
 ];
 
-function setup(holders: string[] = ["u-1", "u-2"]) {
+function setup(
+  byPermission: Record<string, string[]> = {
+    "warehouse:write": ["u-1", "u-2"],
+  },
+) {
+  const user_ids = [...new Set(Object.values(byPermission).flat())];
   server.use(
     http.get("/api/v1/users/org-members", () =>
       HttpResponse.json(onePage(members)),
     ),
     http.get("/api/v1/warehouse/work-items/assignees", () =>
-      HttpResponse.json({ user_ids: holders }),
+      HttpResponse.json({ user_ids, by_permission: byPermission }),
     ),
   );
   const queryClient = new QueryClient({
@@ -60,12 +65,32 @@ describe("useAssignableMembers shares the members cache entry", () => {
   });
 
   it("offers only the members who hold the grant the tasks need", async () => {
-    const { wrapper } = setup(["u-2"]);
+    const { wrapper } = setup({ "warehouse:write": ["u-2"] });
     const { result } = renderHook(() => useAssignableMembers(true), {
       wrapper,
     });
     await waitFor(() => expect(result.current.data).toBeDefined());
     expect(result.current.data).toEqual([
+      { id: "u-2", name: "bob@example.com" },
+    ]);
+  });
+
+  it("names each grant's holders apart, so a count is not offered a stock keeper", async () => {
+    const { wrapper } = setup({
+      "warehouse:write": ["u-1"],
+      "stock_takes:write": ["u-2"],
+    });
+    const { result } = renderHook(() => useAssignableMembers(true), {
+      wrapper,
+    });
+    await waitFor(() => expect(result.current.byPermission).toBeDefined());
+
+    expect(result.current.byPermission).toEqual({
+      "warehouse:write": [{ id: "u-1", name: "Alice" }],
+      "stock_takes:write": [{ id: "u-2", name: "bob@example.com" }],
+    });
+    expect(result.current.data).toEqual([
+      { id: "u-1", name: "Alice" },
       { id: "u-2", name: "bob@example.com" },
     ]);
   });

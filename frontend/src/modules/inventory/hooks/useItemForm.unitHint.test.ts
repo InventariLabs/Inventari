@@ -52,7 +52,12 @@ function renderItemForm(props: Parameters<typeof useItemForm>[0]) {
   return renderHook(() => useItemForm(props), { wrapper: QueryWrapper });
 }
 
-/** Types a product the catalogue knows and waits for the hint to arrive. */
+/**
+ * Types a product the catalogue knows and waits for the hint to arrive and
+ * for the form to adopt its unit: the unit is set by a later effect than the
+ * one that publishes the hint, so waiting on the hint alone can resolve
+ * between the two renders.
+ */
 async function typeMatchedProduct(
   result: { current: ReturnType<typeof useItemForm> },
   name = "Rye flour",
@@ -60,9 +65,10 @@ async function typeMatchedProduct(
   act(() => {
     result.current.handleInputChange("name", name);
   });
-  await waitFor(() =>
-    expect(result.current.templateUnit?.uomSymbol).toBe("kg"),
-  );
+  await waitFor(() => {
+    expect(result.current.templateUnit?.uomSymbol).toBe("kg");
+    expect(result.current.formData.uom_id).toBe(KILOGRAM);
+  });
 }
 
 describe("useItemForm — the unit the catalogue counts the product in", () => {

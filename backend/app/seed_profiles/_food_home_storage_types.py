@@ -27,6 +27,7 @@ FOOD_HOME_STORAGE_TYPES: list[_StorageTypeData] = [
             'de': {'name': 'Gefrierschrank'},
             'fr': {'name': 'Congélateur'},
             'es': {'name': 'Congelador'},
+            'pt': {'name': 'Freezer'},
         },
     },
     {
@@ -42,6 +43,7 @@ FOOD_HOME_STORAGE_TYPES: list[_StorageTypeData] = [
             'de': {'name': 'Kühlschrank'},
             'fr': {'name': 'Réfrigérateur'},
             'es': {'name': 'Refrigerador'},
+            'pt': {'name': 'Geladeira'},
         },
     },
     {
@@ -57,6 +59,7 @@ FOOD_HOME_STORAGE_TYPES: list[_StorageTypeData] = [
             'de': {'name': 'Speisekammer'},
             'fr': {'name': 'Garde-manger'},
             'es': {'name': 'Despensa'},
+            'pt': {'name': 'Despensa'},
         },
     },
     {
@@ -72,6 +75,7 @@ FOOD_HOME_STORAGE_TYPES: list[_StorageTypeData] = [
             'de': {'name': 'Medikamentenschrank'},
             'fr': {'name': 'Armoire à pharmacie'},
             'es': {'name': 'Botiquín'},
+            'pt': {'name': 'Armário de remédios'},
         },
     },
 ]

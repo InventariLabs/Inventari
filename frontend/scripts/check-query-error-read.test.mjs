@@ -388,6 +388,71 @@ describe("unguardedClaimsIn", () => {
     ]);
   });
 
+  it("does not let a mutation's flag in the claim's own expression answer for the read", () => {
+    const source = [
+      "function List() {",
+      "  const { data: rows = [], isError } = useThings();",
+      "  const save = useSave();",
+      "  const total = rows.length;",
+      "  return (",
+      "    <div>",
+      "      {isError && <QueryFailure />}",
+      "      {save.isPending ? <Spinner /> : <ListHeader hasRows={total > 0} />}",
+      "    </div>",
+      "  );",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toMatchObject([
+      { site: "List :: total>0" },
+    ]);
+  });
+
+  it("does not let a mutation's flag in a disabled test answer for the read", () => {
+    const source = [
+      "function List() {",
+      "  const { data: rows = [], isError } = useThings();",
+      "  const exporting = useExport();",
+      "  const total = rows.length;",
+      "  return (",
+      "    <div>",
+      "      {isError && <QueryFailure />}",
+      "      <Button disabled={total === 0 || exporting.isPending}>Export</Button>",
+      "    </div>",
+      "  );",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toMatchObject([
+      { site: "List :: total===0" },
+    ]);
+  });
+
+  it("does not let a mutation's flag in an early-return test answer for the read", () => {
+    const source = [
+      "function List() {",
+      "  const { data: rows = [], isError } = useThings();",
+      "  const save = useSave();",
+      "  if (save.isPending) return <Spinner />;",
+      "  const total = rows.length;",
+      "  return <ListHeader hasRows={total > 0} />;",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toMatchObject([
+      { site: "List :: total>0" },
+    ]);
+  });
+
+  it("still takes a field of the read's own query variable for its outcome", () => {
+    const source = [
+      "function List() {",
+      "  const listQuery = useThings();",
+      "  const rows = listQuery.data ?? [];",
+      "  const save = useSave();",
+      "  return listQuery.isPending ? <Spinner /> : <ListHeader hasRows={rows.length > 0} />;",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toEqual([]);
+  });
+
   it("does not accept a guard inside a handler or an effect", () => {
     const source = [
       "function List() {",
@@ -406,6 +471,61 @@ describe("unguardedClaimsIn", () => {
     ].join("\n");
     expect(unguardedClaimsIn(rel, source)).toMatchObject([
       { site: "List :: total>0" },
+    ]);
+  });
+
+  it("does not take a count inside an event handler for a rendered claim", () => {
+    const source = [
+      "function List() {",
+      "  const { data: rows = [] } = useThings();",
+      "  const handleSave = () => {",
+      "    return <Toast count={rows.length === 0 ? 0 : 1} disabled={rows.length === 0} />;",
+      "  };",
+      "  const onPick = useCallback(() => <EmptyState show={rows.length === 0} />, [rows]);",
+      "  return <Row onClick={() => go(<EmptyState show={rows.length === 0} />)} onDone={handleSave} />;",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toEqual([]);
+  });
+
+  it("still reads a count that an effect draws into the header", () => {
+    const source = [
+      "function List() {",
+      "  const { data: rows = [] } = useThings();",
+      "  useEffect(() => { setHeader(<Actions hasRows={rows.length > 0} />); }, [rows]);",
+      "  return null;",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toMatchObject([
+      { site: "List :: rows.length" },
+    ]);
+  });
+
+  it("still reads a count in a render helper held in a variable", () => {
+    const source = [
+      "function List() {",
+      "  const { data: rows = [] } = useThings();",
+      "  const renderBody = () => <Header hasRows={rows.length > 0} />;",
+      "  return renderBody();",
+      "}",
+    ].join("\n");
+    expect(unguardedClaimsIn(rel, source)).toMatchObject([
+      { site: "List :: rows.length" },
+    ]);
+  });
+
+  it("does not take undefined === 0 for an empty answer, but takes > 0", () => {
+    const body = (test) =>
+      [
+        "function Page() {",
+        "  const { data: count } = useThingsCount();",
+        `  return <Button disabled={${test}}>Add</Button>;`,
+        "}",
+      ].join("\n");
+    expect(unguardedClaimsIn(rel, body("count === 0"))).toEqual([]);
+    expect(unguardedClaimsIn(rel, body("count <= 0"))).toEqual([]);
+    expect(unguardedClaimsIn(rel, body("!(count > 0)"))).toMatchObject([
+      { site: "Page :: count>0" },
     ]);
   });
 

@@ -89,7 +89,7 @@ import { resolve, relative, join, basename } from "node:path";
 import { shorthandPermissionKeys } from "./manifest-permission-keys.mjs";
 import { maintainedLanguages } from "./maintained-languages.mjs";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const SRC = resolve(ROOT, "src");
 /**
  * A second tree shaped like `src/` — source files anywhere in it, module
@@ -346,8 +346,6 @@ const DYNAMIC_ALLOWLIST = [
   // into findings.
   { ns: "warehouse", prefix: "confirmDialog.confirmTitle" },
   { ns: "warehouse", prefix: "confirmDialog.confirmMessage" },
-  { ns: "warehouse", prefix: "confirmDialog.completeTitle" },
-  { ns: "warehouse", prefix: "confirmDialog.completeMessage" },
   { ns: "warehouse", prefix: "confirmDialog.cancelTitle" },
   { ns: "warehouse", prefix: "confirmDialog.cancelMessage" },
   { ns: "warehouse", prefix: "confirmDialog.deleteTitle" },
@@ -1652,7 +1650,8 @@ function sweepThreeDots() {
 const threeDots = sweepThreeDots();
 
 const TITLE_SUFFIXES = ["title", "subtitle", "heading"];
-const SIBLING_LANGS = ["de", "fr", "es", "pt"];
+// The maintained languages other than the two a title is written in first.
+const SIBLING_LANGS = LANGUAGES.filter((l) => l !== "en" && l !== "pl");
 
 // A screen's name is not always the whole last segment: `summary_title`,
 // `page_title` and `modalTitle` name a heading just as `title` does, and the

@@ -109,6 +109,30 @@ describe("DocumentExecutionPanel", () => {
     expect(screen.getByText(/stock does not change/i)).toBeInTheDocument();
   });
 
+  it("names no direction in the record-only note, for a taking or a receipt", () => {
+    const panel = (doc: WarehouseDocument) => (
+      <DocumentExecutionPanel
+        document={doc}
+        isPending={false}
+        onCancel={vi.fn()}
+        onSubmit={vi.fn()}
+      />
+    );
+    const { rerender } = render(
+      panel(
+        buildDocument({ type: "INTERNAL_OUT", stock_already_applied: true }),
+      ),
+    );
+    expect(screen.getByText(/stock does not change/i)).not.toHaveTextContent(
+      /left|arrived|came in/i,
+    );
+
+    rerender(panel(buildDocument({ type: "IN", stock_already_applied: true })));
+    expect(screen.getByText(/stock does not change/i)).not.toHaveTextContent(
+      /left|arrived|came in/i,
+    );
+  });
+
   it("applies a scanned barcode to the matching line quantity", async () => {
     render(
       <DocumentExecutionPanel
@@ -659,6 +683,19 @@ describe("DocumentExecutionPanel", () => {
 
     expect(onSubmit).toHaveBeenCalledOnce();
     expect(onSubmit.mock.calls[0][0]).not.toHaveProperty("shipment");
+  });
+
+  it("offers no carrier on an internal issue, which never leaves with one", () => {
+    render(
+      <DocumentExecutionPanel
+        document={{ ...pickedDispatch(), type: "INTERNAL_OUT" }}
+        isPending={false}
+        onCancel={vi.fn()}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByLabelText("Carrier")).not.toBeInTheDocument();
   });
 
   it("offers no carrier on a receipt", () => {

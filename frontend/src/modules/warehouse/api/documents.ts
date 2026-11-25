@@ -162,12 +162,19 @@ export const documentsApi = {
     return response.data;
   },
 
-  /** The members a task can be given to: those who hold the grant it needs. */
-  workItemAssignees: async (): Promise<string[]> => {
-    const response = await api.get<{ user_ids: string[] }>(
-      "/warehouse/work-items/assignees",
-    );
-    return response.data.user_ids;
+  /** The members a task can be given to, by the grant each kind needs. */
+  workItemAssignees: async (): Promise<{
+    userIds: string[];
+    byPermission: Record<string, string[]>;
+  }> => {
+    const response = await api.get<{
+      user_ids: string[];
+      by_permission: Record<string, string[]>;
+    }>("/warehouse/work-items/assignees");
+    return {
+      userIds: response.data.user_ids,
+      byPermission: response.data.by_permission,
+    };
   },
 
   /** Begin the count a schedule asks for; answers with the stock take made. */

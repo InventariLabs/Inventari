@@ -124,8 +124,10 @@ export const LabelCard = memo(function LabelCard({
               onPreviewSingle();
             }}
             className="bg-surface-card border-accent-100 text-accent-700 hover:bg-accent-50 rounded-full"
-            title={t("labels:actions.preview")}
-            aria-label={t("labels:actions.preview")}
+            title={t("labels:actions.previewLabel", { code: label.short_code })}
+            aria-label={t("labels:actions.previewLabel", {
+              code: label.short_code,
+            })}
           >
             <Eye size={14} />
           </Button>

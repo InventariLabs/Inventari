@@ -31,7 +31,9 @@
       "resultPerUnit": "({{amount}} per {{unit}})",
       "shortage_one": "Short of stock: {{count}} ingredient. Completing will be refused.",
       "shortage_other": "Short of stock: {{count}} ingredients. Completing will be refused.",
-      "batch": "Batch {{batch}}"
+      "batch": "Batch {{batch}}",
+      "plannedFor": "Planned for {{date}}",
+      "startedOn": "Started {{date}}"
     },
     "sortLabel": "Sort",
     "sort": {
@@ -55,7 +57,7 @@
     "table": {
       "product": "Product",
       "status": "Status",
-      "date": "Created",
+      "date": "Date",
       "actions": "Actions"
     }
   },
@@ -67,6 +69,7 @@
     "unitCostHint": "Produced qty",
     "missingTitle": "Ingredients without a price",
     "ingredients": "Ingredients",
+    "otherCosts": "Besides the ingredients",
     "chart": {
       "title": "Cost share",
       "empty": "No ingredient has a price yet, so there is nothing to chart."
@@ -209,7 +212,9 @@
       "totalCostGap_one": "{{count}} ingredient was drawn from stock with no cost, so it is missing from this total: {{names}}. The preview before saving can show a higher figure, because it may estimate a missing cost from other stock or supplier offers.",
       "totalCostGap_other": "{{count}} ingredients were drawn from stock with no cost, so they are missing from this total: {{names}}. The preview before saving can show a higher figure, because it may estimate a missing cost from other stock or supplier offers.",
       "estimatedAtCompletion": "Estimated at completion",
-      "estimatedDifference": "Actual difference: {{amount}}",
+      "estimatedOver": "Actual cost: {{amount}} above the estimate",
+      "estimatedUnder": "Actual cost: {{amount}} below the estimate",
+      "estimatedOnTarget": "Actual cost matches the estimate",
       "takenSoFar": "Taken so far"
     },
     "ingredients": "Consumed ingredients",
@@ -525,6 +530,7 @@
     "advanced": "Advanced",
     "advancedHint": "Rules for shortages and overproduction. The defaults suit a small workshop.",
     "laborHourlyRate": "Hourly rate for own work",
+    "laborHourlyRateUnit": "{{currency}} / hour",
     "laborHourlyRateHint": "A BOM's labour is its timed steps at this rate. Zero means labour costs nothing in estimates."
   },
   "availability": {
@@ -652,6 +658,7 @@
     "noPortions": "No output has been added yet.",
     "portionQty": "Portion",
     "portionDay": "Day",
+    "pastDayNote": "Stock and value statements count the run's movements on the day it is recorded, not on this day.",
     "portionLot": "Batch (optional)",
     "addPortion": "Add portion",
     "portionAdded": "Portion added to stock",

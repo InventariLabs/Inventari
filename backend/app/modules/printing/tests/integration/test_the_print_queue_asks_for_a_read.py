@@ -577,7 +577,9 @@ class TestAQueuedJobAnswersToTheReadOfItsTarget:
     every read of a screen that prints, so a role refused a new product job
     read the product codes off the list and printed that job again, and the
     same held for a shelf. A job is listed to the reads that may send its
-    kind of label, whoever sent it.
+    kind of label, whoever sent it: a pool job answers to the module whose
+    records its labels are assigned to, so an equipment-only reader is not
+    handed a product's label or one nobody assigned.
     """
 
     @pytest.fixture
@@ -591,12 +593,14 @@ class TestAQueuedJobAnswersToTheReadOfItsTarget:
         product_id: str,
         shelf: StorageLocation,
         pool_label: LabelPool,
+        asset_label: LabelPool,
     ) -> dict[str, str]:
         """A failed job of each kind, queued by an admin."""
         targets = {
             'product': {'item_ids': [product_id]},
             'shelf': {'location_ids': [str(shelf.id)]},
             'pool': {'label_ids': [str(pool_label.id)]},
+            'asset': {'label_ids': [str(asset_label.id)]},
         }
         jobs = {}
         for name, target in targets.items():
@@ -620,8 +624,8 @@ class TestAQueuedJobAnswersToTheReadOfItsTarget:
         [
             ('locations:read', {'shelf'}),
             ('warehouse:read', {'shelf'}),
-            ('items:read', {'product', 'pool'}),
-            ('equipment:read', {'pool'}),
+            ('items:read', {'product', 'pool', 'asset'}),
+            ('equipment:read', {'asset'}),
         ],
     )
     def test_a_reader_lists_and_resends_only_what_it_may_read(

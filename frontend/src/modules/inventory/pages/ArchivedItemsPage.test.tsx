@@ -124,7 +124,7 @@ vi.mock("@/modules/settings/hooks/useOrganization", () => ({
   useShowModuleData: vi.fn(() => false),
 }));
 
-const purgeLabel = "Delete permanently";
+const purgeLabel = /^Delete .* permanently$/;
 
 /** The archive's two actions are permission-gated, so every test needs an
  *  account that holds them; the ones about denial narrow it themselves. */
@@ -308,6 +308,21 @@ describe("ArchivedItemsPage", () => {
       expect.objectContaining({ cursor: undefined }),
     );
     expect(await screen.findByText("Milk")).toBeInTheDocument();
+  });
+
+  it("says the archive holds more when the server stopped counting", () => {
+    // The first page counts only so far; the bar says "of more than" rather
+    // than presenting where the count stopped as the size of the archive.
+    mockUseArchivedItems.mockImplementation((params) => {
+      const page = stubCursorPages(params);
+      return {
+        ...page,
+        data: { ...page.data, total: 10000, total_capped: true },
+      } as unknown as ReturnType<typeof useArchivedItems>;
+    });
+    renderPage();
+
+    expect(screen.getByText("more than 10000")).toBeInTheDocument();
   });
 
   it("says no matches only after the server answered empty", async () => {

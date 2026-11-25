@@ -41,6 +41,24 @@ vi.mock("@/modules/warehouse/hooks/useWorkItems", () => ({
       { id: "user-anna", name: "Anna Nowak" },
       { id: "user-marek", name: "Marek Lis" },
     ],
+    byPermission: {
+      "warehouse:write": [
+        { id: "user-anna", name: "Anna Nowak" },
+        { id: "user-marek", name: "Marek Lis" },
+      ],
+      "stock_takes:write": [
+        { id: "user-anna", name: "Anna Nowak" },
+        { id: "user-marek", name: "Marek Lis" },
+      ],
+      "maker:write": [
+        { id: "user-anna", name: "Anna Nowak" },
+        { id: "user-marek", name: "Marek Lis" },
+      ],
+      "approvals:approve": [
+        { id: "user-anna", name: "Anna Nowak" },
+        { id: "user-marek", name: "Marek Lis" },
+      ],
+    },
   }),
   useAssignWorkItem: () => ({ mutate: mutations.assign }),
   useSetCustomWorkItemDone: () => ({ mutate: mutations.done }),

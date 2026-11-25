@@ -816,6 +816,15 @@ describe("DocumentRegisterPage — the desktop branch is a table", () => {
 });
 
 describe("DocumentRegisterPage — what the totals leave out or fold in", () => {
+  // No document profile is set up: the totals read the same without one, and
+  // the describe does not lean on a profile an earlier one left on the mock.
+  beforeEach(() => {
+    vi.mocked(profileHooks.useDocumentProfile).mockReturnValue({
+      data: null,
+      isLoading: false,
+    } as unknown as ReturnType<typeof profileHooks.useDocumentProfile>);
+  });
+
   function windowWith(summary: {
     scrap_documents: number;
     documents_without_value: number;
@@ -828,6 +837,22 @@ describe("DocumentRegisterPage — what the totals leave out or fold in", () => 
     } as unknown as ReturnType<typeof documentsHooks.useDocumentRegister>);
     mockRows(buildRowsResponse());
   }
+
+  it("prints the Gross total figure in a step dark enough for AA text", () => {
+    windowWith({ scrap_documents: 0, documents_without_value: 0 });
+    render(
+      <HeaderHarness>
+        <DocumentRegisterPage />
+      </HeaderHarness>,
+    );
+
+    const figure = screen.getByText("Gross", {
+      exact: true,
+    }).nextElementSibling;
+    // accent-600 is 3.77:1 on a white card: below the 4.5:1 floor at this size.
+    expect(figure).toHaveClass("text-accent-700");
+    expect(figure).not.toHaveClass("text-accent-600");
+  });
 
   it("says the month total includes scrap, at what the write-off cost", () => {
     windowWith({ scrap_documents: 2, documents_without_value: 0 });

@@ -182,7 +182,9 @@ export function CorrectionFormModal({
                 {formatQuantityValue(line.original_quantity)}
               </span>
               <span className="text-xs text-on-secondary shrink-0">
-                {t("corrections.minDelta", { max: line.removable_quantity })}
+                {t("corrections.minDelta", {
+                  max: formatQuantityValue(line.removable_quantity),
+                })}
               </span>
             </div>
 

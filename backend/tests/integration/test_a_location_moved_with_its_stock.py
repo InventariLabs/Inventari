@@ -38,9 +38,17 @@ from ._shelf import post_on_shelf
 
 pytestmark = pytest.mark.integration
 
-_A_MONTH_AGO = datetime.now(UTC) - timedelta(days=30)
-_A_WEEK_AGO = datetime.now(UTC) - timedelta(days=7)
-_TWO_WEEKS_AGO = datetime.now(UTC) - timedelta(days=14)
+
+def _a_month_ago() -> datetime:
+    return datetime.now(UTC) - timedelta(days=30)
+
+
+def _a_week_ago() -> datetime:
+    return datetime.now(UTC) - timedelta(days=7)
+
+
+def _two_weeks_ago() -> datetime:
+    return datetime.now(UTC) - timedelta(days=14)
 
 
 def _location(db_session, user, name, parent=None) -> StorageLocation:
@@ -84,7 +92,7 @@ def warehouses(client, auth_headers, db_session, test_user):
     db_session.execute(
         update(StockMove)
         .where(StockMove.organization_id == test_user.organization_id)
-        .values(completed_at=_A_MONTH_AGO)
+        .values(completed_at=_a_month_ago())
     )
     db_session.commit()
     return {
@@ -309,15 +317,15 @@ def test_a_location_moved_twice_names_where_it_stood_at_each_movement(
         auth_headers,
         [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
     )
-    _date_the_relocations(db_session, _TWO_WEEKS_AGO)
+    _date_the_relocations(db_session, _two_weeks_ago())
     post_on_shelf(client, auth_headers, warehouses['flour'], warehouses['shelf'].id, 1)
     db_session.execute(
         update(StockMove)
         .where(
             StockMove.product_template_id == warehouses['flour'].id,
-            StockMove.completed_at > _A_WEEK_AGO,
+            StockMove.completed_at > _a_week_ago(),
         )
-        .values(completed_at=_A_WEEK_AGO)
+        .values(completed_at=_a_week_ago())
     )
     db_session.commit()
     _reorg(
@@ -341,7 +349,7 @@ def test_a_movement_on_a_location_that_never_moved_keeps_todays_path(
     db_session.execute(
         update(StockMove)
         .where(StockMove.product_template_id == rice.id)
-        .values(completed_at=_A_MONTH_AGO)
+        .values(completed_at=_a_month_ago())
     )
     db_session.commit()
     _reorg(
@@ -362,15 +370,15 @@ def test_the_stock_on_a_date_stands_where_the_location_stood_then(
         auth_headers,
         [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
     )
-    _date_the_relocations(db_session, _A_WEEK_AGO)
+    _date_the_relocations(db_session, _a_week_ago())
     now = datetime.now(UTC)
 
     before = {'Flour': Decimal('3'), 'Sugar': Decimal('5')}
-    assert _stock_as_of(client, auth_headers, _TWO_WEEKS_AGO, warehouses['main']) == (
+    assert _stock_as_of(client, auth_headers, _two_weeks_ago(), warehouses['main']) == (
         before
     )
     assert (
-        _stock_as_of(client, auth_headers, _TWO_WEEKS_AGO, warehouses['pantry']) == {}
+        _stock_as_of(client, auth_headers, _two_weeks_ago(), warehouses['pantry']) == {}
     )
     assert _stock_as_of(client, auth_headers, now, warehouses['main']) == {}
     assert _stock_as_of(client, auth_headers, now, warehouses['pantry']) == before
@@ -386,7 +394,9 @@ def test_a_layout_correction_moves_the_past_with_it(
         [_move(warehouses['cold'], warehouses['pantry'], 'correction')],
     )
 
-    assert _stock_as_of(client, auth_headers, _TWO_WEEKS_AGO, warehouses['pantry']) == {
+    assert _stock_as_of(
+        client, auth_headers, _two_weeks_ago(), warehouses['pantry']
+    ) == {
         'Flour': Decimal('3'),
         'Sugar': Decimal('5'),
     }
@@ -528,3 +538,154 @@ def test_filtering_by_a_location_that_moved_keeps_its_old_contents(
         assert (
             len(_filtered_ledger(client, auth_headers, warehouses['flour'], place)) == 2
         )
+
+
+def _relocation_rows_in(client, auth_headers, product, location) -> list[dict]:
+    response = client.get(
+        '/api/v1/stock-moves',
+        headers=auth_headers,
+        params={
+            'product_template_id': str(product.id),
+            'location_id': str(location.id),
+            'reference_type': 'location_relocation',
+        },
+    )
+    assert response.status_code == status.HTTP_200_OK, response.text
+    return response.json()['items']
+
+
+def test_the_row_a_physical_move_wrote_is_listed_under_both_places(
+    client, auth_headers, db_session, warehouses
+):
+    """The move lists under the place the location left and the one it reached.
+
+    Read under the old warehouse the goods came in and never went out unless
+    the move's own row, naming the shelf in both places, is among them.
+    """
+    _reorg(
+        client,
+        auth_headers,
+        [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
+    )
+    for place in (warehouses['main'], warehouses['pantry'], warehouses['cold']):
+        rows = _relocation_rows_in(client, auth_headers, warehouses['flour'], place)
+        assert len(rows) == 1, place.name
+    # A place the location never stood in does not list it.
+    assert (
+        _relocation_rows_in(
+            client, auth_headers, warehouses['flour'], warehouses['empty']
+        )
+        == []
+    )
+
+
+def _document_into(db_session, user, shelf, number, *, status, completed_at=None):
+    from app.modules.warehouse.models.document import Document
+
+    document = Document(
+        organization_id=user.organization_id,
+        type='IN',
+        number=number,
+        status=status,
+        target_location_id=shelf.id,
+        completed_at=completed_at,
+        created_by=user.id,
+    )
+    db_session.add(document)
+    db_session.flush()
+    return document
+
+
+def _documents_in(client, auth_headers, location) -> set[str]:
+    response = client.get(
+        '/api/v1/warehouse/documents',
+        headers=auth_headers,
+        params={'location_id': str(location.id), 'limit': 100},
+    )
+    assert response.status_code == status.HTTP_200_OK, response.text
+    return {row['number'] for row in response.json()['items']}
+
+
+def test_a_completed_document_lists_under_the_place_its_shelf_stood_in(
+    client, auth_headers, db_session, test_user, warehouses
+):
+    """A completed document belongs to where its shelf stood when it was done.
+
+    An open document is work still to do, so it reads the tree as it is today.
+    """
+    done = _document_into(
+        db_session,
+        test_user,
+        warehouses['shelf'],
+        'IN/2026/901',
+        status='COMPLETED',
+        completed_at=_a_month_ago(),
+    )
+    planned = _document_into(
+        db_session, test_user, warehouses['shelf'], 'IN/2026/902', status='DRAFT'
+    )
+    db_session.commit()
+    _reorg(
+        client,
+        auth_headers,
+        [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
+    )
+
+    assert _documents_in(client, auth_headers, warehouses['main']) == {done.number}
+    assert _documents_in(client, auth_headers, warehouses['pantry']) == {planned.number}
+    # The moved place itself keeps both.
+    assert _documents_in(client, auth_headers, warehouses['cold']) == {
+        done.number,
+        planned.number,
+    }
+
+
+def _todo_keys(client, auth_headers, location) -> set[str]:
+    response = client.get(
+        '/api/v1/warehouse/todo',
+        headers=auth_headers,
+        params={
+            'location_id': str(location.id),
+            'done_since': (datetime.now(UTC) - timedelta(hours=2)).isoformat(),
+            'date_to': (datetime.now(UTC) + timedelta(days=7)).date().isoformat(),
+            'limit': 100,
+        },
+    )
+    assert response.status_code == status.HTTP_200_OK, response.text
+    return {item['key'] for item in response.json()['work_items']['items']}
+
+
+def test_the_done_part_of_the_todo_reads_the_place_a_shelf_stood_in(
+    client, auth_headers, db_session, test_user, warehouses
+):
+    """A document done before its shelf was carried stays under the old place.
+
+    The queue filtered by a place lists the document under the place its shelf
+    stood in when it was done; the work still open reads the tree as it is.
+    """
+    done = _document_into(
+        db_session,
+        test_user,
+        warehouses['shelf'],
+        'IN/2026/911',
+        status='COMPLETED',
+        completed_at=datetime.now(UTC) - timedelta(hours=1),
+    )
+    planned = _document_into(
+        db_session, test_user, warehouses['shelf'], 'IN/2026/912', status='CONFIRMED'
+    )
+    db_session.commit()
+    _reorg(
+        client,
+        auth_headers,
+        [_move(warehouses['cold'], warehouses['pantry'], 'physical')],
+    )
+    done_key = f'document:{done.id}:receive'
+    planned_key = f'document:{planned.id}:receive'
+
+    main = _todo_keys(client, auth_headers, warehouses['main'])
+    assert done_key in main
+    assert planned_key not in main
+    pantry = _todo_keys(client, auth_headers, warehouses['pantry'])
+    assert done_key not in pantry
+    assert planned_key in pantry

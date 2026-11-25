@@ -37,6 +37,7 @@ import {
   useUpdateItem,
   useDeleteItem,
 } from "@/modules/inventory/hooks/useItemMutations";
+import { centerInScrollBody } from "../utils/centerInScrollBody";
 
 /** The product a record is a card of, read for the valuation section. */
 /** The sheet opened with the picture the record had then; one changed since,
@@ -304,7 +305,7 @@ export default function ItemEditModal({
     );
     if (!field) return;
     broughtExpiry.current = true;
-    field.scrollIntoView({ block: "center" });
+    centerInScrollBody(field);
   }, [openAtExpiry, isLoadingItem, fieldDefinitions, modalRef]);
 
   const { requestLeave, requestClose } = useLeaveGuard(

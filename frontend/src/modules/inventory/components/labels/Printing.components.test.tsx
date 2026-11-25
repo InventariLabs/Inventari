@@ -47,6 +47,23 @@ const makeLabel = (overrides: Partial<LabelPool> = {}): LabelPool => ({
 // ─── LabelCard ────────────────────────────────────────────────────────────────
 
 describe("LabelCard", () => {
+  it("names the print preview after the label it opens", () => {
+    render(
+      <LabelCard
+        label={makeLabel({ is_assigned: false })}
+        isSelected={false}
+        onToggleSelect={noop}
+        onPreviewSingle={noop}
+        onDelete={noop}
+      />,
+    );
+    expect(
+      screen.getByRole("button", {
+        name: "Print preview of label INV-0001",
+      }),
+    ).toBeInTheDocument();
+  });
+
   it("renders short_code", () => {
     render(
       <LabelCard
@@ -131,6 +148,27 @@ describe("LabelCard", () => {
 // ─── LabelRow ─────────────────────────────────────────────────────────────────
 
 describe("LabelRow", () => {
+  it("names the print preview after the label it opens", () => {
+    render(
+      <table>
+        <tbody>
+          <LabelRow
+            label={makeLabel()}
+            isSelected={false}
+            onToggleSelect={noop}
+            onPreviewSingle={noop}
+            onDelete={noop}
+          />
+        </tbody>
+      </table>,
+    );
+    expect(
+      screen.getByRole("button", {
+        name: "Print preview of label INV-0001",
+      }),
+    ).toBeInTheDocument();
+  });
+
   it("selects the row once for a tap on the checkbox's 44px square, and once for the row", async () => {
     const user = userEvent.setup();
     const onToggleSelect = vi.fn();

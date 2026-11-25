@@ -8,6 +8,7 @@ import { NativeSelect } from "@/components/ui/NativeSelect";
 import type { TranslateFn } from "@/types/i18n";
 import type { WorkItem } from "@/modules/warehouse/types";
 import {
+  assignableMembers,
   canAct,
   useModuleWrites,
   type Member,
@@ -178,7 +179,7 @@ function Where({ item }: { item: WorkItem }) {
 function Controls({
   item,
   sentence,
-  members,
+  byPermission,
   assignable,
   removable,
   startLabel,
@@ -188,7 +189,7 @@ function Controls({
 }: {
   item: WorkItem;
   sentence: string;
-  members: Member[];
+  byPermission: Record<string, Member[]>;
   assignable: boolean;
   removable: boolean;
   /** The label of the button that begins a due count; none for other cards. */
@@ -209,7 +210,7 @@ function Controls({
           onChange={(e) => onAssign(item, e.target.value || null)}
         >
           <option value="">{t("todo.unassigned")}</option>
-          {members.map((member) => (
+          {assignableMembers(item, byPermission).map((member) => (
             <option key={member.id} value={member.id}>
               {member.name}
             </option>
@@ -244,7 +245,7 @@ function Controls({
  */
 export function BoardCard({
   item,
-  members,
+  byPermission,
   canWrite,
   canAssign,
   dragging,
@@ -256,7 +257,8 @@ export function BoardCard({
   onStartCount,
 }: {
   item: WorkItem;
-  members: Member[];
+  /** The holders of each grant, so the card offers only people who can do it. */
+  byPermission: Record<string, Member[]>;
   canWrite: boolean;
   /** Whether the people to give a card to were loaded. */
   canAssign: boolean;
@@ -334,7 +336,7 @@ export function BoardCard({
       <Controls
         item={item}
         sentence={sentence}
-        members={members}
+        byPermission={byPermission}
         assignable={assignable}
         removable={isCustom && canWrite}
         startLabel={startsCount && showAction ? verb : null}

@@ -93,6 +93,22 @@ describe("BoMEntrySlot", () => {
     expect(await screen.findByTestId("probe-recipe")).toBeInTheDocument();
   });
 
+  it("offers a reader the formula open, not a write they cannot do", async () => {
+    signInWith(["maker:read", "maker:write"]);
+    summaryData = {
+      items: [
+        { template_id: "tpl-1", line_count: 2, default_recipe_id: "recipe-1" },
+      ],
+    };
+    renderSlot(makeItem());
+
+    const link = await screen.findByTestId("maker-bom-entry-link");
+    expect(link).toHaveTextContent("Open this product's BOM");
+    fireEvent.click(link);
+
+    expect(await screen.findByTestId("probe-recipe")).toBeInTheDocument();
+  });
+
   it("sends a product without a BOM to the catalog, not the removed editor", async () => {
     summaryData = { items: [] };
     renderSlot(makeItem());

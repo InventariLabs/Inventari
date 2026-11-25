@@ -11,8 +11,14 @@ from redis.exceptions import ConnectionError as RedisConnectionError
 from app.core.token_blacklist import TokenBlacklist
 
 TOKEN = 'eyJhbGciOiJIUzI1NiJ9.test.token'
-FUTURE_EXPIRY = datetime.now(tz=UTC) + timedelta(minutes=30)
-PAST_EXPIRY = datetime.now(tz=UTC) - timedelta(minutes=5)
+
+
+def _future_expiry() -> datetime:
+    return datetime.now(tz=UTC) + timedelta(minutes=30)
+
+
+def _past_expiry() -> datetime:
+    return datetime.now(tz=UTC) - timedelta(minutes=5)
 
 
 # ---------------------------------------------------------------------------
@@ -42,7 +48,7 @@ def _blacklist_with_redis():
 async def test_revoke_stores_token_in_redis():
     """revoke() must write the key with a positive TTL, and not overwrite."""
     bl, redis_mock = _blacklist_with_redis()
-    await bl.revoke(TOKEN, FUTURE_EXPIRY)
+    await bl.revoke(TOKEN, _future_expiry())
 
     redis_mock.set.assert_called_once()
     (key, value), kwargs = redis_mock.set.call_args
@@ -56,7 +62,7 @@ async def test_revoke_stores_token_in_redis():
 async def test_revoke_skips_already_expired_token():
     """revoke() must NOT write anything if the token is already expired."""
     bl, redis_mock = _blacklist_with_redis()
-    await bl.revoke(TOKEN, PAST_EXPIRY)
+    await bl.revoke(TOKEN, _past_expiry())
 
     redis_mock.set.assert_not_called()
 
@@ -66,7 +72,7 @@ async def test_revoke_without_redis_does_not_raise():
     """revoke() without Redis set must log and return gracefully (fail-open)."""
     bl = TokenBlacklist()  # No Redis injected
     # Should not raise any exception
-    await bl.revoke(TOKEN, FUTURE_EXPIRY)
+    await bl.revoke(TOKEN, _future_expiry())
 
 
 # ---------------------------------------------------------------------------
@@ -168,7 +174,7 @@ async def test_revoke_then_is_revoked():
 
     redis_mock.exists = AsyncMock(side_effect=exists_side_effect)
 
-    await bl.revoke(TOKEN, FUTURE_EXPIRY)
+    await bl.revoke(TOKEN, _future_expiry())
     result = await bl.is_revoked(TOKEN)
 
     assert result is True

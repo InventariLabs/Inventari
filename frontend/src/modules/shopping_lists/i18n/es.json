@@ -17,7 +17,10 @@
     "createSuccess": "¡Lista creada!",
     "createFailed": "Error al crear la lista",
     "nameHint": "Déjalo vacío y la lista tomará la fecha de hoy.",
-    "defaultName": "Lista {{date}}"
+    "defaultName": "Lista {{date}}",
+    "urgentNamed": "Urgente: {{name}}",
+    "decreaseNamed": "Reducir la cantidad de {{name}}",
+    "increaseNamed": "Aumentar la cantidad de {{name}}"
   },
   "completed": "Hecho",
   "detail": {

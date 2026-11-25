@@ -26,9 +26,10 @@ def _run(coro: Coroutine[Any, Any, Any]) -> Any:
 def _no_reserve_shelves() -> Any:
     """These tests pin the alert arithmetic; the reserve search adds none.
 
-    The service reads the location tree, the batches and the transfers
-    already on their way so an alert can carry its proposal. Here there is no
-    tree, no batch and nothing in flight: every quantity stands on the rule's
+    The service reads the location tree, the batches, the transfers already
+    on their way and what is on order so an alert can carry its proposal.
+    Here there is no tree, no batch and nothing in flight or on order: every
+    quantity stands on the rule's
     own shelf, which is where the reserve proposal has nothing to offer
     anyway.
     """
@@ -43,6 +44,10 @@ def _no_reserve_shelves() -> Any:
         ),
         patch(
             'app.modules.purchase_orders.replenishment_service._in_flight_inbound_async',
+            AsyncMock(return_value={}),
+        ),
+        patch(
+            'app.modules.purchase_orders.replenishment_service._on_its_way_async',
             AsyncMock(return_value={}),
         ),
         # Nor a price list: a rule with no preferred supplier asks it for the

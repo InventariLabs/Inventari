@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { ReactNode } from "react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
@@ -341,6 +341,42 @@ describe("ProductionListPage run numbers", () => {
     renderPage();
 
     expect(screen.getByText(/Taken so far:/)).toHaveTextContent(/9[.,]00/);
+  });
+});
+
+describe("ProductionListPage run card day and cost note", () => {
+  const showing = (item: ProductionOrder) => {
+    listData = {
+      items: [item],
+      total: 1,
+      limit: 50,
+      offset: 0,
+      has_more: false,
+    };
+    renderPage();
+  };
+
+  it("shows a draft's planned day on its card", () => {
+    showing({ ...order, production_date: "2026-03-27" });
+
+    expect(screen.getByText(/Planned for/)).toHaveTextContent(/27/);
+  });
+
+  it("leaves the cost note off a cancelled run, which has no total to explain", () => {
+    showing({ ...order, status: "CANCELLED", uncosted_ingredients: 1 });
+
+    expect(screen.queryByText(/only ingredient/)).not.toBeInTheDocument();
+  });
+
+  it("keeps the cost note on a completed run that left an ingredient out", () => {
+    showing({
+      ...order,
+      status: "COMPLETED",
+      total_cost: "4.00",
+      uncosted_ingredients: 1,
+    });
+
+    expect(screen.getByText(/has no rate/)).toBeInTheDocument();
   });
 });
 

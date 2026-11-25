@@ -292,24 +292,24 @@ describe("POApprovalSettings", () => {
         "a member who may write orders",
         ["purchase_orders:read", "purchase_orders:write"],
         /you can use this, not reconfigure it/i,
+        /ask someone who can manage it/i,
       ],
-      // A viewer sees no values either, so it gets the same sentence rather
-      // than "you can view this" above an empty page.
+      // A viewer cannot write in the module either, so it gets the read-only
+      // sentence rather than one that says it can use the module.
       [
         "a viewer",
         ["purchase_orders:read"],
-        /you can use this, not reconfigure it/i,
+        /you can view this, not change it/i,
+        /ask an administrator/i,
       ],
-    ])("offers no save surface to %s", async (_who, grants, notice) => {
+    ])("offers no save surface to %s", async (_who, grants, notice, hint) => {
       signInWith(grants);
       arrange(vi.fn());
 
       render(<POApprovalSettings />);
 
       expect(await screen.findByText(notice)).toBeInTheDocument();
-      expect(
-        screen.getByText(/ask someone who can manage it/i),
-      ).toBeInTheDocument();
+      expect(screen.getByText(hint)).toBeInTheDocument();
       expect(
         screen.queryByRole("button", { name: /save/i }),
       ).not.toBeInTheDocument();

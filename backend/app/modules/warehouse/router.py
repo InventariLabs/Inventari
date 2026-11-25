@@ -297,6 +297,13 @@ async def list_documents(
         if location_id is not None
         else None
     )
+    # A completed document stays with the place its shelf stood in when it was
+    # done, however far the shelf has been carried since.
+    location_epochs = (
+        await core_api.locations.subtree_epochs_async(db, org_id, location_id)
+        if location_id is not None
+        else None
+    )
     try:
         module_filters = await resolve_document_filters_async(
             db, org_id, module_filter or []
@@ -324,6 +331,7 @@ async def list_documents(
         completed_from=completed_from,
         completed_to=completed_to,
         location_ids=location_ids,
+        location_epochs=location_epochs,
         limit=limit,
         offset=offset,
         sort_by=sort_by,

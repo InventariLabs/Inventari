@@ -1,8 +1,8 @@
+import { act } from "react";
 import { render, screen, within } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { http, HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
-import { act } from "react";
 import i18n from "i18next";
 import FailedEmailsCard from "./FailedEmailsCard";
 import { server } from "@/test/mocks/server";

@@ -608,7 +608,7 @@ def test_a_transition_snapshot_shows_the_values_of_the_column_it_moves(
             'services/thing_writes.py': (
                 'from app.models.thing import Thing\n'
                 '\n'
-                'snapshot = {"old_status": "a", "new_status": "b"}\n'
+                'snapshot = {"old_status": before, "new_status": after}\n'
                 'lone = {"old_name": "a"}\n'
             ),
         },
@@ -621,4 +621,136 @@ def test_a_transition_snapshot_shows_the_values_of_the_column_it_moves(
         'new_status:shut',
         'old_status:open',
         'old_status:shut',
+    ]
+
+
+def test_a_literal_written_under_a_transition_pair_is_a_value_the_journal_shows(
+    collect_keys, tmp_path: Path
+) -> None:
+    """A status column typed as a plain string declares no set, so the codes a
+    writer puts under ``old_<f>``/``new_<f>`` are read from its literals; a
+    name or attribute there names no code, and a lone key is no transition."""
+    root = _write_app(
+        tmp_path,
+        {
+            'services/campaign_writes.py': (
+                'snapshot = {"old_status": "DRAFT", "new_status": campaign.status}\n'
+                'closing = {"old_status": previous, "new_status": "ARCHIVED"}\n'
+                'lone = {"new_label": "ignored"}\n'
+            ),
+        },
+    )
+
+    payload = collect_keys(root)
+
+    assert payload['values'] == ['new_status:ARCHIVED', 'old_status:DRAFT']
+
+
+def test_a_code_in_the_status_set_of_the_writers_package_is_a_value_it_can_journal(
+    collect_keys, tmp_path: Path
+) -> None:
+    """A writer that journals the status a column holds through a variable
+    names no code itself; the field's set is the one its own package declares
+    for it, so a code added there is enumerated for both shapes of snapshot
+    (``old_``/``new_`` and ``before``/``after``). A set in another package, a
+    set of the same package the writer spells no code of, and a field the
+    writer does not journal as a value, add nothing."""
+    root = _write_app(
+        tmp_path,
+        {
+            'modules/shop/_schemas.py': (
+                'ShopStatus = Literal["DRAFT", "ACTIVE", "ARCHIVED"]\n'
+                '\n'
+                'class ShopOut(BaseModel):\n'
+                '    status: ShopStatus\n'
+                '    label: Literal["not-journalled"]\n'
+            ),
+            'modules/shop/models.py': ('class Shop(Base):\n    status: Mapped[str]\n'),
+            'modules/shop/_gauge.py': (
+                'class GaugeOut(BaseModel):\n    status: Literal["ok", "over"]\n'
+            ),
+            'modules/shop/_writes.py': (
+                'from app.modules.shop.models import Shop\n'
+                '\n'
+                'snapshot = {"old_status": "DRAFT", "new_status": shop.status}\n'
+                'act(before={"status": previous}, after={"status": shop.status})\n'
+            ),
+            'modules/other/_schemas.py': (
+                'class OtherOut(BaseModel):\n    status: Literal["ELSEWHERE"]\n'
+            ),
+        },
+    )
+
+    payload = collect_keys(root)
+
+    assert payload['values'] == [
+        'new_status:ACTIVE',
+        'new_status:ARCHIVED',
+        'new_status:DRAFT',
+        'old_status:ACTIVE',
+        'old_status:ARCHIVED',
+        'old_status:DRAFT',
+        'status:ACTIVE',
+        'status:ARCHIVED',
+        'status:DRAFT',
+    ]
+
+
+def test_a_code_in_a_status_set_the_writer_imports_is_a_value_it_can_journal(
+    collect_keys, tmp_path: Path
+) -> None:
+    """A writer that journals a status through a variable gets the set from its
+    own application module: the enum named for the model it imports, or else
+    the key set of the transition table / collection it checks against. A set
+    named for another model, a lone sentinel constant, an enum of the core
+    contracts and the set of another module add nothing, whatever codes the
+    writer's file spells."""
+    root = _write_app(
+        tmp_path,
+        {
+            'modules/shop/models.py': (
+                'class DocStatus(StrEnum):\n'
+                '    DRAFT = "DRAFT"\n'
+                '    ARCHIVED = "ARCHIVED"\n'
+                '\n'
+                'class DocLineStatus(StrEnum):\n'
+                '    LINE_OPEN = "LINE_OPEN"\n'
+                '\n'
+                'class Doc(Base):\n'
+                '    status: Mapped[str]\n'
+            ),
+            'modules/shop/_writes.py': (
+                'from .models import Doc\n'
+                '\n'
+                'doc.status = "pending"\n'
+                'snapshot = {"old_status": old, "new_status": doc.status}\n'
+            ),
+            'modules/gear/_machine.py': (
+                '_MOVES = {"AVAILABLE": {"GONE"}, "GONE": {"AVAILABLE"}}\n'
+                'VALID_STATUSES = set(_MOVES.keys())\n'
+                'UNKNOWN_STATUS = "UNKNOWN"\n'
+                'def previous(value): return value\n'
+            ),
+            'modules/gear/_writes.py': (
+                'from ._machine import previous\n'
+                'from app.core.contracts import LotStatus\n'
+                '\n'
+                'snapshot = {"old_status": previous(x), "new_status": item.status}\n'
+            ),
+            'core/contracts.py': 'class LotStatus(StrEnum):\n    HELD = "held"\n    OK = "ok"\n',
+            'modules/other/_status.py': 'OTHER_STATUSES = {"ELSEWHERE", "NOWHERE"}\n',
+        },
+    )
+
+    payload = collect_keys(root)
+
+    assert payload['values'] == [
+        'new_status:ARCHIVED',
+        'new_status:AVAILABLE',
+        'new_status:DRAFT',
+        'new_status:GONE',
+        'old_status:ARCHIVED',
+        'old_status:AVAILABLE',
+        'old_status:DRAFT',
+        'old_status:GONE',
     ]

@@ -22,7 +22,10 @@ from ._wms_session_access import (
     take_over_session_async,
 )
 from ._wms_session_close import destination_awaited, destination_to_scan
-from ._wms_session_ops import SessionHeldByOtherUserError
+from ._wms_session_ops import (
+    SessionHeldByOtherUserError,
+    cancel_empty_session_of_given_back_task_async,
+)
 from ._wms_session_release import pause_session_async
 from ._wms_shelf import confirmed_shelf_id, shelf_scan_required
 from .models import Document, DocumentLine, WmsPickLine, WmsPickSession
@@ -513,6 +516,9 @@ async def pause_picking(
         resource='picking_session',
     )
     await pause_session_async(db, session, current_user.id)
+    await cancel_empty_session_of_given_back_task_async(
+        db, org_id, document_id, current_user.id
+    )
 
 
 @router.post(

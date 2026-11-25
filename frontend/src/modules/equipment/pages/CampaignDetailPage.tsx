@@ -171,9 +171,12 @@ function needsHandingOver(
 function CopyLinkButton({
   campaignId,
   responseId,
+  name,
 }: {
   campaignId: string;
   responseId: string;
+  /** Who the link is for: every row's button reads the same. */
+  name: string;
 }) {
   const { t } = useTranslation("equipment");
   const copy = async () => {
@@ -197,6 +200,7 @@ function CopyLinkButton({
       size="sm"
       onClick={() => void copy()}
       leftIcon={<Link2 size={14} />}
+      aria-label={t("attestation.copyLinkNamed", { name })}
     >
       {t("attestation.copyLink")}
     </Button>
@@ -225,12 +229,9 @@ function ResponsesTable({
   campaignId,
   canHandOver,
   canSendEmail,
-  live,
 }: {
   responses: CampaignResponseRecord[];
   campaignId: string;
-  /** The campaign is still open: a closed one keeps the answers it recorded. */
-  live: boolean;
   /** Links can be given out: the reader may write and the campaign is live. */
   canHandOver: boolean;
   canSendEmail: boolean;
@@ -306,9 +307,13 @@ function ResponsesTable({
                   )}
                 </td>
                 <td className="py-2 pr-4">
-                  <ResponseBadge status={responseDisplayStatus(r, live)} />
+                  <ResponseBadge status={responseDisplayStatus(r)} />
                   {canHandOver && needsHandingOver(r, canSendEmail) && (
-                    <CopyLinkButton campaignId={campaignId} responseId={r.id} />
+                    <CopyLinkButton
+                      campaignId={campaignId}
+                      responseId={r.id}
+                      name={r.assignee_name}
+                    />
                   )}
                 </td>
                 <td className="py-2 pr-4 text-on-secondary text-sm">
@@ -327,7 +332,6 @@ function ResponsesTable({
         campaignId={campaignId}
         canHandOver={canHandOver}
         canSendEmail={canSendEmail}
-        live={live}
       />
     </>
   );
@@ -347,12 +351,9 @@ function ResponsesCards({
   campaignId,
   canHandOver,
   canSendEmail,
-  live,
 }: {
   responses: CampaignResponseRecord[];
   campaignId: string;
-  /** The campaign is still open: a closed one keeps the answers it recorded. */
-  live: boolean;
   canHandOver: boolean;
   canSendEmail: boolean;
 }) {
@@ -370,10 +371,14 @@ function ResponsesCards({
                 {r.assignee_email}
               </div>
             </div>
-            <ResponseBadge status={responseDisplayStatus(r, live)} />
+            <ResponseBadge status={responseDisplayStatus(r)} />
           </div>
           {canHandOver && needsHandingOver(r, canSendEmail) && (
-            <CopyLinkButton campaignId={campaignId} responseId={r.id} />
+            <CopyLinkButton
+              campaignId={campaignId}
+              responseId={r.id}
+              name={r.assignee_name}
+            />
           )}
           <div className="text-sm text-on">
             {r.items.length > 0 ? (
@@ -632,7 +637,6 @@ export default function CampaignDetailPage() {
             campaignId={campaign.id}
             canHandOver={canWrite && campaign.status === "ACTIVE"}
             canSendEmail={canSendEmail}
-            live={campaign.status === "ACTIVE"}
           />
         )}
       </Card>

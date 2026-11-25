@@ -8,6 +8,7 @@ import type { WmsReceiveLine } from "@/modules/warehouse/api/documents_receiving
 import { formatQuantityValue } from "@/utils/formatters";
 import { unitLabel } from "@/lib/i18nHelpers";
 import { groupLinesByUnit } from "@/lib/unitQuantities";
+import { isRaisedTypedCount } from "../../lineStatus";
 import { SkippedLineAnswers } from "../SkippedLineAnswers";
 import type { SkipOutcome } from "../SkippedLineAnswers";
 
@@ -71,7 +72,16 @@ export default function WmsReceivingSummary({
     (group) => ({
       unit: group.unit,
       received: group.lines.reduce((sum, ln) => sum + ln.received_quantity, 0),
-      expected: group.lines.reduce((sum, ln) => sum + ln.expected_quantity, 0),
+      // A typed count that was raised never was a plan: what arrived is
+      // the whole of it, as the closed receipt reads it.
+      expected: group.lines.reduce(
+        (sum, ln) =>
+          sum +
+          (isRaisedTypedCount(ln, ln.received_quantity, ln.expected_quantity)
+            ? ln.received_quantity
+            : ln.expected_quantity),
+        0,
+      ),
     }),
   );
 
@@ -132,8 +142,14 @@ export default function WmsReceivingSummary({
                   )}
                 </span>
                 <span className="shrink-0 text-on-secondary">
-                  {formatQuantityValue(ln.received_quantity)}/
-                  {formatQuantityValue(ln.expected_quantity)}{" "}
+                  {formatQuantityValue(ln.received_quantity)}
+                  {isRaisedTypedCount(
+                    ln,
+                    ln.received_quantity,
+                    ln.expected_quantity,
+                  )
+                    ? ""
+                    : `/${formatQuantityValue(ln.expected_quantity)}`}{" "}
                   {unitLabel(t, ln.uom_symbol)}
                 </span>
               </div>

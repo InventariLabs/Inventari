@@ -51,6 +51,7 @@ _GUIDES = {
     ),
     'Running and maintaining it': (
         '../QUICK_DEPLOY.md',
+        'HOME_INSTALL.md',
         '../DEPLOYMENT.md',
         '../SECURITY.md',
         'SCALING.md',
@@ -76,7 +77,10 @@ _GUIDES = {
         'api/openapi.json',
         'api/ERRORS.md',
     ),
-    'Contributing to Inventari': ('../CONTRIBUTING.md',),
+    'Contributing to Inventari': (
+        '../CONTRIBUTING.md',
+        'HOME_SERVER_STORES.md',
+    ),
 }
 
 #: The deployment sections the operator path links by anchor.

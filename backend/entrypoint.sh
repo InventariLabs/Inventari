@@ -26,6 +26,7 @@ import psycopg2
 from app.cli._migration_lock import (
     MIGRATION_LOCK_APPLICATION_NAME,
     MIGRATION_LOCK_KEY,
+    wait_for_the_migration_lock,
 )
 from app.config import settings
 
@@ -38,7 +39,18 @@ conn = psycopg2.connect(dsn, application_name=MIGRATION_LOCK_APPLICATION_NAME)
 conn.autocommit = True
 cur = conn.cursor()
 print('Waiting for migration advisory lock...', flush=True)
-cur.execute('SELECT pg_advisory_lock(%s)', (MIGRATION_LOCK_KEY,))
+
+
+def try_lock():
+    # Tried, not waited for inside the database: a replica blocked in
+    # pg_advisory_lock keeps a statement running, and a migration building an
+    # index concurrently on the replica holding the lock waits for it to end
+    # (app/cli/_migration_lock.py).
+    cur.execute('SELECT pg_try_advisory_lock(%s)', (MIGRATION_LOCK_KEY,))
+    return cur.fetchone()[0]
+
+
+wait_for_the_migration_lock(try_lock)
 try:
     for label, cmd in (
         ('pre-flight check', ['python', 'manage.py', 'db', 'doctor']),

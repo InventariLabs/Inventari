@@ -58,6 +58,7 @@ LANGUAGE_DATE_FORMATS: dict[str, str] = {
     'de': '%d.%m.%Y',
     'fr': '%d/%m/%Y',
     'es': '%d/%m/%Y',
+    'pt': '%d/%m/%Y',
 }
 
 _ENGLISH_MONTHS = (

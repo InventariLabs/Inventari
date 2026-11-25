@@ -28,7 +28,7 @@ logger = get_logger(__name__)
 #: releases after the current one, the window CONTRACTS_STABILITY.md §2
 #: promises a stable surface. An entry carries its own date; nothing here
 #: moves when one lands.
-REMOVAL_RELEASE = '0.14.0'
+REMOVAL_RELEASE = '0.15.0'
 
 
 @dataclass(frozen=True)

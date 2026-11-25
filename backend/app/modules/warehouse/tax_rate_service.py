@@ -127,6 +127,14 @@ async def update_tax_rate(
     user_id: UUID | None = None,
     **fields: Any,
 ) -> TaxRate | None:
+    if fields.get('is_default') is True:
+        # Before the rate's own row: the default moves under the
+        # organization's lock, and a writer waiting for that lock while
+        # holding a rate is one half of a deadlock — the promotion holds the
+        # lock and waits for the row the re-save holds. Nothing below takes a
+        # row before this one, so the order is the same for every writer, and
+        # ``_ensure_single_default``'s own take is the same transaction's.
+        await acquire_advisory_lock(db, f'tax-default:{org_id}')
     tr = await get_tax_rate(db, org_id, rate_id, for_update=True)
     if not tr:
         return None

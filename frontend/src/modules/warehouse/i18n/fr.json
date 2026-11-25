@@ -232,8 +232,6 @@
   "confirmDialog": {
     "confirmTitle": "Confirmer le document",
     "confirmMessage": "Le document sera marqué comme prêt pour l'exécution en entrepôt. Continuer ?",
-    "completeTitle": "Terminer le document",
-    "completeMessage": "Cela exécutera les opérations de stock et fermera le document. Continuer ?",
     "cancelTitle": "Annuler le document ?",
     "cancelConfirm": "Annuler le document",
     "cancelKeep": "Conserver le document",
@@ -524,7 +522,7 @@
     "snapshotDeltaPlus": "Ajouté",
     "snapshotDeltaMinus": "Retiré",
     "executionHelp": "Ajustez la quantité réellement traitée pour chaque ligne avant de fermer le document.",
-    "executionHelpRecordOnly": "Les marchandises ont déjà quitté l'étagère lors de l'étape que ce document enregistre. La clôture ne fait que garder la trace — le stock ne change pas.",
+    "executionHelpRecordOnly": "Le stock a déjà été modifié lors de l'étape que ce document enregistre. La clôture ne fait que garder la trace — le stock ne change pas.",
     "executionMeta": "Prévu {{expected}} {{unit}} · restant {{remaining}} {{unit}}",
     "executionMetaNoUnit": "Prévu {{expected}} · restant {{remaining}} (sans unité)",
     "doneQuantityLabel": "Quantité exécutée",

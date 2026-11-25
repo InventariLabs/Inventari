@@ -458,21 +458,16 @@ class TestPOApprovalFlow:
         """the queue's verdict and the order's approve door agree.
 
         A person named on the open stage who holds ``approvals:read`` without
-        ``approvals:approve`` is offered the decision by the approvals read
-        and admitted by the order's door; someone the stage does not name is
-        offered nothing and refused.
+        ``approvals:approve`` or the order's write key is offered the decision
+        by the approvals read and admitted by the order's door; someone the
+        stage does not name is offered nothing and refused.
         """
         peer = h.create_user(approval_org, email='po-peer@example.com', role='user')
-        h.grant_permissions(
-            peer, ['approvals:read', 'purchase_orders:read', 'purchase_orders:write']
-        )
+        h.grant_permissions(peer, ['approvals:read', 'purchase_orders:read'])
         outsider = h.create_user(
             approval_org, email='po-outsider@example.com', role='user'
         )
-        h.grant_permissions(
-            outsider,
-            ['approvals:read', 'purchase_orders:read', 'purchase_orders:write'],
-        )
+        h.grant_permissions(outsider, ['approvals:read', 'purchase_orders:read'])
         resp = client.post(
             '/api/v1/approvals/workflows',
             headers=approval_headers,

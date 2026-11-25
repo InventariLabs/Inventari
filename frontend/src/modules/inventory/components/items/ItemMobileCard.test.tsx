@@ -137,6 +137,18 @@ describe("ItemMobileCard — the actions button names its product", () => {
 });
 
 describe("ItemMobileCard — quick actions keep their own touch targets", () => {
+  it("offers no Remove 1 unit on a product used up to zero", () => {
+    render(
+      <ItemMobileCard item={makeItem({ quantity: "0" })} {...baseProps()} />,
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "Remove 1 unit of Rack 42U Open Frame",
+      }),
+    ).toBeDisabled();
+  });
+
   // jsdom has no layout, so this pins the classes that make the geometry:
   // two full 44 px buttons in one column, spaced by a gap, with nothing that
   // grows a hit area past its box (a pseudo-element inset, a negative margin).
@@ -145,7 +157,9 @@ describe("ItemMobileCard — quick actions keep their own touch targets", () => 
   it("gives each action a 44 px box and spaces them instead of overlapping them", () => {
     render(<ItemMobileCard item={makeItem()} {...baseProps()} />);
 
-    const remove = screen.getByRole("button", { name: "Remove 1 unit" });
+    const remove = screen.getByRole("button", {
+      name: "Remove 1 unit of Rack 42U Open Frame",
+    });
     const more = screen.getByRole("button", {
       name: "Product actions: Rack 42U Open Frame",
     });
@@ -491,7 +505,7 @@ describe("ItemMobileCard — quick actions carry their words", () => {
   // The tooltip carries the visible words; the accessible name may add to
   // them (here the product), and must start with them (WCAG 2.5.3).
   const NAMES = [
-    ["Remove 1 unit", "Remove 1 unit"],
+    ["Remove 1 unit of Rack 42U Open Frame", "Remove 1 unit"],
     ["Product actions: Rack 42U Open Frame", "Product actions"],
   ];
 

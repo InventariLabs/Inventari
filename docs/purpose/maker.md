@@ -11,31 +11,37 @@ materials, because a BOM decides what gets consumed.
 ## Inside the boundary
 The bill of materials for a product, a production run against it, the consumption of the components,
 the output that lands in stock, and the cost rolled up from what was actually used plus the fixed
-costs a bill of materials states per batch — labour, packaging, overhead, other. The production
-recipe a bill of materials belongs to, and the day's runs in the warehouse's To do list.
+costs a bill of materials states per batch — packaging, overhead, other — and the labour its
+process steps add up to: each step's minutes at the hourly rate in the production settings. The
+production recipe a bill of materials belongs to, and the day's runs in the warehouse's To do
+list. Also here: the plan of the draft runs by day, with everything they need in one list (in
+stock, on order, missing), and the ordering of what is missing.
 
 ## Outside the boundary
 - The instruction a person follows while cooking, and whether it can be cooked today →
   **recipes**; a culinary recipe is read from there once, as a snapshot, when a production recipe is
   made from it
-- What a run lacks → **shopping_lists**: the shortage is added to the list being filled, and
-  nothing is ordered from here
+- Buying what a run lacks → **purchase_orders**: the Plan screen raises draft purchase orders, one per
+  supplier and currency; the order is the buyer's to check and send there
+- What has no supplier → **shopping_lists**: it is put on the list being filled
 - Stock itself → **Core — Inventory**; where things stand → **Core — Spaces**
 - The record of what a run consumed and produced → the moves register in **Core — Inventory**,
   under the run's own reference; no warehouse document is written
 
 ## Own concepts / Borrowed
 **Own:** bill of materials, production recipe (a product's variant, with its bill of materials),
-component line, fixed cost line, production run, run status, cost rollup.
+component line, fixed cost line, process step with its minutes, production run, run status,
+planned day, run coverage (covered, partly covered, short), cost rollup.
 **Borrowed:** ProductTemplate, Item, StockLot, UoM (Inventory); StorageLocation (Spaces); the
 number sequence a run is numbered from (Warehouse); the culinary recipe snapshot (recipes); the
 shopping list a shortage is added to (shopping_lists).
 
 ## Deliberately not done
-- **No scheduling and no capacity planning.** No MRP, no work centres, no routings, no shift
-  calendar. A run happens when somebody starts it.
-- **No time tracking.** Labour enters as a fixed amount per batch; nobody clocks hours or machine
-  time against a run.
+- **No capacity planning.** Runs are planned by day and moved between days by hand, and the plan
+  shows what they need; it does not know how many runs a day can hold. No MRP, no work centres, no
+  routings, no shift calendar. A run happens when somebody starts it.
+- **No time tracking.** Labour is the steps' minutes at one hourly rate; nobody clocks hours or
+  machine time against a run.
 - **No quality records.** Passing or failing a batch is not modelled.
 - **No forecasting of what to produce.** That question belongs to whoever is reading demand.
 

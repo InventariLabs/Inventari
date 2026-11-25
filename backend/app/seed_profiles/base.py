@@ -212,6 +212,7 @@ NEUTRAL_STORAGE_TYPES: list[_StorageTypeData] = [
             'de': {'name': 'Regal / Schrank'},
             'fr': {'name': 'Étagère / armoire'},
             'es': {'name': 'Estante / armario'},
+            'pt': {'name': 'Prateleira / armário'},
         },
     },
     {
@@ -227,6 +228,7 @@ NEUTRAL_STORAGE_TYPES: list[_StorageTypeData] = [
             'de': {'name': 'Lagerraum'},
             'fr': {'name': 'Local de stockage'},
             'es': {'name': 'Sala de almacenamiento'},
+            'pt': {'name': 'Depósito'},
         },
     },
     {
@@ -241,6 +243,7 @@ NEUTRAL_STORAGE_TYPES: list[_StorageTypeData] = [
             'de': {'name': 'System'},
             'fr': {'name': 'Système'},
             'es': {'name': 'Sistema'},
+            'pt': {'name': 'Sistema'},
         },
     },
 ]

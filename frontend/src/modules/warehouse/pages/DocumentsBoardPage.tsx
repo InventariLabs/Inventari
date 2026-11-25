@@ -143,8 +143,11 @@ export default function DocumentsBoardPage() {
   const refetch = () =>
     Promise.all(COLUMN_STATES.map((state) => queries[state].refetch()));
   const measures = useWorkMeasures(REFRESH_MS);
-  const { data: members = [], isError: membersFailed } =
-    useAssignableMembers(canWrite);
+  const {
+    data: members = [],
+    byPermission = {},
+    isError: membersFailed,
+  } = useAssignableMembers(canWrite);
   const assign = useAssignWorkItem();
   const setDone = useSetCustomWorkItemDone();
   const remove = useDeleteCustomWorkItem();
@@ -259,7 +262,7 @@ export default function DocumentsBoardPage() {
                   <BoardCard
                     key={item.key}
                     item={item}
-                    members={members}
+                    byPermission={byPermission}
                     canWrite={canWrite}
                     canAssign={!membersFailed}
                     dragging={dragged?.key === item.key}
@@ -295,7 +298,7 @@ export default function DocumentsBoardPage() {
                   canWrite &&
                   (adding ? (
                     <AddTaskForm
-                      members={members}
+                      members={byPermission["warehouse:write"] ?? []}
                       onCreated={() => setAdding(false)}
                     />
                   ) : (

@@ -1543,6 +1543,9 @@ export const handlers = [
   http.get("/api/v1/users/org-members", () => {
     return HttpResponse.json(onePage([]));
   }),
+  http.get("/api/v1/audit-log/members", () => {
+    return HttpResponse.json([]);
+  }),
   http.get("/api/v1/approvals/workflows/approvers", () => {
     return HttpResponse.json({ user_ids: [] });
   }),
@@ -1647,6 +1650,11 @@ handlers.push(
   // Configuration says how each top-level location receives; none chose
   // two steps until a test says otherwise.
   http.get("/api/v1/warehouse/putaway/receiving-modes", () =>
+    HttpResponse.json(onePage([])),
+  ),
+  // A posted receipt asks which home shelves it offers; none until a test
+  // says otherwise.
+  http.get("/api/v1/warehouse/documents/:id/home-shelf-offers", () =>
     HttpResponse.json(onePage([])),
   ),
   // The shelf settings panel asks how many products stand on a shelf; the

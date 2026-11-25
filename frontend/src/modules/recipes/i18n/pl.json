@@ -93,7 +93,9 @@
     "unknown_inline_many": "Bez powiązania z zapasami: {{count}}",
     "unknown_inline_other": "Bez powiązania z zapasami: {{count}}",
     "incomparable": "Nie da się porównać",
-    "incomparable_tooltip": "Jest na półce, ale miara przepisu i miara stanu nie dadzą się sprowadzić do wspólnej — nie da się powiedzieć, czy wystarczy."
+    "incomparable_tooltip": "Jest na półce, ale miara przepisu i miara stanu nie dadzą się sprowadzić do wspólnej — nie da się powiedzieć, czy wystarczy.",
+    "not_comparable_fix_named": "Wpisz wagę lub objętość sztuki: {{name}}",
+    "link_to_product_for": "Powiąż z produktem: {{name}}"
   },
   "linking": {
     "title": "Składniki bez produktu",
@@ -386,7 +388,6 @@
   },
   "tags_manager": {
     "title": "Tagi",
-    "set_color": "Ustaw kolor",
     "clear_color": "Wyczyść kolor",
     "merge_title": "Scal tagi",
     "merge_from": "Zastąp tag",
@@ -425,7 +426,9 @@
     "delete_success_few": "Usunięto: zaktualizowano {{count}} przepisy",
     "delete_success_many": "Usunięto: zaktualizowano {{count}} przepisów",
     "delete_success_other": "Usunięto: zaktualizowano {{count}} przepisów",
-    "delete_failed": "Nie udało się usunąć tagu"
+    "delete_failed": "Nie udało się usunąć tagu",
+    "set_color_for": "Ustaw kolor: {{name}}",
+    "more_for": "Więcej akcji: {{name}}"
   },
   "import_export": {
     "export_json": "Pobierz JSON",
@@ -802,7 +805,8 @@
     "back_to_plans": "Wróć do planów posiłków",
     "cook_now_named": "Gotuj teraz: {{recipe}}",
     "remove_entry_named": "Usuń z planu: {{recipe}}",
-    "drag_to_move_named": "Przeciągnij, aby przenieść: {{recipe}}"
+    "drag_to_move_named": "Przeciągnij, aby przenieść: {{recipe}}",
+    "delete_plan_for": "Usuń plan {{name}}"
   },
   "cooking": {
     "rateSession_one": "Oceń {{count}} gwiazdką",
@@ -848,8 +852,6 @@
   },
   "bulk": {
     "select_mode": "Zaznacz przepisy",
-    "select": "Zaznacz",
-    "deselect": "Odznacz",
     "select_all": "Zaznacz wszystkie",
     "deselect_all": "Odznacz wszystkie",
     "selected_count": "Zaznaczono: {{count}}",
@@ -887,7 +889,9 @@
     "toolbar_label_one": "Zaznaczono {{count}} przepis",
     "toolbar_label_few": "Zaznaczono {{count}} przepisy",
     "toolbar_label_many": "Zaznaczono {{count}} przepisów",
-    "toolbar_label_other": "Zaznaczono {{count}} przepisu"
+    "toolbar_label_other": "Zaznaczono {{count}} przepisu",
+    "select_for": "Zaznacz {{name}}",
+    "deselect_for": "Odznacz {{name}}"
   },
   "collections": {
     "load_failed": "Nie udało się wczytać kolekcji.",
@@ -907,7 +911,9 @@
     "add_one": "Dodaj",
     "added_one": "Dodano",
     "add_none": "Nie ma czego dodać — najpierw utwórz przepis",
-    "add_no_match": "Żaden przepis nie pasuje do wyszukiwania"
+    "add_no_match": "Żaden przepis nie pasuje do wyszukiwania",
+    "rename_for": "Zmień nazwę: {{name}}",
+    "delete_for": "Usuń kolekcję {{name}}"
   },
   "cookForStock": {
     "button": "Ugotuj partię na zapas",

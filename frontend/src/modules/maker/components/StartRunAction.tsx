@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { DateInput } from "@/components/ui/DateInput";
+import { PastDayNote } from "@/modules/maker/components/PastDayNote";
 import { todayIso } from "@/utils/formatters";
 import { IngredientBatchPicker } from "@/modules/maker/components/IngredientBatchPicker";
 import { useBatchChoice } from "@/modules/maker/hooks/useBatchChoice";
@@ -127,6 +128,7 @@ export function StartRunAction({
             max={todayIso()}
             onChange={setDay}
           />
+          <PastDayNote day={day} />
           <IngredientBatchPicker choice={batches} />
         </div>
       </ConfirmDialog>

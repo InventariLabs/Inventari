@@ -111,7 +111,7 @@ describe("TagManager colour", () => {
     setColor.mockRejectedValueOnce(new Error("refused"));
     render(<TagManager />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Set color" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Set color/ }));
     fireEvent.click(await screen.findByRole("button", { name: "Clear color" }));
 
     await waitFor(() =>
@@ -127,12 +127,12 @@ describe("TagManager colour swatches", () => {
     tags = [tag("dinner")];
     render(<TagManager />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Set color" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Set color/ }));
 
     expect(
       await screen.findByRole("button", { name: "Set color to green" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("dialog", { name: "Set color" })).toBeVisible();
+    expect(screen.getByRole("dialog", { name: /^Set color/ })).toBeVisible();
     expect(screen.queryByRole("button", { name: /#22c55e/ })).toBeNull();
   });
 });

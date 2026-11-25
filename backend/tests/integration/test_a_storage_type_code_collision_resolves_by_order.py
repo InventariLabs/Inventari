@@ -146,3 +146,42 @@ class TestACodeCollisionResolvesByTheListingsOrder:
 
         assert rows['Abe'].behavior_mode == 'STOCK'
         assert rows['Zed'].behavior_mode == 'EXPIRY'
+
+
+@pytest.mark.parametrize('order', INSERTION_ORDERS)
+async def test_editing_a_global_type_forks_onto_the_first_row(
+    real_async_db_session: AsyncSession,
+    collision_org: Organization,
+    collision_user: User,
+    order: tuple[str, str],
+) -> None:
+    """The fork an edit lands on is the listing's first row, not the heap's.
+
+    A global type edited for the organization forks into it or joins its
+    existing fork; with two rows sharing the code, an unordered lookup let
+    the table's physical layout decide which one the edit rewrote.
+    """
+    from app.core.contracts import UserContextDTO
+    from app.schemas.storage_type import StorageTypeUpdate
+    from app.services.storage_type_service import StorageTypeService
+
+    db = real_async_db_session
+    global_type = StorageType(name='Shelf Type', type_code='SHELF')
+    db.add(global_type)
+    await db.commit()
+    rows = await _plant_pair(db, collision_org.id, 'SHELF', order)
+    user = UserContextDTO(
+        id=collision_user.id,
+        organization_id=collision_org.id,
+        role='admin',
+    )
+
+    await StorageTypeService.update_storage_type_async(
+        db, global_type, StorageTypeUpdate(name='Shelf Type (ours)'), user
+    )
+    await db.flush()
+    await db.refresh(rows['Abe'])
+    await db.refresh(rows['Zed'])
+
+    assert rows['Abe'].name == 'Shelf Type (ours)'
+    assert rows['Zed'].name == 'Zed SHELF'

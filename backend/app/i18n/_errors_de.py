@@ -300,6 +300,7 @@ ERRORS_DE: ErrorMessages = {
     'period_already_closed': 'Die Periode {period} ist bereits geschlossen.',
     'period_closed_for_date': 'Die Periode {period} ist geschlossen, daher kann nichts darin datiert werden. Ändern Sie das Belegdatum oder bitten Sie jemanden, der die Periode wieder öffnen darf.',
     'period_closed_for_stock_change': 'Die Periode {period} ist geschlossen, daher kann darin kein Bestand gebucht werden. Bitten Sie jemanden, der die Periode wieder öffnen darf.',
+    'period_closed_for_correction': 'Die Periode {period} ist geschlossen, daher kann die Korrektur nicht angewendet werden. Bitten Sie jemanden, der die Periode wieder öffnen darf.',
     'transfer_more_than_the_record_holds': 'Der Datensatz „{item_name}“ enthält {available}, die Zeile verschiebt {requested}. Verringern Sie die Menge der Zeile oder verschieben Sie den Rest aus einem anderen Datensatz.',
     'transfer_cannot_split_serialized_record': 'Die Verschiebung kann den serialisierten Datensatz {serial_number} nicht teilen; verschieben Sie den ganzen Datensatz.',
     'use_partially_more_than_left': 'Der Datensatz „{item_name}“ enthält {available} dieser Packung, angegeben wurde ein Rest von {requested}. Geben Sie an, wie viel übrig ist – mehr als vorhanden ist nicht möglich.',

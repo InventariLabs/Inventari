@@ -7,7 +7,7 @@ import { DocumentExtraCostsSection } from "./DocumentExtraCostsSection";
 const addMutate = vi.hoisted(() => vi.fn());
 const removeMutate = vi.hoisted(() => vi.fn());
 
-let view: Record<string, unknown> | undefined = {
+const receipt: Record<string, unknown> = {
   costs: [
     {
       id: "c1",
@@ -34,6 +34,11 @@ let view: Record<string, unknown> | undefined = {
     },
   ],
 };
+let view: Record<string, unknown> | undefined = receipt;
+
+vi.mock("@/hooks/useOrganizationCurrency", () => ({
+  useOrganizationCurrency: () => "PLN",
+}));
 
 vi.mock("@/modules/warehouse/hooks/useExtraCosts", () => ({
   useExtraCosts: () => ({ data: view }),
@@ -52,8 +57,6 @@ describe("DocumentExtraCostsSection", () => {
 
     // The whole point of the section: 12.00 instead of 10.00, on screen,
     // while it can still be changed.
-    // `useMoney` formats with the organization's currency, which the test
-    // harness has no opinion about — so this asks for the numbers.
     expect(screen.getByText(/10[.,]00/)).toBeInTheDocument();
     expect(screen.getByText(/12[.,]00/)).toBeInTheDocument();
   });
@@ -85,6 +88,19 @@ describe("DocumentExtraCostsSection", () => {
     expect(screen.getAllByText(/200[.,]00/).length).toBeGreaterThan(0);
     expect(screen.queryByRole("button", { name: /add/i })).toBeNull();
     expect(screen.queryByLabelText("Amount")).toBeNull();
+  });
+
+  it("states the costs in the receipt's currency, not the organization's", () => {
+    // An organization that changed its currency keeps its older receipts in
+    // the one they were written in; their costs are in that one too.
+    view = { ...receipt, currency: "EUR" };
+
+    renderWithProviders(<DocumentExtraCostsSection documentId="doc-1" />);
+
+    expect(screen.getAllByText("€200.00")).toHaveLength(2);
+    expect(screen.getByText("€10.00")).toBeInTheDocument();
+    expect(screen.getByText("€12.00")).toBeInTheDocument();
+    expect(screen.queryByText(/PLN/)).toBeNull();
   });
 
   it("adds nothing to a posted receipt that never carried a cost", () => {

@@ -5,6 +5,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 import { test, expect } from "./fixtures/auth";
 import { ApiHelper } from "./helpers/api";
+import { startSeed } from "./helpers/receive-seed";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
 
 /**
@@ -254,23 +255,107 @@ test.describe("Accessibility — axe scan of the first screens", () => {
     });
 
     // The screens the round met the class on: the register's checkboxes, the
-    // recipe collections' Rename/Delete, and the asset cards' checkboxes.
-    test("document register at 390", async ({ page, authenticatedPage }) => {
+    // recipe collections' Rename/Delete, and the asset cards' checkboxes. A
+    // fresh stack holds none of those rows, so each test seeds what it scans
+    // and waits for the control the target-size rule measures.
+    test("document register at 390", async ({
+      page,
+      authenticatedPage,
+      playwright,
+      baseURL,
+    }, testInfo) => {
+      const seed = await startSeed({ playwright }, baseURL, testInfo);
+      const shelf = await seed.shelf("Shelf");
+      const supplier = await seed.partner("Supplier", "SUPPLIER");
+      const product = await seed.product("Milk");
+      const receipt = await seed.api.createDocument(seed.token, {
+        type: "IN",
+        partner_id: supplier.id,
+        target_location_id: shelf.id,
+        lines: [{ product_template_id: product.id, expected_quantity: 4 }],
+      });
+      await seed.api.confirmDocument(seed.token, receipt.id);
+      await seed.api.completeDocument(seed.token, receipt.id);
+      const number = (await seed.api.getDocument(seed.token, receipt.id))
+        .number as string;
+
       await page.goto("/warehouse/register");
       await settle(page);
+      // The register opens as groups; the rows the scan measures are inside
+      // the one holding the receipt.
+      await page.getByRole("button", { name: /^Receipt \d/ }).click();
+      await expect(
+        page.getByRole("link", { name: new RegExp(number) }),
+      ).toBeVisible({ timeout: 15000 });
       await scan(page, "phone-document-register", { wcag22: true });
     });
 
-    test("recipes at 390", async ({ page, authenticatedPage }) => {
-      await page.goto("/recipes");
-      await settle(page);
-      await scan(page, "phone-recipes", { wcag22: true });
+    test("recipes at 390", async ({ page, authenticatedPage, request }) => {
+      const api = new ApiHelper(request);
+      const { access_token: token } = await api.login(
+        ADMIN_EMAIL,
+        ADMIN_PASSWORD,
+      );
+      const stamp = Date.now().toString(36);
+      const name = `E2E-Axe-Collection-${stamp}`;
+      const made = await request.post("/api/v1/recipes/collections", {
+        headers: { Authorization: `Bearer ${token}` },
+        data: { name },
+      });
+      expect(made.ok(), await made.text()).toBe(true);
+      const collection = (await made.json()) as { id: string };
+      const recipe = await api.createRecipe(token, {
+        name: `E2E-Axe-Recipe-${stamp}`,
+        servings: 2,
+        ingredients: [],
+      });
+      try {
+        await page.goto("/recipes");
+        await settle(page);
+        await expect(page.getByText(name).first()).toBeVisible({
+          timeout: 15000,
+        });
+        await expect(page.getByTestId("recipe-card").first()).toBeVisible();
+        await scan(page, "phone-recipes", { wcag22: true });
+      } finally {
+        await api.deleteRecipe(token, recipe.id).catch(() => {});
+        await request.delete(`/api/v1/recipes/collections/${collection.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
     });
 
-    test("asset list at 390", async ({ page, authenticatedPage }) => {
-      await page.goto("/equipment/assets");
-      await settle(page);
-      await scan(page, "phone-asset-list", { wcag22: true });
+    test("asset list at 390", async ({ page, authenticatedPage, request }) => {
+      const api = new ApiHelper(request);
+      const { access_token: token } = await api.login(
+        ADMIN_EMAIL,
+        ADMIN_PASSWORD,
+      );
+      const stamp = Date.now().toString(36);
+      const storage = await api.createStorage(token, {
+        name: `E2E-Axe-Assets-${stamp}`,
+      });
+      const asset = await api.createEquipmentItem(token, {
+        name: `E2E-Axe-Asset-${stamp}`,
+        quantity: 1,
+        location_id: storage.id,
+        metadata: { equipment: { equipment_status: "AVAILABLE" } },
+      });
+      try {
+        await page.goto("/equipment/assets");
+        await settle(page);
+        await expect(
+          page
+            .getByText(`E2E-Axe-Asset-${stamp}`)
+            .locator("visible=true")
+            .first(),
+        ).toBeVisible({ timeout: 15000 });
+        await expect(page.getByRole("checkbox").first()).toBeVisible();
+        await scan(page, "phone-asset-list", { wcag22: true });
+      } finally {
+        await api.deleteItem(token, asset.id).catch(() => {});
+        await api.deleteStorage(token, storage.id).catch(() => {});
+      }
     });
   });
 

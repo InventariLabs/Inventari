@@ -351,6 +351,34 @@ describe("ItemDetailPage", () => {
     expect(header.querySelector('[class*="border-l-4"]')).toBeNull();
   });
 
+  it("gives an uncategorized record the register lists the asset's verbs and says why", async () => {
+    // The register lists a record carrying the equipment namespace under no
+    // category. Its own page gives it the asset's verbs, the ones a record
+    // that is returned and disposed of is offered, and says why.
+    server.use(
+      http.get("*/items/item-1", () =>
+        HttpResponse.json({
+          ...item,
+          category: null,
+          category_id: null,
+          metadata: { equipment: null },
+        }),
+      ),
+    );
+    render(<PageHeaderHost />);
+
+    await screen.findByText("Digitus");
+    const header = await screen.findByTestId("header-actions");
+    expect(
+      within(header)
+        .getAllByRole("button")
+        .map((button) => button.textContent?.trim()),
+    ).toEqual(["Return", "Move", "Edit", "Dispose"]);
+    expect(
+      screen.getByText(/returned and disposed of rather than consumed/i),
+    ).toBeInTheDocument();
+  });
+
   it("leaves no second set of actions in the page body", async () => {
     render(
       <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>

@@ -25,7 +25,9 @@ from tests.integration._shelf import post_on_shelf
 
 pytestmark = pytest.mark.integration
 
-_DAY = date.today() + timedelta(days=30)
+
+def _day() -> date:
+    return date.today() + timedelta(days=30)
 
 
 def _plan(
@@ -84,14 +86,14 @@ class TestPlannedRunsDoNotCountTheSameStockTwice:
         bread = self._world(
             client, mk_auth_headers, mk_org, mk_input_loc, db_session, '10'
         )
-        first = _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '6', _DAY)
+        first = _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '6', _day())
         second = _plan(
             client,
             mk_auth_headers,
             bread.id,
             mk_output_loc.id,
             '6',
-            _DAY + timedelta(days=1),
+            _day() + timedelta(days=1),
         )
 
         rows = _by_id(client, mk_auth_headers)
@@ -125,9 +127,11 @@ class TestPlannedRunsDoNotCountTheSameStockTwice:
             bread.id,
             mk_output_loc.id,
             '6',
-            _DAY + timedelta(days=5),
+            _day() + timedelta(days=5),
         )
-        earlier = _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '6', _DAY)
+        earlier = _plan(
+            client, mk_auth_headers, bread.id, mk_output_loc.id, '6', _day()
+        )
 
         rows = _by_id(client, mk_auth_headers)
 
@@ -146,8 +150,8 @@ class TestPlannedRunsDoNotCountTheSameStockTwice:
         bread = self._world(
             client, mk_auth_headers, mk_org, mk_input_loc, db_session, '10'
         )
-        first = _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '6', _DAY)
-        second = _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '6', _DAY)
+        first = _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '6', _day())
+        second = _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '6', _day())
 
         rows = _by_id(client, mk_auth_headers)
 
@@ -166,14 +170,14 @@ class TestPlannedRunsDoNotCountTheSameStockTwice:
         bread = self._world(
             client, mk_auth_headers, mk_org, mk_input_loc, db_session, '10'
         )
-        _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '10', _DAY)
+        _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '10', _day())
         starved = _plan(
             client,
             mk_auth_headers,
             bread.id,
             mk_output_loc.id,
             '3',
-            _DAY + timedelta(days=1),
+            _day() + timedelta(days=1),
         )
 
         rows = _by_id(client, mk_auth_headers)
@@ -192,7 +196,7 @@ class TestPlannedRunsDoNotCountTheSameStockTwice:
         bread = self._world(
             client, mk_auth_headers, mk_org, mk_input_loc, db_session, '10'
         )
-        made = _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '2', _DAY)
+        made = _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '2', _day())
         done = client.post(
             f'/api/v1/maker/production/orders/{made["id"]}/complete',
             headers=mk_auth_headers,
@@ -215,20 +219,20 @@ class TestPlannedRunsDoNotCountTheSameStockTwice:
         bread = self._world(
             client, mk_auth_headers, mk_org, mk_input_loc, db_session, '10'
         )
-        first = _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '6', _DAY)
+        first = _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '6', _day())
         second = _plan(
             client,
             mk_auth_headers,
             bread.id,
             mk_output_loc.id,
             '6',
-            _DAY + timedelta(days=1),
+            _day() + timedelta(days=1),
         )
 
         moved = client.patch(
             f'/api/v1/maker/production/orders/{second["id"]}',
             headers=mk_auth_headers,
-            json={'production_date': (_DAY - timedelta(days=1)).isoformat()},
+            json={'production_date': (_day() - timedelta(days=1)).isoformat()},
         )
         assert moved.status_code == 200, moved.text
         rows = _by_id(client, mk_auth_headers)
@@ -251,14 +255,14 @@ class TestPlannedRunsDoNotCountTheSameStockTwice:
         bread = self._world(
             client, mk_auth_headers, mk_org, mk_input_loc, db_session, '10'
         )
-        inside = _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '1', _DAY)
+        inside = _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '1', _day())
         _plan(
             client,
             mk_auth_headers,
             bread.id,
             mk_output_loc.id,
             '1',
-            _DAY + timedelta(days=20),
+            _day() + timedelta(days=20),
         )
         _plan(client, mk_auth_headers, bread.id, mk_output_loc.id, '1', None)
 
@@ -266,8 +270,8 @@ class TestPlannedRunsDoNotCountTheSameStockTwice:
             '/api/v1/maker/production/orders',
             headers=mk_auth_headers,
             params={
-                'planned_from': _DAY.isoformat(),
-                'planned_to': (_DAY + timedelta(days=6)).isoformat(),
+                'planned_from': _day().isoformat(),
+                'planned_to': (_day() + timedelta(days=6)).isoformat(),
             },
         )
 

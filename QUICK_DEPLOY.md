@@ -1,13 +1,14 @@
 # Quick Deploy — Inventari
 
-Deploy to a VPS with automatic HTTPS in 6 steps.
+Deploy to a VPS with automatic HTTPS in 6 steps. A computer at home with no
+domain is [docs/HOME_INSTALL.md](docs/HOME_INSTALL.md).
 
 ## Requirements
 
 - VPS with Ubuntu 26.04 LTS or Debian 13. The steps below are tested on
   Ubuntu 26.04 LTS, and Debian 13 takes the same commands. Another current
-  64-bit Linux with Docker Engine and Docker Compose v2 should work too, but
-  may need small adjustments (on Fedora or RHEL, for example, SELinux can
+  64-bit Linux with Docker Engine and Docker Compose v2.24.4 or newer (the published-images file uses the
+  `!reset` and `!override` tags) should work too, but may need small adjustments (on Fedora or RHEL, for example, SELinux can
   refuse the containers access to the files mounted from the host).
 - A domain name with an A record pointing to your VPS IP
 
@@ -30,7 +31,7 @@ sudo mkdir -p /opt/inventari && sudo chown $USER:$USER /opt/inventari
 cd /opt/inventari
 git clone https://github.com/InventariLabs/Inventari.git .
 git tag --list 'v*' --sort=-v:refname | head -3   # the releases, newest first
-git checkout v0.12.0                                # the one you install
+git checkout v0.13.0                                # the one you install
 ```
 
 A fresh clone stands on `dev`, where work in progress meets; a tag is a
@@ -40,37 +41,39 @@ the next.
 ## Step 3: Configure
 
 ```bash
-cp .env.production.example .env
-nano .env
+./scripts/init-env.sh
 ```
 
-The copied file is the list of variables the stack reads. Seven have no
-working default: five are hex-string secrets to generate (two of them,
-`DB_APP_PASSWORD` and `REDIS_PASSWORD`, are interpolated into connection URLs
-verbatim, where base64's `+ / =` characters would corrupt them; hex is the safe
-choice for all five), plus the domain and the e-mail address for the
-certificate. `docker compose` itself refuses to start without three of them
-(`REDIS_PASSWORD`, `DB_APP_PASSWORD`, `FERNET_SALT`) and says which; left
-empty, the other four fail later and less clearly — the database will not
-initialise without `DB_PASSWORD`, the backend will not boot without a
-`SECRET_KEY` of at least 32 bytes, and Caddy cannot obtain a certificate
-without `DOMAIN` and `ACME_EMAIL`:
+It asks for the domain and the e-mail address the certificate is issued for,
+and writes `.env` with the rest filled in: the five hex secrets the stack
+needs (`DB_PASSWORD`, `DB_APP_PASSWORD`, `REDIS_PASSWORD`, `SECRET_KEY`,
+`FERNET_SALT`) and an `ENCRYPTION_KEY`, at mode 600 because the file holds
+every secret of the installation. Hex, because two of them are interpolated
+into connection URLs verbatim, where base64's `+ / =` characters would corrupt
+them. It never overwrites an existing `.env`; if one is there, it stops.
+`--domain` and `--email` answer its two questions on the command line.
 
 ```env
 DOMAIN=inventari.example.com
 ACME_EMAIL=you@example.com
-DB_PASSWORD=     # use: openssl rand -hex 32
-DB_APP_PASSWORD= # use: openssl rand -hex 32
-REDIS_PASSWORD=  # use: openssl rand -hex 32
-SECRET_KEY=      # use: openssl rand -hex 32
-FERNET_SALT=     # use: openssl rand -hex 32
+DB_PASSWORD=<generated>
+DB_APP_PASSWORD=<generated>
+REDIS_PASSWORD=<generated>
+SECRET_KEY=<generated>
+ENCRYPTION_KEY=<generated>
+FERNET_SALT=<generated>
+INVENTARI_VERSION=0.13.0
 ```
 
-Set `ENCRYPTION_KEY` the same way (`openssl rand -hex 32`). It is optional,
-but without it `SECRET_KEY` also encrypts the secrets organizations store, and
-rotating it means re-encrypting them all (*Rotating the encryption key* in
-[DEPLOYMENT.md](DEPLOYMENT.md)). Never change `FERNET_SALT` once a secret is
-saved: there is no way back from that.
+Those are the values it writes into the file; the other fields of
+`.env.production.example` stay as they were. `INVENTARI_VERSION` is the
+release of the files it was run in, read only by the published-images route
+of Step 4.
+
+`ENCRYPTION_KEY` encrypts the secrets organizations store; without it
+`SECRET_KEY` does that too, and rotating `SECRET_KEY` means re-encrypting them
+all (*Rotating the encryption key* in [DEPLOYMENT.md](DEPLOYMENT.md)). Never
+change `FERNET_SALT` once a secret is saved: there is no way back from that.
 
 Optionally add `WWW_DOMAIN=www.inventari.example.com` to make that name
 redirect to the main address. It needs its own DNS record (A to the same
@@ -93,11 +96,6 @@ must then be kept off the server, because without it the backups cannot be read
 by anyone. It is explained, with `make backup-verify` to prove a backup
 restores, in *Database Backups* in [DEPLOYMENT.md](DEPLOYMENT.md); you can do it
 today or after the stack is up.
-
-`DB_APP_PASSWORD`, `REDIS_PASSWORD` and `FERNET_SALT` are
-enforced by the compose file itself — an empty value stops
-`docker compose up` with a `required variable … is missing` error, before
-anything is built.
 
 The remaining empty fields in the example are optional; the ones most
 installations meet are:
@@ -125,14 +123,39 @@ The comment above each variable in the file says what it does.
 
 ```bash
 docker compose -f docker-compose.prod.yml up -d --build --scale caddy=0
+```
+
+That builds the images on this machine, which takes several minutes. Each
+release also publishes them, for amd64 and arm64 (a Raspberry Pi included), so
+the first start can download instead:
+
+```bash
+echo 'COMPOSE_FILE=docker-compose.prod.yml:docker-compose.images.yml' >> .env
+docker compose up -d --scale caddy=0
+```
+
+Choose one. The commands below are written for the build. On the published
+images, `.env` names the files (the first line above), so **type every later
+`docker compose` command without its `-f docker-compose.prod.yml`** — with the
+flag Compose reads the build file alone, and `up` or `run` would build all
+three images here and recreate the services on them. The published images carry the release as it is: an
+installation that adds community modules builds from source, and leaves the
+images by removing the `COMPOSE_FILE` line from `.env` and running `docker
+compose -f docker-compose.prod.yml up -d --build`
+([DEPLOYMENT.md](DEPLOYMENT.md#pulling-the-published-images-instead-of-building)).
+
+Then wait for the backend:
+
+```bash
 until docker compose -f docker-compose.prod.yml exec -T backend \
     curl -sf http://localhost:8000/health/ready >/dev/null; do sleep 5; done
 ```
 
-The first command builds and starts every service except Caddy, the proxy
+The first command starts every service except Caddy, the proxy
 that puts the installation on the internet; the second returns once the
 backend has migrated the database and answers. Nothing outside the server
-can reach it yet.
+can reach it yet. (On the published images each of these commands is the
+same without `-f docker-compose.prod.yml`.)
 
 ## Step 5: Create the administrator — before the proxy starts
 
@@ -162,6 +185,10 @@ docker compose -f docker-compose.prod.yml up -d
 docker compose -f docker-compose.prod.yml logs -f caddy
 ```
 
+On the published images, the same two commands without
+`-f docker-compose.prod.yml` — typed as printed, the first one would build the
+three images.
+
 Without `--scale`, `up -d` starts Caddy and leaves the services already
 running as they are. Wait 1–2 minutes for Let's Encrypt to issue the
 certificate. Then open `https://inventari.example.com`, sign in, choose the
@@ -182,6 +209,9 @@ cd /opt/inventari
 docker compose -f docker-compose.prod.yml run --rm -e BACKUP_ONCE=true db-backup
 sudo cp -a backups/last backups/before-update
 ```
+
+On the published images, leave `-f docker-compose.prod.yml` off that first
+command: with it, `run` builds the backup image on this machine.
 
 Everything after it — the release's section in the changelog, the next tag,
 the variables the example gained, the build, the recreate and the migrations

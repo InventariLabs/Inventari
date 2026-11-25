@@ -1,6 +1,6 @@
+import type { ReactElement } from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import type { ReactElement } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import CookingMode, { buildSteps, type CookingModeProps } from "./CookingMode";
 import type { RecipeIngredient } from "@/modules/recipes/types/core";

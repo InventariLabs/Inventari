@@ -1203,6 +1203,7 @@ active:scale-[0.98]
 - Escape key closes modals
 - Focus trap in modals (the first focusable element takes focus on open; Tab and Shift+Tab stay inside — `useFocusTrap`)
 - Form labels connected via `htmlFor` / `id`
+- A `<button>` / `<Button>` that holds only an icon carries `aria-label` (or `aria-labelledby` / `title`); `jsx-a11y/icon-only-control-name` in `eslint.config.js` refuses one without, and its findings in a relaxed file are frozen by `scripts/a11y-baseline.json` like the plugin's own
 - Loading states: `disabled` + spinner visual
 - Disabled state: `opacity-50` + `pointer-events-none` / `cursor-not-allowed`
 - Color contrast: Text on colored backgrounds must meet WCAG AA (4.5:1 for normal text)

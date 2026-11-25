@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render as renderPlain, screen } from "@testing-library/react";
+import type { ReactElement } from "react";
 import { ProductionIngredientsTable } from "./ProductionIngredientsTable";
 import { ProductionStockMovesTable } from "./ProductionStockMovesTable";
 import { withLanguage } from "@/test/mocks/i18n";
@@ -15,6 +16,13 @@ import type {
 vi.mock("@/hooks/useOrganizationCurrency", () => ({
   useOrganizationCurrency: () => "PLN",
 }));
+
+// The ingredients table names its places by looking their ids up, so every
+// render here carries a client.
+const render = (
+  ui: ReactElement,
+  options?: { wrapper?: typeof QueryWrapper },
+) => renderPlain(ui, { wrapper: QueryWrapper, ...options });
 
 const line: ProductionOrderLine = {
   id: "line-1",
@@ -246,18 +254,31 @@ describe("ProductionStockMovesTable", () => {
         name: "Cold Storage",
         parent_id: "annex",
       },
+      { id: "pantry", name: "Pantry", parent_id: "annex" },
       { id: "annex", name: "Annex", parent_id: null },
     ]);
 
     render(
       <ProductionStockMovesTable
-        stockMoves={[{ ...move, from_location_path: "Cold Storage" }]}
+        stockMoves={[
+          { ...move, from_location_path: "Cold Storage" },
+          {
+            ...move,
+            id: "move-2",
+            from_location_id: "pantry",
+            from_location_name: "Pantry",
+          },
+        ]}
       />,
       { wrapper: QueryWrapper },
     );
 
-    expect(await screen.findByText("← Cold Storage")).toBeInTheDocument();
-    expect(screen.queryByText(/Annex/)).not.toBeInTheDocument();
+    // The second row's shelf never moved, so it reads the tree: once it says
+    // "Annex › Pantry" the locations have arrived, and the first row is
+    // being judged against them rather than before they loaded.
+    expect(await screen.findByText("← Annex › Pantry")).toBeInTheDocument();
+    expect(screen.getByText("← Cold Storage")).toBeInTheDocument();
+    expect(screen.queryByText(/Annex › Cold Storage/)).not.toBeInTheDocument();
   });
 
   it("falls back to a label when a named location's row is gone", () => {

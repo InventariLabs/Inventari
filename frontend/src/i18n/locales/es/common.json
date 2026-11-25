@@ -1260,7 +1260,9 @@
     "sessionEndedReadUnsaved": "Tu sesión ha terminado, así que lo que escribiste en esta pantalla no se conservó. Inicia sesión de nuevo y empieza otra vez.",
     "imageFormatUnsupported": "Este formato de imagen no es compatible. Usa una imagen JPG, PNG, GIF o WebP.",
     "modulesUnavailableTitle": "No se pudo leer la lista de módulos",
-    "modulesUnavailableBody": "No se pudo leer la lista de módulos activos de tu organización, así que no se pueden nombrar los espacios de trabajo. No se ha perdido nada: inténtalo de nuevo en un momento y, si el error persiste, avisa a quien administra esta instalación."
+    "modulesUnavailableBody": "No se pudo leer la lista de módulos activos de tu organización, así que no se pueden nombrar los espacios de trabajo. No se ha perdido nada: inténtalo de nuevo en un momento y, si el error persiste, avisa a quien administra esta instalación.",
+    "modulesNotLoadedTitle": "Una parte de la aplicación no se cargó",
+    "modulesNotLoadedBody": "No se pudo cargar un módulo que usa tu organización, algo habitual justo después de una actualización. No se ha perdido nada: recarga la página y, si el error persiste, avisa a quien administra esta instalación."
   },
   "a11y": {
     "skipToContent": "Saltar al contenido",
@@ -1272,7 +1274,6 @@
     "templatePreview": "Vista previa de plantilla",
     "currency": "Moneda",
     "imagePreview": "Vista previa de la imagen",
-    "urgent": "Urgente",
     "removeMember": "Eliminar al miembro {{name}}",
     "copyLink": "Copiar enlace de invitación",
     "favorite": "Favorito",

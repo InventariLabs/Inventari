@@ -40,7 +40,7 @@ async function seedLifecycleContext(
     name: `E2E-Comp-OutStore-${stamp}`,
   });
 
-  // BoM: 1 unit out → 2 kg ingredient
+  // BoM: 1 unit out → 2 pcs ingredient
   const line = await api.createBomLine(token, {
     parent_template_id: output.id,
     child_template_id: ingredient.id,
@@ -101,7 +101,7 @@ test.describe("Maker — completion lifecycle", () => {
   });
 
   test("happy path: complete consumes stock and produces item", async () => {
-    // 1. Seed enough stock at the input storage: 1 unit out → 2 kg in.
+    // 1. Seed enough stock at the input storage: 1 unit out → 2 pcs in.
     // Use the ingredient's name directly so the resolver hits the
     // existing template (created in beforeAll via createProductTemplate).
     const stock = await api.seedStock(token, {
@@ -134,17 +134,17 @@ test.describe("Maker — completion lifecycle", () => {
       (l) => l.child_template_id === ingredient.id,
     );
     expect(ingLine).toBeTruthy();
-    expect(parseFloat(ingLine!.consumed_qty)).toBeCloseTo(6, 1); // 3 units × 2 kg
+    expect(parseFloat(ingLine!.consumed_qty)).toBeCloseTo(6, 1); // 3 units × 2 pcs
   });
 
   test("insufficient stock blocks completion (no partial consume)", async () => {
     // The seed in beforeAll already produced the ingredient (via happy
     // path test). To prove the deficit guard we must consume it back to
     // zero. Cancel the prior draft first to keep state simple, then
-    // create a fresh stock record with only 1 kg and demand 4 kg.
+    // create a fresh stock record with only 1 pcs and demand 4 pcs.
     //
     // Strategy: rather than mutate existing quants, this test creates a
-    // *separate* ingredient template + BoM line and only seeds 1 kg of
+    // *separate* ingredient template + BoM line and only seeds 1 pcs of
     // it. That isolates the deficit from shared state.
     const stamp = Date.now();
     const deficitIng = await api.createProductTemplate(token, {
@@ -161,7 +161,7 @@ test.describe("Maker — completion lifecycle", () => {
       product_template_id: deficitIng.id,
       product_template_name: deficitIng.name,
       location_id: sIn.id,
-      quantity: 1, // demand 2 units × 2 = 4 kg; only 1 kg available
+      quantity: 1, // demand 2 units × 2 = 4 pcs; only 1 pcs available
     });
     createdItemIds.push(stock.item_id);
 

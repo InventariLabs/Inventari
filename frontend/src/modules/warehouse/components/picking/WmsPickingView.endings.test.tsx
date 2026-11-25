@@ -120,7 +120,7 @@ function TodoRow() {
         <WorkItemRow
           key={item.key}
           item={item}
-          members={[]}
+          byPermission={{}}
           canWrite
           canAssign={false}
           onAssign={vi.fn()}

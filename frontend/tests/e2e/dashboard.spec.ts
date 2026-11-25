@@ -123,6 +123,10 @@ test.describe("Dashboard — overview & widgets", () => {
     // Every tile's badge adds its own read, so a module that polls or keys
     // its query apart from a screen that already holds the answer shows here
     // as a repeated address or a count past the ceiling.
+    // The launcher the beforeEach opened can still start its tiles' reads
+    // after the network went quiet (a slow runner compiles the tiles first);
+    // leaving it before counting keeps them out of the one load measured.
+    await page.goto("about:blank");
     const tally = countApiReads(page);
     await page.goto("/launcher");
     await page

@@ -119,7 +119,11 @@
     "selectItems": "Sélectionner des produits",
     "select": "Sélectionner {{name}}",
     "addOneUnit": "Ajouter 1 unité",
-    "consume": "Retirer"
+    "consume": "Retirer",
+    "consume1unitFor": "Retirer 1 unité de {{name}}",
+    "addOneUnitFor": "Ajouter 1 unité à {{name}}",
+    "editFor": "Modifier {{name}}",
+    "deleteFor": "Supprimer {{name}}"
   },
   "import": {
     "pleaseWait": "Veuillez patienter pendant que nous traitons vos produits.",
@@ -496,7 +500,7 @@
     "discardFailed": "Échec du retrait du stock",
     "recordLeftList": "L'enregistrement a quitté la liste des produits.",
     "openRecord": "Ouvrir l'enregistrement",
-    "equipmentNote": "Catégorie équipement : cet enregistrement est retourné et éliminé plutôt que consommé et supprimé."
+    "equipmentNote": "Cet enregistrement est retourné et éliminé plutôt que consommé et supprimé."
   },
   "noArchivedItemsDescRestoreOnly": "Les produits supprimés arrivent ici et peuvent être restaurés. La suppression définitive est désactivée pour cette organisation.",
   "noArchivedItemsDescViewOnly": "Les produits supprimés apparaissent ici. Les restaurer demande une permission que ce compte n'a pas.",
@@ -533,5 +537,7 @@
     "fefoHelp": "FEFO : ce qui périme en premier sort en premier, quelle que soit sa date d’entrée.",
     "sharedProduct": "Ce produit vient du catalogue partagé : l'ordre de sortie de son stock appartient au catalogue et ne peut pas être modifié ici."
   },
-  "addStorage": "Ajouter un emplacement"
+  "addStorage": "Ajouter un emplacement",
+  "restoreItemNamed": "Restaurer {{name}}",
+  "purgeItemNamed": "Supprimer {{name}} définitivement"
 }

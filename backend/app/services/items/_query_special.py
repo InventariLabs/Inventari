@@ -100,6 +100,7 @@ async def get_archived_items_async(
     limit: int = 50,
     after: tuple[datetime, UUID] | None = None,
     known_total: int | None = None,
+    count_up_to: int | None = None,
     context_tag: str | None = None,
     claimed_tags: set[str] | None = None,
     module_scope: str | None = None,
@@ -114,7 +115,9 @@ async def get_archived_items_async(
     id) rather than with a larger ``offset``, so a page deep in an archive
     that only grows costs what the first one costs. The count is the whole
     answer to the filters; a caller holding it from the first page passes it
-    back as ``known_total`` and it is not taken again.
+    back as ``known_total`` and it is not taken again. ``count_up_to`` stops
+    that count one row past it, so a total above it means the archive holds
+    more (``db_utils.LIST_COUNT_CAP``).
 
     context_tag: positive filter — only items whose category has this tag.
     claimed_tags: negative filter — exclude items whose category tag is in
@@ -163,10 +166,13 @@ async def get_archived_items_async(
 
         conditions.append(unclaimed_by_a_module(claimed_tags))
 
+    counted = select(Item.id).where(*conditions)
+    if count_up_to is not None:
+        counted = counted.limit(count_up_to + 1)
     total = (
         known_total
         if known_total is not None
-        else await db.scalar(select(func.count()).select_from(Item).where(*conditions))
+        else await db.scalar(select(func.count()).select_from(counted.subquery()))
     )
 
     async def read(

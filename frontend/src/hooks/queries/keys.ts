@@ -7,6 +7,7 @@ export const queryKeys = {
   auditLog: {
     list: (filters: unknown) => ["audit-log", filters] as const,
     targetTypes: ["audit-log", "target-types"] as const,
+    members: ["audit-log", "members"] as const,
   },
   stockMoves: {
     /** The ledger prefix — what every writer of stock invalidates. */
@@ -305,6 +306,8 @@ export const queryKeys = {
     /** How each warehouse receives: one step, or into a receiving area. */
     putawayReceivingModes: ["putaway-receiving-modes"] as const,
     putawayHomeSilenced: ["putaway-home-silenced"] as const,
+    homeShelfOffers: (documentId: string) =>
+      ["documents", documentId, "home-shelf-offers"] as const,
     /** Every capacity entry of the organization — the locations tab's list. */
     putawayCapacityAll: ["putaway-capacity"] as const,
     putawayCapacity: (locationId: string) =>
@@ -447,6 +450,7 @@ export const queryKeys = {
   },
 
   productTemplates: {
+    all: ["product-templates"] as const,
     count: ["product-templates", "count"] as const,
     search: (term: string) => ["product-templates", "search", term] as const,
     stock: (templateId: string) =>

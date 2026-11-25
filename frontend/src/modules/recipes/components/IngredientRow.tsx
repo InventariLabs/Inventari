@@ -253,6 +253,9 @@ const IngredientRow = memo(function IngredientRow({
               <Link
                 to={`/inventory/items/${ingredient.best_item.item_id}`}
                 className="underline underline-offset-2"
+                aria-label={t("availability.not_comparable_fix_named", {
+                  name: ingredient.name,
+                })}
               >
                 {t("availability.not_comparable_fix")}
               </Link>

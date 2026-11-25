@@ -145,6 +145,13 @@ _OPEN = {
     'POST /api/v1/approvals/requests/{request_id}/approve': 'approve grant or named',
     'POST /api/v1/approvals/requests/{request_id}/reject': 'approve grant or named',
     'POST /api/v1/approvals/requests/{request_id}/cancel': 'the requester withdraws it',
+    # A target's own decision doors ask the engine's rule, through
+    # ``require_decision_possible_on_target``: the approve grant, or named on
+    # the open stage with the approvals read.
+    'POST /api/v1/approvals/documents/{doc_id}/approve': 'approve grant or named',
+    'POST /api/v1/approvals/documents/{doc_id}/reject': 'approve grant or named',
+    'POST /api/v1/purchase-orders/{po_id}/approve': 'approve grant or named',
+    'POST /api/v1/purchase-orders/{po_id}/reject': 'approve grant or named',
 }
 
 #: Reads that answer to a grant other than a read, each with why that grant

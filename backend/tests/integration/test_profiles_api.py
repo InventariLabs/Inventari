@@ -76,8 +76,8 @@ class TestProfilesApi:
         assert food['branding'] == {'subtitle_key': 'profiles.food_home.subtitle'}
 
         equipment = by_id['equipment_wms']
-        assert equipment['theme']['--color-accent-500'] == '59 130 246'
-        assert equipment['theme']['--color-accent-600'] == '37 99 235'
+        assert equipment['theme']['--color-accent-500'] == '20 184 166'
+        assert equipment['theme']['--color-accent-600'] == '13 148 136'
         assert equipment['branding'] == {
             'subtitle_key': 'profiles.equipment_wms.subtitle'
         }

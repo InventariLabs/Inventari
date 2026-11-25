@@ -81,6 +81,8 @@ const CATALOG_POINTER = "/settings/audit/fields/";
 const FIELDS = "fields";
 const TARGET_TYPES = "targetTypes";
 const VALUES = "values";
+/** A value worded from the dictionary of the screen that owns the field. */
+const RESOLVED = "resolver";
 
 /** The renderer the journal's values go through, read for the fields it words
  * on its own (`VALUE_RESOLVERS`). */
@@ -123,10 +125,91 @@ export function valueKeys(pairs, resolved = resolverFields()) {
       pair.split(":")[0],
       pair.slice(pair.indexOf(":") + 1),
     ];
-    if (CAPITALISED_CODE.test(value)) keys.add(value);
-    else if (!resolved.has(field)) keys.add(`${field}_${value}`);
+    if (resolved.has(field)) continue;
+    keys.add(CAPITALISED_CODE.test(value) ? value : `${field}_${value}`);
   }
   return [...keys].sort();
+}
+
+/**
+ * The catalogue a resolver reads, for the resolvers that read one key per
+ * code: `field -> { ns, prefix, lower }` for
+ * `t(\`<ns>:<prefix>${code}\`)` or `…${code.toLowerCase()}`. A resolver that
+ * calls a function (`auditProfileName`) or a lookup table has no catalogue
+ * this gate can read, and is left out.
+ */
+export function resolverCatalogs(
+  source = readFileSync(RENDERER_PATH, "utf8"),
+) {
+  const block = source.match(
+    /const VALUE_RESOLVERS[\s\S]*?\n> = \{([\s\S]*?)\n\};/,
+  );
+  if (!block) return new Map();
+  const found = new Map();
+  for (const entry of block[1].split(/\n(?= {2}\w+:)/)) {
+    const field = entry.match(/^\s*(\w+):/m)?.[1];
+    const call = entry.match(
+      /`(\w+):([\w.]*)\$\{code(\.toLowerCase\(\))?\}`/,
+    );
+    if (field && call)
+      found.set(field, { ns: call[1], prefix: call[2], lower: !!call[3] });
+  }
+  return found;
+}
+
+/** Every dotted path of one namespace's catalogue in one language. */
+function namespacePaths(language, ns) {
+  const file = [
+    resolve(LOCALES_DIR, `${language}/${ns}.json`),
+    resolve(ROOT, `src/i18n/locales/${language}/${ns}.json`),
+    resolve(ROOT, `src/modules/${ns}/i18n/${language}.json`),
+  ].find(existsSync);
+  const paths = new Set();
+  if (!file) return paths;
+  const walk = (node, prefix) => {
+    if (node && typeof node === "object") {
+      for (const [key, value] of Object.entries(node)) {
+        const path = prefix ? `${prefix}.${key}` : key;
+        paths.add(path);
+        walk(value, path);
+      }
+    }
+  };
+  walk(JSON.parse(readFileSync(file, "utf8")), "");
+  return paths;
+}
+
+/**
+ * Stored values a resolver words from its own catalogue that the catalogue
+ * lacks, per language: `{ language, key: "<ns>:<path>" }`.
+ *
+ * `valueKeys` leaves a resolver field alone because the journal reads the
+ * owning screen's dictionary, not `settings.audit.values`; a code that
+ * dictionary does not carry would print raw all the same, so it is reported
+ * here against the dictionary the reader will actually be sent to.
+ */
+export function resolverGaps(
+  pairs,
+  catalogs = resolverCatalogs(),
+  languages = LANGUAGES,
+) {
+  const found = [];
+  for (const pair of pairs) {
+    const field = pair.split(":")[0];
+    const value = pair.slice(pair.indexOf(":") + 1);
+    const catalog = catalogs.get(field);
+    if (!catalog) continue;
+    const path = `${catalog.prefix}${catalog.lower ? value.toLowerCase() : value}`;
+    for (const language of languages) {
+      if (!namespacePaths(language, catalog.ns).has(path))
+        found.push({
+          language,
+          key: `${catalog.ns}:${path}`,
+          section: RESOLVED,
+        });
+    }
+  }
+  return found;
 }
 
 export function catalogKeys(languages = LANGUAGES, section = FIELDS) {
@@ -216,6 +299,7 @@ function allGaps(keys, targetTypes, values = []) {
       ...gap,
       section: VALUES,
     })),
+    ...resolverGaps(values),
     ...gaps(targetTypes, catalogKeys(LANGUAGES, TARGET_TYPES)).map((gap) => ({
       ...gap,
       section: TARGET_TYPES,
@@ -415,7 +499,9 @@ function runCli() {
         );
       const first = reported[0];
       console.error(
-        `Add \`settings.audit.${first.section ?? FIELDS}.${first.key}\` to src/i18n/locales/<lang>/common.json — the journal prints the raw key until you do.`,
+        first.section === RESOLVED
+          ? `Add \`${first.key}\` to the ${first.key.split(":")[0]} catalogue in every language — the journal words this value from there and prints the raw code until you do.`
+          : `Add \`settings.audit.${first.section ?? FIELDS}.${first.key}\` to src/i18n/locales/<lang>/common.json — the journal prints the raw key until you do.`,
       );
     }
     process.exit(1);

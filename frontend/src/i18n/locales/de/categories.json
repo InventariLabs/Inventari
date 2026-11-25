@@ -121,7 +121,9 @@
   "newCategory": "Neue Kategorie",
   "createCategory": "Kategorie erstellen",
   "actions": {
-    "restore": "Wiederherstellen"
+    "editNamed": "{{name}} bearbeiten",
+    "deleteNamed": "{{name}} löschen",
+    "restoreNamed": "{{name}} wiederherstellen"
   },
   "addCategory": "Kategorie hinzufügen",
   "itemsCount_one": "Artikel",

@@ -19,3 +19,12 @@ export function useAuditTargetTypes() {
     staleTime: 60_000,
   });
 }
+
+/** The people the log's rows can name, for its member filter. */
+export function useAuditMembers() {
+  return useQuery({
+    queryKey: queryKeys.auditLog.members,
+    queryFn: auditLogApi.members,
+    staleTime: 60_000,
+  });
+}

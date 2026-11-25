@@ -19,7 +19,7 @@ from typing import Any
 from uuid import UUID
 
 from app.core.datetimes import format_date_for
-from app.core.money import ZERO, amounts_by_rate, line_amounts
+from app.core.money import ZERO, amounts_by_rate, line_amounts, quantise
 from app.core.print_identity import IssuerContext, print_date_rows
 from app.core.public_api import core_api
 
@@ -102,9 +102,11 @@ def _totals(rows: list[dict[str, Any]], labels: dict[str, str]) -> dict[str, Any
             'tax_by_rate': [],
         }
     return {
-        'total_net': sum((row['net'] for row in rows), ZERO),
-        'total_tax': sum((row['tax'] for row in rows), ZERO),
-        'total_gross': sum((row['gross'] for row in rows), ZERO),
+        # Rounded once, here: a custom layout prints {{ total_net }} as the
+        # order's amount, not as the unrounded sum of its lines.
+        'total_net': quantise(sum((row['net'] for row in rows), ZERO)),
+        'total_tax': quantise(sum((row['tax'] for row in rows), ZERO)),
+        'total_gross': quantise(sum((row['gross'] for row in rows), ZERO)),
         # A reduced rate on some lines and the standard one on others: the
         # amounts per rate, rounded once per rate like the totals.
         'tax_by_rate': amounts_by_rate(

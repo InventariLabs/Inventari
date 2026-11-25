@@ -112,10 +112,16 @@ class StorageTypeService:
         """
         if storage_type.organization_id is None:
             existing_fork = await db.scalar(
-                select(StorageType).where(
+                select(StorageType)
+                .where(
                     StorageType.organization_id == user.organization_id,
                     StorageType.type_code == storage_type.type_code,
                 )
+                # The listing's order, not the heap's: two rows sharing a code
+                # are a legacy shape, and the edit lands on the row every
+                # other reader resolves the code to.
+                .order_by(*STORAGE_TYPE_ORDER)
+                .limit(1)
             )
 
             if existing_fork:

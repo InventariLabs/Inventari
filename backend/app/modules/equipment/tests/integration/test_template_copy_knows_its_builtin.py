@@ -106,3 +106,72 @@ class TestTheCopyIsToldItsBuiltInMovedOn:
 
         still_there = client.get(TEMPLATES, headers=eq_auth_headers).json()['items']
         assert seeded[0]['id'] in {t['id'] for t in still_there}
+
+
+@pytest.mark.integration
+class TestTheCopyCanBeResetToItsBuiltIn:
+    def _write_into(self, db: Session, template_id: str) -> None:
+        row = db.scalars(
+            select(DocumentTemplate).where(DocumentTemplate.id == template_id)
+        ).one()
+        row.body_html = '<p>our own wording</p>'
+        db.commit()
+
+    def test_a_changed_copy_becomes_the_built_in_again(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        db_session: Session,
+    ) -> None:
+        seeded = _seed(client, eq_auth_headers)
+        original = seeded[0]['body_html']
+        self._write_into(db_session, seeded[0]['id'])
+
+        response = client.post(
+            f'{TEMPLATES}/{seeded[0]["id"]}/reset', headers=eq_auth_headers
+        )
+
+        assert response.status_code == status.HTTP_200_OK, response.text
+        assert response.json()['id'] == seeded[0]['id']
+        assert response.json()['body_html'] == original
+        listed = client.get(TEMPLATES, headers=eq_auth_headers).json()['items']
+        assert all(not t['source_modified'] for t in listed)
+
+    def test_the_language_it_was_seeded_in_does_not_hide_the_built_in(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        db_session: Session,
+    ) -> None:
+        polish = dict(eq_auth_headers, **{'Accept-Language': 'pl'})
+        seeded = _seed(client, polish)
+        self._write_into(db_session, seeded[0]['id'])
+
+        response = client.post(
+            f'{TEMPLATES}/{seeded[0]["id"]}/reset',
+            headers=dict(eq_auth_headers, **{'Accept-Language': 'en'}),
+        )
+
+        assert response.status_code == status.HTTP_200_OK, response.text
+        assert response.json()['body_html'] == seeded[0]['body_html']
+
+    def test_a_template_not_made_from_a_built_in_is_not_found(
+        self, client: TestClient, eq_auth_headers: dict[str, str]
+    ) -> None:
+        own = client.post(
+            TEMPLATES,
+            headers=eq_auth_headers,
+            json={
+                'name': 'Our own',
+                'document_type': 'CHECKOUT',
+                'module': 'equipment',
+                'body_html': '<html><body>x</body></html>',
+            },
+        )
+        assert own.status_code == status.HTTP_201_CREATED, own.text
+
+        response = client.post(
+            f'{TEMPLATES}/{own.json()["id"]}/reset', headers=eq_auth_headers
+        )
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND

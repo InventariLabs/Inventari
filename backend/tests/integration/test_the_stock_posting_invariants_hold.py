@@ -206,6 +206,16 @@ async def world(real_async_db_session: AsyncSession) -> World:
     )
     db.add(created)
     await db.flush()
+    # A real organization owns the neutral storage types from the moment it
+    # exists; without the SYSTEM one, an emptied record has nowhere to be
+    # filed and the posting that empties it cannot finish.
+    from app.seed_profiles.base import seed_neutral_storage_types
+
+    await db.run_sync(
+        lambda session: seed_neutral_storage_types(
+            session, organization_id=created.id, commit=False
+        )
+    )
     user = await ModuleTestHelper.create_user_async(
         db, created, email=f'posting-{uuid4().hex[:8]}@example.test'
     )

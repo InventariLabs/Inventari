@@ -74,6 +74,7 @@ def _bad_strings(node: dict[str, Any]) -> Iterator[Any]:
 def _bad_numbers(node: dict[str, Any]) -> Iterator[Any]:
     yield 'abc'
     yield {}
+    yield True
     for bound, step in (
         ('minimum', -1),
         ('exclusiveMinimum', -1),
@@ -176,15 +177,13 @@ def write_body_schemas() -> dict[str, Any]:
 def _errors_of(adapter: TypeAdapter, body: Any) -> list[Any]:
     """The pydantic errors a body raises; none when it validates.
 
-    A before-validator that crashes on a wrong type raises something else — a
-    500, a different defect, not a sentence — and yields no errors here.
+    A validator that crashes on a wrong type raises something other than a
+    ``ValidationError`` — a 500 — and propagates, failing the probe.
     """
     try:
         adapter.validate_python(body)
     except ValidationError as exc:
         return list(exc.errors())
-    except (AttributeError, TypeError, KeyError, ArithmeticError):
-        return []
     return []
 
 

@@ -48,9 +48,13 @@ const css =
   (selector: string): RecordOf =>
   (page) =>
     page.locator(selector).first();
-/** A document number such as INT/2026/004, or MM/2026/11/0006 when the format carries the month. */
-const documentNumber: RecordOf = (page) =>
-  page.getByText(/^[A-Z]+\/\d{4}(?:\/\d{2})?\/\d+$/).first();
+/**
+ * The register's first document, numbered or a draft that has no number yet:
+ * each one's tick box is named after it ("Select INT/2026/004",
+ * "Select Transfer – draft 112E"). A draft dated ahead sorts above them all.
+ */
+const firstDocument: RecordOf = (page) =>
+  page.getByRole("checkbox", { name: /^Select (?!all$)/ }).first();
 
 // Every list of the main navigation and of the overview cards. The
 // approvals screens need a workflow that holds every document of the
@@ -121,7 +125,7 @@ const ROUTES: ListRoute[] = [
   {
     name: "warehouse documents",
     path: "/warehouse/all",
-    record: documentNumber,
+    record: firstDocument,
   },
   {
     name: "warehouse codes and labels",
@@ -326,11 +330,13 @@ test.describe("Phone lists — the first record is above the fold", () => {
       metadata: { equipment: { equipment_status: "AVAILABLE" } },
     });
     cleanup.push(() => api.deleteItem(token, asset.id));
-    await api.checkoutAsset(token, {
+    const assignment = await api.checkoutAsset(token, {
       item_id: asset.id,
       assigned_to_name: "Admin",
       assigned_to_email: ADMIN_EMAIL,
     });
+    // Run before the delete above: an asset still checked out is refused.
+    cleanup.push(() => api.checkinAsset(token, assignment.id));
     const model = await api.createModel(token, { name: `${tag} model` });
     cleanup.push(() => api.deleteModel(token, model.id));
     const campaign = await api.createCampaign(token, {
@@ -483,6 +489,8 @@ test.describe("Phone lists — the first record is above the fold", () => {
 
   test.afterAll(async () => {
     // Last created, first removed: the storage goes after what lies in it.
+    // A step that fails must not stop the ones after it: each removes its own
+    // rows, and the E2E sweep takes what a failure leaves.
     for (const undo of cleanup.reverse()) await undo().catch(() => {});
   });
 

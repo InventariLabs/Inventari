@@ -173,6 +173,7 @@ describe("a header button blocks while its own request is in flight", () => {
           category_id: "cat-1",
           location_id: "loc-1",
           context_tag: "equipment",
+          category: { id: "cat-1", name: "Laptops", context_tag: "equipment" },
           quantity: 1,
           added_date: "2024-01-01T00:00:00Z",
           created_at: "2024-01-01T00:00:00Z",

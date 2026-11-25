@@ -32,10 +32,12 @@ export function useFocusTrap<T extends HTMLElement = HTMLDivElement>(
     const container = containerRef.current;
     if (!container) return;
 
-    const focusableElements =
-      container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS);
-    if (focusableElements.length > 0) {
-      focusableElements[0].focus();
+    // A control inside that took the focus as it mounted — an `autoFocus`
+    // field, or one focused by its own effect, which runs before this one —
+    // keeps it. The first focusable element, usually the header's Close, is
+    // only where focus goes when nothing inside asked for it.
+    if (!container.contains(document.activeElement)) {
+      container.querySelector<HTMLElement>(FOCUSABLE_SELECTORS)?.focus();
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {

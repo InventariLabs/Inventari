@@ -29,7 +29,7 @@ import { fileURLToPath } from "node:url";
 
 import { maintainedLanguages } from "./maintained-languages.mjs";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const BACKEND_VALIDATORS = resolve(
   ROOT,
   "../backend/app/schemas/validators.py",

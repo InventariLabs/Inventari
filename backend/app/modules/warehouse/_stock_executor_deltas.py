@@ -106,7 +106,11 @@ def _correction_landing_location(
     landed = original_line.executed_location_id if original_line else None
     if dt.is_receipt(original_type):
         return landed or doc.target_location_id or item_location
-    if dt.is_dispatch(original_type):
+    if dt.is_dispatch(original_type) or dt.is_scrap(original_type):
+        # A write-off leaves by the shelf its document names. The record's own
+        # place is no longer the answer once it was emptied and filed under
+        # Consumed — a correction of it would credit a place stock does not
+        # stand in.
         return landed or doc.source_location_id or item_location
     return landed or item_location
 

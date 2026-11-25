@@ -294,8 +294,8 @@
     "archiveOrDelete": "Arquivar ou excluir…"
   },
   "card": {
-    "unit_one": "produto",
-    "unit_other": "produtos"
+    "unit_one": "registro",
+    "unit_other": "registros"
   },
   "counts": {
     "inSublocations_one": "{{count}} em sublocais",
@@ -341,7 +341,8 @@
     "restore": "Restaurar",
     "emptyTitle": "Nada arquivado",
     "emptyDescription": "Os locais arquivados aparecem aqui e podem ser restaurados.",
-    "detailNotice": "Este local está arquivado. Restaure-o para guardar produtos aqui novamente."
+    "detailNotice": "Este local está arquivado. Restaure-o para guardar produtos aqui novamente.",
+    "restoreNamed": "Restaurar {{name}}"
   },
   "masterDetailSubtitle": "Escolha um local para ver o que há nele, seus produtos e suas configurações.",
   "select": {
@@ -374,9 +375,9 @@
   },
   "contents": {
     "emptyTitle": "Não há nada dentro deste local",
-    "emptyDescriptionNone": "Não contém produtos nem locais dentro.",
-    "emptyDescription_one": "O produto dele ({{count}}) está na aba Produtos.",
-    "emptyDescription_other": "Os {{count}} produtos dele estão na aba Produtos.",
+    "emptyDescriptionNone": "Não contém registros nem locais dentro.",
+    "emptyDescription_one": "O registro dele ({{count}}) está na aba Produtos.",
+    "emptyDescription_other": "Os {{count}} registros dele estão na aba Produtos.",
     "noLocationsInside": "Nenhum local dentro",
     "showProducts": "Mostrar produtos",
     "selected_one": "{{count}} local selecionado",
@@ -388,7 +389,7 @@
     "code": "Código",
     "type": "Tipo",
     "inside": "Dentro",
-    "products": "Produtos"
+    "products": "Registros"
   },
   "products": {
     "includeInside": "Incluir locais dentro",

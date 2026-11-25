@@ -201,7 +201,7 @@ class TestHouseholdsUpdate:
         kept = client.get('/api/v1/organizations/my', headers=auth_headers).json()
         assert kept['name'] == test_household.name
 
-    @pytest.mark.parametrize('field', ['name', 'currency', 'timezone'])
+    @pytest.mark.parametrize('field', ['name', 'currency', 'timezone', 'settings'])
     def test_update_refuses_a_named_null_on_a_required_field(
         self, client, auth_headers, test_household, field
     ):
@@ -228,6 +228,17 @@ class TestHouseholdsUpdate:
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
         kept = client.get('/api/v1/organizations/my', headers=auth_headers).json()
         assert kept['name'] == test_household.name
+
+    def test_update_refuses_a_currency_longer_than_the_column(
+        self, client, auth_headers, test_household
+    ):
+        response = client.put(
+            '/api/v1/organizations', headers=auth_headers, json={'currency': 'ABCDEF'}
+        )
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        kept = client.get('/api/v1/organizations/my', headers=auth_headers).json()
+        assert kept['currency'] == test_household.currency
 
     def test_update_leaves_a_required_field_alone_when_the_key_is_absent(
         self, client, auth_headers, test_household

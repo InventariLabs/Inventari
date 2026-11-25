@@ -10,10 +10,21 @@ import type { DocumentLine } from "@/modules/warehouse/types";
  * A decision the worker cannot see before it books is a decision they cannot
  * correct — this is the read-side half of making the rule's choice visible
  * (the executor was already following it). After execution the component
- * steps aside; `landedElsewhere` owns the story from there.
+ * steps aside; `landedElsewhere` owns the story from there. A line whose unit
+ * cannot become its product's stock unit shows that instead, so the document
+ * opens and the line is marked for correction.
  */
 export function PlannedPutawayLine({ line }: { line: DocumentLine }) {
   const { t } = useTranslation("warehouse");
+  // A unit that does not convert to the product's stock unit has no plan to
+  // show: the line says what to correct, in the server's own words.
+  if (line.unit_conversion_error) {
+    return (
+      <p className="text-xs text-red-600 font-medium">
+        {line.unit_conversion_error}
+      </p>
+    );
+  }
   const planned = plannedPutaway(line);
   if (!planned) return null;
 

@@ -628,9 +628,11 @@ function ItemCardQuickActions({
           e.stopPropagation();
           onConsume(item.id);
         }}
-        disabled={consumingId === item.id}
+        disabled={
+          consumingId === item.id || (toAmount(item.quantity) ?? 0) <= 0
+        }
         className="relative group/tooltip rounded-xl shadow-none bg-surface-raised text-on-secondary hover:bg-surface-inset hover:text-on"
-        aria-label={consumeLabel}
+        aria-label={t("items:actions.consume1unitFor", { name: item.name })}
       >
         {consumingId === item.id ? (
           <span className="text-[10px] font-medium">…</span>

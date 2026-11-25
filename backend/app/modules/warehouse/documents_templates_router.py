@@ -97,7 +97,11 @@ _NESTED_PLACEHOLDERS: dict[str, list[str]] = {
         'lines',
     ],
     'partner': ['name', 'code', 'tax_id', 'address'],
-    'issuer': [field.name for field in dataclasses.fields(IssuerContext)],
+    'issuer': [
+        field.name
+        for field in dataclasses.fields(IssuerContext)
+        if not field.name.startswith('_')
+    ],
 }
 
 #: Document types used in the catalog's ``document_types`` column.
@@ -283,6 +287,11 @@ _PLACEHOLDER_META: dict[str, dict[str, Any]] = {
         'description': 'True when the document is a correction',
         'possibly_empty': False,
         'document_types': _CORRECTION,
+    },
+    'is_adjustment': {
+        'description': "True for the document a stock count's differences post as",
+        'possibly_empty': False,
+        'document_types': ['ADJUSTMENT'],
     },
     'is_external_in': {
         'description': 'True for receipts (IN, PZ)',

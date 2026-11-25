@@ -92,8 +92,9 @@ interface DraftActionsProps {
 
 /**
  * What a draft offers. The one-step verb is the primary action; the old
- * confirm step survives as "Plan" in the row's menu for a future-dated
- * document, where a plan is the point, and for an issue to be picked first.
+ * confirm step survives as "Confirm" (`warehouse:actions.plan`) in the row's
+ * menu for a future-dated document, where a plan is the point, and for an
+ * issue to be picked first.
  */
 function DraftActions({
   isCorrection,
@@ -214,12 +215,15 @@ function offersUndo(
 }
 
 /** Whether the row offers a return: a document the server takes one of, and
- * not one Undo has already put back in full, which has nothing left to send. */
+ * not one Undo has already put back in full, which has nothing left to send.
+ * A record-only document moved no stock itself, so the server refuses its
+ * return and the row does not offer one. */
 function offersReturn(
   docType: string,
   isReversed: boolean | undefined,
+  stockAlreadyApplied: boolean | undefined,
 ): boolean {
-  return RETURNABLE_TYPES.has(docType) && !isReversed;
+  return RETURNABLE_TYPES.has(docType) && !isReversed && !stockAlreadyApplied;
 }
 
 /** Cancelling is what releases a confirmed document's hold, so it stays
@@ -353,7 +357,7 @@ export function DocumentActionButtons({
   const hintKey = executionHintKey(gate);
   const executionHint = hintKey ? t(hintKey) : undefined;
   const executeLabelKey = executeLabelKeyFor(docType);
-  const canReturn = offersReturn(docType, isReversed);
+  const canReturn = offersReturn(docType, isReversed, stockAlreadyApplied);
   // a correction whose first completion failed stays CONFIRMED —
   // keep the apply button available so the user can retry completion.
   const showCorrectionApply =

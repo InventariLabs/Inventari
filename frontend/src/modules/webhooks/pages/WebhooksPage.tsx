@@ -18,8 +18,10 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { extractApiError } from "@/lib/errors";
 import { QueryFailure } from "@/components/ui/QueryResult";
 import WebhookForm from "../components/WebhookForm";
-import WebhookDeliveryLogs from "../components/WebhookDeliveryLogs";
-import { WebhookCard } from "../components/WebhookCard";
+import WebhookDeliveryLogs, {
+  causeText,
+} from "../components/WebhookDeliveryLogs";
+import { TEST_HINT_ID, WebhookCard } from "../components/WebhookCard";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useHasPermission } from "@/hooks/useHasPermission";
 import type {
@@ -115,6 +117,14 @@ export default function WebhooksPage() {
         </Card>
       )}
 
+      {/* One visible line instead of a tooltip on every Test button: a
+          touch screen has no hover and a tooltip is not a control. */}
+      {isAdmin && webhooks.length > 0 && (
+        <p id={TEST_HINT_ID} className="text-sm text-on-secondary">
+          {t("testHint")}
+        </p>
+      )}
+
       {/* Webhook list */}
       <div className="space-y-3">
         {webhooks.map((wh) => (
@@ -157,7 +167,10 @@ export default function WebhooksPage() {
                             status: result.status_code,
                           })
                         : t("testResult.failure", {
-                            error: result.error ?? t("unknownError"),
+                            error:
+                              causeText(t, result.error_cause) ??
+                              result.error ??
+                              t("unknownError"),
                           }),
                     );
                   }

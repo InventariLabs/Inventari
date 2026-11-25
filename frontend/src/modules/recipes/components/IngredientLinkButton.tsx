@@ -54,6 +54,11 @@ export default function IngredientLinkButton({
   const { t } = useTranslation("recipes");
   const [open, setOpen] = useState(false);
   const linkMutation = useLinkIngredientTemplate(recipeId);
+  // The words on the button are the same on every ingredient; the name that
+  // is read out says which one this links.
+  const linkName = ingredientName
+    ? t("availability.link_to_product_for", { name: ingredientName })
+    : t("availability.link_to_product");
 
   const handleSelect = async (templateId: string) => {
     setOpen(false);
@@ -80,8 +85,8 @@ export default function IngredientLinkButton({
           className={`gap-1 rounded px-1 py-1 text-xs hover:bg-primary-50 shrink-0 ${
             primary ? "text-primary-600" : "text-on-muted"
           }`}
-          aria-label={t("availability.link_to_product")}
-          title={t("availability.link_to_product")}
+          aria-label={linkName}
+          title={linkName}
         >
           <Link2 size={16} />
           {/* Icon-only below sm so the ingredient name keeps its width */}

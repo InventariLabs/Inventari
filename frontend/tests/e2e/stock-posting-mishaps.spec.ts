@@ -279,7 +279,9 @@ test.describe("Stock posting survives the floor's mishaps", () => {
       // restart can cut off.
       await serverAway(page);
       await page.getByRole("button", { name: "Finish later" }).click();
-      await expect(page.getByText("Could not save the draft.")).toBeVisible();
+      await expect(
+        page.getByRole("alert").filter({ hasText: "Cannot reach the server" }),
+      ).toBeVisible();
       await expect(page.locator("body")).not.toContainText(RAW_ERROR);
       // Nothing was written, and what the user typed is still on the form.
       await expect(
@@ -318,7 +320,11 @@ test.describe("Stock posting survives the floor's mishaps", () => {
 
       await serverAway(page);
       await page.getByRole("button", { name: "Find" }).click();
-      await expect(page.getByText("Could not look up the code")).toBeVisible();
+      await expect(
+        page
+          .getByRole("region", { name: /Notifications/ })
+          .getByText("Cannot reach the server"),
+      ).toBeVisible();
       await expect(page.locator("body")).not.toContainText(RAW_ERROR);
       await expect(field).toHaveValue(String(number));
 

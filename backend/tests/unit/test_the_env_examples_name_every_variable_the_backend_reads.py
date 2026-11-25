@@ -64,6 +64,7 @@ _TEST_ONLY = frozenset(
         'QA_FAULT_INJECTION',
         'TESTING',
         'TESTING_ACK_UNSAFE',
+        'TESTING_TOKEN_REVOCATION',
     }
 )
 

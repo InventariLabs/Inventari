@@ -620,7 +620,6 @@ if settings.QA_FAULT_INJECTION and settings.DEBUG:
     logger.warning('QA fault injection is ON: a qa_fail cookie will fail API requests.')
 
 app.add_middleware(SecurityHeadersMiddleware)
-app.add_middleware(ApiKeyBearerDeprecationMiddleware)
 app.add_middleware(PerformanceMiddleware)
 app.add_middleware(LanguageMiddleware)
 app.add_middleware(RequestIDMiddleware)
@@ -629,6 +628,11 @@ app.add_middleware(RequestIDMiddleware)
 # shares it, and reset with the response. Inert for core routes.
 app.add_middleware(ModuleIdentityMiddleware)
 app.add_middleware(RouterAwareSlowAPIMiddleware)
+# Outside the limiter on purpose: the limiter is the outermost layer that
+# answers without reaching a route, and its 429 is an answer to a Bearer key
+# like any other — the header says the form is deprecated, so the refusal
+# carries it too.
+app.add_middleware(ApiKeyBearerDeprecationMiddleware)
 
 # Uploads are served ONLY through this router, which verifies organization
 # ownership per file (app/api/uploads.py). Never mount StaticFiles on /uploads:

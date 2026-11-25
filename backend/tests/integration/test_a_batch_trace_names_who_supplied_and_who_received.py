@@ -326,6 +326,45 @@ class TestTheTraceIsTheOrganizations:
             assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
+class TestThePartnersArePartnersReadData:
+    async def test_a_reader_without_the_partner_read_is_refused(
+        self,
+        real_async_client: AsyncClient,
+        recall: _Recall,
+        real_async_db_session: AsyncSession,
+    ) -> None:
+        """A batch's crossings name partners, so tracing asks for ``partners:read``.
+
+        The supplier and customer names and addresses on the trace and its
+        sheet are the partner register's data, behind the same read as the
+        partners screen.
+        """
+        from app.models.role import Role, UserRole
+
+        db = real_async_db_session
+        reader = await ModuleTestHelper.create_user_async(
+            db,
+            recall.org,
+            email=f'trace-reader_{uuid4().hex[:8]}@test.com',
+            role='user',
+        )
+        role = Role(
+            name=f'trace_reader_{uuid4().hex[:8]}',
+            permissions=['items:read'],
+            organization_id=recall.org.id,
+        )
+        db.add(role)
+        await db.flush()
+        db.add(UserRole(user_id=reader.id, role_id=role.id))
+        await db.commit()
+
+        for path in ('trace', 'trace/export/xlsx'):
+            response = await real_async_client.get(
+                f'/api/v1/stock-lots/{recall.flour.id}/{path}', headers=_auth(reader)
+            )
+            assert response.status_code == status.HTTP_403_FORBIDDEN, response.text
+
+
 class TestTheTraceExports:
     async def test_the_sheet_carries_every_crossing_with_its_partner(
         self, real_async_client: AsyncClient, recall: _Recall

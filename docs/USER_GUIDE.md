@@ -117,7 +117,7 @@ Organization modules** (chapter 14).
 - **Your avatar** opens **My profile**, **About**, the **User guide** and
   **Log out**.
 
-![The launcher: "Welcome, Olivia", the profile Equipment & Warehouse, and the wholesaler's modules grouped into essentials — inventory with one product running low — and business: equipment tracking, approvals, purchase orders, the warehouse with five things to do today and partners, above settings and the module store](images/launcher.webp)
+![The launcher: "Welcome, Olivia", the profile Equipment & Warehouse, and the wholesaler's modules grouped into essentials — inventory with one thing needing attention — and business: equipment tracking, approvals, purchase orders, the warehouse with five things to do today and partners, above settings and the module store](images/launcher.webp)
 
 On a phone, the top bar keeps search, the bell and the avatar; settings, the
 theme and the language move into the avatar menu (**Settings**,
@@ -125,7 +125,7 @@ theme and the language move into the avatar menu (**Settings**,
 **Overview**, **Scan** and **More** — the last one holds the rest of the tabs
 and links to the other modules.
 
-![The launcher on a phone: "Welcome, Olivia", the profile Equipment & Warehouse and the modules of a business as tiles — inventory with one product running low, equipment tracking, approvals, purchase orders, warehouse with five things to do today, partners and settings](images/mobile-launcher.webp)
+![The launcher on a phone: "Welcome, Olivia", the profile Equipment & Warehouse and the modules of a business as tiles — inventory with one thing needing attention, equipment tracking, approvals, purchase orders, warehouse with five things to do today, partners and settings](images/mobile-launcher.webp)
 
 ---
 
@@ -439,7 +439,7 @@ yet.
 **Inventory → Labels** keeps a pool of printed QR codes that you stick on
 things before or after they go into Inventari.
 
-![The label pool: twelve printed QR labels, six of them already on equipment in use — a Dell laptop, an APC UPS, a Cisco access point, a Cisco switch, a Dell server and a Dell desktop — and six printed and still free for products](images/labels.webp)
+![The label pool: twelve printed QR labels, six of them already on equipment in use — a Dell desktop, a Cisco access point, an APC UPS, a Dell server, a Dell laptop and a Cisco switch — and six printed and still free for products](images/labels.webp)
 
 - **Generate Labels**: how many (up to 500), a prefix of up to five letters or
   digits (`STM` unless you change it, giving codes such as `STM-4F2A`), and an
@@ -680,7 +680,7 @@ counts the ingredient in another measure, so no comparison is made) — with the
 shelf it stands on and a warning when it is close to its date. The servings control rescales the view,
 nutrition and cost without changing the recipe.
 
-![Shakshuka: its photograph, an estimated cost of $10.73, two servings in 25 minutes and eggs as its allergen; each ingredient with the shelf it is on — eggs in the fridge, the tomatoes and the olive oil on shelves — the onion missing, and a button that puts what is missing on the shopping list](images/recipe.webp)
+![Shakshuka: its photograph, an estimated cost of $10.44, two servings in 25 minutes and eggs as its allergen; each ingredient with the shelf it is on — eggs in the walk-in cooler, the tomatoes and the olive oil on shelves — the onion missing, and a button that puts what is missing on the shopping list](images/recipe.webp)
 
 - **Link to product** tells Inventari which product an ingredient is. Stock
   checks, cost and taking from stock work only for linked ingredients (or ones
@@ -717,14 +717,14 @@ products cost you, and **Cooking history**.
 > the label of each product used. Whoever enters the data and serves or sells
 > the food is responsible for it; Inventari gives no dietary or medical advice.
 
-![A chicken curry recipe on a phone: its photograph, estimated cost, servings, cooking time and allergen, and the first ingredients — chicken breast fillet in the walk-in cooler](images/mobile-recipe.webp)
+![A chicken curry recipe on a phone: its photograph, estimated cost of $11.34, four servings in 40 minutes and the note that no allergens are marked, and the first ingredient — 600 g of chicken breast fillet on its shelf in Fridge A](images/mobile-recipe.webp)
 
 ### 8.3 Meal planner
 
 **Recipes → Meal Planner → New Plan**: a name, start and end dates, the meal
 slots you use (breakfast, lunch, dinner, snack) and servings per meal.
 
-![This week's meal plan: breakfast and dinner over seven days, the meals still to cook, from today on, marked Cook Now, and under the week each day's carbohydrates, protein, fat and calories for the servings planned that day, with a note on the days whose ingredients have nutrition data only in part](images/meal-plan.webp)
+![This week's meal plan: breakfast and dinner over seven days, the meal still to cook, from today on, marked Cook Now, and under the week each day's carbohydrates, protein, fat and calories for one serving of each planned meal, with a note on the days whose ingredients have nutrition data only in part](images/meal-plan.webp)
 
 - Click an empty slot to **Pick a recipe**. The **Suggested** tab favours
   recipes you can cook now, that use up what expires soon, that you have not
@@ -764,7 +764,7 @@ together.
 network gear, servers — with who has them, where they are, their warranty and
 their book value.
 
-![The equipment overview: nine assets need attention — warranties ending within weeks and a server in maintenance — above the totals, 77 assets with four checked out, and the fleet by category as bars: laptops, network devices, monitors, peripherals, desktop computers and other equipment, each with its size and, in colour, the share that is checked out or has a warranty ending soon](images/equipment-overview.webp)
+![The equipment overview: ten assets need attention — warranties ending within weeks and a server in maintenance — above the totals, 84 assets with four checked out, and the fleet by category as bars: network devices, laptops, phones and tablets, servers, peripherals and desktop computers, each with its size and, in colour, the share that is checked out or has a warranty ending soon](images/equipment-overview.webp)
 
 ### 9.1 The tabs
 
@@ -782,7 +782,7 @@ their book value.
 - **Attestations** — asking people to confirm they still have what they hold.
 - **Settings** (administrators).
 
-![The asset register sorted by warranty, soonest first: 77 assets, each with its serial number, location, who holds it, its warranty — expired, expiring or active, with the date — and its status](images/equipment-assets.webp)
+![The asset register sorted by warranty, soonest first: 84 assets, each with its serial number, location, who holds it, its warranty — expired, expiring or active, with the date — and its status](images/equipment-assets.webp)
 
 ### 9.2 Adding an asset
 
@@ -1248,10 +1248,15 @@ quarantine location or a location that does not take stock is never offered as
 a home; the sheet says why instead. Nothing is asked when you were forced off
 the suggestion because it was full or could not take the goods.
 
+A warehouse that receives in one step has no put-away, so the same question is
+asked when the receipt is posted: for each product whose line you put on a
+location other than the suggested one (a shelf chosen on the line), one sheet
+lists the products, each with *Yes*, *No* and *Don't ask about this product
+again*. A line left on the suggestion asks nothing.
+
 The question belongs to warehouses that keep a place per product. In
 Configuration → *Putaway*, the checkbox *Each product has its own location in …*
-is on by default (it appears for a warehouse that receives into its receiving
-area); switch it off for a warehouse that stores goods wherever there is room
+is on by default and appears for every warehouse; switch it off for a warehouse that stores goods wherever there is room
 (pallet stores, logistics) and its put-away never asks, leaving the suggestion
 to the rules alone.
 
@@ -1298,10 +1303,10 @@ reason.
   at 001. Numbers already issued are never rewritten.
 - **Periods.** Close a month to freeze it: in a closed month no document can be
   created, edited, confirmed, completed or cancelled, and stock takes cannot be
-  completed. A correction is the exception at the start: it can be created in
-  a closed month, and is refused when it is confirmed or completed, against
-  its own date. A month can be reopened; both are recorded with who and when.
-  How these records stand up to an audit is set out in 10.11.
+  completed. A correction is no exception: it is refused when it would be
+  created in a closed month, and refused when confirmed or completed there,
+  against the day it was written. A month can be reopened; both are recorded
+  with who and when. How these records stand up to an audit is set out in 10.11.
 
 ![The wholesaler's documents on a phone: each with its number, status, date, partner, location and value, the orders being picked with their progress, above the warehouse's bottom bar of Start, Scan, History and More](images/mobile-documents.webp)
 
@@ -1485,14 +1490,15 @@ with a signed quantity, and moves stock by the difference when it is
 completed. Only quantities can be corrected, and a correction cannot take
 more off a line than is still there. The original stays exactly as it was;
 the two are read together. A correction is subject to the same period check
-as any document when it is confirmed or completed; creating one
-in a closed month is not refused, but it cannot go further until the month
-is reopened.
+as any document: one cannot be created in a closed month, and one whose month
+has closed since it was written cannot be confirmed or completed until the
+month is reopened. A correction has no date of its own to change, so the
+period that decides is the day it was written.
 
 **Closing a period.** **Period closure** closes a calendar month
 (10.8). In a closed month no document can be created, edited, confirmed,
-completed or cancelled (a correction may be created, but not confirmed or
-completed), and no stock take can be completed. Closing and
+completed or cancelled — a correction included — and no stock take can be
+completed. Closing and
 reopening are each recorded with who did it, when, and the note typed at the
 time, and the change appears in the audit log. Reopening is allowed because a
 real mistake sometimes needs it; the record of it is what makes it safe, so
@@ -1630,12 +1636,29 @@ batch yields. The first BOM of a product becomes its **Default**.
   **Multi-level view** shows BOMs used inside other BOMs, and for an ingredient
   that has a BOM of its own it says how much is on the shelf; tick **Always make
   fresh** on it to make it every time instead of using that stock (see 12.2).
-  **Process steps** describe the work.
+  **Process steps** describe the work, and each can say how many minutes it
+  takes (see *Labour from the steps* below).
+- **Price of an ingredient with no stock and no quote** — an ingredient made an
+  hour ago has no cost yet, so the formula would read as free. On its line,
+  **Set price** takes a price per unit. The price belongs to the product, so
+  every BOM that uses the ingredient costs it the same, and it is used only
+  when there is no stock cost and no supplier price: those answer first, and
+  the line says *not used* while they do. Leave the field empty to remove it.
 - **Cost & result** — the materials at what they cost you now, fixed costs per
-  batch (labour, packaging, overhead), and a **reference price** to compare
+  batch (packaging, overhead, other), the **labour from the steps**, and a **reference price** to compare
   with: a shop price (*Savings vs shop price*) or your selling price (*Margin*), as set in
   **Settings**.
 - **History** — the runs made from it.
+
+**Labour from the steps.** Give each process step the minutes it takes, and set
+the **Hourly rate for own work** in the Production settings. The BOM's labour is
+then its steps' minutes at that rate, shown as its own line beside the fixed
+costs and counted in the estimate, the preview and a run's actual cost. With no
+rate set — or a rate of zero — labour costs nothing in the estimates, and the
+BOM says how many minutes its steps take and links to the settings. Nobody
+clocks hours against a run: the time is the one written on the step. A **Labor**
+fixed-cost line is added on top of the computed labour, so keep only one of the
+two or the BOM says the labour may be counted twice.
 
 ![The cost of a plum butter BOM: $7.95 a unit against a reference price of $18.00, a margin of $10.05, and each ingredient's share of the cost](images/production-recipe-cost.webp)
 
@@ -1647,7 +1670,25 @@ uses the product's default BOM). Enter the quantity and where the output goes.
 *What are you recording?* — **Already made**, saved with **Save as made**, or
 **Planning to make**, written with **Plan the run**.
 
-![The list of production runs: a completed batch of plum butter planned at 12 kg, with its cost of $95.36 and a margin of $109.90](images/production-runs.webp)
+![The list of production runs as cards: four planned runs of plum butter, three covered and one partly covered, one run in progress with $79.47 taken so far in the batch DAMSON-A, and one completed run of 12 kg with its cost of $95.36 and a margin of $109.90](images/production-runs.webp)
+
+**Production → Plan** shows the planned runs of a week or a month by day (a list
+by day on a phone). **Move** puts a run on another day. Each run says whether
+the shelf, and the runs planned before it, cover what it needs — **Covered**,
+**Partly covered** or **Short** — and under the calendar one list adds up
+everything the runs need: how much is needed, in stock, on order and still
+missing. **Order what is missing** raises the purchase orders for it.
+
+![The production plan for 23–29 November: three runs of plum butter, 8, 12 and 10 kg, planned for the 23rd, 24th and 25th and marked Covered, and a run of 12 kg on the 27th marked Partly covered, above the list of what the planned runs need — 13.23 kg of sugar against 10.07 kg in stock, 3.16 kg missing — with the Order what is missing button](images/production-plan.webp)
+
+![The production plan on a phone: the planned plum butter runs of the week listed by day, each with its coverage, above the heading of what the runs need and the Order what is missing button](images/production-plan-phone.webp)
+
+A run that is planned reads the shelf honestly: the planned runs are counted
+one after another, by planned day and then by creation, so two runs that each
+fit on the shelf are not both shown as fine. The run list and a run's page say
+**Covered**, **Partly covered** or **Short** (see 12.5), and *Position in the plan* on the
+run says how much would be left of an ingredient after the runs planned before
+it. 12.5 describes the screen that shows all planned runs together.
 
 **Complete run** takes the materials off the shelves and puts the product into
 stock at the target location. You may enter the quantity actually produced; the
@@ -1675,6 +1716,12 @@ still counted in the stock value, so the warehouse does not look poorer while
 the batch matures. **Cancel run** on a run in progress gives the materials back
 to the batches they came from — unless it has already put portions on the
 shelf, in which case finish it instead.
+
+![A production run in progress: 10 kg of plum butter started on 20 November with $79.47 taken so far, two of its four steps ticked with the day each was done, the first 4 kg already on a shelf in the batch DAMSON-A, and the damson plums, sugar and cinnamon it took at their FIFO cost](images/production-run-in-progress.webp)
+
+![The same run in progress in dark mode](images/production-run-in-progress-dark.webp)
+
+![A run in progress on a phone: the plum butter run with its cost so far, its output batch DAMSON-A and the buttons to finish, cancel or duplicate it](images/production-run-in-progress-phone.webp)
 
 ![A finished production run in dark mode: 11.4 kg of plum butter made from a 12 kg plan with 0.6 kg of scrap, a total cost of $95.36 and a margin of $109.90, the damson plums, sugar and cinnamon it consumed at their FIFO cost, and the stock moves it made](images/production-run-dark.webp)
 
@@ -1718,6 +1765,12 @@ A finished run shows its batch with the day it was made and its best-before:
 - **Photos and files** — **Add a file** files a photo or a document under the
   run, up to 10 MB, in the types a product's attachments take.
 
+![A finished production run: 11.4 kg of plum butter made from a 12 kg plan, a total cost of $95.36 and a margin of $109.90, and the output batch 20261122-1 with the day it was made, its best-before date and the buttons Print batch labels, Batch record and Quarantine](images/production-run.webp)
+
+![The Batch labels dialog of the plum butter batch with Ingredients and allergens ticked: the ingredient list and may contain nuts under the name, the batch code in bars, the day it was made and the best-before date](images/production-batch-labels.webp)
+
+![The batch record of the plum butter run PR/2026/0001: the batch, the day it was made, planned and made quantity, each ingredient with the quantity taken and its cost, the costs, who planned and who closed the run and the notes](images/production-batch-record.webp)
+
 At home the run speaks of jars: **Print jar labels**, and a best-before date.
 The batch code is still assigned and printed, but no screen asks for it.
 
@@ -1753,6 +1806,8 @@ The **Label** tab of a BOM computes the made product's label from it:
   in a weight, or the product's weight per piece. An ingredient without a
   figure is named and the figure shown as not known — never counted as zero.
 
+![The Label tab of the plum butter BOM: the ingredients, heaviest first; no allergen named by an ingredient's card; may contain nuts, declared on the product; and the nutrition declaration per 100 g — 956 kJ / 228 kcal, 0.7 g fat, 57 g carbohydrate, 53.3 g sugars, 1.6 g protein](images/production-bom-label.webp)
+
 Every part is computed, and the screens say it is yours to check before it
 goes on a package. On the label sheet of a made product, or of its batch, tick
 **Ingredients and allergens** to print the list (allergens in capitals) under
@@ -1761,6 +1816,55 @@ the default; a batch two BOMs went into gets no list, since neither is its
 own. It is never printed smaller than the letter the EU regulation allows
 on a small package; a label too small for it is refused and asks for a larger
 size.
+
+### 12.5 Planning runs ahead
+
+A run planned with **Plan the run** and a production day shows on
+**Production → Plan**.
+
+- **The period** — **Week** or **Month**, with arrows for the previous and the
+  next one. The planned runs stand under their days (a list by day on a phone).
+  A run with no day does not appear here.
+- **Moving a run** — **Move** on a run asks for a new day and saves it. Moving
+  it changes what the runs planned before it leave on the shelf, so the
+  coverage of the others can change too.
+- **What the planned runs need** — one list of everything the runs of the period
+  take, ingredient by ingredient, with **Needed** and three columns that answer
+  *do I have it?*:
+  - **In stock** — what is left on the shelf for this period, after the runs
+    planned before it have taken their share: a kilo on the shelf is not
+    offered to two runs.
+  - **On order** — what open purchase orders will bring, with their expected
+    dates. The column is absent while purchasing is off. A delivery ordered
+    for one run is not counted again for a later one.
+  - **Missing** — what is needed less what is in stock and on order.
+
+  Each run reads **Covered** when every ingredient it needs is there,
+  **Partly covered** when some of what it needs is there, and **Short** when
+  none of it is.
+
+  An ingredient with a BOM of its own counts on what the shelf holds of it and
+  on runs of it planned for the same day or earlier — never on a run planned
+  after it. An ingredient whose unit cannot be compared with stock is named
+  under the list and not counted.
+
+**Order what is missing** turns the missing quantities into action:
+
+- **One draft purchase order per supplier and currency**, from each
+  ingredient's best price in the supplier's own unit. Offers in your own
+  currency come first, and prices in different currencies are never compared by
+  their numbers. A volume price the shortage does not reach is not bought,
+  unless the whole order costs less that way. The orders are drafts: check and
+  send them from Purchasing.
+- **An ingredient with no supplier** goes to the shopping list instead.
+- **An ingredient you make yourself** — it has a BOM of its own — is not bought:
+  **Plan runs of what is missing** proposes it as a planned run for its day.
+
+The message after the click says how many draft orders were created, how many
+ingredients went to the shopping list and how many are to be made; an
+ingredient with neither a supplier nor a list is counted as left over. A product
+you make that falls below its reorder minimum is proposed as a production run
+in To do and in the reorder alerts, not as a purchase.
 
 ---
 
@@ -1849,7 +1953,7 @@ a link to the source code; the rest is for administrators.
 **Log retention (days)** says otherwise.
 - **Approvals** and **Statistics** — the settings of those modules.
 
-![The demo's module store: twelve of the fifteen modules switched on — partners, approvals, equipment tracking, production, nutrition info, label printing, purchase orders, recipes, shopping lists, statistics, stock takes and the warehouse — with API keys, photo recognition and webhooks left off; each with its version, where it comes from and what it needs: stored data, files, background tasks or internet access](images/app-store.webp)
+![The demo's module store: thirteen of the fifteen modules switched on — partners, API keys, approvals, equipment tracking, production, nutrition info, label printing, purchase orders, recipes, shopping lists, statistics, stock takes and the warehouse — with photo recognition and webhooks left off; each with its version, where it comes from and what it needs: stored data, files, background tasks or internet access](images/app-store.webp)
 
 ---
 

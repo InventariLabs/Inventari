@@ -41,6 +41,15 @@ const renderCard = (plan: MealPlanListItem) =>
     </MemoryRouter>,
   );
 
+describe("MealPlanCard — delete", () => {
+  it("names the plan it deletes", () => {
+    renderCard(basePlan);
+    expect(
+      screen.getByRole("button", { name: "Delete plan Week plan" }),
+    ).toBeInTheDocument();
+  });
+});
+
 describe("MealPlanCard shopping-list CTA", () => {
   it("styles the link as a real button instead of a token that is white in both themes", () => {
     renderCard({ ...basePlan, shopping_list_id: "sl-1" });

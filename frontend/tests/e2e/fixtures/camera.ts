@@ -10,7 +10,9 @@ import { ean13Modules, qrModules } from '../helpers/barcode';
  * Chromium alone. This replaces `navigator.mediaDevices.getUserMedia` with the
  * `captureStream()` of a canvas, so the same spec runs in every project the
  * config has — the iPhone ones included — and can take the code out of view
- * in the middle of a run.
+ * in the middle of a run. Reads are measured in Chromium only (see
+ * scan-camera.spec.ts): Linux WebKit's video now and then stops after its
+ * first frame on a loaded runner.
  *
  * The page sees a real MediaStream. The fixture counts the streams it handed
  * out and how many of them were released, and the scan lookups the app sent.
@@ -57,6 +59,8 @@ function installFakeCamera() {
 
   const control = {
     state,
+    // Whether the fake's tracks report a torch among their capabilities.
+    torch: false,
     showBars(bars: string) {
       const unit = 3;
       const width = bars.length * unit;
@@ -108,6 +112,11 @@ function installFakeCamera() {
     if (liveTracks.delete(this.id)) state.live--;
     nativeStop.call(this);
   };
+  const nativeGetCapabilities = proto.getCapabilities;
+  proto.getCapabilities = function (this: MediaStreamTrack) {
+    if (!fakeTracks.has(this.id)) return nativeGetCapabilities.call(this);
+    return control.torch ? ({ torch: true } as MediaTrackCapabilities) : {};
+  };
   proto.applyConstraints = function (this: MediaStreamTrack, constraints?: MediaTrackConstraints) {
     if (!fakeTracks.has(this.id)) return nativeApplyConstraints.call(this, constraints);
     // WebKit ignores the aspect-ratio constraint the reader applies;
@@ -151,6 +160,8 @@ export interface FakeCamera {
   showQr(text: string): Promise<void>;
   /** Take the code out of view. */
   hide(): Promise<void>;
+  /** Whether the camera reports a torch (the default is none). */
+  setTorch(available: boolean): Promise<void>;
   /** GET /labels/scan/* requests the app sent since the last `resetScanRequests`. */
   scanRequests(): string[];
   resetScanRequests(): void;
@@ -165,6 +176,7 @@ interface Control {
   showBars(bars: string): void;
   showMatrix(rows: boolean[][]): void;
   hide(): void;
+  torch: boolean;
 }
 
 async function attach(page: Page): Promise<FakeCamera> {
@@ -181,6 +193,10 @@ async function attach(page: Page): Promise<FakeCamera> {
     showEan13: (code) => page.evaluate((bars) => (window as unknown as { __fakeCamera: Control }).__fakeCamera.showBars(bars), ean13Modules(code)),
     showQr: (text) => page.evaluate((rows) => (window as unknown as { __fakeCamera: Control }).__fakeCamera.showMatrix(rows), qrModules(text)),
     hide: () => page.evaluate(() => (window as unknown as { __fakeCamera: Control }).__fakeCamera.hide()),
+    setTorch: (available) =>
+      page.evaluate((on) => {
+        (window as unknown as { __fakeCamera: Control }).__fakeCamera.torch = on;
+      }, available),
     scanRequests: () => [...scans],
     resetScanRequests: () => {
       scans.length = 0;

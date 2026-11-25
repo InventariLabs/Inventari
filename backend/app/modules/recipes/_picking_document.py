@@ -57,6 +57,7 @@ _NOTES_LABELS: dict[str, str] = {
     'de': 'Rezeptproduktion: {recipe} — Bestand bereits beim Kommissionieren der Zutaten entnommen',
     'fr': 'Production de recette : {recipe} — stock déjà prélevé lors de la préparation des ingrédients',
     'es': 'Producción de receta: {recipe} — existencias ya retiradas al preparar los ingredientes',
+    'pt': 'Produção de receita: {recipe} — estoque já retirado ao separar os ingredientes',
 }
 
 

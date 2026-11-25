@@ -305,8 +305,25 @@ export function CookForStockModal({
     const stranded = strandedRecipeId.current;
     strandedRecipeId.current = null;
     // Fire and forget: a refusal here means the maker module found the
-    // snapshot in use, which is the one case where keeping it is right.
-    if (stranded) void discardBridgeRecipe(stranded).catch(() => undefined);
+    // snapshot in use, which is the one case where keeping it is right (the
+    // cached lookup then still names it). Once it is discarded the answer is
+    // known — there is no production recipe — so the next sheet on the pair
+    // starts from that, not from the snapshot's yield while the lookup asks
+    // again.
+    if (stranded && product) {
+      const lookup = queryKeys.maker.bridgedRecipe(
+        product.product_template_id,
+        recipe.id,
+      );
+      void discardBridgeRecipe(stranded)
+        .then(() => queryClient.setQueryData(lookup, null))
+        .catch(() => undefined)
+        .then(() =>
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.maker.recipesAll,
+          }),
+        );
+    }
     onClose();
   };
 
@@ -526,9 +543,11 @@ function yieldDescription(
 ): string {
   if (storedYield !== null) {
     const amount = unit ? `${storedYield} ${unit}` : String(storedYield);
+    // The sentence puts its own full stop after the amount, so the stop an
+    // abbreviated unit ("pcs.", "szt.") ends in is left to it.
     return !servingsFit && storedYield === servings
       ? t("cookForStock.yieldStoredDoubtful", { amount })
-      : t("cookForStock.yieldStored", { amount });
+      : t("cookForStock.yieldStored", { amount: amount.replace(/\.$/, "") });
   }
   return servingsFit
     ? t("cookForStock.yieldHint", { servings })

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { DateInput } from "@/components/ui/DateInput";
+import { PastDayNote } from "@/modules/maker/components/PastDayNote";
 import { Input } from "@/components/ui/Input";
 import { formatQuantityLocalized, unitLabel } from "@/lib/i18nHelpers";
 import { QUANTITY_STEP } from "@/module-sdk";
@@ -103,6 +104,7 @@ export function FinishRunAction({ order }: { order: ProductionOrder }) {
             max={todayIso()}
             onChange={setDay}
           />
+          <PastDayNote day={day} />
           <Input
             label={t("progress.portionLot")}
             value={lot}

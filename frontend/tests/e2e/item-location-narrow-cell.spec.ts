@@ -10,7 +10,9 @@ import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
  * the road to the leaf must be the part that gives, never the leaf itself,
  * because records of one product on different shelves differ only there.
  */
-const LEAF = "Shelf A - Bottom Row Seven";
+// The E2E- prefix on every row the spec makes: a place that took stock refuses
+// deletion, and the prefix is what the suite's own sweep finds them by.
+const LEAF = "E2E-Shelf A - Bottom Row Seven";
 
 // The table shows from `lg` (1024 px); below it the list is a stack of cards.
 for (const width of [1024, 1280]) {
@@ -27,11 +29,11 @@ for (const width of [1024, 1280]) {
     let itemId = "";
     try {
       const site = await api.createStorage(token, {
-        name: `Distribution Centre North Building ${suffix}`,
+        name: `E2E-Distribution Centre North Building ${suffix}`,
       });
       ids.push(site.id);
       const zone = await api.createStorage(token, {
-        name: "Ambient Dry Goods Overflow Zone",
+        name: "E2E-Ambient Dry Goods Overflow Zone",
         parent_id: site.id,
       });
       ids.push(zone.id);
@@ -40,7 +42,7 @@ for (const width of [1024, 1280]) {
         parent_id: zone.id,
       });
       ids.push(shelf.id);
-      const itemName = `Narrow cell product ${suffix}`;
+      const itemName = `E2E-Narrow cell product ${suffix}`;
       itemId = (
         await api.createItem(token, {
           name: itemName,
@@ -57,6 +59,9 @@ for (const width of [1024, 1280]) {
       const leaf = row.getByText(LEAF);
       const parents = row.getByTestId("item-location-parents");
       await expect(leaf).toBeVisible();
+      // Asserted, not waited out: a cell without its road line fails here at
+      // once instead of as the test timeout `evaluate` waits for.
+      await expect(parents).toBeVisible();
 
       // Not a vacuous cell: the road is wider than the room it was given.
       const road = await parents.evaluate((el) => ({
@@ -81,8 +86,9 @@ for (const width of [1024, 1280]) {
       );
     } finally {
       if (itemId) await api.deleteItem(token, itemId);
-      // A place that took stock keeps its movement history and refuses to go;
-      // the names carry a per-run suffix, so a leftover collides with nothing.
+      // A place that took stock keeps its movement history and refuses to go,
+      // so every green run leaves these three; the E2E- prefix hands them to
+      // the suite's sweep, and the per-run suffix keeps them from colliding.
       for (const id of ids.reverse())
         await api.deleteStorage(token, id).catch(() => {});
     }

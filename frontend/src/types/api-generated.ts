@@ -754,6 +754,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/audit-log/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Audit Log Members
+         * @description The people a journal row can name.
+         *
+         *     The filter is part of the journal's screen, so it asks the journal's own
+         *     authority rather than the organization read a team list needs: a custom
+         *     administration role opens the log, and its member filter answers.
+         */
+        get: operations["list_audit_log_members_api_v1_audit_log_members_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/audit-log/target-types": {
         parameters: {
             query?: never;
@@ -2022,6 +2046,30 @@ export interface paths {
          *     the two prints remains a decision somebody makes.
          */
         post: operations["refresh_builtin_copy_api_v1_equipment_templates__template_id__refresh_copy_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/equipment/templates/{template_id}/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reset Template To Built In
+         * @description Put a copy back as the built-in it came from, in place.
+         *
+         *     Whatever was written into the copy is gone; its name, its place among
+         *     the defaults and everything that points at it stay. A template that was
+         *     not copied from a built-in has nothing to go back to: 404.
+         */
+        post: operations["reset_template_to_built_in_api_v1_equipment_templates__template_id__reset_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9057,6 +9105,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/warehouse/documents/{doc_id}/home-shelf-offers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Receipt Home Shelf Offers
+         * @description Which shelves a posted receipt in one step offers as a product's home.
+         *
+         *     One entry for each product whose line was put on a shelf other than the
+         *     suggested one; empty when the warehouse keeps no fixed places, receives in
+         *     two steps (the put-away asks) or the product's question was silenced.
+         */
+        get: operations["list_receipt_home_shelf_offers_api_v1_warehouse_documents__doc_id__home_shelf_offers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/warehouse/documents/{doc_id}/import-lines": {
         parameters: {
             query?: never;
@@ -11092,9 +11164,12 @@ export interface paths {
         };
         /**
          * List Work Item Assignees
-         * @description Who a task can be given to: the members who hold the warehouse write
-         *     grant, which every task on the list needs to be done. A viewer is a member
-         *     of the organization and cannot do any of them.
+         * @description Who a task can be given to, by the grant each kind of task needs.
+         *
+         *     A document, a putaway or a hand-typed task is ``warehouse:write`` work; a
+         *     count, a production run and a replenishment open another module's screen
+         *     and need that module's write. The picker in the screen offers, row by
+         *     row, the people who hold everything that row's action needs.
          */
         get: operations["list_work_item_assignees_api_v1_warehouse_work_items_assignees_get"];
         put?: never;
@@ -12555,6 +12630,21 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /**
+         * AuditLogMember
+         * @description One person the journal can name, as its filter offers them.
+         */
+        AuditLogMember: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name?: string | null;
+            /** Email */
+            email: string;
         };
         /** AuditResponseItemSchema */
         AuditResponseItemSchema: {
@@ -14978,6 +15068,8 @@ export interface components {
             planned_capacity_max?: string | null;
             /** Planned Shelf Fill */
             planned_shelf_fill?: number | null;
+            /** Unit Conversion Error */
+            unit_conversion_error?: string | null;
             /** Unit Price */
             unit_price: string | null;
             /** Tax Rate */
@@ -20133,6 +20225,24 @@ export interface components {
         PaginatedResponse_FailedEmailSummary_: {
             /** Items */
             items: components["schemas"]["FailedEmailSummary"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+            /** Has More */
+            has_more: boolean;
+            /**
+             * Total Capped
+             * @default false
+             */
+            total_capped: boolean;
+        };
+        /** PaginatedResponse[HomeShelfOffer] */
+        PaginatedResponse_HomeShelfOffer_: {
+            /** Items */
+            items: components["schemas"]["HomeShelfOffer"][];
             /** Total */
             total: number;
             /** Limit */
@@ -25549,6 +25659,11 @@ export interface components {
              * @default 0
              */
             proposed_move_quantity: number;
+            /**
+             * On Its Way Quantity
+             * @default 0
+             */
+            on_its_way_quantity: number;
             /** Remaining To Buy */
             remaining_to_buy?: number | null;
             /** Preferred Partner Id */
@@ -25591,9 +25706,11 @@ export interface components {
          *     ``not_found`` (no such rule in this org), ``not_alerting`` (stock is
          *     at or above the minimum right now), ``covered_by_reserve`` (the
          *     proposed internal move covers the whole shortage, so there is nothing
-         *     to buy), ``no_supplier`` (neither the rule nor the price list names
-         *     a supplier; reported, never turned into an empty order), ``made_here``
-         *     (the product has a recipe: it is produced, not bought).
+         *     to buy), ``already_on_order`` (open purchase orders already expect
+         *     what reserve does not cover), ``no_supplier`` (neither the rule nor the
+         *     price list names a supplier; reported, never turned into an empty
+         *     order), ``made_here`` (the product has a recipe: it is produced, not
+         *     bought).
          */
         ReplenishmentDraftSkipped: {
             /**
@@ -28475,6 +28592,8 @@ export interface components {
              * Format: uuid
              */
             delivery_id: string;
+            /** Error Cause */
+            error_cause?: string | null;
         };
         /**
          * Token
@@ -29090,6 +29209,8 @@ export interface components {
             created_at: string;
             /** Last Attempt At */
             last_attempt_at?: string | null;
+            /** Error Cause */
+            error_cause?: string | null;
         };
         /** WebhookEndpointCreate */
         WebhookEndpointCreate: {
@@ -29747,10 +29868,20 @@ export interface components {
         /**
          * WorkItemAssignees
          * @description The members a task can be given to: those who hold what doing it needs.
+         *
+         *     ``user_ids`` is everyone who could do a task of some kind. The kinds differ
+         *     in what they need — a count is ``stock_takes:write``, a run ``maker:write``,
+         *     a replenishment both the warehouse's and the orders' — so
+         *     ``by_permission`` names the holders of each, and a picker offers the people
+         *     who hold everything its row needs.
          */
         WorkItemAssignees: {
             /** User Ids */
             user_ids: string[];
+            /** By Permission */
+            by_permission: {
+                [key: string]: string[];
+            };
         };
         /**
          * WorkItemCustomCreate
@@ -31719,6 +31850,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_audit_log_members_api_v1_audit_log_members_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditLogMember"][];
                 };
             };
         };
@@ -34153,6 +34304,37 @@ export interface operations {
             };
         };
     };
+    reset_template_to_built_in_api_v1_equipment_templates__template_id__reset_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentTemplateSchema"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     fleet_valuation_api_v1_equipment_valuation_get: {
         parameters: {
             query?: never;
@@ -34568,6 +34750,8 @@ export interface operations {
             query?: {
                 /** @description Filter by location */
                 location_id?: string | null;
+                /** @description With location_id: also the records of every location below it, at any depth, so a search scoped to a place reaches its sub-places. */
+                include_inside?: boolean;
                 /** @description Filter by category */
                 category_id?: string | null;
                 /** @description Filter by category context_tag (e.g. equipment) */
@@ -34590,7 +34774,7 @@ export interface operations {
                 needs_attention?: boolean;
                 /** @description Threshold for low stock */
                 low_stock_threshold?: number;
-                /** @description Filter by source document (e.g. PZ that created the item) */
+                /** @description Only products whose history names this document: any receipt, issue, transfer or count that touched the product, not only the one that created it */
                 source_document_id?: string | null;
                 /** @description Comma-separated product template UUIDs. Narrows the list to items built on those templates; a module supplies the set (e.g. the templates that have a formula). Empty means no filter. */
                 template_ids?: string;
@@ -34684,7 +34868,7 @@ export interface operations {
                 only_low_stock?: boolean;
                 /** @description Records that need attention: expired, expiring within the expiry horizon, or of a product at its low-stock threshold — the records behind GET /items/attention-counts */
                 needs_attention?: boolean;
-                /** @description Filter by source document (e.g. PZ that created the item) */
+                /** @description Only products whose history names this document: any receipt, issue, transfer or count that touched the product, not only the one that created it */
                 source_document_id?: string | null;
                 /** @description Comma-separated product template UUIDs; empty means no filter. */
                 template_ids?: string;
@@ -47952,6 +48136,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ExtraCostsView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_receipt_home_shelf_offers_api_v1_warehouse_documents__doc_id__home_shelf_offers_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedResponse_HomeShelfOffer_"];
                 };
             };
             /** @description Validation Error */

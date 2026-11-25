@@ -3,7 +3,7 @@
   "info": {
     "title": "Inventari API",
     "description": "Home Inventory Management API",
-    "version": "0.12.0"
+    "version": "0.13.0"
   },
   "paths": {
     "/": {
@@ -2386,6 +2386,40 @@
             }
           }
         }
+      }
+    },
+    "/api/v1/audit-log/members": {
+      "get": {
+        "tags": [
+          "Audit Log"
+        ],
+        "summary": "List Audit Log Members",
+        "description": "The people a journal row can name.\n\nThe filter is part of the journal's screen, so it asks the journal's own\nauthority rather than the organization read a team list needs: a custom\nadministration role opens the log, and its member filter answers.",
+        "operationId": "list_audit_log_members_api_v1_audit_log_members_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AuditLogMember"
+                  },
+                  "type": "array",
+                  "title": "Response List Audit Log Members Api V1 Audit Log Members Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
       }
     },
     "/api/v1/audit-log/target-types": {
@@ -6554,6 +6588,58 @@
         }
       }
     },
+    "/api/v1/equipment/templates/{template_id}/reset": {
+      "post": {
+        "tags": [
+          "Equipment"
+        ],
+        "summary": "Reset Template To Built In",
+        "description": "Put a copy back as the built-in it came from, in place.\n\nWhatever was written into the copy is gone; its name, its place among\nthe defaults and everything that points at it stay. A template that was\nnot copied from a built-in has nothing to go back to: 404.",
+        "operationId": "reset_template_to_built_in_api_v1_equipment_templates__template_id__reset_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentTemplateSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/equipment/valuation": {
       "get": {
         "tags": [
@@ -7326,6 +7412,18 @@
             "description": "Filter by location"
           },
           {
+            "name": "include_inside",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "With location_id: also the records of every location below it, at any depth, so a search scoped to a place reaches its sub-places.",
+              "default": false,
+              "title": "Include Inside"
+            },
+            "description": "With location_id: also the records of every location below it, at any depth, so a search scoped to a place reaches its sub-places."
+          },
+          {
             "name": "category_id",
             "in": "query",
             "required": false,
@@ -7503,10 +7601,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Filter by source document (e.g. PZ that created the item)",
+              "description": "Only products whose history names this document: any receipt, issue, transfer or count that touched the product, not only the one that created it",
               "title": "Source Document Id"
             },
-            "description": "Filter by source document (e.g. PZ that created the item)"
+            "description": "Only products whose history names this document: any receipt, issue, transfer or count that touched the product, not only the one that created it"
           },
           {
             "name": "template_ids",
@@ -7847,10 +7945,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Filter by source document (e.g. PZ that created the item)",
+              "description": "Only products whose history names this document: any receipt, issue, transfer or count that touched the product, not only the one that created it",
               "title": "Source Document Id"
             },
-            "description": "Filter by source document (e.g. PZ that created the item)"
+            "description": "Only products whose history names this document: any receipt, issue, transfer or count that touched the product, not only the one that created it"
           },
           {
             "name": "template_ids",
@@ -14334,7 +14432,7 @@
               "anyOf": [
                 {
                   "type": "string",
-                  "pattern": "^(DRAFT|COMPLETED|CANCELLED|REVERSED)$"
+                  "pattern": "^(DRAFT|IN_PROGRESS|COMPLETED|CANCELLED|REVERSED)$"
                 },
                 {
                   "type": "null"
@@ -33684,6 +33782,58 @@
         }
       }
     },
+    "/api/v1/warehouse/documents/{doc_id}/home-shelf-offers": {
+      "get": {
+        "tags": [
+          "Warehouse"
+        ],
+        "summary": "List Receipt Home Shelf Offers",
+        "description": "Which shelves a posted receipt in one step offers as a product's home.\n\nOne entry for each product whose line was put on a shelf other than the\nsuggested one; empty when the warehouse keeps no fixed places, receives in\ntwo steps (the put-away asks) or the product's question was silenced.",
+        "operationId": "list_receipt_home_shelf_offers_api_v1_warehouse_documents__doc_id__home_shelf_offers_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_HomeShelfOffer_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/warehouse/documents/{doc_id}/import-lines": {
       "post": {
         "tags": [
@@ -41059,7 +41209,7 @@
           "Warehouse"
         ],
         "summary": "List Work Item Assignees",
-        "description": "Who a task can be given to: the members who hold the warehouse write\ngrant, which every task on the list needs to be done. A viewer is a member\nof the organization and cannot do any of them.",
+        "description": "Who a task can be given to, by the grant each kind of task needs.\n\nA document, a putaway or a hand-typed task is ``warehouse:write`` work; a\ncount, a production run and a replenishment open another module's screen\nand need that module's write. The picker in the screen offers, row by\nrow, the people who hold everything that row's action needs.",
         "operationId": "list_work_item_assignees_api_v1_warehouse_work_items_assignees_get",
         "responses": {
           "200": {
@@ -45143,6 +45293,37 @@
         ],
         "title": "AuditLogDTO",
         "description": "Immutable audit-trail entry (SOX / GDPR compliance)."
+      },
+      "AuditLogMember": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email"
+        ],
+        "title": "AuditLogMember",
+        "description": "One person the journal can name, as its filter offers them."
       },
       "AuditResponseItemSchema": {
         "properties": {
@@ -52111,6 +52292,17 @@
               }
             ],
             "title": "Planned Shelf Fill"
+          },
+          "unit_conversion_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Conversion Error"
           },
           "unit_price": {
             "anyOf": [
@@ -64669,6 +64861,7 @@
           },
           "currency": {
             "type": "string",
+            "maxLength": 3,
             "title": "Currency",
             "default": "USD"
           },
@@ -64979,7 +65172,8 @@
           "currency": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 3
               },
               {
                 "type": "null"
@@ -66574,6 +66768,47 @@
           "has_more"
         ],
         "title": "PaginatedResponse[FailedEmailSummary]"
+      },
+      "PaginatedResponse_HomeShelfOffer_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/HomeShelfOffer"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
+          "total_capped": {
+            "type": "boolean",
+            "title": "Total Capped",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset",
+          "has_more"
+        ],
+        "title": "PaginatedResponse[HomeShelfOffer]"
       },
       "PaginatedResponse_HomeShelfSilencedOut_": {
         "properties": {
@@ -81653,6 +81888,11 @@
             "title": "Proposed Move Quantity",
             "default": 0
           },
+          "on_its_way_quantity": {
+            "type": "number",
+            "title": "On Its Way Quantity",
+            "default": 0
+          },
           "remaining_to_buy": {
             "anyOf": [
               {
@@ -81777,7 +82017,7 @@
           "reason"
         ],
         "title": "ReplenishmentDraftSkipped",
-        "description": "A requested rule that did not become a PO line, with the reason.\n\n``reason`` is a stable machine code the UI translates:\n``not_found`` (no such rule in this org), ``not_alerting`` (stock is\nat or above the minimum right now), ``covered_by_reserve`` (the\nproposed internal move covers the whole shortage, so there is nothing\nto buy), ``no_supplier`` (neither the rule nor the price list names\na supplier; reported, never turned into an empty order), ``made_here``\n(the product has a recipe: it is produced, not bought)."
+        "description": "A requested rule that did not become a PO line, with the reason.\n\n``reason`` is a stable machine code the UI translates:\n``not_found`` (no such rule in this org), ``not_alerting`` (stock is\nat or above the minimum right now), ``covered_by_reserve`` (the\nproposed internal move covers the whole shortage, so there is nothing\nto buy), ``already_on_order`` (open purchase orders already expect\nwhat reserve does not cover), ``no_supplier`` (neither the rule nor the\nprice list names a supplier; reported, never turned into an empty\norder), ``made_here`` (the product has a recipe: it is produced, not\nbought)."
       },
       "ReplenishmentMoveLineDTO": {
         "properties": {
@@ -89091,6 +89331,17 @@
             "type": "string",
             "format": "uuid",
             "title": "Delivery Id"
+          },
+          "error_cause": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Cause"
           }
         },
         "type": "object",
@@ -90494,6 +90745,17 @@
               }
             ],
             "title": "Last Attempt At"
+          },
+          "error_cause": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Cause"
           }
         },
         "type": "object",
@@ -92447,14 +92709,26 @@
             },
             "type": "array",
             "title": "User Ids"
+          },
+          "by_permission": {
+            "additionalProperties": {
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "By Permission"
           }
         },
         "type": "object",
         "required": [
-          "user_ids"
+          "user_ids",
+          "by_permission"
         ],
         "title": "WorkItemAssignees",
-        "description": "The members a task can be given to: those who hold what doing it needs."
+        "description": "The members a task can be given to: those who hold what doing it needs.\n\n``user_ids`` is everyone who could do a task of some kind. The kinds differ\nin what they need \u2014 a count is ``stock_takes:write``, a run ``maker:write``,\na replenishment both the warehouse's and the orders' \u2014 so\n``by_permission`` names the holders of each, and a picker offers the people\nwho hold everything its row needs."
       },
       "WorkItemCustomCreate": {
         "properties": {

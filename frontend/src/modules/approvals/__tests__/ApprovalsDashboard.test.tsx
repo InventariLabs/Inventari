@@ -683,10 +683,10 @@ describe("ApprovalsDashboard", () => {
     // No approve/reject buttons (they live inside ApprovalDecisionButtons
     // and are only shown for non-terminal statuses)
     expect(
-      screen.queryByRole("button", { name: /^Approve$/i }),
+      screen.queryByRole("button", { name: /^Approve\b/i }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: /^Reject$/i }),
+      screen.queryByRole("button", { name: /^Reject\b/i }),
     ).not.toBeInTheDocument();
   });
 

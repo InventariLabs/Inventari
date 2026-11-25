@@ -13,9 +13,9 @@
  * each of the calendar's two DndContexts actually receives, at both widths,
  * so a return to sortable coordinates fails here before it fails a reader.
  */
+import type { ReactNode } from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render } from "@testing-library/react";
-import type { ReactNode } from "react";
 import {
   KeyboardSensor,
   PointerSensor,

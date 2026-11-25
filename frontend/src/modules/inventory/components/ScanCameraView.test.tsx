@@ -74,6 +74,16 @@ describe("ScanCameraView — typing a code by hand", () => {
     expect(onManualCode).toHaveBeenCalledWith("STM-0001");
   });
 
+  it("opens the sheet over the running camera with the focus in the code field, on a phone too", () => {
+    render(
+      <ScanCameraView {...baseProps} isCameraActive onManualCode={vi.fn()} />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Type a code" }));
+
+    expect(screen.getByTestId("manual-barcode-input")).toHaveFocus();
+  });
+
   it("offers no way to type a code with the camera running when the caller cannot take one", () => {
     render(<ScanCameraView {...baseProps} isCameraActive />);
 

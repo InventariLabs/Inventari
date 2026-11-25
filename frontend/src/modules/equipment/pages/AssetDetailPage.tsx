@@ -36,6 +36,7 @@ import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { getEquipmentMeta } from "@/modules/equipment/components/assetUtils";
+import { isEquipmentRecord } from "@/modules/shared/lib/equipmentRecord";
 import type { EquipmentAssignment } from "@/modules/equipment/api/equipment";
 
 type Tab = "timeline" | "info" | "assignments" | "maintenance";
@@ -60,9 +61,10 @@ export default function AssetDetailPage() {
   const restoreMutation = useRestoreEquipment();
   const { changeStatus: handleChangeStatus, isPending: isBulkEditing } =
     useChangeAssetStatus(id);
-  // Both reads are keyed by an asset id: an id the item read did not accept
-  // would only draw a validation error behind the not-found card.
-  const knownId = item ? (id ?? "") : "";
+  // Both reads are keyed by an asset id: an id the item read did not accept,
+  // or one the register does not list, would only draw a validation error
+  // behind the not-found card.
+  const knownId = item && isEquipmentRecord(item) ? (id ?? "") : "";
   const { data: approvalStatus } = useApprovalStatus(knownId);
   const { data: assignments } = useItemAssignmentHistory(knownId);
   const activeAssignment = assignments?.find((a) => !a.checked_in_at) ?? null;
@@ -208,7 +210,13 @@ export default function AssetDetailPage() {
     return <QueryError error={error} onRetry={() => void refetch()} />;
   }
 
-  if (!item) {
+  // The register's records are the categories its module claims, plus
+  // uncategorized records carrying its namespace. This card reads Core
+  // items, so a product filed under an unclaimed category is a record the
+  // register does not list — the same "Asset not found" an
+  // equipment-only reader gets, instead of a product dressed as an asset
+  // with actions that then refuse.
+  if (!item || !isEquipmentRecord(item)) {
     return (
       <RecordNotFound
         title={t("detail.not_found")}
@@ -327,7 +335,11 @@ export default function AssetDetailPage() {
 
       <ConfirmDialog
         open={showPurgeConfirm}
-        title={t("detail.confirm_purge")}
+        title={
+          item?.name
+            ? t("detail.confirm_purge_named", { name: item.name })
+            : t("detail.confirm_purge")
+        }
         message={t("detail.confirm_purge_msg")}
         confirmLabel={t("actions.purge")}
         cancelLabel={t("common:actions.cancel", "Cancel")}
@@ -339,7 +351,11 @@ export default function AssetDetailPage() {
 
       <ConfirmDialog
         open={showRestoreConfirm}
-        title={t("actions.restore")}
+        title={
+          item?.name
+            ? t("actions.restoreNamed", { name: item.name })
+            : t("actions.restore")
+        }
         message={t("detail.confirm_restore_msg")}
         confirmLabel={t("actions.restore")}
         cancelLabel={t("common:actions.cancel", "Cancel")}

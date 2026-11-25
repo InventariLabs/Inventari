@@ -146,7 +146,9 @@ async def _flush_new_template_async(
     Two requests that met the same new code both looked, found nothing and
     wrote: the second hits the organization's unique code. The savepoint
     keeps the surrounding transaction usable, and the answer is the one a
-    request arriving a moment later gets from the look — not a 500.
+    request arriving a moment later gets from the look — not a 500. Both
+    codes answer the same way: the barcode and the SKU are each unique per
+    organization, and the door in front of either is the refusal.
     """
     try:
         async with db.begin_nested():
@@ -157,6 +159,8 @@ async def _flush_new_template_async(
             raise ServiceRejectionError(
                 'barcode_already_exists', barcode=barcode
             ) from exc
+        if tpl.sku and 'uq_templates_org_sku' in str(exc.orig):
+            raise ServiceRejectionError('sku_in_use', sku=tpl.sku) from exc
         raise
 
 
@@ -166,8 +170,16 @@ async def create_stub_template_async(
     name: str,
     barcode: str | None = None,
     user_id: UUID | None = None,
+    *,
+    sku: str | None = None,
+    uom_id: UUID | None = None,
 ) -> ProductTemplate:
-    """Async: create a minimal stub ProductTemplate for quick entry."""
+    """Async: create a minimal stub ProductTemplate for quick entry.
+
+    A caller that already holds the product's own code or unit passes them:
+    the stub keeps the code instead of drawing the next generated one, and is
+    kept in that unit instead of pieces.
+    """
     if barcode:
         existing = await db.scalar(
             select(ProductTemplate).where(
@@ -178,14 +190,14 @@ async def create_stub_template_async(
         if existing:
             raise ServiceRejectionError('barcode_already_exists', barcode=barcode)
 
-    sku = await _generate_sku_async(db, org_id)
+    sku = sku or await _generate_sku_async(db, org_id)
 
     # Same as the full create path: a stub is a catalogue row the unit
     # guard and the stock screen read, and "pieces" is the answer for a
     # product nobody described yet.
     from app.services.items._create import _default_piece_uom_id_async
 
-    resolved_uom_id = await _default_piece_uom_id_async(db, org_id)
+    resolved_uom_id = uom_id or await _default_piece_uom_id_async(db, org_id)
 
     meta_data: dict[str, Any] = {'is_stub': True}
 
@@ -249,8 +261,7 @@ async def clone_template(
         min_quantity=original.min_quantity,
         meta_data=original.meta_data,
     )
-    db.add(cloned)
-    await db.flush()
+    await _flush_new_template_async(db, cloned, new_barcode)
     await db.refresh(cloned)
     await _log_template_async(
         db,

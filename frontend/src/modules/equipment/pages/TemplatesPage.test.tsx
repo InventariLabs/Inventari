@@ -275,6 +275,50 @@ describe("TemplatesPage — the model catalogue", () => {
   });
 });
 
+describe("TemplatesPage — putting a copy back as the built-in", () => {
+  it("marks a changed copy, asks before resetting it, and clears the mark", async () => {
+    let reset = false;
+    const resets = vi.fn();
+    server.use(
+      http.get("/api/v1/equipment/templates", () =>
+        HttpResponse.json(
+          onePage([
+            {
+              ...template,
+              source_builtin: "Standard Checkout",
+              source_modified: !reset,
+            },
+          ]),
+        ),
+      ),
+      http.post("/api/v1/equipment/templates/tpl-1/reset", () => {
+        reset = true;
+        resets();
+        return HttpResponse.json({ ...template, source_modified: false });
+      }),
+    );
+    const user = userEvent.setup();
+    renderPage();
+
+    await screen.findByTestId("template-modified-badge");
+    await user.click(
+      screen.getByRole("button", { name: /reset to built-in/i }),
+    );
+
+    const dialog = await screen.findByRole("alertdialog");
+    expect(dialog).toHaveTextContent("Standard Checkout");
+    expect(resets).not.toHaveBeenCalled();
+    await user.click(within(dialog).getByRole("button", { name: "Reset" }));
+
+    await waitFor(() => expect(resets).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(
+        screen.queryByTestId("template-modified-badge"),
+      ).not.toBeInTheDocument(),
+    );
+  });
+});
+
 describe("TemplatesPage — the document templates", () => {
   it("copies the built-in layouts from the header", async () => {
     const seeded = vi.fn();

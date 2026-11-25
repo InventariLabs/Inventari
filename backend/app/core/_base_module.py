@@ -482,6 +482,11 @@ class BaseModule(ABC):
         # in English and translated by whichever screen happens to know how.
         lang = get_current_lang()
 
+        from app.services.storage._names import (
+            check_name_unique_async,
+            flush_under_the_name_rule,
+        )
+
         for decl in self.metadata.default_storage_locations:
             if decl.context_tag and decl.context_tag in existing_tags:
                 logger.info(
@@ -510,6 +515,10 @@ class BaseModule(ABC):
                 if localized and localized.description
                 else decl.description
             )
+            # A parentless place's name is unique, and a hand-made one may
+            # already hold this declaration's — the seed joins nothing and
+            # must say so rather than meet the index raw.
+            await check_name_unique_async(db, organization_id, name)
             db.add(
                 StorageLocation(
                     name=name,
@@ -530,6 +539,9 @@ class BaseModule(ABC):
                     ),
                 )
             )
+            # The read above keeps two enables from writing one name; the
+            # savepoint settles them when they raced anyway.
+            await flush_under_the_name_rule(db, name)
 
     async def _align_seeded_name(
         self, organization_id: Any, decl: Any, lang: str, db: AsyncSession
@@ -564,10 +576,20 @@ class BaseModule(ABC):
             .scalars()
             .all()
         )
+        from app.services.storage._names import (
+            check_name_unique_async,
+            flush_under_the_name_rule,
+        )
+
         for row in rows:
             seed = (row.settings or {}).get('seed') or {}
             if seed.get('code') != decl.code or seed.get('name') != row.name:
                 continue
+            # Joining the reader's language is a rename like any other, and a
+            # hand-made sibling may already hold the name it joins.
+            await check_name_unique_async(
+                db, organization_id, localized.name, exclude_id=row.id
+            )
             row.name = localized.name
             if localized.description and row.description == decl.description:
                 row.description = localized.description
@@ -578,6 +600,7 @@ class BaseModule(ABC):
                 'seed': {**seed, 'name': localized.name},
             }
             db.add(row)
+            await flush_under_the_name_rule(db, localized.name)
 
     def on_enable(
         self, organization_id: UUID, context: ModuleContext
