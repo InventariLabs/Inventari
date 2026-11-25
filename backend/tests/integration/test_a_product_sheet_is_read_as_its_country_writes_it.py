@@ -107,6 +107,29 @@ class TestAProductSheetIsReadAsItsCountryWritesIt:
             item = await _item(real_async_db_session, name)
             assert item.quantity == Decimal(quantity), name
 
+    async def test_a_decimal_comma_in_the_column_makes_a_lone_comma_decimal_in_english(
+        self, real_async_db_session, async_test_user, async_test_storage_location
+    ):
+        """A Polish sheet imported from an English screen: "1,250" is 1.25 kg."""
+        result = await _import(
+            real_async_db_session,
+            async_test_user,
+            'Produkt;Ilość;Cena;Ważne do;Jm\n'
+            'Sruby;12,5;7,49 zł;05.11.2026;kg\n'
+            'Nakretki;1,250;1 289,00 zł;03.12.2026;kg\n'
+            'Podkladki;2;4,50 zł;28.02.2027;kg\n',
+            'en',
+        )
+
+        assert (result['imported'], result['failed']) == (3, 0), result['errors']
+        for name, quantity in (
+            ('Sruby', '12.5'),
+            ('Nakretki', '1.25'),
+            ('Podkladki', '2'),
+        ):
+            item = await _item(real_async_db_session, name)
+            assert item.quantity == Decimal(quantity), name
+
     async def test_an_all_ambiguous_column_follows_the_importers_language(
         self, real_async_db_session, async_test_user, async_test_storage_location
     ):

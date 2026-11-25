@@ -121,6 +121,35 @@ class TestNumbers:
         assert sheet.number('1.234', 'qty') == Decimal('1234')
         assert sheet.number('2,5', 'qty') == Decimal('2.5')
 
+    @pytest.mark.parametrize('lang', ['en', 'de', 'pl'])
+    def test_a_decimal_comma_in_the_column_makes_a_lone_comma_decimal(
+        self, lang: str
+    ) -> None:
+        set_current_lang(lang)
+        sheet = SheetColumns(read_rows(b'a;qty\nx;12,5\ny;1,250\nz;2\n', 'sheet.csv'))
+        assert sheet.number('1,250', 'qty') == Decimal('1.25')
+        assert sheet.number('12,5', 'qty') == Decimal('12.5')
+
+    @pytest.mark.parametrize('lang', ['en', 'de', 'pl'])
+    def test_a_decimal_dot_in_the_column_makes_a_lone_comma_thousands(
+        self, lang: str
+    ) -> None:
+        set_current_lang(lang)
+        sheet = SheetColumns(
+            read_rows(b'a;qty\nx;1,234.50\ny;1,250\nz;2.5\n', 'sheet.csv')
+        )
+        assert sheet.number('1,250', 'qty') == Decimal('1250')
+        assert sheet.number('1,234.50', 'qty') == Decimal('1234.50')
+
+    def test_an_undecided_column_reads_a_lone_comma_by_the_language(self) -> None:
+        sheet = SheetColumns(read_rows(b'a;qty\nx;1,250\ny;2\n', 'sheet.csv'))
+        set_current_lang('en')
+        assert sheet.number('1,250', 'qty') == Decimal('1250')
+        set_current_lang('pl')
+        assert SheetColumns(read_rows(b'a;qty\nx;1,250\ny;2\n', 'sheet.csv')).number(
+            '1,250', 'qty'
+        ) == Decimal('1.25')
+
     def test_a_pasted_column_is_typed_text_like_a_file_column(self) -> None:
         from app.modules.warehouse.document_import_service import parse_pasted_text
 
@@ -128,6 +157,21 @@ class TestNumbers:
         sheet = SheetColumns(parse_pasted_text('Name\tQty\nA\t1.250\nB\t1.234\n'))
         assert sheet.number('1.250', 'Qty') == Decimal('1250')
         assert sheet.number('1.234', 'Qty') == Decimal('1234')
+
+    def test_an_english_pasted_column_in_a_polish_session_keeps_its_comma_groups(
+        self,
+    ) -> None:
+        from app.modules.warehouse.document_import_service import parse_pasted_text
+
+        set_current_lang('pl')
+        sheet = SheetColumns(
+            parse_pasted_text('Name\tQty\nA\t1,234.50\nB\t1,250\nC\t2.5\n')
+        )
+        assert [sheet.number(v, 'Qty') for v in ('1,234.50', '1,250', '2.5')] == [
+            Decimal('1234.50'),
+            Decimal('1250'),
+            Decimal('2.5'),
+        ]
 
     def test_a_workbook_column_keeps_its_decimal_dot(self) -> None:
         set_current_lang('de')

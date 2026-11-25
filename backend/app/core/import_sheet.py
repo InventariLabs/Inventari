@@ -440,12 +440,12 @@ def parse_sheet_number(raw: Any, dot_thousands: bool | None = None) -> Decimal:
     carrying both separators says which is the decimal mark — the last one
     ("1.234,50", "1,234.50"); the same separator repeated is a thousands
     separator ("1.234.567"); a lone comma is a decimal mark ("12,5"), except
-    that exactly three digits after it read as a thousands group for a
-    language that writes the decimal mark as a dot ("1,250" in English is
-    1250).
+    that exactly three digits after it read as a thousands group where the
+    column says the comma groups, or, undecided, for a language that writes
+    the decimal mark as a dot ("1,250" in English is 1250).
 
-    A lone dot before exactly three digits ("1.234") is the one cell no
-    value settles: *dot_thousands* says what its column decided
+    A lone dot or comma before exactly three digits ("1.234", "1,250") is the
+    one cell no value settles: *dot_thousands* says what its column decided
     (:meth:`SheetColumns.number`). Without a decision it is the decimal mark
     a workbook's number cell writes ("2.125"), except that for a language
     that writes a decimal comma a group ending in 0 ("1.200") is thousands —
@@ -518,17 +518,20 @@ def _normalize_separators(text: str, dot_thousands: bool | None) -> str:
 def _is_thousands_group(mark: str, fraction: str, dot_thousands: bool | None) -> bool:
     """Whether one separator before exactly three digits is a thousands mark.
 
-    A comma is for a language that writes its decimal mark as a dot ("1,250"
-    in English). A dot follows *dot_thousands* when the column decided it;
-    undecided, it is for a language that writes a decimal comma ("1.200 kg"
-    in German) when the group ends in 0, the only ending a workbook's float
-    text cannot have.
+    When the column decided which mark is its decimal one, that settles both
+    marks: a dot that groups thousands means the comma is the decimal mark
+    ("1,250" is 1.25 next to "12,5"), a decimal dot means the comma groups
+    ("1,250" is 1250 next to "1,234.50"). Undecided, a comma is thousands
+    for a language that writes its decimal mark as a dot ("1,250" in
+    English), and a dot is thousands for a language that writes a decimal
+    comma ("1.200 kg" in German) when the group ends in 0, the only ending a
+    workbook's float text cannot have.
     """
+    if dot_thousands is not None:
+        return dot_thousands if mark == '.' else not dot_thousands
     comma_decimal = writes_decimal_comma(get_current_lang())
     if mark == ',':
         return not comma_decimal
-    if dot_thousands is not None:
-        return dot_thousands
     return comma_decimal and fraction.endswith('0')
 
 
