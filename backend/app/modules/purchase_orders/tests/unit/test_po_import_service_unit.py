@@ -298,3 +298,59 @@ class TestAWorkbookThatCannotBeOpenedIsRefused:
             await import_lines_into_po(
                 db, po.id, b'PK\x03\x04cut-off', 'data.xlsx', {}, uuid4()
             )
+
+
+class TestASheetWrittenWithADecimalComma:
+    @pytest.mark.asyncio
+    async def test_quantities_and_prices_are_read_as_the_sheet_writes_them(
+        self,
+    ) -> None:
+        db = MagicMock()
+        db.add = MagicMock()
+        db.flush = AsyncMock()
+        po = _make_po(status='DRAFT')
+        mock_result = MagicMock()
+        mock_result.scalars.return_value.first.return_value = po
+        db.execute = AsyncMock(return_value=mock_result)
+        csv = _make_csv(
+            'name;qty;price;tax\n'
+            'Widget A;12,5;1 289,00 zł;23\n'
+            'Widget B;1 200;$4.50;\n'
+            'Widget C;3;tanio;\n'
+        )
+        mapping = {
+            'name': 'name',
+            'quantity_ordered': 'qty',
+            'unit_price': 'price',
+            'tax_rate': 'tax',
+        }
+        with (
+            patch(
+                'app.modules.purchase_orders.po_import_service.core_api',
+                MagicMock(),
+            ) as mock_api,
+            patch(
+                'app.modules.purchase_orders.po_import_service.UomResolverAsync',
+            ) as mock_resolver_cls,
+        ):
+            mock_api.product_templates.lookup_by_sku_async = AsyncMock(
+                return_value=None
+            )
+            mock_api.product_templates.lookup_by_barcode_async = AsyncMock(
+                return_value=None
+            )
+            mock_resolver_cls.return_value.resolve = AsyncMock(return_value=None)
+            result = await import_lines_into_po(
+                db, po.id, csv, 'data.csv', mapping, uuid4()
+            )
+
+        added = [call.args[0] for call in db.add.call_args_list]
+        assert [
+            (str(line.quantity_ordered), str(line.unit_price)) for line in added
+        ] == [
+            ('12.5', '1289.00'),
+            ('1200', '4.50'),
+        ]
+        assert str(added[0].tax_rate) == '23'
+        assert result['imported'] == 2
+        assert 'tanio' in result['errors'][0]['error']
