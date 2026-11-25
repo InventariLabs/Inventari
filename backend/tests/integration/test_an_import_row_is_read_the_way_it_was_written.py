@@ -220,7 +220,7 @@ class TestTheReasonsSpeakTheReadersLanguage:
             assert reason.startswith('Kolumna „Quantity”: ')
             assert 'should be' not in reason
 
-    async def test_a_number_that_is_not_finite_is_worded_in_polish(
+    async def test_a_number_that_is_not_finite_is_refused_with_its_cell_in_polish(
         self, real_async_db_session, async_test_user, async_test_storage_location
     ):
         set_current_lang('pl')
@@ -237,7 +237,10 @@ class TestTheReasonsSpeakTheReadersLanguage:
             set_current_lang('en')
 
         reasons = [e['error'] for e in result['errors']]
-        assert reasons == ['Kolumna „Quantity”: Musi być liczbą'] * 2
+        assert reasons == [
+            'Kolumna „Quantity”: „Infinity” nie jest liczbą',
+            'Kolumna „Quantity”: „-inf” nie jest liczbą',
+        ]
 
     async def test_a_choice_outside_a_custom_field_is_worded_in_the_session_language(
         self, real_async_db_session, async_test_user, async_test_storage_type

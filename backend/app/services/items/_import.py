@@ -8,8 +8,8 @@ products the products list counted and the stock screen had never heard of.
 
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
-from datetime import date, datetime
-from decimal import Decimal, InvalidOperation
+from datetime import date
+from decimal import Decimal
 from typing import Any, Literal, cast
 from uuid import UUID
 
@@ -19,9 +19,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import UserContextDTO
 from app.core.exceptions import ServiceRejectionError
+from app.core.import_sheet import SheetColumns, read_rows
 from app.core.import_sheet import cell_text as _cell_text
 from app.core.import_sheet import explain as _explain
-from app.core.import_sheet import read_rows
 from app.core.import_sheet import row_get as _row_get
 from app.core.location_path import join_location_path
 from app.core.logging import get_logger
@@ -102,6 +102,7 @@ async def import_items(
         db=db,
         user=user,
         mapping=mapping,
+        sheet=SheetColumns(df),
         storages=await _preload_storage_index(db, user.organization_id),
         category_cache=await _preload_category_cache(db, user.organization_id),
         category_fields=await _preload_category_fields(db, user.organization_id),
@@ -445,7 +446,11 @@ async def _resolve_or_create_category(
 
 
 def _number_from_cell(
-    row: pd.Series, mapping: dict[str, Any], key: str, default: Decimal | None
+    row: pd.Series,
+    mapping: dict[str, Any],
+    key: str,
+    default: Decimal | None,
+    sheet: SheetColumns,
 ) -> Decimal | None:
     """Parse a mapped numeric cell, or fall back to ``default`` when empty.
 
@@ -460,14 +465,16 @@ def _number_from_cell(
     if text is None:
         return default
     try:
-        return Decimal(text)
-    except InvalidOperation:
+        return sheet.number(text, mapping[key])
+    except ValueError:
         raise ServiceRejectionError(
             'import_column_not_a_number', column=mapping[key], value=text
         ) from None
 
 
-def _quantity_from_cell(row: pd.Series, mapping: dict[str, Any]) -> Decimal:
+def _quantity_from_cell(
+    row: pd.Series, mapping: dict[str, Any], sheet: SheetColumns
+) -> Decimal:
     """The row's quantity: 1 when the sheet has no quantity column at all.
 
     A column the reader mapped to quantity and left blank in this row is a
@@ -476,7 +483,7 @@ def _quantity_from_cell(row: pd.Series, mapping: dict[str, Any]) -> Decimal:
     """
     if not mapping.get('quantity'):
         return Decimal('1.0')
-    quantity = _number_from_cell(row, mapping, 'quantity', None)
+    quantity = _number_from_cell(row, mapping, 'quantity', None, sheet)
     if quantity is None:
         raise ServiceRejectionError(
             'import_column_quantity_blank', column=mapping['quantity']
@@ -550,12 +557,15 @@ async def _known_units(ctx: '_ImportContext') -> str:
     return ', '.join(sorted({get_unit_label(u.symbol) for u in uoms}))
 
 
-def _parse_date_cell(row: pd.Series, mapping: dict[str, Any], key: str) -> date | None:
+def _parse_date_cell(
+    row: pd.Series, mapping: dict[str, Any], key: str, sheet: SheetColumns
+) -> date | None:
     """Read and parse a mapped date column (expiry, freeze), or refuse the cell.
 
     Not app.core.datetimes.parse_iso_date: the input is a spreadsheet cell,
-    which may already be a datetime and otherwise needs pandas' lenient
-    parsing of whatever the user typed. Item import is its only caller.
+    which may already be a datetime and otherwise is read the way its
+    column writes dates (``sheet`` decides day-first or month-first from the
+    whole column).
 
     A cell the parser cannot read refuses the row with the column and the
     cell, the way quantity and location word theirs: a cell logged and dropped
@@ -563,24 +573,17 @@ def _parse_date_cell(row: pd.Series, mapping: dict[str, Any], key: str) -> date 
     failures, and the product would stay off every expiring-soon screen.
     """
     raw = _row_get(row, mapping, key)
-    if isinstance(raw, datetime):
-        return raw.date()
-    if isinstance(raw, date):
-        return raw
     text = _cell_text(raw)
     if text is None:
         return None
     column = mapping[key]
     try:
-        parsed = pd.to_datetime(text)
+        return sheet.date(raw, column)
     except (KeyError, ValueError, TypeError, OSError) as exc:
         logger.warning('Failed to parse %s: %s', key, exc)
         raise ServiceRejectionError(
             'import_date_invalid', column=column, value=text
         ) from None
-    if pd.isna(parsed):
-        raise ServiceRejectionError('import_date_invalid', column=column, value=text)
-    return cast(date | None, parsed.date())
 
 
 def _field_value(
@@ -589,6 +592,7 @@ def _field_value(
     mapping: dict[str, Any],
     key: str,
     text: str,
+    sheet: SheetColumns,
 ) -> object:
     """One field cell as the form stores the value, or refuse the cell.
 
@@ -602,15 +606,14 @@ def _field_value(
     column = mapping[key]
     value: object = text
     if kind == 'number':
-        value = text.replace(',', '.')
         try:
-            Decimal(value)
-        except InvalidOperation:
+            value = str(sheet.number(text, column))
+        except ValueError:
             raise ServiceRejectionError(
                 'import_column_not_a_number', column=column, value=text
             ) from None
     elif kind == 'date':
-        parsed = _parse_date_cell(row, mapping, key)
+        parsed = _parse_date_cell(row, mapping, key, sheet)
         value = parsed.isoformat() if parsed else None
     elif kind == 'boolean':
         if text.lower() not in _YES | _NO:
@@ -704,7 +707,7 @@ def _field_values(
             text = _cell_text(_row_get(row, ctx.mapping, mapping_key))
             if text is not None:
                 values[key] = _field_value(
-                    definition, row, ctx.mapping, mapping_key, text
+                    definition, row, ctx.mapping, mapping_key, text, ctx.sheet
                 )
                 continue
         # What the row owes is what the form asks for: the form's own
@@ -745,14 +748,16 @@ async def _build_item(
         name=name,
         location_id=storage_id,
         category_id=category_id,
-        quantity=_quantity_from_cell(row, mapping),
+        quantity=_quantity_from_cell(row, mapping, ctx.sheet),
         brand=_cell_text(_row_get(row, mapping, 'brand')),
         barcode=_cell_text(_row_get(row, mapping, 'barcode')),
         serial_number=_cell_text(_row_get(row, mapping, 'serial_number')),
-        purchase_price=_number_from_cell(row, mapping, 'purchase_price', None),
+        purchase_price=_number_from_cell(
+            row, mapping, 'purchase_price', None, ctx.sheet
+        ),
         uom_id=await _resolve_unit(ctx, row),
-        expiry_date=_parse_date_cell(row, mapping, 'expiry_date'),
-        freeze_date=_parse_date_cell(row, mapping, 'freeze_date'),
+        expiry_date=_parse_date_cell(row, mapping, 'expiry_date', ctx.sheet),
+        freeze_date=_parse_date_cell(row, mapping, 'freeze_date', ctx.sheet),
         # A new product owes the form's required check: a row that leaves a
         # field its location requires empty is refused, not imported.
         metadata=_field_values(ctx, row, storage_id, category_id, require_filled=True)
@@ -767,6 +772,7 @@ class _ImportContext:
     db: AsyncSession
     user: UserContextDTO
     mapping: dict[str, Any]
+    sheet: SheetColumns
     storages: _StorageIndex
     category_cache: dict[str, UUID]
     category_fields: dict[UUID, dict[str, dict[str, Any]]]
@@ -855,10 +861,10 @@ async def _overwrite_existing(
             changes[key] = value
     if _cell_text(_row_get(row, ctx.mapping, 'purchase_price')) is not None:
         changes['purchase_price'] = _number_from_cell(
-            row, ctx.mapping, 'purchase_price', None
+            row, ctx.mapping, 'purchase_price', None, ctx.sheet
         )
     for key in ('expiry_date', 'freeze_date'):
-        parsed = _parse_date_cell(row, ctx.mapping, key)
+        parsed = _parse_date_cell(row, ctx.mapping, key, ctx.sheet)
         if parsed is not None:
             changes[key] = parsed
     uom_id = await _resolve_unit(ctx, row)

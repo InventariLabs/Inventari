@@ -78,7 +78,14 @@
       "connectFailed": "Nie udało się połączyć z celem. Adres może być błędny, zapora może go blokować albo odbiorca może nie działać.",
       "tlsRefused": "Połączenie odrzucone przez TLS: nie udało się zweryfikować certyfikatu odbiorcy.",
       "connectionBroken": "Połączenie zerwało się, zanim odbiorca odpowiedział.",
-      "emptyAnswer": "Cel odpowiedział HTTP {{status}} bez treści, więc nie podał powodu. Sprawdź własny log odbiorcy."
+      "emptyAnswer": "Cel odpowiedział HTTP {{status}} bez treści, więc nie podał powodu. Sprawdź własny log odbiorcy.",
+      "urlLoopback": "Ten adres wskazuje na sam serwer, więc wywołanie nigdy nie opuściłoby maszyny. Podaj adres osiągalny z internetu albo poproś osobę, która prowadzi tę instalację, o dopuszczenie adresów lokalnych.",
+      "urlPrivate": "Ten adres nie jest publicznie routowalny lub jest zarezerwowany dla infrastruktury protokołów, więc serwer odmawia takich wywołań. Podaj adres osiągalny z internetu albo poproś osobę, która prowadzi tę instalację, o dopuszczenie adresów lokalnych.",
+      "urlUnresolved": "Nazwy hosta nie udało się rozwiązać, więc adresu nie da się sprawdzić. Podaj nazwę rozwiązywalną publicznie albo poproś osobę, która prowadzi tę instalację, o dopuszczenie adresów lokalnych.",
+      "urlRebinding": "Nazwa hosta wskazuje na adres, który nie jest publicznie routowalny lub jest zarezerwowany dla infrastruktury protokołów. Podaj adres osiągalny z internetu albo poproś osobę, która prowadzi tę instalację, o dopuszczenie adresów lokalnych.",
+      "urlMalformed": "To nie jest poprawny adres internetowy. Podaj pełny adres, na przykład https://example.com/hook.",
+      "urlScheme": "Dla webhooków dozwolone są tylko adresy http i https.",
+      "urlNoHostname": "Adres webhooka musi zawierać nazwę hosta, na przykład https://example.com/hook."
     }
   },
   "testResult": {
