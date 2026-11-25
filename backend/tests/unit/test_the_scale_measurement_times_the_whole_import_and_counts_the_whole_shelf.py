@@ -49,7 +49,7 @@ class _Api:
 
 
 def test_records_without_an_expiry_are_found_past_the_first_page(measure) -> None:
-    rows = [{'id': n, 'expiry_date': '2027-01-01'} for n in range(300)]
+    rows = [{'id': n, 'expiry_date': 'any date'} for n in range(300)]
     rows += [{'id': 300 + n, 'expiry_date': None} for n in range(30)]
     api = _Api(rows)
 
