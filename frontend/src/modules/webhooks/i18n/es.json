@@ -74,7 +74,14 @@
       "connectFailed": "No se pudo conectar con el destino. La dirección puede ser incorrecta, un cortafuegos puede bloquearla o el receptor puede estar caído.",
       "tlsRefused": "La conexión fue rechazada por TLS: no se pudo verificar el certificado del receptor.",
       "connectionBroken": "La conexión se interrumpió antes de que el receptor respondiera.",
-      "emptyAnswer": "El destino respondió HTTP {{status}} sin cuerpo, así que no dio ningún motivo. Revisa el registro del propio receptor."
+      "emptyAnswer": "El destino respondió HTTP {{status}} sin cuerpo, así que no dio ningún motivo. Revisa el registro del propio receptor.",
+      "urlLoopback": "Esta dirección apunta al propio servidor, así que el webhook nunca saldría de la máquina. Usa una dirección accesible desde internet o pide a quien gestiona esta instalación que permita las direcciones locales.",
+      "urlPrivate": "Esta dirección no es enrutable públicamente o está reservada para infraestructura de protocolos, por lo que el servidor se niega a llamarla. Usa una dirección accesible desde internet o pide a quien gestiona esta instalación que permita las direcciones locales.",
+      "urlUnresolved": "No se pudo resolver el nombre de host, así que la dirección no se puede comprobar. Usa un nombre que se resuelva públicamente o pide a quien gestiona esta instalación que permita las direcciones locales.",
+      "urlRebinding": "El nombre de host se resuelve en una dirección que no es enrutable públicamente o está reservada para infraestructura de protocolos. Usa una dirección accesible desde internet o pide a quien gestiona esta instalación que permita las direcciones locales.",
+      "urlMalformed": "No es una dirección web válida. Introduce una dirección completa, por ejemplo https://example.com/hook.",
+      "urlScheme": "Para los webhooks solo se permiten direcciones http y https.",
+      "urlNoHostname": "La dirección del webhook debe incluir un nombre de host, por ejemplo https://example.com/hook."
     }
   },
   "testResult": {
@@ -98,6 +105,7 @@
   },
   "circuitBreakerWarning_one": "Este webhook se ha desactivado automáticamente tras 1 fallo consecutivo — la causa del último intento consta en los registros de entrega.",
   "circuitBreakerWarning_other": "Este webhook se ha desactivado automáticamente tras {{count}} fallos consecutivos — la causa del último intento consta en los registros de entrega.",
+  "circuitBreakerWarning_many": "Este webhook se ha desactivado automáticamente tras {{count}} fallos consecutivos — la causa del último intento consta en los registros de entrega.",
   "eventsWhileOff": "Los eventos que ocurren mientras está desactivado no se entregan, no se ponen en cola ni se registran, y Reactivar no los reproduce. Las entregas que seguían esperando un reintento cuando se desactivó se abandonan igual — quedan en el registro de entregas como fallidas.",
   "settings": {
     "logRetentionDays": "Retención de registros (días)",

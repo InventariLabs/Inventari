@@ -74,7 +74,14 @@
       "connectFailed": "Could not connect to the target. The address may be wrong, a firewall may be blocking it, or the receiver may be down.",
       "tlsRefused": "The connection was refused over TLS: the receiver's certificate could not be verified.",
       "connectionBroken": "The connection broke before the receiver answered.",
-      "emptyAnswer": "The target answered HTTP {{status}} with no body, so it gave no reason. Check the receiver's own log."
+      "emptyAnswer": "The target answered HTTP {{status}} with no body, so it gave no reason. Check the receiver's own log.",
+      "urlLoopback": "This address points back at the server itself, so the webhook never leaves the machine. Use an address reachable from the internet, or ask whoever runs this installation to allow local addresses.",
+      "urlPrivate": "This address is not publicly routable or is reserved for protocol infrastructure, so the server refuses to call it. Use an address reachable from the internet, or ask whoever runs this installation to allow local addresses.",
+      "urlUnresolved": "The host name could not be resolved, so the address cannot be checked. Use a name that resolves publicly, or ask whoever runs this installation to allow local addresses.",
+      "urlRebinding": "The host name resolves to an address that is not publicly routable or is reserved for protocol infrastructure. Use an address reachable from the internet, or ask whoever runs this installation to allow local addresses.",
+      "urlMalformed": "The address is not a valid web address. Enter a full address such as https://example.com/hook.",
+      "urlScheme": "Only http and https addresses are allowed for webhooks.",
+      "urlNoHostname": "The webhook address must include a host name, for example https://example.com/hook."
     }
   },
   "testResult": {

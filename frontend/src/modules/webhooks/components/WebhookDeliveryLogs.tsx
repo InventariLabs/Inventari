@@ -115,6 +115,20 @@ export function causeText(
       return t("delivery.cause.tlsRefused");
     case "connection_broken":
       return t("delivery.cause.connectionBroken");
+    case "url_loopback":
+      return t("delivery.cause.urlLoopback");
+    case "url_private":
+      return t("delivery.cause.urlPrivate");
+    case "url_unresolved":
+      return t("delivery.cause.urlUnresolved");
+    case "url_rebinding":
+      return t("delivery.cause.urlRebinding");
+    case "url_malformed":
+      return t("delivery.cause.urlMalformed");
+    case "url_scheme":
+      return t("delivery.cause.urlScheme");
+    case "url_no_hostname":
+      return t("delivery.cause.urlNoHostname");
     default:
       return undefined;
   }
