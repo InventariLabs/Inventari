@@ -93,6 +93,74 @@ class TestEquipmentAttachments:
         )
         assert upload.status_code == status.HTTP_400_BAD_REQUEST
 
+    def test_a_refused_type_is_answered_as_an_item_attachment_is(
+        self, client: TestClient, eq_auth_headers: dict[str, str], eq_item: Item
+    ) -> None:
+        """415 FILE_TYPE_NOT_ALLOWED in the reader's language, naming the
+        kinds of file an asset takes rather than the type it was sent as."""
+        upload = client.post(
+            f'/api/v1/equipment/{eq_item.id}/attachments',
+            headers={**eq_auth_headers, 'Accept-Language': 'pl'},
+            files={'file': ('manual.doc', b'old word file', 'application/msword')},
+            data={'file_type': 'MANUAL'},
+        )
+
+        assert upload.status_code == status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+        detail = upload.json()['detail']
+        assert detail['code'] == 'FILE_TYPE_NOT_ALLOWED'
+        assert detail['message'] == (
+            'Niedozwolony typ pliku. Dozwolone: '
+            'docx, gif, jpg, pdf, png, txt, webp, xls, xlsx, zip'
+        )
+
+    def test_bytes_that_contradict_their_type_are_answered_as_an_item_attachment_is(
+        self, client: TestClient, eq_auth_headers: dict[str, str], eq_item: Item
+    ) -> None:
+        upload = client.post(
+            f'/api/v1/equipment/{eq_item.id}/attachments',
+            headers={**eq_auth_headers, 'Accept-Language': 'pl'},
+            files={'file': ('scan.pdf', b'not a pdf at all', 'application/pdf')},
+            data={'file_type': 'INVOICE'},
+        )
+
+        assert upload.status_code == status.HTTP_400_BAD_REQUEST
+        detail = upload.json()['detail']
+        assert detail['code'] == 'FILE_SIGNATURE_MISMATCH'
+        assert detail['message'] == (
+            'Sygnatura pliku nie zgadza się z zadeklarowanym typem'
+        )
+
+    def test_a_file_over_the_limit_names_the_limit(
+        self,
+        client: TestClient,
+        eq_auth_headers: dict[str, str],
+        eq_item: Item,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """413 FILE_TOO_LARGE with the asset's own limit, not an item's."""
+        from app.core.upload_validation import UploadPolicy
+        from app.modules.equipment import attachment_service
+
+        monkeypatch.setattr(
+            attachment_service,
+            'ATTACHMENT_POLICY',
+            UploadPolicy(
+                max_bytes=1024,
+                content_types=attachment_service.ATTACHMENT_POLICY.content_types,
+            ),
+        )
+        upload = client.post(
+            f'/api/v1/equipment/{eq_item.id}/attachments',
+            headers={**eq_auth_headers, 'Accept-Language': 'pl'},
+            files={'file': ('scan.pdf', b'%PDF-1.4 ' + b'x' * 2048, 'application/pdf')},
+            data={'file_type': 'INVOICE'},
+        )
+
+        assert upload.status_code == status.HTTP_413_CONTENT_TOO_LARGE
+        detail = upload.json()['detail']
+        assert detail['code'] == 'FILE_TOO_LARGE'
+        assert detail['message'] == 'Plik przekracza dozwolony rozmiar (1 KB)'
+
 
 @pytest.mark.integration
 class TestEquipmentApprovalStatus:

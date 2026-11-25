@@ -94,9 +94,9 @@ The status says what class of thing went wrong; the code says which one.
 | 403 | `FORBIDDEN` (permission or missing organization), `API_KEY_SCOPE_REFUSED`, `MODULES_NOT_ENABLED` (the module is switched off for the organization), `USER_BLOCKED`, `API_KEY_CANNOT_CREATE` and its siblings |
 | 404 | `NOT_FOUND`, and one code per resource: `ITEM_NOT_FOUND`, `STORAGE_NOT_FOUND`, `STOCK_TAKE_NOT_FOUND`, `STOCK_LOT_NOT_FOUND`, `RECIPE_NOT_FOUND`, `MEAL_PLAN_NOT_FOUND`, `USER_NOT_FOUND`, `AI_CONNECTION_NOT_FOUND`, … |
 | 409 | `PERIOD_CLOSED`, `STOCK_STATE_IMPOSSIBLE`, and the conflict's own code: `APPROVAL_REQUIRED`, `RECIPE_IN_USE`, `ROLE_IN_USE`, `PARTNER_CONFLICT`, `SHOPPING_LIST_NOT_EDITABLE`, `RECIPE_NAME_TAKEN`, `AI_CONNECTION_NAME_TAKEN`, `CONNECTION_STILL_BOUND`, … |
-| 413 | `FILE_TOO_LARGE`, `DEMO_UPLOAD_FILE_LIMIT`, `DEMO_UPLOAD_TOTAL_LIMIT` |
+| 413 | `FILE_TOO_LARGE`, `DEMO_UPLOAD_FILE_LIMIT`, `DEMO_UPLOAD_TOTAL_LIMIT`, and `REQUEST_BODY_TOO_LARGE` — any request whose body is over the server's ceiling, answered before a route is reached |
 | 422 | the list shape above; a router that refuses one field after validation answers a coded object with a `field` (`VALIDATION_ERROR`, or the refusal's own code such as `WEBHOOK_URL_SCHEME`); an interceptor's veto answers its own code (`INTERCEPTOR_ERROR` on an item update); also `APPROVAL_SCOPE_REQUIRED`, `BULK_SCOPE_TOO_LARGE` and the production shapes described under the envelope |
-| 415 | `FILE_TYPE_NOT_ALLOWED` (attachments) |
+| 415 | `FILE_TYPE_NOT_ALLOWED` (attachments of products, assets and production runs) |
 | 429 | `RATE_LIMIT_EXCEEDED`, `AI_USAGE_LIMIT_EXCEEDED`, `DEMO_SANDBOX_CAP_REACHED`, `TOO_MANY_STREAMS` |
 | 500 | `INTERNAL_ERROR` — never carries an exception's own text; the log has it, under the `X-Request-ID` the response carries like every other. A PDF that could not be rendered answers `PDF_GENERATION_FAILED` |
 | 502 | `EMAIL_SEND_FAILED` (the email test), `EMAIL_DELIVERY_FAILED` (a purchase order's email) |
@@ -247,6 +247,7 @@ apart.
 | `BOM_LINE_PARENT_MISMATCH` | The line's parent product does not match the product this BOM produces |
 | `BOM_LINE_SELF_REFERENCE` | A BOM line cannot reference the product itself — it would make the product an ingredient of its own BOM. |
 | `BOM_LINE_UNIT_NOT_CONVERTIBLE` | This ingredient is kept in {stock_unit}, and {line_unit} cannot be read as {stock_unit}. Use a unit of the same kind, or record what one {stock_unit} weighs or holds on the product. |
+| `BRIDGE_LINE_UNIT_NOT_CONVERTIBLE` | The ingredient “{name}” is kept in {stock_unit}, and {line_unit} cannot be read as {stock_unit}. Use a unit of the same kind on its line, or record what one {stock_unit} weighs or holds on the product. |
 | `BRIDGE_YIELD_DIFFERS` | A BOM made from this source already exists for this product and makes {qty} per batch; enter that amount, or change the batch yield of that BOM first. |
 | `BRIDGE_YIELD_REQUIRED` | This product is kept in {unit}, so the number of servings cannot stand for the batch yield; enter how much one batch makes in {unit}. |
 | `CAMPAIGN_CLOSED` | This attestation campaign has been closed — your confirmation can no longer be recorded. If you still hold the equipment, please contact your organisation. |
@@ -473,6 +474,7 @@ apart.
 | `MODULES_NO_ORGANIZATION` | User not associated with any organization |
 | `MODULE_DEPENDENCY_CYCLE` | Circular dependency detected involving module: '{module}' |
 | `MODULE_NEEDS_NEWER_PLATFORM` | Module '{module}' requires Inventari {required} or newer; this is version {current}. |
+| `NAME_HAS_NO_LATIN_FORM` | Names are matched by their Latin spelling, and no character in this one has it. Add a Latin spelling beside the name, for example in brackets. |
 | `NOT_AN_EQUIPMENT_MODEL` | Not an equipment model |
 | `NOT_AUTHENTICATED` | Not authenticated |
 | `NOT_FOUND` | Resource not found |

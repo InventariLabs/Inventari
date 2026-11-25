@@ -40,6 +40,24 @@ describe("ReadOnlyNotice", () => {
     expect(screen.getByRole("note")).not.toHaveTextContent(/administrator/i);
   });
 
+  it("sends the reader of an administrator's screen to an administrator", () => {
+    // A screen guarded by an explicit key is that key's boundary, not the
+    // module's manage right: module settings ask for admin:access.
+    rights.write = true;
+    rights.manage = false;
+    render(
+      <ReadOnlyNotice
+        module="maker"
+        permission="admin:access"
+        right="manage"
+      />,
+    );
+
+    const note = screen.getByRole("note");
+    expect(note).toHaveTextContent(/Ask an administrator of your organization/);
+    expect(note).not.toHaveTextContent(/someone who can manage it/);
+  });
+
   it("keeps the write notice for an account that cannot write", () => {
     rights.write = false;
     render(<ReadOnlyNotice module="maker" />);

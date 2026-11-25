@@ -421,7 +421,12 @@ async def create_recipe_from_culinary(
     for ing in snapshot.ingredients:
         if ing.template_id is not None:
             await _refuse_unconvertible_unit(
-                db, organization_id, ing.template_id, ing.uom_id, ing.uom_symbol
+                db,
+                organization_id,
+                ing.template_id,
+                ing.uom_id,
+                ing.uom_symbol,
+                ingredient_name=ing.name,
             )
 
     recipe = MakerRecipe(
@@ -678,6 +683,8 @@ async def _refuse_unconvertible_unit(
     child_template_id: UUID,
     line_uom_id: UUID | None,
     line_unit_text: str | None = None,
+    *,
+    ingredient_name: str | None = None,
 ) -> str | None:
     """Refuse a line written in a unit the ingredient's stock cannot be read in.
 
@@ -702,6 +709,10 @@ async def _refuse_unconvertible_unit(
     backfill in place, a unitless template that has no items at all is the
     only state where nothing knows the unit — a record that genuinely
     predates the units world.
+
+    *ingredient_name* is given where one line is written among many — the
+    bridge writes a whole recipe at once — so the refusal says which line it
+    is about; a single line saved by hand is the one on screen.
 
     Returns the line's unit symbol (for the label the row stores), or ``None``
     when the line names no unit the catalogue knows.
@@ -729,10 +740,17 @@ async def _refuse_unconvertible_unit(
     line_uom = uoms.get(line_uom_id) if line_uom_id is not None else None
 
     if not bom_service.unit_reads_as_stock(line_uom_id, line_uom, text, stock_uom):
+        line_unit = line_uom.symbol if line_uom else text
+        stock_unit = stock_uom.symbol if stock_uom else '?'
+        if ingredient_name:
+            raise ServiceRejectionError(
+                'bridge_line_unit_not_convertible',
+                name=ingredient_name,
+                line_unit=line_unit,
+                stock_unit=stock_unit,
+            )
         raise ServiceRejectionError(
-            'bom_line_unit_not_convertible',
-            line_unit=line_uom.symbol if line_uom else text,
-            stock_unit=stock_uom.symbol if stock_uom else '?',
+            'bom_line_unit_not_convertible', line_unit=line_unit, stock_unit=stock_unit
         )
     return line_uom.symbol if line_uom else None
 
