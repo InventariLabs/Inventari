@@ -177,15 +177,22 @@ test.describe("Registration & Org Joining — flow", () => {
   });
 
   test("login link on register page navigates to login", async ({ page }) => {
-    await page.goto("/register");
-
-    const loginLink = page.getByRole("link", {
-      name: /login|sign in|already|masz|konto/i,
+    // Without an invitation the page only says it needs one: the link to the
+    // sign-in page belongs to the form. The shared invitation may be spent by
+    // the registration test by now, so this one opens one of its own.
+    const auth = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
+    const email = `login-link-${Date.now()}@example.com`;
+    const invite = await api.createInvite(auth.access_token, email);
+    await page.goto(`/register?invite=${invite.invite_code}`);
+    await expect(page.getByLabel(/email|e-mail/i)).toHaveValue(email, {
+      timeout: 10000,
     });
 
-    if (await loginLink.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await loginLink.click();
-      await expect(page).toHaveURL(/\/login/);
-    }
+    const loginLink = page.getByRole("link", {
+      name: /log in to existing account/i,
+    });
+
+    await loginLink.click();
+    await expect(page).toHaveURL(/\/login/);
   });
 });

@@ -1,6 +1,6 @@
 import { test, expect } from "./fixtures/auth";
 import { startSeed } from "./helpers/receive-seed";
-import { isoDay, pickDay } from "./helpers/date-picker";
+import { dayButtonName, isoDay, pickDay } from "./helpers/date-picker";
 
 /**
  * A delivery cost that arrives after the receipt is posted cannot go into the
@@ -42,17 +42,15 @@ test("a variance recorded on a posted receipt is on its card and on the list, th
     .number as string;
 
   const variances = async () =>
-    (
-      (await (
-        await seed.request.get(
-          `/api/v1/warehouse/documents/${receipt.id}/extra-costs`,
-          { headers: { Authorization: `Bearer ${seed.token}` } },
-        )
-      ).json()) as {
-        variances: Array<{ occurred_on: string; amount: string; reason: string }>;
-        variance_total: string;
-      }
-    );
+    (await (
+      await seed.request.get(
+        `/api/v1/warehouse/documents/${receipt.id}/extra-costs`,
+        { headers: { Authorization: `Bearer ${seed.token}` } },
+      )
+    ).json()) as {
+      variances: Array<{ occurred_on: string; amount: string; reason: string }>;
+      variance_total: string;
+    };
 
   await page.goto(`/warehouse/documents/${receipt.id}`);
   const section = page
@@ -77,12 +75,7 @@ test("a variance recorded on a posted receipt is on its card and on the list, th
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   await expect(
-    page.getByRole("button", {
-      name: new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(
-        tomorrow,
-      ),
-      exact: true,
-    }),
+    page.getByRole("button", { name: dayButtonName(tomorrow) }),
   ).toBeDisabled();
   await page.keyboard.press("Escape");
 
@@ -117,12 +110,12 @@ test("a variance recorded on a posted receipt is on its card and on the list, th
   await expect(row).toContainText("40.00");
   await expect(row).toContainText("Freight");
   await row.getByRole("link", { name: number }).click();
-  await expect(page).toHaveURL(new RegExp(`/warehouse/documents/${receipt.id}`));
+  await expect(page).toHaveURL(
+    new RegExp(`/warehouse/documents/${receipt.id}`),
+  );
 
   // Removing it takes it off the card, the list and the record.
-  await section
-    .getByRole("button", { name: "Remove this variance" })
-    .click();
+  await section.getByRole("button", { name: "Remove this variance" }).click();
   await expect(section.getByText(`Freight bill ${seed.uid}`)).toHaveCount(0);
   expect((await variances()).variances).toHaveLength(0);
   await page.goto("/warehouse/cost-variances");

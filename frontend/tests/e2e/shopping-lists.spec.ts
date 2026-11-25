@@ -31,7 +31,9 @@ test.describe("Shopping Lists — flow", () => {
 
   test.beforeEach(async ({ page, authenticatedPage }) => {
     await page.goto("/shopping-lists");
-    await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
+    await page
+      .waitForLoadState("networkidle", { timeout: 15000 })
+      .catch(() => {});
   });
 
   test("displays shopping lists page", async ({ page, authenticatedPage }) => {
@@ -44,7 +46,9 @@ test.describe("Shopping Lists — flow", () => {
   });
 
   test("seeded list is visible", async ({ page, authenticatedPage }) => {
-    await expect(page.getByText(seedListName).first()).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(seedListName).first()).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test("opens list detail and shows seeded item", async ({
@@ -52,7 +56,9 @@ test.describe("Shopping Lists — flow", () => {
     authenticatedPage,
   }) => {
     await page.goto(`/shopping-lists/${seedListId}`);
-    await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
+    await page
+      .waitForLoadState("networkidle", { timeout: 15000 })
+      .catch(() => {});
     const seeded = page.getByText("E2E-Item-Seed");
     await expect(seeded).toBeVisible({ timeout: 10000 });
   });
@@ -90,14 +96,23 @@ test.describe("Shopping Lists — flow", () => {
 
   test("marks item as purchased", async ({ page, authenticatedPage }) => {
     await page.goto(`/shopping-lists/${seedListId}`);
-    await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
+    await page
+      .waitForLoadState("networkidle", { timeout: 15000 })
+      .catch(() => {});
 
     const purchaseToggle = page
       .locator('[data-testid="purchase-checkbox"]')
       .first();
-    if (await purchaseToggle.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await purchaseToggle.click();
-    }
+    await expect(purchaseToggle).toBeVisible({ timeout: 5000 });
+    // A bought item sorts below the others, so count the pressed toggles
+    // instead of watching the first one.
+    const bought = page.locator(
+      '[data-testid="purchase-checkbox"][aria-pressed="true"]',
+    );
+    const before = await bought.count();
+    await expect(purchaseToggle).toHaveAttribute("aria-pressed", "false");
+    await purchaseToggle.click();
+    await expect(bought).toHaveCount(before + 1, { timeout: 5000 });
   });
 
   test("deletes a shopping list", async ({ page, authenticatedPage }) => {
@@ -119,12 +134,11 @@ test.describe("Shopping Lists — flow", () => {
     await listCard.getByRole("button", { name: /actions for/i }).click();
     await page.getByRole("button", { name: /delete list/i }).click();
 
-    const confirmBtn = page
+    await page
+      .getByRole("alertdialog")
       .getByRole("button", { name: /confirm|delete|usuń|tak/i })
-      .last();
-    if (await confirmBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await confirmBtn.click();
-    }
+      .last()
+      .click();
     await expect(page.getByText(name)).toHaveCount(0, {
       timeout: 10000,
     });
@@ -145,7 +159,9 @@ test.describe("Shopping Lists — extended actions (API)", () => {
     const authData = await api.login(ADMIN_EMAIL, ADMIN_PASSWORD);
     token = authData.access_token;
 
-    const list = await api.createShoppingList(token, { name: `E2E-Extended-${Date.now()}` });
+    const list = await api.createShoppingList(token, {
+      name: `E2E-Extended-${Date.now()}`,
+    });
     listId = list.id;
 
     const item = await api.addShoppingListItem(token, listId, {
@@ -156,17 +172,23 @@ test.describe("Shopping Lists — extended actions (API)", () => {
   });
 
   test.afterAll(async () => {
-    if (token && listId) await api.deleteShoppingList(token, listId).catch(() => {});
+    if (token && listId)
+      await api.deleteShoppingList(token, listId).catch(() => {});
   });
 
   test("PUT /{id} updates list name", async () => {
-    const updated = await api.updateShoppingList(token, listId, { name: `E2E-Updated-${Date.now()}` });
+    const updated = await api.updateShoppingList(token, listId, {
+      name: `E2E-Updated-${Date.now()}`,
+    });
     expect(updated).toBeTruthy();
     expect(updated.name).toContain("E2E-Updated");
   });
 
   test("PUT /{id}/items/{itemId} updates item name", async () => {
-    const updated = await api.updateShoppingListItem(token, listId, itemId, { name: "E2E-Updated-Item", quantity: 5 });
+    const updated = await api.updateShoppingListItem(token, listId, itemId, {
+      name: "E2E-Updated-Item",
+      quantity: 5,
+    });
     expect(updated).toBeTruthy();
     expect(updated.name).toBe("E2E-Updated-Item");
     // Quantities come back as fixed-scale strings ("5.000"), not numbers.
@@ -183,14 +205,23 @@ test.describe("Shopping Lists — extended actions (API)", () => {
   });
 
   test("PATCH /{id}/items/{itemId}/unpurchase unpurchases item", async () => {
-    const listItems = await api.request.get(`/api/v1/shopping-lists/${listId}/items`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    });
+    const listItems = await api.request.get(
+      `/api/v1/shopping-lists/${listId}/items`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
     const data = await listItems.json();
     const items = Array.isArray(data) ? data : (data.items ?? []);
-    const purchasable = items.find((i: Record<string, unknown>) => !i.is_purchased);
+    const purchasable = items.find(
+      (i: Record<string, unknown>) => !i.is_purchased,
+    );
     if (purchasable) {
-      const result = await api.unpurchaseShoppingListItem(token, listId, purchasable.id);
+      const result = await api.unpurchaseShoppingListItem(
+        token,
+        listId,
+        purchasable.id,
+      );
       expect(result).toBeTruthy();
     }
   });

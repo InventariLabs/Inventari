@@ -128,7 +128,9 @@ test.describe("Approvals — workflows page & CRUD", () => {
     const name = `E2E-Cancel-${Date.now()}`;
     await page.getByPlaceholder("e.g. Standard Approval").fill(name);
     await page.getByRole("button", { name: /cancel/i }).click();
-    await expect(page.getByPlaceholder("e.g. Standard Approval")).toBeHidden({ timeout: 10000 });
+    await expect(page.getByPlaceholder("e.g. Standard Approval")).toBeHidden({
+      timeout: 10000,
+    });
 
     const workflows = await api.listWorkflows(token);
     const leaked = workflows.find((w) => w.name === name);
@@ -155,31 +157,19 @@ test.describe("Approvals — dashboard", () => {
     });
   });
 
-  test("shows empty requests state or tabs", async ({
-    page,
-    authenticatedPage,
-  }) => {
-    await page
-      .waitForLoadState("networkidle", { timeout: 10000 })
-      .catch(() => {});
-    const hasEmpty = await page
-      .getByText(/no pending.*request|no approval.*request/i)
-      .isVisible({ timeout: 5000 })
-      .catch(() => false);
-    const hasTabs = await page
-      .getByRole("tab", { name: /all/i })
-      .isVisible({ timeout: 5000 })
-      .catch(() => false);
-    const hasContent = await page
-      .locator("h1, h2, table, [role='list']")
-      .first()
-      .isVisible({ timeout: 5000 })
-      .catch(() => false);
-    expect(hasEmpty || hasTabs || hasContent).toBeTruthy();
+  test("shows the request tabs", async ({ page, authenticatedPage }) => {
+    await expect(
+      page.getByRole("tab", { name: "All", exact: true }),
+    ).toBeVisible({ timeout: 10000 });
+    await expect(
+      page.getByRole("tab", { name: "Waiting for approval" }),
+    ).toBeVisible();
   });
 
   test("has search input for requests", async ({ page, authenticatedPage }) => {
-    await expect(page.getByPlaceholder(/search by name, number or type/i)).toBeVisible({
+    await expect(
+      page.getByPlaceholder(/search by name, number or type/i),
+    ).toBeVisible({
       timeout: 15000,
     });
   });

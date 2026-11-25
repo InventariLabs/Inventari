@@ -1,5 +1,4 @@
 import { test, expect } from "./fixtures/auth";
-import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./fixtures/credentials";
 
 test.describe("Settings — organization & user preferences", () => {
   test.beforeEach(async ({ page, authenticatedPage }) => {
@@ -18,68 +17,33 @@ test.describe("Settings — organization & user preferences", () => {
   });
 
   test("displays language selector", async ({ page, authenticatedPage }) => {
-    const langControl = page
-      .locator(
-        '[aria-label*="language" i], [aria-label*="język" i], select, button',
-      )
-      .filter({ hasText: /english|polish|polski|en|pl/i })
-      .first();
-    const langVisible = await langControl
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!langVisible) {
-      await expect(page.locator("h1, h2").first()).toBeVisible({
-        timeout: 10000,
-      });
-    }
+    await expect(
+      page.getByRole("button", { name: /Language: English/ }),
+    ).toBeVisible({ timeout: 10000 });
   });
 
-  // This test flips `preferred_language` on the shared `admin@example.com`
-  // account, and that setting is persisted server-side. Without restoring it,
-  // every test that runs afterwards — in this run and in every future one —
-  // renders the UI in the other language while asserting English text, which
-  // surfaces as a wall of unrelated `element(s) not found` failures.
-  test.afterEach(async ({ request }) => {
-    const login = await request.post("/api/v1/auth/login", {
-      form: { username: ADMIN_EMAIL, password: ADMIN_PASSWORD },
-    });
-    if (!login.ok()) return;
-    const { access_token: token } = await login.json();
-    await request.post("/api/v1/auth/me/language", {
-      headers: { Authorization: `Bearer ${token}` },
-      data: { language: "en" },
-    });
-  });
-
-  test("changing language persists after page reload", async ({
+  // The language is stored on the account, and every spec signs in as the one
+  // shared admin: saving "pl" for real would turn every spec that signs in
+  // meanwhile Polish. The save is answered here instead; the request that
+  // would store it is what the test reads.
+  test("choosing a language saves it to the account and switches the interface", async ({
     page,
     authenticatedPage,
   }) => {
-    const langBtn = page
-      .locator("button")
-      .filter({ hasText: /^(EN|PL)$/ })
-      .first();
-    await expect(langBtn).toBeVisible({ timeout: 5000 });
-    await langBtn.click();
-    await page
-      .getByRole("menuitem")
-      .first()
-      .waitFor({ state: "visible", timeout: 5000 })
-      .catch(() => {});
+    const saved = page.waitForRequest(
+      (request) =>
+        request.url().endsWith("/api/v1/auth/me/language") &&
+        request.method() === "POST",
+    );
+    await page.route("**/api/v1/auth/me/language", (route) =>
+      route.fulfill({ json: { language: "pl" } }),
+    );
 
-    const targetOption = page.getByRole("menuitem").first();
-    if (await targetOption.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await targetOption.click();
-    }
-    await page
-      .waitForLoadState("networkidle", { timeout: 15000 })
-      .catch(() => {});
+    await page.getByRole("button", { name: /Language: English/ }).click();
+    await page.getByRole("button", { name: "Polski", exact: true }).click();
 
-    await page.reload();
-    await page
-      .waitForLoadState("networkidle", { timeout: 15000 })
-      .catch(() => {});
-    await expect(page.locator("h1, h2").first()).toBeVisible({
+    expect((await saved).postDataJSON()).toEqual({ language: "pl" });
+    await expect(page.getByRole("button", { name: /^PL,/ })).toBeVisible({
       timeout: 15000,
     });
   });
@@ -88,20 +52,9 @@ test.describe("Settings — organization & user preferences", () => {
     page,
     authenticatedPage,
   }) => {
-    const orgSection = page
-      .locator("section, div, fieldset")
-      .filter({
-        hasText: /household|organization|organizacja|company|firma|general/i,
-      })
-      .first();
-    const orgVisible = await orgSection
-      .isVisible({ timeout: 10000 })
-      .catch(() => false);
-    if (!orgVisible) {
-      await expect(page.locator("h1, h2").first()).toBeVisible({
-        timeout: 10000,
-      });
-    }
+    await expect(
+      page.getByRole("textbox", { name: "Organization name" }),
+    ).toBeVisible({ timeout: 10000 });
   });
 
   test("displays modules settings/toggle", async ({
@@ -124,38 +77,35 @@ test.describe("Settings — organization & user preferences", () => {
   });
 
   test("saves settings without errors", async ({ page, authenticatedPage }) => {
-    const saveBtn = page.getByRole("button", { name: /save|zapisz/i });
+    const name = page.getByRole("textbox", { name: "Organization name" });
+    const original = await name.inputValue();
+    const save = page.getByRole("button", { name: "Save" }).first();
 
-    if (await saveBtn.isVisible({ timeout: 10000 }).catch(() => false)) {
-      if (await saveBtn.isEnabled().catch(() => false)) {
-        await saveBtn.click();
-        await page
-          .waitForLoadState("networkidle", { timeout: 15000 })
-          .catch(() => {});
-      }
-      const errorAlert = page
-        .locator('[role="alert"]')
-        .filter({ hasText: /error|failed|błąd/i });
-      await expect(errorAlert).toHaveCount(0, { timeout: 5000 });
-    }
+    // Save stays off until a field changed: edit the name, save, put it back.
+    await expect(save).toBeDisabled();
+    await name.fill(`${original} edited`);
+    await save.click();
+    await expect(page.getByText("Organization settings saved")).toBeVisible({
+      timeout: 10000,
+    });
+    // The saved name comes back from the server and refills the field; typing
+    // before it has would be overwritten.
+    await expect(name).toHaveValue(`${original} edited`);
+    await expect(
+      page.locator('[role="alert"]').filter({ hasText: /error|failed/i }),
+    ).toHaveCount(0);
+
+    await name.fill(original);
+    await expect(save).toBeEnabled();
+    await save.click();
+    await expect(save).toBeDisabled({ timeout: 10000 });
   });
 
-  test("navigates to API keys settings if available", async ({
+  test("navigates to API keys settings", async ({
     page,
     authenticatedPage,
   }) => {
-    await page.goto("/settings/developer");
-    await page
-      .waitForLoadState("networkidle", { timeout: 15000 })
-      .catch(() => {});
-
-    const apiKeysLink = page.getByRole("link", {
-      name: /api keys|personal access|tokens/i,
-    });
-
-    if (await apiKeysLink.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await apiKeysLink.click();
-      await expect(page).toHaveURL(/api-keys|keys/);
-    }
+    await page.getByRole("link", { name: "API Keys" }).click();
+    await expect(page).toHaveURL(/\/settings\/api-keys/);
   });
 });
