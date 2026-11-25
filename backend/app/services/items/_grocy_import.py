@@ -40,6 +40,7 @@ from app.core.exceptions import ServiceRejectionError
 from app.core.grocy_file import GrocyFile, GrocyProduct, GrocyStockEntry
 from app.core.import_sheet import explain
 from app.core.logging import get_logger
+from app.core.move_contributors import MoveMatches, bring_async, contributors_for
 from app.core.open_package import OPENED_KEY
 from app.i18n._types import Language
 from app.i18n.service import get_unit_label
@@ -77,6 +78,7 @@ _LEFT_BEHIND_ORDER = (
     'pictures',
     'parent_products',
     'own_field_values',
+    'shopping_list_entries',
     'recipes',
     'meal_plan',
     'chores',
@@ -126,11 +128,16 @@ def _stock_of(grocy: GrocyFile) -> dict[int, list[GrocyStockEntry]]:
     return by_product
 
 
-def left_behind(grocy: GrocyFile, units_as_pieces: list[str]) -> list[dict[str, Any]]:
+def left_behind(
+    grocy: GrocyFile,
+    units_as_pieces: list[str],
+    taken: set[str] | frozenset[str] = frozenset(),
+) -> list[dict[str, Any]]:
     """What the file holds that a move does not bring, by kind and count.
 
     ``units_as_pieces`` names the units no unit here matched, which the
-    imported stock is counted in as pieces.
+    imported stock is counted in as pieces. ``taken`` names the kinds a
+    switched-on module brings (:mod:`app.core.move_contributors`).
     """
     products = _active_products(grocy)
     counts: dict[str, int] = {
@@ -146,6 +153,7 @@ def left_behind(grocy: GrocyFile, units_as_pieces: list[str]) -> list[dict[str, 
             for e in _stock_of(grocy).get(p.id, [])
             if _price_held(e.price) is None and e.price is not None and e.price > 0
         ),
+        'shopping_list_entries': len(grocy.shopping_list),
         **grocy.left_behind,
     }
     return [
@@ -155,7 +163,7 @@ def left_behind(grocy: GrocyFile, units_as_pieces: list[str]) -> list[dict[str, 
             'names': units_as_pieces if kind == 'units_as_pieces' else [],
         }
         for kind in _LEFT_BEHIND_ORDER
-        if counts.get(kind, 0) > 0
+        if counts.get(kind, 0) > 0 and kind not in taken
     ]
 
 
@@ -205,6 +213,13 @@ class GrocyPlan:
     #: reader's screen matched it by the name it shows (see
     #: :func:`plan_grocy_import_async`).
     category_matches: dict[str, UUID] = field(default_factory=dict)
+    #: The modules switched on for the organization; those that registered
+    #: for Grocy bring their part, and the kinds they take stop staying behind.
+    enabled_modules: list[str] = field(default_factory=list)
+
+    @property
+    def taken(self) -> set[str]:
+        return {c.takes for c in contributors_for(SOURCE, self.enabled_modules)}
 
 
 async def plan_grocy_import_async(
@@ -262,6 +277,12 @@ async def plan_grocy_import_async(
         units_as_pieces=[grocy.units[u].name for u in unknown if u in used_units],
         whole_units=whole_units,
         category_matches=matches,
+        enabled_modules=list(
+            await db.scalar(
+                select(Organization.enabled_modules).where(Organization.id == org_id)
+            )
+            or []
+        ),
     )
 
 
@@ -350,7 +371,7 @@ async def analyze_grocy_file_async(
         'new_suppliers': plan.new_suppliers,
         'currency': currency,
         'steps': grocy_import_steps(grocy),
-        'left_behind': left_behind(grocy, plan.units_as_pieces),
+        'left_behind': left_behind(grocy, plan.units_as_pieces, plan.taken),
     }
 
 
@@ -740,7 +761,10 @@ class _Run:
             'created_locations': self.created_locations,
             'created_categories': self.created_categories,
             'created_suppliers': self.created_suppliers,
-            'left_behind': left_behind(self.grocy, self.plan.units_as_pieces),
+            'left_behind': left_behind(
+                self.grocy, self.plan.units_as_pieces, self.plan.taken
+            ),
+            'brought_by_modules': [],
         }
 
 
@@ -791,4 +815,16 @@ async def import_grocy_file_async(
         if on_batch is not None and step - reported >= _BATCH:
             await on_batch(step)
             reported = step
-    return run.result(step)
+    brought = await bring_async(
+        SOURCE,
+        db,
+        user,
+        grocy,
+        MoveMatches(products=dict(run.templates), units=dict(run.plan.unit_ids)),
+        run.plan.enabled_modules,
+    )
+    result = run.result(step)
+    result['brought_by_modules'] = [
+        {'module': b.module, 'sentence': b.sentence} for b in brought
+    ]
+    return result

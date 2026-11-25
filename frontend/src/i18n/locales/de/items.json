@@ -213,6 +213,7 @@
         "pictures": "Produktbilder (Grocy speichert sie außerhalb dieser Datei)",
         "parent_products": "Produkte unter einem übergeordneten Produkt (jedes kommt einzeln herüber)",
         "own_field_values": "Werte eigener Felder",
+        "shopping_list_entries": "Einkaufslisteneinträge (das Modul Einkaufslisten ist aus)",
         "recipes": "Rezepte",
         "meal_plan": "Essensplaneinträge",
         "chores": "Hausarbeiten",

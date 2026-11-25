@@ -61,6 +61,12 @@ const outcome: Outcome = {
   created_categories: [],
   created_suppliers: ["Corner shop"],
   left_behind: [{ what: "recipes", count: 7, names: [] }],
+  brought_by_modules: [
+    {
+      module: "shopping_lists",
+      sentence: "Shopping lists from Grocy — lists created: 1, entries: 5",
+    },
+  ],
 };
 
 function pick(name = "grocy.db") {
@@ -134,6 +140,11 @@ describe("GrocyImportSheet", () => {
     expect(screen.getByText("1 supplier created")).toBeInTheDocument();
     expect(screen.getByText("Corner shop")).toBeInTheDocument();
     expect(screen.getByText("Stays in Grocy")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Shopping lists from Grocy — lists created: 1, entries: 5",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("refuses a file that is not Grocy's with the server's reason", async () => {

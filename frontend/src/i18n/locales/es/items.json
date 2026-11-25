@@ -213,6 +213,7 @@
         "pictures": "Fotos de productos (Grocy las guarda fuera de este archivo)",
         "parent_products": "Productos bajo un producto padre (cada uno pasa por separado)",
         "own_field_values": "Valores de tus propios campos",
+        "shopping_list_entries": "Entradas de listas de compra (el módulo Listas de la compra está desactivado)",
         "recipes": "Recetas",
         "meal_plan": "Entradas del plan de comidas",
         "chores": "Tareas domésticas",

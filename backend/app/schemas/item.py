@@ -339,6 +339,7 @@ LeftBehindKind = Literal[
     'pictures',
     'parent_products',
     'own_field_values',
+    'shopping_list_entries',
     'recipes',
     'meal_plan',
     'chores',
@@ -356,6 +357,13 @@ class ImportLeftBehind(BaseModel):
     #: For ``units_as_pieces``: the units no unit here matched, whose stock
     #: came across counted in pieces.
     names: list[str] = []
+
+
+class ImportBrought(BaseModel):
+    """A module's part of a move, as one sentence in the reader's language."""
+
+    module: str
+    sentence: str
 
 
 class ItemImportResponse(BaseModel):
@@ -393,6 +401,9 @@ class ItemImportResponse(BaseModel):
     created_categories: list[str] = []
     created_suppliers: list[str] = []
     left_behind: list[ImportLeftBehind] = []
+    #: What switched-on modules brought from the same file (a Grocy move's
+    #: shopping lists); empty for a sheet.
+    brought_by_modules: list[ImportBrought] = []
 
 
 class GrocyFileAnalysis(BaseModel):

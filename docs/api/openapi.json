@@ -56928,6 +56928,25 @@
         ],
         "title": "ImportAnalyzeResult"
       },
+      "ImportBrought": {
+        "properties": {
+          "module": {
+            "type": "string",
+            "title": "Module"
+          },
+          "sentence": {
+            "type": "string",
+            "title": "Sentence"
+          }
+        },
+        "type": "object",
+        "required": [
+          "module",
+          "sentence"
+        ],
+        "title": "ImportBrought",
+        "description": "A module's part of a move, as one sentence in the reader's language."
+      },
       "ImportDefaultsResult": {
         "properties": {
           "created": {
@@ -57021,6 +57040,7 @@
               "pictures",
               "parent_products",
               "own_field_values",
+              "shopping_list_entries",
               "recipes",
               "meal_plan",
               "chores",
@@ -59915,6 +59935,14 @@
             },
             "type": "array",
             "title": "Left Behind",
+            "default": []
+          },
+          "brought_by_modules": {
+            "items": {
+              "$ref": "#/components/schemas/ImportBrought"
+            },
+            "type": "array",
+            "title": "Brought By Modules",
             "default": []
           }
         },

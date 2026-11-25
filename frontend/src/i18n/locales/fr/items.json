@@ -213,6 +213,7 @@
         "pictures": "Photos des produits (Grocy les garde hors de ce fichier)",
         "parent_products": "Produits rattachés à un produit parent (chacun repris séparément)",
         "own_field_values": "Valeurs de vos propres champs",
+        "shopping_list_entries": "Articles des listes de courses (le module Listes de courses est désactivé)",
         "recipes": "Recettes",
         "meal_plan": "Entrées du planning des repas",
         "chores": "Tâches ménagères",

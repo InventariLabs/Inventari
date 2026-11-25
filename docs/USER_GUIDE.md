@@ -333,7 +333,8 @@ database: check it against the label, and see the note on allergens and nutritio
   — recipes, chores, pictures, extra barcodes and the like. Every batch of
   stock becomes a record with its best-before date, price, purchase date,
   shelf, store and opened mark; prices are read in the organization's
-  currency. Running the same file again adds only what is new. A row filed under a product you already have takes
+  currency. With **Shopping lists** on, Grocy's shopping lists come across
+  too. Running the same file again adds only what is new. A row filed under a product you already have takes
   that product's name, and one whose unit cannot be converted into the
   product's is refused with both units named. **Export** downloads what the
   list currently shows as XLSX, with the SKU, description, stock alert, the

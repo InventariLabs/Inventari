@@ -50,7 +50,9 @@ says what the release does rather than what changed since them.
   purchase date, shelf, store and opened mark; half of an opened piece is an
   opened piece used down to the half. A unit Grocy names in any of the six
   languages is recognised; one that is not counts pieces and is named.
-  Running the same file again adds only batches that are new.
+  With *Shopping lists* on, Grocy's shopping lists come across as well, each
+  entry linked to the product the move made. Running the same file again adds
+  only batches that are new.
 
 ### Fixed
 

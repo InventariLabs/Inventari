@@ -15,6 +15,8 @@ const LABELS: Record<LeftBehind["what"], string> = {
   pictures: "items:import.grocyMove.leftBehind.pictures",
   parent_products: "items:import.grocyMove.leftBehind.parent_products",
   own_field_values: "items:import.grocyMove.leftBehind.own_field_values",
+  shopping_list_entries:
+    "items:import.grocyMove.leftBehind.shopping_list_entries",
   recipes: "items:import.grocyMove.leftBehind.recipes",
   meal_plan: "items:import.grocyMove.leftBehind.meal_plan",
   chores: "items:import.grocyMove.leftBehind.chores",

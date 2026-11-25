@@ -234,6 +234,7 @@
         "pictures": "Zdjęcia produktów (Grocy trzyma je poza tym plikiem)",
         "parent_products": "Produkty podpięte pod produkt nadrzędny (każdy przechodzi osobno)",
         "own_field_values": "Wartości własnych pól",
+        "shopping_list_entries": "Pozycje list zakupów (moduł Listy zakupów jest wyłączony)",
         "recipes": "Przepisy",
         "meal_plan": "Pozycje planu posiłków",
         "chores": "Obowiązki domowe",

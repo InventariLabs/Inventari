@@ -213,6 +213,7 @@
         "pictures": "Product pictures (Grocy keeps them outside this file)",
         "parent_products": "Products under a parent product (each comes across on its own)",
         "own_field_values": "Values of your own fields",
+        "shopping_list_entries": "Shopping list entries (the Shopping lists module is off)",
         "recipes": "Recipes",
         "meal_plan": "Meal plan entries",
         "chores": "Chores",

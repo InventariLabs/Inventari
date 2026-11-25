@@ -20,6 +20,8 @@ SHOPPING_LABELS: dict[Language, ShoppingLabels] = {
         'suggestion_expired_days_ago': 'Expired {days} days ago',
         'suggestion_frequently_consumed': 'Frequently consumed ({count}× in the last month)',
         'po_note_from_list': 'From shopping list: {name}',
+        'grocy_lists_brought': 'Shopping lists from Grocy — lists created: {lists}, entries: {items}',
+        'grocy_lists_skipped': 'skipped, already here from an earlier move: {count}',
     },
     'pl': {
         'default_name_template': 'Lista zakupów {day} {month}',
@@ -40,6 +42,8 @@ SHOPPING_LABELS: dict[Language, ShoppingLabels] = {
         'suggestion_expired_days_ago': 'Termin minął {days} dni temu',
         'suggestion_frequently_consumed': 'Często zużywane ({count}× w ostatnim miesiącu)',
         'po_note_from_list': 'Z listy zakupów: {name}',
+        'grocy_lists_brought': 'Listy zakupów z Grocy — utworzone listy: {lists}, pozycje: {items}',
+        'grocy_lists_skipped': 'pominięte, bo przeniesione wcześniej: {count}',
     },
     'de': {
         'default_name_template': 'Einkaufsliste {day} {month}',
@@ -60,6 +64,8 @@ SHOPPING_LABELS: dict[Language, ShoppingLabels] = {
         'suggestion_expired_days_ago': 'Vor {days} Tagen abgelaufen',
         'suggestion_frequently_consumed': 'Häufig verbraucht ({count}× im letzten Monat)',
         'po_note_from_list': 'Aus der Einkaufsliste: {name}',
+        'grocy_lists_brought': 'Einkaufslisten aus Grocy — angelegte Listen: {lists}, Einträge: {items}',
+        'grocy_lists_skipped': 'übersprungen, schon früher übernommen: {count}',
     },
     'fr': {
         'default_name_template': 'Liste de courses {day} {month}',
@@ -80,6 +86,8 @@ SHOPPING_LABELS: dict[Language, ShoppingLabels] = {
         'suggestion_expired_days_ago': 'Expiré il y a {days} jours',
         'suggestion_frequently_consumed': 'Souvent consommé ({count}× le mois dernier)',
         'po_note_from_list': 'Depuis la liste de courses : {name}',
+        'grocy_lists_brought': 'Listes de courses de Grocy — listes créées : {lists}, articles : {items}',
+        'grocy_lists_skipped': 'ignorés, déjà repris auparavant : {count}',
     },
     'es': {
         'default_name_template': 'Lista de compras {day} {month}',
@@ -100,6 +108,8 @@ SHOPPING_LABELS: dict[Language, ShoppingLabels] = {
         'suggestion_expired_days_ago': 'Caducó hace {days} días',
         'suggestion_frequently_consumed': 'Consumido con frecuencia ({count}× en el último mes)',
         'po_note_from_list': 'Desde la lista de la compra: {name}',
+        'grocy_lists_brought': 'Listas de la compra de Grocy — listas creadas: {lists}, entradas: {items}',
+        'grocy_lists_skipped': 'omitidas, ya traídas antes: {count}',
     },
     'pt': {
         'default_name_template': 'Lista de compras {day} de {month}',
@@ -120,5 +130,7 @@ SHOPPING_LABELS: dict[Language, ShoppingLabels] = {
         'suggestion_expired_days_ago': 'Venceu há {days} dias',
         'suggestion_frequently_consumed': 'Consumido com frequência ({count}× no último mês)',
         'po_note_from_list': 'Da lista de compras: {name}',
+        'grocy_lists_brought': 'Listas de compras do Grocy — listas criadas: {lists}, itens: {items}',
+        'grocy_lists_skipped': 'ignorados, já trazidos antes: {count}',
     },
 }

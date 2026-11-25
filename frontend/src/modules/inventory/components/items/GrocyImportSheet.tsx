@@ -204,6 +204,7 @@ function GrocyMoveDetails({ result }: { result: ItemImportOutcome }) {
     result.created_locations.length > 0 ||
     result.created_categories.length > 0 ||
     result.created_suppliers.length > 0 ||
+    result.brought_by_modules.length > 0 ||
     result.left_behind.length > 0;
   if (!anything) return null;
   return (
@@ -231,6 +232,13 @@ function GrocyMoveDetails({ result }: { result: ItemImportOutcome }) {
         })}
         names={result.created_suppliers}
       />
+      {/* What other modules brought from the same file, in their own
+          words (the shopping lists, say). */}
+      {result.brought_by_modules.map((brought) => (
+        <p key={brought.module} className="text-xs text-on">
+          {brought.sentence}
+        </p>
+      ))}
       <GrocyLeftBehindList entries={result.left_behind} />
     </div>
   );

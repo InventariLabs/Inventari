@@ -16616,6 +16616,16 @@ export interface components {
             };
         };
         /**
+         * ImportBrought
+         * @description A module's part of a move, as one sentence in the reader's language.
+         */
+        ImportBrought: {
+            /** Module */
+            module: string;
+            /** Sentence */
+            sentence: string;
+        };
+        /**
          * ImportDefaultsResult
          * @description What an import did, row by row: a new ingredient, an override founded
          *     over a system row, an existing override changed, or nothing.
@@ -16670,7 +16680,7 @@ export interface components {
              * What
              * @enum {string}
              */
-            what: "inactive_products" | "extra_barcodes" | "unit_conversions" | "units_as_pieces" | "prices_below_a_cent" | "default_best_before_days" | "pictures" | "parent_products" | "own_field_values" | "recipes" | "meal_plan" | "chores" | "batteries" | "tasks" | "equipment";
+            what: "inactive_products" | "extra_barcodes" | "unit_conversions" | "units_as_pieces" | "prices_below_a_cent" | "default_best_before_days" | "pictures" | "parent_products" | "own_field_values" | "shopping_list_entries" | "recipes" | "meal_plan" | "chores" | "batteries" | "tasks" | "equipment";
             /** Count */
             count: number;
             /**
@@ -17714,6 +17724,11 @@ export interface components {
              * @default []
              */
             left_behind: components["schemas"]["ImportLeftBehind"][];
+            /**
+             * Brought By Modules
+             * @default []
+             */
+            brought_by_modules: components["schemas"]["ImportBrought"][];
         };
         /**
          * ItemListResponse

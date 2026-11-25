@@ -963,6 +963,10 @@ class ShoppingLabels(TypedDict):
     suggestion_frequently_consumed: str
     #: The note a purchase order made from a shopping list starts with.
     po_note_from_list: str
+    #: A Grocy move's summary line for the shopping lists it brought, and the
+    #: clause for the entries an earlier move already brought.
+    grocy_lists_brought: str
+    grocy_lists_skipped: str
 
 
 # Functional syntax because one symbol the catalogue carries — "fl oz" — is
