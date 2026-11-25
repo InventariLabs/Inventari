@@ -78,3 +78,31 @@ async def test_the_asset_filter_lists_every_entry_the_column_calls_an_asset(
     assert product not in await ids('equipment_asset')
 
     assert product in await ids('item')
+
+
+@pytest.mark.asyncio
+async def test_the_filter_offers_asset_when_only_product_entries_are_assets(
+    real_async_client,
+    real_async_db_session,
+    async_test_household,
+    async_test_user,
+):
+    """An asset that was never handed out or retired has only ``item``
+    entries; the filter still offers the word its column prints."""
+    db, org, user = real_async_db_session, async_test_household, async_test_user
+    await _write(db, org, user, 'item', {'name': 'Flour'})
+    await db.commit()
+
+    async def offered() -> list[str]:
+        response = await real_async_client.get(
+            '/api/v1/audit-log/target-types', headers=_auth(user)
+        )
+        assert response.status_code == 200, response.text
+        return response.json()
+
+    assert 'equipment_asset' not in await offered()
+
+    await _write(db, org, user, 'item', {'name': 'Laptop', 'module_name': 'equipment'})
+    await db.commit()
+
+    assert await offered() == ['equipment_asset', 'item']

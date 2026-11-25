@@ -323,6 +323,11 @@ def item_to_snapshot(item: 'Item') -> dict[str, Any]:
     return data
 
 
+#: How many of the newest product entries the filter's list reads to learn
+#: whether any of them is an asset.
+_ASSET_PROBE_ENTRIES = 1000
+
+
 def _of_kind(target_type: str) -> ColumnElement[bool]:
     """The condition for the screen's object-type filter.
 
@@ -501,7 +506,28 @@ async def list_target_types_async(
         .where(kinds.c.target_type.is_not(None))
         .order_by(kinds.c.target_type)
     )
-    return list(result.scalars().all())
+    held = list(result.scalars().all())
+    # An asset that never changed status has only ``item`` entries, which the
+    # Target column still calls an asset. Only the newest ones are read, so
+    # the question costs the same however long the journal is.
+    if 'item' in held and 'equipment_asset' not in held:
+        newest = (
+            select(AuditLog.id)
+            .where(
+                AuditLog.organization_id == organization_id,
+                AuditLog.target_type == 'item',
+            )
+            .order_by(AuditLog.created_at.desc())
+            .limit(_ASSET_PROBE_ENTRIES)
+        )
+        found = await db.scalar(
+            select(AuditLog.id)
+            .where(AuditLog.id.in_(newest), _of_kind('equipment_asset'))
+            .limit(1)
+        )
+        if found is not None:
+            held = sorted([*held, 'equipment_asset'])
+    return held
 
 
 async def list_for_target_async(
