@@ -324,11 +324,8 @@ describe("RecipeCard buttons inside the card link", () => {
 
     // fireEvent.click returns false when a handler cancelled the default
     // action — the navigation a click inside an anchor would otherwise start.
-    expect(
-      fireEvent.click(
-        screen.getByRole("button", { name: "common:a11y.favorite" }),
-      ),
-    ).toBe(false);
+    // The star is the first button on the card, ahead of the tag pills.
+    expect(fireEvent.click(screen.getAllByRole("button")[0])).toBe(false);
     expect(onToggleFavorite).toHaveBeenCalledTimes(1);
     expect(fireEvent.click(screen.getByRole("button", { name: "vegan" }))).toBe(
       false,
