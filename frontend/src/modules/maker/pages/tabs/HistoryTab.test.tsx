@@ -98,4 +98,28 @@ describe("HistoryTab", () => {
       "Savings vs shop price: Shop price minus the cost to make it",
     );
   });
+
+  it("dates a run by the day the Runs list gives it, in the table and the cards", () => {
+    // Recorded on 2026-11-25 as made on 2026-11-18, then reversed or kept:
+    // the day the run was made, not the day it was recorded.
+    read.items = [
+      {
+        id: "ord-1",
+        status: "COMPLETED",
+        planned_qty: "5",
+        actual_qty: "5",
+        output_uom_symbol: "kg",
+        unit_cost_snapshot: "2",
+        result_per_unit: "1.5",
+        total_cost: "10",
+        production_date: "2026-11-18",
+        created_at: "2026-11-25T10:00:00Z",
+        completed_at: "2026-11-25T10:00:00Z",
+      },
+    ];
+    renderTab();
+
+    expect(screen.getAllByText("Nov 18, 2026")).toHaveLength(2);
+    expect(screen.queryByText("Nov 25, 2026")).not.toBeInTheDocument();
+  });
 });

@@ -1,6 +1,6 @@
 import { test, expect } from "./fixtures/auth";
 import { startSeed } from "./helpers/receive-seed";
-import { isoDay, pickDay } from "./helpers/date-picker";
+import { dayButtonName, isoDay, pickDay } from "./helpers/date-picker";
 
 /**
  * A delivery cost that arrives after the receipt is posted cannot go into the
@@ -77,12 +77,7 @@ test("a variance recorded on a posted receipt is on its card and on the list, th
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   await expect(
-    page.getByRole("button", {
-      name: new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(
-        tomorrow,
-      ),
-      exact: true,
-    }),
+    page.getByRole("button", { name: dayButtonName(tomorrow) }),
   ).toBeDisabled();
   await page.keyboard.press("Escape");
 

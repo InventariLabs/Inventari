@@ -10,6 +10,7 @@ import { useProductionOrders } from "@/modules/maker/hooks/useProduction";
 import { ProductionStatusBadge } from "@/modules/maker/components/ProductionStatusBadge";
 import type { MakerRecipe } from "@/modules/maker/types/maker";
 import { formatDate } from "@/utils/helpers";
+import { runDay } from "@/modules/maker/lib/runDay";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
 import { formatMoney } from "@/utils/formatters";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
@@ -128,7 +129,7 @@ export function HistoryTab({ recipe }: HistoryTabProps) {
                 className="border-t border-border/60 hover:bg-surface-raised/40"
               >
                 <td className="py-2.5 pr-3 text-on-muted whitespace-nowrap">
-                  {formatDate(order.completed_at ?? order.created_at)}
+                  {formatDate(runDay(order).day)}
                 </td>
                 <td className="py-2.5 pr-3">
                   <ProductionStatusBadge status={order.status} />
@@ -198,7 +199,7 @@ export function HistoryTab({ recipe }: HistoryTabProps) {
             <span className="flex items-center justify-between gap-2">
               <ProductionStatusBadge status={order.status} />
               <span className="text-xs text-on-muted">
-                {formatDate(order.completed_at ?? order.created_at)}
+                {formatDate(runDay(order).day)}
               </span>
             </span>
             <span className="flex items-center justify-between gap-2">
