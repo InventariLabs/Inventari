@@ -1,7 +1,7 @@
 import secrets
 import string
 from datetime import UTC, datetime
-from typing import Any, Protocol, cast
+from typing import TYPE_CHECKING, Any, Protocol, cast
 from uuid import UUID
 
 from sqlalchemy import Select, or_, select
@@ -19,6 +19,9 @@ from app.models.audit_log import AuditAction, AuditTargetType
 from app.models.label_pool import LabelPool
 from app.schemas.label_pool import LabelCodeItem, LabelPoolCreate
 from app.services.audit_service import audit_value, log_action_async
+
+if TYPE_CHECKING:
+    from app.models.item import Item
 
 logger = get_logger(__name__)
 
@@ -222,18 +225,38 @@ async def _journal_binding_async(
     db: AsyncSession,
     label: LabelPool,
     *,
-    product_name: str | None,
+    product: 'Item | None',
     before: UUID | None,
     after: UUID | None,
     user_id: UUID | None,
 ) -> None:
     """One entry for a label that changed the product it answers for.
 
-    The product's name travels with it: the id alone says nothing to the
-    reader, and a freed label is usually freed from a product since deleted.
+    The entry reads the way every other one does (AUDIT.md, "A reference is
+    written with its name"): the label's code is its ``name``, the Target
+    column's answer, and each side that holds a product carries that product's
+    name beside the id — the id alone says nothing to the reader, and a freed
+    label is usually freed from a product since renamed or deleted. ``product``
+    is the card the call already holds; a side bound to another product is
+    named from its own row.
     """
     if before == after:
         return
+    from app.models.item import Item
+
+    known = {product.id: product.name} if product is not None else {}
+
+    async def side(item_id: UUID | None) -> dict[str, object]:
+        if item_id is None:
+            return {'item_id': None}
+        name = known.get(item_id)
+        if name is None:
+            name = await db.scalar(select(Item.name).where(Item.id == item_id))
+        reading: dict[str, object] = {'item_id': audit_value(item_id)}
+        if name is not None:
+            reading['item_name'] = name
+        return reading
+
     await log_action_async(
         db,
         organization_id=label.organization_id,
@@ -242,10 +265,9 @@ async def _journal_binding_async(
         target_type=AuditTargetType.LABEL,
         target_id=label.id,
         snapshot={
-            'short_code': label.short_code,
-            'product_name': product_name,
-            'before': {'item_id': audit_value(before)},
-            'after': {'item_id': audit_value(after)},
+            'name': label.short_code,
+            'before': await side(before),
+            'after': await side(after),
         },
     )
 
@@ -380,7 +402,7 @@ class LabelService:
             action=AuditAction.HARD_DELETE,
             target_type=AuditTargetType.LABEL,
             target_id=label.id,
-            snapshot={'short_code': label.short_code, 'description': label.description},
+            snapshot={'name': label.short_code, 'description': label.description},
         )
 
         await db.delete(label)
@@ -407,7 +429,7 @@ class LabelService:
         await _journal_binding_async(
             db,
             label,
-            product_name=item.name if item else None,
+            product=item,
             before=bound_to,
             after=None,
             user_id=user_id,
@@ -450,7 +472,7 @@ class LabelService:
                 await _journal_binding_async(
                     db,
                     prev,
-                    product_name=item.name,
+                    product=item,
                     before=freed_from,
                     after=None,
                     user_id=user_id,
@@ -464,7 +486,7 @@ class LabelService:
         await _journal_binding_async(
             db,
             label,
-            product_name=item.name if item else None,
+            product=item,
             before=bound_to,
             after=item_id,
             user_id=user_id,
