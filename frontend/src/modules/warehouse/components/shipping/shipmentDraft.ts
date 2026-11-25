@@ -13,6 +13,14 @@ export const EMPTY_SHIPMENT: ShipmentDraft = {
 };
 
 /**
+ * A dispatch that leaves the company goes with a carrier; an internal issue
+ * (INTERNAL_OUT, and RW as the legacy name for it) stays inside, so no screen
+ * asks it for one.
+ */
+export const leavesWithCarrier = (type: string) =>
+  type === "OUT" || type === "WZ";
+
+/**
  * The shipment a completion carries — none when no carrier was named, so a
  * dispatch completed with both fields empty sends what it always sent.
  */

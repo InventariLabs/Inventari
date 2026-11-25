@@ -911,7 +911,7 @@
       "secretStored": "Une clé est enregistrée — laissez vide pour la conserver",
       "secretUnset": "Aucune clé enregistrée",
       "unknownModule": "Aucun module ne porte ce nom",
-      "unknownModuleHint": "L'adresse pointe vers un module absent de cette installation. Vérifiez le lien ou choisissez le module dans le magasin.",
+      "unknownModuleHint": "L'adresse pointe vers un module absent de cette installation. Vérifiez le lien ou choisissez le module sur la page Modules.",
       "open": "Paramètres du module",
       "saved": "Paramètres enregistrés",
       "guardName": "Les réglages du module",
@@ -1115,7 +1115,7 @@
   "unknown": "Inconnu",
   "focusLock": {
     "title": "Un seul module s'affiche",
-    "body": "Cet espace de travail affiche un module, donc le lanceur d'apps et la boutique sont mis de côté. Ouvrez « Modules de l'organisation » pour tous les réafficher.",
+    "body": "Cet espace de travail affiche un module, donc le lanceur d'apps et la page Modules sont mis de côté. Ouvrez « Modules de l'organisation » pour tous les réafficher.",
     "exit": "Ouvrir « Modules de l'organisation »",
     "unknownTitle": "Impossible de vérifier les modules affichés",
     "unknownBody": "Impossible de lire les modules affichés par cet espace de travail ; le lanceur d'apps n'est donc pas affiché. Réessayez ou ouvrez « Modules de l'organisation ».",

@@ -39,6 +39,8 @@ interface Props {
   onRequestApproval?: () => void | Promise<void>;
   /** Offered on the summary of a dispatch: close without completing, to pack. */
   onPack?: (shipment: ShipmentDraft, documentId: string) => void;
+  /** The dispatch stays inside the company: its summary asks for no carrier. */
+  withoutCarrier?: boolean;
 }
 
 // A line holding no batch has none to promise: say so instead of "it expects ".
@@ -185,6 +187,7 @@ function WmsPickingView({
   onClose,
   onRequestApproval,
   onPack,
+  withoutCarrier,
 }: Props) {
   const { t } = useTranslation("warehouse");
   // Continuing the caller's own session that blocked a start over several
@@ -494,6 +497,7 @@ function WmsPickingView({
         // Left without completing: the document keeps what was picked and
         // waits, as picked, for its Pack step or its own Complete.
         onLeave={() => leave(() => onClose(false))}
+        withoutCarrier={withoutCarrier}
         onPack={
           onPack &&
           ((shipment) => leave(() => onPack(shipment, sessionDocumentId)))

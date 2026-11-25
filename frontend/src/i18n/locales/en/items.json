@@ -396,9 +396,9 @@
       "QUANTITY_CHANGED": "Quantity changed",
       "QUANTITY_INCREASED_VIA_SCAN": "Stock added via scan",
       "CHECKOUT": "Checked out",
-      "CHECKIN": "Checked in",
+      "CHECKIN": "Returned",
       "USED": "Consumed",
-      "DISPOSED": "Discarded",
+      "DISPOSED": "Disposed",
       "DELETED": "Deleted",
       "RESTORED": "Restored",
       "OPENED": "Opened"

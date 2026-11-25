@@ -16,8 +16,62 @@ const catalogues = import.meta.glob<Record<string, unknown>>(
 
 const INFORMAL_PRONOUNS = /\b(du|dein\w*|dich|dir|euch|eure\w*)\b/i;
 // Imperatives in the informal singular; the formal form is "<verb>en Sie".
-const INFORMAL_IMPERATIVES =
-  /(^|[.:;—–!?]\s+)(Wähle|Gib|Füge|Klicke|Lege?|Erstelle|Öffne|Prüfe|Versuche|Lade|Trage|Tippe|Scanne|Speichere|Verwende|Nutze|Ändere|Lösche|Leere|Entferne|Starte|Warte|Kopiere|Schließe|Gehe|Setze|Bestätige|Drücke|Beginne|Benenne|Mache|Verknüpfe|Stelle|Nimm|Fotografiere|Importiere)\b/;
+// Capitalised forms are commands only where a sentence begins (a mid-sentence
+// capital is a noun: "die Stelle"); lowercase forms are commands wherever they
+// stand — after a dash, a colon or a comma — unless a first-person subject
+// goes with them ("ich lege es woanders hin").
+const IMPERATIVES = [
+  "Wähle",
+  "Gib",
+  "Füge",
+  "Klicke",
+  "Lege?",
+  "Erstelle",
+  "Öffne",
+  "Prüfe",
+  "Versuche",
+  "Lade",
+  "Trage",
+  "Tippe",
+  "Scanne",
+  "Speichere",
+  "Verwende",
+  "Nutze",
+  "Ändere",
+  "Lösche",
+  "Leere",
+  "Entferne",
+  "Starte",
+  "Warte",
+  "Kopiere",
+  "Schließe",
+  "Gehe",
+  "Setze",
+  "Bestätige",
+  "Drücke",
+  "Beginne",
+  "Benenne",
+  "Mache",
+  "Verknüpfe",
+  "Stelle",
+  "Nimm",
+  "Fotografiere",
+  "Importiere",
+  "Richte",
+  "Zähle",
+  "Aktiviere",
+  "Wiederhole",
+];
+// "leere" doubles as the adjective ("leere Zeile").
+const LOWERCASE_ONLY_COMMANDS = IMPERATIVES.filter((v) => v !== "Leere").map(
+  (v) => v.toLowerCase(),
+);
+const INFORMAL_IMPERATIVES = new RegExp(
+  `(^|[.:;—–!?]\\s+)(${IMPERATIVES.join("|")})\\b`,
+);
+const EMBEDDED_IMPERATIVES = new RegExp(
+  `(?<!\\b[Ii]ch )\\b(${LOWERCASE_ONLY_COMMANDS.join("|")})\\b`,
+);
 
 function* strings(value: unknown, path: string): Generator<[string, string]> {
   if (typeof value === "string") yield [path, value];
@@ -33,7 +87,11 @@ describe("German catalogues address the reader as Sie", () => {
     const found: string[] = [];
     for (const [file, catalogue] of Object.entries(catalogues)) {
       for (const [path, text] of strings(catalogue, "")) {
-        if (INFORMAL_PRONOUNS.test(text) || INFORMAL_IMPERATIVES.test(text)) {
+        if (
+          INFORMAL_PRONOUNS.test(text) ||
+          INFORMAL_IMPERATIVES.test(text) ||
+          EMBEDDED_IMPERATIVES.test(text)
+        ) {
           found.push(`${file} ${path}: ${text.slice(0, 80)}`);
         }
       }
