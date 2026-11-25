@@ -39,7 +39,16 @@ from decimal import Decimal
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import ColumnElement, Row, ScalarSelect, func, select
+from sqlalchemy import (
+    ColumnElement,
+    Row,
+    ScalarSelect,
+    and_,
+    false,
+    func,
+    or_,
+    select,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.audit_actor import ACTOR_KEY, ACTOR_TYPE_API_KEY, current_actor
@@ -314,6 +323,35 @@ def item_to_snapshot(item: 'Item') -> dict[str, Any]:
     return data
 
 
+def _of_kind(target_type: str) -> ColumnElement[bool]:
+    """The condition for the screen's object-type filter.
+
+    An asset is a product card with an equipment block, so the entries of its
+    creation and edits are stored as ``item`` while its status changes are
+    ``equipment_asset``. The Target column names all of them an asset, so the
+    filter does as well: ``equipment_asset`` also takes the ``item`` entries
+    that carry the equipment block (the module's mark on a create, its
+    ``meta_data`` on either side of an edit), and ``item`` leaves them out.
+    """
+    if target_type != 'equipment_asset':
+        return AuditLog.target_type == target_type
+    snapshot = AuditLog.snapshot
+    is_asset_card = and_(
+        AuditLog.target_type == 'item',
+        func.coalesce(
+            or_(
+                snapshot['module_name'].as_string() == 'equipment',
+                *(
+                    side['meta_data']['equipment'].is_not(None)
+                    for side in (snapshot, snapshot['before'], snapshot['after'])
+                ),
+            ),
+            false(),
+        ),
+    )
+    return or_(AuditLog.target_type == 'equipment_asset', is_asset_card)
+
+
 async def list_for_org_async(
     db: AsyncSession,
     organization_id: uuid.UUID,
@@ -364,7 +402,7 @@ async def list_for_org_async(
 
     conditions = [AuditLog.organization_id == organization_id]
     if target_type is not None:
-        conditions.append(AuditLog.target_type == target_type)
+        conditions.append(_of_kind(target_type))
     if target_id is not None:
         conditions.append(AuditLog.target_id == target_id)
     if user_id is not None:
