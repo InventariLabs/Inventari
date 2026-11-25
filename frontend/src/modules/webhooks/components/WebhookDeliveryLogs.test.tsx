@@ -108,6 +108,24 @@ describe("WebhookDeliveryLogs", () => {
     expect(screen.queryByText("Timeout after 5s")).not.toBeInTheDocument();
   });
 
+  it("words a refused address from its code too", async () => {
+    mockDelivery({
+      status_code: null,
+      error_message:
+        "This address (127.0.0.1) is not publicly routable or is reserved for protocol infrastructure, so the server refuses to call it.",
+      error_cause: "url_private",
+    });
+    renderLogs();
+
+    // not-an-i18n-key
+    fireEvent.click(await screen.findByText(/^item\.created$/));
+
+    expect(
+      screen.getByText(/This address is not publicly routable/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/127\.0\.0\.1/)).not.toBeInTheDocument();
+  });
+
   it("gives a reason when the target refused with an empty body", async () => {
     // The row carried only "Failed - HTTP 500" and the payload: the Error block
     // is drawn from the stored text, and an empty body stored none.

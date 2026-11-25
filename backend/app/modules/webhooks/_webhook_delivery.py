@@ -6,7 +6,9 @@ import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db_retry import mark_external_effect
+from app.core.exceptions import ServiceRejectionError
 from app.core.logging import get_logger
+from app.core.ssrf_guard import WebhookUrlRejectedError
 from app.modules.webhooks.models import WebhookEndpoint
 from app.modules.webhooks.signing import compute_signature
 from app.modules.webhooks.ssrf_guard import validate_webhook_url
@@ -40,6 +42,13 @@ _CONNECT_FAILED_PREFIX = 'Could not connect to '
 _TLS_REFUSED_INFIX = ' was refused over TLS'
 _CONNECTION_BROKEN_INFIX = ' broke before the receiver answered'
 _CONNECTION_PREFIX = 'The connection to '
+
+
+def _url_refusal_sentence(exc: ValueError) -> str:
+    """The guard's refusal in English, the language every stored cause is in."""
+    if isinstance(exc, WebhookUrlRejectedError | ServiceRejectionError):
+        return exc.sentence('en')
+    return str(exc)
 
 
 async def _attempt_delivery(
@@ -97,7 +106,7 @@ async def _attempt_delivery(
         # validate_webhook_url's resolution and httpx's own resolution.
         pinned_ip = validate_webhook_url(str(webhook.url), allow_private=allow_private)
     except ValueError as exc:
-        return False, None, None, str(exc)
+        return False, None, None, _url_refusal_sentence(exc)
 
     try:
         from urllib.parse import urlparse
