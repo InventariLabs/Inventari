@@ -19,7 +19,15 @@ write ``bakłażan`` next to ``baklazan`` and hand the cleanup to
 
 from __future__ import annotations
 
+import unicodedata
+
 from anyascii import anyascii
+
+__all__ = ['match_key', 'normalize_name', 'shows_a_character']
+
+#: Letters and symbols that print as empty space although Unicode files them
+#: with the visible ones: the Braille blank and the Hangul fillers.
+_BLANK_GLYPHS = frozenset('\u2800\u115f\u1160\u3164\uffa0')
 
 
 def normalize_name(name: str) -> str:
@@ -34,3 +42,17 @@ def normalize_name(name: str) -> str:
 def match_key(name: str) -> str:
     """Return an order-insensitive key: :func:`normalize_name`, tokens sorted."""
     return ' '.join(sorted(normalize_name(name).split()))
+
+
+def shows_a_character(name: str) -> bool:
+    """True when *name* holds a letter, digit, mark, punctuation or symbol.
+
+    A name whose key folds to nothing is either invisible (spaces, zero-width
+    characters, a BOM) or written only in characters the ASCII fold has no
+    spelling for: an Arabic word, a rare CJK ideograph. The two are refused
+    with different sentences, because only the first is blank to its reader.
+    """
+    return any(
+        unicodedata.category(char)[0] in 'LMNPS' and char not in _BLANK_GLYPHS
+        for char in name
+    )

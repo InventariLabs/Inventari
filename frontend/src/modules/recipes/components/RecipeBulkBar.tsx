@@ -14,6 +14,9 @@ import {
 } from "@/components/ui/Sheet";
 import type { RecipeCollection } from "@/modules/recipes/types/core";
 
+/** What one Apply may carry: `RecipeBulkTagRequest.tags` on the server. */
+const MAX_TAGS_PER_APPLY = 20;
+
 interface RecipeBulkBarProps {
   open: boolean;
   selectedCount: number;
@@ -68,11 +71,26 @@ export function RecipeBulkBar({
   };
 
   const applyTags = async () => {
-    const tags = tagInput
-      .split(",")
-      .map((tag) => tag.trim().toLowerCase())
-      .filter(Boolean);
+    const tags = [
+      ...new Set(
+        tagInput
+          .split(",")
+          .map((tag) => tag.trim().toLowerCase())
+          .filter(Boolean),
+      ),
+    ];
     if (tags.length === 0) return;
+    // Refused here, in the reader's words, rather than by the server's
+    // schema in its own.
+    if (tags.length > MAX_TAGS_PER_APPLY) {
+      setTagError(
+        t("recipes:bulk.too_many_tags", {
+          max: MAX_TAGS_PER_APPLY,
+          typed: tags.length,
+        }),
+      );
+      return;
+    }
     setTagError(null);
     try {
       await onTag(tags);
@@ -245,7 +263,7 @@ export function RecipeBulkBar({
               {t("recipes:bulk.tag_title", { count: selectedCount })}
             </SheetTitle>
             <p className="text-xs text-on-secondary mb-3">
-              {t("recipes:bulk.tag_hint")}
+              {t("recipes:bulk.tag_hint", { max: MAX_TAGS_PER_APPLY })}
             </p>
             <Input
               aria-label={t("recipes:bulk.tag_placeholder")}

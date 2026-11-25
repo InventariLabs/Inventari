@@ -12,7 +12,8 @@
     "createKey": "Create an API key in API Keys and give it the permission Use the MCP endpoint.",
     "createKeyNeedsAdmin": "Ask an administrator of your organization for a key: it is created in API Keys, with the permission Use the MCP endpoint.",
     "pointClient": "Send the key in the X-API-Key header (or as a Bearer token) to the address above.",
-    "allowHost": "If this installation answers on a public address, add its host to the allowed hosts in the module settings."
+    "allowHost": "If this installation answers on a public address, add its host to the allowed hosts in the module settings.",
+    "allowHostNeedsAdmin": "If this installation answers on a public address, ask an administrator to add its host to the allowed hosts in the module settings."
   },
   "links": {
     "apiKeys": "API Keys"

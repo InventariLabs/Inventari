@@ -344,7 +344,7 @@ class TestTheStatementRefusesWhatItCannotSay:
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json()['detail']['code'] == 'STOCK_AS_OF_BEFORE_LEDGER'
+        assert response.json()['detail']['code'] == 'STOCK_VALUE_FIRST_DAY'
 
     async def test_a_period_cannot_end_before_it_starts(
         self, real_async_client: AsyncClient, books: _Books

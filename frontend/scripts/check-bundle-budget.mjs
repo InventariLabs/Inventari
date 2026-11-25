@@ -607,15 +607,16 @@ const dist = join(root, "dist");
  * 481.2 of 485, issue 592.1 of 595, history 617.2 of 620, products 635.9 of
  * 640, initial 194.0).
  *
- * Re-measured 2026-11-25 on the branch that names the host, the resolved
- * address and the setting in a webhook's URL refusal: the receive screen
- * measures 485.0 KiB gz and a hair over its 485; the development line alone
- * sits just under it. The branch adds about 0.1 KiB of copy in six languages
- * (two slots and the setting name in four sentences) to the language chunk
- * that screen loads, no import. That phone budget moves a step of five, to
- * 490; the other screens stand under theirs (app first paint 408.5 of 410,
- * login 413.4 of 415, launcher 428.3 of 430, start 647.9 of 650, issue 594.4
- * of 595, history 619.5 of 620, products 638.4 of 640, initial 194.2).
+ * Re-measured 2026-11-25 on the branch that words refusals in the reader's
+ * language, merged with the development line: the receive screen measures
+ * 485.1 KiB gz against its 485, and the line alone 485.0. The branch adds
+ * sentences in six languages (the recipe tag limit and its refusal, the MCP
+ * page's step for a reader who is not an administrator) to the language
+ * chunk every first paint loads; no import walked in. That phone budget
+ * moves a step of five, to 490; the other screens stand under theirs (app
+ * first paint 408.5 of 410, login 413.5 of 415, launcher 428.4 of 430, start
+ * 647.9 of 650, issue 594.4 of 595, history 619.5 of 620, products 638.5 of
+ * 640, initial 194.2).
  */
 const BUDGETS = {
   initial: 245,

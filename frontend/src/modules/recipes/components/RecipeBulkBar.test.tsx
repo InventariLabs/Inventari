@@ -6,13 +6,17 @@ import common from "@/i18n/locales/en/common.json";
 import type { TFunction } from "i18next";
 import type { RecipeCollection } from "@/modules/recipes/types/core";
 
-const t = ((key: string) => {
+const t = ((key: string, options?: Record<string, unknown>) => {
   const ns = key.startsWith("common:") ? common : en;
   const path = key.replace(/^(common|recipes):/, "").split(".");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let value: any = ns;
-  for (const part of path) value = value?.[part];
-  return typeof value === "string" ? value : key;
+  let value: unknown = ns;
+  for (const part of path) {
+    value = (value as Record<string, unknown> | undefined)?.[part];
+  }
+  if (typeof value !== "string") return key;
+  return value.replace(/\{\{(\w+)\}\}/g, (_: string, name: string) =>
+    String(options?.[name] ?? ""),
+  );
 }) as unknown as TFunction;
 
 const collection = (id: string, name: string): RecipeCollection => ({
@@ -92,6 +96,47 @@ describe("RecipeBulkBar — tag sheet", () => {
     expect(screen.getByPlaceholderText(en.bulk.tag_placeholder)).toHaveValue(
       "Quick, Dinner",
     );
+  });
+});
+
+describe("RecipeBulkBar — how many tags one Apply takes", () => {
+  const typeTags = (value: string) => {
+    fireEvent.click(screen.getByRole("button", { name: /Tag/ }));
+    fireEvent.change(screen.getByPlaceholderText(en.bulk.tag_placeholder), {
+      target: { value },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+  };
+
+  it("says how many tags fit before anything is typed", () => {
+    render(<RecipeBulkBar {...baseProps} />);
+    fireEvent.click(screen.getByRole("button", { name: /Tag/ }));
+
+    expect(
+      screen.getByText("Separate tags with commas, up to 20 at a time"),
+    ).toBeInTheDocument();
+  });
+
+  it("refuses a 21st tag in the reader's words, before any request", async () => {
+    const onTag = vi.fn().mockResolvedValue(undefined);
+    render(<RecipeBulkBar {...baseProps} onTag={onTag} />);
+    typeTags(Array.from({ length: 21 }, (_, i) => `t${i}`).join(","));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "At most 20 tags can be added at once, and this list has 21.",
+    );
+    expect(onTag).not.toHaveBeenCalled();
+  });
+
+  it("counts a tag typed twice once", async () => {
+    const onTag = vi.fn().mockResolvedValue(undefined);
+    render(<RecipeBulkBar {...baseProps} onTag={onTag} />);
+    const twenty = Array.from({ length: 20 }, (_, i) => `t${i}`);
+    typeTags([...twenty, "T0", " t1 "].join(","));
+
+    await act(async () => {});
+    expect(onTag).toHaveBeenCalledWith(twenty);
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 });
 

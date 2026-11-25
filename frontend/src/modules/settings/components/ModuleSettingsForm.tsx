@@ -273,13 +273,7 @@ function ModuleSettingsFields({
   });
 
   if (!canManageSettings) {
-    return (
-      <ReadOnlyNotice
-        module={moduleName}
-        permission="admin:access"
-        right="manage"
-      />
-    );
+    return <ReadOnlyNotice module={moduleName} permission="admin:access" />;
   }
 
   if (fields.length === 0) {

@@ -32,3 +32,20 @@ def test_a_name_that_folds_to_no_key_is_refused(
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT, response.text
     listed = client.get(EXCLUSIONS, headers=auth_headers).json()
     assert listed['total'] == 0, listed
+
+
+def test_a_visible_name_with_no_latin_form_is_not_called_invisible(
+    client: TestClient, auth_headers: dict[str, str]
+) -> None:
+    """An Arabic or a rare CJK name is seen, so the refusal asks for the
+    Latin spelling the matching keys on instead of calling it blank."""
+    response = client.post(
+        EXCLUSIONS,
+        json={'name': '\u0627\u39dd'},
+        headers={**auth_headers, 'Accept-Language': 'en'},
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT, response.text
+    [error] = response.json()['detail']
+    assert error['code'] == 'NAME_HAS_NO_LATIN_FORM'
+    assert 'invisible' not in error['msg']

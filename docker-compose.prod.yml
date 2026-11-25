@@ -64,11 +64,20 @@ services:
     # organization passes it. Measured at 100 000 products, the compiling
     # took 0.3-1 s of each such statement and the statements then ran in
     # less; nothing this application asks runs long enough to earn it back.
+    #
+    # `plan_cache_mode=force_custom_plan`: PgBouncer keeps the statements the
+    # backend prepares and hands every client the same one, so a list read is
+    # one statement executed for every organization. After five executions
+    # PostgreSQL would plan it once for any organization, sized for the
+    # average one, and an organization a hundred times that size then read
+    # its list in 9-40 s instead of 60-150 ms. Each execution is planned for
+    # its own values instead, as it is without the pooler.
     mem_limit: ${DB_MEM_LIMIT:-2g}
     command: >
       postgres
       -c max_connections=50
       -c jit=off
+      -c plan_cache_mode=force_custom_plan
       -c shared_buffers=${DB_SHARED_BUFFERS:-512MB}
       -c effective_cache_size=${DB_EFFECTIVE_CACHE_SIZE:-2GB}
       -c maintenance_work_mem=128MB

@@ -31,6 +31,17 @@ def refusal(code: str, key: str, **kwargs: object) -> ToolError:
     return ToolError(f'{code}: {message}')
 
 
+def _permission_label(permission: str) -> str:
+    """*permission* as the API key form names it, the box a reader ticks.
+
+    The raw key (``items:write``) is the form's internal name; a permission
+    the catalog has no label for is named by its key.
+    """
+    key = 'permission_' + permission.replace(':', '_')
+    label = get_module_error_message(MODULE_NAME, key, get_current_lang())
+    return permission if label == key else label
+
+
 @dataclass(frozen=True)
 class McpIdentity:
     """The authenticated workspace and the key that authenticated it."""
@@ -50,7 +61,7 @@ class McpIdentity:
             raise refusal(
                 'PERMISSION_REQUIRED',
                 'insufficient_permission',
-                permission=permission,
+                permission=_permission_label(permission),
             )
 
 
