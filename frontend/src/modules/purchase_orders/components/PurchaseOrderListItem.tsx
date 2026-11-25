@@ -105,6 +105,7 @@ const PurchaseOrderListItem = memo(function PurchaseOrderListItem({
           </div>
         </Button>
         <RowActions
+          number={po.number}
           status={po.status}
           canWrite={canWrite}
           canManage={canManage}
@@ -253,6 +254,8 @@ export function ReceiptProgress({
 }
 
 interface RowActionsProps {
+  /** The order's number: the "⋯" button names the order it acts on. */
+  number: string;
   status: PurchaseOrderRow["status"];
   canWrite: boolean;
   canManage: boolean;
@@ -275,6 +278,7 @@ interface RowActionsProps {
  * an account that only writes is not offered a button that ends in a 403.
  */
 export function RowActions({
+  number,
   status,
   canWrite,
   canManage,
@@ -331,7 +335,7 @@ export function RowActions({
         </>
       )}
       {menu.length > 0 && (
-        <ActionMenu actions={menu} label={t("moreActions")} />
+        <ActionMenu actions={menu} label={t("moreActionsFor", { number })} />
       )}
     </div>
   );

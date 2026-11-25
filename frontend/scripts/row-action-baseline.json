@@ -68,7 +68,6 @@
     "modules/stock_takes/pages/StockTakesPage.tsx :: deleteAriaLabel :: #1": 1,
     "modules/warehouse/components/DocumentCostVariancesSection.tsx :: warehouse:costVariances.removeLabel :: #1": 1,
     "modules/warehouse/components/DocumentExtraCostsSection.tsx :: warehouse:extraCosts.removeLabel :: #1": 1,
-    "modules/warehouse/components/DocumentListItem.tsx :: actions.moreActions :: #1": 1,
     "modules/warehouse/components/LineQuantityStepper.tsx :: common:actions.decrease :: #1": 1,
     "modules/warehouse/components/LineQuantityStepper.tsx :: common:actions.increase :: #1": 1,
     "modules/warehouse/components/PutawayRuleEditorDialog.tsx :: putaway.actions.moveUp :: #1": 1,

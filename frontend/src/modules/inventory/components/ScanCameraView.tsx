@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import {
   X,
@@ -130,27 +131,32 @@ function TypeCodeFromCamera({ onCode }: { onCode: (code: string) => void }) {
       >
         {tScan("typeCode")}
       </Button>
-      {open && (
-        <Sheet
-          open
-          onClose={() => setOpen(false)}
-          aria-label={tScan("typeCode")}
-        >
-          <SheetHeader
-            title={tScan("typeCode")}
+      {open &&
+        // The controls overlay is `pointer-events-none`, so the camera stays
+        // reachable around its buttons; a sheet rendered inside it inherits
+        // that and takes no touch. The body is outside it.
+        createPortal(
+          <Sheet
+            open
             onClose={() => setOpen(false)}
-          />
-          <SheetBody className="p-5">
-            <ManualCodeEntry
-              inSheet
-              onSubmit={(code) => {
-                setOpen(false);
-                onCode(code);
-              }}
+            aria-label={tScan("typeCode")}
+          >
+            <SheetHeader
+              title={tScan("typeCode")}
+              onClose={() => setOpen(false)}
             />
-          </SheetBody>
-        </Sheet>
-      )}
+            <SheetBody className="p-5">
+              <ManualCodeEntry
+                inSheet
+                onSubmit={(code) => {
+                  setOpen(false);
+                  onCode(code);
+                }}
+              />
+            </SheetBody>
+          </Sheet>,
+          document.body,
+        )}
     </>
   );
 }

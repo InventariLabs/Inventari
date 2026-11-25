@@ -1077,6 +1077,20 @@ export class ApiHelper {
     return await response.json();
   }
 
+  async listPurchaseOrders(
+    token: string,
+    params?: string,
+  ): Promise<Array<{ id: string; status: string }>> {
+    const url = params
+      ? `/api/v1/purchase-orders?${params}`
+      : "/api/v1/purchase-orders";
+    const response = await this.request.get(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok()) return [];
+    return (await response.json()).items ?? [];
+  }
+
   /**
    * The API deletes no purchase order. Cancelling is how a spec lets go of
    * one, and what lets the partner behind it be deleted afterwards.

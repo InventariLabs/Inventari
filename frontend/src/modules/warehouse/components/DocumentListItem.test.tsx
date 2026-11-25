@@ -110,7 +110,7 @@ beforeEach(() => {
 });
 
 function openMenu() {
-  fireEvent.click(screen.getByRole("button", { name: "More actions" }));
+  fireEvent.click(screen.getByRole("button", { name: /^More actions for / }));
 }
 
 describe("DocumentListItem permission gating", () => {
@@ -163,7 +163,7 @@ describe("DocumentListItem permission gating", () => {
       />,
     );
     expect(
-      screen.queryByRole("button", { name: "More actions" }),
+      screen.queryByRole("button", { name: /^More actions for / }),
     ).not.toBeInTheDocument();
   });
 });
@@ -205,7 +205,7 @@ describe("DocumentListItem duplicate action", () => {
     render(<DocumentListItem doc={buildDocument()} {...baseProps} />);
     // COMPLETED document with no other actions → no menu at all.
     expect(
-      screen.queryByRole("button", { name: "More actions" }),
+      screen.queryByRole("button", { name: /^More actions for / }),
     ).not.toBeInTheDocument();
   });
 
@@ -298,7 +298,7 @@ describe("DocumentListItem content", () => {
       1,
     );
     expect(
-      screen.getAllByRole("button", { name: "More actions" }),
+      screen.getAllByRole("button", { name: /^More actions for / }),
     ).toHaveLength(1);
   });
 

@@ -1426,6 +1426,68 @@ describe("DocumentFormModal validation accessibility", () => {
     );
   });
 
+  it("closes an untouched existing draft on Escape without asking to discard", async () => {
+    // The draft's own partner, location and lines are what it opened with,
+    // and closing leaves the record as it is: there is nothing to discard.
+    const onClose = vi.fn();
+    const existing = {
+      id: "doc-1",
+      organization_id: "org-1",
+      type: "IN",
+      number: "IN/2026/001",
+      status: "DRAFT",
+      partner_id: "partner-1",
+      source_location_id: null,
+      target_location_id: "loc-1",
+      scheduled_date: null,
+      notes: "Dock 2",
+      external_reference: null,
+      currency: null,
+      lines: [{ id: "line-1", name: "Widget", quantity: 10, uom_id: null }],
+    } as unknown as React.ComponentProps<typeof DocumentFormModal>["document"];
+    await act(async () => {
+      render(<DocumentFormModal document={existing} onClose={onClose} />);
+    });
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it("still asks before closing an existing draft that was changed", async () => {
+    const onClose = vi.fn();
+    const existing = {
+      id: "doc-1",
+      organization_id: "org-1",
+      type: "IN",
+      number: "IN/2026/001",
+      status: "DRAFT",
+      partner_id: "partner-1",
+      source_location_id: null,
+      target_location_id: "loc-1",
+      scheduled_date: null,
+      notes: "Dock 2",
+      external_reference: null,
+      currency: null,
+      lines: [{ id: "line-1", name: "Widget", quantity: 10, uom_id: null }],
+    } as unknown as React.ComponentProps<typeof DocumentFormModal>["document"];
+    await act(async () => {
+      render(<DocumentFormModal document={existing} onClose={onClose} />);
+    });
+    fireEvent.change(screen.getAllByPlaceholderText("Item")[0], {
+      target: { value: "Widget 2" },
+    });
+    await waitFor(() =>
+      expect(useFormGuardStore.getState().dirtyForm).toBe("The document form"),
+    );
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+  });
+
   it("reports a changed scrap reason on an existing draft as work", async () => {
     // Save sends the reason, so a change to it alone is work to keep.
     const existing = {
