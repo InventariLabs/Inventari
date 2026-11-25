@@ -23,6 +23,8 @@ import unicodedata
 
 from anyascii import anyascii
 
+__all__ = ['match_key', 'normalize_name', 'shows_a_character']
+
 #: Letters and symbols that print as empty space although Unicode files them
 #: with the visible ones: the Braille blank and the Hangul fillers.
 _BLANK_GLYPHS = frozenset('\u2800\u115f\u1160\u3164\uffa0')
