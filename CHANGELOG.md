@@ -287,6 +287,11 @@ says what the release does rather than what changed since them.
 - An equipment protocol copy that no longer matches its built-in layout can be
   reset to it from the Templates screen, as a warehouse document template
   already could.
+- A purchase order template copy that no longer matches its built-in layout is
+  marked as changed or outdated on the Templates screen, and can be reset to
+  the built-in or have the current built-in copied alongside it — also when
+  the copy was made in another language than the one the screen is read in,
+  on the equipment Templates screen too.
 
 ### Changed
 

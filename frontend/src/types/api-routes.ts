@@ -289,6 +289,8 @@ export const API_ROUTES = [
   "/api/v1/purchase-orders/templates/preview",
   "/api/v1/purchase-orders/templates/seed-defaults",
   "/api/v1/purchase-orders/templates/{template_id}",
+  "/api/v1/purchase-orders/templates/{template_id}/refresh-copy",
+  "/api/v1/purchase-orders/templates/{template_id}/reset",
   "/api/v1/purchase-orders/{po_id}",
   "/api/v1/purchase-orders/{po_id}/approval-requirement",
   "/api/v1/purchase-orders/{po_id}/approve",

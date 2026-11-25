@@ -137,7 +137,7 @@ async def refresh_builtin_copy(
         module='equipment',
         user_id=current_user.id,
         template_id=template_id,
-        built_ins=_built_ins(get_current_lang()),
+        built_ins=_built_ins_under_every_name(),
     )
 
 
