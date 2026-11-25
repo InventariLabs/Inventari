@@ -54,6 +54,18 @@ says what the release does rather than what changed since them.
   lines and opening stock now refuse a date they cannot read, as the product
   import does, instead of importing the row without it, and order lines
   refuse an unreadable price or tax rate instead of dropping it.
+- Opening stock from a sheet keeps what the sheet says. A row in cartons or
+  litres founds its product in that unit instead of in pieces, so the draft
+  receipt opens; a row naming a unit an existing product cannot take is
+  refused with its row number instead of leaving a draft nobody can read; a
+  product founded from a row keeps the row's SKU and barcode; and the result
+  counts products found apart from products founded. A document whose line
+  unit stops converting to its product's stock unit still opens, with that
+  line marked for correction.
+- The production list reads a reversed run on the day it was made rather than
+  the day it was created, and the recipe catalog no longer announces a
+  newest-first or oldest-first order on its Last produced column, which the
+  catalog does not follow.
 - The production list reads a cancelled run on the day it was planned for, or
   started, rather than the day it was created, and its Date column no longer
   announces a newest-first or oldest-first order that the days it shows do not
