@@ -53,15 +53,10 @@ const groupOf = (
  * recipes module): a product created with Open Food Facts' names, or the older
  * `calories`, carries the figure all the same.
  */
-const PRODUCT_NAMES: Record<NutrientKey, readonly string[]> =
-  Object.fromEntries(
-    NUTRIENT_FIELDS.map(({ key }) => [
-      key,
-      key === "calories_kcal"
-        ? [key, "calories", RECORD_NAMES[key]]
-        : [key, RECORD_NAMES[key]],
-    ]),
-  ) as Record<NutrientKey, readonly string[]>;
+const productNames = (key: NutrientKey): readonly string[] =>
+  key === "calories_kcal"
+    ? [key, "calories", RECORD_NAMES[key]]
+    : [key, RECORD_NAMES[key]];
 
 const firstOf = (
   group: Record<string, unknown>,
@@ -89,7 +84,7 @@ export function productNutrition(
   const values: ProductTemplateNutritionInfo = {};
   for (const { key } of NUTRIENT_FIELDS) {
     const value =
-      firstOf(product, PRODUCT_NAMES[key]) ??
+      firstOf(product, productNames(key)) ??
       asNumber(record[RECORD_NAMES[key]]);
     if (value !== null) values[key] = value;
   }
