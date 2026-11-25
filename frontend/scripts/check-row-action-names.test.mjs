@@ -161,4 +161,33 @@ describe("check-row-action-names", () => {
       }),
     ).toEqual([]);
   });
+
+  it("reads the label of an ActionMenu inside a map", () => {
+    // `ActionMenu` carries its trigger's accessible name in `label`, and no
+    // Button, anchor or `onClick` appears in the row's own markup.
+    expect(
+      rowActionNamesIn(
+        rel,
+        map(`<ActionMenu actions={menu} label={t("moreActions")} />`),
+      ),
+    ).toMatchObject([{ label: "moreActions" }]);
+  });
+
+  it("leaves an ActionMenu whose label names the row", () => {
+    const source = map(
+      `<ActionMenu actions={menu} label={t("moreFor", { name: thing.name })} />`,
+    );
+    expect(rowActionNamesIn(rel, source)).toEqual([]);
+  });
+
+  it("reads an ActionMenu in a card rendered per row", () => {
+    const card = `export function ThingCard({ thing }) {
+      return <ActionMenu actions={menu} label={t("moreActions")} />;
+    }`;
+    expect(
+      rowActionNamesIn("modules/things/components/ThingCard.tsx", card, {
+        whole: true,
+      }),
+    ).toMatchObject([{ label: "moreActions" }]);
+  });
 });

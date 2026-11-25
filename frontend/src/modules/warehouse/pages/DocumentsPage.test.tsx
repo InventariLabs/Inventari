@@ -327,7 +327,9 @@ describe("DocumentsPage", () => {
     expect(screen.getAllByText("PZ/2026/001").length).toBeGreaterThan(0);
 
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "More actions" }));
+      await user.click(
+        screen.getByRole("button", { name: /^More actions for / }),
+      );
     });
     await act(async () => {
       await user.click(screen.getByRole("button", { name: "Edit" }));
@@ -460,7 +462,9 @@ describe("DocumentsPage", () => {
     await renderWithHeader(<DocumentsPage />);
 
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "More actions" }));
+      await user.click(
+        screen.getByRole("button", { name: /^More actions for / }),
+      );
     });
     await act(async () => {
       await user.click(screen.getByRole("button", { name: "Duplicate" }));
@@ -492,7 +496,9 @@ describe("DocumentsPage", () => {
     await renderWithHeader(<DocumentsPage />);
 
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: "More actions" }));
+      await user.click(
+        screen.getByRole("button", { name: /^More actions for / }),
+      );
     });
     await act(async () => {
       await user.click(screen.getByRole("button", { name: "Execute" }));
@@ -943,7 +949,9 @@ describe("DocumentsPage", () => {
       expect(screen.getByText("In progress · Ann")).toBeInTheDocument();
 
       await act(async () => {
-        await user.click(screen.getByRole("button", { name: "More actions" }));
+        await user.click(
+          screen.getByRole("button", { name: /^More actions for / }),
+        );
       });
       await act(async () => {
         await user.click(screen.getByRole("button", { name: "Resume" }));
@@ -986,7 +994,9 @@ describe("DocumentsPage", () => {
       expect(screen.getByText("In progress · Ann")).toBeInTheDocument();
 
       await act(async () => {
-        await user.click(screen.getByRole("button", { name: "More actions" }));
+        await user.click(
+          screen.getByRole("button", { name: /^More actions for / }),
+        );
       });
 
       expect(
@@ -1028,7 +1038,9 @@ describe("DocumentsPage", () => {
       await renderWithHeader(<DocumentsPage />);
 
       await act(async () => {
-        await user.click(screen.getByRole("button", { name: "More actions" }));
+        await user.click(
+          screen.getByRole("button", { name: /^More actions for / }),
+        );
       });
       await act(async () => {
         await user.click(screen.getByRole("button", { name: "Resume" }));

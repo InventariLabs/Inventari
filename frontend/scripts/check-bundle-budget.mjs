@@ -640,6 +640,13 @@ const dist = join(root, "dist");
  * of 410, login 413.5 of 415, launcher 428.5 of 430, start 648.2 of 650,
  * issue 594.7 of 595, history 619.8 of 620, products 638.8 of 640, initial
  * 194.2).
+ *
+ * The merge of those two with the line's next commits (row menus that name
+ * their record, the template-copy actions) measures issue at 595.6 KiB gz of
+ * 600 and history at 620.7 of 625, so no budget moves; the other screens stand
+ * under theirs (app first paint 409.3 of 410, login 414.2 of 415, launcher
+ * 429.2 of 430, start 649.2 of 650, receive 486.6 of 490, products 639.6 of
+ * 640, initial 194.3).
  */
 const BUDGETS = {
   initial: 245,

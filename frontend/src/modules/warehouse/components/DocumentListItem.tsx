@@ -522,7 +522,9 @@ const DocumentListItem = memo(function DocumentListItem({
           {execution && <ExecutionProgress groups={execution} />}
         </div>
 
-        {actions.length > 0 && <RowActionsMenu actions={actions} />}
+        {actions.length > 0 && (
+          <RowActionsMenu actions={actions} number={documentTitle(t, doc)} />
+        )}
       </div>
     </Card>
   );
@@ -535,12 +537,19 @@ const DocumentListItem = memo(function DocumentListItem({
  * 390 px and 1440 px. `ActionMenu` keeps the focus in a sheet an action
  * opens and hands it back to the "⋯" button when that sheet closes.
  */
-function RowActionsMenu({ actions }: { actions: RowAction[] }) {
+function RowActionsMenu({
+  actions,
+  number,
+}: {
+  actions: RowAction[];
+  /** The document's title: the "⋯" button names the record it acts on. */
+  number: string;
+}) {
   const { t } = useTranslation("warehouse");
 
   return (
     <ActionMenu
-      label={t("actions.moreActions")}
+      label={t("actions.moreActionsFor", { number })}
       triggerClassName="relative z-10 shrink-0"
       actions={actions.map((action) => ({
         id: action.key,
