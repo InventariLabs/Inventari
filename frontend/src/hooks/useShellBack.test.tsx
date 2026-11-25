@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import {
   Link,
@@ -95,7 +95,7 @@ function renderApp(entries: InitialEntry[], index?: number) {
             </Link>
           }
         />
-        <Route path="/warehouse/receive" element={<p>receipt</p>} />
+        <Route path="/warehouse/receive" element={<BackToStart />} />
         <Route path="/warehouse/documents/7" element={<p>document</p>} />
         <Route path="/inventory/items/42" element={<p>item</p>} />
         <Route path="/warehouse" element={<p>module root</p>} />
@@ -111,6 +111,8 @@ const link = (name: string) => click("link", name);
 const back = () => click("button", "Back");
 
 describe("useShellBack", () => {
+  beforeEach(() => sessionStorage.clear());
+
   it("leaves an action opened from the module start by Back, Back", () => {
     renderApp(["/launcher"]);
     link("go");
@@ -212,5 +214,37 @@ describe("useShellBack", () => {
     // The form the reader finished is not behind the start any more.
     back();
     expect(at()).toBe("/launcher");
+  });
+
+  it("sends a posted result to the start after a reload, not to the order it came from", () => {
+    // The receipt was opened from the order, then the tab reloaded: the shell
+    // reads the entry before from the tab's storage and does not pop to the
+    // order as if it were the start.
+    sessionStorage.setItem(
+      "inventari.shell-entry-before",
+      JSON.stringify({ key: "receipt", path: "/purchase-orders/7" }),
+    );
+    renderApp(
+      [
+        "/launcher",
+        "/purchase-orders/7",
+        { pathname: "/warehouse/receive", key: "receipt" },
+      ],
+      2,
+    );
+    click("button", "Back to start");
+    expect(at()).toBe("/warehouse/todo");
+    back();
+    expect(at()).toBe("/purchase-orders/7");
+  });
+
+  it("keeps the entry before across a reload for the header", () => {
+    renderApp(["/launcher", "/purchase-orders"], 1);
+    link("order");
+    link("receive");
+    const saved = JSON.parse(
+      sessionStorage.getItem("inventari.shell-entry-before") ?? "null",
+    );
+    expect(saved.path).toBe("/purchase-orders/7");
   });
 });

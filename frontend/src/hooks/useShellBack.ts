@@ -78,6 +78,34 @@ function goTo(
 let entryBefore: string | undefined;
 
 /**
+ * The entry before the current one survives a reload: the tab keeps it in
+ * `sessionStorage` next to the router's key of the entry it belongs to. A
+ * reload (a backgrounded phone tab) then still knows whether the entry before
+ * is the screen a button names, instead of reading "unknown" as "pop".
+ */
+const BEFORE_STORE = "inventari.shell-entry-before";
+
+function loadBefore(key: string): string | undefined {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(BEFORE_STORE) ?? "null");
+    return saved?.key === key && typeof saved.path === "string"
+      ? saved.path
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function saveBefore(key: string, path: string | undefined): void {
+  try {
+    if (path === undefined) sessionStorage.removeItem(BEFORE_STORE);
+    else sessionStorage.setItem(BEFORE_STORE, JSON.stringify({ key, path }));
+  } catch {
+    // Storage unavailable: the entry before is unknown after a reload.
+  }
+}
+
+/**
  * What the phone header's Back arrow does. A label that says Back promises
  * the previous screen, so:
  *
@@ -104,20 +132,22 @@ export function useShellBack(
 
   // The path of the entry right before this one, while it is known: a push
   // leaves the screen it came from there, a replace keeps what it had, and a
-  // pop (a browser button, a reload) says nothing about it.
+  // pop (a browser button) says nothing about it; a reload reads it back from
+  // the tab's storage.
   const current = useRef({ key: location.key, path: location.pathname });
   const before = useRef<string | undefined>(undefined);
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    before.current = entryBefore = loadBefore(current.current.key);
+    return () => {
       entryBefore = undefined;
-    },
-    [],
-  );
+    };
+  }, []);
   useEffect(() => {
     if (current.current.key === location.key) return;
     if (navigationType === "PUSH") before.current = current.current.path;
     else if (navigationType === "POP") before.current = undefined;
     entryBefore = before.current;
+    saveBefore(location.key, before.current);
     current.current = { key: location.key, path: location.pathname };
   }, [location, navigationType]);
 
