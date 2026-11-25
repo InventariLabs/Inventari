@@ -413,7 +413,9 @@ async def delete_product_template_async(
         )
     )
     if items_count:
-        raise ServiceRejectionError('template_in_use_by_items', count=items_count)
+        raise ServiceRejectionError(
+            'template_in_use_by_items', plural=items_count, count=items_count
+        )
 
     # Before the row goes, while there is still a definition to describe.
     await _log_template_async(

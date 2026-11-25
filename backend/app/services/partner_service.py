@@ -510,7 +510,9 @@ async def delete_async(
     )
     if open_po_count:
         raise ServiceRejectionError(
-            'partner_delete_open_purchase_orders', count=open_po_count
+            'partner_delete_open_purchase_orders',
+            plural=open_po_count,
+            count=open_po_count,
         )
 
     # Unlink items referencing this partner

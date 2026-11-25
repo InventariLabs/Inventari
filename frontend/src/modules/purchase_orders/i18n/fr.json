@@ -63,7 +63,7 @@
   "confirm": "Confirmer",
   "cancelOrderAction": "Annuler la commande",
   "keepOrderAction": "Garder la commande",
-  "approvalWorkflowMissingForAdmin": "Cette commande doit être approuvée, mais aucun circuit d’approbation n’existe encore. Créez-en un, puis confirmez à nouveau la commande.",
+  "approvalWorkflowMissingForAdmin": "Cette commande doit être approuvée, mais aucun flux d’approbation n’existe encore. Créez-en un, puis confirmez à nouveau la commande.",
   "receiveDelivery": "Réceptionner la livraison",
   "receiveDeliveryNoPartner": "La commande n’indique aucun fournisseur.",
   "details": "Détails de la commande",

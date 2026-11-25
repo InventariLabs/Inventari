@@ -911,7 +911,7 @@
       "secretStored": "Hay una clave guardada — déjalo vacío para conservarla",
       "secretUnset": "No hay ninguna clave guardada",
       "unknownModule": "No existe ningún módulo con ese nombre",
-      "unknownModuleHint": "La dirección apunta a un módulo que esta instalación no tiene. Revisa el enlace o elige el módulo en la tienda.",
+      "unknownModuleHint": "La dirección apunta a un módulo que esta instalación no tiene. Revisa el enlace o elige el módulo en la página Módulos.",
       "open": "Ajustes del módulo",
       "saved": "Ajustes guardados",
       "guardName": "Los ajustes del módulo",
@@ -1115,7 +1115,7 @@
   "unknown": "Desconocido",
   "focusLock": {
     "title": "Solo se muestra un módulo",
-    "body": "Este espacio de trabajo muestra un módulo, así que el lanzador de aplicaciones y la tienda quedan apartados. Abre «Módulos de la organización» para mostrarlos todos de nuevo.",
+    "body": "Este espacio de trabajo muestra un módulo, así que el lanzador de aplicaciones y la página Módulos quedan apartados. Abre «Módulos de la organización» para mostrarlos todos de nuevo.",
     "exit": "Abrir «Módulos de la organización»",
     "unknownTitle": "No se pudo comprobar qué módulos se muestran",
     "unknownBody": "No se pudo leer qué módulos muestra este espacio de trabajo, así que no se muestra el lanzador de aplicaciones. Inténtalo de nuevo o abre «Módulos de la organización».",

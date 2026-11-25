@@ -101,6 +101,8 @@ describe("RecipeAvailabilityChecker — shopping list toast", () => {
     signInWith(["recipes:read", "recipes:write"]);
     modulesMock.shoppingListsEnabled = true;
     mockUseOpenShoppingLists.mockReturnValue({ data: [] });
+    // The picked list is remembered across cards; each test starts unpicked.
+    window.localStorage.clear();
     availabilityData.ingredients = [
       {
         ingredient_id: "i1",
@@ -612,6 +614,74 @@ describe("RecipeAvailabilityChecker — shopping list toast", () => {
       servings: 4,
       shopping_list_id: "older",
     });
+  });
+
+  it("opens the next recipe on the list the reader picked last", async () => {
+    mockUseOpenShoppingLists.mockReturnValue({
+      data: [
+        { id: "newest", name: "Saturday market" },
+        { id: "older", name: "Bakery run" },
+      ],
+    });
+    mockAddToShoppingList.mockResolvedValue({
+      shopping_list_id: "older",
+      added_count: 1,
+    });
+    const card = () => (
+      <RecipeAvailabilityChecker
+        recipeId="r1"
+        activeServings={4}
+        onServingsChange={vi.fn()}
+      />
+    );
+    const { unmount } = render(card());
+    fireEvent.change(screen.getByRole("combobox", { name: /add to list/i }), {
+      target: { value: "older" },
+    });
+    unmount();
+
+    render(card());
+    expect(screen.getByRole("combobox", { name: /add to list/i })).toHaveValue(
+      "older",
+    );
+    fireEvent.click(screen.getByRole("button", { name: /add missing/i }));
+    await vi.waitFor(() => expect(toast.success).toHaveBeenCalled());
+    expect(mockAddToShoppingList).toHaveBeenCalledWith({
+      servings: 4,
+      shopping_list_id: "older",
+    });
+  });
+
+  it("falls back to the newest list once the remembered one is closed", () => {
+    mockUseOpenShoppingLists.mockReturnValue({
+      data: [
+        { id: "newest", name: "Saturday market" },
+        { id: "older", name: "Bakery run" },
+      ],
+    });
+    const card = () => (
+      <RecipeAvailabilityChecker
+        recipeId="r1"
+        activeServings={4}
+        onServingsChange={vi.fn()}
+      />
+    );
+    const { unmount } = render(card());
+    fireEvent.change(screen.getByRole("combobox", { name: /add to list/i }), {
+      target: { value: "older" },
+    });
+    unmount();
+    mockUseOpenShoppingLists.mockReturnValue({
+      data: [
+        { id: "newest", name: "Saturday market" },
+        { id: "third", name: "Pharmacy" },
+      ],
+    });
+
+    render(card());
+    expect(screen.getByRole("combobox", { name: /add to list/i })).toHaveValue(
+      "newest",
+    );
   });
 
   it("keeps Add missing disabled until the open lists have loaded", () => {

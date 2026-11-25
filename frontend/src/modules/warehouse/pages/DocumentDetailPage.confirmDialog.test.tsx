@@ -177,7 +177,7 @@ describe("DocumentDetailPage.confirmDialogMessage", () => {
       t,
     );
 
-    expect(message).toMatch(/already taken from stock/i);
+    expect(message).toMatch(/already changed in the step/i);
     expect(message).toMatch(/stock does not change/i);
     expect(message).not.toMatch(/undo it right after/i);
   });

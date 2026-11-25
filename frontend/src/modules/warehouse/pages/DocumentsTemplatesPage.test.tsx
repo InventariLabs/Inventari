@@ -701,7 +701,7 @@ describe("DocumentsTemplatesPage — the dialog and the badge speak the document
         ["{{document.number}}", "Numer dokumentu, taki jak w rejestrze"],
         [
           "{{documents}}",
-          "Tylko lista kompletacyjna: wydania na arkuszu — numer i jego kod Code128 (code128_img, code128_width_mm, code128_height_mm)",
+          "Tylko lista kompletacji: wydania na arkuszu — numer i jego kod Code128 (code128_img, code128_width_mm, code128_height_mm)",
         ],
         [
           "{{packages}}",
@@ -709,7 +709,7 @@ describe("DocumentsTemplatesPage — the dialog and the badge speak the document
         ],
         [
           "{{pick_lines}}",
-          "Tylko lista kompletacyjna: pozycje w kolejności obchodu — shelf_code, shelf_name, quantity, unit, name, sku, lot i document_number",
+          "Tylko lista kompletacji: pozycje w kolejności obchodu — shelf_code, shelf_name, quantity, unit, name, sku, lot i document_number",
         ],
         [
           "{{tax_by_rate}}",

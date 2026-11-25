@@ -217,7 +217,7 @@ export function CorrectionFormModal({
                   }`}
                 >
                   {line.quantity_delta > 0 ? "+" : ""}
-                  {line.quantity_delta}
+                  {formatQuantityValue(line.quantity_delta)}
                 </span>
               )}
             </div>

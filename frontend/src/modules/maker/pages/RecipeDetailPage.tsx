@@ -32,6 +32,7 @@ import { CompositionTab } from "@/modules/maker/pages/tabs/CompositionTab";
 import { CostResultTab } from "@/modules/maker/pages/tabs/CostResultTab";
 import { HistoryTab } from "@/modules/maker/pages/tabs/HistoryTab";
 import { LabelTab } from "@/modules/maker/pages/tabs/LabelTab";
+import { productUnderName } from "@/modules/maker/lib/productUnderName";
 import { formatDate } from "@/utils/helpers";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 
@@ -75,13 +76,7 @@ export default function RecipeDetailPage() {
     if (!recipe) return;
     setHeader({
       title: recipe.name,
-      // A recipe named after its product ("Soy candle" making "Soy candle")
-      // has nothing to add under its own title.
-      subtitle:
-        recipe.output_template_name &&
-        recipe.output_template_name !== recipe.name
-          ? recipe.output_template_name
-          : undefined,
+      subtitle: productUnderName(recipe),
       backTo: "/maker",
       actions: canManage ? (
         <>

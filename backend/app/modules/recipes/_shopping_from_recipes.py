@@ -9,7 +9,7 @@ listed.
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from decimal import Decimal, InvalidOperation
 from typing import TYPE_CHECKING, Any, Literal
 from uuid import UUID
@@ -23,7 +23,13 @@ from ._availability import build_stock_context, resolve_template
 from ._constants import localized
 from ._helpers import _round_shopping_qty
 from ._shopping_overlap import lines_listed_elsewhere
-from ._shopping_rule import load_exclusions, quantity_to_buy
+from ._shopping_rule import (
+    GoodsKey,
+    goods_key,
+    in_unit,
+    load_exclusions,
+    quantity_to_buy,
+)
 from .schemas import AddToShoppingListResponse
 from .services import get_recipe, get_recipe_availability
 
@@ -65,8 +71,8 @@ async def collect_shopping_items(
     servings: int | Decimal | None,
     scale: Decimal | None,
     lang: Language,
-) -> tuple[dict[tuple[str, UUID | None], dict[str, Any]], list[str]]:
-    """Aggregate what the given recipes need, keyed by (name, unit).
+) -> tuple[dict[GoodsKey, dict[str, Any]], list[str]]:
+    """Aggregate what the given recipes need, keyed by the goods (``goods_key``).
 
     Returns the merged lines and the recipe names they came from — two
     recipes wanting flour buy flour once. Each line keeps what every recipe
@@ -82,8 +88,13 @@ async def collect_shopping_items(
     list already carrying other recipes' need for the goods may still be
     short of it. Lines the organization marked "Always at home" are left
     out, by product or by name, as the meal plan already did.
+
+    Recipes asking the same goods in two units of one measure -- 200 g and
+    0.3 kg of flour -- form one line, in the unit of the first recipe that
+    asked: each need and each shelf reading is restated in it, so the shelf
+    is netted once against 500 g rather than once per unit.
     """
-    merged: dict[tuple[str, UUID | None], dict[str, Any]] = {}
+    merged: dict[GoodsKey, dict[str, Any]] = {}
     recipe_names: list[str] = []
     exclusions = await load_exclusions(db, org_id)
     recipes = []
@@ -115,7 +126,7 @@ async def collect_shopping_items(
             source = ingredients[ing.ingredient_id]
             if exclusions.excludes(ing.name, source.template_id):
                 continue
-            key = (ing.name.strip().lower(), ing.required_uom_id)
+            key = goods_key(ing.name, ing.required_uom_id, stock.uoms_by_id)
             line = merged.setdefault(
                 key,
                 {
@@ -126,7 +137,12 @@ async def collect_shopping_items(
                 },
             )
             by_recipe = line['by_recipe']
-            need = Decimal(str(ing.required_quantity))
+            need = in_unit(
+                Decimal(str(ing.required_quantity)),
+                ing.required_uom_id,
+                line['uom_id'],
+                stock.uoms_by_id,
+            )
             by_recipe[recipe.name] = by_recipe.get(recipe.name, Decimal(0)) + need
             # The shelf is the product the reading came from: the same
             # product read for a second recipe is the same goods, not more
@@ -137,7 +153,12 @@ async def collect_shopping_items(
             # requirement is bought.
             product = resolve_template(source, stock)
             if product is not None and ing.quantities_comparable:
-                line['shelves'][product.id] = Decimal(str(ing.available_quantity or 0))
+                line['shelves'][product.id] = in_unit(
+                    Decimal(str(ing.available_quantity or 0)),
+                    ing.required_uom_id,
+                    line['uom_id'],
+                    stock.uoms_by_id,
+                )
 
     for line in merged.values():
         line['available'] = sum(line.pop('shelves').values(), Decimal(0))
@@ -193,6 +214,51 @@ def _needs_of(line: ShoppingListItemDTO) -> dict[str, Decimal] | None:
     return recorded
 
 
+def _open_recipe_line(
+    lines: list[ShoppingListItemDTO],
+) -> ShoppingListItemDTO | None:
+    """The line a press raises in place: a recipe's, not bought, with its needs."""
+    return next(
+        (
+            line
+            for line in lines
+            if line.source == 'recipe'
+            and not line.is_purchased
+            and _needs_of(line) is not None
+        ),
+        None,
+    )
+
+
+def _in_the_lines_unit(
+    wanted: dict[str, Any],
+    lines: list[ShoppingListItemDTO],
+    uoms_by_id: Mapping[UUID, UomDTO],
+) -> dict[str, Any]:
+    """*wanted*, restated in the unit of the line a press would raise.
+
+    The goods may already stand on the list in another unit of their measure
+    -- 0.3 kg of flour when this press asks 200 g. The raised line keeps its
+    unit, and the needs it records stay in that unit with it.
+    """
+    open_line = _open_recipe_line(lines)
+    if open_line is None or open_line.uom_id == wanted['uom_id']:
+        return wanted
+
+    def restated(qty: Decimal) -> Decimal:
+        return in_unit(qty, wanted['uom_id'], open_line.uom_id, uoms_by_id)
+
+    return {
+        **wanted,
+        'uom_id': open_line.uom_id,
+        'by_recipe': {
+            name: restated(need) for name, need in wanted['by_recipe'].items()
+        },
+        'available': restated(wanted['available']),
+        'quantity': restated(wanted['quantity']),
+    }
+
+
 async def _put_on_list(
     db: AsyncSession,
     org_id: UUID,
@@ -201,6 +267,7 @@ async def _put_on_list(
     uom: UomDTO | None,
     lines: list[ShoppingListItemDTO],
     lang: Language,
+    uoms_by_id: Mapping[UUID, UomDTO],
 ) -> tuple[
     Literal['new', 'raised', 'listed', 'none'], ShoppingListItemCreateDTO | None
 ]:
@@ -223,7 +290,14 @@ async def _put_on_list(
     A line written before the needs were kept names its recipes only: they
     stay covered at whatever they need, as they were, and its quantity
     stands for their need.
+
+    The lines may be in another unit of the goods' measure; every quantity
+    they carry is restated in *wanted*'s unit before it is weighed.
     """
+
+    def restated(qty: Decimal, line: ShoppingListItemDTO) -> Decimal:
+        return in_unit(qty, line.uom_id, wanted['uom_id'], uoms_by_id)
+
     recipe_lines = [line for line in lines if line.source == 'recipe']
     recorded: dict[str, Decimal] = {}
     unrecorded: set[str] = set()
@@ -232,10 +306,10 @@ async def _put_on_list(
         line_needs = _needs_of(line)
         if line_needs is None:
             unrecorded.update(_recipes_of(line))
-            unrecorded_need += line.quantity
+            unrecorded_need += restated(line.quantity, line)
             continue
         for name, need in line_needs.items():
-            recorded[name] = max(recorded.get(name, Decimal(0)), need)
+            recorded[name] = max(recorded.get(name, Decimal(0)), restated(need, line))
     pressed = {
         name: need
         for name, need in wanted['by_recipe'].items()
@@ -254,7 +328,7 @@ async def _put_on_list(
     )
     if target <= 0:
         return 'none', None
-    listed = sum((line.quantity for line in lines), Decimal(0))
+    listed = sum((restated(line.quantity, line) for line in lines), Decimal(0))
     shortfall = _round_shopping_qty(target - listed, uom)
     if not pressed or shortfall <= 0:
         return 'listed', None
@@ -264,14 +338,7 @@ async def _put_on_list(
         name: max(recorded.get(name, Decimal(0)), need)
         for name, need in (grown or pressed).items()
     }
-    open_line = next(
-        (
-            line
-            for line in recipe_lines
-            if not line.is_purchased and _needs_of(line) is not None
-        ),
-        None,
-    )
+    open_line = _open_recipe_line(lines)
     item = ShoppingListItemCreateDTO(
         name=wanted['name'],
         quantity=shortfall,
@@ -349,10 +416,10 @@ async def add_recipes_to_shopping_list(
     uoms_by_id = {
         uom.id: uom for uom in await core_api.uoms.list_for_org_async(db, org_id)
     }
-    lines_by_key: dict[tuple[str, UUID | None], list[ShoppingListItemDTO]] = {}
+    lines_by_key: dict[GoodsKey, list[ShoppingListItemDTO]] = {}
     for existing in existing_items:
         lines_by_key.setdefault(
-            (existing.name.strip().lower(), existing.uom_id), []
+            goods_key(existing.name, existing.uom_id, uoms_by_id), []
         ).append(existing)
     new_items: list[ShoppingListItemCreateDTO] = []
     raised_items: list[ShoppingListItemCreateDTO] = []
@@ -360,13 +427,15 @@ async def add_recipes_to_shopping_list(
     # nothing and said "Added 0 items", which reads as "nothing was
     # missing" or "it failed" — the count lets the screen say which.
     already_listed = 0
-    for key, wanted in merged.items():
+    for key, merged_line in merged.items():
+        lines = lines_by_key.get(key, [])
+        wanted = _in_the_lines_unit(merged_line, lines, uoms_by_id)
         uom = uoms_by_id.get(wanted['uom_id']) if wanted['uom_id'] else None
         # A line that rounds to the unit's zero says "buy nothing" — there
         # is nothing to buy (``none``). Skipping it keeps one unmeasurable
         # ingredient from failing the whole recipe's list.
         outcome, placed = await _put_on_list(
-            db, org_id, list_id, wanted, uom, lines_by_key.get(key, []), lang
+            db, org_id, list_id, wanted, uom, lines, lang, uoms_by_id
         )
         if outcome == 'new' and placed is not None:
             new_items.append(placed)
@@ -383,7 +452,11 @@ async def add_recipes_to_shopping_list(
         raised_count=len(raised_items),
         already_listed_count=already_listed,
         on_other_lists=await lines_listed_elsewhere(
-            db, org_id, [*new_items, *raised_items], list_id=list_id
+            db,
+            org_id,
+            [*new_items, *raised_items],
+            list_id=list_id,
+            uoms_by_id=uoms_by_id,
         ),
         list_name=shopping_list.name,
     )

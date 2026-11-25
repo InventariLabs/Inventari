@@ -39,6 +39,10 @@ vi.mock("@/hooks/useScanCamera", () => ({
   },
 }));
 
+// The submit button carries the verb the heading and the opening button use.
+const RECEIVE_STOCK = "Receive stock";
+const PICK_ITEMS = "Pick items";
+
 function buildDocument(
   overrides: Partial<WarehouseDocument> = {},
 ): WarehouseDocument {
@@ -219,7 +223,7 @@ describe("DocumentExecutionPanel", () => {
     fireEvent.change(screen.getByLabelText("Executed quantity"), {
       target: { value: "1" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Confirm & complete" }));
+    fireEvent.click(screen.getByRole("button", { name: RECEIVE_STOCK }));
 
     expect(onSubmit).not.toHaveBeenCalled();
     const select = screen.getByLabelText("Discrepancy code");
@@ -243,7 +247,7 @@ describe("DocumentExecutionPanel", () => {
     fireEvent.change(screen.getByLabelText("Executed quantity"), {
       target: { value: "1" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Confirm & complete" }));
+    fireEvent.click(screen.getByRole("button", { name: RECEIVE_STOCK }));
     const select = screen.getByLabelText("Discrepancy code");
     expect(select.className).toContain("border-red-500");
 
@@ -657,7 +661,7 @@ describe("DocumentExecutionPanel", () => {
     fireEvent.change(screen.getByLabelText("Tracking number"), {
       target: { value: "1Z999" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Confirm & complete" }));
+    fireEvent.click(screen.getByRole("button", { name: PICK_ITEMS }));
 
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -679,7 +683,7 @@ describe("DocumentExecutionPanel", () => {
     );
 
     await screen.findByLabelText("Carrier");
-    fireEvent.click(screen.getByRole("button", { name: "Confirm & complete" }));
+    fireEvent.click(screen.getByRole("button", { name: PICK_ITEMS }));
 
     expect(onSubmit).toHaveBeenCalledOnce();
     expect(onSubmit.mock.calls[0][0]).not.toHaveProperty("shipment");
@@ -726,7 +730,7 @@ describe("DocumentExecutionPanel", () => {
       "bottom-20",
     );
     expect(
-      screen.getByRole("button", { name: "Confirm & complete" }),
+      screen.getByRole("button", { name: RECEIVE_STOCK }),
     ).toBeInTheDocument();
   });
 

@@ -235,3 +235,19 @@ describe("RecipeCard thumbnail", () => {
     expect(screen.queryByAltText("")).not.toBeInTheDocument();
   });
 });
+
+describe("RecipeCard — the product under the name", () => {
+  it("names the product a recipe makes under a recipe named otherwise", () => {
+    renderCard(baseRecipe);
+    expect(screen.getByText("Granola Bars 500g")).toBeInTheDocument();
+  });
+
+  it("prints the name once for a recipe named after its product", () => {
+    renderCard({
+      ...baseRecipe,
+      name: "Świeca sojowa",
+      output_template_name: "Świeca sojowa",
+    });
+    expect(screen.getAllByText("Świeca sojowa")).toHaveLength(1);
+  });
+});

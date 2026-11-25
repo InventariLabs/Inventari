@@ -46,6 +46,9 @@ interface Props {
    * dispatch, which is also what asks for the carrier here — and shown only
    * over that one document. */
   onPack?: (shipment: ShipmentDraft) => void;
+  /** The dispatch stays inside the company (an internal issue), so the sheet
+   * does not ask for a carrier. */
+  withoutCarrier?: boolean;
   /** Takes a skip back: the line returns to the list to be picked. */
   onUndoSkip?: (line: WmsPickLine) => void;
   /** Answers a skipped line as nothing picked, under the code the person
@@ -186,6 +189,7 @@ export default function WmsPickingSummary({
   onClose,
   onLeave,
   onPack,
+  withoutCarrier,
   onUndoSkip,
   onAnswerSkip,
   isLoading,
@@ -234,6 +238,7 @@ export default function WmsPickingSummary({
   // sends the reader to each document's own page for both; a Pack here would
   // only ever open the page the session was started from.
   const ships = Boolean(onPack) && groups.length <= 1;
+  const asksCarrier = ships && !withoutCarrier;
 
   // The sheet focuses its first field — the optional carrier — and on a
   // phone a focused field raises the keyboard over the summary it opened
@@ -242,9 +247,9 @@ export default function WmsPickingSummary({
 
   const finish = () => {
     if (skipsUnanswered()) return;
-    const fault = ships ? shipmentError(shipment, t) : undefined;
+    const fault = asksCarrier ? shipmentError(shipment, t) : undefined;
     setShipmentFault(fault);
-    if (!fault) onClose(ships ? shipmentPayload(shipment) : undefined);
+    if (!fault) onClose(asksCarrier ? shipmentPayload(shipment) : undefined);
   };
   // Spelled out so the i18n gate reads each key's call site.
   const documentStatus = {
@@ -335,7 +340,7 @@ export default function WmsPickingSummary({
           <p className="text-xs text-on-muted">{t("picking.bookingNote")}</p>
         )}
 
-        {ships && (
+        {asksCarrier && (
           <ShipmentFields
             value={shipment}
             onChange={setShipment}

@@ -247,7 +247,7 @@
     "postNowIssue": "Wydaj",
     "postNowMove": "Przenieś",
     "postNowConsume": "Zużyj",
-    "postNowRecordOnly": "Zapisz dokument — towar już pobrany",
+    "postNowRecordOnly": "Zapisz dokument — stan już zmieniony",
     "postNowScrap": "Zezłomuj",
     "postNowAdjust": "Wyrównaj stan",
     "postNowDefault": "Zaksięguj dokument",
@@ -282,7 +282,7 @@
     "postNowTitle": "Zaksięgować dokument?",
     "postNowApprovalTitle": "Wysłać dokument do akceptacji?",
     "postNowMessage": "To potwierdzi dokument i od razu zaksięguje ruch magazynowy. Jeśli coś się nie zgadza, możesz od razu cofnąć dokument albo później go poprawić. Kontynuować?",
-    "postNowRecordOnlyMessage": "Towar został już zdjęty ze stanu podczas kompletacji. To tylko zapisuje ruch — stan się nie zmienia. Kontynuować?",
+    "postNowRecordOnlyMessage": "Stan magazynowy został już zmieniony w kroku, który ten dokument zapisuje. To tylko utrwala zapis — stan się nie zmienia. Kontynuować?",
     "postNowApprovalMessage": "To potwierdzi dokument i wyśle go do kolejki akceptacji. Po akceptacji zostanie zaksięgowany bez dodatkowego kroku. Kontynuować?",
     "postNowMessageDeadEndNamed": "Dokument trafi do akceptacji, ale nikt by jej nie rozstrzygnął: etap „{{stage}}” wskazuje akceptantów, którzy nie mają dostępu do akceptacji. Dokument będzie tam czekał, dopóki wniosek nie zostanie wycofany albo te osoby nie dostaną dostępu. Kontynuować?",
     "postNowMessageDeadEndNoApprover": "Dokument trafi do akceptacji, ale nikt by jej nie rozstrzygnął: etap „{{stage}}” jest otwarty dla każdego z uprawnieniem akceptowania, a nikt w tej organizacji go nie ma. Dokument będzie tam czekał, dopóki wniosek nie zostanie wycofany albo ktoś nie dostanie tego uprawnienia. Kontynuować?",
@@ -430,7 +430,7 @@
     "confirmed": "Dokument potwierdzony — gotowy do realizacji",
     "pendingApproval": "Dokument wysłany do akceptacji",
     "completed": "Dokument zakończony — stan magazynowy zaktualizowany",
-    "completedRecordOnly": "Dokument zakończony — zapisuje już pobrany towar",
+    "completedRecordOnly": "Dokument zakończony — utrwala zmianę stanu, która już zaszła",
     "correctionApplied": "Korekta zastosowana — stan magazynowy skorygowany",
     "cancelled": "Dokument anulowany",
     "deleted": "Dokument usunięty",
@@ -629,7 +629,6 @@
       "context_tag": "cecha",
       "location_type": "Opcjonalnie — wybierz typ"
     },
-    "executionSubmit": "Zatwierdź i zamknij",
     "executionInvalidQuantity": "Wprowadź poprawną wykonaną ilość dla każdej pozycji.",
     "executionTooHigh": "Wykonana ilość nie może przekraczać ilości planowanej.",
     "executionCodeRequired": "Wybierz kod różnicy, gdy wykonana ilość jest mniejsza od planowanej.",
@@ -1096,7 +1095,7 @@
         "notes": "Uwagi zapisane w dokumencie",
         "lines": "Pozycje, do {% for line in document.lines %} — każda ma name, quantity, done_quantity, uom i kolumny wartości"
       },
-      "documents": "Tylko lista kompletacyjna: wydania na arkuszu — numer i jego kod Code128 (code128_img, code128_width_mm, code128_height_mm)",
+      "documents": "Tylko lista kompletacji: wydania na arkuszu — numer i jego kod Code128 (code128_img, code128_width_mm, code128_height_mm)",
       "is_correction": "Prawda, gdy dokument jest korektą",
       "is_external": "Prawda dla dokumentów z kontrahentem (IN, PZ, OUT, WZ)",
       "is_external_in": "Prawda dla przyjęć (IN, PZ)",
@@ -1119,7 +1118,7 @@
         "tax_id": "NIP kontrahenta (numer VAT/NIP)",
         "address": "Adres kontrahenta, nazwa kraju w języku wydruku"
       },
-      "pick_lines": "Tylko lista kompletacyjna: pozycje w kolejności obchodu — shelf_code, shelf_name, quantity, unit, name, sku, lot i document_number",
+      "pick_lines": "Tylko lista kompletacji: pozycje w kolejności obchodu — shelf_code, shelf_name, quantity, unit, name, sku, lot i document_number",
       "print_dates": "Daty warte wydruku, jako [{label, value}] — data powtarzająca poprzednią jest pomijana",
       "print_number": "Numer dokumentu, tak jak drukuje go wspólny nagłówek",
       "print_status": "Status w języku wydruku, tak jak drukuje go wspólny nagłówek",
@@ -1728,7 +1727,7 @@
   },
   "unitMismatch": {
     "title": "Jednostki się rozjeżdżają",
-    "message": "„{{product}}” prowadzona jest w {{templateUnit}}, a ten zapis trafiłby do {{chosenUnit}}. Potwierdź, a rekord i ta dostawa zostaną przeliczone na {{templateUnit}}, a wybór trafi do historii rekordu. Jeśli jednostki mają zostać różne, najpierw zmień jednostkę rekordu na jego stronie w Inwentarzu.",
+    "message": "„{{product}}” prowadzona jest w {{templateUnit}} (ten zapis trafiłby do {{chosenUnit}}). Potwierdź, a rekord i ta dostawa zostaną przeliczone na {{templateUnit}} — wybór trafi do historii rekordu. Jeśli jednostki mają zostać różne, najpierw zmień jednostkę rekordu na jego stronie w Inwentarzu.",
     "confirm": "Potwierdź i zakończ",
     "cancel": "Nie teraz"
   },

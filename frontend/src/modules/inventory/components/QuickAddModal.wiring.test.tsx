@@ -131,7 +131,7 @@ describe("QuickAddModal — what its buttons and children do", () => {
     const user = userEvent.setup();
     open();
 
-    await user.click(screen.getByRole("button", { name: /vision ai/i }));
+    await user.click(screen.getByRole("button", { name: /^from photo$/i }));
     expect(mocks.setActiveTab).toHaveBeenLastCalledWith("vision");
 
     hookState({ activeTab: "vision" });

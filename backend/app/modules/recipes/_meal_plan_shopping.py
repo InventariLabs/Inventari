@@ -570,5 +570,7 @@ async def generate_shopping_list_async(  # noqa: C901, PLR0915 - existing comple
         available_count=available_count,
         to_buy_count=len(to_buy_items),
         items=to_buy_display,
-        on_other_lists=await lines_listed_elsewhere(db, org_id, written, list_id=sl.id),
+        on_other_lists=await lines_listed_elsewhere(
+            db, org_id, written, list_id=sl.id, uoms_by_id=uoms_by_id
+        ),
     )

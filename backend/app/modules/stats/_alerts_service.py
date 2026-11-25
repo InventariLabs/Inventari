@@ -19,7 +19,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import ColumnElement
 
-from app.core.module_sdk import general_rows, hidden_module_tags_async
+from app.core.module_sdk import (
+    format_date_for,
+    general_rows,
+    get_current_lang,
+    hidden_module_tags_async,
+)
 from app.core.public_api import core_api
 from app.models.item import Item
 from app.models.item_history import ItemAction, ItemHistory
@@ -293,7 +298,9 @@ async def _expiry_alerts_async(
                 'message_params': {
                     'product': item.name,
                     'days': days_until_expiry,
-                    'date': item.effective_expiry_date.strftime('%d.%m.%Y'),
+                    'date': format_date_for(
+                        get_current_lang(), item.effective_expiry_date
+                    ),
                 },
                 'action': 'view_item',
                 'action_param': str(item.id),

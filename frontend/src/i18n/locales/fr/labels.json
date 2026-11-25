@@ -101,9 +101,9 @@
   "quickAdd": {
     "title": "Nouveau produit",
     "guardName": "Le formulaire de produit",
-    "tabVision": "Vision AI",
+    "tabVision": "Depuis une photo",
     "tabManual": "Manuel",
-    "visionTitle": "Ajout rapide avec Vision AI",
+    "visionTitle": "Ajout rapide depuis une photo",
     "visionHelp": "L'IA peut compléter le nom, la marque et la date d'expiration à partir de votre photo.",
     "takePhoto": "Prendre une photo du produit",
     "analyzing": "Analyse de l'image…",

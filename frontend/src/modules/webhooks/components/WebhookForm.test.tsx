@@ -146,6 +146,30 @@ describe("WebhookForm — every control says what it is", () => {
     expect(group).not.toHaveTextContent("item.created");
   });
 
+  it("lets an event row wrap inside its list and keeps the box its size", async () => {
+    server.use(
+      http.get("*/webhooks/events", () =>
+        HttpResponse.json([
+          {
+            event_type: "document.shipped",
+            description: "A dispatch was completed",
+            available: false,
+            source_module: "warehouse",
+          },
+        ]),
+      ),
+    );
+    renderForm();
+
+    const box = await screen.findByRole("checkbox", {
+      name: /document.shipped/,
+    });
+    // A phone row with the needs-module badge is wider than the list: it
+    // wraps onto a second line, and the checkbox is not squeezed to make room.
+    expect(box.closest("label")).toHaveClass("flex-wrap");
+    expect(box).toHaveClass("shrink-0");
+  });
+
   it("keeps a withdrawn subscription visible and removable", async () => {
     // The row held item.consumed, the catalogue no longer lists it, and the
     // form rendered the catalogue alone — so the field showed "1 selected"
