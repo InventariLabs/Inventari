@@ -1,0 +1,659 @@
+{
+  "tier": "1 019 locations, forced custom plan",
+  "started": "2026-11-23T23:46:53.328803+00:00",
+  "machine": {
+    "cores": 4,
+    "memory_gib": 7.6
+  },
+  "load_before": [
+    1.3,
+    1.5,
+    1.2
+  ],
+  "runs": 20,
+  "fixtures": {
+    "org": "60692dbe-4586-470b-9280-1716f97612eb",
+    "products": 110000,
+    "shelf": "d049a11a-bc38-b377-8eee-1df7676206a7",
+    "shelf_code": "A05-002-3",
+    "rack": "04314e9a-14d6-2d29-4736-79a74ed54e8c",
+    "zone": "e45992de-9c53-558b-91c2-5c9c733e9c47",
+    "warehouse": "8da2450e-a2fa-0f13-f2e6-ff8498a1fcf1",
+    "barcode": "2900000366664",
+    "template": "287db929-ee4f-1ef7-e9f2-fb5361d39178",
+    "sku": "SKU-0036666",
+    "record": "8f1d04d7-8306-f182-7789-fb55dcf05a0e",
+    "category": "cbed3796-eea1-ab16-c624-c370dacf4ab8",
+    "po": "6535dcf5-e217-cecd-9a8d-abe304ca2357",
+    "document": "735ff1ce-c690-17e6-d2e9-daf3253bfb2c",
+    "document_number": "OUT/2026/051104"
+  },
+  "reads": {
+    "items: first page": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=0&sort_by=created_at&sort_order=desc",
+      "status": 200,
+      "runs": 20,
+      "p50": 55.5,
+      "p95": 66.4,
+      "max": 69.0,
+      "bytes": 78433
+    },
+    "items: search, common word": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=0&search=bolt",
+      "status": 200,
+      "runs": 20,
+      "p50": 256.2,
+      "p95": 308.3,
+      "max": 393.5,
+      "bytes": 130515
+    },
+    "items: search, one barcode": {
+      "class": "lookup",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=0&search=2900000366664",
+      "status": 200,
+      "runs": 20,
+      "p50": 72.3,
+      "p95": 88.7,
+      "max": 106.2,
+      "bytes": 5246
+    },
+    "items: filter by category": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=0&category_id=cbed3796-eea1-ab16-c624-c370dacf4ab8",
+      "status": 200,
+      "runs": 20,
+      "p50": 70.5,
+      "p95": 80.0,
+      "max": 84.9,
+      "bytes": 129421
+    },
+    "items: filter by shelf": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=0&location_id=d049a11a-bc38-b377-8eee-1df7676206a7",
+      "status": 200,
+      "runs": 20,
+      "p50": 53.6,
+      "p95": 61.0,
+      "max": 66.8,
+      "bytes": 131040
+    },
+    "items: sort by name": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=0&sort_by=name&sort_order=asc",
+      "status": 200,
+      "runs": 20,
+      "p50": 59.7,
+      "p95": 86.4,
+      "max": 88.1,
+      "bytes": 130549
+    },
+    "items: deep page (last counted)": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=9950&sort_by=created_at&sort_order=desc",
+      "status": 200,
+      "runs": 20,
+      "p50": 63.1,
+      "p95": 70.4,
+      "max": 75.7,
+      "bytes": 78436
+    },
+    "items: expiring in 30 days": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=0&expiring_days=30",
+      "status": 200,
+      "runs": 20,
+      "p50": 143.6,
+      "p95": 154.1,
+      "max": 164.1,
+      "bytes": 132078
+    },
+    "items: low stock": {
+      "class": "list",
+      "path": "/api/v1/items?exclude_module_contexts=true&only_expired=false&limit=50&offset=0&only_low_stock=true",
+      "status": 200,
+      "runs": 20,
+      "p50": 254.3,
+      "p95": 281.6,
+      "max": 382.7,
+      "bytes": 130987
+    },
+    "items: aggregates": {
+      "class": "report",
+      "path": "/api/v1/items/aggregates?exclude_module_contexts=true&only_expired=false",
+      "status": 200,
+      "runs": 20,
+      "p50": 1872.6,
+      "p95": 1938.9,
+      "max": 1951.8,
+      "bytes": 225
+    },
+    "scan: product barcode": {
+      "class": "lookup",
+      "path": "/api/v1/labels/scan/2900000366664",
+      "status": 200,
+      "runs": 20,
+      "p50": 56.0,
+      "p95": 61.9,
+      "max": 63.6,
+      "bytes": 1669
+    },
+    "scan: shelf label": {
+      "class": "lookup",
+      "path": "/api/v1/labels/scan/A05-002-3",
+      "status": 200,
+      "runs": 20,
+      "p50": 19.4,
+      "p95": 22.7,
+      "max": 24.0,
+      "bytes": 397
+    },
+    "product lookup by barcode": {
+      "class": "lookup",
+      "path": "/api/v1/items/product-templates/lookup?barcode=2900000366664",
+      "status": 200,
+      "runs": 20,
+      "p50": 23.9,
+      "p95": 27.1,
+      "max": 27.8,
+      "bytes": 321
+    },
+    "product card: stock": {
+      "class": "lookup",
+      "path": "/api/v1/items/product-templates/287db929-ee4f-1ef7-e9f2-fb5361d39178/stock",
+      "status": 200,
+      "runs": 20,
+      "p50": 23.3,
+      "p95": 25.9,
+      "max": 27.9,
+      "bytes": 108
+    },
+    "record card": {
+      "class": "lookup",
+      "path": "/api/v1/items/8f1d04d7-8306-f182-7789-fb55dcf05a0e",
+      "status": 200,
+      "runs": 20,
+      "p50": 37.7,
+      "p95": 43.0,
+      "max": 43.3,
+      "bytes": 2690
+    },
+    "shelf: its records": {
+      "class": "list",
+      "path": "/api/v1/locations/d049a11a-bc38-b377-8eee-1df7676206a7/items?limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 50.4,
+      "p95": 60.6,
+      "max": 68.4,
+      "bytes": 103070
+    },
+    "shelf: its stock": {
+      "class": "list",
+      "path": "/api/v1/stock-quants?location_id=d049a11a-bc38-b377-8eee-1df7676206a7&limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 44.7,
+      "p95": 60.6,
+      "max": 62.5,
+      "bytes": 20954
+    },
+    "zone: its stock": {
+      "class": "list",
+      "path": "/api/v1/stock-quants?location_id=e45992de-9c53-558b-91c2-5c9c733e9c47&limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 76.8,
+      "p95": 94.3,
+      "max": 94.6,
+      "bytes": 20731
+    },
+    "stock: first page": {
+      "class": "list",
+      "path": "/api/v1/stock-quants?limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 167.2,
+      "p95": 181.9,
+      "max": 183.8,
+      "bytes": 20983
+    },
+    "batches: first page": {
+      "class": "list",
+      "path": "/api/v1/stock-lots?limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 62.6,
+      "p95": 74.0,
+      "max": 76.1,
+      "bytes": 25906
+    },
+    "location tree": {
+      "class": "list",
+      "path": "/api/v1/locations/tree?exclude_module_contexts=true",
+      "status": 200,
+      "runs": 20,
+      "p50": 161.2,
+      "p95": 295.2,
+      "max": 306.6,
+      "bytes": 334412
+    },
+    "locations: first page": {
+      "class": "list",
+      "path": "/api/v1/locations?limit=200&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 175.1,
+      "p95": 185.6,
+      "max": 195.9,
+      "bytes": 190780
+    },
+    "occupancy heat map": {
+      "class": "report",
+      "path": "/api/v1/warehouse/putaway/occupancy",
+      "status": 200,
+      "runs": 20,
+      "p50": 630.3,
+      "p95": 850.8,
+      "max": 856.8,
+      "bytes": 480824
+    },
+    "occupancy of a zone": {
+      "class": "report",
+      "path": "/api/v1/warehouse/putaway/occupancy/e45992de-9c53-558b-91c2-5c9c733e9c47",
+      "status": 200,
+      "runs": 20,
+      "p50": 1485.1,
+      "p95": 1619.2,
+      "max": 1633.8,
+      "bytes": 5497483
+    },
+    "To do": {
+      "class": "list",
+      "path": "/api/v1/warehouse/todo?date_to=2026-11-23&limit=100&work_limit=100&view=all",
+      "status": 200,
+      "runs": 20,
+      "p50": 135.6,
+      "p95": 157.1,
+      "max": 166.5,
+      "bytes": 225
+    },
+    "documents: first page": {
+      "class": "list",
+      "path": "/api/v1/warehouse/documents?limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 165.2,
+      "p95": 188.3,
+      "max": 301.2,
+      "bytes": 65385
+    },
+    "documents: search by number": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/documents?limit=50&offset=0&search=OUT/2026/051104",
+      "status": 200,
+      "runs": 20,
+      "p50": 78.4,
+      "p95": 94.1,
+      "max": 96.8,
+      "bytes": 1443
+    },
+    "documents: completed dispatches": {
+      "class": "list",
+      "path": "/api/v1/warehouse/documents?type=OUT&status=COMPLETED&limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 191.0,
+      "p95": 225.4,
+      "max": 346.0,
+      "bytes": 67648
+    },
+    "document card": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/documents/735ff1ce-c690-17e6-d2e9-daf3253bfb2c",
+      "status": 200,
+      "runs": 20,
+      "p50": 90.3,
+      "p95": 113.4,
+      "max": 115.1,
+      "bytes": 19314
+    },
+    "purchase orders: first page": {
+      "class": "list",
+      "path": "/api/v1/purchase-orders?limit=50&offset=0",
+      "status": 200,
+      "runs": 20,
+      "p50": 44.1,
+      "p95": 50.9,
+      "max": 51.2,
+      "bytes": 40538
+    },
+    "journal: first page": {
+      "class": "list",
+      "path": "/api/v1/stock-moves?limit=50",
+      "status": 200,
+      "runs": 20,
+      "p50": 74.4,
+      "p95": 82.8,
+      "max": 93.3,
+      "bytes": 44206
+    },
+    "journal: one product": {
+      "class": "list",
+      "path": "/api/v1/stock-moves?product_template_id=287db929-ee4f-1ef7-e9f2-fb5361d39178&limit=50",
+      "status": 200,
+      "runs": 20,
+      "p50": 38.4,
+      "p95": 40.3,
+      "max": 43.1,
+      "bytes": 8110
+    },
+    "journal: one shelf": {
+      "class": "list",
+      "path": "/api/v1/stock-moves?location_id=d049a11a-bc38-b377-8eee-1df7676206a7&limit=50",
+      "status": 200,
+      "runs": 20,
+      "p50": 111.1,
+      "p95": 131.4,
+      "max": 132.9,
+      "bytes": 45832
+    },
+    "journal: last 30 days": {
+      "class": "list",
+      "path": "/api/v1/stock-moves?since=2026-10-24&limit=50",
+      "status": 200,
+      "runs": 20,
+      "p50": 77.6,
+      "p95": 87.2,
+      "max": 96.9,
+      "bytes": 44206
+    },
+    "stock as of 90 days ago": {
+      "class": "report",
+      "path": "/api/v1/stock-as-of?as_of=2026-08-25",
+      "status": 200,
+      "runs": 5,
+      "p50": 2498.1,
+      "p95": 2526.1,
+      "max": 2526.1,
+      "bytes": 8554
+    },
+    "stock as of 90 days ago, one zone": {
+      "class": "report",
+      "path": "/api/v1/stock-as-of?as_of=2026-08-25&location_id=e45992de-9c53-558b-91c2-5c9c733e9c47",
+      "status": 200,
+      "runs": 20,
+      "p50": 415.5,
+      "p95": 426.8,
+      "max": 429.3,
+      "bytes": 8329
+    },
+    "valuation today (stock as of today)": {
+      "class": "report",
+      "path": "/api/v1/stock-as-of?as_of=2026-11-23",
+      "status": 200,
+      "runs": 5,
+      "p50": 2576.5,
+      "p95": 2585.9,
+      "max": 2585.9,
+      "bytes": 8559
+    },
+    "equipment valuation": {
+      "class": "report",
+      "path": "/api/v1/equipment/valuation",
+      "status": 200,
+      "runs": 20,
+      "p50": 18.1,
+      "p95": 19.9,
+      "max": 20.2,
+      "bytes": 201
+    },
+    "stats: overview": {
+      "class": "report",
+      "path": "/api/v1/stats/overview",
+      "status": 200,
+      "runs": 20,
+      "p50": 20.6,
+      "p95": 23.0,
+      "max": 23.5,
+      "bytes": 317
+    },
+    "stats: by-category": {
+      "class": "report",
+      "path": "/api/v1/stats/by-category",
+      "status": 200,
+      "runs": 20,
+      "p50": 150.0,
+      "p95": 173.4,
+      "max": 216.8,
+      "bytes": 9313
+    },
+    "stats: by-location": {
+      "class": "report",
+      "path": "/api/v1/stats/by-location",
+      "status": 200,
+      "runs": 20,
+      "p50": 176.9,
+      "p95": 329.1,
+      "max": 371.6,
+      "bytes": 7453
+    },
+    "stats: expiry-forecast": {
+      "class": "report",
+      "path": "/api/v1/stats/expiry-forecast",
+      "status": 200,
+      "runs": 20,
+      "p50": 126.9,
+      "p95": 137.4,
+      "max": 142.0,
+      "bytes": 211
+    },
+    "stats: low-stock": {
+      "class": "report",
+      "path": "/api/v1/stats/low-stock",
+      "status": 200,
+      "runs": 20,
+      "p50": 326.3,
+      "p95": 349.3,
+      "max": 353.4,
+      "bytes": 9359
+    },
+    "stats: consumption": {
+      "class": "report",
+      "path": "/api/v1/stats/consumption",
+      "status": 200,
+      "runs": 20,
+      "p50": 38.6,
+      "p95": 44.9,
+      "max": 46.9,
+      "bytes": 141
+    },
+    "stats: cost-analysis": {
+      "class": "report",
+      "path": "/api/v1/stats/cost-analysis",
+      "status": 200,
+      "runs": 20,
+      "p50": 577.6,
+      "p95": 594.3,
+      "max": 598.4,
+      "bytes": 1346
+    },
+    "stats: rotation-analysis": {
+      "class": "report",
+      "path": "/api/v1/stats/rotation-analysis",
+      "status": 200,
+      "runs": 20,
+      "p50": 24.8,
+      "p95": 36.0,
+      "max": 38.9,
+      "bytes": 124886
+    },
+    "stats: smart-alerts": {
+      "class": "report",
+      "path": "/api/v1/stats/smart-alerts",
+      "status": 200,
+      "runs": 20,
+      "p50": 1460.6,
+      "p95": 1661.5,
+      "max": 1666.3,
+      "bytes": 524144
+    },
+    "stats: purchase-patterns": {
+      "class": "report",
+      "path": "/api/v1/stats/purchase-patterns",
+      "status": 200,
+      "runs": 20,
+      "p50": 95.6,
+      "p95": 107.3,
+      "max": 109.7,
+      "bytes": 3374
+    },
+    "stats: expense-forecast": {
+      "class": "report",
+      "path": "/api/v1/stats/expense-forecast",
+      "status": 200,
+      "runs": 20,
+      "p50": 19.0,
+      "p95": 24.9,
+      "max": 27.7,
+      "bytes": 1144
+    },
+    "stats: activity": {
+      "class": "report",
+      "path": "/api/v1/stats/activity",
+      "status": 200,
+      "runs": 20,
+      "p50": 83.5,
+      "p95": 93.3,
+      "max": 94.7,
+      "bytes": 1921
+    },
+    "stats: reconciliation": {
+      "class": "report",
+      "path": "/api/v1/stats/reconciliation",
+      "status": 200,
+      "runs": 5,
+      "p50": 2379.9,
+      "p95": 2417.6,
+      "max": 2417.6,
+      "bytes": 162
+    },
+    "picker: \"h\"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=h&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 68.2,
+      "p95": 80.9,
+      "max": 97.3,
+      "bytes": 4222
+    },
+    "picker: \"he\"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=he&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 54.4,
+      "p95": 62.9,
+      "max": 77.3,
+      "bytes": 4242
+    },
+    "picker: \"hex\"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=hex&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 46.1,
+      "p95": 54.9,
+      "max": 55.0,
+      "bytes": 4209
+    },
+    "picker: \"hex \"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=hex%20&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 44.8,
+      "p95": 56.9,
+      "max": 62.5,
+      "bytes": 4209
+    },
+    "picker: \"hex b\"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=hex%20b&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 47.4,
+      "p95": 56.2,
+      "max": 60.6,
+      "bytes": 4209
+    },
+    "picker: \"hex bo\"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=hex%20bo&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 47.2,
+      "p95": 53.3,
+      "max": 54.7,
+      "bytes": 4209
+    },
+    "picker: \"hex bol\"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=hex%20bol&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 50.9,
+      "p95": 58.6,
+      "max": 60.2,
+      "bytes": 4209
+    },
+    "picker: \"hex bolt\"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=hex%20bolt&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 51.2,
+      "p95": 60.3,
+      "max": 65.1,
+      "bytes": 4209
+    },
+    "picker in stock: \"hex bolt\"": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=hex%20bolt&limit=10&stock=true",
+      "status": 200,
+      "runs": 20,
+      "p50": 115.1,
+      "p95": 136.6,
+      "max": 142.6,
+      "bytes": 4580
+    },
+    "picker: by SKU": {
+      "class": "lookup",
+      "path": "/api/v1/warehouse/product-search?q=SKU-0036666&limit=10",
+      "status": 200,
+      "runs": 20,
+      "p50": 40.9,
+      "p95": 50.6,
+      "max": 52.0,
+      "bytes": 424
+    }
+  },
+  "load_after_reads": [
+    0.8,
+    1.1,
+    1.1
+  ],
+  "load_after_screens": [
+    0.8,
+    1.1,
+    1.1
+  ],
+  "finished": "2026-11-23T23:56:24.078090+00:00",
+  "load_after": [
+    0.8,
+    1.1,
+    1.1
+  ]
+}

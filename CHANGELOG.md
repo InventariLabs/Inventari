@@ -2484,9 +2484,9 @@ lists every public surface and the promise its class makes.
   the quantities the cost history holds against the shelves.
   On a 4-CPU, 8 GB server (the 7 EUR a month class) running the whole stack,
   with 100 000 products, 300 000 records and nearly a million stock
-  movements, the statistics answer in under a second and the heaviest
+  movements, the statistics answer in under two seconds and the heaviest
   reports, the stock reconciliation and stock and valuation as of a date, in
-  two to three and a half seconds ([the scale report](docs/SCALE_REPORT.md) has the
+  two to three seconds ([the scale report](docs/SCALE_REPORT.md) has the
   figures). The scheduled
   reconciliation does not repeat on every restart.
   The **Analytics** tab, which a small household can switch off, adds alerts

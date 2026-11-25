@@ -11,7 +11,7 @@ script builds that organization, in the shape the posting rules produce:
   product is named and no outside catalogue is ever asked), a SKU and a unit;
 - categories whose custom fields the records fill in;
 - one warehouse four levels deep — zones, racks, shelves (``--shelves``,
-  2 000 by default, however large the catalogue) — plus a receiving zone of
+  880 by default, however large the catalogue) — plus a receiving zone of
   dock lanes;
 - about three records per product spread across the shelves, a third of the
   products batch-tracked with an expiry date on most batches, every group of
@@ -299,22 +299,34 @@ class _Steps:
 
     def run(self, label: str, *statements: tuple[str, dict] | str) -> int:
         began = time.monotonic()
-        rows = 0
+        written = 0
+        staged = 0
+        inserts = False
         for statement in statements:
             sql, params = statement if isinstance(statement, tuple) else (statement, {})
             result = self.conn.execute(text(sql), params)
-            rows += max(result.rowcount or 0, 0)
+            count = max(result.rowcount or 0, 0)
+            if sql.lstrip().upper().startswith('INSERT'):
+                inserts = True
+                written += count
+            else:
+                staged += count
+        # A step names the table it fills: the rows of its INSERTs, not the
+        # temporary staging tables built on the way. A step that only stages
+        # (the records' staging) counts what it staged.
+        rows = written if inserts else staged
         took = time.monotonic() - began
         self.timings[label] = round(took, 1)
         _say(f'  {label:<34} {rows:>11,} rows  {took:7.1f} s')
         return rows
 
 
-#: Shelves of the one warehouse, whatever the size of the catalogue. A small
-#: or medium business has hundreds to a few thousand places to put things,
-#: and a shelf of small parts holds hundreds of products: the catalogue grows,
-#: the building does not.
-DEFAULT_SHELVES = 2_000
+#: Shelves of the one warehouse, whatever the size of the catalogue: 10 zones
+#: of 11 racks of 8 levels, about 1 000 locations with the racks, zones and
+#: dock lanes. A small business has hundreds of places to put things, and a
+#: shelf of small parts holds hundreds of products: the catalogue grows, the
+#: building does not.
+DEFAULT_SHELVES = 880
 
 
 def _sizes(products: int, shelves: int = DEFAULT_SHELVES) -> dict[str, int]:

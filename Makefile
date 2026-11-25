@@ -761,7 +761,7 @@ db-seed: ## Initialize system data (storage types, categories)
 loadtest-seed: ## Create k6 users + load_tests/users.csv and seed items (needs K6_PASSWORD; see load_tests/README.md)
 	./load_tests/prepare.sh
 
-seed-scale: ## Seed the admin's empty organization at warehouse scale (usage: make seed-scale PRODUCTS=100000 [SHELVES=2000]; see load_tests/README.md)
+seed-scale: ## Seed the admin's empty organization at warehouse scale (usage: make seed-scale PRODUCTS=100000 [SHELVES=880]; see load_tests/README.md)
 	$(BACKEND_EXEC) uv run python seed_scale_data.py --products $(PRODUCTS) $(if $(SHELVES),--shelves $(SHELVES))
 
 measure-scale: ## Time every daily screen and report on a scale-seeded stack (usage: make measure-scale TIER=100k; needs a built frontend/dist)
