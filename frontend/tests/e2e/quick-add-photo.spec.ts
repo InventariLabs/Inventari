@@ -69,7 +69,7 @@ test.describe("Quick add — a product from a photo", () => {
 
     await page.goto("/inventory/items");
     await page.getByRole("button", { name: "Add product" }).click();
-    await page.getByRole("tab", { name: /vision ai/i }).click();
+    await page.getByRole("tab", { name: "From photo" }).click();
 
     await page.getByTestId("vision-photo-input").setInputFiles({
       name: "label.png",
