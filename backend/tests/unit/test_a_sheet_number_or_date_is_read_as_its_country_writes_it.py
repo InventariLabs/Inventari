@@ -14,6 +14,7 @@ import pytest
 
 from app.core.import_sheet import (
     DateColumns,
+    _sheet_is_csv,
     column_day_first,
     parse_sheet_date,
     parse_sheet_number,
@@ -27,7 +28,9 @@ pytestmark = pytest.mark.unit
 @pytest.fixture(autouse=True)
 def _polish_reader():
     set_current_lang('pl')
+    token = _sheet_is_csv.set(False)
     yield
+    _sheet_is_csv.reset(token)
     set_current_lang('en')
 
 
@@ -74,6 +77,35 @@ class TestNumbers:
         assert parse_sheet_number('1,250') == Decimal('1250')
         assert parse_sheet_number('4,50') == Decimal('4.50')
         assert parse_sheet_number('1.200') == Decimal('1.2')
+
+    @pytest.mark.parametrize('lang', ['de', 'es', 'pl'])
+    @pytest.mark.parametrize(
+        ('cell', 'expected'),
+        [
+            ('1.234', '1234'),
+            ('2.345', '2345'),
+            ('12.345', '12345'),
+            ('1.250', '1250'),
+            ('1.255', '1255'),
+            ('1.234 €', '1234'),
+            ('0.125', '0.125'),
+            ('1.5', '1.5'),
+        ],
+    )
+    def test_a_csv_dot_before_three_digits_is_thousands_whatever_they_are(
+        self, lang: str, cell: str, expected: str
+    ) -> None:
+        set_current_lang(lang)
+        read_rows(b'a;b\nx;1\n', 'sheet.csv')
+        assert parse_sheet_number(cell) == Decimal(expected)
+
+    def test_a_workbook_number_cell_keeps_its_decimal_dot(self) -> None:
+        set_current_lang('de')
+        read_rows(b'a;b\nx;1\n', 'sheet.csv')
+        assert parse_sheet_number('1.234') == Decimal('1234')
+        _sheet_is_csv.set(False)
+        assert parse_sheet_number('1.234') == Decimal('1.234')
+        assert parse_sheet_number('1.200') == Decimal('1200')
 
     @pytest.mark.parametrize(
         'cell',

@@ -9,6 +9,7 @@ becomes; what is here is how a row is read and how a refusal is worded.
 import re
 from collections import Counter
 from collections.abc import Iterable
+from contextvars import ContextVar
 from datetime import date, datetime
 from decimal import Decimal
 from io import BytesIO
@@ -231,6 +232,12 @@ def read_csv_sheet(
     raise last_decode_error
 
 
+#: Whether the sheet read last in this request was a CSV, where every value
+#: is the text as typed. A workbook's number cell arrives as a float's text
+#: instead, which parsing a number has to tell apart from typed text.
+_sheet_is_csv: ContextVar[bool] = ContextVar('sheet_is_csv', default=False)
+
+
 class RowError(ValueError):
     """A reason the reader can act on, worded for the import result screen."""
 
@@ -258,8 +265,10 @@ def read_sheet(content: bytes, filename: str, **kwargs: Any) -> pd.DataFrame:
     carry both answers, so a row whose only name is 'NA' is refused at the door as missing —
     loudly, at import time — rather than imported as the string.
     """
+    is_csv = filename.lower().endswith('.csv')
+    _sheet_is_csv.set(is_csv)
     try:
-        if filename.lower().endswith('.csv'):
+        if is_csv:
             return read_csv_sheet(content)
         return pd.read_excel(BytesIO(content), dtype=str, **kwargs)
     except (BadZipFile, pd.errors.ParserError, ValueError, OSError) as e:
@@ -436,7 +445,8 @@ def parse_sheet_number(raw: Any) -> Decimal:
     language that writes the decimal mark as a dot ("1,250" in English is
     1250). A lone dot is the decimal mark, as it is in the text a workbook
     gives for a number cell, except that for a language that writes a decimal
-    comma three digits ending in 0 after it are a thousands group ("1.200").
+    comma three digits after it are a thousands group in a CSV ("1.234"),
+    and in a workbook when they end in 0 ("1.200").
     """
     text = cell_text(raw)
     if text is None:
@@ -490,15 +500,15 @@ def _is_thousands_group(mark: str, fraction: str) -> bool:
 
     A comma is for a language that writes its decimal mark as a dot ("1,250"
     in English). A dot is for a language that writes a decimal comma
-    ("1.200 kg" in German) and only when the group ends in 0: a workbook
-    number cell reaches the reader as a float's text, which never ends in 0
-    after the dot ("2.125" is a decimal there), so "1.200" or "12.000" is a
-    typed thousands group.
+    ("1.234 kg" in German). Every CSV value is text as typed, so the group
+    is thousands there. A workbook number cell reaches the reader as a
+    float's text, which never ends in 0 after the dot ("2.125" is a decimal
+    there): only "1.200" or "12.000" is a typed thousands group.
     """
     comma_decimal = writes_decimal_comma(get_current_lang())
     if mark == ',':
         return not comma_decimal
-    return comma_decimal and fraction.endswith('0')
+    return comma_decimal and (_sheet_is_csv.get() or fraction.endswith('0'))
 
 
 def _is_grouped(text: str, separator: str) -> bool:

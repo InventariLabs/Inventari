@@ -85,6 +85,28 @@ class TestAProductSheetIsReadAsItsCountryWritesIt:
             2025, 2, 28
         )
 
+    async def test_a_dot_before_three_digits_is_thousands_in_a_german_sheet(
+        self, real_async_db_session, async_test_user, async_test_storage_location
+    ):
+        result = await _import(
+            real_async_db_session,
+            async_test_user,
+            'Produkt;Ilość;Cena;Ważne do;Jm\n'
+            'Schraube A;1.250;1.289,00 €;05.11.2026;kg\n'
+            'Schraube B;1.234;4,50 €;28.02.2027;kg\n'
+            'Schraube C;12.345;R$ 4,50;12.01.2027;kg\n',
+            'de',
+        )
+
+        assert (result['imported'], result['failed']) == (3, 0), result['errors']
+        for name, quantity in (
+            ('Schraube A', '1250'),
+            ('Schraube B', '1234'),
+            ('Schraube C', '12345'),
+        ):
+            item = await _item(real_async_db_session, name)
+            assert item.quantity == Decimal(quantity), name
+
     async def test_an_all_ambiguous_column_follows_the_importers_language(
         self, real_async_db_session, async_test_user, async_test_storage_location
     ):
