@@ -697,7 +697,8 @@
         "body_html": "Vorlageninhalt",
         "reset_to_builtin": "Auf eingebaute Vorlage zurückgesetzt",
         "occurred_on": "Zugehöriger Tag",
-        "order_lines": "Positionen"
+        "order_lines": "Positionen",
+        "purpose_label_key": "Verwendungszweck"
       },
       "showWholeChange": "Ganze Änderung anzeigen",
       "showLess": "Weniger anzeigen",

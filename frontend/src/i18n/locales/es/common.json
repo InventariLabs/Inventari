@@ -697,7 +697,8 @@
         "body_html": "Contenido de la plantilla",
         "reset_to_builtin": "Restablecida a la plantilla integrada",
         "occurred_on": "Día al que pertenece",
-        "order_lines": "Líneas"
+        "order_lines": "Líneas",
+        "purpose_label_key": "Finalidad"
       },
       "showWholeChange": "Mostrar el cambio completo",
       "showLess": "Mostrar menos",

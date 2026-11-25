@@ -699,7 +699,8 @@
         "body_html": "Treść szablonu",
         "reset_to_builtin": "Zresetowany do szablonu wbudowanego",
         "occurred_on": "Dzień, którego dotyczy",
-        "order_lines": "Wiersze"
+        "order_lines": "Wiersze",
+        "purpose_label_key": "Przeznaczenie"
       },
       "showWholeChange": "Pokaż całą zmianę",
       "showLess": "Pokaż mniej",

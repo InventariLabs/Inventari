@@ -697,7 +697,8 @@
         "body_html": "Contenu du modèle",
         "reset_to_builtin": "Rétabli au modèle intégré",
         "occurred_on": "Jour concerné",
-        "order_lines": "Lignes"
+        "order_lines": "Lignes",
+        "purpose_label_key": "Usage"
       },
       "showWholeChange": "Afficher toute la modification",
       "showLess": "Afficher moins",

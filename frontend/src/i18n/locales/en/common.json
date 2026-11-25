@@ -697,7 +697,8 @@
         "body_html": "Template body",
         "reset_to_builtin": "Reset to built-in template",
         "occurred_on": "Day it belongs to",
-        "order_lines": "Lines"
+        "order_lines": "Lines",
+        "purpose_label_key": "Purpose"
       },
       "showWholeChange": "Show the whole change",
       "showLess": "Show less",

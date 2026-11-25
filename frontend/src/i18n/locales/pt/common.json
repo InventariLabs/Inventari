@@ -697,7 +697,8 @@
         "registration": "Registro",
         "response_id": "Resposta",
         "sku_schema": "Formato de SKU",
-        "order_lines": "Linhas"
+        "order_lines": "Linhas",
+        "purpose_label_key": "Finalidade"
       },
       "showWholeChange": "Mostrar a alteração completa",
       "showLess": "Mostrar menos",
