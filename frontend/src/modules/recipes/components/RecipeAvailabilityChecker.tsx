@@ -12,6 +12,7 @@ import IngredientRow, { statusDot } from "./IngredientRow";
 import { Button } from "@/components/ui/Button";
 import { NativeSelect } from "@/components/ui/NativeSelect";
 import { useCanWrite } from "@/hooks/useCanWrite";
+import { useLocalStorage } from "@/module-sdk";
 import ServingsSelector from "./ServingsSelector";
 import { Card } from "@/components/ui/Card";
 import { useModules } from "@/contexts/ModulesContext";
@@ -44,6 +45,9 @@ function needsBuying(
   );
 }
 
+/** The shopping list the reader last picked on a recipe card. */
+const PICKED_LIST_STORAGE_KEY = "recipes:shopping-list-target";
+
 interface RecipeAvailabilityCheckerProps {
   recipeId: string;
   activeServings: number;
@@ -67,8 +71,12 @@ export default function RecipeAvailabilityChecker({
     isLoading: listsLoading,
   } = useOpenShoppingLists();
   // The newest open list is the default; with several, the reader can name
-  // another. A choice that has since left the open lists falls back to it.
-  const [pickedListId, setPickedListId] = useState<string | null>(null);
+  // another, and that choice is remembered for the next recipe opened in this
+  // browser. A choice that has since left the open lists falls back to it.
+  const [pickedListId, setPickedListId] = useLocalStorage<string | null>(
+    PICKED_LIST_STORAGE_KEY,
+    null,
+  );
   const targetListId =
     openLists.find((list) => list.id === pickedListId)?.id ?? openLists[0]?.id;
   // writing to a disabled module succeeded silently — the button
