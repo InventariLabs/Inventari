@@ -406,8 +406,13 @@ _SPACE_GROUPS = re.compile(r"^\d{1,3}(?:[ \u00a0\u202f'\u2019]\d{3})+(?=[.,]\d*$
 _FLOAT_TEXT = re.compile(r'^[+-]?\d+(?:\.\d+)?[eE][+-]?\d+$')
 
 
+#: The Brazilian real is written "R$": the R belongs to the symbol.
+_REAL_SYMBOL = re.compile(r'(?<![^\W\d_])R\$')
+
+
 def _strip_currency(text: str) -> str:
     """The text without a currency symbol, code or word at either end."""
+    text = _REAL_SYMBOL.sub('', text)
     text = ''.join(ch for ch in text if category(ch) != 'Sc').strip()
     lead = _LEADING_WORD.match(text)
     if lead and lead.group(1).lower() in _CURRENCY_WORDS:
@@ -429,8 +434,9 @@ def parse_sheet_number(raw: Any) -> Decimal:
     separator ("1.234.567"); a lone comma is a decimal mark ("12,5"), except
     that exactly three digits after it read as a thousands group for a
     language that writes the decimal mark as a dot ("1,250" in English is
-    1250). A lone dot is always the decimal mark, as it is in the text a
-    workbook gives for a number cell.
+    1250). A lone dot is the decimal mark, as it is in the text a workbook
+    gives for a number cell, except that for a language that writes a decimal
+    comma three digits ending in 0 after it are a thousands group ("1.200").
     """
     text = cell_text(raw)
     if text is None:
@@ -470,14 +476,29 @@ def _normalize_separators(text: str) -> str:
         return text.replace(mark, '')
     whole, _, fraction = text.partition(mark)
     if (
-        mark == ','
-        and not writes_decimal_comma(get_current_lang())
-        and len(fraction) == 3
+        len(fraction) == 3
         and 1 <= len(whole) <= 3
         and not whole.startswith('0')
+        and _is_thousands_group(mark, fraction)
     ):
         return whole + fraction
     return f'{whole or "0"}.{fraction or "0"}'
+
+
+def _is_thousands_group(mark: str, fraction: str) -> bool:
+    """Whether one separator before exactly three digits is a thousands mark.
+
+    A comma is for a language that writes its decimal mark as a dot ("1,250"
+    in English). A dot is for a language that writes a decimal comma
+    ("1.200 kg" in German) and only when the group ends in 0: a workbook
+    number cell reaches the reader as a float's text, which never ends in 0
+    after the dot ("2.125" is a decimal there), so "1.200" or "12.000" is a
+    typed thousands group.
+    """
+    comma_decimal = writes_decimal_comma(get_current_lang())
+    if mark == ',':
+        return not comma_decimal
+    return comma_decimal and fraction.endswith('0')
 
 
 def _is_grouped(text: str, separator: str) -> bool:

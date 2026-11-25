@@ -47,6 +47,12 @@ class TestNumbers:
             ('1,099.00', '1099.00'),
             ('1.234,50', '1234.50'),
             ('1.234.567', '1234567'),
+            ('1.200', '1200'),
+            ('12.000', '12000'),
+            ('1.200 €', '1200'),
+            ('2.125', '2.125'),
+            ('R$ 4,50', '4.50'),
+            ('R$1.289,00', '1289.00'),
             ('PLN 12,5', '12.5'),
             ('12,5 eur', '12.5'),
             ("1'289.50", '1289.50'),
@@ -67,6 +73,7 @@ class TestNumbers:
         set_current_lang('en')
         assert parse_sheet_number('1,250') == Decimal('1250')
         assert parse_sheet_number('4,50') == Decimal('4.50')
+        assert parse_sheet_number('1.200') == Decimal('1.2')
 
     @pytest.mark.parametrize(
         'cell',

@@ -14,17 +14,6 @@ says what the release does rather than what changed since them.
 
 ### Added
 
-- Spreadsheet imports read numbers and dates the way the sheet's country
-  writes them — products, opening stock, document lines, order lines and
-  equipment alike. A decimal comma ("12,5"), thousands separated by a space or
-  a dot, a currency symbol or code ("1 289,00 zł", "$1,289.00", "€ 4,50") are
-  numbers; a day-first date such as "05.11.2026" is 5 November, not 11 May. A
-  column of dates is read from the whole file (a day above 12 settles the
-  order), and a column that is ambiguous throughout follows the language of
-  the person importing: month-first for English, day-first for the others.
-  The mapping preview shows each date column as it will be stored. Document
-  lines and opening stock now refuse a date they cannot read, as the product
-  import does, instead of importing the row without it.
 - Every release now publishes its container images — the backend, the
   frontend and the backup sidecar — to the GitHub Container Registry, for amd64
   and arm64, so a server or a Raspberry Pi can download the stack instead of
@@ -53,6 +42,18 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Spreadsheet imports read numbers and dates the way the sheet's country
+  writes them — products, opening stock, document lines, order lines and
+  equipment alike. A decimal comma ("12,5"), thousands separated by a space or
+  a dot, a currency symbol or code ("1 289,00 zł", "$1,289.00", "€ 4,50") are
+  numbers; a day-first date such as "05.11.2026" is 5 November, not 11 May. A
+  column of dates is read from the whole file (a day above 12 settles the
+  order), and a column that is ambiguous throughout follows the language of
+  the person importing: month-first for English, day-first for the others.
+  The mapping preview shows each date column as it will be stored. Document
+  lines and opening stock now refuse a date they cannot read, as the product
+  import does, instead of importing the row without it, and order lines
+  refuse an unreadable price or tax rate instead of dropping it.
 - The production list reads a cancelled run on the day it was planned for, or
   started, rather than the day it was created, and its Date column no longer
   announces a newest-first or oldest-first order that the days it shows do not
