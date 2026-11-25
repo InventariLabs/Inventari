@@ -118,9 +118,8 @@ test.describe("Webhooks — management & testing", () => {
     const urlInput = dialog
       .locator('input[type="url"], input[placeholder*="http"]')
       .first();
-    if (await urlInput.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await expect(urlInput).toHaveValue(seedWebhookUrl);
-    }
+    await expect(urlInput).toBeVisible({ timeout: 5000 });
+    await expect(urlInput).toHaveValue(seedWebhookUrl);
   });
 
   test("deletes a webhook", async ({ page, authenticatedPage }) => {
@@ -150,12 +149,11 @@ test.describe("Webhooks — management & testing", () => {
       await expect(deleteBtn).toBeVisible({ timeout: 10000 });
       await deleteBtn.click();
 
-      const confirmBtn = page
+      await page
+        .getByRole("alertdialog")
         .getByRole("button", { name: /confirm|delete|usuń|tak/i })
-        .last();
-      if (await confirmBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
-        await confirmBtn.click();
-      }
+        .last()
+        .click();
 
       await expect(page.locator("body").getByText(delName)).toHaveCount(0, {
         timeout: 10000,

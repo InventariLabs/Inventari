@@ -141,10 +141,7 @@ test.describe("API Keys — CRUD flow", () => {
       listKeyName,
       "listKeyName set by an earlier step of this spec",
     ).toBeTruthy();
-    const row = page
-      .getByRole("row")
-      .filter({ hasText: listKeyName })
-      .first();
+    const row = page.getByRole("row").filter({ hasText: listKeyName }).first();
     await expect(row).toBeVisible({ timeout: 10000 });
   });
 
@@ -170,14 +167,15 @@ test.describe("API Keys — CRUD flow", () => {
     await expect(deleteBtn).toBeVisible({ timeout: 5000 });
     await deleteBtn.click();
 
-    const confirmBtn = page
+    await page
+      .getByRole("alertdialog")
       .getByRole("button", { name: /confirm|delete|revoke/i })
-      .last();
-    if (await confirmBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await confirmBtn.click();
-    }
+      .last()
+      .click();
 
-    await expect(page.getByText(revokeKeyName)).toHaveCount(0, { timeout: 10000 });
+    await expect(page.getByText(revokeKeyName)).toHaveCount(0, {
+      timeout: 10000,
+    });
     revokeKeyId = null;
   });
 });

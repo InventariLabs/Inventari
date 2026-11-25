@@ -1564,6 +1564,44 @@ describe("ReceiveGoodsPage", () => {
     expect(await screen.findByText("Order po-1")).toBeInTheDocument();
   });
 
+  it("drops the missing-supplier refusal when the order's supplier arrives after the press", async () => {
+    // The order link names its supplier a moment after the sheet opens; a
+    // press before then is refused, and the refusal must not outlive the
+    // supplier that answers it.
+    let known = false;
+    supplierHook.mockImplementation((orderId: string | null) => ({
+      partnerId: orderId && known ? "partner-1" : null,
+      isLoading: !known,
+      error: null,
+    }));
+    const user = userEvent.setup();
+    const view = renderAt("/warehouse/receive?order=po-1");
+
+    await user.click(
+      screen.getByRole("button", { name: "Receive into stock" }),
+    );
+    expect(await screen.findAllByText("Choose the supplier.")).toHaveLength(1);
+
+    known = true;
+    view.rerender(
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter initialEntries={["/warehouse/receive?order=po-1"]}>
+          <I18nextProvider i18n={i18n}>
+            <Routes>
+              <Route path="/warehouse/receive" element={<ReceiveGoodsPage />} />
+            </Routes>
+          </I18nextProvider>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByLabelText("From")).toHaveValue("partner-1"),
+    );
+    expect(screen.queryByText("Choose the supplier.")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("From")).toBeValid();
+  });
+
   it("lets the reader leave a sheet that is only what the order link loaded", async () => {
     renderAt("/warehouse/receive?order=po-1");
     await screen.findByText("Jasmine Rice");

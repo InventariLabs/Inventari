@@ -38,14 +38,6 @@ test.describe("Categories — CRUD flow", () => {
   test.beforeEach(async ({ page, authenticatedPage }) => {
     await page.goto("/categories");
     await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
-    const signInHeading = page.getByRole("heading", { level: 2, name: /sign in/i });
-    if (await signInHeading.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await page.getByRole("textbox", { name: /email/i }).fill(ADMIN_EMAIL);
-      await page.getByRole("textbox", { name: /password/i }).fill("admin");
-      await page.getByRole("button", { name: /sign in/i }).click();
-      await page.waitForURL(/\/(dashboard|items|categories)/, { timeout: 10000 }).catch(() => {});
-      await page.goto("/categories");
-    }
     await expect(page.locator("h1").first()).toBeVisible({ timeout: 20000 });
   });
 
@@ -71,19 +63,18 @@ test.describe("Categories — CRUD flow", () => {
       name: /add category|dodaj kategorię/i,
     });
 
-    if (await addButton.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await addButton.click();
+    await expect(addButton).toBeVisible({ timeout: 5000 });
+    await addButton.click();
 
-      const input = page.locator("input[required]").first();
-      await expect(input).toBeVisible({ timeout: 10000 });
-      await input.fill(uniqueName);
+    const input = page.locator("input[required]").first();
+    await expect(input).toBeVisible({ timeout: 10000 });
+    await input.fill(uniqueName);
 
-      const saveButton = page.getByRole("button", { name: /save|zapisz/i });
-      await expect(saveButton).toBeVisible({ timeout: 10000 });
-      await saveButton.click();
+    const saveButton = page.getByRole("button", { name: /save|zapisz/i });
+    await expect(saveButton).toBeVisible({ timeout: 10000 });
+    await saveButton.click();
 
-      await expect(page.getByText(uniqueName)).toBeVisible({ timeout: 10000 });
-    }
+    await expect(page.getByText(uniqueName)).toBeVisible({ timeout: 10000 });
   });
 
   test("edits an existing category name", async ({
@@ -117,13 +108,17 @@ test.describe("Categories — CRUD flow", () => {
     const toDelete = await api.createCategory(token, { name: catDeleteName });
 
     const verifyList = await api.listCategories(token);
-    const found = verifyList.find((c: { name: string }) => c.name === catDeleteName);
+    const found = verifyList.find(
+      (c: { name: string }) => c.name === catDeleteName,
+    );
     expect(found).toBeTruthy();
 
     await api.deleteCategory(token, toDelete.id);
 
     const afterDelete = await api.listCategories(token);
-    const gone = afterDelete.find((c: { name: string }) => c.name === catDeleteName);
+    const gone = afterDelete.find(
+      (c: { name: string }) => c.name === catDeleteName,
+    );
     expect(gone).toBeFalsy();
   });
 });

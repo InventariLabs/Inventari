@@ -54,18 +54,15 @@ test.describe("Recipes — exploratory: recipe form with ingredients", () => {
     const firstIngNameInput = dialog
       .getByPlaceholder("Ingredient name")
       .first();
-    if (
-      await firstIngNameInput.isVisible({ timeout: 3000 }).catch(() => false)
-    ) {
-      // A name no catalogue product matches: a matching one opens the
-      // suggestion popover (a second role=dialog) over the unit picker and
-      // links the line to a product whose units may not include grams. A
-      // phrase that matches nothing whole is retried word by word on each
-      // word's first four characters, so "E2E", "ingr" or a timestamp's "1793"
-      // would find every product earlier specs left behind: one word, with a
-      // start nothing else in the catalogue shares.
-      await firstIngNameInput.fill(`Qzxv${Date.now()}`);
-    }
+    await expect(firstIngNameInput).toBeVisible({ timeout: 3000 });
+    // A name no catalogue product matches: a matching one opens the
+    // suggestion popover (a second role=dialog) over the unit picker and
+    // links the line to a product whose units may not include grams. A
+    // phrase that matches nothing whole is retried word by word on each
+    // word's first four characters, so "E2E", "ingr" or a timestamp's "1793"
+    // would find every product earlier specs left behind: one word, with a
+    // start nothing else in the catalogue shares.
+    await firstIngNameInput.fill(`Qzxv${Date.now()}`);
 
     // A line with an amount names its unit; the picker opens inline under
     // its trigger, outside the dialog's own subtree.
@@ -269,9 +266,10 @@ test.describe("Recipes — exploratory: recipe detail page", () => {
       .catch(() => {});
 
     const nutritionBtn = page.getByRole("button", { name: /^nutrition$/i });
-    if (await nutritionBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await nutritionBtn.click();
-    }
+    await expect(nutritionBtn).toHaveAttribute("aria-expanded", "false");
+    await nutritionBtn.click();
+    await expect(nutritionBtn).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByText(/per serving/i).first()).toBeVisible();
   });
 
   test("detail page edit button opens form pre-filled", async ({
@@ -286,31 +284,21 @@ test.describe("Recipes — exploratory: recipe detail page", () => {
     const heading = page.getByRole("heading", { name: recipeName, level: 1 });
     await expect(heading).toBeVisible({ timeout: 10000 });
 
-    const actionBar = page
-      .locator('[class*="action"], [class*="header"]')
-      .filter({ has: page.locator("button") });
-    const editBtn = page
-      .locator("button")
-      .filter({ has: page.locator("img") })
-      .nth(1);
-    if (await editBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await editBtn.click();
+    await page.getByRole("button", { name: "Edit", exact: true }).click();
 
-      const dialog = page.locator('[role="dialog"]');
-      if (await dialog.isVisible({ timeout: 3000 }).catch(() => false)) {
-        const nameInput = dialog.getByPlaceholder("e.g. Pasta Bolognese");
-        await expect(nameInput).toHaveValue(recipeName, { timeout: 3000 });
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible({ timeout: 3000 });
+    const nameInput = dialog.getByPlaceholder("e.g. Pasta Bolognese");
+    await expect(nameInput).toHaveValue(recipeName, { timeout: 3000 });
 
-        const cancelBtn = dialog.getByRole("button", { name: /cancel/i });
-        await cancelBtn.click();
-      }
-    }
+    await dialog.getByRole("button", { name: /cancel/i }).click();
+    await expect(dialog).toBeHidden();
   });
 });
 
 test.describe("Recipes — exploratory: settings page tabs", () => {
   test.beforeEach(async ({ page, authenticatedPage }) => {
-    await page.goto("/recipes/settings");
+    await page.goto("/recipes/ingredient-data");
     await page
       .waitForLoadState("networkidle", { timeout: 10000 })
       .catch(() => {});
@@ -326,10 +314,10 @@ test.describe("Recipes — exploratory: settings page tabs", () => {
     page,
     authenticatedPage,
   }) => {
-    const nutritionTab = page.getByRole("tab", { name: /nutrition/i });
-    if (await nutritionTab.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(nutritionTab).toHaveAttribute("data-state", "active");
-    }
+    const nutritionTab = page.getByRole("tab", {
+      name: /ingredient defaults/i,
+    });
+    await expect(nutritionTab).toHaveAttribute("data-state", "active");
   });
 
   test("can switch to unit conversions tab", async ({
@@ -337,18 +325,16 @@ test.describe("Recipes — exploratory: settings page tabs", () => {
     authenticatedPage,
   }) => {
     const convTab = page.getByRole("tab", { name: /conversion/i });
-    if (await convTab.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await convTab.click();
-    }
+    await convTab.click();
+    await expect(convTab).toHaveAttribute("data-state", "active");
   });
 
   test("can switch to exclusions tab", async ({ page, authenticatedPage }) => {
     const exclTab = page.getByRole("tab", {
       name: /always at home|exclusion/i,
     });
-    if (await exclTab.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await exclTab.click();
-    }
+    await exclTab.click();
+    await expect(exclTab).toHaveAttribute("data-state", "active");
   });
 });
 
@@ -386,10 +372,10 @@ test.describe("Recipes — exploratory: tags panel", () => {
       page.getByRole("heading", { level: 1, name: /recipes/i }),
     ).toBeVisible({ timeout: 10000 });
 
-    const tagsBtn = page.getByRole("button", { name: /^tags$/i });
-    if (await tagsBtn.isVisible({ timeout: 10000 }).catch(() => false)) {
-      await tagsBtn.click();
-    }
+    await page.getByRole("button", { name: /^tags$/i }).click();
+    await expect(page.getByText("italian").first()).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test("search filters recipes by tag", async ({ page, authenticatedPage }) => {
@@ -475,13 +461,12 @@ test.describe("Recipes — exploratory: favorite toggle", () => {
     await card.scrollIntoViewIfNeeded();
     await card.hover();
 
-    const starBtn = card
-      .locator('button[aria-label*="avor"], button')
-      .filter({ has: page.locator("svg") })
-      .first();
-    if (await starBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await starBtn.click();
-    }
+    const star = card.getByRole("button", { name: "Favorite", exact: true });
+    await expect(star.locator("svg")).not.toHaveClass(/fill-amber-500/);
+    await star.click();
+    await expect(star.locator("svg")).toHaveClass(/fill-amber-500/, {
+      timeout: 10000,
+    });
   });
 });
 
@@ -532,9 +517,8 @@ test.describe("Recipes — exploratory: meal planner navigation", () => {
     const newPlanBtn = page.getByRole("button", {
       name: /new plan|create plan/i,
     });
-    if (await newPlanBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await newPlanBtn.click();
-    }
+    await newPlanBtn.first().click();
+    await expect(page.getByRole("dialog", { name: /new plan/i })).toBeVisible();
   });
 });
 
