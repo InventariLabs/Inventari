@@ -809,6 +809,8 @@
     "rename": "Renombrar",
     "delete": "Eliminar colección",
     "delete_confirm": "¿Eliminar la colección «{{name}}»? Las recetas se conservan.",
+    "delete_confirm_nested_one": "¿Eliminar la colección «{{name}}»? Contiene {{count}} subcolección, que también se eliminará. Las recetas se conservan.",
+    "delete_confirm_nested_other": "¿Eliminar la colección «{{name}}»? Contiene {{count}} subcolecciones, que también se eliminarán. Las recetas se conservan.",
     "name_placeholder": "Nombre de la colección",
     "created": "Colección creada",
     "updated": "Colección actualizada",

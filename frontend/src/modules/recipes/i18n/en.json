@@ -809,6 +809,8 @@
     "rename": "Rename",
     "delete": "Delete collection",
     "delete_confirm": "Delete collection \"{{name}}\"? Recipes themselves are kept.",
+    "delete_confirm_nested_one": "Delete collection \"{{name}}\"? It holds {{count}} sub-collection, which goes with it. Recipes themselves are kept.",
+    "delete_confirm_nested_other": "Delete collection \"{{name}}\"? It holds {{count}} sub-collections, which go with it. Recipes themselves are kept.",
     "name_placeholder": "Collection name",
     "created": "Collection created",
     "updated": "Collection updated",

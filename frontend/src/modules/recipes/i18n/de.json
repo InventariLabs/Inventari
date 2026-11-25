@@ -809,6 +809,8 @@
     "rename": "Umbenennen",
     "delete": "Sammlung löschen",
     "delete_confirm": "Sammlung „{{name}}“ löschen? Die Rezepte bleiben erhalten.",
+    "delete_confirm_nested_one": "Sammlung „{{name}}“ löschen? Sie enthält {{count}} Untersammlung, die mit gelöscht wird. Die Rezepte bleiben erhalten.",
+    "delete_confirm_nested_other": "Sammlung „{{name}}“ löschen? Sie enthält {{count}} Untersammlungen, die mit gelöscht werden. Die Rezepte bleiben erhalten.",
     "name_placeholder": "Name der Sammlung",
     "created": "Sammlung erstellt",
     "updated": "Sammlung aktualisiert",

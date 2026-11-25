@@ -809,6 +809,8 @@
     "rename": "Renomear",
     "delete": "Excluir coleção",
     "delete_confirm": "Excluir a coleção \"{{name}}\"? As receitas em si são mantidas.",
+    "delete_confirm_nested_one": "Excluir a coleção \"{{name}}\"? Ela contém {{count}} subcoleção, que também será excluída. As receitas em si são mantidas.",
+    "delete_confirm_nested_other": "Excluir a coleção \"{{name}}\"? Ela contém {{count}} subcoleções, que também serão excluídas. As receitas em si são mantidas.",
     "name_placeholder": "Nome da coleção",
     "created": "Coleção criada",
     "updated": "Coleção atualizada",
