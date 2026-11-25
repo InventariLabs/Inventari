@@ -54,6 +54,13 @@ says what the release does rather than what changed since them.
   lines and opening stock now refuse a date they cannot read, as the product
   import does, instead of importing the row without it, and order lines
   refuse an unreadable price or tax rate instead of dropping it.
+- *Rebuilding on a new server* (DEPLOYMENT.md) brings the backup back from the
+  off-host copy. It pulls `<BACKUP_RCLONE_REMOTE>/backups/last`, where the copy
+  puts the backups since that variable names the parent, and then gives the
+  pulled pair the `-latest` names *Putting a backup back* reads — the copy
+  sends files, not the links in `last/`. Followed as written, the step found
+  nothing at `<BACKUP_RCLONE_REMOTE>/last`, and the restore after it stopped
+  on a file that was not there.
 - Opening stock from a sheet keeps what the sheet says. A row in cartons or
   litres founds its product in that unit instead of in pieces, so the draft
   receipt opens; a row naming a unit an existing product cannot take is
