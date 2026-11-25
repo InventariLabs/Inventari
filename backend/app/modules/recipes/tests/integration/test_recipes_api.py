@@ -789,6 +789,35 @@ class TestIngredientDefaultsRouter:
         )
 
         assert r.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT, r.text
+        assert r.json()['detail'][0]['code'] == 'INGREDIENT_DEFAULT_NAME_HAS_NO_KEY'
+
+    @pytest.mark.parametrize(
+        'name',
+        [
+            '\u39dd',  # a CJK ideograph
+            '\u30fc',  # the katakana long vowel mark
+            '\u0627',  # Arabic alef
+            '\U00012000',  # a cuneiform sign
+            ' \u39dd\u200b ',
+        ],
+    )
+    def test_create_refuses_a_visible_name_without_calling_it_invisible(
+        self, client: TestClient, auth_headers: dict[str, str], name: str
+    ) -> None:
+        """A name the reader can see, but whose characters the ASCII fold
+        has no spelling for, still has no key. The refusal says what it
+        lacks: a Latin spelling, which the reader can add."""
+        r = client.post(
+            f'{RECIPE_URL}/ingredient-defaults',
+            json={'name': name, 'lang': 'en', 'calories_kcal': '100'},
+            headers={**auth_headers, 'Accept-Language': 'en'},
+        )
+
+        assert r.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT, r.text
+        [error] = r.json()['detail']
+        assert error['code'] == 'NAME_HAS_NO_LATIN_FORM'
+        assert 'invisible' not in error['msg']
+        assert 'Latin spelling' in error['msg']
 
     def test_create_refuses_a_name_the_column_cannot_hold(
         self, client: TestClient, auth_headers: dict[str, str]

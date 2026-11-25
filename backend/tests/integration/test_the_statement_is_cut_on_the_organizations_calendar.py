@@ -203,3 +203,29 @@ class TestThePeriodOpensOnADayItCanReport:
         assert 'starts on Jan 11, 2026' in message
         assert 'start on Jan 12, 2026' in message
         assert 'Jan 10' not in message
+
+    @pytest.mark.parametrize('date_from', ['2026-01-11', '2026-01-01'])
+    async def test_a_first_day_picked_on_or_before_the_ledgers_first_names_when_a_statement_can_open(
+        self,
+        real_async_client: AsyncClient,
+        real_async_db_session: AsyncSession,
+        date_from: str,
+    ) -> None:
+        """A first day the reader picks is held to the same boundary as the
+        one the statement picks itself: the answer names the day a statement
+        can open on, not a report for an evening the reader never chose."""
+        _, headers = await _books(real_async_db_session, earlier=False)
+
+        response = await real_async_client.get(
+            '/api/v1/stock-value-movement',
+            params={'date_from': date_from, 'date_to': '2026-01-20', 'lang': 'en'},
+            headers=headers,
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.text
+        detail = response.json()['detail']
+        assert detail['code'] == 'STOCK_VALUE_FIRST_DAY'
+        assert 'starts on Jan 11, 2026' in detail['message']
+        assert 'start on Jan 12, 2026' in detail['message']
+        assert 'Jan 10' not in detail['message']
+        assert 'Dec 31' not in detail['message']

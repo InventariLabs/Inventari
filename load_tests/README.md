@@ -145,7 +145,7 @@ stock yet — in the shape the posting rules produce:
 |---|---|
 | products | N product cards, each with a GS1 restricted-circulation EAN-13 (prefix 29) and a SKU |
 | categories | 40, each declaring three custom fields the records fill in |
-| locations | one warehouse → 10 zones → racks → 8 shelves each, `--shelves` of them (2 000 unless given: the building of a small or medium business, whatever the size of its catalogue), plus a receiving zone of 10 dock lanes |
+| locations | one warehouse → 10 zones → racks → 8 shelves each, `--shelves` of them (880 unless given: 10 zones of 11 racks, about 1 000 locations with the racks, zones and dock lanes, whatever the size of the catalogue — already a generous building for a small business), plus a receiving zone of 10 dock lanes |
 | records | about 3 N, a third of the products batch-tracked, most of those batches dated |
 | anchors | one per group of stock that ever held anything, dock lanes included |
 | movements | about 10 N over 400 days: each record received (12% through a dock lane and put away), then dispatched in parts |
@@ -162,7 +162,10 @@ make seed-scale PRODUCTS=100000          # or 500000, 1000000
 
 The rows are written by `INSERT ... SELECT` over `generate_series` inside the
 database, never through the API: on the 4-core server of the report 100 000 products
-seed in 11 minutes and a million in under three hours. Every value is a hash of the
+seed in 12 minutes and a million in under three hours. The log gives each step the
+rows it wrote to the table it names, a line per table for a step that fills several
+(documents with their purchase orders, open work); a step that only stages rows, the
+records' staging, counts those. Every value is a hash of the
 row's number and `--seed`: the same arguments write the same organization. The run
 ends with the stock reconciliation over what it wrote (`/stats/reconciliation`), and
 any drift between the shelves, the journal and the cost layers fails it. At a million
@@ -187,7 +190,9 @@ python3 load_tests/scale/measure.py --report load_tests/scale/results/*.json
 daily screens — `--runs` times each after a warm-up, p50 and p95 of the whole answer
 read on the same host — then runs the write paths once each (a 200-line purchase
 order received and the receipt undone, five dispatches picked together, a shelf's
-stock take, the spreadsheet export, an import of `--import-rows` rows), and has
+stock take with every record counted, the spreadsheet export, an import of
+`--import-rows` rows timed until its background job is done, with its rows a
+second), and has
 `frontend/scripts/measure-scale-screens.mjs` open every screen on the phone of the
 phone budget (CPU 4x, slow 4G), recording when it is usable and every API request
 it sent. Run it with nothing else on the machine: a test suite running beside it

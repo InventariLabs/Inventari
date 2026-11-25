@@ -495,13 +495,14 @@ guide:
 - **An audit log the application cannot rewrite.** Updates and deletes on it
   are refused by a trigger in the database, not by application code.
 - **Measured at warehouse scale.** On a 4-core VPS with 8 GB of memory (about
-  7 EUR a month), an organization of 100 000 products and 300 000 records fits
-  in a 1.5 GB database: scans, record cards and a shelf's stock answer in
-  20–80 ms, a page of products in under a quarter of a second, the statistics
-  in under a second (the reconciliation and stock as of a date in two to
-  three), and a 200-line receipt is written in 1.4 s. Posting a large receipt
-  still takes about twelve seconds; [the report](docs/SCALE_REPORT.md) has
-  every figure and its cause.
+  7 EUR a month), an organization of 100 000 products, 300 000 records and a
+  building of about 1 000 locations fits in a 1.5 GB database: scans, record
+  cards and a shelf's stock answer in 20–70 ms, a page of products in under a
+  tenth of a second, the statistics in under two (the reconciliation and stock
+  as of a date in two to three), and a 200-line receipt is written in 1.5 s.
+  Posting a 200-line receipt takes about four and a half seconds, a full
+  spreadsheet export four minutes and an import 18 rows a second;
+  [the report](docs/SCALE_REPORT.md) has every figure and its cause.
 
 ---
 

@@ -527,6 +527,11 @@ class TestFromRecipeEndpoint:
             },
         )
         assert resp.status_code == 400, resp.text
+        detail = resp.json()['detail']
+        # The bridge writes every line of the recipe at once, so the refusal
+        # names the ingredient the way the recipe lists it.
+        assert detail['code'] == 'BRIDGE_LINE_UNIT_NOT_CONVERTIBLE'
+        assert detail['message'].startswith('The ingredient “flour” is kept in pcs')
         assert (
             db_session.query(MakerRecipe)
             .filter(MakerRecipe.output_template_id == output.id)

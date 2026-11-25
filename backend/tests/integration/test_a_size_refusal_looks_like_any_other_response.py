@@ -72,7 +72,43 @@ class TestASizeRefusalLooksLikeAnyOtherResponse:
         response = client.post('/api/v1/items/', content=OVER_LIMIT_BODY)
 
         assert response.status_code == 413
-        assert response.json() == {'detail': 'Request body too large'}
+        assert response.json()['detail']['code'] == 'REQUEST_BODY_TOO_LARGE'
+
+    @pytest.mark.parametrize(
+        ('lang', 'sentence'),
+        [
+            (
+                'pl',
+                'Wysłane dane są za duże: serwer przyjmuje najwyżej 1 KB. '
+                'Wyślij mniejszy plik.',
+            ),
+            (
+                'de',
+                'Die gesendeten Daten sind zu groß: Der Server nimmt höchstens '
+                '1 KB an. Senden Sie eine kleinere Datei.',
+            ),
+        ],
+    )
+    def test_the_refusal_is_coded_and_in_the_readers_language(
+        self, client, lang: str, sentence: str
+    ):
+        """The frontend shows a refusal's sentence as it stands, so the
+        sentence is the reader's, and a client branches on the code."""
+        response = client.post(
+            '/api/v1/items/',
+            content=OVER_LIMIT_BODY,
+            headers={'Accept-Language': lang},
+        )
+
+        assert response.status_code == 413
+        assert response.json() == {
+            'detail': {
+                'code': 'REQUEST_BODY_TOO_LARGE',
+                'message': sentence,
+                'lang': lang,
+            }
+        }
+        assert int(response.headers['content-length']) == len(response.content)
 
 
 def test_the_gate_sits_inside_the_layers_that_decorate_responses() -> None:

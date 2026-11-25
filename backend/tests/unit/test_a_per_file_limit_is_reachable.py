@@ -43,8 +43,8 @@ def test_an_image_limit_fires_well_before_the_request_ceiling(
 
     Not an arbitrary ratio: it is the difference between "this file is bigger
     than this endpoint accepts", which names the file and the endpoint, and
-    "Request body too large", which names neither and arrives the same way
-    for every route in the application.
+    the request ceiling's REQUEST_BODY_TOO_LARGE, which names neither and
+    arrives the same way for every route in the application.
     """
     ceiling = settings.MAX_REQUEST_BODY_SIZE
 

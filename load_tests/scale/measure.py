@@ -328,6 +328,48 @@ def _items_of(answer):
     return answer['items'] if isinstance(answer, dict) and 'items' in answer else answer
 
 
+def _paged(api: Api, path: str, page: int = 200):
+    """Every row of a list the API pages (``limit``/``offset``), page by page."""
+    sep = '&' if '?' in path else '?'
+    offset = 0
+    while True:
+        rows = _items_of(api.get(f'{path}{sep}limit={page}&offset={offset}'))
+        yield from rows
+        if len(rows) < page:
+            return
+        offset += page
+
+
+def _shelf_records(api: Api, shelf: str, keep, wanted: int) -> list[dict]:
+    """Up to ``wanted`` records of a shelf for which ``keep`` holds.
+
+    The shelf's list has no filter for a record without an expiry date, and
+    the order it comes in says nothing about which ones those are (on a shelf
+    of 300 records the first 50 may all carry a date), so it is read page by
+    page until enough records qualify.
+    """
+    found: list[dict] = []
+    for record in _paged(api, f'/api/v1/locations/{shelf}/items'):
+        if keep(record):
+            found.append(record)
+            if len(found) >= wanted:
+                break
+    return found
+
+
+def _wait_for_job(api: Api, job: dict, began: float, poll: float = 2.0, give_up: float = 4 * 3600) -> dict:
+    """Read an import's background job until it is done or failed; its last answer."""
+    while job.get('status') == 'running':
+        if time.perf_counter() - began > give_up:
+            return {**job, 'status': 'timeout'}
+        time.sleep(poll)
+        status, answer, _, _ = api.call('GET', f'/api/v1/items/import/jobs/{job["id"]}')
+        if status != 200 or not isinstance(answer, dict):
+            return {**job, 'status': 'failed', 'error': f'job read: {status}'}
+        job = answer
+    return job
+
+
 def _write(results, name, cls, api, method, path, payload=None, **kw):
     status, data, ms, size = api.call(method, path, payload, **kw)
     results[name] = {'class': cls, 'ms': round(ms, 1), 'status': status, 'bytes': size}
@@ -347,8 +389,8 @@ def writes(api: Api, f: dict, import_rows: int) -> dict:
     templates = []
     for code in [f'A01-{rack:03d}-{level}' for rack in range(1, 4) for level in range(1, 9)]:
         shelf = api.get(f'/api/v1/labels/scan/{code}')['location']['id']
-        templates += [r['template_id'] for r in _items_of(api.get(f'/api/v1/locations/{shelf}/items?limit=50&offset=0'))
-                      if r.get('template_id') and not r.get('expiry_date')]
+        templates += [r['template_id'] for r in _shelf_records(
+            api, shelf, lambda r: r.get('template_id') and not r.get('expiry_date'), 200)]
         if len(set(templates)) >= 200:
             break
     templates = list(dict.fromkeys(templates))[:200]
@@ -381,8 +423,11 @@ def writes(api: Api, f: dict, import_rows: int) -> dict:
     lines = []
     for code in [f'A05-00{rack}-{level}' for rack in (1, 2, 3) for level in range(1, 9)]:
         shelf = api.get(f'/api/v1/labels/scan/{code}')['location']['id']
-        lines += [r for r in _items_of(api.get(f'/api/v1/locations/{shelf}/items?limit=50&offset=0'))
-                  if float(r.get('quantity') or 0) >= 2 and r.get('template_id') and not r.get('expiry_date')]
+        lines += _shelf_records(
+            api, shelf,
+            lambda r: float(r.get('quantity') or 0) >= 2 and r.get('template_id') and not r.get('expiry_date'),
+            40,
+        )
         if len(lines) >= 40:
             break
     lines = lines[:40]
@@ -434,7 +479,9 @@ def writes(api: Api, f: dict, import_rows: int) -> dict:
             {'name': f'Scale shelf count {datetime.now(UTC):%H%M%S}', 'location_id': first},
         )
     if status < 300:
-        counted = _items_of(api.get(f'/api/v1/stock-takes/{take["id"]}/items'))
+        # Every record of the shelf: the list is paged, and a completion with
+        # one uncounted record is refused.
+        counted = list(_paged(api, f'/api/v1/stock-takes/{take["id"]}/items'))
         _write(
             results, f'stock take: count {len(counted)} records', 'write', api, 'PATCH',
             f'/api/v1/stock-takes/{take["id"]}/items/bulk-count',
@@ -451,7 +498,7 @@ def writes(api: Api, f: dict, import_rows: int) -> dict:
     # file may hold, so a sheet of 100 000 rows is ten uploads.
     per_file = 10_000
     files = -(-import_rows // per_file)
-    total_ms = 0.0
+    total_ms, done_rows = 0.0, 0
     for k in range(files):
         rows = min(per_file, import_rows - k * per_file)
         sheet = io.StringIO()
@@ -469,14 +516,33 @@ def writes(api: Api, f: dict, import_rows: int) -> dict:
             sheet.getvalue().encode(),
             f'\r\n--{boundary}--\r\n'.encode(),
         ])
-        status, _ = _write(
-            results, f'import: file {k + 1} of {files}, {rows:,} rows (csv)', 'bulk', api, 'POST',
+        name = f'import: file {k + 1} of {files}, {rows:,} rows (csv)'
+        status, queued = _write(
+            results, name, 'bulk', api, 'POST',
             '/api/v1/items/import', raw=body, content_type=f'multipart/form-data; boundary={boundary}',
         )
-        total_ms += results[f'import: file {k + 1} of {files}, {rows:,} rows (csv)']['ms']
+        entry = results[name]
+        if status == 202 and isinstance(queued, dict):
+            # The 202 only queues the job: the import is done when the job says so.
+            entry['queued_ms'] = entry['ms']
+            began = time.perf_counter() - entry['ms'] / 1000
+            job = _wait_for_job(api, queued, began)
+            entry['ms'] = round((time.perf_counter() - began) * 1000, 1)
+            entry['job'] = job.get('status')
+            status = 200 if job.get('status') == 'done' else 500
+            if status >= 400:
+                entry['error'] = f'job {job.get("status")}: {job.get("error")}'
+        if not entry.get('error'):
+            entry['rows_per_s'] = round(rows / (entry['ms'] / 1000), 1)
+            print(f'  {"":<44} {entry["rows_per_s"]:,.1f} rows/s over {entry["ms"] / 1000:,.1f} s', flush=True)
+        total_ms += entry['ms']
+        done_rows += rows
         if status >= 400:
             break
-    results[f'import: {import_rows:,} rows in all'] = {'class': 'bulk', 'ms': round(total_ms, 1), 'status': status, 'bytes': 0}
+    total = {'class': 'bulk', 'ms': round(total_ms, 1), 'status': status, 'bytes': 0}
+    if status < 400 and total_ms:
+        total['rows_per_s'] = round(done_rows / (total_ms / 1000), 1)
+    results[f'import: {import_rows:,} rows in all'] = total
     return results
 
 
@@ -686,7 +752,8 @@ def report(paths: list[str]) -> None:
                 elif e.get('error'):
                     cells.append(f'status {e["status"]}')
                 else:
-                    cells.append(f'{e["ms"]:,.0f}' + (' **over**' if over(e) else ''))
+                    rate = f' ({e["rows_per_s"]:,.0f} rows/s)' if e.get('rows_per_s') else ''
+                    cells.append(f'{e["ms"]:,.0f}' + rate + (' **over**' if over(e) else ''))
             print(f'| {name} | {first["class"]} | ' + ' | '.join(cells) + ' |')
     if all('screens' in t for t in tiers):
         print('\n### Screens on the phone (usable, median) and what they download\n')

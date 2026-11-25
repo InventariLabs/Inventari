@@ -20,7 +20,13 @@ from app.core.deps import (
     require_permission,
 )
 from app.core.exceptions import map_service_errors
-from app.core.module_sdk import PaginatedResponse
+from app.core.module_sdk import (
+    AppException,
+    FileSignatureMismatchError,
+    FileTooLargeError,
+    FileTypeNotAllowedError,
+    PaginatedResponse,
+)
 
 from . import attachment_service
 from .schemas import AttachmentSchema
@@ -56,16 +62,32 @@ async def upload_attachment(
     org_id: UUID = Depends(require_org),
 ) -> Any:
     content = await file.read()
-    return await attachment_service.upload_attachment(
-        db,
-        org_id,
-        item_id,
-        current_user.id,
-        file_content=content,
-        original_name=file.filename or 'upload',
-        content_type=file.content_type or 'application/octet-stream',
-        file_type=file_type,
-    )
+    # Answered as an item attachment's refusals are (``api/attachments.py``):
+    # the status says which refusal it is, before ``map_service_errors``
+    # would turn every one of them into a 400.
+    try:
+        return await attachment_service.upload_attachment(
+            db,
+            org_id,
+            item_id,
+            current_user.id,
+            file_content=content,
+            original_name=file.filename or 'upload',
+            content_type=file.content_type or 'application/octet-stream',
+            file_type=file_type,
+        )
+    except FileTooLargeError as exc:
+        raise AppException(
+            status_code=413, code='FILE_TOO_LARGE', message=str(exc)
+        ) from exc
+    except FileSignatureMismatchError as exc:
+        raise AppException(
+            status_code=400, code='FILE_SIGNATURE_MISMATCH', message=str(exc)
+        ) from exc
+    except FileTypeNotAllowedError as exc:
+        raise AppException(
+            status_code=415, code='FILE_TYPE_NOT_ALLOWED', message=str(exc)
+        ) from exc
 
 
 @router.delete('/{item_id}/attachments/{attachment_id}', status_code=204)

@@ -26,6 +26,9 @@ interface ReadOnlyNoticeProps {
    * `write` is the ordinary case: this account may not change the records.
    * `manage` is the narrower one — it may change the records but not how the
    * module behaves — and only modules declaring a `:manage` key have it.
+   * With an explicit `permission` the boundary is that key's, not the
+   * module's manage right, so the notice does not send the reader to
+   * whoever manages the module.
    */
   right?: "write" | "manage";
 }
@@ -75,7 +78,7 @@ export function ReadOnlyNotice({
   // cannot write in the module either — a viewer may open the screen and
   // nothing more. The manage sentence is for someone with the records but
   // not the settings.
-  const manageOnly = right === "manage" && canWrite;
+  const manageOnly = right === "manage" && !permission && canWrite;
   const title = cannotRead
     ? t("access.noRead")
     : manageOnly

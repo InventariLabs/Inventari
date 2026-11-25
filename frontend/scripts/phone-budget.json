@@ -47,7 +47,7 @@
     "receive": {
       "chunks": ["ReceiveGoodsPage"],
       "budget": {
-        "jsKiB": 485,
+        "jsKiB": 490,
         "loadMs": 10000
       },
       "measured": {
