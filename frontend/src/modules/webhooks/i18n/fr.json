@@ -74,7 +74,14 @@
       "connectFailed": "Connexion à la cible impossible. L'adresse est peut-être erronée, un pare-feu la bloque ou le destinataire est hors service.",
       "tlsRefused": "La connexion a été refusée en TLS : le certificat du destinataire n'a pas pu être vérifié.",
       "connectionBroken": "La connexion s'est interrompue avant que le destinataire ne réponde.",
-      "emptyAnswer": "La cible a répondu HTTP {{status}} sans corps, donc sans motif. Consultez le journal du destinataire."
+      "emptyAnswer": "La cible a répondu HTTP {{status}} sans corps, donc sans motif. Consultez le journal du destinataire.",
+      "urlLoopback": "Cette adresse pointe vers le serveur lui-même : le webhook ne quitterait jamais la machine. Utilisez une adresse joignable depuis Internet, ou demandez à la personne qui gère cette installation d'autoriser les adresses locales.",
+      "urlPrivate": "Cette adresse n'est pas routable publiquement ou est réservée à l'infrastructure des protocoles ; le serveur refuse donc de l'appeler. Utilisez une adresse joignable depuis Internet, ou demandez à la personne qui gère cette installation d'autoriser les adresses locales.",
+      "urlUnresolved": "Le nom d'hôte n'a pas pu être résolu : l'adresse ne peut pas être vérifiée. Utilisez un nom résolu publiquement, ou demandez à la personne qui gère cette installation d'autoriser les adresses locales.",
+      "urlRebinding": "Le nom d'hôte se résout vers une adresse qui n'est pas routable publiquement ou qui est réservée à l'infrastructure des protocoles. Utilisez une adresse joignable depuis Internet, ou demandez à la personne qui gère cette installation d'autoriser les adresses locales.",
+      "urlMalformed": "Ce n'est pas une adresse web valide. Saisissez une adresse complète, par exemple https://example.com/hook.",
+      "urlScheme": "Seules les adresses http et https sont autorisées pour les webhooks.",
+      "urlNoHostname": "L'adresse du webhook doit comporter un nom d'hôte, par exemple https://example.com/hook."
     }
   },
   "testResult": {
@@ -98,6 +105,7 @@
   },
   "circuitBreakerWarning_one": "Ce webhook a été automatiquement désactivé après 1 échec consécutif — la cause de la dernière tentative figure dans les journaux de livraison.",
   "circuitBreakerWarning_other": "Ce webhook a été automatiquement désactivé après {{count}} échecs consécutifs — la cause de la dernière tentative figure dans les journaux de livraison.",
+  "circuitBreakerWarning_many": "Ce webhook a été automatiquement désactivé après {{count}} échecs consécutifs — la cause de la dernière tentative figure dans les journaux de livraison.",
   "eventsWhileOff": "Les événements qui surviennent pendant qu'il est désactivé ne sont ni livrés, ni mis en file, ni consignés, et Réactiver ne les rejoue pas. Les livraisons encore en attente d'une nouvelle tentative au moment de la désactivation sont abandonnées de la même façon — elles restent dans le journal des livraisons comme échouées.",
   "settings": {
     "logRetentionDays": "Conservation des journaux (jours)",
