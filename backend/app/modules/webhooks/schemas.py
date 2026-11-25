@@ -66,37 +66,69 @@ def valid_event_types() -> set[str]:
 #: English catalogue text whatever language the request that triggered the
 #: delivery was in, so one set of patterns recognises it.
 _URL_REFUSAL_REASONS = ('loopback', 'private', 'unresolved', 'rebinding')
-_PLACEHOLDER = '\x00'
+_SLOTS = ('host', 'resolved', 'schemes')
+_SLOT_MARK = re.compile('\x00(\\w+)\x00')
+
+
+def _slot(name: str) -> str:
+    return f'\x00{name}\x00'
 
 
 @cache
 def _url_refusal_patterns() -> tuple[tuple[str, re.Pattern[str]], ...]:
-    """One pattern per refusal: the English template with its slots as wildcards."""
+    """One pattern per refusal: the English template, each slot a named group."""
+    slots = {name: _slot(name) for name in _SLOTS}
     refusals: dict[str, WebhookUrlRejectedError | ServiceRejectionError] = {
         f'url_{reason}': WebhookUrlRejectedError(
-            reason, host=_PLACEHOLDER, resolved=_PLACEHOLDER
+            reason, host=slots['host'], resolved=slots['resolved']
         )
         for reason in _URL_REFUSAL_REASONS
     }
     refusals['url_malformed'] = ServiceRejectionError('webhook_url_malformed')
     refusals['url_scheme'] = ServiceRejectionError(
-        'webhook_url_scheme', schemes=_PLACEHOLDER
+        'webhook_url_scheme', schemes=slots['schemes']
     )
     refusals['url_no_hostname'] = ServiceRejectionError('webhook_url_no_hostname')
     patterns = []
     for code, refusal in refusals.items():
-        template = refusal.sentence('en')
-        body = '.+'.join(re.escape(part) for part in template.split(_PLACEHOLDER))
+        # ``split`` with one group alternates literal text and slot names.
+        parts = _SLOT_MARK.split(refusal.sentence('en'))
+        body = ''.join(
+            f'(?P<{part}>.+)' if index % 2 else re.escape(part)
+            for index, part in enumerate(parts)
+        )
         patterns.append((code, re.compile(body, re.DOTALL)))
     return tuple(patterns)
 
 
+def _url_refusal_match(error_message: str) -> tuple[str, re.Match[str]] | None:
+    for code, pattern in _url_refusal_patterns():
+        if match := pattern.fullmatch(error_message):
+            return code, match
+    return None
+
+
 def url_refusal_code(error_message: str) -> str | None:
     """The code of the URL-guard refusal that *error_message* is, or ``None``."""
-    for code, pattern in _url_refusal_patterns():
-        if pattern.fullmatch(error_message):
-            return code
-    return None
+    found = _url_refusal_match(error_message)
+    return found[0] if found else None
+
+
+def url_refusal_values(error_message: str) -> dict[str, str]:
+    """The host and the resolved address a URL-guard refusal named, if it did.
+
+    Read back from the same match that names the code, so the screen can put
+    them in its own sentence: the stored text is English whatever the language
+    of whoever reads the log.
+    """
+    found = _url_refusal_match(error_message)
+    if not found:
+        return {}
+    return {
+        name: value
+        for name, value in found[1].groupdict().items()
+        if name in ('host', 'resolved')
+    }
 
 
 def failure_cause(status_code: int | None, error_message: str | None) -> str | None:
@@ -120,6 +152,15 @@ def failure_cause(status_code: int | None, error_message: str | None) -> str | N
         if _CONNECTION_BROKEN_INFIX in error_message:
             return 'connection_broken'
     return url_refusal_code(error_message)
+
+
+def failure_cause_values(
+    status_code: int | None, error_message: str | None
+) -> dict[str, str]:
+    """What the sentence behind :func:`failure_cause` names that its code cannot."""
+    if not error_message or status_code is not None:
+        return {}
+    return url_refusal_values(error_message)
 
 
 class WebhookEndpointCreate(BaseModel):
@@ -232,10 +273,15 @@ class WebhookDeliveryResponse(BaseModel):
     #: Why the delivery got no answer, as a code the screen words itself in
     #: the reader's language; filled from the stored sentence on every read.
     error_cause: str | None = None
+    #: The host and the resolved address that cause names, for the sentence.
+    error_cause_values: dict[str, str] | None = None
 
     @model_validator(mode='after')
     def _name_the_cause(self) -> 'WebhookDeliveryResponse':
         self.error_cause = failure_cause(self.status_code, self.error_message)
+        self.error_cause_values = (
+            failure_cause_values(self.status_code, self.error_message) or None
+        )
         return self
 
 
@@ -257,8 +303,13 @@ class TestWebhookResponse(BaseModel):
     delivery_id: UUID
     #: Why the test got no answer, as a code the screen words itself.
     error_cause: str | None = None
+    #: The host and the resolved address that cause names, for the sentence.
+    error_cause_values: dict[str, str] | None = None
 
     @model_validator(mode='after')
     def _name_the_cause(self) -> 'TestWebhookResponse':
         self.error_cause = failure_cause(self.status_code, self.error)
+        self.error_cause_values = (
+            failure_cause_values(self.status_code, self.error) or None
+        )
         return self

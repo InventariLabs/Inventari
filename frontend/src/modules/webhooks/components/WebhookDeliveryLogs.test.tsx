@@ -114,6 +114,7 @@ describe("WebhookDeliveryLogs", () => {
       error_message:
         "This address (127.0.0.1) is not publicly routable or is reserved for protocol infrastructure, so the server refuses to call it.",
       error_cause: "url_private",
+      error_cause_values: { host: "127.0.0.1" },
     });
     renderLogs();
 
@@ -121,9 +122,27 @@ describe("WebhookDeliveryLogs", () => {
     fireEvent.click(await screen.findByText(/^item\.created$/));
 
     expect(
-      screen.getByText(/This address is not publicly routable/),
+      screen.getByText(
+        /This address \(127\.0\.0\.1\) is not publicly routable.*WEBHOOKS_ALLOW_PRIVATE_NETWORKS/,
+      ),
     ).toBeInTheDocument();
-    expect(screen.queryByText(/127\.0\.0\.1/)).not.toBeInTheDocument();
+  });
+
+  it("names the address a rebinding refusal resolved to", async () => {
+    mockDelivery({
+      status_code: null,
+      error_message: "stored english sentence",
+      error_cause: "url_rebinding",
+      error_cause_values: { host: "hook.example", resolved: "10.0.0.9" },
+    });
+    renderLogs();
+
+    // not-an-i18n-key
+    fireEvent.click(await screen.findByText(/^item\.created$/));
+
+    expect(
+      screen.getByText(/'hook\.example'.*\(10\.0\.0\.9\)/),
+    ).toBeInTheDocument();
   });
 
   it("gives a reason when the target refused with an empty body", async () => {

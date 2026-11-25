@@ -114,3 +114,31 @@ describe("the circuit-breaker banner in every plural form", () => {
     expect(bannerForms("fr")).toContain("circuitBreakerWarning_many");
   });
 });
+
+describe("the URL refusals in the delivery log", () => {
+  const SLOTS: Array<[string, string[]]> = [
+    ["urlLoopback", ["{{host}}"]],
+    ["urlPrivate", ["{{host}}"]],
+    ["urlUnresolved", ["{{host}}"]],
+    ["urlRebinding", ["{{host}}", "{{resolved}}"]],
+  ];
+  const ALL: Array<[string, Bundle]> = [["en", en], ...OTHER_LANGUAGES];
+
+  it.each(ALL)(
+    "%s names the host, the address and the setting",
+    (_l, bundle) => {
+      for (const [key, slots] of SLOTS) {
+        const text = read(bundle, `delivery.cause.${key}`) as string;
+        for (const slot of slots) expect(text, key).toContain(slot);
+        expect(text, key).toContain("WEBHOOKS_ALLOW_PRIVATE_NETWORKS");
+      }
+    },
+  );
+
+  it("words pt the Brazilian way, as the rest of the bundle does", () => {
+    for (const key of CAUSE_KEYS) {
+      const text = read(pt, key) as string;
+      expect(text, key).not.toMatch(/\bgere\b|Introduza|tem de /);
+    }
+  });
+});

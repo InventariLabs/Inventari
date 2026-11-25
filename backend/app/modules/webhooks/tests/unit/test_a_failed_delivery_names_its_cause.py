@@ -147,3 +147,51 @@ def test_an_unresolved_name_and_a_rebinding_name_are_recognised() -> None:
         )
         assert 'hook.example' in sentence
         assert schemas.failure_cause(None, sentence) == code
+
+
+def test_a_url_refusal_hands_the_screen_the_values_its_sentence_names() -> None:
+    """The host and the resolved address come back out of the stored sentence."""
+    from app.core.ssrf_guard import WebhookUrlRejectedError
+    from app.modules.webhooks._webhook_delivery import _url_refusal_sentence
+
+    sentence = _url_refusal_sentence(
+        WebhookUrlRejectedError('rebinding', host='hook.example', resolved='10.0.0.9')
+    )
+    assert schemas.failure_cause_values(None, sentence) == {
+        'host': 'hook.example',
+        'resolved': '10.0.0.9',
+    }
+    assert schemas.failure_cause_values(None, 'Timeout after 10s') == {}
+
+
+def test_a_delivery_response_carries_the_values_of_its_cause() -> None:
+    from datetime import UTC, datetime
+    from uuid import uuid4
+
+    from app.core.ssrf_guard import WebhookUrlRejectedError
+    from app.modules.webhooks._webhook_delivery import _url_refusal_sentence
+
+    sentence = _url_refusal_sentence(
+        WebhookUrlRejectedError('private', host='10.0.0.5')
+    )
+    delivery = schemas.WebhookDeliveryResponse(
+        id=uuid4(),
+        event_type='item.created',
+        payload_json={},
+        status_code=None,
+        response_body=None,
+        error_message=sentence,
+        attempt_number=1,
+        delivery_status='failed',
+        created_at=datetime.now(UTC),
+    )
+    assert delivery.error_cause == 'url_private'
+    assert delivery.error_cause_values == {'host': '10.0.0.5'}
+
+    result = schemas.TestWebhookResponse(
+        success=False,
+        status_code=None,
+        error=sentence,
+        delivery_id=uuid4(),
+    )
+    assert result.error_cause_values == {'host': '10.0.0.5'}
