@@ -2,6 +2,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { itemsApi } from "@/lib/api/items";
+import { showExportProgress } from "@/modules/shared/lib/exportProgress";
 import { extractApiError } from "@/lib/errors";
 import {
   useDeleteItem,
@@ -167,10 +168,7 @@ export function useItemsPageActions({
       toast.loading(t("common:actions.exporting"), { id: "items-export" });
       const blob = await itemsApi.exportXlsx(
         exportParamsRef.current,
-        ({ percent }) =>
-          toast.loading(t("common:actions.exportPreparing", { percent }), {
-            id: "items-export",
-          }),
+        showExportProgress(t, "items-export"),
       );
       const storageName = storages?.find((s) => s.id === storageFilter)?.name;
       downloadBlob(
