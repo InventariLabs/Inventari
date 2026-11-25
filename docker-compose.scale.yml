@@ -21,6 +21,7 @@ services:
       postgres
       -c max_connections=200
       -c jit=off
+      -c plan_cache_mode=force_custom_plan
       -c shared_buffers=512MB
       -c effective_cache_size=2GB
       -c maintenance_work_mem=128MB
