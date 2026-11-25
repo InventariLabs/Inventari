@@ -200,6 +200,58 @@ class TestGetPluralErrorMessage:
             == expected
         )
 
+    @pytest.mark.parametrize(
+        ('lang', 'singular_advice', 'plural_advice'),
+        [
+            ('en', 'ask for the permission', 'ask for these permissions'),
+            ('pl', 'poproś o to uprawnienie', 'poproś o te uprawnienia'),
+            (
+                'de',
+                'fordern Sie die Berechtigung an',
+                'fordern Sie diese Berechtigungen an',
+            ),
+            ('fr', 'demandez la permission', 'demandez ces permissions'),
+            ('es', 'solicita el permiso', 'solicita esos permisos'),
+            ('pt', 'peça a permissão', 'peça essas permissões'),
+        ],
+    )
+    def test_the_import_refusal_agrees_with_its_count_to_the_end(
+        self, lang, singular_advice, plural_advice
+    ):
+        """Two missing permissions are asked for as two, and one permission
+        is one toggle to turn off, not several."""
+        two = get_plural_error_message(
+            'import_create_forbidden',
+            2,
+            lang,
+            permissions='categories:write, locations:write',
+        )
+        one = get_plural_error_message(
+            'import_create_forbidden', 1, lang, permissions='locations:write'
+        )
+
+        assert two.endswith(plural_advice)
+        assert singular_advice not in two
+        assert one.endswith(singular_advice)
+
+    @pytest.mark.parametrize(
+        ('lang', 'one_toggle'),
+        [
+            ('en', 'Turn off the matching toggle in the import dialog'),
+            ('pl', 'Wyłącz odpowiedni przełącznik w oknie importu'),
+            ('de', 'Deaktivieren Sie den entsprechenden Schalter im Importdialog'),
+            ('fr', "Désactivez l'interrupteur correspondant dans la boîte d'import"),
+            ('es', 'Desactiva el interruptor correspondiente en el diálogo'),
+            ('pt', 'Desative a opção correspondente na janela de importação'),
+        ],
+    )
+    def test_one_permission_names_one_toggle(self, lang, one_toggle):
+        one = get_plural_error_message(
+            'import_create_forbidden', 1, lang, permissions='locations:write'
+        )
+
+        assert one_toggle in one
+
     def test_a_language_without_plural_forms_keeps_the_single_sentence(self):
         assert (
             get_plural_error_message(
@@ -329,3 +381,43 @@ class TestTheAttestationRefusalsExistInEveryCatalog:
                 value = get_error_message(key, lang)
                 assert value != key, (lang, key)
                 assert ' ' in value and value.endswith('.'), (lang, key, value)
+
+
+class TestTheCatalogueSpeaksLikeTheScreens:
+    """A refusal uses the words of the screen it is read on."""
+
+    @pytest.mark.parametrize(
+        'key',
+        [
+            'documents_approval_workflow_missing',
+            'po_approval_workflow_missing',
+            'document_rework_wrong_status',
+            'stock_take_tolerance_not_allowed',
+        ],
+    )
+    def test_german_names_an_approval_the_way_its_screens_do(self, key):
+        """The German screens of every approval workflow say Genehmigung."""
+        message = get_error_message(key, 'de', status='CONFIRMED')
+
+        assert 'genehmig' in message.lower()
+        assert 'freigabe' not in message.lower()
+
+    def test_an_account_waiting_for_activation_keeps_its_own_word(self):
+        """Activating an account is not an approval workflow."""
+        assert 'Freigabe' in get_error_message('user_inactive', 'de')
+
+    @pytest.mark.parametrize(
+        ('lang', 'module'),
+        [
+            ('en', 'warehouse'),
+            ('pl', 'Magazyn'),
+            ('de', 'Lager'),
+            ('es', 'Almacén'),
+            ('fr', 'Entrepôt'),
+            ('pt', 'armazém'),
+        ],
+    )
+    def test_a_document_template_belongs_to_the_module_the_launcher_names(
+        self, lang, module
+    ):
+        assert module in get_error_message('document_template_wrong_module', lang)

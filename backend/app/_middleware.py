@@ -6,6 +6,7 @@ event-loop binding issues that BaseHTTPMiddleware exhibits with async SQLAlchemy
 and asyncpg connections.
 """
 
+import json
 import re
 import time
 from collections.abc import MutableMapping
@@ -17,7 +18,12 @@ from app.core._request_id import generate_request_id, request_id_var
 from app.core.contracts import API_KEY_HEADER, API_KEY_PREFIX
 from app.core.datetimes import set_request_country
 from app.core.performance import get_performance_stats, reset_query_count
-from app.i18n.service import get_language_from_accept_header, set_current_lang
+from app.i18n.service import (
+    get_current_lang,
+    get_error_message,
+    get_language_from_accept_header,
+    set_current_lang,
+)
 
 
 def _get_settings():
@@ -66,7 +72,7 @@ class BodySizeLimitMiddleware:
             return await self.app(scope, receive, send)
 
         if self._declares_more_than(scope, limit):
-            return await self._reject(send, scope)
+            return await self._reject(send, scope, limit)
 
         return await self._count_while_reading(scope, receive, send, limit)
 
@@ -102,7 +108,7 @@ class BodySizeLimitMiddleware:
                 if received > limit:
                     refused = True
                     if not response_started:
-                        await self._reject(send, scope)
+                        await self._reject(send, scope, limit)
                     # The body ended here as far as the application is
                     # concerned. It will unwind on its own; whatever it says
                     # about it goes nowhere, because the answer is already
@@ -131,13 +137,34 @@ class BodySizeLimitMiddleware:
                 raise
             return None
 
-    async def _reject(self, send: Send, scope: Scope) -> None:
+    async def _reject(self, send: Send, scope: Scope, limit: int) -> None:
+        """Answer the coded envelope every other refusal carries.
+
+        Written here, not raised, so no exception handler shapes it: the
+        envelope is built by hand, in the request's language, which
+        ``LanguageMiddleware`` (outside this one) has already set.
+        """
+        from app.core.exceptions import rejection_code
+        from app.core.upload_validation import format_size_limit
+
         _logger().warning(
             'Request body over the limit rejected: %s %s',
             scope.get('method', '?'),
             scope.get('path', '?'),
         )
-        body = b'{"detail":"Request body too large"}'
+        lang = get_current_lang()
+        key = 'request_body_too_large'
+        body = json.dumps(
+            {
+                'detail': {
+                    'code': rejection_code(key),
+                    'message': get_error_message(
+                        key, lang, limit=format_size_limit(limit)
+                    ),
+                    'lang': lang,
+                }
+            }
+        ).encode()
         await send(
             {
                 'type': 'http.response.start',

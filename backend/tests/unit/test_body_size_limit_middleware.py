@@ -114,7 +114,8 @@ class TestBodySizeLimit:
         response = await client.post('/echo', content=b'x' * (LIMIT + 1))
 
         assert response.status_code == 413
-        assert 'too large' in response.json()['detail'].lower()
+        assert response.json()['detail']['code'] == 'REQUEST_BODY_TOO_LARGE'
+        assert 'too large' in response.json()['detail']['message'].lower()
 
     @pytest.mark.asyncio
     async def test_body_exactly_at_the_limit_passes(self, client):

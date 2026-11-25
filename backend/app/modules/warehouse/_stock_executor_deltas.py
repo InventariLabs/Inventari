@@ -491,12 +491,14 @@ async def execute_adjustment(
         new_qty = old_qty + delta
 
         if new_qty < 0:
+            # Named and stated as the correction above names them: the person
+            # at the shelf knows the product, not its record id.
             raise ServiceRejectionError(
                 'document_adjustment_would_go_negative',
-                item=line.item_id,
-                current=old_qty,
-                delta=delta,
-                result=new_qty,
+                item=line.name or item.name or f'#{line.line_number}',
+                current=stated_quantity(old_qty),
+                delta=stated_quantity(delta),
+                result=stated_quantity(new_qty),
             )
         # See the correction above: the line's batch, else the record's own.
         lot_id = (

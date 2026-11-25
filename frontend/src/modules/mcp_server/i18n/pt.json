@@ -12,7 +12,8 @@
     "createKey": "Crie uma chave de API em Chaves de API e dê a ela a permissão Usar o endpoint MCP.",
     "createKeyNeedsAdmin": "Peça uma chave a um administrador da sua organização: ela é criada em Chaves de API, com a permissão Usar o endpoint MCP.",
     "pointClient": "Envie a chave no cabeçalho X-API-Key (ou como token Bearer) para o endereço acima.",
-    "allowHost": "Se esta instalação responde em um endereço público, adicione o host dela aos hosts permitidos nas configurações do módulo."
+    "allowHost": "Se esta instalação responde em um endereço público, adicione o host dela aos hosts permitidos nas configurações do módulo.",
+    "allowHostNeedsAdmin": "Se esta instalação responde em um endereço público, peça a um administrador que adicione o host dela aos hosts permitidos nas configurações do módulo."
   },
   "links": {
     "apiKeys": "Chaves de API"

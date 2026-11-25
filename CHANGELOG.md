@@ -42,6 +42,35 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Refusals speak the reader's language and name what the reader knows. An
+  upload over the server's size limit is answered in the interface language,
+  with the limit, in the same envelope as every other refusal (code
+  `REQUEST_BODY_TOO_LARGE`), instead of a bare English "Request body too
+  large". An asset's attachment refused for its type, size or content says
+  so in the reader's language and names the kinds of file an asset takes or
+  its own 20 MB limit, never a MIME type, and answers with the status and code
+  a product's attachment does (415 `FILE_TYPE_NOT_ALLOWED`, 413
+  `FILE_TOO_LARGE`, 400 `FILE_SIGNATURE_MISMATCH`) instead of 400
+  `VALIDATION_ERROR`. A stock adjustment that would go below zero names the
+  product, not its record id; building a production recipe from a culinary
+  one names the ingredient whose unit its stock cannot be read in; a stock
+  value statement whose chosen first day is on or before the ledger's first
+  day names the day a statement can start on. An ingredient or exclusion name
+  written only in characters with no Latin spelling is asked for one instead
+  of being called invisible. Tagging selected recipes says that one Apply adds
+  up to 20 tags and refuses more before sending, in the reader's language.
+  German approval refusals say *Genehmigung*, as the screens do; template
+  refusals call the warehouse module by its launcher name in every language;
+  and the import's refusal for missing permissions agrees with how many it
+  names to the end of the sentence.
+- The MCP endpoint answers arguments that break a tool's input schema with
+  `ARGUMENT_REQUIRED` or `ARGUMENT_INVALID`, naming the argument, its type and
+  its description, instead of the server library's validation text; every
+  refusal now starts with its code rather than with "Error executing tool
+  <name>:"; and a permission the key lacks is named the way the API key form
+  names it. The MCP Server page offers the module settings only to an
+  administrator, who alone can open them, and tells anyone else to ask one to
+  add the host.
 - Spreadsheet imports read numbers and dates the way the sheet's country
   writes them — products, opening stock, document lines, order lines and
   equipment alike. A decimal comma ("12,5"), thousands separated by a space or
@@ -185,6 +214,16 @@ says what the release does rather than what changed since them.
   run in progress was started, not the day it was created.
   *Cook a batch for stock*, opened again after an abandoned attempt, no longer
   draws the discarded production recipe while its lookup is still answering.
+- An instance hosting organizations of very different sizes — a demo beside a
+  warehouse of a hundred thousand products, or several companies on one
+  server — no longer reads the lists of its largest organization in 9 to 40
+  seconds. Behind PgBouncer, which shares one prepared statement among every
+  organization asking the same list, PostgreSQL planned that statement once
+  for any organization, sized for the average one. The database now plans
+  each read for the organization that asks (`plan_cache_mode` in the
+  database's command in `docker-compose.prod.yml`), and the same lists answer
+  in tens to hundreds of milliseconds. The upgrade restarts the database once,
+  as any change to its command does; there is nothing to do by hand.
 - The production runs list shows a run under way. Its *In progress* tab asked
   for a status the endpoint did not accept and answered "Failed to load
   production orders"; the filter accepts every status a run holds, so the tab
@@ -2530,9 +2569,9 @@ lists every public surface and the promise its class makes.
   the quantities the cost history holds against the shelves.
   On a 4-CPU, 8 GB server (the 7 EUR a month class) running the whole stack,
   with 100 000 products, 300 000 records and nearly a million stock
-  movements, the statistics answer in under a second and the heaviest
+  movements, the statistics answer in under two seconds and the heaviest
   reports, the stock reconciliation and stock and valuation as of a date, in
-  two to three and a half seconds ([the scale report](docs/SCALE_REPORT.md) has the
+  two to three seconds ([the scale report](docs/SCALE_REPORT.md) has the
   figures). The scheduled
   reconciliation does not repeat on every restart.
   The **Analytics** tab, which a small household can switch off, adds alerts

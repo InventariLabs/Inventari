@@ -13,6 +13,9 @@ export default function IndexPage() {
   // the link to an account that cannot open it sends the reader to a refusal
   // the page could have named instead.
   const canOpenApiKeys = useHasPermission("org:settings:write");
+  // The allowed hosts are set on the module settings screen, which is an
+  // administrator's (settingsAccess.ts): the same reasoning, another key.
+  const canOpenModuleSettings = useHasPermission("admin:access");
   // A client is configured with a whole address, not a path: the reader
   // copies this line into a command that cannot infer the origin.
   const endpoint = `${window.location.origin}${ENDPOINT_PATH}`;
@@ -51,7 +54,11 @@ export default function IndexPage() {
               : t("connect.createKeyNeedsAdmin")}
           </li>
           <li>{t("connect.pointClient")}</li>
-          <li>{t("connect.allowHost")}</li>
+          <li>
+            {canOpenModuleSettings
+              ? t("connect.allowHost")
+              : t("connect.allowHostNeedsAdmin")}
+          </li>
         </ol>
       </Card>
 
@@ -64,12 +71,14 @@ export default function IndexPage() {
             {t("links.apiKeys")}
           </Link>
         )}
-        <Link
-          to="/settings/modules/mcp_server"
-          className="text-sm font-medium text-primary-700 hover:underline"
-        >
-          {t("settings.open")}
-        </Link>
+        {canOpenModuleSettings && (
+          <Link
+            to="/settings/modules/mcp_server"
+            className="text-sm font-medium text-primary-700 hover:underline"
+          >
+            {t("settings.open")}
+          </Link>
+        )}
       </div>
     </div>
   );

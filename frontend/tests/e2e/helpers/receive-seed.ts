@@ -133,17 +133,19 @@ export class ReceivingSeed {
   /**
    * A business with a tax id: an organization whose country asks for the
    * partner's tax id before a document can be confirmed (PL, FR, ES) refuses
-   * a walk that names a partner without one.
+   * a walk that names a partner without one. A walk that exercises that
+   * refusal passes `withTaxId: false`.
    */
   async partner(
     label: string,
     type: "SUPPLIER" | "CUSTOMER",
+    { withTaxId = true }: { withTaxId?: boolean } = {},
   ): Promise<SeededPartner> {
     const name = `E2E-Recv-${label}-${this.uid}`;
     const partner = await this.api.createPartner(this.token, {
       name,
       type,
-      tax_id: `E2E-${this.uid}`.toUpperCase(),
+      ...(withTaxId ? { tax_id: `E2E-${this.uid}`.toUpperCase() } : {}),
     });
     return { id: partner.id, name };
   }

@@ -23,8 +23,9 @@ afterEach(() => {
 
 describe("MCP Server page", () => {
   it("names the module and links to its settings", () => {
-    // A key is made on a settings screen; this account may open it.
-    signInWith(["org:settings:write"]);
+    // A key is made on a settings screen and the allowed hosts on another;
+    // this account may open both.
+    signInWith(["org:settings:write", "admin:access"]);
     renderPage();
 
     expect(
@@ -68,10 +69,36 @@ describe("MCP Server page", () => {
     expect(
       screen.queryByRole("link", { name: "API Keys" }),
     ).not.toBeInTheDocument();
-    expect(screen.getByText(/Ask an administrator/)).toBeInTheDocument();
-    // The link the account can open stays.
     expect(
-      screen.getByRole("link", { name: "MCP Server settings" }),
-    ).toHaveAttribute("href", "/settings/modules/mcp_server");
+      screen.getByText(/Ask an administrator of your organization for a key/),
+    ).toBeInTheDocument();
+    // The module settings screen is an administrator's too
+    // (settingsAccess.ts): no link to its refusal, and the step that needs
+    // it names who takes it.
+    expect(
+      screen.queryByRole("link", { name: "MCP Server settings" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/ask an administrator to add its host/),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/public address, add its host/),
+    ).not.toBeInTheDocument();
+  });
+
+  it("offers the key screen without the settings link to whoever holds only the key permission", () => {
+    signInWith(["org:settings:write"]);
+    renderPage();
+
+    expect(screen.getByRole("link", { name: "API Keys" })).toHaveAttribute(
+      "href",
+      "/settings/api-keys",
+    );
+    expect(
+      screen.queryByRole("link", { name: "MCP Server settings" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/ask an administrator to add its host/),
+    ).toBeInTheDocument();
   });
 });

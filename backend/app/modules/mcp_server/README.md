@@ -140,6 +140,14 @@ The write tools need `items:write`; the read tools need `items:read` (and
 `locations:read` where they name shelves). A key without `mcp_server:use`
 cannot reach the endpoint at all.
 
+A refused call answers `isError` with one text of the shape `CODE: sentence`,
+the sentence in the request's language: a tool's own refusal
+(`ITEM_NOT_FOUND`, `LOCATION_REQUIRED`, …), `PERMISSION_REQUIRED` naming the
+permission the way the API key form does, and `ARGUMENT_REQUIRED` /
+`ARGUMENT_INVALID` for arguments that break the published input schema —
+each argument named with its type and its description from that schema, never
+the value that was sent (`_http._InventariServer`).
+
 ## Checking the module
 
 ```bash

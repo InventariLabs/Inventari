@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from app.core.module_sdk import ServiceRejectionError
 from app.modules.recipes.models import MealSlot
 
-from ._name_matching import match_key
+from ._name_matching import match_key, shows_a_character
 from ._schemas_io import ListedElsewhere
 
 # === MealPlanner ===
@@ -238,6 +238,8 @@ class ShoppingExclusionCreate(BaseModel):
         """
         name = value.strip()
         if not match_key(name):
+            if shows_a_character(name):
+                raise ServiceRejectionError('name_has_no_latin_form')
             raise ServiceRejectionError('shopping_exclusion_name_has_no_key')
         return name
 
