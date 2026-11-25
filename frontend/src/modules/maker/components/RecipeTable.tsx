@@ -13,6 +13,7 @@ import { formatMoney } from "@/utils/formatters";
 import { formatQuantityLocalized } from "@/lib/i18nHelpers";
 import { formatDate } from "@/utils/helpers";
 import type { RecipeCatalogItem } from "@/modules/maker/types/maker";
+import { productUnderName } from "@/modules/maker/lib/productUnderName";
 
 interface RecipeTableProps {
   recipes: RecipeCatalogItem[];
@@ -94,6 +95,7 @@ export function RecipeTable({ recipes, sort, onProduce }: RecipeTableProps) {
                   ? Number(recipe.result)
                   : null;
               const hasIngredients = recipe.ingredient_count > 0;
+              const product = productUnderName(recipe);
               return (
                 <tr
                   key={recipe.id}
@@ -130,9 +132,9 @@ export function RecipeTable({ recipes, sort, onProduce }: RecipeTableProps) {
                         </span>
                       )}
                     </div>
-                    {recipe.output_template_name && (
+                    {product && (
                       <span className="block text-xs text-on-muted truncate max-w-[260px]">
-                        {recipe.output_template_name}
+                        {product}
                       </span>
                     )}
                   </td>
