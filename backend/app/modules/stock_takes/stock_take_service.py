@@ -34,7 +34,7 @@ from app.core.exceptions import (
 )
 from app.core.module_sdk import effective_expiry
 from app.core.public_api import core_api
-from app.i18n.service import get_current_lang, get_error_message
+from app.i18n.service import get_current_lang, get_plural_error_message
 from app.modules.warehouse.warehouse_api import warehouse_api
 
 # Re-export CRUD/query helpers so existing callers (router) are unaffected.
@@ -199,8 +199,11 @@ async def _refuse_if_the_stock_moved(
     await db.flush()
     raise ConflictException(
         code='STOCK_TAKE_STOCK_MOVED',
-        message=get_error_message(
-            'stock_take_stock_moved', get_current_lang(), count=len(moved)
+        message=get_plural_error_message(
+            'stock_take_stock_moved',
+            len(moved),
+            get_current_lang(),
+            count=len(moved),
         ),
         details={'moved_items': moved},
     )
@@ -920,8 +923,9 @@ async def _refuse_a_count_that_cannot_be_posted(
     if awaiting:
         raise ConflictException(
             code='STOCK_TAKE_AWAITING_RECOUNT',
-            message=get_error_message(
+            message=get_plural_error_message(
                 'stock_take_awaiting_recount',
+                len(awaiting),
                 get_current_lang(),
                 count=len(awaiting),
             ),
@@ -948,8 +952,9 @@ async def _refuse_a_count_that_cannot_be_posted(
     if unexplained:
         raise ConflictException(
             code='STOCK_TAKE_TOLERANCE_REASON_MISSING',
-            message=get_error_message(
+            message=get_plural_error_message(
                 'stock_take_tolerance_reason_missing',
+                len(unexplained),
                 get_current_lang(),
                 count=len(unexplained),
             ),
@@ -958,8 +963,9 @@ async def _refuse_a_count_that_cannot_be_posted(
     if over_tolerance and not complete_data.force_over_tolerance:
         raise ConflictException(
             code='STOCK_TAKE_OVER_TOLERANCE',
-            message=get_error_message(
+            message=get_plural_error_message(
                 'stock_take_over_tolerance',
+                len(over_tolerance),
                 get_current_lang(),
                 count=len(over_tolerance),
             ),
@@ -973,8 +979,11 @@ async def _refuse_a_count_that_cannot_be_posted(
     if over_cap and not complete_data.force_over_cap:
         raise ConflictException(
             code='STOCK_TAKE_OVER_CAP',
-            message=get_error_message(
-                'stock_take_over_cap', get_current_lang(), count=len(over_cap)
+            message=get_plural_error_message(
+                'stock_take_over_cap',
+                len(over_cap),
+                get_current_lang(),
+                count=len(over_cap),
             ),
             details={'over_cap_items': over_cap},
         )
@@ -1027,7 +1036,9 @@ async def finalize_stock_take(
     # item must be counted before finalize. Partial counts (and cycle
     # counts, which set the flag to False) close without the gate.
     if locked_stock_take.require_full_count and uncounted > 0:
-        raise catalogue_refusal('stock_take_uncounted_items', count=uncounted)
+        raise catalogue_refusal(
+            'stock_take_uncounted_items', plural=uncounted, count=uncounted
+        )
 
     items_result = await db.execute(
         select(StockTakeItem).where(StockTakeItem.stock_take_id == locked_stock_take.id)

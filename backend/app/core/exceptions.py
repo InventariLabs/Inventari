@@ -474,6 +474,7 @@ def catalogue_refusal(
     *,
     field: str | None = None,
     lang: Language | None = None,
+    plural: int | None = None,
     **kwargs: Any,
 ) -> ValidationException:
     """The 400 for the refusal catalogued under *key*, raised where it is decided.
@@ -490,13 +491,20 @@ def catalogue_refusal(
     *field* names the request field the refusal is about, and fills a
     ``{field}`` in the sentence too — the same name in both places; *lang*
     overrides the request language (a sign-up answers in the language it
-    chose); the other keyword arguments fill the sentence's placeholders.
+    chose); *plural* is the number a counted noun in the sentence agrees with
+    (see :func:`get_plural_error_message`); the other keyword arguments fill
+    the sentence's placeholders.
     """
     lang = lang or get_current_lang()
     if field is not None:
         kwargs.setdefault('field', field)
+    sentence = (
+        get_error_message(key, lang, **kwargs)
+        if plural is None
+        else get_plural_error_message(key, plural, lang, **kwargs)
+    )
     return ValidationException(
-        get_error_message(key, lang, **kwargs),
+        sentence,
         field=field,
         extra={'lang': lang},
         code=rejection_code(key),

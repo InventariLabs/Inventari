@@ -226,6 +226,71 @@ class TestGetPluralErrorMessage:
         ), caplog.records
 
 
+class TestPolishCountedRefusalsAgreeWithTheirCount:
+    """A Polish refusal that counts things inflects the noun for every count.
+
+    "przez 1 miejsc" is the one sentence these keys used to carry; Polish needs
+    a form for one, for two to four and for the rest.
+    """
+
+    @pytest.mark.parametrize(
+        ('key', 'count', 'expected'),
+        [
+            ('storage_type_in_use', 1, 'przez 1 miejsce'),
+            ('storage_type_in_use', 3, 'przez 3 miejsca'),
+            ('storage_type_in_use', 5, 'przez 5 miejsc'),
+            ('template_in_use_by_items', 1, 'używa go 1 produkt'),
+            ('template_in_use_by_items', 2, 'używa go 2 produkty'),
+            ('template_in_use_by_items', 12, 'używa go 12 produktów'),
+            ('storage_archive_blocked_by_items', 1, 'przechowywany jest tu 1 produkt.'),
+            ('storage_archive_blocked_by_items', 4, 'przechowywane są tu 4 produkty.'),
+            (
+                'storage_archive_blocked_by_items',
+                7,
+                'przechowywanych jest tu 7 produktów.',
+            ),
+            ('stock_take_uncounted_items', 1, 'Pozostała 1 niepoliczona pozycja'),
+            ('stock_take_uncounted_items', 3, 'Pozostały 3 niepoliczone pozycje'),
+            ('stock_take_uncounted_items', 8, 'Pozostało 8 niepoliczonych pozycji'),
+            ('stock_take_over_cap', 1, 'W 1 pozycji policzona'),
+            ('stock_take_over_cap', 2, 'W 2 pozycjach policzona'),
+            ('stock_take_stock_moved', 1, 'W 1 pozycji stan'),
+            ('stock_take_stock_moved', 6, 'W 6 pozycjach stan'),
+            (
+                'partner_delete_open_purchase_orders',
+                1,
+                '1 otwarte zamówienie zakupowe odwołuje się',
+            ),
+            (
+                'partner_delete_open_purchase_orders',
+                2,
+                '2 otwarte zamówienia zakupowe odwołują się',
+            ),
+            (
+                'partner_delete_open_purchase_orders',
+                9,
+                '9 otwartych zamówień zakupowych odwołuje się',
+            ),
+            ('storage_delete_blocked_by_movements', 1, '1 ruch magazynowy'),
+            ('storage_delete_blocked_by_movements', 2, '2 ruchy magazynowe'),
+            ('storage_delete_blocked_by_movements', 5, '5 ruchów magazynowych'),
+        ],
+    )
+    def test_the_noun_takes_the_form_of_its_count(self, key, count, expected):
+        message = get_plural_error_message(key, count, 'pl', count=count)
+        assert expected in message
+
+    def test_a_polish_quotation_closes_with_a_curly_quote(self):
+        for key in (
+            'approval_stage_unsolvable',
+            'approval_stage_open_unsolvable',
+            'storage_name_collision',
+        ):
+            message = get_error_message(key, 'pl', label='Etap', name='Półka')
+            assert '„' in message
+            assert '"' not in message
+
+
 class TestGetLanguageFromAcceptHeader:
     """Tests for get_language_from_accept_header function."""
 
