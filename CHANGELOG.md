@@ -35,6 +35,10 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The production list reads a reversed run on the day it was made rather than
+  the day it was created, and the recipe catalog no longer announces a
+  newest-first or oldest-first order on its Last produced column, which the
+  catalog does not follow.
 - The production list reads a cancelled run on the day it was planned for, or
   started, rather than the day it was created, and its Date column no longer
   announces a newest-first or oldest-first order that the days it shows do not
