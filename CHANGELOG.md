@@ -60,6 +60,12 @@ says what the release does rather than what changed since them.
   server error, an opened amount sent without its unit reads in the
   record's own unit, and the recipe price placeholder follows the reader's
   decimal mark.
+- On a phone, the *Type a code* sheet over the running scanner answers to
+  touch: its field, *Scan*, *Close* and the backdrop take a press, where only
+  a keyboard reached them before. The *⋯* menu of a warehouse document and of
+  a purchase order names its record ("More actions for PO/2026/001") instead
+  of reading the same on every row, and closing an untouched edit of an
+  existing draft no longer asks whether to discard the document.
 - Polish wording and the shape of numbers read right. A refusal that counts
   things names them in the right form for one, two to four and five or more
   (a location type used by 1 location, a template used by 3 products, a stock
@@ -305,6 +311,11 @@ says what the release does rather than what changed since them.
 - An equipment protocol copy that no longer matches its built-in layout can be
   reset to it from the Templates screen, as a warehouse document template
   already could.
+- A purchase order template copy that no longer matches its built-in layout is
+  marked as changed or outdated on the Templates screen, and can be reset to
+  the built-in or have the current built-in copied alongside it — also when
+  the copy was made in another language than the one the screen is read in,
+  on the equipment Templates screen too.
 
 ### Changed
 

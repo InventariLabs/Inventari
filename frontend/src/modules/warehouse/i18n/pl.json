@@ -235,6 +235,7 @@
     "duplicateError": "Nie udało się zduplikować dokumentu",
     "applyCorrection": "Zastosuj korektę",
     "moreActions": "Więcej akcji",
+    "moreActionsFor": "Więcej akcji dla {{number}}",
     "execute": "Realizuj",
     "executeReceive": "Przyjmij na stan",
     "executePick": "Skompletuj pozycje",

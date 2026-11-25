@@ -176,3 +176,89 @@ describe("PurchaseOrdersTemplatesPage — editing, deleting and seeding", () => 
     expect(await screen.findByText("Supplier copy")).toBeInTheDocument();
   });
 });
+
+/**
+ * A copy that no longer matches its built-in says so and offers the way
+ * back: Reset asks first, calls the reset door once and clears the mark;
+ * "copy the current built-in alongside" calls the refresh door for an outdated copy.
+ */
+describe("PurchaseOrdersTemplatesPage — a copy against its built-in", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    deleted = [];
+    seeded = 0;
+  });
+
+  it("marks a changed copy, asks before resetting it, and clears the mark", async () => {
+    let reset = false;
+    const resets = vi.fn();
+    server.use(
+      http.get("*/api/v1/purchase-orders/templates", () =>
+        HttpResponse.json(
+          onePage([
+            {
+              ...TEMPLATE,
+              source_builtin: "Standard Purchase Order",
+              source_modified: !reset,
+            },
+          ]),
+        ),
+      ),
+      http.post("*/api/v1/purchase-orders/templates/tpl-1/reset", () => {
+        reset = true;
+        resets();
+        return HttpResponse.json({ ...TEMPLATE, source_modified: false });
+      }),
+    );
+    const user = userEvent.setup();
+    render(<PageHost />);
+
+    await screen.findByTestId("template-modified-badge");
+    await user.click(
+      screen.getByRole("button", { name: /reset to built-in/i }),
+    );
+    const dialog = await screen.findByRole("alertdialog");
+    expect(resets).not.toHaveBeenCalled();
+    await user.click(within(dialog).getByRole("button", { name: "Reset" }));
+
+    await waitFor(() => expect(resets).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(
+        screen.queryByTestId("template-modified-badge"),
+      ).not.toBeInTheDocument(),
+    );
+  });
+
+  it("copies the current built-in beside an outdated copy", async () => {
+    const refreshes = vi.fn();
+    server.use(
+      http.get("*/api/v1/purchase-orders/templates", () =>
+        HttpResponse.json(
+          onePage([
+            {
+              ...TEMPLATE,
+              source_builtin: "Standard Purchase Order",
+              source_outdated: true,
+            },
+          ]),
+        ),
+      ),
+      http.post("*/api/v1/purchase-orders/templates/tpl-1/refresh-copy", () => {
+        refreshes();
+        return HttpResponse.json(
+          { ...TEMPLATE, id: "tpl-2", name: "Standard Purchase Order (2)" },
+          { status: 201 },
+        );
+      }),
+    );
+    const user = userEvent.setup();
+    render(<PageHost />);
+
+    await user.click(
+      await screen.findByRole("button", {
+        name: /copy the current built-in alongside/i,
+      }),
+    );
+    await waitFor(() => expect(refreshes).toHaveBeenCalledTimes(1));
+  });
+});

@@ -205,6 +205,7 @@
     "duplicateError": "Error al duplicar el documento",
     "applyCorrection": "Aplicar corrección",
     "moreActions": "Más acciones",
+    "moreActionsFor": "Más acciones para {{number}}",
     "execute": "Ejecutar",
     "executeReceive": "Recibir existencias",
     "executePick": "Preparar artículos",
