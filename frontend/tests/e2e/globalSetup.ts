@@ -110,6 +110,17 @@ async function globalSetup() {
     const existingPartners = await api.listPartners(token, "limit=1000");
     for (const p of existingPartners) {
       if (p.name.startsWith("E2E-") || p.name.startsWith("Z_Test ")) {
+        // The API refuses to delete a partner an open order still names, and
+        // deletes no order: cancelling the order is what lets the partner go.
+        const openOrders = await api.listPurchaseOrders(
+          token,
+          `partner_id=${p.id}&limit=200`,
+        );
+        for (const po of openOrders) {
+          if (po.status !== "CANCELLED" && po.status !== "COMPLETED") {
+            await api.cancelPurchaseOrder(token, po.id).catch(() => {});
+          }
+        }
         await api.deletePartner(token, p.id).catch(() => {});
       }
     }

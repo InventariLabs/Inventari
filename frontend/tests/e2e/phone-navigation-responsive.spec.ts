@@ -47,7 +47,8 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
   /**
    * A confirmed order with one open line, for the receipt to wait for. An
    * order cannot be deleted once confirmed, so its supplier and goods carry
-   * the `E2E-` prefix that the suite's global setup removes at the next run.
+   * the `E2E-` prefix; the suite's global setup cancels the order and removes
+   * the supplier at the next run.
    */
   async function seedConfirmedOrder() {
     const supplier = await api.createPartner(token, {
