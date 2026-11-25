@@ -13,15 +13,16 @@ from typing import TYPE_CHECKING
 
 from app.modules.shopping_lists.shopping_lists_api import shopping_lists_api
 
+from ._shopping_rule import GoodsKey, goods_key
 from .schemas import ListedElsewhere
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Mapping
     from uuid import UUID
 
     from sqlalchemy.ext.asyncio import AsyncSession
 
-    from app.core.contracts import ShoppingListItemCreateDTO
+    from app.core.contracts import ShoppingListItemCreateDTO, UomDTO
 
 
 async def lines_listed_elsewhere(
@@ -30,22 +31,25 @@ async def lines_listed_elsewhere(
     written: Iterable[ShoppingListItemCreateDTO],
     *,
     list_id: UUID,
+    uoms_by_id: Mapping[UUID, UomDTO],
 ) -> list[ListedElsewhere]:
     """The *written* lines that a list other than *list_id* still has to buy.
 
-    A line matches on name and unit, the key every door already uses to skip
-    what a list carries. A line ticked off elsewhere is bought and is no
-    overlap.
+    A line matches on name and on what its unit measures (``goods_key``), so
+    1 kg of flour here meets 300 g of it on another list. A line ticked off
+    elsewhere is bought and is no overlap.
     """
-    wanted = {(line.name.strip().lower(), line.uom_id): line.name for line in written}
+    wanted = {
+        goods_key(line.name, line.uom_id, uoms_by_id): line.name for line in written
+    }
     if not wanted:
         return []
     overlaps: list[ListedElsewhere] = []
-    seen: set[tuple[tuple[str, UUID | None], UUID]] = set()
+    seen: set[tuple[GoodsKey, UUID]] = set()
     for other, item in await shopping_lists_api.open_lines_async(
         db, org_id, exclude_list_id=list_id
     ):
-        key = (item.name.strip().lower(), item.uom_id)
+        key = goods_key(item.name, item.uom_id, uoms_by_id)
         if key not in wanted or (key, other.id) in seen:
             continue
         seen.add((key, other.id))
