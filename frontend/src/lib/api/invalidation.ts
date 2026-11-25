@@ -57,6 +57,13 @@ export const invalidation = {
     queryClient.invalidateQueries({
       queryKey: queryKeys.productTemplates.count,
     });
+    // The product page's "In all locations" total is read per template
+    // (`["product-templates", id, "stock"]`); any stock change makes it
+    // stale, and the mutation cannot say which template it touched.
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.productTemplates.all,
+      predicate: (query) => query.queryKey[2] === "stock",
+    });
     // The products list of a location is a separate key, and an item mutation
     // usually cannot say which location it touched — an edit may have moved
     // the product from one shelf to another, which makes two of them wrong.

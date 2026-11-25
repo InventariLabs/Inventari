@@ -57,8 +57,14 @@ from .test_two_scans_of_one_line import (
     _wait_until_parked,
 )
 
-_TODAY = date.today()
-_YESTERDAY = _TODAY - timedelta(days=1)
+
+def _today() -> date:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return date.today()
+
+
+def _yesterday() -> date:
+    return _today() - timedelta(days=1)
 
 
 @pytest.fixture
@@ -85,7 +91,7 @@ def _work_items(
     response = client.get(
         '/api/v1/warehouse/todo',
         headers=headers,
-        params={'date_to': _TODAY.isoformat(), 'limit': 50, **params},
+        params={'date_to': _today().isoformat(), 'limit': 50, **params},
     )
     assert response.status_code == status.HTTP_200_OK, response.text
     return cast(dict[str, Any], response.json()['work_items'])
@@ -145,7 +151,7 @@ def _confirmed_receipt_for(
             'type': 'IN',
             'partner_id': str(partner.id),
             'target_location_id': str(target.id),
-            'scheduled_date': _TODAY.isoformat(),
+            'scheduled_date': _today().isoformat(),
             'lines': [
                 {
                     'product_template_id': str(template.id),
@@ -179,11 +185,11 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
     ) -> None:
         late = _order(
             db_session, doc_org, doc_user, doc_partner, doc_template,
-            scheduled=_YESTERDAY,
+            scheduled=_yesterday(),
         )  # fmt: skip
         later = _order(
             db_session, doc_org, doc_user, doc_partner, doc_template,
-            scheduled=_TODAY + timedelta(days=3),
+            scheduled=_today() + timedelta(days=3),
         )  # fmt: skip
         run = ProductionOrder(
             organization_id=doc_org.id,
@@ -192,7 +198,7 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
             planned_qty=Decimal('4'),
             output_storage_location_id=doc_target_location.id,
             status='DRAFT',
-            production_date=_TODAY,
+            production_date=_today(),
         )
         due_count = CycleCountSchedule(
             organization_id=doc_org.id,
@@ -220,7 +226,7 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
         assert delivery['next_action'] == 'receive_delivery'
         assert delivery['state'] == 'todo'
         assert delivery['overdue'] is True
-        assert delivery['due_date'] == _YESTERDAY.isoformat()
+        assert delivery['due_date'] == _yesterday().isoformat()
         assert Decimal(delivery['count']) == 1
         # An order expected next week is not today's work.
         assert _task(section, f'purchase_order:{later.id}') is None
@@ -254,7 +260,7 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
     ) -> None:
         order = _order(
             db_session, doc_org, doc_user, doc_partner, doc_template,
-            scheduled=_TODAY,
+            scheduled=_today(),
         )  # fmt: skip
         receipt_id = _confirmed_receipt_for(
             client, doc_auth_headers, order, doc_partner, doc_target_location,
@@ -310,7 +316,7 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
     ) -> None:
         order = _order(
             db_session, doc_org, doc_user, doc_partner, doc_template,
-            scheduled=_TODAY,
+            scheduled=_today(),
         )  # fmt: skip
         receipt_id = _confirmed_receipt_for(
             client, doc_auth_headers, order, doc_partner, doc_target_location,
@@ -356,7 +362,7 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
     ) -> None:
         order = _order(
             db_session, doc_org, doc_user, doc_partner, doc_template,
-            scheduled=_TODAY,
+            scheduled=_today(),
         )  # fmt: skip
         receipt_id = _confirmed_receipt_for(
             client, doc_auth_headers, order, doc_partner, doc_target_location,
@@ -403,7 +409,7 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
     ) -> None:
         order = _order(
             db_session, doc_org, doc_user, doc_partner, doc_template,
-            scheduled=_TODAY,
+            scheduled=_today(),
         )  # fmt: skip
         receipt_id = _confirmed_receipt_for(
             client, doc_auth_headers, order, doc_partner, doc_target_location,
@@ -457,7 +463,7 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
     ) -> None:
         order = _order(
             db_session, doc_org, doc_user, doc_partner, doc_template,
-            scheduled=_TODAY,
+            scheduled=_today(),
         )  # fmt: skip
         run = ProductionOrder(
             organization_id=doc_org.id,
@@ -465,7 +471,7 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
             planned_qty=Decimal('1'),
             output_storage_location_id=doc_target_location.id,
             status='DRAFT',
-            production_date=_TODAY,
+            production_date=_today(),
         )
         db_session.add(run)
         db_session.commit()
@@ -489,7 +495,7 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
     ) -> None:
         order = _order(
             db_session, doc_org, doc_user, doc_partner, doc_template,
-            scheduled=_TODAY,
+            scheduled=_today(),
         )  # fmt: skip
         key = f'purchase_order:{order.id}'
         path = f'/api/v1/warehouse/work-items/purchase_order/{order.id}/assignee'
@@ -536,7 +542,7 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
         """
         order = _order(
             db_session, doc_org, doc_user, doc_partner, doc_template,
-            scheduled=_TODAY,
+            scheduled=_today(),
         )  # fmt: skip
         colleague = h.create_user(doc_org, email='colleague@example.com')
         key = f'purchase_order:{order.id}'
@@ -599,7 +605,7 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
         stranger = h.create_user(stranger_org, email='stranger@example.com')
         order = _order(
             db_session, doc_org, doc_user, doc_partner, doc_template,
-            scheduled=_TODAY,
+            scheduled=_today(),
         )  # fmt: skip
 
         response = client.put(
@@ -623,7 +629,7 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
             json={
                 'title': '  Move the rack  ',
                 'assignee_id': str(doc_user.id),
-                'due_date': _YESTERDAY.isoformat(),
+                'due_date': _yesterday().isoformat(),
             },
         )
         assert created.status_code == status.HTTP_201_CREATED, created.text
@@ -709,7 +715,7 @@ class TestTheTodoListIsBuiltFromWhatNeedsDoing:
         name; a raw kind and an id alone answer nobody reading it later."""
         order = _order(
             db_session, doc_org, doc_user, doc_partner, doc_template,
-            scheduled=_TODAY,
+            scheduled=_today(),
         )  # fmt: skip
         receipt_id = _confirmed_receipt_for(
             client,
@@ -984,7 +990,7 @@ class TestStateFollowsWhatHappensToTheSource:
             actual_qty=Decimal('5'),
             output_storage_location_id=doc_target_location.id,
             status='COMPLETED',
-            production_date=_TODAY,
+            production_date=_today(),
             completed_at=datetime.now(UTC),
         )
         dropped = ProductionOrder(
@@ -994,7 +1000,7 @@ class TestStateFollowsWhatHappensToTheSource:
             planned_qty=Decimal('1'),
             output_storage_location_id=doc_target_location.id,
             status='CANCELLED',
-            production_date=_TODAY,
+            production_date=_today(),
         )
         db_session.add_all([made, dropped])
         db_session.commit()
@@ -1022,7 +1028,7 @@ class TestStateFollowsWhatHappensToTheSource:
     ) -> None:
         order = _order(
             db_session, doc_org, doc_user, doc_partner, doc_template,
-            scheduled=_TODAY,
+            scheduled=_today(),
         )  # fmt: skip
         receipt_id = _confirmed_receipt_for(
             client, doc_auth_headers, order, doc_partner, doc_target_location,
@@ -1035,7 +1041,7 @@ class TestStateFollowsWhatHappensToTheSource:
             planned_qty=Decimal('1'),
             output_storage_location_id=doc_target_location.id,
             status='DRAFT',
-            production_date=_TODAY,
+            production_date=_today(),
         )
         db_session.add(other)
         document = db_session.get(Document, UUID(receipt_id))
@@ -1084,7 +1090,7 @@ class TestTheListCanBeNarrowedAndPagedOnTheServer:
                 organization_id=org.id,
                 source_kind='custom',
                 title='Mine and late',
-                due_date=_YESTERDAY,
+                due_date=_yesterday(),
                 assignee_id=user.id,
                 created_by=user.id,
             )
@@ -1129,9 +1135,9 @@ class TestTheListCanBeNarrowedAndPagedOnTheServer:
             )
             for title, due in [
                 ('A chore without a day', None),
-                ('Later this week', _TODAY + timedelta(days=3)),
-                ('Late', _YESTERDAY),
-                ('Today', _TODAY),
+                ('Later this week', _today() + timedelta(days=3)),
+                ('Late', _yesterday()),
+                ('Today', _today()),
             ]
         )
         db_session.commit()
@@ -1164,7 +1170,7 @@ class TestTheListCanBeNarrowedAndPagedOnTheServer:
         too_long = client.get(
             '/api/v1/warehouse/todo',
             headers=doc_auth_headers,
-            params={'date_to': _TODAY.isoformat(), 'work_limit': 1001},
+            params={'date_to': _today().isoformat(), 'work_limit': 1001},
         )
         assert too_long.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
@@ -1183,7 +1189,7 @@ class TestModulesOnByDefaultContributeTasks:
     ) -> None:
         order = _order(
             db_session, doc_org, doc_user, doc_partner, doc_template,
-            scheduled=_YESTERDAY,
+            scheduled=_yesterday(),
         )  # fmt: skip
         doc_org.enabled_modules = []
         db_session.commit()

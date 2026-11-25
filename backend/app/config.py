@@ -209,6 +209,12 @@ class Settings(BaseSettings):
     # See check_testing_mode_is_deliberate: TESTING with DEBUG off is refused
     # unless the operator says the combination is meant.
     TESTING_ACK_UNSAFE: bool = False
+    # Under TESTING the backend still gives the token blacklist its Redis, so a
+    # spent reset link or a signed-out session is refused as it is in a
+    # deployment and a browser spec can see it. The backend test suite turns it
+    # off (conftest.py): it enters the lifespan hundreds of times and installs
+    # its own fake store where a test needs one.
+    TESTING_TOKEN_REVOCATION: bool = True
     STRICT_STARTUP: bool = False
 
     # Logging

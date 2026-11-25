@@ -12,8 +12,101 @@ says what the release does rather than what changed since them.
 
 ## Unreleased
 
+### Added
+
+- Every release now publishes its container images — the backend, the
+  frontend and the backup sidecar — to the GitHub Container Registry, for amd64
+  and arm64, so a server or a Raspberry Pi can download the stack instead of
+  building it: one line in `.env` (`COMPOSE_FILE`) switches the production
+  commands to them (QUICK_DEPLOY.md, DEPLOYMENT.md), and the guides give that
+  route its own steps for an update, the way back from a failed one and a move
+  to a new server. It needs Docker Compose 2.24.4 or newer. The images carry
+  the release as shipped, so community modules, which are installed by a
+  rebuild, still need the build from source — `module install` and `module
+  upgrade` on the images say so instead of writing into a container that
+  forgets it, and DEPLOYMENT.md says how to leave the images for the build.
+  `make deploy`, `make backup-verify` and `make backup-status` follow the same
+  line: on the images they pull and recreate, and run the downloaded backup
+  image, instead of building it on the server.
+- `scripts/init-env.sh` writes the production `.env` in one command: it asks
+  for the domain and the e-mail address, generates the five secrets and the
+  encryption key, and never overwrites an existing file. The guides use it
+  instead of six `openssl` commands to paste by hand.
+- A warehouse that receives in one step now asks the home-location question
+  too. When a receipt is posted, one sheet lists each product whose line was
+  put on a location other than the suggested one and offers to make it the
+  product's home, with the same refusals and *Don't ask about this product
+  again* as a put-away. The *Each product has its own location* setting shows
+  for every warehouse, so one that keeps no fixed places can turn the question
+  off.
+
 ### Fixed
 
+- Spreadsheet imports read numbers and dates the way the sheet's country
+  writes them — products, opening stock, document lines, order lines and
+  equipment alike. A decimal comma ("12,5"), thousands separated by a space or
+  a dot, a currency symbol or code ("1 289,00 zł", "$1,289.00", "€ 4,50") are
+  numbers; a day-first date such as "05.11.2026" is 5 November, not 11 May. A
+  column of dates is read from the whole file (a day above 12 settles the
+  order), and a column that is ambiguous throughout follows the language of
+  the person importing: month-first for English, day-first for the others.
+  The mapping preview shows each date column as it will be stored. Document
+  lines and opening stock now refuse a date they cannot read, as the product
+  import does, instead of importing the row without it, and order lines
+  refuse an unreadable price or tax rate instead of dropping it.
+- *Rebuilding on a new server* (DEPLOYMENT.md) brings the backup back from the
+  off-host copy. It pulls `<BACKUP_RCLONE_REMOTE>/backups/last`, where the copy
+  puts the backups since that variable names the parent, and then gives the
+  pulled pair the `-latest` names *Putting a backup back* reads — the copy
+  sends files, not the links in `last/`. Followed as written, the step found
+  nothing at `<BACKUP_RCLONE_REMOTE>/last`, and the restore after it stopped
+  on a file that was not there.
+- Opening stock from a sheet keeps what the sheet says. A row in cartons or
+  litres founds its product in that unit instead of in pieces, so the draft
+  receipt opens; a row naming a unit an existing product cannot take is
+  refused with its row number instead of leaving a draft nobody can read; a
+  product founded from a row keeps the row's SKU and barcode; and the result
+  counts products found apart from products founded. A document whose line
+  unit stops converting to its product's stock unit still opens, with that
+  line marked for correction.
+- The production list reads a reversed run on the day it was made rather than
+  the day it was created, and the recipe catalog no longer announces a
+  newest-first or oldest-first order on its Last produced column, which the
+  catalog does not follow.
+- The production list reads a cancelled run on the day it was planned for, or
+  started, rather than the day it was created, and its Date column no longer
+  announces a newest-first or oldest-first order that the days it shows do not
+  follow.
+- An enabled module whose code fails to load after an update no longer answers
+  every one of its addresses with "Page not found": the application says that
+  part of it did not load and offers a reload.
+- A module's translation overrides take effect only in the namespace named
+  after the module; a key of another namespace needs the module to list it in
+  the new optional `adoptedI18nKeys` field (MODULES_GUIDE.md), and the
+  development console names an ignored key and a key two modules both override.
+- A failed webhook delivery explains itself in the reader's language — an
+  unreadable signing secret, a timeout, a refused or broken connection — and an
+  answer with an empty body says that it gave no reason. The two links in the
+  circuit-breaker banner share one colour.
+- The warning that a failed Test counts toward the circuit breaker is a line on
+  the Webhooks page, not a tooltip, so a phone and a keyboard see it.
+- On a phone, a module's settings page is named in the section picker instead
+  of reading "General".
+- A receiving session's line and completion summary read a typed count that
+  was raised as "2/1 pcs." and "2 of 1 received"; they now print what arrived,
+  as the closed receipt does. The all-locations total on a product page
+  follows a stock press without a reload, a product used up to zero no longer
+  offers *Remove 1 unit*, and the full Add Item page says where a catalogue
+  unit it fills in comes from. A scan's remembered location that has since
+  been deleted is dropped from the add form instead of leaving an empty-looking
+  field, and the counting search reads every page of a counted location.
+  Attention rows and a production order's ingredients name a shelf by its
+  path.
+- The form that records a delivery cost as a variance on a posted receipt marks
+  the amount and the reason as required, as it already did the day, and no
+  longer accepts a day after today. A recipe card that can be dragged stays a
+  link for a screen reader instead of announcing itself as a button that holds
+  other buttons.
 - Permissions now hold across the screens and doors that only half reached
   them. A completed shopping list refuses ticks, line edits and deletions from
   a stale tab, and a finished batch trace and its spreadsheet ask for the
@@ -102,6 +195,23 @@ says what the release does rather than what changed since them.
   database's command in `docker-compose.prod.yml`), and the same lists answer
   in tens to hundreds of milliseconds. The upgrade restarts the database once,
   as any change to its command does; there is nothing to do by hand.
+- The production runs list shows a run under way. Its *In progress* tab asked
+  for a status the endpoint did not accept and answered "Failed to load
+  production orders"; the filter accepts every status a run holds, so the tab
+  lists the runs being filled.
+- Brazilian Portuguese reads as Brazilian and is Portuguese all the way
+  through. Jar labels, the print queue, approval, equipment, purchase-order
+  and webhook notices, the purchase-order e-mail, the meal-plan shopping list,
+  the seeded receiving area and storage types, and printed dates no longer
+  fall back to English, and the catalogs say "recebimento", "configurações"
+  and "registros" instead of the European forms. The putaway rule editor's
+  pickers sit in one column, so their French and Portuguese placeholders are
+  no longer clipped.
+- A sheet that opens on a field to type in puts the cursor in that field, not
+  on its Close button: Type a code over the running scanner, and the forms
+  whose first field takes the typing at once — attaching a label to a
+  product, a stock threshold, a new category. On a phone the keyboard comes
+  up without a second tap.
 
 ### Added
 

@@ -68,7 +68,13 @@ export class ReceivingSeed {
     return { Authorization: `Bearer ${this.token}` };
   }
 
-  async product(label: string): Promise<SeededProduct> {
+  /**
+   * `fefo` makes it a product taken by earliest expiry, so a delivery of it
+   * must be dated. The strategy is written through the record that mints the
+   * card (the template takes no strategy of its own), so one unit is kept on a
+   * shelf apart from the one the walk receives onto.
+   */
+  async product(label: string, fefo = false): Promise<SeededProduct> {
     const name = `E2E-Recv-${label}-${this.uid}`;
     // Two draws of one seed never meet; two seeds meet once in a million.
     let barcode = uniqueEan13();
@@ -76,6 +82,24 @@ export class ReceivingSeed {
       barcode = this.nextBarcode(barcode);
     }
     this.barcodes.add(barcode);
+    if (fefo) {
+      const kept = await this.shelf(`${label}-kept`);
+      const created = await this.request.post("/api/v1/items", {
+        headers: this.auth(),
+        data: {
+          name,
+          barcode,
+          quantity: 1,
+          location_id: kept.id,
+          removal_strategy: "FEFO",
+        },
+      });
+      if (!created.ok()) {
+        throw new Error(`Could not seed ${name}: ${await created.text()}`);
+      }
+      const item = (await created.json()) as { template_id: string };
+      return { id: item.template_id, name, barcode };
+    }
     const template = await this.api.createProductTemplate(this.token, {
       name,
       barcode,
@@ -106,12 +130,21 @@ export class ReceivingSeed {
     return { id: created.id, name, code: body.short_code };
   }
 
+  /**
+   * A business with a tax id: an organization whose country asks for the
+   * partner's tax id before a document can be confirmed (PL, FR, ES) refuses
+   * a walk that names a partner without one.
+   */
   async partner(
     label: string,
     type: "SUPPLIER" | "CUSTOMER",
   ): Promise<SeededPartner> {
     const name = `E2E-Recv-${label}-${this.uid}`;
-    const partner = await this.api.createPartner(this.token, { name, type });
+    const partner = await this.api.createPartner(this.token, {
+      name,
+      type,
+      tax_id: `E2E-${this.uid}`.toUpperCase(),
+    });
     return { id: partner.id, name };
   }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { RecipeCard } from "./RecipeCard";
@@ -283,5 +283,53 @@ describe("RecipeCard ingredient coverage", () => {
     );
 
     expect(screen.queryByText(/in stock/)).toBeNull();
+  });
+});
+
+describe("RecipeCard when it can be dragged", () => {
+  it("stays a link around its own buttons, not a button holding them", () => {
+    render(
+      <MemoryRouter>
+        <RecipeCard
+          {...baseProps}
+          dragEnabled
+          canWrite
+          recipe={makeRecipe({ tags: ["vegan"] })}
+        />
+      </MemoryRouter>,
+    );
+
+    const card = screen.getByRole("link", { name: /Recipe 1/ });
+    expect(card).not.toHaveAttribute("role");
+    expect(card).toContainElement(
+      screen.getByRole("button", { name: "vegan" }),
+    );
+  });
+});
+
+describe("RecipeCard buttons inside the card link", () => {
+  it("keeps the browser from following the link when the star or a tag is pressed", () => {
+    const onToggleFavorite = vi.fn();
+    const onTagClick = vi.fn();
+    render(
+      <MemoryRouter>
+        <RecipeCard
+          {...baseProps}
+          recipe={makeRecipe({ tags: ["vegan"] })}
+          onToggleFavorite={onToggleFavorite}
+          onTagClick={onTagClick}
+        />
+      </MemoryRouter>,
+    );
+
+    // fireEvent.click returns false when a handler cancelled the default
+    // action — the navigation a click inside an anchor would otherwise start.
+    // The star is the first button on the card, ahead of the tag pills.
+    expect(fireEvent.click(screen.getAllByRole("button")[0])).toBe(false);
+    expect(onToggleFavorite).toHaveBeenCalledTimes(1);
+    expect(fireEvent.click(screen.getByRole("button", { name: "vegan" }))).toBe(
+      false,
+    );
+    expect(onTagClick).toHaveBeenCalledWith("vegan");
   });
 });

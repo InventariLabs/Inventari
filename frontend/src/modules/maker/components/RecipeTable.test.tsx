@@ -83,6 +83,22 @@ describe("RecipeTable — the row opens through a link", () => {
   });
 });
 
+describe("RecipeTable — the sort it announces", () => {
+  it("leaves the last-produced column unsorted, whichever date order is chosen", () => {
+    for (const sort of ["newest", "oldest"] as const) {
+      const { unmount } = render(
+        <MemoryRouter>
+          <RecipeTable recipes={[baseRecipe]} sort={sort} />
+        </MemoryRouter>,
+      );
+      expect(
+        screen.getByRole("columnheader", { name: "Last produced" }),
+      ).not.toHaveAttribute("aria-sort");
+      unmount();
+    }
+  });
+});
+
 describe("RecipeTable — the unit-cost column names its number", () => {
   it("shows the estimate a never-run recipe has, under its own label", () => {
     // The table kept printing a dash for every recipe without a run while

@@ -16,8 +16,6 @@ import { useResultTerms } from "@/modules/maker/hooks/useResultTerms";
 
 interface ProductionTableProps {
   orders: ProductionOrder[];
-  /** Ordering the list is in — reflected as `aria-sort` on the date column. */
-  sort: string;
   /** Absent for an account that may not write — the action is then not offered. */
   onDuplicate?: (orderId: string, event: React.MouseEvent) => void;
   isDuplicating: boolean;
@@ -32,7 +30,6 @@ interface ProductionTableProps {
  */
 export function ProductionTable({
   orders,
-  sort,
   onDuplicate,
   isDuplicating,
 }: ProductionTableProps) {
@@ -71,17 +68,7 @@ export function ProductionTable({
               >
                 {resultTerm.label}
               </th>
-              <th
-                scope="col"
-                className={headerClass}
-                aria-sort={
-                  sort === "newest"
-                    ? "descending"
-                    : sort === "oldest"
-                      ? "ascending"
-                      : undefined
-                }
-              >
+              <th scope="col" className={headerClass}>
                 {t("productionList.table.date")}
               </th>
               <th scope="col" className="px-3 py-2.5">

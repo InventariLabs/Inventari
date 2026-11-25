@@ -141,7 +141,8 @@ describe("useDocuments writes — the right call, then the right caches dropped"
     server.use(
       http.post("*/api/v1/warehouse/documents", ({ request }) => {
         keys.push(request.headers.get("Idempotency-Key"));
-        return answers++ === 0
+        // The first and the third answers are lost on the way back.
+        return [0, 2].includes(answers++)
           ? HttpResponse.error()
           : HttpResponse.json({ id: "doc-1" });
       }),
@@ -153,8 +154,9 @@ describe("useDocuments writes — the right call, then the right caches dropped"
     await act(() => result.current.mutateAsync({ data }).catch(() => null));
     await act(() => result.current.mutateAsync({ data }));
     // Answered: the same form saved again is a new draft, not a retry.
-    await act(() => result.current.mutateAsync({ data }));
-    // A changed form is a new draft whatever came before.
+    await act(() => result.current.mutateAsync({ data }).catch(() => null));
+    // Its answer is still owed, but the form changed: a new draft, not a
+    // retry that the server would answer with the draft of the old content.
     await act(() =>
       result.current.mutateAsync({ data: { type: "IN" } as never }),
     );

@@ -663,6 +663,58 @@ done
         assert '/backups/$FROM/uploads-latest.tar.gz.age' in guide
         assert '/backups/$FROM/inventari_db-latest.sql.gz.age' in guide
 
+    def test_the_rebuild_pulls_the_backups_from_where_the_offsite_copy_puts_them(
+        self,
+    ) -> None:
+        """``BACKUP_RCLONE_REMOTE`` names the parent; the backups sit under ``backups/``.
+
+        A rebuild that pulls ``<remote>/last`` finds nothing there and leaves
+        ``backups/restore/`` empty, on the day the off-host copy is all there is.
+        """
+        command = ' '.join(_compose()['db-backup-offsite']['command'])
+        guide = (_REPO_ROOT / 'DEPLOYMENT.md').read_text(encoding='utf-8')
+        pulls = re.findall(r'rclone/rclone:\S+ copy (\S+) /data', guide)
+
+        assert 'rclone sync /backups "$$BACKUP_RCLONE_REMOTE/backups"' in command
+        assert pulls
+        for source in pulls:
+            assert source.endswith('/backups/last'), source
+
+    def test_a_pair_pulled_from_the_offsite_copy_gets_the_names_the_put_back_reads(
+        self, tmp_path: Path
+    ) -> None:
+        """The pulled pair comes without its ``-latest`` links; the rebuild makes them.
+
+        *Putting a backup back* reads ``backups/$FROM/<name>-latest.*.age``. The
+        off-host copy sends files, not links, so the rebuild's step 5 runs its
+        own ``ln -s`` lines in ``backups/restore/`` — run here on such a pair.
+        """
+        words = ' '.join(_compose()['db-backup-offsite']['command']).split()
+        guide = (_REPO_ROOT / 'DEPLOYMENT.md').read_text(encoding='utf-8')
+        rebuild = guide.split('## Rebuilding on a new server', 1)[1]
+        step = re.search(r'^5\. .*?^6\. ', rebuild, flags=re.MULTILINE | re.DOTALL)
+        assert step
+        links = [
+            line.strip().removeprefix('sudo ')
+            for line in step.group(0).splitlines()
+            if line.strip().startswith('sudo ln ')
+        ]
+        reads = set(re.findall(r'/backups/\$FROM/(\S+-latest\.\S+?\.age)', guide))
+        restore = tmp_path / 'restore'
+        restore.mkdir()
+        (restore / 'inventari_db-20261125-020000.sql.gz.age').write_bytes(b'dump')
+        (restore / 'uploads-20261125-020000.tar.gz.age').write_bytes(b'files')
+
+        assert '--skip-links' in words
+        assert links
+        subprocess.run(['/bin/sh', '-ec', '\n'.join(links)], cwd=restore, check=True)
+        assert reads == {'inventari_db-latest.sql.gz.age', 'uploads-latest.tar.gz.age'}
+        for name in reads:
+            assert (restore / name).is_symlink(), name
+            assert (restore / name).is_file(), name
+            assert (restore / name).resolve().parent == restore.resolve(), name
+            assert '-latest' not in (restore / name).resolve().name, name
+
     def test_the_commands_are_there_and_the_image_carries_their_scripts(self) -> None:
         makefile = (_REPO_ROOT / 'Makefile').read_text(encoding='utf-8')
         dockerfile = (_BACKUP / 'Dockerfile').read_text(encoding='utf-8')

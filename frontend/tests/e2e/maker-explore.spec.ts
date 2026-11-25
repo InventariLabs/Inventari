@@ -61,15 +61,14 @@ test.describe.serial("Maker exploratory", () => {
         .catch(() => {});
     });
 
-    test("empty state when no orders exist is informative", async ({
+    test("a list with a run on it shows no empty state", async ({
       page,
       authenticatedPage,
     }) => {
-      const emptyCard = page.getByText(/no production runs yet/i).first();
-      const emptyVisible = await emptyCard
-        .isVisible({ timeout: 1500 })
-        .catch(() => false);
-      expect(typeof emptyVisible).toBe("boolean");
+      await expect(
+        page.getByText(seededTemplate.name, { exact: true }).first(),
+      ).toBeVisible({ timeout: 10000 });
+      await expect(page.getByText(/no production runs yet/i)).toHaveCount(0);
     });
 
     test("search by partial template id finds matching orders", async ({
@@ -179,28 +178,21 @@ test.describe.serial("Maker exploratory", () => {
       const dialog = page.locator('[role="dialog"]').first();
       const search = dialog.getByTestId("maker-create-search-input");
       await search.fill("E2E-Maker-Cake");
-      await page
-        .getByTestId("maker-create-search-result")
-        .first()
-        .waitFor({ state: "visible", timeout: 5000 })
-        .catch(() => {});
       // Portalled to document.body, outside the dialog.
       const result = page.getByTestId("maker-create-search-result").first();
-      if (await result.isVisible({ timeout: 3000 }).catch(() => false)) {
-        await result.click();
-        await dialog.getByTestId("maker-create-pricing-button").click();
-        const slider = page.getByTestId("maker-pricing-slider");
-        if (await slider.isVisible({ timeout: 3000 }).catch(() => false)) {
-          await slider.evaluate((el: HTMLInputElement) => {
-            el.value = "999";
-            el.dispatchEvent(new Event("input", { bubbles: true }));
-            el.dispatchEvent(new Event("change", { bubbles: true }));
-          });
-          await expect(page.getByText("95.0%").first()).toBeVisible({
-            timeout: 5000,
-          });
-        }
-      }
+      await expect(result).toBeVisible({ timeout: 5000 });
+      await result.click();
+      await dialog.getByTestId("maker-create-pricing-button").click();
+      const slider = page.getByTestId("maker-pricing-slider");
+      await expect(slider).toBeVisible({ timeout: 3000 });
+      await slider.evaluate((el: HTMLInputElement) => {
+        el.value = "999";
+        el.dispatchEvent(new Event("input", { bubbles: true }));
+        el.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+      await expect(page.getByText("95.0%").first()).toBeVisible({
+        timeout: 5000,
+      });
     });
   });
 });

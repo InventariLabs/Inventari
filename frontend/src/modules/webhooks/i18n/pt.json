@@ -67,6 +67,21 @@
       "webhookDisabled": "O endpoint foi desligado por um administrador.",
       "webhookDeleted": "O endpoint foi excluído.",
       "moduleDisabled": "O módulo de webhooks está desligado para esta organização."
+    },
+    "cause": {
+      "signingUnreadable": "Não é possível ler o segredo de assinatura — foi gravado com outra chave (rotação) ou editado na tabela. Digite-o de novo nas configurações do endpoint; a entrega é recusada em vez de enviada sem assinatura.",
+      "timeout": "O destino não respondeu dentro do tempo limite do endpoint.",
+      "connectFailed": "Não foi possível conectar ao destino. O endereço pode estar errado, um firewall pode estar bloqueando ou o receptor pode estar fora do ar.",
+      "tlsRefused": "A conexão foi recusada por TLS: o certificado do receptor não pôde ser verificado.",
+      "connectionBroken": "A conexão caiu antes de o receptor responder.",
+      "emptyAnswer": "O destino respondeu HTTP {{status}} sem corpo, portanto sem motivo. Verifique o log do próprio receptor.",
+      "urlLoopback": "Este endereço aponta para o próprio servidor, por isso o webhook nunca sairia da máquina. Use um endereço acessível pela internet ou peça a quem gere esta instalação que permita endereços locais.",
+      "urlPrivate": "Este endereço não é roteável publicamente ou está reservado para infraestrutura de protocolos, por isso o servidor recusa chamá-lo. Use um endereço acessível pela internet ou peça a quem gere esta instalação que permita endereços locais.",
+      "urlUnresolved": "Não foi possível resolver o nome do host, por isso o endereço não pode ser verificado. Use um nome que se resolva publicamente ou peça a quem gere esta instalação que permita endereços locais.",
+      "urlRebinding": "O nome do host resolve para um endereço que não é roteável publicamente ou está reservado para infraestrutura de protocolos. Use um endereço acessível pela internet ou peça a quem gere esta instalação que permita endereços locais.",
+      "urlMalformed": "Este não é um endereço web válido. Introduza um endereço completo, por exemplo https://example.com/hook.",
+      "urlScheme": "Para webhooks só são permitidos endereços http e https.",
+      "urlNoHostname": "O endereço do webhook tem de incluir um nome de host, por exemplo https://example.com/hook."
     }
   },
   "testResult": {
@@ -90,6 +105,7 @@
   },
   "circuitBreakerWarning_one": "Este webhook foi desativado automaticamente após 1 falha consecutiva — a causa da última tentativa está indicada no log de entrega.",
   "circuitBreakerWarning_other": "Este webhook foi desativado automaticamente após {{count}} falhas consecutivas — a causa da última tentativa está indicada no log de entrega.",
+  "circuitBreakerWarning_many": "Este webhook foi desativado automaticamente após {{count}} falhas consecutivas — a causa da última tentativa está indicada no log de entrega.",
   "eventsWhileOff": "Os eventos que ocorrem enquanto está desativado não são entregues, enfileirados nem registrados, e Reativar não os reenvia. As entregas que ainda aguardavam uma nova tentativa quando foi desativado são abandonadas da mesma forma — permanecem no registro de entregas como falhas.",
   "settings": {
     "logRetentionDays": "Retenção de logs (dias)",

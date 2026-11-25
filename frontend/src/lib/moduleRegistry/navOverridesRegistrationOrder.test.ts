@@ -23,6 +23,7 @@ const NS = "test-order-ns";
 const EQUIPMENT_LIKE: FrontendModule = {
   name: "test-order-overrides",
   routes: [],
+  adoptedI18nKeys: [`${NS}:nav.items`, `${NS}:nav.storages`],
   i18nOverrides: {
     en: {
       [`${NS}:nav.items`]: "Assets",
@@ -44,6 +45,12 @@ const CATALOG: Record<string, unknown> = {
 const EQUIPMENT_LIKE_WITH_TITLES: FrontendModule = {
   name: "test-order-titles",
   routes: [],
+  adoptedI18nKeys: [
+    "inventory:nav.items",
+    "inventory:nav.storages",
+    "items:title",
+    "locations:title",
+  ],
   i18nOverrides: {
     en: {
       "inventory:nav.items": "Assets",
@@ -181,6 +188,7 @@ describe("a core namespace is protected on the same terms", () => {
   const CORE_OVERRIDE: FrontendModule = {
     name: "test-order-core-overrides",
     routes: [],
+    adoptedI18nKeys: ["common:actions.save"],
     i18nOverrides: { en: { "common:actions.save": "Stash away" } },
   };
 

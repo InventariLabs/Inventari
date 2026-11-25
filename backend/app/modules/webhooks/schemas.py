@@ -1,12 +1,25 @@
 """Pydantic v2 schemas for the Webhooks module."""
 
+import re
 from datetime import datetime
+from functools import cache
 from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, Field, HttpUrl, field_validator
+from pydantic import BaseModel, Field, HttpUrl, field_validator, model_validator
 
 from app.core.events import SystemEvent
+from app.core.exceptions import ServiceRejectionError
+from app.core.ssrf_guard import WebhookUrlRejectedError
+
+from ._webhook_delivery import (
+    _CONNECT_FAILED_PREFIX,
+    _CONNECTION_BROKEN_INFIX,
+    _CONNECTION_PREFIX,
+    _TIMEOUT_PREFIX,
+    _TLS_REFUSED_INFIX,
+    _UNREADABLE_SIGNING_VALUE,
+)
 
 #: Names in ``SystemEvent`` and the payload registry that nothing emits:
 #: they stand in the core contract, and a webhook subscribed to one never
@@ -46,6 +59,67 @@ def valid_event_types() -> set[str]:
 # ---------------------------------------------------------------------------
 # Request schemas
 # ---------------------------------------------------------------------------
+
+
+#: The refusals of the URL guard, as the codes the API reports: the tail of
+#: each ``webhook_url_<reason>`` catalogue key. The stored sentence is the
+#: English catalogue text whatever language the request that triggered the
+#: delivery was in, so one set of patterns recognises it.
+_URL_REFUSAL_REASONS = ('loopback', 'private', 'unresolved', 'rebinding')
+_PLACEHOLDER = '\x00'
+
+
+@cache
+def _url_refusal_patterns() -> tuple[tuple[str, re.Pattern[str]], ...]:
+    """One pattern per refusal: the English template with its slots as wildcards."""
+    refusals: dict[str, WebhookUrlRejectedError | ServiceRejectionError] = {
+        f'url_{reason}': WebhookUrlRejectedError(
+            reason, host=_PLACEHOLDER, resolved=_PLACEHOLDER
+        )
+        for reason in _URL_REFUSAL_REASONS
+    }
+    refusals['url_malformed'] = ServiceRejectionError('webhook_url_malformed')
+    refusals['url_scheme'] = ServiceRejectionError(
+        'webhook_url_scheme', schemes=_PLACEHOLDER
+    )
+    refusals['url_no_hostname'] = ServiceRejectionError('webhook_url_no_hostname')
+    patterns = []
+    for code, refusal in refusals.items():
+        template = refusal.sentence('en')
+        body = '.+'.join(re.escape(part) for part in template.split(_PLACEHOLDER))
+        patterns.append((code, re.compile(body, re.DOTALL)))
+    return tuple(patterns)
+
+
+def url_refusal_code(error_message: str) -> str | None:
+    """The code of the URL-guard refusal that *error_message* is, or ``None``."""
+    for code, pattern in _url_refusal_patterns():
+        if pattern.fullmatch(error_message):
+            return code
+    return None
+
+
+def failure_cause(status_code: int | None, error_message: str | None) -> str | None:
+    """The code of the cause behind a delivery that got no answer, or ``None``.
+
+    A delivery the target answered carries the target's own reply as its
+    error, and that text is never classified: a receiver whose page starts
+    with "Timeout after" is not a timeout of ours.
+    """
+    if not error_message or status_code is not None:
+        return None
+    if error_message == _UNREADABLE_SIGNING_VALUE:
+        return 'signing_unreadable'
+    if error_message.startswith(_TIMEOUT_PREFIX):
+        return 'timeout'
+    if error_message.startswith(_CONNECT_FAILED_PREFIX):
+        return 'connect_failed'
+    if error_message.startswith(_CONNECTION_PREFIX):
+        if _TLS_REFUSED_INFIX in error_message:
+            return 'tls_refused'
+        if _CONNECTION_BROKEN_INFIX in error_message:
+            return 'connection_broken'
+    return url_refusal_code(error_message)
 
 
 class WebhookEndpointCreate(BaseModel):
@@ -155,6 +229,14 @@ class WebhookDeliveryResponse(BaseModel):
     next_retry_at: datetime | None = None
     created_at: datetime
     last_attempt_at: datetime | None = None
+    #: Why the delivery got no answer, as a code the screen words itself in
+    #: the reader's language; filled from the stored sentence on every read.
+    error_cause: str | None = None
+
+    @model_validator(mode='after')
+    def _name_the_cause(self) -> 'WebhookDeliveryResponse':
+        self.error_cause = failure_cause(self.status_code, self.error_message)
+        return self
 
 
 class AvailableEventResponse(BaseModel):
@@ -173,3 +255,10 @@ class TestWebhookResponse(BaseModel):
     status_code: int | None
     error: str | None
     delivery_id: UUID
+    #: Why the test got no answer, as a code the screen words itself.
+    error_cause: str | None = None
+
+    @model_validator(mode='after')
+    def _name_the_cause(self) -> 'TestWebhookResponse':
+        self.error_cause = failure_cause(self.status_code, self.error)
+        return self

@@ -61,7 +61,7 @@ import { readFileSync, readdirSync, writeFileSync, existsSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const ROOT = resolve(new URL("..", import.meta.url).pathname); // frontend/
+const ROOT = resolve(import.meta.dirname, ".."); // frontend/
 const SRC = resolve(ROOT, "src");
 const APP_TSX = resolve(SRC, "App.tsx");
 const CORE_SECTIONS_TS = resolve(SRC, "lib/moduleRegistry/coreSections.ts");

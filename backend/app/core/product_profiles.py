@@ -90,6 +90,7 @@ MAIN_STORAGE_LOCATION = ProfileStorageLocation(
         'de': LocalizedText(name='Hauptlager'),
         'fr': LocalizedText(name='Stockage principal'),
         'es': LocalizedText(name='Almacén principal'),
+        'pt': LocalizedText(name='Armazém principal'),
     },
 )
 
@@ -286,6 +287,7 @@ PRODUCT_PROFILES: dict[str, ProductProfile] = {
                     'de': LocalizedText(name='Kühlschrank'),
                     'fr': LocalizedText(name='Réfrigérateur'),
                     'es': LocalizedText(name='Nevera'),
+                    'pt': LocalizedText(name='Geladeira'),
                 },
             ),
             ProfileStorageLocation(
@@ -298,6 +300,7 @@ PRODUCT_PROFILES: dict[str, ProductProfile] = {
                     'de': LocalizedText(name='Regal A'),
                     'fr': LocalizedText(name='Étagère A'),
                     'es': LocalizedText(name='Estantería A'),
+                    'pt': LocalizedText(name='Prateleira A'),
                 },
             ),
             ProfileStorageLocation(
@@ -311,6 +314,7 @@ PRODUCT_PROFILES: dict[str, ProductProfile] = {
                     'de': LocalizedText(name='Tiefkühllager'),
                     'fr': LocalizedText(name='Chambre froide'),
                     'es': LocalizedText(name='Cámara fría'),
+                    'pt': LocalizedText(name='Câmara fria'),
                 },
             ),
         ],
@@ -418,6 +422,7 @@ PRODUCT_PROFILES: dict[str, ProductProfile] = {
                     'de': LocalizedText(name='Quarantäne'),
                     'fr': LocalizedText(name='Quarantaine'),
                     'es': LocalizedText(name='Cuarentena'),
+                    'pt': LocalizedText(name='Quarentena'),
                 },
             ),
         ],

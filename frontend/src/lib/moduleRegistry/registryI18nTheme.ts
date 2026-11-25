@@ -22,6 +22,76 @@ import type { FrontendModule } from "./moduleInterfaces";
  * last override comes off.
  */
 
+/**
+ * The overrides of `module` that may take effect.
+ *
+ * A module renames strings in its own namespace (named after it) freely. A key
+ * of another namespace — core vocabulary, or a neighbour's — is applied only
+ * when the module lists it in `adoptedI18nKeys`: without that, a module could
+ * quietly rewrite words every other module and every screen shares, and two
+ * modules touching one key would be settled by the order they were enabled in.
+ */
+export function acceptedI18nOverrides(
+  module: FrontendModule,
+): Record<string, Record<string, string>> {
+  const adopted = new Set(module.adoptedI18nKeys ?? []);
+  const accepted: Record<string, Record<string, string>> = {};
+  Object.entries(module.i18nOverrides ?? {}).forEach(([lang, overrides]) => {
+    const kept = Object.entries(overrides).filter(
+      ([key]) =>
+        parseOverrideKey(key, "").ns === module.name || adopted.has(key),
+    );
+    if (kept.length > 0) accepted[lang] = Object.fromEntries(kept);
+  });
+  return accepted;
+}
+
+/** Development aid: name the keys `module` may not override, once. */
+function warnRejectedKeys(module: FrontendModule): void {
+  if (!import.meta.env.DEV) return;
+  const accepted = acceptedI18nOverrides(module);
+  const rejected = new Set<string>();
+  Object.entries(module.i18nOverrides ?? {}).forEach(([lang, overrides]) => {
+    Object.keys(overrides).forEach((key) => {
+      if (!(key in (accepted[lang] ?? {}))) rejected.add(key);
+    });
+  });
+  if (rejected.size > 0) {
+    logger.warn(
+      `[ModuleRegistry] Module "${module.name}" overrides translation keys ` +
+        `outside its own namespace without listing them in ` +
+        `adoptedI18nKeys, so they are ignored: ${[...rejected].join(", ")}`,
+    );
+  }
+}
+
+/** Development aid: name every key two enabled modules both override. */
+function warnCollisions(
+  module: FrontendModule,
+  modules: Map<string, FrontendModule>,
+  appliedI18nModules: Set<string>,
+): void {
+  if (!import.meta.env.DEV) return;
+  const mine = acceptedI18nOverrides(module);
+  appliedI18nModules.forEach((otherName) => {
+    const other = modules.get(otherName);
+    if (!other || other.name === module.name) return;
+    const theirs = acceptedI18nOverrides(other);
+    const shared = new Set<string>();
+    Object.entries(mine).forEach(([lang, overrides]) => {
+      Object.keys(overrides).forEach((key) => {
+        if (key in (theirs[lang] ?? {})) shared.add(`${lang} ${key}`);
+      });
+    });
+    if (shared.size > 0) {
+      logger.warn(
+        `[ModuleRegistry] Modules "${other.name}" and "${module.name}" both ` +
+          `override ${[...shared].join(", ")}; the one enabled last wins.`,
+      );
+    }
+  });
+}
+
 interface OverrideTarget {
   ns: string;
   path: string[];
@@ -81,12 +151,12 @@ function warnUnmatchedKeys(
   catalog: Record<string, unknown>,
 ): void {
   if (!import.meta.env.DEV || Object.keys(catalog).length === 0) return;
-  const unmatched = Object.keys(module.i18nOverrides?.[language] ?? {}).filter(
-    (key) => {
-      const target = parseOverrideKey(key, "");
-      return target.ns === namespace && !hasString(catalog, target.path);
-    },
-  );
+  const unmatched = Object.keys(
+    acceptedI18nOverrides(module)[language] ?? {},
+  ).filter((key) => {
+    const target = parseOverrideKey(key, "");
+    return target.ns === namespace && !hasString(catalog, target.path);
+  });
   if (unmatched.length > 0) {
     logger.warn(
       `[ModuleRegistry] Module "${module.name}" overrides ${language} ` +
@@ -112,7 +182,7 @@ function groupByNamespace(
 /** The (language, namespace) pairs a module's overrides touch. */
 function targetedNamespaces(module: FrontendModule): string[] {
   const keys = new Set<string>();
-  Object.entries(module.i18nOverrides ?? {}).forEach(([lang, overrides]) => {
+  Object.entries(acceptedI18nOverrides(module)).forEach(([lang, overrides]) => {
     Object.keys(overrides).forEach((key) => {
       keys.add(`${lang}:${parseOverrideKey(key, "").ns}`);
     });
@@ -121,7 +191,7 @@ function targetedNamespaces(module: FrontendModule): string[] {
 }
 
 function applyModuleI18n(module: FrontendModule): void {
-  Object.entries(module.i18nOverrides ?? {}).forEach(([lang, overrides]) => {
+  Object.entries(acceptedI18nOverrides(module)).forEach(([lang, overrides]) => {
     groupByNamespace(overrides).forEach((bundle, ns) => {
       i18n.addResourceBundle(lang, ns, bundle, true, true);
     });
@@ -220,6 +290,8 @@ function applyI18nAdd(
           savedBundles.get(langAndNs) ?? {},
         );
       });
+      warnRejectedKeys(module);
+      warnCollisions(module, modules, appliedI18nModules);
       applyModuleI18n(module);
       appliedI18nModules.add(module.name);
     }

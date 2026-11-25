@@ -663,3 +663,24 @@ class TestTheProductsListHidesNothingFromAVisitor:
         settings = db_session.get(Organization, org_id).settings
         assert settings['kept'] == 'yes'
         assert settings['show_module_data'] is True
+
+
+class TestTheVisitorMayDecideTheirOwnOrders:
+    """A sandbox holds one person, so the approval step they meet is theirs.
+
+    The setting is on in the demo's organization and only there: the module's
+    own default stays off, which is what every other organization starts from.
+    """
+
+    def test_the_demo_organization_allows_it(
+        self, db_session: Session, dressed
+    ) -> None:
+        org_id, _admin_id = dressed
+        db_session.expire_all()
+        org = db_session.get(Organization, org_id)
+        assert org.settings['module:approvals']['allow_admin_self_approve'] is True
+
+    def test_the_product_default_stays_off(self) -> None:
+        from app.modules.approvals.module import _default_settings
+
+        assert _default_settings() == {'allow_admin_self_approve': False}

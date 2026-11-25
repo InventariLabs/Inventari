@@ -304,10 +304,12 @@ export class ApiHelper {
     const uoms = await this.request.get("/api/v1/uoms?limit=200", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    const uom = ((await uoms.json()).items as Array<{
-      id: string;
-      symbol: string;
-    }>).find((u) => u.symbol === symbol);
+    const uom = (
+      (await uoms.json()).items as Array<{
+        id: string;
+        symbol: string;
+      }>
+    ).find((u) => u.symbol === symbol);
     if (!uom) throw new Error(`The unit ${symbol} is not seeded`);
     return uom.id;
   }
@@ -1268,6 +1270,20 @@ export class ApiHelper {
     return await response.json();
   }
 
+  /** Every assignment an asset has had, the open one included. */
+  async listItemAssignments(
+    token: string,
+    itemId: string,
+  ): Promise<Array<{ id: string; checked_in_at: string | null }>> {
+    const response = await this.request.get(
+      `/api/v1/equipment/assignments/item/${itemId}`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    if (!response.ok())
+      throw new Error(`Failed to list assignments: ${await response.text()}`);
+    return (await response.json()).items;
+  }
+
   async listAssignments(
     token: string,
     params?: string,
@@ -1420,6 +1436,16 @@ export class ApiHelper {
     );
     if (!response.ok() && response.status() !== 404)
       throw new Error(`Failed to delete campaign: ${await response.text()}`);
+  }
+
+  /** Call off a launched campaign: the only way out of one (a delete is refused). */
+  async cancelCampaign(token: string, campaignId: string): Promise<void> {
+    const response = await this.request.post(
+      `/api/v1/equipment/campaigns/${campaignId}/cancel`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    if (!response.ok() && response.status() !== 404)
+      throw new Error(`Failed to cancel campaign: ${await response.text()}`);
   }
 
   // ── Rules, prices and templates that fill the lists of a phone ────────
@@ -2223,6 +2249,15 @@ export class ApiHelper {
     );
     if (!response.ok() && response.status() !== 404)
       throw new Error(`Failed to purge item: ${await response.text()}`);
+  }
+
+  /**
+   * Archive an item and then purge it. `deleteItem` alone only archives, and
+   * an archived item still holds its category, so the category cannot go.
+   */
+  async removeItemForGood(token: string, itemId: string): Promise<void> {
+    await this.deleteItem(token, itemId);
+    await this.purgeItem(token, itemId);
   }
 
   async getArchivedItems(

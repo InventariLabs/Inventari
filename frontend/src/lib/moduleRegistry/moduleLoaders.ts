@@ -25,9 +25,13 @@ function loaderFor(moduleName: string): (() => Promise<unknown>) | undefined {
  * enabled list carries along) are skipped. A module whose chunk fails to
  * load is logged and skipped too: one broken module must not take the shell
  * down with it — the eager glob it replaces failed harder, taking the whole
- * entry chunk.
+ * entry chunk. The names that failed are returned, so the caller can say so:
+ * a router built without an enabled module answers every address of it with
+ * Page Not Found.
  */
-export async function registerModules(enabledModules: string[]): Promise<void> {
+export async function registerModules(
+  enabledModules: string[],
+): Promise<string[]> {
   const wanted = enabledModules
     .map((name) => ({ name, load: loaderFor(name) }))
     .filter((entry): entry is { name: string; load: () => Promise<unknown> } =>
@@ -35,8 +39,10 @@ export async function registerModules(enabledModules: string[]): Promise<void> {
     );
 
   const results = await Promise.allSettled(wanted.map(({ load }) => load()));
+  const failed: string[] = [];
   results.forEach((result, i) => {
     if (result.status === "rejected") {
+      failed.push(wanted[i].name);
       logger.error(
         `[ModuleRegistry] Failed to load module "${wanted[i].name}":`,
         result.reason,
@@ -46,4 +52,5 @@ export async function registerModules(enabledModules: string[]): Promise<void> {
   const loaded = wanted.map(({ name }) => name);
   moduleRegistry.warnOrphanedNav(loaded);
   moduleRegistry.warnUnmatchedNavOverrides(loaded);
+  return failed;
 }

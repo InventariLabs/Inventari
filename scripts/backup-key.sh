@@ -20,6 +20,18 @@ key="$(docker run --rm --entrypoint age-keygen "$image" 2>/dev/null)"
 public="$(printf '%s\n' "$key" | sed -n 's/^# public key: //p')"
 [ -n "$public" ] || { echo "age-keygen gave no public key" >&2; exit 1; }
 
+# The recreate command belongs to the route the installation runs: with the
+# images file named in .env a bare `docker compose` already means the stack,
+# and `-f docker-compose.prod.yml` would build the backup image on the server.
+recreate="docker compose -f docker-compose.prod.yml up -d db-backup"
+if grep -q '^COMPOSE_FILE=' "$here/.env" 2>/dev/null; then
+    recreate="docker compose up -d db-backup"
+elif [ ! -f "$here/.env" ]; then
+    recreate="docker compose -f docker-compose.prod.yml up -d db-backup
+                                  (on the published images, without the -f flag:
+                                   docker compose up -d db-backup)"
+fi
+
 cat <<MSG
 
   BACKUP KEY — read this before anything else
@@ -37,7 +49,7 @@ $key
 
   Next:
     1. Put this line in .env:     AGE_RECIPIENT=$public
-    2. Recreate the backup job:   docker compose -f docker-compose.prod.yml up -d db-backup
+    2. Recreate the backup job:   $recreate
     3. After its first backup, prove the key works (the key goes in on
        stdin and is not written to the server):
          ssh you@your-vps 'cd /opt/inventari && make backup-verify' < backup-key.txt

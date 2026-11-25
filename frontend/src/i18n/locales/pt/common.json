@@ -106,10 +106,10 @@
     "refreshCopy": "Copiar o integrado atual ao lado",
     "refreshedCopy": "\"{{name}}\" criado a partir do layout integrado atual",
     "modifiedNote": "Alterado em relação ao integrado",
-    "reset": "Repor o layout integrado",
-    "resetTitle": "Repor \"{{name}}\" para o layout integrado?",
-    "resetMessage": "Todas as alterações feitas neste modelo serão perdidas e substituídas pelo layout integrado. O nome e a definição de impressão por omissão mantêm-se. Não é possível anular.",
-    "resetConfirm": "Repor",
+    "reset": "Redefinir o layout integrado",
+    "resetTitle": "Redefinir \"{{name}}\" para o layout integrado?",
+    "resetMessage": "Todas as alterações feitas neste modelo serão perdidas e substituídas pelo layout integrado. O nome e a configuração de impressão padrão permanecem. Não é possível desfazer.",
+    "resetConfirm": "Redefinir",
     "resetDone": "\"{{name}}\" voltou a ser o layout integrado",
     "export": "Exportar modelo",
     "import": "Importar modelo",
@@ -942,7 +942,7 @@
       "reason": "Motivo: {{reason}}",
       "reasons": {
         "notConfigured": "O SMTP ainda não está configurado",
-        "halfLogin": "O utilizador e a palavra-passe do SMTP têm de ser preenchidos os dois ou deixados os dois vazios",
+        "halfLogin": "O usuário e a senha do SMTP precisam ser preenchidos os dois ou deixados os dois vazios",
         "unreported": "O servidor de correio não indicou nenhum motivo"
       }
     },
@@ -1035,7 +1035,7 @@
   "dashboard": {
     "products": "Produtos",
     "replenishAll": "Rever o que repor",
-    "replenishPolicy": "Os produtos com stock em uso noutro local não contam como baixos nem são repostos.",
+    "replenishPolicy": "Os produtos com estoque em uso em outro local não contam como baixos nem são repostos.",
     "replenishModalTitle": "Revisar sugestões",
     "replenishModalDesc": "Selecione os produtos que você quer adicionar à sua lista de compras.",
     "addSelected": "Adicionar selecionados ({{count}})",
@@ -1258,7 +1258,9 @@
     "sessionEndedReadUnsaved": "Sua sessão terminou, então o que você digitou nesta tela não foi mantido. Entre novamente e comece de novo.",
     "imageFormatUnsupported": "Este formato de imagem não é compatível. Use uma imagem JPG, PNG, GIF ou WebP.",
     "modulesUnavailableTitle": "Não foi possível ler a lista de módulos",
-    "modulesUnavailableBody": "A lista de módulos ativados da sua organização não pôde ser lida, então os espaços de trabalho não podem ser nomeados. Nada foi perdido — tente de novo em instantes; se continuar falhando, fale com quem administra esta instalação."
+    "modulesUnavailableBody": "A lista de módulos ativados da sua organização não pôde ser lida, então os espaços de trabalho não podem ser nomeados. Nada foi perdido — tente de novo em instantes; se continuar falhando, fale com quem administra esta instalação.",
+    "modulesNotLoadedTitle": "Uma parte do aplicativo não carregou",
+    "modulesNotLoadedBody": "Um módulo usado pela sua organização não pôde ser carregado, o que costuma acontecer logo após uma atualização. Nada foi perdido — recarregue a página; se continuar falhando, fale com quem administra esta instalação."
   },
   "a11y": {
     "skipToContent": "Pular para o conteúdo",

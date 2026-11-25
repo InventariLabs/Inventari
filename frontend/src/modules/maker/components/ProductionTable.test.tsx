@@ -61,7 +61,7 @@ describe("ProductionTable — the row opens through a link", () => {
             element={
               <ProductionTable
                 orders={orders}
-                sort="newest"
+
                 isDuplicating={false}
               />
             }
@@ -98,7 +98,7 @@ describe("ProductionTable — the result column", () => {
   it("says what the result is under the table, not in a hover title", () => {
     render(
       <MemoryRouter>
-        <ProductionTable orders={[order]} sort="newest" isDuplicating={false} />
+        <ProductionTable orders={[order]} isDuplicating={false} />
       </MemoryRouter>,
     );
 
@@ -121,7 +121,7 @@ describe("ProductionTable — the day under a run", () => {
   const renderRows = (orders: ProductionOrder[]) =>
     render(
       <MemoryRouter>
-        <ProductionTable orders={orders} sort="newest" isDuplicating={false} />
+        <ProductionTable orders={orders} isDuplicating={false} />
       </MemoryRouter>,
     );
 
@@ -137,6 +137,56 @@ describe("ProductionTable — the day under a run", () => {
 
     expect(screen.queryByText(/Planned for/)).not.toBeInTheDocument();
     expect(screen.getByText(/Jan/)).toBeInTheDocument();
+  });
+
+  it("reads a cancelled run on its own day, not the day it was created", () => {
+    renderRows([
+      {
+        ...order,
+        status: "CANCELLED",
+        production_date: "2026-03-27",
+        started_on: "2026-03-27",
+      },
+    ]);
+
+    expect(screen.getByText(/27/)).toBeInTheDocument();
+    expect(screen.queryByText(/Jan/)).not.toBeInTheDocument();
+  });
+
+  it("reads a cancelled run with no planned day on the day it was started", () => {
+    renderRows([
+      {
+        ...order,
+        status: "CANCELLED",
+        production_date: null,
+        started_on: "2026-03-24",
+      },
+    ]);
+
+    expect(screen.getByText(/24/)).toBeInTheDocument();
+    expect(screen.queryByText(/Jan/)).not.toBeInTheDocument();
+  });
+
+  it("reads a reversed run on the day it was made, not the day it was created", () => {
+    renderRows([
+      {
+        ...order,
+        status: "REVERSED",
+        production_date: "2026-03-27",
+        completed_at: "2026-03-28T09:00:00Z",
+      },
+    ]);
+
+    expect(screen.getByText(/27/)).toBeInTheDocument();
+    expect(screen.queryByText(/Jan/)).not.toBeInTheDocument();
+  });
+
+  it("does not announce a sort the shown days do not follow", () => {
+    renderRows([{ ...order, production_date: "2026-03-27" }]);
+
+    expect(
+      screen.getByRole("columnheader", { name: "Date" }),
+    ).not.toHaveAttribute("aria-sort");
   });
 
   it("reads the day a run in progress was started", () => {

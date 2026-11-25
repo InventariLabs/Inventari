@@ -115,7 +115,11 @@ export const RecipeCard = memo(function RecipeCard({
         to={linkTo}
         ref={setNodeRef}
         style={dragStyle}
-        {...(dragEnabled ? { ...attributes, ...listeners } : {})}
+        // The drag attributes say `role="button"`; the card is a link with
+        // buttons of its own inside, and a button may hold no other control.
+        {...(dragEnabled
+          ? { ...attributes, ...listeners, role: undefined }
+          : {})}
         className={cn(
           "flex flex-1 flex-col",
           dragEnabled && "cursor-grab active:cursor-grabbing",
@@ -146,6 +150,11 @@ export const RecipeCard = memo(function RecipeCard({
               {canWrite && (
                 <Button
                   onClick={(e) => {
+                    // The button sits inside the card's link: stopping the
+                    // event keeps the link's own handler away, but only
+                    // preventing the default keeps the browser from
+                    // following the link as well.
+                    e.preventDefault();
                     e.stopPropagation();
                     onToggleFavorite(recipe);
                   }}
@@ -233,6 +242,7 @@ export const RecipeCard = memo(function RecipeCard({
                       : "bg-surface-raised border-border text-on-secondary hover:border-primary-200 hover:text-on",
                   )}
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     onTagClick(tag);
                   }}

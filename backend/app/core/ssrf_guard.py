@@ -27,6 +27,7 @@ from urllib.parse import urlparse
 
 from app.core.exceptions import ServiceRejectionError
 from app.core.logging import get_logger
+from app.i18n import Language
 from app.i18n.service import get_current_lang, get_error_message
 
 logger = get_logger(__name__)
@@ -61,17 +62,19 @@ class WebhookUrlRejectedError(ValueError):
         host: str,
         resolved: str | None = None,
     ) -> None:
-        super().__init__(
-            get_error_message(
-                f'webhook_url_{reason}',
-                get_current_lang(),
-                host=host,
-                resolved=resolved or '',
-            )
-        )
         self.reason = reason
         self.host = host
         self.resolved = resolved
+        super().__init__(self.sentence(get_current_lang()))
+
+    def sentence(self, lang: Language) -> str:
+        """The refusal in *lang*, for a reader that stores or shows it in another."""
+        return get_error_message(
+            f'webhook_url_{self.reason}',
+            lang,
+            host=self.host,
+            resolved=self.resolved or '',
+        )
 
 
 def _is_private_ip(raw: str) -> bool:

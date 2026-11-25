@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
@@ -12,7 +12,7 @@ from app.core.exceptions import (
     refusal_row,
 )
 from app.core.file_import import analyze_import_file
-from app.core.import_sheet import read_rows
+from app.core.import_sheet import SheetColumns, cell_text, read_rows
 from app.core.logging import get_logger
 from app.core.public_api import core_api
 from app.core.uom_resolver import UomResolverAsync
@@ -52,11 +52,11 @@ class _Columns:
         )
 
 
-def _parse_quantity(raw: Any, column: str) -> Decimal:
+def _parse_quantity(raw: Any, column: str, sheet: SheetColumns) -> Decimal:
     """A row without a usable positive quantity is not a line."""
     try:
-        quantity = Decimal(str(raw))
-    except (ValueError, TypeError, InvalidOperation) as exc:
+        quantity = sheet.number(raw, column)
+    except ValueError as exc:
         raise _RowSkippedError(
             'import_column_not_a_number', column=column, value=raw
         ) from exc
@@ -65,12 +65,20 @@ def _parse_quantity(raw: Any, column: str) -> Decimal:
     return quantity
 
 
-def _optional_decimal(raw: Any) -> Decimal | None:
-    """Money and tax are optional: anything unreadable simply stays empty."""
-    try:
-        return Decimal(str(raw)) if raw else None
-    except (ValueError, TypeError, InvalidOperation):
+def _optional_decimal(raw: Any, column: str, sheet: SheetColumns) -> Decimal | None:
+    """Money and tax are optional: a blank cell is no price.
+
+    A cell that holds something else than a number refuses the row and names
+    the cell; it does not import as a line with no price.
+    """
+    if cell_text(raw) is None:
         return None
+    try:
+        return sheet.number(raw, column)
+    except ValueError as exc:
+        raise _RowSkippedError(
+            'import_column_not_a_number', column=column, value=raw
+        ) from exc
 
 
 async def _match_product_template(
@@ -118,6 +126,7 @@ async def import_lines_into_po(
 
     df = read_rows(file_content, filename)
     columns = _Columns.from_mapping(column_mapping)
+    sheet = SheetColumns(df)
 
     imported = 0
     matched = 0
@@ -137,7 +146,9 @@ async def import_lines_into_po(
             product_template_id = await _match_product_template(
                 db, org_id, row.get(columns.sku), row.get(columns.barcode)
             )
-            quantity = _parse_quantity(row.get(columns.quantity, '1'), columns.quantity)
+            quantity = _parse_quantity(
+                row.get(columns.quantity, '1'), columns.quantity, sheet
+            )
             uom_id = await uom_resolver.resolve(row.get(columns.uom))
 
             db.add(
@@ -147,9 +158,13 @@ async def import_lines_into_po(
                     name=str(name),
                     quantity_ordered=quantity,
                     quantity_received=Decimal('0'),
-                    unit_price=_optional_decimal(row.get(columns.price)),
+                    unit_price=_optional_decimal(
+                        row.get(columns.price), columns.price, sheet
+                    ),
                     uom_id=uom_id,
-                    tax_rate=_optional_decimal(row.get(columns.tax)),
+                    tax_rate=_optional_decimal(
+                        row.get(columns.tax), columns.tax, sheet
+                    ),
                     line_number=next_line_number,
                 )
             )

@@ -7,6 +7,7 @@ import {
   type SeededProduct,
   type SeededShelf,
 } from "./helpers/receive-seed";
+import { setValuation, type Valuation } from "./helpers/valuation";
 import {
   arrivedField,
   chooseLocation,
@@ -29,42 +30,7 @@ import {
  * `value-tracking` project and puts both back.
  */
 
-const PROFILE = "/api/v1/warehouse/profile";
-const STATS_CONFIG = "/api/v1/stats/config";
-
-/** The two organisation-wide switches this spec needs on. */
-interface Valuation {
-  tracked: boolean;
-  valueShown: boolean;
-}
-
 let before: Valuation | undefined;
-
-/** Set both switches, and return what they were. */
-async function setValuation(
-  seed: ReceivingSeed,
-  to: Valuation,
-): Promise<Valuation> {
-  const headers = { Authorization: `Bearer ${seed.token}` };
-  const profile = await (await seed.request.get(PROFILE, { headers })).json();
-  const stats = await (
-    await seed.request.get(STATS_CONFIG, { headers })
-  ).json();
-  const put = await seed.request.put(PROFILE, {
-    headers,
-    data: { value_tracking_enabled: to.tracked },
-  });
-  if (!put.ok()) {
-    throw new Error(`Could not set value tracking: ${await put.text()}`);
-  }
-  await seed.api.setModuleSettings(seed.token, "stats", {
-    show_inventory_value: to.valueShown,
-  });
-  return {
-    tracked: profile.value_tracking_enabled === true,
-    valueShown: stats.show_inventory_value === true,
-  };
-}
 
 test.beforeAll(async ({ playwright, baseURL }, testInfo) => {
   const seed = await startSeed({ playwright }, baseURL, testInfo);

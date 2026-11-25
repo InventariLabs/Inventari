@@ -121,7 +121,7 @@ class TestOpeningStockLandsAsOneDraftReceipt:
         assert 'name' in body['errors'][0]['error'].lower()
         assert 'dużo' in body['errors'][1]['error']
         assert 'tanio' in body['errors'][2]['error']
-        assert body['matched'] == 50 and body['unmatched'] == 0
+        assert body['matched'] == 3 and body['unmatched'] == 0
         assert body['stubs_created'] == 47
 
         doc = db_session.get(Document, body['document_id'])

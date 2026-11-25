@@ -16,7 +16,8 @@ import { useShowModuleData } from "@/modules/settings/hooks/useOrganization";
  *
  * `scope` undefined is a form that checks nothing — an existing product keeps
  * its own place whether or not it would be offered today. `keepId` is a place
- * the form arrived holding: it stays offered whatever the scope says.
+ * the form arrived holding: it stays offered whatever the scope says, for as
+ * long as it exists.
  */
 export function useStorageOffer(
   scope: LocationScope | undefined,
@@ -39,9 +40,18 @@ export function useStorageOffer(
     enabled: !!scope && !!chosenId && !kept,
   });
 
+  // A place the form arrived holding is offered whatever the scope says, but
+  // it still has to exist: one removed while the context was held would show
+  // an empty-looking field the form could not save into.
+  const exists = useQuery({
+    queryKey: [...queryKeys.storages.all, "exists", chosenId],
+    queryFn: () => storagesApi.getPage({ ids: [chosenId], limit: 1 }),
+    enabled: !!scope && kept,
+  });
+
   let chosenOffered: boolean | undefined;
   if (scope && chosenId) {
-    if (kept) chosenOffered = true;
+    if (kept) chosenOffered = exists.data ? exists.data.total > 0 : true;
     else if (check.data) chosenOffered = check.data.total > 0;
   }
   return {

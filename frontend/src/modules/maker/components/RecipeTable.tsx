@@ -79,17 +79,7 @@ export function RecipeTable({ recipes, sort, onProduce }: RecipeTableProps) {
               >
                 {resultTerm.label}
               </th>
-              <th
-                scope="col"
-                className={headerClass}
-                aria-sort={
-                  sort === "newest"
-                    ? "descending"
-                    : sort === "oldest"
-                      ? "ascending"
-                      : undefined
-                }
-              >
+              <th scope="col" className={headerClass}>
                 {t("catalog.lastProduced")}
               </th>
               <th scope="col" className="px-3 py-2.5">

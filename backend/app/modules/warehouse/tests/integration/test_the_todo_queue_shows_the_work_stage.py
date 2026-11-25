@@ -38,7 +38,10 @@ from app.modules.warehouse.models import (
     WmsPickSession,
 )
 
-_TODAY = date.today().isoformat()
+
+def _today() -> str:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return date.today().isoformat()
 
 
 def _create_document(
@@ -64,7 +67,7 @@ def _create_document(
         'type': doc_type,
         'partner_id': str(partner.id),
         'target_location_id': str(target.id),
-        'scheduled_date': _TODAY,
+        'scheduled_date': _today(),
         'lines': [line],
     }
     if source is not None:
@@ -179,7 +182,7 @@ def _todo(
         '/api/v1/warehouse/todo',
         headers=headers,
         params={
-            'date_to': _TODAY,
+            'date_to': _today(),
             'limit': limit,
             'inbound_offset': inbound_offset,
             'outbound_offset': outbound_offset,
@@ -607,7 +610,7 @@ class TestTheTodoQueueShowsTheWorkStage:
         response = client.get(
             '/api/v1/warehouse/todo',
             headers=doc_auth_headers,
-            params={'date_to': _TODAY, 'limit': 2},
+            params={'date_to': _today(), 'limit': 2},
         )
         assert response.status_code == status.HTTP_200_OK, response.text
         data = response.json()
@@ -620,7 +623,7 @@ class TestTheTodoQueueShowsTheWorkStage:
             params={
                 'type': 'IN,INTERNAL_IN',
                 'status': 'CONFIRMED',
-                'date_to': _TODAY,
+                'date_to': _today(),
                 'limit': 1,
             },
         )

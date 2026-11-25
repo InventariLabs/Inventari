@@ -249,6 +249,12 @@ defineStepTask({
       return;
     }
 
+    // The order names its supplier a moment after the sheet opens; a press
+    // before the field shows it is refused ("Choose the supplier.") and opens
+    // no session.
+    await expect(
+      page.getByRole("combobox", { name: "From", exact: true }),
+    ).toContainText(seed.supplierName, { timeout: 15000 });
     await page
       .getByRole("button", { name: "Receive one product at a time" })
       .click();

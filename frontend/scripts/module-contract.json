@@ -1,6 +1,12 @@
 {
   "frontendModule": {
     "props": {
+      "adoptedI18nKeys": {
+        "optional": true,
+        "type": {
+          "array": "string"
+        }
+      },
       "backgroundFeatures": {
         "optional": true,
         "type": {
@@ -2668,6 +2674,15 @@
                 }
               ]
             }
+          },
+          "stockAlreadyApplied": {
+            "optional": true,
+            "type": {
+              "union": [
+                "boolean",
+                "undefined"
+              ]
+            }
           }
         }
       },
@@ -3174,6 +3189,66 @@
             "optional": false,
             "type": {
               "schema": "Item"
+            }
+          },
+          "registerBeforeSubmit": {
+            "optional": true,
+            "type": {
+              "union": [
+                "undefined",
+                {
+                  "fn": {
+                    "params": [
+                      {
+                        "name": "callback",
+                        "optional": false,
+                        "type": {
+                          "fn": {
+                            "params": [],
+                            "returns": {
+                              "union": [
+                                "void",
+                                {
+                                  "args": [
+                                    "void"
+                                  ],
+                                  "ext": "Promise"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returns": {
+                      "fn": {
+                        "params": [],
+                        "returns": "void"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "reportDirty": {
+            "optional": true,
+            "type": {
+              "union": [
+                "undefined",
+                {
+                  "fn": {
+                    "params": [
+                      {
+                        "name": "dirty",
+                        "optional": false,
+                        "type": "boolean"
+                      }
+                    ],
+                    "returns": "void"
+                  }
+                }
+              ]
             }
           },
           "requestLeave": {

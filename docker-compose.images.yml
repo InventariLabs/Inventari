@@ -1,0 +1,37 @@
+# The production stack from the published images instead of a build.
+#
+#   docker compose -f docker-compose.prod.yml -f docker-compose.images.yml up -d
+#
+# It layers on docker-compose.prod.yml, which stays the one description of the
+# stack: this file only swaps the three services that file builds — backend,
+# frontend and db-backup — for the images the release workflow
+# (.github/workflows/release-images.yml) publishes for every v* tag, for
+# linux/amd64 and linux/arm64. INVENTARI_VERSION (.env, written by
+# scripts/init-env.sh) names the release; there is no `latest` default, so an
+# installation moves to a new release by changing that one line and pulling.
+#
+# The backend keeps no checkout's module trees mounted: a community module
+# installs by rebuilding the frontend image, which this install does not do.
+# An installation that wants community modules builds from source: remove the
+# COMPOSE_FILE line from .env, then
+# `docker compose -f docker-compose.prod.yml up -d --build`
+# (DEPLOYMENT.md, "Community modules"). Naming docker-compose.prod.yml alone
+# while the line stays leaves the next bare command on these images.
+services:
+  backend:
+    image: ghcr.io/inventarilabs/inventari-backend:${INVENTARI_VERSION:?set INVENTARI_VERSION in .env — the release to run, see QUICK_DEPLOY.md}
+    build: !reset null
+    pull_policy: always
+    volumes: !override
+      - uploads_data:/app/uploads
+      - module_data:/app/data
+
+  frontend:
+    image: ghcr.io/inventarilabs/inventari-frontend:${INVENTARI_VERSION:?set INVENTARI_VERSION in .env — the release to run, see QUICK_DEPLOY.md}
+    build: !reset null
+    pull_policy: always
+
+  db-backup:
+    image: ghcr.io/inventarilabs/inventari-backup:${INVENTARI_VERSION:?set INVENTARI_VERSION in .env — the release to run, see QUICK_DEPLOY.md}
+    build: !reset null
+    pull_policy: always

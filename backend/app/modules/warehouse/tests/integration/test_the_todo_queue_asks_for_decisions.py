@@ -35,7 +35,10 @@ from app.models.user import User
 from app.modules.approvals.models import ApprovalWorkflow
 from tests.integration._shelf import put_on_shelf, run_in_async_session, shelf_keeper
 
-_TODAY = date.today().isoformat()
+
+def _today() -> str:
+    """Today, read when the test runs, so a run that crosses midnight stays consistent."""
+    return date.today().isoformat()
 
 
 @pytest.fixture
@@ -54,7 +57,7 @@ def _todo(client: TestClient, headers: dict[str, str]) -> dict[str, Any]:
     response = client.get(
         '/api/v1/warehouse/todo',
         headers=headers,
-        params={'date_to': _TODAY, 'limit': 50},
+        params={'date_to': _today(), 'limit': 50},
     )
     assert response.status_code == status.HTTP_200_OK, response.text
     return cast(dict[str, Any], response.json())
@@ -135,7 +138,7 @@ def _create_document(
             'type': doc_type,
             'partner_id': partner_id,
             'target_location_id': target_location_id,
-            'scheduled_date': _TODAY,
+            'scheduled_date': _today(),
             'lines': [line],
         },
     )

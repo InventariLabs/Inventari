@@ -41,14 +41,8 @@ test.describe("Labels — pool & scanning flow", () => {
     await page.goto("/inventory/labels");
     await page.waitForLoadState("networkidle").catch(() => {});
 
-    const allTab = page
-      .locator('[role="tab"]')
-      .filter({ hasText: /all|wszystkie/i })
-      .first();
-    if (await allTab.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await allTab.click();
-      await page.waitForLoadState("networkidle").catch(() => {});
-    }
+    await page.getByRole("tab", { name: "All Statuses" }).click();
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     await expect(page.getByText(seedShortCode)).toBeVisible({ timeout: 15000 });
   });
@@ -70,10 +64,9 @@ test.describe("Labels — pool & scanning flow", () => {
     await expect(dialog).toBeVisible({ timeout: 5000 });
 
     const input = dialog.locator('input[type="number"]').first();
-    if (await input.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await input.clear();
-      await input.fill("1");
-    }
+    await expect(input).toBeVisible({ timeout: 3000 });
+    await input.clear();
+    await input.fill("1");
 
     const submitBtn = dialog
       .locator("button")
@@ -109,14 +102,8 @@ test.describe("Labels — pool & scanning flow", () => {
     await page.goto("/inventory/labels");
     await page.waitForLoadState("networkidle").catch(() => {});
 
-    const allTab = page
-      .locator('[role="tab"]')
-      .filter({ hasText: /all|wszystkie/i })
-      .first();
-    if (await allTab.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await allTab.click();
-      await page.waitForLoadState("networkidle").catch(() => {});
-    }
+    await page.getByRole("tab", { name: "All Statuses" }).click();
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     await expect(page.getByText(delCode)).toBeVisible({ timeout: 15000 });
 
@@ -131,12 +118,11 @@ test.describe("Labels — pool & scanning flow", () => {
     await expect(deleteBtn).toBeVisible({ timeout: 5000 });
     await deleteBtn.click();
 
-    const confirmBtn = page
+    await page
+      .getByRole("alertdialog")
       .getByRole("button", { name: /confirm|delete|usuń|tak/i })
-      .last();
-    if (await confirmBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await confirmBtn.click();
-    }
+      .last()
+      .click();
     await expect(page.locator("body").getByText(delCode)).toHaveCount(0, {
       timeout: 10000,
     });

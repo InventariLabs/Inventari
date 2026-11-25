@@ -6,6 +6,15 @@
 # Docker configuration
 DOCKER_COMPOSE := docker compose
 
+# The production stack, by the route the installation runs. A `.env` that names
+# COMPOSE_FILE (the published images: docker-compose.prod.yml plus
+# docker-compose.images.yml) already says which files make the stack, and
+# `-f docker-compose.prod.yml` would override it with the build file alone —
+# these targets would then build the images on the server. Without the line the
+# installation builds from source and the flag names the one file.
+PROD_ON_IMAGES := $(shell grep -qs '^COMPOSE_FILE=' .env && echo yes)
+PROD_COMPOSE := docker compose $(if $(PROD_ON_IMAGES),,-f docker-compose.prod.yml)
+
 # One source of truth for the development admin account. `dev-up`, the isolated
 # dev2 stack and the E2E suite all read it, and the password must satisfy the
 # same policy the API enforces — an account the CLI can create but the login
@@ -113,20 +122,24 @@ up: ## Start all containers (dev mode)
 down: ## Stop all containers
 	$(DOCKER_COMPOSE) down
 
-deploy: ## Deploy to production (build + recreate containers)
+deploy: ## Deploy to production (build, or pull the published images, and recreate containers)
 	@echo "$(BLUE)[INFO]$(NC) Deploying to production..."
-	@docker compose -f docker-compose.prod.yml build --parallel
-	@docker compose -f docker-compose.prod.yml up -d --force-recreate --no-build
+ifeq ($(PROD_ON_IMAGES),yes)
+	@$(PROD_COMPOSE) pull
+else
+	@$(PROD_COMPOSE) build --parallel
+endif
+	@$(PROD_COMPOSE) up -d --force-recreate --no-build
 	@echo "$(GREEN)[OK]$(NC) Deployment complete."
 
 backup-key: ## Make the key pair that encrypts prod backups (prints the private key once; keep it off the server)
 	@sh scripts/backup-key.sh
 
 backup-verify: ## Prove the newest prod backup restores (encrypted: pipe the private key in on stdin)
-	@docker compose -f docker-compose.prod.yml run --rm $$([ -t 0 ] || echo -T) --entrypoint verify.sh db-backup
+	@$(PROD_COMPOSE) run --rm $$([ -t 0 ] || echo -T) --entrypoint verify.sh db-backup
 
 backup-status: ## Prod backups: encryption on/off, newest backup, when a restore was last proven
-	@docker compose -f docker-compose.prod.yml run --rm -T --no-deps --entrypoint status.sh db-backup
+	@$(PROD_COMPOSE) run --rm -T --no-deps --entrypoint status.sh db-backup
 
 status: ## Show container status and recent logs
 	@echo "$(BLUE)[INFO]$(NC) Container status:"
@@ -236,6 +249,8 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 	docker compose exec frontend npm run lint
 	@echo "$(BLUE)[INFO]$(NC) Checking frontend formatting with prettier (the pre-commit hook's copy)..."
 	docker compose exec frontend npm run format:check
+	@echo "$(BLUE)[INFO]$(NC) Auditing the npm lock for known vulnerabilities (ci.yml's copy)..."
+	docker compose exec frontend npm audit --package-lock-only
 	@echo "$(BLUE)[INFO]$(NC) Running frontend typecheck + production build..."
 	docker compose exec frontend npm run build:check
 	@echo "$(BLUE)[INFO]$(NC) Checking i18n key usage against catalogs..."
@@ -317,6 +332,8 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 	@python3 backend/scripts/check_history_comments.py --tree frontend
 	@echo "$(BLUE)[INFO]$(NC) Checking frontend tests for dates that the clock will overtake..."
 	@python3 backend/scripts/check_time_bombs.py
+	@echo "$(BLUE)[INFO]$(NC) Checking for identifiers that point at private material..."
+	@python3 backend/scripts/check_internal_ids.py --public-tree
 	@echo "$(BLUE)[INFO]$(NC) Checking no accessibility finding was added to a relaxed file (jsx-a11y baseline)..."
 	docker compose exec frontend npm run check:a11y-baseline
 	@echo "$(BLUE)[INFO]$(NC) Checking module settings snapshot..."
@@ -338,7 +355,7 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 	@$(MAKE) --no-print-directory perf-phone
 
 # ─── frontend/package.json targets NO make target calls ───────────────────
-# Measured: 52 scripts, 31 called above/here, the rest are deliberate and
+# Measured: 85 scripts, 52 called above/here, the rest are deliberate and
 # each of these has a reason to stay out of the automated gates:
 #   dev / preview                    — interactive sessions, not gates.
 #   test / test:run                  — the Makefile drives vitest inside the
@@ -351,8 +368,6 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 #                                      the suite used to run without it and
 #                                      enforced nothing, which is how the
 #                                      63/49/73/63 floor went missing locally.
-#   format:check                     — the pre-commit hook checks formatting on commit;
-#                                      this is the whole-tree re-check.
 #   build                            — `vite build` alone; `build:check` (tsc, the
 #                                      build and the bundle budget) is the one
 #                                      wired in above.
@@ -390,6 +405,23 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 #   scan:ui                          — advisory reports, no verdict to gate
 #                                      on (their findings are tracked as
 #                                      follow-up work).
+#   check:a11y-baseline:write /
+#   check:api-types-mirror:baseline /
+#   check:e2e-waits:baseline /
+#   check:raw-machine-values:baseline /
+#   check:title-case:baseline /
+#   check:vocabulary:baseline /
+#   check:modules:contract:write /
+#   test:console-baseline /
+#   test:e2e:steps:write-baseline    — WRITERS of the baselines the gates above
+#                                      (or the test run) read, like the ones
+#                                      before them.
+#   check:modules:contract           — `make check-frontend` runs the script
+#                                      itself, not through npm.
+#   test:e2e:steps                   — a Playwright spec run (it writes to the
+#                                      database it runs against), not a gate.
+#   perf:phone                       — `make perf-phone` runs the script
+#                                      itself, with the stack's API address.
 
 lint-architecture: ## Check architecture boundaries for backend modules
 	@echo "$(BLUE)[INFO]$(NC) Checking architecture boundaries..."

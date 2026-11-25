@@ -78,9 +78,44 @@ describe("blankComments", () => {
     );
     // The outer hole resumes after the inner template: braces and a comment
     // inside it are still read as code, and the text after it as a string.
-    const resumes = "const a = `${f(`${g({ k: 1 })}`) /* c */} /* kept */`;\n// gone\n";
+    const resumes =
+      "const a = `${f(`${g({ k: 1 })}`) /* c */} /* kept */`;\n// gone\n";
     expect(blankComments(resumes)).toBe(
       resumes.replace("/* c */", "       ").replace("// gone", "       "),
     );
+  });
+
+  it("does not open a string at a quote or backtick inside a regex literal", () => {
+    // `/["]/` and `/'([^']+)'/g` held a quote that opened a string frame
+    // which never closed on the right character, so every later comment in
+    // the file stayed visible as code (src/lib/csv.ts was one).
+    for (const regex of [
+      'const r = /["]/;',
+      "const r = /'([^']+)'/g;",
+      "const r = /`/;",
+      'return /[",\\n]/.test(text) ? 1 : 2;',
+      'const r = /[/"]/;',
+      'const r = /a\\/"/;',
+    ]) {
+      const blanked = blankComments(`${regex}\n/* c */ const x = 1;\n`);
+      expect(blanked, regex).toBe(`${regex}\n        const x = 1;\n`);
+    }
+  });
+
+  it("reads a slash after an operand as a division, not a regex", () => {
+    const text =
+      'const a = b / 2; const s = "x"; // c "\nconst d = e / 3; /* z */';
+    const [first, second] = blankComments(text).split("\n");
+    expect(first.trimEnd()).toBe('const a = b / 2; const s = "x";');
+    expect(second.trimEnd()).toBe("const d = e / 3;");
+  });
+
+  it("reads a slash after an arrow as a regex opener", () => {
+    for (const arrow of ['(s) => /"/.test(s)', "(s) =>\n  /'/.test(s)"]) {
+      const text = `const f = ${arrow};\n/* c */ x;\n`;
+      expect(blankComments(text), arrow).toBe(
+        text.replace("/* c */", "       "),
+      );
+    }
   });
 });

@@ -6,7 +6,9 @@ import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db_retry import mark_external_effect
+from app.core.exceptions import ServiceRejectionError
 from app.core.logging import get_logger
+from app.core.ssrf_guard import WebhookUrlRejectedError
 from app.modules.webhooks.models import WebhookEndpoint
 from app.modules.webhooks.signing import compute_signature
 from app.modules.webhooks.ssrf_guard import validate_webhook_url
@@ -28,6 +30,25 @@ _UNREADABLE_SIGNING_VALUE = (
     'key (a rotation) or edited in the table. Re-enter it in the endpoint '
     'settings; the delivery is refused rather than sent unsigned.'
 )
+
+#: The causes a failed delivery can carry without the target answering, as
+#: the codes the API reports beside the stored sentence. The sentence is
+#: English and stays in the log; the code is what lets the screen say it in
+#: the reader's language. ``schemas.failure_cause`` recognises each sentence by the
+#: constants below, which the sentence builders use too, so a reworded
+#: sentence cannot stop being recognised without a test saying so.
+_TIMEOUT_PREFIX = 'Timeout after '
+_CONNECT_FAILED_PREFIX = 'Could not connect to '
+_TLS_REFUSED_INFIX = ' was refused over TLS'
+_CONNECTION_BROKEN_INFIX = ' broke before the receiver answered'
+_CONNECTION_PREFIX = 'The connection to '
+
+
+def _url_refusal_sentence(exc: ValueError) -> str:
+    """The guard's refusal in English, the language every stored cause is in."""
+    if isinstance(exc, WebhookUrlRejectedError | ServiceRejectionError):
+        return exc.sentence('en')
+    return str(exc)
 
 
 async def _attempt_delivery(
@@ -85,7 +106,7 @@ async def _attempt_delivery(
         # validate_webhook_url's resolution and httpx's own resolution.
         pinned_ip = validate_webhook_url(str(webhook.url), allow_private=allow_private)
     except ValueError as exc:
-        return False, None, None, str(exc)
+        return False, None, None, _url_refusal_sentence(exc)
 
     try:
         from urllib.parse import urlparse
@@ -138,7 +159,7 @@ async def _attempt_delivery(
         )
 
     except httpx.TimeoutException:
-        return False, None, None, f'Timeout after {webhook.timeout_seconds}s'
+        return False, None, None, f'{_TIMEOUT_PREFIX}{webhook.timeout_seconds}s'
     except httpx.RequestError as exc:
         logger.info('Webhook %s: the request failed: %r', webhook.id, exc)
         return False, None, None, _request_failure_sentence(exc, webhook)
@@ -158,15 +179,15 @@ def _request_failure_sentence(exc: httpx.RequestError, webhook: WebhookEndpoint)
     if isinstance(exc, httpx.ConnectError):
         if 'certificate' in str(exc).lower() or 'ssl' in str(exc).lower():
             return (
-                f'The connection to {target} was refused over TLS: the '
+                f'{_CONNECTION_PREFIX}{target}{_TLS_REFUSED_INFIX}: the '
                 "receiver's certificate could not be verified."
             )
         return (
-            f'Could not connect to {target}. The address may be wrong, a '
+            f'{_CONNECT_FAILED_PREFIX}{target}. The address may be wrong, a '
             'firewall may be blocking it, or the receiver may be down.'
         )
     return (
-        f'The connection to {target} broke before the receiver answered '
+        f'{_CONNECTION_PREFIX}{target}{_CONNECTION_BROKEN_INFIX} '
         f'({type(exc).__name__}).'
     )
 

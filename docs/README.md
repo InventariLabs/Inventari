@@ -61,7 +61,10 @@ existing workflow through its public extension points.
 
 [CONTRIBUTING.md](../CONTRIBUTING.md) covers the development environment,
 repository workflow, coding standards and pull requests for changes to the
-platform and its included modules.
+platform and its included modules. Packaging Inventari for a home-server app
+store (Unraid, CasaOS, Umbrel, YunoHost, TrueNAS) starts from
+[HOME_SERVER_STORES.md](HOME_SERVER_STORES.md): what each store's current
+submission rules ask for, quoted and dated.
 
 ## Technical reference
 

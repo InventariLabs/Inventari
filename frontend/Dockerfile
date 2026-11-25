@@ -1,4 +1,7 @@
-FROM node:26-alpine as builder
+# The bundle is static files, the same for every architecture: build it on the
+# builder's own, so an arm64 image does not run the whole Vite build under
+# emulation. Only the nginx stage below is per-platform.
+FROM --platform=$BUILDPLATFORM node:26-alpine AS builder
 
 WORKDIR /app
 

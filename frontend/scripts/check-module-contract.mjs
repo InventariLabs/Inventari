@@ -65,12 +65,7 @@
  * the frontend container mounts only `frontend/`, so the guide check is skipped
  * there, exactly like the module-catalog snapshot.
  */
-import {
-  existsSync,
-  readFileSync,
-  readdirSync,
-  writeFileSync,
-} from "node:fs";
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { relative, resolve } from "node:path";
 import ts from "typescript";
 
@@ -91,6 +86,7 @@ const GENERATED_TYPES_PATH = resolve(ROOT, "src/types/api-generated.ts");
 // version-1 file cannot be compared against this one.
 const SNAPSHOT_VERSION = 2;
 
+const FIELD_HEADING = "## `FrontendModule` Interface Reference";
 const GUIDE_HEADING = "### Complete Slot Reference";
 const GUIDE_NEXT_HEADING = "\n> **Status semantics";
 
@@ -101,7 +97,10 @@ const GUIDE_NEXT_HEADING = "\n> **Status semantics";
  * the declarations the contract reaches rather than the whole application.
  */
 function compilerOptions() {
-  const config = ts.readConfigFile(resolve(ROOT, "tsconfig.json"), ts.sys.readFile);
+  const config = ts.readConfigFile(
+    resolve(ROOT, "tsconfig.json"),
+    ts.sys.readFile,
+  );
   if (config.error)
     throw new Error(
       `cannot read tsconfig.json: ${ts.flattenDiagnosticMessageText(
@@ -158,7 +157,8 @@ function programFor(sources, options = compilerOptions()) {
 function findInterface(source, name, file) {
   let found;
   source.forEachChild((node) => {
-    if (ts.isInterfaceDeclaration(node) && node.name.text === name) found = node;
+    if (ts.isInterfaceDeclaration(node) && node.name.text === name)
+      found = node;
   });
   if (!found)
     throw new Error(
@@ -251,7 +251,8 @@ function sortKeys(value) {
   if (Array.isArray(value)) return value.map(sortKeys);
   if (value && typeof value === "object") {
     const sorted = {};
-    for (const key of Object.keys(value).sort()) sorted[key] = sortKeys(value[key]);
+    for (const key of Object.keys(value).sort())
+      sorted[key] = sortKeys(value[key]);
     return sorted;
   }
   return value;
@@ -291,7 +292,9 @@ function describeType({ program, checker }, type, stack = []) {
   // `Array<T>` and `T[]` are the same contract written two ways, so both are
   // recorded as an array of the element before any name is looked at.
   if (checker.isArrayType(type))
-    return { array: describeType(context, checker.getTypeArguments(type)[0], next) };
+    return {
+      array: describeType(context, checker.getTypeArguments(type)[0], next),
+    };
   if (checker.isTupleType(type))
     return {
       tuple: checker
@@ -315,7 +318,10 @@ function describeType({ program, checker }, type, stack = []) {
       : [];
     return args.length === 0
       ? { ext: name }
-      : { ext: name, args: args.map((arg) => describeType(context, arg, next)) };
+      : {
+          ext: name,
+          args: args.map((arg) => describeType(context, arg, next)),
+        };
   }
 
   const schema = generatedSchemaOf(context, type);
@@ -345,7 +351,9 @@ function describeType({ program, checker }, type, stack = []) {
 
   if (flags & ts.TypeFlags.Intersection)
     return {
-      intersect: type.types.map((member) => describeType(context, member, next)),
+      intersect: type.types.map((member) =>
+        describeType(context, member, next),
+      ),
     };
 
   const signature = type.getCallSignatures()[0];
@@ -395,7 +403,8 @@ function describeType({ program, checker }, type, stack = []) {
     value: describeType(context, info.type, next),
   }));
 
-  if (Object.keys(props).length > 0 || indexes.length === 0) return { obj: props };
+  if (Object.keys(props).length > 0 || indexes.length === 0)
+    return { obj: props };
   return { index: indexes };
 }
 
@@ -452,7 +461,11 @@ function contractOf(program, interfacesPath, slotsPath) {
   const context = { program, checker: program.getTypeChecker() };
   return {
     version: SNAPSHOT_VERSION,
-    frontendModule: interfaceContract(context, "FrontendModule", interfacesPath),
+    frontendModule: interfaceContract(
+      context,
+      "FrontendModule",
+      interfacesPath,
+    ),
     slotContribution: interfaceContract(
       context,
       "SlotContribution",
@@ -522,9 +535,7 @@ function print(descriptor) {
     case "function":
       return `(…) => ${print(descriptor.fn.returns)}`;
     case "external":
-      return `${descriptor.ext}${
-        descriptor.args ? "<…>" : ""
-      }`;
+      return `${descriptor.ext}${descriptor.args ? "<…>" : ""}`;
     case "literal":
       return JSON.stringify(descriptor.literal);
     case "schema":
@@ -587,7 +598,9 @@ function compareObjects(where, before, after, changes) {
   for (let i = 0; i < beforeIndex.length; i++) {
     const now = afterIndex[i];
     if (!now) {
-      changes.push(`${where}: index signature ${print(beforeIndex[i])} removed`);
+      changes.push(
+        `${where}: index signature ${print(beforeIndex[i])} removed`,
+      );
       continue;
     }
     compareType(
@@ -622,7 +635,12 @@ function compareFunction(where, before, after, changes) {
           "(only optional parameters may be added)",
       );
   }
-  compareType(`${where}(): return`, before.fn.returns, after.fn.returns, changes);
+  compareType(
+    `${where}(): return`,
+    before.fn.returns,
+    after.fn.returns,
+    changes,
+  );
 }
 
 /** A union's members; a type not written as a union is a union of one. */
@@ -639,9 +657,13 @@ const NULLABLE_MEMBERS = new Set(["undefined", "null"]);
  * nested change names its field instead of reporting the whole member.
  */
 function compareUnion(where, before, after, changes) {
-  const beforeNullable = before.filter((member) => NULLABLE_MEMBERS.has(member));
+  const beforeNullable = before.filter((member) =>
+    NULLABLE_MEMBERS.has(member),
+  );
   const afterNullable = after.filter((member) => NULLABLE_MEMBERS.has(member));
-  const beforePayload = before.filter((member) => !NULLABLE_MEMBERS.has(member));
+  const beforePayload = before.filter(
+    (member) => !NULLABLE_MEMBERS.has(member),
+  );
   const afterPayload = after.filter((member) => !NULLABLE_MEMBERS.has(member));
 
   if (
@@ -824,6 +846,64 @@ export function readGuideTable(markdown) {
   return rows;
 }
 
+/**
+ * The guide's `FrontendModule` field table as `[{ name, required }]`. The
+ * section runs from its heading to the next rule; a table that is gone is an
+ * error rather than an empty answer.
+ */
+export function readFieldTable(markdown) {
+  const start = markdown.indexOf(FIELD_HEADING);
+  if (start === -1)
+    throw new Error(`no "${FIELD_HEADING}" in the module guide`);
+  const end = markdown.indexOf("\n---", start);
+  const section = markdown.slice(start, end === -1 ? undefined : end);
+
+  const rows = [];
+  for (const line of section.split("\n")) {
+    if (!line.trimStart().startsWith("|")) continue;
+    const cells = line
+      .trim()
+      .replace(/^\||\|$/g, "")
+      .split(/(?<!\\)\|/)
+      .map((cell) => cell.trim());
+    const field = cells[0].match(/^`([A-Za-z_][A-Za-z0-9_]*)`$/);
+    if (!field || cells.length < 4) continue; // header and separator rows
+    rows.push({ name: field[1], required: cells[2] === "Yes" });
+  }
+  return rows;
+}
+
+/**
+ * Findings where the field table and `FrontendModule` disagree: a field the
+ * type does not have, a field with no row, a row listed twice, or a
+ * requiredness the type does not carry.
+ */
+export function fieldFindings(fields, rows) {
+  const findings = [];
+  const seen = new Set();
+  for (const row of rows) {
+    if (seen.has(row.name)) findings.push(`GUIDE FIELD DUPLICATE  ${row.name}`);
+    seen.add(row.name);
+    const field = fields[row.name];
+    if (!field) {
+      findings.push(
+        `GUIDE FIELD UNKNOWN  ${row.name} — not a FrontendModule field`,
+      );
+      continue;
+    }
+    if (row.required === Boolean(field.optional))
+      findings.push(
+        `GUIDE FIELD REQUIRED  ${row.name} — the row says ` +
+          `${row.required ? "required" : "optional"}, the type says ` +
+          `${field.optional ? "optional" : "required"}`,
+      );
+  }
+  for (const name of Object.keys(fields)) {
+    if (!seen.has(name)) findings.push(`GUIDE FIELD MISSING  ${name}`);
+  }
+  return findings;
+}
+
 /** Slot names an in-tree module registers into today. */
 export function contributedSlots(dir = MODULES_PATH) {
   const contributed = new Set();
@@ -985,14 +1065,20 @@ function main() {
     return;
   }
 
-  const slots = readContract().slotDataMap.props;
+  const contract = readContract();
+  const slots = contract.slotDataMap.props;
   const guide = readFileSync(GUIDE_PATH, "utf8");
-  const findings = guideFindings(slots, readGuideTable(guide), contributedSlots());
+  const findings = [
+    ...guideFindings(slots, readGuideTable(guide), contributedSlots()),
+    ...fieldFindings(contract.frontendModule.props, readFieldTable(guide)),
+  ];
 
   if (findings.length > 0) {
     for (const finding of findings) console.error(`MODULE-CONTRACT ${finding}`);
     console.error(
-      "\n✗ the guide's slot table disagrees with SlotDataMap. Add a row for a " +
+      "\n✗ the guide disagrees with the module contract. A FrontendModule field " +
+        "needs a row in the interface table, marked Yes only when the type " +
+        "requires it. Add a row for a " +
         "new slot (the other columns are prose: where it renders and what it is " +
         "for), remove a slot that is gone, list every prop the slot passes " +
         "(`name?` for an optional one), and correct any status the tree no " +
@@ -1006,7 +1092,11 @@ function main() {
       Object.keys(slots).length,
       "slot",
       "slots",
-    )}, table matches`,
+    )} and ${plural(
+      Object.keys(contract.frontendModule.props).length,
+      "FrontendModule field",
+      "FrontendModule fields",
+    )}, tables match`,
   );
 }
 

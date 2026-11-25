@@ -6,8 +6,10 @@ This guide covers deploying Inventari on a VPS with automatic HTTPS via **Caddy*
 
 - VPS with Ubuntu 26.04 LTS or Debian 13. The steps below are tested on
   Ubuntu 26.04 LTS, and Debian 13 takes the same commands. Another current
-  64-bit Linux with Docker Engine and Docker Compose v2.20 or newer (the
-  compose file uses `depends_on` with `required: false`) should work too, but
+  64-bit Linux with Docker Engine and Docker Compose v2.24.4 or newer (the
+  compose file uses `depends_on` with `required: false`, and the file that
+  pulls the published images uses the `!reset` and `!override` tags) should
+  work too, but
   may need small adjustments (on Fedora or RHEL, for example, SELinux can
   refuse the containers access to the files mounted from the host).
 - A domain name with an A record pointing to your VPS IP
@@ -65,30 +67,27 @@ ping inventari.example.com
 ## Step 4: Configure Environment
 
 ```bash
-cp .env.production.example .env
-chmod 600 .env
-nano .env
+./scripts/init-env.sh
 ```
+
+It asks for the domain and the e-mail address the certificate is issued for,
+and writes `.env` from `.env.production.example` with every secret generated:
+`DB_PASSWORD`, `DB_APP_PASSWORD`, `REDIS_PASSWORD`, `SECRET_KEY`,
+`ENCRYPTION_KEY` and `FERNET_SALT`, each 64 hex characters from the kernel's
+random source (`--domain` and `--email` answer the questions on the command
+line). It never overwrites an existing `.env`: replacing `FERNET_SALT` or
+`ENCRYPTION_KEY` would leave every stored secret unreadable, so a file that is
+already there is yours to edit by hand.
 
 `.env` holds every secret the installation has, so only the account that runs
-Compose should read it. Keep it at mode 600 — `chmod 600 .env` after you create
-it, and again after any tool that rewrites the file; `ls -l .env` shows
-`-rw-------`.
-
-Generate secure secrets:
-
-```bash
-echo "DB_PASSWORD=$(openssl rand -hex 32)"
-echo "DB_APP_PASSWORD=$(openssl rand -hex 32)"
-echo "REDIS_PASSWORD=$(openssl rand -hex 32)"
-echo "SECRET_KEY=$(openssl rand -hex 32)"
-echo "ENCRYPTION_KEY=$(openssl rand -hex 32)"
-echo "FERNET_SALT=$(openssl rand -hex 32)"
-```
+Compose should read it. The script creates it at mode 600; keep it there,
+and again after any tool that rewrites the file (`ls -l .env` shows
+`-rw-------`).
 
 `DB_APP_PASSWORD` and `REDIS_PASSWORD` are interpolated into connection URLs
 verbatim, so they must be hex — base64's `+ / =` characters would corrupt the
-URLs rather than fail loudly. Hex is right for the other four as well.
+URLs rather than fail loudly. Hex is right for the other four as well, which is
+why the script writes hex only; a value you set by hand has to be hex too.
 
 `SECRET_KEY` signs login tokens; `ENCRYPTION_KEY` encrypts what organizations
 store as secrets. Set both now, on the first install. `ENCRYPTION_KEY` may be
@@ -128,18 +127,8 @@ the key is generated as a pair, `make backup-key` prints the private half once
 and saves it nowhere, and that half must be kept off the server, because an
 encrypted backup nobody can decrypt is worth less than a plain one.
 
-Set at minimum in `.env`:
-
-```env
-DOMAIN=inventari.example.com
-ACME_EMAIL=you@example.com
-DB_PASSWORD=<generated above>
-DB_APP_PASSWORD=<generated above>
-REDIS_PASSWORD=<generated above>
-SECRET_KEY=<generated above>
-ENCRYPTION_KEY=<generated above>
-FERNET_SALT=<generated above>
-```
+The eight values the stack needs — the domain, the e-mail address and the six
+secrets — are the ones the script filled in.
 
 `DB_APP_PASSWORD`, `REDIS_PASSWORD` and `FERNET_SALT` are enforced by the
 compose file — an empty value stops `docker compose up` before anything is
@@ -346,6 +335,49 @@ until docker compose -f docker-compose.prod.yml exec -T backend \
 Nothing outside the server can reach the installation yet — create the
 administrator first.
 
+### Pulling the published images instead of building
+
+Every release tag publishes the three images this file builds — backend,
+frontend and the backup sidecar — to `ghcr.io/inventarilabs/inventari-backend`,
+`-frontend` and `-backup`, for `linux/amd64` and `linux/arm64`, tagged with the
+version (`0.13.0`) and, for a release that is not a pre-release, `latest`. A
+second compose file swaps the build for them, so the first start downloads
+instead of compiling — minutes on a small server, and the way a Raspberry Pi
+or another ARM machine gets the stack without building it:
+
+```bash
+echo 'COMPOSE_FILE=docker-compose.prod.yml:docker-compose.images.yml' >> .env
+docker compose up -d --scale caddy=0
+```
+
+The first line says once, for this installation, which files make the stack;
+from here on **every `docker compose -f docker-compose.prod.yml …` command in
+this guide is typed without its `-f docker-compose.prod.yml`**. A command that
+keeps that flag reads the build file alone: `up` and `run` would then build all
+three images on this machine and recreate the services on them.
+
+The release comes from `INVENTARI_VERSION` in `.env`, which
+`./scripts/init-env.sh` sets to the version of the files it was run in; Compose
+refuses to start with it empty, so a stack never pulls a tag it was not told
+to.
+
+The images carry the application as released, so the two community-module
+trees of the checkout are not mounted: *Community modules* below needs the
+build from source.
+
+**Going back to the build.** Remove the `COMPOSE_FILE` line from `.env`, then
+build and recreate on this machine:
+
+```bash
+sed -i '/^COMPOSE_FILE=/d' .env
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+Starting from `-f docker-compose.prod.yml` alone, with the line still in
+`.env`, is not enough: the next bare `docker compose up` reads the line again
+and returns to the images. From here on the commands of this guide carry the
+`-f docker-compose.prod.yml` flag again.
+
 ## Step 6: Create the administrator, then start the proxy
 
 Nothing seeds an administrator. Create it from the server:
@@ -521,6 +553,16 @@ until docker compose -f docker-compose.prod.yml exec -T backend \
     curl -sf http://localhost:8000/health/ready >/dev/null; do sleep 5; done
 ```
 
+**Pulling the published images.** An installation that runs them
+(*Pulling the published images instead of building*) changes three steps: in
+step 3, set `INVENTARI_VERSION` in `.env` to the new tag without its `v`; in
+step 4, `pull` replaces `build` (`docker compose pull`); in step 5,
+`up -d --force-recreate` runs without `--no-build`, since there is no build to
+skip. Every command, step 1 included, is typed without `-f
+docker-compose.prod.yml` (`COMPOSE_FILE` in `.env` names the files). A new tag publishes its images when the release is cut, so a
+`pull` that finds none means the release is still being built: wait for the
+workflow run named for the tag.
+
 Step 4b applies once, and only to a database created from the development
 line before v0.11.0 was tagged — the project's own installations, or one built
 from an untagged checkout: it moves that database onto the release's baseline.
@@ -598,7 +640,24 @@ git checkout <the tag you came from>
 docker compose -f docker-compose.prod.yml build --parallel
 ```
 
+On the published images (*Pulling the published images instead of building*)
+there is nothing to build, and the release is not the checkout's: after the
+checkout above, set
+`INVENTARI_VERSION` in `.env` back to the tag you came from, without its `v`,
+and `docker compose pull` instead of the build. Without that line the restored
+database would start under the newer images and be migrated forward again. The
+commands carry no `-f docker-compose.prod.yml`, as everywhere on this route.
+
+```bash
+sed -i 's/^INVENTARI_VERSION=.*/INVENTARI_VERSION=<the version you came from>/' .env
+docker compose pull
+```
+
 ## Community modules
+
+Community modules need the build from source: on the published images
+(*Going back to the build* above says how to leave them) `module install` and
+`module upgrade` refuse before they fetch anything.
 
 Community modules are installed, upgraded and uninstalled by the backend
 container's own CLI. That container is the one process with both the database
@@ -846,8 +905,11 @@ files check:    uploads-20261002-020000.tar.gz.age read back at 2026-10-02T09:30
 Until the check has succeeded once, the last two lines read `never`. Run it after
 turning encryption on, and again from time to time: it is the only proof that
 the key you kept is the key the backups were made for. Both commands run in the
-`db-backup` image, which step 4 of *Updating* rebuilds; after any other kind of
-update run `make deploy` first to rebuild it.
+`db-backup` image, which step 4 of *Updating* rebuilds (on the published images,
+`docker compose pull` replaces it); after any other kind of update run `make
+deploy` first to rebuild it — on the published images it pulls the images and
+recreates the services instead. Both commands read `COMPOSE_FILE` from `.env`,
+so they run the stack the installation runs.
 
 ### Manual backup
 
@@ -1047,7 +1109,7 @@ server in Warsaw.
    ```
 
    The delete leaves a delete marker, and `--versions` still lists the object.
-   A plain remote (the `gdrive:` example) works as well, but it can delete
+   A plain remote (Google Drive, say) works as well, but it can delete
    what it was given; the locked bucket is the one that survives a root on the
    server.
 5. Name the destinations in `.env` — parents, not the subtrees:
@@ -1167,7 +1229,10 @@ profile is imported again ([docs/OFF_DATABASE_SETUP.md](docs/OFF_DATABASE_SETUP.
    server ran, or a newer one — the backend migrates an older database forward
    when it starts; never an older one. Point the DNS record at the new address.
 2. **Put the kept `.env` in place** instead of Step 4 — do not generate new
-   secrets. Change `DOMAIN` only if the address changed.
+   secrets. Change `DOMAIN` only if the address changed. On the published
+   images, check its `INVENTARI_VERSION` line too: it names the release the
+   stack pulls, and it must be the one checked out in step 1 — the kept file
+   still says the release the old server ran, which may be older.
 3. **Community modules only: put their code back,** before the images are built,
    because the frontend image is built from the checkout. The archive also
    holds the project's own modules, which the checkout already has at the right
@@ -1181,21 +1246,52 @@ profile is imported again ([docs/OFF_DATABASE_SETUP.md](docs/OFF_DATABASE_SETUP.
    ```bash
    docker compose -f docker-compose.prod.yml build --parallel
    ```
-   Then put the tracking record back into its volume (community modules only):
+   Then put the tracking record back into its volume (community modules only,
+   so the build route only):
    ```bash
    docker compose -f docker-compose.prod.yml run --rm -T --no-deps \
      --entrypoint tar backend -xzf - -C /app/data < module-data-<stamp>.tgz
    ```
+
+   **On the published images,** download them instead, without `-f
+   docker-compose.prod.yml`, as everywhere on that route (step 3 and the
+   tracking record above do not apply: community modules need the build). A
+   `.env` kept from a server that ran the published images already carries the
+   `COMPOSE_FILE` line; one kept from a server that built its images does not —
+   a move onto the images, to a Raspberry Pi say — so add the line from
+   *Pulling the published images instead of building* first:
+   ```bash
+   grep -q '^COMPOSE_FILE=' .env ||
+     echo 'COMPOSE_FILE=docker-compose.prod.yml:docker-compose.images.yml' >> .env
+   ```
+   ```bash
+   docker compose pull
+   ```
+   A build-route server **with community modules cannot move onto the
+   images:** its database keeps the modules' tables, while the images carry no
+   module code, so the backend would start against tables it has no code for.
+   Rebuild such a server from source, as above.
 5. **Bring the backup to `backups/restore/`.** From the off-host copy, with the
    kept `rclone.conf` next to the compose file and your `BACKUP_RCLONE_REMOTE`
-   followed by `/last`:
+   followed by `/backups/last` — the service puts the backups under `backups/`
+   of the remote it is given:
    ```bash
    sudo mkdir -p backups/restore
    docker run --rm -e RCLONE_CONFIG=/config/rclone.conf \
      -v "$PWD/rclone.conf":/config/rclone.conf:ro -v "$PWD/backups/restore":/data \
-     rclone/rclone:1.76.0 copy gdrive:Inventari/prod-backups/last /data
+     rclone/rclone:1.76.0 copy ovh:<backups-bucket>/backups/last /data
    ```
    From the old disk, copy its `backups/last/` there instead.
+
+   The off-host copy holds the pair under its own names only: the `-latest`
+   names *Putting a backup back* reads are links in `last/`, and the copy does
+   not send links. After a pull from the remote, give the pair those names:
+   ```bash
+   cd backups/restore
+   sudo ln -s inventari_db-*.sql.gz.age inventari_db-latest.sql.gz.age
+   sudo ln -s uploads-*.tar.gz.age uploads-latest.tar.gz.age
+   cd -
+   ```
 6. **Follow *Putting a backup back*** above with `FROM=restore`, from step 1.
    The accounts come back with the database — there is no administrator to
    create; sign in as before.
