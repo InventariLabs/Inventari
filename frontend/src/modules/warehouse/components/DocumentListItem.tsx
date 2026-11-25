@@ -523,7 +523,9 @@ const DocumentListItem = memo(function DocumentListItem({
           {execution && <ExecutionProgress groups={execution} />}
         </div>
 
-        {actions.length > 0 && <RowActionsMenu actions={actions} />}
+        {actions.length > 0 && (
+          <RowActionsMenu actions={actions} number={documentTitle(t, doc)} />
+        )}
       </div>
     </Card>
   );
@@ -535,7 +537,14 @@ const DocumentListItem = memo(function DocumentListItem({
  * row's right edge is stable and actions are reachable identically on
  * 390 px and 1440 px.
  */
-function RowActionsMenu({ actions }: { actions: RowAction[] }) {
+function RowActionsMenu({
+  actions,
+  number,
+}: {
+  actions: RowAction[];
+  /** The document's title: the "⋯" button names the record it acts on. */
+  number: string;
+}) {
   const { t } = useTranslation("warehouse");
   const [open, setOpen] = useState(false);
 
@@ -545,8 +554,8 @@ function RowActionsMenu({ actions }: { actions: RowAction[] }) {
         <Button
           variant="ghost"
           size="icon"
-          aria-label={t("actions.moreActions")}
-          title={t("actions.moreActions")}
+          aria-label={t("actions.moreActionsFor", { number })}
+          title={t("actions.moreActionsFor", { number })}
           onClick={(e) => e.stopPropagation()}
           className="relative z-10 shrink-0"
         >
@@ -555,7 +564,7 @@ function RowActionsMenu({ actions }: { actions: RowAction[] }) {
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
         <PopoverPrimitive.Content
-          aria-label={t("actions.moreActions")}
+          aria-label={t("actions.moreActionsFor", { number })}
           className="z-[var(--z-popover)] w-56 bg-surface-card rounded-xl border border-border shadow-xl p-1 flex flex-col gap-1"
           sideOffset={4}
         >

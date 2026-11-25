@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
+import { toast } from "sonner";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
@@ -9,12 +10,14 @@ import { TemplateEditorModal } from "@/modules/shared/components/TemplateEditorM
 import { TemplateCard } from "@/modules/shared/components/TemplateCard";
 import { TemplatesEmptyState } from "@/modules/shared/components/TemplatesEmptyState";
 import { useConfirm } from "@/hooks/useConfirm";
+import { useConfirmedTemplateReset } from "@/modules/shared/hooks/useConfirmedTemplateReset";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import {
   useDocumentTemplates,
   useDeleteTemplate,
   useSeedDefaultTemplates,
+  useRefreshTemplateCopy,
 } from "@/modules/shared/hooks/useDocumentTemplates";
 import { QueryError } from "@/components/ui/QueryResult";
 import type { DocumentTemplate } from "@/modules/shared/lib/templates";
@@ -83,7 +86,12 @@ export default function PurchaseOrdersTemplatesPage() {
   } = useDocumentTemplates("purchase-orders");
   const deleteMutation = useDeleteTemplate("purchase-orders");
   const seedMutation = useSeedDefaultTemplates("purchase-orders");
+  const refreshCopyMutation = useRefreshTemplateCopy("purchase-orders");
   const { confirm, confirmDialogProps } = useConfirm();
+  const { handleReset, isResetPending } = useConfirmedTemplateReset(
+    "purchase-orders",
+    confirm,
+  );
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<
@@ -125,6 +133,17 @@ export default function PurchaseOrdersTemplatesPage() {
     if (ok) {
       deleteMutation.mutate(tpl.id);
     }
+  };
+
+  // The organization's own copy is left exactly as it is — the refreshed
+  // layout arrives beside it, and it says so.
+  const handleRefreshCopy = (tpl: DocumentTemplate) => {
+    refreshCopyMutation.mutate(tpl.id, {
+      onSuccess: (created) =>
+        toast.success(
+          t("common:templates.refreshedCopy", { name: created.name }),
+        ),
+    });
   };
 
   const TYPE_LABELS: Record<string, string> = {
@@ -178,6 +197,10 @@ export default function PurchaseOrdersTemplatesPage() {
               }}
               onDelete={handleDelete}
               defaultLabel={t("common:templates.default", "Default")}
+              onRefreshCopy={handleRefreshCopy}
+              isRefreshPending={refreshCopyMutation.isPending}
+              onReset={handleReset}
+              isResetPending={isResetPending}
             />
           ))}
         </div>

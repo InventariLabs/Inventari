@@ -308,6 +308,7 @@
     "emptyCatalogHint": "Se você ainda não tem produtos, adicione-os antes no Inventário."
   },
   "moreActions": "Mais ações",
+  "moreActionsFor": "Mais ações para {{number}}",
   "permissions": {
     "read": "Ver pedidos de compra",
     "readDesc": "Pode consultar pedidos de compra, listas de preços e regras de reposição",
