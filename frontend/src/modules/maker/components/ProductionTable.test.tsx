@@ -167,6 +167,20 @@ describe("ProductionTable — the day under a run", () => {
     expect(screen.queryByText(/Jan/)).not.toBeInTheDocument();
   });
 
+  it("reads a reversed run on the day it was made, not the day it was created", () => {
+    renderRows([
+      {
+        ...order,
+        status: "REVERSED",
+        production_date: "2026-03-27",
+        completed_at: "2026-03-28T09:00:00Z",
+      },
+    ]);
+
+    expect(screen.getByText(/27/)).toBeInTheDocument();
+    expect(screen.queryByText(/Jan/)).not.toBeInTheDocument();
+  });
+
   it("does not announce a sort the shown days do not follow", () => {
     renderRows([{ ...order, production_date: "2026-03-27" }]);
 

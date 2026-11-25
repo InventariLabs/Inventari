@@ -2,7 +2,8 @@ import { expect, type Locator, type Page } from "@playwright/test";
 
 /**
  * Choose a day in the app's date field: open it, walk the grid to the day's
- * month and press the day, which the grid names in full ("November 5, 2026").
+ * month and press the day, which the grid names in full — "November 5, 2026"
+ * for a US organization, "5 November 2026" for any other, as the app writes it.
  * `field` is the field's trigger — the combobox that carries its label.
  */
 export async function pickDay(page: Page, field: Locator, iso: string) {
@@ -17,13 +18,12 @@ export async function pickDay(page: Page, field: Locator, iso: string) {
     name: steps < 0 ? "Previous month" : "Next month",
   });
   for (let i = 0; i < Math.abs(steps); i++) await nav.click();
+  const date = new Date(year, month - 1, day);
+  const names = ["en-US", "en-GB"].map((locale) =>
+    new Intl.DateTimeFormat(locale, { dateStyle: "long" }).format(date),
+  );
   await page
-    .getByRole("button", {
-      name: new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(
-        new Date(year, month - 1, day),
-      ),
-      exact: true,
-    })
+    .getByRole("button", { name: new RegExp(`^(${names.join("|")})$`) })
     .click();
 }
 
