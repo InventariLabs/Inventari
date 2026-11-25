@@ -21,6 +21,7 @@ from app.core.product_profiles import MAIN_STORAGE_LOCATION, PRODUCT_PROFILES
 from app.i18n import MAINTAINED_LANGUAGES
 from app.modules.approvals import _services_notify as approvals_notify
 from app.modules.equipment import _notification_labels as equipment_labels
+from app.modules.equipment import _protocol_templates as protocol_templates
 from app.modules.equipment._module_declarations import build_equipment_metadata
 from app.modules.maker import labelling
 from app.modules.printing.services import print_queue_service
@@ -178,6 +179,7 @@ def test_the_discovery_finds_the_known_maps() -> None:
     names = {label for label, _ in _DISCOVERED}
     assert 'app.modules.webhooks._notification_labels.AUTO_DISABLED_TITLE' in names
     assert 'app.modules.recipes._meal_plan_shopping._NOTES_LABELS' in names
+    assert 'app.modules.equipment._protocol_templates.LABELS' in names
     assert 'app.modules.purchase_orders._service_email._PO_EMAIL_CONTENT' in names
 
 
@@ -197,3 +199,15 @@ def test_every_seeded_storage_type_is_named_in_the_language(lang: str) -> None:
         code for code, names in seeded_storage_type_names().items() if lang not in names
     ]
     assert not missing, f'no {lang} name for storage types {missing}'
+
+
+@pytest.mark.parametrize('lang', MAINTAINED_LANGUAGES)
+def test_a_protocol_names_every_heading_in_the_language(lang: str) -> None:
+    labels = protocol_templates.LABELS
+    assert labels[lang].keys() == labels['en'].keys()
+
+
+def test_a_portuguese_protocol_is_not_headed_in_english() -> None:
+    labels = protocol_templates.LABELS
+    assert labels['pt']['checkout_title'] != labels['en']['checkout_title']
+    assert labels['pt']['checkin_title'] != labels['en']['checkin_title']
