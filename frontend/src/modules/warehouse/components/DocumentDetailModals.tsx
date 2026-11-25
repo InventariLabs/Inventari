@@ -9,6 +9,7 @@ import { HomeShelvesAfterPosting } from "@/modules/warehouse/components/todo/Rec
 import WmsReceivingView from "@/modules/warehouse/components/receiving/WmsReceivingView";
 import WmsLotExpiryDialog from "@/modules/warehouse/components/receiving/WmsLotExpiryDialog";
 import { isPackedType } from "@/modules/warehouse/components/packing/DocumentPackingStep";
+import { leavesWithCarrier } from "@/modules/warehouse/components/shipping/shipmentDraft";
 import { PACKING_HASH } from "@/modules/warehouse/components/packing/packingHash";
 import type { ShipmentCreate } from "@/modules/warehouse/api/shipments";
 import type { WarehouseDocument } from "@/modules/warehouse/types";
@@ -136,6 +137,7 @@ export default function DocumentDetailModals({
           documentId={doc.id}
           onClose={(completed, shipment) => onPickingClose(completed, shipment)}
           onRequestApproval={onPickingRequestApproval}
+          withoutCarrier={!leavesWithCarrier(doc.type)}
           onPack={
             isPackedType(doc.type)
               ? (shipment) => {

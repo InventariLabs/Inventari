@@ -302,7 +302,7 @@ Good to know:
   adding records, import with the Label Code column mapped and a match mode
   on; a row without a code always adds.
 
-**From a photograph.** With photo recognition on, the page has a **Vision AI**
+**From a photograph.** With photo recognition on, the page has a **From photo**
 tab: **Take Product Photo**, then **Analyze label**. It reads the name, brand, expiry
 date, weight, nutrition and ingredients from the label and fills them in for
 you to check; a category is filled only when it matches one you already have.

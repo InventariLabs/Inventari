@@ -92,7 +92,7 @@ describe("QuickAddModal", () => {
     // The product name field is the form; "Take Product Photo" is the other tab.
     expect(screen.getByLabelText(/Product name/i)).toBeInTheDocument();
     expect(screen.queryByText(/Take Product Photo/i)).toBeNull();
-    expect(screen.getAllByText(/Vision AI/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/^From photo$/i).length).toBeGreaterThan(0);
   });
 
   it("offers to attach a free pool label to an existing product, and a barcode not", () => {
@@ -233,7 +233,7 @@ describe("QuickAddModal without the photo module", () => {
     // that is not there.
     open();
 
-    expect(screen.queryAllByText(/Vision AI/i)).toHaveLength(0);
+    expect(screen.queryAllByText(/^From photo$/i)).toHaveLength(0);
   });
 
   it("leaves the form itself untouched", () => {

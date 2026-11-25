@@ -16,11 +16,13 @@ vi.mock("@/modules/warehouse/components/picking/WmsPickingView", () => ({
   default: ({
     onClose,
     onPack,
+    withoutCarrier,
   }: {
     onClose: (completed?: boolean) => void;
     onPack?: () => void;
+    withoutCarrier?: boolean;
   }) => (
-    <div>
+    <div data-testid="picking" data-without-carrier={String(!!withoutCarrier)}>
       <button onClick={() => onClose(true)}>Close</button>
       {onPack && <button onClick={onPack}>Pack</button>}
     </div>
@@ -156,6 +158,28 @@ describe("DocumentDetailModals picking summary", () => {
       replace: true,
       state: { shipment: expect.anything() },
     });
+  });
+
+  it("asks a dispatch that leaves the company for a carrier, an internal issue not", async () => {
+    const view = (type: string) => (
+      <DocumentDetailModals
+        doc={{ id: "d-4", type, status: "CONFIRMED" } as WarehouseDocument}
+        confirmAction={null}
+        {...closed}
+        pickingOpen
+      />
+    );
+    const { rerender } = render(view("OUT"));
+    expect(await screen.findByTestId("picking")).toHaveAttribute(
+      "data-without-carrier",
+      "false",
+    );
+
+    rerender(view("INTERNAL_OUT"));
+    expect(screen.getByTestId("picking")).toHaveAttribute(
+      "data-without-carrier",
+      "true",
+    );
   });
 
   it("offers no packing on a transfer", async () => {
