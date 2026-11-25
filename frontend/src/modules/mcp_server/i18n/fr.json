@@ -12,7 +12,8 @@
     "createKey": "Créez une clé API dans Clés API et donnez-lui la permission Utiliser le point d'accès MCP.",
     "createKeyNeedsAdmin": "Demandez une clé à un administrateur de votre organisation : elle est créée dans Clés API, avec la permission Utiliser le point d'accès MCP.",
     "pointClient": "Envoyez la clé dans l'en-tête X-API-Key (ou comme jeton Bearer) à l'adresse ci-dessus.",
-    "allowHost": "Si l'installation répond sur une adresse publique, ajoutez son hôte aux hôtes autorisés dans les paramètres du module."
+    "allowHost": "Si l'installation répond sur une adresse publique, ajoutez son hôte aux hôtes autorisés dans les paramètres du module.",
+    "allowHostNeedsAdmin": "Si l'installation répond sur une adresse publique, demandez à un administrateur d'ajouter son hôte aux hôtes autorisés dans les paramètres du module."
   },
   "links": {
     "apiKeys": "Clés API"

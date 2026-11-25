@@ -12,7 +12,8 @@
     "createKey": "Legen Sie unter API-Schlüssel einen Schlüssel an und geben Sie ihm die Berechtigung MCP-Endpunkt verwenden.",
     "createKeyNeedsAdmin": "Bitten Sie einen Administrator Ihrer Organisation um einen Schlüssel: Er wird unter API-Schlüssel mit der Berechtigung MCP-Endpunkt verwenden angelegt.",
     "pointClient": "Senden Sie den Schlüssel im Header X-API-Key (oder als Bearer-Token) an die Adresse oben.",
-    "allowHost": "Antwortet die Installation unter einer öffentlichen Adresse, tragen Sie deren Host bei den erlaubten Hosts in den Moduleinstellungen ein."
+    "allowHost": "Antwortet die Installation unter einer öffentlichen Adresse, tragen Sie deren Host bei den erlaubten Hosts in den Moduleinstellungen ein.",
+    "allowHostNeedsAdmin": "Antwortet die Installation unter einer öffentlichen Adresse, bitten Sie einen Administrator, deren Host bei den erlaubten Hosts in den Moduleinstellungen einzutragen."
   },
   "links": {
     "apiKeys": "API-Schlüssel"

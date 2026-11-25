@@ -13,7 +13,7 @@ from pydantic import (
 
 from app.core.exceptions import ServiceRejectionError
 
-from ._name_matching import normalize_name
+from ._name_matching import normalize_name, shows_a_character
 
 # === Tag Management ===
 
@@ -108,9 +108,12 @@ class IngredientDefaultCreate(IngredientDefaultBase):
 
         ``strip`` removes whitespace but leaves a zero-width space or a BOM,
         and the ASCII fold turns both into '': the row would be filed under
-        the empty key every nameless row shares.
+        the empty key every nameless row shares. A visible name the fold has
+        no spelling for folds to '' too, and is refused for what it lacks.
         """
         if not normalize_name(v):
+            if shows_a_character(v):
+                raise ServiceRejectionError('name_has_no_latin_form')
             raise ServiceRejectionError('ingredient_default_name_has_no_key')
         return v
 

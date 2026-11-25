@@ -34,49 +34,10 @@ LIBRARY_FRAGMENTS = (
     'Error executing tool',
 )
 
-#: (tool, case) pairs still answered in the library's text — the MCP
-#: transport validates a tool's arguments before the tool runs, so every
-#: argument failure reaches the agent as the library's text. Goal: empty.
-BASELINE: frozenset[str] = frozenset(
-    {
-        'correct_stock:item_id of the wrong type',
-        'correct_stock:no arguments',
-        'correct_stock:quantity of the wrong type',
-        'correct_stock:reason of the wrong type',
-        'create_item:barcode of the wrong type',
-        'create_item:brand of the wrong type',
-        'create_item:category_id of the wrong type',
-        'create_item:expiry_date of the wrong type',
-        'create_item:location_id of the wrong type',
-        'create_item:metadata of the wrong type',
-        'create_item:name of the wrong type',
-        'create_item:no arguments',
-        'create_item:quantity of the wrong type',
-        'create_item:serial_number of the wrong type',
-        'create_item:template_id of the wrong type',
-        'get_expiring_soon:days of the wrong type',
-        'get_expiring_soon:limit of the wrong type',
-        'get_expiring_soon:shelf_id of the wrong type',
-        'get_item:item_id of the wrong type',
-        'get_item:no arguments',
-        'get_location_tree:root_id of the wrong type',
-        'get_stock_levels:limit of the wrong type',
-        'get_stock_levels:product_template_id of the wrong type',
-        'get_stock_levels:shelf_id of the wrong type',
-        'list_locations:limit of the wrong type',
-        'list_locations:offset of the wrong type',
-        'list_locations:usage of the wrong type',
-        'list_lots:limit of the wrong type',
-        'list_lots:lot_id of the wrong type',
-        'list_lots:offset of the wrong type',
-        'list_lots:product_template_id of the wrong type',
-        'list_lots:status of the wrong type',
-        'search_items:limit of the wrong type',
-        'search_items:no arguments',
-        'search_items:query of the wrong type',
-        'search_items:shelf_id of the wrong type',
-    }
-)
+#: (tool, case) pairs still answered in the library's text. Empty: argument
+#: validation is answered by the server itself (``_http._InventariServer``).
+#: A pair added here is debt, never permission.
+BASELINE: frozenset[str] = frozenset()
 
 
 def _tools() -> list[dict[str, Any]]:
@@ -130,3 +91,44 @@ def test_the_scan_sees_the_librarys_text() -> None:
     )
     assert library_worded(planted)
     assert not library_worded('LOCATION_REQUIRED: choose a location first')
+
+
+def test_an_omitted_argument_is_named_with_what_to_send(
+    mcp_tool, mcp_write_key: str
+) -> None:
+    """The refusal names the argument and says what it is, from the tool's
+    own published description, so an agent knows which call gives it one."""
+    result = mcp_tool(mcp_write_key, 'get_item', {})
+
+    assert result['isError'] is True
+    text = result['content'][0]['text']
+    assert text.startswith('ARGUMENT_REQUIRED: ')
+    assert 'item_id' in text
+    assert 'search_items' in text
+
+
+def test_an_argument_of_the_wrong_type_says_which_type(
+    mcp_tool, mcp_write_key: str
+) -> None:
+    result = mcp_tool(mcp_write_key, 'get_item', {'item_id': 'not-an-id'})
+
+    assert result['isError'] is True
+    text = result['content'][0]['text']
+    assert text.startswith('ARGUMENT_INVALID: ')
+    assert 'item_id' in text
+    assert 'uuid' in text
+    assert 'not-an-id' not in text
+
+
+def test_a_refusal_of_the_tool_itself_carries_no_library_prefix(
+    mcp_tool, mcp_write_key: str
+) -> None:
+    """A tool's own refusal reaches the agent as written: code first."""
+    result = mcp_tool(
+        mcp_write_key,
+        'get_item',
+        {'item_id': '00000000-0000-0000-0000-000000000000'},
+    )
+
+    assert result['isError'] is True
+    assert result['content'][0]['text'].startswith('ITEM_NOT_FOUND: ')

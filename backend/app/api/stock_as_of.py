@@ -31,7 +31,7 @@ from app.core.deps import (
     require_org,
     require_permission,
 )
-from app.core.exceptions import catalogue_refusal
+from app.core.exceptions import ValidationException, catalogue_refusal
 from app.core.public_api import core_api
 from app.core.work_in_progress import work_in_progress_value_async
 from app.core.xlsx_export import to_xlsx_response
@@ -319,6 +319,31 @@ async def stock_as_of_pdf(
     )
 
 
+async def _ledger_start_on_calendar(db: AsyncSession, org_id: UUID) -> datetime | None:
+    """The ledger's first movement on the organization's calendar, if any."""
+    starts_at = await ledger_starts_at_async(db, org_id)
+    if starts_at is None:
+        return None
+    zone = await core_api.organizations.timezone_async(db, org_id)
+    return starts_at.astimezone(zone)
+
+
+async def _first_day_refusal(
+    db: AsyncSession, org_id: UUID, started_on: datetime
+) -> ValidationException:
+    """The ledger's first day, and the day after it, when a statement can open."""
+    lang = get_current_lang()
+    organization = await core_api.organizations.get_async(db, org_id)
+    country = organization.country if organization else None
+    return catalogue_refusal(
+        'stock_value_first_day',
+        starts_at=format_date_for(lang, started_on, country=country),
+        first_day=format_date_for(
+            lang, started_on.date() + timedelta(days=1), country=country
+        ),
+    )
+
+
 async def _default_period_start(db: AsyncSession, org_id: UUID, date_to: date) -> date:
     """The first day a statement ending on *date_to* can honestly open on.
 
@@ -332,24 +357,11 @@ async def _default_period_start(db: AsyncSession, org_id: UUID, date_to: date) -
     about.
     """
     first = date_to.replace(day=1)
-    starts_at = await ledger_starts_at_async(db, org_id)
-    if starts_at is not None:
-        zone = await core_api.organizations.timezone_async(db, org_id)
-        started_on = starts_at.astimezone(zone)
+    started_on = await _ledger_start_on_calendar(db, org_id)
+    if started_on is not None:
         first = max(first, started_on.date() + timedelta(days=1))
         if first > date_to:
-            lang = get_current_lang()
-            organization = await core_api.organizations.get_async(db, org_id)
-            country = organization.country if organization else None
-            raise catalogue_refusal(
-                'stock_value_first_day',
-                starts_at=format_date_for(lang, started_on, country=country),
-                first_day=format_date_for(
-                    lang,
-                    datetime.combine(first, time.min, tzinfo=zone),
-                    country=country,
-                ),
-            )
+            raise await _first_day_refusal(db, org_id, started_on)
     return first
 
 
@@ -365,11 +377,19 @@ async def _build_value_movement(
     movements are what the cost layers say between them; whatever the two
     ends differ by that the layers do not account for is said, not hidden,
     as ``other_changes``.
+
+    A first day the reader picks is held to the boundary the default one
+    keeps: its evening before has to be inside the ledger, or the answer
+    names the day a statement can open on — not a report for an evening
+    the reader never chose.
     """
     if date_from is None:
         date_from = await _default_period_start(db, org_id, date_to)
     if date_to < date_from:
         raise catalogue_refusal('stock_value_period_reversed')
+    started_on = await _ledger_start_on_calendar(db, org_id)
+    if started_on is not None and date_from <= started_on.date():
+        raise await _first_day_refusal(db, org_id, started_on)
     opening, _ = await _build_report(
         db, org_id, date_from - timedelta(days=1), None, limit=1
     )

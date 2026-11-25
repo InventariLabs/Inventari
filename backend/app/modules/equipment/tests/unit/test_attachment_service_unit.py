@@ -99,7 +99,7 @@ class TestUploadAttachment:
     async def test_upload_invalid_content_type(self, mock_core: Any) -> None:
         mock_core.items.get_async = AsyncMock(return_value=MagicMock())
         db = AsyncMock()
-        with pytest.raises(ValueError, match='Unsupported file type'):
+        with pytest.raises(ValueError, match='File type not allowed. Allowed: docx, '):
             await upload_attachment(
                 db,
                 uuid4(),
@@ -116,7 +116,9 @@ class TestUploadAttachment:
         mock_core.items.get_async = AsyncMock(return_value=MagicMock())
         db = AsyncMock()
         big_content = b'x' * (MAX_FILE_SIZE + 1)
-        with pytest.raises(ValueError, match='File too large'):
+        with pytest.raises(
+            ValueError, match=r'File exceeds the maximum allowed size \(20 MB\)'
+        ):
             await upload_attachment(
                 db,
                 uuid4(),

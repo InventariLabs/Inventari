@@ -13,10 +13,12 @@ from app.core.module_sdk import served_url
 from app.core.public_api import core_api
 from app.core.upload_validation import (
     ATTACHMENT_CONTENT_TYPES,
+    CONTENT_TYPE_TO_EXT,
     UploadMessages,
     UploadPolicy,
+    format_size_limit,
 )
-from app.i18n.service import get_current_lang
+from app.i18n.service import get_current_lang, get_error_message
 
 from ._assets_service import get_asset_async
 from ._unit_identity import audit_identity
@@ -37,6 +39,26 @@ ATTACHMENT_POLICY = UploadPolicy(
 )
 
 VALID_FILE_TYPES = {'INVOICE', 'WARRANTY', 'PHOTO', 'MANUAL', 'OTHER'}
+
+
+def _refusals(policy: UploadPolicy) -> UploadMessages:
+    """What a refused upload is told, in the reader's language.
+
+    The kinds of file an asset takes and its own limit, never the type the
+    browser declared: a MIME type means nothing to the person who picked
+    the file, and the item attachment's sentence names a smaller limit.
+    """
+    lang = get_current_lang()
+    kinds = sorted({CONTENT_TYPE_TO_EXT[kind] for kind in policy.content_types})
+    return UploadMessages(
+        type_not_allowed=get_error_message(
+            'file_type_not_allowed_list', lang, allowed=', '.join(kinds)
+        ),
+        too_large=get_error_message(
+            'file_too_large_limit', lang, limit=format_size_limit(policy.max_bytes)
+        ),
+        signature_mismatch=get_error_message('file_signature_mismatch', lang),
+    )
 
 
 def _served_address(org_id: UUID, file_path: str) -> str:
@@ -70,13 +92,7 @@ async def upload_attachment(
     accepted = ATTACHMENT_POLICY.check(
         file_content,
         declared_type=content_type,
-        messages=UploadMessages(
-            type_not_allowed=f'Unsupported file type: {content_type}',
-            too_large='File too large (max 20 MB)',
-            signature_mismatch=(
-                f'File content does not match declared type {content_type}'
-            ),
-        ),
+        messages=_refusals(ATTACHMENT_POLICY),
     )
 
     # The row keeps the org-relative path (<item_id>/<uuid>.<ext>); the

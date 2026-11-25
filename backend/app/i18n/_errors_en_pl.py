@@ -10,8 +10,8 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'token_expired': 'Authentication token has expired',
         'token_invalid': 'Invalid authentication token',
         'insufficient_permissions': 'You do not have permission to perform this action',
-        'import_create_forbidden': 'This account does not hold the permissions {permissions}, so the import may not create missing locations or categories on its behalf. Turn off the matching toggles in the import dialog, or ask for the permission',
-        'import_create_forbidden_one': 'This account does not hold the permission {permissions}, so the import may not create missing locations or categories on its behalf. Turn off the matching toggles in the import dialog, or ask for the permission',
+        'import_create_forbidden': 'This account does not hold the permissions {permissions}, so the import may not create missing locations or categories on its behalf. Turn off the matching toggles in the import dialog, or ask for these permissions',
+        'import_create_forbidden_one': 'This account does not hold the permission {permissions}, so the import may not create missing locations or categories on its behalf. Turn off the matching toggle in the import dialog, or ask for the permission',
         'import_stubs_forbidden': 'This account does not hold {permissions}, so the import may not create temporary products for unmatched barcodes on its behalf. Clear the "Create product stubs for unmatched barcodes" checkbox in the import dialog, or ask for the permission',
         'user_blocked': 'Your account has been blocked. Reason: {reason}',
         'user_blocked_no_reason': 'No reason provided',
@@ -155,6 +155,8 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'insufficient_quantity': 'Not enough stock to perform this action',
         'file_type_not_allowed': 'File type not allowed',
         'file_signature_mismatch': 'File signature does not match the declared file type',
+        'request_body_too_large': 'What was sent is too large: the server accepts at most {limit}. Send a smaller file.',
+        'file_too_large_limit': 'File exceeds the maximum allowed size ({limit})',
         'file_too_large': 'File exceeds the maximum allowed size (10 MB)',
         'file_type_not_allowed_list': 'File type not allowed. Allowed: {allowed}',
         'file_content_type_missing': 'The file does not say what type it is (the Content-Type header is missing).',
@@ -634,6 +636,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'document_correction_not_duplicable': 'A correction cannot be duplicated: it restates one document. Write a new correction of that document instead.',
         'field_cannot_be_cleared': 'These fields cannot be cleared: {fields}.',
         'ingredient_defaults_unreadable_file': 'The file could not be read. The import expects a .json or .csv file with one row per ingredient.',
+        'name_has_no_latin_form': 'Names are matched by their Latin spelling, and no character in this one has it. Add a Latin spelling beside the name, for example in brackets.',
         'ingredient_default_name_has_no_key': 'A name made only of invisible characters cannot be saved.',
         'onboarding_modules_not_offered': "The profile '{profile}' does not offer these modules: {modules}",
         'location_chain_step_incomplete': 'Each step of a location chain needs an id or a name.',
@@ -816,6 +819,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
             '{template_unit} — or, for pieces, record on the product how much '
             'one piece weighs or holds.'
         ),
+        'bridge_line_unit_not_convertible': 'The ingredient “{name}” is kept in {stock_unit}, and {line_unit} cannot be read as {stock_unit}. Use a unit of the same kind on its line, or record what one {stock_unit} weighs or holds on the product.',
         'bom_line_unit_not_convertible': (
             'This ingredient is kept in {stock_unit}, and {line_unit} cannot be '
             'read as {stock_unit}. Use a unit of the same kind, or record what '
@@ -1108,8 +1112,8 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'token_expired': 'Token uwierzytelniający wygasł',
         'token_invalid': 'Nieprawidłowy token uwierzytelniający',
         'insufficient_permissions': 'Nie masz uprawnień do wykonania tej operacji',
-        'import_create_forbidden': 'To konto nie ma uprawnień {permissions}, więc import nie może tworzyć za nie brakujących miejsc ani kategorii. Wyłącz odpowiednie przełączniki w oknie importu albo poproś o to uprawnienie',
-        'import_create_forbidden_one': 'To konto nie ma uprawnienia {permissions}, więc import nie może tworzyć za nie brakujących miejsc ani kategorii. Wyłącz odpowiednie przełączniki w oknie importu albo poproś o to uprawnienie',
+        'import_create_forbidden': 'To konto nie ma uprawnień {permissions}, więc import nie może tworzyć za nie brakujących miejsc ani kategorii. Wyłącz odpowiednie przełączniki w oknie importu albo poproś o te uprawnienia',
+        'import_create_forbidden_one': 'To konto nie ma uprawnienia {permissions}, więc import nie może tworzyć za nie brakujących miejsc ani kategorii. Wyłącz odpowiedni przełącznik w oknie importu albo poproś o to uprawnienie',
         'import_stubs_forbidden': 'To konto nie ma uprawnienia {permissions}, więc import nie może tworzyć za nie produktów tymczasowych dla niedopasowanych kodów kreskowych. Odznacz pole „Utwórz produkty tymczasowe dla niedopasowanych kodów kreskowych” w oknie importu albo poproś o to uprawnienie',
         'user_blocked': 'Twoje konto zostało zablokowane. Powód: {reason}',
         'user_blocked_no_reason': 'nie podano',
@@ -1249,6 +1253,8 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'insufficient_quantity': 'Niewystarczająca ilość produktu',
         'file_type_not_allowed': 'Niedozwolony typ pliku',
         'file_signature_mismatch': 'Sygnatura pliku nie zgadza się z zadeklarowanym typem',
+        'request_body_too_large': 'Wysłane dane są za duże: serwer przyjmuje najwyżej {limit}. Wyślij mniejszy plik.',
+        'file_too_large_limit': 'Plik przekracza dozwolony rozmiar ({limit})',
         'file_too_large': 'Plik przekracza dozwolony rozmiar (10 MB)',
         'file_type_not_allowed_list': 'Niedozwolony typ pliku. Dozwolone: {allowed}',
         'file_content_type_missing': 'Plik nie podaje swojego typu (brak nagłówka Content-Type).',
@@ -1730,6 +1736,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'document_correction_not_duplicable': 'Korekty nie można zduplikować: odnosi się do jednego dokumentu. Zamiast tego wystaw nową korektę tego dokumentu.',
         'field_cannot_be_cleared': 'Tych pól nie można wyczyścić: {fields}.',
         'ingredient_defaults_unreadable_file': 'Nie udało się odczytać pliku. Import przyjmuje plik .json lub .csv z jednym wierszem na składnik.',
+        'name_has_no_latin_form': 'Nazwy są dopasowywane po zapisie łacińskim, a żaden znak tej nazwy go nie ma. Dopisz obok zapis łacińskimi literami, na przykład w nawiasie.',
         'ingredient_default_name_has_no_key': 'Nie można zapisać nazwy złożonej wyłącznie z niewidocznych znaków.',
         'onboarding_modules_not_offered': 'Profil „{profile}” nie oferuje tych modułów: {modules}',
         'location_chain_step_incomplete': 'Każdy krok łańcucha miejsc wymaga identyfikatora lub nazwy.',
@@ -1904,6 +1911,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'item_unit_change_blocked_by_stock': 'Ta pozycja ma {quantity} {current_unit}. Zmiana jednostki na {new_unit} przekleiłaby etykietę na tej liczbie, nie zmieniając tego, co stoi na półce. Najpierw zużyj albo odpisz stan, albo załóż osobną pozycję w nowej jednostce.',
         'item_unit_differs_from_template_confirmation_required': 'Produkt {product} jest prowadzony w {template_unit}, a ta ilość jest podana w {chosen_unit}. Przy zapisie zostanie przeliczona na {template_unit}, więc potwierdź, że chodziło o {chosen_unit}, albo wpisz ilość w {template_unit}.',
         'item_unit_not_convertible_to_card': 'Produkt {product} jest prowadzony w {template_unit}, a ilości w {chosen_unit} nie da się na nie przeliczyć. Wpisz ilość w {template_unit} albo — dla sztuk — zapisz przy produkcie, ile waży lub mieści jedna sztuka.',
+        'bridge_line_unit_not_convertible': 'Składnik „{name}” prowadzony jest w {stock_unit}, a {line_unit} nie da się przeliczyć na {stock_unit}. Podaj w jego wierszu jednostkę tego samego rodzaju albo zapisz przy produkcie, ile waży lub mieści jeden {stock_unit}.',
         'bom_line_unit_not_convertible': 'Ten składnik prowadzony jest w {stock_unit}, a {line_unit} nie da się '
         'przeliczyć na {stock_unit}. Podaj jednostkę tego samego rodzaju albo '
         'zapisz przy produkcie, ile waży lub mieści jeden {stock_unit}.',
@@ -1963,9 +1971,9 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
             'go zawęzić.'
         ),
         'stock_value_first_day': (
-            'Rejestr ruchów zaczyna się {starts_at}. Zestawienie musi się '
-            'otwierać na znanym wieczorze, więc pierwsze może zacząć się '
-            '{first_day}.'
+            'Rejestr ruchów zaczyna się {starts_at}. Zestawienie otwiera się '
+            'stanem z wieczoru dnia poprzedniego, a ten musi być znany, więc '
+            'pierwsze może zacząć się {first_day}.'
         ),
         'stock_value_period_reversed': (
             'Okres kończy się przed swoim początkiem. Wybierz datę końca nie wcześniejszą niż data początku.'
@@ -2086,7 +2094,7 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
         'putaway_rule_target_receiving': 'Strefa przyjęć nie może być celem reguły rozmieszczania: towar tylko tam czeka.',
         'putaway_rule_target_quarantine': 'Miejsce kwarantanny nie może być celem reguły rozmieszczania: reguła nie wysyła tam towaru, bo wstrzymany towar jest tam trzymany osobno.',
         'putaway_rule_needs_match_key': 'Reguła rozmieszczania musi mieć co najmniej jeden warunek — produkt, kategorię, tag kontekstu lub typ miejsca.',
-        'document_template_wrong_module': 'Szablon dokumentu należy do modułu dokumentów',
+        'document_template_wrong_module': 'Szablon dokumentu należy do modułu Magazyn',
         'search_query_empty': 'Wpisz, czego szukasz',
         'document_type_invalid': 'Nie ma typu dokumentu {type}',
         'settings_payload_not_object': 'Ustawienia muszą być przesłane jako obiekt JSON',

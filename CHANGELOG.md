@@ -42,6 +42,35 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Refusals speak the reader's language and name what the reader knows. An
+  upload over the server's size limit is answered in the interface language,
+  with the limit, in the same envelope as every other refusal (code
+  `REQUEST_BODY_TOO_LARGE`), instead of a bare English "Request body too
+  large". An asset's attachment refused for its type, size or content says
+  so in the reader's language and names the kinds of file an asset takes or
+  its own 20 MB limit, never a MIME type, and answers with the status and code
+  a product's attachment does (415 `FILE_TYPE_NOT_ALLOWED`, 413
+  `FILE_TOO_LARGE`, 400 `FILE_SIGNATURE_MISMATCH`) instead of 400
+  `VALIDATION_ERROR`. A stock adjustment that would go below zero names the
+  product, not its record id; building a production recipe from a culinary
+  one names the ingredient whose unit its stock cannot be read in; a stock
+  value statement whose chosen first day is on or before the ledger's first
+  day names the day a statement can start on. An ingredient or exclusion name
+  written only in characters with no Latin spelling is asked for one instead
+  of being called invisible. Tagging selected recipes says that one Apply adds
+  up to 20 tags and refuses more before sending, in the reader's language.
+  German approval refusals say *Genehmigung*, as the screens do; template
+  refusals call the warehouse module by its launcher name in every language;
+  and the import's refusal for missing permissions agrees with how many it
+  names to the end of the sentence.
+- The MCP endpoint answers arguments that break a tool's input schema with
+  `ARGUMENT_REQUIRED` or `ARGUMENT_INVALID`, naming the argument, its type and
+  its description, instead of the server library's validation text; every
+  refusal now starts with its code rather than with "Error executing tool
+  <name>:"; and a permission the key lacks is named the way the API key form
+  names it. The MCP Server page offers the module settings only to an
+  administrator, who alone can open them, and tells anyone else to ask one to
+  add the host.
 - Opening stock from a sheet keeps what the sheet says. A row in cartons or
   litres founds its product in that unit instead of in pieces, so the draft
   receipt opens; a row naming a unit an existing product cannot take is

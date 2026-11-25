@@ -9,8 +9,8 @@ ERRORS_DE: ErrorMessages = {
     'token_expired': 'Authentifizierungstoken ist abgelaufen',
     'token_invalid': 'Ungültiges Authentifizierungstoken',
     'insufficient_permissions': 'Sie haben keine Berechtigung für diese Aktion',
-    'import_create_forbidden': 'Dieses Konto hat die Berechtigungen {permissions} nicht, daher darf der Import keine fehlenden Orte oder Kategorien anlegen. Deaktivieren Sie die entsprechenden Schalter im Importdialog oder fordern Sie die Berechtigung an',
-    'import_create_forbidden_one': 'Dieses Konto hat die Berechtigung {permissions} nicht, daher darf der Import keine fehlenden Orte oder Kategorien anlegen. Deaktivieren Sie die entsprechenden Schalter im Importdialog oder fordern Sie die Berechtigung an',
+    'import_create_forbidden': 'Dieses Konto hat die Berechtigungen {permissions} nicht, daher darf der Import keine fehlenden Orte oder Kategorien anlegen. Deaktivieren Sie die entsprechenden Schalter im Importdialog oder fordern Sie diese Berechtigungen an',
+    'import_create_forbidden_one': 'Dieses Konto hat die Berechtigung {permissions} nicht, daher darf der Import keine fehlenden Orte oder Kategorien anlegen. Deaktivieren Sie den entsprechenden Schalter im Importdialog oder fordern Sie die Berechtigung an',
     'import_stubs_forbidden': 'Dieses Konto hat die Berechtigung {permissions} nicht, daher darf der Import keine vorübergehenden Produkte für nicht übereinstimmende Strichcodes anlegen. Deaktivieren Sie das Kontrollkästchen „Stub-Produkte für nicht zugeordnete Barcodes erstellen“ im Importdialog oder fordern Sie die Berechtigung an',
     'user_blocked': 'Ihr Konto wurde gesperrt. Grund: {reason}',
     'user_blocked_no_reason': 'nicht angegeben',
@@ -27,6 +27,7 @@ ERRORS_DE: ErrorMessages = {
     'item_unit_change_blocked_by_stock': 'Dieser Datensatz führt {quantity} {current_unit}. Die Einheit auf {new_unit} zu ändern würde diese Zahl nur neu beschriften, ohne den Bestand im Regal zu ändern. Verbrauchen oder abschreiben Sie ihn zuerst, oder legen Sie einen eigenen Datensatz in der neuen Einheit an.',
     'item_unit_differs_from_template_confirmation_required': '{product} wird in {template_unit} geführt, und diese Menge ist in {chosen_unit} angegeben. Beim Speichern wird sie in {template_unit} umgerechnet — bestätigen Sie also, dass {chosen_unit} gemeint war, oder geben Sie die Menge in {template_unit} ein.',
     'item_unit_not_convertible_to_card': '{product} wird in {template_unit} geführt, und eine Menge in {chosen_unit} lässt sich nicht darin umrechnen. Geben Sie die Menge in {template_unit} ein — oder hinterlegen Sie bei Stück am Produkt, wie viel ein Stück wiegt oder fasst.',
+    'bridge_line_unit_not_convertible': 'Die Zutat „{name}“ wird in {stock_unit} geführt, und {line_unit} lässt sich nicht in {stock_unit} umrechnen. Verwenden Sie in ihrer Zeile eine Einheit derselben Art, oder hinterlegen Sie am Produkt, wie viel ein {stock_unit} wiegt oder fasst.',
     'bom_line_unit_not_convertible': 'Diese Zutat wird in {stock_unit} geführt, und {line_unit} lässt sich '
     'nicht in {stock_unit} umrechnen. Verwenden Sie eine Einheit derselben '
     'Art, oder hinterlegen Sie am Produkt, wie viel ein {stock_unit} wiegt '
@@ -221,6 +222,8 @@ ERRORS_DE: ErrorMessages = {
     'insufficient_quantity': 'Nicht genügend Bestand für diese Aktion',
     'file_type_not_allowed': 'Dateityp nicht erlaubt',
     'file_signature_mismatch': 'Dateisignatur stimmt nicht mit dem deklarierten Dateityp überein',
+    'request_body_too_large': 'Die gesendeten Daten sind zu groß: Der Server nimmt höchstens {limit} an. Senden Sie eine kleinere Datei.',
+    'file_too_large_limit': 'Datei überschreitet die maximal erlaubte Größe ({limit})',
     'file_too_large': 'Datei überschreitet die maximal erlaubte Größe (10 MB)',
     'file_type_not_allowed_list': 'Dateityp nicht erlaubt. Erlaubt: {allowed}',
     'file_content_type_missing': 'Die Datei gibt ihren Typ nicht an (der Content-Type-Header fehlt).',
@@ -350,7 +353,7 @@ ERRORS_DE: ErrorMessages = {
     'document_correction_would_go_negative': 'Die Korrektur würde {item} unter null bringen: aktuell {current}, Änderung {delta}, Ergebnis {result}.',
     'document_adjustment_would_go_negative': 'Die Bestandskorrektur würde {item} unter null bringen: aktuell {current}, Änderung {delta}, Ergebnis {result}.',
     'document_line_needs_identity': 'Die Dokumentzeile muss einen Datensatz, ein Produkt oder einen Namen nennen.',
-    'document_rework_wrong_status': 'Ein Dokument im Status {status} kann nicht in den Entwurf zurückgeführt werden; nur ein bestätigtes oder ein zur Freigabe anstehendes Dokument kann das.',
+    'document_rework_wrong_status': 'Ein Dokument im Status {status} kann nicht in den Entwurf zurückgeführt werden; nur ein bestätigtes oder ein auf Genehmigung wartendes Dokument kann das.',
     'stock_record_not_found': 'Der Datensatz {item} wurde nicht gefunden.',
     'stock_product_not_found': 'Das Produkt {product} wurde nicht gefunden.',
     'stock_insufficient_record': 'Nicht genug Bestand für „{item}“: verfügbar {available}, angefordert {requested}.',
@@ -381,7 +384,7 @@ ERRORS_DE: ErrorMessages = {
     'stock_take_over_cap': 'Bei {count} Position(en) liegt die gezählte Menge weit über dem Systembestand. Prüfen Sie sie und bestätigen Sie, um die gezählten Mengen zu speichern.',
     'stock_take_over_tolerance': 'Bei {count} Position(en) weicht die gezählte Menge stärker vom Systembestand ab, als die Toleranz dieser Inventur zulässt. Vor dem Buchen muss jemand mit der entsprechenden Berechtigung sie annehmen.',
     'stock_take_tolerance_reason_missing': 'Bei {count} Position(en) liegt die Abweichung über der Toleranz und es fehlt der Grund. Geben Sie für jede einen Grund an und schließen Sie die Inventur dann ab.',
-    'stock_take_tolerance_not_allowed': 'Eine Abweichung über der Toleranz anzunehmen erfordert die Berechtigung zur Inventurfreigabe.',
+    'stock_take_tolerance_not_allowed': 'Eine Abweichung über der Toleranz anzunehmen erfordert die Berechtigung, Inventuren zu genehmigen.',
     'stock_take_awaiting_recount': 'Bei {count} Position(en) wurde eine erneute Zählung angefordert. Zählen Sie sie noch einmal und schließen Sie die Inventur dann ab.',
     'stock_take_stock_moved': '{count} Position(en) wurden gegen einen Bestand gezählt, den das Lager nicht mehr hat. Sie wurden zur erneuten Zählung zurückgeschickt.',
     'document_not_found': 'Dokument nicht gefunden',
@@ -625,7 +628,7 @@ ERRORS_DE: ErrorMessages = {
     'approvals_read_forbidden': 'Sie haben keine Berechtigung, Genehmigungsanträge einzusehen',
     'approvals_write_forbidden': 'Sie haben keine Berechtigung, Genehmigungsanträge zu stellen',
     'documents_approve_requires_grant': 'Sie haben keine Berechtigung, Dokumente zu genehmigen oder abzulehnen',
-    'po_approval_workflow_missing': 'Diese Bestellung braucht eine Freigabe, aber noch ist niemand dafür eingerichtet. Bitten Sie Ihren Administrator, das einzurichten.',
+    'po_approval_workflow_missing': 'Diese Bestellung braucht eine Genehmigung, aber noch ist niemand dafür eingerichtet. Bitten Sie Ihren Administrator, das einzurichten.',
     'po_supplier_required': 'Eine Bestellung kann ohne Lieferanten nicht bestätigt werden',
     'document_type_requires_partner': 'Dieser Dokumenttyp erfordert einen Partner.',
     'partner_has_no_email': 'Der Partner hat keine E-Mail-Adresse.',
@@ -701,6 +704,7 @@ ERRORS_DE: ErrorMessages = {
     'document_correction_not_duplicable': 'Eine Korrektur kann nicht dupliziert werden: Sie berichtigt ein bestimmtes Dokument. Erstellen Sie stattdessen eine neue Korrektur dieses Dokuments.',
     'field_cannot_be_cleared': 'Diese Felder können nicht geleert werden: {fields}.',
     'ingredient_defaults_unreadable_file': 'Die Datei konnte nicht gelesen werden. Der Import erwartet eine .json- oder .csv-Datei mit einer Zeile pro Zutat.',
+    'name_has_no_latin_form': 'Namen werden über ihre lateinische Schreibweise zugeordnet, und kein Zeichen dieses Namens hat eine. Ergänzen Sie neben dem Namen eine lateinische Schreibweise, zum Beispiel in Klammern.',
     'ingredient_default_name_has_no_key': 'Ein Name, der nur aus unsichtbaren Zeichen besteht, kann nicht gespeichert werden.',
     'onboarding_modules_not_offered': 'Das Profil „{profile}“ bietet diese Module nicht an: {modules}',
     'location_chain_step_incomplete': 'Jeder Schritt einer Lagerortkette braucht eine ID oder einen Namen.',
@@ -905,7 +909,7 @@ ERRORS_DE: ErrorMessages = {
     'permanent_delete_disabled': (
         'Das dauerhafte Löschen ist für diese Organisation deaktiviert.'
     ),
-    'documents_approval_workflow_missing': 'Dieses Dokument braucht eine Freigabe, aber noch ist niemand dafür eingerichtet. Bitten Sie Ihren Administrator, das einzurichten.',
+    'documents_approval_workflow_missing': 'Dieses Dokument braucht eine Genehmigung, aber noch ist niemand dafür eingerichtet. Bitten Sie Ihren Administrator, das einzurichten.',
     'category_delete_blocked_by_items': (
         'Kategorie kann nicht gelöscht werden — sie wird verwendet ({count}). Verschieben Sie ihre Produkte zuerst in eine andere Kategorie.'
     ),
@@ -983,7 +987,7 @@ ERRORS_DE: ErrorMessages = {
     'putaway_rule_target_receiving': 'Ein Wareneingangsbereich kann kein Ziel einer Einlagerungsregel sein: Die Ware wartet dort nur.',
     'putaway_rule_target_quarantine': 'Ein Quarantäne-Lagerort kann kein Ziel einer Einlagerungsregel sein: Zurückgehaltene Ware wird dort getrennt aufbewahrt.',
     'putaway_rule_needs_match_key': 'Eine Einlagerungsregel braucht mindestens eine Bedingung — ein Produkt, eine Kategorie, einen Kontext-Tag oder einen Lagerorttyp.',
-    'document_template_wrong_module': 'Eine Dokumentvorlage gehört zum Modul Dokumente',
+    'document_template_wrong_module': 'Eine Dokumentvorlage gehört zum Modul Lager',
     'search_query_empty': 'Geben Sie einen Suchbegriff ein',
     'document_type_invalid': 'Es gibt keinen Dokumenttyp {type}',
     'settings_payload_not_object': 'Die Einstellungen müssen als JSON-Objekt gesendet werden',

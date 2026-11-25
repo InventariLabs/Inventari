@@ -942,6 +942,40 @@ class TestExecuteAdjustment:
         ):
             await _execute_adjustment(db, doc, user_id)
 
+    @pytest.mark.asyncio
+    async def test_a_count_below_zero_is_refused_by_the_products_name(self) -> None:
+        """The person at the shelf reads the product, not its record id.
+
+        No API door writes a negative adjustment line today, so the refusal
+        is reached here, on the executor, with the line a count would write.
+        """
+        item_id = uuid4()
+        line = _make_line(
+            item_id=item_id,
+            product_template_id=uuid4(),
+            name='Widget A',
+            done_quantity=Decimal('-30.000'),
+        )
+        doc = _make_doc(doc_type='ADJUSTMENT', lines=[line])
+        item = SimpleNamespace(id=item_id, name='Widget A', template_id=uuid4())
+        module = 'app.modules.warehouse._stock_executor_deltas'
+        with (
+            patch(f'{module}._get_item_or_raise', AsyncMock(return_value=item)),
+            patch(f'{module}._locked_quantity', AsyncMock(return_value=Decimal('10'))),
+            patch(f'{module}.core_api') as mock_core,
+        ):
+            mock_core.uoms.to_stock_uom_async = AsyncMock(
+                return_value=Decimal('-30.000')
+            )
+            with pytest.raises(ValueError) as refused:
+                await _execute_adjustment(_make_async_db(), doc, uuid4())
+
+        assert str(refused.value) == (
+            'The adjustment would take Widget A below zero: '
+            'current 10, change -30, result -20.'
+        )
+        assert str(item_id) not in str(refused.value)
+
 
 @pytest.mark.asyncio
 async def test_the_planner_falls_back_to_the_record_shelf() -> None:
