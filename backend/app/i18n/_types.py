@@ -71,6 +71,8 @@ class ErrorMessages(TypedDict):
     storage_type_exists: str
     storage_type_no_access: str
     storage_type_in_use: str
+    storage_type_in_use_one: NotRequired[str]
+    storage_type_in_use_few: NotRequired[str]
     storage_usage_immutable: str
     storage_type_system_modify: str
     storage_type_system_delete: str
@@ -260,15 +262,22 @@ class ErrorMessages(TypedDict):
     stock_take_item_outside_location: str
     stock_take_shelf_outside_location: str
     stock_take_uncounted_items: str
+    stock_take_uncounted_items_one: NotRequired[str]
+    stock_take_uncounted_items_few: NotRequired[str]
     stock_none_at_location: str
     stock_all_batches_held: str
     stock_not_enough: str
     stock_take_over_cap: str
+    stock_take_over_cap_one: NotRequired[str]
     stock_take_over_tolerance: str
+    stock_take_over_tolerance_one: NotRequired[str]
     stock_take_tolerance_reason_missing: str
+    stock_take_tolerance_reason_missing_one: NotRequired[str]
     stock_take_tolerance_not_allowed: str
     stock_take_awaiting_recount: str
+    stock_take_awaiting_recount_one: NotRequired[str]
     stock_take_stock_moved: str
+    stock_take_stock_moved_one: NotRequired[str]
     storage_archived: str
     document_not_found: str
     work_item_not_found: str
@@ -422,6 +431,8 @@ class ErrorMessages(TypedDict):
     partner_name_exists: str
     partner_code_exists: str
     partner_delete_open_purchase_orders: str
+    partner_delete_open_purchase_orders_one: NotRequired[str]
+    partner_delete_open_purchase_orders_few: NotRequired[str]
     partner_import_name_missing: str
     partner_import_duplicate: str
     product_not_found: str
@@ -687,6 +698,8 @@ class ErrorMessages(TypedDict):
     category_delete_blocked_by_items: str
     category_system_field_label_locked: str
     storage_delete_blocked_by_movements: str
+    storage_delete_blocked_by_movements_one: NotRequired[str]
+    storage_delete_blocked_by_movements_few: NotRequired[str]
     storage_delete_blocked_by_stock: str
     storage_delete_blocked_by_child_name: str
     storage_name_collision: str
@@ -880,6 +893,8 @@ class ErrorMessages(TypedDict):
     user_not_in_organization: str
     template_other_organization: str
     template_in_use_by_items: str
+    template_in_use_by_items_one: NotRequired[str]
+    template_in_use_by_items_few: NotRequired[str]
     barcode_already_exists: str
     stock_insufficient_for_template: str
     stock_lot_not_consumable: str
@@ -900,6 +915,8 @@ class ErrorMessages(TypedDict):
     onboarding_profile_unknown: str
     storage_vanished_during_batch: str
     storage_archive_blocked_by_items: str
+    storage_archive_blocked_by_items_one: NotRequired[str]
+    storage_archive_blocked_by_items_few: NotRequired[str]
     storage_archive_target_is_self: str
     storage_archive_target_archived: str
     storage_restore_parent_archived: str

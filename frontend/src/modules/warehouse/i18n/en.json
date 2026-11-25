@@ -216,7 +216,7 @@
     "postNowIssue": "Issue stock",
     "postNowMove": "Move stock",
     "postNowConsume": "Remove from stock",
-    "postNowRecordOnly": "Record it — stock already taken",
+    "postNowRecordOnly": "Record it — stock already updated",
     "postNowScrap": "Write off stock",
     "postNowAdjust": "Adjust stock",
     "postNowDefault": "Post document",
@@ -251,7 +251,7 @@
     "postNowTitle": "Post this document?",
     "postNowApprovalTitle": "Send this document for approval?",
     "postNowMessage": "This confirms the document and posts its stock movement now. If something is wrong, undo it right after — or correct it later. Continue?",
-    "postNowRecordOnlyMessage": "The goods were already taken from stock when they were picked. This only records the movement — the stock does not change. Continue?",
+    "postNowRecordOnlyMessage": "The stock was already changed in the step this document records. This only keeps the record — the stock does not change. Continue?",
     "postNowApprovalMessage": "This confirms the document and sends it to the approval queue. Once approved, it is posted without another step. Continue?",
     "postNowMessageDeadEndNamed": "This sends the document for approval, but nobody could decide it: the stage “{{stage}}” names approvers who cannot see approvals. It waits there until the request is withdrawn or those people are given access. Continue?",
     "postNowMessageDeadEndNoApprover": "This sends the document for approval, but nobody could decide it: the stage “{{stage}}” is open to anyone holding the approve permission, and nobody in this organization holds it. It waits there until the request is withdrawn or someone is given the permission. Continue?",
@@ -383,7 +383,7 @@
     "confirmed": "Document confirmed — ready for execution",
     "pendingApproval": "Document sent for approval",
     "completed": "Document completed — stock updated",
-    "completedRecordOnly": "Document completed — it records the stock already taken",
+    "completedRecordOnly": "Document completed — it records stock that was already changed",
     "correctionApplied": "Correction applied — stock adjusted",
     "cancelled": "Document cancelled",
     "deleted": "Document deleted",
@@ -566,7 +566,6 @@
       "context_tag": "tag",
       "location_type": "Optional — pick a type"
     },
-    "executionSubmit": "Confirm & complete",
     "executionInvalidQuantity": "Enter a valid executed quantity for every line.",
     "executionTooHigh": "Executed quantity cannot exceed the planned quantity.",
     "executionCodeRequired": "Select a discrepancy code when executed quantity is lower than planned.",
@@ -1603,7 +1602,7 @@
   },
   "unitMismatch": {
     "title": "Units disagree",
-    "message": "{{product}} is kept in {{templateUnit}}, and this record would be saved in {{chosenUnit}}. Confirm to restate the record and this delivery into {{templateUnit}} — the choice lands in the record's history. To keep the units apart, change the record's unit on its page in Inventory first.",
+    "message": "{{product}} is kept in {{templateUnit}} (this record would be saved in {{chosenUnit}}). Confirm to restate the record and this delivery into {{templateUnit}} — the choice lands in the record's history. To keep the units apart, change the record's unit on its page in Inventory first.",
     "confirm": "Confirm and complete",
     "cancel": "Not now"
   },

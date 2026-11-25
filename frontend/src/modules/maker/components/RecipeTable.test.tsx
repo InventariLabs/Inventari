@@ -195,3 +195,19 @@ describe("RecipeTable — the overproduction note", () => {
     expect(note.className).toMatch(/max-w-/);
   });
 });
+
+describe("RecipeTable — the product under the name", () => {
+  it("names the product only where it differs from the recipe's name", () => {
+    renderTable([
+      baseRecipe,
+      {
+        ...baseRecipe,
+        id: "recipe-2",
+        name: "Świeca sojowa",
+        output_template_name: "Świeca sojowa",
+      },
+    ]);
+    expect(screen.getByText("Granola Bars 500g")).toBeInTheDocument();
+    expect(screen.getAllByText("Świeca sojowa")).toHaveLength(1);
+  });
+});

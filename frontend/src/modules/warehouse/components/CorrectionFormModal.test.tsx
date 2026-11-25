@@ -85,6 +85,20 @@ describe("CorrectionFormModal", () => {
     expect(screen.getByText("Możesz odjąć najwyżej 2,5")).toBeInTheDocument();
   });
 
+  it("writes the typed change with the reader's decimal mark", async () => {
+    await act(() => i18n.changeLanguage("pl"));
+    const document = makeDocument();
+    document.lines[0].done_quantity = "2.5";
+
+    render(<CorrectionFormModal document={document} onClose={vi.fn()} />);
+
+    const deltaInput = screen.getByRole("spinbutton", { name: "Zmiana" });
+    fireEvent.change(deltaInput, { target: { value: "-0.5" } });
+
+    expect(screen.getByText("-0,5")).toBeInTheDocument();
+    expect(screen.queryByText("-0.5")).not.toBeInTheDocument();
+  });
+
   it("clamps a negative delta to the executed quantity", async () => {
     render(<CorrectionFormModal document={makeDocument()} onClose={vi.fn()} />);
 

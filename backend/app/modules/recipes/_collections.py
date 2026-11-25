@@ -10,6 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import AuditAction, AuditTargetType
+from app.core.db_utils import acquire_advisory_lock
 from app.core.exceptions import ConflictException, ServiceRejectionError
 from app.core.module_sdk import hit_constraint
 from app.core.public_api import core_api
@@ -145,6 +146,15 @@ async def update_collection_async(
     collection_id: UUID,
     data: RecipeCollectionUpdate,
 ) -> RecipeCollection | None:
+    payload = data.model_dump(exclude_unset=True)
+    new_parent_id = payload.get('parent_id')
+    if new_parent_id is not None:
+        # The cycle check below walks the tree as committed. Two moves that
+        # cross (X under a descendant of Y, Y under X) would each walk a tree
+        # without the other and close a ring, so every move under a parent
+        # queues on one lock per organization's tree, taken before any row is
+        # read: the second walk then sees what the first committed.
+        await acquire_advisory_lock(db, f'recipes.collection_tree:{org_id}')
     collection = await db.scalar(
         select(RecipeCollection)
         .where(
@@ -156,8 +166,6 @@ async def update_collection_async(
     if collection is None:
         return None
 
-    payload = data.model_dump(exclude_unset=True)
-    new_parent_id = payload.get('parent_id')
     if new_parent_id is not None:
         if new_parent_id == collection.id:
             raise ServiceRejectionError('recipe_collection_own_parent')
@@ -207,8 +215,13 @@ async def update_collection_async(
 async def _descendants_async(
     db: AsyncSession, org_id: UUID, collection_id: UUID
 ) -> list[RecipeCollection]:
-    """Every sub-collection under *collection_id*, level by level."""
+    """Every sub-collection under *collection_id*, level by level.
+
+    The walk keeps the ids it has seen and never follows one twice, so a ring
+    of parents in the table ends it instead of looping for good.
+    """
     found: list[RecipeCollection] = []
+    seen = {collection_id}
     level = [collection_id]
     while level:
         rows = (
@@ -221,8 +234,10 @@ async def _descendants_async(
                 .order_by(RecipeCollection.name)
             )
         ).all()
-        found.extend(rows)
-        level = [row.id for row in rows]
+        fresh = [row for row in rows if row.id not in seen]
+        seen.update(row.id for row in fresh)
+        found.extend(fresh)
+        level = [row.id for row in fresh]
     return found
 
 
@@ -261,6 +276,13 @@ async def delete_collection_async(
             else None
         ),
     )
+    # A ring of parents reachable from here always runs through this
+    # collection, because every row has one parent: its own parent is then
+    # among its descendants. Cutting that one link leaves a tree, which the
+    # cascade below deletes child first.
+    if collection.parent_id in {child.id for child in removed}:
+        collection.parent_id = None
+        await db.flush()
     # Children and members are removed via cascade (DB-level ondelete=CASCADE
     # plus ORM cascade for in-session deletes).
     await db.delete(collection)

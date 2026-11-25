@@ -111,23 +111,24 @@ export function QuantityInput({
   }, [ownsTyping, value, precision, t]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // A field showing 0 takes the next digit after the zero: "09". A
+    // number input keeps that buffer on its own, since "09" and "9" are
+    // the same number to React, so the text is rewritten on the element.
+    // A digit typed in front of that zero ("90", caret left of it) is the
+    // same replacement, not a ten times larger number. Both modes do it:
+    // a caller that stores the raw text shows the same field.
+    const typed = event.target.value;
+    const text =
+      String(displayed) === "0" && /^[1-9]0$/.test(typed)
+        ? typed[0]
+        : typed.replace(/^(-?)0+(?=\d)/, "$1");
+    if (text !== typed) event.target.value = text;
     if (ownsTyping) {
-      // A field showing 0 takes the next digit after the zero: "09". A
-      // number input keeps that buffer on its own, since "09" and "9" are
-      // the same number to React, so the text is rewritten on the element.
-      // A digit typed in front of that zero ("90", caret left of it) is the
-      // same replacement, not a ten times larger number.
-      const typed = event.target.value;
-      const text =
-        String(displayed) === "0" && /^[1-9]0$/.test(typed)
-          ? typed[0]
-          : typed.replace(/^(-?)0+(?=\d)/, "$1");
-      if (text !== typed) event.target.value = text;
       setDraft(text);
       onQuantityChange?.(parseDraftedQuantity(text));
       return;
     }
-    setTypedError(quantityStepMessage(event.target.value, precision, t));
+    setTypedError(quantityStepMessage(text, precision, t));
     onChange?.(event);
   };
 

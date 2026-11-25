@@ -69,3 +69,28 @@ describe("ModuleTile status badge", () => {
     expect(link).toHaveAccessibleName(/^Inventory\b.*Track what you have/);
   });
 });
+
+describe("ModuleTile phone label", () => {
+  const labelOf = (displayName: string) => {
+    const named = {
+      ...module,
+      launcher: { ...module.launcher, displayName },
+    } as FrontendModule;
+    render(
+      <MemoryRouter>
+        <ModuleTile module={named} />
+      </MemoryRouter>,
+    );
+    return screen.getAllByText(displayName)[0];
+  };
+
+  it("keeps a long single word whole by stepping it down a size", () => {
+    // 12px puts "Zatwierdzenia" a letter wider than the tile where the browser
+    // has no hyphenation dictionary, and the fallback leaves a lone "a".
+    expect(labelOf("Zatwierdzenia")).toHaveClass("text-[10px]");
+  });
+
+  it("leaves a short name at the regular size", () => {
+    expect(labelOf("Inventory")).toHaveClass("text-xs");
+  });
+});

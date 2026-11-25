@@ -227,7 +227,7 @@
     "correct": "Corrigir",
     "viewReversal": "Ver estorno",
     "undoScrap": "Desfazer baixa",
-    "postNowRecordOnly": "Registrar — o estoque já foi retirado"
+    "postNowRecordOnly": "Registrar — o estoque já foi alterado"
   },
   "confirmDialog": {
     "confirmTitle": "Confirmar documento",
@@ -264,7 +264,7 @@
     "undoMessage": "Isto gera uma correção de estorno, devolve o estoque e mantém os dois documentos no histórico. Continuar?",
     "undoConfirm": "Desfazer",
     "undoKeep": "Manter documento",
-    "postNowRecordOnlyMessage": "As mercadorias já foram retiradas do estoque quando foram separadas. Isto registra apenas a movimentação — o estoque não muda. Continuar?"
+    "postNowRecordOnlyMessage": "O estoque já foi alterado na etapa que este documento registra. Isto apenas mantém o registro — o estoque não muda. Continuar?"
   },
   "import": {
     "title": "Importar linhas",
@@ -390,7 +390,7 @@
     "approvalRequested": "Aprovação solicitada",
     "undone": "Desfeito — o estorno {{number}} está no histórico",
     "undoPendingApproval": "Desfazer enviado para aprovação — o estorno {{number}} é lançado quando for aprovado",
-    "completedRecordOnly": "Documento concluído — ele registra o estoque já retirado"
+    "completedRecordOnly": "Documento concluído — ele registra uma alteração de estoque já feita"
   },
   "approvalQueueLink": "Ver na fila de aprovação",
   "approvalsQueue": {
@@ -566,7 +566,6 @@
       "context_tag": "tag",
       "location_type": "Opcional — escolher um tipo"
     },
-    "executionSubmit": "Confirmar e concluir",
     "executionInvalidQuantity": "Informe uma quantidade executada válida para cada linha.",
     "executionTooHigh": "A quantidade executada não pode exceder a quantidade planejada.",
     "executionCodeRequired": "Selecione um código de divergência quando a quantidade executada for menor que a planejada.",
@@ -1021,7 +1020,7 @@
         "address": "Endereço da organização emissora, com o nome do país localizado",
         "logo": "Logotipo da organização emissora (data URI incorporado)"
       },
-      "packages": "Apenas guia de embalagem: os volumes impressos, um por folha — number, count, code, code128_img, weight_kg e lines",
+      "packages": "Apenas romaneio de embalagem: os volumes impressos, um por folha — number, count, code, code128_img, weight_kg e lines",
       "partner": {
         "name": "Nome do parceiro (fornecedor/cliente)",
         "code": "Código do parceiro",
@@ -1603,7 +1602,7 @@
   },
   "unitMismatch": {
     "title": "As unidades não coincidem",
-    "message": "{{product}} é mantido em {{templateUnit}}, e este registro seria salvo em {{chosenUnit}}. Confirme para converter o registro e esta entrega para {{templateUnit}} — a escolha fica no histórico do registro. Para manter as unidades separadas, altere primeiro a unidade do registro na página dele em Estoque.",
+    "message": "{{product}} é mantido em {{templateUnit}} (este registro seria salvo em {{chosenUnit}}). Confirme para converter o registro e esta entrega para {{templateUnit}} — a escolha fica no histórico do registro. Para manter as unidades separadas, altere primeiro a unidade do registro na página dele em Estoque.",
     "confirm": "Confirmar e concluir",
     "cancel": "Agora não"
   },

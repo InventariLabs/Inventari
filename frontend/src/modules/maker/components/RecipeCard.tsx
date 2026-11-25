@@ -12,6 +12,7 @@ import { formatDate } from "@/utils/helpers";
 import { AvailabilityBadge } from "@/modules/maker/components/AvailabilityBadge";
 import { RecipeUnitCost } from "@/modules/maker/components/RecipeUnitCost";
 import { resultTerms } from "@/modules/maker/hooks/useResultTerms";
+import { productUnderName } from "@/modules/maker/lib/productUnderName";
 
 interface RecipeCardProps {
   recipe: RecipeCatalogItem;
@@ -27,6 +28,7 @@ export function RecipeCard({ recipe, onProduce }: RecipeCardProps) {
 
   const hasStock = recipe.stock_qty !== null && Number(recipe.stock_qty) > 0;
   const hasIngredients = recipe.ingredient_count > 0;
+  const product = productUnderName(recipe);
 
   // Financial outcome per unit of output, named the way every production
   // screen names it.
@@ -67,10 +69,8 @@ export function RecipeCard({ recipe, onProduce }: RecipeCardProps) {
                 {recipe.name}
               </Link>
             </h3>
-            {recipe.output_template_name && (
-              <p className="text-xs text-on-muted truncate">
-                {recipe.output_template_name}
-              </p>
+            {product && (
+              <p className="text-xs text-on-muted truncate">{product}</p>
             )}
           </div>
         </div>

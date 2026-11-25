@@ -6,6 +6,9 @@ import { resolveModuleTarget } from "@/lib/moduleRegistry";
 import { makeTDynamic } from "@/lib/i18nHelpers";
 import { cn } from "@/lib/utils";
 
+/** Letters a word may have before the phone label steps down a size: 12px fits about this many in a tile. */
+const LONG_LABEL_WORD = 12;
+
 interface StatusBadge {
   count: number;
   /** Full-form key, translated here with `{ count }` (FrontendModule.useStatusBadge). */
@@ -64,6 +67,9 @@ export function ModuleTile({
     : hasStatusBadge
       ? `${displayName}, ${statusBadge.count} ${countLabel}`
       : displayName;
+  const hasLongWord = displayName
+    .split(/\s+/)
+    .some((word) => word.length > LONG_LABEL_WORD);
   const iconBg = cfg.color ?? "bg-surface-inset";
   const hasColor = !!cfg.color;
 
@@ -112,7 +118,12 @@ export function ModuleTile({
         </div>
         <span
           className={cn(
-            "text-xs font-medium text-center leading-tight line-clamp-2 w-full px-0.5 hyphens-auto break-words",
+            "font-medium text-center leading-tight line-clamp-2 w-full hyphens-auto break-words",
+            // A word wider than the label box has no hyphenation dictionary
+            // on every browser, and the break-words fallback then leaves
+            // "Zatwierdzeni" over a lone "a": a long word steps down to the
+            // micro size so it stays whole.
+            hasLongWord ? "text-[10px]" : "text-xs",
             hasColor ? "text-on" : "text-on-muted",
           )}
         >

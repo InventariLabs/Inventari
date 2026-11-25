@@ -42,6 +42,20 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Polish wording and the shape of numbers read right. A refusal that counts
+  things names them in the right form for one, two to four and five or more
+  (a location type used by 1 location, a template used by 3 products, a stock
+  take with 2 uncounted lines); the sign-in and invitation texts no longer
+  assume a masculine reader; and a quotation in three refusals closes with a
+  curly quote. A unit that carries its own full stop no longer gets a second
+  one in the recipe availability sentence, the unit-choice dialogs or the
+  item history. The occupancy map names a unit in the reader's language, the
+  correction dialog writes the typed change with the reader's decimal mark,
+  and the quantity field of the scan-receiving screen drops a leading zero.
+  On a phone a long launcher label ("Zatwierdzenia") stays in one piece, a
+  To-do row's sentence wraps instead of being cut at the card edge, and the
+  webhook form's event rows wrap inside their list. The date in an expiry
+  alert follows the reader's language.
 - Refusals speak the reader's language and name what the reader knows. An
   upload over the server's size limit is answered in the interface language,
   with the limit, in the same envelope as every other refusal (code
@@ -243,9 +257,33 @@ says what the release does rather than what changed since them.
   whose first field takes the typing at once — attaching a label to a
   product, a stock threshold, a new category. On a phone the keyboard comes
   up without a second tap.
+- Deleting a recipe collection that holds sub-collections says how many go
+  with it; the confirmation only said the recipes were kept. Two moves of
+  recipe collections made at the same moment can no longer leave them
+  parented on each other in a ring, which dropped them off the sidebar and
+  left a delete of any of them waiting for good.
+- Recipes that ask for the same goods in two units of one measure — 200 g and
+  0.3 kg of flour — put one line on the shopping list and subtract the shelf
+  once from what they need together: over 250 g of flour, Bread and Cake ask
+  for 250 g, not 0.05 kg. A recipe whose goods the list already carries in
+  another unit of that measure raises that line instead of adding a second
+  one, and the warning about goods another open list still asks for names
+  1 kg of flour against 300 g of it there.
+- The production recipe list prints the product a recipe makes under its name
+  only when the two differ, so a recipe named after its product is not named
+  twice on its card and row.
+- A product's page shows its nutrition when the figures are stored under the
+  names Open Food Facts uses (`energy_kcal`, `proteins`), as a recipe using
+  the product already counted them.
+- A page title with a long word and no space in it — a recipe or product
+  name of up to 200 characters — wraps instead of running off the screen
+  over the page's buttons, and so does the line under it.
 
 ### Added
 
+- The frontend module SDK hands a module `useLocalStorage`, the state form of
+  `readJson` / `writeJson`: a value a screen renders and remembers in the
+  browser between visits.
 - An equipment protocol copy that no longer matches its built-in layout can be
   reset to it from the Templates screen, as a warehouse document template
   already could.
@@ -298,6 +336,9 @@ says what the release does rather than what changed since them.
   `GET /items/export/xlsx` answers `202` with a job instead of the file;
   read the job at `GET /items/export/jobs/{id}` until its `status` is
   `done`, then fetch the workbook from `GET /items/export/jobs/{id}/file`.
+- A recipe card remembers the shopping list picked last in its *Add to list*
+  picker and starts the next recipe on it, in the same browser; it falls back
+  to the newest open list once that one is completed or archived.
 
 ## v0.13.0 - 2026-11-23
 

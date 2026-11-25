@@ -697,7 +697,7 @@ ERRORS_PT: ErrorMessages = {
         'O período termina antes de começar. Escolha uma data final que não seja anterior à data inicial.'
     ),
     'stock_value_hidden': (
-        'A organização não mostra o valor do seu stock, por isso não há demonstração para exportar. Ative primeiro o valor do stock nas configurações de estatísticas.'
+        'A organização não mostra o valor do seu estoque, por isso não há demonstração para exportar. Ative primeiro o valor do estoque nas configurações de estatísticas.'
     ),
     'equipment_still_assigned': 'O ativo ainda está retirado por alguém. Faça a devolução primeiro.',
     'equipment_deploy_requires_checkout': 'Um ativo passa a ser implantado ao ser retirado por alguém. Faça a retirada em vez de definir o status.',

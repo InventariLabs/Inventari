@@ -101,9 +101,9 @@
   "quickAdd": {
     "title": "Novo produto",
     "guardName": "O formulário do produto",
-    "tabVision": "IA de visão",
+    "tabVision": "A partir da foto",
     "tabManual": "Manual",
-    "visionTitle": "Cadastro rápido com IA de visão",
+    "visionTitle": "Cadastro rápido a partir da foto",
     "visionHelp": "A IA pode preencher o nome, a marca e a validade a partir da sua foto.",
     "takePhoto": "Fotografar o produto",
     "analyzing": "Analisando imagem…",

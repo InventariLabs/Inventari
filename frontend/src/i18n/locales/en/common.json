@@ -912,7 +912,7 @@
       "secretStored": "A key is stored — leave blank to keep it",
       "secretUnset": "No key stored",
       "unknownModule": "There is no module by that name",
-      "unknownModuleHint": "The address points at a module this installation does not have. Check the link, or pick the module from the store.",
+      "unknownModuleHint": "The address points at a module this installation does not have. Check the link, or pick the module on the Modules page.",
       "open": "Module settings",
       "saved": "Settings saved",
       "guardName": "The module settings",
