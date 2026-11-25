@@ -79,11 +79,11 @@ function isPickableTask(item: WorkItem): boolean {
 }
 
 /** Whether every task the picking sheet opened over is an internal issue. */
-function pickedWithoutCarrier(tasks: WorkItem[], ids: string[]): boolean {
+function pickedWithoutCarrier(rows: WorkItem[], ids: string[]): boolean {
   return allWithoutCarrier(
-    tasks
-      .filter((task) => ids.includes(task.source_id))
-      .map((task) => task.document_type ?? ""),
+    rows
+      .filter((row) => ids.includes(row.source_id))
+      .map((row) => row.document_type ?? ""),
   );
 }
 
