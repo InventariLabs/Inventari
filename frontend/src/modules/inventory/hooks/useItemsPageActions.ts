@@ -165,7 +165,13 @@ export function useItemsPageActions({
   const handleExport = useCallback(async () => {
     try {
       toast.loading(t("common:actions.exporting"), { id: "items-export" });
-      const blob = await itemsApi.exportXlsx(exportParamsRef.current);
+      const blob = await itemsApi.exportXlsx(
+        exportParamsRef.current,
+        ({ percent }) =>
+          toast.loading(t("common:actions.exportPreparing", { percent }), {
+            id: "items-export",
+          }),
+      );
       const storageName = storages?.find((s) => s.id === storageFilter)?.name;
       downloadBlob(
         blob,

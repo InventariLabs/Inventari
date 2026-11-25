@@ -29,6 +29,7 @@
     "edit": "Bearbeiten",
     "export": "Exportieren",
     "exportError": "Export fehlgeschlagen",
+    "exportPreparing": "Export wird vorbereitet: {{percent}} %. Die Datei wird heruntergeladen, sobald sie fertig ist.",
     "exportSuccess": "Export abgeschlossen",
     "exporting": "Wird exportiert …",
     "filter": "Filtern",

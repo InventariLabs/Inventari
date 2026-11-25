@@ -22,7 +22,13 @@ export default function SettingsDataTab() {
     try {
       toast.loading(t("common:actions.exporting"), { id: "export" });
       // The backup asks for everything, the list's usage default included.
-      const response = await itemsApi.exportXlsx({ location_usage: "any" });
+      const response = await itemsApi.exportXlsx(
+        { location_usage: "any" },
+        ({ percent }) =>
+          toast.loading(t("common:actions.exportPreparing", { percent }), {
+            id: "export",
+          }),
+      );
       downloadBlob(response, `inventari_export_${getTodayFilename()}.xlsx`);
       toast.success(t("common:actions.exportSuccess"), { id: "export" });
     } catch (err) {

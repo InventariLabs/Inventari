@@ -286,6 +286,18 @@ says what the release does rather than what changed since them.
 - The application answers `/robots.txt` with a file that disallows every
   crawler, instead of its own HTML page, so a search engine is told to stay
   away from an instance and the sign-in behind it.
+- An export of more than 5,000 records to a spreadsheet is prepared in the
+  background instead of inside one request. The notice says how far it has
+  got and the file downloads by itself when it is ready, so a phone or a
+  proxy that gives up on a long request no longer loses it, and the rest of
+  the application answers at its usual speed meanwhile; while the sheet of
+  every record of 100,000 products was written inside a request (about two
+  minutes), the product list answered ten times slower. A shorter export
+  downloads at once, as before. The prepared file is kept for a day.
+  **Breaking** for scripts that call the API: past that size
+  `GET /items/export/xlsx` answers `202` with a job instead of the file;
+  read the job at `GET /items/export/jobs/{id}` until its `status` is
+  `done`, then fetch the workbook from `GET /items/export/jobs/{id}/file`.
 
 ## v0.13.0 - 2026-11-23
 

@@ -117,6 +117,8 @@ export const API_ROUTES = [
   "/api/v1/items/attention-counts",
   "/api/v1/items/bulk",
   "/api/v1/items/cursor-page",
+  "/api/v1/items/export/jobs/{job_id}",
+  "/api/v1/items/export/jobs/{job_id}/file",
   "/api/v1/items/export/xlsx",
   "/api/v1/items/history",
   "/api/v1/items/import",
