@@ -161,3 +161,21 @@ class TestTheCurrentBuiltInCanBeCopiedAlongside:
         assert created['is_default'] is False
         still_there = client.get(TEMPLATES, headers=po_auth_headers).json()['items']
         assert seeded[0]['id'] in {t['id'] for t in still_there}
+
+    def test_a_copy_seeded_in_another_language_can_be_copied_alongside(
+        self,
+        client: TestClient,
+        po_auth_headers: dict[str, str],
+        db_session: Session,
+    ) -> None:
+        polish = dict(po_auth_headers, **{'Accept-Language': 'pl'})
+        seeded = _seed(client, polish)
+        _write_into(db_session, seeded[0]['id'])
+
+        response = client.post(
+            f'{TEMPLATES}/{seeded[0]["id"]}/refresh-copy',
+            headers=dict(po_auth_headers, **{'Accept-Language': 'en'}),
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED, response.text
+        assert response.json()['id'] != seeded[0]['id']
