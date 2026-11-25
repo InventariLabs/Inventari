@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from decimal import InvalidOperation
+from decimal import Decimal, InvalidOperation
 from typing import Any
 from uuid import UUID
 
@@ -211,6 +211,7 @@ async def _maybe_create_stub_for_line(
     barcode: str | None,
     user_id: UUID | None = None,
     *,
+    sku: str | None = None,
     need_barcode: bool = True,
 ) -> bool:
     """If the line is unmatched, create a stub template via
@@ -221,6 +222,9 @@ async def _maybe_create_stub_for_line(
     document import offers is worded around barcodes. Opening stock turns it
     off: every row must end with a product, or posting the draft puts goods on
     the shelf that no movement and no cost layer has heard of.
+
+    The stub is the row's own product: it keeps the row's SKU and is kept in
+    the unit the row is written in, so its line converts to the stock unit.
     """
     if line.product_template_id is not None:
         return False
@@ -231,7 +235,9 @@ async def _maybe_create_stub_for_line(
         return False
     from .product_stub_service import quick_create_stub_async
 
-    template = await quick_create_stub_async(db, org_id, line.name, barcode, user_id)
+    template = await quick_create_stub_async(
+        db, org_id, line.name, barcode, user_id, sku=sku, uom_id=line.uom_id
+    )
     line.product_template_id = template.id
     # Populate snapshot from the freshly created stub so downstream renders
     # show the resolved product (rather than the bare free-text row).
@@ -248,6 +254,21 @@ async def _maybe_create_stub_for_line(
     if template.uom_id and not line.uom_id:
         line.uom_id = template.uom_id
     return True
+
+
+async def _refuse_a_unit_the_product_cannot_take(
+    db: AsyncSession, org_id: UUID, line: DocumentLine
+) -> None:
+    """Refuse the row whose unit does not convert to its product's stock unit.
+
+    Every posting converts the line into the stock unit, and the document
+    detail does too: a line that cannot would leave a draft nobody can read.
+    The refusal names both units and rides the row, like any other the sheet
+    holds.
+    """
+    await core_api.uoms.to_stock_uom_async(
+        db, org_id, line.product_template_id, Decimal('1'), line.uom_id
+    )
 
 
 async def _lines_from_rows(
@@ -283,6 +304,7 @@ async def _lines_from_rows(
     for index, row in df.iterrows():
         try:
             barcode_value = _extract_string(row, column_mapping.get('barcode'))
+            sku_value = _extract_string(row, column_mapping.get('sku'))
             line, was_matched = await _build_document_line(
                 db,
                 org_id,
@@ -293,6 +315,8 @@ async def _lines_from_rows(
                 uom_resolver,
                 allow_negative_quantity=dt.allows_negative_quantity(doc_type),
             )
+            if was_matched:
+                await _refuse_a_unit_the_product_cannot_take(db, org_id, line)
             if doc_id is not None:
                 db.add(line)
             created_lines.append(line)
@@ -306,10 +330,10 @@ async def _lines_from_rows(
                     line,
                     barcode_value,
                     user_id,
+                    sku=sku_value,
                     need_barcode=stubs_need_barcode,
                 ):
                     stubs_created += 1
-                    matched += 1
                 else:
                     unmatched += 1
             if needs_stock_row and not await _name_the_stock_record(

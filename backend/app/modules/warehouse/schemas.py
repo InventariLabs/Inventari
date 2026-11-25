@@ -380,6 +380,10 @@ class DocumentLineSchema(BaseModel):
     # share — set only when other products share the shelf, so a full shelf
     # is explained even where this product's own pair looks roomy.
     planned_shelf_fill: int | None = None
+    # Set when the line's unit does not convert to its product's stock unit:
+    # the sentence naming both units, so the line can be corrected while the
+    # rest of the document stays readable.
+    unit_conversion_error: str | None = None
     unit_price: Decimal | None
     tax_rate: Decimal | None
     line_value: Decimal | None

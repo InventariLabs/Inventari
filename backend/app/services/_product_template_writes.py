@@ -170,8 +170,16 @@ async def create_stub_template_async(
     name: str,
     barcode: str | None = None,
     user_id: UUID | None = None,
+    *,
+    sku: str | None = None,
+    uom_id: UUID | None = None,
 ) -> ProductTemplate:
-    """Async: create a minimal stub ProductTemplate for quick entry."""
+    """Async: create a minimal stub ProductTemplate for quick entry.
+
+    A caller that already holds the product's own code or unit passes them:
+    the stub keeps the code instead of drawing the next generated one, and is
+    kept in that unit instead of pieces.
+    """
     if barcode:
         existing = await db.scalar(
             select(ProductTemplate).where(
@@ -182,14 +190,14 @@ async def create_stub_template_async(
         if existing:
             raise ServiceRejectionError('barcode_already_exists', barcode=barcode)
 
-    sku = await _generate_sku_async(db, org_id)
+    sku = sku or await _generate_sku_async(db, org_id)
 
     # Same as the full create path: a stub is a catalogue row the unit
     # guard and the stock screen read, and "pieces" is the answer for a
     # product nobody described yet.
     from app.services.items._create import _default_piece_uom_id_async
 
-    resolved_uom_id = await _default_piece_uom_id_async(db, org_id)
+    resolved_uom_id = uom_id or await _default_piece_uom_id_async(db, org_id)
 
     meta_data: dict[str, Any] = {'is_stub': True}
 

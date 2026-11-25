@@ -21,6 +21,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import PutawayCandidateDTO
+from app.core.exceptions import ServiceRejectionError
 from app.core.public_api import core_api
 
 from ._receiving_area import receiving_area_for_async
@@ -817,6 +818,12 @@ async def receipt_line_card_async(
     return None
 
 
+def _attach_to_line(line: Any, fields: dict[str, Any]) -> None:
+    """Set read-time attributes on the ORM line, never written back."""
+    for field, value in fields.items():
+        setattr(line, field, value)
+
+
 async def attach_receipt_plans(db: AsyncSession, doc: Document) -> None:
     """Put the planned shelf on every not-yet-executed receipt line.
 
@@ -848,13 +855,22 @@ async def attach_receipt_plans(db: AsyncSession, doc: Document) -> None:
         # and the booking measure the same number. The plan counts what the
         # document EXPECTS — before execution the done count is zero and
         # would plan every line as an empty delivery.
-        quantity_stock = await core_api.uoms.to_stock_uom_async(
-            db,
-            doc.organization_id,
-            stock_template_id,
-            line.expected_quantity,
-            line.uom_id,
-        )
+        try:
+            quantity_stock = await core_api.uoms.to_stock_uom_async(
+                db,
+                doc.organization_id,
+                stock_template_id,
+                line.expected_quantity,
+                line.uom_id,
+            )
+        except ServiceRejectionError as refusal:
+            # A unit that no longer converts is this line's to correct, not a
+            # reason the whole document cannot be read: the line carries the
+            # sentence and has no plan.
+            if refusal.key != 'uom_conversion_unavailable':
+                raise
+            _attach_to_line(line, {'unit_conversion_error': str(refusal)})
+            continue
         decision = planner.booked(
             await planner.decide(
                 named=named,
@@ -879,8 +895,7 @@ async def attach_receipt_plans(db: AsyncSession, doc: Document) -> None:
             'planned_capacity_max': decision.capacity_max,
             'planned_shelf_fill': decision.shelf_fill,
         }
-        for field, value in plan.items():
-            setattr(line, field, value)
+        _attach_to_line(line, plan)
 
 
 async def most_stocked_shelf_async(

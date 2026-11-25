@@ -52241,6 +52241,17 @@
             ],
             "title": "Planned Shelf Fill"
           },
+          "unit_conversion_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Conversion Error"
+          },
           "unit_price": {
             "anyOf": [
               {

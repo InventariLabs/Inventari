@@ -1615,7 +1615,7 @@ class TestDocumentsImport:
         assert resp.status_code == 200
         body = resp.json()
         assert body['imported'] == 2
-        assert body['matched'] == 2
+        assert body['matched'] == 0
         assert body['unmatched'] == 0
         assert body['stubs_created'] == 2
         for line in body['lines']:

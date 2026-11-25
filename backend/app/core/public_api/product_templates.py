@@ -184,10 +184,15 @@ class CoreProductTemplatesAPI:
         name: str,
         barcode: str | None = None,
         user_id: UUID | None = None,
+        *,
+        sku: str | None = None,
+        uom_id: UUID | None = None,
     ) -> ProductTemplateDTO:
         from app.services._product_template_writes import create_stub_template_async
 
-        tpl = await create_stub_template_async(db, org_id, name, barcode, user_id)
+        tpl = await create_stub_template_async(
+            db, org_id, name, barcode, user_id, sku=sku, uom_id=uom_id
+        )
         return ProductTemplateDTO.model_validate(tpl)
 
     @writes

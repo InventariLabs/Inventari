@@ -240,7 +240,7 @@ class TestTheImportStubCheckboxAsksItemsWrite:
         assert resp.status_code == status.HTTP_200_OK, resp.text
         body = resp.json()
         assert body['imported'] == 1
-        assert body['matched'] == 1
+        assert body['matched'] == 0
         assert body['stubs_created'] == 1
         db_session.expire_all()
         assert _org_template_count(db_session, doc_org) == before + 1, (
