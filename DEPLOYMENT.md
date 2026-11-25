@@ -1282,6 +1282,16 @@ profile is imported again ([docs/OFF_DATABASE_SETUP.md](docs/OFF_DATABASE_SETUP.
      rclone/rclone:1.76.0 copy ovh:<backups-bucket>/backups/last /data
    ```
    From the old disk, copy its `backups/last/` there instead.
+
+   The off-host copy holds the pair under its own names only: the `-latest`
+   names *Putting a backup back* reads are links in `last/`, and the copy does
+   not send links. After a pull from the remote, give the pair those names:
+   ```bash
+   cd backups/restore
+   sudo ln -s inventari_db-*.sql.gz.age inventari_db-latest.sql.gz.age
+   sudo ln -s uploads-*.tar.gz.age uploads-latest.tar.gz.age
+   cd -
+   ```
 6. **Follow *Putting a backup back*** above with `FROM=restore`, from step 1.
    The accounts come back with the database — there is no administrator to
    create; sign in as before.
