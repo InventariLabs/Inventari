@@ -498,13 +498,15 @@ def catalogue_refusal(
     lang = lang or get_current_lang()
     if field is not None:
         kwargs.setdefault('field', field)
-    sentence = (
-        get_error_message(key, lang, **kwargs)
-        if plural is None
-        else get_plural_error_message(key, plural, lang, **kwargs)
-    )
+    if plural is not None:
+        return ValidationException(
+            get_plural_error_message(key, plural, lang, **kwargs),
+            field=field,
+            extra={'lang': lang},
+            code=rejection_code(key),
+        )
     return ValidationException(
-        sentence,
+        get_error_message(key, lang, **kwargs),
         field=field,
         extra={'lang': lang},
         code=rejection_code(key),
