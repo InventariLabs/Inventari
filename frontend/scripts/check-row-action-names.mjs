@@ -21,7 +21,8 @@
  * mentions something derived from the map's row: the parameter, a property
  * destructured from it, or a name bound in the callback from one of those.
  * `aria-labelledby` names the control by another element and is not read
- * here.
+ * here. An `ActionMenu` is read by its `label` prop, which is its trigger's
+ * accessible name.
  *
  * Modes:
  *   node check-row-action-names.mjs                    # report and exit 1
@@ -51,7 +52,15 @@ const CONTROL_TAGS = new Set([
   "Link",
   "a",
   "button",
+  "ActionMenu",
 ]);
+
+/**
+ * Components whose own trigger is the control, named by a prop rather than
+ * by markup in the row: `ActionMenu`'s `label` is the "⋯" button's
+ * `aria-label` and `title`.
+ */
+const NAMING_PROP = new Map([["ActionMenu", "label"]]);
 
 function walk(dir, out = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -130,6 +139,22 @@ function textual(node) {
 
 /** The accessible name of the control as label expressions and text. */
 function accessibleName(element) {
+  const naming = NAMING_PROP.get(element.tagName.getText());
+  if (naming) {
+    const prop = attribute(element, naming);
+    if (prop?.initializer && ts.isStringLiteral(prop.initializer))
+      return { nodes: [], text: prop.initializer.text };
+    if (
+      prop?.initializer &&
+      ts.isJsxExpression(prop.initializer) &&
+      prop.initializer.expression
+    )
+      return {
+        nodes: [prop.initializer.expression],
+        text: prop.initializer.expression.getText(),
+      };
+    return null;
+  }
   // Named by another element: the name is that element's, not this markup's.
   if (attribute(element, "aria-labelledby")) return null;
   const labelAttr = attribute(element, "aria-label");

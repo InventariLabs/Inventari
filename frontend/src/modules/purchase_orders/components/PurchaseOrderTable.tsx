@@ -130,6 +130,7 @@ export function PurchaseOrderTable({
                 {canWrite && (
                   <td className="px-3 py-2.5">
                     <RowActions
+                      number={po.number}
                       status={po.status}
                       canWrite={canWrite}
                       canManage={canManage}

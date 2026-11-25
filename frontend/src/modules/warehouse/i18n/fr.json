@@ -205,6 +205,7 @@
     "duplicateError": "Échec de la duplication du document",
     "applyCorrection": "Appliquer correction",
     "moreActions": "Plus d'actions",
+    "moreActionsFor": "Plus d'actions pour {{number}}",
     "execute": "Exécuter",
     "executeReceive": "Réceptionner le stock",
     "executePick": "Préparer les articles",

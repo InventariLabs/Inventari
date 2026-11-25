@@ -308,6 +308,7 @@
     "emptyCatalogHint": "If you don't have any products yet, add them in Inventory first."
   },
   "moreActions": "More actions",
+  "moreActionsFor": "More actions for {{number}}",
   "permissions": {
     "read": "View purchase orders",
     "readDesc": "Can browse purchase orders, pricelists and reorder rules",

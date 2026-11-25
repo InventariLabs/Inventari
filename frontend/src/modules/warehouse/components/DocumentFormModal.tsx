@@ -158,22 +158,22 @@ function hasUserFilledLine(
  * Reports whether the form holds work to the form guard. A new form holds
  * work once the user has filled something in; an existing document opens
  * with its own partner, locations and lines, so there work is any difference
- * from what it opened with.
+ * from what it opened with. Returns what it reported, so closing the form
+ * asks the same question the navigation gate does.
  */
 function useDocumentFormGuard(
   workspace: ReturnType<typeof useDocumentWorkspaceState>,
   hasUnsavedInput: boolean,
-  label: string,
-): void {
+): boolean {
+  const { t } = useTranslation("warehouse");
   // What Save would send, so a field the form carries cannot be left out.
   const snapshot = JSON.stringify(workspace.toUpdatePayload());
   const opened = useRef(snapshot);
-  useFormGuard(
-    workspace.isEdit
-      ? snapshot !== opened.current
-      : hasUnsavedInput || !!workspace.scrapReason.code,
-    label,
-  );
+  const holdsWork = workspace.isEdit
+    ? snapshot !== opened.current
+    : hasUnsavedInput || !!workspace.scrapReason.code;
+  useFormGuard(holdsWork, t("form.guardName"));
+  return holdsWork;
 }
 
 /** A location the user picked, as opposed to none or the one handed in. */
@@ -518,22 +518,23 @@ export default function DocumentFormModal({
   // The shell-wide navigation gate (the command palette, the header) and the
   // reader's own words after a session ended under the form both ask whether
   // the form holds work.
-  useDocumentFormGuard(workspace, hasUnsavedInput, t("form.guardName"));
+  const holdsWork = useDocumentFormGuard(workspace, hasUnsavedInput);
 
   // when the inline partner-create popover is open, Esc/backdrop must
   // close the popover first — not discard the whole document form.
   //
-  // Escape on a filled-in form asks before it throws away the partner, the
-  // locations and every line, since there is no way back.
+  // Escape on a form holding work asks before it throws away the partner, the
+  // locations and every line, since there is no way back. An existing
+  // document that has not been touched holds none: it is closed as it is.
   const handleSheetClose = useCallback(() => {
     if (partnerCreateOpen) {
       handlePartnerCreateCancel();
-    } else if (hasUnsavedInput) {
+    } else if (holdsWork) {
       setDiscardConfirmOpen(true);
     } else {
       onClose();
     }
-  }, [partnerCreateOpen, handlePartnerCreateCancel, hasUnsavedInput, onClose]);
+  }, [partnerCreateOpen, handlePartnerCreateCancel, holdsWork, onClose]);
 
   // Map a backend line index to the current line's stable _key, so 422
   // errors stay attached to the right row after reorder/remove.

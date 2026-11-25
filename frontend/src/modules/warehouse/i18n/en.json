@@ -205,6 +205,7 @@
     "duplicateError": "Failed to duplicate document",
     "applyCorrection": "Apply correction",
     "moreActions": "More actions",
+    "moreActionsFor": "More actions for {{number}}",
     "execute": "Execute",
     "executeReceive": "Receive stock",
     "executePick": "Pick items",

@@ -44,14 +44,18 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
     }
   });
 
-  /** A confirmed order with one open line, for the receipt to wait for. */
+  /**
+   * A confirmed order with one open line, for the receipt to wait for. An
+   * order cannot be deleted once confirmed, so its supplier and goods carry
+   * the `E2E-` prefix that the suite's global setup removes at the next run.
+   */
   async function seedConfirmedOrder() {
     const supplier = await api.createPartner(token, {
-      name: `Phone nav supplier ${tag} ${Date.now()}`,
+      name: `E2E-Phone nav supplier ${tag} ${Date.now()}`,
       type: "SUPPLIER",
     });
     const template = await api.createProductTemplate(token, {
-      name: `Phone nav goods ${tag} ${Date.now()}`,
+      name: `E2E-Phone nav goods ${tag} ${Date.now()}`,
     });
     const order = await api.createPurchaseOrder(token, {
       partner_id: supplier.id,
