@@ -266,6 +266,11 @@ async def _refuse_a_unit_the_product_cannot_take(
     The refusal names both units and rides the row, like any other the sheet
     holds.
     """
+    # The line already in the card's own unit (a row that named none) needs
+    # no conversion: the card's unit rides on the line's snapshot.
+    card_unit = (line.product_snapshot or {}).get('uom_id')
+    if line.uom_id is None or str(line.uom_id) == card_unit:
+        return
     await core_api.uoms.to_stock_uom_async(
         db, org_id, line.product_template_id, Decimal('1'), line.uom_id
     )
