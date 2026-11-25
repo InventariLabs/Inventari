@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
-import { WebhookCard } from "./WebhookCard";
+import { TEST_HINT_ID, WebhookCard } from "./WebhookCard";
 import type { WebhookEndpoint } from "@/modules/webhooks/types/webhooks";
 
 const BASE: WebhookEndpoint = {
@@ -213,14 +213,15 @@ describe("WebhookCard status", () => {
     expect(screen.getByText("Failing")).toBeInTheDocument();
   });
 
-  it("warns, before the click, that a failed test counts toward the breaker", () => {
+  it("points the Test button at the page's warning that a failed test counts toward the breaker", () => {
     // A test is a real probe: six clicks against a dead receiver switched an
-    // endpoint off, and nothing on the button said it could.
+    // endpoint off. The sentence itself is on the page (WebhooksPage.test),
+    // where a phone shows it; the button names it for a keyboard.
     renderCard({});
 
     expect(screen.getByRole("button", { name: /^Test / })).toHaveAttribute(
-      "title",
-      expect.stringMatching(/counts toward the circuit breaker/),
+      "aria-describedby",
+      TEST_HINT_ID,
     );
   });
 

@@ -16,7 +16,7 @@ import {
 } from "@/modules/warehouse/hooks/usePutawayRules";
 
 /** The sentence for an offer; literal keys, so the catalogues' use is traceable. */
-function offerSentence(
+export function offerSentence(
   t: TFunction<"warehouse">,
   offer: HomeShelfOffer,
   params: Record<string, string>,

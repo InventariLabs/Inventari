@@ -395,6 +395,19 @@ describe("useQuickAdd — which locations the form offers", () => {
     expect(result.current.formData.location_id).toBe("loc-equipment");
   });
 
+  it("drops the location it was opened on once that place no longer exists", async () => {
+    // The scanner's place context can outlive the place: the form must not
+    // hold an id it cannot name, with a shortcut to a place that is not there.
+    serveStorages(false);
+
+    const { result } = open({ initialStorageId: "loc-deleted" });
+
+    await waitFor(() => expect(result.current.noStorages).toBe(false));
+    await waitFor(() =>
+      expect(result.current.formData.location_id).not.toBe("loc-deleted"),
+    );
+  });
+
   it("does not hold a location the picker cannot show", async () => {
     // The remembered id survives a reload and a profile switch, and comes
     // back from localStorage whether or not the location still exists. Seeded

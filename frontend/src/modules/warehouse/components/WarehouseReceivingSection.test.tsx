@@ -148,14 +148,16 @@ describe("WarehouseReceivingSection", () => {
     });
   });
 
-  it("offers the choice only where goods are put away later", () => {
+  it("offers the choice for a warehouse that receives in one step too", () => {
     renderSection(true);
 
+    // The question about a product's home is asked after a receipt in one
+    // step as well, so the setting that silences it is there to be turned off.
     expect(
-      screen.queryByLabelText(
+      screen.getByLabelText(
         "Each product has its own location in Main Warehouse",
       ),
-    ).toBeNull();
+    ).toBeChecked();
     expect(
       screen.getByLabelText("Each product has its own location in Cold Store"),
     ).toBeChecked();

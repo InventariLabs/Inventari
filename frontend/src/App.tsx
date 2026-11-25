@@ -202,6 +202,10 @@ function App({ initialEntries }: AppProps = {}) {
   const [registeredFor, setRegisteredFor] = useState<readonly string[] | null>(
     null,
   );
+  // The enabled modules whose chunk did not import. Their routes are not in
+  // the router, so without this the reader met Page Not Found on a module
+  // that is switched on.
+  const [failedModules, setFailedModules] = useState<readonly string[]>([]);
   useEffect(() => {
     // The context hands the default install's list while the real one is in
     // flight — importing eighteen modules off that guess is exactly the
@@ -210,8 +214,9 @@ function App({ initialEntries }: AppProps = {}) {
     // re-runs this with whatever it brings.
     if (!isAuthenticated || isLoadingModules) return;
     let cancelled = false;
-    registerModules(enabledModules).then(() => {
+    registerModules(enabledModules).then((failed) => {
       if (cancelled) return;
+      setFailedModules(failed);
       // ModulesContext applied the overrides when this list changed —
       // before these imports landed, so modules bringing i18n or theme
       // overrides had nothing in the registry to override with. Now they
@@ -312,6 +317,18 @@ function App({ initialEntries }: AppProps = {}) {
   // for an answer the backend never gave.
   if (modulesError) {
     return <ModulesUnavailable onRetry={refreshModules} />;
+  }
+
+  // A module that is on but whose code did not arrive has no routes. Say so
+  // and offer a reload: it fetches the current index.html, so a chunk renamed
+  // by a deploy is found under its new name.
+  if (failedModules.length > 0) {
+    return (
+      <ModulesUnavailable
+        reason="chunks"
+        onRetry={async () => window.location.reload()}
+      />
+    );
   }
 
   return (

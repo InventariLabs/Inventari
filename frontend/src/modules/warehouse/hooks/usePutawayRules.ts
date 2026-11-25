@@ -98,3 +98,16 @@ export function useUnsilenceHomeShelf() {
     qc.invalidateQueries({ queryKey: queryKeys.documents.putawayHomeSilenced });
   });
 }
+
+/**
+ * The home-shelf questions a posted receipt in one step asks. Read once, when
+ * the receipt has just been posted: the server answers from the lines as
+ * posted, and the answer is no longer a question once it has been put.
+ */
+export function useReceiptHomeShelfOffers(documentId: string) {
+  return useModuleQuery("warehouse", {
+    queryKey: queryKeys.documents.homeShelfOffers(documentId),
+    queryFn: () => homeShelfApi.receiptOffers(documentId),
+    staleTime: Infinity,
+  });
+}

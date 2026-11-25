@@ -37,6 +37,7 @@ import {
 } from "@/hooks/useOpenPurchaseOrders";
 import { useLocationOffer } from "@/module-sdk";
 import { useDocumentProfile } from "@/modules/warehouse/hooks/useDocumentProfile";
+import { ReceiptHomeShelves } from "@/modules/warehouse/components/todo/ReceiptHomeShelves";
 import { useShowDocumentValue } from "@/modules/warehouse/hooks/useShowDocumentValue";
 import {
   useConfirmDocument,
@@ -464,6 +465,7 @@ function ReceiveResult({
         }
         onAnother={onAnother}
       />
+      <ReceiptHomeShelves documentId={document.id} />
     </div>
   );
 }
