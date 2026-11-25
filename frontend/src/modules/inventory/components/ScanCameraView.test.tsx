@@ -84,6 +84,20 @@ describe("ScanCameraView — typing a code by hand", () => {
     expect(screen.getByTestId("manual-barcode-input")).toHaveFocus();
   });
 
+  it("opens the sheet outside the camera controls, which let no press through", () => {
+    render(
+      <ScanCameraView {...baseProps} isCameraActive onManualCode={vi.fn()} />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Type a code" }));
+
+    // The controls overlay is `pointer-events-none` so the video stays
+    // reachable around the buttons; a sheet inside it computes the same and
+    // takes no touch at all.
+    const dialog = screen.getByRole("dialog", { name: "Type a code" });
+    expect(dialog.closest(".pointer-events-none")).toBeNull();
+  });
+
   it("offers no way to type a code with the camera running when the caller cannot take one", () => {
     render(<ScanCameraView {...baseProps} isCameraActive />);
 

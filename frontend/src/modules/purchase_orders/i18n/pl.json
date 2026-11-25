@@ -324,6 +324,7 @@
     "emptyCatalogHint": "Jeśli nie masz jeszcze żadnych produktów, najpierw dodaj je w Inwentarzu."
   },
   "moreActions": "Więcej akcji",
+  "moreActionsFor": "Więcej akcji dla {{number}}",
   "permissions": {
     "read": "Podgląd zamówień",
     "readDesc": "Może przeglądać zamówienia, cenniki i reguły uzupełniania",
