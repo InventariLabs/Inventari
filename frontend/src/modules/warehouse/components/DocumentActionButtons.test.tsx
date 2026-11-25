@@ -554,7 +554,7 @@ describe("DocumentActionButtons one-step posting", () => {
       />,
     );
     expect(
-      screen.getByRole("button", { name: "Record it — stock already taken" }),
+      screen.getByRole("button", { name: "Record it — stock already updated" }),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "Remove from stock" }),
