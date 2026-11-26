@@ -62,7 +62,7 @@ printf '%s\n' "$*" >> "$state/calls"
 if [ "$1" != compose ]; then
     case "$1" in
         info) [ ! -e "$state/docker-down" ] ;;
-        image) [ ! -e "$state/no-local-images" ] ;;
+        image) [ ! -e "$state/pull-fails" ] || [ ! -e "$state/no-local-images" ] ;;
         *) true ;;
     esac
     exit $?
@@ -71,7 +71,7 @@ shift
 case "$*" in
     "version --short") echo 2.40.3 ;;
     "ps --status running --services") cat "$state/running" 2>/dev/null || true ;;
-    "pull") [ ! -e "$state/pull-fails" ] ;;
+    "pull --ignore-pull-failures") true ;;
     "config --images") printf 'ghcr.io/inventarilabs/inventari-backend:1\npostgres:17-alpine\n' ;;
     "up -d --pull never --scale caddy=0") printf 'db\nbackend\nfrontend\n' > "$state/running" ;;
     "up -d --pull never")
@@ -329,7 +329,8 @@ class TestRunAgain:
         failed = _server(machine, release)
 
         assert failed.returncode != 0
-        assert 'Stopped: The images could not be downloaded' in failed.stderr
+        assert 'Stopped: These images could not be downloaded:' in failed.stderr
+        assert 'ghcr.io/inventarilabs/inventari-backend:1' in failed.stderr
         assert 'run the same command again' in failed.stderr
         assert not [c for c in _calls(machine) if c.startswith('compose up')]
         secrets_kept = _env(machine)['FERNET_SALT']
@@ -340,6 +341,17 @@ class TestRunAgain:
         assert resumed.returncode == 0, resumed.stderr
         assert 'https://inv.example.com' in resumed.stdout
         assert _env(machine)['FERNET_SALT'] == secrets_kept
+
+    def test_images_already_on_the_machine_do_when_a_download_fails(
+        self, machine: Path, release: Path
+    ) -> None:
+        """One image that fails must not stop the others from downloading."""
+        (machine / 'pull-fails').touch()
+
+        result = _server(machine, release)
+
+        assert result.returncode == 0, result.stderr
+        assert 'compose pull --ignore-pull-failures' in _calls(machine)
 
     def test_a_run_after_the_administrator_exists_asks_for_no_password(
         self, machine: Path, release: Path

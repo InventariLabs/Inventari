@@ -45,8 +45,9 @@ signed in needs the same: Inventari keeps your sign-in in a cookie marked
 *Secure*, which a browser does not keep for a plain `http://` address. That
 is why the installation answers on `https://` only. Over plain `http://`:
 
-- **The camera does not start.** The scan screen shows no picture, only
-  *Camera requires HTTPS or localhost. Please check your connection.*
+- **The camera does not start.** The scan screen shows no picture but
+  *Camera error* and *Camera requires HTTPS or localhost. Please check your
+  connection.*, with a field to type the code by hand.
 - **The sign-in does not last.** It works until the page is reloaded or the
   app reopened, and then the sign-in screen is back.
 

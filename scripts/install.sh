@@ -460,16 +460,18 @@ write_env() {
 
 pull_images() {
     step "Downloading the images (the first time, a few minutes)"
-    dc pull && return 0
-    # A machine that already holds every image (a run after a lost connection,
-    # or a release tried before its images are published) goes on with them.
+    # Without --ignore-pull-failures one image that fails stops the pulls of
+    # all the others. With it, every image that can be downloaded is, and the
+    # check below decides: an image already on the machine (a run after a lost
+    # connection, a release tried before its images are published) will do.
+    dc pull --ignore-pull-failures || true
     images=$(dc config --images) || fail "docker compose cannot read the installation's files (its message is above)."
+    missing=""
     for image in $images; do
-        $docker image inspect "$image" >/dev/null 2>&1 \
-            || fail "The images could not be downloaded (Docker's message is above)." \
-                "Check this machine's connection. A release's images are published within an hour of its tag; a release that new may not have them yet."
+        $docker image inspect "$image" >/dev/null 2>&1 || missing="$missing $image"
     done
-    say "Using the images already on this machine."
+    [ -z "$missing" ] || fail "These images could not be downloaded:$missing (Docker's message is above)." \
+        "Check this machine's connection. A release's images are published within an hour of its tag; a release that new may not have them yet."
 }
 
 start_without_proxy() {
