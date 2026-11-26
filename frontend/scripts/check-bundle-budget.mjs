@@ -641,12 +641,18 @@ const dist = join(root, "dist");
  * issue 594.7 of 595, history 619.8 of 620, products 638.8 of 640, initial
  * 194.2).
  *
- * The merge of those two with the line's next commits (row menus that name
- * their record, the template-copy actions) measures issue at 595.6 KiB gz of
- * 600 and history at 620.7 of 625, so no budget moves; the other screens stand
- * under theirs (app first paint 409.3 of 410, login 414.2 of 415, launcher
- * 429.2 of 430, start 649.2 of 650, receive 486.6 of 490, products 639.6 of
- * 640, initial 194.3).
+ * Re-measured 2026-11-26 on the branch that prepares a long spreadsheet
+ * export in the background, merged with the development line at cd934b784:
+ * the history screen measures 620.2 KiB gz against its 620 and the issue
+ * screen 595.0 against its 595, where the line alone stands at 619.9 and
+ * 594.8. The branch adds the follower of an export job to the items API
+ * client, which every screen that lists products loads, and one sentence in
+ * six languages (the notice of an export being prepared) to the language
+ * chunk every first paint loads; no import walked into either screen. Both
+ * phone budgets move a step of five, history to 625 and issue to 600; the
+ * other screens stand under theirs (app first paint 408.9 of 410, login
+ * 413.8 of 415, launcher 428.8 of 430, start 648.7 of 650, receive 485.7 of
+ * 490, products 639.3 of 640, initial 194.2).
  */
 const BUDGETS = {
   initial: 245,

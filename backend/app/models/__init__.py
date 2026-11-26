@@ -12,6 +12,7 @@ from app.models.event_delivery import EventDelivery
 from app.models.event_outbox import EventOutbox  # noqa: F401
 from app.models.item import Item
 from app.models.item_attachment import ItemAttachment
+from app.models.item_export_job import ItemExportJob
 from app.models.item_history import ItemHistory
 from app.models.item_import_job import ItemImportJob  # noqa: F401
 from app.models.label_pool import LabelPool
@@ -48,6 +49,7 @@ __all__ = [
     'LabelPool',
     'LocationRelocation',
     'ItemAttachment',
+    'ItemExportJob',
     'Notification',
     'Announcement',
     'AuditLog',

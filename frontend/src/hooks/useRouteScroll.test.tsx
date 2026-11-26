@@ -98,6 +98,31 @@ describe("useRouteScroll", () => {
     await waitFor(() => expect(scrollTo).toHaveBeenCalledWith(0, 900));
   });
 
+  it("returns to where the page stood at the tap when its scroll is not yet reported", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={["/list"]}>
+        <Shell />
+      </MemoryRouter>,
+    );
+    setScroll(900);
+    // The page has moved on; the browser says so only with the next frame.
+    Object.defineProperty(window, "scrollY", {
+      value: 520,
+      configurable: true,
+    });
+    await user.click(screen.getByRole("link", { name: "detail" }));
+    await waitFor(() => expect(scrollTo).toHaveBeenCalledWith(0, 0));
+    setScroll(0);
+    scrollTo.mockClear();
+
+    await act(async () => {
+      await user.click(screen.getByRole("button", { name: "back" }));
+    });
+
+    await waitFor(() => expect(scrollTo).toHaveBeenCalledWith(0, 520));
+  });
+
   it("keeps trying while the page is still too short to reach the position", async () => {
     const user = userEvent.setup();
     render(

@@ -279,5 +279,6 @@ says.
 | `system_settings` | `docs/subsystems/MIGRATION_OWNERSHIP.md` — installation-wide key/value settings |
 | `module_installations` | `docs/MODULE_VERSIONING.md` — the installed version of each module, one row per module for the whole installation (no organization); which modules an organization has switched on is `Organization.enabled_modules` |
 | `item_import_jobs` | `backend/app/models/item_import_job.py` — progress of a spreadsheet import that runs in the background |
+| `item_export_jobs` | `backend/app/models/item_export_job.py` — progress of a spreadsheet export that runs in the background, and where its workbook is kept for a day |
 | `organization_invitations` | `docs/GDPR_MANUAL_PROCEDURE.md` — invitations to join an organization |
 | `registration_requests` | `docs/GDPR_MANUAL_PROCEDURE.md` — sign-up requests awaiting approval |

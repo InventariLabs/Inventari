@@ -28,6 +28,8 @@ email_jobs.py::enqueue_email_job
 email_jobs.py::run_email_jobs_once
 equipment/_attestation_scheduler.py::run_scheduled_reminder_check_async
 equipment/notification_worker.py::run_equipment_notification_check_async
+items/_export_job.py::_record_async
+items/_export_job.py::run_job_async
 items/_import_job.py::_record_progress_async
 items/_import_job.py::run_job_async
 items/_retention.py::run_archive_retention_once

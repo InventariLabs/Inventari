@@ -200,7 +200,16 @@ describe("useItemsPageActions — row handlers, failures and the export", () => 
 
   it("exports the list's own rows into a file named after the filtered location", async () => {
     const blob = new Blob(["x"]);
-    mocks.exportXlsx.mockResolvedValue(blob);
+    // A long sheet is prepared by a job, which reports how far it has got.
+    mocks.exportXlsx.mockImplementation(
+      async (
+        _params: unknown,
+        onProgress?: (p: { percent: number }) => void,
+      ) => {
+        onProgress?.({ percent: 40 });
+        return blob;
+      },
+    );
     const { result } = renderActions({
       storageFilter: "loc-1",
       storages: [{ id: "loc-1", name: "Dry Pantry" }] as unknown as Parameters<
@@ -210,7 +219,14 @@ describe("useItemsPageActions — row handlers, failures and the export", () => 
 
     await act(() => result.current.handleExport());
 
-    expect(mocks.exportXlsx).toHaveBeenCalledWith({ search: "fl" });
+    expect(mocks.exportXlsx).toHaveBeenCalledWith(
+      { search: "fl" },
+      expect.any(Function),
+    );
+    expect(toast.loading).toHaveBeenLastCalledWith(
+      "Preparing the export: 40%. The file downloads when it is ready.",
+      { id: "items-export" },
+    );
     const [sentBlob, filename] = mocks.downloadBlob.mock.calls[0] as [
       Blob,
       string,
