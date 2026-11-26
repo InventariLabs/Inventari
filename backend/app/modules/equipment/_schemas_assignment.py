@@ -65,6 +65,10 @@ class AssignmentSchema(BaseModel):
     # says which, because the screens word the two differently.
     holder_name: str | None = None
     holder_kind: Literal['person', 'location'] | None = None
+    # Whether the signed-in reader holds this one, by the rule "My assets"
+    # uses (the address on the row, or a partner carrying it). Answered by an
+    # asset's assignment history; null where nobody asked.
+    held_by_viewer: bool | None = None
     checked_out_at: datetime
     expected_return_at: datetime | None
     checked_in_at: datetime | None

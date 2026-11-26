@@ -5,6 +5,8 @@
     "noRead": "Você não pode abrir isto",
     "noReadHint": "Seu perfil não inclui a permissão para ler este módulo. Peça a um administrador da sua organização que a adicione.",
     "hiddenRecordsAdminOnly": "Só um administrador pode ativar isto — peça a um.",
+    "purgeOff": "A exclusão permanente está desativada nesta organização.",
+    "purgeOffLink": "Ativar nas Configurações",
     "denied": "Você não tem acesso a isto",
     "deniedHint": "Sua conta não pode ler estes dados. Peça acesso a um administrador da sua organização.",
     "manageOnly": "Você pode usar isto, mas não reconfigurá-lo",

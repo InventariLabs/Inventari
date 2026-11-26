@@ -215,7 +215,7 @@
     "sequenceLabel": "Ordre de passage",
     "sequenceHint": "La préparation parcourt les emplacements à partir du plus petit numéro. Un emplacement sans numéro passe après les numérotés, dans l'ordre des codes.",
     "noParentStorage": "Aucun emplacement parent",
-    "deleteMessage": "Supprimer « {{name}} » ? Les produits doivent d'abord être déplacés — et un emplacement traversé par des mouvements de stock ne peut plus être supprimé : archivez-le plutôt.",
+    "deleteMessage": "Supprimer « {{name}} » ? Les produits doivent d'abord être déplacés et les actifs affectés à cet emplacement retournés — et un emplacement traversé par des mouvements de stock ne peut plus être supprimé : archivez-le plutôt.",
     "deleteMovesLocations_one": "1 emplacement enfant monte d'un niveau.",
     "deleteMovesLocations_other": "{{count}} emplacements enfants montent d'un niveau.",
     "deleteMovesRecords_one": "1 enregistrement monte d'un niveau.",
@@ -279,15 +279,15 @@
   "storageNotFoundDescription": "Il a peut-être été supprimé, ou le lien n'est plus à jour.",
   "zoneModule": {
     "title": "Cet emplacement appartient à un module",
-    "description": "« {{name}} » appartient à un module, il est donc absent de la liste des emplacements. Ouvrez-le ici pour voir ce qu'il contient."
+    "description": "« {{name}} » appartient à un module : il est absent de la liste des emplacements et ne s'ouvre pas ici."
   },
   "zoneVirtual": {
     "title": "Il s'agit d'un emplacement système",
-    "description": "« {{name}} » est l'un des emplacements virtuels du système — son contenu ne compte pas dans le stock. Ouvrez-le ici pour voir ce qu'il contient."
+    "description": "« {{name}} » est l'un des emplacements virtuels du système — son contenu ne compte pas dans le stock, la liste des emplacements ne l'ouvre donc pas."
   },
   "zoneArchived": {
     "title": "Cet emplacement est archivé",
-    "description": "« {{name}} » est archivé et reste hors de la liste active. Ouvrez-le ici ou restaurez-le depuis l'archive."
+    "description": "« {{name}} » est archivé et reste hors de la liste active. Pour l'ouvrir, restaurez-le d'abord depuis l'archive."
   },
   "usage": {
     "internal": "Ordinaire",

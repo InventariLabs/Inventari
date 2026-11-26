@@ -19,6 +19,7 @@ import {
 } from "@/modules/inventory/hooks/useItemMutations";
 import { useArchivedItems } from "@/modules/inventory/hooks/useItems";
 import { archivedReasonLabel } from "@/modules/shared/lib/archiveReasons";
+import { PurgeOffHint } from "@/modules/shared/components/PurgeOffHint";
 import { useArchiveTabs } from "@/hooks/useArchiveTabs";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { useFilteredList } from "@/hooks/useFilteredList";
@@ -221,6 +222,7 @@ export default function ArchivedItemsPage() {
       ) : (
         <ListControlBar primaryTabs={archiveTabs} />
       )}
+      <PurgeOffHint />
       <QueryResult
         query={archivedQuery}
         loadingFallback={
@@ -252,10 +254,10 @@ export default function ArchivedItemsPage() {
                 icon={Archive}
                 title={t("items:noArchivedItems")}
                 description={
-                  // "You can restore or permanently remove them" over an
-                  // archive whose only button is Restore: permanent removal is
-                  // an organization setting, and it is off by default. An
-                  // account that may not write products has neither.
+                  // The sentence names only what this account can do here:
+                  // permanent removal is an organization setting, off by
+                  // default (the line above the list says where it is), and
+                  // an account that may not write products has neither.
                   !canRestore
                     ? t("items:noArchivedItemsDescViewOnly")
                     : allowPermanentDelete

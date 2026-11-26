@@ -6,6 +6,15 @@ import { server } from "@/test/mocks/server";
 import { serveLocations } from "@/test/serveLocations";
 import { StorageMovePicker } from "./StorageMovePicker";
 
+// Every tree row draws one slot, so the slot's render count is the row's.
+const drawn = vi.hoisted(() => ({ ids: [] as string[] }));
+vi.mock("@/components/Slot", () => ({
+  TypedSlot: ({ data }: { data: { storageId: string } }) => {
+    drawn.ids.push(data.storageId);
+    return null;
+  },
+}));
+
 const FLOOR = [
   { id: "site", name: "Pantry Building", parent_id: null },
   { id: "zone", name: "Dry Goods", parent_id: "site" },
@@ -177,5 +186,30 @@ describe("StorageMovePicker — choosing where it goes", () => {
       await screen.findByRole("button", { name: /Cold Room/ }),
     ).toBeInTheDocument();
     expect(screen.queryByRole("alert")).toBeNull();
+  });
+});
+
+describe("StorageMovePicker — opening a branch", () => {
+  it("redraws the rows whose look changed, not every row of a long level", async () => {
+    const aisles = Array.from({ length: 60 }, (_, index) => ({
+      id: `aisle-${index}`,
+      name: `Aisle ${index}`,
+      parent_id: null,
+    }));
+    serveLocations([...FLOOR, ...aisles]);
+    renderPicker(["cold"]);
+    const open = await screen.findByRole("button", {
+      name: "Expand Pantry Building",
+    });
+    // The moved place's path arrives on its own request; count from rest.
+    await screen.findByRole("treeitem", { name: /Aisle 59/ });
+    drawn.ids.length = 0;
+
+    await userEvent.click(open);
+    await screen.findByRole("treeitem", { name: /Dry Goods/ });
+
+    // The opened row and the one under it, each a few times at most.
+    expect(drawn.ids.filter((id) => id.startsWith("aisle-"))).toEqual([]);
+    expect(drawn.ids).toContain("zone");
   });
 });

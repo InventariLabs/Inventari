@@ -71,9 +71,28 @@ says what the release does rather than what changed since them.
   With *Shopping lists* on, Grocy's shopping lists come across as well, each
   entry linked to the product the move made. Running the same file again adds
   only batches that are new.
+- Module authors: the frontend SDK (`@/module-sdk`) exports
+  `useReturnTarget`, which reads where a screen entered from another module
+  sends its back arrow (`state={{ backTo }}` on the link).
 
 ### Fixed
 
+- Locations and equipment screens. A location's detail offers *Moves* only
+  where a module that reads the movement ledger is on, and a system, module or
+  archived location no longer asks you to open it where the only button leads
+  back to the list. Deleting a location says that assets checked out to it
+  must be returned first. Archived locations opened from Equipment return
+  there with Back and *Active*. The equipment archive shows the note written
+  when a record was deleted, and both archives say where permanent deletion is
+  switched on, with the link for an administrator only. Whoever holds an asset
+  through their partner record is treated as its holder on the asset's page,
+  as under *My Assets*, and the hints beside the button use the holder's verb.
+  The category delete dialog counts the fields the category editor lists, and
+  *Move to…* opens a branch among thousands of locations without redrawing the
+  rest.
+- A module that refuses the creation or change of an asset during a bulk add or
+  a bulk edit now has that asset listed with its sentence and code, and the
+  other assets go through; the whole request failed before.
 - Organization settings keep what you have typed and not saved: saving one of
   the two cards, or changing the logo, no longer empties the fields of the
   other, and text typed just after a save is no longer replaced when the

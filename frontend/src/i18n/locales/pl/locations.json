@@ -219,7 +219,7 @@
     "sequenceLabel": "Kolejność obchodu",
     "sequenceHint": "Kompletacja odwiedza miejsca od najniższego numeru. Miejsce bez numeru trafia za ponumerowane, według kodu.",
     "noParentStorage": "Bez miejsca nadrzędnego",
-    "deleteMessage": "Usunąć „{{name}}”? Produkty wewnątrz trzeba najpierw przenieść — a miejsca, przez które przeszły ruchy magazynowe, nie da się usunąć wcale: zarchiwizuj je zamiast tego.",
+    "deleteMessage": "Usunąć „{{name}}”? Produkty wewnątrz trzeba najpierw przenieść, a zasoby wydane do tego miejsca zwrócić — a miejsca, przez które przeszły ruchy magazynowe, nie da się usunąć wcale: zarchiwizuj je zamiast tego.",
     "deleteMovesLocations_one": "Przeniesie się o poziom wyżej: {{count}} miejsce podrzędne.",
     "deleteMovesLocations_few": "Przeniosą się o poziom wyżej: {{count}} miejsca podrzędne.",
     "deleteMovesLocations_many": "Przeniesie się o poziom wyżej: {{count}} miejsc podrzędnych.",
@@ -299,15 +299,15 @@
   "storageNotFoundDescription": "Mógł zostać usunięty albo link jest nieaktualny.",
   "zoneModule": {
     "title": "To miejsce należy do modułu",
-    "description": "„{{name}}” należy do modułu, więc nie trafia na listę miejsc. Otwórz je tutaj, aby zobaczyć, co się w nim znajduje."
+    "description": "„{{name}}” należy do modułu, więc nie trafia na listę miejsc i nie otwiera się tutaj."
   },
   "zoneVirtual": {
     "title": "To miejsce systemowe",
-    "description": "„{{name}}” to jedno z miejsc systemowych — jego zawartość nie liczy się do stanów magazynowych. Otwórz je tutaj, aby zobaczyć, co się w nim znajduje."
+    "description": "„{{name}}” to jedno z miejsc systemowych — jego zawartość nie liczy się do stanów magazynowych, więc lista miejsc go nie otwiera."
   },
   "zoneArchived": {
     "title": "To miejsce jest zarchiwizowane",
-    "description": "„{{name}}” jest zarchiwizowane i nie trafia na aktywną listę. Otwórz je tutaj albo przywróć z archiwum."
+    "description": "„{{name}}” jest zarchiwizowane i nie trafia na aktywną listę. Żeby je otworzyć, najpierw przywróć je z archiwum."
   },
   "usage": {
     "internal": "Zwykłe",

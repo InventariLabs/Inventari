@@ -70,7 +70,9 @@ export function AssetDetailHeaderActions({
   const retireReason =
     status === "RETIRED"
       ? t("detail.cannot_retire_retired")
-      : t("detail.cannot_retire_deployed");
+      : holdsIt
+        ? t("detail.cannot_retire_deployed_holder")
+        : t("detail.cannot_retire_deployed");
 
   if (isArchived) {
     return (
@@ -150,6 +152,7 @@ export function AssetDetailHeaderActions({
           else onChangeStatus(next);
         }}
         disabled={bulkEditPending}
+        heldByViewer={holdsIt}
       />
       <ConfirmDialog
         open={returnStatus !== null}

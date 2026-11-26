@@ -45290,6 +45290,17 @@
             ],
             "title": "Holder Kind"
           },
+          "held_by_viewer": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Held By Viewer"
+          },
           "checked_out_at": {
             "type": "string",
             "format": "date-time",

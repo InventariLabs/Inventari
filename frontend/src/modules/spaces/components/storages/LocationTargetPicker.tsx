@@ -24,7 +24,7 @@ type LocationTargetPickerProps = Omit<
 > & {
   scope?: LocationScope;
   /** Places that cannot be chosen, nor anything standing inside them: the
-   *  place being moved or archived and its whole subtree. */
+   *  place being moved, which cannot go into its own subtree. */
   excludeSubtreeOf?: readonly string[];
   /** Places that cannot be chosen themselves while what stands inside them
    *  can: an archived place, whose inner places stay active. */
