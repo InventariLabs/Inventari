@@ -60,7 +60,13 @@ export interface ImportWizardSheetProps<R extends ImportOutcome> {
     summary?: (result: R) => string;
     closeAndView: string;
   };
+  /** A second tile naming a known source that is a sheet; it opens the
+   *  same picker and walks the same mapping. */
   secondaryUpload?: SecondaryUpload;
+  /** A source that is not a sheet (Grocy's database file): a tile with a
+   *  picker of its own, a reading of the file the reader reviews in place of
+   *  the column mapping, and an import of its own. */
+  fileSource?: FileSource<R>;
   /** Beside the analyzed file name; a preset button, say. */
   mappingHeaderExtras?: (ctx: MappingStepContext) => ReactNode;
   /** Under the mapping grid: the entity's notes and options. */
@@ -69,11 +75,31 @@ export interface ImportWizardSheetProps<R extends ImportOutcome> {
   resultExtras?: (result: R) => ReactNode;
 }
 
-type Step = "upload" | "mapping" | "processing" | "result";
+export interface FileSource<R extends ImportOutcome> {
+  label: string;
+  hint: string;
+  /** What the reader needs to know before choosing the file. */
+  note?: string;
+  /** The file picker's filter. */
+  accept: string;
+  /** Reads the file before anything is written; rejects with the reason. */
+  read: (file: File) => Promise<void>;
+  /** The step shown in place of the mapping once the file is read. */
+  review: (file: File) => ReactNode;
+  /** The label of the button that runs the import from the review. */
+  runLabel: string;
+  run: (
+    file: File,
+    onProgress: (progress: ImportProgress) => void,
+  ) => Promise<R>;
+}
+
+type Step = "upload" | "mapping" | "review" | "processing" | "result";
 
 /** The three steps every spreadsheet import walks: pick a file, map its
  *  columns, read the report. What a row becomes is the entity's business,
- *  handed in through `analyze`, `suggest` and `run`. */
+ *  handed in through `analyze`, `suggest` and `run`. A `fileSource` walks
+ *  the same three with a review of its own file in place of the mapping. */
 export function ImportWizardSheet<R extends ImportOutcome>({
   onClose,
   title,
@@ -86,6 +112,7 @@ export function ImportWizardSheet<R extends ImportOutcome>({
   run,
   texts,
   secondaryUpload,
+  fileSource,
   mappingHeaderExtras,
   mappingExtras,
   resultExtras,
@@ -116,18 +143,35 @@ export function ImportWizardSheet<R extends ImportOutcome>({
     }
   };
 
+  const handleSourceFile = async (selectedFile: File) => {
+    if (!fileSource) return;
+    setFile(selectedFile);
+    try {
+      await fileSource.read(selectedFile);
+      setStep("review");
+    } catch (error) {
+      toast.error(extractApiError(error, texts.analyzeFailed));
+    }
+  };
+
   const handleImport = async () => {
-    if (!file || !mapping[requiredField] || !canRun) return;
+    const fromSource = step === "review";
+    if (!file) return;
+    if (!fromSource && (!mapping[requiredField] || !canRun)) return;
     setProgress(null);
     setStep("processing");
     try {
-      setImportResult(await run(file, mapping, setProgress));
+      setImportResult(
+        fromSource && fileSource
+          ? await fileSource.run(file, setProgress)
+          : await run(file, mapping, setProgress),
+      );
       setStep("result");
     } catch (error) {
       // A gate refusal carries its reason and its remedy, written to be read;
       // this catch shows that message, not a generic toast.
       toast.error(extractApiError(error, texts.importFailed));
-      setStep("mapping");
+      setStep(fromSource ? "review" : "mapping");
     }
   };
 
@@ -177,7 +221,17 @@ export function ImportWizardSheet<R extends ImportOutcome>({
         {step === "upload" && (
           <ImportUploadStep
             onFileSelect={handleFileUpload}
-            secondaryUpload={secondaryUpload}
+            secondaryUpload={
+              fileSource
+                ? {
+                    label: fileSource.label,
+                    hint: fileSource.hint,
+                    note: fileSource.note,
+                    accept: fileSource.accept,
+                    onFileSelect: (chosen) => void handleSourceFile(chosen),
+                  }
+                : secondaryUpload
+            }
           />
         )}
 
@@ -194,6 +248,8 @@ export function ImportWizardSheet<R extends ImportOutcome>({
             {mappingExtras?.(ctx)}
           </ImportMappingStep>
         )}
+
+        {step === "review" && file && fileSource?.review(file)}
 
         {(step === "processing" || step === "result") && (
           <ImportProgressStep
@@ -226,6 +282,21 @@ export function ImportWizardSheet<R extends ImportOutcome>({
                 disabled={!mapping[requiredField] || !canRun}
               >
                 <span>{t("common:import.processImport")}</span>
+                <ArrowRight size={20} />
+              </Button>
+            </>
+          )}
+          {step === "review" && fileSource && (
+            <>
+              <Button
+                variant="ghost"
+                onClick={() => setStep("upload")}
+                className="uppercase text-[10px] tracking-[0.2em]"
+              >
+                {t("common:actions.back")}
+              </Button>
+              <Button onClick={handleImport}>
+                <span>{fileSource.runLabel}</span>
                 <ArrowRight size={20} />
               </Button>
             </>

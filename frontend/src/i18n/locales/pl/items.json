@@ -197,14 +197,7 @@
     "matchedSkipped_many": "Pominięto {{count}} produktów",
     "matchedSkipped_other": "Pominięto {{count}} produktów",
     "grocyMove": {
-      "title": "Przeprowadzka z Grocy",
-      "formats": "grocy.db",
-      "pickTitle": "Wybierz plik bazy Grocy",
       "pickBody": "Grocy trzyma wszystko w jednym pliku, grocy.db, w swoim folderze data. W instalacji w Dockerze to wolumen podpięty pod /config/data albo /var/www/data. Skopiuj plik przy zatrzymanym Grocy albo weź go z kopii zapasowej Grocy.",
-      "pickButton": "Wybierz grocy.db",
-      "analyzeFailed": "Nie udało się odczytać pliku.",
-      "importFailed": "Przeprowadzka nie została dokończona.",
-      "wait": "Poczekaj, trwa przeprowadzka z Grocy.",
       "inFile": "W tym pliku",
       "counts": {
         "products": "Produkty",

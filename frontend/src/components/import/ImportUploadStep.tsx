@@ -3,17 +3,20 @@ import { useTranslation } from "react-i18next";
 import { Upload, Database, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
+/** A second tile naming a known source (Grocy, say). Without `accept` it
+ *  opens the sheet picker; with it, a picker of its own that hands the file
+ *  to `onFileSelect` — for a source that is not a sheet (Grocy's database
+ *  file). `note` says what the reader needs to know before choosing it. */
 export interface SecondaryUpload {
   label: string;
   hint: string;
-  onSelect?: () => void;
+  note?: string;
+  accept?: string;
+  onFileSelect?: (file: File) => void;
 }
 
 interface ImportUploadStepProps {
   onFileSelect: (file: File) => void;
-  /** A second tile naming a known source (Grocy, say). It opens the same
-   *  picker, or — given `onSelect` — hands the reader to the source's own
-   *  flow, for a source that is not a sheet (Grocy's database file). */
   secondaryUpload?: SecondaryUpload;
 }
 
@@ -30,6 +33,13 @@ export function ImportUploadStep({
   };
 
   const openFilePicker = () => document.getElementById("import-file")?.click();
+  const ownPicker = Boolean(
+    secondaryUpload?.accept && secondaryUpload.onFileSelect,
+  );
+  const openSecondaryPicker = () =>
+    document
+      .getElementById(ownPicker ? "import-file-secondary" : "import-file")
+      ?.click();
 
   return (
     <div className="space-y-8 py-10">
@@ -58,7 +68,7 @@ export function ImportUploadStep({
           <Button
             size="content"
             variant="outline"
-            onClick={secondaryUpload.onSelect ?? openFilePicker}
+            onClick={openSecondaryPicker}
             className="p-8 border border-dashed border-primary-100 flex-col items-center gap-4"
           >
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center transition-all bg-primary-50 text-primary-400 group-hover:bg-primary-600 group-hover:text-white">
@@ -76,6 +86,10 @@ export function ImportUploadStep({
         )}
       </div>
 
+      {secondaryUpload?.note && (
+        <p className="text-sm text-on-secondary">{secondaryUpload.note}</p>
+      )}
+
       {/* Hidden file input */}
       <input
         id="import-file"
@@ -85,6 +99,21 @@ export function ImportUploadStep({
         onChange={handleFileUpload}
         aria-label={t("common:import.genericFormat")}
       />
+      {ownPicker && secondaryUpload && (
+        <input
+          id="import-file-secondary"
+          type="file"
+          accept={secondaryUpload.accept}
+          className="hidden"
+          onChange={(e) => {
+            const chosen = e.target.files?.[0];
+            // Cleared, so choosing the same file again reads it again.
+            e.target.value = "";
+            if (chosen) secondaryUpload.onFileSelect?.(chosen);
+          }}
+          aria-label={secondaryUpload.label}
+        />
+      )}
 
       {/* Info box */}
       <div className="bg-amber-50 p-6 rounded-3xl border border-amber-100 flex items-start gap-4">

@@ -21,8 +21,8 @@ import type {
   StorageLocationSummary,
 } from "@/types";
 import { locationFieldKey, suggestMapping } from "./importMapping";
-import { GrocyImportSheet } from "./GrocyImportSheet";
-import { ImportFoundedList } from "./ImportFoundedList";
+import { ImportResultDetails } from "./ImportResultDetails";
+import { useGrocySource } from "./grocySource";
 
 interface Props {
   onClose: () => void;
@@ -111,9 +111,6 @@ export default function ImportModal({ onClose }: Props) {
   const [createCategories, setCreateCategories] = useState(true);
   const [createLocations, setCreateLocations] = useState(true);
   const [onLabelMatch, setOnLabelMatch] = useState<LabelMatchMode>("add");
-  // Grocy writes no export: its tile opens a move that reads Grocy's own
-  // database file instead of a sheet's columns.
-  const [fromGrocy, setFromGrocy] = useState(false);
 
   // The price feeds the stock value; where that value is not shown, the
   // item form drops the field, and the import neither offers the column nor
@@ -141,10 +138,14 @@ export default function ImportModal({ onClose }: Props) {
     staleTime: 60_000,
   });
   const {
+    all: allCategories,
     scoped: categories,
     error: categoriesError,
     refetch: refetchCategories,
   } = useScopedCategories();
+  // Grocy writes no export: its tile reads Grocy's own database file and
+  // reviews it in place of a sheet's columns.
+  const grocy = useGrocySource(allCategories);
   const ownFields = productFields(storages, categories);
   const unsupported = categoriesNeedingUncarriableFields(categories);
   const fields: MappingField[] = [
@@ -182,9 +183,6 @@ export default function ImportModal({ onClose }: Props) {
       : t("items:import.added", { count: 0 });
   };
 
-  if (fromGrocy)
-    return <GrocyImportSheet onClose={onClose} summary={summary} />;
-
   return (
     <ImportWizardSheet<ItemImportOutcome>
       onClose={onClose}
@@ -196,7 +194,10 @@ export default function ImportModal({ onClose }: Props) {
       // warning about the ones a cell cannot fill is silent: a gap is not
       // "no categories", and processing would fail every row of them.
       canRun={categories !== undefined}
-      analyze={(file) => itemsApi.analyzeImport(file)}
+      analyze={(file) => {
+        grocy.forget();
+        return itemsApi.analyzeImport(file);
+      }}
       suggest={(headers) =>
         suggestMapping(
           headers,
@@ -224,11 +225,7 @@ export default function ImportModal({ onClose }: Props) {
         summary,
         closeAndView: t("items:import.closeAndView"),
       }}
-      secondaryUpload={{
-        label: t("items:import.grocy"),
-        hint: t("items:import.grocyHint"),
-        onSelect: () => setFromGrocy(true),
-      }}
+      fileSource={grocy.source}
       mappingExtras={({ mapping, filledCounts }) => (
         <>
           {/* Without the answer the columns the locations add are missing
@@ -326,36 +323,9 @@ export default function ImportModal({ onClose }: Props) {
           </div>
         </>
       )}
-      resultExtras={(result) =>
-        result.skipped > 0 ||
-        result.created_locations.length > 0 ||
-        result.created_categories.length > 0 ? (
-          /* What the file founded beside the products, and what it left
-             alone, so the reader learns it here and not from new tiles in
-             the storage tree. The updated count is on the first line now. */
-          <div className="bg-surface p-6 rounded-xl border border-border text-left max-w-md mx-auto space-y-3">
-            {result.skipped > 0 && (
-              /* The count the shared stats grid does not carry: what the
-                 Label Code matched and the mode left alone. */
-              <p className="text-xs text-on">
-                {t("items:import.matchedSkipped", { count: result.skipped })}
-              </p>
-            )}
-            <ImportFoundedList
-              heading={t("items:import.foundedLocations", {
-                count: result.created_locations.length,
-              })}
-              names={result.created_locations}
-            />
-            <ImportFoundedList
-              heading={t("items:import.foundedCategories", {
-                count: result.created_categories.length,
-              })}
-              names={result.created_categories}
-            />
-          </div>
-        ) : null
-      }
+      resultExtras={(result) => (
+        <ImportResultDetails result={result} fromGrocy={grocy.active} />
+      )}
     />
   );
 }

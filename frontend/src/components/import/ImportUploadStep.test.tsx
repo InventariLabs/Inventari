@@ -69,22 +69,44 @@ describe("ImportUploadStep", () => {
     },
   );
 
-  it("hands a source with a flow of its own to that flow, not to the picker", async () => {
-    const onSelect = vi.fn();
+  it("gives a source that is not a sheet a picker, a filter and a note of its own", async () => {
+    const onFileSelect = vi.fn();
+    const onSourceFile = vi.fn();
     render(
       <ImportUploadStep
-        onFileSelect={vi.fn()}
-        secondaryUpload={{ ...grocy, onSelect }}
+        onFileSelect={onFileSelect}
+        secondaryUpload={{
+          ...grocy,
+          note: "Grocy keeps it in its data folder.",
+          accept: ".db",
+          onFileSelect: onSourceFile,
+        }}
       />,
     );
-    const fileInput = document.getElementById("import-file") as HTMLElement;
-    const opened = vi.fn((e: Event) => e.preventDefault());
-    fileInput.addEventListener("click", opened);
+    const own = document.getElementById(
+      "import-file-secondary",
+    ) as HTMLInputElement;
+    const sheet = document.getElementById("import-file") as HTMLElement;
+    const sheetOpened = vi.fn((e: Event) => e.preventDefault());
+    sheet.addEventListener("click", sheetOpened);
+    const ownOpened = vi.fn((e: Event) => e.preventDefault());
+    own.addEventListener("click", ownOpened);
 
     await userEvent.click(screen.getByText("Import from Grocy"));
+    const file = new File(["x"], "grocy.db");
+    // The tile opened the source's own picker, not the sheet's; the upload
+    // below clicks the input itself.
+    expect(ownOpened).toHaveBeenCalledTimes(1);
+    expect(sheetOpened).not.toHaveBeenCalled();
+    own.removeEventListener("click", ownOpened);
+    await userEvent.upload(own, file);
 
-    expect(onSelect).toHaveBeenCalledTimes(1);
-    expect(opened).not.toHaveBeenCalled();
+    expect(
+      screen.getByText("Grocy keeps it in its data folder."),
+    ).toBeInTheDocument();
+    expect(own).toHaveAttribute("accept", ".db");
+    expect(onSourceFile).toHaveBeenCalledExactlyOnceWith(file);
+    expect(onFileSelect).not.toHaveBeenCalled();
   });
 
   it("hands the chosen file to the wizard", async () => {

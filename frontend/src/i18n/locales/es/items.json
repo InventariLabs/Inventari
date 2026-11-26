@@ -178,14 +178,7 @@
     "matchedSkipped_one": "{{count}} producto sin cambios",
     "matchedSkipped_other": "{{count}} productos sin cambios",
     "grocyMove": {
-      "title": "Mudanza desde Grocy",
-      "formats": "grocy.db",
-      "pickTitle": "Elige el archivo de base de datos de Grocy",
       "pickBody": "Grocy guarda todo en un solo archivo, grocy.db, en su carpeta data. En una instalación con Docker es el volumen montado en /config/data o /var/www/data. Copia el archivo con Grocy detenido o tómalo de una copia de seguridad de Grocy.",
-      "pickButton": "Elegir grocy.db",
-      "analyzeFailed": "No se pudo leer el archivo.",
-      "importFailed": "La mudanza no terminó.",
-      "wait": "Espera mientras se completa la mudanza desde Grocy.",
       "inFile": "En este archivo",
       "counts": {
         "products": "Productos",

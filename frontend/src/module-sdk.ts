@@ -179,9 +179,6 @@ export { useStoragesTree } from "@/hooks/queries/useStoragesTree";
 export type { LocationOption } from "@/hooks/useLocationPicker";
 export { useDebounce, useDebouncedCallback } from "@/hooks/useDebounce";
 export { default as Pagination } from "@/components/ui/Pagination";
-// The progress and the report of an import, for a module whose source is not
-// a sheet and so walks its own steps (the products' move from Grocy).
-export { ImportProgressStep } from "@/components/import/ImportProgressStep";
 // The page state of a list the server pages by the last row seen: the cursors
 // of the pages visited, and the first page again when the question changes.
 export { useKeysetPaging } from "@/hooks/useKeysetPaging";
