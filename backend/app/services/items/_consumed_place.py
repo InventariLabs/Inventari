@@ -47,7 +47,10 @@ async def file_under_consumed_async(
 
     organization_id = str(item.organization_id)
     await ensure_virtual_locations_async(
-        db, organization_id, str(user_id) if user_id else organization_id
+        db,
+        organization_id,
+        str(user_id) if user_id else organization_id,
+        align_names=False,
     )
     virtual_loc = await get_virtual_location_async(db, organization_id, virtual_usage)
     if virtual_loc is None or virtual_loc.id == item.storage_location_id:

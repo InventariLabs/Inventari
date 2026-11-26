@@ -36,8 +36,19 @@ async def get_virtual_location_async(
 
 
 async def ensure_virtual_locations_async(
-    db: AsyncSession, organization_id: str, user_id: str
+    db: AsyncSession,
+    organization_id: str,
+    user_id: str,
+    *,
+    align_names: bool = True,
 ) -> None:
+    """Make the organization's virtual places that are missing.
+
+    *align_names* also brings the places nobody renamed into the language of
+    this request, which is for seeding and onboarding: a door that only needs
+    a place to exist passes False, since the next person to come through it
+    may read another language.
+    """
     system_type = await db.scalar(
         select(StorageType)
         .where(
@@ -114,6 +125,8 @@ async def ensure_virtual_locations_async(
         target = localized.name if localized else v['name']
         existing = await get_virtual_location_async(db, organization_id, v_usage)
         if existing:
+            if not align_names:
+                continue
             # An untouched row carries exactly the name the seeder wrote —
             # recorded in its seed handle. It joins the current language; a
             # renamed row never does.
