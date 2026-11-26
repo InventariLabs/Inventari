@@ -4,6 +4,9 @@ Inventari on a server with a domain, with HTTPS from Let's Encrypt, in one
 command. A computer at home with no domain is
 [docs/HOME_INSTALL.md](docs/HOME_INSTALL.md).
 
+The documentation is also readable on the website, in six languages:
+[inventari.app/docs](https://inventari.app/docs/).
+
 ## Install
 
 Log in to the server and run:

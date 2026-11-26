@@ -16,7 +16,7 @@
 
 <br/>
 
-[**Try the demo**](https://demo.inventari.app) · [**Quick Start**](#quick-start) · [**Build on Inventari**](#build-on-inventari) · [**Screens**](#what-it-looks-like) · [**Modules**](#modular-architecture) · [**Docs**](docs/README.md) · [**CLI**](docs/CLI.md) · [**Contributing**](CONTRIBUTING.md) · [**Security**](SECURITY.md)
+[**Try the demo**](https://demo.inventari.app) · [**Website**](https://inventari.app) · [**Quick Start**](#quick-start) · [**Build on Inventari**](#build-on-inventari) · [**Screens**](#what-it-looks-like) · [**Modules**](#modular-architecture) · [**Docs**](docs/README.md) · [**CLI**](docs/CLI.md) · [**Contributing**](CONTRIBUTING.md) · [**Security**](SECURITY.md)
 
 <br/>
 
@@ -38,6 +38,13 @@ process, or extend an existing module through its public interfaces.
 The included applications show both the range and the depth of that model:
 meal planning and equipment custody share the same core, while the warehouse
 module runs receiving, picking, packing and shipping.
+
+**On [inventari.app](https://inventari.app):** Inventari
+[for home and pantry](https://inventari.app/for/home-and-pantry/),
+[for a small business warehouse](https://inventari.app/for/small-business-warehouse/)
+and [for small production](https://inventari.app/for/small-production/),
+[comparisons with other applications](https://inventari.app/compare/) and
+[the documentation in six languages](https://inventari.app/docs/).
 
 **Alpha release:** best for small teams today, with occasional breaking changes
 between releases — see [Alpha Release v0.13.0](#alpha-release-v0130).
