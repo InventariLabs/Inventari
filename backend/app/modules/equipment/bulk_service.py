@@ -530,7 +530,7 @@ async def bulk_edit_items(
             if produced is not None:
                 pending_events.append(produced)
             updated += 1
-        except (ValueError, SQLAlchemyError) as exc:
+        except (InterceptorError, ValueError, SQLAlchemyError) as exc:
             errors.append({'item_id': str(item_id), **row_error(exc)})
 
     await db.flush()

@@ -18,6 +18,9 @@ interface AssetStatusMenuProps {
   onChangeStatus: (status: EquipmentStatus) => void;
   /** Disables interaction (e.g. while a request is in flight). */
   disabled?: boolean;
+  /** The viewer holds the checked-out asset: the hint speaks of handing it
+   *  back, not of receiving it. */
+  heldByViewer?: boolean;
 }
 
 /**
@@ -57,6 +60,7 @@ export function AssetStatusMenu({
   currentStatus,
   onChangeStatus,
   disabled,
+  heldByViewer,
 }: AssetStatusMenuProps) {
   const { t } = useTranslation("equipment");
   const [open, setOpen] = useState(false);
@@ -162,7 +166,9 @@ export function AssetStatusMenu({
               status nobody can set, not as one waiting on the return. */}
           {currentStatus === "DEPLOYED" && (
             <p className="mt-1 border-t border-border px-3 pb-1 pt-2 text-xs text-on-muted">
-              {t("detail.cannot_maintain_deployed")}
+              {heldByViewer
+                ? t("detail.cannot_maintain_deployed_holder")
+                : t("detail.cannot_maintain_deployed")}
             </p>
           )}
         </div>

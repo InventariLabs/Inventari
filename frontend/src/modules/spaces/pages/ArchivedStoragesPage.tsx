@@ -12,6 +12,7 @@ import { QueryResult } from "@/components/ui/QueryResult";
 import { useArchiveTabs } from "@/hooks/useArchiveTabs";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { useModulePageHeader } from "@/hooks/useModulePageHeader";
+import { useReturnTarget } from "@/module-sdk";
 import { useAppMutation } from "@/lib/api/mutationFactory";
 import { storagesApi } from "@/lib/api/storages";
 import { useShowModuleData } from "@/modules/settings/hooks/useOrganization";
@@ -41,11 +42,14 @@ export default function ArchivedStoragesPage() {
   // is hidden, and the way back has to be reachable from where the way in was.
   const [searchParams] = useSearchParams();
   const fromModule = searchParams.get("module");
+  // The linking screen names itself, so Back and Active lead to the list the
+  // restored place appears on — a module's own, for its places.
+  const activeList = useReturnTarget() ?? "/inventory/locations";
 
   // The same pair of tabs the active list carries: the way back has to be
   // where the way in was, now that neither state has a menu entry.
   const archiveTabs = useArchiveTabs("archived", (tab) => {
-    if (tab === "active") navigate("/inventory/locations");
+    if (tab === "active") navigate(activeList);
   });
 
   // The API checks `locations:write` before it puts a location back, so an
@@ -56,9 +60,9 @@ export default function ArchivedStoragesPage() {
     setHeader({
       title: t("locations:archived.title"),
       subtitle: t("locations:archived.subtitle"),
-      backTo: "/inventory/locations",
+      backTo: activeList,
     });
-  }, [setHeader, t]);
+  }, [setHeader, t, activeList]);
 
   // The same module-data scope the Active tab applies — the two tabs are one
   // list in two states, and a restore is confirmed on the tab the row must

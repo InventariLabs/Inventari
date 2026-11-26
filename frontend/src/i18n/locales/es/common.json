@@ -7,6 +7,8 @@
     "manageOnly": "Puede usarlo, pero no reconfigurarlo",
     "manageOnlyHint": "Su cuenta puede usar este módulo, pero no cambiar su comportamiento. Pídaselo a alguien de su organización que pueda gestionarlo.",
     "hiddenRecordsAdminOnly": "Solo un administrador puede activarlo; pídaselo a uno.",
+    "purgeOff": "La eliminación definitiva está desactivada en esta organización.",
+    "purgeOffLink": "Activarla en Configuración",
     "denied": "No tienes acceso a esto",
     "deniedHint": "Tu cuenta no puede leer estos datos. Solicita acceso a un administrador de tu organización."
   },

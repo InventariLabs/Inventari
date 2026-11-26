@@ -1,7 +1,7 @@
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import ColumnElement, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db_utils import paginate_async
@@ -12,35 +12,42 @@ from .models import EquipmentAssignment
 from .status_machine import resolve_previous_status
 
 
+async def held_by_clause(
+    db: AsyncSession, org_id: UUID, user_email: str
+) -> ColumnElement[bool]:
+    """The assignments *user_email* holds, as one condition for every reader.
+
+    The address on the row names the holder, and so does a partner carrying
+    that address. "My assets" and an asset's own history both ask here, so the
+    two screens agree on whose the thing is.
+    """
+    from app.core.public_api import core_api
+
+    partners = await core_api.partners.list_by_email_async(db, org_id, user_email)
+    # legacy rows may carry mixed-case emails — compare lowercase.
+    by_address = func.lower(EquipmentAssignment.assigned_to_email) == user_email.lower()
+    if not partners:
+        return by_address
+    return or_(
+        EquipmentAssignment.assignee_partner_id.in_([p.id for p in partners]),
+        by_address,
+    )
+
+
 async def get_my_active_assets(
     db: AsyncSession, org_id: UUID, user_email: str
 ) -> list[dict[str, Any]]:
     from app.core.public_api import core_api
 
-    partners = await core_api.partners.list_by_email_async(db, org_id, user_email)
-    partner_ids = [p.id for p in partners] if partners else []
-
-    # legacy rows may carry mixed-case emails — compare lowercase.
-    email_lc = user_email.lower()
     query = (
         select(EquipmentAssignment)
         .where(
             EquipmentAssignment.organization_id == org_id,
             EquipmentAssignment.checked_in_at.is_(None),
+            await held_by_clause(db, org_id, user_email),
         )
         .order_by(EquipmentAssignment.checked_out_at.desc())
     )
-    if partner_ids:
-        query = query.where(
-            or_(
-                EquipmentAssignment.assignee_partner_id.in_(partner_ids),
-                func.lower(EquipmentAssignment.assigned_to_email) == email_lc,
-            )
-        )
-    else:
-        query = query.where(
-            func.lower(EquipmentAssignment.assigned_to_email) == email_lc
-        )
 
     result_rows = await db.execute(query)
     assignments = result_rows.scalars().all()
@@ -100,32 +107,17 @@ async def get_my_assignment_history(
 ) -> tuple[list[dict[str, Any]], int]:
     from app.core.public_api import core_api
 
-    partners = await core_api.partners.list_by_email_async(db, org_id, user_email)
-    partner_ids = [p.id for p in partners] if partners else []
-
-    # legacy rows may carry mixed-case emails — compare lowercase.
-    email_lc = user_email.lower()
     query = (
         select(EquipmentAssignment)
         .where(
             EquipmentAssignment.organization_id == org_id,
             EquipmentAssignment.checked_in_at.isnot(None),
+            await held_by_clause(db, org_id, user_email),
         )
         .order_by(
             EquipmentAssignment.checked_in_at.desc(), EquipmentAssignment.id.desc()
         )
     )
-    if partner_ids:
-        query = query.where(
-            or_(
-                EquipmentAssignment.assignee_partner_id.in_(partner_ids),
-                func.lower(EquipmentAssignment.assigned_to_email) == email_lc,
-            )
-        )
-    else:
-        query = query.where(
-            func.lower(EquipmentAssignment.assigned_to_email) == email_lc
-        )
 
     assignments, total = await paginate_async(db, query, limit=limit, offset=offset)
 

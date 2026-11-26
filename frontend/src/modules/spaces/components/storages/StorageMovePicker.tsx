@@ -35,17 +35,25 @@ interface StorageMovePickerProps {
   onPick: (parentId: string | null) => void;
 }
 
-/** Drop the moved places from the levels the picker has open. */
+/**
+ * Drop the moved places from the levels the picker has open. A node that loses
+ * nothing is handed on as it is: the tree redraws a row whose node changed
+ * identity, and a level can hold thousands.
+ */
 function pruneTree(
   nodes: StorageLocationNode[],
   excluded: ReadonlySet<string>,
 ): StorageLocationNode[] {
   return nodes
     .filter((node) => !excluded.has(node.id) && !isVirtualUsage(node.usage))
-    .map((node) => ({
-      ...node,
-      children: pruneTree(node.children ?? [], excluded),
-    }));
+    .map((node) => {
+      const children = node.children ?? [];
+      const kept = pruneTree(children, excluded);
+      const whole =
+        kept.length === children.length &&
+        kept.every((child, index) => child === children[index]);
+      return whole ? node : { ...node, children: kept };
+    });
 }
 
 /**

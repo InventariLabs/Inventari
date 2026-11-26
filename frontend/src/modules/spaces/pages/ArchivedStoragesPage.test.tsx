@@ -23,11 +23,15 @@ vi.mock("sonner", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
 
-type HeaderData = { actions?: ReactNode };
+type HeaderData = { actions?: ReactNode; backTo?: string };
+
+/** What the page last told the shell about itself. */
+let shellHeader: HeaderData = {};
 
 function HeaderHost({ children }: { children: ReactNode }) {
   const [header, setHeader] = useState<HeaderData>({});
   const stableSetHeader = useCallback((data: HeaderData) => {
+    shellHeader = data;
     setHeader(data);
   }, []);
   return (
@@ -48,7 +52,9 @@ describe("ArchivedStoragesPage", () => {
   let queryClient: QueryClient;
   let restored: string[];
 
-  const renderPage = (entry = "/") =>
+  const renderPage = (
+    entry: string | { pathname: string; search: string; state: unknown } = "/",
+  ) =>
     render(
       <MemoryRouter initialEntries={[entry]}>
         <QueryClientProvider client={queryClient}>
@@ -283,5 +289,21 @@ describe("ArchivedStoragesPage", () => {
     expect(seen.every((u) => !u.includes("exclude_module_contexts"))).toBe(
       true,
     );
+  });
+
+  it("sends Back and Active to the screen that linked here", async () => {
+    // A module's places are hidden from the general list, so the way back
+    // from its archive leads to the module's own screen.
+    mockNavigate.mockClear();
+    renderPage({
+      pathname: "/inventory/locations/archived",
+      search: "?module=equipment",
+      state: { backTo: "/equipment/locations" },
+    });
+
+    await userEvent.click(await screen.findByRole("tab", { name: "Active" }));
+
+    expect(mockNavigate).toHaveBeenCalledWith("/equipment/locations");
+    expect(shellHeader.backTo).toBe("/equipment/locations");
   });
 });

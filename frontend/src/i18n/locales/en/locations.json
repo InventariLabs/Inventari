@@ -215,7 +215,7 @@
     "sequenceLabel": "Walk order",
     "sequenceHint": "Picking visits locations from the lowest number up. A location without a number comes after the numbered ones, in code order.",
     "noParentStorage": "No parent location",
-    "deleteMessage": "Delete \"{{name}}\"? Products inside must be moved first — and once stock movements have passed through, the location cannot be deleted at all: archive it instead.",
+    "deleteMessage": "Delete \"{{name}}\"? Products inside must be moved first, and assets checked out to this location returned. Once stock movements have passed through, the location cannot be deleted at all: archive it instead.",
     "deleteMovesLocations_one": "{{count}} child location moves up a level.",
     "deleteMovesLocations_other": "{{count}} child locations move up a level.",
     "deleteMovesRecords_one": "{{count}} record moves up a level.",
@@ -279,15 +279,15 @@
   "storageNotFoundDescription": "It may have been deleted, or the link may be out of date.",
   "zoneModule": {
     "title": "This location belongs to a module",
-    "description": "“{{name}}” is owned by a module, so it is kept out of the location list. Open it here to see what stands in it."
+    "description": "“{{name}}” is owned by a module, so it is kept out of the location list and does not open here."
   },
   "zoneVirtual": {
     "title": "This is a system location",
-    "description": "“{{name}}” is one of the system's virtual locations — its contents do not count as stock. Open it here to see what stands in it."
+    "description": "“{{name}}” is one of the system's virtual locations — its contents do not count as stock, so the location list does not open it."
   },
   "zoneArchived": {
     "title": "This location is archived",
-    "description": "“{{name}}” is archived and stays off the active list. Open it here, or restore it from the archive."
+    "description": "“{{name}}” is archived and stays off the active list. To open it, restore it from the archive first."
   },
   "usage": {
     "internal": "Regular",

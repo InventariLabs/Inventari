@@ -70,4 +70,10 @@ describe("ArchivedAssetRow", () => {
     renderRow({ deletion_reason: null });
     expect(screen.queryByText("Archived")).not.toBeInTheDocument();
   });
+
+  it("shows what was written when the record was deleted", () => {
+    renderRow({ deletion_notes: "screen cracked in transit" });
+    expect(screen.getByText("screen cracked in transit")).toBeInTheDocument();
+    expect(screen.getByText("Note:")).toBeInTheDocument();
+  });
 });

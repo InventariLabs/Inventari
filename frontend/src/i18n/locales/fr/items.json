@@ -544,7 +544,7 @@
     "openRecord": "Ouvrir l'enregistrement",
     "equipmentNote": "Cet enregistrement est retourné et éliminé plutôt que consommé et supprimé."
   },
-  "noArchivedItemsDescRestoreOnly": "Les produits supprimés arrivent ici et peuvent être restaurés. La suppression définitive est désactivée pour cette organisation.",
+  "noArchivedItemsDescRestoreOnly": "Les produits supprimés arrivent ici et peuvent être restaurés.",
   "noArchivedItemsDescViewOnly": "Les produits supprimés apparaissent ici. Les restaurer demande une permission que ce compte n'a pas.",
   "archivedSearchPlaceholder": "Rechercher dans les archives…",
   "archivedNoMatches": "Aucun produit archivé ne correspond à ce nom.",

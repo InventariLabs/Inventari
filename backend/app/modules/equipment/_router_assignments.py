@@ -98,7 +98,12 @@ async def item_assignment_history(
     if await get_asset_async(db, org_id, item_id, include_archived=True) is None:
         raise NotFoundException('item')
     rows = await get_item_assignment_history(
-        db, org_id, item_id, limit=limit, offset=offset
+        db,
+        org_id,
+        item_id,
+        limit=limit,
+        offset=offset,
+        viewer_email=current_user.email,
     )
     total = await count_item_assignment_history(db, org_id, item_id)
     return PaginatedResponse.from_slice(rows, offset=offset, limit=limit, total=total)
