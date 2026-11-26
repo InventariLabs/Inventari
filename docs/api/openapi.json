@@ -45290,6 +45290,17 @@
             ],
             "title": "Holder Kind"
           },
+          "held_by_viewer": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Held By Viewer"
+          },
           "checked_out_at": {
             "type": "string",
             "format": "date-time",
@@ -55529,7 +55540,9 @@
           "volume_value": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 99999999.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
@@ -59144,7 +59157,9 @@
           "volume_value": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 99999999.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
@@ -59730,7 +59745,9 @@
           "volume_value": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 99999999.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
@@ -60866,7 +60883,9 @@
           "weight_value": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 99999999.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
@@ -73393,7 +73412,9 @@
           "weight_value": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 99999999.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
@@ -73416,7 +73437,9 @@
           "volume_value": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 99999999.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"

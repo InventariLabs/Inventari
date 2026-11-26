@@ -13,6 +13,8 @@ export { default as QuickActionSheet } from "./components/QuickActionSheet";
 export { MoveItemModal } from "./components/MoveItemModal";
 // Delete asks for a reason here as it does on the items list.
 export { DeleteReasonDialog } from "./components/DeleteReasonDialog";
+// Whether this organization is shown the movement ledger at all.
+export { recordsMovements } from "./constants/movementModules";
 // The item search and create a count uses for an item it did not expect.
 export { useItemSearch } from "./hooks/useItems";
 export { useCreateItem } from "./hooks/useItemMutations";

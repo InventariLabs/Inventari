@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { TypedSlot } from "@/components/Slot";
+import { useEnabledModulesOptional } from "@/contexts/ModulesContext";
+import { recordsMovements } from "@/modules/inventory/moduleApi";
 import { extractApiError } from "@/lib/errors";
 import { storagesApi } from "@/lib/api/storages";
 import { downloadBlob } from "@/utils/helpers";
@@ -83,6 +85,8 @@ export function StorageDetailPane({
   const [draftName, setDraftName] = useState(storage.name);
   const renameInputRef = useRef<HTMLInputElement>(null);
   const renameMutation = useUpdateStorage();
+  // Where no module reads the movement ledger the tab would open blank.
+  const showMoves = recordsMovements(useEnabledModulesOptional());
 
   useEffect(() => {
     setDraftName(storage.name);
@@ -292,7 +296,9 @@ export function StorageDetailPane({
           <TabsTrigger value="settings">
             {t("locations:tabs.settings")}
           </TabsTrigger>
-          <TabsTrigger value="moves">{t("locations:tabs.moves")}</TabsTrigger>
+          {showMoves && (
+            <TabsTrigger value="moves">{t("locations:tabs.moves")}</TabsTrigger>
+          )}
         </TabsList>
         <TabsContent value="contents" className="pt-4">
           <StorageContentsTab
@@ -321,21 +327,29 @@ export function StorageDetailPane({
             onDeleted={onDeleted}
           />
         </TabsContent>
-        <TabsContent value="moves" className="pt-4">
-          <TypedSlot
-            name="storage_moves"
-            data={{
-              storageId: storage.id,
-              storageTypeCode: storage.location_type?.type_code,
-            }}
-            fallback={
-              <p className="py-6 text-center text-sm text-on-muted">
-                {t("locations:moves.empty")}
-              </p>
-            }
-          />
-        </TabsContent>
+        <MovesPanel storage={storage} />
       </Tabs>
     </div>
+  );
+}
+
+/** What moved through the location; reached only by the Moves tab. */
+function MovesPanel({ storage }: { storage: StorageLocation }) {
+  const { t } = useTranslation("locations");
+  return (
+    <TabsContent value="moves" className="pt-4">
+      <TypedSlot
+        name="storage_moves"
+        data={{
+          storageId: storage.id,
+          storageTypeCode: storage.location_type?.type_code,
+        }}
+        fallback={
+          <p className="py-6 text-center text-sm text-on-muted">
+            {t("moves.empty")}
+          </p>
+        }
+      />
+    </TabsContent>
   );
 }

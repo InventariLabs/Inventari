@@ -244,7 +244,7 @@
     "sequenceLabel": "Ordem de percurso",
     "sequenceHint": "A separação percorre os locais do menor número para o maior. Um local sem número vem depois dos numerados, na ordem do código.",
     "noParentStorage": "Sem local pai",
-    "deleteMessage": "Excluir \"{{name}}\"? Os produtos dentro dele precisam ser movidos antes — e, depois que houve movimentações de estoque, o local não pode mais ser excluído: arquive-o.",
+    "deleteMessage": "Excluir \"{{name}}\"? Antes é preciso mover os produtos dentro dele e devolver os equipamentos entregues a este local. Depois que houve movimentações de estoque, o local não pode mais ser excluído: arquive-o.",
     "deleteMovesLocations_one": "{{count}} local filho sobe um nível.",
     "deleteMovesLocations_other": "{{count}} locais filhos sobem um nível.",
     "deleteMovesRecords_one": "{{count}} registro sobe um nível.",
@@ -308,15 +308,15 @@
   "storageNotFoundDescription": "Ele pode ter sido excluído, ou o link pode estar desatualizado.",
   "zoneModule": {
     "title": "Este local pertence a um módulo",
-    "description": "“{{name}}” pertence a um módulo, por isso fica fora da lista de locais. Abra-o aqui para ver o que há nele."
+    "description": "“{{name}}” pertence a um módulo, por isso fica fora da lista de locais e não abre aqui."
   },
   "zoneVirtual": {
     "title": "Este é um local do sistema",
-    "description": "“{{name}}” é um dos locais virtuais do sistema — seu conteúdo não conta como estoque. Abra-o aqui para ver o que há nele."
+    "description": "“{{name}}” é um dos locais virtuais do sistema — seu conteúdo não conta como estoque, por isso a lista de locais não o abre."
   },
   "zoneArchived": {
     "title": "Este local está arquivado",
-    "description": "“{{name}}” está arquivado e fica fora da lista ativa. Abra-o aqui ou restaure-o a partir do arquivo."
+    "description": "“{{name}}” está arquivado e fica fora da lista ativa. Para abri-lo, restaure-o primeiro a partir do arquivo."
   },
   "usage": {
     "internal": "Comum",

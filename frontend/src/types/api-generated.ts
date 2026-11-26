@@ -12648,6 +12648,8 @@ export interface components {
             holder_name?: string | null;
             /** Holder Kind */
             holder_kind?: ("person" | "location") | null;
+            /** Held By Viewer */
+            held_by_viewer?: boolean | null;
             /**
              * Checked Out At
              * Format: date-time

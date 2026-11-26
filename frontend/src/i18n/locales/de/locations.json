@@ -209,7 +209,7 @@
     "sequenceLabel": "Laufreihenfolge",
     "sequenceHint": "Die Kommissionierung besucht Lagerorte ab der niedrigsten Nummer. Ein Lagerort ohne Nummer folgt nach den nummerierten, nach Code sortiert.",
     "noParentStorage": "Kein übergeordneter Lagerort",
-    "deleteMessage": "„{{name}}“ löschen? Produkte darin müssen zuerst verschoben werden — und ein Ort, durch den Lagerbewegungen liefen, lässt sich gar nicht löschen: archivieren Sie ihn stattdessen.",
+    "deleteMessage": "„{{name}}“ löschen? Zuerst müssen die Produkte darin verschoben und an diesen Ort ausgegebene Geräte zurückgegeben werden. Ein Ort, durch den Lagerbewegungen liefen, lässt sich gar nicht löschen: archivieren Sie ihn stattdessen.",
     "deleteMovesLocations_one": "1 untergeordneter Lagerort rückt eine Ebene höher.",
     "deleteMovesLocations_other": "{{count}} untergeordnete Lagerorte rücken eine Ebene höher.",
     "deleteMovesRecords_one": "1 Datensatz rückt eine Ebene höher.",
@@ -273,15 +273,15 @@
   "storageNotFoundDescription": "Er wurde vielleicht gelöscht, oder der Link ist veraltet.",
   "zoneModule": {
     "title": "Dieser Lagerort gehört zu einem Modul",
-    "description": "„{{name}}“ gehört zu einem Modul und bleibt daher aus der Lagerortliste heraus. Hier öffnen, um zu sehen, was darin steht."
+    "description": "„{{name}}“ gehört zu einem Modul, bleibt daher aus der Lagerortliste heraus und lässt sich hier nicht öffnen."
   },
   "zoneVirtual": {
     "title": "Dies ist ein Systemlagerort",
-    "description": "„{{name}}“ ist einer der virtuellen Systemlagerorte — sein Inhalt zählt nicht zum Bestand. Hier öffnen, um zu sehen, was darin steht."
+    "description": "„{{name}}“ ist einer der virtuellen Systemlagerorte — sein Inhalt zählt nicht zum Bestand, deshalb öffnet ihn die Lagerortliste nicht."
   },
   "zoneArchived": {
     "title": "Dieser Lagerort ist archiviert",
-    "description": "„{{name}}“ ist archiviert und bleibt aus der aktiven Liste heraus. Hier öffnen oder aus dem Archiv wiederherstellen."
+    "description": "„{{name}}“ ist archiviert und bleibt aus der aktiven Liste heraus. Zum Öffnen zuerst aus dem Archiv wiederherstellen."
   },
   "usage": {
     "internal": "Regulär",

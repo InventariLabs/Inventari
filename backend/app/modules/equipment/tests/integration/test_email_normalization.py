@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.category import Category
 from app.models.item import Item
 from app.models.organization import Organization
+from app.models.partner import Partner
 from app.models.storage_location import StorageLocation
 from app.models.storage_type import StorageType
 from app.models.user import User
@@ -238,3 +239,55 @@ class TestEmailNormalization:
             real_async_db_session, eq_org.id, 'someone.else@example.org'
         )
         assert active == []
+
+    async def test_the_asset_history_names_the_holder_as_my_assets_does(
+        self,
+        real_async_client: AsyncClient,
+        real_async_db_session: AsyncSession,
+        eq_org: Organization,
+        eq_user: User,
+        eq_item: Item,
+    ) -> None:
+        """A partner carrying the reader's address holds the asset for them.
+
+        The row names no address: "My assets" counts it, and the asset's own
+        history says the same, for this reader and for nobody else.
+        """
+        partner = Partner(
+            organization_id=eq_org.id,
+            name='Anna Kowalska',
+            type='EMPLOYEE',
+            email=eq_user.email,
+        )
+        real_async_db_session.add(partner)
+        await real_async_db_session.flush()
+        real_async_db_session.add(
+            EquipmentAssignment(
+                organization_id=eq_org.id,
+                item_id=eq_item.id,
+                assignee_partner_id=partner.id,
+                assigned_to_name='Anna Kowalska',
+                checked_out_by=eq_user.id,
+            )
+        )
+        other = User(
+            email=f'other_{uuid4().hex[:8]}@test.com',
+            hashed_password=get_password_hash('pass'),
+            full_name='Somebody Else',
+            organization_id=eq_org.id,
+            role='admin',
+            is_active=True,
+        )
+        real_async_db_session.add(other)
+        await real_async_db_session.commit()
+        url = f'/api/v1/equipment/assignments/item/{eq_item.id}'
+
+        mine = await get_my_active_assets(
+            real_async_db_session, eq_org.id, eq_user.email
+        )
+        asked_by_holder = await real_async_client.get(url, headers=_auth(eq_user))
+        asked_by_other = await real_async_client.get(url, headers=_auth(other))
+
+        assert [a['item_id'] for a in mine] == [eq_item.id]
+        assert asked_by_holder.json()['items'][0]['held_by_viewer'] is True
+        assert asked_by_other.json()['items'][0]['held_by_viewer'] is False

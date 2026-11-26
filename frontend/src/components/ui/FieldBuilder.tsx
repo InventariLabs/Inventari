@@ -16,7 +16,7 @@ import FieldBuilderHeader from "./FieldBuilderHeader";
 import FieldBuilderFieldRow from "./FieldBuilderFieldRow";
 import FieldBuilderFieldForm from "./FieldBuilderFieldForm";
 import type { FieldFormValues } from "./FieldBuilderFieldForm";
-import { needsOptions, type FieldType } from "./fieldTypes";
+import { listedFields, needsOptions, type FieldType } from "./fieldTypes";
 
 /**
  * Settles the field the reader typed but did not confirm, for the form that
@@ -88,12 +88,7 @@ export default function FieldBuilder({
     money: t("modules:fieldBuilder.types.money"),
   };
 
-  const visibleFields = useMemo(
-    // A definition with no type is a module's visibility flag for a built-in
-    // column, not a field: it has nothing to edit, and no catalogue names it.
-    () => fields.filter((f) => f.type && f.label && f.label.trim() !== ""),
-    [fields],
-  );
+  const visibleFields = useMemo(() => listedFields(fields), [fields]);
 
   const pending = useRef<PendingField | null>(null);
 
@@ -208,7 +203,7 @@ export default function FieldBuilder({
       <FieldBuilderHeader
         isOpen={isOpen}
         onToggle={() => setIsOpen(!isOpen)}
-        fields={fields}
+        fields={visibleFields}
         titleOverride={titleOverride}
         subtitleOverride={subtitleOverride}
       />

@@ -27,7 +27,7 @@ import { useAssetImage } from "@/modules/equipment/hooks/useAssetImage";
 import { useLocationLabel } from "@/modules/equipment/hooks/useLocationLabel";
 import { AssetTable } from "@/modules/equipment/components/AssetTable";
 import { ArchivedAssetList } from "@/modules/equipment/components/ArchivedAssetList";
-import { ArchivedPurgeHint } from "@/modules/equipment/components/ArchivedPurgeHint";
+import { PurgeOffHint } from "@/modules/shared/components/PurgeOffHint";
 import { ArchivedEmptyState } from "@/modules/equipment/components/ArchivedEmptyState";
 import { AssetConfirmDialogs } from "@/modules/equipment/components/AssetConfirmDialogs";
 import { BulkEditDialogs } from "@/modules/equipment/components/BulkEditDialogs";
@@ -573,7 +573,7 @@ export default function AssetListPage() {
 
       {listTab === "archived" && (
         <>
-          <ArchivedPurgeHint />
+          <PurgeOffHint />
           {archiveError ? (
             <QueryError error={archiveError} onRetry={refetchArchived} />
           ) : archivedLoading ? (

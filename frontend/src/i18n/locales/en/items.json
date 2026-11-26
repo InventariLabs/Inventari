@@ -565,7 +565,7 @@
     "openRecord": "Open record",
     "equipmentNote": "This record is returned and disposed of rather than consumed and deleted."
   },
-  "noArchivedItemsDescRestoreOnly": "Products you delete will appear here, and you can put them back. Removing one for good is switched off for this organization.",
+  "noArchivedItemsDescRestoreOnly": "Products you delete will appear here, and you can put them back.",
   "noArchivedItemsDescViewOnly": "Products you delete will appear here. Putting one back needs a permission this account does not have.",
   "archivedSearchPlaceholder": "Search archived products…",
   "archivedNoMatches": "No archived product matches that name.",

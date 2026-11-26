@@ -5,7 +5,12 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.schemas.validators import RemovalStrategy, normalize_barcode, normalize_sku
+from app.schemas.validators import (
+    ProductMeasure,
+    RemovalStrategy,
+    normalize_barcode,
+    normalize_sku,
+)
 
 
 class ProductTemplateLookupResult(BaseModel):
@@ -99,6 +104,9 @@ class ProductTemplateCreate(ProductTemplateBase):
     """
 
     meta_data: dict[str, Any] | None = None
+    # Bounded here and not on the base, which the response inherits.
+    weight_value: ProductMeasure | None = None
+    volume_value: ProductMeasure | None = None
 
 
 class ProductTemplateNutritionUpdate(BaseModel):

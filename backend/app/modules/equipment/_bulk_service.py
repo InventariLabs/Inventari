@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import ItemCreateDTO, UserContextDTO
 from app.core.exceptions import ServiceRejectionError
+from app.core.interceptors import InterceptorError
 from app.i18n.service import get_current_lang, get_error_message
 
 from ._serial import without_serial
@@ -93,7 +94,7 @@ async def bulk_create_items(
                 user=user,
             )
             created_ids.append(str(item.id))
-        except (ValueError, SQLAlchemyError, InvalidOperation) as exc:
+        except (InterceptorError, ValueError, SQLAlchemyError, InvalidOperation) as exc:
             errors.append(
                 BulkEquipmentError(
                     index=i,

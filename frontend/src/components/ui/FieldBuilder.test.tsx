@@ -88,6 +88,21 @@ describe("FieldBuilder", () => {
     expect(screen.queryByDisplayValue("Cut type")).not.toBeInTheDocument();
   });
 
+  it("counts in its header the fields it lists, not a stored visibility flag", () => {
+    const flag = {
+      key: "category_id",
+      label: "Category",
+      visible: true,
+    } as FieldDefinition;
+    render(
+      <FieldBuilder fields={[flag, ...sampleFields]} onChange={vi.fn()} />,
+    );
+
+    expect(
+      screen.getByText(new RegExp(`^${sampleFields.length} defined fields?$`)),
+    ).toBeInTheDocument();
+  });
+
   it("names a catalog-owned field with the catalog's word in the reader's language", async () => {
     const fields: FieldDefinition[] = [
       {

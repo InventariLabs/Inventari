@@ -565,7 +565,7 @@
     "openRecord": "Abrir registro",
     "equipmentNote": "Este registro é devolvido e descartado, em vez de consumido e excluído."
   },
-  "noArchivedItemsDescRestoreOnly": "Os produtos que você excluir aparecerão aqui, e você pode trazê-los de volta. A remoção definitiva está desativada para esta organização.",
+  "noArchivedItemsDescRestoreOnly": "Os produtos que você excluir aparecerão aqui, e você pode trazê-los de volta.",
   "noArchivedItemsDescViewOnly": "Os produtos que você excluir aparecerão aqui. Trazer um de volta exige uma permissão que esta conta não tem.",
   "archivedSearchPlaceholder": "Buscar produtos arquivados…",
   "archivedNoMatches": "Nenhum produto arquivado corresponde a esse nome.",

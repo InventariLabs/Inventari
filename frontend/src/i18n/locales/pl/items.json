@@ -609,7 +609,7 @@
     "openRecord": "Otwórz rekord",
     "equipmentNote": "Tę pozycję się przyjmuje i likwiduje, a nie zużywa i usuwa."
   },
-  "noArchivedItemsDescRestoreOnly": "Usunięte produkty trafiają tutaj i można je przywrócić. Trwałe usuwanie jest w tej organizacji wyłączone.",
+  "noArchivedItemsDescRestoreOnly": "Usunięte produkty trafiają tutaj i można je przywrócić.",
   "noArchivedItemsDescViewOnly": "Produkty, które usuniesz, trafią tutaj. Przywrócenie wymaga uprawnienia, którego to konto nie ma.",
   "archivedSearchPlaceholder": "Szukaj w archiwum…",
   "archivedNoMatches": "Żaden zarchiwizowany produkt nie pasuje do tej nazwy.",

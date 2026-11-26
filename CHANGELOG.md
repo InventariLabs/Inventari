@@ -82,12 +82,20 @@ says what the release does rather than what changed since them.
   With *Shopping lists* on, Grocy's shopping lists come across as well, each
   entry linked to the product the move made. Running the same file again adds
   only batches that are new.
+- Module authors: the frontend SDK (`@/module-sdk`) exports
+  `useReturnTarget`, which reads where a screen entered from another module
+  sends its back arrow (`state={{ backTo }}` on the link), and `listedFields`,
+  which tells a category's fields apart from the flags stored beside them.
 
 ### Fixed
 
 - A SKU read off the opening-stock sheet is stored trimmed and in upper case,
   and a code with a character a SKU cannot hold refuses its row, so a product
   founded from a sheet can be saved in its form.
+- A product's unit weight or volume that is negative, or 100,000,000 and up,
+  is refused with a validation error wherever a request writes it: creating a
+  product, creating or editing a stock record, and the quick add after a scan.
+  An oversized value no longer ends in a server error.
 - Taking back a recipe pick, or cancelling a cooking session, no longer loses
   what was used from the same record at the same moment, and picking an
   ingredient no longer fails when that record, or a document of the same
@@ -95,6 +103,23 @@ says what the release does rather than what changed since them.
 - Using up the last of something leaves the names of the **Consumed** and
   **Inventory Loss** places as they are. They no longer switch to the language
   of whoever took it, and back with the next person.
+- Locations and equipment screens. A location's detail offers *Moves* only
+  where a module that reads the movement ledger is on, and a system, module or
+  archived location no longer asks you to open it where the only button leads
+  back to the list. Deleting a location says that assets checked out to it
+  must be returned first. Archived locations opened from Equipment return
+  there with Back and *Active*. The equipment archive shows the note written
+  when a record was deleted, and both archives say where permanent deletion is
+  switched on, with the link for an administrator only. Whoever holds an asset
+  through their partner record is treated as its holder on the asset's page,
+  as under *My Assets*, and the hints beside the button use the holder's verb.
+  The equipment category list, its delete dialog and the field editor's header
+  count the fields the editor lists, without the hidden column flag, and
+  *Move to…* opens a branch among thousands of locations without redrawing the
+  rest.
+- A module that refuses the creation or change of an asset during a bulk add or
+  a bulk edit now has that asset listed with its sentence and code, and the
+  other assets go through; the whole request failed before.
 - The Export buttons (Settings → Data, the product list, the equipment list)
   start one export at a time: a click while the file is still being prepared
   does nothing, instead of starting a second export on the server.

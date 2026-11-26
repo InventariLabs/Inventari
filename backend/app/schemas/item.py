@@ -21,7 +21,7 @@ from app.schemas.product_template import ProductTemplate
 from app.schemas.uom import UomInfoWithCategory
 from app.schemas.validators import (
     QUANTITY_MAX,
-    WEIGHT_MAX,
+    ProductMeasure,
     RemovalStrategy,
     decimal_from_int_float,
     empty_string_to_none,
@@ -87,9 +87,9 @@ class ItemBase(BaseModel):
     metadata: dict[str, Any] | None = None
 
     # Conversion helpers (Logistics 2.0)
-    weight_value: float | None = Field(default=None, ge=0, le=WEIGHT_MAX)
+    weight_value: ProductMeasure | None = None
     weight_uom_id: UUID | None = None
-    volume_value: float | None = None
+    volume_value: ProductMeasure | None = None
     volume_uom_id: UUID | None = None
 
     # COST TRACKING
@@ -264,7 +264,7 @@ class ItemUpdate(_QuantityAsNamed):
 
     # Product-level fields, written to the item's template (ADR-015)
     min_quantity: float | None = None
-    weight_value: float | None = Field(default=None, ge=0, le=WEIGHT_MAX)
+    weight_value: ProductMeasure | None = None
     weight_uom_id: UUID | None = None
     removal_strategy: RemovalStrategy | None = None
     #: The product's SKU, changed on its card. ``None`` (or blank) clears it.

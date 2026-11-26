@@ -373,14 +373,24 @@ describe("AssetListPage — the archive says where permanent deletion is switche
     });
   };
 
-  it("points to the Settings switch while permanent deletion is off", async () => {
+  it("points an administrator to the Settings switch while permanent deletion is off", async () => {
+    signInWith(["admin:access"]);
     openArchive({ allow_permanent_delete: false });
     const hint = await screen.findByTestId("archived-purge-hint");
     expect(hint).toHaveTextContent(/switched off/i);
-    expect(screen.getByRole("link", { name: "Open settings" })).toHaveAttribute(
-      "href",
-      "/settings#permanent-delete",
-    );
+    expect(
+      screen.getByRole("link", { name: "Turn it on in Settings" }),
+    ).toHaveAttribute("href", "/settings#permanent-delete");
+  });
+
+  it("tells anyone else who can turn it on, with no link to a switch they cannot change", async () => {
+    signInWith(["items:read"]);
+    openArchive({ allow_permanent_delete: false });
+    const hint = await screen.findByTestId("archived-purge-hint");
+    expect(hint).toHaveTextContent(/Only an administrator can turn this on/);
+    expect(
+      screen.queryByRole("link", { name: "Turn it on in Settings" }),
+    ).not.toBeInTheDocument();
   });
 
   it("stays quiet once the switch is on", async () => {

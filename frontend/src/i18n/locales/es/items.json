@@ -565,7 +565,7 @@
     "openRecord": "Abrir registro",
     "equipmentNote": "Este registro se devuelve y se desecha, no se consume ni se elimina."
   },
-  "noArchivedItemsDescRestoreOnly": "Los productos eliminados aparecen aquí y se pueden restaurar. La eliminación definitiva está desactivada en esta organización.",
+  "noArchivedItemsDescRestoreOnly": "Los productos eliminados aparecen aquí y se pueden restaurar.",
   "noArchivedItemsDescViewOnly": "Los productos que elimines aparecerán aquí. Restaurarlos requiere un permiso que esta cuenta no tiene.",
   "archivedSearchPlaceholder": "Buscar en el archivo…",
   "archivedNoMatches": "Ningún producto archivado coincide con ese nombre.",
