@@ -14,7 +14,11 @@
  * Only string, template and regular-expression literals are read: comments
  * and identifiers that happen to contain the word select nothing. A string with
  * `{{interpolations}}` or markup is searched by its longest literal fragment,
- * ignoring case and stopping at word boundaries.
+ * ignoring case and stopping at word boundaries. A literal of two or more
+ * words that spells part of a removed text, and part of none a catalog still
+ * holds, is reported as well: a spec rarely writes a long sentence whole. A
+ * quoted literal has to spell that part in the catalog's letter case, which
+ * leaves a label of the spec's own ("App store") alone.
  *
  * Not reported:
  *  - a text some catalog of the same language still holds as a value (the
@@ -101,7 +105,7 @@ const NOT_A_SELECTOR = /(?<![\w.])(?:test(?:\.\w+)*|new\s+Error)\s*\(\s*$/;
 const HOLE = /\$\{(?:[^{}]|\{[^{}]*\})*\}/g;
 
 /** Every literal of one spec that can select by text, without its delimiters. */
-function literals(source) {
+export function literals(source) {
   const spans = [];
   const code = blankComments(source, (start, end) => spans.push([start, end]));
   return spans
@@ -127,7 +131,7 @@ function literals(source) {
  * `/add \(new\)/` and `'Don\'t'` spell the screen's text with escapes;
  * `\b` and `\n` stand between words.
  */
-const unescaped = (text) =>
+export const unescaped = (text) =>
   text.replace(/\\[bnrt]/g, " ").replace(/\\(?=[^A-Za-z0-9])/g, "");
 
 /**
@@ -163,13 +167,20 @@ export function findStaleText({ before, after, specs }) {
         continue;
       const lower = fragment.toLowerCase();
       const pattern = textPattern(fragment);
-      gone.push({ language, path, key, old, next, fragment, lower, pattern });
+      const written = parts(old);
+      const entry = { language, path, key, old, next, written };
+      gone.push({ ...entry, fragment, lower, pattern });
     }
   }
 
   const findings = new Map();
   if (gone.length === 0) return [];
   const held = { en: [...fragments.en], pl: [...fragments.pl] };
+  const report = (spec, line, { old, next, path, key }) => {
+    const id = `${spec}:${line}:${old}`;
+    if (!findings.has(id))
+      findings.set(id, { spec, line, old, next, path, key });
+  };
   for (const [spec, source] of Object.entries(specs)) {
     const wanted = gone.filter(({ language }) => LANGUAGES[language](spec));
     for (const literal of literals(source)) {
@@ -194,12 +205,22 @@ export function findStaleText({ before, after, specs }) {
         );
         if (stillShown) continue;
         const above = text.slice(0, match.index).split("\n").length - 1;
-        const line = literal.line + above;
-        const { old, next, path, key } = gap;
-        const id = `${spec}:${line}:${old}`;
-        if (!findings.has(id))
-          findings.set(id, { spec, line, old, next, path, key });
+        report(spec, literal.line + above, gap);
       }
+      // The other way round: the literal asks for a phrase of a longer text.
+      if (said.split(/\s+/).filter((word) => /\p{L}/u.test(word)).length < 2)
+        continue;
+      const spelled = text.replace(/^\^|\$$/g, "").trim();
+      const phrase = textPattern(spelled);
+      const quoted = wanted.find(
+        (gap) =>
+          gap.written.some(
+            (part) =>
+              phrase.test(part) &&
+              (!literal.quoted || part.includes(spelled)),
+          ) && !held[gap.language].some((part) => part.includes(said)),
+      );
+      if (quoted) report(spec, literal.line, quoted);
     }
   }
   return [...findings.values()].sort(
@@ -240,45 +261,49 @@ function git(...args) {
   });
 }
 
+/**
+ * The spec lines that spell a text removed since the merge base with `base`.
+ * Throws when git cannot read that base.
+ */
+export function staleTextSince(base) {
+  const from = git("merge-base", base, "HEAD").trim();
+  // Files that existed at the base: an added catalog has no old text.
+  const changed = git(
+    "diff",
+    "--name-only",
+    "--no-renames",
+    "--relative",
+    "--diff-filter=MDT",
+    from,
+    "--",
+    "src",
+  )
+    .split("\n")
+    .filter(catalogLanguage);
+  const before = Object.fromEntries(
+    changed.map((path) => [path, JSON.parse(git("show", `${from}:./${path}`))]),
+  );
+  const specs = Object.fromEntries(
+    walk("tests/e2e")
+      .filter((path) => path.endsWith(".ts"))
+      .map((path) => [path, readFileSync(join(ROOT, path), "utf8")]),
+  );
+  return findStaleText({ before, after: currentCatalogs(), specs });
+}
+
 /** The exit code of one run. */
 function main(argv) {
   const flag = argv.indexOf("--base");
   const base = flag === -1 ? "origin/dev" : argv[flag + 1];
-  let before;
+  let findings;
   try {
-    const from = git("merge-base", base, "HEAD").trim();
-    // Files that existed at the base: an added catalog has no old text.
-    const changed = git(
-      "diff",
-      "--name-only",
-      "--no-renames",
-      "--relative",
-      "--diff-filter=MDT",
-      from,
-      "--",
-      "src",
-    )
-      .split("\n")
-      .filter(catalogLanguage);
-    before = Object.fromEntries(
-      changed.map((path) => [
-        path,
-        JSON.parse(git("show", `${from}:./${path}`)),
-      ]),
-    );
+    findings = staleTextSince(base);
   } catch (error) {
     console.error(
       `e2e catalog text: cannot read the changes since ${base}: ${error.stderr?.trim() || error.message}\nFetch it, or name another base with --base <ref>.`,
     );
     return 2;
   }
-
-  const specs = Object.fromEntries(
-    walk("tests/e2e")
-      .filter((path) => path.endsWith(".ts"))
-      .map((path) => [path, readFileSync(join(ROOT, path), "utf8")]),
-  );
-  const findings = findStaleText({ before, after: currentCatalogs(), specs });
 
   if (findings.length === 0) {
     console.log(
