@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
-import { MemoryRouter, useLocation } from "react-router-dom";
+import { MemoryRouter, useLocation, useNavigate } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 import { useItemFilters } from "./useItemFilters";
 import { useOpenProductParam } from "./useOpenProductParam";
@@ -12,6 +12,7 @@ function hookAt(address: string) {
         filters,
         open: useOpenProductParam(filters.writeParams),
         location: useLocation(),
+        navigate: useNavigate(),
       };
     },
     {
@@ -58,5 +59,30 @@ describe("useOpenProductParam — the link that asks for the date", () => {
     const params = new URLSearchParams(result.current.location.search);
     expect(params.has("open")).toBe(false);
     expect(params.get("filter")).toBe("low-stock");
+  });
+});
+
+describe("useOpenProductParam — Back closes the dialog", () => {
+  it("adds an entry for a product opened from the list, and closing pops it", () => {
+    const { result } = hookAt("/inventory/items");
+
+    act(() => result.current.open[1]("a"));
+    expect(result.current.open[0]).toBe("a");
+    expect(result.current.location.search).toBe("?open=a");
+
+    act(() => result.current.open[1](null));
+    expect(result.current.open[0]).toBeNull();
+    expect(result.current.location.search).toBe("");
+  });
+
+  it("closes the dialog when the browser goes back", () => {
+    const { result } = hookAt("/inventory/items");
+    act(() => result.current.open[1]("a"));
+
+    act(() => result.current.navigate(-1));
+
+    expect(result.current.open[0]).toBeNull();
+    expect(result.current.location.pathname).toBe("/inventory/items");
+    expect(result.current.location.search).toBe("");
   });
 });

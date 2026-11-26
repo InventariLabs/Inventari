@@ -66,6 +66,20 @@ says what the release does rather than what changed since them.
   front of *Running low*. When the list opens already narrowed by one of the
   two — from a statistics card, or with Back — both lead the row, so the
   active filter is on a phone's screen.
+- Phone, focus and Back. Back arrows (the page header's and the label
+  scanner's) work on a screen entered through a redirect or the sign-in
+  return, instead of doing nothing. After a reload on an action screen Back
+  shows the module start once, and the posted result's *Back to start* no
+  longer leaves the finished form behind it. A product opened from the list
+  adds a history entry, so Back closes its dialog and leaves the list as it
+  was; the scan sheet's total follows the decimal comma. In the product
+  picker the focus stays on the field after a pick, Tab reaches *Add as
+  new*, and a list that opens upward no longer covers its own input. The
+  row menu of a warehouse document keeps and returns the focus around the
+  sheet it opens, as does any sheet whose field takes the focus as it opens.
+  Community homepage links and *Free label* meet the phone touch-target
+  size, and the tab keeps naming the not-found sentence after a language
+  switch.
 - The audit log and the item history read in words. A label's entries name
   the label's code and the product beside its id; a document type
   configuration's default locations are written with their names, and

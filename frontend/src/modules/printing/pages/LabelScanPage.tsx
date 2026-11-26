@@ -14,7 +14,7 @@ import { QueryError } from "@/components/ui/QueryResult";
 import { apiErrorStatus, isNotFoundError } from "@/lib/errors";
 import { makeTDynamic } from "@/lib/i18nHelpers";
 import { useCanWrite } from "@/hooks/useCanWrite";
-import { useDocumentTitle } from "@/module-sdk";
+import { hasHistoryToPop, useDocumentTitle } from "@/module-sdk";
 import { ReadOnlyNotice } from "@/components/ui/ReadOnlyNotice";
 import { useLabelScan } from "@/modules/printing/hooks/useLabelScan";
 
@@ -54,9 +54,7 @@ export default function LabelScanPage() {
   // of its history — popping it did nothing, and the one button on the dead
   // end did not move. With nothing to go back to, Back goes home.
   const goBack = () =>
-    location.key !== "default"
-      ? navigate(-1)
-      : navigate("/", { replace: true });
+    hasHistoryToPop(location) ? navigate(-1) : navigate("/", { replace: true });
 
   if (isLoading) {
     return (

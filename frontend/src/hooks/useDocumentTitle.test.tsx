@@ -45,4 +45,17 @@ describe("useDocumentTitle", () => {
     older.unmount();
     expect(document.title).toBe("Purchase Orders · Inventari");
   });
+
+  it("keeps the inner holder on the tab when both are re-titled", () => {
+    const outer = renderHook(({ title }) => useDocumentTitle(title), {
+      initialProps: { title: "Purchase Orders" },
+    });
+    const inner = renderHook(({ title }) => useDocumentTitle(title), {
+      initialProps: { title: "Order not found" },
+    });
+    outer.rerender({ title: "Zamówienia zakupu" });
+    inner.rerender({ title: "Nie znaleziono zamówienia" });
+    outer.rerender({ title: "Zamówienia" });
+    expect(document.title).toBe("Nie znaleziono zamówienia · Inventari");
+  });
 });

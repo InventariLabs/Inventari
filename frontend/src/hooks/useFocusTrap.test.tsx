@@ -76,4 +76,34 @@ describe("useFocusTrap", () => {
     fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
     expect(document.activeElement?.textContent).toBe("Third");
   });
+
+  it("hands the focus back to the opener when a field took it as the sheet mounted", () => {
+    function Page() {
+      const [open, setOpen] = React.useState(false);
+      return (
+        <>
+          <button onClick={() => setOpen(true)}>Open</button>
+          {open && <Sheetlike onClose={() => setOpen(false)} />}
+        </>
+      );
+    }
+    function Sheetlike({ onClose }: { onClose: () => void }) {
+      const ref = useFocusTrap(true);
+      return (
+        <div ref={ref as React.RefObject<HTMLDivElement>}>
+          <button onClick={onClose}>Close</button>
+          <input aria-label="Code" autoFocus />
+        </div>
+      );
+    }
+    render(<Page />);
+    const opener = screen.getByRole("button", { name: "Open" });
+    opener.focus();
+    fireEvent.click(opener);
+    expect(screen.getByRole("textbox", { name: "Code" })).toHaveFocus();
+
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+
+    expect(opener).toHaveFocus();
+  });
 });

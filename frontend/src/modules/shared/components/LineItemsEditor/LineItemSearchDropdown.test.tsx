@@ -578,7 +578,9 @@ describe("LineItemSearchDropdown — a phone keyboard takes the bottom of the sc
 
   it("opens above the input when the keyboard leaves no room below it", () => {
     const list = renderAnchored(400);
-    expect(Number.parseFloat(list.style.top)).toBeLessThan(250);
+    // Anchored by its bottom edge to the input's top (y 250 of 800): 4 px gap.
+    expect(list.style.top).toBe("");
+    expect(Number.parseFloat(list.style.bottom)).toBe(800 - 250 + 4);
   });
 });
 

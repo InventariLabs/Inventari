@@ -618,6 +618,18 @@ const dist = join(root, "dist");
  * 647.9 of 650, issue 594.4 of 595, history 619.5 of 620, products 638.5 of
  * 640, initial 194.2).
  *
+ * Re-measured 2026-11-25 on the branch that keeps the focus, Back and the
+ * touch targets right on the phone screens, merged with the development line:
+ * the issue screen measures 595.6 KiB gz against its 595 and history 620.6
+ * against its 620 (the line alone 594.7 and 619.8). This one is code, not
+ * copy: the Back-to-start hook the posted result shares with the header, the
+ * suggestion panel's placement and Tab handling in the product picker, and
+ * their module SDK exports, which both screens load. Those two phone budgets
+ * move a step of five, to 600 and 625; the other screens stand under theirs
+ * (app first paint 409.3 of 410, login 414.2 of 415, launcher 429.1 of 430,
+ * start 649.2 of 650, receive 486.5 of 490, products 639.5 of 640, initial
+ * 194.3).
+ *
  * Re-measured 2026-11-25 on the branch that closes the recipes and shopping
  * list findings, merged with the development line after that step: the
  * receive screen measures 485.4 KiB gz against its 490. The branch adds a
@@ -641,10 +653,24 @@ const dist = join(root, "dist");
  * other screens stand under theirs (app first paint 408.9 of 410, login
  * 413.8 of 415, launcher 428.8 of 430, start 648.7 of 650, receive 485.7 of
  * 490, products 639.3 of 640, initial 194.2).
+ *
+ * Re-measured 2026-11-26 on the branch that keeps the focus, Back and the
+ * touch targets right on the phone screens, merged with the development line
+ * at d91a8765c9: app first paint measures 410.4 KiB gz against its 410,
+ * login 415.4 against 415, launcher 430.3 against 430 and start 650.3
+ * against 650, where the line alone stands at 409.8, 414.7, 429.7 and 649.6.
+ * The branch adds about 0.6 KiB of code to the startup path: the
+ * Back-to-start hook with the entry-before it keeps across a reload, and the
+ * focus a closing sheet hands back. The shell hook also builds into a chunk
+ * of its own, because lazy screens reach it through the module SDK; no
+ * outside import walked in. Those four budgets move a step of five, to 415,
+ * 420, 435 and 655. The other screens stand under theirs (receive 487.7 of
+ * 490, issue 596.7 of 600, history 621.8 of 625, products 629.2 of 640,
+ * initial 194.3).
  */
 const BUDGETS = {
   initial: 245,
-  appFirstPaint: 410,
+  appFirstPaint: 415,
 };
 
 /**

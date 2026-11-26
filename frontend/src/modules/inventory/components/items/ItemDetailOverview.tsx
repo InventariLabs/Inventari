@@ -143,7 +143,7 @@ function LabelCodeField({ item }: { item: Item }) {
             <Button
               size="content"
               variant="ghost"
-              className="px-2 py-1 text-xs"
+              className="min-h-11 px-2 text-xs sm:min-h-0 sm:py-1"
               disabled={isFreeing}
               aria-label={t("labels:actions.freeLabelNamed", { code })}
               onClick={() => void freeLabel(code, item.name)}

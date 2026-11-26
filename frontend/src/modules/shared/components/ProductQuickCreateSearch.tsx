@@ -182,7 +182,7 @@ export function ProductQuickCreateSearch<T extends ProductComboboxOption>({
             aria-describedby={
               !createUomId ? `${testId}-uom-required` : undefined
             }
-            leftIcon={<Plus size={16} />}
+            leftIcon={<Plus size={16} className="shrink-0" />}
             // Semantic accent tokens, not numbered shades: `accent` has no 950 in
             // tailwind.config.js, so the dark variants silently did not exist and
             // the button kept its light background in dark mode.
