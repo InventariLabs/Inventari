@@ -10,6 +10,7 @@ order the free-form ``meta_data`` columns appear in.
 import io
 import uuid
 from collections.abc import Awaitable, Callable
+from datetime import date, timedelta
 from decimal import Decimal
 
 import pandas as pd
@@ -41,6 +42,7 @@ ALWAYS = [
 ]
 
 PRICE = 'Purchase price per unit (USD)'
+A_DAY = date.today() + timedelta(days=30)
 
 Change = Callable[[AsyncSession, Item], Awaitable[None]]
 
@@ -133,12 +135,12 @@ async def open_location(
         pytest.param(_on_the_product(weight_value=Decimal('0')), [], id='no-weight'),
         pytest.param(_counted_by_weight, ['Weight'], id='counted-by-weight'),
         pytest.param(
-            _on_the_record(expiry_date=pd.Timestamp('2027-01-02').date()),
+            _on_the_record(expiry_date=A_DAY),
             ['Expiry Date'],
             id='expiry',
         ),
         pytest.param(
-            _on_the_record(meta_data={'food': {'freeze_date': '2027-01-02'}}),
+            _on_the_record(meta_data={'food': {'freeze_date': A_DAY.isoformat()}}),
             ['Freeze Date'],
             id='frozen',
         ),
