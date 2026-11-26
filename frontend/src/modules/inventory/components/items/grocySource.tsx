@@ -1,6 +1,9 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { FileSource } from "@/components/import/ImportWizardSheet";
+import {
+  defineFileSource,
+  type FileSource,
+} from "@/components/import/ImportWizardSheet";
 import type { ItemImportOutcome } from "@/components/import/types";
 import { itemsApi, type GrocyFileAnalysis } from "@/lib/api/items";
 import { useImportGrocy } from "@/modules/inventory/hooks/useItemMutations";
@@ -34,7 +37,7 @@ export function useGrocySource(categories: CategoryDTO[] | undefined): {
   return {
     active: analysis !== null,
     forget: () => setAnalysis(null),
-    source: {
+    source: defineFileSource({
       label: t("items:import.grocy"),
       hint: t("items:import.grocyHint"),
       note: t("items:import.grocyMove.pickBody"),
@@ -51,6 +54,6 @@ export function useGrocySource(categories: CategoryDTO[] | undefined): {
       runLabel: t("items:import.grocyMove.move"),
       run: (file, onProgress) =>
         importGrocy.mutateAsync({ file, categoryMatches, onProgress }),
-    },
+    }),
   };
 }

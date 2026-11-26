@@ -94,6 +94,15 @@ export interface FileSource<R extends ImportOutcome> {
   ) => Promise<R>;
 }
 
+/** A file source, as the wizard takes it. The wizard awaits its `run` and
+ *  shows the refusal, so a source may hand it a mutation's promise as is —
+ *  the mutateAsync gate reads this call as the place it is caught. */
+export function defineFileSource<R extends ImportOutcome>(
+  source: FileSource<R>,
+): FileSource<R> {
+  return source;
+}
+
 type Step = "upload" | "mapping" | "review" | "processing" | "result";
 
 /** The three steps every spreadsheet import walks: pick a file, map its

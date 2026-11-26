@@ -80,7 +80,12 @@ export const CATCHERS = {
  * `useConfirmDialog` hands the action's promise back to it) or by the
  * slot whose `data` it is (the approvals module's buttons catch).
  */
-const CATCHING_CALL_PROPERTIES = { showConfirm: ["onConfirm"] };
+const CATCHING_CALL_PROPERTIES = {
+  showConfirm: ["onConfirm"],
+  // A file source of the import wizard: the wizard awaits its `run` and
+  // toasts the refusal, as it does for its own `run` prop.
+  defineFileSource: ["run"],
+};
 const CATCHING_SLOT_PROPERTIES = {
   approval_status_badge: ["onApprove", "onRequest", "onReject"],
   approval_decision_panel: ["onApprove", "onReject"],
