@@ -278,9 +278,14 @@ says what the release does rather than what changed since them.
   refused rather than answered with a server error.
 - Editing a global storage type joins the organization's fork that every
   other reader resolves the type code to, whichever row the heap returns
-  first; module seed locations and their language alignment answer a name a
-  hand-made place already holds with the sibling-name refusal, not a server
-  error.
+  first; a module seed location whose name a hand-made place already holds is
+  answered with the sibling-name refusal, not a server error.
+- A seeded or virtual place keeps its name when another place beside it
+  already holds its name in the reader's language. The dispatch, write-off or
+  module switch-on that would have renamed it goes through. When the creation
+  of starting places finds two places bearing a declared name, it takes the
+  same one every time, and an archived place no longer counts as somewhere to
+  put goods.
 - Concurrent changes of an organization's default tax rate take their locks
   in one order, so two saves no longer deadlock and wait for the retry
   middleware.
