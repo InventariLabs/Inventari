@@ -650,8 +650,9 @@ def test_a_dispatch_goes_through_when_the_consumed_places_name_is_taken(
 ) -> None:
     """A hand-made place holding the name in the reader's language stops nothing.
 
-    The first dispatch writes the virtual places in English; the Polish one
-    would rename them, and the Consumed one meets a place already called that.
+    The first dispatch writes the virtual places in English. A Polish one
+    after it goes through and leaves that name, with another place holding
+    the Polish one.
     """
     from app.core.testing import ModuleTestHelper
 

@@ -74,6 +74,13 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Taking back a recipe pick, or cancelling a cooking session, no longer loses
+  what was used from the same record at the same moment, and picking an
+  ingredient no longer fails when that record, or a document of the same
+  product, is being changed at once.
+- Using up the last of something leaves the names of the **Consumed** and
+  **Inventory Loss** places as they are. They no longer switch to the language
+  of whoever took it, and back with the next person.
 - The Export buttons (Settings → Data, the product list, the equipment list)
   start one export at a time: a click while the file is still being prepared
   does nothing, instead of starting a second export on the server.
