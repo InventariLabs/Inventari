@@ -55347,7 +55347,9 @@
           "weight_value": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 99999999.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
@@ -58803,7 +58805,9 @@
           "weight_value": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 99999999.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
@@ -59387,7 +59391,9 @@
           "weight_value": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 99999999.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
@@ -60192,7 +60198,9 @@
           "weight_value": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 99999999.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"

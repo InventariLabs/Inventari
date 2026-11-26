@@ -373,7 +373,11 @@ export default function AuditLogPage() {
   // The names a module gives its own settings, for the rows that changed one.
   const moduleTitles = useModuleSettingTitles(rows.map(moduleOf));
   const titlesOf = (row: AuditLogEntry) =>
-    auditFieldTitles(row.target_type, moduleTitles[moduleOf(row) ?? ""]);
+    auditFieldTitles(
+      row.target_type,
+      moduleTitles[moduleOf(row) ?? ""],
+      row.snapshot,
+    );
 
   const toggleExpanded = (id: string) =>
     setExpanded((prev) => {

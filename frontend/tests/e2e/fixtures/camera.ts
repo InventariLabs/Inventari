@@ -1,7 +1,7 @@
 import { expect, type Page, type Request } from '@playwright/test';
 
 import { test as authTest } from './auth';
-import { ean13Modules, qrModules } from '../helpers/barcode';
+import { ean13Modules, qrDrawings } from '../helpers/barcode';
 
 /**
  * A camera the test controls.
@@ -76,13 +76,17 @@ function installFakeCamera() {
         }
       };
     },
-    showMatrix(rows: boolean[][]) {
+    showMatrices(matrices: boolean[][][]) {
       const quiet = 4;
       const unit = 6;
-      const side = (rows.length + 2 * quiet) * unit;
-      const x0 = Math.floor((canvas.width - side) / 2);
-      const y0 = Math.floor((canvas.height - side) / 2);
       drawing = () => {
+        // The next drawing every third frame, long enough for the reader to
+        // take each one: a phone's picture changes from frame to frame too,
+        // where a still one the decoder misses is missed for good.
+        const rows = matrices[Math.floor(state.frames / 3) % matrices.length];
+        const side = (rows.length + 2 * quiet) * unit;
+        const x0 = Math.floor((canvas.width - side) / 2);
+        const y0 = Math.floor((canvas.height - side) / 2);
         ctx.fillStyle = '#fff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#000';
@@ -174,7 +178,7 @@ export interface FakeCamera {
 interface Control {
   state: FakeCameraState;
   showBars(bars: string): void;
-  showMatrix(rows: boolean[][]): void;
+  showMatrices(matrices: boolean[][][]): void;
   hide(): void;
   torch: boolean;
 }
@@ -191,7 +195,7 @@ async function attach(page: Page): Promise<FakeCamera> {
     page.evaluate(() => (window as unknown as { __fakeCamera: Control }).__fakeCamera.state.frames);
   return {
     showEan13: (code) => page.evaluate((bars) => (window as unknown as { __fakeCamera: Control }).__fakeCamera.showBars(bars), ean13Modules(code)),
-    showQr: (text) => page.evaluate((rows) => (window as unknown as { __fakeCamera: Control }).__fakeCamera.showMatrix(rows), qrModules(text)),
+    showQr: (text) => page.evaluate((all) => (window as unknown as { __fakeCamera: Control }).__fakeCamera.showMatrices(all), qrDrawings(text)),
     hide: () => page.evaluate(() => (window as unknown as { __fakeCamera: Control }).__fakeCamera.hide()),
     setTorch: (available) =>
       page.evaluate((on) => {

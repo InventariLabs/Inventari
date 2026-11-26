@@ -142,3 +142,66 @@ class TestTypeConfigReachesTheLog:
         for column in ('id', 'organization_id', 'document_type', 'created_at'):
             assert column not in entry[0]['before'], column
             assert column not in entry[0]['after'], column
+
+
+class TestTypeConfigNamesWhatItPointsAt:
+    def test_a_default_location_is_written_with_its_name(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_org: Organization,
+        doc_source_location: Any,
+        db_session: Session,
+    ) -> None:
+        before = len(_entries(db_session, doc_org.id))
+        saved = client.put(
+            _URL,
+            headers=doc_auth_headers,
+            json={
+                'document_type': 'IN',
+                'default_source_location_id': str(doc_source_location.id),
+            },
+        )
+        assert saved.status_code == status.HTTP_200_OK, saved.text
+
+        entry = _entries(db_session, doc_org.id)[before:]
+        assert len(entry) == 1
+        assert entry[0]['after']['default_source_location_id'] == str(
+            doc_source_location.id
+        )
+        assert (
+            entry[0]['after']['default_source_location_name']
+            == doc_source_location.name
+        )
+
+        dropped = client.delete(_URL, headers=doc_auth_headers)
+        assert dropped.status_code == status.HTTP_204_NO_CONTENT, dropped.text
+        removal = _entries(db_session, doc_org.id)[before + 1 :]
+        assert len(removal) == 1
+        assert (
+            removal[0]['before']['default_source_location_name']
+            == doc_source_location.name
+        )
+
+    @pytest.mark.parametrize('spelling', ['in', 'PZ'])
+    def test_delete_takes_every_spelling_the_save_takes(
+        self,
+        client: TestClient,
+        doc_auth_headers: dict[str, str],
+        doc_org: Organization,
+        db_session: Session,
+        spelling: str,
+    ) -> None:
+        base = '/api/v1/warehouse/settings/type-configs/'
+        saved = client.put(
+            base + spelling,
+            headers=doc_auth_headers,
+            json={'document_type': 'IN', 'require_partner': True},
+        )
+        assert saved.status_code == status.HTTP_200_OK, saved.text
+        assert _rows(db_session, doc_org.id) == 1
+
+        dropped = client.delete(base + spelling, headers=doc_auth_headers)
+
+        assert dropped.status_code == status.HTTP_204_NO_CONTENT, dropped.text
+        assert _rows(db_session, doc_org.id) == 0

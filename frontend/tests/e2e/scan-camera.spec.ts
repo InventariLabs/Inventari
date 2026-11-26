@@ -384,6 +384,23 @@ test.describe("Scan — one read per presence on the forms", () => {
     expect(camera.scanRequests()).toEqual([PRODUCT_EAN, PRODUCT_EAN]);
   });
 
+  test("a code the decoder misses in one of its drawings is read", async ({
+    page,
+    camera,
+    authenticatedPage: _auth,
+  }) => {
+    test.setTimeout(90000);
+    await openDocumentScan(page);
+
+    // Under the mask the QR standard's penalty score picks for it, the
+    // decoder finds this code in no frame of this panel's picture. A location
+    // code is the server's to name, so any of them may be such a code.
+    await camera.showQr("LOC-LXMB");
+    await expect
+      .poll(() => camera.scanRequests(), { timeout: 20000 })
+      .toContain("LOC-LXMB");
+  });
+
   test("closing the document form's panel stops the camera; reopening reads again", async ({
     page,
     camera,
