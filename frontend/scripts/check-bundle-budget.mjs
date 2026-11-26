@@ -629,18 +629,18 @@ const dist = join(root, "dist");
  * issue 594.7 of 595, history 619.8 of 620, products 638.8 of 640, initial
  * 194.2).
  *
- * Re-measured 2026-11-26 on the branch that moves a household in from
- * Grocy's database file, merged with the development line: the issue screen
- * measures 595.6 KiB gz against its 595 and the history screen 620.8 against
- * its 620. The branch adds the move's copy in six languages (the review of
- * the file, what stays in Grocy, the summary) to the items language file
- * every first paint loads: 0.83 KiB gz of the Polish one, the whole of both
- * overshoots; no import walked into either screen. Its code loads on
- * request with the import dialog, which takes the products screen from
- * 638.8 to 628.0. Those two phone budgets move a step of five, to 600 and
- * 625; the other screens stand under theirs (app first paint 409.6 of 410,
- * login 414.5 of 415, launcher 429.4 of 430, start 649.3 of 650, receive
- * 486.3 of 490, products 628.0 of 640, initial 194.2).
+ * Re-measured 2026-11-26 on the branch that prepares a long spreadsheet
+ * export in the background, merged with the development line at cd934b784:
+ * the history screen measures 620.2 KiB gz against its 620 and the issue
+ * screen 595.0 against its 595, where the line alone stands at 619.9 and
+ * 594.8. The branch adds the follower of an export job to the items API
+ * client, which every screen that lists products loads, and one sentence in
+ * six languages (the notice of an export being prepared) to the language
+ * chunk every first paint loads; no import walked into either screen. Both
+ * phone budgets move a step of five, history to 625 and issue to 600; the
+ * other screens stand under theirs (app first paint 408.9 of 410, login
+ * 413.8 of 415, launcher 428.8 of 430, start 648.7 of 650, receive 485.7 of
+ * 490, products 639.3 of 640, initial 194.2).
  */
 const BUDGETS = {
   initial: 245,

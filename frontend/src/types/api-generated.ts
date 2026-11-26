@@ -2396,6 +2396,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/items/export/jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Export Job
+         * @description How far an export that went to the background has got, and how it ended.
+         */
+        get: operations["read_export_job_api_v1_items_export_jobs__job_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/items/export/jobs/{job_id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Export File
+         * @description The workbook of a finished export job, kept for a day after it started.
+         */
+        get: operations["read_export_file_api_v1_items_export_jobs__job_id__file_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/items/export/xlsx": {
         parameters: {
             query?: never;
@@ -2412,6 +2452,14 @@ export interface paths {
          *     "Showing 1–50 of 102" holds those 102 rows. Feature-module columns (e.g.
          *     equipment's "Assigned To") come from the export-enricher registry — Core
          *     never imports a module directly.
+         *
+         *     A sheet of more than ``INLINE_ROW_LIMIT`` records takes longer than a
+         *     phone or a proxy waits, so it is answered at once with ``202`` and a job
+         *     (:class:`ItemExportJobResponse`) read at ``GET /items/export/jobs/{id}``;
+         *     its workbook is fetched from ``GET /items/export/jobs/{id}/file`` once
+         *     the job is done; a process of its own writes it, so the worker's other
+         *     requests do not wait for it. A shorter one is answered with the
+         *     workbook, written on a thread.
          */
         get: operations["export_items_xlsx_api_v1_items_export_xlsx_get"];
         put?: never;
@@ -17633,6 +17681,34 @@ export interface components {
             reason: string;
             /** Notes */
             notes?: string | null;
+        };
+        /**
+         * ItemExportJobResponse
+         * @description An export that runs on in the background, and how far it has got.
+         *
+         *     A sheet too long for one request is answered with this (HTTP 202) and
+         *     read again at ``GET /items/export/jobs/{id}`` until ``status`` is
+         *     ``done`` — the workbook is then at ``GET /items/export/jobs/{id}/file``
+         *     for a day — or ``failed``, with ``error`` saying why. ``processed``
+         *     counts towards ``total``, the records the sheet holds.
+         */
+        ItemExportJobResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "running" | "done" | "failed";
+            /** Total */
+            total: number;
+            /** Processed */
+            processed: number;
+            /** Error */
+            error?: string | null;
         };
         /**
          * ItemHistorySchema
@@ -35253,6 +35329,68 @@ export interface operations {
             };
         };
     };
+    read_export_job_api_v1_items_export_jobs__job_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemExportJobResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_export_file_api_v1_items_export_jobs__job_id__file_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     export_items_xlsx_api_v1_items_export_xlsx_get: {
         parameters: {
             query?: {
@@ -35292,6 +35430,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemExportJobResponse"];
                 };
             };
             /** @description Validation Error */

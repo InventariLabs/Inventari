@@ -12,6 +12,7 @@ log or its archive.
 """
 
 from collections.abc import Awaitable, Callable
+from contextlib import suppress
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -19,11 +20,15 @@ from sqlalchemy import ColumnElement, CursorResult, delete, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
+from app.core.file_storage.errors import StoredFileNotFoundError
+from app.core.file_storage.service import FileStorageService
 from app.core.logging import get_logger
 from app.models.email_job import EmailJob
 from app.models.event_outbox import EventOutbox
+from app.models.item_export_job import ItemExportJob
 from app.models.notification import Notification
 from app.services.email_jobs import _STATUS_FAILED, _STATUS_SENT
+from app.services.items._export_job import KEEP_FOR as EXPORT_KEPT_FOR
 
 logger = get_logger(__name__)
 
@@ -104,10 +109,33 @@ async def purge_old_notifications(db: AsyncSession) -> int:
     )
 
 
+async def purge_old_export_jobs(db: AsyncSession) -> int:
+    """Delete export jobs a day after they started, each with its workbook.
+
+    A workbook is a copy of an organization's catalogue: it is kept long
+    enough to be fetched, not for good. The files go first; one already gone
+    (another node took it on the same tick) is no reason to keep the row.
+    """
+    started_before = datetime.now(UTC) - EXPORT_KEPT_FOR
+    paths = await db.scalars(
+        select(ItemExportJob.file_path).where(ItemExportJob.created_at < started_before)
+    )
+    storage = FileStorageService()
+    for path in paths.all():
+        if path is None:  # the job never finished: there is no file
+            continue
+        with suppress(StoredFileNotFoundError):
+            await storage.delete(path)
+    return await _delete_in_batches(
+        db, ItemExportJob, ItemExportJob.created_at < started_before
+    )
+
+
 _PURGES: tuple[tuple[str, Callable[[AsyncSession], Awaitable[int]]], ...] = (
     ('event_outbox', purge_published_outbox),
     ('email_jobs', purge_finished_email_jobs),
     ('notifications', purge_old_notifications),
+    ('item_export_jobs', purge_old_export_jobs),
 )
 
 

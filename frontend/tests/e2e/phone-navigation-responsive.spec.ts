@@ -96,14 +96,25 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
     // thumb does, and leaves the last card in reach.
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await expect(last).toBeInViewport();
-    const leftAt = await page.evaluate(() => window.scrollY);
-    expect(leftAt).toBeGreaterThan(500);
     const name = (await last.getAttribute("aria-label"))!.replace(
       "Product actions: ",
       "",
     );
+    // Where the list is left is where it stands when the tap arrives: a tap
+    // Playwright has to retry scrolls the page first.
+    await page.evaluate(() =>
+      addEventListener(
+        "click",
+        () => (document.body.dataset.tappedAt = String(window.scrollY)),
+        { capture: true, once: true },
+      ),
+    );
     // The card itself opens the product's page.
     await page.getByRole("heading", { name, level: 3 }).click();
+    const tappedAt = Number(
+      await page.evaluate(() => document.body.dataset.tappedAt),
+    );
+    expect(tappedAt).toBeGreaterThan(500);
 
     // The product's own name is on the first screen, not above it.
     const heading = page.getByRole("heading", { name, level: 1 });
@@ -128,10 +139,45 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
             const reachable =
               document.documentElement.scrollHeight - window.innerHeight;
             return window.scrollY - Math.min(left, reachable);
-          }, leftAt),
+          }, tappedAt),
         { timeout: 10000 },
       )
       .toBeGreaterThanOrEqual(-2);
+  });
+
+  test("a tap that follows a scroll at once returns Back to where it landed", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto(`/inventory/items?search=${tag}`);
+    const menus = page.getByRole("button", { name: /^Product actions: / });
+    await expect(menus).toHaveCount(createdIds.length, { timeout: 15000 });
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await expect(menus.last()).toBeInViewport();
+    // Let the bottom be reported, so that it is what an older reading holds.
+    await page.evaluate(
+      () => new Promise((done) => requestAnimationFrame(() => setTimeout(done))),
+    );
+
+    // Scroll up and tap in one task: the tap is handled before the browser
+    // reports the scroll, as on a phone too busy to paint between the two.
+    const tappedAt = await page.evaluate(() => {
+      window.scrollBy(0, -400);
+      const y = window.scrollY;
+      [...document.querySelectorAll("h3")].at(-1)!.click();
+      return y;
+    });
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+
+    await page.getByRole("button", { name: "Back" }).click();
+    await expect(menus.first()).toBeVisible();
+    await expect
+      .poll(
+        () => page.evaluate((y) => Math.abs(window.scrollY - y), tappedAt),
+        { timeout: 10000 },
+      )
+      .toBeLessThanOrEqual(2);
   });
 
   test("a search typed into the list is still there after Back", async ({
@@ -170,6 +216,15 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
     await page.goto("/inventory/items");
     const lowStock = page.getByRole("button", { name: "Running low" });
     const usedUp = page.getByRole("button", { name: "Show used up" });
+    // The date chips stand ahead of these two and arrive after them, pushing
+    // them aside: a tap that is down at that moment lands on nothing. Tap once
+    // the row is whole (the suite's seed holds dated records).
+    await expect(page.getByTestId("filter-expired")).toBeAttached({
+      timeout: 15000,
+    });
+    await expect(
+      page.getByRole("button", { name: /^Product actions: / }).first(),
+    ).toBeVisible({ timeout: 15000 });
     await lowStock.click();
     await usedUp.click();
     // Each chip owns its place in the address; ticking the second must not

@@ -58,6 +58,9 @@ says what the release does rather than what changed since them.
 
 - The products' import dialog no longer offers a Grocy CSV preset: Grocy has
   no CSV export, so the preset mapped columns of a file nobody could produce.
+- Back returns a list to where it stood when you tapped away from it, also
+  when the tap came right after a scroll on a busy phone; it could return to
+  an earlier position, several hundred pixels off.
 - On a phone, the *Type a code* sheet over the running scanner answers to
   touch: its field, *Scan*, *Close* and the backdrop take a press, where only
   a keyboard reached them before. The *⋯* menu of a warehouse document and of
@@ -351,6 +354,18 @@ says what the release does rather than what changed since them.
 - The application answers `/robots.txt` with a file that disallows every
   crawler, instead of its own HTML page, so a search engine is told to stay
   away from an instance and the sign-in behind it.
+- An export of more than 5,000 records to a spreadsheet is prepared in the
+  background instead of inside one request. The notice says how far it has
+  got and the file downloads by itself when it is ready, so a phone or a
+  proxy that gives up on a long request no longer loses it, and the rest of
+  the application answers at its usual speed meanwhile; while the sheet of
+  every record of 100,000 products was written inside a request (about two
+  minutes), the product list answered ten times slower. A shorter export
+  downloads at once, as before. The prepared file is kept for a day.
+  **Breaking** for scripts that call the API: past that size
+  `GET /items/export/xlsx` answers `202` with a job instead of the file;
+  read the job at `GET /items/export/jobs/{id}` until its `status` is
+  `done`, then fetch the workbook from `GET /items/export/jobs/{id}/file`.
 - A recipe card remembers the shopping list picked last in its *Add to list*
   picker and starts the next recipe on it, in the same browser; it falls back
   to the newest open list once that one is completed or archived.

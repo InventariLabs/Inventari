@@ -449,6 +449,23 @@ class ItemImportJobResponse(BaseModel):
     error: str | None = None
 
 
+class ItemExportJobResponse(BaseModel):
+    """An export that runs on in the background, and how far it has got.
+
+    A sheet too long for one request is answered with this (HTTP 202) and
+    read again at ``GET /items/export/jobs/{id}`` until ``status`` is
+    ``done`` — the workbook is then at ``GET /items/export/jobs/{id}/file``
+    for a day — or ``failed``, with ``error`` saying why. ``processed``
+    counts towards ``total``, the records the sheet holds.
+    """
+
+    id: UUID
+    status: Literal['running', 'done', 'failed']
+    total: int
+    processed: int
+    error: str | None = None
+
+
 class Item(ItemBase):
     id: UUID
     location_id: UUID

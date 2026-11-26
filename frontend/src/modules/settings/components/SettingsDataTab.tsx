@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { itemsApi } from "@/lib/api/items";
+import { showExportProgress } from "@/modules/shared/lib/exportProgress";
 import { useCanWrite } from "@/hooks/useCanWrite";
 import { downloadBlob } from "@/utils/helpers";
 import { getTodayFilename } from "@/utils/formatters";
@@ -22,7 +23,10 @@ export default function SettingsDataTab() {
     try {
       toast.loading(t("common:actions.exporting"), { id: "export" });
       // The backup asks for everything, the list's usage default included.
-      const response = await itemsApi.exportXlsx({ location_usage: "any" });
+      const response = await itemsApi.exportXlsx(
+        { location_usage: "any" },
+        showExportProgress(t, "export"),
+      );
       downloadBlob(response, `inventari_export_${getTodayFilename()}.xlsx`);
       toast.success(t("common:actions.exportSuccess"), { id: "export" });
     } catch (err) {

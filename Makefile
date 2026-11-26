@@ -310,6 +310,8 @@ check-frontend: ## Run frontend eslint + prettier, typecheck + production build,
 	docker compose exec frontend npm run check:primary-tabs
 	@echo "$(BLUE)[INFO]$(NC) Checking E2E specs do not sleep more than they did (baseline)..."
 	docker compose exec frontend npm run check:e2e-waits
+	@echo "$(BLUE)[INFO]$(NC) Checking no E2E spec still looks for a catalog text the branch removed..."
+	@node frontend/scripts/check-e2e-catalog-text.mjs
 	@echo "$(BLUE)[INFO]$(NC) Checking no count is pasted next to a translated noun..."
 	docker compose exec frontend npm run check:plurals
 	@echo "$(BLUE)[INFO]$(NC) Checking every API route has a caller or a recorded reason..."

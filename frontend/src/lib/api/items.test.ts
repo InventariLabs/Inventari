@@ -367,6 +367,11 @@ describe("removing items", () => {
   });
 });
 
+/** A JSON answer as the bytes a request read as an array buffer receives. */
+function jsonBytes(body: unknown): ArrayBuffer {
+  return new TextEncoder().encode(JSON.stringify(body)).buffer as ArrayBuffer;
+}
+
 describe("files", () => {
   it("exports the rows as a file and passes the filters, so the file matches the screen", async () => {
     let query = "";
@@ -387,6 +392,61 @@ describe("files", () => {
     expect(blob).toBeInstanceOf(Blob);
     expect(blob.size).toBe("sheet-bytes".length);
     expect(query).toBe("?search=milk");
+  });
+
+  it("follows an export the server moved to the background and returns the job's file", async () => {
+    vi.useFakeTimers();
+    const workbook = new Blob(["sheet-bytes"]);
+    const get = vi
+      .spyOn(api, "get")
+      // read as bytes, the job's answer arrives as bytes too
+      .mockResolvedValueOnce({
+        status: 202,
+        data: jsonBytes({ id: "exp-1", status: "running" }),
+      })
+      .mockResolvedValueOnce({
+        data: { status: "running", processed: 100, total: 400 },
+      })
+      .mockResolvedValueOnce({
+        data: { status: "done", processed: 400, total: 400 },
+      })
+      .mockResolvedValueOnce({ data: workbook });
+    const onProgress = vi.fn();
+
+    const pending = itemsApi.exportXlsx({ location_usage: "any" }, onProgress);
+    await vi.advanceTimersByTimeAsync(1500);
+
+    expect(await pending).toBe(workbook);
+    expect(onProgress).toHaveBeenCalledWith({ percent: 25 });
+    expect(get.mock.calls.map((call) => call[0])).toEqual([
+      "/items/export/xlsx",
+      "/items/export/jobs/exp-1",
+      "/items/export/jobs/exp-1",
+      "/items/export/jobs/exp-1/file",
+    ]);
+  });
+
+  it("raises the job's own reason when the background export fails", async () => {
+    vi.spyOn(api, "get")
+      .mockResolvedValueOnce({
+        status: 202,
+        data: jsonBytes({ id: "exp-2", status: "running" }),
+      })
+      .mockResolvedValueOnce({
+        data: {
+          status: "failed",
+          error: "The export was interrupted before it finished.",
+        },
+      });
+
+    const failure: unknown = await itemsApi
+      .exportXlsx()
+      .catch((e: unknown) => e);
+
+    expect(failure).toBeInstanceOf(ReadableError);
+    expect((failure as Error).message).toBe(
+      "The export was interrupted before it finished.",
+    );
   });
 
   it("uploads the picture as the image field and returns its url", async () => {

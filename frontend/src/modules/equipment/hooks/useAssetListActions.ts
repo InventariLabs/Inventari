@@ -15,6 +15,7 @@ import {
 } from "@/modules/equipment/hooks/useEquipment";
 import { ReadableError, extractApiError } from "@/lib/errors";
 import { itemsApi } from "@/lib/api/items";
+import { showExportProgress } from "@/modules/shared/lib/exportProgress";
 import { labelsApi } from "@/lib/api/labels";
 import { downloadBlob } from "@/utils/helpers";
 import { getTodayFilename } from "@/utils/formatters";
@@ -553,10 +554,10 @@ export function useAssetListActions() {
   const handleExport = useCallback(async () => {
     try {
       toast.loading(t("common:actions.exporting"), { id: "eq-export" });
-      const blob = await itemsApi.exportXlsx({
-        context_tag: "equipment",
-        location_usage: "any",
-      });
+      const blob = await itemsApi.exportXlsx(
+        { context_tag: "equipment", location_usage: "any" },
+        showExportProgress(t, "eq-export"),
+      );
       downloadBlob(blob, `equipment_${getTodayFilename()}.xlsx`);
       toast.success(
         t("common:actions.exportSuccess", {

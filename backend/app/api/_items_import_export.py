@@ -1,5 +1,6 @@
 import json
 from collections.abc import Awaitable, Callable
+from functools import partial
 from typing import Any
 from uuid import UUID
 
@@ -33,14 +34,18 @@ from app.core.file_import import analyze_import_file as analyze_sheet
 from app.core.grocy_file import GrocyFile, read_grocy_file
 from app.core.import_sheet import read_rows
 from app.core.upload_validation import read_capped_upload, read_import_file
+from app.core.xlsx_export import xlsx_file_response
 from app.i18n.service import get_current_lang, get_plural_error_message
 from app.schemas._common import SheetAnalysisResponse
 from app.schemas.item import (
     GrocyFileAnalysis,
+    ItemExportJobResponse,
     ItemImportJobResponse,
     ItemImportResponse,
 )
+from app.services.items import _export_job as export_jobs
 from app.services.items import _import_job as import_jobs
+from app.services.items import export_service
 from app.services.items import import_items as import_items_service
 from app.services.items._grocy_import import (
     analyze_grocy_file_async,
@@ -49,7 +54,6 @@ from app.services.items._grocy_import import (
     plan_grocy_import_async,
 )
 from app.services.items._import import LabelMatch
-from app.services.items.export_service import export_items_to_xlsx
 
 router = APIRouter()
 
@@ -328,7 +332,11 @@ async def read_import_job(
     return answer
 
 
-@router.get('/export/xlsx', response_model=None)
+@router.get(
+    '/export/xlsx',
+    response_model=None,
+    responses={202: {'model': ItemExportJobResponse}},
+)
 async def export_items_xlsx(
     location_id: UUID | None = Query(None, description='Filter by location'),
     category_id: UUID | None = Query(None, description='Filter by category'),
@@ -374,6 +382,14 @@ async def export_items_xlsx(
     "Showing 1–50 of 102" holds those 102 rows. Feature-module columns (e.g.
     equipment's "Assigned To") come from the export-enricher registry — Core
     never imports a module directly.
+
+    A sheet of more than ``INLINE_ROW_LIMIT`` records takes longer than a
+    phone or a proxy waits, so it is answered at once with ``202`` and a job
+    (:class:`ItemExportJobResponse`) read at ``GET /items/export/jobs/{id}``;
+    its workbook is fetched from ``GET /items/export/jobs/{id}/file`` once
+    the job is done; a process of its own writes it, so the worker's other
+    requests do not wait for it. A shorter one is answered with the
+    workbook, written on a thread.
     """
     parsed_template_ids = parse_template_ids(template_ids)
 
@@ -418,8 +434,59 @@ async def export_items_xlsx(
         'template_ids': parsed_template_ids or None,
         'today': today,
     }
-    return await db.run_sync(
-        lambda s: export_items_to_xlsx(
-            s, current_user, filters, enrichment, user_storage_ids
+    rows = await export_service.count_rows_async(
+        db, current_user.organization_id, user_storage_ids, filters
+    )
+    if rows <= export_jobs.INLINE_ROW_LIMIT or current_user.organization_id is None:
+        return await export_service.export_items_async(
+            current_user, filters, enrichment, user_storage_ids
         )
+
+    job = await export_jobs.start_job_async(db, current_user, rows)
+    # Committed before the task starts: it reads the job from its own session.
+    await db.commit()
+    export_jobs.spawn(
+        job.id,
+        db_facade.AsyncSessionLocal,
+        partial(
+            export_service.write_workbook_file,
+            current_user,
+            filters,
+            enrichment,
+            user_storage_ids,
+        ),
+    )
+    return JSONResponse(
+        status_code=202,
+        content=ItemExportJobResponse.model_validate(
+            job, from_attributes=True
+        ).model_dump(mode='json'),
+    )
+
+
+@router.get('/export/jobs/{job_id}', response_model=ItemExportJobResponse)
+async def read_export_job(
+    job_id: UUID,
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    _: object = require_permission(SystemPermission.ITEMS_READ),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
+    """How far an export that went to the background has got, and how it ended."""
+    job = await export_jobs.read_job_async(db, current_user, job_id)
+    answer = ItemExportJobResponse.model_validate(job, from_attributes=True)
+    answer.error = export_jobs.reader_reason(answer.error)
+    return answer
+
+
+@router.get('/export/jobs/{job_id}/file', response_model=None)
+async def read_export_file(
+    job_id: UUID,
+    current_user: UserContextDTO = Depends(get_current_user_context),
+    _: object = require_permission(SystemPermission.ITEMS_READ),
+    db: AsyncSession = Depends(get_async_db, scope='function'),
+) -> Any:
+    """The workbook of a finished export job, kept for a day after it started."""
+    workbook, made_at = await export_jobs.read_file_async(db, current_user, job_id)
+    return xlsx_file_response(
+        workbook, filename_stem=export_service.FILENAME_STEM, made_at=made_at
     )

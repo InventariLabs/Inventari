@@ -120,6 +120,23 @@ def _stream_and_close(file: IO[bytes]) -> Iterator[bytes]:
         file.close()
 
 
+def xlsx_file_response(
+    file: IO[bytes], *, filename_stem: str, made_at: datetime | None = None
+) -> StreamingResponse:
+    """A finished workbook in *file* as an attachment, closed once it is sent.
+
+    The name carries when the workbook was made, now unless *made_at* says.
+    """
+    filename = (
+        f'{filename_stem}_{(made_at or datetime.now()).strftime("%Y%m%d_%H%M")}.xlsx'
+    )
+    return StreamingResponse(
+        _stream_and_close(file),
+        media_type=XLSX_MEDIA_TYPE,
+        headers={'Content-Disposition': f'attachment; filename={filename}'},
+    )
+
+
 def rows_to_xlsx_response(
     columns: Sequence[str],
     rows: Iterable[Sequence[Any]],
@@ -129,13 +146,34 @@ def rows_to_xlsx_response(
     readme: pd.DataFrame | None = None,
     readme_sheet: str = 'Read me',
 ) -> StreamingResponse:
+    """A sheet written row by row (:func:`write_rows_xlsx`) as an attachment."""
+    return xlsx_file_response(
+        write_rows_xlsx(
+            columns,
+            rows,
+            sheet_name=sheet_name,
+            readme=readme,
+            readme_sheet=readme_sheet,
+        ),
+        filename_stem=filename_stem,
+    )
+
+
+def write_rows_xlsx(
+    columns: Sequence[str],
+    rows: Iterable[Sequence[Any]],
+    *,
+    sheet_name: str,
+    readme: pd.DataFrame | None = None,
+    readme_sheet: str = 'Read me',
+) -> IO[bytes]:
     """A sheet written row by row, so its size does not decide the memory taken.
 
     :func:`to_xlsx_response` takes a table that is whole in memory and builds
     the workbook in memory too: at 100 000 products the worker grew until its
     container killed it. Here each row goes to a temporary file as it comes
-    from *rows* and the response reads the finished workbook back from that
-    file, so only one row at a time is held. A sheet that reaches
+    from *rows*, and the finished workbook is that file, returned at its
+    start, so only one row at a time is held. A sheet that reaches
     :data:`MAX_ROWS_PER_SHEET` continues on the next, named
     ``<sheet_name> 2``, ``<sheet_name> 3`` and so on, each with the header.
 
@@ -173,9 +211,4 @@ def rows_to_xlsx_response(
     output = tempfile.TemporaryFile()
     workbook.save(output)
     output.seek(0)
-    filename = f'{filename_stem}_{datetime.now().strftime("%Y%m%d_%H%M")}.xlsx'
-    return StreamingResponse(
-        _stream_and_close(output),
-        media_type=XLSX_MEDIA_TYPE,
-        headers={'Content-Disposition': f'attachment; filename={filename}'},
-    )
+    return output
