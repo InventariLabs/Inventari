@@ -79,10 +79,10 @@ export function ean13Modules(code: string): string {
 }
 
 // --- QR: version 2, error correction L, byte mode (up to 32 bytes).
-// The mask is chosen by the standard's penalty score, as a real encoder does.
-// Mask 0 alone is never drawn for every payload, since for some (LOC-Y9MJ, a
-// storage code a stack happened to generate) it leaves patterns the scanner's
-// detector cannot lock onto, so a spec would pass or fail with the data.
+// One payload has eight drawings, one per mask, and the app's decoder cannot
+// find some payloads in some of them, however clean the picture: LOC-LXMB
+// read in no frame under the mask the standard's penalty score picks. A test
+// shows a code the server named, so the camera takes all eight in turn.
 
 const GF_EXP: number[] = [];
 const GF_LOG: number[] = new Array(256).fill(0);
@@ -139,45 +139,11 @@ const MASKS: Array<(r: number, c: number) => boolean> = [
   (r, c) => (((r + c) % 2) + ((r * c) % 3)) % 2 === 0,
 ];
 
-/** The standard's penalty (ISO/IEC 18004, 7.8.3): lower reads more easily. */
-function penalty(m: boolean[][]): number {
-  const n = m.length;
-  let score = 0;
-  const lines = [...m, ...m.map((_, c) => m.map((row) => row[c]))];
-  for (const line of lines) {
-    let run = 1;
-    for (let i = 1; i <= n; i++) {
-      if (i < n && line[i] === line[i - 1]) run++;
-      else {
-        if (run >= 5) score += 3 + (run - 5);
-        run = 1;
-      }
-    }
-    const s = line.map((v) => (v ? "1" : "0")).join("");
-    for (
-      let i = s.indexOf("1011101");
-      i !== -1;
-      i = s.indexOf("1011101", i + 1)
-    ) {
-      const before = s.slice(Math.max(0, i - 4), i);
-      const after = s.slice(i + 7, i + 11);
-      if (before === "0000" || after === "0000") score += 40;
-    }
-  }
-  for (let r = 0; r < n - 1; r++) {
-    for (let c = 0; c < n - 1; c++) {
-      const v = m[r][c];
-      if (m[r][c + 1] === v && m[r + 1][c] === v && m[r + 1][c + 1] === v)
-        score += 3;
-    }
-  }
-  const dark = m.flat().filter(Boolean).length;
-  score += 10 * Math.floor(Math.abs((dark * 100) / (n * n) - 50) / 5);
-  return score;
-}
-
-/** A QR code (version 2-L) as rows of booleans; true is a dark module. */
-export function qrModules(text: string): boolean[][] {
+/**
+ * A QR code (version 2-L) drawn under each of the eight masks, as rows of
+ * booleans; true is a dark module.
+ */
+export function qrDrawings(text: string): boolean[][][] {
   const bytes = Array.from(new TextEncoder().encode(text));
   if (bytes.length > 32) throw new Error("QR payload is limited to 32 bytes");
 
@@ -257,20 +223,13 @@ export function qrModules(text: string): boolean[][] {
     upward = !upward;
   }
 
-  let best: boolean[][] = dark;
-  let bestScore = Infinity;
-  MASKS.forEach((mask, index) => {
-    const candidate = dark.map((row, r) =>
+  return MASKS.map((mask, index) => {
+    const drawing = dark.map((row, r) =>
       row.map((v, c) => (!reserved[r][c] && mask(r, c) ? !v : v)),
     );
     const format = formatBitsL(index);
     for (const [r, c, i] of formatCells)
-      candidate[r][c] = ((format >> i) & 1) === 1;
-    const score = penalty(candidate);
-    if (score < bestScore) {
-      best = candidate;
-      bestScore = score;
-    }
+      drawing[r][c] = ((format >> i) & 1) === 1;
+    return drawing;
   });
-  return best;
 }
