@@ -198,6 +198,7 @@
     "scan_result": {
       "picked": "{{quantity}} {{uom}} de {{ingredient}} sélectionné",
       "not_in_recipe": "Cet article n'est pas dans cette recette",
+      "not_in_stock": "Rien n'a été prélevé — il ne reste rien de ce stock",
       "already_picked": "Déjà sélectionné",
       "disambiguation": "Plusieurs articles trouvés – sélectionnez-en un :",
       "candidate_opened": "Ouvert",
