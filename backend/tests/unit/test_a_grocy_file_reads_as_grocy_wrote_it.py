@@ -8,7 +8,7 @@ is built here on Grocy's own schema (``tests/fixtures/grocy_schema.sql``).
 """
 
 import sqlite3
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
 import pytest
@@ -20,7 +20,13 @@ from tests.integration._grocy import GrocyDb
 pytestmark = pytest.mark.unit
 
 
-def _pantry() -> tuple[GrocyDb, dict[str, int]]:
+def _soon() -> date:
+    """A best-before date still ahead, whenever the test runs."""
+    return date.today() + timedelta(days=100)
+
+
+def _pantry(soon: date | None = None) -> tuple[GrocyDb, dict[str, int]]:
+    soon = soon or _soon()
     g = GrocyDb()
     ids = {
         'pantry': g.location('Pantry'),
@@ -46,7 +52,7 @@ def _pantry() -> tuple[GrocyDb, dict[str, int]]:
     g.stock(
         ids['cookies'],
         3,
-        best_before='2027-03-05',
+        best_before=soon.isoformat(),
         purchased='2026-11-02',
         price=1.25,
         location=ids['pantry'],
@@ -65,14 +71,15 @@ def _pantry() -> tuple[GrocyDb, dict[str, int]]:
 
 class TestTheRowsAMoveNeeds:
     def test_every_batch_keeps_its_own_amount_dates_price_and_shelf(self) -> None:
-        g, ids = _pantry()
+        soon = _soon()
+        g, ids = _pantry(soon)
 
         grocy = read_grocy_file(g.content())
 
         first, second = grocy.stock
         assert first.product_id == ids['cookies']
         assert first.amount == Decimal('3')
-        assert first.best_before == date(2027, 3, 5)
+        assert first.best_before == soon
         assert first.purchased == date(2026, 11, 2)
         assert first.price == Decimal('1.25')
         assert first.location_id == ids['pantry']
@@ -159,7 +166,7 @@ class TestWhatAMoveLeavesBehind:
         )
         cake = g.recipe('Cheesecake')
         g.recipe('2026-47', kind='mealplan-week')
-        g.meal('2026-11-26', cake)
+        g.meal(_soon().isoformat(), cake)
         g.chore('Vacuum')
         g.battery('Smoke alarm')
         g.task('Defrost the freezer')
@@ -212,7 +219,7 @@ class TestAFileThatIsNotGrocys:
             INSERT INTO locations VALUES (1, 'Pantry', NULL);
             INSERT INTO quantity_units VALUES (1, 'Piece', NULL);
             INSERT INTO products VALUES (1, 'Tea', NULL, 1, 1, 1, 0, '4001234567890');
-            INSERT INTO stock VALUES (1, 1, 2, '2027-01-01', NULL, 'abc', NULL);
+            INSERT INTO stock VALUES (1, 1, 2, '2025-01-01', NULL, 'abc', NULL);
             """
         )
 

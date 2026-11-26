@@ -9,7 +9,7 @@ catalogue only. A second run of the same file adds nothing twice, and what
 the file holds that has no place here is counted in the summary.
 """
 
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
 import pytest
@@ -36,13 +36,19 @@ from tests.integration._grocy import GrocyDb
 pytestmark = pytest.mark.integration
 
 
+def _ahead(days: int) -> date:
+    """A best-before date still ahead, whenever the test runs."""
+    return date.today() + timedelta(days=days)
+
+
 def _ctx(user) -> UserContextDTO:
     return UserContextDTO(
         id=user.id, organization_id=user.organization_id, role='admin'
     )
 
 
-def _household() -> tuple[GrocyDb, dict[str, int]]:
+def _household(soon: date | None = None) -> tuple[GrocyDb, dict[str, int]]:
+    soon = soon or _ahead(100)
     g = GrocyDb()
     ids = {
         'pantry': g.location('Grocy pantry'),
@@ -70,7 +76,7 @@ def _household() -> tuple[GrocyDb, dict[str, int]]:
     g.stock(
         ids['cookies'],
         3,
-        best_before='2027-03-05',
+        best_before=soon.isoformat(),
         purchased='2026-11-02',
         price=1.25,
         location=ids['pantry'],
@@ -85,7 +91,9 @@ def _household() -> tuple[GrocyDb, dict[str, int]]:
     ids['flour'] = g.product(
         'Grocy flour', location=ids['pantry'], unit=ids['gram'], group=ids['baking']
     )
-    g.stock(ids['flour'], 750, best_before='2027-06-01', location=ids['pantry'])
+    g.stock(
+        ids['flour'], 750, best_before=_ahead(190).isoformat(), location=ids['pantry']
+    )
     ids['beans'] = g.product('Grocy beans', location=ids['pantry'], unit=ids['tin'])
     g.stock(ids['beans'], 4, location=ids['pantry'])
     ids['saffron'] = g.product(
@@ -113,7 +121,8 @@ class TestAHouseholdMovesIn:
         self, real_async_db_session, async_test_user, async_test_storage_location
     ) -> None:
         db = real_async_db_session
-        g, _ = _household()
+        soon = _ahead(100)
+        g, _ = _household(soon)
 
         result = await import_grocy_file_async(
             db, read_grocy_file(g.content()), _ctx(async_test_user)
@@ -127,7 +136,7 @@ class TestAHouseholdMovesIn:
         assert result['joined_existing'] == 1
         sealed, opened = await _records(db, 'Grocy cookies')
         assert sealed.quantity == Decimal('3')
-        assert sealed.expiry_date == date(2027, 3, 5)
+        assert sealed.expiry_date == soon
         assert sealed.added_date == date(2026, 11, 2)
         assert sealed.purchase_price == Decimal('1.25')
         assert sealed.description == 'Chocolate chip'
