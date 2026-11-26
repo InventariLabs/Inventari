@@ -211,7 +211,7 @@ async def test_meta_columns_come_in_the_order_the_records_introduce_them(
 async def test_a_filtered_scan_reads_the_records_in_one_statement_planned_for_all(
     real_async_db_session: AsyncSession, async_test_user, open_location
 ) -> None:
-    """A filter can cost seconds to evaluate, so the columns pay for it once.
+    """A filter can cost seconds to evaluate, so the columns evaluate it one time.
 
     The one statement is read through a cursor, which Postgres plans for the
     first tenth of the rows unless the transaction asks for the whole answer.

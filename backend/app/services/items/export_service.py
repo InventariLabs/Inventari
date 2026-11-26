@@ -396,8 +396,8 @@ def _scan_records(
     most of the time an export takes, so it is done once, for the rows. Here a
     record is its category, its ``meta_data`` (for the keys) and one answer
     per flag; each flag asks in SQL what :func:`_cell_value` answers for one
-    record, and has to agree with it. All of it comes from one statement: a
-    filter can cost seconds to evaluate, and this pays for it once.
+    record, and has to agree with it. All of it comes from one statement,
+    because a filter can cost seconds to evaluate.
     """
     # Aliases: a filter's own subquery over these tables must not correlate
     # with the joins made here.
