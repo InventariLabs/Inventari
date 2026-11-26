@@ -131,6 +131,73 @@ def _misplaced_food_records(
     return len(rows), misplaced
 
 
+def _expired_food(db: Session, org_id: uuid.UUID) -> list[Item]:
+    food = {row[0] for row in FOOD_TEMPLATES}
+    return (
+        db.query(Item)
+        .filter(
+            Item.organization_id == org_id,
+            Item.name.in_(food),
+            Item.expiry_date < TODAY,
+        )
+        .all()
+    )
+
+
+def _assert_what_has_gone_off_is_chilled(db: Session, org_id: uuid.UUID) -> None:
+    """The story's expired records belong to Cold Storage, used up or not.
+
+    A record a dispatch left with nothing stands in the virtual Consumed
+    place and keeps its date, so its zone is that of the shelf it left.
+    """
+    expired = _expired_food(db, org_id)
+    assert len(expired) == DEMO_STORY_EXPIRED
+    shelves = [
+        (item.meta_data or {}).get('emptied_from', item.storage_location_id)
+        for item in expired
+    ]
+    zones = {_zone_of(db, uuid.UUID(str(shelf))) for shelf in shelves}
+    assert zones == {'Cold Storage'}
+
+
+def _use_up(
+    db: Session, engine: AsyncEngine, org_id: uuid.UUID, record_ids: list[uuid.UUID]
+) -> None:
+    """Empty each record through the door a dispatch writes with."""
+    user_id = (
+        db.query(User.id)
+        .filter(User.organization_id == org_id)
+        .order_by(User.id)
+        .scalar()
+    )
+    assert user_id is not None, 'the seed wrote no user to act as'
+    db.commit()
+
+    async def _draw_it_all(adb: AsyncSession) -> None:
+        for record_id in record_ids:
+            await update_quantity(
+                adb,
+                await adb.get(Item, record_id),
+                ItemQuantityUpdate(quantity=Decimal('0')),
+                user_id=user_id,
+                file_when_emptied=True,
+            )
+
+    run_in_async_session(engine, _draw_it_all)
+    db.expire_all()
+
+    consumed = (
+        db.query(StorageLocation)
+        .filter(
+            StorageLocation.organization_id == org_id,
+            StorageLocation.usage == LocationUsage.CUSTOMER,
+        )
+        .one()
+    )
+    for record_id in record_ids:
+        assert db.get(Item, record_id).storage_location_id == consumed.id
+
+
 class TestTheSeedChargesTheTaxOfTheOrganizationsCountry:
     """A dollar organization with no country was charged Polish VAT on every
     order and document, because the seed wrote the rates by hand."""
@@ -220,38 +287,9 @@ class TestFoodSitsWhereItIsKept:
             .first()
         )
         assert record is not None, 'the seed wrote no yoghurt to use up'
-        record_id = record.id
-        user_id = (
-            db_session.query(User.id)
-            .filter(User.organization_id == seeded)
-            .order_by(User.id)
-            .scalar()
-        )
-        assert user_id is not None, 'the seed wrote no user to act as'
-        db_session.commit()
 
-        async def _use_it_up(adb: AsyncSession) -> None:
-            item = await adb.get(Item, record_id)
-            await update_quantity(
-                adb,
-                item,
-                ItemQuantityUpdate(quantity=Decimal('0')),
-                user_id=user_id,
-                file_when_emptied=True,
-            )
+        _use_up(db_session, async_engine_fixture, seeded, [record.id])
 
-        run_in_async_session(async_engine_fixture, _use_it_up)
-        db_session.expire_all()
-
-        consumed = (
-            db_session.query(StorageLocation)
-            .filter(
-                StorageLocation.organization_id == seeded,
-                StorageLocation.usage == LocationUsage.CUSTOMER,
-            )
-            .one()
-        )
-        assert db_session.get(Item, record_id).storage_location_id == consumed.id
         checked, misplaced = _misplaced_food_records(db_session, seeded)
         assert checked
         assert not misplaced, f'{len(misplaced)} misplaced, e.g. {misplaced[:5]}'
@@ -259,19 +297,21 @@ class TestFoodSitsWhereItIsKept:
     def test_what_has_gone_off_is_something_that_can(
         self, db_session: Session, seeded: uuid.UUID
     ) -> None:
-        food = {row[0] for row in FOOD_TEMPLATES}
-        expired = (
-            db_session.query(Item.storage_location_id)
-            .filter(
-                Item.organization_id == seeded,
-                Item.name.in_(food),
-                Item.expiry_date < TODAY,
-            )
-            .all()
-        )
-        assert len(expired) == DEMO_STORY_EXPIRED
-        zones = {_zone_of(db_session, location_id) for (location_id,) in expired}
-        assert zones == {'Cold Storage'}
+        _assert_what_has_gone_off_is_chilled(db_session, seeded)
+
+    def test_a_used_up_record_still_tells_what_went_off(
+        self, db_session: Session, seeded: uuid.UUID, async_engine_fixture: AsyncEngine
+    ) -> None:
+        """A draw may leave an expired record with nothing. Which one is
+        random, so every expired record still holding stock is used up here
+        on purpose."""
+        on_hand = [
+            item.id for item in _expired_food(db_session, seeded) if item.quantity > 0
+        ]
+
+        _use_up(db_session, async_engine_fixture, seeded, on_hand)
+
+        _assert_what_has_gone_off_is_chilled(db_session, seeded)
 
 
 class TestTheFleetHasAHistory:
