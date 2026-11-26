@@ -45,7 +45,9 @@ says what the release does rather than what changed since them.
 - The product list's filter chips stay where they are while the page loads, so
   a tap on *Running low* is not lost when the date filters arrive. *Only
   expiring soon* and *Expired* now stand at the end of the row instead of in
-  front of *Running low*.
+  front of *Running low*. When the list opens already narrowed by one of the
+  two — from a statistics card, or with Back — both lead the row, so the
+  active filter is on a phone's screen.
 - The audit log and the item history read in words. A label's entries name
   the label's code and the product beside its id; a document type
   configuration's default locations are written with their names, and
