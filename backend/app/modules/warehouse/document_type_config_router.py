@@ -1,4 +1,5 @@
 from typing import Any
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,6 +14,7 @@ from app.core.deps import (
 from app.core.exceptions import NotFoundException, ServiceRejectionError
 from app.core.module_sdk import PaginatedResponse
 from app.core.modules import require_module
+from app.core.public_api import core_api
 from app.core.settings_diff import journal_config_change, record_settings
 from app.i18n.service import get_current_lang
 
@@ -34,6 +36,34 @@ from .schemas import (
 AUDIT_PAYLOAD_SCHEMA = ('DocumentTypeConfigCreate', 'DocumentTypeConfig')
 
 router = APIRouter(dependencies=[Depends(require_module('warehouse'))])
+
+#: The settings that point at a storage location. The journal writes the
+#: location's name beside each id (AUDIT.md, "A reference is written with
+#: its name"), so the Detail column reads a shelf and not eight characters of
+#: its id.
+_LOCATION_SETTINGS = ('default_source_location_id', 'default_target_location_id')
+
+
+async def _reading(db: AsyncSession, org_id: UUID, record: Any) -> dict[str, Any]:
+    """A type configuration as its journal entry reads it: its settings, and
+    the name of each location they point at beside the id."""
+    reading = record_settings(record)
+    for key in _LOCATION_SETTINGS:
+        location_id = getattr(record, key, None)
+        if location_id is None:
+            continue
+        location = await core_api.locations.get_async(db, org_id, location_id)
+        if location is not None:
+            reading[key.removesuffix('_id') + '_name'] = location.name
+    return reading
+
+
+def _with_names(keys: set[str]) -> set[str]:
+    """The keys a journal entry may carry: each location setting also brings
+    its name."""
+    return keys | {
+        key.removesuffix('_id') + '_name' for key in keys if key in _LOCATION_SETTINGS
+    }
 
 
 @router.get(
@@ -68,11 +98,12 @@ async def upsert_type_config(
     previous: DocumentTypeConfig | None = await _svc.get_type_config(
         db, org_id, normalized
     )
+    keys = _with_names(set(payload))
     before = (
         {
             key: value
-            for key, value in record_settings(previous).items()
-            if key in set(payload)
+            for key, value in (await _reading(db, org_id, previous)).items()
+            if key in keys
         }
         if previous is not None
         else {}
@@ -84,9 +115,9 @@ async def upsert_type_config(
         current_user.id,
         module='warehouse',
         subject=f'type-config:{normalized}',
-        keys=set(payload),
+        keys=keys,
         before=before,
-        after=result,
+        after=await _reading(db, org_id, result),
     )
     return result
 
@@ -101,9 +132,9 @@ async def delete_type_config(
     org_id = require_org(current_user)
     normalized = dt.normalize(document_type)
     previous = await _svc.get_type_config(db, org_id, normalized)
-    before = record_settings(previous) if previous is not None else {}
+    before = await _reading(db, org_id, previous) if previous is not None else {}
     try:
-        await _svc.delete_type_config(db, org_id, document_type)
+        await _svc.delete_type_config(db, org_id, normalized)
     except ValueError as exc:
         raise NotFoundException('document_type_config', get_current_lang()) from exc
     await journal_config_change(
@@ -112,7 +143,7 @@ async def delete_type_config(
         current_user.id,
         module='warehouse',
         subject=f'type-config:{normalized}',
-        keys=set(before) & set(DocumentTypeConfigUpdate.model_fields),
+        keys=set(before) & _with_names(set(DocumentTypeConfigUpdate.model_fields)),
         before=before,
         after=None,
     )

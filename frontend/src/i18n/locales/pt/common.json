@@ -697,7 +697,9 @@
         "purpose": "Finalidade",
         "registration": "Registro",
         "response_id": "Resposta",
-        "sku_schema": "Formato de SKU"
+        "sku_schema": "Formato de SKU",
+        "order_lines": "Linhas",
+        "purpose_label_key": "Finalidade"
       },
       "showWholeChange": "Mostrar a alteração completa",
       "showLess": "Mostrar menos",
@@ -780,7 +782,8 @@
         "added": "Campo {{field}} adicionado",
         "removed": "Campo {{field}} removido",
         "changed": "Campo {{field}} alterado",
-        "required": "obrigatório"
+        "required": "obrigatório",
+        "reordered": "Ordem dos campos alterada"
       },
       "values": {
         "CHECKOUT": "Entrega",
@@ -824,8 +827,6 @@
         "approval_approved": "Aprovada",
         "approval_rejected": "Rejeitada",
         "DISPUTED": "Relatou um problema",
-        "MISSING": "Faltando",
-        "WRONG_ITEM": "Equipamento errado",
         "FIRST_ACCOUNT": "Primeira conta da instalação"
       },
       "reactivatedAfterBreaker": "Reativado depois que o disjuntor o cortou",
@@ -836,6 +837,11 @@
         "reorderRule": "regra de reposição: {{location}}",
         "reorderRuleUnnamed": "de uma regra de reposição",
         "note": "nota: {{text}}"
+      },
+      "subjects": {
+        "pricelist": "Preço do fornecedor",
+        "reorderRule": "Regra de reposição",
+        "workflow": "Fluxo de aprovação: {{target}}"
       }
     },
     "shell": {

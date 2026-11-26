@@ -1748,3 +1748,143 @@ describe("auditChanges on a purchase order", () => {
     }
   });
 });
+
+describe("the journal reads coded values in words", () => {
+  const screenT = namespacedT({
+    common: plCommon,
+    equipment: plEquipment,
+    approvals: plApprovals,
+    items: plItems,
+  });
+
+  it("names a maintenance type and an attestation answer as their screens do", () => {
+    const [maintenance] = auditChanges(
+      { maintenance_type: "REPAIR" },
+      "CREATE",
+      undefined,
+      screenT,
+    );
+    const [dispute] = auditChanges(
+      { dispute_type: "DAMAGED" },
+      "CREATE",
+      undefined,
+      screenT,
+    );
+
+    expect(maintenance.to).toBe(plEquipment.maintenance.type_repair);
+    expect(dispute.to).toBe(plEquipment.attestation.disputeType.DAMAGED);
+  });
+
+  it("names the subject of a configuration row, not its code", () => {
+    const interpolating = ((key: string, opts?: Record<string, unknown>) =>
+      (
+        (screenT as unknown as (k: string, o?: unknown) => string)(key, opts) ||
+        ""
+      ).replace(
+        "{{target}}",
+        String(opts?.target),
+      )) as unknown as typeof screenT;
+    const read = (subject: string) =>
+      auditChanges(
+        { name: "purchase_orders", subject },
+        "UPDATE",
+        undefined,
+        interpolating,
+      )[0]?.to;
+
+    expect(read("reorder-rule")).toBe(
+      plCommon.settings.audit.subjects.reorderRule,
+    );
+    expect(read("pricelist")).toBe(plCommon.settings.audit.subjects.pricelist);
+    expect(read("workflow:purchase_order")).toBe(
+      "Przepływ akceptacji: " + plApprovals.workflows.targetType_purchase_order,
+    );
+    // A subject nobody has a word for stays as written.
+    expect(read("something-new")).toBe("something-new");
+  });
+
+  it("reads an AI binding's purpose by the label its module gave it", () => {
+    const withLabel = namespacedT({
+      common: plCommon,
+      vision: { ai: { purposeLabel: "Odczyt produktu ze zdjęcia" } },
+    });
+    const [purpose] = auditChanges(
+      {
+        purpose: "vision.extract",
+        purpose_label_key: "vision:ai.purposeLabel",
+      },
+      "UPDATE",
+      undefined,
+      withLabel,
+    );
+
+    expect(purpose.to).toBe("Odczyt produktu ze zdjęcia");
+    expect(
+      auditChanges(
+        {
+          purpose: "vision.extract",
+          purpose_label_key: "vision:ai.purposeLabel",
+        },
+        "UPDATE",
+        undefined,
+        withLabel,
+      ).map((change) => change.path),
+    ).not.toContain("purpose_label_key");
+  });
+
+  it("calls the list of a purchase order's lines lines, and a count a count", () => {
+    const list = auditFieldTitles("purchase_order", undefined, {
+      before: { lines: [{ name: "Mąka" }] },
+      after: { lines: [{ name: "Cukier" }] },
+    });
+    const count = auditFieldTitles("document", undefined, {
+      before: { lines: 2 },
+      after: { lines: 3 },
+    });
+
+    const common = namespacedT({ common: plCommon });
+    const inCommon = ((key: string, opts?: { defaultValue?: string }) =>
+      (common as unknown as (k: string, o?: unknown) => string)(
+        `common:${key}`,
+        opts,
+      )) as unknown as typeof screenT;
+    expect(auditFieldLabel("lines", inCommon, list)).toBe(
+      plCommon.settings.audit.fields.order_lines,
+    );
+    expect(auditFieldLabel("lines", inCommon, count)).toBe(
+      plCommon.settings.audit.fields.line_count,
+    );
+  });
+
+  it("names a system field the way the field builder does", () => {
+    const [change] = auditChanges(
+      {
+        field_definitions: [
+          { key: "cut_type", type: "text", label: "Cut type", is_system: true },
+        ],
+      },
+      "HARD_DELETE",
+      undefined,
+      screenT,
+    );
+
+    expect(change.to).toContain(plItems.fields.cut_type);
+    expect(change.to).not.toContain("Cut type");
+  });
+
+  it("says a reordered field list was reordered, not as JSON", () => {
+    const a = { key: "a", type: "text", label: "A" };
+    const b = { key: "b", type: "text", label: "B" };
+    const [change] = auditChanges(
+      {
+        before: { field_definitions: [a, b] },
+        after: { field_definitions: [b, a] },
+      },
+      "UPDATE",
+      undefined,
+      screenT,
+    );
+
+    expect(change.to).toBe(plCommon.settings.audit.fieldDefinitions.reordered);
+  });
+});

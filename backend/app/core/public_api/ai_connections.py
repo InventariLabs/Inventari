@@ -330,6 +330,9 @@ class CoreAIConnectionsAPI:
                 snapshot={
                     'name': org.name if org else None,
                     'purpose': purpose_key,
+                    # The word the purpose's own settings row carries, so the
+                    # reader prints it in the reader's language, not the key.
+                    'purpose_label_key': spec.label_key,
                     'before': {
                         'connection_id': str(bound_before) if bound_before else None,
                         'connection_name': before_name,

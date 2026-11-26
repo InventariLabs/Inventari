@@ -77,10 +77,9 @@ async def test_binding_a_label_names_the_product_it_now_answers_for(
     assert entry.organization_id == async_test_household.id
     assert entry.user_id == async_test_user.id
     assert entry.snapshot == {
-        'short_code': 'LBL-B1',
-        'product_name': 'Drill',
+        'name': 'LBL-B1',
         'before': {'item_id': None},
-        'after': {'item_id': str(item.id)},
+        'after': {'item_id': str(item.id), 'item_name': 'Drill'},
     }
 
 
@@ -103,13 +102,12 @@ async def test_a_new_label_frees_the_old_one_and_both_say_so(
 
     _bound, freed = await _entries(db, old.id)
     assert freed.snapshot == {
-        'short_code': 'LBL-OLD',
-        'product_name': 'Drill',
-        'before': {'item_id': str(item.id)},
+        'name': 'LBL-OLD',
+        'before': {'item_id': str(item.id), 'item_name': 'Drill'},
         'after': {'item_id': None},
     }
     (bound,) = await _entries(db, new.id)
-    assert bound.snapshot['after'] == {'item_id': str(item.id)}
+    assert bound.snapshot['after'] == {'item_id': str(item.id), 'item_name': 'Drill'}
 
 
 async def test_freeing_a_label_says_which_product_it_left(
@@ -129,9 +127,8 @@ async def test_freeing_a_label_says_which_product_it_left(
     _bound, freed = await _entries(db, label.id)
     assert freed.action == AuditAction.UPDATE
     assert freed.snapshot == {
-        'short_code': 'LBL-U1',
-        'product_name': 'Drill',
-        'before': {'item_id': str(item.id)},
+        'name': 'LBL-U1',
+        'before': {'item_id': str(item.id), 'item_name': 'Drill'},
         'after': {'item_id': None},
     }
 
@@ -163,4 +160,4 @@ async def test_deleting_a_label_keeps_its_code_in_the_journal(
     (entry,) = await _entries(db, label_id)
     assert entry.action == AuditAction.HARD_DELETE
     assert entry.user_id == async_test_user.id
-    assert entry.snapshot == {'short_code': 'LBL-D1', 'description': None}
+    assert entry.snapshot == {'name': 'LBL-D1', 'description': None}
