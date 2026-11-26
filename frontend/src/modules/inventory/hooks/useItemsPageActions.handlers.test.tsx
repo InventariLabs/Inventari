@@ -249,7 +249,10 @@ describe("useItemsPageActions — row handlers, failures and the export", () => 
     first.unmount();
     const { result } = renderActions();
 
-    await act(() => result.current.handleExport());
+    // Not awaited: a second export that did start would never settle.
+    await act(async () => {
+      void result.current.handleExport();
+    });
 
     expect(mocks.exportXlsx).toHaveBeenCalledTimes(1);
     expect(mocks.downloadBlob).not.toHaveBeenCalled();

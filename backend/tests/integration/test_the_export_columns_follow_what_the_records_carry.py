@@ -15,7 +15,7 @@ from decimal import Decimal
 
 import pandas as pd
 import pytest
-from sqlalchemy import select, text, update
+from sqlalchemy import event, func, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -24,7 +24,7 @@ from app.models.item import Item
 from app.models.uom import Uom, UomCategory
 from app.schemas.item import ItemCreate
 from app.services.items._create import create_item_async
-from app.services.items.export_service import export_items_to_xlsx
+from app.services.items.export_service import _scan_records, export_items_to_xlsx
 
 pytestmark = pytest.mark.integration
 
@@ -206,3 +206,34 @@ async def test_meta_columns_come_in_the_order_the_records_introduce_them(
         'Custom: aa',
         'Nutri: kcal',
     ]
+
+
+async def test_a_filtered_scan_reads_the_records_in_one_statement_planned_for_all(
+    real_async_db_session: AsyncSession, async_test_user, open_location
+) -> None:
+    """A filter can cost seconds to evaluate, so the columns pay for it once.
+
+    The one statement is read through a cursor, which Postgres plans for the
+    first tenth of the rows unless the transaction asks for the whole answer.
+    """
+    db = real_async_db_session
+    await _record(db, async_test_user, open_location, 'Plain')
+    await db.commit()
+    organization_id = async_test_user.organization_id
+    reads: list[str] = []
+
+    def _count(conn, cursor, statement: str, *args) -> None:
+        if 'FROM items' in statement:
+            reads.append(statement)
+
+    def _scan(session) -> str:
+        bind = session.get_bind()
+        event.listen(bind, 'before_cursor_execute', _count)
+        try:
+            _scan_records(session, organization_id, None, {'only_low_stock': True})
+        finally:
+            event.remove(bind, 'before_cursor_execute', _count)
+        return session.scalar(select(func.current_setting('cursor_tuple_fraction')))
+
+    assert await db.run_sync(_scan) == '1'
+    assert len(reads) == 1

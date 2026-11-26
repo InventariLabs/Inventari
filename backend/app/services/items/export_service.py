@@ -46,6 +46,12 @@ def _org_currency(db: Session, organization_id: UUID | None) -> str:
 #: How many records one read of the export fetches.
 _PAGE_SIZE = 2_000
 
+#: Postgres plans a query read through a cursor for the first tenth of its
+#: rows unless told otherwise, and under a filter that sums stock per product
+#: ("running low") that plan takes several times as long to read them all.
+#: Local to the transaction.
+_PLAN_FOR_EVERY_ROW = select(func.set_config('cursor_tuple_fraction', '1', True))
+
 
 def _matching(
     query: Any,
@@ -387,22 +393,12 @@ def _scan_records(
     """Ask the database for the shape of the sheet, without loading the records.
 
     Loading each record with its category, product card, shelf and unit is
-    most of the time an export takes, so it is done once, for the rows. Here
-    the flags are aggregates, the categories a distinct list, and only the
-    ``meta_data`` documents are read, for their keys. Each flag asks in SQL
-    what :func:`_cell_value` answers for one record, and has to agree with it.
+    most of the time an export takes, so it is done once, for the rows. Here a
+    record is its category, its ``meta_data`` (for the keys) and one answer
+    per flag; each flag asks in SQL what :func:`_cell_value` answers for one
+    record, and has to agree with it. All of it comes from one statement: a
+    filter can cost seconds to evaluate, and this pays for it once.
     """
-
-    def _matched(*columns: Any) -> Any:
-        return _matching(
-            select(*columns)
-            .select_from(Item)
-            .join(StorageLocation, Item.storage_location_id == StorageLocation.id),
-            organization_id,
-            user_storage_ids,
-            filters,
-        )
-
     # Aliases: a filter's own subquery over these tables must not correlate
     # with the joins made here.
     product = aliased(ProductTemplate)
@@ -425,34 +421,46 @@ def _scan_records(
         'description': Item.description.is_not(None),
         'shelf_location': Item.shelf_location.is_not(None),
     }
-    flags = db.execute(
-        _matched(
-            func.bool_or(priced),
-            func.bool_or(Item.currency.is_not(None)),
-            *(func.bool_or(condition) for condition in carried_by.values()),
+    query = _matching(
+        select(
+            Item.category_id,
+            Item.meta_data,
+            priced,
+            Item.currency.is_not(None),
+            *carried_by.values(),
         )
-        .outerjoin(product, Item.template_id == product.id)
+        .select_from(Item)
+        .join(StorageLocation, Item.storage_location_id == StorageLocation.id),
+        organization_id,
+        user_storage_ids,
+        filters,
+    )
+    db.execute(_PLAN_FOR_EVERY_ROW)
+    records = db.execute(
+        query.outerjoin(product, Item.template_id == product.id)
         .outerjoin(unit, Item.uom_id == unit.id)
         .outerjoin(unit_category, unit.category_id == unit_category.id)
-    ).one()
-    # No record, or none with an answer, aggregates to NULL.
-    has_price, has_currency, *carried = (bool(flag) for flag in flags)
-
-    category_ids = db.scalars(_matched(Item.category_id).distinct()).all()
-    categories = db.scalars(
-        select(Category).where(Category.id.in_(category_ids)).order_by(Category.id)
-    ).all()
-
-    meta_specs: dict[tuple[str, str], None] = {}
-    documents = db.scalars(
-        _matched(Item.meta_data)
-        .where(Item.meta_data.is_not(None))
         .order_by(Item.id)
         .execution_options(yield_per=_PAGE_SIZE)
     )
-    for meta_data in documents:
+
+    category_ids: set[UUID | None] = set()
+    # The price, the currency and each of ``carried_by``: has any record it?
+    found = [False] * (2 + len(carried_by))
+    meta_specs: dict[tuple[str, str], None] = {}
+    for category_id, meta_data, *answers in records:
+        category_ids.add(category_id)
+        # A comparison with an empty field answers NULL.
+        found = [
+            seen or bool(answer) for seen, answer in zip(found, answers, strict=True)
+        ]
         for kind, key, _ in _meta_entries(meta_data):
             meta_specs.setdefault((kind, key))
+    has_price, has_currency, *carried = found
+
+    categories = db.scalars(
+        select(Category).where(Category.id.in_(category_ids)).order_by(Category.id)
+    ).all()
 
     return _Scan(
         categories=categories,
