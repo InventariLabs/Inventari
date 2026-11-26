@@ -697,7 +697,9 @@
         "sku_schema": "Esquema de SKU",
         "body_html": "Contenido de la plantilla",
         "reset_to_builtin": "Restablecida a la plantilla integrada",
-        "occurred_on": "Día al que pertenece"
+        "occurred_on": "Día al que pertenece",
+        "order_lines": "Líneas",
+        "purpose_label_key": "Finalidad"
       },
       "showWholeChange": "Mostrar el cambio completo",
       "showLess": "Mostrar menos",
@@ -780,7 +782,8 @@
         "added": "Campo {{field}} añadido",
         "removed": "Campo {{field}} eliminado",
         "changed": "Campo {{field}} modificado",
-        "required": "obligatorio"
+        "required": "obligatorio",
+        "reordered": "Orden de los campos modificado"
       },
       "values": {
         "CHECKOUT": "Entrega",
@@ -794,8 +797,6 @@
         "PENDING_APPROVAL": "Aprobación pendiente",
         "CONFIRMED": "Confirmado",
         "DISPUTED": "Problema notificado",
-        "MISSING": "Falta",
-        "WRONG_ITEM": "Equipo equivocado",
         "FIRST_ACCOUNT": "Primera cuenta de la instalación",
         "COMPLETED": "Completado",
         "CANCELLED": "Cancelado",
@@ -836,6 +837,11 @@
         "reorderRule": "regla de reposición: {{location}}",
         "reorderRuleUnnamed": "de una regla de reposición",
         "note": "nota: {{text}}"
+      },
+      "subjects": {
+        "pricelist": "Precio del proveedor",
+        "reorderRule": "Regla de reposición",
+        "workflow": "Flujo de trabajo de aprobación: {{target}}"
       }
     },
     "shell": {

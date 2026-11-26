@@ -697,7 +697,9 @@
         "sku_schema": "SKU schema",
         "body_html": "Template body",
         "reset_to_builtin": "Reset to built-in template",
-        "occurred_on": "Day it belongs to"
+        "occurred_on": "Day it belongs to",
+        "order_lines": "Lines",
+        "purpose_label_key": "Purpose"
       },
       "showWholeChange": "Show the whole change",
       "showLess": "Show less",
@@ -780,7 +782,8 @@
         "added": "Added field {{field}}",
         "removed": "Removed field {{field}}",
         "changed": "Changed field {{field}}",
-        "required": "required"
+        "required": "required",
+        "reordered": "Reordered the fields"
       },
       "values": {
         "CHECKOUT": "Hand-out",
@@ -794,8 +797,6 @@
         "PENDING_APPROVAL": "Waiting for approval",
         "CONFIRMED": "Confirmed",
         "DISPUTED": "Reported a problem",
-        "MISSING": "Missing",
-        "WRONG_ITEM": "Wrong equipment",
         "FIRST_ACCOUNT": "First account of the installation",
         "COMPLETED": "Completed",
         "CANCELLED": "Cancelled",
@@ -836,6 +837,11 @@
         "reorderRule": "reorder rule: {{location}}",
         "reorderRuleUnnamed": "from a reorder rule",
         "note": "note: {{text}}"
+      },
+      "subjects": {
+        "pricelist": "Supplier price",
+        "reorderRule": "Reorder rule",
+        "workflow": "Approval workflow: {{target}}"
       }
     },
     "shell": {

@@ -265,7 +265,7 @@ async def use_partially_async(
                 'before': {'quantity': str(before)},
                 'after': {'quantity': str(item.quantity)},
             },
-            meta_data={'reason': 'package_opened'},
+            reason='package_opened',
         )
         await _log_opened(db, target, item, user, left=left, left_unit=left_unit)
 

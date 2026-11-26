@@ -42,6 +42,24 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The audit log and the item history read in words. A label's entries name
+  the label's code and the product beside its id; a document type
+  configuration's default locations are written with their names, and
+  deleting a configuration journals only its settings; a module row names
+  what it is about (a reorder rule, a supplier price, an approval workflow)
+  and an organization row names a maintenance type, an attestation answer or
+  an AI purpose in the interface language. A purchase order's lines are
+  labelled "lines" rather than a count, a system field of a category is
+  named as the field builder names it, and a reordered field list reads as
+  such instead of as JSON. A module setting stored as `3.0` and posted as `3`
+  is no longer a change, and a minimum written as `0.0000001` no longer reads
+  `1E-7`. The Asset filter lists the creation and edits of an asset, not only
+  its status changes, and the entry for an opened pack says why the quantity
+  moved. An item edit that changes nothing writes no history row, a negative
+  item weight or one too large to store is refused with a validation error
+  instead of being saved or answered with a server error, an opened amount
+  sent without its unit reads in the record's own unit, and the recipe price
+  placeholder follows the reader's decimal mark.
 - Back returns a list to where it stood when you tapped away from it, also
   when the tap came right after a scroll on a busy phone; it could return to
   an earlier position, several hundred pixels off.
