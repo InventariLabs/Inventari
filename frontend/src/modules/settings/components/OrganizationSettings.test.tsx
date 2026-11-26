@@ -505,3 +505,163 @@ describe("OrganizationSettings — organization read fails", () => {
     expect(writes).toBe(0);
   });
 });
+
+/**
+ * Each card edits its own fields of one record, and every save refetches the
+ * whole record under both. What the reader has typed and not saved stays as
+ * typed; every other field takes the record's answer.
+ */
+describe("OrganizationSettings — a refetch keeps unsaved typing", () => {
+  /** A stored organization the writes change, as the server would. `hold`
+   * keeps the next read waiting until its release is called. */
+  function storedOrganization(initial: Record<string, unknown> = {}) {
+    let stored: Record<string, unknown> = { ...org, ...initial };
+    let held: Promise<void> | null = null;
+    const state = {
+      reads: 0,
+      hold() {
+        let release = () => {};
+        held = new Promise<void>((resolve) => {
+          release = resolve;
+        });
+        return release;
+      },
+    };
+    server.use(
+      http.get("*/organizations/my", async () => {
+        state.reads += 1;
+        await held;
+        return HttpResponse.json(stored);
+      }),
+      http.put("*/organizations", async ({ request }) => {
+        const body = (await request.json()) as Record<string, unknown>;
+        if (typeof body.name === "string") body.name = body.name.trim();
+        stored = { ...stored, ...body };
+        return HttpResponse.json(stored);
+      }),
+      http.delete("*/organizations/logo", () => {
+        stored = { ...stored, logo_url: null };
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+    return state;
+  }
+
+  const saveButton = (card: "organization" | "issuer") =>
+    screen.getAllByRole("button", { name: /^save$/i })[
+      card === "organization" ? 0 : 1
+    ];
+
+  it("keeps the issuer card's unsaved fields when the organization card is saved", async () => {
+    storedOrganization();
+    const user = userEvent.setup();
+    renderSettings();
+
+    const taxId = await screen.findByLabelText(/tax id/i);
+    await user.type(taxId, "5260001246");
+    const name = screen.getByLabelText(/organization name/i);
+    await user.type(name, " Two");
+    await user.click(saveButton("organization"));
+
+    // The saved card is clean again once the refetch has answered.
+    await waitFor(() => expect(saveButton("organization")).toBeDisabled());
+    expect(name).toHaveValue("Test Org Two");
+    expect(taxId).toHaveValue("5260001246");
+    expect(saveButton("issuer")).toBeEnabled();
+  });
+
+  it("keeps the organization card's unsaved fields when the issuer card is saved", async () => {
+    storedOrganization();
+    const user = userEvent.setup();
+    renderSettings();
+
+    const name = await screen.findByLabelText(/organization name/i);
+    await user.type(name, " Two");
+    await user.selectOptions(screen.getByLabelText(/currency/i), "CHF");
+    await user.selectOptions(
+      screen.getByLabelText(/timezone/i),
+      "Europe/Warsaw",
+    );
+    await user.type(screen.getByLabelText(/tax id/i), "5260001246");
+    await user.click(saveButton("issuer"));
+
+    await waitFor(() => expect(saveButton("issuer")).toBeDisabled());
+    expect(name).toHaveValue("Test Org Two");
+    expect(screen.getByLabelText(/currency/i)).toHaveValue("CHF");
+    expect(screen.getByLabelText(/timezone/i)).toHaveValue("Europe/Warsaw");
+    expect(saveButton("organization")).toBeEnabled();
+  });
+
+  it("keeps the unsaved fields of both cards when the logo is removed", async () => {
+    storedOrganization({ logo_url: "organizations/logo.png" });
+    const user = userEvent.setup();
+    renderSettings();
+
+    const name = await screen.findByLabelText(/organization name/i);
+    await user.type(name, " Two");
+    const taxId = screen.getByLabelText(/tax id/i);
+    await user.type(taxId, "5260001246");
+    await user.click(screen.getByRole("button", { name: /remove logo/i }));
+
+    // The header reads the record, so the refetch has answered by the time
+    // the upload button is back and a further read has settled.
+    await screen.findByRole("button", { name: /upload logo/i });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(name).toHaveValue("Test Org Two");
+    expect(taxId).toHaveValue("5260001246");
+  });
+
+  it("keeps what is typed after a save while the refetch is still waiting", async () => {
+    const record = storedOrganization();
+    const user = userEvent.setup();
+    renderSettings();
+
+    const name = await screen.findByLabelText(/organization name/i);
+    await user.type(name, " Two");
+    const release = record.hold();
+    const readsBefore = record.reads;
+    await user.click(saveButton("organization"));
+    await waitFor(() => expect(record.reads).toBeGreaterThan(readsBefore));
+    await user.type(name, " Three");
+    release();
+
+    expect(
+      await screen.findByText("Test Org Two", { selector: "p" }),
+    ).toBeInTheDocument();
+    expect(name).toHaveValue("Test Org Two Three");
+    expect(saveButton("organization")).toBeEnabled();
+  });
+
+  it("keeps a field put back to its old value while the refetch is still waiting", async () => {
+    const record = storedOrganization();
+    const user = userEvent.setup();
+    renderSettings();
+
+    const taxId = await screen.findByLabelText(/tax id/i);
+    await user.type(taxId, "5260001246");
+    const release = record.hold();
+    const readsBefore = record.reads;
+    await user.click(saveButton("issuer"));
+    await waitFor(() => expect(record.reads).toBeGreaterThan(readsBefore));
+    await user.clear(taxId);
+    release();
+
+    await waitFor(() => expect(saveButton("issuer")).toBeEnabled());
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(taxId).toHaveValue("");
+    expect(saveButton("issuer")).toBeEnabled();
+  });
+
+  it("shows a saved field as the server stored it", async () => {
+    storedOrganization();
+    const user = userEvent.setup();
+    renderSettings();
+
+    const name = await screen.findByLabelText(/organization name/i);
+    await user.type(name, " Two  ");
+    await user.click(saveButton("organization"));
+
+    await waitFor(() => expect(name).toHaveValue("Test Org Two"));
+    expect(saveButton("organization")).toBeDisabled();
+  });
+});

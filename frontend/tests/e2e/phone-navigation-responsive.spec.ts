@@ -286,6 +286,22 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
     await expect(page).toHaveURL(/filter=low-stock/);
   });
 
+  for (const filter of ["expired", "expiring"]) {
+    test(`?filter=${filter} opens with its pressed chip on the screen`, async ({
+      page,
+      authenticatedPage,
+    }) => {
+      await page.setViewportSize({ width: 360, height: 800 });
+      await page.goto(`/inventory/items?filter=${filter}`);
+      const chip = page.getByTestId(`filter-${filter}`);
+      await expect(chip).toHaveAttribute("aria-pressed", "true", {
+        timeout: 15000,
+      });
+      // The whole of it: the row clips what it has scrolled out of sight.
+      await expect(chip).toBeInViewport({ ratio: 1 });
+    });
+  }
+
   test("Back from a product opened by a direct link climbs, then leaves the module", async ({
     page,
     authenticatedPage,

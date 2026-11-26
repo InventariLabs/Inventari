@@ -125,7 +125,7 @@ function attentionChip(
   };
 }
 
-/** The two date chips, offered where the workspace keeps dates. */
+/** The two date chips. */
 function expiryChips(
   filters: ReturnType<typeof useItemFilters>,
   expiringLabel: string,
@@ -145,6 +145,36 @@ function expiryChips(
       onToggle: () => filters.setExpiredFilter(!filters.expiredFilter),
     },
   ];
+}
+
+/**
+ * Puts the two date chips in their place in the chip row.
+ *
+ * They are offered where the workspace keeps dates — the same decision the
+ * statistics screens read. That answer arrives after the row is drawn, so
+ * they stand last: a chip already on screen does not move out from under a
+ * tap. An address that names a date filter (a statistics card's link, Back)
+ * has no answer to wait for: the two lead the row from the first paint, where
+ * a phone shows the pressed one. Decided once per visit, so that a tap on a
+ * chip reorders nothing.
+ */
+function useDateChips(
+  filters: ReturnType<typeof useItemFilters>,
+  t: TranslateFn,
+) {
+  const tracksExpiry = useTracksExpiry();
+  const [namedByAddress] = useState(
+    () => filters.expiringFilter || filters.expiredFilter,
+  );
+  return (chips: ReturnType<typeof expiryChips>) => {
+    const dates = expiryChips(
+      filters,
+      t("items:onlyExpiring"),
+      t("items:stats.expired"),
+    );
+    if (namedByAddress) return [...dates, ...chips];
+    return tracksExpiry ? [...chips, ...dates] : chips;
+  };
 }
 
 /**
@@ -217,8 +247,7 @@ export default function ItemsPage() {
     [navigate],
   );
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
-  // The one expiry decision, the same one the statistics screens read.
-  const tracksExpiry = useTracksExpiry();
+  const withDateChips = useDateChips(filters, t);
 
   // The organization decides whether the general lists carry module-owned
   // data (Settings → General). That answer scopes what this page *offers* —
@@ -421,7 +450,7 @@ export default function ItemsPage() {
               (filters.usedUpFilter ? 1 : 0),
             onClick: () => filters.setShowFilters(!filters.showFilters),
           }}
-          secondaryFilters={[
+          secondaryFilters={withDateChips([
             attentionChip(filters, t("needsAttention")),
             {
               key: "low_stock",
@@ -443,14 +472,7 @@ export default function ItemsPage() {
               onToggle: () => setGroupByCategory((prev) => !prev),
             },
             ...moduleFilters.chips,
-            // The same decision the statistics screens read: a workspace that
-            // keeps no dates is not offered a filter by date. Its answer
-            // arrives after the row is drawn, so these two stand last: a chip
-            // already on screen does not move out from under a tap.
-            ...(tracksExpiry
-              ? expiryChips(filters, t("onlyExpiring"), t("stats.expired"))
-              : []),
-          ]}
+          ])}
           resultCount={isError ? undefined : exactTotal}
           // One row per record of stock, not per product: the count says so,
           // and names the products too, the unit a shortage is counted in and

@@ -64,6 +64,16 @@ says what the release does rather than what changed since them.
   machine, with the same sheet.
 - Background imports are deleted a week after they end, with their result and
   list of refused rows; the table that holds them no longer grows for good.
+- Organization settings keep what you have typed and not saved: saving one of
+  the two cards, or changing the logo, no longer empties the fields of the
+  other, and text typed just after a save is no longer replaced when the
+  screen refreshes.
+- The product list's filter chips stay where they are while the page loads, so
+  a tap on *Running low* is not lost when the date filters arrive. *Only
+  expiring soon* and *Expired* now stand at the end of the row instead of in
+  front of *Running low*. When the list opens already narrowed by one of the
+  two — from a statistics card, or with Back — both lead the row, so the
+  active filter is on a phone's screen.
 - The audit log and the item history read in words. A label's entries name
   the label's code and the product beside its id; a document type
   configuration's default locations are written with their names, and
