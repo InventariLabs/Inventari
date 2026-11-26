@@ -522,6 +522,5 @@ async def get_item_assignment_history(
                 )
             )
         )
-        for schema in schemas:
-            schema.held_by_viewer = schema.id in held
+        return [s.model_copy(update={'held_by_viewer': s.id in held}) for s in schemas]
     return schemas

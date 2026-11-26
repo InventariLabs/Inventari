@@ -18,14 +18,13 @@ import {
   useDeleteCategory,
 } from "@/modules/shared/hooks/useCategories";
 import { listedFields } from "@/module-sdk";
-import type { CategoryDTO } from "@/types";
+import type { CategoryDTO, FieldDefinition } from "@/types";
 
 /** The fields of a category the reader sees: what the builder lists, without
  *  the hidden ones. A stored visibility flag is not a field. */
 function shownFieldCount(cat: CategoryDTO): number {
-  return listedFields(cat.field_definitions ?? []).filter(
-    (f) => f.visible !== false,
-  ).length;
+  const defined = (cat.field_definitions ?? []) as FieldDefinition[];
+  return listedFields(defined).filter((f) => f.visible !== false).length;
 }
 
 export default function EquipmentCategoriesPage() {
