@@ -328,6 +328,45 @@ class ItemImportMapping(BaseModel):
     purchase_price: str | None = None
 
 
+#: The kinds of record a move from Grocy does not bring, as the summary names
+#: them.
+LeftBehindKind = Literal[
+    'inactive_products',
+    'extra_barcodes',
+    'unit_conversions',
+    'units_as_pieces',
+    'prices_below_a_cent',
+    'default_best_before_days',
+    'pictures',
+    'parent_products',
+    'own_field_values',
+    'shopping_list_entries',
+    'recipes',
+    'meal_plan',
+    'chores',
+    'batteries',
+    'tasks',
+    'equipment',
+]
+
+
+class ImportLeftBehind(BaseModel):
+    """One kind of record the file holds and the move did not bring."""
+
+    what: LeftBehindKind
+    count: int
+    #: For ``units_as_pieces``: the units no unit here matched, whose stock
+    #: came across counted in pieces.
+    names: list[str] = []
+
+
+class ImportBrought(BaseModel):
+    """A module's part of a move, as one sentence in the reader's language."""
+
+    module: str
+    sentence: str
+
+
 class ItemImportResponse(BaseModel):
     """What one import did — including the org data it founded on the way.
 
@@ -344,6 +383,12 @@ class ItemImportResponse(BaseModel):
     already existed — by its barcode, or by its name and brand — and so added
     stock to it rather than making a new product. A product two rows of one
     sheet make together counts its second row here.
+
+    A Grocy database file answers in the same shape, its products and
+    batches standing for rows: ``skipped`` then counts what an earlier run of
+    the file already brought, ``created_suppliers`` the stores it founded,
+    and ``left_behind`` what the file holds that the move did not bring. A
+    sheet leaves both empty.
     """
 
     total: int
@@ -355,6 +400,37 @@ class ItemImportResponse(BaseModel):
     errors: list[dict[str, Any]] = []
     created_locations: list[str] = []
     created_categories: list[str] = []
+    created_suppliers: list[str] = []
+    left_behind: list[ImportLeftBehind] = []
+    #: What switched-on modules brought from the same file (a Grocy move's
+    #: shopping lists); empty for a sheet.
+    brought_by_modules: list[ImportBrought] = []
+
+
+class GrocyFileAnalysis(BaseModel):
+    """What a Grocy database file holds, read before anything is written.
+
+    The step before the move shows it: how much comes across, which
+    locations, categories and suppliers the move would found, what an earlier
+    run already brought, and what stays behind. ``currency`` is the
+    organization's: Grocy keeps its own outside the file, so prices are read
+    in this one. ``steps`` is what the move's progress counts — every batch,
+    and every product without stock.
+    """
+
+    products: int
+    stock_entries: int
+    already_imported: int
+    locations: int
+    product_groups: int
+    stores: int
+    shopping_list_entries: int
+    new_locations: list[str]
+    new_categories: list[str]
+    new_suppliers: list[str]
+    currency: str | None
+    steps: int
+    left_behind: list[ImportLeftBehind]
 
 
 class ItemImportJobResponse(BaseModel):

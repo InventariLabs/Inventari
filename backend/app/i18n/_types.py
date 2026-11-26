@@ -182,6 +182,10 @@ class ErrorMessages(TypedDict):
     file_empty: str
     file_not_webp: str
     import_too_many_rows: str
+    grocy_file_unreadable: str
+    grocy_file_not_grocy: str
+    grocy_import_forbidden: str
+    grocy_import_forbidden_one: NotRequired[str]
     storage_location_ambiguous: str
     pagination_cursor_invalid: str
     webhook_url_scheme: str
@@ -962,6 +966,10 @@ class ShoppingLabels(TypedDict):
     suggestion_frequently_consumed: str
     #: The note a purchase order made from a shopping list starts with.
     po_note_from_list: str
+    #: A Grocy move's summary line for the shopping lists it brought, and the
+    #: clause for the entries an earlier move already brought.
+    grocy_lists_brought: str
+    grocy_lists_skipped: str
 
 
 # Functional syntax because one symbol the catalogue carries — "fl oz" — is

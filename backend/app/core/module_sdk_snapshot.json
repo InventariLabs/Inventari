@@ -680,6 +680,104 @@
       "kind": "class",
       "members": {}
     },
+    "GrocyFile": {
+      "bases": [
+        "object"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "locations",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "groups",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "stores",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "units",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "products",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "stock",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "shopping_list",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "left_behind",
+          "required": true
+        }
+      ],
+      "kind": "class",
+      "members": {}
+    },
+    "GrocyShoppingListEntry": {
+      "bases": [
+        "object"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "id",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "list_id",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "list_name",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "product_id",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "note",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "amount",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "unit_id",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "done",
+          "required": true
+        }
+      ],
+      "kind": "class",
+      "members": {}
+    },
     "InterceptorError": {
       "bases": [
         "Exception"
@@ -1820,6 +1918,49 @@
           "kind": "attribute"
         }
       }
+    },
+    "MoveContributor": {
+      "bases": [
+        "object"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "module",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "takes",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bring",
+          "required": true
+        }
+      ],
+      "kind": "class",
+      "members": {}
+    },
+    "MoveMatches": {
+      "bases": [
+        "object"
+      ],
+      "init": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "products",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "units",
+          "required": true
+        }
+      ],
+      "kind": "class",
+      "members": {}
     },
     "NotFoundException": {
       "bases": [
@@ -3698,6 +3839,21 @@
         {
           "kind": "POSITIONAL_OR_KEYWORD",
           "name": "source",
+          "required": true
+        }
+      ]
+    },
+    "register_move_contributor": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "source",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "contributor",
           "required": true
         }
       ]

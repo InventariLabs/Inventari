@@ -4,7 +4,7 @@ import { describe, it, expect, vi } from "vitest";
 import { withLanguage } from "@/test/mocks/i18n";
 import { ImportUploadStep } from "./ImportUploadStep";
 
-const grocy = { label: "Import from Grocy", hint: "Use your Grocy CSV export" };
+const grocy = { label: "Import from Grocy", hint: "Your Grocy database file" };
 
 describe("ImportUploadStep", () => {
   it("renders the generic tile and the named source when given one", () => {
@@ -68,6 +68,46 @@ describe("ImportUploadStep", () => {
       expect(opened).toHaveBeenCalledTimes(1);
     },
   );
+
+  it("gives a source that is not a sheet a picker, a filter and a note of its own", async () => {
+    const onFileSelect = vi.fn();
+    const onSourceFile = vi.fn();
+    render(
+      <ImportUploadStep
+        onFileSelect={onFileSelect}
+        secondaryUpload={{
+          ...grocy,
+          note: "Grocy keeps it in its data folder.",
+          accept: ".db",
+          onFileSelect: onSourceFile,
+        }}
+      />,
+    );
+    const own = document.getElementById(
+      "import-file-secondary",
+    ) as HTMLInputElement;
+    const sheet = document.getElementById("import-file") as HTMLElement;
+    const sheetOpened = vi.fn((e: Event) => e.preventDefault());
+    sheet.addEventListener("click", sheetOpened);
+    const ownOpened = vi.fn((e: Event) => e.preventDefault());
+    own.addEventListener("click", ownOpened);
+
+    await userEvent.click(screen.getByText("Import from Grocy"));
+    const file = new File(["x"], "grocy.db");
+    // The tile opened the source's own picker, not the sheet's; the upload
+    // below clicks the input itself.
+    expect(ownOpened).toHaveBeenCalledTimes(1);
+    expect(sheetOpened).not.toHaveBeenCalled();
+    own.removeEventListener("click", ownOpened);
+    await userEvent.upload(own, file);
+
+    expect(
+      screen.getByText("Grocy keeps it in its data folder."),
+    ).toBeInTheDocument();
+    expect(own).toHaveAttribute("accept", ".db");
+    expect(onSourceFile).toHaveBeenCalledExactlyOnceWith(file);
+    expect(onFileSelect).not.toHaveBeenCalled();
+  });
 
   it("hands the chosen file to the wizard", async () => {
     const onFileSelect = vi.fn();

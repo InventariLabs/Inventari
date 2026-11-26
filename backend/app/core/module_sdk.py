@@ -107,6 +107,7 @@ from app.core.file_reference import (
     served_url,
     stored_reference,
 )
+from app.core.grocy_file import GrocyFile, GrocyShoppingListEntry
 from app.core.held_back_locations import register_held_back_locations
 from app.core.import_sheet import cell_text, read_sheet
 from app.core.interceptors import InterceptorPipeline, interceptor_pipeline
@@ -121,6 +122,11 @@ from app.core.migration_helpers import (
 )
 from app.core.module_ownership import general_rows, hidden_module_tags_async
 from app.core.module_scope import get_context_tags_of
+from app.core.move_contributors import (
+    MoveContributor,
+    MoveMatches,
+    register_move_contributor,
+)
 from app.core.open_package import effective_expiry
 from app.core.scan_registry import ScanProvider, scan_registry
 from app.core.settings_diff import journal_config_change, record_settings
@@ -179,6 +185,8 @@ __all__ = [
     'FileTooLargeError',
     'FileTypeNotAllowedError',
     'ForbiddenException',
+    'GrocyFile',
+    'GrocyShoppingListEntry',
     'InterceptorError',
     'InterceptorPipeline',
     'ItemInterceptor',
@@ -188,6 +196,8 @@ __all__ = [
     'ModuleMetadata',
     'ModuleModelBase',
     'ModuleScheduledTask',
+    'MoveContributor',
+    'MoveMatches',
     'NotFoundException',
     'OwnedFileMeta',
     'PaginatedResponse',
@@ -240,6 +250,7 @@ __all__ = [
     'register_held_back_locations',
     'register_lot_trace_source',
     'read_sheet',
+    'register_move_contributor',
     'register_work_in_progress_provider',
     'relation_exists',
     'require_module',

@@ -30,6 +30,7 @@ import type {
 type SheetAnalysis = components["schemas"]["SheetAnalysisResponse"];
 type ItemImportJob = components["schemas"]["ItemImportJobResponse"];
 type ItemExportJob = components["schemas"]["ItemExportJobResponse"];
+export type GrocyFileAnalysis = components["schemas"]["GrocyFileAnalysis"];
 
 /** How long to wait between two looks at a job running in the background. */
 const JOB_POLL_MS = 1500;
@@ -404,6 +405,43 @@ export const itemsApi = {
     return outcome as ItemImportResponse & {
       errors: ImportRowError[];
     };
+  },
+
+  /** What Grocy's database file (`grocy.db`) holds, read before the move;
+   * nothing is written. Grocy writes no export, so its file is the source. */
+  analyzeGrocy: async (file: File): Promise<GrocyFileAnalysis> => {
+    assertFileSize(file);
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await api.post<GrocyFileAnalysis>(
+      "/items/import/grocy/analyze",
+      formData,
+    );
+    return response.data;
+  },
+
+  /** Moves a Grocy household in. `categoryMatches` names the Grocy groups
+   * the screen recognised as categories already here (group → category id).
+   * A file of many batches runs in the background like a long sheet;
+   * `onProgress` hears how far it has got. */
+  importGrocy: async (
+    file: File,
+    categoryMatches: Record<string, string>,
+    onProgress?: (progress: ImportProgress) => void,
+  ): Promise<ItemImportOutcome> => {
+    assertFileSize(file);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("category_matches_json", JSON.stringify(categoryMatches));
+    const response = await api.post<ItemImportResponse | ItemImportJob>(
+      "/items/import/grocy",
+      formData,
+    );
+    const outcome =
+      response.status === 202
+        ? await followImportJob((response.data as ItemImportJob).id, onProgress)
+        : (response.data as ItemImportResponse);
+    return outcome as ItemImportResponse & { errors: ImportRowError[] };
   },
 
   /** The rows the list shows for the same params — pass `getAggregates`'s

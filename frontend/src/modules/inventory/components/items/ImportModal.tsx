@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import { itemsApi } from "@/lib/api/items";
 import { getEveryPage } from "@/module-sdk";
 import { queryKeys } from "@/hooks/queries/keys";
 import type { ItemImportOutcome } from "@/components/import/types";
-import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { ChoiceGroup } from "@/components/ui/ChoiceGroup";
 import { InlineQueryError } from "@/components/ui/QueryResult";
@@ -22,11 +20,9 @@ import type {
   FieldDefinition,
   StorageLocationSummary,
 } from "@/types";
-import {
-  applyGrocyPreset,
-  locationFieldKey,
-  suggestMapping,
-} from "./importMapping";
+import { locationFieldKey, suggestMapping } from "./importMapping";
+import { ImportResultDetails } from "./ImportResultDetails";
+import { useGrocySource } from "./grocySource";
 
 interface Props {
   onClose: () => void;
@@ -142,10 +138,14 @@ export default function ImportModal({ onClose }: Props) {
     staleTime: 60_000,
   });
   const {
+    all: allCategories,
     scoped: categories,
     error: categoriesError,
     refetch: refetchCategories,
   } = useScopedCategories();
+  // Grocy writes no export: its tile reads Grocy's own database file and
+  // reviews it in place of a sheet's columns.
+  const grocy = useGrocySource(allCategories);
   const ownFields = productFields(storages, categories);
   const unsupported = categoriesNeedingUncarriableFields(categories);
   const fields: MappingField[] = [
@@ -194,7 +194,10 @@ export default function ImportModal({ onClose }: Props) {
       // warning about the ones a cell cannot fill is silent: a gap is not
       // "no categories", and processing would fail every row of them.
       canRun={categories !== undefined}
-      analyze={(file) => itemsApi.analyzeImport(file)}
+      analyze={(file) => {
+        grocy.forget();
+        return itemsApi.analyzeImport(file);
+      }}
       suggest={(headers) =>
         suggestMapping(
           headers,
@@ -222,23 +225,7 @@ export default function ImportModal({ onClose }: Props) {
         summary,
         closeAndView: t("items:import.closeAndView"),
       }}
-      secondaryUpload={{
-        label: t("items:import.grocy"),
-        hint: t("items:import.grocyHint"),
-      }}
-      mappingHeaderExtras={({ headers, mapping, setMapping }) => (
-        <Button
-          size="content"
-          variant="ghost"
-          onClick={() => {
-            setMapping(applyGrocyPreset(headers, mapping));
-            toast.success(t("inventory:toasts.importGrocyMappingApplied"));
-          }}
-          className="text-[10px] font-medium text-primary-600 hover:text-primary-700 uppercase tracking-wider bg-primary-50 px-3 py-1.5 rounded-lg border border-primary-100"
-        >
-          {t("items:import.applyGrocyPreset")}
-        </Button>
-      )}
+      fileSource={grocy.source}
       mappingExtras={({ mapping, filledCounts }) => (
         <>
           {/* Without the answer the columns the locations add are missing
@@ -336,52 +323,9 @@ export default function ImportModal({ onClose }: Props) {
           </div>
         </>
       )}
-      resultExtras={(result) =>
-        result.skipped > 0 ||
-        result.created_locations.length > 0 ||
-        result.created_categories.length > 0 ? (
-          /* What the file founded beside the products, and what it left
-             alone, so the reader learns it here and not from new tiles in
-             the storage tree. The updated count is on the first line now. */
-          <div className="bg-surface p-6 rounded-xl border border-border text-left max-w-md mx-auto space-y-3">
-            {result.skipped > 0 && (
-              /* The count the shared stats grid does not carry: what the
-                 Label Code matched and the mode left alone. */
-              <p className="text-xs text-on">
-                {t("items:import.matchedSkipped", { count: result.skipped })}
-              </p>
-            )}
-            {result.created_locations.length > 0 && (
-              <div>
-                <p className="text-[10px] font-medium text-on-muted uppercase tracking-widest mb-1">
-                  {t("items:import.foundedLocations", {
-                    count: result.created_locations.length,
-                  })}
-                </p>
-                <ul className="text-xs text-on space-y-0.5">
-                  {result.created_locations.map((path) => (
-                    <li key={path}>{path}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {result.created_categories.length > 0 && (
-              <div>
-                <p className="text-[10px] font-medium text-on-muted uppercase tracking-widest mb-1">
-                  {t("items:import.foundedCategories", {
-                    count: result.created_categories.length,
-                  })}
-                </p>
-                <ul className="text-xs text-on space-y-0.5">
-                  {result.created_categories.map((name) => (
-                    <li key={name}>{name}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        ) : null
-      }
+      resultExtras={(result) => (
+        <ImportResultDetails result={result} fromGrocy={grocy.active} />
+      )}
     />
   );
 }

@@ -1,9 +1,16 @@
+import { lazy, Suspense } from "react";
 import type { Item } from "@/types";
 import { useSearchParams } from "react-router-dom";
 import ItemEditModal from "@/modules/inventory/components/ItemEditModal";
 import ThresholdQuickSetSheet from "@/modules/inventory/components/ThresholdQuickSetSheet";
 import BulkEditModal from "@/modules/inventory/components/items/BulkEditModal";
-import ImportModal from "@/modules/inventory/components/items/ImportModal";
+
+// Importing a file is a desk task, opened on request: its own chunk keeps the
+// import dialog (file upload, column mapping, the move from Grocy) off the
+// product list a phone downloads.
+const ImportModal = lazy(
+  () => import("@/modules/inventory/components/items/ImportModal"),
+);
 
 interface ItemsModalsContainerProps {
   editingItemId: string | null;
@@ -60,7 +67,9 @@ export default function ItemsModalsContainer({
       )}
 
       {showImportModal && (
-        <ImportModal onClose={() => setShowImportModal(false)} />
+        <Suspense fallback={null}>
+          <ImportModal onClose={() => setShowImportModal(false)} />
+        </Suspense>
       )}
     </>
   );

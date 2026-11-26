@@ -136,6 +136,10 @@ describe("check-mutate-async-handled — what reaches a handler", () => {
       `showConfirm({ onConfirm: async () => { await m.mutateAsync(1); } });`,
     ],
     [
+      "an import wizard file source's run",
+      `const source = defineFileSource({ run: (file) => m.mutateAsync({ file }) });`,
+    ],
+    [
       "the page's Save",
       `usePageSavePart("x", dirty, async () => { await m.mutateAsync(1); });`,
     ],

@@ -383,6 +383,8 @@ apart.
 | `FILE_TYPE_NOT_ALLOWED` | File type not allowed |
 | `FILE_TYPE_NOT_ALLOWED_LIST` | File type not allowed. Allowed: {allowed} |
 | `FORBIDDEN` | Access denied |
+| `GROCY_FILE_NOT_GROCY` | This database is not Grocy's: it has no products, stock, locations and quantity units. Choose grocy.db from the data folder of your Grocy installation |
+| `GROCY_FILE_UNREADABLE` | This file is not a database Grocy wrote. Choose grocy.db from the data folder of your Grocy installation |
 | `HEX_COLOR_INVALID` | Invalid hex color: {color}. Use format #RGB or #RRGGBB |
 | `HOME_SHELF_NOT_STOCK` | This location does not take stock, so it cannot be a home location. |
 | `HOME_SHELF_QUARANTINE` | A quarantine location cannot be a home location: goods held back are not kept there. |
