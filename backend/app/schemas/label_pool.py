@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from app.core.contracts._documents_dtos import LabelScanDTO
 from app.core.label_codes import LABEL_PREFIX_MAX_LENGTH, LABEL_PREFIX_PATTERN
 from app.schemas.pagination import PaginatedResponse
-from app.schemas.validators import empty_string_to_none
+from app.schemas.validators import ProductMeasure, empty_string_to_none
 
 
 class LabelPoolBase(BaseModel):
@@ -106,7 +106,7 @@ class LabelAssignRequest(BaseModel):
     uom_id: UUID | None = None
     # Weight of a single unit; it is kept on the product template, not on the
     # item (ADR-015).
-    weight_value: float | None = None
+    weight_value: ProductMeasure | None = None
     weight_uom_id: UUID | None = None
     expiry_date: str | None = None
     freeze_date: str | None = None

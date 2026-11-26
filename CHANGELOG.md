@@ -74,6 +74,10 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A product's unit weight or volume that is negative, or 100,000,000 and up,
+  is refused with a validation error wherever a request writes it: creating a
+  product, creating or editing a stock record, and the quick add after a scan.
+  An oversized value no longer ends in a server error.
 - Organization settings keep what you have typed and not saved: saving one of
   the two cards, or changing the logo, no longer empties the fields of the
   other, and text typed just after a save is no longer replaced when the
