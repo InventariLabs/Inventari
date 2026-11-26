@@ -8,7 +8,7 @@ import re
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 from typing import Annotated, Any, Literal
 
-from pydantic import AfterValidator
+from pydantic import AfterValidator, Field
 
 from app.core.scan_links import scanned_code
 
@@ -45,11 +45,13 @@ QUANTITY_MAX = Decimal(
     f'{"9" * (QUANTITY_MAX_DIGITS - QUANTITY_SCALE)}.{"9" * QUANTITY_SCALE}'
 )
 
-#: The largest weight a product can carry: ``product_templates.weight_value``
-#: is numeric(14, 6), so a magnitude from 1e8 up overflows the column. A bound
-#: on the schema answers it with a 422 instead of the driver's 500; below, the
-#: schema stops at zero, since no product weighs less than nothing.
-WEIGHT_MAX = 99_999_999
+#: A product's unit weight or volume as a request names it.
+#: ``product_templates.weight_value`` and ``volume_value`` are numeric(14, 6),
+#: so a magnitude from 1e8 up overflows the column: the bound answers it with a
+#: 422 instead of the driver's 500. Below, it stops at zero, since nothing
+#: weighs or holds less than nothing. Never on a field a response fills from a
+#: stored row, which is answered as it is.
+ProductMeasure = Annotated[float, Field(ge=0, le=99_999_999)]
 
 #: The orders stock can leave a shelf in — the values
 #: ``app.services.stock_strategy.SUPPORTED_STRATEGIES`` resolves. A product
