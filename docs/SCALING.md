@@ -243,7 +243,7 @@ emission.
 No table is partitioned. A table either has a retention policy, or keeps every
 row for a reason given here.
 
-**Trimmed.** The first four are trimmed by the daily `table_retention` job
+**Trimmed.** The first five are trimmed by the daily `table_retention` job
 (`app/services/table_retention.py`), in committed batches, with the windows of
 the first three set in the environment (`.env.example`).
 
@@ -253,6 +253,7 @@ the first three set in the environment (`.env.example`).
 | `email_jobs` | `sent` and `failed` mail queued more than `EMAIL_JOB_RETENTION_DAYS` (120) ago. A sent job drops its attachment the moment it leaves | `pending` and `sending` mail. The window outlives the 97 days an invitation can be listed with how its mail ended |
 | `notifications` | Read after `NOTIFICATION_READ_RETENTION_DAYS` (90), unread after `NOTIFICATION_UNREAD_RETENTION_DAYS` (365) | Anything younger: unread notices get the longer window because nobody has seen them yet |
 | `item_export_jobs` | A day after the export started, with the workbook it stored: the file is a copy of the catalogue, kept long enough to be fetched | Exports younger than a day |
+| `item_import_jobs` | A week after the import last reported, with its answer and the list of refused rows | Jobs that moved within the week |
 | `webhook_delivery_logs` | After each organization's `log_retention_days` (30 by default), by the webhooks module's own job | |
 | `items` (archived) | After an organization's `archive_retention_days`, only if it set one | Everything otherwise |
 

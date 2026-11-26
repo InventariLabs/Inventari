@@ -46,6 +46,11 @@ INLINE_ROW_LIMIT = 200
 #: reported as lost. A batch is fifty rows, a few seconds.
 STALE_AFTER = timedelta(minutes=5)
 
+#: How long a job and its answer are kept after the job last moved; the daily
+#: table retention deletes them after that. Long enough to look into an import
+#: somebody asks about days later.
+KEEP_FOR = timedelta(days=7)
+
 #: Tasks the event loop only holds weakly; kept here until they finish.
 _running: set[asyncio.Task[None]] = set()
 

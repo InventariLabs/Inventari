@@ -502,7 +502,7 @@ class AuthService:
             await db.flush()
             user.organization_id = organization.id
             user.role = 'admin'
-            await seed_new_organization_async(db, organization.id)
+            await seed_new_organization_async(db, organization.id, user.id)
             # Founding a tenant is an access act, whether it opens the
             # installation or an operator approved a request: the
             # organization's journal starts with it, the way the create

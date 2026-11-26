@@ -72,6 +72,15 @@ group an operation did not name up front and locks later is taken after the
 others; two such operations can close a circle, which the database breaks by
 aborting one of them — nothing is written wrong.
 
+A door that may take a record to nothing files it under one of the
+organization's virtual places, a group of the same product. A use, a
+disposal, a package finished by hand (`lock_record_stock_async` with
+`filed_under`) and a draw that files what it empties lock that group together
+with the shelf's. An organization founded by a registration or through the API
+has the virtual places from the moment it is created
+(`seed_new_organization_async`); one made by `create-admin` gets them at
+onboarding.
+
 Production runs do not take these locks: they are serialized per organization
 by the maker settings lock.
 

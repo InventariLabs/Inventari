@@ -79,7 +79,7 @@ SessionFactory = Callable[[], AbstractAsyncContextManager[AsyncSession]]
 
 #: The body of the writing process, called with the database URL, the path
 #: to write the workbook to and a shared integer to add one to for every
-#: record each of its two passes reads. It must pickle: a module-level
+#: record it writes. It must pickle: a module-level
 #: function, or a ``functools.partial`` of one over picklable arguments.
 WorkbookWriter = Callable[[str, str, Any], None]
 
@@ -150,7 +150,7 @@ async def _write_in_a_process_async(
         writer.start()
         while writer.is_alive():
             await asyncio.sleep(REPORT_EVERY_SECONDS)
-            await _record_async(db, job_id, processed=min(total, steps.value // 2))
+            await _record_async(db, job_id, processed=min(total, steps.value))
         if writer.exitcode != 0:
             raise RuntimeError(f'the export process ended with {writer.exitcode}')
         return await asyncio.to_thread(Path(path).read_bytes)

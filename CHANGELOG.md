@@ -78,6 +78,14 @@ says what the release does rather than what changed since them.
   is refused with a validation error wherever a request writes it: creating a
   product, creating or editing a stock record, and the quick add after a scan.
   An oversized value no longer ends in a server error.
+- The Export buttons (Settings → Data, the product list, the equipment list)
+  start one export at a time: a click while the file is still being prepared
+  does nothing, instead of starting a second export on the server.
+- A large export is quicker, because each record is loaded in full only once:
+  at 100,000 products and 300,000 records it went from 113 to 78 seconds on the
+  test machine, with the same sheet.
+- Background imports are deleted a week after they end, with their result and
+  list of refused rows; the table that holds them no longer grows for good.
 - Organization settings keep what you have typed and not saved: saving one of
   the two cards, or changing the logo, no longer empties the fields of the
   other, and text typed just after a save is no longer replaced when the
@@ -299,7 +307,14 @@ says what the release does rather than what changed since them.
   module switch-on that would have renamed it goes through. When the creation
   of starting places finds two places bearing a declared name, it takes the
   same one every time, and an archived place no longer counts as somewhere to
-  put goods.
+  put goods. An archived main storage stays archived — **Restore** brings it
+  back — and no second one is made beside it.
+- Using up or throwing away a product, or finishing an opened package, at the
+  same moment as a document of that product is completed no longer deadlocks
+  with it, which cost a wait and a retry or failed the action. An organization
+  founded by signing up or through the API has its **Consumed**, **Inventory
+  Loss** and **Production** places from the moment it is created, before any
+  onboarding, so two first uses at once no longer collide on a place's name.
 - Concurrent changes of an organization's default tax rate take their locks
   in one order, so two saves no longer deadlock and wait for the retry
   middleware.

@@ -162,6 +162,12 @@ async def create_default_storage_locations_async(
     (``ProductProfile.default_storage_locations``), the way storage types
     already do. An organization that has not picked one yet is treated as
     neutral — the same default the seeder uses.
+
+    An archived place stays archived. When the row a declaration would write
+    is one the organization archived — the main storage the seed falls back to
+    included — nothing is written in its stead, even if that leaves no
+    ordinary place: the archive is the organization's decision, and Restore
+    undoes it.
     """
     from app.core.product_profiles import (
         DEFAULT_PROFILE_ID,

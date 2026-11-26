@@ -168,6 +168,42 @@ class TestASeedMeetsItsNameTaken:
         # Still the seeder's own name, so it joins once the other one is free.
         assert row.settings['seed']['name'] == CONSUMED_EN
 
+    async def test_an_archived_main_storage_stays_archived(
+        self,
+        real_async_db_session: AsyncSession,
+        seed_org: Organization,
+        seed_user: User,
+        seed_types: None,
+    ) -> None:
+        """The seed neither restores the row nor writes another in its stead."""
+        db = real_async_db_session
+        row = _a_place(
+            db,
+            seed_org.id,
+            MAIN_EN,
+            seed_user.id,
+            settings={
+                'archived': 'true',
+                'seed': {'code': 'MAIN_STORAGE', 'name': MAIN_EN},
+            },
+        )
+        await db.commit()
+
+        created = await create_default_storage_locations_async(
+            db, seed_org.id, seed_user.id
+        )
+
+        assert created == []
+        await db.refresh(row)
+        assert row.settings['archived'] == 'true'
+        ordinary = await db.scalars(
+            select(StorageLocation.name).where(
+                StorageLocation.organization_id == seed_org.id,
+                StorageLocation.usage == LocationUsage.INTERNAL,
+            )
+        )
+        assert ordinary.all() == [MAIN_EN]
+
     async def test_the_profile_seed_row_keeps_its_name_when_the_languages_is_taken(
         self,
         real_async_db_session: AsyncSession,

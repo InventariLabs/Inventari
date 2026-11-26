@@ -37,21 +37,29 @@ def generate_short_id(length: int = 6) -> str:
     return 'ORG-' + ''.join(secrets.choice(chars) for _ in range(length))
 
 
-async def seed_new_organization_async(db: AsyncSession, organization_id: UUID) -> None:
-    """Give a freshly created organization the neutral storage types.
+async def seed_new_organization_async(
+    db: AsyncSession, organization_id: UUID, user_id: UUID
+) -> None:
+    """Give a freshly created organization its storage types and virtual places.
 
-    Storage types are owned by a tenant, so every organization needs
-       its own set from the moment it exists — SYSTEM in particular, without
-       which ``ensure_virtual_locations_async`` cannot book consumption. A
-       profile chosen later adds its own on top.
+    Storage types are owned by a tenant, so every organization needs its own
+    set from the moment it exists — SYSTEM in particular, which the virtual
+    places stand on. A profile chosen later adds its own types on top.
+
+    The virtual places (Consumed, Inventory Loss, Production) are made here
+    too, before anything can use stock up: a door that empties a record locks
+    its place's group with the shelf's, which it can only do for a place that
+    exists, and two operations making one at once would collide on its name.
     """
     from app.seed_profiles.base import seed_neutral_storage_types
+    from app.services.storage._defaults import ensure_virtual_locations_async
 
     await db.run_sync(
         lambda session: seed_neutral_storage_types(
             session, organization_id=organization_id, commit=False
         )
     )
+    await ensure_virtual_locations_async(db, str(organization_id), str(user_id))
 
 
 async def create_organization(
@@ -73,7 +81,7 @@ async def create_organization(
     await db.flush()
     creator.organization_id = organization.id
     creator.role = 'admin'
-    await seed_new_organization_async(db, organization.id)
+    await seed_new_organization_async(db, organization.id, creator.id)
     # Founding a tenant is an access act the operator opens the journal to
     # answer for: the entry rides the same transaction as the row.
     await log_action_async(
