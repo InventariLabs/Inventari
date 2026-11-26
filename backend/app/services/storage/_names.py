@@ -25,6 +25,7 @@ from app.models.storage_location import StorageLocation
 __all__ = [
     'check_name_unique_async',
     'flush_under_the_name_rule',
+    'free_to_take_async',
     'name_rule_held_by_the_database',
     'name_taken',
     'sibling_with_name_async',
@@ -84,6 +85,25 @@ async def check_name_unique_async(
         db, organization_id, name, parent_id=parent_id, exclude_id=exclude_id
     ):
         raise name_taken(name)
+
+
+async def free_to_take_async(
+    db: AsyncSession, place: StorageLocation, name: str
+) -> bool:
+    """Whether *place* can be renamed to *name* on the level it stands on.
+
+    The question of a rename nobody asked for, such as a seeded row joining
+    the reader's language: the row keeps its name when the answer is no, and
+    the operation that ran the seed goes on.
+    """
+    holder = await sibling_with_name_async(
+        db,
+        place.organization_id,
+        name,
+        parent_id=place.parent_id,
+        exclude_id=place.id,
+    )
+    return holder is None
 
 
 @asynccontextmanager
