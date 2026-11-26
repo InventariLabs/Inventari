@@ -157,6 +157,17 @@ const DYNAMIC_ALLOWLIST = [
   // StockLotPage: t(`...lot.status.${lot.status}`) — one label per state a
   // batch can be in (LotStatus in the core contracts).
   { ns: "inventory", prefix: "lot.status" },
+  // rentals: the tab row, the guide's steps and the borrower-kind chips are
+  // built from lists; the state badge, block source and return condition read
+  // one label per value the API carries, and the calendar legend one per bar
+  // kind it draws.
+  { ns: "rentals", prefix: "tabs" },
+  { ns: "rentals", prefix: "status" },
+  { ns: "rentals", prefix: "form.whoKinds" },
+  { ns: "rentals", prefix: "blocks.source" },
+  { ns: "rentals", prefix: "detail.condition" },
+  { ns: "rentals", prefix: "calendar.legend" },
+  { ns: "rentals", prefix: "guide.steps" },
   // StockLotsPage: t(`...lots.setTo.${status}`) — one menu entry per state a
   // batch can be moved into.
   { ns: "inventory", prefix: "lots.setTo" },

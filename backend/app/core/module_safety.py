@@ -41,6 +41,7 @@ REPO_SHIPPED_MODULES = {
     'api_keys',
     'approvals',
     'mcp_server',
+    'rentals',
     'warehouse',
     'equipment',
     'example_widgets',

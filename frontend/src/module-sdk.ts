@@ -121,7 +121,7 @@ export { Badge } from "@/components/ui/Badge";
 // The top of a module's overview: what needs doing, most urgent first.
 export { AttentionCard } from "@/components/ui/AttentionCard";
 export type { AttentionItem } from "@/components/ui/AttentionCard";
-export { Button } from "@/components/ui/Button";
+export { Button, buttonVariants } from "@/components/ui/Button";
 export { Checkbox } from "@/components/ui/Checkbox";
 export { Input } from "@/components/ui/Input";
 // The one look a field label has, for a control that places its own label.
@@ -192,3 +192,46 @@ export type { components } from "@/types/api-generated";
 // template.
 export type { Item, ScannedTemplate, StorageType } from "@/types";
 export type { WithServerDefaults } from "@/types/request";
+
+// --- Rentals additions (additive; see docs/FRONTEND_MODULE_GUIDE.md) --------
+// A side sheet, its parts, and the tabs a module's own screens are grouped by.
+export {
+  Sheet,
+  SheetHeader,
+  SheetBody,
+  SheetFooter,
+  SheetActions,
+} from "@/components/ui/Sheet";
+export { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
+// A select with labels and a search-free option list, for a field with more
+// than a handful of choices where a native select is enough.
+export { Select } from "@/components/ui/Select";
+// A date field (the value is `yyyy-MM-dd`), for a window a screen asks a day at
+// a time and turns into an instant with the organization's clock.
+export { DateInput } from "@/components/ui/DateInput";
+// A record's state in the one badge vocabulary the app reads.
+export { StatusBadge } from "@/components/ui/StatusBadge";
+// A row of chips or a wide grid that scrolls inside its own box on a phone.
+export { ScrollRow } from "@/components/ui/ScrollRow";
+export { useMediaQuery } from "@/hooks/useMediaQuery";
+export {
+  useOrganizationTimezone,
+  useFormatOrgDay,
+} from "@/hooks/useOrganizationTimezone";
+export {
+  formatDate,
+  formatDateTime,
+  formatTime,
+  formatDateRange,
+  formatDateInZone,
+} from "@/utils/formatters";
+// A record page tells a failed read from a record that is not there, and a
+// failed read offers a retry; a missing one sends the reader back.
+export { RecordNotFound } from "@/components/ui/RecordNotFound";
+export { QueryError } from "@/components/ui/QueryResult";
+export { isNotFoundError } from "@/lib/errors";
+export { default as LoadingSpinner } from "@/components/LoadingSpinner";
+// The organization's clock, for a form that asks a day and a time and must
+// store the instant, and for a stored instant shown back on that clock.
+export { zonedWallTimeToInstant, instantToZonedWall } from "@/utils/formatters";
+export { formatQuantityLocale } from "@/utils/formatters";

@@ -1,0 +1,403 @@
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { ArrowLeft, CheckCircle2, CircleDashed, ScanLine } from "lucide-react";
+
+import {
+  Button,
+  Card,
+  Input,
+  LoadingSpinner,
+  NativeSelect,
+  QueryError,
+  ReadOnlyNotice,
+  RecordNotFound,
+  formatDate,
+  formatTime,
+  isNotFoundError,
+  useCanWrite,
+  useModulePageHeader,
+} from "@/module-sdk";
+
+import type { AssetOption } from "../api/rentals";
+import { rentalsApi } from "../api/rentals";
+import {
+  useBooking,
+  usePickupBooking,
+  useRentalAssets,
+} from "../hooks/useRentals";
+
+type Slot = {
+  key: string;
+  lineId: string;
+  itemId: string | null;
+  model: string | null;
+  label: string;
+};
+
+export default function PickupPage() {
+  const { t } = useTranslation("rentals");
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { setHeader } = useModulePageHeader();
+  const canWrite = useCanWrite("rentals");
+  const booking = useBooking(id);
+  const assets = useRentalAssets("");
+  const pickup = usePickupBooking();
+  const [picked, setPicked] = useState<Record<string, string>>({});
+  const [code, setCode] = useState("");
+  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(
+    null,
+  );
+
+  useEffect(() => {
+    setHeader({
+      title: t("pickup.title"),
+      backTo: id ? `/rentals/bookings/${id}` : "/rentals",
+    });
+  }, [setHeader, t, id]);
+
+  const slots: Slot[] = useMemo(() => {
+    if (!booking.data) return [];
+    const list: Slot[] = [];
+    for (const line of booking.data.lines) {
+      if (line.item_id) {
+        list.push({
+          key: `${line.id}:0`,
+          lineId: line.id,
+          itemId: line.item_id,
+          model: null,
+          label: line.item_name ?? "",
+        });
+        continue;
+      }
+      for (let index = 0; index < line.quantity; index += 1) {
+        list.push({
+          key: `${line.id}:${index}`,
+          lineId: line.id,
+          itemId: null,
+          model: line.model ?? null,
+          label: `${line.model} · ${t("pickup.anyUnit")}`,
+        });
+      }
+    }
+    return list;
+  }, [booking.data, t]);
+
+  const totalSlots = booking.isLoading ? 0 : slots.length;
+  const pickedCount = slots.filter((slot) => picked[slot.key]).length;
+  const ready = totalSlots > 0 && pickedCount === totalSlots;
+  const assetsById = useMemo(
+    () => new Map((assets.data ?? []).map((asset) => [asset.id, asset])),
+    [assets.data],
+  );
+
+  function assignSlot(slot: Slot, itemId: string, viaScan: boolean) {
+    setPicked((current) => ({ ...current, [slot.key]: itemId }));
+    const asset = assetsById.get(itemId);
+    if (viaScan) {
+      setMessage({
+        ok: true,
+        text:
+          slot.model !== null
+            ? t("pickup.scanResolvedModel", {
+                name: asset?.name ?? itemId,
+                model: slot.model,
+              })
+            : t("pickup.scanMatched", { name: asset?.name ?? itemId }),
+      });
+    }
+  }
+
+  async function scan(raw: string) {
+    const value = raw.trim();
+    if (!value) return;
+    setCode("");
+    try {
+      const matches = await rentalsApi.assets({ search: value });
+      const exact =
+        matches.find(
+          (asset) =>
+            asset.barcode === value ||
+            asset.serial_number === value ||
+            asset.asset_tag === value,
+        ) ?? matches[0];
+      if (!exact) {
+        setMessage({ ok: false, text: t("pickup.nothingFound") });
+        return;
+      }
+      if (Object.values(picked).includes(exact.id)) {
+        setMessage({
+          ok: false,
+          text: t("pickup.alreadyPicked", { name: exact.name }),
+        });
+        return;
+      }
+      const slot =
+        slots.find(
+          (entry) =>
+            entry.itemId === exact.id &&
+            !picked[entry.key] &&
+            entry.model === null,
+        ) ??
+        slots.find(
+          (entry) => entry.model === exact.model && !picked[entry.key],
+        );
+      if (!slot) {
+        setMessage({
+          ok: false,
+          text: t("pickup.notOnThisBooking", { name: exact.name }),
+        });
+        return;
+      }
+      assignSlot(slot, exact.id, true);
+    } catch {
+      setMessage({ ok: false, text: t("pickup.nothingFound") });
+    }
+  }
+
+  if (booking.isPending || booking.isLoading) return <LoadingSpinner />;
+  if (booking.isError && !isNotFoundError(booking.error)) {
+    return (
+      <QueryError
+        error={booking.error}
+        onRetry={() => void booking.refetch()}
+      />
+    );
+  }
+  if (!booking.data) {
+    return (
+      <RecordNotFound
+        title={t("detail.notFound")}
+        backTo="/rentals"
+        backLabel={t("title")}
+      />
+    );
+  }
+  const data = booking.data;
+
+  const optionsFor = (slot: Slot): AssetOption[] => {
+    if (slot.itemId) {
+      return (assets.data ?? []).filter((asset) => asset.id === slot.itemId);
+    }
+    const taken = new Set(Object.values(picked));
+    return (assets.data ?? []).filter(
+      (asset) =>
+        asset.model === slot.model &&
+        !taken.has(asset.id) &&
+        !slots.some(
+          (entry) => entry.model === null && entry.itemId === asset.id,
+        ),
+    );
+  };
+
+  return (
+    <div className="mx-auto flex w-full max-w-xl flex-col gap-4">
+      <ReadOnlyNotice module="rentals" />
+      {assets.isError ? (
+        <p
+          role="alert"
+          className="m-0 rounded-lg bg-red-50 p-3 text-sm text-red-800"
+        >
+          {t("errors.loadChoices")}
+        </p>
+      ) : null}
+      <Link
+        to={id ? `/rentals/bookings/${id}` : "/rentals"}
+        className="inline-flex min-h-11 items-center gap-1 text-sm"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        {t("pickup.back")}
+      </Link>
+
+      <Card className="flex flex-col gap-0.5 px-4 py-3">
+        <span className="text-base font-semibold">{t("pickup.title")}</span>
+        <span className="text-sm text-zinc-500">
+          {data.borrower_name} · {formatDate(data.ends_at)}{" "}
+          {formatTime(data.ends_at)}
+        </span>
+      </Card>
+
+      {message ? (
+        <div
+          role="status"
+          className={`flex items-start gap-2.5 rounded-xl px-3.5 py-3 text-sm ${
+            message.ok
+              ? "bg-success-50 text-success-900"
+              : "bg-red-50 text-red-800"
+          }`}
+        >
+          <span className="font-semibold">{message.text}</span>
+        </div>
+      ) : null}
+
+      <PickupSlots
+        slots={slots}
+        picked={picked}
+        pickedCount={pickedCount}
+        totalSlots={totalSlots}
+        assetsById={assetsById}
+        optionsFor={optionsFor}
+        onAssign={assignSlot}
+      />
+      <ScanCard code={code} onCode={setCode} onScan={scan} />
+      <ConfirmBar
+        ready={ready}
+        canWrite={canWrite}
+        pending={pickup.isPending}
+        missing={totalSlots - pickedCount}
+        onConfirm={() =>
+          pickup.mutate(
+            {
+              id: data.id,
+              data: {
+                item_ids: slots
+                  .map((slot) => picked[slot.key])
+                  .filter((value): value is string => Boolean(value)),
+              },
+            },
+            { onSuccess: () => navigate(`/rentals/bookings/${data.id}`) },
+          )
+        }
+      />
+    </div>
+  );
+}
+
+function PickupSlots({
+  slots,
+  picked,
+  pickedCount,
+  totalSlots,
+  assetsById,
+  optionsFor,
+  onAssign,
+}: {
+  slots: Slot[];
+  picked: Record<string, string>;
+  pickedCount: number;
+  totalSlots: number;
+  assetsById: Map<string, AssetOption>;
+  optionsFor: (slot: Slot) => AssetOption[];
+  onAssign: (slot: Slot, itemId: string, viaScan: boolean) => void;
+}) {
+  const { t } = useTranslation("rentals");
+  return (
+    <Card className="overflow-hidden">
+      <h2 className="m-0 border-b border-zinc-200 px-3.5 py-3 text-sm font-semibold">
+        {t("pickup.toHandOut", { picked: pickedCount, total: totalSlots })}
+      </h2>
+      {slots.map((slot) => {
+        const value = picked[slot.key] ?? "";
+        const asset = value ? assetsById.get(value) : undefined;
+        return (
+          <div
+            key={slot.key}
+            className="flex flex-wrap items-center gap-2.5 border-b border-zinc-100 px-3.5 py-3 last:border-b-0"
+          >
+            {asset ? (
+              <CheckCircle2 className="h-5 w-5 flex-none text-success-700" />
+            ) : (
+              <CircleDashed className="h-5 w-5 flex-none text-zinc-400" />
+            )}
+            <div className="min-w-0 flex-1">
+              <span className="block text-sm font-medium">
+                {asset?.name ?? slot.label}
+              </span>
+              <span className="block text-xs text-zinc-500">
+                {slot.itemId
+                  ? t("pickup.specificUnit")
+                  : t("pickup.anyUnitLine")}
+              </span>
+            </div>
+            {slot.itemId && value ? null : (
+              <div className="w-full sm:w-56">
+                <NativeSelect
+                  aria-label={t("pickup.choose", { name: slot.label })}
+                  value={value}
+                  onChange={(event) =>
+                    onAssign(slot, event.target.value, false)
+                  }
+                >
+                  <option value="">{t("pickup.chooseUnit")}</option>
+                  {optionsFor(slot).map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.name}
+                      {option.serial_number ? ` · ${option.serial_number}` : ""}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </Card>
+  );
+}
+
+function ScanCard({
+  code,
+  onCode,
+  onScan,
+}: {
+  code: string;
+  onCode: (value: string) => void;
+  onScan: (value: string) => void;
+}) {
+  const { t } = useTranslation("rentals");
+  return (
+    <Card className="flex flex-col gap-2 px-3.5 py-3">
+      <div className="flex gap-2">
+        <Input
+          id="pickup-scan"
+          label={t("pickup.scan")}
+          value={code}
+          onChange={(event) => onCode(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              onScan(code);
+            }
+          }}
+          placeholder={t("pickup.scanPlaceholder")}
+        />
+        <Button type="button" variant="outline" onClick={() => onScan(code)}>
+          <ScanLine className="mr-1.5 h-4 w-4" />
+          {t("pickup.scanButton")}
+        </Button>
+      </div>
+      <p className="m-0 text-xs text-zinc-500">{t("pickup.scanHint")}</p>
+    </Card>
+  );
+}
+
+function ConfirmBar({
+  ready,
+  canWrite,
+  pending,
+  missing,
+  onConfirm,
+}: {
+  ready: boolean;
+  canWrite: boolean;
+  pending: boolean;
+  missing: number;
+  onConfirm: () => void;
+}) {
+  const { t } = useTranslation("rentals");
+  return (
+    <div className="sticky bottom-[calc(var(--mobile-nav-height)+env(safe-area-inset-bottom,0px)+0.5rem)] z-[var(--z-sticky)] rounded-xl border border-zinc-200 bg-white p-3 md:bottom-2">
+      <Button
+        type="button"
+        variant="primary"
+        className="w-full"
+        disabled={!ready || !canWrite}
+        isLoading={pending}
+        onClick={onConfirm}
+      >
+        {ready ? t("pickup.confirm") : t("pickup.missing", { count: missing })}
+      </Button>
+    </div>
+  );
+}

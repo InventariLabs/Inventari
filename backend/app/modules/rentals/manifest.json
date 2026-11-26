@@ -1,0 +1,37 @@
+{
+  "name": "rentals",
+  "version": "0.1.0",
+  "inventari_min_version": "0.13.0",
+  "category": "business",
+  "display_name": "Rentals",
+  "description": "Reserve equipment for a window, hand it out and take it back.",
+  "icon": "Package",
+  "module_type": "official",
+  "requires": [
+    "equipment"
+  ],
+  "capabilities": [
+    "database"
+  ],
+  "permissions": [
+    {
+      "key": "rentals:read",
+      "label_key": "rentals:permissions.read",
+      "description_key": "rentals:permissions.readDesc",
+      "default_roles": [
+        "manager",
+        "user",
+        "viewer"
+      ]
+    },
+    {
+      "key": "rentals:write",
+      "label_key": "rentals:permissions.write",
+      "description_key": "rentals:permissions.writeDesc",
+      "default_roles": [
+        "manager",
+        "user"
+      ]
+    }
+  ]
+}

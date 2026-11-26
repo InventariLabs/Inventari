@@ -1,3 +1,10 @@
+rentals | owner=core | expires=2027-11-26 | a booking's availability is decided in one transaction under an advisory lock, which CoreAPI does not express, and its refusals are the core catalogue's; the equipment register is reached through that module's public API, which the manifest requires.
+  app.core.db_utils
+  app.core.exceptions
+  app.core.migration_helpers
+  app.i18n.service
+  app.modules.equipment.equipment_api
+
 # Module import-surface baseline
 #
 # A module reaches Core through three paths: app.core.module_sdk (registration,

@@ -8,32 +8,22 @@
     "disabled": "Módulo {{name}} desativado"
   },
   "modules": {
+    "announcements": {
+      "name": "Avisos"
+    },
+    "api_keys": {
+      "name": "Chaves de API",
+      "description": "Acesso programático por chaves da API REST."
+    },
+    "approvals": {
+      "name": "Aprovações",
+      "description": "Fluxos de aprovação em várias etapas para operações críticas."
+    },
+    "categories": {
+      "name": "Categorias"
+    },
     "core": {
       "title": "Casa e cozinha"
-    },
-    "shopping_lists": {
-      "name": "Listas de compras",
-      "description": "Crie e gerencie listas de compras com sugestões automáticas."
-    },
-    "vision": {
-      "name": "Reconhecimento por foto",
-      "description": "Lê o nome, a marca e a validade de um produto a partir da foto do rótulo. Desativado, o cadastro de produtos perde a aba de foto e as tabelas nutricionais precisam ser digitadas."
-    },
-    "stats": {
-      "name": "Estatísticas",
-      "description": "Análise avançada de consumo e acompanhamento de perdas."
-    },
-    "stock_takes": {
-      "name": "Contagens de estoque",
-      "description": "Conferências periódicas do estoque para verificar sua exatidão."
-    },
-    "partners": {
-      "name": "Parceiros",
-      "description": "Gerencie fornecedores, clientes e prestadores de serviço para fluxos B2B."
-    },
-    "recipes": {
-      "name": "Receitas",
-      "description": "Crie e gerencie receitas com controle de ingredientes."
     },
     "equipment": {
       "name": "Controle de equipamentos",
@@ -43,53 +33,67 @@
       "name": "Widgets de exemplo",
       "description": "Módulo de referência que demonstra os padrões de módulos do Inventari: gerencie widgets simples com nome, cor e quantidade."
     },
-    "warehouse": {
-      "name": "Armazém",
-      "description": "Com a câmera do celular ou um leitor, receba, despache, mova e conte o estoque; os documentos numerados são gerados em segundo plano, com regras de armazenagem."
-    },
-    "purchase_orders": {
-      "name": "Pedidos de compra",
-      "description": "Crie e acompanhe pedidos de compra com fornecedores."
-    },
-    "printing": {
-      "name": "Impressão de etiquetas",
-      "description": "Gere e imprima etiquetas para produtos e locais."
-    },
-    "nutrition": {
-      "name": "Informações nutricionais",
-      "description": "Exibe dados nutricionais e ingredientes do Open Food Facts."
-    },
-    "approvals": {
-      "name": "Aprovações",
-      "description": "Fluxos de aprovação em várias etapas para operações críticas."
-    },
-    "webhooks": {
-      "name": "Webhooks",
-      "description": "Notificações HTTP de saída sobre eventos no seu espaço de trabalho."
-    },
-    "api_keys": {
-      "name": "Chaves de API",
-      "description": "Acesso programático por chaves da API REST."
-    },
-    "maker": {
-      "name": "Produção",
-      "description": "Ordens de produção, listas de materiais (BOM) e consolidação de custos."
-    },
     "items": {
       "name": "Estoque"
     },
     "locations": {
       "name": "Locais"
     },
-    "categories": {
-      "name": "Categorias"
-    },
-    "announcements": {
-      "name": "Avisos"
+    "maker": {
+      "name": "Produção",
+      "description": "Ordens de produção, listas de materiais (BOM) e consolidação de custos."
     },
     "mcp_server": {
       "name": "Servidor MCP",
       "description": "Permita que um agente de IA trabalhe com este espaço por meio do Model Context Protocol, com uma chave que só vê o que pode."
+    },
+    "nutrition": {
+      "name": "Informações nutricionais",
+      "description": "Exibe dados nutricionais e ingredientes do Open Food Facts."
+    },
+    "partners": {
+      "name": "Parceiros",
+      "description": "Gerencie fornecedores, clientes e prestadores de serviço para fluxos B2B."
+    },
+    "printing": {
+      "name": "Impressão de etiquetas",
+      "description": "Gere e imprima etiquetas para produtos e locais."
+    },
+    "purchase_orders": {
+      "name": "Pedidos de compra",
+      "description": "Crie e acompanhe pedidos de compra com fornecedores."
+    },
+    "recipes": {
+      "name": "Receitas",
+      "description": "Crie e gerencie receitas com controle de ingredientes."
+    },
+    "rentals": {
+      "name": "Aluguéis",
+      "description": "Reserve equipamentos para um período, entregue e receba de volta."
+    },
+    "shopping_lists": {
+      "name": "Listas de compras",
+      "description": "Crie e gerencie listas de compras com sugestões automáticas."
+    },
+    "stats": {
+      "name": "Estatísticas",
+      "description": "Análise avançada de consumo e acompanhamento de perdas."
+    },
+    "stock_takes": {
+      "name": "Contagens de estoque",
+      "description": "Conferências periódicas do estoque para verificar sua exatidão."
+    },
+    "vision": {
+      "name": "Reconhecimento por foto",
+      "description": "Lê o nome, a marca e a validade de um produto a partir da foto do rótulo. Desativado, o cadastro de produtos perde a aba de foto e as tabelas nutricionais precisam ser digitadas."
+    },
+    "warehouse": {
+      "name": "Armazém",
+      "description": "Com a câmera do celular ou um leitor, receba, despache, mova e conte o estoque; os documentos numerados são gerados em segundo plano, com regras de armazenagem."
+    },
+    "webhooks": {
+      "name": "Webhooks",
+      "description": "Notificações HTTP de saída sobre eventos no seu espaço de trabalho."
     }
   },
   "config": {

@@ -57,6 +57,7 @@ and must name each key from this catalog, not from a vocabulary of its own.
 | `partners` (virtual) | Partners | Partnerzy | Partner | Partenaires | Socios | Parceiros | Manage suppliers, customers, and service providers for B2B workflows. |
 | `printing` | Label Printing | Druk etykiet | Etikettendruck | Impression d'étiquettes | Impresión de etiquetas | Impressão de etiquetas | Generate and print labels for products and locations. |
 | `purchase_orders` | Purchase Orders | Zamówienia zakupu | Einkaufsbestellungen | Bons de commande | Órdenes de compra | Pedidos de compra | Create and track purchase orders with suppliers. |
+| `rentals` | Rentals | Wypożyczenia | Verleih | Locations de matériel | Alquileres | Aluguéis | Reserve equipment for a window, hand it out and take it back, and see what is late. |
 | `recipes` | Recipes | Przepisy | Rezepte | Recettes | Recetas | Receitas | Create and manage recipes with ingredient tracking. |
 | `shopping_lists` | Shopping Lists | Listy zakupów | Einkaufslisten | Listes de courses | Listas de compras | Listas de compras | Create and manage shopping lists with automatic suggestions. |
 | `stats` | Statistics | Statystyki | Statistiken | Statistiques | Estadísticas | Estatísticas | Advanced consumption analysis and waste tracking. |

@@ -8,32 +8,22 @@
     "disabled": "Module {{name}} disabled"
   },
   "modules": {
+    "announcements": {
+      "name": "Announcements"
+    },
+    "api_keys": {
+      "name": "API Keys",
+      "description": "Programmatic access via REST API keys."
+    },
+    "approvals": {
+      "name": "Approvals",
+      "description": "Multi-stage approval workflows for critical operations."
+    },
+    "categories": {
+      "name": "Categories"
+    },
     "core": {
       "title": "Home & Kitchen"
-    },
-    "shopping_lists": {
-      "name": "Shopping Lists",
-      "description": "Create and manage shopping lists with automatic suggestions."
-    },
-    "vision": {
-      "name": "Photo Recognition",
-      "description": "Reads a product's name, brand and expiry date off a photo of its label. Switched off, adding a product loses its photo tab and nutrition tables have to be typed in."
-    },
-    "stats": {
-      "name": "Statistics",
-      "description": "Advanced consumption analysis and waste tracking."
-    },
-    "stock_takes": {
-      "name": "Stock Takes",
-      "description": "Periodic inventory checks to verify stock accuracy."
-    },
-    "partners": {
-      "name": "Partners",
-      "description": "Manage suppliers, customers, and service providers for B2B workflows."
-    },
-    "recipes": {
-      "name": "Recipes",
-      "description": "Create and manage recipes with ingredient tracking."
     },
     "equipment": {
       "name": "Equipment Tracking",
@@ -43,53 +33,67 @@
       "name": "Example Widgets",
       "description": "Reference module demonstrating Inventari module patterns: manage simple widgets with a name, color, and quantity."
     },
-    "warehouse": {
-      "name": "Warehouse",
-      "description": "Scan with your phone's camera or a scanner to receive, issue, move and count stock; the numbered documents are written in the background, with putaway rules."
-    },
-    "purchase_orders": {
-      "name": "Purchase Orders",
-      "description": "Create and track purchase orders with suppliers."
-    },
-    "printing": {
-      "name": "Label Printing",
-      "description": "Generate and print labels for products and locations."
-    },
-    "nutrition": {
-      "name": "Nutrition Info",
-      "description": "Display nutritional data and ingredients from Open Food Facts."
-    },
-    "approvals": {
-      "name": "Approvals",
-      "description": "Multi-stage approval workflows for critical operations."
-    },
-    "webhooks": {
-      "name": "Webhooks",
-      "description": "Outbound HTTP notifications about events in your workspace."
-    },
-    "api_keys": {
-      "name": "API Keys",
-      "description": "Programmatic access via REST API keys."
-    },
-    "maker": {
-      "name": "Production",
-      "description": "Production runs, bills of materials (BOM), and cost rollup."
-    },
     "items": {
       "name": "Inventory"
     },
     "locations": {
       "name": "Locations"
     },
-    "categories": {
-      "name": "Categories"
-    },
-    "announcements": {
-      "name": "Announcements"
+    "maker": {
+      "name": "Production",
+      "description": "Production runs, bills of materials (BOM), and cost rollup."
     },
     "mcp_server": {
       "name": "MCP Server",
       "description": "Let an AI agent work with this workspace over the Model Context Protocol, with a key that sees only what it may."
+    },
+    "nutrition": {
+      "name": "Nutrition Info",
+      "description": "Display nutritional data and ingredients from Open Food Facts."
+    },
+    "partners": {
+      "name": "Partners",
+      "description": "Manage suppliers, customers, and service providers for B2B workflows."
+    },
+    "printing": {
+      "name": "Label Printing",
+      "description": "Generate and print labels for products and locations."
+    },
+    "purchase_orders": {
+      "name": "Purchase Orders",
+      "description": "Create and track purchase orders with suppliers."
+    },
+    "recipes": {
+      "name": "Recipes",
+      "description": "Create and manage recipes with ingredient tracking."
+    },
+    "rentals": {
+      "name": "Rentals",
+      "description": "Reserve equipment for a window, hand it out and take it back."
+    },
+    "shopping_lists": {
+      "name": "Shopping Lists",
+      "description": "Create and manage shopping lists with automatic suggestions."
+    },
+    "stats": {
+      "name": "Statistics",
+      "description": "Advanced consumption analysis and waste tracking."
+    },
+    "stock_takes": {
+      "name": "Stock Takes",
+      "description": "Periodic inventory checks to verify stock accuracy."
+    },
+    "vision": {
+      "name": "Photo Recognition",
+      "description": "Reads a product's name, brand and expiry date off a photo of its label. Switched off, adding a product loses its photo tab and nutrition tables have to be typed in."
+    },
+    "warehouse": {
+      "name": "Warehouse",
+      "description": "Scan with your phone's camera or a scanner to receive, issue, move and count stock; the numbered documents are written in the background, with putaway rules."
+    },
+    "webhooks": {
+      "name": "Webhooks",
+      "description": "Outbound HTTP notifications about events in your workspace."
     }
   },
   "config": {

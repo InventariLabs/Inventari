@@ -76,6 +76,7 @@ DEMO_EXTRA_MODULES = [
     'nutrition',
     'api_keys',
     'mcp_server',
+    'rentals',
 ]
 
 #: Modules that seed no rows but that the demo switches on because the server

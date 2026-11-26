@@ -43,6 +43,8 @@ async def checkout(
     org_id: UUID,
     data: AssignmentCreate,
     user_id: UUID,
+    *,
+    pin_expected_return: bool = True,
 ) -> AssignmentSchema:
     from app.core.public_api import core_api
 
@@ -144,8 +146,10 @@ async def checkout(
     # inside the organization's day and the service pins the end of the day
     # it reads there, so every reader — and the overdue check — sees the day
     # the form said, whatever clock the reader's browser runs (review 2026-09-23).
+    # A booking names its window to the minute, so the contract that hands
+    # one out asks for the instant as given.
     expected_return_at = data.expected_return_at
-    if expected_return_at is not None:
+    if expected_return_at is not None and pin_expected_return:
         tz = await core_api.organizations.timezone_async(db, org_id)
         expected_return_at = pin_org_day_end(expected_return_at, tz)
 

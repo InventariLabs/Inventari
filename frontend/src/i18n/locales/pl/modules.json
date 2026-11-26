@@ -8,32 +8,22 @@
     "disabled": "Moduł {{name}} został wyłączony"
   },
   "modules": {
+    "announcements": {
+      "name": "Ogłoszenia"
+    },
+    "api_keys": {
+      "name": "Klucze API",
+      "description": "Programowy dostęp przez klucze REST API."
+    },
+    "approvals": {
+      "name": "Zatwierdzenia",
+      "description": "Wieloetapowe przepływy zatwierdzeń dla krytycznych operacji."
+    },
+    "categories": {
+      "name": "Kategorie"
+    },
     "core": {
       "title": "Dom i Kuchnia"
-    },
-    "shopping_lists": {
-      "name": "Listy zakupów",
-      "description": "Twórz i zarządzaj listami zakupów, automatyczne sugestie."
-    },
-    "vision": {
-      "name": "Rozpoznawanie ze zdjęć",
-      "description": "Odczytuje nazwę, markę i datę przydatności produktu ze zdjęcia etykiety. Wyłączony — dodawanie produktu traci zakładkę ze zdjęciem, a tabele wartości odżywczych trzeba wpisać ręcznie."
-    },
-    "stats": {
-      "name": "Statystyki",
-      "description": "Zaawansowana analiza spożycia i śledzenie marnotrawstwa."
-    },
-    "stock_takes": {
-      "name": "Inwentaryzacja",
-      "description": "Okresowe kontrole zapasów w celu weryfikacji dokładności stanów."
-    },
-    "partners": {
-      "name": "Partnerzy",
-      "description": "Zarządzaj dostawcami, klientami i usługodawcami dla przepływów B2B."
-    },
-    "recipes": {
-      "name": "Przepisy",
-      "description": "Twórz i zarządzaj przepisami ze śledzeniem składników."
     },
     "equipment": {
       "name": "Śledzenie sprzętu",
@@ -43,53 +33,67 @@
       "name": "Przykładowe widżety",
       "description": "Moduł referencyjny pokazujący wzorce modułów Inventari: zarządzaj prostymi widżetami z nazwą, kolorem i liczbą."
     },
-    "warehouse": {
-      "name": "Magazyn",
-      "description": "Aparatem telefonu lub skanerem przyjmuj, wydawaj, przenoś i licz towar; numerowane dokumenty powstają w tle — z regułami rozmieszczania."
-    },
-    "purchase_orders": {
-      "name": "Zamówienia zakupu",
-      "description": "Twórz i śledź zamówienia zakupu u dostawców."
-    },
-    "printing": {
-      "name": "Druk etykiet",
-      "description": "Generuj i drukuj etykiety dla produktów i miejsc."
-    },
-    "nutrition": {
-      "name": "Wartości odżywcze",
-      "description": "Wyświetlaj dane odżywcze i składniki z Open Food Facts."
-    },
-    "approvals": {
-      "name": "Zatwierdzenia",
-      "description": "Wieloetapowe przepływy zatwierdzeń dla krytycznych operacji."
-    },
-    "webhooks": {
-      "name": "Webhooki",
-      "description": "Wychodzące powiadomienia HTTP o zdarzeniach w obszarze roboczym."
-    },
-    "api_keys": {
-      "name": "Klucze API",
-      "description": "Programowy dostęp przez klucze REST API."
-    },
-    "maker": {
-      "name": "Produkcja",
-      "description": "Zarządzanie produkcją i listami materiałów (BOM)."
-    },
     "items": {
       "name": "Inwentarz"
     },
     "locations": {
       "name": "Miejsca"
     },
-    "categories": {
-      "name": "Kategorie"
-    },
-    "announcements": {
-      "name": "Ogłoszenia"
+    "maker": {
+      "name": "Produkcja",
+      "description": "Zarządzanie produkcją i listami materiałów (BOM)."
     },
     "mcp_server": {
       "name": "Serwer MCP",
       "description": "Pozwól agentowi AI pracować z tą przestrzenią przez Model Context Protocol, kluczem, który widzi tylko to, co może."
+    },
+    "nutrition": {
+      "name": "Wartości odżywcze",
+      "description": "Wyświetlaj dane odżywcze i składniki z Open Food Facts."
+    },
+    "partners": {
+      "name": "Partnerzy",
+      "description": "Zarządzaj dostawcami, klientami i usługodawcami dla przepływów B2B."
+    },
+    "printing": {
+      "name": "Druk etykiet",
+      "description": "Generuj i drukuj etykiety dla produktów i miejsc."
+    },
+    "purchase_orders": {
+      "name": "Zamówienia zakupu",
+      "description": "Twórz i śledź zamówienia zakupu u dostawców."
+    },
+    "recipes": {
+      "name": "Przepisy",
+      "description": "Twórz i zarządzaj przepisami ze śledzeniem składników."
+    },
+    "rentals": {
+      "name": "Wypożyczenia",
+      "description": "Rezerwuj sprzęt na termin, wydawaj go i przyjmuj zwroty."
+    },
+    "shopping_lists": {
+      "name": "Listy zakupów",
+      "description": "Twórz i zarządzaj listami zakupów, automatyczne sugestie."
+    },
+    "stats": {
+      "name": "Statystyki",
+      "description": "Zaawansowana analiza spożycia i śledzenie marnotrawstwa."
+    },
+    "stock_takes": {
+      "name": "Inwentaryzacja",
+      "description": "Okresowe kontrole zapasów w celu weryfikacji dokładności stanów."
+    },
+    "vision": {
+      "name": "Rozpoznawanie ze zdjęć",
+      "description": "Odczytuje nazwę, markę i datę przydatności produktu ze zdjęcia etykiety. Wyłączony — dodawanie produktu traci zakładkę ze zdjęciem, a tabele wartości odżywczych trzeba wpisać ręcznie."
+    },
+    "warehouse": {
+      "name": "Magazyn",
+      "description": "Aparatem telefonu lub skanerem przyjmuj, wydawaj, przenoś i licz towar; numerowane dokumenty powstają w tle — z regułami rozmieszczania."
+    },
+    "webhooks": {
+      "name": "Webhooki",
+      "description": "Wychodzące powiadomienia HTTP o zdarzeniach w obszarze roboczym."
     }
   },
   "config": {
