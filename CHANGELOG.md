@@ -60,6 +60,9 @@ says what the release does rather than what changed since them.
   instead of being saved or answered with a server error, an opened amount
   sent without its unit reads in the record's own unit, and the recipe price
   placeholder follows the reader's decimal mark.
+- Back returns a list to where it stood when you tapped away from it, also
+  when the tap came right after a scroll on a busy phone; it could return to
+  an earlier position, several hundred pixels off.
 - On a phone, the *Type a code* sheet over the running scanner answers to
   touch: its field, *Scan*, *Close* and the backdrop take a press, where only
   a keyboard reached them before. The *⋯* menu of a warehouse document and of
