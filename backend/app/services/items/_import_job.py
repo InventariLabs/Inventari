@@ -7,6 +7,8 @@ longer than a browser or a proxy waits on one request. A sheet above
 rows are imported by a task that outlives the request, and the screen reads
 the job (:func:`read_job_async`) until it is done. A smaller sheet is
 imported inside the request and answered with its result, as before.
+A Grocy database file takes the same road by the same count, its products
+and batches standing for rows (:mod:`._grocy_import`).
 
 The task owns its session: the request's closes when the request ends. The
 job row is committed before the answer goes out, so the first read finds it.
@@ -15,7 +17,7 @@ job row is committed before the answer goes out, so the first read finds it.
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from contextlib import AbstractAsyncContextManager
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -100,9 +102,15 @@ async def _record_progress_async(db: AsyncSession, job_id: UUID, **values: Any) 
     await db.commit()
 
 
-async def run_job_async(
-    job_id: UUID,
-    session_factory: SessionFactory,
+#: What a job does with the session it owns: the import, telling the
+#: callback how many of its steps are done, and answering with the summary
+#: the synchronous answer would have carried.
+Work = Callable[
+    [AsyncSession, Callable[[int], Awaitable[None]]], Awaitable[dict[str, Any]]
+]
+
+
+def _sheet_work(
     *,
     file_content: bytes,
     filename: str,
@@ -111,24 +119,45 @@ async def run_job_async(
     create_missing_locations: bool,
     create_missing_categories: bool,
     on_label_match: LabelMatch,
-) -> None:
-    """Import the sheet and write what happened onto the job.
+) -> Work:
+    async def work(
+        db: AsyncSession, on_batch: Callable[[int], Awaitable[None]]
+    ) -> dict[str, Any]:
+        return await import_items(
+            db=db,
+            file_content=file_content,
+            filename=filename,
+            mapping=mapping,
+            user=user,
+            create_missing_locations=create_missing_locations,
+            create_missing_categories=create_missing_categories,
+            on_label_match=on_label_match,
+            on_batch=on_batch,
+        )
 
-    The task owns its session and its transactions: no request is around it
-    to commit for it.
+    return work
+
+
+async def run_job_async(
+    job_id: UUID,
+    session_factory: SessionFactory,
+    *,
+    work: Work | None = None,
+    **sheet: Any,
+) -> None:
+    """Run the import and write what happened onto the job.
+
+    ``work`` is the import to run; without it the job imports the sheet
+    the remaining arguments describe (:func:`_sheet_work`). The task owns
+    its session and its transactions: no request is around it to commit
+    for it.
     """
+    work = work or _sheet_work(**sheet)
     async with session_factory() as db:
         try:
-            result = await import_items(
-                db=db,
-                file_content=file_content,
-                filename=filename,
-                mapping=mapping,
-                user=user,
-                create_missing_locations=create_missing_locations,
-                create_missing_categories=create_missing_categories,
-                on_label_match=on_label_match,
-                on_batch=lambda processed: _record_progress_async(
+            result = await work(
+                db,
+                lambda processed: _record_progress_async(
                     db, job_id, processed=processed
                 ),
             )

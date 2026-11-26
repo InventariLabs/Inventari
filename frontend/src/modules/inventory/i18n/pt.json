@@ -23,7 +23,6 @@
   },
   "toasts": {
     "importFailedToAnalyze": "Não foi possível analisar o arquivo",
-    "importGrocyMappingApplied": "Mapeamento do Grocy aplicado!",
     "importFailed": "Falha na importação",
     "archivedLabelFreed": "A etiqueta agora está livre para reutilização"
   },

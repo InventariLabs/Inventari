@@ -23,7 +23,6 @@
   },
   "toasts": {
     "importFailedToAnalyze": "Failed to analyze file",
-    "importGrocyMappingApplied": "Grocy mapping applied!",
     "importFailed": "Import failed",
     "archivedLabelFreed": "Label is now free for reuse"
   },

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyGrocyPreset, suggestMapping } from "./importMapping";
+import { suggestMapping } from "./importMapping";
 
 /** The header row `export_items_to_xlsx` writes for a priced, tracked org. */
 const EXPORT_HEADERS = [
@@ -64,16 +64,6 @@ describe("suggestMapping", () => {
     expect(suggestMapping(["Quantity", "Quantity (old)"]).quantity).toBe(
       "Quantity",
     );
-  });
-});
-
-describe("applyGrocyPreset", () => {
-  it("maps Grocy's export headers over whatever was suggested", () => {
-    const headers = ["name", "amount", "best_before_date", "location"];
-    const mapping = applyGrocyPreset(headers, suggestMapping(headers));
-    expect(mapping.quantity).toBe("amount");
-    expect(mapping.expiry_date).toBe("best_before_date");
-    expect(mapping.location).toBe("location");
   });
 });
 

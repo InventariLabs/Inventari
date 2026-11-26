@@ -325,8 +325,17 @@ database: check it against the label, and see the note on allergens and nutritio
 - The number above the list counts records, one per batch or shelf a product
   stands on, not products; the category cards count products.
 - Sorting by date added, name, quantity or expiry.
-- **Import** reads XLSX, CSV or a Grocy export, and can create missing locations
-  and categories as it goes. A row filed under a product you already have takes
+- **Import** reads XLSX or CSV, and can create missing locations and
+  categories as it goes. Its **Import from Grocy** tile moves a Grocy
+  household in from Grocy's own database file, `grocy.db` in Grocy's `data`
+  folder (in Docker, the volume mounted at `/config/data` or
+  `/var/www/data`); Grocy itself writes no export. Before anything is written
+  it shows what the file holds, what it would create and what stays in Grocy
+  — recipes, chores, pictures, extra barcodes and the like. Every batch of
+  stock becomes a record with its best-before date, price, purchase date,
+  shelf, store and opened mark; prices are read in the organization's
+  currency. With **Shopping lists** on, Grocy's shopping lists come across
+  too. Running the same file again adds only what is new. A row filed under a product you already have takes
   that product's name, and one whose unit cannot be converted into the
   product's is refused with both units named. **Export** downloads what the
   list currently shows as XLSX, with the SKU, description, stock alert, the
