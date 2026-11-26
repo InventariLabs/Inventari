@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Input } from "@/components/ui/Input";
 import { NativeSelect } from "@/components/ui/NativeSelect";
 import { useFormGuard } from "@/hooks/useFormGuard";
+import { useRecordFields } from "@/modules/shared/hooks/useRecordFields";
 import { CURRENCY_CODES, currencyLabel } from "@/lib/currencies";
 import { COUNTRY_CODES, countryLabel } from "@/lib/countries";
 import { TIMEZONE_CODES, timezoneLabel } from "@/lib/timezones";
@@ -114,6 +115,14 @@ type LoadedOrg = NonNullable<ReturnType<typeof useOrganization>["data"]>;
 const currencyOf = (org?: LoadedOrg) => org?.currency ?? "USD";
 const timezoneOf = (org?: LoadedOrg) => org?.timezone ?? "UTC";
 
+function organizationFormOf(org?: LoadedOrg) {
+  return {
+    name: org?.name ?? "",
+    currency: currencyOf(org),
+    timezone: timezoneOf(org),
+  };
+}
+
 /** The issuer block as the form holds it. The wire types the address a loose
  * dict; the form reads exactly its three members, so they are narrowed once,
  * here. */
@@ -129,7 +138,6 @@ function issuerFormOf(org?: LoadedOrg) {
     street: address.street ?? "",
     city: address.city ?? "",
     postalCode: address.postal_code ?? "",
-    logoUrl: org?.logo_url ?? null,
   };
 }
 
@@ -145,33 +153,24 @@ function OrganizationCard({
   // Queries
   const { data: household } = useOrganization();
 
-  // The card mounts only once the organization has been read, so the forms
-  // start from the stored values rather than from a first dirty render.
-  const [orgName, setOrgName] = useState(household?.name ?? "");
-  const [selectedCurrency, setSelectedCurrency] = useState(
-    currencyOf(household),
+  // The card mounts only once the organization has been read, so the form
+  // starts from the stored values rather than from a first dirty render.
+  const { fields, setField, markSaved } = useRecordFields(
+    household,
+    organizationFormOf,
   );
-  const [selectedTimezone, setSelectedTimezone] = useState(
-    timezoneOf(household),
-  );
-
-  useEffect(() => {
-    if (household) {
-      setOrgName(household.name);
-      setSelectedCurrency(currencyOf(household));
-      setSelectedTimezone(timezoneOf(household));
-    }
-  }, [household]);
 
   // Mutations
   const updateOrgMutation = useUpdateOrganization();
 
   const savedCurrency =
     household?.settings?.currency ?? household?.currency ?? "USD";
-  const currencyChanged = selectedCurrency !== savedCurrency;
-  const timezoneChanged = selectedTimezone !== timezoneOf(household);
+  const currencyChanged = fields.currency !== savedCurrency;
+  const timezoneChanged = fields.timezone !== timezoneOf(household);
   const isDirty =
-    orgName !== (household?.name ?? "") || currencyChanged || timezoneChanged;
+    fields.name !== (household?.name ?? "") ||
+    currencyChanged ||
+    timezoneChanged;
 
   // The page's gate asks about this card's unsaved work on the way out; the
   // report, not the local flag, is what reaches it.
@@ -181,14 +180,14 @@ function OrganizationCard({
   }, [isDirty, onDirtyChange]);
 
   const handleSaveConfig = () => {
-    updateOrgMutation.mutate(
-      { name: orgName, currency: selectedCurrency, timezone: selectedTimezone },
-      {
-        onSuccess: () => toast.success(t("settings.organization.saved")),
-        onError: (err: unknown) =>
-          toast.error(extractApiError(err, t("messages.error"))),
+    updateOrgMutation.mutate(fields, {
+      onSuccess: () => {
+        markSaved(fields);
+        toast.success(t("settings.organization.saved"));
       },
-    );
+      onError: (err: unknown) =>
+        toast.error(extractApiError(err, t("messages.error"))),
+    });
   };
 
   return (
@@ -218,8 +217,8 @@ function OrganizationCard({
               label={t("settings.organization.orgName", {
                 defaultValue: "Organization name",
               })}
-              value={orgName}
-              onChange={(e) => setOrgName(e.target.value)}
+              value={fields.name}
+              onChange={(e) => setField("name", e.target.value)}
             />
           </div>
 
@@ -231,8 +230,8 @@ function OrganizationCard({
               label={t("settings.organization.currency", {
                 defaultValue: "Currency",
               })}
-              value={selectedCurrency}
-              onChange={(e) => setSelectedCurrency(e.target.value)}
+              value={fields.currency}
+              onChange={(e) => setField("currency", e.target.value)}
             >
               {CURRENCY_CODES.map((code) => (
                 <option key={code} value={code}>
@@ -255,14 +254,14 @@ function OrganizationCard({
               label={t("settings.organization.timezone", {
                 defaultValue: "Timezone",
               })}
-              value={selectedTimezone}
-              onChange={(e) => setSelectedTimezone(e.target.value)}
+              value={fields.timezone}
+              onChange={(e) => setField("timezone", e.target.value)}
             >
               {(TIMEZONE_CODES.includes(
-                selectedTimezone as (typeof TIMEZONE_CODES)[number],
+                fields.timezone as (typeof TIMEZONE_CODES)[number],
               )
                 ? TIMEZONE_CODES
-                : [selectedTimezone, ...TIMEZONE_CODES]
+                : [fields.timezone, ...TIMEZONE_CODES]
               ).map((zone) => (
                 <option key={zone} value={zone}>
                   {timezoneLabel(zone)}
@@ -309,31 +308,20 @@ function IssuerCard({
   const deleteLogoMutation = useDeleteOrganizationLogo();
 
   const saved = issuerFormOf(org);
-  const [taxId, setTaxId] = useState(saved.taxId);
-  const [country, setCountry] = useState(saved.country);
-  const [street, setStreet] = useState(saved.street);
-  const [city, setCity] = useState(saved.city);
-  const [postalCode, setPostalCode] = useState(saved.postalCode);
-  const [logoUrl, setLogoUrl] = useState<string | null>(saved.logoUrl);
+  const { fields, setField, markSaved } = useRecordFields(org, issuerFormOf);
+  const [logoUrl, setLogoUrl] = useState<string | null>(org.logo_url ?? null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!org) return;
-    const form = issuerFormOf(org);
-    setTaxId(form.taxId);
-    setCountry(form.country);
-    setStreet(form.street);
-    setCity(form.city);
-    setPostalCode(form.postalCode);
-    setLogoUrl(form.logoUrl);
+    setLogoUrl(org.logo_url ?? null);
   }, [org]);
 
   const isDirty =
-    taxId !== saved.taxId ||
-    country !== saved.country ||
-    street !== saved.street ||
-    city !== saved.city ||
-    postalCode !== saved.postalCode;
+    fields.taxId !== saved.taxId ||
+    fields.country !== saved.country ||
+    fields.street !== saved.street ||
+    fields.city !== saved.city ||
+    fields.postalCode !== saved.postalCode;
 
   useEffect(() => {
     onDirtyChange(isDirty);
@@ -343,16 +331,19 @@ function IssuerCard({
   const handleSaveConfig = () => {
     updateOrgMutation.mutate(
       {
-        tax_id: taxId || null,
-        country: country || null,
+        tax_id: fields.taxId || null,
+        country: fields.country || null,
         address: {
-          street: street || null,
-          city: city || null,
-          postal_code: postalCode || null,
+          street: fields.street || null,
+          city: fields.city || null,
+          postal_code: fields.postalCode || null,
         },
       },
       {
-        onSuccess: () => toast.success(t("settings.organization.issuerSaved")),
+        onSuccess: () => {
+          markSaved(fields);
+          toast.success(t("settings.organization.issuerSaved"));
+        },
         onError: (err: unknown) =>
           toast.error(extractApiError(err, t("messages.error"))),
       },
@@ -409,8 +400,8 @@ function IssuerCard({
             <div className="space-y-1.5">
               <Input
                 label={t("settings.organization.taxId", "Tax ID (VAT/NIP)")}
-                value={taxId}
-                onChange={(e) => setTaxId(e.target.value)}
+                value={fields.taxId}
+                onChange={(e) => setField("taxId", e.target.value)}
                 maxLength={50}
               />
             </div>
@@ -418,8 +409,8 @@ function IssuerCard({
             <div className="space-y-1.5">
               <NativeSelect
                 label={t("settings.organization.country", "Country")}
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
+                value={fields.country}
+                onChange={(e) => setField("country", e.target.value)}
               >
                 <option value="">
                   {t("settings.organization.countryNone", "Not set")}
@@ -435,8 +426,8 @@ function IssuerCard({
             <div className="space-y-1.5">
               <Input
                 label={t("settings.organization.street", "Street")}
-                value={street}
-                onChange={(e) => setStreet(e.target.value)}
+                value={fields.street}
+                onChange={(e) => setField("street", e.target.value)}
                 maxLength={255}
               />
             </div>
@@ -444,8 +435,8 @@ function IssuerCard({
             <div className="space-y-1.5">
               <Input
                 label={t("settings.organization.city", "City")}
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
+                value={fields.city}
+                onChange={(e) => setField("city", e.target.value)}
                 maxLength={255}
               />
             </div>
@@ -453,8 +444,8 @@ function IssuerCard({
             <div className="space-y-1.5">
               <Input
                 label={t("settings.organization.postalCode", "Postal code")}
-                value={postalCode}
-                onChange={(e) => setPostalCode(e.target.value)}
+                value={fields.postalCode}
+                onChange={(e) => setField("postalCode", e.target.value)}
                 maxLength={20}
               />
             </div>

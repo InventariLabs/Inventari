@@ -28,6 +28,7 @@ import {
   getUomCategoryName,
 } from "@/modules/shared/hooks/useUoms";
 import { useModuleValidation } from "@/hooks/useModuleValidation";
+import { changedSince } from "@/modules/shared/hooks/useRecordFields";
 import { useFieldDefinitions } from "./useFieldDefinitions";
 import {
   useSaveAfterUnitAnswer,
@@ -189,20 +190,6 @@ function editableQuantity(quantity: unknown, whenMissing = ""): string {
   return quantity == null
     ? whenMissing
     : formatDecimalQty(quantity as string | number);
-}
-
-/** The fields of `current` that differ from `base` — an edit in progress. */
-function changedSince(
-  base: ItemFormData,
-  current: ItemFormData,
-): Partial<ItemFormData> {
-  const baseFields = base as Record<string, unknown>;
-  return Object.fromEntries(
-    Object.entries(current).filter(
-      ([key, value]) =>
-        JSON.stringify(value) !== JSON.stringify(baseFields[key]),
-    ),
-  );
 }
 
 /** What the form holds before anybody touches it.
