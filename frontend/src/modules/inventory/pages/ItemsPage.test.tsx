@@ -1401,6 +1401,60 @@ describe("ItemsPage — control bar layout", () => {
     await screen.findByTestId("filter-expired");
     expect(chips()).toEqual([...before, "filter-expiring", "filter-expired"]);
   });
+
+  it.each(["expired", "expiring"])(
+    "opens ?filter=%s with the date chips leading the row, and keeps them there",
+    async (named) => {
+      // The pressed chip has to be on a phone's screen from the first paint,
+      // without an answer to wait for, and no tap may reorder the row.
+      server.use(
+        http.get("/api/v1/location-types", async () => {
+          await delay("infinite");
+          return HttpResponse.json(onePage([]));
+        }),
+        http.get("/api/v1/stats/overview", async () => {
+          await delay("infinite");
+          return HttpResponse.json({ tracks_expiry: true });
+        }),
+      );
+      rtlRender(
+        <QueryClientProvider
+          client={
+            new QueryClient({ defaultOptions: { queries: { retry: false } } })
+          }
+        >
+          <I18nextProvider i18n={i18n}>
+            <ModulesProvider>
+              <PageHeaderContext.Provider
+                value={{ data: {}, setHeader: () => {} }}
+              >
+                <MemoryRouter
+                  initialEntries={[`/inventory/items?filter=${named}`]}
+                >
+                  <ItemsPage />
+                </MemoryRouter>
+              </PageHeaderContext.Provider>
+            </ModulesProvider>
+          </I18nextProvider>
+        </QueryClientProvider>,
+      );
+      const chips = () =>
+        screen
+          .getAllByTestId(/^filter-/)
+          .map((chip) => chip.getAttribute("data-testid"));
+      const pressed = await screen.findByTestId(`filter-${named}`);
+      expect(pressed).toHaveAttribute("aria-pressed", "true");
+      const first = chips();
+      expect(first.slice(0, 2)).toEqual(["filter-expiring", "filter-expired"]);
+
+      await userEvent.click(pressed);
+
+      await waitFor(() =>
+        expect(pressed).toHaveAttribute("aria-pressed", "false"),
+      );
+      expect(chips()).toEqual(first);
+    },
+  );
 });
 
 /**

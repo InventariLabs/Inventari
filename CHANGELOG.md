@@ -60,6 +60,12 @@ says what the release does rather than what changed since them.
   the two cards, or changing the logo, no longer empties the fields of the
   other, and text typed just after a save is no longer replaced when the
   screen refreshes.
+- The product list's filter chips stay where they are while the page loads, so
+  a tap on *Running low* is not lost when the date filters arrive. *Only
+  expiring soon* and *Expired* now stand at the end of the row instead of in
+  front of *Running low*. When the list opens already narrowed by one of the
+  two — from a statistics card, or with Back — both lead the row, so the
+  active filter is on a phone's screen.
 - The audit log and the item history read in words. A label's entries name
   the label's code and the product beside its id; a document type
   configuration's default locations are written with their names, and
