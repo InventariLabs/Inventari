@@ -607,16 +607,24 @@ jobs:
         # this reporter, and `github` alone left nothing to upload.
         run: npx playwright test --reporter=github,html
 
-      # The debug step above only fires when the readiness check fails, so a
-      # spec failing against a 500 showed the browser's view and nothing of the
-      # server's. Playwright reports the status code; the traceback lives here.
-      - name: Backend log (only when the specs fail)
+      # The debug step above runs only for a failure before the specs. A spec
+      # failing against a 500 needs the server's traceback, and one refused on
+      # :5173 needs what the dev server printed, whether either server still
+      # listens, and whether the kernel recorded a crash or an out-of-memory
+      # kill, which leaves nothing in the process's own log.
+      - name: Service logs (only when the specs fail)
         if: ${{ failure() && steps.e2e.outcome == 'failure' }}
         run: |
           echo "===== /tmp/backend.log — tracebacks ====="
           grep -B5 -A30 'Traceback' /tmp/backend.log | head -200 || echo "(no traceback logged)"
           echo "===== /tmp/backend.log (last 150 lines) ====="
           tail -n 150 /tmp/backend.log || echo "(no backend.log)"
+          echo "===== /tmp/frontend.log (last 200 lines) ====="
+          tail -n 200 /tmp/frontend.log || echo "(no frontend.log)"
+          echo "===== listening sockets ====="
+          ss -tlnp 2>&1 | grep -E ':(8000|5173)' || echo "(no listeners on 8000/5173)"
+          echo "===== kernel: segfaults, traps, out of memory ====="
+          sudo dmesg -T | grep -iE 'segfault|general protection|traps:|out of memory|oom-kill' || echo "(no such line in dmesg)"
 
       # On a green run too: a spec that failed and passed on its retry is the
       # flake worth reading, and only this report keeps its failed attempt's
