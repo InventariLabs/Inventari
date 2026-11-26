@@ -4,6 +4,9 @@ The documents in this directory are organised by the reader they serve. Start
 at the path that fits you; the technical reference below is design detail that
 ships with the repository, not a guide.
 
+Most of the guides below are also readable on the website, in six languages:
+[inventari.app/docs](https://inventari.app/docs/).
+
 - **Using the app** — you have an account and want to get things done.
 - **Running and maintaining it** — you host an instance and keep it healthy.
 - **Building on Inventari** — you create an application or extend a workflow with your own module.

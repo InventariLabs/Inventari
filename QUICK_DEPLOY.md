@@ -3,6 +3,9 @@
 Deploy to a VPS with automatic HTTPS in 6 steps. A computer at home with no
 domain is [docs/HOME_INSTALL.md](docs/HOME_INSTALL.md).
 
+The documentation is also readable on the website, in six languages:
+[inventari.app/docs](https://inventari.app/docs/).
+
 ## Requirements
 
 - VPS with Ubuntu 26.04 LTS or Debian 13. The steps below are tested on
