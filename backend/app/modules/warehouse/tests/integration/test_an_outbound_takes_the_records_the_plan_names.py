@@ -636,3 +636,65 @@ def test_a_scrap_that_takes_the_last_unit_files_the_record(
 
     assert _record_quantity(db_session, record.id) == Decimal('0')
     _assert_filed_under_consumed(db_session, record.id, doc_source_location.id)
+
+
+def test_a_dispatch_goes_through_when_the_consumed_places_name_is_taken(
+    client: TestClient,
+    doc_auth_headers: dict[str, str],
+    doc_source_location: StorageLocation,
+    doc_target_location: StorageLocation,
+    doc_partner: Partner,
+    db_session: Session,
+    async_engine_fixture: AsyncEngine,
+    doc_org: Organization,
+) -> None:
+    """A hand-made place holding the name in the reader's language stops nothing.
+
+    The first dispatch writes the virtual places in English; the Polish one
+    would rename them, and the Consumed one meets a place already called that.
+    """
+    from app.core.testing import ModuleTestHelper
+
+    h = ModuleTestHelper(db_session)
+    template = h.create_template(doc_org, name=f'Name Taken {uuid4().hex[:6]}')
+    records = [
+        sow(
+            db_session,
+            async_engine_fixture,
+            doc_org,
+            template,
+            doc_source_location.id,
+            Decimal('1'),
+        )
+        for _ in range(2)
+    ]
+
+    def dispatch(record: Item, headers: dict[str, str]) -> None:
+        _run_out(
+            client,
+            headers,
+            partner_id=doc_partner.id,
+            source_location_id=doc_source_location.id,
+            target_location_id=doc_target_location.id,
+            item_id=record.id,
+            template_id=template.id,
+            quantity=1,
+        )
+
+    dispatch(records[0], doc_auth_headers)
+    consumed, _ = _place_of(db_session, records[0].id)
+    assert consumed.name == 'Consumed (Virtual)'
+    db_session.add(
+        StorageLocation(
+            organization_id=doc_org.id,
+            name='Zużyte (wirtualna)',
+            created_by=doc_source_location.created_by,
+        )
+    )
+    db_session.commit()
+
+    dispatch(records[1], {**doc_auth_headers, 'Accept-Language': 'pl'})
+
+    _assert_filed_under_consumed(db_session, records[1].id, doc_source_location.id)
+    place, _ = _place_of(db_session, records[1].id)
+    assert place.name == 'Consumed (Virtual)'

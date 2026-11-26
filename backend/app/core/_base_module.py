@@ -554,7 +554,8 @@ class BaseModule(ABC):
         language of the session enabling the module; the handle then records
         the new name, so enabling again in a third language leaves the row
         alone. A row whose name differs from its handle is one the user named,
-        and is never touched.
+        and is never touched. A row whose new name a place beside it holds
+        keeps the old one.
         """
         from sqlalchemy import select
 
@@ -577,19 +578,16 @@ class BaseModule(ABC):
             .all()
         )
         from app.services.storage._names import (
-            check_name_unique_async,
             flush_under_the_name_rule,
+            free_to_take_async,
         )
 
         for row in rows:
             seed = (row.settings or {}).get('seed') or {}
             if seed.get('code') != decl.code or seed.get('name') != row.name:
                 continue
-            # Joining the reader's language is a rename like any other, and a
-            # hand-made sibling may already hold the name it joins.
-            await check_name_unique_async(
-                db, organization_id, localized.name, exclude_id=row.id
-            )
+            if not await free_to_take_async(db, row, localized.name):
+                continue
             row.name = localized.name
             if localized.description and row.description == decl.description:
                 row.description = localized.description

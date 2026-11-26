@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Any, cast
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core._module_declarations import LocalizedText
@@ -12,6 +12,7 @@ from app.models.storage_type import STORAGE_TYPE_ORDER, StorageType
 from app.services.storage._names import (
     check_name_unique_async,
     flush_under_the_name_rule,
+    free_to_take_async,
 )
 
 if TYPE_CHECKING:
@@ -120,12 +121,11 @@ async def ensure_virtual_locations_async(
             untouched = (
                 seed.get('code') == v_code and seed.get('name') == existing.name
             ) or existing.name == v['name']
-            if untouched and existing.name != target:
-                # A parentless name is unique, and a hand-made place may
-                # already carry the one this row is joining.
-                await check_name_unique_async(
-                    db, UUID(str(organization_id)), target, exclude_id=existing.id
-                )
+            if (
+                untouched
+                and existing.name != target
+                and await free_to_take_async(db, existing, target)
+            ):
                 existing.name = target
                 existing.settings = {
                     **(existing.settings or {}),
@@ -272,16 +272,14 @@ async def _seed_location_async(
         *(t.name for t in default.translations.values()),
     }
 
-    rows = (
-        (
-            await db.execute(
-                select(StorageLocation).where(
-                    StorageLocation.organization_id == organization_id,
-                )
-            )
+    rows = await db.scalars(
+        select(StorageLocation)
+        .where(StorageLocation.organization_id == organization_id)
+        .order_by(
+            func.lower(StorageLocation.name),
+            StorageLocation.name,
+            StorageLocation.id,
         )
-        .scalars()
-        .all()
     )
     existing = None
     for row in rows:
@@ -289,7 +287,8 @@ async def _seed_location_async(
         if default.code and seed.get('code') == default.code:
             existing = row
             break
-        if row.name in declared_names:
+        # The first by name, unless a later row carries the handle.
+        if existing is None and row.name in declared_names:
             existing = row
     if existing:
         seed = (existing.settings or {}).get('seed') or {}
@@ -298,10 +297,11 @@ async def _seed_location_async(
             and seed.get('code') == default.code
             and seed.get('name') == existing.name
         ) or existing.name in (default.name, *default.former_names)
-        if untouched and existing.name != target:
-            await check_name_unique_async(
-                db, UUID(str(organization_id)), target, exclude_id=existing.id
-            )
+        if (
+            untouched
+            and existing.name != target
+            and await free_to_take_async(db, existing, target)
+        ):
             existing.name = target
             existing.settings = {
                 **(existing.settings or {}),
@@ -334,10 +334,11 @@ async def _has_an_ordinary_location_async(
     """Whether the organization has somewhere ordinary to put a product.
 
     Ordinary is what the product form offers every organization: a real
-    location (not a virtual counterpart), owned by no module, and not the
-    quarantine shelf a damaged receipt lands on.
+    location (not a virtual counterpart), not archived, owned by no module,
+    and not the quarantine shelf a damaged receipt lands on.
     """
     from app.core.product_profiles import QUARANTINE_LOCATION_CODE
+    from app.services.storage._queries import not_archived_condition
 
     rows = (
         await db.execute(
@@ -345,6 +346,7 @@ async def _has_an_ordinary_location_async(
                 StorageLocation.organization_id == organization_id,
                 StorageLocation.usage == LocationUsage.INTERNAL,
                 StorageLocation.context_tag.is_(None),
+                not_archived_condition(),
             )
         )
     ).scalars()
