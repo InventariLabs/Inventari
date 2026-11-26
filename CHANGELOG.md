@@ -56,6 +56,10 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- Organization settings keep what you have typed and not saved: saving one of
+  the two cards, or changing the logo, no longer empties the fields of the
+  other, and text typed just after a save is no longer replaced when the
+  screen refreshes.
 - The audit log and the item history read in words. A label's entries name
   the label's code and the product beside its id; a document type
   configuration's default locations are written with their names, and
