@@ -13,7 +13,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from io import BytesIO
 from math import isnan
-from typing import Any
+from typing import Any, cast
 from unicodedata import category
 from zipfile import BadZipFile
 
@@ -26,6 +26,7 @@ from app.core.logging import get_logger
 from app.core.upload_validation import MAX_IMPORT_ROWS
 from app.i18n._validation import translate_validation_error
 from app.i18n.service import get_current_lang, writes_decimal_comma
+from app.schemas.validators import normalize_sku
 
 logger = get_logger(__name__)
 
@@ -328,6 +329,20 @@ def row_text(row: pd.Series, col: str | None) -> str | None:
     if not col or col not in row.index:
         return None
     return cell_text(row[col])
+
+
+def sku_from_cell(text: str, column: str) -> str:
+    """A sheet's code in the shape every door keeps a SKU, or a refusal.
+
+    The forms accept the same shape, so a product founded from a sheet can
+    still be saved in its form.
+    """
+    try:
+        return cast(str, normalize_sku(text))
+    except ServiceRejectionError:
+        raise ServiceRejectionError(
+            'import_column_sku_invalid', column=column, value=text
+        ) from None
 
 
 def row_get(row: pd.Series, mapping: dict[str, Any], key: str) -> Any:

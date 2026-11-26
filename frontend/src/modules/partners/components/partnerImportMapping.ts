@@ -2,8 +2,8 @@
  *
  * The keys are what the import endpoint reads; the empty string means skip.
  * `suggestPartnerMapping` fills them from the header row, in English and
- * Polish, so a sheet kept the way a small company keeps one lands without
- * a click per column. */
+ * Polish, so a sheet kept the way a small company keeps one — or Odoo's
+ * contact export — lands without a click per column. */
 import type { ImportMapping } from "@/components/import/types";
 
 export const PARTNER_IMPORT_FIELDS = [
@@ -15,6 +15,8 @@ export const PARTNER_IMPORT_FIELDS = [
   "phone",
   "website",
   "contact_person",
+  /** The company a contact person's row belongs to. */
+  "company",
   "street",
   "city",
   "postal_code",
@@ -30,9 +32,13 @@ const RULES: {
   includes?: string[];
 }[] = [
   { field: "name", exact: ["name", "nazwa", "partner", "company", "firma"] },
+  { field: "company", exact: ["related company"] },
   { field: "postal_code", includes: ["postal", "zip", "kod pocztowy"] },
   { field: "tax_id", includes: ["tax", "vat", "nip"] },
-  { field: "code", exact: ["code", "kod", "partner code", "kod partnera"] },
+  {
+    field: "code",
+    exact: ["code", "kod", "partner code", "kod partnera", "reference"],
+  },
   { field: "type", exact: ["type", "typ", "role", "rola"] },
   { field: "email", includes: ["email", "e-mail", "mail"] },
   { field: "phone", includes: ["phone", "telefon", "tel"] },

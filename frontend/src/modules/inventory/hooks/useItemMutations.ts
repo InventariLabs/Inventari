@@ -1,5 +1,9 @@
 import { useAppMutation } from "@/lib/api/mutationFactory";
-import { itemsApi, type LabelMatchMode } from "@/lib/api/items";
+import {
+  itemsApi,
+  type LabelMatchMode,
+  type LocationSlash,
+} from "@/lib/api/items";
 import type { ImportProgress } from "@/components/import/types";
 import { productTemplatesApi } from "@/lib/api/productTemplates";
 import type { ItemCreate, ItemUpdate, ItemBulkUpdate } from "@/types";
@@ -153,6 +157,8 @@ export function useImportItems() {
       createLocations = true,
       createCategories = true,
       onLabelMatch = "add",
+      locationSlash = "path",
+      countAsOne = false,
       onProgress,
     }: {
       file: File;
@@ -160,6 +166,8 @@ export function useImportItems() {
       createLocations?: boolean;
       createCategories?: boolean;
       onLabelMatch?: LabelMatchMode;
+      locationSlash?: LocationSlash;
+      countAsOne?: boolean;
       onProgress?: (progress: ImportProgress) => void;
     }) =>
       itemsApi.importItems(
@@ -169,6 +177,7 @@ export function useImportItems() {
         createCategories,
         onLabelMatch,
         onProgress,
+        { locationSlash, countAsOne },
       ),
     (qc, result) => {
       invalidation.items(qc);

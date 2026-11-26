@@ -28,8 +28,9 @@ describe("PartnerImportModal", () => {
       filled_counts: {},
     });
     mutateAsync.mockResolvedValue({
-      total: 5,
+      total: 7,
       imported: 3,
+      contacts: 2,
       failed: 2,
       errors: [
         {
@@ -53,6 +54,9 @@ describe("PartnerImportModal", () => {
     fireEvent.click(screen.getByRole("button", { name: /Process Import/ }));
 
     expect(await screen.findByText("Added 3 partners.")).toBeInTheDocument();
+    expect(
+      screen.getByText("2 contact people were added to their companies."),
+    ).toBeInTheDocument();
     expect(screen.getByText("#5:")).toBeInTheDocument();
     expect(
       screen.getByText(/already has this name or tax id/),

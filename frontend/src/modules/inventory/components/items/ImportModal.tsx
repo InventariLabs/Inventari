@@ -22,6 +22,10 @@ import type {
 } from "@/types";
 import { locationFieldKey, suggestMapping } from "./importMapping";
 import { ImportResultDetails } from "./ImportResultDetails";
+import {
+  ImportReadingChoices,
+  type SheetReading,
+} from "./ImportReadingChoices";
 import { useGrocySource } from "./grocySource";
 
 interface Props {
@@ -32,6 +36,7 @@ interface Props {
 const MAPPING_FIELDS: { key: string; labelKey: string; required?: boolean }[] =
   [
     { key: "name", labelKey: "items:import.fields.name", required: true },
+    { key: "sku", labelKey: "items:import.fields.sku" },
     { key: "quantity", labelKey: "items:import.fields.quantity" },
     { key: "unit", labelKey: "items:import.fields.unit" },
     { key: "expiry_date", labelKey: "items:import.fields.expiryDate" },
@@ -40,11 +45,14 @@ const MAPPING_FIELDS: { key: string; labelKey: string; required?: boolean }[] =
       key: "location",
       labelKey: "items:import.fields.storageLocation",
     },
+    { key: "sublocation", labelKey: "items:import.fields.sublocation" },
     { key: "category", labelKey: "items:import.fields.category" },
     { key: "brand", labelKey: "items:import.fields.brand" },
     { key: "barcode", labelKey: "items:import.fields.barcode" },
     { key: "serial_number", labelKey: "items:import.fields.serialNumber" },
     { key: "purchase_price", labelKey: "items:import.fields.purchasePrice" },
+    { key: "min_quantity", labelKey: "items:import.fields.stockAlert" },
+    { key: "description", labelKey: "items:import.fields.description" },
     { key: "label_code", labelKey: "items:import.fields.labelCode" },
   ];
 
@@ -111,6 +119,10 @@ export default function ImportModal({ onClose }: Props) {
   const [createCategories, setCreateCategories] = useState(true);
   const [createLocations, setCreateLocations] = useState(true);
   const [onLabelMatch, setOnLabelMatch] = useState<LabelMatchMode>("add");
+  const [reading, setReading] = useState<SheetReading>({
+    locationSlash: "path",
+    countAsOne: false,
+  });
 
   // The price feeds the stock value; where that value is not shown, the
   // item form drops the field, and the import neither offers the column nor
@@ -214,6 +226,7 @@ export default function ImportModal({ onClose }: Props) {
           createLocations: canWriteStorages && createLocations,
           createCategories: canWriteCategories && createCategories,
           onLabelMatch,
+          ...reading,
           onProgress,
         })
       }
@@ -226,7 +239,7 @@ export default function ImportModal({ onClose }: Props) {
         closeAndView: t("items:import.closeAndView"),
       }}
       fileSource={grocy.source}
-      mappingExtras={({ mapping, filledCounts }) => (
+      mappingExtras={({ headers, mapping, setMapping, filledCounts }) => (
         <>
           {/* Without the answer the columns the locations add are missing
               from the mapping, and a column of the file that belongs to one
@@ -256,6 +269,13 @@ export default function ImportModal({ onClose }: Props) {
               })}
             </p>
           )}
+          <ImportReadingChoices
+            headers={headers}
+            mapping={mapping}
+            setMapping={setMapping}
+            reading={reading}
+            onChange={setReading}
+          />
           {/* What the import will and will not do to what is already there. */}
           <div className="px-2">
             <ChoiceGroup

@@ -10,40 +10,41 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from datetime import date
 from decimal import Decimal
-from typing import Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal
 from uuid import UUID
 
 import pandas as pd
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.barcode import normalize_barcode
 from app.core.contracts import UserContextDTO
 from app.core.exceptions import ServiceRejectionError
-from app.core.import_sheet import SheetColumns, read_rows
+from app.core.import_sheet import SheetColumns, read_rows, sku_from_cell
 from app.core.import_sheet import cell_text as _cell_text
 from app.core.import_sheet import explain as _explain
 from app.core.import_sheet import row_get as _row_get
-from app.core.location_path import join_location_path
 from app.core.logging import get_logger
 from app.i18n.service import get_unit_label
 from app.models.category import Category
 from app.models.item import Item
-from app.models.storage_location import StorageLocation
-from app.models.storage_type import StorageType
 from app.schemas.category import CategoryFieldDefinition
 from app.schemas.item import ItemCreate, ItemUpdate
 from app.services.fields.validation import FieldValueError, validate_field_value
 
 from ._create import create_item_async
-from ._template import find_template_async
+from ._import_locations import LocationSlash, SheetLocations
+from ._import_products import (
+    add_product_without_stock,
+    product_of_a_record,
+    read_reference,
+)
 from ._update import update_item
 
-logger = get_logger(__name__)
+if TYPE_CHECKING:
+    from app.core.uom_resolver import UomResolverAsync
 
-#: The app writes a location as "Pantry › Dry Goods › Shelf A"; a keyboard
-#: writes it as "->" or ">", and a file written before the arrow gave way to
-#: it still says "→". All of them read as the same path.
-_PATH_SEPARATORS = ('\u203a', '→', '->', '>')
+logger = get_logger(__name__)
 
 #: What a row does when its Label Code names a product the organization
 #: already has. 'add' is what the import always did — the code is ignored and
@@ -60,6 +61,16 @@ _OVERWRITABLE_TEXT = ('brand', 'barcode', 'serial_number')
 #: A mapping key naming a product field a location sets ("field:supplier"),
 #: as opposed to one of the fixed system columns above.
 _FIELD_PREFIX = 'field:'
+
+#: A mapping key naming a column that holds the quantity at one location
+#: ("stock_at:Shop"), for a sheet with a quantity column per location.
+_STOCK_AT_PREFIX = 'stock_at:'
+
+#: What the description column of a product and of a record holds.
+_DESCRIPTION_LIMIT = 500
+
+#: Odoo writes a category as its whole path, "All / Saleable / Food".
+_CATEGORY_PATH_SEPARATOR = ' / '
 
 #: How a sheet says yes or no to a yes/no field, in every maintained language.
 #: The accented and unaccented Portuguese spellings both appear in sheets.
@@ -81,6 +92,8 @@ async def import_items(
     create_missing_categories: bool = True,
     on_label_match: LabelMatch = 'add',
     on_batch: Callable[[int], Awaitable[None]] | None = None,
+    location_slash: LocationSlash = 'path',
+    count_as_one: bool = False,
 ) -> dict[str, Any]:
     """Import items from XLSX or CSV file based on column mapping.
 
@@ -95,6 +108,10 @@ async def import_items(
     ('skip') or write the row's other columns onto it ('overwrite'). A row
     without a code, or with one the organization does not know, always
     becomes a new product.
+
+    A sheet with no quantity column adds products without stock, unless
+    ``count_as_one`` asks for a record of one per row. ``location_slash``
+    says how a "/" in a location cell reads.
     """
     df = read_rows(file_content, filename)
 
@@ -103,13 +120,12 @@ async def import_items(
         user=user,
         mapping=mapping,
         sheet=SheetColumns(df),
-        storages=await _preload_storage_index(db, user.organization_id),
+        locations=await SheetLocations.load(
+            db, user, create_missing=create_missing_locations, slash=location_slash
+        ),
         category_cache=await _preload_category_cache(db, user.organization_id),
         category_fields=await _preload_category_fields(db, user.organization_id),
-        default_storage_type_id=await _default_storage_type_id(
-            db, user.organization_id
-        ),
-        create_missing_locations=create_missing_locations,
+        count_as_one=count_as_one,
         create_missing_categories=create_missing_categories,
         on_label_match=on_label_match,
         labels=await _preload_label_codes(db, user.organization_id)
@@ -122,6 +138,8 @@ async def import_items(
     updated = 0
     skipped = 0
     failed = 0
+    written_rows = 0
+    extra_records = 0
     errors: list[dict[str, Any]] = []
 
     for index, row in df.iterrows():
@@ -133,121 +151,28 @@ async def import_items(
             skipped += 1
         elif row_result.outcome in ('imported', 'updated'):
             if row_result.outcome == 'imported':
-                imported += 1
+                imported += row_result.records
                 joined_existing += row_result.joined_existing
+                extra_records += row_result.records - 1
             else:
                 updated += 1
-            if (imported + updated) % _BATCH_ROWS == 0 and on_batch is not None:
+            written_rows += 1
+            if written_rows % _BATCH_ROWS == 0 and on_batch is not None:
                 await on_batch(int(index) + 1)
 
     return {
-        'total': len(df),
+        # A row holding stock at several locations is several records, and
+        # the counts below it add up to this one.
+        'total': len(df) + extra_records,
         'imported': imported,
         'joined_existing': joined_existing,
         'updated': updated,
         'skipped': skipped,
         'failed': failed,
         'errors': errors[:10],
-        'created_locations': ctx.created_locations,
+        'created_locations': ctx.locations.created,
         'created_categories': ctx.created_categories,
     }
-
-
-class _StorageIndex:
-    """The organization's locations, by name and by place in the tree.
-
-    A bare name matches any location carrying it (the first one seen), a
-    path matches segment by segment from the root — so "Shelf A" and
-    "Pantry › Dry Goods › Shelf A" both find the shelf, and a path whose
-    tail is missing knows which parent to grow it under.
-    """
-
-    def __init__(self) -> None:
-        self._children: dict[tuple[UUID | None, str], UUID] = {}
-        self._by_name: dict[str, UUID] = {}
-        self._name: dict[UUID, str] = {}
-        self._parent: dict[UUID, UUID | None] = {}
-        self._fields: dict[UUID, list[dict[str, Any]]] = {}
-
-    @staticmethod
-    def _key(name: str) -> str:
-        return name.strip().lower()
-
-    def add(
-        self,
-        loc_id: UUID,
-        name: str,
-        parent_id: UUID | None,
-        fields: list[dict[str, Any]] | None = None,
-    ) -> None:
-        self._children[(parent_id, self._key(name))] = loc_id
-        self._by_name.setdefault(self._key(name), loc_id)
-        self._name[loc_id] = name
-        self._parent[loc_id] = parent_id
-        self._fields[loc_id] = fields or []
-
-    def remove(self, loc_id: UUID) -> None:
-        """Forget a location whose INSERT was rolled back."""
-        name = self._name.pop(loc_id, None)
-        parent_id = self._parent.pop(loc_id, None)
-        self._fields.pop(loc_id, None)
-        if name is None:
-            return
-        self._children.pop((parent_id, self._key(name)), None)
-        if self._by_name.get(self._key(name)) == loc_id:
-            del self._by_name[self._key(name)]
-
-    def child(self, parent_id: UUID | None, name: str) -> UUID | None:
-        return self._children.get((parent_id, self._key(name)))
-
-    def by_name(self, name: str) -> UUID | None:
-        return self._by_name.get(self._key(name))
-
-    def path_of(self, loc_id: UUID) -> str:
-        names: list[str] = []
-        seen: set[UUID] = set()
-        current: UUID | None = loc_id
-        while current is not None and current not in seen:
-            seen.add(current)
-            names.append(self._name.get(current, ''))
-            current = self._parent.get(current)
-        return join_location_path(reversed(names))
-
-    def fields_of(self, loc_id: UUID) -> dict[str, dict[str, Any]]:
-        """The product fields a location asks for: its own and every level's above.
-
-        The rule the storages listing and the form follow: the nearest level
-        that defines a key gives it, so the location's own definition wins
-        over its rack's and the rack's over the warehouse's. A location this
-        import founds sets nothing itself and still inherits.
-        """
-        fields: dict[str, dict[str, Any]] = {}
-        seen: set[UUID] = set()
-        current: UUID | None = loc_id
-        while current is not None and current not in seen:
-            seen.add(current)
-            for definition in self._fields.get(current, []):
-                key = definition.get('key') if isinstance(definition, dict) else None
-                if key:
-                    fields.setdefault(key, definition)
-            current = self._parent.get(current)
-        return fields
-
-
-async def _preload_storage_index(
-    db: AsyncSession, org_id: UUID | None
-) -> _StorageIndex:
-    index = _StorageIndex()
-    if org_id is None:
-        return index
-    result = await db.execute(
-        select(StorageLocation)
-        .where(StorageLocation.organization_id == org_id)
-        .order_by(StorageLocation.created_at, StorageLocation.name)
-    )
-    for s in result.scalars().all():
-        index.add(s.id, s.name, s.parent_id, s.field_definitions)
-    return index
 
 
 async def _preload_category_cache(
@@ -319,99 +244,6 @@ async def _preload_label_codes(
     return {code.strip().lower(): item_id for code, item_id in result.all() if code}
 
 
-async def _default_storage_type_id(
-    db: AsyncSession, org_id: UUID | None
-) -> UUID | None:
-    """The StorageType a freshly-founded location gets.
-
-    Prefers the org's own types; falls back to a global (org_id IS NULL) type;
-    None when no type exists at all.
-    """
-    if org_id is None:
-        return None
-    own = await db.scalar(
-        select(StorageType.id).where(StorageType.organization_id == org_id).limit(1)
-    )
-    if own:
-        return own
-    return cast(
-        UUID | None,
-        await db.scalar(
-            select(StorageType.id).where(StorageType.organization_id.is_(None)).limit(1)
-        ),
-    )
-
-
-def _split_path(text: str) -> list[str]:
-    for separator in _PATH_SEPARATORS:
-        text = text.replace(separator, '\x00')
-    return [part.strip() for part in text.split('\x00') if part.strip()]
-
-
-async def _resolve_storage(ctx: '_ImportContext', row: pd.Series) -> UUID:
-    """Where the row's product goes; raises a refusal when nowhere."""
-    col = ctx.mapping.get('location')
-    text = _cell_text(row.get(col)) if col and col in row else None
-    if text:
-        found = await _walk_path(ctx, _split_path(text), create=False)
-        if found is not None:
-            return found
-        if ctx.create_missing_locations:
-            return await _walk_path(ctx, _split_path(text), create=True)  # type: ignore[return-value]
-        raise ServiceRejectionError(
-            'import_column_location_not_found', column=col, value=text
-        )
-
-    if ctx.default_storage_id is None:
-        ctx.default_storage_id = await ctx.db.scalar(
-            select(StorageLocation.id)
-            .where(StorageLocation.organization_id == ctx.user.organization_id)
-            .order_by(StorageLocation.created_at)
-        )
-    if ctx.default_storage_id is None:
-        raise ServiceRejectionError('import_location_unresolved')
-    return ctx.default_storage_id
-
-
-async def _walk_path(
-    ctx: '_ImportContext', segments: list[str], *, create: bool
-) -> UUID | None:
-    """Follow a path down the tree, founding what is missing when allowed.
-
-    The first segment may sit anywhere in the tree (a reader may start the
-    path below the root); every later one must be a child of the one before.
-    """
-    parent_id: UUID | None = None
-    for position, name in enumerate(segments):
-        found = ctx.storages.child(parent_id, name)
-        if found is None and position == 0:
-            found = ctx.storages.by_name(name)
-        if found is None:
-            if not create:
-                return None
-            found = await _found_location(ctx, name, parent_id)
-        parent_id = found
-    return parent_id
-
-
-async def _found_location(
-    ctx: '_ImportContext', name: str, parent_id: UUID | None
-) -> UUID:
-    location = StorageLocation(
-        name=name,
-        organization_id=ctx.user.organization_id,
-        storage_type_id=ctx.default_storage_type_id,
-        created_by=ctx.user.id,
-        parent_id=parent_id,
-    )
-    ctx.db.add(location)
-    await ctx.db.flush()
-    ctx.storages.add(location.id, name, parent_id)
-    ctx.row_locations.append(location.id)
-    ctx.created_locations.append(ctx.storages.path_of(location.id))
-    return location.id
-
-
 async def _resolve_or_create_category(
     ctx: '_ImportContext', row: pd.Series
 ) -> UUID | None:
@@ -427,6 +259,10 @@ async def _resolve_or_create_category(
     c_name = _cell_text(row.get(cat_col)) if cat_col and cat_col in row else None
     if not c_name:
         return None
+    if c_name.lower() not in ctx.category_cache:
+        # A category named with the whole text wins; otherwise the text is a
+        # path and the product belongs in its last step.
+        c_name = c_name.rsplit(_CATEGORY_PATH_SEPARATOR, 1)[-1].strip()
     if c_name.lower() in ctx.category_cache:
         return ctx.category_cache[c_name.lower()]
     if not ctx.create_missing_categories:
@@ -492,7 +328,7 @@ def _quantity_from_cell(
 
 
 async def _resolve_unit(ctx: '_ImportContext', row: pd.Series) -> UUID | None:
-    """The unit the sheet names, by symbol — 'kg', 'pcs', the org's own."""
+    """The unit the sheet names: its symbol, a synonym or any language's label."""
     from app.core.uom_resolver import UomResolverAsync
     from app.services.uom_service import get_uom_by_symbol_async
 
@@ -500,24 +336,17 @@ async def _resolve_unit(ctx: '_ImportContext', row: pd.Series) -> UUID | None:
     symbol = _cell_text(row.get(col)) if col and col in row else None
     if not symbol:
         return None
+    org_id = ctx.user.organization_id
     if symbol not in ctx.uom_cache:
-        uom = await get_uom_by_symbol_async(
-            ctx.db, symbol, ctx.user.organization_id
-        ) or await get_uom_by_symbol_async(
-            ctx.db, symbol.lower(), ctx.user.organization_id
-        )
-        # The app writes a piece as "szt." and a keyboard writes "szt": the
-        # resolver the other imports use reads both, and the aliases too.
-        org_id = ctx.user.organization_id
+        # The symbol as written first: an organization's own unit may differ
+        # from a system one only by its letter case.
+        uom = await get_uom_by_symbol_async(ctx.db, symbol, org_id)
         if uom is None and org_id is not None:
-            found = await UomResolverAsync(ctx.db, org_id).resolve(symbol)
+            if ctx.uom_resolver is None:
+                ctx.uom_resolver = UomResolverAsync(ctx.db, org_id)
+            ctx.uom_cache[symbol] = await ctx.uom_resolver.resolve(symbol)
         else:
-            found = uom.id if uom else None
-        # The refusal lists units by the label the app shows ("Packung"), so
-        # that spelling has to import too.
-        if found is None:
-            found = (await _unit_labels(ctx)).get(_label_key(symbol))
-        ctx.uom_cache[symbol] = found
+            ctx.uom_cache[symbol] = uom.id if uom else None
     uom_id = ctx.uom_cache[symbol]
     if uom_id is None:
         raise ServiceRejectionError(
@@ -529,23 +358,6 @@ async def _resolve_unit(ctx: '_ImportContext', row: pd.Series) -> UUID | None:
     return uom_id
 
 
-def _label_key(text: str) -> str:
-    return text.strip().rstrip('.').lower()
-
-
-async def _unit_labels(ctx: '_ImportContext') -> dict[str, UUID]:
-    """Unit id by the label the app shows for it, in the session language."""
-    from app.services.uom_service import list_uoms_for_org_async
-
-    org_id = ctx.user.organization_id
-    if org_id is None:
-        return {}
-    uoms = await list_uoms_for_org_async(ctx.db, org_id)
-    # Organization units win over a system unit that shares the label.
-    uoms.sort(key=lambda u: u.organization_id is not None)
-    return {_label_key(get_unit_label(u.symbol)): u.id for u in uoms}
-
-
 async def _known_units(ctx: '_ImportContext') -> str:
     """The units a sheet may name, as the app writes them, for the refusal."""
     from app.services.uom_service import list_uoms_for_org_async
@@ -555,6 +367,36 @@ async def _known_units(ctx: '_ImportContext') -> str:
         return ''
     uoms = await list_uoms_for_org_async(ctx.db, org_id)
     return ', '.join(sorted({get_unit_label(u.symbol) for u in uoms}))
+
+
+def _barcode_from_cell(row: pd.Series, mapping: dict[str, Any]) -> str | None:
+    """The row's code in the shape the forms keep it, which products match by."""
+    text = _cell_text(_row_get(row, mapping, 'barcode'))
+    return normalize_barcode(text) if text else None
+
+
+def _description_from_cell(row: pd.Series, mapping: dict[str, Any]) -> str | None:
+    text = _cell_text(_row_get(row, mapping, 'description'))
+    if text is not None and len(text) > _DESCRIPTION_LIMIT:
+        raise ServiceRejectionError(
+            'import_column_too_long',
+            column=mapping['description'],
+            limit=_DESCRIPTION_LIMIT,
+        )
+    return text
+
+
+def _min_quantity_from_cell(
+    row: pd.Series, mapping: dict[str, Any], sheet: SheetColumns
+) -> float | None:
+    value = _number_from_cell(row, mapping, 'min_quantity', None, sheet)
+    if value is None:
+        return None
+    if value < 0:
+        raise ServiceRejectionError(
+            'import_column_below_zero', column=mapping['min_quantity'], value=value
+        )
+    return float(value)
 
 
 def _parse_date_cell(
@@ -697,7 +539,7 @@ def _field_values(
     }
     values: dict[str, object] = {}
     definitions = {
-        **ctx.storages.fields_of(storage_id),
+        **ctx.locations.index.fields_of(storage_id),
         **(ctx.category_fields.get(category_id, {}) if category_id else {}),
     }
     for key, definition in definitions.items():
@@ -735,27 +577,106 @@ def _field_values(
     return values
 
 
+@dataclass
+class _Shelf:
+    """One record a row asks for: where, and how much."""
+
+    cells: list[tuple[str, str]]
+    #: ``None`` reads the mapped quantity column.
+    quantity: Decimal | None = None
+
+
+def _location_cells(ctx: '_ImportContext', row: pd.Series) -> list[tuple[str, str]]:
+    """The row's filled location cells, as (column, text), outermost first."""
+    cells = []
+    for key in ('location', 'sublocation'):
+        column = ctx.mapping.get(key)
+        text = _cell_text(row.get(column)) if column and column in row else None
+        if column and text:
+            cells.append((column, text))
+    return cells
+
+
+def _shelves(ctx: '_ImportContext', row: pd.Series) -> list[_Shelf]:
+    """The records a row asks for; none when it names a product without stock.
+
+    A sheet with a quantity column per location gives one record for every
+    column that holds some. Otherwise the row is one record, unless the sheet
+    has no quantity column and the reader did not ask for one of each.
+    """
+    per_location = [
+        (key.removeprefix(_STOCK_AT_PREFIX), column)
+        for key, column in ctx.mapping.items()
+        if key.startswith(_STOCK_AT_PREFIX) and column
+    ]
+    if not per_location:
+        if ctx.mapping.get('quantity') or ctx.count_as_one:
+            return [_Shelf(_location_cells(ctx, row))]
+        return []
+    shelves = []
+    for location, column in per_location:
+        quantity = _number_from_cell(
+            row,
+            ctx.mapping,
+            f'{_STOCK_AT_PREFIX}{location}',
+            None,
+            ctx.sheet,
+        )
+        if quantity:
+            shelves.append(_Shelf([(column, location)], quantity))
+    return shelves
+
+
 async def _build_item(
     ctx: '_ImportContext',
     row: pd.Series,
     name: str,
     storage_id: UUID,
     category_id: UUID | None,
-) -> ItemCreate:
-    """One row as the create endpoint would have received it."""
+    quantity: Decimal | None,
+    sku: str | None,
+) -> tuple[ItemCreate, bool]:
+    """One record of a row as the create endpoint would have received it.
+
+    Also says whether the record joins a product that already existed.
+    """
     mapping = ctx.mapping
-    return ItemCreate(
+    org_id = ctx.user.organization_id
+    if org_id is None:
+        raise ServiceRejectionError('user_has_no_organization')
+    barcode = _barcode_from_cell(row, mapping)
+    brand = _cell_text(_row_get(row, mapping, 'brand'))
+    description = _description_from_cell(row, mapping)
+    uom_id = await _resolve_unit(ctx, row)
+    product = await product_of_a_record(
+        ctx.db,
+        ctx.user,
+        org_id,
         name=name,
+        brand=brand,
+        barcode=barcode,
+        sku=sku,
+        description=description,
+        uom_id=uom_id,
+    )
+    item_in = ItemCreate(
+        name=product.name,
         location_id=storage_id,
         category_id=category_id,
-        quantity=_quantity_from_cell(row, mapping, ctx.sheet),
-        brand=_cell_text(_row_get(row, mapping, 'brand')),
-        barcode=_cell_text(_row_get(row, mapping, 'barcode')),
+        template_id=product.template_id,
+        sku=product.sku,
+        description=description,
+        min_quantity=_min_quantity_from_cell(row, mapping, ctx.sheet),
+        quantity=quantity
+        if quantity is not None
+        else _quantity_from_cell(row, mapping, ctx.sheet),
+        brand=brand,
+        barcode=barcode,
         serial_number=_cell_text(_row_get(row, mapping, 'serial_number')),
         purchase_price=_number_from_cell(
             row, mapping, 'purchase_price', None, ctx.sheet
         ),
-        uom_id=await _resolve_unit(ctx, row),
+        uom_id=uom_id,
         expiry_date=_parse_date_cell(row, mapping, 'expiry_date', ctx.sheet),
         freeze_date=_parse_date_cell(row, mapping, 'freeze_date', ctx.sheet),
         # A new product owes the form's required check: a row that leaves a
@@ -763,6 +684,7 @@ async def _build_item(
         metadata=_field_values(ctx, row, storage_id, category_id, require_filled=True)
         or None,
     )
+    return item_in, product.exists
 
 
 @dataclass
@@ -773,33 +695,27 @@ class _ImportContext:
     user: UserContextDTO
     mapping: dict[str, Any]
     sheet: SheetColumns
-    storages: _StorageIndex
+    locations: SheetLocations
     category_cache: dict[str, UUID]
     category_fields: dict[UUID, dict[str, dict[str, Any]]]
-    default_storage_type_id: UUID | None
-    create_missing_locations: bool
     create_missing_categories: bool
+    count_as_one: bool = False
     on_label_match: LabelMatch = 'add'
     labels: dict[str, UUID] = field(default_factory=dict)
-    default_storage_id: UUID | None = None
     uom_cache: dict[str, UUID | None] = field(default_factory=dict)
-    created_locations: list[str] = field(default_factory=list)
+    uom_resolver: 'UomResolverAsync | None' = None
     created_categories: list[str] = field(default_factory=list)
     # What the row in progress added to the shared caches. The savepoint
     # rolls back its INSERTs, not these in-memory maps — a stale id would
     # FK-fail every later row reusing the same name.
-    row_locations: list[UUID] = field(default_factory=list)
     row_categories: list[str] = field(default_factory=list)
 
     def begin_row(self) -> None:
-        self.row_locations.clear()
+        self.locations.row_founded.clear()
         self.row_categories.clear()
 
     def discard_row(self) -> None:
-        for loc_id in self.row_locations:
-            self.storages.remove(loc_id)
-        if self.row_locations:
-            del self.created_locations[-len(self.row_locations) :]
+        self.locations.discard_row()
         for key in self.row_categories:
             self.category_cache.pop(key, None)
         if self.row_categories:
@@ -810,18 +726,21 @@ class _ImportContext:
 class _RowResult:
     """What one import row became: a product, an update, a pass, a refusal."""
 
-    __slots__ = ('outcome', 'error', 'joined_existing')
+    __slots__ = ('outcome', 'error', 'records', 'joined_existing')
 
     def __init__(
         self,
         *,
         outcome: Literal['imported', 'updated', 'skipped', 'failed'],
         error: dict[str, Any] | None = None,
-        joined_existing: bool = False,
+        records: int = 1,
+        joined_existing: int = 0,
     ) -> None:
         self.outcome = outcome
         self.error = error
-        #: The row became a record of a product that already existed.
+        #: How many records the row became (a product without stock counts one).
+        self.records = records
+        #: How many of them joined a product that already existed.
         self.joined_existing = joined_existing
 
 
@@ -840,7 +759,7 @@ def _match_by_label(ctx: _ImportContext, row: pd.Series) -> UUID | None:
 
 
 async def _overwrite_existing(
-    ctx: _ImportContext, row: pd.Series, item_id: UUID, name: str
+    ctx: _ImportContext, row: pd.Series, item_id: UUID, name: str, sku: str | None
 ) -> _RowResult:
     """Write the row's columns onto the product its Label Code named.
 
@@ -863,6 +782,14 @@ async def _overwrite_existing(
         changes['purchase_price'] = _number_from_cell(
             row, ctx.mapping, 'purchase_price', None, ctx.sheet
         )
+    if sku is not None:
+        changes['sku'] = sku
+    description = _description_from_cell(row, ctx.mapping)
+    if description is not None:
+        changes['description'] = description
+    min_quantity = _min_quantity_from_cell(row, ctx.mapping, ctx.sheet)
+    if min_quantity is not None:
+        changes['min_quantity'] = min_quantity
     for key in ('expiry_date', 'freeze_date'):
         parsed = _parse_date_cell(row, ctx.mapping, key, ctx.sheet)
         if parsed is not None:
@@ -873,10 +800,9 @@ async def _overwrite_existing(
     category_id = await _resolve_or_create_category(ctx, row)
     if category_id is not None:
         changes['category_id'] = category_id
-    storage_col = ctx.mapping.get('location')
     storage_id = item.storage_location_id
-    if storage_col and _cell_text(row.get(storage_col)):
-        storage_id = await _resolve_storage(ctx, row)
+    if cells := _location_cells(ctx, row):
+        storage_id = await ctx.locations.resolve(cells)
         changes['location_id'] = storage_id
     fields = _field_values(ctx, row, storage_id, category_id or item.category_id)
     if fields:
@@ -916,40 +842,9 @@ async def _process_import_row(
     return result
 
 
-async def _file_under_the_product_the_code_names(
-    ctx: _ImportContext, item_in: ItemCreate
-) -> bool:
-    """A row matched to an existing product takes that product's name.
-
-    Returns whether there was a match, so the result can say the row added
-    stock to a product rather than making one.
-
-    The create door joins a row to the product its barcode (or name and brand)
-    names, and the record keeps the name the row happened to carry — a record
-    called "Imported Tuna" filed under Plum Butter, on a list and in a search
-    that show the name. The product's own name is the one every other record
-    of it carries.
-    """
-    if ctx.user.organization_id is None:
-        return False
-    card = await find_template_async(
-        ctx.db,
-        ctx.user.organization_id,
-        name=item_in.name,
-        barcode=item_in.barcode,
-        brand=item_in.brand,
-    )
-    if card is not None and card.name != item_in.name:
-        item_in.name = card.name
-    return card is not None
-
-
 async def _import_one_row(
     ctx: _ImportContext, row: pd.Series, row_num: int
 ) -> _RowResult:
-    from app.core.period_guard import check_period_not_closed
-    from app.services.analytics._common import org_today_async
-
     name = _cell_text(_row_get(row, ctx.mapping, 'name'))
     if not name:
         return _RowResult(
@@ -960,16 +855,65 @@ async def _import_one_row(
             },
         )
 
+    sku_column = ctx.mapping.get('sku')
+    sku_text = _cell_text(_row_get(row, ctx.mapping, 'sku'))
+    sku = sku_from_cell(sku_text, sku_column) if sku_column and sku_text else None
+    if sku is None and ctx.user.organization_id is not None:
+        name, sku = await read_reference(
+            ctx.db, ctx.user.organization_id, name, ctx.mapping['name']
+        )
+
     matched = _match_by_label(ctx, row)
     if matched is not None:
         if ctx.on_label_match == 'skip':
             return _RowResult(outcome='skipped')
-        return await _overwrite_existing(ctx, row, matched, name)
+        return await _overwrite_existing(ctx, row, matched, name, sku)
 
-    storage_id = await _resolve_storage(ctx, row)
+    shelves = _shelves(ctx, row)
+    if not shelves:
+        return await _import_product_alone(ctx, row, name, sku)
+
     category_id = await _resolve_or_create_category(ctx, row)
-    item_in = await _build_item(ctx, row, name, storage_id, category_id)
-    joined_existing = await _file_under_the_product_the_code_names(ctx, item_in)
+    joined = 0
+    for shelf in shelves:
+        storage_id = await ctx.locations.resolve(shelf.cells)
+        item_in, exists = await _build_item(
+            ctx, row, name, storage_id, category_id, shelf.quantity, sku
+        )
+        await _file_the_record(ctx, item_in)
+        joined += exists
+    return _RowResult(outcome='imported', records=len(shelves), joined_existing=joined)
+
+
+async def _import_product_alone(
+    ctx: _ImportContext, row: pd.Series, name: str, sku: str | None
+) -> _RowResult:
+    """A row without stock: the product only, nothing on a shelf.
+
+    Location, category, price, serial number and dates describe stock, so
+    they are not read.
+    """
+    if ctx.user.organization_id is None:
+        raise ServiceRejectionError('user_has_no_organization')
+    added = await add_product_without_stock(
+        ctx.db,
+        ctx.user,
+        ctx.user.organization_id,
+        name=name,
+        brand=_cell_text(_row_get(row, ctx.mapping, 'brand')),
+        barcode=_barcode_from_cell(row, ctx.mapping),
+        sku=sku,
+        description=_description_from_cell(row, ctx.mapping),
+        uom_id=await _resolve_unit(ctx, row),
+        min_quantity=_min_quantity_from_cell(row, ctx.mapping, ctx.sheet),
+    )
+    return _RowResult(outcome='imported' if added else 'skipped')
+
+
+async def _file_the_record(ctx: _ImportContext, item_in: ItemCreate) -> None:
+    """Create one record through the door the form uses."""
+    from app.core.period_guard import check_period_not_closed
+    from app.services.analytics._common import org_today_async
 
     # A code names the product, not the row: two rows may carry one code and
     # become two states of the shared template, at two shelves or one. The
@@ -996,4 +940,3 @@ async def _import_one_row(
     await create_item_async(
         ctx.db, item_in, ctx.user, unit_confirmed_over_template=True
     )
-    return _RowResult(outcome='imported', joined_existing=joined_existing)

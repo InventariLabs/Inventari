@@ -16,6 +16,9 @@ const EXPORT_HEADERS = [
   "Freeze Date",
   "Purchase price per unit (USD)",
   "Currency",
+  "SKU",
+  "Stock alert",
+  "Description",
 ];
 
 describe("suggestMapping", () => {
@@ -33,6 +36,10 @@ describe("suggestMapping", () => {
       expiry_date: "Expiry Date",
       freeze_date: "Freeze Date",
       purchase_price: "Purchase price per unit (USD)",
+      sku: "SKU",
+      min_quantity: "Stock alert",
+      description: "Description",
+      sublocation: "",
     });
   });
 
@@ -111,6 +118,10 @@ describe("suggestMapping by the dialog's own labels", () => {
       serial_number: "Numer seryjny",
       label_code: "Kod etykiety",
       purchase_price: "Cena zakupu za jednostkę",
+      sublocation: "",
+      sku: "",
+      description: "",
+      min_quantity: "",
     });
   });
 
@@ -118,5 +129,232 @@ describe("suggestMapping by the dialog's own labels", () => {
     const mapping = suggestMapping(["Name", "Expiry Date"], [], PL_LABELS);
     expect(mapping.name).toBe("Name");
     expect(mapping.expiry_date).toBe("Expiry Date");
+  });
+});
+
+/** The header row of each tool's export, and the columns it should feed.
+ *  The backend's import test runs each mapping over a row of that shape. */
+describe("suggestMapping for another tool's export", () => {
+  const suggested = (headers: string[]) =>
+    Object.fromEntries(
+      Object.entries(suggestMapping(headers)).filter(([, column]) => column),
+    );
+
+  it("reads Odoo's product export", () => {
+    expect(
+      suggested([
+        "Name",
+        "Internal Reference",
+        "Barcode",
+        "Sales Price",
+        "Cost",
+        "Product Category",
+        "Unit of Measure",
+        "Quantity On Hand",
+      ]),
+    ).toEqual({
+      name: "Name",
+      sku: "Internal Reference",
+      barcode: "Barcode",
+      purchase_price: "Cost",
+      category: "Product Category",
+      unit: "Unit of Measure",
+      quantity: "Quantity On Hand",
+    });
+  });
+
+  it("reads Odoo's stock export, on hand rather than reserved", () => {
+    expect(
+      suggested([
+        "Location",
+        "Product",
+        "Product Category",
+        "Lot/Serial Number",
+        "Package",
+        "Owner",
+        "Reserved Quantity",
+        "On Hand Quantity",
+        "Unit of Measure",
+      ]),
+    ).toEqual({
+      location: "Location",
+      name: "Product",
+      category: "Product Category",
+      quantity: "On Hand Quantity",
+      unit: "Unit of Measure",
+    });
+  });
+
+  it("reads Sortly, where the only price is the item's", () => {
+    expect(
+      suggested([
+        "Entry Name",
+        "Entry Type",
+        "Folder Path",
+        "Quantity",
+        "Unit",
+        "Min Level",
+        "Price",
+        "Tags",
+        "Notes",
+        "Barcode/QR-1",
+      ]),
+    ).toEqual({
+      name: "Entry Name",
+      location: "Folder Path",
+      quantity: "Quantity",
+      unit: "Unit",
+      min_quantity: "Min Level",
+      purchase_price: "Price",
+      description: "Notes",
+      barcode: "Barcode/QR-1",
+    });
+  });
+
+  it("reads inFlow's stock levels, a location over two columns", () => {
+    expect(
+      suggested([
+        "ProductName",
+        "SKU",
+        "Location",
+        "Sublocation",
+        "Quantity",
+        "Serial",
+        "LotNumber",
+        "ExpiryDate",
+      ]),
+    ).toEqual({
+      name: "ProductName",
+      sku: "SKU",
+      location: "Location",
+      sublocation: "Sublocation",
+      quantity: "Quantity",
+      serial_number: "Serial",
+      expiry_date: "ExpiryDate",
+    });
+  });
+
+  it("reads inFlow's product file, the cost rather than the price", () => {
+    expect(
+      suggested([
+        "ProductName",
+        "SKU",
+        "Barcode",
+        "Category",
+        "Description",
+        "UnitPrice",
+        "Cost",
+        "UnitOfMeasure",
+      ]),
+    ).toEqual({
+      name: "ProductName",
+      sku: "SKU",
+      barcode: "Barcode",
+      category: "Category",
+      description: "Description",
+      purchase_price: "Cost",
+      unit: "UnitOfMeasure",
+    });
+  });
+
+  it("reads Zoho's items, the purchase rate rather than the selling one", () => {
+    expect(
+      suggested([
+        "Item Name",
+        "SKU",
+        "EAN",
+        "Description",
+        "Usage unit",
+        "Rate",
+        "Purchase Rate",
+        "Reorder Level",
+        "Category Name",
+        "Warehouse Name",
+        "Stock On Hand",
+      ]),
+    ).toEqual({
+      name: "Item Name",
+      sku: "SKU",
+      barcode: "EAN",
+      description: "Description",
+      unit: "Usage unit",
+      purchase_price: "Purchase Rate",
+      min_quantity: "Reorder Level",
+      category: "Category Name",
+      location: "Warehouse Name",
+      quantity: "Stock On Hand",
+    });
+  });
+
+  it("reads Katana's product and material files", () => {
+    expect(
+      suggested([
+        "Material name",
+        "Variant code / SKU",
+        "Category",
+        "Unit of measure",
+        "Default purchase price",
+      ]),
+    ).toEqual({
+      name: "Material name",
+      sku: "Variant code / SKU",
+      category: "Category",
+      unit: "Unit of measure",
+      purchase_price: "Default purchase price",
+    });
+    expect(suggested(["Product name / Material name"]).name).toBe(
+      "Product name / Material name",
+    );
+  });
+
+  it("reads BoxHero's quantity column per location, Cost before Price", () => {
+    expect(
+      suggested([
+        "SKU",
+        "Item Name",
+        "Barcode",
+        "Cost",
+        "Price",
+        "Brand",
+        "Category",
+        "Qty(Warehouse)",
+        "Qty(Shop)",
+      ]),
+    ).toEqual({
+      sku: "SKU",
+      name: "Item Name",
+      barcode: "Barcode",
+      purchase_price: "Cost",
+      brand: "Brand",
+      category: "Category",
+      "stock_at:Warehouse": "Qty(Warehouse)",
+      "stock_at:Shop": "Qty(Shop)",
+    });
+  });
+
+  it("reads Homebox's export", () => {
+    expect(
+      suggested([
+        "HB.name",
+        "HB.description",
+        "HB.notes",
+        "HB.location",
+        "HB.tags",
+        "HB.quantity",
+        "HB.manufacturer",
+        "HB.serial_number",
+        "HB.purchase_price",
+        "HB.purchase_date",
+        "HB.warranty_expires",
+      ]),
+    ).toEqual({
+      name: "HB.name",
+      description: "HB.description",
+      location: "HB.location",
+      quantity: "HB.quantity",
+      brand: "HB.manufacturer",
+      serial_number: "HB.serial_number",
+      purchase_price: "HB.purchase_price",
+    });
   });
 });

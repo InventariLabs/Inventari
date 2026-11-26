@@ -120,6 +120,8 @@ async function followExportJob(
 
 /** What an import does with a row whose Label Code is already taken. */
 export type LabelMatchMode = "add" | "skip" | "overwrite";
+/** How a "/" in a sheet's location cell reads. */
+export type LocationSlash = "path" | "name";
 
 export const itemsApi = {
   getAll: async (params?: {
@@ -383,11 +385,17 @@ export const itemsApi = {
     createCategories: boolean = true,
     onLabelMatch: LabelMatchMode = "add",
     onProgress?: (progress: ImportProgress) => void,
+    reading: { locationSlash: LocationSlash; countAsOne: boolean } = {
+      locationSlash: "path",
+      countAsOne: false,
+    },
   ): Promise<ItemImportOutcome> => {
     assertFileSize(file);
     const formData = new FormData();
     formData.append("file", file);
     formData.append("mapping_json", JSON.stringify(mapping));
+    formData.append("location_slash", reading.locationSlash);
+    formData.append("count_as_one", String(reading.countAsOne));
     formData.append("create_missing_locations", String(createLocations));
     formData.append("create_missing_categories", String(createCategories));
     formData.append("on_label_match", onLabelMatch);

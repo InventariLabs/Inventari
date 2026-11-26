@@ -379,6 +379,9 @@ class ItemImportResponse(BaseModel):
     product the organization already had, under the update mode the reader
     chose; both stay zero when the import only adds.
 
+    A row of a sheet with a quantity column per location counts once for every
+    location it puts stock into, in ``total`` as in ``imported``.
+
     ``joined_existing`` counts the imported rows filed under a product that
     already existed — by its barcode, or by its name and brand — and so added
     stock to it rather than making a new product. A product two rows of one

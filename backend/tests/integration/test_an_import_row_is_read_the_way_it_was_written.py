@@ -36,7 +36,9 @@ def _ctx(user) -> UserContextDTO:
     )
 
 
-async def _import(db: AsyncSession, user, rows: list[dict], mapping=None) -> dict:
+async def _import(
+    db: AsyncSession, user, rows: list[dict], mapping=None, **options
+) -> dict:
     return await import_items(
         db,
         _csv(rows),
@@ -45,6 +47,7 @@ async def _import(db: AsyncSession, user, rows: list[dict], mapping=None) -> dic
         _ctx(user),
         create_missing_locations=False,
         create_missing_categories=False,
+        **options,
     )
 
 
@@ -71,12 +74,13 @@ class TestABlankQuantityIsNotAOne:
             {
                 'row': 1,
                 'error': 'Column "Quantity": the quantity is empty. Fill it in, '
-                'or clear the quantity mapping to import every row as 1',
+                'or clear the quantity mapping and choose what a file without '
+                'quantities adds',
             }
         ]
         assert await _count_named(real_async_db_session, 'Flour') == 0
 
-    async def test_a_sheet_without_a_quantity_column_still_imports_as_one(
+    async def test_a_sheet_without_a_quantity_column_can_import_as_one(
         self, real_async_db_session, async_test_user, async_test_storage_location
     ):
         result = await _import(
@@ -84,6 +88,7 @@ class TestABlankQuantityIsNotAOne:
             async_test_user,
             [{'Name': 'Salt'}],
             mapping={'name': 'Name'},
+            count_as_one=True,
         )
 
         assert result['imported'] == 1, result
@@ -294,6 +299,7 @@ class TestTheReasonsSpeakTheReadersLanguage:
                         'field:colour': 'Kolor',
                         'field:tags': 'Tagi',
                     },
+                    count_as_one=True,
                 )
             finally:
                 set_current_lang('en')
@@ -373,6 +379,7 @@ class TestTheReasonsSpeakTheReadersLanguage:
                         'category': 'Category',
                         'field:colour': 'Kolor',
                     },
+                    count_as_one=True,
                 )
             finally:
                 set_current_lang('en')
@@ -426,6 +433,7 @@ class TestTheReasonsSpeakTheReadersLanguage:
                     'category': 'Category',
                     'field:cena': 'Cena',
                 },
+                count_as_one=True,
             )
         finally:
             set_current_lang('en')

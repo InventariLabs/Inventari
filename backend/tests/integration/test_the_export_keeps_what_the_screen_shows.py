@@ -83,8 +83,9 @@ class TestTheExportKeepsWhatTheScreenShows:
         assert row['Stock alert'] == 20
         assert row['Custom: Thread size'] == 'M8'
         read_me = sheets['Read me'].set_index('Column')
-        for column in ('SKU', 'Description', 'Stock alert', 'Custom: Thread size'):
-            assert read_me.loc[column, 'On import'] == 'not read'
+        for column in ('SKU', 'Description', 'Stock alert'):
+            assert read_me.loc[column, 'On import'] == 'read'
+        assert read_me.loc['Custom: Thread size', 'On import'] == 'not read'
 
     async def test_the_location_column_names_one_place(
         self, real_async_db_session: AsyncSession, async_test_user

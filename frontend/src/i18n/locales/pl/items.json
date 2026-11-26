@@ -162,7 +162,28 @@
       "barcode": "Kod kreskowy",
       "purchasePrice": "Cena zakupu za jednostkę",
       "serialNumber": "Numer seryjny",
-      "labelCode": "Kod etykiety"
+      "labelCode": "Kod etykiety",
+      "sku": "SKU",
+      "sublocation": "Miejsce podrzędne",
+      "stockAlert": "Alert stanu",
+      "description": "Opis"
+    },
+    "reading": {
+      "perLocation": "Czytaj stan z kolumn {{columns}}: każda to osobne miejsce",
+      "noQuantity": {
+        "label": "Plik bez kolumny z ilością",
+        "products": "Same produkty",
+        "one": "Każdy jako 1",
+        "productsNote": "Produkty zostaną dodane bez stanu. Miejsce, kategoria, cena, numer seryjny i daty opisują stan, więc nie są czytane.",
+        "oneNote": "Każdy wiersz dodaje do stanu swój produkt w ilości 1."
+      },
+      "slash": {
+        "label": "Ukośnik w nazwie miejsca",
+        "hint": "Na przykład „Garaż / Stół warsztatowy”.",
+        "path": "Rozdziela poziomy",
+        "name": "Jest częścią nazwy"
+      },
+      "categoryPath": "Z kategorii zapisanej jako ścieżka, na przykład „All / Saleable / Food”, brany jest ostatni człon."
     },
     "foundedLocations_one": "Utworzono {{count}} miejsce",
     "foundedLocations_few": "Utworzono {{count}} miejsca",

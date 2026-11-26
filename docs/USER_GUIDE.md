@@ -327,7 +327,8 @@ database: check it against the label, and see the note on allergens and nutritio
   stands on, not products; the category cards count products.
 - Sorting by date added, name, quantity or expiry.
 - **Import** reads XLSX or CSV, and can create missing locations and
-  categories as it goes. Its **Import from Grocy** tile moves a Grocy
+  categories as it goes (more under *Importing a sheet* below). Its
+  **Import from Grocy** tile moves a Grocy
   household in from Grocy's own database file, `grocy.db` in Grocy's `data`
   folder (in Docker, the volume mounted at `/config/data` or
   `/var/www/data`); Grocy itself writes no export. Before anything is written
@@ -342,6 +343,32 @@ database: check it against the label, and see the note on allergens and nutritio
   list currently shows as XLSX, with the SKU, description, stock alert, the
   values of the category's custom fields and each location as its full path;
   its second sheet says which columns an import reads back.
+
+**Importing a sheet.** After the file is chosen, each product field is matched
+to a column; the dialog suggests the columns of this app's own export and of
+the exports of Odoo (products and stock), Sortly, inFlow, Zoho, Katana,
+BoxHero and Homebox, and you can change any of them. Besides the fields of the
+product form, a column can feed the **SKU**, the **Description**, the **Stock
+alert** and a **Sublocation**.
+
+- A product named by a SKU you already have is that product, whatever name the
+  row gives it. A name written `[REF] Name`, as Odoo's stock export writes it,
+  is read as the reference and the name. A SKU holds letters, digits, dashes,
+  underscores and slashes; a row with another character is refused and names
+  it. Two rows with one name and two SKUs are two products.
+- A file with no quantity column adds **Products only**: nothing is put into
+  stock, and location, category, price, serial number and dates, which describe
+  stock, are not read. Choose **One of each** to add one of every row's product
+  instead. A file with a quantity column per location, headed `Qty(Shop)`, puts
+  each filled cell into stock at that location.
+- A location may be written as a path, `Pantry › Shelf A`, `Pantry > Shelf A`
+  or `WH/Stock/Shelf 1`, or split over a location and a sublocation column;
+  missing levels are created one inside the other. Set **A slash in a
+  location** to **Part of the name** when your names hold slashes.
+- A category written as a path, such as `All / Saleable / Food`, takes its last
+  step.
+- A unit is read by its symbol, by common spellings such as `Units`, `ea` or
+  `each`, and by the name the app gives it in any of its languages.
 - Each row has **Remove 1 unit**, **Add 1 unit**, **Edit**, **Delete** and a bell,
   **Set stock alert**, for the minimum below which the product counts as
   running low. Clicking a row opens its quick actions.
@@ -1885,7 +1912,10 @@ in To do and in the reorder alerts, not as a purchase.
 
 **Partners** is the directory of suppliers, customers, partners that are both,
 service providers, manufacturers and employees — with codes, tax IDs and contact details.
-**New partner** adds one, **Import** reads XLSX or CSV. On the screen a partner is
+**New partner** adds one, **Import** reads XLSX or CSV (a country may be its
+two-letter code or its name; a row that names the company it belongs to, as
+Odoo's contact export does, becomes that company's contact person when the same
+file adds the company, with their name, e-mail and phone in its notes). On the screen a partner is
 deactivated rather than deleted. The API can also delete one outright
 (`DELETE /partners/{id}`) while no open purchase order names it: the products,
 documents and orders that named it then name no partner, a document already
