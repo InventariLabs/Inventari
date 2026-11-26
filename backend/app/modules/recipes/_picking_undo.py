@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
@@ -12,7 +13,11 @@ from app.core.exceptions import AppException, ServiceRejectionError
 from app.core.public_api import core_api
 from app.i18n.service import get_current_lang, get_error_message
 
-from ._picking_consume import picking_move_reference
+from ._picking_consume import (
+    lock_record_for_pick,
+    lock_stock_for_picking,
+    picking_move_reference,
+)
 from ._picking_session_helpers import _get_session_or_404
 from .models import PickingSession, PickingSessionItem, RecipeIngredient
 
@@ -39,7 +44,7 @@ async def _restore_single_item(
     the take it undoes, and in a household profile there is no other record to
     tell the two apart.
     """
-    item = await core_api.items.get_async(db, org_id, item_id)
+    item = await lock_record_for_pick(db, org_id, item_id)
     if not item:
         return
     new_quantity = (item.quantity or Decimal('0')) + consumed
@@ -89,6 +94,34 @@ async def _restore_single_item(
             )
 
 
+def _taken_from(session_item: PickingSessionItem) -> list[tuple[UUID, Decimal]]:
+    """The records this pick took from, and how much of each.
+
+    The ``picked_items`` breakdown names them; a row without one names a
+    single record (``item_id`` + ``quantity_consumed``).
+    """
+    if session_item.picked_items:
+        return [
+            (UUID(entry['item_id']), Decimal(str(entry['quantity'])))
+            for entry in session_item.picked_items
+            if entry.get('item_id') and entry.get('quantity') is not None
+        ]
+    if not session_item.item_id or not session_item.quantity_consumed:
+        return []
+    return [(session_item.item_id, session_item.quantity_consumed)]
+
+
+async def lock_stock_to_restore(
+    db: AsyncSession, org_id: UUID, session_items: Iterable[PickingSessionItem]
+) -> None:
+    """Lock everything putting these picks back writes, before the first write."""
+    await lock_stock_for_picking(
+        db,
+        org_id,
+        [item_id for row in session_items for item_id, _ in _taken_from(row)],
+    )
+
+
 async def _restore_consumption(
     db: AsyncSession,
     org_id: UUID,
@@ -98,41 +131,21 @@ async def _restore_consumption(
 ) -> None:
     """Restore consumed quantity + valuation for a picked session item.
 
-    Supports multi-item partial picks via the ``picked_items`` JSONB
-    breakdown.  Falls back to the legacy single-item path (``item_id`` +
-    ``quantity_consumed``) when no breakdown is recorded.  Idempotent —
-    no-op when nothing was consumed.  Does NOT mutate ``session_item`` or
-    commit; the caller owns the transaction and the session-item reset.
+    Every record the pick took from gets its share back. Idempotent — no-op
+    when nothing was consumed.  Does NOT mutate ``session_item`` or commit;
+    the caller owns the transaction and the session-item reset, and locks the
+    stock first (:func:`lock_stock_to_restore`).
     """
-    breakdown = session_item.picked_items
-    if breakdown:
-        for entry in breakdown:
-            entry_item_id = entry.get('item_id')
-            entry_qty = entry.get('quantity')
-            if not entry_item_id or entry_qty is None:
-                continue
-            await _restore_single_item(
-                db,
-                org_id,
-                UUID(entry_item_id),
-                Decimal(str(entry_qty)),
-                user_id,
-                consumed_valuation_rate=session_item.consumed_valuation_rate,
-                history_changes=history_changes,
-            )
-        return
-
-    if not session_item.item_id or not session_item.quantity_consumed:
-        return
-    await _restore_single_item(
-        db,
-        org_id,
-        session_item.item_id,
-        session_item.quantity_consumed,
-        user_id,
-        consumed_valuation_rate=session_item.consumed_valuation_rate,
-        history_changes=history_changes,
-    )
+    for item_id, quantity in _taken_from(session_item):
+        await _restore_single_item(
+            db,
+            org_id,
+            item_id,
+            quantity,
+            user_id,
+            consumed_valuation_rate=session_item.consumed_valuation_rate,
+            history_changes=history_changes,
+        )
 
 
 async def undo_pick(
@@ -168,6 +181,7 @@ async def undo_pick(
         )
 
     if session_item.item_id and session_item.quantity_consumed:
+        await lock_stock_to_restore(db, org_id, [session_item])
         await _restore_consumption(
             db,
             org_id,

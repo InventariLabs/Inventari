@@ -20,7 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ServiceRejectionError
 
-from ._picking_undo import _restore_consumption
+from ._picking_undo import _restore_consumption, lock_stock_to_restore
 from .models import PickingSession, PickingSessionItem
 
 logger = logging.getLogger(__name__)
@@ -60,6 +60,7 @@ async def terminate_session(
     )
     picked_items = list(picked_result.scalars().all())
 
+    await lock_stock_to_restore(db, session.organization_id, picked_items)
     for item in picked_items:
         await _restore_consumption(
             db,

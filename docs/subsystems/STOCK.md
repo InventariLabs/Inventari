@@ -76,7 +76,10 @@ A door that may take a record to nothing files it under one of the
 organization's virtual places, a group of the same product. A use, a
 disposal, a package finished by hand (`lock_record_stock_async` with
 `filed_under`) and a draw that files what it empties lock that group together
-with the shelf's. An organization founded by a registration or through the API
+with the shelf's. A recipe pick and its undo lock every shelf of the record's
+product, that place included, before they lock the record's row and read the
+number they write from. Filing makes a virtual place that is missing and
+renames none: their names follow onboarding. An organization founded by a registration or through the API
 has the virtual places from the moment it is created
 (`seed_new_organization_async`); one made by `create-admin` gets them at
 onboarding.

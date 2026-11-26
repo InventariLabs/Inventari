@@ -16,6 +16,7 @@ from app.core.exceptions import NotFoundException
 from app.core.public_api import core_api
 from app.i18n.service import get_current_lang
 
+from ._picking_consume import lock_record_for_pick
 from ._picking_fefo import (
     needs_disambiguation,
     open_pack_meets_earlier_sealed,
@@ -46,13 +47,10 @@ async def load_recipe_ingredients(
 async def resolve_scanned_item_by_id(
     db: AsyncSession, org_id: UUID, item_id: UUID
 ) -> ItemDTO:
-    """Fetch the item by primary key, raising 404 if not found."""
-    lang = get_current_lang()
-    dto = await core_api.items.get_for_update_async(db, org_id, item_id)
-    if not dto:
-        raise NotFoundException('item', lang)
-    item = await core_api.items.get_async(db, org_id, dto.id)
-    assert item is not None
+    """Fetch and lock the item by primary key, raising 404 if not found."""
+    item = await lock_record_for_pick(db, org_id, item_id)
+    if not item:
+        raise NotFoundException('item', get_current_lang())
     return item
 
 
@@ -66,13 +64,13 @@ async def resolve_scanned_item_by_barcode(
         - PickingScanResponse when the caller should return it directly
           (product not recognized, not in stock, or disambiguation needed).
     """
-    dto = await core_api.items.find_by_barcode_async(
-        db, org_id, barcode, for_update=True
-    )
-    if dto:
-        item = await core_api.items.get_async(db, org_id, dto.id)
-        assert item is not None
-        return item
+    found = await core_api.items.find_by_barcode_async(db, org_id, barcode)
+    if found:
+        item = await lock_record_for_pick(db, org_id, found.id)
+        # A record emptied while its lock was waited for no longer answers to
+        # the barcode.
+        if item and item.quantity and item.quantity > 0:
+            return item
 
     template = await core_api.product_templates.lookup_by_barcode_async(
         db, org_id, barcode
@@ -104,14 +102,12 @@ async def resolve_scanned_item_by_barcode(
             piece_measure=await piece_measure_of_template(db, org_id, template.id),
         )
     best, _ = select_best_item(candidates, today=today)
-    resolved = await core_api.items.get_for_update_async(db, org_id, best.id)
-    if not resolved:
+    item = await lock_record_for_pick(db, org_id, best.id)
+    if not item:
         return PickingScanResponse(
             status='not_in_recipe',
             message='Product not recognized',
         )
-    item = await core_api.items.get_async(db, org_id, resolved.id)
-    assert item is not None
     return item
 
 

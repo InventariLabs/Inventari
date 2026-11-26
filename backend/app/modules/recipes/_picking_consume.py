@@ -6,6 +6,7 @@ Extracted from _picking_scan.py to keep the orchestrator under the
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from decimal import ROUND_FLOOR, Decimal
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
@@ -41,6 +42,37 @@ def picking_move_reference(history_changes: dict[str, Any] | None) -> dict[str, 
         'move_reference_type': PICKING_MOVE_REFERENCE_TYPE,
         'move_reference_id': UUID(str(session_id)),
     }
+
+
+async def lock_stock_for_picking(
+    db: AsyncSession, org_id: UUID, item_ids: Iterable[UUID]
+) -> None:
+    """Lock the stock a pick, or putting one back, writes through these records.
+
+    Every shelf of each record's product in one call, so the Consumed place an
+    emptied record goes to is locked together with the shelf it leaves, in the
+    order every writer of stock takes them. It comes before any record's row
+    is locked: a door holding a product's group asks for the row next.
+    """
+    templates = set()
+    for item_id in item_ids:
+        item = await core_api.items.get_async(db, org_id, item_id)
+        if item is not None and item.template_id:
+            templates.add(item.template_id)
+    await core_api.stock.lock_async(
+        db, org_id, keys=[(template_id, None) for template_id in templates]
+    )
+
+
+async def lock_record_for_pick(
+    db: AsyncSession, org_id: UUID, item_id: UUID
+) -> ItemDTO | None:
+    """The record, read under the locks its quantity is written under.
+
+    A pick and its undo write an absolute quantity, worked out from this read.
+    """
+    await lock_stock_for_picking(db, org_id, [item_id])
+    return await core_api.items.get_for_update_async(db, org_id, item_id)
 
 
 async def load_or_lock_session_item(
