@@ -174,6 +174,49 @@ describe("usePickingSession — a refused scan is not a pick", () => {
     expect(result.current.refusals).toEqual({});
   });
 
+  it.each(["scan", "resolveDisambiguation"] as const)(
+    "reads the checklist again when %s finds the record used up",
+    async (door) => {
+      // The row still names the record that is gone; only a fresh reading
+      // can name the next one.
+      const answers = [
+        { status: "disambiguation_required", candidates: [] },
+        { status: "not_in_stock", ingredient_id: "ing-1", message: "no" },
+      ];
+      scanAnswers(...(door === "scan" ? answers.slice(1) : answers));
+      server.use(
+        http.get("/api/v1/recipes/:id/picking/:sessionId", () =>
+          HttpResponse.json({
+            ...session,
+            items_to_pick: [
+              { ...session.items_to_pick[0], recommended_item_id: "item-2" },
+            ],
+          }),
+        ),
+      );
+      const { result } = renderHook(() => usePickingSession("recipe-1"), {
+        wrapper: QueryWrapper,
+      });
+
+      await act(async () => {
+        await result.current.startSession(2);
+      });
+      await act(async () => {
+        await result.current.scan({ item_id: "item-1" });
+      });
+      if (door === "resolveDisambiguation") {
+        await act(async () => {
+          await result.current.resolveDisambiguation("item-1");
+        });
+      }
+
+      expect(result.current.state).toMatchObject({
+        phase: "active",
+        items: [{ status: "pending", recommended_item_id: "item-2" }],
+      });
+    },
+  );
+
   it("does not close the session on a refusal that claims completion", async () => {
     // `session_complete` is read after the status, so a refusal carrying it does
     // not end the session with nothing taken.
