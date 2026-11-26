@@ -730,9 +730,11 @@ done
     ) -> None:
         example = (_REPO_ROOT / '.env.production.example').read_text(encoding='utf-8')
         quick = (_REPO_ROOT / 'QUICK_DEPLOY.md').read_text(encoding='utf-8')
-        block = re.search(r'```env\n(.*?)```', quick, flags=re.DOTALL)
+        blocks = re.findall(r'```env\n(.*?)```', quick, flags=re.DOTALL)
 
         assert re.search(r'^AGE_RECIPIENT=$', example, flags=re.MULTILINE)
         assert 'REQUIRED' not in example.split('AGE_RECIPIENT=')[0].split('\n\n')[-1]
-        assert block is not None
-        assert 'AGE_RECIPIENT' not in block.group(1)
+        assert not [block for block in blocks if 'AGE_RECIPIENT' in block]
+        assert 'Backups run from the first night, with no key to set up' in ' '.join(
+            quick.split()
+        )

@@ -1,0 +1,45 @@
+name: Release installer
+
+# The one-command install of QUICK_DEPLOY.md and docs/HOME_INSTALL.md starts from
+#
+#   https://github.com/InventariLabs/Inventari/releases/latest/download/install.sh
+#
+# GitHub resolves `latest` to the newest published release that is not a
+# pre-release, so the address stays the same from one release to the next.
+# This job attaches scripts/install.sh to every release when it is published,
+# with the release's version written into it: the installer of a release
+# installs that release, whose files are the ones it was written against.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  installer:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Write the release into the installer
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          version="${TAG#v}"
+          sed "s/^published_release=\"\"\$/published_release=\"$version\"/" scripts/install.sh > install.sh
+          if ! grep -qx "published_release=\"$version\"" install.sh; then
+            echo "scripts/install.sh has no empty published_release= line to write $version into." >&2
+            exit 1
+          fi
+          sh -n install.sh
+
+      - name: Attach it to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$TAG" install.sh --clobber --repo "$GITHUB_REPOSITORY"

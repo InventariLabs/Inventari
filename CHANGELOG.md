@@ -14,6 +14,24 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- Inventari installs with one command, on a server with a domain or on a
+  Linux computer at home:
+  `curl -fsSL https://github.com/InventariLabs/Inventari/releases/latest/download/install.sh | sh -s -- vps`
+  (or `-- home`). It asks only what the reader alone knows — on a server the
+  domain and the e-mail address for the certificate, on both the
+  administrator's e-mail address and password — installs Docker when it is
+  missing, fetches the release, writes `.env`, downloads the published images,
+  creates the administrator before the proxy puts the address on the
+  internet, and ends by printing the https address. Run again, it changes
+  nothing and says so; after a step that failed, it says what failed and
+  continues from there. At home it goes through Tailscale, whose certificate
+  every phone already trusts, so the camera scans with nothing installed on
+  the phone but the Tailscale app; Caddy's own certificate authority stays as
+  the way without a Tailscale account (`-- home --local-ca`). QUICK_DEPLOY.md
+  and docs/HOME_INSTALL.md open with that line, the home guide says before
+  anything else why the camera and staying signed in need HTTPS, and the
+  steps by hand live in DEPLOYMENT.md. Every published release carries the
+  installer as a download of its own.
 - Every release now publishes its container images — the backend, the
   frontend and the backup sidecar — to the GitHub Container Registry, for amd64
   and arm64, so a server or a Raspberry Pi can download the stack instead of

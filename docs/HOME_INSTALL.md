@@ -1,105 +1,150 @@
-# Installing Inventari on a home network
+# Installing Inventari at home
 
-For a computer at home — a spare PC or a mini PC — that the household reaches from phones and laptops on the same Wi-Fi.
-There is no domain name, no public address and no open port on the router: the
-installation is not on the internet at all.
+For a Linux computer at home — a spare PC, a mini PC, a Raspberry Pi — that
+the household opens from their phones. There is no domain to buy and no port
+to open on the router.
 
-[QUICK_DEPLOY.md](../QUICK_DEPLOY.md) is the same stack for a server with a
-domain, where Let's Encrypt issues the certificate. At home that cannot work —
-nobody on the internet can reach the machine to prove it owns the name — so
-Caddy, the proxy in front of the application, issues the certificate itself
-from a small certificate authority of its own, and each device is told once to
-trust it. Everything else is the production stack: the same compose file, the
-same database roles, the same nightly backups.
+## Install
 
-## What you need
-
-- A 64-bit Linux machine that stays on, with 4 GB of memory or more, Docker
-  Engine and Docker Compose v2.24.4 or newer, which the published-images
-  file needs (`curl -fsSL https://get.docker.com | sh`, then
-  `sudo usermod -aG docker $USER` and log in again). Ports 80 and 443 free.
-- A name the *household's devices* can resolve to the machine, because a
-  certificate is issued for a name and a phone that types a bare IP address
-  sends none. Two ways to get one, neither needs a domain you own:
-  - **The router's local DNS** (most routers have a "local hostnames" or
-    "static DNS" page; so does a Pi-hole): map `inventari.home.arpa` to the
-    machine's address. Give the machine a fixed address on the router first —
-    a DHCP reservation — or the name will point at nothing after a restart.
-  - **The machine's own `.local` name**, where mDNS runs (Avahi on Linux;
-    macOS and iOS speak it natively): `<hostname>.local`, with the hostname
-    from `hostname`. Phones on Android may not resolve it; the router's DNS
-    is the safer choice there.
-
-  The rest of this page says `inventari.home.arpa`; use whatever name you chose.
-  The name must end in `.home.arpa`, `.local` or `.internal`: Caddy uses its
-  own authority only for names no public authority could certify, and asks
-  Let's Encrypt for any other — a bare word such as `inventari` included,
-  which then never gets a certificate.
-
-## Step 1: Get Inventari
+On that computer, run:
 
 ```bash
-sudo mkdir -p /opt/inventari && sudo chown $USER:$USER /opt/inventari
-cd /opt/inventari
-git clone https://github.com/InventariLabs/Inventari.git .
-git tag --list 'v*' --sort=-v:refname | head -3   # the releases, newest first
-git checkout v0.13.0                                # the one you install
+curl -fsSL https://github.com/InventariLabs/Inventari/releases/latest/download/install.sh | sh -s -- home
 ```
 
-## Step 2: Configure
+It asks for the administrator's e-mail address and password — 8 characters
+or more, with a lowercase letter, an uppercase letter and a digit. Then it
+puts the computer on [Tailscale](https://tailscale.com), a private network
+for your own devices that is free for a household: it prints a Tailscale
+address to open in any browser, where you sign in or create the account. The
+first time, it also asks you to switch on HTTPS for that network in
+Tailscale's admin page, and says where. Then it works on its own for a few
+minutes, and ends with the address:
+
+```text
+Inventari 0.14.0 is running at
+
+    https://box.tail1234.ts.net
+```
+
+`box` is the computer's name and `tail1234` your network's; yours differ.
+
+What the computer needs:
+
+- Linux, 64-bit (amd64 or arm64), with 4 GB of memory or more, left on.
+  Ubuntu 26.04 LTS and Debian 13 are the ones tested; macOS and Windows are
+  not.
+- Ports 80 and 443 free (nothing else serving web pages on it).
+- Root, or an account that may use `sudo`.
+
+## Why HTTPS, even at home
+
+A browser lets a page use the camera only when it is sure the page is the
+one it asked for: an `https://` address with a certificate it trusts. Staying
+signed in needs the same: Inventari keeps your sign-in in a cookie marked
+*Secure*, which a browser does not keep for a plain `http://` address. That
+is why the installation answers on `https://` only. Over plain `http://`:
+
+- **The camera does not start.** The scan screen shows no picture but
+  *Camera error* and *Camera requires HTTPS or localhost. Please check your
+  connection.*, with a field to type the code by hand.
+- **The sign-in does not last.** It works until the page is reloaded or the
+  app reopened, and then the sign-in screen is back.
+
+With a certificate the phone does not trust, a warning comes before the app
+(*Your connection is not private*). Clicking past it is not the fix: trust
+the certificate instead, which is what Tailscale spares you. And typing the
+computer's own address (`192.168.…`) leads nowhere: the certificate is issued
+for the name, not for the number.
+
+Tailscale is what makes this easy: it gets the computer a certificate for its
+`ts.net` name that every phone already trusts, with nothing to install on the
+phone but the Tailscale app. *Without Tailscale* below is the other way, with
+a certificate each device is told to trust by hand.
+
+## The phones
+
+On each phone, and on any computer that should open Inventari:
+
+1. Install Tailscale — App Store, Google Play, or
+   [tailscale.com/download](https://tailscale.com/download).
+2. Sign in with the account the installation used, and leave Tailscale
+   switched on.
+3. Open the address the installation printed and sign in. To keep it as an
+   app: *Share → Add to Home Screen* on an iPhone, *⋮ → Add to Home screen*
+   on Android.
+
+The address works away from home too, wherever the phone has internet, and
+only on devices signed in to your Tailscale network.
+
+**Check that the camera works.** In Inventory, tap **Scan** in the bar at the
+bottom of the screen. The browser asks once whether the page may use the
+camera; allow it, and the picture appears. Point it at the barcode on any
+package: a product you do not have yet opens the new product form with the
+code filled in. If the message above shows instead, check that the address
+starts with `https://` and ends in `.ts.net`.
+
+## What it did
+
+- Installed Docker, git and Tailscale where they were missing, and signed the
+  computer in to your Tailscale network.
+- Fetched the release into `/opt/inventari` and wrote
+  `/opt/inventari/.env` with `scripts/init-env.sh`: the `ts.net` name and six
+  generated secrets, readable by its owner only, plus a line naming the
+  release's published images.
+- Downloaded those images, started everything except Caddy, the proxy, and
+  created the administrator before Caddy started, as on a server
+  ([QUICK_DEPLOY.md](../QUICK_DEPLOY.md) says why).
+- Started Caddy, which asks Tailscale for the certificate of the `ts.net`
+  name, and waited until the address answered over HTTPS.
+
+Run the same line again and it changes nothing and says so. When a step
+fails, it says which one and what to check; run the line again once that is
+fixed, and it continues from that step.
+
+A Tailscale certificate, like every public one, is listed in public
+certificate logs: the computer's name and your network's name become public
+there. The address itself answers only inside your Tailscale network.
+
+## Without Tailscale
+
+For a household that does not want a Tailscale account: Caddy issues the
+certificate itself, from a small certificate authority of its own, and each
+device is told once to trust that authority. It takes more steps on each
+device, and the address works only at home.
+
+**1. A name for the computer.** A certificate is issued for a name, and a
+phone that types a bare IP address sends none, so the household's devices
+need a name that leads to the computer. Two ways, neither needs a domain you
+own:
+
+- **The router's local DNS** (most routers have a "local hostnames" or
+  "static DNS" page; so does a Pi-hole): map `inventari.home.arpa` to the
+  computer's address. Give the computer a fixed address on the router first —
+  a DHCP reservation — or the name will point at nothing after a restart.
+- **The computer's own `.local` name**, where mDNS runs (Avahi on Linux;
+  macOS and iOS speak it natively): `<hostname>.local`, with the hostname
+  from `hostname`. Phones on Android may not resolve it; the router's DNS
+  is the safer choice there.
+
+The name must end in `.home.arpa`, `.local` or `.internal`: Caddy uses its
+own authority only for names no public authority could certify, and asks
+Let's Encrypt for any other — a bare word such as `inventari` included,
+which then never gets a certificate.
+
+**2. Install.** On the computer, run:
 
 ```bash
-./scripts/init-env.sh --domain inventari.home.arpa --email home@inventari.home.arpa
+curl -fsSL https://github.com/InventariLabs/Inventari/releases/latest/download/install.sh | sh -s -- home --local-ca
 ```
 
-It writes `.env` with all six secrets generated (the same command as *Step 3* of
-[QUICK_DEPLOY.md](../QUICK_DEPLOY.md)), with two differences from a server with a
-domain: the name is the one from above, and the e-mail address is not used at
-home, but must not be empty.
+It asks for the name and for the administrator's e-mail address and password,
+does what the Tailscale route does without Tailscale, and leaves the
+authority's certificate in `/opt/inventari/inventari-root.crt`.
 
-Keep a copy of the finished `.env` off the machine: no backup contains it, and
-without its `ENCRYPTION_KEY` and `FERNET_SALT` a restored database cannot read
-the secrets stored in it.
-
-## Step 3: Start the stack and create the administrator
-
-```bash
-docker compose -f docker-compose.prod.yml up -d --build --scale caddy=0
-until docker compose -f docker-compose.prod.yml exec -T backend \
-    curl -sf http://localhost:8000/health/ready >/dev/null; do sleep 5; done
-docker compose -f docker-compose.prod.yml exec backend \
-  python manage.py user create-admin \
-    --email you@example.com --password '<your password>' --name "Your Name"
-docker compose -f docker-compose.prod.yml up -d
-```
-
-The first build takes several minutes; on a small machine or a Raspberry Pi,
-download the published images (amd64 and arm64) instead: run
-`echo 'COMPOSE_FILE=docker-compose.prod.yml:docker-compose.images.yml' >> .env`
-once, and type every `docker compose` command of this guide without its
-`-f docker-compose.prod.yml` — with the flag, Compose reads the build file
-alone and builds the images after all. The password needs at least 8
-characters with a lowercase letter, an uppercase letter and a digit. The proxy
-starts last, as in QUICK_DEPLOY.md, so nobody can register before the
-administrator exists. In `docker compose -f docker-compose.prod.yml logs caddy`
-you will see `certificate obtained successfully … "issuer":"local"` within a
-few seconds — there is no waiting for Let's Encrypt.
-
-## Step 4: Let each device trust the certificate
-
-A browser warns about a certificate from an authority it has never heard of,
-and a phone camera is not available to a page it does not trust (below). The
-fix is to hand each device the authority's root certificate once. Copy it out
-of the proxy:
-
-```bash
-docker compose -f docker-compose.prod.yml cp \
-  caddy:/data/caddy/pki/authorities/local/root.crt ./inventari-root.crt
-```
-
-`inventari-root.crt` is public — it only says *this authority exists* — and it
-is the only file to share. Send it to the phone (a message to yourself, a file
-share, a USB cable), then:
+**3. Trust the certificate on each device.** `inventari-root.crt` is public —
+it only says *this authority exists* — and it is the only file to share. Send
+it to the phone (a message to yourself, a file share, a USB cable), then:
 
 - **iPhone / iPad:** open the file, allow the profile in Settings, install it
   (Settings → General → VPN & Device Management), then switch it on under
@@ -113,39 +158,33 @@ share, a USB cable), then:
   (macOS). Firefox keeps its own list: Settings → Privacy & Security →
   Certificates → Import.
 
-Then open `https://inventari.home.arpa` on any of them, sign in, and name the
-organization in **Settings → General**.
+**4. Open `https://inventari.home.arpa`** (or the name you chose) on each of
+them, sign in, and check the camera as above.
 
-## What HTTPS and the camera need
-
-- **Scanning with the phone's camera** works only on a page the browser
-  considers secure: HTTPS with a certificate it trusts. That is what Step 4
-  provides. Over plain `http://` the browser offers no camera at all, and a page
-  behind a certificate warning is not one to rely on. Everything else in the
-  application works either way.
-- **Installing the app on the home screen** (the browser's *Add to Home
-  Screen*) wants the same trusted HTTPS.
-- **The root certificate's key stays on the machine** in the `caddy_data`
-  volume. Anyone who holds it can issue a certificate your devices accept, so
-  keep that machine as private as the rest of the house's network, and install
-  `root.crt` only on devices you own.
-- **Away from home the application is out of reach**, by design. If you want
-  it outside the house, a private network such as Tailscale or WireGuard that
-  puts your phone on the home network is a better route than opening ports.
+**The authority's key stays on the computer**, in the `caddy_data` volume.
+Anyone who holds it can issue a certificate your devices accept, so keep that
+computer as private as the rest of the house's network, and install
+`inventari-root.crt` only on devices you own.
 
 ## Afterwards
+
+Later commands run in `/opt/inventari` as `docker compose …`. When the
+installer added your account to the `docker` group, log out and back in once
+before using them; until then, put `sudo` in front.
 
 - **Backups** run from the first night and are described in *Database Backups*
   in [DEPLOYMENT.md](../DEPLOYMENT.md#database-backups). At home the backup
   directory sits on the same disk as the database: copy `backups/` to another
   disk or machine, or set up the off-host copy there, or one dead disk takes
-  both.
+  both. Keep a copy of `/opt/inventari/.env` off the computer too, in your
+  password manager: no backup contains it.
 - **Mail** is not set up. Invitations are still created and you pass the link
-  on yourself; a forgotten password is reset on the machine with the
-  `create-admin` command above (*Locked out* in
-  [DEPLOYMENT.md](../DEPLOYMENT.md#locked-out-the-administrator-forgot-the-password)).
-- **Updating** is the section of that name in DEPLOYMENT.md.
-- **Changing the name later** means changing `DOMAIN` in `.env` and running
-  `docker compose -f docker-compose.prod.yml up -d` again. Caddy issues a
-  certificate for the new name from the same authority, so the devices need
-  nothing new.
+  on yourself; a forgotten password is reset on the computer (*Locked out* in
+  [QUICK_DEPLOY.md](../QUICK_DEPLOY.md#troubleshooting)).
+- **Updating** is the section of that name in
+  [QUICK_DEPLOY.md](../QUICK_DEPLOY.md#updating): a backup first, then
+  *Updating* in DEPLOYMENT.md.
+- **Changing the name later** — renaming the computer in Tailscale, or
+  choosing another home-network name — means setting `DOMAIN` in `.env` to
+  the new name and running `docker compose up -d`. Caddy gets a certificate
+  for it from the same source, so the devices need nothing new.

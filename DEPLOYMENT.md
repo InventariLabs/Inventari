@@ -2,6 +2,16 @@
 
 This guide covers deploying Inventari on a VPS with automatic HTTPS via **Caddy**.
 
+**One command does the installation below.** [QUICK_DEPLOY.md](QUICK_DEPLOY.md)
+(a server with a domain) and [docs/HOME_INSTALL.md](docs/HOME_INSTALL.md) (a
+computer at home) run `scripts/install.sh`, which takes Steps 1 to 6 in order
+on the published images. This guide is the same installation by hand, the
+build from source the installer does not do, and everything after the first
+day. An installation the installer made is a git checkout of a release tag in
+`/opt/inventari` whose `.env` names the published images (`COMPOSE_FILE`, see
+*Pulling the published images instead of building*), so every command of this
+guide applies to it typed without `-f docker-compose.prod.yml`.
+
 ## Prerequisites
 
 - VPS with Ubuntu 26.04 LTS or Debian 13. The steps below are tested on
@@ -63,6 +73,33 @@ Verify propagation (usually a few minutes):
 ```bash
 ping inventari.example.com
 ```
+
+### At home, without a domain
+
+A computer at home takes the same steps with a name in place of the domain;
+[docs/HOME_INSTALL.md](docs/HOME_INSTALL.md) explains both routes and what the
+phones need. By hand:
+
+- **Through Tailscale.** Sign the machine in (`sudo tailscale up`), turn on
+  MagicDNS and HTTPS Certificates for the tailnet at
+  <https://login.tailscale.com/admin/dns>, and use the machine's name there —
+  `tailscale status --json` lists it under `CertDomains` — as the domain in
+  Step 4. Caddy asks the Tailscale daemon for the certificate of a `*.ts.net`
+  name through its socket, which `docker-compose.tailscale.yml` mounts, so that
+  file joins the stack: add
+  `COMPOSE_FILE=docker-compose.prod.yml:docker-compose.tailscale.yml` to `.env`
+  (with `docker-compose.images.yml` between them on the published images), and
+  type every later command without `-f docker-compose.prod.yml`.
+- **With Caddy's own authority.** Use a name that ends in `.home.arpa`,
+  `.local` or `.internal` as the domain, with any address for the e-mail
+  (`./scripts/init-env.sh --domain inventari.home.arpa --email you@example.com`).
+  Once Step 6 has started the proxy, copy the authority's certificate out for
+  the devices to trust:
+
+  ```bash
+  docker compose -f docker-compose.prod.yml cp \
+    caddy:/data/caddy/pki/authorities/local/root.crt ./inventari-root.crt
+  ```
 
 ## Step 4: Configure Environment
 

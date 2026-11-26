@@ -1,0 +1,15 @@
+# The home installation reached through Tailscale (docs/HOME_INSTALL.md;
+# scripts/install.sh writes this file into COMPOSE_FILE for `install.sh home`).
+#
+# DOMAIN is the machine's name on the tailnet (<machine>.<tailnet>.ts.net).
+# For a *.ts.net name Caddy asks the Tailscale daemon on this host for the
+# certificate instead of Let's Encrypt — Tailscale obtains it, publicly
+# trusted, so a phone's browser offers the camera with nothing installed but
+# the Tailscale app. Caddy reaches the daemon through its socket, so the
+# directory that holds it is mounted: the directory and not the socket file,
+# because tailscaled makes a new socket each time it starts. Read-only is
+# enough to connect to a socket.
+services:
+  caddy:
+    volumes:
+      - /var/run/tailscale:/var/run/tailscale:ro
