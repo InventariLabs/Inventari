@@ -71,7 +71,7 @@ async def _reduce_quantity(
     # The new number is worked out from the old one, so the old one is read
     # under the lock: two hands taking three off the same five each read
     # five before anybody locked, and both went through.
-    await lock_record_stock_async(db, item)
+    await lock_record_stock_async(db, item, filed_under=virtual_usage)
     if item.quantity < quantity:
         raise ServiceRejectionError('insufficient_quantity')
 

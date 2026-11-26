@@ -35,6 +35,7 @@ from app.core.open_package import OPENED_KEY, USE_BY_KEY, opened_at, use_by_of
 from app.models.item import Item
 from app.models.item_history import ItemAction
 from app.models.product_template import ProductTemplate
+from app.models.storage_location import LocationUsage
 from app.models.uom import UomCategory
 from app.schemas.item import ItemConsumeRequest, ItemCreate
 from app.services.audit_service import log_action_async
@@ -184,7 +185,10 @@ async def use_partially_async(
     """
     from .move_service import consume_item
 
-    await lock_record_stock_async(db, item)
+    # Saying what is left may use a record up; only opening a package cannot.
+    await lock_record_stock_async(
+        db, item, filed_under=LocationUsage.CUSTOMER if left is not None else None
+    )
 
     if item.serial_number:
         raise ServiceRejectionError(
