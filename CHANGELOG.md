@@ -303,7 +303,14 @@ says what the release does rather than what changed since them.
   module switch-on that would have renamed it goes through. When the creation
   of starting places finds two places bearing a declared name, it takes the
   same one every time, and an archived place no longer counts as somewhere to
-  put goods.
+  put goods. An archived main storage stays archived — **Restore** brings it
+  back — and no second one is made beside it.
+- Using up or throwing away a product, or finishing an opened package, at the
+  same moment as a document of that product is completed no longer deadlocks
+  with it, which cost a wait and a retry or failed the action. An organization
+  founded by signing up or through the API has its **Consumed**, **Inventory
+  Loss** and **Production** places from the moment it is created, before any
+  onboarding, so two first uses at once no longer collide on a place's name.
 - Concurrent changes of an organization's default tax rate take their locks
   in one order, so two saves no longer deadlock and wait for the retry
   middleware.

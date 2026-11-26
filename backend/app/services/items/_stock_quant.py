@@ -13,10 +13,12 @@ from app.core.txn_memo import records_locked
 from app.models.item import Item
 from app.models.item_history import ItemAction
 from app.models.stock_move import StockMoveReferenceType
+from app.models.storage_location import LocationUsage
 from app.schemas.validators import QUANTITY_MAX
 from app.services._stock_draw import free_in_grain_async, records_by_grain_async
 from app.services._stock_quant_ops import _refuse, lock_stock_async
 from app.services._stock_quant_query import assert_lot_consumable_async
+from app.services.storage._defaults import get_virtual_location_async
 
 logger = get_logger(__name__)
 
@@ -367,7 +369,11 @@ _RECORD_GRAIN = ['quantity', 'template_id', 'storage_location_id', 'lot_id', 'ow
 
 
 async def lock_record_stock_async(
-    db: AsyncSession, item: Item, *, read_again: Sequence[str] = _RECORD_GRAIN
+    db: AsyncSession,
+    item: Item,
+    *,
+    read_again: Sequence[str] = _RECORD_GRAIN,
+    filed_under: LocationUsage | None = None,
 ) -> None:
     """Lock the stock a change to *item* writes, then read the record under the lock.
 
@@ -387,13 +393,22 @@ async def lock_record_stock_async(
     by default. The posting reads only the number, since its caller may have
     set the record's batch or shelf just before; a caller that already knows
     the number it replaces reads nothing and takes the anchor alone.
+
+    *filed_under* is for a door that uses the record up: a record taken to
+    nothing is filed under the organization's virtual place of that usage, a
+    group of the same product, so its anchor is locked here with the shelf's.
+    Asked for after the shelf's, it would deadlock the door with an operation
+    that holds it and waits for the shelf.
     """
     if item.template_id is not None and item.storage_location_id is not None:
-        await lock_stock_async(
-            db,
-            item.organization_id,
-            keys=[(item.template_id, item.storage_location_id)],
-        )
+        keys = [(item.template_id, item.storage_location_id)]
+        if filed_under is not None and (
+            place := await get_virtual_location_async(
+                db, str(item.organization_id), filed_under
+            )
+        ):
+            keys.append((item.template_id, place.id))
+        await lock_stock_async(db, item.organization_id, keys=keys)
     held = records_locked(db)
     if (item.organization_id, item.id) in held:
         # Already read under this transaction's lock, and nobody else can
