@@ -29,9 +29,15 @@ import type {
 } from "@/types";
 type SheetAnalysis = components["schemas"]["SheetAnalysisResponse"];
 type ItemImportJob = components["schemas"]["ItemImportJobResponse"];
+type ItemExportJob = components["schemas"]["ItemExportJobResponse"];
 
-/** How long to wait between two looks at an import running in the background. */
-const IMPORT_POLL_MS = 1500;
+/** How long to wait between two looks at a job running in the background. */
+const JOB_POLL_MS = 1500;
+
+/** The wait between two looks at a background job. */
+function waitForTheNextLook(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, JOB_POLL_MS));
+}
 
 /** Follows an import the server moved to the background until it ends.
  *
@@ -68,7 +74,46 @@ async function followImportJob(
       );
     }
     onProgress?.({ processed: job.processed, total: job.total });
-    await new Promise((resolve) => setTimeout(resolve, IMPORT_POLL_MS));
+    await waitForTheNextLook();
+  }
+}
+
+/** How far an export running in the background has got, in whole percent. */
+export interface ExportProgress {
+  percent: number;
+}
+
+/** Follows an export the server moved to the background, then fetches its file.
+ *
+ * A sheet of every record takes minutes to write, longer than a phone or a
+ * proxy waits on one request, so past a size the server answers with a job.
+ * Once the job is done its workbook is the file the short export would have
+ * answered with, so the caller cannot tell the two apart. `onProgress` hears
+ * each look at the running job. */
+async function followExportJob(
+  jobId: string,
+  onProgress?: (progress: ExportProgress) => void,
+): Promise<Blob> {
+  for (;;) {
+    const { data: job } = await api.get<ItemExportJob>(
+      `/items/export/jobs/${jobId}`,
+    );
+    if (job.status === "done") {
+      const file = await api.get<Blob>(`/items/export/jobs/${jobId}/file`, {
+        responseType: "blob",
+      });
+      return file.data;
+    }
+    if (job.status === "failed") {
+      throw new ReadableError(
+        job.error || i18next.t("common:actions.exportError"),
+      );
+    }
+    onProgress?.({
+      percent:
+        job.total > 0 ? Math.floor((job.processed / job.total) * 100) : 0,
+    });
+    await waitForTheNextLook();
   }
 }
 
@@ -363,25 +408,40 @@ export const itemsApi = {
 
   /** The rows the list shows for the same params — pass `getAggregates`'s
    * params to export what is on screen; `location_usage: "any"` is the
-   * backup export asking for every location. */
-  exportXlsx: async (params?: {
-    location_id?: string;
-    category_id?: string;
-    context_tag?: string;
-    exclude_module_contexts?: boolean;
-    location_usage?: "any";
-    search?: string;
-    expiring_days?: number;
-    only_expired?: boolean;
-    only_low_stock?: boolean;
-    needs_attention?: boolean;
-    template_ids?: string;
-  }): Promise<Blob> => {
-    const response = await api.get("/items/export/xlsx", {
+   * backup export asking for every location. A long sheet is written by a
+   * background job (`onProgress` hears how far it has got) and its file is
+   * fetched when the job is done. */
+  exportXlsx: async (
+    params?: {
+      location_id?: string;
+      category_id?: string;
+      context_tag?: string;
+      exclude_module_contexts?: boolean;
+      location_usage?: "any";
+      search?: string;
+      expiring_days?: number;
+      only_expired?: boolean;
+      only_low_stock?: boolean;
+      needs_attention?: boolean;
+      template_ids?: string;
+    },
+    onProgress?: (progress: ExportProgress) => void,
+  ): Promise<Blob> => {
+    // Read as bytes: the answer is either the workbook or, past a size, the
+    // job's JSON, and which one is known only once it has arrived.
+    const response = await api.get<ArrayBuffer>("/items/export/xlsx", {
       params,
-      responseType: "blob",
+      responseType: "arraybuffer",
     });
-    return response.data;
+    if (response.status !== 202) {
+      return new Blob([response.data], {
+        type: String(response.headers["content-type"] ?? ""),
+      });
+    }
+    const job = JSON.parse(
+      new TextDecoder().decode(response.data),
+    ) as ItemExportJob;
+    return followExportJob(job.id, onProgress);
   },
 
   lookup: async (barcode: string): Promise<ProductLookupResult | null> => {

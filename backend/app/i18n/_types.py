@@ -48,6 +48,7 @@ class ErrorMessages(TypedDict):
     user_inactive: str
     uom_not_found: str
     import_job_not_found: str
+    export_job_not_found: str
     user_not_found: str
     user_email_required: str
     item_not_found: str
@@ -292,6 +293,8 @@ class ErrorMessages(TypedDict):
     import_date_invalid: str
     import_job_failed: str
     import_job_interrupted: str
+    export_job_failed: str
+    export_job_interrupted: str
     import_column_not_a_number: str
     import_quantity_not_positive: str
     import_column_location_not_found: str

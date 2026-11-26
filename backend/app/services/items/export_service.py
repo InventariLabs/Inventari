@@ -1,16 +1,19 @@
-from collections.abc import Iterable, Iterator
+from collections.abc import Callable, Iterable, Iterator
 from decimal import Decimal
-from typing import Any
+from typing import Any, NamedTuple
 from uuid import UUID
 
 import pandas as pd
 from fastapi.responses import StreamingResponse
-from sqlalchemy import select
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session, joinedload
 
+from app.core import db_facade
+from app.core.async_utils import run_sync_in_thread
 from app.core.contracts import UserContextDTO
 from app.core.location_path import join_location_path
-from app.core.xlsx_export import rows_to_xlsx_response
+from app.core.xlsx_export import rows_to_xlsx_response, write_rows_xlsx
 from app.models.category import Category
 from app.models.item import Item
 from app.models.storage_location import StorageLocation
@@ -41,11 +44,51 @@ def _org_currency(db: Session, organization_id: UUID | None) -> str:
 _PAGE_SIZE = 2_000
 
 
+def _matching(
+    query: Any,
+    organization_id: UUID | None,
+    user_storage_ids: list[UUID] | None,
+    filters: dict[str, Any],
+) -> Any:
+    """*query* narrowed to the records the list shows for the same filters."""
+    from app.services.items._query_get import _apply_item_filters
+
+    return _apply_item_filters(
+        query,
+        organization_id=organization_id,
+        user_storage_ids=user_storage_ids,
+        **filters,
+    )
+
+
+async def count_rows_async(
+    db: AsyncSession,
+    organization_id: UUID | None,
+    user_storage_ids: list[UUID] | None,
+    filters: dict[str, Any],
+) -> int:
+    """How many records the sheet for these filters holds, one row each."""
+    query = _matching(
+        select(func.count(Item.id))
+        .select_from(Item)
+        .join(StorageLocation, Item.storage_location_id == StorageLocation.id),
+        organization_id,
+        user_storage_ids,
+        filters,
+    )
+    return await db.scalar(query) or 0
+
+
+def _nothing() -> None:
+    """The default listener of a read that nobody follows."""
+
+
 def _iter_items(
     db: Session,
     organization_id: UUID | None,
     user_storage_ids: list[UUID] | None,
     filters: dict[str, Any],
+    on_record: Callable[[], None] = _nothing,
 ) -> Iterator[Item]:
     """The rows the list would show for the same filters, all pages at once.
 
@@ -56,9 +99,7 @@ def _iter_items(
     template, shelf and unit in one list, which at 100 000 products would grow
     the worker until the container killed it.
     """
-    from app.services.items._query_get import _apply_item_filters
-
-    query = (
+    query = _matching(
         select(Item)
         .join(StorageLocation)
         .options(
@@ -66,13 +107,10 @@ def _iter_items(
             joinedload(Item.template),
             joinedload(Item.uom),
             joinedload(Item.storage_location).joinedload(StorageLocation.storage_type),
-        )
-    )
-    query = _apply_item_filters(
-        query,
-        organization_id=organization_id,
-        user_storage_ids=user_storage_ids,
-        **filters,
+        ),
+        organization_id,
+        user_storage_ids,
+        filters,
     )
     last_id: UUID | None = None
     while True:
@@ -80,7 +118,9 @@ def _iter_items(
         if last_id is not None:
             page_query = page_query.where(Item.id > last_id)
         page = db.scalars(page_query).unique().all()
-        yield from page
+        for item in page:
+            on_record()
+            yield item
         if len(page) < _PAGE_SIZE:
             return
         last_id = page[-1].id
@@ -347,25 +387,32 @@ class _Scan:
             self.meta_specs.setdefault((kind, key))
 
 
-def export_items_to_xlsx(
+class _Sheet(NamedTuple):
+    """The columns, the rows and the notes of one export, ready to be written."""
+
+    columns: list[str]
+    rows: Iterator[list[object]]
+    readme: pd.DataFrame
+
+
+def _sheet(
     db: Session,
     current_user: UserContextDTO,
     filters: dict[str, Any] | None = None,
     enrichment: dict[UUID, dict[str, object]] | None = None,
     user_storage_ids: list[UUID] | None = None,
-) -> StreamingResponse:
-    """Export items to XLSX, dynamically including active tracking fields.
+    on_record: Callable[[], None] = _nothing,
+) -> _Sheet:
+    """The sheet of the items, dynamically including active tracking fields.
 
     ``filters`` are the list's own (``_apply_item_filters`` keywords), so the
     sheet covers exactly the rows the list shows. ``enrichment`` carries rows
     contributed by feature modules through :mod:`app.core.export_enrichers`
     (e.g. equipment's "Assigned To") — Core renders them without knowing the
-    module.
+    module. ``on_record`` hears every record each of the two passes reads.
 
-    The workbook is written row by row to a temporary file and streamed back
-    from it, so the memory it takes does not depend on how many records the
-    sheet holds; a sheet that fills (a million rows) continues on the next
-    one (:func:`app.core.xlsx_export.rows_to_xlsx_response`).
+    The rows are read when they are written, on *db*, so the sheet is written
+    before the session closes.
     """
     org_currency = _org_currency(db, current_user.organization_id)
     filters = filters or {}
@@ -387,7 +434,9 @@ def export_items_to_xlsx(
     }
 
     def _items() -> Iterator[Item]:
-        return _iter_items(db, current_user.organization_id, user_storage_ids, filters)
+        return _iter_items(
+            db, current_user.organization_id, user_storage_ids, filters, on_record
+        )
 
     scan = _Scan(key for key in key_map if key != 'purchase_price')
     for item in _items():
@@ -449,10 +498,114 @@ def export_items_to_xlsx(
                 row[_meta_header(kind, key, field_labels)] = value
             yield [row.get(column) for column in columns]
 
+    return _Sheet(columns, _rows(), _read_me(columns, key_map['purchase_price']))
+
+
+#: The name the data sheet of an export carries.
+_SHEET_NAME = 'Inventory'
+
+#: The start of the name of a downloaded export; the date follows.
+FILENAME_STEM = 'inventari_export'
+
+
+def export_items_to_xlsx(
+    db: Session,
+    current_user: UserContextDTO,
+    filters: dict[str, Any] | None = None,
+    enrichment: dict[UUID, dict[str, object]] | None = None,
+    user_storage_ids: list[UUID] | None = None,
+) -> StreamingResponse:
+    """The sheet of the items (:func:`_sheet`) as a downloadable workbook.
+
+    The workbook is written row by row to a temporary file and streamed back
+    from it, so the memory it takes does not depend on how many records the
+    sheet holds; a sheet that fills (a million rows) continues on the next
+    one (:func:`app.core.xlsx_export.rows_to_xlsx_response`).
+    """
+    sheet = _sheet(db, current_user, filters, enrichment, user_storage_ids)
     return rows_to_xlsx_response(
-        columns,
-        _rows(),
-        sheet_name='Inventory',
-        filename_stem='inventari_export',
-        readme=_read_me(columns, key_map['purchase_price']),
+        sheet.columns,
+        sheet.rows,
+        sheet_name=_SHEET_NAME,
+        filename_stem=FILENAME_STEM,
+        readme=sheet.readme,
     )
+
+
+def _in_own_session[T](work: Callable[[Session], T]) -> T:
+    """*work* on a database session of its own, closed when it returns."""
+    with db_facade.SessionLocal() as db:
+        return work(db)
+
+
+async def export_items_async(
+    current_user: UserContextDTO,
+    filters: dict[str, Any],
+    enrichment: dict[UUID, dict[str, object]],
+    user_storage_ids: list[UUID] | None,
+) -> StreamingResponse:
+    """:func:`export_items_to_xlsx`, written on a thread on a session of its own.
+
+    Writing a sheet is Python from the first row to the last, a millisecond
+    a record; on the event loop it held every other request of the worker
+    for as long. On a thread the loop goes on answering them.
+    """
+    return await run_sync_in_thread(
+        lambda: _in_own_session(
+            lambda db: export_items_to_xlsx(
+                db, current_user, filters, enrichment, user_storage_ids
+            )
+        )
+    )
+
+
+def write_workbook_file(
+    current_user: UserContextDTO,
+    filters: dict[str, Any],
+    enrichment: dict[UUID, dict[str, object]],
+    user_storage_ids: list[UUID] | None,
+    database_url: str,
+    path: str,
+    steps: Any,
+) -> None:
+    """Write the workbook of an export job to *path*: the body of a process of its own.
+
+    Not a thread of the worker: writing the sheet is Python from the first
+    record to the last, and on a thread it still took the interpreter from
+    the event loop for most of that time, so the worker's other requests
+    answered several times slower until the sheet was done. A process runs
+    on its own interpreter. It loads the models the way a command does
+    (every module's tables, so the mappers resolve), reads on an engine of
+    its own at *database_url*, and adds one to *steps* (a shared integer)
+    for every record each of the two passes reads.
+    """
+    import shutil
+
+    from sqlalchemy import create_engine
+    from sqlalchemy.pool import NullPool
+
+    from app.core.module_registry import module_registry
+
+    module_registry.discover_modules()
+    engine = create_engine(database_url, poolclass=NullPool)
+
+    def _step() -> None:
+        steps.value += 1
+
+    try:
+        with Session(engine) as db:
+            sheet = _sheet(
+                db, current_user, filters, enrichment, user_storage_ids, _step
+            )
+            with (
+                write_rows_xlsx(
+                    sheet.columns,
+                    sheet.rows,
+                    sheet_name=_SHEET_NAME,
+                    readme=sheet.readme,
+                ) as written,
+                open(path, 'wb') as out,
+            ):
+                shutil.copyfileobj(written, out)
+    finally:
+        engine.dispose()

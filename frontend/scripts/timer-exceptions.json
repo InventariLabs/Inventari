@@ -39,7 +39,7 @@
     {
       "path": "src/lib/api/items.ts",
       "sites": 1,
-      "reason": "The wait between two reads of a background import is a promise-sleep inside the awaited mutation function: nothing is held in a component, the sleep resolves on its own within 1.5 s, and the loop ends when the job reaches done or failed (the server marks a job nobody is working on as failed). It touches neither the DOM nor window."
+      "reason": "The wait between two reads of a background import or export is a promise-sleep inside the awaited call: nothing is held in a component, the sleep resolves on its own within 1.5 s, and the loop ends when the job reaches done or failed (the server marks a job nobody is working on as failed). It touches neither the DOM nor window."
     }
   ]
 }

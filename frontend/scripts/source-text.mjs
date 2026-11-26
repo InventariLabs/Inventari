@@ -26,6 +26,10 @@
  * Line count and column offsets survive, so a finding's reported line number
  * is still the line the reader will open.
  *
+ * `onLiteral(start, end)`, when given, is told the span of every string,
+ * template and regular-expression literal, delimiters included — for a gate
+ * that reads what literals say and nothing else.
+ *
  * Comment *openers* are recognised string-aware: a `/*` inside a string
  * literal (`accept="image/*"`) or a `//` inside a URL ("https://…") is code,
  * not prose, and blanking from there swallowed real code — a tag lost its
@@ -43,7 +47,7 @@
  * JSX text (`{a} / {b}`) makes it ambiguous, and a regex that does not close
  * on its own line is read as a division instead.
  */
-export function blankComments(text) {
+export function blankComments(text, onLiteral) {
   const chars = text.split("");
   const n = text.length;
   const blank = (i) => {
@@ -55,6 +59,7 @@ export function blankComments(text) {
   // is a frame of its own (`{ depth }`), so a template nested in a hole
   // keeps its own hole and the outer one resumes where it stopped.
   const stack = ["code"];
+  const opened = []; // start of every string or template still open
   let i = 0;
   // The last code character that is not whitespace or comment, and whether
   // it ended a keyword that is followed by an expression.
@@ -95,6 +100,7 @@ export function blankComments(text) {
       if (ctx === "tpl") {
         if (c === "`") {
           stack.pop();
+          onLiteral?.(opened.pop(), i + 1);
           prev = c;
         } else if (c === "$" && text[i + 1] === "{") {
           stack.push({ depth: 0 });
@@ -103,6 +109,7 @@ export function blankComments(text) {
         }
       } else if (c === ctx) {
         stack.pop();
+        onLiteral?.(opened.pop(), i + 1);
         prev = c;
       }
       i++;
@@ -110,6 +117,7 @@ export function blankComments(text) {
     }
     if (c === "'" || c === '"' || c === "`") {
       stack.push(c === "`" ? "tpl" : c);
+      opened.push(i);
       i++;
       continue;
     }
@@ -130,6 +138,7 @@ export function blankComments(text) {
     if (c === "/" && regexAllowed()) {
       const end = regexEnd(i);
       if (end > 0) {
+        onLiteral?.(i, end);
         i = end;
         prev = ")"; // a literal is an operand: a slash after it divides
         continue;
