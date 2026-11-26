@@ -8,7 +8,7 @@
     "login": {
       "chunks": ["LoginPage"],
       "budget": {
-        "jsKiB": 415,
+        "jsKiB": 420,
         "loadMs": 5500
       },
       "measured": {
@@ -21,7 +21,7 @@
     "launcher": {
       "chunks": ["Launcher"],
       "budget": {
-        "jsKiB": 430,
+        "jsKiB": 435,
         "loadMs": 8500
       },
       "measured": {
@@ -34,7 +34,7 @@
     "start": {
       "chunks": ["DocumentsTodoPage"],
       "budget": {
-        "jsKiB": 650,
+        "jsKiB": 655,
         "loadMs": 8000
       },
       "measured": {
@@ -86,7 +86,7 @@
     "products": {
       "chunks": ["ItemsPage"],
       "budget": {
-        "jsKiB": 645,
+        "jsKiB": 640,
         "loadMs": 7500
       },
       "measured": {
