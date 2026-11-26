@@ -1,6 +1,9 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { http, HttpResponse } from "msw";
+import { toast } from "sonner";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { server } from "@/test/mocks/server";
 import SettingsDataTab from "./SettingsDataTab";
 
 vi.mock("sonner", () => ({
@@ -55,6 +58,25 @@ describe("SettingsDataTab", () => {
     fireEvent.click(screen.getByText("Import"));
 
     expect(screen.getByText("products list")).toBeInTheDocument();
+  });
+
+  it("says why the server refused the export", async () => {
+    const message = "You may not read products.";
+    server.use(
+      http.get("*/api/v1/items/export/xlsx", () =>
+        HttpResponse.json(
+          { detail: { code: "FORBIDDEN", message } },
+          { status: 403 },
+        ),
+      ),
+    );
+    renderTab();
+
+    fireEvent.click(screen.getByText("Export"));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(message, { id: "export" }),
+    );
   });
 
   it("has no button that only looks disabled", () => {

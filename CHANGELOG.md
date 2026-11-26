@@ -80,6 +80,9 @@ says what the release does rather than what changed since them.
   Community homepage links and *Free label* meet the phone touch-target
   size, and the tab keeps naming the not-found sentence after a language
   switch.
+- A refused export of the products, from the list, the equipment screen or
+  *Settings*, says why: the message shows the server's sentence instead of the
+  generic "export failed" one.
 - The audit log and the item history read in words. A label's entries name
   the label's code and the product beside its id; a document type
   configuration's default locations are written with their names, and
