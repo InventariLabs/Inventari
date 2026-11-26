@@ -34,6 +34,26 @@ VITE_API_URL=http://127.0.0.1:5273 scripts/dev2 make test-e2e
 all optional modules, English UI language, leftover-data cleanup, and baseline
 seed data (`E2E-Kitchen` storage, `E2E-Dairy` category, three items).
 
+## Only the specs a branch can break
+
+The whole suite is slow. `make test-e2e-affected` runs the part of it that the
+changes since `origin/dev` (or `BASE=<ref>`) can break, on the stack the
+wrapper names, and prepares the stack the way `make test-e2e` does:
+
+```bash
+scripts/dev2 make test-e2e-affected          # a seeded, onboardable stack
+node frontend/scripts/select-e2e-specs.mjs   # the list alone, with its reasons
+```
+
+It selects the changed specs, those that import a changed helper or fixture,
+those that spell a catalog text the changes removed, and, for each changed
+module (`frontend/src/modules/<m>`, `backend/app/modules/<m>`), the specs named
+after it or opening one of its routes. A change to the Playwright config, the
+shared fixture, the global setup, the router or the app shell selects the whole
+suite. Each Playwright project then runs on its own, in dependency order, with
+`--no-deps`. It is a selection, not a proof: a change outside these rules (a
+shared component, a core endpoint) reaches the specs only in CI's full run.
+
 ## The dev server runs without hot reload during a run
 
 The stacks serve the frontend with the Vite dev server over the mounted

@@ -81,6 +81,13 @@ test.describe("Settings — organization & user preferences", () => {
     const original = await name.inputValue();
     const save = page.getByRole("button", { name: "Save" }).first();
 
+    // The organization read after a save answers late here, as it does on a
+    // loaded machine, so typing ahead of it is caught on every run.
+    await page.route("**/api/v1/organizations/my", async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await route.continue();
+    });
+
     // Save stays off until a field changed: edit the name, save, put it back.
     await expect(save).toBeDisabled();
     await name.fill(`${original} edited`);
@@ -89,15 +96,19 @@ test.describe("Settings — organization & user preferences", () => {
       timeout: 10000,
     });
     // The saved name comes back from the server and refills the field; typing
-    // before it has would be overwritten.
-    await expect(name).toHaveValue(`${original} edited`);
+    // before it has would be overwritten. The field already holds the typed
+    // name, so it cannot tell. Save can: it stays on until the form matches
+    // the organization as the server last answered it.
+    await expect(save).toBeDisabled({ timeout: 10000 });
     await expect(
       page.locator('[role="alert"]').filter({ hasText: /error|failed/i }),
     ).toHaveCount(0);
 
     await name.fill(original);
     await expect(save).toBeEnabled();
+    const restored = page.waitForResponse("**/api/v1/organizations/my");
     await save.click();
+    expect((await restored).ok()).toBe(true);
     await expect(save).toBeDisabled({ timeout: 10000 });
   });
 
