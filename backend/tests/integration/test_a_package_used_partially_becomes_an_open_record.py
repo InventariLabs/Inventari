@@ -277,6 +277,8 @@ class TestUsePartially:
         assert len(entries) == 1
         assert entries[0].snapshot['before'] == {'quantity': '3.000'}
         assert entries[0].snapshot['after'] == {'quantity': '2.000'}
+        # The journal reads the reason column: the row says why it moved.
+        assert entries[0].reason == 'package_opened'
 
     def test_a_single_unit_is_flagged_where_it_stands(
         self,

@@ -12,15 +12,21 @@ import {
 } from "@/test/factories/storage";
 
 const analyzeImport = vi.fn();
+const analyzeGrocy = vi.fn();
 const mutateAsync = vi.fn();
+const grocyMutateAsync = vi.fn();
 const toastError = vi.fn();
 
 vi.mock("@/lib/api/items", () => ({
-  itemsApi: { analyzeImport: (file: File) => analyzeImport(file) },
+  itemsApi: {
+    analyzeImport: (file: File) => analyzeImport(file),
+    analyzeGrocy: (file: File) => analyzeGrocy(file),
+  },
 }));
 
 vi.mock("@/modules/inventory/hooks/useItemMutations", () => ({
   useImportItems: () => ({ mutateAsync }),
+  useImportGrocy: () => ({ mutateAsync: grocyMutateAsync }),
 }));
 
 // Which keys the account holds, set per test; both by default, as for the
@@ -88,6 +94,9 @@ describe("ImportModal (products)", () => {
     errors: [],
     created_locations: [],
     created_categories: [],
+    created_suppliers: [],
+    left_behind: [],
+    brought_by_modules: [],
   };
 
   it("maps and sends the price column where the inventory value is shown", async () => {
@@ -147,10 +156,9 @@ describe("ImportModal (products)", () => {
     expect(mapping.name).toBe("Name");
   });
 
-  it("keeps the Grocy preset and the create-missing option on the mapping step", async () => {
-    // The preset is not gated on a `grocy_importer` module, which this product
-    // does not have, so a column mapping computed entirely in the browser is
-    // reachable for everyone.
+  it("keeps the create-missing options on the mapping step, and no Grocy column preset", async () => {
+    // Grocy writes no sheet, so a preset for Grocy's columns mapped a file
+    // nobody can produce; its tile opens a move that reads Grocy's database.
     analyzeImport.mockResolvedValue({
       headers: ["name", "amount", "location"],
       preview_rows: [],
@@ -160,8 +168,8 @@ describe("ImportModal (products)", () => {
     await reachMappingStep();
 
     expect(
-      screen.getByRole("button", { name: "Apply Grocy preset" }),
-    ).toBeInTheDocument();
+      screen.queryByRole("button", { name: /Grocy/ }),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole("checkbox", {
         name: "Create missing locations automatically",
@@ -175,6 +183,136 @@ describe("ImportModal (products)", () => {
     expect(
       screen.getByText(/Every row becomes a new product/),
     ).toBeInTheDocument();
+  });
+
+  describe("the move from Grocy's database file", () => {
+    const analysis = {
+      products: 12,
+      stock_entries: 30,
+      already_imported: 0,
+      locations: 3,
+      product_groups: 4,
+      stores: 2,
+      shopping_list_entries: 5,
+      new_locations: ["Pantry", "Chest freezer"],
+      new_categories: [],
+      new_suppliers: ["Corner shop"],
+      currency: "EUR",
+      steps: 31,
+      left_behind: [
+        { what: "recipes", count: 7, names: [] },
+        { what: "units_as_pieces", count: 1, names: ["Tin"] },
+      ],
+    };
+
+    async function reviewGrocyFile() {
+      serveLocations(storages.list);
+      render(<ImportModal onClose={vi.fn()} />);
+      expect(screen.getByText(/one file, grocy\.db/)).toBeInTheDocument();
+      const own = document.getElementById(
+        "import-file-secondary",
+      ) as HTMLInputElement;
+      expect(own).toHaveAttribute("accept", ".db,.sqlite,.sqlite3");
+      fireEvent.change(own, {
+        target: { files: [new File(["x"], "grocy.db")] },
+      });
+      await screen.findByText("Batches of stock");
+    }
+
+    beforeEach(() => {
+      analyzeGrocy.mockReset();
+      grocyMutateAsync.mockReset();
+      analyzeGrocy.mockResolvedValue(analysis);
+    });
+
+    it("reviews what the file holds in place of a sheet's columns, before writing anything", async () => {
+      await reviewGrocyFile();
+
+      expect(screen.getByText("30")).toBeInTheDocument();
+      expect(
+        screen.getByText("Locations: Pantry, Chest freezer"),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Suppliers: Corner shop")).toBeInTheDocument();
+      expect(screen.getByText(/Prices are read in EUR/)).toBeInTheDocument();
+      expect(
+        screen.getByText("Units counted in pieces: Tin"),
+      ).toBeInTheDocument();
+      expect(analyzeImport).not.toHaveBeenCalled();
+      expect(grocyMutateAsync).not.toHaveBeenCalled();
+    });
+
+    it("moves the file and says what it created, what modules brought and what stayed", async () => {
+      grocyMutateAsync.mockResolvedValue({
+        total: 31,
+        imported: 31,
+        joined_existing: 18,
+        updated: 0,
+        skipped: 2,
+        failed: 0,
+        errors: [],
+        created_locations: [],
+        created_categories: [],
+        created_suppliers: ["Corner shop"],
+        left_behind: [{ what: "recipes", count: 7, names: [] }],
+        brought_by_modules: [
+          {
+            module: "shopping_lists",
+            sentence:
+              "Shopping lists from Grocy — lists created: 1, entries: 5",
+          },
+        ],
+      });
+      await reviewGrocyFile();
+
+      fireEvent.click(screen.getByRole("button", { name: /Move in/ }));
+
+      expect(await screen.findByText(/Added 13 products/)).toBeInTheDocument();
+      expect(grocyMutateAsync).toHaveBeenCalledWith(
+        expect.objectContaining({
+          file: expect.any(File),
+          categoryMatches: {},
+        }),
+      );
+      expect(screen.getByText("1 supplier created")).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          "Shopping lists from Grocy — lists created: 1, entries: 5",
+        ),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/2 entries were already here/),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Stays in Grocy")).toBeInTheDocument();
+    });
+
+    it("refuses a file that is not Grocy's with the server's reason and stays at the tiles", async () => {
+      analyzeGrocy.mockRejectedValue({
+        isAxiosError: true,
+        response: {
+          status: 400,
+          data: {
+            detail: {
+              code: "GROCY_FILE_UNREADABLE",
+              message: "This file is not a database Grocy wrote.",
+            },
+          },
+        },
+      });
+      serveLocations(storages.list);
+      render(<ImportModal onClose={vi.fn()} />);
+
+      fireEvent.change(
+        document.getElementById("import-file-secondary") as HTMLInputElement,
+        { target: { files: [new File(["x"], "stock.csv")] } },
+      );
+
+      await waitFor(() =>
+        expect(toastError).toHaveBeenCalledWith(
+          "This file is not a database Grocy wrote.",
+        ),
+      );
+      expect(screen.queryByText("Batches of stock")).not.toBeInTheDocument();
+    });
   });
 
   it("warns when the match mode has not one code in the file, and not when codes sit below the preview", async () => {
@@ -249,6 +387,9 @@ describe("ImportModal (products)", () => {
       errors: [],
       created_locations: ["Pantry"],
       created_categories: [],
+      created_suppliers: [],
+      left_behind: [],
+      brought_by_modules: [],
     });
     await reachMappingStep();
 
@@ -357,6 +498,9 @@ describe("ImportModal (products)", () => {
       errors: [],
       created_locations: [],
       created_categories: [],
+      created_suppliers: [],
+      left_behind: [],
+      brought_by_modules: [],
     });
     await reachMappingStep();
 
@@ -392,6 +536,9 @@ describe("ImportModal (products)", () => {
       errors: [],
       created_locations: [],
       created_categories: [],
+      created_suppliers: [],
+      left_behind: [],
+      brought_by_modules: [],
     });
     await reachMappingStep();
 
@@ -420,6 +567,9 @@ describe("ImportModal (products)", () => {
       errors: [],
       created_locations: [],
       created_categories: [],
+      created_suppliers: [],
+      left_behind: [],
+      brought_by_modules: [],
     });
     await reachMappingStep();
 

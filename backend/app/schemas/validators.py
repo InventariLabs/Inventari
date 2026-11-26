@@ -45,6 +45,12 @@ QUANTITY_MAX = Decimal(
     f'{"9" * (QUANTITY_MAX_DIGITS - QUANTITY_SCALE)}.{"9" * QUANTITY_SCALE}'
 )
 
+#: The largest weight a product can carry: ``product_templates.weight_value``
+#: is numeric(14, 6), so a magnitude from 1e8 up overflows the column. A bound
+#: on the schema answers it with a 422 instead of the driver's 500; below, the
+#: schema stops at zero, since no product weighs less than nothing.
+WEIGHT_MAX = 99_999_999
+
 #: The orders stock can leave a shelf in — the values
 #: ``app.services.stock_strategy.SUPPORTED_STRATEGIES`` resolves. A product
 #: carries one, a category names the one its new products start with.

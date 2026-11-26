@@ -184,6 +184,29 @@ export function useImportItems() {
   );
 }
 
+/** Moves a Grocy household in from its database file. The move founds
+ *  locations, categories and suppliers as well as products, and refreshes
+ *  each list it founded something in. */
+export function useImportGrocy() {
+  return useAppMutation(
+    ({
+      file,
+      categoryMatches = {},
+      onProgress,
+    }: {
+      file: File;
+      categoryMatches?: Record<string, string>;
+      onProgress?: (progress: ImportProgress) => void;
+    }) => itemsApi.importGrocy(file, categoryMatches, onProgress),
+    (qc, result) => {
+      invalidation.items(qc);
+      if (result.created_locations.length > 0) invalidation.storages(qc);
+      if (result.created_categories.length > 0) invalidation.categories(qc);
+      if (result.created_suppliers.length > 0) invalidation.partners(qc);
+    },
+  );
+}
+
 /** An internal code for the product form's barcode field; nothing to refresh,
  *  since nothing is saved until the form is. */
 export function useGenerateProductCode() {

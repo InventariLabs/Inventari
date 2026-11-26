@@ -23,7 +23,6 @@
   },
   "toasts": {
     "importFailedToAnalyze": "Datei konnte nicht analysiert werden",
-    "importGrocyMappingApplied": "Grocy-Zuordnung angewendet!",
     "importFailed": "Import fehlgeschlagen",
     "archivedLabelFreed": "Etikett ist nun wieder verwendbar"
   },

@@ -39,6 +39,20 @@ says what the release does rather than what changed since them.
   again* as a put-away. The *Each product has its own location* setting shows
   for every warehouse, so one that keeps no fixed places can turn the question
   off.
+- A Grocy household moves in from Grocy's own database file. Grocy writes no
+  export, so **Import from Grocy** in the products' import dialog takes
+  `grocy.db` from Grocy's data folder. Before anything is written it shows
+  what the file holds, which locations, categories and suppliers it would
+  create, and what stays in Grocy. The move turns Grocy's locations, product
+  groups and stores into locations, categories and suppliers, reusing ones
+  with the same name — a Polish "Nabiał" goes to the seeded *Dairy* — and
+  every batch of stock into a record with its best-before date, price,
+  purchase date, shelf, store and opened mark; half of an opened piece is an
+  opened piece used down to the half. A unit Grocy names in any of the six
+  languages is recognised; one that is not counts pieces and is named.
+  With *Shopping lists* on, Grocy's shopping lists come across as well, each
+  entry linked to the product the move made. Running the same file again adds
+  only batches that are new.
 
 ### Fixed
 
@@ -56,6 +70,30 @@ says what the release does rather than what changed since them.
   Community homepage links and *Free label* meet the phone touch-target
   size, and the tab keeps naming the not-found sentence after a language
   switch.
+- The audit log and the item history read in words. A label's entries name
+  the label's code and the product beside its id; a document type
+  configuration's default locations are written with their names, and
+  deleting a configuration journals only its settings; a module row names
+  what it is about (a reorder rule, a supplier price, an approval workflow)
+  and an organization row names a maintenance type, an attestation answer or
+  an AI purpose in the interface language. A purchase order's lines are
+  labelled "lines" rather than a count, a system field of a category is
+  named as the field builder names it, and a reordered field list reads as
+  such instead of as JSON. A module setting stored as `3.0` and posted as `3`
+  is no longer a change, and a minimum written as `0.0000001` no longer reads
+  `1E-7`. The Asset filter lists the creation and edits of an asset, not only
+  its status changes, and the entry for an opened pack says why the quantity
+  moved. An item edit that changes nothing writes no history row, a negative
+  item weight or one too large to store is refused with a validation error
+  instead of being saved or answered with a server error, an opened amount
+  sent without its unit reads in the record's own unit, and the recipe price
+  placeholder follows the reader's decimal mark.
+- The product list's filter chips stay where they are while the page loads, so
+  a tap on *Running low* is not lost when the date filters arrive. *Only
+  expiring soon* and *Expired* now stand at the end of the row instead of in
+  front of *Running low*.
+- The products' import dialog no longer offers a Grocy CSV preset: Grocy has
+  no CSV export, so the preset mapped columns of a file nobody could produce.
 - Back returns a list to where it stood when you tapped away from it, also
   when the tap came right after a scroll on a busy phone; it could return to
   an earlier position, several hundred pixels off.

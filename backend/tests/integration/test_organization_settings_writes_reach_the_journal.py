@@ -143,6 +143,7 @@ class TestSettingsWritesReachTheJournal:
         )
         assert entry.user_id == async_test_user.id
         assert entry.snapshot['purpose'] == 'vision.extract'
+        assert entry.snapshot['purpose_label_key'] == 'vision:ai.purposeLabel'
         assert entry.snapshot['name'] == async_test_household.name
         assert entry.snapshot['before'] == {
             'connection_id': None,

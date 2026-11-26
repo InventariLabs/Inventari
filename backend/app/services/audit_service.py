@@ -39,7 +39,16 @@ from decimal import Decimal
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import ColumnElement, Row, ScalarSelect, func, select
+from sqlalchemy import (
+    ColumnElement,
+    Row,
+    ScalarSelect,
+    and_,
+    false,
+    func,
+    or_,
+    select,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.audit_actor import ACTOR_KEY, ACTOR_TYPE_API_KEY, current_actor
@@ -219,13 +228,25 @@ def audit_value(value: Any) -> object:
     the encoder would refuse.
 
     A ``Decimal`` -- and a ``float``, by its shortest round-trip digits --
-    becomes its **exact digits as a string**. The journal is
+    becomes its **exact digits as a string**, in plain notation: ``1E-7``
+    is not a shape anybody typed or the screen reads. The journal is
     the account of what the numbers were, and a float is a less precise copy
     of the data it describes -- the same rule the quantity path and
     ``docs/subsystems/AUDIT.md`` state. Use :func:`audit_key` to decide
     whether a value moved; this one only says what it became.
     """
-    return _render(value, decimal=lambda d: str(d))
+    return _render(value, decimal=lambda d: format(d, 'f'))
+
+
+def audit_walk(value: Any) -> object:
+    """Render a value like :func:`audit_value`, but leave every number a number.
+
+    For a reading that is still to be compared before it is written: a
+    ``float`` becomes the ``Decimal`` of its shortest digits, a ``Decimal``
+    stays, at any depth. ``audit_key`` then answers whether it moved and
+    ``audit_value`` says what it became, as for any other entry.
+    """
+    return _render(value, decimal=lambda d: d)
 
 
 def audit_key(value: Any) -> object:
@@ -302,6 +323,41 @@ def item_to_snapshot(item: 'Item') -> dict[str, Any]:
     return data
 
 
+#: How many of the newest product entries the filter's list reads to learn
+#: whether any of them is an asset.
+_ASSET_PROBE_ENTRIES = 1000
+
+
+def _of_kind(target_type: str) -> ColumnElement[bool]:
+    """The condition for the screen's object-type filter.
+
+    An asset is a product card with an equipment block, so the entries of its
+    creation and edits are stored as ``item`` while its status changes are
+    ``equipment_asset``. The Target column names all of them an asset, so the
+    filter does as well: ``equipment_asset`` also takes the ``item`` entries
+    that carry the equipment block (the module's mark on a create, its
+    ``meta_data`` on either side of an edit). The ``item`` filter is the stored
+    type alone, so it lists those entries too.
+    """
+    if target_type != 'equipment_asset':
+        return AuditLog.target_type == target_type
+    snapshot = AuditLog.snapshot
+    is_asset_card = and_(
+        AuditLog.target_type == 'item',
+        func.coalesce(
+            or_(
+                snapshot['module_name'].as_string() == 'equipment',
+                *(
+                    side['meta_data']['equipment'].is_not(None)
+                    for side in (snapshot, snapshot['before'], snapshot['after'])
+                ),
+            ),
+            false(),
+        ),
+    )
+    return or_(AuditLog.target_type == 'equipment_asset', is_asset_card)
+
+
 async def list_for_org_async(
     db: AsyncSession,
     organization_id: uuid.UUID,
@@ -352,7 +408,7 @@ async def list_for_org_async(
 
     conditions = [AuditLog.organization_id == organization_id]
     if target_type is not None:
-        conditions.append(AuditLog.target_type == target_type)
+        conditions.append(_of_kind(target_type))
     if target_id is not None:
         conditions.append(AuditLog.target_id == target_id)
     if user_id is not None:
@@ -451,7 +507,28 @@ async def list_target_types_async(
         .where(kinds.c.target_type.is_not(None))
         .order_by(kinds.c.target_type)
     )
-    return list(result.scalars().all())
+    held = list(result.scalars().all())
+    # An asset that never changed status has only ``item`` entries, which the
+    # Target column still calls an asset. Only the newest ones are read, so
+    # the question costs the same however long the journal is.
+    if 'item' in held and 'equipment_asset' not in held:
+        newest = (
+            select(AuditLog.id)
+            .where(
+                AuditLog.organization_id == organization_id,
+                AuditLog.target_type == 'item',
+            )
+            .order_by(AuditLog.created_at.desc())
+            .limit(_ASSET_PROBE_ENTRIES)
+        )
+        found = await db.scalar(
+            select(AuditLog.id)
+            .where(AuditLog.id.in_(newest), _of_kind('equipment_asset'))
+            .limit(1)
+        )
+        if found is not None:
+            held = sorted([*held, 'equipment_asset'])
+    return held
 
 
 async def list_for_target_async(

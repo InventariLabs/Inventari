@@ -25,7 +25,6 @@
   },
   "toasts": {
     "importFailedToAnalyze": "Nie udało się przeanalizować pliku",
-    "importGrocyMappingApplied": "Mapowanie Grocy zastosowane!",
     "importFailed": "Import nie powiódł się",
     "archivedLabelFreed": "Etykieta jest teraz wolna do ponownego użycia"
   },

@@ -699,7 +699,9 @@
         "sku_schema": "Schemat SKU",
         "body_html": "Treść szablonu",
         "reset_to_builtin": "Zresetowany do szablonu wbudowanego",
-        "occurred_on": "Dzień, którego dotyczy"
+        "occurred_on": "Dzień, którego dotyczy",
+        "order_lines": "Wiersze",
+        "purpose_label_key": "Przeznaczenie"
       },
       "showWholeChange": "Pokaż całą zmianę",
       "showLess": "Pokaż mniej",
@@ -782,7 +784,8 @@
         "added": "Dodano pole {{field}}",
         "removed": "Usunięto pole {{field}}",
         "changed": "Zmieniono pole {{field}}",
-        "required": "wymagane"
+        "required": "wymagane",
+        "reordered": "Zmieniono kolejność pól"
       },
       "values": {
         "CHECKOUT": "Wydanie",
@@ -796,8 +799,6 @@
         "PENDING_APPROVAL": "Oczekuje na akceptację",
         "CONFIRMED": "Potwierdzone",
         "DISPUTED": "Zgłoszono problem",
-        "MISSING": "Brak sprzętu",
-        "WRONG_ITEM": "Inny sprzęt",
         "FIRST_ACCOUNT": "Pierwsze konto w instalacji",
         "COMPLETED": "Zakończone",
         "CANCELLED": "Anulowane",
@@ -838,6 +839,11 @@
         "reorderRule": "reguła uzupełnień: {{location}}",
         "reorderRuleUnnamed": "z reguły uzupełnień",
         "note": "notatka: {{text}}"
+      },
+      "subjects": {
+        "pricelist": "Cena dostawcy",
+        "reorderRule": "Reguła uzupełniania",
+        "workflow": "Przepływ akceptacji: {{target}}"
       }
     },
     "shell": {

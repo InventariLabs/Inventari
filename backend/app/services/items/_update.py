@@ -683,22 +683,23 @@ async def _log_and_emit(
             db, {f: update_data.get(f, changed[f][1]) for f in changed}
         )
     )
-    # The card's own history carries the names too, not only the ids, so an
-    # event reads the same words on the card as in the journal beside it.
-    await log_history_async(
-        db,
-        item,
-        ItemAction.UPDATED,
-        {
-            'old': {**old_values, **before},
-            'new': {**update_data, **after},
-        },
-        user_id=user.id,
-    )
-    # An update that changed nothing is not an event. Logging it anyway is how
-    # the log filled up with entries whose every field read `x → x`, and a log
-    # nobody can read for the change they are looking for is not a record.
+    # An update that changed nothing is not an event, on the card's history
+    # or in the journal. Logging it anyway is how the log filled up with
+    # entries whose every field read `x → x`, and a log nobody can read for
+    # the change they are looking for is not a record.
     if changed:
+        # The card's own history carries the names too, not only the ids, so
+        # an event reads the same words on the card as in the journal beside it.
+        await log_history_async(
+            db,
+            item,
+            ItemAction.UPDATED,
+            {
+                'old': {**old_values, **before},
+                'new': {**update_data, **after},
+            },
+            user_id=user.id,
+        )
         await log_action_async(
             db,
             organization_id=item.organization_id,

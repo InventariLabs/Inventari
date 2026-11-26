@@ -224,14 +224,19 @@ function readRestored(
  */
 function readOpened(
   changes: Record<string, unknown>,
-  { t }: ReadContext,
+  ctx: ReadContext,
 ): string {
+  const { t } = ctx;
   const left = changes.left as Amount | undefined;
   if (left === undefined) return "";
   if (Number(left) === 0) return t("items:history.openedNothingLeft");
   const unit = changes.left_unit as string | undefined;
+  // A call that sent an amount without its unit still left the record's own:
+  // the amount reads the way the USED row beneath it does.
   return t("items:history.openedLeft", {
-    amount: formatQuantityLocalized(t, left, unit),
+    amount: unit
+      ? formatQuantityLocalized(t, left, unit)
+      : amountText(left, ctx),
   });
 }
 

@@ -21,16 +21,6 @@ const EMPTY_MAPPING: ImportMapping = {
   label_code: "",
 };
 
-const GROCY_MAPPING: Record<string, string> = {
-  name: "name",
-  quantity: "amount",
-  expiry_date: "best_before_date",
-  location: "location",
-  category: "product_group",
-  barcode: "barcode",
-  purchase_price: "price",
-};
-
 /** Header shapes per field, tried in this order. Exact words come before
  *  substrings so "Purchase price per unit (USD)" is the price, not the unit. */
 const RULES: {
@@ -132,18 +122,4 @@ export function suggestMapping(
     if (header) mapping[locationFieldKey(key)] = header;
   });
   return mapping;
-}
-
-export function applyGrocyPreset(
-  headers: string[],
-  mapping: ImportMapping,
-): ImportMapping {
-  const next = { ...mapping };
-  Object.entries(GROCY_MAPPING).forEach(([field, grocyHeader]) => {
-    const actual = headers.find(
-      (h) => h.toLowerCase() === grocyHeader.toLowerCase(),
-    );
-    if (actual) next[field] = actual;
-  });
-  return next;
 }
