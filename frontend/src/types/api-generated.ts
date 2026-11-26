@@ -2507,7 +2507,7 @@ export interface paths {
         put?: never;
         /**
          * Import Grocy File
-         * @description Move a Grocy household in: its locations, groups, stores, products and stock.
+         * @description Move in from Grocy: its locations, groups, stores, products and stock.
          *
          *     The founding the file asks for — a location, a category, a supplier the
          *     organization does not have — is the work the front doors gate by

@@ -242,7 +242,7 @@ async def import_grocy_file(
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
     db: AsyncSession = Depends(get_async_db, scope='function'),
 ) -> Any:
-    """Move a Grocy household in: its locations, groups, stores, products and stock.
+    """Move in from Grocy: its locations, groups, stores, products and stock.
 
     The founding the file asks for — a location, a category, a supplier the
     organization does not have — is the work the front doors gate by

@@ -185,7 +185,7 @@
       "pickButton": "Choisir grocy.db",
       "analyzeFailed": "Le fichier n'a pas pu être lu.",
       "importFailed": "Le déménagement n'a pas abouti.",
-      "wait": "Patientez pendant que votre foyer déménage depuis Grocy.",
+      "wait": "Patientez pendant l'import depuis Grocy.",
       "inFile": "Dans ce fichier",
       "counts": {
         "products": "Produits",

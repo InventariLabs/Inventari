@@ -185,7 +185,7 @@
       "pickButton": "Choose grocy.db",
       "analyzeFailed": "The file could not be read.",
       "importFailed": "The move did not finish.",
-      "wait": "Please wait while your Grocy household moves in.",
+      "wait": "Please wait while the move from Grocy runs.",
       "inFile": "In this file",
       "counts": {
         "products": "Products",

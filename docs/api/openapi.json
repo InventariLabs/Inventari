@@ -8778,7 +8778,7 @@
           "Items"
         ],
         "summary": "Import Grocy File",
-        "description": "Move a Grocy household in: its locations, groups, stores, products and stock.\n\nThe founding the file asks for \u2014 a location, a category, a supplier the\norganization does not have \u2014 is the work the front doors gate by\npermission, so an account short of one is refused before anything is\nwritten, with every missing key named. A file of more than\n``INLINE_ROW_LIMIT`` steps (batches, and products without stock) is\nanswered with ``202`` and a job, as a long sheet is.\n\n``category_matches_json`` maps a Grocy group's name to a category the\nreader's screen recognised by the name it shows \u2014 a seeded category is\nstored in English and shown in the reader's language.",
+        "description": "Move in from Grocy: its locations, groups, stores, products and stock.\n\nThe founding the file asks for \u2014 a location, a category, a supplier the\norganization does not have \u2014 is the work the front doors gate by\npermission, so an account short of one is refused before anything is\nwritten, with every missing key named. A file of more than\n``INLINE_ROW_LIMIT`` steps (batches, and products without stock) is\nanswered with ``202`` and a job, as a long sheet is.\n\n``category_matches_json`` maps a Grocy group's name to a category the\nreader's screen recognised by the name it shows \u2014 a seeded category is\nstored in English and shown in the reader's language.",
         "operationId": "import_grocy_file_api_v1_items_import_grocy_post",
         "requestBody": {
           "content": {
