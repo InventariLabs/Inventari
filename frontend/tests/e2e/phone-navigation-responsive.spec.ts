@@ -157,7 +157,8 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
     await expect(menus.last()).toBeInViewport();
     // Let the bottom be reported, so that it is what an older reading holds.
     await page.evaluate(
-      () => new Promise((done) => requestAnimationFrame(() => setTimeout(done))),
+      () =>
+        new Promise((done) => requestAnimationFrame(() => setTimeout(done))),
     );
 
     // Scroll up and tap in one task: the tap is handled before the browser
@@ -216,12 +217,6 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
     await page.goto("/inventory/items");
     const lowStock = page.getByRole("button", { name: "Running low" });
     const usedUp = page.getByRole("button", { name: "Show used up" });
-    // The date chips stand ahead of these two and arrive after them, pushing
-    // them aside: a tap that is down at that moment lands on nothing. Tap once
-    // the row is whole (the suite's seed holds dated records).
-    await expect(page.getByTestId("filter-expired")).toBeAttached({
-      timeout: 15000,
-    });
     await expect(
       page.getByRole("button", { name: /^Product actions: / }).first(),
     ).toBeVisible({ timeout: 15000 });
@@ -248,6 +243,47 @@ test.describe("Phone — a new screen opens at its top and Back returns", () => 
     await page.reload();
     await expect(lowStock).toHaveAttribute("aria-pressed", "true");
     await expect(usedUp).toHaveAttribute("aria-pressed", "true");
+  });
+
+  test("a chip held down while the date chips arrive still takes the tap", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    // Hold the two answers that decide whether the date chips are offered.
+    let release = () => {};
+    const released = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route(
+      /\/api\/v1\/(stats\/overview|location-types)(\?|$)/,
+      async (route) => {
+        await released;
+        await route.continue();
+      },
+    );
+    await page.goto("/inventory/items");
+    // The rows and their count are in: the row of chips stands where it will.
+    await expect(
+      page.getByRole("button", { name: /^Product actions: / }).first(),
+    ).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/^\d+ records/)).toBeVisible();
+    const lowStock = page.getByRole("button", { name: "Running low" });
+    await lowStock.scrollIntoViewIfNeeded();
+    const dates = page.getByTestId("filter-expired");
+    await expect(dates).toHaveCount(0);
+
+    const box = (await lowStock.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    release();
+    // The suite's seed holds dated records, so the date chips are offered.
+    await expect(dates).toBeAttached({ timeout: 15000 });
+    expect(await lowStock.boundingBox()).toEqual(box);
+    await page.mouse.up();
+
+    await expect(lowStock).toHaveAttribute("aria-pressed", "true");
+    await expect(page).toHaveURL(/filter=low-stock/);
   });
 
   test("Back from a product opened by a direct link climbs, then leaves the module", async ({

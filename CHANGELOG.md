@@ -42,6 +42,10 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The product list's filter chips stay where they are while the page loads, so
+  a tap on *Running low* is not lost when the date filters arrive. *Only
+  expiring soon* and *Expired* now stand at the end of the row instead of in
+  front of *Running low*.
 - Back returns a list to where it stood when you tapped away from it, also
   when the tap came right after a scroll on a busy phone; it could return to
   an earlier position, several hundred pixels off.

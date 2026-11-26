@@ -423,12 +423,6 @@ export default function ItemsPage() {
           }}
           secondaryFilters={[
             attentionChip(filters, t("needsAttention")),
-            // The same decision the statistics screens read. Offered
-            // unconditionally, these two chips contradicted a health card that
-            // had just said this workspace keeps no dates.
-            ...(tracksExpiry
-              ? expiryChips(filters, t("onlyExpiring"), t("stats.expired"))
-              : []),
             {
               key: "low_stock",
               label: t("onlyLowStock"),
@@ -449,6 +443,13 @@ export default function ItemsPage() {
               onToggle: () => setGroupByCategory((prev) => !prev),
             },
             ...moduleFilters.chips,
+            // The same decision the statistics screens read: a workspace that
+            // keeps no dates is not offered a filter by date. Its answer
+            // arrives after the row is drawn, so these two stand last: a chip
+            // already on screen does not move out from under a tap.
+            ...(tracksExpiry
+              ? expiryChips(filters, t("onlyExpiring"), t("stats.expired"))
+              : []),
           ]}
           resultCount={isError ? undefined : exactTotal}
           // One row per record of stock, not per product: the count says so,
