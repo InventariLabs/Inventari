@@ -42,7 +42,6 @@ ALWAYS = [
 ]
 
 PRICE = 'Purchase price per unit (USD)'
-A_DAY = date.today() + timedelta(days=30)
 
 Change = Callable[[AsyncSession, Item], Awaitable[None]]
 
@@ -113,6 +112,16 @@ async def _priced_not_a_number(db: AsyncSession, item: Item) -> None:
     )
 
 
+async def _expiring(db: AsyncSession, item: Item) -> None:
+    a_day = date.today() + timedelta(days=30)
+    await _on_the_record(expiry_date=a_day)(db, item)
+
+
+async def _frozen(db: AsyncSession, item: Item) -> None:
+    a_day = date.today().isoformat()
+    await _on_the_record(meta_data={'food': {'freeze_date': a_day}})(db, item)
+
+
 @pytest.fixture
 async def open_location(
     real_async_db_session: AsyncSession, async_test_storage_location
@@ -134,16 +143,8 @@ async def open_location(
         pytest.param(_on_the_product(weight_value=Decimal('5')), ['Weight'], id='kg'),
         pytest.param(_on_the_product(weight_value=Decimal('0')), [], id='no-weight'),
         pytest.param(_counted_by_weight, ['Weight'], id='counted-by-weight'),
-        pytest.param(
-            _on_the_record(expiry_date=A_DAY),
-            ['Expiry Date'],
-            id='expiry',
-        ),
-        pytest.param(
-            _on_the_record(meta_data={'food': {'freeze_date': A_DAY.isoformat()}}),
-            ['Freeze Date'],
-            id='frozen',
-        ),
+        pytest.param(_expiring, ['Expiry Date'], id='expiry'),
+        pytest.param(_frozen, ['Freeze Date'], id='frozen'),
         pytest.param(
             _on_the_record(meta_data={'food': {'freeze_date': None}}),
             [],
