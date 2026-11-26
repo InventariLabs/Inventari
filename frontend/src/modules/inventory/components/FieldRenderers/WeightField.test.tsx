@@ -189,6 +189,16 @@ describe("WeightField", () => {
     ).toBeInTheDocument();
   });
 
+  it("states the range the server accepts", () => {
+    render(
+      <WeightField field={field} value="" onChange={noop} onUomChange={noop} />,
+    );
+
+    const input = screen.getByRole("spinbutton");
+    expect(input).toHaveAttribute("min", "0");
+    expect(input).toHaveAttribute("max", "99999999");
+  });
+
   // The visible label lives in UnifiedFieldRenderer, across a file boundary
   // the field-names gate cannot read — the input carries its own name,
   // resolved from the same source the visible label is rendered from.

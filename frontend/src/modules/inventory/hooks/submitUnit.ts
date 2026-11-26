@@ -1,11 +1,15 @@
+import type { TFunction } from "i18next";
 import type { FieldDefinition, ItemCreate } from "@/types";
 import type { ItemFormData } from "./useItemForm";
 
-/** The errors the form's own rules find, keyed the way the fields are. */
-export function requiredFieldErrors(
+/** The largest unit weight or volume the server stores; the smallest is 0. */
+export const MEASURE_MAX = 99_999_999;
+
+/** The errors the field definitions' rules find, keyed the way the fields are. */
+export function fieldRuleErrors(
   fieldDefinitions: FieldDefinition[],
   formData: ItemFormData,
-  requiredMessage: string,
+  t: TFunction<["items", "common"]>,
 ): Record<string, string> {
   const errors: Record<string, string> = {};
   fieldDefinitions
@@ -15,10 +19,35 @@ export function requiredFieldErrors(
         ? formData.metadata?.[field.key]
         : formData[field.key as keyof ItemFormData];
       if (!value || (typeof value === "string" && !value.trim())) {
-        errors[field.key] = requiredMessage;
+        errors[field.key] = t("common:labels.required");
       }
     });
+  // The unit weight's range is checked here as well as stated on the input: a
+  // Save button that calls the submit itself never runs the browser's check.
+  if (fieldDefinitions.some((f) => f.key === "weight" && f.visible)) {
+    const weight = Number(formData.weight);
+    if (weight < 0) {
+      errors.weight = t("common:nativeValidation.rangeUnderflow", { min: 0 });
+    } else if (weight > MEASURE_MAX) {
+      errors.weight = t("common:nativeValidation.rangeOverflow", {
+        max: MEASURE_MAX,
+      });
+    }
+  }
   return errors;
+}
+
+/** The form's labels, keyed by the name the API refuses a value under. */
+export function apiFieldNames(
+  fieldDefinitions: FieldDefinition[],
+  label: (field: FieldDefinition) => string,
+): Record<string, string> {
+  return Object.fromEntries(
+    fieldDefinitions
+      .filter((f) => !f.is_custom)
+      // The form's unit weight travels as `weight_value`.
+      .map((f) => [f.key === "weight" ? "weight_value" : f.key, label(f)]),
+  );
 }
 
 /**

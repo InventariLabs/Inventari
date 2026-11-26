@@ -233,7 +233,8 @@ export function useQuickAdd({
         if ((apiErrorStatus(error) ?? 500) >= 500) {
           logger.error("[QuickAdd] error:", error);
         }
-        toast.error(extractApiError(error, t("labels:quickAdd.error")), {
+        const fallback = t("labels:quickAdd.error");
+        toast.error(extractApiError(error, fallback, fieldNames), {
           duration: 5000,
         });
       },
@@ -279,6 +280,7 @@ export function useQuickAdd({
     errors,
     setErrors,
     fieldDefinitions,
+    fieldNames,
     handleInputChange,
     handleMetadataChange,
     submit,
