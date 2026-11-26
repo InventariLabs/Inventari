@@ -18,6 +18,14 @@ vi.mock("@/utils/helpers", async (importOriginal) => ({
   downloadBlob: vi.fn(),
 }));
 
+const { enabledModulesMock } = vi.hoisted(() => ({
+  enabledModulesMock: vi.fn<() => string[]>(() => []),
+}));
+vi.mock("@/contexts/ModulesContext", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/contexts/ModulesContext")>()),
+  useEnabledModulesOptional: () => enabledModulesMock(),
+}));
+
 const node = makeStorageSummary({
   id: "shelf-a",
   name: "Shelf A",
@@ -236,5 +244,28 @@ describe("StorageDetailPane — the header's actions", () => {
     await user.click(crumb);
     expect(props.onSelect).toHaveBeenNthCalledWith(1, "rack-1");
     expect(props.onSelect).toHaveBeenNthCalledWith(2, "rack-1");
+  });
+});
+
+/**
+ * The Moves tab shows the movement ledger, so it is offered only where a
+ * module that reads the ledger is on; anywhere else it would open blank.
+ */
+describe("StorageDetailPane — the Moves tab", () => {
+  it("is not offered where no module reads the ledger", () => {
+    enabledModulesMock.mockReturnValue(["core", "items", "locations"]);
+    renderPane();
+
+    expect(screen.getByRole("tab", { name: "Contents" })).toBeInTheDocument();
+    expect(
+      screen.queryByRole("tab", { name: "Moves" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("is offered where one does", () => {
+    enabledModulesMock.mockReturnValue(["items", "stock_takes"]);
+    renderPane();
+
+    expect(screen.getByRole("tab", { name: "Moves" })).toBeInTheDocument();
   });
 });

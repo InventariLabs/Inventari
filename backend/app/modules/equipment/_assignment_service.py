@@ -27,6 +27,7 @@ from ._org_day import pin_org_day_end
 from ._unit_identity import audit_identity
 from .bulk_service import CHECKOUT_REFUSALS, row_error
 from .models import EquipmentAssignment
+from .my_assets_service import held_by_clause
 from .schemas import AssignmentCheckin, AssignmentCreate, AssignmentSchema
 from .services import (
     _get_assignment_or_404,
@@ -484,7 +485,12 @@ async def count_item_assignment_history(
 
 
 async def get_item_assignment_history(
-    db: AsyncSession, org_id: UUID, item_id: UUID, limit: int = 50, offset: int = 0
+    db: AsyncSession,
+    org_id: UUID,
+    item_id: UUID,
+    limit: int = 50,
+    offset: int = 0,
+    viewer_email: str | None = None,
 ) -> list[AssignmentSchema]:
     result = await db.execute(
         select(EquipmentAssignment)
@@ -505,4 +511,16 @@ async def get_item_assignment_history(
     )
     rows = list(result.scalars().all())
     names = await _operator_names(db, org_id, rows)
-    return [_to_assignment_schema(a, names) for a in rows]
+    schemas = [_to_assignment_schema(a, names) for a in rows]
+    if viewer_email and rows:
+        held = set(
+            await db.scalars(
+                select(EquipmentAssignment.id).where(
+                    EquipmentAssignment.organization_id == org_id,
+                    EquipmentAssignment.id.in_([a.id for a in rows]),
+                    await held_by_clause(db, org_id, viewer_email),
+                )
+            )
+        )
+        return [s.model_copy(update={'held_by_viewer': s.id in held}) for s in schemas]
+    return schemas

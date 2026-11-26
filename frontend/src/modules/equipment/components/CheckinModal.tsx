@@ -39,6 +39,8 @@ export interface CheckinTarget {
   /** The holder, person or place, resolved by the backend. */
   holder_name?: string | null;
   holder_kind?: "person" | "location" | null;
+  /** The server's answer to whether the viewer holds it. */
+  held_by_viewer?: boolean | null;
 }
 
 interface CheckinModalProps {
@@ -47,8 +49,9 @@ interface CheckinModalProps {
   homeLocationId?: string | null;
   /**
    * The holder is handing it back, not a manager receiving it: the dialog
-   * speaks the holder's verb. A viewer whose own address is the assignment's
-   * is the holder without being told, so the asset page words it right too.
+   * speaks the holder's verb. A viewer the assignment itself names (see
+   * `useHoldsAssignment`) is the holder without being told, so the asset page
+   * words it right too.
    */
   byHolder?: boolean;
   onClose: () => void;

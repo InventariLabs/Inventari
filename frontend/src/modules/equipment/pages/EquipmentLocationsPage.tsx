@@ -205,7 +205,8 @@ function LocationActions({
  * The way back from Archive. Places made on this screen are tagged for the
  * module, which the inventory list of archived places hides unless the
  * organization shows module data; the link carries the module so they are
- * listed there either way.
+ * listed there either way, and this screen as the place Back and Active
+ * return to.
  */
 function ArchivedLocationsLink() {
   const { t } = useTranslation(["equipment", "locations"]);
@@ -213,6 +214,7 @@ function ArchivedLocationsLink() {
     <div className="flex justify-center">
       <Link
         to="/inventory/locations/archived?module=equipment"
+        state={{ backTo: "/equipment/locations" }}
         className="inline-flex min-h-6 items-center text-sm text-on-primary hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
       >
         {t("locations:archived.title")}

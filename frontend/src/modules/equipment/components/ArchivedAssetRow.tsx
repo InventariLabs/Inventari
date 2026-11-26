@@ -67,6 +67,12 @@ export const ArchivedAssetRow = memo(function ArchivedAssetRow({
           {item.category && <span>{getCategoryLabel(t, item.category)}</span>}
           {item.deleted_at && <span>{formatDate(item.deleted_at)}</span>}
         </div>
+        {item.deletion_notes && (
+          <p className="mt-0.5 text-xs text-on-secondary [overflow-wrap:anywhere]">
+            <span className="font-medium">{t("items:archivedNoteLabel")}:</span>{" "}
+            {item.deletion_notes}
+          </p>
+        )}
       </div>
       {selectable && (
         <div className="flex items-center gap-2 shrink-0">

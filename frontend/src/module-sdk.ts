@@ -88,6 +88,12 @@ export type { VisitedRecord } from "@/hooks/useRecordVisit";
 // Whether the history holds an earlier screen of the app to go back to, for a
 // dialog that closes by going back to the link that opened it.
 export { hasHistoryToPop, useBackToScreen } from "@/hooks/useShellBack";
+// Where a screen entered from another module sends the back arrow: the linking
+// page passes `state={{ backTo }}`.
+export { useReturnTarget } from "@/hooks/useReturnTarget";
+// Which of a category's stored definitions are fields: what a screen lists and
+// counts, without the visibility flags stored beside them.
+export { listedFields } from "@/components/ui/fieldTypes";
 export { placeListPanel, type ListPanelPlace } from "@/lib/listPanelPlacement";
 // The product profile the organization runs, for wording that follows it.
 export { useActiveProfile } from "@/hooks/useActiveProfile";

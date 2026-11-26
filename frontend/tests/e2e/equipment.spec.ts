@@ -533,6 +533,75 @@ test.describe("Equipment — checkout from detail header", () => {
   });
 });
 
+test.describe("Equipment — the holder hands it back", () => {
+  let api: ApiHelper;
+  let token: string;
+  let assetId = "";
+  let partnerId = "";
+  const name = `E2E-Holder-Asset-${Date.now()}`;
+
+  test.beforeAll(async ({ playwright, baseURL }) => {
+    const requestContext = await playwright.request.newContext({ baseURL });
+    api = new ApiHelper(requestContext);
+    token = (await api.login(ADMIN_EMAIL, ADMIN_PASSWORD)).access_token;
+    const storageId =
+      process.env.E2E_STORAGE_ID || (await api.listStorages(token))[0]?.id;
+    assetId = (
+      await api.createEquipmentItem(token, {
+        name,
+        quantity: 1,
+        location_id: storageId,
+      })
+    ).id;
+    // The signed-in user holds it through their partner record alone: the
+    // assignment itself names no address.
+    partnerId = (
+      await api.createPartner(token, {
+        name: `E2E Holder ${Date.now()}`,
+        type: "EMPLOYEE",
+        email: ADMIN_EMAIL,
+      })
+    ).id;
+    await api.checkoutAsset(token, {
+      item_id: assetId,
+      assignee_partner_id: partnerId,
+    });
+  });
+
+  test.afterAll(async () => {
+    if (assetId) {
+      for (const a of await api.listItemAssignments(token, assetId)) {
+        if (!a.checked_in_at) await api.checkinAsset(token, a.id);
+      }
+      await api.deleteItem(token, assetId);
+    }
+    if (partnerId) await api.deletePartner(token, partnerId);
+  });
+
+  test("returns it from the asset page, in the holder's words, on a phone", async ({
+    page,
+    authenticatedPage,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/equipment/my");
+    await page.getByRole("link", { name }).first().click();
+    await expect(page).toHaveURL(new RegExp(`/equipment/${assetId}`));
+
+    await page.getByRole("button", { name: /^return$/i }).first().click();
+    const dialog = page.getByTestId("checkin-modal-card");
+    // The manager's dialog is titled "Return Asset"; the holder's is not.
+    await expect(
+      dialog.getByRole("heading", { name: "Return asset", exact: true }),
+    ).toBeVisible();
+    await dialog.getByRole("button", { name: /^return$/i }).click();
+
+    await expect(dialog).not.toBeVisible({ timeout: 15000 });
+    await expect(
+      page.getByRole("button", { name: /^check out$/i }).first(),
+    ).toBeVisible();
+  });
+});
+
 test.describe("Equipment — maintenance logs", () => {
   test.describe.configure({ mode: "serial" });
 

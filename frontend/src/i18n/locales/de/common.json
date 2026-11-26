@@ -7,6 +7,8 @@
     "manageOnly": "Sie dürfen das nutzen, aber nicht umstellen",
     "manageOnlyHint": "Ihr Konto darf das Modul nutzen, aber sein Verhalten nicht ändern. Bitten Sie jemanden in Ihrer Organisation, der es verwalten darf.",
     "hiddenRecordsAdminOnly": "Nur ein Administrator kann das einschalten – bitten Sie einen darum.",
+    "purgeOff": "Endgültiges Löschen ist für diese Organisation ausgeschaltet.",
+    "purgeOffLink": "In den Einstellungen einschalten",
     "denied": "Sie haben darauf keinen Zugriff",
     "deniedHint": "Ihr Konto kann diese Daten nicht lesen. Bitten Sie eine Administratorin oder einen Administrator Ihrer Organisation um Zugriff."
   },

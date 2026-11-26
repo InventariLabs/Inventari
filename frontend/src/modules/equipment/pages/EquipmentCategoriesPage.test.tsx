@@ -133,7 +133,14 @@ describe("EquipmentCategoriesPage", () => {
             {
               ...CATEGORIES[0],
               items_count: 3,
-              field_definitions: [{ key: "a" }, { key: "b" }],
+              // The untyped visibility flag is stored beside the fields,
+              // visible as the module seeds it, and no screen lists it.
+              field_definitions: [
+                { key: "a", label: "A", type: "text" },
+                { key: "b", label: "B", type: "text" },
+                { key: "category_id", label: "Category", visible: true },
+                { key: "c", label: "C", type: "text", visible: false },
+              ],
             },
           ]),
         ),

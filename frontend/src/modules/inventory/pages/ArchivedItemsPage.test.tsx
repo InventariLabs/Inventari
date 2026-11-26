@@ -262,6 +262,38 @@ describe("ArchivedItemsPage", () => {
     expect(screen.queryByText(purgeLabel)).toBeNull();
   });
 
+  it.each([
+    ["rows", archivedRows],
+    ["no rows", []],
+  ])(
+    "says where permanent deletion is switched on, with %s",
+    async (_label, rows) => {
+      const { useOrganization } =
+        await import("@/modules/settings/hooks/useOrganization");
+      vi.mocked(useOrganization).mockReturnValue({
+        data: { settings: { allow_permanent_delete: false } },
+      } as unknown as ReturnType<typeof useOrganization>);
+      mockUseArchivedItems.mockReturnValue({
+        data: {
+          items: rows,
+          total: rows.length,
+          limit: 50,
+          offset: 0,
+          has_more: false,
+        },
+        isLoading: false,
+      } as unknown as ReturnType<typeof useArchivedItems>);
+      signIn(["items:write", "admin:access"]);
+
+      renderPage();
+
+      expect(
+        await screen.findByRole("link", { name: "Turn it on in Settings" }),
+      ).toHaveAttribute("href", "/settings#permanent-delete");
+      expect(screen.getAllByText(/switched off/i)).toHaveLength(1);
+    },
+  );
+
   it("sends the phrase to the server and renders its answer", async () => {
     // Sixty rows of repeating names, no search and no filter, while the active
     // list has both: getting the right thing back was scrolling and guessing.
