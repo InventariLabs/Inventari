@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { toast } from "sonner";
 import { useEquipmentAssets } from "@/modules/equipment/hooks/useEquipmentAssets";
 import {
@@ -325,6 +326,32 @@ function useArchivedListing(listTab: ListTab, search: string) {
   };
 }
 
+/** The equipment list's export, from its first notice to the download. */
+async function downloadEquipmentExport(t: TFunction): Promise<void> {
+  try {
+    toast.loading(t("common:actions.exporting"), { id: "eq-export" });
+    const blob = await itemsApi.exportXlsx(
+      { context_tag: "equipment", location_usage: "any" },
+      showExportProgress(t, "eq-export"),
+    );
+    downloadBlob(blob, `equipment_${getTodayFilename()}.xlsx`);
+    toast.success(
+      t("common:actions.exportSuccess", {
+        defaultValue: "Export completed!",
+      }),
+      { id: "eq-export" },
+    );
+  } catch (error) {
+    toast.error(
+      extractApiError(
+        error,
+        t("common:actions.exportError", { defaultValue: "Export error" }),
+      ),
+      { id: "eq-export" },
+    );
+  }
+}
+
 export function useAssetListActions() {
   const { t } = useTranslation("equipment");
   // The filters the address holds, handed on to the page as they are.
@@ -555,31 +582,7 @@ export function useAssetListActions() {
   }, [skip, archivedPagination.skip, listTab, archivedSearch]);
 
   const handleExport = useCallback(
-    () =>
-      onePreparedAtATime("eq-export", async () => {
-        try {
-          toast.loading(t("common:actions.exporting"), { id: "eq-export" });
-          const blob = await itemsApi.exportXlsx(
-            { context_tag: "equipment", location_usage: "any" },
-            showExportProgress(t, "eq-export"),
-          );
-          downloadBlob(blob, `equipment_${getTodayFilename()}.xlsx`);
-          toast.success(
-            t("common:actions.exportSuccess", {
-              defaultValue: "Export completed!",
-            }),
-            { id: "eq-export" },
-          );
-        } catch (error) {
-          toast.error(
-            extractApiError(
-              error,
-              t("common:actions.exportError", { defaultValue: "Export error" }),
-            ),
-            { id: "eq-export" },
-          );
-        }
-      }),
+    () => onePreparedAtATime("eq-export", () => downloadEquipmentExport(t)),
     [t],
   );
 
