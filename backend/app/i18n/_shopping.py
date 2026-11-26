@@ -86,7 +86,7 @@ SHOPPING_LABELS: dict[Language, ShoppingLabels] = {
         'suggestion_expired_days_ago': 'Expiré il y a {days} jours',
         'suggestion_frequently_consumed': 'Souvent consommé ({count}× le mois dernier)',
         'po_note_from_list': 'Depuis la liste de courses : {name}',
-        'grocy_lists_brought': 'Listes de courses de Grocy — listes créées : {lists}, articles : {items}',
+        'grocy_lists_brought': 'Listes de courses de Grocy — listes créées : {lists}, lignes : {items}',
         'grocy_lists_skipped': 'ignorés, déjà repris auparavant : {count}',
     },
     'es': {
