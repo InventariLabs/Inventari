@@ -60,6 +60,12 @@ build, which has no Vite client.
 
 ## Conventions the specs rely on
 
+- **A renamed catalog string takes its specs with it.** `make check-frontend`
+  runs `scripts/check-e2e-catalog-text.mjs` (on the host, it needs git), which
+  fails when the branch removed or changed an English value (a Polish one for
+  `polish-ui.spec.ts`) that a spec's string or regex still spells. It reads
+  text, not selectors, so a literal that happens to spell the removed text,
+  such as the name of a record the spec creates, has to be reworded too.
 - **Route drift is checked against the app, not memory.** When a helper gets
   `Failed to list …: {"detail":"Not Found"}`, verify the path against the
   backend routers (`app.main:api_v1_router`, module `router.py`) before

@@ -8,6 +8,16 @@ import { describe, expect, it } from "vitest";
 import { blankComments } from "./source-text.mjs";
 
 describe("blankComments", () => {
+  it("reports the span of every literal, and none from a comment", () => {
+    const text = [
+      "// 'not this'",
+      "f('a', \"b\", /c/i, `d ${g(`e`)} h`, 1 / 2);",
+    ].join("\n");
+    const literals = [];
+    blankComments(text, (start, end) => literals.push(text.slice(start, end)));
+    expect(literals).toEqual(["'a'", '"b"', "/c/i", "`e`", "`d ${g(`e`)} h`"]);
+  });
+
   it("keeps the line count, so a finding's line number stays true", () => {
     const text = ["/* a", "   b */", "<input />"].join("\n");
     expect(blankComments(text).split("\n")).toHaveLength(3);
