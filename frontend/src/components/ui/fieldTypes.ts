@@ -1,4 +1,4 @@
-import type { FieldType } from "@/types";
+import type { FieldDefinition, FieldType } from "@/types";
 
 /**
  * The one declaration of what a custom field may be, on this side.
@@ -24,4 +24,15 @@ export const OPTIONS_REQUIRED_TYPES: ReadonlySet<FieldType> =
 /** Whether this type is one the reader has to list the choices for. */
 export function needsOptions(type: FieldType): boolean {
   return OPTIONS_REQUIRED_TYPES.has(type);
+}
+
+/**
+ * The definitions that are fields to a reader. One with no type is a module's
+ * visibility flag for a built-in column: it has nothing to edit, and no
+ * catalogue names it — so no list shows it and no count includes it.
+ */
+export function listedFields(
+  fields: readonly FieldDefinition[],
+): FieldDefinition[] {
+  return fields.filter((f) => f.type && f.label && f.label.trim() !== "");
 }

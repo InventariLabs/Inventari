@@ -17,12 +17,15 @@ import {
   useCategories,
   useDeleteCategory,
 } from "@/modules/shared/hooks/useCategories";
+import { listedFields } from "@/module-sdk";
 import type { CategoryDTO } from "@/types";
 
-/** The fields a category's builder lists: a stored visibility flag is not one. */
-function listedFieldCount(cat: CategoryDTO): number {
-  const defined = cat.field_definitions ?? [];
-  return defined.filter((f) => f.visible !== false).length;
+/** The fields of a category the reader sees: what the builder lists, without
+ *  the hidden ones. A stored visibility flag is not a field. */
+function shownFieldCount(cat: CategoryDTO): number {
+  return listedFields(cat.field_definitions ?? []).filter(
+    (f) => f.visible !== false,
+  ).length;
 }
 
 export default function EquipmentCategoriesPage() {
@@ -95,9 +98,9 @@ export default function EquipmentCategoriesPage() {
         t("categories.confirmDelete", {
           name: getCategoryLabel(t, { code: cat.code, name: cat.name }),
         }),
-        listedFieldCount(cat) > 0
+        shownFieldCount(cat) > 0
           ? t("categories.confirmDeleteFields", {
-              count: listedFieldCount(cat),
+              count: shownFieldCount(cat),
             })
           : null,
         (cat.items_count ?? 0) > 0
@@ -162,7 +165,7 @@ export default function EquipmentCategoriesPage() {
               </thead>
               <tbody>
                 {equipmentCategories.map((cat: CategoryDTO) => {
-                  const fieldCount = listedFieldCount(cat);
+                  const fieldCount = shownFieldCount(cat);
                   // The same words the row shows, so the button that acts on
                   // this record is announced by the name the reader just read.
                   const label = getCategoryLabel(t, {
@@ -232,7 +235,7 @@ export default function EquipmentCategoriesPage() {
            clear of the scroller's right edge. */}
           <ul className="md:hidden divide-y divide-border">
             {equipmentCategories.map((cat: CategoryDTO) => {
-              const fieldCount = listedFieldCount(cat);
+              const fieldCount = shownFieldCount(cat);
               const label = getCategoryLabel(t, {
                 code: cat.code,
                 name: cat.name,

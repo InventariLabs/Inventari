@@ -221,7 +221,7 @@
     "sequenceLabel": "Orden de recorrido",
     "sequenceHint": "La preparación recorre las ubicaciones desde el número más bajo. Una ubicación sin número va después de las numeradas, por orden de código.",
     "noParentStorage": "Sin ubicación superior",
-    "deleteMessage": "¿Eliminar «{{name}}»? Los productos de dentro deben moverse primero y los activos entregados a esta ubicación devolverse — y una ubicación por la que pasaron movimientos de stock no se puede eliminar: archívela en su lugar.",
+    "deleteMessage": "¿Eliminar «{{name}}»? Primero hay que mover los productos de dentro y devolver los activos entregados a esta ubicación. Una ubicación por la que pasaron movimientos de stock no se puede eliminar: archívela en su lugar.",
     "deleteMovesLocations_one": "1 ubicación secundaria sube un nivel.",
     "deleteMovesLocations_other": "{{count}} ubicaciones secundarias suben un nivel.",
     "deleteMovesRecords_one": "1 registro sube un nivel.",

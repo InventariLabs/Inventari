@@ -215,7 +215,7 @@
     "sequenceLabel": "Ordre de passage",
     "sequenceHint": "La préparation parcourt les emplacements à partir du plus petit numéro. Un emplacement sans numéro passe après les numérotés, dans l'ordre des codes.",
     "noParentStorage": "Aucun emplacement parent",
-    "deleteMessage": "Supprimer « {{name}} » ? Les produits doivent d'abord être déplacés et les actifs affectés à cet emplacement retournés — et un emplacement traversé par des mouvements de stock ne peut plus être supprimé : archivez-le plutôt.",
+    "deleteMessage": "Supprimer « {{name}} » ? Les produits doivent d'abord être déplacés et les actifs affectés à cet emplacement retournés. Un emplacement traversé par des mouvements de stock ne peut plus être supprimé : archivez-le plutôt.",
     "deleteMovesLocations_one": "1 emplacement enfant monte d'un niveau.",
     "deleteMovesLocations_other": "{{count}} emplacements enfants montent d'un niveau.",
     "deleteMovesRecords_one": "1 enregistrement monte d'un niveau.",

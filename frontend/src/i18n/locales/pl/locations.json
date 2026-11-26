@@ -219,7 +219,7 @@
     "sequenceLabel": "Kolejność obchodu",
     "sequenceHint": "Kompletacja odwiedza miejsca od najniższego numeru. Miejsce bez numeru trafia za ponumerowane, według kodu.",
     "noParentStorage": "Bez miejsca nadrzędnego",
-    "deleteMessage": "Usunąć „{{name}}”? Produkty wewnątrz trzeba najpierw przenieść, a zasoby wydane do tego miejsca zwrócić — a miejsca, przez które przeszły ruchy magazynowe, nie da się usunąć wcale: zarchiwizuj je zamiast tego.",
+    "deleteMessage": "Usunąć „{{name}}”? Najpierw trzeba przenieść produkty z wewnątrz i zwrócić zasoby wydane do tego miejsca. Miejsca, przez które przeszły ruchy magazynowe, nie da się usunąć wcale: zarchiwizuj je zamiast tego.",
     "deleteMovesLocations_one": "Przeniesie się o poziom wyżej: {{count}} miejsce podrzędne.",
     "deleteMovesLocations_few": "Przeniosą się o poziom wyżej: {{count}} miejsca podrzędne.",
     "deleteMovesLocations_many": "Przeniesie się o poziom wyżej: {{count}} miejsc podrzędnych.",

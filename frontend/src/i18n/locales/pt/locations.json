@@ -244,7 +244,7 @@
     "sequenceLabel": "Ordem de percurso",
     "sequenceHint": "A separação percorre os locais do menor número para o maior. Um local sem número vem depois dos numerados, na ordem do código.",
     "noParentStorage": "Sem local pai",
-    "deleteMessage": "Excluir \"{{name}}\"? Os produtos dentro dele precisam ser movidos antes e os equipamentos entregues a este local devolvidos — e, depois que houve movimentações de estoque, o local não pode mais ser excluído: arquive-o.",
+    "deleteMessage": "Excluir \"{{name}}\"? Antes é preciso mover os produtos dentro dele e devolver os equipamentos entregues a este local. Depois que houve movimentações de estoque, o local não pode mais ser excluído: arquive-o.",
     "deleteMovesLocations_one": "{{count}} local filho sobe um nível.",
     "deleteMovesLocations_other": "{{count}} locais filhos sobem um nível.",
     "deleteMovesRecords_one": "{{count}} registro sobe um nível.",

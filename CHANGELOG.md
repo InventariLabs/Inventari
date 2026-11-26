@@ -73,7 +73,8 @@ says what the release does rather than what changed since them.
   only batches that are new.
 - Module authors: the frontend SDK (`@/module-sdk`) exports
   `useReturnTarget`, which reads where a screen entered from another module
-  sends its back arrow (`state={{ backTo }}` on the link).
+  sends its back arrow (`state={{ backTo }}` on the link), and `listedFields`,
+  which tells a category's fields apart from the flags stored beside them.
 
 ### Fixed
 
@@ -87,7 +88,8 @@ says what the release does rather than what changed since them.
   switched on, with the link for an administrator only. Whoever holds an asset
   through their partner record is treated as its holder on the asset's page,
   as under *My Assets*, and the hints beside the button use the holder's verb.
-  The category delete dialog counts the fields the category editor lists, and
+  The equipment category list, its delete dialog and the field editor's header
+  count the fields the editor lists, without the hidden column flag, and
   *Move to…* opens a branch among thousands of locations without redrawing the
   rest.
 - A module that refuses the creation or change of an asset during a bulk add or

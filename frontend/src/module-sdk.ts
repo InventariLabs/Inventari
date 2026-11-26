@@ -91,6 +91,9 @@ export { hasHistoryToPop, useBackToScreen } from "@/hooks/useShellBack";
 // Where a screen entered from another module sends the back arrow: the linking
 // page passes `state={{ backTo }}`.
 export { useReturnTarget } from "@/hooks/useReturnTarget";
+// Which of a category's stored definitions are fields: what a screen lists and
+// counts, without the visibility flags stored beside them.
+export { listedFields } from "@/components/ui/fieldTypes";
 export { placeListPanel, type ListPanelPlace } from "@/lib/listPanelPlacement";
 // The product profile the organization runs, for wording that follows it.
 export { useActiveProfile } from "@/hooks/useActiveProfile";

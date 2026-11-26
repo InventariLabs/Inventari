@@ -209,7 +209,7 @@
     "sequenceLabel": "Laufreihenfolge",
     "sequenceHint": "Die Kommissionierung besucht Lagerorte ab der niedrigsten Nummer. Ein Lagerort ohne Nummer folgt nach den nummerierten, nach Code sortiert.",
     "noParentStorage": "Kein übergeordneter Lagerort",
-    "deleteMessage": "„{{name}}“ löschen? Produkte darin müssen zuerst verschoben und an diesen Ort ausgegebene Geräte zurückgegeben werden — und ein Ort, durch den Lagerbewegungen liefen, lässt sich gar nicht löschen: archivieren Sie ihn stattdessen.",
+    "deleteMessage": "„{{name}}“ löschen? Zuerst müssen die Produkte darin verschoben und an diesen Ort ausgegebene Geräte zurückgegeben werden. Ein Ort, durch den Lagerbewegungen liefen, lässt sich gar nicht löschen: archivieren Sie ihn stattdessen.",
     "deleteMovesLocations_one": "1 untergeordneter Lagerort rückt eine Ebene höher.",
     "deleteMovesLocations_other": "{{count}} untergeordnete Lagerorte rücken eine Ebene höher.",
     "deleteMovesRecords_one": "1 Datensatz rückt eine Ebene höher.",
