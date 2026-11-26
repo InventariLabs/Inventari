@@ -9,6 +9,7 @@ from fastapi import (
     Depends,
     File,
     Form,
+    Header,
     Query,
     UploadFile,
 )
@@ -17,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api._items_params import parse_template_ids
 from app.api.dependencies import get_user_storage_ids
+from app.config import settings
 from app.core import db_facade
 from app.core.contracts import SystemPermission, UserContextDTO
 from app.core.deps import (
@@ -370,6 +372,9 @@ async def export_items_xlsx(
         '',
         description='Comma-separated product template UUIDs; empty means no filter.',
     ),
+    asks_for_job: bool = Header(
+        False, alias='X-Test-Export-Job', include_in_schema=False
+    ),
     user_storage_ids: list[UUID] = Depends(get_user_storage_ids),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
@@ -437,7 +442,12 @@ async def export_items_xlsx(
     rows = await export_service.count_rows_async(
         db, current_user.organization_id, user_storage_ids, filters
     )
-    if rows <= export_jobs.INLINE_ROW_LIMIT or current_user.organization_id is None:
+    # A browser spec follows a job without storing thousands of records: a
+    # ``TESTING`` stack lets a request ask for one, any other ignores the ask.
+    inline_limit = (
+        0 if asks_for_job and settings.TESTING else export_jobs.INLINE_ROW_LIMIT
+    )
+    if rows <= inline_limit or current_user.organization_id is None:
         return await export_service.export_items_async(
             current_user, filters, enrichment, user_storage_ids
         )
