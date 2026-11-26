@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { EmojiPicker } from "@/components/ui/EmojiPicker";
@@ -27,8 +27,11 @@ describe("EmojiPicker", () => {
     render(<EmojiPicker value={null} onChange={onChange} />);
     await openPicker();
 
-    expect(screen.getByText("Smileys")).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: "😀" }));
+    // A role query computes the name and visibility of every candidate, which
+    // over the whole grid (about 1200 buttons) takes seconds: search one
+    // category.
+    const smileys = screen.getByText("Smileys").parentElement!;
+    await userEvent.click(within(smileys).getByRole("button", { name: "😀" }));
 
     expect(onChange).toHaveBeenCalledExactlyOnceWith("😀");
     expect(
@@ -102,10 +105,10 @@ describe("EmojiPicker", () => {
     expect(screen.getByTestId("value")).toHaveTextContent("🍎");
     await openPicker();
 
-    // While the popover is open the trigger is aria-hidden, so this is the
-    // reset button inside the popover.
+    // The trigger shows the chosen emoji, so this text is the popover's reset
+    // button. A role query for it would walk every button of the grid.
     await userEvent.click(
-      screen.getByRole("button", { name: "Auto (based on name)" }),
+      screen.getByText("Auto (based on name)").closest("button")!,
     );
 
     expect(screen.getByTestId("value")).toHaveTextContent("null");
