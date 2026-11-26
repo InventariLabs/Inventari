@@ -46,8 +46,9 @@ QUANTITY_MAX = Decimal(
 )
 
 #: The largest weight a product can carry: ``product_templates.weight_value``
-#: is numeric(14, 6), so anything from 1e8 up overflows the column. A bound on
-#: the schema answers it with a 422 instead of the driver's 500.
+#: is numeric(14, 6), so a magnitude from 1e8 up overflows the column. A bound
+#: on the schema answers it with a 422 instead of the driver's 500; below, the
+#: schema stops at zero, since no product weighs less than nothing.
 WEIGHT_MAX = 99_999_999
 
 #: The orders stock can leave a shelf in — the values

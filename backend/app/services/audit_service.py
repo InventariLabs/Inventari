@@ -336,7 +336,8 @@ def _of_kind(target_type: str) -> ColumnElement[bool]:
     ``equipment_asset``. The Target column names all of them an asset, so the
     filter does as well: ``equipment_asset`` also takes the ``item`` entries
     that carry the equipment block (the module's mark on a create, its
-    ``meta_data`` on either side of an edit), and ``item`` leaves them out.
+    ``meta_data`` on either side of an edit). The ``item`` filter is the stored
+    type alone, so it lists those entries too.
     """
     if target_type != 'equipment_asset':
         return AuditLog.target_type == target_type

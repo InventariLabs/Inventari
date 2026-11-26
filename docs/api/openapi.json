@@ -55236,7 +55236,8 @@
             "anyOf": [
               {
                 "type": "number",
-                "maximum": 99999999.0
+                "maximum": 99999999.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
@@ -58693,7 +58694,8 @@
             "anyOf": [
               {
                 "type": "number",
-                "maximum": 99999999.0
+                "maximum": 99999999.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
@@ -59278,7 +59280,8 @@
             "anyOf": [
               {
                 "type": "number",
-                "maximum": 99999999.0
+                "maximum": 99999999.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
@@ -60038,7 +60041,8 @@
             "anyOf": [
               {
                 "type": "number",
-                "maximum": 99999999.0
+                "maximum": 99999999.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"

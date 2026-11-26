@@ -55,11 +55,11 @@ says what the release does rather than what changed since them.
   is no longer a change, and a minimum written as `0.0000001` no longer reads
   `1E-7`. The Asset filter lists the creation and edits of an asset, not only
   its status changes, and the entry for an opened pack says why the quantity
-  moved. An item edit that changes nothing writes no history row, a weight
-  too large for its column is refused with a validation error instead of a
-  server error, an opened amount sent without its unit reads in the
-  record's own unit, and the recipe price placeholder follows the reader's
-  decimal mark.
+  moved. An item edit that changes nothing writes no history row, a negative
+  item weight or one too large to store is refused with a validation error
+  instead of being saved or answered with a server error, an opened amount
+  sent without its unit reads in the record's own unit, and the recipe price
+  placeholder follows the reader's decimal mark.
 - On a phone, the *Type a code* sheet over the running scanner answers to
   touch: its field, *Scan*, *Close* and the backdrop take a press, where only
   a keyboard reached them before. The *⋯* menu of a warehouse document and of
