@@ -1362,6 +1362,45 @@ describe("ItemsPage — control bar layout", () => {
     expect(screen.getByText("1 record")).toBeInTheDocument();
     expect(screen.queryByText(/^results:$/i)).toBeNull();
   });
+
+  it("adds the date chips after every chip already offered, moving none", async () => {
+    // A tap that is down while a chip moves lands on nothing, so an answer
+    // that arrives late may only add to the end of the row.
+    let answer = () => {};
+    const answered = new Promise<void>((resolve) => {
+      answer = resolve;
+    });
+    server.use(
+      http.get("/api/v1/modules/my", () =>
+        HttpResponse.json(["core", "items", "locations", "stats"]),
+      ),
+      http.get("/api/v1/location-types", async () => {
+        await answered;
+        return HttpResponse.json(onePage([]));
+      }),
+      http.get("/api/v1/stats/overview", async () => {
+        await answered;
+        return HttpResponse.json({ tracks_expiry: true });
+      }),
+    );
+    render(
+      <PageHeaderContext.Provider value={{ data: {}, setHeader: () => {} }}>
+        <ItemsPage />
+      </PageHeaderContext.Provider>,
+    );
+    const chips = () =>
+      screen
+        .getAllByTestId(/^filter-/)
+        .map((chip) => chip.getAttribute("data-testid"));
+    await screen.findByTestId("filter-low_stock");
+    const before = chips();
+    expect(before).not.toContain("filter-expired");
+
+    answer();
+
+    await screen.findByTestId("filter-expired");
+    expect(chips()).toEqual([...before, "filter-expiring", "filter-expired"]);
+  });
 });
 
 /**

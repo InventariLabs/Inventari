@@ -318,9 +318,10 @@ database: check it against the label, and see the note on allergens and nutritio
 
 - **Active** and **Archived** tabs, a search box, and **Filter** by location and
   category.
-- Chips: **Only expiring soon** (within 7 days, today included) and **Expired**
-  (when your locations track expiry), **Running low**, **Show used up** (records
-  at zero), **Group by category**, and **BOM** when Production is on.
+- Chips: **Running low**, **Show used up** (records at zero), **Group by
+  category**, **BOM** when Production is on, and last **Only expiring soon**
+  (within 7 days, today included) and **Expired** (when your locations track
+  expiry).
 - The number above the list counts records, one per batch or shelf a product
   stands on, not products; the category cards count products.
 - Sorting by date added, name, quantity or expiry.

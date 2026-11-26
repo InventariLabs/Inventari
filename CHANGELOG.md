@@ -60,6 +60,10 @@ says what the release does rather than what changed since them.
   instead of being saved or answered with a server error, an opened amount
   sent without its unit reads in the record's own unit, and the recipe price
   placeholder follows the reader's decimal mark.
+- The product list's filter chips stay where they are while the page loads, so
+  a tap on *Running low* is not lost when the date filters arrive. *Only
+  expiring soon* and *Expired* now stand at the end of the row instead of in
+  front of *Running low*.
 - Back returns a list to where it stood when you tapped away from it, also
   when the tap came right after a scroll on a busy phone; it could return to
   an earlier position, several hundred pixels off.
