@@ -193,7 +193,9 @@ function playwright(args, options) {
 /** The exit code of the selected specs' run. */
 function run(files, full) {
   // The suite whole is the config's own business: its order and its projects.
-  if (full) return playwright(["--reporter=list"], { stdio: "inherit" }).status;
+  // A run a signal ended has no status, and is not a green one.
+  if (full)
+    return playwright(["--reporter=list"], { stdio: "inherit" }).status ?? 1;
   const listing = playwright(
     ["--list", "--no-deps", "--pass-with-no-tests", ...files],
     { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 },

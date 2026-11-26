@@ -202,6 +202,7 @@ describe("the script as a process", () => {
          require("node:fs").appendFileSync(${JSON.stringify(calls)}, args.join(" ") + "\\n");
          if (args.includes("--list"))
            console.log("  [approvals] › approvals.spec.ts:1 › a\\n  [chromium] › items.spec.ts:1 › b");
+         if (${JSON.stringify(red)} === "killed") process.kill(process.pid, "SIGKILL");
          process.exit(${JSON.stringify(red)} && args.includes("--project=" + ${JSON.stringify(red)}) ? 1 : 0);`,
       ),
     });
@@ -252,6 +253,14 @@ describe("the script as a process", () => {
     const result = run(["--run"], { changed: ["frontend/src/App.tsx"] });
     expect(result.status).toBe(0);
     expect(result.asked).toEqual(["playwright test --reporter=list"]);
+  });
+
+  it("is red when a signal ends the run", () => {
+    const result = run(["--run"], {
+      changed: ["frontend/src/App.tsx"],
+      red: "killed",
+    });
+    expect(result.status).toBe(1);
   });
 
   it("runs nothing for an empty selection", () => {
