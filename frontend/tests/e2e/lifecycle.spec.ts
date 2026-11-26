@@ -11,6 +11,10 @@ test.describe("Item lifecycle — full state machine", () => {
   let storage2Id: string;
   let itemId: string;
   const itemName = `E2E-Lifecycle-${Date.now()}`;
+  // The list is paged, newest first, and specs running alongside create
+  // products all the time: unnarrowed, this one can leave the first page
+  // between a save and the refresh that follows it.
+  const listUrl = `/inventory/items?search=${itemName}`;
 
   test.beforeAll(async ({ playwright, baseURL }) => {
     const ctx = await playwright.request.newContext({ baseURL });
@@ -49,7 +53,7 @@ test.describe("Item lifecycle — full state machine", () => {
     page,
     authenticatedPage,
   }) => {
-    await page.goto("/inventory/items");
+    await page.goto(listUrl);
     await page.waitForLoadState("networkidle").catch(() => {});
     await expect(
       page.getByTestId("item-name").filter({ hasText: itemName }),
@@ -60,7 +64,7 @@ test.describe("Item lifecycle — full state machine", () => {
     page,
     authenticatedPage,
   }) => {
-    await page.goto("/inventory/items");
+    await page.goto(listUrl);
     await page.waitForLoadState("networkidle").catch(() => {});
     const itemRow = page
       .locator('[data-testid="item-row"]')
@@ -134,7 +138,7 @@ test.describe("Item lifecycle — full state machine", () => {
     page,
     authenticatedPage,
   }) => {
-    await page.goto("/inventory/items");
+    await page.goto(listUrl);
     await page.waitForLoadState("networkidle").catch(() => {});
     const itemRow = page
       .locator('[data-testid="item-row"]')
