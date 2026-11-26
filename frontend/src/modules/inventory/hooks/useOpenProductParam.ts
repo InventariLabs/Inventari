@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { hasHistoryToPop } from "@/module-sdk";
 
@@ -11,6 +11,11 @@ import { hasHistoryToPop } from "@/module-sdk";
  * history): there is nothing to go back to, so it closes
  * in place.
  *
+ * A product opened from the list adds an entry of its own, so the browser's
+ * Back (and the phone header's) closes the dialog and leaves the list as it
+ * was, instead of leaving the list; the dialog follows the address in both
+ * directions.
+ *
  * `&at=expiry` opens the dialog at the expiry date. It belongs to the link that
  * carried it: the next product opened from the list starts at the top.
  *
@@ -19,7 +24,10 @@ import { hasHistoryToPop } from "@/module-sdk";
  * moment both stay in it.
  */
 export function useOpenProductParam(
-  writeParams: (edit: (next: URLSearchParams) => void) => void,
+  writeParams: (
+    edit: (next: URLSearchParams) => void,
+    write?: { push?: boolean },
+  ) => void,
 ): [string | null, (id: string | null) => void] {
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,6 +38,12 @@ export function useOpenProductParam(
   const openedByLink = useRef(
     searchParams.get("open") !== null && hasHistoryToPop(location),
   );
+  // Back, forward or a link moves the address under the dialog: it follows.
+  const addressOpen = searchParams.get("open");
+  useEffect(() => {
+    setOpenId(addressOpen);
+    if (addressOpen === null) openedByLink.current = false;
+  }, [addressOpen]);
 
   const setOpen = useCallback(
     (id: string | null) => {
@@ -39,14 +53,20 @@ export function useOpenProductParam(
         navigate(-1);
         return;
       }
+      // Opening from the list adds the entry that closing pops again.
+      const opening = id !== null && openId === null;
+      if (opening) openedByLink.current = true;
       setOpenId(id);
-      writeParams((next) => {
-        next.delete("at");
-        if (id) next.set("open", id);
-        else next.delete("open");
-      });
+      writeParams(
+        (next) => {
+          next.delete("at");
+          if (id) next.set("open", id);
+          else next.delete("open");
+        },
+        { push: opening },
+      );
     },
-    [navigate, writeParams],
+    [navigate, openId, writeParams],
   );
 
   return [openId, setOpen];

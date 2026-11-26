@@ -153,3 +153,45 @@ describe("a refusal that arrives as a blob", () => {
     expect(extractApiError(error, FALLBACK)).toBe("Cannot reach the server");
   });
 });
+
+/**
+ * A route that may answer with a file or with a job asks for bytes, so its
+ * refusal arrives as an ArrayBuffer.
+ */
+describe("a refusal that arrives as bytes", () => {
+  it("reaches the screen as the sentence the backend wrote", async () => {
+    server.use(
+      http.get("*/api/v1/items/export/xlsx", () =>
+        HttpResponse.json(REFUSAL, { status: 400 }),
+      ),
+    );
+
+    const error = await rejection(
+      api.get("/items/export/xlsx", { responseType: "arraybuffer" }),
+    );
+
+    expect(extractApiError(error, FALLBACK)).toBe(REFUSAL.detail.message);
+    expect((error as AxiosError).response?.data).toEqual(REFUSAL);
+  });
+
+  it("leaves a body that is not JSON where it is", async () => {
+    server.use(
+      http.get(
+        "*/api/v1/items/export/xlsx",
+        () =>
+          new HttpResponse("<html>the gateway said no</html>", {
+            status: 400,
+            headers: { "Content-Type": "text/html" },
+          }),
+      ),
+    );
+
+    const error = await rejection(
+      api.get("/items/export/xlsx", { responseType: "arraybuffer" }),
+    );
+    const body = (error as AxiosError).response?.data as ArrayBuffer;
+
+    expect(new TextDecoder().decode(body)).toContain("the gateway said no");
+    expect(extractApiError(error, FALLBACK)).toBe(FALLBACK);
+  });
+});

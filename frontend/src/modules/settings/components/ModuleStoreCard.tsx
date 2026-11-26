@@ -112,9 +112,9 @@ function ModuleHomepageLink({ homepage }: { homepage?: string | null }) {
       href={href.href}
       target="_blank"
       rel="noreferrer"
-      className="block text-[10px] text-primary-700 dark:text-primary-500 mt-0.5 truncate hover:underline"
+      className="flex min-h-11 items-center text-[10px] text-primary-700 dark:text-primary-500 hover:underline sm:min-h-6"
     >
-      {href.hostname}
+      <span className="truncate">{href.hostname}</span>
     </a>
   );
 }

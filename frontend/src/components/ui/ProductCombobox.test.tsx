@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor, fireEvent, act } from "@/test/utils";
 import userEvent from "@testing-library/user-event";
@@ -609,5 +610,92 @@ describe("ProductCombobox", () => {
     });
     expect(screen.getByText('No results for "la"')).toBeInTheDocument();
     vi.useRealTimers();
+  });
+});
+
+describe("ProductCombobox — keyboard and focus", () => {
+  function Picker({ withCreate = false }: { withCreate?: boolean }) {
+    const [value, setValue] = useState<ProductComboboxOption | null>(null);
+    return (
+      <form>
+        <ProductCombobox
+          value={value}
+          onSelect={setValue}
+          onClear={() => setValue(null)}
+          search={search}
+          renderNoResults={
+            withCreate
+              ? () => (
+                  <div>
+                    <button type="button">Add as new</button>
+                  </div>
+                )
+              : undefined
+          }
+        />
+        <input aria-label="Next field" />
+      </form>
+    );
+  }
+
+  it("keeps the focus on the field after a product is picked", async () => {
+    const user = userEvent.setup();
+    search.mockResolvedValue([stub("Latte cups")]);
+    render(<Picker />);
+    const input = screen.getByRole("combobox");
+
+    await user.type(input, "la");
+    await user.click(await screen.findByRole("option", { name: /Latte cups/ }));
+
+    expect(input).toHaveValue("Latte cups");
+    expect(document.activeElement).toBe(input);
+  });
+
+  it("keeps the focus on the field when a product is picked with Enter", async () => {
+    const user = userEvent.setup();
+    search.mockResolvedValue([stub("Latte cups")]);
+    render(<Picker />);
+    const input = screen.getByRole("combobox");
+
+    await user.type(input, "la");
+    await screen.findByRole("option");
+    await user.keyboard("{ArrowDown}{Enter}");
+
+    expect(input).toHaveValue("Latte cups");
+    expect(document.activeElement).toBe(input);
+  });
+
+  it("reaches the add-as-new button with Tab, and leaves the field with the next Tab", async () => {
+    const user = userEvent.setup();
+    search.mockResolvedValue([]);
+    render(<Picker withCreate />);
+    const input = screen.getByRole("combobox");
+
+    await user.type(input, "nowy");
+    const add = await screen.findByRole("button", { name: "Add as new" });
+
+    await user.tab();
+    expect(document.activeElement).toBe(add);
+
+    await user.tab();
+    expect(document.activeElement).toBe(input);
+    expect(screen.queryByRole("button", { name: "Add as new" })).toBeNull();
+
+    await user.tab();
+    expect(document.activeElement).toBe(screen.getByLabelText("Next field"));
+  });
+
+  it("goes back from the add-as-new button to the field with Shift+Tab", async () => {
+    const user = userEvent.setup();
+    search.mockResolvedValue([]);
+    render(<Picker withCreate />);
+    const input = screen.getByRole("combobox");
+
+    await user.type(input, "nowy");
+    await screen.findByRole("button", { name: "Add as new" });
+    await user.tab();
+    await user.tab({ shift: true });
+
+    expect(document.activeElement).toBe(input);
   });
 });

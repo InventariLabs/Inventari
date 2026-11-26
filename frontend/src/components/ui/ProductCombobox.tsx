@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { isForbiddenError } from "@/lib/errors";
 import { useDebounce } from "@/hooks/useDebounce";
 import { SEARCH_MAX_LENGTH } from "@/lib/productSearch";
+import { placeListPanel, type ListPanelPlace } from "@/lib/listPanelPlacement";
 import { readableSku } from "@/lib/readableSku";
 import { Button } from "./Button";
 import { Input } from "./Input";
@@ -351,6 +352,10 @@ function ProductComboboxList<T extends ProductComboboxOption>({
   );
 }
 
+/** What Tab can land on inside the panel: the rows have the arrow keys. */
+const PANEL_TABBABLE =
+  'button:not(:disabled):not([role="option"]), select:not(:disabled), input:not(:disabled), a[href]';
+
 /**
  * A panel that outlives the focus holds Escape for a box nobody is typing in
  * (`hasListboxOpen`), so a sheet around it could not be closed from anywhere
@@ -386,6 +391,162 @@ function useDismissOnOutside(
       document.removeEventListener("focusin", onFocusIn);
     };
   }, [open, inputRef, panelRef, setDismissed]);
+}
+
+/**
+ * Where the panel stands, and when it goes. It lives in a portal positioned
+ * against the input in the viewport: as an absolutely positioned child it
+ * ended at the modal's scroll edge, opened downwards regardless of the space
+ * left, and inherited the modal's pointer-events freeze. Fixed against the
+ * rect fixes all three.
+ */
+function usePanelPlacement({
+  open,
+  inputRef,
+  resultCount,
+  searching,
+  empty,
+  reset,
+}: {
+  open: boolean;
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  resultCount: number;
+  /** The panel holds a one-line message (searching, nothing found), not rows. */
+  searching: boolean;
+  empty: boolean;
+  reset: () => void;
+}): ListPanelPlace | null {
+  const loadingOrEmpty = searching || empty;
+  const resetRef = useRef(reset);
+  resetRef.current = reset;
+  const [panelPos, setPanelPos] = useState<ListPanelPlace | null>(null);
+  // Counts the input's moves that were no scroll, to place the panel again.
+  const [inputMoves, setInputMoves] = useState(0);
+
+  useEffect(() => {
+    if (!open) {
+      setPanelPos(null);
+      return;
+    }
+    const update = () => {
+      const rect = inputRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const estimatedHeight = loadingOrEmpty
+        ? 120
+        : Math.min(240, Math.max(56, resultCount * 48));
+      setPanelPos(
+        placeListPanel(
+          rect,
+          estimatedHeight,
+          window.innerHeight,
+          document.documentElement.clientHeight || window.innerHeight,
+        ),
+      );
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [open, inputRef, resultCount, loadingOrEmpty, inputMoves]);
+
+  // Close when the form scrolls under the fixed panel — otherwise the
+  // suggestions drift away from the input they belong to. Only a scroll of
+  // something holding the input moves it: the panel's own list does not, nor
+  // does the input scrolling its own text sideways, which a long name does
+  // when the focus comes back to it — that must not wipe the name the reader
+  // had just been refused on.
+  //
+  // "Holding the input" is not enough: a scroll event reaches the listener a
+  // frame after the layout move that caused it (a sheet settling under the
+  // box, a focus scroll-into-view), so it can arrive for a list that opened
+  // after the move, with the input exactly where it was. Closing then wiped a
+  // correct query. The list closes only when the input really moved.
+  //
+  // Nor can a scroll be judged while the input is on its way somewhere. A sheet
+  // slides in from below the fold with the focus already in it, so the browser
+  // scrolls the document to the input and takes that back frame by frame as the
+  // sliding sheet stops overflowing it: real scroll events and a real move, with
+  // nobody scrolling, and a box filled at machine speed can have its list open
+  // by then. So a frame checks whether the input came to rest, and carries the
+  // panel along if not. A scroll closes the list only when it finds an input
+  // that stands still, which the first scroll of a reader's always does.
+  useEffect(() => {
+    if (!open) return;
+    let lastSeen = inputRef.current?.getBoundingClientRect();
+    let atRest = false;
+    let frame = requestAnimationFrame(function follow() {
+      const now = inputRef.current?.getBoundingClientRect();
+      if (now && lastSeen) {
+        atRest = samePlace(now, lastSeen);
+        if (!atRest) setInputMoves((count) => count + 1);
+      }
+      lastSeen = now;
+      frame = requestAnimationFrame(follow);
+    });
+    const onScroll = (e: Event) => {
+      const scrolled = e.target as Node;
+      const input = inputRef.current;
+      const holdsInput =
+        scrolled === document ||
+        (scrolled !== input && scrolled.contains(input));
+      if (!holdsInput || !atRest || !lastSeen || !input) return;
+      if (!samePlace(lastSeen, input.getBoundingClientRect()))
+        resetRef.current();
+    };
+    window.addEventListener("scroll", onScroll, true);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll, true);
+    };
+  }, [open, inputRef]);
+  return panelPos;
+}
+
+/**
+ * The panel is portalled to the body, so Tab from the input would skip past
+ * it to the next field of the form. Tab from the input enters the panel's own
+ * controls (the caller's "add as new" button); Shift+Tab off the first one
+ * comes back to the input, and Tab off the last one hands the focus back to
+ * it with the panel closed, so the next Tab moves on to the next field.
+ */
+function usePanelTabbing(
+  open: boolean,
+  inputRef: React.RefObject<HTMLInputElement | null>,
+  panelRef: React.RefObject<HTMLElement | null>,
+  closeForTab: () => void,
+) {
+  const closeRef = useRef(closeForTab);
+  closeRef.current = closeForTab;
+  useEffect(() => {
+    if (!open) return;
+    // One listener on the document: the panel mounts a render after the open
+    // state turns true, so neither element is there to hang a handler on yet.
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      const input = inputRef.current;
+      const panel = panelRef.current;
+      const controls = panel
+        ? Array.from(panel.querySelectorAll<HTMLElement>(PANEL_TABBABLE))
+        : [];
+      if (controls.length === 0) return;
+      if (e.target === input && !e.shiftKey) {
+        e.preventDefault();
+        controls[0].focus();
+        return;
+      }
+      const at = controls.indexOf(e.target as HTMLElement);
+      if (at < 0) return;
+      if (e.shiftKey && at === 0) {
+        e.preventDefault();
+        input?.focus();
+      } else if (!e.shiftKey && at === controls.length - 1) {
+        e.preventDefault();
+        closeRef.current();
+        input?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open, inputRef, panelRef]);
 }
 
 /**
@@ -507,6 +668,9 @@ export function ProductCombobox<T extends ProductComboboxOption>({
   function select(product: T) {
     onSelect(product);
     reset();
+    // The option the pointer or Enter chose unmounts with the panel; the
+    // picked field is where the focus stays, not the page body.
+    inputRef.current?.focus();
   }
 
   const searching = queryLongEnough;
@@ -533,9 +697,25 @@ export function ProductCombobox<T extends ProductComboboxOption>({
   // brings the list back.
   const [dismissed, setDismissed] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  // Set while the focus returns to the input from the panel's last control:
+  // the panel stays closed, so the next Tab leaves the field.
+  const keepClosed = useRef(false);
   const dropdownOpen = (showResults || showLoading || showEmpty) && !dismissed;
+  const closeForTab = () => {
+    keepClosed.current = true;
+    setDismissed(true);
+  };
 
   useDismissOnOutside(dropdownOpen, inputRef, panelRef, setDismissed);
+  usePanelTabbing(dropdownOpen, inputRef, panelRef, closeForTab);
+  const panelPos = usePanelPlacement({
+    open: dropdownOpen,
+    inputRef,
+    resultCount: results.length,
+    searching: showLoading,
+    empty: showEmpty,
+    reset,
+  });
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown" && showResults) {
@@ -551,98 +731,6 @@ export function ProductCombobox<T extends ProductComboboxOption>({
       reset();
     }
   };
-
-  // The panel lives in a portal positioned against the input in the viewport:
-  // as an absolutely positioned child it ended at the modal's scroll edge
-  //opened downwards regardless of the space left, and inherited the
-  // modal's pointer-events freeze. Fixed against the rect fixes all three.
-  const [panelPos, setPanelPos] = useState<{
-    top: number;
-    left: number;
-    width: number;
-    maxHeight: number;
-  } | null>(null);
-  // Counts the input's moves that were no scroll, to place the panel again.
-  const [inputMoves, setInputMoves] = useState(0);
-
-  useEffect(() => {
-    if (!dropdownOpen) {
-      setPanelPos(null);
-      return;
-    }
-    const update = () => {
-      const rect = inputRef.current?.getBoundingClientRect();
-      if (!rect) return;
-      const gap = 4;
-      const estimatedHeight =
-        showEmpty || showLoading
-          ? 120
-          : Math.min(240, Math.max(56, results.length * 48));
-      const spaceBelow = window.innerHeight - rect.bottom - gap;
-      const up = spaceBelow < estimatedHeight && rect.top > spaceBelow;
-      setPanelPos({
-        left: rect.left,
-        width: rect.width,
-        top: up
-          ? Math.max(8, rect.top - estimatedHeight - gap)
-          : rect.bottom + gap,
-        maxHeight: up ? Math.max(96, rect.top - 16) : Math.min(240, spaceBelow),
-      });
-    };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, [dropdownOpen, results.length, showEmpty, showLoading, inputMoves]);
-
-  // Close when the form scrolls under the fixed panel — otherwise the
-  // suggestions drift away from the input they belong to. Only a scroll of
-  // something holding the input moves it: the panel's own list does not, nor
-  // does the input scrolling its own text sideways, which a long name does
-  // when the focus comes back to it — that must not wipe the name the reader
-  // had just been refused on.
-  //
-  // "Holding the input" is not enough: a scroll event reaches the listener a
-  // frame after the layout move that caused it (a sheet settling under the
-  // box, a focus scroll-into-view), so it can arrive for a list that opened
-  // after the move, with the input exactly where it was. Closing then wiped a
-  // correct query. The list closes only when the input really moved.
-  //
-  // Nor can a scroll be judged while the input is on its way somewhere. A sheet
-  // slides in from below the fold with the focus already in it, so the browser
-  // scrolls the document to the input and takes that back frame by frame as the
-  // sliding sheet stops overflowing it: real scroll events and a real move, with
-  // nobody scrolling, and a box filled at machine speed can have its list open
-  // by then. So a frame checks whether the input came to rest, and carries the
-  // panel along if not. A scroll closes the list only when it finds an input
-  // that stands still, which the first scroll of a reader's always does.
-  useEffect(() => {
-    if (!dropdownOpen) return;
-    let lastSeen = inputRef.current?.getBoundingClientRect();
-    let atRest = false;
-    let frame = requestAnimationFrame(function follow() {
-      const now = inputRef.current?.getBoundingClientRect();
-      if (now && lastSeen) {
-        atRest = samePlace(now, lastSeen);
-        if (!atRest) setInputMoves((count) => count + 1);
-      }
-      lastSeen = now;
-      frame = requestAnimationFrame(follow);
-    });
-    const onScroll = (e: Event) => {
-      const scrolled = e.target as Node;
-      const input = inputRef.current;
-      const holdsInput =
-        scrolled === document ||
-        (scrolled !== input && scrolled.contains(input));
-      if (!holdsInput || !atRest || !lastSeen || !input) return;
-      if (!samePlace(lastSeen, input.getBoundingClientRect())) reset();
-    };
-    window.addEventListener("scroll", onScroll, true);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll, true);
-    };
-  }, [dropdownOpen]);
 
   return (
     <div className="relative">
@@ -666,11 +754,16 @@ export function ProductCombobox<T extends ProductComboboxOption>({
           setQuery(e.target.value);
           setDismissed(false);
         }}
-        onFocus={() => setDismissed(false)}
+        onFocus={() => {
+          if (keepClosed.current) keepClosed.current = false;
+          else setDismissed(false);
+        }}
         maxLength={maxLength}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        disabled={!!value}
+        // A picked product is read-only rather than disabled: a disabled
+        // field cannot hold the focus the pick leaves in it.
+        readOnly={!!value}
         leftIcon={<Search size={16} className="pointer-events-none" />}
         rightIcon={
           isLoading && !value ? (
@@ -720,6 +813,7 @@ export function ProductCombobox<T extends ProductComboboxOption>({
             style={{
               position: "fixed",
               top: panelPos.top,
+              bottom: panelPos.bottom,
               left: panelPos.left,
               width: panelPos.width,
               maxHeight: panelPos.maxHeight,

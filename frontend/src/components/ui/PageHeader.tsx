@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useNavLeaveGuard } from "@/hooks/useNavLeaveGuard";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { hasHistoryToPop } from "@/hooks/useShellBack";
 import type { PageHeaderData } from "@/hooks/useModulePageHeader";
 
 interface PageHeaderProps extends PageHeaderData {
@@ -28,11 +29,11 @@ export function PageHeader({
 
   // Use browser history (-1) when possible so the in-page back arrow behaves
   // like the browser back button. Fall back to the explicit `backTo` path
-  // (with `replace`) when there is no in-app history to pop — e.g. deep-link
-  // entry where location.key is the router's initial "default".
+  // (with `replace`) when there is no in-app history to pop — a deep link, or
+  // an entry a redirect or the sign-in return replaced.
   const handleBack = () => {
     guardNavigate(() => {
-      if (location.key !== "default") {
+      if (hasHistoryToPop(location)) {
         navigate(-1);
       } else if (backTo) {
         navigate(backTo, { replace: true });

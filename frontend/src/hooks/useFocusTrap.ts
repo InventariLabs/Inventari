@@ -15,6 +15,24 @@ const FOCUSABLE_SELECTORS = [
 ].join(", ");
 
 /**
+ * The last move of the focus: the element that lost it and the one that took
+ * it. A field inside a sheet that focuses itself as it mounts has taken the
+ * focus before the trap's effect runs, so `document.activeElement` is already
+ * that field; the element that held the focus before is the one it came from.
+ */
+let lastFocusMove: { from: EventTarget | null; to: EventTarget | null } | null =
+  null;
+if (typeof document !== "undefined") {
+  document.addEventListener(
+    "focusout",
+    (e) => {
+      lastFocusMove = { from: e.target, to: e.relatedTarget };
+    },
+    true,
+  );
+}
+
+/**
  * Traps keyboard focus within a modal container.
  * Returns a ref to attach to the container element.
  */
@@ -27,10 +45,21 @@ export function useFocusTrap<T extends HTMLElement = HTMLDivElement>(
   useEffect(() => {
     if (!isActive) return;
 
-    previousFocusRef.current = document.activeElement;
-
     const container = containerRef.current;
     if (!container) return;
+
+    // The element to give the focus back to: what held it when this layer
+    // opened. A field inside that took the focus as it mounted has already
+    // moved it, so the move that brought it in names the opener.
+    const active = document.activeElement;
+    previousFocusRef.current =
+      active && container.contains(active)
+        ? lastFocusMove?.to === active &&
+          lastFocusMove.from instanceof Element &&
+          !container.contains(lastFocusMove.from)
+          ? lastFocusMove.from
+          : null
+        : active;
 
     // A control inside that took the focus as it mounted — an `autoFocus`
     // field, or one focused by its own effect, which runs before this one —

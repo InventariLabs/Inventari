@@ -4,6 +4,7 @@ import {
   useNavigate,
   useNavigationType,
   type Location,
+  type NavigateFunction,
 } from "react-router-dom";
 import { useReturnTarget } from "@/hooks/useReturnTarget";
 
@@ -48,6 +49,63 @@ export function hasHistoryToPop(location: Location): boolean {
 }
 
 /**
+ * Where `target` is, relative to this entry, when a screen sends the reader
+ * to it: by popping when the entry just before is that screen — or when the
+ * shell never saw the entry before (a reload) and the browser counts an
+ * earlier one, which is then the screen the reader came from — so the history
+ * does not grow a second copy of it; by replacing this entry otherwise.
+ */
+function goTo(
+  navigate: NavigateFunction,
+  location: Location,
+  target: string,
+  before: string | undefined,
+): void {
+  const targetPath = trimmed(target.split(/[?#]/)[0]);
+  const popsToIt =
+    before === undefined
+      ? hasHistoryToPop(location)
+      : trimmed(before) === targetPath;
+  if (popsToIt) navigate(-1);
+  else navigate(target, { replace: true });
+}
+
+/**
+ * The path of the entry right before the current one, while the shell knows
+ * it. The shell header and the screens under it both ask, so it lives at
+ * module level: there is one shell per tab.
+ */
+let entryBefore: string | undefined;
+
+/**
+ * The entry before the current one survives a reload: the tab keeps it in
+ * `sessionStorage` next to the router's key of the entry it belongs to. A
+ * reload (a backgrounded phone tab) then still knows whether the entry before
+ * is the screen a button names, instead of reading "unknown" as "pop".
+ */
+const BEFORE_STORE = "inventari.shell-entry-before";
+
+function loadBefore(key: string): string | undefined {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(BEFORE_STORE) ?? "null");
+    return saved?.key === key && typeof saved.path === "string"
+      ? saved.path
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function saveBefore(key: string, path: string | undefined): void {
+  try {
+    if (path === undefined) sessionStorage.removeItem(BEFORE_STORE);
+    else sessionStorage.setItem(BEFORE_STORE, JSON.stringify({ key, path }));
+  } catch {
+    // Storage unavailable: the entry before is unknown after a reload.
+  }
+}
+
+/**
  * What the phone header's Back arrow does. A label that says Back promises
  * the previous screen, so:
  *
@@ -74,27 +132,28 @@ export function useShellBack(
 
   // The path of the entry right before this one, while it is known: a push
   // leaves the screen it came from there, a replace keeps what it had, and a
-  // pop (a browser button, a reload) says nothing about it.
+  // pop (a browser button) says nothing about it; a reload reads it back from
+  // the tab's storage.
   const current = useRef({ key: location.key, path: location.pathname });
   const before = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    before.current = entryBefore = loadBefore(current.current.key);
+    return () => {
+      entryBefore = undefined;
+    };
+  }, []);
   useEffect(() => {
     if (current.current.key === location.key) return;
     if (navigationType === "PUSH") before.current = current.current.path;
     else if (navigationType === "POP") before.current = undefined;
+    entryBefore = before.current;
+    saveBefore(location.key, before.current);
     current.current = { key: location.key, path: location.pathname };
   }, [location, navigationType]);
 
   return () => {
     if (returnTarget) {
-      const targetPath = trimmed(returnTarget.split(/[?#]/)[0]);
-      if (
-        before.current !== undefined &&
-        trimmed(before.current) === targetPath
-      ) {
-        navigate(-1);
-      } else {
-        navigate(returnTarget, { replace: true });
-      }
+      goTo(navigate, location, returnTarget, before.current);
     } else if (!basePath || trimmed(location.pathname) === trimmed(basePath)) {
       navigate(homePath);
     } else if (hasHistoryToPop(location)) {
@@ -109,4 +168,16 @@ export function useShellBack(
       );
     }
   };
+}
+
+/**
+ * A button that leads back to a named screen the reader came from — "Back to
+ * start" on a posted result. It pops when that screen is the entry before,
+ * and puts it in place of this one otherwise, so Back from the start never
+ * returns to the form that was just finished.
+ */
+export function useBackToScreen(target: string): () => void {
+  const navigate = useNavigate();
+  const location = useLocation();
+  return () => goTo(navigate, location, target, entryBefore);
 }

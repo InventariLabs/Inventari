@@ -89,34 +89,39 @@ api.interceptors.request.use(applyRequestHeaders);
 /**
  * A refusal that arrives as a file.
  *
- * `responseType: 'blob'` tells axios to read the body as a Blob whatever the
- * server sent it as, and a route that answers with a file refuses in JSON like
- * any other route: FastAPI writes `{"detail": {"code", "message"}}` — a
- * sentence translated into the language the request asked for — and it lands
- * in `error.response.data` as an opaque blob. Every reader of a failed request
- * (`extractApiError` and its field/rows siblings) looks for `detail` on an
- * object, finds none on a Blob, and hands the reader the caller's fallback.
- * Five screens had already wired the backend's sentence into their toast and
- * showed the generic one instead.
+ * `responseType: 'blob'` or `'arraybuffer'` tells axios to hand the body over
+ * as a Blob or as bytes whatever the server sent it as, and a route that
+ * answers with a file refuses in JSON like any other route: FastAPI writes
+ * `{"detail": {"code", "message"}}` — a sentence translated into the language
+ * the request asked for — and it lands in `error.response.data` unread. Every
+ * reader of a failed request (`extractApiError` and its field/rows siblings)
+ * looks for `detail` on an object, finds none there, and hands the reader the
+ * caller's fallback.
  *
- * So the body is un-wrapped here, once, rather than at each of the twelve call
- * sites that ask for a Blob today: a call site does not know its refusal could
- * arrive as a file, and the thirteenth would arrive believing a rejection has
- * nothing in it. Best-effort on purpose — a body that does not read as JSON
- * stays a Blob, where the caller's fallback is a better sentence than a parse
- * error, and a body whose media type is not JSON is not a sentence at all.
+ * So the body is un-wrapped here, once, rather than at each call site that
+ * asks for a file: a call site does not know its refusal could arrive as one.
+ * Best-effort on purpose — a body that does not read as JSON stays as it came,
+ * where the caller's fallback is a better sentence than a parse error, and a
+ * body whose media type is not JSON is not a sentence at all.
  */
-async function readBlobRefusal(error: unknown): Promise<void> {
+async function readFileRefusal(error: unknown): Promise<void> {
   if (!axios.isAxiosError(error)) return;
   const response = error.response;
   if (!response) return;
 
   const body: unknown = response.data;
-  if (!(body instanceof Blob)) return;
-  if (!body.type.includes("json")) return;
+  if (!(body instanceof Blob || body instanceof ArrayBuffer)) return;
+  // Bytes carry no media type of their own; the answer's header names it.
+  const type =
+    body instanceof Blob
+      ? body.type
+      : String(response.headers["content-type"] ?? "");
+  if (!type.includes("json")) return;
 
   try {
-    response.data = JSON.parse(await body.text()) as unknown;
+    const text =
+      body instanceof Blob ? await body.text() : new TextDecoder().decode(body);
+    response.data = JSON.parse(text) as unknown;
   } catch {
     // Left as it came in.
   }
@@ -193,8 +198,9 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     // Before any branch below reads the error: a refusal behind a file route
-    // is JSON inside a Blob, and no reader downstream should have to know.
-    await readBlobRefusal(error);
+    // is JSON inside a Blob or bytes, and no reader downstream should have to
+    // know.
+    await readFileRefusal(error);
     const originalRequest = error.config;
 
     // Prevent infinite loop if refresh endpoint itself returns 401

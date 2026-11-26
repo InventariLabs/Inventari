@@ -188,6 +188,37 @@ describe("StockActionSheet", () => {
     }
   });
 
+  it("writes the total with the reader's decimal comma, like the rows under it", async () => {
+    const data: LabelScanView = {
+      ...mockData,
+      stock_summary: {
+        total_quantity: 12.4,
+        unit: "kg",
+        items: [
+          { id: "a", expiry_date: null, location: "Pantry", quantity: 11.4 },
+          { id: "b", expiry_date: null, location: "Fridge", quantity: 1 },
+        ],
+      },
+    };
+    await act(() => i18n.changeLanguage("pl"));
+    try {
+      render(
+        <StockActionSheet
+          data={data}
+          onClose={vi.fn()}
+          onConsume={vi.fn()}
+          onAddOne={vi.fn()}
+          onAdd={vi.fn()}
+        />,
+        { wrapper: createWrapper() },
+      );
+      expect(document.body.textContent).toContain("12,4");
+      expect(document.body.textContent).not.toContain("12.4");
+    } finally {
+      await act(() => i18n.changeLanguage("en"));
+    }
+  });
+
   it("returns null when stock_summary is missing", () => {
     const noSummaryData: LabelScanView = {
       ...mockData,

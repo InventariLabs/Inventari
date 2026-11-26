@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@/test/utils";
+import { render, screen, fireEvent, waitFor } from "@/test/utils";
+import { Sheet } from "@/components/ui/Sheet";
 import userEvent from "@testing-library/user-event";
 import { DocumentListItem } from "./DocumentListItem";
 import type {
@@ -557,5 +559,46 @@ describe("DocumentListItem phone layout", () => {
         screen.getByRole("button", { name: "IN/2026/001" }).className,
       ).toContain("min-h-11");
     });
+  });
+});
+
+describe("DocumentListItem row menu and the sheet it opens", () => {
+  beforeEach(() => {
+    mockAuthState.user = { role: "admin", is_superuser: false };
+    rights.manage = true;
+  });
+
+  function Row() {
+    const [editing, setEditing] = useState(false);
+    return (
+      <>
+        <DocumentListItem
+          doc={makeDoc()}
+          {...baseProps}
+          onEdit={() => setEditing(true)}
+        />
+        <Sheet
+          open={editing}
+          onClose={() => setEditing(false)}
+          aria-label="Edit document"
+        >
+          <button onClick={() => setEditing(false)}>Done</button>
+        </Sheet>
+      </>
+    );
+  }
+
+  it("keeps the focus in the sheet it opens and returns it to the ⋯ button on close", async () => {
+    render(<Row />);
+    const trigger = screen.getByRole("button", { name: /^More actions for / });
+    openMenu();
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Done" })).toHaveFocus(),
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Done" }));
+
+    await waitFor(() => expect(trigger).toHaveFocus());
   });
 });

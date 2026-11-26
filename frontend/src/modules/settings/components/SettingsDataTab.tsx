@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { itemsApi } from "@/lib/api/items";
+import { extractApiError } from "@/lib/errors";
 import {
   onePreparedAtATime,
   showExportProgress,
@@ -33,8 +34,10 @@ export default function SettingsDataTab() {
         );
         downloadBlob(response, `inventari_export_${getTodayFilename()}.xlsx`);
         toast.success(t("common:actions.exportSuccess"), { id: "export" });
-      } catch (err) {
-        toast.error(t("common:actions.exportError"), { id: "export" });
+      } catch (error) {
+        toast.error(extractApiError(error, t("common:actions.exportError")), {
+          id: "export",
+        });
       }
     });
 
