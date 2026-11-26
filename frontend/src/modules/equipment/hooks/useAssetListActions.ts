@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { toast } from "sonner";
 import { useEquipmentAssets } from "@/modules/equipment/hooks/useEquipmentAssets";
 import {
@@ -15,7 +16,10 @@ import {
 } from "@/modules/equipment/hooks/useEquipment";
 import { ReadableError, extractApiError } from "@/lib/errors";
 import { itemsApi } from "@/lib/api/items";
-import { showExportProgress } from "@/modules/shared/lib/exportProgress";
+import {
+  onePreparedAtATime,
+  showExportProgress,
+} from "@/modules/shared/lib/exportProgress";
 import { labelsApi } from "@/lib/api/labels";
 import { downloadBlob } from "@/utils/helpers";
 import { getTodayFilename } from "@/utils/formatters";
@@ -322,6 +326,32 @@ function useArchivedListing(listTab: ListTab, search: string) {
   };
 }
 
+/** The equipment list's export, from its first notice to the download. */
+async function downloadEquipmentExport(t: TFunction): Promise<void> {
+  try {
+    toast.loading(t("common:actions.exporting"), { id: "eq-export" });
+    const blob = await itemsApi.exportXlsx(
+      { context_tag: "equipment", location_usage: "any" },
+      showExportProgress(t, "eq-export"),
+    );
+    downloadBlob(blob, `equipment_${getTodayFilename()}.xlsx`);
+    toast.success(
+      t("common:actions.exportSuccess", {
+        defaultValue: "Export completed!",
+      }),
+      { id: "eq-export" },
+    );
+  } catch (error) {
+    toast.error(
+      extractApiError(
+        error,
+        t("common:actions.exportError", { defaultValue: "Export error" }),
+      ),
+      { id: "eq-export" },
+    );
+  }
+}
+
 export function useAssetListActions() {
   const { t } = useTranslation("equipment");
   // The filters the address holds, handed on to the page as they are.
@@ -551,30 +581,10 @@ export function useAssetListActions() {
     setAllMatching(false);
   }, [skip, archivedPagination.skip, listTab, archivedSearch]);
 
-  const handleExport = useCallback(async () => {
-    try {
-      toast.loading(t("common:actions.exporting"), { id: "eq-export" });
-      const blob = await itemsApi.exportXlsx(
-        { context_tag: "equipment", location_usage: "any" },
-        showExportProgress(t, "eq-export"),
-      );
-      downloadBlob(blob, `equipment_${getTodayFilename()}.xlsx`);
-      toast.success(
-        t("common:actions.exportSuccess", {
-          defaultValue: "Export completed!",
-        }),
-        { id: "eq-export" },
-      );
-    } catch (error) {
-      toast.error(
-        extractApiError(
-          error,
-          t("common:actions.exportError", { defaultValue: "Export error" }),
-        ),
-        { id: "eq-export" },
-      );
-    }
-  }, [t]);
+  const handleExport = useCallback(
+    () => onePreparedAtATime("eq-export", () => downloadEquipmentExport(t)),
+    [t],
+  );
 
   // The five handlers below are confirm-dialog `onConfirm`s, and each returns
   // its promise: the dialog waits for the answer instead of closing on the
