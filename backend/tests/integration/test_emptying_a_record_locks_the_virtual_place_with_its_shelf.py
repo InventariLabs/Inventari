@@ -37,6 +37,7 @@ from app.models.item import Item
 from app.models.stock_anchor import StockAnchor
 from app.models.storage_location import LocationUsage
 from app.models.uom import Uom
+from app.modules.recipes.picking_service import scan_item_in_picking
 from app.schemas.item import ItemConsumeRequest, ItemDiscardRequest
 from app.services._stock_quant_ops import take_from_the_records_async
 from app.services.items import _consumed_place, consume_item, discard_item
@@ -46,6 +47,7 @@ from app.services.storage._defaults import (
     get_virtual_location_async,
 )
 
+from ._cooking import a_picking_session
 from ._core_api_helpers import make_template
 from ._shelf import put_on_shelf, shelf_keeper
 from .test_a_group_of_stock_is_locked_through_its_anchor import (
@@ -98,6 +100,19 @@ async def _finish_the_package(db, keeper, record, quantity):
     await use_partially_async(db, record, keeper, left=Decimal('0'))
 
 
+async def _pick_for_a_recipe(db, keeper, record, quantity):
+    session_id, _ = await a_picking_session(db, keeper, record.template_id, quantity)
+    answer = await scan_item_in_picking(
+        db,
+        session_id,
+        keeper.organization_id,
+        keeper,
+        barcode=None,
+        item_id=record.id,
+    )
+    assert answer.status == 'picked'
+
+
 async def _a_record_whose_place_locks_first(
     db: AsyncSession,
     org_id: uuid.UUID,
@@ -148,6 +163,7 @@ async def _a_record_whose_place_locks_first(
         pytest.param(_use, LocationUsage.CUSTOMER, 5, id='use'),
         pytest.param(_dispose, LocationUsage.INVENTORY, 5, id='dispose'),
         pytest.param(_finish_the_package, LocationUsage.CUSTOMER, 1, id='package'),
+        pytest.param(_pick_for_a_recipe, LocationUsage.CUSTOMER, 5, id='pick'),
     ],
 )
 async def test_a_door_that_files_a_record_and_a_lock_of_every_shelf_do_not_deadlock(
