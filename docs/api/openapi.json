@@ -8347,13 +8347,115 @@
         }
       }
     },
+    "/api/v1/items/export/jobs/{job_id}": {
+      "get": {
+        "tags": [
+          "Items"
+        ],
+        "summary": "Read Export Job",
+        "description": "How far an export that went to the background has got, and how it ended.",
+        "operationId": "read_export_job_api_v1_items_export_jobs__job_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemExportJobResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/items/export/jobs/{job_id}/file": {
+      "get": {
+        "tags": [
+          "Items"
+        ],
+        "summary": "Read Export File",
+        "description": "The workbook of a finished export job, kept for a day after it started.",
+        "operationId": "read_export_file_api_v1_items_export_jobs__job_id__file_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/items/export/xlsx": {
       "get": {
         "tags": [
           "Items"
         ],
         "summary": "Export Items Xlsx",
-        "description": "Export the rows the list shows for the same filters, as a workbook.\n\nTakes the filters of ``GET /items`` minus pagination and sorting and runs\nthem through the same query builder, so the sheet downloaded from under\n\"Showing 1\u201350 of 102\" holds those 102 rows. Feature-module columns (e.g.\nequipment's \"Assigned To\") come from the export-enricher registry \u2014 Core\nnever imports a module directly.",
+        "description": "Export the rows the list shows for the same filters, as a workbook.\n\nTakes the filters of ``GET /items`` minus pagination and sorting and runs\nthem through the same query builder, so the sheet downloaded from under\n\"Showing 1\u201350 of 102\" holds those 102 rows. Feature-module columns (e.g.\nequipment's \"Assigned To\") come from the export-enricher registry \u2014 Core\nnever imports a module directly.\n\nA sheet of more than ``INLINE_ROW_LIMIT`` records takes longer than a\nphone or a proxy waits, so it is answered at once with ``202`` and a job\n(:class:`ItemExportJobResponse`) read at ``GET /items/export/jobs/{id}``;\nits workbook is fetched from ``GET /items/export/jobs/{id}/file`` once\nthe job is done; a process of its own writes it, so the worker's other\nrequests do not wait for it. A shorter one is answered with the\nworkbook, written on a thread.",
         "operationId": "export_items_xlsx_api_v1_items_export_xlsx_get",
         "security": [
           {
@@ -8544,6 +8646,16 @@
                 "schema": {}
               }
             }
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemExportJobResponse"
+                }
+              }
+            },
+            "description": "Accepted"
           },
           "422": {
             "description": "Validation Error",
@@ -59509,6 +59621,52 @@
           "reason"
         ],
         "title": "ItemDiscardRequest"
+      },
+      "ItemExportJobResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "running",
+              "done",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "processed": {
+            "type": "integer",
+            "title": "Processed"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "total",
+          "processed"
+        ],
+        "title": "ItemExportJobResponse",
+        "description": "An export that runs on in the background, and how far it has got.\n\nA sheet too long for one request is answered with this (HTTP 202) and\nread again at ``GET /items/export/jobs/{id}`` until ``status`` is\n``done`` \u2014 the workbook is then at ``GET /items/export/jobs/{id}/file``\nfor a day \u2014 or ``failed``, with ``error`` saying why. ``processed``\ncounts towards ``total``, the records the sheet holds."
       },
       "ItemHistorySchema": {
         "properties": {
