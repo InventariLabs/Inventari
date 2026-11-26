@@ -101,7 +101,7 @@
     },
     "src/modules/equipment/hooks/useAssetListActions.ts": {
       "useAssetListActions": [
-        438
+        418
       ]
     },
     "src/modules/equipment/pages/AssetListPage.tsx": {

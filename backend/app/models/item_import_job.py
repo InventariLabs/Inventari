@@ -22,6 +22,8 @@ class ItemImportJob(Base):
     ``updated_at`` moves with every committed batch. A job that is still
     ``running`` long after it last moved belongs to a worker that is gone;
     the status read says so (:func:`app.services.items._import_job.read_job_async`).
+    A job is deleted a week after it last moved, by the daily table retention
+    (:mod:`app.services.table_retention`).
     """
 
     __tablename__ = 'item_import_jobs'

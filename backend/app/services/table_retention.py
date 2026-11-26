@@ -26,9 +26,11 @@ from app.core.logging import get_logger
 from app.models.email_job import EmailJob
 from app.models.event_outbox import EventOutbox
 from app.models.item_export_job import ItemExportJob
+from app.models.item_import_job import ItemImportJob
 from app.models.notification import Notification
 from app.services.email_jobs import _STATUS_FAILED, _STATUS_SENT
 from app.services.items._export_job import KEEP_FOR as EXPORT_KEPT_FOR
+from app.services.items._import_job import KEEP_FOR as IMPORT_KEPT_FOR
 
 logger = get_logger(__name__)
 
@@ -131,11 +133,25 @@ async def purge_old_export_jobs(db: AsyncSession) -> int:
     )
 
 
+async def purge_old_import_jobs(db: AsyncSession) -> int:
+    """Delete import jobs a week after they last moved, each with its answer.
+
+    The age is the last report, not the start: a running import reports every
+    batch, so a job that has been still for the whole window is finished, or
+    belongs to a worker that is gone and still reads "running".
+    """
+    still_since = datetime.now(UTC) - IMPORT_KEPT_FOR
+    return await _delete_in_batches(
+        db, ItemImportJob, ItemImportJob.updated_at < still_since
+    )
+
+
 _PURGES: tuple[tuple[str, Callable[[AsyncSession], Awaitable[int]]], ...] = (
     ('event_outbox', purge_published_outbox),
     ('email_jobs', purge_finished_email_jobs),
     ('notifications', purge_old_notifications),
     ('item_export_jobs', purge_old_export_jobs),
+    ('item_import_jobs', purge_old_import_jobs),
 )
 
 

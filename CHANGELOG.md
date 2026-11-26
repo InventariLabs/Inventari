@@ -74,6 +74,14 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The Export buttons (Settings → Data, the product list, the equipment list)
+  start one export at a time: a click while the file is still being prepared
+  does nothing, instead of starting a second export on the server.
+- A large export is quicker, because each record is loaded in full only once:
+  at 100,000 products and 300,000 records it went from 113 to 78 seconds on the
+  test machine, with the same sheet.
+- Background imports are deleted a week after they end, with their result and
+  list of refused rows; the table that holds them no longer grows for good.
 - Organization settings keep what you have typed and not saved: saving one of
   the two cards, or changing the logo, no longer empties the fields of the
   other, and text typed just after a save is no longer replaced when the
