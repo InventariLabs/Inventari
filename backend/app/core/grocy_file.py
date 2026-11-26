@@ -185,7 +185,6 @@ def _open(content: bytes) -> sqlite3.Connection:
     except sqlite3.DatabaseError as exc:
         con.close()
         raise ServiceRejectionError('grocy_file_unreadable') from exc
-    con.row_factory = sqlite3.Row
     return con
 
 
@@ -218,8 +217,9 @@ class _Tables:
             return []
         wanted = list(wanted)
         found = self.con.execute(_SELECT[table])
-        present = {d[0] for d in found.description}
-        return [{c: row[c] if c in present else None for c in wanted} for row in found]
+        present = [d[0] for d in found.description]
+        rows = [dict(zip(present, values, strict=True)) for values in found]
+        return [{c: row.get(c) for c in wanted} for row in rows]
 
     def count(self, table: str, statements: tuple[str, ...]) -> int:
         """The first of *statements* the table's columns can answer."""
