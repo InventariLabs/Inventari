@@ -15,6 +15,7 @@ from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
 from functools import partial
 from io import BytesIO
+from types import SimpleNamespace
 
 import pandas as pd
 import pytest
@@ -159,6 +160,33 @@ class TestTheJobWritesTheWorkbookInAProcessOfItsOwn:
         workbook, _ = await export_jobs.read_file_async(db, user, job.id)
         sheet = pd.read_excel(workbook, sheet_name='Inventory')
         assert list(sheet['Name']) == [async_test_item.name]
+
+    async def test_each_record_is_read_once_for_the_progress_it_reports(
+        self,
+        real_async_db_session: AsyncSession,
+        async_test_user,
+        async_test_item,
+        tmp_path,
+    ) -> None:
+        """The job counts the records written: the columns are asked of the database."""
+        db = real_async_db_session
+        await db.commit()
+        steps = SimpleNamespace(value=0)
+        url = export_jobs._database_url()
+        path = str(tmp_path / 'workbook.xlsx')
+
+        await asyncio.to_thread(
+            export_service.write_workbook_file,
+            _user(async_test_user),
+            {},
+            {},
+            None,
+            url,
+            path,
+            steps,
+        )
+
+        assert steps.value == 1
 
     async def test_a_process_that_ends_without_a_workbook_ends_the_job_failed(
         self,

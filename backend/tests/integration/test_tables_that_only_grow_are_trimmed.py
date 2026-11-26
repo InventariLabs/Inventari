@@ -19,12 +19,14 @@ from app._lifespan import _register_background_jobs
 from app.config import settings
 from app.models.email_job import EmailJob
 from app.models.event_outbox import EventOutbox
+from app.models.item_import_job import ItemImportJob
 from app.models.notification import Notification
 from app.models.user import User
 from app.services import table_retention
 from app.services._org_membership import INVITE_RETENTION, INVITE_TTL
 from app.services.table_retention import (
     purge_finished_email_jobs,
+    purge_old_import_jobs,
     purge_old_notifications,
     purge_published_outbox,
     run_table_retention_once,
@@ -181,6 +183,42 @@ class TestTheBellForgetsOldNotifications:
         assert await purge_old_notifications(db) == 2
 
         assert await _ids(db, Notification) == kept
+
+
+class TestAFinishedImportIsKeptForAWeek:
+    async def test_a_job_goes_a_week_after_it_last_moved(
+        self, real_async_db_session: AsyncSession, async_test_user: User
+    ) -> None:
+        db = real_async_db_session
+
+        def _job(status: str, moved_days_ago: int) -> ItemImportJob:
+            return ItemImportJob(
+                id=uuid.uuid4(),
+                organization_id=async_test_user.organization_id,
+                user_id=async_test_user.id,
+                filename='stock.xlsx',
+                status=status,
+                # Started long ago: the window counts from the last move.
+                created_at=_days_ago(400),
+                updated_at=_days_ago(moved_days_ago),
+            )
+
+        done = _job('done', 8)
+        failed = _job('failed', 8)
+        # A worker that went away leaves its job reading "running".
+        abandoned = _job('running', 8)
+        recent = _job('done', 6)
+        running = _job('running', 0)
+        db.add_all([done, failed, abandoned, recent, running])
+        await db.commit()
+        kept = {recent.id, running.id}
+
+        assert await purge_old_import_jobs(db) == 3
+
+        assert await _ids(db, ItemImportJob) == kept
+
+    def test_the_daily_run_trims_the_table(self) -> None:
+        assert ('item_import_jobs', purge_old_import_jobs) in table_retention._PURGES
 
 
 class TestTheRun:

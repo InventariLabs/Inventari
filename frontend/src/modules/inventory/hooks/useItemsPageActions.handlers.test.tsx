@@ -238,6 +238,33 @@ describe("useItemsPageActions — row handlers, failures and the export", () => 
     });
   });
 
+  it("starts no second export while one is being prepared, and the next one after it ends", async () => {
+    let finish: (blob: Blob) => void = () => {};
+    mocks.exportXlsx.mockImplementation(
+      () => new Promise<Blob>((resolve) => (finish = resolve)),
+    );
+    // Two mounts: leaving the page and coming back keeps the export running.
+    const first = renderActions();
+    const pending = first.result.current.handleExport();
+    first.unmount();
+    const { result } = renderActions();
+
+    await act(() => result.current.handleExport());
+
+    expect(mocks.exportXlsx).toHaveBeenCalledTimes(1);
+    expect(mocks.downloadBlob).not.toHaveBeenCalled();
+
+    await act(async () => {
+      finish(new Blob(["x"]));
+      await pending;
+    });
+    mocks.exportXlsx.mockResolvedValue(new Blob(["y"]));
+    await act(() => result.current.handleExport());
+
+    expect(mocks.exportXlsx).toHaveBeenCalledTimes(2);
+    expect(mocks.downloadBlob).toHaveBeenCalledTimes(2);
+  });
+
   it("reports a failed export instead of downloading", async () => {
     mocks.exportXlsx.mockRejectedValue(new Error("boom"));
     const { result } = renderActions();

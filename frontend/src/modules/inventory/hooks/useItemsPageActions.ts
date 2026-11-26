@@ -2,7 +2,10 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { itemsApi } from "@/lib/api/items";
-import { showExportProgress } from "@/modules/shared/lib/exportProgress";
+import {
+  onePreparedAtATime,
+  showExportProgress,
+} from "@/modules/shared/lib/exportProgress";
 import { extractApiError } from "@/lib/errors";
 import {
   useDeleteItem,
@@ -163,25 +166,33 @@ export function useItemsPageActions({
   const exportParamsRef = useRef(exportParams);
   exportParamsRef.current = exportParams;
 
-  const handleExport = useCallback(async () => {
-    try {
-      toast.loading(t("common:actions.exporting"), { id: "items-export" });
-      const blob = await itemsApi.exportXlsx(
-        exportParamsRef.current,
-        showExportProgress(t, "items-export"),
-      );
-      const storageName = storages?.find((s) => s.id === storageFilter)?.name;
-      downloadBlob(
-        blob,
-        `inventory${storageName ? `_${storageName.toLowerCase().replace(/\s+/g, "_")}` : ""}_${getTodayFilename()}.xlsx`,
-      );
-      toast.success(t("common:actions.exportSuccess"), { id: "items-export" });
-    } catch (error) {
-      toast.error(extractApiError(error, t("common:actions.exportError")), {
-        id: "items-export",
-      });
-    }
-  }, [storageFilter, storages, t]);
+  const handleExport = useCallback(
+    () =>
+      onePreparedAtATime("items-export", async () => {
+        try {
+          toast.loading(t("common:actions.exporting"), { id: "items-export" });
+          const blob = await itemsApi.exportXlsx(
+            exportParamsRef.current,
+            showExportProgress(t, "items-export"),
+          );
+          const storageName = storages?.find(
+            (s) => s.id === storageFilter,
+          )?.name;
+          downloadBlob(
+            blob,
+            `inventory${storageName ? `_${storageName.toLowerCase().replace(/\s+/g, "_")}` : ""}_${getTodayFilename()}.xlsx`,
+          );
+          toast.success(t("common:actions.exportSuccess"), {
+            id: "items-export",
+          });
+        } catch (error) {
+          toast.error(extractApiError(error, t("common:actions.exportError")), {
+            id: "items-export",
+          });
+        }
+      }),
+    [storageFilter, storages, t],
+  );
 
   return {
     deleteMutation,

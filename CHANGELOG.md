@@ -56,6 +56,14 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- The Export buttons (Settings → Data, the product list, the equipment list)
+  start one export at a time: a click while the file is still being prepared
+  does nothing, instead of starting a second export on the server.
+- A large export is quicker, because the records are read once: at 100,000
+  products and 300,000 records it went from 114 to 73 seconds on the test
+  machine, with the same sheet.
+- Background imports are deleted a week after they end, with their result and
+  list of refused rows; the table that holds them no longer grows for good.
 - The audit log and the item history read in words. A label's entries name
   the label's code and the product beside its id; a document type
   configuration's default locations are written with their names, and

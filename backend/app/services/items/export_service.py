@@ -1,13 +1,13 @@
-from collections.abc import Callable, Iterable, Iterator
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from decimal import Decimal
 from typing import Any, NamedTuple
 from uuid import UUID
 
 import pandas as pd
 from fastapi.responses import StreamingResponse
-from sqlalchemy import func, select
+from sqlalchemy import func, literal_column, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, aliased, joinedload
 
 from app.core import db_facade
 from app.core.async_utils import run_sync_in_thread
@@ -16,7 +16,10 @@ from app.core.location_path import join_location_path
 from app.core.xlsx_export import rows_to_xlsx_response, write_rows_xlsx
 from app.models.category import Category
 from app.models.item import Item
+from app.models.product_template import ProductTemplate
 from app.models.storage_location import StorageLocation
+from app.models.uom import Uom, UomCategory
+from app.services.items.weight import CONTINUOUS_UOM_CATEGORIES
 
 #: What a tracked field names on the product, where the two vocabularies do
 #: not say a field in the same words. A location's tracked-field toggles call
@@ -234,9 +237,11 @@ def _format_cell(value: object) -> object:
     return float(value) if isinstance(value, (int, float, Decimal)) else value
 
 
-def _meta_entries(item: Item) -> Iterator[tuple[str, str, object]]:
+def _meta_entries(
+    meta_data: dict[str, Any] | None,
+) -> Iterator[tuple[str, str, object]]:
     """The columns ``meta_data`` spreads into: ``(kind, key, value)`` each."""
-    for k, v in (item.meta_data or {}).items():
+    for k, v in (meta_data or {}).items():
         if k == 'nutrition' and isinstance(v, dict):
             for nutry_k, nutry_v in v.items():
                 yield 'nutrition', nutry_k, nutry_v
@@ -356,35 +361,106 @@ def _read_me(columns: list[str], price_header: str) -> pd.DataFrame:
     return pd.DataFrame(rows, columns=['Column', 'On import', 'Note'])
 
 
-class _Scan:
-    """What one pass over the exported records says about the sheet's shape.
+class _Scan(NamedTuple):
+    """What the exported records say about the sheet's shape.
 
-    The columns of the sheet depend on every row — a column exists when any
-    row carries a value for it — so the shape is read in a pass of its own,
-    keeping only these few sets and flags, and the rows are written in a
-    second pass. Neither pass holds the records.
+    The columns of the sheet depend on every record — a column exists when any
+    record carries a value for it — so the shape is known before the first row
+    is written.
     """
 
-    def __init__(self, tracked_keys: Iterable[str]) -> None:
-        self.categories: dict[UUID, Category] = {}
-        self.has_purchase_price = False
-        self.include_currency = False
-        self.carries_value = dict.fromkeys(tracked_keys, False)
-        self.meta_specs: dict[tuple[str, str], None] = {}
+    categories: Sequence[Category]
+    has_purchase_price: bool
+    include_currency: bool
+    #: Per tracking field: whether any record carries a value for it.
+    carries_value: dict[str, bool]
+    #: The ``meta_data`` columns, ``(kind, key)``, as the records introduce them.
+    meta_specs: dict[tuple[str, str], None]
 
-    def see(self, item: Item) -> None:
-        if item.category is not None:
-            self.categories.setdefault(item.category.id, item.category)
-        if item.purchase_price is not None:
-            self.has_purchase_price = True
-            self.include_currency = True
-        elif item.currency is not None:
-            self.include_currency = True
-        for key, carried in self.carries_value.items():
-            if not carried and _cell_value(item, key) is not None:
-                self.carries_value[key] = True
-        for kind, key, _ in _meta_entries(item):
-            self.meta_specs.setdefault((kind, key))
+
+def _scan_records(
+    db: Session,
+    organization_id: UUID | None,
+    user_storage_ids: list[UUID] | None,
+    filters: dict[str, Any],
+) -> _Scan:
+    """Ask the database for the shape of the sheet, without loading the records.
+
+    Loading each record with its category, product card, shelf and unit is
+    most of the time an export takes, so it is done once, for the rows. Here
+    the flags are aggregates, the categories a distinct list, and only the
+    ``meta_data`` documents are read, for their keys. Each flag asks in SQL
+    what :func:`_cell_value` answers for one record, and has to agree with it.
+    """
+
+    def _matched(*columns: Any) -> Any:
+        return _matching(
+            select(*columns)
+            .select_from(Item)
+            .join(StorageLocation, Item.storage_location_id == StorageLocation.id),
+            organization_id,
+            user_storage_ids,
+            filters,
+        )
+
+    # Aliases: a filter's own subquery over these tables must not correlate
+    # with the joins made here.
+    product = aliased(ProductTemplate)
+    unit = aliased(Uom)
+    unit_category = aliased(UomCategory)
+    # A price stored as NaN reads as no price (``FiniteNumeric``).
+    priced = func.nullif(Item.purchase_price, literal_column("'NaN'::numeric")).is_not(
+        None
+    )
+    carried_by = {
+        'sku': product.sku.is_not(None),
+        'min_quantity': product.min_quantity != 0,
+        'expiry_date': Item.expiry_date.is_not(None),
+        'freeze_date': Item.meta_data['food']['freeze_date'].astext.is_not(None),
+        'brand': Item.brand.is_not(None),
+        'weight': or_(
+            unit_category.name.in_(CONTINUOUS_UOM_CATEGORIES),
+            product.weight_value != 0,
+        ),
+        'description': Item.description.is_not(None),
+        'shelf_location': Item.shelf_location.is_not(None),
+    }
+    flags = db.execute(
+        _matched(
+            func.bool_or(priced),
+            func.bool_or(Item.currency.is_not(None)),
+            *(func.bool_or(condition) for condition in carried_by.values()),
+        )
+        .outerjoin(product, Item.template_id == product.id)
+        .outerjoin(unit, Item.uom_id == unit.id)
+        .outerjoin(unit_category, unit.category_id == unit_category.id)
+    ).one()
+    # No record, or none with an answer, aggregates to NULL.
+    has_price, has_currency, *carried = (bool(flag) for flag in flags)
+
+    category_ids = db.scalars(_matched(Item.category_id).distinct()).all()
+    categories = db.scalars(
+        select(Category).where(Category.id.in_(category_ids)).order_by(Category.id)
+    ).all()
+
+    meta_specs: dict[tuple[str, str], None] = {}
+    documents = db.scalars(
+        _matched(Item.meta_data)
+        .where(Item.meta_data.is_not(None))
+        .order_by(Item.id)
+        .execution_options(yield_per=_PAGE_SIZE)
+    )
+    for meta_data in documents:
+        for kind, key, _ in _meta_entries(meta_data):
+            meta_specs.setdefault((kind, key))
+
+    return _Scan(
+        categories=categories,
+        has_purchase_price=has_price,
+        include_currency=has_price or has_currency,
+        carries_value=dict(zip(carried_by, carried, strict=True)),
+        meta_specs=meta_specs,
+    )
 
 
 class _Sheet(NamedTuple):
@@ -409,7 +485,7 @@ def _sheet(
     sheet covers exactly the rows the list shows. ``enrichment`` carries rows
     contributed by feature modules through :mod:`app.core.export_enrichers`
     (e.g. equipment's "Assigned To") — Core renders them without knowing the
-    module. ``on_record`` hears every record each of the two passes reads.
+    module. ``on_record`` hears every record as its row is read.
 
     The rows are read when they are written, on *db*, so the sheet is written
     before the session closes.
@@ -433,17 +509,9 @@ def _sheet(
         'shelf_location': 'Shelf Location',
     }
 
-    def _items() -> Iterator[Item]:
-        return _iter_items(
-            db, current_user.organization_id, user_storage_ids, filters, on_record
-        )
-
-    scan = _Scan(key for key in key_map if key != 'purchase_price')
-    for item in _items():
-        scan.see(item)
-
+    scan = _scan_records(db, current_user.organization_id, user_storage_ids, filters)
     active_keys, unrestricted, field_labels = _active_field_keys(
-        db, current_user.organization_id, scan.categories.values()
+        db, current_user.organization_id, scan.categories
     )
 
     def _exported(key: str) -> bool:
@@ -470,7 +538,9 @@ def _sheet(
             columns.append(column)
 
     def _rows() -> Iterator[list[object]]:
-        for item in _items():
+        for item in _iter_items(
+            db, current_user.organization_id, user_storage_ids, filters, on_record
+        ):
             row: dict[str, Any] = {
                 'Name': item.name,
                 'Brand': item.brand,
@@ -494,7 +564,7 @@ def _sheet(
                 for column, value in (enrichment.get(item.id) or {}).items():
                     row[column] = value
 
-            for kind, key, value in _meta_entries(item):
+            for kind, key, value in _meta_entries(item.meta_data):
                 row[_meta_header(kind, key, field_labels)] = value
             yield [row.get(column) for column in columns]
 
@@ -577,7 +647,7 @@ def write_workbook_file(
     on its own interpreter. It loads the models the way a command does
     (every module's tables, so the mappers resolve), reads on an engine of
     its own at *database_url*, and adds one to *steps* (a shared integer)
-    for every record each of the two passes reads.
+    for every record it reads for a row.
     """
     import shutil
 
