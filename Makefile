@@ -1,4 +1,4 @@
-.PHONY: help setup setup-hooks dev-up dev-up-full up down deploy backup-key backup-verify backup-status status logs logs-backend logs-frontend lint check-commit-messages audit lint-frontend check-frontend perf-phone check-audit-fields-fresh lint-architecture typecheck validate-module module-smoke new-module new-community-module format frontend-format test test-backend test-frontend test-e2e e2e-example-module test-e2e-ui test-unit test-integration test-coverage check-diff-coverage mutate-stock test-fast test-profile clean clean-test db-migrate db-upgrade db-reset db-seed db-seed-demo db-seed-clean demo-reset release-db-snapshot shell db-shell scan-dead create-admin off-import off-count generate-api-docs check-openapi-fresh loadtest-seed seed-scale measure-scale
+.PHONY: help setup setup-hooks dev-up dev-up-full up down deploy backup-key backup-verify backup-status status logs logs-backend logs-frontend lint check-commit-messages audit lint-frontend check-frontend perf-phone check-audit-fields-fresh lint-architecture typecheck validate-module module-smoke new-module new-community-module format frontend-format test test-backend test-frontend test-e2e test-e2e-affected e2e-example-module test-e2e-ui test-unit test-integration test-coverage check-diff-coverage mutate-stock test-fast test-profile clean clean-test db-migrate db-upgrade db-reset db-seed db-seed-demo db-seed-clean demo-reset release-db-snapshot shell db-shell scan-dead create-admin off-import off-count generate-api-docs check-openapi-fresh loadtest-seed seed-scale measure-scale
 
 # Default goal
 .DEFAULT_GOAL := help
@@ -579,6 +579,11 @@ test-frontend: ## Run only frontend tests
 	@# this is that command, run where the Makefile drives vitest.
 	docker compose exec -T frontend npx vitest run --coverage
 
+# What test-e2e runs in frontend/ once the stack is ready for the browser.
+E2E_COMMAND = npx playwright test --reporter=list
+# The ref test-e2e-affected compares the tree with.
+BASE ?= origin/dev
+
 test-e2e: ## Run Playwright E2E tests (restarts backend with TESTING=true)
 	@echo "$(BLUE)[INFO]$(NC) Running E2E tests..."
 	@# A @playwright/test bump leaves ~/.cache/ms-playwright holding the old
@@ -623,7 +628,10 @@ test-e2e: ## Run Playwright E2E tests (restarts backend with TESTING=true)
 		VITE_DISABLE_HMR=1 $(DOCKER_COMPOSE) up -d --no-deps frontend >/dev/null; \
 		n=0; until $(DOCKER_COMPOSE) exec -T frontend node -e "fetch('http://127.0.0.1:5173/').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))" >/dev/null 2>&1 || [ $$n -ge 90 ]; do n=$$((n+1)); sleep 1; done; \
 	fi; \
-	cd frontend && npx playwright test --reporter=list
+	cd frontend && $(E2E_COMMAND)
+
+test-e2e-affected: ## Run the E2E specs the changes since BASE (default origin/dev) can break, on the stack the wrapper names
+	@$(MAKE) --no-print-directory test-e2e E2E_COMMAND='node scripts/select-e2e-specs.mjs --base $(BASE) --run'
 
 e2e-example-module: ## Install the guide's example module, walk it in the browser, uninstall it (on the stack the wrapper names; VITE_API_URL as for test-e2e)
 	@echo "$(BLUE)[INFO]$(NC) Installing examples/lot_certificates the community way..."

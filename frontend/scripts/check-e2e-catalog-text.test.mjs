@@ -181,6 +181,44 @@ describe("findStaleText", () => {
     ).toEqual([]);
   });
 
+  it("names a phrase of a removed text that no catalog still holds", () => {
+    const old = "{{form}} holds unsaved changes. Leave anyway?";
+    const now = "{{form}} has changes you have not saved. Leave?";
+    const spec = "page.getByText(/holds unsaved changes/i);";
+    expect(renamed(old, now, spec)).toMatchObject([{ line: 1, old }]);
+    // A phrase some catalog still holds is still on a screen.
+    expect(
+      renamed(old, now, spec, {
+        also: {
+          "src/modules/warehouse/i18n/en.json": {
+            b: "The form holds unsaved changes",
+          },
+        },
+      }),
+    ).toEqual([]);
+  });
+
+  it("takes only a phrase of two words, whole words, for a removed text", () => {
+    const old = "This place holds unsaved changes";
+    const spec = [
+      "page.getByText('unsaved');",
+      "page.getByText('holds unsaved chang');",
+      "page.getByText('1 2');",
+    ];
+    expect(renamed(old, "Saved", spec)).toEqual([]);
+  });
+
+  it("holds a quoted phrase to the catalog's letter case, a regex to none", () => {
+    const old = "Enable in the App Store";
+    expect(renamed(old, "Enable it", "const name = 'App store';")).toEqual([]);
+    expect(
+      renamed(old, "Enable it", "page.getByText('App Store');"),
+    ).toHaveLength(1);
+    expect(
+      renamed(old, "Enable it", "page.getByText(/app store/i);"),
+    ).toHaveLength(1);
+  });
+
   it("reads a text through the escapes of a regex or a string", () => {
     const spec = [
       "name: /add \\(new\\)/i",
