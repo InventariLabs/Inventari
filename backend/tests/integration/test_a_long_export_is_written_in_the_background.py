@@ -24,6 +24,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.core.contracts import UserContextDTO
 from app.core.exceptions import NotFoundException
 from app.core.file_storage.service import FileStorageService
@@ -89,6 +90,25 @@ class TestTheEndpointAnswersWithAJobPastTheLimit:
             f'/api/v1/items/export/jobs/{job["id"]}/file', headers=auth_headers
         )
         assert unfinished.status_code == 404, 'a running job has no file yet'
+
+    def test_only_a_testing_stack_lets_a_request_ask_for_the_job(
+        self,
+        client: TestClient,
+        auth_headers: dict,
+        test_items_batch: list[Item],
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr(export_jobs, 'spawn', lambda job_id, factory, write: None)
+        asking = {**auth_headers, 'X-Test-Export-Job': '1'}
+
+        followed = client.get(EXPORT, headers=asking)
+        assert followed.status_code == 202, followed.text
+        assert followed.json()['total'] == 5
+
+        monkeypatch.setattr(settings, 'TESTING', False)
+        ignored = client.get(EXPORT, headers=asking)
+        assert ignored.status_code == 200, ignored.text
+        assert ignored.headers['content-type'] == XLSX_MEDIA_TYPE
 
 
 class TestTheFileIsTheAskersAlone:
