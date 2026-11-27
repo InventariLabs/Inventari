@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/Input";
 import type {
   LineItem,
+  LineItemErrors,
   LineItemsEditorFeatures,
   LineItemsEditorLabels,
 } from "./types";
@@ -12,8 +13,8 @@ interface LineItemValueFieldsProps {
   unitPriceFieldId: string;
   taxRateFieldId: string;
   lineValue: string;
-  /** Why the server refused this line's price. */
-  unitPriceError?: string;
+  /** The line's refusals; the price field shows its own. */
+  error?: LineItemErrors;
   onUpdate: (updates: Partial<LineItem>) => void;
 }
 
@@ -24,7 +25,7 @@ export function LineItemValueFieldsDesktop({
   unitPriceFieldId,
   taxRateFieldId,
   lineValue,
-  unitPriceError,
+  error,
   onUpdate,
 }: LineItemValueFieldsProps) {
   return (
@@ -37,7 +38,7 @@ export function LineItemValueFieldsDesktop({
         label={labels.unitPrice}
         value={line.unit_price ?? ""}
         onChange={(e) => onUpdate({ unit_price: e.target.value })}
-        error={unitPriceError}
+        error={error?.unit_price}
         className="h-10 px-2 text-right"
         wrapperClassName="hidden xl:block xl:space-y-0"
         labelClassName="xl:sr-only"
@@ -72,7 +73,7 @@ export function LineItemValueFieldsMobile({
   unitPriceFieldId,
   taxRateFieldId,
   lineValue,
-  unitPriceError,
+  error,
   onUpdate,
 }: LineItemValueFieldsProps) {
   // Bottoms line the controls up under labels of any height; a message under
@@ -87,7 +88,7 @@ export function LineItemValueFieldsMobile({
         label={labels.unitPrice}
         value={line.unit_price ?? ""}
         onChange={(e) => onUpdate({ unit_price: e.target.value })}
-        error={unitPriceError}
+        error={error?.unit_price}
         className="h-10 px-2"
       />
       {features.taxField && (
