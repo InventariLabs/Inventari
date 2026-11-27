@@ -100,10 +100,10 @@ export function createEmptyQuickAddLineDraft(): QuickAddLineDraft {
   };
 }
 
-/** What the line editor shows under a row: the name field's and the quantity's. */
+/** What the line editor shows under a row's name, quantity and price fields. */
 export type LineFieldErrors = Record<
   string,
-  { name?: string; quantity?: string }
+  { name?: string; quantity?: string; unit_price?: string }
 >;
 
 /**
@@ -124,11 +124,13 @@ export function lineFieldErrors(
     const itemIdMsg = errors[`line.${line._key}.item_id`];
     const nameMsg = errors[`line.${line._key}.name`];
     const quantityMsg = errors[`line.${line._key}.quantity`];
-    if (!itemIdMsg && !nameMsg && !quantityMsg) continue;
+    const priceMsg = errors[`line.${line._key}.unit_price`];
+    if (!itemIdMsg && !nameMsg && !quantityMsg && !priceMsg) continue;
     const nameError = itemIdMsg ?? nameMsg;
     byLine[line._key] = {
       ...(nameError ? { name: render(nameError) } : {}),
       ...(quantityMsg ? { quantity: render(quantityMsg) } : {}),
+      ...(priceMsg ? { unit_price: render(priceMsg) } : {}),
     };
   }
   return byLine;

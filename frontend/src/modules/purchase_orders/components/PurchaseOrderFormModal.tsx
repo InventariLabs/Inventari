@@ -5,7 +5,9 @@ import { DiscardDraftDialog } from "@/components/ui/DiscardDraftDialog";
 import { FormSheetFooter } from "@/components/ui/FormSheetFooter";
 import { NativeSelect } from "@/components/ui/NativeSelect";
 import { Sheet } from "@/components/ui/Sheet";
+import axios from "axios";
 import { extractApiError } from "@/lib/errors";
+import { parseApiValidationErrors } from "@/module-sdk";
 import { todayIso } from "@/utils/formatters";
 import { CURRENCY_CODES, currencyLabel } from "@/lib/currencies";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
@@ -57,6 +59,23 @@ function emptyLine(): POLineInput {
 /** What a line holds once the reader has touched it — its id is bookkeeping. */
 function lineContent({ id: _id, ...content }: POLineInput) {
   return JSON.stringify(content);
+}
+
+/** The prices a refused save named, keyed by the id of the line they are on. */
+function refusedLinePrices(
+  err: unknown,
+  lines: POLineInput[],
+): Record<string, string> {
+  const detail = axios.isAxiosError(err)
+    ? err.response?.data?.detail
+    : undefined;
+  const refused = parseApiValidationErrors(detail, (i) => lines[i]?.id);
+  return Object.fromEntries(
+    lines.flatMap(({ id }) => {
+      const message = refused[`line.${id}.unit_price`];
+      return message ? [[id, message]] : [];
+    }),
+  );
 }
 
 /** Line ids that still need a product name, keyed to their inline error. */
@@ -160,6 +179,8 @@ export default function PurchaseOrderFormModal({
     lines.some((l, i) => lineContent(l) !== initialLines[i]);
 
   const [nameErrors, setNameErrors] = useState<Record<string, string>>({});
+  // Why the server refused a line's price, until that price is edited.
+  const [priceErrors, setPriceErrors] = useState<Record<string, string>>({});
 
   const [partnerCreateOpen, setPartnerCreateOpen] = useState(false);
   const [partnerCreateQuery, setPartnerCreateQuery] = useState("");
@@ -216,6 +237,9 @@ export default function PurchaseOrderFormModal({
         delete next[id];
         return next;
       });
+    }
+    if (data.unit_price !== undefined) {
+      setPriceErrors(({ [id]: _edited, ...rest }) => rest);
     }
   };
 
@@ -308,7 +332,12 @@ export default function PurchaseOrderFormModal({
       }
       onSuccess();
     } catch (err) {
-      toast.error(extractApiError(err, t("unknownError")));
+      setPriceErrors(refusedLinePrices(err, lines));
+      toast.error(
+        extractApiError(err, t("unknownError"), {
+          unit_price: t("form.lineUnitPrice"),
+        }),
+      );
     }
   };
 
@@ -402,6 +431,7 @@ export default function PurchaseOrderFormModal({
           t={t}
           currency={currency}
           nameErrors={nameErrors}
+          priceErrors={priceErrors}
           {...footerTotals(lines)}
           subtotalLabel={t("form.subtotal")}
           taxAmountLabel={t("form.taxAmount")}

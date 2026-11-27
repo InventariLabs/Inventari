@@ -1,4 +1,5 @@
 import { Input } from "@/components/ui/Input";
+import { cn } from "@/lib/utils";
 import type {
   LineItem,
   LineItemsEditorFeatures,
@@ -12,6 +13,8 @@ interface LineItemValueFieldsProps {
   unitPriceFieldId: string;
   taxRateFieldId: string;
   lineValue: string;
+  /** Why the server refused this line's price. */
+  unitPriceError?: string;
   onUpdate: (updates: Partial<LineItem>) => void;
 }
 
@@ -22,6 +25,7 @@ export function LineItemValueFieldsDesktop({
   unitPriceFieldId,
   taxRateFieldId,
   lineValue,
+  unitPriceError,
   onUpdate,
 }: LineItemValueFieldsProps) {
   return (
@@ -34,6 +38,7 @@ export function LineItemValueFieldsDesktop({
         label={labels.unitPrice}
         value={line.unit_price ?? ""}
         onChange={(e) => onUpdate({ unit_price: e.target.value })}
+        error={unitPriceError}
         className="h-10 px-2 text-right"
         wrapperClassName="hidden xl:block xl:space-y-0"
         labelClassName="xl:sr-only"
@@ -68,10 +73,18 @@ export function LineItemValueFieldsMobile({
   unitPriceFieldId,
   taxRateFieldId,
   lineValue,
+  unitPriceError,
   onUpdate,
 }: LineItemValueFieldsProps) {
   return (
-    <div className="mt-3 grid grid-cols-2 items-end gap-3 sm:grid-cols-3 xl:hidden">
+    <div
+      className={cn(
+        "mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:hidden",
+        // Bottoms line the controls up under labels of any height; a message
+        // under one of them would push its neighbours down to it.
+        unitPriceError ? "items-start" : "items-end",
+      )}
+    >
       <Input
         id={`${unitPriceFieldId}-mobile`}
         type="number"
@@ -80,6 +93,7 @@ export function LineItemValueFieldsMobile({
         label={labels.unitPrice}
         value={line.unit_price ?? ""}
         onChange={(e) => onUpdate({ unit_price: e.target.value })}
+        error={unitPriceError}
         className="h-10 px-2"
       />
       {features.taxField && (
