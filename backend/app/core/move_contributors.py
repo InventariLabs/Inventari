@@ -6,7 +6,8 @@ files its own part, then hands the same rows — with the products and units it
 matched — to every module that registered for the source and is switched on
 for the organization. A module answers with one sentence for the summary, in
 the reader's language, and names the kind of record it takes over, so the
-summary stops listing that kind among what stays behind.
+summary stops listing that kind among what stays behind — once its part has
+run; a kind whose part failed stays listed, marked as failed.
 
 A contributor runs in the move's transaction, in a savepoint of its own: one
 that fails is logged, its writes roll back, and the move goes on without it.
@@ -89,6 +90,14 @@ class MoveContribution:
     sentence: str
 
 
+@dataclass(frozen=True)
+class MoveOutcome:
+    #: The sentences of the parts that had something to say.
+    brought: list[MoveContribution]
+    #: The kinds (``MoveContributor.takes``) whose module's part failed.
+    failed: set[str]
+
+
 async def bring_async(
     source: str,
     db: AsyncSession,
@@ -96,9 +105,10 @@ async def bring_async(
     rows: Any,
     matches: MoveMatches,
     enabled_modules: Iterable[str],
-) -> list[MoveContribution]:
+) -> MoveOutcome:
     """Every switched-on module's part of the move, each in a savepoint."""
     brought: list[MoveContribution] = []
+    failed: set[str] = set()
     for contributor in contributors_for(source, enabled_modules):
         try:
             async with db.begin_nested():
@@ -110,7 +120,8 @@ async def bring_async(
                 source,
                 user.id,
             )
+            failed.add(contributor.takes)
             continue
         if sentence:
             brought.append(MoveContribution(contributor.module, sentence))
-    return brought
+    return MoveOutcome(brought, failed)

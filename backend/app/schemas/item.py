@@ -335,6 +335,9 @@ class ItemImportMapping(BaseModel):
 #: them.
 LeftBehindKind = Literal[
     'inactive_products',
+    'inactive_locations',
+    'inactive_product_groups',
+    'inactive_stores',
     'extra_barcodes',
     'unit_conversions',
     'units_as_pieces',
@@ -361,6 +364,9 @@ class ImportLeftBehind(BaseModel):
     #: For ``units_as_pieces``: the units no unit here matched, whose stock
     #: came across counted in pieces.
     names: list[str] = []
+    #: A switched-on module was to bring this kind, and its part failed: none
+    #: of it came across, and a second run of the file tries again.
+    failed: bool = False
 
 
 class ImportBrought(BaseModel):

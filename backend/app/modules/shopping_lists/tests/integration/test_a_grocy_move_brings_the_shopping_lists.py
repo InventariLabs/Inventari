@@ -135,12 +135,44 @@ async def test_with_the_module_off_the_entries_stay_in_grocy(
     )
 
     assert result['brought_by_modules'] == []
-    assert {'what': 'shopping_list_entries', 'count': 3, 'names': []} in result[
-        'left_behind'
-    ]
+    assert {
+        'what': 'shopping_list_entries',
+        'count': 3,
+        'names': [],
+        'failed': False,
+    } in result['left_behind']
     lists = await db.execute(
         select(ShoppingList).where(
             ShoppingList.organization_id == async_test_user.organization_id
         )
     )
     assert lists.scalars().all() == []
+
+
+async def test_a_part_that_fails_leaves_its_entries_counted_as_staying(
+    real_async_db_session: AsyncSession,
+    async_test_user: User,
+    async_test_storage_location: StorageLocation,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db = real_async_db_session
+
+    async def refuse(*args: object, **kwargs: object) -> None:
+        raise RuntimeError('no list today')
+
+    monkeypatch.setattr(
+        'app.modules.shopping_lists._grocy_move.create_shopping_list', refuse
+    )
+
+    result = await import_grocy_file_async(
+        db, read_grocy_file(_household().content()), _ctx(async_test_user)
+    )
+
+    assert result['imported'] > 0
+    assert result['brought_by_modules'] == []
+    assert {
+        'what': 'shopping_list_entries',
+        'count': 3,
+        'names': [],
+        'failed': True,
+    } in result['left_behind']

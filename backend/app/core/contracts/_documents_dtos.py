@@ -7,6 +7,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.schemas.validators import PRICE_MAX
+
 
 class ShoppingListDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -237,7 +239,9 @@ class PurchaseOrderLineInput(BaseModel):
     product_template_id: UUID | None = None
     name: str | None = Field(default=None, max_length=255)
     quantity_ordered: Decimal = Field(gt=0)
-    unit_price: Decimal | None = Field(default=None, max_digits=12, decimal_places=2)
+    unit_price: Decimal | None = Field(
+        default=None, ge=0, le=PRICE_MAX, decimal_places=2
+    )
     uom_id: UUID | None = None
     tax_rate: Decimal | None = Field(default=None, max_digits=5, decimal_places=2)
     notes: str | None = None

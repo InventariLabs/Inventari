@@ -17579,7 +17579,7 @@ export interface components {
              * What
              * @enum {string}
              */
-            what: "inactive_products" | "extra_barcodes" | "unit_conversions" | "units_as_pieces" | "prices_below_a_cent" | "default_best_before_days" | "pictures" | "parent_products" | "own_field_values" | "shopping_list_entries" | "recipes" | "meal_plan" | "chores" | "batteries" | "tasks" | "equipment";
+            what: "inactive_products" | "inactive_locations" | "inactive_product_groups" | "inactive_stores" | "extra_barcodes" | "unit_conversions" | "units_as_pieces" | "prices_below_a_cent" | "default_best_before_days" | "pictures" | "parent_products" | "own_field_values" | "shopping_list_entries" | "recipes" | "meal_plan" | "chores" | "batteries" | "tasks" | "equipment";
             /** Count */
             count: number;
             /**
@@ -17587,6 +17587,11 @@ export interface components {
              * @default []
              */
             names: string[];
+            /**
+             * Failed
+             * @default false
+             */
+            failed: boolean;
         };
         /**
          * ImportPasteRequest

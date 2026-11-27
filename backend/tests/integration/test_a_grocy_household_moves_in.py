@@ -176,6 +176,7 @@ class TestAHouseholdMovesIn:
             'what': 'units_as_pieces',
             'count': 1,
             'names': ['Tin'],
+            'failed': False,
         } in result['left_behind']
 
     async def test_a_product_without_stock_is_a_product_of_the_catalogue_only(
@@ -225,6 +226,27 @@ class TestAHouseholdMovesIn:
             await db.execute(select(Partner).where(Partner.name == 'Grocy corner shop'))
         ).scalar_one()
         assert supplier.type == 'SUPPLIER'
+
+    async def test_places_groups_and_stores_switched_off_are_counted_as_staying(
+        self, real_async_db_session, async_test_user, async_test_storage_location
+    ) -> None:
+        db = real_async_db_session
+        g, _ = _household()
+        g.location('Grocy old cellar', active=False)
+        g.location('Grocy old attic', active=False)
+        g.group('Grocy old snacks', active=False)
+        g.store('Grocy closed market', active=False)
+        grocy = read_grocy_file(g.content())
+
+        analysis = await analyze_grocy_file_async(db, _ctx(async_test_user), grocy)
+        result = await import_grocy_file_async(db, grocy, _ctx(async_test_user))
+
+        for summary in (analysis, result):
+            left = {e['what']: e['count'] for e in summary['left_behind']}
+            assert left['inactive_locations'] == 2
+            assert left['inactive_product_groups'] == 1
+            assert left['inactive_stores'] == 1
+        assert 'Grocy old cellar' not in result['created_locations']
 
     async def test_a_place_group_or_store_already_here_is_reused(
         self, real_async_db_session, async_test_user, async_test_storage_location
@@ -526,6 +548,9 @@ class TestAPriceARecordCannotHold:
             (r.quantity, r.purchase_price)
             for r in await _records(db, 'Grocy rye flour')
         ) == [(Decimal('500'), Decimal('0.01')), (Decimal('850'), None)]
-        assert {'what': 'prices_below_a_cent', 'count': 1, 'names': []} in result[
-            'left_behind'
-        ]
+        assert {
+            'what': 'prices_below_a_cent',
+            'count': 1,
+            'names': [],
+            'failed': False,
+        } in result['left_behind']

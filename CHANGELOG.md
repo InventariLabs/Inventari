@@ -102,7 +102,10 @@ says what the release does rather than what changed since them.
   opened piece used down to the half. A unit Grocy names in any of the six
   languages is recognised; one that is not counts pieces and is named.
   With *Shopping lists* on, Grocy's shopping lists come across as well, each
-  entry linked to the product the move made. Running the same file again adds
+  entry linked to the product the move made; if that part fails, the rest
+  still moves and the summary counts the entries as staying in Grocy, saying
+  so. Rows switched off in Grocy — products, locations, product groups and
+  stores — are counted among what stays. Running the same file again adds
   only batches that are new.
 - Module authors: the frontend SDK (`@/module-sdk`) exports
   `useReturnTarget`, which reads where a screen entered from another module
@@ -147,6 +150,13 @@ says what the release does rather than what changed since them.
   equipment import names the cell. While a product holds stock, its edit form
   keeps the unit fixed and says why, and the refusal of a unit change writes
   the quantity with the reader's decimal mark and unit names.
+- A line of a stock document or a purchase order takes a unit price from 0 to
+  99,999,999.99 — typed, imported, or ordered by another module, which must
+  pass a price in that range. A price outside it is refused when the line is
+  written: an oversized one no longer ends in a server error when the receipt
+  is completed, and a negative one no longer opens a stock record priced below
+  zero. A quantity that grows past what a record keeps on being restated into
+  the product's unit is refused with that limit named, not with a server error.
 - Taking back a recipe pick, or cancelling a cooking session, no longer loses
   what was used from the same record at the same moment, and picking an
   ingredient no longer fails when that record, or a document of the same

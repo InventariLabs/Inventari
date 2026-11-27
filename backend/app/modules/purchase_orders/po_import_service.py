@@ -14,6 +14,7 @@ from app.core.exceptions import (
 from app.core.file_import import analyze_import_file
 from app.core.import_sheet import SheetColumns, cell_text, read_rows
 from app.core.logging import get_logger
+from app.core.module_sdk import PRICE_MAX
 from app.core.public_api import core_api
 from app.core.uom_resolver import UomResolverAsync
 
@@ -79,6 +80,14 @@ def _optional_decimal(raw: Any, column: str, sheet: SheetColumns) -> Decimal | N
         raise _RowSkippedError(
             'import_column_not_a_number', column=column, value=raw
         ) from exc
+
+
+def _line_price(raw: Any, column: str, sheet: SheetColumns) -> Decimal | None:
+    """A price an order line can keep; any other cell refuses the row."""
+    price = _optional_decimal(raw, column, sheet)
+    if price is not None and not 0 <= price <= PRICE_MAX:
+        raise _RowSkippedError('import_price_invalid', column=column, value=raw)
+    return price
 
 
 async def _match_product_template(
@@ -158,7 +167,7 @@ async def import_lines_into_po(
                     name=str(name),
                     quantity_ordered=quantity,
                     quantity_received=Decimal('0'),
-                    unit_price=_optional_decimal(
+                    unit_price=_line_price(
                         row.get(columns.price), columns.price, sheet
                     ),
                     uom_id=uom_id,

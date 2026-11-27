@@ -241,6 +241,42 @@ class TestRegisterPickingAsDocument:
         assert str(session.id) not in data.notes
         assert recipe.name in data.notes
 
+    async def test_a_stored_negative_valuation_rate_is_carried_onto_the_line(
+        self,
+        real_async_db_session: AsyncSession,
+        pick_doc_org: Organization,
+        pick_doc_user: User,
+    ) -> None:
+        """A line copies the rate the stock stood at; it is not a new price."""
+        recipe, ingredient = await _recipe_and_ingredient(
+            real_async_db_session, pick_doc_org, pick_doc_user
+        )
+        session, item = _session_with_picked(recipe, ingredient)
+        item.consumed_valuation_rate = Decimal('-1.00')
+        mock_core = _core_mock(feature_on=True, docs_enabled=True)
+        first_item = MagicMock()
+        first_item.location_id = uuid.uuid4()
+        mock_core.items.get_async = AsyncMock(return_value=first_item)
+
+        doc = MagicMock()
+        doc.id = uuid.uuid4()
+        with (
+            patch('app.modules.recipes._picking_document.core_api', mock_core),
+            patch.object(
+                warehouse_api,
+                'create_document_draft_async',
+                new_callable=AsyncMock,
+                return_value=doc,
+            ) as mock_create,
+        ):
+            result = await register_picking_as_document_async(
+                real_async_db_session, session, pick_doc_org.id, pick_doc_user.id
+            )
+
+        assert result == str(doc.id)
+        data = cast(Any, mock_create.call_args.args[2])
+        assert data.lines[0].unit_price == Decimal('-1.00')
+
     async def test_recipe_relation_missing_falls_back_to_id(
         self,
         real_async_db_session: AsyncSession,
