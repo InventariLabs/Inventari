@@ -237,9 +237,8 @@ class TestDates:
     def test_a_twelve_hour_time_follows_the_order_its_column_decided(self) -> None:
         """``AM`` after the time is part of the time, not a reason to guess.
 
-        Without the suffix in the pattern the value falls through to pandas,
-        which reads the month first whatever the column decided: an expiry
-        term moves by months with no word.
+        The suffix is read where the column's order is applied, so the day
+        keeps its place and an expiry term does not move by months.
         """
         assert parse_sheet_date('05/11/2026 10:30 AM', True) == date(2026, 11, 5)
         assert parse_sheet_date('05/11/2026 10:30 AM', False) == date(2026, 5, 11)

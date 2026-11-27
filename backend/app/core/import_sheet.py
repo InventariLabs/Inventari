@@ -410,8 +410,8 @@ class UnreadableCellError(ValueError):
 #: A code is written the way ISO 4217 writes it, in capitals. A lowercase
 #: word after a quantity is the language's word for the thing measured —
 #: "2 cup", "3 top" — and CUP, TOP, ALL and BOB are also currency codes:
-#: matching those case-insensitively read the cell as a bare number and
-#: dropped the unit without a word.
+#: matched case-insensitively, each would make the cell a bare number and
+#: drop the unit without a word.
 _CURRENCY_CODES = frozenset(list_currencies())
 _CURRENCY_WORDS = frozenset(
     {

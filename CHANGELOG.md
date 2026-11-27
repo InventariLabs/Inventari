@@ -108,6 +108,10 @@ says what the release does rather than what changed since them.
   `useReturnTarget`, which reads where a screen entered from another module
   sends its back arrow (`state={{ backTo }}` on the link), and `listedFields`,
   which tells a category's fields apart from the flags stored beside them.
+- Module authors: the backend module SDK exports `SheetColumns`, which reads
+  a cell's number or date by what its whole column says — the decimal mark,
+  the thousands grouping, a day-first order, a currency code — so a module's
+  own import door reads a sheet the way every other door does.
 
 ### Fixed
 

@@ -114,9 +114,8 @@ def test_the_nutrient_columns_read_numbers_the_way_every_door_does(
 ) -> None:
     """A space groups thousands and the last separator is the decimal one.
 
-    The nutrition sheet kept a rule of its own — a comma replaced by a dot —
-    so a value grouped with a space or written "1.234,5" was not read the way
-    the same value is read in every other import.
+    "1 289,5" is 1289.5 and "1.234,5" is 1234.5 in the nutrient columns, as
+    they are in every other import door.
     """
     body = _import(client, auth_headers, 'defaults.csv', THOUSANDS)
 

@@ -248,11 +248,8 @@ def read_defaults_csv(content: bytes, filename: str) -> list[dict[str, Any]]:
     A nutrient cell is read as the number it names by the same reader every
     other import door uses (:class:`SheetColumns`): "1 289,5" is 1289.5 and
     "1.234,5" is 1234.5, and a lone dot is read by what the rest of its
-    column says. This door had a rule of its own — a comma replaced by a dot
-    — so a value grouped with a space was not a number, and one written with
-    both separators was not read the way the sheet's country writes it. A
-    cell the reader cannot read stays as it came, and the row's validation
-    counts it as an error.
+    column says. A cell the reader cannot read stays as it came, and the
+    row's validation counts it as an error.
     """
     frame = read_sheet(content, filename)
     sheet = SheetColumns(frame)
