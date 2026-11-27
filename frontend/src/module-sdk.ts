@@ -50,9 +50,6 @@ export { useLocalStorage } from "@/hooks/useLocalStorage";
 // The sentence to show for a failed request: the server's own message, in the
 // reader's language, or the fallback the caller passes when there is none.
 export { extractApiError } from "@/lib/errors";
-// A refused save's messages keyed by field, and by line, for a form to show
-// beside the input each one names.
-export { parseApiValidationErrors } from "@/lib/validationErrors";
 // The error a callback throws to put its own sentence on the screen that asked.
 export { ReadableError } from "@/lib/errors";
 // What a file picker for an attachment offers: the types the server's

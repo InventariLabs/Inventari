@@ -7,7 +7,6 @@ import { NativeSelect } from "@/components/ui/NativeSelect";
 import { Sheet } from "@/components/ui/Sheet";
 import axios from "axios";
 import { extractApiError } from "@/lib/errors";
-import { parseApiValidationErrors } from "@/module-sdk";
 import { todayIso } from "@/utils/formatters";
 import { CURRENCY_CODES, currencyLabel } from "@/lib/currencies";
 import { useOrganizationCurrency } from "@/hooks/useOrganizationCurrency";
@@ -69,11 +68,12 @@ function refusedLinePrices(
   const detail = axios.isAxiosError(err)
     ? err.response?.data?.detail
     : undefined;
-  const refused = parseApiValidationErrors(detail, (i) => lines[i]?.id);
+  if (!Array.isArray(detail)) return {};
   return Object.fromEntries(
-    lines.flatMap(({ id }) => {
-      const message = refused[`line.${id}.unit_price`];
-      return message ? [[id, message]] : [];
+    detail.flatMap(({ loc, msg }: { loc: unknown[]; msg: string }) => {
+      const [, list, index, field] = loc;
+      const line = list === "lines" ? lines[Number(index)] : undefined;
+      return line && field === "unit_price" ? [[line.id, msg]] : [];
     }),
   );
 }

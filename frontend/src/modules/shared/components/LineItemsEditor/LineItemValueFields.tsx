@@ -1,5 +1,4 @@
 import { Input } from "@/components/ui/Input";
-import { cn } from "@/lib/utils";
 import type {
   LineItem,
   LineItemsEditorFeatures,
@@ -76,15 +75,10 @@ export function LineItemValueFieldsMobile({
   unitPriceError,
   onUpdate,
 }: LineItemValueFieldsProps) {
+  // Bottoms line the controls up under labels of any height; a message under
+  // one of them would push its neighbours down to it.
   return (
-    <div
-      className={cn(
-        "mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:hidden",
-        // Bottoms line the controls up under labels of any height; a message
-        // under one of them would push its neighbours down to it.
-        unitPriceError ? "items-start" : "items-end",
-      )}
-    >
+    <div className="mt-3 grid grid-cols-2 items-end gap-3 has-[[role=alert]]:items-start sm:grid-cols-3 xl:hidden">
       <Input
         id={`${unitPriceFieldId}-mobile`}
         type="number"

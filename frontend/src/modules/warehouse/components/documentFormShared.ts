@@ -121,17 +121,13 @@ export function lineFieldErrors(
   const render = (msg: string) => (msg.startsWith("errors.") ? t(msg) : msg);
   const byLine: LineFieldErrors = {};
   for (const line of lines) {
-    const itemIdMsg = errors[`line.${line._key}.item_id`];
-    const nameMsg = errors[`line.${line._key}.name`];
-    const quantityMsg = errors[`line.${line._key}.quantity`];
-    const priceMsg = errors[`line.${line._key}.unit_price`];
-    if (!itemIdMsg && !nameMsg && !quantityMsg && !priceMsg) continue;
-    const nameError = itemIdMsg ?? nameMsg;
-    byLine[line._key] = {
-      ...(nameError ? { name: render(nameError) } : {}),
-      ...(quantityMsg ? { quantity: render(quantityMsg) } : {}),
-      ...(priceMsg ? { unit_price: render(priceMsg) } : {}),
-    };
+    const at = (field: string) => errors[`line.${line._key}.${field}`];
+    const shown = Object.entries({
+      name: at("item_id") ?? at("name"),
+      quantity: at("quantity"),
+      unit_price: at("unit_price"),
+    }).flatMap(([field, msg]) => (msg ? [[field, render(msg)]] : []));
+    if (shown.length) byLine[line._key] = Object.fromEntries(shown);
   }
   return byLine;
 }
