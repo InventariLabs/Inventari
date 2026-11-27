@@ -114,8 +114,12 @@
     "closeAndView": "Schließen und Partner ansehen",
     "added_one": "{{count}} Partner hinzugefügt.",
     "added_other": "{{count}} Partner hinzugefügt.",
+    "contacts_one": "{{count}} Ansprechperson wurde ihrer Firma zugeordnet.",
+    "contacts_other": "{{count}} Ansprechpersonen wurden ihren Firmen zugeordnet.",
     "defaultType": "Typ für Zeilen ohne Angabe",
     "addOnlyNote": "Der Import fügt nur Partner hinzu. Eine Zeile mit einem Partner, den Sie bereits haben — derselbe Name in beliebiger Schreibweise oder dieselbe Steuernummer — wird abgelehnt und mit Begründung aufgeführt.",
+    "contactNote": "Eine Zeile mit einer Firma in dieser Spalte ist eine Ansprechperson: Sie wird dieser Firma aus derselben Datei zugeordnet, als Ansprechperson und als Zeile in ihren Notizen.",
+    "companyField": "Firma der Ansprechperson",
     "analyzeFailed": "Die Datei konnte nicht gelesen werden",
     "failed": "Import fehlgeschlagen"
   },

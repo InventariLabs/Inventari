@@ -5,18 +5,25 @@ uses. A row is refused, with a reason, when it names a partner the
 organization already has: the same name in any letter case, or the same tax
 id (compared without spaces and punctuation), whether that partner sits in
 the database or a few rows up in the same file.
+
+A country may be written as its code or as its name in English or another
+maintained language. A row naming the company it belongs to is a contact
+person: it becomes part of that company, not a partner of its own.
 """
 
 import re
 from dataclasses import dataclass, field
-from typing import Any
+from functools import cache
+from typing import Any, get_args
 from uuid import UUID
 
 import pandas as pd
+from babel import Locale
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.contracts import UserContextDTO
+from app.core.contracts._core_dtos import ISO_3166_ALPHA2_CODES
 from app.core.import_sheet import (
     RowError,
     cell_text,
@@ -24,6 +31,7 @@ from app.core.import_sheet import (
     read_rows,
     row_get,
 )
+from app.i18n._types import Language
 from app.i18n.service import get_current_lang, get_error_message
 from app.models.partner import Partner
 from app.schemas.partner import PartnerAddress, PartnerCreate
@@ -42,6 +50,41 @@ _TEXT_FIELDS = (
     'contact_person',
     'notes',
 )
+
+
+#: Names other tools write that the locale data spells otherwise.
+_COUNTRY_ALIASES = {
+    'czech republic': 'CZ',
+    'great britain': 'GB',
+    'republic of korea': 'KR',
+    'russian federation': 'RU',
+    'slovak republic': 'SK',
+    'turkey': 'TR',
+    'united states of america': 'US',
+    'viet nam': 'VN',
+}
+
+
+@cache
+def _country_codes() -> dict[str, str]:
+    """Country code by each name the maintained languages give the country."""
+    # "pt" is Brazil's spelling; Portugal's names differ.
+    locales = [*get_args(Language), 'pt_PT']
+    names = {
+        name.casefold(): code
+        for locale in locales
+        for code, name in Locale.parse(locale).territories.items()
+        if code in ISO_3166_ALPHA2_CODES
+    }
+    return names | _COUNTRY_ALIASES
+
+
+def _country(text: str | None) -> str | None:
+    """A country cell as a code; a word naming no country goes on as written,
+    for the address to refuse."""
+    if text is None or text.upper() in ISO_3166_ALPHA2_CODES:
+        return text
+    return _country_codes().get(' '.join(text.casefold().split()), text)
 
 
 def _name_key(name: str) -> str:
@@ -103,9 +146,56 @@ def _build_partner(
     for key in _TEXT_FIELDS:
         data[key] = cell_text(row_get(row, mapping, key))
     address = {key: cell_text(row_get(row, mapping, key)) for key in _ADDRESS_FIELDS}
+    address['country'] = _country(address['country'])
     if any(address.values()):
         data['address'] = PartnerAddress(**address)
     return PartnerCreate(**data)
+
+
+def _company_of(row: pd.Series, mapping: dict[str, Any]) -> str | None:
+    """The company a contact person's row belongs to; ``None`` for a partner."""
+    company = cell_text(row_get(row, mapping, 'company'))
+    name = cell_text(row_get(row, mapping, 'name'))
+    if not company or not name or _name_key(company) == _name_key(name):
+        return None
+    return company
+
+
+def _contact_rows(
+    df: pd.DataFrame, mapping: dict[str, Any]
+) -> dict[str, list[tuple[int, str, pd.Series]]]:
+    """The contact persons' rows by their company's name key: (index, company, row)."""
+    contacts: dict[str, list[tuple[int, str, pd.Series]]] = {}
+    for index, row in df.iterrows():
+        company = _company_of(row, mapping)
+        if company is not None:
+            entry = (int(index), company, row)
+            contacts.setdefault(_name_key(company), []).append(entry)
+    return contacts
+
+
+def _with_contacts(
+    partner_in: PartnerCreate,
+    rows: list[tuple[int, str, pd.Series]],
+    mapping: dict[str, Any],
+) -> PartnerCreate:
+    """The company with its contact persons: the first one as its contact
+    person, and each one's name, e-mail and phone as a line of its notes."""
+    names: list[str] = []
+    lines = [partner_in.notes] if partner_in.notes else []
+    for _, _, row in rows:
+        cells = [
+            cell_text(row_get(row, mapping, key)) for key in ('name', 'email', 'phone')
+        ]
+        names.append(cells[0] or '')
+        lines.append(', '.join(cell for cell in cells if cell))
+    return PartnerCreate.model_validate(
+        partner_in.model_dump(exclude_unset=True)
+        | {
+            'contact_person': partner_in.contact_person or names[0],
+            'notes': '\n'.join(lines),
+        }
+    )
 
 
 async def import_partners(
@@ -123,8 +213,13 @@ async def import_partners(
     assert org_id is not None
 
     imported = 0
+    folded = 0
     errors: list[dict[str, Any]] = []
+    contacts = _contact_rows(df, mapping)
+    contact_indexes = {index for rows in contacts.values() for index, _, _ in rows}
     for index, row in df.iterrows():
+        if index in contact_indexes:
+            continue
         # Data rows from 1, as the preview and every other import number them.
         row_num = int(index) + 1
         partner_in: PartnerCreate | None = None
@@ -141,6 +236,9 @@ async def import_partners(
                         )
                     )
                 known.remember(partner_in.name, partner_in.tax_id)
+                persons = contacts.get(_name_key(partner_in.name), [])
+                if persons:
+                    partner_in = _with_contacts(partner_in, persons, mapping)
                 await partner_service.create_async(db, org_id, partner_in, user.id)
         except Exception as exc:  # noqa: BLE001 — per-row errors are reported so the batch can continue
             if partner_in is not None:
@@ -148,10 +246,20 @@ async def import_partners(
             errors.append({'row': row_num, 'error': explain(exc, mapping)})
             continue
         imported += 1
+        folded += len(contacts.pop(_name_key(partner_in.name), []))
+
+    # What is left belongs to a company this file did not add.
+    for rows in contacts.values():
+        for index, company, _ in rows:
+            reason = get_error_message(
+                'partner_import_company_missing', get_current_lang(), company=company
+            )
+            errors.append({'row': index + 1, 'error': reason})
 
     return {
         'total': len(df),
         'imported': imported,
+        'contacts': folded,
         'failed': len(errors),
-        'errors': errors[:10],
+        'errors': sorted(errors, key=lambda e: e['row'])[:10],
     }

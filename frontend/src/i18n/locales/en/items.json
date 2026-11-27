@@ -151,7 +151,28 @@
       "barcode": "Barcode",
       "purchasePrice": "Purchase price per unit",
       "serialNumber": "Serial number",
-      "labelCode": "Label code"
+      "labelCode": "Label code",
+      "sku": "SKU",
+      "sublocation": "Sublocation",
+      "stockAlert": "Stock alert",
+      "description": "Description"
+    },
+    "reading": {
+      "perLocation": "Read stock from the columns {{columns}}: each one is a location",
+      "noQuantity": {
+        "label": "A file with no quantity column",
+        "products": "Products only",
+        "one": "One of each",
+        "productsNote": "Products are added without stock. Location, category, price, serial number and dates describe stock, so they are not read.",
+        "oneNote": "Every row adds its product to stock with a quantity of 1."
+      },
+      "slash": {
+        "label": "A slash in a location",
+        "hint": "For example “Garage / Workbench”.",
+        "path": "Separates levels",
+        "name": "Part of the name"
+      },
+      "categoryPath": "A category written as a path, such as “All / Saleable / Food”, takes its last step."
     },
     "foundedLocations_one": "{{count}} location created",
     "foundedLocations_other": "{{count}} locations created",

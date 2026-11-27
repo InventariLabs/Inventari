@@ -56,6 +56,7 @@ from app.services.items._grocy_import import (
     plan_grocy_import_async,
 )
 from app.services.items._import import LabelMatch
+from app.services.items._import_locations import LocationSlash
 
 router = APIRouter()
 
@@ -98,6 +99,8 @@ async def import_items(
     create_missing_locations: bool = Form(True),
     create_missing_categories: bool = Form(True),
     on_label_match: LabelMatch = Form('add'),
+    location_slash: LocationSlash = Form('path'),
+    count_as_one: bool = Form(False),
     current_user: UserContextDTO = Depends(get_current_user_context),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
     db: AsyncSession = Depends(get_async_db, scope='function'),
@@ -107,6 +110,11 @@ async def import_items(
     ``on_label_match`` says what a row does when its Label Code names a
     product the organization already has: add it anyway (the default, and
     what the import always did), skip the row, or overwrite the product.
+
+    A sheet whose mapping names no quantity column (nor a ``stock_at:<place>``
+    column per location) adds products without stock; ``count_as_one`` asks
+    for a record of one per row instead. ``location_slash`` says whether a
+    "/" in a location cell divides the levels of a path or belongs to the name.
 
     A sheet of more than ``INLINE_ROW_LIMIT`` rows takes minutes, longer than
     a browser or a proxy waits, so it is answered at once with ``202`` and a
@@ -168,6 +176,8 @@ async def import_items(
                 create_missing_locations=create_missing_locations,
                 create_missing_categories=create_missing_categories,
                 on_label_match=on_label_match,
+                location_slash=location_slash,
+                count_as_one=count_as_one,
             )
     except ValueError as exc:
         raise refusal_exception(exc) from exc
@@ -185,6 +195,8 @@ async def import_items(
         create_missing_locations=create_missing_locations,
         create_missing_categories=create_missing_categories,
         on_label_match=on_label_match,
+        location_slash=location_slash,
+        count_as_one=count_as_one,
     )
     return JSONResponse(
         status_code=202,

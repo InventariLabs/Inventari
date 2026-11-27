@@ -1,10 +1,13 @@
 """Shared UOM resolution helper for import services."""
 
+from typing import get_args
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.public_api import core_api
+from app.i18n._types import Language
+from app.i18n.service import get_unit_label
 
 # Unit aliases normalized during import. Maps common spellings / plural
 # forms / localized seeds onto canonical system symbols. Keys are already
@@ -62,6 +65,11 @@ UOM_ALIASES: dict[str, str] = {
     'pieces': 'pcs',
     'pc': 'pcs',
     'pcs.': 'pcs',
+    'unit': 'pcs',  # Odoo writes "Units" and "Unit(s)"
+    'units': 'pcs',
+    'unit(s)': 'pcs',
+    'ea': 'pcs',  # inFlow
+    'each': 'pcs',
     'szt': 'pcs',  # PL
     'szt.': 'pcs',  # PL
     'sztuka': 'pcs',  # PL
@@ -107,7 +115,8 @@ class UomResolverAsync:
     Resolution order:
       1. exact symbol (case-insensitive, trimmed),
       2. alias map (``UOM_ALIASES``) → canonical symbol,
-      3. ``None`` (unknown unit — caller decides how to surface it).
+      3. the label the app shows the unit under, in any maintained language,
+      4. ``None`` (unknown unit — caller decides how to surface it).
     """
 
     def __init__(self, db: AsyncSession, organization_id: UUID):
@@ -115,6 +124,7 @@ class UomResolverAsync:
         self.organization_id = organization_id
         self._cache: dict[str, UUID] = {}
         self._miss_cache: set[str] = set()
+        self._labels: dict[str, UUID] | None = None
 
     async def resolve(self, symbol: str | None) -> UUID | None:
         if not symbol or not symbol.strip():
@@ -128,8 +138,26 @@ class UomResolverAsync:
         uom = await core_api.uoms.get_by_symbol_async(
             self.db, candidate, self.organization_id
         )
-        if uom:
-            self._cache[normalized] = uom.id
-            return uom.id
-        self._miss_cache.add(normalized)
-        return None
+        found = uom.id if uom else (await self._by_label()).get(normalized)
+        if found is None:
+            self._miss_cache.add(normalized)
+            return None
+        self._cache[normalized] = found
+        return found
+
+    async def _by_label(self) -> dict[str, UUID]:
+        """Unit id by each label the app shows for it, whatever the language.
+
+        A sheet is written in its author's language, not necessarily the
+        importer's. An organization's own unit wins over a system one that
+        shares a label.
+        """
+        if self._labels is None:
+            uoms = await core_api.uoms.list_for_org_async(self.db, self.organization_id)
+            own_last = sorted(uoms, key=lambda u: u.organization_id is not None)
+            self._labels = {
+                get_unit_label(u.symbol, lang).lower().rstrip('.'): u.id
+                for lang in get_args(Language)
+                for u in own_last
+            }
+        return self._labels

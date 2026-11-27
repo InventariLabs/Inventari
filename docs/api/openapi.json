@@ -8780,7 +8780,7 @@
           "Items"
         ],
         "summary": "Import Items",
-        "description": "Imports items based on mapping.\n\n``on_label_match`` says what a row does when its Label Code names a\nproduct the organization already has: add it anyway (the default, and\nwhat the import always did), skip the row, or overwrite the product.\n\nA sheet of more than ``INLINE_ROW_LIMIT`` rows takes minutes, longer than\na browser or a proxy waits, so it is answered at once with ``202`` and a\njob (:class:`ItemImportJobResponse`) that is read at\n``GET /items/import/jobs/{id}``. A shorter one is imported inside the\nrequest and answered with its result.",
+        "description": "Imports items based on mapping.\n\n``on_label_match`` says what a row does when its Label Code names a\nproduct the organization already has: add it anyway (the default, and\nwhat the import always did), skip the row, or overwrite the product.\n\nA sheet whose mapping names no quantity column (nor a ``stock_at:<place>``\ncolumn per location) adds products without stock; ``count_as_one`` asks\nfor a record of one per row instead. ``location_slash`` says whether a\n\"/\" in a location cell divides the levels of a path or belongs to the name.\n\nA sheet of more than ``INLINE_ROW_LIMIT`` rows takes minutes, longer than\na browser or a proxy waits, so it is answered at once with ``202`` and a\njob (:class:`ItemImportJobResponse`) that is read at\n``GET /items/import/jobs/{id}``. A shorter one is imported inside the\nrequest and answered with its result.",
         "operationId": "import_items_api_v1_items_import_post",
         "requestBody": {
           "content": {
@@ -48685,6 +48685,20 @@
             ],
             "title": "On Label Match",
             "default": "add"
+          },
+          "location_slash": {
+            "type": "string",
+            "enum": [
+              "path",
+              "name"
+            ],
+            "title": "Location Slash",
+            "default": "path"
+          },
+          "count_as_one": {
+            "type": "boolean",
+            "title": "Count As One",
+            "default": false
           }
         },
         "type": "object",
@@ -62786,7 +62800,7 @@
           "failed"
         ],
         "title": "ItemImportResponse",
-        "description": "What one import did \u2014 including the org data it founded on the way.\n\nA sheet may name locations and categories the organization does not\nhave yet; with auto-create on, the importer founds them. Their names\ntravel back so the reader learns what the file added beside the\nproducts, instead of finding new tiles in the storage tree later.\n\n``updated`` and ``skipped`` count the rows whose Label Code named a\nproduct the organization already had, under the update mode the reader\nchose; both stay zero when the import only adds.\n\n``joined_existing`` counts the imported rows filed under a product that\nalready existed \u2014 by its barcode, or by its name and brand \u2014 and so added\nstock to it rather than making a new product. A product two rows of one\nsheet make together counts its second row here.\n\nA Grocy database file answers in the same shape, its products and\nbatches standing for rows: ``skipped`` then counts what an earlier run of\nthe file already brought, ``created_suppliers`` the stores it founded,\nand ``left_behind`` what the file holds that the move did not bring. A\nsheet leaves both empty."
+        "description": "What one import did \u2014 including the org data it founded on the way.\n\nA sheet may name locations and categories the organization does not\nhave yet; with auto-create on, the importer founds them. Their names\ntravel back so the reader learns what the file added beside the\nproducts, instead of finding new tiles in the storage tree later.\n\n``updated`` and ``skipped`` count the rows whose Label Code named a\nproduct the organization already had, under the update mode the reader\nchose; both stay zero when the import only adds.\n\nA row of a sheet with a quantity column per location counts once for every\nlocation it puts stock into, in ``total`` as in ``imported``.\n\n``joined_existing`` counts the imported rows filed under a product that\nalready existed \u2014 by its barcode, or by its name and brand \u2014 and so added\nstock to it rather than making a new product. A product two rows of one\nsheet make together counts its second row here.\n\nA Grocy database file answers in the same shape, its products and\nbatches standing for rows: ``skipped`` then counts what an earlier run of\nthe file already brought, ``created_suppliers`` the stores it founded,\nand ``left_behind`` what the file holds that the move did not bring. A\nsheet leaves both empty."
       },
       "ItemListResponse": {
         "properties": {
@@ -72999,6 +73013,11 @@
           "imported": {
             "type": "integer",
             "title": "Imported"
+          },
+          "contacts": {
+            "type": "integer",
+            "title": "Contacts",
+            "default": 0
           },
           "failed": {
             "type": "integer",

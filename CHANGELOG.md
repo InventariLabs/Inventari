@@ -34,6 +34,19 @@ says what the release does rather than what changed since them.
   in service, and overdue is read from the window rather than stored. The
   module needs the equipment register and is switched off on its own; it ships
   in the six maintained languages with demo data and a guide page.
+- Moving in from another tool: the product import suggests the columns of the
+  exports of Odoo (products and stock), Sortly, inFlow, Zoho, Katana, BoxHero
+  and Homebox, and maps the SKU, the description, the stock alert and a
+  sublocation. It finds a product by its SKU, reads Odoo's `[REF] Name`, puts
+  the stock of BoxHero's `Qty(<location>)` columns at each location, reads a
+  location written with slashes as nested locations (or as one name, by the
+  reader's choice), takes the last step of a category path, and knows units
+  such as `Units`, `ea` and `each` and their names in all six languages. A
+  row whose file names no location goes to the oldest real location, never to
+  one of the virtual places. The partner import reads a country by its name
+  and files a contact person's row with the company it belongs to. The
+  export's Read me sheet now says SKU, stock alert and description are read
+  back.
 - Inventari installs with one command, on a server with a domain or on a
   Linux computer at home:
   `curl -fsSL https://github.com/InventariLabs/Inventari/releases/latest/download/install.sh | sh -s -- vps`
@@ -98,6 +111,9 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- A SKU read off the opening-stock sheet is stored trimmed and in upper case,
+  and a code with a character a SKU cannot hold refuses its row, so a product
+  founded from a sheet can be saved in its form.
 - A product's unit weight or volume that is negative, or 100,000,000 and up,
   is refused with a validation error wherever a request writes it: creating a
   product, creating or editing a stock record, and the quick add after a scan.
@@ -466,6 +482,10 @@ says what the release does rather than what changed since them.
 
 ### Changed
 
+- **Breaking** for API clients of `POST /items/import`: a sheet whose mapping
+  names no quantity column adds products without stock instead of one record of
+  each; send `count_as_one=true` to keep a record per row. A "/" in a location
+  cell now reads as a path unless `location_slash=name` is sent.
 - The purchase order template editor's placeholder list says *Supplier name*,
   *Supplier tax ID* and *Supplier address*, as the rest of the screens do.
 - The Equipment & Warehouse profile is teal instead of blue: the application's

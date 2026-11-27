@@ -392,6 +392,7 @@ apart.
 | `HOME_SHELF_RECEIVING` | A receiving area cannot be a home location: goods only wait there. |
 | `IMAGE_UNREADABLE` | This file could not be read as an image |
 | `IMPORT_ASSET_NAME_MISSING` | Missing asset name |
+| `IMPORT_COLUMN_BELOW_ZERO` | Column "{column}": "{value}" is below zero |
 | `IMPORT_COLUMN_CATEGORY_NOT_FOUND` | Column "{column}": category "{value}" not found |
 | `IMPORT_COLUMN_FIELD_REQUIRED` | Column "{column}": the field is required |
 | `IMPORT_COLUMN_FIELD_SHAPE` | Column "{column}": the value does not fit the field the column is mapped to |
@@ -399,8 +400,10 @@ apart.
 | `IMPORT_COLUMN_NOT_A_NUMBER` | Column "{column}": "{value}" is not a number |
 | `IMPORT_COLUMN_NOT_IN_OPTIONS` | Column "{column}": "{value}" is not one of the choices: {options} |
 | `IMPORT_COLUMN_NOT_YES_NO` | Column "{column}": "{value}" is not yes or no |
-| `IMPORT_COLUMN_QUANTITY_BLANK` | Column "{column}": the quantity is empty. Fill it in, or clear the quantity mapping to import every row as 1 |
+| `IMPORT_COLUMN_QUANTITY_BLANK` | Column "{column}": the quantity is empty. Fill it in, or clear the quantity mapping and choose what a file without quantities adds |
 | `IMPORT_COLUMN_REASON` | Column "{column}": {reason} |
+| `IMPORT_COLUMN_SKU_INVALID` | Column "{column}": "{value}" — a SKU may contain only letters, digits, dashes, underscores and slashes |
+| `IMPORT_COLUMN_TOO_LONG` | Column "{column}": the text is longer than {limit} characters |
 | `IMPORT_DATE_INVALID` | Column "{column}": "{value}" is not a date |
 | `IMPORT_FIELD_REQUIRED_NO_COLUMN` | Field "{field}" is required and the sheet has no column for it |
 | `IMPORT_FIELD_REQUIRED_UNREADABLE` | Field "{field}" is required and cannot be read from a cell |

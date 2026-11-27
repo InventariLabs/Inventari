@@ -116,8 +116,12 @@
     "closeAndView": "Fechar e ver parceiros",
     "added_one": "{{count}} parceiro adicionado.",
     "added_other": "{{count}} parceiros adicionados.",
+    "contacts_one": "{{count}} pessoa de contato foi adicionada à sua empresa.",
+    "contacts_other": "{{count}} pessoas de contato foram adicionadas às suas empresas.",
     "defaultType": "Tipo para linhas sem tipo",
     "addOnlyNote": "A importação apenas adiciona parceiros. Uma linha com um parceiro que você já tem — o mesmo nome, com qualquer combinação de maiúsculas e minúsculas, ou o mesmo ID fiscal — é recusada e listada com o motivo.",
+    "contactNote": "Uma linha com uma empresa nesta coluna é uma pessoa de contato: ela vai para essa empresa do mesmo arquivo, como pessoa de contato e como uma linha nas notas.",
+    "companyField": "Empresa da pessoa de contato",
     "analyzeFailed": "Não foi possível ler o arquivo",
     "failed": "Falha na importação"
   },
