@@ -177,5 +177,7 @@ class PartnerImportResponse(BaseModel):
 
     total: int
     imported: int
+    #: Rows that were a company's contact persons and became part of it.
+    contacts: int = 0
     failed: int
     errors: list[dict[str, Any]] = []

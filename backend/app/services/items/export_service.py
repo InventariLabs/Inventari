@@ -303,6 +303,9 @@ _READ_BACK_ON_IMPORT = {
     'Brand': 'brand',
     'Expiry Date': 'expiry date',
     'Freeze Date': 'freeze date',
+    'SKU': 'SKU',
+    'Stock alert': 'stock alert',
+    'Description': 'description',
 }
 _NOT_READ_BECAUSE = {
     'Currency': "the organization's currency applies",

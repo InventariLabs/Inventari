@@ -151,7 +151,28 @@
       "barcode": "Código de barras",
       "purchasePrice": "Preço de compra por unidade",
       "serialNumber": "Número de série",
-      "labelCode": "Código da etiqueta"
+      "labelCode": "Código da etiqueta",
+      "sku": "SKU",
+      "sublocation": "Sublocalização",
+      "stockAlert": "Alerta de estoque",
+      "description": "Descrição"
+    },
+    "reading": {
+      "perLocation": "Ler o estoque das colunas {{columns}}: cada uma é uma localização",
+      "noQuantity": {
+        "label": "Arquivo sem coluna de quantidade",
+        "products": "Apenas produtos",
+        "one": "Um de cada",
+        "productsNote": "Os produtos são adicionados sem estoque. A localização, a categoria, o preço, o número de série e as datas descrevem o estoque, por isso não são lidos.",
+        "oneNote": "Cada linha adiciona seu produto ao estoque com a quantidade 1."
+      },
+      "slash": {
+        "label": "Barra numa localização",
+        "hint": "Por exemplo, «Garagem / Bancada».",
+        "path": "Separa níveis",
+        "name": "Faz parte do nome"
+      },
+      "categoryPath": "De uma categoria escrita como caminho, por exemplo «All / Saleable / Food», é usado o último nível."
     },
     "foundedLocations_one": "{{count}} local criado",
     "foundedLocations_other": "{{count}} locais criados",

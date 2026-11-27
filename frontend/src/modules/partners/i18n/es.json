@@ -114,8 +114,12 @@
     "closeAndView": "Cerrar y ver los socios",
     "added_one": "Se añadió {{count}} socio.",
     "added_other": "Se añadieron {{count}} socios.",
+    "contacts_one": "{{count}} persona de contacto se añadió a su empresa.",
+    "contacts_other": "{{count}} personas de contacto se añadieron a sus empresas.",
     "defaultType": "Tipo para las filas sin tipo",
     "addOnlyNote": "La importación solo añade socios. Una fila con un socio que ya tiene — el mismo nombre en cualquier combinación de mayúsculas o el mismo NIF — se rechaza y se muestra con su motivo.",
+    "contactNote": "Una fila con una empresa en esta columna es una persona de contacto: pasa a esa empresa del mismo archivo, como persona de contacto y como una línea en sus notas.",
+    "companyField": "Empresa de la persona de contacto",
     "analyzeFailed": "No se pudo leer el archivo",
     "failed": "La importación ha fallado"
   },

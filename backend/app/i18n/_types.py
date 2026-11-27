@@ -312,6 +312,9 @@ class ErrorMessages(TypedDict):
     import_field_required_no_column: str
     import_column_field_required: str
     import_column_reason: str
+    import_column_sku_invalid: str
+    import_column_too_long: str
+    import_column_below_zero: str
     import_row_failed: str
     document_lines_quantity_not_positive: str
     document_delivery_lines_reference_items: str
@@ -439,6 +442,7 @@ class ErrorMessages(TypedDict):
     partner_delete_open_purchase_orders_few: NotRequired[str]
     partner_import_name_missing: str
     partner_import_duplicate: str
+    partner_import_company_missing: str
     product_not_found: str
     product_template_not_found: str
     profile_not_found: str

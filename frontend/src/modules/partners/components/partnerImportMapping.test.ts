@@ -48,4 +48,43 @@ describe("suggestPartnerMapping", () => {
       website: "Website",
     });
   });
+
+  it("reads Odoo's contact export, the company a contact belongs to", () => {
+    const mapping = suggestPartnerMapping([
+      "Display Name",
+      "Name",
+      "Is a Company",
+      "Related Company",
+      "Reference",
+      "Tax ID",
+      "Street",
+      "Street2",
+      "City",
+      "Zip",
+      "State",
+      "Country",
+      "Email",
+      "Phone",
+      "Mobile",
+      "Website Link",
+      "Tags",
+      "Notes",
+    ]);
+    expect(
+      Object.fromEntries(Object.entries(mapping).filter(([, value]) => value)),
+    ).toEqual({
+      name: "Name",
+      company: "Related Company",
+      code: "Reference",
+      tax_id: "Tax ID",
+      street: "Street",
+      city: "City",
+      postal_code: "Zip",
+      country: "Country",
+      email: "Email",
+      phone: "Phone",
+      website: "Website Link",
+      notes: "Notes",
+    });
+  });
 });

@@ -124,13 +124,18 @@ async def _log_template_async(
     )
 
 
+#: How a SKU the catalogue drew for a product nobody gave one begins, in an
+#: organization that numbers none of its own.
+PLACEHOLDER_SKU_PREFIX = 'STM-'
+
+
 async def _generate_sku_async(
-    db: AsyncSession, org_id: UUID, prefix: str = 'STM-'
+    db: AsyncSession, org_id: UUID, prefix: str = PLACEHOLDER_SKU_PREFIX
 ) -> str:
     """Generate the org's next SKU, falling back to a random code.
 
-    Single fallback path, so every caller gets the same STM- prefix unless it
-    passes another one.
+    Single fallback path, so every caller gets the same placeholder prefix
+    unless it passes another one.
     """
     sku = await SkuService.generate_next_async(db, org_id)
     if sku:
