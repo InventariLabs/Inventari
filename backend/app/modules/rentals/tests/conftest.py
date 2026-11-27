@@ -143,6 +143,28 @@ def screen(
 
 
 @pytest.fixture
+def racks(
+    db_session: Session,
+    rental_org: Organization,
+    rental_place: StorageLocation,
+    rental_category: Category,
+) -> list[Item]:
+    """Two units of one model: the smallest fleet a promise can leave short."""
+    return [
+        make_asset(
+            db_session,
+            rental_org,
+            rental_place,
+            rental_category,
+            f'Rack 42U #{index}',
+            model='Rack 42U',
+            serial=f'RACK-{index}',
+        )
+        for index in (1, 2)
+    ]
+
+
+@pytest.fixture
 def borrower(
     h: ModuleTestHelper, rental_org: Organization, rental_user: User
 ) -> Partner:

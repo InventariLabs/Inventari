@@ -30,6 +30,7 @@ from app.modules.equipment.equipment_api import EquipmentAssetDTO, equipment_api
 from ._availability import (
     ACTIVE_STATUSES,
     DisplacedBooking,
+    Slot,
     World,
     build_calendar,
     checks_for_lines,
@@ -38,6 +39,7 @@ from ._availability import (
     load_world,
     model_pool,
     organization_today,
+    promise_conflicts,
 )
 from ._blocks import block_schema
 from .exceptions import RentalConflictError
@@ -286,13 +288,22 @@ class LockLine:
 def _line_lock_keys(
     org_id: UUID,
     lines: list[LockLine],
+    assets_by_id: dict[UUID, EquipmentAssetDTO],
     assets_by_model: dict[str | None, list[EquipmentAssetDTO]],
 ) -> list[str]:
-    """Lock every asset and model a line can decide about."""
+    """Lock every asset and model a line can decide about.
+
+    A unit line decides about its model too: taking the last unit free for a
+    model line's whole window breaks that promise, so the model is part of
+    what this write reads and must be held while it does.
+    """
     keys: set[str] = set()
     for line in lines:
         if line.item_id is not None:
             keys.add(f'rentals:item:{org_id}:{line.item_id}')
+            asset = assets_by_id.get(line.item_id)
+            if asset is not None and asset.model:
+                keys.add(f'rentals:model:{org_id}:{asset.model}')
             continue
         keys.add(f'rentals:model:{org_id}:{line.model}')
         for asset in assets_by_model.get(line.model, []):
@@ -304,9 +315,10 @@ async def _lock(
     db: AsyncSession,
     org_id: UUID,
     lines: list[LockLine],
+    assets_by_id: dict[UUID, EquipmentAssetDTO],
     assets_by_model: dict[str | None, list[EquipmentAssetDTO]],
 ) -> None:
-    for key in _line_lock_keys(org_id, lines, assets_by_model):
+    for key in _line_lock_keys(org_id, lines, assets_by_id, assets_by_model):
         await acquire_advisory_lock(db, key)
 
 
@@ -332,20 +344,21 @@ async def create_booking(
     for asset in assets:
         by_model.setdefault(asset.model, []).append(asset)
 
+    for line in data.lines:
+        if line.item_id is not None and line.item_id not in by_id:
+            raise ServiceRejectionError('rental_asset_not_bookable')
+
     # The request's own lines, before any row exists: the lock keys come from
     # what is asked for, not from what was stored.
     await _lock(
         db,
         org_id,
         [LockLine(item_id=line.item_id, model=line.model) for line in data.lines],
+        by_id,
         by_model,
     )
 
-    for line in data.lines:
-        if line.item_id is not None and line.item_id not in by_id:
-            raise ServiceRejectionError('rental_asset_not_bookable')
-
-    world = await load_world(db, org_id, starts_at, ends_at)
+    world = await load_world(db, org_id, starts_at, ends_at, cover_bookings=True)
     checks = checks_for_lines(world, data.lines, starts_at, ends_at)
     if any(not check.ok for check in checks):
         raise RentalConflictError(
@@ -404,12 +417,15 @@ async def check_booking(
     for line in data.lines:
         if line.item_id is not None and line.item_id not in by_id:
             raise ServiceRejectionError('rental_asset_not_bookable')
-    # The way-out search looks further than the window it was asked about.
+    # The way-out search looks further than the window it was asked about,
+    # and a unit line is judged against the whole window of every promise it
+    # could take a unit from.
     world = await load_world(
         db,
         org_id,
         data.starts_at,
         data.ends_at + timedelta(days=60),
+        cover_bookings=True,
     )
     checks = checks_for_lines(
         world,
@@ -512,6 +528,7 @@ async def pickup_booking(
         db,
         org_id,
         [LockLine(item_id=line.item_id, model=line.model) for line in booking.lines],
+        by_id,
         by_model,
     )
 
@@ -521,6 +538,14 @@ async def pickup_booking(
     for item_id in scanned:
         if item_id not in by_id:
             raise ServiceRejectionError('rental_asset_not_bookable')
+
+    # The world is read before the scans are pinned: a unit this pickup
+    # resolves must be free for the booking's window *and* must not be the
+    # last unit another model line is counting on. Reading it after the
+    # write would count this pickup's own units as already busy elsewhere.
+    world = await load_world(
+        db, org_id, booking.starts_at, booking.ends_at, cover_bookings=True
+    )
 
     remaining = list(scanned)
     new_units, missing_count = _assign_scans(db, booking, remaining, by_id)
@@ -535,12 +560,13 @@ async def pickup_booking(
         )
 
     await db.flush()
-    world = await load_world(db, org_id, booking.starts_at, booking.ends_at)
     units_by_id = {unit.id: unit for line in booking.lines for unit in line.units}
     for unit in new_units:
         units_by_id[unit.id] = unit
     units = list(units_by_id.values())
-    blocked = _blocked_units(world, booking, units, by_id)
+    blocked = _blocked_units(
+        world, booking, units, by_id, {unit.id for unit in new_units}
+    )
     if blocked:
         raise RentalConflictError(
             'rental_pickup_asset_taken',
@@ -619,6 +645,7 @@ def _blocked_units(
     booking: RentalBooking,
     units: list[RentalBookingUnit],
     by_id: dict[UUID, EquipmentAssetDTO],
+    resolved: set[UUID],
 ) -> list[dict]:
     blocked: list[dict] = []
     for unit in units:
@@ -629,7 +656,35 @@ def _blocked_units(
             booking.ends_at,
             exclude_booking_id=booking.id,
         )
-        if not conflicts:
+        reasons = [
+            {
+                'kind': slot.kind,
+                'label': slot.label,
+                'starts_at': slot.starts_at.isoformat(),
+                'ends_at': slot.ends_at.isoformat(),
+            }
+            for slot in conflicts
+        ]
+        if unit.id in resolved:
+            # A model line becomes this unit at pickup; taking it must leave
+            # every other model line enough units for its own whole window.
+            reasons.extend(
+                {
+                    'kind': 'model_booking',
+                    'label': displaced.booking.borrower_name,
+                    'starts_at': displaced.booking.starts_at.isoformat(),
+                    'ends_at': displaced.booking.ends_at.isoformat(),
+                    'booking_id': str(displaced.booking.id),
+                }
+                for displaced in promise_conflicts(
+                    world,
+                    unit.item_id,
+                    booking.starts_at,
+                    booking.ends_at,
+                    exclude_booking_id=booking.id,
+                )
+            )
+        if not reasons:
             continue
         asset = by_id.get(unit.item_id)
         blocked.append(
@@ -639,15 +694,7 @@ def _blocked_units(
                 'item_serial_number': (
                     asset.serial_number if asset is not None else None
                 ),
-                'reasons': [
-                    {
-                        'kind': slot.kind,
-                        'label': slot.label,
-                        'starts_at': slot.starts_at.isoformat(),
-                        'ends_at': slot.ends_at.isoformat(),
-                    }
-                    for slot in conflicts
-                ],
+                'reasons': reasons,
             }
         )
     return blocked
@@ -656,7 +703,7 @@ def _blocked_units(
 def _free_units_for_booking(
     world: World, booking: RentalBooking, model: str | None
 ) -> list[EquipmentAssetDTO]:
-    """Units the booking could move to without starving a model-line promise."""
+    """Units the booking could move to without starving another promise."""
     pool = model_pool(
         world,
         model,
@@ -672,6 +719,14 @@ def _free_units_for_booking(
         if asset.id in taken:
             continue
         if item_busy_conflicts(
+            world,
+            asset.id,
+            booking.starts_at,
+            booking.ends_at,
+            exclude_booking_id=booking.id,
+        ):
+            continue
+        if promise_conflicts(
             world,
             asset.id,
             booking.starts_at,
@@ -703,11 +758,12 @@ async def return_booking(
     by_model: dict[str | None, list[EquipmentAssetDTO]] = {}
     for asset in assets:
         by_model.setdefault(asset.model, []).append(asset)
-    # Lock the returned units and every unit a move may touch.
+    # Lock the returned units, the units their models can promise, and every
+    # unit a move may touch.
     lock_lines = [LockLine(item_id=unit.item_id) for unit in booking.units]
     for planned_move in data.moves:
         lock_lines.append(LockLine(item_id=planned_move.to_item_id))
-    await _lock(db, org_id, lock_lines, by_model)
+    await _lock(db, org_id, lock_lines, by_id, by_model)
 
     planning = {unit.unit_id: unit for unit in data.units}
     world = await load_world(
@@ -718,8 +774,11 @@ async def return_booking(
     )
 
     # A unit that goes to service blocks its own time; a block that reaches a
-    # later booking must either move that booking or end before it.
+    # later booking must either move that booking or end before it. The
+    # blocks are part of the world before the moves are planned: a move must
+    # not land on the unit this same return sends to service.
     planned_blocks = _planned_service_blocks(planning, units_by_id, now)
+    _add_planned_service_blocks(world, planned_blocks)
     conflicts, applied_moves = _plan_service_moves(
         booking, world, by_id, planned_blocks, data.moves
     )
@@ -786,6 +845,27 @@ def _planned_service_blocks(
     return planned
 
 
+def _add_planned_service_blocks(
+    world: World,
+    planned_blocks: list[tuple[RentalBookingUnit, datetime, datetime, str]],
+) -> None:
+    """Put the blocks this return would open into the world before moving."
+
+    Without them the same request offers the unit it is about to take out of
+    service as the free unit to move a later booking onto.
+    """
+    for unit, block_start, block_end, reason in planned_blocks:
+        world.slots_by_item.setdefault(unit.item_id, []).append(
+            Slot(
+                kind='block',
+                starts_at=block_start,
+                ends_at=block_end,
+                label=reason,
+                reason=reason,
+            )
+        )
+
+
 def _plan_service_moves(
     booking: RentalBooking,
     world: World,
@@ -831,9 +911,18 @@ def _plan_service_moves(
                     )
                 )
                 continue
-            applied.append(
-                _apply_move(world, by_id, later_booking, later_unit, line, move)
-            )
+            moved = _apply_move(world, by_id, later_booking, later_unit, line, move)
+            if moved is None:
+                # The chosen unit is not free for the later booking once this
+                # return's own blocks are in the world; the sheet is offered
+                # the same conflict again, with no free unit to pick.
+                conflicts.append(
+                    _service_conflict(
+                        world, later_booking, line, unit, by_id, busy_start
+                    )
+                )
+                continue
+            applied.append(moved)
     return conflicts, applied
 
 
@@ -898,7 +987,8 @@ def _apply_move(
     later_unit: RentalBookingUnit,
     line: RentalBookingLine,
     move: MoveIn,
-) -> tuple[RentalBooking, RentalBookingUnit, EquipmentAssetDTO]:
+) -> tuple[RentalBooking, RentalBookingUnit, EquipmentAssetDTO] | None:
+    """Move one pinned unit, or answer ``None`` when the target is not free."""
     target = by_id.get(move.to_item_id)
     if target is None or target.model != by_id[later_unit.item_id].model:
         raise ServiceRejectionError('rental_move_needs_same_model')
@@ -910,11 +1000,40 @@ def _apply_move(
             world, later_booking, by_id[later_unit.item_id].model
         )
     }:
-        raise ServiceRejectionError('rental_move_target_taken')
+        return None
+    _move_booking_slots(world, later_booking.id, later_unit.item_id, target.id)
     later_unit.item_id = target.id
     if line.item_id is not None:
         line.item_id = target.id
     return later_booking, later_unit, target
+
+
+def _move_booking_slots(
+    world: World,
+    booking_id: UUID,
+    from_item_id: UUID,
+    to_item_id: UUID,
+) -> None:
+    """Carry a moved booking's holds across in the planner's world.
+
+    A later block is planned against the world the earlier move changed; a
+    slot left on the old unit would answer for a booking that is no longer
+    there.
+    """
+    moving = [
+        slot
+        for slot in world.slots_by_item.get(from_item_id, [])
+        if slot.booking_id == booking_id
+    ]
+    if not moving:
+        return
+    world.slots_by_item[from_item_id] = [
+        slot
+        for slot in world.slots_by_item.get(from_item_id, [])
+        if slot.booking_id != booking_id
+    ]
+    world.slots_by_item.setdefault(to_item_id, []).extend(moving)
+    world.slots_by_item[to_item_id].sort(key=lambda slot: slot.starts_at)
 
 
 async def _check_in_units(
@@ -1012,7 +1131,12 @@ def _extension_unit_conflicts(
 def _extension_model_conflicts(
     world: World, booking: RentalBooking, ends_at: datetime
 ) -> list[dict]:
-    """What a model line's longer promise runs into."""
+    """What a model line's longer promise runs into.
+
+    The line promises a unit for the whole enlarged window, not only for the
+    tail: a unit free next week is no use if it is taken next month, and the
+    old window's own holds are part of the answer.
+    """
     conflicts: list[dict] = []
     for line in booking.lines:
         if line.model is None or line.unresolved_count <= 0:
@@ -1020,7 +1144,7 @@ def _extension_model_conflicts(
         pool = model_pool(
             world,
             line.model,
-            booking.ends_at,
+            booking.starts_at,
             ends_at,
             exclude_booking_id=booking.id,
         )
@@ -1066,6 +1190,7 @@ async def extend_booking(
         raise ServiceRejectionError('rental_extend_not_later')
 
     assets = await equipment_api.list_bookable_assets_async(db, org_id)
+    by_id = {asset.id: asset for asset in assets}
     by_model: dict[str | None, list[EquipmentAssetDTO]] = {}
     for asset in assets:
         by_model.setdefault(asset.model, []).append(asset)
@@ -1073,10 +1198,13 @@ async def extend_booking(
         db,
         org_id,
         [LockLine(item_id=line.item_id, model=line.model) for line in booking.lines],
+        by_id,
         by_model,
     )
 
-    world = await load_world(db, org_id, booking.starts_at, data.ends_at)
+    world = await load_world(
+        db, org_id, booking.starts_at, data.ends_at, cover_bookings=True
+    )
     assets_by_id = {asset.id: asset for asset in assets}
     conflicts = _extension_unit_conflicts(
         world, booking, data.ends_at, assets_by_id

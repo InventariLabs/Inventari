@@ -369,7 +369,7 @@ async def availability_endpoint(
     db: AsyncSession = Depends(get_async_db, scope='function'),
     org_id: UUID = Depends(require_org),
 ) -> RentalAvailabilityResponse:
-    world = await load_world(db, org_id, starts_at, ends_at)
+    world = await load_world(db, org_id, starts_at, ends_at, cover_bookings=True)
     if item_id is not None:
         asset = world.assets_by_id.get(item_id)
         if asset is None:
@@ -442,7 +442,9 @@ async def nearest_window_endpoint(
         if item_id is not None
         else BookingLineIn(model=model, quantity=quantity)
     )
-    world = await load_world(db, org_id, starts_at, ends_at + timedelta(days=60))
+    world = await load_world(
+        db, org_id, starts_at, ends_at + timedelta(days=60), cover_bookings=True
+    )
     window = nearest_window(world, line, starts_at, ends_at)
     return NearestWindowResponse(
         starts_at=window.starts_at if window else None,

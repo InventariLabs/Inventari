@@ -34,6 +34,19 @@ def _now() -> datetime:
     return datetime.now(UTC)
 
 
+async def _lock_asset_and_model(
+    db: AsyncSession, org_id: UUID, asset: EquipmentAssetDTO
+) -> None:
+    """Hold the unit and the model whose promise the unit can take a part of.
+
+    Acquired in the same order ``service._lock`` uses: the item first, then
+    the model.
+    """
+    await acquire_advisory_lock(db, f'rentals:item:{org_id}:{asset.id}')
+    if asset.model:
+        await acquire_advisory_lock(db, f'rentals:model:{org_id}:{asset.model}')
+
+
 async def _assets_map(db: AsyncSession, org_id: UUID) -> dict[UUID, EquipmentAssetDTO]:
     assets = await equipment_api.list_bookable_assets_async(
         db, org_id, include_retired=True
@@ -63,7 +76,9 @@ async def _blocking_bookings(
     ends_at: datetime,
 ) -> list[dict]:
     """The active bookings a block of this window would take the asset from."""
-    world = await load_world(db, org_id, starts_at, ends_at)
+    # A block on one day can take the last unit a model line promised for the
+    # whole week, so the world covers every booking the block's window touches.
+    world = await load_world(db, org_id, starts_at, ends_at, cover_bookings=True)
     asset = world.assets_by_id.get(item_id)
     if asset is None:
         return []
@@ -159,7 +174,7 @@ async def create_block(
     assets = await _assets_map(db, org_id)
     if data.item_id not in assets:
         raise ServiceRejectionError('rental_asset_not_bookable')
-    await acquire_advisory_lock(db, f'rentals:item:{org_id}:{data.item_id}')
+    await _lock_asset_and_model(db, org_id, assets[data.item_id])
     conflicts = await _blocking_bookings(
         db, org_id, data.item_id, data.starts_at, data.ends_at
     )
@@ -210,7 +225,11 @@ async def update_block(
     user_id: UUID,
 ) -> BlockSchema:
     block = await _require_block(db, org_id, block_id)
-    await acquire_advisory_lock(db, f'rentals:item:{org_id}:{block.item_id}')
+    asset = (await _assets_map(db, org_id)).get(block.item_id)
+    if asset is not None:
+        await _lock_asset_and_model(db, org_id, asset)
+    else:
+        await acquire_advisory_lock(db, f'rentals:item:{org_id}:{block.item_id}')
     conflicts = await _blocking_bookings(
         db, org_id, block.item_id, data.starts_at, data.ends_at
     )
