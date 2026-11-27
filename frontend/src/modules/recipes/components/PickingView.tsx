@@ -108,6 +108,8 @@ export default function PickingView({
       );
     } else if (result.status === "not_in_recipe") {
       toast.error(t("picking.scan_result.not_in_recipe"));
+    } else if (result.status === "not_in_stock") {
+      toast.error(t("picking.scan_result.not_in_stock"));
     } else if (result.status === "already_picked") {
       toast(t("picking.scan_result.already_picked"));
     }

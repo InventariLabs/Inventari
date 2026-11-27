@@ -198,7 +198,7 @@ class UnitMismatch(BaseModel):
 
 class PickingScanResponse(BaseModel):
     # picked | disambiguation_required | not_in_recipe | already_picked
-    # | fefo_mismatch | unit_mismatch
+    # | fefo_mismatch | unit_mismatch | not_in_stock
     status: str
     ingredient_id: UUID | None = None
     ingredient_name: str | None = None

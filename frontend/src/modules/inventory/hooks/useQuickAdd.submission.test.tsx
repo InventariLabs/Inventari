@@ -202,6 +202,42 @@ describe("useQuickAdd — around the save", () => {
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
+  /**
+   * A refusal of one value is a sentence about nothing in a form of a dozen
+   * inputs, so the toast leads with the field's own label.
+   */
+  it("names the weight field when the server refuses its value", async () => {
+    server.use(
+      http.post("/api/v1/items", () =>
+        HttpResponse.json(
+          {
+            detail: [
+              {
+                loc: ["body", "weight_value"],
+                msg: "Must be less than or equal to 99999999",
+                type: "less_than_equal",
+              },
+            ],
+          },
+          { status: 422 },
+        ),
+      ),
+    );
+    const { result } = renderHook(() => useQuickAdd({ onSuccess: vi.fn() }), {
+      wrapper: createWrapper(),
+    });
+
+    fillIn(result);
+    await act(async () => {
+      await result.current.submit();
+    });
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalled());
+    expect(vi.mocked(toast.error).mock.calls[0]?.[0]).toBe(
+      "Weight / volume per piece: Must be less than or equal to 99999999",
+    );
+  });
+
   it("preselects the category a label's purpose names", async () => {
     const { result } = renderHook(
       () => useQuickAdd({ onSuccess: vi.fn(), contextTag: "workshop" }),

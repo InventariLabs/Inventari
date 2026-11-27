@@ -88,10 +88,7 @@ async def resolve_scanned_item_by_barcode(
         order='asc',
     )
     if not candidates:
-        return PickingScanResponse(
-            status='not_in_recipe',
-            message='Product not in stock',
-        )
+        return not_in_stock_response()
     today = await core_api.organizations.today_async(db, org_id)
     if needs_disambiguation(candidates) or open_pack_meets_earlier_sealed(
         candidates, today
@@ -108,7 +105,23 @@ async def resolve_scanned_item_by_barcode(
             status='not_in_recipe',
             message='Product not recognized',
         )
+    if not item.quantity:
+        # Emptied while its lock was waited for. The product's stock is locked
+        # now, so reading again chooses among what is left.
+        return await resolve_scanned_item_by_barcode(db, org_id, barcode)
     return item
+
+
+def not_in_stock_response(
+    ingredient: RecipeIngredient | None = None,
+) -> PickingScanResponse:
+    """Nothing left to take, so nothing is picked."""
+    return PickingScanResponse(
+        status='not_in_stock',
+        ingredient_id=ingredient.id if ingredient else None,
+        ingredient_name=ingredient.name if ingredient else None,
+        message='Product not in stock',
+    )
 
 
 def match_ingredient_or_not_in_recipe(

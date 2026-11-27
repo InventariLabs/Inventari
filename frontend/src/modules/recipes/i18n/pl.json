@@ -217,6 +217,7 @@
     "scan_result": {
       "picked": "Zebrano {{quantity}} {{uom}} składnika {{ingredient}}",
       "not_in_recipe": "Ten produkt nie jest składnikiem tego przepisu",
+      "not_in_stock": "Nic nie pobrano — z tego zapasu nic nie zostało",
       "already_picked": "Już zebrano",
       "disambiguation": "Znaleziono kilka pasujących przedmiotów — wybierz jeden:",
       "candidate_opened": "Otwarte",

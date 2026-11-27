@@ -230,6 +230,65 @@ describe("ItemEditModal", () => {
     });
   });
 
+  it("names the weight field when the server refuses its value", async () => {
+    server.use(
+      http.put("/api/v1/items/:id", () =>
+        HttpResponse.json(
+          {
+            detail: [
+              {
+                loc: ["body", "weight_value"],
+                msg: "Must be less than or equal to 99999999",
+                type: "less_than_equal",
+              },
+            ],
+          },
+          { status: 422 },
+        ),
+      ),
+    );
+    render(<ItemEditModal itemId="1" onClose={vi.fn()} />);
+    await screen.findByDisplayValue("Test Item");
+
+    fireEvent.click(screen.getByRole("button", { name: /Save changes/i }));
+
+    expect(
+      await screen.findByText(
+        "Weight / volume per piece: Must be less than or equal to 99999999",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  /** The Save button submits through a click handler, so the browser's own
+   * range check never runs on it: the form states the range itself. */
+  it("refuses a weight outside the stored range without a request", async () => {
+    const sent = vi.fn();
+    server.use(
+      http.put("/api/v1/items/:id", () => {
+        sent();
+        return HttpResponse.json({});
+      }),
+    );
+    render(<ItemEditModal itemId="1" onClose={vi.fn()} />);
+    await screen.findByDisplayValue("Test Item");
+    const weight = screen.getByRole("spinbutton", {
+      name: "Weight / volume per piece",
+    });
+
+    fireEvent.change(weight, { target: { value: "-5" } });
+    fireEvent.click(screen.getByRole("button", { name: /Save changes/i }));
+    expect(
+      await screen.findByText("Enter a value of at least 0"),
+    ).toBeInTheDocument();
+
+    fireEvent.change(weight, { target: { value: "100000000" } });
+    fireEvent.click(screen.getByRole("button", { name: /Save changes/i }));
+    expect(
+      await screen.findByText("Enter a value of at most 99999999"),
+    ).toBeInTheDocument();
+    expect(sent).not.toHaveBeenCalled();
+  });
+
   /**
    * The Save button must stay on screen however long the form is. That holds
    * only while the footer is a sibling of the scrolling body inside a clipped
