@@ -21,6 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.exceptions import ServiceRejectionError
 from app.core.import_sheet import SheetColumns, cell_text
 from app.core.logging import get_logger
+from app.core.module_sdk import PRICE_MAX
 from app.core.public_api import core_api
 from app.core.uom_resolver import UomResolverAsync
 
@@ -239,6 +240,13 @@ async def _build_document_line(
         _extract_string(row, column_mapping.get('uom_symbol'))
     )
     unit_price = _extract_decimal(row, column_mapping.get('unit_price'), sheet)
+    if unit_price is not None and not 0 <= unit_price <= PRICE_MAX:
+        column = column_mapping.get('unit_price')
+        raise ServiceRejectionError(
+            'import_price_invalid',
+            column=column,
+            value=cell_text(row.get(column)),
+        )
     tax_rate = _extract_decimal(row, column_mapping.get('tax_rate'), sheet)
     batch_number = _extract_string(row, column_mapping.get('batch_number'))
     expiry_date = _extract_date(row, column_mapping.get('expiry_date'), sheet)

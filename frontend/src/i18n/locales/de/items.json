@@ -259,6 +259,7 @@
   "form": {
     "selectUnit": "Einheit auswählen …",
     "unitLabel": "Einheit",
+    "unitLockedByStock": "Die Einheit ist gesperrt, solange Bestand da ist: Eine andere würde die Menge nur umbenennen.",
     "unitEmpty": "Wählen",
     "templateUnitHint": "{{product}} wird in {{unit}} gezählt — dieser Datensatz übernimmt diese Einheit, sofern Sie keine andere wählen.",
     "existingProducts": "Schon in Ihren Produkten:"

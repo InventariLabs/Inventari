@@ -39,6 +39,10 @@
       "name": "Seguimiento de equipos",
       "description": "Realice el seguimiento de activos de TI y físicos con gestión del ciclo de vida."
     },
+    "rentals": {
+      "name": "Alquileres",
+      "description": "Reserva equipos para un periodo, entrégalos y recíbelos de vuelta."
+    },
     "example_widgets": {
       "name": "Widgets de ejemplo",
       "description": "Módulo de referencia que demuestra los patrones de módulos de Inventari: gestione widgets simples con nombre, color y cantidad."

@@ -716,3 +716,90 @@ export function formatPercentLocale(
     maximumFractionDigits: places,
   }).format(n / 100);
 }
+
+/**
+ * `2026-12-01` + `09:00` on the organization's clock → the instant it names.
+ *
+ * The mirror of `formatDateInZone` for a form that asks a day *and* a time:
+ * the value is stored as an instant, and reading the pair in the browser's
+ * zone would move it for every reader east or west of the organization.
+ * The offset is read twice, because the first guess can land on the far side
+ * of a DST edge.
+ */
+export function zonedWallTimeToInstant(
+  dayIso: string,
+  time: string,
+  timeZone: string | undefined,
+): Date {
+  const [year, month, day] = dayIso.split("-").map(Number);
+  const [hour, minute] = time.split(":").map(Number);
+  if (timeZone === undefined) {
+    return new Date(year, (month ?? 1) - 1, day ?? 1, hour ?? 0, minute ?? 0);
+  }
+  const naive = Date.UTC(
+    year,
+    (month ?? 1) - 1,
+    day ?? 1,
+    hour ?? 0,
+    minute ?? 0,
+  );
+  const first = zoneOffsetMs(naive, timeZone);
+  const corrected = zoneOffsetMs(naive - first, timeZone);
+  return new Date(naive - corrected);
+}
+
+/** An instant → the day and time the organization's clock shows. */
+export function instantToZonedWall(
+  instantIso: string,
+  timeZone: string | undefined,
+): { date: string; time: string } {
+  const date = new Date(instantIso);
+  if (timeZone === undefined) {
+    const pad = (value: number) => String(value).padStart(2, "0");
+    return {
+      date: `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`,
+      time: `${pad(date.getHours())}:${pad(date.getMinutes())}`,
+    };
+  }
+  const parts: Record<string, string> = {};
+  for (const part of new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).formatToParts(date)) {
+    parts[part.type] = part.value;
+  }
+  return {
+    date: `${parts.year}-${parts.month}-${parts.day}`,
+    time: `${parts.hour === "24" ? "00" : parts.hour}:${parts.minute}`,
+  };
+}
+
+function zoneOffsetMs(instant: number, timeZone: string): number {
+  const parts: Record<string, string> = {};
+  for (const part of new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  }).formatToParts(new Date(instant))) {
+    parts[part.type] = part.value;
+  }
+  const asUtc = Date.UTC(
+    Number(parts.year),
+    Number(parts.month) - 1,
+    Number(parts.day),
+    Number(parts.hour) % 24,
+    Number(parts.minute),
+    Number(parts.second),
+  );
+  return asUtc - instant;
+}

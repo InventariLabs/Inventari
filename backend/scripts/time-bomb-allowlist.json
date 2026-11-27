@@ -584,6 +584,11 @@
       "path": "frontend/tests/e2e/helpers/api.ts",
       "literal": "2026-12-31",
       "reason": "Audited: the value is stored and read back, sorted, or formatted as data; no code under test compares it with the clock, so the calendar passing it changes nothing."
+    },
+    {
+      "path": "frontend/src/utils/__tests__/formatters.test.ts",
+      "literal": "2026-12-01",
+      "reason": "Audited: the date is what the test is about — the zone's DST transition days and a winter/summer round trip; the formatter's output is asserted, nothing compares the date with the clock."
     }
   ]
 }

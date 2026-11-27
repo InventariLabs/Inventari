@@ -39,6 +39,10 @@
       "name": "Controle de equipamentos",
       "description": "Acompanhe ativos de TI e físicos com gestão do ciclo de vida."
     },
+    "rentals": {
+      "name": "Aluguéis",
+      "description": "Reserve equipamentos para um período, entregue e receba de volta."
+    },
     "example_widgets": {
       "name": "Widgets de exemplo",
       "description": "Módulo de referência que demonstra os padrões de módulos do Inventari: gerencie widgets simples com nome, cor e quantidade."

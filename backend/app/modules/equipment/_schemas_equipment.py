@@ -5,7 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from app.core.module_sdk import RefusedRowsFile
+from app.core.module_sdk import RefusedRowsFile, UnitPrice
 from app.schemas.item import Item
 from app.schemas.pagination import PaginatedResponse
 
@@ -75,7 +75,7 @@ class BulkEquipmentCreate(BaseModel):
     location_id: UUID
     brand: str | None = Field(None, max_length=255)
     description: str | None = None
-    purchase_price: Decimal | None = Field(None, ge=0)
+    purchase_price: UnitPrice | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
     entries: list[BulkEquipmentEntry] = Field(min_length=1, max_length=200)
 

@@ -39,6 +39,10 @@
       "name": "Equipment Tracking",
       "description": "Track IT and physical assets with lifecycle management."
     },
+    "rentals": {
+      "name": "Rentals",
+      "description": "Reserve equipment for a window, hand it out and take it back."
+    },
     "example_widgets": {
       "name": "Example Widgets",
       "description": "Reference module demonstrating Inventari module patterns: manage simple widgets with a name, color, and quantity."

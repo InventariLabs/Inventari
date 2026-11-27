@@ -14,6 +14,26 @@ says what the release does rather than what changed since them.
 
 ### Added
 
+- A Rentals module promises equipment for a window and follows it to the
+  desk and back. A booking names a borrower (a partner, a member, or somebody
+  outside the system with a name and an e-mail), a pickup and a return, and
+  lines of a specific unit or a model with a count; the sheet refuses a line
+  that does not fit, names what is in the way, and offers fewer units or the
+  nearest window of the same length in which enough are free. The calendar
+  groups the fleet by model, draws each unit's reserved, handed-out, late and
+  returned time beside its service blocks and buffer hours, and keeps an
+  "any unit" row for bookings a scan has not resolved yet. Handing out is a
+  scan (or a choice) per unit, and the hand-out is confirmed only when every
+  line is covered. A unit handed out before its booking starts is taken from
+  that moment, so the hand-out is refused if somebody else has it before then,
+  and a booking whose window is over is extended before it is handed out.
+  Taking back records each unit's condition, and a unit that needs service
+  opens a block in the same step, moving a later booking to a free unit of its
+  model when one exists or ending the block before it. Today opens the module
+  with the loans past their window, the day's pickups and returns and what is
+  in service, and overdue is read from the window rather than stored. The
+  module needs the equipment register and is switched off on its own; it ships
+  in the six maintained languages with demo data and a guide page.
 - Moving in from another tool: the product import suggests the columns of the
   exports of Odoo (products and stock), Sortly, inFlow, Zoho, Katana, BoxHero
   and Homebox, and maps the SKU, the description, the stock alert and a
@@ -107,6 +127,10 @@ says what the release does rather than what changed since them.
   `Description` as the notes, gives the places it founds to the equipment
   module, so its location pickers offer them, and its title no longer runs
   under the close button on a phone.
+- When saving a product's edit form is refused — for example a unit changed
+  while the product holds stock — the form scrolls to the sentence that says
+  why and screen readers announce it. It stood above the fields, out of sight
+  of a reader who had scrolled down, so pressing **Save** seemed to do nothing.
 - A SKU read off the opening-stock sheet is stored trimmed and in upper case,
   and a code with a character a SKU cannot hold refuses its row, so a product
   founded from a sheet can be saved in its form.
@@ -128,6 +152,20 @@ says what the release does rather than what changed since them.
   An oversized value no longer ends in a server error. The product forms say
   which field a refused value belongs to, and the weight field states the range
   it accepts and refuses a value outside it before anything is sent.
+- A purchase price that is negative, or 100,000,000 and up, is refused with a
+  validation error when a product is created, edited, scanned in or added as
+  equipment, and when it grows past that ceiling on being restated into the
+  product's unit. An oversized value no longer ends in a server error, and the
+  equipment import names the cell. While a product holds stock, its edit form
+  keeps the unit fixed and says why, and the refusal of a unit change writes
+  the quantity with the reader's decimal mark and unit names.
+- A line of a stock document or a purchase order takes a unit price from 0 to
+  99,999,999.99 — typed, imported, or ordered by another module, which must
+  pass a price in that range. A price outside it is refused when the line is
+  written: an oversized one no longer ends in a server error when the receipt
+  is completed, and a negative one no longer opens a stock record priced below
+  zero. A quantity that grows past what a record keeps on being restated into
+  the product's unit is refused with that limit named, not with a server error.
 - Taking back a recipe pick, or cancelling a cooking session, no longer loses
   what was used from the same record at the same moment, and picking an
   ingredient no longer fails when that record, or a document of the same

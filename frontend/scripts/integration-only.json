@@ -195,6 +195,16 @@
       "expires": "2027-02-28",
       "verdict": "to-wire",
       "reason": "Read, update and delete one storage type. The UI lists storage types to pick one for a location, and has no screen that creates, corrects or deletes a type. Deferred on 2026-11-17: the screen is a board task, and the date is when this entry is read again."
+    },
+    "/api/v1/rentals/availability": {
+      "owner": "maintainers",
+      "verdict": "integration-only",
+      "reason": "Answers \"how many units of this model, or this asset, are free in this window\" for anything that asks it — a dispatch script, an external booking page, another module — without writing a booking. The screens draw the same time as bars on the calendar and as the booking sheet's live check, so no screen needs a second read."
+    },
+    "/api/v1/rentals/availability/nearest": {
+      "owner": "maintainers",
+      "verdict": "integration-only",
+      "reason": "The nearest window of the same length in which an asset or a model is free, for a caller that wants to offer a move without opening the booking sheet. The sheet itself reads the same suggestion from the check it makes while the reader types."
     }
   }
 }
