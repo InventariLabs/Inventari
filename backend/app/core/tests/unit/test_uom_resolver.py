@@ -75,13 +75,17 @@ class TestUomResolverAsync:
     """Resolver behavior with a mocked CoreAPI UOM lookup."""
 
     def _patch_core_api(
-        self, monkeypatch: pytest.MonkeyPatch, return_value: object
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        return_value: object,
+        uoms: list[object] | None = None,
     ) -> AsyncMock:
         import app.core.uom_resolver as mod
 
         api = AsyncMock(return_value=return_value)
         core_api = MagicMock()
         core_api.uoms.get_by_symbol_async = api
+        core_api.uoms.list_for_org_async = AsyncMock(return_value=uoms or [])
         # Through monkeypatch, so it is put back: assigned, the mock stayed
         # for every later test on the worker, and a recipe import there
         # resolved no unit at all.
@@ -113,6 +117,20 @@ class TestUomResolverAsync:
         assert await resolver.resolve('furlong') is None
         assert await resolver.resolve('furlong') is None
         assert api.await_count == 1
+
+    @pytest.mark.asyncio
+    async def test_resolves_a_units_label_in_any_language(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A sheet is written in its author's language, not the importer's:
+        "Packung" and "caja" name the units the app labels that way."""
+        pack = MagicMock(id='uom-pack', symbol='pack', organization_id=None)
+        box = MagicMock(id='uom-box', symbol='box', organization_id=None)
+        self._patch_core_api(monkeypatch, None, uoms=[pack, box])
+        resolver = UomResolverAsync(MagicMock(), _ORG_ID)
+
+        assert await resolver.resolve('Packung') == 'uom-pack'
+        assert await resolver.resolve('caja') == 'uom-box'
 
     @pytest.mark.asyncio
     async def test_empty_symbol_returns_none_without_lookup(

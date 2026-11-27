@@ -8,7 +8,7 @@ same pairs), so nothing is chosen by hand.
 from __future__ import annotations
 
 import json
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from io import BytesIO
 
@@ -24,7 +24,7 @@ from app.core.uom_resolver import UomResolverAsync
 from app.models.category import Category
 from app.models.item import Item
 from app.models.product_template import ProductTemplate
-from app.models.storage_location import StorageLocation
+from app.models.storage_location import LocationUsage, StorageLocation
 from app.services.items._import import import_items
 
 pytestmark = pytest.mark.integration
@@ -435,6 +435,37 @@ class TestEachToolsShapeMovesIn:
         assert seen['description'] == 'Hand saw'
         assert seen['price'] == Decimal('45')
         assert (item.brand, item.serial_number) == ('Bahco', 'SN-77')
+
+
+class TestAFileThatNamesNoShelf:
+    async def test_its_stock_lands_on_a_real_shelf_not_a_virtual_place(
+        self, real_async_db_session, async_test_user, async_test_storage_location
+    ):
+        """A sheet that names no location has nowhere of its own, and the
+        places the app seeds first mean something else: the stock must not
+        arrive already consumed, where the products list cannot show it."""
+        db = real_async_db_session
+        db.add(
+            StorageLocation(
+                name='Consumed (Virtual)',
+                organization_id=async_test_user.organization_id,
+                created_by=async_test_user.id,
+                usage=LocationUsage.CUSTOMER,
+                created_at=datetime.now(UTC) - timedelta(days=1),
+            )
+        )
+        await db.flush()
+
+        result = await _import(
+            db,
+            async_test_user,
+            [{'Item Name': 'Tinned Beans', 'Stock On Hand': '3'}],
+            {'name': 'Item Name', 'quantity': 'Stock On Hand'},
+        )
+
+        assert result['failed'] == 0, result
+        [item] = await _records(db, async_test_user, 'Tinned Beans')
+        assert item.storage_location_id == async_test_storage_location.id
 
 
 class TestAListWithoutQuantities:

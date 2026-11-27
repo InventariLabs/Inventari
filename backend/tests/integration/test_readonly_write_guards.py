@@ -354,11 +354,15 @@ class TestImportSideDoorGuard:
             files={
                 'file': (
                     'sheet.csv',
-                    b'nazwa,kategoria\nBolt,Washers\n',
+                    b'nazwa,kategoria,ilosc\nBolt,Washers,2\n',
                     'text/csv',
                 )
             },
-            data={'mapping_json': '{"name": "nazwa", "category": "kategoria"}'},
+            data={
+                'mapping_json': (
+                    '{"name": "nazwa", "category": "kategoria", "quantity": "ilosc"}'
+                )
+            },
             headers=_auth(user),
         )
         assert resp.status_code == 200, resp.text

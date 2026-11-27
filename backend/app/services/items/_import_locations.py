@@ -17,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.contracts import UserContextDTO
 from app.core.exceptions import ServiceRejectionError
 from app.core.location_path import join_location_path
-from app.models.storage_location import StorageLocation
+from app.models.storage_location import LocationUsage, StorageLocation
 from app.models.storage_type import StorageType
 
 #: A keyboard writes the app's arrow as "->" or ">", and a file written before
@@ -228,10 +228,22 @@ class SheetLocations:
         return found
 
     async def _default(self) -> UUID:
+        """The organization's first real shelf, for a row that names none.
+
+        The virtual places — consumed, loss, production — are seeded before
+        any shelf and sort first by creation, so taking the oldest location
+        outright files the import's stock as already gone: the products list
+        shows only what sits on a real shelf, and the reader's new product
+        would never appear. An organization with no shelf at all has nowhere
+        for stock to go, and the refusal says so.
+        """
         if self.default_id is None:
             self.default_id = await self.db.scalar(
                 select(StorageLocation.id)
-                .where(StorageLocation.organization_id == self.user.organization_id)
+                .where(
+                    StorageLocation.organization_id == self.user.organization_id,
+                    StorageLocation.usage == LocationUsage.INTERNAL,
+                )
                 .order_by(StorageLocation.created_at)
             )
         if self.default_id is None:
