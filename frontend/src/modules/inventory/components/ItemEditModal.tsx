@@ -66,6 +66,27 @@ function useProductTemplate(templateId: string | null | undefined) {
   return { template, isLoadingTemplate };
 }
 
+/** Why the save was refused. Save sits under the scrolling body and the
+ * sentence at the top of it, so each refusal brings it into view: *errors* is
+ * a new object on every one, even when the sentence repeats. */
+function SubmitError({ errors }: { errors: Record<string, string> }) {
+  const banner = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (banner.current) centerInScrollBody(banner.current);
+  }, [errors]);
+  if (!errors.submit) return null;
+  return (
+    <div
+      ref={banner}
+      role="alert"
+      className="flex items-center gap-2 p-3 bg-red-50 text-on-danger dark:bg-red-500/10 rounded-xl text-sm italic"
+    >
+      <AlertCircle size={18} className="shrink-0" />
+      <span>{errors.submit}</span>
+    </div>
+  );
+}
+
 /** The sheet's action row: Close and Save to an account that may change the
  * product, Close alone to one that may only read it. */
 function ItemEditFooter({
@@ -419,12 +440,7 @@ export default function ItemEditModal({
           <form id="edit-item-form" onSubmit={submit} className="p-6 space-y-8">
             <ReadOnlyNotice module="items" />
 
-            {errors.submit && (
-              <div className="flex items-center gap-2 p-3 bg-red-50 text-red-600 rounded-xl text-sm italic">
-                <AlertCircle size={18} />
-                <span>{errors.submit}</span>
-              </div>
-            )}
+            <SubmitError errors={errors} />
 
             {/* One fieldset rather than a `disabled` on every control: the
                 next field added is read-only by having been added. */}
@@ -448,6 +464,8 @@ export default function ItemEditModal({
                 imagePreview={imagePreview}
                 setImagePreview={setImagePreview}
                 readOnly={!canWrite}
+                // The stored quantity, which is what the server judges.
+                unitLocked={Number(item.quantity) > 0}
               />
 
               <StockThresholdSection

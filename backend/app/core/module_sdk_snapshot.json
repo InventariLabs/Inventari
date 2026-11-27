@@ -2000,6 +2000,10 @@
       "kind": "class",
       "members": {}
     },
+    "PRICE_MAX": {
+      "kind": "value",
+      "type": "Decimal"
+    },
     "PaginatedResponse": {
       "bases": [
         "BaseModel",
@@ -2615,6 +2619,10 @@
         }
       }
     },
+    "UnitPrice": {
+      "kind": "value",
+      "type": "_AnnotatedAlias"
+    },
     "UomResolverAsync": {
       "bases": [
         "object"
@@ -3145,6 +3153,26 @@
         {
           "kind": "POSITIONAL_OR_KEYWORD",
           "name": "db",
+          "required": false
+        }
+      ]
+    },
+    "get_error_message": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "key",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "lang",
+          "required": false
+        },
+        {
+          "kind": "VAR_KEYWORD",
+          "name": "kwargs",
           "required": false
         }
       ]

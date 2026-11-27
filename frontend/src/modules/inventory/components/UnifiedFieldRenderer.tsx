@@ -15,6 +15,7 @@ import { getPlaceholder, getLabel } from "./FieldRenderers/helpers";
 import type { TemplateUnitPrompt } from "@/modules/inventory/hooks/useItemForm";
 import { CategoryField } from "./FieldRenderers/CategoryField";
 import { UnitField } from "./FieldRenderers/UnitField";
+import { UnitLockedHint } from "./FieldRenderers/UnitLockedHint";
 import { WeightField } from "./FieldRenderers/WeightField";
 import { TextareaField } from "./FieldRenderers/TextareaField";
 import { DateField } from "./FieldRenderers/DateField";
@@ -43,6 +44,8 @@ interface UnifiedFieldRendererProps {
    * land with, so "a quantity of what" is answered before the save.
    */
   templateUnit?: TemplateUnitPrompt | null;
+  /** The record holds stock: the unit picker is disabled and says why. */
+  unitLocked?: boolean;
 }
 
 /**
@@ -78,6 +81,7 @@ export default function UnifiedFieldRenderer({
   onAddCategory,
   onConfigureCategoryFields,
   templateUnit = null,
+  unitLocked,
 }: UnifiedFieldRendererProps) {
   const { t } = useTranslation(["items", "common", "categories"]);
   const tDyn = makeTDynamic(t);
@@ -178,6 +182,7 @@ export default function UnifiedFieldRenderer({
         <UnitField
           uomId={fdUomId}
           error={errors[field.key]}
+          locked={unitLocked}
           onChange={(uomId, uom) => {
             onChange("uom_id", uomId, false);
             if (onUomChange) onUomChange(uomId, uom);
@@ -347,12 +352,12 @@ export default function UnifiedFieldRenderer({
                   />
                 </div>
                 <div className="w-28 self-stretch">
-                  {/* UomSelect for grouped unit picker */}
                   <UomSelect
                     compact
                     value={fdUomId || null}
                     // The save files a product with no unit as pieces.
                     unitWhenUnset="pcs"
+                    disabled={unitLocked}
                     onChange={(uomId, uom) => {
                       onChange("uom_id", uomId, false);
                       if (onUomChange) onUomChange(uomId, uom);
@@ -375,6 +380,7 @@ export default function UnifiedFieldRenderer({
                   })}
                 </p>
               )}
+              {unitLocked && <UnitLockedHint />}
               {errors.quantity && (
                 <p className="text-xs text-red-600 font-medium ml-1">
                   {errors.quantity}

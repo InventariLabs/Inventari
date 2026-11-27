@@ -157,6 +157,19 @@ export const MODULE_PATHS: Readonly<Record<string, ModulePaths>> = {
       "/recipes/meal-planner/:id",
     ],
   },
+  rentals: {
+    basePath: "/rentals",
+    paths: [
+      "/rentals",
+      "/rentals/calendar",
+      "/rentals/bookings",
+      "/rentals/bookings/new",
+      "/rentals/bookings/:id",
+      "/rentals/bookings/:id/pickup",
+      "/rentals/blocks",
+      "/rentals/guide",
+    ],
+  },
   shopping_lists: {
     basePath: "/shopping-lists",
     paths: ["/shopping-lists", "/shopping-lists/:id"],

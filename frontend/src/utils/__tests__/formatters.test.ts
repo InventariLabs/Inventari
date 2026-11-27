@@ -13,6 +13,8 @@ import {
   formatDecimalQty,
   getTodayFilename,
   todayIso,
+  zonedWallTimeToInstant,
+  instantToZonedWall,
 } from "../formatters";
 
 describe("formatMoney — locale-aware currency", () => {
@@ -382,5 +384,57 @@ describe("formatDecimalQty", () => {
     expect(formatDecimalQty(undefined)).toBe("");
     expect(formatDecimalQty("")).toBe("");
     expect(formatDecimalQty("n/a")).toBe("n/a");
+  });
+});
+
+describe("zoned wall time — the organization's clock", () => {
+  it("reads a day and a time in the organization's zone", () => {
+    expect(
+      zonedWallTimeToInstant(
+        "2026-12-01",
+        "09:00",
+        "Europe/Warsaw",
+      ).toISOString(),
+    ).toBe("2026-12-01T08:00:00.000Z");
+  });
+
+  it("follows the zone across both sides of a DST change", () => {
+    // Warsaw moves to summer time at 02:00 on 29 March 2026 and back at
+    // 03:00 on 25 October: the same wall time is a different instant.
+    expect(
+      zonedWallTimeToInstant(
+        "2026-03-29",
+        "09:00",
+        "Europe/Warsaw",
+      ).toISOString(),
+    ).toBe("2026-03-29T07:00:00.000Z");
+    expect(
+      zonedWallTimeToInstant(
+        "2026-10-25",
+        "09:00",
+        "Europe/Warsaw",
+      ).toISOString(),
+    ).toBe("2026-10-25T08:00:00.000Z");
+  });
+
+  it("reads an instant back as the day and time its zone shows", () => {
+    expect(instantToZonedWall("2026-12-01T08:00:00Z", "Europe/Warsaw")).toEqual(
+      { date: "2026-12-01", time: "09:00" },
+    );
+    expect(instantToZonedWall("2026-12-01T00:30:00Z", "Europe/Warsaw")).toEqual(
+      { date: "2026-12-01", time: "01:30" },
+    );
+  });
+
+  it("round-trips a winter and a summer date", () => {
+    for (const day of ["2026-12-01", "2026-07-01"]) {
+      const instant = zonedWallTimeToInstant(day, "16:00", "Europe/Warsaw");
+      expect(
+        instantToZonedWall(instant.toISOString(), "Europe/Warsaw"),
+      ).toEqual({
+        date: day,
+        time: "16:00",
+      });
+    }
   });
 });

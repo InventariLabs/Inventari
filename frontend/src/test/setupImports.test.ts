@@ -5,10 +5,15 @@
  * `src/test/` only; a test that needs a part of the application imports it
  * itself.
  *
- * Imports, re-exports and literal dynamic imports are followed. A glob is not,
- * so every `import.meta.glob` fails, with one named exception: the
- * translation-catalog glob of `src/test/mocks/i18n.ts` (one call for the core
- * catalogs, one for the modules'), which loads every catalog on purpose.
+ * Imports, re-exports and dynamic imports of a literal are followed, and so
+ * are the targets of `vi.importActual`, `vi.unmock` and `vi.doUnmock`, which
+ * Vitest relates like imports (`vitest.` is the same object as `vi.`). Three
+ * forms fail whatever they name, because the source text does not settle what
+ * they reach: a template with an interpolation; a `vi.mock` without an inline
+ * factory, which Vitest may redirect to a `__mocks__` file; and every
+ * `import.meta.glob`, with one named exception: the translation-catalog glob
+ * of `src/test/mocks/i18n.ts` (one call for the core catalogs, one for the
+ * modules'), which loads every catalog on purpose.
  */
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -18,11 +23,19 @@ const TEST_DIR = resolve(import.meta.dirname);
 const SRC_DIR = resolve(TEST_DIR, "..");
 
 /**
- * Static imports, re-exports and literal dynamic imports; `import type` and
+ * Static imports and re-exports, then dynamic imports and the `vi` calls that
+ * load the real module, whose literal may be a template. `import type` and
  * `export type` bring no module in.
  */
 const IMPORT =
-  /^(?:import\s+(?!type\b)(?:[^"';]*?\sfrom\s+)?|export\s+(?=[*{])[^"';]*?\sfrom\s+)["']([^"']+)["']|(?<!typeof )\bimport\(\s*["']([^"']+)["']/gm;
+  /^(?:import\s+(?!type\b)(?:[^"';]*?\sfrom\s+)?|export\s+(?=[*{])[^"';]*?\sfrom\s+)["']([^"']+)["']|(?:(?<!typeof )\bimport|\bvi(?:test)?\s*\.\s*(?:importActual|unmock|doUnmock)(?:<[\s\S]*?>)?)\(\s*["'`]([^"'`]+)["'`]/gm;
+
+/**
+ * A `vi.mock` whose module is not followed by a function written in the call:
+ * nothing, an options object, or a name Vitest does not look into.
+ */
+const MOCK_WITHOUT_FACTORY =
+  /\bvi(?:test)?\s*\.\s*mock(?:<[\s\S]*?>)?\(\s*(?:(?:await\s+)?import\(\s*["'`]([^"'`]+)["'`]\s*\)|["'`]([^"'`]+)["'`])(?!\s*,\s*(?:async\b\s*)?(?:\(|function\b|[\w$]+\s*=>))/g;
 
 /** Every glob; the pattern is captured when the call opens with one string. */
 const GLOB = /\bimport\.meta\.glob\b(?:<[^(]*>)?(?:\(\s*["']([^"']+)["'])?/g;
@@ -55,6 +68,10 @@ function reachedBy(file: string, source: string) {
   for (const match of source.matchAll(IMPORT)) {
     const specifier = match[1] ?? match[2];
     let base: string;
+    if (specifier.includes("${")) {
+      leaving.push(`${from} -> ${specifier}`);
+      continue;
+    }
     if (specifier.startsWith(".")) base = resolve(dirname(file), specifier);
     else if (specifier.startsWith("@/"))
       base = resolve(SRC_DIR, specifier.slice(2));
@@ -62,6 +79,10 @@ function reachedBy(file: string, source: string) {
     if (base.startsWith(`${TEST_DIR}/`)) within.push(base);
     else leaving.push(`${from} -> ${specifier}`);
   }
+  for (const [, imported, literal] of source.matchAll(MOCK_WITHOUT_FACTORY))
+    leaving.push(
+      `${from} -> vi.mock(${imported ?? literal}) without an inline factory`,
+    );
   for (const [, pattern = "no single string"] of source.matchAll(GLOB)) {
     const glob = `${from} -> import.meta.glob(${pattern})`;
     if (!CATALOG_GLOBS.includes(glob)) leaving.push(glob);
@@ -99,6 +120,22 @@ describe("the test setup's imports", () => {
     'import.meta.glob<Record<string, unknown>>(\n  "@/modules/*/module.ts",\n);',
     'import.meta.glob(["../../modules/*/module.ts"]);',
     'import.meta.glob("../../i18n/locales/*/*.json");',
+    "await import(`../../modules/stats/module`);",
+    "await import(`../../modules/${name}/module.ts`);",
+    "await import(`./${name}`);",
+    "await import(`${directory}/module`);",
+    'await vi.importActual("../../modules/stats/module");',
+    'await vi.importActual<typeof import("@/modules/stats/module")>(\n  "@/modules/stats/module",\n);',
+    'vi.unmock("../../modules/stats/module");',
+    "vi.doUnmock(`@/modules/stats/module`);",
+    'vi.mock("../../modules/stats/module");',
+    'vi.mock("@/modules/stats/module", { spy: true });',
+    'vi.mock(import("sonner"));',
+    'vi.mock(\n  "sonner",\n);',
+    'vi.mock(await import("sonner"));',
+    'vi.mock("@/modules/stats/module", statsFactory);',
+    'await vitest.importActual("../../modules/stats/module");',
+    'vitest.mock("sonner");',
   ])("are seen leaving it in %j", (source) => {
     expect(reachedBy(mock, source).leaving).toHaveLength(1);
   });
@@ -111,16 +148,28 @@ describe("the test setup's imports", () => {
     expect(reachedBy(i18n, modules).leaving).toHaveLength(1);
   });
 
-  it("are followed through a re-export that stays inside", () => {
-    expect(reachedBy(mock, 'export * from "./server";').within).toEqual([
-      resolve(TEST_DIR, "mocks/server"),
-    ]);
+  it.each([
+    'export * from "./server";',
+    "await import(`./server`);",
+    'await vi.importActual("./server");',
+    'vi.unmock("./server");',
+  ])("are followed when they stay inside, as in %j", (source) => {
+    expect(reachedBy(mock, source)).toEqual({
+      leaving: [],
+      within: [resolve(TEST_DIR, "mocks/server")],
+    });
   });
 
   it.each([
     'export type * from "../../modules/stats/module";',
     'export type { Stats } from "../../modules/stats/module";',
     'export const from = "../../modules/stats/module";',
+    "type Stats = typeof import(`../../modules/stats/module`);",
+    'await vi.importActual("sonner");',
+    'vi.mock("../../modules/stats/module", () => ({}));',
+    'vi.mock(import("sonner"), async (original) => original());',
+    'vi.mock("sonner", async original => original());',
+    'vi.mock("sonner", function () {\n  return {};\n});',
   ])("take nothing in from %j", (source) => {
     expect(reachedBy(mock, source)).toEqual({ leaving: [], within: [] });
   });

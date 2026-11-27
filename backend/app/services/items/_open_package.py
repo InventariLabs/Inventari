@@ -112,10 +112,13 @@ async def _split_one_unit_async(
             expiry_date=item.expiry_date,
             shelf_location=item.shelf_location,
             metadata=_with_opening(item.meta_data, when),
-            purchase_price=item.purchase_price,
             currency=item.currency,
             image_url=item.image_url,
             added_date=item.added_date,
+        ).model_copy(
+            # A stored price is carried as it is: the schema's bounds are for
+            # a price a request names.
+            update={'purchase_price': item.purchase_price}
         ),
         user,
         # The unit was already here: the record's birth says so, and a report

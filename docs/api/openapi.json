@@ -27205,6 +27205,1317 @@
         }
       }
     },
+    "/api/v1/rentals/assets": {
+      "get": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "List Assets Endpoint",
+        "operationId": "list_assets_endpoint_api_v1_rentals_assets_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssetOption"
+                  },
+                  "title": "Response List Assets Endpoint Api V1 Rentals Assets Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rentals/availability": {
+      "get": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Availability Endpoint",
+        "operationId": "availability_endpoint_api_v1_rentals_availability_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "starts_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Starts At"
+            }
+          },
+          {
+            "name": "ends_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Ends At"
+            }
+          },
+          {
+            "name": "item_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Item Id"
+            }
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Model"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RentalAvailabilityResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rentals/availability/nearest": {
+      "get": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Nearest Window Endpoint",
+        "operationId": "nearest_window_endpoint_api_v1_rentals_availability_nearest_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "starts_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Starts At"
+            }
+          },
+          {
+            "name": "ends_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Ends At"
+            }
+          },
+          {
+            "name": "item_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Item Id"
+            }
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Model"
+            }
+          },
+          {
+            "name": "quantity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 999,
+              "minimum": 1,
+              "default": 1,
+              "title": "Quantity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NearestWindowResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rentals/blocks": {
+      "get": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "List Blocks Endpoint",
+        "operationId": "list_blocks_endpoint_api_v1_rentals_blocks_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Item Id"
+            }
+          },
+          {
+            "name": "active_only",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Active Only"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_BlockSchema_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Create Block Endpoint",
+        "operationId": "create_block_endpoint_api_v1_rentals_blocks_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlockCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlockSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rentals/blocks/{block_id}": {
+      "patch": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Update Block Endpoint",
+        "operationId": "update_block_endpoint_api_v1_rentals_blocks__block_id__patch",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "block_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Block Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlockUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlockSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Delete Block Endpoint",
+        "operationId": "delete_block_endpoint_api_v1_rentals_blocks__block_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "block_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Block Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rentals/bookings": {
+      "get": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "List Bookings Endpoint",
+        "operationId": "list_bookings_endpoint_api_v1_rentals_bookings_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_BookingListRow_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Create Booking Endpoint",
+        "operationId": "create_booking_endpoint_api_v1_rentals_bookings_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rentals/bookings/check": {
+      "post": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Check Booking Endpoint",
+        "operationId": "check_booking_endpoint_api_v1_rentals_bookings_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingCheckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingCheckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/v1/rentals/bookings/{booking_id}": {
+      "get": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Get Booking Endpoint",
+        "operationId": "get_booking_endpoint_api_v1_rentals_bookings__booking_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Booking Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rentals/bookings/{booking_id}/cancel": {
+      "post": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Cancel Booking Endpoint",
+        "operationId": "cancel_booking_endpoint_api_v1_rentals_bookings__booking_id__cancel_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Booking Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rentals/bookings/{booking_id}/extend": {
+      "post": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Extend Booking Endpoint",
+        "operationId": "extend_booking_endpoint_api_v1_rentals_bookings__booking_id__extend_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Booking Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExtendRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rentals/bookings/{booking_id}/pickup": {
+      "post": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Pickup Booking Endpoint",
+        "operationId": "pickup_booking_endpoint_api_v1_rentals_bookings__booking_id__pickup_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Booking Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PickupRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rentals/bookings/{booking_id}/return": {
+      "post": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Return Booking Endpoint",
+        "operationId": "return_booking_endpoint_api_v1_rentals_bookings__booking_id__return_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Booking Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReturnRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rentals/buffer-rules": {
+      "get": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "List Buffer Rules Endpoint",
+        "operationId": "list_buffer_rules_endpoint_api_v1_rentals_buffer_rules_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BufferRuleSchema"
+                  },
+                  "type": "array",
+                  "title": "Response List Buffer Rules Endpoint Api V1 Rentals Buffer Rules Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Set Buffer Rule Endpoint",
+        "operationId": "set_buffer_rule_endpoint_api_v1_rentals_buffer_rules_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BufferRuleIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BufferRuleSchema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/v1/rentals/buffer-rules/{rule_id}": {
+      "delete": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Delete Buffer Rule Endpoint",
+        "operationId": "delete_buffer_rule_endpoint_api_v1_rentals_buffer_rules__rule_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "rule_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Rule Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rentals/calendar": {
+      "get": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Calendar Endpoint",
+        "operationId": "calendar_endpoint_api_v1_rentals_calendar_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "starts_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Starts At"
+            }
+          },
+          {
+            "name": "ends_at",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Ends At"
+            }
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Model"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rentals/categories": {
+      "get": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "List Categories Endpoint",
+        "operationId": "list_categories_endpoint_api_v1_rentals_categories_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryOption"
+                  },
+                  "type": "array",
+                  "title": "Response List Categories Endpoint Api V1 Rentals Categories Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/v1/rentals/models": {
+      "get": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "List Models Endpoint",
+        "operationId": "list_models_endpoint_api_v1_rentals_models_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModelOption"
+                  },
+                  "type": "array",
+                  "title": "Response List Models Endpoint Api V1 Rentals Models Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/v1/rentals/today": {
+      "get": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Today Endpoint",
+        "operationId": "today_endpoint_api_v1_rentals_today_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodayResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/v1/roles": {
       "get": {
         "tags": [
@@ -44684,6 +45995,108 @@
         "title": "AssetFilter",
         "description": "The asset list's filters, as the scope of a bulk action.\n\nThe filters ``GET /equipment/assets`` takes, so \"everything\nthat matches\" means exactly what the reader is looking at."
       },
+      "AssetOption": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "category_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Id"
+          },
+          "category_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Code"
+          },
+          "category_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Name"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "serial_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Serial Number"
+          },
+          "asset_tag": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asset Tag"
+          },
+          "barcode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Barcode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "status"
+        ],
+        "title": "AssetOption"
+      },
       "AssetTimelineEvent": {
         "properties": {
           "kind": {
@@ -46469,6 +47882,168 @@
         ],
         "title": "BestItemSchema"
       },
+      "BlockCreate": {
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Item Id"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "item_id",
+          "starts_at",
+          "ends_at",
+          "reason"
+        ],
+        "title": "BlockCreate"
+      },
+      "BlockSchema": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "item_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Item Id"
+          },
+          "item_name": {
+            "type": "string",
+            "title": "Item Name"
+          },
+          "item_serial_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Serial Number"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "MANUAL",
+              "SERVICE"
+            ],
+            "title": "Source"
+          },
+          "booking_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Booking Id"
+          },
+          "borrower_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Borrower Name"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "item_id",
+          "item_name",
+          "starts_at",
+          "ends_at",
+          "reason",
+          "source",
+          "created_at"
+        ],
+        "title": "BlockSchema"
+      },
+      "BlockUpdate": {
+        "properties": {
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "starts_at",
+          "ends_at",
+          "reason"
+        ],
+        "title": "BlockUpdate"
+      },
       "BoMLineCreateForRecipe": {
         "properties": {
           "child_template_id": {
@@ -47514,6 +49089,557 @@
         "title": "BomTreeResponse",
         "description": "Output for GET /bom/tree/{template_id} \u2014 full hierarchy under parent."
       },
+      "BookingCheckRequest": {
+        "properties": {
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/BookingLineIn"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Lines"
+          },
+          "booking_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Booking Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "starts_at",
+          "ends_at",
+          "lines"
+        ],
+        "title": "BookingCheckRequest"
+      },
+      "BookingCheckResponse": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/LineCheck"
+            },
+            "type": "array",
+            "title": "Lines"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ok",
+          "lines"
+        ],
+        "title": "BookingCheckResponse"
+      },
+      "BookingCreate": {
+        "properties": {
+          "borrower_partner_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Borrower Partner Id"
+          },
+          "borrower_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Borrower User Id"
+          },
+          "borrower_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Borrower Name"
+          },
+          "borrower_email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Borrower Email"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/BookingLineIn"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Lines"
+          }
+        },
+        "type": "object",
+        "required": [
+          "starts_at",
+          "ends_at",
+          "lines"
+        ],
+        "title": "BookingCreate"
+      },
+      "BookingLineIn": {
+        "properties": {
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "quantity": {
+            "type": "integer",
+            "maximum": 999.0,
+            "minimum": 1.0,
+            "title": "Quantity",
+            "default": 1
+          }
+        },
+        "type": "object",
+        "title": "BookingLineIn",
+        "description": "One thing a booking asks for: an asset, or a model and a count."
+      },
+      "BookingListRow": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "RESERVED",
+              "PICKED_UP",
+              "RETURNED",
+              "CANCELLED"
+            ],
+            "title": "Status"
+          },
+          "is_late": {
+            "type": "boolean",
+            "title": "Is Late"
+          },
+          "late_days": {
+            "type": "integer",
+            "title": "Late Days"
+          },
+          "borrower_name": {
+            "type": "string",
+            "title": "Borrower Name"
+          },
+          "borrower_kind": {
+            "type": "string",
+            "enum": [
+              "partner",
+              "user",
+              "external"
+            ],
+            "title": "Borrower Kind"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "units_count": {
+            "type": "integer",
+            "title": "Units Count"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "is_late",
+          "late_days",
+          "borrower_name",
+          "borrower_kind",
+          "starts_at",
+          "ends_at",
+          "units_count",
+          "summary"
+        ],
+        "title": "BookingListRow"
+      },
+      "BookingSchema": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "RESERVED",
+              "PICKED_UP",
+              "RETURNED",
+              "CANCELLED"
+            ],
+            "title": "Status"
+          },
+          "is_late": {
+            "type": "boolean",
+            "title": "Is Late"
+          },
+          "late_days": {
+            "type": "integer",
+            "title": "Late Days"
+          },
+          "borrower_kind": {
+            "type": "string",
+            "enum": [
+              "partner",
+              "user",
+              "external"
+            ],
+            "title": "Borrower Kind"
+          },
+          "borrower_partner_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Borrower Partner Id"
+          },
+          "borrower_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Borrower User Id"
+          },
+          "borrower_name": {
+            "type": "string",
+            "title": "Borrower Name"
+          },
+          "borrower_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Borrower Email"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/LineSchema"
+            },
+            "type": "array",
+            "title": "Lines"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "created_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By Name"
+          },
+          "can_pickup": {
+            "type": "boolean",
+            "title": "Can Pickup"
+          },
+          "can_return": {
+            "type": "boolean",
+            "title": "Can Return"
+          },
+          "can_cancel": {
+            "type": "boolean",
+            "title": "Can Cancel"
+          },
+          "can_extend": {
+            "type": "boolean",
+            "title": "Can Extend"
+          },
+          "handed_out_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handed Out At"
+          },
+          "returned_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Returned At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "is_late",
+          "late_days",
+          "borrower_kind",
+          "borrower_name",
+          "starts_at",
+          "ends_at",
+          "lines",
+          "created_at",
+          "can_pickup",
+          "can_return",
+          "can_cancel",
+          "can_extend"
+        ],
+        "title": "BookingSchema"
+      },
+      "BufferRuleIn": {
+        "properties": {
+          "model": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "category_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Id"
+          },
+          "hours_before": {
+            "type": "integer",
+            "maximum": 336.0,
+            "minimum": 0.0,
+            "title": "Hours Before",
+            "default": 0
+          },
+          "hours_after": {
+            "type": "integer",
+            "maximum": 336.0,
+            "minimum": 0.0,
+            "title": "Hours After",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "BufferRuleIn"
+      },
+      "BufferRuleSchema": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "category_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Id"
+          },
+          "category_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Code"
+          },
+          "category_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Name"
+          },
+          "hours_before": {
+            "type": "integer",
+            "title": "Hours Before"
+          },
+          "hours_after": {
+            "type": "integer",
+            "title": "Hours After"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "hours_before",
+          "hours_after"
+        ],
+        "title": "BufferRuleSchema"
+      },
       "BuiltInTemplate": {
         "properties": {
           "name": {
@@ -47760,6 +49886,7 @@
             "anyOf": [
               {
                 "type": "number",
+                "maximum": 99999999.99,
                 "minimum": 0.0
               },
               {
@@ -48086,6 +50213,67 @@
         ],
         "title": "BulkUpdateResponse"
       },
+      "BusyInterval": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "reserved",
+              "out",
+              "late",
+              "returned",
+              "block",
+              "buffer"
+            ],
+            "title": "Kind"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "booking_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Booking Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "starts_at",
+          "ends_at",
+          "label"
+        ],
+        "title": "BusyInterval"
+      },
       "ByCategory": {
         "properties": {
           "category_name": {
@@ -48103,6 +50291,223 @@
           "count"
         ],
         "title": "ByCategory"
+      },
+      "CalendarAnyUnit": {
+        "properties": {
+          "booking_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Booking Id"
+          },
+          "borrower_name": {
+            "type": "string",
+            "title": "Borrower Name"
+          },
+          "quantity": {
+            "type": "integer",
+            "title": "Quantity"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "booking_id",
+          "borrower_name",
+          "quantity",
+          "starts_at",
+          "ends_at",
+          "status"
+        ],
+        "title": "CalendarAnyUnit"
+      },
+      "CalendarBar": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "reserved",
+              "out",
+              "late",
+              "returned",
+              "block",
+              "buffer"
+            ],
+            "title": "Kind"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "booking_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Booking Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "label",
+          "starts_at",
+          "ends_at"
+        ],
+        "title": "CalendarBar"
+      },
+      "CalendarGroup": {
+        "properties": {
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "total_units": {
+            "type": "integer",
+            "title": "Total Units"
+          },
+          "service_units": {
+            "type": "integer",
+            "title": "Service Units"
+          },
+          "units": {
+            "items": {
+              "$ref": "#/components/schemas/CalendarUnit"
+            },
+            "type": "array",
+            "title": "Units"
+          },
+          "any_unit": {
+            "items": {
+              "$ref": "#/components/schemas/CalendarAnyUnit"
+            },
+            "type": "array",
+            "title": "Any Unit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_units",
+          "service_units",
+          "units",
+          "any_unit"
+        ],
+        "title": "CalendarGroup"
+      },
+      "CalendarResponse": {
+        "properties": {
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/CalendarGroup"
+            },
+            "type": "array",
+            "title": "Groups"
+          }
+        },
+        "type": "object",
+        "required": [
+          "starts_at",
+          "ends_at",
+          "groups"
+        ],
+        "title": "CalendarResponse"
+      },
+      "CalendarUnit": {
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Item Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "serial_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Serial Number"
+          },
+          "asset_tag": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asset Tag"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "bars": {
+            "items": {
+              "$ref": "#/components/schemas/CalendarBar"
+            },
+            "type": "array",
+            "title": "Bars"
+          }
+        },
+        "type": "object",
+        "required": [
+          "item_id",
+          "name",
+          "status"
+        ],
+        "title": "CalendarUnit"
       },
       "CampaignCreate": {
         "properties": {
@@ -49481,6 +51886,36 @@
         ],
         "title": "CategoryGroupRenameResult"
       },
+      "CategoryOption": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "CategoryOption"
+      },
       "CategoryRotation": {
         "properties": {
           "category_name": {
@@ -49846,6 +52281,106 @@
         ],
         "title": "ClosedLocation",
         "description": "A shelf the counter closed, and who closed it.\n\n``empty`` says nothing was on it \u2014 no row, or every row counted as none \u2014\nwhich is how a shelf found empty is confirmed as counted."
+      },
+      "ConflictDetail": {
+        "properties": {
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "item_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Name"
+          },
+          "item_serial_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Serial Number"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "starts_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends At"
+          },
+          "booking_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Booking Id"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "label"
+        ],
+        "title": "ConflictDetail",
+        "description": "What stands in the way of a line, said unit by unit."
       },
       "ConsumptionStats": {
         "properties": {
@@ -56333,6 +58868,20 @@
         ],
         "title": "ExpiryForecast"
       },
+      "ExtendRequest": {
+        "properties": {
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ends_at"
+        ],
+        "title": "ExtendRequest"
+      },
       "ExtraCostAllocation": {
         "type": "string",
         "enum": [
@@ -59813,7 +62362,9 @@
           "purchase_price": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 99999999.99,
+                "minimum": 0.0
               },
               {
                 "type": "string"
@@ -60560,7 +63111,9 @@
           "purchase_price": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 99999999.99,
+                "minimum": 0.0
               },
               {
                 "type": "string"
@@ -61007,7 +63560,9 @@
           "purchase_price": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 99999999.99,
+                "minimum": 0.0
               },
               {
                 "type": "string"
@@ -62025,6 +64580,126 @@
         ],
         "title": "LanguageUpdate",
         "description": "Schema for updating user language preference."
+      },
+      "LineCheck": {
+        "properties": {
+          "index": {
+            "type": "integer",
+            "title": "Index"
+          },
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "requested": {
+            "type": "integer",
+            "title": "Requested"
+          },
+          "available": {
+            "type": "integer",
+            "title": "Available"
+          },
+          "conflicts": {
+            "items": {
+              "$ref": "#/components/schemas/ConflictDetail"
+            },
+            "type": "array",
+            "title": "Conflicts"
+          },
+          "max_quantity": {
+            "type": "integer",
+            "title": "Max Quantity",
+            "default": 0
+          },
+          "nearest_window": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WindowSuggestion"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "index",
+          "ok",
+          "label",
+          "requested",
+          "available"
+        ],
+        "title": "LineCheck"
+      },
+      "LineSchema": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "item_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Name"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "quantity": {
+            "type": "integer",
+            "title": "Quantity"
+          },
+          "resolved_count": {
+            "type": "integer",
+            "title": "Resolved Count"
+          },
+          "units": {
+            "items": {
+              "$ref": "#/components/schemas/UnitSchema"
+            },
+            "type": "array",
+            "title": "Units"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "quantity",
+          "resolved_count"
+        ],
+        "title": "LineSchema"
       },
       "LinkIngredientTemplateRequest": {
         "properties": {
@@ -63938,6 +66613,24 @@
         ],
         "title": "MessageResponse"
       },
+      "ModelOption": {
+        "properties": {
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "total_units": {
+            "type": "integer",
+            "title": "Total Units"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model",
+          "total_units"
+        ],
+        "title": "ModelOption"
+      },
       "ModuleEnablePreview": {
         "properties": {
           "resumes": {
@@ -64309,6 +67002,33 @@
         ],
         "title": "MostConsumedItem"
       },
+      "MoveIn": {
+        "properties": {
+          "line_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Line Id"
+          },
+          "from_item_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "From Item Id"
+          },
+          "to_item_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "To Item Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "line_id",
+          "from_item_id",
+          "to_item_id"
+        ],
+        "title": "MoveIn",
+        "description": "Move a later booking of the returned unit to another unit of its model."
+      },
       "MyAssetHistoryItem": {
         "properties": {
           "assignment_id": {
@@ -64562,6 +67282,36 @@
           "tax_rate_id"
         ],
         "title": "NameTaxRate"
+      },
+      "NearestWindowResponse": {
+        "properties": {
+          "starts_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends At"
+          }
+        },
+        "type": "object",
+        "title": "NearestWindowResponse"
       },
       "NeedRowRead": {
         "properties": {
@@ -66947,6 +69697,47 @@
         ],
         "title": "PaginatedResponse[AttachmentSchema]"
       },
+      "PaginatedResponse_BlockSchema_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BlockSchema"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
+          "total_capped": {
+            "type": "boolean",
+            "title": "Total Capped",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset",
+          "has_more"
+        ],
+        "title": "PaginatedResponse[BlockSchema]"
+      },
       "PaginatedResponse_BoMLineRead_": {
         "properties": {
           "items": {
@@ -66987,6 +69778,47 @@
           "has_more"
         ],
         "title": "PaginatedResponse[BoMLineRead]"
+      },
+      "PaginatedResponse_BookingListRow_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BookingListRow"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
+          "total_capped": {
+            "type": "boolean",
+            "title": "Total Capped",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset",
+          "has_more"
+        ],
+        "title": "PaginatedResponse[BookingListRow]"
       },
       "PaginatedResponse_CampaignSchema_": {
         "properties": {
@@ -71711,6 +74543,20 @@
           "items_to_pick"
         ],
         "title": "PickingStartResponse"
+      },
+      "PickupRequest": {
+        "properties": {
+          "item_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Item Ids"
+          }
+        },
+        "type": "object",
+        "title": "PickupRequest"
       },
       "PlaceholderInfo": {
         "properties": {
@@ -82202,6 +85048,66 @@
         ],
         "title": "RemoveMemberResponse"
       },
+      "RentalAvailabilityResponse": {
+        "properties": {
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "total_units": {
+            "type": "integer",
+            "title": "Total Units"
+          },
+          "free_units": {
+            "type": "integer",
+            "title": "Free Units"
+          },
+          "busy": {
+            "items": {
+              "$ref": "#/components/schemas/BusyInterval"
+            },
+            "type": "array",
+            "title": "Busy"
+          }
+        },
+        "type": "object",
+        "required": [
+          "starts_at",
+          "ends_at",
+          "total_units",
+          "free_units"
+        ],
+        "title": "RentalAvailabilityResponse"
+      },
       "ReorderRuleCreate": {
         "properties": {
           "product_template_id": {
@@ -83041,6 +85947,90 @@
         ],
         "title": "ReturnReasonCode",
         "description": "Why goods come back \u2014 same bargain as CorrectionReasonCode."
+      },
+      "ReturnRequest": {
+        "properties": {
+          "units": {
+            "items": {
+              "$ref": "#/components/schemas/ReturnUnitIn"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Units"
+          },
+          "moves": {
+            "items": {
+              "$ref": "#/components/schemas/MoveIn"
+            },
+            "type": "array",
+            "title": "Moves"
+          }
+        },
+        "type": "object",
+        "required": [
+          "units"
+        ],
+        "title": "ReturnRequest"
+      },
+      "ReturnUnitIn": {
+        "properties": {
+          "unit_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Unit Id"
+          },
+          "condition": {
+            "type": "string",
+            "enum": [
+              "GOOD",
+              "DAMAGED",
+              "NEEDS_REPAIR"
+            ],
+            "title": "Condition"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "service_reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Reason"
+          },
+          "service_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Until"
+          }
+        },
+        "type": "object",
+        "required": [
+          "unit_id",
+          "condition"
+        ],
+        "title": "ReturnUnitIn"
       },
       "RoleCreate": {
         "properties": {
@@ -90070,6 +93060,114 @@
         ],
         "title": "TestWebhookResponse"
       },
+      "TodayItem": {
+        "properties": {
+          "booking_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Booking Id"
+          },
+          "borrower_name": {
+            "type": "string",
+            "title": "Borrower Name"
+          },
+          "what": {
+            "type": "string",
+            "title": "What"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Until"
+          },
+          "late_days": {
+            "type": "integer",
+            "title": "Late Days",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "booking_id",
+          "borrower_name",
+          "what",
+          "at"
+        ],
+        "title": "TodayItem"
+      },
+      "TodayResponse": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Date"
+          },
+          "pickups_count": {
+            "type": "integer",
+            "title": "Pickups Count"
+          },
+          "returns_count": {
+            "type": "integer",
+            "title": "Returns Count"
+          },
+          "late_count": {
+            "type": "integer",
+            "title": "Late Count"
+          },
+          "late": {
+            "items": {
+              "$ref": "#/components/schemas/TodayItem"
+            },
+            "type": "array",
+            "title": "Late"
+          },
+          "pickups": {
+            "items": {
+              "$ref": "#/components/schemas/TodayItem"
+            },
+            "type": "array",
+            "title": "Pickups"
+          },
+          "returns": {
+            "items": {
+              "$ref": "#/components/schemas/TodayItem"
+            },
+            "type": "array",
+            "title": "Returns"
+          },
+          "in_service": {
+            "items": {
+              "$ref": "#/components/schemas/BlockSchema"
+            },
+            "type": "array",
+            "title": "In Service"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "pickups_count",
+          "returns_count",
+          "late_count",
+          "late",
+          "pickups",
+          "returns",
+          "in_service"
+        ],
+        "title": "TodayResponse"
+      },
       "Token": {
         "properties": {
           "access_token": {
@@ -90380,6 +93478,115 @@
         ],
         "title": "UnitMismatch",
         "description": "Both readings, when the recipe's measure and the shelf's cannot meet.\n\nHanded over instead of a consumed quantity: with nothing recording how\nthe two units relate, any number picking took would be invented."
+      },
+      "UnitSchema": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "item_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Item Id"
+          },
+          "item_name": {
+            "type": "string",
+            "title": "Item Name"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "serial_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Serial Number"
+          },
+          "asset_tag": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asset Tag"
+          },
+          "assignment_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignment Id"
+          },
+          "condition": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "GOOD",
+                  "DAMAGED",
+                  "NEEDS_REPAIR"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Condition"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "returned_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Returned At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "item_id",
+          "item_name"
+        ],
+        "title": "UnitSchema"
       },
       "UnlinkedIngredient": {
         "properties": {
@@ -92014,6 +95221,26 @@
         },
         "type": "object",
         "title": "WidgetUpdate"
+      },
+      "WindowSuggestion": {
+        "properties": {
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "starts_at",
+          "ends_at"
+        ],
+        "title": "WindowSuggestion"
       },
       "WmsPickCoverageOut": {
         "properties": {

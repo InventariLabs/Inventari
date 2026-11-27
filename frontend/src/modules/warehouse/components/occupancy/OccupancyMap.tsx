@@ -23,7 +23,7 @@ import {
 /** A block with more shelves than this switches to small tiles. */
 const DENSE_FROM = 40;
 
-interface Block {
+interface OccupancyBlock {
   key: string;
   container: OccupancyNode | null;
   shelves: OccupancyNode[];
@@ -31,7 +31,7 @@ interface Block {
 
 /** Shelves grouped under the location that holds them, in walk order. */
 function toBlocks(nodes: OccupancyNode[], byId: Map<string, OccupancyNode>) {
-  const blocks = new Map<string, Block>();
+  const blocks = new Map<string, OccupancyBlock>();
   for (const node of nodes) {
     if (!node.cell) continue;
     const key = node.parent_id ?? "top";

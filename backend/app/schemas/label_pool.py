@@ -1,5 +1,4 @@
 from datetime import datetime
-from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
@@ -8,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from app.core.contracts._documents_dtos import LabelScanDTO
 from app.core.label_codes import LABEL_PREFIX_MAX_LENGTH, LABEL_PREFIX_PATTERN
 from app.schemas.pagination import PaginatedResponse
-from app.schemas.validators import ProductMeasure, empty_string_to_none
+from app.schemas.validators import ProductMeasure, UnitPrice, empty_string_to_none
 
 
 class LabelPoolBase(BaseModel):
@@ -118,7 +117,7 @@ class LabelAssignRequest(BaseModel):
     # one of them is a column on the record; what the form asks for, the
     # request carries.
     serial_number: str | None = None
-    purchase_price: Decimal | None = None
+    purchase_price: UnitPrice | None = None
     shelf_location: str | None = None
     #: The product's code, when the scanned code is a pool label and not one.
     #: A scanned barcode is the product's code itself and wins over this.
