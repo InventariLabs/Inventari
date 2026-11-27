@@ -263,6 +263,28 @@ for the contracts it takes and returns (new optional parameters are fine,
 removals and renames are breaking); the contracts themselves are in the
 snapshot (§3). An experimental method may change with a changelog note.
 
+### Module APIs: `equipment_api`
+
+`app.modules.equipment.equipment_api.equipment_api` is the equipment
+register's door for other modules — the shipped ones, and a module installed
+from outside whose manifest lists `"requires": ["equipment"]`. It is the only
+way a module reads the assets it may book and hands one out or takes it back;
+the status machine, the item history, the journal and the hand-over events
+stay in the equipment module. Every public method is listed here.
+
+| Method | Class | What it is for |
+|---|---|---|
+| `is_enabled_async` | stable | whether the organization has the equipment module on; a consumer whose manifest requires it may still be enabled while the provider is off |
+| `list_bookable_assets_async` | experimental | the organization's bookable units with the open hand-out attached, as `EquipmentAssetDTO`; retired units are left out unless asked for, and every page is read so a large fleet is not silently cut off |
+| `checkout_async` | experimental | hand one unit out against a booking's window, returning `EquipmentAssignmentRefDTO` with the assignment the return will close; `None` when the module is off |
+| `checkin_async` | experimental | take one unit back with its condition, closing the assignment `checkout_async` opened; `None` when the module is off |
+| `set_expected_return_async` | stable | move the return a hand-out expects, keeping the journal entry; `False` when the module is off or the assignment is already closed |
+
+"Stable" and "experimental" mean the same as for `warehouse_api` above: a
+stable method takes and returns only Core contracts and plain values, while
+an experimental one hands over the equipment module's own DTOs, whose shape
+follows its screens.
+
 ## 5. Scope & limits
 
 - Covered today: the DTO/enum surface of `app/core/contracts` (DTOs and enums), plus two enums that live outside `contracts.__all__` but that an out-of-repo module names: `SystemEvent` (the event names it subscribes to — dropping one silences the subscription without an exception) and `LlmCapability` (declared per LLM purpose).
@@ -282,6 +304,7 @@ Stability classes are the ones above; a vector is listed with the file that owns
 | Entry vector | What a module does with it | Owned in |
 |---|---|---|
 | Module manifest | declares name, version, permissions, capabilities, `requires` and `optional_requires`, module type and category, and whether it has settings (`has_settings_schema`); navigation and slots are declared by the frontend module, not the manifest | `backend/app/core/module_manifest_schema.py`; `docs/MODULE_CAPABILITIES.md` |
+| Module APIs | reaches another module's one public door, listed with its stability classes above, rather than importing its models, services or helpers | `backend/app/modules/<module>/<module>_api.py` (`warehouse_api`, `equipment_api`); `docs/subsystems/CROSS_MODULE_EXTENSION.md` |
 | Module lifecycle | runs code at startup, install, upgrade and uninstall, and registers the module's services, contributions, routes, interceptors and scheduled tasks | `backend/app/core/_base_module.py` (`BaseModule`) and `backend/app/core/define_module.py` (`define_module`); [MODULES_GUIDE.md](../../MODULES_GUIDE.md), "Creating a New Module" |
 | Events | subscribes to or emits `<module>.<event>`, with payload DTOs from `app.core.contracts`, and registers the payload model of its own events with `core_api.events.register_payload` | `backend/app/core/public_api/events.py`, `backend/app/core/contracts/events/_registry.py`; [EVENTS.md](EVENTS.md) |
 | Interceptors | runs before or after an item, storage-location or category write, inside the write's transaction; a `before_*` hook may amend the data or refuse the write with `InterceptorError` | `backend/app/core/_interceptor_base.py` (`ItemInterceptor`, `StorageInterceptor`, `CategoryInterceptor`, `InterceptorError`) and `backend/app/core/_interceptor_pipeline.py`; declared with `define_module(interceptors=[...])` or the `item_interceptors`, `storage_interceptors` and `category_interceptors` contribution points; [ADR-007](../adr/ADR-007-interceptors-and-eventbus.md) |

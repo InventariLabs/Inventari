@@ -142,7 +142,11 @@ from app.core.upload_validation import (
 from app.core.utils import pick_by_lang
 from app.core.work_in_progress import register_work_in_progress_provider
 from app.database import Base as CoreModelBase
-from app.i18n.service import get_current_lang, get_module_error_message
+from app.i18n.service import (
+    get_current_lang,
+    get_error_message,
+    get_module_error_message,
+)
 from app.schemas.pagination import (
     CursorPaginatedResponse,
     KeysetPaginatedResponse,
@@ -235,6 +239,7 @@ __all__ = [
     'get_current_lang',
     'get_current_user',
     'get_current_user_context',
+    'get_error_message',
     'get_logger',
     'get_module_error_message',
     'hidden_module_tags_async',

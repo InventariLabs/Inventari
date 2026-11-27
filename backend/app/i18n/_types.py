@@ -32,6 +32,41 @@ MAINTAINED_LANGUAGES: tuple[Language, ...] = tuple(
 class ErrorMessages(TypedDict):
     """Type definition for error messages dictionary."""
 
+    rental_line_names_one_kind: str
+    rental_asset_line_quantity: str
+    rental_model_line_needs_model: str
+    rental_booking_needs_one_borrower: str
+    rental_borrower_needs_name: str
+    rental_window_order: str
+    rental_block_window_order: str
+    rental_service_needs_reason_and_date: str
+    rental_service_until_in_past: str
+    rental_buffer_needs_one_target: str
+    rental_buffer_needs_model: str
+    rental_booking_not_found: str
+    rental_asset_not_bookable: str
+    rental_cancel_not_reserved: str
+    rental_pickup_not_reserved: str
+    rental_pickup_duplicate_scan: str
+    rental_pickup_window_passed: str
+    rental_unit_on_two_lines: str
+    rental_return_not_picked_up: str
+    rental_return_needs_every_unit: str
+    rental_extend_not_active: str
+    rental_extend_not_later: str
+    rental_move_needs_same_model: str
+    rental_move_target_taken: str
+    rental_block_not_found: str
+    rental_buffer_rule_not_found: str
+    rental_availability_needs_target: str
+    equipment_module_unavailable: str
+    rental_booking_conflict: str
+    rental_pickup_incomplete: str
+    rental_pickup_asset_taken: str
+    rental_service_block_conflict: str
+    rental_block_over_booking: str
+    rental_extension_blocked: str
+
     invalid_credentials: str
     invalid_input: str
     not_authenticated: str

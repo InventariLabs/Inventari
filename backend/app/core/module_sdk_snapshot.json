@@ -3080,6 +3080,26 @@
         }
       ]
     },
+    "get_error_message": {
+      "kind": "function",
+      "params": [
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "key",
+          "required": true
+        },
+        {
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "lang",
+          "required": false
+        },
+        {
+          "kind": "VAR_KEYWORD",
+          "name": "kwargs",
+          "required": false
+        }
+      ]
+    },
     "get_logger": {
       "kind": "function",
       "params": [

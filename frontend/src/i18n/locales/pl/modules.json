@@ -39,6 +39,10 @@
       "name": "Śledzenie sprzętu",
       "description": "Śledź zasoby IT i fizyczne z zarządzaniem cyklem życia."
     },
+    "rentals": {
+      "name": "Wypożyczenia",
+      "description": "Rezerwuj sprzęt na termin, wydawaj go i przyjmuj zwroty."
+    },
     "example_widgets": {
       "name": "Przykładowe widżety",
       "description": "Moduł referencyjny pokazujący wzorce modułów Inventari: zarządzaj prostymi widżetami z nazwą, kolorem i liczbą."

@@ -457,6 +457,7 @@ how to add your own.
 | Module | Description |
 |---|---|
 | **Equipment Tracking** | IT and physical assets with lifecycle management |
+| **Rentals** | Reserve equipment for a window, hand it out and take it back; the calendar shows what is free, and the today view what is late |
 
 ### Integrations
 | Module | Description |

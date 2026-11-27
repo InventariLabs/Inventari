@@ -22,12 +22,20 @@ _PROJECT_ROOT = Path(os.environ.get('INVENTARI_REPO_ROOT') or _BACKEND_DIR.paren
 _DOC = _PROJECT_ROOT / 'docs' / 'subsystems' / 'CONTRACTS_STABILITY.md'
 
 _ROW = re.compile(r'^\| `(\w+)` \| (stable|experimental) \|', re.MULTILINE)
+_HEADING = '### Module APIs: `warehouse_api`'
+
+
+def _warehouse_section(text: str) -> str:
+    start = text.index(_HEADING)
+    rest = text[start + len(_HEADING) :]
+    end = re.search(r'^### ', rest, re.MULTILINE)
+    return rest[: end.start()] if end else rest
 
 
 @pytest.mark.integration
 def test_every_warehouse_api_method_is_listed_with_its_class() -> None:
     assert _DOC.exists(), f'{_DOC} is not reachable from here'
-    listed = dict(_ROW.findall(_DOC.read_text(encoding='utf-8')))
+    listed = dict(_ROW.findall(_warehouse_section(_DOC.read_text(encoding='utf-8'))))
     public = {
         name
         for name in vars(WarehouseAPI)
