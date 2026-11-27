@@ -221,6 +221,9 @@
       "stays": "Bleibt in Grocy",
       "leftBehind": {
         "inactive_products": "In Grocy deaktivierte Produkte",
+        "inactive_locations": "In Grocy deaktivierte Orte",
+        "inactive_product_groups": "In Grocy deaktivierte Produktgruppen",
+        "inactive_stores": "In Grocy deaktivierte Geschäfte",
         "extra_barcodes": "Zusätzliche Barcodes (ein Produkt hat hier einen)",
         "unit_conversions": "Einheitenumrechnungen wie eine Packung zu sechs",
         "units_as_pieces": "In Stück gezählte Einheiten",
@@ -230,6 +233,7 @@
         "parent_products": "Produkte unter einem übergeordneten Produkt (jedes kommt einzeln herüber)",
         "own_field_values": "Werte eigener Felder",
         "shopping_list_entries": "Einkaufslisteneinträge (das Modul Einkaufslisten ist aus)",
+        "shopping_list_entries_failed": "Einkaufslisteneinträge (die Übernahme ist fehlgeschlagen; dieselbe Datei erneut ausführen, um es noch einmal zu versuchen)",
         "recipes": "Rezepte",
         "meal_plan": "Essensplaneinträge",
         "chores": "Hausarbeiten",

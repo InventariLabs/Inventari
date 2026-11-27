@@ -333,11 +333,13 @@ database: check it against the label, and see the note on allergens and nutritio
   folder (in Docker, the volume mounted at `/config/data` or
   `/var/www/data`); Grocy itself writes no export. Before anything is written
   it shows what the file holds, what it would create and what stays in Grocy
-  — recipes, chores, pictures, extra barcodes and the like. Every batch of
-  stock becomes a record with its best-before date, price, purchase date,
-  shelf, store and opened mark; prices are read in the organization's
-  currency. With **Shopping lists** on, Grocy's shopping lists come across
-  too. Running the same file again adds only what is new. A row filed under a product you already have takes
+  — recipes, chores, pictures, extra barcodes, whatever is switched off in
+  Grocy and the like. Every batch of stock becomes a record with its
+  best-before date, price, purchase date, shelf, store and opened mark;
+  prices are read in the organization's currency. With **Shopping lists** on,
+  Grocy's shopping lists come across too; if they cannot be brought, the
+  summary says so and counts their entries among what stays. Running the same
+  file again adds only what is new. A row filed under a product you already have takes
   that product's name, and one whose unit cannot be converted into the
   product's is refused with both units named. **Export** downloads what the
   list currently shows as XLSX, with the SKU, description, stock alert, the

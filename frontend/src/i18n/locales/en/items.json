@@ -221,6 +221,9 @@
       "stays": "Stays in Grocy",
       "leftBehind": {
         "inactive_products": "Products switched off in Grocy",
+        "inactive_locations": "Locations switched off in Grocy",
+        "inactive_product_groups": "Product groups switched off in Grocy",
+        "inactive_stores": "Stores switched off in Grocy",
         "extra_barcodes": "Extra barcodes (a product here keeps one)",
         "unit_conversions": "Unit conversions such as a pack of six",
         "units_as_pieces": "Units counted in pieces",
@@ -230,6 +233,7 @@
         "parent_products": "Products under a parent product (each comes across on its own)",
         "own_field_values": "Values of your own fields",
         "shopping_list_entries": "Shopping list entries (the Shopping lists module is off)",
+        "shopping_list_entries_failed": "Shopping list entries (bringing them failed; run the same file again to retry)",
         "recipes": "Recipes",
         "meal_plan": "Meal plan entries",
         "chores": "Chores",

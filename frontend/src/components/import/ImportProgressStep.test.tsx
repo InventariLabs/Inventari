@@ -19,6 +19,25 @@ describe("ImportProgressStep", () => {
     ).toBeInTheDocument();
   });
 
+  it.each([
+    [true, "file-spreadsheet", "database"],
+    [false, "database", "file-spreadsheet"],
+  ])(
+    "draws the icon of what is being read (a sheet: %s)",
+    (fromSheet, drawn, absent) => {
+      const { container } = render(
+        <ImportProgressStep
+          isProcessing={true}
+          importResult={null}
+          fromSheet={fromSheet}
+          {...texts}
+        />,
+      );
+      expect(container.querySelector(`.lucide-${drawn}`)).toBeInTheDocument();
+      expect(container.querySelector(`.lucide-${absent}`)).toBeNull();
+    },
+  );
+
   it("shows how many rows a long import has got through", () => {
     render(
       <ImportProgressStep

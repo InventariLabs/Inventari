@@ -109,6 +109,24 @@ describe("ImportUploadStep", () => {
     expect(onFileSelect).not.toHaveBeenCalled();
   });
 
+  it("keeps the header-row note with the sheet tile when a source is not a sheet", () => {
+    render(
+      <ImportUploadStep
+        onFileSelect={vi.fn()}
+        secondaryUpload={{ ...grocy, accept: ".db", onFileSelect: vi.fn() }}
+      />,
+    );
+    const sheetColumn = screen.getByRole("button", {
+      name: /Generic XLSX\/CSV/,
+    }).parentElement as HTMLElement;
+
+    expect(sheetColumn).toHaveTextContent(
+      "Make sure the file has a header row",
+    );
+    expect(sheetColumn).not.toHaveTextContent("Import from Grocy");
+    expect(screen.getAllByText("Important note")).toHaveLength(1);
+  });
+
   it("hands the chosen file to the wizard", async () => {
     const onFileSelect = vi.fn();
     render(<ImportUploadStep onFileSelect={onFileSelect} />);

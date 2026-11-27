@@ -1,6 +1,12 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Loader2, Check, FileSpreadsheet, AlertCircle } from "lucide-react";
+import {
+  Loader2,
+  Check,
+  Database,
+  FileSpreadsheet,
+  AlertCircle,
+} from "lucide-react";
 import { RefusedRows } from "./RefusedRows";
 import type { ImportOutcome, ImportProgress } from "./types";
 
@@ -21,6 +27,9 @@ interface ImportProgressStepProps {
   progress?: ImportProgress | null;
   /** What the import founded beside the records, when the entity has any. */
   children?: ReactNode;
+  /** `false` for a source that is a database file: no spreadsheet is drawn,
+   *  and an error's number is not explained as a sheet's row. */
+  fromSheet?: boolean;
 }
 
 export function ImportProgressStep({
@@ -31,8 +40,10 @@ export function ImportProgressStep({
   summaryText,
   progress,
   children,
+  fromSheet = true,
 }: ImportProgressStepProps) {
   const { t } = useTranslation(["common"]);
+  const SourceIcon = fromSheet ? FileSpreadsheet : Database;
   if (isProcessing) {
     const percent =
       progress && progress.total > 0
@@ -43,7 +54,7 @@ export function ImportProgressStep({
         <div className="relative">
           <Loader2 size={64} className="text-primary-600 animate-spin" />
           <div className="absolute inset-0 flex items-center justify-center">
-            <FileSpreadsheet size={24} className="text-primary-400" />
+            <SourceIcon size={24} className="text-primary-400" />
           </div>
         </div>
         <div className="text-center">
@@ -139,9 +150,11 @@ export function ImportProgressStep({
             <AlertCircle size={12} />
             {t("common:import.firstErrors")}
           </p>
-          <p className="text-xs text-on-muted mb-3">
-            {t("common:import.rowsCountedNote")}
-          </p>
+          {fromSheet && (
+            <p className="text-xs text-on-muted mb-3">
+              {t("common:import.rowsCountedNote")}
+            </p>
+          )}
           <ul className="space-y-2">
             {importResult.errors.map((err) => (
               <li
