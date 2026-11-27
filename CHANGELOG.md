@@ -91,6 +91,10 @@ says what the release does rather than what changed since them.
 
 ### Fixed
 
+- When saving a product's edit form is refused — for example a unit changed
+  while the product holds stock — the form scrolls to the sentence that says
+  why and screen readers announce it. It stood above the fields, out of sight
+  of a reader who had scrolled down, so pressing **Save** seemed to do nothing.
 - A SKU read off the opening-stock sheet is stored trimmed and in upper case,
   and a code with a character a SKU cannot hold refuses its row, so a product
   founded from a sheet can be saved in its form.
