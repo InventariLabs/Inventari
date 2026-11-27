@@ -37,7 +37,9 @@ FILES = {
     'backend/tests/__init__.py': '',
     'backend/tests/_shared.py': 'from app.modules.gamma.models import Row\n',
     'backend/tests/_helper.py': 'VALUE = 1\n',
-    'backend/tests/_lonely.py': 'VALUE = 2\n',
+    'backend/tests/_wrapper.py': 'from ._helper import VALUE\n',
+    TESTS + 'test_uses_the_wrapper.py': 'from tests._wrapper import VALUE\n',
+    TESTS + 'test_patches_the_helper.py': "TARGET = 'tests._helper.VALUE'\n",
     'backend/app/__init__.py': '',
     'backend/app/core/engine.py': 'from app.modules.alpha.service import run\n',
     'backend/app/modules/__init__.py': '',
@@ -215,6 +217,14 @@ class OtherChanges(unittest.TestCase):
         self.assertIn('test_uses_the_helper.py', names(got.backend))
         self.assertFalse(got.backend_full)
 
+    def test_a_test_helper_runs_the_users_of_its_users(self):
+        got = plan('backend/tests/_helper.py')
+        self.assertIn('test_uses_the_wrapper.py', names(got.backend))
+
+    def test_a_name_written_as_a_string_is_an_import(self):
+        got = plan('backend/tests/_helper.py')
+        self.assertIn('test_patches_the_helper.py', names(got.backend))
+
     def test_a_script_runs_the_tests_that_name_it(self):
         got = plan('backend/scripts/check_thing.py')
         self.assertIn('test_runs_the_script.py', names(got.backend))
@@ -296,19 +306,18 @@ class TheCommands(unittest.TestCase):
         self.assertEqual(got[0][-2:], ['-n', '3'])
         self.assertEqual(got[1][-1], 'run')
 
-    def test_the_worker_count_is_the_scripts(self):
-        root = Path(__file__).resolve().parents[1]
-        with mock.patch.dict(picker.os.environ, {'PYTEST_WORKERS': ''}):
-            expected = subprocess.run(
-                [sys.executable, str(root / 'scripts/test-workers.py'), 'pytest'],
-                capture_output=True,
-                text=True,
-                check=True,
-            ).stdout
-            # Memory moves between the two readings; the range does not.
-            self.assertTrue(1 <= picker._workers(root) <= 12, expected)
-        with mock.patch.dict(picker.os.environ, {'PYTEST_WORKERS': '5'}):
-            self.assertEqual(picker._workers(root), 5)
+    def test_the_worker_count_is_the_scripts_unless_overridden(self):
+        root = Path('/repository')
+        answer = subprocess.CompletedProcess([], 0, stdout='9\n')
+        with mock.patch.object(picker.subprocess, 'run', return_value=answer) as run:
+            with mock.patch.dict(picker.os.environ, {'PYTEST_WORKERS': ''}):
+                self.assertEqual(picker._workers(root), 9)
+            command = run.call_args.args[0]
+            self.assertEqual(
+                command[1:], [str(root / 'scripts/test-workers.py'), 'pytest']
+            )
+            with mock.patch.dict(picker.os.environ, {'PYTEST_WORKERS': '5'}):
+                self.assertEqual(picker._workers(root), 5)
 
     def test_a_run_runs_every_suite_and_keeps_the_first_failure(self):
         ran = []
