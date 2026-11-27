@@ -10,6 +10,9 @@ import { PageHeaderContext } from "@/hooks/useModulePageHeader";
 import { server } from "@/test/mocks/server";
 import { signInWith } from "@/test/auth";
 import "./module";
+// What the entry loads on demand, resolved with this file: on a busy machine a
+// first import can outlast the wait for the screen.
+import "./pages/StatsModuleSettingsPage";
 
 /**
  * The module's only contribution is its settings entry in the sidebar. It is
