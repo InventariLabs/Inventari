@@ -153,21 +153,21 @@
       "serialNumber": "Seriennummer",
       "labelCode": "Etikettencode",
       "sku": "SKU",
-      "sublocation": "Unterstandort",
+      "sublocation": "Unterort",
       "stockAlert": "Bestandsalarm",
       "description": "Beschreibung"
     },
     "reading": {
-      "perLocation": "Bestand aus den Spalten {{columns}} lesen: Jede ist ein Standort",
+      "perLocation": "Bestand aus den Spalten {{columns}} lesen: Jede ist ein Lagerort",
       "noQuantity": {
         "label": "Datei ohne Mengenspalte",
         "products": "Nur Produkte",
         "one": "Je eins",
-        "productsNote": "Die Produkte werden ohne Bestand angelegt. Standort, Kategorie, Preis, Seriennummer und Daten beschreiben den Bestand und werden deshalb nicht gelesen.",
+        "productsNote": "Die Produkte werden ohne Bestand angelegt. Lagerort, Kategorie, Preis, Seriennummer und Daten beschreiben den Bestand und werden deshalb nicht gelesen.",
         "oneNote": "Jede Zeile bucht ihr Produkt mit der Menge 1 in den Bestand."
       },
       "slash": {
-        "label": "Schrägstrich in einem Standort",
+        "label": "Schrägstrich in einem Lagerort",
         "hint": "Zum Beispiel „Garage / Werkbank“.",
         "path": "Trennt Ebenen",
         "name": "Gehört zum Namen"
