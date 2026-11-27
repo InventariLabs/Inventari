@@ -104,6 +104,11 @@ says what the release does rather than what changed since them.
   what was used from the same record at the same moment, and picking an
   ingredient no longer fails when that record, or a document of the same
   product, is being changed at once.
+- Picking an ingredient from stock that someone has just used up no longer ticks
+  it off with nothing taken. A scanned product barcode takes another record of
+  the product when there is one; otherwise the sheet says nothing was taken and
+  reads the checklist again. The picking scan answers `not_in_stock` for this,
+  and for a product that has no stock at all.
 - Using up the last of something leaves the names of the **Consumed** and
   **Inventory Loss** places as they are. They no longer switch to the language
   of whoever took it, and back with the next person.

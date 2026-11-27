@@ -28,6 +28,7 @@ from ._picking_fefo_checks import check_fefo_ambiguity, check_fefo_recommendatio
 from ._picking_item_resolution import (
     load_recipe_ingredients,
     match_ingredient_or_not_in_recipe,
+    not_in_stock_response,
     resolve_scanned_item_by_barcode,
     resolve_scanned_item_by_id,
 )
@@ -102,6 +103,10 @@ async def scan_item_in_picking(
     )
     if already_picked:
         return already_picked
+
+    # A record named by id can be one used up since the sheet was drawn.
+    if not scanned_item.quantity:
+        return not_in_stock_response(matched_ingredient)
 
     fefo_ambiguity = await check_fefo_ambiguity(
         db, org_id, scanned_item, barcode, item_id, from_checklist

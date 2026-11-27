@@ -118,6 +118,28 @@ function openSessionId(state: PickingState): string | null {
   return state.session.picking_session_id;
 }
 
+/** Puts a fresh reading of the session on the sheet, answering whether it
+ * came. The picks already made are kept by the backend; only the rows still
+ * open are resolved against stock again. */
+async function readChecklist(
+  recipeId: string,
+  session: PickingStartResponse,
+  show: (state: PickingState) => void,
+  fail: (message: string) => void,
+): Promise<boolean> {
+  try {
+    const fresh = await recipesApi.readPicking(
+      recipeId,
+      session.picking_session_id,
+    );
+    show({ phase: "active", session: fresh, items: fresh.items_to_pick });
+    return true;
+  } catch (e: unknown) {
+    fail(extractApiError(e, fallback.refresh()));
+    return false;
+  }
+}
+
 export function usePickingSession(recipeId: string, mealPlanEntryId?: string) {
   const queryClient = useQueryClient();
   const [state, setState] = useState<PickingState>({ phase: "idle" });
@@ -206,6 +228,12 @@ export function usePickingSession(recipeId: string, mealPlanEntryId?: string) {
     [recipeId, invalidateStock],
   );
 
+  const showChecklist = useCallback(
+    (session: PickingStartResponse) =>
+      readChecklist(recipeId, session, setState, setError),
+    [recipeId],
+  );
+
   const scan = useCallback(
     async (data: {
       barcode?: string;
@@ -274,6 +302,7 @@ export function usePickingSession(recipeId: string, mealPlanEntryId?: string) {
           // and the count does not go up for stock still on the shelf.
           noteRefusal(result.ingredient_id, result.status);
           setState({ phase: "active", session, items });
+          if (result.status === "not_in_stock") await showChecklist(session);
         }
         return result;
       } catch (e: unknown) {
@@ -282,7 +311,7 @@ export function usePickingSession(recipeId: string, mealPlanEntryId?: string) {
         setIsLoading(false);
       }
     },
-    [state, recipeId, finishInDatabase, invalidateStock],
+    [state, recipeId, finishInDatabase, showChecklist, invalidateStock],
   );
 
   const resolveDisambiguation = useCallback(
@@ -333,10 +362,11 @@ export function usePickingSession(recipeId: string, mealPlanEntryId?: string) {
         // unit bridge is checked after the item is known, not before.
         noteRefusal(result.ingredient_id, result.status);
         setState({ phase: "active", session, items });
+        if (result.status === "not_in_stock") await showChecklist(session);
       }
       return result;
     },
-    [state, recipeId, finishInDatabase, invalidateStock],
+    [state, recipeId, finishInDatabase, showChecklist, invalidateStock],
   );
 
   const dismissOpenedSuggestion = useCallback(async () => {
@@ -433,25 +463,13 @@ export function usePickingSession(recipeId: string, mealPlanEntryId?: string) {
     }
   }, [state, recipeId, invalidateStock]);
 
-  /** Re-read the session after linking an ingredient at the shelf.
-   *  The picks already made are kept by the backend; only the rows still
-   *  open are resolved against stock again. */
+  /** Re-read the session after linking an ingredient at the shelf. */
   const refreshSession = useCallback(async () => {
     if (state.phase !== "active") return;
-    const { session } = state;
-    try {
-      const fresh = await recipesApi.readPicking(
-        recipeId,
-        session.picking_session_id,
-      );
-      // Linking the ingredient is the way out of `unit_mismatch` and
-      // `not_in_recipe`, so the fresh reading replaces the trace as well.
-      setRefusals({});
-      setState({ phase: "active", session: fresh, items: fresh.items_to_pick });
-    } catch (e: unknown) {
-      setError(extractApiError(e, fallback.refresh()));
-    }
-  }, [state, recipeId]);
+    // Linking the ingredient is the way out of `unit_mismatch` and
+    // `not_in_recipe`, so the fresh reading replaces the trace as well.
+    if (await showChecklist(state.session)) setRefusals({});
+  }, [state, showChecklist]);
 
   const reset = useCallback(() => {
     setState({ phase: "idle" });

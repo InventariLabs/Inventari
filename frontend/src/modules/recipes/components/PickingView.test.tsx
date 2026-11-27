@@ -305,6 +305,27 @@ describe("PickingView — tapping an ingredient", () => {
       ),
     );
   });
+
+  it("says nothing is left rather than failing in silence", async () => {
+    mockHook.scan.mockResolvedValue({ status: "not_in_stock" });
+    mockHook.state = activeStateWith([
+      makePickingItem({ ingredient_id: "i1", name: "Flour" }),
+    ]);
+    vi.mocked(toast.error).mockClear();
+
+    render(
+      <QueryWrapper>
+        <PickingView {...defaultProps} />
+      </QueryWrapper>,
+    );
+    await userEvent.click(screen.getByText("Flour"));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Nothing was taken — none of that stock is left",
+      ),
+    );
+  });
 });
 
 describe("PickingView — the unlinked notice", () => {

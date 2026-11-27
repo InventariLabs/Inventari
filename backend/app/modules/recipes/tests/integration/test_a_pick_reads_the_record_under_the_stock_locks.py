@@ -16,6 +16,7 @@ from __future__ import annotations
 import asyncio
 import uuid
 from collections.abc import AsyncIterator, Awaitable, Callable
+from datetime import date, timedelta
 from decimal import Decimal
 from typing import Any
 from unittest.mock import patch
@@ -34,10 +35,13 @@ from app.core.contracts import UserContextDTO
 from app.core.public_api import core_api
 from app.models.item import Item
 from app.models.organization import Organization
+from app.models.product_template import ProductTemplate
 from app.models.storage_location import StorageLocation
 from app.models.uom import Uom
 from app.modules.recipes import _picking_scan
+from app.modules.recipes.models import PickingSessionItem
 from app.modules.recipes.picking_service import scan_item_in_picking, undo_pick
+from app.modules.recipes.schemas import PickingScanResponse
 from app.schemas.item import ItemConsumeRequest
 from app.services.items import _consumed_place, consume_item
 from tests.integration._cooking import a_picking_session
@@ -276,27 +280,28 @@ async def test_an_undone_pick_keeps_what_was_used_meanwhile(
     assert await _held(db, record_id) == Decimal('7')
 
 
-async def test_a_record_used_up_while_its_scan_waited_is_not_picked(
-    real_async_db_session: AsyncSession,
-    async_test_household: Organization,
-    async_test_storage_location: StorageLocation,
+async def _used_up_while_a_scan_waits(
     engine: AsyncEngine,
-) -> None:
-    db = real_async_db_session
-    org_id = async_test_household.id
-    keeper, template_id, record_id, barcode = await _ten_on_the_shelf(
-        db, org_id, async_test_storage_location.id
-    )
-    session_id, _ = await a_picking_session(db, keeper, template_id, Decimal('2'))
-    await _label(db, record_id, barcode)
-    await db.commit()
-    answers: list[str] = []
+    org_id: uuid.UUID,
+    keeper: UserContextDTO,
+    session_id: uuid.UUID,
+    record_id: uuid.UUID,
+    **by: Any,
+) -> PickingScanResponse:
+    """All ten of the record are used while a scan of it waits for the locks."""
+    answers: list[PickingScanResponse] = []
 
     async def scan(session: AsyncSession) -> None:
-        answer = await scan_item_in_picking(
-            session, session_id, org_id, keeper, barcode=barcode, item_id=None
+        answers.append(
+            await scan_item_in_picking(
+                session,
+                session_id,
+                org_id,
+                keeper,
+                barcode=by.get('barcode'),
+                item_id=by.get('item_id'),
+            )
         )
-        answers.append(answer.status)
 
     await _the_second_starts_while_the_first_is_stopped(
         engine,
@@ -305,6 +310,109 @@ async def test_a_record_used_up_while_its_scan_waited_is_not_picked(
         _use(keeper, record_id, 10),
         scan,
     )
+    return answers[0]
 
-    assert answers == ['not_in_recipe']
+
+async def _line(db: AsyncSession, session_id: uuid.UUID) -> PickingSessionItem:
+    db.expire_all()
+    line = await db.scalar(
+        select(PickingSessionItem).where(PickingSessionItem.session_id == session_id)
+    )
+    assert line is not None
+    return line
+
+
+@pytest.mark.parametrize('scanned', ['record', 'record-barcode', 'product-barcode'])
+async def test_a_record_used_up_while_its_scan_waited_is_not_picked(
+    real_async_db_session: AsyncSession,
+    async_test_household: Organization,
+    async_test_storage_location: StorageLocation,
+    engine: AsyncEngine,
+    scanned: str,
+) -> None:
+    db = real_async_db_session
+    org_id = async_test_household.id
+    keeper, template_id, record_id, barcode = await _ten_on_the_shelf(
+        db, org_id, async_test_storage_location.id
+    )
+    session_id, _ = await a_picking_session(db, keeper, template_id, Decimal('2'))
+    if scanned == 'record-barcode':
+        await _label(db, record_id, barcode)
+    await db.commit()
+    by = {'item_id': record_id} if scanned == 'record' else {'barcode': barcode}
+
+    answer = await _used_up_while_a_scan_waits(
+        engine, org_id, keeper, session_id, record_id, **by
+    )
+
+    assert answer.status == 'not_in_stock', answer
     assert await _held(db, record_id) == Decimal('0')
+    assert (await _line(db, session_id)).status == 'pending'
+
+
+@pytest.mark.parametrize('scanned', ['record-barcode', 'product-barcode'])
+async def test_a_barcode_scan_takes_another_record_when_its_first_is_used_up(
+    real_async_db_session: AsyncSession,
+    async_test_household: Organization,
+    async_test_storage_location: StorageLocation,
+    engine: AsyncEngine,
+    scanned: str,
+) -> None:
+    db = real_async_db_session
+    org_id = async_test_household.id
+    shelf = async_test_storage_location.id
+    keeper, template_id, record_id, barcode = await _ten_on_the_shelf(db, org_id, shelf)
+    template = await db.get(ProductTemplate, template_id)
+    assert template is not None
+    # No date sorts after any date, so the dated record is the one chosen first.
+    first = await db.get(Item, record_id)
+    assert first is not None
+    first.expiry_date = date.today() + timedelta(days=100)
+    other_id = (await put_on_shelf(db, keeper, template, shelf, 7)).id
+    session_id, _ = await a_picking_session(db, keeper, template_id, Decimal('2'))
+    if scanned == 'record-barcode':
+        await _label(db, record_id, barcode)
+    await db.commit()
+
+    answer = await _used_up_while_a_scan_waits(
+        engine, org_id, keeper, session_id, record_id, barcode=barcode
+    )
+
+    assert answer.status == 'picked', answer
+    assert await _held(db, other_id) == Decimal('5')
+    assert (await _line(db, session_id)).item_id == other_id
+
+
+async def test_a_checklist_row_whose_record_is_gone_is_not_picked(
+    real_async_db_session: AsyncSession,
+    async_test_household: Organization,
+    async_test_storage_location: StorageLocation,
+) -> None:
+    """The sheet recommends a record that is used up before anyone taps it."""
+    db = real_async_db_session
+    org_id = async_test_household.id
+    keeper, template_id, record_id, _ = await _ten_on_the_shelf(
+        db, org_id, async_test_storage_location.id
+    )
+    session_id, ingredient_id = await a_picking_session(
+        db, keeper, template_id, Decimal('2')
+    )
+    await _use(keeper, record_id, 10)(db)
+    await db.commit()
+
+    answer = await scan_item_in_picking(
+        db,
+        session_id,
+        org_id,
+        keeper,
+        barcode=None,
+        item_id=record_id,
+        from_checklist=True,
+    )
+    await db.commit()
+
+    assert answer.status == 'not_in_stock', answer
+    assert answer.ingredient_id == ingredient_id
+    line = await _line(db, session_id)
+    assert line.status == 'pending'
+    assert not line.picked_items
