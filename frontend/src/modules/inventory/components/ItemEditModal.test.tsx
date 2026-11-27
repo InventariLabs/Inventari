@@ -984,3 +984,56 @@ describe("ItemEditModal — a category list that failed", () => {
     ).not.toBeInTheDocument();
   });
 });
+
+describe("the unit of a record that holds stock", () => {
+  const HINT = /Fixed while there is stock/i;
+
+  async function openWith(quantity: number) {
+    server.use(
+      http.get("/api/v1/items/:id", () =>
+        HttpResponse.json({
+          id: "1",
+          name: "Test Item",
+          quantity,
+          added_date: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }),
+      ),
+    );
+    render(<ItemEditModal itemId="1" onClose={() => {}} />);
+    await screen.findByDisplayValue(/Test Item/i);
+    // The sheet has a unit picker for the stock and others for the weight and
+    // the alert threshold: this is the one beside the quantity.
+    const row = await waitFor(() => {
+      const box = document.querySelector('[data-field-key="quantity"]');
+      expect(box).not.toBeNull();
+      return box as HTMLElement;
+    });
+    return within(row).getByRole("button", { name: /^Unit/ });
+  }
+
+  it("is fixed, and the sheet says why beside it", async () => {
+    const picker = await openWith(5.6);
+
+    await waitFor(() => expect(picker).toBeDisabled());
+    expect(screen.getByText(HINT)).toBeInTheDocument();
+  });
+
+  it("can be chosen on an empty record", async () => {
+    const picker = await openWith(0);
+
+    await waitFor(() => expect(picker).toBeEnabled());
+    expect(screen.queryByText(HINT)).not.toBeInTheDocument();
+  });
+
+  it("stays fixed while the quantity is typed down to zero but not saved", async () => {
+    const picker = await openWith(5);
+
+    fireEvent.change(screen.getByLabelText("Quantity"), {
+      target: { value: "0" },
+    });
+
+    expect(picker).toBeDisabled();
+  });
+});

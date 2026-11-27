@@ -853,6 +853,10 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
             '{quantity} cannot be saved. Round the quantity to that '
             'precision.'
         ),
+        'item_price_above_ceiling': (
+            'Restated per {unit}, the price comes to {price}, and the most a '
+            'record can keep is {ceiling}.'
+        ),
         'item_unit_cannot_be_removed': (
             'The unit {unit} cannot be removed: a quantity without a unit says '
             'nothing. Choose another unit instead.'
@@ -1965,6 +1969,10 @@ ERRORS_EN_PL: dict[str, ErrorMessages] = {
             'Jednostka {unit} przyjmuje liczby z dokładnością do {places} '
             'miejsc po przecinku, więc {quantity} nie da się zapisać. '
             'Zaokrąglij ilość do tej dokładności.'
+        ),
+        'item_price_above_ceiling': (
+            'Po przeliczeniu na {unit} cena wynosi {price}, a pozycja mieści '
+            'najwyżej {ceiling}.'
         ),
         'item_unit_cannot_be_removed': (
             'Jednostki {unit} nie da się usunąć: ilość bez jednostki nic nie '

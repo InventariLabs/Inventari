@@ -15,6 +15,7 @@ from app.core.interceptors import interceptor_pipeline
 from app.core.logging import get_logger
 from app.core.money import quantise
 from app.core.posting_batch import current_batch
+from app.i18n.service import get_unit_label, stated_quantity
 from app.models.audit_log import AuditAction, AuditTargetType
 from app.models.category import Category
 from app.models.item import Item
@@ -315,9 +316,9 @@ async def _refuse_unit_swap_under_stock(
     incoming = await get_uom_async(db, new_uom_id)
     raise ServiceRejectionError(
         'item_unit_change_blocked_by_stock',
-        current_unit=current.symbol if current else '—',
-        new_unit=incoming.symbol if incoming else str(new_uom_id),
-        quantity=item.quantity,
+        current_unit=get_unit_label(current.symbol) if current else '—',
+        new_unit=get_unit_label(incoming.symbol) if incoming else str(new_uom_id),
+        quantity=stated_quantity(item.quantity),
     )
 
 

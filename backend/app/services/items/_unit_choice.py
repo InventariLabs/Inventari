@@ -32,10 +32,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ServiceRejectionError
 from app.core.money import quantise
+from app.i18n.service import get_unit_label, stated_quantity
 from app.models.item import Item
 from app.models.item_history import ItemAction
 from app.models.product_template import ProductTemplate
 from app.models.uom import Uom, UomCategory
+from app.schemas.validators import PRICE_MAX
 from app.services.uom_service import STOCK_PLACES, convert_quantity, get_uom_async
 
 from .history import log_history_async
@@ -249,9 +251,17 @@ async def keep_in_card_unit_async(
             Decimal(str(data['quantity'])) * ratio, STOCK_PLACES
         )
     if data.get('purchase_price') is not None:
-        data['purchase_price'] = quantise(
-            Decimal(str(data['purchase_price'])) / ratio, PRICE_PLACES
-        )
+        price = quantise(Decimal(str(data['purchase_price'])) / ratio, PRICE_PLACES)
+        # A price per gram restated per kilogram can outgrow the column the
+        # request's own bound was checked against.
+        if abs(price) > PRICE_MAX:
+            raise ServiceRejectionError(
+                'item_price_above_ceiling',
+                price=stated_quantity(price),
+                unit=get_unit_label(card_uom.symbol if card_uom else '—'),
+                ceiling=stated_quantity(PRICE_MAX),
+            )
+        data['purchase_price'] = price
     data['uom_id'] = card.uom_id
 
 

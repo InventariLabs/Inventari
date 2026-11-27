@@ -689,6 +689,7 @@ ERRORS_PT: ErrorMessages = {
     'bom_line_cycle': 'Esta linha fecharia um ciclo: o produto se tornaria um ingrediente da própria lista de materiais.',
     'uom_quantity_requires_whole_number': 'A unidade {unit} aceita apenas números inteiros, então {quantity} não pode ser salvo. Arredonde a quantidade para um número inteiro.',
     'uom_quantity_too_many_decimal_places': 'A unidade {unit} aceita no máximo {places} casa(s) decimal(is), então {quantity} não pode ser salvo. Arredonde a quantidade para essa precisão.',
+    'item_price_above_ceiling': 'Convertido por {unit}, o preço fica em {price}, e um registro guarda no máximo {ceiling}.',
     'item_unit_cannot_be_removed': 'A unidade {unit} não pode ser removida: uma quantidade sem unidade não diz nada. Escolha outra unidade.',
     'removal_strategy_of_shared_product': 'Este produto vem do catálogo compartilhado, então a ordem de saída do estoque dele é a do catálogo e não pode ser alterada para uma única organização.',
     'unit_weight_of_shared_product': 'Este produto vem do catálogo compartilhado, então o peso de uma peça é o do catálogo e não pode ser alterado para uma única organização.',

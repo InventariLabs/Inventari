@@ -448,6 +448,8 @@ export default function ItemEditModal({
                 imagePreview={imagePreview}
                 setImagePreview={setImagePreview}
                 readOnly={!canWrite}
+                // The stored quantity, which is what the server judges.
+                unitLocked={Number(item.quantity) > 0}
               />
 
               <StockThresholdSection

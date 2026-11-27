@@ -257,6 +257,7 @@
   "form": {
     "selectUnit": "Select unit…",
     "unitLabel": "Unit",
+    "unitLockedByStock": "Fixed while there is stock: another unit would only relabel the quantity.",
     "unitEmpty": "Choose",
     "templateUnitHint": "{{product}} is counted in {{unit}} — this record takes that unit unless you choose another.",
     "existingProducts": "Already in your products:"

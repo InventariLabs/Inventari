@@ -28,6 +28,7 @@ from app.core.import_sheet import (
 )
 from app.core.interceptors import InterceptorError
 from app.core.logging import get_logger
+from app.core.module_sdk import PRICE_MAX
 
 from ._import_dedup_service import find_item_by_serial_async
 from ._serial import serial_of, without_serial
@@ -239,11 +240,14 @@ def _sheet_price(row: Any, column: str | None, sheet: SheetColumns) -> Decimal |
     if not text:
         return None
     try:
-        return sheet.number(text, column)
+        price = sheet.number(text, column)
     except ValueError as exc:
         raise ServiceRejectionError(
             'import_price_invalid', column=column, value=text
         ) from exc
+    if not 0 <= price <= PRICE_MAX:
+        raise ServiceRejectionError('import_price_invalid', column=column, value=text)
+    return price
 
 
 def _suggested_mapping(headers: list[str]) -> dict[str, str]:
