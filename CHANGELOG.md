@@ -21,10 +21,12 @@ says what the release does rather than what changed since them.
   the stock of BoxHero's `Qty(<location>)` columns at each location, reads a
   location written with slashes as nested locations (or as one name, by the
   reader's choice), takes the last step of a category path, and knows units
-  such as `Units`, `ea` and `each` and their names in all six languages. The
-  partner import reads a country by its name and files a contact person's row
-  with the company it belongs to. The export's Read me sheet now says SKU,
-  stock alert and description are read back.
+  such as `Units`, `ea` and `each` and their names in all six languages. A
+  row whose file names no location goes to the oldest real location, never to
+  one of the virtual places. The partner import reads a country by its name
+  and files a contact person's row with the company it belongs to. The
+  export's Read me sheet now says SKU, stock alert and description are read
+  back.
 - Inventari installs with one command, on a server with a domain or on a
   Linux computer at home:
   `curl -fsSL https://github.com/InventariLabs/Inventari/releases/latest/download/install.sh | sh -s -- vps`

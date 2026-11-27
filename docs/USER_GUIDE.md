@@ -361,6 +361,9 @@ alert** and a **Sublocation**.
   stock, are not read. Choose **One of each** to add one of every row's product
   instead. A file with a quantity column per location, headed `Qty(Shop)`, puts
   each filled cell into stock at that location.
+- A row whose file names no location goes to the oldest real location the
+  organization has; the virtual places where used-up stock goes are never
+  chosen.
 - A location may be written as a path, `Pantry › Shelf A`, `Pantry > Shelf A`
   or `WH/Stock/Shelf 1`, or split over a location and a sublocation column;
   missing levels are created one inside the other. Set **A slash in a
