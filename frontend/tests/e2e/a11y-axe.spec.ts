@@ -282,8 +282,9 @@ test.describe("Accessibility — axe scan of the first screens", () => {
       await page.goto("/warehouse/register");
       await settle(page);
       // The register opens as groups; the rows the scan measures are inside
-      // the one holding the receipt.
-      await page.getByRole("button", { name: /^Receipt \d/ }).click();
+      // the one holding the receipt. It is found by the type code: the name on
+      // the button is the document profile's to choose ("Receipt", "PZ").
+      await page.getByTestId("register-group-IN").click();
       await expect(
         page.getByRole("link", { name: new RegExp(number) }),
       ).toBeVisible({ timeout: 15000 });
