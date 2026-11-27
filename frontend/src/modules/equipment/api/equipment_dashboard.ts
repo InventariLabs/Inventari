@@ -37,6 +37,8 @@ export const equipmentDashboardApi = {
     mapping: Record<string, string>,
     defaultLocationId?: string,
     defaultCategoryId?: string,
+    createLocations: boolean = true,
+    createCategories: boolean = true,
   ): Promise<ImportExecuteResult> => {
     assertFileSize(file);
     const formData = new FormData();
@@ -46,6 +48,8 @@ export const equipmentDashboardApi = {
       formData.append("default_location_id", defaultLocationId);
     if (defaultCategoryId)
       formData.append("default_category_id", defaultCategoryId);
+    formData.append("create_missing_locations", String(createLocations));
+    formData.append("create_missing_categories", String(createCategories));
     const response = await api.post<ImportExecuteResult>(
       "/equipment/import/execute",
       formData,

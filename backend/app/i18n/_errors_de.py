@@ -404,6 +404,7 @@ ERRORS_DE: ErrorMessages = {
     'import_location_not_found': 'Kein Ort heißt „{value}“',
     'import_price_invalid': 'Spalte „{column}“: „{value}“ ist kein Preis',
     'import_date_invalid': 'Spalte „{column}“: „{value}“ ist kein Datum',
+    'import_warranty_months_without_purchase_date': 'Spalte „{column}“: „{value}“ zählt Monate, und die Zeile hat kein Kaufdatum. Ordnen Sie das Kaufdatum oder eine Spalte mit dem Garantieende zu',
     'import_job_failed': 'Der Import wurde wegen eines unerwarteten Fehlers abgebrochen.',
     'import_job_interrupted': 'Der Import wurde unterbrochen, bevor er fertig war.',
     'export_job_failed': 'Der Export wurde wegen eines unerwarteten Fehlers abgebrochen.',

@@ -20,6 +20,13 @@ def _csv_bytes(headers: str, *rows: str) -> bytes:
     return '\n'.join(lines).encode('utf-8')
 
 
+def _session() -> AsyncMock:
+    """A session whose savepoint opens and closes without a database."""
+    db = AsyncMock()
+    db.begin_nested = MagicMock()
+    return db
+
+
 @pytest.mark.unit
 class TestAnalyzeEquipmentImport:
     async def test_returns_headers_and_preview(self) -> None:
@@ -40,7 +47,7 @@ class TestExecuteEquipmentImport:
 
         df = pd.DataFrame({'name': [None], 'serial': ['SN-001']})
         mock_read.return_value = df
-        db = AsyncMock()
+        db = _session()
         org_id = uuid4()
         user = UserContextDTO(id=uuid4(), organization_id=org_id)
         result = await execute_equipment_import(
@@ -65,7 +72,7 @@ class TestExecuteEquipmentImport:
         df = pd.DataFrame({'name': ['Laptop']})
         mock_read.return_value = df
         mock_resolve.return_value = None
-        db = AsyncMock()
+        db = _session()
         org_id = uuid4()
         user = UserContextDTO(id=uuid4(), organization_id=org_id)
         result = await execute_equipment_import(
@@ -100,7 +107,7 @@ class TestExecuteEquipmentImport:
         mock_loc.return_value = str(loc_id)
         mock_cat.return_value = None
         mock_core.items.create_async = AsyncMock(return_value=MagicMock(id=uuid4()))
-        db = AsyncMock()
+        db = _session()
         # the serial dedup lookup must report "no existing item".
         lookup_result = MagicMock()
         lookup_result.scalars.return_value.first.return_value = None
@@ -138,7 +145,7 @@ class TestExecuteEquipmentImport:
         mock_loc.return_value = str(loc_id)
         mock_cat.return_value = None
         mock_core.items.create_async = AsyncMock(return_value=MagicMock(id=uuid4()))
-        db = AsyncMock()
+        db = _session()
         org_id = uuid4()
         user = UserContextDTO(id=uuid4(), organization_id=org_id)
         result = await execute_equipment_import(
@@ -167,7 +174,7 @@ class TestExecuteEquipmentImport:
         mock_loc.return_value = str(loc_id)
         mock_cat.return_value = None
         mock_core.items.create_async = AsyncMock(side_effect=SQLAlchemyError('db fail'))
-        db = AsyncMock()
+        db = _session()
         org_id = uuid4()
         user = UserContextDTO(id=uuid4(), organization_id=org_id)
         result = await execute_equipment_import(
@@ -196,7 +203,7 @@ class TestExecuteEquipmentImport:
         mock_loc.return_value = str(loc_id)
         mock_cat.return_value = str(cat_id)
         mock_core.items.create_async = AsyncMock(return_value=MagicMock(id=uuid4()))
-        db = AsyncMock()
+        db = _session()
         org_id = uuid4()
         user = UserContextDTO(id=uuid4(), organization_id=org_id)
         result = await execute_equipment_import(

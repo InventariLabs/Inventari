@@ -4,6 +4,7 @@ import { SheetActions } from "@/components/ui/Sheet";
 import { useTranslation } from "react-i18next";
 import { Loader2, Upload, Check, AlertCircle, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { Select } from "@/components/ui/Select";
 import { ImportPreviewTable } from "@/components/import/ImportPreviewTable";
 import {
@@ -21,6 +22,7 @@ import {
 import { useEquipmentImportExecute } from "@/modules/equipment/hooks/useEquipment";
 import { ImportResultSummary } from "@/modules/equipment/components/ImportResultSummary";
 import { downloadBlob } from "@/utils/helpers";
+import { useCanWrite } from "@/hooks/useCanWrite";
 import { extractApiError, isServerRefusal } from "@/lib/errors";
 import { InlineQueryError } from "@/components/ui/QueryResult";
 import { LocationCombobox } from "@/module-sdk";
@@ -134,7 +136,7 @@ function DefaultTargetSelect({
 export default function ImportEquipmentModal({
   onClose,
 }: ImportEquipmentModalProps) {
-  const { t } = useTranslation(["equipment", "common"]);
+  const { t } = useTranslation(["equipment", "common", "items"]);
   const executeImport = useEquipmentImportExecute();
   const categories = useAllCategories();
 
@@ -152,6 +154,12 @@ export default function ImportEquipmentModal({
   >("create_only");
   const [defaultLocationId, setDefaultLocationId] = useState("");
   const [defaultCategoryId, setDefaultCategoryId] = useState("");
+  // Each switch is offered only to an account holding the key it spends; a
+  // hidden one posts false, and the server's own check stays the authority.
+  const canWriteCategories = useCanWrite("categories");
+  const canWriteStorages = useCanWrite("locations");
+  const [createCategories, setCreateCategories] = useState(true);
+  const [createLocations, setCreateLocations] = useState(true);
   const [importResult, setImportResult] = useState<ImportExecuteResult | null>(
     null,
   );
@@ -199,6 +207,8 @@ export default function ImportEquipmentModal({
         mapping: { ...mapping, duplicate_mode: duplicateMode },
         defaultLocationId: defaultLocationId || undefined,
         defaultCategoryId: defaultCategoryId || undefined,
+        createLocations: canWriteStorages && createLocations,
+        createCategories: canWriteCategories && createCategories,
       },
       {
         onSuccess: (result) => {
@@ -439,6 +449,23 @@ export default function ImportEquipmentModal({
                     },
                   ]}
                 />
+              </div>
+
+              <div className="space-y-3">
+                {canWriteStorages && (
+                  <Checkbox
+                    checked={createLocations}
+                    onChange={(e) => setCreateLocations(e.target.checked)}
+                    label={t("items:import.autoCreateLocations")}
+                  />
+                )}
+                {canWriteCategories && (
+                  <Checkbox
+                    checked={createCategories}
+                    onChange={(e) => setCreateCategories(e.target.checked)}
+                    label={t("items:import.autoCreateCategories")}
+                  />
+                )}
               </div>
 
               <SheetActions>

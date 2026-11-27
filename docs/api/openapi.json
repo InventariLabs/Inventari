@@ -46969,6 +46969,16 @@
               }
             ],
             "title": "Default Category Id"
+          },
+          "create_missing_locations": {
+            "type": "boolean",
+            "title": "Create Missing Locations",
+            "default": true
+          },
+          "create_missing_categories": {
+            "type": "boolean",
+            "title": "Create Missing Categories",
+            "default": true
           }
         },
         "type": "object",
@@ -57247,6 +57257,22 @@
             },
             "type": "array",
             "title": "Skipped Serials",
+            "default": []
+          },
+          "created_locations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Created Locations",
+            "default": []
+          },
+          "created_categories": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Created Categories",
             "default": []
           }
         },

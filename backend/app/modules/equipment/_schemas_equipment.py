@@ -115,6 +115,10 @@ class ImportExecuteResult(BaseModel):
     # as with ``errors``): a bare count leaves the reader to find which rows
     # of a long sheet it is.
     skipped_serials: list[str] = []
+    # What the import founded on the way: the places, as paths, and the
+    # categories, by name.
+    created_locations: list[str] = []
+    created_categories: list[str] = []
 
 
 class AttachmentSchema(BaseModel):

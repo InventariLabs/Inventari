@@ -33,6 +33,7 @@ from app.core.exceptions import (
     refusal_exception,
 )
 from app.core.file_import import analyze_import_file as analyze_sheet
+from app.core.file_import import refuse_founding_without_permission
 from app.core.grocy_file import GrocyFile, read_grocy_file
 from app.core.import_sheet import read_rows
 from app.core.upload_validation import read_capped_upload, read_import_file
@@ -119,40 +120,12 @@ async def import_items(
     except json.JSONDecodeError as e:
         raise catalogue_refusal('invalid_mapping_json') from e
 
-    # Founding a category or a whole location path is the work the front
-    # doors (POST /categories, POST /locations) gate by permission — the
-    # bulk door asks for items:write only, and both flags default to on,
-    # so without this check the import granted a permission the caller
-    # does not hold. Refused, not silently downgraded: the sheet asked
-    # for creation, and quietly importing without it would be a
-    # half-true answer. The sheet asks only through a column the mapping
-    # names — with no category or location column nothing can be founded,
-    # whatever the toggles say, and the refusal would be about a switch,
-    # not about the sheet. Every missing key is named, so an account short
-    # on both reads one refusal that says the whole price.
-    named = mapping if isinstance(mapping, dict) else {}
-    missing: list[str] = []
-    if (
-        create_missing_categories
-        and named.get('category')
-        and not current_user.has_permission(SystemPermission.CATEGORIES_WRITE)
-    ):
-        missing.append('categories:write')
-    if (
-        create_missing_locations
-        and named.get('location')
-        and not current_user.has_permission(SystemPermission.STORAGES_WRITE)
-    ):
-        missing.append('locations:write')
-    if missing:
-        raise ForbiddenException(
-            message=get_plural_error_message(
-                'import_create_forbidden',
-                len(missing),
-                get_current_lang(),
-                permissions=', '.join(missing),
-            )
-        )
+    refuse_founding_without_permission(
+        current_user,
+        mapping,
+        create_missing_locations=create_missing_locations,
+        create_missing_categories=create_missing_categories,
+    )
 
     content = await read_import_file(file)
     filename = file.filename or ''

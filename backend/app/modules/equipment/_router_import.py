@@ -28,6 +28,7 @@ from app.core.deps import (
     require_permission,
 )
 from app.core.exceptions import catalogue_refusal
+from app.core.file_import import refuse_founding_without_permission
 from app.core.upload_validation import read_import_file
 from app.i18n import Language
 from app.i18n.service import get_current_lang
@@ -68,6 +69,8 @@ async def execute_equipment_import_endpoint(
     mapping_json: str = Form(...),
     default_location_id: str | None = Form(None),
     default_category_id: str | None = Form(None),
+    create_missing_locations: bool = Form(True),
+    create_missing_categories: bool = Form(True),
     current_user: UserContextDTO = Depends(get_current_user_context),
     db: AsyncSession = Depends(get_async_db, scope='function'),
     _: object = require_permission(SystemPermission.ITEMS_WRITE),
@@ -80,6 +83,12 @@ async def execute_equipment_import_endpoint(
         mapping = json.loads(mapping_json)
     except JSONDecodeError as exc:
         raise catalogue_refusal('invalid_mapping_json') from exc
+    refuse_founding_without_permission(
+        current_user,
+        mapping,
+        create_missing_locations=create_missing_locations,
+        create_missing_categories=create_missing_categories,
+    )
 
     content = await read_import_file(file, lang)
     raw = await execute_equipment_import(
@@ -91,5 +100,7 @@ async def execute_equipment_import_endpoint(
         user=current_user,
         default_location_id=default_location_id,
         default_category_id=default_category_id,
+        create_missing_locations=create_missing_locations,
+        create_missing_categories=create_missing_categories,
     )
     return ImportExecuteResult.model_validate(raw)

@@ -61,7 +61,7 @@ async def _import(sheet: str, language: Language = 'pl') -> dict[str, Any]:
     set_current_lang(language)
     org_id = uuid4()
     return await execute_equipment_import(
-        AsyncMock(),
+        AsyncMock(begin_nested=MagicMock()),
         sheet.encode('cp1250'),
         'sprzet.csv',
         MAPPING,
