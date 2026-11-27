@@ -72,6 +72,8 @@ backend/coverage.json
 
 # Alembic
 *.db
+# The Grocy file a browser spec uploads is a fixture, not a local database.
+!frontend/tests/e2e/fixtures/grocy.db
 *.sqlite
 *.sqlite3
 

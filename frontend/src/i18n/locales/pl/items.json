@@ -240,6 +240,9 @@
       "stays": "Zostaje w Grocy",
       "leftBehind": {
         "inactive_products": "Produkty wyłączone w Grocy",
+        "inactive_locations": "Miejsca wyłączone w Grocy",
+        "inactive_product_groups": "Grupy produktów wyłączone w Grocy",
+        "inactive_stores": "Sklepy wyłączone w Grocy",
         "extra_barcodes": "Dodatkowe kody kreskowe (produkt ma tu jeden)",
         "unit_conversions": "Przeliczniki jednostek, np. opakowanie = 6 sztuk",
         "units_as_pieces": "Jednostki liczone w sztukach",
@@ -249,6 +252,7 @@
         "parent_products": "Produkty podpięte pod produkt nadrzędny (każdy przechodzi osobno)",
         "own_field_values": "Wartości własnych pól",
         "shopping_list_entries": "Pozycje list zakupów (moduł Listy zakupów jest wyłączony)",
+        "shopping_list_entries_failed": "Pozycje list zakupów (nie udało się ich przenieść; uruchom ten sam plik ponownie, aby spróbować jeszcze raz)",
         "recipes": "Przepisy",
         "meal_plan": "Pozycje planu posiłków",
         "chores": "Obowiązki domowe",

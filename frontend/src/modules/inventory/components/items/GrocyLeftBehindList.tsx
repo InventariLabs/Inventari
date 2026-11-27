@@ -6,6 +6,10 @@ type LeftBehind = components["schemas"]["ImportLeftBehind"];
 /** Each kind's words, named in full so the unused-key gate sees them read. */
 const LABELS: Record<LeftBehind["what"], string> = {
   inactive_products: "items:import.grocyMove.leftBehind.inactive_products",
+  inactive_locations: "items:import.grocyMove.leftBehind.inactive_locations",
+  inactive_product_groups:
+    "items:import.grocyMove.leftBehind.inactive_product_groups",
+  inactive_stores: "items:import.grocyMove.leftBehind.inactive_stores",
   extra_barcodes: "items:import.grocyMove.leftBehind.extra_barcodes",
   unit_conversions: "items:import.grocyMove.leftBehind.unit_conversions",
   units_as_pieces: "items:import.grocyMove.leftBehind.units_as_pieces",
@@ -45,7 +49,13 @@ export function GrocyLeftBehindList({ entries }: Props) {
         {entries.map((entry) => (
           <li key={entry.what} className="flex justify-between gap-4">
             <span>
-              {t(LABELS[entry.what])}
+              {/* A part that failed has words of its own: the usual ones
+                  give another reason for the entries staying behind. */}
+              {entry.failed && entry.what === "shopping_list_entries"
+                ? t(
+                    "items:import.grocyMove.leftBehind.shopping_list_entries_failed",
+                  )
+                : t(LABELS[entry.what])}
               {entry.names.length > 0 && `: ${entry.names.join(", ")}`}
             </span>
             <span className="tabular-nums text-on-secondary">
