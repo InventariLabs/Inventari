@@ -259,9 +259,8 @@ export default function ItemEditModal({
             );
           },
           onError: (error: unknown) => {
-            setErrors({
-              submit: extractApiError(error, t("messages.updateFailed")),
-            });
+            const fallback = t("messages.updateFailed");
+            setErrors({ submit: extractApiError(error, fallback, fieldNames) });
           },
         },
       ),
@@ -274,6 +273,7 @@ export default function ItemEditModal({
     errors,
     setErrors,
     fieldDefinitions,
+    fieldNames,
     handleInputChange,
     submit,
     selectedStorageType,
