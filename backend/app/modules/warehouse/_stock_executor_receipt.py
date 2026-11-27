@@ -16,7 +16,10 @@ from app.core.contracts import (
     UserContextDTO,
 )
 from app.core.exceptions import ServiceRejectionError
+from app.core.module_sdk import PRICE_MAX
+from app.core.money import quantise, quantise_or_none
 from app.core.public_api import core_api
+from app.i18n.service import get_unit_label, stated_quantity
 
 from ._receipt_planning import ReceiptLocationPlanner
 from ._stock_executor_helpers import (
@@ -144,6 +147,7 @@ async def _open_received_row(
     location_id: UUID,
     quantity: Decimal,
     history: dict[str, Any],
+    unit_price: Decimal | None,
     named: Any = None,
     lot_id: UUID | None = None,
 ) -> ItemDTO:
@@ -181,7 +185,7 @@ async def _open_received_row(
     organization = await core_api.organizations.get_async(db, doc.organization_id)
     price_currency = line.currency or doc.currency
     stated_price = (
-        line.unit_price
+        quantise_or_none(unit_price)
         if organization is None or price_currency in (None, organization.currency)
         else None
     )
@@ -394,6 +398,7 @@ async def _land_the_delivery_async(
     receive_location: UUID,
     quantity: Decimal,
     history: dict[str, Any],
+    unit_price: Decimal | None,
 ) -> tuple[Any, UUID | None]:
     """Book one quantity onto one shelf: the record and the movement.
 
@@ -431,6 +436,7 @@ async def _land_the_delivery_async(
             location_id=receive_location,
             quantity=quantity,
             history=history,
+            unit_price=unit_price,
             named=named,
             lot_id=lot_id,
         )
@@ -457,6 +463,52 @@ async def _land_the_delivery_async(
         records=record_posts,
     )
     return row, lot_id
+
+
+def _price_per_stock_unit(
+    line: DocumentLine, stock_quantity: Decimal
+) -> Decimal | None:
+    """The line's price restated per unit of the product's stock.
+
+    The price on the line is per line unit, so this is the line's total value
+    spread over the converted quantity: 500 g at 0.02 is 10.00 for half a
+    kilogram, which is 20.00 a kilogram.
+    """
+    line_quantity = _executed_quantity(line)
+    if line.unit_price is None or stock_quantity in (Decimal('0'), line_quantity):
+        return line.unit_price
+    return (line_quantity * line.unit_price) / stock_quantity
+
+
+async def _refuse_a_cost_the_books_cannot_keep(
+    db: AsyncSession,
+    organization_id: UUID,
+    product_template_id: UUID,
+    unit_cost: Decimal,
+) -> None:
+    """Refuse by name a cost per stock unit that is past the price ceiling.
+
+    A line price within its own bound can outgrow it once restated into a
+    larger unit, and so can a delivery cost spread over a very small quantity.
+    Both the record's price and the cost layer are kept per stock unit.
+    """
+    cost = quantise(unit_cost)
+    if cost <= PRICE_MAX:
+        return
+    template = await core_api.product_templates.get_async(
+        db, organization_id, product_template_id
+    )
+    uom = (
+        await core_api.uoms.get_async(db, template.uom_id, organization_id)
+        if template is not None and template.uom_id is not None
+        else None
+    )
+    raise ServiceRejectionError(
+        'item_price_above_ceiling',
+        price=stated_quantity(cost),
+        unit=get_unit_label(uom.symbol if uom else '—'),
+        ceiling=stated_quantity(PRICE_MAX),
+    )
 
 
 async def _receive_item(
@@ -540,6 +592,21 @@ async def _receive_item(
         db, doc.organization_id, stock_template_id, executed_quantity, line.uom_id
     )
 
+    # The price and the line's share of the freight, duty and insurance, both
+    # per stock unit, and refused here, before anything of the line is written.
+    unit_price = _price_per_stock_unit(line, executed_quantity)
+    extra_unit_cost = (
+        surcharge / executed_quantity
+        if surcharge and executed_quantity > 0
+        else Decimal('0')
+    )
+    await _refuse_a_cost_the_books_cannot_keep(
+        db,
+        doc.organization_id,
+        stock_template_id,
+        (unit_price or Decimal('0')) + extra_unit_cost,
+    )
+
     # One decision for preview and execution alike: the planner holds the
     # rules loaded once for the whole document and answers with where the
     # goods land and who decided it.
@@ -585,6 +652,7 @@ async def _receive_item(
                 receive_location=receive_location,
                 quantity=executed_quantity - held_quantity,
                 history=history,
+                unit_price=unit_price,
             )
         held_history = _base_history(doc)
         held_history['held_back'] = 'true'
@@ -598,6 +666,7 @@ async def _receive_item(
             receive_location=quarantine_location,
             quantity=held_quantity,
             history=held_history,
+            unit_price=unit_price,
         )
         await _reserve_the_held_goods_async(
             db,
@@ -626,13 +695,20 @@ async def _receive_item(
             receive_location=receive_location,
             quantity=executed_quantity,
             history=history,
+            unit_price=unit_price,
         )
         if held_line_quantity > Decimal('0') and lot_id is not None:
             await _hold_the_batch_back_async(db, doc, line, lot_id, user_id)
     # The layer covers everything the line brought in, held back or not: the
     # goods exist and carry the supplier's cost, wherever they are waiting.
     await _record_receipt_valuation(
-        db, doc, line, stock_template_id, executed_quantity, surcharge
+        db,
+        doc,
+        line,
+        stock_template_id,
+        executed_quantity,
+        unit_price,
+        extra_unit_cost,
     )
 
 
@@ -642,14 +718,13 @@ async def _record_receipt_valuation(
     line: DocumentLine,
     product_template_id: UUID,
     stock_quantity: Decimal,
-    surcharge: Decimal = Decimal('0'),
+    unit_cost: Decimal | None,
+    extra_unit_cost: Decimal,
 ) -> None:
     """Post the receipt layer, in the unit the stock is kept in.
 
-    *stock_quantity* is the line quantity already converted. The price on the
-    line is per line unit, so the layer's unit cost is the line's total value
-    spread over the converted quantity — 500 g at 0.02 is 10.00 for half a
-    kilogram, not 0.02 per kilogram.
+    *stock_quantity* is the line quantity already converted, and *unit_cost*
+    and *extra_unit_cost* are per that unit.
     """
     # A line with no price still posts a layer, so the goods reach the shelf and
     # the cost history hears of them. Reconciliation compares records against
@@ -661,21 +736,14 @@ async def _record_receipt_valuation(
     # too — the line carries it, the document carries it, and the cost history
     # receives both. A receipt of 100 x 40.10 PLN into an organization keeping
     # USD keeps the currency of the line, so the layer knows it is złoty.
-    unit_cost = line.unit_price
-    if unit_cost is not None and stock_quantity > 0:
-        line_quantity = _executed_quantity(line)
-        if line_quantity != stock_quantity:
-            unit_cost = (line_quantity * unit_cost) / stock_quantity
-    # This line's share of the freight, duty and insurance the delivery
-    # arrived with. Without it the shelf is worth what the supplier invoiced
-    # and nothing else, and every margin taken off that number is short by
-    # the cost of getting the goods there. A line nobody priced still gets
-    # its share, but on top of the cost an unpriced line has - the
-    # organization's rate, or none - so the share never makes the layer look
-    # like a price the supplier stated.
-    extra_unit_cost = (
-        surcharge / stock_quantity if surcharge and stock_quantity > 0 else Decimal('0')
-    )
+    #
+    # *extra_unit_cost* is this line's share of the freight, duty and
+    # insurance the delivery arrived with. Without it the shelf is worth what
+    # the supplier invoiced and nothing else, and every margin taken off that
+    # number is short by the cost of getting the goods there. A line nobody
+    # priced still gets its share, but on top of the cost an unpriced line has
+    # - the organization's rate, or none - so the share never makes the layer
+    # look like a price the supplier stated.
     await core_api.valuation.record_receipt_async(
         db,
         doc.organization_id,
