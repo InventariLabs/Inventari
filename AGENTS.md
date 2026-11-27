@@ -143,7 +143,7 @@ The rule is about **what** runs, not when:
 
 - **While you write — the tests of what you are changing.** The test you are writing (TDD red,
   then green), and the test file that covers the code you just edited, when there is one. A file
-  or a `-k <expr>`: seconds. This is where most mistakes are stopped.
+  or a `-k <expr>`: seconds. Wider: `scripts/select-tests.py`.
 - **At commit — nothing extra.** The pre-commit hook lints the whole tree; that is the commit's gate.
 - **Before the push — the full suite, once.** It exists for the regressions that live between
   modules, which no scoped run can see.
